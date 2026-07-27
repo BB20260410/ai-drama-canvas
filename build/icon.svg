@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#24251f"/>
+      <stop offset="1" stop-color="#10110f"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f2d67c"/>
+      <stop offset="1" stop-color="#bf8e31"/>
+    </linearGradient>
+  </defs>
+  <rect x="42" y="42" width="940" height="940" rx="218" fill="url(#bg)"/>
+  <rect x="92" y="92" width="840" height="840" rx="172" fill="none" stroke="#4b4532" stroke-width="4"/>
+  <path d="M177 312H847M177 512H847M177 712H847M312 177V847M512 177V847M712 177V847" stroke="#303228" stroke-width="5"/>
+  <path d="M290 378H734V646H290Z" fill="#171815" stroke="url(#gold)" stroke-width="18"/>
+  <path d="M290 438H734" stroke="#d7af55" stroke-width="10"/>
+  <circle cx="334" cy="408" r="10" fill="#d7af55"/>
+  <circle cx="372" cy="408" r="10" fill="#7d846d"/>
+  <path d="M360 574L430 498L496 558L561 476L664 574" fill="none" stroke="#5d6252" stroke-width="18" stroke-linecap="square" stroke-linejoin="miter"/>
+  <text x="512" y="610" text-anchor="middle" fill="url(#gold)" font-family="Arial,Helvetica,sans-serif" font-size="126" font-weight="700" letter-spacing="10">AI</text>
+  <circle cx="214" cy="312" r="18" fill="#d7af55"/>
+  <circle cx="810" cy="712" r="18" fill="#d7af55"/>
+  <path d="M214 312L290 378M734 646L810 712" stroke="#d7af55" stroke-width="8"/>
+</svg>

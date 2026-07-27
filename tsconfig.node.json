@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "types": ["node"],
+    "outDir": "dist-node"
+  },
+  "include": [
+    "electron.vite.config.ts",
+    "src/main/**/*.ts",
+    "src/preload/**/*.ts",
+    "src/core/**/*.ts",
+    "src/mcp/**/*.ts",
+    "scripts/**/*.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist-node",
+    "scripts/qa-dudu-storyboard.ts",
+    "scripts/_s1e2-batch2-review-attest.ts",
+    "scripts/_s1e2-commit-retry.ts",
+    "scripts/_s1e2-u11-diag.ts",
+    "scripts/s1e2-formal-freeze-chain.ts",
+    "scripts/s1e2-u01-oneshot-ordered.ts",
+    "scripts/s1e2-u02-bootstrap-and-ordered.ts",
+    "scripts/s1e2-u03-run.ts",
+    "scripts/s1e2-u04-run.ts",
+    "scripts/s1e2-u05-run.ts",
+    "scripts/s1e2-u13-run.ts",
+    "scripts/s1e2-u15-run.ts"
+  ]
+}

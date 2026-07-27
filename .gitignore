@@ -1,0 +1,73 @@
+# 依赖、构建与覆盖率
+/node_modules/
+/out/
+/dist-mcp/
+/dist/
+/release/
+/coverage/
+
+# 本机生产事实源与运行态：必须独立备份，禁止进入源码 Git
+/projects/
+/output/
+/productions/
+/formal-calibration/
+/.aicanvas-runtime/
+
+# 本机工具、临时研究与抓屏
+/.tmp-*/
+/.qoder/
+/.vscode/
+/$HOME/
+.DS_Store
+
+# 第三方技能由 skills-lock.json 还原，不复制其安装目录
+/.agents/skills/playwright-best-practices/
+/.agents/skills/typescript-advanced-types/
+/.agents/skills/vue/
+/.claude/skills/playwright-best-practices
+/.claude/skills/typescript-advanced-types
+/.claude/skills/vue
+
+# 研究镜像与可重建源码快照
+/docs/community-research/vendors/
+/docs/community-research/local-mirrors/
+/docs/evidence/runs/
+/docs/evidence/source-snapshots/
+/docs/evidence/**/*.png
+/docs/evidence/**/*.jpg
+/docs/evidence/**/*.jpeg
+/docs/evidence/**/*.gif
+/docs/evidence/**/*.webp
+/docs/evidence/**/*.mp4
+/docs/evidence/**/*.mov
+/docs/evidence/**/*.mkv
+/docs/evidence/**/*.wav
+/docs/evidence/**/*.m4a
+/docs/evidence/real-imagegen-canary-20260727-grok-current-source-cli-receipt.json
+
+# Planning 默认属于本机执行态；仅显式强制纳管当前恢复包
+/.planning/
+
+# 根目录散落的视觉工作文件不属于软件源码
+/*.png
+*.app/
+*.dmg
+
+# 候选摘要明确排除的外部内容生产脚本
+/scripts/qa-dudu-storyboard.ts
+
+# 日志、数据库与凭据
+*.log
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite-journal
+.env
+.env.*
+!.env.example
+.npmrc
+*.pem
+*.key
+*.p12
+*.pfx
+*.mobileprovision

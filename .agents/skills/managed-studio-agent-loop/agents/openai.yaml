@@ -1,0 +1,4 @@
+interface:
+  display_name: "受管 Studio Agent 标准环"
+  short_description: "自动连接当前活动画布并安全完成生图写回与审片全流程闭环"
+  default_prompt: "Use $managed-studio-agent-loop to continue the active AI drama canvas project safely."

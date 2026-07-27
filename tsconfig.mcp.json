@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rootDir": "src",
+    "outDir": "dist-mcp",
+    "sourceMap": true,
+    "declaration": false
+  },
+  "include": ["src/core/**/*.ts", "src/mcp/**/*.ts"]
+}
