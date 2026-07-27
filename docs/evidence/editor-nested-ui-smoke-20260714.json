@@ -1,0 +1,360 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T05:48:41.826Z",
+  "transport": "electron-current-production-build",
+  "fixture": {
+    "kind": "isolated-real-h264",
+    "root": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-nested-ui-i0bvZ8",
+    "registryPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-nested-ui-registry-25268-1784008115191.json",
+    "mode": "nested",
+    "parentEditProjectId": "edit-0bab3c03-8b5c-4db3-bde2-daeb90279d89",
+    "parentRevision": 1,
+    "parentVisualTrackId": "track-bbcb45a6-7c75-474c-ae0f-e25e8baeb68a",
+    "childEditProjectId": "edit-fe832093-c6e1-4911-8999-cc287c7bf981",
+    "childRevision": 1,
+    "childClipId": "clip-d6c4b896-f6d5-491f-a018-a6545af1a8b1",
+    "childClips": 2,
+    "parentTimebase": {
+      "rateNumerator": 30000,
+      "rateDenominator": 1001
+    },
+    "childTimebase": {
+      "rateNumerator": 24000,
+      "rateDenominator": 1001
+    }
+  },
+  "selector": {
+    "options": [
+      {
+        "value": "",
+        "text": "子时间线"
+      },
+      {
+        "value": "edit-fe832093-c6e1-4911-8999-cc287c7bf981",
+        "text": "EP01 嵌套子时间线 · v1"
+      }
+    ],
+    "selfExcluded": true,
+    "childPresent": true
+  },
+  "revisions": {
+    "parentFixture": 1,
+    "attached": 2,
+    "undone": 3,
+    "redone": 4,
+    "trimmed": 6,
+    "dirtyRejected": 6,
+    "refreshed": 7,
+    "childFixture": 1,
+    "childUpdated": 2
+  },
+  "attached": {
+    "clipId": "clip-ad47104c-95f2-47c4-95e9-d96c6098fc12",
+    "durationFrames": 120,
+    "reference": {
+      "contract": "aicanvas.nested-timeline.v1",
+      "ownerProjectId": "project-160b6a7d617a",
+      "childEditProjectId": "edit-fe832093-c6e1-4911-8999-cc287c7bf981",
+      "childEditProjectRevision": 1,
+      "childSnapshotSha256": "7dbda8fa48a5e348b9f6709bc0a719fa55e12024d9efbca48228d86ec6628457",
+      "childTimebase": {
+        "rateNumerator": 24000,
+        "rateDenominator": 1001
+      },
+      "childCanvas": {
+        "width": 540,
+        "height": 960
+      },
+      "childDurationFrames": 96,
+      "sourceRange": {
+        "startFrame": 0,
+        "durationFrames": 96
+      },
+      "sourceOffset": {
+        "numerator": 0,
+        "denominator": 1
+      },
+      "sourceStep": {
+        "numerator": 4,
+        "denominator": 5
+      },
+      "mappedDurationFrames": 120
+    }
+  },
+  "preview": {
+    "initial": {
+      "readyState": 4,
+      "videoWidth": 540,
+      "videoHeight": 960,
+      "duration": 4.004,
+      "error": null,
+      "currentSrc": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-editor-nested-ui-i0bvZ8%2F.aicanvas%2Feditor%2Fnested-cache%2Fpreview-a4badd7df49f6e408e1dd13c43c03975f877bf56e8cb9366770405f97731c366.mp4"
+    },
+    "afterRedo": {
+      "readyState": 4,
+      "videoWidth": 540,
+      "videoHeight": 960,
+      "duration": 4.004,
+      "error": null,
+      "currentSrc": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-editor-nested-ui-i0bvZ8%2F.aicanvas%2Feditor%2Fnested-cache%2Fpreview-a4badd7df49f6e408e1dd13c43c03975f877bf56e8cb9366770405f97731c366.mp4"
+    },
+    "afterRefresh": {
+      "readyState": 4,
+      "videoWidth": 540,
+      "videoHeight": 960,
+      "duration": 4.004,
+      "error": null,
+      "currentSrc": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-editor-nested-ui-i0bvZ8%2F.aicanvas%2Feditor%2Fnested-cache%2Fpreview-303bf3d8c6134e0974cf38d74ec4fbc01a0df4c5a5b6e37a4e6f32e983eb4e93.mp4"
+    },
+    "afterApplicationRestart": {
+      "readyState": 1,
+      "videoWidth": 540,
+      "videoHeight": 960,
+      "duration": 4.004,
+      "error": null,
+      "currentSrc": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-editor-nested-ui-i0bvZ8%2F.aicanvas%2Feditor%2Fnested-cache%2Fpreview-303bf3d8c6134e0974cf38d74ec4fbc01a0df4c5a5b6e37a4e6f32e983eb4e93.mp4"
+    },
+    "prepared": {
+      "schemaVersion": 1,
+      "clipId": "clip-ad47104c-95f2-47c4-95e9-d96c6098fc12",
+      "path": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-nested-ui-i0bvZ8/.aicanvas/editor/nested-cache/preview-303bf3d8c6134e0974cf38d74ec4fbc01a0df4c5a5b6e37a4e6f32e983eb4e93.mp4",
+      "width": 540,
+      "height": 960,
+      "durationFrames": 114,
+      "trimStartFrame": 0,
+      "trimStartSeconds": 0,
+      "timebase": {
+        "rateNumerator": 30000,
+        "rateDenominator": 1001
+      },
+      "childEditProjectId": "edit-fe832093-c6e1-4911-8999-cc287c7bf981",
+      "childEditProjectRevision": 2,
+      "childSnapshotSha256": "65badb173a431fb569810886783e5e17db0cca99f71bee1c01e569e5aeee83a9",
+      "dependencyManifestSha256": "912f7eed27d2911746ba1749410889b5d47bceeea0b6db5810232ef798deb51c",
+      "renderPlanSha256": "5375264e505831af87d6d25e0f8c4109366e5e469facb256554ea91e2f6775d9"
+    },
+    "file": {
+      "path": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-nested-ui-i0bvZ8/.aicanvas/editor/nested-cache/preview-303bf3d8c6134e0974cf38d74ec4fbc01a0df4c5a5b6e37a4e6f32e983eb4e93.mp4",
+      "bytes": 394803,
+      "sha256": "5b645f582545a743013302cc9f6586d19c77f02cd2d8987b1cdbba20a65260d2"
+    },
+    "probe": {
+      "streams": [
+        {
+          "index": 0,
+          "codec_name": "h264",
+          "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+          "profile": "High",
+          "codec_type": "video",
+          "codec_tag_string": "avc1",
+          "codec_tag": "0x31637661",
+          "mime_codec_string": "avc1.64001f",
+          "width": 540,
+          "height": 960,
+          "coded_width": 540,
+          "coded_height": 960,
+          "has_b_frames": 2,
+          "sample_aspect_ratio": "1:1",
+          "display_aspect_ratio": "9:16",
+          "pix_fmt": "yuv420p",
+          "level": 31,
+          "chroma_location": "left",
+          "field_order": "progressive",
+          "is_avc": "true",
+          "nal_length_size": "4",
+          "id": "0x1",
+          "r_frame_rate": "30000/1001",
+          "avg_frame_rate": "30000/1001",
+          "time_base": "1/30000",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 120120,
+          "duration": "4.004000",
+          "bit_rate": "775124",
+          "bits_per_raw_sample": "8",
+          "nb_frames": "120",
+          "extradata_size": 44,
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "language": "und",
+            "handler_name": "VideoHandler",
+            "encoder": "Lavc62.28.101 libx264"
+          }
+        },
+        {
+          "index": 1,
+          "codec_name": "aac",
+          "codec_long_name": "AAC (Advanced Audio Coding)",
+          "profile": "LC",
+          "codec_type": "audio",
+          "codec_tag_string": "mp4a",
+          "codec_tag": "0x6134706d",
+          "mime_codec_string": "mp4a.40.2",
+          "sample_fmt": "fltp",
+          "sample_rate": "48000",
+          "channels": 2,
+          "channel_layout": "stereo",
+          "bits_per_sample": 0,
+          "initial_padding": 0,
+          "id": "0x2",
+          "r_frame_rate": "0/0",
+          "avg_frame_rate": "0/0",
+          "time_base": "1/48000",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 192192,
+          "duration": "4.004000",
+          "bit_rate": "2287",
+          "nb_frames": "189",
+          "extradata_size": 5,
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "language": "und",
+            "handler_name": "SoundHandler"
+          }
+        }
+      ],
+      "format": {
+        "filename": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-nested-ui-i0bvZ8/.aicanvas/editor/nested-cache/preview-303bf3d8c6134e0974cf38d74ec4fbc01a0df4c5a5b6e37a4e6f32e983eb4e93.mp4",
+        "nb_streams": 2,
+        "nb_programs": 0,
+        "nb_stream_groups": 0,
+        "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "start_time": "0.000000",
+        "duration": "4.004000",
+        "size": "394803",
+        "bit_rate": "788817",
+        "probe_score": 100,
+        "tags": {
+          "major_brand": "isom",
+          "minor_version": "512",
+          "compatible_brands": "isomiso2avc1mp41",
+          "encoder": "Lavf62.12.101"
+        }
+      }
+    }
+  },
+  "undoRedo": {
+    "undoRemoved": true,
+    "redoRestoredSameId": true
+  },
+  "trim": {
+    "framesRemoved": 6,
+    "revisionDelta": 2,
+    "beforeDurationFrames": 120,
+    "afterDurationFrames": 114,
+    "sourceOffset": {
+      "numerator": 0,
+      "denominator": 1
+    },
+    "persistedAcrossReload": true
+  },
+  "dirtyRefresh": {
+    "message": "父剪辑工程存在未保存改动；为避免丢失，已拒绝刷新。请先保存或重新载入后再试。",
+    "draftOpacity": 0.55,
+    "draftOpacityPreserved": true,
+    "revisionBefore": 6,
+    "revisionAfter": 6,
+    "parentHashBefore": "e066ea3050a184562c3e710fdeb3aed38cc55673f48f18591a0375f0544dea10",
+    "parentHashAfter": "e066ea3050a184562c3e710fdeb3aed38cc55673f48f18591a0375f0544dea10",
+    "noDiskWrite": true
+  },
+  "drift": {
+    "message": "Error invoking remote method 'canvas:prepare-nested-timeline-preview': Error: EP01 嵌套子时间线 · 冻结 r1 的子时间线修订已漂移：冻结 r1，当前 r2；请显式刷新。",
+    "frozenRevisionBefore": 1,
+    "childCurrentRevision": 2
+  },
+  "refresh": {
+    "oldSnapshotSha256": "7dbda8fa48a5e348b9f6709bc0a719fa55e12024d9efbca48228d86ec6628457",
+    "newSnapshotSha256": "65badb173a431fb569810886783e5e17db0cca99f71bee1c01e569e5aeee83a9",
+    "childRevision": 2,
+    "trimPreserved": true
+  },
+  "applicationRestart": {
+    "projectRevision": 7,
+    "childSnapshotSha256": "65badb173a431fb569810886783e5e17db0cca99f71bee1c01e569e5aeee83a9",
+    "durationFrames": 114,
+    "preview": {
+      "readyState": 1,
+      "videoWidth": 540,
+      "videoHeight": 960,
+      "duration": 4.004,
+      "error": null,
+      "currentSrc": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-editor-nested-ui-i0bvZ8%2F.aicanvas%2Feditor%2Fnested-cache%2Fpreview-303bf3d8c6134e0974cf38d74ec4fbc01a0df4c5a5b6e37a4e6f32e983eb4e93.mp4"
+    },
+    "pageErrors": []
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-nested-ui-20260714.png",
+    "bytes": 311714,
+    "sha256": "17c6af4e1652716db22e477e96a8220d9854fd3251de736ea52cdcb146fffdeb",
+    "width": 1560,
+    "height": 980,
+    "deviceScaleNormalized": true,
+    "captureAttempt": 1,
+    "content": {
+      "pixels": 1528800,
+      "brightPixels": 125092,
+      "brightRatio": 0.08182365253793825,
+      "chromaticPixels": 82106,
+      "chromaticRatio": 0.05370617477760335
+    }
+  },
+  "pageErrors": [],
+  "sourceHashes": {
+    "src/core/types.ts": "8d4f07923059811899dbff0a6687879b4d831a9b9501aff2d9c1e439b4b260dd",
+    "src/core/editor.ts": "7625068a924e4f067e3b5d3e7e02376a4121316213d8fd245fe162ab8c2a57d6",
+    "src/core/command-outcome.ts": "3afb51d9175db0af8d58e119d31ea4f881884033d842f6a9ac4dc785193a1d5e",
+    "src/core/command-bus.ts": "a8516d3fb994927fe1321eba3d5086d165b045bbb1936040cbc2aaa1412a3e2b",
+    "src/main/index.ts": "17787ca4607740e013ba9b7d79ecae9f82182263d9f043ad4886c83d436f26b6",
+    "src/preload/index.ts": "4a91cb72cabb0e2a393c73a8556d104b5b481b27bbde6efabbc268b7ecbc31f9",
+    "src/renderer/src/components/VideoEditorView.vue": "dd04aec0d998afce2ba05347a2d8b3169a5bb709803edfec9e983b9e3c9ab061",
+    "scripts/create-editor-ui-fixture.ts": "45951e172a451426ff1d3df9cc88679ce82de933b5654b2ebab75419a363abd4",
+    "scripts/ui-editor-nested-smoke.mjs": "1f61ac40c8be2abffe3752cabb410dbd3b33e75f747ad71b7905213e907934be"
+  },
+  "terminal": {
+    "rootRemoved": true,
+    "registryRemoved": true
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "kind": "p13-p14-installed-production-loop-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-18T16:28:42.271Z",
+  "runtime": {
+    "executablePath": "/Applications/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+    "installedBundle": true,
+    "systemNodeRequired": false,
+    "release": {
+      "version": "0.2.0",
+      "sourceDigest": "267d6f29baf0b20908d8453ae80b3fc1a306a2ef949e383acfffeddc131dd582",
+      "buildId": "4372262cc78d9ed7773414cfdede38af",
+      "mcpToolCount": 183,
+      "distribution": "local-only"
+    }
+  },
+  "projects": {
+    "created": {
+      "projectId": "project-a2d14072dd2b",
+      "projectRoot": "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-p13-p14-installed-ui-gybIM5/projects/p14-零说明桌面验收工程-5a49a69a",
+      "sourceRoots": 0
+    },
+    "restored": {
+      "projectId": "project-a2d14072dd2b",
+      "projectRoot": "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-p13-p14-installed-ui-gybIM5/restores/restored-project-a2d14072dd2b",
+      "overwroteSource": false
+    },
+    "fixture": {
+      "projectId": "project-6b63fd95a082",
+      "projectRoot": "/private/tmp/studio-p7-fixture-GYxWB4/p7-continuity-fixture-d68b490e",
+      "assets": 3,
+      "textDocuments": 2,
+      "units": 2,
+      "panels": 8,
+      "generationRunId": "p13-p14-installed-ui-run-001",
+      "provider": "codex",
+      "visualReviewClaimed": false
+    },
+    "switchCount": 3
+  },
+  "assertions": {
+    "firstRunThreeEntriesVisible": true,
+    "firstRunRecentDisabledWithoutExplicitActiveProject": true,
+    "importEntryCanceledWithoutMutation": true,
+    "projectCreatedThroughUi": true,
+    "backupCompletedThroughUi": true,
+    "restoreCompletedThroughUiToNewDirectory": true,
+    "restartRestoredExplicitActiveProject": true,
+    "projectSwitchIsolated": true,
+    "fiveStepNavigation": true,
+    "materialLibraryCharacterSceneProp": true,
+    "scriptAndPromptVisible": true,
+    "generationPaneVisible": true,
+    "managedCanvasVisible": true,
+    "rawLabeledReviewNodesVisible": true,
+    "oneClickResultNodeOpenedReview": true,
+    "agentConnectionStatusVisible": true,
+    "helpAndBackupRestoreEntriesVisible": true
+  },
+  "ui": {
+    "agentStatusText": "DESKTOP PRODUCTION SUPPORT\nAgent 连接\n刷新状态\nCODEX\n尚未配置\n\n通过同一个 ai-drama-canvas MCP 读取当前活动工程。\n\nGROK\n尚未配置\n\n与 Codex 共用受管工程和不可变生图包。\n\n画布连接服务\n已就绪\n\n检测到未配置或旧构建连接；点击后将先备份再修复。\n\n只在你明确点击后才修复配置\n原配置只在本机以 0600 权限备份用于失败回滚；软件不解析、不显示、不上传其中的 API 密钥。切换项目后无需重新配置。\n\n备份并修复 Agent 连接",
+    "canvasMetrics": "3 资产 2 单元 8 宫格 19 媒体 2 文稿",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  "isolation": {
+    "freshUserData": true,
+    "isolatedRegistry": true,
+    "createdProjectContained": true,
+    "restoredProjectContained": true,
+    "fixtureProjectContained": true,
+    "formalProjectOpened": false,
+    "formalProjectWrites": 0,
+    "externalRequests": 0,
+    "agentRepairClicks": 0
+  },
+  "screenshots": [
+    {
+      "fileName": "01-first-run.png",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p11-p14-final/p14-installed-production-loop-ui-20260718-r7-shots/01-first-run.png",
+      "width": 1728,
+      "height": 1029,
+      "sizeBytes": 40926,
+      "sha256": "5737475fab63158bc14aec6aa5d0dc8170f22c71e49d8bd3a3792970481d812c",
+      "maxChannelStandardDeviation": 10.367192803817495
+    },
+    {
+      "fileName": "02-help-backup-restore.png",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p11-p14-final/p14-installed-production-loop-ui-20260718-r7-shots/02-help-backup-restore.png",
+      "width": 1728,
+      "height": 1029,
+      "sizeBytes": 95894,
+      "sha256": "0d074bbc4ea61e6d000f990ffdebf5a2b320b6f0a9be822c29e48ae0f3c537ba",
+      "maxChannelStandardDeviation": 17.996456920842608
+    },
+    {
+      "fileName": "03-restart-restored-project.png",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p11-p14-final/p14-installed-production-loop-ui-20260718-r7-shots/03-restart-restored-project.png",
+      "width": 1728,
+      "height": 1029,
+      "sizeBytes": 114527,
+      "sha256": "9952787788ce54c44523a996032f43caa04e6742c1f54b9a34dda6c8fcff3949",
+      "maxChannelStandardDeviation": 31.789735346545886
+    },
+    {
+      "fileName": "04-agent-connection.png",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p11-p14-final/p14-installed-production-loop-ui-20260718-r7-shots/04-agent-connection.png",
+      "width": 1728,
+      "height": 1029,
+      "sizeBytes": 78290,
+      "sha256": "7d5761f6f2d52c2268d837b5dd78a352390d11abbd3f2d1abd53d56f01d533d0",
+      "maxChannelStandardDeviation": 16.86784642878966
+    },
+    {
+      "fileName": "05-managed-canvas-results.png",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p11-p14-final/p14-installed-production-loop-ui-20260718-r7-shots/05-managed-canvas-results.png",
+      "width": 1728,
+      "height": 1029,
+      "sizeBytes": 226152,
+      "sha256": "664e274d7d755951ee05c587dddccf796d02c44156ae385bf4425525fb8f8ec3",
+      "maxChannelStandardDeviation": 33.02909489410584
+    },
+    {
+      "fileName": "06-one-click-review.png",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p11-p14-final/p14-installed-production-loop-ui-20260718-r7-shots/06-one-click-review.png",
+      "width": 1728,
+      "height": 1029,
+      "sizeBytes": 118571,
+      "sha256": "ace1084f06158f2ae8e994f6680541007c05e255831e7f7d67e2db65b7447bb1",
+      "maxChannelStandardDeviation": 19.070131606767273
+    }
+  ],
+  "terminal": {
+    "applicationClosed": true,
+    "runtimeRootRemoved": true,
+    "fixtureRootRemoved": true
+  },
+  "boundaries": {
+    "installedApplicationMutated": false,
+    "applicationInstalledBySmoke": false,
+    "agentConfigurationMutated": false,
+    "imageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0,
+    "gitActions": 0,
+    "visualReviewClaimed": false
+  }
+}

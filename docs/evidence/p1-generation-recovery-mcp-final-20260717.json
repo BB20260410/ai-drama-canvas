@@ -1,0 +1,391 @@
+{
+  "schemaVersion": 1,
+  "kind": "p1-generation-recovery-mcp-smoke",
+  "createdAt": "2026-07-17T02:07:55.023Z",
+  "serverPath": "/Users/hxx/Documents/无限画布/dist-mcp/mcp/server.js",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "jobId": "gen-2026-07-16T12-10-57-215Z-892023c0",
+  "guardedFiles": {
+    "beforeHashes": {
+      "generationJobs": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182",
+      "generationSettings": "6815df33ee0c0f420a9be6ee640ffb7e2c208d44066f02c1878e23032da433e1",
+      "publications": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238",
+      "events": "af4369169b7cade50e8259059caea01d2c6ecc17158a63809abff2495272ea96",
+      "index": "303aa65edaeb7f32b71c3e47e2c629f714a044f60822130f52c32e3afdbb1cdb",
+      "overrides": "0155f1731175ce5a7fdabf279d6493b535c521596d849c5221a8041609f2f31d",
+      "commandLedger": "8a774e773a5c3436ea84737f9d29b34cf4914a27282b1c9a6d0206cd53b933bc",
+      "subagentPlan": "41f855f18aeb867b5f7a7d5aae756089a51ba93c5a0990800abd60686a2a952c"
+    },
+    "afterHashes": {
+      "generationJobs": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182",
+      "generationSettings": "6815df33ee0c0f420a9be6ee640ffb7e2c208d44066f02c1878e23032da433e1",
+      "publications": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238",
+      "events": "af4369169b7cade50e8259059caea01d2c6ecc17158a63809abff2495272ea96",
+      "index": "303aa65edaeb7f32b71c3e47e2c629f714a044f60822130f52c32e3afdbb1cdb",
+      "overrides": "0155f1731175ce5a7fdabf279d6493b535c521596d849c5221a8041609f2f31d",
+      "commandLedger": "8a774e773a5c3436ea84737f9d29b34cf4914a27282b1c9a6d0206cd53b933bc",
+      "subagentPlan": "41f855f18aeb867b5f7a7d5aae756089a51ba93c5a0990800abd60686a2a952c"
+    },
+    "unchanged": true
+  },
+  "tools": {
+    "count": 150,
+    "generationStatusFilter": [
+      "queued",
+      "submitting",
+      "submission_unknown",
+      "waiting_external",
+      "waiting_remote",
+      "generating",
+      "generation_unknown",
+      "candidate_generated",
+      "visual_rejected",
+      "succeeded",
+      "failed",
+      "cancelled"
+    ]
+  },
+  "capabilities": {
+    "subagentImagegen": {
+      "adapter": "codex-subagent-imagegen",
+      "kinds": [
+        "image"
+      ],
+      "oneAgentPerImage": true,
+      "projectConcurrency": 1,
+      "providerConcurrency": 1,
+      "migrationSourceStages": [
+        "plan_ready",
+        "preflight_blocked"
+      ],
+      "preservesGenerationJobAndPublication": true,
+      "executionStates": [
+        "plan_ready",
+        "leased",
+        "generating",
+        "generation_unknown",
+        "candidate_generated",
+        "visual_rejected",
+        "verified"
+      ],
+      "leaseFields": [
+        "leaseId",
+        "owner",
+        "heartbeatAt",
+        "leaseUntil",
+        "leaseSeconds",
+        "fence"
+      ],
+      "leaseActions": [
+        "claim",
+        "heartbeat",
+        "release",
+        "takeover"
+      ],
+      "legacyLeaseRecovery": "migrate_generation_execution_state-to-generation_unknown",
+      "leaseBeforeSpawn": true,
+      "callIntentBeforeModel": true,
+      "callIntentFields": [
+        "callId",
+        "runId",
+        "leaseId",
+        "owner",
+        "attempt",
+        "maxCalls",
+        "executionSnapshotHash"
+      ],
+      "callWithoutReceipt": "generation_unknown-no-retry",
+      "exactlyOneImagePerLease": true,
+      "frozenPromptParametersAndReferenceHashes": true,
+      "remoteIdentityRequired": false,
+      "directFormalOutputRejected": true,
+      "isolatedCopyAndShaRequired": true,
+      "candidateRequiresVisualDecision": true,
+      "rawLabeledPublicationBundleRequired": true,
+      "mechanicalPublicationRequired": true,
+      "mainAgentVisualReviewRequired": true
+    },
+    "migrationCommandExposed": true
+  },
+  "doctor": {
+    "summary": {
+      "errors": 0,
+      "warnings": 1,
+      "ok": 26
+    },
+    "generationCheck": {
+      "id": "generation-jobs",
+      "level": "warning",
+      "title": "生成队列",
+      "detail": "1 个进行中任务，0 个网页任务停在可恢复 preflight_blocked；一图一子代理共 1 个：调用结果不明 1、候选待视觉验收 0、leased 0（过期/缺 TTL 0、旧协议 0）；0 个提交结果待对账（网页 0、HTTP 0、ComfyUI 0），0 个 ComfyUI 原子取消待 exact history/稳定 absent 确认，0 个远端暂态/未知错误可定向恢复，0 个发布冲突待人工核对，0 个 Publication 终态缺少匹配来源，0 个终态 Job 仍保留 unknown 检查点，0 个任务混入多个当前适配器检查点。",
+      "suggestedAction": "先读取 get_subagent_image_generation_plan；gen-2026-07-16T12-10-57-215Z-892023c0 只能用结构化证据对账，严禁 claim、取消或重生。旧协议 leased 应通过 execute_command(migrate_generation_execution_state) 迁为 unknown。",
+      "paths": [
+        "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-requests/gen-2026-07-16T12-10-57-215Z-892023c0.subagent-imagegen.json"
+      ]
+    },
+    "suggestedNextCalls": [
+      "list_generation_jobs",
+      "get_subagent_image_generation_plan",
+      "list_publications",
+      "doctor_project"
+    ]
+  },
+  "job": {
+    "id": "gen-2026-07-16T12-10-57-215Z-892023c0",
+    "status": "generation_unknown",
+    "attempts": 1,
+    "publicationBundleId": "generation-bundle-gen-2026-07-16T12-10-57-215Z-892023c0",
+    "publicationIntentId": "publication-472b11c0-0821-4ed1-8051-32d8f046f565",
+    "companionPublicationIntentId": "publication-de235c33-2161-4b87-8abd-8bac235e9241",
+    "checkpoint": {
+      "schemaVersion": 2,
+      "revision": 3,
+      "stage": "generation_unknown",
+      "updatedAt": "2026-07-16T23:56:52.767Z",
+      "remoteIdentityRequired": false,
+      "oneImagePerAgent": true,
+      "note": "P1 正式迁移：旧协议 lease 后没有模型调用前 intent 与调用后 receipt，无法证明 image_gen 未执行；保持同一 Job/attempt/Publication 并进入 generation_unknown。",
+      "lease": {
+        "leaseId": "subagent-lease-109aae14dd1db8b32dba07be",
+        "agentTaskName": "/root/generate_ep01_008_p05_892023c0",
+        "claimedAt": "2026-07-16T12:10:58.110Z",
+        "oneImageOnly": true,
+        "promptSha256": "f587104a850dc737170ea6aefa2de75b1b088ff8db4515d334403659a90d5e0b",
+        "parametersSha256": "20fb77444cc5c610372bfc18dd4ac91350e0ccba6a72d7740510d9f87c5ab671",
+        "referencesSha256": "5f53fc5491d7c61d973f23d54bd6c10d07b50959369d3321d8804a55c9470abb",
+        "executionSnapshotHash": "f858d252625ae5d91ca08a732a0108040e782505351a760e335f6853444bda8a"
+      },
+      "unknown": {
+        "code": "legacy_leased_without_call_receipt",
+        "observedAt": "2026-07-16T23:56:52.767Z",
+        "note": "P1 正式迁移：旧协议 lease 后没有模型调用前 intent 与调用后 receipt，无法证明 image_gen 未执行；保持同一 Job/attempt/Publication 并进入 generation_unknown。",
+        "previousStage": "leased",
+        "leaseId": "subagent-lease-109aae14dd1db8b32dba07be",
+        "evidenceReference": "legacy-unreceipted-lease-892023c0"
+      }
+    }
+  },
+  "plan": {
+    "jobId": "gen-2026-07-16T12-10-57-215Z-892023c0",
+    "publicationBundleId": "generation-bundle-gen-2026-07-16T12-10-57-215Z-892023c0",
+    "publicationIntentId": "publication-472b11c0-0821-4ed1-8051-32d8f046f565",
+    "companionPublicationIntentId": "publication-de235c33-2161-4b87-8abd-8bac235e9241",
+    "expectedOutputPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格05_中间帧_892023c0_raw.png",
+    "expectedCompanionPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格05_中间帧_892023c0_labeled.png",
+    "contract": {
+      "exactlyOneImage": true,
+      "oneAgentPerImage": true,
+      "sequentialOnly": true,
+      "remoteIdentityRequired": false,
+      "copyThroughIsolation": true,
+      "persistCallIntentBeforeModel": true,
+      "recordCandidateBeforePublication": true,
+      "rawLabeledBundleRequired": true,
+      "mainAgentVisualReviewRequired": true,
+      "publicationAndMechanicalValidationRequired": true
+    },
+    "currentCheckpoint": {
+      "schemaVersion": 2,
+      "revision": 3,
+      "stage": "generation_unknown",
+      "updatedAt": "2026-07-16T23:56:52.767Z",
+      "remoteIdentityRequired": false,
+      "oneImagePerAgent": true,
+      "note": "P1 正式迁移：旧协议 lease 后没有模型调用前 intent 与调用后 receipt，无法证明 image_gen 未执行；保持同一 Job/attempt/Publication 并进入 generation_unknown。",
+      "lease": {
+        "leaseId": "subagent-lease-109aae14dd1db8b32dba07be",
+        "agentTaskName": "/root/generate_ep01_008_p05_892023c0",
+        "claimedAt": "2026-07-16T12:10:58.110Z",
+        "oneImageOnly": true,
+        "promptSha256": "f587104a850dc737170ea6aefa2de75b1b088ff8db4515d334403659a90d5e0b",
+        "parametersSha256": "20fb77444cc5c610372bfc18dd4ac91350e0ccba6a72d7740510d9f87c5ab671",
+        "referencesSha256": "5f53fc5491d7c61d973f23d54bd6c10d07b50959369d3321d8804a55c9470abb",
+        "executionSnapshotHash": "f858d252625ae5d91ca08a732a0108040e782505351a760e335f6853444bda8a"
+      },
+      "unknown": {
+        "code": "legacy_leased_without_call_receipt",
+        "observedAt": "2026-07-16T23:56:52.767Z",
+        "note": "P1 正式迁移：旧协议 lease 后没有模型调用前 intent 与调用后 receipt，无法证明 image_gen 未执行；保持同一 Job/attempt/Publication 并进入 generation_unknown。",
+        "previousStage": "leased",
+        "leaseId": "subagent-lease-109aae14dd1db8b32dba07be",
+        "evidenceReference": "legacy-unreceipted-lease-892023c0"
+      }
+    }
+  },
+  "publications": {
+    "bundleIntents": [
+      {
+        "schemaVersion": 1,
+        "id": "publication-de235c33-2161-4b87-8abd-8bac235e9241",
+        "projectId": "gushujuan-s3-f1a688020bfb7af6",
+        "revision": 1,
+        "status": "reserved",
+        "idempotencyKey": "generation:gen-2026-07-16T12-10-57-215Z-892023c0:pair-migration:companion",
+        "requestHash": "b3c17b9b56164f054030b24e3f531188204055384de3acdadc5354f513a9613e",
+        "requestedPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格05_中间帧_892023c0_labeled.png",
+        "targetPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格05_中间帧_892023c0_labeled.png",
+        "allowedRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+        "kind": "labeled-image",
+        "variant": "generic",
+        "context": {
+          "purpose": "generation-output",
+          "itemId": "season-三-ep01-unit008",
+          "jobId": "gen-2026-07-16T12-10-57-215Z-892023c0",
+          "metadata": {
+            "providerId": "codex-subagent-gpt-image-2",
+            "generationKind": "image",
+            "generationPurpose": "fusion_storyboard_panel",
+            "panelId": "season-三-ep01-unit008-panel-05"
+          }
+        },
+        "bundleId": "generation-bundle-gen-2026-07-16T12-10-57-215Z-892023c0",
+        "bundleMember": "companion",
+        "note": "P1 迁移：把旧单 raw 预留原子扩展为 raw/labeled 双成员事务；不触发供应商调用。",
+        "createdAt": "2026-07-16T23:56:52.777Z",
+        "updatedAt": "2026-07-16T23:56:52.777Z"
+      },
+      {
+        "schemaVersion": 1,
+        "id": "publication-472b11c0-0821-4ed1-8051-32d8f046f565",
+        "projectId": "gushujuan-s3-f1a688020bfb7af6",
+        "revision": 2,
+        "status": "reserved",
+        "idempotencyKey": "generation:gen-2026-07-16T12-10-57-215Z-892023c0:output",
+        "requestHash": "9428114bf8415431588fd32cd67300a6205864b88339f35f594b9bc40842dff6",
+        "requestedPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格05_中间帧_892023c0_raw.png",
+        "targetPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格05_中间帧_892023c0_raw.png",
+        "allowedRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+        "kind": "raw-image",
+        "variant": "generic",
+        "context": {
+          "purpose": "generation-output",
+          "itemId": "season-三-ep01-unit008",
+          "jobId": "gen-2026-07-16T12-10-57-215Z-892023c0",
+          "metadata": {
+            "providerId": "codex-subagent-gpt-image-2",
+            "generationKind": "image",
+            "generationPurpose": "fusion_storyboard_panel",
+            "panelId": "season-三-ep01-unit008-panel-05"
+          }
+        },
+        "bundleId": "generation-bundle-gen-2026-07-16T12-10-57-215Z-892023c0",
+        "bundleMember": "primary",
+        "note": "生成任务输出路径预留；成功机械验收后登记发布回执。",
+        "createdAt": "2026-07-16T12:10:58.038Z",
+        "updatedAt": "2026-07-16T23:56:52.777Z"
+      }
+    ],
+    "matchingReceiptCount": 0
+  },
+  "snapshot": {
+    "suggestedNextCalls": [
+      "get_subagent_image_generation_plan",
+      "list_publications",
+      "doctor_project"
+    ],
+    "job": {
+      "id": "gen-2026-07-16T12-10-57-215Z-892023c0",
+      "itemId": "season-三-ep01-unit008",
+      "kind": "image",
+      "providerId": "codex-subagent-gpt-image-2",
+      "status": "generation_unknown",
+      "expectedOutputPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格05_中间帧_892023c0_raw.png",
+      "expectedCompanionPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格05_中间帧_892023c0_labeled.png",
+      "clientJobId": "gen-2026-07-16T12-10-57-215Z-892023c0",
+      "submissionIntent": {
+        "clientJobId": "gen-2026-07-16T12-10-57-215Z-892023c0",
+        "attempt": 1,
+        "createdAt": "2026-07-16T12:10:58.070Z"
+      },
+      "pollAttempts": 0,
+      "downloadAttempts": 0,
+      "subagentCheckpoint": {
+        "schemaVersion": 2,
+        "revision": 3,
+        "stage": "generation_unknown",
+        "updatedAt": "2026-07-16T23:56:52.767Z",
+        "remoteIdentityRequired": false,
+        "oneImagePerAgent": true,
+        "note": "P1 正式迁移：旧协议 lease 后没有模型调用前 intent 与调用后 receipt，无法证明 image_gen 未执行；保持同一 Job/attempt/Publication 并进入 generation_unknown。",
+        "lease": {
+          "leaseId": "subagent-lease-109aae14dd1db8b32dba07be",
+          "agentTaskName": "/root/generate_ep01_008_p05_892023c0",
+          "claimedAt": "2026-07-16T12:10:58.110Z",
+          "oneImageOnly": true,
+          "promptSha256": "f587104a850dc737170ea6aefa2de75b1b088ff8db4515d334403659a90d5e0b",
+          "parametersSha256": "20fb77444cc5c610372bfc18dd4ac91350e0ccba6a72d7740510d9f87c5ab671",
+          "referencesSha256": "5f53fc5491d7c61d973f23d54bd6c10d07b50959369d3321d8804a55c9470abb",
+          "executionSnapshotHash": "f858d252625ae5d91ca08a732a0108040e782505351a760e335f6853444bda8a"
+        },
+        "unknown": {
+          "code": "legacy_leased_without_call_receipt",
+          "observedAt": "2026-07-16T23:56:52.767Z",
+          "note": "P1 正式迁移：旧协议 lease 后没有模型调用前 intent 与调用后 receipt，无法证明 image_gen 未执行；保持同一 Job/attempt/Publication 并进入 generation_unknown。",
+          "previousStage": "leased",
+          "leaseId": "subagent-lease-109aae14dd1db8b32dba07be",
+          "evidenceReference": "legacy-unreceipted-lease-892023c0"
+        }
+      },
+      "publicationBundleId": "generation-bundle-gen-2026-07-16T12-10-57-215Z-892023c0",
+      "publicationIntentId": "publication-472b11c0-0821-4ed1-8051-32d8f046f565",
+      "companionPublicationIntentId": "publication-de235c33-2161-4b87-8abd-8bac235e9241",
+      "error": "P1 正式迁移：旧协议 lease 后没有模型调用前 intent 与调用后 receipt，无法证明 image_gen 未执行；保持同一 Job/attempt/Publication 并进入 generation_unknown。",
+      "updatedAt": "2026-07-16T23:56:52.767Z"
+    },
+    "continuationPromptSha256": "c7ff048fd7169b65c6e57be77d285f2e139e61539e2b6e2d8eb5f59117bd3a85"
+  },
+  "continuation": {
+    "recovery": {
+      "jobId": "gen-2026-07-16T12-10-57-215Z-892023c0",
+      "itemId": "season-三-ep01-unit008",
+      "kind": "image",
+      "providerId": "codex-subagent-gpt-image-2",
+      "status": "generation_unknown",
+      "expectedOutputPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格05_中间帧_892023c0_raw.png",
+      "requestPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-requests/gen-2026-07-16T12-10-57-215Z-892023c0.subagent-imagegen.json",
+      "error": "P1 正式迁移：旧协议 lease 后没有模型调用前 intent 与调用后 receipt，无法证明 image_gen 未执行；保持同一 Job/attempt/Publication 并进入 generation_unknown。",
+      "subagentCheckpoint": {
+        "schemaVersion": 2,
+        "revision": 3,
+        "stage": "generation_unknown",
+        "updatedAt": "2026-07-16T23:56:52.767Z",
+        "remoteIdentityRequired": false,
+        "oneImagePerAgent": true,
+        "note": "P1 正式迁移：旧协议 lease 后没有模型调用前 intent 与调用后 receipt，无法证明 image_gen 未执行；保持同一 Job/attempt/Publication 并进入 generation_unknown。",
+        "lease": {
+          "leaseId": "subagent-lease-109aae14dd1db8b32dba07be",
+          "agentTaskName": "/root/generate_ep01_008_p05_892023c0",
+          "claimedAt": "2026-07-16T12:10:58.110Z",
+          "oneImageOnly": true,
+          "promptSha256": "f587104a850dc737170ea6aefa2de75b1b088ff8db4515d334403659a90d5e0b",
+          "parametersSha256": "20fb77444cc5c610372bfc18dd4ac91350e0ccba6a72d7740510d9f87c5ab671",
+          "referencesSha256": "5f53fc5491d7c61d973f23d54bd6c10d07b50959369d3321d8804a55c9470abb",
+          "executionSnapshotHash": "f858d252625ae5d91ca08a732a0108040e782505351a760e335f6853444bda8a"
+        },
+        "unknown": {
+          "code": "legacy_leased_without_call_receipt",
+          "observedAt": "2026-07-16T23:56:52.767Z",
+          "note": "P1 正式迁移：旧协议 lease 后没有模型调用前 intent 与调用后 receipt，无法证明 image_gen 未执行；保持同一 Job/attempt/Publication 并进入 generation_unknown。",
+          "previousStage": "leased",
+          "leaseId": "subagent-lease-109aae14dd1db8b32dba07be",
+          "evidenceReference": "legacy-unreceipted-lease-892023c0"
+        }
+      }
+    },
+    "nextItemCount": 0,
+    "promptSha256": "c7ff048fd7169b65c6e57be77d285f2e139e61539e2b6e2d8eb5f59117bd3a85"
+  },
+  "recoveryPromptSha256": "460f3f65919b6033dd5531658c6ef89ed7e82a2295209256a14b015ded24b98a",
+  "secretExposure": false,
+  "stderrSha256": "ea5e904820335f9cc38c2a1797e6d84def70dbe6cf94cfaf5a850ca56fad401e",
+  "assertions": {
+    "newStatusesExposed": true,
+    "unknownJobAndBundleObservable": true,
+    "doctorPrioritizesReconciliation": true,
+    "snapshotPrioritizesReconciliation": true,
+    "continuationBlocksNewWork": true,
+    "recoveryPromptForbidsReplay": true,
+    "publicationTokensRedacted": true,
+    "readOnlyCallsDidNotWrite": true
+  }
+}

@@ -1,0 +1,407 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-15T07:59:00+08:00",
+  "status": "passed",
+  "slice": "formal-fengshen-project-nle-calibration",
+  "summary": "用户授权的只读《封神篇》正式源已在工作区全新隔离根完成剧本规范化、140 单元导入、EP22 24000/1001 长时间线、多轨/嵌套/关键帧/TimeWarp/Dissolve、OTIO、真实成片、Publication、Continuation、fresh source/compiled MCP 与 source Electron 双重启闭环；源逐文件元数据和内容保持不变，40 个测试文件/247 项测试与 production build 通过，missingForFullNle 已清零。",
+  "goal": {
+    "status": "active",
+    "complete": false,
+    "reason": "正式项目 NLE 校准纵向切片已完成；长期产品仍缺真实生图/图生视频网站闭环，当前等待网站、登录会话、上传、提交/付费、下载和视觉验收边界授权。"
+  },
+  "priorityAudit": {
+    "handoffPriority": "real-project-nle-validation",
+    "handoffPriorityStillValidAtSliceStart": true,
+    "evidenceAtStart": [
+      "docs/当前开发交接.md 当时唯一 P1",
+      "src/core/codex.ts 当时 missingForFullNle=[real-project-nle-validation]",
+      "tests/codex.test.ts、tests/mcp-scan-cancel.test.ts、tests/mcp.test.ts 同步断言"
+    ],
+    "completedInThisSlice": true,
+    "capabilityMissingForFullNleAfterSlice": [],
+    "independentPostSliceAudit": {
+      "safeLocalP0OrP1Found": false,
+      "todoFixmeOrSkippedTestsFoundInSrcTestsScripts": false,
+      "mockOrRepeatedPackageAcceptedAsSubstitute": false
+    },
+    "nextUniqueHighestPriority": {
+      "priority": "P1",
+      "capability": "real-generation-website-calibration",
+      "title": "真实生图 / 图生视频网站闭环校准",
+      "status": "waiting_authorization",
+      "missingAuthorization": [
+        "网站或域名及允许使用的已登录浏览器会话",
+        "允许上传的本地目录和具体文件范围",
+        "允许提交的任务类型、次数及付费额度边界",
+        "结果下载目录",
+        "提交后是否在视觉验收前暂停"
+      ],
+      "substitutionForbidden": [
+        "mock 或 browser fixture 冒充真实网站",
+        "重复 package、重复测试或重复正式 NLE 校准冒充产品推进",
+        "在未授权时登录、上传、提交、付费或下载"
+      ]
+    }
+  },
+  "sourceAuthorization": {
+    "authoritativeRoot": "/Users/hxx/Desktop/豆包版本/剧本_封神篇",
+    "mode": "read-only",
+    "isolatedWritableCopyAllowed": true,
+    "isolatedWritableRoot": "/Users/hxx/Documents/无限画布/formal-calibration",
+    "sourceWritebackForbidden": true,
+    "sourceSidecarCreatedOrModified": false,
+    "sourceAicanvasExistsAfter": false
+  },
+  "formalSource": {
+    "inventoryAlgorithm": "sha256-relative-path-bytes-content-v1",
+    "aggregateSha256": "bcbd8aca412c6f48021624ef07d9b627e9635c17095adb70fc47f8487f7ec0c0",
+    "files": 30,
+    "bytes": 2436824,
+    "symlinks": 0,
+    "episodes": 23,
+    "shots": 968,
+    "durationSeconds": 8637,
+    "explicitFpsShots": 845,
+    "default24Shots": 123,
+    "nativeVideoOrAudio": false,
+    "metadataFieldsCompared": [
+      "relativePath",
+      "inode",
+      "bytes",
+      "sha256",
+      "mtimeNs",
+      "ctimeNs"
+    ],
+    "metadataBeforeEqualsMetadataAfter": true,
+    "contentUnchanged": true
+  },
+  "implementation": {
+    "formalDramaCore": {
+      "file": "src/core/formal-drama.ts",
+      "exports": [
+        "parseFormalDramaEpisodeMarkdown",
+        "inspectFormalDramaSource",
+        "materializeFormalDramaProject"
+      ],
+      "failClosedBoundaries": [
+        "target must be a new directory under the allowed workspace root",
+        "source-internal targets and symlinks rejected",
+        "non-regular source entries rejected",
+        "source metadata change during copy rejected",
+        "copied content SHA mismatch rejected"
+      ]
+    },
+    "orchestration": [
+      "scripts/formal-project-nle-calibration.ts",
+      "scripts/formal-project-nle-mcp-smoke.ts",
+      "scripts/ui-formal-project-nle-smoke.mjs"
+    ],
+    "packageScripts": [
+      "formal:nle-calibration",
+      "formal:nle-mcp-smoke",
+      "ui:formal-nle-smoke"
+    ],
+    "capabilityContract": {
+      "file": "src/core/codex.ts",
+      "missingForFullNle": []
+    }
+  },
+  "isolatedProject": {
+    "canonicalRoot": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729",
+    "sourceSnapshotCreated": true,
+    "normalizedEpisodes": [
+      19,
+      21,
+      22
+    ],
+    "normalizedUnits": 140,
+    "episode22Units": 53,
+    "repeatedScanStable": true,
+    "derivedMedia": {
+      "truthfullyMarkedAsCalibrationDerived": true,
+      "sourceNativeMedia": false,
+      "videoFrameRates": [
+        24,
+        48,
+        96,
+        120
+      ],
+      "audioBedSeconds": 457,
+      "productionReferencePairs": 4,
+      "productionReferenceDimensions": "1920x1080",
+      "productionReferenceBytesRange": [
+        98457,
+        221423
+      ],
+      "placeholderPairs": 0
+    }
+  },
+  "timeline": {
+    "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+    "revisionAfterMcp": 6,
+    "episode": 22,
+    "title": "斩鼎",
+    "semanticShots": 53,
+    "semanticDurationSeconds": 456,
+    "mainTrackClips": 54,
+    "timebase": {
+      "numerator": 24000,
+      "denominator": 1001
+    },
+    "durationFrames": 10933,
+    "durationSeconds": 455.997208333,
+    "semanticDeltaSeconds": -0.002791667,
+    "maximumIntermediateBoundaryErrorFrames": 2,
+    "audioTracks": 1,
+    "subtitles": 6,
+    "nestedTimelines": 1,
+    "keyframedClips": 2,
+    "timewarpClips": 20,
+    "smpteDissolves": 1,
+    "otioMasterRoundTripPassed": true,
+    "otioProofLinearTimeWarpPassed": true
+  },
+  "renders": {
+    "proof": {
+      "path": "formal-calibration/fengshen-bcbd8aca-20260715-0729/evidence/EP22_formal_proof_sync.mp4",
+      "codec": "H.264 360x640 + AAC 48kHz",
+      "durationSeconds": 16.016,
+      "bytes": 432769,
+      "sha256": "e295c8fad7b84d63f478c223c91974fd8ac137d9ddc2e456ca38713de476d3e3",
+      "publicationReceiptMatchesFile": true
+    },
+    "master": {
+      "path": "formal-calibration/fengshen-bcbd8aca-20260715-0729/evidence/EP22_formal_master_456s.mp4",
+      "codec": "H.264 360x640 + AAC 48kHz",
+      "durationSeconds": 455.997208,
+      "frames": 10933,
+      "bytes": 4654358,
+      "sha256": "df8e6bfc61a0a1943720e80130cd6d017a1d9ad467d8134d79f43fc51719eae3",
+      "publicationReceiptMatchesFile": true
+    },
+    "firstMiddleLastFramesExtracted": true,
+    "continuationTailFrameShaMatches": true
+  },
+  "mcp": {
+    "sourceToolCount": 134,
+    "compiledToolCount": 134,
+    "sourceMissingForFullNle": [],
+    "compiledMissingForFullNle": [],
+    "sourceExpectedRevision": 5,
+    "liveRevision": 6,
+    "replayedOriginalSucceededRequest": true,
+    "createdRevision7": false,
+    "compiledReadPersistedRevision6": true,
+    "continuation": {
+      "enqueueRequested": false,
+      "generationJobCreated": false,
+      "finalRevision": 2,
+      "finalStatus": "cancelled",
+      "cleanupUsedRevisionCas": true,
+      "cleanupLedgerStatus": "succeeded"
+    },
+    "doctor": {
+      "errors": 0,
+      "warnings": 0,
+      "ok": 25
+    }
+  },
+  "electron": {
+    "transport": "source-electron",
+    "fullApplicationLaunches": 2,
+    "stateRevision": 6,
+    "uiRevisionFirst": 6,
+    "uiRevisionRestart": 6,
+    "pageErrors": 0,
+    "htmlVideoReadyStateAtLeast2": true,
+    "htmlVideoDimensionsAndCurrentSrcPresent": true,
+    "previewBrightRatio": 0.9031,
+    "previewChromaticRatio": 0.1299,
+    "previewNonBlack": true,
+    "firstAndRestartPixelHashesMatch": true,
+    "manualVisualInspection": {
+      "performedByPrimaryAgent": true,
+      "passed": true,
+      "nestedBlackPreviewUsedOnlyAsStructuralEvidence": true
+    }
+  },
+  "safeFailures": {
+    "freshRootsUsed": 6,
+    "failedRootsRetainedForDiagnostics": [
+      "fengshen-bcbd8aca-20260715-0719",
+      "fengshen-bcbd8aca-20260715-0721",
+      "fengshen-bcbd8aca-20260715-0723",
+      "fengshen-bcbd8aca-20260715-0725",
+      "fengshen-bcbd8aca-20260715-0727"
+    ],
+    "failedRootReusedOrOverwritten": false,
+    "failureReasons": [
+      "LinearTimeWarp source mapping was not an integer frame",
+      "keyframe endpoint exceeded normalized clip duration",
+      "first keyframe endpoint fix did not match validator normalization order",
+      "109+109 split broke 0.5x integer-source-frame proof",
+      "master OTIO available_range overclaimed 576 frames where only 575 were provable"
+    ],
+    "successfulRoot": "fengshen-bcbd8aca-20260715-0729"
+  },
+  "validation": {
+    "formalDramaTargeted": {
+      "testFiles": 1,
+      "testsPassed": 5,
+      "testsFailed": 0
+    },
+    "editorTargeted": {
+      "testFiles": 3,
+      "testsPassed": 29,
+      "testsFailed": 0
+    },
+    "capabilityMcpTargeted": {
+      "testFiles": 4,
+      "testsPassed": 15,
+      "testsFailed": 0
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    "build": {
+      "command": "npm run build",
+      "electronMainPreloadRenderer": "passed",
+      "compiledMcp": "passed",
+      "exitCode": 0
+    },
+    "fullTests": {
+      "command": "npm test",
+      "testFiles": 40,
+      "testsPassed": 247,
+      "testsFailed": 0,
+      "testsSkipped": 0,
+      "testsTodo": 0,
+      "exitCode": 0,
+      "onlyNonFailureWarning": "Node SQLite experimental warning"
+    },
+    "finalUiSmokeAfterMcpRevision6": {
+      "status": "passed",
+      "directlyExecutedAfterUiAssertionChange": true,
+      "exitCode": 0
+    }
+  },
+  "permanentEvidence": {
+    "core": {
+      "path": "docs/evidence/formal-project-nle-core-20260715-0729.json",
+      "bytes": 61906,
+      "sha256": "4d74c97eee1a4b7b19d2c62e2b35c5f4de4d429b7eeed55e52ebf631e7cfb31c"
+    },
+    "mcp": {
+      "path": "docs/evidence/formal-project-nle-mcp-20260715-0748.json",
+      "bytes": 6739,
+      "sha256": "7de8c507c213e67ab21722e755c329e95f24912dbc8aef13a6308091f158c9e2"
+    },
+    "ui": {
+      "path": "docs/evidence/formal-project-nle-ui-20260715-0751.json",
+      "bytes": 11917,
+      "sha256": "1fd60dbb10ddef5e76937f72ce3afcec9e97a40de9b8d709816f8241f0e8cc00"
+    },
+    "uiFirst": {
+      "path": "docs/evidence/formal-project-nle-ui-20260715-0751.png",
+      "bytes": 261660,
+      "sha256": "b22c413d438b9db597e0a4c55fffbac444bd727a1327f2bba9cda7f4ca510a3f"
+    },
+    "uiPreview": {
+      "path": "docs/evidence/formal-project-nle-ui-20260715-0751-preview.png",
+      "bytes": 153315,
+      "sha256": "701b794f1470379b3b6bbf094e99049da770a99c7585fa94d168024e300d09f5"
+    },
+    "uiNested": {
+      "path": "docs/evidence/formal-project-nle-ui-20260715-0751-nested.png",
+      "bytes": 173460,
+      "sha256": "4df9eaa16a3d8d8555b5476f5c3bc9aeca5e3b88c63e270db3c18feb2ee4063a"
+    },
+    "uiRestart": {
+      "path": "docs/evidence/formal-project-nle-ui-20260715-0751-restart.png",
+      "bytes": 261660,
+      "sha256": "b22c413d438b9db597e0a4c55fffbac444bd727a1327f2bba9cda7f4ca510a3f"
+    },
+    "uiRestartPreview": {
+      "path": "docs/evidence/formal-project-nle-ui-20260715-0751-restart-preview.png",
+      "bytes": 153315,
+      "sha256": "701b794f1470379b3b6bbf094e99049da770a99c7585fa94d168024e300d09f5"
+    },
+    "formalManifest": {
+      "path": "formal-calibration/fengshen-bcbd8aca-20260715-0729/formal-source-manifest.json",
+      "bytes": 145332,
+      "sha256": "f94e3d800052ae3985c5e792b43d016a7c78b98f387dd041659df59d550ab7b7"
+    },
+    "calibrationState": {
+      "path": "formal-calibration/fengshen-bcbd8aca-20260715-0729/calibration-state.json",
+      "bytes": 1477,
+      "sha256": "f7ca9f57072d1313231ed78f0460ee689ccc3846e9b1240d48c0a60268067b6b"
+    },
+    "report": {
+      "path": "docs/验证报告_正式封神篇项目NLE校准闭环_2026-07-15.md",
+      "bytes": 9518,
+      "sha256": "f12c638e06a11b80d7512a8f7cd8d28145ace533cbff32a67ce021791dd7068c"
+    }
+  },
+  "currentHashes": {
+    "src/core/formal-drama.ts": "29207d2697f31525fd3e62d7a02409a1b0e981b8e1b2a10203c6a176eab09f9a",
+    "tests/formal-drama.test.ts": "dbbcfcebc00f24e7caa17227acc94236c534a9865bf48b023466d20a3c9011fc",
+    "scripts/formal-project-nle-calibration.ts": "100f91bda8db43716f634a65fe0061b1cb4bfc400087d8e5ac215197a19e20f7",
+    "scripts/formal-project-nle-mcp-smoke.ts": "dc8cf98a049b959f3145ac3c0ad1a0ce9c0e4e9a9f050ebc5364f699de8116d0",
+    "scripts/ui-formal-project-nle-smoke.mjs": "2bb7a84aeb3e7b3b3625c5187da730cd7fd9260cf852863dac2f11b7035ec5a4",
+    "package.json": "156d0fc4433522fe36685b1097c16d6448579d2abfae72b35a1bb217242c8622",
+    "dist-mcp/mcp/server.js": "648d5bb98359db7ec3d68dc297c6514024f745a1f6a2e52a7c18e4f5bf446d00",
+    "README.md": "8c3d79d46e64f21134ed1e0a1c58eb81af205d040a7995843128c0d5047f5ca8",
+    "docs/CODEX_MCP.md": "1aed7f31c9db5508066b4d2934f3f789b93505d1287254b192bc7aab10403222",
+    "docs/当前开发交接.md": "4fc5cf470fd54f73fba0d0839b910e3612a6554da0fc11aaa54fde884ef03ace",
+    "docs/目标模式提示词.md": "e11fe822dac5ae9a16d1594b0efba7b6441fa1270d22025a4aefbd8e83a9a90b",
+    "docs/长期目标模式总提示词.md": "0a772b684ee0019c51a24cc4ce0163dbaa412e045e49eca5128e930458a8e22f",
+    "docs/验证报告_正式封神篇项目NLE校准闭环_2026-07-15.md": "f12c638e06a11b80d7512a8f7cd8d28145ace533cbff32a67ce021791dd7068c"
+  },
+  "cleanup": {
+    "canonicalRootHasLockTmpOrPartialFiles": false,
+    "formalCalibrationProcessesRemaining": 0,
+    "dedicatedFfmpegProcessesRemaining": 0,
+    "dedicatedElectronProcessesRemaining": 0,
+    "dedicatedMcpSmokeProcessesRemaining": 0,
+    "failedFreshRootsIntentionallyRetained": true,
+    "genericCompiledMcpProcessesFromDesktopOrOtherTasksWereNotKilled": true
+  },
+  "oldDmg": {
+    "path": "dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "bytes": 136652595,
+    "sha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972",
+    "unchanged": true,
+    "generatedThisTurn": false,
+    "overwritten": false,
+    "installed": false,
+    "signedOrNotarizedThisTurn": false,
+    "published": false
+  },
+  "authorizationBoundary": {
+    "formalProjectUsed": true,
+    "formalProjectReadOnly": true,
+    "formalProjectSourceWritten": false,
+    "isolatedWorkspaceCopyUsed": true,
+    "externalWebsiteUsed": false,
+    "loginUsed": false,
+    "uploadUsed": false,
+    "paidActionUsed": false,
+    "downloadUsed": false,
+    "installed": false,
+    "published": false,
+    "developerIdSigningRequested": false,
+    "notarizationRequested": false,
+    "closesRealProjectNleValidation": true,
+    "closesLongTermGoal": false
+  },
+  "git": {
+    "branch": "main",
+    "hasCommits": false,
+    "allProjectFilesUntracked": true,
+    "staged": false,
+    "committed": false,
+    "pushed": false,
+    "pullRequestCreated": false
+  }
+}

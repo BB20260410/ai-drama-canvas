@@ -1,0 +1,460 @@
+{
+  "kind": "p18-performance-baseline",
+  "generatedAt": "2026-07-19T12:46:49.968Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "scope": "只测量，不修复；全部在自动清理的隔离夹具与隔离注册表中进行",
+  "buildState": {
+    "liveSourceDigest": "8b52212e0b35852b517b679a5e13147d93243fc7acb900c8c0fd41eed73cbbcc",
+    "liveSourceFiles": 468,
+    "liveSourceBytes": 10606813,
+    "p17AcceptedSourceDigest": "5c8bee97b9848e09434784687c86a905634336db53c29ab0437cafc30f719a98",
+    "note": "live 相对 P17 的增量 = large-canvas-ui-smoke 激活修复 + 探针写盘等待 + App.vue 异步分包（未验收中间态）+ 本测量脚本。勘误（审核 M2）：p17AcceptedSourceDigest 初版误写为 P17 中期值 863db9d1，P17 最终验收值为 5c8bee97。"
+  },
+  "phases": {
+    "phaseA": {
+      "fixture": {
+        "units": 400,
+        "images": "270×480 PNG ×400（小图）"
+      },
+      "coarse100": {
+        "stepTimes": {
+          "count": 100,
+          "p50Ms": 16.7,
+          "p95Ms": 17.9,
+          "maxMs": 18.6,
+          "meanMs": 16.61
+        },
+        "ipcCounts": {},
+        "wrapped": [],
+        "wrapFailures": {
+          "loadLayout": "assignment-not-effective",
+          "saveLayout": "assignment-not-effective",
+          "loadStudioCanvasLayout": "assignment-not-effective",
+          "saveStudioCanvasLayout": "assignment-not-effective",
+          "getStudioMedia": "assignment-not-effective"
+        },
+        "mutationBatches": 101,
+        "mutationNodesReplaced": 200,
+        "longTasks": [],
+        "frames": {
+          "count": 199,
+          "p50Ms": 8.3,
+          "p95Ms": 9.9,
+          "maxMs": 10.3,
+          "meanMs": 8.33
+        },
+        "heapUsedBytes": 72200000
+      },
+      "fine20SubHysteresis": {
+        "stepTimes": {
+          "count": 20,
+          "p50Ms": 16.7,
+          "p95Ms": 18.3,
+          "maxMs": 18.3,
+          "meanMs": 16.47
+        },
+        "ipcCounts": {},
+        "mutationBatches": 2,
+        "mutationNodesReplaced": 2,
+        "longTasks": [],
+        "frames": {
+          "count": 39,
+          "p50Ms": 8.3,
+          "p95Ms": 9.3,
+          "maxMs": 9.6,
+          "meanMs": 8.33
+        }
+      },
+      "media": {
+        "images": [
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-a-gMIlJG%2Flegacy-400%2FEP01_15s_001_%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95%E9%95%9C%E5%A4%B4_0001%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png",
+            "naturalWidth": 270,
+            "naturalHeight": 480,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-a-gMIlJG%2Flegacy-400%2FEP01_15s_002_%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95%E9%95%9C%E5%A4%B4_0002%2FEP01_15s_002_%E9%A6%96%E5%B8%A7_raw.png",
+            "naturalWidth": 270,
+            "naturalHeight": 480,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-a-gMIlJG%2Flegacy-400%2FEP01_15s_003_%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95%E9%95%9C%E5%A4%B4_0003%2FEP01_15s_003_%E9%A6%96%E5%B8%A7_raw.png",
+            "naturalWidth": 270,
+            "naturalHeight": 480,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-a-gMIlJG%2Flegacy-400%2FEP01_15s_004_%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95%E9%95%9C%E5%A4%B4_0004%2FEP01_15s_004_%E9%A6%96%E5%B8%A7_raw.png",
+            "naturalWidth": 270,
+            "naturalHeight": 480,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-a-gMIlJG%2Flegacy-400%2FEP01_15s_005_%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95%E9%95%9C%E5%A4%B4_0005%2FEP01_15s_005_%E9%A6%96%E5%B8%A7_raw.png",
+            "naturalWidth": 270,
+            "naturalHeight": 480,
+            "complete": true,
+            "servedBytes": null
+          }
+        ],
+        "resources": [],
+        "heapUsedBytes": 72200000
+      }
+    },
+    "phaseB": {
+      "fixture": {
+        "units": 40,
+        "perUnitImages": "3840×2160 PNG ×2",
+        "singlePngBytes": 14276545
+      },
+      "initialDecode": {
+        "ok": false,
+        "pending": [
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_006_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0006%2FEP01_15",
+            "complete": false,
+            "naturalWidth": 0
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_006_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0006%2FEP01_15",
+            "complete": false,
+            "naturalWidth": 0
+          }
+        ]
+      },
+      "initialMedia": {
+        "images": [
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_001_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0001%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_001_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0001%2FEP01_15s_001_%E5%B0%BE%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_002_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0002%2FEP01_15s_002_%E9%A6%96%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_002_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0002%2FEP01_15s_002_%E5%B0%BE%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_003_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0003%2FEP01_15s_003_%E9%A6%96%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_003_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0003%2FEP01_15s_003_%E5%B0%BE%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_004_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0004%2FEP01_15s_004_%E9%A6%96%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_004_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0004%2FEP01_15s_004_%E5%B0%BE%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_005_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0005%2FEP01_15s_005_%E9%A6%96%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_005_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0005%2FEP01_15s_005_%E5%B0%BE%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_006_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0006%2FEP01_15s_006_%E9%A6%96%E5%B8%A7_raw.png",
+            "naturalWidth": 0,
+            "naturalHeight": 0,
+            "complete": false,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_006_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0006%2FEP01_15s_006_%E5%B0%BE%E5%B8%A7_raw.png",
+            "naturalWidth": 0,
+            "naturalHeight": 0,
+            "complete": false,
+            "servedBytes": null
+          }
+        ],
+        "resources": [],
+        "heapUsedBytes": 11900000
+      },
+      "focusLastNodeMs": 11.8,
+      "focusDecode": {
+        "ok": true,
+        "pending": []
+      },
+      "afterFocus": {
+        "longTasks": [],
+        "frames": {
+          "count": 9,
+          "p50Ms": 8.3,
+          "p95Ms": 58.5,
+          "maxMs": 58.5,
+          "meanMs": 17.59
+        },
+        "heapDeltaBytes": 0
+      },
+      "focusedMedia": {
+        "images": [
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_037_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0037%2FEP01_15s_037_%E9%A6%96%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_037_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0037%2FEP01_15s_037_%E5%B0%BE%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_038_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0038%2FEP01_15s_038_%E9%A6%96%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_038_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0038%2FEP01_15s_038_%E5%B0%BE%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_039_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0039%2FEP01_15s_039_%E9%A6%96%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_039_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0039%2FEP01_15s_039_%E5%B0%BE%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_040_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0040%2FEP01_15s_040_%E9%A6%96%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-asset://file/?path=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-p18-b-p1HlaU%2Flegacy-4k%2FEP01_15s_040_%E5%A4%A7%E5%9B%BE%E9%95%9C%E5%A4%B4_0040%2FEP01_15s_040_%E5%B0%BE%E5%B8%A7_raw.png",
+            "naturalWidth": 3840,
+            "naturalHeight": 2160,
+            "complete": true,
+            "servedBytes": null
+          }
+        ],
+        "resources": [],
+        "heapUsedBytes": 11900000
+      }
+    },
+    "phaseC": {
+      "fixture": {
+        "root": "/private/tmp/studio-p7-fixture-0x11wZ/p7-continuity-fixture-89764042",
+        "kind": "studio-p7 受管工程"
+      },
+      "managedDecode": {
+        "ok": true,
+        "pending": []
+      },
+      "managedMedia": {
+        "images": [
+          {
+            "src": "aicanvas-studio://thumbnail/1820c32fe7b7dd49aa7f03640ba805cad454799ec45f0e87f99bbccb3dca2a22?projectRoot=%2Fprivate%2Ftmp%2Fstudio-p7-fixture-0x11wZ%2Fp7-continuity-fixture-89764042",
+            "naturalWidth": 48,
+            "naturalHeight": 72,
+            "complete": true,
+            "servedBytes": null
+          },
+          {
+            "src": "aicanvas-studio://thumbnail/1820c32fe7b7dd49aa7f03640ba805cad454799ec45f0e87f99bbccb3dca2a22?projectRoot=%2Fprivate%2Ftmp%2Fstudio-p7-fixture-0x11wZ%2Fp7-continuity-fixture-89764042",
+            "naturalWidth": 48,
+            "naturalHeight": 72,
+            "complete": true,
+            "servedBytes": null
+          }
+        ],
+        "resources": [],
+        "heapUsedBytes": 19300000
+      },
+      "zoomClicks100": {
+        "clickTimes": {
+          "count": 100,
+          "p50Ms": 17,
+          "p95Ms": 18,
+          "maxMs": 24,
+          "meanMs": 16.74
+        },
+        "ipcCounts": {},
+        "wrapped": [],
+        "wrapFailures": {
+          "loadLayout": "assignment-not-effective",
+          "saveLayout": "assignment-not-effective",
+          "loadStudioCanvasLayout": "assignment-not-effective",
+          "saveStudioCanvasLayout": "assignment-not-effective",
+          "getStudioMedia": "assignment-not-effective"
+        },
+        "mutationBatches": 0,
+        "mutationNodesReplaced": 0,
+        "longTasks": [],
+        "frames": {
+          "count": 284,
+          "p50Ms": 8.3,
+          "p95Ms": 9.6,
+          "maxMs": 10.2,
+          "meanMs": 8.33
+        },
+        "heapUsedBytes": 19300000
+      }
+    },
+    "phaseD": {
+      "note": "当前 out/ 为 19:39 构建，主 chunk 已含异步分包（743,525 B）；1.72MB 整包基线已被该构建覆盖，无法同机回测，此处给出当前构建的绝对值。",
+      "runs": [
+        {
+          "run": 1,
+          "wallToLoadMs": 307,
+          "wallToInteractiveMs": 509,
+          "navToDomContentLoadedMs": 90,
+          "navToLoadMs": 91,
+          "paints": [
+            {
+              "name": "first-paint",
+              "startTime": 132
+            },
+            {
+              "name": "first-contentful-paint",
+              "startTime": 132
+            }
+          ],
+          "mainJs": [],
+          "heapUsedBytes": 35100000
+        },
+        {
+          "run": 2,
+          "wallToLoadMs": 320,
+          "wallToInteractiveMs": 388,
+          "navToDomContentLoadedMs": 90,
+          "navToLoadMs": 91,
+          "paints": [
+            {
+              "name": "first-paint",
+              "startTime": 92
+            },
+            {
+              "name": "first-contentful-paint",
+              "startTime": 136
+            }
+          ],
+          "mainJs": [],
+          "heapUsedBytes": 14300000
+        },
+        {
+          "run": 3,
+          "wallToLoadMs": 317,
+          "wallToInteractiveMs": 388,
+          "navToDomContentLoadedMs": 90,
+          "navToLoadMs": 91,
+          "paints": [
+            {
+              "name": "first-paint",
+              "startTime": 132
+            },
+            {
+              "name": "first-contentful-paint",
+              "startTime": 132
+            }
+          ],
+          "mainJs": [],
+          "heapUsedBytes": 14300000
+        },
+        {
+          "run": 4,
+          "wallToLoadMs": 320,
+          "wallToInteractiveMs": 378,
+          "navToDomContentLoadedMs": 90,
+          "navToLoadMs": 91,
+          "paints": [
+            {
+              "name": "first-paint",
+              "startTime": 96
+            },
+            {
+              "name": "first-contentful-paint",
+              "startTime": 132
+            }
+          ],
+          "mainJs": [],
+          "heapUsedBytes": 14300000
+        },
+        {
+          "run": 5,
+          "wallToLoadMs": 324,
+          "wallToInteractiveMs": 390,
+          "navToDomContentLoadedMs": 91,
+          "navToLoadMs": 92,
+          "paints": [
+            {
+              "name": "first-paint",
+              "startTime": 92
+            },
+            {
+              "name": "first-contentful-paint",
+              "startTime": 132
+            }
+          ],
+          "mainJs": [],
+          "heapUsedBytes": 14300000
+        }
+      ]
+    }
+  }
+}

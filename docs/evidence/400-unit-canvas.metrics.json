@@ -1,0 +1,120 @@
+{
+  "url": "file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/out/renderer/index.html",
+  "loading": false,
+  "visible": true,
+  "bounds": {
+    "x": 84,
+    "y": 33,
+    "width": 1560,
+    "height": 980
+  },
+  "rendererState": {
+    "readyState": "complete",
+    "title": "AI 漫剧画布",
+    "bodyText": "AI\n漫剧画布\n\nAI 漫剧画布 · 400 单元压力测试\n\n15 秒单元\n400\n待续做\n400\n首尾帧\n400 / 0\n视频\n0\n15:59 · 114ms\n项目\n扫描\n生产画布\n故事图谱\n自动改编\n生产设计\n分集剧本\n单元清单\n镜头时间线\n导演剪辑台\n资产库\n视频工作台\n导演验收\nCodex 接续\n生成队列\n任务中心\n项目设置\n分集\n10\n全部分集\nEP01\nEP02\nEP03\nEP04\nEP05\nEP06\nEP07\nEP08\nEP09\nEP10\n显示原镜头\n显示资产节点\n显示小说叙事链\n生产状态\n清除\n待尾帧\n400\n文件监听已开启\n/tmp/ai-canvas-large-ui-smoke-400\n批注\n分组\n连线\n01\n剧本\n0\n02\n硬锁资产\n0\n03\n首尾帧\n400\n04\n视频\n0\n05\n验收\n0\nEP10 · 15s 037\n待尾帧\nEP10 15s 037 压力测试镜头 0397\n首帧\n待补\n尾帧\n尾帧\n待补\n按连续性生成并保存尾帧 raw/labeled\n→\nEP10 · 15s 038\n待尾帧\nEP10 15s 038 压力测试镜头 0398\n首帧\n待补\n尾帧\n尾帧\n待补\n按连续性生成并保存尾帧 raw/labeled\n→\nEP10 · 15s 039\n待尾帧\nEP10 15s 039 压力测试镜头 0399\n首帧\n待补\n尾帧\n尾帧\n待补\n按连续性生成并保存尾帧 raw/labeled\n→\nEP10 · 15s 040\n待尾帧\nEP10 15s 040 压力测试镜头 0400\n首帧\n待补\n尾帧\n尾帧\n待补\n按连续性生成并保存尾帧 raw/labeled\n→\n400 个可见节点\n缩放 62%\n选择一个节点\n查看提示词、文件路径、版本与验收结果",
+    "bodyWidth": 1560,
+    "bodyHeight": 980,
+    "viewport": {
+      "width": 1560,
+      "height": 980,
+      "scrollWidth": 1560,
+      "scrollHeight": 980,
+      "canScrollX": false,
+      "canScrollY": false
+    },
+    "visibleRegions": {
+      ".adaptation-header": null,
+      ".adaptation-toolbar": null,
+      ".review-bar": null,
+      ".adaptation-grid": null,
+      ".facts-pane": null,
+      ".beats-pane": null,
+      ".plan-pane": null,
+      ".review-drawer": null
+    },
+    "moduleButtons": [
+      "生产画布",
+      "故事图谱",
+      "自动改编",
+      "生产设计",
+      "分集剧本",
+      "单元清单",
+      "镜头时间线",
+      "导演剪辑台",
+      "资产库",
+      "视频工作台",
+      "导演验收",
+      "Codex 接续",
+      "生成队列",
+      "任务中心",
+      "项目设置"
+    ]
+  },
+  "performanceProbe": {
+    "ok": true,
+    "checks": {
+      "all400LogicalNodes": true,
+      "filterExactOne": true,
+      "autoLayoutNoDuplicates": true,
+      "autoLayoutNoOverlaps": true,
+      "zoomChanged": true,
+      "lastNodeRenderedAfterPan": true,
+      "firstNodeUnloadedAfterPan": true,
+      "targetThumbnailDecoded": true,
+      "boundedDomImages": true
+    },
+    "visibleCaption": "400 个可见节点缩放 62%",
+    "logicalProductionNodes": 400,
+    "vueFlowNodesInDom": 9,
+    "productionNodesInDom": 4,
+    "images": {
+      "total": 4,
+      "decoded": 4
+    },
+    "viewport": {
+      "before": 0.62,
+      "afterZoomIn": 0.8,
+      "final": {
+        "x": -52.200000000000045,
+        "y": -61528.22,
+        "zoom": 0.62
+      }
+    },
+    "virtualization": {
+      "initialDomIds": [
+        "main-ep01-unit001",
+        "main-ep01-unit002",
+        "main-ep01-unit003",
+        "main-ep01-unit004",
+        "main-ep01-unit005",
+        "main-ep01-unit006"
+      ],
+      "focusedDomIds": [
+        "main-ep10-unit037",
+        "main-ep10-unit038",
+        "main-ep10-unit039",
+        "main-ep10-unit040"
+      ],
+      "targetNodeId": "main-ep10-unit040"
+    },
+    "layout": {
+      "duplicatePositionPairs": [],
+      "overlapPairs": []
+    },
+    "interactions": {
+      "showAllEpisodesMs": 330.9,
+      "filterMs": 208.5,
+      "clearFilterMs": 267.3,
+      "zoomInMs": 212.2,
+      "zoomOutMs": 155.3,
+      "focusLastNodeMs": 31
+    },
+    "frames": {
+      "samples": 89,
+      "p50Ms": 8.3,
+      "p95Ms": 9.2,
+      "maxMs": 9.4
+    },
+    "heapUsedBytes": 17100000
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "wrote": 0,
+  "freeze": {
+    "status": "blocked",
+    "code": "continuity-opaque",
+    "message": "允许资产 char-dudu 的 costume 仍是内部定位，必须录入实际视觉状态后才能冻结。"
+  },
+  "review": {
+    "decision": "pass",
+    "advancesHead": false,
+    "currentAtSubmission": false,
+    "staleReasons": [
+      "generation-input-stale",
+      "labeled:continuity-opaque: 资产 char-dudu 的 costume 是内部定位，不是可执行视觉状态。",
+      "raw:continuity-opaque: 资产 char-dudu 的 costume 是内部定位，不是可执行视觉状态。"
+    ]
+  },
+  "u25": {
+    "status": "result_pending_review",
+    "raw": null
+  },
+  "summary": {
+    "pass": 24,
+    "pendingReview": 1,
+    "inProgress": 0,
+    "failed": 0,
+    "blocked": 1
+  },
+  "pass": false,
+  "writeFailSample": [
+    {
+      "panel": "panel-133d9a",
+      "assetId": "char-dudu",
+      "field": "costume",
+      "ok": false,
+      "err": "continuity head continuity-head-f1c97f906ff7eccdb3aed2da6d8385b8c85a5245 已变化：期望 revision=0，实际 revision=1。"
+    },
+    {
+      "panel": "panel-133d9a",
+      "assetId": "char-dudu",
+      "field": "injury",
+      "ok": false,
+      "err": "continuity head continuity-head-3fa3bc54148693dcc71f35f910a7d9de2ffc63ac 已变化：期望 revision=0，实际 revision=1。"
+    },
+    {
+      "panel": "panel-133d9a",
+      "assetId": "char-dudu",
+      "field": "heldObject",
+      "ok": false,
+      "err": "continuity head continuity-head-d8880c6d1189acb93915b9439f7f47505eef2a11 已变化：期望 revision=0，实际 revision=1。"
+    },
+    {
+      "panel": "panel-133d9a",
+      "assetId": "char-dudu",
+      "field": "position",
+      "ok": false,
+      "err": "continuity head continuity-head-47990eee0e9b692a254cf8f503fade9b3a38fbe4 已变化：期望 revision=0，实际 revision=1。"
+    },
+    {
+      "panel": "panel-133d9a",
+      "assetId": "char-dudu",
+      "field": "facing",
+      "ok": false,
+      "err": "continuity head continuity-head-1861d99aa76a163b522089c5cddd7cae60ba1a11 已变化：期望 revision=0，实际 revision=1。"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "kind": "final-validation",
+  "createdAt": "2026-07-16T00:28:11Z",
+  "status": "in-progress",
+  "slice": "artlist-sidebrowser-control-recovery-strike2",
+  "sliceComplete": false,
+  "goalComplete": false,
+  "goalRuntimeStatus": "active",
+  "project": {
+    "id": "gushujuan-s3-f1a688020bfb7af6",
+    "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6"
+  },
+  "currentProduction": {
+    "jobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+    "publicationId": "publication-b17a8792-7c31-43ea-ae95-04be4de08f5f",
+    "checkpoint": "plan_ready",
+    "revision": 3,
+    "executionSurface": "codex-in-app-side-browser@1",
+    "formalRaw": 0,
+    "formalLabeled": 0,
+    "formalStoryboardSheets": 0
+  },
+  "validation": {
+    "sameJobPreserved": true,
+    "samePublicationPreserved": true,
+    "sidecarsUnchanged": true,
+    "sourceBoundaryUnchanged": true,
+    "noRemoteSideEffects": true,
+    "noDuplicateSubmission": true,
+    "browserControlAvailable": false,
+    "reason": "in_app_browser_control_transport_unavailable"
+  },
+  "blockedAudit": {
+    "strike": 2,
+    "threshold": 3,
+    "eligibleToMarkBlocked": false,
+    "goalRemainsActive": true
+  },
+  "sourceBoundary": {
+    "controlledAggregateSha256": "f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+    "fullRootAggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+  },
+  "evidence": [
+    "docs/evidence/artlist-sidebrowser-resume-attempt-strike2-20260716.json",
+    "docs/evidence/final-validation-20260716-artlist-sidebrowser-r3.json"
+  ],
+  "completionAudit": {
+    "fullSeasonAssetsComplete": false,
+    "all1288UnitsComplete": false,
+    "all4330RawComplete": false,
+    "all4330LabeledComplete": false,
+    "all1288StoryboardSheetsComplete": false,
+    "allowedToCompleteGoal": false
+  }
+}

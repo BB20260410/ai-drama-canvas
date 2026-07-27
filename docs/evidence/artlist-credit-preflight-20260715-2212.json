@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "kind": "artlist-generation-preflight",
+  "capturedAt": "2026-07-15T14:12:15Z",
+  "capturedAtAsiaShanghai": "2026-07-15T22:12:15+08:00",
+  "projectId": "gushujuan-s3-f1a688020bfb7af6",
+  "jobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+  "itemId": "asset-P01",
+  "page": {
+    "url": "https://toolkit.artlist.io/image-video-generator?mode=image",
+    "title": "Video & Image Generation – AI Toolkit | Artlist",
+    "surface": "authenticated_workbench",
+    "authenticationEvidence": [
+      "account_menu_visible",
+      "credit_balance_button_visible",
+      "session_list_visible"
+    ]
+  },
+  "frozenContract": {
+    "providerId": "artlist-gpt-image-2",
+    "model": "GPT Image 2",
+    "aspectRatio": "9:16",
+    "resolution": "Medium",
+    "imageCount": 1,
+    "concurrency": 1,
+    "mode": "text",
+    "allowedUploads": []
+  },
+  "observedPageState": {
+    "model": "纳米香蕉 2",
+    "aspectRatio": "16:9",
+    "resolution": "2K",
+    "imageCount": 1,
+    "unlimitedSwitchChecked": true,
+    "creditMessage": "您的积分不足以生成奖励。",
+    "generateButtonEnabled": false,
+    "matchesFrozenContract": false
+  },
+  "decision": {
+    "status": "stopped_before_side_effect",
+    "reason": "insufficient_credits_and_contract_mismatch",
+    "purchaseForbidden": true,
+    "resumeCondition": "Artlist no longer reports insufficient credits and the visible controls can be set to GPT Image 2 / 9:16 / Medium / 1 Image without purchase."
+  },
+  "actions": {
+    "promptEntered": false,
+    "settingsChanged": false,
+    "filesUploaded": false,
+    "submitIntentRecorded": false,
+    "generateClicked": false,
+    "remoteIdentityObserved": false,
+    "downloadStarted": false,
+    "publicationReceiptCreated": false,
+    "purchaseAttempted": false
+  },
+  "localStateAfterPreflight": {
+    "generationJobsSha256": "bd07e1276d6d7698f6cbf9adc6db85708768872d584a49d92e38677451ad1b6b",
+    "publicationsSha256": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+    "assetConsistencyBatchesSha256": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7",
+    "generationJobCount": 6,
+    "publicationIntentCount": 6,
+    "publicationReceiptCount": 0,
+    "formalGeneratedImageCount": 0
+  }
+}

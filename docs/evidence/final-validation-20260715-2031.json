@@ -1,0 +1,326 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-15T20:31:03+08:00",
+  "status": "passed",
+  "slice": "gushujuan-s3-fusion-storyboard-grid-and-local-chinese-sheet",
+  "summary": "第三季全季 1288 个 15 秒单元已物化自动 2–6 格分镜合同，逐格独立生图、硬锁依赖、唯一参考板、Publication/SHA/raw-labeled 门禁、本地 2160x3840 中文详细成板、MCP 与真实 Electron UI 纵向链路均已通过。全季为 1222 个两格和 66 个三格合同，共需 2642 张逐格画面；EP01 修订为 71 raw + 71 labeled + 34 中文板。正式第三季图片尚未生成，长期目标继续 active。",
+  "goal": {
+    "status": "active",
+    "complete": false,
+    "reason": "软件纵向切片已完成；EP01 仍需生成并验收 18 项新资产、71 对逐格 raw/labeled 和 34 张正式中文板，之后还需逐集扩展至全季 1288 单元。"
+  },
+  "priorityAudit": {
+    "previousHandoffPriority": "historical-ep22-artlist-job",
+    "previousHandoffPriorityStillValid": false,
+    "supersededByUser": true,
+    "nextUniqueHighestPriority": {
+      "priority": "P1",
+      "title": "恢复同一 P01 布囊 Artlist job 并完成 EP01 首批 6 项资产",
+      "status": "waiting_user_chrome_login",
+      "existingJobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+      "mustNotRequeue": true,
+      "userAction": "在 Chrome 手动登录 Artlist 后回复 Chrome 已登录",
+      "credentialHandling": "Codex 不读取、不保存、不输入凭据"
+    }
+  },
+  "sourceAuthorization": {
+    "authoritativeRoot": "/Users/hxx/Documents/古蜀卷第三季",
+    "mode": "read-only",
+    "isolatedWritableCopyAllowed": true,
+    "isolatedWritableRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+    "sourceWritebackForbidden": true,
+    "sourceSidecarCreatedOrModified": false
+  },
+  "sourceVerification": {
+    "algorithm": "sha256(relativePath-null-bytes-null-mtimeMs-null-fileSha256 joined by newline)",
+    "verifiedAt": "2026-07-15T20:31:03+08:00",
+    "fileCount": 3344,
+    "totalBytes": 24570877,
+    "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26",
+    "baselineAggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26",
+    "unchanged": true
+  },
+  "isolatedProject": {
+    "projectId": "gushujuan-s3-f1a688020bfb7af6",
+    "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+    "sourceContentAddress": "sha256:f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+    "counts": {
+      "episodes": 32,
+      "units": 1288,
+      "sourceShots": 1472,
+      "storyboardRows": 2640,
+      "assets": 77,
+      "characters": 24,
+      "scenes": 20,
+      "props": 33,
+      "continuityTracks": 77,
+      "continuitySpans": 4287
+    }
+  },
+  "authorityLocks": {
+    "ahang": {
+      "assetId": "C01",
+      "sha256": "5132d4320f956cf2a2320e52fae941ef15ffb243ad79343045006a8773f4548e",
+      "hardLocked": true,
+      "rules": [
+        "same face",
+        "black ancient robe",
+        "hair bun",
+        "left silver-white streak"
+      ]
+    },
+    "dudu": {
+      "assetId": "C02",
+      "sha256": "d6759fbd03df6d3b9c83e193130bea6073c15865a5f9cf7d308b069ea2b131cd",
+      "hardLocked": true,
+      "rules": [
+        "same breed and face",
+        "fixed black-white-brown markings",
+        "white curled tail"
+      ]
+    },
+    "goldenMask": {
+      "sha256": "91b074b882113d6c0bdde156e6d38adf7883e8388ba4064168d6c32ade8e2253",
+      "exposeToGeneration": false,
+      "rules": [
+        "complete structure only",
+        "hidden inside P01 before EP32",
+        "no half mask",
+        "no cracked mask",
+        "no mouth shape"
+      ]
+    }
+  },
+  "storyboardGrid": {
+    "contract": "FusionStoryboardGridContract",
+    "minimumPanels": 2,
+    "maximumPanels": 6,
+    "automaticSelection": true,
+    "singlePlotRowPolicy": "split into opening and closing panels",
+    "twoToSixRowsPolicy": "one plot row per panel",
+    "moreThanSixRowsPolicy": "ordered transparent grouping into six panels without dropping source rows",
+    "manualOverrideRequiresRevisionAndReason": true,
+    "oneAiImagePerPanel": true,
+    "aiGeneratedTextAllowed": false,
+    "chineseTextRenderedLocally": true,
+    "panelFields": [
+      "seconds",
+      "sourceStoryboardRows",
+      "sourceShots",
+      "assetIds",
+      "action",
+      "composition",
+      "shooting",
+      "continuityAndSound",
+      "dialogueAndSubtitle",
+      "frameRole",
+      "frozenNoTextPrompt"
+    ],
+    "allSeason": {
+      "contracts": 1288,
+      "panelDistribution": {
+        "2": 1222,
+        "3": 66
+      },
+      "panelImagesRequired": 2642
+    },
+    "episode01": {
+      "units": 34,
+      "panelDistribution": {
+        "2": 31,
+        "3": 3
+      },
+      "startFrames": 34,
+      "endFrames": 34,
+      "additionalMiddleFrames": 3,
+      "rawImagesRequired": 71,
+      "labeledImagesRequired": 71,
+      "localChineseSheetsRequired": 34
+    }
+  },
+  "generationContract": {
+    "purpose": "fusion_storyboard_panel",
+    "provider": "Artlist",
+    "model": "GPT Image 2",
+    "aspectRatio": "9:16",
+    "resolution": "Medium",
+    "imageCount": 1,
+    "maxConcurrency": 1,
+    "failClosed": [
+      "third-season unit image without current grid contract",
+      "unreviewed or unlocked dependency asset",
+      "duplicate panel job",
+      "stale or conflicting grid contract",
+      "more than six references or silent reference truncation",
+      "missing publication receipt",
+      "result SHA mismatch",
+      "missing raw/labeled pair",
+      "conflicting target file"
+    ]
+  },
+  "localChineseSheet": {
+    "renderer": "Sharp plus self-contained SVG",
+    "width": 2160,
+    "height": 3840,
+    "outputs": [
+      "PNG",
+      "SVG",
+      "receipt"
+    ],
+    "formalRenderRequiresCompletedPublications": true,
+    "fixture": {
+      "fixtureOnly": true,
+      "pngPath": "docs/evidence/fusion-storyboard-sheet-local-v1-20260715.png",
+      "pngSha256": "4965a57cde1c9a177cf716ea6512b88d8635caca923ba3a11fca8ed1bd9384dd",
+      "pngBytes": 1699584,
+      "svgPath": "docs/evidence/fusion-storyboard-sheet-local-v1-20260715.svg"
+    }
+  },
+  "mcp": {
+    "toolCount": 144,
+    "newTools": [
+      "build_fusion_storyboard_grid",
+      "render_fusion_storyboard_sheet"
+    ],
+    "enqueueGenerationSupportsFusionStoryboardPanel": true
+  },
+  "electronUi": {
+    "evidencePath": "docs/evidence/fusion-storyboard-grid-ui-smoke-20260715.json",
+    "screenshotPath": "docs/evidence/fusion-storyboard-grid-ui-smoke-20260715.png",
+    "screenshotSha256": "cdab3fab66d611b4f045b347e793e064da5d60d6f469da9c720699eefedd315a",
+    "unitCount": 1288,
+    "selectedItemId": "season-三-ep01-unit008",
+    "panelCount": 3,
+    "totalDurationSeconds": 15,
+    "allPanelFieldsPresent": true,
+    "localTextOnly": true,
+    "horizontalPageOverflow": false,
+    "pageErrors": 0,
+    "hardLockGate": {
+      "blockedAssetId": "P01",
+      "jobsBefore": 6,
+      "jobsAfter": 6,
+      "rejectedWithoutNewJob": true
+    }
+  },
+  "validation": {
+    "targetedGridSheetProduction": {
+      "testFiles": 3,
+      "testsPassed": 17,
+      "testsFailed": 0
+    },
+    "targetedMcpAndGrid": {
+      "testFiles": 5,
+      "testsPassed": 19,
+      "testsFailed": 0
+    },
+    "fullTest": {
+      "command": "npm test",
+      "testFiles": 48,
+      "testsPassed": 281,
+      "testsFailed": 0,
+      "durationSeconds": 100.63
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "passed": true
+    },
+    "productionBuild": {
+      "command": "npm run build",
+      "passed": true,
+      "built": [
+        "electron main",
+        "preload",
+        "renderer",
+        "compiled MCP"
+      ],
+      "warningsOnly": [
+        "Vite dynamic and static import chunk notice"
+      ]
+    }
+  },
+  "productionState": {
+    "episode01Assets": 20,
+    "authorityAssetsHardLocked": 2,
+    "newAssetsRequired": 18,
+    "generationJobs": 6,
+    "jobs": [
+      {
+        "assetId": "P01",
+        "jobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+        "status": "waiting_external",
+        "browserState": "plan_ready"
+      },
+      {
+        "assetId": "S01",
+        "jobId": "gen-2026-07-15T11-19-38-350Z-a654d3da",
+        "status": "queued"
+      },
+      {
+        "assetId": "P30",
+        "jobId": "gen-2026-07-15T11-19-38-387Z-c7ecc0a0",
+        "status": "queued"
+      },
+      {
+        "assetId": "S02",
+        "jobId": "gen-2026-07-15T11-19-38-423Z-788bc493",
+        "status": "queued"
+      },
+      {
+        "assetId": "C07",
+        "jobId": "gen-2026-07-15T11-19-38-459Z-d9861f39",
+        "status": "queued"
+      },
+      {
+        "assetId": "P29",
+        "jobId": "gen-2026-07-15T11-19-38-495Z-c9b89a3b",
+        "status": "queued"
+      }
+    ],
+    "remoteIdentities": 0,
+    "downloadedResults": 0,
+    "publicationReceipts": 0,
+    "formalNewAssetImages": 0,
+    "formalEpisode01PanelImages": 0,
+    "formalEpisode01ChineseSheets": 0,
+    "generateClicks": 0,
+    "creditsPurchased": false
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/fusion-s3-cas-materialization-20260715.json",
+      "role": "full-season CAS materialization and source before/after inventory"
+    },
+    {
+      "path": "docs/evidence/fusion-s3-storyboard-grids-20260715.json",
+      "sha256": "ae0232f1df5dd3e7f25193bb742c4ee90121827a3615e771fa9598f470b9a835",
+      "role": "1288 grid contracts and EP01 revised counts"
+    },
+    {
+      "path": "docs/evidence/fusion-storyboard-grid-ui-smoke-20260715.json",
+      "sha256": "dddfbd0f6246960de8c5de81d14fc723511a0f988de26e94e34ebb7e8cd063a1",
+      "role": "real Electron UI and hard-lock gate"
+    },
+    {
+      "path": "docs/evidence/fusion-storyboard-sheet-local-v1-20260715.json",
+      "sha256": "9d8158424af56005a7b30ff9daf92f211d0acf98f0b6441c46084edcaed89562",
+      "role": "fixture-only Chinese sheet renderer evidence"
+    }
+  ],
+  "prohibitedSubstitutions": [
+    "fixture sheet as formal third-season output",
+    "software test as proof of remote Artlist generation",
+    "EP01 as proof of full-season completion",
+    "requeueing the existing P01 job",
+    "buying credits without new explicit authorization",
+    "writing back to the third-season source root"
+  ],
+  "git": {
+    "branch": "main",
+    "commitsExist": false,
+    "worktree": "all project files untracked",
+    "staged": false,
+    "committed": false,
+    "pushed": false
+  }
+}

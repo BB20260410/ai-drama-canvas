@@ -1,0 +1,114 @@
+{
+  "url": "file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/out/renderer/index.html",
+  "loading": false,
+  "visible": true,
+  "bounds": {
+    "x": 84,
+    "y": 33,
+    "width": 1560,
+    "height": 980
+  },
+  "rendererState": {
+    "readyState": "complete",
+    "title": "AI 漫剧画布",
+    "bodyText": "AI 漫剧画布\nP7 确定性连续性合同夹具\n\n受管项目 · 仅访问当前工程 · 原媒体安全存放\n\n1 剧本\n2 资产\n3 绑定\n4 生成\n5 审片\n无限画布\n驾驶舱\nAgent 连接\n帮助 / 备份\n24\n全部素材\n2\n剧本 / 提示词\n3\n规范资产\n19\n媒体\n唯一下一步\n\n在驾驶舱选择下一格并冻结生图包：素材与单元已就绪；由 驾驶舱 打开单元视图，按 系统 投影处理阻塞宫格。\n\n继续\n项目\n刷新\n导入媒体\n工程素材\n本地受管\n剧本\n1\n提示词\n1\n角色\n1\n场景\n1\n道具\n1\n媒体\n19\n建立规范资产\n角色\n场景\n道具\n\n已隔离旧工程\n打开时不扫描其他项目或原媒体目录。\n\n搜索当前素材\n剧本 · 1 项\n剧本\nP7 确定性夹具剧本\n\n剧本正文\n\n正文已保存\n07/21\n上一页\n第 1 页 · 本页 1 / 共 1 项\n下一页\n剧本\nP7 确定性夹具剧本\n\n已保存 1 个不可变文本修订。\n\n剧本正文\n132 B\n阿航站在石室中央，双手捧着完整黄金面具。火光从左侧照入，所有画面必须保持身份与空间连续。\n诊断详情\n阿航站在石室中央，双手捧着完整黄金面具。火光从左侧照入，所有画面必须保持身份与空间连续。\n文档 ID\np7-fixture-script\n修订\nr1\nSHA\n4d91695561…74655c\n来源\nfixture/p7/EP01.md\n版本\np7-fixture-v1\n修订历史（最新在前，仅前 20 条）\nr1 · text-revision-bab76bb511419517fa15934aa4e1688233693098 · 4d91695561…74655c （当前）\n当前权威图\n未锁定\n尚无 approved 权威图\n此界面不执行生图\n后续由 Codex 根据已冻结的权威版本、正向锁和禁止项组装生图包，结果再回存当前工程。\n15 秒时间线\n已审片槽位 1\n导入剧本后在此显示镜头节奏\n0 / 15 秒\n3 个单元\n1 个已审片槽位\n进入剧本绑定",
+    "bodyWidth": 1560,
+    "bodyHeight": 980,
+    "viewport": {
+      "width": 1560,
+      "height": 980,
+      "scrollWidth": 1560,
+      "scrollHeight": 980,
+      "canScrollX": false,
+      "canScrollY": false
+    },
+    "visibleRegions": {
+      ".adaptation-header": null,
+      ".adaptation-toolbar": null,
+      ".review-bar": null,
+      ".adaptation-grid": null,
+      ".facts-pane": null,
+      ".beats-pane": null,
+      ".plan-pane": null,
+      ".review-drawer": null
+    },
+    "moduleButtons": []
+  },
+  "p2324Probe": {
+    "ok": false,
+    "checks": {
+      "singleDragSnapGuidesSeen": true,
+      "noGuidesAfterSingleStop": true,
+      "singleDragMoved": true,
+      "undoReverts": true,
+      "redoRestores": true,
+      "undoButtonsEnabled": true,
+      "groupDragNoGuides": true,
+      "groupFormationKept": true,
+      "groupDragMoved": true,
+      "groupSelectionCount": true,
+      "u1PackIdentity": true,
+      "u2Classification": false,
+      "u3ReviewIdentity": false,
+      "u4RevisionHistory": true
+    },
+    "notes": {
+      "nodeIds": [
+        "asset:prop-complete-golden-mask",
+        "unit:p7-unit-a-six-panel",
+        "unit:p7-unit-b-two-panel",
+        "unit:p24-unit-four-panel"
+      ],
+      "singleDrag": {
+        "beforeSingle": {
+          "x": 999,
+          "y": 521,
+          "left": 909,
+          "top": 460,
+          "width": 179
+        },
+        "afterSingle": {
+          "x": 571,
+          "y": 461,
+          "left": 481,
+          "top": 400,
+          "width": 179
+        },
+        "singleMaxGuides": 2,
+        "guidesAfterSingleStop": 0
+      },
+      "undoRedo": {
+        "afterUndo": {
+          "x": 999,
+          "y": 521,
+          "left": 909,
+          "top": 460,
+          "width": 179
+        },
+        "afterRedo": {
+          "x": 571,
+          "y": 461,
+          "left": 481,
+          "top": 400,
+          "width": 179
+        }
+      },
+      "groupDrag": {
+        "selectionCount": 2,
+        "groupMaxGuides": 0,
+        "deltaBefore": {
+          "dx": 65,
+          "dy": 44
+        },
+        "deltaAfter": {
+          "dx": 65,
+          "dy": 44
+        }
+      },
+      "u1Text": "冻结包身份（生成时版本）packIdstudio-generation-freeze-43a9dfb02e66d29113ad8ee1d8f9d960包指纹43a9dfb02e66…剧本修订text-revision-bab76bb511419517fa15934aa4e1688233693098 · 4d91695561ce…提示词修订text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675 · 83d641137e3a…",
+      "u2Text": "生成时身份studio-generation-freeze-43a9dfb02e66d29113ad8ee1d8f9d960 · 包指纹 43a9dfb02e66…",
+      "u3Text": "",
+      "u4Text": "修订历史（最新在前，仅前 20 条） r1 · text-revision-bab76bb511419517fa15934aa4e1688233693098 · 4d91695561…74655c （当前）"
+    }
+  }
+}

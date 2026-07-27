@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T03:48:01.494Z",
+  "success": true,
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "fixture": {
+    "jobId": "gen-2026-07-14T03-47-58-065Z-e3e542c0",
+    "promptId": "3d6ca5b5-d494-4865-9545-ac0af2e59395",
+    "providerRevision": 1,
+    "remoteSubmitted": true,
+    "realComfyUiCalled": false
+  },
+  "interaction": {
+    "queuedText": "等待远端\nEP01 15s 001 ComfyUI桌面验收\ngen-2026-07-14T03-47-58-065Z-e3e542c0\n\n电影写实，完整黄金面具，角色与道具连续，不得换脸。\n\nComfyUI Electron 协议夹具 · 3d6ca5b5-d494-4865-9545-ac0af2e59395\n快照 349385c93d54 · 工作流 f91dad8fd653\nComfyUI queued · R4 · prompt 3d6ca5b5\n/tmp/ai-canvas-comfyui-local-ui/EP01_15s_001_ComfyUI桌面验收/AI画布生成/EP01_15s_001_尾帧_e3e542c0_raw.png\n配对：/tmp/ai-canvas-comfyui-local-ui/EP01_15s_001_ComfyUI桌面验收/AI画布生成/EP01_15s_001_尾帧_e3e542c0_labeled.png\n请求单\n取消",
+    "completedText": "已完成\nEP01 15s 001 ComfyUI桌面验收\ngen-2026-07-14T03-47-58-065Z-e3e542c0\n\n电影写实，完整黄金面具，角色与道具连续，不得换脸。\n\nComfyUI Electron 协议夹具 · 3d6ca5b5-d494-4865-9545-ac0af2e59395\n快照 349385c93d54 · 工作流 f91dad8fd653\nComfyUI verified · R7 · prompt 3d6ca5b5 · 9[0] / electron-result.png\n/tmp/ai-canvas-comfyui-local-ui/EP01_15s_001_ComfyUI桌面验收/AI画布生成/EP01_15s_001_尾帧_e3e542c0_raw.png\n配对：/tmp/ai-canvas-comfyui-local-ui/EP01_15s_001_ComfyUI桌面验收/AI画布生成/EP01_15s_001_尾帧_e3e542c0_labeled.png\n请求单\nraw\nlabeled",
+    "steps": [
+      "打开生成队列",
+      "核验 queued 稳定 promptId",
+      "打开供应商设置",
+      "核验 official tuple/原子取消边界",
+      "关闭设置",
+      "点击提交 / 轮询",
+      "核验 verified 输出节点"
+    ]
+  },
+  "persisted": {
+    "status": "succeeded",
+    "attempts": 1,
+    "externalTaskId": "3d6ca5b5-d494-4865-9545-ac0af2e59395",
+    "checkpoint": {
+      "schemaVersion": 1,
+      "revision": 7,
+      "stage": "verified",
+      "updatedAt": "2026-07-14T03:48:00.279Z",
+      "clientId": "gen-2026-07-14T03-47-58-065Z-e3e542c0",
+      "promptId": "3d6ca5b5-d494-4865-9545-ac0af2e59395",
+      "workflowHash": "f91dad8fd653b409255568ab3af2572fcf705f3b244912a46f6cbc6bd62e4493",
+      "submittedWorkflowHash": "2a0496ae04276d13991ceff6eb8f8d7350ac9e009a0d1559739e3ebee2973855",
+      "requestPath": "/tmp/ai-canvas-comfyui-local-ui/.aicanvas/generation-requests/gen-2026-07-14T03-47-58-065Z-e3e542c0.comfyui.json",
+      "outputNodeId": "9",
+      "outputIndex": 0,
+      "preflight": {
+        "checkedAt": "2026-07-14T03:47:58.160Z",
+        "observedOrigin": "http://127.0.0.1:53483",
+        "comfyUiVersion": "electron-loopback",
+        "systemStatsSha256": "16ac0851af96cc3e7fc635f2f2ef182335664ae4807e497d4232f8297e08ea57",
+        "featuresSha256": "5398c126f227f1cc540a4372e0ce8775d10fc508db0a48b3f5badec388440d8c",
+        "nodeDefinitions": [
+          {
+            "classType": "CLIPTextEncode",
+            "sha256": "f928700eb21abb7bd4774ccef27633ca08663af6be7be796a39ed14eaf8dbedb"
+          },
+          {
+            "classType": "SaveImage",
+            "sha256": "02b4416d47c2a0c047f2d516a2d3d6ecc126a332852866d56bfb256790018dc6"
+          }
+        ]
+      },
+      "postAttemptedAt": "2026-07-14T03:47:58.170Z",
+      "queueNumber": 1,
+      "history": {
+        "generationJobId": "gen-2026-07-14T03-47-58-065Z-e3e542c0",
+        "promptId": "3d6ca5b5-d494-4865-9545-ac0af2e59395",
+        "clientId": "gen-2026-07-14T03-47-58-065Z-e3e542c0",
+        "clientJobId": "gen-2026-07-14T03-47-58-065Z-e3e542c0",
+        "attempt": 1,
+        "workflowHash": "f91dad8fd653b409255568ab3af2572fcf705f3b244912a46f6cbc6bd62e4493",
+        "submittedWorkflowHash": "2a0496ae04276d13991ceff6eb8f8d7350ac9e009a0d1559739e3ebee2973855",
+        "outputNodeId": "9",
+        "outputIndex": 0,
+        "historySha256": "f3cfbd528e167b5136a9ac98b37346cd58ec4cc7e7e8d9aa8405dc1e7a180d90",
+        "eventName": "execution_success",
+        "observedAt": "2026-07-14T03:48:00.223Z"
+      },
+      "output": {
+        "promptId": "3d6ca5b5-d494-4865-9545-ac0af2e59395",
+        "nodeId": "9",
+        "index": 0,
+        "filename": "electron-result.png",
+        "subfolder": "AI_Canvas",
+        "type": "output",
+        "historySha256": "f3cfbd528e167b5136a9ac98b37346cd58ec4cc7e7e8d9aa8405dc1e7a180d90"
+      }
+    },
+    "resultPath": "/tmp/ai-canvas-comfyui-local-ui/EP01_15s_001_ComfyUI桌面验收/AI画布生成/EP01_15s_001_尾帧_e3e542c0_raw.png",
+    "resultSha256": "ae2ea9edd0e23df53c243cf506e7a572ffa4420c832dcbc62e77eee6dd65097e",
+    "publicationReceiptId": "receipt-4a3471a9-05f4-4de8-82a3-e478b8ac5dde",
+    "outputBytes": 16763,
+    "outputSha256": "ae2ea9edd0e23df53c243cf506e7a572ffa4420c832dcbc62e77eee6dd65097e"
+  },
+  "protocolCounts": {
+    "post": 1,
+    "history": 1,
+    "queue": 0,
+    "view": 1
+  },
+  "fit": {
+    "innerWidth": 1560,
+    "innerHeight": 980,
+    "documentOverflowX": false,
+    "documentOverflowY": false,
+    "row": {
+      "left": 26,
+      "top": 266,
+      "right": 1534,
+      "bottom": 358
+    },
+    "list": {
+      "left": 0,
+      "top": 266,
+      "right": 1560,
+      "bottom": 980
+    }
+  },
+  "settingsFit": {
+    "scrollTop": 618,
+    "windowScrollX": 0,
+    "windowScrollY": 0,
+    "documentWidth": 1560,
+    "documentHeight": 980,
+    "viewportWidth": 1560,
+    "viewportHeight": 980,
+    "scroller": {
+      "top": 330,
+      "bottom": 921
+    },
+    "target": {
+      "top": 330,
+      "bottom": 1067.6875
+    }
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/comfyui-local-ui-20260714.png",
+    "bytes": 171069,
+    "sha256": "8aad4c881d1177078e4d730d0f343a3094f979b4c588b2dcd578bc344ed1dbfd",
+    "width": 1560,
+    "height": 980,
+    "brightRatio": 0.007467294610151753,
+    "chromaticRatio": 0.00782705389848247,
+    "nonDarkRatio": 0.034826007326007324,
+    "entropy": 1.5738644286757335,
+    "channelStdDev": [
+      19.222096490393124,
+      17.2103680296664,
+      13.679059294248004
+    ]
+  },
+  "settingsScreenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/comfyui-local-settings-ui-20260714.png",
+    "bytes": 78292,
+    "sha256": "52c37610f589c8a3559dcf425ffffa4e21b058fcf1fe77b5e26f9a7a42e6f33f",
+    "width": 760,
+    "height": 1428,
+    "brightRatio": 0.05332172342621259,
+    "chromaticRatio": 0.04367536488279522,
+    "nonDarkRatio": 0.14025873507297656,
+    "entropy": 2.4993139513608185,
+    "channelStdDev": [
+      43.72530247960016,
+      37.08680855759235,
+      26.094019483176123
+    ]
+  },
+  "settingsScreenshotScope": "visible-provider-settings-panel",
+  "cleanup": {
+    "projectRoot": "/tmp/ai-canvas-comfyui-local-ui",
+    "registryPath": "/tmp/ai-canvas-comfyui-local-ui-registry.json",
+    "projectRemoved": true,
+    "registryRemoved": true,
+    "serverClosed": true
+  },
+  "boundaries": {
+    "realComfyUiCalled": false,
+    "externalProviderCalled": false,
+    "websiteOpened": false,
+    "uploadPerformed": false,
+    "paidActionPerformed": false,
+    "signedDmgTouched": false
+  }
+}

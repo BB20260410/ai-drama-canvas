@@ -1,0 +1,278 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-07-14T04:50:00+08:00",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "objective": "arbitrary integer-frame lossless keyframe split and trim",
+  "status": "passed",
+  "commands": {
+    "typecheck": {
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    "targeted": {
+      "command": "npx vitest run tests/keyframe-curve.test.ts tests/editor.test.ts tests/codex.test.ts --maxWorkers=1",
+      "exitCode": 0,
+      "files": 3,
+      "tests": 33
+    },
+    "sourceMcpContract": {
+      "command": "npx vitest run tests/mcp-scan-cancel.test.ts --maxWorkers=1",
+      "exitCode": 0,
+      "tests": 1
+    },
+    "tests": {
+      "command": "npm test",
+      "exitCode": 0,
+      "files": 30,
+      "tests": 172,
+      "durationSeconds": 55.98
+    },
+    "build": {
+      "command": "npm run build",
+      "exitCode": 0,
+      "main": true,
+      "preload": true,
+      "renderer": true,
+      "compiledMcp": true
+    },
+    "mcpSmoke": {
+      "command": "npm run mcp:smoke",
+      "exitCode": 0,
+      "tools": 133,
+      "resourceTemplates": 9,
+      "prompts": 7
+    },
+    "compiledMcpContract": {
+      "command": "AI_CANVAS_MCP_SERVER_PATH=dist-mcp/mcp/server.js npx vitest run tests/mcp-scan-cancel.test.ts --maxWorkers=1",
+      "exitCode": 0,
+      "tests": 1
+    },
+    "subdivisionRenderSmoke": {
+      "command": "npm run editor:subdivision-render-smoke",
+      "exitCode": 0,
+      "evidence": "docs/evidence/keyframe-subdivision-render-smoke-20260714.json"
+    },
+    "subdivisionElectronUiSmoke": {
+      "command": "npm run ui:editor-subdivision-smoke",
+      "exitCode": 0,
+      "evidence": "docs/evidence/editor-subdivision-ui-smoke-20260714.json",
+      "rebuiltBeforeLaunch": true,
+      "isolatedFixtureCleaned": true
+    },
+    "legacyBezierRenderRegression": {
+      "command": "npm run editor:bezier-render-smoke",
+      "exitCode": 0
+    },
+    "legacyBezierUiRegression": {
+      "command": "npm run ui:editor-bezier-smoke",
+      "exitCode": 0,
+      "stableScreenshotContentGate": true
+    },
+    "fullWorkflowSmoke": {
+      "command": "npm run full:smoke",
+      "exitCode": 0,
+      "restartVerified": true
+    }
+  },
+  "keyframeCurveContract": {
+    "contractVersion": 2,
+    "scope": "overlay-visual-tracks",
+    "segmentOwnership": "destination-keyframe-controls-entering-segment",
+    "authored": {
+      "mode": "unit",
+      "editable": true,
+      "controlPointRange": [0, 1],
+      "monotonic": true,
+      "overshoot": false
+    },
+    "derived": {
+      "mode": "derived_monotone",
+      "editable": false,
+      "monotonic": true,
+      "sourceWindow": "original-easing-and-required-integer-frame-window",
+      "sourceTransform": "original-segment-start-and-end-transform-anchors",
+      "semanticAuthority": "sourceWindow+sourceTransform",
+      "roundedChildBoundaryIsSemanticAuthority": false
+    },
+    "editing": {
+      "splitTrim": "arbitrary-frame-lossless-subdivision",
+      "arbitraryCurveSubdivision": true,
+      "algorithm": "de-casteljau-coordinate-renormalization",
+      "quantization": "project-integer-frame",
+      "holdPolicy": "step-at-original-destination-frame",
+      "failurePolicy": "reject-if-unprovable"
+    },
+    "otio": {
+      "namespace": "metadata.aicanvas",
+      "acceptedContracts": ["aicanvas.cubic-bezier.v1", "aicanvas.cubic-bezier.v2"],
+      "exportPolicy": "lowest-compatible-v1-unit-v2-derived",
+      "portability": "aicanvas-private-metadata",
+      "foreignCurvePolicy": "reject-before-project-create"
+    }
+  },
+  "automatedCoverage": {
+    "legacyPresetFormulasUnchanged": true,
+    "pathologicalZeroDerivativeCurve": true,
+    "deCasteljauRecomposition": true,
+    "outsideUnitDerivedControlsNotClamped": true,
+    "integerFrameSourceWindow": true,
+    "originalTransformAnchors": true,
+    "sourceTransformTamperRejected": true,
+    "repeatedSubdivision": true,
+    "holdDestinationFramePreserved": true,
+    "constantTailPreserved": true,
+    "splitTrimCasHistory": true,
+    "fractionalTimebase": true,
+    "otioV1V2RoundTripAndRejection": true,
+    "sourceAndCompiledMcpSchema": true,
+    "electronSplitUndoRedo": true,
+    "electronDerivedReadOnly": true,
+    "electronPointerCancelRestoresWithoutWrite": true,
+    "electronRepeatedTrim": true,
+    "stableScreenshotContentGate": true
+  },
+  "renderEquivalence": {
+    "curve": { "x1": 1, "y1": 0, "x2": 0, "y2": 1 },
+    "codec": "h264",
+    "width": 320,
+    "height": 320,
+    "timebase": "24000/1001",
+    "frames": 48,
+    "durationSeconds": 2.002,
+    "baselineAndSplitByteIdentical": true,
+    "baselineAndSplitSha256": "b1103325920c0949b4cc454ff4989ec8588b314b7501ded43d9250165e23f4a3",
+    "maxTransformDifference": 0,
+    "split": {
+      "centroidError": 0,
+      "bboxDifference": 0,
+      "redPixelDifference": 0,
+      "meanAbsoluteChannelDifference": 0,
+      "maxChannelDifference": 0
+    },
+    "trimStart": {
+      "centroidError": 0,
+      "bboxDifference": 0,
+      "redPixelDifference": 0,
+      "meanAbsoluteChannelDifference": 0.005950520833333334,
+      "maxChannelDifference": 6
+    },
+    "trimEnd": {
+      "centroidError": 0,
+      "bboxDifference": 0,
+      "redPixelDifference": 0,
+      "meanAbsoluteChannelDifference": 0.006666666666666667,
+      "maxChannelDifference": 9
+    },
+    "publicationReceipts": 4,
+    "finalProjectLocks": 0,
+    "finalActiveMediaWeight": 0,
+    "finalMediaQueueDepth": 0
+  },
+  "electronUi": {
+    "transport": "source-electron-current-build",
+    "split": {
+      "globalFrame": 13,
+      "left": { "startFrame": 6, "durationFrames": 7, "sourceStartFrame": 0, "sourceEndFrame": 7, "sourceTotalFrames": 36 },
+      "right": { "startFrame": 13, "durationFrames": 29, "sourceStartFrame": 7, "sourceEndFrame": 36, "sourceTotalFrames": 36 }
+    },
+    "otioV2": true,
+    "undoRestoredSingleClip": true,
+    "redoRestoredSplit": true,
+    "derivedSelectDisabled": true,
+    "derivedInputsDisabled": true,
+    "derivedControlsOutsideUnitPreserved": true,
+    "editableHandles": 0,
+    "pointerCancel": {
+      "revisionBefore": 6,
+      "revisionAfter": 6,
+      "projectSha256Unchanged": true,
+      "geometryRestored": true,
+      "pageErrors": []
+    },
+    "trimStart": { "startFrame": 19, "durationFrames": 23, "sourceStartFrame": 13, "sourceEndFrame": 36 },
+    "trimEnd": { "startFrame": 19, "durationFrames": 17, "sourceStartFrame": 13, "sourceEndFrame": 30 },
+    "screenshot": {
+      "path": "docs/evidence/editor-subdivision-ui-20260714.png",
+      "width": 1560,
+      "height": 980,
+      "sizeBytes": 322289,
+      "sha256": "fd90a6b635995df4059bfbcc41063e6129a03e19df3577cc4c711e22e9ea85ad",
+      "brightRatio": 0.08296310832025118,
+      "chromaticRatio": 0.05448456305599163,
+      "visuallyInspected": true
+    },
+    "isolatedRootRemoved": true,
+    "isolatedRegistryRemoved": true
+  },
+  "evidenceHashes": {
+    "docs/evidence/keyframe-subdivision-render-smoke-20260714.json": "29222d5479e1c807ebf704391412eb264cad3de8faa287f4166b9a74b95cf488",
+    "docs/evidence/keyframe-subdivision-baseline-20260714.mp4": "b1103325920c0949b4cc454ff4989ec8588b314b7501ded43d9250165e23f4a3",
+    "docs/evidence/keyframe-subdivision-split-20260714.mp4": "b1103325920c0949b4cc454ff4989ec8588b314b7501ded43d9250165e23f4a3",
+    "docs/evidence/keyframe-subdivision-trim-start-20260714.mp4": "113bfbe939a6fa8c9b28d2dfa1baae45f9157a5c301ebca7dc712053a33f6c50",
+    "docs/evidence/keyframe-subdivision-trim-end-20260714.mp4": "e2aecff39074d9c0e53200795884c074c1b5606be39782d49bca584603e8f88b",
+    "docs/evidence/editor-subdivision-ui-smoke-20260714.json": "642c2a39fa06c287d03c8ee1fc9aeed9ba572e755155f29553aecb50e508dbac",
+    "docs/evidence/editor-subdivision-ui-20260714.png": "fd90a6b635995df4059bfbcc41063e6129a03e19df3577cc4c711e22e9ea85ad",
+    "docs/evidence/editor-subdivision-split-20260714.otio": "9ed813bfdc825dcf7d273bb752c8090d65acbc7bd9aebe49f306d31e163fc133",
+    "docs/evidence/editor-subdivision-final-20260714.otio": "00b83577d6891a72271bf4caa5a46e3ebc701d028deb3246a31622d75b238dc2",
+    "docs/evidence/keyframe-bezier-render-smoke-20260714.json": "7e45a197d495a4adf720f0e82e53b09097f1cacaef8322183e242d8750ba3597",
+    "docs/evidence/editor-bezier-ui-smoke-20260714.json": "a6fb2a11a9150ddd201a025557cdeadc8cbf6cb599fc95aee6e0c60833d6aebc",
+    "docs/evidence/editor-bezier-20260714.png": "45a07f9e557671dca17611e79f41d39f6c7b07128d74ce36f30cb6e21b47eaa0",
+    "docs/evidence/editor-bezier-1280-20260714.png": "bb0b5e2aed3ee81fbaf93b8150af5239224b883e6aef7cc5fa70ea6dcfb511a9"
+  },
+  "sourceHashes": {
+    "src/core/types.ts": "242db9042cfd70a5b02c4239ad8ba52f9ed66ba7625281e1a468b78477790134",
+    "src/core/keyframe-curve.ts": "dabf66146c642040d1419e11393e2d39461fe2b224ae4037bc04a6d7936172f6",
+    "src/core/editor.ts": "affae7d2d452f0ff8ffb1d70530cd0583b86b251899a1830d9a3bbd9c385a198",
+    "src/core/codex.ts": "f82ad6afa94e1f330d684c19f36d814eae5dae102e653c788394517ee488fbc2",
+    "src/mcp/server.ts": "f15d6de5c9aad86caa4c94ca7e08db52211e2d718f827ca8ceb3a9ad8e743d7c",
+    "src/renderer/src/components/VideoEditorView.vue": "dc7df0fe0805cc78e0fd273448e55666ac39393f67e52f1ce9b64c148b0cd0c5",
+    "scripts/keyframe-subdivision-render-smoke.ts": "e8d86ee2aaae3480ce2ed22cc0d8636c2bc733cf9d8557a376b93b632927ba11",
+    "scripts/create-editor-ui-fixture.ts": "47713e189558e487573b691f0954aebdcbc132e0f7ebe53ef2c938bab95509a4",
+    "scripts/ui-editor-subdivision-smoke.mjs": "de0033eb0c30fe9f4f1e21cfebd4b70dbcf9367efd107ca559d6b9289a0f8d87",
+    "scripts/ui-editor-smoke.mjs": "3133cdabcec0497134541409dff870d839c1b6d57f90bdd90789a1807ee7f684",
+    "tests/keyframe-curve.test.ts": "7bafbacfa0d6936463cad63d9f1e233a5d97ee9665b7ea86528e75020d9ff157",
+    "tests/editor.test.ts": "541e0dc45a61ae8768d6c1e104ae37d80fb82b98aba5d4afb851ebe76ffd8863",
+    "tests/codex.test.ts": "053f898b867058e42dd827101db3c1086e78f961281a3da1bf2f80ddb2c8f02c",
+    "tests/mcp-scan-cancel.test.ts": "698af5ec9036322a8a243cef66eb1b37435ae8b58026855bc915d2c1360c75b0",
+    "package.json": "bc2e833c2e481e1c96358697a37c0e920f4d3b7a66a90fd5d9f0ef04f97b1cbd"
+  },
+  "documentationHashes": {
+    "README.md": "722eaf3303c778a66d92baaa302157f2053a2d37ecd7d5ccadd798ca1cb56648",
+    "docs/CODEX_MCP.md": "7af0dc8de62c70985107093a56038e444036ae313f21245c645fe3268692de40",
+    "docs/验证报告_任意关键帧边界无损分段_2026-07-14.md": "cfa91f221157cf46d341be6ca5f71fa3a775daed16f83d872f01ef1584badb2c"
+  },
+  "packaging": {
+    "existingSignedDmgUpdated": false,
+    "existingSignedDmgContainsPreviousSource": true,
+    "existingSignedDmgPath": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "existingSignedDmgSizeBytes": 136652595,
+    "existingSignedDmgSha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972"
+  },
+  "boundaries": {
+    "formalProjectRootsTouched": false,
+    "generationWebsiteOpened": false,
+    "uploadsPerformed": false,
+    "paidSubmissionsPerformed": false,
+    "existingPackageOverwritten": false,
+    "softwareInstalled": false,
+    "softwarePublished": false,
+    "gitCommitCreated": false,
+    "gitPushPerformed": false,
+    "pullRequestCreated": false,
+    "notarizationPerformed": false,
+    "oldThreadContentRead": false,
+    "isolatedFixturesCleaned": true
+  },
+  "knownLimitations": [
+    "main-track-transform-keyframes",
+    "complex-nested-timelines",
+    "third-party-effect-compatibility",
+    "real-project-nle-validation"
+  ],
+  "nextPriority": {
+    "id": "main-track-transform-keyframes",
+    "priority": "P1",
+    "requiresNewExternalAuthorization": false,
+    "reason": "The shared keyframe model is still restricted to overlay visual tracks while main-track rendering rejects transform animation."
+  }
+}

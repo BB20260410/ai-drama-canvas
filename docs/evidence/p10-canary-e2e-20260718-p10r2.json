@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 2,
+  "kind": "p10-canary-e2e",
+  "status": "pass",
+  "createdAt": "2026-07-18T07:21:47.086Z",
+  "buildIdentity": {
+    "buildId": "1ee489189308542684e83679a1724a6a",
+    "sourceDigest": "3996312f7fe09de33d7148405786293b1ae2d25c0015a125637ff3c69412c244",
+    "fingerprint": "c7756c7f0a627ecc30921cf9455612ba117e5196383f1c03f80fa40bcd254095",
+    "capabilities": {
+      "mcpToolCount": 182,
+      "protocolVersion": "1.1",
+      "studioDashboard": true,
+      "studioBinding": true,
+      "studioContinuity": true,
+      "formalImagegenProvider": "agent-imagegen",
+      "formalImagegenProviders": [
+        "codex",
+        "grok"
+      ],
+      "browserGeneration": false,
+      "artlist": false
+    }
+  },
+  "mcp": {
+    "toolCount": 182,
+    "capabilitiesToolCount": 182,
+    "formalImagegenProviders": [
+      "codex",
+      "grok"
+    ]
+  },
+  "dualProvider": {
+    "sameAllowedProviders": true,
+    "sameFrozenPack": true,
+    "sharedPanelId": "p7-unit-a-panel-01",
+    "codex": {
+      "provider": "codex",
+      "packId": "studio-generation-freeze-1d9e1306643283f171ebbfa82e692a5d",
+      "packFingerprint": "1d9e1306643283f171ebbfa82e692a5db2c4d9d69467b9cd224dd4e1798a6470",
+      "executorKind": "agent-imagegen",
+      "allowedProviders": [
+        "codex",
+        "grok"
+      ],
+      "rawSha": "1209744ddbd17bcd7688fb0dcab77233d2bf4275c7e1df732410c17ced7ff325",
+      "labeledSha": "1b23b2ef6a5303347edd234ff8ae8ba311d9d49a9b2434fda3b9b5fe8b1e135a",
+      "briefHasLocalPath": false
+    },
+    "grok": {
+      "provider": "grok",
+      "packId": "studio-generation-freeze-1d9e1306643283f171ebbfa82e692a5d",
+      "packFingerprint": "1d9e1306643283f171ebbfa82e692a5db2c4d9d69467b9cd224dd4e1798a6470",
+      "executorKind": "agent-imagegen",
+      "allowedProviders": [
+        "codex",
+        "grok"
+      ],
+      "rawSha": "1209744ddbd17bcd7688fb0dcab77233d2bf4275c7e1df732410c17ced7ff325",
+      "labeledSha": "1b23b2ef6a5303347edd234ff8ae8ba311d9d49a9b2434fda3b9b5fe8b1e135a",
+      "briefHasLocalPath": false
+    }
+  },
+  "canary": {
+    "twoPanelUnitId": "p7-unit-b-two-panel",
+    "sixPanelUnitId": "p7-unit-a-six-panel",
+    "longChinesePresent": true,
+    "sixPanelCount": 6,
+    "sixNextAction": "approved-raw-ready",
+    "restartFingerprintMatch": true,
+    "readinessNoLocalPath": true
+  },
+  "backupRestore": {
+    "schemaVersion": 2,
+    "fileCount": 70,
+    "hasPerFileSha": true,
+    "restoredProjectId": "project-7879832102c5",
+    "duplicateRestoreRejected": true
+  },
+  "boundaries": {
+    "formalImageGenerationCalls": 0,
+    "realImagegenCanary": false,
+    "browserSupplierCalls": 0,
+    "gitStage": 0,
+    "fixtureMediaUsed": true
+  }
+}

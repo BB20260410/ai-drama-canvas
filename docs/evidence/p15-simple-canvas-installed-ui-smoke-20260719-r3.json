@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "kind": "p15-simple-canvas-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-19T02:47:06.048Z",
+  "projectId": "project-c79b138b82f4",
+  "runtime": "installed-app",
+  "ui": {
+    "simpleEntrypoints": [
+      "添加",
+      "素材库",
+      "连线",
+      "开始"
+    ],
+    "libraryCollapsedByDefault": true,
+    "freeDrag": true,
+    "connectionHandles": true,
+    "nodeLayoutBounded": true,
+    "visibleNodeCount": 12,
+    "maxNodeWidth": 123,
+    "maxNodeHeight": 137,
+    "panelRowsSeparated": true,
+    "crossCategoryPinnedAssets": 3,
+    "draftEdgePersisted": true,
+    "clearWorkspaceIsViewOnly": true,
+    "restartPreserved": true,
+    "provider": "codex",
+    "externalRequests": 0,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "rendererCrashed": false
+  },
+  "production": {
+    "targetPanels": 2,
+    "packsAdded": 2,
+    "dispatchesAdded": 2,
+    "resultsAdded": 0,
+    "realImageGenerated": false,
+    "visualReviewClaimed": false
+  },
+  "safety": {
+    "draftIsNotBindingSource": true,
+    "formalFreezeRebuiltByOwner": true,
+    "noBrowserGeneration": true,
+    "noUpload": true,
+    "noPayment": true,
+    "noPublish": true,
+    "isolatedFixtureCleaned": {
+      "fixture": true,
+      "runtime": true
+    }
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p15-simple-canvas-installed-ui-smoke-20260719-r3.png",
+    "sizeBytes": 382484,
+    "sha256": "f54faaaa777073fc6b271041a2dd828972933978ff086c4ccedf0ed1b21b5934",
+    "width": 1728,
+    "height": 1029,
+    "stdev": 32.60152573582244
+  }
+}

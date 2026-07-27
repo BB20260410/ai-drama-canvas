@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "kind": "p1-generation-projection-refresh",
+  "createdAt": "2026-07-17T01:29:14.832Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "jobId": "gen-2026-07-16T12-10-57-215Z-892023c0",
+  "itemId": "season-三-ep01-unit008",
+  "backupRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p1-generation-projection-20260717-before-scan",
+  "backupManifest": [
+    {
+      "sourcePath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/index.json",
+      "backupPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p1-generation-projection-20260717-before-scan/index.json",
+      "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p1-generation-projection-20260717-before-scan/index.json",
+      "bytes": 21857599,
+      "sha256": "e3b22e7934a583a8e1929b136590061ecd4a0bb2edf78dcea06616831caead68"
+    },
+    {
+      "sourcePath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/events.jsonl",
+      "backupPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p1-generation-projection-20260717-before-scan/events.jsonl",
+      "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p1-generation-projection-20260717-before-scan/events.jsonl",
+      "bytes": 237055,
+      "sha256": "2484eb55c306ee7f8b15464e99bc9021d0ae7da4016858a46a80d8f5871b19e4"
+    },
+    {
+      "sourcePath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/cache.sqlite",
+      "backupPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p1-generation-projection-20260717-before-scan/cache.sqlite",
+      "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p1-generation-projection-20260717-before-scan/cache.sqlite",
+      "bytes": 48168960,
+      "sha256": "eb4089d8b9e498d64618791b959d158573843b9d359c89f5e7ef4a60268f00aa"
+    }
+  ],
+  "sourceBoundary": {
+    "before": {
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "after": {
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "unchanged": true
+  },
+  "immutableGenerationState": {
+    "generationJobsBeforeSha256": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182",
+    "generationJobsAfterSha256": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182",
+    "publicationsBeforeSha256": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238",
+    "publicationsAfterSha256": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238",
+    "jobs": 30,
+    "publicationIntents": 31,
+    "publicationReceipts": 26
+  },
+  "before": {
+    "scanId": "a0b506b1-d6ab-4fe1-b3c5-68986da00b05",
+    "storedPanelState": "generating",
+    "livePanelState": "generation_unknown",
+    "liveIssue": "供应商调用结果不明；禁止重试，必须先完成结构化对账"
+  },
+  "after": {
+    "scanId": "34955bb4-bc9a-4ef3-9eb8-f1b86b6780fb",
+    "unitCount": 1288,
+    "contractId": "grid-76e6545a6efec0e4091b",
+    "panelCount": 6,
+    "completedPanelCount": 4,
+    "panelStates": [
+      "awaiting_review",
+      "awaiting_review",
+      "awaiting_review",
+      "awaiting_review",
+      "generation_unknown",
+      "missing"
+    ],
+    "panel05GenerationStatus": "generation_unknown",
+    "panel05Issue": "供应商调用结果不明；禁止重试，必须先完成结构化对账"
+  },
+  "assertions": {
+    "backupCreated": true,
+    "liveProjectionWasAlreadyUnknown": true,
+    "storedCanvasProjectionRefreshed": true,
+    "generationJobUnchanged": true,
+    "publicationsUnchanged": true,
+    "noOutputCreated": true,
+    "sourceUnchanged": true
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "kind": "aicanvas-formal-project-nle-mcp-smoke",
+  "generatedAt": "2026-07-14T23:47:11.663Z",
+  "status": "passed",
+  "projectRoot": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729",
+  "registryPath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/.runtime/registry.json",
+  "statePath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/calibration-state.json",
+  "compiledServer": {
+    "path": "/Users/hxx/Documents/无限画布/dist-mcp/mcp/server.js",
+    "bytes": 187144,
+    "sha256": "648d5bb98359db7ec3d68dc297c6514024f745a1f6a2e52a7c18e4f5bf446d00"
+  },
+  "source": {
+    "toolCount": 134,
+    "capabilityMissingForFullNle": [],
+    "scanId": "0495b879-d9ac-4ba0-9096-97f9c59fbbd0",
+    "projectName": "封神篇正式剧本派生 NLE 校准",
+    "stateRevisionBefore": 6,
+    "liveRevisionBefore": 6,
+    "commandExpectedRevision": 5,
+    "revisionAfter": 6,
+    "recoveredPriorCommittedWrite": true,
+    "existingLedgerRequestHash": "5178522aaa1800d6ad6c633c6238f8b864126a5d5e3639bc7d6c92ee39f2a3b9",
+    "firstCallReplayed": true,
+    "replayed": true,
+    "stderrTail": "(node:98336) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+  },
+  "compiled": {
+    "toolCount": 134,
+    "capabilityMissingForFullNle": [],
+    "revision": 6,
+    "persistedNote": "正式封神篇 NLE：source MCP CAS 已验证，等待 compiled fresh-process 复读。",
+    "ledger": {
+      "schemaVersion": 1,
+      "requestId": "formal-nle-source-mcp-edit-17963ad8-94ce-4398-bea5-488749bfbd7d-request-1",
+      "idempotencyKey": "formal-nle-source-mcp-edit-17963ad8-94ce-4398-bea5-488749bfbd7d-idempotency-v1",
+      "command": "apply_edit_operation",
+      "status": "succeeded",
+      "replayed": false,
+      "requestHash": "5178522aaa1800d6ad6c633c6238f8b864126a5d5e3639bc7d6c92ee39f2a3b9",
+      "execution": {
+        "pid": 75921,
+        "phase": "side_effect_committed",
+        "heartbeatAt": "2026-07-14T23:36:20.857Z"
+      },
+      "startedAt": "2026-07-14T23:36:20.795Z",
+      "result": {
+        "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+        "revision": 6,
+        "updatedAt": "2026-07-14T23:36:20.830Z",
+        "affectedTrackIds": [
+          "track-b5270728-9c0a-4a36-bcc7-ff25c7f64e62"
+        ],
+        "affectedClipIds": [
+          "clip-formal-ep22-010"
+        ]
+      },
+      "executedAt": "2026-07-14T23:36:20.860Z"
+    },
+    "continuationCleanup": {
+      "before": {
+        "id": "continuation-d3765fc6-9d59-4024-99ac-b9fa05d89649",
+        "revision": 2,
+        "status": "cancelled"
+      },
+      "after": {
+        "id": "continuation-d3765fc6-9d59-4024-99ac-b9fa05d89649",
+        "revision": 2,
+        "status": "cancelled",
+        "error": "正式 NLE 校准仅验证 enqueue:false 的时间线续接帧；按授权边界明确取消未入队包，不创建外部生成任务。"
+      },
+      "recovered": true,
+      "generationEnqueued": false,
+      "ledger": {
+        "schemaVersion": 1,
+        "requestId": "formal-nle-continuation-cleanup-continuation-d3765fc6-9d59-4024-99ac-b9fa05d89649-request-1",
+        "idempotencyKey": "formal-nle-continuation-cleanup-continuation-d3765fc6-9d59-4024-99ac-b9fa05d89649-idempotency-v1",
+        "command": "update_video_continuation",
+        "status": "succeeded",
+        "replayed": false,
+        "requestHash": "a2cd00b4680d6ff54b59d46e964800516d2a28af35d7e932fbb12bcf5e354769",
+        "execution": {
+          "pid": 94519,
+          "phase": "side_effect_committed",
+          "heartbeatAt": "2026-07-14T23:45:51.721Z"
+        },
+        "startedAt": "2026-07-14T23:45:51.680Z",
+        "result": {
+          "schemaVersion": 1,
+          "id": "continuation-d3765fc6-9d59-4024-99ac-b9fa05d89649",
+          "revision": 2,
+          "projectId": "project-29d03471c583",
+          "itemId": "main-ep22-unit053",
+          "sourceType": "timeline",
+          "sourceVideoPath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/.calibration_media/formal-reference-derived-48fps.mp4",
+          "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+          "editProjectRevision": 5,
+          "dependencyManifestSha256": "9a80b2ce36e0a86b635f56b5ba7853da341288e6b3c6902b936af3a2fba804ab",
+          "renderPlanSha256": "d3e2ff0073be7e95bd2e92eff56917793a7c84b869082f97f77ce1c8dee1b980",
+          "timelineFrameId": "timeline-frame-21afee1a-2f34-4268-9023-b8e294fc9b3a",
+          "timelineTimeSeconds": 455.956,
+          "targetFirstFrameArtifactId": "main-ep22-unit053-67b0b6ba8212",
+          "lastFramePath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/EP22_15s_053_极缓推·极特写·黑金渗入空格/AI画布生成/EP22_15s_053_首帧_时间线合成_0455956ms_94fc9b3a_raw.png",
+          "prompt": "承接 EP22 镜53 正式剧本结尾；保持封神台、涟漪、定格与淡出方向连续。",
+          "referencePaths": [
+            "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/EP22_15s_053_极缓推·极特写·黑金渗入空格/AI画布生成/EP22_15s_053_首帧_时间线合成_0455956ms_94fc9b3a_raw.png"
+          ],
+          "hardLocks": [],
+          "expectedOutputDirectory": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/EP22_15s_053_极缓推·极特写·黑金渗入空格",
+          "acceptanceCriteria": [
+            "新视频第一帧与提取末帧视觉连续",
+            "角色、道具、服装、完整面具与场景硬锁不变",
+            "动作方向、速度与摄影机运动自然续接",
+            "输出必须是新文件，且可被 ffprobe 解码",
+            "生成后登记回原生产节点并进入视频视觉验收"
+          ],
+          "status": "cancelled",
+          "createdAt": "2026-07-14T23:29:21.943Z",
+          "updatedAt": "2026-07-14T23:45:51.709Z",
+          "error": "正式 NLE 校准仅验证 enqueue:false 的时间线续接帧；按授权边界明确取消未入队包，不创建外部生成任务。",
+          "completedAt": "2026-07-14T23:45:51.709Z"
+        },
+        "executedAt": "2026-07-14T23:45:51.724Z"
+      }
+    },
+    "doctor": {
+      "errors": 0,
+      "warnings": 0,
+      "ok": 25
+    },
+    "stderrTail": "(node:98381) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+  }
+}

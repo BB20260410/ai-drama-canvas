@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "kind": "p9-formal-project-integrity-final",
+  "status": "PASS",
+  "projectRoot": "/Users/hxx/Documents/无限画布/projects/local-import-dudu-world-prologue-b8bfcf14",
+  "startedAt": "2026-07-27T02:39:07.715Z",
+  "endedAt": "2026-07-27T02:39:11.835Z",
+  "readOnly": true,
+  "externalCalls": 0,
+  "databaseChecks": [
+    {
+      "name": "cache.sqlite",
+      "result": [
+        "ok"
+      ],
+      "ok": true
+    },
+    {
+      "name": "command-ledger.sqlite",
+      "result": [
+        "ok"
+      ],
+      "ok": true
+    },
+    {
+      "name": "material-studio.sqlite",
+      "result": [
+        "ok"
+      ],
+      "ok": true
+    },
+    {
+      "name": "studio-generation-ledger.sqlite",
+      "result": [
+        "ok"
+      ],
+      "ok": true
+    },
+    {
+      "name": "studio-production.sqlite",
+      "result": [
+        "ok"
+      ],
+      "ok": true
+    },
+    {
+      "name": "studio.sqlite",
+      "result": [
+        "ok"
+      ],
+      "ok": true
+    }
+  ],
+  "media": {
+    "registered": 266,
+    "totalBytes": 891478880,
+    "byKind": {
+      "image": 264,
+      "video": 1,
+      "audio": 1
+    },
+    "allExist": true,
+    "allSizesMatch": true,
+    "allSha256Match": true,
+    "allFullyDecodedOrProbed": true,
+    "imageDimensions": {
+      "minimumWidth": 941,
+      "maximumWidth": 2752,
+      "minimumHeight": 418,
+      "maximumHeight": 3144
+    },
+    "nonImage": [
+      {
+        "sha256": "90d4965bd7aed49853cca295386da50c7ef2586e56dadec8dd829ce83cc98477",
+        "kind": "audio",
+        "bytes": 1152078,
+        "decoded": {
+          "codec": "pcm_s16le",
+          "durationSeconds": 12,
+          "streamCount": 1
+        }
+      },
+      {
+        "sha256": "82a558e1609147713ab66d673bc227331f6946d58858266733284edcf954a3ad",
+        "kind": "video",
+        "bytes": 247802,
+        "decoded": {
+          "codec": "h264",
+          "durationSeconds": 12,
+          "streamCount": 2
+        }
+      }
+    ]
+  },
+  "generation": {
+    "resultCount": 4,
+    "runCount": 2,
+    "allRawLabeledPaired": true,
+    "pairs": [
+      {
+        "generationRunId": "0533c5146305f25442eba302c3e5205129b55509ddad4fa65c215b8b6526aa4c:node:1:attempt:1",
+        "unitId": "unit-local-e61b4628ca1abe8d8752c50d304fdb6e77847b16",
+        "panelId": "W00_G01",
+        "panelIndex": 1,
+        "raw": {
+          "resultId": "studio-generation-result-875adb91f1e16961e3da46239cd48fde03037f1b",
+          "sha256": "c06167335a2128529e3d3da5fd123ef212b667f8d6572b9e1c05da458b5db3ae",
+          "status": "pending"
+        },
+        "labeled": {
+          "resultId": "studio-generation-result-0e8fe2b4de159b6e4fadb8af6ba897e9a84f8407",
+          "sha256": "53108c9296eb10634cf86083cba6a5284557838dacfe4e9e3dd2336d8a9831c6",
+          "status": "pending"
+        },
+        "current": true,
+        "promotionEligible": true
+      },
+      {
+        "generationRunId": "0533c5146305f25442eba302c3e5205129b55509ddad4fa65c215b8b6526aa4c:node:1:attempt:2",
+        "unitId": "unit-local-e61b4628ca1abe8d8752c50d304fdb6e77847b16",
+        "panelId": "W00_G01",
+        "panelIndex": 1,
+        "raw": {
+          "resultId": "studio-generation-result-601915f8f43f01cd6253f4f42b432fc3d966005e",
+          "sha256": "0ac76a2653460fa7f46444f6a42e04c6cfac0761ccf6617790c33b4e50f1fa68",
+          "status": "pending"
+        },
+        "labeled": {
+          "resultId": "studio-generation-result-b5dc7be758abfe2ebb032a22fdc369696c5e7b09",
+          "sha256": "289b58fd861bbf779c0bdd9e3783ef227e4e939a2c9ddeff7c6aa8311847997a",
+          "status": "pending"
+        },
+        "current": true,
+        "promotionEligible": true
+      }
+    ],
+    "reviewHeadCount": 2,
+    "reviewHeads": [
+      {
+        "generation_run_id": "0533c5146305f25442eba302c3e5205129b55509ddad4fa65c215b8b6526aa4c:node:1:attempt:1",
+        "decision": "rework",
+        "reviewer": "codex"
+      },
+      {
+        "generation_run_id": "0533c5146305f25442eba302c3e5205129b55509ddad4fa65c215b8b6526aa4c:node:1:attempt:2",
+        "decision": "pass",
+        "reviewer": "codex"
+      }
+    ],
+    "note": "Review head 只记录实际账本裁决。"
+  },
+  "assertions": {
+    "allDatabaseQuickChecksPass": true,
+    "allRegisteredMediaVerified": true,
+    "allGenerationResultsRegistered": true,
+    "allGenerationRunsPaired": true
+  }
+}

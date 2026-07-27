@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "kind": "p1-final-acceptance",
+  "finishedAt": "2026-07-26T14:35:00.000Z",
+  "candidate": "mcp-candidate-e3a5b3d4431860ee-2ae98ba00e95efad-0ba586d7",
+  "materialAuthority": { "reviews": 7, "authorityEvents": 7, "primaryAuthorities": 7, "assetsTotal": 19,
+    "approved": ["allowed-ref:char-zhulong(新建,媒体12191570…)", "allowed-ref:scene-star", "allowed-ref:scene-yazihe", "allowed-ref:scene-yucun", "allowed-ref:scene-cave-mouth(以id含cave-mouth的资产)", "style-night", "style-cine"],
+    "visualBasis": "主代理逐张原图亲验（会话 scratchpad p1-visual-precheck-20260726.md，用户已授权代裁并留证）" },
+  "bindingSets": { "heads": 10, "totalWithHistory": 12, "assetBindings": 18, "decisions": 24, "emptyConfirmations": 3,
+    "panels": ["W00_G01(confirmed-empty)", "W00_G02", "W00_G03", "W00_G04", "W01_G01(zhulong)", "W01_G02", "W01_G03", "W02_G01", "W02_G02", "W02_G03"],
+    "allGenerationReady": true },
+  "sourceContracts": { "W00": "r3 回填 5/5", "W01": "r2 回填 5/5", "W02": "r2 回填 6/6",
+    "productFix": "src/core/local-creative-project-content-import.ts 新增 readValidatedExternalDeclaredReferenceMediaSha256（精确 origin + 现场/CAS 双复验 fail-closed）；materializer 声明引用回填 fallback——修复源层外锁库引用永远 null 的断链" },
+  "negativeEvidence": [
+    "无来源合同时 confirm/freeze 拒绝（W00 修复前实录）",
+    "声明引用未映射 current Authority 时 freeze 拒绝（十格实录，回填后放行）",
+    "同资产同格双 decision 冲突时 freeze 拒绝（W00_G02 实录，exclude 后放行）",
+    "幂等键复用不同参数被 CONFLICT 拒绝（命令账本实录）",
+    "OUTCOME_UNKNOWN 键锁定 + reconcile_command 对账闭环（W00 recover 实录）"
+  ],
+  "regression": "local-creative 测试族 12 文件 94 测试 PASS；三套 typecheck PASS；候选 v4 重建自校验通过"
+}

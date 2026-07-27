@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "kind": "fusion-storyboard-grid-ui-smoke",
+  "createdAt": "2026-07-15T12:21:36.699Z",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "registryPath": "/tmp/ai-canvas-fusion-grid-ui-registry-20260715.json",
+  "screenshotPath": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-grid-ui-smoke-20260715.png",
+  "screenshotSha256": "cdab3fab66d611b4f045b347e793e064da5d60d6f469da9c720699eefedd315a",
+  "apiState": {
+    "unitCount": 1288,
+    "selectedItemId": "season-三-ep01-unit008",
+    "selectedTitle": "EP01 15s 008 面具沉睡嘟嘟先闻到第三世",
+    "contractId": "grid-ad5f08543c69ca8dc5f9",
+    "panelCount": 3,
+    "selectionReason": "3 个剧情段自动采用一段一格",
+    "totalDuration": 15,
+    "allPanelFieldsPresent": true,
+    "localTextOnly": true
+  },
+  "rendered": {
+    "panelCount": 3,
+    "visibleLabels": [
+      "画面 / 动作",
+      "景别 / 构图",
+      "拍摄方式",
+      "连续性 / 声音",
+      "台词 / 字幕",
+      "画面 / 动作",
+      "景别 / 构图",
+      "拍摄方式",
+      "连续性 / 声音",
+      "台词 / 字幕",
+      "画面 / 动作",
+      "景别 / 构图",
+      "拍摄方式",
+      "连续性 / 声音",
+      "台词 / 字幕"
+    ],
+    "header": "15 秒中文宫格合同3 格 · 3 个剧情段自动采用一段一格grid-ad5f08543c69ca8dc5f9 · storyboard r1 · 逐格纯画面 / 本地中文",
+    "horizontalPageOverflow": false
+  },
+  "queueGate": {
+    "gateMessage": "Error invoking remote method 'canvas:enqueue-generation': Error: 资产 P01 尚未通过视觉验收并提升为硬锁，禁止依赖它生成分镜。",
+    "jobsBeforeGate": 6,
+    "jobsAfterGate": 6,
+    "rejectedWithoutNewJob": true
+  },
+  "pageErrors": []
+}

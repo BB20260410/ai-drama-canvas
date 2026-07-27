@@ -1,0 +1,21 @@
+{
+  "runId": "s1e2-u25-residual-ms06qhp1",
+  "packId": "studio-generation-freeze-62abe22b2848da8740ef0133e6ce7812",
+  "packFingerprint": "62abe22b2848da8740ef0133e6ce781256daa5dfdeb18d397cce8f8dec54a03d",
+  "continuityFingerprint": "9880afae3c373e2f8d7bcc90c88cf943a1820acb12991f4ce20bdb75594ed919",
+  "callId": "studio-imagegen-call-2b8c496fb127d1cb42e8363c5e60026d812db669",
+  "inputFingerprint": "2b8c496fb127d1cb42e8363c5e60026d812db6697501551861520abe7cb1b4f5",
+  "projectContextToken": "studioctx-v1-efcea1fdc2dd40ca989e8e449a09141f0585b76a083cbfe6727411ec39451c29",
+  "quarantine": {
+    "schemaVersion": 1,
+    "kind": "studio-imagegen-quarantine-grant",
+    "rootPath": "/Users/hxx/Documents/\u65e0\u9650\u753b\u5e03/projects/dudu-gaiden-lock-20260723-12a6516c/.aicanvas/studio-generation/quarantine/studio-imagegen-call-2b8c496fb127d1cb42e8363c5e60026d812db669",
+    "candidatePath": "/Users/hxx/Documents/\u65e0\u9650\u753b\u5e03/projects/dudu-gaiden-lock-20260723-12a6516c/.aicanvas/studio-generation/quarantine/studio-imagegen-call-2b8c496fb127d1cb42e8363c5e60026d812db669/candidate.png",
+    "receiptPath": "/Users/hxx/Documents/\u65e0\u9650\u753b\u5e03/projects/dudu-gaiden-lock-20260723-12a6516c/.aicanvas/studio-generation/quarantine/studio-imagegen-call-2b8c496fb127d1cb42e8363c5e60026d812db669/execution-receipt.json"
+  },
+  "refPaths": [
+    "/Users/hxx/Documents/\u65e0\u9650\u753b\u5e03/projects/dudu-gaiden-lock-20260723-12a6516c/.aicanvas/objects/sha256/fa/fa33ebc0b8b86514878ced17c982791cd17f7e3dc0a7d42cf69c24e78c5204f6",
+    "/Users/hxx/Documents/\u65e0\u9650\u753b\u5e03/projects/dudu-gaiden-lock-20260723-12a6516c/.aicanvas/objects/sha256/3f/3f5beae6126f00c3a16243c043cc7210aa3739df6d85ef9f0c747bca9b83d027"
+  ],
+  "provider": "codex"
+}

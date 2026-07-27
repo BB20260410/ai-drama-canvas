@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "kind": "p17-navigation-support-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-19T10:24:51.540Z",
+  "buildIdentity": {
+    "schemaVersion": 1,
+    "kind": "ai-drama-canvas-release-manifest",
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "sourceDigest": "8e686dad53588f48f9d230c5d0e2efb7ec88f42b27faf0ff3bfed3f4819f253b",
+    "buildId": "876acea02224657d88619b07348d4e9d",
+    "buildIdentityFingerprint": "ea24767fff41059abf56ab31f3cd4d0196d49cc94c8a58e29224bc40218d09fd",
+    "protocolVersion": "1.1",
+    "mcpToolCount": 183,
+    "builtAt": "2026-07-19T10:23:44.481Z",
+    "distribution": "local-only",
+    "localOnly": true,
+    "source": {
+      "files": 467,
+      "bytes": 10575491
+    },
+    "fingerprint": "36dff476a0012651614fa46ece724fd714fcb87be58756e8068dff1dc04dce32"
+  },
+  "projectId": "project-b45e4db197fc",
+  "runtime": "workspace-build",
+  "ui": {
+    "visited": [
+      "无限画布",
+      "宫格→绑定工作台",
+      "宫格→驾驶舱",
+      "宫格→Agent 生图队列",
+      "节点面板收起与重新打开",
+      "资产→出场时间线",
+      "单元→展开宫格",
+      "剧本",
+      "资产",
+      "绑定",
+      "生成",
+      "审片",
+      "驾驶舱",
+      "Agent 连接",
+      "帮助与安全",
+      "备份取消",
+      "恢复取消",
+      "项目中心焦点闭环",
+      "未保存名称二次确认"
+    ],
+    "canvasNodeCountPreserved": true,
+    "nodeActionsExecuted": [
+      "open-binding",
+      "open-dashboard",
+      "freeze-dispatch",
+      "close-panel",
+      "asset-appearances",
+      "focus-unit"
+    ],
+    "generationPanelCount": 0,
+    "dashboardPanelCount": 6,
+    "reviewBlockedWithoutResult": true,
+    "agentRepairBlockedInDevelopment": true,
+    "backupCancel": true,
+    "restoreCancel": true,
+    "operationShieldDuringBackupRestore": true,
+    "projectCenterFocusTrap": true,
+    "projectCenterUnsavedCloseConfirmation": true,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "externalRequests": 0
+  },
+  "safety": {
+    "isolatedFixture": true,
+    "agentConfigurationWrites": 0,
+    "realImageGenerated": false,
+    "browser": false,
+    "upload": false,
+    "payment": false,
+    "publish": false
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p17-navigation-support-ui-smoke-20260719-03.png",
+    "sizeBytes": 212367,
+    "sha256": "3b2ab4e9a001639fe6bd99c81cd743a951da770f0abc0666add6ce497ef88865",
+    "width": 3456,
+    "height": 2058,
+    "stdev": 17.656027410831726
+  }
+}

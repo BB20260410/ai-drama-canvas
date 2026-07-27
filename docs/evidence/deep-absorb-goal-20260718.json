@@ -1,0 +1,35 @@
+{
+  "kind": "deep-absorb-goal-closeout",
+  "date": "2026-07-18",
+  "items": {
+    "research_path_to_function": ["01", "03", "04", "05", "06", "07"],
+    "local_node_panel_overlay": {
+      "core": ["studio-canvas-node-action-panel.ts", "studio-canvas-node-status.ts"],
+      "ui": "ManagedStudioCanvasView node-action-panel + status busy class"
+    },
+    "lumenx_queue": {
+      "cancel_jump_preview": true,
+      "ui": "GenerationQueueView"
+    },
+    "jellyfish_binding": {
+      "contract": "studio-binding-candidate-decision.ts",
+      "ui": "StudioBindingWorkbench confirm/ignore labels → resolveStudioEntityProposal"
+    },
+    "twitcanva_edges": {
+      "source": "types.ts NodeType + useGeneration parent constraints",
+      "module": "studio-canvas-edge-validation.ts ALLOWED expanded"
+    }
+  },
+  "skeptic_fixes": {
+    "app_jump_handler": "App.vue @jump=onGenerationQueueJump → openItemInList / studioModeRequest binding",
+    "open_binding": "ManagedStudioCanvas emit openBinding → MaterialStudio activeMode=binding",
+    "plan_contract": "StudioBindingWorkbench resolveProposal uses planStudioBindingCandidateConfirm/Ignore",
+    "jellyfish_evidence": "docs/ref-study/03-jellyfish/evidence/research-pin.txt",
+    "formal_db_full_transcript": "implementer/formal-db-count.log table-level COUNTs"
+  },
+  "verification": {
+    "typecheck": "pass",
+    "vitest": "targeted deep-absorb suite",
+    "formalBusinessZero": true
+  }
+}

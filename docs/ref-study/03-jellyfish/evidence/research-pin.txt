@@ -1,0 +1,8 @@
+clone_path=/Users/hxx/Documents/_ref-study/jellyfish-a9678194ddf2d9be3ccbe78d4287d87d5089e123
+sha=a9678194ddf2d9be3ccbe78d4287d87d5089e123
+license=Apache-2.0
+key_files=
+/Users/hxx/Documents/_ref-study/jellyfish-a9678194ddf2d9be3ccbe78d4287d87d5089e123/backend/app/services/studio/shot_preparation_state.py
+/Users/hxx/Documents/_ref-study/jellyfish-a9678194ddf2d9be3ccbe78d4287d87d5089e123/backend/app/services/studio/shot_status.py
+3b35130c0d9db899e10503dd2a0fc5fd75a13b6f176c1789d2ab371040ccd7e8  /Users/hxx/Documents/_ref-study/jellyfish-a9678194ddf2d9be3ccbe78d4287d87d5089e123/backend/app/services/studio/shot_status.py
+d13c7d30c8d55b001149b85c4cf69cbee18447c2eca9e879a816357968184eee  /Users/hxx/Documents/_ref-study/jellyfish-a9678194ddf2d9be3ccbe78d4287d87d5089e123/backend/app/services/studio/shot_extracted_candidates.py

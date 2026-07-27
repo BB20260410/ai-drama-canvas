@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "testedAt": "2026-07-13T23:13:45+08:00",
+  "protocolVersion": "1.1",
+  "toolCount": 133,
+  "fullTestFiles": 28,
+  "fullTests": 143,
+  "fullTestDurationSeconds": 44.30,
+  "scanCancellation": {
+    "entrypoints": [
+      "scan_project",
+      "execute_command:scan_project",
+      "preview_scan_project"
+    ],
+    "progressNotifications": true,
+    "progressMonotonic": true,
+    "commitBoundary": "before-index-commit",
+    "ledgerStatus": "cancelled",
+    "replayWithCancelledKey": false,
+    "waitingCallerIsolation": true,
+    "preCancelledRegistrationWrites": 0,
+    "ffprobeTerminated": true,
+    "stableIndexPreserved": true,
+    "scanLockReleased": true
+  },
+  "runtimes": {
+    "sourceStdio": "passed",
+    "compiledStdio": "passed",
+    "packagedElectronAsNodeStdio": "passed"
+  },
+  "gates": {
+    "typecheck": "passed",
+    "mcpSmoke": "passed",
+    "productionBuild": "passed",
+    "codesignDeepStrict": "passed",
+    "dmgVerify": "passed",
+    "appleNotarization": "not_configured"
+  },
+  "package": {
+    "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "sizeBytes": 136660264,
+    "sha256": "b30031818b3ccff9ef6f08ab42392f115066aab8230c2b9076c12693fffd788a",
+    "signingIdentity": "Developer ID Application: YIHANG LI (3JS43BTTJ3)",
+    "signingTimestamp": "2026-07-13T23:12:30+08:00",
+    "spctl": "rejected_unnotarized_developer_id"
+  },
+  "formalProjectRootsTouched": []
+}

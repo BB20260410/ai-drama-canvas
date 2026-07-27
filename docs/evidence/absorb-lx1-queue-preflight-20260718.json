@@ -1,0 +1,9 @@
+{
+  "project": "LumenX",
+  "slice": "LX-1",
+  "modules": ["src/core/studio-generation-queue-view.ts"],
+  "ui": "dashboard-generation-preflight",
+  "typecheck": "pass",
+  "vitest": "studio-generation-queue-view 3 passed",
+  "date": "2026-07-18"
+}

@@ -1,0 +1,28 @@
+{
+  "status": "PASS_CONTRACT_LAYER",
+  "date": "2026-07-23",
+  "aspects": {
+    "P1.5": "studio-agent-tool-factory.ts",
+    "P1.7": "studio-media-provider-adapter.ts",
+    "P1.8": "studio-prompt-templates.ts",
+    "P1.9": "studio-schema-retry.ts",
+    "P1.10": "studio-panel-batch-continue.ts",
+    "P2.1-P2.10": "studio-fusion-p2-finish.ts",
+    "P3-P4": "studio-fusion-p3-p4.ts",
+    "P5-P9": "studio-fusion-p5-p9.ts",
+    "P10.optional": "studio-fusion-p10-optional.ts"
+  },
+  "commands": [
+    {
+      "cmd": "npm run typecheck",
+      "result": "PASS"
+    },
+    {
+      "cmd": "npx vitest run [11 fusion files]",
+      "result": "PASS",
+      "tests": 53
+    }
+  ],
+  "usefulness": "剩余优先级表项均有可调用合同与反向校验；正式账本/生图供应未被旁路",
+  "notClaimed": ["full UI wiring", "live codex", "real ffmpeg CAS compose"]
+}

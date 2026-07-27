@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "kind": "absorb-a2-canvas-layout-ui",
+  "status": "pass",
+  "createdAt": "2026-07-18T06:56:00.000Z",
+  "slice": "A2",
+  "ownerAgent": "grok",
+  "implementation": {
+    "files": [
+      "src/core/studio-canvas-layout.ts",
+      "src/core/studio-canvas-layout-store.ts",
+      "src/main/index.ts",
+      "src/preload/index.ts",
+      "src/renderer/src/components/ManagedStudioCanvasView.vue",
+      "tests/studio-canvas-layout.test.ts",
+      "tests/managed-studio-canvas-ui.test.ts"
+    ],
+    "behavior": [
+      "hydrateLayoutFromDisk on refresh/project switch",
+      "resolveStudioCanvasNodePosition: session > layout > fallback",
+      "node-drag-stop + move-end debounce 450ms → saveStudioCanvasLayout patch",
+      "merge off-page persisted nodes to avoid pagination wipe",
+      "fingerprint conflict: reload then one retry",
+      "VueFlow pan-on-drag [1,2], selection-key-code true (LocalMiniDrama-style)",
+      "layout is view-only; no sqlite/localStorage in canvas vue"
+    ],
+    "ipc": [
+      "canvas:load-studio-canvas-layout",
+      "canvas:save-studio-canvas-layout"
+    ],
+    "copiedThirdPartySource": false
+  },
+  "verification": {
+    "typecheck": "pass",
+    "tests": {
+      "tests/studio-canvas-layout.test.ts": "3/3",
+      "tests/studio-canvas-layout-store.test.ts": "2/2",
+      "tests/managed-studio-canvas-ui.test.ts": "4/4"
+    }
+  },
+  "nextSlice": "A3 list↔canvas dual entry with unit/panel locator"
+}

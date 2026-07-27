@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "p9r2-p10r2-after-lmd1-production-build",
+  "status": "pass",
+  "startedAt": "2026-07-18T07:42:31.938Z",
+  "endedAt": "2026-07-18T07:42:46.584Z",
+  "durationMs": 14689,
+  "argv": [
+    "npm",
+    "run",
+    "build"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "67d76f6f49281a143ce27e73eefcd73a",
+      "sourceDigest": "0be4f88bc3476a94a8d9b18140e625fb9bdbb9a2d216def2069402329dd4507d"
+    },
+    "after": {
+      "buildId": "67d76f6f49281a143ce27e73eefcd73a",
+      "sourceDigest": "0be4f88bc3476a94a8d9b18140e625fb9bdbb9a2d216def2069402329dd4507d"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/runs/p9r2-p10r2-production-build-20260718-after-lmd1.log",
+    "sizeBytes": 8686,
+    "sha256": "1c27ac6668b2aa337b0669eda13e6c8dcb81aebf693164ad106621862111b30f"
+  }
+}

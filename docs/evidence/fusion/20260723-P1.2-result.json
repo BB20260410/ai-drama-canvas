@@ -1,0 +1,14 @@
+{
+  "aspect": "P1.2",
+  "status": "PASS",
+  "strategy": "CLEAN_ROOM",
+  "ours": "src/core/studio-shot-schema.ts",
+  "commands": [
+    {
+      "cmd": "npx vitest run tests/studio-shot-schema.test.ts",
+      "result": "PASS",
+      "tests": 3
+    }
+  ],
+  "usefulness": "Shot 景别/机位/运镜枚举与 ≤15s 时长可机械校验，供拆格 draft 报错"
+}

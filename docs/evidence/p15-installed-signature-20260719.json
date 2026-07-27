@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "kind": "p14-installed-signature-evidence",
+  "status": "pass",
+  "createdAt": "2026-07-19T01:59:08.874Z",
+  "release": {
+    "version": "0.2.0",
+    "sourceDigest": "f3e6561c0e86910c13543d596fc2167ddba3c7deea4771335170164735487c59",
+    "buildId": "9d7f06e836afc2ec272da3b5e8630006",
+    "releaseManifestFingerprint": "a97c686d80f570ad2bbea24219b7b23b396d45947c2d32cf425047f238dc5461",
+    "mcpToolCount": 183
+  },
+  "bundle": {
+    "identifier": "com.hxx.aidramacanvas",
+    "version": "0.2.0",
+    "name": "AI 漫剧画布",
+    "architecture": "arm64"
+  },
+  "signing": {
+    "verified": true,
+    "deepStrict": true,
+    "identityCommonName": "Developer ID Application: YIHANG LI (3JS43BTTJ3)",
+    "teamIdentifier": "3JS43BTTJ3"
+  },
+  "installation": {
+    "path": "/Applications/AI 漫剧画布.app",
+    "launchWithoutSystemNode": true,
+    "packagedMcpStartedWithAppElectronRuntime": true,
+    "actualMcpToolCount": 183
+  },
+  "distribution": "local-only",
+  "notarization": {
+    "performed": false
+  },
+  "boundaries": {
+    "systemNodeRequired": false,
+    "uploaded": false,
+    "published": false,
+    "autoUpdateConfigured": false
+  }
+}

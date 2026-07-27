@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "kind": "p9-final-test-matrix",
+  "status": "PASS",
+  "createdAt": "2026-07-27T12:50:00+08:00",
+  "testPartitionAudit": {
+    "command": "npm run test:partitions:audit",
+    "rerunAtClosure": true,
+    "thresholdMilliseconds": 5000,
+    "counts": {
+      "all": 302,
+      "fast": 172,
+      "medium": 90,
+      "integration": 35,
+      "heavy": 5
+    },
+    "unionEqualsAll": true,
+    "overlapCount": 0,
+    "missingCount": 0,
+    "fingerprint": "c7b85a0040725a0bdb03eaaafe658bb8351f61fee40c70da2bc9083095bf56a4"
+  },
+  "executedPartitions": [
+    {
+      "partition": "fast",
+      "command": "npm run test:fast",
+      "processPolicy": "single partition run",
+      "testFiles": 172,
+      "tests": 853,
+      "failedFiles": 0,
+      "failedTests": 0,
+      "status": "PASS"
+    },
+    {
+      "partition": "medium",
+      "command": "npm run test:medium",
+      "processPolicy": "fresh-process chunks to prevent runner memory accumulation",
+      "testFiles": 90,
+      "tests": 712,
+      "failedFiles": 0,
+      "failedTests": 0,
+      "status": "PASS"
+    },
+    {
+      "partition": "integration",
+      "command": "npm run test:integration",
+      "processPolicy": "single partition run",
+      "testFiles": 35,
+      "tests": 119,
+      "failedFiles": 0,
+      "failedTests": 0,
+      "status": "PASS"
+    },
+    {
+      "partition": "heavy",
+      "command": "npm run test:heavy",
+      "processPolicy": "single partition run with maxWorkers=1",
+      "testFiles": 5,
+      "tests": 15,
+      "failedFiles": 0,
+      "failedTests": 0,
+      "status": "PASS"
+    }
+  ],
+  "totals": {
+    "testFiles": 302,
+    "tests": 1699,
+    "failedFiles": 0,
+    "failedTests": 0,
+    "status": "PASS"
+  },
+  "postValidationScriptChecks": {
+    "reason": "完整分区通过后只新增非 Dudu 隔离验收脚本；产品代码和测试文件未再改变。最终源码仍重新执行类型检查与完整构建。",
+    "checks": [
+      {
+        "command": "npx tsc --noEmit -p tsconfig.node.json",
+        "status": "PASS"
+      },
+      {
+        "command": "AI_CANVAS_MCP_ALLOW_MULTI=1 npm run build",
+        "status": "PASS",
+        "note": "首次未设置 allow-multi 时被仍在使用的 MCP 单例 PID 60816 正确拒绝；未终止该进程，随后使用隔离允许多实例的构建模式通过。"
+      },
+      {
+        "command": "packaged MCP smoke through bundled Electron runtime",
+        "status": "PASS",
+        "tools": 202,
+        "resources": 206,
+        "resourceTemplates": 9,
+        "prompts": 8
+      }
+    ]
+  },
+  "finalBuildIdentity": {
+    "manifestPath": "release-manifest.json",
+    "manifestSha256": "59137b8021bebda84fa9ea22b78a296b2df508abfbcc375d106bca5cc0f383aa",
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "sourceDigest": "d4b07c20a04cd8c7ff0b48c3e1fd80acf2f364a9123a7f2335591dc18a3ee5b4",
+    "buildId": "40b9cc725097394108667c877901446a",
+    "mcpToolCount": 202
+  },
+  "evidenceLimit": {
+    "rawVitestLogPersisted": false,
+    "note": "本文件汇总本次实际分区运行的最终退出结果和计数；原始逐测试 stdout 未另行持久化。分区结构、当前源码构建身份、正式工程完整性、运行 UI、性能与恢复证据分别由独立文件复核。"
+  },
+  "boundaries": {
+    "installed": false,
+    "signed": false,
+    "published": false,
+    "externalProviderCalls": 0,
+    "gitOperations": 0
+  }
+}

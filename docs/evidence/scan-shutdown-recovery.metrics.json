@@ -1,0 +1,16 @@
+{
+  "root": "/tmp/ai-canvas-scan-shutdown-ui-20260713",
+  "registryPath": "/tmp/ai-canvas-scan-shutdown-ui-20260713-registry.json",
+  "screenshotPath": "/Users/hxx/Documents/无限画布/docs/evidence/scan-shutdown-recovery.png",
+  "baselineScanId": "da8ebf3e-2c37-46ce-8a88-0699c935f0cf",
+  "preservedScanId": "da8ebf3e-2c37-46ce-8a88-0699c935f0cf",
+  "scanEventCount": 1,
+  "probePid": 13262,
+  "probeStarts": 1,
+  "probeTerminated": true,
+  "locks": 0,
+  "exit": {
+    "code": 0,
+    "signal": null
+  }
+}

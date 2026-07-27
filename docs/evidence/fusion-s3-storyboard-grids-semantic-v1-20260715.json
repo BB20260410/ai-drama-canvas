@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 2,
+  "kind": "fusion-storyboard-grid-materialization-validation",
+  "createdAt": "2026-07-15T15:28:51.106Z",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "sourceContentAddress": "sha256:f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+  "allSeason": {
+    "algorithmVersion": "semantic-beat-v1",
+    "contracts": 1288,
+    "panelDistribution": {
+      "2": 151,
+      "3": 667,
+      "4": 349,
+      "5": 95,
+      "6": 26
+    },
+    "panelImagesRequired": 4330,
+    "contractIdsSha256InputCount": 1288,
+    "contractIdsSha256": "671f2c3395a05a935796a3fca5da227a687270330946be5d4386e882d0b64651"
+  },
+  "ep01": {
+    "units": 34,
+    "panelDistribution": {
+      "3": 6,
+      "4": 16,
+      "5": 8,
+      "6": 4
+    },
+    "panelImagesRequired": 146,
+    "originalStartFrames": 34,
+    "originalEndFrames": 34,
+    "additionalMiddleFrames": 78,
+    "localChineseStoryboardSheets": 34,
+    "rawImagesRequired": 71,
+    "labeledImagesRequired": 71
+  },
+  "policy": {
+    "minimumPanels": 2,
+    "maximumPanels": 6,
+    "automaticSelection": "semantic-beat-audited",
+    "algorithmVersion": "semantic-beat-v1",
+    "oneImagePerPanel": true,
+    "aiGeneratedTextAllowed": false,
+    "chineseTextRenderedLocally": true,
+    "silentReferenceTruncationAllowed": false
+  }
+}

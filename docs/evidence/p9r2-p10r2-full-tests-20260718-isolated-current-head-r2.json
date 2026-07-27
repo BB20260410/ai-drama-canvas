@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "p9r2-p10r2-isolated-current-head-full-tests-r2",
+  "status": "pass",
+  "startedAt": "2026-07-18T08:05:23.338Z",
+  "endedAt": "2026-07-18T08:11:16.095Z",
+  "durationMs": 352803,
+  "argv": [
+    "npx",
+    "vitest",
+    "run"
+  ],
+  "cwd": "/private/tmp/ai-canvas-p9r2-final.hnWvt9",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "3eb0d839ced4bfb92a9d3ad3346eae5e",
+      "sourceDigest": "4b4fa1b3455dda6263f25e20e7485801edd6b5cdc7b1efd6c9a2a320f4444b86"
+    },
+    "after": {
+      "buildId": "3eb0d839ced4bfb92a9d3ad3346eae5e",
+      "sourceDigest": "4b4fa1b3455dda6263f25e20e7485801edd6b5cdc7b1efd6c9a2a320f4444b86"
+    }
+  },
+  "log": {
+    "relativePath": "../../../Users/hxx/Documents/无限画布/docs/evidence/runs/p9r2-p10r2-full-tests-20260718-isolated-current-head-r2.log",
+    "sizeBytes": 15017,
+    "sha256": "83dfee89e27d6647fdbcf8692e51a78903060d1a8ad540d8360fbaa9da361a8b"
+  }
+}

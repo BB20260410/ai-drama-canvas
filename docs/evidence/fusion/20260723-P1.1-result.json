@@ -1,0 +1,20 @@
+{
+  "aspect": "P1.1",
+  "status": "PASS",
+  "strategy": "CLEAN_ROOM",
+  "sources": {
+    "peer": "huobao-drama skills/storyboard_breaker video_prompt 分段",
+    "ours": [
+      "src/core/studio-video-prompt-segments.ts",
+      "src/core/studio-shot-schema.ts"
+    ]
+  },
+  "commands": [
+    {
+      "cmd": "npx vitest run tests/studio-video-prompt-segments.test.ts tests/studio-shot-schema.test.ts",
+      "result": "PASS"
+    }
+  ],
+  "usefulness": "可解析 0-3秒 多段 video_prompt、检测重叠/空/超长/超15s；Shot draft 可选严格 requireVideoPromptSegments；16 要素字段袋 STUDIO_SHOT_SIXTEEN_KEYS",
+  "reverseProbe": "empty, no timecode, overlap, end>15s"
+}

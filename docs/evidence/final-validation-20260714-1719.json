@@ -1,0 +1,334 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T17:19:04+08:00",
+  "success": true,
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "goal": {
+    "name": "AI 漫剧无限画布",
+    "status": "active",
+    "mode": "研发",
+    "entireLongTermGoalComplete": false
+  },
+  "slice": {
+    "name": "current-source-isolated-unpacked-app-validation",
+    "complete": true,
+    "closesRealProjectNleValidation": false,
+    "report": "/Users/hxx/Documents/无限画布/docs/验证报告_当前源码隔离安装结构_2026-07-14.md"
+  },
+  "priorityRevalidation": {
+    "handoffProductPriorityStillValid": true,
+    "productPriority": "real-project-nle-validation",
+    "executionAuthorized": false,
+    "authorizationMissing": [
+      "formal project absolute path",
+      "read-only source or writable-copy boundary",
+      "allowed output directory"
+    ],
+    "fixtureMayCloseRealProjectValidation": false,
+    "independentLocalSlicesAllowedWhileWaiting": true,
+    "independentPackageGapWasReal": true,
+    "independentPackageGapNowComplete": true,
+    "remainingSameLevelSafeLocalGapIdentified": false
+  },
+  "temporaryPackagedApp": {
+    "format": "unpacked-app",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "bundleId": "com.hxx.aidramacanvas",
+    "name": "AI 漫剧画布",
+    "version": "0.1.0",
+    "fileCount": 7751,
+    "bytes": 367576416,
+    "manifestSha256": "9b3e0acb6d4034fabca3e141b797c60665d767352f5a282ccbb75be1806e33de",
+    "developerIdSigned": false,
+    "deepStrictSignatureValid": false,
+    "mainExecutableSignature": "adhoc-linker-signed",
+    "teamIdentifier": null,
+    "dmgGenerated": false,
+    "zipGenerated": false,
+    "blockmapGenerated": false,
+    "installed": false,
+    "published": false,
+    "notarizationRequested": false,
+    "tempRootRemoved": true,
+    "reusablePathExists": false
+  },
+  "packageIsolation": {
+    "stageRoot": "temporary /tmp/ai-canvas-current-source-package-* (removed)",
+    "apfsCowClone": true,
+    "externalSymlinks": 0,
+    "internalSymlinks": 71,
+    "isolatedHome": true,
+    "isolatedTmp": true,
+    "isolatedAppBuilderCache": true,
+    "isolatedElectronBuilderCache": true,
+    "isolatedNpmCache": true,
+    "signingCredentialsCleared": true,
+    "publishMode": "never",
+    "builderTarget": "dir",
+    "identity": null,
+    "notarize": false,
+    "forceCodeSigning": false,
+    "npmRebuild": false
+  },
+  "packageIdentity": {
+    "workspaceSource": {
+      "fileCount": 61,
+      "bytes": 1954520,
+      "sha256": "28c1b9419feb1ae7ee62ba322bfb8c0bd8fbaab704d85d2a33f71daf8ed6c008"
+    },
+    "stageSource": {
+      "fileCount": 61,
+      "bytes": 1954520,
+      "sha256": "28c1b9419feb1ae7ee62ba322bfb8c0bd8fbaab704d85d2a33f71daf8ed6c008"
+    },
+    "currentOut": {
+      "fileCount": 5,
+      "bytes": 2442763,
+      "sha256": "0aea033d3f1beb073769658960587e0e3d62f344cfe5f86980f94694df8561ec"
+    },
+    "packagedOut": {
+      "fileCount": 5,
+      "bytes": 2442763,
+      "sha256": "0aea033d3f1beb073769658960587e0e3d62f344cfe5f86980f94694df8561ec"
+    },
+    "currentMcp": {
+      "fileCount": 62,
+      "bytes": 2478589,
+      "sha256": "071cc38d82ef340ac4e5dac635d02600ec8e8285511b2ab08e22fca5c3093d36"
+    },
+    "packagedMcp": {
+      "fileCount": 62,
+      "bytes": 2478589,
+      "sha256": "071cc38d82ef340ac4e5dac635d02600ec8e8285511b2ab08e22fca5c3093d36"
+    },
+    "appAsar": {
+      "bytes": 4371963,
+      "sha256": "3041edcd3a68905484c48d454e8147f9ce37c4cccc52274b1765fedd75dabb70"
+    },
+    "packagedMcpServer": {
+      "bytes": 185760,
+      "sha256": "8844e797637946911d8c51f1b5f8fad4ed443f31a9e8c909b657354f1c5533fd"
+    },
+    "allComparedFilesByteIdentical": true
+  },
+  "tests": {
+    "typecheck": {
+      "success": true
+    },
+    "isolatedPackageGuards": {
+      "success": true,
+      "testFiles": 1,
+      "tests": 3
+    },
+    "effectTransitionMcpSource": {
+      "success": true,
+      "tests": 1
+    },
+    "effectTransitionMcpCompiled": {
+      "success": true,
+      "tests": 1
+    },
+    "effectTransitionMcpPackaged": {
+      "success": true,
+      "tests": 1
+    },
+    "full": {
+      "success": true,
+      "testFiles": 39,
+      "passedTestFiles": 39,
+      "failedTestFiles": 0,
+      "tests": 219,
+      "passedTests": 219,
+      "failedTests": 0,
+      "durationSeconds": 81.46
+    }
+  },
+  "build": {
+    "success": true,
+    "typecheck": true,
+    "mainBytes": 943952,
+    "preloadBytes": 17526,
+    "rendererJsBytes": 1300411,
+    "mcpServerBytes": 185760,
+    "stageBuildSuccess": true,
+    "workspaceBuildSuccess": true
+  },
+  "mcp": {
+    "protocolVersion": "1.1",
+    "smokeSuccess": true,
+    "toolCount": 134,
+    "resourceTemplateCount": 9,
+    "promptCount": 7,
+    "commandTypes": 79,
+    "sourceCompiledAndPackagedEffectTransitionTests": true,
+    "capabilityMissingForFullNle": [
+      "real-project-nle-validation"
+    ],
+    "packagedEmptyProject": {
+      "success": true,
+      "transport": "packaged-electron-node",
+      "toolCount": 134,
+      "chapters": 2,
+      "facts": 34,
+      "beats": 11,
+      "splitUnits": 4,
+      "storyboardRows": 11,
+      "ledgerEntries": 19,
+      "uncertainCommands": 0,
+      "restartVerified": true,
+      "directorContractPreserved": true
+    }
+  },
+  "uiSmoke": {
+    "success": true,
+    "transport": "packaged-electron-current-source",
+    "productionBuild": true,
+    "humanVisualInspection": true,
+    "fullApplicationRestart": true,
+    "fixtureRevision": 1,
+    "savedRevision": 2,
+    "undoneRevision": 3,
+    "redoneRevision": 4,
+    "afterApplicationRestartRevision": 4,
+    "initialOffsets": [
+      3,
+      5
+    ],
+    "persistedOffsets": [
+      2,
+      4
+    ],
+    "pageErrors": 0,
+    "screenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-effect-transition-packaged-ui-20260714.png",
+      "bytes": 251776,
+      "sha256": "2bc111d8ea39b7708443c181799bda8676cf25190ea251211d453710d583bff7",
+      "width": 1560,
+      "height": 980,
+      "brightRatio": 0.07352171637885924,
+      "chromaticRatio": 0.050411433804290945
+    }
+  },
+  "protectedWorkspaceArtifacts": {
+    "unchangedDuringIsolatedSmoke": true,
+    "dist": {
+      "fileCount": 385,
+      "bytes": 502527188,
+      "sha256Before": "861cb31266f0d93145e9e16f9315e376a60128092e7f3a7a3c4342b352f292d2",
+      "sha256After": "861cb31266f0d93145e9e16f9315e376a60128092e7f3a7a3c4342b352f292d2"
+    },
+    "out": {
+      "fileCount": 5,
+      "bytes": 2442763,
+      "sha256Before": "0aea033d3f1beb073769658960587e0e3d62f344cfe5f86980f94694df8561ec",
+      "sha256After": "0aea033d3f1beb073769658960587e0e3d62f344cfe5f86980f94694df8561ec"
+    },
+    "distMcp": {
+      "fileCount": 62,
+      "bytes": 2478589,
+      "sha256Before": "071cc38d82ef340ac4e5dac635d02600ec8e8285511b2ab08e22fca5c3093d36",
+      "sha256After": "071cc38d82ef340ac4e5dac635d02600ec8e8285511b2ab08e22fca5c3093d36"
+    }
+  },
+  "protectedLegacyDmg": {
+    "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "bytes": 136652595,
+    "mtimeMs": 1783962490004.7156,
+    "sha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972",
+    "dmgCodeSigned": false,
+    "dmgStapledTicket": false,
+    "embeddedAppDeveloperIdSigned": true,
+    "embeddedAppIdentity": "Developer ID Application: YIHANG LI (3JS43BTTJ3)",
+    "embeddedAppDeepStrictVerified": true,
+    "embeddedAppStapledTicket": false,
+    "notarized": false,
+    "containsCurrentSource": false,
+    "unchanged": true,
+    "touched": false
+  },
+  "boundaries": {
+    "formalProjectUsed": false,
+    "externalCreativeDirectoriesTouched": false,
+    "externalWebsiteUsed": false,
+    "networkUploadUsed": false,
+    "paidActionUsed": false,
+    "realComfyUiUsed": false,
+    "realProviderUsed": false,
+    "dmgGenerated": false,
+    "applicationInstalled": false,
+    "developerIdSigningPerformed": false,
+    "notarizationPerformed": false,
+    "publicationPerformed": false,
+    "existingArtifactsOverwritten": false,
+    "oldThreadJsonlRead": false,
+    "gitWritePerformed": false
+  },
+  "cleanup": {
+    "tempRootRemoved": true,
+    "packagedApplicationRemoved": true,
+    "emptyProjectRemoved": true,
+    "registryRemoved": true,
+    "cacheRemoved": true,
+    "electronUserDataRemoved": true,
+    "lingeringStageProcesses": 0
+  },
+  "sourceHashes": {
+    "package.json": "b0306c3b856126c412103478e104fe00844ae66c8bc2ef61a3461dbb7532dd53",
+    "scripts/isolated-package-guards.ts": "f014864c1e07437bef1e5f84de263bd6b8406ccab771063e8ab6baffbc2b9c9b",
+    "scripts/isolated-package-smoke.ts": "0199ea4232f271cecff4cb40f7c5152e78753506203ac6eef11223969d2fdecb",
+    "scripts/ui-editor-effect-transition-smoke.mjs": "edc87166fe721c6ec689cf2b62feae5585bfc5c3afe07fc82cc5e5c19a40c981",
+    "tests/isolated-package-guards.test.ts": "76173f20e194c429a9f43a4c3ebfb19ef2e31340c2a2766b08a1077cdf48b20c",
+    "tests/mcp-editor-effect-transition.test.ts": "80d097a735bd5b8e7585e2f24bd3131f63ffde04f773825ce97b66bd406e57f0"
+  },
+  "documentationHashes": {
+    "README.md": "c63cb034f8d6a579223ac15dbebd8680f22485c86e8ea93865d3b593dae1f6a5",
+    "docs/CODEX_MCP.md": "94c4508b5ff928c10c3e488272d8a775cd509a9675c45d515b75d297f7669ee0",
+    "docs/当前开发交接.md": "bbac591b65d39f02891d3b902101d997309cfe8a554f2957f070bd9d9463f146",
+    "docs/验证报告_当前源码隔离安装结构_2026-07-14.md": "4cd4d7266c2519620a45b44f612f9ad179a9f9b7cec88c51595b0d7b456a3183"
+  },
+  "evidenceFiles": {
+    "package": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-current-source-package-smoke-20260714.json",
+      "bytes": 28770,
+      "sha256": "a0d56f25cff4509fe46aa4c44500ea1bd604527daaa0162743571992c7a2c4a9"
+    },
+    "packagedUi": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-effect-transition-packaged-ui-smoke-20260714.json",
+      "bytes": 6004,
+      "sha256": "217f3b2d228645a0ee991f485a064e3ac4fac798242596cd9d3b909715382866"
+    },
+    "packagedScreenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-effect-transition-packaged-ui-20260714.png",
+      "bytes": 251776,
+      "sha256": "2bc111d8ea39b7708443c181799bda8676cf25190ea251211d453710d583bff7"
+    }
+  },
+  "git": {
+    "branch": "main",
+    "hasCommits": false,
+    "worktree": "all project files untracked",
+    "stagePerformed": false,
+    "commitCreated": false,
+    "pushPerformed": false,
+    "pullRequestCreated": false
+  },
+  "knownLimitations": [
+    "The temporary unpacked App was removed and is not an installable or distributable artifact.",
+    "No current-source DMG, installation, Developer ID signing, notarization or public distribution was performed.",
+    "The existing DMG still contains older source and was not changed.",
+    "Real-project NLE calibration remains incomplete and requires an explicitly authorized project boundary.",
+    "Real ComfyUI and provider website calibration remain outside this slice."
+  ],
+  "nextUniqueHighestPriority": {
+    "name": "正式 AI 漫剧项目 NLE 校准",
+    "capability": "real-project-nle-validation",
+    "status": "waiting_for_explicit_authorization",
+    "requiredBeforeExecution": [
+      "formal project absolute path",
+      "read-only source or writable-copy decision",
+      "allowed output directory"
+    ],
+    "ifAuthorizationStillMissing": "Re-audit live capabilities, source, tests and completion matrix for another independent local gap; do not repeat verified modules or substitute a fixture for formal-project validation."
+  }
+}

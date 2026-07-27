@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "kind": "p14-installed-real-canary-review-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-18T16:45:49.252Z",
+  "decision": "rework",
+  "authority": {
+    "actor": "main-agent",
+    "source": "explicit-cli-decision",
+    "userConfirmationClaimed": false,
+    "visualQualityInferredByScript": false
+  },
+  "runtime": {
+    "executablePath": "/Applications/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+    "release": {
+      "version": "0.2.0",
+      "sourceDigest": "267d6f29baf0b20908d8453ae80b3fc1a306a2ef949e383acfffeddc131dd582",
+      "buildId": "4372262cc78d9ed7773414cfdede38af",
+      "mcpToolCount": 183,
+      "distribution": "local-only"
+    }
+  },
+  "canary": {
+    "statePath": "/Users/hxx/Documents/无限画布/output/p14-real-canary/p14-r10-strict-doujie-mask/canary-state.json",
+    "initialStateFingerprint": "debae34daabafb0562d0e2fa69b9297091383a9672181c7634468c59e2018197",
+    "reviewedStateFingerprint": "029629d45098d940c83b380282e881898c87a95bccc49519db93f8c79303abc9",
+    "projectId": "project-a93c05465af6",
+    "manifestFingerprint": "19778f2a7a13d0f7b885df45d8c6c5a9933ae3419e04fa638ebcc743a563ef08",
+    "generationRunId": "p14-codex-canary-17499365db5a230e0a62839e",
+    "packFingerprint": "6751e0daedb1f9312265867b537cf7cba9db1c87e3563428c2cacaf22bb77b69",
+    "reviewId": "studio-generation-review-a3d49c9073bd26d3d49328685911d363143e1014",
+    "reviewFingerprint": "a3d49c9073bd26d3d49328685911d363143e101494c949bbf7c4da67ff1b129c",
+    "ledgerReviewer": "user",
+    "internalReviewEvidencePath": "/Users/hxx/Documents/无限画布/output/p14-real-canary/p14-r10-strict-doujie-mask/installed-ui-review-evidence.json",
+    "authorityReferences": {
+      "mode": "real-user-assets",
+      "assets": [
+        {
+          "assetId": "character-ahang",
+          "sourcePath": "/Users/hxx/Desktop/阿航_青年_三视图_.jpg",
+          "sourceBasename": "阿航_青年_三视图_.jpg",
+          "sourceSha256": "5132d4320f956cf2a2320e52fae941ef15ffb243ad79343045006a8773f4548e",
+          "importedSha256": "5132d4320f956cf2a2320e52fae941ef15ffb243ad79343045006a8773f4548e",
+          "width": 2048,
+          "height": 1536,
+          "sizeBytes": 892422,
+          "sourceMtimeMs": 1782952045576.4463,
+          "entropy": 6.740891211433336,
+          "sourceUnchanged": true,
+          "authorityVersionId": "version-f8062664-af7a-4dd0-b51b-9b153f771d7f"
+        },
+        {
+          "assetId": "scene-stone-room",
+          "sourcePath": "/Users/hxx/Desktop/7月2日/黄金面具_鱼凫篇_EP01-EP05_真人实拍首尾帧资产包_20260702/07_参考图/已锁定参考图复制/04_建筑装置/B06_神权密室天外遗物室_三角度.png",
+          "sourceBasename": "B06_神权密室天外遗物室_三角度.png",
+          "sourceSha256": "ee8b3dd2f975d48be6014e2e110caae47922a32dbdc547551cb8a4c3a6e61fee",
+          "importedSha256": "ee8b3dd2f975d48be6014e2e110caae47922a32dbdc547551cb8a4c3a6e61fee",
+          "width": 1672,
+          "height": 941,
+          "sizeBytes": 2563503,
+          "sourceMtimeMs": 1782587592488.0566,
+          "entropy": 6.0975621578108985,
+          "sourceUnchanged": true,
+          "authorityVersionId": "version-99d4cb98-0b79-4d3a-ba40-3c4c3ed854ca"
+        },
+        {
+          "assetId": "prop-complete-golden-mask",
+          "sourcePath": "/Users/hxx/Desktop/豆姐参考图.png",
+          "sourceBasename": "豆姐参考图.png",
+          "sourceSha256": "02e9438ecee038f7d14860da37cb315bf358db4a26fa224e342eee5b592b55a9",
+          "importedSha256": "02e9438ecee038f7d14860da37cb315bf358db4a26fa224e342eee5b592b55a9",
+          "width": 1403,
+          "height": 1121,
+          "sizeBytes": 2367597,
+          "sourceMtimeMs": 1782373316697.9963,
+          "entropy": 5.4347973282274324,
+          "sourceUnchanged": true,
+          "authorityVersionId": "version-097e7399-255c-43b8-a2bd-58b856da3dcc"
+        }
+      ]
+    }
+  },
+  "mechanicalMedia": {
+    "raw": {
+      "sha256": "fee87760f11ad57e34a70d6b92dec0d0e5636e9f8496d898cf0a9450019e602a",
+      "width": 941,
+      "height": 1672,
+      "sizeBytes": 2315166,
+      "format": "png"
+    },
+    "labeled": {
+      "sha256": "ba4c2e27a2be09868715352d22dc1bcd6a533b543cad485662de9e320e8f0a7d",
+      "width": 941,
+      "height": 1672,
+      "sizeBytes": 3170091,
+      "format": "png"
+    }
+  },
+  "assertions": {
+    "stateFingerprintValidated": true,
+    "pendingReviewPhaseValidated": true,
+    "projectManifestMatched": true,
+    "activeRegistryProjectMatched": true,
+    "installedBuildMatchedCanary": true,
+    "realAuthorityReferencesValidated": true,
+    "authoritySourcesUnchanged": true,
+    "primaryAuthoritiesCurrent": true,
+    "packReferencesMatched": true,
+    "continuityReferencesMatched": true,
+    "fixtureAuthoritiesExcluded": true,
+    "goldenMaskDefinitionLocked": true,
+    "rawDecoded": true,
+    "labeledDecoded": true,
+    "rawAndLabeledVisible": true,
+    "canvasResultNodesVisible": true,
+    "oneClickOpenedReview": true,
+    "decisionSubmittedThroughUiOwner": true,
+    "explicitCliDecisionRecorded": true,
+    "reviewHeadMatchedDecision": true,
+    "reviewPersistedAfterRestart": true
+  },
+  "ui": {
+    "note": "主 Agent按显式 CLI decision=rework 执行受授权桌面 UI 审片；未声明用户亲自确认；脚本只验证 raw/labeled 可解码与界面可见，不推断视觉质量。",
+    "beforeStatus": "unreviewed",
+    "afterStatus": "rework",
+    "afterRestartStatus": "rework",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  "isolation": {
+    "canaryProjectOnly": true,
+    "formalProjectOpened": false,
+    "formalProjectWrites": 0,
+    "externalRequests": 0,
+    "agentRepairClicks": 0,
+    "imageGenerationCalls": 0
+  },
+  "screenshots": [
+    {
+      "fileName": "01-canvas-result-nodes.png",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p11-p14-final/superseded/p14-installed-real-canary-r10-rework-ui-20260718-shots/01-canvas-result-nodes.png",
+      "width": 1728,
+      "height": 1029,
+      "sizeBytes": 331414,
+      "sha256": "b7023bd5c690987fea5b885ae3f7ecfbb3f1b3617e21ab9adc911548ac4d6143",
+      "maxChannelStandardDeviation": 34.26217779515586
+    },
+    {
+      "fileName": "02-review-before-decision.png",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p11-p14-final/superseded/p14-installed-real-canary-r10-rework-ui-20260718-shots/02-review-before-decision.png",
+      "width": 1728,
+      "height": 1029,
+      "sizeBytes": 223973,
+      "sha256": "868a9fa3c44fbaabcf6e4eafae350e88a7eac3afe146b76d68f56a55bd176549",
+      "maxChannelStandardDeviation": 20.35958711545833
+    },
+    {
+      "fileName": "03-review-after-decision.png",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p11-p14-final/superseded/p14-installed-real-canary-r10-rework-ui-20260718-shots/03-review-after-decision.png",
+      "width": 1728,
+      "height": 1029,
+      "sizeBytes": 244391,
+      "sha256": "ace077f24b45f8379000e3df7f249c319827186deaa44e4148dfce43109539aa",
+      "maxChannelStandardDeviation": 23.019694409143245
+    },
+    {
+      "fileName": "04-review-after-restart.png",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p11-p14-final/superseded/p14-installed-real-canary-r10-rework-ui-20260718-shots/04-review-after-restart.png",
+      "width": 1728,
+      "height": 1029,
+      "sizeBytes": 113799,
+      "sha256": "fd89f43b72ac4a05ba35dc0d05a9eb54f482f00d7bb82d64641b5c202e8e13f4",
+      "maxChannelStandardDeviation": 18.336826652512254
+    }
+  ],
+  "terminal": {
+    "applicationClosed": true,
+    "temporaryRuntimeRemoved": true,
+    "reviewPersistedAfterRestart": true
+  },
+  "boundaries": {
+    "imageGeneratedByScript": false,
+    "fixtureCreatedByScript": false,
+    "userPersonallyClickedClaimed": false,
+    "mechanicalDecodeEqualsVisualApproval": false,
+    "agentConfigurationMutated": false,
+    "browserUsed": false,
+    "uploads": 0,
+    "gitActions": 0
+  }
+}

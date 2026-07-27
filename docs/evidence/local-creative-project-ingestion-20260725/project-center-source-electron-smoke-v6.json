@@ -1,0 +1,550 @@
+{
+  "schemaVersion": 1,
+  "kind": "local-creative-project-center-source-electron-smoke",
+  "createdAt": "2026-07-25T15:54:01.205Z",
+  "verdict": "PASS",
+  "scope": {
+    "runtime": "workspace source build",
+    "registry": "真实注册表逐字节只读镜像",
+    "projectRoots": "真实项目目录",
+    "forbiddenActions": [
+      "切换项目",
+      "生成图片",
+      "写业务状态",
+      "安装",
+      "打包"
+    ]
+  },
+  "build": [
+    {
+      "path": "out/main/index.js",
+      "sizeBytes": 4086082,
+      "sha256": "270f79c9c06fd3a627498b97c1b220c18cac1b179b3382b7204e0ab1658386a9"
+    },
+    {
+      "path": "out/preload/index.mjs",
+      "sizeBytes": 30212,
+      "sha256": "c57f2ec386ff552aaaf1a6e5cb95cd37106a5340b2ea03629401e2d77ed43784"
+    },
+    {
+      "path": "out/renderer/assets/arrow-up-right-Cp_yK8j0.js",
+      "sizeBytes": 252,
+      "sha256": "5ce4382740074c9639e11b7e004e2d801248d70bbc3272b88628fa4a5ba51c1d"
+    },
+    {
+      "path": "out/renderer/assets/bot-7PZLT-Ye.js",
+      "sizeBytes": 441,
+      "sha256": "7068a1d03f0968e1bfa7f5a97b8b1ea0573931a896e514da966a692eea86752f"
+    },
+    {
+      "path": "out/renderer/assets/CanonicalAssetLibraryView-DlY7W-FD.css",
+      "sizeBytes": 7825,
+      "sha256": "159bad12d13c3c5d99bb71b4cbeb6c8cee11c177826b6c1834878f5d5ac7bdca"
+    },
+    {
+      "path": "out/renderer/assets/CanonicalAssetLibraryView-qLzbpwNU.js",
+      "sizeBytes": 27112,
+      "sha256": "ecb90a223ded8aeb2a9671ccf8d2d189fc35d9fa35faf5e65659fcecfdf1d4ee"
+    },
+    {
+      "path": "out/renderer/assets/check-4xPvTxLV.js",
+      "sizeBytes": 184,
+      "sha256": "98c3001f4ec6d0f2c23dee09f096da53a495e7ead105253a47627ef953dd245c"
+    },
+    {
+      "path": "out/renderer/assets/chevron-right-D2jouzYC.js",
+      "sizeBytes": 340,
+      "sha256": "59b0aa084ff2c8b37318b27510ed83d2b841755aa1d61a6703930e028f1ba117"
+    },
+    {
+      "path": "out/renderer/assets/circle-alert-B2SDxzlv.js",
+      "sizeBytes": 359,
+      "sha256": "a0084c4c2730456900e4147bf89d29da196bce3451e266be42f12ded1e88d15d"
+    },
+    {
+      "path": "out/renderer/assets/circle-check-DvPOiP7p.js",
+      "sizeBytes": 266,
+      "sha256": "2aa5ef90dad6130e0eefd3c043f5353ac5a7a15d8ac9e26582efa0ce1c527959"
+    },
+    {
+      "path": "out/renderer/assets/ContinuationWorkbenchView-D_p_qPC9.js",
+      "sizeBytes": 42970,
+      "sha256": "80bd3c047fe108b8cb75166f83dc09ef598cddff178616300e6e4023a617ffc5"
+    },
+    {
+      "path": "out/renderer/assets/ContinuationWorkbenchView-Do8t9xQN.css",
+      "sizeBytes": 15741,
+      "sha256": "186a551772d09108feec1ad94af8aca6b753873b82a2c1f99adea680eaa6f1bb"
+    },
+    {
+      "path": "out/renderer/assets/ContinuityTimelineView-BR6wfLDL.css",
+      "sizeBytes": 8128,
+      "sha256": "583d62c913dc4bd9ad96f496d894b82c8378bc5f16ad80e49952f84099403950"
+    },
+    {
+      "path": "out/renderer/assets/ContinuityTimelineView-CVYK2qAF.js",
+      "sizeBytes": 24084,
+      "sha256": "d9994e1cd369a8bd7d3e0edfd70463c5da2e776a7775f785b5dae2fdcc42d7a9"
+    },
+    {
+      "path": "out/renderer/assets/copy-C8Aw0J9I.js",
+      "sizeBytes": 317,
+      "sha256": "592b1f49504aacf1838026bda3f10e2046da6b876a736265ecba79fd2c51e2ff"
+    },
+    {
+      "path": "out/renderer/assets/DesktopSupportView-BEH9D8h-.css",
+      "sizeBytes": 5758,
+      "sha256": "3dad68ddf8de35fa8408bb69b96a77638b3046d777d567f8acceddf8d3f9e4e9"
+    },
+    {
+      "path": "out/renderer/assets/DesktopSupportView-DZrLkQl5.js",
+      "sizeBytes": 18396,
+      "sha256": "3a785c59853bda24433357f8abc551e52b44e196336a654a46c3ef056687d6ec"
+    },
+    {
+      "path": "out/renderer/assets/file-input-CCc_VmSQ.js",
+      "sizeBytes": 390,
+      "sha256": "7b8881f14c3feaad68428899024f59a6b7997d44f40cfbe8ca57363aec6924c9"
+    },
+    {
+      "path": "out/renderer/assets/GenerationQueueView-Ct2YgDA4.css",
+      "sizeBytes": 7166,
+      "sha256": "e23d51ca6fa2d4689c3e094b0cdec89b4c970480da1c3a909c20abc6a75aec5c"
+    },
+    {
+      "path": "out/renderer/assets/GenerationQueueView-xNZmePRg.js",
+      "sizeBytes": 77750,
+      "sha256": "294de081b27a2f37e42dfac51c62f8ffe3aad5cf54fa9419b18ce6de8f4185f4"
+    },
+    {
+      "path": "out/renderer/assets/index-DACaCsCR.js",
+      "sizeBytes": 753815,
+      "sha256": "387977479eca6e594c33bc90a61d561cb47cb923fc562dfa05ae810f05bbd69d"
+    },
+    {
+      "path": "out/renderer/assets/index-DK3bwWdN.css",
+      "sizeBytes": 38149,
+      "sha256": "542d0427ae1f1daa4c07116e76aa5eeaaae44908e258f60ec2efadf76985df4c"
+    },
+    {
+      "path": "out/renderer/assets/layers-Chgl4gMz.js",
+      "sizeBytes": 589,
+      "sha256": "ff35ed159ed40436f349740c0e8d0c19cc705825b52590ddff82faab86f346b2"
+    },
+    {
+      "path": "out/renderer/assets/loader-circle-2HxUUzfj.js",
+      "sizeBytes": 221,
+      "sha256": "890b706cefdf56eaa0027329a852f8ebe5ca5ac37ce48735775ffdc545052e8c"
+    },
+    {
+      "path": "out/renderer/assets/ManagedStudioCanvasView-BAtLMKyS.js",
+      "sizeBytes": 407870,
+      "sha256": "6f1654221f64dbf6a966cc7a85f3c2f38fe33cdca0beeac5abc9e3b1197071bd"
+    },
+    {
+      "path": "out/renderer/assets/ManagedStudioCanvasView-ujUa-JnN.css",
+      "sizeBytes": 37600,
+      "sha256": "c935d149e2b42b98ad33bf98054b4facb92cbd2083f8d7d219cd0e7e5b5b08dc"
+    },
+    {
+      "path": "out/renderer/assets/MaterialStudioView-CE0QUkKI.css",
+      "sizeBytes": 38485,
+      "sha256": "d8a34d06dbfa161603945d400077a565a291ad3deea9f62ecf11997525825f81"
+    },
+    {
+      "path": "out/renderer/assets/MaterialStudioView-v2w1Kisi.js",
+      "sizeBytes": 154232,
+      "sha256": "dd91f6ebff1c8549904e7298eb3f192984c403cc0933f2d9ae3f334d8f63e952"
+    },
+    {
+      "path": "out/renderer/assets/NarrativeAdaptationView-DJlrwWve.js",
+      "sizeBytes": 75204,
+      "sha256": "db6018591eeb83938a9008359a1e43aedbfddd8bd11d5669759ae976a49199dc"
+    },
+    {
+      "path": "out/renderer/assets/NarrativeAdaptationView-P6OMeJVq.css",
+      "sizeBytes": 17836,
+      "sha256": "ebee70017191fba2a80f2b4269220a38873e7201dfa7a2a8500bdad674bf09e2"
+    },
+    {
+      "path": "out/renderer/assets/package-plus-CdF-QSyX.js",
+      "sizeBytes": 610,
+      "sha256": "930d8cef2432729b78575ee23b5d1ccbcb2469e110bd7761160775137b75e882"
+    },
+    {
+      "path": "out/renderer/assets/PanelReferenceWorkbench-BXhd3FSV.js",
+      "sizeBytes": 68270,
+      "sha256": "695f40a10b75ebc6ea4e5e243b95dd015a091c24c1361a41f6ba7b72641ba49d"
+    },
+    {
+      "path": "out/renderer/assets/PanelReferenceWorkbench-D3JOJljj.css",
+      "sizeBytes": 17839,
+      "sha256": "af166b30398a31eabfe791c33760d20f1f0974a30a02cd5c6c1bc1b8acd1b862"
+    },
+    {
+      "path": "out/renderer/assets/plug-zap-D03Jw5X_.js",
+      "sizeBytes": 468,
+      "sha256": "23b2a1cf6fea24a0f8344d8b5befd4c1bbb7e1ea54d065b58cd6ef9bf1339b33"
+    },
+    {
+      "path": "out/renderer/assets/plus-CyE8cN2_.js",
+      "sizeBytes": 224,
+      "sha256": "ed9753e7930f616f1683f07347baf79f91c8765e04c284476b7a91b48cec5d76"
+    },
+    {
+      "path": "out/renderer/assets/ProductionDesignView-6o0dVaTB.css",
+      "sizeBytes": 25336,
+      "sha256": "87ca1647baca7820a6dd20dfcd62b184b594845bfdc58e2e114c69e664a0f3a9"
+    },
+    {
+      "path": "out/renderer/assets/ProductionDesignView-Cp0ODDWG.js",
+      "sizeBytes": 112885,
+      "sha256": "ee6f1768b33ba02399d55355686587e42d234a4f95dacfb28e6212fd1e62a3a7"
+    },
+    {
+      "path": "out/renderer/assets/ProductionWorkspace-BeyvKnz0.js",
+      "sizeBytes": 25380,
+      "sha256": "7e9b15f8b01bbf39021f6599d6cdd450ace3172b688e96d1551b29f34ba5ae9c"
+    },
+    {
+      "path": "out/renderer/assets/ProductionWorkspace-DH5fMccS.css",
+      "sizeBytes": 9375,
+      "sha256": "d03d554b7c51123cbb82723830bed644d8e39969ecc97505423f8ba68a51f11f"
+    },
+    {
+      "path": "out/renderer/assets/ProjectCenter-D35pFqDn.css",
+      "sizeBytes": 10117,
+      "sha256": "d5cce0a5512df81f9e3dbed6e5a7657c2167668031c9639419c2221b80eb86a8"
+    },
+    {
+      "path": "out/renderer/assets/ProjectCenter-QEkNzHJ2.js",
+      "sizeBytes": 25777,
+      "sha256": "58b9e8244bbd861384350dc5a3a8797987e35932e441afbd7d97134f7a41d82b"
+    },
+    {
+      "path": "out/renderer/assets/ProjectImportWizard-D_ZTowWC.css",
+      "sizeBytes": 12290,
+      "sha256": "dda8cbefe1a4e9b6e85417c5bcb21541e03c2c8771fda2ff5349c26b8d8cee73"
+    },
+    {
+      "path": "out/renderer/assets/ProjectImportWizard-D-v82hn4.js",
+      "sizeBytes": 36483,
+      "sha256": "b0bb6e02bec0c53be3dcb8655e9fd74faddd0ca39827cb45d9984033db7786a1"
+    },
+    {
+      "path": "out/renderer/assets/ProjectSettingsView-CXe5Mf3q.js",
+      "sizeBytes": 18860,
+      "sha256": "1bba6dbbb803452d991b80b94f275aff0b332ea018e80254c0b6934065664f7d"
+    },
+    {
+      "path": "out/renderer/assets/ProjectSettingsView-TQwxqx-9.css",
+      "sizeBytes": 3864,
+      "sha256": "f1346ff644d25c37c6c9cd7e6edb68edaa487e647d817de1b62e7c4ab31bc026"
+    },
+    {
+      "path": "out/renderer/assets/ReviewStudioView-B9kJq5kc.js",
+      "sizeBytes": 57138,
+      "sha256": "cec0d79b24958c8db4130731d79169903f2ae18cad047df872eea8a433f46372"
+    },
+    {
+      "path": "out/renderer/assets/ReviewStudioView-ByHAzrEV.css",
+      "sizeBytes": 17682,
+      "sha256": "91e9d73f8eb807dd8df583c51e918ef78be0f9d0f9417cc6af36e9872dd64bca"
+    },
+    {
+      "path": "out/renderer/assets/scan-text-D43Z7Qva.js",
+      "sizeBytes": 525,
+      "sha256": "cb807ae6d3ea41aa125860bcf3b254c78b201dbdb229e4d416deab00fe4e2cc3"
+    },
+    {
+      "path": "out/renderer/assets/ScriptMediaAlignView-qnRcVBk3.js",
+      "sizeBytes": 7979,
+      "sha256": "a11d4aaff108e93049d5f9f0921f2ad25a726bb55791b7a21c4d6b87eac9c01c"
+    },
+    {
+      "path": "out/renderer/assets/ScriptMediaAlignView-SBXvYAmI.css",
+      "sizeBytes": 2303,
+      "sha256": "7bb0813eb7a5a1ee6d242557eb625ed4460551473a179ee5ca6333984eaa9087"
+    },
+    {
+      "path": "out/renderer/assets/ScriptWorkbenchView-CLLCUAjF.css",
+      "sizeBytes": 6185,
+      "sha256": "67e73dc8d88c1f37f810cc9fae42efa9c988c236b24f0776c1a0c77495c72ccc"
+    },
+    {
+      "path": "out/renderer/assets/ScriptWorkbenchView-OjnEsTlk.js",
+      "sizeBytes": 18045,
+      "sha256": "d040c45e5ed087bec099ad5a559e4f86bc82b88f56e532c07eff86767ef8d4dc"
+    },
+    {
+      "path": "out/renderer/assets/shield-alert-Dhr13Smy.js",
+      "sizeBytes": 474,
+      "sha256": "1e1394ff7555568275c8d84bf81f94a2a2254cf665b273f6ecf6e7985af66007"
+    },
+    {
+      "path": "out/renderer/assets/ShotTimelineView-CaLAcHRH.css",
+      "sizeBytes": 7879,
+      "sha256": "e4fe41a6ad229bdc88036f5f0a500a811a9a9ae861395cca104e80c450cf5c7b"
+    },
+    {
+      "path": "out/renderer/assets/ShotTimelineView-D4lRwu8W.js",
+      "sizeBytes": 22765,
+      "sha256": "c414c3b945bd85acf3080040102f2046fd4317c51c54a3eb14037e7e08d36b69"
+    },
+    {
+      "path": "out/renderer/assets/sliders-horizontal-CfMFk6x5.js",
+      "sizeBytes": 798,
+      "sha256": "1436b4234246c8aa6576c4b6803695545e17c72646201dac47c50d0d4097bc86"
+    },
+    {
+      "path": "out/renderer/assets/StoryWorkbenchView-CTBO_FaT.css",
+      "sizeBytes": 12514,
+      "sha256": "14d361fbf3e0c402836caba13e0c75a5cdf7f0c64db2a9a8d2257d01e0a8d2bf"
+    },
+    {
+      "path": "out/renderer/assets/StoryWorkbenchView-CVXDpq6L.js",
+      "sizeBytes": 38659,
+      "sha256": "c4a1cd9e8ca0b8da07ef5cd19bc618f538135743800e652538e33e4912c73db1"
+    },
+    {
+      "path": "out/renderer/assets/studio-canvas-pipeline-graph-CLlN-eCb.js",
+      "sizeBytes": 5567,
+      "sha256": "f22873c892a629fb3b5cc6a967675e703761b5273a538731f31ffeb85d1576ae"
+    },
+    {
+      "path": "out/renderer/assets/studio-dashboard-unit-selection-DCtWZGki.js",
+      "sizeBytes": 1068,
+      "sha256": "59e8012cfa0ce9073336f02c22116b0eb9ac5815cfd5759d726782101ee41fbf"
+    },
+    {
+      "path": "out/renderer/assets/StudioBindingWorkbench-CmGjmFgA.css",
+      "sizeBytes": 18124,
+      "sha256": "33650be7b86f44c33299507412bd339d21d0a17751200ffa2e39a81bc90e8412"
+    },
+    {
+      "path": "out/renderer/assets/StudioBindingWorkbench-DNoxg1Ut.js",
+      "sizeBytes": 64311,
+      "sha256": "68f680c5900319197f1ff504b29125fa3db65ab8acc2b43c62799c6ca51cc50b"
+    },
+    {
+      "path": "out/renderer/assets/StudioContinuityReviewView-BgAviIId.js",
+      "sizeBytes": 116602,
+      "sha256": "4d54fac63b4fd3e181e5f5083e40015e36d586de6a192cdacff2f717df96820f"
+    },
+    {
+      "path": "out/renderer/assets/StudioContinuityReviewView-QKaSEmsj.css",
+      "sizeBytes": 25631,
+      "sha256": "dce9b86efb334be8e6ed7843e67fca2bb36ec0b358ee061098694509709f391b"
+    },
+    {
+      "path": "out/renderer/assets/StudioGenerationControlView-DhO460sb.css",
+      "sizeBytes": 9222,
+      "sha256": "51ea351597c07951f888c675cff60d8a250987cca34e0173956022a0f3fe72cc"
+    },
+    {
+      "path": "out/renderer/assets/StudioGenerationControlView-DwlhAK3_.js",
+      "sizeBytes": 58353,
+      "sha256": "7a6bd94b19fc01ef8dda97af396006d00c731439c957412306d7a1d753af7aa1"
+    },
+    {
+      "path": "out/renderer/assets/StudioMultimediaTimelineView-BhcyI2w5.js",
+      "sizeBytes": 37018,
+      "sha256": "cb0d56df304ef936a1555d93ffdc7b85d463882f77ec3d87f5e9f904e483d3ba"
+    },
+    {
+      "path": "out/renderer/assets/StudioMultimediaTimelineView-DIc0pDWX.css",
+      "sizeBytes": 13349,
+      "sha256": "665045b649f0ec75d87424b0157ca35dc255099b15d0a1d0de5c7cc76f8ef0a9"
+    },
+    {
+      "path": "out/renderer/assets/StudioProductionDashboardView-BZDMuDpm.css",
+      "sizeBytes": 7227,
+      "sha256": "bd583917ae5998e0089bfe55b179758318f52015030b5d435f297d6773e97087"
+    },
+    {
+      "path": "out/renderer/assets/StudioProductionDashboardView-DHZ9xY5F.js",
+      "sizeBytes": 49251,
+      "sha256": "7664754067e27e2ee899106184edd146717f223e42fe2c9df5239ed3e16354ff"
+    },
+    {
+      "path": "out/renderer/assets/TaskCenterView-Be_xKG2z.css",
+      "sizeBytes": 4241,
+      "sha256": "944e3db1eef8e8641b96b8722d5698ebc52bf0e7118ddb694e7d52bf8bf410d9"
+    },
+    {
+      "path": "out/renderer/assets/TaskCenterView-Z8i0AuBJ.js",
+      "sizeBytes": 15608,
+      "sha256": "9d113d43c985d31ed9ddf7af99950aebfa192e02ab51dec930b56cb3322ecc61"
+    },
+    {
+      "path": "out/renderer/assets/trash-2-B11hvkTj.js",
+      "sizeBytes": 471,
+      "sha256": "6398018c587046f1e379f6568e5620acf73ab88079beb863b38392e69644d494"
+    },
+    {
+      "path": "out/renderer/assets/triangle-alert-DvIw7XM1.js",
+      "sizeBytes": 514,
+      "sha256": "4da3d3a9ec6e7cd6113d4462a8f3a08107c1fd59e619a7248ee2f96e559f0652"
+    },
+    {
+      "path": "out/renderer/assets/user-facing-error-BH7f5sPt.js",
+      "sizeBytes": 2283,
+      "sha256": "62dbf28ba1ebeef482ebf3a749a8f31c330ec0584d73f9c6b643f11da583f2c1"
+    },
+    {
+      "path": "out/renderer/assets/VideoEditorView-BxTQtAf5.css",
+      "sizeBytes": 21554,
+      "sha256": "5a0393d4cc8f304f487b3b0d25ded7ecdc2b92f67bd8e18faf4d26385a0439d3"
+    },
+    {
+      "path": "out/renderer/assets/VideoEditorView-q8uOQLei.js",
+      "sizeBytes": 172948,
+      "sha256": "3ccec0e4b16260e0df29bba8721f39392c57069d481625986c75dec0ba59f57b"
+    },
+    {
+      "path": "out/renderer/index.html",
+      "sizeBytes": 727,
+      "sha256": "a74b3fc82221f74362ff30df92f694ee6b6a6da29e8f0cf1954e025b3bed307a"
+    }
+  ],
+  "registry": {
+    "realRegistryPath": "/Users/hxx/.aicanvas/projects.json",
+    "realRegistryIdentity": {
+      "sizeBytes": 12582,
+      "mtimeMs": 1784988545898.221,
+      "sha256": "40fe62a9ba2ccce62800c328fbc0c9ce1cb00a3cd4eeacf0fa802649790c1ed7"
+    },
+    "mirrorRegistryPath": "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-local-project-center-ui-bOFEeM/registry/projects.json"
+  },
+  "activeProjectGuard": {
+    "realActiveProjectPath": "/Users/hxx/.aicanvas/active-project.json",
+    "primaryRoot": "/Users/hxx/Documents/无限画布/projects/dudu-gaiden-lock-20260723-12a6516c",
+    "before": {
+      "sizeBytes": 269,
+      "mtimeMs": 1784973088350.836,
+      "sha256": "eab7289f4fcccd8f9eb73e6ae756459c31ac5b00ecdbbd2a9e6dfc3b553b9501"
+    },
+    "after": {
+      "sizeBytes": 269,
+      "mtimeMs": 1784973088350.836,
+      "sha256": "eab7289f4fcccd8f9eb73e6ae756459c31ac5b00ecdbbd2a9e6dfc3b553b9501"
+    },
+    "byteIdentical": true,
+    "mirrorBefore": {
+      "sizeBytes": 269,
+      "mtimeMs": 1784994839648.3696,
+      "sha256": "eab7289f4fcccd8f9eb73e6ae756459c31ac5b00ecdbbd2a9e6dfc3b553b9501"
+    },
+    "mirrorAfter": {
+      "sizeBytes": 269,
+      "mtimeMs": 1784994840588.182,
+      "sha256": "f113813f7f4ec77e8b100ed0e6771d9c2ecd334483e4dddde0e305ed4df25a17"
+    },
+    "note": "Electron 仅可改动临时镜像中的活动登记；真实活动登记未改变。"
+  },
+  "ui": {
+    "rendererReadyMs": 672,
+    "availableCount": 26,
+    "unavailableCount": 27,
+    "unavailableDefaultCollapsed": true,
+    "unavailableExpandedCount": 27,
+    "unavailableCanExpandAndCollapse": true,
+    "localCreativeProjectCount": 20,
+    "localCreativeCompletedCount": 20,
+    "localCreativeLockRecordLabelCount": 20,
+    "localCreativeCandidateRecordLabelCount": 20,
+    "localCreativeMediaSourceLabelCount": 20,
+    "localCreativeDocumentRecordLabelCount": 20,
+    "localProjectNames": [
+      "《嘟嘟》世界观概念序章",
+      "《封神榜》人物图鉴",
+      "《古蜀卷》48秒预告",
+      "《黄金面具·封神篇》",
+      "《黄金面具》真人电影历史母版",
+      "《金帐鱼令》",
+      "《聊斋志异》角色图鉴",
+      "《三星堆:时空回响》",
+      "《蜀道山·古蜀卷》第四季·问路篇",
+      "《蜀道山·古蜀卷》第五季·先行篇",
+      "《蜀道山》故事圣经与改编源",
+      "《蜀王》60秒动作短片",
+      "本机未分配短剧媒体收件箱",
+      "狗狗胖嘟嘟表情与三视图资产开发",
+      "黄金面具三态视觉开发",
+      "神鬼形象50",
+      "饕餮Boss视觉开发",
+      "鱼凫王宫动作分镜",
+      "中国幽冥鬼怪全信息图鉴",
+      "中国志怪妖怪全信息图鉴"
+    ],
+    "localLockSummaries": [
+      "本机项目 · 197 文件 · 锁记录 15 / 候选记录 3",
+      "本机项目 · 74 文件 · 锁记录 0 / 候选记录 70",
+      "本机项目 · 48 文件 · 锁记录 0 / 候选记录 8",
+      "本机项目 · 17159 文件 · 锁记录 89 / 候选记录 2595",
+      "本机项目 · 456 文件 · 锁记录 0 / 候选记录 105",
+      "本机项目 · 1793 文件 · 锁记录 35 / 候选记录 503",
+      "本机项目 · 693 文件 · 锁记录 362 / 候选记录 63",
+      "本机项目 · 180 文件 · 锁记录 3 / 候选记录 0",
+      "本机项目 · 1451 文件 · 锁记录 4 / 候选记录 59",
+      "本机项目 · 92 文件 · 锁记录 10 / 候选记录 40",
+      "本机项目 · 306 文件 · 锁记录 2 / 候选记录 22",
+      "本机项目 · 77 文件 · 锁记录 0 / 候选记录 0",
+      "本机项目 · 433 文件 · 锁记录 0 / 候选记录 6",
+      "本机项目 · 33 文件 · 锁记录 0 / 候选记录 20",
+      "本机项目 · 192 文件 · 锁记录 0 / 候选记录 100",
+      "本机项目 · 192 文件 · 锁记录 0 / 候选记录 134",
+      "本机项目 · 304 文件 · 锁记录 0 / 候选记录 280",
+      "本机项目 · 218 文件 · 锁记录 0 / 候选记录 12",
+      "本机项目 · 138 文件 · 锁记录 0 / 候选记录 91",
+      "本机项目 · 211 文件 · 锁记录 0 / 候选记录 1"
+    ],
+    "localContentSummaries": [
+      "完成 · 媒体来源 100/100 · 文档记录 48 · pending 资产 0",
+      "完成 · 媒体来源 67/67 · 文档记录 5 · pending 资产 0",
+      "完成 · 媒体来源 43/43 · 文档记录 4 · pending 资产 0",
+      "完成 · 媒体来源 6663/6663 · 文档记录 500 · pending 资产 69",
+      "完成 · 媒体来源 388/388 · 文档记录 64 · pending 资产 0",
+      "完成 · 媒体来源 1145/1145 · 文档记录 379 · pending 资产 5",
+      "完成 · 媒体来源 684/684 · 文档记录 5 · pending 资产 222",
+      "完成 · 媒体来源 103/103 · 文档记录 77 · pending 资产 0",
+      "完成 · 媒体来源 0/0 · 文档记录 500 · pending 资产 0",
+      "完成 · 媒体来源 0/0 · 文档记录 76 · pending 资产 0",
+      "完成 · 媒体来源 7/7 · 文档记录 273 · pending 资产 0",
+      "完成 · 媒体来源 76/76 · 文档记录 1 · pending 资产 0",
+      "完成 · 媒体来源 433/433 · 文档记录 0 · pending 资产 0",
+      "完成 · 媒体来源 32/32 · 文档记录 1 · pending 资产 0",
+      "完成 · 媒体来源 181/181 · 文档记录 11 · pending 资产 0",
+      "完成 · 媒体来源 189/189 · 文档记录 1 · pending 资产 0",
+      "完成 · 媒体来源 280/280 · 文档记录 15 · pending 资产 0",
+      "完成 · 媒体来源 215/215 · 文档记录 3 · pending 资产 0",
+      "完成 · 媒体来源 134/134 · 文档记录 1 · pending 资产 0",
+      "完成 · 媒体来源 182/182 · 文档记录 27 · pending 资产 0"
+    ],
+    "search": {
+      "query": "《嘟嘟》世界观概念序章",
+      "matchNames": [
+        "《嘟嘟》世界观概念序章"
+      ],
+      "passed": true
+    },
+    "duduReadonlyRecovery": {
+      "missingDefaultRootHandledAsNone": true,
+      "expectedText": "未发现隔离续作工程",
+      "visibleErrorCount": 0
+    },
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/local-creative-project-ingestion-20260725/project-center-source-electron-smoke-v6.png",
+    "sizeBytes": 593887,
+    "mtimeMs": 1784994840990.583,
+    "sha256": "72c914c9cae54ca7026eb11b69e39bc4cc459280065b228091c00dcd6fe144de",
+    "width": 3456,
+    "height": 2056,
+    "format": "png",
+    "stdev": 57.0552544376632,
+    "nonBlank": true
+  }
+}

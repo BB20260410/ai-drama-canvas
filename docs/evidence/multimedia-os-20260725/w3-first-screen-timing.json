@@ -1,0 +1,63 @@
+{
+  "kind": "w3-first-screen-timing",
+  "budgetMs": 1500,
+  "hardPassRequired": false,
+  "softDoorNote": "历史 UI verify ~1.8-2.0s WARN；Core 投影计时本波实测如下",
+  "largeProject": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio",
+  "timings": [
+    {
+      "label": "isolation-fast",
+      "ms": 38,
+      "unitCount": 5,
+      "summary": {
+        "pass": 1,
+        "pendingReview": 0,
+        "inProgress": 0,
+        "failed": 0,
+        "blocked": 0
+      },
+      "productionStatusSample": "pass"
+    },
+    {
+      "label": "isolation-full",
+      "ms": 661,
+      "unitCount": 5,
+      "summary": {
+        "pass": 1,
+        "pendingReview": 0,
+        "inProgress": 0,
+        "failed": 0,
+        "blocked": 0
+      },
+      "productionStatusSample": "pass"
+    },
+    {
+      "label": "large-fast",
+      "ms": 43,
+      "unitCount": 0,
+      "summary": {
+        "pass": 0,
+        "pendingReview": 0,
+        "inProgress": 0,
+        "failed": 0,
+        "blocked": 0
+      },
+      "error": null
+    },
+    {
+      "label": "large-fast-s1e2",
+      "ms": 24,
+      "unitCount": 0,
+      "summary": {
+        "pass": 0,
+        "pendingReview": 0,
+        "inProgress": 0,
+        "failed": 0,
+        "blocked": 0
+      },
+      "error": null
+    }
+  ],
+  "isolationUnderBudget": true,
+  "createdAt": "2026-07-25T08:34:07.779Z"
+}

@@ -1,0 +1,15 @@
+{
+  "aspect": "P1.4",
+  "status": "PASS",
+  "strategy": "CLEAN_ROOM",
+  "peer": "ai-comic-factory panel/instructions/speech",
+  "ours": "src/core/studio-panel-json-contract.ts",
+  "commands": [
+    {
+      "cmd": "npx vitest run tests/studio-panel-json-contract.test.ts",
+      "result": "PASS",
+      "tests": 2
+    }
+  ],
+  "usefulness": "2–6 格 JSON：连续 panel 序号 + 非空 instructions 视觉线索；越界/空说明 fail-close"
+}

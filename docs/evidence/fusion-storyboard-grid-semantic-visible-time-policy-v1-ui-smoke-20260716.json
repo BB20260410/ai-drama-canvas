@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "kind": "fusion-storyboard-grid-ui-smoke",
+  "createdAt": "2026-07-15T16:38:05.297Z",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "registryPath": "/tmp/ai-canvas-fusion-grid-ui-registry-visible-time-policy-v1-20260716.json",
+  "screenshotPath": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-grid-semantic-visible-time-policy-v1-ui-smoke-20260716.png",
+  "screenshotSha256": "c18589b95da6c53f91f815f4be75ac38c4356dc07620b7c83d4fb643faeb3e63",
+  "apiState": {
+    "unitCount": 1288,
+    "selectedItemId": "season-三-ep01-unit008",
+    "selectedTitle": "EP01 15s 008 面具沉睡嘟嘟先闻到第三世",
+    "contractId": "grid-a3c831e8c241ea2bb770",
+    "panelCount": 6,
+    "algorithmVersion": "semantic-beat-v1",
+    "visibleTimePolicyVersion": "one-decimal-boundaries-then-difference-v1",
+    "detectedBeatCount": 6,
+    "rowPlans": [
+      {
+        "storyboardRowId": "storyboard-EP01_15s_008-01",
+        "durationSeconds": 8,
+        "detectedBeatCount": 2,
+        "detectedBeats": [
+          "阿航一手按胸前布囊，内层贴身压着完整黄金面具，外侧小袋里收着小鱼铜片，半璧另用素麻布包着贴在掌心侧；三件信物互不相露；布囊不发光，只随着他的呼吸轻轻一坠",
+          "嘟嘟忽然停步"
+        ],
+        "allocatedPanelCount": 2,
+        "reason": "检测 2 个剧情节拍，逐节拍独立成格"
+      },
+      {
+        "storyboardRowId": "storyboard-EP01_15s_008-02",
+        "durationSeconds": 5,
+        "detectedBeatCount": 3,
+        "detectedBeats": [
+          "嘟嘟鼻尖贴着冻土，嗅到一缕极淡的温白气息，尾巴僵住",
+          "随后猛地朝一条岔路小跑",
+          "阿航没有问，直接跟上"
+        ],
+        "allocatedPanelCount": 3,
+        "reason": "检测 3 个剧情节拍，逐节拍独立成格"
+      },
+      {
+        "storyboardRowId": "storyboard-EP01_15s_008-03",
+        "durationSeconds": 2,
+        "detectedBeatCount": 1,
+        "detectedBeats": [
+          "补足动作前奏/反应/收束、运镜延展、环境声和道具细节；不新增改变剧情走向的事件"
+        ],
+        "allocatedPanelCount": 1,
+        "reason": "通用延展段固定为一格，不伪造新剧情节拍"
+      }
+    ],
+    "selectionReason": "剧情语义检测到 6 个可画节拍，自动采用 6 格",
+    "totalDuration": 15,
+    "visibleDurationLabels": [
+      "0.0–4.0s（4.0s）",
+      "4.0–8.0s（4.0s）",
+      "8.0–9.7s（1.7s）",
+      "9.7–11.3s（1.6s）",
+      "11.3–13.0s（1.7s）",
+      "13.0–15.0s（2.0s）"
+    ],
+    "visibleDurationTotal": 14.999999999999998,
+    "allPanelFieldsPresent": true,
+    "allPanelBeatsAudited": true,
+    "uniquePanelPrompts": true,
+    "localTextOnly": true
+  },
+  "rendered": {
+    "panelCount": 6,
+    "visibleLabels": [
+      "画面 / 动作",
+      "景别 / 构图",
+      "拍摄方式",
+      "连续性 / 声音",
+      "台词 / 字幕",
+      "画面 / 动作",
+      "景别 / 构图",
+      "拍摄方式",
+      "连续性 / 声音",
+      "台词 / 字幕",
+      "画面 / 动作",
+      "景别 / 构图",
+      "拍摄方式",
+      "连续性 / 声音",
+      "台词 / 字幕",
+      "画面 / 动作",
+      "景别 / 构图",
+      "拍摄方式",
+      "连续性 / 声音",
+      "台词 / 字幕",
+      "画面 / 动作",
+      "景别 / 构图",
+      "拍摄方式",
+      "连续性 / 声音",
+      "台词 / 字幕",
+      "画面 / 动作",
+      "景别 / 构图",
+      "拍摄方式",
+      "连续性 / 声音",
+      "台词 / 字幕"
+    ],
+    "header": "15 秒中文宫格合同6 格 · 剧情语义检测到 6 个可画节拍，自动采用 6 格semantic-beat-v1 · one-decimal-boundaries-then-difference-v1 · 6 节拍 · grid-a3c831e8c241ea2bb770 · storyboard r1 · 逐格纯画面 / 本地中文",
+    "horizontalPageOverflow": false
+  },
+  "queueGate": {
+    "gateMessage": "Error invoking remote method 'canvas:enqueue-generation': Error: 分镜生图被六张资产一致性门禁阻止：fusion-asset-batch-001 必须先通过复核并将全部当前版本提升硬锁。",
+    "jobsBeforeGate": 6,
+    "jobsAfterGate": 6,
+    "rejectedWithoutNewJob": true
+  },
+  "pageErrors": []
+}

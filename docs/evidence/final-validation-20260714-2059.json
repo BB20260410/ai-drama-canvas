@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T12:59:01.000Z",
+  "status": "passed",
+  "slice": "packaged-runtime-global-state-zero-contact",
+  "summary": "当前最终工作区已在临时 arm64 unpacked App 中完成统一运行态隔离、静态 Resource 门禁、packaged MCP/空项目 fresh restart/Effect-Transition Electron 真实验证；宿主 registry、媒体运行时状态、旧 DMG 与工作区构建产物均未变化。",
+  "goal": {
+    "status": "active",
+    "complete": false,
+    "reason": "本纵向切片完成，但长期目标仍有 safe-local P0 与等待授权的正式项目校准。"
+  },
+  "priorityAudit": {
+    "objectiveKeyframeFocusStillValid": false,
+    "keyframeReason": "任意关键帧边界病态曲线、派生区间与 FFmpeg 整数帧求值已由既有零漂移证据闭环，不重复建设。",
+    "handoffFormalProjectPriorityStillProductRelevant": true,
+    "formalProjectExecutableThisTurn": false,
+    "formalProjectMissingAuthorization": [
+      "正式项目绝对路径",
+      "只读权威源或可写副本边界",
+      "允许输出目录",
+      "扫描、导入与覆盖边界"
+    ],
+    "executedSafeLocalPriority": "P0 packaged runtime global-state zero-contact",
+    "redEvidence": {
+      "path": "docs/evidence/isolated-current-source-package-smoke-20260714.json",
+      "finding": "历史 passed 证据的 packaged MCP capability stdout 含多个 aicanvas://projects/project-.../tasks URI，证明读取了用户全局 registry。"
+    }
+  },
+  "implementation": {
+    "runtimeEnvironment": {
+      "helper": "createIsolatedRuntimeEnvironment",
+      "requiredKeys": [
+        "HOME",
+        "TMPDIR",
+        "AI_CANVAS_REGISTRY_PATH",
+        "AI_CANVAS_MEDIA_RUNTIME_DIR",
+        "AI_CANVAS_PROJECT_ROOT"
+      ],
+      "strictTempRootChildren": true,
+      "allPackagedSubprocessesShareBase": true
+    },
+    "resourceGate": {
+      "helper": "assertOnlyStaticPackagedResources",
+      "expected": [
+        "aicanvas://server/capabilities",
+        "aicanvas://projects"
+      ],
+      "dynamicProjectResourcesAllowed": false
+    },
+    "hostStateProtection": [
+      "registry existence/bytes/mtime/SHA-256",
+      "media runtime state existence/bytes/mtime/SHA-256",
+      "old DMG existence/bytes/mtime/SHA-256",
+      "workspace dist/out/dist-mcp manifests"
+    ],
+    "evidenceNaming": "permanent runs use explicit new evidence stems; npm package:isolated-smoke writes isolated-package-smoke-latest*"
+  },
+  "validation": {
+    "redGate": {
+      "command": "npx vitest run tests/isolated-package-guards.test.ts --maxWorkers=1",
+      "testFiles": 1,
+      "tests": 5,
+      "failed": 2,
+      "expectedFailures": [
+        "createIsolatedRuntimeEnvironment missing",
+        "assertOnlyStaticPackagedResources missing"
+      ]
+    },
+    "targetedGate": {
+      "command": "npx vitest run tests/isolated-package-guards.test.ts --maxWorkers=1",
+      "testFiles": 1,
+      "testsPassed": 5,
+      "testsFailed": 0,
+      "exitCode": 0
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    "build": {
+      "command": "npm run build",
+      "electronMainPreloadRenderer": "passed",
+      "compiledMcp": "passed",
+      "exitCode": 0
+    },
+    "compiledMcpCapability": {
+      "isolatedEnvironment": true,
+      "tools": 134,
+      "resources": 2,
+      "resourceTemplates": 9,
+      "prompts": 7,
+      "exitCode": 0
+    },
+    "package": {
+      "command": "npx tsx scripts/isolated-package-smoke.ts docs/evidence/isolated-package-runtime-isolation-20260714-2052.json",
+      "status": "passed",
+      "exitCode": 0
+    },
+    "fullTests": {
+      "command": "npm test",
+      "finalRunAfterAllImplementationChanges": true,
+      "testFiles": 39,
+      "testsPassed": 235,
+      "testsFailed": 0,
+      "durationSeconds": 94.36,
+      "exitCode": 0
+    },
+    "nonGateObservation": {
+      "mcpRealSmoke": "A newly created empty fixture is correctly rejected by production workflow prerequisites; no product gate was loosened. The package uses the dedicated empty-project workflow smoke."
+    }
+  },
+  "workspaceManifests": {
+    "src": {
+      "fileCount": 62,
+      "bytes": 1980680,
+      "sha256": "61afcbc6541d00fd1d69f1a590d0285df5c87e8f2c69037380c971deadf5aa89"
+    },
+    "tests": {
+      "fileCount": 41,
+      "bytes": 673609,
+      "sha256": "40c530ddb91a4119d7cde39a6ba04243b679e89bc13c8f26c50cfa65796b6885"
+    },
+    "scripts": {
+      "fileCount": 49,
+      "bytes": 488503,
+      "sha256": "12d005653e408d20c3456abeb3dade1fea172347a1f2902efb2f6f0b9b9af84f"
+    }
+  },
+  "packageBoundary": {
+    "revalidatedCurrentFinalWorktree": true,
+    "workspaceSourceEqualsStageSource": true,
+    "workspaceSource": {
+      "fileCount": 62,
+      "bytes": 1980680,
+      "sha256": "61afcbc6541d00fd1d69f1a590d0285df5c87e8f2c69037380c971deadf5aa89"
+    },
+    "currentOutEqualsPackagedOut": true,
+    "out": {
+      "fileCount": 5,
+      "bytes": 2463287,
+      "sha256": "d15ef0acfa535746901f84cf4f5de5a8adc1b939bc7bd8cf5d35e10cea9f071d"
+    },
+    "currentMcpEqualsPackagedMcp": true,
+    "mcp": {
+      "fileCount": 64,
+      "bytes": 2526309,
+      "sha256": "c11cbf1430ac0b7b96366b648d856c083708ef8e2f0557dcbe558557d2142770"
+    },
+    "capabilities": {
+      "tools": 134,
+      "staticResources": 2,
+      "resourceTemplates": 9,
+      "prompts": 7,
+      "dynamicProjectResources": 0
+    },
+    "emptyProjectFreshRestart": {
+      "chapters": 2,
+      "facts": 34,
+      "beats": 11,
+      "splitUnits": 4,
+      "storyboardRows": 11,
+      "ledgerEntries": 19,
+      "uncertainCommands": 0,
+      "restartVerified": true
+    },
+    "packagedElectron": {
+      "transport": "packaged-electron-current-source",
+      "revisionAfterRestart": 4,
+      "pageErrors": 0,
+      "userDataRemoved": true,
+      "fixtureRemoved": true,
+      "registryRemoved": true
+    },
+    "packagedReviewContentIdentitySourceIncluded": true,
+    "packagedReviewStaleSubmitBehaviorSpecificallyValidated": false,
+    "reviewBoundaryNote": "Review content-identity source is present through exact src/out manifests, but this package UI smoke exercises Effect/Transition rather than packaged ReviewStudio stale-submit."
+  },
+  "zeroContact": {
+    "staticResourcesOnly": true,
+    "hostRegistryUnchanged": true,
+    "hostRegistry": {
+      "bytes": 4305,
+      "sha256": "b2c5dcd93b51a8bc8f15725f618a7413817ea6fd4491d4e5d3ad338094b309bc"
+    },
+    "hostMediaRuntimeStateUnchanged": true,
+    "hostMediaRuntimeState": {
+      "bytes": 16473,
+      "sha256": "757910fb27b96f9549c581ca7b334b537801c3f538d0924e05fa53f3d8031600"
+    },
+    "workspaceDistOutMcpUnchanged": true,
+    "oldDmgUnchanged": true,
+    "oldDmg": {
+      "bytes": 136652595,
+      "sha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972"
+    },
+    "tempRootRemoved": true,
+    "temporaryRegistriesRemoved": true,
+    "temporaryMediaRuntimeRemoved": true,
+    "temporaryProjectRootRemoved": true,
+    "electronUserDataRemoved": true,
+    "lingeringProcesses": 0
+  },
+  "visualEvidence": {
+    "width": 1560,
+    "height": 980,
+    "bytes": 251893,
+    "sha256": "305b043f3461291e57289340c09917f93b5dcfc87b91c8d9456f382895cc027c",
+    "manualInspection": "passed",
+    "visible": [
+      "director editor chrome",
+      "two timeline clips",
+      "composited portrait preview",
+      "SMPTE Dissolve offsets 2/4",
+      "revision v4"
+    ],
+    "viewerDiagnostic": "The authoritative PNG is 3-channel sRGB without alpha. A temporary JPEG conversion was used only to bypass one local PNG display anomaly; the permanent PNG remained authoritative."
+  },
+  "evidence": {
+    "package": {
+      "path": "docs/evidence/isolated-package-runtime-isolation-20260714-2052.json",
+      "bytes": 31272,
+      "sha256": "8b11528057872e2f223fd6c9222bb4e0096a61cdf3a606c360768021212017ff"
+    },
+    "electron": {
+      "path": "docs/evidence/isolated-package-runtime-isolation-20260714-2052-electron-ui.json",
+      "bytes": 6483,
+      "sha256": "32d8fd057215522d852a7e70d6201d0e5a6b88b959ec1cc5ad62be13e06aad92"
+    },
+    "screenshot": {
+      "path": "docs/evidence/isolated-package-runtime-isolation-20260714-2052-electron-ui.png",
+      "bytes": 251893,
+      "sha256": "305b043f3461291e57289340c09917f93b5dcfc87b91c8d9456f382895cc027c"
+    },
+    "report": {
+      "path": "docs/验证报告_隔离包运行态零接触_2026-07-14.md",
+      "sha256": "2e2fbfe0bd4f7a6943b53e5d9cd9f78d00dcbf7e3a5527be76f17760c4be26f2"
+    },
+    "handoff": {
+      "path": "docs/当前开发交接.md",
+      "sha256": "3a31245d841c1ac30c75bef08074b1069f160600db6781a36973fe4c75864af8"
+    },
+    "readme": {
+      "path": "README.md",
+      "sha256": "e2266c827090b5c2cb79b402594eba560abdedc0920577b9243d5e88109fa56b"
+    },
+    "codexMcp": {
+      "path": "docs/CODEX_MCP.md",
+      "sha256": "bb1fb1eaff305282f0cecb081b11663b5c44f8c7f4b9fcc8942ecbf51a9c2a64"
+    }
+  },
+  "implementationHashes": {
+    "package.json": "d631739fc4688af5db827cda9999d9d98711005c35f8783b52952100d1fabc48",
+    "scripts/isolated-package-smoke.ts": "079d802e22cd17fc499516da3da729ce8f0649b77587e0770eb2639183ccd79e",
+    "scripts/isolated-package-guards.ts": "bb6316dfcb4136f7d965bcf64401bfd56d795b479a7c59c3ec08a800dbe66856",
+    "scripts/ui-editor-effect-transition-smoke.mjs": "bdc0cfa663dc4da73f839468a2b23c6a3dd1506ba7dca899054e08607375ae7c",
+    "tests/isolated-package-guards.test.ts": "c106417ea0057c6936a86971cfed006cf3cfd2477549e700eeb9561f54462e24"
+  },
+  "authorizationBoundary": {
+    "formalProjectUsed": false,
+    "externalCreativeDirectoriesModified": false,
+    "externalWebsiteUsed": false,
+    "uploadUsed": false,
+    "paidActionUsed": false,
+    "installed": false,
+    "published": false,
+    "dmgGenerated": false,
+    "existingDmgOverwritten": false,
+    "developerIdSigningRequested": false,
+    "notarizationRequested": false,
+    "gitStaged": false,
+    "gitCommitted": false,
+    "gitPushed": false,
+    "pullRequestCreated": false
+  },
+  "git": {
+    "branch": "main",
+    "commits": 0,
+    "status": "No commits yet; all project files untracked",
+    "staged": false
+  },
+  "nextUniquePriority": {
+    "priority": "P0",
+    "name": "long-lived fact write revision CAS",
+    "verifiedFromSource": true,
+    "scope": [
+      "production workflow existing updates",
+      "Creative Bible existing updates",
+      "AssetRelation existing updates",
+      "VoiceIdentity existing updates",
+      "ProjectContext existing updates and delete"
+    ],
+    "requirements": [
+      "existing update/delete requires matching revision",
+      "unknown existing IDs are rejected instead of silently created",
+      "core, command bus, MCP, IPC/UI contracts are synchronized",
+      "missing/stale revision failures are confirmed failed rather than unknown",
+      "multi-window fixture, source/compiled MCP and Electron behavior are verified"
+    ]
+  },
+  "remainingExternalPriority": {
+    "priority": "P1",
+    "name": "formal AI drama project NLE calibration",
+    "status": "waiting_authorization",
+    "capability": "real-project-nle-validation"
+  }
+}

@@ -1,0 +1,352 @@
+{
+  "schemaVersion": 1,
+  "kind": "redline-project-sentinel",
+  "mode": "formal-readonly-copy-core-probes",
+  "createdAt": "2026-07-25T13:01:39.713Z",
+  "pass": true,
+  "failed": 0,
+  "checks": [
+    {
+      "id": "dudu-s1e1-formal",
+      "project": "/Users/hxx/Documents/无限画布/projects/dudu-s1e1-a84aa353",
+      "expect": {
+        "units": 33,
+        "unitCount": 33,
+        "pass": 33
+      },
+      "actual": {
+        "units": 33,
+        "unitCount": 33,
+        "pass": 33
+      },
+      "pass": true,
+      "isolation": {
+        "coreProjectRoot": "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/aicanvas-redline-project-PvfTvQ/project/dudu-s1e1-a84aa353",
+        "formalSentinelsBefore": [
+          {
+            "relativePath": ".aicanvas/managed-project.json",
+            "exists": true,
+            "bytes": 1393,
+            "mtimeMs": 1784699224834.592,
+            "sha256": "a1dddf6ab916056364e87765891f59941d1888245bd2af3b1a1a468925be83f6"
+          },
+          {
+            "relativePath": ".aicanvas/project.json",
+            "exists": true,
+            "bytes": 787,
+            "mtimeMs": 1784699224796.5515,
+            "sha256": "c6e0cc0bc031ba0d6cbb70fb255fa805da6ac9cc9eefb529035b4c3ebd5d43cf"
+          },
+          {
+            "relativePath": ".aicanvas/studio-production.sqlite",
+            "exists": true,
+            "bytes": 3448832,
+            "mtimeMs": 1784982122663.9563,
+            "sha256": "70643e309349ae72ea2134e2941f1d85f107e548b325d760cdc9481f1be11d95"
+          },
+          {
+            "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+            "exists": true,
+            "bytes": 13094912,
+            "mtimeMs": 1784952564445.4329,
+            "sha256": "b6a448fc99a5a7808350ae462a0da9fcf030c9dcfcddfbee40f46d3caf7d2c56"
+          },
+          {
+            "relativePath": ".aicanvas/material-studio.sqlite",
+            "exists": true,
+            "bytes": 528384,
+            "mtimeMs": 1784895719412.2288,
+            "sha256": "3af133b25fa826f4c84f8a1025fa218f0664b441e0cf22a02cd7cb03fb41fc74"
+          },
+          {
+            "relativePath": ".aicanvas/studio-canvas-layout.json",
+            "exists": true,
+            "bytes": 26383,
+            "mtimeMs": 1784935368044.3918,
+            "sha256": "ef27acd3dbb591abc9f65d48c4940745c395613b6fbecae6d49b5e834ddac1fe"
+          }
+        ],
+        "formalSentinelsAfter": [
+          {
+            "relativePath": ".aicanvas/managed-project.json",
+            "exists": true,
+            "bytes": 1393,
+            "mtimeMs": 1784699224834.592,
+            "sha256": "a1dddf6ab916056364e87765891f59941d1888245bd2af3b1a1a468925be83f6"
+          },
+          {
+            "relativePath": ".aicanvas/project.json",
+            "exists": true,
+            "bytes": 787,
+            "mtimeMs": 1784699224796.5515,
+            "sha256": "c6e0cc0bc031ba0d6cbb70fb255fa805da6ac9cc9eefb529035b4c3ebd5d43cf"
+          },
+          {
+            "relativePath": ".aicanvas/studio-production.sqlite",
+            "exists": true,
+            "bytes": 3448832,
+            "mtimeMs": 1784982122663.9563,
+            "sha256": "70643e309349ae72ea2134e2941f1d85f107e548b325d760cdc9481f1be11d95"
+          },
+          {
+            "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+            "exists": true,
+            "bytes": 13094912,
+            "mtimeMs": 1784952564445.4329,
+            "sha256": "b6a448fc99a5a7808350ae462a0da9fcf030c9dcfcddfbee40f46d3caf7d2c56"
+          },
+          {
+            "relativePath": ".aicanvas/material-studio.sqlite",
+            "exists": true,
+            "bytes": 528384,
+            "mtimeMs": 1784895719412.2288,
+            "sha256": "3af133b25fa826f4c84f8a1025fa218f0664b441e0cf22a02cd7cb03fb41fc74"
+          },
+          {
+            "relativePath": ".aicanvas/studio-canvas-layout.json",
+            "exists": true,
+            "bytes": 26383,
+            "mtimeMs": 1784935368044.3918,
+            "sha256": "ef27acd3dbb591abc9f65d48c4940745c395613b6fbecae6d49b5e834ddac1fe"
+          }
+        ],
+        "verifiedUnchanged": true
+      },
+      "sampleRaw": [
+        "6b99dc21cf04ca050ca9eedb861625114aef910ca5194887b30831855df74c52",
+        "178a32de255724a0a1350bd1f46e265c1ef2ff3b9306214f78cc2ccefcc944af",
+        "f530c72f82fb4cf67cc099bc327df4f24ef822974535aa39bc44b90e96a4f47b"
+      ]
+    },
+    {
+      "id": "codex-ai-drama-studio-counts",
+      "project": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio",
+      "expect": {
+        "units": 541
+      },
+      "actual": {
+        "units": 541,
+        "panels": 3246,
+        "panelsEstimated": 3246,
+        "scriptDocuments": 541,
+        "promptDocuments": 541,
+        "characters": 33,
+        "scenes": 33,
+        "props": 19,
+        "styles": 0,
+        "canonicalAssets": 85,
+        "media": 1152,
+        "assetBindingSets": 156,
+        "mentionProposals": 2262
+      },
+      "pass": true,
+      "note": "只读 counts；不读/改 PASS raw；Core 仅在完整临时副本运行",
+      "isolation": {
+        "coreProjectRoot": "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/aicanvas-redline-project-Dwpte8/project/codex-ai-drama-studio",
+        "formalSentinelsBefore": [
+          {
+            "relativePath": ".aicanvas/managed-project.json",
+            "exists": true,
+            "bytes": 1398,
+            "mtimeMs": 1784319566128.3538,
+            "sha256": "bb50a0b40dee08ecf305055a7db66624751b075f500c3c9451b2b82376fc6735"
+          },
+          {
+            "relativePath": ".aicanvas/project.json",
+            "exists": true,
+            "bytes": 785,
+            "mtimeMs": 1784312990325.3296,
+            "sha256": "a266f16d27241ef05eafad4d78f58e7a4119c09098c4faf0f9dbf12618d5bdeb"
+          },
+          {
+            "relativePath": ".aicanvas/studio-production.sqlite",
+            "exists": true,
+            "bytes": 17698816,
+            "mtimeMs": 1784698722136.0076,
+            "sha256": "bd7197a90298b3b72d8e5d3da4fea50892439d1c242a2b0843d9a2b85cee771e"
+          },
+          {
+            "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+            "exists": true,
+            "bytes": 1765376,
+            "mtimeMs": 1784974025454.2202,
+            "sha256": "dad07f835393e150b66f21573bd70966a384b205cef2d51abc7d5d5be8c92580"
+          },
+          {
+            "relativePath": ".aicanvas/material-studio.sqlite",
+            "exists": true,
+            "bytes": 2359296,
+            "mtimeMs": 1784394587515.734,
+            "sha256": "965e0f08fdf6d226db64a0378cf3764e7abc481dae961313ba49f0c50f9963b0"
+          },
+          {
+            "relativePath": ".aicanvas/studio-canvas-layout.json",
+            "exists": true,
+            "bytes": 4023,
+            "mtimeMs": 1784440240828.018,
+            "sha256": "d95657391572f4463868159f5571f634a7f1a2cfb3c3c89583ddd2b0f147d327"
+          }
+        ],
+        "formalSentinelsAfter": [
+          {
+            "relativePath": ".aicanvas/managed-project.json",
+            "exists": true,
+            "bytes": 1398,
+            "mtimeMs": 1784319566128.3538,
+            "sha256": "bb50a0b40dee08ecf305055a7db66624751b075f500c3c9451b2b82376fc6735"
+          },
+          {
+            "relativePath": ".aicanvas/project.json",
+            "exists": true,
+            "bytes": 785,
+            "mtimeMs": 1784312990325.3296,
+            "sha256": "a266f16d27241ef05eafad4d78f58e7a4119c09098c4faf0f9dbf12618d5bdeb"
+          },
+          {
+            "relativePath": ".aicanvas/studio-production.sqlite",
+            "exists": true,
+            "bytes": 17698816,
+            "mtimeMs": 1784698722136.0076,
+            "sha256": "bd7197a90298b3b72d8e5d3da4fea50892439d1c242a2b0843d9a2b85cee771e"
+          },
+          {
+            "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+            "exists": true,
+            "bytes": 1765376,
+            "mtimeMs": 1784974025454.2202,
+            "sha256": "dad07f835393e150b66f21573bd70966a384b205cef2d51abc7d5d5be8c92580"
+          },
+          {
+            "relativePath": ".aicanvas/material-studio.sqlite",
+            "exists": true,
+            "bytes": 2359296,
+            "mtimeMs": 1784394587515.734,
+            "sha256": "965e0f08fdf6d226db64a0378cf3764e7abc481dae961313ba49f0c50f9963b0"
+          },
+          {
+            "relativePath": ".aicanvas/studio-canvas-layout.json",
+            "exists": true,
+            "bytes": 4023,
+            "mtimeMs": 1784440240828.018,
+            "sha256": "d95657391572f4463868159f5571f634a7f1a2cfb3c3c89583ddd2b0f147d327"
+          }
+        ],
+        "verifiedUnchanged": true
+      }
+    },
+    {
+      "id": "isolation-snapshot",
+      "present": true,
+      "projectId": "project-c78607fac2a4",
+      "unitCount": 1,
+      "summary": {
+        "pass": 1,
+        "pendingReview": 0,
+        "inProgress": 0,
+        "failed": 0,
+        "blocked": 0
+      },
+      "note": "隔离 canary 也只在完整临时副本探测",
+      "isolation": {
+        "coreProjectRoot": "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/aicanvas-redline-project-eHuDt4/project/grok-mvp-qingdeng-mrwc97mu-d0aea463",
+        "formalSentinelsBefore": [
+          {
+            "relativePath": ".aicanvas/managed-project.json",
+            "exists": true,
+            "bytes": 1413,
+            "mtimeMs": 1784740236203.9014,
+            "sha256": "855a5f69c3cdc9a2f0593ba6b028584a9369b535ae81f3a72da2b2c922584c59"
+          },
+          {
+            "relativePath": ".aicanvas/project.json",
+            "exists": true,
+            "bytes": 824,
+            "mtimeMs": 1784740236036.3489,
+            "sha256": "ed3ca6c297accc77cedfb1002ba31f7dfcc81996b643617af8cdcc5337930255"
+          },
+          {
+            "relativePath": ".aicanvas/studio-production.sqlite",
+            "exists": true,
+            "bytes": 512000,
+            "mtimeMs": 1784969603995.0037,
+            "sha256": "4aab04cef030406a62ef156405cd5dbad67201f7d84e2f41ea69873ba04659fb"
+          },
+          {
+            "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+            "exists": true,
+            "bytes": 1380352,
+            "mtimeMs": 1784972120513.9106,
+            "sha256": "1eea7d80397ee9f48180b48919c22ae021c4920c2edf69fa5b904fbec4e5c18e"
+          },
+          {
+            "relativePath": ".aicanvas/material-studio.sqlite",
+            "exists": true,
+            "bytes": 253952,
+            "mtimeMs": 1784969603872.3389,
+            "sha256": "7a3c12318350c5f4ad0134371af6032f40d2fb259e3fe6be1338d1d035c135eb"
+          },
+          {
+            "relativePath": ".aicanvas/studio-canvas-layout.json",
+            "exists": true,
+            "bytes": 1337,
+            "mtimeMs": 1784763814789.3625,
+            "sha256": "c3e56d6ac82b8c1105a0a46ae43996bd8659364ca616e75114143b5dcdd5e5c6"
+          }
+        ],
+        "formalSentinelsAfter": [
+          {
+            "relativePath": ".aicanvas/managed-project.json",
+            "exists": true,
+            "bytes": 1413,
+            "mtimeMs": 1784740236203.9014,
+            "sha256": "855a5f69c3cdc9a2f0593ba6b028584a9369b535ae81f3a72da2b2c922584c59"
+          },
+          {
+            "relativePath": ".aicanvas/project.json",
+            "exists": true,
+            "bytes": 824,
+            "mtimeMs": 1784740236036.3489,
+            "sha256": "ed3ca6c297accc77cedfb1002ba31f7dfcc81996b643617af8cdcc5337930255"
+          },
+          {
+            "relativePath": ".aicanvas/studio-production.sqlite",
+            "exists": true,
+            "bytes": 512000,
+            "mtimeMs": 1784969603995.0037,
+            "sha256": "4aab04cef030406a62ef156405cd5dbad67201f7d84e2f41ea69873ba04659fb"
+          },
+          {
+            "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+            "exists": true,
+            "bytes": 1380352,
+            "mtimeMs": 1784972120513.9106,
+            "sha256": "1eea7d80397ee9f48180b48919c22ae021c4920c2edf69fa5b904fbec4e5c18e"
+          },
+          {
+            "relativePath": ".aicanvas/material-studio.sqlite",
+            "exists": true,
+            "bytes": 253952,
+            "mtimeMs": 1784969603872.3389,
+            "sha256": "7a3c12318350c5f4ad0134371af6032f40d2fb259e3fe6be1338d1d035c135eb"
+          },
+          {
+            "relativePath": ".aicanvas/studio-canvas-layout.json",
+            "exists": true,
+            "bytes": 1337,
+            "mtimeMs": 1784763814789.3625,
+            "sha256": "c3e56d6ac82b8c1105a0a46ae43996bd8659364ca616e75114143b5dcdd5e5c6"
+          }
+        ],
+        "verifiedUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "id": "build-identity",
+      "buildId": "aa90d9c9430cafc66566d12720844732",
+      "packageVersion": "0.2.0",
+      "hasFingerprint": true,
+      "pass": true
+    }
+  ]
+}

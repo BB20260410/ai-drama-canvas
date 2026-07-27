@@ -1,0 +1,38 @@
+{
+  "kind": "w1-four-media-import-smoke",
+  "image": {
+    "sha256": "c414cd0e204de974f73753c7e28d7638e7b3691bb8b1a2bab6b25bb7fed7ce77",
+    "pass": true
+  },
+  "script": {
+    "imported": 1,
+    "skippedDuplicate": 0,
+    "failed": 0,
+    "files": [
+      {
+        "sourcePath": "/Users/hxx/Documents/无限画布/docs/evidence/multimedia-os-20260725/av-inputs/w1-smoke-script.md",
+        "title": "w1-smoke-script",
+        "bodySha256": "f72bfa3d42b222837841c2dec9aa4cc76f08c3ee0c8d8d10ea0a8f449b8bed5a",
+        "status": "imported",
+        "documentId": "text-ab4ff263-6466-46ef-82e1-fbfbcba4a446",
+        "revisionId": "text-revision-58636a071b99306918bf4e44bfefbf4ef2df5b36"
+      }
+    ]
+  },
+  "mediaByKind": {
+    "video": 1,
+    "audio": 1,
+    "image": 8
+  },
+  "videoCount": 1,
+  "audioCount": 1,
+  "fourKindsPresent": {
+    "image": true,
+    "video": true,
+    "audio": true,
+    "script": true
+  },
+  "libraryDocs": 3,
+  "createdAt": "2026-07-25T08:53:24.031Z",
+  "pass": true
+}

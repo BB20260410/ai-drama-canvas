@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "kind": "fusion-asset-consistency-ui-smoke",
+  "createdAt": "2026-07-15T13:52:49.183Z",
+  "transport": "electron-current-production-build",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "registryPath": "/tmp/ai-canvas-fusion-asset-consistency-ui-registry-20260715-final.json",
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-asset-consistency-ui-smoke-20260715-final.png",
+    "sha256": "b61ef059535d4e47849fef65efab90d5d393c9e54bd13cb1a89a83541e003d74"
+  },
+  "guardedFiles": {
+    "beforeHashes": {
+      "generationJobs": "bd07e1276d6d7698f6cbf9adc6db85708768872d584a49d92e38677451ad1b6b",
+      "publications": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+      "consistency": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7"
+    },
+    "afterHashes": {
+      "generationJobs": "bd07e1276d6d7698f6cbf9adc6db85708768872d584a49d92e38677451ad1b6b",
+      "publications": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+      "consistency": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7"
+    },
+    "unchanged": true
+  },
+  "apiState": {
+    "persisted": true,
+    "batchSize": 6,
+    "canEnqueueNewAsset": false,
+    "batch": {
+      "id": "fusion-asset-batch-001",
+      "status": "generating",
+      "sealed": true,
+      "memberCount": 6,
+      "readyCount": 0,
+      "hardLockCount": 0,
+      "requiredCriteria": [
+        "character_identity",
+        "era_visual_style",
+        "scene_layout_lighting",
+        "scale_compatibility",
+        "prop_structure",
+        "clean_frame",
+        "hidden_mask_rule"
+      ],
+      "members": [
+        {
+          "order": 1,
+          "assetId": "P01",
+          "itemId": "asset-P01",
+          "jobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+          "jobStatus": "waiting_external"
+        },
+        {
+          "order": 2,
+          "assetId": "S01",
+          "itemId": "asset-S01",
+          "jobId": "gen-2026-07-15T11-19-38-350Z-a654d3da",
+          "jobStatus": "queued"
+        },
+        {
+          "order": 3,
+          "assetId": "P30",
+          "itemId": "asset-P30",
+          "jobId": "gen-2026-07-15T11-19-38-387Z-c7ecc0a0",
+          "jobStatus": "queued"
+        },
+        {
+          "order": 4,
+          "assetId": "S02",
+          "itemId": "asset-S02",
+          "jobId": "gen-2026-07-15T11-19-38-423Z-788bc493",
+          "jobStatus": "queued"
+        },
+        {
+          "order": 5,
+          "assetId": "C07",
+          "itemId": "asset-C07",
+          "jobId": "gen-2026-07-15T11-19-38-459Z-d9861f39",
+          "jobStatus": "queued"
+        },
+        {
+          "order": 6,
+          "assetId": "P29",
+          "itemId": "asset-P29",
+          "jobId": "gen-2026-07-15T11-19-38-495Z-c9b89a3b",
+          "jobStatus": "queued"
+        }
+      ]
+    },
+    "jobs": [
+      {
+        "id": "gen-2026-07-15T11-19-38-495Z-c9b89a3b",
+        "status": "queued"
+      },
+      {
+        "id": "gen-2026-07-15T11-19-38-459Z-d9861f39",
+        "status": "queued"
+      },
+      {
+        "id": "gen-2026-07-15T11-19-38-423Z-788bc493",
+        "status": "queued"
+      },
+      {
+        "id": "gen-2026-07-15T11-19-38-387Z-c7ecc0a0",
+        "status": "queued"
+      },
+      {
+        "id": "gen-2026-07-15T11-19-38-350Z-a654d3da",
+        "status": "queued"
+      },
+      {
+        "id": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+        "status": "waiting_external",
+        "stage": "plan_ready"
+      }
+    ]
+  },
+  "rendered": {
+    "memberCards": 6,
+    "criteria": 7,
+    "heading": "每六张暂停复核fusion-asset-batch-001 · 生成中跨图证据绑定 Publication、raw/labeled、单图 Review、权威参考与 SHA；通过后仍须把六项当前版本逐一提升硬锁。刷新证据准备 2×3 复核板",
+    "metrics": "批次槽位6 / 6证据就绪0 / 6当前硬锁0 / 6复核有效否",
+    "submitDisabled": true,
+    "pageOverflowX": false
+  },
+  "pageErrors": []
+}

@@ -1,0 +1,27 @@
+{
+  "kind": "absorb-integration-wiring",
+  "date": "2026-07-18",
+  "after": "eight-projects-closeout",
+  "changes": [
+    {
+      "take": "TC-1",
+      "wire": "buildStudioCanvasPipelineGraph 构图末 validateStudioCanvasEdges",
+      "files": ["src/core/studio-canvas-pipeline-graph.ts", "src/core/studio-canvas-edge-validation.ts"]
+    },
+    {
+      "take": "LX-1",
+      "wire": "GenerationQueueView active/done/failed tabs via buildStudioGenerationQueueView",
+      "files": ["src/renderer/src/components/GenerationQueueView.vue", "src/core/studio-generation-queue-view.ts"]
+    },
+    {
+      "take": "OTIO-1",
+      "wire": "exportEditProjectOtioUnlocked 写盘前 probeStudioOtioDocument",
+      "files": ["src/core/editor.ts"]
+    }
+  ],
+  "verification": {
+    "typecheck": "pass",
+    "vitest": "21 passed (7 files)",
+    "formalBusinessCountZero": true
+  }
+}

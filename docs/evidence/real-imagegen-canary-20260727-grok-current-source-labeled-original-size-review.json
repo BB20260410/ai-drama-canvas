@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "kind": "local-labeled-original-size-visual-review",
+  "decision": "pass",
+  "reviewedAt": "2026-07-27T05:24:38Z",
+  "reviewer": "Codex-independent-original-size-review",
+  "rawSha256": "5cd5b448374fb60f59d86fc2023702be0af2e6d439f649b6863b0a40829c84ae",
+  "labeledSha256": "694b7d74c6329b8d4cf09f91c2f06266473ee1fa1e3318e41b84413a10ae8299",
+  "dimensions": {
+    "width": 720,
+    "height": 1280
+  },
+  "criteria": [
+    {
+      "code": "label-legibility",
+      "status": "pass",
+      "note": "顶部“真实 Agent 生图 canary · 宫格 1”和底部“中文审片标注由本地排版生成”均清晰可读。"
+    },
+    {
+      "code": "layout-safety",
+      "status": "pass",
+      "note": "上下半透明标注区未裁切、未越界，主体脸部、双手和完整黄金面具未被遮挡。"
+    },
+    {
+      "code": "content-preservation",
+      "status": "pass",
+      "note": "labeled 保持 raw 的 9:16 主体构图，仅增加本地中文审片标注。"
+    }
+  ],
+  "boundary": "本文件只验收本地 labeled 排版，不改变 synthetic-canary-contract 范围，也不构成正式 Dudu 连续性批准。"
+}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "kind": "agent-imagegen-session-attestation",
+  "attestationLevel": "agent-session-direct",
+  "provider": "grok",
+  "executorKind": "agent-imagegen",
+  "primaryTool": "image_gen",
+  "directToolCall": true,
+  "generationRunId": "real-grok-canary-v2-001",
+  "packFingerprint": "bf8c8db781952f4c3d91a45c6190db1c30b9f8b1140cfd33befb9c3b77aa01b6",
+  "promptSha256": "c1240b19546e1ef7841df475dd3fcb968416013c6f743061d15d7756d33a6200",
+  "rawSha256": "5cd5b448374fb60f59d86fc2023702be0af2e6d439f649b6863b0a40829c84ae",
+  "formalImageGenerationCalls": 1,
+  "agentTaskName": "grok-live-current-source-canary-20260727",
+  "createdAt": "2026-07-27T05:13:37.696Z",
+  "note": "Grok Build version: grok 0.2.112 (9bbd559437aa). Backend: Grok Build Imagine built-in image_gen. Single direct tool call (formalImageGenerationCalls=1), no retry, no image_edit. raw.jpg is a byte-for-byte copy of the tool-returned original image file with no re-encoding.",
+  "backend": "grok-build-imagine"
+}

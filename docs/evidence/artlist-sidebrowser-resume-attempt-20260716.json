@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "kind": "artlist-sidebrowser-resume-attempt",
+  "createdAt": "2026-07-15T23:59:07Z",
+  "localTime": "2026-07-16 07:59:07 +0800",
+  "goalStatus": "active",
+  "goalBlockerStrike": 1,
+  "project": {
+    "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+    "id": "gushujuan-s3-f1a688020bfb7af6"
+  },
+  "sourceBoundary": {
+    "readOnly": true,
+    "controlled": {
+      "files": 1354,
+      "bytes": 14093144,
+      "aggregateSha256": "f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c"
+    },
+    "full": {
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    }
+  },
+  "softwareSlice": {
+    "executionSurface": {
+      "id": "codex-in-app-side-browser",
+      "version": "1"
+    },
+    "providerSettingsRevision": 3,
+    "features": [
+      "execution surface identity is frozen in provider, execution snapshot, browser plan, checkpoint and preflight evidence",
+      "same job and Publication can migrate by CAS refresh_plan without requeue",
+      "successful preflight mechanically matches model, aspect ratio, resolution, image count and Generate enabled",
+      "text-only uploaded checkpoint requires observedReferenceThumbnailCount=0",
+      "codex-browser queue rejects expectedOutputPath before downloaded checkpoint and remote identity",
+      "formal images require expected aspect ratio, minimum dimensions and bytes, full decode and non-placeholder pixel variation"
+    ]
+  },
+  "p01": {
+    "jobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+    "itemId": "asset-P01",
+    "status": "waiting_external",
+    "browserState": "plan_ready",
+    "checkpoint": {
+      "revision": 3,
+      "stage": "plan_ready",
+      "executionSurface": {
+        "id": "codex-in-app-side-browser",
+        "version": "1"
+      }
+    },
+    "publicationIntentId": "publication-b17a8792-7c31-43ea-ae95-04be4de08f5f",
+    "publicationStatus": "reserved",
+    "promptSha256": "c65e978c4d509b659bebaccb23598b6ef4bf364ee96b1a484deb3039526ea826",
+    "executionSnapshotHash": "740a494e0b8ffe8ef94dc8d25d2ba9c4b4c1944cc6d56fb9e6367b1e39f29d58",
+    "browserPlanSha256": "47a50b853351655aeb95f9021ae9725e2b4c0d468aeae8215a43c5f5daccda8c",
+    "allowedUploads": [],
+    "parameters": {
+      "model": "GPT Image 2",
+      "mode": "text",
+      "aspectRatio": "9:16",
+      "resolution": "Medium",
+      "quality": "Medium",
+      "imageCount": 1
+    },
+    "externalTaskId": null,
+    "publicationReceiptId": null,
+    "downloadedArtifact": null
+  },
+  "currentBrowserObservation": {
+    "browser": "Codex in-app side browser",
+    "url": "https://toolkit.artlist.io/image-video-generator?mode=image",
+    "loginVerified": true,
+    "accountEmailVisible": true,
+    "unlimitedEnabled": true,
+    "creditsLeft": 50,
+    "fastGenerations": "3764/4000",
+    "generateEnabled": true,
+    "observedGeneration": {
+      "model": "GPT Image 2",
+      "aspectRatio": "16:9",
+      "resolution": "Medium",
+      "imageCount": 4
+    },
+    "matchesFrozenPlan": false,
+    "beforeScreenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/artlist-sidebrowser-preflight-before-20260716.png",
+      "width": 1521,
+      "height": 990,
+      "bytes": 220235,
+      "sha256": "382a6069ad74ad7cbd09cc31838a36a1e5065beccd88b1b57e2d3c9f7ce4a55d"
+    }
+  },
+  "browserControlFailure": {
+    "code": "in_app_browser_control_transport_unavailable",
+    "summary": "The current Artlist page is readable and screenshot-capable intermittently, but all supported interaction transports timed out before a reliable state transition could be observed.",
+    "channels": [
+      {
+        "channel": "playwright",
+        "action": "unique Open generation settings button click",
+        "result": "timeout_and_connection_reset"
+      },
+      {
+        "channel": "cua",
+        "action": "single screenshot-grounded settings button click",
+        "result": "timeout_and_connection_reset"
+      },
+      {
+        "channel": "cdp",
+        "action": "first read-only Runtime.evaluate",
+        "result": "timeout_and_connection_reset"
+      }
+    ],
+    "noBrowserFallbackUsed": true,
+    "chromeUsed": false
+  },
+  "sideEffects": {
+    "uploads": 0,
+    "promptFilled": false,
+    "submitIntentPersisted": false,
+    "generateClicks": 0,
+    "remoteTasksCreated": 0,
+    "downloads": 0,
+    "publicationReceipts": 0,
+    "formalRaw": 0,
+    "formalLabeled": 0,
+    "formalChineseStoryboardSheets": 0
+  },
+  "verification": {
+    "typecheck": "passed",
+    "targetedTests": {
+      "files": 4,
+      "tests": 29,
+      "failed": 0
+    },
+    "fullTests": {
+      "files": 49,
+      "tests": 292,
+      "failed": 0
+    },
+    "productionBuild": "passed",
+    "mcpSmoke": {
+      "tools": 148,
+      "passed": true
+    },
+    "doctor": {
+      "healthy": true,
+      "errors": 0,
+      "warnings": 1,
+      "ok": 26
+    },
+    "uiSmoke": {
+      "passed": true,
+      "checkpointText": "网页 plan_ready · R3 · codex-in-app-side-browser@1",
+      "sidecarsUnchanged": true,
+      "screenshot": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/artlist-sidebrowser-plan-ui-smoke-20260716.png",
+        "sha256": "3280ddc8b03eed75e174a8c05b1411fc53fcdef764ec3cfdab3577fe91dec3fa"
+      }
+    }
+  },
+  "sidecarSha256": {
+    "generationJobs": "aa6e2ef31a883db3e1eccbff4b830def896248c4814cacacd5c64cb4345e3dc1",
+    "publications": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+    "assetConsistencyBatches": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7",
+    "commandLedger": "8bf00fd6a1d349c610d45a667b72d74abb8029dbe3daa1d6b10fc94765e85392",
+    "generationSettings": "c885db37f648e6fd4cac43447714e90218dd3ddb1b29e1d34dd69a84a69a9563",
+    "browserPlan": "47a50b853351655aeb95f9021ae9725e2b4c0d468aeae8215a43c5f5daccda8c"
+  },
+  "resume": {
+    "sameJobOnly": true,
+    "nextCheckpointRevision": 3,
+    "firstAction": "Reconnect the existing Codex in-app Artlist tab and read current settings before any click.",
+    "requiredPageChanges": [
+      "aspect ratio 16:9 to 9:16",
+      "image count 4 to 1"
+    ],
+    "then": [
+      "record successful preflight with executionSurface codex-in-app-side-browser@1",
+      "record uploaded with files=[] and observedReferenceThumbnailCount=0",
+      "fill the frozen P01 prompt",
+      "persist submit_intent",
+      "click Generate exactly once"
+    ]
+  }
+}

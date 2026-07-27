@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "kind": "p25-canvas-theme-screenshots",
+  "sourceDigest": "05a3f6213bac43bea5ec72a4a53e84252526232e2299e9f8899b798d982a87cd",
+  "sourceFiles": 508,
+  "sourceBytes": 11227303,
+  "createdAt": "2026-07-20T20:41:31.931Z",
+  "themes": [
+    "light",
+    "dark",
+    "paper"
+  ],
+  "pinnedNodeIds": [
+    "asset:character-ahang",
+    "asset:scene-stone-room",
+    "asset:prop-complete-golden-mask",
+    "script:p7-fixture-script",
+    "prompt:p7-fixture-prompt",
+    "unit:p24-unit-four-panel"
+  ],
+  "screenshots": {
+    "light": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p25-canvas-theme-light-20260721.png",
+      "bytes": 518542
+    },
+    "dark": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p25-canvas-theme-dark-20260721.png",
+      "bytes": 467293
+    },
+    "paper": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p25-canvas-theme-paper-20260721.png",
+      "bytes": 538137
+    }
+  }
+}

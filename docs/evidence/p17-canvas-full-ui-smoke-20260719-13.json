@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "kind": "p15-simple-canvas-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-19T12:12:40.283Z",
+  "buildIdentity": {
+    "schemaVersion": 1,
+    "kind": "ai-drama-canvas-release-manifest",
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "sourceDigest": "2b3b9cb530cdba84d6d8c306a7c78d43272850c48b990d867c997fb045c66e42",
+    "buildId": "89bd9aa1688950f46cb0139a0e7710ae",
+    "buildIdentityFingerprint": "8c3c48cf85fcf7b9f4b7614e94081c0dd250b8eaaeb536a6dd430502505a1c2d",
+    "protocolVersion": "1.1",
+    "mcpToolCount": 183,
+    "builtAt": "2026-07-19T12:02:53.091Z",
+    "distribution": "local-only",
+    "localOnly": true,
+    "source": {
+      "files": 468,
+      "bytes": 10603335
+    },
+    "fingerprint": "57e16bc767602ec44db7ec5de490bbe0af1d02ae313ab127a1cf10f07c884fd8"
+  },
+  "projectId": "project-adeec3a6a371",
+  "runtime": "workspace-build",
+  "ui": {
+    "simpleEntrypoints": [
+      "添加",
+      "素材库",
+      "连线",
+      "开始"
+    ],
+    "libraryCollapsedByDefault": true,
+    "freeDrag": true,
+    "nodeInspectorOpenClose": true,
+    "zoomControl": true,
+    "middleButtonPan": true,
+    "connectionHandles": true,
+    "plusConnectorsAlwaysVisible": true,
+    "plusToPlusConnection": true,
+    "reversePlusConnection": true,
+    "keyboardPlusConnectionGuard": true,
+    "duplicateEdgeRejected": true,
+    "illegalEdgeRejected": true,
+    "partialDraftStartRejectedBeforeLedgerWrite": true,
+    "individualRemovePrunedEdge": true,
+    "selectedEdgeDeleteAndReconnect": true,
+    "hideShowEdges": true,
+    "connectTogglePreservedNodeCount": true,
+    "connectToggleMs": 17,
+    "nodeLayoutBounded": true,
+    "visibleNodeCount": 12,
+    "maxNodeWidth": 123,
+    "maxNodeHeight": 137,
+    "panelRowsSeparated": true,
+    "crossCategoryPinnedAssets": 3,
+    "draftEdgePersisted": true,
+    "clearWorkspaceIsViewOnly": true,
+    "clearWorkspaceRequiresConfirmation": true,
+    "restartPreserved": true,
+    "restartExpandedPanels": true,
+    "provider": "codex",
+    "duplicateStartIdempotent": true,
+    "externalRequests": 0,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "rendererCrashed": false
+  },
+  "production": {
+    "targetPanels": 2,
+    "packsAdded": 2,
+    "dispatchesAdded": 2,
+    "resultsAdded": 0,
+    "realImageGenerated": false,
+    "visualReviewClaimed": false
+  },
+  "safety": {
+    "draftIsNotBindingSource": true,
+    "formalFreezeRebuiltByOwner": true,
+    "noBrowserGeneration": true,
+    "noUpload": true,
+    "noPayment": true,
+    "noPublish": true,
+    "isolatedFixtureCleaned": {
+      "fixture": true,
+      "runtime": true
+    }
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p17-canvas-full-ui-smoke-20260719-13.png",
+    "sizeBytes": 394423,
+    "sha256": "a217719d08043bd919386b2bff0c58a9e8fb3467dc8cf2bc42b670d0a06e71bb",
+    "width": 1728,
+    "height": 1029,
+    "stdev": 32.73012184980112
+  }
+}

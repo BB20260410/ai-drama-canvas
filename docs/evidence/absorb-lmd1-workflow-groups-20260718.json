@@ -1,0 +1,12 @@
+{
+  "kind": "absorb-slice-evidence",
+  "project": "LocalMiniDrama",
+  "slice": "LMD-1",
+  "date": "2026-07-18",
+  "module": "src/core/studio-canvas-workflow-groups.ts",
+  "tests": "tests/studio-canvas-workflow-groups.test.ts",
+  "typecheck": "pass",
+  "vitest": "9 passed (groups + layout + workflow-runner regression)",
+  "formalEmptyBusinessCounts": 0,
+  "refStudy": "docs/ref-study/01-local-mini-drama/"
+}

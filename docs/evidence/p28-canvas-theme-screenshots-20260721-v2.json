@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "kind": "p28-canvas-theme-screenshots",
+  "sourceDigest": "1a18d0d2870d554ffebb3394fdb5892771bfd86e5bc834d71051aea2faef2fc2",
+  "sourceFiles": 513,
+  "sourceBytes": 11313695,
+  "createdAt": "2026-07-21T11:02:22.714Z",
+  "themes": [
+    "light",
+    "dark",
+    "paper"
+  ],
+  "pinnedNodeIds": [
+    "asset:character-ahang",
+    "asset:scene-stone-room",
+    "asset:prop-complete-golden-mask",
+    "script:p7-fixture-script",
+    "prompt:p7-fixture-prompt",
+    "unit:p24-unit-four-panel"
+  ],
+  "screenshots": {
+    "light": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p28-canvas-theme-v2-light-20260721.png",
+      "bytes": 518599,
+      "sha256": "ca8d725bb133008fb0eaa04cb75b96160878819bb13a1b58dc4b74d4241b6b7b"
+    },
+    "dark": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p28-canvas-theme-v2-dark-20260721.png",
+      "bytes": 467288,
+      "sha256": "3267da6859789e3639f7d8d0504e03d0a9f6f7b098fd21b1b62c48dd1a77c921"
+    },
+    "paper": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p28-canvas-theme-v2-paper-20260721.png",
+      "bytes": 538249,
+      "sha256": "53908f8d1d8b3a359fe7808832a7aa76807e538530c7553a9a47c257fbbd289e"
+    }
+  },
+  "supersedesEvidence": "P25 同名截图曾被后续任务覆写；本索引使用 P28 新文件名与现场 SHA，旧文件保持不动。"
+}

@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "kind": "aicanvas-effect-transition-render-smoke",
+  "generatedAt": "2026-07-14T07:33:30.064Z",
+  "status": "passed",
+  "contract": "aicanvas.otio-effect-transition.v1",
+  "timebase": {
+    "rateNumerator": 24000,
+    "rateDenominator": 1001,
+    "frameRate": 23.976023976023978
+  },
+  "standards": {
+    "linearTimeWarp": "LinearTimeWarp.1/LinearTimeWarp",
+    "transition": "Transition.1/SMPTE_Dissolve",
+    "inOffsetFrames": 5,
+    "outOffsetFrames": 7
+  },
+  "importRoundTrip": {
+    "sourceProjectId": "edit-5d4e84dd-bad5-4e1b-98f7-31a8be1276c4",
+    "sourceRevision": 1,
+    "reimportedProjectId": "edit-84eb96ee-9fb1-40fd-87dd-9df37c76e03e",
+    "timebase": {
+      "rateNumerator": 24000,
+      "rateDenominator": 1001
+    },
+    "effectTransitionContract": "aicanvas.otio-effect-transition.v1"
+  },
+  "renders": {
+    "synchronous": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/effect-transition-sync-20260714.mp4",
+      "bytes": 31638,
+      "sha256": "c1b76e3d3ae6cf4f7dd156079a63e476830c0c325062f2598e670714f26b8457",
+      "frameCount": 48,
+      "samples": [
+        {
+          "frame": 18,
+          "red": 253.753193359375,
+          "green": 10.555654296875,
+          "blue": 0.070908203125
+        },
+        {
+          "frame": 19,
+          "red": 253.753193359375,
+          "green": 10.555654296875,
+          "blue": 0.070908203125
+        },
+        {
+          "frame": 24,
+          "red": 146.002470703125,
+          "green": 10.529833984375,
+          "blue": 103.8106640625
+        },
+        {
+          "frame": 28,
+          "red": 62.939970703125,
+          "green": 10.566826171875,
+          "blue": 189.902431640625
+        },
+        {
+          "frame": 30,
+          "red": 19.970439453125,
+          "green": 10.528251953125,
+          "blue": 231.898388671875
+        },
+        {
+          "frame": 31,
+          "red": 0.092119140625,
+          "green": 10.54923828125,
+          "blue": 254.74123046875
+        }
+      ]
+    },
+    "background": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/effect-transition-background-20260714.mp4",
+      "bytes": 31638,
+      "sha256": "c1b76e3d3ae6cf4f7dd156079a63e476830c0c325062f2598e670714f26b8457",
+      "frameCount": 48,
+      "samples": [
+        {
+          "frame": 18,
+          "red": 253.753193359375,
+          "green": 10.555654296875,
+          "blue": 0.070908203125
+        },
+        {
+          "frame": 19,
+          "red": 253.753193359375,
+          "green": 10.555654296875,
+          "blue": 0.070908203125
+        },
+        {
+          "frame": 24,
+          "red": 146.002470703125,
+          "green": 10.529833984375,
+          "blue": 103.8106640625
+        },
+        {
+          "frame": 28,
+          "red": 62.939970703125,
+          "green": 10.566826171875,
+          "blue": 189.902431640625
+        },
+        {
+          "frame": 30,
+          "red": 19.970439453125,
+          "green": 10.528251953125,
+          "blue": 231.898388671875
+        },
+        {
+          "frame": 31,
+          "red": 0.092119140625,
+          "green": 10.54923828125,
+          "blue": 254.74123046875
+        }
+      ]
+    },
+    "audio": {
+      "durationSeconds": 1.001,
+      "playbackRate": 2
+    }
+  },
+  "timelineFrame": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/effect-transition-midpoint-20260714.png",
+    "bytes": 1858,
+    "sha256": "7d6104e53a2138bd20acc2554396fa06afb31b3af163174f4783064a9cd6c157",
+    "timeFrame": 24,
+    "color": {
+      "red": 145.94501953125,
+      "green": 10.53416015625,
+      "blue": 103.82708984375,
+      "width": 320,
+      "height": 320
+    }
+  },
+  "restartContinuation": {
+    "extractionId": "timeline-frame-756de035-7089-4b01-a874-996fda036cf0",
+    "framePath": "/Users/hxx/Documents/无限画布/docs/evidence/effect-transition-continuation-20260714.png",
+    "packId": "continuation-d43dc617-a545-48ff-a87b-79227eff33dc",
+    "sourceType": "timeline",
+    "targetFirstFrameArtifactId": "main-ep01-unit002-ea3b8a965d22",
+    "generationJob": null,
+    "frame": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/effect-transition-continuation-20260714.png",
+      "bytes": 1521,
+      "sha256": "74924967b76e010d467b10cf21d9eb145b1bfd4a8aa6be3caa071f778cea0e87"
+    },
+    "color": {
+      "red": 0.08486328125,
+      "green": 10.5482421875,
+      "blue": 254.73275390625,
+      "width": 320,
+      "height": 320
+    },
+    "enqueue": false
+  },
+  "sourceMedia": {
+    "firstVideo": {
+      "path": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-effect-transition-smoke-83168-1784014408007/EP01_15s_001_标准转场前项/EP01_15s_001_v1.mp4",
+      "bytes": 3782,
+      "sha256": "f9f1e1a55d656d456385d5a511402bd98f50edfab90a23e799b6312d8ddbb99c"
+    },
+    "secondVideo": {
+      "path": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-effect-transition-smoke-83168-1784014408007/EP01_15s_002_标准转场续接/EP01_15s_002_v1.mp4",
+      "bytes": 3837,
+      "sha256": "95607da32e442e503168a2a2c1b195b86e686ed4d1a1ce12f3599b1616c261b1"
+    },
+    "audio": {
+      "path": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-effect-transition-smoke-83168-1784014408007/timewarp-source.wav",
+      "bytes": 384078,
+      "sha256": "03fd1415d3a26d5565a0e7789bd1a78b91f4e837014535896e0146fde3285655"
+    }
+  }
+}

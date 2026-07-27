@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 2,
+  "kind": "final-validation-p10r-build-identity",
+  "status": "PARTIAL",
+  "note": "双供应方合同/MCP/备份破坏性/构建身份/全量测试已过；真实 Codex/Grok 付费生图 canary 未执行（fixture 媒体登记）。",
+  "createdAt": "2026-07-18T06:04:24.311Z",
+  "buildIdentity": {
+    "buildId": "7195b3215a72b4338941109487108a2c",
+    "sourceDigest": "095d57ac0d81a92178f812b7a1350d60b99977b72e86794264168296adb64e40",
+    "sourceFiles": 353,
+    "sourceBytes": 9192922,
+    "capabilities": {
+      "mcpToolCount": 182,
+      "protocolVersion": "1.1",
+      "studioDashboard": true,
+      "studioBinding": true,
+      "studioContinuity": true,
+      "formalImagegenProvider": "agent-imagegen",
+      "formalImagegenProviders": [
+        "codex",
+        "grok"
+      ],
+      "browserGeneration": false,
+      "artlist": false
+    },
+    "fingerprint": "5303eb557dd5bd905b8e53c05747ce525408b945e665d91a37a9895a76ab23e9"
+  },
+  "mcp": {
+    "toolCount": 182
+  },
+  "canaryPath": "/Users/hxx/Documents/无限画布/docs/evidence/p10-canary-e2e-20260718-p10r.json",
+  "runs": {
+    "typecheck": {
+      "name": "typecheck",
+      "exitCode": 0,
+      "logSha256": "8aca887056e876fdc407b955daffd0b0a5dec0c074cd623f6decb7a214530132",
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ]
+    },
+    "targeted": {
+      "name": "p10-targeted",
+      "exitCode": 0,
+      "logSha256": "e39957d589d99b95233e3abb7622708bd0e38d49efd65a46e5b77be1ac2f1d62",
+      "argv": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/build-identity.test.ts",
+        "tests/project-backup.test.ts",
+        "tests/mcp-managed-studio.test.ts"
+      ]
+    },
+    "buildMcp": {
+      "name": "build-mcp",
+      "exitCode": 0,
+      "logSha256": "416027fb1268c24317f93d5104624af168a0451307eda3ce23102480f5dd79c5",
+      "argv": [
+        "npm",
+        "run",
+        "build:mcp"
+      ]
+    },
+    "build": {
+      "name": "build",
+      "exitCode": 0,
+      "logSha256": "d68836bb7619d3fe7e6496e95789b02932e83f3226183aba306931dcd6788f89",
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ]
+    },
+    "full": {
+      "name": "full",
+      "exitCode": 0,
+      "logSha256": "5d3a3f2e4370c8ec4e27314569e11886a41b75ada315c46e2b4868b98ebd3429",
+      "argv": [
+        "npx",
+        "vitest",
+        "run"
+      ]
+    }
+  },
+  "boundaries": {
+    "realImagegenCanary": false,
+    "formalBatchProduction": false,
+    "gitStage": false
+  },
+  "canarySha256": "246035723706db99810ef35491555ae6a823bd164aae938c90a835855b5407b0",
+  "refreshedAt": "2026-07-18T06:04:24.311Z"
+}

@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-13T23:01:25.071Z",
+  "success": true,
+  "command": "npm run publication:consistency-smoke -- <evidence-path>",
+  "environment": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "v22.22.2",
+    "ffmpeg": "ffmpeg",
+    "ffprobe": "ffprobe",
+    "isolatedProject": true,
+    "isolatedMediaRuntime": true
+  },
+  "realMedia": {
+    "pathClass": "temporary-isolated",
+    "sizeBytes": 211328,
+    "sha256": "1424ce5844e205dbfe747e8a1d5c303bb50fa86100df8e4672270f572794d207",
+    "receiptId": "receipt-cbb5750c-a86a-4bb0-bfc2-ec28f044584f",
+    "check": {
+      "ok": true,
+      "exists": true,
+      "decodable": true,
+      "width": 640,
+      "height": 360,
+      "duration": 1,
+      "size": 211328,
+      "sha256": "1424ce5844e205dbfe747e8a1d5c303bb50fa86100df8e4672270f572794d207",
+      "modifiedAt": "2026-07-13T23:01:24.373Z",
+      "issues": []
+    },
+    "replaySameReceipt": true
+  },
+  "twoPhase": {
+    "mode": "snapshot-validate-cas",
+    "validationOutsideProjectLock": true,
+    "unrelatedPreflightMs": 17,
+    "unrelatedPreflightCommitted": true,
+    "storeRevisionNotUsedAsCas": true
+  },
+  "cancellation": {
+    "cancellationMs": 18,
+    "terminalStatus": "cancelled",
+    "staleValidationError": "发布意图状态已变化为 cancelled，旧校验结果未提交。"
+  },
+  "fileCas": {
+    "sameSize": true,
+    "mtimeRestored": true,
+    "conflict": "最终发布文件或路径在机械校验后发生变化，CAS 未提交；发布意图仍保留原终态。 ",
+    "remainedReserved": true,
+    "retryReceiptId": "receipt-a75e04fb-cb33-4127-94ae-447fa02a4287",
+    "retrySha256": "4a8d8134f29b0b7b60c126f5532bc9f5d9bb73037373cf6fb872d81f1dcefdfd"
+  },
+  "crossProcess": {
+    "workers": 2,
+    "receiptIds": [
+      "receipt-598d4515-b5fb-44c4-9786-3a2c40893047",
+      "receipt-598d4515-b5fb-44c4-9786-3a2c40893047"
+    ],
+    "uniqueReceiptCount": 1
+  },
+  "crashRecovery": {
+    "killedAfterValidationBeforeCommit": true,
+    "statusAfterCrash": "reserved",
+    "locksAfterCrash": 0,
+    "retryReceiptId": "receipt-579d0570-de20-4857-aab9-e3165e3b8815"
+  },
+  "final": {
+    "intentCounts": {
+      "reserved": 0,
+      "registered": 4,
+      "cancelled": 2,
+      "failed": 0
+    },
+    "receiptCount": 4,
+    "projectLocks": 0,
+    "activeMediaWeight": 0,
+    "mediaQueueDepth": 0
+  },
+  "boundaries": {
+    "formalProjectRootsTouched": false,
+    "uploadsPerformed": false,
+    "paidSubmissionsPerformed": false,
+    "existingPackageOverwritten": false,
+    "softwarePublished": false,
+    "notarizationPerformed": false
+  }
+}

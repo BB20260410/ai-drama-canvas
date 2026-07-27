@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "p9r2-p10r2-after-lmd1-targeted",
+  "status": "pass",
+  "startedAt": "2026-07-18T07:41:13.151Z",
+  "endedAt": "2026-07-18T07:42:12.529Z",
+  "durationMs": 59420,
+  "argv": [
+    "npx",
+    "vitest",
+    "run",
+    "tests/build-identity.test.ts",
+    "tests/mcp-build-currentness-gate.test.ts",
+    "tests/project-backup.test.ts",
+    "tests/studio-continuity-pagination.test.ts",
+    "tests/studio-production-dashboard.test.ts",
+    "tests/studio-production-dashboard-ui.test.ts",
+    "tests/studio-production-dashboard-scale.test.ts",
+    "tests/studio-production-dashboard-desktop-integration.test.ts",
+    "tests/mcp-studio-production-dashboard.test.ts",
+    "tests/managed-studio-canvas-ui.test.ts",
+    "tests/studio-canvas-layout.test.ts",
+    "tests/studio-canvas-layout-store.test.ts",
+    "tests/studio-canvas-locator.test.ts",
+    "tests/studio-canvas-pipeline-graph.test.ts",
+    "tests/studio-canvas-workflow-runner.test.ts",
+    "tests/real-imagegen-canary-v2.test.ts",
+    "tests/legacy-real-imagegen-canary-disabled.test.ts",
+    "tests/mcp-managed-studio.test.ts",
+    "tests/studio-scale-fixture.test.ts",
+    "tests/studio-reliability.test.ts",
+    "tests/material-studio.test.ts",
+    "tests/material-studio-identity.test.ts",
+    "tests/material-studio-pagination.test.ts"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "67d76f6f49281a143ce27e73eefcd73a",
+      "sourceDigest": "0be4f88bc3476a94a8d9b18140e625fb9bdbb9a2d216def2069402329dd4507d"
+    },
+    "after": {
+      "buildId": "67d76f6f49281a143ce27e73eefcd73a",
+      "sourceDigest": "0be4f88bc3476a94a8d9b18140e625fb9bdbb9a2d216def2069402329dd4507d"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/runs/p9r2-p10r2-targeted-tests-20260718-after-lmd1.log",
+    "sizeBytes": 2760,
+    "sha256": "d3c3df1603c118659994a63eaa0fd39c0d3747749b40473aa946555cfccab19c"
+  },
+  "testCounts": {
+    "files": 23,
+    "tests": 72
+  }
+}

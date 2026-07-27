@@ -1,0 +1,6 @@
+clone_path=/Users/hxx/Documents/_ref-study/local-mini-drama-92c66dd75688d83aac3ccc31bb51378613122cbc
+sha=92c66dd75688d83aac3ccc31bb51378613122cbc
+version_frontweb=1.2.8
+vue_flow=^1.48.2
+minimap=^1.5.4
+outside_monorepo=yes

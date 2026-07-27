@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "kind": "deep-absorb-ui-smoke",
+  "createdAt": "2026-07-18T08:44:19.756Z",
+  "projectRoot": "/private/tmp/studio-p7-fixture-C5vcVv/p7-continuity-fixture-ccb2c681",
+  "projectId": "project-c3764487bc54",
+  "checks": {
+    "coreOverviewOk": true,
+    "materialStudioVisible": true,
+    "canvasViewVisible": true,
+    "minimapVisible": true,
+    "workflowToolbarVisible": true,
+    "panelNodeClicked": false,
+    "nodeActionPanelVisible": false,
+    "dashboardVisible": true,
+    "prepChecklistVisible": false,
+    "preflightVisible": false,
+    "bindingWorkbenchVisible": true,
+    "bindingConfirmActionPresent": false,
+    "bindingIgnoreActionPresent": false
+  },
+  "hardFail": [],
+  "ok": true,
+  "pageErrors": [],
+  "consoleErrors": [],
+  "screenshots": {
+    "canvas": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/deep-absorb-ui-smoke-canvas-20260718-mrq4ek75.png",
+      "sizeBytes": 115201,
+      "sha256": "b016a6a40ed4d4cdeba67b28de743df6db613332dad081ec46ef29809fe75638"
+    },
+    "binding": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/deep-absorb-ui-smoke-binding-20260718-mrq4ek75.png",
+      "sizeBytes": 94416,
+      "sha256": "5ff4ccdd2e6769992700c2bfc512aee36821a23410ae83d52e1a5d44934286ff"
+    }
+  },
+  "notes": [
+    "隔离 P7 fixture，未写正式 projects/codex-ai-drama-studio",
+    "节点操作面板依赖 VueFlow 节点命中；若 panelNodeClicked=false 则属交互命中降级",
+    "生成队列 UI 在 managedShell 路径下默认不展示；cancel/jump 已在 App 源码接线，本 smoke 以受管 Studio 画布/绑定/驾驶舱为主"
+  ]
+}

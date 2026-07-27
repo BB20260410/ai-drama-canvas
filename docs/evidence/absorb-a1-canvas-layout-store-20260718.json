@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "kind": "absorb-a1-canvas-layout-store",
+  "status": "pass",
+  "createdAt": "2026-07-18T06:51:00.000Z",
+  "slice": "A1",
+  "ownerAgent": "grok",
+  "coordination": {
+    "scheme": "serial-wave-A",
+    "protocol": "docs/多Agent并行协议_20260718.md",
+    "rationale": "No stable git baseline; A1-A5 share canvas surface — serial preferred over dual working trees."
+  },
+  "implementation": {
+    "files": [
+      "src/core/studio-canvas-layout.ts",
+      "src/core/studio-canvas-layout-store.ts",
+      "tests/studio-canvas-layout.test.ts",
+      "tests/studio-canvas-layout-store.test.ts"
+    ],
+    "sidecarRelativePath": ".aicanvas/studio-canvas-layout.json",
+    "apis": [
+      "loadStudioCanvasLayout",
+      "saveStudioCanvasLayout",
+      "clearStudioCanvasLayout"
+    ],
+    "guarantees": [
+      "managed-project only",
+      "view-layer only (no panel business state)",
+      "atomic write + project lock",
+      "optional expectedFingerprint CAS",
+      "merge patch preserves workflowGroups when omitted"
+    ],
+    "copiedThirdPartySource": false,
+    "inspiration": "LocalMiniDrama canvas_layout metadata (MIT, clean-room)"
+  },
+  "verification": {
+    "typecheck": "pass",
+    "tests": {
+      "tests/studio-canvas-layout.test.ts": "2/2",
+      "tests/studio-canvas-layout-store.test.ts": "2/2"
+    },
+    "formalProjectTouched": false
+  },
+  "nextSlice": "A2 ManagedStudioCanvas drag debounce → saveStudioCanvasLayout"
+}

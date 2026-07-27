@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "kind": "p9-scale-fixture-evidence",
+  "status": "pass",
+  "createdAt": "2026-07-18T04:02:45.763Z",
+  "durationMs": 7278,
+  "requested": {
+    "unitCount": 1288,
+    "assetCount": 77,
+    "mediaMetaCount": 80,
+    "expectedPanels": 4232
+  },
+  "observed": {
+    "units": 1288,
+    "panels": 4232,
+    "assets": 77,
+    "media": 80
+  },
+  "sourceShot": "not-applicable",
+  "notes": "新 Studio 无独立 SourceShot 实体；panelCount 对应约 4330 量级宫格元数据。",
+  "dashboard": {
+    "overviewFingerprint": "a6c0ed3fd44ff0b6cb97ad82e2e8361a9fb68774a26b4baffd84520dc9a61b34",
+    "unitsPageSize": 36,
+    "unitsHardCap": 36,
+    "panelsEstimated": 4222
+  },
+  "preflight": {
+    "schemaVersion": 1,
+    "kind": "studio-disk-preflight",
+    "projectRoot": "/private/tmp/p9-scale-full-V3A2TM/p9-scale-1ae41202-ad62e7fe",
+    "projectId": "project-316c609c653b",
+    "filesystem": {
+      "totalBytes": 1995165736960,
+      "freeBytes": 712714571776,
+      "availableBytes": 712714571776
+    },
+    "memory": {
+      "totalBytes": 137438953472,
+      "freeBytes": 26886455296
+    },
+    "blocked": false,
+    "blockers": [],
+    "fingerprint": "19c6c04c1c47e3753d6ed75bf474752934ad837b7d46c439b30b005224a1d1ab"
+  },
+  "scaleProbe": {
+    "schemaVersion": 1,
+    "kind": "studio-scale-probe",
+    "projectRoot": "/private/tmp/p9-scale-full-V3A2TM/p9-scale-1ae41202-ad62e7fe",
+    "projectId": "project-316c609c653b",
+    "counts": {
+      "units": 1288,
+      "canonicalAssets": 77,
+      "media": 80,
+      "assetBindingSets": 0
+    },
+    "dashboard": {
+      "overviewFingerprint": "a6c0ed3fd44ff0b6cb97ad82e2e8361a9fb68774a26b4baffd84520dc9a61b34",
+      "unitsPageSize": 36,
+      "unitsHardCap": 36
+    },
+    "fingerprint": "56fb2b6c28aeb66dcb171eb0dd5287685cddc30acb1d123f1fd6b62f8b9e5ec9"
+  },
+  "gcDryRun": {
+    "scannedObjects": 80,
+    "candidateCount": 0,
+    "fingerprint": "2493d202109ca250bf319d82c9607366eb13cba7d9747cf510ba71be42068ad9"
+  },
+  "boundaries": {
+    "formalImageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "realMediaCopied": false
+  }
+}

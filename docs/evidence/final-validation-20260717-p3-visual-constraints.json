@@ -1,0 +1,1854 @@
+{
+  "schemaVersion": 1,
+  "kind": "p3-visual-constraints-final-validation",
+  "createdAt": "2026-07-17T11:57:52.679Z",
+  "validationWindow": {
+    "startedAt": "2026-07-17T11:52:25.805Z",
+    "endedAt": "2026-07-17T11:57:52.679Z"
+  },
+  "invocation": {
+    "argv": [
+      "/Users/hxx/.nvm/versions/node/v22.22.2/bin/node",
+      "/Users/hxx/Documents/无限画布/scripts/validate-p3-visual-constraints-final.ts"
+    ],
+    "cwd": "/Users/hxx/Documents/无限画布"
+  },
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "sourceRoot": "/Users/hxx/Documents/古蜀卷第三季",
+  "runRoot": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-final-runs-20260717-01",
+  "source": {
+    "before": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "after": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "unchanged": true
+  },
+  "sourceCode": {
+    "before": {
+      "files": 227,
+      "aggregateSha256": "8cbcc287d8995002162cd5eb6d863354d5c7ad7c658d78785ba11e8af4a9b3ab"
+    },
+    "after": {
+      "files": 227,
+      "aggregateSha256": "8cbcc287d8995002162cd5eb6d863354d5c7ad7c658d78785ba11e8af4a9b3ab"
+    },
+    "unchanged": true
+  },
+  "p2": {
+    "revision": 2,
+    "storeFingerprint": "3cd7bc5b43531385c68cc3e7c9fe4906081806177652944bd4523b9de132a788",
+    "auditFingerprint": "3791ea31da3cd2b33461a35718be073537a4cac9b2dd5ee210499e5eb000b49e",
+    "currentness": {
+      "snapshotBefore": {
+        "current": true,
+        "checkedAt": "2026-07-17T11:52:32.883Z",
+        "storeRevision": 2,
+        "storeFingerprint": "3cd7bc5b43531385c68cc3e7c9fe4906081806177652944bd4523b9de132a788",
+        "driftedInputs": []
+      },
+      "strictBefore": {
+        "current": true,
+        "checkedAt": "2026-07-17T11:52:32.850Z",
+        "storeRevision": 2,
+        "storeFingerprint": "3cd7bc5b43531385c68cc3e7c9fe4906081806177652944bd4523b9de132a788",
+        "driftedInputs": []
+      },
+      "strictAfter": {
+        "current": true,
+        "checkedAt": "2026-07-17T11:57:45.223Z",
+        "storeRevision": 2,
+        "storeFingerprint": "3cd7bc5b43531385c68cc3e7c9fe4906081806177652944bd4523b9de132a788",
+        "driftedInputs": []
+      }
+    }
+  },
+  "p3": {
+    "revision": 1,
+    "storeFingerprint": "95f836f3f4b4458b1bbd698cefc775c7ff5f3d48d5917421c015531a3eea2e1b",
+    "audit": {
+      "schemaVersion": 1,
+      "builderVersion": "panel-visual-constraint-v1",
+      "contracts": 1288,
+      "expectedPanels": 4330,
+      "constraints": 4330,
+      "missingConstraints": 0,
+      "extraConstraints": 0,
+      "invalidConstraints": 0,
+      "duplicateConstraintIds": 0,
+      "onScreenAssets": 12502,
+      "continuityOnlyAssets": 1310,
+      "optionalOffscreenAssets": 0,
+      "unresolvedIdentityLocks": 8331,
+      "unresolvedSpatialLocks": 24992,
+      "unresolvedContinuityLocks": 440,
+      "invalidModelFingerprints": 0,
+      "invalidReviewRulesFingerprints": 0,
+      "modelPromptLeakPanels": 0,
+      "modelPathLeakPanels": 0,
+      "concealedMaskPanels": 304,
+      "revealAuthorizedPanels": 0,
+      "warningCounts": {
+        "AHANG_IDENTITY": 1415,
+        "DUDU_MARKINGS": 924,
+        "HIDDEN_MASK_DISCLOSURE": 304,
+        "OCR_OR_TEXT": 4330,
+        "WATERMARK_OR_UI": 4330,
+        "MODERN_OBJECT": 4330,
+        "COLLAGE_OR_SPLIT": 4330,
+        "PROP_STRUCTURE": 2665,
+        "SCENE_LAYOUT": 2574,
+        "EXTRA_CHARACTER": 4330,
+        "AMBIGUOUS_VISIBILITY": 776,
+        "SPATIAL_LOCK_UNKNOWN": 4330
+      },
+      "warningsWithoutReviewRules": 0,
+      "closurePassed": true,
+      "auditFingerprint": "794c699bd7eed74b3328069ee9b51db6880b797a558a85901eb68020841bba22"
+    },
+    "currentness": {
+      "before": {
+        "current": true,
+        "checkedAt": "2026-07-17T11:52:41.145Z",
+        "storeRevision": 1,
+        "storeFingerprint": "95f836f3f4b4458b1bbd698cefc775c7ff5f3d48d5917421c015531a3eea2e1b",
+        "p2StoreRevision": 2,
+        "p2StoreFingerprint": "3cd7bc5b43531385c68cc3e7c9fe4906081806177652944bd4523b9de132a788",
+        "driftedInputs": []
+      },
+      "after": {
+        "current": true,
+        "checkedAt": "2026-07-17T11:57:52.677Z",
+        "storeRevision": 1,
+        "storeFingerprint": "95f836f3f4b4458b1bbd698cefc775c7ff5f3d48d5917421c015531a3eea2e1b",
+        "p2StoreRevision": 2,
+        "p2StoreFingerprint": "3cd7bc5b43531385c68cc3e7c9fe4906081806177652944bd4523b9de132a788",
+        "driftedInputs": []
+      }
+    },
+    "storeFile": {
+      "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/panel-visual-constraints.json",
+      "bytes": 78768303,
+      "sha256": "6eb445f84f38c0c2e4e6e6d56b3f1195bdbf5643c624246f9500566a5af8ffd8"
+    },
+    "constraintValidation": {
+      "identitySha256": "ba0a2260ce2fb1566eff7b60079bf8a3428d280e13206fa138d2924bd30908f3",
+      "independentlyRecomputed": {
+        "contracts": 1288,
+        "constraints": 4330,
+        "onScreenAssets": 12502,
+        "continuityOnlyAssets": 1310,
+        "optionalOffscreenAssets": 0,
+        "unresolvedIdentityLocks": 8331,
+        "unresolvedSpatialLocks": 24992,
+        "unresolvedContinuityLocks": 440,
+        "concealedMaskPanels": 304,
+        "revealAuthorizedPanels": 0,
+        "modelPromptLeakPanels": 0,
+        "modelPathLeakPanels": 0
+      },
+      "generationReadyPanels": 610,
+      "reviewRules": 34638,
+      "warnings": 34638,
+      "legacyGenerationJobEvidence": 11
+    }
+  },
+  "generationProvider": {
+    "revision": 5,
+    "concurrency": 1,
+    "providers": [
+      {
+        "id": "codex-subagent-gpt-image-2",
+        "instructionSha256": "c3aa8d3c3e165fff402978a0fbacff69f6e557271d5c6468c7ee89220931b74b"
+      }
+    ],
+    "genericInstructionSha256": "c3aa8d3c3e165fff402978a0fbacff69f6e557271d5c6468c7ee89220931b74b"
+  },
+  "productionLedger": {
+    "counts": {
+      "generationJobs": 30,
+      "generationByStatus": {
+        "failed": 3,
+        "generation_unknown": 1,
+        "succeeded": 26
+      },
+      "publicationIntents": 31,
+      "publicationReceipts": 26,
+      "reviews": 20,
+      "rawLabeledPairs": 26
+    },
+    "ledgerIdentitySha256": "3ccf7c8f32a26b60440072ae81cfed3870afe5f0246ecae3e2f7906f0ebc17da",
+    "generationJobs": {
+      "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-jobs.json",
+      "bytes": 333529,
+      "sha256": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182"
+    },
+    "publications": {
+      "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/publications.json",
+      "bytes": 84340,
+      "sha256": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238"
+    },
+    "reviews": {
+      "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/reviews.json",
+      "bytes": 85063,
+      "sha256": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97"
+    },
+    "publicationClosure": {
+      "registeredRawIntents": 26,
+      "registeredRawReceipts": 26,
+      "companionReceipts": 0,
+      "failedIntents": 3,
+      "unknownReservedBundleIntents": 2,
+      "receiptIdentitySha256": "9eb094a4a5d6d330d1d3adddbd97c6b5616d0b44e4caa16ed5dc41d829c1061c",
+      "note": "历史 26 个成功任务各有 1 个 raw Publication 回执；labeled 为本地伴生文件，未伪造成额外回执。"
+    },
+    "ep01Unit008": {
+      "expectedPanels": 6,
+      "succeededPanels": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "succeeded": 4,
+      "unknownPanel": 5,
+      "unknownJobId": "gen-2026-07-16T12-10-57-215Z-892023c0",
+      "missingPanel": 6,
+      "missingPanelJobs": 0
+    }
+  },
+  "imagePairs": {
+    "count": 26,
+    "inventory": {
+      "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+      "files": 52,
+      "bytes": 128973009,
+      "aggregateSha256": "77d4a46fa04c05c635701363f394faab0cc5094fc437990f6eeb580ce0e4c83b"
+    },
+    "pairIdentitySha256": "6e373c5d1b56a866191bd431c4842e6ad60d159350f645b2b413975df9dd8375",
+    "pairs": [
+      {
+        "key": "assets/C03a_禾安·婴儿/AI画布生成/C03a_资产_2ae3b748",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C03a_禾安·婴儿/AI画布生成/C03a_资产_2ae3b748_raw.png",
+          "relativePath": "assets/C03a_禾安·婴儿/AI画布生成/C03a_资产_2ae3b748_raw.png",
+          "bytes": 1983096,
+          "sha256": "5491fc11fa7fd85c7040e36adf8603b5ba8bf24021159dfd32aa985e91d19227",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 5.781945215879205,
+          "maximumChannelDeviation": 66.96067647371339
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C03a_禾安·婴儿/AI画布生成/C03a_资产_2ae3b748_labeled.png",
+          "relativePath": "assets/C03a_禾安·婴儿/AI画布生成/C03a_资产_2ae3b748_labeled.png",
+          "bytes": 2695888,
+          "sha256": "4d017dfd03f2f8696a3e2e0c7deaf9761cee71517561d8a514e2d0c64c3780d6",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 5.985256979117366,
+          "maximumChannelDeviation": 74.02329860417433
+        }
+      },
+      {
+        "key": "assets/C04a_榛母·中年/AI画布生成/C04a_资产_ae6fbbb8",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C04a_榛母·中年/AI画布生成/C04a_资产_ae6fbbb8_raw.png",
+          "relativePath": "assets/C04a_榛母·中年/AI画布生成/C04a_资产_ae6fbbb8_raw.png",
+          "bytes": 1901920,
+          "sha256": "bb77ec684d012b904cd6af0fb744582e87b06cc7f6199395d8f16147edaed709",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 4.511408150923671,
+          "maximumChannelDeviation": 95.1367103022939
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C04a_榛母·中年/AI画布生成/C04a_资产_ae6fbbb8_labeled.png",
+          "relativePath": "assets/C04a_榛母·中年/AI画布生成/C04a_资产_ae6fbbb8_labeled.png",
+          "bytes": 2180967,
+          "sha256": "c77ef4e52c77cabad4733f54673e510b76cacb836faebab83de77cc8bab012ad",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 4.665342869149754,
+          "maximumChannelDeviation": 98.22476053530393
+        }
+      },
+      {
+        "key": "assets/C07_姜子牙/AI画布生成/C07_资产_d9861f39",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C07_姜子牙/AI画布生成/C07_资产_d9861f39_raw.png",
+          "relativePath": "assets/C07_姜子牙/AI画布生成/C07_资产_d9861f39_raw.png",
+          "bytes": 2602033,
+          "sha256": "a92bddc6ff58ab70fb3b453a391f630f05f8cf967d9898b93d1021709eaca97c",
+          "width": 1026,
+          "height": 1824,
+          "aspectRatio": 0.5625,
+          "entropy": 5.073157134378562,
+          "maximumChannelDeviation": 67.10819522257718
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C07_姜子牙/AI画布生成/C07_资产_d9861f39_labeled.png",
+          "relativePath": "assets/C07_姜子牙/AI画布生成/C07_资产_d9861f39_labeled.png",
+          "bytes": 2737920,
+          "sha256": "70ff3f5b6e4ce6ca6aa0231a86897980222030dafad1633e9da37996f2e97c3a",
+          "width": 1026,
+          "height": 1824,
+          "aspectRatio": 0.5625,
+          "entropy": 5.26804677178734,
+          "maximumChannelDeviation": 74.6792086749925
+        }
+      },
+      {
+        "key": "assets/C09_管牍长者(铜匠长者)/AI画布生成/C09_资产_864dc4e4",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C09_管牍长者(铜匠长者)/AI画布生成/C09_资产_864dc4e4_raw.png",
+          "relativePath": "assets/C09_管牍长者(铜匠长者)/AI画布生成/C09_资产_864dc4e4_raw.png",
+          "bytes": 1375248,
+          "sha256": "6831af44de777117cd9bb61f30e36fc9c0e488281e487fee107d08451bceda71",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 4.090719724918017,
+          "maximumChannelDeviation": 88.20119212423117
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C09_管牍长者(铜匠长者)/AI画布生成/C09_资产_864dc4e4_labeled.png",
+          "relativePath": "assets/C09_管牍长者(铜匠长者)/AI画布生成/C09_资产_864dc4e4_labeled.png",
+          "bytes": 1715418,
+          "sha256": "1978140c4ef8ceb5da36b67801da109447cc786f65e3202bb3b2e29c5d1be2c5",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 4.301989801664604,
+          "maximumChannelDeviation": 93.29556025831735
+        }
+      },
+      {
+        "key": "assets/C12_产婆/AI画布生成/C12_资产_48d2ac40",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C12_产婆/AI画布生成/C12_资产_48d2ac40_raw.png",
+          "relativePath": "assets/C12_产婆/AI画布生成/C12_资产_48d2ac40_raw.png",
+          "bytes": 1683604,
+          "sha256": "f037ae8befee31670789b3e5cc6ebbe449c359870df05811ca3ca8146d4a8223",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 4.612288930162322,
+          "maximumChannelDeviation": 86.17734105101083
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C12_产婆/AI画布生成/C12_资产_48d2ac40_labeled.png",
+          "relativePath": "assets/C12_产婆/AI画布生成/C12_资产_48d2ac40_labeled.png",
+          "bytes": 2270423,
+          "sha256": "6a6ec3d6c6487ca81b94cacb65408bffb7541df228307d7c9756ce89ec8d3153",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 4.84114212176064,
+          "maximumChannelDeviation": 90.44209190640868
+        }
+      },
+      {
+        "key": "assets/P01_阿航胸前布囊_★面具铁律替代资产/AI画布生成/P01_资产_23ac427f",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P01_阿航胸前布囊_★面具铁律替代资产/AI画布生成/P01_资产_23ac427f_raw.png",
+          "relativePath": "assets/P01_阿航胸前布囊_★面具铁律替代资产/AI画布生成/P01_资产_23ac427f_raw.png",
+          "bytes": 1615604,
+          "sha256": "907e96df267d3520c302ea2dad36afa5f6c42181f28492bd35a22450e5ad70a5",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 4.267844643909484,
+          "maximumChannelDeviation": 72.87917893230944
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P01_阿航胸前布囊_★面具铁律替代资产/AI画布生成/P01_资产_23ac427f_labeled.png",
+          "relativePath": "assets/P01_阿航胸前布囊_★面具铁律替代资产/AI画布生成/P01_资产_23ac427f_labeled.png",
+          "bytes": 2002008,
+          "sha256": "efc6bf7e3c33470d2f4d78245caceb956840611c5db1209af702c36ebdabedfc",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 4.504893628065474,
+          "maximumChannelDeviation": 81.22340815857937
+        }
+      },
+      {
+        "key": "assets/P03_半璧(随魂素玉)/AI画布生成/P03_资产_6474db01",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P03_半璧(随魂素玉)/AI画布生成/P03_资产_6474db01_raw.png",
+          "relativePath": "assets/P03_半璧(随魂素玉)/AI画布生成/P03_资产_6474db01_raw.png",
+          "bytes": 1112291,
+          "sha256": "e499749c5362379f067604a22d67c2072cc64e570e49cb69c1c67b2c1fa5db6f",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 3.749285057677298,
+          "maximumChannelDeviation": 52.89853518354833
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P03_半璧(随魂素玉)/AI画布生成/P03_资产_6474db01_labeled.png",
+          "relativePath": "assets/P03_半璧(随魂素玉)/AI画布生成/P03_资产_6474db01_labeled.png",
+          "bytes": 1479577,
+          "sha256": "1e83761ba5020ccc9a3fd4b503ba56da8c78544bf73b8ed764bd8c6b6dfc377e",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 4.002914652917752,
+          "maximumChannelDeviation": 66.10772422390004
+        }
+      },
+      {
+        "key": "assets/P07_记名木牍(通用)/AI画布生成/P07_资产_2ce8aa79",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P07_记名木牍(通用)/AI画布生成/P07_资产_2ce8aa79_raw.png",
+          "relativePath": "assets/P07_记名木牍(通用)/AI画布生成/P07_资产_2ce8aa79_raw.png",
+          "bytes": 2090020,
+          "sha256": "e9a9e74dc533ac651d46281aa9edb86f5260dd989e28bd681686a4603f7a4219",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 4.84720143047889,
+          "maximumChannelDeviation": 93.58545511681119
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P07_记名木牍(通用)/AI画布生成/P07_资产_2ce8aa79_labeled.png",
+          "relativePath": "assets/P07_记名木牍(通用)/AI画布生成/P07_资产_2ce8aa79_labeled.png",
+          "bytes": 2610350,
+          "sha256": "746700790161a28bc5fd4165eaafa99c16c64b3484f95c79ba015e6249b6fc76",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 5.076873546007846,
+          "maximumChannelDeviation": 95.80387098406885
+        }
+      },
+      {
+        "key": "assets/P09_青铜刻刀/AI画布生成/P09_资产_9646965b",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P09_青铜刻刀/AI画布生成/P09_资产_9646965b_raw.png",
+          "relativePath": "assets/P09_青铜刻刀/AI画布生成/P09_资产_9646965b_raw.png",
+          "bytes": 1166914,
+          "sha256": "ebd254c68967cb3738db00430f39b8c4da961eadfa0d4e9a4fddfb86a1a04f67",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 2.648952112494044,
+          "maximumChannelDeviation": 59.02321358687282
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P09_青铜刻刀/AI画布生成/P09_资产_9646965b_labeled.png",
+          "relativePath": "assets/P09_青铜刻刀/AI画布生成/P09_资产_9646965b_labeled.png",
+          "bytes": 1303652,
+          "sha256": "94dc69b8a706806e309566cf3a5fa5d077edd464576558636bcadf3f052de7d8",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 2.9223067379398344,
+          "maximumChannelDeviation": 73.46523635864308
+        }
+      },
+      {
+        "key": "assets/P10_「无名医」木牌/AI画布生成/P10_资产_5c528d9a",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P10_「无名医」木牌/AI画布生成/P10_资产_5c528d9a_raw.png",
+          "relativePath": "assets/P10_「无名医」木牌/AI画布生成/P10_资产_5c528d9a_raw.png",
+          "bytes": 1650675,
+          "sha256": "d21c92306216f92e7c627eb751c4855c998cc8a257c63bc05beaddd64b65afd0",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 4.278269783681026,
+          "maximumChannelDeviation": 80.36042480563712
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P10_「无名医」木牌/AI画布生成/P10_资产_5c528d9a_labeled.png",
+          "relativePath": "assets/P10_「无名医」木牌/AI画布生成/P10_资产_5c528d9a_labeled.png",
+          "bytes": 2211952,
+          "sha256": "972b47d81a9b09f8e935d70f14120a5533f7dfb9c29ee02a74cbbb5ea6b928fc",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 4.513186707597924,
+          "maximumChannelDeviation": 86.13880896817963
+        }
+      },
+      {
+        "key": "assets/P11_阿航行医装备组/AI画布生成/P11_资产_743ecb95",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P11_阿航行医装备组/AI画布生成/P11_资产_743ecb95_raw.png",
+          "relativePath": "assets/P11_阿航行医装备组/AI画布生成/P11_资产_743ecb95_raw.png",
+          "bytes": 2304267,
+          "sha256": "89d301fbf829d6d653f9c5fef7afa1d5bcb410165f8d5f1cfd5322637167b8ed",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 5.864833226427436,
+          "maximumChannelDeviation": 93.88246538601067
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P11_阿航行医装备组/AI画布生成/P11_资产_743ecb95_labeled.png",
+          "relativePath": "assets/P11_阿航行医装备组/AI画布生成/P11_资产_743ecb95_labeled.png",
+          "bytes": 2829749,
+          "sha256": "bf58ec209333ba66959af05829aaf21a84b0d8e9a8e535948f55cb0a97baa634",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 6.032770155929029,
+          "maximumChannelDeviation": 95.24326747137091
+        }
+      },
+      {
+        "key": "assets/P29_姜子牙木杖/AI画布生成/P29_资产_c9b89a3b",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P29_姜子牙木杖/AI画布生成/P29_资产_c9b89a3b_raw.png",
+          "relativePath": "assets/P29_姜子牙木杖/AI画布生成/P29_资产_c9b89a3b_raw.png",
+          "bytes": 778133,
+          "sha256": "6c554348cacd6cfb0bba96e4e067c293df93ea83ebdcf01b102f1a7d56710822",
+          "width": 864,
+          "height": 1536,
+          "aspectRatio": 0.5625,
+          "entropy": 1.9821490813046694,
+          "maximumChannelDeviation": 49.2052964162444
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P29_姜子牙木杖/AI画布生成/P29_资产_c9b89a3b_labeled.png",
+          "relativePath": "assets/P29_姜子牙木杖/AI画布生成/P29_资产_c9b89a3b_labeled.png",
+          "bytes": 822447,
+          "sha256": "b7da4744b951d45a682facb9c6d0817f7ae841d9459247991eee30a685046a0f",
+          "width": 864,
+          "height": 1536,
+          "aspectRatio": 0.5625,
+          "entropy": 2.2730271189284394,
+          "maximumChannelDeviation": 68.8836254660296
+        }
+      },
+      {
+        "key": "assets/P30_天庭职司牌/AI画布生成/P30_资产_c7ecc0a0",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P30_天庭职司牌/AI画布生成/P30_资产_c7ecc0a0_raw.png",
+          "relativePath": "assets/P30_天庭职司牌/AI画布生成/P30_资产_c7ecc0a0_raw.png",
+          "bytes": 1638201,
+          "sha256": "9cccfe5836edb841f0f4b5889f8c9c7f11458690bc6b396055418a6952415616",
+          "width": 891,
+          "height": 1584,
+          "aspectRatio": 0.5625,
+          "entropy": 4.345406347812968,
+          "maximumChannelDeviation": 100.11006135546631
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P30_天庭职司牌/AI画布生成/P30_资产_c7ecc0a0_labeled.png",
+          "relativePath": "assets/P30_天庭职司牌/AI画布生成/P30_资产_c7ecc0a0_labeled.png",
+          "bytes": 1755309,
+          "sha256": "08cffce611ea3b78aa03268ab835cc1ee0ac2f46affb7cbacddd464de9ff128f",
+          "width": 891,
+          "height": 1584,
+          "aspectRatio": 0.5625,
+          "entropy": 4.563050622789888,
+          "maximumChannelDeviation": 103.31774029212427
+        }
+      },
+      {
+        "key": "assets/S01_岐山封神台·封神榜空白格(神魔层)/AI画布生成/S01_资产_a654d3da",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S01_岐山封神台·封神榜空白格(神魔层)/AI画布生成/S01_资产_a654d3da_raw.png",
+          "relativePath": "assets/S01_岐山封神台·封神榜空白格(神魔层)/AI画布生成/S01_资产_a654d3da_raw.png",
+          "bytes": 2886295,
+          "sha256": "bac348616e2ce336d439b8b58ba5d166f2d80acbecb4c6c58116bb77335af017",
+          "width": 864,
+          "height": 1536,
+          "aspectRatio": 0.5625,
+          "entropy": 6.680311879779765,
+          "maximumChannelDeviation": 47.79686937305236
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S01_岐山封神台·封神榜空白格(神魔层)/AI画布生成/S01_资产_a654d3da_labeled.png",
+          "relativePath": "assets/S01_岐山封神台·封神榜空白格(神魔层)/AI画布生成/S01_资产_a654d3da_labeled.png",
+          "bytes": 3022413,
+          "sha256": "157db6e5a2e04ba1e698db96902f2cb359e8210d9b5cd586aef389ef0c19aba2",
+          "width": 864,
+          "height": 1536,
+          "aspectRatio": 0.5625,
+          "entropy": 6.678680349312344,
+          "maximumChannelDeviation": 48.38180573993953
+        }
+      },
+      {
+        "key": "assets/S02_天庭云署·职司牌阵(神魔层)/AI画布生成/S02_资产_788bc493",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S02_天庭云署·职司牌阵(神魔层)/AI画布生成/S02_资产_788bc493_raw.png",
+          "relativePath": "assets/S02_天庭云署·职司牌阵(神魔层)/AI画布生成/S02_资产_788bc493_raw.png",
+          "bytes": 2551491,
+          "sha256": "c8224304ab4dc97ecf2172068703558aa01ce1929c166ab06da543a8cd791634",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.37521807111716,
+          "maximumChannelDeviation": 57.25094317552309
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S02_天庭云署·职司牌阵(神魔层)/AI画布生成/S02_资产_788bc493_labeled.png",
+          "relativePath": "assets/S02_天庭云署·职司牌阵(神魔层)/AI画布生成/S02_资产_788bc493_labeled.png",
+          "bytes": 4127734,
+          "sha256": "39001e89cbd6649ef78eef6e52bf25a82001f2d3f6a28e26c68791ae3d22ab19",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.481466333862954,
+          "maximumChannelDeviation": 58.80799110159192
+        }
+      },
+      {
+        "key": "assets/S03_周原青铜作坊(院落主场景)/AI画布生成/S03_资产_93de2f22",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S03_周原青铜作坊(院落主场景)/AI画布生成/S03_资产_93de2f22_raw.png",
+          "relativePath": "assets/S03_周原青铜作坊(院落主场景)/AI画布生成/S03_资产_93de2f22_raw.png",
+          "bytes": 2455061,
+          "sha256": "4fcf9fdbf17ce1ad3559a69692c0cc78b6c812c207c2c474c3c8aac02f6d1dd1",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.312586290368927,
+          "maximumChannelDeviation": 56.567239273028605
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S03_周原青铜作坊(院落主场景)/AI画布生成/S03_资产_93de2f22_labeled.png",
+          "relativePath": "assets/S03_周原青铜作坊(院落主场景)/AI画布生成/S03_资产_93de2f22_labeled.png",
+          "bytes": 3516938,
+          "sha256": "7e101183811eb9ccfd00dbb136cdb46fc631b3bd34ccc6823e6ed894e59735a7",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.1662352035345975,
+          "maximumChannelDeviation": 44.02113561523508
+        }
+      },
+      {
+        "key": "assets/S07_榛母家(含产房)/AI画布生成/S07_资产_0ae2988b",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S07_榛母家(含产房)/AI画布生成/S07_资产_0ae2988b_raw.png",
+          "relativePath": "assets/S07_榛母家(含产房)/AI画布生成/S07_资产_0ae2988b_raw.png",
+          "bytes": 2421750,
+          "sha256": "b7fc40ece9b761f90ff0abb1a94af0ff60d6b8cc9e6c5f7869bc8ddc1cf5beeb",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 6.995363872643793,
+          "maximumChannelDeviation": 46.81542862580795
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S07_榛母家(含产房)/AI画布生成/S07_资产_0ae2988b_labeled.png",
+          "relativePath": "assets/S07_榛母家(含产房)/AI画布生成/S07_资产_0ae2988b_labeled.png",
+          "bytes": 3449421,
+          "sha256": "9ef369bb005ded89510627bb5fcc11b9b7c8329756aaeafd388b37089e68b8fe",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 6.962265821319306,
+          "maximumChannelDeviation": 47.811504221903775
+        }
+      },
+      {
+        "key": "assets/S08_阿航药棚/AI画布生成/S08_资产_08f97395",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S08_阿航药棚/AI画布生成/S08_资产_08f97395_raw.png",
+          "relativePath": "assets/S08_阿航药棚/AI画布生成/S08_资产_08f97395_raw.png",
+          "bytes": 2753122,
+          "sha256": "986738b7078995c35581a6ac8c5f754a0a65fa43c277107928a7c013e3ece398",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.8004305366339395,
+          "maximumChannelDeviation": 71.72083016824146
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S08_阿航药棚/AI画布生成/S08_资产_08f97395_labeled.png",
+          "relativePath": "assets/S08_阿航药棚/AI画布生成/S08_资产_08f97395_labeled.png",
+          "bytes": 3898071,
+          "sha256": "4f5c92d3fda7173c71fa193495ff3354175f2a5cb0d06a06660e41c1b04b29cc",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.723193284342415,
+          "maximumChannelDeviation": 72.11545920539457
+        }
+      },
+      {
+        "key": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格01_首帧_0e3ed496",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格01_首帧_0e3ed496_raw.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格01_首帧_0e3ed496_raw.png",
+          "bytes": 2525533,
+          "sha256": "1fc7eb955a7da6bef6ee07bd0a3eb9aeaa89d97a3f8950dacc1850443abcec1b",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.2523948361194925,
+          "maximumChannelDeviation": 68.2050186644431
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格01_首帧_0e3ed496_labeled.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格01_首帧_0e3ed496_labeled.png",
+          "bytes": 3845508,
+          "sha256": "83b1323b2ac426f924582a39774f7168e16c5672eddd4d48baf6d62f12aab4b8",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.289550310422783,
+          "maximumChannelDeviation": 69.15385507472047
+        }
+      },
+      {
+        "key": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格02_中间帧_f12f122c",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格02_中间帧_f12f122c_raw.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格02_中间帧_f12f122c_raw.png",
+          "bytes": 2387138,
+          "sha256": "3e4b48a288a53b498768bb4a7001ad0b07b1fb2eec9a6fc2cf923ec800b95890",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 6.825985447503626,
+          "maximumChannelDeviation": 45.938050277319526
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格02_中间帧_f12f122c_labeled.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格02_中间帧_f12f122c_labeled.png",
+          "bytes": 3355288,
+          "sha256": "b500ee52d0e6abf34bf8c235b62b93c6f9ab8dde92a2c7004f7670320717b00a",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 6.800071848207153,
+          "maximumChannelDeviation": 46.32549568973355
+        }
+      },
+      {
+        "key": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格03_中间帧_c90796be",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格03_中间帧_c90796be_raw.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格03_中间帧_c90796be_raw.png",
+          "bytes": 3083765,
+          "sha256": "9b96b1275c2edef502ea10cd995c803898319edca4a3147d9399930ad38c1e37",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 6.4851216343095075,
+          "maximumChannelDeviation": 46.830337005335814
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格03_中间帧_c90796be_labeled.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格03_中间帧_c90796be_labeled.png",
+          "bytes": 3881350,
+          "sha256": "f93dc909b2792cfc3c5c14bd5dbec64dc03086e15fd495ae8078f657d80eaad7",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 6.545798604479387,
+          "maximumChannelDeviation": 47.42639201145534
+        }
+      },
+      {
+        "key": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格04_尾帧_cb99b5f6",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格04_尾帧_cb99b5f6_raw.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格04_尾帧_cb99b5f6_raw.png",
+          "bytes": 2833125,
+          "sha256": "a0e98acee77fe8efd2a5694340be3b5a70e3e387c205e3f9233ea6215586748f",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 6.739357765991372,
+          "maximumChannelDeviation": 44.24441558658889
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格04_尾帧_cb99b5f6_labeled.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格04_尾帧_cb99b5f6_labeled.png",
+          "bytes": 3792341,
+          "sha256": "99932b6132ef239edd1a1e71103388d2d2929b9d36dc92e646d10ea19cb0de2f",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 6.781800659135115,
+          "maximumChannelDeviation": 45.57985161812377
+        }
+      },
+      {
+        "key": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格01_首帧_7d096dcd",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格01_首帧_7d096dcd_raw.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格01_首帧_7d096dcd_raw.png",
+          "bytes": 2477201,
+          "sha256": "d328401822b16f9aeedc705d2edd67c7022e7125439769f0dc3405defeca421b",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.826625175133813,
+          "maximumChannelDeviation": 71.71048420037921
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格01_首帧_7d096dcd_labeled.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格01_首帧_7d096dcd_labeled.png",
+          "bytes": 3558166,
+          "sha256": "f6a26afb3da23add545c7e0141449186176b5d2c8659e73b5d54e32b2e9a0e5b",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.724612430320121,
+          "maximumChannelDeviation": 66.7264299410662
+        }
+      },
+      {
+        "key": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格02_中间帧_402d132b",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格02_中间帧_402d132b_raw.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格02_中间帧_402d132b_raw.png",
+          "bytes": 2273741,
+          "sha256": "217908c7bd04d55949d7fc6512ec17884111d29a446071a4d8efa9a1fbe616ec",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.651176817524174,
+          "maximumChannelDeviation": 61.5359484639532
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格02_中间帧_402d132b_labeled.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格02_中间帧_402d132b_labeled.png",
+          "bytes": 3512927,
+          "sha256": "32c7a6428ad43cfd9ee3d7d7edecd2bd7a1b3c2d5ef5c5d312c63ecf297c9832",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.617475885706881,
+          "maximumChannelDeviation": 61.17765780815754
+        }
+      },
+      {
+        "key": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格03_中间帧_ddbce3ce",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格03_中间帧_ddbce3ce_raw.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格03_中间帧_ddbce3ce_raw.png",
+          "bytes": 2163838,
+          "sha256": "9103d855edb5b3d37b5bbbe7d6c5eaeee256224dff0c4e266a55962c95fbbe25",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.483706455532229,
+          "maximumChannelDeviation": 46.056463280988595
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格03_中间帧_ddbce3ce_labeled.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格03_中间帧_ddbce3ce_labeled.png",
+          "bytes": 3362986,
+          "sha256": "8827a26b7a760471ea95b083c8e831cb9a701e17e2ca1306e706e7fd18179f43",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.540865316143027,
+          "maximumChannelDeviation": 50.41016068328017
+        }
+      },
+      {
+        "key": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格04_中间帧_0020493e",
+        "raw": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格04_中间帧_0020493e_raw.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格04_中间帧_0020493e_raw.png",
+          "bytes": 2643341,
+          "sha256": "4dfa9cc50cfa9d6357f5926d8e1f70eaf0e21820c1453239554be49d45b81dc1",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.400998101453297,
+          "maximumChannelDeviation": 51.504659896817344
+        },
+        "labeled": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格04_中间帧_0020493e_labeled.png",
+          "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格04_中间帧_0020493e_labeled.png",
+          "bytes": 3676799,
+          "sha256": "37ce17619649ad544aac1b0379abdefeb231b8d269061f20171f098f08adb2a2",
+          "width": 941,
+          "height": 1672,
+          "aspectRatio": 0.562799043062201,
+          "entropy": 7.34535758884158,
+          "maximumChannelDeviation": 50.10309775465528
+        }
+      }
+    ]
+  },
+  "reviewBoundary": {
+    "ep01Unit001": {
+      "requirementId": "fusion-review-4d135bb3ad9766b0471d5c1922edc6cc474003af38facbeb7c2fb537a74559a4",
+      "complete": true,
+      "panels": 4,
+      "artifacts": 8,
+      "visualRules": 28,
+      "oldPassReviewIds": [
+        "review-2026-07-16T09-53-29-114Z-5ab8a207",
+        "review-2026-07-16T19-18-14-130Z-527bbafe"
+      ],
+      "oldReviewsCarryP3Attestations": false,
+      "validOldReviewsUnderP3": 0
+    },
+    "ep01Unit008": {
+      "panels": 6,
+      "completeRawLabeledPairs": 4,
+      "unknownPanel": 5,
+      "missingPanel": 6,
+      "requirementComplete": false,
+      "issues": [
+        "宫格05：GenerationJob 尚未成功：generation_unknown",
+        "宫格05：缺少当前槽位 raw",
+        "宫格05：缺少当前槽位 labeled",
+        "宫格05：供应商调用结果不明；禁止重试，必须先完成结构化对账",
+        "宫格06：缺少绑定当前槽位的 GenerationJob",
+        "宫格06：缺少当前槽位 raw",
+        "宫格06：缺少当前槽位 labeled",
+        "宫格06：GenerationJob 的 P3 PanelVisualConstraint 证据不是当前版本"
+      ]
+    }
+  },
+  "guardedFormalState": {
+    "before": {
+      "files": {
+        "projectConfig": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/project.json",
+          "bytes": 7323,
+          "sha256": "44745e4c8780e2a40d998e0e8bb457b0991bc2c21bc2dcf68221a9e25953b96f"
+        },
+        "projectIndex": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/index.json",
+          "bytes": 25228150,
+          "sha256": "1da3342f3aa624d05a89588ca8d88393c881f39d5be8f6a5962b85422c95c826"
+        },
+        "projectOverrides": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/overrides.json",
+          "bytes": 9233,
+          "sha256": "0155f1731175ce5a7fdabf279d6493b535c521596d849c5221a8041609f2f31d"
+        },
+        "events": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/events.jsonl",
+          "bytes": 241940,
+          "sha256": "a7691608d2c4c3b898c5214a5a2cad81beb50c37232def7fa09968379f597e05"
+        },
+        "commandLedger": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/command-ledger.json",
+          "bytes": 283081,
+          "sha256": "f1c1e669298591c59ae3a93b1b599fc5c9bb4b03308404a587cc3be4fabe6286"
+        },
+        "storyboards": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboards.json",
+          "bytes": 6249388,
+          "sha256": "48351896542028241ea689e930a4aa1df190a18de002d6c432cb4c4b6d9b3a78"
+        },
+        "fusionManifest": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/fusion-project-manifest.json",
+          "bytes": 6369749,
+          "sha256": "93ad685f8f0de8f46f6163bbe3e931c937aae54df25a3046780d34f81c03a969"
+        },
+        "productionAssets": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/production-assets.json",
+          "bytes": 408965,
+          "sha256": "e693c5477044d9389de19188d14e876ea334c762cea86f9010a3de47f41abeae"
+        },
+        "continuityTracks": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/continuity-tracks.json",
+          "bytes": 4031882,
+          "sha256": "62b7a2fd80eefeb28e7b15780f5483df5381ce8dd94573311859e48b6962a20a"
+        },
+        "gridSelections": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboard-grid-selections.json",
+          "bytes": 539782,
+          "sha256": "a8ec5e31899a71383bbb514720d0e00f918b9d0efe1a0d4cf408a9013c645ffa"
+        },
+        "p2PanelReferences": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/panel-reference-resolutions.json",
+          "bytes": 32695281,
+          "sha256": "35aa251d9b6f767190924d697e7dd03a58cc198ded0918ad4fd89508217f877b"
+        },
+        "p3VisualConstraints": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/panel-visual-constraints.json",
+          "bytes": 78768303,
+          "sha256": "6eb445f84f38c0c2e4e6e6d56b3f1195bdbf5643c624246f9500566a5af8ffd8"
+        },
+        "generationSettings": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation.json",
+          "bytes": 3102,
+          "sha256": "2ccd6f6fd8b431ca8d851dbad8e3b3eb642edd8b582c3a3df0f4fe5d32172b0e"
+        },
+        "generationJobs": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-jobs.json",
+          "bytes": 333529,
+          "sha256": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182"
+        },
+        "publications": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/publications.json",
+          "bytes": 84340,
+          "sha256": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238"
+        },
+        "reviews": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/reviews.json",
+          "bytes": 85063,
+          "sha256": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97"
+        }
+      },
+      "immutableSidecar": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas",
+        "files": 5518,
+        "bytes": 366579140,
+        "aggregateSha256": "d0b651a1b57a7fe9bc3fefa9fc5823f05530c15c0a5f56f586e14375b0bd1c9e"
+      },
+      "historicalRequests": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-requests",
+        "files": 31,
+        "bytes": 174082,
+        "aggregateSha256": "171ca4fd131b977f07f7bbb5e44bfd836a1158ce63c6bcaff721b45f95b1fbca"
+      },
+      "generationDownloads": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-downloads",
+        "files": 26,
+        "bytes": 55357407,
+        "aggregateSha256": "ccfd0599ac21da61f79bee1538de3f7faea54d156c05f594181f0d5437849dc8"
+      },
+      "subagentStaging": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/subagent-staging",
+        "files": 36,
+        "bytes": 68776407,
+        "aggregateSha256": "6f1b769092934ca3f35fe94a7cffca1c5e5e510d4a10f1dbbfec0883fb943c95"
+      },
+      "rawLabeled": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+        "files": 52,
+        "bytes": 128973009,
+        "aggregateSha256": "77d4a46fa04c05c635701363f394faab0cc5094fc437990f6eeb580ce0e4c83b"
+      },
+      "identitySha256": "42d088dd111f611ba75b0b3a73c1849011a2baad217a7e2984b9a8a225afde47"
+    },
+    "after": {
+      "files": {
+        "projectConfig": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/project.json",
+          "bytes": 7323,
+          "sha256": "44745e4c8780e2a40d998e0e8bb457b0991bc2c21bc2dcf68221a9e25953b96f"
+        },
+        "projectIndex": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/index.json",
+          "bytes": 25228150,
+          "sha256": "1da3342f3aa624d05a89588ca8d88393c881f39d5be8f6a5962b85422c95c826"
+        },
+        "projectOverrides": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/overrides.json",
+          "bytes": 9233,
+          "sha256": "0155f1731175ce5a7fdabf279d6493b535c521596d849c5221a8041609f2f31d"
+        },
+        "events": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/events.jsonl",
+          "bytes": 241940,
+          "sha256": "a7691608d2c4c3b898c5214a5a2cad81beb50c37232def7fa09968379f597e05"
+        },
+        "commandLedger": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/command-ledger.json",
+          "bytes": 283081,
+          "sha256": "f1c1e669298591c59ae3a93b1b599fc5c9bb4b03308404a587cc3be4fabe6286"
+        },
+        "storyboards": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboards.json",
+          "bytes": 6249388,
+          "sha256": "48351896542028241ea689e930a4aa1df190a18de002d6c432cb4c4b6d9b3a78"
+        },
+        "fusionManifest": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/fusion-project-manifest.json",
+          "bytes": 6369749,
+          "sha256": "93ad685f8f0de8f46f6163bbe3e931c937aae54df25a3046780d34f81c03a969"
+        },
+        "productionAssets": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/production-assets.json",
+          "bytes": 408965,
+          "sha256": "e693c5477044d9389de19188d14e876ea334c762cea86f9010a3de47f41abeae"
+        },
+        "continuityTracks": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/continuity-tracks.json",
+          "bytes": 4031882,
+          "sha256": "62b7a2fd80eefeb28e7b15780f5483df5381ce8dd94573311859e48b6962a20a"
+        },
+        "gridSelections": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboard-grid-selections.json",
+          "bytes": 539782,
+          "sha256": "a8ec5e31899a71383bbb514720d0e00f918b9d0efe1a0d4cf408a9013c645ffa"
+        },
+        "p2PanelReferences": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/panel-reference-resolutions.json",
+          "bytes": 32695281,
+          "sha256": "35aa251d9b6f767190924d697e7dd03a58cc198ded0918ad4fd89508217f877b"
+        },
+        "p3VisualConstraints": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/panel-visual-constraints.json",
+          "bytes": 78768303,
+          "sha256": "6eb445f84f38c0c2e4e6e6d56b3f1195bdbf5643c624246f9500566a5af8ffd8"
+        },
+        "generationSettings": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation.json",
+          "bytes": 3102,
+          "sha256": "2ccd6f6fd8b431ca8d851dbad8e3b3eb642edd8b582c3a3df0f4fe5d32172b0e"
+        },
+        "generationJobs": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-jobs.json",
+          "bytes": 333529,
+          "sha256": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182"
+        },
+        "publications": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/publications.json",
+          "bytes": 84340,
+          "sha256": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238"
+        },
+        "reviews": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/reviews.json",
+          "bytes": 85063,
+          "sha256": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97"
+        }
+      },
+      "immutableSidecar": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas",
+        "files": 5518,
+        "bytes": 366579140,
+        "aggregateSha256": "d0b651a1b57a7fe9bc3fefa9fc5823f05530c15c0a5f56f586e14375b0bd1c9e"
+      },
+      "historicalRequests": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-requests",
+        "files": 31,
+        "bytes": 174082,
+        "aggregateSha256": "171ca4fd131b977f07f7bbb5e44bfd836a1158ce63c6bcaff721b45f95b1fbca"
+      },
+      "generationDownloads": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-downloads",
+        "files": 26,
+        "bytes": 55357407,
+        "aggregateSha256": "ccfd0599ac21da61f79bee1538de3f7faea54d156c05f594181f0d5437849dc8"
+      },
+      "subagentStaging": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/subagent-staging",
+        "files": 36,
+        "bytes": 68776407,
+        "aggregateSha256": "6f1b769092934ca3f35fe94a7cffca1c5e5e510d4a10f1dbbfec0883fb943c95"
+      },
+      "rawLabeled": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+        "files": 52,
+        "bytes": 128973009,
+        "aggregateSha256": "77d4a46fa04c05c635701363f394faab0cc5094fc437990f6eeb580ce0e4c83b"
+      },
+      "identitySha256": "42d088dd111f611ba75b0b3a73c1849011a2baad217a7e2984b9a8a225afde47"
+    },
+    "unchanged": true
+  },
+  "externalEvidence": {
+    "rehearsal": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-migration-rehearsal-20260717.json",
+      "bytes": 2067,
+      "sha256": "b8b7350b553a1b3916978a4550dc48422c56bba22836d1ed8ed598977ec57bf1"
+    },
+    "migration": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-migration-20260717.json",
+      "bytes": 6023,
+      "sha256": "5fe3caf28c43ae4c81219cda7fa7cd8f4173fd5645ba9590a62ec64f3404e703"
+    },
+    "backup": {
+      "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p3-visual-constraints/b44c926089bcb75fc9b2391c7983302c98a0462d1613f71807c171ba77d695bb",
+      "manifest": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p3-visual-constraints/b44c926089bcb75fc9b2391c7983302c98a0462d1613f71807c171ba77d695bb/manifest.json",
+        "bytes": 910,
+        "sha256": "6b6313bb4733c7dd7d5b12193694aeb83a4812d00ba5fe3a0e61fe3d88ee1156"
+      },
+      "entries": 3,
+      "blobsChecked": 2
+    },
+    "mcp": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-mcp-final-20260717.json",
+      "bytes": 7922,
+      "sha256": "fdcf79154a9acb8c0b0f6a1672bd03aaabdabe0b0e0d8a43cfdd715edda6104f"
+    },
+    "ui": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-ui-final-20260717.json",
+      "bytes": 2460,
+      "sha256": "dd1fe22e2843e63756d1fcdee6130ca24c02f982fcaf6d85909d0c599bdeae4e"
+    },
+    "screenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-ui-final-20260717.png",
+      "bytes": 1690821,
+      "sha256": "4b7be777922d99443cda1f7f4de2d906ff8b523e0a43d82480c801abcedcfaca",
+      "dimensions": [
+        3456,
+        2058
+      ]
+    }
+  },
+  "externalEvidenceFiles": {
+    "before": {
+      "rehearsal": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-migration-rehearsal-20260717.json",
+        "bytes": 2067,
+        "sha256": "b8b7350b553a1b3916978a4550dc48422c56bba22836d1ed8ed598977ec57bf1"
+      },
+      "migration": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-migration-20260717.json",
+        "bytes": 6023,
+        "sha256": "5fe3caf28c43ae4c81219cda7fa7cd8f4173fd5645ba9590a62ec64f3404e703"
+      },
+      "mcp": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-mcp-final-20260717.json",
+        "bytes": 7922,
+        "sha256": "fdcf79154a9acb8c0b0f6a1672bd03aaabdabe0b0e0d8a43cfdd715edda6104f"
+      },
+      "ui": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-ui-final-20260717.json",
+        "bytes": 2460,
+        "sha256": "dd1fe22e2843e63756d1fcdee6130ca24c02f982fcaf6d85909d0c599bdeae4e"
+      },
+      "screenshot": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-ui-final-20260717.png",
+        "bytes": 1690821,
+        "sha256": "4b7be777922d99443cda1f7f4de2d906ff8b523e0a43d82480c801abcedcfaca"
+      },
+      "backupManifest": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p3-visual-constraints/b44c926089bcb75fc9b2391c7983302c98a0462d1613f71807c171ba77d695bb/manifest.json",
+        "bytes": 910,
+        "sha256": "6b6313bb4733c7dd7d5b12193694aeb83a4812d00ba5fe3a0e61fe3d88ee1156"
+      }
+    },
+    "after": {
+      "rehearsal": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-migration-rehearsal-20260717.json",
+        "bytes": 2067,
+        "sha256": "b8b7350b553a1b3916978a4550dc48422c56bba22836d1ed8ed598977ec57bf1"
+      },
+      "migration": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-migration-20260717.json",
+        "bytes": 6023,
+        "sha256": "5fe3caf28c43ae4c81219cda7fa7cd8f4173fd5645ba9590a62ec64f3404e703"
+      },
+      "mcp": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-mcp-final-20260717.json",
+        "bytes": 7922,
+        "sha256": "fdcf79154a9acb8c0b0f6a1672bd03aaabdabe0b0e0d8a43cfdd715edda6104f"
+      },
+      "ui": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-ui-final-20260717.json",
+        "bytes": 2460,
+        "sha256": "dd1fe22e2843e63756d1fcdee6130ca24c02f982fcaf6d85909d0c599bdeae4e"
+      },
+      "screenshot": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-ui-final-20260717.png",
+        "bytes": 1690821,
+        "sha256": "4b7be777922d99443cda1f7f4de2d906ff8b523e0a43d82480c801abcedcfaca"
+      },
+      "backupManifest": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p3-visual-constraints/b44c926089bcb75fc9b2391c7983302c98a0462d1613f71807c171ba77d695bb/manifest.json",
+        "bytes": 910,
+        "sha256": "6b6313bb4733c7dd7d5b12193694aeb83a4812d00ba5fe3a0e61fe3d88ee1156"
+      }
+    },
+    "unchanged": true
+  },
+  "compiledMcpServer": {
+    "afterProductionBuild": {
+      "path": "/Users/hxx/Documents/无限画布/dist-mcp/mcp/server.js",
+      "bytes": 245015,
+      "sha256": "c9c208219cf0e71d0fcd1ce3b8c8d2a71dda5fe0b44f861732122beab06586f3"
+    },
+    "exercisedByReadOnlyMcpRun": [
+      "npx",
+      "tsx",
+      "scripts/mcp-p3-visual-constraints-smoke.ts",
+      "--workspace",
+      "/Users/hxx/Documents/无限画布",
+      "--project-root",
+      "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6"
+    ],
+    "toolCount": 162
+  },
+  "commandRuns": {
+    "typecheck": {
+      "name": "01-typecheck",
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T11:52:52.732Z",
+      "endedAt": "2026-07-17T11:52:58.699Z",
+      "durationMs": 5967,
+      "exitCode": 0,
+      "termination": {
+        "timeoutMs": 240000,
+        "timedOut": false,
+        "signalsSent": []
+      },
+      "stdout": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-final-runs-20260717-01/01-typecheck.stdout.log",
+        "bytes": 114,
+        "sha256": "8aca887056e876fdc407b955daffd0b0a5dec0c074cd623f6decb7a214530132",
+        "tail": [
+          "> ai-drama-canvas@0.1.0 typecheck",
+          "> vue-tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json"
+        ]
+      },
+      "stderr": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-final-runs-20260717-01/01-typecheck.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tail": []
+      }
+    },
+    "targeted": {
+      "name": "02-p3-targeted-tests",
+      "argv": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/fusion-visual-constraints.test.ts",
+        "tests/fusion-visual-review.test.ts",
+        "tests/fusion-visual-generation.test.ts",
+        "tests/fusion-production.test.ts",
+        "tests/mcp.test.ts",
+        "tests/mcp-fusion-production.test.ts",
+        "--maxWorkers=1"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T11:52:58.700Z",
+      "endedAt": "2026-07-17T11:53:25.304Z",
+      "durationMs": 26604,
+      "exitCode": 0,
+      "termination": {
+        "timeoutMs": 600000,
+        "timedOut": false,
+        "signalsSent": []
+      },
+      "stdout": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-final-runs-20260717-01/02-p3-targeted-tests.stdout.log",
+        "bytes": 222,
+        "sha256": "e232ceb03770d79c137e67f853dc6dd718d217ddb95e8ee7508e5e0cf696fd18",
+        "tail": [
+          " RUN  v4.1.0 /Users/hxx/Documents/无限画布",
+          " Test Files  6 passed (6)",
+          "      Tests  46 passed (46)",
+          "   Start at  19:52:58",
+          "   Duration  26.34s (transform 441ms, setup 27ms, import 874ms, tests 25.14s, environment 0ms)"
+        ]
+      },
+      "stderr": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-final-runs-20260717-01/02-p3-targeted-tests.stderr.log",
+        "bytes": 507,
+        "sha256": "1be52c48cf88bfbb663bbfb68b5a6a66cfacd1973d8ca5ecd34111640e3f6445",
+        "tail": [
+          "(node:23328) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:24407) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:24415) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)"
+        ]
+      },
+      "testSummary": {
+        "filesPassed": 6,
+        "testsPassed": 46,
+        "filesSkipped": 0,
+        "testsSkipped": 0
+      }
+    },
+    "full": {
+      "name": "03-full-tests",
+      "argv": [
+        "npm",
+        "test"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T11:53:25.305Z",
+      "endedAt": "2026-07-17T11:55:31.860Z",
+      "durationMs": 126556,
+      "exitCode": 0,
+      "termination": {
+        "timeoutMs": 900000,
+        "timedOut": false,
+        "signalsSent": []
+      },
+      "stdout": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-final-runs-20260717-01/03-full-tests.stdout.log",
+        "bytes": 273,
+        "sha256": "aedab23a5def826f00ca7756e044418149b724645a6152aaf7d41cf664014cf0",
+        "tail": [
+          "> ai-drama-canvas@0.1.0 test",
+          "> vitest run",
+          " RUN  v4.1.0 /Users/hxx/Documents/无限画布",
+          " Test Files  53 passed (53)",
+          "      Tests  336 passed (336)",
+          "   Start at  19:53:25",
+          "   Duration  126.35s (transform 845ms, setup 210ms, import 5.64s, tests 243.56s, environment 2ms)"
+        ]
+      },
+      "stderr": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-final-runs-20260717-01/03-full-tests.stderr.log",
+        "bytes": 5746,
+        "sha256": "054fdc933c3996cce1c8d62e69791191c093246bfd974185db63102f72a23d7f",
+        "tail": [
+          "(node:30555) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:31190) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:31488) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:32380) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:32414) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:32434) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:32435) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:32793) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:33065) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:33623) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:33628) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:33629) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:33640) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:33647) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:33648) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:33659) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:33785) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:34169) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:34170) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:34172) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:34173) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:34175) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:34176) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:34181) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:34184) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:34185) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:34190) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:34193) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:34195) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:34201) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)"
+        ]
+      },
+      "testSummary": {
+        "filesPassed": 53,
+        "testsPassed": 336,
+        "filesSkipped": 0,
+        "testsSkipped": 0
+      }
+    },
+    "build": {
+      "name": "04-production-build",
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T11:55:31.861Z",
+      "endedAt": "2026-07-17T11:55:43.488Z",
+      "durationMs": 11627,
+      "exitCode": 0,
+      "termination": {
+        "timeoutMs": 360000,
+        "timedOut": false,
+        "signalsSent": []
+      },
+      "stdout": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-final-runs-20260717-01/04-production-build.stdout.log",
+        "bytes": 980,
+        "sha256": "0517937347fa71ffcc5bbeee2fa0150ed2d5125ded1cecf3222ec3468767b0d0",
+        "tail": [
+          "> ai-drama-canvas@0.1.0 build",
+          "> npm run typecheck && electron-vite build && npm run build:mcp",
+          "> ai-drama-canvas@0.1.0 typecheck",
+          "> vue-tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json",
+          "vite v7.3.6 building ssr environment for production...",
+          "transforming...",
+          "✓ 45 modules transformed.",
+          "rendering chunks...",
+          "out/main/index.js  1,609.21 kB",
+          "✓ built in 519ms",
+          "vite v7.3.6 building ssr environment for production...",
+          "transforming...",
+          "✓ 1 modules transformed.",
+          "rendering chunks...",
+          "out/preload/index.mjs  20.01 kB",
+          "✓ built in 8ms",
+          "vite v7.3.6 building client environment for production...",
+          "transforming...",
+          "✓ 1636 modules transformed.",
+          "rendering chunks...",
+          "../../out/renderer/index.html                     0.69 kB",
+          "../../out/renderer/assets/index-DhydqTdg.css    218.92 kB",
+          "../../out/renderer/assets/index-wK_7m850.js   1,455.47 kB",
+          "✓ built in 1.49s",
+          "> ai-drama-canvas@0.1.0 build:mcp",
+          "> rm -rf dist-mcp && tsc -p tsconfig.mcp.json && chmod +x dist-mcp/mcp/server.js"
+        ]
+      },
+      "stderr": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-final-runs-20260717-01/04-production-build.stderr.log",
+        "bytes": 3855,
+        "sha256": "c402896e6b539fa10a191dbd5f128ff1ac43e658f526273e9bfd9daca299b3b7",
+        "tail": [
+          "[plugin vite:reporter] ",
+          "(!) /Users/hxx/Documents/无限画布/src/core/fusion-panel-references.ts is dynamically imported by /Users/hxx/Documents/无限画布/src/core/generation.ts, /Users/hxx/Documents/无限画布/src/core/generation.ts, /Users/hxx/Documents/无限画布/src/core/generation.ts but also statically imported by /Users/hxx/Documents/无限画布/src/core/codex.ts, /Users/hxx/Documents/无限画布/src/core/command-bus.ts, /Users/hxx/Documents/无限画布/src/core/fusion-references.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-evidence.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-migration.ts, /Users/hxx/Documents/无限画布/src/core/fusion-visual-constraint-store.ts, /Users/hxx/Documents/无限画布/src/main/index.ts, dynamic import will not move module into another chunk.",
+          "[plugin vite:reporter] ",
+          "(!) /Users/hxx/Documents/无限画布/src/core/fusion-visual-constraint-store.ts is dynamically imported by /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-evidence.ts, /Users/hxx/Documents/无限画布/src/core/generation.ts but also statically imported by /Users/hxx/Documents/无限画布/src/core/command-bus.ts, /Users/hxx/Documents/无限画布/src/core/fusion-references.ts, /Users/hxx/Documents/无限画布/src/main/index.ts, dynamic import will not move module into another chunk.",
+          "[plugin vite:reporter] ",
+          "(!) /Users/hxx/Documents/无限画布/src/core/production.ts is dynamically imported by /Users/hxx/Documents/无限画布/src/core/generation.ts, /Users/hxx/Documents/无限画布/src/core/generation.ts, /Users/hxx/Documents/无限画布/src/core/service.ts, /Users/hxx/Documents/无限画布/src/core/service.ts but also statically imported by /Users/hxx/Documents/无限画布/src/core/adaptation.ts, /Users/hxx/Documents/无限画布/src/core/codex.ts, /Users/hxx/Documents/无限画布/src/core/command-bus.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-production.ts, /Users/hxx/Documents/无限画布/src/main/index.ts, dynamic import will not move module into another chunk.",
+          "[plugin vite:reporter] ",
+          "(!) /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-production.ts is dynamically imported by /Users/hxx/Documents/无限画布/src/core/generation.ts but also statically imported by /Users/hxx/Documents/无限画布/src/core/command-bus.ts, /Users/hxx/Documents/无限画布/src/core/fusion-panel-references.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-migration.ts, /Users/hxx/Documents/无限画布/src/core/fusion-visual-constraint-store.ts, /Users/hxx/Documents/无限画布/src/core/scanner.ts, dynamic import will not move module into another chunk.",
+          "[plugin vite:reporter] ",
+          "(!) /Users/hxx/Documents/无限画布/src/core/service.ts is dynamically imported by /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-production.ts but also statically imported by /Users/hxx/Documents/无限画布/src/core/adaptation.ts, /Users/hxx/Documents/无限画布/src/core/asset-registry.ts, /Users/hxx/Documents/无限画布/src/core/canvas-state.ts, /Users/hxx/Documents/无限画布/src/core/codex.ts, /Users/hxx/Documents/无限画布/src/core/command-bus.ts, /Users/hxx/Documents/无限画布/src/core/continuity.ts, /Users/hxx/Documents/无限画布/src/core/documents.ts, /Users/hxx/Documents/无限画布/src/core/editor.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-migration.ts, /Users/hxx/Documents/无限画布/src/core/generation.ts, /Users/hxx/Documents/无限画布/src/core/memory.ts, /Users/hxx/Documents/无限画布/src/core/production.ts, /Users/hxx/Documents/无限画布/src/core/reviews.ts, /Users/hxx/Documents/无限画布/src/core/timeline.ts, /Users/hxx/Documents/无限画布/src/main/index.ts, dynamic import will not move module into another chunk."
+        ]
+      }
+    },
+    "migrationReadOnlyFirst": {
+      "name": "05-migration-readonly-first",
+      "argv": [
+        "npx",
+        "tsx",
+        "scripts/migrate-p3-visual-constraints.ts",
+        "--workspace",
+        "/Users/hxx/Documents/无限画布",
+        "--project-root",
+        "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+        "--source-root",
+        "/Users/hxx/Documents/古蜀卷第三季"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T11:55:43.488Z",
+      "endedAt": "2026-07-17T11:55:55.331Z",
+      "durationMs": 11843,
+      "exitCode": 0,
+      "termination": {
+        "timeoutMs": 600000,
+        "timedOut": false,
+        "signalsSent": []
+      },
+      "stdout": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-final-runs-20260717-01/05-migration-readonly-first.stdout.log",
+        "bytes": 2284,
+        "sha256": "b385b2a9430bf6f838b0cb89e43223a5d994aae5f302eec928a50a410362dc94",
+        "tail": [
+          "{",
+          "  \"schemaVersion\": 1,",
+          "  \"kind\": \"p3-visual-constraints-migration-dry-run\",",
+          "  \"createdAt\": \"2026-07-17T11:55:55.290Z\",",
+          "  \"apply\": false,",
+          "  \"workspace\": \"/Users/hxx/Documents/无限画布\",",
+          "  \"projectRoot\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6\",",
+          "  \"sourceRoot\": \"/Users/hxx/Documents/古蜀卷第三季\",",
+          "  \"source\": {",
+          "    \"root\": \"/Users/hxx/Documents/古蜀卷第三季\",",
+          "    \"files\": 3344,",
+          "    \"bytes\": 24570877,",
+          "    \"aggregateSha256\": \"649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26\"",
+          "  },",
+          "  \"protected\": {",
+          "    \"identitySha256\": \"2e11b3a389a7f46ffffec1d269d9f432215ab9e14ba5c7ec68a1e40473687d26\",",
+          "    \"counts\": {",
+          "      \"generationJobs\": 30,",
+          "      \"generationByStatus\": {",
+          "        \"failed\": 3,",
+          "        \"generation_unknown\": 1,",
+          "        \"succeeded\": 26",
+          "      },",
+          "      \"publicationIntents\": 31,",
+          "      \"publicationReceipts\": 26,",
+          "      \"reviews\": 20",
+          "    },",
+          "    \"rawLabeled\": {",
+          "      \"root\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6\",",
+          "      \"files\": 52,",
+          "      \"bytes\": 128973009,",
+          "      \"aggregateSha256\": \"77d4a46fa04c05c635701363f394faab0cc5094fc437990f6eeb580ce0e4c83b\"",
+          "    },",
+          "    \"historicalRequests\": {",
+          "      \"root\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-requests\",",
+          "      \"files\": 31,",
+          "      \"bytes\": 174082,",
+          "      \"aggregateSha256\": \"171ca4fd131b977f07f7bbb5e44bfd836a1158ce63c6bcaff721b45f95b1fbca\"",
+          "    },",
+          "    \"p2StoreSha256\": \"35aa251d9b6f767190924d697e7dd03a58cc198ded0918ad4fd89508217f877b\"",
+          "  },",
+          "  \"plan\": {",
+          "    \"providerIdsToUpdate\": [],",
+          "    \"providerInstructionSha256\": \"c3aa8d3c3e165fff402978a0fbacff69f6e557271d5c6468c7ee89220931b74b\",",
+          "    \"needsP3Materialization\": false,",
+          "    \"plannedSidecarFiles\": [],",
+          "    \"p3Before\": {",
+          "      \"exists\": true,",
+          "      \"current\": true,",
+          "      \"revision\": 1,",
+          "      \"storeFingerprint\": \"95f836f3f4b4458b1bbd698cefc775c7ff5f3d48d5917421c015531a3eea2e1b\",",
+          "      \"auditFingerprint\": \"794c699bd7eed74b3328069ee9b51db6880b797a558a85901eb68020841bba22\",",
+          "      \"constraints\": 4330,",
+          "      \"contracts\": 1288,",
+          "      \"legacyGenerationJobEvidence\": 11",
+          "    },",
+          "    \"productionFreeze\": true",
+          "  },",
+          "  \"next\": \"正式工程已经满足 P3 provider 与视觉约束物化要求；--apply 将只做幂等核验。\"",
+          "}"
+        ]
+      },
+      "stderr": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-final-runs-20260717-01/05-migration-readonly-first.stderr.log",
+        "bytes": 169,
+        "sha256": "25ae1fa85b75aef524847560004b0a69df04535d7a6f3a09f640cbc293055784",
+        "tail": [
+          "(node:34677) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)"
+        ]
+      }
+    },
+    "migrationReadOnlySecond": {
+      "name": "06-migration-readonly-second",
+      "argv": [
+        "npx",
+        "tsx",
+        "scripts/migrate-p3-visual-constraints.ts",
+        "--workspace",
+        "/Users/hxx/Documents/无限画布",
+        "--project-root",
+        "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+        "--source-root",
+        "/Users/hxx/Documents/古蜀卷第三季"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T11:55:55.332Z",
+      "endedAt": "2026-07-17T11:56:07.062Z",
+      "durationMs": 11730,
+      "exitCode": 0,
+      "termination": {
+        "timeoutMs": 600000,
+        "timedOut": false,
+        "signalsSent": []
+      },
+      "stdout": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-final-runs-20260717-01/06-migration-readonly-second.stdout.log",
+        "bytes": 2284,
+        "sha256": "737e28fdb6d12e680a81bc686bd7f079682c79ef742363f1c8045dbba1c702fc",
+        "tail": [
+          "{",
+          "  \"schemaVersion\": 1,",
+          "  \"kind\": \"p3-visual-constraints-migration-dry-run\",",
+          "  \"createdAt\": \"2026-07-17T11:56:07.027Z\",",
+          "  \"apply\": false,",
+          "  \"workspace\": \"/Users/hxx/Documents/无限画布\",",
+          "  \"projectRoot\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6\",",
+          "  \"sourceRoot\": \"/Users/hxx/Documents/古蜀卷第三季\",",
+          "  \"source\": {",
+          "    \"root\": \"/Users/hxx/Documents/古蜀卷第三季\",",
+          "    \"files\": 3344,",
+          "    \"bytes\": 24570877,",
+          "    \"aggregateSha256\": \"649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26\"",
+          "  },",
+          "  \"protected\": {",
+          "    \"identitySha256\": \"2e11b3a389a7f46ffffec1d269d9f432215ab9e14ba5c7ec68a1e40473687d26\",",
+          "    \"counts\": {",
+          "      \"generationJobs\": 30,",
+          "      \"generationByStatus\": {",
+          "        \"failed\": 3,",
+          "        \"generation_unknown\": 1,",
+          "        \"succeeded\": 26",
+          "      },",
+          "      \"publicationIntents\": 31,",
+          "      \"publicationReceipts\": 26,",
+          "      \"reviews\": 20",
+          "    },",
+          "    \"rawLabeled\": {",
+          "      \"root\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6\",",
+          "      \"files\": 52,",
+          "      \"bytes\": 128973009,",
+          "      \"aggregateSha256\": \"77d4a46fa04c05c635701363f394faab0cc5094fc437990f6eeb580ce0e4c83b\"",
+          "    },",
+          "    \"historicalRequests\": {",
+          "      \"root\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-requests\",",
+          "      \"files\": 31,",
+          "      \"bytes\": 174082,",
+          "      \"aggregateSha256\": \"171ca4fd131b977f07f7bbb5e44bfd836a1158ce63c6bcaff721b45f95b1fbca\"",
+          "    },",
+          "    \"p2StoreSha256\": \"35aa251d9b6f767190924d697e7dd03a58cc198ded0918ad4fd89508217f877b\"",
+          "  },",
+          "  \"plan\": {",
+          "    \"providerIdsToUpdate\": [],",
+          "    \"providerInstructionSha256\": \"c3aa8d3c3e165fff402978a0fbacff69f6e557271d5c6468c7ee89220931b74b\",",
+          "    \"needsP3Materialization\": false,",
+          "    \"plannedSidecarFiles\": [],",
+          "    \"p3Before\": {",
+          "      \"exists\": true,",
+          "      \"current\": true,",
+          "      \"revision\": 1,",
+          "      \"storeFingerprint\": \"95f836f3f4b4458b1bbd698cefc775c7ff5f3d48d5917421c015531a3eea2e1b\",",
+          "      \"auditFingerprint\": \"794c699bd7eed74b3328069ee9b51db6880b797a558a85901eb68020841bba22\",",
+          "      \"constraints\": 4330,",
+          "      \"contracts\": 1288,",
+          "      \"legacyGenerationJobEvidence\": 11",
+          "    },",
+          "    \"productionFreeze\": true",
+          "  },",
+          "  \"next\": \"正式工程已经满足 P3 provider 与视觉约束物化要求；--apply 将只做幂等核验。\"",
+          "}"
+        ]
+      },
+      "stderr": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-final-runs-20260717-01/06-migration-readonly-second.stderr.log",
+        "bytes": 169,
+        "sha256": "cee00d205216e7e39a61a069239dc31263546b2270b8a1d01ad59edfced6f3c5",
+        "tail": [
+          "(node:35593) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)"
+        ]
+      }
+    },
+    "mcpReadOnly": {
+      "name": "07-compiled-mcp-readonly",
+      "argv": [
+        "npx",
+        "tsx",
+        "scripts/mcp-p3-visual-constraints-smoke.ts",
+        "--workspace",
+        "/Users/hxx/Documents/无限画布",
+        "--project-root",
+        "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T11:56:07.063Z",
+      "endedAt": "2026-07-17T11:57:40.426Z",
+      "durationMs": 93363,
+      "exitCode": 0,
+      "termination": {
+        "timeoutMs": 240000,
+        "timedOut": false,
+        "signalsSent": []
+      },
+      "stdout": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-final-runs-20260717-01/07-compiled-mcp-readonly.stdout.log",
+        "bytes": 276,
+        "sha256": "21d2d8c732221c1a747bed19f9dc6373adbd1c8590cce4ea2893ccd18b1a7e3e",
+        "tail": [
+          "{",
+          "  \"passed\": true,",
+          "  \"toolCount\": 162,",
+          "  \"storeRevision\": 1,",
+          "  \"storeFingerprint\": \"95f836f3f4b4458b1bbd698cefc775c7ff5f3d48d5917421c015531a3eea2e1b\",",
+          "  \"auditFingerprint\": \"794c699bd7eed74b3328069ee9b51db6880b797a558a85901eb68020841bba22\",",
+          "  \"guardedFilesUnchanged\": true",
+          "}"
+        ]
+      },
+      "stderr": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-final-runs-20260717-01/07-compiled-mcp-readonly.stderr.log",
+        "bytes": 240,
+        "sha256": "d9c1ae7d033fa255d78ba76927da60e673fedcb3fbe18eb50bfa42b37d0f4055",
+        "tail": [
+          "[P3 MCP smoke] 工具发现通过",
+          "[P3 MCP smoke] 能力合同通过",
+          "[P3 MCP smoke] 全季闭包与 currentness 通过",
+          "[P3 MCP smoke] 分页、详情与模型隔离通过",
+          "[P3 MCP smoke] 隐藏面具、生成就绪与 unresolved 过滤通过"
+        ]
+      }
+    }
+  },
+  "liveRunEvidence": {
+    "migrationReadOnly": {
+      "firstCreatedAt": "2026-07-17T11:55:55.290Z",
+      "secondCreatedAt": "2026-07-17T11:56:07.027Z",
+      "exactSemanticReplay": true,
+      "productionFreeze": true,
+      "needsP3Materialization": false,
+      "providerIdsToUpdate": []
+    },
+    "compiledMcp": {
+      "passed": true,
+      "toolCount": 162,
+      "storeRevision": 1,
+      "storeFingerprint": "95f836f3f4b4458b1bbd698cefc775c7ff5f3d48d5917421c015531a3eea2e1b",
+      "auditFingerprint": "794c699bd7eed74b3328069ee9b51db6880b797a558a85901eb68020841bba22",
+      "guardedFilesUnchanged": true
+    }
+  },
+  "productionFreeze": {
+    "enabled": true,
+    "eventFileUnchanged": true,
+    "commandLedgerUnchanged": true,
+    "generationJobsUnchanged": true,
+    "publicationsUnchanged": true,
+    "historicalRequestsUnchanged": true,
+    "generationDownloadsUnchanged": true,
+    "subagentStagingUnchanged": true,
+    "browserOrVendorInvoked": false,
+    "imageGenerationInvoked": false
+  },
+  "assertions": {
+    "source3344Files24570877BytesAndAggregateShaExact": true,
+    "sourceUnchangedDuringValidation": true,
+    "sourceCodeDigestStableDuringValidation": true,
+    "p2StoreCurrentBeforeAndAfter": true,
+    "p3StoreCurrentBeforeAndAfter": true,
+    "p3Audit1288Contracts4330PanelsExact": true,
+    "p3PresenceAndUnresolvedCountsExact": true,
+    "hiddenMaskConcealed304RevealZero": true,
+    "modelPromptAndLocalPathLeakPanelsZero": true,
+    "everyConstraintCarriesFrozenModelAndReviewFingerprints": true,
+    "providerUsesGenericCoreInstructionsAndConcurrencyOne": true,
+    "thirtyJobs31Intents26Receipts20ReviewsPreserved": true,
+    "twentySixRawAndLabeledPairsDecodeAsRealNineBySixteenPng": true,
+    "rawAndLabeledShasUniqueAndTraceableToSucceededJobs": true,
+    "ep01Unit001OldReviewInvalidUnderP3": true,
+    "ep01Unit001RequirementFourPanelsTwentyEightRules": true,
+    "ep01Unit008RemainsFourOfSixUnknownPlusMissing": true,
+    "migrationRehearsalAndFormalEvidenceMatchCurrentState": true,
+    "migrationContentAddressedBackupStillValid": true,
+    "formalMigrationStrictSecondPassWasIdempotent": true,
+    "twoNewMigrationPreflightsAreReadOnlyAndSemanticallyIdentical": true,
+    "compiledMcpDiscoversExactly162ToolsWithoutWrites": true,
+    "existingMcpEvidenceMatchesCurrentStoreAndGuardedFiles": true,
+    "realUiEvidenceAndDecodableScreenshotMatchCurrentStore": true,
+    "externalEvidenceFilesStableDuringCloseout": true,
+    "uiReviewInteractionDidNotSubmitOrFabricateHumanReview": true,
+    "historicalGenerationRequestsRemain31AndHashExact": true,
+    "guardedSidecarRawLabeledDownloadsAndStagingUnchanged": true,
+    "zeroFormalGenerationBrowserVendorOrPublicationEventsDuringCloseout": true,
+    "allSevenCommandRunsExitedZeroWithExclusiveShaBoundLogs": true
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "kind": "t23-layer4-project-ui-verify",
+  "createdAt": "2026-07-25T11:42:25.660Z",
+  "ok": true,
+  "mode": "build",
+  "project": {
+    "id": "project-2e3b44bc6ac4",
+    "name": "Codex AI 短剧素材中心",
+    "root": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio"
+  },
+  "expectations": {
+    "expectUnits": 541
+  },
+  "timings": {
+    "launchToStudioViewMs": 734,
+    "launchToFirstUnitNodeMs": 1626,
+    "totalMs": 7439,
+    "firstUnitNodeSoftBudgetMs": 1500
+  },
+  "assertions": [
+    {
+      "id": "a-startup-managed-canvas",
+      "title": "应用启动后直达受管工程画布（非首启/默认页）",
+      "status": "PASS",
+      "detail": "直达「Codex AI 短剧素材中心」受管画布，url=file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/out/renderer/index.html",
+      "durationMs": 1553
+    },
+    {
+      "id": "b-timeline-units",
+      "title": "时间线渲染工程单元",
+      "status": "PASS",
+      "detail": "指标单元数=541，期望=541；首屏渲染单元节点 36 个；通用工程未启用双编号硬门",
+      "durationMs": 25
+    },
+    {
+      "id": "c-media-load",
+      "title": "媒体加载失败数=0（aicanvas-studio: 协议失败 / HTTP≥400 / img 解码失败）",
+      "status": "PASS",
+      "detail": "aicanvas-studio 请求 3 次，失败 0",
+      "durationMs": 10
+    },
+    {
+      "id": "g-build-identity",
+      "title": "构建身份/指纹展示读取",
+      "status": "PASS",
+      "detail": "来源=data-testid，值=构建身份 v0.2.0 · buildId:aedf1ce10150 · sourceDigest:87893590c741"
+    },
+    {
+      "id": "e-screenshot-nonblank",
+      "title": "截图落盘且 sharp 方差校验防空白",
+      "status": "PASS",
+      "detail": "3456×2054，365946B，stdev=21.27",
+      "durationMs": 141
+    },
+    {
+      "id": "f-perf-first-screen",
+      "title": "首屏到首批单元卡渲染耗时（软目标 ≤1500ms，超时 WARN 不 FAIL）",
+      "status": "PASS",
+      "detail": "launch→material-studio-view 734ms；launch→首个单元卡 1626ms（WARN：超软目标）",
+      "warnings": [
+        "首屏到首批单元卡 1626ms 超过软目标 1500ms（dev 模式含 vite 编译为预期；真实硬门待性能波次）"
+      ]
+    },
+    {
+      "id": "d-console-clean",
+      "title": "页面 console error=0（良性名单可配置）且 pageerror=0",
+      "status": "PASS",
+      "detail": "原始 console error 0 条，忽略 0 条后 0"
+    },
+    {
+      "id": "h-readonly-guard",
+      "title": "只读护栏：工程哨兵文件哈希全程不变",
+      "status": "PASS",
+      "detail": "比对 .aicanvas/studio-canvas-layout.json、.aicanvas/studio-production.sqlite、.aicanvas/managed-project.json 哈希一致"
+    }
+  ],
+  "media": {
+    "studioRequests": 3,
+    "failures": []
+  },
+  "console": {
+    "rawErrors": [],
+    "ignoredErrors": [],
+    "effectiveErrors": [],
+    "pageErrors": []
+  },
+  "network": {
+    "externalRequests": []
+  },
+  "screenshot": {
+    "sha256": "ed0481e3e983cc49cdf2341e7208a1d438727828b5ff905959185a05f3df6877",
+    "sizeBytes": 365946,
+    "width": 3456,
+    "height": 2054,
+    "maxChannelStandardDeviation": 21.26683729704731,
+    "path": "docs/evidence/source-product-standard-20260725/scale-541-layer4/t23-layer4-build-2026-07-25T11-42-18-221Z.png"
+  },
+  "warnings": [
+    "首屏到首批单元卡 1626ms 超过软目标 1500ms（dev 模式含 vite 编译为预期；真实硬门待性能波次）"
+  ],
+  "boundaries": {
+    "readonlyJourney": true,
+    "writeButtonClicks": 0,
+    "executeCommandWrites": 0,
+    "viewportMoves": 0,
+    "isolatedUserData": true,
+    "isolatedRegistryCopy": true,
+    "isolatedProjectCopy": true,
+    "isolatedManagedProjectsRoot": true,
+    "isolatedMediaRuntime": true,
+    "isolatedRuntimeCleaned": true,
+    "formalProjectWrites": 0,
+    "buildPerformedByScript": false,
+    "gitActions": 0
+  }
+}

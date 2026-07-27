@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "kind": "final-validation",
+  "phase": "P30_S4_SOURCE_FROZEN_M1_SOFTWARE_ACCEPTED",
+  "status": "PASS",
+  "createdAt": "2026-07-22T05:10:00.000Z",
+  "timezoneNote": "Asia/Shanghai local wall ~13:10",
+  "executor": "grok-s4-sole-writer",
+  "frozenIdentity": {
+    "sourceDigest": "349f6207900969e54e953e29df9d3824b5d9c37eb9ae938751d77dc565086241",
+    "sourceFiles": 530,
+    "sourceBytes": 12370977,
+    "version": "0.2.0",
+    "buildId": "cf14cf4445fb89d8d071ec8558b42906",
+    "buildIdentityFingerprint": "ef9b35effa12d4876274909e65ec3689f95b931d7e40f5c521eda70f333264da",
+    "mcpToolCount": 189,
+    "mcpToolCountDynamicTripleEqual": true,
+    "protocolVersion": "1.1",
+    "releaseManifestFingerprint": "b49c825f162d5d7356a5a57f8da66e1afe3cc0d554157a9837f0f34d73578915"
+  },
+  "milestones": {
+    "M1": "SOFTWARE_ACCEPTED",
+    "M2": "NOT_STARTED",
+    "M3": "NOT_STARTED",
+    "LOCAL_INSTALL": "NOT_STARTED"
+  },
+  "phases": {
+    "S0": "PASS",
+    "S1": "PASS",
+    "S2": "PASS",
+    "S3": "PASS",
+    "S4": "PASS",
+    "S5": "NOT_STARTED",
+    "S6": "NOT_STARTED",
+    "S7": "NOT_STARTED",
+    "S8": "NOT_STARTED",
+    "S9": "NOT_STARTED",
+    "S10": "NOT_STARTED"
+  },
+  "freezeHistory": [
+    {
+      "digest": "fb3dd3727be4a0bf3ff0de02d900b51e1c5c57d72b8dccea573d993e90b86278",
+      "sourceFiles": 530,
+      "sourceBytes": 12368714,
+      "role": "S3_completion_candidate",
+      "status": "superseded",
+      "reason": "formal npm test failed 3 cases; minimal test-fixture fixes formed new digest"
+    },
+    {
+      "digest": "349f6207900969e54e953e29df9d3824b5d9c37eb9ae938751d77dc565086241",
+      "sourceFiles": 530,
+      "sourceBytes": 12370977,
+      "role": "S4_frozen",
+      "status": "frozen",
+      "reason": "full formal chain pass after one remediating round"
+    }
+  ],
+  "remediation": {
+    "productSourceFunctionalChanges": false,
+    "filesChanged": [
+      "tests/mcp.test.ts",
+      "tests/studio-generation-plan.test.ts"
+    ],
+    "summary": "Add 3 P30 readonly tools to mcp.test expected list; strip all V5 objects when synthesizing v3 ledger fixture"
+  },
+  "validationChain": {
+    "typecheck": { "status": "PASS" },
+    "directedVitest": { "status": "PASS", "files": 30, "tests": 154 },
+    "npmTest": {
+      "status": "PASS",
+      "testFiles": 188,
+      "tests": 1043,
+      "p29BaselineMinimum": 999,
+      "p29BaselineMet": true,
+      "p30AddedApprox": 44
+    },
+    "buildMcp": { "status": "PASS" },
+    "buildIdentity": { "status": "PASS" },
+    "electronViteBuild": { "status": "PASS" },
+    "electronUnitGridJourney": {
+      "status": "PASS",
+      "evidence": ".planning/reviews/P30/evidence/p30-s4-unit-grid-source-electron-2026-07-22T05-03-53-3NZ.json",
+      "sha256": "5924be9586dd56551d7e5e8cbf9cd26b9a35b8182abf6745e4819b5ec3c1aad7",
+      "screenshots": {
+        "generation": {
+          "path": ".planning/reviews/P30/evidence/p30-s4-unit-grid-generation-2026-07-22T05-03-53-3NZ.png",
+          "sha256": "9754b91c30b824cc65537858a6a093caa6763793e6dea5f33d59803969bf4bc4"
+        },
+        "review": {
+          "path": ".planning/reviews/P30/evidence/p30-s4-unit-grid-review-2026-07-22T05-03-53-3NZ.png",
+          "sha256": "e0770cc09bf2c8e3353a34ee0f70492b005f6f9668bab20426dd3507ef17db9b"
+        }
+      },
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalRequests": 0,
+      "imagegenCalls": 0,
+      "formalProjectWrites": 0,
+      "digestStableAcrossJourney": true
+    },
+    "scaleSmoke": {
+      "status": "PASS",
+      "evidence": "docs/evidence/p30-s4-managed-studio-scale-canvas-ui-smoke-20260722T050536Z.json",
+      "sha256": "9de35526fa303997703b37ce2f8938ca128f07bcbcc747a68d594e8ff0d6b776",
+      "screenshot": {
+        "path": "docs/evidence/p30-s4-managed-studio-scale-canvas-ui-smoke-20260722T050536Z.png",
+        "sha256": "0dc425197e478b84ed09b6c72b83dc7a164eab3103931ae8f73e7719bf1308dc"
+      },
+      "assets": 77,
+      "units": 1288,
+      "panels": 4235,
+      "media": 10000,
+      "projectSwitchCount": 10,
+      "crossProjectLeak": false,
+      "fileDescriptorDelta": 0,
+      "rssDeltaKiB": 16064
+    },
+    "dualReadOnlyFinalReview": {
+      "status": "PASS",
+      "A": { "path": ".planning/reviews/P30/08_S4_终审A_架构与合同_20260722.md", "P0": 0, "P1": 0, "blockingP2": 0 },
+      "B": { "path": ".planning/reviews/P30/09_S4_终审B_前端与证据_20260722.md", "P0": 0, "P1": 0, "blockingP2": 0 }
+    }
+  },
+  "itemizedStatus": {
+    "softwareS4M1": "S4_PASS_M1_SOFTWARE_ACCEPTED",
+    "ipcMcpFrontendDynamicToolCount": "PASS_189_DYNAMIC_TRIPLE",
+    "electronAndScale": "PASS",
+    "humanVisualAcceptance": "NOT_STARTED",
+    "duduFormalImport": "NOT_STARTED",
+    "rawLabeledFormalReview": "NOT_STARTED",
+    "videoPackageRealProduction": "NOT_STARTED",
+    "formalProductionDispatchImagegen": "NOT_STARTED",
+    "installPackage": "NOT_STARTED",
+    "gitStageCommitPush": false,
+    "u28Unknown": "LATE_RESULT_FROM_CANCELLED_TASK_GENERATION_UNKNOWN_UNTOUCHED",
+    "activeRun": null,
+    "activeCall": null,
+    "activePack": null
+  },
+  "notRun": [
+    "package:isolated-smoke",
+    "npm run build full-chain after electron-vite",
+    "formal dudu import",
+    "codex imagegen",
+    "grok imagegen",
+    "real video model",
+    "install replace Applications app",
+    "git stage commit push PR"
+  ],
+  "nonClaims": [
+    "P30 complete",
+    "M2 FIRST_CANARY_ACCEPTED",
+    "M3 AUTHORIZED_PRODUCTION_CONTINUED",
+    "human visual canary accept",
+    "formal production ready"
+  ],
+  "nextAction": {
+    "owner": "GPT_or_Codex",
+    "phase": "S5_NO_GENERATION_REPLAY",
+    "forbiddenForGrok": true
+  },
+  "report": "docs/验证报告_20260722_P30_S4_M1软件机械验收.md"
+}

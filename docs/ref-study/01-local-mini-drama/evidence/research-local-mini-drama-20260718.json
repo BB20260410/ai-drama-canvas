@@ -1,0 +1,22 @@
+{
+  "kind": "ref-study-research",
+  "project": "LocalMiniDrama",
+  "seq": 1,
+  "date": "2026-07-18",
+  "pin": {
+    "repo": "https://github.com/xuanyustudio/LocalMiniDrama",
+    "sha": "92c66dd75688d83aac3ccc31bb51378613122cbc",
+    "version": "1.2.8",
+    "license": "MIT",
+    "clonePath": "/Users/hxx/Documents/_ref-study/local-mini-drama-92c66dd75688d83aac3ccc31bb51378613122cbc",
+    "outsideMonorepo": true,
+    "lfsSkipped": true,
+    "reasonLfsSkip": "GitHub LFS budget exceeded on example zip"
+  },
+  "deliverables": [
+    "docs/ref-study/01-local-mini-drama/00_研究完成报告.md",
+    "docs/ref-study/01-local-mini-drama/01_功能对照表.md",
+    "docs/ref-study/01-local-mini-drama/02_实施切片.md"
+  ],
+  "phase": "R complete"
+}

@@ -1,0 +1,643 @@
+{
+  "schemaVersion": 1,
+  "kind": "p5-canonical-mcp-smoke",
+  "startedAt": "2026-07-17T17:31:23.599Z",
+  "completedAt": "2026-07-17T17:31:36.546Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "assertions": {
+    "sourceAndCompiledToolCount168": true,
+    "canonicalCatalogCurrent": true,
+    "canonicalAssets77": true,
+    "explicitCategoryCounts": {
+      "character": 24,
+      "scene": 20,
+      "prop": 33
+    },
+    "paginationAndSearchPassed": true,
+    "p01PrimaryAndSupportingVisible": true,
+    "p01SupportingExposureForbidden": true,
+    "p01GoldenMaskPathExcludedFromGenerationProjection": true,
+    "legacyDeprecatedCanonicalCompatibility": true,
+    "noBase64OrLargeMediaPayload": true,
+    "formalProjectUnchanged": true
+  },
+  "formalProjectGuard": {
+    "policy": "全树文件内容 SHA + 路径语义 + dev/ino/mode/mtime/ctime 身份守卫；无正式工程日志例外",
+    "allowedProjectMutations": [],
+    "before": {
+      "tree": {
+        "files": 11117,
+        "directories": 4266,
+        "symlinks": 0,
+        "bytes": 876048899,
+        "semanticSha256": "9369a17535ebae2c75da6a418bf700a1e142cdaf9e6112dc105b53e5f108a141",
+        "identitySha256": "d3d2667929a88718513d4e9e03bc25b3783d4a2a904bf45030e93c403533db81"
+      },
+      "canonicalStore": {
+        "bytes": 689747,
+        "rawSha256": "ea41c4c77e852b5fab58774a5aaa99a73e4a3d63b6fe18bf83330430528b798b",
+        "semanticSha256": "a4a6371078ead700a2bd437bb88a12212998da8190c945b68b3acc16b4be67fc",
+        "revision": 2,
+        "storeFingerprint": "a4e1aa3588e690d272d0c8b3efae2b8335968f9e0a2b98c67b4f7afe9aa5a672",
+        "counts": {
+          "assets": 77,
+          "aliases": 154,
+          "versions": 21,
+          "authorities": 21,
+          "relations": 0
+        }
+      }
+    },
+    "afterSource": {
+      "tree": {
+        "files": 11117,
+        "directories": 4266,
+        "symlinks": 0,
+        "bytes": 876048899,
+        "semanticSha256": "9369a17535ebae2c75da6a418bf700a1e142cdaf9e6112dc105b53e5f108a141",
+        "identitySha256": "d3d2667929a88718513d4e9e03bc25b3783d4a2a904bf45030e93c403533db81"
+      },
+      "canonicalStore": {
+        "bytes": 689747,
+        "rawSha256": "ea41c4c77e852b5fab58774a5aaa99a73e4a3d63b6fe18bf83330430528b798b",
+        "semanticSha256": "a4a6371078ead700a2bd437bb88a12212998da8190c945b68b3acc16b4be67fc",
+        "revision": 2,
+        "storeFingerprint": "a4e1aa3588e690d272d0c8b3efae2b8335968f9e0a2b98c67b4f7afe9aa5a672",
+        "counts": {
+          "assets": 77,
+          "aliases": 154,
+          "versions": 21,
+          "authorities": 21,
+          "relations": 0
+        }
+      }
+    },
+    "afterCompiled": {
+      "tree": {
+        "files": 11117,
+        "directories": 4266,
+        "symlinks": 0,
+        "bytes": 876048899,
+        "semanticSha256": "9369a17535ebae2c75da6a418bf700a1e142cdaf9e6112dc105b53e5f108a141",
+        "identitySha256": "d3d2667929a88718513d4e9e03bc25b3783d4a2a904bf45030e93c403533db81"
+      },
+      "canonicalStore": {
+        "bytes": 689747,
+        "rawSha256": "ea41c4c77e852b5fab58774a5aaa99a73e4a3d63b6fe18bf83330430528b798b",
+        "semanticSha256": "a4a6371078ead700a2bd437bb88a12212998da8190c945b68b3acc16b4be67fc",
+        "revision": 2,
+        "storeFingerprint": "a4e1aa3588e690d272d0c8b3efae2b8335968f9e0a2b98c67b4f7afe9aa5a672",
+        "counts": {
+          "assets": 77,
+          "aliases": 154,
+          "versions": 21,
+          "authorities": 21,
+          "relations": 0
+        }
+      }
+    },
+    "sourceUnchanged": true,
+    "compiledUnchanged": true
+  },
+  "runs": [
+    {
+      "mode": "source",
+      "process": {
+        "executable": "/Users/hxx/.nvm/versions/node/v22.22.2/bin/node",
+        "server": "src/mcp/server.ts via tsx",
+        "runtimeIsolation": "temporary HOME/TMPDIR/registry/media-runtime removed after close"
+      },
+      "toolCount": 168,
+      "toolCatalogBytes": 287429,
+      "schemas": {
+        "canonicalReadTools": true,
+        "legacyReadTool": true,
+        "projectRootRequired": true,
+        "listDefaults": {
+          "offset": 0,
+          "limit": 30,
+          "maximumLimit": 100
+        }
+      },
+      "catalog": {
+        "available": true,
+        "current": true,
+        "storeRevision": 2,
+        "storeFingerprint": "a4e1aa3588e690d272d0c8b3efae2b8335968f9e0a2b98c67b4f7afe9aa5a672",
+        "counts": {
+          "assets": 77,
+          "aliases": 154,
+          "definitionVersions": 77,
+          "contractVersions": 77,
+          "versions": 21,
+          "authorities": 21,
+          "relations": 0,
+          "media": 39,
+          "assetsWithVersions": 20,
+          "assetsWithoutVersions": 57,
+          "primaryAuthorities": 20,
+          "supportingAuthorities": 1,
+          "byCategory": {
+            "character": 24,
+            "scene": 20,
+            "prop": 33
+          }
+        },
+        "driftedInputs": []
+      },
+      "paginationAndSearch": {
+        "pageSizes": [
+          13,
+          13,
+          7
+        ],
+        "pageOffsets": [
+          0,
+          13,
+          70
+        ],
+        "adjacentPagesDisjoint": true,
+        "crossPageOrderStable": true,
+        "categoryCounts": {
+          "character": 24,
+          "scene": 20,
+          "prop": 33
+        },
+        "categoryCoverage": 77,
+        "categoryIdsUnique": 77,
+        "searches": {
+          "P01": [
+            "P01"
+          ],
+          "布囊": [
+            "P01"
+          ]
+        }
+      },
+      "p01": {
+        "assetId": "P01",
+        "category": "prop",
+        "primary": {
+          "authorityId": "asset-authority-P01-74f50610a9c15b822c4ee3cedb92fb20",
+          "role": "production-hard-lock",
+          "exposure": "allowed",
+          "usage": "generation-reference",
+          "versionId": "asset-version-P01-a6585f981d3566a0cae0fcf1a009026d",
+          "representation": "production-output"
+        },
+        "supporting": [
+          {
+            "authorityId": "asset-authority-P01-285cbf881b0c87cbe5a1a8897eb45dc7",
+            "role": "supporting-identity",
+            "exposure": "forbidden",
+            "usage": "human-review-only",
+            "versionId": "asset-version-P01-408d397da5bbf9b78ce9c39d9cac4251",
+            "representation": "supporting-reference"
+          }
+        ],
+        "pathAudit": {
+          "supportingPathCount": 2,
+          "supportingPathDigests": [
+            "a0f204e084395db8021d0b1e408f6aeab060829f14e47429134ddb3b93c1c38f",
+            "df5605da34da159fc97d6224d8f421655bb18c28ac9f918241cebed8d43a6d5e"
+          ],
+          "supportingPathHasGoldenMaskMarker": true,
+          "canonicalPrimaryProjectionPathCount": 2,
+          "canonicalPrimaryProjectionPathDigests": [
+            "6258a71e72f850cfeef72b1a0f7725d2f48003f8250d5286903e97ffe918f09e",
+            "d8c880e12e781c2d3e3f2c819bc987bf1eea130c3e25c4923d948b544472bab4"
+          ],
+          "ep01PanelResolutionTotal": 146,
+          "ep01PanelPages": 3,
+          "p01PanelOccurrences": 16,
+          "downstreamProjectionPathCount": 1,
+          "downstreamProjectionPathDigests": [
+            "6258a71e72f850cfeef72b1a0f7725d2f48003f8250d5286903e97ffe918f09e"
+          ],
+          "downstreamReferenceVersions": [
+            "asset-version-P01-a6585f981d3566a0cae0fcf1a009026d"
+          ],
+          "supportingPathsExcludedFromGenerationProjection": true,
+          "goldenMaskPathsExcludedFromGenerationProjection": true
+        }
+      },
+      "legacyCompatibility": {
+        "deprecated": true,
+        "compatibilitySource": "canonical-assets",
+        "total": 1,
+        "assetId": "P01",
+        "fullLegacyDetailFieldsAbsent": true,
+        "supportingPathsAbsent": true
+      },
+      "payloadSafety": {
+        "calls": [
+          {
+            "callKey": "catalog-state",
+            "tool": "get_canonical_asset_catalog_state",
+            "bytes": 774,
+            "parsedSha256": "96aea70a14d0383e9d2f185f78709eb3db510816aa03999a88434ca771c92adb"
+          },
+          {
+            "callKey": "canonical-page-0",
+            "tool": "list_canonical_assets",
+            "bytes": 19954,
+            "parsedSha256": "ee0c9ef4e68bc4fbf5efb2aa14d2fbf1fa877e7c4e3f15be0c11735c07ac2ca2"
+          },
+          {
+            "callKey": "canonical-page-13",
+            "tool": "list_canonical_assets",
+            "bytes": 19015,
+            "parsedSha256": "2a36d00a4d4e0566b5301108145711b7741259258749c2fcbbdcd1995ef9724b"
+          },
+          {
+            "callKey": "canonical-page-70",
+            "tool": "list_canonical_assets",
+            "bytes": 9789,
+            "parsedSha256": "91ffd969597462732f1d33d205614f48e0849d0567940e8ba9fd8be531ff54b5"
+          },
+          {
+            "callKey": "category-character",
+            "tool": "list_canonical_assets",
+            "bytes": 35292,
+            "parsedSha256": "5dca08dd88b8493bcc6ff837e49ffb6f92fcfcd03de1e826d0178a1a0d2f290c"
+          },
+          {
+            "callKey": "category-scene",
+            "tool": "list_canonical_assets",
+            "bytes": 29512,
+            "parsedSha256": "460aa45993a83a73e4be244c69e6f8b3d172fc7318c4e5d61252550d1138b1b8"
+          },
+          {
+            "callKey": "category-prop",
+            "tool": "list_canonical_assets",
+            "bytes": 47650,
+            "parsedSha256": "42ec72fa9b7fc4bb4e5f22572851439985d1c7d528e7f0295198e3d8628af0af"
+          },
+          {
+            "callKey": "search-P01",
+            "tool": "list_canonical_assets",
+            "bytes": 2211,
+            "parsedSha256": "ff81c054e69fb147423c1a938a786ddc09a16921fb6185f7cdb264066e21983a"
+          },
+          {
+            "callKey": "search-布囊",
+            "tool": "list_canonical_assets",
+            "bytes": 2211,
+            "parsedSha256": "8ae7af1e0776e5f716d04a0147670403ff8c3150a3f7f1708548dde627151975"
+          },
+          {
+            "callKey": "detail-P01",
+            "tool": "get_canonical_asset",
+            "bytes": 17035,
+            "parsedSha256": "5e72338ca10e59c122a46763ecc88a26af0466a6edda95bcfde25bb23b8150f6"
+          },
+          {
+            "callKey": "legacy-P01",
+            "tool": "list_fusion_production_assets",
+            "bytes": 1242,
+            "parsedSha256": "0a3e72f8c392254af1c589f3b8e4e0f970b7feeb826296c536d5d05a063a53d3"
+          },
+          {
+            "callKey": "panel-reference-ep01-0",
+            "tool": "list_fusion_panel_reference_resolutions",
+            "bytes": 315531,
+            "parsedSha256": "6fdc0b7a80f2115b414462522e3f235bd497a74c5fd2f861630ca32d5ecf24f6"
+          },
+          {
+            "callKey": "panel-reference-ep01-50",
+            "tool": "list_fusion_panel_reference_resolutions",
+            "bytes": 404961,
+            "parsedSha256": "57752e7f973d11a44db7240faa2e07647333a8a866e445dc06659a866a86a64b"
+          },
+          {
+            "callKey": "panel-reference-ep01-100",
+            "tool": "list_fusion_panel_reference_resolutions",
+            "bytes": 348723,
+            "parsedSha256": "ae66c5eeab56ab4a2c6f9a289d7284999d68fcd97a532fc3d8a8b087d59a8c0a"
+          }
+        ],
+        "callCount": 14,
+        "totalBytes": 1253900,
+        "largestResponseBytes": 404961,
+        "largestResponseCall": "panel-reference-ep01-50",
+        "maxStringBytes": 1552,
+        "responseLimitBytes": 1500000,
+        "stringLimitBytes": 262144,
+        "nonTextContentBlocks": 0,
+        "binaryValues": 0,
+        "embeddedMediaFields": 0,
+        "base64Payloads": 0
+      },
+      "responseFingerprints": {
+        "catalog-state": "96aea70a14d0383e9d2f185f78709eb3db510816aa03999a88434ca771c92adb",
+        "canonical-page-0": "ee0c9ef4e68bc4fbf5efb2aa14d2fbf1fa877e7c4e3f15be0c11735c07ac2ca2",
+        "canonical-page-13": "2a36d00a4d4e0566b5301108145711b7741259258749c2fcbbdcd1995ef9724b",
+        "canonical-page-70": "91ffd969597462732f1d33d205614f48e0849d0567940e8ba9fd8be531ff54b5",
+        "category-character": "5dca08dd88b8493bcc6ff837e49ffb6f92fcfcd03de1e826d0178a1a0d2f290c",
+        "category-scene": "460aa45993a83a73e4be244c69e6f8b3d172fc7318c4e5d61252550d1138b1b8",
+        "category-prop": "42ec72fa9b7fc4bb4e5f22572851439985d1c7d528e7f0295198e3d8628af0af",
+        "search-P01": "ff81c054e69fb147423c1a938a786ddc09a16921fb6185f7cdb264066e21983a",
+        "search-布囊": "8ae7af1e0776e5f716d04a0147670403ff8c3150a3f7f1708548dde627151975",
+        "detail-P01": "5e72338ca10e59c122a46763ecc88a26af0466a6edda95bcfde25bb23b8150f6",
+        "legacy-P01": "0a3e72f8c392254af1c589f3b8e4e0f970b7feeb826296c536d5d05a063a53d3",
+        "panel-reference-ep01-0": "6fdc0b7a80f2115b414462522e3f235bd497a74c5fd2f861630ca32d5ecf24f6",
+        "panel-reference-ep01-50": "57752e7f973d11a44db7240faa2e07647333a8a866e445dc06659a866a86a64b",
+        "panel-reference-ep01-100": "ae66c5eeab56ab4a2c6f9a289d7284999d68fcd97a532fc3d8a8b087d59a8c0a"
+      },
+      "parityFingerprint": "4278cfccd783d30b5ee9ce2fb0b1692404e2d604c109413d4b819aee9c45f748",
+      "serverStderr": {
+        "bytes": 169,
+        "retainedTailOnly": true,
+        "tail": [
+          "(node:90879) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)"
+        ]
+      },
+      "readOnlyToolsInvoked": [
+        "get_canonical_asset_catalog_state",
+        "list_canonical_assets",
+        "get_canonical_asset",
+        "list_fusion_production_assets",
+        "list_fusion_panel_reference_resolutions"
+      ],
+      "writeToolsInvoked": [],
+      "vendorBrowserOrGenerationInvoked": false,
+      "passed": true
+    },
+    {
+      "mode": "compiled",
+      "process": {
+        "executable": "/Users/hxx/.nvm/versions/node/v22.22.2/bin/node",
+        "server": "dist-mcp/mcp/server.js",
+        "runtimeIsolation": "temporary HOME/TMPDIR/registry/media-runtime removed after close"
+      },
+      "toolCount": 168,
+      "toolCatalogBytes": 287429,
+      "schemas": {
+        "canonicalReadTools": true,
+        "legacyReadTool": true,
+        "projectRootRequired": true,
+        "listDefaults": {
+          "offset": 0,
+          "limit": 30,
+          "maximumLimit": 100
+        }
+      },
+      "catalog": {
+        "available": true,
+        "current": true,
+        "storeRevision": 2,
+        "storeFingerprint": "a4e1aa3588e690d272d0c8b3efae2b8335968f9e0a2b98c67b4f7afe9aa5a672",
+        "counts": {
+          "assets": 77,
+          "aliases": 154,
+          "definitionVersions": 77,
+          "contractVersions": 77,
+          "versions": 21,
+          "authorities": 21,
+          "relations": 0,
+          "media": 39,
+          "assetsWithVersions": 20,
+          "assetsWithoutVersions": 57,
+          "primaryAuthorities": 20,
+          "supportingAuthorities": 1,
+          "byCategory": {
+            "character": 24,
+            "scene": 20,
+            "prop": 33
+          }
+        },
+        "driftedInputs": []
+      },
+      "paginationAndSearch": {
+        "pageSizes": [
+          13,
+          13,
+          7
+        ],
+        "pageOffsets": [
+          0,
+          13,
+          70
+        ],
+        "adjacentPagesDisjoint": true,
+        "crossPageOrderStable": true,
+        "categoryCounts": {
+          "character": 24,
+          "scene": 20,
+          "prop": 33
+        },
+        "categoryCoverage": 77,
+        "categoryIdsUnique": 77,
+        "searches": {
+          "P01": [
+            "P01"
+          ],
+          "布囊": [
+            "P01"
+          ]
+        }
+      },
+      "p01": {
+        "assetId": "P01",
+        "category": "prop",
+        "primary": {
+          "authorityId": "asset-authority-P01-74f50610a9c15b822c4ee3cedb92fb20",
+          "role": "production-hard-lock",
+          "exposure": "allowed",
+          "usage": "generation-reference",
+          "versionId": "asset-version-P01-a6585f981d3566a0cae0fcf1a009026d",
+          "representation": "production-output"
+        },
+        "supporting": [
+          {
+            "authorityId": "asset-authority-P01-285cbf881b0c87cbe5a1a8897eb45dc7",
+            "role": "supporting-identity",
+            "exposure": "forbidden",
+            "usage": "human-review-only",
+            "versionId": "asset-version-P01-408d397da5bbf9b78ce9c39d9cac4251",
+            "representation": "supporting-reference"
+          }
+        ],
+        "pathAudit": {
+          "supportingPathCount": 2,
+          "supportingPathDigests": [
+            "a0f204e084395db8021d0b1e408f6aeab060829f14e47429134ddb3b93c1c38f",
+            "df5605da34da159fc97d6224d8f421655bb18c28ac9f918241cebed8d43a6d5e"
+          ],
+          "supportingPathHasGoldenMaskMarker": true,
+          "canonicalPrimaryProjectionPathCount": 2,
+          "canonicalPrimaryProjectionPathDigests": [
+            "6258a71e72f850cfeef72b1a0f7725d2f48003f8250d5286903e97ffe918f09e",
+            "d8c880e12e781c2d3e3f2c819bc987bf1eea130c3e25c4923d948b544472bab4"
+          ],
+          "ep01PanelResolutionTotal": 146,
+          "ep01PanelPages": 3,
+          "p01PanelOccurrences": 16,
+          "downstreamProjectionPathCount": 1,
+          "downstreamProjectionPathDigests": [
+            "6258a71e72f850cfeef72b1a0f7725d2f48003f8250d5286903e97ffe918f09e"
+          ],
+          "downstreamReferenceVersions": [
+            "asset-version-P01-a6585f981d3566a0cae0fcf1a009026d"
+          ],
+          "supportingPathsExcludedFromGenerationProjection": true,
+          "goldenMaskPathsExcludedFromGenerationProjection": true
+        }
+      },
+      "legacyCompatibility": {
+        "deprecated": true,
+        "compatibilitySource": "canonical-assets",
+        "total": 1,
+        "assetId": "P01",
+        "fullLegacyDetailFieldsAbsent": true,
+        "supportingPathsAbsent": true
+      },
+      "payloadSafety": {
+        "calls": [
+          {
+            "callKey": "catalog-state",
+            "tool": "get_canonical_asset_catalog_state",
+            "bytes": 774,
+            "parsedSha256": "96aea70a14d0383e9d2f185f78709eb3db510816aa03999a88434ca771c92adb"
+          },
+          {
+            "callKey": "canonical-page-0",
+            "tool": "list_canonical_assets",
+            "bytes": 19954,
+            "parsedSha256": "ee0c9ef4e68bc4fbf5efb2aa14d2fbf1fa877e7c4e3f15be0c11735c07ac2ca2"
+          },
+          {
+            "callKey": "canonical-page-13",
+            "tool": "list_canonical_assets",
+            "bytes": 19015,
+            "parsedSha256": "2a36d00a4d4e0566b5301108145711b7741259258749c2fcbbdcd1995ef9724b"
+          },
+          {
+            "callKey": "canonical-page-70",
+            "tool": "list_canonical_assets",
+            "bytes": 9789,
+            "parsedSha256": "91ffd969597462732f1d33d205614f48e0849d0567940e8ba9fd8be531ff54b5"
+          },
+          {
+            "callKey": "category-character",
+            "tool": "list_canonical_assets",
+            "bytes": 35292,
+            "parsedSha256": "5dca08dd88b8493bcc6ff837e49ffb6f92fcfcd03de1e826d0178a1a0d2f290c"
+          },
+          {
+            "callKey": "category-scene",
+            "tool": "list_canonical_assets",
+            "bytes": 29512,
+            "parsedSha256": "460aa45993a83a73e4be244c69e6f8b3d172fc7318c4e5d61252550d1138b1b8"
+          },
+          {
+            "callKey": "category-prop",
+            "tool": "list_canonical_assets",
+            "bytes": 47650,
+            "parsedSha256": "42ec72fa9b7fc4bb4e5f22572851439985d1c7d528e7f0295198e3d8628af0af"
+          },
+          {
+            "callKey": "search-P01",
+            "tool": "list_canonical_assets",
+            "bytes": 2211,
+            "parsedSha256": "ff81c054e69fb147423c1a938a786ddc09a16921fb6185f7cdb264066e21983a"
+          },
+          {
+            "callKey": "search-布囊",
+            "tool": "list_canonical_assets",
+            "bytes": 2211,
+            "parsedSha256": "8ae7af1e0776e5f716d04a0147670403ff8c3150a3f7f1708548dde627151975"
+          },
+          {
+            "callKey": "detail-P01",
+            "tool": "get_canonical_asset",
+            "bytes": 17035,
+            "parsedSha256": "5e72338ca10e59c122a46763ecc88a26af0466a6edda95bcfde25bb23b8150f6"
+          },
+          {
+            "callKey": "legacy-P01",
+            "tool": "list_fusion_production_assets",
+            "bytes": 1242,
+            "parsedSha256": "0a3e72f8c392254af1c589f3b8e4e0f970b7feeb826296c536d5d05a063a53d3"
+          },
+          {
+            "callKey": "panel-reference-ep01-0",
+            "tool": "list_fusion_panel_reference_resolutions",
+            "bytes": 315531,
+            "parsedSha256": "6fdc0b7a80f2115b414462522e3f235bd497a74c5fd2f861630ca32d5ecf24f6"
+          },
+          {
+            "callKey": "panel-reference-ep01-50",
+            "tool": "list_fusion_panel_reference_resolutions",
+            "bytes": 404961,
+            "parsedSha256": "57752e7f973d11a44db7240faa2e07647333a8a866e445dc06659a866a86a64b"
+          },
+          {
+            "callKey": "panel-reference-ep01-100",
+            "tool": "list_fusion_panel_reference_resolutions",
+            "bytes": 348723,
+            "parsedSha256": "ae66c5eeab56ab4a2c6f9a289d7284999d68fcd97a532fc3d8a8b087d59a8c0a"
+          }
+        ],
+        "callCount": 14,
+        "totalBytes": 1253900,
+        "largestResponseBytes": 404961,
+        "largestResponseCall": "panel-reference-ep01-50",
+        "maxStringBytes": 1552,
+        "responseLimitBytes": 1500000,
+        "stringLimitBytes": 262144,
+        "nonTextContentBlocks": 0,
+        "binaryValues": 0,
+        "embeddedMediaFields": 0,
+        "base64Payloads": 0
+      },
+      "responseFingerprints": {
+        "catalog-state": "96aea70a14d0383e9d2f185f78709eb3db510816aa03999a88434ca771c92adb",
+        "canonical-page-0": "ee0c9ef4e68bc4fbf5efb2aa14d2fbf1fa877e7c4e3f15be0c11735c07ac2ca2",
+        "canonical-page-13": "2a36d00a4d4e0566b5301108145711b7741259258749c2fcbbdcd1995ef9724b",
+        "canonical-page-70": "91ffd969597462732f1d33d205614f48e0849d0567940e8ba9fd8be531ff54b5",
+        "category-character": "5dca08dd88b8493bcc6ff837e49ffb6f92fcfcd03de1e826d0178a1a0d2f290c",
+        "category-scene": "460aa45993a83a73e4be244c69e6f8b3d172fc7318c4e5d61252550d1138b1b8",
+        "category-prop": "42ec72fa9b7fc4bb4e5f22572851439985d1c7d528e7f0295198e3d8628af0af",
+        "search-P01": "ff81c054e69fb147423c1a938a786ddc09a16921fb6185f7cdb264066e21983a",
+        "search-布囊": "8ae7af1e0776e5f716d04a0147670403ff8c3150a3f7f1708548dde627151975",
+        "detail-P01": "5e72338ca10e59c122a46763ecc88a26af0466a6edda95bcfde25bb23b8150f6",
+        "legacy-P01": "0a3e72f8c392254af1c589f3b8e4e0f970b7feeb826296c536d5d05a063a53d3",
+        "panel-reference-ep01-0": "6fdc0b7a80f2115b414462522e3f235bd497a74c5fd2f861630ca32d5ecf24f6",
+        "panel-reference-ep01-50": "57752e7f973d11a44db7240faa2e07647333a8a866e445dc06659a866a86a64b",
+        "panel-reference-ep01-100": "ae66c5eeab56ab4a2c6f9a289d7284999d68fcd97a532fc3d8a8b087d59a8c0a"
+      },
+      "parityFingerprint": "4278cfccd783d30b5ee9ce2fb0b1692404e2d604c109413d4b819aee9c45f748",
+      "serverStderr": {
+        "bytes": 169,
+        "retainedTailOnly": true,
+        "tail": [
+          "(node:91099) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)"
+        ]
+      },
+      "readOnlyToolsInvoked": [
+        "get_canonical_asset_catalog_state",
+        "list_canonical_assets",
+        "get_canonical_asset",
+        "list_fusion_production_assets",
+        "list_fusion_panel_reference_resolutions"
+      ],
+      "writeToolsInvoked": [],
+      "vendorBrowserOrGenerationInvoked": false,
+      "passed": true
+    }
+  ],
+  "parity": {
+    "sourceFingerprint": "4278cfccd783d30b5ee9ce2fb0b1692404e2d604c109413d4b819aee9c45f748",
+    "compiledFingerprint": "4278cfccd783d30b5ee9ce2fb0b1692404e2d604c109413d4b819aee9c45f748",
+    "responseFingerprintsEqual": true,
+    "passed": true
+  },
+  "writeToolsInvoked": [],
+  "vendorBrowserOrGenerationInvoked": false,
+  "p5CompletionClaimed": false,
+  "passed": true
+}

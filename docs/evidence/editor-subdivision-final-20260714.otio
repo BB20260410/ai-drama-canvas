@@ -1,0 +1,471 @@
+{
+  "OTIO_SCHEMA": "Timeline.1",
+  "name": "EP01 分割、Ripple 与贝塞尔验收",
+  "global_start_time": null,
+  "tracks": {
+    "OTIO_SCHEMA": "Stack.1",
+    "name": "tracks",
+    "source_range": null,
+    "effects": [],
+    "markers": [],
+    "children": [
+      {
+        "OTIO_SCHEMA": "Track.1",
+        "name": "主画面",
+        "kind": "Video",
+        "source_range": null,
+        "effects": [],
+        "markers": [],
+        "children": [
+          {
+            "OTIO_SCHEMA": "Clip.2",
+            "name": "EP01 EP01 15s 001 雾河建立镜头 · EP01_15s_001_v1.mp4",
+            "source_range": {
+              "OTIO_SCHEMA": "TimeRange.1",
+              "start_time": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 0,
+                "rate": 23.976023976023978
+              },
+              "duration": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 48,
+                "rate": 23.976023976023978
+              }
+            },
+            "media_reference": {
+              "OTIO_SCHEMA": "ExternalReference.1",
+              "target_url": "file:///var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-subdivision-ui-6qz5VM/EP01_15s_001_%E9%9B%BE%E6%B2%B3%E5%BB%BA%E7%AB%8B%E9%95%9C%E5%A4%B4/EP01_15s_001_v1.mp4",
+              "available_range": null,
+              "available_image_bounds": null,
+              "metadata": {}
+            },
+            "effects": [],
+            "markers": [],
+            "metadata": {
+              "aicanvas": {
+                "id": "clip-6fca731f-194b-41d5-89e7-6581a52b6e4a",
+                "trackId": "track-4f40759f-ee67-42a7-88e6-72781e19d22b",
+                "kind": "video",
+                "name": "EP01 EP01 15s 001 雾河建立镜头 · EP01_15s_001_v1.mp4",
+                "artifactId": "main-ep01-unit001-0a8b5303db64",
+                "itemId": "main-ep01-unit001",
+                "startSeconds": 0,
+                "durationSeconds": 2.002,
+                "trimStartSeconds": 0,
+                "playbackRate": 1,
+                "volume": 1,
+                "opacity": 1,
+                "muted": false,
+                "positionX": 0,
+                "positionY": 0,
+                "scale": 1,
+                "rotation": 0,
+                "filter": "none",
+                "filterIntensity": 1,
+                "keyframes": [],
+                "startFrame": 0,
+                "durationFrames": 48,
+                "trimStartFrame": 0,
+                "transitionOut": "cut",
+                "transitionDurationSeconds": 0.5
+              }
+            }
+          },
+          {
+            "OTIO_SCHEMA": "Clip.2",
+            "name": "EP01 EP01 15s 002 祭坛反应镜头 · EP01_15s_002_v1.mp4",
+            "source_range": {
+              "OTIO_SCHEMA": "TimeRange.1",
+              "start_time": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 0,
+                "rate": 23.976023976023978
+              },
+              "duration": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 48,
+                "rate": 23.976023976023978
+              }
+            },
+            "media_reference": {
+              "OTIO_SCHEMA": "ExternalReference.1",
+              "target_url": "file:///var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-subdivision-ui-6qz5VM/EP01_15s_002_%E7%A5%AD%E5%9D%9B%E5%8F%8D%E5%BA%94%E9%95%9C%E5%A4%B4/EP01_15s_002_v1.mp4",
+              "available_range": null,
+              "available_image_bounds": null,
+              "metadata": {}
+            },
+            "effects": [],
+            "markers": [],
+            "metadata": {
+              "aicanvas": {
+                "id": "clip-417ca0f4-b3a3-4a64-815e-3b9076a682ee",
+                "trackId": "track-4f40759f-ee67-42a7-88e6-72781e19d22b",
+                "kind": "video",
+                "name": "EP01 EP01 15s 002 祭坛反应镜头 · EP01_15s_002_v1.mp4",
+                "artifactId": "main-ep01-unit002-206b7488ff5e",
+                "itemId": "main-ep01-unit002",
+                "startSeconds": 2.002,
+                "durationSeconds": 2.002,
+                "trimStartSeconds": 0,
+                "playbackRate": 1,
+                "volume": 1,
+                "opacity": 1,
+                "muted": false,
+                "positionX": 0,
+                "positionY": 0,
+                "scale": 1,
+                "rotation": 0,
+                "filter": "none",
+                "filterIntensity": 1,
+                "keyframes": [],
+                "startFrame": 48,
+                "durationFrames": 48,
+                "trimStartFrame": 0,
+                "transitionOut": "cut",
+                "transitionDurationSeconds": 0.5
+              }
+            }
+          }
+        ],
+        "metadata": {
+          "aicanvas": {
+            "id": "track-4f40759f-ee67-42a7-88e6-72781e19d22b",
+            "kind": "visual",
+            "order": 0,
+            "locked": false,
+            "muted": false,
+            "hidden": false
+          }
+        }
+      },
+      {
+        "OTIO_SCHEMA": "Track.1",
+        "name": "贝塞尔画中画",
+        "kind": "Video",
+        "source_range": null,
+        "effects": [],
+        "markers": [],
+        "children": [
+          {
+            "OTIO_SCHEMA": "Gap.1",
+            "name": "Gap",
+            "source_range": {
+              "OTIO_SCHEMA": "TimeRange.1",
+              "start_time": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 0,
+                "rate": 23.976023976023978
+              },
+              "duration": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 6,
+                "rate": 23.976023976023978
+              }
+            },
+            "effects": [],
+            "markers": [],
+            "metadata": {}
+          },
+          {
+            "OTIO_SCHEMA": "Clip.2",
+            "name": "病态曲线分段 UI 覆盖层",
+            "source_range": {
+              "OTIO_SCHEMA": "TimeRange.1",
+              "start_time": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 0,
+                "rate": 23.976023976023978
+              },
+              "duration": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 7,
+                "rate": 23.976023976023978
+              }
+            },
+            "media_reference": {
+              "OTIO_SCHEMA": "ExternalReference.1",
+              "target_url": "file:///var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-subdivision-ui-6qz5VM/EP01_15s_001_%E9%9B%BE%E6%B2%B3%E5%BB%BA%E7%AB%8B%E9%95%9C%E5%A4%B4/EP01_15s_001_v1.mp4",
+              "available_range": null,
+              "available_image_bounds": null,
+              "metadata": {}
+            },
+            "effects": [],
+            "markers": [],
+            "metadata": {
+              "aicanvas": {
+                "id": "clip-ui-subdivision-overlay",
+                "trackId": "track-ui-subdivision-overlay",
+                "kind": "video",
+                "name": "病态曲线分段 UI 覆盖层",
+                "artifactId": "main-ep01-unit001-0a8b5303db64",
+                "itemId": "main-ep01-unit001",
+                "startSeconds": 0.25,
+                "durationSeconds": 0.292,
+                "trimStartSeconds": 0,
+                "playbackRate": 1,
+                "volume": 0,
+                "opacity": 0.92,
+                "muted": false,
+                "positionX": -120,
+                "positionY": -80,
+                "scale": 0.3,
+                "rotation": -6,
+                "filter": "none",
+                "filterIntensity": 1,
+                "keyframes": [
+                  {
+                    "id": "kf-ui-subdivision-start",
+                    "frame": 0,
+                    "timeSeconds": 0,
+                    "easing": "hold",
+                    "positionX": -120,
+                    "positionY": -80,
+                    "scale": 0.3,
+                    "rotation": -6
+                  },
+                  {
+                    "id": "kf-2a6e6b1e-4baf-4dd2-8019-3ba96a6ac8fc",
+                    "frame": 7,
+                    "timeSeconds": 0.292,
+                    "easing": "cubic_bezier",
+                    "bezier": {
+                      "x1": 0.389295698717362,
+                      "y1": 0,
+                      "x2": 0.719654842585897,
+                      "y2": 0.351048747638334,
+                      "mode": "derived_monotone",
+                      "sourceWindow": {
+                        "x1": 1,
+                        "y1": 0,
+                        "x2": 0,
+                        "y2": 1,
+                        "sourceEasing": "cubic_bezier",
+                        "startX": 0,
+                        "endX": 0.194444444444444,
+                        "startFrame": 0,
+                        "endFrame": 7,
+                        "totalFrames": 36
+                      }
+                    },
+                    "sourceTransform": {
+                      "start": {
+                        "positionX": -120,
+                        "positionY": -80,
+                        "scale": 0.3,
+                        "rotation": -6
+                      },
+                      "end": {
+                        "positionX": 120,
+                        "positionY": 80,
+                        "scale": 0.5,
+                        "rotation": 6
+                      }
+                    },
+                    "positionX": -116.082634423118,
+                    "positionY": -77.388422948745,
+                    "scale": 0.303264471314,
+                    "rotation": -5.804131721156
+                  }
+                ],
+                "startFrame": 6,
+                "durationFrames": 7,
+                "trimStartFrame": 0,
+                "transitionOut": "cut",
+                "transitionDurationSeconds": 0.5
+              }
+            }
+          },
+          {
+            "OTIO_SCHEMA": "Gap.1",
+            "name": "Gap",
+            "source_range": {
+              "OTIO_SCHEMA": "TimeRange.1",
+              "start_time": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 0,
+                "rate": 23.976023976023978
+              },
+              "duration": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 6,
+                "rate": 23.976023976023978
+              }
+            },
+            "effects": [],
+            "markers": [],
+            "metadata": {}
+          },
+          {
+            "OTIO_SCHEMA": "Clip.2",
+            "name": "病态曲线分段 UI 覆盖层 · 后段",
+            "source_range": {
+              "OTIO_SCHEMA": "TimeRange.1",
+              "start_time": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 13,
+                "rate": 23.976023976023978
+              },
+              "duration": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 17,
+                "rate": 23.976023976023978
+              }
+            },
+            "media_reference": {
+              "OTIO_SCHEMA": "ExternalReference.1",
+              "target_url": "file:///var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-subdivision-ui-6qz5VM/EP01_15s_001_%E9%9B%BE%E6%B2%B3%E5%BB%BA%E7%AB%8B%E9%95%9C%E5%A4%B4/EP01_15s_001_v1.mp4",
+              "available_range": null,
+              "available_image_bounds": null,
+              "metadata": {}
+            },
+            "effects": [],
+            "markers": [],
+            "metadata": {
+              "aicanvas": {
+                "id": "clip-ab218d7a-279b-4ea1-ae1c-795b4350be04",
+                "trackId": "track-ui-subdivision-overlay",
+                "kind": "video",
+                "name": "病态曲线分段 UI 覆盖层 · 后段",
+                "artifactId": "main-ep01-unit001-0a8b5303db64",
+                "itemId": "main-ep01-unit001",
+                "startSeconds": 0.792,
+                "durationSeconds": 0.709,
+                "trimStartSeconds": 0.542,
+                "playbackRate": 1,
+                "volume": 0,
+                "opacity": 0.92,
+                "muted": false,
+                "positionX": -100.779362568399,
+                "positionY": -67.186241712266,
+                "scale": 0.31601719786,
+                "rotation": -5.03896812842,
+                "filter": "none",
+                "filterIntensity": 1,
+                "keyframes": [
+                  {
+                    "id": "kf-8d13c9fa-997e-4c30-80fd-6e5377d01675",
+                    "frame": 17,
+                    "timeSeconds": 0.709,
+                    "easing": "cubic_bezier",
+                    "bezier": {
+                      "x1": 0.687901735342453,
+                      "y1": 0.24117731556075,
+                      "x2": -0.233106440771431,
+                      "y2": 0.900527061474848,
+                      "mode": "derived_monotone",
+                      "sourceWindow": {
+                        "x1": 1,
+                        "y1": 0,
+                        "x2": 0,
+                        "y2": 1,
+                        "sourceEasing": "cubic_bezier",
+                        "startX": 0.361111111111111,
+                        "endX": 0.833333333333333,
+                        "startFrame": 13,
+                        "endFrame": 30,
+                        "totalFrames": 36
+                      }
+                    },
+                    "sourceTransform": {
+                      "start": {
+                        "positionX": -120,
+                        "positionY": -80,
+                        "scale": 0.3,
+                        "rotation": -6
+                      },
+                      "end": {
+                        "positionX": 120,
+                        "positionY": 80,
+                        "scale": 0.5,
+                        "rotation": 6
+                      }
+                    },
+                    "positionX": 117.244483652534,
+                    "positionY": 78.162989101689,
+                    "scale": 0.497703736377,
+                    "rotation": 5.862224182627
+                  }
+                ],
+                "startFrame": 19,
+                "durationFrames": 17,
+                "trimStartFrame": 13,
+                "transitionOut": "cut",
+                "transitionDurationSeconds": 0.355,
+                "fadeInSeconds": 0,
+                "fadeOutSeconds": 0
+              }
+            }
+          }
+        ],
+        "metadata": {
+          "aicanvas": {
+            "id": "track-ui-subdivision-overlay",
+            "kind": "visual",
+            "order": 1,
+            "locked": false,
+            "muted": false,
+            "hidden": false
+          }
+        }
+      },
+      {
+        "OTIO_SCHEMA": "Track.1",
+        "name": "配音 _ 音乐",
+        "kind": "Audio",
+        "source_range": null,
+        "effects": [],
+        "markers": [],
+        "children": [],
+        "metadata": {
+          "aicanvas": {
+            "id": "track-130d292d-570d-41f1-96fb-9245accdaf80",
+            "kind": "audio",
+            "order": 2,
+            "locked": false,
+            "muted": false,
+            "hidden": false
+          }
+        }
+      },
+      {
+        "OTIO_SCHEMA": "Track.1",
+        "name": "字幕",
+        "kind": "Video",
+        "source_range": null,
+        "effects": [],
+        "markers": [],
+        "children": [],
+        "metadata": {
+          "aicanvas": {
+            "id": "track-1a0bf4e3-d0ed-4ce7-84c7-b8e8e06aa26c",
+            "kind": "subtitle",
+            "order": 3,
+            "locked": false,
+            "muted": false,
+            "hidden": false
+          }
+        }
+      }
+    ],
+    "metadata": {}
+  },
+  "metadata": {
+    "aicanvas": {
+      "schemaVersion": 1,
+      "projectId": "project-36178c88d000",
+      "editProjectId": "edit-796e9a81-7d8a-4475-8acd-6e79fab78c38",
+      "revision": 9,
+      "width": 540,
+      "height": 960,
+      "fps": 23.976,
+      "timebase": {
+        "rateNumerator": 24000,
+        "rateDenominator": 1001
+      },
+      "backgroundColor": "#000000",
+      "keyframeCurveContract": "aicanvas.cubic-bezier.v2",
+      "curvePortability": "aicanvas-private-metadata"
+    }
+  }
+}

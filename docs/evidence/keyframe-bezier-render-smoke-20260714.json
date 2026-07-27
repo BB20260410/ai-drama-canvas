@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-13T21:25:26.688Z",
+  "fixture": {
+    "kind": "isolated-synthetic",
+    "root": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-bezier-render-ZjfFpy",
+    "width": 320,
+    "height": 320,
+    "fps": 24,
+    "durationSeconds": 2,
+    "background": "black",
+    "overlay": "high-saturation-red"
+  },
+  "curve": {
+    "ownership": "destination-keyframe-controls-entering-segment",
+    "easing": "cubic_bezier",
+    "bezier": {
+      "x1": 0.25,
+      "y1": 0.1,
+      "x2": 0.25,
+      "y2": 1
+    },
+    "samples": [
+      {
+        "frame": 12,
+        "timeSeconds": 0.5,
+        "expectedTransform": {
+          "positionX": -18.297881728920828,
+          "positionY": 0,
+          "scale": 0.1,
+          "rotation": 0
+        },
+        "expectedCentroidX": 141.20211827107917,
+        "linearCentroidX": 109.5,
+        "measured": {
+          "pixels": 1024,
+          "centroid": {
+            "x": 141.5,
+            "y": 159.5
+          },
+          "bbox": {
+            "minX": 126,
+            "minY": 144,
+            "maxX": 157,
+            "maxY": 175,
+            "width": 32,
+            "height": 32
+          }
+        },
+        "errorPixels": 0.297881728920828,
+        "distanceFromLinearPixels": 32,
+        "file": {
+          "path": "/Users/hxx/Documents/无限画布/docs/evidence/keyframe-bezier-sample-f012-20260714.png",
+          "bytes": 1165,
+          "sha256": "4a954e1be00497df0eb29add6d00c055077d0569bd49ac78f8cb990bb7903615"
+        }
+      },
+      {
+        "frame": 24,
+        "timeSeconds": 1,
+        "expectedTransform": {
+          "positionX": 60.48067751697138,
+          "positionY": 0,
+          "scale": 0.1,
+          "rotation": 0
+        },
+        "expectedCentroidX": 219.98067751697138,
+        "linearCentroidX": 159.5,
+        "measured": {
+          "pixels": 1024,
+          "centroid": {
+            "x": 219.5,
+            "y": 159.5
+          },
+          "bbox": {
+            "minX": 204,
+            "minY": 144,
+            "maxX": 235,
+            "maxY": 175,
+            "width": 32,
+            "height": 32
+          }
+        },
+        "errorPixels": 0.48067751697138306,
+        "distanceFromLinearPixels": 60,
+        "file": {
+          "path": "/Users/hxx/Documents/无限画布/docs/evidence/keyframe-bezier-sample-f024-20260714.png",
+          "bytes": 1235,
+          "sha256": "b940243db2cd55b2240e4452f3c5fa9172165be59d29ed4e72da6659a2b080b8"
+        }
+      },
+      {
+        "frame": 36,
+        "timeSeconds": 1.5,
+        "expectedTransform": {
+          "positionX": 92.0917956697948,
+          "positionY": 0,
+          "scale": 0.1,
+          "rotation": 0
+        },
+        "expectedCentroidX": 251.5917956697948,
+        "linearCentroidX": 209.5,
+        "measured": {
+          "pixels": 1024,
+          "centroid": {
+            "x": 249.5,
+            "y": 159.5
+          },
+          "bbox": {
+            "minX": 234,
+            "minY": 144,
+            "maxX": 265,
+            "maxY": 175,
+            "width": 32,
+            "height": 32
+          }
+        },
+        "errorPixels": 2.0917956697948057,
+        "distanceFromLinearPixels": 40,
+        "file": {
+          "path": "/Users/hxx/Documents/无限画布/docs/evidence/keyframe-bezier-sample-f036-20260714.png",
+          "bytes": 1147,
+          "sha256": "6fbd56384e6bc9ac4b2c3cf27bf88b8737eb066b82f41f9cc977ccaa9cfa7898"
+        }
+      }
+    ]
+  },
+  "render": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/keyframe-bezier-render-20260714.mp4",
+    "bytes": 4281,
+    "sha256": "8701dd6dd65728a1d28d355e176bdc46bafef597bc008f1f21f4542a4db621a5",
+    "magic": "ftyp",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 320,
+          "height": 320,
+          "r_frame_rate": "24/1",
+          "nb_frames": "48"
+        }
+      ],
+      "format": {
+        "duration": "2.000000",
+        "size": "4281"
+      }
+    },
+    "job": {
+      "id": "render-afb75c57-126e-400a-bfa2-bc6d386dd64d",
+      "status": "succeeded",
+      "revision": 2,
+      "publicationReceiptId": "receipt-c1b989a2-a56a-4cc4-bac7-4ce95fdcd1cd"
+    }
+  },
+  "persistence": {
+    "savedRevision": 2,
+    "otio": {
+      "path": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-bezier-render-ZjfFpy/.aicanvas/editor/otio/cubic-bezier 真实渲染验收_r2_1783977926167.otio",
+      "contract": "aicanvas.cubic-bezier.v1",
+      "portability": "aicanvas-private-metadata",
+      "importedCurve": {
+        "id": "kf-bezier-real-end",
+        "timeSeconds": 2,
+        "easing": "cubic_bezier",
+        "bezier": {
+          "x1": 0.25,
+          "y1": 0.1,
+          "x2": 0.25,
+          "y2": 1
+        },
+        "positionX": 100,
+        "positionY": 0,
+        "scale": 0.1,
+        "rotation": 0,
+        "frame": 48
+      }
+    }
+  },
+  "publication": {
+    "receipts": [
+      {
+        "id": "receipt-c1b989a2-a56a-4cc4-bac7-4ce95fdcd1cd",
+        "sha256": "8701dd6dd65728a1d28d355e176bdc46bafef597bc008f1f21f4542a4db621a5",
+        "bytes": 4281,
+        "targetPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-bezier-render-ZjfFpy/cubic-bezier 真实渲染验收_20260713T212526390Z_v002.mp4"
+      }
+    ]
+  },
+  "terminal": {
+    "machineActiveWeight": 0,
+    "machineQueueDepth": 0,
+    "projectLockFiles": []
+  },
+  "sourceHashes": {
+    "src/core/keyframe-curve.ts": "dabf66146c642040d1419e11393e2d39461fe2b224ae4037bc04a6d7936172f6",
+    "src/core/editor.ts": "39c537e526ab22249468da1fdab93a4157550e670a731f31a307156fda6fc72f",
+    "src/core/types.ts": "242db9042cfd70a5b02c4239ad8ba52f9ed66ba7625281e1a468b78477790134",
+    "src/mcp/server.ts": "f15d6de5c9aad86caa4c94ca7e08db52211e2d718f827ca8ceb3a9ad8e743d7c",
+    "src/renderer/src/components/VideoEditorView.vue": "1f0fbeaf44358e33e4dbaec13788a805bc48a002921dd4e0f1bf23d199105e69"
+  }
+}

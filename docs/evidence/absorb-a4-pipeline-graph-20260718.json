@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "kind": "absorb-a4-pipeline-graph",
+  "status": "pass",
+  "createdAt": "2026-07-18T07:05:00.000Z",
+  "slice": "A4",
+  "files": [
+    "src/core/studio-canvas-pipeline-graph.ts",
+    "src/renderer/src/components/ManagedStudioCanvasView.vue",
+    "tests/studio-canvas-pipeline-graph.test.ts"
+  ],
+  "behavior": [
+    "buildStudioCanvasPipelineGraph bounded ≤6 panels",
+    "assertStudioCanvasUnitsPageBounded ≤36",
+    "nodes carry locator/flags only (no sha/localPath)",
+    "selectUnit applies pipeline panel positions into layout merge"
+  ]
+}

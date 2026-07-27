@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "kind": "goal-desktop-mcp-lock-generate-writeback",
+  "createdAt": "2026-07-18T09:10:00.000Z",
+  "conclusion": "已完成",
+  "objective": "桌面看片整理审片 + MCP 同项目读锁 + agent 生图写回 + 无需懂库/粘贴全书",
+  "acceptance": {
+    "desktopReview": "pass — Material Studio 画布/驾驶舱/Binding/Review 入口；有界投影 + 权威缩略图",
+    "mcpSameProject": "pass — get_managed_studio_overview / dashboard / binding / generation control / list assets & prompts",
+    "lockedInputs": "pass — freeze pack 含人物/场景/道具权威 SHA + 冻结提示词；歧义不偷选",
+    "writebackVisible": "pass — register 后 history 可见；漂移 inputCurrent=false promotionEligible=false",
+    "noDbNoPasteBook": "pass — MCP Prompt managed_studio_lock_generate_writeback + skill managed-studio-agent-loop"
+  },
+  "verification": {
+    "desktopContractLog": "SCRATCH/desktop-contract.log",
+    "mcpSameProjectLog": "SCRATCH/mcp-same-project.log",
+    "writebackLoopLog": "SCRATCH/writeback-loop.log",
+    "promptsList": "SCRATCH/prompts-list.json",
+    "electronLaunch": "SCRATCH/electron-launch.log",
+    "electronEvidence": "docs/evidence/deep-absorb-ui-smoke-20260718-mrq5bd6f.json",
+    "committedTests": [
+      "tests/goal-managed-studio-loop.test.ts",
+      "tests/studio-production-dashboard.test.ts",
+      "tests/managed-studio-canvas-ui.test.ts",
+      "tests/mcp-managed-studio.test.ts"
+    ]
+  },
+  "electronSmokeHighlights": {
+    "materialStudioVisible": true,
+    "canvasCustomNodes": 6,
+    "canvasThumbNodes": 3,
+    "canvasScriptOrPromptNodes": 2,
+    "unitNodeClicked": true,
+    "panelNodeClicked": true,
+    "nodeActionPanelVisible": true,
+    "bindingWorkbenchVisible": true
+  },
+  "implementationDelta": [
+    "src/mcp/server.ts — registerPrompt managed_studio_lock_generate_writeback",
+    ".grok/skills/managed-studio-agent-loop/SKILL.md",
+    "tests/goal-managed-studio-loop.test.ts",
+    ".grok/skills/ai-drama-canvas-agent/SKILL.md — 终态环指针"
+  ]
+}

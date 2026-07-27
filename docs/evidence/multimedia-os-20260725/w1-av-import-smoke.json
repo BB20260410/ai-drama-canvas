@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "kind": "w1-av-import-smoke",
+  "projectRoot": "/Users/hxx/Documents/无限画布/projects/grok-mvp-qingdeng-mrwc97mu-d0aea463",
+  "createdAt": "2026-07-25T08:33:04.174Z",
+  "video": {
+    "sha256": "0d5689ea1ff567abcc2a01acf637591efa0c81efeb02ddd1420d4012ed2bf47c",
+    "kind": "video",
+    "mimeType": "video/mp4",
+    "hasThumbnail": false
+  },
+  "audio": {
+    "sha256": "26c3df3ba7fed590de56f4766ac03c48342dddf27f707639fad16a11bab46dc9",
+    "kind": "audio",
+    "mimeType": "audio/wav"
+  },
+  "videoDerivatives": {
+    "status": "ready",
+    "derivativeCount": 2
+  },
+  "audioDerivatives": {
+    "status": "ready",
+    "derivativeCount": 1
+  },
+  "list": {
+    "totalReturned": 9,
+    "byKind": {
+      "image": 7,
+      "video": 1,
+      "audio": 1,
+      "other": 0
+    },
+    "videoHits": [
+      {
+        "sha256": "0d5689ea1ff567abcc2a01acf637591efa0c81efeb02ddd1420d4012ed2bf47c",
+        "kind": "video",
+        "mimeType": "video/mp4"
+      }
+    ],
+    "audioHits": [
+      {
+        "sha256": "26c3df3ba7fed590de56f4766ac03c48342dddf27f707639fad16a11bab46dc9",
+        "kind": "audio",
+        "mimeType": "audio/wav"
+      }
+    ],
+    "videoFound": true,
+    "audioFound": true
+  },
+  "pass": true
+}

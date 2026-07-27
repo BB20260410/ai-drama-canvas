@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 2,
+  "kind": "p9-scale-fixture-evidence",
+  "status": "pass",
+  "createdAt": "2026-07-18T05:41:56.467Z",
+  "durationMs": 62734,
+  "requested": {
+    "unitCount": 1288,
+    "assetCount": 77,
+    "mediaMetaCount": 100,
+    "expectedPanels": 4235,
+    "seedProductionPath": true,
+    "realAvDerivatives": true
+  },
+  "observed": {
+    "units": 1288,
+    "panels": 4235,
+    "assets": 77,
+    "media": 191,
+    "assetBindingSets": 6,
+    "productionPath": {
+      "unitId": "p9-unit-0001",
+      "panelCount": 6,
+      "bindingSets": 6,
+      "continuityReady": true,
+      "generationRuns": 6,
+      "reviews": 6,
+      "videoDerivativesReady": 2,
+      "audioDerivativesReady": 1
+    }
+  },
+  "dashboard": {
+    "overviewFingerprint": "c801bde166093a627af708c445bbc497cc2cf49ff975f4560f29a2fad6641d1a",
+    "unitsPageSize": 36,
+    "unitsHardCap": 36,
+    "panels": 4235,
+    "panelsEstimated": 4235,
+    "panelsExactMatch": true
+  },
+  "mediaQuality": {
+    "imageWidth": 64,
+    "imageHeight": 96,
+    "realVideoCount": 1,
+    "realAudioCount": 1,
+    "placeholderSignatureOnly": false
+  },
+  "productionPath": {
+    "unitId": "p9-unit-0001",
+    "panelCount": 6,
+    "bindingSets": 6,
+    "continuityReady": true,
+    "generationRuns": 6,
+    "reviews": 6,
+    "videoDerivativesReady": 2,
+    "audioDerivativesReady": 1
+  },
+  "preflight": {
+    "schemaVersion": 1,
+    "kind": "studio-disk-preflight",
+    "projectRoot": "/private/tmp/p9-scale-full-f7utZZ/p9-scale-af6bc726-dcccfaa1",
+    "projectId": "project-e07f880bccad",
+    "filesystem": {
+      "totalBytes": 1995165736960,
+      "freeBytes": 713968758784,
+      "availableBytes": 713968758784
+    },
+    "memory": {
+      "totalBytes": 137438953472,
+      "freeBytes": 25483902976
+    },
+    "blocked": false,
+    "blockers": [],
+    "fingerprint": "f07d90b56e080a9b3e3f10d8504f980c771dc64229f8869e17107ed323d1c9c8"
+  },
+  "scaleProbe": {
+    "schemaVersion": 1,
+    "kind": "studio-scale-probe",
+    "projectRoot": "/private/tmp/p9-scale-full-f7utZZ/p9-scale-af6bc726-dcccfaa1",
+    "projectId": "project-e07f880bccad",
+    "counts": {
+      "units": 1288,
+      "canonicalAssets": 77,
+      "media": 191,
+      "assetBindingSets": 6
+    },
+    "dashboard": {
+      "overviewFingerprint": "c801bde166093a627af708c445bbc497cc2cf49ff975f4560f29a2fad6641d1a",
+      "unitsPageSize": 36,
+      "unitsHardCap": 36
+    },
+    "fingerprint": "d090a9aa7c8bb4ffe48933f16f2700e0b71a75b94556a98ace3e671704da5d44"
+  },
+  "gcDryRun": {
+    "scannedObjects": 191,
+    "candidateCount": 0,
+    "fingerprint": "08db09a574bfb9e91daf376401caac810c31dcd91b4f2a835f947e2f4a6a06a1"
+  },
+  "gates": {
+    "exactPanelCount": true,
+    "productionPathNonZero": true,
+    "realDecodableMedia": true
+  },
+  "boundaries": {
+    "formalImageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "formalStudioUntouched": true,
+    "realImagegenCanary": false
+  },
+  "notes": [
+    "panels 为 studio_production_units.panel_count 的 SQL SUM，非首屏抽样。",
+    "图片为 sharp 真 PNG；视频/音频在 ffmpeg 可用时生成并物化派生。",
+    "首单元 6 宫格含 BindingSet、九字段、freeze/dispatch/register/Review。"
+  ]
+}

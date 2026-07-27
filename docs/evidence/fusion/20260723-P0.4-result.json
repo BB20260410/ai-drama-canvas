@@ -1,0 +1,13 @@
+{
+  "aspect": "P0.4",
+  "status": "PASS",
+  "strategy": "CLEAN_ROOM",
+  "sources": {
+    "peer": ".tmp-competitor-study/huobao-drama/backend/src/services/grid-split.ts",
+    "ours": "src/core/studio-grid-split.ts"
+  },
+  "commands": [
+    {"cmd": "npx vitest run tests/studio-grid-split.test.ts", "result": "PASS", "tests": 4}
+  ],
+  "usefulness": "给定宽高与行列，可算出无重叠宫格矩形并映射到 1-based 序号，供后续 Sharp 裁切与 quarantine 登记"
+}

@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "kind": "t23-layer4-project-ui-verify",
+  "createdAt": "2026-07-25T09:35:21.637Z",
+  "ok": true,
+  "mode": "installed",
+  "project": {
+    "id": "project-c78607fac2a4",
+    "name": "Grok最小受管生图闭环-青灯客",
+    "root": "/Users/hxx/Documents/无限画布/projects/grok-mvp-qingdeng-mrwc97mu-d0aea463"
+  },
+  "expectations": {
+    "expectUnits": 1
+  },
+  "timings": {
+    "launchToStudioViewMs": 1033,
+    "launchToFirstUnitNodeMs": 1360,
+    "totalMs": 1996,
+    "firstUnitNodeSoftBudgetMs": 1500
+  },
+  "assertions": [
+    {
+      "id": "a-startup-managed-canvas",
+      "title": "应用启动后直达受管工程画布（非首启/默认页）",
+      "status": "PASS",
+      "detail": "直达「Grok最小受管生图闭环-青灯客」受管画布，url=file:///Applications/AI%20%E6%BC%AB%E5%89%A7%E7%94%BB%E5%B8%83.app/Contents/Resources/app.asar/out/renderer/index.html",
+      "durationMs": 707
+    },
+    {
+      "id": "b-timeline-units",
+      "title": "时间线渲染工程单元且双编号至少命中一个",
+      "status": "PASS",
+      "detail": "指标单元数=1，期望=1；首屏渲染单元节点 1 个；双编号命中",
+      "durationMs": 268
+    },
+    {
+      "id": "c-media-load",
+      "title": "媒体加载失败数=0（aicanvas-studio: 协议失败 / HTTP≥400 / img 解码失败）",
+      "status": "PASS",
+      "detail": "aicanvas-studio 请求 3 次，失败 0",
+      "durationMs": 4
+    },
+    {
+      "id": "e-screenshot-nonblank",
+      "title": "截图落盘且 sharp 方差校验防空白",
+      "status": "PASS",
+      "detail": "3456×2054，656590B，stdev=45.27",
+      "durationMs": 178
+    },
+    {
+      "id": "f-perf-first-screen",
+      "title": "首屏到首批单元卡渲染耗时（软目标 ≤1500ms，超时 WARN 不 FAIL）",
+      "status": "PASS",
+      "detail": "launch→material-studio-view 1033ms；launch→首个单元卡 1360ms"
+    },
+    {
+      "id": "g-build-identity",
+      "title": "构建身份/指纹展示读取（无展示则 SKIP）",
+      "status": "PASS",
+      "detail": "来源=data-testid，值=构建身份 v0.2.0 · buildId:b5d5329c4e52 · sourceDigest:74131e9fab43"
+    },
+    {
+      "id": "d-console-clean",
+      "title": "页面 console error=0（良性名单可配置）且 pageerror=0",
+      "status": "PASS",
+      "detail": "原始 console error 0 条，忽略 0 条后 0"
+    },
+    {
+      "id": "h-readonly-guard",
+      "title": "只读护栏：工程哨兵文件哈希全程不变",
+      "status": "PASS",
+      "detail": "比对 .aicanvas/studio-canvas-layout.json、.aicanvas/studio-production.sqlite、.aicanvas/managed-project.json 哈希一致"
+    }
+  ],
+  "media": {
+    "studioRequests": 3,
+    "failures": []
+  },
+  "console": {
+    "rawErrors": [],
+    "ignoredErrors": [],
+    "effectiveErrors": [],
+    "pageErrors": []
+  },
+  "network": {
+    "externalRequests": []
+  },
+  "screenshot": {
+    "sha256": "07ad66965f610adaa9c7e35557ebb450daace8610b5f22b0d2046fcfdb8ffd62",
+    "sizeBytes": 656590,
+    "width": 3456,
+    "height": 2054,
+    "maxChannelStandardDeviation": 45.265281728334074,
+    "path": "docs/evidence/followup-20260725/t23-ui/t23-layer4-installed-2026-07-25T09-35-19-641Z.png"
+  },
+  "warnings": [],
+  "boundaries": {
+    "readonlyJourney": true,
+    "writeButtonClicks": 0,
+    "executeCommandWrites": 0,
+    "viewportMoves": 0,
+    "isolatedUserData": true,
+    "isolatedRegistryCopy": true,
+    "isolatedManagedProjectsRoot": true,
+    "isolatedMediaRuntime": true,
+    "isolatedRuntimeCleaned": true,
+    "formalProjectWrites": 0,
+    "buildPerformedByScript": false,
+    "gitActions": 0
+  }
+}

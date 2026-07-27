@@ -1,0 +1,51 @@
+{
+  "url": "file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/out/renderer/index.html",
+  "loading": false,
+  "visible": true,
+  "bounds": {
+    "x": 84,
+    "y": 33,
+    "width": 1560,
+    "height": 980
+  },
+  "rendererState": {
+    "readyState": "complete",
+    "title": "AI 漫剧画布",
+    "bodyText": "AI\n漫剧画布\n\n雾河来客 · 小说自动分镜验收\n\n15 秒单元\n4\n待续做\n4\n首尾帧\n0 / 0\n视频\n0\n10:32 · 29ms\n项目\n扫描\n生产画布\n故事图谱\n自动改编\n生产设计\n分集剧本\n单元清单\n镜头时间线\n导演剪辑台\n资产库\n视频工作台\n导演验收\nCodex 接续\n生成队列\n任务中心\n项目设置\n分集\n1\n全部分集\nEP01\n显示原镜头\n显示资产节点\n显示小说叙事链\n生产状态\n清除\n待首帧\n4\n文件监听已开启\n/tmp/ai-canvas-novel-storyboard-final\n批注\n分组\n连线\n01\n剧本\n0\n02\n硬锁资产\n0\n小说原文\n原文 1\n\nsource-adabfc859208b7af\n\n11 个可视事件\n小说事实\n清晨，阿航穿着黑袍走进雾河边的古老祭坛，浓雾贴着石阶缓慢流动。\n\n原文确认\n\nfact-ef1426cfae013a6a · R1\n小说事实\n门后的黑暗里传来脚步声。\n\n原文确认\n\nfact-58a777285cda26ef · R1\n小说事实\n嘟嘟举起火把，阿航将完整黄金面具护在胸前。\n\n原文确认\n\nfact-5742ca19c1481a5b · R1\n小说事实\n嘟嘟守在门外，低声说：“别碰那副完整黄金面具。”\n\n原文确认\n\nfact-c014d6aca830d377 · R1\n小说事实\n两人沿着右侧石壁前进，始终没有跨过中央裂缝。\n\n原文确认\n\nfact-7d3435591944ee90 · R1\n小说事实\n远处，一个披着祭司袍的人影停在雾中。\n\n原文确认\n\nfact-8b26af8c2b9884d7 · R1\n小说事实\n阿航想起师父的警告：完整黄金面具不得改成半面具，也不能遮掉一半脸。\n\n原文确认\n\nfact-b63a9345d6c6a4f5 · R1\n小说事实\n忽然火光熄灭，水声从地底传来。\n\n原文确认\n\nfact-66957d091a1f1e35 · R1\n小说事实\n阿航心中害怕，却仍伸手拿起黄金面具。\n\n原文确认\n\nfact-1fac73386cad2e62 · R1\n剧情节拍\n01 · 清晨，阿航穿着黑袍走进雾河边的古老祭坛，浓雾贴着石阶缓慢流动。\n\n推进已证实事件\n\n4.0s · 强度 2/5\n剧情节拍\n02 · 嘟嘟守在门外，低声说：“别碰那副完整黄金面具。”\n\n通过对白推进人物关系与信息\n\n6.5s · 强度 2/5\n剧情节拍\n03 · 阿航想起师父的警告：完整黄金面具不得改成半面具，也不能遮掉一半脸。\n\n推进已证实事件\n\n4.0s · 强度 2/5\n剧情节拍\n04 · 忽然火光熄灭，水声从地底传来。\n\n推进已证实事件\n\n4.0s · 强度 2/5\n剧情节拍\n05 · 阿航心中害怕，却仍伸手拿起黄金面具。\n\n推进已证实事件\n\n4.0s · 强度 2/5\n剧情节拍\n06 · 石门轰然关闭，嘟嘟冲进祭坛。\n\n推动冲突或转折\n\n4.0s · 强度 4/5\n剧情节拍\n07 · 阿航回头看向她，面具表面的金光照亮两人的脸。\n\n推进已证实事件\n\n4.0s · 强度 2/5\n剧情节拍\n08 · 门后的黑暗里传来脚步声。\n\n推进已证实事件\n\n4.0s · 强度 2/5\n剧情节拍\n09 · 嘟嘟举起火把，阿航将完整黄金面具护在胸前。\n\n推进已证实事件\n\n4.0s · 强度 2/5\n改编方案\n精简模式\n\n1 个 15 秒单元 · 6 镜\n\ndraft · 0 硬错误\n改编方案\n拆分模式\n\n4 个 15 秒单元 · 11 镜\n\nmaterialized · 0 硬错误\n29 个可见节点\n缩放 62%\n选择一个节点\n查看提示词、文件路径、版本与验收结果",
+    "bodyWidth": 1560,
+    "bodyHeight": 980,
+    "viewport": {
+      "width": 1560,
+      "height": 980,
+      "scrollWidth": 1560,
+      "scrollHeight": 980,
+      "canScrollX": false,
+      "canScrollY": false
+    },
+    "visibleRegions": {
+      ".adaptation-header": null,
+      ".adaptation-toolbar": null,
+      ".adaptation-grid": null,
+      ".facts-pane": null,
+      ".beats-pane": null,
+      ".plan-pane": null
+    },
+    "moduleButtons": [
+      "生产画布",
+      "故事图谱",
+      "自动改编",
+      "生产设计",
+      "分集剧本",
+      "单元清单",
+      "镜头时间线",
+      "导演剪辑台",
+      "资产库",
+      "视频工作台",
+      "导演验收",
+      "Codex 接续",
+      "生成队列",
+      "任务中心",
+      "项目设置"
+    ]
+  }
+}

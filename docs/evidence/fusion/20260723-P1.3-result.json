@@ -1,0 +1,15 @@
+{
+  "aspect": "P1.3",
+  "status": "PASS",
+  "strategy": "CLEAN_ROOM",
+  "peer": "Shotbuddy SH010/020 intercalation",
+  "ours": "src/core/studio-shot-numbering.ts",
+  "commands": [
+    {
+      "cmd": "npx vitest run tests/studio-shot-numbering.test.ts",
+      "result": "PASS",
+      "tests": 7
+    }
+  ],
+  "usefulness": "镜号 10/20 间可插 15；相邻无空隙 fail-close；nextShotNumber 步进追加"
+}

@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "kind": "t23-layer4-project-ui-verify",
+  "createdAt": "2026-07-26T03:25:33.771Z",
+  "ok": false,
+  "mode": "dev",
+  "project": {
+    "id": "project-b3e5fa60bbcd",
+    "name": "《嘟嘟》世界观概念序章",
+    "root": "/Users/hxx/Documents/无限画布/projects/local-import-dudu-world-prologue-b8bfcf14"
+  },
+  "expectations": {
+    "derivedUnits": 1
+  },
+  "timings": {
+    "totalMs": 63675,
+    "firstUnitNodeSoftBudgetMs": 1500
+  },
+  "assertions": [
+    {
+      "id": "a-startup-managed-canvas",
+      "title": "应用启动后直达受管工程画布（非首启/默认页）",
+      "status": "FAIL",
+      "detail": "locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"material-studio-view\"]') to be visible\u001b[22m\n",
+      "durationMs": 60002
+    },
+    {
+      "id": "x-infrastructure",
+      "title": "基础设施/旅程执行",
+      "status": "FAIL",
+      "detail": "启动断言失败，后续 UI 断言无意义，提前终止旅程。；dev 日志尾：onment for development...\ntransforming...\n✓ 1 modules transformed.\nrendering chunks...\nout/preload/index.mjs  31.10 kB\n✓ built in 11ms\n\nelectron preload scripts built successfully\n\n-----\n\ndev server running for the electron renderer process at:\n\n  ➜  Local:   http://localhost:5173/\n  ➜  Network: use --host to expose\n\nstarting electron app...\n\n\nDevTools listening on ws://127.0.0.1:63459/devtools/browser/8f6d8c82-e7c1-48bb-afb6-138715e20fe0\n[canvas-outbox] 启动重放被运行时写闸门拒绝或失败： RUNTIME_RESTART_REQUIRED（background:canvas-projection-outbox-startup-replay）：源码或运行工件已在本进程启动后变化；为保护正式工程，写入已拒绝。请重启源码无限画布后重试。\n"
+    },
+    {
+      "id": "d-console-clean",
+      "title": "页面 console error=0（良性名单可配置）且 pageerror=0",
+      "status": "PASS",
+      "detail": "原始 console error 0 条，忽略 0 条后 0"
+    },
+    {
+      "id": "h-readonly-guard",
+      "title": "只读护栏：存在的六项候选工程哨兵 SHA-256、bytes、mtime 全程不变",
+      "status": "PASS",
+      "detail": "逐项复核 .aicanvas/managed-project.json[sha256=68b4747ca2c8…,bytes=1414,mtimeMs=1784988532217]；.aicanvas/project.json[sha256=0294f210f97a…,bytes=831,mtimeMs=1784988532077]；.aicanvas/studio-production.sqlite[sha256=74c53995dcf2…,bytes=557056,mtimeMs=1785035952824]；.aicanvas/studio-generation-ledger.sqlite[sha256=8ba7dcfd1c72…,bytes=323584,mtimeMs=1784988532362]；.aicanvas/material-studio.sqlite[sha256=78f890cfe523…,bytes=577536,mtimeMs=1785035958117]；mtime 精度=integer-millisecond"
+    },
+    {
+      "id": "h2-readonly-full-tree",
+      "title": "只读护栏：正式工程全树元数据与关键数据库内容 SHA 不变",
+      "status": "PASS",
+      "detail": "814 项全树节点未变化"
+    }
+  ],
+  "media": {
+    "studioRequests": 0,
+    "failures": []
+  },
+  "console": {
+    "rawErrors": [],
+    "ignoredErrors": [],
+    "effectiveErrors": [],
+    "pageErrors": []
+  },
+  "network": {
+    "externalRequests": []
+  },
+  "readonlySentinels": {
+    "ok": true,
+    "candidateRelativePaths": [
+      ".aicanvas/managed-project.json",
+      ".aicanvas/project.json",
+      ".aicanvas/studio-production.sqlite",
+      ".aicanvas/studio-generation-ledger.sqlite",
+      ".aicanvas/material-studio.sqlite",
+      ".aicanvas/studio-canvas-layout.json"
+    ],
+    "includedExistingCount": 5,
+    "mtimePrecision": "integer-millisecond",
+    "items": [
+      {
+        "relativePath": ".aicanvas/managed-project.json",
+        "status": "PASS",
+        "changedFields": [],
+        "before": {
+          "relativePath": ".aicanvas/managed-project.json",
+          "exists": true,
+          "bytes": 1414,
+          "mtimeMs": 1784988532217,
+          "sha256": "68b4747ca2c83db5a77eeb574c2e8fcb0364e4b3457e987a314cd9eaeea9b5ac"
+        },
+        "after": {
+          "relativePath": ".aicanvas/managed-project.json",
+          "exists": true,
+          "bytes": 1414,
+          "mtimeMs": 1784988532217,
+          "sha256": "68b4747ca2c83db5a77eeb574c2e8fcb0364e4b3457e987a314cd9eaeea9b5ac"
+        }
+      },
+      {
+        "relativePath": ".aicanvas/project.json",
+        "status": "PASS",
+        "changedFields": [],
+        "before": {
+          "relativePath": ".aicanvas/project.json",
+          "exists": true,
+          "bytes": 831,
+          "mtimeMs": 1784988532077,
+          "sha256": "0294f210f97ad4a76c90f293c089f0ea8eac9c442f621e4c94b2c2dbbe1cddfa"
+        },
+        "after": {
+          "relativePath": ".aicanvas/project.json",
+          "exists": true,
+          "bytes": 831,
+          "mtimeMs": 1784988532077,
+          "sha256": "0294f210f97ad4a76c90f293c089f0ea8eac9c442f621e4c94b2c2dbbe1cddfa"
+        }
+      },
+      {
+        "relativePath": ".aicanvas/studio-production.sqlite",
+        "status": "PASS",
+        "changedFields": [],
+        "before": {
+          "relativePath": ".aicanvas/studio-production.sqlite",
+          "exists": true,
+          "bytes": 557056,
+          "mtimeMs": 1785035952824,
+          "sha256": "74c53995dcf22e7e94a5a21b2169231bd9fc0b2a4ec16fe3db9a9f18d223c590"
+        },
+        "after": {
+          "relativePath": ".aicanvas/studio-production.sqlite",
+          "exists": true,
+          "bytes": 557056,
+          "mtimeMs": 1785035952824,
+          "sha256": "74c53995dcf22e7e94a5a21b2169231bd9fc0b2a4ec16fe3db9a9f18d223c590"
+        }
+      },
+      {
+        "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+        "status": "PASS",
+        "changedFields": [],
+        "before": {
+          "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+          "exists": true,
+          "bytes": 323584,
+          "mtimeMs": 1784988532362,
+          "sha256": "8ba7dcfd1c72e87894bd553913b4117a1b585bbd330b3c62fe55d92f14a2a1f9"
+        },
+        "after": {
+          "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+          "exists": true,
+          "bytes": 323584,
+          "mtimeMs": 1784988532362,
+          "sha256": "8ba7dcfd1c72e87894bd553913b4117a1b585bbd330b3c62fe55d92f14a2a1f9"
+        }
+      },
+      {
+        "relativePath": ".aicanvas/material-studio.sqlite",
+        "status": "PASS",
+        "changedFields": [],
+        "before": {
+          "relativePath": ".aicanvas/material-studio.sqlite",
+          "exists": true,
+          "bytes": 577536,
+          "mtimeMs": 1785035958117,
+          "sha256": "78f890cfe5239ee17175d4febaa26f64076490ceec3d1433764e637bfe3cee38"
+        },
+        "after": {
+          "relativePath": ".aicanvas/material-studio.sqlite",
+          "exists": true,
+          "bytes": 577536,
+          "mtimeMs": 1785035958117,
+          "sha256": "78f890cfe5239ee17175d4febaa26f64076490ceec3d1433764e637bfe3cee38"
+        }
+      }
+    ]
+  },
+  "readonlyProjectTree": {
+    "ok": true,
+    "beforeFingerprint": "bd060dd8279709b8cd5740e7d0226274106170a18686daead8f7480cab148fdc",
+    "afterFingerprint": "bd060dd8279709b8cd5740e7d0226274106170a18686daead8f7480cab148fdc",
+    "beforeEntryCount": 814,
+    "afterEntryCount": 814,
+    "changedPaths": [],
+    "addedPaths": [],
+    "removedPaths": [],
+    "criticalContentChangedPaths": []
+  },
+  "warnings": [],
+  "boundaries": {
+    "readonlyJourney": true,
+    "writeButtonClicks": 0,
+    "executeCommandWrites": 0,
+    "viewportMoves": 0,
+    "isolatedUserData": true,
+    "isolatedRegistryCopy": true,
+    "isolatedProjectCopy": true,
+    "isolatedManagedProjectsRoot": true,
+    "isolatedMediaRuntime": true,
+    "isolatedRuntimeCleaned": true,
+    "formalProjectWrites": 0,
+    "buildPerformedByScript": false,
+    "gitActions": 0
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "live-tree-post-closeout-typecheck",
+  "status": "fail",
+  "startedAt": "2026-07-18T08:22:47.364Z",
+  "endedAt": "2026-07-18T08:22:58.869Z",
+  "durationMs": 11550,
+  "argv": [
+    "npm",
+    "run",
+    "typecheck"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": false,
+  "buildIdentity": {
+    "before": {
+      "buildId": "d2a6604aae4bdcf724a6f9635ec4587c",
+      "sourceDigest": "611deee534ffe90aef006628b6641f52ace41043666f80c6b5e71b4e2863abc2"
+    },
+    "after": {
+      "buildId": "92f7a91674b98ff82c34f9243f1e2fe8",
+      "sourceDigest": "cb9c1208d1165ba5358e62d6bae7903ca42fb8e42d626062429b113757509b2d"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/runs/live-tree-post-closeout-typecheck-20260718.log",
+    "sizeBytes": 114,
+    "sha256": "8aca887056e876fdc407b955daffd0b0a5dec0c074cd623f6decb7a214530132"
+  }
+}

@@ -1,0 +1,284 @@
+{
+  "schemaVersion": 1,
+  "kind": "semantic-grid-asset-order-final-validation",
+  "status": "passed-with-expected-external-blocker",
+  "createdAt": "2026-07-15T16:41:15.014Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "sourceContentAddress": "sha256:f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+  "sourceBoundary": {
+    "mode": "read-only",
+    "fullDirectory": {
+      "before": {
+        "files": 3344,
+        "bytes": 24570877,
+        "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+      },
+      "after": {
+        "files": 3344,
+        "bytes": 24570877,
+        "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+      },
+      "unchanged": true
+    },
+    "controlledFusionInputs": {
+      "before": {
+        "files": 1354,
+        "bytes": 14093144,
+        "aggregateSha256": "f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c"
+      },
+      "after": {
+        "files": 1354,
+        "bytes": 14093144,
+        "aggregateSha256": "f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c"
+      },
+      "unchanged": true
+    }
+  },
+  "semanticStoryboardGrid": {
+    "algorithmVersion": "semantic-beat-v1",
+    "contracts": 1288,
+    "panelDistribution": {
+      "2": 151,
+      "3": 667,
+      "4": 349,
+      "5": 95,
+      "6": 26
+    },
+    "panelImagesRequired": 4330,
+    "contractIdsSha256": "9c646f95d64f556274915bb0ad3e4065e5f2c613d6bb1eb2f203bbed4f5623e2",
+    "currentContractsPresent": 1288,
+    "ep01": {
+      "units": 34,
+      "panelDistribution": {
+        "3": 6,
+        "4": 16,
+        "5": 8,
+        "6": 4
+      },
+      "panelImagesRequired": 146,
+      "originalStartFrames": 34,
+      "originalEndFrames": 34,
+      "additionalMiddleFrames": 78,
+      "localChineseStoryboardSheets": 34,
+      "rawImagesRequired": 146,
+      "labeledImagesRequired": 146
+    },
+    "uiEvidence": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-grid-semantic-visible-time-policy-v1-ui-smoke-20260716.json",
+      "screenshotPath": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-grid-semantic-visible-time-policy-v1-ui-smoke-20260716.png",
+      "screenshotSha256": "c18589b95da6c53f91f815f4be75ac38c4356dc07620b7c83d4fb643faeb3e63"
+    },
+    "visibleTimePolicyVersion": "one-decimal-boundaries-then-difference-v1",
+    "visibleTimeQuantization": "one-decimal-boundaries-then-difference",
+    "detailedChineseSheetPreview": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-ep01-008-contract-preview-visible-time-policy-v1-20260716.json",
+      "renderPurpose": "layout-preview",
+      "formalProductionEligible": false,
+      "png": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-ep01-008-contract-preview-visible-time-policy-v1-20260716.png",
+        "sha256": "fdd912a4e645f69e0d98892c06f846c2782ede5afbea4138dd056b99c73416c4",
+        "bytes": 1227609,
+        "status": "created"
+      },
+      "svg": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-ep01-008-contract-preview-visible-time-policy-v1-20260716.svg",
+        "sha256": "45a54da48d1888c9f56182fe38c79b65273add00b8259357036be35aa44ce524",
+        "bytes": 162275,
+        "status": "created"
+      },
+      "contractId": "grid-a3c831e8c241ea2bb770",
+      "checks": {
+        "currentSemanticContract": true,
+        "currentVisibleTimePolicy": true,
+        "exactSixPanels": true,
+        "exactFifteenSeconds": true,
+        "visiblePanelDurationsSumToFifteen": true,
+        "pngDecodable": true,
+        "portraitDimensions": true,
+        "detailedChineseColumnsPresent": true,
+        "panelPreviewWatermarks": true,
+        "headerPreviewIdentity": true,
+        "footerPreviewIdentity": true,
+        "startAndEndRolesPresent": true,
+        "rhythmAndTotalDurationPresent": true,
+        "sourceTracePresent": true,
+        "machinePurposeEmbedded": true,
+        "allPanelHashesMatched": true,
+        "guardedFormalSidecarsUnchanged": true,
+        "outputOutsideProductionProject": true
+      }
+    },
+    "supersededEvidence": [
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-s3-storyboard-grids-semantic-v1-20260715.json",
+        "reason": "raw/labeled 旧字段误留 71；不得用于当前计数"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-s3-storyboard-grids-semantic-v1-corrected-20260715.json",
+        "reason": "可见时长独立四舍五入会让 EP01_008 显示合计为 15.1s"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-ep01-008-contract-preview-20260716.json",
+        "reason": "修复前第 4 格错误显示 1.7s；由 v2 预览取代"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-s3-storyboard-grids-semantic-v1-visible-time-v2-20260716.json",
+        "reason": "可见时间策略尚未进入合同和 UI 幂等键；由 policy-v1 证据取代"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-ep01-008-contract-preview-v2-20260716.json",
+        "reason": "时间数值已修正但策略未版本化；由 policy-v1 预览取代"
+      }
+    ]
+  },
+  "assetProductionOrder": {
+    "version": "hidden-mask-first-then-first-appearance-v1",
+    "totalAssets": 75,
+    "reservedAssets": 6,
+    "nextAssetId": "P11",
+    "nextBatchAssetIds": [
+      "P11",
+      "P07",
+      "S03",
+      "C04a",
+      "P03",
+      "S07"
+    ],
+    "currentBatch": "fusion-asset-batch-001",
+    "currentBatchStatus": "generating",
+    "nextBatchBlockedUntilCurrentReviewAndHardLocks": true,
+    "coreEvidence": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-asset-production-order-formal-20260715.json",
+    "uiEvidence": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-asset-production-order-ui-smoke-20260715.json",
+      "screenshot": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-asset-production-order-ui-smoke-20260715.png",
+        "sha256": "fb685f71e590dd5bdf867de5dd38f7e32abcafa9a068d5916296780f8e88bd94"
+      }
+    }
+  },
+  "browserTextOnlyRecovery": {
+    "evidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/p01-text-only-resume-formal-smoke-20260715.json",
+    "formalJobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+    "currentStatus": "waiting_external",
+    "currentStage": "preflight_blocked",
+    "currentRevision": 2,
+    "zeroUploadCheckpointSupported": true,
+    "remoteSideEffects": false
+  },
+  "tests": {
+    "files": 49,
+    "tests": 290,
+    "status": "passed",
+    "execution": "vitest full suite",
+    "focusedRerunAfterDoctorFix": {
+      "files": 3,
+      "tests": 18,
+      "status": "passed"
+    }
+  },
+  "build": {
+    "status": "passed",
+    "artifacts": [
+      {
+        "path": "/Users/hxx/Documents/无限画布/out/main/index.js",
+        "bytes": 1212354,
+        "sha256": "8805d12b2ff5ab94fa2d6f76a945007dbf1c4905349999397439dfc82984a1e7"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/out/renderer/index.html",
+        "bytes": 693,
+        "sha256": "7158e56453db221cfb634d86cf815ef3ca15b427f78fddfadb71aafac899b966"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/dist-mcp/mcp/server.js",
+        "bytes": 213292,
+        "sha256": "51934e454deb5953f63ce7aa3c18212750ef55a8aaa77574addc28475222fae9"
+      }
+    ]
+  },
+  "mcp": {
+    "status": "passed",
+    "toolCount": 148
+  },
+  "doctor": {
+    "status": "passed",
+    "summary": {
+      "errors": 0,
+      "warnings": 2,
+      "ok": 25
+    },
+    "expectedWarnings": [
+      "fusion-asset-consistency",
+      "generation-jobs"
+    ]
+  },
+  "formalProduction": {
+    "assetJobs": 6,
+    "formalAssetRawImages": 0,
+    "formalAssetLabeledImages": 0,
+    "formalStoryboardPanelRawImages": 0,
+    "formalStoryboardPanelLabeledImages": 0,
+    "formalChineseStoryboardSheets": 0,
+    "outputPresence": [
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P29_姜子牙木杖/AI画布生成/P29_资产_c9b89a3b_raw.png",
+        "exists": false
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P29_姜子牙木杖/AI画布生成/P29_资产_c9b89a3b_labeled.png",
+        "exists": false
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C07_姜子牙/AI画布生成/C07_资产_d9861f39_raw.png",
+        "exists": false
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C07_姜子牙/AI画布生成/C07_资产_d9861f39_labeled.png",
+        "exists": false
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S02_天庭云署·职司牌阵(神魔层)/AI画布生成/S02_资产_788bc493_raw.png",
+        "exists": false
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S02_天庭云署·职司牌阵(神魔层)/AI画布生成/S02_资产_788bc493_labeled.png",
+        "exists": false
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P30_天庭职司牌/AI画布生成/P30_资产_c7ecc0a0_raw.png",
+        "exists": false
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P30_天庭职司牌/AI画布生成/P30_资产_c7ecc0a0_labeled.png",
+        "exists": false
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S01_岐山封神台·封神榜空白格(神魔层)/AI画布生成/S01_资产_a654d3da_raw.png",
+        "exists": false
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S01_岐山封神台·封神榜空白格(神魔层)/AI画布生成/S01_资产_a654d3da_labeled.png",
+        "exists": false
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P01_阿航胸前布囊_★面具铁律替代资产/AI画布生成/P01_资产_23ac427f_raw.png",
+        "exists": false
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P01_阿航胸前布囊_★面具铁律替代资产/AI画布生成/P01_资产_23ac427f_labeled.png",
+        "exists": false
+      }
+    ]
+  },
+  "externalBlocker": {
+    "code": "artlist-insufficient-credits-and-mode-mismatch",
+    "recoverable": true,
+    "nextAction": "用户确认 Artlist 额度已恢复后，读取同一 P01 计划并从 R2 重新预检；不得重新入队、购买积分或重复点击 Generate。"
+  },
+  "goal": {
+    "status": "active",
+    "completedSlice": "semantic-beat-v1 全季建库、text-only 零上传恢复链、资产首次出场顺序门禁、正式/预览成板身份门禁与可见时长修复",
+    "remaining": "EP01 18 项新资产、146 raw/labeled 逐格图与 34 张正式中文故事板，再逐集扩展全季"
+  }
+}

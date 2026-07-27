@@ -1,0 +1,1007 @@
+{
+  "schemaVersion": 1,
+  "kind": "p14-installed-application-endurance-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-18T17:54:30.761Z",
+  "buildIdentity": {
+    "version": "0.2.0",
+    "sourceDigest": "267d6f29baf0b20908d8453ae80b3fc1a306a2ef949e383acfffeddc131dd582",
+    "buildId": "4372262cc78d9ed7773414cfdede38af",
+    "fingerprint": "cd038b51258bbaabe85041e88584a4dd68c191b3abc91ed10ec7a6d5c4c69eee",
+    "releaseManifestFingerprint": "9b9750598a557b679cefc5d8605c38fad522a7dec59e903fbcbeb0c6aa7060fc",
+    "source": "installed-app-resources-release-manifest"
+  },
+  "runtime": {
+    "executable": "/Applications/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+    "installed": true,
+    "systemNodeRequired": false
+  },
+  "formalProject": {
+    "projectId": "project-2e3b44bc6ac4",
+    "projectName": "Codex AI 短剧素材中心",
+    "writesBySmoke": 0,
+    "snapshotBefore": {
+      "projectId": "project-2e3b44bc6ac4",
+      "manifestFingerprint": "57e55eaf4b571c8e1ca7f606f79f849d08d0ad074ebd112eb0f82968413c3ac8",
+      "stableFileCount": 2295,
+      "fingerprint": "c7c460cbe10fbeea0eb08b9ce267b7f400e3170f9df823014a25b269faa74fa4"
+    },
+    "snapshotAfter": {
+      "projectId": "project-2e3b44bc6ac4",
+      "manifestFingerprint": "57e55eaf4b571c8e1ca7f606f79f849d08d0ad074ebd112eb0f82968413c3ac8",
+      "stableFileCount": 2295,
+      "fingerprint": "c7c460cbe10fbeea0eb08b9ce267b7f400e3170f9df823014a25b269faa74fa4"
+    },
+    "stableFilesUnchanged": true
+  },
+  "endurance": {
+    "requestedMs": 1800000,
+    "actualMs": 1800100,
+    "sampleIntervalMs": 30000,
+    "samples": [
+      {
+        "at": "2026-07-18T17:22:45.715Z",
+        "phase": "initial-ready",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 779456,
+        "fileDescriptors": 245,
+        "mediaRequestCount": 6
+      },
+      {
+        "at": "2026-07-18T17:22:45.954Z",
+        "phase": "switch-1",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 785616,
+        "fileDescriptors": 245,
+        "mediaRequestCount": 6
+      },
+      {
+        "at": "2026-07-18T17:23:03.270Z",
+        "phase": "switch-2",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 839600,
+        "fileDescriptors": 245,
+        "mediaRequestCount": 6
+      },
+      {
+        "at": "2026-07-18T17:23:03.487Z",
+        "phase": "switch-3",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 842176,
+        "fileDescriptors": 245,
+        "mediaRequestCount": 6
+      },
+      {
+        "at": "2026-07-18T17:23:20.767Z",
+        "phase": "switch-4",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 810256,
+        "fileDescriptors": 245,
+        "mediaRequestCount": 6
+      },
+      {
+        "at": "2026-07-18T17:23:21.010Z",
+        "phase": "switch-5",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 812784,
+        "fileDescriptors": 245,
+        "mediaRequestCount": 6
+      },
+      {
+        "at": "2026-07-18T17:23:38.815Z",
+        "phase": "switch-6",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 815472,
+        "fileDescriptors": 245,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:23:39.038Z",
+        "phase": "switch-7",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 817456,
+        "fileDescriptors": 245,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:23:56.720Z",
+        "phase": "switch-8",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 815472,
+        "fileDescriptors": 245,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:23:56.947Z",
+        "phase": "switch-9",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 817984,
+        "fileDescriptors": 245,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:24:14.277Z",
+        "phase": "switch-10",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 808688,
+        "fileDescriptors": 245,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:24:44.370Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658272,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:25:14.462Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658304,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:25:44.561Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658288,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:26:14.657Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658304,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:26:44.759Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658304,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:27:14.857Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658304,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:27:44.953Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658304,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:28:15.051Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658304,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:28:45.150Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658304,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:29:15.246Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658304,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:29:45.344Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658304,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:30:15.441Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658288,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:30:45.538Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658288,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:31:15.637Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658368,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:31:45.731Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658352,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:32:15.827Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658400,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:32:45.925Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658400,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:33:16.018Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658400,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:33:46.108Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658416,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:34:16.200Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658416,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:34:46.293Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658416,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:35:16.387Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658416,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:35:46.485Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658400,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:36:16.575Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658416,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:36:46.673Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658416,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:37:16.765Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658416,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:37:46.861Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658432,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:38:16.961Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658480,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:38:47.062Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658480,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:39:17.157Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658496,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:39:47.256Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658496,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:40:17.355Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658496,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:40:47.452Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658496,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:41:17.547Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658496,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:41:47.636Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658496,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:42:17.733Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658496,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:42:47.830Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658496,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:43:17.928Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658496,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:43:48.018Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658640,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:44:18.113Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658544,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:44:48.204Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658544,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:45:18.295Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658560,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:45:48.391Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658560,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:46:18.492Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658560,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:46:48.592Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658560,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:47:18.764Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658560,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:47:48.864Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658560,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:48:18.961Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658560,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:48:49.056Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658560,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:49:19.153Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658560,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:49:49.253Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658560,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:50:19.353Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658560,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:50:49.456Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658560,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:51:19.556Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658560,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:51:49.658Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658560,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:52:19.762Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658560,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:52:49.862Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658592,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:53:19.961Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 658592,
+        "fileDescriptors": 247,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:53:50.066Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 647216,
+        "fileDescriptors": 245,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:54:14.377Z",
+        "phase": "soak",
+        "pids": [
+          25908,
+          25910,
+          25911,
+          25912
+        ],
+        "rssKiB": 647216,
+        "fileDescriptors": 245,
+        "mediaRequestCount": 12
+      },
+      {
+        "at": "2026-07-18T17:54:30.173Z",
+        "phase": "force-restart-ready",
+        "pids": [
+          83075,
+          83076,
+          83077,
+          83078
+        ],
+        "rssKiB": 786752,
+        "fileDescriptors": 244,
+        "mediaRequestCount": 18
+      }
+    ],
+    "peakRssKiB": 842176,
+    "peakFileDescriptors": 247,
+    "stableTailRssDeltaKiB": -11344,
+    "stableTailFileDescriptorDelta": -2,
+    "stableTailMediaRequests": true
+  },
+  "projectSwitch": {
+    "count": 10,
+    "crossProjectLeak": false
+  },
+  "forceRestart": {
+    "killedPid": 25908,
+    "reopened": true,
+    "restoredProjectId": "project-2e3b44bc6ac4",
+    "restoredMetrics": "85 资产 541 单元 3246 宫格 1152 媒体 8 文稿"
+  },
+  "screenshot": {
+    "relativePath": "docs/evidence/p11-p14-final/p14-installed-soak-20260718-r7.png",
+    "width": 1728,
+    "height": 1029,
+    "sizeBytes": 507621
+  },
+  "boundaries": {
+    "formalProjectGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0,
+    "gitStage": 0
+  }
+}

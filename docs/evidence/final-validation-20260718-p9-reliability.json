@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "kind": "final-validation-p9-reliability",
+  "status": "PASS",
+  "createdAt": "2026-07-18T04:05:20.800Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "fullScaleFormula": {
+    "units": 1288,
+    "assets": 77,
+    "panels": 4232
+  },
+  "fullScaleSatisfied": true,
+  "scaleEvidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/p9-scale-fixture-20260718-01.json",
+  "scaleEvidence": {
+    "schemaVersion": 1,
+    "kind": "p9-scale-fixture-evidence",
+    "status": "pass",
+    "createdAt": "2026-07-18T04:02:45.763Z",
+    "durationMs": 7278,
+    "requested": {
+      "unitCount": 1288,
+      "assetCount": 77,
+      "mediaMetaCount": 80,
+      "expectedPanels": 4232
+    },
+    "observed": {
+      "units": 1288,
+      "panels": 4232,
+      "assets": 77,
+      "media": 80
+    },
+    "sourceShot": "not-applicable",
+    "notes": "新 Studio 无独立 SourceShot 实体；panelCount 对应约 4330 量级宫格元数据。",
+    "dashboard": {
+      "overviewFingerprint": "a6c0ed3fd44ff0b6cb97ad82e2e8361a9fb68774a26b4baffd84520dc9a61b34",
+      "unitsPageSize": 36,
+      "unitsHardCap": 36,
+      "panelsEstimated": 4222
+    },
+    "preflight": {
+      "schemaVersion": 1,
+      "kind": "studio-disk-preflight",
+      "projectRoot": "/private/tmp/p9-scale-full-V3A2TM/p9-scale-1ae41202-ad62e7fe",
+      "projectId": "project-316c609c653b",
+      "filesystem": {
+        "totalBytes": 1995165736960,
+        "freeBytes": 712714571776,
+        "availableBytes": 712714571776
+      },
+      "memory": {
+        "totalBytes": 137438953472,
+        "freeBytes": 26886455296
+      },
+      "blocked": false,
+      "blockers": [],
+      "fingerprint": "19c6c04c1c47e3753d6ed75bf474752934ad837b7d46c439b30b005224a1d1ab"
+    },
+    "scaleProbe": {
+      "schemaVersion": 1,
+      "kind": "studio-scale-probe",
+      "projectRoot": "/private/tmp/p9-scale-full-V3A2TM/p9-scale-1ae41202-ad62e7fe",
+      "projectId": "project-316c609c653b",
+      "counts": {
+        "units": 1288,
+        "canonicalAssets": 77,
+        "media": 80,
+        "assetBindingSets": 0
+      },
+      "dashboard": {
+        "overviewFingerprint": "a6c0ed3fd44ff0b6cb97ad82e2e8361a9fb68774a26b4baffd84520dc9a61b34",
+        "unitsPageSize": 36,
+        "unitsHardCap": 36
+      },
+      "fingerprint": "56fb2b6c28aeb66dcb171eb0dd5287685cddc30acb1d123f1fd6b62f8b9e5ec9"
+    },
+    "gcDryRun": {
+      "scannedObjects": 80,
+      "candidateCount": 0,
+      "fingerprint": "2493d202109ca250bf319d82c9607366eb13cba7d9747cf510ba71be42068ad9"
+    },
+    "boundaries": {
+      "formalImageGenerationCalls": 0,
+      "browserSupplierCalls": 0,
+      "realMediaCopied": false
+    }
+  },
+  "mediaScalePath": "/Users/hxx/Documents/无限画布/docs/evidence/p9-media-scale-20260718-01.json",
+  "mediaScale": {
+    "schemaVersion": 1,
+    "kind": "p9-media-scale-evidence",
+    "status": "pass",
+    "createdAt": "2026-07-18T04:04:07.406Z",
+    "counts": {
+      "mediaMetadata": 10000,
+      "thumbnails": 1000,
+      "videoProxies": 100,
+      "audioWaveforms": 100
+    },
+    "coldStartMs": 1,
+    "materialCounts": {
+      "media": 10000,
+      "mediaImports": 0,
+      "canonicalAssets": 0,
+      "characters": 0,
+      "scenes": 0,
+      "props": 0,
+      "assetVersions": 0,
+      "assetDefinitions": 0,
+      "primaryAuthorities": 0,
+      "authorityEvents": 0,
+      "versionReviews": 0,
+      "assetRelations": 0
+    },
+    "boundaries": {
+      "realMediaCopied": false,
+      "formalImageGenerationCalls": 0
+    }
+  },
+  "commands": [
+    {
+      "name": "typecheck",
+      "exitCode": 0,
+      "logSha256": "8aca887056e876fdc407b955daffd0b0a5dec0c074cd623f6decb7a214530132"
+    },
+    {
+      "name": "p9-targeted",
+      "exitCode": 0,
+      "logSha256": "47df259f655e1f6246be549a2a93ed5d11dfbb38fda7aeb91deb70e4bd4bcf48"
+    }
+  ],
+  "reportPath": "/Users/hxx/Documents/无限画布/docs/验证报告_20260718_P9运行可靠性完整关账.md",
+  "imagegen": 0,
+  "browser": 0,
+  "git": 0
+}

@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 3,
+  "kind": "p9-media-scale-evidence",
+  "status": "pass",
+  "createdAt": "2026-07-18T07:21:31.330Z",
+  "durationMs": 3036,
+  "counts": {
+    "mediaIndexed": 10000,
+    "requestedMedia": 10000,
+    "imageObjects": 9996,
+    "realVideoImports": 2,
+    "realAudioImports": 2,
+    "casObjectsVerified": 10000,
+    "casObjectBytes": 3460068,
+    "uniqueShaCount": 10000,
+    "uniqueObjectPathCount": 10000,
+    "realDecodableThumbFiles": 1000,
+    "videoDerivativesReady": 4,
+    "audioDerivativesReady": 2
+  },
+  "performance": {
+    "coldCreateAndIndexMs": 2407,
+    "firstTwoMediaPagesMs": 13,
+    "firstMediaPageSize": 100,
+    "secondMediaPageSize": 100,
+    "fullMediaIndexScanMs": 371,
+    "mediaPages": 100,
+    "listOwner": "listStudioMedia",
+    "keyset": true
+  },
+  "mediaQuality": {
+    "allIndexedObjectsLanded": true,
+    "allIndexedObjectsShaAndSizeMatch": true,
+    "thumbnailFormat": "webp",
+    "thumbnailWidth": 64,
+    "thumbnailHeight": 96,
+    "avDerivativeFailureClosesEvidence": true
+  },
+  "gates": {
+    "exactMediaCount": true,
+    "allCasObjectsVerified": true,
+    "uniqueContentAddresses": true,
+    "decodableThumbnailFloor": true,
+    "realVideoDerivatives": true,
+    "realAudioDerivatives": true,
+    "realMediaKeysetPages": true,
+    "realMediaSearch": true
+  },
+  "boundaries": {
+    "formalStudioUntouched": true,
+    "formalImageGenerationCalls": 0,
+    "fixtureRootRemovedAfterRun": true
+  }
+}

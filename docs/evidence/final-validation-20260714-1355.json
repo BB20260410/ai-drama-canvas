@@ -1,0 +1,283 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T05:55:35Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "goal": {
+    "name": "AI 漫剧无限画布",
+    "status": "active",
+    "mode": "research-and-development"
+  },
+  "priorityRevalidation": {
+    "handoffPriorityAtSliceStart": "complex-nested-timelines",
+    "handoffPriorityWasStillValid": true,
+    "reason": "At slice start the capability contract still listed complex-nested-timelines as missing, OTIO rejected nested Stack input, EditClip lacked a frozen child-project reference, and render/Continuation/MCP/Electron lacked positive nested gates.",
+    "alreadyVerifiedModulesNotRebuilt": [
+      "comfyui-local-recoverable-adapter",
+      "http-submission-reconciliation",
+      "custom-cubic-bezier-keyframes",
+      "arbitrary-keyframe-boundary-subdivision",
+      "main-track-transform-keyframes"
+    ],
+    "nextPriorityAfterSlice": "third-party-effect-transition-compatibility"
+  },
+  "slice": {
+    "name": "complex-nested-timelines",
+    "complete": true,
+    "capabilityContract": "aicanvas.nested-timeline.v1",
+    "renderContract": "aicanvas.nested-timeline.ffmpeg.v1",
+    "maximumDepth": 8,
+    "stateModel": "existing-EditProject-EditClip-revision-history-command-Publication-Continuation",
+    "operations": [
+      "add_nested_timeline",
+      "refresh_nested_timeline"
+    ],
+    "snapshotPolicy": "immutable-content-addressed-explicit-refresh",
+    "timeAuthority": "parent-integer-frames-and-child-reduced-rational-source-range",
+    "resolverConsumers": [
+      "synchronous-render",
+      "background-render",
+      "timeline-frame",
+      "timeline-continuation",
+      "publication-provenance",
+      "electron-preview"
+    ],
+    "otio": {
+      "container": "Stack.1-private-subset",
+      "roundTrip": true,
+      "canonicalChildrenVerifiedAgainstFrozenSnapshot": true,
+      "foreignEffectTransitionPolicy": "reject"
+    },
+    "evidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/nested-timeline-validation-20260714.json"
+  },
+  "uiSmoke": {
+    "success": true,
+    "script": "npm run ui:editor-nested-smoke",
+    "evidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/editor-nested-ui-smoke-20260714.json",
+    "evidenceSha256": "29e7e8ffc3191d0999fa9aefa2c9203cd89e4ea3134c68ae0b0270aae5c012ba",
+    "parentRevisionSequence": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7
+    ],
+    "childRevisionSequence": [
+      1,
+      2
+    ],
+    "clipFramesBeforeTrim": 120,
+    "clipFramesAfterTrim": 114,
+    "dirtyDraftRefreshRejected": true,
+    "dirtyDraftPreserved": true,
+    "dirtyRefreshDiskWrite": false,
+    "explicitRefreshChangedSnapshot": true,
+    "explicitRefreshPreservedTrim": true,
+    "freshApplicationRestartVerified": true,
+    "preview": {
+      "codec": "H264+AAC",
+      "width": 540,
+      "height": 960,
+      "durationSeconds": 4.004,
+      "bytes": 394803,
+      "sha256": "5b645f582545a743013302cc9f6586d19c77f02cd2d8987b1cdbba20a65260d2",
+      "mediaError": null
+    },
+    "screenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-nested-ui-20260714.png",
+      "bytes": 311714,
+      "sha256": "17c6af4e1652716db22e477e96a8220d9854fd3251de736ea52cdcb146fffdeb",
+      "width": 1560,
+      "height": 980,
+      "humanVisualInspection": true,
+      "visibleNestedClip": true,
+      "visibleDecodedFrame": true,
+      "placeholderOrBlank": false
+    },
+    "pageErrors": 0,
+    "fixtureRemoved": true
+  },
+  "tests": {
+    "typecheck": {
+      "success": true
+    },
+    "targeted": {
+      "success": true,
+      "testFiles": 8,
+      "tests": 41,
+      "durationSeconds": 29.48,
+      "files": [
+        "tests/editor-nested.test.ts",
+        "tests/editor-nested-continuation.test.ts",
+        "tests/editor.test.ts",
+        "tests/timeline-preview.test.ts",
+        "tests/codex.test.ts",
+        "tests/mcp-editor-nested.test.ts",
+        "tests/mcp.test.ts",
+        "tests/mcp-scan-cancel.test.ts"
+      ]
+    },
+    "full": {
+      "success": true,
+      "testFiles": 36,
+      "passedTestFiles": 36,
+      "failedTestFiles": 0,
+      "tests": 210,
+      "passedTests": 210,
+      "failedTests": 0,
+      "durationSeconds": 80.48
+    },
+    "sourceMcp": {
+      "success": true,
+      "testFiles": 3,
+      "tests": 3,
+      "server": "src/mcp/server.ts"
+    },
+    "compiledMcp": {
+      "success": true,
+      "testFiles": 3,
+      "tests": 3,
+      "serverPath": "/Users/hxx/Documents/无限画布/dist-mcp/mcp/server.js"
+    },
+    "realElectron": {
+      "success": true,
+      "humanVisualInspection": true,
+      "fullApplicationRestart": true
+    },
+    "crossProcess": {
+      "fullWorkflow": {
+        "success": true,
+        "restartVerified": true
+      },
+      "mcpHeadless": {
+        "success": true,
+        "commandTypes": 79,
+        "ledgerEntries": 22,
+        "uncertainCommands": 0,
+        "finalDoctorErrors": 0,
+        "finalDoctorWarnings": 0,
+        "runtimeResourcesIdle": true
+      },
+      "mcpEmptyProject": {
+        "success": true,
+        "ledgerEntries": 19,
+        "uncertainCommands": 0,
+        "restartVerified": true
+      }
+    }
+  },
+  "build": {
+    "success": true,
+    "typecheck": true,
+    "mainBytes": 919029,
+    "preloadBytes": 17526,
+    "rendererJavaScriptBytes": 1286697,
+    "mcpServerBytes": 185412,
+    "signedDmgRebuilt": false
+  },
+  "mcp": {
+    "smokeSuccess": true,
+    "toolCount": 134,
+    "resourceTemplateCount": 9,
+    "promptCount": 7,
+    "sourceAndCompiledNestedTests": true,
+    "idempotentReplayVerified": true,
+    "staleCasRecordedAsFailedNotUnknown": true,
+    "capabilityMissingForFullNle": [
+      "third-party-effect-compatibility",
+      "real-project-nle-validation"
+    ]
+  },
+  "sourceHashes": {
+    "package.json": "df661bd743563dec7e5fd9d8eac311318f3d4757a9407b395b67a5f44e206d32",
+    "src/core/types.ts": "8d4f07923059811899dbff0a6687879b4d831a9b9501aff2d9c1e439b4b260dd",
+    "src/core/editor.ts": "7625068a924e4f067e3b5d3e7e02376a4121316213d8fd245fe162ab8c2a57d6",
+    "src/core/command-bus.ts": "a8516d3fb994927fe1321eba3d5086d165b045bbb1936040cbc2aaa1412a3e2b",
+    "src/core/command-outcome.ts": "3afb51d9175db0af8d58e119d31ea4f881884033d842f6a9ac4dc785193a1d5e",
+    "src/core/codex.ts": "8d47f8c38f0d3535aff7ffbd11008fee41055d408c1146f6d97374eaeab604ee",
+    "src/mcp/server.ts": "3730793e0b7c6310103ecc4530631173e5f30a7be745e605684ae2b96b51f775",
+    "src/renderer/src/components/VideoEditorView.vue": "dd04aec0d998afce2ba05347a2d8b3169a5bb709803edfec9e983b9e3c9ab061",
+    "tests/editor-nested.test.ts": "163c82ecff9432fa880829e2b31886e833cc4d43bc24c701c6706f093285c32a",
+    "tests/editor-nested-continuation.test.ts": "b8fa0539d3b84e11c875af719390e107f09211ff7890e2209c0cd93f315ad467",
+    "tests/mcp-editor-nested.test.ts": "c7f861bc84421105f31d452ceb8e3fd1faa5c0548957fb3da977d0b77fec3a09",
+    "scripts/ui-editor-nested-smoke.mjs": "1f61ac40c8be2abffe3752cabb410dbd3b33e75f747ad71b7905213e907934be",
+    "scripts/create-editor-ui-fixture.ts": "45951e172a451426ff1d3df9cc88679ce82de933b5654b2ebab75419a363abd4"
+  },
+  "documentationHashes": {
+    "README.md": "b0c74b4bcaabb2980881e433b9f2729b9d0901b086185e46ae1e5b03e8887864",
+    "docs/CODEX_MCP.md": "77e05e3811b739cc89710c4fe93965a21c7f1d99e5ee13192ed7fff02a5a9d4d",
+    "docs/当前开发交接.md": "0b2309e899e0a146e9c7f4a493b5440e8397722a6d08cf1b4a5a3a78d918a864",
+    "docs/验证报告_复杂嵌套时间线_2026-07-14.md": "6db464af00dab2b117422fb362c810f29cb55280aa06931cc6ba6233d3d3b50c",
+    "docs/evidence/nested-timeline-validation-20260714.json": "c570f4cee5bb3f6d38332f229cfebec7b6360e55672f130107813012da3b6894",
+    "docs/evidence/editor-nested-ui-smoke-20260714.json": "29e7e8ffc3191d0999fa9aefa2c9203cd89e4ea3134c68ae0b0270aae5c012ba",
+    "docs/evidence/editor-nested-ui-20260714.png": "17c6af4e1652716db22e477e96a8220d9854fd3251de736ea52cdcb146fffdeb"
+  },
+  "signedDmg": {
+    "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "bytes": 136652595,
+    "sha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972",
+    "touched": false,
+    "containsCurrentSource": false,
+    "notarized": false
+  },
+  "boundaries": {
+    "formalProjectScanned": false,
+    "formalProjectModified": false,
+    "realComfyUiCalled": false,
+    "externalProviderCalled": false,
+    "websiteOpened": false,
+    "uploadPerformed": false,
+    "paidActionPerformed": false,
+    "externalAssetsOverwritten": false,
+    "installationPerformed": false,
+    "releasePerformed": false,
+    "notarizationPerformed": false,
+    "gitCommitPerformed": false,
+    "gitPushPerformed": false,
+    "pullRequestCreated": false
+  },
+  "cleanup": {
+    "electronFixtureRootRemoved": true,
+    "electronFixtureRegistryRemoved": true,
+    "crossProcessSmokeFixturesRemoved": true,
+    "remainingTargetProcesses": 0,
+    "runtimeResourcesIdleAtHeadlessSmoke": true
+  },
+  "git": {
+    "branch": "main",
+    "hasCommits": false,
+    "worktree": "all project files untracked",
+    "commitCreated": false,
+    "pushPerformed": false,
+    "pullRequestCreated": false
+  },
+  "knownLimitations": [
+    "OTIO nested support is the AI Canvas private Stack.1 subset, not general third-party nested NLE compatibility.",
+    "Third-party Effect and Transition objects remain fail-closed.",
+    "Dirty parent drafts must be saved or reloaded before explicit nested refresh.",
+    "Nested preview preparation is correctness-verified but not benchmarked for many simultaneous timeline clips.",
+    "Formal real-project NLE calibration was not authorized or performed.",
+    "Real ComfyUI, Provider/site, Apple notarization and public distribution remain outside this slice."
+  ],
+  "nextUniqueHighestPriority": {
+    "rank": "P1",
+    "id": "third-party-effect-transition-compatibility",
+    "title": "Third-party Effect and Transition OTIO compatibility core vertical slice",
+    "reason": "Capabilities now has only third-party-effect-compatibility and real-project-nle-validation missing. Formal project validation requires authorization, while a bounded Effect/Transition allowlist can be implemented and proved safely with isolated real-media fixtures.",
+    "acceptance": [
+      "select an explicit minimal OTIO Effect and Transition allowlist that can be proved frame by frame",
+      "reuse EditClip, operations, revision, history, Publication, resolver and command ledger without a second effect state machine",
+      "validate adjacency, source handles, offsets, integer duration and fractional timebase for transitions",
+      "preserve allowed objects across OTIO import/export, FFmpeg, timeline frames, Continuation, MCP capabilities and Electron UI",
+      "fail closed for unknown schema, parameters, curves, media types and unsupported nested combinations",
+      "prove source and compiled MCP, real dynamic media, fresh Node/Electron restart and permanent evidence"
+    ],
+    "waitingExternalAuthorization": [
+      "formal AI drama project NLE calibration",
+      "real local ComfyUI version and custom-node calibration",
+      "real Provider or generation website login/upload/paid submission",
+      "Apple notarization and public distribution"
+    ]
+  },
+  "success": true
+}

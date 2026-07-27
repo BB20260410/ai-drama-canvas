@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "kind": "p0-fusion-panel-review-ui-smoke",
+  "createdAt": "2026-07-16T20:29:38.867Z",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "registryPath": "/tmp/ai-canvas-p0-panel-review-ui-registry-20260717.json",
+  "screenshotPath": "/Users/hxx/Documents/无限画布/docs/evidence/p0-panel-review-ui-smoke-20260717.png",
+  "screenshotSha256": "e234f3c4b1dbb88467424ef4759484eb652476960728ac68aa3eae4c39bc5048",
+  "apiState": {
+    "unitCount": 1288,
+    "ep001": {
+      "status": "待视频",
+      "contractId": "grid-6c02035d032128e0f62a",
+      "panelCount": 4,
+      "completedPanelCount": 4,
+      "visuallyApproved": true
+    },
+    "ep008": {
+      "status": "待尾帧",
+      "contractId": "grid-76e6545a6efec0e4091b",
+      "panelCount": 6,
+      "completedPanelCount": 4,
+      "states": [
+        "awaiting_review",
+        "awaiting_review",
+        "awaiting_review",
+        "awaiting_review",
+        "generating",
+        "missing"
+      ]
+    },
+    "review001": {
+      "requirementId": "fusion-review-7916b22425ae2df44a0a3ce895530eb21459fb256d8e0ad8524182a558ec9aff",
+      "complete": true,
+      "panelCount": 4,
+      "artifactCount": 8,
+      "panelArtifactPairs": [
+        {
+          "panelId": "season-三-ep01-unit001-panel-01",
+          "raw": "season-三-ep01-unit001-ccb0d70ca56a",
+          "labeled": "season-三-ep01-unit001-f7baf9859d81"
+        },
+        {
+          "panelId": "season-三-ep01-unit001-panel-02",
+          "raw": "season-三-ep01-unit001-0c8c3f7ad7b3",
+          "labeled": "season-三-ep01-unit001-800488fd7398"
+        },
+        {
+          "panelId": "season-三-ep01-unit001-panel-03",
+          "raw": "season-三-ep01-unit001-6f5734c57fa3",
+          "labeled": "season-三-ep01-unit001-d33ac4593fa4"
+        },
+        {
+          "panelId": "season-三-ep01-unit001-panel-04",
+          "raw": "season-三-ep01-unit001-12f823e8e794",
+          "labeled": "season-三-ep01-unit001-145552d14abe"
+        }
+      ]
+    }
+  },
+  "reviewUi": {
+    "panelLabels": [
+      "宫格01",
+      "宫格02",
+      "宫格03",
+      "宫格04"
+    ],
+    "viewedPanelCount": 4,
+    "requirementHint": "视觉通过前必须查看全部 4 格",
+    "passEnabled": true,
+    "horizontalPageOverflow": false
+  },
+  "migrationButtonVisible": true,
+  "sideEffects": {
+    "generationJobsUnchanged": true,
+    "publicationsUnchanged": true,
+    "generationJobsSha256": "b958c3f54195cb709816fc11f33fe0fb8a597389c9a922f8ff6581b42264c12c",
+    "publicationsSha256": "eadc1faa75bde0ff88b9142805290ca832d3a286a7f4f3573bb1a1169a0a843e"
+  },
+  "pageErrors": []
+}

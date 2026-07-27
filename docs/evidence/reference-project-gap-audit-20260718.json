@@ -1,0 +1,393 @@
+{
+  "schemaVersion": 1,
+  "kind": "reference-project-gap-audit",
+  "status": "complete",
+  "createdAt": "2026-07-18T06:30:00.000Z",
+  "verifiedOn": "2026-07-18",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "researchMode": "remote-readme-license-release-api-only",
+  "clonedThirdPartyRepos": false,
+  "coreCodeChanged": false,
+  "implementThisRound": false,
+  "implementDecision": "无需实现",
+  "implementDecisionReason": "商用保守视角：十项目多许可证封锁或能力重叠。",
+  "personalUseAmendment": {
+    "date": "2026-07-18",
+    "userDeclaredUsage": "personal-non-commercial",
+    "doc": "docs/参考项目_个人非商用重分级_20260718.md",
+    "revisedStance": "BigBanana/Huobao/Toonflow 个人可用场景下可积极借鉴需求并 clean-room 落地；AGPL/GPL 宜独立进程自用而非并入 monorepo。",
+    "implementedAfterAmendment": {
+      "slice": "studio-local-labeled-layout",
+      "evidence": "docs/evidence/personal-use-labeled-layout-20260718.json"
+    }
+  },
+  "baselineSoftwareGate": {
+    "p0_to_p10": "PASS",
+    "sources": [
+      "docs/验证报告_20260718_P0至P10最终关账.md",
+      "docs/evidence/final-validation-20260718-p8-production-dashboard.json",
+      "docs/evidence/final-validation-20260718-p9-reliability.json",
+      "docs/evidence/final-validation-20260718-p10-build-identity.json"
+    ],
+    "forbidRebuildP8": true
+  },
+  "residualDepth": {
+    "p9r": "PARTIAL",
+    "p10r": "PARTIAL",
+    "grokRealImagegenCanary": "pass"
+  },
+  "supplierPolicyNote": "OBJECTIVE 文案写「仅 Codex imagegen」；树内合同为 agent-imagegen + [codex,grok]。本轮不静默回退双供应。",
+  "decisionQuestions": {
+    "q1_already_implemented": [
+      "规范资产/CAS/版本/Authority（material-studio）",
+      "15s 单元 2–6 宫格与 BindingSet（studio-production / binding）",
+      "连续性九字段 + Review + checkpoint（studio-continuity*）",
+      "冻结包/dispatch/register raw-labeled（studio-generation*）",
+      "生产驾驶舱只读聚合（studio-production-dashboard）",
+      "ComfyUI 本机受控适配器（generation comfyui-local）",
+      "审片批注坐标/时间码（2026-07-13 Kitsu 模型借鉴落地）",
+      "备份 schema v2 / build-identity"
+    ],
+    "q2_more_mature_elsewhere": [
+      "ArcReel/Toonflow/Huobao：多供应商云端图视频一键流水线 UI 更「产品化」",
+      "Kitsu/Zou：多人制片任务状态与预览修订网络协作更成熟",
+      "tldraw：无限画布交互与协作 SDK 更成熟（但许可证限制生产）",
+      "ComfyUI：节点图本地扩散生态更成熟（已适配器边界）"
+    ],
+    "q3_ui_only_no_capability_delta": [
+      "Toonflow「无限画布」营销表述 vs 本项目驾驶舱+画布（不同事实源架构）",
+      "各短剧平台的 Web 控制台布局差异",
+      "Storyboarder 手绘分镜 UI"
+    ],
+    "q4_second_truth_risk": [
+      "完整引入 Kitsu/Zou 数据库",
+      "嵌入 ArcReel/Toonflow/Huobao 工程库",
+      "把 tldraw 文档模型当 Studio 权威画布"
+    ],
+    "q5_adapter_candidates": [
+      "ComfyUI（已有）",
+      "Kitsu/Zou 未来单向预览推送（未实施）",
+      "ArcReel 仅作独立服务候选（AGPL，默认不接）"
+    ],
+    "q6_consistency_value": [
+      "角色设计图先锁定再分镜：需求已对齐 BindingSet/Authority，实现路径不同",
+      "线索/道具跨镜：对应 continuity + hard-lock，无新许可证安全源码可搬"
+    ],
+    "q7_no_further_research_now": [
+      "Storyboarder（手绘、久未主推 AI 短剧 CAS）",
+      "StoryToolkitAI（成片转写检索，偏离当前 15s 单元生产）",
+      "Huobao/BigBanana（NC/非商用）作为源码来源"
+    ],
+    "q8_next_unique_priority": "残差产品深度：Electron 驾驶舱+大规模数据冷启动/翻页/切工程 smoke 与截图证据；或 P9 command-bus 全写入口故障矩阵（扩展既有 owner，非重建 P8）。不从十项目复制代码。"
+  },
+  "classificationCounts": {
+    "LICENSE_BLOCKED": 4,
+    "ADAPTER_ONLY": 3,
+    "RESEARCH_ONLY": 2,
+    "ALREADY_IMPLEMENTED": 1,
+    "NET_NEW_HIGH_VALUE_implementNow": 0
+  },
+  "projects": [
+    {
+      "id": "arcreel",
+      "name": "ArcReel",
+      "repo": "https://github.com/ArcReel/ArcReel",
+      "defaultBranch": "main",
+      "pin": { "kind": "commit+release", "commit": "1a5f08d2a347", "release": "v0.22.0", "commitDate": "2026-07-18T04:18:19Z" },
+      "license": {
+        "spdx": "AGPL-3.0",
+        "link": "https://github.com/ArcReel/ArcReel/blob/main/LICENSE",
+        "verifiedOn": "2026-07-18",
+        "notes": "README 声明 AGPL-3.0 + NOTICE 附加条款；网络服务分发义务重"
+      },
+      "referenceFeatures": [
+        "小说→角色/线索→分镜→视频 Agent 流水线",
+        "多供应商图/视频/文本",
+        "异步队列与版本回滚",
+        "Web 工作台"
+      ],
+      "localOwners": [
+        "studio-generation",
+        "studio-generation-ledger",
+        "material-studio",
+        "studio-production",
+        "studio-continuity",
+        "studio-production-dashboard"
+      ],
+      "localSrc": [
+        "src/core/studio-generation.ts",
+        "src/core/studio-generation-ledger.ts",
+        "src/core/material-studio.ts",
+        "src/core/studio-production-dashboard.ts"
+      ],
+      "localTests": [
+        "tests/studio-scale-fixture.test.ts",
+        "tests/mcp-managed-studio.test.ts",
+        "scripts/run-p10-canary-e2e.ts"
+      ],
+      "alreadyImplemented": true,
+      "realGap": "云端多供应商一键编排 UI 与 Docker 服务形态；非本机 CAS/Binding/Review 深度",
+      "userValue": "中（流水线体验）；对一致性核心无新许可证安全增益",
+      "integrationMode": "独立进程/服务候选 only；禁止源码并入",
+      "migrationPerfImpact": "高：第二事实源 + 服务运维",
+      "risks": "AGPL 网络交互义务；供应链与密钥面扩大",
+      "classification": "LICENSE_BLOCKED",
+      "secondaryTags": ["RESEARCH_ONLY", "ADAPTER_ONLY"],
+      "implementThisRound": false
+    },
+    {
+      "id": "toonflow",
+      "name": "Toonflow",
+      "repo": "https://github.com/HBAI-Ltd/Toonflow-app",
+      "defaultBranch": "master",
+      "pin": { "kind": "commit+release", "commit": "bc61ec7a1b5d", "release": "v1.1.8", "commitDate": "2026-07-09T07:20:54Z" },
+      "license": {
+        "spdx": "Apache-2.0",
+        "link": "https://github.com/HBAI-Ltd/Toonflow-app/blob/master/LICENSE",
+        "verifiedOn": "2026-07-18",
+        "notes": "LICENSE 含「补充协议」：向 2+ 独立第三方以产品形式分发需书面商业授权；非纯 Apache 可商用路径"
+      },
+      "referenceFeatures": [
+        "无限画布式生产工作台",
+        "三层 Agent + 记忆",
+        "章节事件图谱改编",
+        "可编程供应商"
+      ],
+      "localOwners": [
+        "studio-production-dashboard",
+        "studio-production",
+        "material-studio",
+        "generation"
+      ],
+      "localSrc": [
+        "src/core/studio-production-dashboard.ts",
+        "src/renderer/src/studio-production-dashboard-store.ts"
+      ],
+      "localTests": ["tests/studio-scale-fixture.test.ts"],
+      "alreadyImplemented": true,
+      "realGap": "产品化 Agent 桌面壳与供应商热编码；画布是另一套事实源",
+      "userValue": "中（UX 参考）；核心 CAS/Binding 已有",
+      "integrationMode": "RESEARCH_ONLY；禁止复制核心进 monorepo",
+      "migrationPerfImpact": "高：第二库/第二画布真源",
+      "risks": "补充商业协议；商标/版权标识条款",
+      "classification": "LICENSE_BLOCKED",
+      "secondaryTags": ["RESEARCH_ONLY"],
+      "implementThisRound": false
+    },
+    {
+      "id": "huobao-drama",
+      "name": "Huobao Drama",
+      "repo": "https://github.com/chatfire-AI/huobao-drama",
+      "defaultBranch": "master",
+      "pin": { "kind": "commit+release", "commit": "ad1cd7cd0127", "release": "v1.0.4", "commitDate": "2026-07-08T06:29:08Z" },
+      "license": {
+        "spdx": "CC-BY-NC-SA-4.0",
+        "link": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+        "verifiedOn": "2026-07-18",
+        "notes": "README badge CC BY-NC-SA 4.0；GitHub API license 字段为 null。非商用，禁止进核心"
+      },
+      "referenceFeatures": [
+        "剧本/角色/分镜/视频全自动",
+        "宫格生成切分",
+        "多厂商适配",
+        "Mastra Agents"
+      ],
+      "localOwners": ["studio-production", "studio-generation", "material-studio"],
+      "localSrc": ["src/core/studio-production.ts", "src/core/studio-generation.ts"],
+      "localTests": ["tests/mcp-managed-studio.test.ts"],
+      "alreadyImplemented": true,
+      "realGap": "Web SaaS 形态与自动成片产品层",
+      "userValue": "中（流程对照）",
+      "integrationMode": "禁止源码；仅需求研究",
+      "migrationPerfImpact": "n/a",
+      "risks": "CC-NC 传染与商用封锁",
+      "classification": "LICENSE_BLOCKED",
+      "implementThisRound": false
+    },
+    {
+      "id": "bigbanana",
+      "name": "BigBanana AI Director",
+      "repo": "https://github.com/shuyu-labs/BigBanana-AI-Director",
+      "defaultBranch": "main",
+      "pin": { "kind": "branch-head-unresolved-sha", "commit": null, "release": null, "note": "API rate limit mid-pass; license file fetched" },
+      "license": {
+        "spdx": "NOASSERTION",
+        "name": "BigBanana Community License 1.0",
+        "link": "https://github.com/shuyu-labs/BigBanana-AI-Director/blob/main/LICENSE",
+        "verifiedOn": "2026-07-18",
+        "notes": "明确非商用、禁止商业活动/SaaS/OEM；非 OSI"
+      },
+      "referenceFeatures": ["Script-to-Asset-to-Keyframe 工业化工作流", "角色一致性与镜头控制宣传"],
+      "localOwners": ["studio-generation", "studio-asset-binding", "studio-continuity"],
+      "localSrc": ["src/core/studio-generation.ts", "src/core/studio-asset-binding.ts"],
+      "localTests": ["tests/studio-scale-fixture.test.ts"],
+      "alreadyImplemented": true,
+      "realGap": "产品化一键导演流水线包装",
+      "userValue": "低-中（需求叙事）",
+      "integrationMode": "禁止源码",
+      "migrationPerfImpact": "n/a",
+      "risks": "非商用自定义许可证",
+      "classification": "LICENSE_BLOCKED",
+      "implementThisRound": false
+    },
+    {
+      "id": "tldraw",
+      "name": "tldraw",
+      "repo": "https://github.com/tldraw/tldraw",
+      "defaultBranch": "main",
+      "pin": { "kind": "branch", "commit": null, "note": "license verified; commit pin rate-limited" },
+      "license": {
+        "spdx": "NOASSERTION",
+        "name": "tldraw proprietary development license",
+        "link": "https://github.com/tldraw/tldraw/blob/main/LICENSE.md",
+        "verifiedOn": "2026-07-18",
+        "notes": "允许开发环境；禁止生产环境无商业协议使用；含 license key 技术强制"
+      },
+      "referenceFeatures": ["无限画布 React SDK", "视口/协作/性能"],
+      "localOwners": ["canvas-scale-performance skill", "studio-production-dashboard UI bounds"],
+      "localSrc": ["src/core/studio-production-dashboard.ts", ".grok/skills/canvas-scale-performance"],
+      "localTests": ["scripts/ui-p8-production-dashboard-smoke.ts"],
+      "alreadyImplemented": false,
+      "realGap": "自由无限白板产品 UI 非 P8 合同范围；P8 已是受限驾驶舱",
+      "userValue": "高（交互研究）但许可证挡生产嵌入",
+      "integrationMode": "RESEARCH_ONLY 需求/性能；不复制 SDK 进生产",
+      "migrationPerfImpact": "若嵌入：高依赖与许可成本",
+      "risks": "生产禁令、商标、遥测",
+      "classification": "RESEARCH_ONLY",
+      "secondaryTags": ["LICENSE_BLOCKED"],
+      "implementThisRound": false
+    },
+    {
+      "id": "kitsu",
+      "name": "Kitsu",
+      "repo": "https://github.com/cgwire/kitsu",
+      "defaultBranch": "main",
+      "pin": { "kind": "branch", "commit": null, "note": "AGPL known; prior audit 2026-07-13" },
+      "license": {
+        "spdx": "AGPL-3.0",
+        "link": "https://github.com/cgwire/kitsu/blob/main/LICENSE",
+        "verifiedOn": "2026-07-18"
+      },
+      "referenceFeatures": ["任务-评论-预览修订-主预览", "动画/VFX 协作前端"],
+      "localOwners": ["review records", "studio-generation-review"],
+      "localSrc": ["docs/开源项目借鉴审计_2026-07-13.md"],
+      "localTests": [],
+      "alreadyImplemented": true,
+      "realGap": "多人网络协作与权限（当前单机不需要）",
+      "userValue": "低（当前场景）",
+      "integrationMode": "ADAPTER_ONLY 未来单向；默认不接",
+      "migrationPerfImpact": "高：第二事实源",
+      "risks": "AGPL",
+      "classification": "ADAPTER_ONLY",
+      "secondaryTags": ["DEFERRED", "LICENSE_BLOCKED"],
+      "implementThisRound": false
+    },
+    {
+      "id": "zou",
+      "name": "Zou",
+      "repo": "https://github.com/cgwire/zou",
+      "defaultBranch": "main",
+      "pin": { "kind": "branch", "commit": null },
+      "license": {
+        "spdx": "AGPL-3.0",
+        "link": "https://github.com/cgwire/zou/blob/main/LICENSE",
+        "verifiedOn": "2026-07-18"
+      },
+      "referenceFeatures": ["Kitsu API/生产数据记忆层", "预览修订"],
+      "localOwners": ["material-studio", "review"],
+      "localSrc": ["docs/开源项目借鉴审计_2026-07-13.md"],
+      "localTests": [],
+      "alreadyImplemented": true,
+      "realGap": "集中式生产 DB（与文件事实源冲突）",
+      "userValue": "低",
+      "integrationMode": "ADAPTER_ONLY 未来",
+      "migrationPerfImpact": "高",
+      "risks": "AGPL + 双向同步",
+      "classification": "ADAPTER_ONLY",
+      "secondaryTags": ["DEFERRED", "LICENSE_BLOCKED"],
+      "implementThisRound": false
+    },
+    {
+      "id": "comfyui",
+      "name": "ComfyUI",
+      "repo": "https://github.com/Comfy-Org/ComfyUI",
+      "defaultBranch": "master",
+      "pin": { "kind": "branch", "commit": null, "note": "GPL-3.0 from API before rate limit" },
+      "license": {
+        "spdx": "GPL-3.0",
+        "link": "https://github.com/Comfy-Org/ComfyUI/blob/master/LICENSE",
+        "verifiedOn": "2026-07-18"
+      },
+      "referenceFeatures": ["节点图本地扩散", "异步队列/history 对账"],
+      "localOwners": ["generation comfyui-local adapter"],
+      "localSrc": ["src/core/generation.ts", "scripts/comfyui-local-protocol-smoke.ts"],
+      "localTests": [],
+      "alreadyImplemented": true,
+      "realGap": "正式供应商已改为 agent-imagegen；Comfy 非正式生图主链",
+      "userValue": "中（本机备线已存在）",
+      "integrationMode": "ADAPTER_ONLY 独立安装",
+      "migrationPerfImpact": "已隔离 localhost",
+      "risks": "GPL 禁止并入核心",
+      "classification": "ADAPTER_ONLY",
+      "secondaryTags": ["ALREADY_IMPLEMENTED"],
+      "implementThisRound": false
+    },
+    {
+      "id": "storytoolkitai",
+      "name": "StoryToolkitAI",
+      "repo": "https://github.com/octimot/StoryToolkitAI",
+      "defaultBranch": "main",
+      "pin": { "kind": "branch", "commit": null },
+      "license": {
+        "spdx": "GPL-3.0",
+        "link": "https://github.com/octimot/StoryToolkitAI/blob/main/LICENSE",
+        "verifiedOn": "2026-07-18"
+      },
+      "referenceFeatures": ["素材转写/语义检索/剪辑辅助"],
+      "localOwners": [],
+      "localSrc": [],
+      "localTests": [],
+      "alreadyImplemented": false,
+      "realGap": "成片理解检索，非 15s 单元生成主路径",
+      "userValue": "低（当前目标）",
+      "integrationMode": "ADAPTER_ONLY 或 DEFERRED",
+      "migrationPerfImpact": "中",
+      "risks": "GPL",
+      "classification": "DEFERRED",
+      "secondaryTags": ["LICENSE_BLOCKED", "NOT_NEEDED"],
+      "implementThisRound": false
+    },
+    {
+      "id": "storyboarder",
+      "name": "Storyboarder",
+      "repo": "https://github.com/wonderunit/storyboarder",
+      "defaultBranch": "master",
+      "pin": { "kind": "branch", "commit": null, "pushedAt": "2024-03-17", "note": "stale activity; license field null on GitHub API" },
+      "license": {
+        "spdx": null,
+        "link": "https://github.com/wonderunit/storyboarder",
+        "verifiedOn": "2026-07-18",
+        "notes": "OBJECTIVE 要求仅研究公开功能不复制源码；许可证未在 API 暴露，仍禁止并入"
+      },
+      "referenceFeatures": ["快速手绘分镜", "故事可视化"],
+      "localOwners": ["studio-production panels"],
+      "localSrc": ["src/core/studio-production.ts"],
+      "localTests": [],
+      "alreadyImplemented": false,
+      "realGap": "手绘工作流与 AI CAS 短剧目标不对齐",
+      "userValue": "低",
+      "integrationMode": "RESEARCH_ONLY",
+      "migrationPerfImpact": "n/a",
+      "risks": "源码复制禁止；维护停滞",
+      "classification": "RESEARCH_ONLY",
+      "secondaryTags": ["NOT_NEEDED"],
+      "implementThisRound": false
+    }
+  ],
+  "boundaries": {
+    "thirdPartyTreesInMonorepo": false,
+    "gitStage": false,
+    "formalImagegen": false,
+    "finalValidationOverwritten": false
+  }
+}

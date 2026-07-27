@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "kind": "p5-multimedia-formal-electron-smoke",
+  "createdAt": "2026-07-26T19:54:49.370Z",
+  "projectId": "project-b3e5fa60bbcd",
+  "unitId": "unit-local-e61b4628ca1abe8d8752c50d304fdb6e77847b16",
+  "availabilityText": "剧本 可用\n图片 可用\n视频 可用\n音频 可用",
+  "videoEntries": 1,
+  "audioEntries": 1,
+  "gapText": "缺失项与派生物状态\n无已知缺失\n\nCore 未报告正式故事板、视频、音频或派生物缺口。",
+  "importButtonEnabled": true,
+  "playbackOptions": [
+    {
+      "value": "timeline-binding-6850a5ae52deb1e74b23302ca230c4682ba566a4",
+      "label": "视频 · w00-video-main · 0.000s–12.000s"
+    },
+    {
+      "value": "timeline-binding-eec3bc974b4790122f972f8db756ac36fbfb8f40",
+      "label": "对白 · w00-dialogue-main · 0.000s–12.000s"
+    }
+  ],
+  "videoPlayback": {
+    "readyState": 4,
+    "networkState": 1,
+    "durationSeconds": 12,
+    "startSeconds": 0,
+    "endSeconds": 0.791809,
+    "advanced": true,
+    "paused": true,
+    "errorCode": null,
+    "sourceProtocol": "aicanvas-studio:"
+  },
+  "audioPlayback": {
+    "readyState": 4,
+    "networkState": 1,
+    "durationSeconds": 12,
+    "startSeconds": 0,
+    "endSeconds": 0.801608,
+    "advanced": true,
+    "paused": true,
+    "errorCode": null,
+    "sourceProtocol": "aicanvas-studio:"
+  },
+  "derivativeLabels": [
+    "缩略图 ready",
+    "缩略图 ready",
+    "视频海报 ready",
+    "视频代理 ready",
+    "音频波形 ready"
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalResources": [],
+  "screenshots": {
+    "overview": {
+      "path": "output/playwright/p5-multimedia-formal-overview-2026-07-26T19-54-43-190Z.png",
+      "sha256": "4e2d063d8b121c53f9818d59477ffdaa1f900232a3389ad21ca70dce745c61e3",
+      "sizeBytes": 163360,
+      "width": 1728,
+      "height": 1029,
+      "maxChannelStandardDeviation": 22.42232776914868
+    },
+    "tracks": {
+      "path": "output/playwright/p5-multimedia-formal-tracks-2026-07-26T19-54-43-190Z.png",
+      "sha256": "0e8e207cfb109ff201ccfba8152aa6d93994b7d58c15bc6939f34d8b124b9be6",
+      "sizeBytes": 179311,
+      "width": 1728,
+      "height": 1029,
+      "maxChannelStandardDeviation": 26.190789996242017
+    }
+  },
+  "externalUploadCount": 0,
+  "imageGenerationCount": 0,
+  "paidActionCount": 0
+}

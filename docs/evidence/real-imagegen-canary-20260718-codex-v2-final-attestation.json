@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "kind": "agent-imagegen-session-attestation",
+  "attestationLevel": "agent-session-direct",
+  "provider": "codex",
+  "executorKind": "agent-imagegen",
+  "primaryTool": "image_gen",
+  "generationRunId": "real-codex-canary-v2-001",
+  "packFingerprint": "3b91ba54398ffe4e50e99442fe3bc8b497c868ce6def034c59f74ede6f47ba7d",
+  "promptSha256": "f2671d1826560aa36d191a6278aac48846ee2cc1ab604418297f33fe2c75a5a7",
+  "rawSha256": "d6bff7f86ee00322daf105a02c86bf62f3cebc44e533abf9cca26332ab894875",
+  "directToolCall": true,
+  "formalImageGenerationCalls": 1,
+  "agentTaskName": "/root",
+  "createdAt": "2026-07-18T07:25:59Z",
+  "note": "本次冻结包 dispatch 后由当前会话直接调用一次 Codex image_gen；这是会话级审计证言，不是供应商密码学回执。"
+}

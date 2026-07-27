@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 3,
+  "createdAt": "2026-07-18T07:33:24.351Z",
+  "buildIdentity": {
+    "buildId": "1ee489189308542684e83679a1724a6a",
+    "sourceDigest": "3996312f7fe09de33d7148405786293b1ae2d25c0015a125637ff3c69412c244",
+    "fingerprint": "c7756c7f0a627ecc30921cf9455612ba117e5196383f1c03f80fa40bcd254095",
+    "sourceFiles": 380,
+    "sourceBytes": 9428452,
+    "capabilities": {
+      "mcpToolCount": 182,
+      "protocolVersion": "1.1",
+      "studioDashboard": true,
+      "studioBinding": true,
+      "studioContinuity": true,
+      "formalImagegenProvider": "agent-imagegen",
+      "formalImagegenProviders": [
+        "codex",
+        "grok"
+      ],
+      "browserGeneration": false,
+      "artlist": false
+    }
+  },
+  "formalProject": {
+    "projectId": "project-2e3b44bc6ac4",
+    "startupPolicy": "no-filesystem-scan",
+    "sourceRoots": [],
+    "materialCounts": {
+      "media": 0,
+      "mediaImports": 0,
+      "canonicalAssets": 0,
+      "characters": 0,
+      "scenes": 0,
+      "props": 0,
+      "assetVersions": 0,
+      "assetDefinitions": 0,
+      "primaryAuthorities": 0,
+      "authorityEvents": 0,
+      "versionReviews": 0,
+      "assetRelations": 0
+    },
+    "productionCounts": {
+      "textDocuments": 0,
+      "scriptDocuments": 0,
+      "promptDocuments": 0,
+      "textRevisions": 0,
+      "units": 0,
+      "panels": 0,
+      "unitRevisions": 0,
+      "scriptSectionRevisions": 0,
+      "mentionAnalyses": 0,
+      "mentionProposals": 0,
+      "mentionDecisions": 0,
+      "panelEntityClosureConfirmations": 0,
+      "assetBindingSets": 0
+    },
+    "generationCounts": {
+      "packs": 0,
+      "dispatches": 0,
+      "results": 0,
+      "pendingResults": 0,
+      "staleAtRegistrationResults": 0
+    }
+  },
+  "kind": "final-validation-p9r2-reliability",
+  "status": "PASS",
+  "conclusion": "SQL 深分页、1288/4235/77 精确规模、10k 真实 CAS、1000 可解码缩略图、受管无限画布与 Electron 滚动/切工程均通过。",
+  "evidence": [
+    {
+      "relativePath": "docs/evidence/p9-scale-fixture-20260718-p9r2-full1288.json",
+      "sizeBytes": 3203,
+      "sha256": "0bdd13869cf4ba222d4b8d31e6245043072983a64690e73653ed62fea5d65f65"
+    },
+    {
+      "relativePath": "docs/evidence/p9-media-scale-20260718-p9r2-real10k.json",
+      "sizeBytes": 1452,
+      "sha256": "690b2b5d4e53886818d5e9cbb8526e9686caab2a4574f3bfd88bf8d3b0d4f3c9"
+    },
+    {
+      "relativePath": "docs/evidence/managed-studio-scale-canvas-ui-smoke-20260718-r3.json",
+      "sizeBytes": 2275,
+      "sha256": "fa7dfe414d65e37570cfb89d7fbb792c6f4de787bb1252508b0d6a6cc6e53881"
+    },
+    {
+      "relativePath": "docs/evidence/p9r2-p10r2-targeted-tests-20260718.json",
+      "sizeBytes": 2056,
+      "sha256": "1206dda1a7b0239b149ba24d72d2b426e836e2d877460e857ab3167849d5c038"
+    },
+    {
+      "relativePath": "docs/evidence/p9r2-p10r2-full-tests-20260718.json",
+      "sizeBytes": 974,
+      "sha256": "567b08c2f36ea9a633d11261aa008f05e9fd746b5982bc001ce47ae52b11726a"
+    },
+    {
+      "relativePath": "docs/evidence/p9r2-p10r2-production-build-20260718.json",
+      "sizeBytes": 925,
+      "sha256": "553fb197f94b67a0c9d4f6084352230d961ea6e311f1280d505f175d47097c99"
+    }
+  ],
+  "gates": {
+    "exactScale": true,
+    "realCas10k": true,
+    "sqlKeysetDeepPages": true,
+    "boundedCanvasDom": true,
+    "mediaScrollBounded": true,
+    "projectSwitchIsolated": true
+  }
+}

@@ -1,0 +1,386 @@
+{
+  "schemaVersion": 1,
+  "kind": "aicanvas-formal-project-nle-electron-smoke",
+  "generatedAt": "2026-07-14T23:34:17.436Z",
+  "status": "passed",
+  "transport": "source-electron-current-build",
+  "projectRoot": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729",
+  "registryPath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/.runtime/registry.json",
+  "statePath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/calibration-state.json",
+  "first": {
+    "summary": {
+      "id": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+      "name": "EP22《斩鼎》53 镜正式长时间线",
+      "revision": 5,
+      "timebase": {
+        "rateNumerator": 24000,
+        "rateDenominator": 1001
+      },
+      "mainClipCount": 54,
+      "totalFrames": 10933,
+      "audioClips": 1,
+      "subtitleClips": 6,
+      "nestedClips": [
+        {
+          "id": "clip-0dc2bdf1-d1e5-4f9c-aa97-a7c0679cbb9b",
+          "snapshot": "17cb12aa8060fcebce0c10df449c08ed5532e9a4583447c8e32ea7882d848f1f",
+          "childRevision": 2
+        }
+      ],
+      "keyframeClips": [
+        {
+          "id": "clip-formal-ep22-044",
+          "keyframes": 2
+        },
+        {
+          "id": "clip-19366079-293a-4dd4-a4fb-e4c06bb0ba5c",
+          "keyframes": 1
+        }
+      ],
+      "timewarpClips": [
+        {
+          "id": "clip-formal-ep22-003",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-004",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-010",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-024",
+          "playbackRate": 0.25
+        },
+        {
+          "id": "clip-formal-ep22-025",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-027",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-029",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-030",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-031",
+          "playbackRate": 0.25
+        },
+        {
+          "id": "clip-formal-ep22-033",
+          "playbackRate": 0.25
+        },
+        {
+          "id": "clip-formal-ep22-034",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-035",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-037",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-039",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-042",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-043",
+          "playbackRate": 0.2
+        },
+        {
+          "id": "clip-formal-ep22-044",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-19366079-293a-4dd4-a4fb-e4c06bb0ba5c",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-046",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-053",
+          "playbackRate": 0.5
+        }
+      ],
+      "transitionClips": [
+        {
+          "id": "clip-formal-ep22-001",
+          "transition": {
+            "contract": "aicanvas.otio-transition.v1",
+            "kind": "smpte_dissolve",
+            "targetClipId": "clip-formal-ep22-002",
+            "inOffsetFrames": 12,
+            "outOffsetFrames": 12
+          }
+        }
+      ]
+    },
+    "timebaseText": "360×640 · 24000/1001 · F0",
+    "headerText": "工程与片段\nEP22《斩鼎》53 镜正式长时间线\n修订 v5 · 10933 帧 · 455.997 秒",
+    "preview": {
+      "currentSrc": "aicanvas-asset://file/?path=%2FUsers%2Fhxx%2FDocuments%2F%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83%2Fformal-calibration%2Ffengshen-bcbd8aca-20260715-0729%2F.calibration_media%2Fformal-reference-derived-24fps.mp4",
+      "currentTime": 2.001999,
+      "readyState": 4,
+      "videoWidth": 360,
+      "videoHeight": 640,
+      "error": null
+    },
+    "previewScreenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/formal-project-nle-ui-20260715-0735-preview.png",
+      "bytes": 153315,
+      "sha256": "701b794f1470379b3b6bbf094e99049da770a99c7585fa94d168024e300d09f5",
+      "width": 392,
+      "height": 696,
+      "content": {
+        "pixels": 272832,
+        "brightPixels": 246388,
+        "brightRatio": 0.9030758855266244,
+        "chromaticPixels": 35448,
+        "chromaticRatio": 0.12992610837438423
+      }
+    },
+    "nestedInspector": "快照 17cb12aa8060 · 24/1\n显式刷新到子工程当前修订",
+    "nestedScreenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/formal-project-nle-ui-20260715-0735-nested.png",
+      "bytes": 173460,
+      "sha256": "4df9eaa16a3d8d8555b5476f5c3bc9aeca5e3b88c63e270db3c18feb2ee4063a",
+      "width": 1560,
+      "height": 980,
+      "content": {
+        "pixels": 1528800,
+        "brightPixels": 96687,
+        "brightRatio": 0.06324372056514914,
+        "chromaticPixels": 13546,
+        "chromaticRatio": 0.008860544217687075
+      }
+    },
+    "renders": [
+      {
+        "id": "render-65610593-bcaa-4eff-b540-66b05af7c915",
+        "status": "succeeded",
+        "outputPath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/成片输出/EP22《斩鼎》53 镜正式长时间线_20260714T232818306Z_v005.mp4",
+        "progress": 1
+      },
+      {
+        "id": "render-1548a06f-4ccc-4e69-846d-bbae1fc54ae5",
+        "status": "succeeded",
+        "outputPath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/成片输出/EP22 正式剧本派生 Effect Transition Proof_20260714T232817058Z_v001.mp4",
+        "progress": 1
+      }
+    ],
+    "pageErrors": [],
+    "screenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/formal-project-nle-ui-20260715-0735.png",
+      "bytes": 261660,
+      "sha256": "b22c413d438b9db597e0a4c55fffbac444bd727a1327f2bba9cda7f4ca510a3f",
+      "width": 1560,
+      "height": 980,
+      "content": {
+        "pixels": 1528800,
+        "brightPixels": 157544,
+        "brightRatio": 0.10305075876504448,
+        "chromaticPixels": 24487,
+        "chromaticRatio": 0.016017137624280482
+      }
+    }
+  },
+  "restarted": {
+    "summary": {
+      "id": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+      "name": "EP22《斩鼎》53 镜正式长时间线",
+      "revision": 5,
+      "timebase": {
+        "rateNumerator": 24000,
+        "rateDenominator": 1001
+      },
+      "mainClipCount": 54,
+      "totalFrames": 10933,
+      "audioClips": 1,
+      "subtitleClips": 6,
+      "nestedClips": [
+        {
+          "id": "clip-0dc2bdf1-d1e5-4f9c-aa97-a7c0679cbb9b",
+          "snapshot": "17cb12aa8060fcebce0c10df449c08ed5532e9a4583447c8e32ea7882d848f1f",
+          "childRevision": 2
+        }
+      ],
+      "keyframeClips": [
+        {
+          "id": "clip-formal-ep22-044",
+          "keyframes": 2
+        },
+        {
+          "id": "clip-19366079-293a-4dd4-a4fb-e4c06bb0ba5c",
+          "keyframes": 1
+        }
+      ],
+      "timewarpClips": [
+        {
+          "id": "clip-formal-ep22-003",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-004",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-010",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-024",
+          "playbackRate": 0.25
+        },
+        {
+          "id": "clip-formal-ep22-025",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-027",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-029",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-030",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-031",
+          "playbackRate": 0.25
+        },
+        {
+          "id": "clip-formal-ep22-033",
+          "playbackRate": 0.25
+        },
+        {
+          "id": "clip-formal-ep22-034",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-035",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-037",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-039",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-042",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-043",
+          "playbackRate": 0.2
+        },
+        {
+          "id": "clip-formal-ep22-044",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-19366079-293a-4dd4-a4fb-e4c06bb0ba5c",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-046",
+          "playbackRate": 0.5
+        },
+        {
+          "id": "clip-formal-ep22-053",
+          "playbackRate": 0.5
+        }
+      ],
+      "transitionClips": [
+        {
+          "id": "clip-formal-ep22-001",
+          "transition": {
+            "contract": "aicanvas.otio-transition.v1",
+            "kind": "smpte_dissolve",
+            "targetClipId": "clip-formal-ep22-002",
+            "inOffsetFrames": 12,
+            "outOffsetFrames": 12
+          }
+        }
+      ]
+    },
+    "timebaseText": "360×640 · 24000/1001 · F0",
+    "headerText": "工程与片段\nEP22《斩鼎》53 镜正式长时间线\n修订 v5 · 10933 帧 · 455.997 秒",
+    "preview": {
+      "currentSrc": "aicanvas-asset://file/?path=%2FUsers%2Fhxx%2FDocuments%2F%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83%2Fformal-calibration%2Ffengshen-bcbd8aca-20260715-0729%2F.calibration_media%2Fformal-reference-derived-24fps.mp4",
+      "currentTime": 2.001999,
+      "readyState": 4,
+      "videoWidth": 360,
+      "videoHeight": 640,
+      "error": null
+    },
+    "previewScreenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/formal-project-nle-ui-20260715-0735-restart-preview.png",
+      "bytes": 153315,
+      "sha256": "701b794f1470379b3b6bbf094e99049da770a99c7585fa94d168024e300d09f5",
+      "width": 392,
+      "height": 696,
+      "content": {
+        "pixels": 272832,
+        "brightPixels": 246388,
+        "brightRatio": 0.9030758855266244,
+        "chromaticPixels": 35448,
+        "chromaticRatio": 0.12992610837438423
+      }
+    },
+    "nestedInspector": "快照 17cb12aa8060 · 24/1\n显式刷新到子工程当前修订",
+    "renders": [
+      {
+        "id": "render-65610593-bcaa-4eff-b540-66b05af7c915",
+        "status": "succeeded",
+        "outputPath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/成片输出/EP22《斩鼎》53 镜正式长时间线_20260714T232818306Z_v005.mp4",
+        "progress": 1
+      },
+      {
+        "id": "render-1548a06f-4ccc-4e69-846d-bbae1fc54ae5",
+        "status": "succeeded",
+        "outputPath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/成片输出/EP22 正式剧本派生 Effect Transition Proof_20260714T232817058Z_v001.mp4",
+        "progress": 1
+      }
+    ],
+    "pageErrors": [],
+    "screenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/formal-project-nle-ui-20260715-0735-restart.png",
+      "bytes": 261660,
+      "sha256": "b22c413d438b9db597e0a4c55fffbac444bd727a1327f2bba9cda7f4ca510a3f",
+      "width": 1560,
+      "height": 980,
+      "content": {
+        "pixels": 1528800,
+        "brightPixels": 157544,
+        "brightRatio": 0.10305075876504448,
+        "chromaticPixels": 24487,
+        "chromaticRatio": 0.016017137624280482
+      }
+    }
+  },
+  "fullAppRestartPersisted": true,
+  "pageErrors": []
+}

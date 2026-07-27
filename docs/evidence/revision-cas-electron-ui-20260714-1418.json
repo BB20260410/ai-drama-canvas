@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "kind": "revision-cas-dual-electron",
+  "generatedAt": "2026-07-14T14:18:30.775Z",
+  "transport": "two-independent-electron-processes-current-build",
+  "projectRoot": "/tmp/ai-canvas-revision-cas-ui-62814",
+  "registryPath": "/tmp/ai-canvas-revision-cas-ui-registry-62814.json",
+  "clients": {
+    "clientA": {
+      "userDataDir": "/tmp/ai-canvas-revision-cas-ui-62814-client-a",
+      "role": "winner"
+    },
+    "clientB": {
+      "userDataDir": "/tmp/ai-canvas-revision-cas-ui-62814-client-b",
+      "role": "stale-loser"
+    }
+  },
+  "fixture": {
+    "projectRoot": "/tmp/ai-canvas-revision-cas-ui-62814",
+    "registryPath": "/tmp/ai-canvas-revision-cas-ui-registry-62814.json",
+    "itemIds": [
+      "main-ep01-unit001",
+      "main-ep01-unit002"
+    ],
+    "workflowRevision": 0,
+    "bible": {
+      "id": "bible-fbd824a4-18b6-451a-8886-cdfce17b26a8",
+      "revision": 1
+    },
+    "relation": {
+      "id": "asset-relation-180e9c25-115c-470b-a6ba-863ea29c060a",
+      "revision": 1
+    },
+    "voice": {
+      "id": "voice-9de5d82b-deec-4c92-8c39-76082811551b",
+      "revision": 1
+    },
+    "updateContext": {
+      "id": "context-5e6272d0-60ff-48b6-8411-916f6d396de3",
+      "revision": 1
+    },
+    "deleteContext": {
+      "id": "context-f2a9fb6d-4bdb-4a37-bb34-52d7e7337aee",
+      "revision": 1
+    }
+  },
+  "successes": {
+    "contextUpdate": "项目记忆已保存：双客户端更新竞争",
+    "contextDeleteGuard": "项目记忆已保存：双客户端更新竞争",
+    "workflow": "生产阶段已保存并重新核验证据",
+    "bible": "创作 Bible 已保存",
+    "relation": "资产血缘已安全保存 · r2",
+    "voice": "角色音色已保存"
+  },
+  "conflicts": {
+    "contextUpdate": "Error invoking remote method 'canvas:upsert-context': RejectedCommandFailure: 项目记忆已被其他窗口更新（当前修订 2），请刷新后重试。",
+    "contextDelete": "Error invoking remote method 'canvas:delete-context': RejectedCommandFailure: 项目记忆已被其他窗口更新（当前修订 2），请刷新后重试。",
+    "workflow": "Error invoking remote method 'canvas:update-production-workflow-stage': RejectedCommandFailure: 生产工作流已被其他窗口更新（当前修订 1），请刷新后重试。",
+    "bible": "Error invoking remote method 'canvas:upsert-creative-bible': RejectedCommandFailure: 创作 Bible已被其他窗口更新（当前修订 2），请刷新后重试。",
+    "relation": "Error invoking remote method 'canvas:upsert-asset-relation': RejectedCommandFailure: 资产关系已被其他窗口更新（当前修订 2），请刷新后重试。",
+    "voice": "Error invoking remote method 'canvas:upsert-voice-identity': RejectedCommandFailure: 音色身份已被其他窗口更新（当前修订 2），请刷新后重试。"
+  },
+  "finalState": {
+    "workflow": {
+      "revision": 1,
+      "source": {
+        "inputRequirements": [
+          "本地 TXT、Markdown、DOCX 或明确原文路径"
+        ],
+        "outputRequirements": [
+          "可追溯原文快照"
+        ],
+        "acceptanceCriteria": [
+          "原文件存在且快照可读",
+          "来源路径、修改时间和哈希可追溯"
+        ],
+        "failurePaths": [
+          "编码或格式失败时保留原文件并记录警告"
+        ],
+        "nextActions": [
+          "import_story_file",
+          "list_story_sources"
+        ],
+        "id": "source",
+        "name": "原文导入",
+        "status": "in_progress",
+        "evidencePaths": [],
+        "itemIds": [],
+        "updatedAt": "2026-07-14T14:18:29.882Z",
+        "note": "CLIENT_A_WORKFLOW_WINNER"
+      }
+    },
+    "bible": {
+      "schemaVersion": 1,
+      "id": "bible-fbd824a4-18b6-451a-8886-cdfce17b26a8",
+      "kind": "director",
+      "name": "双客户端导演 Bible",
+      "summary": "CLIENT_A_BIBLE_WINNER",
+      "rules": [
+        "winner 的修改必须保留"
+      ],
+      "forbidden": [
+        "禁止 loser 静默覆盖"
+      ],
+      "referencePaths": [],
+      "tags": [
+        "revision-cas",
+        "hidden-preserve"
+      ],
+      "revision": 2,
+      "createdAt": "2026-07-14T14:18:28.497Z",
+      "updatedAt": "2026-07-14T14:18:29.989Z"
+    },
+    "relation": {
+      "id": "asset-relation-180e9c25-115c-470b-a6ba-863ea29c060a",
+      "kind": "reference_of",
+      "parentItemId": "main-ep01-unit001",
+      "childItemId": "main-ep01-unit002",
+      "operation": "CLIENT_A_RELATION_WINNER",
+      "note": "用于双客户端 stale update 验收",
+      "revision": 2,
+      "createdAt": "2026-07-14T14:18:28.513Z",
+      "updatedAt": "2026-07-14T14:18:30.116Z"
+    },
+    "voice": {
+      "id": "voice-9de5d82b-deec-4c92-8c39-76082811551b",
+      "name": "双客户端旁白",
+      "provider": "local-fixture",
+      "providerVoiceId": "voice-initial",
+      "language": "zh-CN",
+      "description": "CLIENT_A_VOICE_WINNER",
+      "samplePaths": [],
+      "characterItemIds": [],
+      "tags": [
+        "revision-cas",
+        "hidden-preserve"
+      ],
+      "revision": 2,
+      "createdAt": "2026-07-14T14:18:28.530Z",
+      "updatedAt": "2026-07-14T14:18:30.216Z"
+    },
+    "updateContext": {
+      "id": "context-5e6272d0-60ff-48b6-8411-916f6d396de3",
+      "kind": "continuity",
+      "title": "双客户端更新竞争",
+      "content": "CLIENT_A_CONTEXT_UPDATE_WINNER",
+      "tags": [
+        "revision-cas",
+        "update"
+      ],
+      "itemIds": [
+        "main-ep01-unit001"
+      ],
+      "sourcePaths": [],
+      "revision": 2,
+      "createdAt": "2026-07-14T14:18:28.546Z",
+      "updatedAt": "2026-07-14T14:18:29.298Z"
+    },
+    "deleteContext": {
+      "id": "context-f2a9fb6d-4bdb-4a37-bb34-52d7e7337aee",
+      "kind": "decision",
+      "title": "双客户端删除竞争",
+      "content": "CLIENT_A_CONTEXT_DELETE_GUARD_WINNER",
+      "tags": [
+        "revision-cas",
+        "delete"
+      ],
+      "itemIds": [
+        "main-ep01-unit002"
+      ],
+      "sourcePaths": [],
+      "revision": 2,
+      "createdAt": "2026-07-14T14:18:28.562Z",
+      "updatedAt": "2026-07-14T14:18:29.481Z"
+    }
+  },
+  "assertions": {
+    "twoIndependentElectronProcesses": true,
+    "sameProjectAndRegistry": true,
+    "contextStaleUpdateRejected": true,
+    "contextStaleDeleteRejected": true,
+    "workflowStaleUpdateRejected": true,
+    "bibleStaleUpdateRejected": true,
+    "relationStaleUpdateRejected": true,
+    "voiceStaleUpdateRejected": true,
+    "exactlyOneRevisionAdvancePerEntity": true,
+    "loserContentAbsent": true,
+    "hiddenFieldsPreserved": true,
+    "pageErrors": {
+      "clientA": [],
+      "clientB": []
+    },
+    "screenshotCaptureAttempt": 1
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/revision-cas-electron-ui-20260714-1418.png",
+    "bytes": 180207,
+    "sha256": "c057ff18c062122bc9423a21732e169e1167f2fae69b4414ffabc1241a61339e",
+    "width": 1560,
+    "height": 980,
+    "content": {
+      "pixels": 1528800,
+      "brightPixels": 43143,
+      "brightRatio": 0.028220172684458398,
+      "chromaticPixels": 17778,
+      "chromaticRatio": 0.0116287284144427,
+      "edgeBrightRatios": {
+        "top": 0.04692569335426478,
+        "left": 0.04755610429225071,
+        "right": 0.02506195335276968
+      }
+    }
+  }
+}

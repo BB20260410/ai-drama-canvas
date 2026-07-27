@@ -1,0 +1,379 @@
+{
+  "schemaVersion": 1,
+  "kind": "p4-fusion-storyboard-sheet-migration",
+  "createdAt": "2026-07-17T13:47:09.918Z",
+  "apply": true,
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "sourceRoot": "/Users/hxx/Documents/古蜀卷第三季",
+  "source": {
+    "before": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "after": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "unchanged": true
+  },
+  "protected": {
+    "before": {
+      "generationJobs": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-jobs.json",
+        "exists": true,
+        "bytes": 333529,
+        "sha256": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182"
+      },
+      "publications": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/publications.json",
+        "exists": true,
+        "bytes": 84340,
+        "sha256": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238"
+      },
+      "reviews": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/reviews.json",
+        "exists": true,
+        "bytes": 85063,
+        "sha256": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97"
+      },
+      "generationRequests": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-requests",
+        "files": 31,
+        "bytes": 174082,
+        "aggregateSha256": "171ca4fd131b977f07f7bbb5e44bfd836a1158ce63c6bcaff721b45f95b1fbca"
+      },
+      "generationDownloads": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-downloads",
+        "files": 26,
+        "bytes": 55357407,
+        "aggregateSha256": "ccfd0599ac21da61f79bee1538de3f7faea54d156c05f594181f0d5437849dc8"
+      },
+      "rawLabeled": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+        "files": 52,
+        "bytes": 128973009,
+        "aggregateSha256": "77d4a46fa04c05c635701363f394faab0cc5094fc437990f6eeb580ce0e4c83b"
+      },
+      "identitySha256": "fe1a25a316b4f7f342546b812c8fd9afb1bf3899bc46d6819a22c9ab1aa2ef09"
+    },
+    "after": {
+      "generationJobs": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-jobs.json",
+        "exists": true,
+        "bytes": 333529,
+        "sha256": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182"
+      },
+      "publications": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/publications.json",
+        "exists": true,
+        "bytes": 84340,
+        "sha256": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238"
+      },
+      "reviews": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/reviews.json",
+        "exists": true,
+        "bytes": 85063,
+        "sha256": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97"
+      },
+      "generationRequests": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-requests",
+        "files": 31,
+        "bytes": 174082,
+        "aggregateSha256": "171ca4fd131b977f07f7bbb5e44bfd836a1158ce63c6bcaff721b45f95b1fbca"
+      },
+      "generationDownloads": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-downloads",
+        "files": 26,
+        "bytes": 55357407,
+        "aggregateSha256": "ccfd0599ac21da61f79bee1538de3f7faea54d156c05f594181f0d5437849dc8"
+      },
+      "rawLabeled": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+        "files": 52,
+        "bytes": 128973009,
+        "aggregateSha256": "77d4a46fa04c05c635701363f394faab0cc5094fc437990f6eeb580ce0e4c83b"
+      },
+      "identitySha256": "fe1a25a316b4f7f342546b812c8fd9afb1bf3899bc46d6819a22c9ab1aa2ef09"
+    },
+    "unchanged": true
+  },
+  "command": {
+    "requestId": "p4-sheet-migration-18329c75e78e3969d4fca7cc8e517ff6c6ce1d48ac723e82",
+    "idempotencyKey": "p4-sheet-migration-18329c75e78e3969d4fca7cc8e517ff6c6ce1d48ac723e82",
+    "request": {
+      "command": "migrate_fusion_storyboard_sheets",
+      "payload": {
+        "expectedStoreRevision": 0,
+        "expectedCandidateFingerprint": "76d02dcf4bf5a789f8dc2155843b944192d09d9d035d882f613050cccd6e4fbd"
+      }
+    }
+  },
+  "first": {
+    "record": {
+      "schemaVersion": 1,
+      "requestId": "p4-sheet-migration-18329c75e78e3969d4fca7cc8e517ff6c6ce1d48ac723e82",
+      "idempotencyKey": "p4-sheet-migration-18329c75e78e3969d4fca7cc8e517ff6c6ce1d48ac723e82",
+      "command": "migrate_fusion_storyboard_sheets",
+      "status": "succeeded",
+      "replayed": false,
+      "requestHash": "ccd31ef1e23c97550ad4e045aa8742295cf4c3f8831bfc5b6294ef3342202a6a",
+      "execution": {
+        "pid": 599,
+        "phase": "side_effect_committed",
+        "heartbeatAt": "2026-07-17T13:47:09.581Z"
+      },
+      "startedAt": "2026-07-17T13:47:09.453Z",
+      "result": {
+        "schemaVersion": 1,
+        "kind": "fusion-storyboard-sheet-migration-result",
+        "previousRevision": 0,
+        "candidateFingerprint": "76d02dcf4bf5a789f8dc2155843b944192d09d9d035d882f613050cccd6e4fbd",
+        "candidateCount": 2,
+        "pendingCount": 2,
+        "byStatus": {
+          "stale": 1,
+          "legacyInvalid": 1
+        },
+        "sheetIds": [
+          "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+          "legacy-sheet-d75625366c9b08f7fbbb8802741789b0"
+        ],
+        "applied": true,
+        "replayed": false,
+        "storeRevision": 1,
+        "created": 2,
+        "unchanged": 0
+      },
+      "executedAt": "2026-07-17T13:47:09.584Z"
+    },
+    "result": {
+      "schemaVersion": 1,
+      "kind": "fusion-storyboard-sheet-migration-result",
+      "previousRevision": 0,
+      "candidateFingerprint": "76d02dcf4bf5a789f8dc2155843b944192d09d9d035d882f613050cccd6e4fbd",
+      "candidateCount": 2,
+      "pendingCount": 2,
+      "byStatus": {
+        "stale": 1,
+        "legacyInvalid": 1
+      },
+      "sheetIds": [
+        "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+        "legacy-sheet-d75625366c9b08f7fbbb8802741789b0"
+      ],
+      "applied": true,
+      "replayed": false,
+      "storeRevision": 1,
+      "created": 2,
+      "unchanged": 0
+    }
+  },
+  "replay": {
+    "record": {
+      "schemaVersion": 1,
+      "requestId": "p4-sheet-migration-18329c75e78e3969d4fca7cc8e517ff6c6ce1d48ac723e82-replay",
+      "idempotencyKey": "p4-sheet-migration-18329c75e78e3969d4fca7cc8e517ff6c6ce1d48ac723e82",
+      "command": "migrate_fusion_storyboard_sheets",
+      "status": "succeeded",
+      "replayed": true,
+      "requestHash": "ccd31ef1e23c97550ad4e045aa8742295cf4c3f8831bfc5b6294ef3342202a6a",
+      "execution": {
+        "pid": 599,
+        "phase": "side_effect_committed",
+        "heartbeatAt": "2026-07-17T13:47:09.581Z"
+      },
+      "startedAt": "2026-07-17T13:47:09.453Z",
+      "result": {
+        "schemaVersion": 1,
+        "kind": "fusion-storyboard-sheet-migration-result",
+        "previousRevision": 0,
+        "candidateFingerprint": "76d02dcf4bf5a789f8dc2155843b944192d09d9d035d882f613050cccd6e4fbd",
+        "candidateCount": 2,
+        "pendingCount": 2,
+        "byStatus": {
+          "stale": 1,
+          "legacyInvalid": 1
+        },
+        "sheetIds": [
+          "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+          "legacy-sheet-d75625366c9b08f7fbbb8802741789b0"
+        ],
+        "applied": true,
+        "replayed": false,
+        "storeRevision": 1,
+        "created": 2,
+        "unchanged": 0
+      },
+      "executedAt": "2026-07-17T13:47:09.584Z"
+    },
+    "result": {
+      "schemaVersion": 1,
+      "kind": "fusion-storyboard-sheet-migration-result",
+      "previousRevision": 0,
+      "candidateFingerprint": "76d02dcf4bf5a789f8dc2155843b944192d09d9d035d882f613050cccd6e4fbd",
+      "candidateCount": 2,
+      "pendingCount": 2,
+      "byStatus": {
+        "stale": 1,
+        "legacyInvalid": 1
+      },
+      "sheetIds": [
+        "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+        "legacy-sheet-d75625366c9b08f7fbbb8802741789b0"
+      ],
+      "applied": true,
+      "replayed": false,
+      "storeRevision": 1,
+      "created": 2,
+      "unchanged": 0
+    },
+    "strict": true
+  },
+  "preview": {
+    "before": {
+      "schemaVersion": 1,
+      "kind": "fusion-storyboard-sheet-migration-preview",
+      "storeRevision": 0,
+      "scope": {
+        "itemIds": []
+      },
+      "candidateFingerprint": "76d02dcf4bf5a789f8dc2155843b944192d09d9d035d882f613050cccd6e4fbd",
+      "candidateCount": 2,
+      "pendingCount": 2,
+      "blockers": [],
+      "canMigrate": true,
+      "candidates": [
+        {
+          "sheetId": "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+          "receiptPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json",
+          "itemId": "season-三-ep01-unit001",
+          "status": "stale",
+          "contractId": "grid-6c02035d032128e0f62a",
+          "requirementId": "fusion-review-7916b22425ae2df44a0a3ce895530eb21459fb256d8e0ad8524182a558ec9aff",
+          "reviewId": "review-2026-07-16T19-18-14-130Z-527bbafe",
+          "artifacts": [
+            {
+              "role": "png",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.png",
+              "pageIndex": 1,
+              "pageCount": 1,
+              "sha256": "8600c46fe40ad797927c68c1bc09072556646a423f5edeb8a14fa90697e1e06e",
+              "bytes": 4472760
+            },
+            {
+              "role": "svg",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.svg",
+              "pageIndex": 1,
+              "pageCount": 1,
+              "sha256": "420d0cc54a7685a4d58e9f5b3145e8cf1c8248a31483d45d19e61a334b0448de",
+              "bytes": 1184873
+            },
+            {
+              "role": "receipt",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json",
+              "pageCount": 1,
+              "sha256": "7cb26385590c783a6d3af4318a3c53586b15ef5b38e7336425960fbc2e2e6f44",
+              "bytes": 3843
+            }
+          ],
+          "reason": "schema-v1 历史板绑定旧 Review/requirement，但未冻结 P4 当前完整证据，只能登记为 stale",
+          "pending": true
+        },
+        {
+          "sheetId": "legacy-sheet-d75625366c9b08f7fbbb8802741789b0",
+          "receiptPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json",
+          "itemId": "season-三-ep01-unit001",
+          "status": "legacy-invalid",
+          "contractId": "grid-6c02035d032128e0f62a",
+          "artifacts": [
+            {
+              "role": "receipt",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json",
+              "pageCount": 1,
+              "sha256": "f509797e0aef7793fcbf8e72a7b58a0b49e039cd247399032edde5227d0d1148",
+              "bytes": 3589
+            }
+          ],
+          "reason": "schema-v1 历史 receipt 未同时绑定 Review/requirement，只登记 receipt 且永久 legacy-invalid",
+          "pending": true
+        }
+      ]
+    },
+    "after": {
+      "schemaVersion": 1,
+      "kind": "fusion-storyboard-sheet-migration-preview",
+      "storeRevision": 1,
+      "scope": {
+        "itemIds": []
+      },
+      "candidateFingerprint": "76d02dcf4bf5a789f8dc2155843b944192d09d9d035d882f613050cccd6e4fbd",
+      "candidateCount": 2,
+      "pendingCount": 0,
+      "blockers": [],
+      "canMigrate": false,
+      "candidates": [
+        {
+          "sheetId": "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+          "receiptPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json",
+          "itemId": "season-三-ep01-unit001",
+          "status": "stale",
+          "contractId": "grid-6c02035d032128e0f62a",
+          "requirementId": "fusion-review-7916b22425ae2df44a0a3ce895530eb21459fb256d8e0ad8524182a558ec9aff",
+          "reviewId": "review-2026-07-16T19-18-14-130Z-527bbafe",
+          "artifacts": [
+            {
+              "role": "png",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.png",
+              "pageIndex": 1,
+              "pageCount": 1,
+              "sha256": "8600c46fe40ad797927c68c1bc09072556646a423f5edeb8a14fa90697e1e06e",
+              "bytes": 4472760
+            },
+            {
+              "role": "svg",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.svg",
+              "pageIndex": 1,
+              "pageCount": 1,
+              "sha256": "420d0cc54a7685a4d58e9f5b3145e8cf1c8248a31483d45d19e61a334b0448de",
+              "bytes": 1184873
+            },
+            {
+              "role": "receipt",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json",
+              "pageCount": 1,
+              "sha256": "7cb26385590c783a6d3af4318a3c53586b15ef5b38e7336425960fbc2e2e6f44",
+              "bytes": 3843
+            }
+          ],
+          "reason": "schema-v1 历史板绑定旧 Review/requirement，但未冻结 P4 当前完整证据，只能登记为 stale",
+          "pending": false
+        },
+        {
+          "sheetId": "legacy-sheet-d75625366c9b08f7fbbb8802741789b0",
+          "receiptPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json",
+          "itemId": "season-三-ep01-unit001",
+          "status": "legacy-invalid",
+          "contractId": "grid-6c02035d032128e0f62a",
+          "artifacts": [
+            {
+              "role": "receipt",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json",
+              "pageCount": 1,
+              "sha256": "f509797e0aef7793fcbf8e72a7b58a0b49e039cd247399032edde5227d0d1148",
+              "bytes": 3589
+            }
+          ],
+          "reason": "schema-v1 历史 receipt 未同时绑定 Review/requirement，只登记 receipt 且永久 legacy-invalid",
+          "pending": false
+        }
+      ]
+    }
+  },
+  "vendorOrGenerationInvoked": false,
+  "passed": true
+}

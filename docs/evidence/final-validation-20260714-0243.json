@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-07-14T02:48:00+08:00",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "objective": "Publication registration two-phase snapshot validate CAS consistency",
+  "commands": {
+    "typecheck": { "command": "npm run typecheck", "exitCode": 0 },
+    "targeted": { "command": "npx vitest run tests/publication.test.ts tests/command-bus.test.ts tests/editor.test.ts tests/codex.test.ts --maxWorkers=2", "exitCode": 0, "files": 4, "tests": 41 },
+    "sourceMcpContract": { "command": "npx vitest run tests/mcp-scan-cancel.test.ts --maxWorkers=1", "exitCode": 0, "tests": 1 },
+    "compiledMcpContract": { "command": "AI_CANVAS_MCP_SERVER_PATH=dist-mcp/mcp/server.js npx vitest run tests/mcp-scan-cancel.test.ts --maxWorkers=1", "exitCode": 0, "tests": 1 },
+    "tests": { "command": "npm test", "exitCode": 0, "files": 29, "tests": 157, "durationSeconds": 54.84, "maxWorkers": 2 },
+    "build": { "command": "npm run build", "exitCode": 0 },
+    "mcpSmoke": { "command": "npm run mcp:smoke", "exitCode": 0, "tools": 133, "resourceTemplates": 9, "prompts": 7 },
+    "publicationConsistencySmoke": { "command": "npm run publication:consistency-smoke -- docs/evidence/publication-consistency-smoke-20260714.json", "exitCode": 0, "evidence": "docs/evidence/publication-consistency-smoke-20260714.json" }
+  },
+  "publicationConsistency": {
+    "mode": "two-phase-snapshot-validate-cas",
+    "persistentValidationState": false,
+    "validationOutsideProjectLock": true,
+    "intentCasFields": ["revision", "reservationToken", "status", "targetPath", "allowedRoot", "kind", "variant", "projectId"],
+    "transientFileIdentity": ["canonicalRoot", "canonicalParent", "dev", "ino", "mode", "nlink", "size", "mtimeNs", "ctimeNs"],
+    "sha256Source": "fixed-o_nofollow-file-descriptor",
+    "concurrentSameIntent": "single-receipt",
+    "cancellationWins": true,
+    "fileDriftLeavesReserved": true,
+    "stableMechanicalFailure": "confirmed-failed",
+    "registeredReplayRevalidatesCurrentFile": true
+  },
+  "automatedCoverage": {
+    "validationDoesNotHoldPublicationLock": true,
+    "unrelatedPreflightDoesNotInvalidateIntentCas": true,
+    "cancelDuringValidationWins": true,
+    "sameSizeSameMtimeAtomicReplacementRejected": true,
+    "registeredFileTamperRejected": true,
+    "sameProcessConcurrentSingleReceipt": true,
+    "crossProcessConcurrentSingleReceipt": true,
+    "crashBeforeCommitLeavesReserved": true,
+    "ffprobeTimeoutKillsProcessGroupAndLeavesNoReceipt": true,
+    "stableFailureLedgerStatus": "failed",
+    "editorRegisteredShortcutRemoved": true,
+    "snapshotRedactsReservationTokenAndFileIdentity": true
+  },
+  "realMedia": {
+    "codec": "h264",
+    "width": 640,
+    "height": 360,
+    "durationSeconds": 1,
+    "sizeBytes": 211328,
+    "sha256": "1424ce5844e205dbfe747e8a1d5c303bb50fa86100df8e4672270f572794d207",
+    "decodable": true,
+    "replaySameReceipt": true,
+    "unrelatedPreflightMs": 17,
+    "cancelDuringProbeMs": 15,
+    "crossProcessWorkers": 2,
+    "uniqueReceiptCount": 1,
+    "crashStatus": "reserved",
+    "locksAfterCrash": 0,
+    "finalProjectLocks": 0,
+    "finalActiveMediaWeight": 0,
+    "finalMediaQueueDepth": 0
+  },
+  "sourceHashes": {
+    "src/core/publication.ts": "449b6921d82cee629b109eb6ebe18297d352ac6056bad920a8257bf4e8ababb3",
+    "src/core/command-outcome.ts": "0d00532d40b19bbbf3729f6f536ed785f98b05a212eff0946c41a1117a6717e3",
+    "src/core/command-bus.ts": "5059b4d1ca22adc49ec596ece137b75819ff718e577d054211462ed699ce240f",
+    "src/core/editor.ts": "3b0e1a1fb0821c6979eec10f589b2b39bc4798d950523d16cf3411e74aba0443",
+    "src/core/codex.ts": "eb77dc16e036d3e1a611a47c7a4224aaca68b5a5ae2e4bedaf21465846d011a9",
+    "src/mcp/server.ts": "f23ff4ddb1b6791cb2ff12afe2632f714c3d21e31a922068944c3009b1a86027",
+    "scripts/publication-consistency-smoke.ts": "0a7d51b9871d1f60fdff76008fd87108a630cccaf0d487411a6dd581ee3c9356",
+    "scripts/publication-register-worker.ts": "b4c636ed1872e0aa01afa84441e21d6606a7fe8e33de0dd26b61ae59f8eb3f0a",
+    "package.json": "2fbdead0c449c3851531679b47e342b9178a27992495c7da631b385215651ab9"
+  },
+  "packaging": {
+    "existingSignedDmgUpdated": false,
+    "existingSignedDmgContainsPreviousSource": true,
+    "existingSignedDmgPath": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "existingSignedDmgSizeBytes": 136652595,
+    "existingSignedDmgSha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972"
+  },
+  "boundaries": {
+    "formalProjectRootsTouched": false,
+    "generationWebsiteOpened": false,
+    "uploadsPerformed": false,
+    "paidSubmissionsPerformed": false,
+    "existingPackageOverwritten": false,
+    "softwareInstalled": false,
+    "softwarePublished": false,
+    "notarizationPerformed": false
+  },
+  "nextUniquePriority": "P1 local custom Bezier keyframe curves; external Provider/formal project/notarization P0 items remain authorization-blocked",
+  "longTermGoalStatus": "active"
+}

@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "kind": "mcp-candidate-live-probe-result",
+  "candidateRoot": "/Users/hxx/Documents/无限画布/.aicanvas-runtime/mcp-candidates/mcp-candidate-673a2ebe3f3d7400-dd877226823c29a5-68e93510",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "registryPath": "/Users/hxx/.aicanvas/projects.json",
+  "allowDriftProbe": true,
+  "startedAt": "2026-07-26T13:36:59.324Z",
+  "activeProjectRoot": "/Users/hxx/Documents/无限画布/projects/local-import-dudu-world-prologue-b8bfcf14",
+  "liveWorkspaceSourceDigestProbeMs": 244.5029159999999,
+  "liveWorkspaceSourceDigest": "673a2ebe3f3d7400585db0264d349097fa2b40bbcfcb2caaae7319367fe6d679",
+  "liveWorkspaceMatchesCandidateSourceDigest": true,
+  "mcpStartupMs": 1598.387875,
+  "stderrTail": "(node:89482) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)",
+  "finishedAt": "2026-07-26T13:37:07.240Z",
+  "probes": [
+    {
+      "sequence": 1,
+      "id": "candidate-integrity-preflight",
+      "title": "候选完整性预检：receipt/release-manifest/runtime-tree 三方一致 + 只读密封",
+      "status": "pass",
+      "durationMs": 156.990584,
+      "detail": {
+        "candidateId": "mcp-candidate-673a2ebe3f3d7400-dd877226823c29a5-68e93510",
+        "sourceDigest": "673a2ebe3f3d7400585db0264d349097fa2b40bbcfcb2caaae7319367fe6d679",
+        "buildId": "0f59c1becde4f92a64f8b3afca66ded3",
+        "entryRelativePath": "dist-mcp/mcp/server.js",
+        "entrySha256": "d6e8a3bdb9deee6a4a3cbe9db037e5e502d1d4ae238e10cf582abcb992c236e5",
+        "runtimeTreeFingerprint": "dd877226823c29a5a8eece1ff5b77e5eec6bb0b639b05c7de6d4dfd811ec25b6",
+        "releaseManifestFingerprint": "68e93510a46a48e89d666582dd7e26f8923751b7c4804018f2041a5bd29e0801",
+        "builtAt": "2026-07-26T13:32:11.041Z"
+      }
+    },
+    {
+      "sequence": 2,
+      "id": "capabilities",
+      "title": "capabilities 探针：候选冷启动 get_capabilities buildCurrentness + sourceDigest 一致",
+      "status": "pass",
+      "durationMs": 1214.2262500000002,
+      "detail": {
+        "isError": false,
+        "buildCurrentness": {
+          "allowed": true,
+          "buildId": "0f59c1becde4f92a64f8b3afca66ded3",
+          "sourceDigest": "673a2ebe3f3d7400585db0264d349097fa2b40bbcfcb2caaae7319367fe6d679"
+        },
+        "expectedSourceDigest": "673a2ebe3f3d7400585db0264d349097fa2b40bbcfcb2caaae7319367fe6d679",
+        "runtimeGateMetrics": {
+          "digestCalls": 1,
+          "inspectionCalls": 1,
+          "readChecks": 1,
+          "readCacheHits": 0,
+          "readCacheMisses": 1,
+          "readSingleflightJoins": 0,
+          "mutationChecks": 0,
+          "mutationSingleflightJoins": 0,
+          "mutationEpochRetries": 0,
+          "mutationUnstableFailures": 0,
+          "invalidations": 1,
+          "totalInspectionDurationMs": 341,
+          "maxInspectionDurationMs": 341,
+          "watcherHealthy": true,
+          "invalidationEpoch": 1
+        },
+        "budgetMs": 2000,
+        "withinBudget": true
+      }
+    },
+    {
+      "sequence": 3,
+      "id": "active-context",
+      "title": "active context 探针：get_active_managed_studio_context 命中活动工程且暖调用 ≤500ms",
+      "status": "pass",
+      "durationMs": 11.061500000000024,
+      "detail": {
+        "calls": [
+          {
+            "durationMs": 14.817499999999654,
+            "projectRoot": "/Users/hxx/Documents/无限画布/projects/local-import-dudu-world-prologue-b8bfcf14",
+            "isError": false
+          },
+          {
+            "durationMs": 7.305500000000393,
+            "projectRoot": "/Users/hxx/Documents/无限画布/projects/local-import-dudu-world-prologue-b8bfcf14",
+            "isError": false
+          }
+        ],
+        "groundTruthProjectRoot": "/Users/hxx/Documents/无限画布/projects/local-import-dudu-world-prologue-b8bfcf14",
+        "groundTruthSource": "src/core/sidecar.ts getActiveProjectRegistration()（独立读 active-project.json，不依赖被测 MCP 的返回值）",
+        "budgetMs": 500
+      }
+    },
+    {
+      "sequence": 4,
+      "id": "physical-zero-write",
+      "title": "物理零写探针：capabilities/active-context 调用前后哨兵快照不变",
+      "status": "pass",
+      "durationMs": 108.75820799999974,
+      "detail": {
+        "registryFileUnchanged": true,
+        "registryDirUnchanged": true,
+        "projectAicanvasUnchanged": true,
+        "projectTopLevelUnchanged": true,
+        "suspiciousEntriesNew": [],
+        "suspiciousEntriesPreexisting": [
+          "locks",
+          "mcp-os-writer.lock",
+          "cache.sqlite-shm",
+          "cache.sqlite-wal",
+          "command-ledger.sqlite-shm",
+          "command-ledger.sqlite-wal",
+          "material-studio.sqlite-shm",
+          "material-studio.sqlite-wal",
+          "studio-generation-ledger.sqlite-shm",
+          "studio-generation-ledger.sqlite-wal",
+          "studio-production.sqlite-shm",
+          "studio-production.sqlite-wal"
+        ],
+        "registryPath": "/Users/hxx/.aicanvas/projects.json",
+        "projectAicanvasPath": "/Users/hxx/Documents/无限画布/projects/local-import-dudu-world-prologue-b8bfcf14/.aicanvas",
+        "projectRoot": "/Users/hxx/Documents/无限画布/projects/local-import-dudu-world-prologue-b8bfcf14"
+      }
+    },
+    {
+      "sequence": 5,
+      "id": "drift-fail-closed",
+      "title": "drift fail-closed 探针：源码漂移后 mutation 工具被 BUILD_CURRENTNESS_MISMATCH 拒绝",
+      "status": "pass",
+      "durationMs": 210.01245800000015,
+      "detail": {
+        "driftFilePath": "/Users/hxx/Documents/无限画布/src/livecheck-drift-probe.tmp.ts",
+        "isError": true,
+        "responseText": "{\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"BUILD_CURRENTNESS_MISMATCH：source-changed 请先更新构建；仅 get_capabilities 可用于诊断。\",\n    \"retryable\": false,\n    \"suggestedAction\": \"修正输入后重试；不要绕过门禁。\"\n  }\n}"
+      }
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0
+  },
+  "overallPass": true
+}

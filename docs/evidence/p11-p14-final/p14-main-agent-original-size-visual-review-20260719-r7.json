@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "kind": "p14-main-agent-original-size-visual-review",
+  "status": "PASS",
+  "reviewedAt": "2026-07-18T20:31:24.545Z",
+  "actor": "main-agent",
+  "decision": "pass",
+  "viewMode": "original-size",
+  "canary": {
+    "runName": "p14-r14-final-cas10000",
+    "provider": "codex",
+    "source": "codex-imagegen",
+    "width": 941,
+    "height": 1672,
+    "aspectRatio": "9:16",
+    "files": {
+      "raw": {
+        "path": "/Users/hxx/Documents/无限画布/output/p14-real-canary/p14-r14-final-cas10000/incoming/p14-codex-canary-8624fd37fdadc5239df676ef_raw.png",
+        "sha256": "3891fde18e230b0ab477437492491395b6a5cea13cf91b46f9bdc2e94008dfd8",
+        "sizeBytes": 2061661
+      },
+      "character": {
+        "path": "/Users/hxx/Desktop/阿航_青年_三视图_.jpg",
+        "sha256": "5132d4320f956cf2a2320e52fae941ef15ffb243ad79343045006a8773f4548e",
+        "sizeBytes": 892422
+      },
+      "scene": {
+        "path": "/Users/hxx/Desktop/7月2日/黄金面具_鱼凫篇_EP01-EP05_真人实拍首尾帧资产包_20260702/07_参考图/已锁定参考图复制/04_建筑装置/B06_神权密室天外遗物室_三角度.png",
+        "sha256": "ee8b3dd2f975d48be6014e2e110caae47922a32dbdc547551cb8a4c3a6e61fee",
+        "sizeBytes": 2563503
+      },
+      "mask": {
+        "path": "/Users/hxx/Desktop/豆姐参考图.png",
+        "sha256": "02e9438ecee038f7d14860da37cb315bf358db4a26fa224e342eee5b592b55a9",
+        "sizeBytes": 2367597
+      }
+    }
+  },
+  "criteria": {
+    "ahangIdentity": {
+      "pass": true,
+      "notes": [
+        "同一青年东方男性脸型与五官",
+        "黑色发髻和长发",
+        "人物左侧银白挑染",
+        "黑色破旧古装"
+      ]
+    },
+    "sceneContinuity": {
+      "pass": true,
+      "notes": [
+        "同一黑色古蜀神权密室",
+        "中央圆形神纹与立柱祭台空间关系保留",
+        "火光与冷顶光延续",
+        "无现代物"
+      ]
+    },
+    "goldenMaskAuthority": {
+      "pass": true,
+      "notes": [
+        "平直微内凹额顶",
+        "深色双眉带与杏仁眼孔",
+        "长窄直鼻梁",
+        "小闭口与短圆下颏",
+        "左右侧缘铆孔与锤揲旧金纹理",
+        "无高冠、尖角、兽耳、长颈、裂口或第二张面具"
+      ]
+    },
+    "composition": {
+      "pass": true,
+      "notes": [
+        "单张竖屏成片",
+        "无字幕、水印、拼图、三视图标题或规格文字",
+        "无多余人物"
+      ]
+    }
+  },
+  "limitations": {
+    "singleCanaryOnly": true,
+    "doesNotApproveBatchProduction": true,
+    "mechanicalChecksAloneNotUsed": true,
+    "userPersonallyReviewedClaimed": false
+  },
+  "boundaries": {
+    "imageGenerationCallsByThisReview": 0,
+    "browserCalls": 0,
+    "uploads": 0,
+    "formalProjectWrites": 0,
+    "sourceWrites": 0,
+    "gitActions": 0
+  },
+  "fingerprint": "6664d2ba3a0084b011f9eaa8c3cac8184b5c2d5789d14a917eee2057b332dc89"
+}

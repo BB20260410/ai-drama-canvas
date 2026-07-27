@@ -1,0 +1,332 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T04:04:40Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "success": true,
+  "goal": {
+    "name": "AI 漫剧无限画布",
+    "status": "active",
+    "mode": "research-and-development"
+  },
+  "priorityRevalidation": {
+    "objectiveHint": "arbitrary-keyframe-boundary-lossless-split-trim",
+    "objectiveHintWasStale": true,
+    "keyframeStrictEvidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/final-validation-20260714-1020.json",
+    "keyframeProductionCoreRegressionFound": false,
+    "handoffPriorityAtSliceStart": "comfyui-local-dedicated-recoverable-adapter",
+    "handoffPriorityWasStillValid": true,
+    "reason": "The keyframe core and strict evidence were already closed. The working tree contained an incomplete ComfyUI adapter without permanent restart, history ownership, cancellation, Electron, compiled MCP, full-gate, documentation, or final evidence closure.",
+    "nextPriorityAfterSlice": "complex-nested-timelines"
+  },
+  "slice": {
+    "name": "comfyui-local-dedicated-recoverable-adapter",
+    "complete": true,
+    "adapter": "comfyui-local",
+    "scope": "loopback-local-image-protocol",
+    "realComfyUiCalibration": false,
+    "reusedExistingStateMachines": [
+      "GenerationJob",
+      "GenerationExecutionSnapshot",
+      "Publication",
+      "command-ledger",
+      "machine-media-runtime"
+    ],
+    "contracts": {
+      "promptIdentity": "caller-persisted-canonical-uuid-before-post",
+      "preparedRestart": "same-attempt-same-prompt-id",
+      "postDisconnect": "query-same-prompt-id-no-repost",
+      "terminalFacts": [
+        "official-prompt-5-tuple",
+        "queue",
+        "history-exact-terminal-event",
+        "validated-output-file"
+      ],
+      "outputIdentity": [
+        "promptId",
+        "outputNodeId",
+        "outputIndex",
+        "filename",
+        "subfolder",
+        "type=output",
+        "historySha256"
+      ],
+      "cancellation": {
+        "endpoint": "atomic-api-jobs-cancel",
+        "pending": "server-acted-and-two-stable-absent-observations",
+        "running": "exact-history-execution_interrupted",
+        "unconfirmed": "keep-job-and-publication-locked",
+        "registeredOrSuccess": "wins"
+      },
+      "websocketIsTerminalFact": false
+    }
+  },
+  "tests": {
+    "typecheck": {
+      "success": true
+    },
+    "targeted": {
+      "success": true,
+      "testFiles": 8,
+      "tests": 45,
+      "durationSeconds": 23.79,
+      "files": [
+        "tests/comfyui-local.test.ts",
+        "tests/publication.test.ts",
+        "tests/http-submission-reconciliation.test.ts",
+        "tests/codex.test.ts",
+        "tests/continuation.test.ts",
+        "tests/mcp.test.ts",
+        "tests/mcp-generation-observation.test.ts",
+        "tests/mcp-scan-cancel.test.ts"
+      ]
+    },
+    "full": {
+      "success": true,
+      "testFiles": 33,
+      "passedTestFiles": 33,
+      "failedTestFiles": 0,
+      "tests": 198,
+      "passedTests": 198,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "durationSeconds": 76.78
+    },
+    "compiledMcp": {
+      "success": true,
+      "testFiles": 3,
+      "tests": 3,
+      "serverPath": "/Users/hxx/Documents/无限画布/dist-mcp/mcp/server.js"
+    },
+    "realElectron": {
+      "success": true,
+      "script": "npm run ui:comfyui-local-smoke",
+      "humanVisualInspection": true
+    },
+    "crossProcess": {
+      "fullWorkflow": {
+        "success": true,
+        "restartVerified": true
+      },
+      "mcpHeadless": {
+        "success": true,
+        "finalDoctorErrors": 0,
+        "finalDoctorWarnings": 0,
+        "runtimeResourcesIdle": true
+      },
+      "mcpEmptyProject": {
+        "success": true,
+        "restartVerified": true
+      }
+    }
+  },
+  "build": {
+    "success": true,
+    "mainBytes": 862124,
+    "preloadBytes": 17308,
+    "rendererJavaScriptBytes": 1276065,
+    "mcpServerBytes": 184941
+  },
+  "mcp": {
+    "smokeSuccess": true,
+    "toolCount": 134,
+    "resourceTemplateCount": 9,
+    "promptCount": 7,
+    "compiledServerTestSuccess": true,
+    "comfyUiProjection": [
+      "Capabilities",
+      "Doctor",
+      "Snapshot",
+      "Generation Resource",
+      "Continuation",
+      "Recovery Prompt"
+    ],
+    "sanitized": true
+  },
+  "protocolSmoke": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/comfyui-local-protocol-smoke-20260714.json",
+    "sha256": "5789f55eb841f4a1ab5df5988098e014e607729135a3476d64e69f5954a21f47",
+    "success": true,
+    "counts": {
+      "post": 7,
+      "history": 13,
+      "queue": 7,
+      "view": 3,
+      "atomicCancel": 2,
+      "legacyQueueCancel": 0,
+      "legacyInterrupt": 0
+    },
+    "scenarios": {
+      "happyOfficialTuple": true,
+      "preparedTransientThenFreshNodeSameAttempt": true,
+      "postDisconnectFreshNodeNoReplay": true,
+      "httpCheckpointAbsentForComfyUi": true,
+      "exactExecutionErrorPublicationProvenance": true,
+      "pendingCancelServerActedAndStableAbsent": true,
+      "runningCancelStaysLockedUntilExactInterrupted": true,
+      "ownershipConflictBlocksDownload": true
+    },
+    "happyOutput": {
+      "bytes": 16763,
+      "sha256": "17bc63e006aaa3479e1377c09a0310db38448ccbbf3d16677630ae5c3921eb9b"
+    },
+    "terminal": {
+      "projectLocks": [],
+      "machineActiveWeight": 0,
+      "machineQueueDepth": 0
+    },
+    "cleanup": {
+      "rootRemoved": true,
+      "registryRemoved": true,
+      "serverClosed": true
+    }
+  },
+  "uiSmoke": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/comfyui-local-ui-smoke-20260714.json",
+    "sha256": "d6597ca4708418b3c0fdc19154ff1c215c7c2c9cf3f743b9b7de8629d154b0f1",
+    "success": true,
+    "flow": [
+      "queued-stable-prompt-id",
+      "provider-settings-workflow-contract",
+      "history-success",
+      "verified-output-node"
+    ],
+    "protocolCounts": {
+      "post": 1,
+      "history": 1,
+      "queue": 0,
+      "view": 1
+    },
+    "persisted": {
+      "status": "succeeded",
+      "attempts": 1,
+      "checkpointStage": "verified",
+      "historyEvent": "execution_success",
+      "outputNodeId": "9",
+      "outputIndex": 0,
+      "outputFilename": "electron-result.png",
+      "outputType": "output",
+      "outputBytes": 16763,
+      "outputSha256": "ae2ea9edd0e23df53c243cf506e7a572ffa4420c832dcbc62e77eee6dd65097e"
+    },
+    "queueScreenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/comfyui-local-ui-20260714.png",
+      "sha256": "8aad4c881d1177078e4d730d0f343a3094f979b4c588b2dcd578bc344ed1dbfd",
+      "bytes": 171069,
+      "width": 1560,
+      "height": 980,
+      "humanInspected": true,
+      "blankOrPlaceholder": false
+    },
+    "settingsScreenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/comfyui-local-settings-ui-20260714.png",
+      "sha256": "52c37610f589c8a3559dcf425ffffa4e21b058fcf1fe77b5e26f9a7a42e6f33f",
+      "bytes": 78292,
+      "width": 760,
+      "height": 1428,
+      "scope": "visible-provider-settings-panel",
+      "humanInspected": true,
+      "blankOrPlaceholder": false
+    },
+    "layout": {
+      "viewportWidth": 1560,
+      "viewportHeight": 980,
+      "documentOverflowX": false,
+      "documentOverflowY": false,
+      "settingsWindowScrollX": 0,
+      "settingsWindowScrollY": 0
+    },
+    "cleanup": {
+      "projectRemoved": true,
+      "registryRemoved": true,
+      "serverClosed": true
+    }
+  },
+  "sourceHashes": {
+    "package.json": "cc91b0da091359b76b13abf4e64e4c7e7cec26d94f82db3a1c81fa1035d4a7db",
+    "src/core/types.ts": "089ee7c82e8fd44334e1cf85509bd68dfd372ea116df11302e96fb8b0a0ce78c",
+    "src/core/generation.ts": "6986a0584b45027feff12fc9c2144b03c7ed0b2516ff629c006345c7e2efbf9a",
+    "src/core/publication.ts": "4302ff14912a1fdb7c98300ff5ce38cad852fe68384d6fd980e796fe09c84fb4",
+    "src/core/codex.ts": "9ae4ab98b9a60e6cb41a6696cf3c5734e69f2a68c1405ba0795c91fed4a432d5",
+    "src/core/memory.ts": "0a3c0cecf1e94cdf2779f5d559f73763b4cbc408e25fe3a931045ccead7c196c",
+    "src/mcp/server.ts": "1a51cdd02be13e96a53a1b4365928d94b22677590f532be9280c9e448568958e",
+    "src/renderer/src/components/GenerationQueueView.vue": "f7df509f8ca3d24c9a1dc70c5895d468c3786acbeb3154a6c1f963bf60fd412d",
+    "tests/comfyui-local.test.ts": "18c762ce4c8df03f5a1f344944e603073724bd6145f9c2d68abb7d900c23974f",
+    "scripts/comfyui-local-protocol-smoke.ts": "41c64d93c65c19fb5788fd2e3086590dcea6747fda470ed7815811337327bb45",
+    "scripts/prepare-comfyui-local-ui-fixture.ts": "52920db87053535a991f49d9034e46b9a28d5fc16b0839cb9d842296f504547b",
+    "scripts/ui-comfyui-local-smoke.mjs": "2e147b39b2a0592703d6ab2b463de39226a37685ec78c3c4fada8cee815b69b3"
+  },
+  "documentationHashes": {
+    "README.md": "44b189c2f97cb002cd95cc67ddef97fd89404e3af0249fc079560aaed4a2c4d3",
+    "docs/CODEX_MCP.md": "5f41914fd728891b617c818f3b9ad217331ce2cdb5d0b6736e0ea755c95f703a",
+    "docs/当前开发交接.md": "1ab06b724624a493de83275b88d9ca156a7d17372c13342d9a1dbfcf282a15a0",
+    "docs/验证报告_ComfyUI本地专用可恢复适配_2026-07-14.md": "16090f6d1a9ca7d7a0160a86d3b599815c948a8f248ffa52bc7e6fea78401577",
+    ".planning/2026-07-14-untitled-4e5b9efd/task_plan.md": "44e7cc938ad87f32e25dc4c885f7c2c349860ac09e443b28d7c2d0feb5b5a96d"
+  },
+  "cleanup": {
+    "comfyUiProtocolFixtureRemoved": true,
+    "comfyUiUiFixtureRemoved": true,
+    "crossProcessSmokeFixturesRemoved": true,
+    "nativeScreenshotTemporaryFiles": 0,
+    "projectLocks": [],
+    "machineActiveWeight": 0,
+    "machineQueueDepth": 0
+  },
+  "git": {
+    "branch": "main",
+    "hasCommits": false,
+    "allWorkspaceFilesUntracked": true,
+    "commitCreated": false,
+    "pushPerformed": false,
+    "pullRequestCreated": false
+  },
+  "signedDmg": {
+    "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "bytes": 136652595,
+    "sha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972",
+    "touched": false,
+    "containsCurrentSource": false,
+    "notarized": false
+  },
+  "boundaries": {
+    "formalProjectScanned": false,
+    "formalProjectModified": false,
+    "realComfyUiCalled": false,
+    "externalProviderCalled": false,
+    "websiteOpened": false,
+    "uploadPerformed": false,
+    "paidActionPerformed": false,
+    "externalAssetsOverwritten": false,
+    "installationPerformed": false,
+    "releasePerformed": false,
+    "notarizationPerformed": false
+  },
+  "knownLimitations": [
+    "complex-nested-timelines",
+    "third-party-effect-transition-compatibility",
+    "real-project-nle-validation",
+    "real-comfyui-environment-calibration",
+    "real-provider-site-calibration",
+    "apple-notarization"
+  ],
+  "nextUniqueHighestPriority": {
+    "rank": "P1",
+    "id": "complex-nested-timelines",
+    "title": "Complex nested timeline core vertical slice",
+    "reason": "Capabilities still lists complex-nested-timelines as missing, OTIO import rejects nested Stack containers, and EditClip has no frozen child-project identity/revision/time mapping. The hierarchy and timing contract must be stable before third-party effects and transitions can be attached safely.",
+    "acceptance": [
+      "reuse EditProject/EditClip revision, history, Publication, render, continuation and MCP state machines",
+      "freeze child project id, revision, timebase, canvas and visible source range",
+      "reject self-reference, cycles, excessive depth, missing child projects, revision drift and unprovable duration",
+      "use exact rational parent-child frame mapping across preview, sync/background FFmpeg, composite frames and continuation",
+      "cover split, trim, move, ripple, CAS/history and unsupported cross-layer edits",
+      "define a lossless OTIO nested subset and private metadata round-trip while third-party effects remain fail-closed",
+      "prove source and compiled MCP, real media, restart recovery and Electron UI with permanent evidence"
+    ],
+    "waitingExternalAuthorization": [
+      "formal AI drama project calibration",
+      "real local ComfyUI version and custom-node calibration",
+      "real Provider or generation website login/upload/paid submission",
+      "Apple notarization and public distribution"
+    ]
+  }
+}

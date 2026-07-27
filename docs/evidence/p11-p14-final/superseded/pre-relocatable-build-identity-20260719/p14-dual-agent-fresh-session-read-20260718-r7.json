@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "kind": "p14-dual-agent-fresh-session-read-evidence",
+  "status": "FAIL",
+  "startedAt": "2026-07-18T17:12:24.358Z",
+  "completedAt": "2026-07-18T17:12:39.492Z",
+  "expected": {
+    "projectId": "project-2e3b44bc6ac4",
+    "manifestFingerprint": "57e55eaf4b571c8e1ca7f606f79f849d08d0ad074ebd112eb0f82968413c3ac8",
+    "sourceDigest": "267d6f29baf0b20908d8453ae80b3fc1a306a2ef949e383acfffeddc131dd582"
+  },
+  "clients": {
+    "codex": {
+      "executable": "codex.js",
+      "sessionStarted": true,
+      "help": {
+        "client": "codex",
+        "supported": true,
+        "missing": [],
+        "helpSha256": "da7f8d58749fb3084723cded1620d133235a090ebe5ee412ef404f171415d434"
+      }
+    },
+    "grok": {
+      "executable": "grok-macos-aarch64",
+      "sessionStarted": true,
+      "help": {
+        "client": "grok",
+        "supported": true,
+        "missing": [],
+        "helpSha256": "263ec698ed63cd7cbcaea6a4d76f552b97f34e62670e93f4760a005ef529ca3a"
+      }
+    }
+  },
+  "boundaries": {
+    "execFileWithoutShell": true,
+    "freshSessions": true,
+    "projectRootAcceptedByScript": false,
+    "projectRootArgumentSupplied": false,
+    "agentConfigurationModified": false,
+    "secretEnvironmentVariablesForwarded": false,
+    "secretsReadOrPrinted": false
+  },
+  "failure": {
+    "code": "agent-session-failed",
+    "message": "grok session 进程未以成功状态退出。"
+  },
+  "fingerprint": "7a8f14e49d684046969c1dc5160b3c58494e9c92455b19c86f7c7b269942548a"
+}

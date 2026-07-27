@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "kind": "absorb-a5-workflow-runner",
+  "status": "pass",
+  "createdAt": "2026-07-18T07:05:00.000Z",
+  "slice": "A5",
+  "files": [
+    "src/core/studio-canvas-workflow-runner.ts",
+    "tests/studio-canvas-workflow-runner.test.ts"
+  ],
+  "behavior": [
+    "runStudioCanvasWorkflowGroup serial panel order",
+    "image step freeze-dispatch-only (not real imagegen)",
+    "stopOnFailure when target missing after first success",
+    "managed project gate via inspectManagedProject"
+  ],
+  "boundaries": {
+    "realImagegen": false,
+    "fixtureRegister": false
+  }
+}

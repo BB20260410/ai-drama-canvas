@@ -1,0 +1,475 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T00:28:37.715Z",
+  "success": true,
+  "command": "npm run generation:http-resilience-smoke -- <evidence-path>",
+  "environment": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "v22.22.2",
+    "loopbackOnly": true,
+    "isolatedProject": true,
+    "realImageDecode": true
+  },
+  "cases": {
+    "resilientPolling": {
+      "jobId": "gen-2026-07-14T00-28-32-424Z-e4961be2",
+      "externalTaskId": "remote-resilient",
+      "clientJobId": "gen-2026-07-14T00-28-32-424Z-e4961be2",
+      "observations": [
+        {
+          "label": "http-500",
+          "status": "waiting_remote",
+          "observation": {
+            "state": "retryable_or_unknown",
+            "stage": "poll",
+            "observedAt": "2026-07-14T00:28:32.567Z",
+            "httpStatus": 500,
+            "message": "HTTP 恢复 Smoke HTTP 500：{\"error\":\"temporary upstream\"}",
+            "retryCount": 1,
+            "nextAction": "retry_same_task"
+          },
+          "intentStatus": "reserved",
+          "submitCount": 1,
+          "externalTaskId": "remote-resilient"
+        },
+        {
+          "label": "socket-disconnect",
+          "status": "waiting_remote",
+          "observation": {
+            "state": "retryable_or_unknown",
+            "stage": "poll",
+            "observedAt": "2026-07-14T00:28:32.598Z",
+            "message": "fetch failed",
+            "retryCount": 2,
+            "nextAction": "retry_same_task"
+          },
+          "intentStatus": "reserved",
+          "submitCount": 1,
+          "externalTaskId": "remote-resilient"
+        },
+        {
+          "label": "invalid-json",
+          "status": "waiting_remote",
+          "observation": {
+            "state": "retryable_or_unknown",
+            "stage": "poll",
+            "observedAt": "2026-07-14T00:28:32.630Z",
+            "message": "HTTP 恢复 Smoke 返回的不是有效 JSON。",
+            "retryCount": 3,
+            "nextAction": "retry_same_task"
+          },
+          "intentStatus": "reserved",
+          "submitCount": 1,
+          "externalTaskId": "remote-resilient"
+        },
+        {
+          "label": "completed-without-url",
+          "status": "waiting_remote",
+          "observation": {
+            "state": "retryable_or_unknown",
+            "stage": "poll",
+            "observedAt": "2026-07-14T00:28:32.673Z",
+            "message": "HTTP 恢复 Smoke 已完成但未返回结果 URL。",
+            "retryCount": 4,
+            "nextAction": "retry_same_task"
+          },
+          "intentStatus": "reserved",
+          "submitCount": 1,
+          "externalTaskId": "remote-resilient"
+        }
+      ],
+      "finalStatus": "succeeded",
+      "observation": {
+        "state": "succeeded",
+        "stage": "publish",
+        "observedAt": "2026-07-14T00:28:35.215Z",
+        "observedStatus": "succeeded",
+        "message": "远端结果已完成隔离下载、机械验收和不可覆盖发布。",
+        "retryCount": 0,
+        "nextAction": "none"
+      },
+      "submitCount": 1
+    },
+    "partialRestart": {
+      "partialBytes": 5587,
+      "sourceBytes": 16763,
+      "workerPid": 10766,
+      "workerExit": {
+        "code": null,
+        "signal": "SIGKILL"
+      },
+      "killedWithSigkill": true,
+      "generationLockPresentWhileDownloading": true,
+      "locksObservedAfterCrash": [
+        {
+          "name": "generation",
+          "pid": 10766,
+          "ageMs": 111.95068359375,
+          "stale": false
+        }
+      ],
+      "finalWasAbsentBeforeRestart": true,
+      "readyWasAbsentBeforeRestart": true,
+      "freshNodeRecovery": true,
+      "finalSha256": "83c92c6242fa81d3f43d6304df8640a5af8a85d929094b5a22eb56fb6d7fbb25",
+      "sourceSha256": "83c92c6242fa81d3f43d6304df8640a5af8a85d929094b5a22eb56fb6d7fbb25",
+      "readyPresent": true,
+      "partialRemoved": true
+    },
+    "registeredCrashRecovery": {
+      "staleStatus": "waiting_remote",
+      "cancelRequestResult": "succeeded",
+      "publicationReceiptId": "receipt-8f82f44d-aa1d-4646-9ec9-50a694793ff7",
+      "remoteCancelRequests": 0
+    },
+    "confirmedFailure": {
+      "jobId": "gen-2026-07-14T00-28-35-510Z-8765abad",
+      "status": "failed",
+      "observation": {
+        "state": "confirmed_failed",
+        "stage": "poll",
+        "observedAt": "2026-07-14T00:28:35.665Z",
+        "observedStatus": "failed",
+        "message": "HTTP 恢复 Smoke 生成失败，状态：failed",
+        "retryCount": 0,
+        "nextAction": "none"
+      },
+      "intentStatus": "failed",
+      "receiptPresent": false
+    },
+    "cancellation": {
+      "jobId": "gen-2026-07-14T00-28-35-679Z-386c5a34",
+      "pending200Attempt": "HTTP 恢复 Smoke 取消接口 HTTP 200 但未返回结构化 cancelled/canceled 终态；本地任务与 Publication 保持不变。",
+      "failed503Attempt": "HTTP 恢复 Smoke 取消远端任务未确认终态：HTTP 503；本地任务与 Publication 保持不变。",
+      "statusAfterFailedAttempts": "waiting_remote",
+      "intentAfterFailedAttempts": "reserved",
+      "finalStatus": "cancelled",
+      "remoteCancelCount": 3,
+      "intentStatus": "cancelled",
+      "isolatedDirectoryRemoved": true,
+      "retryObservationCleared": true
+    },
+    "submitDisconnect": {
+      "jobId": "gen-2026-07-14T00-28-36-565Z-601dfb23",
+      "initialStatus": "submission_unknown",
+      "observation": {
+        "state": "retryable_or_unknown",
+        "stage": "submit",
+        "observedAt": "2026-07-14T00:28:36.658Z",
+        "message": "fetch failed",
+        "retryCount": 1,
+        "nextAction": "inspect_remote_task"
+      },
+      "initialIntentStatus": "reserved",
+      "postCountBeforeRestart": 5,
+      "postCountAfterRestart": 5,
+      "duplicateBlocked": true
+    },
+    "submissionUnknownFound": {
+      "jobId": "gen-2026-07-14T00-28-36-565Z-601dfb23",
+      "reconciliation": {
+        "schemaVersion": 1,
+        "applied": true,
+        "outcome": "found",
+        "jobId": "gen-2026-07-14T00-28-36-565Z-601dfb23",
+        "itemId": "main-ep01-unit001",
+        "providerId": "http-resilience-smoke",
+        "status": "waiting_remote",
+        "clientJobId": "gen-2026-07-14T00-28-36-565Z-601dfb23",
+        "externalTaskId": "remote-disconnected-found",
+        "remoteAcceptedAt": "2026-07-14T00:28:36.873Z",
+        "remoteObservation": {
+          "state": "pending",
+          "stage": "submit",
+          "observedAt": "2026-07-14T00:28:36.873Z",
+          "observedStatus": "reconciled_found",
+          "message": "HTTP 提交对账已找到同一远端任务；后续只允许定向轮询该 externalTaskId，不会重新 POST。",
+          "retryCount": 1,
+          "nextAction": "poll_same_task"
+        },
+        "httpSubmissionCheckpoint": {
+          "revision": 2,
+          "stage": "reconciled_found",
+          "updatedAt": "2026-07-14T00:28:36.873Z",
+          "submissionIntent": {
+            "clientJobId": "gen-2026-07-14T00-28-36-565Z-601dfb23",
+            "attempt": 1,
+            "createdAt": "2026-07-14T00:28:36.626Z"
+          },
+          "reconciliation": {
+            "method": "client_job_id_search",
+            "result": "found",
+            "clientJobId": "gen-2026-07-14T00-28-36-565Z-601dfb23",
+            "attempt": 1,
+            "evidenceReference": "loopback-provider-search-audit-001",
+            "note": "按 clientJobId 在 loopback 任务列表找到唯一任务",
+            "externalTaskId": "remote-disconnected-found",
+            "checkedAt": "2026-07-14T00:28:36.873Z"
+          }
+        },
+        "publicationIntentId": "publication-8efad09c-d0be-4606-8a62-81d666cca8e9",
+        "publicationStatus": "reserved",
+        "updatedAt": "2026-07-14T00:28:36.873Z"
+      },
+      "freshNodeRecoveryStatus": "succeeded",
+      "externalTaskId": "remote-disconnected-found",
+      "publicationStatus": "registered",
+      "postCount": 5,
+      "pollCount": 1,
+      "downloadCount": 1
+    },
+    "submissionUnknownNotFound": {
+      "jobId": "gen-2026-07-14T00-28-37-442Z-a2034fa4",
+      "unknownCheckpoint": {
+        "revision": 1,
+        "stage": "submission_unknown",
+        "updatedAt": "2026-07-14T00:28:37.503Z",
+        "submissionIntent": {
+          "clientJobId": "gen-2026-07-14T00-28-37-442Z-a2034fa4",
+          "attempt": 1,
+          "createdAt": "2026-07-14T00:28:37.503Z"
+        }
+      },
+      "reconciliation": {
+        "schemaVersion": 1,
+        "applied": true,
+        "outcome": "not_found",
+        "jobId": "gen-2026-07-14T00-28-37-442Z-a2034fa4",
+        "itemId": "main-ep01-unit001",
+        "providerId": "http-resilience-smoke",
+        "status": "failed",
+        "clientJobId": "gen-2026-07-14T00-28-37-442Z-a2034fa4",
+        "httpSubmissionCheckpoint": {
+          "revision": 2,
+          "stage": "reconciled_not_found",
+          "updatedAt": "2026-07-14T00:28:37.560Z",
+          "submissionIntent": {
+            "clientJobId": "gen-2026-07-14T00-28-37-442Z-a2034fa4",
+            "attempt": 1,
+            "createdAt": "2026-07-14T00:28:37.503Z"
+          },
+          "reconciliation": {
+            "method": "provider_request_log",
+            "result": "not_found",
+            "clientJobId": "gen-2026-07-14T00-28-37-442Z-a2034fa4",
+            "attempt": 1,
+            "evidenceReference": "loopback-request-log-audit-002",
+            "note": "loopback 请求日志确认未建立远端任务",
+            "confirmNoRemoteResult": true,
+            "checkedAt": "2026-07-14T00:28:37.552Z"
+          }
+        },
+        "publicationIntentId": "publication-b8fd1921-c81e-4b6d-bce0-23b5c85cfbd3",
+        "publicationStatus": "failed",
+        "updatedAt": "2026-07-14T00:28:37.552Z"
+      },
+      "publicationStatus": "failed",
+      "publicationProvenance": {
+        "schemaVersion": 1,
+        "source": "generation",
+        "generationJobId": "gen-2026-07-14T00-28-37-442Z-a2034fa4",
+        "cause": "http_submission_not_found",
+        "clientJobId": "gen-2026-07-14T00-28-37-442Z-a2034fa4",
+        "attempt": 1,
+        "checkpointRevision": 2,
+        "reconciliation": {
+          "method": "provider_request_log",
+          "result": "not_found",
+          "clientJobId": "gen-2026-07-14T00-28-37-442Z-a2034fa4",
+          "attempt": 1,
+          "evidenceReference": "loopback-request-log-audit-002",
+          "note": "loopback 请求日志确认未建立远端任务",
+          "confirmNoRemoteResult": true,
+          "checkedAt": "2026-07-14T00:28:37.552Z"
+        }
+      },
+      "postCountBefore": 6,
+      "postCountAfter": 6,
+      "replacementJob": {
+        "id": "gen-2026-07-14T00-28-37-628Z-21ce6ab7",
+        "status": "queued",
+        "expectedOutputPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-http-generation-smoke-pc3XDC/EP01_15s_001_HTTP恢复证据/AI画布生成/EP01_15s_001_首帧_21ce6ab7_raw.png"
+      }
+    },
+    "noClobber": {
+      "jobId": "gen-2026-07-14T00-28-35-877Z-f3803ffd",
+      "blockedStatus": "waiting_remote",
+      "observation": {
+        "state": "retryable_or_unknown",
+        "stage": "publish",
+        "observedAt": "2026-07-14T00:28:36.041Z",
+        "message": "预期输出路径已经存在且内容不同，拒绝覆盖；保留隔离结果等待人工处理。 ",
+        "retryCount": 1,
+        "nextAction": "inspect_publication"
+      },
+      "conflictingFileSha256": "81b5052760d5de99ae0d1eefd7b30b9428f0b1525cb7de8529dbe5625bb8f45e",
+      "expectedConflictSha256": "81b5052760d5de99ae0d1eefd7b30b9428f0b1525cb7de8529dbe5625bb8f45e",
+      "isolatedReadyPresentWhileBlocked": true,
+      "blockedIntentStatus": "reserved",
+      "recoveredAfterManualResolution": "succeeded",
+      "recoveredFinalSha256": "83c92c6242fa81d3f43d6304df8640a5af8a85d929094b5a22eb56fb6d7fbb25",
+      "recoveredIntentStatus": "registered"
+    }
+  },
+  "requestCounts": {
+    "submit": 6,
+    "resilientPoll": 5,
+    "resilientDownload": 2,
+    "failedPoll": 1,
+    "cancel": 3,
+    "conflictPoll": 1,
+    "conflictDownload": 1,
+    "reconciledFoundPoll": 1,
+    "reconciledFoundDownload": 1
+  },
+  "clientJobIds": [
+    "gen-2026-07-14T00-28-32-424Z-e4961be2",
+    "gen-2026-07-14T00-28-35-510Z-8765abad",
+    "gen-2026-07-14T00-28-35-679Z-386c5a34",
+    "gen-2026-07-14T00-28-35-877Z-f3803ffd",
+    "gen-2026-07-14T00-28-36-565Z-601dfb23",
+    "gen-2026-07-14T00-28-37-442Z-a2034fa4"
+  ],
+  "doctor": {
+    "generationCheck": {
+      "id": "generation-jobs",
+      "level": "warning",
+      "title": "生成队列",
+      "detail": "1 个进行中任务，0 个提交结果待对账（网页 0、HTTP 0），1 个远端暂态/未知错误可定向恢复，0 个发布冲突待人工核对，0 个 Publication 终态缺少匹配来源，0 个终态 Job 仍保留 unknown 检查点。",
+      "suggestedAction": "调用 list_generation_jobs 查看最后观测，再用 process_generation_queue(jobId) 定向恢复既有 externalTaskId/结果下载；不会提交其他 queued 任务，也不会重新 POST 该任务。",
+      "paths": []
+    },
+    "suggestedNextCalls": [
+      "list_generation_jobs",
+      "process_generation_queue",
+      "doctor_project"
+    ]
+  },
+  "snapshot": {
+    "activeGeneration": {
+      "activeJobIds": [
+        "gen-2026-07-14T00-28-32-424Z-e4961be2"
+      ],
+      "byStatus": {
+        "queued": 0,
+        "submitting": 0,
+        "submission_unknown": 0,
+        "waiting_external": 0,
+        "waiting_remote": 1
+      }
+    },
+    "retryJob": {
+      "id": "gen-2026-07-14T00-28-32-424Z-e4961be2",
+      "itemId": "main-ep01-unit001",
+      "kind": "image",
+      "providerId": "http-resilience-smoke",
+      "status": "waiting_remote",
+      "expectedOutputPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-http-generation-smoke-pc3XDC/EP01_15s_001_HTTP恢复证据/AI画布生成/EP01_15s_001_尾帧_e4961be2_raw.png",
+      "clientJobId": "gen-2026-07-14T00-28-32-424Z-e4961be2",
+      "submissionIntent": {
+        "clientJobId": "gen-2026-07-14T00-28-32-424Z-e4961be2",
+        "attempt": 1,
+        "createdAt": "2026-07-14T00:28:32.482Z"
+      },
+      "externalTaskId": "remote-resilient",
+      "remoteAcceptedAt": "2026-07-14T00:28:32.511Z",
+      "remoteObservation": {
+        "state": "retryable_or_unknown",
+        "stage": "poll",
+        "observedAt": "2026-07-14T00:28:32.673Z",
+        "message": "HTTP 恢复 Smoke 已完成但未返回结果 URL。",
+        "retryCount": 4,
+        "nextAction": "retry_same_task"
+      },
+      "pollAttempts": 4,
+      "downloadAttempts": 0,
+      "lastPolledAt": "2026-07-14T00:28:32.684Z",
+      "publicationIntentId": "publication-b21b2cc8-b081-40c6-9459-bbd28591e82e",
+      "error": "HTTP 恢复 Smoke 已完成但未返回结果 URL。",
+      "updatedAt": "2026-07-14T00:28:32.684Z"
+    },
+    "signedUrlQueryExposed": false
+  },
+  "capabilities": {
+    "observationStates": [
+      "pending",
+      "succeeded",
+      "confirmed_failed",
+      "retryable_or_unknown"
+    ],
+    "observationStages": [
+      "submit",
+      "poll",
+      "download",
+      "validation",
+      "publish"
+    ],
+    "observationNextActions": [
+      "poll_same_task",
+      "retry_same_task",
+      "inspect_remote_task",
+      "inspect_publication",
+      "none"
+    ],
+    "stableClientJobId": true,
+    "persistRemoteIdentityBeforeDownload": true,
+    "retryablePollErrorsRemainWaitingRemote": true,
+    "publicationReservationPreservedAcrossRetries": true,
+    "automaticPostReplayAfterUnknown": false,
+    "isolatedDownloadPerJob": true,
+    "partialFileNeverSignalsCompletion": true,
+    "verifiedNoClobberPromotion": true,
+    "resultRedirectRevalidated": true,
+    "terminalRemoteFailureRequiresStructuredFailureValue": true,
+    "cancellationConfirmation": "204-or-200-structured-cancelled",
+    "publicationTerminalReconciledBeforeCancel": true,
+    "companionNoClobber": true,
+    "mcpCommandResultsSanitized": true,
+    "remoteResultExposure": "hostname-only",
+    "remoteResultPersistence": "local-sidecar-only",
+    "recoveryScope": "single-job",
+    "waitingRemoteRecoveryAction": "process_generation_queue(jobId)",
+    "submissionUnknownRecoveryAction": "reconcile_http_generation_submission(jobId,expectedRevision,reconciliation)",
+    "submissionUnknownReconciliationCAS": true,
+    "submissionUnknownNotFoundRequiresExplicitConfirmation": true,
+    "submissionUnknownReconciliationMakesRemoteRequests": false,
+    "generationPublicationTerminalRequiresStructuredProvenance": true
+  },
+  "publication": {
+    "intentCounts": {
+      "reserved": 1,
+      "registered": 3,
+      "cancelled": 1,
+      "failed": 2
+    },
+    "receiptCount": 3,
+    "resilientReceiptCount": 1
+  },
+  "terminal": {
+    "projectLocks": 0,
+    "activeMediaWeight": 0,
+    "mediaQueueDepth": 0,
+    "generationDownloadEntries": [
+      "gen-2026-07-14T00-28-32-424Z-e4961be2",
+      "gen-2026-07-14T00-28-35-877Z-f3803ffd",
+      "gen-2026-07-14T00-28-36-565Z-601dfb23"
+    ],
+    "transientFiles": []
+  },
+  "boundaries": {
+    "formalProjectRootsTouched": false,
+    "realProvidersContacted": false,
+    "uploadsPerformed": false,
+    "paidSubmissionsPerformed": false,
+    "existingMediaOverwritten": false,
+    "signedPackageOverwritten": false,
+    "softwarePublished": false,
+    "notarizationPerformed": false
+  },
+  "cleanup": {
+    "serverClosed": true,
+    "isolatedProjectRemoved": true,
+    "registryRemovedWithProject": true
+  }
+}

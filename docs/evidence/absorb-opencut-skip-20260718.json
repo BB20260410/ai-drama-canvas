@@ -1,0 +1,9 @@
+{
+  "project": "OpenCut",
+  "slice": "none",
+  "takeCount": 0,
+  "reason": "ground-up rewrite in progress; classic separate; editor API unstable",
+  "pin": "5e0696bc9b921dcbaf2f42bdf3e96891a30c1e9e",
+  "researchOnly": true,
+  "date": "2026-07-18"
+}

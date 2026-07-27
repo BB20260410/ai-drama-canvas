@@ -1,0 +1,391 @@
+{
+  "schemaVersion": 1,
+  "kind": "p1-stage1-asset-authority-result",
+  "candidate": {
+    "sourceDigest": "673a2ebe3f3d7400585db0264d349097fa2b40bbcfcb2caaae7319367fe6d679",
+    "entrySha256": "d6e8a3bdb9deee6a4a3cbe9db037e5e502d1d4ae238e10cf582abcb992c236e5"
+  },
+  "projectRoot": "/Users/hxx/Documents/无限画布/projects/local-import-dudu-world-prologue-b8bfcf14",
+  "finishedAt": "2026-07-26T13:49:14.514Z",
+  "steps": [
+    {
+      "at": "2026-07-26T13:49:10.177Z",
+      "id": "lease",
+      "ok": false,
+      "leaseId": null
+    },
+    {
+      "at": "2026-07-26T13:49:10.355Z",
+      "id": "list-assets",
+      "ok": true,
+      "count": 18
+    },
+    {
+      "at": "2026-07-26T13:49:11.629Z",
+      "id": "a1-create",
+      "command": "create_studio_asset",
+      "ok": true,
+      "result": {
+        "id": "allowed-ref:char-zhulong",
+        "category": "character",
+        "name": "烛龙",
+        "description": "古蜀神兽烛龙。W01_G01 的天象级显现形态：西北天际厚重乌云中一道竖直橙金发光裂隙（竖瞳），与残星构成不完整十字。",
+        "aliases": [
+          "zhulong",
+          "烛龙",
+          "烛龙之眼"
+        ],
+        "applicability": {
+          "projects": [],
+          "seasons": [],
+          "episodes": [],
+          "units": [],
+          "timeRanges": [],
+          "tags": []
+        },
+        "revision": 1,
+        "versionCount": 0,
+        "createdAt": "2026-07-26T13:49:11.233Z",
+        "updatedAt": "2026-07-26T13:49:11.233Z",
+        "versions": [],
+        "currentDefinitionVersionId": "definition-0843d0a6-3d97-413f-8469-7efc00fe0f5b",
+        "definitionVersions": [
+          {
+            "id": "definition-0843d0a6-3d97-413f-8469-7efc00fe0f5b",
+            "assetId": "allowed-ref:char-zhulong",
+            "ordinal": 1,
+            "assetRevision": 1,
+            "category": "character",
+            "name": "烛龙",
+            "description": "古蜀神兽烛龙。W01_G01 的天象级显现形态：西北天际厚重乌云中一道竖直橙金发光裂隙（竖瞳），与残星构成不完整十字。",
+            "aliases": [
+              "烛龙",
+              "zhulong",
+              "烛龙之眼"
+            ],
+            "identityFeatures": [],
+            "positiveLocks": [
+              "竖直橙金发光裂隙状竖瞳",
+              "西北天际乌云中显现",
+              "天象级尺度"
+            ],
+            "negativeLocks": [
+              "不画完整龙身",
+              "不画具象龙头",
+              "非人形"
+            ],
+            "defaultPrompt": "",
+            "applicability": {
+              "projects": [],
+              "seasons": [],
+              "episodes": [],
+              "units": [],
+              "timeRanges": [],
+              "tags": []
+            },
+            "createdAt": "2026-07-26T13:49:11.233Z"
+          }
+        ],
+        "identityFeatures": [],
+        "positiveLocks": [
+          "竖直橙金发光裂隙状竖瞳",
+          "西北天际乌云中显现",
+          "天象级尺度"
+        ],
+        "negativeLocks": [
+          "不画完整龙身",
+          "不画具象龙头",
+          "非人形"
+        ],
+        "defaultPrompt": "",
+        "authorityHistory": [],
+        "reviewHistory": [],
+        "relations": []
+      }
+    },
+    {
+      "at": "2026-07-26T13:49:12.650Z",
+      "id": "a2-append-version",
+      "command": "append_studio_asset_version",
+      "ok": true,
+      "result": {
+        "version": {
+          "id": "version-1866ef97-5627-4714-bb06-8db01f6acf69",
+          "assetId": "allowed-ref:char-zhulong",
+          "ordinal": 1,
+          "mediaSha256": "12191570b77e5b4a2c6c74d3ec322601de41e28c98c49a8a79e97a371fdb82b3",
+          "reviewStatus": "pending",
+          "sourceNote": "W01_G01 单元源合同 declaredReferences 声明引用；媒体已在 studio_media。",
+          "createdAt": "2026-07-26T13:49:12.354Z"
+        },
+        "assetRevision": 2
+      }
+    },
+    {
+      "at": "2026-07-26T13:49:13.560Z",
+      "id": "a3-review",
+      "command": "review_studio_asset_version",
+      "ok": true,
+      "result": {
+        "id": "allowed-ref:char-zhulong",
+        "category": "character",
+        "name": "烛龙",
+        "description": "古蜀神兽烛龙。W01_G01 的天象级显现形态：西北天际厚重乌云中一道竖直橙金发光裂隙（竖瞳），与残星构成不完整十字。",
+        "aliases": [
+          "zhulong",
+          "烛龙",
+          "烛龙之眼"
+        ],
+        "applicability": {
+          "projects": [],
+          "seasons": [],
+          "episodes": [],
+          "units": [],
+          "timeRanges": [],
+          "tags": []
+        },
+        "revision": 3,
+        "versionCount": 1,
+        "createdAt": "2026-07-26T13:49:11.233Z",
+        "updatedAt": "2026-07-26T13:49:13.299Z",
+        "versions": [
+          {
+            "id": "version-1866ef97-5627-4714-bb06-8db01f6acf69",
+            "assetId": "allowed-ref:char-zhulong",
+            "ordinal": 1,
+            "mediaSha256": "12191570b77e5b4a2c6c74d3ec322601de41e28c98c49a8a79e97a371fdb82b3",
+            "thumbnailRecipeKey": "842e186cb9fe6f5ba4eed30bc0cb1268342eec7b22d3299a81758275d34e2a56",
+            "reviewStatus": "approved",
+            "sourceNote": "W01_G01 单元源合同 declaredReferences 声明引用；媒体已在 studio_media。",
+            "createdAt": "2026-07-26T13:49:12.354Z"
+          }
+        ],
+        "currentDefinitionVersionId": "definition-0843d0a6-3d97-413f-8469-7efc00fe0f5b",
+        "definitionVersions": [
+          {
+            "id": "definition-0843d0a6-3d97-413f-8469-7efc00fe0f5b",
+            "assetId": "allowed-ref:char-zhulong",
+            "ordinal": 1,
+            "assetRevision": 1,
+            "category": "character",
+            "name": "烛龙",
+            "description": "古蜀神兽烛龙。W01_G01 的天象级显现形态：西北天际厚重乌云中一道竖直橙金发光裂隙（竖瞳），与残星构成不完整十字。",
+            "aliases": [
+              "烛龙",
+              "zhulong",
+              "烛龙之眼"
+            ],
+            "identityFeatures": [],
+            "positiveLocks": [
+              "竖直橙金发光裂隙状竖瞳",
+              "西北天际乌云中显现",
+              "天象级尺度"
+            ],
+            "negativeLocks": [
+              "不画完整龙身",
+              "不画具象龙头",
+              "非人形"
+            ],
+            "defaultPrompt": "",
+            "applicability": {
+              "projects": [],
+              "seasons": [],
+              "episodes": [],
+              "units": [],
+              "timeRanges": [],
+              "tags": []
+            },
+            "createdAt": "2026-07-26T13:49:11.233Z"
+          }
+        ],
+        "identityFeatures": [],
+        "positiveLocks": [
+          "竖直橙金发光裂隙状竖瞳",
+          "西北天际乌云中显现",
+          "天象级尺度"
+        ],
+        "negativeLocks": [
+          "不画完整龙身",
+          "不画具象龙头",
+          "非人形"
+        ],
+        "defaultPrompt": "",
+        "authorityHistory": [],
+        "reviewHistory": [
+          {
+            "id": "review-509a3a2f-8385-4de1-aaaa-3ebeb084bf9c",
+            "assetId": "allowed-ref:char-zhulong",
+            "versionId": "version-1866ef97-5627-4714-bb06-8db01f6acf69",
+            "fromStatus": "pending",
+            "toStatus": "approved",
+            "assetRevision": 3,
+            "note": "原图亲验：竖直橙金发光裂隙（竖瞳）于西北乌云，与 W01_G01 需求吻合。依据：会话 scratchpad p1-visual-precheck-20260726.md（主代理原图亲验记录）",
+            "createdAt": "2026-07-26T13:49:13.299Z"
+          }
+        ],
+        "relations": []
+      }
+    },
+    {
+      "at": "2026-07-26T13:49:14.514Z",
+      "id": "a4-primary",
+      "command": "set_studio_primary_authority",
+      "ok": true,
+      "result": {
+        "id": "allowed-ref:char-zhulong",
+        "category": "character",
+        "name": "烛龙",
+        "description": "古蜀神兽烛龙。W01_G01 的天象级显现形态：西北天际厚重乌云中一道竖直橙金发光裂隙（竖瞳），与残星构成不完整十字。",
+        "aliases": [
+          "zhulong",
+          "烛龙",
+          "烛龙之眼"
+        ],
+        "applicability": {
+          "projects": [],
+          "seasons": [],
+          "episodes": [],
+          "units": [],
+          "timeRanges": [],
+          "tags": []
+        },
+        "revision": 4,
+        "versionCount": 1,
+        "createdAt": "2026-07-26T13:49:11.233Z",
+        "updatedAt": "2026-07-26T13:49:14.232Z",
+        "primaryAuthority": {
+          "versionId": "version-1866ef97-5627-4714-bb06-8db01f6acf69",
+          "mediaSha256": "12191570b77e5b4a2c6c74d3ec322601de41e28c98c49a8a79e97a371fdb82b3",
+          "thumbnailRecipeKey": "842e186cb9fe6f5ba4eed30bc0cb1268342eec7b22d3299a81758275d34e2a56"
+        },
+        "versions": [
+          {
+            "id": "version-1866ef97-5627-4714-bb06-8db01f6acf69",
+            "assetId": "allowed-ref:char-zhulong",
+            "ordinal": 1,
+            "mediaSha256": "12191570b77e5b4a2c6c74d3ec322601de41e28c98c49a8a79e97a371fdb82b3",
+            "thumbnailRecipeKey": "842e186cb9fe6f5ba4eed30bc0cb1268342eec7b22d3299a81758275d34e2a56",
+            "reviewStatus": "approved",
+            "sourceNote": "W01_G01 单元源合同 declaredReferences 声明引用；媒体已在 studio_media。",
+            "createdAt": "2026-07-26T13:49:12.354Z"
+          }
+        ],
+        "currentDefinitionVersionId": "definition-0843d0a6-3d97-413f-8469-7efc00fe0f5b",
+        "definitionVersions": [
+          {
+            "id": "definition-0843d0a6-3d97-413f-8469-7efc00fe0f5b",
+            "assetId": "allowed-ref:char-zhulong",
+            "ordinal": 1,
+            "assetRevision": 1,
+            "category": "character",
+            "name": "烛龙",
+            "description": "古蜀神兽烛龙。W01_G01 的天象级显现形态：西北天际厚重乌云中一道竖直橙金发光裂隙（竖瞳），与残星构成不完整十字。",
+            "aliases": [
+              "烛龙",
+              "zhulong",
+              "烛龙之眼"
+            ],
+            "identityFeatures": [],
+            "positiveLocks": [
+              "竖直橙金发光裂隙状竖瞳",
+              "西北天际乌云中显现",
+              "天象级尺度"
+            ],
+            "negativeLocks": [
+              "不画完整龙身",
+              "不画具象龙头",
+              "非人形"
+            ],
+            "defaultPrompt": "",
+            "applicability": {
+              "projects": [],
+              "seasons": [],
+              "episodes": [],
+              "units": [],
+              "timeRanges": [],
+              "tags": []
+            },
+            "createdAt": "2026-07-26T13:49:11.233Z"
+          }
+        ],
+        "identityFeatures": [],
+        "positiveLocks": [
+          "竖直橙金发光裂隙状竖瞳",
+          "西北天际乌云中显现",
+          "天象级尺度"
+        ],
+        "negativeLocks": [
+          "不画完整龙身",
+          "不画具象龙头",
+          "非人形"
+        ],
+        "defaultPrompt": "",
+        "authorityHistory": [
+          {
+            "id": "authority-f956199a-237a-46f2-97c0-e595b9d595e3",
+            "assetId": "allowed-ref:char-zhulong",
+            "versionId": "version-1866ef97-5627-4714-bb06-8db01f6acf69",
+            "assetRevision": 4,
+            "note": "烛龙唯一版本，W01_G01 声明引用的权威身份。",
+            "createdAt": "2026-07-26T13:49:14.232Z"
+          }
+        ],
+        "reviewHistory": [
+          {
+            "id": "review-509a3a2f-8385-4de1-aaaa-3ebeb084bf9c",
+            "assetId": "allowed-ref:char-zhulong",
+            "versionId": "version-1866ef97-5627-4714-bb06-8db01f6acf69",
+            "fromStatus": "pending",
+            "toStatus": "approved",
+            "assetRevision": 3,
+            "note": "原图亲验：竖直橙金发光裂隙（竖瞳）于西北乌云，与 W01_G01 需求吻合。依据：会话 scratchpad p1-visual-precheck-20260726.md（主代理原图亲验记录）",
+            "createdAt": "2026-07-26T13:49:13.299Z"
+          }
+        ],
+        "relations": []
+      }
+    },
+    {
+      "at": "2026-07-26T13:49:14.514Z",
+      "id": "b-scene-star",
+      "ok": true,
+      "skipped": "无 pending 版本（可能已审）",
+      "assetId": "allowed-ref:scene-star"
+    },
+    {
+      "at": "2026-07-26T13:49:14.514Z",
+      "id": "b-scene-yazihe",
+      "ok": true,
+      "skipped": "无 pending 版本（可能已审）",
+      "assetId": "allowed-ref:scene-yazihe"
+    },
+    {
+      "at": "2026-07-26T13:49:14.514Z",
+      "id": "b-scene-yucun",
+      "ok": true,
+      "skipped": "无 pending 版本（可能已审）",
+      "assetId": "allowed-ref:scene-yucun"
+    },
+    {
+      "at": "2026-07-26T13:49:14.514Z",
+      "id": "b-scene-cave-mouth",
+      "ok": true,
+      "skipped": "无 pending 版本（可能已审）",
+      "assetId": "allowed-ref:scene-cave-mouth"
+    },
+    {
+      "at": "2026-07-26T13:49:14.514Z",
+      "id": "b-style-night",
+      "ok": true,
+      "skipped": "无 pending 版本（可能已审）",
+      "assetId": "allowed-ref:style-night"
+    },
+    {
+      "at": "2026-07-26T13:49:14.514Z",
+      "id": "b-style-cine",
+      "ok": true,
+      "skipped": "无 pending 版本（可能已审）",
+      "assetId": "allowed-ref:style-cine"
+    }
+  ]
+}

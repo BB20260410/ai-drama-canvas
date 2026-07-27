@@ -1,0 +1,59 @@
+{
+  "kind": "p3-experience-gate",
+  "budgetMs": 1500,
+  "coreProjection": [
+    {
+      "label": "isolation-fast",
+      "ms": 21,
+      "unitCount": 1,
+      "summary": {
+        "pass": 1,
+        "pendingReview": 0,
+        "inProgress": 0,
+        "failed": 0,
+        "blocked": 0
+      }
+    },
+    {
+      "label": "isolation-full",
+      "ms": 553,
+      "unitCount": 1,
+      "summary": {
+        "pass": 1,
+        "pendingReview": 0,
+        "inProgress": 0,
+        "failed": 0,
+        "blocked": 0
+      }
+    },
+    {
+      "label": "dudu-fast",
+      "ms": 155,
+      "unitCount": 33,
+      "summary": {
+        "pass": 33,
+        "pendingReview": 0,
+        "inProgress": 0,
+        "failed": 0,
+        "blocked": 0
+      }
+    }
+  ],
+  "isolationFastUnderBudget": true,
+  "duduFastUnderBudget": true,
+  "uiPolicy": {
+    "mustUseFastModeForFirstScreen": true,
+    "thumbnailPreferOverFullMedia": true,
+    "noFullDomMount": true,
+    "evidenceReuse": [
+      "docs/evidence/multimedia-os-20260725/w3-thumbnail-priority.json",
+      "docs/evidence/multimedia-os-20260725/w3-large-project-soak.json"
+    ]
+  },
+  "hardUiPlaywright": {
+    "ran": false,
+    "note": "Core 路径硬证据；安装版 Playwright 可选强化，不阻塞（软门+Core≤1.5s）"
+  },
+  "pass": true,
+  "createdAt": "2026-07-25T09:27:29.154Z"
+}

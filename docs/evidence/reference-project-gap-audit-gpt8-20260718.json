@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "kind": "reference-project-gap-audit-gpt8",
+  "status": "complete",
+  "createdAt": "2026-07-18T06:50:00.000Z",
+  "verifiedOn": "2026-07-18",
+  "usage": "personal-non-commercial",
+  "researchMode": "remote-readme-license-docs-only",
+  "clonedThirdPartyRepos": false,
+  "suggestedOrder": [
+    "LocalMiniDrama",
+    "Jellyfish",
+    "LumenX",
+    "TwitCanva",
+    "VueFlow",
+    "OpenAssetIO",
+    "OpenTimelineIO",
+    "OpenCut"
+  ],
+  "implementDecision": "contract-slice-landed",
+  "implementDecisionReason": "八项许可证均为 MIT/Apache，个人可用。最高增量来自 LocalMiniDrama 画布=视图层 + workflow 组；Vue Flow/OTIO 已在本库。落地 studio-canvas-layout 合同，不整库复制。",
+  "localAlreadyPresent": {
+    "vueFlow": { "packages": ["@vue-flow/core@1.48.2", "@vue-flow/background@1.3.2", "@vue-flow/controls@1.1.3"] },
+    "otio": { "owners": ["src/core/editor.ts export/import_edit_otio"], "contracts": ["aicanvas.otio-effect-transition.v1", "aicanvas.otio-transition.v1"] },
+    "openAssetIOPriorAudit": "docs/开源项目借鉴审计_2026-07-13.md"
+  },
+  "sliceLanded": {
+    "name": "studio-canvas-layout",
+    "files": ["src/core/studio-canvas-layout.ts", "tests/studio-canvas-layout.test.ts"],
+    "inspiration": "LocalMiniDrama canvas_layout / workflow_groups (MIT, clean-room)",
+    "copiedThirdPartySource": false
+  },
+  "projects": [
+    {
+      "id": "localminidrama",
+      "name": "LocalMiniDrama",
+      "repo": "https://github.com/xuanyustudio/LocalMiniDrama",
+      "license": { "spdx": "MIT", "link": "https://github.com/xuanyustudio/LocalMiniDrama/blob/main/LICENSE", "verifiedOn": "2026-07-18" },
+      "docs": ["https://github.com/xuanyustudio/LocalMiniDrama/blob/main/docs/plans/2026-06-15-drama-canvas-workflow-plan.md"],
+      "referenceFeatures": ["local-first Electron", "list+canvas dual view", "vue-flow canvas", "workflow groups batch re-run", "canvas as view layer"],
+      "localOwners": ["ManagedStudioCanvasView", "studio-production-dashboard", "studio-canvas-layout"],
+      "classification": "NET_NEW_HIGH_VALUE",
+      "alreadyImplemented": false,
+      "realGap": "production storyboard pipeline canvas UX + layout/workflow metadata contract",
+      "implementThisRound": true,
+      "implementNote": "clean-room layout contract only; full UI next"
+    },
+    {
+      "id": "jellyfish",
+      "name": "Jellyfish",
+      "repo": "https://github.com/Forget-C/Jellyfish",
+      "license": { "spdx": "Apache-2.0", "link": "https://github.com/Forget-C/Jellyfish/blob/main/LICENSE", "verifiedOn": "2026-07-18" },
+      "referenceFeatures": ["shot preparation readiness", "asset consistency", "async task center"],
+      "localOwners": ["studio-binding-control", "studio-continuity", "studio-generation"],
+      "classification": "REUSE_EXISTING_OWNER",
+      "alreadyImplemented": true,
+      "realGap": "finer candidate accept/ignore UX",
+      "implementThisRound": false
+    },
+    {
+      "id": "lumenx",
+      "name": "LumenX Studio",
+      "repo": "https://github.com/alibaba/lumenx",
+      "license": { "spdx": "MIT", "link": "https://github.com/alibaba/lumenx/blob/main/LICENSE", "verifiedOn": "2026-07-18" },
+      "referenceFeatures": ["script-to-export pipeline", "playground multi-model"],
+      "classification": "RESEARCH_ONLY",
+      "alreadyImplemented": false,
+      "realGap": "product shell / model catalog UX",
+      "implementThisRound": false
+    },
+    {
+      "id": "twitcanva",
+      "name": "TwitCanva",
+      "repo": "https://github.com/SankaiAI/TwitCanva-Video-Workflow",
+      "license": { "spdx": "Apache-2.0", "link": "https://github.com/SankaiAI/TwitCanva-Video-Workflow/blob/main/LICENSE", "verifiedOn": "2026-07-18" },
+      "referenceFeatures": ["node canvas gen", "social post X/TikTok"],
+      "classification": "NOT_NEEDED",
+      "secondaryTags": ["RESEARCH_ONLY"],
+      "alreadyImplemented": false,
+      "realGap": "social publishing out of product scope",
+      "implementThisRound": false
+    },
+    {
+      "id": "vue-flow",
+      "name": "Vue Flow",
+      "repo": "https://github.com/bcakmakoglu/vue-flow",
+      "license": { "spdx": "MIT", "link": "https://github.com/bcakmakoglu/vue-flow/blob/master/LICENSE", "verifiedOn": "2026-07-18" },
+      "classification": "ALREADY_IMPLEMENTED",
+      "alreadyImplemented": true,
+      "localEvidence": "package.json @vue-flow/core@1.48.2",
+      "implementThisRound": false
+    },
+    {
+      "id": "openassetio",
+      "name": "OpenAssetIO",
+      "repo": "https://github.com/OpenAssetIO/OpenAssetIO",
+      "license": { "spdx": "Apache-2.0", "link": "https://github.com/OpenAssetIO/OpenAssetIO/blob/main/LICENSE", "verifiedOn": "2026-07-18" },
+      "classification": "RESEARCH_ONLY",
+      "alreadyImplemented": false,
+      "priorAudit": "docs/开源项目借鉴审计_2026-07-13.md",
+      "implementThisRound": false
+    },
+    {
+      "id": "opentimelineio",
+      "name": "OpenTimelineIO",
+      "repo": "https://github.com/AcademySoftwareFoundation/OpenTimelineIO",
+      "license": { "spdx": "Apache-2.0", "link": "https://github.com/AcademySoftwareFoundation/OpenTimelineIO/blob/main/LICENSE.txt", "verifiedOn": "2026-07-18" },
+      "classification": "ALREADY_IMPLEMENTED",
+      "alreadyImplemented": true,
+      "localEvidence": "src/core/editor.ts exportEditProjectOtio/importEditProjectOtio",
+      "implementThisRound": false
+    },
+    {
+      "id": "opencut",
+      "name": "OpenCut",
+      "repo": "https://github.com/OpenCut-app/OpenCut",
+      "license": { "spdx": "MIT", "link": "https://github.com/OpenCut-app/OpenCut/blob/main/LICENSE", "verifiedOn": "2026-07-18" },
+      "classification": "DEFERRED",
+      "alreadyImplemented": false,
+      "realGap": "rewrite in progress; classic archived",
+      "implementThisRound": false
+    }
+  ],
+  "decisionQuestions": {
+    "q1_already": ["Vue Flow", "OTIO edit exchange", "CAS/Binding/dashboard"],
+    "q2_more_mature": ["LocalMiniDrama drama canvas UX", "LumenX playground", "Jellyfish prep UX"],
+    "q3_ui_only": ["LumenX shell", "TwitCanva chrome"],
+    "q4_second_truth": ["merge LocalMiniDrama/Jellyfish full DB"],
+    "q5_adapter": ["OpenAssetIO future sidecar"],
+    "q6_consistency": ["Jellyfish entity reuse aligns Binding"],
+    "q7_stop": ["OpenCut rewrite", "TwitCanva social"],
+    "q8_next": "Wire studio-canvas-layout into ManagedStudioCanvas / dual list-canvas entry"
+  },
+  "boundaries": {
+    "rebuildP8": false,
+    "finalValidationOverwritten": false,
+    "gitStage": false,
+    "formalProjectTouched": false
+  }
+}

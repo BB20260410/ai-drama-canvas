@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "kind": "absorb-a-wave-closeout",
+  "status": "pass",
+  "createdAt": "2026-07-18T07:06:00.000Z",
+  "wave": "A",
+  "slices": [
+    "A0",
+    "A1",
+    "A2",
+    "A3",
+    "A4",
+    "A5"
+  ],
+  "evidence": [
+    "docs/evidence/absorb-a1-canvas-layout-store-20260718.json",
+    "docs/evidence/absorb-a2-canvas-layout-ui-20260718.json",
+    "docs/evidence/absorb-a3-dual-entry-20260718.json",
+    "docs/evidence/absorb-a4-pipeline-graph-20260718.json",
+    "docs/evidence/absorb-a5-workflow-runner-20260718.json"
+  ],
+  "verification": {
+    "typecheck": "pass",
+    "relatedVitest": "15+ tests across canvas modules",
+    "formalProjectEmpty": true,
+    "formalBusinessEmpty": true,
+    "formalCountLog": "implementer/boundaries.txt (business_table_row_sum=0; meta/fts excluded)",
+    "a3FocusFix": "watch immediate + applyExternalFocus + unit query helper"
+  },
+  "nextWave": "B1 preparation checklist UI"
+}

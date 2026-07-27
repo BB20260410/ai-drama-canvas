@@ -1,0 +1,1808 @@
+{
+  "schemaVersion": 1,
+  "kind": "aicanvas-formal-project-nle-core-calibration",
+  "generatedAt": "2026-07-14T23:29:22.050Z",
+  "status": "passed",
+  "authorization": {
+    "sourceRoot": "/Users/hxx/Desktop/豆包版本/剧本_封神篇",
+    "sourceReadOnly": true,
+    "sourceWriteForbidden": true,
+    "writableIsolationRoot": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729"
+  },
+  "source": {
+    "nativeMedia": false,
+    "episodes": 23,
+    "shots": 968,
+    "durationSeconds": 8637,
+    "inventory": {
+      "algorithm": "sha256-relative-path-bytes-content-v1",
+      "aggregateSha256": "bcbd8aca412c6f48021624ef07d9b627e9635c17095adb70fc47f8487f7ec0c0",
+      "files": [
+        {
+          "relativePath": "封神篇_EP01_征兵.md",
+          "bytes": 37978,
+          "sha256": "45476605171cdfc0179dfdf3b66c54c56ac38a687e29f65948ff77de76fbcc16",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP02_夜话.md",
+          "bytes": 69970,
+          "sha256": "b45c08c70a5326b764554eae3cf35f562e77cc7914013a8d4ebbb0e3df852dc5",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP03_天边的光.md",
+          "bytes": 24427,
+          "sha256": "a91ac6e30f47003fea37a1506021e85535eaf8605939c760fb861a29b184eeb5",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP04_金面客.md",
+          "bytes": 52407,
+          "sha256": "60cf61b9e11a93291660ec235d5069f870c1f656684c1760fcd12fa0f6ec0b98",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP05_朝歌.md",
+          "bytes": 53280,
+          "sha256": "970a5e825b98c3d0d507521a6f523b27a6d9e62fb8c80b1502b8a0f13746e7da",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP06_守望.md",
+          "bytes": 40366,
+          "sha256": "13e508b6f698317b7df3a767b7b67d7b6877a85bc479ee4d8a8035434ede3c7e",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP07_炮烙.md",
+          "bytes": 48962,
+          "sha256": "e9997c21650763fc631c7ee709abd30f469c7d8d2259df0d8e34e62c03ddf3e0",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP08_人牲.md",
+          "bytes": 69933,
+          "sha256": "3eb30baea84451a6608f7ea368997e875c1b3ed4a44b8ef8d8e35eb0b3fa83c2",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP09_见过.md",
+          "bytes": 33596,
+          "sha256": "49098adfe2f95455e7a8b2c05f521837c91ad805b2788bc092d62eba4eda090f",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP10_酒池.md",
+          "bytes": 50158,
+          "sha256": "d11df86731c39273b4505e0286083b0cf8bc71835079493d5b34c0915b79215e",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP11_无心菜.md",
+          "bytes": 74800,
+          "sha256": "049748d8ac6397baf2122079130468b5525297eedcfd9f1b910ddbdab636cd26",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP12_太师回朝.md",
+          "bytes": 40181,
+          "sha256": "1d85d4efa796ebf733a2504494afe79564f660300fad17f59a6b14c7df777fed",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP13_桑林雨.md",
+          "bytes": 56809,
+          "sha256": "bdea904c254a0ad3e0a3585bf854c561a4a0975231f6e55a929b39a3de263f67",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP14_西边的雷.md",
+          "bytes": 50370,
+          "sha256": "0f10278e62bed7babe65d1e20e4ab29819d42531570f789edb594e95365af6cd",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP15_黑鸟.md",
+          "bytes": 46149,
+          "sha256": "11196117d9724af06275776c6c4a658fe1c27ff0a6b2c2fabaaf2d576c33bfd9",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP16_小鱼.md",
+          "bytes": 36484,
+          "sha256": "a2317d836bc4aaeccb3d2f04a95b8e6f66df7de023091471eecca65362b972de",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP17_败讯.md",
+          "bytes": 45982,
+          "sha256": "b34a63b15cf999d872948a57b53b87cee0105767d3bf8245b8da6b221da415e1",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP18_岁星.md",
+          "bytes": 55428,
+          "sha256": "f276a6ae4ca8ebdbd73ba60f27be03753e46e7ccbcf066c28405e2f86182d0a2",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP19_牧野上泥里.md",
+          "bytes": 36135,
+          "sha256": "18bf287b1a476a73752c39827ec5ec2ac2962b916cc8e1707de8b7463b58cb43",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP20_牧野下漂杵.md",
+          "bytes": 68901,
+          "sha256": "4aa6ec426eaedf07a67e9996dbcda91bc2e0009f77593681e79b758057d06559",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP21_封神台.md",
+          "bytes": 85051,
+          "sha256": "36434418642271cf8c318ca69540a93144edde97bd0d25713b6989d7172eaff4",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP22_斩鼎.md",
+          "bytes": 60489,
+          "sha256": "c484202f7589234bcf77a9276a28a6b5c3ccfb1a1bf8991005e33cc2f951111d",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇_EP23_家.md",
+          "bytes": 37720,
+          "sha256": "c6a20cf5ff379570f7fad334fe922b4dcc6409d6fdfc546d7c0422ca4226ad96",
+          "kind": "episode-markdown"
+        },
+        {
+          "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705.zip",
+          "bytes": 605902,
+          "sha256": "79ed94a14c82829b2666fc6e114bf254a22899467ea884f9cf4600bb26adfd8d",
+          "kind": "other"
+        },
+        {
+          "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/make_reference_images.py",
+          "bytes": 18058,
+          "sha256": "2e45e8d69540bab6b218e74247e62596e4c20af1db07e2064915fde3dc4286ba",
+          "kind": "other"
+        },
+        {
+          "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/README_prompt_pack.md",
+          "bytes": 8976,
+          "sha256": "e6c4341f0ffeb358150ad249801bcd7d46c89c5e63d19df6e55d729d38aad757",
+          "kind": "other"
+        },
+        {
+          "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/ref_01_multi_panel_reading_guide.png",
+          "bytes": 221423,
+          "sha256": "d6718fb6b65e71e3bd69939cd3e6724c227af4cfc1610960362c50ab2d0939cc",
+          "kind": "reference-png"
+        },
+        {
+          "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/ref_02_dialogue_confrontation_4shots.png",
+          "bytes": 122959,
+          "sha256": "9758d04601ecf553d575513672ae28d69ed196728cd373070a6c5dbb6570f08a",
+          "kind": "reference-png"
+        },
+        {
+          "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/ref_03_action_escape_6shots.png",
+          "bytes": 98457,
+          "sha256": "f55b1fb6810317f4f05732372ce32c28a70c4f72f88e2bc32f0735a3711a8136",
+          "kind": "reference-png"
+        },
+        {
+          "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/ref_04_contact_sheet_layout_template.png",
+          "bytes": 185473,
+          "sha256": "6bcbe465deff34d12cba01f242786385ce41eff15a272cfc6048f43d2a3535e1",
+          "kind": "reference-png"
+        }
+      ],
+      "totalBytes": 2436824
+    },
+    "metadataBefore": [
+      {
+        "relativePath": "封神篇_EP01_征兵.md",
+        "bytes": 37978,
+        "sha256": "45476605171cdfc0179dfdf3b66c54c56ac38a687e29f65948ff77de76fbcc16",
+        "inode": "153807175",
+        "mtimeNs": "1783147583699350657",
+        "ctimeNs": "1783494511743293582"
+      },
+      {
+        "relativePath": "封神篇_EP02_夜话.md",
+        "bytes": 69970,
+        "sha256": "b45c08c70a5326b764554eae3cf35f562e77cc7914013a8d4ebbb0e3df852dc5",
+        "inode": "153796511",
+        "mtimeNs": "1783142666746821857",
+        "ctimeNs": "1783142666755126574"
+      },
+      {
+        "relativePath": "封神篇_EP03_天边的光.md",
+        "bytes": 24427,
+        "sha256": "a91ac6e30f47003fea37a1506021e85535eaf8605939c760fb861a29b184eeb5",
+        "inode": "153796394",
+        "mtimeNs": "1783142621617833284",
+        "ctimeNs": "1783142621618781706"
+      },
+      {
+        "relativePath": "封神篇_EP04_金面客.md",
+        "bytes": 52407,
+        "sha256": "60cf61b9e11a93291660ec235d5069f870c1f656684c1760fcd12fa0f6ec0b98",
+        "inode": "153805885",
+        "mtimeNs": "1783146705125673552",
+        "ctimeNs": "1783146705125989133"
+      },
+      {
+        "relativePath": "封神篇_EP05_朝歌.md",
+        "bytes": 53280,
+        "sha256": "970a5e825b98c3d0d507521a6f523b27a6d9e62fb8c80b1502b8a0f13746e7da",
+        "inode": "153791572",
+        "mtimeNs": "1783141908545447867",
+        "ctimeNs": "1783141908556314599"
+      },
+      {
+        "relativePath": "封神篇_EP06_守望.md",
+        "bytes": 40366,
+        "sha256": "13e508b6f698317b7df3a767b7b67d7b6877a85bc479ee4d8a8035434ede3c7e",
+        "inode": "153807945",
+        "mtimeNs": "1783148271897497864",
+        "ctimeNs": "1783148271897971412"
+      },
+      {
+        "relativePath": "封神篇_EP07_炮烙.md",
+        "bytes": 48962,
+        "sha256": "e9997c21650763fc631c7ee709abd30f469c7d8d2259df0d8e34e62c03ddf3e0",
+        "inode": "153798625",
+        "mtimeNs": "1783143196383985593",
+        "ctimeNs": "1783143196384494763"
+      },
+      {
+        "relativePath": "封神篇_EP08_人牲.md",
+        "bytes": 69933,
+        "sha256": "3eb30baea84451a6608f7ea368997e875c1b3ed4a44b8ef8d8e35eb0b3fa83c2",
+        "inode": "153850910",
+        "mtimeNs": "1783159178645482586",
+        "ctimeNs": "1783159178646921226"
+      },
+      {
+        "relativePath": "封神篇_EP09_见过.md",
+        "bytes": 33596,
+        "sha256": "49098adfe2f95455e7a8b2c05f521837c91ad805b2788bc092d62eba4eda090f",
+        "inode": "153807946",
+        "mtimeNs": "1783148273210818512",
+        "ctimeNs": "1783148273211646647"
+      },
+      {
+        "relativePath": "封神篇_EP10_酒池.md",
+        "bytes": 50158,
+        "sha256": "d11df86731c39273b4505e0286083b0cf8bc71835079493d5b34c0915b79215e",
+        "inode": "153807011",
+        "mtimeNs": "1783147550904723686",
+        "ctimeNs": "1783147550904928060"
+      },
+      {
+        "relativePath": "封神篇_EP11_无心菜.md",
+        "bytes": 74800,
+        "sha256": "049748d8ac6397baf2122079130468b5525297eedcfd9f1b910ddbdab636cd26",
+        "inode": "153805924",
+        "mtimeNs": "1783146741355440932",
+        "ctimeNs": "1783146741355902597"
+      },
+      {
+        "relativePath": "封神篇_EP12_太师回朝.md",
+        "bytes": 40181,
+        "sha256": "1d85d4efa796ebf733a2504494afe79564f660300fad17f59a6b14c7df777fed",
+        "inode": "153853856",
+        "mtimeNs": "1783159749696914883",
+        "ctimeNs": "1783159749697545264"
+      },
+      {
+        "relativePath": "封神篇_EP13_桑林雨.md",
+        "bytes": 56809,
+        "sha256": "bdea904c254a0ad3e0a3585bf854c561a4a0975231f6e55a929b39a3de263f67",
+        "inode": "153789137",
+        "mtimeNs": "1783141002999058658",
+        "ctimeNs": "1783141002999961998"
+      },
+      {
+        "relativePath": "封神篇_EP14_西边的雷.md",
+        "bytes": 50370,
+        "sha256": "0f10278e62bed7babe65d1e20e4ab29819d42531570f789edb594e95365af6cd",
+        "inode": "153791769",
+        "mtimeNs": "1783142073275730584",
+        "ctimeNs": "1783142073277205635"
+      },
+      {
+        "relativePath": "封神篇_EP15_黑鸟.md",
+        "bytes": 46149,
+        "sha256": "11196117d9724af06275776c6c4a658fe1c27ff0a6b2c2fabaaf2d576c33bfd9",
+        "inode": "153789162",
+        "mtimeNs": "1783141031347853844",
+        "ctimeNs": "1783141031349734398"
+      },
+      {
+        "relativePath": "封神篇_EP16_小鱼.md",
+        "bytes": 36484,
+        "sha256": "a2317d836bc4aaeccb3d2f04a95b8e6f66df7de023091471eecca65362b972de",
+        "inode": "153791423",
+        "mtimeNs": "1783141788392196453",
+        "ctimeNs": "1783141788393394543"
+      },
+      {
+        "relativePath": "封神篇_EP17_败讯.md",
+        "bytes": 45982,
+        "sha256": "b34a63b15cf999d872948a57b53b87cee0105767d3bf8245b8da6b221da415e1",
+        "inode": "153807188",
+        "mtimeNs": "1783147592562575708",
+        "ctimeNs": "1783147592563561371"
+      },
+      {
+        "relativePath": "封神篇_EP18_岁星.md",
+        "bytes": 55428,
+        "sha256": "f276a6ae4ca8ebdbd73ba60f27be03753e46e7ccbcf066c28405e2f86182d0a2",
+        "inode": "153854183",
+        "mtimeNs": "1783159926394373065",
+        "ctimeNs": "1783159926395456742"
+      },
+      {
+        "relativePath": "封神篇_EP19_牧野上泥里.md",
+        "bytes": 36135,
+        "sha256": "18bf287b1a476a73752c39827ec5ec2ac2962b916cc8e1707de8b7463b58cb43",
+        "inode": "153791398",
+        "mtimeNs": "1783141767451257811",
+        "ctimeNs": "1783141767452780279"
+      },
+      {
+        "relativePath": "封神篇_EP20_牧野下漂杵.md",
+        "bytes": 68901,
+        "sha256": "4aa6ec426eaedf07a67e9996dbcda91bc2e0009f77593681e79b758057d06559",
+        "inode": "153807196",
+        "mtimeNs": "1783147597865044360",
+        "ctimeNs": "1783147597865460609"
+      },
+      {
+        "relativePath": "封神篇_EP21_封神台.md",
+        "bytes": 85051,
+        "sha256": "36434418642271cf8c318ca69540a93144edde97bd0d25713b6989d7172eaff4",
+        "inode": "153855000",
+        "mtimeNs": "1783160762653150866",
+        "ctimeNs": "1783160762654105834"
+      },
+      {
+        "relativePath": "封神篇_EP22_斩鼎.md",
+        "bytes": 60489,
+        "sha256": "c484202f7589234bcf77a9276a28a6b5c3ccfb1a1bf8991005e33cc2f951111d",
+        "inode": "153807219",
+        "mtimeNs": "1783147609035701273",
+        "ctimeNs": "1783147609036604353"
+      },
+      {
+        "relativePath": "封神篇_EP23_家.md",
+        "bytes": 37720,
+        "sha256": "c6a20cf5ff379570f7fad334fe922b4dcc6409d6fdfc546d7c0422ca4226ad96",
+        "inode": "153852094",
+        "mtimeNs": "1783159447870706112",
+        "ctimeNs": "1783159447871604245"
+      },
+      {
+        "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705.zip",
+        "bytes": 605902,
+        "sha256": "79ed94a14c82829b2666fc6e114bf254a22899467ea884f9cf4600bb26adfd8d",
+        "inode": "154037865",
+        "mtimeNs": "1783218032154546202",
+        "ctimeNs": "1783218032154732707"
+      },
+      {
+        "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/make_reference_images.py",
+        "bytes": 18058,
+        "sha256": "2e45e8d69540bab6b218e74247e62596e4c20af1db07e2064915fde3dc4286ba",
+        "inode": "154037100",
+        "mtimeNs": "1783217966004261841",
+        "ctimeNs": "1783217966004261841"
+      },
+      {
+        "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/README_prompt_pack.md",
+        "bytes": 8976,
+        "sha256": "e6c4341f0ffeb358150ad249801bcd7d46c89c5e63d19df6e55d729d38aad757",
+        "inode": "154037847",
+        "mtimeNs": "1783218019774894166",
+        "ctimeNs": "1783218019774894166"
+      },
+      {
+        "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/ref_01_multi_panel_reading_guide.png",
+        "bytes": 221423,
+        "sha256": "d6718fb6b65e71e3bd69939cd3e6724c227af4cfc1610960362c50ab2d0939cc",
+        "inode": "154037245",
+        "mtimeNs": "1783217971403494809",
+        "ctimeNs": "1783217971403494809"
+      },
+      {
+        "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/ref_02_dialogue_confrontation_4shots.png",
+        "bytes": 122959,
+        "sha256": "9758d04601ecf553d575513672ae28d69ed196728cd373070a6c5dbb6570f08a",
+        "inode": "154037246",
+        "mtimeNs": "1783217971441872752",
+        "ctimeNs": "1783217971441872752"
+      },
+      {
+        "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/ref_03_action_escape_6shots.png",
+        "bytes": 98457,
+        "sha256": "f55b1fb6810317f4f05732372ce32c28a70c4f72f88e2bc32f0735a3711a8136",
+        "inode": "154037247",
+        "mtimeNs": "1783217971473751042",
+        "ctimeNs": "1783217971473751042"
+      },
+      {
+        "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/ref_04_contact_sheet_layout_template.png",
+        "bytes": 185473,
+        "sha256": "6bcbe465deff34d12cba01f242786385ce41eff15a272cfc6048f43d2a3535e1",
+        "inode": "154037248",
+        "mtimeNs": "1783217971522661467",
+        "ctimeNs": "1783217971522661467"
+      }
+    ],
+    "metadataAfter": [
+      {
+        "relativePath": "封神篇_EP01_征兵.md",
+        "bytes": 37978,
+        "sha256": "45476605171cdfc0179dfdf3b66c54c56ac38a687e29f65948ff77de76fbcc16",
+        "inode": "153807175",
+        "mtimeNs": "1783147583699350657",
+        "ctimeNs": "1783494511743293582"
+      },
+      {
+        "relativePath": "封神篇_EP02_夜话.md",
+        "bytes": 69970,
+        "sha256": "b45c08c70a5326b764554eae3cf35f562e77cc7914013a8d4ebbb0e3df852dc5",
+        "inode": "153796511",
+        "mtimeNs": "1783142666746821857",
+        "ctimeNs": "1783142666755126574"
+      },
+      {
+        "relativePath": "封神篇_EP03_天边的光.md",
+        "bytes": 24427,
+        "sha256": "a91ac6e30f47003fea37a1506021e85535eaf8605939c760fb861a29b184eeb5",
+        "inode": "153796394",
+        "mtimeNs": "1783142621617833284",
+        "ctimeNs": "1783142621618781706"
+      },
+      {
+        "relativePath": "封神篇_EP04_金面客.md",
+        "bytes": 52407,
+        "sha256": "60cf61b9e11a93291660ec235d5069f870c1f656684c1760fcd12fa0f6ec0b98",
+        "inode": "153805885",
+        "mtimeNs": "1783146705125673552",
+        "ctimeNs": "1783146705125989133"
+      },
+      {
+        "relativePath": "封神篇_EP05_朝歌.md",
+        "bytes": 53280,
+        "sha256": "970a5e825b98c3d0d507521a6f523b27a6d9e62fb8c80b1502b8a0f13746e7da",
+        "inode": "153791572",
+        "mtimeNs": "1783141908545447867",
+        "ctimeNs": "1783141908556314599"
+      },
+      {
+        "relativePath": "封神篇_EP06_守望.md",
+        "bytes": 40366,
+        "sha256": "13e508b6f698317b7df3a767b7b67d7b6877a85bc479ee4d8a8035434ede3c7e",
+        "inode": "153807945",
+        "mtimeNs": "1783148271897497864",
+        "ctimeNs": "1783148271897971412"
+      },
+      {
+        "relativePath": "封神篇_EP07_炮烙.md",
+        "bytes": 48962,
+        "sha256": "e9997c21650763fc631c7ee709abd30f469c7d8d2259df0d8e34e62c03ddf3e0",
+        "inode": "153798625",
+        "mtimeNs": "1783143196383985593",
+        "ctimeNs": "1783143196384494763"
+      },
+      {
+        "relativePath": "封神篇_EP08_人牲.md",
+        "bytes": 69933,
+        "sha256": "3eb30baea84451a6608f7ea368997e875c1b3ed4a44b8ef8d8e35eb0b3fa83c2",
+        "inode": "153850910",
+        "mtimeNs": "1783159178645482586",
+        "ctimeNs": "1783159178646921226"
+      },
+      {
+        "relativePath": "封神篇_EP09_见过.md",
+        "bytes": 33596,
+        "sha256": "49098adfe2f95455e7a8b2c05f521837c91ad805b2788bc092d62eba4eda090f",
+        "inode": "153807946",
+        "mtimeNs": "1783148273210818512",
+        "ctimeNs": "1783148273211646647"
+      },
+      {
+        "relativePath": "封神篇_EP10_酒池.md",
+        "bytes": 50158,
+        "sha256": "d11df86731c39273b4505e0286083b0cf8bc71835079493d5b34c0915b79215e",
+        "inode": "153807011",
+        "mtimeNs": "1783147550904723686",
+        "ctimeNs": "1783147550904928060"
+      },
+      {
+        "relativePath": "封神篇_EP11_无心菜.md",
+        "bytes": 74800,
+        "sha256": "049748d8ac6397baf2122079130468b5525297eedcfd9f1b910ddbdab636cd26",
+        "inode": "153805924",
+        "mtimeNs": "1783146741355440932",
+        "ctimeNs": "1783146741355902597"
+      },
+      {
+        "relativePath": "封神篇_EP12_太师回朝.md",
+        "bytes": 40181,
+        "sha256": "1d85d4efa796ebf733a2504494afe79564f660300fad17f59a6b14c7df777fed",
+        "inode": "153853856",
+        "mtimeNs": "1783159749696914883",
+        "ctimeNs": "1783159749697545264"
+      },
+      {
+        "relativePath": "封神篇_EP13_桑林雨.md",
+        "bytes": 56809,
+        "sha256": "bdea904c254a0ad3e0a3585bf854c561a4a0975231f6e55a929b39a3de263f67",
+        "inode": "153789137",
+        "mtimeNs": "1783141002999058658",
+        "ctimeNs": "1783141002999961998"
+      },
+      {
+        "relativePath": "封神篇_EP14_西边的雷.md",
+        "bytes": 50370,
+        "sha256": "0f10278e62bed7babe65d1e20e4ab29819d42531570f789edb594e95365af6cd",
+        "inode": "153791769",
+        "mtimeNs": "1783142073275730584",
+        "ctimeNs": "1783142073277205635"
+      },
+      {
+        "relativePath": "封神篇_EP15_黑鸟.md",
+        "bytes": 46149,
+        "sha256": "11196117d9724af06275776c6c4a658fe1c27ff0a6b2c2fabaaf2d576c33bfd9",
+        "inode": "153789162",
+        "mtimeNs": "1783141031347853844",
+        "ctimeNs": "1783141031349734398"
+      },
+      {
+        "relativePath": "封神篇_EP16_小鱼.md",
+        "bytes": 36484,
+        "sha256": "a2317d836bc4aaeccb3d2f04a95b8e6f66df7de023091471eecca65362b972de",
+        "inode": "153791423",
+        "mtimeNs": "1783141788392196453",
+        "ctimeNs": "1783141788393394543"
+      },
+      {
+        "relativePath": "封神篇_EP17_败讯.md",
+        "bytes": 45982,
+        "sha256": "b34a63b15cf999d872948a57b53b87cee0105767d3bf8245b8da6b221da415e1",
+        "inode": "153807188",
+        "mtimeNs": "1783147592562575708",
+        "ctimeNs": "1783147592563561371"
+      },
+      {
+        "relativePath": "封神篇_EP18_岁星.md",
+        "bytes": 55428,
+        "sha256": "f276a6ae4ca8ebdbd73ba60f27be03753e46e7ccbcf066c28405e2f86182d0a2",
+        "inode": "153854183",
+        "mtimeNs": "1783159926394373065",
+        "ctimeNs": "1783159926395456742"
+      },
+      {
+        "relativePath": "封神篇_EP19_牧野上泥里.md",
+        "bytes": 36135,
+        "sha256": "18bf287b1a476a73752c39827ec5ec2ac2962b916cc8e1707de8b7463b58cb43",
+        "inode": "153791398",
+        "mtimeNs": "1783141767451257811",
+        "ctimeNs": "1783141767452780279"
+      },
+      {
+        "relativePath": "封神篇_EP20_牧野下漂杵.md",
+        "bytes": 68901,
+        "sha256": "4aa6ec426eaedf07a67e9996dbcda91bc2e0009f77593681e79b758057d06559",
+        "inode": "153807196",
+        "mtimeNs": "1783147597865044360",
+        "ctimeNs": "1783147597865460609"
+      },
+      {
+        "relativePath": "封神篇_EP21_封神台.md",
+        "bytes": 85051,
+        "sha256": "36434418642271cf8c318ca69540a93144edde97bd0d25713b6989d7172eaff4",
+        "inode": "153855000",
+        "mtimeNs": "1783160762653150866",
+        "ctimeNs": "1783160762654105834"
+      },
+      {
+        "relativePath": "封神篇_EP22_斩鼎.md",
+        "bytes": 60489,
+        "sha256": "c484202f7589234bcf77a9276a28a6b5c3ccfb1a1bf8991005e33cc2f951111d",
+        "inode": "153807219",
+        "mtimeNs": "1783147609035701273",
+        "ctimeNs": "1783147609036604353"
+      },
+      {
+        "relativePath": "封神篇_EP23_家.md",
+        "bytes": 37720,
+        "sha256": "c6a20cf5ff379570f7fad334fe922b4dcc6409d6fdfc546d7c0422ca4226ad96",
+        "inode": "153852094",
+        "mtimeNs": "1783159447870706112",
+        "ctimeNs": "1783159447871604245"
+      },
+      {
+        "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705.zip",
+        "bytes": 605902,
+        "sha256": "79ed94a14c82829b2666fc6e114bf254a22899467ea884f9cf4600bb26adfd8d",
+        "inode": "154037865",
+        "mtimeNs": "1783218032154546202",
+        "ctimeNs": "1783218032154732707"
+      },
+      {
+        "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/make_reference_images.py",
+        "bytes": 18058,
+        "sha256": "2e45e8d69540bab6b218e74247e62596e4c20af1db07e2064915fde3dc4286ba",
+        "inode": "154037100",
+        "mtimeNs": "1783217966004261841",
+        "ctimeNs": "1783217966004261841"
+      },
+      {
+        "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/README_prompt_pack.md",
+        "bytes": 8976,
+        "sha256": "e6c4341f0ffeb358150ad249801bcd7d46c89c5e63d19df6e55d729d38aad757",
+        "inode": "154037847",
+        "mtimeNs": "1783218019774894166",
+        "ctimeNs": "1783218019774894166"
+      },
+      {
+        "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/ref_01_multi_panel_reading_guide.png",
+        "bytes": 221423,
+        "sha256": "d6718fb6b65e71e3bd69939cd3e6724c227af4cfc1610960362c50ab2d0939cc",
+        "inode": "154037245",
+        "mtimeNs": "1783217971403494809",
+        "ctimeNs": "1783217971403494809"
+      },
+      {
+        "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/ref_02_dialogue_confrontation_4shots.png",
+        "bytes": 122959,
+        "sha256": "9758d04601ecf553d575513672ae28d69ed196728cd373070a6c5dbb6570f08a",
+        "inode": "154037246",
+        "mtimeNs": "1783217971441872752",
+        "ctimeNs": "1783217971441872752"
+      },
+      {
+        "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/ref_03_action_escape_6shots.png",
+        "bytes": 98457,
+        "sha256": "f55b1fb6810317f4f05732372ce32c28a70c4f72f88e2bc32f0735a3711a8136",
+        "inode": "154037247",
+        "mtimeNs": "1783217971473751042",
+        "ctimeNs": "1783217971473751042"
+      },
+      {
+        "relativePath": "封神篇内容/ai_short_drama_storyboard_refs_20260705/ref_04_contact_sheet_layout_template.png",
+        "bytes": 185473,
+        "sha256": "6bcbe465deff34d12cba01f242786385ce41eff15a272cfc6048f43d2a3535e1",
+        "inode": "154037248",
+        "mtimeNs": "1783217971522661467",
+        "ctimeNs": "1783217971522661467"
+      }
+    ],
+    "unchanged": true
+  },
+  "normalized": {
+    "selectedEpisodes": [
+      19,
+      21,
+      22
+    ],
+    "units": 140,
+    "ep22Units": 53,
+    "formalSourceManifest": {
+      "path": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/formal-source-manifest.json",
+      "bytes": 145332,
+      "sha256": "f94e3d800052ae3985c5e792b43d016a7c78b98f387dd041659df59d550ab7b7"
+    },
+    "repeatedScanStable": true,
+    "scanIds": [
+      "9a6f4bed-3f9b-4a9b-b6de-f16508bde39a",
+      "439e49a5-d7da-48a4-82cf-9ab6e02a0559"
+    ]
+  },
+  "derivedMedia": {
+    "sourceNativeMedia": false,
+    "calibrationDerived": true,
+    "files": [
+      {
+        "path": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/.calibration_media/formal-reference-derived-24fps.mp4",
+        "bytes": 94233,
+        "sha256": "1265771eee0978ca700445f418c7f3b5d55cdf150da2213c0302b94736faeb76",
+        "probe": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "h264",
+              "codec_type": "video",
+              "width": 360,
+              "height": 640,
+              "r_frame_rate": "24/1",
+              "avg_frame_rate": "24/1",
+              "duration": "24.000000",
+              "nb_frames": "576"
+            }
+          ],
+          "format": {
+            "duration": "24.000000",
+            "size": "94233"
+          }
+        }
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/.calibration_media/formal-reference-derived-48fps.mp4",
+        "bytes": 100997,
+        "sha256": "6d7015270cfa3a5203a75c11d3521005da990b71e76f89f036d63a721fed23aa",
+        "probe": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "h264",
+              "codec_type": "video",
+              "width": 360,
+              "height": 640,
+              "r_frame_rate": "48/1",
+              "avg_frame_rate": "48/1",
+              "duration": "24.000000",
+              "nb_frames": "1152"
+            }
+          ],
+          "format": {
+            "duration": "24.000000",
+            "size": "100997"
+          }
+        }
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/.calibration_media/formal-reference-derived-96fps.mp4",
+        "bytes": 178944,
+        "sha256": "04a8119153573c345fc307f9e1a3fb759656047c7c76260856d00e7d48a0f4e5",
+        "probe": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "h264",
+              "codec_type": "video",
+              "width": 360,
+              "height": 640,
+              "r_frame_rate": "96/1",
+              "avg_frame_rate": "96/1",
+              "duration": "24.000000",
+              "nb_frames": "2304"
+            }
+          ],
+          "format": {
+            "duration": "24.000000",
+            "size": "178944"
+          }
+        }
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/.calibration_media/formal-reference-derived-120fps.mp4",
+        "bytes": 262455,
+        "sha256": "7e56469819bbfc13a71eef3f6ed9819b22fe86b99bc615d84442ebd40fda6d80",
+        "probe": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "h264",
+              "codec_type": "video",
+              "width": 360,
+              "height": 640,
+              "r_frame_rate": "120/1",
+              "avg_frame_rate": "120/1",
+              "duration": "24.000000",
+              "nb_frames": "2880"
+            }
+          ],
+          "format": {
+            "duration": "24.000000",
+            "size": "262455"
+          }
+        }
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/.calibration_media/EP22_script-audio-cue-bed.m4a",
+        "bytes": 5045257,
+        "sha256": "fa74647561e339e0272ec40d41c856490ecfb9c716655053a770a87ea4f7895d",
+        "probe": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "aac",
+              "codec_type": "audio",
+              "sample_rate": "48000",
+              "channels": 1,
+              "r_frame_rate": "0/0",
+              "avg_frame_rate": "0/0",
+              "duration": "457.000000",
+              "nb_frames": "21423"
+            }
+          ],
+          "format": {
+            "duration": "457.000000",
+            "size": "5045257"
+          }
+        }
+      }
+    ]
+  },
+  "timeline": {
+    "master": {
+      "id": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+      "revision": 5,
+      "name": "EP22《斩鼎》53 镜正式长时间线",
+      "timebase": {
+        "rateNumerator": 24000,
+        "rateDenominator": 1001
+      },
+      "mainClipCount": 54,
+      "totalFrames": 10933,
+      "durationSeconds": 455.997208333,
+      "sourceSemanticDurationSeconds": 456,
+      "frameQuantizationDeltaSeconds": -0.002791666999996778,
+      "maxFrameQuantizationBoundaryError": 2,
+      "frameQuantization": [
+        {
+          "shotCode": "01",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 0,
+          "durationFrames": 216,
+          "endFrame": 216,
+          "idealEndFrame": 216,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "02",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 216,
+          "durationFrames": 216,
+          "endFrame": 432,
+          "idealEndFrame": 432,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "03",
+          "sourceFps": 48,
+          "playbackRate": 0.5,
+          "requiredFrameMultiple": 2,
+          "startFrame": 432,
+          "durationFrames": 216,
+          "endFrame": 648,
+          "idealEndFrame": 647,
+          "boundaryErrorFrames": 1
+        },
+        {
+          "shotCode": "04",
+          "sourceFps": 48,
+          "playbackRate": 0.5,
+          "requiredFrameMultiple": 2,
+          "startFrame": 648,
+          "durationFrames": 216,
+          "endFrame": 864,
+          "idealEndFrame": 863,
+          "boundaryErrorFrames": 1
+        },
+        {
+          "shotCode": "05",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 864,
+          "durationFrames": 215,
+          "endFrame": 1079,
+          "idealEndFrame": 1079,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "06",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 1079,
+          "durationFrames": 216,
+          "endFrame": 1295,
+          "idealEndFrame": 1295,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "07",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 1295,
+          "durationFrames": 168,
+          "endFrame": 1463,
+          "idealEndFrame": 1463,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "08",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 1463,
+          "durationFrames": 167,
+          "endFrame": 1630,
+          "idealEndFrame": 1630,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "09",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 1630,
+          "durationFrames": 192,
+          "endFrame": 1822,
+          "idealEndFrame": 1822,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "10",
+          "sourceFps": 48,
+          "playbackRate": 0.5,
+          "requiredFrameMultiple": 2,
+          "startFrame": 1822,
+          "durationFrames": 288,
+          "endFrame": 2110,
+          "idealEndFrame": 2110,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "11",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 2110,
+          "durationFrames": 216,
+          "endFrame": 2326,
+          "idealEndFrame": 2326,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "12",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 2326,
+          "durationFrames": 191,
+          "endFrame": 2517,
+          "idealEndFrame": 2517,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "13",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 2517,
+          "durationFrames": 216,
+          "endFrame": 2733,
+          "idealEndFrame": 2733,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "14",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 2733,
+          "durationFrames": 192,
+          "endFrame": 2925,
+          "idealEndFrame": 2925,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "15",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 2925,
+          "durationFrames": 192,
+          "endFrame": 3117,
+          "idealEndFrame": 3117,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "16",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 3117,
+          "durationFrames": 192,
+          "endFrame": 3309,
+          "idealEndFrame": 3309,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "17",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 3309,
+          "durationFrames": 239,
+          "endFrame": 3548,
+          "idealEndFrame": 3548,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "18",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 3548,
+          "durationFrames": 168,
+          "endFrame": 3716,
+          "idealEndFrame": 3716,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "19",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 3716,
+          "durationFrames": 216,
+          "endFrame": 3932,
+          "idealEndFrame": 3932,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "20",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 3932,
+          "durationFrames": 264,
+          "endFrame": 4196,
+          "idealEndFrame": 4196,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "21",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 4196,
+          "durationFrames": 240,
+          "endFrame": 4436,
+          "idealEndFrame": 4436,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "22",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 4436,
+          "durationFrames": 143,
+          "endFrame": 4579,
+          "idealEndFrame": 4579,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "23",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 4579,
+          "durationFrames": 144,
+          "endFrame": 4723,
+          "idealEndFrame": 4723,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "24",
+          "sourceFps": 96,
+          "playbackRate": 0.25,
+          "requiredFrameMultiple": 4,
+          "startFrame": 4723,
+          "durationFrames": 288,
+          "endFrame": 5011,
+          "idealEndFrame": 5011,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "25",
+          "sourceFps": 48,
+          "playbackRate": 0.5,
+          "requiredFrameMultiple": 2,
+          "startFrame": 5011,
+          "durationFrames": 216,
+          "endFrame": 5227,
+          "idealEndFrame": 5227,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "26",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 5227,
+          "durationFrames": 168,
+          "endFrame": 5395,
+          "idealEndFrame": 5395,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "27",
+          "sourceFps": 48,
+          "playbackRate": 0.5,
+          "requiredFrameMultiple": 2,
+          "startFrame": 5395,
+          "durationFrames": 192,
+          "endFrame": 5587,
+          "idealEndFrame": 5586,
+          "boundaryErrorFrames": 1
+        },
+        {
+          "shotCode": "28",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 5587,
+          "durationFrames": 239,
+          "endFrame": 5826,
+          "idealEndFrame": 5826,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "29",
+          "sourceFps": 48,
+          "playbackRate": 0.5,
+          "requiredFrameMultiple": 2,
+          "startFrame": 5826,
+          "durationFrames": 168,
+          "endFrame": 5994,
+          "idealEndFrame": 5994,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "30",
+          "sourceFps": 48,
+          "playbackRate": 0.5,
+          "requiredFrameMultiple": 2,
+          "startFrame": 5994,
+          "durationFrames": 192,
+          "endFrame": 6186,
+          "idealEndFrame": 6186,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "31",
+          "sourceFps": 96,
+          "playbackRate": 0.25,
+          "requiredFrameMultiple": 4,
+          "startFrame": 6186,
+          "durationFrames": 192,
+          "endFrame": 6378,
+          "idealEndFrame": 6378,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "32",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 6378,
+          "durationFrames": 167,
+          "endFrame": 6545,
+          "idealEndFrame": 6545,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "33",
+          "sourceFps": 96,
+          "playbackRate": 0.25,
+          "requiredFrameMultiple": 4,
+          "startFrame": 6545,
+          "durationFrames": 240,
+          "endFrame": 6785,
+          "idealEndFrame": 6785,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "34",
+          "sourceFps": 48,
+          "playbackRate": 0.5,
+          "requiredFrameMultiple": 2,
+          "startFrame": 6785,
+          "durationFrames": 216,
+          "endFrame": 7001,
+          "idealEndFrame": 7001,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "35",
+          "sourceFps": 48,
+          "playbackRate": 0.5,
+          "requiredFrameMultiple": 2,
+          "startFrame": 7001,
+          "durationFrames": 240,
+          "endFrame": 7241,
+          "idealEndFrame": 7241,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "36",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 7241,
+          "durationFrames": 168,
+          "endFrame": 7409,
+          "idealEndFrame": 7409,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "37",
+          "sourceFps": 48,
+          "playbackRate": 0.5,
+          "requiredFrameMultiple": 2,
+          "startFrame": 7409,
+          "durationFrames": 216,
+          "endFrame": 7625,
+          "idealEndFrame": 7624,
+          "boundaryErrorFrames": 1
+        },
+        {
+          "shotCode": "38",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 7625,
+          "durationFrames": 191,
+          "endFrame": 7816,
+          "idealEndFrame": 7816,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "39",
+          "sourceFps": 48,
+          "playbackRate": 0.5,
+          "requiredFrameMultiple": 2,
+          "startFrame": 7816,
+          "durationFrames": 240,
+          "endFrame": 8056,
+          "idealEndFrame": 8056,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "40",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 8056,
+          "durationFrames": 192,
+          "endFrame": 8248,
+          "idealEndFrame": 8248,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "41",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 8248,
+          "durationFrames": 192,
+          "endFrame": 8440,
+          "idealEndFrame": 8440,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "42",
+          "sourceFps": 48,
+          "playbackRate": 0.5,
+          "requiredFrameMultiple": 2,
+          "startFrame": 8440,
+          "durationFrames": 168,
+          "endFrame": 8608,
+          "idealEndFrame": 8607,
+          "boundaryErrorFrames": 1
+        },
+        {
+          "shotCode": "43",
+          "sourceFps": 120,
+          "playbackRate": 0.2,
+          "requiredFrameMultiple": 5,
+          "startFrame": 8608,
+          "durationFrames": 285,
+          "endFrame": 8893,
+          "idealEndFrame": 8895,
+          "boundaryErrorFrames": -2
+        },
+        {
+          "shotCode": "44",
+          "sourceFps": 48,
+          "playbackRate": 0.5,
+          "requiredFrameMultiple": 2,
+          "startFrame": 8893,
+          "durationFrames": 218,
+          "endFrame": 9111,
+          "idealEndFrame": 9111,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "45",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 9111,
+          "durationFrames": 192,
+          "endFrame": 9303,
+          "idealEndFrame": 9303,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "46",
+          "sourceFps": 48,
+          "playbackRate": 0.5,
+          "requiredFrameMultiple": 2,
+          "startFrame": 9303,
+          "durationFrames": 192,
+          "endFrame": 9495,
+          "idealEndFrame": 9495,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "47",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 9495,
+          "durationFrames": 191,
+          "endFrame": 9686,
+          "idealEndFrame": 9686,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "48",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 9686,
+          "durationFrames": 288,
+          "endFrame": 9974,
+          "idealEndFrame": 9974,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "49",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 9974,
+          "durationFrames": 168,
+          "endFrame": 10142,
+          "idealEndFrame": 10142,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "50",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 10142,
+          "durationFrames": 192,
+          "endFrame": 10334,
+          "idealEndFrame": 10334,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "51",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 10334,
+          "durationFrames": 191,
+          "endFrame": 10525,
+          "idealEndFrame": 10525,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "52",
+          "sourceFps": 24,
+          "playbackRate": 1,
+          "requiredFrameMultiple": 1,
+          "startFrame": 10525,
+          "durationFrames": 192,
+          "endFrame": 10717,
+          "idealEndFrame": 10717,
+          "boundaryErrorFrames": 0
+        },
+        {
+          "shotCode": "53",
+          "sourceFps": 48,
+          "playbackRate": 0.5,
+          "requiredFrameMultiple": 2,
+          "startFrame": 10717,
+          "durationFrames": 216,
+          "endFrame": 10933,
+          "idealEndFrame": 10933,
+          "boundaryErrorFrames": 0
+        }
+      ],
+      "audioClips": 1,
+      "subtitleClips": 6,
+      "nestedClips": 1,
+      "splitKeyframeClip": true
+    },
+    "child": {
+      "id": "edit-fbe3f6d1-e746-4ec7-b69b-fc8e34172444",
+      "revision": 2,
+      "timebase": {
+        "rateNumerator": 24,
+        "rateDenominator": 1
+      },
+      "clips": 5
+    },
+    "proof": {
+      "id": "edit-97a017b1-4388-4031-ac33-e4dfdf436b7b",
+      "revision": 1,
+      "timebase": {
+        "rateNumerator": 24000,
+        "rateDenominator": 1001
+      },
+      "transition": {
+        "contract": "aicanvas.otio-transition.v1",
+        "kind": "smpte_dissolve",
+        "targetClipId": "clip-345ebe04-d96c-4bed-bb8c-78b601c984ae",
+        "inOffsetFrames": 12,
+        "outOffsetFrames": 12
+      },
+      "timeWarpRates": [
+        2
+      ]
+    },
+    "otioRoundTrip": {
+      "export": {
+        "path": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/.aicanvas/editor/otio/EP22《斩鼎》53 镜正式长时间线_r5_1784071696752.otio",
+        "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+        "revision": 5,
+        "clips": 62
+      },
+      "importedProjectId": "edit-aef0f52b-eddc-4151-8ce8-24c9c969de38",
+      "importedRevision": 1,
+      "mainClipCount": 54,
+      "timebase": {
+        "rateNumerator": 24000,
+        "rateDenominator": 1001
+      },
+      "nestedPreserved": true
+    }
+  },
+  "renders": {
+    "synchronousProof": {
+      "jobId": "render-1548a06f-4ccc-4e69-846d-bbae1fc54ae5",
+      "publicationReceiptId": "receipt-1702a113-9353-4c50-bcb1-a8d9aaa92bc7",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/evidence/EP22_formal_proof_sync.mp4",
+        "bytes": 432769,
+        "sha256": "e295c8fad7b84d63f478c223c91974fd8ac137d9ddc2e456ca38713de476d3e3",
+        "probe": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "h264",
+              "codec_type": "video",
+              "width": 360,
+              "height": 640,
+              "r_frame_rate": "24000/1001",
+              "avg_frame_rate": "24000/1001",
+              "duration": "16.016000",
+              "nb_frames": "384"
+            },
+            {
+              "codec_name": "aac",
+              "codec_type": "audio",
+              "sample_rate": "48000",
+              "channels": 2,
+              "r_frame_rate": "0/0",
+              "avg_frame_rate": "0/0",
+              "duration": "16.016000",
+              "nb_frames": "752"
+            }
+          ],
+          "format": {
+            "duration": "16.016000",
+            "size": "432769"
+          }
+        }
+      }
+    },
+    "backgroundMaster": {
+      "jobId": "render-65610593-bcaa-4eff-b540-66b05af7c915",
+      "publicationReceiptId": "receipt-0b00e0ff-30ae-4b31-97c0-5dff5f78d2dc",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/evidence/EP22_formal_master_456s.mp4",
+        "bytes": 4654358,
+        "sha256": "df8e6bfc61a0a1943720e80130cd6d017a1d9ad467d8134d79f43fc51719eae3",
+        "probe": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "h264",
+              "codec_type": "video",
+              "width": 360,
+              "height": 640,
+              "r_frame_rate": "24000/1001",
+              "avg_frame_rate": "24000/1001",
+              "duration": "455.997208",
+              "nb_frames": "10933"
+            },
+            {
+              "codec_name": "aac",
+              "codec_type": "audio",
+              "sample_rate": "48000",
+              "channels": 2,
+              "r_frame_rate": "0/0",
+              "avg_frame_rate": "0/0",
+              "duration": "455.997000",
+              "nb_frames": "21376"
+            }
+          ],
+          "format": {
+            "duration": "455.997208",
+            "size": "4654358"
+          }
+        }
+      }
+    },
+    "receipts": {
+      "proof": {
+        "schemaVersion": 1,
+        "id": "receipt-1702a113-9353-4c50-bcb1-a8d9aaa92bc7",
+        "intentId": "publication-d74c99de-6c3c-4e55-8037-850525bf602d",
+        "projectId": "project-29d03471c583",
+        "targetPath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/成片输出/EP22 正式剧本派生 Effect Transition Proof_20260714T232817058Z_v001.mp4",
+        "kind": "video",
+        "variant": "generic",
+        "context": {
+          "purpose": "edit-render",
+          "jobId": "render-1548a06f-4ccc-4e69-846d-bbae1fc54ae5",
+          "metadata": {
+            "editProjectId": "edit-97a017b1-4388-4031-ac33-e4dfdf436b7b",
+            "editProjectRevision": 1,
+            "dependencyManifestSha256": "2d30af2210d9dc9aeec3eae9f41372b617459d1a5c53c3628d494b4b59bd6f9e",
+            "renderPlanSha256": "c51eb5a66236c26f8bf315639f630c523c85c55cdb997a36443bfde625ecad3c"
+          }
+        },
+        "check": {
+          "ok": true,
+          "exists": true,
+          "decodable": true,
+          "width": 360,
+          "height": 640,
+          "duration": 16.016,
+          "size": 432769,
+          "sha256": "e295c8fad7b84d63f478c223c91974fd8ac137d9ddc2e456ca38713de476d3e3",
+          "modifiedAt": "2026-07-14T23:28:17.685Z",
+          "issues": []
+        },
+        "registeredAt": "2026-07-14T23:28:17.764Z"
+      },
+      "master": {
+        "schemaVersion": 1,
+        "id": "receipt-0b00e0ff-30ae-4b31-97c0-5dff5f78d2dc",
+        "intentId": "publication-ca16419a-93da-4454-9217-8b9ea211ba24",
+        "projectId": "project-29d03471c583",
+        "targetPath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/成片输出/EP22《斩鼎》53 镜正式长时间线_20260714T232818306Z_v005.mp4",
+        "kind": "video",
+        "variant": "generic",
+        "context": {
+          "purpose": "edit-render",
+          "jobId": "render-65610593-bcaa-4eff-b540-66b05af7c915",
+          "metadata": {
+            "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+            "editProjectRevision": 5,
+            "dependencyManifestSha256": "9a80b2ce36e0a86b635f56b5ba7853da341288e6b3c6902b936af3a2fba804ab",
+            "renderPlanSha256": "d3e2ff0073be7e95bd2e92eff56917793a7c84b869082f97f77ce1c8dee1b980"
+          }
+        },
+        "check": {
+          "ok": true,
+          "exists": true,
+          "decodable": true,
+          "width": 360,
+          "height": 640,
+          "duration": 455.997208,
+          "size": 4654358,
+          "sha256": "df8e6bfc61a0a1943720e80130cd6d017a1d9ad467d8134d79f43fc51719eae3",
+          "modifiedAt": "2026-07-14T23:28:37.973Z",
+          "issues": []
+        },
+        "registeredAt": "2026-07-14T23:28:38.080Z"
+      }
+    }
+  },
+  "extractedFrames": [
+    {
+      "extraction": {
+        "schemaVersion": 1,
+        "id": "timeline-frame-3021b111-329b-411a-80bc-fe60f108b510",
+        "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+        "editProjectRevision": 5,
+        "timeSeconds": 0.042,
+        "framePath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/剪辑帧/EP22《斩鼎》53 镜正式长时间线_时间线合成_0000042ms_f108b510_raw.png",
+        "width": 360,
+        "height": 640,
+        "sourceClipIds": [
+          "clip-formal-ep22-001",
+          "clip-formal-ep22-audio"
+        ],
+        "sourceArtifactIds": [
+          "main-ep22-unit001-8cf6893d5abb"
+        ],
+        "sourceItemIds": [
+          "main-ep22-unit001"
+        ],
+        "sourceClipRefs": [
+          {
+            "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+            "editProjectRevision": 5,
+            "clipId": "clip-formal-ep22-001"
+          },
+          {
+            "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+            "editProjectRevision": 5,
+            "clipId": "clip-formal-ep22-audio"
+          }
+        ],
+        "dependencyManifestSha256": "9a80b2ce36e0a86b635f56b5ba7853da341288e6b3c6902b936af3a2fba804ab",
+        "renderPlanSha256": "d3e2ff0073be7e95bd2e92eff56917793a7c84b869082f97f77ce1c8dee1b980",
+        "dependencyRefs": [
+          {
+            "editProjectId": "edit-fbe3f6d1-e746-4ec7-b69b-fc8e34172444",
+            "revision": 2,
+            "snapshotSha256": "17cb12aa8060fcebce0c10df449c08ed5532e9a4583447c8e32ea7882d848f1f",
+            "depth": 1
+          }
+        ],
+        "extractedAt": "2026-07-14T23:28:38.723Z"
+      },
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/evidence/EP22_master_frame_1.png",
+        "bytes": 109851,
+        "sha256": "9c67c9806ffceaf031b217c51789bee78a8a87952e0f11c8322a17afe27bbc7f"
+      }
+    },
+    {
+      "extraction": {
+        "schemaVersion": 1,
+        "id": "timeline-frame-6f800ff4-effb-480d-bc54-c03d7757c297",
+        "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+        "editProjectRevision": 5,
+        "timeSeconds": 227.978,
+        "framePath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/剪辑帧/EP22《斩鼎》53 镜正式长时间线_时间线合成_0227978ms_7757c297_raw.png",
+        "width": 360,
+        "height": 640,
+        "sourceClipIds": [
+          "clip-formal-ep22-027",
+          "clip-formal-ep22-audio"
+        ],
+        "sourceArtifactIds": [
+          "main-ep22-unit002-aac81c975647"
+        ],
+        "sourceItemIds": [
+          "main-ep22-unit027"
+        ],
+        "sourceClipRefs": [
+          {
+            "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+            "editProjectRevision": 5,
+            "clipId": "clip-formal-ep22-027"
+          },
+          {
+            "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+            "editProjectRevision": 5,
+            "clipId": "clip-formal-ep22-audio"
+          }
+        ],
+        "dependencyManifestSha256": "9a80b2ce36e0a86b635f56b5ba7853da341288e6b3c6902b936af3a2fba804ab",
+        "renderPlanSha256": "d3e2ff0073be7e95bd2e92eff56917793a7c84b869082f97f77ce1c8dee1b980",
+        "dependencyRefs": [
+          {
+            "editProjectId": "edit-fbe3f6d1-e746-4ec7-b69b-fc8e34172444",
+            "revision": 2,
+            "snapshotSha256": "17cb12aa8060fcebce0c10df449c08ed5532e9a4583447c8e32ea7882d848f1f",
+            "depth": 1
+          }
+        ],
+        "extractedAt": "2026-07-14T23:28:47.765Z"
+      },
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/evidence/EP22_master_frame_2.png",
+        "bytes": 70629,
+        "sha256": "8b179eafb01eba27f6edf99c0a773ae91e399e203789f6403b1237113f342f3f"
+      }
+    },
+    {
+      "extraction": {
+        "schemaVersion": 1,
+        "id": "timeline-frame-0acc8b33-9569-49f5-8078-b1a13272e640",
+        "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+        "editProjectRevision": 5,
+        "timeSeconds": 455.956,
+        "framePath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/剪辑帧/EP22《斩鼎》53 镜正式长时间线_时间线合成_0455956ms_3272e640_raw.png",
+        "width": 360,
+        "height": 640,
+        "sourceClipIds": [
+          "clip-formal-ep22-053",
+          "clip-formal-ep22-audio",
+          "subtitle-formal-ep22-53"
+        ],
+        "sourceArtifactIds": [
+          "main-ep22-unit002-aac81c975647"
+        ],
+        "sourceItemIds": [
+          "main-ep22-unit053"
+        ],
+        "sourceClipRefs": [
+          {
+            "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+            "editProjectRevision": 5,
+            "clipId": "clip-formal-ep22-053"
+          },
+          {
+            "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+            "editProjectRevision": 5,
+            "clipId": "clip-formal-ep22-audio"
+          },
+          {
+            "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+            "editProjectRevision": 5,
+            "clipId": "subtitle-formal-ep22-53"
+          }
+        ],
+        "dependencyManifestSha256": "9a80b2ce36e0a86b635f56b5ba7853da341288e6b3c6902b936af3a2fba804ab",
+        "renderPlanSha256": "d3e2ff0073be7e95bd2e92eff56917793a7c84b869082f97f77ce1c8dee1b980",
+        "dependencyRefs": [
+          {
+            "editProjectId": "edit-fbe3f6d1-e746-4ec7-b69b-fc8e34172444",
+            "revision": 2,
+            "snapshotSha256": "17cb12aa8060fcebce0c10df449c08ed5532e9a4583447c8e32ea7882d848f1f",
+            "depth": 1
+          }
+        ],
+        "extractedAt": "2026-07-14T23:29:04.681Z"
+      },
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/evidence/EP22_master_frame_3.png",
+        "bytes": 81433,
+        "sha256": "f9a68377f2e69154c948151ce32bb24b5a7b8483a884e628fe8a5835756e1429"
+      }
+    }
+  ],
+  "continuation": {
+    "extractionId": "timeline-frame-21afee1a-2f34-4268-9023-b8e294fc9b3a",
+    "framePath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/EP22_15s_053_极缓推·极特写·黑金渗入空格/AI画布生成/EP22_15s_053_首帧_时间线合成_0455956ms_94fc9b3a_raw.png",
+    "packId": "continuation-d3765fc6-9d59-4024-99ac-b9fa05d89649",
+    "sourceType": "timeline",
+    "targetFirstFrameArtifactId": "main-ep22-unit053-67b0b6ba8212",
+    "generationJob": null,
+    "generationEnqueued": false,
+    "frame": {
+      "path": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/evidence/EP22_continuation_frame.png",
+      "bytes": 81433,
+      "sha256": "f9a68377f2e69154c948151ce32bb24b5a7b8483a884e628fe8a5835756e1429"
+    }
+  },
+  "statePath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/calibration-state.json"
+}

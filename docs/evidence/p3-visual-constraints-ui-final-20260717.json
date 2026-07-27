@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "kind": "p3-visual-constraints-ui-smoke",
+  "createdAt": "2026-07-17T11:25:36.635Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "referenceEvidence": {
+    "currentness": {
+      "current": true,
+      "checkedAt": "2026-07-17T11:20:57.143Z",
+      "storeRevision": 1,
+      "storeFingerprint": "95f836f3f4b4458b1bbd698cefc775c7ff5f3d48d5917421c015531a3eea2e1b",
+      "p2StoreRevision": 2,
+      "p2StoreFingerprint": "3cd7bc5b43531385c68cc3e7c9fe4906081806177652944bd4523b9de132a788",
+      "driftedInputs": []
+    },
+    "contractId": "grid-6c02035d032128e0f62a",
+    "panelId": "season-三-ep01-unit001-panel-01",
+    "constraintId": "panel-visual-814cfd40609563145152432d9495",
+    "reviewRules": 7,
+    "warnings": 7,
+    "unresolved": {
+      "identity": 0,
+      "spatial": 5,
+      "continuity": 0
+    }
+  },
+  "reviewEvidence": {
+    "itemId": "season-三-ep01-unit001",
+    "requirementId": "fusion-review-4d135bb3ad9766b0471d5c1922edc6cc474003af38facbeb7c2fb537a74559a4",
+    "panelCount": 4,
+    "expectedRules": 28,
+    "ruleButtonsClicked": 28,
+    "passInitiallyDisabled": true,
+    "passEnabledAfterExplicitHumanChecks": true,
+    "submitClicked": false
+  },
+  "guardedFiles": {
+    "before": {
+      "visualConstraints": "6eb445f84f38c0c2e4e6e6d56b3f1195bdbf5643c624246f9500566a5af8ffd8",
+      "panelReferences": "35aa251d9b6f767190924d697e7dd03a58cc198ded0918ad4fd89508217f877b",
+      "jobs": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182",
+      "publications": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238",
+      "reviews": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97"
+    },
+    "after": {
+      "visualConstraints": "6eb445f84f38c0c2e4e6e6d56b3f1195bdbf5643c624246f9500566a5af8ffd8",
+      "panelReferences": "35aa251d9b6f767190924d697e7dd03a58cc198ded0918ad4fd89508217f877b",
+      "jobs": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182",
+      "publications": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238",
+      "reviews": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97"
+    },
+    "unchanged": true
+  },
+  "screenshotPath": "/Users/hxx/Documents/无限画布/docs/evidence/p3-visual-constraints-ui-final-20260717.png",
+  "vendorOrGenerationInvoked": false,
+  "passed": true
+}

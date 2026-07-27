@@ -1,0 +1,1662 @@
+{
+  "schemaVersion": 1,
+  "kind": "p5-managed-studio-final-validation",
+  "status": "pass",
+  "createdAt": "2026-07-17T21:47:28.069Z",
+  "scope": {
+    "phase": "P5",
+    "softwareOnly": true,
+    "formalSeasonProductionComplete": false,
+    "formalImageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0
+  },
+  "project": {
+    "root": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio",
+    "id": "project-2e3b44bc6ac4",
+    "name": "Codex AI 短剧素材中心",
+    "manifestFingerprint": "57e55eaf4b571c8e1ca7f606f79f849d08d0ad074ebd112eb0f82968413c3ac8",
+    "sourceRoots": [],
+    "outputRoots": [
+      "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio"
+    ],
+    "startupPolicy": "no-filesystem-scan",
+    "legacyRoots": [],
+    "activePointer": {
+      "path": "/Users/hxx/.aicanvas/active-project.json",
+      "sizeBytes": 153,
+      "mtimeMs": 1784315098240.856,
+      "sha256": "e545bf120d745b0331503cf07b8cc184aca46eda672776d2b1dd1c0f1bc2c186"
+    },
+    "activePointerBefore": {
+      "path": "/Users/hxx/.aicanvas/active-project.json",
+      "sizeBytes": 153,
+      "mtimeMs": 1784315098240.856,
+      "sha256": "e545bf120d745b0331503cf07b8cc184aca46eda672776d2b1dd1c0f1bc2c186"
+    },
+    "noSymlinkEntriesChecked": 55,
+    "noSymlinkEntriesCheckedAfter": 55,
+    "rawSymlinkEntriesBeforeGetter": 55,
+    "rawSymlinkEntriesAfterGetter": 55,
+    "rawManagedLayout": {
+      "manifest": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/managed-project.json",
+        "sizeBytes": 1398,
+        "mtimeMs": 1784319566128.3538,
+        "sha256": "bb50a0b40dee08ecf305055a7db66624751b075f500c3c9451b2b82376fc6735"
+      },
+      "requiredFiles": [
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/events.jsonl",
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/project.json",
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/index.json",
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/cache.sqlite",
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/material-studio.sqlite",
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-production.sqlite",
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-generation-ledger.sqlite"
+      ],
+      "requiredDirectories": [
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-production/objects/sha256",
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-generation/objects/sha256",
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/objects/sha256",
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/derived/thumb",
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/derived/proxy",
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/derived/waveform",
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/objects/sha256/.tmp",
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-production/objects/.tmp",
+        "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-generation/objects/.tmp"
+      ]
+    },
+    "rawTreeBeforeGetter": {
+      "entries": [
+        {
+          "path": ".aicanvas",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/asset-consistency-boards",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/cache.sqlite",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/derived",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/derived/proxy",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/derived/thumb",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/derived/waveform",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/continuations",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/dependencies",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/history",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/nested-cache",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/otio",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/outputs",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/previews",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/projects",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/proxies",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/render-plans",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/events.jsonl",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/generation-downloads",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/generation-requests",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/handoffs",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/history",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/history/documents",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/history/skills",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/history/story",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/index.json",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/locks",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/managed-project.json",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/material-studio.sqlite",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/objects",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/objects/sha256",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/objects/sha256/.tmp",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/overrides.json",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/project.json",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/skills",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/story",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/story/analysis-tasks",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/story/chapters",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/story/sources",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/storyboard-sheets",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-generation",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-generation-ledger.sqlite",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/studio-generation/objects",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-generation/objects/.tmp",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-generation/objects/sha256",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-production",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-production.sqlite",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/studio-production/objects",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-production/objects/.tmp",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-production/objects/sha256",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/tasks",
+          "type": "directory"
+        },
+        {
+          "path": "00_画布进度.md",
+          "type": "file"
+        }
+      ],
+      "digest": "7e8be829a1b38ddc64779bfcbbf8f906bb9422aad00ea6e70de71983dcd52b92"
+    },
+    "rawTreeAfterGetter": {
+      "entries": [
+        {
+          "path": ".aicanvas",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/asset-consistency-boards",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/cache.sqlite",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/derived",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/derived/proxy",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/derived/thumb",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/derived/waveform",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/continuations",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/dependencies",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/history",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/nested-cache",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/otio",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/outputs",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/previews",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/projects",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/proxies",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/render-plans",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/events.jsonl",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/generation-downloads",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/generation-requests",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/handoffs",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/history",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/history/documents",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/history/skills",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/history/story",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/index.json",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/locks",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/managed-project.json",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/material-studio.sqlite",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/objects",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/objects/sha256",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/objects/sha256/.tmp",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/overrides.json",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/project.json",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/skills",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/story",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/story/analysis-tasks",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/story/chapters",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/story/sources",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/storyboard-sheets",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-generation",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-generation-ledger.sqlite",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/studio-generation/objects",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-generation/objects/.tmp",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-generation/objects/sha256",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-production",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-production.sqlite",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/studio-production/objects",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-production/objects/.tmp",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-production/objects/sha256",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/tasks",
+          "type": "directory"
+        },
+        {
+          "path": "00_画布进度.md",
+          "type": "file"
+        }
+      ],
+      "digest": "7e8be829a1b38ddc64779bfcbbf8f906bb9422aad00ea6e70de71983dcd52b92"
+    },
+    "rawTreeAfterValidation": {
+      "entries": [
+        {
+          "path": ".aicanvas",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/asset-consistency-boards",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/cache.sqlite",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/derived",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/derived/proxy",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/derived/thumb",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/derived/waveform",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/continuations",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/dependencies",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/history",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/nested-cache",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/otio",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/outputs",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/previews",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/projects",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/proxies",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/editor/render-plans",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/events.jsonl",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/generation-downloads",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/generation-requests",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/handoffs",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/history",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/history/documents",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/history/skills",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/history/story",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/index.json",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/locks",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/managed-project.json",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/material-studio.sqlite",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/objects",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/objects/sha256",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/objects/sha256/.tmp",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/overrides.json",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/project.json",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/skills",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/story",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/story/analysis-tasks",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/story/chapters",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/story/sources",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/storyboard-sheets",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-generation",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-generation-ledger.sqlite",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/studio-generation/objects",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-generation/objects/.tmp",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-generation/objects/sha256",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-production",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-production.sqlite",
+          "type": "file"
+        },
+        {
+          "path": ".aicanvas/studio-production/objects",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-production/objects/.tmp",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/studio-production/objects/sha256",
+          "type": "directory"
+        },
+        {
+          "path": ".aicanvas/tasks",
+          "type": "directory"
+        },
+        {
+          "path": "00_画布进度.md",
+          "type": "file"
+        }
+      ],
+      "digest": "7e8be829a1b38ddc64779bfcbbf8f906bb9422aad00ea6e70de71983dcd52b92"
+    },
+    "sqliteIntegrity": {
+      "material": "ok",
+      "production": "ok",
+      "generation": "ok"
+    },
+    "counts": {
+      "material": {
+        "media": 0,
+        "mediaImports": 0,
+        "canonicalAssets": 0,
+        "characters": 0,
+        "scenes": 0,
+        "props": 0,
+        "assetVersions": 0,
+        "assetDefinitions": 0,
+        "primaryAuthorities": 0,
+        "authorityEvents": 0,
+        "versionReviews": 0,
+        "assetRelations": 0
+      },
+      "production": {
+        "textDocuments": 0,
+        "scriptDocuments": 0,
+        "promptDocuments": 0,
+        "textRevisions": 0,
+        "units": 0,
+        "unitRevisions": 0
+      },
+      "generation": {
+        "packs": 0,
+        "results": 0,
+        "pendingResults": 0
+      }
+    },
+    "materialKnowledgeSchema": {
+      "scopeRelationSchema": 2,
+      "applicabilityColumns": [
+        "studio_canonical_assets.applicability_json",
+        "studio_asset_definitions.applicability_json"
+      ],
+      "relationColumns": [
+        "id",
+        "relation_series_id",
+        "relation_revision",
+        "supersedes_relation_id",
+        "kind",
+        "subject_asset_id",
+        "object_asset_id",
+        "subject_category",
+        "object_category",
+        "subject_asset_revision",
+        "object_asset_revision",
+        "subject_definition_version_id",
+        "object_definition_version_id",
+        "subject_authority_version_id",
+        "object_authority_version_id",
+        "subject_authority_media_sha256",
+        "object_authority_media_sha256",
+        "ordinal",
+        "role",
+        "note",
+        "fingerprint",
+        "created_at"
+      ],
+      "relationHeadProjection": true,
+      "appendOnlyTriggers": [
+        "studio_asset_relation_heads_guard_insert",
+        "studio_asset_relation_heads_guard_update",
+        "studio_asset_relation_heads_no_delete",
+        "studio_asset_relation_lineage_guard",
+        "studio_asset_relations_no_delete",
+        "studio_asset_relations_no_update"
+      ],
+      "reviewReceiptGuards": [
+        "index:studio_review_version_once_idx",
+        "trigger:studio_version_reviews_no_delete",
+        "trigger:studio_version_reviews_no_update"
+      ],
+      "immutableHistoryGuards": [
+        "studio_asset_aliases_no_delete",
+        "studio_asset_aliases_no_update",
+        "studio_asset_definitions_no_delete",
+        "studio_asset_definitions_no_update",
+        "studio_asset_versions_no_delete",
+        "studio_asset_versions_no_update",
+        "studio_authority_events_no_delete",
+        "studio_authority_events_no_update",
+        "studio_media_identity_no_update",
+        "studio_media_imports_no_delete",
+        "studio_media_imports_no_update",
+        "studio_media_no_delete"
+      ],
+      "mediaImportOrigins": true,
+      "zeroCounts": {
+        "studio_media": 0,
+        "studio_media_derivatives": 0,
+        "studio_media_imports": 0,
+        "studio_canonical_assets": 0,
+        "studio_asset_aliases": 0,
+        "studio_asset_versions": 0,
+        "studio_asset_definitions": 0,
+        "studio_authority_events": 0,
+        "studio_version_reviews": 0,
+        "studio_asset_relations": 0,
+        "studio_asset_relation_heads": 0
+      }
+    },
+    "productionKnowledgeSchema": {
+      "schemaVersion": 2,
+      "seasonColumns": [
+        "studio_production_units.season",
+        "studio_production_unit_revisions.season"
+      ],
+      "sequenceConstraint": "CREATE UNIQUE INDEX studio_production_units_season_episode_sequence_uidx\n          ON studio_production_units(season, episode, sequence)",
+      "appendOnlyTriggers": [
+        "studio_continuity_evidence_no_delete",
+        "studio_continuity_evidence_no_update",
+        "studio_panel_assets_no_delete",
+        "studio_panel_assets_no_update",
+        "studio_panels_no_delete",
+        "studio_panels_no_update",
+        "studio_text_revisions_no_delete",
+        "studio_text_revisions_no_update",
+        "studio_unit_revisions_no_delete",
+        "studio_unit_revisions_no_update"
+      ],
+      "tables": [
+        "studio_production_continuity_evidence",
+        "studio_production_panel_assets",
+        "studio_production_panels",
+        "studio_production_unit_revisions",
+        "studio_production_units",
+        "studio_text_documents",
+        "studio_text_revisions"
+      ],
+      "zeroCounts": {
+        "studio_text_documents": 0,
+        "studio_text_revisions": 0,
+        "studio_production_units": 0,
+        "studio_production_unit_revisions": 0,
+        "studio_production_panels": 0,
+        "studio_production_panel_assets": 0,
+        "studio_production_continuity_evidence": 0
+      }
+    },
+    "generationLedgerSchema": {
+      "schemaVersion": 1,
+      "tables": [
+        "studio_generation_packs",
+        "studio_generation_results"
+      ],
+      "indexes": [
+        "studio_generation_pack_panel_sequence_idx",
+        "studio_generation_result_pack_idx",
+        "studio_generation_result_panel_sequence_idx"
+      ],
+      "appendOnlyTriggers": [
+        "studio_generation_packs_no_delete",
+        "studio_generation_packs_no_update",
+        "studio_generation_results_no_delete",
+        "studio_generation_results_no_update"
+      ],
+      "counts": {
+        "packs": 0,
+        "results": 0
+      }
+    },
+    "storyFirstCreationEvent": {
+      "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/events.jsonl",
+      "sizeBytes": 311,
+      "mtimeMs": 1784312990353.853,
+      "sha256": "cce1a9a471a44408f690b0e1e655b47fe14764db90d1fce94f781bdbb63c3b4e"
+    },
+    "criticalBefore": {
+      ".aicanvas/cache.sqlite": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/cache.sqlite",
+        "sizeBytes": 49152,
+        "mtimeMs": 1784312990353.4475,
+        "sha256": "5044f916a418fd8e01622c956c47876471a898518b43ce48cc0be30ae16db63c"
+      },
+      ".aicanvas/events.jsonl": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/events.jsonl",
+        "sizeBytes": 311,
+        "mtimeMs": 1784312990353.853,
+        "sha256": "cce1a9a471a44408f690b0e1e655b47fe14764db90d1fce94f781bdbb63c3b4e"
+      },
+      ".aicanvas/index.json": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/index.json",
+        "sizeBytes": 2175,
+        "mtimeMs": 1784312990336.426,
+        "sha256": "3ab2d044bee82324dff4cd65a4bc4307389730acbb2b224c680e024753b99f82"
+      },
+      ".aicanvas/managed-project.json": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/managed-project.json",
+        "sizeBytes": 1398,
+        "mtimeMs": 1784319566128.3538,
+        "sha256": "bb50a0b40dee08ecf305055a7db66624751b075f500c3c9451b2b82376fc6735"
+      },
+      ".aicanvas/material-studio.sqlite": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/material-studio.sqlite",
+        "sizeBytes": 237568,
+        "mtimeMs": 1784323507284.7761,
+        "sha256": "c40c726d68e03e6bed3d2716c842628a1429f93ec1e94da982bc58e7ae7b7100"
+      },
+      ".aicanvas/project.json": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/project.json",
+        "sizeBytes": 785,
+        "mtimeMs": 1784312990325.3296,
+        "sha256": "a266f16d27241ef05eafad4d78f58e7a4119c09098c4faf0f9dbf12618d5bdeb"
+      },
+      ".aicanvas/studio-generation-ledger.sqlite": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-generation-ledger.sqlite",
+        "sizeBytes": 73728,
+        "mtimeMs": 1784318126260.3171,
+        "sha256": "fd9b1f8ff43defa89093c37784c9bb57d25bb7c30195fc53c7b6563c0db7710d"
+      },
+      ".aicanvas/studio-production.sqlite": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-production.sqlite",
+        "sizeBytes": 126976,
+        "mtimeMs": 1784323116015.688,
+        "sha256": "3fb53c869812b3eeb38407fb39b28eb351bec666ee11fe3fc0067eb7cb2f508b"
+      }
+    },
+    "criticalAfter": {
+      ".aicanvas/cache.sqlite": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/cache.sqlite",
+        "sizeBytes": 49152,
+        "mtimeMs": 1784312990353.4475,
+        "sha256": "5044f916a418fd8e01622c956c47876471a898518b43ce48cc0be30ae16db63c"
+      },
+      ".aicanvas/events.jsonl": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/events.jsonl",
+        "sizeBytes": 311,
+        "mtimeMs": 1784312990353.853,
+        "sha256": "cce1a9a471a44408f690b0e1e655b47fe14764db90d1fce94f781bdbb63c3b4e"
+      },
+      ".aicanvas/index.json": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/index.json",
+        "sizeBytes": 2175,
+        "mtimeMs": 1784312990336.426,
+        "sha256": "3ab2d044bee82324dff4cd65a4bc4307389730acbb2b224c680e024753b99f82"
+      },
+      ".aicanvas/managed-project.json": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/managed-project.json",
+        "sizeBytes": 1398,
+        "mtimeMs": 1784319566128.3538,
+        "sha256": "bb50a0b40dee08ecf305055a7db66624751b075f500c3c9451b2b82376fc6735"
+      },
+      ".aicanvas/material-studio.sqlite": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/material-studio.sqlite",
+        "sizeBytes": 237568,
+        "mtimeMs": 1784323507284.7761,
+        "sha256": "c40c726d68e03e6bed3d2716c842628a1429f93ec1e94da982bc58e7ae7b7100"
+      },
+      ".aicanvas/project.json": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/project.json",
+        "sizeBytes": 785,
+        "mtimeMs": 1784312990325.3296,
+        "sha256": "a266f16d27241ef05eafad4d78f58e7a4119c09098c4faf0f9dbf12618d5bdeb"
+      },
+      ".aicanvas/studio-generation-ledger.sqlite": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-generation-ledger.sqlite",
+        "sizeBytes": 73728,
+        "mtimeMs": 1784318126260.3171,
+        "sha256": "fd9b1f8ff43defa89093c37784c9bb57d25bb7c30195fc53c7b6563c0db7710d"
+      },
+      ".aicanvas/studio-production.sqlite": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-production.sqlite",
+        "sizeBytes": 126976,
+        "mtimeMs": 1784323116015.688,
+        "sha256": "3fb53c869812b3eeb38407fb39b28eb351bec666ee11fe3fc0067eb7cb2f508b"
+      }
+    },
+    "wholeProjectBefore": {
+      "root": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio",
+      "files": 11,
+      "bytes": 492752,
+      "aggregateSha256": "e9693f6eda032c1e27ffa4e2edac88c46a787dadeda730be859aa839b22422cc"
+    },
+    "wholeProjectAfter": {
+      "root": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio",
+      "files": 11,
+      "bytes": 492752,
+      "aggregateSha256": "e9693f6eda032c1e27ffa4e2edac88c46a787dadeda730be859aa839b22422cc"
+    },
+    "logicalBefore": {
+      "material": {
+        "databasePath": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/material-studio.sqlite",
+        "integrity": "ok",
+        "schemaSha256": "b022d7ed3a6d0c58114ea5fd9df85b40f19e1689c2884e0692a2dd0c5142d0ec",
+        "tableCounts": {
+          "studio_asset_aliases": 0,
+          "studio_asset_definitions": 0,
+          "studio_asset_relation_heads": 0,
+          "studio_asset_relations": 0,
+          "studio_asset_versions": 0,
+          "studio_authority_events": 0,
+          "studio_canonical_assets": 0,
+          "studio_media": 0,
+          "studio_media_derivatives": 0,
+          "studio_media_imports": 0,
+          "studio_meta": 2,
+          "studio_version_reviews": 0
+        },
+        "metaRows": [
+          {
+            "key": "asset_scope_relation_schema",
+            "value": "2"
+          },
+          {
+            "key": "schema_version",
+            "value": "1"
+          }
+        ],
+        "digest": "d70c020ae11b58430a2a06a460262bf9caccf51f7575f9a2404dbb52a58f55f8"
+      },
+      "production": {
+        "databasePath": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-production.sqlite",
+        "integrity": "ok",
+        "schemaSha256": "19c1840bf8b0c0a6b17b2576efb1fa008554a14367a5cb190bd32a6f254d7702",
+        "tableCounts": {
+          "studio_production_continuity_evidence": 0,
+          "studio_production_meta": 1,
+          "studio_production_panel_assets": 0,
+          "studio_production_panels": 0,
+          "studio_production_unit_revisions": 0,
+          "studio_production_units": 0,
+          "studio_text_documents": 0,
+          "studio_text_revisions": 0
+        },
+        "metaRows": [
+          {
+            "key": "schema_version",
+            "value": "2"
+          }
+        ],
+        "digest": "021f326bd05bdcf89ad5f76cf38893c68d6dbed40ef2eb89993ef19c4e689855"
+      },
+      "generation": {
+        "databasePath": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-generation-ledger.sqlite",
+        "integrity": "ok",
+        "schemaSha256": "b67a6f96d7fb91d81bb818908610c542eadc6196ec9e0da21d6f0fcb84d78da1",
+        "tableCounts": {
+          "studio_generation_ledger_meta": 1,
+          "studio_generation_packs": 0,
+          "studio_generation_results": 0
+        },
+        "metaRows": [
+          {
+            "key": "schema_version",
+            "value": "1"
+          }
+        ],
+        "digest": "593f79d452a3f84e0cebe2e2acc7b1284a58910ba9d50ca0fd03f64fdd575202"
+      }
+    },
+    "logicalAfter": {
+      "material": {
+        "databasePath": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/material-studio.sqlite",
+        "integrity": "ok",
+        "schemaSha256": "b022d7ed3a6d0c58114ea5fd9df85b40f19e1689c2884e0692a2dd0c5142d0ec",
+        "tableCounts": {
+          "studio_asset_aliases": 0,
+          "studio_asset_definitions": 0,
+          "studio_asset_relation_heads": 0,
+          "studio_asset_relations": 0,
+          "studio_asset_versions": 0,
+          "studio_authority_events": 0,
+          "studio_canonical_assets": 0,
+          "studio_media": 0,
+          "studio_media_derivatives": 0,
+          "studio_media_imports": 0,
+          "studio_meta": 2,
+          "studio_version_reviews": 0
+        },
+        "metaRows": [
+          {
+            "key": "asset_scope_relation_schema",
+            "value": "2"
+          },
+          {
+            "key": "schema_version",
+            "value": "1"
+          }
+        ],
+        "digest": "d70c020ae11b58430a2a06a460262bf9caccf51f7575f9a2404dbb52a58f55f8"
+      },
+      "production": {
+        "databasePath": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-production.sqlite",
+        "integrity": "ok",
+        "schemaSha256": "19c1840bf8b0c0a6b17b2576efb1fa008554a14367a5cb190bd32a6f254d7702",
+        "tableCounts": {
+          "studio_production_continuity_evidence": 0,
+          "studio_production_meta": 1,
+          "studio_production_panel_assets": 0,
+          "studio_production_panels": 0,
+          "studio_production_unit_revisions": 0,
+          "studio_production_units": 0,
+          "studio_text_documents": 0,
+          "studio_text_revisions": 0
+        },
+        "metaRows": [
+          {
+            "key": "schema_version",
+            "value": "2"
+          }
+        ],
+        "digest": "021f326bd05bdcf89ad5f76cf38893c68d6dbed40ef2eb89993ef19c4e689855"
+      },
+      "generation": {
+        "databasePath": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-generation-ledger.sqlite",
+        "integrity": "ok",
+        "schemaSha256": "b67a6f96d7fb91d81bb818908610c542eadc6196ec9e0da21d6f0fcb84d78da1",
+        "tableCounts": {
+          "studio_generation_ledger_meta": 1,
+          "studio_generation_packs": 0,
+          "studio_generation_results": 0
+        },
+        "metaRows": [
+          {
+            "key": "schema_version",
+            "value": "1"
+          }
+        ],
+        "digest": "593f79d452a3f84e0cebe2e2acc7b1284a58910ba9d50ca0fd03f64fdd575202"
+      }
+    },
+    "walBefore": {
+      ".aicanvas/material-studio.sqlite-wal": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/material-studio.sqlite-wal",
+        "sizeBytes": 0
+      },
+      ".aicanvas/studio-production.sqlite-wal": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-production.sqlite-wal",
+        "sizeBytes": 0
+      },
+      ".aicanvas/studio-generation-ledger.sqlite-wal": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-generation-ledger.sqlite-wal",
+        "sizeBytes": 0
+      }
+    },
+    "walAfter": {
+      ".aicanvas/material-studio.sqlite-wal": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/material-studio.sqlite-wal",
+        "sizeBytes": 0
+      },
+      ".aicanvas/studio-production.sqlite-wal": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-production.sqlite-wal",
+        "sizeBytes": 0
+      },
+      ".aicanvas/studio-generation-ledger.sqlite-wal": {
+        "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-generation-ledger.sqlite-wal",
+        "sizeBytes": 0
+      }
+    },
+    "walHeaders": {
+      ".aicanvas/material-studio.sqlite": {
+        "writeVersion": 2,
+        "readVersion": 2
+      },
+      ".aicanvas/studio-production.sqlite": {
+        "writeVersion": 2,
+        "readVersion": 2
+      },
+      ".aicanvas/studio-generation-ledger.sqlite": {
+        "writeVersion": 2,
+        "readVersion": 2
+      }
+    },
+    "unchangedDuringValidation": true
+  },
+  "capabilities": {
+    "canonicalAssets": [
+      "character",
+      "scene",
+      "prop",
+      "alias",
+      "immutable-version",
+      "approved-authority",
+      "positive-lock",
+      "negative-lock",
+      "applicability-gate",
+      "append-only-provenance",
+      "composite-member"
+    ],
+    "media": [
+      "project-local-cas",
+      "streaming-sha256",
+      "thumbnail",
+      "video-poster",
+      "video-720p-proxy",
+      "audio-waveform",
+      "range-streaming"
+    ],
+    "production": [
+      "script-revision",
+      "prompt-revision",
+      "strict-15s",
+      "2-to-6-panels",
+      "asset-timeline"
+    ],
+    "codexGeneration": [
+      "freeze-verified-pack",
+      "max-6-control-references",
+      "forbidden-exclusion",
+      "applicability-fail-closed",
+      "relation-currentness",
+      "composite-member-provenance",
+      "result-registration",
+      "raw-labeled-variants",
+      "sha-drift-fail-closed"
+    ]
+  },
+  "commandRuns": {
+    "targeted": {
+      "name": "targeted-tests",
+      "argv": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/managed-project.test.ts",
+        "tests/material-studio.test.ts",
+        "tests/studio-production.test.ts",
+        "tests/studio-media-protocol.test.ts",
+        "tests/studio-media-derivatives.test.ts",
+        "tests/studio-generation.test.ts",
+        "tests/studio-generation-ledger.test.ts",
+        "tests/studio-asset-knowledge.test.ts",
+        "tests/studio-command-bus.test.ts",
+        "tests/mcp-managed-studio.test.ts",
+        "tests/mcp.test.ts",
+        "tests/material-studio-pagination.test.ts",
+        "tests/managed-project-create-ui.test.ts",
+        "tests/managed-project-service.test.ts"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T21:44:35.803Z",
+      "finishedAt": "2026-07-17T21:44:50.085Z",
+      "durationMs": 14283,
+      "exitCode": 0,
+      "timedOut": false,
+      "log": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p5-managed-studio-final-20260718/targeted-tests.log",
+        "sizeBytes": 2783,
+        "mtimeMs": 1784324690086.0698,
+        "sha256": "3feb07d4336de52de40ff744bdacfa334b4004af574163ae512da09d2f9ea0af"
+      },
+      "testSummary": {
+        "filesPassed": 14,
+        "testsPassed": 96,
+        "filesSkipped": 0,
+        "testsSkipped": 0
+      }
+    },
+    "full": {
+      "name": "full-tests",
+      "argv": [
+        "npm",
+        "test"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T21:44:50.086Z",
+      "finishedAt": "2026-07-17T21:47:14.205Z",
+      "durationMs": 144119,
+      "exitCode": 0,
+      "timedOut": false,
+      "log": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p5-managed-studio-final-20260718/full-tests.log",
+        "sizeBytes": 8740,
+        "mtimeMs": 1784324834205.5605,
+        "sha256": "17dc8b1dd537313a91756798ff14b56252305d905ec7578f23f36c1b7c612626"
+      },
+      "testSummary": {
+        "filesPassed": 72,
+        "testsPassed": 482,
+        "filesSkipped": 0,
+        "testsSkipped": 0
+      }
+    },
+    "build": {
+      "name": "production-build",
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T21:47:14.206Z",
+      "finishedAt": "2026-07-17T21:47:27.285Z",
+      "durationMs": 13080,
+      "exitCode": 0,
+      "timedOut": false,
+      "log": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p5-managed-studio-final-20260718/production-build.log",
+        "sizeBytes": 6585,
+        "mtimeMs": 1784324847285.9712,
+        "sha256": "fe053d13a23c8dbd4becfc1025a2dd4799b9fa800d5874301100f4fdb0190a30"
+      }
+    },
+    "compiledMcp": {
+      "name": "compiled-mcp",
+      "argv": [
+        "npx",
+        "tsx",
+        "scripts/mcp-smoke.ts",
+        "dist-mcp/mcp/server.js"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T21:47:27.289Z",
+      "finishedAt": "2026-07-17T21:47:27.832Z",
+      "durationMs": 544,
+      "exitCode": 0,
+      "timedOut": false,
+      "log": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p5-managed-studio-final-20260718/compiled-mcp.log",
+        "sizeBytes": 11870,
+        "mtimeMs": 1784324847833.191,
+        "sha256": "bdb7a3871ff38378c66812d6f250b0a6051319562c5d13a94b0c9a704587730f"
+      }
+    }
+  },
+  "compiledMcp": {
+    "toolCount": 179,
+    "requiredTools": [
+      "get_managed_studio_overview",
+      "get_studio_generation_control",
+      "list_studio_media_import_origins",
+      "execute_command"
+    ],
+    "server": {
+      "path": "/Users/hxx/Documents/无限画布/dist-mcp/mcp/server.js",
+      "sizeBytes": 289634,
+      "mtimeMs": 1784324847260.1714,
+      "sha256": "750602f814ccbd885f3f1fd3a0f88d45108e7b24e7d954b103c7bdaa8538afe9"
+    }
+  },
+  "scaleAndReliabilityContracts": [
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/managed-project.test.ts",
+        "sizeBytes": 13259,
+        "mtimeMs": 1784317830141.9438,
+        "sha256": "5e21a3f05ad95b856a969dcef4bf4ba091cc1340cb12e693d2a303097233a044"
+      },
+      "phrase": "多次重启检查只读固定侧车，不调用 scanProject 或扫描旧根"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/material-studio.test.ts",
+        "sizeBytes": 27884,
+        "mtimeMs": 1784323364869.666,
+        "sha256": "024828adf96af0aed143aa83634b8cd4b2c2336476a80d3c6fe3fcdd758ab21e"
+      },
+      "phrase": "10000 条资产元数据仍走 limit/keyset 查询，并可在重启后恢复"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/material-studio.test.ts",
+        "sizeBytes": 27884,
+        "mtimeMs": 1784323364869.666,
+        "sha256": "024828adf96af0aed143aa83634b8cd4b2c2336476a80d3c6fe3fcdd758ab21e"
+      },
+      "phrase": "10000 条图片视频音频元数据分页时只返回轻量索引，不读取媒体本体"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/material-studio.test.ts",
+        "sizeBytes": 27884,
+        "mtimeMs": 1784323364869.666,
+        "sha256": "024828adf96af0aed143aa83634b8cd4b2c2336476a80d3c6fe3fcdd758ab21e"
+      },
+      "phrase": "重复 SHA 不产生第二份 blob，图片生成冻结配方缩略图"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/studio-production.test.ts",
+        "sizeBytes": 26278,
+        "mtimeMs": 1784322940160.1199,
+        "sha256": "79a724c73fe6645f8c1e969f887e92d479a28dbd0f3692b08ba3e02119912571"
+      },
+      "phrase": "10000 个单元仍使用索引 + limit 键集查询，不全表装载"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/studio-media-protocol.test.ts",
+        "sizeBytes": 21457,
+        "mtimeMs": 1784323391070.3447,
+        "sha256": "f007d79d943f154c376161879cf0f96d50073b53afe8dd48b5cf6499fb1d2cf8"
+      },
+      "phrase": "64 MiB 原件保持流式校验与区间读取，不使用整文件 readFile"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/studio-media-protocol.test.ts",
+        "sizeBytes": 21457,
+        "mtimeMs": 1784323391070.3447,
+        "sha256": "f007d79d943f154c376161879cf0f96d50073b53afe8dd48b5cf6499fb1d2cf8"
+      },
+      "phrase": "32 MiB ready 视频代理的连续 Range 只在首次计算整文件 SHA"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/studio-media-derivatives.test.ts",
+        "sizeBytes": 18825,
+        "mtimeMs": 1784317946829.5552,
+        "sha256": "fd044da6cf02a6a79bacb988dc9b4b50c348f50fba1ee1b6ed41575b61207183"
+      },
+      "phrase": "100 视频 + 100 音频只分页读轻量元数据，不创建派生或启动进程"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/studio-generation.test.ts",
+        "sizeBytes": 41367,
+        "mtimeMs": 1784322993740.1191,
+        "sha256": "ed5319fec1ec5f84f58b9f7c078485c6435b3d99d2d7cb36f2100e6d7d17b276"
+      },
+      "phrase": "单格超过 6 项控制参考时失败关闭，要求先建立组合派生资产"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/studio-generation.test.ts",
+        "sizeBytes": 41367,
+        "mtimeMs": 1784322993740.1191,
+        "sha256": "ed5319fec1ec5f84f58b9f7c078485c6435b3d99d2d7cb36f2100e6d7d17b276"
+      },
+      "phrase": "派生资产只冻结自身 outgoing 关系，过期的 incoming derived 不会让来源资产失效"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/studio-generation-ledger.test.ts",
+        "sizeBytes": 15687,
+        "mtimeMs": 1784322792588.9426,
+        "sha256": "c26df548ebed42c47afe6e65d915f206c92d6d657ee8c6ea960ace3acd3d1628"
+      },
+      "phrase": "同 generationRunId+variant 禁止静默换图，raw/labeled 可作为两个显式变体"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/studio-asset-knowledge.test.ts",
+        "sizeBytes": 28426,
+        "mtimeMs": 1784322918982.3923,
+        "sha256": "9e4756e9c24a775e1bf0365a3aa8a0576f74867606deb24a5dcba1405382841b"
+      },
+      "phrase": "以不可变定义版本追加范围历史，并可对项目/季/集/单元/秒段做失败关闭判断"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/studio-asset-knowledge.test.ts",
+        "sizeBytes": 28426,
+        "mtimeMs": 1784322918982.3923,
+        "sha256": "9e4756e9c24a775e1bf0365a3aa8a0576f74867606deb24a5dcba1405382841b"
+      },
+      "phrase": "跨类别组合成员可追溯、精确重放幂等，端点语义变化会让关系过期"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/studio-asset-knowledge.test.ts",
+        "sizeBytes": 28426,
+        "mtimeMs": 1784322918982.3923,
+        "sha256": "9e4756e9c24a775e1bf0365a3aa8a0576f74867606deb24a5dcba1405382841b"
+      },
+      "phrase": "过期 head 只能用双 revision CAS 追加同语义修订，重放幂等且历史完整可查"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/studio-generation.test.ts",
+        "sizeBytes": 41367,
+        "mtimeMs": 1784322993740.1191,
+        "sha256": "ed5319fec1ec5f84f58b9f7c078485c6435b3d99d2d7cb36f2100e6d7d17b276"
+      },
+      "phrase": "组合无权威时建立成员关系，锁定组合权威后可显式 rebase 恢复冻结且旧历史不阻断"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/material-studio.test.ts",
+        "sizeBytes": 27884,
+        "mtimeMs": 1784323364869.666,
+        "sha256": "024828adf96af0aed143aa83634b8cd4b2c2336476a80d3c6fe3fcdd758ab21e"
+      },
+      "phrase": "历史版本禁止伪造 UPDATE，直接插入 approved 但没有审核收据也不能提升"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/mcp-managed-studio.test.ts",
+        "sizeBytes": 44408,
+        "mtimeMs": 1784323877982.029,
+        "sha256": "bad7fff8a4ef29cf91c06ba053a9a5a0b98b9b3e5e917c024087c7b7af535f6a"
+      },
+      "phrase": "compiled MCP 只接受 pending 新版本，伪造 approved 状态也无法绕过审核收据"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/material-studio-pagination.test.ts",
+        "sizeBytes": 2218,
+        "mtimeMs": 1784322595268.4082,
+        "sha256": "b56ff6d7b013e526512da728edd5f5157364ba5eb0f0d3e2585f10b8a477ed14"
+      },
+      "phrase": "每次只保留当前页且最多 36 个唯一 DOM 条目"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/managed-project-create-ui.test.ts",
+        "sizeBytes": 1430,
+        "mtimeMs": 1784322595268.608,
+        "sha256": "b7497ebb4ba9a0e71b433221da90ae318e75df9591ed751996d7f9316dd87b23"
+      },
+      "phrase": "固定 story_first 并保留用户明确填写的隔离父目录"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/managed-project-service.test.ts",
+        "sizeBytes": 4446,
+        "mtimeMs": 1784323463483.3442,
+        "sha256": "5e4037892df3dd180b9a2b6d6c531a2fb390c0e42f0613c79e1f170d95dbad4b"
+      },
+      "phrase": "服务成功创建时只写 managed_created，并保持三库与活动指针为空且隔离"
+    },
+    {
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/scripts/ui-managed-studio-scale-smoke.ts",
+        "sizeBytes": 10130,
+        "mtimeMs": 1784322723146.3801,
+        "sha256": "572b94e5090d9c12b1dfe2bd642a1f394dddc327eeb562fe55d8eb203010a046"
+      },
+      "phrase": "const SCRIPT_COUNT = 10_000"
+    }
+  ],
+  "electronUi": {
+    "evidence": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p5-managed-studio-ui-smoke-20260718-04.json",
+      "sizeBytes": 5229,
+      "mtimeMs": 1784324425474.8845,
+      "sha256": "9b789d027c8a23f4cf7dd3fb9e76c186bbdd373a823b2caecc82488d56e91999"
+    },
+    "screenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p5-managed-studio-ui-smoke-20260718-04.png",
+      "sizeBytes": 474039,
+      "mtimeMs": 1784324425012.0698,
+      "sha256": "d733f47611d4d4607964449ecd4ef79ffccdb16ed2f0cb25e54548614f7dab8f"
+    },
+    "width": 3456,
+    "height": 2058,
+    "format": "png",
+    "decodedImages": 4,
+    "studioMediaRequests": 4,
+    "studioMediaFailures": [],
+    "supersedesEvidence": [
+      "docs/evidence/p5-managed-studio-ui-smoke-20260718-01.json",
+      "docs/evidence/p5-managed-studio-ui-smoke-20260718-02.json",
+      "docs/evidence/p5-managed-studio-ui-smoke-20260718-03.json"
+    ],
+    "scale": {
+      "evidence": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p5-managed-studio-scale-ui-smoke-20260718-01.json",
+        "sizeBytes": 2239,
+        "mtimeMs": 1784324452404.7354,
+        "sha256": "7d1daf4078d6791c222ce7e4acca6dc5872d911563637f63dc31e95e180edda6"
+      },
+      "screenshot": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p5-managed-studio-scale-ui-smoke-20260718-01.png",
+        "sizeBytes": 281988,
+        "mtimeMs": 1784324452220.923,
+        "sha256": "3a91e5fb11d34ba0ef3b351e765a84d46a238f6c881157ab59b69c507ecc0cd8"
+      },
+      "width": 3360,
+      "height": 2040,
+      "format": "png",
+      "scriptDocuments": 10000,
+      "maximumMaterialEntryDomCount": 36
+    }
+  },
+  "source": {
+    "before": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "after": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "unchanged": true
+  },
+  "buildIdentity": {
+    "workspaceSourceBefore": {
+      "files": 277,
+      "aggregateSha256": "e6a252f7c51f8cd002c88535b2804ae66af764ae40fa8d506d78fb3a6912c0c8"
+    },
+    "workspaceSourceAfter": {
+      "files": 277,
+      "aggregateSha256": "e6a252f7c51f8cd002c88535b2804ae66af764ae40fa8d506d78fb3a6912c0c8"
+    },
+    "unchanged": true,
+    "packageLock": {
+      "path": "/Users/hxx/Documents/无限画布/package-lock.json",
+      "sizeBytes": 361999,
+      "mtimeMs": 1783922925278.7944,
+      "sha256": "04d8601d35063b44810d2b6d921f408de399ee4ccce45eaf62b71f757a007269"
+    },
+    "compiled": {
+      "files": [
+        {
+          "relativePath": "out/main/index.js",
+          "sizeBytes": 2183643,
+          "sha256": "60f6218ebfb468c51ae9c6e1de863c7e2c956e2270489fc8b838c3c746b4ee08"
+        },
+        {
+          "relativePath": "out/preload/index.mjs",
+          "sizeBytes": 24017,
+          "sha256": "539275a49afbe394b794a7c9b7c62d39d3b68aeb4b0f0ae143cb0a8aa10510de"
+        },
+        {
+          "relativePath": "out/renderer/assets/index-5Z6LItUh.js",
+          "sizeBytes": 1625811,
+          "sha256": "fb83108e1b7704a4b15b085e511300464785d77941e7208a75304f17a16c0de1"
+        },
+        {
+          "relativePath": "out/renderer/assets/index-B2on2HqS.css",
+          "sizeBytes": 262443,
+          "sha256": "1f0de58030d8d6d99c8b53b9bbf95103d823d6e00cb6c4c0a23fc45657dc236b"
+        },
+        {
+          "relativePath": "out/renderer/index.html",
+          "sizeBytes": 727,
+          "sha256": "8f680bdbc636403119769b7ddb47ef3b0ffc42f671af4b323ca6b1c450a139ed"
+        }
+      ]
+    }
+  },
+  "boundaries": {
+    "oldProjectsScannedAtStartup": 0,
+    "formalImagesCreated": 0,
+    "formalVideosCreated": 0,
+    "formalAudioCreated": 0,
+    "externalGenerationCalls": 0,
+    "browserCalls": 0,
+    "uploads": 0,
+    "gitOperations": 0
+  }
+}

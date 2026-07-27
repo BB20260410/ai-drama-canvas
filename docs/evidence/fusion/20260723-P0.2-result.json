@@ -1,0 +1,18 @@
+{
+  "aspect": "P0.2",
+  "status": "PASS",
+  "strategy": "CLEAN_ROOM",
+  "sources": {
+    "peer": "InvokeAI canvasStagingAreaSlice (discarded queue items / session)",
+    "ours": "src/core/studio-generation-staging.ts"
+  },
+  "commands": [
+    {
+      "cmd": "npx vitest run tests/studio-generation-staging.test.ts",
+      "result": "PASS",
+      "tests": 4
+    }
+  ],
+  "usefulness": "结果可 stage→accept（允许挂正式 pipeline）或 discard（禁止挂）；未知 id / 二次决策 fail-close；不平行 ledger",
+  "reverseProbe": "not-found / not-staged / empty-id"
+}

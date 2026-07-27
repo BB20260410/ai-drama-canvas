@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "kind": "infinite-canvas-cross-timeline-consistency-stress",
+  "goal": "CONSISTENCY_STRESS_3_SCENES",
+  "updatedAt": "2026-07-23T01:42:13+0800",
+  "projectRoot": "/Users/hxx/Documents/无限画布/projects/grok-mvp-qingdeng-mrwc97mu-d0aea463",
+  "projectId": "project-c78607fac2a4",
+  "characterId": "character-qingdeng-ke",
+  "provider": "grok",
+  "concurrency": 1,
+  "method": "image_edit serial with authority(+prev PASS) hard lock",
+  "promptContract": ".planning/PROMPT_无限画布跨时间线一致性压测.md",
+  "timeline": [
+    {
+      "id": "T1",
+      "scene": "雨夜客栈廊下",
+      "tool": "image_edit",
+      "refs": [
+        "authority"
+      ],
+      "sha256": "9ce7a368456695faad18f8b0957f8943618c2c26736e66b8e298bf90504b4b19",
+      "session": "images/3.jpg"
+    },
+    {
+      "id": "T2",
+      "scene": "晨雾山道牌坊",
+      "tool": "image_edit",
+      "refs": [
+        "authority",
+        "T1"
+      ],
+      "sha256": "9cb998123ff74945f5dc41123ed5780ebab68b1dd5c00ca275d9f6c012cd77c2",
+      "session": "images/4.jpg"
+    },
+    {
+      "id": "T3",
+      "scene": "昏色阁楼窗前",
+      "tool": "image_edit",
+      "refs": [
+        "authority",
+        "T2"
+      ],
+      "sha256": "ffa0f6a9b7ed3c39ccc208fea1eed589db8324f57b042a012c197ebe8fec1616",
+      "session": "images/5.jpg"
+    }
+  ],
+  "authoritySha256": "81185521f52e17872ad4758bab9262223244237fb7a0fa91056c2f20118df87d",
+  "consistencyMatrix": {
+    "T1": {
+      "C1_face": "PASS",
+      "C2_hair": "PASS",
+      "C3_costume": "PASS",
+      "C4_prop_lantern": "PASS",
+      "C5_proportion": "PASS",
+      "C6_stance": "PASS",
+      "C7_style": "PASS",
+      "C8_scene_diff": "PASS",
+      "C9_clean": "PASS",
+      "notes": "雨夜客栈廊下；双手护灯胸前；身份与Authority一致"
+    },
+    "T2": {
+      "C1_face": "PASS",
+      "C2_hair": "PASS",
+      "C3_costume": "PASS",
+      "C4_prop_lantern": "PASS",
+      "C5_proportion": "PASS",
+      "C6_stance": "PASS",
+      "C7_style": "PASS",
+      "C8_scene_diff": "PASS",
+      "C9_clean": "PASS",
+      "notes": "晨雾山道牌坊；灯垂右侧近膝；场景与T1异质"
+    },
+    "T3": {
+      "C1_face": "PASS",
+      "C2_hair": "PASS",
+      "C3_costume": "PASS",
+      "C4_prop_lantern": "PASS",
+      "C5_proportion": "PASS",
+      "C6_stance": "PASS",
+      "C7_style": "PASS",
+      "C8_scene_diff": "PASS",
+      "C9_clean": "PASS",
+      "notes": "昏色阁楼窗前；灯举肩高左手扶框；场景与T1/T2异质"
+    }
+  },
+  "verdict": "PASS_3_OF_3_COMPLEX_DIFFERENT_SCENES",
+  "canvasAssistUsed": [
+    "isolated managed project active",
+    "character authority master reference SHA locked",
+    "serial image_edit chain T1→T2→T3 with hard refs",
+    "timeline labeled artifacts under consistency-stress folder (pre-cleanup)"
+  ],
+  "duduProtection": {
+    "ledgerSha256": "0998c00f8bc84583f207ae3e434a7171d1597ed177cc21c595082f665bfc54af",
+    "expected": "0998c00f8bc84583f207ae3e434a7171d1597ed177cc21c595082f665bfc54af",
+    "unchanged": true
+  },
+  "cleanupPlan": [
+    "delete consistency-stress-20260723/*.jpg",
+    "delete session images/3.jpg images/4.jpg images/5.jpg if present",
+    "keep authority master and historical MVP evidence JSON"
+  ],
+  "nonClaims": [
+    "not full product UI hand-test",
+    "not Dudu production",
+    "not install/git/video"
+  ]
+}

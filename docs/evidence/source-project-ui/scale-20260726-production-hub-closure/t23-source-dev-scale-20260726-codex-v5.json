@@ -1,0 +1,341 @@
+{
+  "schemaVersion": 1,
+  "kind": "t23-source-dev-scale-performance",
+  "status": "PASS",
+  "ok": true,
+  "createdAt": "2026-07-26T04:31:55.476Z",
+  "fixture": {
+    "kind": "deterministic-synthetic-mechanical-fixture",
+    "visualAcceptance": false,
+    "aiImageGeneration": false,
+    "isolatedTemporaryProject": true,
+    "unitCount": 36,
+    "passRawCount": 4,
+    "note": "所有图均为 sharp 生成的可解码纯色 PNG；PASS 仅表示测试账本闭环，不代表视觉质量。"
+  },
+  "consoleErrors": [],
+  "pageErrors": [],
+  "performance": {
+    "ok": true,
+    "status": "PASS",
+    "budget": {
+      "minUnitCount": 36,
+      "minProjectedUnitNodeCount": 36,
+      "minUniqueProjectedUnitNodeCount": 36,
+      "minPassRawCount": 4,
+      "minUniqueRawShaCount": 4,
+      "minUniqueRawUrlCount": 4,
+      "minReferenceCount": 4,
+      "minUniqueReferenceShaCount": 4,
+      "minUniqueReferenceUrlCount": 4,
+      "maxDevToolchainToCdpReadyMs": 30000,
+      "maxRendererFirstCardMs": 8000,
+      "maxRendererFirstRawMs": 20000,
+      "maxRendererAllPassReferencesMs": 30000,
+      "maxOutstandingProjectionIpc": 16
+    },
+    "measurements": {
+      "fixtureUnitCount": 36,
+      "projectedUnitNodeCount": 36,
+      "uniqueProjectedUnitNodeCount": 36,
+      "passRawCount": 4,
+      "uniqueRawShaCount": 4,
+      "uniqueRawUrlCount": 4,
+      "referenceCount": 4,
+      "uniqueReferenceShaCount": 4,
+      "uniqueReferenceUrlCount": 4,
+      "devToolchainToCdpReadyMs": 3184,
+      "rendererFirstCardMs": 4388,
+      "rendererFirstRawMs": 19719,
+      "rendererAllPassReferencesMs": 29142,
+      "peakOutstandingProjectionIpc": 4
+    },
+    "checks": [
+      {
+        "id": "fixture-unit-count",
+        "status": "PASS",
+        "actual": 36,
+        "comparator": ">=",
+        "budget": 36
+      },
+      {
+        "id": "renderer-unit-node-count",
+        "status": "PASS",
+        "actual": 36,
+        "comparator": ">=",
+        "budget": 36
+      },
+      {
+        "id": "renderer-unique-unit-node-count",
+        "status": "PASS",
+        "actual": 36,
+        "comparator": ">=",
+        "budget": 36
+      },
+      {
+        "id": "fixture-pass-raw-count",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": ">=",
+        "budget": 4
+      },
+      {
+        "id": "fixture-unique-raw-sha-count",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": ">=",
+        "budget": 4
+      },
+      {
+        "id": "renderer-unique-raw-url-count",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": ">=",
+        "budget": 4
+      },
+      {
+        "id": "fixture-reference-count",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": ">=",
+        "budget": 4
+      },
+      {
+        "id": "fixture-unique-reference-sha-count",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": ">=",
+        "budget": 4
+      },
+      {
+        "id": "renderer-unique-reference-url-count",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": ">=",
+        "budget": 4
+      },
+      {
+        "id": "dev-toolchain-to-cdp",
+        "status": "PASS",
+        "actual": 3184,
+        "comparator": "<=",
+        "budget": 30000
+      },
+      {
+        "id": "renderer-first-card",
+        "status": "PASS",
+        "actual": 4388,
+        "comparator": "<=",
+        "budget": 8000
+      },
+      {
+        "id": "renderer-first-raw",
+        "status": "PASS",
+        "actual": 19719,
+        "comparator": "<=",
+        "budget": 20000
+      },
+      {
+        "id": "renderer-all-pass-references",
+        "status": "PASS",
+        "actual": 29142,
+        "comparator": "<=",
+        "budget": 30000
+      },
+      {
+        "id": "peak-outstanding-projection-ipc",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": "<=",
+        "budget": 16
+      }
+    ]
+  },
+  "ui": {
+    "visibleUnitNodeCount": 2,
+    "projectedUnitNodeCount": 36,
+    "rendererProbe": {
+      "projectedUnitNodeCount": 36,
+      "uniqueProjectedUnitNodeCount": 36,
+      "passRawCount": 4,
+      "uniqueRawShaCount": 4,
+      "uniqueRawUrlCount": 4,
+      "referenceCount": 4,
+      "uniqueReferenceShaCount": 4,
+      "uniqueReferenceUrlCount": 4
+    },
+    "projectMetricsText": "项目概览 5 资产 36 单元 72 宫格 13 媒体 2 文稿 4 通过 0 待审 32 进行中 0 失败 0 阻塞 投影于 04:35:01 构建身份 v0.2.0 · buildId:1519dba98053 · sourceDigest:218e1d539fc0 详细诊断",
+    "rawSnapshot": {
+      "loading": false,
+      "unitNodeIds": [
+        "S1E01-U00",
+        "S1E01-U01",
+        "S1E01-U02",
+        "S1E01-U03",
+        "S1E01-U04",
+        "S1E01-U05",
+        "S1E01-U06",
+        "S1E01-U07",
+        "S1E01-U08",
+        "S1E01-U09",
+        "S1E01-U10",
+        "S1E01-U11",
+        "S1E01-U12",
+        "S1E01-U13",
+        "S1E01-U14",
+        "S1E01-U15",
+        "S1E01-U16",
+        "S1E01-U17",
+        "S1E01-U18",
+        "S1E01-U19",
+        "S1E01-U20",
+        "S1E01-U21",
+        "S1E01-U22",
+        "S1E01-U23",
+        "S1E01-U24",
+        "S1E01-U25",
+        "S1E01-U26",
+        "S1E01-U27",
+        "S1E01-U28",
+        "S1E01-U29",
+        "S1E01-U30",
+        "S1E01-U31",
+        "S1E01-U32",
+        "S1E01-U33",
+        "S1E01-U34",
+        "S1E01-U35"
+      ],
+      "corePassUnitIds": [
+        "S1E01-U00",
+        "S1E01-U01",
+        "S1E01-U02",
+        "S1E01-U03"
+      ],
+      "referenceCount": 4,
+      "referenceUnitIds": [
+        "S1E01-U03",
+        "S1E01-U00",
+        "S1E01-U01",
+        "S1E01-U02"
+      ],
+      "raws": [
+        {
+          "unitId": "S1E01-U03",
+          "rawMediaSha256": "430e3dd5ca4227ad30ab9c601080947144e4f1fe1c748b4350e5b23ebf179fb0",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/83aa3fb4b34d281c95ad4fb7a2a58d61df4ba4215122691d39bbc57d8eaeaa6b?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-DEzi7z%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-04801e85",
+          "verification": "deep-verified",
+          "provenance": "generated"
+        },
+        {
+          "unitId": "S1E01-U00",
+          "rawMediaSha256": "abc21f3e1613fa37f47744de8318e903197ae801b772ce86c3aad4d560b3a196",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/3fc97bed8c1fb8f050881a6b4fab185c2f2d1df138aac9e020171f50b92da9d2?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-DEzi7z%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-04801e85",
+          "verification": "deep-verified",
+          "provenance": "generated"
+        },
+        {
+          "unitId": "S1E01-U01",
+          "rawMediaSha256": "548d86fa2785598ee80d7e7ec7cfae73ec2d866ab35a26d494cc3debbce9452a",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/42ae55cdadde59630251b0abe1c84bfcb0cb37d87721162353144dded52af4e1?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-DEzi7z%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-04801e85",
+          "verification": "deep-verified",
+          "provenance": "generated"
+        },
+        {
+          "unitId": "S1E01-U02",
+          "rawMediaSha256": "61fcbce7284d765c4432472e33637e509339d370c90d27deab389a457168e23b",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/23e868a45a749bf3dd78c473060960af0ba25c2e18354922115d2b5f2d4fd534?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-DEzi7z%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-04801e85",
+          "verification": "deep-verified",
+          "provenance": "generated"
+        }
+      ],
+      "references": [
+        {
+          "unitId": "S1E01-U03",
+          "referenceId": "unit-grid-reference-1c33ac8d00f0adb8fcfb389ca197f3b2",
+          "mediaSha256": "1c33ac8d00f0adb8fcfb389ca197f3b27568cb9f139d2e7673085902026d3d83",
+          "referenceType": "character",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/54c94176e1c753884c0a6994fbc3c0eaf79fea8677f58d07fea79a6b53f21800?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-DEzi7z%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-04801e85"
+        },
+        {
+          "unitId": "S1E01-U00",
+          "referenceId": "unit-grid-reference-4fe2618913890b32edf151798ac534f8",
+          "mediaSha256": "4fe2618913890b32edf151798ac534f87fe60e0e2f12c42b7c7984f55ea5a26b",
+          "referenceType": "character",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/0ccc3db6c63eaa682278604c078e3d0e0c843091e0b115a7b8e1ab40e0e87860?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-DEzi7z%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-04801e85"
+        },
+        {
+          "unitId": "S1E01-U01",
+          "referenceId": "unit-grid-reference-a538abdc09a79e373f4dc4727ea26d6e",
+          "mediaSha256": "a538abdc09a79e373f4dc4727ea26d6e4c40446b8162a0b66ce9adc561f63f8d",
+          "referenceType": "character",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/4cf132d71aa2dd81fda4529c9667adc8361566196fa96ef515581790fce0a975?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-DEzi7z%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-04801e85"
+        },
+        {
+          "unitId": "S1E01-U02",
+          "referenceId": "unit-grid-reference-6875009bcf0732b4de884db607280a8b",
+          "mediaSha256": "6875009bcf0732b4de884db607280a8ba462bb0f16c6f25c8a47c8e397c8daf6",
+          "referenceType": "character",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/7fc19b6e4a0bfe2f2f0ffaec6dcb2885084995d7fd5c71e7ad7fdd61b84a664f?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-DEzi7z%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-04801e85"
+        }
+      ]
+    },
+    "decodedRawThumbnailCount": 4,
+    "decodedReferenceThumbnailCount": 4
+  },
+  "ipcProbe": {
+    "enabled": true,
+    "totalCalls": 31,
+    "currentOutstanding": 0,
+    "peakOutstanding": 4,
+    "channels": [
+      {
+        "channel": "canvas:get-approved-timeline-projection",
+        "totalCalls": 2,
+        "currentOutstanding": 0,
+        "peakOutstanding": 2
+      },
+      {
+        "channel": "canvas:get-studio-frozen-pack",
+        "totalCalls": 4,
+        "currentOutstanding": 0,
+        "peakOutstanding": 4
+      },
+      {
+        "channel": "canvas:get-studio-generation-checkpoint-canvas-projection",
+        "totalCalls": 1,
+        "currentOutstanding": 0,
+        "peakOutstanding": 1
+      },
+      {
+        "channel": "canvas:get-studio-generation-review-control",
+        "totalCalls": 4,
+        "currentOutstanding": 0,
+        "peakOutstanding": 4
+      },
+      {
+        "channel": "canvas:get-studio-media",
+        "totalCalls": 8,
+        "currentOutstanding": 0,
+        "peakOutstanding": 4
+      },
+      {
+        "channel": "canvas:get-studio-post-result-observation-control",
+        "totalCalls": 4,
+        "currentOutstanding": 0,
+        "peakOutstanding": 4
+      },
+      {
+        "channel": "canvas:get-studio-production-dashboard",
+        "totalCalls": 4,
+        "currentOutstanding": 0,
+        "peakOutstanding": 3
+      },
+      {
+        "channel": "canvas:list-studio-generation-unit-grid-history",
+        "totalCalls": 4,
+        "currentOutstanding": 0,
+        "peakOutstanding": 4
+      }
+    ]
+  }
+}

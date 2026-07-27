@@ -1,0 +1,277 @@
+{
+  "schemaVersion": 1,
+  "kind": "p5-managed-studio-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-19T10:41:55.395Z",
+  "buildIdentity": {
+    "files": [
+      {
+        "relativePath": "out/main/index.js",
+        "sizeBytes": 2903936,
+        "sha256": "542f471975307c3a6ec8fbf88a5e212a05cfc38a5401ed1aeb301ab8457d13cf"
+      },
+      {
+        "relativePath": "out/preload/index.mjs",
+        "sizeBytes": 26579,
+        "sha256": "6a55c456238037ad094834de53c1dacb6bb1457634524db0cc2b8df05cb5b2e8"
+      },
+      {
+        "relativePath": "out/renderer/assets/DesktopSupportView-BaySLf0U.css",
+        "sizeBytes": 4996,
+        "sha256": "9dd47bd865dc3700e97d739807560a37b10edae5a9ed701833a80e093137ed11"
+      },
+      {
+        "relativePath": "out/renderer/assets/DesktopSupportView-BZDyRqBR.js",
+        "sizeBytes": 16363,
+        "sha256": "57601e625ca6550b19e087f9cea0b261a6ff7fe8c74ca4266ad2763c137733d7"
+      },
+      {
+        "relativePath": "out/renderer/assets/index-Bll86Bic.js",
+        "sizeBytes": 1723539,
+        "sha256": "6d8b07c06fb18366f77959dcdefa16290cfe7d8bd84d22bc2020590ece1d1cfd"
+      },
+      {
+        "relativePath": "out/renderer/assets/index-Dcrrdz1-.css",
+        "sizeBytes": 269130,
+        "sha256": "49bf1cf5a5db6e4c2e3768eb2950465172c63068645d70240ed90fdfd6db1dee"
+      },
+      {
+        "relativePath": "out/renderer/assets/ManagedStudioCanvasView-CQrTwgoY.js",
+        "sizeBytes": 242539,
+        "sha256": "50b4335646615e4abfd5c0b605bfe21bb19b44a74a45d97283a479fe6e3c9e71"
+      },
+      {
+        "relativePath": "out/renderer/assets/ManagedStudioCanvasView-Cs7oSN2w.css",
+        "sizeBytes": 18022,
+        "sha256": "f3556d303aa349114d79b04e902793fb662a997a4b8419cccef2d280f21dcc5a"
+      },
+      {
+        "relativePath": "out/renderer/assets/studio-canvas-pipeline-graph-CEszVFnk.js",
+        "sizeBytes": 8982,
+        "sha256": "9e2c278c598a55f4e86dd5d527968bc63a9e5a96e0f815f20aa2d86220de5cc6"
+      },
+      {
+        "relativePath": "out/renderer/assets/studio-dashboard-unit-selection-DCtWZGki.js",
+        "sizeBytes": 1068,
+        "sha256": "59e8012cfa0ce9073336f02c22116b0eb9ac5815cfd5759d726782101ee41fbf"
+      },
+      {
+        "relativePath": "out/renderer/assets/studio-production-dashboard-store-Db3QTGi9.js",
+        "sizeBytes": 1196,
+        "sha256": "65022293b0cc46e90480024c25a8bf7991e6df850b59962d5dcce77de984cfcd"
+      },
+      {
+        "relativePath": "out/renderer/assets/StudioBindingWorkbench-CvFhA5r0.js",
+        "sizeBytes": 64140,
+        "sha256": "5c18199c07b91e9053a8cc048206536025c14520d19dd6781915c309c4de4201"
+      },
+      {
+        "relativePath": "out/renderer/assets/StudioBindingWorkbench-Dmz26Ofy.css",
+        "sizeBytes": 17247,
+        "sha256": "2d0e1060e27e8dfe4dac205a2e3ed0b77df08850abd1c1b291d6b5445c1caffa"
+      },
+      {
+        "relativePath": "out/renderer/assets/StudioContinuityReviewView-b22TLAeL.js",
+        "sizeBytes": 54153,
+        "sha256": "beef7a38e33be20012ac1fc31ae59ee4dea65d6d3d22915854e3b16453896d5e"
+      },
+      {
+        "relativePath": "out/renderer/assets/StudioContinuityReviewView-B3It0zWa.css",
+        "sizeBytes": 15452,
+        "sha256": "9136b6727be3c1b4b9bce234d19c2cb103762e4fa64959abf9777a4b10ad4d7a"
+      },
+      {
+        "relativePath": "out/renderer/assets/StudioGenerationControlView-BkAN5z1y.js",
+        "sizeBytes": 19801,
+        "sha256": "8577c1cd6cf55d9b19eead97345dc4d9f27198093836f9e3cb0048a13726f17b"
+      },
+      {
+        "relativePath": "out/renderer/assets/StudioGenerationControlView-CzlXILRu.css",
+        "sizeBytes": 5906,
+        "sha256": "ef86c54e54a4f16effb259c039321d8375975639263954149cdec0b67dfdeda2"
+      },
+      {
+        "relativePath": "out/renderer/assets/StudioProductionDashboardView-BsAw4PyR.js",
+        "sizeBytes": 43465,
+        "sha256": "5ddd35a5020cf7da83462a0d54d6b3e66540f483b10b140df522e8512d9d989d"
+      },
+      {
+        "relativePath": "out/renderer/assets/StudioProductionDashboardView-Zt2WWUQN.css",
+        "sizeBytes": 6470,
+        "sha256": "ff9faa3f6eff69e5dc3df7d2767f98f337b2f6ac90d1a1a610ec97b564b47482"
+      },
+      {
+        "relativePath": "out/renderer/index.html",
+        "sizeBytes": 727,
+        "sha256": "19865d8fe77b674cb3f1694d22f52ab316e357417d650b3834fa00548715ec74"
+      }
+    ]
+  },
+  "project": {
+    "id": "project-4810ca7ba63c",
+    "startupPolicy": "no-filesystem-scan",
+    "legacyRoots": []
+  },
+  "startup": {
+    "readyMs": 656,
+    "oldProjectGuardUnchanged": true,
+    "legacyIndexAndCacheUnchanged": true,
+    "externalRequests": 0,
+    "pageErrors": 0,
+    "studioMediaRequests": 4,
+    "studioMediaFailures": [],
+    "watcherSwitch": {
+      "legacyWatcherStarted": true,
+      "switchedToManaged": true,
+      "postSwitchRelevantMutationWaitMs": 1800,
+      "errors": [],
+      "legacySidecarCreated": false
+    }
+  },
+  "ui": {
+    "managedStudioVisible": true,
+    "legacyNavigationHidden": true,
+    "strictFifteenSecondTimelineVisible": true,
+    "panelCount": 2,
+    "assetWorkflow": [
+      "create",
+      "append-pending",
+      "approve",
+      "promote-authority"
+    ],
+    "applicabilityVisible": true,
+    "applicability": {
+      "episodes": [
+        "EP01"
+      ],
+      "units": [
+        "unit-ep01-001"
+      ],
+      "tags": [
+        "UI smoke",
+        "石室"
+      ]
+    },
+    "relationWorkflow": [
+      "append-reference-of",
+      "render-current-relation"
+    ],
+    "relationRevisionWorkflow": [
+      "render-stale",
+      "rebase-current",
+      "retain-superseded-history"
+    ],
+    "textDocumentWorkflow": [
+      "list-prompt",
+      "open-frozen-prompt-body"
+    ],
+    "managedProjectCreationEntryVisible": true,
+    "managedProjectCreatedAndOpened": true,
+    "managedProjectCreation": {
+      "differentRoot": true,
+      "parentMatches": true,
+      "isolatedDirectoryName": "p5-ui-新建空白受管工程-33aaa700",
+      "activePointerMatches": true,
+      "projectId": "project-25d1adef1a94",
+      "projectName": "P5 UI 新建空白受管工程",
+      "projectRoot": "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-managed-studio-ui-736gvl/projects/p5-ui-新建空白受管工程-33aaa700",
+      "sourceRoots": [],
+      "outputRoots": [
+        "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-managed-studio-ui-736gvl/projects/p5-ui-新建空白受管工程-33aaa700"
+      ],
+      "startupPolicy": "no-filesystem-scan",
+      "manifestFingerprint": "4999ca1a74990f8897159e57b77cf562884191201648ec90e7a6f36136b407f2",
+      "materialCounts": {
+        "media": 0,
+        "mediaImports": 0,
+        "canonicalAssets": 0,
+        "characters": 0,
+        "scenes": 0,
+        "props": 0,
+        "assetVersions": 0,
+        "assetDefinitions": 0,
+        "primaryAuthorities": 0,
+        "authorityEvents": 0,
+        "versionReviews": 0,
+        "assetRelations": 0
+      },
+      "productionCounts": {
+        "textDocuments": 0,
+        "scriptDocuments": 0,
+        "promptDocuments": 0,
+        "textRevisions": 0,
+        "units": 0,
+        "panels": 0,
+        "unitRevisions": 0,
+        "scriptSectionRevisions": 0,
+        "mentionAnalyses": 0,
+        "mentionProposals": 0,
+        "mentionDecisions": 0,
+        "panelEntityClosureConfirmations": 0,
+        "assetBindingSets": 0
+      },
+      "generationCounts": {
+        "packs": 0,
+        "dispatches": 0,
+        "results": 0,
+        "pendingResults": 0,
+        "staleAtRegistrationResults": 0
+      },
+      "bootstrap": {
+        "total": 0,
+        "items": 0,
+        "artifacts": 0,
+        "discoveredFiles": 0
+      },
+      "managedCreatedEventCount": 1,
+      "originalFixtureAndLegacySentinelUnchanged": true
+    },
+    "materialCounts": {
+      "media": 4,
+      "mediaImports": 4,
+      "canonicalAssets": 4,
+      "characters": 1,
+      "scenes": 2,
+      "props": 1,
+      "assetVersions": 5,
+      "assetDefinitions": 4,
+      "primaryAuthorities": 4,
+      "authorityEvents": 5,
+      "versionReviews": 5,
+      "assetRelations": 2
+    },
+    "productionCounts": {
+      "textDocuments": 2,
+      "scriptDocuments": 1,
+      "promptDocuments": 1,
+      "textRevisions": 2,
+      "units": 1,
+      "panels": 2,
+      "unitRevisions": 1,
+      "scriptSectionRevisions": 0,
+      "mentionAnalyses": 0,
+      "mentionProposals": 0,
+      "mentionDecisions": 0,
+      "panelEntityClosureConfirmations": 0,
+      "assetBindingSets": 0
+    },
+    "mediaDomCount": 2,
+    "decodedImageCount": 4
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p17-managed-studio-full-ui-smoke-20260719-05.png",
+    "sizeBytes": 445624,
+    "mtimeMs": 1784457714879.7617,
+    "sha256": "1153565b9cfd1ab07cb80846d4f840c6ef872f258380e606bd5de37bbd361c6f",
+    "width": 3456,
+    "height": 2058,
+    "format": "png",
+    "stdev": 20.73838813097291
+  },
+  "boundaries": {
+    "formalImageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0,
+    "sourceWrites": 0
+  }
+}

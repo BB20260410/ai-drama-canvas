@@ -1,0 +1,37 @@
+{
+  "url": "file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/out/renderer/index.html",
+  "loading": false,
+  "visible": true,
+  "bounds": {
+    "x": 0,
+    "y": 33,
+    "width": 1728,
+    "height": 1027
+  },
+  "rendererState": {
+    "readyState": "complete",
+    "title": "AI 漫剧画布",
+    "bodyText": "AI 漫剧画布\nP7 确定性连续性合同夹具\n\n受管项目 · 仅访问当前工程 · 原媒体安全存放\n\n1 剧本\n2 资产\n3 绑定\n4 生成\n5 审片\n无限画布\n驾驶舱\nAgent 连接\n帮助 / 备份\n唯一下一步\n\n在驾驶舱选择下一格并冻结生图包：素材与单元已就绪；由 驾驶舱 打开单元视图，按 系统 投影处理阻塞宫格。\n\n继续\n项目\n\n009 · P24 四格追溯单元 · 4 宫格\n\n项目概览\n3\n资产\n3\n单元\n12\n宫格\n19\n媒体\n2\n文稿\n开始全部 4 格\n可以开始\n节点两侧的＋可直接连线；开始前会按后台正式绑定重新核对\n高级操作\n添加\n素材库\n连线\n帮助\n1\n原始图\n标注图\n审片\n2\n原始图\n标注图\n审片\n3\n原始图\n标注图\n审片\n4\n＋\n角色\n阿航\n\n参考图已锁定\n\nP7 确定性机械夹具规范资产，不代表生产画面视觉验收。\n\n＋\n＋\n道具\n完整黄金面具\n\n参考图已锁定\n\nP7 确定性机械夹具规范资产，不代表生产画面视觉验收。\n\n＋\n＋\n场景\n石室\n\n参考图已锁定\n\nP7 确定性机械夹具规范资产，不代表生产画面视觉验收。\n\n＋\n单\n15 秒单元\n001 · P7 六格连续性单元\n\n6 格 · 等待检查\n\n单\n15 秒单元\n002 · P7 二格长中文单元\n\n2 格 · 等待检查\n\n单\n15 秒单元\n009 · P24 四格追溯单元\n\n4 格 · 等待检查\n\n＋\n宫格 1\np24-unit-four 宫格 1\n\n0–3.75 秒 · 绑定有效\n\n阿航在石室中捧着完整黄金面具。\n\n＋\n原\n原始图\n等待原始图\n\n尚未生成完成\n\n标\n标注图\n等待标注图\n\n本地排版尚未完成\n\n审\n审片\n待审片\n\n结果成对后可审片\n\n＋\n宫格 2\np24-unit-four 宫格 2\n\n3.75–7.5 秒 · 绑定有效\n\n阿航承接前格站位，完成第 2 格动作。\n\n＋\n原\n原始图\n等待原始图\n\n尚未生成完成\n\n标\n标注图\n等待标注图\n\n本地排版尚未完成\n\n审\n审片\n待审片\n\n结果成对后可审片\n\n＋\n宫格 3\np24-unit-four 宫格 3\n\n7.5–11.25 秒 · 绑定有效\n\n阿航承接前格站位，完成第 3 格动作。\n\n＋\n原\n原始图\n等待原始图\n\n尚未生成完成\n\n标\n标注图\n等待标注图\n\n本地排版尚未完成\n\n审\n审片\n待审片\n\n结果成对后可审片\n\n适配\n撤销\n重做\n隐藏连线\n视图\n诊断详情",
+    "bodyWidth": 1728,
+    "bodyHeight": 1027,
+    "viewport": {
+      "width": 1728,
+      "height": 1027,
+      "scrollWidth": 1728,
+      "scrollHeight": 1027,
+      "canScrollX": false,
+      "canScrollY": false
+    },
+    "visibleRegions": {
+      ".adaptation-header": null,
+      ".adaptation-toolbar": null,
+      ".review-bar": null,
+      ".adaptation-grid": null,
+      ".facts-pane": null,
+      ".beats-pane": null,
+      ".plan-pane": null,
+      ".review-drawer": null
+    },
+    "moduleButtons": []
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "kind": "golden-mask-authority-lock-evidence",
+  "status": "PASS",
+  "createdAt": "2026-07-18T15:29:13.741Z",
+  "project": {
+    "id": "project-2e3b44bc6ac4",
+    "assetId": "prop-d01-golden-mask"
+  },
+  "source": {
+    "basename": "豆姐参考图.png",
+    "sha256": "02e9438ecee038f7d14860da37cb315bf358db4a26fa224e342eee5b592b55a9",
+    "width": 1403,
+    "height": 1121,
+    "sizeBytes": 2367597,
+    "mtimeMs": 1782373316697.9963,
+    "unchanged": true
+  },
+  "previousAuthority": {
+    "versionId": "version-cae7bf6f-e547-40c7-b98b-7d937136d42a",
+    "mediaSha256": "a452ba42457962a67766cf49bfd492ebec545af2b270aa9d0b93a2af05abaae5",
+    "thumbnailRecipeKey": "20f58bb5f8f911a8d88053bba829767325ff61d038861ec1f7e933de14c2efe5"
+  },
+  "newAuthority": {
+    "versionId": "version-94a47bf4-8161-4e37-b805-e5c60969a6a5",
+    "mediaSha256": "02e9438ecee038f7d14860da37cb315bf358db4a26fa224e342eee5b592b55a9",
+    "thumbnailRecipeKey": "b3271167000cb2f2a2bea318a72c89c4d39a0b1003ef95e723581b87b7a1dfb5"
+  },
+  "newVersion": {
+    "id": "version-94a47bf4-8161-4e37-b805-e5c60969a6a5",
+    "reviewStatus": "approved"
+  },
+  "definition": {
+    "revision": 8,
+    "uniqueAuthorityDeclared": true,
+    "forbidsHalfCrackedTalkingMask": true,
+    "forbidsReferenceSheetTextInFinalFrames": true
+  },
+  "boundaries": {
+    "sourceWritten": false,
+    "oldVersionDeleted": false,
+    "formalImageGenerationCalls": 0,
+    "browserCalls": 0,
+    "uploads": 0,
+    "gitActions": 0
+  },
+  "fingerprint": "ce921e4d493ea0c3cc580234e2efd3c20cd7a18691ce9c8e6292d95bbf765330"
+}

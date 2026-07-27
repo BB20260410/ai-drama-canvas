@@ -1,0 +1,967 @@
+{
+  "schemaVersion": 1,
+  "kind": "p2-panel-reference-mcp-smoke",
+  "createdAt": "2026-07-17T07:15:24.733Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "serverPath": "/Users/hxx/Documents/无限画布/dist-mcp/mcp/server.js",
+  "serverSha256": "c4f9f4534b8574bf4315ea0e8d5eb43553dddc974713cfc05aad46efd7ed86ad",
+  "tools": {
+    "count": 157,
+    "required": [
+      "audit_fusion_panel_references",
+      "list_fusion_panel_reference_resolutions",
+      "get_fusion_panel_reference_resolution",
+      "list_derived_panel_reference_assets",
+      "materialize_fusion_panel_references",
+      "upsert_panel_reference_override",
+      "register_derived_panel_reference_artifact"
+    ]
+  },
+  "guardedFiles": {
+    "before": {
+      "projectConfig": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/project.json",
+        "bytes": 7323,
+        "sha256": "6fec419aed4439c7e6751ed77de5f5a147fc6fe9d6909da27d83ef491559ecf9"
+      },
+      "projectIndex": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/index.json",
+        "bytes": 25228663,
+        "sha256": "99ba7da9ecbf7df3a53d738c1ded92cc3f4ffec3fd500c684689d62ecd78178d"
+      },
+      "projectOverrides": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/overrides.json",
+        "bytes": 9233,
+        "sha256": "0155f1731175ce5a7fdabf279d6493b535c521596d849c5221a8041609f2f31d"
+      },
+      "scanCache": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/cache.sqlite",
+        "bytes": 50036736,
+        "sha256": "019766507c9dcfea00e482ed5f46e6b5a5f5daae5341feaf4bf0918e7c8d5d8a"
+      },
+      "storyboards": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboards.json",
+        "bytes": 6249388,
+        "sha256": "48351896542028241ea689e930a4aa1df190a18de002d6c432cb4c4b6d9b3a78"
+      },
+      "fusionProjectManifest": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/fusion-project-manifest.json",
+        "bytes": 6369749,
+        "sha256": "93ad685f8f0de8f46f6163bbe3e931c937aae54df25a3046780d34f81c03a969"
+      },
+      "productionAssets": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/production-assets.json",
+        "bytes": 408965,
+        "sha256": "e693c5477044d9389de19188d14e876ea334c762cea86f9010a3de47f41abeae"
+      },
+      "continuityTracks": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/continuity-tracks.json",
+        "bytes": 4031882,
+        "sha256": "62b7a2fd80eefeb28e7b15780f5483df5381ce8dd94573311859e48b6962a20a"
+      },
+      "assetConsistencyBatches": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/asset-consistency-batches.json",
+        "bytes": 40188,
+        "sha256": "69b78c19397550cfa14e917c505030071a1811d273012255e9d97c87892269f7"
+      },
+      "panelReferenceResolutions": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/panel-reference-resolutions.json",
+        "bytes": 32684718,
+        "sha256": "71d1cc640b50be371aa1f3e5886fc90656747a34fd3ab8d0a9e7c7f4344b5bd1"
+      },
+      "storyboardGridSelections": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboard-grid-selections.json",
+        "bytes": 539782,
+        "sha256": "a8ec5e31899a71383bbb514720d0e00f918b9d0efe1a0d4cf408a9013c645ffa"
+      },
+      "generationJobs": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-jobs.json",
+        "bytes": 333529,
+        "sha256": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182"
+      },
+      "publications": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/publications.json",
+        "bytes": 84340,
+        "sha256": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238"
+      },
+      "reviews": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/reviews.json",
+        "bytes": 85063,
+        "sha256": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97"
+      },
+      "events": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/events.jsonl",
+        "bytes": 239563,
+        "sha256": "2bb58947462e05789d3ae2cf4e3953a8d91f6d30e77ba0129263778c438c8a68"
+      },
+      "commandLedger": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/command-ledger.json",
+        "bytes": 280151,
+        "sha256": "07dfa33c9c39524bdf773dd70e78e2b5346b0febcda779bf8d7d4db050748d16"
+      }
+    },
+    "after": {
+      "projectConfig": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/project.json",
+        "bytes": 7323,
+        "sha256": "6fec419aed4439c7e6751ed77de5f5a147fc6fe9d6909da27d83ef491559ecf9"
+      },
+      "projectIndex": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/index.json",
+        "bytes": 25228663,
+        "sha256": "99ba7da9ecbf7df3a53d738c1ded92cc3f4ffec3fd500c684689d62ecd78178d"
+      },
+      "projectOverrides": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/overrides.json",
+        "bytes": 9233,
+        "sha256": "0155f1731175ce5a7fdabf279d6493b535c521596d849c5221a8041609f2f31d"
+      },
+      "scanCache": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/cache.sqlite",
+        "bytes": 50036736,
+        "sha256": "019766507c9dcfea00e482ed5f46e6b5a5f5daae5341feaf4bf0918e7c8d5d8a"
+      },
+      "storyboards": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboards.json",
+        "bytes": 6249388,
+        "sha256": "48351896542028241ea689e930a4aa1df190a18de002d6c432cb4c4b6d9b3a78"
+      },
+      "fusionProjectManifest": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/fusion-project-manifest.json",
+        "bytes": 6369749,
+        "sha256": "93ad685f8f0de8f46f6163bbe3e931c937aae54df25a3046780d34f81c03a969"
+      },
+      "productionAssets": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/production-assets.json",
+        "bytes": 408965,
+        "sha256": "e693c5477044d9389de19188d14e876ea334c762cea86f9010a3de47f41abeae"
+      },
+      "continuityTracks": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/continuity-tracks.json",
+        "bytes": 4031882,
+        "sha256": "62b7a2fd80eefeb28e7b15780f5483df5381ce8dd94573311859e48b6962a20a"
+      },
+      "assetConsistencyBatches": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/asset-consistency-batches.json",
+        "bytes": 40188,
+        "sha256": "69b78c19397550cfa14e917c505030071a1811d273012255e9d97c87892269f7"
+      },
+      "panelReferenceResolutions": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/panel-reference-resolutions.json",
+        "bytes": 32684718,
+        "sha256": "71d1cc640b50be371aa1f3e5886fc90656747a34fd3ab8d0a9e7c7f4344b5bd1"
+      },
+      "storyboardGridSelections": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboard-grid-selections.json",
+        "bytes": 539782,
+        "sha256": "a8ec5e31899a71383bbb514720d0e00f918b9d0efe1a0d4cf408a9013c645ffa"
+      },
+      "generationJobs": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-jobs.json",
+        "bytes": 333529,
+        "sha256": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182"
+      },
+      "publications": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/publications.json",
+        "bytes": 84340,
+        "sha256": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238"
+      },
+      "reviews": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/reviews.json",
+        "bytes": 85063,
+        "sha256": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97"
+      },
+      "events": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/events.jsonl",
+        "bytes": 239563,
+        "sha256": "2bb58947462e05789d3ae2cf4e3953a8d91f6d30e77ba0129263778c438c8a68"
+      },
+      "commandLedger": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/command-ledger.json",
+        "bytes": 280151,
+        "sha256": "07dfa33c9c39524bdf773dd70e78e2b5346b0febcda779bf8d7d4db050748d16"
+      }
+    },
+    "unchanged": true
+  },
+  "audit": {
+    "schemaVersion": 1,
+    "resolverVersion": "panel-reference-resolution-v1",
+    "currentContracts": 1288,
+    "panels": 4330,
+    "panelDistribution": {
+      "2": 151,
+      "3": 667,
+      "4": 349,
+      "5": 95,
+      "6": 26
+    },
+    "semanticAssetBindings": 13808,
+    "referenceSlots": 12716,
+    "confirmedEmptyPanels": 10,
+    "generationReadyPanels": 610,
+    "pendingHardLockPanels": 3554,
+    "pendingHardLockReferences": 7480,
+    "pendingDerivedArtifactPanels": 166,
+    "detectedOverflowPanels": 166,
+    "derivedDefinitions": 52,
+    "detectedRowContinuityDifferencePanels": 909,
+    "detectedRowContinuityDifferences": 1990,
+    "unresolvedPanels": 0,
+    "unresolvedReferences": 0,
+    "knownAssetMissingBindingPanels": 0,
+    "knownAssetMissingBindings": 0,
+    "unhandledOverflowPanels": 0,
+    "timeSpanContinuityMismatchPanels": 0,
+    "timeSpanContinuityMismatches": 0,
+    "maximumSemanticAssetsPerPanel": 12,
+    "maximumReferenceSlotsPerPanel": 6,
+    "closurePassed": true,
+    "auditFingerprint": "64651abfbf1f495eb1865eca7819e0f01ab92e9e9803d7905bde550001a76e16",
+    "currentness": {
+      "current": true,
+      "checkedAt": "2026-07-17T07:14:59.308Z",
+      "storeRevision": 1,
+      "storeFingerprint": "a151dc3c32e12996b3a1f345b9b04f9516fd8d4ceb489797a8d6bafa6eb9c475",
+      "driftedInputs": []
+    },
+    "storeRevision": 1,
+    "storeFingerprint": "a151dc3c32e12996b3a1f345b9b04f9516fd8d4ceb489797a8d6bafa6eb9c475",
+    "responsePolicy": "只返回引用语义、来源、本地路径与 SHA-256 摘要；不返回图片、base64 或全季未分页数组。"
+  },
+  "page": {
+    "total": 146,
+    "storeRevision": 1,
+    "storeFingerprint": "a151dc3c32e12996b3a1f345b9b04f9516fd8d4ceb489797a8d6bafa6eb9c475",
+    "firstTwo": [
+      {
+        "resolutionId": "panel-reference-5c79dc210e45886d190badacb90a",
+        "resolutionFingerprint": "5c79dc210e45886d190badacb90a3da2a12e5348a293f6f3e24dd457c08b556a",
+        "resolverVersion": "panel-reference-resolution-v1",
+        "projectId": "gushujuan-s3-f1a688020bfb7af6",
+        "sourceContentAddress": "sha256:f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+        "unitItemId": "season-三-ep01-unit001",
+        "gridContractId": "grid-6c02035d032128e0f62a",
+        "gridSourceFingerprint": "674103c439fecf32680352c40bf107455952a17aab084db0dcb50fffad5466df",
+        "panelId": "season-三-ep01-unit001-panel-01",
+        "panelIndex": 1,
+        "panelCount": 4,
+        "startSeconds": 0,
+        "endSeconds": 3,
+        "storyboardRowIds": [
+          "storyboard-EP01_15s_001-01"
+        ],
+        "sourceShotNumbers": [
+          1
+        ],
+        "scheduleRowIndexes": [
+          0
+        ],
+        "semanticAssets": [
+          {
+            "assetId": "S01",
+            "assetName": "岐山封神台·封神榜空白格（神魔层）",
+            "category": "scene",
+            "bindingId": "panel-binding-d8a42592e678ebb50b95c79c",
+            "provenance": [
+              {
+                "kind": "storyboard-row",
+                "storyboardRowId": "storyboard-EP01_15s_001-01",
+                "note": "已确认分镜行显式引用"
+              },
+              {
+                "kind": "continuity-span",
+                "scheduleRowIndexes": [
+                  0
+                ],
+                "sourceShotNumbers": [
+                  1
+                ],
+                "continuitySpanIds": [
+                  "S01:EP01_15s_001"
+                ],
+                "note": "连续性时间段与当前宫格半开区间相交"
+              },
+              {
+                "kind": "source-shot-schedule",
+                "scheduleRowIndexes": [
+                  0
+                ],
+                "sourceShotNumbers": [
+                  1
+                ],
+                "note": "宫格对应的原镜与融合排期秒段"
+              }
+            ],
+            "hardLock": {
+              "authority": "reviewed-hard-lock",
+              "artifactId": "asset-S01-9e8b7485371c",
+              "reviewId": "review-2026-07-16T02-23-31-417Z-55603e02",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S01_岐山封神台·封神榜空白格(神魔层)/AI画布生成/S01_资产_a654d3da_raw.png",
+              "sha256": "bac348616e2ce336d439b8b58ba5d166f2d80acbecb4c6c58116bb77335af017",
+              "referenceVersion": "e9699234824e2ad6c19da12d7fb4290e89c0079a5c06fe11e47744f857aeff42"
+            }
+          }
+        ],
+        "excludedAssets": [],
+        "referenceSlots": [
+          {
+            "id": "panel-slot-d8a42592e678ebb50b95c79c",
+            "kind": "canonical-asset",
+            "readiness": "ready",
+            "coveredAssetIds": [
+              "S01"
+            ],
+            "assetId": "S01",
+            "artifactId": "asset-S01-9e8b7485371c",
+            "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S01_岐山封神台·封神榜空白格(神魔层)/AI画布生成/S01_资产_a654d3da_raw.png",
+            "sha256": "bac348616e2ce336d439b8b58ba5d166f2d80acbecb4c6c58116bb77335af017",
+            "reviewId": "review-2026-07-16T02-23-31-417Z-55603e02"
+          }
+        ],
+        "timelineReconciliations": [],
+        "detectedOverflow": false,
+        "closureStatus": "resolved",
+        "generationReady": true,
+        "blockerCodes": [],
+        "issues": []
+      },
+      {
+        "resolutionId": "panel-reference-82d7f737cb177d4bed0685ec2cae",
+        "resolutionFingerprint": "82d7f737cb177d4bed0685ec2cae42df07e4fb98b9f8cb2a0c519fd0cf5e545f",
+        "resolverVersion": "panel-reference-resolution-v1",
+        "projectId": "gushujuan-s3-f1a688020bfb7af6",
+        "sourceContentAddress": "sha256:f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+        "unitItemId": "season-三-ep01-unit001",
+        "gridContractId": "grid-6c02035d032128e0f62a",
+        "gridSourceFingerprint": "674103c439fecf32680352c40bf107455952a17aab084db0dcb50fffad5466df",
+        "panelId": "season-三-ep01-unit001-panel-02",
+        "panelIndex": 2,
+        "panelCount": 4,
+        "startSeconds": 3,
+        "endSeconds": 7.5,
+        "storyboardRowIds": [
+          "storyboard-EP01_15s_001-01"
+        ],
+        "sourceShotNumbers": [
+          1
+        ],
+        "scheduleRowIndexes": [
+          0
+        ],
+        "semanticAssets": [
+          {
+            "assetId": "S01",
+            "assetName": "岐山封神台·封神榜空白格（神魔层）",
+            "category": "scene",
+            "bindingId": "panel-binding-305a5937fb4643096b2d5dc2",
+            "provenance": [
+              {
+                "kind": "storyboard-row",
+                "storyboardRowId": "storyboard-EP01_15s_001-01",
+                "note": "已确认分镜行显式引用"
+              },
+              {
+                "kind": "continuity-span",
+                "scheduleRowIndexes": [
+                  0
+                ],
+                "sourceShotNumbers": [
+                  1
+                ],
+                "continuitySpanIds": [
+                  "S01:EP01_15s_001"
+                ],
+                "note": "连续性时间段与当前宫格半开区间相交"
+              },
+              {
+                "kind": "source-shot-schedule",
+                "scheduleRowIndexes": [
+                  0
+                ],
+                "sourceShotNumbers": [
+                  1
+                ],
+                "note": "宫格对应的原镜与融合排期秒段"
+              }
+            ],
+            "hardLock": {
+              "authority": "reviewed-hard-lock",
+              "artifactId": "asset-S01-9e8b7485371c",
+              "reviewId": "review-2026-07-16T02-23-31-417Z-55603e02",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S01_岐山封神台·封神榜空白格(神魔层)/AI画布生成/S01_资产_a654d3da_raw.png",
+              "sha256": "bac348616e2ce336d439b8b58ba5d166f2d80acbecb4c6c58116bb77335af017",
+              "referenceVersion": "e9699234824e2ad6c19da12d7fb4290e89c0079a5c06fe11e47744f857aeff42"
+            }
+          }
+        ],
+        "excludedAssets": [],
+        "referenceSlots": [
+          {
+            "id": "panel-slot-305a5937fb4643096b2d5dc2",
+            "kind": "canonical-asset",
+            "readiness": "ready",
+            "coveredAssetIds": [
+              "S01"
+            ],
+            "assetId": "S01",
+            "artifactId": "asset-S01-9e8b7485371c",
+            "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S01_岐山封神台·封神榜空白格(神魔层)/AI画布生成/S01_资产_a654d3da_raw.png",
+            "sha256": "bac348616e2ce336d439b8b58ba5d166f2d80acbecb4c6c58116bb77335af017",
+            "reviewId": "review-2026-07-16T02-23-31-417Z-55603e02"
+          }
+        ],
+        "timelineReconciliations": [],
+        "detectedOverflow": false,
+        "closureStatus": "resolved",
+        "generationReady": true,
+        "blockerCodes": [],
+        "issues": []
+      }
+    ]
+  },
+  "detail": {
+    "resolutionId": "panel-reference-5c79dc210e45886d190badacb90a",
+    "resolutionFingerprint": "5c79dc210e45886d190badacb90a3da2a12e5348a293f6f3e24dd457c08b556a",
+    "resolverVersion": "panel-reference-resolution-v1",
+    "projectId": "gushujuan-s3-f1a688020bfb7af6",
+    "sourceContentAddress": "sha256:f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+    "unitItemId": "season-三-ep01-unit001",
+    "gridContractId": "grid-6c02035d032128e0f62a",
+    "gridSourceFingerprint": "674103c439fecf32680352c40bf107455952a17aab084db0dcb50fffad5466df",
+    "panelId": "season-三-ep01-unit001-panel-01",
+    "panelIndex": 1,
+    "panelCount": 4,
+    "startSeconds": 0,
+    "endSeconds": 3,
+    "storyboardRowIds": [
+      "storyboard-EP01_15s_001-01"
+    ],
+    "sourceShotNumbers": [
+      1
+    ],
+    "scheduleRowIndexes": [
+      0
+    ],
+    "semanticAssets": [
+      {
+        "assetId": "S01",
+        "assetName": "岐山封神台·封神榜空白格（神魔层）",
+        "category": "scene",
+        "bindingId": "panel-binding-d8a42592e678ebb50b95c79c",
+        "provenance": [
+          {
+            "kind": "storyboard-row",
+            "storyboardRowId": "storyboard-EP01_15s_001-01",
+            "note": "已确认分镜行显式引用"
+          },
+          {
+            "kind": "continuity-span",
+            "scheduleRowIndexes": [
+              0
+            ],
+            "sourceShotNumbers": [
+              1
+            ],
+            "continuitySpanIds": [
+              "S01:EP01_15s_001"
+            ],
+            "note": "连续性时间段与当前宫格半开区间相交"
+          },
+          {
+            "kind": "source-shot-schedule",
+            "scheduleRowIndexes": [
+              0
+            ],
+            "sourceShotNumbers": [
+              1
+            ],
+            "note": "宫格对应的原镜与融合排期秒段"
+          }
+        ],
+        "hardLock": {
+          "authority": "reviewed-hard-lock",
+          "artifactId": "asset-S01-9e8b7485371c",
+          "reviewId": "review-2026-07-16T02-23-31-417Z-55603e02",
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S01_岐山封神台·封神榜空白格(神魔层)/AI画布生成/S01_资产_a654d3da_raw.png",
+          "sha256": "bac348616e2ce336d439b8b58ba5d166f2d80acbecb4c6c58116bb77335af017",
+          "referenceVersion": "e9699234824e2ad6c19da12d7fb4290e89c0079a5c06fe11e47744f857aeff42"
+        }
+      }
+    ],
+    "excludedAssets": [],
+    "referenceSlots": [
+      {
+        "id": "panel-slot-d8a42592e678ebb50b95c79c",
+        "kind": "canonical-asset",
+        "readiness": "ready",
+        "coveredAssetIds": [
+          "S01"
+        ],
+        "assetId": "S01",
+        "artifactId": "asset-S01-9e8b7485371c",
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S01_岐山封神台·封神榜空白格(神魔层)/AI画布生成/S01_资产_a654d3da_raw.png",
+        "sha256": "bac348616e2ce336d439b8b58ba5d166f2d80acbecb4c6c58116bb77335af017",
+        "reviewId": "review-2026-07-16T02-23-31-417Z-55603e02"
+      }
+    ],
+    "timelineReconciliations": [],
+    "detectedOverflow": false,
+    "closureStatus": "resolved",
+    "generationReady": true,
+    "blockerCodes": [],
+    "issues": [],
+    "responsePolicy": "只返回引用语义、来源、本地路径与 SHA-256 摘要；不返回图片、base64 或全季未分页数组。",
+    "semanticAssetCount": 1,
+    "referenceSlotCount": 1
+  },
+  "overflow": {
+    "total": 166,
+    "first": {
+      "resolutionId": "panel-reference-af81dc696ab91ff3b95adb13ed33",
+      "resolutionFingerprint": "af81dc696ab91ff3b95adb13ed3387274f8d4e68e965e93d1697f216d130689f",
+      "resolverVersion": "panel-reference-resolution-v1",
+      "projectId": "gushujuan-s3-f1a688020bfb7af6",
+      "sourceContentAddress": "sha256:f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+      "unitItemId": "season-三-ep02-unit032",
+      "gridContractId": "grid-bc2e3ff321d1c559b8c5",
+      "gridSourceFingerprint": "82bbfe79112f73af59e7ba36a44f57dc9452d739ff551ece128109a0744ba5c0",
+      "panelId": "season-三-ep02-unit032-panel-01",
+      "panelIndex": 1,
+      "panelCount": 3,
+      "startSeconds": 0,
+      "endSeconds": 6.5,
+      "storyboardRowIds": [
+        "storyboard-EP02_15s_032-01"
+      ],
+      "sourceShotNumbers": [
+        40
+      ],
+      "scheduleRowIndexes": [
+        0
+      ],
+      "semanticAssets": [
+        {
+          "assetId": "C01",
+          "assetName": "阿航",
+          "category": "character",
+          "bindingId": "panel-binding-df2bfbdac06095ccecc7ce5e",
+          "provenance": [
+            {
+              "kind": "storyboard-row",
+              "storyboardRowId": "storyboard-EP02_15s_032-01",
+              "note": "已确认分镜行显式引用"
+            },
+            {
+              "kind": "continuity-span",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "continuitySpanIds": [
+                "C01:EP02_15s_032"
+              ],
+              "note": "连续性时间段与当前宫格半开区间相交"
+            },
+            {
+              "kind": "source-shot-schedule",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "note": "宫格对应的原镜与融合排期秒段"
+            }
+          ],
+          "hardLock": {
+            "authority": "user-authority",
+            "artifactId": "asset-C01-b432805c2401",
+            "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/authorities/ahang/阿航_青年_三视图_.jpg",
+            "sha256": "5132d4320f956cf2a2320e52fae941ef15ffb243ad79343045006a8773f4548e",
+            "referenceVersion": "14395c5fcf360afbd54800e460f3b8b23f85336b4b897f55aa0d64ca1e85f80b"
+          }
+        },
+        {
+          "assetId": "C02",
+          "assetName": "嘟嘟",
+          "category": "character",
+          "bindingId": "panel-binding-fddb09cd969f0074c0a745e1",
+          "provenance": [
+            {
+              "kind": "storyboard-row",
+              "storyboardRowId": "storyboard-EP02_15s_032-01",
+              "note": "已确认分镜行显式引用"
+            },
+            {
+              "kind": "continuity-span",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "continuitySpanIds": [
+                "C02:EP02_15s_032"
+              ],
+              "note": "连续性时间段与当前宫格半开区间相交"
+            },
+            {
+              "kind": "source-shot-schedule",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "note": "宫格对应的原镜与融合排期秒段"
+            }
+          ],
+          "hardLock": {
+            "authority": "user-authority",
+            "artifactId": "asset-C02-04c9fe09a622",
+            "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/authorities/dudu/嘟嘟参考图.png",
+            "sha256": "d6759fbd03df6d3b9c83e193130bea6073c15865a5f9cf7d308b069ea2b131cd",
+            "referenceVersion": "bed378c58eeed5bde6e6305c67231b158ef0d3520ae7702a8dc33f9539117bb1"
+          }
+        },
+        {
+          "assetId": "C03a",
+          "assetName": "禾安·婴儿",
+          "category": "character",
+          "bindingId": "panel-binding-0b154fc7e772c6f2197d250e",
+          "provenance": [
+            {
+              "kind": "storyboard-row",
+              "storyboardRowId": "storyboard-EP02_15s_032-01",
+              "note": "已确认分镜行显式引用"
+            },
+            {
+              "kind": "continuity-span",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "continuitySpanIds": [
+                "C03a:EP02_15s_032"
+              ],
+              "note": "连续性时间段与当前宫格半开区间相交"
+            },
+            {
+              "kind": "source-shot-schedule",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "note": "宫格对应的原镜与融合排期秒段"
+            }
+          ],
+          "hardLock": {
+            "authority": "reviewed-hard-lock",
+            "artifactId": "asset-C03a-26d380d8c0f3",
+            "reviewId": "review-2026-07-16T05-36-23-547Z-6ddeea3d",
+            "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C03a_禾安·婴儿/AI画布生成/C03a_资产_2ae3b748_raw.png",
+            "sha256": "5491fc11fa7fd85c7040e36adf8603b5ba8bf24021159dfd32aa985e91d19227",
+            "referenceVersion": "e1bcd2175fdc18021cad5ea9fcbc3c9fd6813a741f0e8236cc57aed36667ec6f"
+          }
+        },
+        {
+          "assetId": "C04a",
+          "assetName": "榛母·中年",
+          "category": "character",
+          "bindingId": "panel-binding-a0ec6a85f145379330c04bb5",
+          "provenance": [
+            {
+              "kind": "storyboard-row",
+              "storyboardRowId": "storyboard-EP02_15s_032-01",
+              "note": "已确认分镜行显式引用"
+            },
+            {
+              "kind": "continuity-span",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "continuitySpanIds": [
+                "C04a:EP02_15s_032"
+              ],
+              "note": "连续性时间段与当前宫格半开区间相交"
+            },
+            {
+              "kind": "source-shot-schedule",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "note": "宫格对应的原镜与融合排期秒段"
+            }
+          ],
+          "hardLock": {
+            "authority": "reviewed-hard-lock",
+            "artifactId": "asset-C04a-ffa2cb6fbf57",
+            "reviewId": "review-2026-07-16T04-37-58-599Z-23d9e9e4",
+            "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C04a_榛母·中年/AI画布生成/C04a_资产_ae6fbbb8_raw.png",
+            "sha256": "bb77ec684d012b904cd6af0fb744582e87b06cc7f6199395d8f16147edaed709",
+            "referenceVersion": "0bea83da8f4e5e798ecd58db54dd8e59bc02a7be8b7acc868b75778acdfa74b9"
+          }
+        },
+        {
+          "assetId": "P03",
+          "assetName": "半璧（随魂素玉）",
+          "category": "prop",
+          "bindingId": "panel-binding-11c80ab2f1c96e1c09d52fd1",
+          "provenance": [
+            {
+              "kind": "storyboard-row",
+              "storyboardRowId": "storyboard-EP02_15s_032-01",
+              "note": "已确认分镜行显式引用"
+            },
+            {
+              "kind": "continuity-span",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "continuitySpanIds": [
+                "P03:EP02_15s_032"
+              ],
+              "note": "连续性时间段与当前宫格半开区间相交"
+            },
+            {
+              "kind": "source-shot-schedule",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "note": "宫格对应的原镜与融合排期秒段"
+            }
+          ],
+          "hardLock": {
+            "authority": "reviewed-hard-lock",
+            "artifactId": "asset-P03-8b0747166195",
+            "reviewId": "review-2026-07-16T04-42-41-091Z-614fa876",
+            "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P03_半璧(随魂素玉)/AI画布生成/P03_资产_6474db01_raw.png",
+            "sha256": "e499749c5362379f067604a22d67c2072cc64e570e49cb69c1c67b2c1fa5db6f",
+            "referenceVersion": "e6d0a606260ae903382cd9616a49bf352869eb697e4877faf8692fe942fd9d52"
+          }
+        },
+        {
+          "assetId": "P10",
+          "assetName": "「无名医」木牌",
+          "category": "prop",
+          "bindingId": "panel-binding-fc4de9350a0858d47506e1dc",
+          "provenance": [
+            {
+              "kind": "storyboard-row",
+              "storyboardRowId": "storyboard-EP02_15s_032-01",
+              "note": "已确认分镜行显式引用"
+            },
+            {
+              "kind": "continuity-span",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "continuitySpanIds": [
+                "P10:EP02_15s_032"
+              ],
+              "note": "连续性时间段与当前宫格半开区间相交"
+            },
+            {
+              "kind": "source-shot-schedule",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "note": "宫格对应的原镜与融合排期秒段"
+            }
+          ],
+          "hardLock": {
+            "authority": "reviewed-hard-lock",
+            "artifactId": "asset-P10-599f89d31a43",
+            "reviewId": "review-2026-07-16T06-16-54-419Z-2bf1f568",
+            "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P10_「无名医」木牌/AI画布生成/P10_资产_5c528d9a_raw.png",
+            "sha256": "d21c92306216f92e7c627eb751c4855c998cc8a257c63bc05beaddd64b65afd0",
+            "referenceVersion": "9b86479bded906023cca10bc55e415cb550f5de5fc6cf8ea5ef226b6d34279ca"
+          }
+        },
+        {
+          "assetId": "S03",
+          "assetName": "周原青铜作坊（院落主场景）",
+          "category": "scene",
+          "bindingId": "panel-binding-3c21e974bf468fa96e11797d",
+          "provenance": [
+            {
+              "kind": "storyboard-row",
+              "storyboardRowId": "storyboard-EP02_15s_032-01",
+              "note": "已确认分镜行显式引用"
+            },
+            {
+              "kind": "continuity-span",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "continuitySpanIds": [
+                "S03:EP02_15s_032"
+              ],
+              "note": "连续性时间段与当前宫格半开区间相交"
+            },
+            {
+              "kind": "source-shot-schedule",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "note": "宫格对应的原镜与融合排期秒段"
+            }
+          ],
+          "hardLock": {
+            "authority": "reviewed-hard-lock",
+            "artifactId": "asset-S03-b7d2abc826f0",
+            "reviewId": "review-2026-07-16T04-27-54-681Z-cb8fd847",
+            "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S03_周原青铜作坊(院落主场景)/AI画布生成/S03_资产_93de2f22_raw.png",
+            "sha256": "4fcf9fdbf17ce1ad3559a69692c0cc78b6c812c207c2c474c3c8aac02f6d1dd1",
+            "referenceVersion": "80973f286754bf7c8bea49577b2a17a4db6e587a30aa74e15ab35551e0c0e8f7"
+          }
+        },
+        {
+          "assetId": "S08",
+          "assetName": "阿航药棚",
+          "category": "scene",
+          "bindingId": "panel-binding-db332e47f3c60c337263470d",
+          "provenance": [
+            {
+              "kind": "storyboard-row",
+              "storyboardRowId": "storyboard-EP02_15s_032-01",
+              "note": "已确认分镜行显式引用"
+            },
+            {
+              "kind": "continuity-span",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "continuitySpanIds": [
+                "S08:EP02_15s_032"
+              ],
+              "note": "连续性时间段与当前宫格半开区间相交"
+            },
+            {
+              "kind": "source-shot-schedule",
+              "scheduleRowIndexes": [
+                0
+              ],
+              "sourceShotNumbers": [
+                40
+              ],
+              "note": "宫格对应的原镜与融合排期秒段"
+            }
+          ],
+          "hardLock": {
+            "authority": "reviewed-hard-lock",
+            "artifactId": "asset-S08-24f8411b8063",
+            "reviewId": "review-2026-07-16T07-20-56-534Z-28144aed",
+            "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S08_阿航药棚/AI画布生成/S08_资产_08f97395_raw.png",
+            "sha256": "986738b7078995c35581a6ac8c5f754a0a65fa43c277107928a7c013e3ece398",
+            "referenceVersion": "da0358f45535f09ef2f921b16665cc2f074e0347ca223a00075a7af7858ced0f"
+          }
+        }
+      ],
+      "excludedAssets": [
+        {
+          "assetId": "P02",
+          "source": "parser-reconciliation",
+          "reason": "旧无边界正则把 EPxx 文本误识别为 Pxx；该资产不在当前格对应的源分镜声明或重叠连续性证据中。"
+        }
+      ],
+      "referenceSlots": [
+        {
+          "id": "panel-slot-117ed2990ed8f2740d62a5fb",
+          "kind": "derived-composite",
+          "readiness": "pending-derived-artifact",
+          "coveredAssetIds": [
+            "C01",
+            "C02",
+            "C03a",
+            "C04a",
+            "P03",
+            "P10",
+            "S03",
+            "S08"
+          ],
+          "derivedAssetId": "derived-reference-112c011e6f59c4c6d179c893"
+        }
+      ],
+      "timelineReconciliations": [
+        {
+          "assetId": "P02",
+          "difference": "parser-artifact",
+          "resolution": "exclude-undeclared-parser-artifact",
+          "status": "resolved",
+          "evidenceIds": [
+            "storyboard-EP02_15s_032-01"
+          ],
+          "note": "资产未被当前格对应的源分镜声明且没有重叠连续性证据；按 P2 已知旧解析缺陷显式排除并保留裁决。"
+        }
+      ],
+      "detectedOverflow": true,
+      "overflowHandledByDerivedAssetId": "derived-reference-112c011e6f59c4c6d179c893",
+      "closureStatus": "resolved",
+      "generationReady": false,
+      "blockerCodes": [
+        "pending-derived-artifact"
+      ],
+      "issues": []
+    }
+  },
+  "derived": {
+    "total": 52,
+    "structuralDefinitions": 52,
+    "visualReady": 0
+  },
+  "diagnosticsSha256": "df1b96d64d9341828ebf72fa8d1c6730f8d28b64421c2001878011e30f3b2d9d",
+  "projectSnapshot": {
+    "skipped": false,
+    "configuredPrimaryRootMismatch": false
+  },
+  "stderrSha256": "bf0ab6e060d4bfe7c0dead48525c9096a87f8029ebfa70f733f8c7124c6a84c5",
+  "assertions": {
+    "sevenP2ToolsDiscoverable": true,
+    "capabilitiesExposeReadToolsAndCommands": true,
+    "exactAuditCountsAndFourClosureErrorsZero": true,
+    "listAndDetailShareFrozenResolutionIdentity": true,
+    "paginationAndFiltersWork": true,
+    "overflowPanelsAreNotSilentlyTruncated": true,
+    "derivedDefinitionsAreStructuralOnlyAndGenerationBlocked": true,
+    "doctorExposesClosureAndReadiness": true,
+    "projectSnapshotPolicyHonored": true,
+    "noBinaryOrSecretExposure": true,
+    "readOnlyCallsDidNotWriteFormalState": true
+  }
+}

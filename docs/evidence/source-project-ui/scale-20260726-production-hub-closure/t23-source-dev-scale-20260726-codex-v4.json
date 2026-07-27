@@ -1,0 +1,238 @@
+{
+  "schemaVersion": 1,
+  "kind": "t23-source-dev-scale-performance",
+  "status": "PASS",
+  "ok": true,
+  "createdAt": "2026-07-26T04:06:23.432Z",
+  "fixture": {
+    "kind": "deterministic-synthetic-mechanical-fixture",
+    "visualAcceptance": false,
+    "aiImageGeneration": false,
+    "isolatedTemporaryProject": true,
+    "unitCount": 36,
+    "passRawCount": 4,
+    "note": "所有图均为 sharp 生成的可解码纯色 PNG；PASS 仅表示测试账本闭环，不代表视觉质量。"
+  },
+  "consoleErrors": [],
+  "pageErrors": [],
+  "performance": {
+    "ok": true,
+    "status": "PASS",
+    "budget": {
+      "minUnitCount": 36,
+      "minPassRawCount": 4,
+      "minReferenceCount": 4,
+      "maxDevToolchainToCdpReadyMs": 30000,
+      "maxRendererFirstCardMs": 8000,
+      "maxRendererFirstRawMs": 20000,
+      "maxRendererAllPassReferencesMs": 30000,
+      "maxOutstandingProjectionIpc": 16
+    },
+    "measurements": {
+      "fixtureUnitCount": 36,
+      "passRawCount": 4,
+      "referenceCount": 4,
+      "devToolchainToCdpReadyMs": 2320,
+      "rendererFirstCardMs": 4330,
+      "rendererFirstRawMs": 19176,
+      "rendererAllPassReferencesMs": 27212,
+      "peakOutstandingProjectionIpc": 4
+    },
+    "checks": [
+      {
+        "id": "fixture-unit-count",
+        "status": "PASS",
+        "actual": 36,
+        "comparator": ">=",
+        "budget": 36
+      },
+      {
+        "id": "fixture-pass-raw-count",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": ">=",
+        "budget": 4
+      },
+      {
+        "id": "fixture-reference-count",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": ">=",
+        "budget": 4
+      },
+      {
+        "id": "dev-toolchain-to-cdp",
+        "status": "PASS",
+        "actual": 2320,
+        "comparator": "<=",
+        "budget": 30000
+      },
+      {
+        "id": "renderer-first-card",
+        "status": "PASS",
+        "actual": 4330,
+        "comparator": "<=",
+        "budget": 8000
+      },
+      {
+        "id": "renderer-first-raw",
+        "status": "PASS",
+        "actual": 19176,
+        "comparator": "<=",
+        "budget": 20000
+      },
+      {
+        "id": "renderer-all-pass-references",
+        "status": "PASS",
+        "actual": 27212,
+        "comparator": "<=",
+        "budget": 30000
+      },
+      {
+        "id": "peak-outstanding-projection-ipc",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": "<=",
+        "budget": 16
+      }
+    ]
+  },
+  "ui": {
+    "visibleUnitNodeCount": 1,
+    "projectMetricsText": "项目概览 2 资产 36 单元 72 宫格 4 媒体 2 文稿 4 通过 0 待审 32 进行中 0 失败 0 阻塞 投影于 04:07:55 构建身份 v0.2.0 · buildId:486f57b942ee · sourceDigest:b76d18b762bf 详细诊断",
+    "rawSnapshot": {
+      "loading": false,
+      "corePassUnitIds": [
+        "S1E01-U00",
+        "S1E01-U01",
+        "S1E01-U02",
+        "S1E01-U03"
+      ],
+      "referenceCount": 4,
+      "referenceUnitIds": [
+        "S1E01-U03",
+        "S1E01-U01",
+        "S1E01-U00",
+        "S1E01-U02"
+      ],
+      "raws": [
+        {
+          "unitId": "S1E01-U03",
+          "rawMediaSha256": "abc21f3e1613fa37f47744de8318e903197ae801b772ce86c3aad4d560b3a196",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/3fc97bed8c1fb8f050881a6b4fab185c2f2d1df138aac9e020171f50b92da9d2?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-7GG4uK%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-2845f785",
+          "verification": "deep-verified",
+          "provenance": "generated"
+        },
+        {
+          "unitId": "S1E01-U01",
+          "rawMediaSha256": "abc21f3e1613fa37f47744de8318e903197ae801b772ce86c3aad4d560b3a196",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/3fc97bed8c1fb8f050881a6b4fab185c2f2d1df138aac9e020171f50b92da9d2?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-7GG4uK%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-2845f785",
+          "verification": "deep-verified",
+          "provenance": "generated"
+        },
+        {
+          "unitId": "S1E01-U00",
+          "rawMediaSha256": "abc21f3e1613fa37f47744de8318e903197ae801b772ce86c3aad4d560b3a196",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/3fc97bed8c1fb8f050881a6b4fab185c2f2d1df138aac9e020171f50b92da9d2?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-7GG4uK%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-2845f785",
+          "verification": "deep-verified",
+          "provenance": "generated"
+        },
+        {
+          "unitId": "S1E01-U02",
+          "rawMediaSha256": "abc21f3e1613fa37f47744de8318e903197ae801b772ce86c3aad4d560b3a196",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/3fc97bed8c1fb8f050881a6b4fab185c2f2d1df138aac9e020171f50b92da9d2?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-7GG4uK%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-2845f785",
+          "verification": "deep-verified",
+          "provenance": "generated"
+        }
+      ],
+      "references": [
+        {
+          "unitId": "S1E01-U03",
+          "referenceId": "unit-grid-reference-4fe2618913890b32edf151798ac534f8",
+          "mediaSha256": "4fe2618913890b32edf151798ac534f87fe60e0e2f12c42b7c7984f55ea5a26b",
+          "referenceType": "character",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/0ccc3db6c63eaa682278604c078e3d0e0c843091e0b115a7b8e1ab40e0e87860?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-7GG4uK%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-2845f785"
+        },
+        {
+          "unitId": "S1E01-U01",
+          "referenceId": "unit-grid-reference-4fe2618913890b32edf151798ac534f8",
+          "mediaSha256": "4fe2618913890b32edf151798ac534f87fe60e0e2f12c42b7c7984f55ea5a26b",
+          "referenceType": "character",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/0ccc3db6c63eaa682278604c078e3d0e0c843091e0b115a7b8e1ab40e0e87860?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-7GG4uK%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-2845f785"
+        },
+        {
+          "unitId": "S1E01-U00",
+          "referenceId": "unit-grid-reference-4fe2618913890b32edf151798ac534f8",
+          "mediaSha256": "4fe2618913890b32edf151798ac534f87fe60e0e2f12c42b7c7984f55ea5a26b",
+          "referenceType": "character",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/0ccc3db6c63eaa682278604c078e3d0e0c843091e0b115a7b8e1ab40e0e87860?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-7GG4uK%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-2845f785"
+        },
+        {
+          "unitId": "S1E01-U02",
+          "referenceId": "unit-grid-reference-4fe2618913890b32edf151798ac534f8",
+          "mediaSha256": "4fe2618913890b32edf151798ac534f87fe60e0e2f12c42b7c7984f55ea5a26b",
+          "referenceType": "character",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/0ccc3db6c63eaa682278604c078e3d0e0c843091e0b115a7b8e1ab40e0e87860?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-7GG4uK%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-2845f785"
+        }
+      ]
+    },
+    "decodedRawThumbnailCount": 4,
+    "decodedReferenceThumbnailCount": 4
+  },
+  "ipcProbe": {
+    "enabled": true,
+    "totalCalls": 28,
+    "currentOutstanding": 0,
+    "peakOutstanding": 4,
+    "channels": [
+      {
+        "channel": "canvas:get-approved-timeline-projection",
+        "totalCalls": 2,
+        "currentOutstanding": 0,
+        "peakOutstanding": 2
+      },
+      {
+        "channel": "canvas:get-studio-frozen-pack",
+        "totalCalls": 4,
+        "currentOutstanding": 0,
+        "peakOutstanding": 4
+      },
+      {
+        "channel": "canvas:get-studio-generation-checkpoint-canvas-projection",
+        "totalCalls": 1,
+        "currentOutstanding": 0,
+        "peakOutstanding": 1
+      },
+      {
+        "channel": "canvas:get-studio-generation-review-control",
+        "totalCalls": 4,
+        "currentOutstanding": 0,
+        "peakOutstanding": 4
+      },
+      {
+        "channel": "canvas:get-studio-media",
+        "totalCalls": 5,
+        "currentOutstanding": 0,
+        "peakOutstanding": 4
+      },
+      {
+        "channel": "canvas:get-studio-post-result-observation-control",
+        "totalCalls": 4,
+        "currentOutstanding": 0,
+        "peakOutstanding": 4
+      },
+      {
+        "channel": "canvas:get-studio-production-dashboard",
+        "totalCalls": 4,
+        "currentOutstanding": 0,
+        "peakOutstanding": 3
+      },
+      {
+        "channel": "canvas:list-studio-generation-unit-grid-history",
+        "totalCalls": 4,
+        "currentOutstanding": 0,
+        "peakOutstanding": 4
+      }
+    ]
+  }
+}

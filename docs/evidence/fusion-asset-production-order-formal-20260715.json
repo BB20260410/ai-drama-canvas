@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "kind": "fusion-asset-production-order-formal-validation",
+  "createdAt": "2026-07-15T15:44:06.215Z",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "sourceContentAddress": "sha256:f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+  "firstBatch": [
+    "P01",
+    "S01",
+    "P30",
+    "S02",
+    "C07",
+    "P29"
+  ],
+  "productionOrder": {
+    "version": "hidden-mask-first-then-first-appearance-v1",
+    "totalAssets": 75,
+    "reservedAssets": 6,
+    "nextAssetId": "P11",
+    "nextBatchAssetIds": [
+      "P11",
+      "P07",
+      "S03",
+      "C04a",
+      "P03",
+      "S07"
+    ]
+  },
+  "gate": {
+    "canEnqueueNewAsset": false,
+    "currentBatchId": "fusion-asset-batch-001",
+    "currentBatchStatus": "generating",
+    "nextBatchRemainsBlocked": true
+  },
+  "guardedSidecarHashes": {
+    "generationJobs": "3fc7dd327fb0d4c51feefab39d568e89d3248f26925cb89732f9188b436919f7",
+    "publications": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+    "assetConsistency": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7",
+    "commandLedger": "0a0dc0bc96438bcd33515a615e3753a8e048b9abea7759a8da249047360ae679"
+  },
+  "mutationDetected": false
+}

@@ -1,0 +1,18 @@
+{
+  "kind": "absorb-slice-evidence",
+  "project": "Vue Flow",
+  "slices": ["VF-1", "VF-2"],
+  "date": "2026-07-18",
+  "pin": "17953c329db2d5dc5f5097370cbf5e1173bab520",
+  "changes": {
+    "dependency": "@vue-flow/minimap@^1.5.4",
+    "ui": "ManagedStudioCanvasView MiniMap + selection→workflow group",
+    "coreReuse": "studio-canvas-workflow-groups (LMD-1)",
+    "styles": "main.ts minimap css"
+  },
+  "verification": {
+    "typecheck": "pass",
+    "vitest": "14 passed (managed-studio-canvas-ui + workflow-groups + layout)",
+    "formalBusinessCountZero": true
+  }
+}

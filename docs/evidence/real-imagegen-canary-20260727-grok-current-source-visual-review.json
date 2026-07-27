@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "kind": "agent-imagegen-visual-review",
+  "scope": "synthetic-canary-contract",
+  "rawSha256": "5cd5b448374fb60f59d86fc2023702be0af2e6d439f649b6863b0a40829c84ae",
+  "packFingerprint": "bf8c8db781952f4c3d91a45c6190db1c30b9f8b1140cfd33befb9c3b77aa01b6",
+  "decision": "pass",
+  "reviewer": "Codex-independent-original-size-review",
+  "reviewedAt": "2026-07-27T05:15:15Z",
+  "note": "原尺寸 720x1280 独立审片通过，仅证明 Grok 当前源码隔离 canary 的提示词与回写合同；不提升为正式《嘟嘟》人物连续性或黄金面具唯一权威图视觉一致性通过。",
+  "criteria": [
+    {
+      "code": "forbidden-content",
+      "status": "pass",
+      "note": "单张竖图，无拼图、分屏、字幕、水印、界面文字、现代建筑或额外主体。"
+    },
+    {
+      "code": "image-quality",
+      "status": "pass",
+      "note": "720x1280 JPEG 可解码；主体、双手、面具与石墙清楚，无决定性肢体或结构崩坏。"
+    },
+    {
+      "code": "prompt-contract",
+      "status": "pass",
+      "note": "东方青年黑发束发、素麻古装，中景居中，在室内石室双手捧完整黄金面具，左侧火光，符合本次冻结提示词。"
+    },
+    {
+      "code": "prop-scene-consistency",
+      "status": "pass",
+      "note": "道具为完整对称金色全脸面具，非半面具或裂面具；背景为灰黑巨石室内且左侧有火光。此项仅按合成 canary 合同判断。"
+    }
+  ]
+}

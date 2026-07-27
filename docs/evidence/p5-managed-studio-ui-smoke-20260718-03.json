@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "kind": "p5-managed-studio-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-17T20:36:00.194Z",
+  "project": {
+    "id": "project-eab5931154e2",
+    "startupPolicy": "no-filesystem-scan",
+    "legacyRoots": []
+  },
+  "startup": {
+    "readyMs": 780,
+    "oldProjectGuardUnchanged": true,
+    "legacyIndexAndCacheUnchanged": true,
+    "externalRequests": 0,
+    "pageErrors": 0,
+    "studioMediaRequests": 4,
+    "studioMediaFailures": [],
+    "watcherSwitch": {
+      "legacyWatcherStarted": true,
+      "switchedToManaged": true,
+      "postSwitchRelevantMutationWaitMs": 1800,
+      "errors": [],
+      "legacySidecarCreated": false
+    }
+  },
+  "ui": {
+    "managedStudioVisible": true,
+    "legacyNavigationHidden": true,
+    "strictFifteenSecondTimelineVisible": true,
+    "panelCount": 2,
+    "assetWorkflow": [
+      "create",
+      "append-pending",
+      "approve",
+      "promote-authority"
+    ],
+    "applicabilityVisible": true,
+    "applicability": {
+      "episodes": [
+        "EP01"
+      ],
+      "units": [
+        "unit-ep01-001"
+      ],
+      "tags": [
+        "UI smoke",
+        "石室"
+      ]
+    },
+    "relationWorkflow": [
+      "append-reference-of",
+      "render-current-relation"
+    ],
+    "materialCounts": {
+      "media": 4,
+      "canonicalAssets": 4,
+      "characters": 1,
+      "scenes": 2,
+      "props": 1,
+      "assetVersions": 4,
+      "assetDefinitions": 4,
+      "primaryAuthorities": 4,
+      "authorityEvents": 4,
+      "versionReviews": 4,
+      "assetRelations": 1
+    },
+    "productionCounts": {
+      "textDocuments": 2,
+      "scriptDocuments": 1,
+      "promptDocuments": 1,
+      "textRevisions": 2,
+      "units": 1,
+      "unitRevisions": 1
+    },
+    "mediaDomCount": 2,
+    "decodedImageCount": 4
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p5-managed-studio-ui-smoke-20260718-03.png",
+    "sizeBytes": 412033,
+    "mtimeMs": 1784320559999.4585,
+    "sha256": "312810f097b39c27eb4ef067af4bb1f2105b1c49cf3794c22f4c7c2be7f4b23f",
+    "width": 3456,
+    "height": 2058,
+    "format": "png",
+    "stdev": 21.13738143115438
+  },
+  "boundaries": {
+    "formalImageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0,
+    "sourceWrites": 0
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "url": "file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/out/renderer/index.html",
+  "loading": false,
+  "visible": true,
+  "bounds": {
+    "x": 84,
+    "y": 33,
+    "width": 1560,
+    "height": 980
+  },
+  "rendererState": {
+    "readyState": "complete",
+    "title": "AI 漫剧画布",
+    "bodyText": "AI\n漫剧画布\n\n黄金面具 · 演示项目\n\n15 秒单元\n3\n待续做\n3\n首尾帧\n5 / 5\n视频\n0\n05:09 · 10ms\n项目\n扫描\n生产画布\n故事图谱\n生产设计\n分集剧本\n单元清单\n镜头时间线\n导演剪辑台\n资产库\n视频工作台\n导演验收\nCodex 接续\n生成队列\n任务中心\n项目设置\nCODEX 接续\n任务中心\n\n每个任务包都可在应用关闭后由本地 MCP 继续领取。\n\n刷新\n下一图片批次\n下一视频批次\n任务包\n1\n图片批次\n进行中\nEP01 · 2 个单元\n锁定同一集\n上限 6\n视觉验收后暂停\ndesktop-app\n租约至 07/13 05:24\nr2\n\ntask-2026-07-12T21-09-21-510Z-2daab3e6\n\nEP01 15s 003 完整金面初醒\n检查角色、道具、场景连续性并确认权威版本 · 4 份参考\nEP01 15s 002 阿依发现异光\n按连续性生成并保存尾帧 raw/labeled · 2 份参考\n07/13 05:09\n提交视觉验收\n释放\n文件\n审计时间线\n8\n任务领取\n07/13 05:09 · codex\ntask-2026-07-12T21-09-21-510Z-2daab3e6\nasset.voice-identity-upserted\n07/13 05:09 · user\nasset.relation-upserted\n07/13 05:09 · user\nmain-ep01-unit002\n任务创建\n07/13 05:09 · codex\ntask-2026-07-12T21-09-21-510Z-2daab3e6\neditor.operation.add_media_clip\n07/13 05:09 · user\neditor.project-saved\n07/13 05:09 · user\neditor.project-created\n07/13 05:09 · user\n项目扫描\n07/13 05:09 · scanner",
+    "bodyWidth": 1560,
+    "bodyHeight": 980,
+    "moduleButtons": [
+      "生产画布",
+      "故事图谱",
+      "生产设计",
+      "分集剧本",
+      "单元清单",
+      "镜头时间线",
+      "导演剪辑台",
+      "资产库",
+      "视频工作台",
+      "导演验收",
+      "Codex 接续",
+      "生成队列",
+      "任务中心",
+      "项目设置"
+    ]
+  },
+  "taskAutomation": {
+    "ok": true,
+    "message": "桌面端已领取 15 分钟任务租约"
+  }
+}

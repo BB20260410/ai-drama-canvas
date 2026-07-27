@@ -1,0 +1,50 @@
+{
+  "url": "file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/out/renderer/index.html",
+  "loading": false,
+  "visible": true,
+  "bounds": {
+    "x": 84,
+    "y": 33,
+    "width": 1560,
+    "height": 980
+  },
+  "rendererState": {
+    "readyState": "complete",
+    "title": "AI 漫剧画布",
+    "bodyText": "AI 漫剧画布\nP23P24-smoke-second\n\n受管项目 · 仅访问当前工程 · 原媒体安全存放\n\n1 剧本\n2 资产\n3 绑定\n4 生成\n5 审片\n无限画布\n驾驶舱\nAgent 连接\n帮助 / 备份\n唯一下一步\n\n导入第一份剧本：工程尚无剧本文档，无法建立可追溯文本修订与实体解析。\n\n继续\n项目\n\n添加素材和 15 秒分镜，然后点击开始\n\n项目概览\n0\n资产\n0\n单元\n0\n宫格\n0\n媒体\n0\n文稿\n开始\n请选择 15 秒分镜\n从左侧“添加”放入角色、场景、道具、文稿和分镜\n高级操作\n添加\n素材库\n连线\n帮助\n适配\n撤销\n重做\n隐藏连线\n视图\n诊断详情",
+    "bodyWidth": 1560,
+    "bodyHeight": 980,
+    "viewport": {
+      "width": 1560,
+      "height": 980,
+      "scrollWidth": 1560,
+      "scrollHeight": 980,
+      "canScrollX": false,
+      "canScrollY": false
+    },
+    "visibleRegions": {
+      ".adaptation-header": null,
+      ".adaptation-toolbar": null,
+      ".review-bar": null,
+      ".adaptation-grid": null,
+      ".facts-pane": null,
+      ".beats-pane": null,
+      ".plan-pane": null,
+      ".review-drawer": null
+    },
+    "moduleButtons": []
+  },
+  "p2324Probe": {
+    "ok": true,
+    "checks": {
+      "canvasMounted": true,
+      "undoDisabled": true,
+      "redoDisabled": true
+    },
+    "notes": {
+      "undo": true,
+      "redo": true,
+      "canvasMounted": true
+    }
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 2,
+  "kind": "managed-studio-scale-canvas-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-18T10:55:26.903Z",
+  "buildIdentity": {
+    "buildId": "bcd750881f4679f92f7caa34ceafaf06",
+    "sourceDigest": "8611e0f5a643974358b145cd9ba40eeb844337b8a9083c0c9e55d44933a69a98",
+    "fingerprint": "56c5959b8063ec8583d8b3cad5c14a2f0f796d6a2770ee7eba9321c6a6f41137"
+  },
+  "fixture": {
+    "fixtureMs": 9285,
+    "large": {
+      "projectId": "project-080f514f723b",
+      "units": 1288,
+      "panels": 4235,
+      "assets": 77,
+      "media": {
+        "existing": 77,
+        "seeded": 9923,
+        "verifiedCas": 9923,
+        "verifiedThumbnails": 1000,
+        "total": 10000
+      },
+      "startupPolicy": "no-filesystem-scan",
+      "sourceRoots": []
+    },
+    "small": {
+      "projectId": "project-1eefcadb4cba",
+      "units": 4,
+      "panels": 16,
+      "assets": 6
+    }
+  },
+  "startup": {
+    "readyMs": 3182,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "externalRequests": 0
+  },
+  "runtime": {
+    "kind": "workspace-electron",
+    "executable": "/Users/hxx/.nvm/versions/node/v22.22.2/bin/node",
+    "systemNodeRequired": false
+  },
+  "canvas": {
+    "logicalPageLimit": 36,
+    "assetPageLimit": 6,
+    "unitPageLimit": 36,
+    "panelExpansionLimit": 6,
+    "pipelineNodeLimit": 18,
+    "maximumDomNodes": 74,
+    "initialDom": 12,
+    "expandedDom": 12,
+    "pipelineDom": 18,
+    "expandedLogicalCounts": "当前 DOM：6 资产 · 36 单元 · 6 宫格 · 18 结果/审片 · 2 文稿 有图节点 6 缩放 122% 默认布局",
+    "unitPageReplaced": true,
+    "assetPageReplaced": true,
+    "viewportCullingEnabled": true,
+    "panelExpansionBound": 6
+  },
+  "mediaLibrary": {
+    "exactCount": 10000,
+    "firstPageDom": 36,
+    "scrolledDom": 36,
+    "secondPageDom": 36,
+    "keysetPageReplaced": true,
+    "previousPageRestored": true
+  },
+  "projectSwitch": {
+    "largeToSmall": true,
+    "smallToLarge": true,
+    "crossProjectLeak": false,
+    "smallMetrics": "6 资产 4 单元 16 宫格 6 媒体 2 文稿",
+    "restoredMetrics": "77 资产 1288 单元 4235 宫格 10000 媒体 2 文稿"
+  },
+  "screenshot": {
+    "relativePath": "docs/evidence/managed-studio-scale-canvas-ui-smoke-20260718-p13.png",
+    "sizeBytes": 198160,
+    "sha256": "48f219e9d0feea16a87b3f384e61f990a996bf6ba6610c25e0fb02a0498c914e",
+    "width": 1728,
+    "height": 1029,
+    "format": "png",
+    "stdev": 44.55126572892346
+  },
+  "boundaries": {
+    "filesystemScans": 0,
+    "formalStudioTouched": false,
+    "formalImageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0,
+    "gitStage": 0
+  }
+}

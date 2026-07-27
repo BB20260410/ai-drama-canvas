@@ -1,0 +1,21 @@
+{
+  "projectRoot": "/Users/hxx/Documents/无限画布/projects/grok-mvp-qingdeng-mrwc97mu-d0aea463",
+  "projectId": "project-c78607fac2a4",
+  "slug": "grok-mvp-qingdeng-mrwc97mu-d0aea463",
+  "name": "Grok最小受管生图闭环-青灯客",
+  "characterId": "character-qingdeng-ke",
+  "sceneId": "scene-rainy-inn-porch",
+  "sceneAuthoritySha256": "c9de966d40888818f3638809194b6143210c98b00719c3e3373998f5b3f998b4",
+  "characterHasAuthority": false,
+  "unitId": "S1E01-U01",
+  "unitRevision": 1,
+  "panelIds": [
+    "S1E01-U01-P1",
+    "S1E01-U01-P2",
+    "S1E01-U01-P3"
+  ],
+  "scriptRevisionId": "text-revision-d7f0e6c4fbf609f553d7e349868164358c7b85bd",
+  "next": "generate_character_reference_then_authority_then_bind_freeze",
+  "duduProtected": true,
+  "active": true
+}

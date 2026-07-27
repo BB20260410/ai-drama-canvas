@@ -1,0 +1,366 @@
+{
+  "schemaVersion": 1,
+  "kind": "p8-non-dudu-real-project-canary",
+  "status": "PASS",
+  "createdAt": "2026-07-27T04:30:11.849Z",
+  "sourceProject": {
+    "projectId": "project-c78607fac2a4",
+    "projectName": "Grok最小受管生图闭环-青灯客",
+    "sourceProjectRoot": "/Users/hxx/Documents/无限画布/projects/grok-mvp-qingdeng-mrwc97mu-d0aea463",
+    "isolatedCopy": true,
+    "sourceSentinelsBefore": [
+      {
+        "relativePath": ".aicanvas/managed-project.json",
+        "exists": true,
+        "bytes": 1413,
+        "mtimeMs": 1784740236203,
+        "sha256": "855a5f69c3cdc9a2f0593ba6b028584a9369b535ae81f3a72da2b2c922584c59"
+      },
+      {
+        "relativePath": ".aicanvas/project.json",
+        "exists": true,
+        "bytes": 824,
+        "mtimeMs": 1784740236036,
+        "sha256": "ed3ca6c297accc77cedfb1002ba31f7dfcc81996b643617af8cdcc5337930255"
+      },
+      {
+        "relativePath": ".aicanvas/studio-production.sqlite",
+        "exists": true,
+        "bytes": 536576,
+        "mtimeMs": 1785125758211,
+        "sha256": "79486b7117d8fa6c350ee91667f52144586750b835dace87d57eb7e8010812a1"
+      },
+      {
+        "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+        "exists": true,
+        "bytes": 1400832,
+        "mtimeMs": 1785125757662,
+        "sha256": "a3e9d2ffdfd6f16f07f73bb89de3e029e490203bce6bc6553e8e4bde9a28a79b"
+      },
+      {
+        "relativePath": ".aicanvas/material-studio.sqlite",
+        "exists": true,
+        "bytes": 274432,
+        "mtimeMs": 1785125758418,
+        "sha256": "18201844e66bb5bcceb64294da16ecea769fd847e5889f4ea1178e856e17bade"
+      },
+      {
+        "relativePath": ".aicanvas/studio-canvas-layout.json",
+        "exists": true,
+        "bytes": 1337,
+        "mtimeMs": 1784763814789,
+        "sha256": "c3e56d6ac82b8c1105a0a46ae43996bd8659364ca616e75114143b5dcdd5e5c6"
+      }
+    ],
+    "sourceSentinelsAfter": [
+      {
+        "relativePath": ".aicanvas/managed-project.json",
+        "exists": true,
+        "bytes": 1413,
+        "mtimeMs": 1784740236203,
+        "sha256": "855a5f69c3cdc9a2f0593ba6b028584a9369b535ae81f3a72da2b2c922584c59"
+      },
+      {
+        "relativePath": ".aicanvas/project.json",
+        "exists": true,
+        "bytes": 824,
+        "mtimeMs": 1784740236036,
+        "sha256": "ed3ca6c297accc77cedfb1002ba31f7dfcc81996b643617af8cdcc5337930255"
+      },
+      {
+        "relativePath": ".aicanvas/studio-production.sqlite",
+        "exists": true,
+        "bytes": 536576,
+        "mtimeMs": 1785125758211,
+        "sha256": "79486b7117d8fa6c350ee91667f52144586750b835dace87d57eb7e8010812a1"
+      },
+      {
+        "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+        "exists": true,
+        "bytes": 1400832,
+        "mtimeMs": 1785125757662,
+        "sha256": "a3e9d2ffdfd6f16f07f73bb89de3e029e490203bce6bc6553e8e4bde9a28a79b"
+      },
+      {
+        "relativePath": ".aicanvas/material-studio.sqlite",
+        "exists": true,
+        "bytes": 274432,
+        "mtimeMs": 1785125758418,
+        "sha256": "18201844e66bb5bcceb64294da16ecea769fd847e5889f4ea1178e856e17bade"
+      },
+      {
+        "relativePath": ".aicanvas/studio-canvas-layout.json",
+        "exists": true,
+        "bytes": 1337,
+        "mtimeMs": 1784763814789,
+        "sha256": "c3e56d6ac82b8c1105a0a46ae43996bd8659364ca616e75114143b5dcdd5e5c6"
+      }
+    ],
+    "sourceProjectMutated": false
+  },
+  "realOwners": {
+    "scriptRevisionId": "text-revision-d7f0e6c4fbf609f553d7e349868164358c7b85bd",
+    "scriptSha256": "b404e86056bf9e5cb356cebe9daf489886cc53e571ecca79d329602e7330e2e8",
+    "assets": {
+      "canonicalAssets": 3,
+      "primaryAuthorities": 3
+    },
+    "unit": {
+      "id": "S1E01-U01",
+      "revision": 2,
+      "title": "青灯客·雨夜廊下",
+      "panelCount": 3,
+      "durationSeconds": 15,
+      "fingerprint": "0793bb3617d4cc1e4af5415ee159cfa664a56b91f32cd77b40eaf2600bf6a0da"
+    },
+    "generation": {
+      "provider": "codex",
+      "reviewMode": "isolated-deterministic-core-canary",
+      "sourceReview": {
+        "reviewId": "studio-generation-review-87929ec06aac8d09ea17d87545274ef6c5e9b3b0",
+        "current": false,
+        "approvedRawEligible": false,
+        "currentStaleReasons": [
+          "labeled-promotion-ineligible",
+          "labeled:input-drift: unit-grid 冻结输入已漂移，必须重新冻结。",
+          "raw-promotion-ineligible",
+          "raw:input-drift: unit-grid 冻结输入已漂移，必须重新冻结。"
+        ]
+      },
+      "reviewId": "studio-generation-review-3d5b8377e4fff9f880f51c70e4ffbcc8ab5c773f",
+      "reviewFingerprint": "3d5b8377e4fff9f880f51c70e4ffbcc8ab5c773f695a48ae028032337eb736e4",
+      "packId": "studio-generation-freeze-8f487fe4cdd2b3f25086f3a7883e5df0",
+      "packFingerprint": "8f487fe4cdd2b3f25086f3a7883e5df0c8bde5e0b9595737d2eccd9a666e0876",
+      "rawSha256": "df70d5a88a7cedba4ed506c6990a1f78bf89ce018f24ed879c86d02aa6aa0206",
+      "labeledSha256": "35559ebea3505bdd6443a7d8d9f08c2c67523d11162a5b416d5f00fa077d2ec2",
+      "countsBefore": {
+        "dispatches": 5,
+        "callIntents": 5,
+        "callEvents": 5,
+        "results": 4,
+        "reviews": 2
+      },
+      "countsAfterBuild": {
+        "dispatches": 6,
+        "callIntents": 6,
+        "callEvents": 6,
+        "results": 6,
+        "reviews": 3
+      },
+      "providerInvocationCount": 0,
+      "deterministicLocalResultCount": 1
+    }
+  },
+  "fourTrack": {
+    "availability": {
+      "script": "available",
+      "storyboard": "available",
+      "video": "available",
+      "audio": "available"
+    },
+    "gaps": [],
+    "videoBinding": {
+      "schemaVersion": 1,
+      "kind": "studio-multimedia-timeline-binding",
+      "recordId": "timeline-binding-911859084471b801e3a7874147556bc7952d29cb",
+      "operationId": "p8-real-non-dudu-video-attach-v1",
+      "unitId": "S1E01-U01",
+      "unitRevision": 2,
+      "unitFingerprint": "0793bb3617d4cc1e4af5415ee159cfa664a56b91f32cd77b40eaf2600bf6a0da",
+      "slotId": "p8-video-main",
+      "revision": 1,
+      "startSeconds": 0,
+      "endSeconds": 3,
+      "role": "video",
+      "mediaSha256": "2532e4f17ccc3e62e4418ea0892d6248111c87e7d9615cf8ce0356c5a284f6a9",
+      "mediaKind": "video",
+      "note": "P8 非嘟嘟真实项目隔离 canary：H.264/AAC。",
+      "fingerprint": "911859084471b801e3a7874147556bc7952d29cba531954714c8aa189947f7a2",
+      "createdAt": "2026-07-27T04:29:17.917Z"
+    },
+    "audioBinding": {
+      "schemaVersion": 1,
+      "kind": "studio-multimedia-timeline-binding",
+      "recordId": "timeline-binding-f74ca157678ad839743c846a1535b79dbc5e4a58",
+      "operationId": "p8-real-non-dudu-audio-attach-v1",
+      "unitId": "S1E01-U01",
+      "unitRevision": 2,
+      "unitFingerprint": "0793bb3617d4cc1e4af5415ee159cfa664a56b91f32cd77b40eaf2600bf6a0da",
+      "slotId": "p8-dialogue-main",
+      "revision": 1,
+      "startSeconds": 0,
+      "endSeconds": 3,
+      "role": "dialogue",
+      "mediaSha256": "2d852934160889d14d710953972c1da587f4e1b380ad37cd93cbc002e9268d78",
+      "mediaKind": "audio",
+      "note": "P8 非嘟嘟真实项目隔离 canary：PCM 对白轨。",
+      "fingerprint": "f74ca157678ad839743c846a1535b79dbc5e4a58328e04e5189366d056adc736",
+      "createdAt": "2026-07-27T04:29:17.990Z"
+    },
+    "videoMedia": {
+      "sha256": "2532e4f17ccc3e62e4418ea0892d6248111c87e7d9615cf8ce0356c5a284f6a9",
+      "mimeType": "video/mp4",
+      "sizeBytes": 296146,
+      "derivatives": [
+        {
+          "recipeKey": "fdcadadb8b9cd29131f535a10c3668b59d9cdae06463aa713a5896e29cd8c40a",
+          "mediaSha256": "2532e4f17ccc3e62e4418ea0892d6248111c87e7d9615cf8ce0356c5a284f6a9",
+          "kind": "video_poster",
+          "status": "ready",
+          "recipe": "studio-video-poster:v1:first-frame:max-1280x720:webp-q82",
+          "outputSha256": "59d415a414d21aa705bd876c144919401d8c843339a4b39b24e7c1fd43cba043",
+          "sizeBytes": 11434,
+          "mimeType": "image/webp",
+          "relativePath": ".aicanvas/derived/thumb/fdcadadb8b9cd29131f535a10c3668b59d9cdae06463aa713a5896e29cd8c40a.webp",
+          "createdAt": "2026-07-27T04:29:17.647Z",
+          "updatedAt": "2026-07-27T04:29:17.647Z"
+        },
+        {
+          "recipeKey": "3af837038283bac5f410cae802953136963e1cde1a37aeb6050f817932e0f238",
+          "mediaSha256": "2532e4f17ccc3e62e4418ea0892d6248111c87e7d9615cf8ce0356c5a284f6a9",
+          "kind": "video_proxy",
+          "status": "ready",
+          "recipe": "studio-video-proxy:v1:max-1280x720:h264-crf28-aac128k-faststart",
+          "outputSha256": "7e6ed1129830b9b19cd61189b982e5bd642c7476a801896681084b743482aa55",
+          "sizeBytes": 179587,
+          "mimeType": "video/mp4",
+          "relativePath": ".aicanvas/derived/proxy/3af837038283bac5f410cae802953136963e1cde1a37aeb6050f817932e0f238.mp4",
+          "createdAt": "2026-07-27T04:29:17.647Z",
+          "updatedAt": "2026-07-27T04:29:17.647Z"
+        }
+      ]
+    },
+    "audioMedia": {
+      "sha256": "2d852934160889d14d710953972c1da587f4e1b380ad37cd93cbc002e9268d78",
+      "mimeType": "audio/wav",
+      "sizeBytes": 288078,
+      "derivatives": [
+        {
+          "recipeKey": "2dfb429ce346e3148b89ae73d21a668309d246092d15f595c1b1f1b692c207ce",
+          "mediaSha256": "2d852934160889d14d710953972c1da587f4e1b380ad37cd93cbc002e9268d78",
+          "kind": "audio_waveform",
+          "status": "ready",
+          "recipe": "studio-audio-waveform:v1:1200x160:mono:webp-q82",
+          "outputSha256": "6fdc50900df82bfcbd426ee5f23324b8ad5690da6c9a5a41119ac4fa16edd0b6",
+          "sizeBytes": 3494,
+          "mimeType": "image/webp",
+          "relativePath": ".aicanvas/derived/waveform/2dfb429ce346e3148b89ae73d21a668309d246092d15f595c1b1f1b692c207ce.webp",
+          "createdAt": "2026-07-27T04:29:12.639Z",
+          "updatedAt": "2026-07-27T04:29:12.639Z"
+        }
+      ]
+    }
+  },
+  "videoPackage": {
+    "adapterKind": "managed-evidence-v1",
+    "sourceFingerprint": "586c7bf44529b62df7a6e28e8fab318ae7d89069870ac86fdbaff654f28d09d0",
+    "intentId": "studio-video-package-intent-3daf6c1539bec93de950e294e17a46c167b07348",
+    "receipt": {
+      "schemaVersion": 3,
+      "kind": "studio-video-package-verify-receipt",
+      "receiptId": "studio-video-package-receipt-5a86de536575b0d3539161b3c6e92600875091af",
+      "intentId": "studio-video-package-intent-3daf6c1539bec93de950e294e17a46c167b07348",
+      "storageKind": "managed-evidence",
+      "storageRelativePath": ".aicanvas/studio-video-package-evidence/studio-video-package-intent-3daf6c1539bec93de950e294e17a46c167b07348/S1E01-U01",
+      "manifestRelativePath": ".aicanvas/studio-video-package-evidence/studio-video-package-intent-3daf6c1539bec93de950e294e17a46c167b07348/S1E01-U01/manifest.json",
+      "manifestSha256": "83f543bbb76335add3db3cc5a2790717f27c621b2db3092325a5a50a3044f440",
+      "manifestFingerprint": "1d4f945568d782af6090f9f7b49fc1b62e04d9de81037cb6f4dedb7ad8d343b5",
+      "files": [
+        {
+          "path": "S1E01-U01-G1_raw.png",
+          "sha256": "8533a03aa5539b6f0bc71ac36e70d3ed8f3ef32622ee96868444cda219b4bc11"
+        },
+        {
+          "path": "S1E01-U01-G1_labeled.png",
+          "sha256": "9160f7661bb9597cc9773552ecac85ee9832fe0fba91d5469d5edacc7d440d4d"
+        },
+        {
+          "path": "S1E01-U01-G1_video.md",
+          "sha256": "896683c3340dbbb61fec46dddf878f8683ee1cb33edc6bbe968e2b33b89a2567"
+        },
+        {
+          "path": "S1E01-U01-G2_raw.png",
+          "sha256": "8533a03aa5539b6f0bc71ac36e70d3ed8f3ef32622ee96868444cda219b4bc11"
+        },
+        {
+          "path": "S1E01-U01-G2_labeled.png",
+          "sha256": "9c3bacea02d751eb69cb0f6c6a8a4aacf3b970a5e2e5c91ea9c2cb97374bc4cf"
+        },
+        {
+          "path": "S1E01-U01-G2_video.md",
+          "sha256": "202e779bb41b5667d9e7cf8117a099116c22d540150ff97c8fff2ed65e4955a0"
+        },
+        {
+          "path": "S1E01-U01-G3_raw.png",
+          "sha256": "8533a03aa5539b6f0bc71ac36e70d3ed8f3ef32622ee96868444cda219b4bc11"
+        },
+        {
+          "path": "S1E01-U01-G3_labeled.png",
+          "sha256": "3c55b55b9acd95dfde52fc3ca8c8bc3e526fe4cdac7fe2cb57488dff17835339"
+        },
+        {
+          "path": "S1E01-U01-G3_video.md",
+          "sha256": "ed5c65e729437836c0a0d57fdd13a71079c89a24abaf9b9ffec516896db1d391"
+        },
+        {
+          "path": "S1E01-U01_labeled.png",
+          "sha256": "35559ebea3505bdd6443a7d8d9f08c2c67523d11162a5b416d5f00fa077d2ec2"
+        },
+        {
+          "path": "S1E01-U01_video.json",
+          "sha256": "708e64cef6a833956fc769684be70ecdb69dcb0682b2ee379d20d7419f94fdd2"
+        }
+      ],
+      "specSchemaVersion": "2.0",
+      "packageStatus": "PASS",
+      "i2vReadiness": "STORYBOARD_CROP_ANCHOR_FOLLOWUP_ONLY",
+      "mechanicalStatus": "verified",
+      "i2vStaticStatus": "needs-independent-frame-or-review",
+      "dynamicModelStatus": "not-run",
+      "verifiedAt": "2026-07-27T04:30:07.144Z",
+      "sequence": 1,
+      "fingerprint": "1a5d5fc1abaa40935b1b4e13290e6e975153d50d0bf6b2331566eb66a93affb3"
+    }
+  },
+  "packagedDesktop": {
+    "executablePath": "/tmp/ai-canvas-p9-closure-final.7SOrBo/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+    "availabilityText": "剧本 可用\n图片 可用\n视频 可用\n音频 可用",
+    "videoPlayback": {
+      "readyState": 4,
+      "networkState": 1,
+      "durationSeconds": 3,
+      "startSeconds": 0,
+      "endSeconds": 0.682386,
+      "advanced": true,
+      "paused": true,
+      "errorCode": null,
+      "sourceProtocol": "aicanvas-studio:"
+    },
+    "audioPlayback": {
+      "readyState": 4,
+      "networkState": 1,
+      "durationSeconds": 3,
+      "startSeconds": 0,
+      "endSeconds": 0.852754,
+      "advanced": true,
+      "paused": true,
+      "errorCode": null,
+      "sourceProtocol": "aicanvas-studio:"
+    },
+    "pageErrors": [],
+    "consoleErrors": [],
+    "externalRequests": [],
+    "screenshot": {
+      "path": "output/playwright/p8-non-dudu-real-project-canary-final-20260727.png",
+      "sha256": "976e4da7e8caf0bb428cfde3348c2ce1f8bba361d1e0b74ede832b9f8b59cd38",
+      "sizeBytes": 136566,
+      "width": 1728,
+      "height": 1029,
+      "maxChannelStandardDeviation": 22.006237487987892
+    }
+  },
+  "externalUploadCount": 0,
+  "imageGenerationCount": 0,
+  "paidActionCount": 0,
+  "publishedCount": 0
+}

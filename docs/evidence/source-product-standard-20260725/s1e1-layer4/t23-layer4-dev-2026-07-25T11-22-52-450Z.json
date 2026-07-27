@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "kind": "t23-layer4-project-ui-verify",
+  "createdAt": "2026-07-25T11:23:54.414Z",
+  "ok": false,
+  "mode": "dev",
+  "project": {
+    "id": "project-17b0cef36e44",
+    "name": "《嘟嘟》S1E1 隔离受管工程",
+    "root": "/Users/hxx/Documents/无限画布/projects/dudu-s1e1-a84aa353"
+  },
+  "expectations": {
+    "expectUnits": 33
+  },
+  "timings": {
+    "totalMs": 61964,
+    "firstUnitNodeSoftBudgetMs": 1500
+  },
+  "assertions": [
+    {
+      "id": "a-startup-managed-canvas",
+      "title": "应用启动后直达受管工程画布（非首启/默认页）",
+      "status": "FAIL",
+      "detail": "locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"material-studio-view\"]') to be visible\u001b[22m\n",
+      "durationMs": 60001
+    },
+    {
+      "id": "x-infrastructure",
+      "title": "基础设施/旅程执行",
+      "status": "FAIL",
+      "detail": "启动断言失败，后续 UI 断言无意义，提前终止旅程。；dev 日志尾：y/dudu-s1e1-a84aa353\n    at assertRealDirectoryWithoutSymlink (file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/out/main/index.js:31977:37)\n    at async inspectManagedProjectShell (file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/out/main/index.js:32314:25)\n    at async inspectManagedProject (file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/out/main/index.js:32416:18)\n    at async file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/out/main/index.js:73326:20\n    at async Session.<anonymous> (node:electron/js2c/browser_init:2:114924)\n"
+    },
+    {
+      "id": "d-console-clean",
+      "title": "页面 console error=0（良性名单可配置）且 pageerror=0",
+      "status": "FAIL",
+      "detail": "pageerror 1 条：Error invoking remote method 'canvas:get-managed-project-shell': Error: 受管项目根目录的真实路径与输入不一致，禁止通过符号链接或路径别名访问：/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/t23-layer4-project-ui-kqmJBb/project-copy/dudu-s1e1-a84aa353"
+    },
+    {
+      "id": "h-readonly-guard",
+      "title": "只读护栏：工程哨兵文件哈希全程不变",
+      "status": "PASS",
+      "detail": "比对 .aicanvas/studio-canvas-layout.json、.aicanvas/studio-production.sqlite、.aicanvas/managed-project.json 哈希一致"
+    }
+  ],
+  "media": {
+    "studioRequests": 0,
+    "failures": []
+  },
+  "console": {
+    "rawErrors": [],
+    "ignoredErrors": [],
+    "effectiveErrors": [],
+    "pageErrors": [
+      "Error invoking remote method 'canvas:get-managed-project-shell': Error: 受管项目根目录的真实路径与输入不一致，禁止通过符号链接或路径别名访问：/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/t23-layer4-project-ui-kqmJBb/project-copy/dudu-s1e1-a84aa353"
+    ]
+  },
+  "network": {
+    "externalRequests": []
+  },
+  "warnings": [],
+  "boundaries": {
+    "readonlyJourney": true,
+    "writeButtonClicks": 0,
+    "executeCommandWrites": 0,
+    "viewportMoves": 0,
+    "isolatedUserData": true,
+    "isolatedRegistryCopy": true,
+    "isolatedProjectCopy": true,
+    "isolatedManagedProjectsRoot": true,
+    "isolatedMediaRuntime": true,
+    "isolatedRuntimeCleaned": true,
+    "formalProjectWrites": 0,
+    "buildPerformedByScript": false,
+    "gitActions": 0
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-13T17:51:27.513Z",
+  "success": true,
+  "command": "npm run media:runtime-smoke -- <evidence-path>",
+  "environment": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "v22.22.2",
+    "ffmpeg": "ffmpeg",
+    "ffprobe": "ffprobe",
+    "isolatedRuntime": true
+  },
+  "scheduling": {
+    "capacity": 4,
+    "peakActiveWeight": 4,
+    "peakActive": [
+      {
+        "tool": "ffmpeg",
+        "stage": "smoke-render",
+        "weight": 3,
+        "ownerAlive": true
+      },
+      {
+        "tool": "ffprobe",
+        "stage": "smoke-probe",
+        "weight": 1,
+        "ownerAlive": true
+      }
+    ],
+    "peakQueued": [
+      {
+        "tool": "ffmpeg",
+        "stage": "smoke-foreground",
+        "weight": 2,
+        "ownerAlive": true
+      }
+    ],
+    "final": {
+      "activeWeight": 0,
+      "queueDepth": 0,
+      "metrics": {
+        "granted": 6,
+        "succeeded": 6,
+        "failed": 0,
+        "cancelled": 0,
+        "timedOut": 0,
+        "acquisitionTimeouts": 0,
+        "orphanedLeasesReaped": 0,
+        "orphanedQueueEntriesReaped": 0,
+        "maxObservedWeight": 4,
+        "totalWaitMs": 1562
+      }
+    }
+  },
+  "results": {
+    "seed": {
+      "status": "succeeded",
+      "code": 0,
+      "waitMs": 11,
+      "durationMs": 29,
+      "leaseId": "media-3b791944-1327-451b-8cd6-af6b5e43439a"
+    },
+    "render": {
+      "status": "succeeded",
+      "code": 0,
+      "waitMs": 6,
+      "durationMs": 1486,
+      "leaseId": "media-3a9c1699-dc82-44d5-84a9-e74aee1f30e6"
+    },
+    "probe": {
+      "status": "succeeded",
+      "code": 0,
+      "waitMs": 5,
+      "durationMs": 550,
+      "leaseId": "media-d4c7c5f5-0808-4fe6-899a-b927e33c53b0"
+    },
+    "foreground": {
+      "status": "succeeded",
+      "code": 0,
+      "waitMs": 1481,
+      "durationMs": 25,
+      "leaseId": "media-d1664f45-b713-41be-b808-7b0db4a07bad"
+    },
+    "renderValidation": {
+      "status": "succeeded",
+      "code": 0,
+      "waitMs": 5,
+      "durationMs": 17,
+      "leaseId": "media-6a43ae4d-f3d6-4a5c-8cd8-b2b2cc2826f0"
+    },
+    "foregroundValidation": {
+      "status": "succeeded",
+      "code": 0,
+      "waitMs": 60,
+      "durationMs": 17,
+      "leaseId": "media-31fd1ba2-08eb-46be-875e-6e71a8bc8b40"
+    }
+  },
+  "validation": {
+    "render": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 640,
+          "height": 360
+        }
+      ],
+      "format": {
+        "duration": "2.000000"
+      }
+    },
+    "foreground": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 640,
+          "height": 360
+        }
+      ],
+      "format": {
+        "duration": "1.000000"
+      }
+    }
+  },
+  "files": [
+    {
+      "name": "seed.mp4",
+      "size": 418636,
+      "sha256": "0c668bee2e6f48a8b96a0f0cdd668d303d89401edc8b16ca2d22b7fde6adf17a"
+    },
+    {
+      "name": "render.mp4",
+      "size": 404771,
+      "sha256": "b07e7b28661a026e627fb6a2f689b4a3b8299d34003a2ef90f80ccdad91fc41c"
+    },
+    {
+      "name": "foreground.mp4",
+      "size": 211328,
+      "sha256": "1424ce5844e205dbfe747e8a1d5c303bb50fa86100df8e4672270f572794d207"
+    }
+  ]
+}

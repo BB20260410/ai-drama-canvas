@@ -1,0 +1,24 @@
+{
+  "kind": "p4-new-product-boundary-decision",
+  "decision": "out-of-scope-for-this-goal-written-close",
+  "items": [
+    {
+      "name": "NLE 多轨时间线",
+      "status": "另开 Goal",
+      "reason": "主轴 15s 单元×宫格"
+    },
+    {
+      "name": "视频成片主链",
+      "status": "另开 Goal",
+      "reason": "与 image formal 环分离"
+    },
+    {
+      "name": "Grok live 第二主供应",
+      "status": "协议保留+书面降级",
+      "reason": "Codex 主供应"
+    }
+  ],
+  "doesNotBlockGoalClose": true,
+  "pass": true,
+  "createdAt": "2026-07-25T09:27:29.154Z"
+}

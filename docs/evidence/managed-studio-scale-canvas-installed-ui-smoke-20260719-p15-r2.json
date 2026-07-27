@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 2,
+  "kind": "managed-studio-scale-canvas-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-19T02:48:04.189Z",
+  "buildIdentity": {
+    "version": "0.2.0",
+    "buildId": "08c6a495b4801f1b47966f17c502f53c",
+    "sourceDigest": "4a80aea02f97ced7820a759951a6a8974455309f61362ad23c321c185a7e1b4a",
+    "fingerprint": "8dc7c02f135e9bb192ce3b1d6978c20ea4720a0fcc750819d1bb3a4e95843680",
+    "releaseManifestFingerprint": "6108e64632462df903465fb623dcfd02f4ed20aa87c11bd3df70fd8463635b4b",
+    "source": "installed-app-resources-release-manifest"
+  },
+  "fixture": {
+    "fixtureMs": 10221,
+    "large": {
+      "projectId": "project-d8ba12bdae1e",
+      "units": 1288,
+      "panels": 4235,
+      "assets": 77,
+      "media": {
+        "existing": 77,
+        "seeded": 9923,
+        "verifiedCas": 10000,
+        "verifiedThumbnails": 1000,
+        "total": 10000
+      },
+      "startupPolicy": "no-filesystem-scan",
+      "sourceRoots": []
+    },
+    "small": {
+      "projectId": "project-0471480d5deb",
+      "units": 4,
+      "panels": 16,
+      "assets": 6
+    }
+  },
+  "startup": {
+    "readyMs": 2981,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "externalRequests": 0
+  },
+  "runtime": {
+    "kind": "installed-application",
+    "executable": "/Applications/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+    "systemNodeRequired": false
+  },
+  "canvas": {
+    "logicalPageLimit": 36,
+    "assetPageLimit": 6,
+    "unitPageLimit": 36,
+    "panelExpansionLimit": 6,
+    "pipelineNodeLimit": 18,
+    "maximumDomNodes": 74,
+    "initialDom": 16,
+    "expandedDom": 8,
+    "pipelineDom": 0,
+    "expandedLogicalCounts": "当前 DOM：6 资产 · 36 单元 · 6 宫格 · 18 结果/审片 · 2 文稿 有图节点 6 缩放 129% 默认布局",
+    "unitPageReplaced": true,
+    "assetPageReplaced": true,
+    "viewportCullingEnabled": true,
+    "panelExpansionBound": 6
+  },
+  "mediaLibrary": {
+    "exactCount": 10000,
+    "firstPageDom": 36,
+    "scrolledDom": 36,
+    "secondPageDom": 36,
+    "keysetPageReplaced": true,
+    "previousPageRestored": true
+  },
+  "projectSwitch": {
+    "largeToSmall": true,
+    "smallToLarge": true,
+    "crossProjectLeak": false,
+    "smallMetrics": "项目概览 6 资产 4 单元 16 宫格 6 媒体 2 文稿",
+    "restoredMetrics": "项目概览 77 资产 1288 单元 4235 宫格 10000 媒体 2 文稿"
+  },
+  "screenshot": {
+    "relativePath": "docs/evidence/managed-studio-scale-canvas-installed-ui-smoke-20260719-p15-r2.png",
+    "sizeBytes": 435692,
+    "sha256": "8f66725f6abdbd2e144da69f623970a7553ab5a72662a856632e4e14c3901602",
+    "width": 1728,
+    "height": 1029,
+    "format": "png",
+    "stdev": 36.30339263824862
+  },
+  "boundaries": {
+    "filesystemScans": 0,
+    "formalStudioTouched": false,
+    "formalImageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0,
+    "gitStage": 0
+  }
+}

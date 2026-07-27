@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "p9r2-p10r2-current-head-after-jf1-targeted",
+  "status": "pass",
+  "startedAt": "2026-07-18T07:52:49.086Z",
+  "endedAt": "2026-07-18T07:53:53.796Z",
+  "durationMs": 64756,
+  "argv": [
+    "npx",
+    "vitest",
+    "run",
+    "tests/build-identity.test.ts",
+    "tests/mcp-build-currentness-gate.test.ts",
+    "tests/project-backup.test.ts",
+    "tests/studio-continuity-pagination.test.ts",
+    "tests/studio-production-dashboard.test.ts",
+    "tests/studio-production-dashboard-ui.test.ts",
+    "tests/studio-production-dashboard-scale.test.ts",
+    "tests/studio-production-dashboard-desktop-integration.test.ts",
+    "tests/mcp-studio-production-dashboard.test.ts",
+    "tests/managed-studio-canvas-ui.test.ts",
+    "tests/studio-canvas-layout.test.ts",
+    "tests/studio-canvas-layout-store.test.ts",
+    "tests/studio-canvas-locator.test.ts",
+    "tests/studio-canvas-pipeline-graph.test.ts",
+    "tests/studio-canvas-workflow-runner.test.ts",
+    "tests/real-imagegen-canary-v2.test.ts",
+    "tests/legacy-real-imagegen-canary-disabled.test.ts",
+    "tests/mcp-managed-studio.test.ts",
+    "tests/studio-scale-fixture.test.ts",
+    "tests/studio-reliability.test.ts",
+    "tests/material-studio.test.ts",
+    "tests/material-studio-identity.test.ts",
+    "tests/material-studio-pagination.test.ts",
+    "tests/studio-canvas-workflow-groups.test.ts",
+    "tests/studio-panel-preparation-checklist.test.ts"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "feebaf32e0df7abe6f97d40992a15c64",
+      "sourceDigest": "fd8936cc3cf76d3bb50e0d18af751eeb1e6cbe8b551b7c23f5d06307d5a25700"
+    },
+    "after": {
+      "buildId": "feebaf32e0df7abe6f97d40992a15c64",
+      "sourceDigest": "fd8936cc3cf76d3bb50e0d18af751eeb1e6cbe8b551b7c23f5d06307d5a25700"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/runs/p9r2-p10r2-targeted-tests-20260718-after-jf1.log",
+    "sizeBytes": 2761,
+    "sha256": "81d6cf0fcf2da629acf90d857f45a10245ed46b9e894ce2a072b5d2e6813cfaa"
+  },
+  "testCounts": {
+    "files": 25,
+    "tests": 82
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "kind": "s1e1-formal-raw-sentinel",
+  "project": "/Users/hxx/Documents/无限画布/projects/dudu-s1e1-a84aa353",
+  "unitCount": 33,
+  "summary": {
+    "pass": 33,
+    "pendingReview": 0,
+    "inProgress": 0,
+    "failed": 0,
+    "blocked": 0
+  },
+  "sampleRawSha256": [
+    "6b99dc21cf04ca050ca9eedb861625114aef910ca5194887b30831855df74c52",
+    "178a32de255724a0a1350bd1f46e265c1ef2ff3b9306214f78cc2ccefcc944af",
+    "f530c72f82fb4cf67cc099bc327df4f24ef822974535aa39bc44b90e96a4f47b",
+    "952123207d8884c2009654018b0c0b83dfb320af86cd0ddf6ed0e4499275c0f0",
+    "7ec20a23e0e04ca3b64005ccf8d4b735ed8dacb991013833ea40b2f168aa63a1"
+  ],
+  "note": "只读投影；本波未写入 dudu；以 unitCount=33 + pass=33 + raw SHA 样本为哨兵",
+  "pass": true,
+  "createdAt": "2026-07-25T08:57:37.323Z"
+}

@@ -1,0 +1,719 @@
+{
+  "schemaVersion": 1,
+  "kind": "p5-canonical-mcp-smoke",
+  "startedAt": "2026-07-17T18:16:43.128Z",
+  "completedAt": "2026-07-17T18:17:01.587Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "assertions": {
+    "sourceAndCompiledToolCount168": true,
+    "canonicalCatalogCurrent": true,
+    "canonicalAssets77": true,
+    "explicitCategoryCounts": {
+      "character": 24,
+      "scene": 20,
+      "prop": 33
+    },
+    "paginationAndSearchPassed": true,
+    "explicitAliasSearchPassed": true,
+    "p01ModelProjectionContainsOnlyCurrentPrimary": true,
+    "p01CurrentForbiddenAuthorityRedactedCount1": true,
+    "p01GenerationPolicyAllSafetyFieldsTrue": true,
+    "p01ForbiddenHistoricalSourceSnapshotShaMediaAndLocksAbsent": true,
+    "p01GoldenMaskPathExcludedFromGenerationProjection": true,
+    "downstreamReferencesOnlyCurrentPrimaryVersion": true,
+    "legacyDeprecatedCanonicalCompatibility": true,
+    "noBase64OrLargeMediaPayload": true,
+    "formalProjectUnchanged": true
+  },
+  "formalProjectGuard": {
+    "policy": "全树文件内容 SHA + 路径语义 + dev/ino/mode/mtime/ctime 身份守卫；无正式工程日志例外",
+    "allowedProjectMutations": [],
+    "before": {
+      "tree": {
+        "files": 11119,
+        "directories": 4266,
+        "symlinks": 0,
+        "bytes": 876129673,
+        "semanticSha256": "2ee24f2535d08840796cbd3b9a6323f8f8ffc32b446e8c7fead218325173fef4",
+        "identitySha256": "dd108e9870cb6bc7e12261c0d2de9936be2a10754d79abb96f93b0a6324a33a4"
+      },
+      "canonicalStore": {
+        "bytes": 747627,
+        "rawSha256": "8d34846f134a13a220f02f87f69ae6351a413598c60f6940969e7a182ee4fb46",
+        "semanticSha256": "717edd65bfe215f026e83041d0d43821af46f8c7289d93d7a837308126ff1170",
+        "revision": 3,
+        "storeFingerprint": "8f1057fe11a53594cda2032d14808a730664705ad2b5b9c2e3dcdc5d7ac45964",
+        "counts": {
+          "assets": 77,
+          "aliases": 194,
+          "versions": 21,
+          "authorities": 21,
+          "relations": 0
+        }
+      }
+    },
+    "afterSource": {
+      "tree": {
+        "files": 11119,
+        "directories": 4266,
+        "symlinks": 0,
+        "bytes": 876129673,
+        "semanticSha256": "2ee24f2535d08840796cbd3b9a6323f8f8ffc32b446e8c7fead218325173fef4",
+        "identitySha256": "dd108e9870cb6bc7e12261c0d2de9936be2a10754d79abb96f93b0a6324a33a4"
+      },
+      "canonicalStore": {
+        "bytes": 747627,
+        "rawSha256": "8d34846f134a13a220f02f87f69ae6351a413598c60f6940969e7a182ee4fb46",
+        "semanticSha256": "717edd65bfe215f026e83041d0d43821af46f8c7289d93d7a837308126ff1170",
+        "revision": 3,
+        "storeFingerprint": "8f1057fe11a53594cda2032d14808a730664705ad2b5b9c2e3dcdc5d7ac45964",
+        "counts": {
+          "assets": 77,
+          "aliases": 194,
+          "versions": 21,
+          "authorities": 21,
+          "relations": 0
+        }
+      }
+    },
+    "afterCompiled": {
+      "tree": {
+        "files": 11119,
+        "directories": 4266,
+        "symlinks": 0,
+        "bytes": 876129673,
+        "semanticSha256": "2ee24f2535d08840796cbd3b9a6323f8f8ffc32b446e8c7fead218325173fef4",
+        "identitySha256": "dd108e9870cb6bc7e12261c0d2de9936be2a10754d79abb96f93b0a6324a33a4"
+      },
+      "canonicalStore": {
+        "bytes": 747627,
+        "rawSha256": "8d34846f134a13a220f02f87f69ae6351a413598c60f6940969e7a182ee4fb46",
+        "semanticSha256": "717edd65bfe215f026e83041d0d43821af46f8c7289d93d7a837308126ff1170",
+        "revision": 3,
+        "storeFingerprint": "8f1057fe11a53594cda2032d14808a730664705ad2b5b9c2e3dcdc5d7ac45964",
+        "counts": {
+          "assets": 77,
+          "aliases": 194,
+          "versions": 21,
+          "authorities": 21,
+          "relations": 0
+        }
+      }
+    },
+    "sourceUnchanged": true,
+    "compiledUnchanged": true
+  },
+  "runs": [
+    {
+      "mode": "source",
+      "process": {
+        "executable": "/Users/hxx/.nvm/versions/node/v22.22.2/bin/node",
+        "server": "src/mcp/server.ts via tsx",
+        "runtimeIsolation": "temporary HOME/TMPDIR/registry/media-runtime removed after close"
+      },
+      "toolCount": 168,
+      "toolCatalogBytes": 287518,
+      "schemas": {
+        "canonicalReadTools": true,
+        "legacyReadTool": true,
+        "projectRootRequired": true,
+        "listDefaults": {
+          "offset": 0,
+          "limit": 30,
+          "maximumLimit": 100
+        }
+      },
+      "catalog": {
+        "available": true,
+        "current": true,
+        "storeRevision": 3,
+        "storeFingerprint": "8f1057fe11a53594cda2032d14808a730664705ad2b5b9c2e3dcdc5d7ac45964",
+        "counts": {
+          "assets": 77,
+          "aliases": 194,
+          "definitionVersions": 77,
+          "contractVersions": 77,
+          "versions": 21,
+          "authorities": 21,
+          "relations": 0,
+          "media": 39,
+          "assetsWithVersions": 20,
+          "assetsWithoutVersions": 57,
+          "primaryAuthorities": 20,
+          "supportingAuthorities": 1,
+          "byCategory": {
+            "character": 24,
+            "scene": 20,
+            "prop": 33
+          }
+        },
+        "driftedInputs": []
+      },
+      "paginationAndSearch": {
+        "pageSizes": [
+          13,
+          13,
+          7
+        ],
+        "pageOffsets": [
+          0,
+          13,
+          70
+        ],
+        "adjacentPagesDisjoint": true,
+        "crossPageOrderStable": true,
+        "categoryCounts": {
+          "character": 24,
+          "scene": 20,
+          "prop": 33
+        },
+        "categoryCoverage": 77,
+        "categoryIdsUnique": 77,
+        "searches": {
+          "P01": [
+            "P01"
+          ],
+          "布囊": [
+            "P01"
+          ],
+          "半璧": [
+            "P03"
+          ],
+          "旧铜鱼挂坠": [
+            "P04"
+          ]
+        }
+      },
+      "p01": {
+        "assetId": "P01",
+        "category": "prop",
+        "primary": {
+          "authorityId": "asset-authority-P01-74f50610a9c15b822c4ee3cedb92fb20",
+          "role": "production-hard-lock",
+          "exposure": "allowed",
+          "usage": "generation-reference",
+          "versionId": "asset-version-P01-a6585f981d3566a0cae0fcf1a009026d",
+          "representation": "production-output"
+        },
+        "modelSafeProjection": {
+          "returnedAuthorityCount": 1,
+          "returnedVersionCount": 1,
+          "returnedSupportingAuthorityCount": 0,
+          "generationPolicy": {
+            "authorityOverridesDefinition": true,
+            "currentAuthorityOnly": true,
+            "forbiddenAndHistoricalOmitted": true,
+            "mediaMayBeUsedOnlyWhenReturnedByThisProjection": true
+          },
+          "redactions": {
+            "currentForbiddenAuthorityCount": 1,
+            "historicalAuthorityCount": 0,
+            "currentForbiddenVersionCount": 1,
+            "historicalVersionCount": 0,
+            "omittedVersionCount": 1,
+            "historicalDefinitionVersionCount": 0,
+            "historicalContractVersionCount": 0,
+            "omittedAssetLockCount": 4,
+            "policy": "当前允许生成权威以外的媒体、来源、SHA、锁规则与历史关系均不返回；完整历史仅供本地人工复核界面查看。"
+          },
+          "forbiddenAndHistoricalAuthorityIdsAbsent": true,
+          "forbiddenAndHistoricalVersionIdsAbsent": true,
+          "forbiddenAndHistoricalSourceSnapshotShaMediaValuesAbsent": true,
+          "forbiddenAndHistoricalLockRowsAbsent": true
+        },
+        "pathAudit": {
+          "redactedPathCount": 2,
+          "redactedPathDigests": [
+            "a0f204e084395db8021d0b1e408f6aeab060829f14e47429134ddb3b93c1c38f",
+            "df5605da34da159fc97d6224d8f421655bb18c28ac9f918241cebed8d43a6d5e"
+          ],
+          "redactedPathHasGoldenMaskMarker": true,
+          "canonicalPrimaryProjectionPathCount": 2,
+          "canonicalPrimaryProjectionPathDigests": [
+            "6258a71e72f850cfeef72b1a0f7725d2f48003f8250d5286903e97ffe918f09e",
+            "d8c880e12e781c2d3e3f2c819bc987bf1eea130c3e25c4923d948b544472bab4"
+          ],
+          "ep01PanelResolutionTotal": 146,
+          "ep01PanelPages": 3,
+          "p01PanelOccurrences": 16,
+          "downstreamProjectionPathCount": 1,
+          "downstreamProjectionPathDigests": [
+            "6258a71e72f850cfeef72b1a0f7725d2f48003f8250d5286903e97ffe918f09e"
+          ],
+          "downstreamReferenceVersions": [
+            "asset-version-P01-a6585f981d3566a0cae0fcf1a009026d"
+          ],
+          "forbiddenAndHistoricalPathsExcludedFromModelAndGenerationProjection": true,
+          "goldenMaskPathsExcludedFromGenerationProjection": true
+        }
+      },
+      "legacyCompatibility": {
+        "deprecated": true,
+        "compatibilitySource": "canonical-assets",
+        "total": 1,
+        "assetId": "P01",
+        "fullLegacyDetailFieldsAbsent": true,
+        "forbiddenAndHistoricalPathsAbsent": true
+      },
+      "payloadSafety": {
+        "calls": [
+          {
+            "callKey": "catalog-state",
+            "tool": "get_canonical_asset_catalog_state",
+            "bytes": 774,
+            "parsedSha256": "eb402ee2ecf3a0ed2b1e42d1a228de5f42e6d4f6ab6165f0eee6e0e684a093d1"
+          },
+          {
+            "callKey": "canonical-page-0",
+            "tool": "list_canonical_assets",
+            "bytes": 28007,
+            "parsedSha256": "11fdd094301ae530208db337f94103ea8c90a57e913741e0b95bcbc51da86c26"
+          },
+          {
+            "callKey": "canonical-page-13",
+            "tool": "list_canonical_assets",
+            "bytes": 32434,
+            "parsedSha256": "9be25db80ba5f092da7d3a446dbbbd1e859b601293e40ae905b725130892b45b"
+          },
+          {
+            "callKey": "canonical-page-70",
+            "tool": "list_canonical_assets",
+            "bytes": 15509,
+            "parsedSha256": "56750f97c3eee72d9809ef629a1f871e422cf267176e13d9d36cd74e42ffd107"
+          },
+          {
+            "callKey": "category-character",
+            "tool": "list_canonical_assets",
+            "bytes": 54986,
+            "parsedSha256": "a2fc81c6d30634ae0f1c3e70baca34de6f22de09ea2dbb0f0246587ff7fd10d6"
+          },
+          {
+            "callKey": "category-scene",
+            "tool": "list_canonical_assets",
+            "bytes": 46498,
+            "parsedSha256": "f76a41902a71e80ade2c9168e95a9102739516b6623443e5d9af9ea47910db44"
+          },
+          {
+            "callKey": "category-prop",
+            "tool": "list_canonical_assets",
+            "bytes": 71429,
+            "parsedSha256": "c73e021e1452ecfd41cadcb86e4275b9d99e6614a23c25ef3068f2a3d9be4125"
+          },
+          {
+            "callKey": "search-P01",
+            "tool": "list_canonical_assets",
+            "bytes": 2644,
+            "parsedSha256": "bedf0ea0906b44939aeef4bb1b44a6401fc9879e4c7f591394bd928146fbf7a1"
+          },
+          {
+            "callKey": "search-布囊",
+            "tool": "list_canonical_assets",
+            "bytes": 2644,
+            "parsedSha256": "b5c09cc2b7b6703e18e054c6e37fa71ccb2903f66a38655ccd473fec44b50607"
+          },
+          {
+            "callKey": "search-alias-P03",
+            "tool": "list_canonical_assets",
+            "bytes": 3935,
+            "parsedSha256": "932752021e1452eeb5d4c87bcd0aa2f76f094af7489e077f8488d330dd79effe"
+          },
+          {
+            "callKey": "search-alias-P04",
+            "tool": "list_canonical_assets",
+            "bytes": 3493,
+            "parsedSha256": "9a464ec6f07b4fe97e9b2d5d75386b058f0925e530b0cdcb6a9aa7c84f11ffc5"
+          },
+          {
+            "callKey": "detail-P01",
+            "tool": "get_canonical_asset",
+            "bytes": 13520,
+            "parsedSha256": "176370a0bad712bf6157f8f353badabb9fc0597f0eb0fe0231d6019ec8e9db2a"
+          },
+          {
+            "callKey": "legacy-P01",
+            "tool": "list_fusion_production_assets",
+            "bytes": 1242,
+            "parsedSha256": "134b094871d0a890545684dac76c48ba5bf676a8e1b96bbea3394de76045e83e"
+          },
+          {
+            "callKey": "panel-reference-ep01-0",
+            "tool": "list_fusion_panel_reference_resolutions",
+            "bytes": 315531,
+            "parsedSha256": "6fdc0b7a80f2115b414462522e3f235bd497a74c5fd2f861630ca32d5ecf24f6"
+          },
+          {
+            "callKey": "panel-reference-ep01-50",
+            "tool": "list_fusion_panel_reference_resolutions",
+            "bytes": 404961,
+            "parsedSha256": "57752e7f973d11a44db7240faa2e07647333a8a866e445dc06659a866a86a64b"
+          },
+          {
+            "callKey": "panel-reference-ep01-100",
+            "tool": "list_fusion_panel_reference_resolutions",
+            "bytes": 348723,
+            "parsedSha256": "ae66c5eeab56ab4a2c6f9a289d7284999d68fcd97a532fc3d8a8b087d59a8c0a"
+          }
+        ],
+        "callCount": 16,
+        "totalBytes": 1346330,
+        "largestResponseBytes": 404961,
+        "largestResponseCall": "panel-reference-ep01-50",
+        "maxStringBytes": 1552,
+        "responseLimitBytes": 1500000,
+        "stringLimitBytes": 262144,
+        "nonTextContentBlocks": 0,
+        "binaryValues": 0,
+        "embeddedMediaFields": 0,
+        "base64Payloads": 0
+      },
+      "responseFingerprints": {
+        "catalog-state": "eb402ee2ecf3a0ed2b1e42d1a228de5f42e6d4f6ab6165f0eee6e0e684a093d1",
+        "canonical-page-0": "11fdd094301ae530208db337f94103ea8c90a57e913741e0b95bcbc51da86c26",
+        "canonical-page-13": "9be25db80ba5f092da7d3a446dbbbd1e859b601293e40ae905b725130892b45b",
+        "canonical-page-70": "56750f97c3eee72d9809ef629a1f871e422cf267176e13d9d36cd74e42ffd107",
+        "category-character": "a2fc81c6d30634ae0f1c3e70baca34de6f22de09ea2dbb0f0246587ff7fd10d6",
+        "category-scene": "f76a41902a71e80ade2c9168e95a9102739516b6623443e5d9af9ea47910db44",
+        "category-prop": "c73e021e1452ecfd41cadcb86e4275b9d99e6614a23c25ef3068f2a3d9be4125",
+        "search-P01": "bedf0ea0906b44939aeef4bb1b44a6401fc9879e4c7f591394bd928146fbf7a1",
+        "search-布囊": "b5c09cc2b7b6703e18e054c6e37fa71ccb2903f66a38655ccd473fec44b50607",
+        "search-alias-P03": "932752021e1452eeb5d4c87bcd0aa2f76f094af7489e077f8488d330dd79effe",
+        "search-alias-P04": "9a464ec6f07b4fe97e9b2d5d75386b058f0925e530b0cdcb6a9aa7c84f11ffc5",
+        "detail-P01": "176370a0bad712bf6157f8f353badabb9fc0597f0eb0fe0231d6019ec8e9db2a",
+        "legacy-P01": "134b094871d0a890545684dac76c48ba5bf676a8e1b96bbea3394de76045e83e",
+        "panel-reference-ep01-0": "6fdc0b7a80f2115b414462522e3f235bd497a74c5fd2f861630ca32d5ecf24f6",
+        "panel-reference-ep01-50": "57752e7f973d11a44db7240faa2e07647333a8a866e445dc06659a866a86a64b",
+        "panel-reference-ep01-100": "ae66c5eeab56ab4a2c6f9a289d7284999d68fcd97a532fc3d8a8b087d59a8c0a"
+      },
+      "parityFingerprint": "047f39b71cb54650723ec482b8affac4b74117df5493f08466211db9150aa963",
+      "serverStderr": {
+        "bytes": 169,
+        "retainedTailOnly": true,
+        "tail": [
+          "(node:94457) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)"
+        ]
+      },
+      "readOnlyToolsInvoked": [
+        "get_canonical_asset_catalog_state",
+        "list_canonical_assets",
+        "get_canonical_asset",
+        "list_fusion_production_assets",
+        "list_fusion_panel_reference_resolutions"
+      ],
+      "writeToolsInvoked": [],
+      "vendorBrowserOrGenerationInvoked": false,
+      "passed": true
+    },
+    {
+      "mode": "compiled",
+      "process": {
+        "executable": "/Users/hxx/.nvm/versions/node/v22.22.2/bin/node",
+        "server": "dist-mcp/mcp/server.js",
+        "runtimeIsolation": "temporary HOME/TMPDIR/registry/media-runtime removed after close"
+      },
+      "toolCount": 168,
+      "toolCatalogBytes": 287518,
+      "schemas": {
+        "canonicalReadTools": true,
+        "legacyReadTool": true,
+        "projectRootRequired": true,
+        "listDefaults": {
+          "offset": 0,
+          "limit": 30,
+          "maximumLimit": 100
+        }
+      },
+      "catalog": {
+        "available": true,
+        "current": true,
+        "storeRevision": 3,
+        "storeFingerprint": "8f1057fe11a53594cda2032d14808a730664705ad2b5b9c2e3dcdc5d7ac45964",
+        "counts": {
+          "assets": 77,
+          "aliases": 194,
+          "definitionVersions": 77,
+          "contractVersions": 77,
+          "versions": 21,
+          "authorities": 21,
+          "relations": 0,
+          "media": 39,
+          "assetsWithVersions": 20,
+          "assetsWithoutVersions": 57,
+          "primaryAuthorities": 20,
+          "supportingAuthorities": 1,
+          "byCategory": {
+            "character": 24,
+            "scene": 20,
+            "prop": 33
+          }
+        },
+        "driftedInputs": []
+      },
+      "paginationAndSearch": {
+        "pageSizes": [
+          13,
+          13,
+          7
+        ],
+        "pageOffsets": [
+          0,
+          13,
+          70
+        ],
+        "adjacentPagesDisjoint": true,
+        "crossPageOrderStable": true,
+        "categoryCounts": {
+          "character": 24,
+          "scene": 20,
+          "prop": 33
+        },
+        "categoryCoverage": 77,
+        "categoryIdsUnique": 77,
+        "searches": {
+          "P01": [
+            "P01"
+          ],
+          "布囊": [
+            "P01"
+          ],
+          "半璧": [
+            "P03"
+          ],
+          "旧铜鱼挂坠": [
+            "P04"
+          ]
+        }
+      },
+      "p01": {
+        "assetId": "P01",
+        "category": "prop",
+        "primary": {
+          "authorityId": "asset-authority-P01-74f50610a9c15b822c4ee3cedb92fb20",
+          "role": "production-hard-lock",
+          "exposure": "allowed",
+          "usage": "generation-reference",
+          "versionId": "asset-version-P01-a6585f981d3566a0cae0fcf1a009026d",
+          "representation": "production-output"
+        },
+        "modelSafeProjection": {
+          "returnedAuthorityCount": 1,
+          "returnedVersionCount": 1,
+          "returnedSupportingAuthorityCount": 0,
+          "generationPolicy": {
+            "authorityOverridesDefinition": true,
+            "currentAuthorityOnly": true,
+            "forbiddenAndHistoricalOmitted": true,
+            "mediaMayBeUsedOnlyWhenReturnedByThisProjection": true
+          },
+          "redactions": {
+            "currentForbiddenAuthorityCount": 1,
+            "historicalAuthorityCount": 0,
+            "currentForbiddenVersionCount": 1,
+            "historicalVersionCount": 0,
+            "omittedVersionCount": 1,
+            "historicalDefinitionVersionCount": 0,
+            "historicalContractVersionCount": 0,
+            "omittedAssetLockCount": 4,
+            "policy": "当前允许生成权威以外的媒体、来源、SHA、锁规则与历史关系均不返回；完整历史仅供本地人工复核界面查看。"
+          },
+          "forbiddenAndHistoricalAuthorityIdsAbsent": true,
+          "forbiddenAndHistoricalVersionIdsAbsent": true,
+          "forbiddenAndHistoricalSourceSnapshotShaMediaValuesAbsent": true,
+          "forbiddenAndHistoricalLockRowsAbsent": true
+        },
+        "pathAudit": {
+          "redactedPathCount": 2,
+          "redactedPathDigests": [
+            "a0f204e084395db8021d0b1e408f6aeab060829f14e47429134ddb3b93c1c38f",
+            "df5605da34da159fc97d6224d8f421655bb18c28ac9f918241cebed8d43a6d5e"
+          ],
+          "redactedPathHasGoldenMaskMarker": true,
+          "canonicalPrimaryProjectionPathCount": 2,
+          "canonicalPrimaryProjectionPathDigests": [
+            "6258a71e72f850cfeef72b1a0f7725d2f48003f8250d5286903e97ffe918f09e",
+            "d8c880e12e781c2d3e3f2c819bc987bf1eea130c3e25c4923d948b544472bab4"
+          ],
+          "ep01PanelResolutionTotal": 146,
+          "ep01PanelPages": 3,
+          "p01PanelOccurrences": 16,
+          "downstreamProjectionPathCount": 1,
+          "downstreamProjectionPathDigests": [
+            "6258a71e72f850cfeef72b1a0f7725d2f48003f8250d5286903e97ffe918f09e"
+          ],
+          "downstreamReferenceVersions": [
+            "asset-version-P01-a6585f981d3566a0cae0fcf1a009026d"
+          ],
+          "forbiddenAndHistoricalPathsExcludedFromModelAndGenerationProjection": true,
+          "goldenMaskPathsExcludedFromGenerationProjection": true
+        }
+      },
+      "legacyCompatibility": {
+        "deprecated": true,
+        "compatibilitySource": "canonical-assets",
+        "total": 1,
+        "assetId": "P01",
+        "fullLegacyDetailFieldsAbsent": true,
+        "forbiddenAndHistoricalPathsAbsent": true
+      },
+      "payloadSafety": {
+        "calls": [
+          {
+            "callKey": "catalog-state",
+            "tool": "get_canonical_asset_catalog_state",
+            "bytes": 774,
+            "parsedSha256": "eb402ee2ecf3a0ed2b1e42d1a228de5f42e6d4f6ab6165f0eee6e0e684a093d1"
+          },
+          {
+            "callKey": "canonical-page-0",
+            "tool": "list_canonical_assets",
+            "bytes": 28007,
+            "parsedSha256": "11fdd094301ae530208db337f94103ea8c90a57e913741e0b95bcbc51da86c26"
+          },
+          {
+            "callKey": "canonical-page-13",
+            "tool": "list_canonical_assets",
+            "bytes": 32434,
+            "parsedSha256": "9be25db80ba5f092da7d3a446dbbbd1e859b601293e40ae905b725130892b45b"
+          },
+          {
+            "callKey": "canonical-page-70",
+            "tool": "list_canonical_assets",
+            "bytes": 15509,
+            "parsedSha256": "56750f97c3eee72d9809ef629a1f871e422cf267176e13d9d36cd74e42ffd107"
+          },
+          {
+            "callKey": "category-character",
+            "tool": "list_canonical_assets",
+            "bytes": 54986,
+            "parsedSha256": "a2fc81c6d30634ae0f1c3e70baca34de6f22de09ea2dbb0f0246587ff7fd10d6"
+          },
+          {
+            "callKey": "category-scene",
+            "tool": "list_canonical_assets",
+            "bytes": 46498,
+            "parsedSha256": "f76a41902a71e80ade2c9168e95a9102739516b6623443e5d9af9ea47910db44"
+          },
+          {
+            "callKey": "category-prop",
+            "tool": "list_canonical_assets",
+            "bytes": 71429,
+            "parsedSha256": "c73e021e1452ecfd41cadcb86e4275b9d99e6614a23c25ef3068f2a3d9be4125"
+          },
+          {
+            "callKey": "search-P01",
+            "tool": "list_canonical_assets",
+            "bytes": 2644,
+            "parsedSha256": "bedf0ea0906b44939aeef4bb1b44a6401fc9879e4c7f591394bd928146fbf7a1"
+          },
+          {
+            "callKey": "search-布囊",
+            "tool": "list_canonical_assets",
+            "bytes": 2644,
+            "parsedSha256": "b5c09cc2b7b6703e18e054c6e37fa71ccb2903f66a38655ccd473fec44b50607"
+          },
+          {
+            "callKey": "search-alias-P03",
+            "tool": "list_canonical_assets",
+            "bytes": 3935,
+            "parsedSha256": "932752021e1452eeb5d4c87bcd0aa2f76f094af7489e077f8488d330dd79effe"
+          },
+          {
+            "callKey": "search-alias-P04",
+            "tool": "list_canonical_assets",
+            "bytes": 3493,
+            "parsedSha256": "9a464ec6f07b4fe97e9b2d5d75386b058f0925e530b0cdcb6a9aa7c84f11ffc5"
+          },
+          {
+            "callKey": "detail-P01",
+            "tool": "get_canonical_asset",
+            "bytes": 13520,
+            "parsedSha256": "176370a0bad712bf6157f8f353badabb9fc0597f0eb0fe0231d6019ec8e9db2a"
+          },
+          {
+            "callKey": "legacy-P01",
+            "tool": "list_fusion_production_assets",
+            "bytes": 1242,
+            "parsedSha256": "134b094871d0a890545684dac76c48ba5bf676a8e1b96bbea3394de76045e83e"
+          },
+          {
+            "callKey": "panel-reference-ep01-0",
+            "tool": "list_fusion_panel_reference_resolutions",
+            "bytes": 315531,
+            "parsedSha256": "6fdc0b7a80f2115b414462522e3f235bd497a74c5fd2f861630ca32d5ecf24f6"
+          },
+          {
+            "callKey": "panel-reference-ep01-50",
+            "tool": "list_fusion_panel_reference_resolutions",
+            "bytes": 404961,
+            "parsedSha256": "57752e7f973d11a44db7240faa2e07647333a8a866e445dc06659a866a86a64b"
+          },
+          {
+            "callKey": "panel-reference-ep01-100",
+            "tool": "list_fusion_panel_reference_resolutions",
+            "bytes": 348723,
+            "parsedSha256": "ae66c5eeab56ab4a2c6f9a289d7284999d68fcd97a532fc3d8a8b087d59a8c0a"
+          }
+        ],
+        "callCount": 16,
+        "totalBytes": 1346330,
+        "largestResponseBytes": 404961,
+        "largestResponseCall": "panel-reference-ep01-50",
+        "maxStringBytes": 1552,
+        "responseLimitBytes": 1500000,
+        "stringLimitBytes": 262144,
+        "nonTextContentBlocks": 0,
+        "binaryValues": 0,
+        "embeddedMediaFields": 0,
+        "base64Payloads": 0
+      },
+      "responseFingerprints": {
+        "catalog-state": "eb402ee2ecf3a0ed2b1e42d1a228de5f42e6d4f6ab6165f0eee6e0e684a093d1",
+        "canonical-page-0": "11fdd094301ae530208db337f94103ea8c90a57e913741e0b95bcbc51da86c26",
+        "canonical-page-13": "9be25db80ba5f092da7d3a446dbbbd1e859b601293e40ae905b725130892b45b",
+        "canonical-page-70": "56750f97c3eee72d9809ef629a1f871e422cf267176e13d9d36cd74e42ffd107",
+        "category-character": "a2fc81c6d30634ae0f1c3e70baca34de6f22de09ea2dbb0f0246587ff7fd10d6",
+        "category-scene": "f76a41902a71e80ade2c9168e95a9102739516b6623443e5d9af9ea47910db44",
+        "category-prop": "c73e021e1452ecfd41cadcb86e4275b9d99e6614a23c25ef3068f2a3d9be4125",
+        "search-P01": "bedf0ea0906b44939aeef4bb1b44a6401fc9879e4c7f591394bd928146fbf7a1",
+        "search-布囊": "b5c09cc2b7b6703e18e054c6e37fa71ccb2903f66a38655ccd473fec44b50607",
+        "search-alias-P03": "932752021e1452eeb5d4c87bcd0aa2f76f094af7489e077f8488d330dd79effe",
+        "search-alias-P04": "9a464ec6f07b4fe97e9b2d5d75386b058f0925e530b0cdcb6a9aa7c84f11ffc5",
+        "detail-P01": "176370a0bad712bf6157f8f353badabb9fc0597f0eb0fe0231d6019ec8e9db2a",
+        "legacy-P01": "134b094871d0a890545684dac76c48ba5bf676a8e1b96bbea3394de76045e83e",
+        "panel-reference-ep01-0": "6fdc0b7a80f2115b414462522e3f235bd497a74c5fd2f861630ca32d5ecf24f6",
+        "panel-reference-ep01-50": "57752e7f973d11a44db7240faa2e07647333a8a866e445dc06659a866a86a64b",
+        "panel-reference-ep01-100": "ae66c5eeab56ab4a2c6f9a289d7284999d68fcd97a532fc3d8a8b087d59a8c0a"
+      },
+      "parityFingerprint": "047f39b71cb54650723ec482b8affac4b74117df5493f08466211db9150aa963",
+      "serverStderr": {
+        "bytes": 169,
+        "retainedTailOnly": true,
+        "tail": [
+          "(node:94977) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)"
+        ]
+      },
+      "readOnlyToolsInvoked": [
+        "get_canonical_asset_catalog_state",
+        "list_canonical_assets",
+        "get_canonical_asset",
+        "list_fusion_production_assets",
+        "list_fusion_panel_reference_resolutions"
+      ],
+      "writeToolsInvoked": [],
+      "vendorBrowserOrGenerationInvoked": false,
+      "passed": true
+    }
+  ],
+  "parity": {
+    "sourceFingerprint": "047f39b71cb54650723ec482b8affac4b74117df5493f08466211db9150aa963",
+    "compiledFingerprint": "047f39b71cb54650723ec482b8affac4b74117df5493f08466211db9150aa963",
+    "responseFingerprintsEqual": true,
+    "passed": true
+  },
+  "writeToolsInvoked": [],
+  "vendorBrowserOrGenerationInvoked": false,
+  "p5CompletionClaimed": false,
+  "passed": true
+}

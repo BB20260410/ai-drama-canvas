@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "kind": "p28-independent-audit-final-validation",
+  "status": "PASS",
+  "createdAt": "2026-07-21T11:13:14Z",
+  "conclusion": "P19–P27 current behavior independently revalidated; all P28 P0/P1 and core-impact P2 findings closed.",
+  "buildIdentity": {
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "sourceDigest": "1a18d0d2870d554ffebb3394fdb5892771bfd86e5bc834d71051aea2faef2fc2",
+    "sourceFiles": 513,
+    "sourceBytes": 11313695,
+    "buildId": "0c435c94d1631c1142d76f7d906922b8",
+    "buildIdentityFingerprint": "1b8d457c9be0159de9ef2c503493173d4f77059dde98e490c5d6a003e615120f",
+    "releaseManifestFingerprint": "2817d50c464eb951ecb923f3269e7778684bbfa257aa3de5e6af46c3b45a3a66",
+    "releaseManifestSha256": "fb45c04cc86e649ea6758a224b22feb50bf1f11cdf7e5155f40b8670bdd38cf0",
+    "protocolVersion": "1.1",
+    "mcpToolCount": 186,
+    "builtAt": "2026-07-21T10:58:23.487Z",
+    "distribution": "local-only"
+  },
+  "goal": {
+    "name": "P28：P19–P27 独立审计与缺陷收敛",
+    "status": "COMPLETE",
+    "sourceFrozenBeforeFinalValidation": true,
+    "reopenedModulesAfterFinalFailure": [
+      "studio-continuity-review-initialization",
+      "studio-media-protocol-sqlite-companions"
+    ],
+    "fullExplorationRepeated": false
+  },
+  "stageVerdicts": [
+    { "stage": "P19", "verdict": "ACCEPTED_AFTER_REMEDIATION" },
+    { "stage": "P20", "verdict": "ACCEPTED" },
+    { "stage": "P21", "verdict": "ACCEPTED_AFTER_REMEDIATION" },
+    { "stage": "P22", "verdict": "ACCEPTED_AFTER_REMEDIATION" },
+    { "stage": "P23", "verdict": "ACCEPTED_AFTER_REAL_UI" },
+    { "stage": "P24", "verdict": "ACCEPTED_AFTER_REAL_UI" },
+    { "stage": "P25", "verdict": "ACCEPTED_AFTER_EVIDENCE_REBUILD" },
+    { "stage": "P26", "verdict": "ACCEPTED", "notRun": ["user-subjective-hand-feel"] },
+    {
+      "stage": "P27",
+      "verdict": "PARTIALLY_ACCEPTED",
+      "currentFunctionality": "ACCEPTED",
+      "historicalReviewProvenance": "NOT_INDEPENDENTLY_ARCHIVED"
+    }
+  ],
+  "findings": {
+    "total": 27,
+    "bySeverity": { "P0": 3, "P1": 12, "P2": 11, "P3": 1 },
+    "closed": 27,
+    "open": 0,
+    "remainingP0": 0,
+    "remainingP1": 0,
+    "remainingCoreImpactP2": 0,
+    "ledger": ".planning/P28_独立审计与缺陷收敛清单.md"
+  },
+  "grokK3Checklist": {
+    "path": ".planning/P28_Grok审查修复清单.md",
+    "sha256": "1b0e51ae5126ea9069fe31cb9d2b103aef09cbd41d0102e64362a50f5f911b5c",
+    "usefulItems": ["P28-1", "P28-2", "P28-3", "P28-4", "P28-5", "P28-6", "P28-7", "P28-8"],
+    "completedItems": ["P28-1", "P28-2", "P28-3", "P28-4", "P28-5", "P28-6", "P28-7", "P28-8"],
+    "skippedItems": [
+      { "id": "D-1", "reason": "P28 explicitly forbids installation/signing; separate user authorization required." }
+    ],
+    "executionDisciplineAdjustment": "Module-batched targeted validation plus one frozen-source final chain replaced per-item full typecheck/build repetition."
+  },
+  "validation": [
+    {
+      "command": "npm run typecheck",
+      "status": "PASS",
+      "sourceDigest": "1a18d0d2870d554ffebb3394fdb5892771bfd86e5bc834d71051aea2faef2fc2"
+    },
+    {
+      "command": "npx vitest run tests/studio-media-protocol.test.ts tests/material-studio.test.ts tests/p18-canvas-performance-contract.test.ts",
+      "status": "PASS",
+      "files": 3,
+      "tests": 31,
+      "sourceDigest": "1a18d0d2870d554ffebb3394fdb5892771bfd86e5bc834d71051aea2faef2fc2"
+    },
+    {
+      "command": "npm test",
+      "status": "PASS",
+      "files": 179,
+      "tests": 997,
+      "durationSeconds": 557.56,
+      "sourceDigest": "1a18d0d2870d554ffebb3394fdb5892771bfd86e5bc834d71051aea2faef2fc2"
+    },
+    {
+      "command": "npm run build:mcp",
+      "status": "PASS",
+      "sourceDigest": "1a18d0d2870d554ffebb3394fdb5892771bfd86e5bc834d71051aea2faef2fc2"
+    },
+    {
+      "command": "npm run build:identity",
+      "status": "PASS",
+      "sourceDigest": "1a18d0d2870d554ffebb3394fdb5892771bfd86e5bc834d71051aea2faef2fc2"
+    },
+    {
+      "command": "npx electron-vite build",
+      "status": "PASS",
+      "sourceDigest": "1a18d0d2870d554ffebb3394fdb5892771bfd86e5bc834d71051aea2faef2fc2"
+    }
+  ],
+  "currentDigestTargetedTestNote": "The final 3-file/31-test protocol set was rerun after the last source change. A broader P19–P28 19-file/197-test set passed at an earlier digest; the final 179-file/997-test full run covers it, so the earlier targeted count is not represented as a final-digest standalone run.",
+  "uiEvidence": {
+    "p15": {
+      "status": "PASS",
+      "json": "docs/evidence/p28-p15-simple-canvas-ui-smoke-20260721-v3.json",
+      "jsonSha256": "92c392a6127fde6dceb522712875946ce58acbb4dbb6c41957385fce30f1f6a6",
+      "screenshot": "docs/evidence/p28-p15-simple-canvas-ui-smoke-20260721-v3.png",
+      "screenshotSha256": "aacd0b68f021c7878eab093640063faffa8e0c198865909a46fd8f5e59ba2ae7",
+      "checks": {
+        "visibleNodes": 12,
+        "plusToPlus": true,
+        "reverseConnection": true,
+        "connectToggleMs": 13,
+        "provider": "codex",
+        "packs": 2,
+        "dispatches": 2,
+        "results": 0,
+        "realGeneration": false
+      }
+    },
+    "p23p24": {
+      "status": "PASS",
+      "json": "docs/evidence/p28-p23-p24-electron-smoke-20260721-v4.json",
+      "jsonSha256": "1e067e4fca6b93d9a956bced132b5988dafd1bcbb4b803848d3d51a36bd1757b",
+      "screenshot": "docs/evidence/p28-p23-p24-electron-smoke-20260721-v4.png",
+      "screenshotSha256": "edf201d349c568b7cee5d0ac227de718cd8f4693fcb9edce5f2f46e66eadef25",
+      "debugSha256": "f1b0f5c12e347e5df83a679fe2a47a269b0585b01344ad6030ed43131efc28c2",
+      "checks": {
+        "selectionCount": 2,
+        "groupFormationKept": true,
+        "groupGuides": 0,
+        "undoRedo": true,
+        "u1PackIdentity": true,
+        "u2Classification": true,
+        "u3ReviewIdentity": true,
+        "u4RevisionHistory": true,
+        "restartReset": true,
+        "projectSwitchReset": true
+      },
+      "screenshotBoundary": "The final PNG is the switched empty-project phase; full-phase U1-U4 claims are supported by JSON/debug, not by that PNG alone."
+    },
+    "themes": {
+      "status": "PASS",
+      "index": "docs/evidence/p28-canvas-theme-screenshots-20260721-v2.json",
+      "indexSha256": "b8b7972b09748ef45a1cae5e2a856b0fae7d05c913f12f0331a2b38cf76f7136",
+      "screenshots": [
+        { "theme": "light", "path": "docs/evidence/p28-canvas-theme-v2-light-20260721.png", "sha256": "ca8d725bb133008fb0eaa04cb75b96160878819bb13a1b58dc4b74d4241b6b7b" },
+        { "theme": "dark", "path": "docs/evidence/p28-canvas-theme-v2-dark-20260721.png", "sha256": "3267da6859789e3639f7d8d0504e03d0a9f6f7b098fd21b1b62c48dd1a77c921" },
+        { "theme": "paper", "path": "docs/evidence/p28-canvas-theme-v2-paper-20260721.png", "sha256": "53908f8d1d8b3a359fe7808832a7aa76807e538530c7553a9a47c257fbbd289e" }
+      ]
+    },
+    "scale": {
+      "status": "PASS",
+      "json": "docs/evidence/p28-managed-studio-scale-canvas-ui-smoke-20260721-v4.json",
+      "jsonSha256": "5b985f11897bb6fe9c03a307090b5dfc3d2eb596b4de31802792d272b0082b5c",
+      "screenshot": "docs/evidence/p28-managed-studio-scale-canvas-ui-smoke-20260721-v4.png",
+      "screenshotSha256": "643179a8d6f10813a2fd6a7aea928c85d9516fb2e3018e416815711db5358b96",
+      "counts": { "assets": 77, "units": 1288, "panels": 4235, "media": 10000, "verifiedCas": 10000, "verifiedThumbnails": 1000 },
+      "bounds": { "initialDom": 44, "expandedDom": 44, "maximumDomNodes": 78, "fileDescriptorDelta": 0, "projectSwitches": 10, "crossProjectLeak": false }
+    },
+    "mainAgentOriginalSizeInspection": {
+      "status": "PASS_MECHANICAL_VISUAL",
+      "inspected": ["p15", "p23p24", "scale", "theme-light", "theme-dark", "theme-paper"],
+      "nonClaims": ["user-subjective-hand-feel", "generated-image-quality", "story-quality"]
+    }
+  },
+  "p27Supplement": {
+    "path": "docs/evidence/p27-fullstack-review-validation-20260721-v2.json",
+    "sha256": "111c248193481ba7288f8715c440170a8f6f19be4832190ababaeb209d6c8d5c",
+    "currentFunctionality": "ACCEPTED",
+    "historicalBlindReviewReports": [],
+    "provenanceVerdict": "NOT_INDEPENDENTLY_ARCHIVED"
+  },
+  "supersededEvidence": [
+    { "path": "docs/evidence/p28-p15-simple-canvas-ui-smoke-20260721.json", "supersededBy": "docs/evidence/p28-p15-simple-canvas-ui-smoke-20260721-v3.json" },
+    { "path": "docs/evidence/p28-p15-simple-canvas-ui-smoke-20260721-v2.json", "supersededBy": "docs/evidence/p28-p15-simple-canvas-ui-smoke-20260721-v3.json" },
+    { "path": "docs/evidence/p28-p23-p24-electron-smoke-20260721-v3.json", "supersededBy": "docs/evidence/p28-p23-p24-electron-smoke-20260721-v4.json" },
+    { "path": "docs/evidence/p28-canvas-theme-screenshots-20260721.json", "supersededBy": "docs/evidence/p28-canvas-theme-screenshots-20260721-v2.json" },
+    { "path": "docs/evidence/p28-managed-studio-scale-canvas-ui-smoke-20260721.png", "status": "FAILED_PARTIAL_EVIDENCE", "supersededBy": "docs/evidence/p28-managed-studio-scale-canvas-ui-smoke-20260721-v4.json" },
+    { "path": "docs/evidence/p28-managed-studio-scale-canvas-ui-smoke-20260721-v2.json", "supersededBy": "docs/evidence/p28-managed-studio-scale-canvas-ui-smoke-20260721-v4.json" },
+    { "path": "docs/evidence/p28-managed-studio-scale-canvas-ui-smoke-20260721-v3.json", "supersededBy": "docs/evidence/p28-managed-studio-scale-canvas-ui-smoke-20260721-v4.json" }
+  ],
+  "documents": {
+    "report": {
+      "path": "docs/验证报告_20260721_P28独立审计与缺陷收敛.md",
+      "sha256": "b01af59895f926980a34aafc1b6f483a0c0677d350e4e72fc57bf69a623f1769"
+    },
+    "handoff": {
+      "path": "docs/当前开发交接.md",
+      "sha256": "10848fbfd0f6edb5c09ffa8180610b9de0f0d1a26d369f924d5e38c397ce8548"
+    },
+    "auditLedger": {
+      "path": ".planning/P28_独立审计与缺陷收敛清单.md",
+      "sha256": "3b705c08b6b58ad01231b219d9e34fa5d6b0a952beae82bf7efc46e1b1af8512"
+    }
+  },
+  "boundaries": {
+    "formalProjectWritten": false,
+    "externalAuthorityFilesWritten": false,
+    "realImageGeneration": false,
+    "grokUsed": false,
+    "browserOrArtlistUsed": false,
+    "uploadPaymentPublishNotarization": false,
+    "installedAppBuiltOrReplaced": false,
+    "gitStageCommitPushPr": false,
+    "d1Executed": false
+  },
+  "notRun": [
+    { "item": "real image generation and visual continuity", "completionGate": false },
+    { "item": "Grok live provider", "completionGate": false },
+    { "item": "user subjective interaction feel", "completionGate": false },
+    { "item": "installed-app P19-P28 validation", "completionGate": false, "reason": "installation explicitly out of scope" }
+  ],
+  "nextAction": "Wait for an explicit production request; then use the managed Studio MCP loop. Installation remains a separate authorization decision."
+}

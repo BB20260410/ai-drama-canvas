@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "managed-studio-scale-canvas-after-browser-boundary",
+  "status": "pass",
+  "startedAt": "2026-07-18T07:57:33.865Z",
+  "endedAt": "2026-07-18T07:58:02.446Z",
+  "durationMs": 28623,
+  "argv": [
+    "npm",
+    "run",
+    "ui:managed-studio-scale-canvas-smoke",
+    "--",
+    "docs/evidence/managed-studio-scale-canvas-ui-smoke-20260718-after-browser-boundary.json",
+    "docs/evidence/managed-studio-scale-canvas-ui-smoke-20260718-after-browser-boundary.png"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "3eb0d839ced4bfb92a9d3ad3346eae5e",
+      "sourceDigest": "4b4fa1b3455dda6263f25e20e7485801edd6b5cdc7b1efd6c9a2a320f4444b86"
+    },
+    "after": {
+      "buildId": "3eb0d839ced4bfb92a9d3ad3346eae5e",
+      "sourceDigest": "4b4fa1b3455dda6263f25e20e7485801edd6b5cdc7b1efd6c9a2a320f4444b86"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/runs/managed-studio-scale-canvas-ui-command-20260718-after-browser-boundary.log",
+    "sizeBytes": 9567,
+    "sha256": "819d0bd2b423faf23e3cabcca95e99f76d8fa69b6fcd1b9c4d4c0b51ba7e52b5"
+  }
+}

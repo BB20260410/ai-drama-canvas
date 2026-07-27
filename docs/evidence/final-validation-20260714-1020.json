@@ -1,0 +1,281 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T02:21:50Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "goal": {
+    "name": "AI 漫剧无限画布",
+    "status": "active",
+    "mode": "research-and-development"
+  },
+  "priorityRevalidation": {
+    "objectiveHint": "arbitrary-keyframe-boundary-lossless-split-trim",
+    "handoffPriority": "comfyui-local-dedicated-recoverable-adapter",
+    "keyframeCoreRegressionFound": false,
+    "evidenceGapFound": true,
+    "evidenceGapClosed": true,
+    "nextPriorityStillValid": true,
+    "reason": "The production curve subdivision remained exact, but the previous report conflated decoded H.264 codec differences with semantic geometry. The smoke gate and report now separate exact core and pre-encode lossless evidence from diagnostic delivery-codec differences."
+  },
+  "slice": {
+    "name": "keyframe-split-trim-strict-zero-drift-evidence-revalidation",
+    "complete": true,
+    "productionCoreChanged": false,
+    "smokeGateStrengthened": true,
+    "coreSemanticExact": true,
+    "preEncodeLosslessExact": true,
+    "h264CodecDifferenceSeparatedFromSemanticGeometry": true,
+    "staleReportCorrected": true
+  },
+  "tests": {
+    "typecheck": {
+      "success": true
+    },
+    "targeted": {
+      "success": true,
+      "testFiles": 4,
+      "tests": 36,
+      "files": [
+        "tests/keyframe-curve.test.ts",
+        "tests/editor.test.ts",
+        "tests/codex.test.ts",
+        "tests/mcp-scan-cancel.test.ts"
+      ]
+    },
+    "full": {
+      "success": true,
+      "testFiles": 33,
+      "passedTestFiles": 33,
+      "failedTestFiles": 0,
+      "tests": 193,
+      "passedTests": 193,
+      "failedTests": 0,
+      "durationSeconds": 69.81
+    },
+    "compiledMcp": {
+      "success": true,
+      "testFiles": 1,
+      "tests": 1
+    },
+    "realElectron": {
+      "success": true,
+      "script": "npm run ui:editor-subdivision-smoke"
+    }
+  },
+  "build": {
+    "success": true,
+    "mainBytes": 840864,
+    "preloadBytes": 17308,
+    "rendererJavaScriptBytes": 1275984,
+    "mcpServerBytes": 184941
+  },
+  "mcp": {
+    "smokeSuccess": true,
+    "toolCount": 134,
+    "resourceTemplateCount": 9,
+    "promptCount": 7,
+    "compiledServerTestSuccess": true
+  },
+  "renderSmoke": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/keyframe-subdivision-render-smoke-20260714.json",
+    "sha256": "452650db127929c7e013855bf80d508bcc51726b2e575a8cc1d5cd66b6700d67",
+    "curve": "pathological cubic-bezier (1,0,0,1) with derived monotone source windows",
+    "semanticGeometry": {
+      "core": {
+        "split": {
+          "framesCompared": 49,
+          "maximumAbsoluteDifference": 0,
+          "exact": true
+        },
+        "trimStart": {
+          "framesCompared": 36,
+          "maximumAbsoluteDifference": 0,
+          "exact": true
+        },
+        "trimEnd": {
+          "framesCompared": 32,
+          "maximumAbsoluteDifference": 0,
+          "exact": true
+        }
+      },
+      "preEncodeLossless": {
+        "split": {
+          "framesCompared": 48,
+          "changedFrames": 0,
+          "changedChannels": 0,
+          "maximumChannelDifference": 0,
+          "rawSha256": "b2246824ae4d4fb34348c6e4c4a93faf13d52346e07ab479706a14253a1ab288",
+          "exact": true
+        },
+        "trimStart": {
+          "framesCompared": 35,
+          "changedFrames": 0,
+          "changedChannels": 0,
+          "maximumChannelDifference": 0,
+          "rawSha256": "30cb268c28edc1392f4293e98f0f74d55d199f40b933ea885cc93fb40724d2b4",
+          "exact": true
+        },
+        "trimEnd": {
+          "framesCompared": 31,
+          "changedFrames": 0,
+          "changedChannels": 0,
+          "maximumChannelDifference": 0,
+          "rawSha256": "780ef22d484f95fb0ed67432f925dfa28248c42b84ff800532cdb0049699a389",
+          "exact": true
+        }
+      }
+    },
+    "deliveryH264CodecDifference": {
+      "semanticGate": false,
+      "note": "Different visible intervals change x264 GOP/lookahead quantization. These values are retained as codec diagnostics and are not accepted as spatial-geometry tolerance.",
+      "split": {
+        "centroidError": 0,
+        "bboxDifference": 0,
+        "meanAbsoluteChannelDifference": 0,
+        "maxChannelDifference": 0
+      },
+      "trimStart": {
+        "centroidError": 0.05135824879060387,
+        "bboxDifference": 0,
+        "meanAbsoluteChannelDifference": 0.011214192708333333,
+        "maxChannelDifference": 21
+      },
+      "trimEnd": {
+        "centroidError": 0.4347667096643815,
+        "bboxDifference": 1,
+        "meanAbsoluteChannelDifference": 0.014479166666666666,
+        "maxChannelDifference": 18
+      }
+    },
+    "media": {
+      "baseline": {
+        "bytes": 4570,
+        "sha256": "bf97bf50f83e41d04fe8222a679321ac8a88b4fc31791bc908a5e1d859561bee"
+      },
+      "split": {
+        "bytes": 4570,
+        "sha256": "bf97bf50f83e41d04fe8222a679321ac8a88b4fc31791bc908a5e1d859561bee"
+      },
+      "trimStart": {
+        "bytes": 4414,
+        "sha256": "d5e642e511049804c56e0cc205fe2eea2dc9266cd914f7eacc9fdea62780229d"
+      },
+      "trimEnd": {
+        "bytes": 4286,
+        "sha256": "f97bcf804b53828185842a65ab9f80f6f90ada2c40586cf5012c134b41912c98"
+      }
+    },
+    "terminal": {
+      "machineActiveWeight": 0,
+      "machineQueueDepth": 0,
+      "projectLockFiles": []
+    }
+  },
+  "uiSmoke": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-subdivision-ui-smoke-20260714.json",
+    "sha256": "4d696219c6c3ea6a695b44308f28ded67f8bdadf708d8b1c31ad16164995bdf8",
+    "revisions": {
+      "fixture": 2,
+      "baseline": 3,
+      "split": 4,
+      "undo": 5,
+      "redo": 6,
+      "pointercancel": 6,
+      "trimStart": 8,
+      "trimEnd": 9
+    },
+    "pointercancelRevisionAndHashUnchanged": true,
+    "errors": [],
+    "otio": {
+      "splitSha256": "2382a662aa214af0c5da04fb2807aad79e8d19c824c7b5e583a6b0ad9352af6f",
+      "finalSha256": "0d325519cfb0c96fc6dfeb86ceead29b2e0d7f5645f5230c3d4640398043b317"
+    },
+    "screenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-subdivision-ui-20260714.png",
+      "bytes": 322800,
+      "sha256": "cb2ff93437c6776ca15651535b46471caedc6329d449048ab74926d5e3dcc637",
+      "width": 1560,
+      "height": 980,
+      "brightRatio": 0.0832031658817373,
+      "chromaticRatio": 0.05448456305599163,
+      "visuallyInspected": true,
+      "blankOrPlaceholder": false
+    },
+    "terminal": {
+      "rootRemoved": true,
+      "registryRemoved": true
+    }
+  },
+  "cleanup": {
+    "workspacePartialOrPublishTemporaryFiles": 0,
+    "workspaceProjectLockFiles": 0,
+    "diagnosticProjectRemoved": true,
+    "diagnosticRegistryRemoved": true
+  },
+  "signedDmg": {
+    "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "bytes": 136652595,
+    "sha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972",
+    "overwritten": false,
+    "notarized": false,
+    "representsCurrentSource": false
+  },
+  "git": {
+    "branch": "main",
+    "repositoryHasCommits": false,
+    "workingTree": "entire workspace remains untracked",
+    "destructiveGitOperationPerformed": false,
+    "commitCreated": false,
+    "pushPerformed": false,
+    "pullRequestCreated": false
+  },
+  "boundaries": {
+    "oldThreadJsonlRead": false,
+    "formalProjectRootsTouched": false,
+    "externalCreativeDirectoriesTouched": false,
+    "realProviderCalled": false,
+    "websiteOpened": false,
+    "uploadsPerformed": false,
+    "paidSubmissionsPerformed": false,
+    "externalAssetsOverwritten": false,
+    "softwareInstalled": false,
+    "softwarePublished": false,
+    "notarizationPerformed": false
+  },
+  "sourceHashes": {
+    "src/core/types.ts": "789ffc4c048cb2458e6d496c704f92c0bd5f1c552025a5d341c635fc85cebf54",
+    "src/core/keyframe-curve.ts": "dabf66146c642040d1419e11393e2d39461fe2b224ae4037bc04a6d7936172f6",
+    "src/core/editor.ts": "39c537e526ab22249468da1fdab93a4157550e670a731f31a307156fda6fc72f",
+    "src/core/codex.ts": "7f5d2002fd0b18d5b63c4be1530f18b2ce64e09aab74d70351176cb7c65ef33a",
+    "src/mcp/server.ts": "1a51cdd02be13e96a53a1b4365928d94b22677590f532be9280c9e448568958e",
+    "src/renderer/src/components/VideoEditorView.vue": "1f0fbeaf44358e33e4dbaec13788a805bc48a002921dd4e0f1bf23d199105e69",
+    "scripts/keyframe-subdivision-render-smoke.ts": "2001048934fab95077c626691e6399de6c8a9042fd1e4d532ef7bf4a23706758",
+    "scripts/ui-editor-subdivision-smoke.mjs": "de0033eb0c30fe9f4f1e21cfebd4b70dbcf9367efd107ca559d6b9289a0f8d87",
+    "tests/keyframe-curve.test.ts": "7bafbacfa0d6936463cad63d9f1e233a5d97ee9665b7ea86528e75020d9ff157",
+    "tests/editor.test.ts": "accada6abc9bb55f8a32755f44174fe3f5950278d2b790e563d29260b24344b3",
+    "tests/codex.test.ts": "24358788ff017d6026804692864c09cb679b29b4f5ebe4574ad42d41d16bbf1f",
+    "tests/mcp-scan-cancel.test.ts": "222658fe745cd4bd15397058119c0166f9f44afba4566d0856562ac733f0160",
+    "package.json": "ff98d0910d3fff9e7ed4e49a74bd1412deb65ed8881297f480433f6401c17985"
+  },
+  "documentationHashes": {
+    "README.md": "fd454f459c3f3582e6cee03fbea330b0a3de61e853d06b1548d571a099d356e3",
+    "docs/CODEX_MCP.md": "8e57ae1928a34b0c4d06fd057e24704d3c0e8f8ad03fbf352c75a8c079dd7ea6",
+    "docs/当前开发交接.md": "ea91a0c9e6e3d2eb1d64a94b4dca1c2f1f03de5b54c272d6a40b60de007cb5f7",
+    "docs/验证报告_任意关键帧边界无损分段_2026-07-14.md": "fba81544572b446d581bf3dc753470b6912081c129a1aedf05bd0268bc282cdd"
+  },
+  "nextUniqueHighestPriority": {
+    "priority": "P1",
+    "id": "comfyui-local-dedicated-recoverable-adapter",
+    "reason": "Keyframe split and trim are now strictly closed. The current source contains an in-progress ComfyUI adapter, while the handoff acceptance contract is not yet proven by a permanent loopback, restart, cancellation-race, output-ownership, Electron, compiled MCP and full-gate evidence package.",
+    "acceptance": [
+      "reuse GenerationJob, ExecutionSnapshot, Publication and command idempotency without a second task state machine",
+      "persist stable client identity and prompt_id before polling so restart never resubmits the same prompt",
+      "treat queue and history as facts while WebSocket progress remains advisory",
+      "bind output to prompt_id, output node and file identity before isolated decode, sha256 and no-clobber publication",
+      "distinguish confirmed pending deletion from running interrupt request and reject unconfirmed local cancellation",
+      "expose sanitized capability, Doctor snapshot, MCP continuation and recovery actions",
+      "prove submit, queue, running, history, success, failure, disconnect, restart, cancellation race, output conflict and cleanup with a local protocol loopback"
+    ],
+    "requiresAdditionalAuthorizationForCurrentSlice": false,
+    "realLocalComfyUiCompatibilityCalibrationRequiresUserAuthorization": true
+  }
+}

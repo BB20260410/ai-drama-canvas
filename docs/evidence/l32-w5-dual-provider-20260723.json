@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "kind": "l32-dual-provider-prepare-contract",
+  "packId": "studio-generation-freeze-093616079dd0778f247b32ecfdb286a1",
+  "packFingerprint": "093616079dd0778f247b32ecfdb286a163f708cbb055491388a853ca7872408c",
+  "unitId": "S1E01-U01",
+  "unitRevision": 2,
+  "providers": {
+    "codex": {
+      "briefKind": "studio-agent-imagegen-brief",
+      "exactlyOneImage": true,
+      "maxCalls": 1,
+      "layout": "9:16-vertical-ordered-grid",
+      "referenceCount": 3,
+      "referencePathSource": "pack-operation-controlReferences-only",
+      "primaryTool": "image_gen（Codex / OpenAI 图像能力）",
+      "executorKind": "agent-imagegen"
+    },
+    "grok": {
+      "briefKind": "studio-agent-imagegen-brief",
+      "exactlyOneImage": true,
+      "maxCalls": 1,
+      "layout": "9:16-vertical-ordered-grid",
+      "referenceCount": 3,
+      "referencePathSource": "pack-operation-controlReferences-only",
+      "primaryTool": "image_gen",
+      "referenceTool": "image_edit",
+      "executorKind": "agent-imagegen"
+    }
+  },
+  "sharedRules": [
+    "provider must match dispatch and commit",
+    "first prepare callAllowed=true only once per generationRunId",
+    "quarantine candidate path exact only",
+    "no browser/Artlist/ComfyUI"
+  ]
+}

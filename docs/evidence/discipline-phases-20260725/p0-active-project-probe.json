@@ -1,0 +1,89 @@
+{
+  "kind": "p0-active-project-and-capabilities-probe",
+  "buildIdentity": {
+    "buildId": "c67395fb7fac4af1a107ff9fe6e2670b",
+    "packageVersion": "0.2.0",
+    "sourceDigest": "1b20b7bc26c34d78",
+    "builtAt": "2026-07-25T09:27:11.134Z"
+  },
+  "note": "Core 侧探测；MCP get_active 需桌面/MCP 进程。本证据证明工程可打开且 counts 可解析。",
+  "projects": [
+    {
+      "name": "isolation",
+      "root": "/Users/hxx/Documents/无限画布/projects/grok-mvp-qingdeng-mrwc97mu-d0aea463",
+      "projectId": "project-c78607fac2a4",
+      "projectName": "Grok最小受管生图闭环-青灯客",
+      "counts": {
+        "units": 1,
+        "panels": 3,
+        "panelsEstimated": 3,
+        "scriptDocuments": 3,
+        "promptDocuments": 6,
+        "characters": 1,
+        "scenes": 1,
+        "props": 1,
+        "canonicalAssets": 3,
+        "media": 10,
+        "assetBindingSets": 6,
+        "mentionProposals": 15
+      },
+      "nextAction": "open-production-dashboard",
+      "generationProjection": {
+        "status": "current"
+      },
+      "ok": true
+    },
+    {
+      "name": "dudu-s1e1",
+      "root": "/Users/hxx/Documents/无限画布/projects/dudu-s1e1-a84aa353",
+      "projectId": "project-17b0cef36e44",
+      "projectName": "《嘟嘟》S1E1 隔离受管工程",
+      "counts": {
+        "units": 33,
+        "panels": 112,
+        "panelsEstimated": 112,
+        "scriptDocuments": 1,
+        "promptDocuments": 112,
+        "characters": 3,
+        "scenes": 9,
+        "props": 7,
+        "canonicalAssets": 19,
+        "media": 103,
+        "assetBindingSets": 123,
+        "mentionProposals": 395
+      },
+      "nextAction": "open-production-dashboard",
+      "generationProjection": {
+        "status": "current"
+      },
+      "ok": true
+    },
+    {
+      "name": "gaiden",
+      "root": "/Users/hxx/Documents/无限画布/projects/dudu-gaiden-lock-20260723-12a6516c",
+      "projectId": "project-1abfd57f23eb",
+      "projectName": "嘟嘟外传图锁隔离工程",
+      "counts": {
+        "units": 26,
+        "panels": 102,
+        "panelsEstimated": 102,
+        "scriptDocuments": 47,
+        "promptDocuments": 28,
+        "characters": 8,
+        "scenes": 5,
+        "props": 3,
+        "canonicalAssets": 16,
+        "media": 70,
+        "assetBindingSets": 102,
+        "mentionProposals": 200
+      },
+      "nextAction": "open-production-dashboard",
+      "generationProjection": {
+        "status": "current"
+      },
+      "ok": true
+    }
+  ],
+  "createdAt": "2026-07-25T09:27:11.207Z",
+  "pass": true
+}

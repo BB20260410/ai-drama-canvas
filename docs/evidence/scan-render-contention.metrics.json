@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "root": "/tmp/ai-canvas-scan-render-contention-20260714",
+  "unitCount": 24,
+  "clipCount": 24,
+  "baseline": {
+    "scanId": "294f715d-802b-44f5-923c-6ebcc017ede1",
+    "durationMs": 118,
+    "stats": {
+      "discoveredFiles": 48,
+      "candidateFiles": 48,
+      "reservedPublicationFilesSkipped": 0,
+      "referenceAssets": 0,
+      "inspectedChecks": 48,
+      "reusedChecks": 0,
+      "textFilesRead": 24,
+      "includeHashes": false,
+      "inspectionConcurrency": 6
+    }
+  },
+  "contention": {
+    "scanId": "65b6c865-84a5-4b32-92ad-c641d761c5b2",
+    "durationMs": 144,
+    "wallDurationMs": 192,
+    "stats": {
+      "discoveredFiles": 49,
+      "candidateFiles": 48,
+      "reservedPublicationFilesSkipped": 1,
+      "referenceAssets": 0,
+      "inspectedChecks": 48,
+      "reusedChecks": 0,
+      "textFilesRead": 24,
+      "includeHashes": true,
+      "inspectionConcurrency": 6
+    },
+    "skippedOutputPath": "/tmp/ai-canvas-scan-render-contention-20260714/成片输出/EP01_15s_099_并发验收成片_20260713T165746051Z_v001.mp4",
+    "outputIndexedWhileReserved": false,
+    "renderAliveAtScanStart": true,
+    "renderAliveAtScanCompletion": true,
+    "overlapObserved": true,
+    "registeredOutputIndexedAfterCompletion": true,
+    "registeredArtifactId": "main-ep01-unit099-aa1312ef274e"
+  },
+  "render": {
+    "id": "render-1fb046de-4b28-439d-9cd9-d135244afa87",
+    "pid": 46029,
+    "status": "succeeded",
+    "durationSeconds": 36,
+    "outputPath": "/tmp/ai-canvas-scan-render-contention-20260714/成片输出/EP01_15s_099_并发验收成片_20260713T165746051Z_v001.mp4",
+    "outputSize": 18676028,
+    "publicationIntentId": "publication-7e2339a3-a5ec-49b8-91f0-8888be9ab1a2",
+    "publicationReceiptId": "receipt-f09fcf36-78c3-4674-b32d-935286d10669",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video",
+          "width": 1280,
+          "height": 720
+        }
+      ],
+      "format": {
+        "duration": "36.000000"
+      }
+    }
+  },
+  "recovery": {
+    "finalScanId": "b364ac94-9af1-4dca-b7fc-369ab6e256d1",
+    "finalStats": {
+      "discoveredFiles": 49,
+      "candidateFiles": 49,
+      "reservedPublicationFilesSkipped": 0,
+      "referenceAssets": 0,
+      "inspectedChecks": 1,
+      "reusedChecks": 48,
+      "textFilesRead": 24,
+      "includeHashes": true,
+      "inspectionConcurrency": 6
+    },
+    "activeScan": false,
+    "activeRenderIds": [],
+    "blockedActions": [],
+    "locks": []
+  },
+  "verifiedAt": "2026-07-13T16:57:47.907Z"
+}

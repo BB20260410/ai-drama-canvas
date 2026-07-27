@@ -1,0 +1,658 @@
+{
+  "schemaVersion": 1,
+  "kind": "p5-canonical-consumer-refresh-evidence",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "sourceRoot": "/Users/hxx/Documents/古蜀卷第三季",
+  "startedAt": "2026-07-17T18:05:19.058Z",
+  "finishedAt": "2026-07-17T18:06:01.508Z",
+  "durationMs": 42450,
+  "commands": {
+    "scan": {
+      "requestId": "p5-canonical-scan-signed-cache-recovery-v5-8f1057fe11a53594",
+      "idempotencyKey": "p5-canonical-scan-signed-cache-recovery-v5-8f1057fe11a53594",
+      "status": "succeeded",
+      "replayed": false,
+      "result": {
+        "project": {
+          "id": "gushujuan-s3-f1a688020bfb7af6",
+          "name": "蜀道山·古蜀卷 第三季",
+          "primaryRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6"
+        },
+        "scannedAt": "2026-07-17T18:05:37.033Z",
+        "scanId": "b7e44af5-e2fc-41f9-a2fb-02cd8d42553a",
+        "scanDurationMs": 15904,
+        "scanStats": {
+          "discoveredFiles": 4181,
+          "candidateFiles": 4068,
+          "reservedPublicationFilesSkipped": 0,
+          "referenceAssets": 0,
+          "productionAssets": 77,
+          "inspectedChecks": 0,
+          "reusedChecks": 4106,
+          "textFilesRead": 4050,
+          "includeHashes": false,
+          "inspectionConcurrency": 6
+        },
+        "summary": {
+          "total": 1288,
+          "active": 1288,
+          "completed": 0,
+          "deprecated": 0,
+          "blocked": 0,
+          "byStatus": {
+            "待规划": 0,
+            "待提示词": 0,
+            "待首帧": 1287,
+            "待尾帧": 0,
+            "待机械验收": 0,
+            "待视觉验收": 1,
+            "待视频": 0,
+            "视频生成中": 0,
+            "待视频验收": 0,
+            "已完成": 0,
+            "返工": 0,
+            "阻塞": 0,
+            "弃用": 0
+          },
+          "byEpisode": {
+            "EP01": {
+              "total": 34,
+              "completed": 0,
+              "active": 34
+            },
+            "EP02": {
+              "total": 32,
+              "completed": 0,
+              "active": 32
+            },
+            "EP03": {
+              "total": 39,
+              "completed": 0,
+              "active": 39
+            },
+            "EP04": {
+              "total": 38,
+              "completed": 0,
+              "active": 38
+            },
+            "EP05": {
+              "total": 38,
+              "completed": 0,
+              "active": 38
+            },
+            "EP06": {
+              "total": 41,
+              "completed": 0,
+              "active": 41
+            },
+            "EP07": {
+              "total": 40,
+              "completed": 0,
+              "active": 40
+            },
+            "EP08": {
+              "total": 45,
+              "completed": 0,
+              "active": 45
+            },
+            "EP09": {
+              "total": 38,
+              "completed": 0,
+              "active": 38
+            },
+            "EP10": {
+              "total": 39,
+              "completed": 0,
+              "active": 39
+            },
+            "EP11": {
+              "total": 39,
+              "completed": 0,
+              "active": 39
+            },
+            "EP12": {
+              "total": 39,
+              "completed": 0,
+              "active": 39
+            },
+            "EP13": {
+              "total": 40,
+              "completed": 0,
+              "active": 40
+            },
+            "EP14": {
+              "total": 35,
+              "completed": 0,
+              "active": 35
+            },
+            "EP15": {
+              "total": 38,
+              "completed": 0,
+              "active": 38
+            },
+            "EP16": {
+              "total": 40,
+              "completed": 0,
+              "active": 40
+            },
+            "EP17": {
+              "total": 39,
+              "completed": 0,
+              "active": 39
+            },
+            "EP18": {
+              "total": 40,
+              "completed": 0,
+              "active": 40
+            },
+            "EP19": {
+              "total": 39,
+              "completed": 0,
+              "active": 39
+            },
+            "EP20": {
+              "total": 42,
+              "completed": 0,
+              "active": 42
+            },
+            "EP21": {
+              "total": 44,
+              "completed": 0,
+              "active": 44
+            },
+            "EP22": {
+              "total": 39,
+              "completed": 0,
+              "active": 39
+            },
+            "EP23": {
+              "total": 40,
+              "completed": 0,
+              "active": 40
+            },
+            "EP24": {
+              "total": 45,
+              "completed": 0,
+              "active": 45
+            },
+            "EP25": {
+              "total": 40,
+              "completed": 0,
+              "active": 40
+            },
+            "EP26": {
+              "total": 42,
+              "completed": 0,
+              "active": 42
+            },
+            "EP27": {
+              "total": 41,
+              "completed": 0,
+              "active": 41
+            },
+            "EP28": {
+              "total": 42,
+              "completed": 0,
+              "active": 42
+            },
+            "EP29": {
+              "total": 44,
+              "completed": 0,
+              "active": 44
+            },
+            "EP30": {
+              "total": 42,
+              "completed": 0,
+              "active": 42
+            },
+            "EP31": {
+              "total": 46,
+              "completed": 0,
+              "active": 46
+            },
+            "EP32": {
+              "total": 48,
+              "completed": 0,
+              "active": 48
+            }
+          },
+          "rawImages": 28,
+          "labeledImages": 26,
+          "videos": 0,
+          "storyboardSheets": {
+            "current": 0,
+            "stale": 1,
+            "invalid": 0,
+            "legacyInvalid": 1,
+            "pages": 1
+          },
+          "mechanicalFailures": 0,
+          "fusionStoryboardPanels": {
+            "required": 4330,
+            "produced": 0,
+            "mechanicallyValid": 0,
+            "approved": 0
+          }
+        },
+        "warnings": [
+          "gen-2026-07-16T12-10-57-215Z-892023c0 历史任务首次 P3 物化冻结的视觉约束身份已失效，未映射到 Artifact 或视觉 Review",
+          "gen-2026-07-16T11-49-24-552Z-0020493e 历史任务首次 P3 物化冻结的视觉约束身份已失效，未映射到 Artifact 或视觉 Review",
+          "gen-2026-07-16T11-36-02-740Z-ddbce3ce 历史任务首次 P3 物化冻结的视觉约束身份已失效，未映射到 Artifact 或视觉 Review",
+          "gen-2026-07-16T11-18-15-645Z-c2db12be 历史任务首次 P3 物化冻结的视觉约束身份已失效，未映射到 Artifact 或视觉 Review",
+          "gen-2026-07-16T11-02-30-946Z-402d132b 历史任务首次 P3 物化冻结的视觉约束身份已失效，未映射到 Artifact 或视觉 Review",
+          "gen-2026-07-16T10-49-14-030Z-7d096dcd 历史任务首次 P3 物化冻结的视觉约束身份已失效，未映射到 Artifact 或视觉 Review",
+          "gen-2026-07-16T09-57-05-901Z-1515bab0 P3 当前宫格约束缺失或单元身份不一致，未映射到 Artifact 或视觉 Review",
+          "gen-2026-07-16T09-45-29-939Z-cb99b5f6 历史任务首次 P3 物化冻结的视觉约束身份已失效，未映射到 Artifact 或视觉 Review",
+          "gen-2026-07-16T09-37-34-098Z-c90796be 历史任务首次 P3 物化冻结的视觉约束身份已失效，未映射到 Artifact 或视觉 Review",
+          "gen-2026-07-16T09-21-32-524Z-f12f122c 历史任务首次 P3 物化冻结的视觉约束身份已失效，未映射到 Artifact 或视觉 Review",
+          "gen-2026-07-16T08-22-34-309Z-0e3ed496 历史任务首次 P3 物化冻结的视觉约束身份已失效，未映射到 Artifact 或视觉 Review",
+          "season-三-ep01-unit001 “待视频”覆盖已忽略：图片视觉验收 requirement 已变化；视觉验收状态缺少匹配当前素材内容的不可变验收记录；当前权威图片缺少仍有效的视觉通过证据"
+        ]
+      }
+    },
+    "canonicalRemigration": null,
+    "p2": {
+      "requestId": "p5-canonical-p2-8f1057fe11a53594cd-7d582c1a8f45",
+      "idempotencyKey": "p5-canonical-p2-8f1057fe11a53594cd-7d582c1a8f45",
+      "status": "succeeded",
+      "replayed": false,
+      "result": {
+        "schemaVersion": 1,
+        "resolverVersion": "panel-reference-resolution-v1",
+        "revision": 3,
+        "projectId": "gushujuan-s3-f1a688020bfb7af6",
+        "sourceContentAddress": "sha256:f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+        "storeFingerprint": "7d582c1a8f454ded642be64b0d0e82439941c5ee432f9898fece12d154f93b43",
+        "updatedAt": "2026-07-17T17:12:54.724Z",
+        "audit": {
+          "schemaVersion": 1,
+          "resolverVersion": "panel-reference-resolution-v1",
+          "contractCoverageVersion": 1,
+          "currentContracts": 1288,
+          "panels": 4330,
+          "panelDistribution": {
+            "2": 151,
+            "3": 667,
+            "4": 349,
+            "5": 95,
+            "6": 26
+          },
+          "semanticAssetBindings": 13812,
+          "referenceSlots": 12720,
+          "confirmedEmptyPanels": 10,
+          "generationReadyPanels": 610,
+          "pendingHardLockPanels": 3554,
+          "pendingHardLockReferences": 7480,
+          "pendingDerivedArtifactPanels": 166,
+          "detectedOverflowPanels": 166,
+          "derivedDefinitions": 52,
+          "detectedRowContinuityDifferencePanels": 913,
+          "detectedRowContinuityDifferences": 1994,
+          "unresolvedPanels": 0,
+          "unresolvedReferences": 0,
+          "knownAssetMissingBindingPanels": 0,
+          "knownAssetMissingBindings": 0,
+          "semanticAssetMissingSlotPanels": 0,
+          "semanticAssetMissingSlots": 0,
+          "contractAssetMissingBindingPanels": 0,
+          "contractAssetMissingBindings": 0,
+          "explicitContinuityMissingBindingPanels": 0,
+          "explicitContinuityMissingBindings": 0,
+          "unhandledOverflowPanels": 0,
+          "timeSpanContinuityMismatchPanels": 0,
+          "timeSpanContinuityMismatches": 0,
+          "maximumSemanticAssetsPerPanel": 12,
+          "maximumReferenceSlotsPerPanel": 6,
+          "closurePassed": true,
+          "auditFingerprint": "3791ea31da3cd2b33461a35718be073537a4cac9b2dd5ee210499e5eb000b49e"
+        },
+        "derivedDefinitions": 52,
+        "overrides": 0,
+        "responsePolicy": "仅返回引用闭包审计与计数；逐格详情请使用分页只读工具。"
+      }
+    },
+    "p3": {
+      "requestId": "p5-canonical-p3-superseded-v2-7d582c1a8f454ded64-r2",
+      "idempotencyKey": "p5-canonical-p3-superseded-v2-7d582c1a8f454ded64-r2",
+      "status": "succeeded",
+      "replayed": true,
+      "result": {
+        "schemaVersion": 1,
+        "builderVersion": "panel-visual-constraint-v1",
+        "revision": 2,
+        "projectId": "gushujuan-s3-f1a688020bfb7af6",
+        "sourceContentAddress": "sha256:f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+        "storeFingerprint": "71abcbca845f4fcfd4615431f3fe9bced40dd1bc829a99dca0bbe470b25b0ca8",
+        "audit": {
+          "schemaVersion": 1,
+          "builderVersion": "panel-visual-constraint-v1",
+          "contracts": 1288,
+          "expectedPanels": 4330,
+          "constraints": 4330,
+          "missingConstraints": 0,
+          "extraConstraints": 0,
+          "invalidConstraints": 0,
+          "duplicateConstraintIds": 0,
+          "onScreenAssets": 12502,
+          "continuityOnlyAssets": 1310,
+          "optionalOffscreenAssets": 0,
+          "unresolvedIdentityLocks": 8331,
+          "unresolvedSpatialLocks": 24992,
+          "unresolvedContinuityLocks": 440,
+          "invalidModelFingerprints": 0,
+          "invalidReviewRulesFingerprints": 0,
+          "modelPromptLeakPanels": 0,
+          "modelPathLeakPanels": 0,
+          "concealedMaskPanels": 304,
+          "revealAuthorizedPanels": 0,
+          "warningCounts": {
+            "AHANG_IDENTITY": 1415,
+            "DUDU_MARKINGS": 924,
+            "HIDDEN_MASK_DISCLOSURE": 304,
+            "OCR_OR_TEXT": 4330,
+            "WATERMARK_OR_UI": 4330,
+            "MODERN_OBJECT": 4330,
+            "COLLAGE_OR_SPLIT": 4330,
+            "PROP_STRUCTURE": 2665,
+            "SCENE_LAYOUT": 2574,
+            "EXTRA_CHARACTER": 4330,
+            "AMBIGUOUS_VISIBILITY": 776,
+            "SPATIAL_LOCK_UNKNOWN": 4330
+          },
+          "warningsWithoutReviewRules": 0,
+          "closurePassed": true,
+          "auditFingerprint": "794c699bd7eed74b3328069ee9b51db6880b797a558a85901eb68020841bba22"
+        },
+        "presenceOverrideCount": 0,
+        "revealAuthorizationCount": 0,
+        "legacyGenerationJobEvidenceCount": 11,
+        "responsePolicy": "仅返回 P3 视觉约束仓身份、审计与计数；逐格规则请使用分页或单格只读工具。"
+      }
+    }
+  },
+  "canonical": {
+    "revision": 3,
+    "storeFingerprint": "8f1057fe11a53594cda2032d14808a730664705ad2b5b9c2e3dcdc5d7ac45964",
+    "beforeCurrentness": {
+      "available": true,
+      "current": true,
+      "checkedAt": "2026-07-17T18:05:20.816Z",
+      "storeRevision": 3,
+      "storeFingerprint": "8f1057fe11a53594cda2032d14808a730664705ad2b5b9c2e3dcdc5d7ac45964",
+      "currentCandidateFingerprint": "684fb14ec669f386162370f64333ef602a63e7cbfcb2152e4202594c3daef3e4",
+      "driftedInputs": [],
+      "issues": []
+    },
+    "currentness": {
+      "available": true,
+      "current": true,
+      "checkedAt": "2026-07-17T18:05:37.706Z",
+      "storeRevision": 3,
+      "storeFingerprint": "8f1057fe11a53594cda2032d14808a730664705ad2b5b9c2e3dcdc5d7ac45964",
+      "currentCandidateFingerprint": "684fb14ec669f386162370f64333ef602a63e7cbfcb2152e4202594c3daef3e4",
+      "driftedInputs": [],
+      "issues": []
+    },
+    "versionIds": 21,
+    "currentAllowedVersionIds": [
+      "asset-version-C01-c192f983ff759d65ff8e377b3ad01faf",
+      "asset-version-C02-948e595fa3249de590a77632b5cb349f",
+      "asset-version-C03a-5c4457513b6c8fcdbe2ddcb8c33a4e2d",
+      "asset-version-C04a-a0ca7badba9870297d244e9cb0f2a5b3",
+      "asset-version-C07-1add46bd02abbec6e5231d7717593068",
+      "asset-version-C09-892c83a2a413c839e12f5e3148b52564",
+      "asset-version-C12-cac2d054b0615c2739a03a48fcef5f5c",
+      "asset-version-P01-a6585f981d3566a0cae0fcf1a009026d",
+      "asset-version-P03-797cbabb048982929a8539f1653a233d",
+      "asset-version-P07-df70fcad506c1d330e4ae71621118612",
+      "asset-version-P09-5e4643def2f004e9f79805f2adc3b5e4",
+      "asset-version-P10-0801cc4e3562a5aa46e24f7874476234",
+      "asset-version-P11-0e0cbddafac39fa6871c37cd3c545e05",
+      "asset-version-P29-bc1e192acfaeb3c1d94aafeef67482d2",
+      "asset-version-P30-745f0d0537a355b436facaa2095b6845",
+      "asset-version-S01-b15114f02bf829349d1c5d247dc00e97",
+      "asset-version-S02-70b91d5f8a46a04859a6b43dade7c7df",
+      "asset-version-S03-ce68445516692cbeb3aa5b83efa41773",
+      "asset-version-S07-bf5add35f0605870ac3ac62ee70b135a",
+      "asset-version-S08-2e80323c73d89f19ed16b87809c85303"
+    ],
+    "disallowedVersionIds": [
+      "asset-version-P01-408d397da5bbf9b78ce9c39d9cac4251"
+    ],
+    "forbiddenVersionIds": [
+      "asset-version-P01-408d397da5bbf9b78ce9c39d9cac4251"
+    ],
+    "disallowedPathLeaks": []
+  },
+  "scanner": {
+    "scanId": "b7e44af5-e2fc-41f9-a2fb-02cd8d42553a",
+    "assets": 77,
+    "categories": {
+      "character": 24,
+      "scene": 20,
+      "prop": 33,
+      "unclassified": 0
+    },
+    "primaryAuthorityAssets": 20
+  },
+  "p2": {
+    "beforeRevision": 3,
+    "revision": 3,
+    "storeFingerprint": "7d582c1a8f454ded642be64b0d0e82439941c5ee432f9898fece12d154f93b43",
+    "currentness": {
+      "current": true,
+      "checkedAt": "2026-07-17T18:05:47.923Z",
+      "storeRevision": 3,
+      "storeFingerprint": "7d582c1a8f454ded642be64b0d0e82439941c5ee432f9898fece12d154f93b43",
+      "driftedInputs": []
+    },
+    "audit": {
+      "schemaVersion": 1,
+      "resolverVersion": "panel-reference-resolution-v1",
+      "contractCoverageVersion": 1,
+      "currentContracts": 1288,
+      "panels": 4330,
+      "panelDistribution": {
+        "2": 151,
+        "3": 667,
+        "4": 349,
+        "5": 95,
+        "6": 26
+      },
+      "semanticAssetBindings": 13812,
+      "referenceSlots": 12720,
+      "confirmedEmptyPanels": 10,
+      "generationReadyPanels": 610,
+      "pendingHardLockPanels": 3554,
+      "pendingHardLockReferences": 7480,
+      "pendingDerivedArtifactPanels": 166,
+      "detectedOverflowPanels": 166,
+      "derivedDefinitions": 52,
+      "detectedRowContinuityDifferencePanels": 913,
+      "detectedRowContinuityDifferences": 1994,
+      "unresolvedPanels": 0,
+      "unresolvedReferences": 0,
+      "knownAssetMissingBindingPanels": 0,
+      "knownAssetMissingBindings": 0,
+      "semanticAssetMissingSlotPanels": 0,
+      "semanticAssetMissingSlots": 0,
+      "contractAssetMissingBindingPanels": 0,
+      "contractAssetMissingBindings": 0,
+      "explicitContinuityMissingBindingPanels": 0,
+      "explicitContinuityMissingBindings": 0,
+      "unhandledOverflowPanels": 0,
+      "timeSpanContinuityMismatchPanels": 0,
+      "timeSpanContinuityMismatches": 0,
+      "maximumSemanticAssetsPerPanel": 12,
+      "maximumReferenceSlotsPerPanel": 6,
+      "closurePassed": true,
+      "auditFingerprint": "3791ea31da3cd2b33461a35718be073537a4cac9b2dd5ee210499e5eb000b49e"
+    },
+    "canonicalLockedBindings": 5481,
+    "canonicalReferenceVersions": [
+      "asset-version-C01-c192f983ff759d65ff8e377b3ad01faf",
+      "asset-version-C02-948e595fa3249de590a77632b5cb349f",
+      "asset-version-C03a-5c4457513b6c8fcdbe2ddcb8c33a4e2d",
+      "asset-version-C04a-a0ca7badba9870297d244e9cb0f2a5b3",
+      "asset-version-C07-1add46bd02abbec6e5231d7717593068",
+      "asset-version-C09-892c83a2a413c839e12f5e3148b52564",
+      "asset-version-C12-cac2d054b0615c2739a03a48fcef5f5c",
+      "asset-version-P01-a6585f981d3566a0cae0fcf1a009026d",
+      "asset-version-P03-797cbabb048982929a8539f1653a233d",
+      "asset-version-P07-df70fcad506c1d330e4ae71621118612",
+      "asset-version-P09-5e4643def2f004e9f79805f2adc3b5e4",
+      "asset-version-P10-0801cc4e3562a5aa46e24f7874476234",
+      "asset-version-P11-0e0cbddafac39fa6871c37cd3c545e05",
+      "asset-version-P29-bc1e192acfaeb3c1d94aafeef67482d2",
+      "asset-version-P30-745f0d0537a355b436facaa2095b6845",
+      "asset-version-S01-b15114f02bf829349d1c5d247dc00e97",
+      "asset-version-S02-70b91d5f8a46a04859a6b43dade7c7df",
+      "asset-version-S03-ce68445516692cbeb3aa5b83efa41773",
+      "asset-version-S07-bf5add35f0605870ac3ac62ee70b135a",
+      "asset-version-S08-2e80323c73d89f19ed16b87809c85303"
+    ]
+  },
+  "p3": {
+    "beforeRevision": 2,
+    "revision": 2,
+    "storeFingerprint": "71abcbca845f4fcfd4615431f3fe9bced40dd1bc829a99dca0bbe470b25b0ca8",
+    "currentness": {
+      "current": true,
+      "checkedAt": "2026-07-17T18:06:01.424Z",
+      "storeRevision": 2,
+      "storeFingerprint": "71abcbca845f4fcfd4615431f3fe9bced40dd1bc829a99dca0bbe470b25b0ca8",
+      "p2StoreRevision": 3,
+      "p2StoreFingerprint": "7d582c1a8f454ded642be64b0d0e82439941c5ee432f9898fece12d154f93b43",
+      "driftedInputs": []
+    },
+    "audit": {
+      "schemaVersion": 1,
+      "builderVersion": "panel-visual-constraint-v1",
+      "contracts": 1288,
+      "expectedPanels": 4330,
+      "constraints": 4330,
+      "missingConstraints": 0,
+      "extraConstraints": 0,
+      "invalidConstraints": 0,
+      "duplicateConstraintIds": 0,
+      "onScreenAssets": 12502,
+      "continuityOnlyAssets": 1310,
+      "optionalOffscreenAssets": 0,
+      "unresolvedIdentityLocks": 8331,
+      "unresolvedSpatialLocks": 24992,
+      "unresolvedContinuityLocks": 440,
+      "invalidModelFingerprints": 0,
+      "invalidReviewRulesFingerprints": 0,
+      "modelPromptLeakPanels": 0,
+      "modelPathLeakPanels": 0,
+      "concealedMaskPanels": 304,
+      "revealAuthorizedPanels": 0,
+      "warningCounts": {
+        "AHANG_IDENTITY": 1415,
+        "DUDU_MARKINGS": 924,
+        "HIDDEN_MASK_DISCLOSURE": 304,
+        "OCR_OR_TEXT": 4330,
+        "WATERMARK_OR_UI": 4330,
+        "MODERN_OBJECT": 4330,
+        "COLLAGE_OR_SPLIT": 4330,
+        "PROP_STRUCTURE": 2665,
+        "SCENE_LAYOUT": 2574,
+        "EXTRA_CHARACTER": 4330,
+        "AMBIGUOUS_VISIBILITY": 776,
+        "SPATIAL_LOCK_UNKNOWN": 4330
+      },
+      "warningsWithoutReviewRules": 0,
+      "closurePassed": true,
+      "auditFingerprint": "794c699bd7eed74b3328069ee9b51db6880b797a558a85901eb68020841bba22"
+    },
+    "canonicalLockedIdentities": 5481,
+    "canonicalReferenceVersions": [
+      "asset-version-C01-c192f983ff759d65ff8e377b3ad01faf",
+      "asset-version-C02-948e595fa3249de590a77632b5cb349f",
+      "asset-version-C03a-5c4457513b6c8fcdbe2ddcb8c33a4e2d",
+      "asset-version-C04a-a0ca7badba9870297d244e9cb0f2a5b3",
+      "asset-version-C07-1add46bd02abbec6e5231d7717593068",
+      "asset-version-C09-892c83a2a413c839e12f5e3148b52564",
+      "asset-version-C12-cac2d054b0615c2739a03a48fcef5f5c",
+      "asset-version-P01-a6585f981d3566a0cae0fcf1a009026d",
+      "asset-version-P03-797cbabb048982929a8539f1653a233d",
+      "asset-version-P07-df70fcad506c1d330e4ae71621118612",
+      "asset-version-P09-5e4643def2f004e9f79805f2adc3b5e4",
+      "asset-version-P10-0801cc4e3562a5aa46e24f7874476234",
+      "asset-version-P11-0e0cbddafac39fa6871c37cd3c545e05",
+      "asset-version-P29-bc1e192acfaeb3c1d94aafeef67482d2",
+      "asset-version-P30-745f0d0537a355b436facaa2095b6845",
+      "asset-version-S01-b15114f02bf829349d1c5d247dc00e97",
+      "asset-version-S02-70b91d5f8a46a04859a6b43dade7c7df",
+      "asset-version-S03-ce68445516692cbeb3aa5b83efa41773",
+      "asset-version-S07-bf5add35f0605870ac3ac62ee70b135a",
+      "asset-version-S08-2e80323c73d89f19ed16b87809c85303"
+    ],
+    "legacyDispositionCounts": {
+      "superseded-constraint-readonly": 10,
+      "obsolete-terminal-readonly": 1
+    }
+  },
+  "sourceBefore": {
+    "root": "/Users/hxx/Documents/古蜀卷第三季",
+    "fileCount": 3344,
+    "totalBytes": 24570877,
+    "digest": "f62c9504da74f5873634300b85ab584d7039a1356fa3d24004d99f30e2cc9f8b"
+  },
+  "sourceAfter": {
+    "root": "/Users/hxx/Documents/古蜀卷第三季",
+    "fileCount": 3344,
+    "totalBytes": 24570877,
+    "digest": "f62c9504da74f5873634300b85ab584d7039a1356fa3d24004d99f30e2cc9f8b"
+  },
+  "protectedProjectBefore": {
+    "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+    "fileCount": 11110,
+    "totalBytes": 687898826,
+    "digest": "54d71f8a45e5da46525c1788d079dd52cf56a15bc51c442886cafdb354e30a86"
+  },
+  "protectedProjectAfter": {
+    "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+    "fileCount": 11110,
+    "totalBytes": 687898826,
+    "digest": "54d71f8a45e5da46525c1788d079dd52cf56a15bc51c442886cafdb354e30a86"
+  },
+  "projectConfigBefore": {
+    "rawSha256": "dd8407c6fe4b6598f18a737ababcd7987a0be340590fa0027be014f9a8597482",
+    "semanticSha256": "3db3a11247349c5b734a94308130aacba35ddb0655355cba3e157873c0b9c627",
+    "updatedAt": "2026-07-17T17:33:41.795Z"
+  },
+  "projectConfigAfter": {
+    "rawSha256": "dffcd48aa40c7edcc7effd8f72d8820aba2c52cc15e90dd45670388479ada883",
+    "semanticSha256": "3db3a11247349c5b734a94308130aacba35ddb0655355cba3e157873c0b9c627",
+    "updatedAt": "2026-07-17T18:05:21.130Z"
+  },
+  "allowedWrites": [
+    ".aicanvas/cache.sqlite",
+    ".aicanvas/cache.sqlite-shm",
+    ".aicanvas/cache.sqlite-wal",
+    ".aicanvas/canonical-assets.json",
+    ".aicanvas/command-ledger.json",
+    ".aicanvas/events.jsonl",
+    ".aicanvas/index.json",
+    ".aicanvas/panel-reference-resolutions.json",
+    ".aicanvas/panel-visual-constraints.json",
+    ".aicanvas/project.json",
+    "00_画布进度.md"
+  ],
+  "assertions": {
+    "canonicalCurrent": true,
+    "explicitCategories24_20_33": true,
+    "scannerPrimaryAuthorities20": true,
+    "p2CanonicalVersionBindings5481": true,
+    "p3CanonicalVersionLocks5481": true,
+    "p2P3UseOnlyCurrentAllowedHeads": true,
+    "forbiddenAndHistoricalPathLeaksZero": true,
+    "p3HistoricalJobsPreservedAsSuperseded10Obsolete1": true,
+    "projectConfigSemanticUnchanged": true,
+    "p2Closure": true,
+    "p3Closure": true,
+    "sourceUnchanged": true,
+    "unrelatedProjectFilesUnchanged": true
+  }
+}

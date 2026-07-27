@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "p9r2-p10r2-targeted",
+  "status": "pass",
+  "startedAt": "2026-07-18T07:22:49.702Z",
+  "endedAt": "2026-07-18T07:23:53.838Z",
+  "durationMs": 64193,
+  "argv": [
+    "npx",
+    "vitest",
+    "run",
+    "tests/build-identity.test.ts",
+    "tests/mcp-build-currentness-gate.test.ts",
+    "tests/project-backup.test.ts",
+    "tests/studio-continuity-pagination.test.ts",
+    "tests/studio-production-dashboard.test.ts",
+    "tests/studio-production-dashboard-ui.test.ts",
+    "tests/studio-production-dashboard-scale.test.ts",
+    "tests/studio-production-dashboard-desktop-integration.test.ts",
+    "tests/mcp-studio-production-dashboard.test.ts",
+    "tests/managed-studio-canvas-ui.test.ts",
+    "tests/studio-canvas-layout.test.ts",
+    "tests/studio-canvas-layout-store.test.ts",
+    "tests/studio-canvas-locator.test.ts",
+    "tests/studio-canvas-pipeline-graph.test.ts",
+    "tests/studio-canvas-workflow-runner.test.ts",
+    "tests/real-imagegen-canary-v2.test.ts",
+    "tests/legacy-real-imagegen-canary-disabled.test.ts",
+    "tests/mcp-managed-studio.test.ts",
+    "tests/studio-scale-fixture.test.ts",
+    "tests/studio-reliability.test.ts",
+    "tests/material-studio.test.ts",
+    "tests/material-studio-identity.test.ts",
+    "tests/material-studio-pagination.test.ts"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "1ee489189308542684e83679a1724a6a",
+      "sourceDigest": "3996312f7fe09de33d7148405786293b1ae2d25c0015a125637ff3c69412c244"
+    },
+    "after": {
+      "buildId": "1ee489189308542684e83679a1724a6a",
+      "sourceDigest": "3996312f7fe09de33d7148405786293b1ae2d25c0015a125637ff3c69412c244"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/runs/p9r2-p10r2-targeted-tests-20260718.log",
+    "sizeBytes": 2761,
+    "sha256": "72dc06f042686cb16c9945957458b69601ad120e65cd5bfecb4f4069ab861b12"
+  },
+  "testCounts": {
+    "files": 23,
+    "tests": 72
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "kind": "p23-p24-electron-smoke",
+  "sourceDigest": "6f16e8d1d6a594863b8b4418e783422395881601dbd56b7eff8eb7be0a73b62c",
+  "sourceFiles": 514,
+  "sourceBytes": 11331358,
+  "fixtureRoot": "/private/tmp/studio-p7-fixture-uMAHkf/p7-continuity-fixture-4a62b667",
+  "registryPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/p23-p24-smoke-registry-85231.json",
+  "phases": {
+    "full": {
+      "ok": true,
+      "checks": {
+        "singleDragSnapGuidesSeen": true,
+        "noGuidesAfterSingleStop": true,
+        "singleDragMoved": true,
+        "undoReverts": true,
+        "redoRestores": true,
+        "undoButtonsEnabled": true,
+        "groupDragNoGuides": true,
+        "groupFormationKept": true,
+        "groupDragMoved": true,
+        "groupSelectionCount": true,
+        "u1PackIdentity": true,
+        "u2Classification": true,
+        "u3ReviewIdentity": true,
+        "u4RevisionHistory": true
+      },
+      "notes": {
+        "nodeIds": [
+          "asset:prop-complete-golden-mask",
+          "unit:p7-unit-a-six-panel",
+          "unit:p7-unit-b-two-panel",
+          "unit:p24-unit-four-panel"
+        ],
+        "singleDrag": {
+          "beforeSingle": {
+            "x": 999,
+            "y": 517,
+            "left": 909,
+            "top": 457,
+            "width": 179
+          },
+          "afterSingle": {
+            "x": 571,
+            "y": 457,
+            "left": 481,
+            "top": 397,
+            "width": 179
+          },
+          "singleMaxGuides": 2,
+          "guidesAfterSingleStop": 0
+        },
+        "undoRedo": {
+          "afterUndo": {
+            "x": 999,
+            "y": 517,
+            "left": 909,
+            "top": 457,
+            "width": 179
+          },
+          "afterRedo": {
+            "x": 571,
+            "y": 457,
+            "left": 481,
+            "top": 397,
+            "width": 179
+          }
+        },
+        "groupDrag": {
+          "selectionCount": 2,
+          "groupMaxGuides": 0,
+          "deltaBefore": {
+            "dx": 67,
+            "dy": 45
+          },
+          "deltaAfter": {
+            "dx": 67,
+            "dy": 45
+          }
+        },
+        "u1Text": "冻结包身份（生成时版本）packIdstudio-generation-freeze-5189a9d86fdcee75f3ed7e30be1a6462包指纹5189a9d86fdc…剧本修订text-revision-bab76bb511419517fa15934aa4e1688233693098 · 4d91695561ce…提示词修订text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675 · 83d641137e3a…",
+        "u2Text": "生成时身份studio-generation-freeze-5189a9d86fdcee75f3ed7e30be1a6462 · 包指纹 5189a9d86fdc…输入当前 ",
+        "u3Text": "#1 · observationrework当前有效P23/P24 GLOBAL_VALIDATING smoke 批注提交时身份（生成时版本）pack studio-generation-freeze-5189a9d86fdcee75f3ed7e30be1a6462 · 包指纹 5189a9d86fdc…raw 1209744ddbd1… · labeled 1b23b2ef6a53…",
+        "u4Text": "修订历史（最新在前，仅前 20 条） r1 · text-revision-bab76bb511419517fa15934aa4e1688233693098 · 4d91695561…74655c （当前）"
+      }
+    },
+    "restart": {
+      "ok": true,
+      "checks": {
+        "canvasMounted": true,
+        "undoDisabled": true,
+        "redoDisabled": true
+      },
+      "notes": {
+        "undo": true,
+        "redo": true,
+        "canvasMounted": true
+      }
+    },
+    "switched": {
+      "ok": true,
+      "checks": {
+        "canvasMounted": true,
+        "undoDisabled": true,
+        "redoDisabled": true
+      },
+      "notes": {
+        "undo": true,
+        "redo": true,
+        "canvasMounted": true
+      }
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "kind": "final-validation-p8-production-dashboard",
+  "status": "PASS",
+  "createdAt": "2026-07-18T03:51:48.679Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio",
+  "sourceRoot": "/Users/hxx/Documents/古蜀卷第三季",
+  "expectedToolCount": 182,
+  "targeted": {
+    "files": 5,
+    "tests": 8
+  },
+  "full": {
+    "files": 108,
+    "tests": 606
+  },
+  "uiEvidence": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p8-production-dashboard-ui-smoke-20260718-01.json",
+    "sha256": "3b71757ae20eb554c0483bed8f94b9cd7f414ac26c5e0c4a370f7eb5354a9cd5",
+    "overviewFingerprint": "4f32098ef47727a29d15c3b9120395950216be334d6fa291748eb6c00e6a2764"
+  },
+  "inventories": {
+    "projectBefore": {
+      "root": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio",
+      "files": 18,
+      "bytes": 623824,
+      "aggregateSha256": "d95ac52b124d353bdc77b74a33ad52a014ad4db3868ff4f02f0ec18df72e38da"
+    },
+    "projectAfter": {
+      "root": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio",
+      "files": 18,
+      "bytes": 623824,
+      "aggregateSha256": "d95ac52b124d353bdc77b74a33ad52a014ad4db3868ff4f02f0ec18df72e38da"
+    },
+    "sourceBefore": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "4c4e09dad123f56f6ab489ca11a3d3595d01c27ab489c1840a70c8a13aca2215"
+    },
+    "sourceAfter": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "4c4e09dad123f56f6ab489ca11a3d3595d01c27ab489c1840a70c8a13aca2215"
+    }
+  },
+  "commands": [
+    {
+      "name": "typecheck",
+      "exitCode": 0,
+      "durationMs": 8246,
+      "logSha256": "8aca887056e876fdc407b955daffd0b0a5dec0c074cd623f6decb7a214530132"
+    },
+    {
+      "name": "p8-targeted",
+      "exitCode": 0,
+      "durationMs": 6990,
+      "logSha256": "c06b30f859d5e1e3ace94a4871a6af24367d7c8df8af38b9e3c01a893669c452"
+    },
+    {
+      "name": "full",
+      "exitCode": 0,
+      "durationMs": 291195,
+      "logSha256": "cf8095817490b61b1bfa27aaa4976438473b5373ca840ef6218994e484e0c789"
+    },
+    {
+      "name": "build",
+      "exitCode": 0,
+      "durationMs": 13851,
+      "logSha256": "cd7eaedd4ebbb86ce97c28e2838e6a49f751e3b9138a25b3b20ae218775f98af"
+    },
+    {
+      "name": "mcp-build",
+      "exitCode": 0,
+      "durationMs": 2738,
+      "logSha256": "416027fb1268c24317f93d5104624af168a0451307eda3ce23102480f5dd79c5"
+    },
+    {
+      "name": "mcp-smoke",
+      "exitCode": 0,
+      "durationMs": 460,
+      "logSha256": "b4a91f8f911221425e558da53da45f24c026454ab00c7dcc68a8e673bebc67d4"
+    }
+  ],
+  "reportPath": "/Users/hxx/Documents/无限画布/docs/验证报告_20260718_P8无限画布生产驾驶舱.md",
+  "runRoot": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p8-production-dashboard-final-20260718-01",
+  "git": {
+    "stage": 0,
+    "commit": 0,
+    "push": 0
+  },
+  "imagegen": 0,
+  "browser": 0,
+  "upload": 0
+}

@@ -1,0 +1,55 @@
+{
+  "root": "/tmp/ai-canvas-incremental-scan-400",
+  "registryPath": "/tmp/ai-canvas-incremental-scan-400-registry.json",
+  "fixture": {
+    "requested": 400,
+    "recognized": 400,
+    "thumbnails": 400,
+    "scanDurationMs": 88,
+    "scanStats": {
+      "discoveredFiles": 800,
+      "candidateFiles": 800,
+      "referenceAssets": 0,
+      "inspectedChecks": 800,
+      "reusedChecks": 0,
+      "textFilesRead": 400,
+      "includeHashes": false,
+      "inspectionConcurrency": 6
+    }
+  },
+  "unchanged": {
+    "elapsedMs": 150,
+    "scanDurationMs": 81,
+    "scanStats": {
+      "discoveredFiles": 800,
+      "candidateFiles": 800,
+      "referenceAssets": 0,
+      "inspectedChecks": 0,
+      "reusedChecks": 800,
+      "textFilesRead": 400,
+      "includeHashes": false,
+      "inspectionConcurrency": 6
+    }
+  },
+  "oneFileChanged": {
+    "path": "/tmp/ai-canvas-incremental-scan-400/EP10_15s_040_压力测试镜头_0400/EP10_15s_040_首帧_raw.png",
+    "elapsedMs": 134,
+    "scanDurationMs": 69,
+    "scanStats": {
+      "discoveredFiles": 800,
+      "candidateFiles": 800,
+      "referenceAssets": 0,
+      "inspectedChecks": 1,
+      "reusedChecks": 799,
+      "textFilesRead": 400,
+      "includeHashes": false,
+      "inspectionConcurrency": 6
+    }
+  },
+  "cancellation": {
+    "progressAtAbort": 1,
+    "preservedScanId": "8cff0a07-5012-42e6-a7ae-f962839d3ccf",
+    "eventCount": 3,
+    "locks": 0
+  }
+}

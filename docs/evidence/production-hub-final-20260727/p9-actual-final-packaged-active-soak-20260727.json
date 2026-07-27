@@ -1,0 +1,2158 @@
+{
+  "schemaVersion": 1,
+  "kind": "p8-packaged-active-soak",
+  "status": "PASS",
+  "generatedAt": "2026-07-27T03:44:10.144Z",
+  "buildIdentity": {
+    "source": "installed-app-resources-release-manifest",
+    "executablePath": "/tmp/ai-canvas-p9-actual-final.OKC9RH/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+    "manifestPath": "/tmp/ai-canvas-p9-actual-final.OKC9RH/mac-arm64/AI 漫剧画布.app/Contents/Resources/release-manifest.json",
+    "version": "0.2.0",
+    "sourceDigest": "10c93cbb2288ebe7c23f12a759a58248db5d90384cfbbf10f6f7ac195a851f27",
+    "buildId": "fad7c07f82af08cfdf748bbb09e9463e",
+    "fingerprint": "68cbb19899032f9961d1b40ddac428b4dc2b413e8474b7831a350acb97a7a83b",
+    "releaseManifestFingerprint": "407950b1d9cdd141eccc5d8de26feaf2c3bf5c5a1c2b1be37910f185c493c4ac"
+  },
+  "runtime": {
+    "executable": "/tmp/ai-canvas-p9-actual-final.OKC9RH/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+    "packaged": true,
+    "installed": false,
+    "isolatedUserData": true,
+    "isolatedRegistry": true,
+    "formalProjectOpenedDirectly": false
+  },
+  "projectIsolation": {
+    "formalRoot": "/Users/hxx/Documents/无限画布/projects/local-import-dudu-world-prologue-b8bfcf14",
+    "formalProjectMutated": false,
+    "formalSentinelsBefore": [
+      {
+        "relativePath": ".aicanvas/managed-project.json",
+        "exists": true,
+        "bytes": 1414,
+        "mtimeMs": 1784988532217,
+        "sha256": "68b4747ca2c83db5a77eeb574c2e8fcb0364e4b3457e987a314cd9eaeea9b5ac"
+      },
+      {
+        "relativePath": ".aicanvas/project.json",
+        "exists": true,
+        "bytes": 831,
+        "mtimeMs": 1784988532077,
+        "sha256": "0294f210f97ad4a76c90f293c089f0ea8eac9c442f621e4c94b2c2dbbe1cddfa"
+      },
+      {
+        "relativePath": ".aicanvas/studio-production.sqlite",
+        "exists": true,
+        "bytes": 749568,
+        "mtimeMs": 1785095221206,
+        "sha256": "5ff80761bc916f7ced658f9c40281d6356209ba1134cda3d586bd43635a382c1"
+      },
+      {
+        "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+        "exists": true,
+        "bytes": 1339392,
+        "mtimeMs": 1785095685149,
+        "sha256": "46507077d984e43e83138b99b614e27f2b2d7559e96cf2d2ed3b6dde2a4ee3ae"
+      },
+      {
+        "relativePath": ".aicanvas/material-studio.sqlite",
+        "exists": true,
+        "bytes": 700416,
+        "mtimeMs": 1785095174803,
+        "sha256": "f5414aaa8bd1ed27996af47110d82ce7593d033fb6423aba563b2b085debde99"
+      },
+      {
+        "relativePath": ".aicanvas/studio-canvas-layout.json",
+        "exists": true,
+        "bytes": 4094,
+        "mtimeMs": 1785049077624,
+        "sha256": "b4688c42790c435e43690b125e48695e3d9693b3291568e44646a5e8196cbe40"
+      }
+    ],
+    "formalSentinelsAfter": [
+      {
+        "relativePath": ".aicanvas/managed-project.json",
+        "exists": true,
+        "bytes": 1414,
+        "mtimeMs": 1784988532217,
+        "sha256": "68b4747ca2c83db5a77eeb574c2e8fcb0364e4b3457e987a314cd9eaeea9b5ac"
+      },
+      {
+        "relativePath": ".aicanvas/project.json",
+        "exists": true,
+        "bytes": 831,
+        "mtimeMs": 1784988532077,
+        "sha256": "0294f210f97ad4a76c90f293c089f0ea8eac9c442f621e4c94b2c2dbbe1cddfa"
+      },
+      {
+        "relativePath": ".aicanvas/studio-production.sqlite",
+        "exists": true,
+        "bytes": 749568,
+        "mtimeMs": 1785095221206,
+        "sha256": "5ff80761bc916f7ced658f9c40281d6356209ba1134cda3d586bd43635a382c1"
+      },
+      {
+        "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+        "exists": true,
+        "bytes": 1339392,
+        "mtimeMs": 1785095685149,
+        "sha256": "46507077d984e43e83138b99b614e27f2b2d7559e96cf2d2ed3b6dde2a4ee3ae"
+      },
+      {
+        "relativePath": ".aicanvas/material-studio.sqlite",
+        "exists": true,
+        "bytes": 700416,
+        "mtimeMs": 1785095174803,
+        "sha256": "f5414aaa8bd1ed27996af47110d82ce7593d033fb6423aba563b2b085debde99"
+      },
+      {
+        "relativePath": ".aicanvas/studio-canvas-layout.json",
+        "exists": true,
+        "bytes": 4094,
+        "mtimeMs": 1785049077624,
+        "sha256": "b4688c42790c435e43690b125e48695e3d9693b3291568e44646a5e8196cbe40"
+      }
+    ],
+    "cloneProjectId": "project-b3e5fa60bbcd",
+    "smallProjectId": "project-9ce75a7d5cf1",
+    "legacyScanCancellationFixture": {
+      "rootWasIsolated": true,
+      "managedProject": false,
+      "acceptedCount": 30,
+      "fakeProbeTerminationObserved": true
+    },
+    "cloneRemovedAfterRun": true
+  },
+  "endurance": {
+    "requestedDurationMs": 1800000,
+    "actualDurationMs": 1800003,
+    "cycleIntervalMs": 60000,
+    "activeCycleCount": 30,
+    "projectSwitchCount": 60,
+    "cycles": [
+      {
+        "cycle": 1,
+        "startedAt": "2026-07-27T03:14:04.963Z",
+        "finishedAt": "2026-07-27T03:14:12.500Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.783329,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.808183,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 7537
+      },
+      {
+        "cycle": 2,
+        "startedAt": "2026-07-27T03:15:04.964Z",
+        "finishedAt": "2026-07-27T03:15:11.146Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.791282,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.790332,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 6182
+      },
+      {
+        "cycle": 3,
+        "startedAt": "2026-07-27T03:16:04.965Z",
+        "finishedAt": "2026-07-27T03:16:11.124Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.782687,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.790137,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 6159
+      },
+      {
+        "cycle": 4,
+        "startedAt": "2026-07-27T03:17:04.968Z",
+        "finishedAt": "2026-07-27T03:17:10.596Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.791567,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.80829,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 5628
+      },
+      {
+        "cycle": 5,
+        "startedAt": "2026-07-27T03:18:04.971Z",
+        "finishedAt": "2026-07-27T03:18:11.153Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.791869,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.80855,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 6182
+      },
+      {
+        "cycle": 6,
+        "startedAt": "2026-07-27T03:19:04.973Z",
+        "finishedAt": "2026-07-27T03:19:11.172Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.785212,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.797971,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 6199
+      },
+      {
+        "cycle": 7,
+        "startedAt": "2026-07-27T03:20:04.976Z",
+        "finishedAt": "2026-07-27T03:20:11.225Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.772564,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.789872,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 6249
+      },
+      {
+        "cycle": 8,
+        "startedAt": "2026-07-27T03:21:04.977Z",
+        "finishedAt": "2026-07-27T03:21:11.340Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.784183,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.789027,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 6363
+      },
+      {
+        "cycle": 9,
+        "startedAt": "2026-07-27T03:22:04.978Z",
+        "finishedAt": "2026-07-27T03:22:11.400Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.788088,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.807866,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 6422
+      },
+      {
+        "cycle": 10,
+        "startedAt": "2026-07-27T03:23:04.980Z",
+        "finishedAt": "2026-07-27T03:23:10.869Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.788884,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.798979,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 5889
+      },
+      {
+        "cycle": 11,
+        "startedAt": "2026-07-27T03:24:04.981Z",
+        "finishedAt": "2026-07-27T03:24:11.041Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.773257,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.797305,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 6060
+      },
+      {
+        "cycle": 12,
+        "startedAt": "2026-07-27T03:25:04.983Z",
+        "finishedAt": "2026-07-27T03:25:11.080Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.779451,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.803664,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 6097
+      },
+      {
+        "cycle": 13,
+        "startedAt": "2026-07-27T03:26:04.985Z",
+        "finishedAt": "2026-07-27T03:26:11.145Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.773987,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.801565,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 6160
+      },
+      {
+        "cycle": 14,
+        "startedAt": "2026-07-27T03:27:04.986Z",
+        "finishedAt": "2026-07-27T03:27:11.100Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.780251,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.805103,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 6114
+      },
+      {
+        "cycle": 15,
+        "startedAt": "2026-07-27T03:28:04.987Z",
+        "finishedAt": "2026-07-27T03:28:11.086Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.786428,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.809057,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 6099
+      },
+      {
+        "cycle": 16,
+        "startedAt": "2026-07-27T03:29:04.988Z",
+        "finishedAt": "2026-07-27T03:29:12.115Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.772342,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.795155,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 7127
+      },
+      {
+        "cycle": 17,
+        "startedAt": "2026-07-27T03:30:04.990Z",
+        "finishedAt": "2026-07-27T03:30:11.465Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.778003,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.789095,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 6475
+      },
+      {
+        "cycle": 18,
+        "startedAt": "2026-07-27T03:31:04.992Z",
+        "finishedAt": "2026-07-27T03:31:12.678Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.771338,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.799235,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 7686
+      },
+      {
+        "cycle": 19,
+        "startedAt": "2026-07-27T03:32:04.994Z",
+        "finishedAt": "2026-07-27T03:32:13.246Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.773505,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.794059,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 8252
+      },
+      {
+        "cycle": 20,
+        "startedAt": "2026-07-27T03:33:04.996Z",
+        "finishedAt": "2026-07-27T03:33:12.445Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.780782,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.802635,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 7449
+      },
+      {
+        "cycle": 21,
+        "startedAt": "2026-07-27T03:34:04.998Z",
+        "finishedAt": "2026-07-27T03:34:13.335Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.785118,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.787774,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 8337
+      },
+      {
+        "cycle": 22,
+        "startedAt": "2026-07-27T03:35:05.000Z",
+        "finishedAt": "2026-07-27T03:35:12.414Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.78054,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.799514,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 7414
+      },
+      {
+        "cycle": 23,
+        "startedAt": "2026-07-27T03:36:05.002Z",
+        "finishedAt": "2026-07-27T03:36:17.360Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.792131,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.792954,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 12358
+      },
+      {
+        "cycle": 24,
+        "startedAt": "2026-07-27T03:37:05.003Z",
+        "finishedAt": "2026-07-27T03:37:16.337Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.773204,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.795416,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 11334
+      },
+      {
+        "cycle": 25,
+        "startedAt": "2026-07-27T03:38:05.005Z",
+        "finishedAt": "2026-07-27T03:38:17.348Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.77166,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.785733,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 12343
+      },
+      {
+        "cycle": 26,
+        "startedAt": "2026-07-27T03:39:05.006Z",
+        "finishedAt": "2026-07-27T03:39:13.196Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.783923,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.791838,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 8190
+      },
+      {
+        "cycle": 27,
+        "startedAt": "2026-07-27T03:40:05.103Z",
+        "finishedAt": "2026-07-27T03:40:11.452Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.782463,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.803553,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 6349
+      },
+      {
+        "cycle": 28,
+        "startedAt": "2026-07-27T03:41:05.105Z",
+        "finishedAt": "2026-07-27T03:41:13.954Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.780652,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.788494,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 8849
+      },
+      {
+        "cycle": 29,
+        "startedAt": "2026-07-27T03:42:05.108Z",
+        "finishedAt": "2026-07-27T03:42:16.699Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.780888,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.804152,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 11591
+      },
+      {
+        "cycle": 30,
+        "startedAt": "2026-07-27T03:43:05.111Z",
+        "finishedAt": "2026-07-27T03:43:17.658Z",
+        "projectSwitches": 2,
+        "canvas": {
+          "panDistancePx": 105,
+          "wheelDeltaY": 420
+        },
+        "original": {
+          "alt": "嘟嘟唯一身份主锁 v1 受管原图",
+          "naturalWidth": 2048,
+          "naturalHeight": 1152,
+          "sourceProtocol": "aicanvas-studio:"
+        },
+        "playback": {
+          "availability": "剧本 可用 图片 可用 视频 可用 音频 可用",
+          "video": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.773741,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          },
+          "audio": {
+            "readyState": 4,
+            "networkState": 1,
+            "durationSeconds": 12,
+            "startSeconds": 0,
+            "endSeconds": 0.790807,
+            "advanced": true,
+            "paused": true,
+            "errorCode": null,
+            "sourceProtocol": "aicanvas-studio:"
+          }
+        },
+        "scanCancel": {
+          "accepted": true,
+          "scanOutcome": "rejected",
+          "scanError": "Error invoking remote method 'canvas:scan': AbortError: 用户取消了手动扫描。",
+          "probeStarted": true,
+          "probeTerminated": true
+        },
+        "durationMs": 12547
+      }
+    ],
+    "resourceSamples": [
+      {
+        "at": "2026-07-27T03:14:04.963Z",
+        "elapsedMs": 109,
+        "phase": "initial-ready",
+        "cycle": 0,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          8940
+        ],
+        "rssKiB": 645792,
+        "fileDescriptors": 249,
+        "mediaRequestCount": 0
+      },
+      {
+        "at": "2026-07-27T03:14:12.604Z",
+        "elapsedMs": 7750,
+        "phase": "active-cycle",
+        "cycle": 1,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 917824,
+        "fileDescriptors": 280,
+        "mediaRequestCount": 17
+      },
+      {
+        "at": "2026-07-27T03:15:11.249Z",
+        "elapsedMs": 66395,
+        "phase": "active-cycle",
+        "cycle": 2,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 903600,
+        "fileDescriptors": 279,
+        "mediaRequestCount": 28
+      },
+      {
+        "at": "2026-07-27T03:16:11.228Z",
+        "elapsedMs": 126374,
+        "phase": "active-cycle",
+        "cycle": 3,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 915968,
+        "fileDescriptors": 282,
+        "mediaRequestCount": 39
+      },
+      {
+        "at": "2026-07-27T03:17:10.699Z",
+        "elapsedMs": 185845,
+        "phase": "active-cycle",
+        "cycle": 4,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 925504,
+        "fileDescriptors": 283,
+        "mediaRequestCount": 50
+      },
+      {
+        "at": "2026-07-27T03:18:11.262Z",
+        "elapsedMs": 246408,
+        "phase": "active-cycle",
+        "cycle": 5,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 921776,
+        "fileDescriptors": 283,
+        "mediaRequestCount": 61
+      },
+      {
+        "at": "2026-07-27T03:19:11.276Z",
+        "elapsedMs": 306422,
+        "phase": "active-cycle",
+        "cycle": 6,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 934992,
+        "fileDescriptors": 283,
+        "mediaRequestCount": 72
+      },
+      {
+        "at": "2026-07-27T03:20:11.328Z",
+        "elapsedMs": 366474,
+        "phase": "active-cycle",
+        "cycle": 7,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 943232,
+        "fileDescriptors": 281,
+        "mediaRequestCount": 83
+      },
+      {
+        "at": "2026-07-27T03:21:11.442Z",
+        "elapsedMs": 426588,
+        "phase": "active-cycle",
+        "cycle": 8,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 957072,
+        "fileDescriptors": 283,
+        "mediaRequestCount": 94
+      },
+      {
+        "at": "2026-07-27T03:22:11.504Z",
+        "elapsedMs": 486650,
+        "phase": "active-cycle",
+        "cycle": 9,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 947008,
+        "fileDescriptors": 281,
+        "mediaRequestCount": 105
+      },
+      {
+        "at": "2026-07-27T03:23:10.982Z",
+        "elapsedMs": 546128,
+        "phase": "active-cycle",
+        "cycle": 10,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 957312,
+        "fileDescriptors": 280,
+        "mediaRequestCount": 116
+      },
+      {
+        "at": "2026-07-27T03:24:11.144Z",
+        "elapsedMs": 606290,
+        "phase": "active-cycle",
+        "cycle": 11,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 967648,
+        "fileDescriptors": 283,
+        "mediaRequestCount": 122
+      },
+      {
+        "at": "2026-07-27T03:25:11.189Z",
+        "elapsedMs": 666335,
+        "phase": "active-cycle",
+        "cycle": 12,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 987040,
+        "fileDescriptors": 283,
+        "mediaRequestCount": 127
+      },
+      {
+        "at": "2026-07-27T03:26:11.247Z",
+        "elapsedMs": 726393,
+        "phase": "active-cycle",
+        "cycle": 13,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 1000624,
+        "fileDescriptors": 282,
+        "mediaRequestCount": 132
+      },
+      {
+        "at": "2026-07-27T03:27:11.202Z",
+        "elapsedMs": 786348,
+        "phase": "active-cycle",
+        "cycle": 14,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 1011648,
+        "fileDescriptors": 283,
+        "mediaRequestCount": 137
+      },
+      {
+        "at": "2026-07-27T03:28:11.188Z",
+        "elapsedMs": 846334,
+        "phase": "active-cycle",
+        "cycle": 15,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 1006672,
+        "fileDescriptors": 280,
+        "mediaRequestCount": 142
+      },
+      {
+        "at": "2026-07-27T03:29:12.256Z",
+        "elapsedMs": 907402,
+        "phase": "active-cycle",
+        "cycle": 16,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 979360,
+        "fileDescriptors": 283,
+        "mediaRequestCount": 147
+      },
+      {
+        "at": "2026-07-27T03:30:11.586Z",
+        "elapsedMs": 966732,
+        "phase": "active-cycle",
+        "cycle": 17,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 1017280,
+        "fileDescriptors": 283,
+        "mediaRequestCount": 152
+      },
+      {
+        "at": "2026-07-27T03:31:12.821Z",
+        "elapsedMs": 1027967,
+        "phase": "active-cycle",
+        "cycle": 18,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 1004496,
+        "fileDescriptors": 280,
+        "mediaRequestCount": 157
+      },
+      {
+        "at": "2026-07-27T03:32:13.395Z",
+        "elapsedMs": 1088541,
+        "phase": "active-cycle",
+        "cycle": 19,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 991360,
+        "fileDescriptors": 282,
+        "mediaRequestCount": 162
+      },
+      {
+        "at": "2026-07-27T03:33:12.616Z",
+        "elapsedMs": 1147762,
+        "phase": "active-cycle",
+        "cycle": 20,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 1008768,
+        "fileDescriptors": 280,
+        "mediaRequestCount": 167
+      },
+      {
+        "at": "2026-07-27T03:34:13.494Z",
+        "elapsedMs": 1208640,
+        "phase": "active-cycle",
+        "cycle": 21,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 991008,
+        "fileDescriptors": 283,
+        "mediaRequestCount": 172
+      },
+      {
+        "at": "2026-07-27T03:35:12.836Z",
+        "elapsedMs": 1267982,
+        "phase": "active-cycle",
+        "cycle": 22,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 1001312,
+        "fileDescriptors": 283,
+        "mediaRequestCount": 177
+      },
+      {
+        "at": "2026-07-27T03:36:17.629Z",
+        "elapsedMs": 1332775,
+        "phase": "active-cycle",
+        "cycle": 23,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 1011488,
+        "fileDescriptors": 279,
+        "mediaRequestCount": 182
+      },
+      {
+        "at": "2026-07-27T03:37:16.603Z",
+        "elapsedMs": 1391749,
+        "phase": "active-cycle",
+        "cycle": 24,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 1035392,
+        "fileDescriptors": 279,
+        "mediaRequestCount": 187
+      },
+      {
+        "at": "2026-07-27T03:38:17.624Z",
+        "elapsedMs": 1452770,
+        "phase": "active-cycle",
+        "cycle": 25,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 1033104,
+        "fileDescriptors": 287,
+        "mediaRequestCount": 192
+      },
+      {
+        "at": "2026-07-27T03:39:13.304Z",
+        "elapsedMs": 1508450,
+        "phase": "active-cycle",
+        "cycle": 26,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 1058352,
+        "fileDescriptors": 282,
+        "mediaRequestCount": 197
+      },
+      {
+        "at": "2026-07-27T03:40:11.579Z",
+        "elapsedMs": 1566725,
+        "phase": "active-cycle",
+        "cycle": 27,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 761648,
+        "fileDescriptors": 282,
+        "mediaRequestCount": 202
+      },
+      {
+        "at": "2026-07-27T03:41:14.146Z",
+        "elapsedMs": 1629292,
+        "phase": "active-cycle",
+        "cycle": 28,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 716288,
+        "fileDescriptors": 284,
+        "mediaRequestCount": 207
+      },
+      {
+        "at": "2026-07-27T03:42:16.966Z",
+        "elapsedMs": 1692112,
+        "phase": "active-cycle",
+        "cycle": 29,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 733520,
+        "fileDescriptors": 281,
+        "mediaRequestCount": 212
+      },
+      {
+        "at": "2026-07-27T03:43:18.014Z",
+        "elapsedMs": 1753160,
+        "phase": "active-cycle",
+        "cycle": 30,
+        "pids": [
+          8928,
+          8931,
+          8932,
+          8933,
+          9026
+        ],
+        "rssKiB": 751696,
+        "fileDescriptors": 283,
+        "mediaRequestCount": 217
+      },
+      {
+        "at": "2026-07-27T03:44:09.463Z",
+        "elapsedMs": 1804609,
+        "phase": "force-restart-ready",
+        "cycle": 30,
+        "pids": [
+          49318,
+          49594,
+          49595,
+          49616,
+          49627
+        ],
+        "rssKiB": 654976,
+        "fileDescriptors": 252,
+        "mediaRequestCount": 217
+      }
+    ],
+    "tailPolicy": "second-half first-3 median vs last-3 median",
+    "tailRssStartKiB": 1004496,
+    "tailRssEndKiB": 733520,
+    "tailRssGrowthRatio": -0.2697631449005272,
+    "tailRssGrowthLimit": 0.1,
+    "tailFdStart": 283,
+    "tailFdEnd": 283,
+    "tailFdDelta": 0,
+    "tailFdDeltaLimit": 5,
+    "acceptedScanCancellationCount": 30
+  },
+  "errors": {
+    "pageErrors": [],
+    "consoleErrors": [],
+    "externalRequests": []
+  },
+  "forceRestart": {
+    "killedPid": 8928,
+    "exitCode": null,
+    "exitSignal": "SIGKILL",
+    "reopened": true,
+    "expectedProjectId": "project-b3e5fa60bbcd",
+    "restoredTitle": "《嘟嘟》世界观概念序章",
+    "restoredMetrics": "项目概览 19 资产 3 单元 10 宫格 266 媒体 108 文稿 构建身份 v0.2.0 · buildId:fad7c07f82af · sourceDigest:10c93cbb2288"
+  },
+  "screenshot": {
+    "relativePath": "output/playwright/p9-actual-final-packaged-active-soak-20260727.png",
+    "sha256": "eb2a8f0081ba17ced35d8217acb6adfc2f94cec8fb48506fad20d82e691d33fd",
+    "width": 1728,
+    "height": 1029,
+    "sizeBytes": 139361,
+    "maxChannelStandardDeviation": 19.92944743499908
+  },
+  "boundaries": {
+    "formalGenerationCalls": 0,
+    "externalProviderCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0,
+    "publishing": 0,
+    "gitStage": 0
+  }
+}

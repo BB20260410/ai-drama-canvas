@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "kind": "p8-production-dashboard-ui-smoke",
+  "createdAt": "2026-07-18T03:46:15.837Z",
+  "projectRoot": "/private/tmp/studio-p7-fixture-OVjEEf/p7-continuity-fixture-80ff5b3b",
+  "projectId": "project-4a82d037c43f",
+  "core": {
+    "overviewFingerprint": "4f32098ef47727a29d15c3b9120395950216be334d6fa291748eb6c00e6a2764",
+    "overviewNextAction": {
+      "code": "open-production-dashboard",
+      "label": "在驾驶舱选择下一格并冻结生图包",
+      "reason": "素材与单元已就绪；由 Dashboard 打开单元视图，按 Core 投影处理阻塞宫格。",
+      "requiresWrite": false,
+      "locator": {
+        "kind": "project",
+        "projectId": "project-4a82d037c43f"
+      }
+    },
+    "unitsCount": 2
+  },
+  "ui": {
+    "nextActionLabel": "冻结当前宫格生成包",
+    "unitDomCount": 2,
+    "panelDomCount": 6,
+    "pageErrors": [],
+    "consoleErrors": [],
+    "externalResources": []
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p8-production-dashboard-ui-smoke-20260718-01.png",
+    "sizeBytes": 179739,
+    "sha256": "de6085f8818c4bc51b2e895d16d84552afcd5de0458e947a0e534fbbca0feb6f"
+  },
+  "formalAccess": 0,
+  "imagegen": 0,
+  "browser": 0,
+  "upload": 0
+}

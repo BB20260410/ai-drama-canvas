@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "kind": "artlist-sidebrowser-plan-ui-smoke",
+  "createdAt": "2026-07-15T23:58:37.680Z",
+  "transport": "electron-current-production-build",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "jobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+  "registryPath": "/tmp/ai-canvas-artlist-sidebrowser-plan-ui-registry-20260716.json",
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/artlist-sidebrowser-plan-ui-smoke-20260716.png",
+    "sha256": "3280ddc8b03eed75e174a8c05b1411fc53fcdef764ec3cfdab3577fe91dec3fa"
+  },
+  "guardedFiles": {
+    "beforeHashes": {
+      "generationJobs": "aa6e2ef31a883db3e1eccbff4b830def896248c4814cacacd5c64cb4345e3dc1",
+      "publications": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+      "consistency": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7",
+      "commandLedger": "8bf00fd6a1d349c610d45a667b72d74abb8029dbe3daa1d6b10fc94765e85392",
+      "generationSettings": "c885db37f648e6fd4cac43447714e90218dd3ddb1b29e1d34dd69a84a69a9563",
+      "browserPlan": "47a50b853351655aeb95f9021ae9725e2b4c0d468aeae8215a43c5f5daccda8c"
+    },
+    "afterHashes": {
+      "generationJobs": "aa6e2ef31a883db3e1eccbff4b830def896248c4814cacacd5c64cb4345e3dc1",
+      "publications": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+      "consistency": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7",
+      "commandLedger": "8bf00fd6a1d349c610d45a667b72d74abb8029dbe3daa1d6b10fc94765e85392",
+      "generationSettings": "c885db37f648e6fd4cac43447714e90218dd3ddb1b29e1d34dd69a84a69a9563",
+      "browserPlan": "47a50b853351655aeb95f9021ae9725e2b4c0d468aeae8215a43c5f5daccda8c"
+    },
+    "unchanged": true
+  },
+  "apiState": {
+    "jobCount": 6,
+    "settingsRevision": 3,
+    "job": {
+      "id": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+      "itemId": "asset-P01",
+      "status": "waiting_external",
+      "browserState": "plan_ready",
+      "browserCheckpoint": {
+        "revision": 3,
+        "stage": "plan_ready",
+        "updatedAt": "2026-07-15T23:47:13.506Z",
+        "executionSurface": {
+          "id": "codex-in-app-side-browser",
+          "version": "1"
+        },
+        "note": "迁移到 Codex 应用内侧边浏览器；保留原 job、Publication、提示词、白名单和输出路径，旧 Chrome 预检证据失效。"
+      },
+      "model": "GPT Image 2",
+      "parameters": {
+        "mode": "text",
+        "aspectRatio": "9:16",
+        "resolution": "Medium",
+        "quality": "Medium",
+        "imageCount": 1
+      },
+      "referencePaths": [],
+      "publicationIntentId": "publication-b17a8792-7c31-43ea-ae95-04be4de08f5f"
+    },
+    "provider": {
+      "id": "artlist-gpt-image-2",
+      "name": "Artlist · GPT Image 2",
+      "adapter": "codex-browser",
+      "kinds": [
+        "image"
+      ],
+      "enabled": true,
+      "model": "GPT Image 2",
+      "siteUrl": "https://toolkit.artlist.io/image-video-generator?mode=image",
+      "browserInstructions": "仅使用 Codex 应用内侧边浏览器的已登录会话；9:16、Medium、1 Image、并发1。出现购买积分或额度不足提示时在点击前停止。禁止切换到 Chrome 或其他外部浏览器。",
+      "executionSurface": {
+        "id": "codex-in-app-side-browser",
+        "version": "1"
+      },
+      "capabilities": {
+        "referenceModes": [
+          "text",
+          "multi_image"
+        ],
+        "maxReferenceImages": 6,
+        "maxReferenceVideos": 0,
+        "supportedDurations": [],
+        "supportedAspectRatios": [
+          "9:16"
+        ],
+        "supportedResolutions": [
+          "Medium"
+        ],
+        "models": [
+          "GPT Image 2"
+        ],
+        "maxConcurrency": 1,
+        "supportsCancel": false
+      },
+      "outputRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+      "createdAt": "2026-07-15T11:16:44.150Z",
+      "updatedAt": "2026-07-15T23:46:52.433Z"
+    }
+  },
+  "rendered": {
+    "status": "等待外部落盘",
+    "checkpoint": "网页 plan_ready · R3 · codex-in-app-side-browser@1",
+    "blockedCount": 0,
+    "submitIntentCount": 0,
+    "uploadSlotCount": 0,
+    "rowRect": {
+      "left": 26,
+      "top": 726,
+      "right": 1694,
+      "bottom": 818,
+      "width": 1668
+    },
+    "listRect": {
+      "left": 0,
+      "top": 266,
+      "right": 1720,
+      "bottom": 1029,
+      "width": 1720
+    },
+    "pageOverflowX": false,
+    "pageOverflowY": false
+  },
+  "pageErrors": []
+}

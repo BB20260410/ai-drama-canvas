@@ -1,0 +1,40 @@
+{
+  "derived": {
+    "schemaVersion": 1,
+    "kind": "studio-generation-target-state",
+    "targetKind": "unit-grid",
+    "unitId": "S1E2-U25",
+    "state": "result_pending_review",
+    "reason": "run s1e2-u25-mcp-grok-mrxwt3u9 成对结果未审片",
+    "blockingRunId": "s1e2-u25-mcp-grok-mrxwt3u9",
+    "nextAction": "submit_studio_generation_review",
+    "latestRun": {
+      "generationRunId": "s1e2-u25-mcp-grok-mrxwt3u9",
+      "packId": "studio-generation-freeze-3b1e5f1678d1e0ae1cfe57d28865c6d1",
+      "provider": "grok",
+      "dispatchedAt": "2026-07-23T19:34:55.716Z",
+      "latestEventKind": "dispatched",
+      "terminal": true,
+      "hasCallIntent": true,
+      "callId": "studio-imagegen-call-1677c54b31cdd3401bd1d8576d0695231819fd05",
+      "callStatus": "result-committed",
+      "hasResultPair": true,
+      "reviewStatus": "unreviewed",
+      "nextAction": "submit-review"
+    }
+  },
+  "latest": {
+    "generationRunId": "s1e2-u25-mcp-grok-mrxwt3u9",
+    "packId": "studio-generation-freeze-3b1e5f1678d1e0ae1cfe57d28865c6d1",
+    "provider": "grok",
+    "dispatchedAt": "2026-07-23T19:34:55.716Z",
+    "latestEventKind": "dispatched",
+    "terminal": true,
+    "hasCallIntent": true,
+    "callId": "studio-imagegen-call-1677c54b31cdd3401bd1d8576d0695231819fd05",
+    "callStatus": "result-committed",
+    "hasResultPair": true,
+    "reviewStatus": "unreviewed",
+    "nextAction": "submit-review"
+  }
+}

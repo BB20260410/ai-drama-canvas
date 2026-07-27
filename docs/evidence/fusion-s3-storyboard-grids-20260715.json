@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "kind": "fusion-storyboard-grid-materialization-validation",
+  "createdAt": "2026-07-15T11:57:45.120Z",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "sourceContentAddress": "sha256:f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+  "allSeason": {
+    "contracts": 1288,
+    "panelDistribution": {
+      "2": 1222,
+      "3": 66
+    },
+    "panelImagesRequired": 2642,
+    "contractIdsSha256InputCount": 1288
+  },
+  "ep01": {
+    "units": 34,
+    "panelDistribution": {
+      "2": 31,
+      "3": 3
+    },
+    "panelImagesRequired": 71,
+    "originalStartFrames": 34,
+    "originalEndFrames": 34,
+    "additionalMiddleFrames": 3,
+    "localChineseStoryboardSheets": 34,
+    "rawImagesRequired": 71,
+    "labeledImagesRequired": 71
+  },
+  "policy": {
+    "minimumPanels": 2,
+    "maximumPanels": 6,
+    "automaticSelection": true,
+    "oneImagePerPanel": true,
+    "aiGeneratedTextAllowed": false,
+    "chineseTextRenderedLocally": true,
+    "silentReferenceTruncationAllowed": false
+  }
+}

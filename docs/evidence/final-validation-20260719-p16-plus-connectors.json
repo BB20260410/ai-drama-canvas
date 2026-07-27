@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "kind": "p16-plus-connector-interaction-final-validation",
+  "status": "pass",
+  "createdAt": "2026-07-19T06:18:00Z",
+  "scope": "workspace-source-and-electron-build-only",
+  "release": {
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "sourceDigest": "f67afd2a44b7ce4e9e16c2b0e56d21a60d8afbadb7931738b48d6c4ebd17326f",
+    "buildId": "d8de9040c485a489ce4271a6b34bd9bb",
+    "buildIdentityFingerprint": "36c1f8c68a16808e0dd534ee9bc4f547259cbf9ae1b6088572292979753433ee",
+    "releaseManifestFingerprint": "91e9b7e152d311b188a5909975e5fccd4ee8362db48f5a01d87054c958fc258a",
+    "mcpToolCount": 183,
+    "distribution": "local-only"
+  },
+  "acceptance": {
+    "leftPlusHandle": true,
+    "rightPlusHandle": true,
+    "handlesAlwaysVisibleOnEligibleNodes": true,
+    "looseEitherSideStart": true,
+    "plusToPlusClickConnection": true,
+    "connectToggleDoesNotRebuildGraph": true,
+    "connectToggleDoesNotChangeWorkspaceMode": true,
+    "emptyWorkflowFallsBackToProjection": true,
+    "clearWorkspaceReturnsToProjection": true,
+    "formalBindingOwnerPreserved": true,
+    "draftIsNotBindingSource": true
+  },
+  "tests": [
+    {
+      "command": "npm run typecheck",
+      "status": "pass"
+    },
+    {
+      "command": "npx vitest run tests/managed-studio-canvas-ui.test.ts tests/studio-canvas-workflow-draft.test.ts tests/studio-canvas-edge-validation.test.ts tests/studio-canvas-layout-store.test.ts tests/studio-canvas-layout-geometry.test.ts",
+      "status": "pass",
+      "files": 4,
+      "tests": 29
+    },
+    {
+      "command": "npm test",
+      "status": "pass",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "status": "pass"
+    }
+  ],
+  "interactionSmoke": {
+    "runtime": "workspace-build",
+    "connectToggleMs": 16,
+    "connectTogglePreservedNodeCount": true,
+    "plusConnectorsAlwaysVisible": true,
+    "plusToPlusConnection": true,
+    "draftEdgePersisted": true,
+    "restartPreserved": true,
+    "visibleNodeCount": 12,
+    "maxNodeWidth": 123,
+    "maxNodeHeight": 137,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "externalRequests": 0,
+    "rendererCrashed": false
+  },
+  "scaleSmoke": {
+    "assets": 77,
+    "units": 1288,
+    "panels": 4235,
+    "media": 10000,
+    "initialDom": 16,
+    "expandedDom": 8,
+    "readyMs": 3017,
+    "status": "pass"
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/p16-plus-connector-ui-smoke-20260719-02.json",
+      "sha256": "0f02c3b720293ee0b94db52e5ed6f77c6fee4c88f5d4ec0f52157624a0ec699a"
+    },
+    {
+      "path": "docs/evidence/p16-plus-connector-ui-smoke-20260719-02.png",
+      "sha256": "37f03f8f4dafc5751804ff3f7a75d8950de845dba435659e9eae1aff719d3d09"
+    },
+    {
+      "path": "docs/evidence/p16-scale-canvas-ui-smoke-20260719-01.json",
+      "sha256": "4ca339154fe8dfcd4c3d1a8ce39622bd28737bbfa8a9055591bc1ec420af2fcd"
+    },
+    {
+      "path": "docs/evidence/p16-scale-canvas-ui-smoke-20260719-01.png",
+      "sha256": "4db4a2d4023d1f8b947013cc465d95b28813b9da9f2b7d10ab20e5729c064cb0"
+    },
+    {
+      "path": "release-manifest.json",
+      "sha256": "64954d2ffb4fd693802d7ac67446bd061ba282022293de60fd1c94ce935c969f"
+    }
+  ],
+  "safety": {
+    "installedApplicationUpdated": false,
+    "packageCreated": false,
+    "formalProjectMutated": false,
+    "realImageGenerated": false,
+    "browserUsed": false,
+    "grokUsed": false,
+    "upload": false,
+    "payment": false,
+    "publish": false,
+    "gitMutation": false
+  }
+}

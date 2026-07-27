@@ -1,0 +1,379 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-07-14T05:40:00+08:00",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "objective": "main-track per-clip transform keyframes across core, FFmpeg, Electron, MCP, OTIO, split, frame extraction and continuation",
+  "status": "passed",
+  "commands": {
+    "typecheck": {
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    "targeted": {
+      "command": "npx vitest run tests/keyframe-curve.test.ts tests/editor.test.ts tests/codex.test.ts tests/mcp-scan-cancel.test.ts --maxWorkers=1",
+      "exitCode": 0,
+      "files": 4,
+      "tests": 35,
+      "durationSeconds": 14.67
+    },
+    "sourceMcpContract": {
+      "command": "npx vitest run tests/mcp-scan-cancel.test.ts --maxWorkers=1",
+      "exitCode": 0,
+      "tests": 1
+    },
+    "tests": {
+      "command": "npm test",
+      "exitCode": 0,
+      "files": 30,
+      "tests": 173,
+      "durationSeconds": 56.96
+    },
+    "build": {
+      "command": "npm run build",
+      "exitCode": 0,
+      "main": true,
+      "preload": true,
+      "renderer": true,
+      "compiledMcp": true,
+      "existingViteDynamicStaticImportWarningOnly": true
+    },
+    "mcpSmoke": {
+      "command": "npm run mcp:smoke",
+      "exitCode": 0,
+      "tools": 133,
+      "resourceTemplates": 9,
+      "prompts": 7
+    },
+    "compiledMcpContract": {
+      "command": "AI_CANVAS_MCP_SERVER_PATH=dist-mcp/mcp/server.js npx vitest run tests/mcp-scan-cancel.test.ts --maxWorkers=1",
+      "exitCode": 0,
+      "tests": 1
+    },
+    "mainTrackRenderSmoke": {
+      "command": "npm run editor:main-track-render-smoke",
+      "exitCode": 0,
+      "evidence": "docs/evidence/main-track-keyframe-render-smoke-20260714.json",
+      "rerunAfterFinalSourceAndPackageChanges": true
+    },
+    "mainTrackElectronUiSmoke": {
+      "command": "npm run ui:editor-main-track-smoke",
+      "exitCode": 0,
+      "evidence": "docs/evidence/editor-main-track-keyframe-ui-smoke-20260714.json",
+      "rebuiltBeforeLaunch": true,
+      "isolatedFixtureCleaned": true
+    },
+    "legacyBezierRenderRegression": {
+      "command": "npm run editor:bezier-render-smoke",
+      "exitCode": 0
+    },
+    "legacyBezierUiRegression": {
+      "command": "npm run ui:editor-bezier-smoke",
+      "exitCode": 0,
+      "stableScreenshotContentGate": true
+    },
+    "subdivisionRenderRegression": {
+      "command": "npm run editor:subdivision-render-smoke",
+      "exitCode": 0
+    },
+    "subdivisionElectronUiRegression": {
+      "command": "npm run ui:editor-subdivision-smoke",
+      "exitCode": 0,
+      "stableScreenshotContentGate": true
+    },
+    "fullWorkflowSmoke": {
+      "command": "npm run full:smoke",
+      "exitCode": 0,
+      "restartVerified": true,
+      "isolatedFixtureCleaned": true
+    }
+  },
+  "capabilityContract": {
+    "feature": "main-track-transform-keyframes",
+    "featureDeclared": true,
+    "keyframeScope": "all-visual-tracks",
+    "arbitraryCurveSubdivision": true,
+    "toolCountUnchanged": 133,
+    "missingForFullNle": [
+      "complex-nested-timelines",
+      "third-party-effect-compatibility",
+      "real-project-nle-validation"
+    ],
+    "nonVisualTransformKeyframes": "reject"
+  },
+  "mainTrackTransformContract": {
+    "trackSelection": "lowest-order-visual-track-fixed-identity",
+    "overlayPromotionWhenMainHiddenOrMuted": false,
+    "coordinates": {
+      "origin": "project-canvas-center",
+      "unit": "project-pixels",
+      "positiveX": "right",
+      "positiveY": "down"
+    },
+    "transformOrder": [
+      "aspect-fit",
+      "dynamic-scale",
+      "static-clip-opacity",
+      "center-rotation",
+      "position-on-fixed-project-background"
+    ],
+    "opacityIsKeyframed": false,
+    "hiddenOrMutedMainTrackPolicy": "fail-closed",
+    "mutedMainClipPolicy": "preserve-integer-frame-duration-with-project-background",
+    "identityMainCompatibilityPath": "legacy-scale-pad",
+    "rotationCanvas": "fixed-transparent-square-from-project-diagonal-and-clip-max-scale",
+    "frameAuthority": "project-integer-frame",
+    "fractionalTimebase": "24000/1001",
+    "state": "shared-EditKeyframe-array",
+    "sharedConsumers": [
+      "core-validation",
+      "vue-preview",
+      "synchronous-render",
+      "background-render",
+      "timeline-frame-extraction",
+      "timeline-continuation",
+      "split-trim",
+      "otio-v1-v2",
+      "mcp-capability-and-operations"
+    ]
+  },
+  "automatedCoverage": {
+    "pathologicalCubicBezierOnMain": true,
+    "staticMainTransformAndOpacity": true,
+    "nonVisualKeyframeRejected": true,
+    "nonFiniteStaticPositionRejected": true,
+    "singleKeyframeFrameZeroValueUsed": true,
+    "splitFrameSevenLossless": true,
+    "splitFrameThirteenRendered": true,
+    "casAndHistory": true,
+    "otioV1V2RoundTrip": true,
+    "fractionalFrameAuthority": true,
+    "sourceAndCompiledMcp": true,
+    "directAnimatedMainContinuation": true,
+    "visibleOverlayNotPromotedWhenMainHidden": true,
+    "legacyOverlayRenderRegression": true,
+    "legacyOverlayElectronRegression": true,
+    "subdivisionRenderRegression": true,
+    "subdivisionElectronRegression": true
+  },
+  "renderValidation": {
+    "fixture": {
+      "kind": "isolated-synthetic-h264",
+      "timebase": "24000/1001",
+      "frames": 48,
+      "durationSeconds": 2.002,
+      "animatedFrames": 36,
+      "mutedTailFrames": 12,
+      "background": "#18314f",
+      "opacity": 0.72
+    },
+    "portrait": {
+      "project": [320, 480],
+      "source": [320, 180],
+      "codec": "h264",
+      "audioCodec": "aac",
+      "frames": 48,
+      "durationSeconds": 2.002,
+      "baselineBytes": 64242,
+      "splitBytes": 64242,
+      "baselineAndSplitByteIdentical": true,
+      "baselineAndSplitSha256": "94fb26ec36944e7a314b30d0fa48525542e65a27239665c9904b6ec370cf593b"
+    },
+    "landscape": {
+      "project": [480, 320],
+      "source": [180, 320],
+      "codec": "h264",
+      "audioCodec": "aac",
+      "frames": 48,
+      "durationSeconds": 2.002,
+      "bytes": 66879,
+      "sha256": "d30ad184961bea4e82a8f7be22305518d3c98bc813c852b155a467b1948a8b60"
+    },
+    "splitEquivalence": {
+      "frame": 13,
+      "framesCompared": 48,
+      "maximumCentroidError": 0,
+      "maximumBboxError": 0,
+      "mutedTailMaximumForegroundPixels": 0
+    },
+    "absoluteGeometryComparedToMathematicalExpectation": {
+      "maximumSampledCentroidErrorPx": 1.4585319201256777,
+      "maximumSampledBboxErrorPx": 3.1628827427024078,
+      "centroidThresholdPx": 3,
+      "bboxThresholdPx": 10,
+      "isDistinctFromSplitEquivalence": true
+    },
+    "mutedTail": {
+      "frames": "F36-F47",
+      "foregroundPixels": 0,
+      "projectBackgroundPreserved": true,
+      "timelineDurationPreserved": true
+    },
+    "frameExtraction": {
+      "frame": 24,
+      "timeSeconds": 1.001,
+      "width": 320,
+      "height": 480,
+      "centroidErrorToRenderedFramePx": 0.044221844866262475,
+      "bboxErrorToRenderedFramePx": 0,
+      "sourceClipIdsIncludeMain": true,
+      "sha256": "cf54642c08ff811b9aad300fbc2ca58bf88d31a11239bfcbf0787ca322a2da03"
+    },
+    "otio": {
+      "authoredContract": "aicanvas.cubic-bezier.v1",
+      "splitContract": "aicanvas.cubic-bezier.v2",
+      "splitSha256": "32b604015052eb5c15a6105f7acfc7343055e151c7b87cab3dffd45cdf901009"
+    },
+    "failureClosure": {
+      "hiddenMainError": "剪辑工程总时长为 0，无法导出。 ",
+      "visibleOverlayPresent": true,
+      "visibleOverlayPromoted": false
+    },
+    "publicationReceipts": 3,
+    "terminal": {
+      "machineActiveWeight": 0,
+      "machineQueueDepth": 0,
+      "projectLockFiles": 0
+    }
+  },
+  "continuationValidation": {
+    "transport": "direct-prepareTimelineVideoContinuation-with-real-ffmpeg-frame",
+    "animatedMainTransform": true,
+    "timeFrame": 12,
+    "sourceType": "timeline",
+    "sourceVideoPathEqualsActiveFixedMainClip": true,
+    "extractionDimensions": [320, 320],
+    "sourceClipIdsIncludeMain": true,
+    "targetVariant": "start",
+    "targetArtifactRegistered": true,
+    "enqueue": false
+  },
+  "electronUi": {
+    "transport": "source-electron-current-build",
+    "inspectorTitle": "主画面变换",
+    "fields": ["positionX", "positionY", "scale", "rotation", "opacity"],
+    "addKeyframeVisible": true,
+    "preview": {
+      "frameZeroTransform": "matrix(0.40373, -0.115768, 0.115768, 0.40373, -16.875, -26.25)",
+      "frameEighteenTransform": "matrix(0.53498, 0.0046687, -0.0046687, 0.53498, -1.875, -1.875)",
+      "changedByKeyframes": true,
+      "staticOpacity": 0.72,
+      "projectBackground": "rgb(24, 49, 79)"
+    },
+    "invalidSave": {
+      "scale": 5,
+      "revisionBefore": 2,
+      "revisionAfter": 2,
+      "rejected": true
+    },
+    "persistence": {
+      "addedKeyframeFrame": 9,
+      "savedOpacity": 0.68,
+      "savedRevision": 3,
+      "reloaded": true,
+      "undoRevision": 4,
+      "redoRevision": 5
+    },
+    "split": {
+      "frame": 13,
+      "undoRevision": 7,
+      "redoRevision": 8,
+      "rightClipIdStable": true,
+      "otioContract": "aicanvas.cubic-bezier.v2"
+    },
+    "screenshot": {
+      "path": "docs/evidence/editor-main-track-keyframe-ui-20260714.png",
+      "width": 1560,
+      "height": 980,
+      "sizeBytes": 294345,
+      "sha256": "aff7b138174e1bc83cfdb7be148eddc3e16ee9e4109a54edb1b9ab18fd3b5a10",
+      "brightRatio": 0.08092098377812663,
+      "chromaticRatio": 0.0524476713762428,
+      "visuallyInspected": true,
+      "notBlankOrPlaceholder": true
+    },
+    "pageErrors": [],
+    "isolatedRootRemoved": true,
+    "isolatedRegistryRemoved": true
+  },
+  "evidenceHashes": {
+    "docs/evidence/main-track-keyframe-render-smoke-20260714.json": "8b06b22d628213e670124597452dea6bdd6689397435f1bde4a6fa7ff79287d9",
+    "docs/evidence/main-track-keyframe-portrait-baseline-20260714.mp4": "94fb26ec36944e7a314b30d0fa48525542e65a27239665c9904b6ec370cf593b",
+    "docs/evidence/main-track-keyframe-portrait-split-20260714.mp4": "94fb26ec36944e7a314b30d0fa48525542e65a27239665c9904b6ec370cf593b",
+    "docs/evidence/main-track-keyframe-landscape-20260714.mp4": "d30ad184961bea4e82a8f7be22305518d3c98bc813c852b155a467b1948a8b60",
+    "docs/evidence/main-track-keyframe-composite-F24-20260714.png": "cf54642c08ff811b9aad300fbc2ca58bf88d31a11239bfcbf0787ca322a2da03",
+    "docs/evidence/main-track-keyframe-split-20260714.otio": "32b604015052eb5c15a6105f7acfc7343055e151c7b87cab3dffd45cdf901009",
+    "docs/evidence/editor-main-track-keyframe-ui-smoke-20260714.json": "447ff47db9e28425b23ea4a96163162344c0d253b26e25f84c0a83ac39900893",
+    "docs/evidence/editor-main-track-keyframe-ui-20260714.png": "aff7b138174e1bc83cfdb7be148eddc3e16ee9e4109a54edb1b9ab18fd3b5a10",
+    "docs/evidence/editor-main-track-keyframe-split-20260714.otio": "01c95460a580f9cc0d99b9c493c4bc47986fcfe6122163b44646b118402163ad",
+    "docs/evidence/keyframe-bezier-render-smoke-20260714.json": "204d05a2d361a7420cafcd92d873885da64b93ded21f10ee9293dfb8c5e0ec14",
+    "docs/evidence/editor-bezier-ui-smoke-20260714.json": "9fa2e49162e1fdd7c8ef010b4bcb0524a9ce2d6c9870817a8f973761c3360627",
+    "docs/evidence/keyframe-subdivision-render-smoke-20260714.json": "c089f347ddc797d5ad88d94fda4fd748a7a233c7ae87192fba72da7c188e2c4c",
+    "docs/evidence/editor-subdivision-ui-smoke-20260714.json": "3b5c6b3a4bd3c4e9b8c89d95693962ce7f3b6170baec63f8a2dd276e2af2eea7"
+  },
+  "sourceHashes": {
+    "src/core/types.ts": "242db9042cfd70a5b02c4239ad8ba52f9ed66ba7625281e1a468b78477790134",
+    "src/core/keyframe-curve.ts": "dabf66146c642040d1419e11393e2d39461fe2b224ae4037bc04a6d7936172f6",
+    "src/core/editor.ts": "39c537e526ab22249468da1fdab93a4157550e670a731f31a307156fda6fc72f",
+    "src/core/codex.ts": "27eac9a543f656b4077b30d7e542646d4bcf42afd05c7d6b969a89b139a50b93",
+    "src/mcp/server.ts": "f15d6de5c9aad86caa4c94ca7e08db52211e2d718f827ca8ceb3a9ad8e743d7c",
+    "src/renderer/src/components/VideoEditorView.vue": "1f0fbeaf44358e33e4dbaec13788a805bc48a002921dd4e0f1bf23d199105e69",
+    "scripts/main-track-keyframe-render-smoke.ts": "9c0c4f0e1ce8059d660a1f0465f84a7343251c4f455d8ffa6c4285a184306f90",
+    "scripts/create-editor-ui-fixture.ts": "ce3f5de67705fbfc7797e4403ad3a043d4bc3220fcf064ef90914642cecc2e41",
+    "scripts/ui-editor-main-track-smoke.mjs": "4fc52a0ee927f7568e3ae57febbd7c863da83f1592dcce9ed0ca9ad155f25a8f",
+    "tests/editor.test.ts": "accada6abc9bb55f8a32755f44174fe3f5950278d2b790e563d29260b24344b3",
+    "tests/codex.test.ts": "2027cc9cb651584b064760027f6646451061dc1e212e8f3ca8f008af263a50dc",
+    "tests/mcp-scan-cancel.test.ts": "b321223ec0d83f284c120cabe76fbb3fcd79ca1e7a17166a9733ca1e2da5e187",
+    "package.json": "99b6f640fc7ccfac4f1c9bbfd8b45a0fae4dd998e64bcf4edbddbaf60b81ac15"
+  },
+  "documentationHashes": {
+    "README.md": "053bfe6d2e558cbde54ccb04674a418d2aa51cbd69f2f17dc8bb864168dc9ab5",
+    "docs/CODEX_MCP.md": "26eb8d8e9ea4ed642285c1220ddf7fad0f1175ef3dcd4f1d86387d7722fb9dbf",
+    "docs/当前开发交接.md": "f945f33cc76b101321f37c42d53742533320284da2a53b4e299c8a5bb58e8ab5",
+    "docs/验证报告_主画面逐片段Transform关键帧_2026-07-14.md": "bab6359d2c261aaa8efd7adf6bfad3fc9907ac97785575a0d6edf1b0ae5cd374"
+  },
+  "packaging": {
+    "existingSignedDmgUpdated": false,
+    "existingSignedDmgContainsPreviousSource": true,
+    "existingSignedDmgPath": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "existingSignedDmgSizeBytes": 136652595,
+    "existingSignedDmgSha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972",
+    "notarized": false
+  },
+  "boundaries": {
+    "formalProjectRootsTouched": false,
+    "generationWebsiteOpened": false,
+    "uploadsPerformed": false,
+    "paidSubmissionsPerformed": false,
+    "externalCreativeAssetsOverwritten": false,
+    "existingPackageOverwritten": false,
+    "softwareInstalled": false,
+    "softwarePublished": false,
+    "gitCommitCreated": false,
+    "gitPushPerformed": false,
+    "pullRequestCreated": false,
+    "notarizationPerformed": false,
+    "oldThreadContentRead": false,
+    "isolatedFixturesCleaned": true
+  },
+  "knownLimitations": [
+    "generic-http-remote-observation-uncertainty",
+    "generic-http-isolated-partial-download-recovery",
+    "comfyui-local-native-adapter",
+    "complex-nested-timelines",
+    "third-party-effect-compatibility",
+    "real-project-nle-validation"
+  ],
+  "nextPriority": {
+    "id": "generic-http-remote-observation-and-isolated-download-recovery",
+    "priority": "P0",
+    "requiresNewExternalAuthorization": false,
+    "reason": "Transient polling or download failures are currently collapsed with confirmed provider failure, and direct writes to the final reserved target can turn crash leftovers into false completion or terminal failure, creating recovery and duplicate-paid-submission risk.",
+    "acceptance": [
+      "separate pending, succeeded, confirmed_failed and retryable_or_unknown observations",
+      "never re-POST while externalTaskId, clientJobId and reserved intent remain recoverable",
+      "download to per-job isolation, validate size, magic or decode and sha256, then publish without overwrite",
+      "surface last observation error and recovery action in Doctor, snapshot and MCP",
+      "loopback evidence for 500 recovery, disconnect, bad JSON, partial restart, confirmed failure, cancel and single submission"
+    ]
+  }
+}

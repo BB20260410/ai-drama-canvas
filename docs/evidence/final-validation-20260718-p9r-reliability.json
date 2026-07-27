@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 2,
+  "kind": "final-validation-p9r-reliability",
+  "status": "PARTIAL",
+  "note": "规模精确计数+真实媒体+生产路径+命令账本O(1)+驾驶舱多流 token 已过；全量故障矩阵与 Electron 10k 滚动 smoke 未宣称穷尽。",
+  "createdAt": "2026-07-18T05:50:37.745Z",
+  "buildIdentity": {
+    "buildId": "63634dc0b0871b1850130f899bc1d247",
+    "sourceDigest": "c412b8eb7ea0fbe5f2bedd6645cc871f8b734e66796f6d0382c2ef61ddec72b0",
+    "sourceFiles": 353,
+    "capabilities": {
+      "mcpToolCount": 182,
+      "protocolVersion": "1.1",
+      "studioDashboard": true,
+      "studioBinding": true,
+      "studioContinuity": true,
+      "formalImagegenProvider": "agent-imagegen",
+      "formalImagegenProviders": [
+        "codex",
+        "grok"
+      ],
+      "browserGeneration": false,
+      "artlist": false
+    }
+  },
+  "scale": {
+    "units": 1288,
+    "panels": 4235,
+    "assets": 77,
+    "formulaPanels": 4235,
+    "productionPath": {
+      "unitId": "p9-unit-0001",
+      "panelCount": 6,
+      "bindingSets": 6,
+      "continuityReady": true,
+      "generationRuns": 6,
+      "reviews": 6,
+      "videoDerivativesReady": 2,
+      "audioDerivativesReady": 1
+    }
+  },
+  "media": {
+    "mediaIndexed": 10002,
+    "requestedMedia": 10000,
+    "realDecodableThumbFiles": 1000,
+    "videoDerivativesReady": 4,
+    "audioDerivativesReady": 2
+  },
+  "evidence": {
+    "scale": "/Users/hxx/Documents/无限画布/docs/evidence/p9-scale-fixture-20260718-p9r-full1288.json",
+    "media": "/Users/hxx/Documents/无限画布/docs/evidence/p9-media-scale-20260718-p9r.json"
+  },
+  "runs": {
+    "typecheck": {
+      "name": "typecheck",
+      "exitCode": 0,
+      "logSha256": "8aca887056e876fdc407b955daffd0b0a5dec0c074cd623f6decb7a214530132"
+    },
+    "targeted": {
+      "name": "p9-targeted",
+      "exitCode": 0,
+      "logSha256": "398f47315665289dfdfd0f0cea34af6613f99843878294bdaf2b67fb27f9d0ec"
+    }
+  }
+}

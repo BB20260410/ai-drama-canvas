@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "kind": "p9-media-scale-evidence",
+  "status": "pass",
+  "createdAt": "2026-07-18T04:04:07.406Z",
+  "counts": {
+    "mediaMetadata": 10000,
+    "thumbnails": 1000,
+    "videoProxies": 100,
+    "audioWaveforms": 100
+  },
+  "coldStartMs": 1,
+  "materialCounts": {
+    "media": 10000,
+    "mediaImports": 0,
+    "canonicalAssets": 0,
+    "characters": 0,
+    "scenes": 0,
+    "props": 0,
+    "assetVersions": 0,
+    "assetDefinitions": 0,
+    "primaryAuthorities": 0,
+    "authorityEvents": 0,
+    "versionReviews": 0,
+    "assetRelations": 0
+  },
+  "boundaries": {
+    "realMediaCopied": false,
+    "formalImageGenerationCalls": 0
+  }
+}

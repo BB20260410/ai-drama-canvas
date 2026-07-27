@@ -1,0 +1,15 @@
+{
+  "kind": "l32-w0-baseline",
+  "sourceDigest": "2f35d839cd21f7d4e3a6337eaff6e9269485c43405e9229c28c3572b0182199f",
+  "sourceFiles": 561,
+  "sourceBytes": 12802766,
+  "mcpToolCount": 189,
+  "activeProjectId": "project-c78607fac2a4",
+  "activeProjectRoot": "projects/grok-mvp-qingdeng-mrwc97mu-d0aea463",
+  "call22d2": "not-invoked",
+  "runMrwecb5s": "failed",
+  "duduLedgerSha256": "0998c00f8bc84583f207ae3e434a7171d1597ed177cc21c595082f665bfc54af",
+  "lsofProjectSqliteHits": 0,
+  "releaseManifestStale": true,
+  "releaseSourceDigest": "de1ecd2f073fcd4fe6be40fe2cc5568e635e3e5179523b2c2938166483ede8a0"
+}

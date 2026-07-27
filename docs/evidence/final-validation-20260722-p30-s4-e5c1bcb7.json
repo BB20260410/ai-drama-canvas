@@ -1,0 +1,324 @@
+{
+  "schemaVersion": 1,
+  "kind": "final-validation",
+  "phase": "P30_S8_DASHBOARD_FORBIDDEN_REMEDIATION_S4_M1_SOFTWARE_ACCEPTED",
+  "status": "PASS",
+  "createdAt": "2026-07-22T10:03:08.000Z",
+  "timezoneNote": "Asia/Shanghai local wall 18:03",
+  "executor": "gpt-codex-main-sole-writer",
+  "frozenIdentity": {
+    "sourceDigest": "e5c1bcb779552118e551286d45b392586d05fa7924e35680d69507e895e884dc",
+    "sourceFiles": 530,
+    "sourceBytes": 12428051,
+    "version": "0.2.0",
+    "buildId": "41e82a0b3924ce39e1e5a810fa4f6d20",
+    "buildIdentityFingerprint": "97da7f515f87303aa34c56ff30408da949de772a9f864502c348c731faa519cc",
+    "mcpToolCount": 189,
+    "mcpToolCountDynamicTripleEqual": true,
+    "protocolVersion": "1.1",
+    "releaseManifestFingerprint": "ae13d227573cd516ff13c54bf490b63ae647b91d1116509303ed7f5b6416a187",
+    "releaseManifestFileSha256": "2c392c86e89c7392faa3d28660b46be492a658e0864096712faf49c0dfc035d4"
+  },
+  "milestones": {
+    "M1": "SOFTWARE_ACCEPTED",
+    "M2": "NOT_ACCEPTED",
+    "M3": "NOT_STARTED",
+    "LOCAL_INSTALL": "NOT_STARTED"
+  },
+  "phases": {
+    "S0": "PASS",
+    "S1": "PASS",
+    "S2": "PASS",
+    "S3": "PASS",
+    "S4": "PASS",
+    "S5": "PASS",
+    "S6": "PASS",
+    "S7": "MECHANICAL_PASS_VISUAL_REJECTED",
+    "S8": "SOFTWARE_REMEDIATED_REPROJECTED_DASHBOARD_REMEDIATED_A2_PENDING",
+    "S9": "NOT_STARTED",
+    "S10": "NOT_STARTED"
+  },
+  "freezeHistory": [
+    {
+      "digest": "349f6207900969e54e953e29df9d3824b5d9c37eb9ae938751d77dc565086241",
+      "sourceFiles": 530,
+      "sourceBytes": 12370977,
+      "role": "pre_canary_S4_frozen",
+      "status": "superseded",
+      "reason": "U29 v1 canary visual reject exposed adapter/import and Binding currentness defects"
+    },
+    {
+      "digest": "1c91e11b182cfbc91ddd20b1d482969e7d36adc1619aff9c79d1163adac5e04c",
+      "sourceFiles": 530,
+      "sourceBytes": 12426264,
+      "role": "post_adapter_remediation_S4_frozen",
+      "status": "superseded",
+      "reason": "Formal U29 rev2 reproject exposed Dashboard continuity projection of forbidden assets"
+    },
+    {
+      "digest": "e5c1bcb779552118e551286d45b392586d05fa7924e35680d69507e895e884dc",
+      "sourceFiles": 530,
+      "sourceBytes": 12428051,
+      "role": "post_dashboard_forbidden_remediation_S4_frozen",
+      "status": "frozen",
+      "reason": "Single formal S4 chain and dual read-only final review passed for this source digest"
+    }
+  ],
+  "remediation": {
+    "originalTrigger": "S7 U29 v1 canary mechanically passed but human visual review rejected mother/cub appearances forbidden by the external A/E contract",
+    "dashboardTrigger": "After formal U29 rev2 reproject, Dashboard incorrectly requested continuity for forbidden Su because panel control assets included forbidden proposals",
+    "classification": "software_adapter_import_binding_and_dashboard_projection_defects",
+    "productFilesChanged": [
+      "src/core/dudu-readonly-source.ts",
+      "src/core/dudu-readonly-import.ts",
+      "src/core/studio-binding-control.ts",
+      "src/core/studio-production-dashboard.ts",
+      "tests/helpers/dudu-readonly-source-fixture.ts",
+      "tests/dudu-readonly-import.test.ts",
+      "tests/p30-command-contract-matrix.test.ts",
+      "tests/studio-binding-control.test.ts",
+      "tests/studio-production-dashboard.test.ts"
+    ],
+    "summary": "Parse and freeze exact A/D/E forbidden roles, keep them out of control references and continuity, fail-close path and visible conflicts, preserve current Binding replacement semantics, and filter forbidden proposals before Dashboard continuity projection."
+  },
+  "validationChain": {
+    "typecheck": {
+      "status": "PASS",
+      "record": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-typecheck.json",
+      "recordSha256": "8c95c4d0b0d0b906bc255373183b4d6c16e419dda8a8690e99f4137b77edda92"
+    },
+    "directedVitest": {
+      "status": "PASS",
+      "files": 32,
+      "tests": 171,
+      "record": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-targeted.json",
+      "recordSha256": "fff0eb4becbd7181d28ef2e850903693a09a9fef532fcad30e848b89a681da16"
+    },
+    "npmTest": {
+      "status": "PASS",
+      "testFiles": 188,
+      "tests": 1053,
+      "p29BaselineMinimum": 999,
+      "p29BaselineMet": true,
+      "record": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-full.json",
+      "recordSha256": "6dae28284800abd68eb7062be09c2e78100802fd30aa1c3906c16575ea6b3f55"
+    },
+    "buildMcp": {
+      "status": "PASS",
+      "record": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-build-mcp.json",
+      "recordSha256": "92162e81efab2a18f355f656621ff4fcd827ae8912686022f295eff473d4f154"
+    },
+    "buildIdentity": {
+      "status": "PASS",
+      "record": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-build-identity.json",
+      "recordSha256": "e9270d20e07c30fa11d2f9523363e70ea6f701130ad7223d7b34939521e83524"
+    },
+    "mcpSmoke": {
+      "status": "PASS",
+      "record": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-mcp-smoke.json",
+      "recordSha256": "c9a50eb3fec629ca90cfbfe8bd53071f6288ca8e50df3beaeb83e3c6c0840d04"
+    },
+    "mcpDynamicTriple": {
+      "status": "PASS",
+      "manifest": 189,
+      "listTools": 189,
+      "capabilities": 189,
+      "record": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-mcp-triple.json",
+      "recordSha256": "e7efe0c1b7e1ba1d73bb9209c99a32739592a3a6974da070907c110e613648cb"
+    },
+    "electronViteBuild": {
+      "status": "PASS",
+      "record": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-electron-vite-build.json",
+      "recordSha256": "5750a28b7b006aabb6860ac3f022be253b6a065848a443d0a2de150c552eb2f3"
+    },
+    "electronUnitGridJourney": {
+      "status": "PASS",
+      "commandRecord": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-unit-grid-electron-command.json",
+      "commandRecordSha256": "f83cb963243b6ea402b7f0823847b2725edd3bfb7264e810095613c0238a8dd6",
+      "evidence": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-unit-grid-source-electron.json",
+      "evidenceSha256": "39f4219ce4defa0027049c61ec411b24125a9d343bd51436b618de4058b783b1",
+      "screenshots": {
+        "generation": {
+          "path": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-unit-grid-generation.png",
+          "sha256": "8f85751ce34ada700401d573e1ea5d6f617ffbad1192c86e38bf06dd40139cb6",
+          "width": 3456,
+          "height": 2054
+        },
+        "review": {
+          "path": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-unit-grid-review.png",
+          "sha256": "2a6f532a75a65e54b5af0e3fcb359c01813d98de7f9a69cba52d751b2b8bb491",
+          "width": 3456,
+          "height": 2054
+        }
+      },
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalRequests": 0,
+      "imagegenCalls": 0,
+      "formalProjectReads": 0,
+      "formalProjectWrites": 0,
+      "humanVisualAcceptanceClaimed": false,
+      "digestStableAcrossJourney": true
+    },
+    "scaleSmoke": {
+      "status": "PASS",
+      "commandRecord": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-scale-electron-command.json",
+      "commandRecordSha256": "fadeda19a2246fb79e7c3b116586ad6ecb4ac5d75486017e63c1ac72072019f7",
+      "evidence": "docs/evidence/p30-s4-e5c1bcb7-managed-studio-scale-canvas-ui-smoke.json",
+      "evidenceSha256": "ff8c8b5836262307b59fe8db92c13f6d62946c5370cd3cfd6d39baf801a94ab6",
+      "screenshot": {
+        "path": "docs/evidence/p30-s4-e5c1bcb7-managed-studio-scale-canvas-ui-smoke.png",
+        "sha256": "464944fcce92167922f3210b389055d50f350329c0a71e5d8391dd65234b9472",
+        "width": 1728,
+        "height": 1029
+      },
+      "assets": 77,
+      "units": 1288,
+      "panels": 4235,
+      "media": 10000,
+      "projectSwitchCount": 10,
+      "crossProjectLeak": false,
+      "fileDescriptorDelta": 0,
+      "rssDeltaKiB": 19360,
+      "formalStudioTouched": false
+    },
+    "formalCoreIntegrity": {
+      "status": "PASS",
+      "record": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-final-core-integrity-command.json",
+      "recordSha256": "65366e77db4267a8b2be9aa96ad7dda00c77806c3b3170b1ded2b2932080e4e7"
+    },
+    "formalLedgerIntegrity": {
+      "status": "PASS",
+      "mode": "sqlite_query_only",
+      "record": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-final-ledger-query-only-command.json",
+      "recordSha256": "04a416c5fa778952f275cddacc56149146b922159b5e0acd1861433d7536ca85"
+    },
+    "dualReadOnlyFinalReview": {
+      "status": "PASS",
+      "A": {
+        "path": ".planning/reviews/P30/16_S4_e5c1_终审A_架构与合同_20260722.md",
+        "sha256": "da805f7c9ef2b0ef7d0b7c849bd4e6729ab24dc1eab25b46b163ad7f55470e83",
+        "P0": 0,
+        "P1": 0,
+        "blockingP2": 0,
+        "nonBlockingP2": 0
+      },
+      "B": {
+        "path": ".planning/reviews/P30/17_S4_e5c1_终审B_前端与证据_20260722.md",
+        "sha256": "3a358ed378a10572e3890aab312f2963a78efc550e55edbc29bef970d38ffc6d",
+        "P0": 0,
+        "P1": 0,
+        "blockingP2": 0,
+        "nonBlockingP2": 0
+      }
+    }
+  },
+  "invalidCommandAttempts": [
+    {
+      "record": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-electron-build.json",
+      "reason": "Nonexistent npm script build:electron; failed before Electron build",
+      "supersededBy": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-electron-vite-build.json",
+      "productFailure": false
+    },
+    {
+      "record": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-final-integrity-command.json",
+      "reason": "Auxiliary read-only probe imported unavailable better-sqlite3 before opening the project",
+      "supersededBy": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-final-core-integrity-command.json",
+      "productFailure": false
+    },
+    {
+      "records": [
+        ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-final-ledger-integrity-command.json",
+        ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-final-ledger-integrity-absolute-command.json"
+      ],
+      "reason": "Auxiliary sqlite3 -readonly probes failed to open before SQL execution",
+      "supersededBy": ".planning/reviews/P30/evidence/p30-s4-e5c1bcb7-final-ledger-query-only-command.json",
+      "productFailure": false
+    }
+  ],
+  "integrityChecks": {
+    "sourceDigestRecomputedThreeTimesEqual": true,
+    "gitHeadPresent": false,
+    "gitIndexSha256": "a9de1c589e0116f6b2460eb06ddb28591a82c341a1ea54d9141425026c66a229",
+    "gitOperationsPerformed": false,
+    "duduSourceManifestFingerprint": "7852166e185b3ab78c59ccd609ab94e0382c512185bfd12098f7d13b02ca12c9",
+    "duduSourceFiles": 540,
+    "duduSourceBytes": 421983373,
+    "u29FormalRevision": 2,
+    "u29CurrentPackId": "studio-generation-freeze-f0367581163a34b546fb5257a1e23100",
+    "u29CurrentPackFingerprint": "f0367581163a34b546fb5257a1e231003bd3883a0b9819ae4f00a632beda218d",
+    "u29CurrentControlAssets": [
+      "char-shuo-user-locked-v1",
+      "scene-shixue-interior-night-v1"
+    ],
+    "u29ForbiddenEveryPanel": [
+      "char-dudu-user-locked-v1",
+      "char-su-user-locked-v1"
+    ],
+    "u29ForbiddenContinuityEntries": 0,
+    "formalGenerationLedgerCounts": {
+      "packs": 31,
+      "packTargets": 31,
+      "dispatches": 1,
+      "results": 2,
+      "callIntents": 1,
+      "callEvents": 1,
+      "plans": 2,
+      "detachedUnknownObservations": 1,
+      "reviewHeads": 1
+    },
+    "u29CurrentPackCounts": {
+      "dispatches": 0,
+      "results": 0,
+      "callIntents": 0,
+      "planNodes": 0
+    },
+    "u28LateCandidateSha256": "da44489eb5e43861a9f9ed277103e0845b570286b80f412bc3a38c4f9a57c235",
+    "u28Status": "generation_unknown"
+  },
+  "itemizedStatus": {
+    "softwareS4M1": "S4_PASS_M1_SOFTWARE_ACCEPTED",
+    "ipcMcpFrontendDynamicToolCount": "PASS_189_DYNAMIC_TRIPLE",
+    "electronAndScale": "PASS",
+    "duduFormalImport": "PASS_S5",
+    "historicalNoGenerationReplay": "PASS_S5",
+    "canaryMechanicalAcceptance": "PASS_S7_V1",
+    "canaryHumanVisualAcceptance": "REJECTED_S7_V1",
+    "rawLabeledFormalReview": "REJECTED_PAIR_RECORDED_OLD_CHAIN_IMMUTABLE",
+    "s8SoftwareRemediation": "PASS",
+    "s8FormalReprojection": "PASS_U29_REV2_APPEND_ONLY",
+    "s8DashboardRemediation": "PASS_S4_E5C1",
+    "s8CanaryA2": "NOT_STARTED",
+    "videoPackageStaticEvidence": "S5_U17_MECHANICAL_PASS_DYNAMIC_MODEL_NOT_RUN",
+    "videoRealProduction": "NOT_STARTED",
+    "formalProduction": "PAUSED_PENDING_M2",
+    "installPackage": "NOT_STARTED",
+    "applicationsAppTouched": false,
+    "gitStageCommitPushPR": false,
+    "u28Unknown": "GENERATION_UNKNOWN_UNTOUCHED"
+  },
+  "notRun": [
+    "duplicate S4 full chain for e5c1 digest",
+    "aggregate package build or installer",
+    "S8 A2 Codex imagegen canary",
+    "real video model",
+    "package sign install replace Applications app",
+    "git stage commit push PR"
+  ],
+  "nonClaims": [
+    "P30 complete",
+    "M2 FIRST_CANARY_ACCEPTED",
+    "M3 AUTHORIZED_PRODUCTION_ACCEPTED",
+    "new U29 rev2 human visual canary accepted",
+    "formal production resumed",
+    "local install accepted"
+  ],
+  "nextAction": {
+    "owner": "GPT_Codex_main",
+    "phase": "S8_DYNAMIC_CANARY_A2_PRECALL",
+    "instruction": "Recompute the unique canary from current Core state; current read-only candidate is U29 rev2 but must not be hardcoded. Create a new plan/dispatch/pre-call identity and only then authorize one fresh isolated Codex imagegen execution unit for exactly one image.",
+    "generationAllowed": false,
+    "formalStudioWriteAllowed": "only_after_dynamic_recompute_for_new_plan_dispatch_precall"
+  },
+  "report": "docs/验证报告_20260722_P30_DashboardForbidden整改后S4_M1软件机械验收.md"
+}

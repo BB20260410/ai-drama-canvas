@@ -1,0 +1,267 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-15T00:56:11+08:00",
+  "status": "passed",
+  "slice": "packaged-reviewstudio-content-identity-behavior",
+  "summary": "当前源码已在临时 arm64 unpacked App 的真实 packaged executable 中完成 ReviewStudio 旧快照拒绝、自动新 SHA、检查项重置、重验、完整 App 重启恢复和再次同路径漂移失效；独立 JSON/PNG、人工目视、242 项全量测试与零接触清理均通过。",
+  "goal": {
+    "status": "active",
+    "complete": false,
+    "reason": "本纵向切片完成；当前唯一产品级剩余项 real-project-nle-validation 需要新增正式项目授权，状态 waiting_authorization。"
+  },
+  "priorityAudit": {
+    "handoffRevisionCasPriorityStillValid": false,
+    "revisionCasEvidence": "docs/验证报告_长期事实写路径RevisionCAS闭环_2026-07-14.md",
+    "revisionCasReason": "长期事实 create/update/delete revision CAS、deterministic failed/zero unknown、source/compiled MCP 与双 Electron 已完成，旧交接 P0 陈旧。",
+    "previousPackagedReviewGapConfirmed": true,
+    "previousEvidenceField": "packagedReviewStaleSubmitBehaviorSpecificallyValidated=false",
+    "previousEvidencePath": "docs/evidence/final-validation-20260714-2059.json",
+    "executedSafeLocalPriority": "P0 current-source packaged ReviewStudio stale-submit and full-restart behavior",
+    "independentReadOnlyAudit": {
+      "safeLocalP0OrP1FoundAfterSlice": false,
+      "todoFixmeOrSkippedTestsFound": false,
+      "capabilityMissingForFullNle": [
+        "real-project-nle-validation"
+      ]
+    },
+    "nextUniqueHighestPriority": {
+      "priority": "P1",
+      "capability": "real-project-nle-validation",
+      "title": "正式 AI 漫剧项目 NLE 校准",
+      "status": "waiting_authorization",
+      "missingAuthorization": [
+        "正式项目绝对路径",
+        "只读权威源或可写副本边界",
+        "允许的新工程、成片和证据输出目录",
+        "是否允许扫描、导入，以及任何覆盖边界"
+      ],
+      "substitutionForbidden": [
+        "fixture 冒充正式项目",
+        "重复 package 或重复测试冒充产品推进",
+        "重复建设内容身份、revision CAS、关键帧、嵌套或 Effect/Transition"
+      ]
+    }
+  },
+  "implementation": {
+    "reviewUiSmoke": {
+      "supportsExplicitElectronExecutable": true,
+      "sourceModeCompatible": true,
+      "independentUserData": true,
+      "fullApplicationCloseAndRestart": true,
+      "transportEvidenceRequired": "packaged-electron-current-source"
+    },
+    "isolatedPackage": {
+      "packagedReviewProjectUnderChildTmpdir": true,
+      "packagedReviewRegistryUnderChildTmpdir": true,
+      "packagedReviewUserDataUnderChildTmpdir": true,
+      "independentReviewEvidence": true,
+      "derivedEvidenceRemovedOnFailure": true
+    },
+    "guards": {
+      "realPackagedExecutableRequired": true,
+      "businessAssertionsRequired": true,
+      "pageErrorsMustBeZero": true,
+      "screenshotWidth": 1560,
+      "screenshotHeight": 980,
+      "minimumScreenshotBytes": 20000,
+      "cleanupRequired": true
+    }
+  },
+  "safeFailure": {
+    "evidenceStem": "isolated-package-review-content-identity-20260715-0038",
+    "status": "failed_closed_before_packaged_review_launch",
+    "reason": "Review project/registry/user-data were under tempRoot but outside the packaged child TMPDIR.",
+    "fix": "Move only those three paths under isolatedTmp; do not weaken either outer tempRoot or inner TMPDIR guards.",
+    "failedEvidenceRetained": false,
+    "tempRootCleaned": true
+  },
+  "validation": {
+    "targetedTests": {
+      "command": "npx vitest run tests/isolated-package-guards.test.ts tests/reviews.test.ts tests/production.test.ts tests/service.test.ts tests/scanner.test.ts tests/command-bus.test.ts --maxWorkers=1",
+      "testFiles": 6,
+      "testsPassed": 68,
+      "testsFailed": 0,
+      "exitCode": 0
+    },
+    "packageGuardAfterFix": {
+      "testFiles": 1,
+      "testsPassed": 6,
+      "testsFailed": 0,
+      "exitCode": 0
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    "build": {
+      "command": "npm run build",
+      "electronMainPreloadRenderer": "passed",
+      "compiledMcp": "passed",
+      "exitCode": 0
+    },
+    "sourceReviewUi": {
+      "transport": "source",
+      "stalePassRestartDriftHistoryAssertions": "passed",
+      "pageErrors": 0,
+      "screenshotWidth": 1560,
+      "screenshotHeight": 980,
+      "screenshotBytes": 226021,
+      "allTemporaryPathsRemoved": true,
+      "exitCode": 0
+    },
+    "revisionCasMcpRegression": {
+      "modes": [
+        "source",
+        "compiled"
+      ],
+      "toolsPerMode": 134,
+      "status": "passed",
+      "exitCode": 0
+    },
+    "isolatedPackage": {
+      "command": "npx tsx scripts/isolated-package-smoke.ts docs/evidence/isolated-package-review-content-identity-20260715-0041.json",
+      "status": "passed",
+      "tools": 134,
+      "staticResources": 2,
+      "resourceTemplates": 9,
+      "prompts": 7,
+      "emptyProjectFreshRestart": "passed",
+      "effectTransitionMcp": "passed",
+      "effectTransitionElectron": "passed",
+      "reviewStudioElectron": "passed",
+      "exitCode": 0
+    },
+    "fullTests": {
+      "command": "npm test -- --reporter=json --outputFile=/tmp/ai-canvas-full-vitest-packaged-review-20260715.json",
+      "finalRunAfterImplementationChanges": true,
+      "testFiles": 39,
+      "testSuites": 78,
+      "testsPassed": 242,
+      "testsFailed": 0,
+      "testsPending": 0,
+      "rawReportPath": "/tmp/ai-canvas-full-vitest-packaged-review-20260715.json",
+      "rawReportBytes": 90256,
+      "rawReportSha256": "4d6a90a91994c3327cd0d1b77601a3868d7e60ed0b0b2fbcc2c1812ee5b3c332",
+      "exitCode": 0
+    }
+  },
+  "packagedReviewStudio": {
+    "transport": "packaged-electron-current-source",
+    "assertions": {
+      "staleSubmitRejectedThroughUi": true,
+      "staleAttemptWroteNoReview": true,
+      "staleRejectAutoReloadedHash": true,
+      "staleRejectResetCriteria": true,
+      "visualPassSubmittedThroughUi": true,
+      "passRestoredAfterApplicationRestart": true,
+      "restartHashMatchesPassedContent": true,
+      "samePathArtifactIdStable": true,
+      "shaChanged": true,
+      "stalePassNotCurrent": true,
+      "statusReturnedToVisualReview": true,
+      "cacheBustChanged": true,
+      "historyPreserved": true,
+      "pageErrors": 0
+    },
+    "manualVisualInspection": {
+      "performedByPrimaryAgent": true,
+      "passed": true,
+      "observed": [
+        "完整应用顶部导航与导演验收页面",
+        "A/B 两张有效素材",
+        "右侧 1/7 检查项",
+        "历史、刷新与底部操作",
+        "无黑屏、空白、占位或错页"
+      ]
+    }
+  },
+  "permanentEvidence": {
+    "packageMain": {
+      "path": "docs/evidence/isolated-package-review-content-identity-20260715-0041.json",
+      "bytes": 36340,
+      "sha256": "484bdfe80dd2d91d8bf0db71959b6a6dd6af6260fa84644edb38a3d85b840304"
+    },
+    "reviewJson": {
+      "path": "docs/evidence/isolated-package-review-content-identity-20260715-0041-review-ui.json",
+      "bytes": 5466,
+      "sha256": "83251c96e109d92d2091faa2c971168fde189a525e7db225dd800fd152cee78d"
+    },
+    "reviewScreenshot": {
+      "path": "docs/evidence/isolated-package-review-content-identity-20260715-0041-review-ui.png",
+      "bytes": 227544,
+      "sha256": "05b85a55b9971db54ababf067dbaff013a7d9359c061d692826eea3ac23bfc5f",
+      "width": 1560,
+      "height": 980,
+      "brightRatio": 0.212201072736787,
+      "chromaticRatio": 0.1498711407639979
+    },
+    "effectTransitionJson": {
+      "path": "docs/evidence/isolated-package-review-content-identity-20260715-0041-electron-ui.json",
+      "bytes": 6487,
+      "sha256": "2afb33097e73876d62bd74352d117525c4e15f1cd9f01c913a4552235cb7b517"
+    },
+    "effectTransitionScreenshot": {
+      "path": "docs/evidence/isolated-package-review-content-identity-20260715-0041-electron-ui.png",
+      "bytes": 254341,
+      "sha256": "f456a8ec7e2bb7a6f273778f9e04f9571a0ffae5f8ab2b2000e4c555d0d5909f"
+    }
+  },
+  "currentHashes": {
+    "sourceManifestAtPackage": {
+      "fileCount": 62,
+      "bytes": 1987181,
+      "sha256": "fe851e0b7b701c9e214c307696ce56d3b744262f00c519f1f967418c14b56005"
+    },
+    "scripts/isolated-package-smoke.ts": "504d131dd293ba7c02d944cc8c80161a0991acdc5cc88e325ccb3db5129d0fc7",
+    "scripts/isolated-package-guards.ts": "91972ab36533ac4af205e128e107474034251d662e2e1c5ebb7bb51e0365b33c",
+    "scripts/ui-review-content-identity-smoke.mjs": "082bbb752fdbd896dd676508a051f596d50df330aaee61916128f12f6425f067",
+    "tests/isolated-package-guards.test.ts": "cae57e002b56e8bfdc26815d3c6c68757625c8c678e97e9243b0318aeebd0169",
+    "README.md": "d59dc5eb1e24e9346d386bd33b570d8746e198a79b09874947eacfc5997425a3",
+    "docs/CODEX_MCP.md": "5f958c23fda0c0c38a53ee74c0fbe41866fe8f0c36fd175e0445bbf877fe5a9d",
+    "docs/当前开发交接.md": "a9cbf688d6fdd7de2848fe6e5167f3f9e2e650041aa3598dd2df2d55aa3cc5e8",
+    "docs/目标模式提示词.md": "96598cdc74122c1cde70bc95b9350509a20d4f4ebb8b06af5b1a80494c742edf",
+    "docs/验证报告_隔离包ReviewStudio内容身份行为闭环_2026-07-15.md": "a5ab9e66402b7d4ed8888f65b864cc93f716ed1c1bc6a14a1df3ec4f18ddcf1d"
+  },
+  "cleanup": {
+    "packageTempRootsRemoved": true,
+    "failed0038EvidenceAbsent": true,
+    "reviewProjectRemoved": true,
+    "reviewRegistryRemoved": true,
+    "reviewUserDataRemoved": true,
+    "packagedMediaRuntimeRemoved": true,
+    "lingeringPackageOrReviewProcesses": 0,
+    "hostRegistryUnchanged": true,
+    "hostMediaRuntimeStateUnchanged": true,
+    "workspaceDistOutMcpUnchangedByPackage": true
+  },
+  "oldDmg": {
+    "path": "dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "bytes": 136652595,
+    "sha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972",
+    "unchanged": true,
+    "generatedThisTurn": false,
+    "overwritten": false
+  },
+  "authorizationBoundary": {
+    "formalProjectUsed": false,
+    "externalCreativeFoldersTouched": false,
+    "externalWebsiteUsed": false,
+    "uploadUsed": false,
+    "paidActionUsed": false,
+    "installed": false,
+    "published": false,
+    "developerIdSigningRequested": false,
+    "notarizationRequested": false,
+    "closesRealProjectNleValidation": false
+  },
+  "git": {
+    "branch": "main",
+    "hasCommits": false,
+    "allProjectFilesUntracked": true,
+    "diffCheckPassed": true,
+    "staged": false,
+    "committed": false,
+    "pushed": false,
+    "pullRequestCreated": false
+  }
+}

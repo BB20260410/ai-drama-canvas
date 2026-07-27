@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "kind": "absorb-a3-dual-entry",
+  "status": "pass",
+  "createdAt": "2026-07-18T07:05:00.000Z",
+  "slice": "A3",
+  "files": [
+    "src/core/studio-canvas-locator.ts",
+    "src/renderer/src/components/MaterialStudioView.vue",
+    "src/renderer/src/components/ManagedStudioCanvasView.vue",
+    "src/renderer/src/components/StudioProductionDashboardView.vue",
+    "tests/studio-canvas-locator.test.ts",
+    "tests/managed-studio-canvas-ui.test.ts"
+  ],
+  "behavior": [
+    "intentOpenCanvasFromDashboard / intentOpenDashboardFromCanvas",
+    "dashboard open-canvas buttons emit focus",
+    "canvas double-click emits openDashboard",
+    "MaterialStudioView switches mode + shared focus props",
+    "nextAction not recomputed in UI",
+    "FIX: focus watch immediate + applyExternalFocus after refreshAll",
+    "FIX: loadUnits prefers focus over first unit",
+    "selectUnit uses studioDashboardUnitQueryForFocus (same query as tests)"
+  ],
+  "tests": [
+    "tests/studio-dashboard-focus.test.ts (loadStudioDashboardUnitForFocus drives getDashboard)",
+    "tests/studio-canvas-locator.test.ts"
+  ]
+}

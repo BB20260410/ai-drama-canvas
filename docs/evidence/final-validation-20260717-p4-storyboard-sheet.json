@@ -1,0 +1,3131 @@
+{
+  "schemaVersion": 1,
+  "kind": "p4-storyboard-sheet-final-validation",
+  "createdAt": "2026-07-17T14:56:06.348Z",
+  "validationWindow": {
+    "startedAt": "2026-07-17T14:48:55.365Z",
+    "endedAt": "2026-07-17T14:56:06.348Z"
+  },
+  "invocation": {
+    "argv": [
+      "/Users/hxx/.nvm/versions/node/v22.22.2/bin/node",
+      "/Users/hxx/Documents/无限画布/scripts/validate-p4-storyboard-sheet-final.ts",
+      "--mcp-evidence",
+      "docs/evidence/p4-storyboard-sheet-mcp-final-20260717-r2.json",
+      "--ui-evidence",
+      "docs/evidence/p4-storyboard-sheet-ui-final-20260717-r2.json",
+      "--ui-screenshot",
+      "docs/evidence/p4-storyboard-sheet-ui-final-20260717-r2-ep01-001.png",
+      "--ui-screenshot",
+      "docs/evidence/p4-storyboard-sheet-ui-final-20260717-r2-ep01-001-ep01-008.png",
+      "--evidence",
+      "docs/evidence/final-validation-20260717-p4-storyboard-sheet.json",
+      "--run-root",
+      "docs/evidence/runs/p4-storyboard-sheet-final-20260717"
+    ],
+    "cwd": "/Users/hxx/Documents/无限画布"
+  },
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "sourceRoot": "/Users/hxx/Documents/古蜀卷第三季",
+  "runRoot": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717",
+  "source": {
+    "before": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26",
+      "jsonRowsSha256": "c222295b2ed93ff0f38ae6f98fa8032cedb47be91358671ea04137f525c5f7a1"
+    },
+    "after": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26",
+      "jsonRowsSha256": "c222295b2ed93ff0f38ae6f98fa8032cedb47be91358671ea04137f525c5f7a1"
+    },
+    "unchanged": true
+  },
+  "sourceCode": {
+    "before": {
+      "files": 238,
+      "aggregateSha256": "ba8bdb25f1f09932c0661eafd0d263f54fdb6c9c6e76e05c50efd65a8dc1b851"
+    },
+    "after": {
+      "files": 238,
+      "aggregateSha256": "ba8bdb25f1f09932c0661eafd0d263f54fdb6c9c6e76e05c50efd65a8dc1b851"
+    },
+    "unchanged": true
+  },
+  "planning": {
+    "before": {
+      "root": "/Users/hxx/Documents/无限画布/.planning/2026-07-17-ai-p0-p10",
+      "taskPlan": {
+        "path": "/Users/hxx/Documents/无限画布/.planning/2026-07-17-ai-p0-p10/task_plan.md",
+        "bytes": 14589,
+        "sha256": "85205319f198ca2c59e63622386779baef495e202430d78dcf9b17afe89f3e19"
+      },
+      "attestation": {
+        "path": "/Users/hxx/Documents/无限画布/.planning/2026-07-17-ai-p0-p10/.attestation",
+        "bytes": 65,
+        "sha256": "7a88ea23adbce5f3881ecdf83594808a1e754bac1de03fde5e45c3127dcc96fa"
+      },
+      "modeFile": {
+        "path": "/Users/hxx/Documents/无限画布/.planning/2026-07-17-ai-p0-p10/.mode",
+        "bytes": 16,
+        "sha256": "935bc1bbe17f94d1a8dddeb9471f9d822654135156758e7004ecaa0c3b03643a"
+      },
+      "stopBlocksFile": {
+        "path": "/Users/hxx/Documents/无限画布/.planning/2026-07-17-ai-p0-p10/.stop_blocks",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "taskPlanSha256": "85205319f198ca2c59e63622386779baef495e202430d78dcf9b17afe89f3e19",
+      "attestedSha256": "85205319f198ca2c59e63622386779baef495e202430d78dcf9b17afe89f3e19",
+      "mode": "autonomous gate",
+      "stopBlocks": 0
+    },
+    "after": {
+      "root": "/Users/hxx/Documents/无限画布/.planning/2026-07-17-ai-p0-p10",
+      "taskPlan": {
+        "path": "/Users/hxx/Documents/无限画布/.planning/2026-07-17-ai-p0-p10/task_plan.md",
+        "bytes": 14589,
+        "sha256": "85205319f198ca2c59e63622386779baef495e202430d78dcf9b17afe89f3e19"
+      },
+      "attestation": {
+        "path": "/Users/hxx/Documents/无限画布/.planning/2026-07-17-ai-p0-p10/.attestation",
+        "bytes": 65,
+        "sha256": "7a88ea23adbce5f3881ecdf83594808a1e754bac1de03fde5e45c3127dcc96fa"
+      },
+      "modeFile": {
+        "path": "/Users/hxx/Documents/无限画布/.planning/2026-07-17-ai-p0-p10/.mode",
+        "bytes": 16,
+        "sha256": "935bc1bbe17f94d1a8dddeb9471f9d822654135156758e7004ecaa0c3b03643a"
+      },
+      "stopBlocksFile": {
+        "path": "/Users/hxx/Documents/无限画布/.planning/2026-07-17-ai-p0-p10/.stop_blocks",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "taskPlanSha256": "85205319f198ca2c59e63622386779baef495e202430d78dcf9b17afe89f3e19",
+      "attestedSha256": "85205319f198ca2c59e63622386779baef495e202430d78dcf9b17afe89f3e19",
+      "mode": "autonomous gate",
+      "stopBlocks": 0
+    },
+    "unchanged": true
+  },
+  "priorGates": {
+    "p2": {
+      "revision": 2,
+      "storeFingerprint": "3cd7bc5b43531385c68cc3e7c9fe4906081806177652944bd4523b9de132a788",
+      "auditFingerprint": "3791ea31da3cd2b33461a35718be073537a4cac9b2dd5ee210499e5eb000b49e",
+      "audit": {
+        "schemaVersion": 1,
+        "resolverVersion": "panel-reference-resolution-v1",
+        "contractCoverageVersion": 1,
+        "currentContracts": 1288,
+        "panels": 4330,
+        "panelDistribution": {
+          "2": 151,
+          "3": 667,
+          "4": 349,
+          "5": 95,
+          "6": 26
+        },
+        "semanticAssetBindings": 13812,
+        "referenceSlots": 12720,
+        "confirmedEmptyPanels": 10,
+        "generationReadyPanels": 610,
+        "pendingHardLockPanels": 3554,
+        "pendingHardLockReferences": 7480,
+        "pendingDerivedArtifactPanels": 166,
+        "detectedOverflowPanels": 166,
+        "derivedDefinitions": 52,
+        "detectedRowContinuityDifferencePanels": 913,
+        "detectedRowContinuityDifferences": 1994,
+        "unresolvedPanels": 0,
+        "unresolvedReferences": 0,
+        "knownAssetMissingBindingPanels": 0,
+        "knownAssetMissingBindings": 0,
+        "semanticAssetMissingSlotPanels": 0,
+        "semanticAssetMissingSlots": 0,
+        "contractAssetMissingBindingPanels": 0,
+        "contractAssetMissingBindings": 0,
+        "explicitContinuityMissingBindingPanels": 0,
+        "explicitContinuityMissingBindings": 0,
+        "unhandledOverflowPanels": 0,
+        "timeSpanContinuityMismatchPanels": 0,
+        "timeSpanContinuityMismatches": 0,
+        "maximumSemanticAssetsPerPanel": 12,
+        "maximumReferenceSlotsPerPanel": 6,
+        "closurePassed": true,
+        "auditFingerprint": "3791ea31da3cd2b33461a35718be073537a4cac9b2dd5ee210499e5eb000b49e"
+      },
+      "currentnessBefore": {
+        "current": true,
+        "checkedAt": "2026-07-17T14:49:10.773Z",
+        "storeRevision": 2,
+        "storeFingerprint": "3cd7bc5b43531385c68cc3e7c9fe4906081806177652944bd4523b9de132a788",
+        "driftedInputs": []
+      },
+      "currentnessAfter": {
+        "current": true,
+        "checkedAt": "2026-07-17T14:54:53.528Z",
+        "storeRevision": 2,
+        "storeFingerprint": "3cd7bc5b43531385c68cc3e7c9fe4906081806177652944bd4523b9de132a788",
+        "driftedInputs": []
+      }
+    },
+    "p3": {
+      "revision": 1,
+      "storeFingerprint": "95f836f3f4b4458b1bbd698cefc775c7ff5f3d48d5917421c015531a3eea2e1b",
+      "audit": {
+        "schemaVersion": 1,
+        "builderVersion": "panel-visual-constraint-v1",
+        "contracts": 1288,
+        "expectedPanels": 4330,
+        "constraints": 4330,
+        "missingConstraints": 0,
+        "extraConstraints": 0,
+        "invalidConstraints": 0,
+        "duplicateConstraintIds": 0,
+        "onScreenAssets": 12502,
+        "continuityOnlyAssets": 1310,
+        "optionalOffscreenAssets": 0,
+        "unresolvedIdentityLocks": 8331,
+        "unresolvedSpatialLocks": 24992,
+        "unresolvedContinuityLocks": 440,
+        "invalidModelFingerprints": 0,
+        "invalidReviewRulesFingerprints": 0,
+        "modelPromptLeakPanels": 0,
+        "modelPathLeakPanels": 0,
+        "concealedMaskPanels": 304,
+        "revealAuthorizedPanels": 0,
+        "warningCounts": {
+          "AHANG_IDENTITY": 1415,
+          "DUDU_MARKINGS": 924,
+          "HIDDEN_MASK_DISCLOSURE": 304,
+          "OCR_OR_TEXT": 4330,
+          "WATERMARK_OR_UI": 4330,
+          "MODERN_OBJECT": 4330,
+          "COLLAGE_OR_SPLIT": 4330,
+          "PROP_STRUCTURE": 2665,
+          "SCENE_LAYOUT": 2574,
+          "EXTRA_CHARACTER": 4330,
+          "AMBIGUOUS_VISIBILITY": 776,
+          "SPATIAL_LOCK_UNKNOWN": 4330
+        },
+        "warningsWithoutReviewRules": 0,
+        "closurePassed": true,
+        "auditFingerprint": "794c699bd7eed74b3328069ee9b51db6880b797a558a85901eb68020841bba22"
+      },
+      "currentnessBefore": {
+        "current": true,
+        "checkedAt": "2026-07-17T14:49:28.067Z",
+        "storeRevision": 1,
+        "storeFingerprint": "95f836f3f4b4458b1bbd698cefc775c7ff5f3d48d5917421c015531a3eea2e1b",
+        "p2StoreRevision": 2,
+        "p2StoreFingerprint": "3cd7bc5b43531385c68cc3e7c9fe4906081806177652944bd4523b9de132a788",
+        "driftedInputs": []
+      },
+      "currentnessAfter": {
+        "current": true,
+        "checkedAt": "2026-07-17T14:55:12.310Z",
+        "storeRevision": 1,
+        "storeFingerprint": "95f836f3f4b4458b1bbd698cefc775c7ff5f3d48d5917421c015531a3eea2e1b",
+        "p2StoreRevision": 2,
+        "p2StoreFingerprint": "3cd7bc5b43531385c68cc3e7c9fe4906081806177652944bd4523b9de132a788",
+        "driftedInputs": []
+      }
+    }
+  },
+  "formal": {
+    "store": {
+      "schemaVersion": 1,
+      "kind": "fusion-storyboard-sheet-index",
+      "revision": 1,
+      "records": {},
+      "legacyRecords": {
+        "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec": {
+          "itemId": "season-三-ep01-unit001",
+          "status": "stale",
+          "contractId": "grid-6c02035d032128e0f62a",
+          "requirementId": "fusion-review-7916b22425ae2df44a0a3ce895530eb21459fb256d8e0ad8524182a558ec9aff",
+          "reviewId": "review-2026-07-16T19-18-14-130Z-527bbafe",
+          "receiptPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json",
+          "artifacts": [
+            {
+              "role": "png",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.png",
+              "pageIndex": 1,
+              "pageCount": 1,
+              "sha256": "8600c46fe40ad797927c68c1bc09072556646a423f5edeb8a14fa90697e1e06e",
+              "bytes": 4472760
+            },
+            {
+              "role": "svg",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.svg",
+              "pageIndex": 1,
+              "pageCount": 1,
+              "sha256": "420d0cc54a7685a4d58e9f5b3145e8cf1c8248a31483d45d19e61a334b0448de",
+              "bytes": 1184873
+            },
+            {
+              "role": "receipt",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json",
+              "pageCount": 1,
+              "sha256": "7cb26385590c783a6d3af4318a3c53586b15ef5b38e7336425960fbc2e2e6f44",
+              "bytes": 3843
+            }
+          ],
+          "reason": "schema-v1 历史板绑定旧 Review/requirement，但未冻结 P4 当前完整证据，只能登记为 stale",
+          "sheetId": "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+          "registeredAt": "2026-07-17T13:47:09.572Z"
+        },
+        "legacy-sheet-d75625366c9b08f7fbbb8802741789b0": {
+          "itemId": "season-三-ep01-unit001",
+          "status": "legacy-invalid",
+          "contractId": "grid-6c02035d032128e0f62a",
+          "receiptPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json",
+          "artifacts": [
+            {
+              "role": "receipt",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json",
+              "pageCount": 1,
+              "sha256": "f509797e0aef7793fcbf8e72a7b58a0b49e039cd247399032edde5227d0d1148",
+              "bytes": 3589
+            }
+          ],
+          "reason": "schema-v1 历史 receipt 未同时绑定 Review/requirement，只登记 receipt 且永久 legacy-invalid",
+          "sheetId": "legacy-sheet-d75625366c9b08f7fbbb8802741789b0",
+          "registeredAt": "2026-07-17T13:47:09.572Z"
+        }
+      },
+      "currentByItemId": {},
+      "updatedAt": "2026-07-17T13:47:09.572Z"
+    },
+    "ep01_001": {
+      "schemaVersion": 2,
+      "kind": "fusion-storyboard-sheet-state",
+      "itemId": "season-三-ep01-unit001",
+      "storeRevision": 1,
+      "currentContract": {
+        "schemaVersion": 1,
+        "kind": "fusion-storyboard-grid-contract",
+        "contractId": "grid-6c02035d032128e0f62a",
+        "sourceStoryboardRevision": 1,
+        "sourceFingerprint": "674103c439fecf32680352c40bf107455952a17aab084db0dcb50fffad5466df",
+        "displayTiming": {
+          "policyVersion": "one-decimal-boundaries-then-difference-v1",
+          "decimals": 1,
+          "durationDerivedFromDisplayedBoundaries": true,
+          "totalVisibleDurationSeconds": 15
+        },
+        "unit": {
+          "unitId": "season-三-ep01-unit001",
+          "title": "EP01 承第二季EP23彩蛋第三",
+          "episodeLabel": "EP01",
+          "unitSequence": 1,
+          "storyGoal": "承第二季 EP23 彩蛋·第三季第一帧直接接榜缝",
+          "aspectRatio": "9:16",
+          "standardDurationSeconds": 15
+        },
+        "header": {
+          "title": "15秒分镜故事板·EP01 承第二季EP23彩蛋第三",
+          "subtitle": "EP01 | season-三-ep01-unit001 | 承第二季 EP23 彩蛋·第三季第一帧直接接榜缝",
+          "metadataLine": "4格 | 15.0s | 9:16 | storyboard r1"
+        },
+        "selection": {
+          "mode": "automatic",
+          "algorithmVersion": "semantic-beat-v1",
+          "panelCount": 4,
+          "sourceRowCount": 2,
+          "detectedBeatCount": 4,
+          "cappedByMaximum": false,
+          "reason": "剧情语义检测到 4 个可画节拍，自动采用 4 格",
+          "rowPlans": [
+            {
+              "storyboardRowId": "storyboard-EP01_15s_001-01",
+              "durationSeconds": 12,
+              "detectedBeatCount": 3,
+              "detectedBeats": [
+                "第一秒，封神榜三百六十五个名字同时亮起",
+                "第三秒，金文流到那个写不出字的空白格，整面榜像被谁按住喉咙，顿住半息",
+                "金文绕开它继续流，格子深处那一星黑金悬着，像一粒沉在琥珀里的墨"
+              ],
+              "allocatedPanelCount": 3,
+              "reason": "检测 3 个剧情节拍，逐节拍独立成格"
+            },
+            {
+              "storyboardRowId": "storyboard-EP01_15s_001-02",
+              "durationSeconds": 3,
+              "detectedBeatCount": 1,
+              "detectedBeats": [
+                "补足动作前奏/反应/收束、运镜延展、环境声和道具细节；不新增改变剧情走向的事件"
+              ],
+              "allocatedPanelCount": 1,
+              "reason": "通用延展段固定为一格，不伪造新剧情节拍"
+            }
+          ]
+        },
+        "panels": [
+          {
+            "id": "season-三-ep01-unit001-panel-01",
+            "index": 1,
+            "frameRole": "start",
+            "startSeconds": 0,
+            "endSeconds": 3,
+            "durationSeconds": 3,
+            "durationLabel": "0.0–3.0s（3.0s）",
+            "storyboardRowIds": [
+              "storyboard-EP01_15s_001-01"
+            ],
+            "storyboardRowRevisions": [
+              1
+            ],
+            "sourceShotItemIds": [
+              "season-三-ep01-unit001-shot01"
+            ],
+            "sourceShotNumbers": [
+              1
+            ],
+            "scheduleRowIndexes": [
+              0
+            ],
+            "scheduleRowIds": [
+              "season-三-ep01-unit001:schedule:0"
+            ],
+            "assetIds": [
+              "S01"
+            ],
+            "semanticBeats": [
+              {
+                "storyboardRowId": "storyboard-EP01_15s_001-01",
+                "detectedBeatIndexes": [
+                  1
+                ],
+                "detectedBeatCount": 3,
+                "kind": "narrative",
+                "text": "第一秒，封神榜三百六十五个名字同时亮起"
+              }
+            ],
+            "imageContentAction": "第一秒，封神榜三百六十五个名字同时亮起",
+            "shotComposition": "极特写",
+            "shootingMethod": "贴榜横移 / 平视 / 100mm",
+            "continuitySound": "前承：承接上一单元或本集起幅：承第二季 EP23 彩蛋·第三季第一帧直接接榜缝；后接：连续进入 12.0 秒后的下一行。",
+            "dialogueSubtitle": "无",
+            "imageGenerationPrompt": "电影级写实风格，中国神话史诗质感，商周时代考据，戏剧性自然光影，9:16竖屏。光线：夜色墨蓝 4400K，榜文法条金 2800K 冷而匀，黑金浑浊发暗。。机位/焦段/运镜参考：极特写，100mm，平视，起幅保持稳定可作为图生视频首帧。。禁止文字水印、logo、字幕、二维码、海报感排版；禁止现代建筑、现代交通工具、现代电器、纸张、铁器、椅凳高桌、马镫、辣椒等周初禁物（当代库房彩蛋单元除外）；禁止半面具、破面具、露出黄金面具、不露第二只眼、不露全脸、面具口型；嘟嘟必须是黑白毛吉娃娃普通犬态，禁止错犬种、拟人表情、说人话、发光变身；避免错手错眼、多指畸形、脸崩、现代真人照片感、明星脸、网红脸、影楼写真、低清噪点。。极特写，稳定构图，首格起势，对应 0.0–3.0 秒，当前格只呈现这一组剧情节拍：第一秒，封神榜三百六十五个名字同时亮起。纯画面，画面内不要任何中文、英文、字母、数字、字幕、标题、表格线、水印或界面元素。",
+            "selectionReason": "语义节拍 1/3 独立成格",
+            "tableFields": [
+              {
+                "key": "imageContentAction",
+                "label": "画面内容/动作",
+                "value": "第一秒，封神榜三百六十五个名字同时亮起"
+              },
+              {
+                "key": "shotComposition",
+                "label": "景别/构图",
+                "value": "极特写"
+              },
+              {
+                "key": "shootingMethod",
+                "label": "拍摄方式",
+                "value": "贴榜横移 / 平视 / 100mm"
+              },
+              {
+                "key": "continuitySound",
+                "label": "连续性/声音",
+                "value": "前承：承接上一单元或本集起幅：承第二季 EP23 彩蛋·第三季第一帧直接接榜缝；后接：连续进入 12.0 秒后的下一行。"
+              },
+              {
+                "key": "dialogueSubtitle",
+                "label": "台词/字幕",
+                "value": "无"
+              },
+              {
+                "key": "duration",
+                "label": "时长",
+                "value": "0.0–3.0s（3.0s）"
+              }
+            ],
+            "layout": {
+              "row": 1,
+              "column": 1,
+              "columnSpan": 1,
+              "readingOrder": 1,
+              "imagePlacement": "left",
+              "detailPlacement": "right-table-columns",
+              "emphasis": "start"
+            },
+            "continuityReferenceAssetIds": []
+          },
+          {
+            "id": "season-三-ep01-unit001-panel-02",
+            "index": 2,
+            "frameRole": "middle",
+            "startSeconds": 3,
+            "endSeconds": 7.5,
+            "durationSeconds": 4.5,
+            "durationLabel": "3.0–7.5s（4.5s）",
+            "storyboardRowIds": [
+              "storyboard-EP01_15s_001-01"
+            ],
+            "storyboardRowRevisions": [
+              1
+            ],
+            "sourceShotItemIds": [
+              "season-三-ep01-unit001-shot01"
+            ],
+            "sourceShotNumbers": [
+              1
+            ],
+            "scheduleRowIndexes": [
+              0
+            ],
+            "scheduleRowIds": [
+              "season-三-ep01-unit001:schedule:0"
+            ],
+            "assetIds": [
+              "S01"
+            ],
+            "semanticBeats": [
+              {
+                "storyboardRowId": "storyboard-EP01_15s_001-01",
+                "detectedBeatIndexes": [
+                  2
+                ],
+                "detectedBeatCount": 3,
+                "kind": "narrative",
+                "text": "第三秒，金文流到那个写不出字的空白格，整面榜像被谁按住喉咙，顿住半息"
+              }
+            ],
+            "imageContentAction": "第三秒，金文流到那个写不出字的空白格，整面榜像被谁按住喉咙，顿住半息",
+            "shotComposition": "极特写",
+            "shootingMethod": "贴榜横移 / 平视 / 100mm",
+            "continuitySound": "前承：承接上一单元或本集起幅：承第二季 EP23 彩蛋·第三季第一帧直接接榜缝；后接：连续进入 12.0 秒后的下一行。",
+            "dialogueSubtitle": "无",
+            "imageGenerationPrompt": "电影级写实风格，中国神话史诗质感，商周时代考据，戏剧性自然光影，9:16竖屏。光线：夜色墨蓝 4400K，榜文法条金 2800K 冷而匀，黑金浑浊发暗。。机位/焦段/运镜参考：极特写，100mm，平视，起幅保持稳定可作为图生视频首帧。。禁止文字水印、logo、字幕、二维码、海报感排版；禁止现代建筑、现代交通工具、现代电器、纸张、铁器、椅凳高桌、马镫、辣椒等周初禁物（当代库房彩蛋单元除外）；禁止半面具、破面具、露出黄金面具、不露第二只眼、不露全脸、面具口型；嘟嘟必须是黑白毛吉娃娃普通犬态，禁止错犬种、拟人表情、说人话、发光变身；避免错手错眼、多指畸形、脸崩、现代真人照片感、明星脸、网红脸、影楼写真、低清噪点。。极特写，稳定构图，中段关键定格，对应 3.0–7.5 秒，当前格只呈现这一组剧情节拍：第三秒，金文流到那个写不出字的空白格，整面榜像被谁按住喉咙，顿住半息。纯画面，画面内不要任何中文、英文、字母、数字、字幕、标题、表格线、水印或界面元素。",
+            "selectionReason": "语义节拍 2/3 独立成格",
+            "tableFields": [
+              {
+                "key": "imageContentAction",
+                "label": "画面内容/动作",
+                "value": "第三秒，金文流到那个写不出字的空白格，整面榜像被谁按住喉咙，顿住半息"
+              },
+              {
+                "key": "shotComposition",
+                "label": "景别/构图",
+                "value": "极特写"
+              },
+              {
+                "key": "shootingMethod",
+                "label": "拍摄方式",
+                "value": "贴榜横移 / 平视 / 100mm"
+              },
+              {
+                "key": "continuitySound",
+                "label": "连续性/声音",
+                "value": "前承：承接上一单元或本集起幅：承第二季 EP23 彩蛋·第三季第一帧直接接榜缝；后接：连续进入 12.0 秒后的下一行。"
+              },
+              {
+                "key": "dialogueSubtitle",
+                "label": "台词/字幕",
+                "value": "无"
+              },
+              {
+                "key": "duration",
+                "label": "时长",
+                "value": "3.0–7.5s（4.5s）"
+              }
+            ],
+            "layout": {
+              "row": 2,
+              "column": 1,
+              "columnSpan": 1,
+              "readingOrder": 2,
+              "imagePlacement": "left",
+              "detailPlacement": "right-table-columns",
+              "emphasis": "normal"
+            },
+            "continuityReferenceAssetIds": []
+          },
+          {
+            "id": "season-三-ep01-unit001-panel-03",
+            "index": 3,
+            "frameRole": "middle",
+            "startSeconds": 7.5,
+            "endSeconds": 12,
+            "durationSeconds": 4.5,
+            "durationLabel": "7.5–12.0s（4.5s）",
+            "storyboardRowIds": [
+              "storyboard-EP01_15s_001-01"
+            ],
+            "storyboardRowRevisions": [
+              1
+            ],
+            "sourceShotItemIds": [
+              "season-三-ep01-unit001-shot01"
+            ],
+            "sourceShotNumbers": [
+              1
+            ],
+            "scheduleRowIndexes": [
+              0
+            ],
+            "scheduleRowIds": [
+              "season-三-ep01-unit001:schedule:0"
+            ],
+            "assetIds": [
+              "S01"
+            ],
+            "semanticBeats": [
+              {
+                "storyboardRowId": "storyboard-EP01_15s_001-01",
+                "detectedBeatIndexes": [
+                  3
+                ],
+                "detectedBeatCount": 3,
+                "kind": "narrative",
+                "text": "金文绕开它继续流，格子深处那一星黑金悬着，像一粒沉在琥珀里的墨"
+              }
+            ],
+            "imageContentAction": "金文绕开它继续流，格子深处那一星黑金悬着，像一粒沉在琥珀里的墨",
+            "shotComposition": "极特写",
+            "shootingMethod": "贴榜横移 / 平视 / 100mm",
+            "continuitySound": "前承：承接上一单元或本集起幅：承第二季 EP23 彩蛋·第三季第一帧直接接榜缝；后接：连续进入 12.0 秒后的下一行。",
+            "dialogueSubtitle": "无",
+            "imageGenerationPrompt": "电影级写实风格，中国神话史诗质感，商周时代考据，戏剧性自然光影，9:16竖屏。光线：夜色墨蓝 4400K，榜文法条金 2800K 冷而匀，黑金浑浊发暗。。机位/焦段/运镜参考：极特写，100mm，平视，起幅保持稳定可作为图生视频首帧。。禁止文字水印、logo、字幕、二维码、海报感排版；禁止现代建筑、现代交通工具、现代电器、纸张、铁器、椅凳高桌、马镫、辣椒等周初禁物（当代库房彩蛋单元除外）；禁止半面具、破面具、露出黄金面具、不露第二只眼、不露全脸、面具口型；嘟嘟必须是黑白毛吉娃娃普通犬态，禁止错犬种、拟人表情、说人话、发光变身；避免错手错眼、多指畸形、脸崩、现代真人照片感、明星脸、网红脸、影楼写真、低清噪点。。极特写，稳定构图，中段关键定格，对应 7.5–12.0 秒，当前格只呈现这一组剧情节拍：金文绕开它继续流，格子深处那一星黑金悬着，像一粒沉在琥珀里的墨。纯画面，画面内不要任何中文、英文、字母、数字、字幕、标题、表格线、水印或界面元素。",
+            "selectionReason": "语义节拍 3/3 独立成格",
+            "tableFields": [
+              {
+                "key": "imageContentAction",
+                "label": "画面内容/动作",
+                "value": "金文绕开它继续流，格子深处那一星黑金悬着，像一粒沉在琥珀里的墨"
+              },
+              {
+                "key": "shotComposition",
+                "label": "景别/构图",
+                "value": "极特写"
+              },
+              {
+                "key": "shootingMethod",
+                "label": "拍摄方式",
+                "value": "贴榜横移 / 平视 / 100mm"
+              },
+              {
+                "key": "continuitySound",
+                "label": "连续性/声音",
+                "value": "前承：承接上一单元或本集起幅：承第二季 EP23 彩蛋·第三季第一帧直接接榜缝；后接：连续进入 12.0 秒后的下一行。"
+              },
+              {
+                "key": "dialogueSubtitle",
+                "label": "台词/字幕",
+                "value": "无"
+              },
+              {
+                "key": "duration",
+                "label": "时长",
+                "value": "7.5–12.0s（4.5s）"
+              }
+            ],
+            "layout": {
+              "row": 3,
+              "column": 1,
+              "columnSpan": 1,
+              "readingOrder": 3,
+              "imagePlacement": "left",
+              "detailPlacement": "right-table-columns",
+              "emphasis": "normal"
+            },
+            "continuityReferenceAssetIds": []
+          },
+          {
+            "id": "season-三-ep01-unit001-panel-04",
+            "index": 4,
+            "frameRole": "end",
+            "startSeconds": 12,
+            "endSeconds": 15,
+            "durationSeconds": 3,
+            "durationLabel": "12.0–15.0s（3.0s）",
+            "storyboardRowIds": [
+              "storyboard-EP01_15s_001-02"
+            ],
+            "storyboardRowRevisions": [
+              1
+            ],
+            "sourceShotItemIds": [],
+            "sourceShotNumbers": [],
+            "scheduleRowIndexes": [
+              1
+            ],
+            "scheduleRowIds": [
+              "season-三-ep01-unit001:schedule:1"
+            ],
+            "assetIds": [
+              "S01"
+            ],
+            "semanticBeats": [
+              {
+                "storyboardRowId": "storyboard-EP01_15s_001-02",
+                "detectedBeatIndexes": [
+                  1
+                ],
+                "detectedBeatCount": 1,
+                "kind": "continuity-extension",
+                "text": "补足动作前奏/反应/收束、运镜延展、环境声和道具细节；不新增改变剧情走向的事件"
+              }
+            ],
+            "imageContentAction": "补足动作前奏/反应/收束、运镜延展、环境声和道具细节；不新增改变剧情走向的事件",
+            "shotComposition": "延展镜头",
+            "shootingMethod": "承接末镜延展",
+            "continuitySound": "前承：承接本单元第 1 行尾态。；后接：作为下一单元可续接尾态。",
+            "dialogueSubtitle": "无",
+            "imageGenerationPrompt": "电影级写实风格，中国神话史诗质感，商周时代考据，9:16竖屏。延展镜头，稳定构图，末格落点，对应 12.0–15.0 秒，当前格只呈现这一组剧情节拍：补足动作前奏/反应/收束、运镜延展、环境声和道具细节；不新增改变剧情走向的事件。纯画面，画面内不要任何中文、英文、字母、数字、字幕、标题、表格线、水印或界面元素。",
+            "selectionReason": "延展段固定为一格，只承接动作和环境，不新增剧情事件",
+            "tableFields": [
+              {
+                "key": "imageContentAction",
+                "label": "画面内容/动作",
+                "value": "补足动作前奏/反应/收束、运镜延展、环境声和道具细节；不新增改变剧情走向的事件"
+              },
+              {
+                "key": "shotComposition",
+                "label": "景别/构图",
+                "value": "延展镜头"
+              },
+              {
+                "key": "shootingMethod",
+                "label": "拍摄方式",
+                "value": "承接末镜延展"
+              },
+              {
+                "key": "continuitySound",
+                "label": "连续性/声音",
+                "value": "前承：承接本单元第 1 行尾态。；后接：作为下一单元可续接尾态。"
+              },
+              {
+                "key": "dialogueSubtitle",
+                "label": "台词/字幕",
+                "value": "无"
+              },
+              {
+                "key": "duration",
+                "label": "时长",
+                "value": "12.0–15.0s（3.0s）"
+              }
+            ],
+            "layout": {
+              "row": 4,
+              "column": 1,
+              "columnSpan": 1,
+              "readingOrder": 4,
+              "imagePlacement": "left",
+              "detailPlacement": "right-table-columns",
+              "emphasis": "end"
+            },
+            "continuityReferenceAssetIds": []
+          }
+        ],
+        "layout": {
+          "template": "portrait-storyboard-table",
+          "pageOrientation": "portrait",
+          "pageAspectRatio": "9:16",
+          "gridColumns": 1,
+          "gridRows": 4,
+          "headerPlacement": "top-full-width",
+          "footerPlacement": "bottom-full-width",
+          "panelCellModel": "image-left-details-columns",
+          "detailFieldOrder": [
+            "imageContentAction",
+            "shotComposition",
+            "shootingMethod",
+            "continuitySound",
+            "dialogueSubtitle",
+            "duration"
+          ]
+        },
+        "footer": {
+          "rhythmChain": [
+            {
+              "panelId": "season-三-ep01-unit001-panel-01",
+              "frameRole": "start",
+              "startSeconds": 0,
+              "endSeconds": 3,
+              "label": "1. 第一秒，封神榜三百六十五个名字同时亮起"
+            },
+            {
+              "panelId": "season-三-ep01-unit001-panel-02",
+              "frameRole": "middle",
+              "startSeconds": 3,
+              "endSeconds": 7.5,
+              "label": "2. 第三秒，金文流到那个写不出字的空白格，整面榜像被谁按住喉咙，顿住半息"
+            },
+            {
+              "panelId": "season-三-ep01-unit001-panel-03",
+              "frameRole": "middle",
+              "startSeconds": 7.5,
+              "endSeconds": 12,
+              "label": "3. 金文绕开它继续流，格子深处那一星黑金悬着，像一粒沉在琥珀里的墨"
+            },
+            {
+              "panelId": "season-三-ep01-unit001-panel-04",
+              "frameRole": "end",
+              "startSeconds": 12,
+              "endSeconds": 15,
+              "label": "4. 补足动作前奏/反应/收束、运镜延展、环境声和道具细节；不新增改变剧情走向的事件"
+            }
+          ],
+          "summary": "0.0-3.0s 第一秒，封神榜三百六十五个名字同时亮起 → 3.0-7.5s 第三秒，金文流到那个写不出字的空白格，整面榜像被 → 7.5-12.0s 金文绕开它继续流，格子深处那一星黑金悬着，像一粒 → 12.0-15.0s 补足动作前奏/反应/收束、运镜延展、环境声和道具"
+        },
+        "coverage": {
+          "allStoryboardRowsCovered": true,
+          "storyboardRowIds": [
+            "storyboard-EP01_15s_001-01",
+            "storyboard-EP01_15s_001-02"
+          ],
+          "groupedPanelIds": [],
+          "splitStoryboardRowIds": [
+            "storyboard-EP01_15s_001-01"
+          ],
+          "allScheduleRowsCovered": true,
+          "scheduleRowIndexes": [
+            0,
+            1
+          ]
+        },
+        "localRendering": {
+          "engine": "svg-sharp",
+          "language": "zh-CN",
+          "textRendering": "local-only",
+          "panelImageMode": "one-image-per-panel",
+          "assetReferenceMode": "one-image-per-asset",
+          "aiImageContainsText": false,
+          "fontFallbacks": [
+            "PingFang SC",
+            "Noto Sans CJK SC",
+            "Microsoft YaHei",
+            "sans-serif"
+          ],
+          "outputArtifacts": [
+            "panel-images",
+            "storyboard-svg",
+            "storyboard-png"
+          ],
+          "outputInstructions": [
+            "每格先单独生成一张无文字纯画面，不让生图模型绘制中文表格。",
+            "资产参考图继续保持一图一资产，不把多个资产预先拼成一张参考图。",
+            "再由本地 SVG 按 panel.layout 排布画面和 tableFields，使用中文字体回退链。",
+            "最后用 Sharp 将 SVG 渲染为竖版 PNG，保留顶部单元元数据和底部节奏链。"
+          ],
+          "negativePrompt": "纯画面，画面内不要任何中文、英文、字母、数字、字幕、标题、表格线、水印或界面元素。"
+        },
+        "productionFingerprint": "421370f570c43251c15775e86493359064ae361691bc3519a958452b8bf5f3f0"
+      },
+      "readiness": {
+        "canRender": false,
+        "blockers": [
+          "当前全部宫格缺少覆盖 P3 逐规则证明的有效视觉通过 Review"
+        ],
+        "requirementId": "fusion-review-4d135bb3ad9766b0471d5c1922edc6cc474003af38facbeb7c2fb537a74559a4"
+      },
+      "versions": [
+        {
+          "sheetId": "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+          "itemId": "season-三-ep01-unit001",
+          "createdAt": "2026-07-17T13:47:09.572Z",
+          "status": "stale",
+          "reasons": [
+            "legacy-v1-never-promotable-under-p4",
+            "schema-v1 历史板绑定旧 Review/requirement，但未冻结 P4 当前完整证据，只能登记为 stale"
+          ],
+          "contractId": "grid-6c02035d032128e0f62a",
+          "requirementId": "fusion-review-7916b22425ae2df44a0a3ce895530eb21459fb256d8e0ad8524182a558ec9aff",
+          "reviewId": "review-2026-07-16T19-18-14-130Z-527bbafe",
+          "artifacts": [
+            {
+              "role": "png",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.png",
+              "pageIndex": 1,
+              "pageCount": 1
+            },
+            {
+              "role": "receipt",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json",
+              "pageCount": 1
+            },
+            {
+              "role": "svg",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.svg",
+              "pageIndex": 1,
+              "pageCount": 1
+            }
+          ]
+        },
+        {
+          "sheetId": "legacy-sheet-d75625366c9b08f7fbbb8802741789b0",
+          "itemId": "season-三-ep01-unit001",
+          "createdAt": "2026-07-17T13:47:09.572Z",
+          "status": "legacy-invalid",
+          "reasons": [
+            "pre-p4-receipt-does-not-freeze-current-p3-evidence",
+            "schema-v1 历史 receipt 未同时绑定 Review/requirement，只登记 receipt 且永久 legacy-invalid"
+          ],
+          "contractId": "grid-6c02035d032128e0f62a",
+          "artifacts": [
+            {
+              "role": "receipt",
+              "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json",
+              "pageCount": 1
+            }
+          ]
+        }
+      ],
+      "migrationPreview": {
+        "schemaVersion": 1,
+        "kind": "fusion-storyboard-sheet-migration-preview",
+        "storeRevision": 1,
+        "scope": {
+          "itemIds": [
+            "season-三-ep01-unit001"
+          ]
+        },
+        "candidateFingerprint": "d874afe261ec2e93ada33958e62d7760f806db36dfe0d28ff0f46faa08333caa",
+        "candidateCount": 2,
+        "pendingCount": 0,
+        "blockers": [],
+        "canMigrate": false,
+        "candidates": [
+          {
+            "sheetId": "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+            "receiptPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json",
+            "itemId": "season-三-ep01-unit001",
+            "status": "stale",
+            "contractId": "grid-6c02035d032128e0f62a",
+            "requirementId": "fusion-review-7916b22425ae2df44a0a3ce895530eb21459fb256d8e0ad8524182a558ec9aff",
+            "reviewId": "review-2026-07-16T19-18-14-130Z-527bbafe",
+            "artifacts": [
+              {
+                "role": "png",
+                "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.png",
+                "pageIndex": 1,
+                "pageCount": 1,
+                "sha256": "8600c46fe40ad797927c68c1bc09072556646a423f5edeb8a14fa90697e1e06e",
+                "bytes": 4472760
+              },
+              {
+                "role": "svg",
+                "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.svg",
+                "pageIndex": 1,
+                "pageCount": 1,
+                "sha256": "420d0cc54a7685a4d58e9f5b3145e8cf1c8248a31483d45d19e61a334b0448de",
+                "bytes": 1184873
+              },
+              {
+                "role": "receipt",
+                "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json",
+                "pageCount": 1,
+                "sha256": "7cb26385590c783a6d3af4318a3c53586b15ef5b38e7336425960fbc2e2e6f44",
+                "bytes": 3843
+              }
+            ],
+            "reason": "schema-v1 历史板绑定旧 Review/requirement，但未冻结 P4 当前完整证据，只能登记为 stale",
+            "pending": false
+          },
+          {
+            "sheetId": "legacy-sheet-d75625366c9b08f7fbbb8802741789b0",
+            "receiptPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json",
+            "itemId": "season-三-ep01-unit001",
+            "status": "legacy-invalid",
+            "contractId": "grid-6c02035d032128e0f62a",
+            "artifacts": [
+              {
+                "role": "receipt",
+                "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json",
+                "pageCount": 1,
+                "sha256": "f509797e0aef7793fcbf8e72a7b58a0b49e039cd247399032edde5227d0d1148",
+                "bytes": 3589
+              }
+            ],
+            "reason": "schema-v1 历史 receipt 未同时绑定 Review/requirement，只登记 receipt 且永久 legacy-invalid",
+            "pending": false
+          }
+        ]
+      }
+    },
+    "ep01_008": {
+      "schemaVersion": 2,
+      "kind": "fusion-storyboard-sheet-state",
+      "itemId": "season-三-ep01-unit008",
+      "storeRevision": 1,
+      "currentContract": {
+        "schemaVersion": 1,
+        "kind": "fusion-storyboard-grid-contract",
+        "contractId": "grid-76e6545a6efec0e4091b",
+        "sourceStoryboardRevision": 1,
+        "sourceFingerprint": "fc852fdfcea1dbbbde9a86599358d9923b3a4c95c196b1d361098cb2836f15f6",
+        "displayTiming": {
+          "policyVersion": "one-decimal-boundaries-then-difference-v1",
+          "decimals": 1,
+          "durationDerivedFromDisplayedBoundaries": true,
+          "totalVisibleDurationSeconds": 15
+        },
+        "unit": {
+          "unitId": "season-三-ep01-unit008",
+          "title": "EP01 面具沉睡嘟嘟先闻到第三世",
+          "episodeLabel": "EP01",
+          "unitSequence": 8,
+          "storyGoal": "面具沉睡·嘟嘟先闻到第三世 / 嘟嘟认魂/认名功能启动",
+          "aspectRatio": "9:16",
+          "standardDurationSeconds": 15
+        },
+        "header": {
+          "title": "15秒分镜故事板·EP01 面具沉睡嘟嘟先闻到第三世",
+          "subtitle": "EP01 | season-三-ep01-unit008 | 面具沉睡·嘟嘟先闻到第三世 / 嘟嘟认魂/认名功能启动",
+          "metadataLine": "6格 | 15.0s | 9:16 | storyboard r1"
+        },
+        "selection": {
+          "mode": "automatic",
+          "algorithmVersion": "semantic-beat-v1",
+          "panelCount": 6,
+          "sourceRowCount": 3,
+          "detectedBeatCount": 6,
+          "cappedByMaximum": false,
+          "reason": "剧情语义检测到 6 个可画节拍，自动采用 6 格",
+          "rowPlans": [
+            {
+              "storyboardRowId": "storyboard-EP01_15s_008-01",
+              "durationSeconds": 8,
+              "detectedBeatCount": 2,
+              "detectedBeats": [
+                "阿航一手按胸前布囊，内层贴身压着完整黄金面具，外侧小袋里收着小鱼铜片，半璧另用素麻布包着贴在掌心侧；三件信物互不相露；布囊不发光，只随着他的呼吸轻轻一坠",
+                "嘟嘟忽然停步"
+              ],
+              "allocatedPanelCount": 2,
+              "reason": "检测 2 个剧情节拍，逐节拍独立成格"
+            },
+            {
+              "storyboardRowId": "storyboard-EP01_15s_008-02",
+              "durationSeconds": 5,
+              "detectedBeatCount": 3,
+              "detectedBeats": [
+                "嘟嘟鼻尖贴着冻土，嗅到一缕极淡的温白气息，尾巴僵住",
+                "随后猛地朝一条岔路小跑",
+                "阿航没有问，直接跟上"
+              ],
+              "allocatedPanelCount": 3,
+              "reason": "检测 3 个剧情节拍，逐节拍独立成格"
+            },
+            {
+              "storyboardRowId": "storyboard-EP01_15s_008-03",
+              "durationSeconds": 2,
+              "detectedBeatCount": 1,
+              "detectedBeats": [
+                "补足动作前奏/反应/收束、运镜延展、环境声和道具细节；不新增改变剧情走向的事件"
+              ],
+              "allocatedPanelCount": 1,
+              "reason": "通用延展段固定为一格，不伪造新剧情节拍"
+            }
+          ]
+        },
+        "referenceOverride": {
+          "expectedRevision": 1,
+          "reason": "P01 是阿航随身胸前布囊；后续嘟嘟认路与阿航跟随镜头必须保留同一硬锁版本，不能因原镜未重复点名而漂移",
+          "promptInstruction": "P01 始终由 C01 阿航随身携带；阿航胸前进入画面时必须保持同一粗麻布囊造型与尺度，聚焦 C02 嘟嘟时 P01 可留在画外或被黑衣遮挡；禁止露出内部黄金面具、小鱼铜片或半璧，禁止金色边缘、金属纹样、眼口、发光或第二只布囊",
+          "additionalAssetIdsByRowId": {
+            "storyboard-EP01_15s_008-02": [
+              "P01"
+            ],
+            "storyboard-EP01_15s_008-03": [
+              "P01"
+            ]
+          }
+        },
+        "panels": [
+          {
+            "id": "season-三-ep01-unit008-panel-01",
+            "index": 1,
+            "frameRole": "start",
+            "startSeconds": 0,
+            "endSeconds": 4,
+            "durationSeconds": 4,
+            "durationLabel": "0.0–4.0s（4.0s）",
+            "storyboardRowIds": [
+              "storyboard-EP01_15s_008-01"
+            ],
+            "storyboardRowRevisions": [
+              1
+            ],
+            "sourceShotItemIds": [
+              "season-三-ep01-unit008-shot08"
+            ],
+            "sourceShotNumbers": [
+              8
+            ],
+            "scheduleRowIndexes": [
+              0
+            ],
+            "scheduleRowIds": [
+              "season-三-ep01-unit008:schedule:0"
+            ],
+            "assetIds": [
+              "C01",
+              "C02",
+              "P01"
+            ],
+            "continuityReferenceAssetIds": [],
+            "semanticBeats": [
+              {
+                "storyboardRowId": "storyboard-EP01_15s_008-01",
+                "detectedBeatIndexes": [
+                  1
+                ],
+                "detectedBeatCount": 2,
+                "kind": "narrative",
+                "text": "阿航一手按胸前布囊，内层贴身压着完整黄金面具，外侧小袋里收着小鱼铜片，半璧另用素麻布包着贴在掌心侧；三件信物互不相露；布囊不发光，只随着他的呼吸轻轻一坠"
+              }
+            ],
+            "imageContentAction": "阿航一手按胸前布囊，内层贴身压着完整黄金面具，外侧小袋里收着小鱼铜片，半璧另用素麻布包着贴在掌心侧；三件信物互不相露；布囊不发光，只随着他的呼吸轻轻一坠",
+            "shotComposition": "中景",
+            "shootingMethod": "侧移跟拍 / 平视 / 50mm",
+            "continuitySound": "前承：承接上一单元或本集起幅：面具沉睡·嘟嘟先闻到第三世 / 嘟嘟认魂/认名功能启动；后接：连续进入 8.0 秒后的下一行。",
+            "dialogueSubtitle": "无",
+            "imageGenerationPrompt": "电影级写实风格，中国神话史诗质感，商周时代考据，戏剧性自然光影，9:16竖屏。光线：晨灰，布囊边缘一线冷光。。机位/焦段/运镜参考：中景，50mm，平视，起幅保持稳定可作为图生视频首帧。。禁止文字水印、logo、字幕、二维码、海报感排版；禁止现代建筑、现代交通工具、现代电器、纸张、铁器、椅凳高桌、马镫、辣椒等周初禁物（当代库房彩蛋单元除外）；禁止半面具、破面具、露出黄金面具、不露第二只眼、不露全脸、面具口型；嘟嘟必须是黑白毛吉娃娃普通犬态，禁止错犬种、拟人表情、说人话、发光变身；避免错手错眼、多指畸形、脸崩、现代真人照片感、明星脸、网红脸、影楼写真、低清噪点。。中景，稳定构图，首格起势，对应 0.0–4.0 秒，当前格只呈现这一组剧情节拍：阿航一手按胸前布囊，内层贴身压着完整黄金面具，外侧小袋里收着小鱼铜片，半璧另用素麻布包着贴在掌心侧；三件信物互不相露；布囊不发光，只随着他的呼吸轻轻一坠。纯画面，画面内不要任何中文、英文、字母、数字、字幕、标题、表格线、水印或界面元素。",
+            "selectionReason": "语义节拍 1/2 独立成格",
+            "tableFields": [
+              {
+                "key": "imageContentAction",
+                "label": "画面内容/动作",
+                "value": "阿航一手按胸前布囊，内层贴身压着完整黄金面具，外侧小袋里收着小鱼铜片，半璧另用素麻布包着贴在掌心侧；三件信物互不相露；布囊不发光，只随着他的呼吸轻轻一坠"
+              },
+              {
+                "key": "shotComposition",
+                "label": "景别/构图",
+                "value": "中景"
+              },
+              {
+                "key": "shootingMethod",
+                "label": "拍摄方式",
+                "value": "侧移跟拍 / 平视 / 50mm"
+              },
+              {
+                "key": "continuitySound",
+                "label": "连续性/声音",
+                "value": "前承：承接上一单元或本集起幅：面具沉睡·嘟嘟先闻到第三世 / 嘟嘟认魂/认名功能启动；后接：连续进入 8.0 秒后的下一行。"
+              },
+              {
+                "key": "dialogueSubtitle",
+                "label": "台词/字幕",
+                "value": "无"
+              },
+              {
+                "key": "duration",
+                "label": "时长",
+                "value": "0.0–4.0s（4.0s）"
+              }
+            ],
+            "layout": {
+              "row": 1,
+              "column": 1,
+              "columnSpan": 1,
+              "readingOrder": 1,
+              "imagePlacement": "left",
+              "detailPlacement": "right-table-columns",
+              "emphasis": "start"
+            }
+          },
+          {
+            "id": "season-三-ep01-unit008-panel-02",
+            "index": 2,
+            "frameRole": "middle",
+            "startSeconds": 4,
+            "endSeconds": 8,
+            "durationSeconds": 4,
+            "durationLabel": "4.0–8.0s（4.0s）",
+            "storyboardRowIds": [
+              "storyboard-EP01_15s_008-01"
+            ],
+            "storyboardRowRevisions": [
+              1
+            ],
+            "sourceShotItemIds": [
+              "season-三-ep01-unit008-shot08"
+            ],
+            "sourceShotNumbers": [
+              8
+            ],
+            "scheduleRowIndexes": [
+              0
+            ],
+            "scheduleRowIds": [
+              "season-三-ep01-unit008:schedule:0"
+            ],
+            "assetIds": [
+              "C01",
+              "C02",
+              "P01"
+            ],
+            "continuityReferenceAssetIds": [],
+            "semanticBeats": [
+              {
+                "storyboardRowId": "storyboard-EP01_15s_008-01",
+                "detectedBeatIndexes": [
+                  2
+                ],
+                "detectedBeatCount": 2,
+                "kind": "narrative",
+                "text": "嘟嘟忽然停步"
+              }
+            ],
+            "imageContentAction": "嘟嘟忽然停步",
+            "shotComposition": "中景",
+            "shootingMethod": "侧移跟拍 / 平视 / 50mm",
+            "continuitySound": "前承：承接上一单元或本集起幅：面具沉睡·嘟嘟先闻到第三世 / 嘟嘟认魂/认名功能启动；后接：连续进入 8.0 秒后的下一行。",
+            "dialogueSubtitle": "无",
+            "imageGenerationPrompt": "电影级写实风格，中国神话史诗质感，商周时代考据，戏剧性自然光影，9:16竖屏。光线：晨灰，布囊边缘一线冷光。。机位/焦段/运镜参考：中景，50mm，平视，起幅保持稳定可作为图生视频首帧。。禁止文字水印、logo、字幕、二维码、海报感排版；禁止现代建筑、现代交通工具、现代电器、纸张、铁器、椅凳高桌、马镫、辣椒等周初禁物（当代库房彩蛋单元除外）；禁止半面具、破面具、露出黄金面具、不露第二只眼、不露全脸、面具口型；嘟嘟必须是黑白毛吉娃娃普通犬态，禁止错犬种、拟人表情、说人话、发光变身；避免错手错眼、多指畸形、脸崩、现代真人照片感、明星脸、网红脸、影楼写真、低清噪点。。中景，稳定构图，中段关键定格，对应 4.0–8.0 秒，当前格只呈现这一组剧情节拍：嘟嘟忽然停步。纯画面，画面内不要任何中文、英文、字母、数字、字幕、标题、表格线、水印或界面元素。",
+            "selectionReason": "语义节拍 2/2 独立成格",
+            "tableFields": [
+              {
+                "key": "imageContentAction",
+                "label": "画面内容/动作",
+                "value": "嘟嘟忽然停步"
+              },
+              {
+                "key": "shotComposition",
+                "label": "景别/构图",
+                "value": "中景"
+              },
+              {
+                "key": "shootingMethod",
+                "label": "拍摄方式",
+                "value": "侧移跟拍 / 平视 / 50mm"
+              },
+              {
+                "key": "continuitySound",
+                "label": "连续性/声音",
+                "value": "前承：承接上一单元或本集起幅：面具沉睡·嘟嘟先闻到第三世 / 嘟嘟认魂/认名功能启动；后接：连续进入 8.0 秒后的下一行。"
+              },
+              {
+                "key": "dialogueSubtitle",
+                "label": "台词/字幕",
+                "value": "无"
+              },
+              {
+                "key": "duration",
+                "label": "时长",
+                "value": "4.0–8.0s（4.0s）"
+              }
+            ],
+            "layout": {
+              "row": 2,
+              "column": 1,
+              "columnSpan": 1,
+              "readingOrder": 2,
+              "imagePlacement": "left",
+              "detailPlacement": "right-table-columns",
+              "emphasis": "normal"
+            }
+          },
+          {
+            "id": "season-三-ep01-unit008-panel-03",
+            "index": 3,
+            "frameRole": "middle",
+            "startSeconds": 8,
+            "endSeconds": 9.667,
+            "durationSeconds": 1.667,
+            "durationLabel": "8.0–9.7s（1.7s）",
+            "storyboardRowIds": [
+              "storyboard-EP01_15s_008-02"
+            ],
+            "storyboardRowRevisions": [
+              1
+            ],
+            "sourceShotItemIds": [
+              "season-三-ep01-unit008-shot09"
+            ],
+            "sourceShotNumbers": [
+              9
+            ],
+            "scheduleRowIndexes": [
+              1
+            ],
+            "scheduleRowIds": [
+              "season-三-ep01-unit008:schedule:1"
+            ],
+            "assetIds": [
+              "C01",
+              "C02",
+              "P01"
+            ],
+            "continuityReferenceAssetIds": [
+              "P01"
+            ],
+            "semanticBeats": [
+              {
+                "storyboardRowId": "storyboard-EP01_15s_008-02",
+                "detectedBeatIndexes": [
+                  1
+                ],
+                "detectedBeatCount": 3,
+                "kind": "narrative",
+                "text": "嘟嘟鼻尖贴着冻土，嗅到一缕极淡的温白气息，尾巴僵住"
+              }
+            ],
+            "imageContentAction": "嘟嘟鼻尖贴着冻土，嗅到一缕极淡的温白气息，尾巴僵住",
+            "shotComposition": "特写",
+            "shootingMethod": "跟随 / 低机位 / 85mm",
+            "continuitySound": "前承：承接本单元第 1 行尾态。；后接：连续进入 13.0 秒后的下一行。；连续性参考：P01；P01 始终由 C01 阿航随身携带；阿航胸前进入画面时必须保持同一粗麻布囊造型与尺度，聚焦 C02 嘟嘟时 P01 可留在画外或被黑衣遮挡；禁止露出内部黄金面具、小鱼铜片或半璧，禁止金色边缘、金属纹样、眼口、发光或第二只布囊",
+            "dialogueSubtitle": "无",
+            "imageGenerationPrompt": "电影级写实风格，中国神话史诗质感，商周时代考据，9:16竖屏。特写，稳定构图，中段关键定格，对应 8.0–9.7 秒，当前格只呈现这一组剧情节拍：嘟嘟鼻尖贴着冻土，嗅到一缕极淡的温白气息，尾巴僵住。纯画面，画面内不要任何中文、英文、字母、数字、字幕、标题、表格线、水印或界面元素。 连续性参考硬约束（P01）：P01 始终由 C01 阿航随身携带；阿航胸前进入画面时必须保持同一粗麻布囊造型与尺度，聚焦 C02 嘟嘟时 P01 可留在画外或被黑衣遮挡；禁止露出内部黄金面具、小鱼铜片或半璧，禁止金色边缘、金属纹样、眼口、发光或第二只布囊。这些参考只用于保持前后身份与道具一致；当前剧情和构图未明确展示时不得强行入画。",
+            "selectionReason": "语义节拍 1/3 独立成格",
+            "tableFields": [
+              {
+                "key": "imageContentAction",
+                "label": "画面内容/动作",
+                "value": "嘟嘟鼻尖贴着冻土，嗅到一缕极淡的温白气息，尾巴僵住"
+              },
+              {
+                "key": "shotComposition",
+                "label": "景别/构图",
+                "value": "特写"
+              },
+              {
+                "key": "shootingMethod",
+                "label": "拍摄方式",
+                "value": "跟随 / 低机位 / 85mm"
+              },
+              {
+                "key": "continuitySound",
+                "label": "连续性/声音",
+                "value": "前承：承接本单元第 1 行尾态。；后接：连续进入 13.0 秒后的下一行。；连续性参考：P01；P01 始终由 C01 阿航随身携带；阿航胸前进入画面时必须保持同一粗麻布囊造型与尺度，聚焦 C02 嘟嘟时 P01 可留在画外或被黑衣遮挡；禁止露出内部黄金面具、小鱼铜片或半璧，禁止金色边缘、金属纹样、眼口、发光或第二只布囊"
+              },
+              {
+                "key": "dialogueSubtitle",
+                "label": "台词/字幕",
+                "value": "无"
+              },
+              {
+                "key": "duration",
+                "label": "时长",
+                "value": "8.0–9.7s（1.7s）"
+              }
+            ],
+            "layout": {
+              "row": 3,
+              "column": 1,
+              "columnSpan": 1,
+              "readingOrder": 3,
+              "imagePlacement": "left",
+              "detailPlacement": "right-table-columns",
+              "emphasis": "normal"
+            }
+          },
+          {
+            "id": "season-三-ep01-unit008-panel-04",
+            "index": 4,
+            "frameRole": "middle",
+            "startSeconds": 9.667,
+            "endSeconds": 11.333,
+            "durationSeconds": 1.666,
+            "durationLabel": "9.7–11.3s（1.6s）",
+            "storyboardRowIds": [
+              "storyboard-EP01_15s_008-02"
+            ],
+            "storyboardRowRevisions": [
+              1
+            ],
+            "sourceShotItemIds": [
+              "season-三-ep01-unit008-shot09"
+            ],
+            "sourceShotNumbers": [
+              9
+            ],
+            "scheduleRowIndexes": [
+              1
+            ],
+            "scheduleRowIds": [
+              "season-三-ep01-unit008:schedule:1"
+            ],
+            "assetIds": [
+              "C01",
+              "C02",
+              "P01"
+            ],
+            "continuityReferenceAssetIds": [
+              "P01"
+            ],
+            "semanticBeats": [
+              {
+                "storyboardRowId": "storyboard-EP01_15s_008-02",
+                "detectedBeatIndexes": [
+                  2
+                ],
+                "detectedBeatCount": 3,
+                "kind": "narrative",
+                "text": "随后猛地朝一条岔路小跑"
+              }
+            ],
+            "imageContentAction": "随后猛地朝一条岔路小跑",
+            "shotComposition": "特写",
+            "shootingMethod": "跟随 / 低机位 / 85mm",
+            "continuitySound": "前承：承接本单元第 1 行尾态。；后接：连续进入 13.0 秒后的下一行。；连续性参考：P01；P01 始终由 C01 阿航随身携带；阿航胸前进入画面时必须保持同一粗麻布囊造型与尺度，聚焦 C02 嘟嘟时 P01 可留在画外或被黑衣遮挡；禁止露出内部黄金面具、小鱼铜片或半璧，禁止金色边缘、金属纹样、眼口、发光或第二只布囊",
+            "dialogueSubtitle": "无",
+            "imageGenerationPrompt": "电影级写实风格，中国神话史诗质感，商周时代考据，9:16竖屏。特写，稳定构图，中段关键定格，对应 9.7–11.3 秒，当前格只呈现这一组剧情节拍：随后猛地朝一条岔路小跑。纯画面，画面内不要任何中文、英文、字母、数字、字幕、标题、表格线、水印或界面元素。 连续性参考硬约束（P01）：P01 始终由 C01 阿航随身携带；阿航胸前进入画面时必须保持同一粗麻布囊造型与尺度，聚焦 C02 嘟嘟时 P01 可留在画外或被黑衣遮挡；禁止露出内部黄金面具、小鱼铜片或半璧，禁止金色边缘、金属纹样、眼口、发光或第二只布囊。这些参考只用于保持前后身份与道具一致；当前剧情和构图未明确展示时不得强行入画。",
+            "selectionReason": "语义节拍 2/3 独立成格",
+            "tableFields": [
+              {
+                "key": "imageContentAction",
+                "label": "画面内容/动作",
+                "value": "随后猛地朝一条岔路小跑"
+              },
+              {
+                "key": "shotComposition",
+                "label": "景别/构图",
+                "value": "特写"
+              },
+              {
+                "key": "shootingMethod",
+                "label": "拍摄方式",
+                "value": "跟随 / 低机位 / 85mm"
+              },
+              {
+                "key": "continuitySound",
+                "label": "连续性/声音",
+                "value": "前承：承接本单元第 1 行尾态。；后接：连续进入 13.0 秒后的下一行。；连续性参考：P01；P01 始终由 C01 阿航随身携带；阿航胸前进入画面时必须保持同一粗麻布囊造型与尺度，聚焦 C02 嘟嘟时 P01 可留在画外或被黑衣遮挡；禁止露出内部黄金面具、小鱼铜片或半璧，禁止金色边缘、金属纹样、眼口、发光或第二只布囊"
+              },
+              {
+                "key": "dialogueSubtitle",
+                "label": "台词/字幕",
+                "value": "无"
+              },
+              {
+                "key": "duration",
+                "label": "时长",
+                "value": "9.7–11.3s（1.6s）"
+              }
+            ],
+            "layout": {
+              "row": 4,
+              "column": 1,
+              "columnSpan": 1,
+              "readingOrder": 4,
+              "imagePlacement": "left",
+              "detailPlacement": "right-table-columns",
+              "emphasis": "normal"
+            }
+          },
+          {
+            "id": "season-三-ep01-unit008-panel-05",
+            "index": 5,
+            "frameRole": "middle",
+            "startSeconds": 11.333,
+            "endSeconds": 13,
+            "durationSeconds": 1.667,
+            "durationLabel": "11.3–13.0s（1.7s）",
+            "storyboardRowIds": [
+              "storyboard-EP01_15s_008-02"
+            ],
+            "storyboardRowRevisions": [
+              1
+            ],
+            "sourceShotItemIds": [
+              "season-三-ep01-unit008-shot09"
+            ],
+            "sourceShotNumbers": [
+              9
+            ],
+            "scheduleRowIndexes": [
+              1
+            ],
+            "scheduleRowIds": [
+              "season-三-ep01-unit008:schedule:1"
+            ],
+            "assetIds": [
+              "C01",
+              "C02",
+              "P01"
+            ],
+            "continuityReferenceAssetIds": [
+              "P01"
+            ],
+            "semanticBeats": [
+              {
+                "storyboardRowId": "storyboard-EP01_15s_008-02",
+                "detectedBeatIndexes": [
+                  3
+                ],
+                "detectedBeatCount": 3,
+                "kind": "narrative",
+                "text": "阿航没有问，直接跟上"
+              }
+            ],
+            "imageContentAction": "阿航没有问，直接跟上",
+            "shotComposition": "特写",
+            "shootingMethod": "跟随 / 低机位 / 85mm",
+            "continuitySound": "前承：承接本单元第 1 行尾态。；后接：连续进入 13.0 秒后的下一行。；连续性参考：P01；P01 始终由 C01 阿航随身携带；阿航胸前进入画面时必须保持同一粗麻布囊造型与尺度，聚焦 C02 嘟嘟时 P01 可留在画外或被黑衣遮挡；禁止露出内部黄金面具、小鱼铜片或半璧，禁止金色边缘、金属纹样、眼口、发光或第二只布囊",
+            "dialogueSubtitle": "无",
+            "imageGenerationPrompt": "电影级写实风格，中国神话史诗质感，商周时代考据，9:16竖屏。特写，稳定构图，中段关键定格，对应 11.3–13.0 秒，当前格只呈现这一组剧情节拍：阿航没有问，直接跟上。纯画面，画面内不要任何中文、英文、字母、数字、字幕、标题、表格线、水印或界面元素。 连续性参考硬约束（P01）：P01 始终由 C01 阿航随身携带；阿航胸前进入画面时必须保持同一粗麻布囊造型与尺度，聚焦 C02 嘟嘟时 P01 可留在画外或被黑衣遮挡；禁止露出内部黄金面具、小鱼铜片或半璧，禁止金色边缘、金属纹样、眼口、发光或第二只布囊。这些参考只用于保持前后身份与道具一致；当前剧情和构图未明确展示时不得强行入画。",
+            "selectionReason": "语义节拍 3/3 独立成格",
+            "tableFields": [
+              {
+                "key": "imageContentAction",
+                "label": "画面内容/动作",
+                "value": "阿航没有问，直接跟上"
+              },
+              {
+                "key": "shotComposition",
+                "label": "景别/构图",
+                "value": "特写"
+              },
+              {
+                "key": "shootingMethod",
+                "label": "拍摄方式",
+                "value": "跟随 / 低机位 / 85mm"
+              },
+              {
+                "key": "continuitySound",
+                "label": "连续性/声音",
+                "value": "前承：承接本单元第 1 行尾态。；后接：连续进入 13.0 秒后的下一行。；连续性参考：P01；P01 始终由 C01 阿航随身携带；阿航胸前进入画面时必须保持同一粗麻布囊造型与尺度，聚焦 C02 嘟嘟时 P01 可留在画外或被黑衣遮挡；禁止露出内部黄金面具、小鱼铜片或半璧，禁止金色边缘、金属纹样、眼口、发光或第二只布囊"
+              },
+              {
+                "key": "dialogueSubtitle",
+                "label": "台词/字幕",
+                "value": "无"
+              },
+              {
+                "key": "duration",
+                "label": "时长",
+                "value": "11.3–13.0s（1.7s）"
+              }
+            ],
+            "layout": {
+              "row": 5,
+              "column": 1,
+              "columnSpan": 1,
+              "readingOrder": 5,
+              "imagePlacement": "left",
+              "detailPlacement": "right-table-columns",
+              "emphasis": "normal"
+            }
+          },
+          {
+            "id": "season-三-ep01-unit008-panel-06",
+            "index": 6,
+            "frameRole": "end",
+            "startSeconds": 13,
+            "endSeconds": 15,
+            "durationSeconds": 2,
+            "durationLabel": "13.0–15.0s（2.0s）",
+            "storyboardRowIds": [
+              "storyboard-EP01_15s_008-03"
+            ],
+            "storyboardRowRevisions": [
+              1
+            ],
+            "sourceShotItemIds": [],
+            "sourceShotNumbers": [],
+            "scheduleRowIndexes": [
+              2
+            ],
+            "scheduleRowIds": [
+              "season-三-ep01-unit008:schedule:2"
+            ],
+            "assetIds": [
+              "C01",
+              "C02",
+              "P01"
+            ],
+            "continuityReferenceAssetIds": [
+              "P01"
+            ],
+            "semanticBeats": [
+              {
+                "storyboardRowId": "storyboard-EP01_15s_008-03",
+                "detectedBeatIndexes": [
+                  1
+                ],
+                "detectedBeatCount": 1,
+                "kind": "continuity-extension",
+                "text": "补足动作前奏/反应/收束、运镜延展、环境声和道具细节；不新增改变剧情走向的事件"
+              }
+            ],
+            "imageContentAction": "补足动作前奏/反应/收束、运镜延展、环境声和道具细节；不新增改变剧情走向的事件",
+            "shotComposition": "延展镜头",
+            "shootingMethod": "承接末镜延展",
+            "continuitySound": "前承：承接本单元第 2 行尾态。；后接：作为下一单元可续接尾态。；连续性参考：P01；P01 始终由 C01 阿航随身携带；阿航胸前进入画面时必须保持同一粗麻布囊造型与尺度，聚焦 C02 嘟嘟时 P01 可留在画外或被黑衣遮挡；禁止露出内部黄金面具、小鱼铜片或半璧，禁止金色边缘、金属纹样、眼口、发光或第二只布囊",
+            "dialogueSubtitle": "无",
+            "imageGenerationPrompt": "电影级写实风格，中国神话史诗质感，商周时代考据，9:16竖屏。延展镜头，稳定构图，末格落点，对应 13.0–15.0 秒，当前格只呈现这一组剧情节拍：补足动作前奏/反应/收束、运镜延展、环境声和道具细节；不新增改变剧情走向的事件。纯画面，画面内不要任何中文、英文、字母、数字、字幕、标题、表格线、水印或界面元素。 连续性参考硬约束（P01）：P01 始终由 C01 阿航随身携带；阿航胸前进入画面时必须保持同一粗麻布囊造型与尺度，聚焦 C02 嘟嘟时 P01 可留在画外或被黑衣遮挡；禁止露出内部黄金面具、小鱼铜片或半璧，禁止金色边缘、金属纹样、眼口、发光或第二只布囊。这些参考只用于保持前后身份与道具一致；当前剧情和构图未明确展示时不得强行入画。",
+            "selectionReason": "延展段固定为一格，只承接动作和环境，不新增剧情事件",
+            "tableFields": [
+              {
+                "key": "imageContentAction",
+                "label": "画面内容/动作",
+                "value": "补足动作前奏/反应/收束、运镜延展、环境声和道具细节；不新增改变剧情走向的事件"
+              },
+              {
+                "key": "shotComposition",
+                "label": "景别/构图",
+                "value": "延展镜头"
+              },
+              {
+                "key": "shootingMethod",
+                "label": "拍摄方式",
+                "value": "承接末镜延展"
+              },
+              {
+                "key": "continuitySound",
+                "label": "连续性/声音",
+                "value": "前承：承接本单元第 2 行尾态。；后接：作为下一单元可续接尾态。；连续性参考：P01；P01 始终由 C01 阿航随身携带；阿航胸前进入画面时必须保持同一粗麻布囊造型与尺度，聚焦 C02 嘟嘟时 P01 可留在画外或被黑衣遮挡；禁止露出内部黄金面具、小鱼铜片或半璧，禁止金色边缘、金属纹样、眼口、发光或第二只布囊"
+              },
+              {
+                "key": "dialogueSubtitle",
+                "label": "台词/字幕",
+                "value": "无"
+              },
+              {
+                "key": "duration",
+                "label": "时长",
+                "value": "13.0–15.0s（2.0s）"
+              }
+            ],
+            "layout": {
+              "row": 6,
+              "column": 1,
+              "columnSpan": 1,
+              "readingOrder": 6,
+              "imagePlacement": "left",
+              "detailPlacement": "right-table-columns",
+              "emphasis": "end"
+            }
+          }
+        ],
+        "layout": {
+          "template": "portrait-storyboard-table",
+          "pageOrientation": "portrait",
+          "pageAspectRatio": "9:16",
+          "gridColumns": 1,
+          "gridRows": 6,
+          "headerPlacement": "top-full-width",
+          "footerPlacement": "bottom-full-width",
+          "panelCellModel": "image-left-details-columns",
+          "detailFieldOrder": [
+            "imageContentAction",
+            "shotComposition",
+            "shootingMethod",
+            "continuitySound",
+            "dialogueSubtitle",
+            "duration"
+          ]
+        },
+        "footer": {
+          "rhythmChain": [
+            {
+              "panelId": "season-三-ep01-unit008-panel-01",
+              "frameRole": "start",
+              "startSeconds": 0,
+              "endSeconds": 4,
+              "label": "1. 阿航一手按胸前布囊，内层贴身压着完整黄金面具，外侧小袋里收着小鱼铜片，半璧另用素"
+            },
+            {
+              "panelId": "season-三-ep01-unit008-panel-02",
+              "frameRole": "middle",
+              "startSeconds": 4,
+              "endSeconds": 8,
+              "label": "2. 嘟嘟忽然停步"
+            },
+            {
+              "panelId": "season-三-ep01-unit008-panel-03",
+              "frameRole": "middle",
+              "startSeconds": 8,
+              "endSeconds": 9.667,
+              "label": "3. 嘟嘟鼻尖贴着冻土，嗅到一缕极淡的温白气息，尾巴僵住"
+            },
+            {
+              "panelId": "season-三-ep01-unit008-panel-04",
+              "frameRole": "middle",
+              "startSeconds": 9.667,
+              "endSeconds": 11.333,
+              "label": "4. 随后猛地朝一条岔路小跑"
+            },
+            {
+              "panelId": "season-三-ep01-unit008-panel-05",
+              "frameRole": "middle",
+              "startSeconds": 11.333,
+              "endSeconds": 13,
+              "label": "5. 阿航没有问，直接跟上"
+            },
+            {
+              "panelId": "season-三-ep01-unit008-panel-06",
+              "frameRole": "end",
+              "startSeconds": 13,
+              "endSeconds": 15,
+              "label": "6. 补足动作前奏/反应/收束、运镜延展、环境声和道具细节；不新增改变剧情走向的事件"
+            }
+          ],
+          "summary": "0.0-4.0s 阿航一手按胸前布囊，内层贴身压着完整黄金面具，外 → 4.0-8.0s 嘟嘟忽然停步 → 8.0-9.7s 嘟嘟鼻尖贴着冻土，嗅到一缕极淡的温白气息，尾巴僵 → 9.7-11.3s 随后猛地朝一条岔路小跑 → 11.3-13.0s 阿航没有问，直接跟上 → 13.0-15.0s 补足动作前奏/反应/收束、运镜延展、环境声和道具"
+        },
+        "coverage": {
+          "allStoryboardRowsCovered": true,
+          "storyboardRowIds": [
+            "storyboard-EP01_15s_008-01",
+            "storyboard-EP01_15s_008-02",
+            "storyboard-EP01_15s_008-03"
+          ],
+          "groupedPanelIds": [],
+          "splitStoryboardRowIds": [
+            "storyboard-EP01_15s_008-01",
+            "storyboard-EP01_15s_008-02"
+          ],
+          "allScheduleRowsCovered": true,
+          "scheduleRowIndexes": [
+            0,
+            1,
+            2
+          ]
+        },
+        "localRendering": {
+          "engine": "svg-sharp",
+          "language": "zh-CN",
+          "textRendering": "local-only",
+          "panelImageMode": "one-image-per-panel",
+          "assetReferenceMode": "one-image-per-asset",
+          "aiImageContainsText": false,
+          "fontFallbacks": [
+            "PingFang SC",
+            "Noto Sans CJK SC",
+            "Microsoft YaHei",
+            "sans-serif"
+          ],
+          "outputArtifacts": [
+            "panel-images",
+            "storyboard-svg",
+            "storyboard-png"
+          ],
+          "outputInstructions": [
+            "每格先单独生成一张无文字纯画面，不让生图模型绘制中文表格。",
+            "资产参考图继续保持一图一资产，不把多个资产预先拼成一张参考图。",
+            "再由本地 SVG 按 panel.layout 排布画面和 tableFields，使用中文字体回退链。",
+            "最后用 Sharp 将 SVG 渲染为竖版 PNG，保留顶部单元元数据和底部节奏链。"
+          ],
+          "negativePrompt": "纯画面，画面内不要任何中文、英文、字母、数字、字幕、标题、表格线、水印或界面元素。"
+        },
+        "productionFingerprint": "85c6e7c25ecfd92c5a975437d09015bb0e815b8201d50dcabae6b1e46b5d131d"
+      },
+      "readiness": {
+        "canRender": false,
+        "blockers": [
+          "宫格05：GenerationJob 尚未成功：generation_unknown",
+          "宫格05：缺少当前槽位 raw",
+          "宫格05：缺少当前槽位 labeled",
+          "宫格05：供应商调用结果不明；禁止重试，必须先完成结构化对账",
+          "宫格06：缺少绑定当前槽位的 GenerationJob",
+          "宫格06：缺少当前槽位 raw",
+          "宫格06：缺少当前槽位 labeled",
+          "宫格06：GenerationJob 的 P3 PanelVisualConstraint 证据不是当前版本",
+          "完整宫格证据不足：0/6"
+        ],
+        "requirementId": "fusion-review-2a81764051c12de22913d7d503b227c35bb366521b4270939f90dfc74d770550"
+      },
+      "versions": [],
+      "migrationPreview": {
+        "schemaVersion": 1,
+        "kind": "fusion-storyboard-sheet-migration-preview",
+        "storeRevision": 1,
+        "scope": {
+          "itemIds": [
+            "season-三-ep01-unit008"
+          ]
+        },
+        "candidateFingerprint": "f37611a1873146bb3f3e5c4a10da0edaacbdd26502b46164cb47b5b0f66cf737",
+        "candidateCount": 0,
+        "pendingCount": 0,
+        "blockers": [],
+        "canMigrate": false,
+        "candidates": []
+      }
+    },
+    "scanner": {
+      "persist": false,
+      "scanId": "96c040c9-a01a-435a-903f-c43c45863cba",
+      "sheetArtifacts": 4,
+      "statuses": [
+        "legacy-invalid",
+        "stale"
+      ],
+      "authoritative": 0,
+      "accepted": 0,
+      "summary": {
+        "current": 0,
+        "stale": 1,
+        "invalid": 0,
+        "legacyInvalid": 1,
+        "pages": 1
+      },
+      "persistedProjection": {
+        "indexPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/index.json",
+        "sheetArtifacts": 4,
+        "ep01_001": 4,
+        "ep01_008": 0,
+        "summary": {
+          "current": 0,
+          "stale": 1,
+          "invalid": 0,
+          "legacyInvalid": 1,
+          "pages": 1
+        },
+        "exactlyMatchesReadOnlyRescan": true
+      }
+    },
+    "ledger": {
+      "generationJobs": 30,
+      "jobsByStatus": {
+        "failed": 3,
+        "generation_unknown": 1,
+        "succeeded": 26
+      },
+      "publications": {
+        "intents": 31,
+        "receipts": 26,
+        "unknownBundleIntents": [
+          {
+            "id": "publication-de235c33-2161-4b87-8abd-8bac235e9241",
+            "member": "companion",
+            "kind": "labeled-image",
+            "revision": 1,
+            "status": "reserved"
+          },
+          {
+            "id": "publication-472b11c0-0821-4ed1-8051-32d8f046f565",
+            "member": "primary",
+            "kind": "raw-image",
+            "revision": 2,
+            "status": "reserved"
+          }
+        ]
+      },
+      "migrationPreview": {
+        "storeRevision": 1,
+        "candidateFingerprint": "76d02dcf4bf5a789f8dc2155843b944192d09d9d035d882f613050cccd6e4fbd",
+        "candidateCount": 2,
+        "pendingCount": 0,
+        "sheetIds": [
+          "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+          "legacy-sheet-d75625366c9b08f7fbbb8802741789b0"
+        ]
+      },
+      "reviews": 20,
+      "ep01_001": {
+        "current": 0,
+        "requirementPanels": 4,
+        "visualRules": 28,
+        "historicalPassReviewIds": [
+          "review-2026-07-16T09-53-29-114Z-5ab8a207",
+          "review-2026-07-16T19-18-14-130Z-527bbafe"
+        ],
+        "historicalP3Attestations": 0
+      },
+      "ep01_008": {
+        "current": 0,
+        "panels": 6,
+        "completePairs": 4,
+        "succeededPanels": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "unknownPanel": 5,
+        "unknownJobId": "gen-2026-07-16T12-10-57-215Z-892023c0",
+        "missingPanel": 6
+      }
+    },
+    "sheetArtifacts": [
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.png",
+        "bytes": 4472760,
+        "sha256": "8600c46fe40ad797927c68c1bc09072556646a423f5edeb8a14fa90697e1e06e",
+        "sheetId": "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+        "role": "png",
+        "status": "stale"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.svg",
+        "bytes": 1184873,
+        "sha256": "420d0cc54a7685a4d58e9f5b3145e8cf1c8248a31483d45d19e61a334b0448de",
+        "sheetId": "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+        "role": "svg",
+        "status": "stale"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json",
+        "bytes": 3843,
+        "sha256": "7cb26385590c783a6d3af4318a3c53586b15ef5b38e7336425960fbc2e2e6f44",
+        "sheetId": "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+        "role": "receipt",
+        "status": "stale"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json",
+        "bytes": 3589,
+        "sha256": "f509797e0aef7793fcbf8e72a7b58a0b49e039cd247399032edde5227d0d1148",
+        "sheetId": "legacy-sheet-d75625366c9b08f7fbbb8802741789b0",
+        "role": "receipt",
+        "status": "legacy-invalid"
+      }
+    ],
+    "semanticIdentityBefore": "e770099399262612f58c495921448513033f7cb8c3e3b5da7615e8068eeb4739",
+    "semanticIdentityAfter": "e770099399262612f58c495921448513033f7cb8c3e3b5da7615e8068eeb4739",
+    "unchanged": true
+  },
+  "guardedFormalState": {
+    "before": {
+      "files": {
+        "projectConfig": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/project.json",
+          "bytes": 7323,
+          "sha256": "5f7e41c32ca9cc4f9d0a836a60caa7a97442af2ebf0bbe22d4ae6619835d84ac"
+        },
+        "projectIndex": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/index.json",
+          "bytes": 25237819,
+          "sha256": "b0f29abbbd80e417389cc39fae8dc193a3936afadce11156c057b400cda38884"
+        },
+        "progressMarkdown": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/00_画布进度.md",
+          "bytes": 3833,
+          "sha256": "e932eae4962bdb4ee53192a28e71a7499e68aea52a0a09d77f20ea1405e1437c"
+        },
+        "projectOverrides": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/overrides.json",
+          "bytes": 9233,
+          "sha256": "0155f1731175ce5a7fdabf279d6493b535c521596d849c5221a8041609f2f31d"
+        },
+        "events": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/events.jsonl",
+          "bytes": 244537,
+          "sha256": "7b79d05fd0d0c64883e9ae3a96df5211b00e385c7787477e45ff6b2530ef96d2"
+        },
+        "commandLedger": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/command-ledger.json",
+          "bytes": 284398,
+          "sha256": "900875a71d88b8e0ba74af7005ed677cce746979360f63164a8ef5f594d2c40f"
+        },
+        "generationJobs": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-jobs.json",
+          "bytes": 333529,
+          "sha256": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182"
+        },
+        "publications": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/publications.json",
+          "bytes": 84340,
+          "sha256": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238"
+        },
+        "reviews": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/reviews.json",
+          "bytes": 85063,
+          "sha256": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97"
+        },
+        "p2PanelReferences": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/panel-reference-resolutions.json",
+          "bytes": 32695281,
+          "sha256": "35aa251d9b6f767190924d697e7dd03a58cc198ded0918ad4fd89508217f877b"
+        },
+        "p3VisualConstraints": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/panel-visual-constraints.json",
+          "bytes": 78768303,
+          "sha256": "6eb445f84f38c0c2e4e6e6d56b3f1195bdbf5643c624246f9500566a5af8ffd8"
+        },
+        "storyboardGridSelections": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboard-grid-selections.json",
+          "bytes": 539782,
+          "sha256": "a8ec5e31899a71383bbb514720d0e00f918b9d0efe1a0d4cf408a9013c645ffa"
+        },
+        "storyboardSheetIndex": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboard-sheet-index.json",
+          "bytes": 3947,
+          "sha256": "11533501e7a2a6dedd1dbfa6f108c3a4e8f02141bafbaa16aa706125832e3fd6"
+        },
+        "storyboards": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboards.json",
+          "bytes": 6249388,
+          "sha256": "48351896542028241ea689e930a4aa1df190a18de002d6c432cb4c4b6d9b3a78"
+        },
+        "fusionManifest": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/fusion-project-manifest.json",
+          "bytes": 6369749,
+          "sha256": "93ad685f8f0de8f46f6163bbe3e931c937aae54df25a3046780d34f81c03a969"
+        },
+        "productionAssets": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/production-assets.json",
+          "bytes": 408965,
+          "sha256": "e693c5477044d9389de19188d14e876ea334c762cea86f9010a3de47f41abeae"
+        },
+        "continuityTracks": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/continuity-tracks.json",
+          "bytes": 4031882,
+          "sha256": "62b7a2fd80eefeb28e7b15780f5483df5381ce8dd94573311859e48b6962a20a"
+        },
+        "generationSettings": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation.json",
+          "bytes": 3102,
+          "sha256": "2ccd6f6fd8b431ca8d851dbad8e3b3eb642edd8b582c3a3df0f4fe5d32172b0e"
+        }
+      },
+      "requests": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-requests",
+        "files": 31,
+        "bytes": 174082,
+        "aggregateSha256": "171ca4fd131b977f07f7bbb5e44bfd836a1158ce63c6bcaff721b45f95b1fbca",
+        "jsonRowsSha256": "23c2a6ec9d1cd2a1bb613e476a10b1b2b004f8f18e5d53aa1989696d31783020"
+      },
+      "downloads": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-downloads",
+        "files": 26,
+        "bytes": 55357407,
+        "aggregateSha256": "ccfd0599ac21da61f79bee1538de3f7faea54d156c05f594181f0d5437849dc8",
+        "jsonRowsSha256": "21f624b13aa49d423c20a918968edb3151abc8eef094bb444015b504078de68d"
+      },
+      "subagentStaging": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/subagent-staging",
+        "files": 36,
+        "bytes": 68776407,
+        "aggregateSha256": "6f1b769092934ca3f35fe94a7cffca1c5e5e510d4a10f1dbbfec0883fb943c95",
+        "jsonRowsSha256": "4a1745ad4a68694fcad1c295de30f3543e4abeecc9cb50f0f36133fe442d5001"
+      },
+      "rawLabeled": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+        "files": 52,
+        "bytes": 128973009,
+        "aggregateSha256": "77d4a46fa04c05c635701363f394faab0cc5094fc437990f6eeb580ce0e4c83b",
+        "jsonRowsSha256": "05ee1ce7eac462b141b1a4a85b71411b777eb920ca8fd32c48e2f8d70ce0a401"
+      },
+      "sheetArtifacts": [
+        {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json",
+          "bytes": 3843,
+          "sha256": "7cb26385590c783a6d3af4318a3c53586b15ef5b38e7336425960fbc2e2e6f44"
+        },
+        {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json",
+          "bytes": 3589,
+          "sha256": "f509797e0aef7793fcbf8e72a7b58a0b49e039cd247399032edde5227d0d1148"
+        },
+        {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.png",
+          "bytes": 4472760,
+          "sha256": "8600c46fe40ad797927c68c1bc09072556646a423f5edeb8a14fa90697e1e06e"
+        },
+        {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.svg",
+          "bytes": 1184873,
+          "sha256": "420d0cc54a7685a4d58e9f5b3145e8cf1c8248a31483d45d19e61a334b0448de"
+        }
+      ],
+      "identitySha256": "bb1b887ea6f61d8e687c975abb36ab9d45b8364526399fa64314d7720b5089d0"
+    },
+    "after": {
+      "files": {
+        "projectConfig": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/project.json",
+          "bytes": 7323,
+          "sha256": "5f7e41c32ca9cc4f9d0a836a60caa7a97442af2ebf0bbe22d4ae6619835d84ac"
+        },
+        "projectIndex": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/index.json",
+          "bytes": 25237819,
+          "sha256": "b0f29abbbd80e417389cc39fae8dc193a3936afadce11156c057b400cda38884"
+        },
+        "progressMarkdown": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/00_画布进度.md",
+          "bytes": 3833,
+          "sha256": "e932eae4962bdb4ee53192a28e71a7499e68aea52a0a09d77f20ea1405e1437c"
+        },
+        "projectOverrides": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/overrides.json",
+          "bytes": 9233,
+          "sha256": "0155f1731175ce5a7fdabf279d6493b535c521596d849c5221a8041609f2f31d"
+        },
+        "events": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/events.jsonl",
+          "bytes": 244537,
+          "sha256": "7b79d05fd0d0c64883e9ae3a96df5211b00e385c7787477e45ff6b2530ef96d2"
+        },
+        "commandLedger": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/command-ledger.json",
+          "bytes": 284398,
+          "sha256": "900875a71d88b8e0ba74af7005ed677cce746979360f63164a8ef5f594d2c40f"
+        },
+        "generationJobs": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-jobs.json",
+          "bytes": 333529,
+          "sha256": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182"
+        },
+        "publications": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/publications.json",
+          "bytes": 84340,
+          "sha256": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238"
+        },
+        "reviews": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/reviews.json",
+          "bytes": 85063,
+          "sha256": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97"
+        },
+        "p2PanelReferences": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/panel-reference-resolutions.json",
+          "bytes": 32695281,
+          "sha256": "35aa251d9b6f767190924d697e7dd03a58cc198ded0918ad4fd89508217f877b"
+        },
+        "p3VisualConstraints": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/panel-visual-constraints.json",
+          "bytes": 78768303,
+          "sha256": "6eb445f84f38c0c2e4e6e6d56b3f1195bdbf5643c624246f9500566a5af8ffd8"
+        },
+        "storyboardGridSelections": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboard-grid-selections.json",
+          "bytes": 539782,
+          "sha256": "a8ec5e31899a71383bbb514720d0e00f918b9d0efe1a0d4cf408a9013c645ffa"
+        },
+        "storyboardSheetIndex": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboard-sheet-index.json",
+          "bytes": 3947,
+          "sha256": "11533501e7a2a6dedd1dbfa6f108c3a4e8f02141bafbaa16aa706125832e3fd6"
+        },
+        "storyboards": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboards.json",
+          "bytes": 6249388,
+          "sha256": "48351896542028241ea689e930a4aa1df190a18de002d6c432cb4c4b6d9b3a78"
+        },
+        "fusionManifest": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/fusion-project-manifest.json",
+          "bytes": 6369749,
+          "sha256": "93ad685f8f0de8f46f6163bbe3e931c937aae54df25a3046780d34f81c03a969"
+        },
+        "productionAssets": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/production-assets.json",
+          "bytes": 408965,
+          "sha256": "e693c5477044d9389de19188d14e876ea334c762cea86f9010a3de47f41abeae"
+        },
+        "continuityTracks": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/continuity-tracks.json",
+          "bytes": 4031882,
+          "sha256": "62b7a2fd80eefeb28e7b15780f5483df5381ce8dd94573311859e48b6962a20a"
+        },
+        "generationSettings": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation.json",
+          "bytes": 3102,
+          "sha256": "2ccd6f6fd8b431ca8d851dbad8e3b3eb642edd8b582c3a3df0f4fe5d32172b0e"
+        }
+      },
+      "requests": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-requests",
+        "files": 31,
+        "bytes": 174082,
+        "aggregateSha256": "171ca4fd131b977f07f7bbb5e44bfd836a1158ce63c6bcaff721b45f95b1fbca",
+        "jsonRowsSha256": "23c2a6ec9d1cd2a1bb613e476a10b1b2b004f8f18e5d53aa1989696d31783020"
+      },
+      "downloads": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-downloads",
+        "files": 26,
+        "bytes": 55357407,
+        "aggregateSha256": "ccfd0599ac21da61f79bee1538de3f7faea54d156c05f594181f0d5437849dc8",
+        "jsonRowsSha256": "21f624b13aa49d423c20a918968edb3151abc8eef094bb444015b504078de68d"
+      },
+      "subagentStaging": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/subagent-staging",
+        "files": 36,
+        "bytes": 68776407,
+        "aggregateSha256": "6f1b769092934ca3f35fe94a7cffca1c5e5e510d4a10f1dbbfec0883fb943c95",
+        "jsonRowsSha256": "4a1745ad4a68694fcad1c295de30f3543e4abeecc9cb50f0f36133fe442d5001"
+      },
+      "rawLabeled": {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+        "files": 52,
+        "bytes": 128973009,
+        "aggregateSha256": "77d4a46fa04c05c635701363f394faab0cc5094fc437990f6eeb580ce0e4c83b",
+        "jsonRowsSha256": "05ee1ce7eac462b141b1a4a85b71411b777eb920ca8fd32c48e2f8d70ce0a401"
+      },
+      "sheetArtifacts": [
+        {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json",
+          "bytes": 3843,
+          "sha256": "7cb26385590c783a6d3af4318a3c53586b15ef5b38e7336425960fbc2e2e6f44"
+        },
+        {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json",
+          "bytes": 3589,
+          "sha256": "f509797e0aef7793fcbf8e72a7b58a0b49e039cd247399032edde5227d0d1148"
+        },
+        {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.png",
+          "bytes": 4472760,
+          "sha256": "8600c46fe40ad797927c68c1bc09072556646a423f5edeb8a14fa90697e1e06e"
+        },
+        {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.svg",
+          "bytes": 1184873,
+          "sha256": "420d0cc54a7685a4d58e9f5b3145e8cf1c8248a31483d45d19e61a334b0448de"
+        }
+      ],
+      "identitySha256": "bb1b887ea6f61d8e687c975abb36ab9d45b8364526399fa64314d7720b5089d0"
+    },
+    "unchanged": true
+  },
+  "externalEvidence": {
+    "migration": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p4-fusion-storyboard-sheet-migration-final-20260717.json",
+      "bytes": 17504,
+      "sha256": "075941ee493d67be352b962eecb7e219bddbff82dea627c78060308a54e05cdf"
+    },
+    "mcp": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p4-storyboard-sheet-mcp-final-20260717-r2.json",
+      "bytes": 8098,
+      "sha256": "afd65676ba3b93a4b2a7c8467fe97de725076d45bce8ddd99b705b3cdb03a19d"
+    },
+    "ui": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p4-storyboard-sheet-ui-final-20260717-r2.json",
+      "bytes": 14084,
+      "sha256": "44980969fdde19cdc0efa48e322187976627169bc3a3549b3c731c4bf5d449ff"
+    },
+    "screenshots": [
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p4-storyboard-sheet-ui-final-20260717-r2-ep01-001.png",
+        "bytes": 601976,
+        "sha256": "295f74049ccc9118bef8ec899e8000962dbb32eaf6db3b867690e70e9a372f1e",
+        "width": 3456,
+        "height": 2058,
+        "standardDeviation": 72.57436376982044
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p4-storyboard-sheet-ui-final-20260717-r2-ep01-001-ep01-008.png",
+        "bytes": 536075,
+        "sha256": "0811fd4056ff12fd312f6b90a2a392e3d7a2ef8715aad3e921f7cb8cd15a2303",
+        "width": 3456,
+        "height": 2058,
+        "standardDeviation": 72.5996843752577
+      }
+    ],
+    "migrationCandidateFingerprint": "76d02dcf4bf5a789f8dc2155843b944192d09d9d035d882f613050cccd6e4fbd",
+    "migrationSheetIds": [
+      "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+      "legacy-sheet-d75625366c9b08f7fbbb8802741789b0"
+    ],
+    "mcpToolCount": 165,
+    "uiNetworkObservationScope": {
+      "observedExternalRequests": 0,
+      "coverage": "listeners-installed-after-first-window",
+      "provesFullStartupNetworkSilence": false,
+      "claim": "只声明 UI smoke 记录区间内零外网；不把旧证据升级为启动期完整零外网证明。"
+    }
+  },
+  "externalEvidenceFiles": {
+    "before": [
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p4-fusion-storyboard-sheet-migration-final-20260717.json",
+        "bytes": 17504,
+        "sha256": "075941ee493d67be352b962eecb7e219bddbff82dea627c78060308a54e05cdf"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p4-storyboard-sheet-mcp-final-20260717-r2.json",
+        "bytes": 8098,
+        "sha256": "afd65676ba3b93a4b2a7c8467fe97de725076d45bce8ddd99b705b3cdb03a19d"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p4-storyboard-sheet-ui-final-20260717-r2.json",
+        "bytes": 14084,
+        "sha256": "44980969fdde19cdc0efa48e322187976627169bc3a3549b3c731c4bf5d449ff"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p4-storyboard-sheet-ui-final-20260717-r2-ep01-001.png",
+        "bytes": 601976,
+        "sha256": "295f74049ccc9118bef8ec899e8000962dbb32eaf6db3b867690e70e9a372f1e"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p4-storyboard-sheet-ui-final-20260717-r2-ep01-001-ep01-008.png",
+        "bytes": 536075,
+        "sha256": "0811fd4056ff12fd312f6b90a2a392e3d7a2ef8715aad3e921f7cb8cd15a2303"
+      }
+    ],
+    "after": [
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p4-fusion-storyboard-sheet-migration-final-20260717.json",
+        "bytes": 17504,
+        "sha256": "075941ee493d67be352b962eecb7e219bddbff82dea627c78060308a54e05cdf"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p4-storyboard-sheet-mcp-final-20260717-r2.json",
+        "bytes": 8098,
+        "sha256": "afd65676ba3b93a4b2a7c8467fe97de725076d45bce8ddd99b705b3cdb03a19d"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p4-storyboard-sheet-ui-final-20260717-r2.json",
+        "bytes": 14084,
+        "sha256": "44980969fdde19cdc0efa48e322187976627169bc3a3549b3c731c4bf5d449ff"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p4-storyboard-sheet-ui-final-20260717-r2-ep01-001.png",
+        "bytes": 601976,
+        "sha256": "295f74049ccc9118bef8ec899e8000962dbb32eaf6db3b867690e70e9a372f1e"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/p4-storyboard-sheet-ui-final-20260717-r2-ep01-001-ep01-008.png",
+        "bytes": 536075,
+        "sha256": "0811fd4056ff12fd312f6b90a2a392e3d7a2ef8715aad3e921f7cb8cd15a2303"
+      }
+    ],
+    "unchanged": true
+  },
+  "isolatedFixture": {
+    "rootKind": "exclusive-mkdtemp-under-os-tmpdir",
+    "productionProjectTouched": false,
+    "browserOrVendorInvoked": false,
+    "externalGenerationInvoked": false,
+    "renderer": {
+      "twoPanelLongChinese": {
+        "panelCount": 2,
+        "width": 2160,
+        "height": 9115,
+        "expanded": true,
+        "allRequiredTextVisible": true,
+        "truncatedFields": [],
+        "longFieldSha256": "c4a71a2ebf5715a3e72eacec88bd95aa54e862c958d80eb995bc97598c1f23a9",
+        "completeEndingVisible": true,
+        "defaultContain": true,
+        "output": {
+          "bytes": 4844455,
+          "sha256": "b633c27a444de8e2c68ed4e90962f2d50c80917e1be57546181b9ce9dfd69a99"
+        },
+        "svg": {
+          "bytes": 1911068,
+          "sha256": "fe03eda588f322ddc94c581d14dd1abfa4766aac848549f8e1425b40d00d0f05"
+        }
+      },
+      "sixPanel": {
+        "panelCount": 6,
+        "pageCount": 1,
+        "allRequiredTextVisible": true,
+        "defaultContain": true,
+        "everySourceFieldVisibleInSvg": true,
+        "idempotentReplay": true,
+        "pngSha256": "36af22c6ce78e05f90a76b4c026837a5d00de7eb3bd52fe328c01c96865c60de",
+        "svgSha256": "b86765a903c95a8d66b7bc1ef65581a96d4789ffc7e1854c84b5e8675339e804",
+        "mtimesUnchanged": true
+      },
+      "explicitCrop": {
+        "panelCount": 2,
+        "focalPointAudit": {
+          "panelId": "season-3-ep01-unit001-panel-01",
+          "fit": "crop",
+          "geometry": "focal-point",
+          "focalPoint": {
+            "x": 0.25,
+            "y": 0.7
+          },
+          "appliedRect": {
+            "x": 0,
+            "y": 0,
+            "width": 0.6347222222222222,
+            "height": 1
+          },
+          "appliedPixelRect": {
+            "left": 0,
+            "top": 0,
+            "width": 457,
+            "height": 1280
+          },
+          "sourceWidth": 720,
+          "sourceHeight": 1280,
+          "orientedWidth": 720,
+          "orientedHeight": 1280,
+          "targetWidth": 570,
+          "targetHeight": 1597,
+          "cropApplied": true
+        },
+        "normalizedRectAudit": {
+          "panelId": "season-3-ep01-unit001-panel-02",
+          "fit": "crop",
+          "geometry": "rect",
+          "requestedRect": {
+            "x": 0.1,
+            "y": 0.2,
+            "width": 0.75,
+            "height": 0.6
+          },
+          "appliedRect": {
+            "x": 0.1,
+            "y": 0.2,
+            "width": 0.75,
+            "height": 0.6
+          },
+          "appliedPixelRect": {
+            "left": 72,
+            "top": 256,
+            "width": 540,
+            "height": 768
+          },
+          "sourceWidth": 720,
+          "sourceHeight": 1280,
+          "orientedWidth": 720,
+          "orientedHeight": 1280,
+          "targetWidth": 570,
+          "targetHeight": 1598,
+          "cropApplied": true
+        },
+        "embeddedInSvgMetadata": true
+      }
+    },
+    "vertical": {
+      "projectKind": "isolated-temporary-fusion-project",
+      "panelCount": 2,
+      "review": {
+        "id": "review-2026-07-17T14-50-23-544Z-cf935ac1",
+        "requirementId": "fusion-review-07d06201afc7f99d80d0633033b54db484633f37fa1bae9c55e173a367df7930",
+        "explicitVisualRuleAttestations": 19,
+        "note": "仅隔离 fixture；未写入正式第三季 Review store。"
+      },
+      "current": {
+        "sheetId": "sheet-v2-4278985a1611cbd5f5096f7d3e8d1b4c",
+        "inputFingerprint": "4278985a1611cbd5f5096f7d3e8d1b4caeecff4a2cb66423b7b215acefc848ba",
+        "recordFingerprint": "8b6a39376f7d38aa3265547b1558ad2ac35d21d761424b63fe93e21752ae9cf1",
+        "storeRevision": 1,
+        "artifacts": [
+          {
+            "role": "png",
+            "status": "current",
+            "authoritative": true,
+            "accepted": true,
+            "sha256": "0e58adb2fe70d00e224147d210d41dac1d804ef38130a4c79ec888d6845e0d18"
+          },
+          {
+            "role": "svg",
+            "status": "current",
+            "authoritative": true,
+            "accepted": true,
+            "sha256": "befe936fa874b5120aed0e2db259667ea0dae8839194be1239cc4b3113bd9e3a"
+          },
+          {
+            "role": "receipt",
+            "status": "current",
+            "authoritative": true,
+            "accepted": true,
+            "sha256": "499cb18abe68b7104f908c701f19dafe8b3498b6717830140ac8a48b7fc42e72"
+          }
+        ]
+      },
+      "idempotentReplay": {
+        "reused": true,
+        "sameSheetId": true,
+        "samePngSha256": true,
+        "sameSvgSha256": true
+      },
+      "orphan": {
+        "status": "invalid",
+        "authoritative": false,
+        "accepted": false,
+        "reasons": [
+          "orphan-sheet-file-not-registered-in-p4-store"
+        ]
+      },
+      "drift": {
+        "sourceRawBeforeSha256": "4165215013e0043776d3eb21d49cf4e0aa05427f20bc903931a20be8f5a6b3cb",
+        "sourceRawAfterSha256": "3b4a79416b09fdb4dce77ce8a9fc176687b3f721caaac295a75e84571b2783e2",
+        "currentAfterDrift": 0,
+        "oldSheetStatus": "stale",
+        "oldExpectedInputFingerprintRejected": true,
+        "scannerAuthoritativeAfterDrift": 0,
+        "storeRevisionUnchanged": true
+      }
+    },
+    "cleaned": true
+  },
+  "compiledMcpServer": {
+    "afterProductionBuild": {
+      "path": "/Users/hxx/Documents/无限画布/dist-mcp/mcp/server.js",
+      "bytes": 249572,
+      "sha256": "884ebc4b77d81c4852276bf54c97a366aca2cbc353475baefbdab5ff0b98ebc8"
+    },
+    "exercisedByReadOnlyMcpRun": [
+      "npx",
+      "tsx",
+      "scripts/mcp-p4-storyboard-sheet-smoke.ts",
+      "--workspace",
+      "/Users/hxx/Documents/无限画布",
+      "--project-root",
+      "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+      "--migration-evidence",
+      "/Users/hxx/Documents/无限画布/docs/evidence/p4-fusion-storyboard-sheet-migration-final-20260717.json"
+    ],
+    "toolCount": 165
+  },
+  "commandRuns": {
+    "typecheck": {
+      "name": "01-typecheck",
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T14:50:29.040Z",
+      "endedAt": "2026-07-17T14:50:35.936Z",
+      "durationMs": 6897,
+      "exitCode": 0,
+      "termination": {
+        "timeoutMs": 300000,
+        "timedOut": false,
+        "signalsSent": []
+      },
+      "stdout": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717/01-typecheck.stdout.log",
+        "bytes": 114,
+        "sha256": "8aca887056e876fdc407b955daffd0b0a5dec0c074cd623f6decb7a214530132",
+        "tail": [
+          "> ai-drama-canvas@0.1.0 typecheck",
+          "> vue-tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json"
+        ]
+      },
+      "stderr": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717/01-typecheck.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tail": []
+      }
+    },
+    "targeted": {
+      "name": "02-p4-targeted-tests",
+      "argv": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/fusion-storyboard-sheet.test.ts",
+        "tests/fusion-storyboard-sheet-store.test.ts",
+        "tests/fusion-storyboard-sheet-migration.test.ts",
+        "tests/fusion-production.test.ts",
+        "tests/command-bus.test.ts",
+        "tests/scanner.test.ts",
+        "tests/mcp.test.ts",
+        "tests/mcp-fusion-production.test.ts",
+        "--maxWorkers=1",
+        "--reporter=verbose"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T14:50:35.937Z",
+      "endedAt": "2026-07-17T14:51:24.141Z",
+      "durationMs": 48204,
+      "exitCode": 0,
+      "termination": {
+        "timeoutMs": 900000,
+        "timedOut": false,
+        "signalsSent": []
+      },
+      "stdout": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717/02-p4-targeted-tests.stdout.log",
+        "bytes": 12744,
+        "sha256": "976e7f4a18457afcd0c30d4739347da0eeb915a514e55d19a8dc40b59afb8742",
+        "tail": [
+          " ✓ tests/fusion-production.test.ts > 融合包 CAS 隔离物化 > 首次 P2 物化会分别冻结当前合同 resolution 与淘汰旧合同无输出终态，旧任务永久不能执行或映射 Artifact/Review 293ms",
+          " ✓ tests/fusion-production.test.ts > 融合包 CAS 隔离物化 > 首次 P2 冻结后 legacy job 或其 Publication 账本任一漂移都会失败关闭且 currentness=false 473ms",
+          " ✓ tests/fusion-production.test.ts > 融合包 CAS 隔离物化 > 首次 P2 物化遇到 '淘汰旧合同任务不是 failed/cancelled 终态' 时拒绝建立历史旁路 216ms",
+          " ✓ tests/fusion-production.test.ts > 融合包 CAS 隔离物化 > 首次 P2 物化遇到 '淘汰旧合同任务已经声明 result/companion 输出' 时拒绝建立历史旁路 227ms",
+          " ✓ tests/fusion-production.test.ts > 融合包 CAS 隔离物化 > 首次 P2 物化遇到 '淘汰旧合同任务已经声明 Publication receipt' 时拒绝建立历史旁路 227ms",
+          " ✓ tests/fusion-production.test.ts > 融合包 CAS 隔离物化 > 首次 P2 物化遇到 '淘汰旧合同任务的宫格身份已被改写' 时拒绝建立历史旁路 234ms",
+          " ✓ tests/fusion-production.test.ts > 融合包 CAS 隔离物化 > 首次 P2 物化遇到 '淘汰旧合同关联 Publication 已注册并带 receipt' 时拒绝建立历史旁路 235ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > 相同幂等键只执行一次，不同参数复用时拒绝 314ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > 任务租约命令强制修订号且同幂等键仍直接重放原结果 280ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > 统一入口覆盖项目记忆、画布语义和任务包等主要写操作 442ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > 长期事实 CAS 写前拒绝形成 failed/committed:false 而不是 unknown 667ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > 副作用后回执中断会锁定为 unknown，重试不会重复执行 308ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > 只有中间业务事件时不能把 unknown 错判为成功 273ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > P4 migration 业务 store 落盘后、终态事件前崩溃时由候选指纹确定恢复且不重复登记 265ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > reconcile_command 可使用账本内 P4 请求快照从业务 store 对账，并回写独立事务根 266ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > P4 render 已登记 current receipt/store 后崩溃只做确定性对账与补扫，不再次渲染或登记 244ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > P4 migration 的 stale candidate fingerprint 与 CAS 冲突保持确定 failed，原键绝不被业务对账改判 409ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > 独立事务根的 unknown 可从项目根对账并同步回原账本 323ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > 两个独立进程使用同一幂等键只执行一次 601ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > 两个独立进程用不同幂等键和同一 revision 更新长期事实时恰好一成一败 534ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > 长业务操作不会占住全局命令账本锁阻塞其他业务域 1420ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > scan_project 取消会形成 cancelled 终态，不提交索引且不能复用原幂等键 505ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > 预取消不写命令账本，等待者取消也不会终止同键原执行者 1099ms",
+          " ✓ tests/command-bus.test.ts > Codex 幂等命令总线 > 执行进程在业务前消失时将 running 转为 unknown 且不自动重放 189ms",
+          " ✓ tests/fusion-storyboard-sheet.test.ts > 融合分镜故事板本地渲染 > 将六张纯画面按完整中文纵向表格生成确定性 long-sheet，并保持幂等 2566ms",
+          " ✓ tests/fusion-storyboard-sheet.test.ts > 融合分镜故事板本地渲染 > 用醒目水印和机器字段区分布局预览，禁止把占位画面计入正式生产 1266ms",
+          " ✓ tests/fusion-storyboard-sheet.test.ts > 融合分镜故事板本地渲染 > 测量长中文字段后动态增加行高，完整保留结尾；超过上限时 formal 失败关闭 2175ms",
+          " ✓ tests/fusion-storyboard-sheet.test.ts > 融合分镜故事板本地渲染 > 默认 contain 不裁图；显式 focal/rect crop 归一化并冻结实际像素审计 870ms",
+          " ✓ tests/fusion-storyboard-sheet.test.ts > 融合分镜故事板本地渲染 > 严格拒绝缺图、错误 SHA、源图覆盖和非 15 秒合同 23ms",
+          " ✓ tests/fusion-storyboard-sheet.test.ts > 融合分镜故事板本地渲染 > 目标已有不同内容时失败关闭并保留原文件 812ms",
+          " ✓ tests/scanner.test.ts > 真实文件扫描与状态推断 > 发布预留中的半成品不进入索引，发布失败后重新按真实文件机械验收 244ms",
+          " ✓ tests/scanner.test.ts > 真实文件扫描与状态推断 > 发布预留中的自动参考资产不会绕过写入中保护 133ms",
+          " ✓ tests/scanner.test.ts > 真实文件扫描与状态推断 > 发布侧车损坏时持久扫描失败关闭并保留旧索引，只读预检给出明确警告 165ms",
+          " ✓ tests/scanner.test.ts > 真实文件扫描与状态推断 > 大项目复用未变化机械检查，只重检一个已变化文件，并让哈希缓存可继续复用 470ms",
+          " ✓ tests/scanner.test.ts > 真实文件扫描与状态推断 > 扫描取消后不覆盖索引、SQLite提交点或审计事件，并释放扫描锁 234ms",
+          " ✓ tests/scanner.test.ts > 真实文件扫描与状态推断 > 取消扫描会终止正在运行的 ffprobe 子进程 293ms",
+          " ✓ tests/scanner.test.ts > 真实文件扫描与状态推断 > 只读预检不会创建侧车或登记项目 3ms",
+          " ✓ tests/scanner.test.ts > 真实文件扫描与状态推断 > 把完整且已视觉验收的首尾帧推进到待视频 126ms",
+          " ✓ tests/scanner.test.ts > 真实文件扫描与状态推断 > 区分缺尾帧、缺配对和损坏图片 99ms",
+          " ✓ tests/scanner.test.ts > 真实文件扫描与状态推断 > 旧版和备份不会压过新版权威素材 108ms",
+          " ✓ tests/scanner.test.ts > 真实文件扫描与状态推断 > 只有旧版文件的生产单元会直接分流为弃用 71ms",
+          " ✓ tests/scanner.test.ts > 真实文件扫描与状态推断 > 资产库与镜头硬锁按权威文件名精确关联 82ms",
+          " ✓ tests/scanner.test.ts > 真实文件扫描与状态推断 > 把 15 秒目录内的原镜头识别为子节点而不混入单元素材 88ms",
+          " ✓ tests/scanner.test.ts > 真实文件扫描与状态推断 > 项目主根整体移动后素材 ID 与 aicanvas URI 保持稳定 98ms",
+          " ✓ tests/mcp.test.ts > stdio MCP > 暴露生产与第二阶段工具且不监听网络端口 3270ms",
+          " ✓ tests/mcp-fusion-production.test.ts > 第三季融合生产 MCP 入口 > 只读预检、幂等物化、当前索引参考板与连续性查询贯通且不返回图片内容 1570ms",
+          " ✓ tests/fusion-storyboard-sheet-store.test.ts > P4 内容寻址正式中文分镜板 store > sheetId 冻结合同、requirement、Review、逐格账本、渲染策略和输出 SHA 10ms",
+          " ✓ tests/fusion-storyboard-sheet-store.test.ts > P4 内容寻址正式中文分镜板 store > 严格拒绝缺格、伪造 crop 审计和任何 overflow 静默截断 1ms",
+          " ✓ tests/fusion-storyboard-sheet-store.test.ts > P4 内容寻址正式中文分镜板 store > 以 CAS 登记不可变 receipt/index，重放幂等、冲突不覆盖并保留历史版本 78ms",
+          " ✓ tests/fusion-storyboard-sheet-store.test.ts > P4 内容寻址正式中文分镜板 store > 从绝对路径派生 current/stale/invalid/legacy-invalid 及精确原因 86ms",
+          " ✓ tests/fusion-storyboard-sheet-store.test.ts > P4 内容寻址正式中文分镜板 store > 拒绝把 v2 或历史 Artifact 登记到工程根外 3ms",
+          " ✓ tests/fusion-storyboard-sheet-migration.test.ts > P4 schema-v1 中文分镜板迁移 > 共享输出的无 Review receipt 只登记自身，带旧 Review receipt 登记 PNG/SVG/receipt 为 stale，批量 revision 只加一且重放幂等 49ms",
+          " ✓ tests/fusion-storyboard-sheet-migration.test.ts > P4 schema-v1 中文分镜板迁移 > 同一当前 requirement 的 later rework 是权威裁决，不能继续复用旧 pass 0ms",
+          " ✓ tests/fusion-storyboard-sheet-migration.test.ts > P4 schema-v1 中文分镜板迁移 > CAS 冲突和候选 SHA/size 漂移均以 RejectedCommandFailure 零写入 29ms",
+          " ✓ tests/fusion-storyboard-sheet-migration.test.ts > P4 schema-v1 中文分镜板迁移 > 越界输出和符号链接输出失败关闭，不产生迁移索引 15ms",
+          " ✓ tests/fusion-storyboard-sheet-migration.test.ts > P4 schema-v1 中文分镜板迁移 > receipt projectId 或 itemId 不属于当前权威索引时 blocker 且零写入 14ms",
+          " Test Files  8 passed (8)",
+          "      Tests  78 passed (78)",
+          "   Start at  22:50:36",
+          "   Duration  47.04s (transform 522ms, setup 36ms, import 1.16s, tests 45.38s, environment 0ms)"
+        ]
+      },
+      "stderr": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717/02-p4-targeted-tests.stderr.log",
+        "bytes": 676,
+        "sha256": "a5309a919e7d362112a9f771229ebbbc4ffedf79c150e77230569521811adef4",
+        "tail": [
+          "(node:48489) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:48862) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:48883) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:48939) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)"
+        ]
+      },
+      "testSummary": {
+        "filesPassed": 8,
+        "testsPassed": 78,
+        "filesSkipped": 0,
+        "testsSkipped": 0
+      }
+    },
+    "full": {
+      "name": "03-full-tests",
+      "argv": [
+        "npm",
+        "test"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T14:51:24.142Z",
+      "endedAt": "2026-07-17T14:53:35.224Z",
+      "durationMs": 131082,
+      "exitCode": 0,
+      "termination": {
+        "timeoutMs": 1200000,
+        "timedOut": false,
+        "signalsSent": []
+      },
+      "stdout": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717/03-full-tests.stdout.log",
+        "bytes": 273,
+        "sha256": "47d68cfe86216f505c2225000fbf905a91b10cd3673e69ef969bd6158a949351",
+        "tail": [
+          "> ai-drama-canvas@0.1.0 test",
+          "> vitest run",
+          " RUN  v4.1.0 /Users/hxx/Documents/无限画布",
+          " Test Files  55 passed (55)",
+          "      Tests  352 passed (352)",
+          "   Start at  22:51:24",
+          "   Duration  130.83s (transform 1.06s, setup 197ms, import 5.66s, tests 252.68s, environment 2ms)"
+        ]
+      },
+      "stderr": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717/03-full-tests.stderr.log",
+        "bytes": 5915,
+        "sha256": "69aeb0ba8c62929d196fd8d92388872a9c7d52faed9a067f9daed23220b17c10",
+        "tail": [
+          "(node:54451) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:55042) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:55045) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:55378) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:55557) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:55607) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:55960) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:56478) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:56515) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:56517) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:56552) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:56590) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:56591) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:56614) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:56615) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:56619) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:56744) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:57033) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:57035) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:57037) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:57038) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:57128) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:57130) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:57131) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:57133) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:57135) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:57137) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:57145) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:57146) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)",
+          "(node:57150) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)"
+        ]
+      },
+      "testSummary": {
+        "filesPassed": 55,
+        "testsPassed": 352,
+        "filesSkipped": 0,
+        "testsSkipped": 0
+      }
+    },
+    "build": {
+      "name": "04-production-build",
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T14:53:35.224Z",
+      "endedAt": "2026-07-17T14:53:46.762Z",
+      "durationMs": 11538,
+      "exitCode": 0,
+      "termination": {
+        "timeoutMs": 480000,
+        "timedOut": false,
+        "signalsSent": []
+      },
+      "stdout": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717/04-production-build.stdout.log",
+        "bytes": 980,
+        "sha256": "d15431574d51cf085fc2fea7c3541197348e1fea1bafa918500ac2a0be7c806f",
+        "tail": [
+          "> ai-drama-canvas@0.1.0 build",
+          "> npm run typecheck && electron-vite build && npm run build:mcp",
+          "> ai-drama-canvas@0.1.0 typecheck",
+          "> vue-tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json",
+          "vite v7.3.6 building ssr environment for production...",
+          "transforming...",
+          "✓ 48 modules transformed.",
+          "rendering chunks...",
+          "out/main/index.js  1,739.12 kB",
+          "✓ built in 569ms",
+          "vite v7.3.6 building ssr environment for production...",
+          "transforming...",
+          "✓ 1 modules transformed.",
+          "rendering chunks...",
+          "out/preload/index.mjs  20.43 kB",
+          "✓ built in 7ms",
+          "vite v7.3.6 building client environment for production...",
+          "transforming...",
+          "✓ 1636 modules transformed.",
+          "rendering chunks...",
+          "../../out/renderer/index.html                     0.69 kB",
+          "../../out/renderer/assets/index-C6e-MlT-.css    221.56 kB",
+          "../../out/renderer/assets/index-nOraD3-q.js   1,466.88 kB",
+          "✓ built in 1.42s",
+          "> ai-drama-canvas@0.1.0 build:mcp",
+          "> rm -rf dist-mcp && tsc -p tsconfig.mcp.json && chmod +x dist-mcp/mcp/server.js"
+        ]
+      },
+      "stderr": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717/04-production-build.stderr.log",
+        "bytes": 4970,
+        "sha256": "138b11afc006c8461759654ef5eecc451ad88b50434a991cec7c588456355e5b",
+        "tail": [
+          "[plugin vite:reporter] ",
+          "(!) /Users/hxx/Documents/无限画布/src/core/fusion-panel-references.ts is dynamically imported by /Users/hxx/Documents/无限画布/src/core/generation.ts, /Users/hxx/Documents/无限画布/src/core/generation.ts, /Users/hxx/Documents/无限画布/src/core/generation.ts but also statically imported by /Users/hxx/Documents/无限画布/src/core/codex.ts, /Users/hxx/Documents/无限画布/src/core/command-bus.ts, /Users/hxx/Documents/无限画布/src/core/fusion-references.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-evidence.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-migration.ts, /Users/hxx/Documents/无限画布/src/core/fusion-visual-constraint-store.ts, /Users/hxx/Documents/无限画布/src/main/index.ts, dynamic import will not move module into another chunk.",
+          "[plugin vite:reporter] ",
+          "(!) /Users/hxx/Documents/无限画布/src/core/fusion-visual-constraint-store.ts is dynamically imported by /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-evidence.ts, /Users/hxx/Documents/无限画布/src/core/generation.ts but also statically imported by /Users/hxx/Documents/无限画布/src/core/command-bus.ts, /Users/hxx/Documents/无限画布/src/core/fusion-references.ts, /Users/hxx/Documents/无限画布/src/main/index.ts, dynamic import will not move module into another chunk.",
+          "[plugin vite:reporter] ",
+          "(!) /Users/hxx/Documents/无限画布/src/core/production.ts is dynamically imported by /Users/hxx/Documents/无限画布/src/core/generation.ts, /Users/hxx/Documents/无限画布/src/core/generation.ts, /Users/hxx/Documents/无限画布/src/core/service.ts, /Users/hxx/Documents/无限画布/src/core/service.ts but also statically imported by /Users/hxx/Documents/无限画布/src/core/adaptation.ts, /Users/hxx/Documents/无限画布/src/core/codex.ts, /Users/hxx/Documents/无限画布/src/core/command-bus.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-production.ts, /Users/hxx/Documents/无限画布/src/main/index.ts, dynamic import will not move module into another chunk.",
+          "[plugin vite:reporter] ",
+          "(!) /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-sheet-store.ts is dynamically imported by /Users/hxx/Documents/无限画布/src/core/scanner.ts but also statically imported by /Users/hxx/Documents/无限画布/src/core/command-bus.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-production.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-sheet-evidence.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-sheet-migration.ts, dynamic import will not move module into another chunk.",
+          "[plugin vite:reporter] ",
+          "(!) /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-sheet-evidence.ts is dynamically imported by /Users/hxx/Documents/无限画布/src/core/scanner.ts but also statically imported by /Users/hxx/Documents/无限画布/src/core/command-bus.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-production.ts, /Users/hxx/Documents/无限画布/src/main/index.ts, dynamic import will not move module into another chunk.",
+          "[plugin vite:reporter] ",
+          "(!) /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-production.ts is dynamically imported by /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-sheet-evidence.ts, /Users/hxx/Documents/无限画布/src/core/generation.ts but also statically imported by /Users/hxx/Documents/无限画布/src/core/command-bus.ts, /Users/hxx/Documents/无限画布/src/core/fusion-panel-references.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-migration.ts, /Users/hxx/Documents/无限画布/src/core/fusion-visual-constraint-store.ts, /Users/hxx/Documents/无限画布/src/core/scanner.ts, dynamic import will not move module into another chunk.",
+          "[plugin vite:reporter] ",
+          "(!) /Users/hxx/Documents/无限画布/src/core/service.ts is dynamically imported by /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-production.ts but also statically imported by /Users/hxx/Documents/无限画布/src/core/adaptation.ts, /Users/hxx/Documents/无限画布/src/core/asset-registry.ts, /Users/hxx/Documents/无限画布/src/core/canvas-state.ts, /Users/hxx/Documents/无限画布/src/core/codex.ts, /Users/hxx/Documents/无限画布/src/core/command-bus.ts, /Users/hxx/Documents/无限画布/src/core/continuity.ts, /Users/hxx/Documents/无限画布/src/core/documents.ts, /Users/hxx/Documents/无限画布/src/core/editor.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-migration.ts, /Users/hxx/Documents/无限画布/src/core/generation.ts, /Users/hxx/Documents/无限画布/src/core/memory.ts, /Users/hxx/Documents/无限画布/src/core/production.ts, /Users/hxx/Documents/无限画布/src/core/reviews.ts, /Users/hxx/Documents/无限画布/src/core/timeline.ts, /Users/hxx/Documents/无限画布/src/main/index.ts, dynamic import will not move module into another chunk."
+        ]
+      }
+    },
+    "migrationReadOnlyFirst": {
+      "name": "05-migration-readonly-first",
+      "argv": [
+        "npx",
+        "tsx",
+        "scripts/migrate-p4-fusion-storyboard-sheets.ts",
+        "--workspace",
+        "/Users/hxx/Documents/无限画布",
+        "--project-root",
+        "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+        "--source-root",
+        "/Users/hxx/Documents/古蜀卷第三季"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T14:53:46.763Z",
+      "endedAt": "2026-07-17T14:53:47.489Z",
+      "durationMs": 726,
+      "exitCode": 0,
+      "termination": {
+        "timeoutMs": 600000,
+        "timedOut": false,
+        "signalsSent": []
+      },
+      "stdout": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717/05-migration-readonly-first.stdout.log",
+        "bytes": 6989,
+        "sha256": "f5efa69ae9283e1fc67e59c1a0ba32e4722b1d34d366463a905f1fc63d747da3",
+        "tail": [
+          "            \"role\": \"png\",",
+          "            \"path\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.png\",",
+          "            \"pageIndex\": 1,",
+          "            \"pageCount\": 1,",
+          "            \"sha256\": \"8600c46fe40ad797927c68c1bc09072556646a423f5edeb8a14fa90697e1e06e\",",
+          "            \"bytes\": 4472760",
+          "          },",
+          "          {",
+          "            \"role\": \"svg\",",
+          "            \"path\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.svg\",",
+          "            \"pageIndex\": 1,",
+          "            \"pageCount\": 1,",
+          "            \"sha256\": \"420d0cc54a7685a4d58e9f5b3145e8cf1c8248a31483d45d19e61a334b0448de\",",
+          "            \"bytes\": 1184873",
+          "          },",
+          "          {",
+          "            \"role\": \"receipt\",",
+          "            \"path\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json\",",
+          "            \"pageCount\": 1,",
+          "            \"sha256\": \"7cb26385590c783a6d3af4318a3c53586b15ef5b38e7336425960fbc2e2e6f44\",",
+          "            \"bytes\": 3843",
+          "          }",
+          "        ],",
+          "        \"reason\": \"schema-v1 历史板绑定旧 Review/requirement，但未冻结 P4 当前完整证据，只能登记为 stale\",",
+          "        \"pending\": false",
+          "      },",
+          "      {",
+          "        \"sheetId\": \"legacy-sheet-d75625366c9b08f7fbbb8802741789b0\",",
+          "        \"receiptPath\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json\",",
+          "        \"itemId\": \"season-三-ep01-unit001\",",
+          "        \"status\": \"legacy-invalid\",",
+          "        \"contractId\": \"grid-6c02035d032128e0f62a\",",
+          "        \"artifacts\": [",
+          "          {",
+          "            \"role\": \"receipt\",",
+          "            \"path\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json\",",
+          "            \"pageCount\": 1,",
+          "            \"sha256\": \"f509797e0aef7793fcbf8e72a7b58a0b49e039cd247399032edde5227d0d1148\",",
+          "            \"bytes\": 3589",
+          "          }",
+          "        ],",
+          "        \"reason\": \"schema-v1 历史 receipt 未同时绑定 Review/requirement，只登记 receipt 且永久 legacy-invalid\",",
+          "        \"pending\": false",
+          "      }",
+          "    ]",
+          "  },",
+          "  \"command\": {",
+          "    \"requestId\": \"p4-sheet-migration-ba6b49724cec31be6d8a1aba8ace0cec419a4c8a696dfc3b\",",
+          "    \"idempotencyKey\": \"p4-sheet-migration-ba6b49724cec31be6d8a1aba8ace0cec419a4c8a696dfc3b\",",
+          "    \"request\": {",
+          "      \"command\": \"migrate_fusion_storyboard_sheets\",",
+          "      \"payload\": {",
+          "        \"expectedStoreRevision\": 1,",
+          "        \"expectedCandidateFingerprint\": \"76d02dcf4bf5a789f8dc2155843b944192d09d9d035d882f613050cccd6e4fbd\"",
+          "      }",
+          "    }",
+          "  },",
+          "  \"vendorOrGenerationInvoked\": false,",
+          "  \"next\": \"没有待登记候选；--apply 只会进行幂等核验。\"",
+          "}"
+        ]
+      },
+      "stderr": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717/05-migration-readonly-first.stderr.log",
+        "bytes": 169,
+        "sha256": "8875939f9b886b203d4139704c9c98c1db579a1f1e725d6f2d30776363753558",
+        "tail": [
+          "(node:57664) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)"
+        ]
+      }
+    },
+    "migrationReadOnlySecond": {
+      "name": "06-migration-readonly-second",
+      "argv": [
+        "npx",
+        "tsx",
+        "scripts/migrate-p4-fusion-storyboard-sheets.ts",
+        "--workspace",
+        "/Users/hxx/Documents/无限画布",
+        "--project-root",
+        "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+        "--source-root",
+        "/Users/hxx/Documents/古蜀卷第三季"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T14:53:47.490Z",
+      "endedAt": "2026-07-17T14:53:48.228Z",
+      "durationMs": 738,
+      "exitCode": 0,
+      "termination": {
+        "timeoutMs": 600000,
+        "timedOut": false,
+        "signalsSent": []
+      },
+      "stdout": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717/06-migration-readonly-second.stdout.log",
+        "bytes": 6989,
+        "sha256": "1560e8a64eb545c005d805a9aaef645fedd5534f3808e5ef5065db48ab808e1c",
+        "tail": [
+          "            \"role\": \"png\",",
+          "            \"path\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.png\",",
+          "            \"pageIndex\": 1,",
+          "            \"pageCount\": 1,",
+          "            \"sha256\": \"8600c46fe40ad797927c68c1bc09072556646a423f5edeb8a14fa90697e1e06e\",",
+          "            \"bytes\": 4472760",
+          "          },",
+          "          {",
+          "            \"role\": \"svg\",",
+          "            \"path\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.svg\",",
+          "            \"pageIndex\": 1,",
+          "            \"pageCount\": 1,",
+          "            \"sha256\": \"420d0cc54a7685a4d58e9f5b3145e8cf1c8248a31483d45d19e61a334b0448de\",",
+          "            \"bytes\": 1184873",
+          "          },",
+          "          {",
+          "            \"role\": \"receipt\",",
+          "            \"path\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json\",",
+          "            \"pageCount\": 1,",
+          "            \"sha256\": \"7cb26385590c783a6d3af4318a3c53586b15ef5b38e7336425960fbc2e2e6f44\",",
+          "            \"bytes\": 3843",
+          "          }",
+          "        ],",
+          "        \"reason\": \"schema-v1 历史板绑定旧 Review/requirement，但未冻结 P4 当前完整证据，只能登记为 stale\",",
+          "        \"pending\": false",
+          "      },",
+          "      {",
+          "        \"sheetId\": \"legacy-sheet-d75625366c9b08f7fbbb8802741789b0\",",
+          "        \"receiptPath\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json\",",
+          "        \"itemId\": \"season-三-ep01-unit001\",",
+          "        \"status\": \"legacy-invalid\",",
+          "        \"contractId\": \"grid-6c02035d032128e0f62a\",",
+          "        \"artifacts\": [",
+          "          {",
+          "            \"role\": \"receipt\",",
+          "            \"path\": \"/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json\",",
+          "            \"pageCount\": 1,",
+          "            \"sha256\": \"f509797e0aef7793fcbf8e72a7b58a0b49e039cd247399032edde5227d0d1148\",",
+          "            \"bytes\": 3589",
+          "          }",
+          "        ],",
+          "        \"reason\": \"schema-v1 历史 receipt 未同时绑定 Review/requirement，只登记 receipt 且永久 legacy-invalid\",",
+          "        \"pending\": false",
+          "      }",
+          "    ]",
+          "  },",
+          "  \"command\": {",
+          "    \"requestId\": \"p4-sheet-migration-ba6b49724cec31be6d8a1aba8ace0cec419a4c8a696dfc3b\",",
+          "    \"idempotencyKey\": \"p4-sheet-migration-ba6b49724cec31be6d8a1aba8ace0cec419a4c8a696dfc3b\",",
+          "    \"request\": {",
+          "      \"command\": \"migrate_fusion_storyboard_sheets\",",
+          "      \"payload\": {",
+          "        \"expectedStoreRevision\": 1,",
+          "        \"expectedCandidateFingerprint\": \"76d02dcf4bf5a789f8dc2155843b944192d09d9d035d882f613050cccd6e4fbd\"",
+          "      }",
+          "    }",
+          "  },",
+          "  \"vendorOrGenerationInvoked\": false,",
+          "  \"next\": \"没有待登记候选；--apply 只会进行幂等核验。\"",
+          "}"
+        ]
+      },
+      "stderr": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717/06-migration-readonly-second.stderr.log",
+        "bytes": 169,
+        "sha256": "7a9d5722d4ef54ef5ea854d7e7b91ca96c8c7034886c301cd46ed967e287a2d8",
+        "tail": [
+          "(node:57822) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+          "(Use `node --trace-warnings ...` to show where the warning was created)"
+        ]
+      }
+    },
+    "mcpReadOnly": {
+      "name": "07-compiled-mcp-readonly",
+      "argv": [
+        "npx",
+        "tsx",
+        "scripts/mcp-p4-storyboard-sheet-smoke.ts",
+        "--workspace",
+        "/Users/hxx/Documents/无限画布",
+        "--project-root",
+        "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+        "--migration-evidence",
+        "/Users/hxx/Documents/无限画布/docs/evidence/p4-fusion-storyboard-sheet-migration-final-20260717.json"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-17T14:53:48.229Z",
+      "endedAt": "2026-07-17T14:54:38.623Z",
+      "durationMs": 50394,
+      "exitCode": 0,
+      "termination": {
+        "timeoutMs": 300000,
+        "timedOut": false,
+        "signalsSent": []
+      },
+      "stdout": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717/07-compiled-mcp-readonly.stdout.log",
+        "bytes": 257,
+        "sha256": "d9c66f51de8c7bb5dfcb30e38ccb4c9529f1aa1bccb05f33f97aeaea439893fb",
+        "tail": [
+          "{",
+          "  \"passed\": true,",
+          "  \"toolCount\": 165,",
+          "  \"ep01_001\": {",
+          "    \"current\": 0,",
+          "    \"history\": [",
+          "      \"stale\",",
+          "      \"legacy-invalid\"",
+          "    ]",
+          "  },",
+          "  \"ep01_008\": {",
+          "    \"current\": 0,",
+          "    \"panelCount\": 6",
+          "  },",
+          "  \"migrationReplayed\": true,",
+          "  \"guardedUnchanged\": true",
+          "}"
+        ]
+      },
+      "stderr": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717/07-compiled-mcp-readonly.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tail": []
+      }
+    }
+  },
+  "runLogInventory": {
+    "root": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p4-storyboard-sheet-final-20260717",
+    "files": 14,
+    "bytes": 40245,
+    "aggregateSha256": "40de117bf1ea3acd401c848b12edfe30c7c45ca2139a66e0ea53dcd8aa5f9f79",
+    "jsonRowsSha256": "4ed00b053cc921bc83333e9853b07d04426e3752a48d1cd765ea0faaf0e1348f"
+  },
+  "liveRunEvidence": {
+    "migrationReadOnly": {
+      "candidateFingerprint": "76d02dcf4bf5a789f8dc2155843b944192d09d9d035d882f613050cccd6e4fbd",
+      "storeRevision": 1,
+      "candidateCount": 2,
+      "pendingCount": 0,
+      "exactSemanticReplay": true,
+      "vendorOrGenerationInvoked": false
+    },
+    "compiledMcp": {
+      "passed": true,
+      "toolCount": 165,
+      "ep01_001": {
+        "current": 0,
+        "history": [
+          "stale",
+          "legacy-invalid"
+        ]
+      },
+      "ep01_008": {
+        "current": 0,
+        "panelCount": 6
+      },
+      "migrationReplayed": true,
+      "guardedUnchanged": true
+    },
+    "namedRegressions": {
+      "verboseReporter": true,
+      "passedNames": [
+        "P4 migration 业务 store 落盘后、终态事件前崩溃时由候选指纹确定恢复且不重复登记",
+        "reconcile_command 可使用账本内 P4 请求快照从业务 store 对账，并回写独立事务根",
+        "P4 render 已登记 current receipt/store 后崩溃只做确定性对账与补扫，不再次渲染或登记",
+        "默认 contain 不裁图；显式 focal/rect crop 归一化并冻结实际像素审计",
+        "从绝对路径派生 current/stale/invalid/legacy-invalid 及精确原因",
+        "拒绝把 v2 或历史 Artifact 登记到工程根外",
+        "越界输出和符号链接输出失败关闭，不产生迁移索引",
+        "逐格宫格任务各自冻结唯一参考板，首中尾可并存且同格拒绝重复"
+      ],
+      "cropPolicyRetentionAssertionsPresent": true,
+      "companionReceiptIndependentValidationAssertionsPresent": true,
+      "infoPathRealpathAndSymlinkContainmentAssertionsPresent": true
+    }
+  },
+  "productionFreeze": {
+    "enabled": true,
+    "formalProjectWritesByValidator": false,
+    "scannerMode": "read-only-rescan-must-match-preexisting-persisted-projection",
+    "browserOrVendorInvokedByValidator": false,
+    "imageGenerationInvokedByValidator": false,
+    "reviewSubmittedToFormalProject": false,
+    "unknownJobClaimedOrRetried": false,
+    "guardedIdentityUnchanged": true
+  },
+  "assertions": {
+    "source3344Files24570877BytesAndAggregateShaExact": true,
+    "sourceUnchangedDuringValidation": true,
+    "sourceCodeDigestStableDuringValidation": true,
+    "gatedP4PlanningAttestationValidAndStable": true,
+    "p2StrictCurrentBeforeAndAfterWith1288Contracts4330Panels": true,
+    "p3CurrentBeforeAndAfterWith1288Contracts4330Constraints": true,
+    "formalP4StoreRevisionOneWithZeroCurrentAndTwoHistorical": true,
+    "persistedScannerProjectionMatchesReadOnlyRescanExactly": true,
+    "scannerHasFourNonAuthoritativeHistoricalArtifacts": true,
+    "ep01Unit001CurrentZeroWithStaleAndLegacyInvalid": true,
+    "ep01Unit001NoFabricatedP3ReviewAndTwentyEightRulesRemainRequired": true,
+    "ep01Unit008CurrentZeroFourOfSixUnknownPlusMissing": true,
+    "unknownPanelFiveAttemptAndReservedPublicationBundleRemainUnclaimed": true,
+    "thirtyJobs31Intents26ReceiptsAnd52RawLabeledFilesPreserved": true,
+    "migrationEvidenceAndTwoFreshReadOnlyPreviewsAreIdempotent": true,
+    "compiledMcpDiscoversExactly165ToolsWithoutWrites": true,
+    "existingMcpEvidenceMatchesCurrentFormalState": true,
+    "uiEvidenceAndTwoDecodableScreenshotsMatchCurrentFormalState": true,
+    "uiReportedZeroExternalRequestsInItsPostFirstWindowObservationInterval": true,
+    "uiStartupNetworkWasNotOverclaimedByThisValidator": true,
+    "twoAndSixPanelLongChineseContainAndExplicitCropFixturesPassed": true,
+    "isolatedCurrentReceiptStoreScannerAndIdempotentReplayPassed": true,
+    "isolatedOrphanInputDriftAndOldFingerprintFailClosed": true,
+    "crashReconcileCropRetentionLegacyTamperAndPathContainmentRegressionsPassed": true,
+    "companionReceiptIndependentValidationRegressionPassed": true,
+    "storyboardInfoPathRealpathAndSymlinkFailClosedRegressionPassed": true,
+    "uiEvidenceGuardIncludesFormalProjectIndex": true,
+    "formalSidecarRequestsDownloadsStagingMediaAndSheetArtifactsUnchanged": true,
+    "externalEvidenceFilesStableDuringCloseout": true,
+    "allSevenCommandRunsExitedZeroWithFourteenExclusiveShaBoundLogs": true
+  }
+}

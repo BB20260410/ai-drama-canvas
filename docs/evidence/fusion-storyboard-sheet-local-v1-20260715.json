@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "kind": "fusion-storyboard-sheet-visual-evidence",
+  "fixtureOnly": true,
+  "fixtureNotice": "本文件只证明本地中文故事板排版与机械门禁，不冒充正式第三季生图资产。",
+  "reference": {
+    "path": "/Users/hxx/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_5301013010611_6204/temp/RWTemp/2026-07/9e20f478899dc29eb19741386f9343c8/b5ed6bfde193cebf2f04c82406d145dc.jpg",
+    "sha256": "6d69a4b7823db780192df1cb45a3a1c09bccf6a9a21856a6234ce8c62129beb8",
+    "width": 720,
+    "height": 1280,
+    "readOnly": true
+  },
+  "contract": {
+    "id": "grid-f72ff21022286f32eca7",
+    "sourceFingerprint": "ccb076739002e3c22223a9128c98e57cc233c6d0ad41f1ab9bf8388c44383a99",
+    "unitId": "EP01_15s_001",
+    "panelCount": 6,
+    "durationSeconds": 15,
+    "layout": {
+      "template": "portrait-storyboard-table",
+      "pageOrientation": "portrait",
+      "pageAspectRatio": "9:16",
+      "gridColumns": 1,
+      "gridRows": 6,
+      "headerPlacement": "top-full-width",
+      "footerPlacement": "bottom-full-width",
+      "panelCellModel": "image-left-details-columns",
+      "detailFieldOrder": [
+        "imageContentAction",
+        "shotComposition",
+        "shootingMethod",
+        "continuitySound",
+        "dialogueSubtitle",
+        "duration"
+      ]
+    },
+    "localRendering": {
+      "engine": "svg-sharp",
+      "language": "zh-CN",
+      "textRendering": "local-only",
+      "panelImageMode": "one-image-per-panel",
+      "assetReferenceMode": "one-image-per-asset",
+      "aiImageContainsText": false,
+      "fontFallbacks": [
+        "PingFang SC",
+        "Noto Sans CJK SC",
+        "Microsoft YaHei",
+        "sans-serif"
+      ],
+      "outputArtifacts": [
+        "panel-images",
+        "storyboard-svg",
+        "storyboard-png"
+      ],
+      "outputInstructions": [
+        "每格先单独生成一张无文字纯画面，不让生图模型绘制中文表格。",
+        "资产参考图继续保持一图一资产，不把多个资产预先拼成一张参考图。",
+        "再由本地 SVG 按 panel.layout 排布画面和 tableFields，使用中文字体回退链。",
+        "最后用 Sharp 将 SVG 渲染为竖版 PNG，保留顶部单元元数据和底部节奏链。"
+      ],
+      "negativePrompt": "纯画面，画面内不要任何中文、英文、字母、数字、字幕、标题、表格线、水印或界面元素。"
+    }
+  },
+  "output": {
+    "png": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-local-v1-20260715.png",
+      "sha256": "4965a57cde1c9a177cf716ea6512b88d8635caca923ba3a11fca8ed1bd9384dd",
+      "bytes": 1699584
+    },
+    "svg": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-local-v1-20260715.svg",
+      "sha256": "fea0feb2e3dfa269f242644b1bf34c8e51d2fedbd4178a17b87afd71cdbbe0b7",
+      "bytes": 176736
+    },
+    "width": 2160,
+    "height": 3840
+  },
+  "panelImages": [
+    {
+      "panelId": "EP01_15s_001-panel-01",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-local-v1-20260715-panels/宫格01_首帧.png",
+      "sha256": "c5da3d76ba55fe5056b829f8eb68bf65a96163e52ab11c6e0927492b97108742",
+      "bytes": 449348,
+      "width": 2160,
+      "height": 3840,
+      "format": "png"
+    },
+    {
+      "panelId": "EP01_15s_001-panel-02",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-local-v1-20260715-panels/宫格02_中间帧.png",
+      "sha256": "ffaffa761be70b0406b879658c421d3181f6c70c44e5ee17f5e0d211a7f9eb0b",
+      "bytes": 450200,
+      "width": 2160,
+      "height": 3840,
+      "format": "png"
+    },
+    {
+      "panelId": "EP01_15s_001-panel-03",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-local-v1-20260715-panels/宫格03_中间帧.png",
+      "sha256": "b8dc78f63aa616e417592ea77dcb0504a013d08edf3deb60c4c187e0af774560",
+      "bytes": 391300,
+      "width": 2160,
+      "height": 3840,
+      "format": "png"
+    },
+    {
+      "panelId": "EP01_15s_001-panel-04",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-local-v1-20260715-panels/宫格04_中间帧.png",
+      "sha256": "b8b43ef1182691fbc8c403b88d3b4a18aa9640791b749f0e791ac9f0aff2851e",
+      "bytes": 397719,
+      "width": 2160,
+      "height": 3840,
+      "format": "png"
+    },
+    {
+      "panelId": "EP01_15s_001-panel-05",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-local-v1-20260715-panels/宫格05_中间帧.png",
+      "sha256": "0b58026b122ae014222e3c702c0fa4a7418d170a3456c6f94e958b02c390c805",
+      "bytes": 360016,
+      "width": 2160,
+      "height": 3840,
+      "format": "png"
+    },
+    {
+      "panelId": "EP01_15s_001-panel-06",
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-local-v1-20260715-panels/宫格06_尾帧.png",
+      "sha256": "60e6d76dc1496fd962b30d8609549b17dda434411509ebff8d95fea2bab77c0e",
+      "bytes": 273048,
+      "width": 2160,
+      "height": 3840,
+      "format": "png"
+    }
+  ],
+  "mechanicalChecks": {
+    "pngDecodable": true,
+    "pngDimensions": [
+      2160,
+      3840
+    ],
+    "portraitAspectRatio": true,
+    "localChineseMarkersPresent": true,
+    "embeddedPanelImages": true,
+    "externalFileUris": false,
+    "allInputHashesMatched": true
+  }
+}

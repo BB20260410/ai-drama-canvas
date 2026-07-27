@@ -1,0 +1,19 @@
+{
+  "url": "file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/dist/mac-arm64/AI%20%E6%BC%AB%E5%89%A7%E7%94%BB%E5%B8%83.app/Contents/Resources/app.asar/out/renderer/index.html",
+  "loading": false,
+  "visible": true,
+  "bounds": {
+    "x": 84,
+    "y": 33,
+    "width": 1560,
+    "height": 980
+  },
+  "rendererState": {
+    "readyState": "complete",
+    "title": "AI 漫剧画布",
+    "bodyText": "AI\n漫剧画布\n\n尚未导入项目\n\n项目\n本地项目\n导入后才开始扫描\n\n选择或拖入一个 AI 漫剧项目目录。画布先展示识别结果、忽略规则和风险，确认后才建立可恢复侧车。\n\n选择项目目录\n识别 00_信息.md、15 秒单元、raw/labeled 与视频\n旧版、弃用和备份只作为历史版本\n不删除、不移动、不覆盖现有素材",
+    "bodyWidth": 1560,
+    "bodyHeight": 980,
+    "moduleButtons": []
+  }
+}

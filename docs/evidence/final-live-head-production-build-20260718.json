@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "final-live-head-production-build",
+  "status": "pass",
+  "startedAt": "2026-07-18T08:11:46.797Z",
+  "endedAt": "2026-07-18T08:12:03.793Z",
+  "durationMs": 17044,
+  "argv": [
+    "npm",
+    "run",
+    "build"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "735e6e6bb392590d46b3b8a963ccef61",
+      "sourceDigest": "2c100ebb68bb957c03dc338b6665b03dd4f6cf2d9650552cc0218f7158918544"
+    },
+    "after": {
+      "buildId": "735e6e6bb392590d46b3b8a963ccef61",
+      "sourceDigest": "2c100ebb68bb957c03dc338b6665b03dd4f6cf2d9650552cc0218f7158918544"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/runs/final-live-head-production-build-20260718.log",
+    "sizeBytes": 8686,
+    "sha256": "2a6be78d883b305dcd6d8e81501379d0497ac0e3523c1e9b7ee9ddeaa4c7ebaa"
+  }
+}

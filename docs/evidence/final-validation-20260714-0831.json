@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T00:31:28Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "goal": {
+    "name": "AI 漫剧无限画布",
+    "status": "active",
+    "mode": "research-and-development"
+  },
+  "priorityRevalidation": {
+    "handoffPriorityAtStart": "http-submission-unknown-structured-reconciliation-write-api",
+    "stillValidAtStart": true,
+    "completedThisRun": true,
+    "reason": "HTTP submit disconnect was non-replayed but had no revisioned idempotent found or not_found write path; untrusted Publication terminal text could also release the duplicate-submission lock"
+  },
+  "slice": {
+    "name": "http-submission-unknown-structured-reconciliation-and-publication-provenance",
+    "complete": true,
+    "httpCheckpointIndependentRevision": true,
+    "foundRequiresStableExternalTaskId": true,
+    "notFoundRequiresExplicitNoRemoteResultConfirmation": true,
+    "stableEvidenceReferenceRequired": true,
+    "staleRevisionRejectedBeforeSideEffects": true,
+    "reconciliationNetworkRequests": 0,
+    "foundPreservesClientJobIdAndAttempt": true,
+    "foundTransitionsOnlyToWaitingRemote": true,
+    "notFoundClosesPublicationBeforeJob": true,
+    "publicationRegisteredWinsRaces": true,
+    "generationPublicationTerminalRequiresStructuredProvenance": true,
+    "untrustedPublicationTerminalKeepsDuplicateLock": true,
+    "browserDownloadedProcessingScope": "single-job",
+    "historicalRegisteredProjectionIsStatusIdempotent": true,
+    "continuationCheckpointProjection": true,
+    "mcpResultsSanitized": true
+  },
+  "tests": {
+    "typecheck": {
+      "success": true
+    },
+    "targeted": {
+      "success": true,
+      "testFiles": 8,
+      "tests": 49
+    },
+    "crossProcessWorkflowRegression": {
+      "success": true,
+      "testFiles": 2,
+      "tests": 2,
+      "covered": [
+        "full-workflow",
+        "mcp-headless-workflow"
+      ]
+    },
+    "full": {
+      "success": true,
+      "testFiles": 32,
+      "passedTestFiles": 32,
+      "failedTestFiles": 0,
+      "tests": 188,
+      "passedTests": 188,
+      "failedTests": 0,
+      "pendingTests": 0,
+      "durationSeconds": 66.74
+    },
+    "compiledMcpGeneration": {
+      "success": true,
+      "testFiles": 2,
+      "tests": 2
+    },
+    "initialFullRunRegression": {
+      "observed": true,
+      "failedTestFiles": 2,
+      "cause": "registered Publication was reprojected on every later queue pass and demoted an already reviewed completed item back to awaiting video review",
+      "fixed": true,
+      "finalFullRunGreen": true
+    }
+  },
+  "build": {
+    "success": true,
+    "mainBytes": 803889,
+    "preloadBytes": 17308,
+    "rendererJavaScriptBytes": 1269518,
+    "mcpServerBytes": 184561
+  },
+  "mcp": {
+    "smokeSuccess": true,
+    "toolCount": 134,
+    "resourceTemplateCount": 9,
+    "promptCount": 7,
+    "newTool": "reconcile_http_generation_submission",
+    "commandBusSupport": true,
+    "expectedRevisionRequired": true,
+    "requestIdRequiredByGuard": true,
+    "idempotencyKeyRequiredByGuard": true,
+    "generationSummarySanitized": true,
+    "generationResourceSanitized": true,
+    "commandReplayAndLedgerSanitized": true
+  },
+  "httpReconciliationSmoke": {
+    "success": true,
+    "path": "docs/evidence/http-generation-reconciliation-smoke-20260714.json",
+    "sha256": "5918fde088f2d861784d89380b5effb4e208f813358e6075dd95d8ff06ed8be3",
+    "caseCount": 9,
+    "submitRequests": 6,
+    "foundPostCountBeforeAndAfter": 5,
+    "foundFreshNodeStatus": "succeeded",
+    "foundPublicationStatus": "registered",
+    "notFoundPostCountBeforeAndAfter": 6,
+    "notFoundPublicationStatus": "failed",
+    "replacementJobStatus": "queued",
+    "partialBytesBeforeSigkill": 5587,
+    "sourceBytes": 16763,
+    "freshNodePartialRecovery": true,
+    "finalShaMatchesSource": true,
+    "projectLocksAtEnd": 0,
+    "activeMediaWeightAtEnd": 0,
+    "mediaQueueDepthAtEnd": 0,
+    "transientFilesAtEnd": 0,
+    "isolatedProjectRemoved": true,
+    "registryRemoved": true,
+    "serverClosed": true
+  },
+  "publicationConsistencySmoke": {
+    "success": true,
+    "path": "docs/evidence/publication-consistency-http-reconciliation-20260714.json",
+    "sha256": "6d06cb02308a763564c619332bdf1de3a0b2b25d993a2b1765be2229a0e887dd",
+    "intentCounts": {
+      "reserved": 0,
+      "registered": 4,
+      "cancelled": 2,
+      "failed": 0
+    },
+    "receiptCount": 4,
+    "twoPhaseValidationOutsideProjectLock": true,
+    "strongFileCas": true,
+    "cancellationWinsStaleValidation": true,
+    "crossProcessUniqueReceiptCount": 1,
+    "crashRecoveryFromReserved": true,
+    "projectLocksAtEnd": 0,
+    "activeMediaWeightAtEnd": 0,
+    "mediaQueueDepthAtEnd": 0
+  },
+  "cleanup": {
+    "diagnosticProjectRemoved": true,
+    "diagnosticRegistryRemoved": true,
+    "workspacePartialOrPublishTemporaryFiles": 0,
+    "workspaceProjectLockFiles": 0,
+    "orphanSmokeWorkerProcesses": 0,
+    "preExistingLongLivedMcpServerProcessesObservedAndLeftUntouched": true
+  },
+  "signedDmg": {
+    "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "bytes": 136652595,
+    "sha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972",
+    "overwritten": false,
+    "notarized": false,
+    "representsCurrentSource": false
+  },
+  "git": {
+    "branch": "main",
+    "repositoryHasCommits": false,
+    "workingTree": "entire workspace remains untracked",
+    "destructiveGitOperationPerformed": false,
+    "commitCreated": false,
+    "pushPerformed": false,
+    "pullRequestCreated": false
+  },
+  "boundaries": {
+    "oldThreadJsonlRead": false,
+    "formalProjectRootsTouched": false,
+    "externalCreativeDirectoriesTouched": false,
+    "realProviderCalled": false,
+    "websiteOpened": false,
+    "uploadsPerformed": false,
+    "paidSubmissionsPerformed": false,
+    "externalAssetsOverwritten": false,
+    "softwareInstalled": false,
+    "softwarePublished": false,
+    "notarizationPerformed": false
+  },
+  "sourceHashes": {
+    "src/core/types.ts": "e20b578688501b78c19c0329888f63b9968a744e687409413d7f1b7a3b355e63",
+    "src/core/publication.ts": "cf013be24e4e1bc3ee432adb94a9a93991febaf59063dcac0ceee8c78276c2ac",
+    "src/core/generation.ts": "d57bba3dfaa92db50c52757acdd197e5875793052039f3d045a1f286ff51fe3c",
+    "src/core/command-bus.ts": "ac0c729bfd4ed093d155afda0b8f414c6895f15b60fd0bcb658f68e8e4b484f7",
+    "src/core/codex.ts": "cb428442eb5c00c86117c2a03bdad7f16e34a95f9f8a15bb7959a1909e1fa9c3",
+    "src/core/memory.ts": "f407e55ad9d93ac3988a19ce85a70dc17faf77d996eb559d3441dd976b313eea",
+    "src/mcp/server.ts": "f781e7a65a374c75d0a034d1baddbd9eb1d1ebe6ed20aa36d8b8cc022d3c2dd3",
+    "tests/http-submission-reconciliation.test.ts": "ddb4d3c083078ab050232a9fbe3dfa457343829abfcbeb90e54aab12fbbc674a",
+    "tests/advanced.test.ts": "94d37af02669358acbf9facb015ee788c3833eeb349ebeed30a6e04a01b23149",
+    "tests/mcp-generation-observation.test.ts": "73f7281e77c89c5bfb18229d699a06f9a70ac2b2893907c8667f18cd8d3c954c",
+    "scripts/http-generation-resilience-smoke.ts": "0506aa94b313a0cd81f986a6f4bea82603711f84a9fdaecd8e8a8c6d85f4b6b0",
+    "package.json": "ff98d0910d3fff9e7ed4e49a74bd1412deb65ed8881297f480433f6401c17985"
+  },
+  "documentationHashes": {
+    "README.md": "fd454f459c3f3582e6cee03fbea330b0a3de61e853d06b1548d571a099d356e3",
+    "docs/CODEX_MCP.md": "8e57ae1928a34b0c4d06fd057e24704d3c0e8f8ad03fbf352c75a8c079dd7ea6",
+    "docs/当前开发交接.md": "ea91a0c9e6e3d2eb1d64a94b4dca1c2f1f03de5b54c272d6a40b60de007cb5f7",
+    "docs/验证报告_HTTP提交不明结构化对账_2026-07-14.md": "291c12597bcbf945a92d5ce9618dd060f8c0a1032dff4d9c4aaaf7bafb65f1fd"
+  },
+  "nextUniqueHighestPriority": {
+    "priority": "P1",
+    "id": "comfyui-local-dedicated-recoverable-adapter",
+    "reason": "comfyui-api is only a stored workflow format; GenerationAdapterType has no dedicated local ComfyUI executor and no prompt_id queue history output ownership or confirmed cancellation contract",
+    "acceptance": [
+      "reuse GenerationJob ExecutionSnapshot Publication and command idempotency without a second task state machine",
+      "persist stable client identity and prompt_id before polling so restart never resubmits the same prompt",
+      "treat queue history and verified output files as facts while WebSocket progress remains advisory",
+      "bind output to prompt_id output node and file identity before isolated decode sha256 and no-clobber publication",
+      "distinguish running interrupt from pending queue deletion and reject unconfirmed local cancellation",
+      "expose sanitized capability Doctor snapshot MCP continuation and recovery actions",
+      "prove submit queue running history success failure disconnect restart cancellation race output conflict and cleanup with a local protocol loopback"
+    ],
+    "requiresAdditionalAuthorizationForCurrentSlice": false,
+    "realLocalComfyUiCompatibilityCalibrationRequiresUserAuthorization": true,
+    "after": [
+      "complex-nested-timelines",
+      "third-party-effect-transition-compatibility",
+      "formal-project-calibration"
+    ]
+  }
+}

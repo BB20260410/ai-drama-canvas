@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "managed-studio-scale-canvas-current-head-after-jf1",
+  "status": "fail",
+  "startedAt": "2026-07-18T07:54:23.049Z",
+  "endedAt": "2026-07-18T07:54:35.290Z",
+  "durationMs": 12285,
+  "argv": [
+    "npm",
+    "run",
+    "ui:managed-studio-scale-canvas-smoke",
+    "--",
+    "docs/evidence/managed-studio-scale-canvas-ui-smoke-20260718-after-jf1.json",
+    "docs/evidence/managed-studio-scale-canvas-ui-smoke-20260718-after-jf1.png"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 1,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "feebaf32e0df7abe6f97d40992a15c64",
+      "sourceDigest": "fd8936cc3cf76d3bb50e0d18af751eeb1e6cbe8b551b7c23f5d06307d5a25700"
+    },
+    "after": {
+      "buildId": "feebaf32e0df7abe6f97d40992a15c64",
+      "sourceDigest": "fd8936cc3cf76d3bb50e0d18af751eeb1e6cbe8b551b7c23f5d06307d5a25700"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/runs/managed-studio-scale-canvas-ui-command-20260718-after-jf1.log",
+    "sizeBytes": 9959,
+    "sha256": "396c0a40916a684f446f81f45770aa5a84e8d823b3b7be73d15fa78a28b6e450"
+  }
+}

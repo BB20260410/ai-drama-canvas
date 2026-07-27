@@ -1,0 +1,111 @@
+{
+  "kind": "p2-assist-metrics",
+  "createdAt": "2026-07-25T09:27:12.379Z",
+  "projects": [
+    {
+      "name": "isolation",
+      "projectRoot": "/Users/hxx/Documents/无限画布/projects/grok-mvp-qingdeng-mrwc97mu-d0aea463",
+      "season": "S1",
+      "episode": "S1E1",
+      "elapsedMs": 1212,
+      "counts": {
+        "units": 1,
+        "panels": 3,
+        "panelsEstimated": 3,
+        "scriptDocuments": 3,
+        "promptDocuments": 6,
+        "characters": 1,
+        "scenes": 1,
+        "props": 1,
+        "canonicalAssets": 3,
+        "media": 10,
+        "assetBindingSets": 6,
+        "mentionProposals": 15
+      },
+      "projection": {
+        "unitCount": 1,
+        "summary": {
+          "pass": 1,
+          "pendingReview": 0,
+          "inProgress": 0,
+          "failed": 0,
+          "blocked": 0
+        },
+        "passWithRaw": 1,
+        "passTotal": 1,
+        "rawCoverageOfPass": 1
+      },
+      "scriptMediaAlign": {
+        "unitCount": 1,
+        "coveredCount": 1,
+        "partialCount": 0,
+        "missingAllCount": 0,
+        "coveredRate": 1
+      },
+      "mediaSample": {
+        "listed": 8,
+        "withThumbnail": 8,
+        "thumbnailRate": 1
+      },
+      "consistencyAssist": {
+        "note": "四态评价 per-unit；本波记投影/对照覆盖，不伪造成片级一致",
+        "machineAutoPassForbidden": true
+      }
+    },
+    {
+      "name": "dudu-s1e1",
+      "projectRoot": "/Users/hxx/Documents/无限画布/projects/dudu-s1e1-a84aa353",
+      "season": "S1",
+      "episode": "S1E1",
+      "elapsedMs": 14833,
+      "counts": {
+        "units": 33,
+        "panels": 112,
+        "panelsEstimated": 112,
+        "scriptDocuments": 1,
+        "promptDocuments": 112,
+        "characters": 3,
+        "scenes": 9,
+        "props": 7,
+        "canonicalAssets": 19,
+        "media": 103,
+        "assetBindingSets": 123,
+        "mentionProposals": 395
+      },
+      "projection": {
+        "unitCount": 33,
+        "summary": {
+          "pass": 33,
+          "pendingReview": 0,
+          "inProgress": 0,
+          "failed": 0,
+          "blocked": 0
+        },
+        "passWithRaw": 33,
+        "passTotal": 33,
+        "rawCoverageOfPass": 1
+      },
+      "scriptMediaAlign": {
+        "unitCount": 33,
+        "coveredCount": 5,
+        "partialCount": 0,
+        "missingAllCount": 28,
+        "coveredRate": 0.15151515151515152
+      },
+      "mediaSample": {
+        "listed": 36,
+        "withThumbnail": 36,
+        "thumbnailRate": 1
+      },
+      "consistencyAssist": {
+        "note": "四态评价 per-unit；本波记投影/对照覆盖，不伪造成片级一致",
+        "machineAutoPassForbidden": true
+      }
+    }
+  ],
+  "pass": true,
+  "interpretation": {
+    "lockRef": "freeze controlRefs 在生图环强制；pass+raw 与 align covered 作辅助力度量",
+    "notClaimed": "永不漂 / 100% 契合"
+  }
+}

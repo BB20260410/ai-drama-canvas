@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T19:57:30+08:00",
+  "success": true,
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "slice": "review-artifact-content-identity-and-phase-evidence",
+  "goalStatus": "active",
+  "entireLongTermGoalComplete": false,
+  "priorityRevalidation": {
+    "handoffProductPriority": "real-project-nle-validation",
+    "handoffProductPriorityStillValid": true,
+    "formalProjectAuthorizationPresent": false,
+    "formalProjectValidationClosed": false,
+    "safeLocalP1Found": "same-path media replacement could preserve artifactId and stale review completion",
+    "safeLocalP1Completed": true
+  },
+  "contentIdentityContract": {
+    "artifactIdMeaning": "stable logical path identity",
+    "reviewEvidenceMeaning": "immutable rootSlot, relativePath, kind, variant, size and sha256 snapshot",
+    "phaseEvidence": [
+      "image",
+      "video"
+    ],
+    "unitVideoStagesRequireCurrentImagePass": true,
+    "unitCompletionRequiresCurrentImageAndVideoPass": true,
+    "shotCompletionRequiresCurrentImagePass": true,
+    "imageEvidenceDriftFallback": "待视觉验收",
+    "videoEvidenceDriftFallback": "待视频验收",
+    "generationStatusPreservesPhaseEvidence": true,
+    "videoSubmitRevalidatesImagesBeforeAndAfterFinalScan": true,
+    "postRecordStatusScanRequired": true,
+    "postRecordDriftOutcome": "confirmed failure with historical record preserved and status not advanced",
+    "expectedScanIdSemantics": "snapshot provenance only; content CAS is expectedArtifactHashes plus targeted rescans",
+    "legacyArtifactIdsOnlyTrusted": false,
+    "legacyQueueTwoPassHashRecovery": true,
+    "historicalHashScope": "override-referenced records and bounded legacy phase candidates, not all review history"
+  },
+  "mcpContract": {
+    "currentAuthoritativeArtifactsPrioritizedBeforeLimit": true,
+    "artifactDisplayLimit": 20,
+    "artifactTotalReturned": true,
+    "artifactsTruncatedReturned": true,
+    "twelveVersionFixtureCurrentV12ArtifactsVisible": 4,
+    "staleSubmitLedgerStatus": "failed",
+    "staleSubmitWritesReviewRecord": false,
+    "toolCount": 134,
+    "resourceTemplateCount": 9,
+    "promptCount": 7,
+    "missingForFullNle": [
+      "real-project-nle-validation"
+    ]
+  },
+  "concurrency": {
+    "overridesMutationLock": "project-level overrides lock",
+    "coveredWriters": [
+      "updateStatus",
+      "updateStatusOverridesBatch",
+      "setAuthoritativeArtifact"
+    ],
+    "differentItemConcurrentBatchRegression": true,
+    "reviewRejectionBeforeRecord": "RejectedCommandFailure",
+    "failureAfterRecord": "ConfirmedCommandFailure or unknown only when outcome cannot be confirmed"
+  },
+  "tests": {
+    "typecheck": {
+      "success": true
+    },
+    "build": {
+      "success": true,
+      "mainBytes": 963712,
+      "preloadBytes": 17526,
+      "rendererJsBytes": 1301175,
+      "mcpServerBytes": 187672
+    },
+    "reviewsAndCommandBus": {
+      "success": true,
+      "testFiles": 2,
+      "tests": 27
+    },
+    "scanner": {
+      "success": true,
+      "testFiles": 1,
+      "tests": 14
+    },
+    "mcpStdio": {
+      "success": true,
+      "testFiles": 1,
+      "tests": 1,
+      "coversMoreThanTwentyArtifactsAndStaleLedger": true
+    },
+    "mcpHeadlessSource": {
+      "success": true,
+      "transport": "source-stdio",
+      "tests": 1
+    },
+    "mcpHeadlessCompiled": {
+      "success": true,
+      "transport": "compiled-node",
+      "tests": 1
+    },
+    "full": {
+      "success": true,
+      "testFiles": 39,
+      "testSuites": 78,
+      "tests": 233,
+      "failed": 0,
+      "pending": 0,
+      "rawReporterPath": "/tmp/ai-canvas-full-vitest-review-content-identity-20260714-final2.json",
+      "rawReporterBytes": 87309,
+      "rawReporterSha256": "9ff0495ad3ea4796dc5feba1cace04446b26d5bd434f6cccc24c634b066fac04"
+    }
+  },
+  "electronUi": {
+    "success": true,
+    "transport": "source-electron-current-build",
+    "staleSubmitRejectedThroughUi": true,
+    "staleAttemptWroteNoReview": true,
+    "staleRejectAutoReloadedHash": true,
+    "staleRejectResetCriteria": true,
+    "recheckedPassSucceeded": true,
+    "laterSamePathDriftInvalidatedPass": true,
+    "pageErrors": 0,
+    "humanVisualInspection": true,
+    "screenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/review-content-identity-ui-20260714.png",
+      "bytes": 224246,
+      "sha256": "4f0975aecff695fdb9b917990e87d35316f0f8e1b96a4bd8d18968e764639b51",
+      "width": 1560,
+      "height": 980,
+      "brightRatio": 0.20791405023547882,
+      "chromaticRatio": 0.14951661433804292,
+      "edgeBrightRatios": {
+        "top": 0.04885858189429618,
+        "left": 0.048765342435906744,
+        "right": 0.05580903790087464
+      }
+    },
+    "evidenceJson": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/review-content-identity-ui-20260714.json",
+      "bytes": 3225,
+      "sha256": "273e22bc77421d4d75ca496b8725c12d6b82e3c51302470da85cb1f57faa0564"
+    }
+  },
+  "sourceIdentity": {
+    "src": {
+      "fileCount": 62,
+      "bytes": 1980680,
+      "manifestSha256": "b0946c109d945afaa9d9e014cfa85cbeb1ede12477c0d65cfa16d8342753faab"
+    },
+    "tests": {
+      "fileCount": 41,
+      "bytes": 671749,
+      "manifestSha256": "8926ab3b378f27a5e7a7dbbbe247ec4b8d5e1ee22ab066d98a8fb29084dab954"
+    }
+  },
+  "packagedRuntime": {
+    "revalidatedForThisSlice": false,
+    "reason": "no package build was authorized or required for this source and compiled-MCP slice",
+    "previousPackageEvidenceIsHistoricalUpstreamOnly": true,
+    "previousPackageContainsThisSlice": false
+  },
+  "protectedLegacyDmg": {
+    "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "bytes": 136652595,
+    "sha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972",
+    "containsThisSlice": false,
+    "touched": false
+  },
+  "boundaries": {
+    "formalProjectUsed": false,
+    "externalCreativeDirectoriesTouched": false,
+    "externalWebsiteUsed": false,
+    "networkUploadUsed": false,
+    "paidActionUsed": false,
+    "dmgGenerated": false,
+    "applicationInstalled": false,
+    "publicationPerformed": false,
+    "gitWritePerformed": false,
+    "oldThreadJsonlRead": false
+  }
+}

@@ -1,0 +1,216 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-15T21:54:00+08:00",
+  "status": "passed",
+  "slice": "gushujuan-s3-six-asset-consistency-gate-and-formal-bootstrap",
+  "summary": "第三季每6张资产的持久化一致性门禁已贯通核心、生成队列、网页提交前复验、hard-lock、融合参考板、Doctor、项目快照、命令总线、148-tool MCP 与 Electron UI；正式 P01+5 被安全接管为首批，既有任务和 Publication 未改写。正式图片仍为0，长期目标继续 active。",
+  "goal": {
+    "status": "active",
+    "complete": false,
+    "reason": "本轮完成软件与正式状态纵向切片；仍需完成 EP01 18 项新资产、71 对逐格 raw/labeled、34 张正式中文板，再逐集扩展至全季 1288 单元。"
+  },
+  "priorityAudit": {
+    "historicalTask": "EP22 Artlist",
+    "historicalTaskFrozen": true,
+    "nextUniqueHighestPriorityStillValid": true,
+    "nextUniqueHighestPriority": {
+      "title": "恢复同一 P01 布囊 Artlist job 并完成首批6项",
+      "status": "waiting_user_chrome_login",
+      "existingJobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+      "mustNotRequeue": true,
+      "userAction": "在 Chrome 手动登录 Artlist 后回复 Chrome 已登录",
+      "credentialHandling": "Codex 不读取、不保存、不输入凭据"
+    }
+  },
+  "sourceBoundary": {
+    "root": "/Users/hxx/Documents/古蜀卷第三季",
+    "mode": "read-only",
+    "writeback": false,
+    "fullDirectory": {
+      "files": 3344,
+      "bytes": 24570877,
+      "beforeAggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26",
+      "afterAggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26",
+      "unchanged": true
+    },
+    "controlledFusionInputs": {
+      "files": 1354,
+      "bytes": 14093144,
+      "beforeAggregateSha256": "f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+      "afterAggregateSha256": "f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+      "unchanged": true
+    }
+  },
+  "isolatedProject": {
+    "projectId": "gushujuan-s3-f1a688020bfb7af6",
+    "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+    "sourceContentAddress": "sha256:f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+    "counts": {
+      "episodes": 32,
+      "units": 1288,
+      "sourceShots": 1472,
+      "storyboardRows": 2640,
+      "assets": 77,
+      "characters": 24,
+      "scenes": 20,
+      "props": 33,
+      "continuityTracks": 77,
+      "continuitySpans": 4287
+    }
+  },
+  "assetConsistency": {
+    "sidecar": ".aicanvas/asset-consistency-batches.json",
+    "batchSize": 6,
+    "statusFlow": [
+      "collecting",
+      "generating",
+      "awaiting_item_reviews",
+      "awaiting_batch_review",
+      "passed",
+      "rework",
+      "invalidated"
+    ],
+    "batch": {
+      "id": "fusion-asset-batch-001",
+      "status": "generating",
+      "sealed": true,
+      "sealedReason": "batch_size_reached",
+      "memberCount": 6,
+      "readyCount": 0,
+      "hardLockCount": 0,
+      "canEnqueueNewAsset": false,
+      "members": [
+        { "order": 1, "assetId": "P01", "jobId": "gen-2026-07-15T11-19-38-303Z-23ac427f", "status": "waiting_external", "browserStage": "plan_ready" },
+        { "order": 2, "assetId": "S01", "jobId": "gen-2026-07-15T11-19-38-350Z-a654d3da", "status": "queued" },
+        { "order": 3, "assetId": "P30", "jobId": "gen-2026-07-15T11-19-38-387Z-c7ecc0a0", "status": "queued" },
+        { "order": 4, "assetId": "S02", "jobId": "gen-2026-07-15T11-19-38-423Z-788bc493", "status": "queued" },
+        { "order": 5, "assetId": "C07", "jobId": "gen-2026-07-15T11-19-38-459Z-d9861f39", "status": "queued" },
+        { "order": 6, "assetId": "P29", "jobId": "gen-2026-07-15T11-19-38-495Z-c9b89a3b", "status": "queued" }
+      ]
+    },
+    "criteria": [
+      "character_identity",
+      "era_visual_style",
+      "scene_layout_lighting",
+      "scale_compatibility",
+      "prop_structure",
+      "clean_frame",
+      "hidden_mask_rule"
+    ],
+    "reviewBoard": {
+      "layout": "2x3",
+      "width": 1920,
+      "height": 2160,
+      "role": "review-only-not-generation-reference",
+      "generatedOnlyAfterAllCurrentEvidenceReady": true
+    },
+    "hardLockBeforeBatchPassAllowed": false,
+    "nextBatchBeforeSixCurrentHardLocksAllowed": false,
+    "finalPartialRequiresExplicitSeal": true,
+    "contentDriftInvalidatesPass": true
+  },
+  "existingStatePreservation": {
+    "generationJobsSha256Before": "bd07e1276d6d7698f6cbf9adc6db85708768872d584a49d92e38677451ad1b6b",
+    "generationJobsSha256After": "bd07e1276d6d7698f6cbf9adc6db85708768872d584a49d92e38677451ad1b6b",
+    "publicationsSha256Before": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+    "publicationsSha256After": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+    "jobsUnchanged": true,
+    "publicationsUnchanged": true,
+    "originalP01Preserved": true,
+    "publicationReserved": 6,
+    "publicationReceipts": 0
+  },
+  "p01BrowserPlan": {
+    "model": "GPT Image 2",
+    "aspectRatio": "9:16",
+    "quality": "Medium",
+    "imageCount": 1,
+    "concurrency": 1,
+    "referenceMode": "text-only",
+    "allowedUploads": [],
+    "remoteIdentityAbsent": true
+  },
+  "mcp": {
+    "protocolVersion": "1.1",
+    "toolCount": 148,
+    "newTools": [
+      "get_fusion_asset_consistency",
+      "prepare_fusion_asset_consistency_review",
+      "submit_fusion_asset_consistency_review",
+      "seal_final_fusion_asset_consistency_batch"
+    ],
+    "doctorAndSnapshotExposeBatchState": true
+  },
+  "electronUi": {
+    "evidencePath": "docs/evidence/fusion-asset-consistency-ui-smoke-20260715-final.json",
+    "screenshotPath": "docs/evidence/fusion-asset-consistency-ui-smoke-20260715-final.png",
+    "screenshotSha256": "b61ef059535d4e47849fef65efab90d5d393c9e54bd13cb1a89a83541e003d74",
+    "memberCards": 6,
+    "criteriaSelectors": 7,
+    "submitDisabledBeforeEvidence": true,
+    "horizontalPageOverflow": false,
+    "pageErrors": 0,
+    "guardedSidecarsUnchanged": true
+  },
+  "validation": {
+    "targetedAssetConsistency": { "testFiles": 1, "testsPassed": 5, "testsFailed": 0 },
+    "fullTest": { "command": "npm test", "testFiles": 49, "testsPassed": 286, "testsFailed": 0, "durationSeconds": 106.0 },
+    "typecheck": { "command": "npm run typecheck", "passed": true },
+    "productionBuild": {
+      "command": "npm run build",
+      "passed": true,
+      "built": ["electron main", "preload", "renderer", "compiled MCP"],
+      "warningsOnly": ["Vite dynamic and static import chunk notice"]
+    },
+    "mcpSmoke": { "command": "npm run mcp:smoke", "passed": true, "toolCount": 148 },
+    "formalValidation": { "command": "npm run fusion:validate-asset-consistency", "passed": true },
+    "electronSmoke": { "passed": true, "transport": "electron-current-production-build" }
+  },
+  "productionState": {
+    "formalNewAssetImages": 0,
+    "formalEpisode01PanelImages": 0,
+    "formalEpisode01ChineseSheets": 0,
+    "remoteIdentities": 0,
+    "downloadedResults": 0,
+    "publicationReceipts": 0,
+    "generateClicks": 0,
+    "creditsPurchased": false
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/fusion-asset-consistency-formal-20260715.json",
+      "sha256": "9276acc8010ba99364d959f64d55dd059338ccf4369698d6c6429de0c46a7329",
+      "role": "formal project bootstrap, source boundary, existing jobs and Publication preservation"
+    },
+    {
+      "path": "docs/evidence/fusion-asset-consistency-ui-smoke-20260715-final.json",
+      "sha256": "c019e0b347551ca3e226d1ed54ab21eb62f677ab788f87357ca1d926821ea017",
+      "role": "current production build Electron UI and read-only guarded sidecars"
+    },
+    {
+      "path": "docs/evidence/fusion-asset-consistency-ui-smoke-20260715-final.png",
+      "sha256": "b61ef059535d4e47849fef65efab90d5d393c9e54bd13cb1a89a83541e003d74",
+      "role": "six-member and seven-criterion UI screenshot"
+    },
+    {
+      "path": "docs/evidence/final-validation-20260715-2031.json",
+      "role": "previous 2-6 panel Chinese storyboard slice"
+    }
+  ],
+  "prohibitedSubstitutions": [
+    "review board as formal asset or generation reference",
+    "software tests as proof of remote Artlist generation",
+    "EP01 as proof of full-season completion",
+    "requeueing existing P01",
+    "buying credits without new explicit authorization",
+    "writing back to third-season source root"
+  ],
+  "git": {
+    "branch": "main",
+    "commitsExist": false,
+    "worktree": "all project files untracked",
+    "staged": false,
+    "committed": false,
+    "pushed": false
+  }
+}

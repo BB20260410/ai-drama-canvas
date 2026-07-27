@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "kind": "p5-managed-studio-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-17T20:09:30.361Z",
+  "project": {
+    "id": "project-8c5c50e3a449",
+    "startupPolicy": "no-filesystem-scan",
+    "legacyRoots": []
+  },
+  "startup": {
+    "readyMs": 496,
+    "oldProjectGuardUnchanged": true,
+    "legacyIndexAndCacheUnchanged": true,
+    "externalRequests": 0,
+    "pageErrors": 0
+  },
+  "ui": {
+    "managedStudioVisible": true,
+    "legacyNavigationHidden": true,
+    "strictFifteenSecondTimelineVisible": true,
+    "panelCount": 2,
+    "assetWorkflow": [
+      "create",
+      "append-pending",
+      "approve",
+      "promote-authority"
+    ],
+    "materialCounts": {
+      "media": 4,
+      "canonicalAssets": 4,
+      "characters": 1,
+      "scenes": 2,
+      "props": 1,
+      "assetVersions": 4,
+      "assetDefinitions": 4,
+      "primaryAuthorities": 4,
+      "authorityEvents": 4,
+      "versionReviews": 4
+    },
+    "productionCounts": {
+      "textDocuments": 2,
+      "scriptDocuments": 1,
+      "promptDocuments": 1,
+      "textRevisions": 2,
+      "units": 1,
+      "unitRevisions": 1
+    },
+    "mediaDomCount": 2
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p5-managed-studio-ui-smoke-20260718-01.png",
+    "sizeBytes": 355196,
+    "mtimeMs": 1784318970174.887,
+    "sha256": "afaaa564478662d47f223885838e8e13912990b7a08625184ee3b183d2ea911e",
+    "width": 3456,
+    "height": 2058,
+    "format": "png",
+    "stdev": 21.33148452113681
+  },
+  "boundaries": {
+    "formalImageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0,
+    "sourceWrites": 0
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "kind": "p3-visual-constraints-migration",
+  "createdAt": "2026-07-17T10:55:27.132Z",
+  "apply": true,
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "sourceRoot": "/Users/hxx/Documents/古蜀卷第三季",
+  "productionFreeze": true,
+  "source": {
+    "before": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "after": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "unchanged": true
+  },
+  "protected": {
+    "beforeIdentitySha256": "2e11b3a389a7f46ffffec1d269d9f432215ab9e14ba5c7ec68a1e40473687d26",
+    "afterIdentitySha256": "2e11b3a389a7f46ffffec1d269d9f432215ab9e14ba5c7ec68a1e40473687d26",
+    "unchanged": true,
+    "counts": {
+      "generationJobs": 30,
+      "generationByStatus": {
+        "failed": 3,
+        "generation_unknown": 1,
+        "succeeded": 26
+      },
+      "publicationIntents": 31,
+      "publicationReceipts": 26,
+      "reviews": 20
+    },
+    "generationJobsSha256": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182",
+    "publicationsSha256": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238",
+    "reviewsSha256": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97",
+    "p2StoreSha256": "35aa251d9b6f767190924d697e7dd03a58cc198ded0918ad4fd89508217f877b",
+    "rawLabeled": {
+      "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+      "files": 52,
+      "bytes": 128973009,
+      "aggregateSha256": "77d4a46fa04c05c635701363f394faab0cc5094fc437990f6eeb580ce0e4c83b"
+    },
+    "historicalRequests": {
+      "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-requests",
+      "files": 31,
+      "bytes": 174082,
+      "aggregateSha256": "171ca4fd131b977f07f7bbb5e44bfd836a1158ce63c6bcaff721b45f95b1fbca"
+    },
+    "immutableSidecarSha256": "d0b651a1b57a7fe9bc3fefa9fc5823f05530c15c0a5f56f586e14375b0bd1c9e",
+    "reviewAttestationsFabricated": false
+  },
+  "providerMigration": {
+    "providerIdsUpdated": [
+      "codex-subagent-gpt-image-2"
+    ],
+    "instructionSha256": "c3aa8d3c3e165fff402978a0fbacff69f6e557271d5c6468c7ee89220931b74b",
+    "beforeRevision": 4,
+    "afterRevision": 5,
+    "allSubagentProvidersGeneric": true
+  },
+  "p3": {
+    "before": {
+      "exists": false,
+      "current": false
+    },
+    "after": {
+      "exists": true,
+      "current": true,
+      "revision": 1,
+      "storeFingerprint": "95f836f3f4b4458b1bbd698cefc775c7ff5f3d48d5917421c015531a3eea2e1b",
+      "auditFingerprint": "794c699bd7eed74b3328069ee9b51db6880b797a558a85901eb68020841bba22",
+      "constraints": 4330,
+      "contracts": 1288,
+      "legacyGenerationJobEvidence": 11
+    },
+    "audit": {
+      "schemaVersion": 1,
+      "builderVersion": "panel-visual-constraint-v1",
+      "contracts": 1288,
+      "expectedPanels": 4330,
+      "constraints": 4330,
+      "missingConstraints": 0,
+      "extraConstraints": 0,
+      "invalidConstraints": 0,
+      "duplicateConstraintIds": 0,
+      "onScreenAssets": 12502,
+      "continuityOnlyAssets": 1310,
+      "optionalOffscreenAssets": 0,
+      "unresolvedIdentityLocks": 8331,
+      "unresolvedSpatialLocks": 24992,
+      "unresolvedContinuityLocks": 440,
+      "invalidModelFingerprints": 0,
+      "invalidReviewRulesFingerprints": 0,
+      "modelPromptLeakPanels": 0,
+      "modelPathLeakPanels": 0,
+      "concealedMaskPanels": 304,
+      "revealAuthorizedPanels": 0,
+      "warningCounts": {
+        "AHANG_IDENTITY": 1415,
+        "DUDU_MARKINGS": 924,
+        "HIDDEN_MASK_DISCLOSURE": 304,
+        "OCR_OR_TEXT": 4330,
+        "WATERMARK_OR_UI": 4330,
+        "MODERN_OBJECT": 4330,
+        "COLLAGE_OR_SPLIT": 4330,
+        "PROP_STRUCTURE": 2665,
+        "SCENE_LAYOUT": 2574,
+        "EXTRA_CHARACTER": 4330,
+        "AMBIGUOUS_VISIBILITY": 776,
+        "SPATIAL_LOCK_UNKNOWN": 4330
+      },
+      "warningsWithoutReviewRules": 0,
+      "closurePassed": true,
+      "auditFingerprint": "794c699bd7eed74b3328069ee9b51db6880b797a558a85901eb68020841bba22"
+    },
+    "currentness": {
+      "current": true,
+      "checkedAt": "2026-07-17T10:55:05.958Z",
+      "storeRevision": 1,
+      "storeFingerprint": "95f836f3f4b4458b1bbd698cefc775c7ff5f3d48d5917421c015531a3eea2e1b",
+      "p2StoreRevision": 2,
+      "p2StoreFingerprint": "3cd7bc5b43531385c68cc3e7c9fe4906081806177652944bd4523b9de132a788",
+      "driftedInputs": []
+    },
+    "strictSecondPass": {
+      "revisionUnchanged": true,
+      "storeFingerprintUnchanged": true,
+      "auditFingerprintUnchanged": true,
+      "allowedFilesSha256Unchanged": true,
+      "identitySha256": "fe0bf2fc1ee1e0b09a88c07879e5092f357801eb08155a2b2e4047b9b395a0bf"
+    }
+  },
+  "backup": {
+    "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p3-visual-constraints/b44c926089bcb75fc9b2391c7983302c98a0462d1613f71807c171ba77d695bb",
+    "address": "b44c926089bcb75fc9b2391c7983302c98a0462d1613f71807c171ba77d695bb",
+    "reused": false,
+    "manifestSha256": "6b6313bb4733c7dd7d5b12193694aeb83a4812d00ba5fe3a0e61fe3d88ee1156",
+    "entries": [
+      {
+        "relativePath": "events.jsonl",
+        "existed": true,
+        "bytes": 241722,
+        "sha256": "4b5ad1525880513901b99bdf7e9b976f90161638afe153ebbf870b9dc2b13fe8"
+      },
+      {
+        "relativePath": "generation.json",
+        "existed": true,
+        "bytes": 4802,
+        "sha256": "6815df33ee0c0f420a9be6ee640ffb7e2c208d44066f02c1878e23032da433e1"
+      },
+      {
+        "relativePath": "panel-visual-constraints.json",
+        "existed": false
+      }
+    ]
+  }
+}

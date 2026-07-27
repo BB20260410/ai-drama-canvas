@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "kind": "fusion-storyboard-sheet-formal-contract-preview-evidence",
+  "evidenceRole": "formal-contract-layout-preview",
+  "fixtureOnly": true,
+  "formalProductionEligible": false,
+  "fixtureNotice": "本证据读取现行正式剧情合同，但逐格画面是本地布局占位；只证明中文成板版式，不计入第三季正式图片。",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "itemId": "season-三-ep01-unit008",
+  "contract": {
+    "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboard-grids/season-三-ep01-unit008/grid-e2a03792c22877f05477.json",
+    "sha256": "d9c072b5be4f6b667df75d62d44cf80b93cdfb05bdf43cb73d8a724de0099a29",
+    "id": "grid-e2a03792c22877f05477",
+    "sourceFingerprint": "5069b34250bda7bdd04841e41ddaf1d059390baa773b8a8e15ce72ab087cff7a",
+    "algorithmVersion": "semantic-beat-v1",
+    "panelCount": 6,
+    "detectedBeatCount": 6,
+    "durationSeconds": 15,
+    "header": {
+      "title": "15秒分镜故事板·EP01 面具沉睡嘟嘟先闻到第三世",
+      "subtitle": "EP01 | season-三-ep01-unit008 | 面具沉睡·嘟嘟先闻到第三世 / 嘟嘟认魂/认名功能启动",
+      "metadataLine": "6格 | 15.0s | 9:16 | storyboard r1"
+    },
+    "panels": [
+      {
+        "id": "season-三-ep01-unit008-panel-01",
+        "index": 1,
+        "frameRole": "start",
+        "startSeconds": 0,
+        "endSeconds": 4,
+        "imageContentAction": "阿航一手按胸前布囊，内层贴身压着完整黄金面具，外侧小袋里收着小鱼铜片，半璧另用素麻布包着贴在掌心侧；三件信物互不相露；布囊不发光，只随着他的呼吸轻轻一坠",
+        "assetIds": [
+          "C01",
+          "C02",
+          "P01"
+        ]
+      },
+      {
+        "id": "season-三-ep01-unit008-panel-02",
+        "index": 2,
+        "frameRole": "middle",
+        "startSeconds": 4,
+        "endSeconds": 8,
+        "imageContentAction": "嘟嘟忽然停步",
+        "assetIds": [
+          "C01",
+          "C02",
+          "P01"
+        ]
+      },
+      {
+        "id": "season-三-ep01-unit008-panel-03",
+        "index": 3,
+        "frameRole": "middle",
+        "startSeconds": 8,
+        "endSeconds": 9.667,
+        "imageContentAction": "嘟嘟鼻尖贴着冻土，嗅到一缕极淡的温白气息，尾巴僵住",
+        "assetIds": [
+          "C01",
+          "C02"
+        ]
+      },
+      {
+        "id": "season-三-ep01-unit008-panel-04",
+        "index": 4,
+        "frameRole": "middle",
+        "startSeconds": 9.667,
+        "endSeconds": 11.333,
+        "imageContentAction": "随后猛地朝一条岔路小跑",
+        "assetIds": [
+          "C01",
+          "C02"
+        ]
+      },
+      {
+        "id": "season-三-ep01-unit008-panel-05",
+        "index": 5,
+        "frameRole": "middle",
+        "startSeconds": 11.333,
+        "endSeconds": 13,
+        "imageContentAction": "阿航没有问，直接跟上",
+        "assetIds": [
+          "C01",
+          "C02"
+        ]
+      },
+      {
+        "id": "season-三-ep01-unit008-panel-06",
+        "index": 6,
+        "frameRole": "end",
+        "startSeconds": 13,
+        "endSeconds": 15,
+        "imageContentAction": "补足动作前奏/反应/收束、运镜延展、环境声和道具细节；不新增改变剧情走向的事件",
+        "assetIds": [
+          "C01",
+          "C02"
+        ]
+      }
+    ]
+  },
+  "render": {
+    "renderPurpose": "layout-preview",
+    "formalProductionEligible": false,
+    "png": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-ep01-008-contract-preview-v2-20260716.png",
+      "sha256": "dd88f0833c8823099f084f49f3d64de897dda867a426f8d320edc3cacca04297",
+      "bytes": 1227190,
+      "status": "created"
+    },
+    "svg": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-ep01-008-contract-preview-v2-20260716.svg",
+      "sha256": "ebacd6f4195f2328ad7567da9b0162eeb88a5e0abeeb860e557c4fb0aecb820c",
+      "bytes": 162275,
+      "status": "created"
+    },
+    "width": 2160,
+    "height": 3840,
+    "panelCount": 6,
+    "durationSeconds": 15,
+    "panelImages": [
+      {
+        "panelId": "season-三-ep01-unit008-panel-01",
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-ep01-008-contract-preview-v2-20260716-panels/season-三-ep01-unit008-panel-01_布局占位.png",
+        "sha256": "6364a1ae216b106478c535a1f91ff402d9d273706026d65bd268486327768c5f",
+        "bytes": 390210,
+        "width": 2160,
+        "height": 3840,
+        "format": "png"
+      },
+      {
+        "panelId": "season-三-ep01-unit008-panel-02",
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-ep01-008-contract-preview-v2-20260716-panels/season-三-ep01-unit008-panel-02_布局占位.png",
+        "sha256": "1e93c6a1ea5b029abf52ab8dde25455f6dbb14729424e0965e888255370c734a",
+        "bytes": 479682,
+        "width": 2160,
+        "height": 3840,
+        "format": "png"
+      },
+      {
+        "panelId": "season-三-ep01-unit008-panel-03",
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-ep01-008-contract-preview-v2-20260716-panels/season-三-ep01-unit008-panel-03_布局占位.png",
+        "sha256": "1059bd8badaa03327df213f73bc8fa89466c7fba0bb0666014d3f2e5d87c2d3b",
+        "bytes": 386353,
+        "width": 2160,
+        "height": 3840,
+        "format": "png"
+      },
+      {
+        "panelId": "season-三-ep01-unit008-panel-04",
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-ep01-008-contract-preview-v2-20260716-panels/season-三-ep01-unit008-panel-04_布局占位.png",
+        "sha256": "61857cfaace2d2c1496bad033a931f0b966e5722eeb006170ad2fd5e1c36fc4b",
+        "bytes": 476385,
+        "width": 2160,
+        "height": 3840,
+        "format": "png"
+      },
+      {
+        "panelId": "season-三-ep01-unit008-panel-05",
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-ep01-008-contract-preview-v2-20260716-panels/season-三-ep01-unit008-panel-05_布局占位.png",
+        "sha256": "e56912623c4ff42da516cc266d893eff043a3551209a7d9ebfbd189a8ea5c691",
+        "bytes": 396659,
+        "width": 2160,
+        "height": 3840,
+        "format": "png"
+      },
+      {
+        "panelId": "season-三-ep01-unit008-panel-06",
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/fusion-storyboard-sheet-ep01-008-contract-preview-v2-20260716-panels/season-三-ep01-unit008-panel-06_布局占位.png",
+        "sha256": "02a51697a90bb570cc2a53bf5516ec48ab85b2670ae2f22648d66f4b573afd89",
+        "bytes": 345623,
+        "width": 2160,
+        "height": 3840,
+        "format": "png"
+      }
+    ]
+  },
+  "guardedSidecars": {
+    "before": {
+      "generation-jobs.json": "3fc7dd327fb0d4c51feefab39d568e89d3248f26925cb89732f9188b436919f7",
+      "publications.json": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+      "asset-consistency-batches.json": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7",
+      "command-ledger.json": "0a0dc0bc96438bcd33515a615e3753a8e048b9abea7759a8da249047360ae679"
+    },
+    "after": {
+      "generation-jobs.json": "3fc7dd327fb0d4c51feefab39d568e89d3248f26925cb89732f9188b436919f7",
+      "publications.json": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+      "asset-consistency-batches.json": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7",
+      "command-ledger.json": "0a0dc0bc96438bcd33515a615e3753a8e048b9abea7759a8da249047360ae679"
+    },
+    "unchanged": true
+  },
+  "formalSideEffects": {
+    "jobsCreated": 0,
+    "publicationsCreated": 0,
+    "reviewsCreated": 0,
+    "remoteIdentityCreated": false,
+    "productionOutputsWritten": 0
+  },
+  "checks": {
+    "currentSemanticContract": true,
+    "exactSixPanels": true,
+    "exactFifteenSeconds": true,
+    "visiblePanelDurationsSumToFifteen": true,
+    "pngDecodable": true,
+    "portraitDimensions": true,
+    "detailedChineseColumnsPresent": true,
+    "panelPreviewWatermarks": true,
+    "headerPreviewIdentity": true,
+    "footerPreviewIdentity": true,
+    "startAndEndRolesPresent": true,
+    "rhythmAndTotalDurationPresent": true,
+    "sourceTracePresent": true,
+    "machinePurposeEmbedded": true,
+    "allPanelHashesMatched": true,
+    "guardedFormalSidecarsUnchanged": true,
+    "outputOutsideProductionProject": true
+  }
+}

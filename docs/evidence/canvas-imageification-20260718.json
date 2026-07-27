@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "kind": "canvas-imageification-slice",
+  "createdAt": "2026-07-18T09:00:00.000Z",
+  "conclusion": "部分完成",
+  "goal": "权威图/剧本/提示词进入受管无限画布可直观查看",
+  "verification": {
+    "typecheckWeb": "pass",
+    "vitest": {
+      "files": [
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-production-dashboard.test.ts",
+        "tests/absorb-wiring-complete.test.ts"
+      ],
+      "result": "16 passed"
+    },
+    "electronSmoke": {
+      "evidence": "docs/evidence/deep-absorb-ui-smoke-20260718-mrq4wngp.json",
+      "screenshot": "docs/evidence/deep-absorb-ui-smoke-canvas-20260718-mrq4wngp.png",
+      "checks": {
+        "canvasFlowNodes": 6,
+        "canvasCustomNodes": true,
+        "canvasCustomNodeCount": 6,
+        "canvasThumbNodes": 3,
+        "canvasAssetNodes": 3,
+        "canvasThumbCountLabel": "有图节点 3",
+        "canvasTextDocCountLabel": "2 文稿",
+        "canvasScriptOrPromptNodes": 2,
+        "unitNodeClicked": true
+      }
+    },
+    "dashboardField": "P7 fixture assets 返回 authorityThumbnailRecipeKey + authorityMediaSha256"
+  },
+  "remainingBoundaries": [
+    "宫格 raw/labeled 成片不全量贴图（有界投影）",
+    "自动搜索仍为精确匹配，无语义/向量",
+    "软件一致性锁 ≠ 生成模型零漂移"
+  ],
+  "implementation": [
+    "src/renderer/src/components/ManagedStudioCanvasNode.vue",
+    "src/renderer/src/components/ManagedStudioCanvasView.vue",
+    "src/core/studio-production-dashboard.ts#authorityThumbnailRecipeKey"
+  ]
+}

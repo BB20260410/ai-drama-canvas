@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "kind": "p14-codex-fresh-session-read-evidence",
+  "status": "PASS",
+  "validationProfile": {
+    "id": "codex-primary-v1",
+    "requiredLiveProviders": [
+      "codex"
+    ],
+    "offlineCompatibleProviders": [
+      "grok"
+    ]
+  },
+  "startedAt": "2026-07-18T20:21:32.070Z",
+  "completedAt": "2026-07-18T20:23:10.747Z",
+  "expected": {
+    "projectId": "project-2e3b44bc6ac4",
+    "manifestFingerprint": "57e55eaf4b571c8e1ca7f606f79f849d08d0ad074ebd112eb0f82968413c3ac8",
+    "sourceDigest": "1b96b83602ec60a0d1a1c44919453849cc944a90d7bf60445e385262c6a22f2a"
+  },
+  "client": {
+    "executable": "codex",
+    "sessionStarted": true,
+    "stdinClosedBeforeExecution": true,
+    "nativeTrace": {
+      "client": "codex",
+      "format": "codex-jsonl",
+      "jsonEventCount": 9,
+      "toolCalls": [
+        {
+          "serverName": "ai-drama-canvas",
+          "toolName": "get_capabilities",
+          "argumentsEmpty": true,
+          "completed": true,
+          "succeeded": true
+        },
+        {
+          "serverName": "ai-drama-canvas",
+          "toolName": "get_active_managed_studio_context",
+          "argumentsEmpty": true,
+          "completed": true,
+          "succeeded": true
+        }
+      ],
+      "traceSha256": "d2ce93e51f8b5e005dbe2c41111b639b70a688a5eb20e37ba9acfb12f88a87d4",
+      "verifiable": true,
+      "exactToolSequence": true
+    },
+    "result": {
+      "schemaVersion": 1,
+      "marker": "AI_DRAMA_CANVAS_FRESH_SESSION_READ_V1",
+      "client": "codex",
+      "toolCalls": [
+        "get_capabilities",
+        "get_active_managed_studio_context"
+      ],
+      "capabilities": {
+        "serverName": "ai-drama-canvas",
+        "buildId": "eafa84d97331dcb6c50a87ac7fe2ea4f",
+        "sourceDigest": "1b96b83602ec60a0d1a1c44919453849cc944a90d7bf60445e385262c6a22f2a",
+        "toolCount": 183,
+        "buildIdentityFingerprint": "1130a88f77a86a14c2e36f719d895cbcf23a024aeb914b00d5c658164f638117"
+      },
+      "activeContext": {
+        "projectId": "project-2e3b44bc6ac4",
+        "manifestFingerprint": "57e55eaf4b571c8e1ca7f606f79f849d08d0ad074ebd112eb0f82968413c3ac8",
+        "contextFingerprint": "61a0497419b838b868126786c623db03e535d76e47282a05bc6eb9dca3fb0249",
+        "sourceDigest": "1b96b83602ec60a0d1a1c44919453849cc944a90d7bf60445e385262c6a22f2a",
+        "lockedAssets": [
+          {
+            "assetId": "character-a01-energy",
+            "name": "五维度生物A01",
+            "category": "character",
+            "revision": 4,
+            "currentness": "current"
+          },
+          {
+            "assetId": "character-adult-jianglv",
+            "name": "成年姜绿",
+            "category": "character",
+            "revision": 10,
+            "currentness": "current"
+          },
+          {
+            "assetId": "character-aye",
+            "name": "阿爷",
+            "category": "character",
+            "revision": 12,
+            "currentness": "current"
+          },
+          {
+            "assetId": "character-ayi-niang",
+            "name": "阿依娘穗氏",
+            "category": "character",
+            "revision": 6,
+            "currentness": "current"
+          },
+          {
+            "assetId": "character-bandits",
+            "name": "强盗袭村土匪群像",
+            "category": "character",
+            "revision": 4,
+            "currentness": "current"
+          },
+          {
+            "assetId": "character-bashe",
+            "name": "巴蛇",
+            "category": "character",
+            "revision": 4,
+            "currentness": "current"
+          }
+        ],
+        "nextAction": {
+          "code": "complete-checkpoint",
+          "label": "完成第 1 批六图停检",
+          "reason": "新槽 dispatch 被 checkpoint 阻断，需先完成 Review/快照/attestation。",
+          "requiresWrite": true,
+          "command": "attest_studio_generation_checkpoint"
+        },
+        "promptEntry": "managed_studio_lock_generate_writeback"
+      },
+      "safety": {
+        "projectRootArgumentSupplied": false,
+        "secretsReadOrPrinted": false
+      }
+    },
+    "comparisons": {
+      "expectedProjectId": true,
+      "expectedManifestFingerprint": true,
+      "expectedCapabilitySourceDigest": true,
+      "expectedContextSourceDigest": true,
+      "buildIdentityCurrent": true,
+      "exactToolSequence": true,
+      "promptEntryCurrent": true
+    }
+  },
+  "grokLive": {
+    "status": "NOT_RUN",
+    "requiredForPass": false,
+    "reasonCode": "USER_SCOPED_OUT_NO_QUOTA"
+  },
+  "boundaries": {
+    "execFileWithoutShell": true,
+    "freshEphemeralSession": true,
+    "projectRootArgumentSupplied": false,
+    "agentConfigurationModified": false,
+    "secretEnvironmentVariablesForwarded": false,
+    "secretsReadOrPrinted": false,
+    "browserUsed": false,
+    "externalWrite": false
+  },
+  "fingerprint": "59ec19b6f37076a32c28ff8c55b28d43dd0452f20ce3f3472933c033279cdeb9"
+}

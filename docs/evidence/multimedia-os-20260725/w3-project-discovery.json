@@ -1,0 +1,71 @@
+[
+  {
+    "name": "dudu-s1e1-a84aa353",
+    "projectId": "project-17b0cef36e44",
+    "nextAction": "open-production-dashboard",
+    "unitSample": [],
+    "keys": [
+      "schemaVersion",
+      "kind",
+      "operation",
+      "projectId",
+      "projectName",
+      "manifestFingerprint",
+      "nextAction",
+      "locator",
+      "counts",
+      "facets",
+      "queueTotals",
+      "checkpoint",
+      "capabilities",
+      "generationProjection",
+      "fingerprint"
+    ]
+  },
+  {
+    "name": "codex-ai-drama-studio",
+    "projectId": "project-2e3b44bc6ac4",
+    "nextAction": "open-production-dashboard",
+    "unitSample": [],
+    "keys": [
+      "schemaVersion",
+      "kind",
+      "operation",
+      "projectId",
+      "projectName",
+      "manifestFingerprint",
+      "nextAction",
+      "locator",
+      "counts",
+      "facets",
+      "queueTotals",
+      "checkpoint",
+      "capabilities",
+      "generationProjection",
+      "fingerprint"
+    ]
+  },
+  {
+    "name": "grok-mvp-qingdeng-mrwc97mu-d0aea463",
+    "projectId": "project-c78607fac2a4",
+    "nextAction": "open-production-dashboard",
+    "unitSample": [],
+    "keys": [
+      "schemaVersion",
+      "kind",
+      "operation",
+      "projectId",
+      "projectName",
+      "manifestFingerprint",
+      "nextAction",
+      "locator",
+      "counts",
+      "facets",
+      "queueTotals",
+      "checkpoint",
+      "capabilities",
+      "generationProjection",
+      "fingerprint"
+    ]
+  }
+]

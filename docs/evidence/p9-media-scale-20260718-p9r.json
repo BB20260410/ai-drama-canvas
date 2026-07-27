@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "kind": "p9-media-scale-evidence",
+  "status": "pass",
+  "createdAt": "2026-07-18T05:49:03.580Z",
+  "durationMs": 1701,
+  "counts": {
+    "mediaIndexed": 10002,
+    "requestedMedia": 10000,
+    "realDecodableThumbFiles": 1000,
+    "videoDerivativesReady": 4,
+    "audioDerivativesReady": 2
+  },
+  "performance": {
+    "coldCreateAndIndexMs": 1700,
+    "listAssetsPageMsApprox": 1,
+    "listAssetsPageSize": 0
+  },
+  "mediaQuality": {
+    "placeholderSignatureOnly": false,
+    "thumbWidth": 64,
+    "thumbHeight": 96,
+    "realVideoImports": 2,
+    "realAudioImports": 2
+  },
+  "boundaries": {
+    "formalStudioUntouched": true,
+    "formalImageGenerationCalls": 0
+  }
+}

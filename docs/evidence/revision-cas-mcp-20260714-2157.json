@@ -1,0 +1,467 @@
+{
+  "schemaVersion": 1,
+  "kind": "long-lived-fact-revision-cas-mcp",
+  "startedAt": "2026-07-14T14:02:35.336Z",
+  "completedAt": "2026-07-14T14:02:38.013Z",
+  "success": true,
+  "runs": [
+    {
+      "mode": "source",
+      "toolCount": 134,
+      "schemaTools": [
+        "update_production_workflow_stage",
+        "upsert_creative_bible",
+        "upsert_asset_relation",
+        "upsert_voice_identity",
+        "upsert_context",
+        "delete_context",
+        "execute_command"
+      ],
+      "revisions": {
+        "contextCreated": 1,
+        "contextUpdated": 2,
+        "workflowBefore": 0,
+        "workflowAfter": 1
+      },
+      "schemaRejections": {
+        "missingContextRevision": "MCP error -32602: Input validation error: Invalid arguments for tool upsert_context: [\n  {\n    \"code\": \"custom\",\n    \"path\": [\n      \"expectedRevision\"\n    ],\n    \"message\": \"更新时必须携带 expectedRevision\"\n  }\n]",
+        "invalidContextCreate": "MCP error -32602: Input validation error: Invalid arguments for tool upsert_context: [\n  {\n    \"code\": \"custom\",\n    \"path\": [\n      \"expectedRevision\"\n    ],\n    \"message\": \"创建时不能携带 expectedRevision\"\n  }\n]",
+        "missingWorkflowRevision": "MCP error -32602: Input validation error: Invalid arguments for tool update_production_workflow_stage: [\n  {\n    \"expected\": \"number\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"expectedRevision\"\n    ],\n    \"message\": \"Invalid input: expected number, received undefined\"\n  }\n]",
+        "executeMissingRevision": "MCP error -32602: Input validation error: Invalid arguments for tool execute_command: [\n  {\n    \"code\": \"custom\",\n    \"path\": [\n      \"request\",\n      \"payload\",\n      \"expectedRevision\"\n    ],\n    \"message\": \"更新时必须携带 expectedRevision\"\n  }\n]"
+      },
+      "failedLedger": [
+        {
+          "schemaVersion": 1,
+          "requestId": "request-source-context-stale",
+          "idempotencyKey": "source-context-stale-v1",
+          "command": "upsert_context",
+          "status": "failed",
+          "replayed": false,
+          "requestHash": "a3c7ddda0b37ca0978aa8e6f47552347e3d914178363e70536ab6743772a52bd",
+          "execution": {
+            "pid": 48559,
+            "phase": "executing",
+            "heartbeatAt": "2026-07-14T14:02:35.898Z"
+          },
+          "startedAt": "2026-07-14T14:02:35.885Z",
+          "result": {
+            "schemaVersion": 1,
+            "applied": false,
+            "reason": "revision_conflict",
+            "entityType": "project_context",
+            "entityId": "context-fb1810cd-0c6f-482f-8d27-b27c08a1363f",
+            "expectedRevision": 1,
+            "currentRevision": 2
+          },
+          "error": {
+            "message": "项目记忆已被其他窗口更新（当前修订 2），请刷新后重试。",
+            "observedAt": "2026-07-14T14:02:35.916Z"
+          },
+          "executedAt": "2026-07-14T14:02:35.916Z"
+        },
+        {
+          "schemaVersion": 1,
+          "requestId": "request-source-context-unknown",
+          "idempotencyKey": "source-context-unknown-v1",
+          "command": "upsert_context",
+          "status": "failed",
+          "replayed": false,
+          "requestHash": "83cd92f345a21a00fc0c36a2aa0e85d218a50bdc1f0c5d9cad7a811e8c4f706e",
+          "execution": {
+            "pid": 48559,
+            "phase": "executing",
+            "heartbeatAt": "2026-07-14T14:02:35.953Z"
+          },
+          "startedAt": "2026-07-14T14:02:35.940Z",
+          "result": {
+            "schemaVersion": 1,
+            "applied": false,
+            "reason": "not_found",
+            "entityType": "project_context",
+            "entityId": "context-missing",
+            "expectedRevision": 1
+          },
+          "error": {
+            "message": "找不到项目记忆：context-missing",
+            "observedAt": "2026-07-14T14:02:35.970Z"
+          },
+          "executedAt": "2026-07-14T14:02:35.970Z"
+        },
+        {
+          "schemaVersion": 1,
+          "requestId": "request-source-bible-stale",
+          "idempotencyKey": "source-bible-stale-v1",
+          "command": "upsert_creative_bible",
+          "status": "failed",
+          "replayed": false,
+          "requestHash": "cd5f8b16c08e215a19cc86f4c701818fc7036cadb119068c3276dfad728f43ef",
+          "execution": {
+            "pid": 48559,
+            "phase": "executing",
+            "heartbeatAt": "2026-07-14T14:02:36.075Z"
+          },
+          "startedAt": "2026-07-14T14:02:36.063Z",
+          "result": {
+            "schemaVersion": 1,
+            "applied": false,
+            "reason": "revision_conflict",
+            "entityType": "creative_bible",
+            "entityId": "bible-885258bf-ec2a-4e05-8e83-537865ee6f96",
+            "expectedRevision": 2,
+            "currentRevision": 1
+          },
+          "error": {
+            "message": "创作 Bible已被其他窗口更新（当前修订 1），请刷新后重试。",
+            "observedAt": "2026-07-14T14:02:36.092Z"
+          },
+          "executedAt": "2026-07-14T14:02:36.092Z"
+        },
+        {
+          "schemaVersion": 1,
+          "requestId": "request-source-relation-stale",
+          "idempotencyKey": "source-relation-stale-v1",
+          "command": "upsert_asset_relation",
+          "status": "failed",
+          "replayed": false,
+          "requestHash": "8e6bd5850b47b1a982b6d0ddb51c7a942ab8ce8daf74b8a4926a0d620a8a4753",
+          "execution": {
+            "pid": 48559,
+            "phase": "executing",
+            "heartbeatAt": "2026-07-14T14:02:36.201Z"
+          },
+          "startedAt": "2026-07-14T14:02:36.188Z",
+          "result": {
+            "schemaVersion": 1,
+            "applied": false,
+            "reason": "revision_conflict",
+            "entityType": "asset_relation",
+            "entityId": "asset-relation-bb8bcc8f-cdff-4e06-a343-3fdaa3a1ce30",
+            "expectedRevision": 2,
+            "currentRevision": 1
+          },
+          "error": {
+            "message": "资产关系已被其他窗口更新（当前修订 1），请刷新后重试。",
+            "observedAt": "2026-07-14T14:02:36.220Z"
+          },
+          "executedAt": "2026-07-14T14:02:36.220Z"
+        },
+        {
+          "schemaVersion": 1,
+          "requestId": "request-source-voice-stale",
+          "idempotencyKey": "source-voice-stale-v1",
+          "command": "upsert_voice_identity",
+          "status": "failed",
+          "replayed": false,
+          "requestHash": "1ff65446f08baf3a622b48df53bfe8b874468ff054bb25be19621a4f58f2623a",
+          "execution": {
+            "pid": 48559,
+            "phase": "executing",
+            "heartbeatAt": "2026-07-14T14:02:36.331Z"
+          },
+          "startedAt": "2026-07-14T14:02:36.318Z",
+          "result": {
+            "schemaVersion": 1,
+            "applied": false,
+            "reason": "revision_conflict",
+            "entityType": "voice_identity",
+            "entityId": "voice-eb78aee3-b060-4015-ab39-f3893b9a0d21",
+            "expectedRevision": 2,
+            "currentRevision": 1
+          },
+          "error": {
+            "message": "音色身份已被其他窗口更新（当前修订 1），请刷新后重试。",
+            "observedAt": "2026-07-14T14:02:36.348Z"
+          },
+          "executedAt": "2026-07-14T14:02:36.348Z"
+        },
+        {
+          "schemaVersion": 1,
+          "requestId": "request-source-workflow-stale",
+          "idempotencyKey": "source-workflow-stale-v1",
+          "command": "update_workflow_stage",
+          "status": "failed",
+          "replayed": false,
+          "requestHash": "d60139772aa0e75d149c960e21b2e184af0fb4c7ac2bc00f2de1bb90dcadc7d8",
+          "execution": {
+            "pid": 48559,
+            "phase": "executing",
+            "heartbeatAt": "2026-07-14T14:02:36.450Z"
+          },
+          "startedAt": "2026-07-14T14:02:36.438Z",
+          "result": {
+            "schemaVersion": 1,
+            "applied": false,
+            "reason": "revision_conflict",
+            "entityType": "production_workflow",
+            "expectedRevision": 0,
+            "currentRevision": 1
+          },
+          "error": {
+            "message": "生产工作流已被其他窗口更新（当前修订 1），请刷新后重试。",
+            "observedAt": "2026-07-14T14:02:36.466Z"
+          },
+          "executedAt": "2026-07-14T14:02:36.466Z"
+        },
+        {
+          "schemaVersion": 1,
+          "requestId": "request-source-context-delete-stale",
+          "idempotencyKey": "source-context-delete-stale-v1",
+          "command": "delete_context",
+          "status": "failed",
+          "replayed": false,
+          "requestHash": "5d9654bc571723c4272491adac7e0ffbf615d59cd22eb47276cbdca2b08a6fb4",
+          "execution": {
+            "pid": 48559,
+            "phase": "executing",
+            "heartbeatAt": "2026-07-14T14:02:36.500Z"
+          },
+          "startedAt": "2026-07-14T14:02:36.488Z",
+          "result": {
+            "schemaVersion": 1,
+            "applied": false,
+            "reason": "revision_conflict",
+            "entityType": "project_context",
+            "entityId": "context-fb1810cd-0c6f-482f-8d27-b27c08a1363f",
+            "expectedRevision": 1,
+            "currentRevision": 2
+          },
+          "error": {
+            "message": "项目记忆已被其他窗口更新（当前修订 2），请刷新后重试。",
+            "observedAt": "2026-07-14T14:02:36.517Z"
+          },
+          "executedAt": "2026-07-14T14:02:36.517Z"
+        }
+      ],
+      "unknownLedgerCount": 0
+    },
+    {
+      "mode": "compiled",
+      "toolCount": 134,
+      "schemaTools": [
+        "update_production_workflow_stage",
+        "upsert_creative_bible",
+        "upsert_asset_relation",
+        "upsert_voice_identity",
+        "upsert_context",
+        "delete_context",
+        "execute_command"
+      ],
+      "revisions": {
+        "contextCreated": 1,
+        "contextUpdated": 2,
+        "workflowBefore": 0,
+        "workflowAfter": 1
+      },
+      "schemaRejections": {
+        "missingContextRevision": "MCP error -32602: Input validation error: Invalid arguments for tool upsert_context: [\n  {\n    \"code\": \"custom\",\n    \"path\": [\n      \"expectedRevision\"\n    ],\n    \"message\": \"更新时必须携带 expectedRevision\"\n  }\n]",
+        "invalidContextCreate": "MCP error -32602: Input validation error: Invalid arguments for tool upsert_context: [\n  {\n    \"code\": \"custom\",\n    \"path\": [\n      \"expectedRevision\"\n    ],\n    \"message\": \"创建时不能携带 expectedRevision\"\n  }\n]",
+        "missingWorkflowRevision": "MCP error -32602: Input validation error: Invalid arguments for tool update_production_workflow_stage: [\n  {\n    \"expected\": \"number\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"expectedRevision\"\n    ],\n    \"message\": \"Invalid input: expected number, received undefined\"\n  }\n]",
+        "executeMissingRevision": "MCP error -32602: Input validation error: Invalid arguments for tool execute_command: [\n  {\n    \"code\": \"custom\",\n    \"path\": [\n      \"request\",\n      \"payload\",\n      \"expectedRevision\"\n    ],\n    \"message\": \"更新时必须携带 expectedRevision\"\n  }\n]"
+      },
+      "failedLedger": [
+        {
+          "schemaVersion": 1,
+          "requestId": "request-compiled-context-stale",
+          "idempotencyKey": "compiled-context-stale-v1",
+          "command": "upsert_context",
+          "status": "failed",
+          "replayed": false,
+          "requestHash": "954792af23547a19b20f460cdb00abf5b256bbf78f7fff604a2572e006f2a4af",
+          "execution": {
+            "pid": 48617,
+            "phase": "executing",
+            "heartbeatAt": "2026-07-14T14:02:37.185Z"
+          },
+          "startedAt": "2026-07-14T14:02:37.173Z",
+          "result": {
+            "schemaVersion": 1,
+            "applied": false,
+            "reason": "revision_conflict",
+            "entityType": "project_context",
+            "entityId": "context-8774383b-efa9-4244-a1c9-b98be513eec9",
+            "expectedRevision": 1,
+            "currentRevision": 2
+          },
+          "error": {
+            "message": "项目记忆已被其他窗口更新（当前修订 2），请刷新后重试。",
+            "observedAt": "2026-07-14T14:02:37.201Z"
+          },
+          "executedAt": "2026-07-14T14:02:37.201Z"
+        },
+        {
+          "schemaVersion": 1,
+          "requestId": "request-compiled-context-unknown",
+          "idempotencyKey": "compiled-context-unknown-v1",
+          "command": "upsert_context",
+          "status": "failed",
+          "replayed": false,
+          "requestHash": "22ecbdd93b087e8acdb7a384ccabb92bf92f8875041bf93942a1ac1a369c1d52",
+          "execution": {
+            "pid": 48617,
+            "phase": "executing",
+            "heartbeatAt": "2026-07-14T14:02:37.237Z"
+          },
+          "startedAt": "2026-07-14T14:02:37.224Z",
+          "result": {
+            "schemaVersion": 1,
+            "applied": false,
+            "reason": "not_found",
+            "entityType": "project_context",
+            "entityId": "context-missing",
+            "expectedRevision": 1
+          },
+          "error": {
+            "message": "找不到项目记忆：context-missing",
+            "observedAt": "2026-07-14T14:02:37.253Z"
+          },
+          "executedAt": "2026-07-14T14:02:37.253Z"
+        },
+        {
+          "schemaVersion": 1,
+          "requestId": "request-compiled-bible-stale",
+          "idempotencyKey": "compiled-bible-stale-v1",
+          "command": "upsert_creative_bible",
+          "status": "failed",
+          "replayed": false,
+          "requestHash": "8fa4088cd87fb09f81d7a3d23ddaf475ef32a8a0a51c22d3d9f14c20e6677065",
+          "execution": {
+            "pid": 48617,
+            "phase": "executing",
+            "heartbeatAt": "2026-07-14T14:02:37.357Z"
+          },
+          "startedAt": "2026-07-14T14:02:37.345Z",
+          "result": {
+            "schemaVersion": 1,
+            "applied": false,
+            "reason": "revision_conflict",
+            "entityType": "creative_bible",
+            "entityId": "bible-9bf9a3a7-b871-4d3f-939b-dc6589b8cc1b",
+            "expectedRevision": 2,
+            "currentRevision": 1
+          },
+          "error": {
+            "message": "创作 Bible已被其他窗口更新（当前修订 1），请刷新后重试。",
+            "observedAt": "2026-07-14T14:02:37.374Z"
+          },
+          "executedAt": "2026-07-14T14:02:37.374Z"
+        },
+        {
+          "schemaVersion": 1,
+          "requestId": "request-compiled-relation-stale",
+          "idempotencyKey": "compiled-relation-stale-v1",
+          "command": "upsert_asset_relation",
+          "status": "failed",
+          "replayed": false,
+          "requestHash": "19461ac6f07ecef883235af9c18a727996bbfad1092c22720a5ffe0c891589fe",
+          "execution": {
+            "pid": 48617,
+            "phase": "executing",
+            "heartbeatAt": "2026-07-14T14:02:37.479Z"
+          },
+          "startedAt": "2026-07-14T14:02:37.466Z",
+          "result": {
+            "schemaVersion": 1,
+            "applied": false,
+            "reason": "revision_conflict",
+            "entityType": "asset_relation",
+            "entityId": "asset-relation-ab4bf90b-12d7-4115-a6ab-5eb9afd4892c",
+            "expectedRevision": 2,
+            "currentRevision": 1
+          },
+          "error": {
+            "message": "资产关系已被其他窗口更新（当前修订 1），请刷新后重试。",
+            "observedAt": "2026-07-14T14:02:37.499Z"
+          },
+          "executedAt": "2026-07-14T14:02:37.499Z"
+        },
+        {
+          "schemaVersion": 1,
+          "requestId": "request-compiled-voice-stale",
+          "idempotencyKey": "compiled-voice-stale-v1",
+          "command": "upsert_voice_identity",
+          "status": "failed",
+          "replayed": false,
+          "requestHash": "ad94421ed62a4bd459f422f3d6c71c4fdb056e2170e737de6b7b75c5c5381796",
+          "execution": {
+            "pid": 48617,
+            "phase": "executing",
+            "heartbeatAt": "2026-07-14T14:02:37.612Z"
+          },
+          "startedAt": "2026-07-14T14:02:37.599Z",
+          "result": {
+            "schemaVersion": 1,
+            "applied": false,
+            "reason": "revision_conflict",
+            "entityType": "voice_identity",
+            "entityId": "voice-0b72616f-f927-44f7-bb63-e569b367af20",
+            "expectedRevision": 2,
+            "currentRevision": 1
+          },
+          "error": {
+            "message": "音色身份已被其他窗口更新（当前修订 1），请刷新后重试。",
+            "observedAt": "2026-07-14T14:02:37.631Z"
+          },
+          "executedAt": "2026-07-14T14:02:37.631Z"
+        },
+        {
+          "schemaVersion": 1,
+          "requestId": "request-compiled-workflow-stale",
+          "idempotencyKey": "compiled-workflow-stale-v1",
+          "command": "update_workflow_stage",
+          "status": "failed",
+          "replayed": false,
+          "requestHash": "188ab8e86ad02ecf58cbffcea65b6267b59e2ce95719d7d40e02e4b9ad4ef126",
+          "execution": {
+            "pid": 48617,
+            "phase": "executing",
+            "heartbeatAt": "2026-07-14T14:02:37.749Z"
+          },
+          "startedAt": "2026-07-14T14:02:37.736Z",
+          "result": {
+            "schemaVersion": 1,
+            "applied": false,
+            "reason": "revision_conflict",
+            "entityType": "production_workflow",
+            "expectedRevision": 0,
+            "currentRevision": 1
+          },
+          "error": {
+            "message": "生产工作流已被其他窗口更新（当前修订 1），请刷新后重试。",
+            "observedAt": "2026-07-14T14:02:37.769Z"
+          },
+          "executedAt": "2026-07-14T14:02:37.769Z"
+        },
+        {
+          "schemaVersion": 1,
+          "requestId": "request-compiled-context-delete-stale",
+          "idempotencyKey": "compiled-context-delete-stale-v1",
+          "command": "delete_context",
+          "status": "failed",
+          "replayed": false,
+          "requestHash": "dd9ffcadd95ad5ee0eef7846cbcfdbdaee2341e7d5efbd0c225d502944434f3e",
+          "execution": {
+            "pid": 48617,
+            "phase": "executing",
+            "heartbeatAt": "2026-07-14T14:02:37.807Z"
+          },
+          "startedAt": "2026-07-14T14:02:37.795Z",
+          "result": {
+            "schemaVersion": 1,
+            "applied": false,
+            "reason": "revision_conflict",
+            "entityType": "project_context",
+            "entityId": "context-8774383b-efa9-4244-a1c9-b98be513eec9",
+            "expectedRevision": 1,
+            "currentRevision": 2
+          },
+          "error": {
+            "message": "项目记忆已被其他窗口更新（当前修订 2），请刷新后重试。",
+            "observedAt": "2026-07-14T14:02:37.827Z"
+          },
+          "executedAt": "2026-07-14T14:02:37.827Z"
+        }
+      ],
+      "unknownLedgerCount": 0
+    }
+  ]
+}

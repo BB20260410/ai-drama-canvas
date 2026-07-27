@@ -1,0 +1,322 @@
+{
+  "schemaVersion": 1,
+  "kind": "p19-p24-final-validation",
+  "title": "P19–P24 统一终验 · 最终证据索引（GLOBAL_VALIDATING 终态）",
+  "createdAt": "2026-07-20T15:43:54.000Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "scope": "P19 一致性辅助门禁 / P20 剧本→15秒2–6宫格 / P21 生成进度与恢复 / P22 批注对比与返工 / P23 画布编辑增量 / P24 双向追溯与回归 的统一终验（合同 docs/K3_P19-P24_长期目标执行规范.md §10）。P0–P18 保持已验收，未重做。",
+  "stages": {
+    "P19": {
+      "status": "STAGE_ACCEPTED",
+      "note": "一致性辅助门禁：studio-consistency-evaluator 四态判定+可选 consistency 段（不进指纹）+MCP get_studio_consistency_evaluation+审片横幅"
+    },
+    "P20": {
+      "status": "STAGE_ACCEPTED",
+      "acceptedCandidate": "7c22cd57eda3bd93d82de17c4521690ae35afd3caae0e020a22b1376e3f393c9"
+    },
+    "P21": {
+      "status": "STAGE_ACCEPTED",
+      "acceptedCandidate": "9ef296c3a62201e6223a2a92e750e2d8ae5a31692cf25b508a5ab1da4c8eb555"
+    },
+    "P22": {
+      "status": "STAGE_ACCEPTED",
+      "acceptedCandidate": "bcc2bf3bceb3a3b7c2dcb814dc737a1ba21b52d0c93636fd75192391dd6fdf4e"
+    },
+    "P23": {
+      "status": "STAGE_ACCEPTED",
+      "acceptedCandidate": "d1b179b15eb8b86291f0115ee6c62cfea16e4093ea092723a711843b70cc6733"
+    },
+    "P24": {
+      "status": "STAGE_ACCEPTED",
+      "acceptedCandidate": "17fda62ff42c8f7aa175f3e6c59a47acd57f5591fbf2af732c5b80db4807901c"
+    }
+  },
+  "buildIdentity": {
+    "sourceDigest": "07287c72ebcb0c43f33f0efb2e7c2ea5ccd66697731bc8986f27b2e7d8108293",
+    "sourceFiles": 502,
+    "sourceBytes": 11165692,
+    "buildId": "22799978873662ee4e46fec84e36213f",
+    "buildIdentityFingerprint": "fada6c114eef2a5181c24fae14b7344f4e1083c5a98f2b6f38c3dd0059760217",
+    "releaseManifestFingerprint": "5c4dc272bc0d2765eda69e493e51a0cb7503fa32adbf7533be9102acbe269cff",
+    "mcpToolCount": 186,
+    "protocolVersion": "1.1",
+    "builtAt": "2026-07-20T15:09:11.809Z",
+    "digestChain": "P24 接受候选 17fda62f（500 文件）→ 加终验探针工具（main/index.ts AI_CANVAS_P23_P24_PROBE 块 + scripts/ui-p23-p24-canvas-trace-smoke.ts）得 8b8c516f（501 文件/11,159,723 B）→ 加 impact 规模测量脚本得终态 07287c72（502 文件/11,165,692 B）；P19–P24 产品代码零变化，仅终验工具增量",
+    "digestClosure": "2026-07-20 23:32 +08 复算 live 源码 npx tsx scripts/compute-source-digest.ts == release-manifest.json sourceDigest（07287c72，502/11,165,692），零漂移；无并发写者（23:32 时点快照：23:20 后 src/tests/scripts/docs/.planning 无改动；其后 REMEDIATING 仅改 docs/.planning 四文件与证据日志，SOURCE_GLOBS 外，2026-07-21 00:30 复算仍 == 07287c72）"
+  },
+  "commands": [
+    {
+      "command": "npm run typecheck",
+      "result": "PASS（node+mcp 双项目）",
+      "at": "2026-07-20 22:35 +08"
+    },
+    {
+      "command": "P19–P24 定向 20 文件 150 测试",
+      "result": "150/150 PASS",
+      "at": "2026-07-20 22:35 +08"
+    },
+    {
+      "command": "npm test（终态摘要 07287c72 全量 Vitest）",
+      "exitCode": 0,
+      "result": "174 文件 / 930 测试全部通过（含 packaged-mcp-runtime，R4-F3 闭环）；首次 503.98s、完整日志复跑 500.57s 均退出码 0",
+      "at": "2026-07-20 23:33:48 +08",
+      "log": "docs/evidence/p19-p24-final-full-regression-20260720.log",
+      "logSha256": "359db94c2042d23337d45fb42a7d80abfb5b46ce13ed1ef86a6363993c7f2fc3"
+    },
+    {
+      "command": "npm run build（build:mcp + build:identity + electron-vite production build）",
+      "result": "PASS；release-manifest 重新生成（buildId=22799978，mcpToolCount=186，sourceDigest=07287c72）；packaged-mcp-runtime 由延期失败转绿",
+      "at": "2026-07-20 23:09 +08"
+    },
+    {
+      "command": "scripts/ui-p23-p24-canvas-trace-smoke.ts（真实 Electron 三相位）",
+      "result": "PASS（full/restart/switched 全 ok）",
+      "evidence": "docs/evidence/p23-p24-electron-smoke-20260720.json"
+    },
+    {
+      "command": "scripts/large-canvas-ui-smoke.ts（400 节点）",
+      "result": "PASS（performanceProbe.ok=true，全部 checks true）",
+      "evidence": "docs/evidence/p24-global-large-canvas-400-20260720.json"
+    },
+    {
+      "command": "scripts/ui-managed-studio-scale-canvas-smoke.ts（1288/4235/10000）",
+      "result": "PASS（status=pass）",
+      "evidence": "docs/evidence/p24-global-scale-canvas-ui-smoke-20260720.json"
+    },
+    {
+      "command": "scripts/ui-p15-simple-canvas-smoke.ts（错误路径+重启恢复）",
+      "result": "PASS（status=pass）",
+      "evidence": "docs/evidence/p24-global-p15-canvas-ui-smoke-20260720.json"
+    },
+    {
+      "command": "impact 规模耗时实测（script-revision-impact + by-pack 首跳，1288 单元/10000 媒体夹具）",
+      "result": "PASS",
+      "evidence": "docs/evidence/p24-trace-scale-measure-20260720.json"
+    },
+    {
+      "command": "npx tsx scripts/update-p24-golden.ts（无 P24_GOLDEN_UPDATE，门禁实测）",
+      "exitCode": 1,
+      "result": "按预期拒写（baseline 只能显式审核更新）；配套 golden runner 复跑 tests/studio-trace-golden.test.ts 4/4 绿（30 case 与终态代码确定性一致，若现更新仅刷新标记）",
+      "at": "2026-07-21 00:13 +08",
+      "note": "update-golden 流程机械半实测完成；人工审核半 NOT_RUN（属 humanAcceptance）"
+    }
+  ],
+  "uiCases": {
+    "p23p24ElectronThreePhases": {
+      "full": "单拖吸附出线/松手清零/移动落盘、undo/redo 精确回退恢复、组拖全程零参考线+队形像素级保持（dx/dy 126/99 不变）、U1 冻结包身份/U2 @toggle 分类/U3 Review 身份/U4 修订历史 全部 true",
+      "restart": "重启后 canvasMounted，undo/redo 禁用（栈不跨工程/会话）",
+      "switched": "切工程后 canvasMounted，undo/redo 禁用"
+    },
+    "largeCanvas400": "400 逻辑节点全在、精确筛 1、自动布局无重复无重叠、缩放响应、平移后末节点渲染/首节点卸载、目标缩略图解码、DOM/图片有界",
+    "scaleCanvas": "1288 单元/4235 宫格/77 资产/10000 媒体：initialDom 16、expandedDom 8、媒体库 keyset 分页 DOM 恒 36、十次切工程无串库、FD/RSS/媒体请求稳定",
+    "p15SimpleCanvas": "四主入口/自由拖拽/连线/加号互连/反向加号/键盘守卫/重边与非法边拒绝/清空仅视图/重启恢复/重复开始幂等 全过"
+  },
+  "screenshots": [
+    {
+      "path": "docs/evidence/p23-p24-electron-smoke-20260720.png",
+      "sha256": "c855e5d0c5bbc27073ac71bbf3a32fc74bfe77be04c2678c8209248494c7eebd",
+      "debugJsonSha256": "90919216e0881ad5590bc3eae2962440bb7a8f166da36f78bebf942235de5451",
+      "review": "主代理已原尺寸查看：切工程相位空画布 undo/redo 禁用，与 checks 一致"
+    },
+    {
+      "path": "docs/evidence/p24-global-large-canvas-400-20260720.png",
+      "sha256": "109216b9eaab5f897820106955846c90674fb2e6ff1aeb1510e5a94a5c1f841d",
+      "debugJsonSha256": "69a9cd64e43e60e9ada9ccc53f9b1b0355a02b554022b5b2c64741c68d57142d",
+      "review": "主代理已原尺寸查看：400 节点视口剔除生效（DOM 仅 4 生产节点/4 图），与 checks 一致"
+    },
+    {
+      "path": "docs/evidence/p24-global-scale-canvas-ui-smoke-20260720.png",
+      "sha256": "2212eb079086bfb63a16dcbbd7b4ec94fd1a98d30265bbb8a62c5ccebd56fbb8",
+      "review": "主代理已原尺寸查看：77/1288/4235/10000/2 概览，DOM 有界，与 status=pass 一致"
+    },
+    {
+      "path": "docs/evidence/p24-global-p15-canvas-ui-smoke-20260720.png",
+      "sha256": "7098c5f03819ef0e6c25b3dbd3f574a5f77845e0829917503f67eaee3f533f30",
+      "review": "主代理已原尺寸查看：P7 夹具画布已派发等待 Agent，无伪造结果，与 safety 段一致"
+    }
+  ],
+  "evidenceFiles": [
+    {
+      "path": "docs/evidence/p23-p24-electron-smoke-20260720.json",
+      "sha256": "698835bb0be28d5bc91790e9b1a9a82e41eca2f4c4d4820c72cc1085c962af1e"
+    },
+    {
+      "path": "docs/evidence/p24-global-large-canvas-400-20260720.json",
+      "sha256": "da6fda1ba0ba16fdb981a4ced1a0b925b8dcd149245b6a4692336654f063afe7"
+    },
+    {
+      "path": "docs/evidence/p24-global-scale-canvas-ui-smoke-20260720.json",
+      "sha256": "fb61ce15b67c606b3dde7617d6eaaaf19492d200572a1fd6103648728f795b1e"
+    },
+    {
+      "path": "docs/evidence/p24-global-p15-canvas-ui-smoke-20260720.json",
+      "sha256": "6b3a52bd203c4a0fc0d6fa498de38f37e4055f430fc056b0b9c7250a3da5f695"
+    },
+    {
+      "path": "docs/evidence/p24-trace-scale-measure-20260720.json",
+      "sha256": "1e625b94fa9dcc9fe85d2e6981cbf33cf659f6d84501aa7089c9e7c9b3dafdef"
+    },
+    {
+      "path": "docs/evidence/p24-full-regression-20260720.log",
+      "sha256": "58d4ecbfe201bc6fd0085037b8c7b916314a67328555b1d4558d8aabac1b353f",
+      "note": "P24 复冻态无并发全量回归 929/930（唯一失败=R4-F3 已登记延期）"
+    },
+    {
+      "path": "docs/evidence/p19-p24-final-full-regression-20260720.log",
+      "sha256": "359db94c2042d23337d45fb42a7d80abfb5b46ce13ed1ef86a6363993c7f2fc3",
+      "note": "终态 930/930 全绿完整 stdout 日志（725 行；E2-F5 修复后替换 tail -8 摘要版，旧版 SHA 7e4b5464… 作旧）"
+    }
+  ],
+  "isolationIdentity": {
+    "electronSmoke": {
+      "fixtureRoot": "/private/tmp/studio-p7-fixture-FAllZI/p7-continuity-fixture-4b6a4536",
+      "registryPath": "隔离 registry（/var/folders/.../p23-p24-smoke-registry-27875.json）",
+      "userData": "隔离 Electron userData"
+    },
+    "large400": {
+      "fixtureRoot": "/tmp/p24-global-large-400",
+      "nodes": 400
+    },
+    "scaleCanvas": {
+      "largeProjectId": "project-3b7791d97646",
+      "units": 1288,
+      "panels": 4235,
+      "assets": 77,
+      "media": 10000,
+      "startupPolicy": "no-filesystem-scan"
+    },
+    "p15": {
+      "projectId": "project-f40fc0bf507d",
+      "fixtureCleaned": true,
+      "runtimeCleaned": true
+    },
+    "traceMeasure": {
+      "fixtureRoot": "/private/var/folders/.../p24-scale-m3NBMl/p9-scale-6be25112-bfdba807",
+      "unitCount": 1288
+    },
+    "formalProjectUntouched": "projects/codex-ai-drama-studio 全程只读，未写"
+  },
+  "errorPaths": [
+    "p15：重复边拒绝、非法边拒绝、残缺草稿开始前拦截（ledger 写入前）、清空工作区仅视图且需二次确认",
+    "P21 恢复：重启后 undo/redo 禁用不幽灵；切工程 undo 栈清空",
+    "P22/P24：结果行分类 fail-safe（未知→unexpected），冻结包身份当时链还原不读 head",
+    "large-400：平移换出节点卸载、目标缩略图解码失败回退"
+  ],
+  "performance": {
+    "largeCanvas400": {
+      "frameP50Ms": 8.3,
+      "frameP95Ms": 9.1,
+      "frameMaxMs": 9.3,
+      "heapUsedBytes": 26000000,
+      "vueFlowNodesInDom": 9,
+      "productionNodesInDom": 4,
+      "imagesInDom": 4
+    },
+    "scaleCanvas": {
+      "initialDom": 16,
+      "expandedDom": 8,
+      "mediaLibraryPageDom": 36,
+      "maximumDomNodes": 78,
+      "crossProjectLeak": false
+    },
+    "traceScale": {
+      "firstHopLimit100Ms": 1.41,
+      "impactFirstPageLimit50Ms": 1686.82,
+      "impactSubsequentPageMs": [
+        126.7,
+        127.04,
+        125.42,
+        125.88
+      ],
+      "note": "无索引首跳（1288 单元）与反向影响分页实测"
+    },
+    "planProgressProjection": "1288 单元 11.7ms（P21 验收实测）"
+  },
+  "mechanicalAcceptance": "PASS：typecheck 双项目、定向 150/150、全量 930/930、production build、真实 Electron 三相位、400 节点、1288/4235/10000 规模、p15 错误路径/重启恢复、impact 规模耗时 全部通过，且全部证据同属 sourceDigest 07287c72 / buildId 22799978",
+  "humanAcceptance": "NOT_RUN：机械通过≠手感/视觉/剧情合理；组拖手感、审片体验、剧情质量留用户人工验收",
+  "notRun": [
+    "Grok live（无额度，仅离线合同兼容）",
+    "真实 Codex 生图（本终验 0 张；p15 夹具派发 2、结果 0，不冒充已出图）",
+    "安装包制作/签名/替换 /Applications（合同：P19–P24 不打包）",
+    "正式工程生产推进（checkpoint 冻结保持）",
+    "update-golden 人工审核半（baseline 显式审核属人工动作；机械半已实测：默认拒写门禁 exit 1 + golden runner 4/4 绿）"
+  ],
+  "nonClaims": [
+    "不承诺对任意未来输入零 Bug",
+    "探针通过≠手感无问题；测试通过≠UI 已被人验收；已派发≠已出图",
+    "旧 D01 黄金面具 Binding/连续性/冻结包/结果保持 stale，未提升",
+    "正式工程约 1.1GB 活动受管，未按空库处理"
+  ],
+  "safety": {
+    "gitOperations": "无 commit/push/PR，无 remote。例外登记（E2-F1）：2026-07-20 21:28:22 .git/index 记录一次约 35,333 文件的 git add（仅 stage，文件内容零改动）；主代理会话 wire 全量检索无任何 git 变更命令，执行者未能归因（疑似另一窗口/工具）；sourceDigest 按文件内容哈希与 git index 无关，冻结摘要链不受影响（复算闭环成立）；stage 保留现状，是否 git reset 留用户决定",
+    "formalProjectWrites": "无（主数据文件 mtime 均早于 P18 基线；wal/shm mtime=2026-07-20 03:00:32 归因 P20 GAP_AUDIT 只读查询 DatabaseSync(readOnly:true) 打开 WAL 触发恢复，合同允许的只读规模检查）",
+    "authoritativeAssetWrites": "无（黄金面具权威图只读，SHA 复核=02e9438ecee038f7d14860da37cb315bf358db4a26fa224e342eee5b592b55a9）",
+    "externalUploadsPayments": "无",
+    "installPackage": "未制作",
+    "historyEvidence": "未覆盖/删除任何历史 final-validation 与证据（P17 及更早 mtime 未变）",
+    "secrets": "未读取/打印/保存任何密钥"
+  },
+  "reviewReportShas": {
+    "P19/R-pre-1_预审报告.md": "09b16b851ef74670180c540a038f15061dbc498a953748fddd3014bc6ef283b3",
+    "P19/R-pre-2_预审报告.md": "b239919580a927263ae878c322e77ba9e40f84666f00f7f625d62173805b4434",
+    "P19/REMEDIATING复查_存档.md": "65455600c21877d7c826d6563a9c988e3f108030ebfe5d7470f7e0ce67586608",
+    "P19/盲审四路_存档.md": "b5f60aa408e51a432c8a76d71fe8f0c110541b909c3d1b59534fd843fb3cd092",
+    "P20/R-pre-1_预审报告.md": "8d961f4b70cfb95ba10fae4772ed9c44d88382a9f960bfa38d2e57cae1398640",
+    "P20/R-pre-2_预审报告.md": "743d4038b09b377201c1fabbbb64c0b3280b0bfc19bc1f65e69f1fe9e21f9045",
+    "P20/REMEDIATING复查_存档.md": "fd1993aeccbea4cc69ee66ec3d35d4adc4008e85b946b4fd1193de3a6a38fcce",
+    "P20/第二轮复查_存档.md": "aad31bd82b4758f92767a74dbe2113111aa655751c1a9cdf87eaacf26076d3e5",
+    "P20/第三轮复查_存档.md": "883ae004f89883c1ecc21ea6e92635125e4305c767be17e980bfcc47efde97b6",
+    "P20/盲审四路_存档.md": "701eaaedd2fa1a72194ced2bdd572d76f472bdb394fce35ec61865a23c05d967",
+    "P21/SPEC_REVIEW预审_存档.md": "0ee306fc46bb2fa2604748a1268378eb22ec4cfd3cd025f188b521cf93a83937",
+    "P21/盲审与复查_存档.md": "57ec9b6ba7b07cf88863a4a8176ad9094370421059c7d81b250da5994155273e",
+    "P22/SPEC_REVIEW预审_存档.md": "154e106affa97105ff38d0924f567b49d956d736db4d911c80ac253a012eb571",
+    "P22/盲审与复查_存档.md": "51e018e65cfd373604274eee8d00a0bf5296d5d24dca46563e97dbe6dec886ee",
+    "P23/SPEC_REVIEW预审_存档.md": "8604d13a29f934e209a8a0124959afa53721801897aa2d2619529d8a5ab15d6f",
+    "P23/盲审四路_存档.md": "48ce429ebd3ec5770cfee5d82dc651d2e59764f748643a34df1fa09973dfbcb9",
+    "P24/GAP_AUDIT_存档.md": "5f4a6a3b22ff1eac6d8b5d4be309c6d548d90e344150cdaa3b1283dec2fb186b",
+    "P24/SPEC_REVIEW预审_存档.md": "32999b3b9278374e6bc1324d6615eb4ce507333876802f6621e7422d6323763b",
+    "P24/盲审四路_存档.md": "9f71a9fc4a611ea042a243d97e1c6d0b8cd00bb64376df9b03bca01ac7d87aa5"
+  },
+  "reviewReportsRoot": ".planning/reviews/",
+  "deferredRegistrations": [
+    "R5-F4（>50 pack 挤出场景行为级复现）登记为可选补强，不阻断",
+    "P24-X1（外来 QA 脚本 scripts/qa-dudu-storyboard.ts 的 tsconfig exclude+SOURCE_GLOBS ignore 最小处置）保留：另一窗口《嘟嘟》番外会话仍可能活动，防止活动迭代污染冻结摘要",
+    "R3-F1 建议器响应截断（P21+ 评估）、R1-F10 suggest 工具 extra.signal（可选）、F-R2-08 迁移夹具形态偏差（P3 记录）",
+    "P22 残余登记：decode 单边失败 bitmap 泄漏窗口、@media 280px 残规、多端点触控 pointercancel 中止、视图单文件约 1230 行未拆子组件",
+    "R3-F4 undo 全图快照内存口径（2–5MB@400 节点，80 条封顶有界）changed-only 增量为后续可选",
+    "E1-F1/E2-F6（P3）：electron smoke 与 trace 证据仅绑定 sourceDigest、large-400 证据 JSON 无内嵌身份字段——绑定经索引 SHA 转述闭合，后续 smoke 脚本统一补写完整 buildIdentity 段",
+    "E2-F1（P1 已处置）：2026-07-20 21:28 git add 例外登记见 safety.gitOperations；主代理 wire 无 git 变更命令，执行者未归因；stage 是否清理留用户",
+    "E2-F5（P3）：首版终态回归日志仅 tail -8；已重跑完整 stdout 版替换（同一终态摘要，SHA 以 evidenceFiles 段为准）"
+  ],
+  "evidenceReview": {
+    "round1": [
+      {
+        "reviewer": "E1（证据一致性）",
+        "actualModel": "Kimi K3（Kimi Code CLI 只读子代理）",
+        "verdict": "PASS",
+        "notes": "9 项核验全过：摘要复算/13 证据 SHA/五份证据绑定/数字交叉/19 报告 SHA/历史证据完整；2×P3（E1-F1 身份字段、E1-F2 日志 tail-only）"
+      },
+      {
+        "reviewer": "E2（合同/边界/交接/许可证）",
+        "actualModel": "Kimi K3（Kimi Code CLI 只读子代理）",
+        "verdict": "FAIL→REMEDIATING",
+        "findings": "E2-F1 P1（21:28 git add 未申报+三处文档失实）/ E2-F2 P2（正式工程 wal/shm mtime 断言失实）/ E2-F3 P2（update-golden 必验悬空）/ E2-F4/F5/F6/F7 P3"
+      }
+    ],
+    "remediating": "F1：交接/索引更正并归因（主代理 wire 无 git 变更命令；无 commit/push/remote；内容哈希与 index 无关）；F2：交接更正为 wal/shm 只读打开 touch 归因（P20 GAP_AUDIT 03:00:31）；F3：门禁拒写实测 exit 1 + golden runner 4/4 绿，人工审核半显式 NOT_RUN；F4：检查表三处陈旧更正（impact 终态值/6f5530ff 中间态标注/P20 标题）；F5：完整 stdout 日志重跑替换；F6：登记；F7：CanvasMind 冲突说明澄清（UI 勿仿即梦，代码 MIT）",
+    "round2": [
+      {
+        "reviewer": "E2（原发现者）",
+        "actualModel": "Kimi K3（Kimi Code CLI 只读子代理）",
+        "verdict": "PASS",
+        "notes": "F1–F7 全部关闭，独立核验与现场一致；新发现 E2-F8（P3 日期笔误+交接一行未同步）已顺手更正"
+      },
+      {
+        "reviewer": "E3（不同审查者，delta 复核）",
+        "actualModel": "Kimi K3（Kimi Code CLI 只读子代理）",
+        "verdict": "PASS",
+        "notes": "摘要零漂移/git/wal/golden 门禁/日志 SHA/夹带检查全过；4×P3 文档级（E3-F1..F4）已全部更正：检查表日期、耗时归属、正式工程枚举、digestClosure 时点限定"
+      }
+    ]
+  }
+}

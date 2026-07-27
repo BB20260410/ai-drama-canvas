@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "kind": "p29-journey-screenshots",
+  "sourceDigest": "6f16e8d1d6a594863b8b4418e783422395881601dbd56b7eff8eb7be0a73b62c",
+  "sourceFiles": 514,
+  "sourceBytes": 11331358,
+  "createdAt": "2026-07-21T16:05:45.997Z",
+  "screenshots": {
+    "j4-canvas": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p29-journey-j4-canvas-20260721-v2.png",
+      "bytes": 244920,
+      "sha256": "24d2fca5d8548f6bab50d66b1e81860545bd3e9105a1124301f766670826a64a"
+    },
+    "j2-script": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p29-journey-j2-script-20260721-v2.png",
+      "bytes": 93567,
+      "sha256": "c928dbf7b07c35f2ee778871ce8b5a69ff5e9a65c1de1f04192d8a975b48ae47"
+    },
+    "j3-assets": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p29-journey-j3-assets-20260721-v2.png",
+      "bytes": 92519,
+      "sha256": "79fe9953fefc9118557f698dff2d3b26ec968d1e1e6db430ed6f4fc15b861ec1"
+    },
+    "j5-binding": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p29-journey-j5-binding-20260721-v2.png",
+      "bytes": 196021,
+      "sha256": "d41ad5497bd3905343d6d4225d1c87bd8ecf71e5f84a0ab50610cbbd7756456c"
+    },
+    "j6-generation": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p29-journey-j6-generation-20260721-v2.png",
+      "bytes": 131176,
+      "sha256": "ab7daeda32f21b169cd4848bc4aa847b8577d57e3dfea96e62af96e8d896be8f"
+    },
+    "j7-review": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p29-journey-j7-review-20260721-v2.png",
+      "bytes": 72737,
+      "sha256": "45bf8905e4a9c3d8a218c89ba7cdcc8393540a4482fc54ff3f8a655b7b6f4f79"
+    },
+    "j8-dashboard": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p29-journey-j8-dashboard-20260721-v2.png",
+      "bytes": 224908,
+      "sha256": "56927ce6046b43f9624419e971f664ef7ec2d8e0c9255093a1f14873b4033c49"
+    },
+    "j8-agent": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p29-journey-j8-agent-20260721-v2.png",
+      "bytes": 87698,
+      "sha256": "148a435fcb832e26ca2c4aa585d166c7117e1ad8194756d2ac90cda24ac216fb"
+    },
+    "j8-help": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p29-journey-j8-help-20260721-v2.png",
+      "bytes": 90118,
+      "sha256": "04b7578c32c83abcff6ea511a5d2aa05ee3e683de277b859182b49aa9d67e72a"
+    },
+    "j1-project-center": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p29-journey-j1-project-center-20260721-v2.png",
+      "bytes": 144766,
+      "sha256": "887d5a8569389a0cc43a8fa061b36fcb67db557b40159cbcb78d1d6d4eee57e5"
+    }
+  }
+}

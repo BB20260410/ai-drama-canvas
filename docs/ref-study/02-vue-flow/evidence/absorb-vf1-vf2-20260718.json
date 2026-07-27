@@ -1,0 +1,9 @@
+{
+  "kind": "ref-study-absorb",
+  "project": "Vue Flow",
+  "slices": ["VF-1 MiniMap", "VF-2 selection→workflow group"],
+  "date": "2026-07-18",
+  "level": ["L2-npm", "L1-clean-room-ui"],
+  "typecheck": "pass",
+  "vitest": "14 passed"
+}

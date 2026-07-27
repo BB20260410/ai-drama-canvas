@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 1,
+  "kind": "p14-formal-project-backup-restore-validation",
+  "status": "pass",
+  "startedAt": "2026-07-18T17:11:01.751Z",
+  "completedAt": "2026-07-18T17:11:10.662Z",
+  "buildIdentity": {
+    "sourceDigest": "267d6f29baf0b20908d8453ae80b3fc1a306a2ef949e383acfffeddc131dd582",
+    "buildId": "4372262cc78d9ed7773414cfdede38af"
+  },
+  "source": {
+    "projectId": "project-2e3b44bc6ac4",
+    "projectName": "Codex AI 短剧素材中心",
+    "manifestFingerprint": "57e55eaf4b571c8e1ca7f606f79f849d08d0ad074ebd112eb0f82968413c3ac8",
+    "counts": {
+      "material": {
+        "media": 1152,
+        "mediaImports": 1235,
+        "canonicalAssets": 85,
+        "characters": 33,
+        "scenes": 33,
+        "props": 19,
+        "assetVersions": 141,
+        "assetDefinitions": 87,
+        "primaryAuthorities": 85,
+        "authorityEvents": 86,
+        "versionReviews": 141,
+        "assetRelations": 0
+      },
+      "production": {
+        "textDocuments": 1082,
+        "scriptDocuments": 541,
+        "promptDocuments": 541,
+        "textRevisions": 1082,
+        "units": 541,
+        "panels": 3246,
+        "unitRevisions": 567,
+        "scriptSectionRevisions": 0,
+        "mentionAnalyses": 156,
+        "mentionProposals": 2262,
+        "mentionDecisions": 2262,
+        "panelEntityClosureConfirmations": 6,
+        "assetBindingSets": 156
+      }
+    },
+    "mediaInventory": {
+      "image": 1152,
+      "video": 0,
+      "audio": 0
+    },
+    "writeCommandsByThisRun": 0
+  },
+  "backup": {
+    "root": "output/p14-formal-backups-p11p14-final-masklock-20260718/backup-project-2e3b44bc6ac4-2026-07-18T17-11-01-872Z",
+    "schemaVersion": 2,
+    "fileCount": 3448,
+    "aggregateSha256": "ed652057ee4681ce2874c7abcb2efe3ae964a5289d00aa69a0b35eed415e1a58",
+    "manifestSha256": "3da49c901067cfa22bbc749512bfb89c0347c22f1242c5f2f6e700d968d348bf",
+    "snapshot": {
+      "strategy": "sqlite-online-backup-write-barrier-v1",
+      "sourceStabilityVerified": true,
+      "ordinaryFileCount": 3443,
+      "sqliteDatabases": [
+        ".aicanvas/cache.sqlite",
+        ".aicanvas/command-ledger.sqlite",
+        ".aicanvas/material-studio.sqlite",
+        ".aicanvas/studio-generation-ledger.sqlite",
+        ".aicanvas/studio-production.sqlite"
+      ]
+    },
+    "durationMs": 5092
+  },
+  "restore": {
+    "root": "output/p14-formal-restore-p11p14-final-masklock-20260718/restored-project-2e3b44bc6ac4",
+    "overwriteSource": false,
+    "projectIdPreserved": true,
+    "durationMs": 2749,
+    "sqliteIntegrity": [
+      {
+        "relativePath": "output/p14-formal-restore-p11p14-final-masklock-20260718/restored-project-2e3b44bc6ac4/.aicanvas/cache.sqlite",
+        "result": "ok"
+      },
+      {
+        "relativePath": "output/p14-formal-restore-p11p14-final-masklock-20260718/restored-project-2e3b44bc6ac4/.aicanvas/command-ledger.sqlite",
+        "result": "ok"
+      },
+      {
+        "relativePath": "output/p14-formal-restore-p11p14-final-masklock-20260718/restored-project-2e3b44bc6ac4/.aicanvas/material-studio.sqlite",
+        "result": "ok"
+      },
+      {
+        "relativePath": "output/p14-formal-restore-p11p14-final-masklock-20260718/restored-project-2e3b44bc6ac4/.aicanvas/studio-generation-ledger.sqlite",
+        "result": "ok"
+      },
+      {
+        "relativePath": "output/p14-formal-restore-p11p14-final-masklock-20260718/restored-project-2e3b44bc6ac4/.aicanvas/studio-production.sqlite",
+        "result": "ok"
+      }
+    ],
+    "mediaInventory": {
+      "image": 1152,
+      "video": 0,
+      "audio": 0
+    },
+    "mediaSamples": {
+      "images": [
+        {
+          "sha256": "002c31334ac34fa70058ca8efa595c8168ceddea1f6df7572943c890ac3ff6ec",
+          "kind": "image",
+          "width": 1920,
+          "height": 1080,
+          "format": "jpeg"
+        },
+        {
+          "sha256": "008f123911e2bbfd68f96b84fc2d50be16c0ba6093b25397e07b279db9a6879d",
+          "kind": "image",
+          "width": 1920,
+          "height": 1080,
+          "format": "jpeg"
+        },
+        {
+          "sha256": "00f2b5bf144a334254dbf497ac58ca0c5fa1141ce2c1b86924c2ee5bd1e8024b",
+          "kind": "image",
+          "width": 1920,
+          "height": 1080,
+          "format": "jpeg"
+        },
+        {
+          "sha256": "015a60f0171afdcf4962cc99f0a9aa7d63e512e5fd03201820d14b63a468e526",
+          "kind": "image",
+          "width": 1536,
+          "height": 1024,
+          "format": "png"
+        },
+        {
+          "sha256": "01761b5becc5c3dd19fa7f146619569094d014f98ea750e8781a7cefaee450ee",
+          "kind": "image",
+          "width": 1920,
+          "height": 1080,
+          "format": "jpeg"
+        },
+        {
+          "sha256": "01c9b4f548777d0a0842f595f28529df9937144e3249e955d55ee8e2ff4492b2",
+          "kind": "image",
+          "width": 1920,
+          "height": 1080,
+          "format": "jpeg"
+        },
+        {
+          "sha256": "0228da5cd7ea73363edd18b4ac0133d05a1381ce509376cfdaef4485b9edd731",
+          "kind": "image",
+          "width": 1920,
+          "height": 1080,
+          "format": "jpeg"
+        },
+        {
+          "sha256": "02383da6b672ff3a8bacf02a9ea68bdcc61877bbfdea8e04b417d1820ea738d0",
+          "kind": "image",
+          "width": 1920,
+          "height": 1080,
+          "format": "jpeg"
+        },
+        {
+          "sha256": "02452174d38914e26f70dfbac68cce363cbe590766748c031fa40eac3f306042",
+          "kind": "image",
+          "width": 1920,
+          "height": 1080,
+          "format": "jpeg"
+        },
+        {
+          "sha256": "024cbe48dd91c8436d65a9bb3171e63e772e7e38876849f3f6a15ef0e3021998",
+          "kind": "image",
+          "width": 1920,
+          "height": 1080,
+          "format": "jpeg"
+        },
+        {
+          "sha256": "028709410602186f6ca79c82040b5f159ae8449fc3fc1686e3f9f5bc6d98f64f",
+          "kind": "image",
+          "width": 1920,
+          "height": 1080,
+          "format": "jpeg"
+        },
+        {
+          "sha256": "028894d7c87e0acc87a1e55a00ffd8e07e2e271f3524849c1109c93f287c4ddd",
+          "kind": "image",
+          "width": 1920,
+          "height": 1080,
+          "format": "jpeg"
+        }
+      ],
+      "videos": [],
+      "audio": []
+    },
+    "safeWrite": {
+      "command": "create_studio_prompt_document",
+      "documentId": "p14-restored-write-probe-1784394670594",
+      "status": "succeeded"
+    }
+  },
+  "boundaries": {
+    "formalProjectGenerationCalls": 0,
+    "formalProjectWriteCommands": 0,
+    "restoredCopyWriteCommands": 1,
+    "browserCalls": 0,
+    "uploads": 0,
+    "gitStage": 0
+  }
+}

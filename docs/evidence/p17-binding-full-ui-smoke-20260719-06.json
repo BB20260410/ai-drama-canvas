@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "kind": "p6-binding-workbench-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-19T10:17:02.427Z",
+  "fixture": {
+    "projectId": "project-8211b2cfddbf",
+    "sourceRoots": [],
+    "units": 1,
+    "panels": 2,
+    "canonicalAssets": 3
+  },
+  "ui": {
+    "startupDefaultCanvas": true,
+    "bindingChunkLazyLoaded": true,
+    "sourceExcerptVisible": true,
+    "chapterAndSceneSourcesVisible": true,
+    "exactAliasPendingHumanAccept": true,
+    "ambiguousCandidateCount": 2,
+    "silentAmbiguitySelection": 0,
+    "resolvedDecisionVisible": true,
+    "confirmedEmptyReviewedByUser": true,
+    "confirmedEmptyCurrent": true,
+    "confirmedEmptyFrozen": true,
+    "bindingSetCurrent": true,
+    "generationReady": true,
+    "nextActionAfterFirstFreeze": "宫格 2：解析当前宫格的剧本实体。",
+    "nextActionAfterConfirmedEmptyFreeze": "全部宫格绑定已就绪，可由 Codex 冻结下一个单图生成包。",
+    "readyMs": 2534,
+    "pageErrors": 0,
+    "externalRequests": 0
+  },
+  "bindingSet": {
+    "id": "asset-binding-set-ca2ef9d6f688981114dc3ebf7ee4818c0281ced7",
+    "fingerprint": "ca2ef9d6f688981114dc3ebf7ee4818c0281ced79aefc9522f06dcb8989f29f4",
+    "bindings": 2
+  },
+  "confirmedEmptyBindingSet": {
+    "id": "asset-binding-set-ad61f152576ee1bc9c6e462dca90caa18060e87e",
+    "fingerprint": "ad61f152576ee1bc9c6e462dca90caa18060e87e3dfe201844abe9feb49223fe",
+    "bindings": 0,
+    "confirmedEmpty": true,
+    "confirmationId": "panel-entity-closure-confirmation-3cf26cbe1d9f9776904c9c9ce9892f7ba0204677",
+    "reviewer": "user"
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p17-binding-full-ui-smoke-20260719-06.png",
+    "sizeBytes": 388269,
+    "sha256": "f75af92d75e8e17d006dfec593d72ec01d06f16582f29fe6308d38d562a4a3aa",
+    "width": 3456,
+    "height": 2058,
+    "format": "png",
+    "stdev": 96.38278640670171
+  },
+  "boundaries": {
+    "formalProjectWrites": 0,
+    "filesystemScans": 0,
+    "imageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0
+  }
+}

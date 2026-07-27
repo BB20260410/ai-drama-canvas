@@ -1,0 +1,63 @@
+{
+  "kind": "multimedia-os-product-completion-checklist",
+  "goal": "docs/GOAL_多媒体时间线生产OS_20260725.md",
+  "gates": {
+    "1_store_script_image_video_audio": {
+      "pass": true,
+      "evidence": "w1-four-media-import-smoke.json + w1-av-import-smoke.json"
+    },
+    "2_timeline_unit_media_align": {
+      "pass": true,
+      "evidence": "prior w1-timeline + isolation U01 pass + script-media-align"
+    },
+    "3_agent_ring_codex": {
+      "pass": true,
+      "evidence": "prior w2-canary-bond (isolation U01 pass raw ab3c6570…)"
+    },
+    "4_lock_refs": {
+      "pass": true,
+      "evidence": "w2 freeze controlRefs×3 + gate tests prior wave"
+    },
+    "5_smooth_soft_or_soak": {
+      "pass": true,
+      "evidence": "w3-first-screen-timing + w3-thumbnail-priority + w3-large-project-soak"
+    },
+    "6_redlines": {
+      "pass": true,
+      "evidence": "s1e1-formal-raw-sentinel-after.json unitCount=33 pass=33"
+    }
+  },
+  "optional": {
+    "grok_live": {
+      "pass": "protocol-only-written-degrade",
+      "evidence": "w2-grok-live-decision.json"
+    },
+    "w4_ux": {
+      "pass": true,
+      "evidence": "w4-script-library-build-identity.json"
+    }
+  },
+  "residualHonest": [
+    "非 NLE 多轨剪辑时间线",
+    "一致性辅助不保证永不漂",
+    "dudu full 投影采样 ~50s（非首屏路径；fastMode 首屏 p50~158ms）",
+    "Grok live 本波未跑（无第二 canary 单元 + 策略书面降级）"
+  ],
+  "productCompleteForStatedGates": true,
+  "evidenceFiles": [
+    "FINAL_REPORT.md",
+    "av-inputs",
+    "ffmpeg-audio.log",
+    "ffmpeg-video.log",
+    "s1e1-formal-raw-sentinel-after.json",
+    "w1-av-import-smoke.json",
+    "w1-four-media-import-smoke.json",
+    "w2-grok-live-decision.json",
+    "w3-first-screen-timing.json",
+    "w3-large-project-soak.json",
+    "w3-project-discovery.json",
+    "w3-thumbnail-priority.json",
+    "w4-script-library-build-identity.json"
+  ],
+  "createdAt": "2026-07-25T08:58:46.389Z"
+}

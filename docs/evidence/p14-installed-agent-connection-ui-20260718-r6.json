@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "kind": "p14-installed-agent-repair-ui-smoke",
+  "status": "FAIL",
+  "stage": "snapshot-after",
+  "errorSha256": "a7f7adc6c42209f04a41d3ef1436eedf7fcbda2814826c691f00751287a1bcc5",
+  "knownBackupCreated": true,
+  "backupDeletionAttempted": false,
+  "rawAbsoluteLocationStored": false,
+  "configurationPayloadStored": false,
+  "credentialPayloadStored": false
+}

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 2,
+  "kind": "p27-fullstack-review-validation-supplement",
+  "status": "PARTIALLY_ACCEPTED",
+  "createdAt": "2026-07-21T11:09:00.000Z",
+  "buildIdentity": {
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "sourceDigest": "1a18d0d2870d554ffebb3394fdb5892771bfd86e5bc834d71051aea2faef2fc2",
+    "sourceFiles": 513,
+    "sourceBytes": 11313695,
+    "buildId": "0c435c94d1631c1142d76f7d906922b8",
+    "buildIdentityFingerprint": "1b8d457c9be0159de9ef2c503493173d4f77059dde98e490c5d6a003e615120f",
+    "releaseManifestFingerprint": "2817d50c464eb951ecb923f3269e7778684bbfa257aa3de5e6af46c3b45a3a66",
+    "releaseManifestSha256": "fb45c04cc86e649ea6758a224b22feb50bf1f11cdf7e5155f40b8670bdd38cf0",
+    "protocolVersion": "1.1",
+    "mcpToolCount": 186,
+    "distribution": "local-only"
+  },
+  "acceptance": {
+    "currentFunctionality": "ACCEPTED_AFTER_P28_REMEDIATION",
+    "historicalReviewProvenance": "NOT_INDEPENDENTLY_ARCHIVED",
+    "explanation": "P27 所声明的路径、协议、迁移、恢复、MCP 与 UI 行为已在 P28 当前源码上重新验证；但仓库中没有可独立核对作者和时间线的两路盲审单独报告，因此不把清单中的 R2/R4/R5 叙述当作独立作者证明。"
+  },
+  "historicalEvidence": {
+    "originalValidation": {
+      "path": "docs/evidence/p27-fullstack-review-validation-20260721.json",
+      "sha256": "2f6e9f7e681fe68cd52ba39af695ac8a936f25e8b74313c4486b6755f6207c10"
+    },
+    "implementationChecklist": {
+      "path": ".planning/P27_全栈审查与优化清单.md",
+      "sha256": "76be8ef000908ffb7e7db6fd2ab2f5e9985ae343fb5d43a1eccac93c62a29a22"
+    },
+    "separateBlindReviewReports": [],
+    "reviewArchiveStatus": "not-independently-archived"
+  },
+  "declaredTouchedSurfaceCurrentHashes": [
+    { "path": "src/core/legacy-asset-confinement.ts", "sha256": "35f4b1a44782cfa009d2e0abefed317330541d1e328e89528358466892dfb207" },
+    { "path": "src/core/project-backup.ts", "sha256": "5593f29f80e8b75e19eef73edbd06d9d4f28cfb5447a6b2e8b95b2778a6f5078" },
+    { "path": "src/core/material-studio.ts", "sha256": "28bbeb32f152c8c8335f7ab13136360562866935f61045446bb00436e3b2a07e" },
+    { "path": "src/core/sidecar.ts", "sha256": "eeb5641061312c948385e0abd08235c1f153c6f12b134026bab94a78e1777772" },
+    { "path": "src/core/command-bus.ts", "sha256": "7e192be13d9fa1ed9bb0d8995d1b1593bade1b2500be7ac49e2fa027820b1fe5" },
+    { "path": "src/mcp/server.ts", "sha256": "8a5c20c90fb9ff6dd7b8274ddd7e75437473437bf21bbb43e2e2d0a90287a108" },
+    { "path": "src/main/index.ts", "sha256": "a9c50e92d1aeb9d03856784a42b0b0cc0eef66ec2c3186daf4986e4f61d78d97" },
+    { "path": "src/main/renderer-navigation-policy.ts", "sha256": "f2e19d9af3e5a9bced1a95a6088f5f6923ef3f4994a2938ebc4fe804cf8dddf2" },
+    { "path": "src/preload/index.ts", "sha256": "7750f3fba212814b0ba1fea8de5b05c677ada6253219adcfa4fb667e187c1675" },
+    { "path": "src/renderer/src/App.vue", "sha256": "02f0a9f94d792b3435e234fd29124ecac7ed153f044c345c2fae955d108ae335" },
+    { "path": "src/renderer/src/components/ProductionWorkspace.vue", "sha256": "c6b4208b39f3622c140435ca58202cf16230e2c35bfb5d2eb555f15052878b26" },
+    { "path": "src/renderer/src/components/NarrativeAdaptationView.vue", "sha256": "6a8658396fd9066a413a56fca7c4bebff493e0515a7216e6184aa25e7efb9244" },
+    { "path": "src/renderer/src/components/ProductionDesignView.vue", "sha256": "c7cc9aef78420d8800fb8775c6df4c205f04ebe8063f7f6477a532d6b0e5d853" },
+    { "path": "src/renderer/src/components/MaterialStudioView.vue", "sha256": "421c45509dff0e8121ff645949faef4112d41b451a806b10d859e595a4c7dbfd" },
+    { "path": "tests/legacy-asset-confinement.test.ts", "sha256": "dd597406c64e1dd73ab93bd07f160fd16bf0aebb0048ec77c0998d65e7596fa2" },
+    { "path": "tests/project-backup.test.ts", "sha256": "2e3c0c29de6518064e9d9a581f39785cca2f37f891508f5d1a82044e3465fb24" },
+    { "path": "tests/mcp-managed-studio.test.ts", "sha256": "7c49e14948887fde7e5eb27ba333df9a45b47e705e4e2a3734927d225747f816" },
+    { "path": "tests/renderer-navigation-policy.test.ts", "sha256": "762ec0e3d5c9e73cfe96b3dda64f7a724dea55b4a24d91c0cd79a670a22067c1" }
+  ],
+  "hashSemantics": "上表是 P27 清单声明涉及面的 P28 当前文件哈希，用于复核当前状态；没有 Git HEAD 或 P27 独立历史变更清单，故不宣称这些哈希能证明 P27 当时的完整 diff。",
+  "currentRevalidation": {
+    "typecheck": { "command": "npm run typecheck", "status": "PASS" },
+    "affectedTests": {
+      "command": "npx vitest run tests/studio-media-protocol.test.ts tests/material-studio.test.ts tests/p18-canvas-performance-contract.test.ts",
+      "status": "PASS",
+      "files": 3,
+      "tests": 31
+    },
+    "fullVitest": { "command": "npm test", "status": "PASS", "files": 179, "tests": 997, "durationSeconds": 557.56 },
+    "buildMcp": { "command": "npm run build:mcp", "status": "PASS" },
+    "buildIdentity": { "command": "npm run build:identity", "status": "PASS" },
+    "productionBuild": { "command": "npx electron-vite build", "status": "PASS" },
+    "uiEvidence": [
+      "docs/evidence/p28-p15-simple-canvas-ui-smoke-20260721-v3.json",
+      "docs/evidence/p28-p23-p24-electron-smoke-20260721-v4.json",
+      "docs/evidence/p28-managed-studio-scale-canvas-ui-smoke-20260721-v4.json"
+    ]
+  },
+  "boundaries": {
+    "historicalAuthorshipClaimed": false,
+    "formalProjectWritten": false,
+    "realGenerationRun": false,
+    "browserOrGrokUsed": false,
+    "installedAppRebuilt": false,
+    "gitMutated": false
+  }
+}

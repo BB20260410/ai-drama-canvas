@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T03:49:15.733Z",
+  "success": true,
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "protocol": {
+    "origin": "http://127.0.0.1:53658",
+    "loopbackOnly": true,
+    "officialPromptTupleValidated": true,
+    "extraDataOwnershipTagValidated": true,
+    "exactTerminalEvents": true,
+    "historySha256Locked": true,
+    "atomicCancelEndpoint": "/api/jobs/{promptId}/cancel",
+    "legacyCancellationCalls": {
+      "queue": 0,
+      "interrupt": 0
+    }
+  },
+  "scenarios": {
+    "happy": {
+      "jobId": "gen-2026-07-14T03-49-12-698Z-7ce8669d",
+      "status": "succeeded",
+      "promptId": "f3782679-b18a-4548-ab1c-e5b4dfc05a76",
+      "attempt": 1,
+      "checkpointRevision": 7,
+      "historySha256": "568b9541ec90617f05038d252aadb2dbd988fea9d073da63ae043a25da5206a6",
+      "resultSha256": "17bc63e006aaa3479e1377c09a0310db38448ccbbf3d16677630ae5c3921eb9b",
+      "publicationReceiptId": "receipt-3c8e0fd4-9f66-4de5-b079-4fe478d09ad9",
+      "outputBytes": 16763,
+      "outputSha256": "17bc63e006aaa3479e1377c09a0310db38448ccbbf3d16677630ae5c3921eb9b"
+    },
+    "preparedFreshNode": {
+      "jobId": "gen-2026-07-14T03-49-13-108Z-656c3156",
+      "status": "succeeded",
+      "attempts": 1,
+      "promptIdStable": true,
+      "postDelta": 1
+    },
+    "disconnectedFreshNode": {
+      "jobId": "gen-2026-07-14T03-49-13-926Z-4218e248",
+      "status": "succeeded",
+      "promptId": "139e94b9-e715-4f80-9332-ef300a4da592",
+      "httpCheckpointAbsent": true,
+      "postCountBefore": 2,
+      "postCountAfterRecovery": 3,
+      "noReplay": true
+    },
+    "exactFailure": {
+      "jobId": "gen-2026-07-14T03-49-14-807Z-db21ad9e",
+      "status": "failed",
+      "eventName": "execution_error",
+      "checkpointRevision": 5,
+      "publicationStatus": "failed",
+      "provenance": {
+        "schemaVersion": 1,
+        "source": "generation",
+        "generationJobId": "gen-2026-07-14T03-49-14-807Z-db21ad9e",
+        "cause": "remote_confirmed_failed",
+        "clientJobId": "gen-2026-07-14T03-49-14-807Z-db21ad9e",
+        "attempt": 1,
+        "externalTaskId": "1ab20ecb-71e2-4504-bb53-41dae8cff9cf",
+        "checkpointRevision": 5,
+        "comfyUi": {
+          "promptId": "1ab20ecb-71e2-4504-bb53-41dae8cff9cf",
+          "clientId": "gen-2026-07-14T03-49-14-807Z-db21ad9e",
+          "submittedWorkflowHash": "6327fce86d5dfc49447b257042cd8d5a5395c60b5bef363534a6e51bef4a0c4c",
+          "historySha256": "14ae6081a428213c3d7e987a478fb828c62ef04b52fa316a4371c0072604bfe8",
+          "eventName": "execution_error"
+        }
+      }
+    },
+    "pendingCancel": {
+      "jobId": "gen-2026-07-14T03-49-14-958Z-2b3c234b",
+      "status": "cancelled",
+      "cancellation": {
+        "requestedAt": "2026-07-14T03:49:15.066Z",
+        "promptId": "c3b6eac7-5654-4a54-87f1-b874e3cec927",
+        "preObservedState": "pending",
+        "endpoint": "api_jobs_cancel",
+        "attempt": 1,
+        "outcome": "acted",
+        "observations": [
+          {
+            "state": "pending",
+            "observedAt": "2026-07-14T03:49:15.066Z"
+          },
+          {
+            "state": "absent",
+            "observedAt": "2026-07-14T03:49:15.085Z"
+          },
+          {
+            "state": "absent",
+            "observedAt": "2026-07-14T03:49:15.122Z"
+          }
+        ],
+        "responseReceivedAt": "2026-07-14T03:49:15.075Z",
+        "httpStatus": 200,
+        "responseSha256": "9276eb843ff68796a54b383ac048d8ab004be4cb9c28fb9df49d346e02361384",
+        "serverActed": true,
+        "confirmation": {
+          "kind": "pending_deleted",
+          "confirmedAt": "2026-07-14T03:49:15.133Z",
+          "stableAbsentCount": 2
+        }
+      }
+    },
+    "runningCancel": {
+      "jobId": "gen-2026-07-14T03-49-15-187Z-8abbcde3",
+      "firstAttemptStayedLocked": true,
+      "status": "cancelled",
+      "cancellation": {
+        "requestedAt": "2026-07-14T03:49:15.304Z",
+        "promptId": "dc285b19-9c47-4385-97a7-d43565907143",
+        "preObservedState": "running",
+        "endpoint": "api_jobs_cancel",
+        "attempt": 1,
+        "responseReceivedAt": "2026-07-14T03:49:15.320Z",
+        "httpStatus": 200,
+        "responseSha256": "9276eb843ff68796a54b383ac048d8ab004be4cb9c28fb9df49d346e02361384",
+        "outcome": "acted",
+        "serverActed": true,
+        "observations": [
+          {
+            "state": "running",
+            "observedAt": "2026-07-14T03:49:15.304Z"
+          },
+          {
+            "state": "absent",
+            "observedAt": "2026-07-14T03:49:15.338Z"
+          },
+          {
+            "state": "history_interrupted",
+            "observedAt": "2026-07-14T03:49:15.363Z",
+            "historySha256": "9229136347350f923015cb17840cb828615953873bb63b3203d003d68d1387ab",
+            "eventName": "execution_interrupted"
+          }
+        ],
+        "confirmation": {
+          "kind": "history_interrupted",
+          "confirmedAt": "2026-07-14T03:49:15.363Z",
+          "historySha256": "9229136347350f923015cb17840cb828615953873bb63b3203d003d68d1387ab",
+          "eventName": "execution_interrupted"
+        }
+      }
+    },
+    "ownershipConflict": {
+      "jobId": "gen-2026-07-14T03-49-15-430Z-94d5ab30",
+      "status": "waiting_remote",
+      "nextAction": "inspect_remote_task",
+      "viewCountUnchanged": true,
+      "publicationStatus": "reserved"
+    }
+  },
+  "counts": {
+    "post": 7,
+    "history": 13,
+    "queue": 7,
+    "view": 3,
+    "atomicCancel": 2,
+    "legacyQueueCancel": 0,
+    "legacyInterrupt": 0
+  },
+  "capabilities": {
+    "transport": "loopback-http-only",
+    "kinds": [
+      "image"
+    ],
+    "workflowFormat": "comfyui-api",
+    "promptIdentity": "caller-persisted-canonical-uuid-before-post",
+    "terminalFacts": [
+      "history",
+      "queue",
+      "validated-output-file"
+    ],
+    "outputBinding": [
+      "promptId",
+      "outputNodeId",
+      "outputIndex",
+      "filename",
+      "subfolder",
+      "type=output"
+    ],
+    "cancellation": {
+      "endpoint": "atomic-api-jobs-cancel",
+      "pendingConfirmation": "server-acted-and-stable-absent",
+      "runningConfirmation": "exact-history-execution-interrupted",
+      "unconfirmed": "keep-job-and-publication-locked"
+    },
+    "websocketIsTerminalFact": false,
+    "realEnvironmentCalibration": "requires-user-authorization"
+  },
+  "doctor": {
+    "generationCheck": {
+      "id": "generation-jobs",
+      "level": "warning",
+      "title": "生成队列",
+      "detail": "1 个进行中任务，0 个提交结果待对账（网页 0、HTTP 0、ComfyUI 0），0 个 ComfyUI 原子取消待 exact history/稳定 absent 确认，1 个远端暂态/未知错误可定向恢复，0 个发布冲突待人工核对，0 个 Publication 终态缺少匹配来源，0 个终态 Job 仍保留 unknown 检查点，0 个任务混入多个适配器检查点。",
+      "suggestedAction": "调用 list_generation_jobs 查看最后观测，再用 process_generation_queue(jobId) 定向恢复既有 externalTaskId/结果下载；不会提交其他 queued 任务，也不会重新 POST 该任务。",
+      "paths": []
+    },
+    "suggestedNextCalls": [
+      "list_generation_jobs",
+      "process_generation_queue",
+      "doctor_project"
+    ]
+  },
+  "snapshot": {
+    "generationJobs": 7,
+    "activeJobIds": [
+      "gen-2026-07-14T03-49-15-430Z-94d5ab30"
+    ]
+  },
+  "publication": {
+    "reserved": 1,
+    "registered": 3,
+    "cancelled": 2,
+    "failed": 1,
+    "receipts": 3
+  },
+  "terminal": {
+    "projectLocks": [],
+    "machineActiveWeight": 0,
+    "machineQueueDepth": 0
+  },
+  "cleanup": {
+    "projectRoot": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-comfyui-protocol-smoke-ewF0gd",
+    "registryPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-comfyui-protocol-smoke-ewF0gd/registry.json",
+    "rootRemoved": true,
+    "registryRemoved": true,
+    "serverClosed": true
+  },
+  "boundaries": {
+    "realComfyUiCalled": false,
+    "externalProviderCalled": false,
+    "websiteOpened": false,
+    "uploadPerformed": false,
+    "paidActionPerformed": false,
+    "signedDmgTouched": false
+  }
+}

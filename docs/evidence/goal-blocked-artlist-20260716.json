@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "kind": "goal-external-blocker-audit",
+  "createdAt": "2026-07-16T00:48:14+08:00",
+  "status": "blocked",
+  "recoverable": true,
+  "goal": {
+    "threadId": "019f5c86-44c6-75d1-b522-293a485a8393",
+    "runtimeUpdatedAtEpochSeconds": 1784134072,
+    "complete": false,
+    "reason": "同一 Artlist 额度不足与页面模式不匹配已连续三轮成立；所有安全离线纵向缺口已收口，真实生产无法在当前授权边界内继续。"
+  },
+  "blocker": {
+    "code": "artlist-insufficient-credits-and-mode-mismatch",
+    "sameConditionOccurrences": 3,
+    "currentObservedState": {
+      "signedIn": true,
+      "insufficientCredits": true,
+      "generateDisabled": true,
+      "parametersMatchFrozenContract": false
+    },
+    "prohibitedActionsPreserved": [
+      "purchase-credits",
+      "upload-before-preflight-pass",
+      "submit-intent-before-preflight-pass",
+      "click-generate-while-disabled",
+      "requeue-p01"
+    ]
+  },
+  "sameJobCheckpoint": {
+    "jobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+    "workItemId": "P01",
+    "stage": "waiting_external",
+    "checkpoint": "preflight_blocked",
+    "revision": 2,
+    "publicationStatus": "reserved",
+    "publicationReceiptPresent": false,
+    "allowedUploads": []
+  },
+  "formalProduction": {
+    "assetRawImages": 0,
+    "assetLabeledImages": 0,
+    "storyboardPanelRawImages": 0,
+    "storyboardPanelLabeledImages": 0,
+    "chineseStoryboardSheets": 0,
+    "remoteIdentities": 0,
+    "downloadedResults": 0,
+    "publicationReceipts": 0
+  },
+  "repeatedEvidence": [
+    {
+      "sequence": 1,
+      "validation": "docs/evidence/final-validation-20260715-2245.json",
+      "report": "docs/验证报告_第三季Artlist额度预检可恢复检查点_2026-07-15.md",
+      "finding": "同一 P01 R2 被积分不足和参数不匹配阻止，零上传、零提交、零生成。"
+    },
+    {
+      "sequence": 2,
+      "validation": "docs/evidence/final-validation-20260715-semantic-grid-asset-order.json",
+      "finding": "externalBlocker 再次为 artlist-insufficient-credits-and-mode-mismatch，正式输出仍为 0。"
+    },
+    {
+      "sequence": 3,
+      "validation": "docs/evidence/final-validation-20260716-storyboard-preview-visible-time.json",
+      "finding": "完成最后可安全离线纵向切片后，同一 externalBlocker 仍成立，正式输出仍为 0。"
+    }
+  ],
+  "resume": {
+    "userPhrase": "Artlist 额度已恢复",
+    "action": "恢复同一长期 Goal，读取同一 P01 R2 并重新预检；不得重新入队或重建 Publication。"
+  },
+  "validationStatusNote": "最新 final-validation 在 Goal 运行时状态切换前生成，因此其中 goal.status=active 是当时快照；本文件记录紧随其后的 blocked 状态转换。"
+}

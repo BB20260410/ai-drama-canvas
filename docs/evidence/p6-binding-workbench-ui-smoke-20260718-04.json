@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "kind": "p6-binding-workbench-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-18T00:32:22.205Z",
+  "fixture": {
+    "projectId": "project-235a437376c8",
+    "sourceRoots": [],
+    "units": 1,
+    "panels": 2,
+    "canonicalAssets": 3
+  },
+  "ui": {
+    "startupDefaultLibrary": true,
+    "bindingChunkLazyLoaded": true,
+    "sourceExcerptVisible": true,
+    "chapterAndSceneSourcesVisible": true,
+    "exactAliasPendingHumanAccept": true,
+    "ambiguousCandidateCount": 2,
+    "silentAmbiguitySelection": 0,
+    "resolvedDecisionVisible": true,
+    "confirmedEmptyReviewedByUser": true,
+    "confirmedEmptyCurrent": true,
+    "confirmedEmptyFrozen": true,
+    "bindingSetCurrent": true,
+    "generationReady": true,
+    "nextActionAfterFirstFreeze": "宫格 2：解析当前宫格的剧本实体。",
+    "nextActionAfterConfirmedEmptyFreeze": "全部宫格绑定已就绪，可由 Codex 冻结下一个单图生成包。",
+    "readyMs": 2056,
+    "pageErrors": 0,
+    "externalRequests": 0
+  },
+  "bindingSet": {
+    "id": "asset-binding-set-9586699c35f29799666f2fc10fd3cff15e907823",
+    "fingerprint": "9586699c35f29799666f2fc10fd3cff15e907823ecb08056a5016a4a96e5aa67",
+    "bindings": 2
+  },
+  "confirmedEmptyBindingSet": {
+    "id": "asset-binding-set-5a9dbdcd48ad0074550ce3ee8ef9d4167be768d6",
+    "fingerprint": "5a9dbdcd48ad0074550ce3ee8ef9d4167be768d637bc699bff1f0bbcec9cb9dd",
+    "bindings": 0,
+    "confirmedEmpty": true,
+    "confirmationId": "panel-entity-closure-confirmation-719293432b17f7905be76629e829508373878872",
+    "reviewer": "user"
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p6-binding-workbench-ui-smoke-20260718-04.png",
+    "sizeBytes": 411856,
+    "sha256": "1357ed6efb050705159905313c44f9ae12a15e0931ab142d2553a738b9b76c54",
+    "width": 3456,
+    "height": 2058,
+    "format": "png",
+    "stdev": 94.59970971776269
+  },
+  "boundaries": {
+    "formalProjectWrites": 0,
+    "filesystemScans": 0,
+    "imageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0
+  }
+}

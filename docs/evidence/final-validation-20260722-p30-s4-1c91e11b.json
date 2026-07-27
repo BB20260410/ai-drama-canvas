@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 1,
+  "kind": "final-validation",
+  "phase": "P30_S8_REMEDIATION_S4_SOURCE_REFROZEN_M1_SOFTWARE_ACCEPTED",
+  "status": "PASS",
+  "createdAt": "2026-07-22T09:10:53.000Z",
+  "timezoneNote": "Asia/Shanghai local wall 17:10",
+  "executor": "gpt-codex-main-sole-writer",
+  "frozenIdentity": {
+    "sourceDigest": "1c91e11b182cfbc91ddd20b1d482969e7d36adc1619aff9c79d1163adac5e04c",
+    "sourceFiles": 530,
+    "sourceBytes": 12426264,
+    "version": "0.2.0",
+    "buildId": "0d19ef1af143797254cd649cddffa5b6",
+    "buildIdentityFingerprint": "ea3cc15eddf92db914d6517565c4f1b0e499be2b32f1c6bd98db7bb0eb694d00",
+    "mcpToolCount": 189,
+    "mcpToolCountDynamicTripleEqual": true,
+    "protocolVersion": "1.1",
+    "releaseManifestFingerprint": "717fe745b2534ad96166b23562296efcc35a33f92a6998b563ad05a723837712",
+    "releaseManifestFileSha256": "87f255c968981416e31d9a638072bde1131ecfba6760e809d2715beea9f2418a"
+  },
+  "milestones": {
+    "M1": "SOFTWARE_ACCEPTED",
+    "M2": "NOT_ACCEPTED",
+    "M3": "NOT_STARTED",
+    "LOCAL_INSTALL": "NOT_STARTED"
+  },
+  "phases": {
+    "S0": "PASS",
+    "S1": "PASS",
+    "S2": "PASS",
+    "S3": "PASS",
+    "S4": "PASS",
+    "S5": "PASS",
+    "S6": "PASS",
+    "S7": "MECHANICAL_PASS_VISUAL_REJECTED",
+    "S8": "SOFTWARE_REMEDIATED_REPROJECT_BLOCKED_HELPER_DRIFT",
+    "S9": "NOT_STARTED",
+    "S10": "NOT_STARTED"
+  },
+  "freezeHistory": [
+    {
+      "digest": "349f6207900969e54e953e29df9d3824b5d9c37eb9ae938751d77dc565086241",
+      "sourceFiles": 530,
+      "sourceBytes": 12370977,
+      "role": "pre_canary_S4_frozen",
+      "status": "superseded",
+      "reason": "U29 canary visual reject exposed Dudu adapter/import and generic Binding currentness defects; product remediation formed a new digest"
+    },
+    {
+      "digest": "1c91e11b182cfbc91ddd20b1d482969e7d36adc1619aff9c79d1163adac5e04c",
+      "sourceFiles": 530,
+      "sourceBytes": 12426264,
+      "role": "post_S8_remediation_S4_frozen",
+      "status": "frozen",
+      "reason": "single formal S4 chain passed for this product source digest"
+    }
+  ],
+  "remediation": {
+    "trigger": "S7 U29 canary mechanically passed but human visual review rejected mother/cub appearances forbidden by the external A/E contract",
+    "classification": "software_adapter_import_and_binding_currentness_defect",
+    "productFilesChanged": [
+      "src/core/dudu-readonly-source.ts",
+      "src/core/dudu-readonly-import.ts",
+      "src/core/studio-binding-control.ts",
+      "tests/helpers/dudu-readonly-source-fixture.ts",
+      "tests/dudu-readonly-import.test.ts",
+      "tests/p30-command-contract-matrix.test.ts",
+      "tests/studio-binding-control.test.ts"
+    ],
+    "summary": "Project A/D/E forbidden roles into exact path-free panel prompts, preserve semantic UTF-16 spans and fail-close visible conflicts, and allow only current append-only BindingSet replacement while rejecting subsequent identity or section drift."
+  },
+  "validationChain": {
+    "typecheck": {
+      "status": "PASS",
+      "record": ".planning/reviews/P30/evidence/p30-s4-1c91e11b-typecheck.json",
+      "recordSha256": "aab7611ff0aebbad3188bdfbaf4e59626fb6e052907e56bb5f9202262efd6f86"
+    },
+    "directedVitest": {
+      "status": "PASS",
+      "files": 31,
+      "tests": 167,
+      "record": ".planning/reviews/P30/evidence/p30-s4-1c91e11b-targeted.json",
+      "recordSha256": "801571861095d0096d8b1eb2f6b2968414dfd33aef9cb20a70c2cfb019e2be8c"
+    },
+    "npmTest": {
+      "status": "PASS",
+      "testFiles": 188,
+      "tests": 1052,
+      "p29BaselineMinimum": 999,
+      "p29BaselineMet": true,
+      "record": ".planning/reviews/P30/evidence/p30-s4-1c91e11b-full.json",
+      "recordSha256": "71abe7f9f7bfdf4acafaff6ba848fb51d247c7887b25262d505b4da53b923f1d"
+    },
+    "buildMcp": {
+      "status": "PASS",
+      "record": ".planning/reviews/P30/evidence/p30-s4-1c91e11b-build-mcp.json",
+      "recordSha256": "4553aef7e9e6cedcc9daa21fdbf6617d6ea3d8d6b488d8acd23649f6a3520694"
+    },
+    "buildIdentity": {
+      "status": "PASS",
+      "record": ".planning/reviews/P30/evidence/p30-s4-1c91e11b-build-identity.json",
+      "recordSha256": "2b938b8169bc816360017d033c574832caaf10dbd8790eed55292d7d7639ca63"
+    },
+    "mcpSmoke": {
+      "status": "PASS",
+      "record": ".planning/reviews/P30/evidence/p30-s4-1c91e11b-mcp-smoke.json",
+      "recordSha256": "c10467bd205ca917dcdbace175989399d8bca2e293b861a7e09254a5bbfa5222"
+    },
+    "mcpDynamicTriple": {
+      "status": "PASS",
+      "manifest": 189,
+      "listTools": 189,
+      "capabilities": 189,
+      "record": ".planning/reviews/P30/evidence/p30-s4-1c91e11b-mcp-triple.json",
+      "recordSha256": "07decdc1e7985a9cee533ac85ef5e56cb3618eafd6706084664ed621b369bcd4"
+    },
+    "electronViteBuild": {
+      "status": "PASS",
+      "record": ".planning/reviews/P30/evidence/p30-s4-1c91e11b-electron-build.json",
+      "recordSha256": "6caed0bea07d3f143b7f40f6273e541aaf4d1887a8f28d8ecb78a476b20f5a20"
+    },
+    "electronUnitGridJourney": {
+      "status": "PASS",
+      "commandRecord": ".planning/reviews/P30/evidence/p30-s4-1c91e11b-unit-grid-electron-command.json",
+      "commandRecordSha256": "e7a5a7fe8a27eb4892eb10d22e149da1552f6e3d573e29cee0e989c4b6f27d98",
+      "evidence": ".planning/reviews/P30/evidence/p30-s4-1c91e11b-unit-grid-source-electron.json",
+      "evidenceSha256": "a60e6afe6618339a05234d3cf4161725115f8c22cd2783b852723aab4083c7ff",
+      "screenshots": {
+        "generation": {
+          "path": ".planning/reviews/P30/evidence/p30-s4-1c91e11b-unit-grid-generation.png",
+          "sha256": "05045a860a8e75328a1689fe9a761b55d046db2fb5a1fab805b2e4140c182eb9",
+          "width": 3456,
+          "height": 2054
+        },
+        "review": {
+          "path": ".planning/reviews/P30/evidence/p30-s4-1c91e11b-unit-grid-review.png",
+          "sha256": "2a6f532a75a65e54b5af0e3fcb359c01813d98de7f9a69cba52d751b2b8bb491",
+          "width": 3456,
+          "height": 2054
+        }
+      },
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalRequests": 0,
+      "imagegenCalls": 0,
+      "formalProjectReads": 0,
+      "formalProjectWrites": 0,
+      "humanVisualAcceptanceClaimed": false,
+      "digestStableAcrossJourney": true
+    },
+    "scaleSmoke": {
+      "status": "PASS",
+      "commandRecord": ".planning/reviews/P30/evidence/p30-s4-1c91e11b-scale-electron-command.json",
+      "commandRecordSha256": "d5b0059503bc44fc6868888199a6246b49094d602b94622efd8847f238735c8b",
+      "evidence": "docs/evidence/p30-s4-1c91e11b-managed-studio-scale-canvas-ui-smoke.json",
+      "evidenceSha256": "5b8c938ef5a8d6c52a10a9071ae9bc9ab66fb0f53743f4d24c99093a4db06e5b",
+      "screenshot": {
+        "path": "docs/evidence/p30-s4-1c91e11b-managed-studio-scale-canvas-ui-smoke.png",
+        "sha256": "e2ba7da6f640017cb04a0755edf99b779272d0f7c1284c686fa414c3ee1ce6b4",
+        "width": 1728,
+        "height": 1029
+      },
+      "assets": 77,
+      "units": 1288,
+      "panels": 4235,
+      "media": 10000,
+      "projectSwitchCount": 10,
+      "crossProjectLeak": false,
+      "fileDescriptorDelta": 0,
+      "rssDeltaKiB": 23728,
+      "formalStudioTouched": false
+    },
+    "dualReadOnlyFinalReview": {
+      "status": "PASS",
+      "A": {
+        "path": ".planning/reviews/P30/14_S4_1c91_终审A_架构与合同_20260722.md",
+        "sha256": "1170abb1c26c9f7a3bcb105e8f37bbf5410316de64aac97acc04eb6bd99ad927",
+        "P0": 0,
+        "P1": 0,
+        "blockingP2": 0
+      },
+      "B": {
+        "path": ".planning/reviews/P30/15_S4_1c91_终审B_前端与证据_20260722.md",
+        "sha256": "8f0cfa008dc5e4525cad10ecc53f5f9918d66cb157b49c0bfe796ec0c28bc416",
+        "P0": 0,
+        "P1": 0,
+        "blockingP2": 0
+      }
+    }
+  },
+  "integrityChecks": {
+    "sourceDigestRecomputedThreeTimesEqual": true,
+    "gitHeadPresent": false,
+    "gitIndexSha256": "a9de1c589e0116f6b2460eb06ddb28591a82c341a1ea54d9141425026c66a229",
+    "gitOperationsPerformed": false,
+    "duduSourceManifestFingerprint": "7852166e185b3ab78c59ccd609ab94e0382c512185bfd12098f7d13b02ca12c9",
+    "duduSourceFiles": 540,
+    "duduSourceBytes": 421983373,
+    "u29FormalRevision": 1,
+    "u29FormalPackCount": 1,
+    "formalGenerationLedgerCounts": {
+      "packs": 30,
+      "dispatches": 1,
+      "results": 2,
+      "callIntents": 1,
+      "callEvents": 1,
+      "plans": 2,
+      "detachedUnknownObservations": 1,
+      "reviewHeads": 1
+    },
+    "u28LateCandidateSha256": "da44489eb5e43861a9f9ed277103e0845b570286b80f412bc3a38c4f9a57c235",
+    "u28Status": "generation_unknown"
+  },
+  "concurrencyIncident": {
+    "occurred": true,
+    "summary": "An old Codex app-server attempted duplicate scoped commands and later left a guard that would intercept the main agent. The main agent accepted only the already-running same-digest typecheck and directed group, terminated duplicate command groups, then terminated the interfering old app-server PID 79329. All accepted command records form a non-overlapping ordered chain.",
+    "independentProcessReceiptAvailable": false,
+    "productSourceDigestStable": true,
+    "formalStudioTouched": false
+  },
+  "s8ReprojectGate": {
+    "status": "BLOCKED_HELPER_IDENTITY_DRIFT",
+    "currentExecutorSha256": "c042d2a301f54501f9a8f89733b20f6b015efc99e548dfd392ec212cc610854a",
+    "currentExecutorSizeBytes": 55359,
+    "previousApprovedDryRunExecutorSha256": "9d08d20fbac86b045f46b7157e21056527454532c0ea4d6b91d4b64086849ebd",
+    "previousApprovedDryRunExecutorSizeBytes": 50230,
+    "formalWriteAllowed": false,
+    "requiredResolution": "Audit the current helper and create a fresh isolated-clone dry-run bound to its exact SHA before any formal one-shot."
+  },
+  "itemizedStatus": {
+    "softwareS4M1": "S4_PASS_M1_SOFTWARE_ACCEPTED",
+    "ipcMcpFrontendDynamicToolCount": "PASS_189_DYNAMIC_TRIPLE",
+    "electronAndScale": "PASS",
+    "duduFormalImport": "PASS_S5",
+    "historicalNoGenerationReplay": "PASS_S5",
+    "canaryMechanicalAcceptance": "PASS_S7",
+    "canaryHumanVisualAcceptance": "REJECTED_S7",
+    "rawLabeledFormalReview": "REJECTED_PAIR_RECORDED_OLD_CHAIN_IMMUTABLE",
+    "s8SoftwareRemediation": "PASS",
+    "s8FormalReprojection": "NOT_STARTED_BLOCKED_HELPER_IDENTITY_DRIFT",
+    "videoPackageStaticEvidence": "S5_U17_MECHANICAL_PASS_DYNAMIC_MODEL_NOT_RUN",
+    "videoRealProduction": "NOT_STARTED",
+    "formalProduction": "PAUSED",
+    "installPackage": "NOT_STARTED",
+    "applicationsAppTouched": false,
+    "gitStageCommitPushPR": false,
+    "u28Unknown": "GENERATION_UNKNOWN_UNTOUCHED"
+  },
+  "notRun": [
+    "duplicate S4 full chain for this digest",
+    "npm run build aggregate after electron-vite",
+    "package:isolated-smoke",
+    "S8 formal U29 reproject",
+    "second Codex imagegen canary",
+    "real video model",
+    "package sign install replace Applications app",
+    "git stage commit push PR"
+  ],
+  "nonClaims": [
+    "P30 complete",
+    "M2 FIRST_CANARY_ACCEPTED",
+    "M3 AUTHORIZED_PRODUCTION_ACCEPTED",
+    "human visual canary accepted",
+    "S8 formal reproject complete",
+    "formal production resumed",
+    "local install accepted"
+  ],
+  "nextAction": {
+    "owner": "GPT_Codex_main",
+    "phase": "S8_REPROVE_REPROJECT_HELPER_IN_ISOLATED_CLONE",
+    "generationAllowed": false,
+    "formalStudioWriteAllowed": false
+  },
+  "report": "docs/验证报告_20260722_P30_S8整改后S4_M1软件机械验收.md"
+}

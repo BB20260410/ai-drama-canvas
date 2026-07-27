@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-13T23:20:56Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "goal": {
+    "name": "AI 漫剧无限画布",
+    "status": "active",
+    "mode": "research-and-development"
+  },
+  "priorityRevalidation": {
+    "handoffPriorityAtStart": "generic-http-remote-observation-and-isolated-download-recovery",
+    "stillValidAtStart": true,
+    "completedThisRun": true,
+    "reason": "waiting_remote transient observations and partial downloads previously collapsed into local failure and could trigger duplicate paid submissions"
+  },
+  "slice": {
+    "name": "generic-http-remote-recovery-and-isolated-download",
+    "complete": true,
+    "observationStates": [
+      "pending",
+      "succeeded",
+      "confirmed_failed",
+      "retryable_or_unknown"
+    ],
+    "observationStages": [
+      "submit",
+      "poll",
+      "download",
+      "validation",
+      "publish"
+    ],
+    "stableClientJobId": true,
+    "remoteIdentityPersistedBeforeDownload": true,
+    "retryableObservationsRemainWaitingRemote": true,
+    "publicationReservationPreserved": true,
+    "automaticPostReplayAfterUnknown": false,
+    "targetedRecovery": "process_generation_queue(jobId)",
+    "maySubmitOtherQueuedJobsDuringTargetedRecovery": false,
+    "isolatedDownloadPerJob": true,
+    "imageDownloadLimitBytes": 104857600,
+    "videoDownloadLimitBytes": 2147483648,
+    "fullDecodeBeforePublish": true,
+    "sha256BeforePublish": true,
+    "noClobberPublish": true,
+    "strictRemoteCancelConfirmation": true,
+    "publicationTerminalStatePrecedesLateCancel": true,
+    "mcpRemoteResultExposure": "hostname-only",
+    "providerUrlCredentialsRejectedOnNewWrites": true,
+    "legacyProviderUrlsSanitizedAtMcpBoundary": true
+  },
+  "tests": {
+    "typecheck": {
+      "success": true
+    },
+    "targeted": {
+      "success": true,
+      "files": 4,
+      "tests": 25
+    },
+    "full": {
+      "success": true,
+      "testSuites": 62,
+      "passedTestSuites": 62,
+      "failedTestSuites": 0,
+      "tests": 179,
+      "passedTests": 179,
+      "failedTests": 0,
+      "pendingTests": 0,
+      "temporaryJsonReportBytes": 66199,
+      "temporaryJsonReportSha256": "15a06301bf4da4421d21cd1fd58ae71848707f56388c5fe767b0a4b12ee51093",
+      "temporaryJsonReportCleaned": true
+    },
+    "initialFullRunRegression": {
+      "observed": true,
+      "cause": "mcp-headless workflow still treated process_generation_queue safe result as GenerationJob array",
+      "fixed": true,
+      "finalFullRunGreen": true
+    },
+    "compiledMcpGenerationObservation": {
+      "success": true,
+      "files": 2,
+      "tests": 2
+    }
+  },
+  "build": {
+    "success": true,
+    "mainBytes": 776332,
+    "preloadBytes": 17308,
+    "rendererJavaScriptBytes": 1269518,
+    "mcpServerBytes": 181136
+  },
+  "mcp": {
+    "smokeSuccess": true,
+    "toolCount": 133,
+    "resourceTemplateCount": 9,
+    "promptCount": 7,
+    "generationSummarySanitized": true,
+    "generationResourceSanitized": true,
+    "commandReplayAndLedgerSanitized": true,
+    "changesResourceSanitized": true,
+    "providerConfigurationOutputSanitized": true
+  },
+  "httpResilienceSmoke": {
+    "success": true,
+    "evidencePath": "docs/evidence/http-generation-resilience-smoke-20260714.json",
+    "bytes": 11783,
+    "sha256": "b6375cb8537e49d9511e91af759851b755ce71229f56fbc418f6bfffef3478be",
+    "submitRequestsAcrossScenarios": 5,
+    "resilientTaskSubmitCount": 1,
+    "resilientPollRequests": 5,
+    "resilientDownloadRequests": 2,
+    "cancelRequests": 3,
+    "realSigkill": true,
+    "partialBytesBeforeKill": 5587,
+    "sourceBytes": 16763,
+    "freshNodeRecovery": true,
+    "partialRemovedAfterRecovery": true,
+    "finalShaMatchesSource": true,
+    "confirmedFailureClosedPublication": true,
+    "cancel200PendingRejected": true,
+    "cancel503Rejected": true,
+    "cancel204Confirmed": true,
+    "registeredPublicationRecoveredWithoutRemoteCancel": true,
+    "noClobberConflictRecoveredAfterManualResolution": true,
+    "submitDisconnectNotRepostedAfterRestart": true,
+    "isolatedProjectCleaned": true,
+    "serverClosed": true
+  },
+  "publicationConsistencySmoke": {
+    "success": true,
+    "evidencePath": "docs/evidence/publication-consistency-smoke-20260714.json",
+    "bytes": 2617,
+    "sha256": "2fb22fcce5c58b195587a4d9d41b47fcf1fc8eceedc9549bb8fb682f61085fb8",
+    "registeredIntents": 4,
+    "cancelledIntents": 2,
+    "reservedIntents": 0,
+    "failedIntents": 0,
+    "projectLocks": 0,
+    "activeMediaWeight": 0,
+    "mediaQueueDepth": 0
+  },
+  "fullWorkflow": {
+    "success": true,
+    "chapters": 2,
+    "facts": 34,
+    "beats": 11,
+    "splitUnits": 4,
+    "storyboardRows": 11,
+    "confirmedStoryboardRows": 11,
+    "succeededGenerationJobs": 10,
+    "restartVerified": true,
+    "continuationCompleted": true,
+    "temporaryProjectCleaned": true,
+    "temporaryRegistryCleaned": true
+  },
+  "sourceHashes": {
+    "src/core/types.ts": "b9bd69f6a15965d1f4b663ca7fc0759f7dda9713a8340282262ce1a907457d73",
+    "src/core/generation.ts": "894d522c942ba6efb18176bee5292620e72a1f7c98bc0c0b4eed1105e3b41ad5",
+    "src/core/codex.ts": "e72ca4d075d74de5318972a760bd2edf0220b6d2aa1bee1c6bf0b0e607cf41d5",
+    "src/mcp/server.ts": "3b04e2276870d171d28778232b0ba71e95bd07a0e490cc9503fb8e7f617b69a2",
+    "src/core/command-bus.ts": "e500f3566e56555ee7db122d0ac288f91ed4611c08d7e92eb44beaf1bee9e84f",
+    "tests/advanced.test.ts": "03dddc4ab359bb1546d76618ecb9f15d6aeb7c855c855f86fa3996dc925ed9ff",
+    "tests/mcp-generation-observation.test.ts": "a62f6c4022c91524b82c1708ca1397a85424bfaf2e75d8b39fb3b841cba7ca03",
+    "scripts/http-generation-resilience-smoke.ts": "768d08f680c7ebf0c865c5cc4529b5c1e7433e4f018453d09fc12e8fb6e0bbb4",
+    "scripts/mcp-headless-workflow-smoke.ts": "8bd249eb992300be93a0e4ebff922afbc30d0c03d74760fbf4701a4a16244168",
+    "package.json": "ff98d0910d3fff9e7ed4e49a74bd1412deb65ed8881297f480433f6401c17985"
+  },
+  "documentationHashes": {
+    "README.md": "67f0cba604a1823d23e7a893223e0bf789c6b5d88cf724805b95b7fbd3971095",
+    "docs/CODEX_MCP.md": "d5a9e20011f5caf5ecbaf6f8596eedd4c8873733569f74af9c4870902d2865f9",
+    "docs/当前开发交接.md": "2d4b2fd7d2ab7ceec153e897c06df1e32b57f672ab9e4fcf173ae8cc7ad11e83",
+    "docs/验证报告_通用HTTP远端恢复与隔离下载_2026-07-14.md": "1d429b727a07ffef5b9de7db10839aab00fa951678dd8c11723029ebf7f31c3b"
+  },
+  "signedDmg": {
+    "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "bytes": 136652595,
+    "sha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972",
+    "overwritten": false,
+    "notarized": false,
+    "representsCurrentSource": false
+  },
+  "boundaries": {
+    "oldThreadJsonlRead": false,
+    "formalProjectRootsTouched": false,
+    "realProviderCalled": false,
+    "websiteOpened": false,
+    "uploadsPerformed": false,
+    "paidSubmissionsPerformed": false,
+    "externalAssetsOverwritten": false,
+    "softwareInstalled": false,
+    "softwarePublished": false,
+    "notarizationPerformed": false,
+    "gitCommitCreated": false,
+    "gitPushPerformed": false,
+    "pullRequestCreated": false
+  },
+  "cleanup": {
+    "temporaryFullWorkflowProjectRemoved": true,
+    "temporaryFullWorkflowRegistryRemoved": true,
+    "temporaryVitestReportRemoved": true,
+    "orphanSmokeProcesses": 0,
+    "partialOrPublishTemporaryFilesObservedAtFinalAudit": 0
+  },
+  "git": {
+    "repositoryHasCommits": false,
+    "workingTree": "entire workspace remains untracked",
+    "destructiveGitOperationPerformed": false
+  },
+  "nextUniqueHighestPriority": {
+    "priority": "P0",
+    "id": "http-submission-unknown-structured-reconciliation-write-api",
+    "reason": "submission disconnect is safely non-replayed but currently has no authorized revisioned idempotent found/not_found write path, leaving the job, publication and same-item generation permanently locked",
+    "acceptance": [
+      "found requires a stable externalTaskId and transitions only to waiting_remote without POST",
+      "not_found closes the old job and reserved publication with structured evidence before a new version can be enqueued",
+      "expectedRevision requestId and idempotencyKey are mandatory",
+      "registered failed or cancelled publication terminal states win over stale reconciliation",
+      "Doctor snapshot capability contract and source/compiled MCP expose an executable sanitized recovery action",
+      "loopback proves one POST across disconnect found restart poll download publish, and proves not_found revision conflicts replay safety and cleanup"
+    ],
+    "after": [
+      "comfyui-local-dedicated-adapter",
+      "complex-nested-timelines",
+      "third-party-effect-transition-compatibility"
+    ]
+  }
+}

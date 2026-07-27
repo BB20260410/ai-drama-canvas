@@ -1,0 +1,308 @@
+{
+  "OTIO_SCHEMA": "Timeline.1",
+  "name": "EP01 主画面 Transform 关键帧验收",
+  "global_start_time": null,
+  "tracks": {
+    "OTIO_SCHEMA": "Stack.1",
+    "name": "tracks",
+    "source_range": null,
+    "effects": [],
+    "markers": [],
+    "children": [
+      {
+        "OTIO_SCHEMA": "Track.1",
+        "name": "主画面",
+        "kind": "Video",
+        "source_range": null,
+        "effects": [],
+        "markers": [],
+        "children": [
+          {
+            "OTIO_SCHEMA": "Clip.2",
+            "name": "主画面 Transform UI",
+            "source_range": {
+              "OTIO_SCHEMA": "TimeRange.1",
+              "start_time": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 0,
+                "rate": 23.976023976023978
+              },
+              "duration": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 13,
+                "rate": 23.976023976023978
+              }
+            },
+            "media_reference": {
+              "OTIO_SCHEMA": "ExternalReference.1",
+              "target_url": "file:///var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-main-track-ui-CCVtbc/EP01_15s_001_%E9%9B%BE%E6%B2%B3%E5%BB%BA%E7%AB%8B%E9%95%9C%E5%A4%B4/EP01_15s_001_v1.mp4",
+              "available_range": null,
+              "available_image_bounds": null,
+              "metadata": {}
+            },
+            "effects": [],
+            "markers": [],
+            "metadata": {
+              "aicanvas": {
+                "id": "clip-aaf54d0b-8704-4f8d-a68d-8139bdeb73b8",
+                "trackId": "track-b33cd89c-2730-4a1b-b9f8-23903e1e6823",
+                "kind": "video",
+                "name": "主画面 Transform UI",
+                "artifactId": "main-ep01-unit001-0a8b5303db64",
+                "itemId": "main-ep01-unit001",
+                "startSeconds": 0,
+                "durationSeconds": 0.542,
+                "trimStartSeconds": 0,
+                "playbackRate": 1,
+                "volume": 0,
+                "opacity": 0.68,
+                "muted": false,
+                "positionX": -30,
+                "positionY": 20,
+                "scale": 0.55,
+                "rotation": 8,
+                "filter": "none",
+                "filterIntensity": 1,
+                "keyframes": [
+                  {
+                    "id": "kf-ui-main-transform-start",
+                    "frame": 0,
+                    "timeSeconds": 0,
+                    "easing": "hold",
+                    "positionX": -45,
+                    "positionY": -70,
+                    "scale": 0.42,
+                    "rotation": -16
+                  },
+                  {
+                    "id": "kf-1fea98fa-d1a5-48a1-810b-3b05cf567ed1",
+                    "easing": "ease_in_out",
+                    "timeSeconds": 0.375,
+                    "frame": 9,
+                    "positionX": -30,
+                    "positionY": 20,
+                    "scale": 0.55,
+                    "rotation": 8
+                  },
+                  {
+                    "id": "kf-9233abde-233e-420c-8d63-04dd3f2c87d4",
+                    "frame": 13,
+                    "timeSeconds": 0.542,
+                    "easing": "cubic_bezier",
+                    "bezier": {
+                      "x1": 0.373048145187812,
+                      "y1": 0,
+                      "x2": 0.704862240411753,
+                      "y2": 0.346084563403025,
+                      "mode": "derived_monotone",
+                      "sourceWindow": {
+                        "x1": 1,
+                        "y1": 0,
+                        "x2": 0,
+                        "y2": 1,
+                        "sourceEasing": "cubic_bezier",
+                        "startX": 0,
+                        "endX": 0.148148148148148,
+                        "startFrame": 0,
+                        "endFrame": 4,
+                        "totalFrames": 27
+                      }
+                    },
+                    "sourceTransform": {
+                      "start": {
+                        "positionX": -30,
+                        "positionY": 20,
+                        "scale": 0.55,
+                        "rotation": 8
+                      },
+                      "end": {
+                        "positionX": 35,
+                        "positionY": 60,
+                        "scale": 0.65,
+                        "rotation": 17
+                      }
+                    },
+                    "positionX": -29.426341606546,
+                    "positionY": 20.353020549818,
+                    "scale": 0.550882551375,
+                    "rotation": 8.079429623709
+                  }
+                ],
+                "startFrame": 0,
+                "durationFrames": 13,
+                "trimStartFrame": 0,
+                "transitionOut": "cut"
+              }
+            }
+          },
+          {
+            "OTIO_SCHEMA": "Clip.2",
+            "name": "主画面 Transform UI · 后段",
+            "source_range": {
+              "OTIO_SCHEMA": "TimeRange.1",
+              "start_time": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 13,
+                "rate": 23.976023976023978
+              },
+              "duration": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 23,
+                "rate": 23.976023976023978
+              }
+            },
+            "media_reference": {
+              "OTIO_SCHEMA": "ExternalReference.1",
+              "target_url": "file:///var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-main-track-ui-CCVtbc/EP01_15s_001_%E9%9B%BE%E6%B2%B3%E5%BB%BA%E7%AB%8B%E9%95%9C%E5%A4%B4/EP01_15s_001_v1.mp4",
+              "available_range": null,
+              "available_image_bounds": null,
+              "metadata": {}
+            },
+            "effects": [],
+            "markers": [],
+            "metadata": {
+              "aicanvas": {
+                "id": "clip-e589fcf1-6656-416c-b08e-ef166c38d9fc",
+                "trackId": "track-b33cd89c-2730-4a1b-b9f8-23903e1e6823",
+                "kind": "video",
+                "name": "主画面 Transform UI · 后段",
+                "artifactId": "main-ep01-unit001-0a8b5303db64",
+                "itemId": "main-ep01-unit001",
+                "startSeconds": 0.542,
+                "durationSeconds": 0.959,
+                "trimStartSeconds": 0.542,
+                "playbackRate": 1,
+                "volume": 0,
+                "opacity": 0.68,
+                "muted": false,
+                "positionX": -29.426341606546,
+                "positionY": 20.353020549818,
+                "scale": 0.550882551375,
+                "rotation": 8.079429623709,
+                "filter": "none",
+                "filterIntensity": 1,
+                "keyframes": [
+                  {
+                    "id": "kf-b9cc64b9-762d-46a4-b9f5-3e5eceebd20d",
+                    "frame": 23,
+                    "timeSeconds": 0.959,
+                    "easing": "cubic_bezier",
+                    "bezier": {
+                      "x1": 0.877415262537087,
+                      "y1": 0.099531310894919,
+                      "x2": -0.109035105184728,
+                      "y2": 1,
+                      "mode": "derived_monotone",
+                      "sourceWindow": {
+                        "x1": 1,
+                        "y1": 0,
+                        "x2": 0,
+                        "y2": 1,
+                        "sourceEasing": "cubic_bezier",
+                        "startX": 0.148148148148148,
+                        "endX": 1,
+                        "startFrame": 4,
+                        "endFrame": 27,
+                        "totalFrames": 27
+                      }
+                    },
+                    "positionX": 35,
+                    "positionY": 60,
+                    "scale": 0.65,
+                    "rotation": 17,
+                    "sourceTransform": {
+                      "start": {
+                        "positionX": -30,
+                        "positionY": 20,
+                        "scale": 0.55,
+                        "rotation": 8
+                      },
+                      "end": {
+                        "positionX": 35,
+                        "positionY": 60,
+                        "scale": 0.65,
+                        "rotation": 17
+                      }
+                    }
+                  }
+                ],
+                "startFrame": 13,
+                "durationFrames": 23,
+                "trimStartFrame": 13,
+                "transitionOut": "cut",
+                "transitionDurationSeconds": 0.5
+              }
+            }
+          }
+        ],
+        "metadata": {
+          "aicanvas": {
+            "id": "track-b33cd89c-2730-4a1b-b9f8-23903e1e6823",
+            "kind": "visual",
+            "order": 0,
+            "locked": false,
+            "muted": false,
+            "hidden": false
+          }
+        }
+      },
+      {
+        "OTIO_SCHEMA": "Track.1",
+        "name": "配音 _ 音乐",
+        "kind": "Audio",
+        "source_range": null,
+        "effects": [],
+        "markers": [],
+        "children": [],
+        "metadata": {
+          "aicanvas": {
+            "id": "track-425e98ac-f523-4143-8d69-a6e9f3223e01",
+            "kind": "audio",
+            "order": 1,
+            "locked": false,
+            "muted": false,
+            "hidden": false
+          }
+        }
+      },
+      {
+        "OTIO_SCHEMA": "Track.1",
+        "name": "字幕",
+        "kind": "Video",
+        "source_range": null,
+        "effects": [],
+        "markers": [],
+        "children": [],
+        "metadata": {
+          "aicanvas": {
+            "id": "track-bdab1f61-4f2a-4841-962a-3a670ac5ba64",
+            "kind": "subtitle",
+            "order": 2,
+            "locked": false,
+            "muted": false,
+            "hidden": false
+          }
+        }
+      }
+    ],
+    "metadata": {}
+  },
+  "metadata": {
+    "aicanvas": {
+      "schemaVersion": 1,
+      "projectId": "project-508738941689",
+      "editProjectId": "edit-af7d487a-e519-4668-ba63-3cca35c5e279",
+      "revision": 8,
+      "width": 540,
+      "height": 960,
+      "fps": 23.976,
+      "timebase": {
+        "rateNumerator": 24000,
+        "rateDenominator": 1001
+      },
+      "backgroundColor": "#18314f",
+      "keyframeCurveContract": "aicanvas.cubic-bezier.v2",
+      "curvePortability": "aicanvas-private-metadata"
+    }
+  }
+}

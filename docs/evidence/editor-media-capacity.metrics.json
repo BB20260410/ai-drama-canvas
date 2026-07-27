@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "testedAt": "2026-07-13T23:13:45+08:00",
+  "foregroundHeavyJobsPerProject": 1,
+  "activeRenderLimitPerProject": 1,
+  "activeRenderBlocks": [
+    "preview",
+    "proxy",
+    "timeline-frame",
+    "last-frame",
+    "timeline-continuation",
+    "synchronous-render"
+  ],
+  "concurrentPreviewFixture": {
+    "requestedArtifacts": 3,
+    "uniqueArtifacts": 2,
+    "persistedIndexEntries": 2,
+    "duplicateArtifactCacheReused": true,
+    "lostUpdates": 0
+  },
+  "backgroundRenderFixture": {
+    "secondRenderRejectedBeforePublicationIntent": true,
+    "previewRejectedBeforeFfmpeg": true,
+    "proxyRejectedBeforeFfmpeg": true,
+    "timelineFrameRejectedBeforeFfmpeg": true,
+    "capacityReleasedAfterCancel": true
+  },
+  "gates": {
+    "typecheck": "passed",
+    "fullTestFiles": 28,
+    "fullTests": 143,
+    "fullTestDurationSeconds": 44.30,
+    "mcpTools": 133,
+    "resourceTemplates": 9,
+    "prompts": 7,
+    "productionBuild": "passed",
+    "packagedHeadlessWorkflow": "passed",
+    "packagedFinalDoctorErrors": 0,
+    "packagedUncertainCommands": 0,
+    "runtimeResourceSnapshot": "passed",
+    "packagedRuntimeResourcesIdle": true
+  },
+  "package": {
+    "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "sizeBytes": 136660264,
+    "sha256": "b30031818b3ccff9ef6f08ab42392f115066aab8230c2b9076c12693fffd788a",
+    "signingIdentity": "Developer ID Application: YIHANG LI (3JS43BTTJ3)",
+    "signingTimestamp": "2026-07-13T23:12:30+08:00",
+    "codesignDeepStrict": "passed",
+    "dmgVerify": "passed",
+    "spctl": "rejected_unnotarized_developer_id"
+  },
+  "packagedWorkflowRoot": "/tmp/ai-canvas-packaged-resource-snapshot-20260713",
+  "formalProjectRootsTouched": []
+}

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "kind": "p11-p14-command-gate-record",
+  "status": "PASS",
+  "mode": "targeted",
+  "startedAt": "2026-07-18T19:41:04.142Z",
+  "endedAt": "2026-07-18T19:41:22.764Z",
+  "durationMs": 18622,
+  "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/build-identity.test.ts",
+    "tests/active-managed-studio-context.test.ts",
+    "tests/mcp-build-currentness-gate.test.ts",
+    "tests/studio-agent-imagegen-result-bundle.test.ts",
+    "tests/agent-connection-config.test.ts",
+    "tests/p13-desktop-production-loop-ui.test.ts",
+    "tests/studio-continuity-review-ui.test.ts",
+    "tests/studio-continuity-review-desktop-integration.test.ts",
+    "tests/studio-continuity-command-bus.test.ts",
+    "tests/p13-p14-installed-ui-smoke-guards.test.ts",
+    "tests/p14-dual-agent-fresh-session-read-smoke.test.ts",
+    "tests/p14-real-canary-orchestrator.test.ts",
+    "tests/p14-installed-real-canary-ui-guards.test.ts",
+    "tests/p14-installed-runtime-identity-guards.test.ts",
+    "tests/p14-installed-agent-repair-ui-smoke-guards.test.ts",
+    "tests/validate-p11-p14-desktop-loop-final.test.ts",
+    "tests/p11-p14-command-gate.test.ts"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "failureReasons": [],
+  "sourceDigest": {
+    "before": "1b96b83602ec60a0d1a1c44919453849cc944a90d7bf60445e385262c6a22f2a",
+    "after": "1b96b83602ec60a0d1a1c44919453849cc944a90d7bf60445e385262c6a22f2a",
+    "beforeFiles": 459,
+    "afterFiles": 459
+  },
+  "buildIdentity": {
+    "before": {
+      "buildId": "eafa84d97331dcb6c50a87ac7fe2ea4f",
+      "sourceDigest": "1b96b83602ec60a0d1a1c44919453849cc944a90d7bf60445e385262c6a22f2a",
+      "fingerprint": "1130a88f77a86a14c2e36f719d895cbcf23a024aeb914b00d5c658164f638117"
+    },
+    "after": {
+      "buildId": "eafa84d97331dcb6c50a87ac7fe2ea4f",
+      "sourceDigest": "1b96b83602ec60a0d1a1c44919453849cc944a90d7bf60445e385262c6a22f2a",
+      "fingerprint": "1130a88f77a86a14c2e36f719d895cbcf23a024aeb914b00d5c658164f638117"
+    }
+  },
+  "testCounts": {
+    "applicable": true,
+    "files": {
+      "total": 17,
+      "passed": 17,
+      "failed": 0
+    },
+    "tests": {
+      "total": 61,
+      "passed": 61,
+      "failed": 0
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/runs/2026-07-18T19-41-04-141Z-targeted-e3e92540/command.log",
+    "sizeBytes": 3031,
+    "sha256": "dea2b66542d88dcb451cdf611ab1d443e2f035cb866ca5ebb14b5a3631464816"
+  },
+  "security": {
+    "environmentRecorded": false,
+    "childEnvironmentAllowlisted": true
+  }
+}

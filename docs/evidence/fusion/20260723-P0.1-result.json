@@ -1,0 +1,18 @@
+{
+  "aspect": "P0.1",
+  "status": "PASS",
+  "strategy": "UX_ONLY",
+  "files": [
+    "src/renderer/src/components/StudioProductionDashboardView.vue",
+    "src/renderer/src/components/DesktopSupportView.vue"
+  ],
+  "commands": [
+    {"cmd": "npm run typecheck", "result": "PASS"}
+  ],
+  "usefulness": "驾驶舱未选单元/宫格时有三步引导并回显唯一下一步；Agent 连接页有「唯一下一步」条与步骤，避免大白页无指引",
+  "testids": [
+    "dashboard-empty-unit-guide",
+    "dashboard-empty-panel-guide",
+    "agent-connection-next-strip"
+  ]
+}

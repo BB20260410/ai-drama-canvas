@@ -1,0 +1,408 @@
+{
+  "schemaVersion": 1,
+  "kind": "fusion-asset-batch-final-validation",
+  "createdAt": "2026-07-16T07:31:29.568Z",
+  "pixelProbeVersion": "extracted-buffer-v2",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "batch": {
+    "id": "fusion-asset-batch-003",
+    "status": "passed",
+    "reviewValid": true,
+    "hardLockCount": 6,
+    "canStartNextBatch": true,
+    "snapshotHash": "3bf75bfe0d0e0bfb300e50fe0040bf0809951e175228982b9b02af3e169a7618",
+    "reviewId": "fusion-asset-review-43559e1b-6ca8-4d63-b403-6fa88687af64",
+    "criteria": [
+      {
+        "key": "character_identity",
+        "result": "pass"
+      },
+      {
+        "key": "era_visual_style",
+        "result": "pass"
+      },
+      {
+        "key": "scene_layout_lighting",
+        "result": "pass"
+      },
+      {
+        "key": "scale_compatibility",
+        "result": "pass"
+      },
+      {
+        "key": "prop_structure",
+        "result": "pass"
+      },
+      {
+        "key": "clean_frame",
+        "result": "pass"
+      },
+      {
+        "key": "hidden_mask_rule",
+        "result": "pass"
+      }
+    ],
+    "board": {
+      "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/asset-consistency-boards/fusion-asset-batch-003-visible-tiles-v2-3bf75bfe0d0e0bfb300e.png",
+      "metadataPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/asset-consistency-boards/fusion-asset-batch-003-visible-tiles-v2-3bf75bfe0d0e0bfb300e.json",
+      "sha256": "7a3adf98da556491411ac2993b05fab0e5dbdb91eae0bd129cab919f5de296f6",
+      "width": 1920,
+      "height": 2160,
+      "snapshotHash": "3bf75bfe0d0e0bfb300e50fe0040bf0809951e175228982b9b02af3e169a7618",
+      "renderVersion": "visible-tiles-v2",
+      "bytes": 5212275,
+      "tilePixels": [
+        {
+          "assetId": "C03a",
+          "visible": true,
+          "channelMeans": [
+            212.14952680655773,
+            201.07408445193124,
+            191.393269511354
+          ],
+          "channelStdevs": [
+            50.05069309515654,
+            59.18005503390513,
+            67.48011202736554
+          ]
+        },
+        {
+          "assetId": "C12",
+          "visible": true,
+          "channelMeans": [
+            204.87127281409167,
+            190.91497937446945,
+            181.89705472729202
+          ],
+          "channelStdevs": [
+            63.960110660566244,
+            77.91856883061475,
+            87.2951442312334
+          ]
+        },
+        {
+          "assetId": "C09",
+          "visible": true,
+          "channelMeans": [
+            192.38487671105688,
+            189.43454875848897,
+            187.62991763051784
+          ],
+          "channelStdevs": [
+            85.31527213345046,
+            87.94759038922479,
+            89.96930707173034
+          ]
+        },
+        {
+          "assetId": "P09",
+          "visible": true,
+          "channelMeans": [
+            231.4630265810696,
+            231.01034426729626,
+            228.9908213073005
+          ],
+          "channelStdevs": [
+            55.82643414330635,
+            56.313746239019494,
+            61.09759161190163
+          ]
+        },
+        {
+          "assetId": "P10",
+          "visible": true,
+          "channelMeans": [
+            219.91430125212224,
+            206.79584538147284,
+            190.9495271381579
+          ],
+          "channelStdevs": [
+            48.03600272986161,
+            62.446744294207356,
+            81.20599451437629
+          ]
+        },
+        {
+          "assetId": "S08",
+          "visible": true,
+          "channelMeans": [
+            113.3871664102292,
+            98.86294135982598,
+            86.3232554515068
+          ],
+          "channelStdevs": [
+            71.78391045699033,
+            68.22524730075995,
+            67.29683903557903
+          ]
+        }
+      ]
+    },
+    "members": [
+      "C03a",
+      "C12",
+      "C09",
+      "P09",
+      "P10",
+      "S08"
+    ]
+  },
+  "assets": [
+    {
+      "assetId": "C03a",
+      "itemId": "asset-C03a",
+      "jobId": "gen-2026-07-16T05-12-50-232Z-2ae3b748",
+      "providerId": "codex-subagent-gpt-image-2",
+      "agentTaskName": "/root/generate_c03a_2ae3b748",
+      "agentRunId": "exec-8743d899-b011-4abe-88d1-7ccbe4ff3eb7",
+      "leaseId": "subagent-lease-1f2518274f2f2fc9f0cdc1a2",
+      "publicationIntentId": "publication-5c6a2e09-4019-4b17-bd8c-28d7b8562703",
+      "publicationReceiptId": "receipt-73ec7a75-b982-4c9e-8248-cc9cd19c0546",
+      "individualReviewId": "review-2026-07-16T05-36-23-547Z-6ddeea3d",
+      "historicalAttempts": [],
+      "raw": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C03a_禾安·婴儿/AI画布生成/C03a_资产_2ae3b748_raw.png",
+        "bytes": 1983096,
+        "sha256": "5491fc11fa7fd85c7040e36adf8603b5ba8bf24021159dfd32aa985e91d19227",
+        "width": 941,
+        "height": 1672,
+        "ratio": 0.562799043062201
+      },
+      "labeled": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C03a_禾安·婴儿/AI画布生成/C03a_资产_2ae3b748_labeled.png",
+        "bytes": 2695888,
+        "sha256": "4d017dfd03f2f8696a3e2e0c7deaf9761cee71517561d8a514e2d0c64c3780d6",
+        "width": 941,
+        "height": 1672,
+        "ratio": 0.562799043062201
+      },
+      "hardLockPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C03a_禾安·婴儿/AI画布生成/C03a_资产_2ae3b748_raw.png"
+    },
+    {
+      "assetId": "C12",
+      "itemId": "asset-C12",
+      "jobId": "gen-2026-07-16T05-37-38-594Z-48d2ac40",
+      "providerId": "codex-subagent-gpt-image-2",
+      "agentTaskName": "/root/generate_c12_48d2ac40",
+      "agentRunId": "exec-1b314936-4b23-4019-aba1-24fcdde51769",
+      "leaseId": "subagent-lease-6d7e5e83b0ff69a8f667bae6",
+      "publicationIntentId": "publication-b35eec11-6b5e-4812-9984-3c20e159173a",
+      "publicationReceiptId": "receipt-5bdf592c-cf7b-48ac-b94a-2ed7e65b0c5f",
+      "individualReviewId": "review-2026-07-16T05-47-11-340Z-160aa8a1",
+      "historicalAttempts": [],
+      "raw": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C12_产婆/AI画布生成/C12_资产_48d2ac40_raw.png",
+        "bytes": 1683604,
+        "sha256": "f037ae8befee31670789b3e5cc6ebbe449c359870df05811ca3ca8146d4a8223",
+        "width": 941,
+        "height": 1672,
+        "ratio": 0.562799043062201
+      },
+      "labeled": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C12_产婆/AI画布生成/C12_资产_48d2ac40_labeled.png",
+        "bytes": 2270423,
+        "sha256": "6a6ec3d6c6487ca81b94cacb65408bffb7541df228307d7c9756ce89ec8d3153",
+        "width": 941,
+        "height": 1672,
+        "ratio": 0.562799043062201
+      },
+      "hardLockPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C12_产婆/AI画布生成/C12_资产_48d2ac40_raw.png"
+    },
+    {
+      "assetId": "C09",
+      "itemId": "asset-C09",
+      "jobId": "gen-2026-07-16T05-49-18-154Z-864dc4e4",
+      "providerId": "codex-subagent-gpt-image-2",
+      "agentTaskName": "/root/generate_c09_864dc4e4",
+      "agentRunId": "exec-0aeca835-4f2c-43b9-aa00-28fc464ea15e",
+      "leaseId": "subagent-lease-f0fc308af9696c8dd633db76",
+      "publicationIntentId": "publication-5cb7069a-86c2-4e6c-b847-c82a0d3eb226",
+      "publicationReceiptId": "receipt-358adc33-cd43-4d81-9286-5e992d0446bd",
+      "individualReviewId": "review-2026-07-16T05-59-14-503Z-2def139f",
+      "historicalAttempts": [],
+      "raw": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C09_管牍长者(铜匠长者)/AI画布生成/C09_资产_864dc4e4_raw.png",
+        "bytes": 1375248,
+        "sha256": "6831af44de777117cd9bb61f30e36fc9c0e488281e487fee107d08451bceda71",
+        "width": 941,
+        "height": 1672,
+        "ratio": 0.562799043062201
+      },
+      "labeled": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C09_管牍长者(铜匠长者)/AI画布生成/C09_资产_864dc4e4_labeled.png",
+        "bytes": 1715418,
+        "sha256": "1978140c4ef8ceb5da36b67801da109447cc786f65e3202bb3b2e29c5d1be2c5",
+        "width": 941,
+        "height": 1672,
+        "ratio": 0.562799043062201
+      },
+      "hardLockPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/C09_管牍长者(铜匠长者)/AI画布生成/C09_资产_864dc4e4_raw.png"
+    },
+    {
+      "assetId": "P09",
+      "itemId": "asset-P09",
+      "jobId": "gen-2026-07-16T06-00-38-292Z-9646965b",
+      "providerId": "codex-subagent-gpt-image-2",
+      "agentTaskName": "/root/generate_p09_9646965b",
+      "agentRunId": "exec-928a8e8e-f392-4a13-9afb-b2f74965f0d5",
+      "leaseId": "subagent-lease-9275b2afc75c4d5bf28cb43a",
+      "publicationIntentId": "publication-8010296b-3075-4a30-b1d0-0a2315734bd2",
+      "publicationReceiptId": "receipt-f06f4905-3e40-4507-b997-3ddf325c8b15",
+      "individualReviewId": "review-2026-07-16T06-08-26-317Z-348c303f",
+      "historicalAttempts": [],
+      "raw": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P09_青铜刻刀/AI画布生成/P09_资产_9646965b_raw.png",
+        "bytes": 1166914,
+        "sha256": "ebd254c68967cb3738db00430f39b8c4da961eadfa0d4e9a4fddfb86a1a04f67",
+        "width": 941,
+        "height": 1672,
+        "ratio": 0.562799043062201
+      },
+      "labeled": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P09_青铜刻刀/AI画布生成/P09_资产_9646965b_labeled.png",
+        "bytes": 1303652,
+        "sha256": "94dc69b8a706806e309566cf3a5fa5d077edd464576558636bcadf3f052de7d8",
+        "width": 941,
+        "height": 1672,
+        "ratio": 0.562799043062201
+      },
+      "hardLockPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P09_青铜刻刀/AI画布生成/P09_资产_9646965b_raw.png"
+    },
+    {
+      "assetId": "P10",
+      "itemId": "asset-P10",
+      "jobId": "gen-2026-07-16T06-09-47-159Z-5c528d9a",
+      "providerId": "codex-subagent-gpt-image-2",
+      "agentTaskName": "/root/generate_p10_5c528d9a",
+      "agentRunId": "exec-0f236faf-46d0-4c5d-aed6-b83a46295c6a",
+      "leaseId": "subagent-lease-1bf62c302767c22003fe9a53",
+      "publicationIntentId": "publication-c8beffa6-e05e-4682-8661-351828a2baf3",
+      "publicationReceiptId": "receipt-194792b4-be7b-4b9f-92b4-e9da253afdd0",
+      "individualReviewId": "review-2026-07-16T06-16-54-419Z-2bf1f568",
+      "historicalAttempts": [],
+      "raw": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P10_「无名医」木牌/AI画布生成/P10_资产_5c528d9a_raw.png",
+        "bytes": 1650675,
+        "sha256": "d21c92306216f92e7c627eb751c4855c998cc8a257c63bc05beaddd64b65afd0",
+        "width": 941,
+        "height": 1672,
+        "ratio": 0.562799043062201
+      },
+      "labeled": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P10_「无名医」木牌/AI画布生成/P10_资产_5c528d9a_labeled.png",
+        "bytes": 2211952,
+        "sha256": "972b47d81a9b09f8e935d70f14120a5533f7dfb9c29ee02a74cbbb5ea6b928fc",
+        "width": 941,
+        "height": 1672,
+        "ratio": 0.562799043062201
+      },
+      "hardLockPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P10_「无名医」木牌/AI画布生成/P10_资产_5c528d9a_raw.png"
+    },
+    {
+      "assetId": "S08",
+      "itemId": "asset-S08",
+      "jobId": "gen-2026-07-16T06-28-20-871Z-08f97395",
+      "providerId": "codex-subagent-gpt-image-2",
+      "agentTaskName": "/root/generate_s08_retry_08f97395",
+      "agentRunId": "exec-f35d368a-aa24-4175-a337-f455668915fe",
+      "leaseId": "subagent-lease-97053fa153cedc7df79a7693",
+      "publicationIntentId": "publication-ee3c9f6a-e498-4590-be1f-45b68ad4ac4d",
+      "publicationReceiptId": "receipt-188a7bb7-9c36-4b88-ab55-7d0993a4f83b",
+      "individualReviewId": "review-2026-07-16T07-20-56-534Z-28144aed",
+      "historicalAttempts": [
+        {
+          "jobId": "gen-2026-07-16T06-18-25-327Z-ed1a04cb",
+          "status": "failed",
+          "error": "主代理视觉验收未通过：棚体布局合格，但入口木牌正面刻痕过于清楚，不能与当前 P10 正式版本可靠判为同一块牌；为防跨镜头道具漂移，禁止 Publication。",
+          "publicationIntentId": "publication-aab3eca6-e8b3-4279-8aa9-aab47ca757db",
+          "publicationStatus": "failed",
+          "checkpointStage": "failed"
+        }
+      ],
+      "raw": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S08_阿航药棚/AI画布生成/S08_资产_08f97395_raw.png",
+        "bytes": 2753122,
+        "sha256": "986738b7078995c35581a6ac8c5f754a0a65fa43c277107928a7c013e3ece398",
+        "width": 941,
+        "height": 1672,
+        "ratio": 0.562799043062201
+      },
+      "labeled": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S08_阿航药棚/AI画布生成/S08_资产_08f97395_labeled.png",
+        "bytes": 3898071,
+        "sha256": "4f5c92d3fda7173c71fa193495ff3354175f2a5cb0d06a06660e41c1b04b29cc",
+        "width": 941,
+        "height": 1672,
+        "ratio": 0.562799043062201
+      },
+      "hardLockPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/S08_阿航药棚/AI画布生成/S08_资产_08f97395_raw.png"
+    }
+  ],
+  "sourceBoundary": {
+    "mode": "read-only",
+    "fullDirectory": {
+      "before": {
+        "files": 3344,
+        "bytes": 24570877,
+        "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+      },
+      "after": {
+        "files": 3344,
+        "bytes": 24570877,
+        "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+      },
+      "unchanged": true
+    },
+    "controlledFusionInputs": {
+      "before": {
+        "files": 1354,
+        "bytes": 14093144,
+        "aggregateSha256": "f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c"
+      },
+      "after": {
+        "files": 1354,
+        "bytes": 14093144,
+        "aggregateSha256": "f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c"
+      },
+      "unchanged": true
+    }
+  },
+  "doctor": {
+    "errors": 0,
+    "warnings": 0,
+    "ok": 27
+  },
+  "ongoingProduction": {
+    "goalComplete": false,
+    "nextAssetId": "P25",
+    "nextBatchAssetIds": [
+      "P25",
+      "C19",
+      "C20",
+      "P24",
+      "P04",
+      "P06"
+    ],
+    "note": "截至 fusion-asset-batch-003 完成；不得冒充 EP01 或全季完成。"
+  },
+  "recordedVerificationRun": {
+    "typecheck": "passed",
+    "targeted": "tests/fusion-asset-consistency.test.ts + tests/fusion-production.test.ts: 2 files / 13 tests passed",
+    "fullTests": "49 files / 294 tests passed",
+    "productionBuild": "passed",
+    "mcpBuild": "passed"
+  },
+  "assertions": {
+    "allCurrentPublicationsRegistered": true,
+    "allImagesBoundToUniqueSubagentLeases": true,
+    "allHistoricalAttemptsFailedClosed": true,
+    "allRawLabeledPairsTraceable": true,
+    "allImagesDecodableAndVertical": true,
+    "allSixReviewTilesVisible": true,
+    "allSevenCriteriaPassed": true,
+    "hiddenMaskRulePassed": true,
+    "allSixCurrentHardLocks": true,
+    "sourceUnchanged": true,
+    "longGoalStillActive": true
+  }
+}

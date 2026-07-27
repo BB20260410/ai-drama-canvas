@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "kind": "grok-isolated-managed-imagegen-mvp-evidence",
+  "updatedAt": "2026-07-23T01:18:41+0800",
+  "platformNextAction": "GROK_RECOVER_AND_COMPLETE_ISOLATED_MANAGED_IMAGEGEN_MVP",
+  "writer": "Grok",
+  "provider": "grok",
+  "executorKind": "agent-imagegen",
+  "generationConcurrency": 1,
+  "software": {
+    "sourceDigest": "ede642222ec914675d66a004833f2411547b96b195282ad47c4369de79422551",
+    "buildId": "fcee0e1c7b968c7daffb1099755e7791",
+    "mcpToolCount": 189,
+    "releaseCurrentness": true,
+    "affectedTests": "4 files / 21 tests PASS (imagegen-call, result-bundle, mcp-managed-studio, canvas-workflow-runner)",
+    "typecheck": "NOT_RE_RUN_after_scripts_only",
+    "mcpConfig": "pointed to source dist-mcp via ~/.grok/config.toml (backup .bak-20260723-source-mcp)"
+  },
+  "duduProtection": {
+    "project": "projects/dudu-s1e1-a84aa353",
+    "generationLedgerSha256": "0998c00f8bc84583f207ae3e434a7171d1597ed177cc21c595082f665bfc54af",
+    "expectedSha256": "0998c00f8bc84583f207ae3e434a7171d1597ed177cc21c595082f665bfc54af",
+    "unchanged": true,
+    "u28u29": "NOT_TOUCHED_no_retry_no_fail_no_cancel",
+    "scopedActionRemains": "RECONCILE_U29_A2_EXTERNAL_UNKNOWN_ONLY"
+  },
+  "isolatedProject": {
+    "projectRoot": "/Users/hxx/Documents/无限画布/projects/grok-mvp-qingdeng-mrwc97mu-d0aea463",
+    "projectId": "project-c78607fac2a4",
+    "name": "Grok最小受管生图闭环-青灯客",
+    "generationLedgerSha256": "813c2c54c3cb68fe1b9fe05a642cda6568f3a4ad09fbb2209c9cceb92dfaaec9",
+    "characterId": "character-qingdeng-ke",
+    "characterAuthoritySha256": "81185521f52e17872ad4758bab9262223244237fb7a0fa91056c2f20118df87d",
+    "sceneId": "scene-rainy-inn-porch",
+    "unitId": "S1E01-U01",
+    "panelIds": [
+      "S1E01-U01-P1",
+      "S1E01-U01-P2",
+      "S1E01-U01-P3"
+    ],
+    "bindingSets": 3,
+    "packId": "studio-generation-freeze-210c16ea088f4bd4aaf2f262a160342b",
+    "packFingerprint": "210c16ea088f4bd4aaf2f262a160342bd5e9603a1003f42d48481cde87b80f0b",
+    "generationRunId": "grok-mvp-ug-run-mrwcedcu",
+    "callId": "studio-imagegen-call-61b5d514d654517566db97d96772e09fadfc8f6c",
+    "callAllowedFirst": true,
+    "rawSha256": "aed5cc05a0df3c090bb3bb144e945769e05f18df38bf81ce4f9781f9a7f6621d",
+    "labeledSha256": "925f606d18e0a7d256402c8147852b7a60d1121a5922c43aadd16bed4170ff28",
+    "pairComplete": true,
+    "reviewDecision": "pass",
+    "reviewId": "studio-generation-review-3dc2bd67c1bf6706d3a1212dadbb881c9fd9d75c"
+  },
+  "imageCalls": [
+    {
+      "kind": "character-reference",
+      "tool": "image_gen",
+      "sessionPath": "images/1.jpg",
+      "path": "Authority import+approve",
+      "preCall": false,
+      "note": "asset-reference pack target not present; Authority path used"
+    },
+    {
+      "kind": "unit-grid-canary",
+      "tool": "image_edit",
+      "sessionPath": "images/2.jpg",
+      "preCall": true,
+      "callId": "studio-imagegen-call-61b5d514d654517566db97d96772e09fadfc8f6c",
+      "aspectNote": "single model output recomposed to 9:16 stacked panels for unit-grid contract; no second model call"
+    }
+  ],
+  "nonClaims": [
+    "Not full-repo zero-defect remediation",
+    "Not App package/install",
+    "Not Dudu M2/M3",
+    "Not real video",
+    "Not Git stage/commit/push",
+    "Character reference did not use unit-grid pre-call (no asset-reference target)",
+    "Unit dashboard nextAction may still project panel-level execute-agent-imagegen after unit-grid pass"
+  ],
+  "status": "ISOLATED_MVP_LOOP_CLOSED"
+}

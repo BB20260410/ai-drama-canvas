@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 3,
+  "generatedAt": "2026-07-18T13:54:56.874Z",
+  "status": "passed",
+  "transport": "packaged-electron-current-source",
+  "executablePath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-Rk0JnS/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+  "projectRoot": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-Rk0JnS/tmp/review-project",
+  "registryPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-Rk0JnS/tmp/review-project-registry.json",
+  "userDataPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-Rk0JnS/tmp/review-electron-user-data",
+  "initial": {
+    "itemId": "main-ep01-unit001",
+    "targetPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-Rk0JnS/tmp/review-project/EP01_15s_001_雾河神落/EP01_15s_001_首帧_raw.png",
+    "targetId": "main-ep01-unit001-f2283ede5089",
+    "sha256": "6a3d6d04ae193fec663d9d387e90dc6708a0367a243da4f356da7e7da2c768f6",
+    "scanId": "f9594c98-45e4-4e27-8038-2a9bf31fe1de",
+    "historicalReviewCount": 1,
+    "mediaSrc": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-current-source-package-Rk0JnS%2Ftmp%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=6a3d6d04ae193fec663d9d387e90dc6708a0367a243da4f356da7e7da2c768f6"
+  },
+  "staleRejected": {
+    "status": "待视觉验收",
+    "sha256": "ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412",
+    "scanId": "83b7799e-5cfa-477a-b298-118df846b846",
+    "historicalReviewCount": 1,
+    "attemptedMediaSrc": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-current-source-package-Rk0JnS%2Ftmp%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E5%B0%BE%E5%B8%A7_raw.png&sha256=4f63c9d3597dbf4103a14bc3bc94c5256eceb1a1f1f21d76246586802bd4f6c8",
+    "mediaSrc": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-current-source-package-Rk0JnS%2Ftmp%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412"
+  },
+  "passed": {
+    "status": "待视频",
+    "latestReviewId": "review-2026-07-18T13-54-52-044Z-8a82883c",
+    "sha256": "ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412",
+    "historicalReviewCount": 2,
+    "mediaSrc": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-current-source-package-Rk0JnS%2Ftmp%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412"
+  },
+  "restarted": {
+    "status": "待视频",
+    "latestReviewId": "review-2026-07-18T13-54-52-044Z-8a82883c",
+    "sha256": "ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412",
+    "historicalReviewCount": 2,
+    "mediaSrc": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-current-source-package-Rk0JnS%2Ftmp%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412"
+  },
+  "refreshed": {
+    "status": "待视觉验收",
+    "sha256": "577319c9aa3a0368ac551272561441e8db81cfcd008af2f742f9a44952f280e8",
+    "scanId": "ccb76f07-50a8-404c-a37b-6d34087ef76f",
+    "historicalReviewCount": 2,
+    "mediaSrc": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-current-source-package-Rk0JnS%2Ftmp%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=577319c9aa3a0368ac551272561441e8db81cfcd008af2f742f9a44952f280e8"
+  },
+  "pageErrors": [],
+  "assertions": {
+    "staleSubmitRejectedThroughUi": true,
+    "staleAttemptWroteNoReview": true,
+    "staleRejectAutoReloadedHash": true,
+    "staleRejectResetCriteria": true,
+    "visualPassSubmittedThroughUi": true,
+    "passRestoredAfterApplicationRestart": true,
+    "restartHashMatchesPassedContent": true,
+    "samePathArtifactIdStable": true,
+    "shaChanged": true,
+    "stalePassNotCurrent": true,
+    "statusReturnedToVisualReview": true,
+    "cacheBustChanged": true,
+    "historyPreserved": true,
+    "pageErrors": 0,
+    "screenshotCaptureAttempt": 1
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p14-isolated-package-smoke-20260718-p11p14-r6-review-ui.png",
+    "bytes": 228257,
+    "sha256": "3d1f43e013aaa2673ef3db2c68d4c6b7d67c80cc536d9d386beaaeac224ee740",
+    "width": 1560,
+    "height": 980,
+    "content": {
+      "pixels": 1528800,
+      "brightPixels": 340573,
+      "brightRatio": 0.22277145473574045,
+      "chromaticPixels": 229130,
+      "chromaticRatio": 0.14987571951857667,
+      "edgeBrightRatios": {
+        "top": 0.10274725274725274,
+        "left": 0.06044375045391822,
+        "right": 0.08606049562682216
+      }
+    }
+  },
+  "terminal": {
+    "rootRemoved": true,
+    "registryRemoved": true,
+    "userDataRemoved": true
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "kind": "deep-absorb-ui-smoke",
+  "createdAt": "2026-07-18T09:39:34.040Z",
+  "projectRoot": "/private/tmp/studio-p7-fixture-965rkB/p7-continuity-fixture-01c0c4d2",
+  "projectId": "project-d805222b98bc",
+  "checks": {
+    "coreOverviewOk": true,
+    "materialStudioVisible": true,
+    "canvasViewVisible": true,
+    "minimapVisible": true,
+    "workflowToolbarVisible": true,
+    "canvasFlowNodes": 6,
+    "canvasCustomNodes": true,
+    "canvasCustomNodeCount": 6,
+    "canvasThumbNodes": 3,
+    "canvasAssetNodes": 3,
+    "canvasThumbCountLabel": "有图节点 3",
+    "canvasTextDocCountLabel": "2 文稿",
+    "canvasScriptOrPromptNodes": 2,
+    "unitNodeClicked": true,
+    "panelNodeClicked": true,
+    "nodeActionPanelVisible": true,
+    "actionOpenDashboard": true,
+    "actionOpenBinding": true,
+    "generationTabVisible": true,
+    "generationPaneVisible": true,
+    "generationManagedHint": true,
+    "dashboardVisible": true,
+    "prepChecklistVisible": false,
+    "preflightVisible": false,
+    "prepChecklistInDom": false,
+    "preflightInDom": false,
+    "bindingWorkbenchVisible": true,
+    "bindingConfirmActionPresent": true,
+    "bindingIgnoreActionPresent": true,
+    "bindingUnitListVisible": true,
+    "openBindingClicked": false,
+    "nodeActionPanelAfterRetry": false
+  },
+  "hardFail": [],
+  "ok": true,
+  "pageErrors": [],
+  "consoleErrors": [],
+  "screenshots": {
+    "canvas": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/deep-absorb-ui-smoke-canvas-20260718-mrq6df2g.png",
+      "sizeBytes": 207014,
+      "sha256": "dea7aac0925af0d3b2d2a999bd2dc9fa695866e2725a460ad7d9afb3d222bad0"
+    },
+    "binding": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/deep-absorb-ui-smoke-binding-20260718-mrq6df2g.png",
+      "sizeBytes": 184875,
+      "sha256": "0200d0e5bad4461de68bf5588cebb6051a438bb249f3ef1e7d067d3ef5d7e1eb"
+    }
+  },
+  "notes": [
+    "隔离 P7 fixture，未写正式 projects/codex-ai-drama-studio",
+    "节点操作面板依赖 VueFlow 节点命中；若 panelNodeClicked=false 则属交互命中降级",
+    "生成队列 UI 在 managedShell 路径下默认不展示；cancel/jump 已在 App 源码接线，本 smoke 以受管 Studio 画布/绑定/驾驶舱为主"
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "url": "file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/dist/mac-arm64/AI%20%E6%BC%AB%E5%89%A7%E7%94%BB%E5%B8%83.app/Contents/Resources/app.asar/out/renderer/index.html",
+  "loading": false,
+  "visible": true,
+  "bounds": {
+    "x": 224,
+    "y": 85,
+    "width": 1280,
+    "height": 820
+  },
+  "rendererState": {
+    "readyState": "complete",
+    "title": "AI 漫剧画布",
+    "bodyText": "AI\n漫剧画布\n\n扫描退出恢复门禁\n\n15 秒单元\n1\n待续做\n1\n首尾帧\n0 / 0\n视频\n0\n项目\n扫描\n生产画布\n故事图谱\n自动改编\n生产设计\n分集剧本\n单元清单\n镜头时间线\n导演剪辑台\n资产库\n视频工作台\n导演验收\nCodex 接续\n生成队列\n任务中心\n项目设置\n分集\n1\n全部分集\nEP01\n显示原镜头\n显示资产节点\n显示小说叙事链\n生产状态\n清除\n待首帧\n1\n文件监听已开启\n/tmp/ai-canvas-packaged-scan-shutdown-20260713\n批注\n分组\n连线\n01\n剧本\n0\n02\n硬锁资产\n0\n03\n首尾帧\n1\n04\n视频\n0\nEP01 · 15s 001\n待首帧\nEP01 15s 001 退出门禁\n首帧\n首帧\n待补\n尾帧\n尾帧\n待补\n按硬锁生成并保存首帧 raw/labeled\n→\n1 个可见节点\n缩放 62%\n选择一个节点\n查看提示词、文件路径、版本与验收结果",
+    "bodyWidth": 1280,
+    "bodyHeight": 820,
+    "viewport": {
+      "width": 1280,
+      "height": 820,
+      "scrollWidth": 1280,
+      "scrollHeight": 820,
+      "canScrollX": false,
+      "canScrollY": false
+    },
+    "visibleRegions": {
+      ".adaptation-header": null,
+      ".adaptation-toolbar": null,
+      ".review-bar": null,
+      ".adaptation-grid": null,
+      ".facts-pane": null,
+      ".beats-pane": null,
+      ".plan-pane": null,
+      ".review-drawer": null
+    },
+    "moduleButtons": [
+      "生产画布",
+      "故事图谱",
+      "自动改编",
+      "生产设计",
+      "分集剧本",
+      "单元清单",
+      "镜头时间线",
+      "导演剪辑台",
+      "资产库",
+      "视频工作台",
+      "导演验收",
+      "Codex 接续",
+      "生成队列",
+      "任务中心",
+      "项目设置"
+    ]
+  }
+}

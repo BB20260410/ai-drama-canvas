@@ -1,0 +1,8 @@
+{
+  "project": "OpenTimelineIO",
+  "slice": "OTIO-1",
+  "module": "src/core/studio-otio-capability-matrix.ts",
+  "typecheck": "pass",
+  "vitest": "3 passed",
+  "date": "2026-07-18"
+}

@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "kind": "p11-p14-command-gate-record",
+  "status": "PASS",
+  "mode": "targeted",
+  "startedAt": "2026-07-18T14:59:52.008Z",
+  "endedAt": "2026-07-18T15:00:01.833Z",
+  "durationMs": 9825,
+  "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/active-managed-studio-context.test.ts",
+    "tests/mcp-build-currentness-gate.test.ts",
+    "tests/studio-agent-imagegen-result-bundle.test.ts",
+    "tests/agent-connection-config.test.ts",
+    "tests/p13-desktop-production-loop-ui.test.ts",
+    "tests/studio-continuity-review-ui.test.ts",
+    "tests/p13-p14-installed-ui-smoke-guards.test.ts",
+    "tests/p14-dual-agent-fresh-session-read-smoke.test.ts",
+    "tests/p14-real-canary-orchestrator.test.ts",
+    "tests/p14-installed-real-canary-ui-guards.test.ts",
+    "tests/p14-installed-runtime-identity-guards.test.ts",
+    "tests/p14-installed-agent-repair-ui-smoke-guards.test.ts",
+    "tests/validate-p11-p14-desktop-loop-final.test.ts",
+    "tests/p11-p14-command-gate.test.ts"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "failureReasons": [],
+  "sourceDigest": {
+    "before": "6e5e275010e6e9d0cada9997d21f2dcd572ad9e342819145f89b43c583eb20bc",
+    "after": "6e5e275010e6e9d0cada9997d21f2dcd572ad9e342819145f89b43c583eb20bc",
+    "beforeFiles": 459,
+    "afterFiles": 459
+  },
+  "buildIdentity": {
+    "before": {
+      "buildId": "9e035198e3847e6d6ae7fec57517f6f0",
+      "sourceDigest": "6e5e275010e6e9d0cada9997d21f2dcd572ad9e342819145f89b43c583eb20bc",
+      "fingerprint": "0ac78e4289ffccdf68a7e7706cb5e44dfd534d5653bb5a057d159416a21a8fe8"
+    },
+    "after": {
+      "buildId": "9e035198e3847e6d6ae7fec57517f6f0",
+      "sourceDigest": "6e5e275010e6e9d0cada9997d21f2dcd572ad9e342819145f89b43c583eb20bc",
+      "fingerprint": "0ac78e4289ffccdf68a7e7706cb5e44dfd534d5653bb5a057d159416a21a8fe8"
+    }
+  },
+  "testCounts": {
+    "applicable": true,
+    "files": {
+      "total": 14,
+      "passed": 14,
+      "failed": 0
+    },
+    "tests": {
+      "total": 50,
+      "passed": 50,
+      "failed": 0
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/runs/2026-07-18T14-59-52-007Z-targeted-750068a8/command.log",
+    "sizeBytes": 2421,
+    "sha256": "5b5235ca49be0a5939cd558ffacf2827bdeab0a32c6354ecd93789d486d77fc1"
+  },
+  "security": {
+    "environmentRecorded": false,
+    "childEnvironmentAllowlisted": true
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-07-14T01:11:20+08:00",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "commands": {
+    "typecheck": { "command": "npm run typecheck", "exitCode": 0 },
+    "tests": { "command": "npm test", "exitCode": 0, "files": 28, "tests": 146, "durationSeconds": 50.52, "maxWorkers": 2 },
+    "build": { "command": "npm run build", "exitCode": 0 },
+    "mcpSmoke": { "command": "npm run mcp:smoke", "exitCode": 0, "tools": 133, "resourceTemplates": 9, "prompts": 7 },
+    "scanRenderContention": { "command": "npm run scan:render-contention-smoke -- /tmp/ai-canvas-scan-render-contention-20260714 docs/evidence/scan-render-contention.metrics.json 24", "exitCode": 0 },
+    "packageMac": { "command": "npm run package:mac", "exitCode": 0 },
+    "packagedScanCancellation": { "command": "AI_CANVAS_MCP_RUNTIME=<packaged-app> AI_CANVAS_MCP_SERVER_PATH=<packaged-server> npx vitest run tests/mcp-scan-cancel.test.ts", "exitCode": 0, "tests": 1 },
+    "packagedHeadless": { "command": "AI_CANVAS_MCP_RUNTIME=<packaged-app> AI_CANVAS_MCP_SERVER_PATH=<packaged-server> npm run mcp:headless-smoke -- /tmp/ai-canvas-packaged-snapshot-20260714 /tmp/ai-canvas-packaged-snapshot-registry-20260714.json", "exitCode": 0 },
+    "sourceUiShutdown": { "command": "npx tsx scripts/scan-shutdown-ui-smoke.ts /tmp/ai-canvas-scan-shutdown-source-20260714 ...", "exitCode": 0 },
+    "packagedUiShutdown": { "command": "AI_CANVAS_APP_EXECUTABLE=<packaged-app> npx tsx scripts/scan-shutdown-ui-smoke.ts /tmp/ai-canvas-scan-shutdown-packaged-20260714 ...", "exitCode": 0 }
+  },
+  "scanRenderContention": {
+    "units": 24,
+    "clips": 24,
+    "renderDurationSeconds": 36,
+    "renderWidth": 1280,
+    "renderHeight": 720,
+    "renderBytes": 18676028,
+    "scanDurationMs": 144,
+    "scanWallDurationMs": 192,
+    "reservedPublicationFilesSkipped": 1,
+    "renderAliveAtScanStart": true,
+    "renderAliveAtScanCompletion": true,
+    "outputIndexedWhileReserved": false,
+    "registeredOutputIndexedAfterCompletion": true,
+    "finalInspectedChecks": 1,
+    "finalReusedChecks": 48,
+    "locksAfter": 0
+  },
+  "packagedHeadless": {
+    "transport": "packaged-electron-node",
+    "desktopUiLaunched": false,
+    "tools": 133,
+    "resourceTemplates": 9,
+    "prompts": 7,
+    "commandTypes": 78,
+    "ledgerEntries": 22,
+    "uncertainCommands": 0,
+    "finalDoctor": { "errors": 0, "warnings": 0, "ok": 24 },
+    "runtimeResourcesIdle": true,
+    "restartVerified": true
+  },
+  "package": {
+    "dmg": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "sizeBytes": 136652595,
+    "sha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972",
+    "signature": "Developer ID Application: YIHANG LI (3JS43BTTJ3)",
+    "signatureTimestamp": "2026-07-14T01:07:57+08:00",
+    "codesignDeepStrict": true,
+    "dmgChecksumValid": true,
+    "notarized": false,
+    "spctlResult": "Unnotarized Developer ID"
+  },
+  "uiEvidence": {
+    "sourceScreenshot": "docs/evidence/scan-shutdown-snapshot-source-20260714.png",
+    "sourceMetrics": "docs/evidence/scan-shutdown-snapshot-source-20260714.metrics.json",
+    "packagedScreenshot": "docs/evidence/scan-shutdown-snapshot-packaged-20260714.png",
+    "packagedMetrics": "docs/evidence/scan-shutdown-snapshot-packaged-20260714.metrics.json",
+    "sourceExitCode": 0,
+    "packagedExitCode": 0,
+    "scanIdPreserved": true,
+    "ffprobeTerminated": true,
+    "locksAfter": 0
+  },
+  "sourceHashes": {
+    "src/core/scanner.ts": "16331a38f3c3dbae36707cc569104a5c318248025b40ee860073fc34dffc7411",
+    "src/core/publication.ts": "eee56c263dd497ffe3935776b2fcf8f7d55af386d8cc178bf77668101333ef12",
+    "src/core/codex.ts": "ba2abb50510343d7cd21c7f34bab8cd1987b89f45c19c326b510cedf9eadcc15",
+    "src/core/editor.ts": "9a44f22077723fd6bb92431184b474ccbcac432d7f535db6204957dd92ed0552",
+    "src/mcp/server.ts": "7072c14732624997d8b6dd1a75762097a5a712fa355b3968763356f012c32239"
+  },
+  "compiledCapability": {
+    "reservedPublicationTargetsExcluded": true,
+    "publicationSnapshotAfterDiscovery": true,
+    "compiledMcpMatched": true,
+    "packagedMcpMatched": true
+  },
+  "formalProjectRootsTouched": false
+}

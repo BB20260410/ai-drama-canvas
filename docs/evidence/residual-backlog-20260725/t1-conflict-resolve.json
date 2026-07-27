@@ -1,0 +1,36 @@
+{
+  "conflictsTotal": 88,
+  "relevant": 0,
+  "resolved": 0,
+  "errs": [],
+  "ready": false,
+  "freeze": {
+    "status": "blocked",
+    "code": "continuity-not-ready",
+    "message": "允许资产 char-dudu 在 panel panel-133d9aeaf63b06da72cb0af195b705d02b4690c6 的固定九字段连续性未 ready。"
+  },
+  "remainingU25": 0,
+  "review": {
+    "decision": "pass",
+    "advancesHead": false,
+    "currentAtSubmission": false,
+    "staleReasons": [
+      "generation-input-stale",
+      "labeled:continuity-opaque: 资产 char-dudu 的 costume 是内部定位，不是可执行视觉状态。",
+      "raw:continuity-opaque: 资产 char-dudu 的 costume 是内部定位，不是可执行视觉状态。"
+    ]
+  },
+  "derived": "result_pending_review",
+  "u25": {
+    "status": "result_pending_review",
+    "raw": null
+  },
+  "summary": {
+    "pass": 24,
+    "pendingReview": 1,
+    "inProgress": 0,
+    "failed": 0,
+    "blocked": 1
+  },
+  "pass": false
+}

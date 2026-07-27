@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-07-14T02:04:00+08:00",
+  "finalizedAt": "2026-07-14T02:11:00+08:00",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "objective": "machine-level weighted media execution control and FFmpeg/ffprobe lifecycle",
+  "commands": {
+    "typecheck": { "command": "npm run typecheck", "exitCode": 0 },
+    "targetedMedia": { "command": "npx vitest run tests/media-runtime.test.ts tests/scanner.test.ts tests/publication.test.ts tests/editor.test.ts tests/codex.test.ts", "exitCode": 0, "files": 5, "tests": 42 },
+    "tests": { "command": "npm test", "exitCode": 0, "files": 29, "tests": 151, "durationSeconds": 53.75, "maxWorkers": 2 },
+    "build": { "command": "npm run build", "exitCode": 0 },
+    "mcpSmoke": { "command": "npm run mcp:smoke", "exitCode": 0, "tools": 133, "resourceTemplates": 9, "prompts": 7 },
+    "mediaRuntimeSmoke": { "command": "npm run media:runtime-smoke -- docs/evidence/media-runtime-smoke-20260714.json", "exitCode": 0, "evidence": "docs/evidence/media-runtime-smoke-20260714.json" },
+    "scanRenderContention": { "command": "AI_CANVAS_MEDIA_RUNTIME_DIR=<isolated> npm run scan:render-contention-smoke -- /tmp/ai-canvas-scan-render-contention-machine-20260714 docs/evidence/scan-render-contention-machine-runtime-20260714.json 24", "exitCode": 0, "evidence": "docs/evidence/scan-render-contention-machine-runtime-20260714.json" },
+    "temporaryPackagedMcpSmoke": { "command": "AI_CANVAS_MCP_RUNTIME=<temporary-app> npm run mcp:smoke -- <temporary-packaged-server>", "exitCode": 0, "tools": 133, "resourceTemplates": 9, "prompts": 7 },
+    "temporaryPackagedCancellation": { "command": "AI_CANVAS_MCP_RUNTIME=<temporary-app> AI_CANVAS_MCP_SERVER_PATH=<temporary-packaged-server> npx vitest run tests/mcp-scan-cancel.test.ts", "exitCode": 0, "tests": 1 }
+  },
+  "mediaRuntime": {
+    "scope": "machine-cross-project-cross-process",
+    "algorithm": "strict-weighted-fifo",
+    "defaultCapacity": 4,
+    "weights": { "ffprobe": 1, "foregroundFfmpeg": 2, "renderFfmpeg": 3 },
+    "boundedOutput": true,
+    "stageTimeouts": true,
+    "posixProcessGroupTermination": true,
+    "deadOwnerReaping": true,
+    "readOnlySnapshot": true,
+    "stateCorruptionFailsClosed": true
+  },
+  "automatedCoverage": {
+    "crossProcessWeightedFifo": true,
+    "noPermanentStarvation": true,
+    "fastExitLeaseRelease": { "processes": 20, "activeWeightAfter": 0, "queueDepthAfter": 0 },
+    "timeoutKillsParentAndGrandchild": true,
+    "boundedTailLogBytes": 4096,
+    "orphanLeaseAndProcessGroupReaped": true,
+    "publicationTimeoutFailsIntent": true,
+    "scannerAbortPreservesStableIndex": true,
+    "crossProcessRenderCancellationProjection": "implemented-not-separately-exercised"
+  },
+  "realMedia": {
+    "capacity": 4,
+    "peakActiveWeight": 4,
+    "peakCombination": [
+      { "stage": "smoke-render", "tool": "ffmpeg", "weight": 3 },
+      { "stage": "smoke-probe", "tool": "ffprobe", "weight": 1 }
+    ],
+    "queuedStage": { "stage": "smoke-foreground", "tool": "ffmpeg", "weight": 2 },
+    "finalActiveWeight": 0,
+    "finalQueueDepth": 0,
+    "maxObservedWeight": 4,
+    "files": [
+      { "name": "seed.mp4", "sizeBytes": 418636, "sha256": "0c668bee2e6f48a8b96a0f0cdd668d303d89401edc8b16ca2d22b7fde6adf17a" },
+      { "name": "render.mp4", "sizeBytes": 404771, "sha256": "b07e7b28661a026e627fb6a2f689b4a3b8299d34003a2ef90f80ccdad91fc41c", "video": { "codec": "h264", "width": 640, "height": 360, "durationSeconds": 2 } },
+      { "name": "foreground.mp4", "sizeBytes": 211328, "sha256": "1424ce5844e205dbfe747e8a1d5c303bb50fa86100df8e4672270f572794d207", "video": { "codec": "h264", "width": 640, "height": 360, "durationSeconds": 1 } }
+    ]
+  },
+  "scanRenderContention": {
+    "units": 24,
+    "clips": 24,
+    "renderDurationSeconds": 36,
+    "renderWidth": 1280,
+    "renderHeight": 720,
+    "renderBytes": 18676028,
+    "renderSha256": "78a77f6ea415f5e5594f2d54bb4ecd7f43e0321dbbc8fcf9f8cc298237452078",
+    "renderWeightAtScanStart": 3,
+    "machineCapacity": 4,
+    "maxObservedWeight": 4,
+    "overlapObserved": true,
+    "reservedPublicationFilesSkipped": 1,
+    "outputIndexedWhileReserved": false,
+    "registeredOutputIndexedAfterCompletion": true,
+    "finalInspectedChecks": 1,
+    "finalReusedChecks": 48,
+    "locksAfter": 0
+  },
+  "packaging": {
+    "productionDependenciesUnpackedForMcp": true,
+    "temporaryUnsignedAppVerified": true,
+    "temporaryArtifactsRemovedAfterVerification": true,
+    "temporaryAppPublished": false,
+    "temporaryAppInstalled": false,
+    "existingSignedDmgUpdated": false,
+    "existingSignedDmgContainsPreviousSource": true,
+    "existingSignedDmg": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg"
+  },
+  "sourceHashes": {
+    "src/core/media-runtime.ts": "0253ae9cb4b08840dc179bc868001e249532715e713af672b4c561629d4d3ec3",
+    "src/core/scanner.ts": "215a03a86b2acea161b2f65f0d08e359ff533cf9cdce1a9a0155df2e922521b9",
+    "src/core/publication.ts": "4557c25ff23d8cba73402411debfcb0b26a0fc2bf7b67bd629e5c8ff48e069bd",
+    "src/core/editor.ts": "990b8bc220f38179a4b7bd0553f0b60aa18174a5ccdeaa467977c134a2d0c1c9",
+    "src/core/codex.ts": "bb051f16511bc703dd0cda3baa19464c8b9b52cecd02dc221c92c4c93837a935",
+    "src/core/types.ts": "64d65d223704c79f7cd6c29285235e90c217d6087205ecc83828ea0acda9d26a",
+    "src/mcp/server.ts": "7072c14732624997d8b6dd1a75762097a5a712fa355b3968763356f012c32239",
+    "package.json": "63be30826ff71a237ac23ef2d37fd52e60d0fff797c16aed14ad2cc0eac8b70a"
+  },
+  "boundaries": {
+    "formalProjectRootsTouched": false,
+    "generationWebsiteOpened": false,
+    "uploadsPerformed": false,
+    "paidSubmissionsPerformed": false,
+    "existingPackageOverwritten": false,
+    "softwarePublished": false,
+    "notarizationPerformed": false
+  },
+  "nextUniquePriority": "Publication registration two-phase validation with out-of-lock ffprobe/SHA-256 and in-lock CAS commit"
+}

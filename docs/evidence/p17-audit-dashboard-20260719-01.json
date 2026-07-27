@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "kind": "p8-production-dashboard-ui-smoke",
+  "createdAt": "2026-07-19T06:31:04.093Z",
+  "projectRoot": "/private/tmp/studio-p7-fixture-x8WxFN/p7-continuity-fixture-0b064eac",
+  "projectId": "project-fc925e87c7f2",
+  "core": {
+    "overviewFingerprint": "ed6dbf13af3fd5e7f18b726a1473acfca45aa255d8691506977beca336bedba9",
+    "overviewNextAction": {
+      "code": "open-production-dashboard",
+      "label": "在驾驶舱选择下一格并冻结生图包",
+      "reason": "素材与单元已就绪；由 Dashboard 打开单元视图，按 Core 投影处理阻塞宫格。",
+      "requiresWrite": false,
+      "locator": {
+        "kind": "project",
+        "projectId": "project-fc925e87c7f2"
+      }
+    },
+    "unitsCount": 2
+  },
+  "ui": {
+    "nextActionLabel": "用冻结包执行 Codex 或 Grok 生图并登记结果",
+    "unitDomCount": 2,
+    "panelDomCount": 6,
+    "pageErrors": [],
+    "consoleErrors": [],
+    "externalResources": []
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p17-audit-dashboard-20260719-01.png",
+    "sizeBytes": 216272,
+    "sha256": "25678e4b3f9bb210c94e2bfcfa1c3c3785ebdc9d38107bb799a712c4d0dbdf9f"
+  },
+  "formalAccess": 0,
+  "imagegen": 0,
+  "browser": 0,
+  "upload": 0
+}

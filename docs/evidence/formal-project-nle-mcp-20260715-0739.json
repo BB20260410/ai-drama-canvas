@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "kind": "aicanvas-formal-project-nle-mcp-smoke",
+  "generatedAt": "2026-07-14T23:39:13.296Z",
+  "status": "passed",
+  "projectRoot": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729",
+  "registryPath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/.runtime/registry.json",
+  "statePath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/calibration-state.json",
+  "compiledServer": {
+    "path": "/Users/hxx/Documents/无限画布/dist-mcp/mcp/server.js",
+    "bytes": 187144,
+    "sha256": "648d5bb98359db7ec3d68dc297c6514024f745a1f6a2e52a7c18e4f5bf446d00"
+  },
+  "source": {
+    "toolCount": 134,
+    "capabilityMissingForFullNle": [],
+    "scanId": "0495b879-d9ac-4ba0-9096-97f9c59fbbd0",
+    "projectName": "封神篇正式剧本派生 NLE 校准",
+    "stateRevisionBefore": 5,
+    "liveRevisionBefore": 6,
+    "revisionAfter": 6,
+    "recoveredPriorCommittedWrite": true,
+    "firstCallReplayed": true,
+    "replayed": true,
+    "stderrTail": "(node:79958) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+  },
+  "compiled": {
+    "toolCount": 134,
+    "capabilityMissingForFullNle": [],
+    "revision": 6,
+    "persistedNote": "正式封神篇 NLE：source MCP CAS 已验证，等待 compiled fresh-process 复读。",
+    "ledger": {
+      "schemaVersion": 1,
+      "requestId": "formal-nle-source-mcp-edit-17963ad8-94ce-4398-bea5-488749bfbd7d-request-1",
+      "idempotencyKey": "formal-nle-source-mcp-edit-17963ad8-94ce-4398-bea5-488749bfbd7d-idempotency-v1",
+      "command": "apply_edit_operation",
+      "status": "succeeded",
+      "replayed": false,
+      "requestHash": "5178522aaa1800d6ad6c633c6238f8b864126a5d5e3639bc7d6c92ee39f2a3b9",
+      "execution": {
+        "pid": 75921,
+        "phase": "side_effect_committed",
+        "heartbeatAt": "2026-07-14T23:36:20.857Z"
+      },
+      "startedAt": "2026-07-14T23:36:20.795Z",
+      "result": {
+        "editProjectId": "edit-17963ad8-94ce-4398-bea5-488749bfbd7d",
+        "revision": 6,
+        "updatedAt": "2026-07-14T23:36:20.830Z",
+        "affectedTrackIds": [
+          "track-b5270728-9c0a-4a36-bcc7-ff25c7f64e62"
+        ],
+        "affectedClipIds": [
+          "clip-formal-ep22-010"
+        ]
+      },
+      "executedAt": "2026-07-14T23:36:20.860Z"
+    },
+    "doctor": {
+      "errors": 0,
+      "warnings": 1,
+      "ok": 24
+    },
+    "stderrTail": "(node:80044) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+  }
+}

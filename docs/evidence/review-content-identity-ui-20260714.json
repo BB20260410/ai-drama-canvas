@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-14T11:53:51.506Z",
+  "transport": "source-electron-current-build",
+  "projectRoot": "/tmp/ai-canvas-review-content-identity-ui",
+  "registryPath": "/tmp/ai-canvas-review-content-identity-registry.json",
+  "initial": {
+    "itemId": "main-ep01-unit001",
+    "targetPath": "/tmp/ai-canvas-review-content-identity-ui/EP01_15s_001_雾河神落/EP01_15s_001_首帧_raw.png",
+    "targetId": "main-ep01-unit001-f2283ede5089",
+    "sha256": "6a3d6d04ae193fec663d9d387e90dc6708a0367a243da4f356da7e7da2c768f6",
+    "scanId": "2c7bcb83-4ad3-4576-8d47-af4e0916bbc2",
+    "historicalReviewCount": 1,
+    "mediaSrc": "aicanvas-asset://file/?path=%2Ftmp%2Fai-canvas-review-content-identity-ui%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=6a3d6d04ae193fec663d9d387e90dc6708a0367a243da4f356da7e7da2c768f6"
+  },
+  "staleRejected": {
+    "status": "待视觉验收",
+    "sha256": "ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412",
+    "scanId": "f6ce5809-04b3-46ba-9c47-7c491750ec74",
+    "historicalReviewCount": 1,
+    "attemptedMediaSrc": "aicanvas-asset://file/?path=%2Ftmp%2Fai-canvas-review-content-identity-ui%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E5%B0%BE%E5%B8%A7_raw.png&sha256=4f63c9d3597dbf4103a14bc3bc94c5256eceb1a1f1f21d76246586802bd4f6c8",
+    "mediaSrc": "aicanvas-asset://file/?path=%2Ftmp%2Fai-canvas-review-content-identity-ui%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412"
+  },
+  "refreshed": {
+    "status": "待视觉验收",
+    "sha256": "577319c9aa3a0368ac551272561441e8db81cfcd008af2f742f9a44952f280e8",
+    "scanId": "d2817397-4c13-4343-b709-339f6cc72fa5",
+    "historicalReviewCount": 2,
+    "mediaSrc": "aicanvas-asset://file/?path=%2Ftmp%2Fai-canvas-review-content-identity-ui%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=577319c9aa3a0368ac551272561441e8db81cfcd008af2f742f9a44952f280e8"
+  },
+  "assertions": {
+    "staleSubmitRejectedThroughUi": true,
+    "staleAttemptWroteNoReview": true,
+    "staleRejectAutoReloadedHash": true,
+    "staleRejectResetCriteria": true,
+    "visualPassSubmittedThroughUi": true,
+    "samePathArtifactIdStable": true,
+    "shaChanged": true,
+    "stalePassNotCurrent": true,
+    "statusReturnedToVisualReview": true,
+    "cacheBustChanged": true,
+    "historyPreserved": true,
+    "pageErrors": 0,
+    "screenshotCaptureAttempt": 1
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/review-content-identity-ui-20260714.png",
+    "bytes": 224246,
+    "sha256": "4f0975aecff695fdb9b917990e87d35316f0f8e1b96a4bd8d18968e764639b51",
+    "width": 1560,
+    "height": 980,
+    "content": {
+      "pixels": 1528800,
+      "brightPixels": 317859,
+      "brightRatio": 0.20791405023547882,
+      "chromaticPixels": 228581,
+      "chromaticRatio": 0.14951661433804292,
+      "edgeBrightRatios": {
+        "top": 0.04885858189429618,
+        "left": 0.048765342435906744,
+        "right": 0.05580903790087464
+      }
+    }
+  }
+}

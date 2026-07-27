@@ -1,0 +1,308 @@
+{
+  "schemaVersion": 1,
+  "kind": "p8-generation-recovery-matrix",
+  "status": "PASS",
+  "generatedAt": "2026-07-26T22:14:40.161Z",
+  "scope": {
+    "projectKind": "isolated-managed-non-dudu-fixture",
+    "stages": [
+      "before-call",
+      "generation-unknown",
+      "result-cas",
+      "review",
+      "observation",
+      "video-receipt"
+    ],
+    "externalProviderInvocationCount": 0,
+    "formalProjectMutated": false
+  },
+  "assertions": {
+    "everyWorkerActuallySigkilled": true,
+    "everyDatabaseQuickCheckOk": true,
+    "generationUnknownBlocksDuplicateDispatch": true,
+    "providerCountUnchanged": true,
+    "resultPairRecoveredExactly": true,
+    "reviewHeadRecoveredExactly": true,
+    "observationHeadRecoveredExactly": true,
+    "videoReceiptRecoveredExactly": true
+  },
+  "stages": [
+    {
+      "stage": "before-call",
+      "sigkill": {
+        "pid": 3468,
+        "signal": "SIGKILL",
+        "exitCode": null,
+        "exitSignal": "SIGKILL"
+      },
+      "durable": {
+        "projectId": "project-f5aacff2d30e",
+        "packId": "studio-generation-freeze-c3595afd007df60a8788c3a45872a784",
+        "packFingerprint": "c3595afd007df60a8788c3a45872a7843af235067d1d03020b2512d3c6adf83d",
+        "run": {
+          "generationRunId": "p8-before-call-run-1",
+          "packId": "studio-generation-freeze-c3595afd007df60a8788c3a45872a784",
+          "provider": "codex",
+          "dispatchedAt": "2026-07-26T22:13:42.408Z",
+          "latestEventKind": "dispatched",
+          "terminal": false,
+          "hasCallIntent": false,
+          "callId": null,
+          "callStatus": null,
+          "hasResultPair": false,
+          "reviewStatus": "unreviewed",
+          "nextAction": "prepare-call-or-await"
+        },
+        "blockingRuns": [
+          {
+            "generationRunId": "p8-before-call-run-1",
+            "reason": "非终态 run 占用槽位（in-flight）",
+            "recoveryAction": "cancel_studio_generation_run 或等待结果登记"
+          }
+        ],
+        "recoveryDecision": "prepare-call-or-await"
+      },
+      "quickCheck": "ok",
+      "externalProviderInvocationCount": 0,
+      "restartVerifiedAt": "2026-07-26T22:13:42.547Z"
+    },
+    {
+      "stage": "generation-unknown",
+      "sigkill": {
+        "pid": 3500,
+        "signal": "SIGKILL",
+        "exitCode": null,
+        "exitSignal": "SIGKILL"
+      },
+      "durable": {
+        "projectId": "project-3834760bb907",
+        "packId": "studio-generation-freeze-0b95a4757702bf19de66232bef68bb6a",
+        "packFingerprint": "0b95a4757702bf19de66232bef68bb6a81706e323093b239fea40374c9d5184c",
+        "run": {
+          "generationRunId": "p8-generation-unknown-run-1",
+          "packId": "studio-generation-freeze-0b95a4757702bf19de66232bef68bb6a",
+          "provider": "codex",
+          "dispatchedAt": "2026-07-26T22:13:46.307Z",
+          "latestEventKind": "dispatched",
+          "terminal": false,
+          "hasCallIntent": true,
+          "callId": "studio-imagegen-call-2be3670ff340e83ef015997ba0d854b37f8cadda",
+          "callStatus": "generation_unknown",
+          "hasResultPair": false,
+          "reviewStatus": "unreviewed",
+          "nextAction": "reconcile-or-abandon-call"
+        },
+        "blockingRuns": [
+          {
+            "generationRunId": "p8-generation-unknown-run-1",
+            "reason": "非终态 run 占用槽位（in-flight）",
+            "recoveryAction": "cancel_studio_generation_run 或等待结果登记"
+          }
+        ],
+        "recoveryDecision": "reconcile-or-abandon-call",
+        "duplicateDispatchRejected": {
+          "name": "StudioGenerationCheckpointError",
+          "code": "checkpoint-required",
+          "message": "生产槽 unit-grid:p8-generation-unknown 的 generationRunId=p8-generation-unknown-run-1 存在调用未知（generation_unknown）的 imagegen call，必须先经 reconcile/abandon 受管路径闭合，禁止另开 generationRunId。"
+        },
+        "providerCountUnchanged": true
+      },
+      "quickCheck": "ok",
+      "externalProviderInvocationCount": 0,
+      "restartVerifiedAt": "2026-07-26T22:13:47.219Z"
+    },
+    {
+      "stage": "result-cas",
+      "sigkill": {
+        "pid": 3627,
+        "signal": "SIGKILL",
+        "exitCode": null,
+        "exitSignal": "SIGKILL"
+      },
+      "durable": {
+        "projectId": "project-04b2d5aabf41",
+        "packId": "studio-generation-freeze-93cfa4a0434ed880c89b835b29947051",
+        "packFingerprint": "93cfa4a0434ed880c89b835b29947051bc9f8ae48c9dfae0028a53a1965fb22a",
+        "run": {
+          "generationRunId": "p8-result-cas-run-1",
+          "packId": "studio-generation-freeze-93cfa4a0434ed880c89b835b29947051",
+          "provider": "codex",
+          "dispatchedAt": "2026-07-26T22:13:50.915Z",
+          "latestEventKind": "dispatched",
+          "terminal": true,
+          "hasCallIntent": true,
+          "callId": "studio-imagegen-call-8ea36dc6eb86ca58fbcd16994f4ff5f6bfa0291b",
+          "callStatus": "result-committed",
+          "hasResultPair": true,
+          "reviewStatus": "unreviewed",
+          "nextAction": "submit-review"
+        },
+        "blockingRuns": [
+          {
+            "generationRunId": "p8-result-cas-run-1",
+            "reason": "成对结果未审片",
+            "recoveryAction": "submit_studio_generation_review"
+          }
+        ],
+        "bundle": {
+          "rawResultId": "studio-generation-result-6214199b4a1c6dd8067120443f509b9f63ee0be3",
+          "rawSha256": "abc21f3e1613fa37f47744de8318e903197ae801b772ce86c3aad4d560b3a196",
+          "labeledResultId": "studio-generation-result-a60687d5e7f04fc24fde45d191556ef4c0ed4257",
+          "labeledSha256": "486ad7956c5fb9c93b7edb6d29b9a80b93a3248a7f6258bb9e61b5c07de0d97d"
+        },
+        "recoveryDecision": "submit-review"
+      },
+      "quickCheck": "ok",
+      "externalProviderInvocationCount": 0,
+      "restartVerifiedAt": "2026-07-26T22:13:53.725Z"
+    },
+    {
+      "stage": "review",
+      "sigkill": {
+        "pid": 4095,
+        "signal": "SIGKILL",
+        "exitCode": null,
+        "exitSignal": "SIGKILL"
+      },
+      "durable": {
+        "projectId": "project-5eaf81f1d032",
+        "packId": "studio-generation-freeze-5d9258cef9b77c205de23ec755d5fd01",
+        "packFingerprint": "5d9258cef9b77c205de23ec755d5fd01e32c69f315111efc18b6a2f68e52778e",
+        "run": {
+          "generationRunId": "p8-review-run-1",
+          "packId": "studio-generation-freeze-5d9258cef9b77c205de23ec755d5fd01",
+          "provider": "codex",
+          "dispatchedAt": "2026-07-26T22:13:57.213Z",
+          "latestEventKind": "dispatched",
+          "terminal": true,
+          "hasCallIntent": true,
+          "callId": "studio-imagegen-call-09c1333b1f0a3b05c3cb2486fb285f35f1ca1903",
+          "callStatus": "result-committed",
+          "hasResultPair": true,
+          "reviewStatus": "pass",
+          "nextAction": "complete"
+        },
+        "blockingRuns": [],
+        "bundle": {
+          "rawResultId": "studio-generation-result-9017dd545cb1f0b3091166d3c79cfdf363e03144",
+          "rawSha256": "abc21f3e1613fa37f47744de8318e903197ae801b772ce86c3aad4d560b3a196",
+          "labeledResultId": "studio-generation-result-8098708236b99c56d66dfe44bd1d329fd4160d0c",
+          "labeledSha256": "486ad7956c5fb9c93b7edb6d29b9a80b93a3248a7f6258bb9e61b5c07de0d97d"
+        },
+        "review": {
+          "status": "pass",
+          "headRevision": 1,
+          "reviewId": "studio-generation-review-db63721f782d71e09a36145b532b7def01bbbd7e",
+          "fingerprint": "db63721f782d71e09a36145b532b7def01bbbd7e3e8ef907807dbbd96b9ae2a8"
+        }
+      },
+      "quickCheck": "ok",
+      "externalProviderInvocationCount": 0,
+      "restartVerifiedAt": "2026-07-26T22:14:02.025Z"
+    },
+    {
+      "stage": "observation",
+      "sigkill": {
+        "pid": 4139,
+        "signal": "SIGKILL",
+        "exitCode": null,
+        "exitSignal": "SIGKILL"
+      },
+      "durable": {
+        "projectId": "project-28e6a8e72f50",
+        "packId": "studio-generation-freeze-19f5fb974702245daeaec958c300d003",
+        "packFingerprint": "19f5fb974702245daeaec958c300d00342a3a0d0e4c7ae1f42ea5a5f48e1aae9",
+        "run": {
+          "generationRunId": "p8-observation-run-1",
+          "packId": "studio-generation-freeze-19f5fb974702245daeaec958c300d003",
+          "provider": "codex",
+          "dispatchedAt": "2026-07-26T22:14:05.328Z",
+          "latestEventKind": "dispatched",
+          "terminal": true,
+          "hasCallIntent": true,
+          "callId": "studio-imagegen-call-c8fd5f6c58fba1f57d13292dcb59f425634e50d4",
+          "callStatus": "result-committed",
+          "hasResultPair": true,
+          "reviewStatus": "pass",
+          "nextAction": "complete"
+        },
+        "blockingRuns": [],
+        "bundle": {
+          "rawResultId": "studio-generation-result-d96d473ed7906d66d1f007a0b55866b071643afc",
+          "rawSha256": "abc21f3e1613fa37f47744de8318e903197ae801b772ce86c3aad4d560b3a196",
+          "labeledResultId": "studio-generation-result-9992b700850480ceaf40a83f73c54290f0f80200",
+          "labeledSha256": "486ad7956c5fb9c93b7edb6d29b9a80b93a3248a7f6258bb9e61b5c07de0d97d"
+        },
+        "review": {
+          "status": "pass",
+          "headRevision": 1,
+          "reviewId": "studio-generation-review-88d7423eed66c8c8aeafbf3ea4abc3013ac910f4",
+          "fingerprint": "88d7423eed66c8c8aeafbf3ea4abc3013ac910f46715c4e2b828989d3ef9ade0"
+        },
+        "observation": {
+          "status": "current",
+          "headRevision": 1,
+          "observationId": "studio-post-result-observation-1b80dd2f41900b8f328de893453deb40bf5c3630",
+          "fingerprint": "1b80dd2f41900b8f328de893453deb40bf5c36301674b21c5ec7d92319a5a41c",
+          "nextAction": "use-observed-end-state"
+        }
+      },
+      "quickCheck": "ok",
+      "externalProviderInvocationCount": 0,
+      "restartVerifiedAt": "2026-07-26T22:14:18.097Z"
+    },
+    {
+      "stage": "video-receipt",
+      "sigkill": {
+        "pid": 4209,
+        "signal": "SIGKILL",
+        "exitCode": null,
+        "exitSignal": "SIGKILL"
+      },
+      "durable": {
+        "projectId": "project-bd1da2bcb030",
+        "packId": "studio-generation-freeze-bc044a35682137cad9d777f62062e061",
+        "packFingerprint": "bc044a35682137cad9d777f62062e061925c8454355007c52eb1e4d4fea15d75",
+        "run": {
+          "generationRunId": "p8-video-receipt-run-1",
+          "packId": "studio-generation-freeze-bc044a35682137cad9d777f62062e061",
+          "provider": "codex",
+          "dispatchedAt": "2026-07-26T22:14:21.314Z",
+          "latestEventKind": "dispatched",
+          "terminal": true,
+          "hasCallIntent": true,
+          "callId": "studio-imagegen-call-fdc8fc66e39a63cb7b509966cd7e32292f636022",
+          "callStatus": "result-committed",
+          "hasResultPair": true,
+          "reviewStatus": "pass",
+          "nextAction": "complete"
+        },
+        "blockingRuns": [],
+        "bundle": {
+          "rawResultId": "studio-generation-result-04fff32c474c410b0462c1995a666f8cdc6d9d31",
+          "rawSha256": "abc21f3e1613fa37f47744de8318e903197ae801b772ce86c3aad4d560b3a196",
+          "labeledResultId": "studio-generation-result-0a02874747b86c37377a55b9ef4f97054ef17e35",
+          "labeledSha256": "486ad7956c5fb9c93b7edb6d29b9a80b93a3248a7f6258bb9e61b5c07de0d97d"
+        },
+        "review": {
+          "status": "pass",
+          "headRevision": 1,
+          "reviewId": "studio-generation-review-92e17481e7a94ed9bd00615c72699b2485d6e914",
+          "fingerprint": "92e17481e7a94ed9bd00615c72699b2485d6e91450f8e7661553c180779961b2"
+        },
+        "video": {
+          "status": "mechanically-verified",
+          "nextAction": "complete-i2v-static-input",
+          "receiptId": "studio-video-package-receipt-ba3717a2de8ce8c5c2983d78c9c2e334d9e2c567",
+          "receiptFingerprint": "55fbe962420bef6fce237d2394ac575acd5102e1335a4956978aff77129046a3",
+          "storageKind": "managed-evidence",
+          "manifestSha256": "d4c734276b588951379da770ef3b7d803de04f4e12136a2dc9a639caf74667ba"
+        }
+      },
+      "quickCheck": "ok",
+      "externalProviderInvocationCount": 0,
+      "restartVerifiedAt": "2026-07-26T22:14:40.161Z"
+    }
+  ],
+  "temporaryProjectsRetained": false
+}

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "p9r2-p10r2-full-tests",
+  "status": "pass",
+  "startedAt": "2026-07-18T07:27:37.810Z",
+  "endedAt": "2026-07-18T07:33:12.582Z",
+  "durationMs": 334810,
+  "argv": [
+    "npx",
+    "vitest",
+    "run"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "1ee489189308542684e83679a1724a6a",
+      "sourceDigest": "3996312f7fe09de33d7148405786293b1ae2d25c0015a125637ff3c69412c244"
+    },
+    "after": {
+      "buildId": "1ee489189308542684e83679a1724a6a",
+      "sourceDigest": "3996312f7fe09de33d7148405786293b1ae2d25c0015a125637ff3c69412c244"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/runs/p9r2-p10r2-full-tests-20260718.log",
+    "sizeBytes": 14998,
+    "sha256": "7b12f1e806473d739d41ce1610fc143b5bd2d293e5722dc593cf1da86e94896b"
+  },
+  "testCounts": {
+    "files": 123,
+    "tests": 650
+  }
+}

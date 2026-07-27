@@ -1,0 +1,15 @@
+{
+  "aspect": "P1.6",
+  "status": "PASS",
+  "strategy": "CLEAN_ROOM",
+  "peer": "huobao validateStoryboardBindings",
+  "ours": "src/core/studio-binding-scope.ts",
+  "commands": [
+    {
+      "cmd": "npx vitest run tests/studio-binding-scope.test.ts",
+      "result": "PASS",
+      "tests": 3
+    }
+  ],
+  "usefulness": "跨单元 character/scene 绑定必拒；assertBindingScope 可接 command 路径"
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "kind": "p11-p14-command-gate-record",
+  "status": "PASS",
+  "mode": "production-build",
+  "startedAt": "2026-07-18T13:52:54.872Z",
+  "endedAt": "2026-07-18T13:53:10.079Z",
+  "durationMs": 15207,
+  "argv": [
+    "npm",
+    "run",
+    "build"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "failureReasons": [],
+  "sourceDigest": {
+    "before": "0f5cdf84163c219e5aa20a5c650701a1162bd4fa425259527f5a9c90969d7b77",
+    "after": "0f5cdf84163c219e5aa20a5c650701a1162bd4fa425259527f5a9c90969d7b77",
+    "beforeFiles": 459,
+    "afterFiles": 459
+  },
+  "buildIdentity": {
+    "before": {
+      "buildId": "ce99e247061b259de7a3a640a1791b1d",
+      "sourceDigest": "0f5cdf84163c219e5aa20a5c650701a1162bd4fa425259527f5a9c90969d7b77",
+      "fingerprint": "b4f344b7fe8bf565874af7f8e4a83728a27d6704fe1fe6237107571fc36156a5"
+    },
+    "after": {
+      "buildId": "ce99e247061b259de7a3a640a1791b1d",
+      "sourceDigest": "0f5cdf84163c219e5aa20a5c650701a1162bd4fa425259527f5a9c90969d7b77",
+      "fingerprint": "b4f344b7fe8bf565874af7f8e4a83728a27d6704fe1fe6237107571fc36156a5"
+    }
+  },
+  "testCounts": {
+    "applicable": false,
+    "files": null,
+    "tests": null
+  },
+  "log": {
+    "relativePath": "docs/evidence/runs/2026-07-18T13-52-54-871Z-production-build-ecaee6f2/command.log",
+    "sizeBytes": 10128,
+    "sha256": "23c29d20f6ea54ff42416d2026ec2d258c6f87f40cce8c42cdc58b8496c9a72c"
+  },
+  "security": {
+    "environmentRecorded": false,
+    "childEnvironmentAllowlisted": true
+  }
+}

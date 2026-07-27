@@ -1,0 +1,16 @@
+{
+  "kind": "w2-grok-live-decision",
+  "decision": "protocol-only-pass-written-degrade",
+  "reasons": [
+    "isolation 仅 S1E01-U01 且已 formal pass，不宜再 live 覆盖",
+    "无第二可重试单元作 Grok canary",
+    "skill：正式主供应 Codex；Grok live 额度/策略敏感",
+    "allowedProviders 合同含 grok（协议层已有）"
+  ],
+  "protocol": {
+    "allowedProvidersIncludesGrok": true
+  },
+  "liveAttempted": false,
+  "passAsOptionalComplete": true,
+  "createdAt": "2026-07-25T08:57:07.556Z"
+}

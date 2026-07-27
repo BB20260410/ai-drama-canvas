@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 2,
+  "kind": "real-imagegen-canary",
+  "status": "pass",
+  "createdAt": "2026-07-27T05:16:08.584Z",
+  "provider": "grok",
+  "executorKind": "agent-imagegen",
+  "pack": {
+    "packId": "studio-generation-freeze-bf8c8db781952f4c3d91a45c6190db1c",
+    "packFingerprint": "bf8c8db781952f4c3d91a45c6190db1c30b9f8b1140cfd33befb9c3b77aa01b6",
+    "promptSha256": "c1240b19546e1ef7841df475dd3fcb968416013c6f743061d15d7756d33a6200",
+    "unitId": "p7-unit-b-two-panel",
+    "panelId": "p7-unit-b-panel-01",
+    "generationRunId": "real-grok-canary-v2-001"
+  },
+  "providerProvenance": {
+    "level": "agent-session-direct",
+    "directToolCall": true,
+    "primaryTool": "image_gen",
+    "formalImageGenerationCalls": 1,
+    "cryptographicProviderReceipt": false,
+    "note": "Agent 当前会话自证已绑定 pack/prompt/raw；工具未提供可落盘密码学供应商回执。"
+  },
+  "visualReview": {
+    "scope": "synthetic-canary-contract",
+    "decision": "pass",
+    "reviewer": "Codex-independent-original-size-review",
+    "criteria": [
+      {
+        "code": "forbidden-content",
+        "status": "pass",
+        "note": "单张竖图，无拼图、分屏、字幕、水印、界面文字、现代建筑或额外主体。"
+      },
+      {
+        "code": "image-quality",
+        "status": "pass",
+        "note": "720x1280 JPEG 可解码；主体、双手、面具与石墙清楚，无决定性肢体或结构崩坏。"
+      },
+      {
+        "code": "prompt-contract",
+        "status": "pass",
+        "note": "东方青年黑发束发、素麻古装，中景居中，在室内石室双手捧完整黄金面具，左侧火光，符合本次冻结提示词。"
+      },
+      {
+        "code": "prop-scene-consistency",
+        "status": "pass",
+        "note": "道具为完整对称金色全脸面具，非半面具或裂面具；背景为灰黑巨石室内且左侧有火光。此项仅按合成 canary 合同判断。"
+      }
+    ],
+    "productionContinuityPassed": false
+  },
+  "media": {
+    "raw": {
+      "sha256": "5cd5b448374fb60f59d86fc2023702be0af2e6d439f649b6863b0a40829c84ae",
+      "width": 720,
+      "height": 1280,
+      "format": "jpeg",
+      "sizeBytes": 285810,
+      "retainedFile": "real-imagegen-canary-20260727-grok-current-source-raw.jpg"
+    },
+    "labeled": {
+      "sha256": "694b7d74c6329b8d4cf09f91c2f06266473ee1fa1e3318e41b84413a10ae8299",
+      "width": 720,
+      "height": 1280,
+      "format": "png",
+      "sizeBytes": 1672332,
+      "retainedFile": "real-imagegen-canary-20260727-grok-current-source-labeled.png"
+    }
+  },
+  "review": {
+    "reviewId": "studio-generation-review-9eb62bc810caa7e6a40f946272c2a6d0fc1cf77a",
+    "decision": "pass",
+    "approvedRawEligible": true
+  },
+  "dashboard": {
+    "fingerprint": "99e3051e5f231a1d89866834f29ba908c4fe32ab4e957eaa71a00188a1f7918a",
+    "selectedPanelGenerationStatus": "blocked",
+    "nextActionCode": "generation-projection-degraded"
+  },
+  "retainedEvidence": {
+    "attestation": "real-imagegen-canary-20260727-grok-current-source-attestation.json",
+    "visualReview": "real-imagegen-canary-20260727-grok-current-source-visual-review.json"
+  },
+  "buildIdentity": {
+    "sourceDigest": "d4b07c20a04cd8c7ff0b48c3e1fd80acf2f364a9123a7f2335591dc18a3ee5b4",
+    "buildId": "40b9cc725097394108667c877901446a"
+  },
+  "boundaries": {
+    "fixtureMediaUsedAsGenerated": false,
+    "formalProjectTouched": false,
+    "browserSupplierCalls": 0,
+    "gitStage": 0,
+    "rawSingleImage": true,
+    "labeledLocalLayout": true
+  }
+}

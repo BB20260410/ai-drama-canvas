@@ -1,0 +1,12 @@
+{
+  "kind": "absorb-slice-evidence",
+  "project": "Jellyfish",
+  "slice": "JF-1",
+  "date": "2026-07-18",
+  "pin": "a9678194ddf2d9be3ccbe78d4287d87d5089e123",
+  "module": "src/core/studio-panel-preparation-checklist.ts",
+  "ui": "StudioProductionDashboardView preparation checklist",
+  "typecheck": "pass",
+  "vitest": "studio-panel-preparation-checklist 4 passed",
+  "formalBusinessCountZero": true
+}

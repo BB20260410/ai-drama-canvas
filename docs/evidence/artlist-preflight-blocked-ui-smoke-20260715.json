@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "kind": "artlist-preflight-blocked-ui-smoke",
+  "createdAt": "2026-07-15T14:34:57.116Z",
+  "transport": "electron-current-production-build",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "jobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+  "registryPath": "/tmp/ai-canvas-artlist-preflight-blocked-ui-registry-20260715.json",
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/artlist-preflight-blocked-ui-smoke-20260715.png",
+    "sha256": "b3516cb59ef6e3cbcc779e75bf60175f19e64a7d57a7bf1e9572a14fa68cf24b"
+  },
+  "guardedFiles": {
+    "beforeHashes": {
+      "generationJobs": "3fc7dd327fb0d4c51feefab39d568e89d3248f26925cb89732f9188b436919f7",
+      "publications": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+      "consistency": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7",
+      "commandLedger": "671120e72b6eb40df3385ada746bdd571d8a582e8871ab936dd83a05cfa5ebd7"
+    },
+    "afterHashes": {
+      "generationJobs": "3fc7dd327fb0d4c51feefab39d568e89d3248f26925cb89732f9188b436919f7",
+      "publications": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+      "consistency": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7",
+      "commandLedger": "671120e72b6eb40df3385ada746bdd571d8a582e8871ab936dd83a05cfa5ebd7"
+    },
+    "unchanged": true
+  },
+  "apiState": {
+    "jobCount": 6,
+    "job": {
+      "id": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+      "itemId": "asset-P01",
+      "status": "waiting_external",
+      "browserState": "preflight_blocked",
+      "browserCheckpoint": {
+        "revision": 2,
+        "stage": "preflight_blocked",
+        "updatedAt": "2026-07-15T14:31:47.513Z",
+        "note": "Chrome Artlist 已登录工作台，但页面明确提示积分不足，Generate 禁用；当前可见模型/画幅/分辨率为纳米香蕉 2 / 16:9 / 2K，与冻结合同 GPT Image 2 / 9:16 / Medium 不符。已在上传、填词、submit_intent 和 Generate 前停止。",
+        "preflightEvidence": {
+          "observedHost": "toolkit.artlist.io",
+          "loginVerified": true,
+          "pageReady": true,
+          "generationModeVerified": false,
+          "balanceChecked": true,
+          "paidActionRequired": true,
+          "paidActionAuthorized": false,
+          "blockers": [
+            "insufficient_credits",
+            "generation_mode_mismatch"
+          ],
+          "observedGeneration": {
+            "model": "纳米香蕉 2",
+            "aspectRatio": "16:9",
+            "resolution": "2K",
+            "imageCount": 1,
+            "generateEnabled": false,
+            "creditMessage": "您的积分不足以生成奖励。"
+          },
+          "checkedAt": "2026-07-15T14:31:47.513Z"
+        }
+      },
+      "model": "GPT Image 2",
+      "parameters": {
+        "mode": "text",
+        "aspectRatio": "9:16",
+        "resolution": "Medium",
+        "quality": "Medium",
+        "imageCount": 1
+      },
+      "referencePaths": []
+    },
+    "provider": {
+      "id": "artlist-gpt-image-2",
+      "name": "Artlist · GPT Image 2",
+      "adapter": "codex-browser",
+      "kinds": [
+        "image"
+      ],
+      "enabled": true,
+      "model": "GPT Image 2",
+      "siteUrl": "https://toolkit.artlist.io/image-video-generator?mode=image",
+      "browserInstructions": "必须使用已登录 Chrome；9:16、Medium、1 Image、并发1。出现购买积分或额度不足提示时在点击前停止。",
+      "capabilities": {
+        "referenceModes": [
+          "text",
+          "multi_image"
+        ],
+        "maxReferenceImages": 6,
+        "maxReferenceVideos": 0,
+        "supportedDurations": [],
+        "supportedAspectRatios": [
+          "9:16"
+        ],
+        "supportedResolutions": [
+          "Medium"
+        ],
+        "models": [
+          "GPT Image 2"
+        ],
+        "maxConcurrency": 1,
+        "supportsCancel": false
+      },
+      "outputRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+      "createdAt": "2026-07-15T11:16:44.150Z",
+      "updatedAt": "2026-07-15T11:16:44.150Z"
+    }
+  },
+  "rendered": {
+    "status": "预检阻塞",
+    "checkpoint": "网页 preflight_blocked · R2",
+    "blocked": "点击前已停止 · 额度不足 / 生成参数不匹配",
+    "submitIntentCount": 0,
+    "uploadSlotCount": 0,
+    "rowRect": {
+      "left": 26,
+      "top": 726,
+      "right": 1694,
+      "bottom": 823,
+      "width": 1668
+    },
+    "listRect": {
+      "left": 0,
+      "top": 266,
+      "right": 1720,
+      "bottom": 1029,
+      "width": 1720
+    },
+    "pageOverflowX": false,
+    "pageOverflowY": false
+  },
+  "pageErrors": []
+}

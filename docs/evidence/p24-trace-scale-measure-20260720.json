@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "kind": "p24-trace-scale-measure",
+  "sourceDigest": "07287c72ebcb0c43f33f0efb2e7c2ea5ccd66697731bc8986f27b2e7d8108293",
+  "sourceFiles": 502,
+  "sourceBytes": 11165692,
+  "fixture": {
+    "root": "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/p24-scale-m3NBMl/p9-scale-6be25112-bfdba807",
+    "unitCount": 1288,
+    "scriptRevisionId": "text-revision-3c2f42eae8695bb2e7730f4036a2229803d702ac"
+  },
+  "measurements": {
+    "firstHopLimit100Ms": 1.41,
+    "firstHopItems": 100,
+    "impactFirstPageLimit50Ms": 1686.82,
+    "impactFirstPageUnits": 50,
+    "impactPageMs": [
+      1686.82,
+      126.7,
+      127.04,
+      125.42,
+      125.88
+    ],
+    "impactTotalRowsFirstPage": 61
+  }
+}

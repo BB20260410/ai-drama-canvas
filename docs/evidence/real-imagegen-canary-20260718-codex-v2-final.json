@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 2,
+  "kind": "real-imagegen-canary",
+  "status": "pass",
+  "createdAt": "2026-07-18T07:26:44.261Z",
+  "provider": "codex",
+  "executorKind": "agent-imagegen",
+  "pack": {
+    "packId": "studio-generation-freeze-3b91ba54398ffe4e50e99442fe3bc8b4",
+    "packFingerprint": "3b91ba54398ffe4e50e99442fe3bc8b497c868ce6def034c59f74ede6f47ba7d",
+    "promptSha256": "f2671d1826560aa36d191a6278aac48846ee2cc1ab604418297f33fe2c75a5a7",
+    "unitId": "p7-unit-b-two-panel",
+    "panelId": "p7-unit-b-panel-01",
+    "generationRunId": "real-codex-canary-v2-001"
+  },
+  "providerProvenance": {
+    "level": "agent-session-direct",
+    "directToolCall": true,
+    "primaryTool": "image_gen",
+    "formalImageGenerationCalls": 1,
+    "cryptographicProviderReceipt": false,
+    "note": "Agent 当前会话自证已绑定 pack/prompt/raw；工具未提供可落盘密码学供应商回执。"
+  },
+  "visualReview": {
+    "scope": "synthetic-canary-contract",
+    "decision": "pass",
+    "reviewer": "/root/original-size-visual-review",
+    "criteria": [
+      {
+        "code": "prompt-contract",
+        "status": "pass",
+        "note": "单张 9:16 竖屏电影写实画面，主体居中并双手持完整黄金面具。"
+      },
+      {
+        "code": "prop-scene-consistency",
+        "status": "pass",
+        "note": "面具完整、对称、无裂缝或半面结构；灰黑巨石室与左侧火光清晰，未换为室外。"
+      },
+      {
+        "code": "forbidden-content",
+        "status": "pass",
+        "note": "未见拼图、分屏、字幕、水印、界面文字、现代物或未声明人物。"
+      },
+      {
+        "code": "image-quality",
+        "status": "pass",
+        "note": "PNG 可解码，941x1672，曝光与主体细节清楚，手部、面具和石室结构可辨。"
+      }
+    ],
+    "productionContinuityPassed": false
+  },
+  "media": {
+    "raw": {
+      "sha256": "d6bff7f86ee00322daf105a02c86bf62f3cebc44e533abf9cca26332ab894875",
+      "width": 941,
+      "height": 1672,
+      "format": "png",
+      "sizeBytes": 1991070,
+      "retainedFile": "real-imagegen-canary-20260718-codex-v2-final-raw.png"
+    },
+    "labeled": {
+      "sha256": "47a849ca02f7aa0d3eab5a7b4ff2006696c3b018b79a7b0e2838fcfba78e4944",
+      "width": 941,
+      "height": 1672,
+      "format": "png",
+      "sizeBytes": 2870277,
+      "retainedFile": "real-imagegen-canary-20260718-codex-v2-final-labeled.png"
+    }
+  },
+  "review": {
+    "reviewId": "studio-generation-review-fe6e7456dc7f68aa98a04daafe03de6b29917936",
+    "decision": "pass",
+    "approvedRawEligible": true
+  },
+  "dashboard": {
+    "fingerprint": "3dc0baed38aad57c7ca523d5d64d0bd695958b179f6a18f6299bb509c1ee9754",
+    "selectedPanelGenerationStatus": "ready",
+    "nextActionCode": "approved-raw-ready"
+  },
+  "retainedEvidence": {
+    "attestation": "real-imagegen-canary-20260718-codex-v2-final-attestation.json",
+    "visualReview": "real-imagegen-canary-20260718-codex-v2-final-visual-review.json"
+  },
+  "buildIdentity": {
+    "sourceDigest": "3996312f7fe09de33d7148405786293b1ae2d25c0015a125637ff3c69412c244",
+    "buildId": "1ee489189308542684e83679a1724a6a"
+  },
+  "boundaries": {
+    "fixtureMediaUsedAsGenerated": false,
+    "formalProjectTouched": false,
+    "browserSupplierCalls": 0,
+    "gitStage": 0,
+    "rawSingleImage": true,
+    "labeledLocalLayout": true
+  }
+}

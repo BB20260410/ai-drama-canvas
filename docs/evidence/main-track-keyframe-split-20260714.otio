@@ -1,0 +1,390 @@
+{
+  "OTIO_SCHEMA": "Timeline.1",
+  "name": "portrait-split",
+  "global_start_time": null,
+  "tracks": {
+    "OTIO_SCHEMA": "Stack.1",
+    "name": "tracks",
+    "source_range": null,
+    "effects": [],
+    "markers": [],
+    "children": [
+      {
+        "OTIO_SCHEMA": "Track.1",
+        "name": "主画面",
+        "kind": "Video",
+        "source_range": null,
+        "effects": [],
+        "markers": [],
+        "children": [
+          {
+            "OTIO_SCHEMA": "Clip.2",
+            "name": "portrait-split 主画面动画",
+            "source_range": {
+              "OTIO_SCHEMA": "TimeRange.1",
+              "start_time": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 0,
+                "rate": 23.976023976023978
+              },
+              "duration": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 13,
+                "rate": 23.976023976023978
+              }
+            },
+            "media_reference": {
+              "OTIO_SCHEMA": "ExternalReference.1",
+              "target_url": "file:///var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-main-track-keyframes-VCeydG/landscape-red-source.mp4",
+              "available_range": null,
+              "available_image_bounds": null,
+              "metadata": {}
+            },
+            "effects": [],
+            "markers": [],
+            "metadata": {
+              "aicanvas": {
+                "id": "clip-main-portrait-split",
+                "trackId": "track-ae968065-95ef-4989-848c-b80d6e3cfe31",
+                "kind": "video",
+                "name": "portrait-split 主画面动画",
+                "startSeconds": 0,
+                "durationSeconds": 0.542,
+                "trimStartSeconds": 0,
+                "playbackRate": 1,
+                "volume": 0,
+                "opacity": 0.72,
+                "muted": false,
+                "positionX": -45,
+                "positionY": -70,
+                "scale": 0.42,
+                "rotation": -16,
+                "filter": "none",
+                "filterIntensity": 1,
+                "keyframes": [
+                  {
+                    "id": "kf-portrait-split-start",
+                    "frame": 0,
+                    "timeSeconds": 0,
+                    "easing": "hold",
+                    "positionX": -45,
+                    "positionY": -70,
+                    "scale": 0.42,
+                    "rotation": -16
+                  },
+                  {
+                    "id": "kf-c47ab4db-ac4d-471d-94ae-435e26ddc8ff",
+                    "frame": 13,
+                    "timeSeconds": 0.542,
+                    "easing": "cubic_bezier",
+                    "bezier": {
+                      "x1": 0.481184390499493,
+                      "y1": 0,
+                      "x2": 0.795146590466498,
+                      "y2": 0.377005962932365,
+                      "mode": "derived_monotone",
+                      "sourceWindow": {
+                        "x1": 1,
+                        "y1": 0,
+                        "x2": 0,
+                        "y2": 1,
+                        "sourceEasing": "cubic_bezier",
+                        "startX": 0,
+                        "endX": 0.361111111111111,
+                        "startFrame": 0,
+                        "endFrame": 13,
+                        "totalFrames": 36
+                      }
+                    },
+                    "sourceTransform": {
+                      "start": {
+                        "positionX": -45,
+                        "positionY": -70,
+                        "scale": 0.42,
+                        "rotation": -16
+                      },
+                      "end": {
+                        "positionX": 35,
+                        "positionY": 60,
+                        "scale": 0.65,
+                        "rotation": 17
+                      }
+                    },
+                    "positionX": -38.593120856133,
+                    "positionY": -59.588821391216,
+                    "scale": 0.438419777539,
+                    "rotation": -13.357162353155
+                  }
+                ],
+                "startFrame": 0,
+                "durationFrames": 13,
+                "trimStartFrame": 0,
+                "transitionOut": "cut"
+              }
+            }
+          },
+          {
+            "OTIO_SCHEMA": "Clip.2",
+            "name": "portrait-split 主画面动画 · 后段",
+            "source_range": {
+              "OTIO_SCHEMA": "TimeRange.1",
+              "start_time": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 13,
+                "rate": 23.976023976023978
+              },
+              "duration": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 23,
+                "rate": 23.976023976023978
+              }
+            },
+            "media_reference": {
+              "OTIO_SCHEMA": "ExternalReference.1",
+              "target_url": "file:///var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-main-track-keyframes-VCeydG/landscape-red-source.mp4",
+              "available_range": null,
+              "available_image_bounds": null,
+              "metadata": {}
+            },
+            "effects": [],
+            "markers": [],
+            "metadata": {
+              "aicanvas": {
+                "id": "clip-f9f42054-a69f-44f2-8471-65fa95354216",
+                "trackId": "track-ae968065-95ef-4989-848c-b80d6e3cfe31",
+                "kind": "video",
+                "name": "portrait-split 主画面动画 · 后段",
+                "startSeconds": 0.542,
+                "durationSeconds": 0.959,
+                "trimStartSeconds": 0.542,
+                "playbackRate": 1,
+                "volume": 0,
+                "opacity": 0.72,
+                "muted": false,
+                "positionX": -38.593120856133,
+                "positionY": -59.588821391216,
+                "scale": 0.438419777539,
+                "rotation": -13.357162353155,
+                "filter": "none",
+                "filterIntensity": 1,
+                "keyframes": [
+                  {
+                    "id": "kf-76be9b4f-66f6-4855-a1b0-d2cb1d08de6e",
+                    "frame": 23,
+                    "timeSeconds": 0.959,
+                    "easing": "cubic_bezier",
+                    "bezier": {
+                      "x1": 0.55056931843198,
+                      "y1": 0.257897121072311,
+                      "x2": -0.293243605369852,
+                      "y2": 1,
+                      "mode": "derived_monotone",
+                      "sourceWindow": {
+                        "x1": 1,
+                        "y1": 0,
+                        "x2": 0,
+                        "y2": 1,
+                        "sourceEasing": "cubic_bezier",
+                        "startX": 0.361111111111111,
+                        "endX": 1,
+                        "startFrame": 13,
+                        "endFrame": 36,
+                        "totalFrames": 36
+                      }
+                    },
+                    "positionX": 35,
+                    "positionY": 60,
+                    "scale": 0.65,
+                    "rotation": 17,
+                    "sourceTransform": {
+                      "start": {
+                        "positionX": -45,
+                        "positionY": -70,
+                        "scale": 0.42,
+                        "rotation": -16
+                      },
+                      "end": {
+                        "positionX": 35,
+                        "positionY": 60,
+                        "scale": 0.65,
+                        "rotation": 17
+                      }
+                    }
+                  }
+                ],
+                "startFrame": 13,
+                "durationFrames": 23,
+                "trimStartFrame": 13
+              }
+            }
+          },
+          {
+            "OTIO_SCHEMA": "Clip.2",
+            "name": "portrait-split 静音背景尾段",
+            "source_range": {
+              "OTIO_SCHEMA": "TimeRange.1",
+              "start_time": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 0,
+                "rate": 23.976023976023978
+              },
+              "duration": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 12,
+                "rate": 23.976023976023978
+              }
+            },
+            "media_reference": {
+              "OTIO_SCHEMA": "ExternalReference.1",
+              "target_url": "file:///var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-main-track-keyframes-VCeydG/landscape-red-source.mp4",
+              "available_range": null,
+              "available_image_bounds": null,
+              "metadata": {}
+            },
+            "effects": [],
+            "markers": [],
+            "metadata": {
+              "aicanvas": {
+                "id": "clip-main-portrait-split-muted-tail",
+                "trackId": "track-ae968065-95ef-4989-848c-b80d6e3cfe31",
+                "kind": "video",
+                "name": "portrait-split 静音背景尾段",
+                "startSeconds": 1.501,
+                "durationSeconds": 0.5,
+                "trimStartSeconds": 0,
+                "playbackRate": 1,
+                "volume": 0,
+                "opacity": 1,
+                "muted": true,
+                "positionX": 0,
+                "positionY": 0,
+                "scale": 1,
+                "rotation": 0,
+                "filter": "none",
+                "filterIntensity": 1,
+                "keyframes": [],
+                "startFrame": 36,
+                "durationFrames": 12,
+                "trimStartFrame": 0
+              }
+            }
+          }
+        ],
+        "metadata": {
+          "aicanvas": {
+            "id": "track-ae968065-95ef-4989-848c-b80d6e3cfe31",
+            "kind": "visual",
+            "order": 0,
+            "locked": false,
+            "muted": false,
+            "hidden": false
+          }
+        }
+      },
+      {
+        "OTIO_SCHEMA": "Track.1",
+        "name": "配音 _ 音乐",
+        "kind": "Audio",
+        "source_range": null,
+        "effects": [],
+        "markers": [],
+        "children": [
+          {
+            "OTIO_SCHEMA": "Clip.2",
+            "name": "portrait-split 测试音频",
+            "source_range": {
+              "OTIO_SCHEMA": "TimeRange.1",
+              "start_time": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 0,
+                "rate": 23.976023976023978
+              },
+              "duration": {
+                "OTIO_SCHEMA": "RationalTime.1",
+                "value": 48,
+                "rate": 23.976023976023978
+              }
+            },
+            "media_reference": {
+              "OTIO_SCHEMA": "ExternalReference.1",
+              "target_url": "file:///var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-main-track-keyframes-VCeydG/main-transform-tone.wav",
+              "available_range": null,
+              "available_image_bounds": null,
+              "metadata": {}
+            },
+            "effects": [],
+            "markers": [],
+            "metadata": {
+              "aicanvas": {
+                "id": "clip-audio-portrait-split",
+                "trackId": "track-e6292658-08a7-4826-9f0a-bd34e8e17e8b",
+                "kind": "audio",
+                "name": "portrait-split 测试音频",
+                "startSeconds": 0,
+                "durationSeconds": 2.002,
+                "trimStartSeconds": 0,
+                "playbackRate": 1,
+                "volume": 0.5,
+                "opacity": 1,
+                "muted": false,
+                "fadeInSeconds": 0.05,
+                "fadeOutSeconds": 0.05,
+                "startFrame": 0,
+                "durationFrames": 48,
+                "trimStartFrame": 0
+              }
+            }
+          }
+        ],
+        "metadata": {
+          "aicanvas": {
+            "id": "track-e6292658-08a7-4826-9f0a-bd34e8e17e8b",
+            "kind": "audio",
+            "order": 1,
+            "locked": false,
+            "muted": false,
+            "hidden": false
+          }
+        }
+      },
+      {
+        "OTIO_SCHEMA": "Track.1",
+        "name": "字幕",
+        "kind": "Video",
+        "source_range": null,
+        "effects": [],
+        "markers": [],
+        "children": [],
+        "metadata": {
+          "aicanvas": {
+            "id": "track-71d2bf20-acb3-447f-8588-6135634a8d4f",
+            "kind": "subtitle",
+            "order": 2,
+            "locked": false,
+            "muted": false,
+            "hidden": false
+          }
+        }
+      }
+    ],
+    "metadata": {}
+  },
+  "metadata": {
+    "aicanvas": {
+      "schemaVersion": 1,
+      "projectId": "project-f6119b167a4c",
+      "editProjectId": "edit-8f63737b-ae80-4c39-b9b9-faaf2f497f36",
+      "revision": 3,
+      "width": 320,
+      "height": 480,
+      "fps": 23.976,
+      "timebase": {
+        "rateNumerator": 24000,
+        "rateDenominator": 1001
+      },
+      "backgroundColor": "#18314f",
+      "keyframeCurveContract": "aicanvas.cubic-bezier.v2",
+      "curvePortability": "aicanvas-private-metadata"
+    }
+  }
+}

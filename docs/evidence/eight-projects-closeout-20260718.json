@@ -1,0 +1,19 @@
+{
+  "kind": "eight-projects-serial-closeout",
+  "date": "2026-07-18",
+  "formalBusinessTablesZero": true,
+  "typecheck": "pass",
+  "vitestBatch": "26 passed (7 files covering LMD/VF/JF/LX/OTIO/OA/TC)",
+  "projects": [
+    { "seq": 1, "name": "LocalMiniDrama", "status": "closed", "take": "LMD-1 workflow groups" },
+    { "seq": 2, "name": "Vue Flow", "status": "closed", "take": "VF-1 minimap + VF-2 selection→group" },
+    { "seq": 3, "name": "Jellyfish", "status": "closed", "take": "JF-1 preparation checklist" },
+    { "seq": 4, "name": "LumenX", "status": "closed", "take": "LX-1 queue view + preflight preview" },
+    { "seq": 5, "name": "OpenTimelineIO", "status": "closed", "take": "OTIO-1 capability matrix + probe" },
+    { "seq": 6, "name": "OpenAssetIO", "status": "closed", "take": "OA-1 publication diagnostics" },
+    { "seq": 7, "name": "TwitCanva", "status": "closed", "take": "TC-1 edge validation", "skip": "social post" },
+    { "seq": 8, "name": "OpenCut", "status": "closed", "take": null, "skip": "rewrite in progress" }
+  ],
+  "refStudyRoot": "docs/ref-study/",
+  "clonesOutsideMonorepo": "~/Documents/_ref-study/"
+}

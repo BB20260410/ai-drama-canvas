@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-07-14T03:21:00+08:00",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "objective": "custom cubic-bezier keyframe curves end-to-end",
+  "commands": {
+    "typecheck": { "command": "npm run typecheck", "exitCode": 0 },
+    "targeted": { "command": "npx vitest run tests/keyframe-curve.test.ts tests/editor.test.ts tests/codex.test.ts tests/mcp-scan-cancel.test.ts --maxWorkers=2", "exitCode": 0, "files": 4, "tests": 25 },
+    "tests": { "command": "npm test", "exitCode": 0, "files": 30, "tests": 163, "durationSeconds": 55.53, "maxWorkers": 2 },
+    "build": { "command": "npm run build", "exitCode": 0 },
+    "mcpSmoke": { "command": "npm run mcp:smoke", "exitCode": 0, "tools": 133, "resourceTemplates": 9, "prompts": 7 },
+    "sourceMcpContract": { "command": "npx vitest run tests/mcp-scan-cancel.test.ts --maxWorkers=1", "exitCode": 0, "tests": 1 },
+    "compiledMcpContract": { "command": "AI_CANVAS_MCP_SERVER_PATH=dist-mcp/mcp/server.js npx vitest run tests/mcp-scan-cancel.test.ts --maxWorkers=1", "exitCode": 0, "tests": 1 },
+    "renderSmoke": { "command": "npm run editor:bezier-render-smoke", "exitCode": 0, "evidence": "docs/evidence/keyframe-bezier-render-smoke-20260714.json" },
+    "electronUiSmoke": { "command": "npm run ui:editor-bezier-smoke", "exitCode": 0, "evidence": "docs/evidence/editor-bezier-ui-smoke-20260714.json", "rebuiltBeforeLaunch": true }
+  },
+  "keyframeCurveContract": {
+    "contractVersion": 1,
+    "scope": "overlay-visual-tracks",
+    "segmentOwnership": "destination-keyframe-controls-entering-segment",
+    "legacyPresets": { "linear": "p", "ease_in": "p^2", "ease_out": "1-(1-p)^2", "ease_in_out": "p^2*(3-2p)", "hold": "0-until-destination-frame" },
+    "custom": { "easing": "cubic_bezier", "field": "bezier", "order": ["x1", "y1", "x2", "y2"], "controlPointRange": [0, 1], "monotonic": true, "overshoot": false, "identityAllowed": true },
+    "evaluator": { "preview": "fixed-40-step-x-bisection-then-y", "render": "ffmpeg-root-x-then-y", "sharedDefinition": true },
+    "persistence": { "projectJson": true, "updateClipCas": true, "undoRedoSnapshots": true, "maxPerClip": 200, "duplicateFramePolicy": "reject" },
+    "editing": { "splitTrim": "existing-keyframe-boundaries-only", "arbitraryCurveSubdivision": false, "mainTrackKeyframes": "reject-until-render-supported" },
+    "otio": { "namespace": "metadata.aicanvas", "contract": "aicanvas.cubic-bezier.v1", "portability": "aicanvas-private-metadata", "roundTrip": true, "foreignCurvePolicy": "reject-before-project-create" }
+  },
+  "automatedCoverage": {
+    "legacyPresetFormulasUnchanged": true,
+    "identityCurveMatchesLinear": true,
+    "xSolvedBeforeY": true,
+    "invalidMissingNonFiniteOutOfRangeAndDormantPointsRejected": true,
+    "timeZeroKeyframeReplacesStaticBase": true,
+    "destinationKeyframeOwnsSegment": true,
+    "maxKeyframesAndDuplicateFramesRejected": true,
+    "mainTrackUnrenderedAnimationRejected": true,
+    "updateClipCasAndStaleRevision": true,
+    "undoRedoRoundTrip": true,
+    "nonKeyframeSplitTrimRejected": true,
+    "otioPrivateRoundTrip": true,
+    "otioMissingAndUnknownContractRejectedAtomically": true,
+    "sourceAndCompiledMcpSchema": true,
+    "electronInvalidInputFailClosed": true,
+    "electronSaveReloadUndoRedo": true
+  },
+  "realMedia": {
+    "path": "docs/evidence/keyframe-bezier-render-20260714.mp4",
+    "codec": "h264",
+    "width": 320,
+    "height": 320,
+    "fps": 24,
+    "durationSeconds": 2,
+    "frames": 48,
+    "sizeBytes": 4157,
+    "sha256": "97203153f3169031fb3e0f806dcab61c542440ecaebd2798244d072c3727e04c",
+    "magic": "ftyp",
+    "decodable": true,
+    "publicationReceipt": true,
+    "samples": [
+      { "frame": 12, "expectedCentroidX": 141.2021182710542, "actualCentroidX": 139.5, "errorPixels": 1.7021182710541893, "distanceFromLinearPixels": 30 },
+      { "frame": 24, "expectedCentroidX": 219.98067751701703, "actualCentroidX": 219.5, "errorPixels": 0.4806775170170283, "distanceFromLinearPixels": 60 },
+      { "frame": 36, "expectedCentroidX": 251.59179566977957, "actualCentroidX": 251.5, "errorPixels": 0.09179566977957165, "distanceFromLinearPixels": 42 }
+    ],
+    "finalProjectLocks": 0,
+    "finalActiveMediaWeight": 0,
+    "finalMediaQueueDepth": 0
+  },
+  "electronUi": {
+    "transport": "source-electron-current-build",
+    "invalidRevisionRejected": true,
+    "saveReloadUndoRedo": true,
+    "curveA": { "x1": 0.25, "y1": 0.1, "x2": 0.25, "y2": 1 },
+    "curveB": { "x1": 0.42, "y1": 0, "x2": 0.58, "y2": 1 },
+    "revisions": { "beforeInvalid": 7, "afterInvalid": 7, "savedB": 8, "undoA": 9, "redoB": 10 },
+    "fullScreenshot": { "path": "docs/evidence/editor-bezier-20260714.png", "width": 1560, "height": 980, "sizeBytes": 313495, "sha256": "1f1188409b409b954b661cc2ed875ed318cef7af1ec2d9d0f044fe27ac9aa8d3", "visuallyInspected": true },
+    "compactScreenshot": { "path": "docs/evidence/editor-bezier-1280-20260714.png", "width": 1280, "height": 760, "sizeBytes": 236177, "sha256": "e3b977c7eceaf806e681a05e10f6d85a47189effb8ed2c21c5febf740f5098cd", "visuallyInspected": true, "documentOverflowX": false }
+  },
+  "evidenceHashes": {
+    "docs/evidence/keyframe-bezier-render-smoke-20260714.json": "cadf3c717fb518d6b49471d22ec56b7f1a23f8f1756aadad6b6a8373a7cf8a42",
+    "docs/evidence/keyframe-bezier-sample-f012-20260714.png": "2d821e1bf884869c14cb4068bec891d12341ee7adafc529182c77900e97319e7",
+    "docs/evidence/keyframe-bezier-sample-f024-20260714.png": "5a9127daf1d47c755327f2893484bbe00b9e825eeb4f904f1b5289d3ade389e6",
+    "docs/evidence/keyframe-bezier-sample-f036-20260714.png": "0b0db5d4173e93a6da4a756d9d894ec4a8ba8b4cdbaed2c2efa27e14aa5d6e85",
+    "docs/evidence/editor-bezier-ui-smoke-20260714.json": "53a4f03a5b971b03e0667605788032a6f3f3489be9365ba448c3e164a27d75b4"
+  },
+  "sourceHashes": {
+    "src/core/keyframe-curve.ts": "fa0c6cc8cc812e0fe30ece42a05b2992f934534977a53988c99c2564e69691aa",
+    "src/core/types.ts": "4af6abc9bd8c89cda00ebe3d50de481dd483b1881929546bedbab5382db9abe6",
+    "src/core/editor.ts": "4e0721de5e176d6e36e96f6a1fd4253c5588ddbc146d97e2960a9215accacabc",
+    "src/core/codex.ts": "d665d4491c99bedb20afe8687b3619b45039911182ab3da9c0a12f5e73614c75",
+    "src/mcp/server.ts": "d114f509d9670e7c034563aabd0dc66ac60d0f7aa78ed8fd99fc79d3505c2d26",
+    "src/renderer/src/components/VideoEditorView.vue": "7070c999089a165fa2a5e5619c4507bdb757823f0f3a75d313a3c6154a97663a",
+    "tests/keyframe-curve.test.ts": "51d16a3c4c537868a9236b9c424b98b6fc4c839a3105fdb7e9039b119dd83e96",
+    "scripts/keyframe-bezier-render-smoke.ts": "3163e49dd2a264eab14f06e0bc3d538e1e05d618f4f32d4fdac0e07b86d608fd",
+    "scripts/create-editor-ui-fixture.ts": "b3efc844d2e2c722250720ab808e8a25af4026cdc6104da9009deee5d003e786",
+    "scripts/ui-editor-smoke.mjs": "46a26a32df090576edf5a7aef77b9517c490fd88ffe304deaf1697ac057a9935",
+    "package.json": "0495c4911bdea2d68604f3134eaa7fe7f2782f843eabc2963e8d9a55abe8274b"
+  },
+  "packaging": {
+    "existingSignedDmgUpdated": false,
+    "existingSignedDmgContainsPreviousSource": true,
+    "existingSignedDmgPath": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "existingSignedDmgSizeBytes": 136652595,
+    "existingSignedDmgSha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972"
+  },
+  "boundaries": {
+    "formalProjectRootsTouched": false,
+    "generationWebsiteOpened": false,
+    "uploadsPerformed": false,
+    "paidSubmissionsPerformed": false,
+    "existingPackageOverwritten": false,
+    "softwareInstalled": false,
+    "softwarePublished": false,
+    "gitCommitCreated": false,
+    "notarizationPerformed": false,
+    "isolatedUiFixtureCleaned": true
+  },
+  "knownLimitations": ["arbitrary-keyframe-curve-subdivision", "main-track-transform-keyframes", "complex-nested-timelines", "third-party-effect-compatibility", "real-project-nle-validation"],
+  "nextUniquePriority": "P1 lossless arbitrary keyframe curve subdivision for split/trim; external Provider/formal project/notarization items remain authorization-blocked",
+  "longTermGoalStatus": "active"
+}

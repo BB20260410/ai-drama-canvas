@@ -1,0 +1,13 @@
+{
+  "aspect": "P0.8",
+  "status": "PASS",
+  "strategy": "COPY_WITH_LICENSE style constant (self)",
+  "sources": {
+    "peer": "qmd busy_timeout=120000 思路",
+    "ours": "src/core/studio-sqlite-busy.ts + material-studio/command-ledger/generation-ledger/studio-production"
+  },
+  "commands": [
+    {"cmd": "npx vitest run tests/studio-sqlite-busy.test.ts", "result": "PASS"}
+  ],
+  "usefulness": "写库 busy_timeout 从 5s 统一到 120s，降低生图回写高峰 SQLITE_BUSY"
+}

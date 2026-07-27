@@ -1,0 +1,39 @@
+{
+  "kind": "ref-study-absorb",
+  "project": "LocalMiniDrama",
+  "slice": "LMD-1",
+  "date": "2026-07-18",
+  "title": "工作流组从选择创建 / pipeline normalize / panel→group map",
+  "level": "L1-clean-room",
+  "sourceBehavior": "frontweb/src/utils/canvasWorkflow.js createWorkflowGroup/delete/normalizePipeline/getStoryboardGroupMap + DramaCanvas selection",
+  "shipped": {
+    "module": "src/core/studio-canvas-workflow-groups.ts",
+    "tests": "tests/studio-canvas-workflow-groups.test.ts"
+  },
+  "exports": [
+    "normalizeStudioCanvasPipeline",
+    "extractStudioCanvasPanelIdsFromSelection",
+    "createStudioCanvasWorkflowGroup",
+    "deleteStudioCanvasWorkflowGroup",
+    "getPanelWorkflowGroupMap",
+    "applyStudioCanvasWorkflowGroupsToLayout",
+    "createWorkflowGroupFromCanvasSelection"
+  ],
+  "verification": {
+    "typecheck": "pass",
+    "vitest": {
+      "files": [
+        "tests/studio-canvas-workflow-groups.test.ts",
+        "tests/studio-canvas-workflow-runner.test.ts",
+        "tests/studio-canvas-layout.test.ts"
+      ],
+      "result": "9 passed"
+    },
+    "formalBusinessTableCountZero": true
+  },
+  "notDone": [
+    "ManagedStudioCanvas toolbar UI wiring (backlog)",
+    "node inline panel UI",
+    "minimap (Vue Flow project)"
+  ]
+}

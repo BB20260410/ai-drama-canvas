@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T07:38:37.804Z",
+  "status": "passed",
+  "transport": "electron-current-production-build",
+  "fixture": {
+    "root": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-effect-transition-ui-cPR3se",
+    "registryPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-effect-transition-ui-registry-90231-1784014714009.json",
+    "editProjectId": "edit-f7109b7a-061a-4e32-961f-3fdea5bf2989",
+    "revision": 1,
+    "outgoingClipId": "clip-65c7c590-1dca-4354-94f9-0fe50385c23f",
+    "incomingClipId": "clip-4bd14442-50b3-4a7f-8f06-2f1a5521fd41",
+    "inOffsetFrames": 3,
+    "outOffsetFrames": 5,
+    "timebase": {
+      "rateNumerator": 24,
+      "rateDenominator": 1
+    }
+  },
+  "inspector": {
+    "initial": {
+      "transition": "smpte_dissolve",
+      "inOffsetFrames": 3,
+      "outOffsetFrames": 5,
+      "playbackDisabled": true,
+      "keyframeDisabled": true
+    },
+    "restart": {
+      "inOffsetFrames": 2,
+      "outOffsetFrames": 4
+    }
+  },
+  "preview": {
+    "initial": {
+      "outgoing": {
+        "currentTime": 1.167,
+        "opacity": 0.625,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-editor-effect-transition-ui-cPR3se%2FEP01_15s_001_UI%E8%BD%AC%E5%9C%BA%E5%89%8D%E9%A1%B9%2FEP01_15s_001_v1.mp4"
+      },
+      "incoming": {
+        "currentTime": 0.167,
+        "opacity": 0.375,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-editor-effect-transition-ui-cPR3se%2FEP01_15s_002_UI%E8%BD%AC%E5%9C%BA%E5%90%8E%E9%A1%B9%2FEP01_15s_002_v1.mp4"
+      }
+    },
+    "afterRedo": {
+      "outgoing": {
+        "currentTime": 1.167,
+        "opacity": 0.666667,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-editor-effect-transition-ui-cPR3se%2FEP01_15s_001_UI%E8%BD%AC%E5%9C%BA%E5%89%8D%E9%A1%B9%2FEP01_15s_001_v1.mp4"
+      },
+      "incoming": {
+        "currentTime": 0.165999,
+        "opacity": 0.333333,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-editor-effect-transition-ui-cPR3se%2FEP01_15s_002_UI%E8%BD%AC%E5%9C%BA%E5%90%8E%E9%A1%B9%2FEP01_15s_002_v1.mp4"
+      }
+    },
+    "afterApplicationRestart": {
+      "outgoing": {
+        "currentTime": 1.167,
+        "opacity": 0.666667,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-editor-effect-transition-ui-cPR3se%2FEP01_15s_001_UI%E8%BD%AC%E5%9C%BA%E5%89%8D%E9%A1%B9%2FEP01_15s_001_v1.mp4"
+      },
+      "incoming": {
+        "currentTime": 0.165999,
+        "opacity": 0.333333,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-editor-effect-transition-ui-cPR3se%2FEP01_15s_002_UI%E8%BD%AC%E5%9C%BA%E5%90%8E%E9%A1%B9%2FEP01_15s_002_v1.mp4"
+      }
+    }
+  },
+  "revisions": {
+    "fixture": 1,
+    "saved": 2,
+    "undone": 3,
+    "redone": 4,
+    "afterApplicationRestart": 4
+  },
+  "undoRedo": {
+    "undoRestoredOffsets": [
+      3,
+      5
+    ],
+    "redoRestoredOffsets": [
+      2,
+      4
+    ]
+  },
+  "otioExport": {
+    "path": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-effect-transition-ui-cPR3se/.aicanvas/editor/otio/UI 标准 Effect Transition_r4_1784014715966.otio",
+    "transition": {
+      "OTIO_SCHEMA": "Transition.1",
+      "name": "SMPTE Dissolve",
+      "transition_type": "SMPTE_Dissolve",
+      "in_offset": {
+        "OTIO_SCHEMA": "RationalTime.1",
+        "value": 2,
+        "rate": 24
+      },
+      "out_offset": {
+        "OTIO_SCHEMA": "RationalTime.1",
+        "value": 4,
+        "rate": 24
+      },
+      "enabled": true,
+      "metadata": {
+        "aicanvas": {
+          "contract": "aicanvas.otio-effect-transition.v1"
+        }
+      }
+    },
+    "contract": "aicanvas.otio-effect-transition.v1"
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-effect-transition-ui-20260714.png",
+    "bytes": 254543,
+    "sha256": "c7517d2dce0bb92711d788b5f817fdb68e748e9c71b9b0ec0698692cb62e7c32",
+    "width": 1560,
+    "height": 980,
+    "captureAttempt": 1,
+    "content": {
+      "pixels": 1528800,
+      "brightRatio": 0.07858712715855573,
+      "chromaticRatio": 0.05038723181580324
+    }
+  },
+  "pageErrors": [],
+  "sourceHashes": {
+    "src/core/types.ts": "c6901f66ba18f3145115cdf8dc4a24ff8d347b034f5eb42a13d2637361ac9c04",
+    "src/core/editor.ts": "f6d75f2d4c7c7b51adc1c5489158ad100ad9c6f55850b24d317545aa144b97a8",
+    "src/core/codex.ts": "989aef1f171d23fa92c43ce1a26640a971fb4ba87919d29e22b1298586feee47",
+    "src/mcp/server.ts": "4a5d18e172effb4d81d65f6346a29443adc2c94713b0d223824018fc493aa03b",
+    "src/renderer/src/components/VideoEditorView.vue": "37d26d9481b1e5917d6ecd9a19c402b1ae39e14d8f64cd53f2d30e190a3885b3",
+    "scripts/create-effect-transition-ui-fixture.ts": "1ea59de33c0efde4c6a680aa8ab8cae970f617a3a8ca6121d742f4f722b80d05",
+    "scripts/ui-editor-effect-transition-smoke.mjs": "a6a584c6cd6381e6c47cf980bc84f99ecc736d746908f76fd1b66059b46564ca"
+  },
+  "terminal": {
+    "rootRemoved": true,
+    "registryRemoved": true
+  }
+}

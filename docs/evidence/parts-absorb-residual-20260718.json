@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "kind": "parts-absorb-residual-closeout",
+  "createdAt": "2026-07-18T09:53:30.000Z",
+  "conclusion": "已完成",
+  "matrixDoc": "docs/ref-study/parts-absorb-residual-matrix-20260718.md",
+  "skepticFixes": [
+    "prepChecklist: resolveUnitPanelFetchPlan + smoke wait → prepChecklistVisible=true",
+    "typecheck: vue-tsc web_exit=0 in SCRATCH/parts-absorb-typecheck-web.log",
+    "jump: resolve prioritizes panel/unit; managedEmbed maps item→unit; MaterialStudio navigates binding/dashboard"
+  ],
+  "residualTakeLanded": [
+    {
+      "from": "LumenX",
+      "what": "managedShell 生成队列 + jump 导航 binding/dashboard",
+      "anchors": [
+        "MaterialStudioView studio-mode-generation",
+        "GenerationQueueView jumpJob unitId/panelId",
+        "resolveStudioGenerationQueueJumpTarget"
+      ]
+    },
+    {
+      "from": "LocalMiniDrama",
+      "what": "画布执行最近工作流组",
+      "anchors": ["runLastWorkflowGroup", "canvas:run-studio-canvas-workflow-group"]
+    },
+    {
+      "from": "Jellyfish",
+      "what": "选单元→selectedPanel→准备清单稳定可达",
+      "anchors": [
+        "studio-dashboard-unit-selection.ts",
+        "StudioProductionDashboardView.selectUnit",
+        "tests/studio-dashboard-unit-selection.test.ts"
+      ]
+    }
+  ],
+  "tests": {
+    "studio-dashboard-unit-selection": "2 passed (incl shipped unit无 panelId→checklist)",
+    "studio-generation-queue-view": "5 passed",
+    "parts-absorb-residual-ui": "5 passed",
+    "batch": "23 passed"
+  },
+  "typecheck": {
+    "command": "npx vue-tsc --noEmit -p tsconfig.web.json",
+    "exit": 0,
+    "log": "SCRATCH/parts-absorb-typecheck-web.log"
+  },
+  "electron": {
+    "evidence": "docs/evidence/deep-absorb-ui-smoke-20260718-mrq6uvka.json",
+    "prepChecklistVisible": true,
+    "preflightVisible": true,
+    "generationTabVisible": true,
+    "generationPaneVisible": true
+  },
+  "noSecondTruth": true
+}

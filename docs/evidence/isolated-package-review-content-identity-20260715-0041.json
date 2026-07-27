@@ -1,0 +1,632 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T16:41:27.813Z",
+  "status": "passed",
+  "scope": "current-source-isolated-unpacked-app-validation",
+  "authorizationBoundary": {
+    "formalProjectUsed": false,
+    "externalWebsiteUsed": false,
+    "uploadUsed": false,
+    "paidActionUsed": false,
+    "installed": false,
+    "published": false,
+    "dmgGenerated": false,
+    "developerIdSigningRequested": false,
+    "notarizationRequested": false,
+    "workspaceDistOverwritten": false,
+    "closesRealProjectNleValidation": false
+  },
+  "package": {
+    "tempRoot": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy",
+    "stageRoot": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage",
+    "builderOutput": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output",
+    "appPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app",
+    "executablePath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+    "builderArgs": [
+      "--mac",
+      "--dir",
+      "--publish",
+      "never",
+      "-c.directories.output=/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output",
+      "-c.mac.identity=null",
+      "-c.mac.notarize=false",
+      "-c.forceCodeSigning=false",
+      "-c.npmRebuild=false",
+      "-c.electronDist=/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/node_modules/electron/dist"
+    ],
+    "stageInputs": [
+      "package.json",
+      "package-lock.json",
+      "electron.vite.config.ts",
+      "tsconfig.json",
+      "tsconfig.mcp.json",
+      "tsconfig.node.json",
+      "tsconfig.web.json",
+      "src",
+      "build",
+      "node_modules"
+    ],
+    "stageSource": {
+      "fileCount": 62,
+      "bytes": 1987181,
+      "sha256": "fe851e0b7b701c9e214c307696ce56d3b744262f00c519f1f967418c14b56005"
+    },
+    "workspaceSource": {
+      "fileCount": 62,
+      "bytes": 1987181,
+      "sha256": "fe851e0b7b701c9e214c307696ce56d3b744262f00c519f1f967418c14b56005"
+    },
+    "stageSymlinkCount": 71,
+    "builderEnvironment": {
+      "HOME": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/home",
+      "TMPDIR": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/tmp",
+      "APP_BUILDER_TMP_DIR": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/app-builder-tmp",
+      "ELECTRON_BUILDER_CACHE": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/electron-builder-cache",
+      "npm_config_cache": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/npm-cache",
+      "CSC_IDENTITY_AUTO_DISCOVERY": "false",
+      "clearedSigningEnvironmentKeys": [
+        "CSC_LINK",
+        "CSC_KEY_PASSWORD",
+        "CSC_NAME",
+        "APPLE_ID",
+        "APPLE_APP_SPECIFIC_PASSWORD",
+        "APPLE_TEAM_ID",
+        "APPLE_API_KEY",
+        "APPLE_API_KEY_ID",
+        "APPLE_API_ISSUER",
+        "APPLE_KEYCHAIN",
+        "APPLE_KEYCHAIN_PROFILE"
+      ]
+    },
+    "packagedRuntimeEnvironment": {
+      "HOME": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/home",
+      "TMPDIR": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/tmp",
+      "AI_CANVAS_REGISTRY_PATH": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/runtime/projects.json",
+      "AI_CANVAS_MEDIA_RUNTIME_DIR": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/runtime/media-v1",
+      "AI_CANVAS_PROJECT_ROOT": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/runtime/project-root"
+    },
+    "appBundle": {
+      "fileCount": 7753,
+      "bytes": 367657847,
+      "sha256": "9d5fb17ddcd2ec52d60116214eacc1fd0df0130ac722a763d4586569a711fe1b"
+    },
+    "executable": {
+      "path": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+      "exists": true,
+      "bytes": 33968,
+      "mtimeMs": 1784047259893.486,
+      "sha256": "69cb21f64c53c751678957803b2d82d2d5d7f054afd570267eda21179cbff136"
+    },
+    "executableArchitecture": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布: Mach-O 64-bit executable arm64",
+    "bundleIdentity": {
+      "identifier": "com.hxx.aidramacanvas",
+      "version": "0.1.0",
+      "name": "AI 漫剧画布"
+    },
+    "appAsar": {
+      "path": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Resources/app.asar",
+      "exists": true,
+      "bytes": 4399899,
+      "mtimeMs": 1784047270655.8374,
+      "sha256": "3f22933d6ab0a0f4633f2409de887ee4f7cf370309faa0aab6d5a329709cbf66"
+    },
+    "currentOut": {
+      "fileCount": 5,
+      "bytes": 2470175,
+      "sha256": "071c35af03d63bc61803da2023dcbaf21ab8deed64896805b9facfcf3c52bb5c"
+    },
+    "packagedOut": {
+      "fileCount": 5,
+      "bytes": 2470175,
+      "sha256": "071c35af03d63bc61803da2023dcbaf21ab8deed64896805b9facfcf3c52bb5c"
+    },
+    "currentMcp": {
+      "fileCount": 64,
+      "bytes": 2532084,
+      "sha256": "6b63396ef0102a2ea0a6e49c4e18282ee57d4329601accafdfacf4694b2dde8e"
+    },
+    "packagedMcp": {
+      "fileCount": 64,
+      "bytes": 2532084,
+      "sha256": "6b63396ef0102a2ea0a6e49c4e18282ee57d4329601accafdfacf4694b2dde8e"
+    },
+    "packagedMcpServer": {
+      "path": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Resources/app.asar.unpacked/dist-mcp/mcp/server.js",
+      "exists": true,
+      "bytes": 187144,
+      "mtimeMs": 1784047270653.5864,
+      "sha256": "648d5bb98359db7ec3d68dc297c6514024f745a1f6a2e52a7c18e4f5bf446d00"
+    },
+    "packagedMcpSdkVersion": "1.29.0",
+    "packageJson": {
+      "name": "ai-drama-canvas",
+      "version": "0.1.0",
+      "private": true,
+      "description": "本地优先的 AI 漫剧无限画布与 Codex 接续系统",
+      "author": "hxx",
+      "type": "module",
+      "main": "out/main/index.js",
+      "bin": {
+        "ai-drama-canvas-mcp": "dist-mcp/mcp/server.js"
+      },
+      "dependencies": {
+        "@modelcontextprotocol/sdk": "1.29.0",
+        "@vue-flow/background": "1.3.2",
+        "@vue-flow/controls": "1.1.3",
+        "@vue-flow/core": "1.48.2",
+        "chokidar": "4.0.3",
+        "fast-glob": "3.3.3",
+        "lucide-vue-next": "0.468.0",
+        "mammoth": "^1.12.0",
+        "sharp": "0.34.5",
+        "vue": "3.5.39",
+        "zod": "4.3.5"
+      }
+    },
+    "dmgOutputs": [],
+    "filesOutsideAppBundles": [],
+    "allowedBuilderDiagnostics": [],
+    "forbiddenPackageOutputs": [],
+    "codeSignature": {
+      "exitCode": 1,
+      "stdoutTail": "",
+      "stderrTail": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app: code has no resources but signature indicates they must be present"
+    },
+    "signatureDetails": {
+      "exitCode": 0,
+      "stdoutTail": "",
+      "stderrTail": "Executable=/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布\nIdentifier=Electron\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=392 flags=0x20002(adhoc,linker-signed) hashes=9+0 location=embedded\nVersionPlatform=1\nVersionMin=786432\nVersionSDK=1704960\nHash type=sha256 size=32\nCandidateCDHash sha256=282237d8bbbe84a800c1a52b4d60a2909f2d41cc\nCandidateCDHashFull sha256=282237d8bbbe84a800c1a52b4d60a2909f2d41ccf285be51c10793790f66d5c0\nHash choices=sha256\nCMSDigest=282237d8bbbe84a800c1a52b4d60a2909f2d41ccf285be51c10793790f66d5c0\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=16384\nExecutable Segment flags=0x1\nPage size=4096\nCDHash=282237d8bbbe84a800c1a52b4d60a2909f2d41cc\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements=none"
+    },
+    "builderLogTail": {
+      "stdout": "• electron-builder  version=26.0.12 os=25.5.0\n  • loaded configuration  file=package.json (\"build\" field)\n  • skipped dependencies rebuild  reason=npmRebuild is set to false\n  • packaging       platform=darwin arch=arm64 electron=43.1.0 appOutDir=/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64\n  • custom electronDist provided but no zip found; assuming unpacked electron directory.  electronDist=/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/node_modules/electron/dist expectedFile=electron-v43.1.0-darwin-arm64.zip\n  • copying Electron  source=/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/node_modules/electron/dist/Electron.app destination=/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/Electron.app\n  • skipped macOS code signing  reason=identity explicitly is set to null",
+      "stderr": ""
+    }
+  },
+  "packagedMcp": {
+    "runtime": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+    "serverPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Resources/app.asar.unpacked/dist-mcp/mcp/server.js",
+    "toolCount": 134,
+    "resourceTemplateCount": 9,
+    "promptCount": 7,
+    "resources": [
+      "aicanvas://server/capabilities",
+      "aicanvas://projects"
+    ],
+    "staticResourceCount": 2,
+    "effectTransitionIntegrationPassed": true,
+    "emptyProjectFreshRestart": {
+      "root": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/empty-project",
+      "registryPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/empty-project-registry.json",
+      "transport": "packaged-electron-node",
+      "desktopUiLaunched": false,
+      "toolCount": 134,
+      "chapters": 2,
+      "facts": 34,
+      "beats": 11,
+      "splitUnits": 4,
+      "storyboardRows": 11,
+      "directorContractPreserved": true,
+      "projectId": "project-eb7b2de4563f",
+      "totalItems": 4,
+      "jsonPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/empty-project/导出/雾河来客_纯MCP分镜_v001.json",
+      "markdownPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/empty-project/导出/雾河来客_纯MCP分镜_v001.md",
+      "ledgerEntries": 19,
+      "uncertainCommands": 0,
+      "restartVerified": true
+    }
+  },
+  "packagedElectronUi": {
+    "evidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-review-content-identity-20260715-0041-electron-ui.json",
+    "evidenceSha256": "2afb33097e73876d62bd74352d117525c4e15f1cd9f01c913a4552235cb7b517",
+    "screenshotPath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-review-content-identity-20260715-0041-electron-ui.png",
+    "screenshotSha256": "f456a8ec7e2bb7a6f273778f9e04f9571a0ffae5f8ab2b2000e4c555d0d5909f",
+    "transport": "packaged-electron-current-source",
+    "userDataPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/tmp/ai-canvas-editor-effect-transition-ui-H5Ll4B/electron-user-data",
+    "userDataRemoved": true,
+    "revisions": {
+      "fixture": 1,
+      "saved": 2,
+      "undone": 3,
+      "redone": 4,
+      "afterApplicationRestart": 4
+    },
+    "terminal": {
+      "rootRemoved": true,
+      "registryRemoved": true,
+      "userDataRemoved": true
+    }
+  },
+  "packagedReviewStudio": {
+    "evidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-review-content-identity-20260715-0041-review-ui.json",
+    "evidenceSha256": "83251c96e109d92d2091faa2c971168fde189a525e7db225dd800fd152cee78d",
+    "screenshotPath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-review-content-identity-20260715-0041-review-ui.png",
+    "screenshotSha256": "05b85a55b9971db54ababf067dbaff013a7d9359c061d692826eea3ac23bfc5f",
+    "transport": "packaged-electron-current-source",
+    "executablePath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+    "assertions": {
+      "staleSubmitRejectedThroughUi": true,
+      "staleAttemptWroteNoReview": true,
+      "staleRejectAutoReloadedHash": true,
+      "staleRejectResetCriteria": true,
+      "visualPassSubmittedThroughUi": true,
+      "passRestoredAfterApplicationRestart": true,
+      "restartHashMatchesPassedContent": true,
+      "samePathArtifactIdStable": true,
+      "shaChanged": true,
+      "stalePassNotCurrent": true,
+      "statusReturnedToVisualReview": true,
+      "cacheBustChanged": true,
+      "historyPreserved": true,
+      "pageErrors": 0,
+      "screenshotCaptureAttempt": 1
+    },
+    "passed": {
+      "status": "待视频",
+      "latestReviewId": "review-2026-07-14T16-41-21-612Z-06e3cd2e",
+      "sha256": "ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412",
+      "historicalReviewCount": 2,
+      "mediaSrc": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-current-source-package-H9crdy%2Ftmp%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412"
+    },
+    "restarted": {
+      "status": "待视频",
+      "latestReviewId": "review-2026-07-14T16-41-21-612Z-06e3cd2e",
+      "sha256": "ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412",
+      "historicalReviewCount": 2,
+      "mediaSrc": "aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-current-source-package-H9crdy%2Ftmp%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412"
+    },
+    "terminal": {
+      "rootRemoved": true,
+      "registryRemoved": true,
+      "userDataRemoved": true
+    }
+  },
+  "protectedWorkspaceArtifacts": {
+    "oldDmgBefore": {
+      "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+      "exists": true,
+      "bytes": 136652595,
+      "mtimeMs": 1783962490004.7156,
+      "sha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972"
+    },
+    "oldDmgAfter": {
+      "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+      "exists": true,
+      "bytes": 136652595,
+      "mtimeMs": 1783962490004.7156,
+      "sha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972"
+    },
+    "unchanged": true,
+    "distTopLevelBefore": [
+      {
+        "name": "AI 漫剧画布-0.1.0-arm64.dmg",
+        "kind": "file",
+        "bytes": 136652595,
+        "mtimeMs": 1783962490004.7156
+      },
+      {
+        "name": "AI 漫剧画布-0.1.0-arm64.dmg.blockmap",
+        "kind": "file",
+        "bytes": 144470,
+        "mtimeMs": 1783962490500.586
+      },
+      {
+        "name": "builder-debug.yml",
+        "kind": "file",
+        "bytes": 864,
+        "mtimeMs": 1783962490511.0706
+      },
+      {
+        "name": "mac-arm64",
+        "kind": "directory",
+        "bytes": 96,
+        "mtimeMs": 1783962398198.4429
+      }
+    ],
+    "distTopLevelAfter": [
+      {
+        "name": "AI 漫剧画布-0.1.0-arm64.dmg",
+        "kind": "file",
+        "bytes": 136652595,
+        "mtimeMs": 1783962490004.7156
+      },
+      {
+        "name": "AI 漫剧画布-0.1.0-arm64.dmg.blockmap",
+        "kind": "file",
+        "bytes": 144470,
+        "mtimeMs": 1783962490500.586
+      },
+      {
+        "name": "builder-debug.yml",
+        "kind": "file",
+        "bytes": 864,
+        "mtimeMs": 1783962490511.0706
+      },
+      {
+        "name": "mac-arm64",
+        "kind": "directory",
+        "bytes": 96,
+        "mtimeMs": 1783962398198.4429
+      }
+    ],
+    "distManifestBefore": {
+      "fileCount": 385,
+      "bytes": 502527188,
+      "sha256": "861cb31266f0d93145e9e16f9315e376a60128092e7f3a7a3c4342b352f292d2"
+    },
+    "distManifestAfter": {
+      "fileCount": 385,
+      "bytes": 502527188,
+      "sha256": "861cb31266f0d93145e9e16f9315e376a60128092e7f3a7a3c4342b352f292d2"
+    },
+    "outManifestBefore": {
+      "fileCount": 5,
+      "bytes": 2470175,
+      "sha256": "071c35af03d63bc61803da2023dcbaf21ab8deed64896805b9facfcf3c52bb5c"
+    },
+    "outManifestAfter": {
+      "fileCount": 5,
+      "bytes": 2470175,
+      "sha256": "071c35af03d63bc61803da2023dcbaf21ab8deed64896805b9facfcf3c52bb5c"
+    },
+    "mcpManifestBefore": {
+      "fileCount": 64,
+      "bytes": 2532084,
+      "sha256": "6b63396ef0102a2ea0a6e49c4e18282ee57d4329601accafdfacf4694b2dde8e"
+    },
+    "mcpManifestAfter": {
+      "fileCount": 64,
+      "bytes": 2532084,
+      "sha256": "6b63396ef0102a2ea0a6e49c4e18282ee57d4329601accafdfacf4694b2dde8e"
+    },
+    "hostRegistryBefore": {
+      "path": "/Users/hxx/.aicanvas/projects.json",
+      "exists": true,
+      "bytes": 6379,
+      "mtimeMs": 1784047080191.4229,
+      "sha256": "8d0c2fca01c4808de98fcee5272d6e11896013994ec148b201a3fa45c7918d0f"
+    },
+    "hostRegistryAfterRuntime": {
+      "path": "/Users/hxx/.aicanvas/projects.json",
+      "exists": true,
+      "bytes": 6379,
+      "mtimeMs": 1784047080191.4229,
+      "sha256": "8d0c2fca01c4808de98fcee5272d6e11896013994ec148b201a3fa45c7918d0f"
+    },
+    "hostMediaRuntimeStateBefore": {
+      "path": "/Users/hxx/.aicanvas/runtime/media-v1/state.json",
+      "exists": true,
+      "bytes": 16473,
+      "mtimeMs": 1784029673386.7622,
+      "sha256": "757910fb27b96f9549c581ca7b334b537801c3f538d0924e05fa53f3d8031600"
+    },
+    "hostMediaRuntimeStateAfterRuntime": {
+      "path": "/Users/hxx/.aicanvas/runtime/media-v1/state.json",
+      "exists": true,
+      "bytes": 16473,
+      "mtimeMs": 1784029673386.7622,
+      "sha256": "757910fb27b96f9549c581ca7b334b537801c3f538d0924e05fa53f3d8031600"
+    }
+  },
+  "sourceHashes": {
+    "package.json": "14220837714bca432af460c3626ddef3441efbc3a46b8cb8779954adb65ee7d3",
+    "src/core/types.ts": "45b52c583bd7c1fc076f3a3a5fa1329e144c1d1b15eca7cd27286fb576960106",
+    "src/core/editor.ts": "f6d75f2d4c7c7b51adc1c5489158ad100ad9c6f55850b24d317545aa144b97a8",
+    "src/core/codex.ts": "989aef1f171d23fa92c43ce1a26640a971fb4ba87919d29e22b1298586feee47",
+    "src/core/reviews.ts": "0b631fd54c93a791cc4c427157ae56945119a5063d03c9d836cf6ec884077efb",
+    "src/mcp/server.ts": "bda3fe4574d9fd75710c93144732ccc7d296cb066bd52c5787951772e3f37465",
+    "src/renderer/src/components/ReviewStudioView.vue": "4d78137d72ffee277e7a912945399a43b8dc2cc44b99a00230a5f205bc4f0119",
+    "src/renderer/src/components/VideoEditorView.vue": "37d26d9481b1e5917d6ecd9a19c402b1ae39e14d8f64cd53f2d30e190a3885b3",
+    "scripts/create-review-fixture.ts": "65a87d0ee67b8b7b9bc26a8d7257ab8c2ce93a704175e68cc11c1d8289f8089a",
+    "scripts/isolated-package-guards.ts": "91972ab36533ac4af205e128e107474034251d662e2e1c5ebb7bb51e0365b33c",
+    "scripts/isolated-package-smoke.ts": "504d131dd293ba7c02d944cc8c80161a0991acdc5cc88e325ccb3db5129d0fc7",
+    "scripts/ui-editor-effect-transition-smoke.mjs": "bdc0cfa663dc4da73f839468a2b23c6a3dd1506ba7dca899054e08607375ae7c",
+    "scripts/ui-review-content-identity-smoke.mjs": "082bbb752fdbd896dd676508a051f596d50df330aaee61916128f12f6425f067",
+    "tests/isolated-package-guards.test.ts": "cae57e002b56e8bfdc26815d3c6c68757625c8c678e97e9243b0318aeebd0169",
+    "tests/mcp-editor-effect-transition.test.ts": "80d097a735bd5b8e7585e2f24bd3131f63ffde04f773825ce97b66bd406e57f0",
+    "tests/reviews.test.ts": "e0d91da2b9017c64616e790b00fdd2843c41da780e1bb44631b0fd151f04191d"
+  },
+  "commands": [
+    {
+      "label": "APFS COW clone into isolated stage",
+      "executable": "/bin/cp",
+      "args": [
+        "-cR",
+        "package.json",
+        "package-lock.json",
+        "electron.vite.config.ts",
+        "tsconfig.json",
+        "tsconfig.mcp.json",
+        "tsconfig.node.json",
+        "tsconfig.web.json",
+        "src",
+        "build",
+        "node_modules",
+        "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage"
+      ],
+      "durationMs": 1788,
+      "stdoutTail": "",
+      "stderrTail": ""
+    },
+    {
+      "label": "isolated stage current-source build",
+      "executable": "/usr/bin/env",
+      "args": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "durationMs": 8547,
+      "stdoutTail": "> ai-drama-canvas@0.1.0 build\n> npm run typecheck && electron-vite build && npm run build:mcp\n\n\n> ai-drama-canvas@0.1.0 typecheck\n> vue-tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json\n\nvite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 32 modules transformed.\nrendering chunks...\nout/main/index.js  967.60 kB\n✓ built in 508ms\nvite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 1 modules transformed.\nrendering chunks...\nout/preload/index.mjs  17.52 kB\n✓ built in 10ms\nvite v7.3.6 building client environment for production...\ntransforming...\n✓ 1630 modules transformed.\nrendering chunks...\n../../out/renderer/index.html                     0.69 kB\n../../out/renderer/assets/index-2zKFLkqP.css    180.84 kB\n../../out/renderer/assets/index-C06ZWoRV.js   1,303.53 kB\n✓ built in 1.35s\n\n> ai-drama-canvas@0.1.0 build:mcp\n> rm -rf dist-mcp && tsc -p tsconfig.mcp.json && chmod +x dist-mcp/mcp/server.js",
+      "stderrTail": "[plugin vite:reporter] \n(!) /private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/src/core/production.ts is dynamically imported by /private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/src/core/generation.ts, /private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/src/core/service.ts, /private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/src/core/service.ts but also statically imported by /private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/src/core/adaptation.ts, /private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/src/core/codex.ts, /private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/src/core/command-bus.ts, /private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/src/main/index.ts, dynamic import will not move module into another chunk."
+    },
+    {
+      "label": "electron-builder 隔离 unpacked App",
+      "executable": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/node_modules/.bin/electron-builder",
+      "args": [
+        "--mac",
+        "--dir",
+        "--publish",
+        "never",
+        "-c.directories.output=/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output",
+        "-c.mac.identity=null",
+        "-c.mac.notarize=false",
+        "-c.forceCodeSigning=false",
+        "-c.npmRebuild=false",
+        "-c.electronDist=/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/node_modules/electron/dist"
+      ],
+      "durationMs": 11349,
+      "stdoutTail": "• electron-builder  version=26.0.12 os=25.5.0\n  • loaded configuration  file=package.json (\"build\" field)\n  • skipped dependencies rebuild  reason=npmRebuild is set to false\n  • packaging       platform=darwin arch=arm64 electron=43.1.0 appOutDir=/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64\n  • custom electronDist provided but no zip found; assuming unpacked electron directory.  electronDist=/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/node_modules/electron/dist expectedFile=electron-v43.1.0-darwin-arm64.zip\n  • copying Electron  source=/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/node_modules/electron/dist/Electron.app destination=/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/Electron.app\n  • skipped macOS code signing  reason=identity explicitly is set to null",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged executable architecture",
+      "executable": "/usr/bin/file",
+      "args": [
+        "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布"
+      ],
+      "durationMs": 3,
+      "stdoutTail": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布: Mach-O 64-bit executable arm64",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged bundle identifier",
+      "executable": "/usr/bin/plutil",
+      "args": [
+        "-extract",
+        "CFBundleIdentifier",
+        "raw",
+        "-o",
+        "-",
+        "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Info.plist"
+      ],
+      "durationMs": 3,
+      "stdoutTail": "com.hxx.aidramacanvas",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged bundle version",
+      "executable": "/usr/bin/plutil",
+      "args": [
+        "-extract",
+        "CFBundleShortVersionString",
+        "raw",
+        "-o",
+        "-",
+        "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Info.plist"
+      ],
+      "durationMs": 3,
+      "stdoutTail": "0.1.0",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged bundle name",
+      "executable": "/usr/bin/plutil",
+      "args": [
+        "-extract",
+        "CFBundleName",
+        "raw",
+        "-o",
+        "-",
+        "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Info.plist"
+      ],
+      "durationMs": 3,
+      "stdoutTail": "AI 漫剧画布",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged MCP capability smoke",
+      "executable": "/Users/hxx/Documents/无限画布/node_modules/.bin/tsx",
+      "args": [
+        "/Users/hxx/Documents/无限画布/scripts/mcp-smoke.ts",
+        "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Resources/app.asar.unpacked/dist-mcp/mcp/server.js"
+      ],
+      "durationMs": 433,
+      "stdoutTail": "    \"extract_last_frame\",\n    \"create_video_continuation\",\n    \"list_video_continuations\",\n    \"update_video_continuation\"\n  ],\n  \"resources\": [\n    \"aicanvas://server/capabilities\",\n    \"aicanvas://projects\"\n  ],\n  \"resourceTemplates\": [\n    \"aicanvas://projects/{projectId}/snapshot\",\n    \"aicanvas://projects/{projectId}/items/{itemId}\",\n    \"aicanvas://projects/{projectId}/artifacts/{artifactId}\",\n    \"aicanvas://projects/{projectId}/canvas\",\n    \"aicanvas://projects/{projectId}/tasks\",\n    \"aicanvas://projects/{projectId}/generation/{jobId}\",\n    \"aicanvas://projects/{projectId}/editor/{editProjectId}\",\n    \"aicanvas://projects/{projectId}/story/chapters/{chapterId}\",\n    \"aicanvas://projects/{projectId}/changes/{cursor}\"\n  ],\n  \"prompts\": [\n    \"resume_project\",\n    \"produce_next_image_batch\",\n    \"produce_next_video_batch\",\n    \"run_browser_generation\",\n    \"continue_video_from_last_frame\",\n    \"review_visual_batch\",\n    \"recover_interrupted_work\"\n  ]\n}",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged Effect/Transition MCP integration",
+      "executable": "/Users/hxx/Documents/无限画布/node_modules/.bin/vitest",
+      "args": [
+        "run",
+        "tests/mcp-editor-effect-transition.test.ts",
+        "--maxWorkers=1"
+      ],
+      "durationMs": 1197,
+      "stdoutTail": "RUN  v4.1.0 /Users/hxx/Documents/无限画布\n\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n   Start at  00:41:11\n   Duration  1.05s (transform 21ms, setup 14ms, import 55ms, tests 926ms, environment 0ms)",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged MCP empty-project fresh-restart workflow",
+      "executable": "/Users/hxx/Documents/无限画布/node_modules/.bin/tsx",
+      "args": [
+        "/Users/hxx/Documents/无限画布/scripts/mcp-empty-project-workflow-smoke.ts",
+        "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/empty-project",
+        "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/empty-project-registry.json"
+      ],
+      "durationMs": 2573,
+      "stdoutTail": "{\n  \"root\": \"/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/empty-project\",\n  \"registryPath\": \"/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/empty-project-registry.json\",\n  \"transport\": \"packaged-electron-node\",\n  \"desktopUiLaunched\": false,\n  \"toolCount\": 134,\n  \"chapters\": 2,\n  \"facts\": 34,\n  \"beats\": 11,\n  \"splitUnits\": 4,\n  \"storyboardRows\": 11,\n  \"directorContractPreserved\": true,\n  \"projectId\": \"project-eb7b2de4563f\",\n  \"totalItems\": 4,\n  \"jsonPath\": \"/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/empty-project/导出/雾河来客_纯MCP分镜_v001.json\",\n  \"markdownPath\": \"/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/empty-project/导出/雾河来客_纯MCP分镜_v001.md\",\n  \"ledgerEntries\": 19,\n  \"uncertainCommands\": 0,\n  \"restartVerified\": true\n}",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged Effect/Transition Electron UI full-restart",
+      "executable": "/Users/hxx/.nvm/versions/node/v22.22.2/bin/node",
+      "args": [
+        "/Users/hxx/Documents/无限画布/scripts/ui-editor-effect-transition-smoke.mjs",
+        "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-review-content-identity-20260715-0041-electron-ui.json"
+      ],
+      "durationMs": 4232,
+      "stdoutTail": "        \"source\": \"aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-current-source-package-H9crdy%2Ftmp%2Fai-canvas-editor-effect-transition-ui-H5Ll4B%2FEP01_15s_001_UI%E8%BD%AC%E5%9C%BA%E5%89%8D%E9%A1%B9%2FEP01_15s_001_v1.mp4\"\n      },\n      \"incoming\": {\n        \"currentTime\": 0.165999,\n        \"opacity\": 0.333333,\n        \"muted\": true,\n        \"readyState\": 1,\n        \"source\": \"aicanvas-asset://file/?path=%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Fai-canvas-current-source-package-H9crdy%2Ftmp%2Fai-canvas-editor-effect-transition-ui-H5Ll4B%2FEP01_15s_002_UI%E8%BD%AC%E5%9C%BA%E5%90%8E%E9%A1%B9%2FEP01_15s_002_v1.mp4\"\n      }\n    }\n  },\n  \"screenshot\": {\n    \"path\": \"/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-review-content-identity-20260715-0041-electron-ui.png\",\n    \"bytes\": 254341,\n    \"sha256\": \"f456a8ec7e2bb7a6f273778f9e04f9571a0ffae5f8ab2b2000e4c555d0d5909f\",\n    \"width\": 1560,\n    \"height\": 980,\n    \"captureAttempt\": 1,\n    \"content\": {\n      \"pixels\": 1528800,\n      \"brightRatio\": 0.0785858189429618,\n      \"chromaticRatio\": 0.05038723181580324\n    }\n  },\n  \"terminal\": {\n    \"rootRemoved\": true,\n    \"registryRemoved\": true,\n    \"userDataRemoved\": true\n  }\n}",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged ReviewStudio stale-submit full-restart",
+      "executable": "/Users/hxx/.nvm/versions/node/v22.22.2/bin/node",
+      "args": [
+        "/Users/hxx/Documents/无限画布/scripts/ui-review-content-identity-smoke.mjs",
+        "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/tmp/review-project",
+        "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-current-source-package-H9crdy/tmp/review-project-registry.json",
+        "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-review-content-identity-20260715-0041-review-ui.json",
+        "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-review-content-identity-20260715-0041-review-ui.png"
+      ],
+      "durationMs": 7242,
+      "stdoutTail": "      \"edgeBrightRatios\": {\n        \"top\": 0.04989207221350078,\n        \"left\": 0.04924468007843707,\n        \"right\": 0.07856049562682216\n      }\n    }\n  },\n  \"assertions\": {\n    \"staleSubmitRejectedThroughUi\": true,\n    \"staleAttemptWroteNoReview\": true,\n    \"staleRejectAutoReloadedHash\": true,\n    \"staleRejectResetCriteria\": true,\n    \"visualPassSubmittedThroughUi\": true,\n    \"passRestoredAfterApplicationRestart\": true,\n    \"restartHashMatchesPassedContent\": true,\n    \"samePathArtifactIdStable\": true,\n    \"shaChanged\": true,\n    \"stalePassNotCurrent\": true,\n    \"statusReturnedToVisualReview\": true,\n    \"cacheBustChanged\": true,\n    \"historyPreserved\": true,\n    \"pageErrors\": 0,\n    \"screenshotCaptureAttempt\": 1\n  },\n  \"terminal\": {\n    \"rootRemoved\": true,\n    \"registryRemoved\": true,\n    \"userDataRemoved\": true\n  }\n}",
+      "stderrTail": ""
+    }
+  ],
+  "terminal": {
+    "tempRootRemoved": true,
+    "lingeringProcessesBeforeCleanup": [],
+    "lingeringProcessesAfterCleanup": [],
+    "emptyProjectRemoved": true,
+    "emptyProjectRegistryRemoved": true,
+    "effectTransitionRegistryRemoved": true,
+    "packagedRegistryRemoved": true,
+    "packagedMediaRuntimeRemoved": true,
+    "packagedProjectRootRemoved": true,
+    "packagedReviewProjectRemoved": true,
+    "packagedReviewRegistryRemoved": true,
+    "packagedReviewUserDataRemoved": true,
+    "hostRegistryPostCleanup": {
+      "path": "/Users/hxx/.aicanvas/projects.json",
+      "exists": true,
+      "bytes": 6379,
+      "mtimeMs": 1784047080191.4229,
+      "sha256": "8d0c2fca01c4808de98fcee5272d6e11896013994ec148b201a3fa45c7918d0f"
+    },
+    "hostMediaRuntimeStatePostCleanup": {
+      "path": "/Users/hxx/.aicanvas/runtime/media-v1/state.json",
+      "exists": true,
+      "bytes": 16473,
+      "mtimeMs": 1784029673386.7622,
+      "sha256": "757910fb27b96f9549c581ca7b334b537801c3f538d0924e05fa53f3d8031600"
+    },
+    "oldDmgFinal": {
+      "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+      "exists": true,
+      "bytes": 136652595,
+      "mtimeMs": 1783962490004.7156,
+      "sha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972"
+    }
+  }
+}

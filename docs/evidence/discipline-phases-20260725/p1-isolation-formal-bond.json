@@ -1,0 +1,15 @@
+{
+  "kind": "p1-isolation-formal-bond",
+  "projectRoot": "/Users/hxx/Documents/无限画布/projects/grok-mvp-qingdeng-mrwc97mu-d0aea463",
+  "unitId": "S1E01-U01",
+  "productionStatus": "pass",
+  "selectedRawSha256": "ab3c65706a90a847d8c9e5c3a9f4a81ac2818802b2a7c0a65954d469ec2d0ccd",
+  "selectedLabeledSha256": "6e0dfead7cdc437eb5355fde2276af3b37500de64c8c37bafd9656304f49d1cd",
+  "selectedGenerationRunId": "codex-w2-ug-ms02u3ur",
+  "selectedResultSource": "generation-run",
+  "matchRawEligible": true,
+  "controlRefsNote": "W2 canary controlRefs×3；raw 见 selectedRawSha256",
+  "priorEvidence": "docs/evidence/multimedia-os-20260725",
+  "createdAt": "2026-07-25T09:27:12.378Z",
+  "pass": true
+}

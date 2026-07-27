@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "kind": "p17-full-interaction-workspace-final-validation",
+  "status": "pass",
+  "createdAt": "2026-07-19T12:03:00.000Z",
+  "scope": "workspace-source-electron",
+  "conclusion": "P17 工作区版全交互整改通过：清单覆盖的桌面主路径、自由画布、绑定、连续性、驾驶舱、素材中心、支持页和规模交互均无遗留阻断。该结论不等于对任意未来输入、操作系统或外部服务承诺绝对无缺陷。",
+  "buildIdentity": {
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "sourceDigest": "5c8bee97b9848e09434784687c86a905634336db53c29ab0437cafc30f719a98",
+    "buildId": "c50c4bd0b39621048b76b045e5671829",
+    "buildIdentityFingerprint": "ee724d32aa90f2ca963560171f026f96d6363bde2a21833aa58076207993f42d",
+    "releaseManifestFingerprint": "a45f5ad6fe85d5c8ca366923a2e0aad4512c8a6631b07befca12b1c4602b2739",
+    "releaseManifestSha256": "2f8f99c3062c9009de92435529f33bf00e32a03f2e4ba57b0760618b49006717",
+    "protocolVersion": "1.1",
+    "mcpToolCount": 183,
+    "builtAt": "2026-07-19T11:39:37.352Z",
+    "sourceFiles": 467,
+    "sourceBytes": 10578151,
+    "computedSourceDigestMatchesManifest": true,
+    "distribution": "local-only"
+  },
+  "verification": {
+    "targetedTests": {
+      "command": "npx vitest run tests/command-ledger-store.test.ts tests/command-bus.test.ts --reporter=verbose",
+      "status": "pass",
+      "files": 2,
+      "tests": 19
+    },
+    "crossProcessIdempotencyStress": {
+      "command": "20 x vitest: 两个独立进程使用同一幂等键只执行一次",
+      "status": "pass",
+      "rounds": 20,
+      "failed": 0,
+      "durationMs": 35291
+    },
+    "fullTests": {
+      "command": "npm test -- --run",
+      "status": "pass",
+      "files": 157,
+      "tests": 804,
+      "durationSeconds": 373.7
+    },
+    "productionBuild": {
+      "command": "npm run build",
+      "status": "pass",
+      "includes": [
+        "typecheck",
+        "build:mcp",
+        "build:identity",
+        "electron-vite build"
+      ],
+      "nonBlockingWarnings": [
+        "Vite reported modules imported both statically and dynamically",
+        "Node reported node:sqlite as experimental"
+      ]
+    },
+    "visualInspection": {
+      "status": "pass",
+      "mode": "original-size-main-agent-inspection",
+      "screenshots": 8,
+      "mechanicalPassNotTreatedAsGeneratedImageVisualReview": true
+    }
+  },
+  "interactionEvidence": [
+    {
+      "area": "navigation-project-agent-help-backup",
+      "json": "docs/evidence/p17-navigation-support-ui-smoke-20260719-08.json",
+      "jsonSha256": "d65d30e08804496f67057fc4a25010fe102ae639b030800fa26e41a2c44951ad",
+      "screenshot": "docs/evidence/p17-navigation-support-ui-smoke-20260719-08.png",
+      "screenshotSha256": "3b2ab4e9a001639fe6bd99c81cd743a951da770f0abc0666add6ce497ef88865",
+      "status": "pass"
+    },
+    {
+      "area": "free-canvas-connect-drag-viewport-dispatch-restart",
+      "json": "docs/evidence/p17-canvas-full-ui-smoke-20260719-12.json",
+      "jsonSha256": "ff7c1e231b75fced1f6fa1babdc8d64f2bf70da69b8740c232bd6f8e25c4bc01",
+      "screenshot": "docs/evidence/p17-canvas-full-ui-smoke-20260719-12.png",
+      "screenshotSha256": "5d5a2918b31eb37817bbcf787da8d4648dd0b9b3cc75c80c2aca7d0a8baad7af",
+      "status": "pass"
+    },
+    {
+      "area": "binding-workbench",
+      "json": "docs/evidence/p17-binding-full-ui-smoke-20260719-11.json",
+      "jsonSha256": "f1365fe5c32c1c3b98c8606f022f6abbc0efd817aaf97ed02a01ea7a56b038ba",
+      "screenshot": "docs/evidence/p17-binding-full-ui-smoke-20260719-11.png",
+      "screenshotSha256": "2330a52fc18a616cd23340ba7f9874dd14385a29c29cbd933cf339ca692d161c",
+      "status": "pass"
+    },
+    {
+      "area": "continuity-review-checkpoint",
+      "json": "docs/evidence/p17-continuity-review-full-ui-smoke-20260719-08.json",
+      "jsonSha256": "e0f0bf1424e0ebae2cce63925c6bf0c42c4d5ec6ea636e8c73005f4f560f95c8",
+      "screenshot": "docs/evidence/p17-continuity-review-full-ui-smoke-20260719-08.png",
+      "screenshotSha256": "e450e9f4d8277ffd1e47948d00ffa53931a0e87876bb827f7e180bc37318b249",
+      "status": "pass"
+    },
+    {
+      "area": "production-dashboard",
+      "json": "docs/evidence/p17-dashboard-full-ui-smoke-20260719-08.json",
+      "jsonSha256": "546e11036806d2c5c01aed2e8643fcd97d24a8547ec698311e1b8cd35355557f",
+      "screenshot": "docs/evidence/p17-dashboard-full-ui-smoke-20260719-08.png",
+      "screenshotSha256": "e67ffe6ba8349ca886736fb1742dd85fa38732ea53555baff1e161c56b62a505",
+      "status": "pass"
+    },
+    {
+      "area": "managed-material-studio",
+      "json": "docs/evidence/p17-managed-studio-full-ui-smoke-20260719-08.json",
+      "jsonSha256": "06213b9196b34f3baf02a9d3821443e99f8245ae226a966b848069a7373fa0c9",
+      "screenshot": "docs/evidence/p17-managed-studio-full-ui-smoke-20260719-08.png",
+      "screenshotSha256": "1153565b9cfd1ab07cb80846d4f840c6ef872f258380e606bd5de37bbd361c6f",
+      "status": "pass"
+    },
+    {
+      "area": "scale-project-switch-media-pagination",
+      "json": "docs/evidence/p17-managed-studio-scale-canvas-ui-smoke-20260719-07.json",
+      "jsonSha256": "87bac3315f48a03d989f7c5babfcb2f68270b297ace2650ceb57ae53ba65a55f",
+      "screenshot": "docs/evidence/p17-managed-studio-scale-canvas-ui-smoke-20260719-07.png",
+      "screenshotSha256": "dc5bc85e71b2a8d9670e6ce8ce8cf437d155942e24ccd53fe314fbcc559d4ec4",
+      "status": "pass"
+    },
+    {
+      "area": "legacy-production-canvas-400-node-virtualization",
+      "json": "docs/evidence/p17-large-canvas-ui-smoke-20260719-02.png.debug.json",
+      "jsonSha256": "b041a648ccf133d7c4348de64a4776de4d304f3dc693dc312e55f128e0adc729",
+      "screenshot": "docs/evidence/p17-large-canvas-ui-smoke-20260719-02.png",
+      "screenshotSha256": "6c384a51dbca1c1339d8ac80a7cee1cbe053ba0b38dccd83f98b640bbb79520d",
+      "status": "pass"
+    }
+  ],
+  "canvasAcceptance": {
+    "freeDrag": true,
+    "nativeImageDragDoesNotStealNodeDrag": true,
+    "zoomPersistence": true,
+    "middleButtonPan": true,
+    "plusConnectorsAlwaysVisible": true,
+    "plusToPlusBothDirections": true,
+    "duplicateAndIllegalEdgesRejected": true,
+    "selectedEdgeDeleteAndReconnect": true,
+    "hideShowEdges": true,
+    "clearRequiresConfirmation": true,
+    "duplicateStartIdempotent": true,
+    "projectRestartPreservesLayout": true,
+    "packsAdded": 2,
+    "dispatchesAdded": 2,
+    "resultsAdded": 0
+  },
+  "scaleAcceptance": {
+    "assets": 77,
+    "assetCategories": {
+      "character": 24,
+      "scene": 20,
+      "prop": 33
+    },
+    "units": 1288,
+    "panels": 4235,
+    "media": 10000,
+    "mediaPageDom": 36,
+    "maximumCanvasDomNodes": 78,
+    "initialCanvasDom": 16,
+    "expandedCanvasDom": 8,
+    "projectSwitches": 10,
+    "crossProjectLeak": false,
+    "rssDeltaKiB": 38432,
+    "fileDescriptorDelta": 0,
+    "idleMediaRequestsStable": true,
+    "filesystemScans": 0,
+    "legacyCanvas400NodeProbe": {
+      "logicalNodes": 400,
+      "productionNodesInDomAfterFocus": 4,
+      "imagesInDom": 4,
+      "imagesDecoded": 4,
+      "p95FrameMs": 8.8,
+      "maxFrameMs": 9,
+      "heapUsedBytes": 16100000,
+      "duplicatePositions": 0,
+      "overlaps": 0
+    }
+  },
+  "fixedDefects": [
+    "connection mode no longer rebuilds into an empty canvas",
+    "left and right plus connectors support click-to-click connections",
+    "native image dragging no longer steals node dragging",
+    "viewport controls persist the actual Vue Flow viewport",
+    "layout flushes before project switch and unmount",
+    "stale async project and unit responses cannot overwrite the active project",
+    "off-page active units remain reachable in the bounded projection",
+    "repeated Start reuses the existing workflow and no longer returns a non-cloneable Vue proxy",
+    "generation history can request newest-first results",
+    "backup restore rejects symlinks, path overlap, unsafe project IDs and legacy schema",
+    "restore remains behind the write barrier until validation and activation finish",
+    "Project Center traps focus and confirms unsaved names before close",
+    "Agent repair is Codex-primary and disabled in development mode",
+    "command ledger configures SQLite busy timeout before WAL and DDL under cross-process load",
+    "renderer business views are lazy-loaded while the tested navigation and state contracts remain intact"
+  ],
+  "boundaries": {
+    "isolatedFixturesOnlyForWrites": true,
+    "formalProjectWrites": 0,
+    "realImageGenerated": false,
+    "visualImageReviewClaimed": false,
+    "browserUsed": false,
+    "grokUsed": false,
+    "artlistUsed": false,
+    "uploadUsed": false,
+    "paymentUsed": false,
+    "publishUsed": false,
+    "desktopPackageBuilt": false,
+    "applicationsInstallUpdated": false,
+    "gitStageCommitPush": false
+  },
+  "supersession": {
+    "authoritativeP17EvidenceSuffixes": [
+      "navigation-support-20260719-08",
+      "canvas-full-20260719-12",
+      "binding-full-20260719-11",
+      "continuity-review-full-20260719-08",
+      "dashboard-full-20260719-08",
+      "managed-studio-full-20260719-08",
+      "managed-studio-scale-canvas-20260719-07",
+      "large-canvas-20260719-02"
+    ],
+    "earlierP17DebugAndIntermediateEvidence": "superseded",
+    "p0ThroughP16ValidatedModules": "not-rebuilt"
+  },
+  "remainingRisks": [
+    "The installed /Applications app remains the earlier P15 build by explicit deferred-packaging policy.",
+    "No real image-generation provider or generated-image visual review was exercised in P17.",
+    "Passing the tested interaction matrix cannot guarantee the absence of defects for every future input, OS update or external service."
+  ]
+}

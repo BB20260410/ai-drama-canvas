@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 2,
+  "kind": "t23-source-project-raw-sha-ui-verify",
+  "createdAt": "2026-07-25T13:01:20.429Z",
+  "ok": true,
+  "mode": "build",
+  "sourceProjectRoot": "/Users/hxx/Documents/无限画布/projects/dudu-gaiden-lock-20260723-12a6516c",
+  "runtimeProjectRoot": "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/t23-layer4-project-ui-FUlNfj/project-copy/dudu-gaiden-lock-20260723-12a6516c",
+  "scope": {
+    "season": "S1",
+    "episode": "S1E2"
+  },
+  "core": {
+    "unitCount": 26,
+    "passCount": 25,
+    "summary": {
+      "pass": 25,
+      "pendingReview": 0,
+      "inProgress": 1,
+      "failed": 0,
+      "blocked": 0
+    }
+  },
+  "ui": {
+    "loading": false,
+    "attrRawCount": 25,
+    "corePassSetExact": true,
+    "corePassUnitIds": [
+      "S1E2-U01",
+      "S1E2-U02",
+      "S1E2-U03",
+      "S1E2-U04",
+      "S1E2-U05",
+      "S1E2-U06",
+      "S1E2-U07",
+      "S1E2-U08",
+      "S1E2-U09",
+      "S1E2-U10",
+      "S1E2-U11",
+      "S1E2-U12",
+      "S1E2-U13",
+      "S1E2-U14",
+      "S1E2-U15",
+      "S1E2-U16",
+      "S1E2-U17",
+      "S1E2-U18",
+      "S1E2-U19",
+      "S1E2-U20",
+      "S1E2-U21",
+      "S1E2-U22",
+      "S1E2-U23",
+      "S1E2-U24",
+      "S1E2-U25"
+    ],
+    "observedRows": 35
+  },
+  "comparison": {
+    "ok": true,
+    "expectedCount": 25,
+    "observedUnitCount": 25,
+    "matchedCount": 25,
+    "missingUnitIds": [],
+    "strayUnitIds": [],
+    "invalidExpectedUnitIds": [],
+    "invalidObserved": [],
+    "mismatches": []
+  },
+  "screenshot": {
+    "sha256": "8f3348784ef6c515e2af2f51aee6c2f7de56abf8de1d35867db6f7959b1027b2",
+    "sizeBytes": 1443508,
+    "width": 3456,
+    "height": 2054,
+    "maxChannelStandardDeviation": 46.050213575794615,
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/source-product-standard-20260725-final/s1e2-raw-sha/raw-sha-S1-S1E2-build-1784984480165.png"
+  },
+  "boundaries": {
+    "sourceOnly": true,
+    "installedAppUsed": false,
+    "isolatedProjectCopy": true,
+    "formalProjectWrites": 0,
+    "imageGenerationCalls": 0
+  }
+}

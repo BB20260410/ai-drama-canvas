@@ -1,0 +1,94 @@
+{
+  "root": "/tmp/ai-canvas-large-ui-smoke-400",
+  "screenshotPath": "/tmp/ai-canvas-large-ui-smoke-400.png",
+  "debugPath": "/tmp/ai-canvas-large-ui-smoke-400.png.debug.json",
+  "fixture": {
+    "root": "/tmp/ai-canvas-large-ui-smoke-400",
+    "requested": 400,
+    "recognized": 400,
+    "episodes": 10,
+    "thumbnails": 400,
+    "thumbnailBytes": 223888,
+    "scanDurationMs": 100,
+    "scanStats": {
+      "discoveredFiles": 800,
+      "candidateFiles": 800,
+      "reservedPublicationFilesSkipped": 0,
+      "referenceAssets": 0,
+      "productionAssets": 0,
+      "inspectedChecks": 800,
+      "reusedChecks": 0,
+      "textFilesRead": 400,
+      "includeHashes": false,
+      "inspectionConcurrency": 6
+    },
+    "elapsedMs": 178
+  },
+  "performanceProbe": {
+    "ok": true,
+    "checks": {
+      "all400LogicalNodes": true,
+      "filterExactOne": true,
+      "autoLayoutNoDuplicates": true,
+      "autoLayoutNoOverlaps": true,
+      "zoomChanged": true,
+      "lastNodeRenderedAfterPan": true,
+      "firstNodeUnloadedAfterPan": true,
+      "targetThumbnailDecoded": true,
+      "boundedDomImages": true
+    },
+    "visibleCaption": "400 个可见节点缩放 62%",
+    "logicalProductionNodes": 400,
+    "vueFlowNodesInDom": 9,
+    "productionNodesInDom": 4,
+    "images": {
+      "total": 4,
+      "decoded": 4
+    },
+    "viewport": {
+      "before": 0.62,
+      "afterZoomIn": 0.8,
+      "final": {
+        "x": -52.200000000000045,
+        "y": -61528.22,
+        "zoom": 0.62
+      }
+    },
+    "virtualization": {
+      "initialDomIds": [
+        "main-ep01-unit001",
+        "main-ep01-unit002",
+        "main-ep01-unit003",
+        "main-ep01-unit004",
+        "main-ep01-unit005",
+        "main-ep01-unit006"
+      ],
+      "focusedDomIds": [
+        "main-ep10-unit037",
+        "main-ep10-unit038",
+        "main-ep10-unit039",
+        "main-ep10-unit040"
+      ],
+      "targetNodeId": "main-ep10-unit040"
+    },
+    "layout": {
+      "duplicatePositionPairs": [],
+      "overlapPairs": []
+    },
+    "interactions": {
+      "showAllEpisodesMs": 168.4,
+      "filterMs": 118,
+      "clearFilterMs": 158,
+      "zoomInMs": 83.7,
+      "zoomOutMs": 91.1,
+      "focusLastNodeMs": 31.7
+    },
+    "frames": {
+      "samples": 89,
+      "p50Ms": 8.3,
+      "p95Ms": 8.7,
+      "maxMs": 9.2
+    },
+    "heapUsedBytes": 44700000
+  }
+}

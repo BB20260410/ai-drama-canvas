@@ -1,0 +1,30 @@
+{
+  "kind": "deep-absorb-electron-ui-smoke-summary",
+  "date": "2026-07-18",
+  "script": "scripts/ui-deep-absorb-smoke.ts",
+  "build": "npm run build (out/main + renderer)",
+  "latestRun": {
+    "evidence": "docs/evidence/deep-absorb-ui-smoke-20260718-mrq4fwzd.json",
+    "screenshotCanvas": "docs/evidence/deep-absorb-ui-smoke-canvas-20260718-mrq4fwzd.png",
+    "screenshotBinding": "docs/evidence/deep-absorb-ui-smoke-binding-20260718-mrq4fwzd.png",
+    "ok": true,
+    "hardFail": []
+  },
+  "observedInRealElectronWindow": {
+    "materialStudio": true,
+    "managedCanvas": true,
+    "minimap": true,
+    "workflowToolbar": true,
+    "nodeActionPanel": true,
+    "actionsOpenDashboardAndBinding": true,
+    "bindingWorkbench": true,
+    "bindingConfirmIgnoreLabels": true,
+    "dashboardOpened": true,
+    "prepChecklistWithSelectedPanel": "not observed this run (panel select path soft-miss); code path exists in StudioProductionDashboardView"
+  },
+  "isolation": "P7 fixture under /tmp; formal empty project not written",
+  "honestLimits": [
+    "managedShell 下生成队列视图不进入 MaterialStudio 主壳；cancel/jump 在非受管 generation 视图 + App 接线",
+    "驾驶舱准备清单需选中宫格后才挂载 DOM，本轮 smoke 未稳定点中 panel-card"
+  ]
+}

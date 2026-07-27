@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "kind": "p29-canvas-theme-screenshots",
+  "sourceDigest": "fd4468d99a7292a2f5e2d29088ea99262262814083e5a08b2077d143d49daf4c",
+  "sourceFiles": 514,
+  "sourceBytes": 11331150,
+  "createdAt": "2026-07-21T15:19:38.818Z",
+  "themes": [
+    "light",
+    "dark",
+    "paper"
+  ],
+  "screenshots": {
+    "light": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p29-canvas-theme-light-20260721.png",
+      "bytes": 545303,
+      "sha256": "1c8a195cbde42d1b05869e1135f4076bfd00cb94c6c331e0274a2ce42766362d"
+    },
+    "dark": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p29-canvas-theme-dark-20260721.png",
+      "bytes": 518597,
+      "sha256": "0525523591887e6e617fdb65c83d47e8267d12f81d128505d05e1c85fae1bf07"
+    },
+    "paper": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p29-canvas-theme-paper-20260721.png",
+      "bytes": 556465,
+      "sha256": "b73be8bda397f4d795d6746847f9249e81d4f3117a4c7578860b5d88dfcd0ca4"
+    }
+  }
+}

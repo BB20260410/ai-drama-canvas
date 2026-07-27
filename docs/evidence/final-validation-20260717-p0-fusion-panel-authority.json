@@ -1,0 +1,536 @@
+{
+  "schemaVersion": 1,
+  "kind": "p0-fusion-panel-authority-final-validation",
+  "status": "passed",
+  "createdAt": "2026-07-16T20:29:51.782Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "sourceBoundary": {
+    "mode": "read-only",
+    "before": {
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "after": {
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "unchanged": true
+  },
+  "p0": {
+    "scope": "2–6 宫格独立权威资产模型",
+    "currentSelections": {
+      "revision": 1,
+      "ep001": {
+        "contractId": "grid-6c02035d032128e0f62a",
+        "sourceFingerprint": "674103c439fecf32680352c40bf107455952a17aab084db0dcb50fffad5466df",
+        "productionFingerprint": "421370f570c43251c15775e86493359064ae361691bc3519a958452b8bf5f3f0",
+        "sourceStoryboardRevision": 1,
+        "panelCount": 4,
+        "selectedAt": "2026-07-16T19:18:11.681Z",
+        "selectedBy": "migration"
+      },
+      "ep008": {
+        "contractId": "grid-76e6545a6efec0e4091b",
+        "sourceFingerprint": "fc852fdfcea1dbbbde9a86599358d9923b3a4c95c196b1d361098cb2836f15f6",
+        "productionFingerprint": "85c6e7c25ecfd92c5a975437d09015bb0e815b8201d50dcabae6b1e46b5d131d",
+        "sourceStoryboardRevision": 1,
+        "panelCount": 6,
+        "selectedAt": "2026-07-16T19:18:11.681Z",
+        "selectedBy": "migration"
+      }
+    },
+    "ep001": {
+      "itemId": "season-三-ep01-unit001",
+      "contractId": "grid-6c02035d032128e0f62a",
+      "status": "待视频",
+      "panelCount": 4,
+      "completedPanelCount": 4,
+      "mechanicallyValidPanelCount": 4,
+      "visuallyApproved": true,
+      "authoritativeArtifacts": [
+        {
+          "id": "season-三-ep01-unit001-f7baf9859d81",
+          "kind": "labeled-image",
+          "panel": {
+            "schemaVersion": 1,
+            "type": "fusion-storyboard-panel",
+            "contractId": "grid-6c02035d032128e0f62a",
+            "sourceFingerprint": "674103c439fecf32680352c40bf107455952a17aab084db0dcb50fffad5466df",
+            "productionFingerprint": "421370f570c43251c15775e86493359064ae361691bc3519a958452b8bf5f3f0",
+            "panelId": "season-三-ep01-unit001-panel-01",
+            "panelIndex": 1,
+            "panelCount": 4,
+            "frameRole": "start",
+            "startSeconds": 0,
+            "endSeconds": 3,
+            "generationJobId": "gen-2026-07-16T08-22-34-309Z-0e3ed496",
+            "publicationReceiptId": "receipt-4c54382e-7ce1-46db-b12d-0929e394c72f"
+          },
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格01_首帧_0e3ed496_labeled.png",
+          "sha256": "83b1323b2ac426f924582a39774f7168e16c5672eddd4d48baf6d62f12aab4b8"
+        },
+        {
+          "id": "season-三-ep01-unit001-ccb0d70ca56a",
+          "kind": "raw-image",
+          "panel": {
+            "schemaVersion": 1,
+            "type": "fusion-storyboard-panel",
+            "contractId": "grid-6c02035d032128e0f62a",
+            "sourceFingerprint": "674103c439fecf32680352c40bf107455952a17aab084db0dcb50fffad5466df",
+            "productionFingerprint": "421370f570c43251c15775e86493359064ae361691bc3519a958452b8bf5f3f0",
+            "panelId": "season-三-ep01-unit001-panel-01",
+            "panelIndex": 1,
+            "panelCount": 4,
+            "frameRole": "start",
+            "startSeconds": 0,
+            "endSeconds": 3,
+            "generationJobId": "gen-2026-07-16T08-22-34-309Z-0e3ed496",
+            "publicationReceiptId": "receipt-4c54382e-7ce1-46db-b12d-0929e394c72f"
+          },
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格01_首帧_0e3ed496_raw.png",
+          "sha256": "1fc7eb955a7da6bef6ee07bd0a3eb9aeaa89d97a3f8950dacc1850443abcec1b"
+        },
+        {
+          "id": "season-三-ep01-unit001-800488fd7398",
+          "kind": "labeled-image",
+          "panel": {
+            "schemaVersion": 1,
+            "type": "fusion-storyboard-panel",
+            "contractId": "grid-6c02035d032128e0f62a",
+            "sourceFingerprint": "674103c439fecf32680352c40bf107455952a17aab084db0dcb50fffad5466df",
+            "productionFingerprint": "421370f570c43251c15775e86493359064ae361691bc3519a958452b8bf5f3f0",
+            "panelId": "season-三-ep01-unit001-panel-02",
+            "panelIndex": 2,
+            "panelCount": 4,
+            "frameRole": "middle",
+            "startSeconds": 3,
+            "endSeconds": 7.5,
+            "generationJobId": "gen-2026-07-16T09-21-32-524Z-f12f122c",
+            "publicationReceiptId": "receipt-90757545-2a77-4057-8b93-b24787117215"
+          },
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格02_中间帧_f12f122c_labeled.png",
+          "sha256": "b500ee52d0e6abf34bf8c235b62b93c6f9ab8dde92a2c7004f7670320717b00a"
+        },
+        {
+          "id": "season-三-ep01-unit001-0c8c3f7ad7b3",
+          "kind": "raw-image",
+          "panel": {
+            "schemaVersion": 1,
+            "type": "fusion-storyboard-panel",
+            "contractId": "grid-6c02035d032128e0f62a",
+            "sourceFingerprint": "674103c439fecf32680352c40bf107455952a17aab084db0dcb50fffad5466df",
+            "productionFingerprint": "421370f570c43251c15775e86493359064ae361691bc3519a958452b8bf5f3f0",
+            "panelId": "season-三-ep01-unit001-panel-02",
+            "panelIndex": 2,
+            "panelCount": 4,
+            "frameRole": "middle",
+            "startSeconds": 3,
+            "endSeconds": 7.5,
+            "generationJobId": "gen-2026-07-16T09-21-32-524Z-f12f122c",
+            "publicationReceiptId": "receipt-90757545-2a77-4057-8b93-b24787117215"
+          },
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格02_中间帧_f12f122c_raw.png",
+          "sha256": "3e4b48a288a53b498768bb4a7001ad0b07b1fb2eec9a6fc2cf923ec800b95890"
+        },
+        {
+          "id": "season-三-ep01-unit001-d33ac4593fa4",
+          "kind": "labeled-image",
+          "panel": {
+            "schemaVersion": 1,
+            "type": "fusion-storyboard-panel",
+            "contractId": "grid-6c02035d032128e0f62a",
+            "sourceFingerprint": "674103c439fecf32680352c40bf107455952a17aab084db0dcb50fffad5466df",
+            "productionFingerprint": "421370f570c43251c15775e86493359064ae361691bc3519a958452b8bf5f3f0",
+            "panelId": "season-三-ep01-unit001-panel-03",
+            "panelIndex": 3,
+            "panelCount": 4,
+            "frameRole": "middle",
+            "startSeconds": 7.5,
+            "endSeconds": 12,
+            "generationJobId": "gen-2026-07-16T09-37-34-098Z-c90796be",
+            "publicationReceiptId": "receipt-0ca00229-b646-46b3-9cec-2cfa3d7b8554"
+          },
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格03_中间帧_c90796be_labeled.png",
+          "sha256": "f93dc909b2792cfc3c5c14bd5dbec64dc03086e15fd495ae8078f657d80eaad7"
+        },
+        {
+          "id": "season-三-ep01-unit001-6f5734c57fa3",
+          "kind": "raw-image",
+          "panel": {
+            "schemaVersion": 1,
+            "type": "fusion-storyboard-panel",
+            "contractId": "grid-6c02035d032128e0f62a",
+            "sourceFingerprint": "674103c439fecf32680352c40bf107455952a17aab084db0dcb50fffad5466df",
+            "productionFingerprint": "421370f570c43251c15775e86493359064ae361691bc3519a958452b8bf5f3f0",
+            "panelId": "season-三-ep01-unit001-panel-03",
+            "panelIndex": 3,
+            "panelCount": 4,
+            "frameRole": "middle",
+            "startSeconds": 7.5,
+            "endSeconds": 12,
+            "generationJobId": "gen-2026-07-16T09-37-34-098Z-c90796be",
+            "publicationReceiptId": "receipt-0ca00229-b646-46b3-9cec-2cfa3d7b8554"
+          },
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格03_中间帧_c90796be_raw.png",
+          "sha256": "9b96b1275c2edef502ea10cd995c803898319edca4a3147d9399930ad38c1e37"
+        },
+        {
+          "id": "season-三-ep01-unit001-145552d14abe",
+          "kind": "labeled-image",
+          "panel": {
+            "schemaVersion": 1,
+            "type": "fusion-storyboard-panel",
+            "contractId": "grid-6c02035d032128e0f62a",
+            "sourceFingerprint": "674103c439fecf32680352c40bf107455952a17aab084db0dcb50fffad5466df",
+            "productionFingerprint": "421370f570c43251c15775e86493359064ae361691bc3519a958452b8bf5f3f0",
+            "panelId": "season-三-ep01-unit001-panel-04",
+            "panelIndex": 4,
+            "panelCount": 4,
+            "frameRole": "end",
+            "startSeconds": 12,
+            "endSeconds": 15,
+            "generationJobId": "gen-2026-07-16T09-45-29-939Z-cb99b5f6",
+            "publicationReceiptId": "receipt-25590536-7fdf-48b6-a66d-648bd88f0fa3"
+          },
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格04_尾帧_cb99b5f6_labeled.png",
+          "sha256": "99932b6132ef239edd1a1e71103388d2d2929b9d36dc92e646d10ea19cb0de2f"
+        },
+        {
+          "id": "season-三-ep01-unit001-12f823e8e794",
+          "kind": "raw-image",
+          "panel": {
+            "schemaVersion": 1,
+            "type": "fusion-storyboard-panel",
+            "contractId": "grid-6c02035d032128e0f62a",
+            "sourceFingerprint": "674103c439fecf32680352c40bf107455952a17aab084db0dcb50fffad5466df",
+            "productionFingerprint": "421370f570c43251c15775e86493359064ae361691bc3519a958452b8bf5f3f0",
+            "panelId": "season-三-ep01-unit001-panel-04",
+            "panelIndex": 4,
+            "panelCount": 4,
+            "frameRole": "end",
+            "startSeconds": 12,
+            "endSeconds": 15,
+            "generationJobId": "gen-2026-07-16T09-45-29-939Z-cb99b5f6",
+            "publicationReceiptId": "receipt-25590536-7fdf-48b6-a66d-648bd88f0fa3"
+          },
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格04_尾帧_cb99b5f6_raw.png",
+          "sha256": "a0e98acee77fe8efd2a5694340be3b5a70e3e387c205e3f9233ea6215586748f"
+        }
+      ],
+      "migratedReview": {
+        "id": "review-2026-07-16T19-18-14-130Z-527bbafe",
+        "migratedFromReviewId": "review-2026-07-16T09-53-29-114Z-5ab8a207",
+        "requirementId": "fusion-review-7916b22425ae2df44a0a3ce895530eb21459fb256d8e0ad8524182a558ec9aff",
+        "artifactCount": 8
+      },
+      "sheetReceipt": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json",
+        "reviewId": "review-2026-07-16T19-18-14-130Z-527bbafe",
+        "requirementId": "fusion-review-7916b22425ae2df44a0a3ce895530eb21459fb256d8e0ad8524182a558ec9aff",
+        "png": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.png",
+          "sha256": "8600c46fe40ad797927c68c1bc09072556646a423f5edeb8a14fa90697e1e06e",
+          "bytes": 4472760
+        },
+        "svg": {
+          "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.svg",
+          "sha256": "420d0cc54a7685a4d58e9f5b3145e8cf1c8248a31483d45d19e61a334b0448de",
+          "bytes": 1184873
+        }
+      }
+    },
+    "ep008": {
+      "itemId": "season-三-ep01-unit008",
+      "contractId": "grid-76e6545a6efec0e4091b",
+      "status": "待尾帧",
+      "panelCount": 6,
+      "completedPanelCount": 4,
+      "visuallyApproved": false,
+      "panelStates": [
+        "awaiting_review",
+        "awaiting_review",
+        "awaiting_review",
+        "awaiting_review",
+        "generating",
+        "missing"
+      ],
+      "completeReviewForbidden": true
+    },
+    "migrationSafety": {
+      "backupRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p0-panel-authority-20260717-before-migration",
+      "immutableLegacyReviewPreserved": true,
+      "generationJobs": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-jobs.json",
+        "bytes": 332482,
+        "sha256": "b958c3f54195cb709816fc11f33fe0fb8a597389c9a922f8ff6581b42264c12c"
+      },
+      "publications": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/publications.json",
+        "bytes": 82270,
+        "sha256": "eadc1faa75bde0ff88b9142805290ca832d3a286a7f4f3573bb1a1169a0a843e"
+      },
+      "generationJobsUnchanged": true,
+      "publicationsUnchanged": true,
+      "rawImages": 26,
+      "labeledImages": 26,
+      "mediaChecksPassed": 52
+    }
+  },
+  "tests": {
+    "typecheck": {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "durationMs": 5828,
+      "stdoutTail": [
+        "> ai-drama-canvas@0.1.0 typecheck",
+        "> vue-tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json"
+      ],
+      "stderrTail": []
+    },
+    "targeted": {
+      "command": "npx vitest run tests/fusion-production.test.ts tests/reviews.test.ts tests/scanner.test.ts tests/production.test.ts tests/mcp.test.ts tests/mcp-fusion-production.test.ts",
+      "exitCode": 0,
+      "durationMs": 24346,
+      "stdoutTail": [
+        " RUN  v4.1.0 /Users/hxx/Documents/无限画布",
+        " Test Files  6 passed (6)",
+        "      Tests  51 passed (51)",
+        "   Start at  04:26:54",
+        "   Duration  24.05s (transform 536ms, setup 42ms, import 1.10s, tests 45.55s, environment 0ms)"
+      ],
+      "stderrTail": [
+        "(node:44831) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:44832) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:46251) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:46600) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)"
+      ],
+      "files": 6,
+      "tests": 51,
+      "status": "passed"
+    },
+    "full": {
+      "command": "npm test",
+      "exitCode": 0,
+      "durationMs": 116561,
+      "stdoutTail": [
+        "> ai-drama-canvas@0.1.0 test",
+        "> vitest run",
+        " RUN  v4.1.0 /Users/hxx/Documents/无限画布",
+        " Test Files  49 passed (49)",
+        "      Tests  296 passed (296)",
+        "   Start at  04:27:18",
+        "   Duration  116.29s (transform 797ms, setup 182ms, import 4.42s, tests 225.05s, environment 2ms)"
+      ],
+      "stderrTail": [
+        "(node:53065) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:53370) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:53456) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:53467) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:53473) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:53562) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:53918) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:54016) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:54023) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:54194) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:54196) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:54197) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:54575) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:54576) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:54589) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:54593) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:54595) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:54596) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:54602) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "(node:54605) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "(Use `node --trace-warnings ...` to show where the warning was created)"
+      ],
+      "files": 49,
+      "tests": 296,
+      "status": "passed"
+    }
+  },
+  "build": {
+    "status": "passed",
+    "command": {
+      "command": "npm run build",
+      "exitCode": 0,
+      "durationMs": 10056,
+      "stdoutTail": [
+        "> ai-drama-canvas@0.1.0 build",
+        "> npm run typecheck && electron-vite build && npm run build:mcp",
+        "> ai-drama-canvas@0.1.0 typecheck",
+        "> vue-tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json",
+        "vite v7.3.6 building ssr environment for production...",
+        "transforming...",
+        "✓ 42 modules transformed.",
+        "rendering chunks...",
+        "out/main/index.js  1,310.41 kB",
+        "✓ built in 472ms",
+        "vite v7.3.6 building ssr environment for production...",
+        "transforming...",
+        "✓ 1 modules transformed.",
+        "rendering chunks...",
+        "out/preload/index.mjs  18.77 kB",
+        "✓ built in 7ms",
+        "vite v7.3.6 building client environment for production...",
+        "transforming...",
+        "✓ 1633 modules transformed.",
+        "rendering chunks...",
+        "../../out/renderer/index.html                     0.69 kB",
+        "../../out/renderer/assets/index-CE3oYr5e.css    197.99 kB",
+        "../../out/renderer/assets/index-tvCt-O3I.js   1,369.56 kB",
+        "✓ built in 1.39s",
+        "> ai-drama-canvas@0.1.0 build:mcp",
+        "> rm -rf dist-mcp && tsc -p tsconfig.mcp.json && chmod +x dist-mcp/mcp/server.js"
+      ],
+      "stderrTail": [
+        "[plugin vite:reporter] ",
+        "(!) /Users/hxx/Documents/无限画布/src/core/production.ts is dynamically imported by /Users/hxx/Documents/无限画布/src/core/generation.ts, /Users/hxx/Documents/无限画布/src/core/generation.ts, /Users/hxx/Documents/无限画布/src/core/service.ts, /Users/hxx/Documents/无限画布/src/core/service.ts but also statically imported by /Users/hxx/Documents/无限画布/src/core/adaptation.ts, /Users/hxx/Documents/无限画布/src/core/codex.ts, /Users/hxx/Documents/无限画布/src/core/command-bus.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-production.ts, /Users/hxx/Documents/无限画布/src/main/index.ts, dynamic import will not move module into another chunk.",
+        "[plugin vite:reporter] ",
+        "(!) /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-production.ts is dynamically imported by /Users/hxx/Documents/无限画布/src/core/generation.ts but also statically imported by /Users/hxx/Documents/无限画布/src/core/command-bus.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-migration.ts, /Users/hxx/Documents/无限画布/src/core/scanner.ts, dynamic import will not move module into another chunk.",
+        "[plugin vite:reporter] ",
+        "(!) /Users/hxx/Documents/无限画布/src/core/service.ts is dynamically imported by /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-production.ts but also statically imported by /Users/hxx/Documents/无限画布/src/core/adaptation.ts, /Users/hxx/Documents/无限画布/src/core/asset-registry.ts, /Users/hxx/Documents/无限画布/src/core/canvas-state.ts, /Users/hxx/Documents/无限画布/src/core/codex.ts, /Users/hxx/Documents/无限画布/src/core/command-bus.ts, /Users/hxx/Documents/无限画布/src/core/continuity.ts, /Users/hxx/Documents/无限画布/src/core/documents.ts, /Users/hxx/Documents/无限画布/src/core/editor.ts, /Users/hxx/Documents/无限画布/src/core/fusion-storyboard-migration.ts, /Users/hxx/Documents/无限画布/src/core/generation.ts, /Users/hxx/Documents/无限画布/src/core/memory.ts, /Users/hxx/Documents/无限画布/src/core/production.ts, /Users/hxx/Documents/无限画布/src/core/reviews.ts, /Users/hxx/Documents/无限画布/src/core/timeline.ts, /Users/hxx/Documents/无限画布/src/main/index.ts, dynamic import will not move module into another chunk."
+      ]
+    },
+    "artifacts": [
+      {
+        "path": "/Users/hxx/Documents/无限画布/out/main/index.js",
+        "bytes": 1310408,
+        "sha256": "db945526a73101024a37c576b7b23667d7223b3e2582a8c8d90c801a995052e4"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/out/preload/index.mjs",
+        "bytes": 18769,
+        "sha256": "9b54e9a61a6e0c63111ed8ffacfbb0a656f7f62562f66a515e4ccd003e53ac5d"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/out/renderer/index.html",
+        "bytes": 693,
+        "sha256": "38456978840ce205df1ffe47d3547d1cd1e70b1e89e363ed3f7ad4b95b6e6be9"
+      },
+      {
+        "path": "/Users/hxx/Documents/无限画布/dist-mcp/mcp/server.js",
+        "bytes": 218789,
+        "sha256": "786c650b1c881ba1e9ca0d0f4c3576cfab9f45f5e9b692e576d99846b7b1961f"
+      }
+    ]
+  },
+  "mcp": {
+    "status": "passed",
+    "transport": "compiled-stdio-read-only-formal-project",
+    "toolCount": 150,
+    "migrationCommandAdvertised": true,
+    "doctor": {
+      "errors": 0,
+      "warnings": 1,
+      "ok": 26
+    },
+    "ep001RequirementId": "fusion-review-7916b22425ae2df44a0a3ce895530eb21459fb256d8e0ad8524182a558ec9aff",
+    "ep008InReviewQueue": false,
+    "ep008Status": "待尾帧",
+    "ep008CompletedPanelCount": 4
+  },
+  "ui": {
+    "status": "passed",
+    "command": {
+      "command": "node scripts/ui-fusion-storyboard-grid-smoke.mjs",
+      "exitCode": 0,
+      "durationMs": 21889,
+      "stdoutTail": [
+        "        },",
+        "        {",
+        "          \"panelId\": \"season-三-ep01-unit001-panel-02\",",
+        "          \"raw\": \"season-三-ep01-unit001-0c8c3f7ad7b3\",",
+        "          \"labeled\": \"season-三-ep01-unit001-800488fd7398\"",
+        "        },",
+        "        {",
+        "          \"panelId\": \"season-三-ep01-unit001-panel-03\",",
+        "          \"raw\": \"season-三-ep01-unit001-6f5734c57fa3\",",
+        "          \"labeled\": \"season-三-ep01-unit001-d33ac4593fa4\"",
+        "        },",
+        "        {",
+        "          \"panelId\": \"season-三-ep01-unit001-panel-04\",",
+        "          \"raw\": \"season-三-ep01-unit001-12f823e8e794\",",
+        "          \"labeled\": \"season-三-ep01-unit001-145552d14abe\"",
+        "        }",
+        "      ]",
+        "    }",
+        "  },",
+        "  \"reviewUi\": {",
+        "    \"panelLabels\": [",
+        "      \"宫格01\",",
+        "      \"宫格02\",",
+        "      \"宫格03\",",
+        "      \"宫格04\"",
+        "    ],",
+        "    \"viewedPanelCount\": 4,",
+        "    \"requirementHint\": \"视觉通过前必须查看全部 4 格\",",
+        "    \"passEnabled\": true,",
+        "    \"horizontalPageOverflow\": false",
+        "  },",
+        "  \"migrationButtonVisible\": true,",
+        "  \"sideEffects\": {",
+        "    \"generationJobsUnchanged\": true,",
+        "    \"publicationsUnchanged\": true,",
+        "    \"generationJobsSha256\": \"b958c3f54195cb709816fc11f33fe0fb8a597389c9a922f8ff6581b42264c12c\",",
+        "    \"publicationsSha256\": \"eadc1faa75bde0ff88b9142805290ca832d3a286a7f4f3573bb1a1169a0a843e\"",
+        "  },",
+        "  \"pageErrors\": []",
+        "}"
+      ],
+      "stderrTail": []
+    },
+    "evidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/p0-panel-review-ui-smoke-20260717.json",
+    "screenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p0-panel-review-ui-smoke-20260717.png",
+      "bytes": 1811712,
+      "sha256": "e234f3c4b1dbb88467424ef4759484eb652476960728ac68aa3eae4c39bc5048"
+    },
+    "screenshotSize": {
+      "width": 3440,
+      "height": 2058
+    },
+    "panelLabels": [
+      "宫格01",
+      "宫格02",
+      "宫格03",
+      "宫格04"
+    ],
+    "allPanelsViewed": true,
+    "generationJobsUnchanged": true,
+    "publicationsUnchanged": true,
+    "pageErrors": []
+  },
+  "goal": {
+    "complete": false,
+    "completedPriority": "P0",
+    "nextPriority": "P1 可恢复的生图执行状态机",
+    "productionFreeze": "P0–P4 通过前继续冻结扩大正式生图"
+  }
+}

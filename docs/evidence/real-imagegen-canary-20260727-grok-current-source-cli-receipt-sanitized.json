@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "kind": "grok-build-cli-invocation-receipt",
+  "createdAt": "2026-07-27T05:20:00Z",
+  "cli": {
+    "version": "0.2.112",
+    "revision": "9bbd559437aa",
+    "model": "grok-4.5-build"
+  },
+  "readonlyMcpCheck": {
+    "numTurns": 3,
+    "reportedModelCostUsd": 0.1561024,
+    "result": {
+      "mcpConnected": true,
+      "mcpToolCount": 202,
+      "buildId": "40b9cc725097394108667c877901446a",
+      "sourceDigest": "d4b07c20a04cd8c7ff0b48c3e1fd80acf2f364a9123a7f2335591dc18a3ee5b4",
+      "buildCurrentnessAllowed": true,
+      "activeProjectId": "project-b3e5fa60bbcd",
+      "activeProjectName": "《嘟嘟》世界观概念序章",
+      "nextActionCode": "list-binding-units"
+    }
+  },
+  "imagegenSession": {
+    "numTurns": 4,
+    "reportedModelCostUsd": 0.1638956,
+    "formalImageGenerationCalls": 1,
+    "primaryTool": "image_gen",
+    "backend": "grok-build-imagine",
+    "rawSha256": "5cd5b448374fb60f59d86fc2023702be0af2e6d439f649b6863b0a40829c84ae"
+  },
+  "reportedModelCostUsdTotal": 0.319998,
+  "costBoundary": "金额来自 Grok CLI JSON 的模型费用字段；Imagine 生图工具若有独立计费，本地输出没有单列，不能据此宣称总账单封顶为该金额。",
+  "provenanceBoundary": "CLI 会话与 Agent attestation 共同支持当前 Grok 直调事实，但不是 xAI 提供的可落盘密码学供应商回执。",
+  "sanitization": {
+    "removedFields": [
+      "readonlyMcpCheck.sessionId",
+      "readonlyMcpCheck.requestId",
+      "imagegenSession.sessionId",
+      "imagegenSession.requestId"
+    ],
+    "reason": "Git baseline excludes local CLI session and request identifiers."
+  }
+}

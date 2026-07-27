@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "kind": "p1-generation-recovery-ui-smoke",
+  "createdAt": "2026-07-17T02:07:41.490Z",
+  "transport": "electron-current-production-build",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "jobId": "gen-2026-07-16T12-10-57-215Z-892023c0",
+  "registryPath": "/tmp/ai-canvas-p1-generation-recovery-ui-final-registry-20260717.json",
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p1-generation-recovery-ui-final-20260717.png",
+    "sha256": "fe26226bb4d31fa60fc678f58891e5d10999634a1607230b5c5295efe0547c1b"
+  },
+  "guardedFiles": {
+    "beforeHashes": {
+      "generationJobs": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182",
+      "generationSettings": "6815df33ee0c0f420a9be6ee640ffb7e2c208d44066f02c1878e23032da433e1",
+      "publications": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238",
+      "events": "af4369169b7cade50e8259059caea01d2c6ecc17158a63809abff2495272ea96",
+      "index": "303aa65edaeb7f32b71c3e47e2c629f714a044f60822130f52c32e3afdbb1cdb",
+      "overrides": "0155f1731175ce5a7fdabf279d6493b535c521596d849c5221a8041609f2f31d",
+      "commandLedger": "8a774e773a5c3436ea84737f9d29b34cf4914a27282b1c9a6d0206cd53b933bc"
+    },
+    "afterHashes": {
+      "generationJobs": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182",
+      "generationSettings": "6815df33ee0c0f420a9be6ee640ffb7e2c208d44066f02c1878e23032da433e1",
+      "publications": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238",
+      "events": "af4369169b7cade50e8259059caea01d2c6ecc17158a63809abff2495272ea96",
+      "index": "303aa65edaeb7f32b71c3e47e2c629f714a044f60822130f52c32e3afdbb1cdb",
+      "overrides": "0155f1731175ce5a7fdabf279d6493b535c521596d849c5221a8041609f2f31d",
+      "commandLedger": "8a774e773a5c3436ea84737f9d29b34cf4914a27282b1c9a6d0206cd53b933bc"
+    },
+    "unchanged": true
+  },
+  "apiState": {
+    "jobCount": 30,
+    "settingsRevision": 4,
+    "projectConcurrency": 1,
+    "job": {
+      "id": "gen-2026-07-16T12-10-57-215Z-892023c0",
+      "itemId": "season-三-ep01-unit008",
+      "status": "generation_unknown",
+      "attempts": 1,
+      "providerId": "codex-subagent-gpt-image-2",
+      "model": "GPT Image 2",
+      "parameters": {
+        "mode": "multi_image",
+        "aspectRatio": "9:16",
+        "resolution": "Medium",
+        "imageCount": 1,
+        "quality": "Medium"
+      },
+      "referenceCount": 4,
+      "publicationIntentId": "publication-472b11c0-0821-4ed1-8051-32d8f046f565",
+      "publicationBundleId": "generation-bundle-gen-2026-07-16T12-10-57-215Z-892023c0",
+      "companionPublicationIntentId": "publication-de235c33-2161-4b87-8abd-8bac235e9241",
+      "checkpoint": {
+        "schemaVersion": 2,
+        "revision": 3,
+        "stage": "generation_unknown",
+        "updatedAt": "2026-07-16T23:56:52.767Z",
+        "remoteIdentityRequired": false,
+        "oneImagePerAgent": true,
+        "note": "P1 正式迁移：旧协议 lease 后没有模型调用前 intent 与调用后 receipt，无法证明 image_gen 未执行；保持同一 Job/attempt/Publication 并进入 generation_unknown。",
+        "lease": {
+          "leaseId": "subagent-lease-109aae14dd1db8b32dba07be",
+          "agentTaskName": "/root/generate_ep01_008_p05_892023c0",
+          "claimedAt": "2026-07-16T12:10:58.110Z",
+          "oneImageOnly": true,
+          "promptSha256": "f587104a850dc737170ea6aefa2de75b1b088ff8db4515d334403659a90d5e0b",
+          "parametersSha256": "20fb77444cc5c610372bfc18dd4ac91350e0ccba6a72d7740510d9f87c5ab671",
+          "referencesSha256": "5f53fc5491d7c61d973f23d54bd6c10d07b50959369d3321d8804a55c9470abb",
+          "executionSnapshotHash": "f858d252625ae5d91ca08a732a0108040e782505351a760e335f6853444bda8a"
+        },
+        "unknown": {
+          "code": "legacy_leased_without_call_receipt",
+          "observedAt": "2026-07-16T23:56:52.767Z",
+          "note": "P1 正式迁移：旧协议 lease 后没有模型调用前 intent 与调用后 receipt，无法证明 image_gen 未执行；保持同一 Job/attempt/Publication 并进入 generation_unknown。",
+          "previousStage": "leased",
+          "leaseId": "subagent-lease-109aae14dd1db8b32dba07be",
+          "evidenceReference": "legacy-unreceipted-lease-892023c0"
+        }
+      }
+    },
+    "provider": {
+      "id": "codex-subagent-gpt-image-2",
+      "adapter": "codex-subagent-imagegen",
+      "enabled": true,
+      "model": "GPT Image 2",
+      "maxConcurrency": 1
+    }
+  },
+  "bundleIntents": [
+    {
+      "id": "publication-de235c33-2161-4b87-8abd-8bac235e9241",
+      "status": "reserved",
+      "bundleId": "generation-bundle-gen-2026-07-16T12-10-57-215Z-892023c0",
+      "bundleMember": "companion"
+    },
+    {
+      "id": "publication-472b11c0-0821-4ed1-8051-32d8f046f565",
+      "status": "reserved",
+      "bundleId": "generation-bundle-gen-2026-07-16T12-10-57-215Z-892023c0",
+      "bundleMember": "primary"
+    }
+  ],
+  "candidateFiles": [],
+  "rendered": {
+    "status": "调用结果不明",
+    "checkpoint": "一图一代理 generation_unknown · R3 · /root/generate_ep01_008_p05_892023c0",
+    "leaseLines": [
+      "租约 subagent-lease-109… · owner legacy-unknown · fence —",
+      "心跳 无 · 到期 无 TTL · 旧协议 / 无法安全接管"
+    ],
+    "unknown": "调用归因不明：legacy_leased_without_call_receipt · 禁止取消、接管、重生",
+    "actions": [
+      "请求单"
+    ]
+  },
+  "headerActions": [
+    " 供应商",
+    " 只读刷新"
+  ],
+  "settingsUi": {
+    "selectedAdapter": "codex-subagent-imagegen",
+    "providerConcurrency": "1",
+    "providerBoundary": "严格串行：一张图只领取一个唯一租约，只调用一次生图；代理只写隔离候选文件，主代理统一做视觉验收、Publication 与硬锁决策。",
+    "projectConcurrency": "1",
+    "projectBoundary": "一图一代理项目固定项目并发 1；UI 不允许放宽，避免未知调用与新任务重叠。",
+    "horizontalPageOverflow": false
+  },
+  "pageErrors": [],
+  "assertions": {
+    "unknownStateVisible": true,
+    "legacyLeaseVisibleAndNotTakeoverEligible": true,
+    "retryCancelTakeoverHidden": true,
+    "onlyReadRefreshAtHeader": true,
+    "readRefreshDidNotWrite": true,
+    "rawLabeledBundleReservedWithoutReceipts": true,
+    "noCandidateOrFormalOutput": true,
+    "projectAndProviderConcurrencyOne": true
+  }
+}

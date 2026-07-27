@@ -1,0 +1,24 @@
+{
+  "kind": "goal-closeout-remaining-wiring",
+  "date": "2026-07-18",
+  "reason": "user: 用 goal 模式把后续任务都完成；禁止只汇报就停",
+  "completed": [
+    "OA-1: command-bus preflight_publication → enrichPublicationIntentWithDiagnostics",
+    "TC-1: pipeline-graph edge validation (already + re-verified)",
+    "LX-1: GenerationQueueView tabs (already + re-verified)",
+    "OTIO-1: export probe (already + re-verified)",
+    "JF-1 + preflight UI on dashboard (already + re-verified)",
+    "VF/LMD canvas minimap + workflow groups (already + re-verified)",
+    "structural absorb-wiring-complete tests"
+  ],
+  "notInScope": [
+    "OpenCut Editor API absorb (upstream rewrite; SKIP remains)",
+    "TwitCanva social post (redline SKIP remains)",
+    "git commit/push"
+  ],
+  "verification": {
+    "typecheck": "pass",
+    "vitest": "35 passed / 10 files",
+    "formalBusinessCountZero": true
+  }
+}

@@ -1,0 +1,321 @@
+{
+  "schemaVersion": 2,
+  "kind": "p5-canonical-assets-fresh-profile-ui-smoke",
+  "createdAt": "2026-07-17T18:09:49.196Z",
+  "passed": true,
+  "transport": "electron-current-production-build-fresh-profile",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "freshProfile": {
+    "path": "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-p5-ui-f85D56/fresh-profile",
+    "filesBeforeLaunch": 0,
+    "filesAfterClose": 40,
+    "cleaned": true
+  },
+  "localPageUrl": "file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/out/renderer/index.html",
+  "openedProject": {
+    "id": "gushujuan-s3-f1a688020bfb7af6",
+    "name": "蜀道山·古蜀卷 第三季"
+  },
+  "probeInstallation": {
+    "installed": true,
+    "installedBy": "ipcMain-handler",
+    "handlerCount": 165
+  },
+  "catalog": {
+    "storeRevision": 3,
+    "storeFingerprint": "8f1057fe11a53594cda2032d14808a730664705ad2b5b9c2e3dcdc5d7ac45964",
+    "counts": {
+      "assets": 77,
+      "aliases": 194,
+      "definitionVersions": 77,
+      "contractVersions": 77,
+      "versions": 21,
+      "authorities": 21,
+      "relations": 0,
+      "media": 39,
+      "assetsWithVersions": 20,
+      "assetsWithoutVersions": 57,
+      "primaryAuthorities": 20,
+      "supportingAuthorities": 1,
+      "byCategory": {
+        "character": 24,
+        "scene": 20,
+        "prop": 33
+      }
+    },
+    "uiMetrics": {
+      "全部资产": "77",
+      "角色": "24",
+      "场景": "20",
+      "道具": "33",
+      "已有版本": "20",
+      "待生成": "57",
+      "Store Revision": "r3"
+    }
+  },
+  "pagination": {
+    "uiPageSize": 24,
+    "pages": [
+      {
+        "count": 24,
+        "range": "1–24 / 77",
+        "first": "C01",
+        "last": "C21"
+      },
+      {
+        "count": 24,
+        "range": "25–48 / 77",
+        "first": "P01",
+        "last": "P24"
+      },
+      {
+        "count": 24,
+        "range": "49–72 / 77",
+        "first": "P25",
+        "last": "S15"
+      },
+      {
+        "count": 5,
+        "range": "73–77 / 77",
+        "first": "S16",
+        "last": "S20"
+      }
+    ],
+    "uniqueAssetsVisited": 77,
+    "ipcMaximum": 100,
+    "overLimitRejected": true
+  },
+  "race": {
+    "staleSuccess": {
+      "calls": [
+        {
+          "category": "character",
+          "startOrder": 9,
+          "finishOrder": 10,
+          "delayedMs": 900,
+          "total": 24
+        },
+        {
+          "category": "scene",
+          "startOrder": 10,
+          "finishOrder": 9,
+          "delayedMs": 20,
+          "total": 20
+        }
+      ],
+      "final": {
+        "activeCategory": "场景",
+        "totalLabel": "20 项",
+        "count": 20,
+        "allExplicitScene": true,
+        "staleErrorVisible": false
+      }
+    },
+    "staleError": {
+      "calls": [
+        {
+          "category": "character",
+          "startOrder": 12,
+          "finishOrder": 13,
+          "delayedMs": 900,
+          "error": "P5 injected stale list error"
+        },
+        {
+          "category": "scene",
+          "startOrder": 13,
+          "finishOrder": 12,
+          "delayedMs": 20,
+          "total": 20
+        }
+      ],
+      "final": {
+        "activeCategory": "场景",
+        "totalLabel": "20 项",
+        "count": 20,
+        "allExplicitScene": true,
+        "staleErrorVisible": false
+      }
+    }
+  },
+  "assetProtocol": {
+    "mediaPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P01_阿航胸前布囊_★面具铁律替代资产/AI画布生成/P01_资产_23ac427f_raw.png",
+    "expectedSha256": "907e96df267d3520c302ea2dad36afa5f6c42181f28492bd35a22450e5ad70a5",
+    "bytes": 1615604,
+    "correct": {
+      "ok": true,
+      "status": 200,
+      "bytes": 1615604,
+      "contentType": "image/png",
+      "cacheControl": "no-store",
+      "bodyPreview": ""
+    },
+    "wrong": {
+      "ok": false,
+      "status": 409,
+      "bytes": 24,
+      "contentType": "text/plain;charset=UTF-8",
+      "cacheControl": null,
+      "bodyPreview": "Content SHA-256 mismatch"
+    }
+  },
+  "staleCatalogGate": {
+    "injectedDriftInput": "p5-ui-smoke-injected-stale",
+    "callsBefore": {
+      "catalog": 2,
+      "list": 13,
+      "detail": 1
+    },
+    "callsDuring": {
+      "catalog": 3,
+      "list": 13,
+      "detail": 1
+    },
+    "callsRestored": {
+      "catalog": 4,
+      "list": 14,
+      "detail": 1
+    },
+    "staleUi": {
+      "cards": 0,
+      "images": 0,
+      "details": 0,
+      "toolbar": 0,
+      "heading": "规范资产库输入已漂移",
+      "blocker": "旧列表、详情和缩略图已清空；重新完成内容寻址迁移前不会显示或返回旧权威媒体。",
+      "drift": "输入已漂移：p5-ui-smoke-injected-stale。在重新迁移前禁止把旧索引用于生产。",
+      "refreshDisabled": false
+    },
+    "currentRestored": true
+  },
+  "search": {
+    "query": "P01",
+    "total": 1,
+    "resultId": "P01"
+  },
+  "lazyDetail": {
+    "callsBeforeSelection": 0,
+    "callsAfterSelection": 1,
+    "callsAfterStaleRestoreSelection": 2
+  },
+  "p01": {
+    "heading": "阿航胸前布囊 ★面具铁律替代资产",
+    "currentSupportingAuthorityIds": [
+      "asset-authority-P01-285cbf881b0c87cbe5a1a8897eb45dc7"
+    ],
+    "primary": {
+      "id": "asset-authority-P01-74f50610a9c15b822c4ee3cedb92fb20",
+      "role": "production-hard-lock",
+      "exposure": "allowed",
+      "usage": "generation-reference",
+      "crossProject": false,
+      "assetVersionId": "asset-version-P01-a6585f981d3566a0cae0fcf1a009026d"
+    },
+    "hiddenSupporting": {
+      "id": "asset-authority-P01-285cbf881b0c87cbe5a1a8897eb45dc7",
+      "role": "supporting-identity",
+      "exposure": "forbidden",
+      "usage": "human-review-only",
+      "crossProject": false,
+      "assetVersionId": "asset-version-P01-408d397da5bbf9b78ce9c39d9cac4251",
+      "exposeToGeneration": false
+    },
+    "uiAuthorities": [
+      {
+        "forbidden": true,
+        "historical": false,
+        "text": "辅助身份权威user-provided · 当前仅人工复核/禁止上传生成asset-version-P01-408d397da5bbf9b78ce9c39d9cac4251"
+      },
+      {
+        "forbidden": false,
+        "historical": false,
+        "text": "生产硬锁reviewed-hard-lock · 当前可用于生成asset-version-P01-a6585f981d3566a0cae0fcf1a009026d"
+      }
+    ],
+    "uiVersions": [
+      {
+        "historical": false,
+        "text": "辅助参考版本当前 · 1 个媒体成员 · 0 条 Reviewraw · 91b074b882…8e2253"
+      },
+      {
+        "historical": false,
+        "text": "生产输出当前 · 2 个媒体成员 · 1 条 Reviewraw · 907e96df26…ad70a5labeled · efc6bf7e3c…abedfc"
+      }
+    ],
+    "versionRepresentations": [
+      "supporting-reference",
+      "production-output"
+    ],
+    "generationOrUploadActions": 0
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p5-canonical-assets-ui-smoke-20260718-r2.png",
+    "bytes": 434888,
+    "sha256": "41a21e3bed441098cb2373b9e6da5c4e67c9410f31fe3d232db4212d8accdeef",
+    "width": 3456,
+    "height": 2058,
+    "standardDeviation": 42.21166667562446
+  },
+  "guarded": {
+    "unchanged": true,
+    "files": {
+      "canonicalAssets": "8d34846f134a13a220f02f87f69ae6351a413598c60f6940969e7a182ee4fb46",
+      "project": "dffcd48aa40c7edcc7effd8f72d8820aba2c52cc15e90dd45670388479ada883",
+      "index": "ceacdddbaa9868df05c191ee09138f1f34009041312275bf64d073b8da20de67",
+      "productionAssets": "e693c5477044d9389de19188d14e876ea334c762cea86f9010a3de47f41abeae",
+      "overrides": "0155f1731175ce5a7fdabf279d6493b535c521596d849c5221a8041609f2f31d",
+      "jobs": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182",
+      "publications": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238",
+      "reviews": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97",
+      "panelReferences": "02c9b7f89a571296cfd01498cbf922e95091908e04795a1759bad33339973de1",
+      "panelConstraints": "184aca16415ed8b070fa09a543f9601180795ed9a483b69952ed72ae71a41854",
+      "sheetIndex": "11533501e7a2a6dedd1dbfa6f108c3a4e8f02141bafbaa16aa706125832e3fd6",
+      "commandLedger": "85ad08ecd07169db41fee58f536b6c542fc8ea21bb1be62425e69d6797787f52",
+      "events": "ff19ea23f669e538c6ef1bc736edf653174e7e67e4599b49f148cd553c9d0e76"
+    },
+    "protectedTreesUnchanged": true,
+    "protectedTrees": [
+      {
+        "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+        "fileCount": 11119,
+        "totalBytes": 876129673,
+        "digest": "36d70813d056428119fd70bc478bf0997b4cb0d7b481eaef5c55d57791b80860"
+      },
+      {
+        "root": "/Users/hxx/Documents/古蜀卷第三季",
+        "fileCount": 3344,
+        "totalBytes": 24570877,
+        "digest": "a15a28dfb347e2225d980335f553592fbc0bd384c3b3005d62efa21ba71d1d6d"
+      }
+    ]
+  },
+  "externalWebpages": 0,
+  "pageErrors": 0,
+  "writes": {
+    "formalProject": false,
+    "migration": false,
+    "generation": false,
+    "upload": false,
+    "review": false
+  },
+  "assertions": {
+    "formalProjectOpened": true,
+    "exactCounts77And24_20_33": true,
+    "uiPagination24AndAll77Visited": true,
+    "ipcPaginationMaximum100Enforced": true,
+    "searchP01Exact": true,
+    "detailLazyLoadedAfterSelection": true,
+    "primaryAuthorityAuditable": true,
+    "hiddenSupportingAuthorityAuditableButGenerationForbidden": true,
+    "currentPrimaryAndSupportingAuthorityHeadsExplicit": true,
+    "currentAndHistoricalAuthorityLabelsSeparated": true,
+    "contentAddressedThumbnailCorrectSha200AndMismatch409": true,
+    "staleCatalogClearsCardsImagesAndDetail": true,
+    "staleCatalogSkipsListAndDetailReads": true,
+    "currentCatalogRestoredAfterStaleInjection": true,
+    "staleAsyncFilterResponseDiscarded": true,
+    "freshProfileUsedAndRemoved": true,
+    "formalProjectUnchanged": true,
+    "formalProjectAndSourceTreesUnchanged": true
+  }
+}

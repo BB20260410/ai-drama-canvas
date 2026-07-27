@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "kind": "p3-visual-constraints-migration-dry-run",
+  "createdAt": "2026-07-17T10:53:57.005Z",
+  "apply": false,
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "sourceRoot": "/Users/hxx/Documents/古蜀卷第三季",
+  "source": {
+    "root": "/Users/hxx/Documents/古蜀卷第三季",
+    "files": 3344,
+    "bytes": 24570877,
+    "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+  },
+  "protected": {
+    "identitySha256": "2e11b3a389a7f46ffffec1d269d9f432215ab9e14ba5c7ec68a1e40473687d26",
+    "counts": {
+      "generationJobs": 30,
+      "generationByStatus": {
+        "failed": 3,
+        "generation_unknown": 1,
+        "succeeded": 26
+      },
+      "publicationIntents": 31,
+      "publicationReceipts": 26,
+      "reviews": 20
+    },
+    "rawLabeled": {
+      "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+      "files": 52,
+      "bytes": 128973009,
+      "aggregateSha256": "77d4a46fa04c05c635701363f394faab0cc5094fc437990f6eeb580ce0e4c83b"
+    },
+    "historicalRequests": {
+      "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-requests",
+      "files": 31,
+      "bytes": 174082,
+      "aggregateSha256": "171ca4fd131b977f07f7bbb5e44bfd836a1158ce63c6bcaff721b45f95b1fbca"
+    },
+    "p2StoreSha256": "35aa251d9b6f767190924d697e7dd03a58cc198ded0918ad4fd89508217f877b"
+  },
+  "plan": {
+    "providerIdsToUpdate": [
+      "codex-subagent-gpt-image-2"
+    ],
+    "providerInstructionSha256": "c3aa8d3c3e165fff402978a0fbacff69f6e557271d5c6468c7ee89220931b74b",
+    "needsP3Materialization": true,
+    "plannedSidecarFiles": [
+      "generation.json",
+      "events.jsonl",
+      "panel-visual-constraints.json"
+    ],
+    "p3Before": {
+      "exists": false,
+      "current": false
+    },
+    "productionFreeze": true
+  },
+  "next": "只读预检通过；确认后显式追加 --apply。"
+}

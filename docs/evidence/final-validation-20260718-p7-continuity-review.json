@@ -1,0 +1,2667 @@
+{
+  "schemaVersion": 2,
+  "kind": "p7-continuity-review-final-validation",
+  "status": "pass",
+  "createdAt": "2026-07-18T02:44:10.753Z",
+  "scope": {
+    "phase": "P7",
+    "softwareOnly": true,
+    "formalSeasonProductionComplete": false,
+    "validatorInvokedBrowser": false,
+    "validatorInvokedImagegen": false,
+    "formalImageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0
+  },
+  "planning": {
+    "before": {
+      "activePlan": {
+        "path": "/Users/hxx/Documents/无限画布/.planning/.active_plan",
+        "sizeBytes": 21,
+        "mtimeMs": 1784220519896.5244,
+        "sha256": "57885a03a7d0ed8efec56a67eca8fb3c199d47036dd380c33a7143bbaed0a13a"
+      },
+      "taskPlan": {
+        "path": "/Users/hxx/Documents/无限画布/.planning/2026-07-17-ai-p0-p10/task_plan.md",
+        "sizeBytes": 21463,
+        "mtimeMs": 1784339773275.729,
+        "sha256": "730a4dbb0d59f0c47818b7ce79986f11456df612a9c0c50c3e5fb67626470b5b"
+      },
+      "attestation": {
+        "path": "/Users/hxx/Documents/无限画布/.planning/2026-07-17-ai-p0-p10/.attestation",
+        "sizeBytes": 65,
+        "mtimeMs": 1784341230173.0273,
+        "sha256": "16445ad10b1aa5bfb8a361daeb4c3a48b0b110561000888d8c2a052a24e8461d"
+      },
+      "mode": "autonomous gate",
+      "stopBlocks": 0,
+      "currentPhase": "P7",
+      "p7Status": "in_progress"
+    },
+    "after": {
+      "activePlan": {
+        "path": "/Users/hxx/Documents/无限画布/.planning/.active_plan",
+        "sizeBytes": 21,
+        "mtimeMs": 1784220519896.5244,
+        "sha256": "57885a03a7d0ed8efec56a67eca8fb3c199d47036dd380c33a7143bbaed0a13a"
+      },
+      "taskPlan": {
+        "path": "/Users/hxx/Documents/无限画布/.planning/2026-07-17-ai-p0-p10/task_plan.md",
+        "sizeBytes": 21463,
+        "mtimeMs": 1784339773275.729,
+        "sha256": "730a4dbb0d59f0c47818b7ce79986f11456df612a9c0c50c3e5fb67626470b5b"
+      },
+      "attestation": {
+        "path": "/Users/hxx/Documents/无限画布/.planning/2026-07-17-ai-p0-p10/.attestation",
+        "sizeBytes": 65,
+        "mtimeMs": 1784341230173.0273,
+        "sha256": "16445ad10b1aa5bfb8a361daeb4c3a48b0b110561000888d8c2a052a24e8461d"
+      },
+      "mode": "autonomous gate",
+      "stopBlocks": 0,
+      "currentPhase": "P7",
+      "p7Status": "in_progress"
+    },
+    "unchangedDuringValidation": true
+  },
+  "formalProject": {
+    "root": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio",
+    "id": "project-2e3b44bc6ac4",
+    "name": "Codex AI 短剧素材中心",
+    "schemaVersions": {
+      "material": 1,
+      "production": 2,
+      "generation": 1
+    },
+    "p7SchemasInitializedOnlyInTemporaryFixtures": true,
+    "manifest": {
+      "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/managed-project.json",
+      "sizeBytes": 1398,
+      "mtimeMs": 1784319566128.3538,
+      "sha256": "bb50a0b40dee08ecf305055a7db66624751b075f500c3c9451b2b82376fc6735"
+    },
+    "config": {
+      "path": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/project.json",
+      "sizeBytes": 785,
+      "mtimeMs": 1784312990325.3296,
+      "sha256": "a266f16d27241ef05eafad4d78f58e7a4119c09098c4faf0f9dbf12618d5bdeb"
+    },
+    "databases": {
+      "material": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/material-studio.sqlite",
+      "production": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-production.sqlite",
+      "generation": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-generation-ledger.sqlite"
+    },
+    "logicalBefore": {
+      "material": {
+        "databasePath": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/material-studio.sqlite",
+        "integrity": "ok",
+        "schemaSha256": "b022d7ed3a6d0c58114ea5fd9df85b40f19e1689c2884e0692a2dd0c5142d0ec",
+        "tableCounts": {
+          "studio_asset_aliases": 0,
+          "studio_asset_definitions": 0,
+          "studio_asset_relation_heads": 0,
+          "studio_asset_relations": 0,
+          "studio_asset_versions": 0,
+          "studio_authority_events": 0,
+          "studio_canonical_assets": 0,
+          "studio_media": 0,
+          "studio_media_derivatives": 0,
+          "studio_media_imports": 0,
+          "studio_meta": 2,
+          "studio_version_reviews": 0
+        },
+        "metaRowsByTable": {
+          "studio_meta": [
+            {
+              "key": "asset_scope_relation_schema",
+              "value": "2"
+            },
+            {
+              "key": "schema_version",
+              "value": "1"
+            }
+          ]
+        },
+        "digest": "548b81b99f36bedd9ccbdea4e0ea041b12447e49745e6369d84c7790d578ca0b"
+      },
+      "production": {
+        "databasePath": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-production.sqlite",
+        "integrity": "ok",
+        "schemaSha256": "19c1840bf8b0c0a6b17b2576efb1fa008554a14367a5cb190bd32a6f254d7702",
+        "tableCounts": {
+          "studio_production_continuity_evidence": 0,
+          "studio_production_meta": 1,
+          "studio_production_panel_assets": 0,
+          "studio_production_panels": 0,
+          "studio_production_unit_revisions": 0,
+          "studio_production_units": 0,
+          "studio_text_documents": 0,
+          "studio_text_revisions": 0
+        },
+        "metaRowsByTable": {
+          "studio_production_meta": [
+            {
+              "key": "schema_version",
+              "value": "2"
+            }
+          ]
+        },
+        "digest": "3c694231be52e72fa926df05f42e8e428eb4d97b9d548c8d54ec3d24ece98d05"
+      },
+      "generation": {
+        "databasePath": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-generation-ledger.sqlite",
+        "integrity": "ok",
+        "schemaSha256": "b67a6f96d7fb91d81bb818908610c542eadc6196ec9e0da21d6f0fcb84d78da1",
+        "tableCounts": {
+          "studio_generation_ledger_meta": 1,
+          "studio_generation_packs": 0,
+          "studio_generation_results": 0
+        },
+        "metaRowsByTable": {
+          "studio_generation_ledger_meta": [
+            {
+              "key": "schema_version",
+              "value": "1"
+            }
+          ]
+        },
+        "digest": "a0e576e688d98be06173925b27007107a633e96ffbe027756dbe8fb1abb92ce2"
+      }
+    },
+    "logicalAfter": {
+      "material": {
+        "databasePath": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/material-studio.sqlite",
+        "integrity": "ok",
+        "schemaSha256": "b022d7ed3a6d0c58114ea5fd9df85b40f19e1689c2884e0692a2dd0c5142d0ec",
+        "tableCounts": {
+          "studio_asset_aliases": 0,
+          "studio_asset_definitions": 0,
+          "studio_asset_relation_heads": 0,
+          "studio_asset_relations": 0,
+          "studio_asset_versions": 0,
+          "studio_authority_events": 0,
+          "studio_canonical_assets": 0,
+          "studio_media": 0,
+          "studio_media_derivatives": 0,
+          "studio_media_imports": 0,
+          "studio_meta": 2,
+          "studio_version_reviews": 0
+        },
+        "metaRowsByTable": {
+          "studio_meta": [
+            {
+              "key": "asset_scope_relation_schema",
+              "value": "2"
+            },
+            {
+              "key": "schema_version",
+              "value": "1"
+            }
+          ]
+        },
+        "digest": "548b81b99f36bedd9ccbdea4e0ea041b12447e49745e6369d84c7790d578ca0b"
+      },
+      "production": {
+        "databasePath": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-production.sqlite",
+        "integrity": "ok",
+        "schemaSha256": "19c1840bf8b0c0a6b17b2576efb1fa008554a14367a5cb190bd32a6f254d7702",
+        "tableCounts": {
+          "studio_production_continuity_evidence": 0,
+          "studio_production_meta": 1,
+          "studio_production_panel_assets": 0,
+          "studio_production_panels": 0,
+          "studio_production_unit_revisions": 0,
+          "studio_production_units": 0,
+          "studio_text_documents": 0,
+          "studio_text_revisions": 0
+        },
+        "metaRowsByTable": {
+          "studio_production_meta": [
+            {
+              "key": "schema_version",
+              "value": "2"
+            }
+          ]
+        },
+        "digest": "3c694231be52e72fa926df05f42e8e428eb4d97b9d548c8d54ec3d24ece98d05"
+      },
+      "generation": {
+        "databasePath": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio/.aicanvas/studio-generation-ledger.sqlite",
+        "integrity": "ok",
+        "schemaSha256": "b67a6f96d7fb91d81bb818908610c542eadc6196ec9e0da21d6f0fcb84d78da1",
+        "tableCounts": {
+          "studio_generation_ledger_meta": 1,
+          "studio_generation_packs": 0,
+          "studio_generation_results": 0
+        },
+        "metaRowsByTable": {
+          "studio_generation_ledger_meta": [
+            {
+              "key": "schema_version",
+              "value": "1"
+            }
+          ]
+        },
+        "digest": "a0e576e688d98be06173925b27007107a633e96ffbe027756dbe8fb1abb92ce2"
+      }
+    },
+    "emptyBefore": {
+      "businessRows": 0,
+      "materialObjects": 0,
+      "productionObjects": 0,
+      "generationObjects": 0,
+      "derivedFiles": 0
+    },
+    "emptyAfter": {
+      "businessRows": 0,
+      "materialObjects": 0,
+      "productionObjects": 0,
+      "generationObjects": 0,
+      "derivedFiles": 0
+    },
+    "remainsEmpty": true,
+    "treeBefore": {
+      "root": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio",
+      "files": 18,
+      "directories": 43,
+      "bytes": 623824,
+      "entries": [
+        {
+          "relativePath": ".aicanvas",
+          "type": "directory",
+          "sizeBytes": 1088,
+          "mtimeMs": 1784340509476.231
+        },
+        {
+          "relativePath": ".aicanvas/asset-consistency-boards",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.1157
+        },
+        {
+          "relativePath": ".aicanvas/cache.sqlite",
+          "type": "file",
+          "sizeBytes": 49152,
+          "mtimeMs": 1784312990353.4475,
+          "sha256": "5044f916a418fd8e01622c956c47876471a898518b43ce48cc0be30ae16db63c"
+        },
+        {
+          "relativePath": ".aicanvas/cache.sqlite-shm",
+          "type": "file",
+          "sizeBytes": 32768,
+          "mtimeMs": 1784319654035.4685,
+          "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+        },
+        {
+          "relativePath": ".aicanvas/cache.sqlite-wal",
+          "type": "file",
+          "sizeBytes": 0,
+          "mtimeMs": 1784319648418.8691,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "relativePath": ".aicanvas/derived",
+          "type": "directory",
+          "sizeBytes": 160,
+          "mtimeMs": 1784315032222.589
+        },
+        {
+          "relativePath": ".aicanvas/derived/proxy",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784315032222.585
+        },
+        {
+          "relativePath": ".aicanvas/derived/thumb",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784315032222.5544
+        },
+        {
+          "relativePath": ".aicanvas/derived/waveform",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784315032222.535
+        },
+        {
+          "relativePath": ".aicanvas/editor",
+          "type": "directory",
+          "sizeBytes": 384,
+          "mtimeMs": 1784312990282.7446
+        },
+        {
+          "relativePath": ".aicanvas/editor/continuations",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.606
+        },
+        {
+          "relativePath": ".aicanvas/editor/dependencies",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.4902
+        },
+        {
+          "relativePath": ".aicanvas/editor/history",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.6301
+        },
+        {
+          "relativePath": ".aicanvas/editor/nested-cache",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.5566
+        },
+        {
+          "relativePath": ".aicanvas/editor/otio",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.659
+        },
+        {
+          "relativePath": ".aicanvas/editor/outputs",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.5818
+        },
+        {
+          "relativePath": ".aicanvas/editor/previews",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.6907
+        },
+        {
+          "relativePath": ".aicanvas/editor/projects",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.456
+        },
+        {
+          "relativePath": ".aicanvas/editor/proxies",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.7434
+        },
+        {
+          "relativePath": ".aicanvas/editor/render-plans",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.5222
+        },
+        {
+          "relativePath": ".aicanvas/events.jsonl",
+          "type": "file",
+          "sizeBytes": 311,
+          "mtimeMs": 1784312990353.853,
+          "sha256": "cce1a9a471a44408f690b0e1e655b47fe14764db90d1fce94f781bdbb63c3b4e"
+        },
+        {
+          "relativePath": ".aicanvas/generation-downloads",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.0625
+        },
+        {
+          "relativePath": ".aicanvas/generation-requests",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.03
+        },
+        {
+          "relativePath": ".aicanvas/handoffs",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.1956
+        },
+        {
+          "relativePath": ".aicanvas/history",
+          "type": "directory",
+          "sizeBytes": 160,
+          "mtimeMs": 1784312990282.3567
+        },
+        {
+          "relativePath": ".aicanvas/history/documents",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990281.9934
+        },
+        {
+          "relativePath": ".aicanvas/history/skills",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.1675
+        },
+        {
+          "relativePath": ".aicanvas/history/story",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.3496
+        },
+        {
+          "relativePath": ".aicanvas/index.json",
+          "type": "file",
+          "sizeBytes": 2175,
+          "mtimeMs": 1784312990336.426,
+          "sha256": "3ab2d044bee82324dff4cd65a4bc4307389730acbb2b224c680e024753b99f82"
+        },
+        {
+          "relativePath": ".aicanvas/locks",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784319566140.4834
+        },
+        {
+          "relativePath": ".aicanvas/managed-project.json",
+          "type": "file",
+          "sizeBytes": 1398,
+          "mtimeMs": 1784319566128.3538,
+          "sha256": "bb50a0b40dee08ecf305055a7db66624751b075f500c3c9451b2b82376fc6735"
+        },
+        {
+          "relativePath": ".aicanvas/material-studio.sqlite",
+          "type": "file",
+          "sizeBytes": 237568,
+          "mtimeMs": 1784323507284.7761,
+          "sha256": "c40c726d68e03e6bed3d2716c842628a1429f93ec1e94da982bc58e7ae7b7100"
+        },
+        {
+          "relativePath": ".aicanvas/material-studio.sqlite-shm",
+          "type": "file",
+          "sizeBytes": 32768,
+          "mtimeMs": 1784340509472.8752,
+          "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+        },
+        {
+          "relativePath": ".aicanvas/material-studio.sqlite-wal",
+          "type": "file",
+          "sizeBytes": 0,
+          "mtimeMs": 1784340509472.7742,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "relativePath": ".aicanvas/objects",
+          "type": "directory",
+          "sizeBytes": 96,
+          "mtimeMs": 1784315032222.5327
+        },
+        {
+          "relativePath": ".aicanvas/objects/sha256",
+          "type": "directory",
+          "sizeBytes": 96,
+          "mtimeMs": 1784315032222.793
+        },
+        {
+          "relativePath": ".aicanvas/objects/sha256/.tmp",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784315032222.7026
+        },
+        {
+          "relativePath": ".aicanvas/overrides.json",
+          "type": "file",
+          "sizeBytes": 40,
+          "mtimeMs": 1784312990295.4417,
+          "sha256": "288fe394163c569c697bdcdf7350a33fd5e7c540144bcac31f6e0307e612c43d"
+        },
+        {
+          "relativePath": ".aicanvas/project.json",
+          "type": "file",
+          "sizeBytes": 785,
+          "mtimeMs": 1784312990325.3296,
+          "sha256": "a266f16d27241ef05eafad4d78f58e7a4119c09098c4faf0f9dbf12618d5bdeb"
+        },
+        {
+          "relativePath": ".aicanvas/skills",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.1423
+        },
+        {
+          "relativePath": ".aicanvas/story",
+          "type": "directory",
+          "sizeBytes": 160,
+          "mtimeMs": 1784312990282.3076
+        },
+        {
+          "relativePath": ".aicanvas/story/analysis-tasks",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.3062
+        },
+        {
+          "relativePath": ".aicanvas/story/chapters",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.2522
+        },
+        {
+          "relativePath": ".aicanvas/story/sources",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.2803
+        },
+        {
+          "relativePath": ".aicanvas/storyboard-sheets",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.089
+        },
+        {
+          "relativePath": ".aicanvas/studio-generation",
+          "type": "directory",
+          "sizeBytes": 96,
+          "mtimeMs": 1784318126254.5466
+        },
+        {
+          "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+          "type": "file",
+          "sizeBytes": 73728,
+          "mtimeMs": 1784318126260.3171,
+          "sha256": "fd9b1f8ff43defa89093c37784c9bb57d25bb7c30195fc53c7b6563c0db7710d"
+        },
+        {
+          "relativePath": ".aicanvas/studio-generation-ledger.sqlite-shm",
+          "type": "file",
+          "sizeBytes": 32768,
+          "mtimeMs": 1784340509476.3296,
+          "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+        },
+        {
+          "relativePath": ".aicanvas/studio-generation-ledger.sqlite-wal",
+          "type": "file",
+          "sizeBytes": 0,
+          "mtimeMs": 1784340509476.182,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "relativePath": ".aicanvas/studio-generation/objects",
+          "type": "directory",
+          "sizeBytes": 128,
+          "mtimeMs": 1784318126254.6323
+        },
+        {
+          "relativePath": ".aicanvas/studio-generation/objects/.tmp",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784318126254.6296
+        },
+        {
+          "relativePath": ".aicanvas/studio-generation/objects/sha256",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784318126254.5918
+        },
+        {
+          "relativePath": ".aicanvas/studio-production",
+          "type": "directory",
+          "sizeBytes": 96,
+          "mtimeMs": 1784315032262.9697
+        },
+        {
+          "relativePath": ".aicanvas/studio-production.sqlite",
+          "type": "file",
+          "sizeBytes": 126976,
+          "mtimeMs": 1784323116015.688,
+          "sha256": "3fb53c869812b3eeb38407fb39b28eb351bec666ee11fe3fc0067eb7cb2f508b"
+        },
+        {
+          "relativePath": ".aicanvas/studio-production.sqlite-shm",
+          "type": "file",
+          "sizeBytes": 32768,
+          "mtimeMs": 1784340509475.457,
+          "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+        },
+        {
+          "relativePath": ".aicanvas/studio-production.sqlite-wal",
+          "type": "file",
+          "sizeBytes": 0,
+          "mtimeMs": 1784340509475.3804,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "relativePath": ".aicanvas/studio-production/objects",
+          "type": "directory",
+          "sizeBytes": 128,
+          "mtimeMs": 1784315032263.0159
+        },
+        {
+          "relativePath": ".aicanvas/studio-production/objects/.tmp",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784315032263.0017
+        },
+        {
+          "relativePath": ".aicanvas/studio-production/objects/sha256",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784315032263.0144
+        },
+        {
+          "relativePath": ".aicanvas/tasks",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990281.9211
+        },
+        {
+          "relativePath": "00_画布进度.md",
+          "type": "file",
+          "sizeBytes": 619,
+          "mtimeMs": 1784312990344.231,
+          "sha256": "b4fa6e5e135fecfe0d528b3e7b763ed84b7944f3c1d4802230770d0d9e67cc30"
+        }
+      ],
+      "aggregateSha256": "eb0d3612c8b18dd14fe315f3f9400803835f45082ea1c7308dba5e91632dcea6"
+    },
+    "treeAfter": {
+      "root": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio",
+      "files": 18,
+      "directories": 43,
+      "bytes": 623824,
+      "entries": [
+        {
+          "relativePath": ".aicanvas",
+          "type": "directory",
+          "sizeBytes": 1088,
+          "mtimeMs": 1784340509476.231
+        },
+        {
+          "relativePath": ".aicanvas/asset-consistency-boards",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.1157
+        },
+        {
+          "relativePath": ".aicanvas/cache.sqlite",
+          "type": "file",
+          "sizeBytes": 49152,
+          "mtimeMs": 1784312990353.4475,
+          "sha256": "5044f916a418fd8e01622c956c47876471a898518b43ce48cc0be30ae16db63c"
+        },
+        {
+          "relativePath": ".aicanvas/cache.sqlite-shm",
+          "type": "file",
+          "sizeBytes": 32768,
+          "mtimeMs": 1784319654035.4685,
+          "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+        },
+        {
+          "relativePath": ".aicanvas/cache.sqlite-wal",
+          "type": "file",
+          "sizeBytes": 0,
+          "mtimeMs": 1784319648418.8691,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "relativePath": ".aicanvas/derived",
+          "type": "directory",
+          "sizeBytes": 160,
+          "mtimeMs": 1784315032222.589
+        },
+        {
+          "relativePath": ".aicanvas/derived/proxy",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784315032222.585
+        },
+        {
+          "relativePath": ".aicanvas/derived/thumb",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784315032222.5544
+        },
+        {
+          "relativePath": ".aicanvas/derived/waveform",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784315032222.535
+        },
+        {
+          "relativePath": ".aicanvas/editor",
+          "type": "directory",
+          "sizeBytes": 384,
+          "mtimeMs": 1784312990282.7446
+        },
+        {
+          "relativePath": ".aicanvas/editor/continuations",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.606
+        },
+        {
+          "relativePath": ".aicanvas/editor/dependencies",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.4902
+        },
+        {
+          "relativePath": ".aicanvas/editor/history",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.6301
+        },
+        {
+          "relativePath": ".aicanvas/editor/nested-cache",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.5566
+        },
+        {
+          "relativePath": ".aicanvas/editor/otio",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.659
+        },
+        {
+          "relativePath": ".aicanvas/editor/outputs",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.5818
+        },
+        {
+          "relativePath": ".aicanvas/editor/previews",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.6907
+        },
+        {
+          "relativePath": ".aicanvas/editor/projects",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.456
+        },
+        {
+          "relativePath": ".aicanvas/editor/proxies",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.7434
+        },
+        {
+          "relativePath": ".aicanvas/editor/render-plans",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.5222
+        },
+        {
+          "relativePath": ".aicanvas/events.jsonl",
+          "type": "file",
+          "sizeBytes": 311,
+          "mtimeMs": 1784312990353.853,
+          "sha256": "cce1a9a471a44408f690b0e1e655b47fe14764db90d1fce94f781bdbb63c3b4e"
+        },
+        {
+          "relativePath": ".aicanvas/generation-downloads",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.0625
+        },
+        {
+          "relativePath": ".aicanvas/generation-requests",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.03
+        },
+        {
+          "relativePath": ".aicanvas/handoffs",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.1956
+        },
+        {
+          "relativePath": ".aicanvas/history",
+          "type": "directory",
+          "sizeBytes": 160,
+          "mtimeMs": 1784312990282.3567
+        },
+        {
+          "relativePath": ".aicanvas/history/documents",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990281.9934
+        },
+        {
+          "relativePath": ".aicanvas/history/skills",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.1675
+        },
+        {
+          "relativePath": ".aicanvas/history/story",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.3496
+        },
+        {
+          "relativePath": ".aicanvas/index.json",
+          "type": "file",
+          "sizeBytes": 2175,
+          "mtimeMs": 1784312990336.426,
+          "sha256": "3ab2d044bee82324dff4cd65a4bc4307389730acbb2b224c680e024753b99f82"
+        },
+        {
+          "relativePath": ".aicanvas/locks",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784319566140.4834
+        },
+        {
+          "relativePath": ".aicanvas/managed-project.json",
+          "type": "file",
+          "sizeBytes": 1398,
+          "mtimeMs": 1784319566128.3538,
+          "sha256": "bb50a0b40dee08ecf305055a7db66624751b075f500c3c9451b2b82376fc6735"
+        },
+        {
+          "relativePath": ".aicanvas/material-studio.sqlite",
+          "type": "file",
+          "sizeBytes": 237568,
+          "mtimeMs": 1784323507284.7761,
+          "sha256": "c40c726d68e03e6bed3d2716c842628a1429f93ec1e94da982bc58e7ae7b7100"
+        },
+        {
+          "relativePath": ".aicanvas/material-studio.sqlite-shm",
+          "type": "file",
+          "sizeBytes": 32768,
+          "mtimeMs": 1784340509472.8752,
+          "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+        },
+        {
+          "relativePath": ".aicanvas/material-studio.sqlite-wal",
+          "type": "file",
+          "sizeBytes": 0,
+          "mtimeMs": 1784340509472.7742,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "relativePath": ".aicanvas/objects",
+          "type": "directory",
+          "sizeBytes": 96,
+          "mtimeMs": 1784315032222.5327
+        },
+        {
+          "relativePath": ".aicanvas/objects/sha256",
+          "type": "directory",
+          "sizeBytes": 96,
+          "mtimeMs": 1784315032222.793
+        },
+        {
+          "relativePath": ".aicanvas/objects/sha256/.tmp",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784315032222.7026
+        },
+        {
+          "relativePath": ".aicanvas/overrides.json",
+          "type": "file",
+          "sizeBytes": 40,
+          "mtimeMs": 1784312990295.4417,
+          "sha256": "288fe394163c569c697bdcdf7350a33fd5e7c540144bcac31f6e0307e612c43d"
+        },
+        {
+          "relativePath": ".aicanvas/project.json",
+          "type": "file",
+          "sizeBytes": 785,
+          "mtimeMs": 1784312990325.3296,
+          "sha256": "a266f16d27241ef05eafad4d78f58e7a4119c09098c4faf0f9dbf12618d5bdeb"
+        },
+        {
+          "relativePath": ".aicanvas/skills",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.1423
+        },
+        {
+          "relativePath": ".aicanvas/story",
+          "type": "directory",
+          "sizeBytes": 160,
+          "mtimeMs": 1784312990282.3076
+        },
+        {
+          "relativePath": ".aicanvas/story/analysis-tasks",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.3062
+        },
+        {
+          "relativePath": ".aicanvas/story/chapters",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.2522
+        },
+        {
+          "relativePath": ".aicanvas/story/sources",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.2803
+        },
+        {
+          "relativePath": ".aicanvas/storyboard-sheets",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990282.089
+        },
+        {
+          "relativePath": ".aicanvas/studio-generation",
+          "type": "directory",
+          "sizeBytes": 96,
+          "mtimeMs": 1784318126254.5466
+        },
+        {
+          "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+          "type": "file",
+          "sizeBytes": 73728,
+          "mtimeMs": 1784318126260.3171,
+          "sha256": "fd9b1f8ff43defa89093c37784c9bb57d25bb7c30195fc53c7b6563c0db7710d"
+        },
+        {
+          "relativePath": ".aicanvas/studio-generation-ledger.sqlite-shm",
+          "type": "file",
+          "sizeBytes": 32768,
+          "mtimeMs": 1784340509476.3296,
+          "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+        },
+        {
+          "relativePath": ".aicanvas/studio-generation-ledger.sqlite-wal",
+          "type": "file",
+          "sizeBytes": 0,
+          "mtimeMs": 1784340509476.182,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "relativePath": ".aicanvas/studio-generation/objects",
+          "type": "directory",
+          "sizeBytes": 128,
+          "mtimeMs": 1784318126254.6323
+        },
+        {
+          "relativePath": ".aicanvas/studio-generation/objects/.tmp",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784318126254.6296
+        },
+        {
+          "relativePath": ".aicanvas/studio-generation/objects/sha256",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784318126254.5918
+        },
+        {
+          "relativePath": ".aicanvas/studio-production",
+          "type": "directory",
+          "sizeBytes": 96,
+          "mtimeMs": 1784315032262.9697
+        },
+        {
+          "relativePath": ".aicanvas/studio-production.sqlite",
+          "type": "file",
+          "sizeBytes": 126976,
+          "mtimeMs": 1784323116015.688,
+          "sha256": "3fb53c869812b3eeb38407fb39b28eb351bec666ee11fe3fc0067eb7cb2f508b"
+        },
+        {
+          "relativePath": ".aicanvas/studio-production.sqlite-shm",
+          "type": "file",
+          "sizeBytes": 32768,
+          "mtimeMs": 1784340509475.457,
+          "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+        },
+        {
+          "relativePath": ".aicanvas/studio-production.sqlite-wal",
+          "type": "file",
+          "sizeBytes": 0,
+          "mtimeMs": 1784340509475.3804,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "relativePath": ".aicanvas/studio-production/objects",
+          "type": "directory",
+          "sizeBytes": 128,
+          "mtimeMs": 1784315032263.0159
+        },
+        {
+          "relativePath": ".aicanvas/studio-production/objects/.tmp",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784315032263.0017
+        },
+        {
+          "relativePath": ".aicanvas/studio-production/objects/sha256",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784315032263.0144
+        },
+        {
+          "relativePath": ".aicanvas/tasks",
+          "type": "directory",
+          "sizeBytes": 64,
+          "mtimeMs": 1784312990281.9211
+        },
+        {
+          "relativePath": "00_画布进度.md",
+          "type": "file",
+          "sizeBytes": 619,
+          "mtimeMs": 1784312990344.231,
+          "sha256": "b4fa6e5e135fecfe0d528b3e7b763ed84b7944f3c1d4802230770d0d9e67cc30"
+        }
+      ],
+      "aggregateSha256": "eb0d3612c8b18dd14fe315f3f9400803835f45082ea1c7308dba5e91632dcea6"
+    },
+    "unchangedDuringValidation": true
+  },
+  "capabilities": {
+    "continuity": [
+      "fixed-nine-fields",
+      "panel-and-source-shot-half-open-spans",
+      "discontinuous-no-gap-fill",
+      "explicit-unresolved",
+      "append-only-observation-correction",
+      "head-cas",
+      "persistent-conflicts",
+      "operation-receipts"
+    ],
+    "generationV4": [
+      "continuity-snapshot",
+      "identity-and-continuity-reference-limit-six",
+      "explicit-current-pass-previous-raw",
+      "adjacent-panel-proof",
+      "historical-v3-read-only",
+      "real-dispatch-checkpoint-gate"
+    ],
+    "review": [
+      "raw-labeled-pair-identity",
+      "pack-continuity-fingerprint-binding",
+      "stale-historical-only",
+      "no-upstream-mutation",
+      "review-head-cas"
+    ],
+    "checkpoint": [
+      "six-unique-production-slots",
+      "content-addressed-snapshot",
+      "pass-or-rework-attestation",
+      "review-correction-invalidates-old-pass",
+      "seventh-dispatch-zero-write",
+      "durable-refresh-attest-receipts"
+    ],
+    "surfaces": [
+      "core-next-action",
+      "bounded-read-control",
+      "execute-command-only-writes",
+      "mcp-codex-reviewer",
+      "desktop-user-reviewer",
+      "lazy-electron-tab"
+    ]
+  },
+  "testContracts": [
+    {
+      "capability": "fixed-nine-field-continuity-contract",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/src/core/studio-continuity.ts",
+        "sizeBytes": 22961,
+        "mtimeMs": 1784337615328.4038,
+        "sha256": "a10723693bbe97d8900def29c416a7ea081feb2065e54e23d48e0bc6950bb391"
+      },
+      "markers": [
+        "export const STUDIO_CONTINUITY_FIELDS = [",
+        "\"referenceSha256\"",
+        "STUDIO_CONTINUITY_UNIT_DURATION_MILLISECONDS = 15_000",
+        "required-state-gap"
+      ]
+    },
+    {
+      "capability": "continuity-ledger-same-sqlite-append-only",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/src/core/studio-continuity-ledger.ts",
+        "sizeBytes": 67196,
+        "mtimeMs": 1784337459166.062,
+        "sha256": "31d6c6b9a653e7c572354fdc5678ad056c6484cce002d440d49b0c26fbe12866"
+      },
+      "markers": [
+        "const CONTINUITY_SCHEMA_MARKER = \"studio_continuity_schema_version\"",
+        "studio_generation_ledger_meta",
+        "continuity entries are append-only",
+        "continuity receipts are append-only"
+      ]
+    },
+    {
+      "capability": "panel-reference-resolution-v3-continuity-frame",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/src/core/panel-reference-resolution-core.ts",
+        "sizeBytes": 81813,
+        "mtimeMs": 1784338435829.8062,
+        "sha256": "355d905a970394626fabb0c33455ca3af7a4a9850c2844b615c81e8cea0a7a96"
+      },
+      "markers": [
+        "schemaVersion: 3",
+        "\"continuity-frame\"",
+        "entry.kind === \"continuity-frame\" ? \"continuity\"",
+        "overflowControlReferences"
+      ]
+    },
+    {
+      "capability": "generation-v4-continuity-and-previous-raw",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/src/core/studio-generation.ts",
+        "sizeBytes": 100348,
+        "mtimeMs": 1784338875187.9175,
+        "sha256": "54e91e18b201ed1dcef7018a7ceaf13736a9e01ba0eeb9802fae80920608e435"
+      },
+      "markers": [
+        "schemaVersion: 4;",
+        "previousApprovedRawReviewId",
+        "continuityFrame",
+        "previous-panel-not-adjacent",
+        "continuity-not-ready"
+      ]
+    },
+    {
+      "capability": "real-dispatch-checkpoint-gate",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/src/core/studio-generation-ledger.ts",
+        "sizeBytes": 60505,
+        "mtimeMs": 1784339220497.281,
+        "sha256": "2f9764a02b26349a08e1a791867662ea603ff2c842445cf6beebea25072839cb"
+      },
+      "markers": [
+        "await import(\"./studio-generation-checkpoint.js\")",
+        "assertStudioGenerationCheckpointDispatchAllowed",
+        "pack-schema-unsupported"
+      ]
+    },
+    {
+      "capability": "generation-review-pack-continuity-binding",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/src/core/studio-generation-review.ts",
+        "sizeBytes": 37186,
+        "mtimeMs": 1784338728746.489,
+        "sha256": "d583c841ead796fce9598e931f84068b48acaffd04d947e75e0396a4aff269d3"
+      },
+      "markers": [
+        "pack.continuity.fingerprint !== input.continuityFingerprint",
+        "generation review events are append-only",
+        "generation review receipts are append-only"
+      ]
+    },
+    {
+      "capability": "six-image-checkpoint-cas-receipts",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/src/core/studio-generation-checkpoint.ts",
+        "sizeBytes": 64787,
+        "mtimeMs": 1784339505229.4941,
+        "sha256": "dbf4c6b3abd2f8692ffb54a2b438bf17a76e4c6cd7e91c8df3c5c17b292bf842"
+      },
+      "markers": [
+        "studio_generation_checkpoint_snapshots",
+        "studio_generation_checkpoint_attestations",
+        "studio_generation_checkpoint_operation_receipts",
+        "readStudioGenerationCheckpointOperationReceipt",
+        "checkpoint snapshots are append-only"
+      ]
+    },
+    {
+      "capability": "bounded-continuity-review-control",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/src/core/studio-continuity-review-control.ts",
+        "sizeBytes": 21123,
+        "mtimeMs": 1784339991566.325,
+        "sha256": "66d709d691086e605dba7293c74b017be56072e9ad454c18d17489edf97b6f6e"
+      },
+      "markers": [
+        "STUDIO_CONTINUITY_REVIEW_ASSET_LIMIT = 6",
+        "STUDIO_CONTINUITY_REVIEW_TIMELINE_LIMIT = 36",
+        "STUDIO_CONTINUITY_REVIEW_HISTORY_LIMIT = 20",
+        "STUDIO_CONTINUITY_REVIEW_CHECKPOINT_LIMIT = 12",
+        "\"resolve-generation-input\"",
+        "\"freeze-generation-pack\""
+      ]
+    },
+    {
+      "capability": "central-studio-command-routing",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/src/core/command-bus.ts",
+        "sizeBytes": 137623,
+        "mtimeMs": 1784339481043.557,
+        "sha256": "405cd9359d8699fb22b3b26bd7b0b3afd1e54ae621b42bd43a6261fcdb7b4f87"
+      },
+      "markers": [
+        "\"append_studio_continuity_observation\"",
+        "\"append_studio_continuity_correction\"",
+        "\"submit_studio_generation_review\"",
+        "\"refresh_studio_generation_checkpoint\"",
+        "\"attest_studio_generation_checkpoint\"",
+        "withProjectLock(root, \"studio-mutation\""
+      ]
+    },
+    {
+      "capability": "mcp-read-and-execute-only-surface",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/src/mcp/server.ts",
+        "sizeBytes": 300642,
+        "mtimeMs": 1784339863267.7322,
+        "sha256": "4ebdadce4439ccb34cdcf93bd05ba20e0c5a8284584fb2c15f9c22de5762a8ba"
+      },
+      "markers": [
+        "\"get_studio_continuity_review_control\"",
+        "command: z.literal(\"append_studio_continuity_observation\")",
+        "command: z.literal(\"append_studio_continuity_correction\")",
+        "command: z.literal(\"submit_studio_generation_review\")",
+        "command: z.literal(\"refresh_studio_generation_checkpoint\")",
+        "command: z.literal(\"attest_studio_generation_checkpoint\")",
+        "MCP/Codex 的 Studio 裁决 reviewer 必须是 codex"
+      ]
+    },
+    {
+      "capability": "desktop-read-boundary",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/src/main/index.ts",
+        "sizeBytes": 99356,
+        "mtimeMs": 1784339770828.1562,
+        "sha256": "883641932d9f48413bc3c120305da8bd5d4b60f03122aa6c396fe1bfb351fe45"
+      },
+      "markers": [
+        "\"canvas:get-studio-continuity-review-control\"",
+        "桌面 UI 的 Studio 裁决 reviewer 必须是 user"
+      ]
+    },
+    {
+      "capability": "preload-read-boundary",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/src/preload/index.ts",
+        "sizeBytes": 45366,
+        "mtimeMs": 1784339747468.768,
+        "sha256": "7eb0af4a3bd72f08a3f7abb91d17cf4e35ea6c2cc34d303a3416de1362ec01f1"
+      },
+      "markers": [
+        "getStudioContinuityReviewControl",
+        "canvas:get-studio-continuity-review-control"
+      ]
+    },
+    {
+      "capability": "lazy-continuity-review-ui",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/src/renderer/src/components/MaterialStudioView.vue",
+        "sizeBytes": 101906,
+        "mtimeMs": 1784339717639.0854,
+        "sha256": "4dbf87ddd31390ac3bd923174ee62df5935d1110ca47afd6f0873b78801dc20f"
+      },
+      "markers": [
+        "连续性 / Review",
+        "defineAsyncComponent(() => import(\"./StudioContinuityReviewView.vue\"))",
+        "正在按需加载连续性 / Review 控制面"
+      ]
+    },
+    {
+      "capability": "ui-core-next-action-only",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/src/renderer/src/components/StudioContinuityReviewView.vue",
+        "sizeBytes": 26086,
+        "mtimeMs": 1784340104381.3699,
+        "sha256": "7d50cb924b01f3c40b0565766d3589caf520d547e8df28306ac5deedb28f02b8"
+      },
+      "markers": [
+        "data-testid=\"studio-continuity-review-view\"",
+        "连续性 / Review",
+        "nextAction"
+      ]
+    },
+    {
+      "capability": "deterministic-p7-fixture",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/helpers/studio-p7-fixture.ts",
+        "sizeBytes": 30930,
+        "mtimeMs": 1784340985478.2524,
+        "sha256": "50d5de8a110cd581c62d0edb562ef721be614eaaad0be54b5ca9d874089a5cf0"
+      },
+      "markers": [
+        "STUDIO_P7_CONTINUITY_FIELD_NAMES",
+        "seedStudioP7ResolvedContinuity",
+        "visualReviewClaimed: false"
+      ]
+    },
+    {
+      "capability": "real-checkpoint-dispatch-test",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/studio-generation-checkpoint.test.ts",
+        "sizeBytes": 14183,
+        "mtimeMs": 1784339691783.6345,
+        "sha256": "8c56e0c3d319793a3d15a16bccde5f2a2c4c0c285c01b8f85dc14f4465d6d06e"
+      },
+      "markers": [
+        "六槽阻断第七槽，pass 解锁；Review correction 使旧批准派生失效并要求重批准",
+        "readStudioGenerationDispatch",
+        "AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE"
+      ]
+    },
+    {
+      "capability": "compiled-mcp-schema-contract-test",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/tests/mcp-studio-continuity-review.test.ts",
+        "sizeBytes": 12956,
+        "mtimeMs": 1784340063010.475,
+        "sha256": "d388bda416429f206234f35f1f93ca1c9b874b8510645b06ef90b351d6438cde"
+      },
+      "markers": [
+        "只扩展统一 execute_command schema",
+        "AI_CANVAS_TEST_COMPILED_MCP",
+        "operationId|headKey|receiptId|requestFingerprint"
+      ]
+    },
+    {
+      "capability": "immutable-p7-ui-smoke-writer",
+      "file": {
+        "path": "/Users/hxx/Documents/无限画布/scripts/ui-p7-continuity-review-smoke.ts",
+        "sizeBytes": 17027,
+        "mtimeMs": 1784340705684.9338,
+        "sha256": "1783eaec204b5befcbbda097f11a5abaf734cd7bd817d09efd5b2168b303cf2a"
+      },
+      "markers": [
+        "kind: \"p7-continuity-review-ui-smoke\"",
+        "continuityTabNotPreloadedAtStartup: true",
+        "continuityChunkLazyLoaded: true",
+        "formalProjectAccesses: 0",
+        "flag: \"wx\""
+      ]
+    }
+  ],
+  "commandRuns": {
+    "typecheck": {
+      "name": "typecheck",
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-18T02:35:34.364Z",
+      "finishedAt": "2026-07-18T02:35:43.527Z",
+      "durationMs": 9163,
+      "exitCode": 0,
+      "timedOut": false,
+      "outputOverflow": false,
+      "capturedBytes": 114,
+      "maximumCapturedBytes": 4194304,
+      "log": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p7-continuity-review-final-20260718-02/typecheck.log",
+        "sizeBytes": 379,
+        "mtimeMs": 1784342143528.1516,
+        "sha256": "849a26ead8297d2b3f37513ae4912bb998dcf0c3df78c999dc5f444cdf3536b4"
+      }
+    },
+    "targetedCore": {
+      "name": "targeted-core-tests",
+      "argv": [
+        "/Users/hxx/Documents/无限画布/node_modules/.bin/vitest",
+        "run",
+        "tests/studio-continuity-contract.test.ts",
+        "tests/studio-continuity-ledger.test.ts",
+        "tests/panel-reference-resolution-core.test.ts",
+        "tests/studio-generation-continuity-gate.test.ts",
+        "tests/studio-generation.test.ts",
+        "tests/studio-generation-ledger.test.ts",
+        "tests/studio-generation-review.test.ts",
+        "tests/studio-generation-review-stale.test.ts",
+        "tests/studio-continuity-command-bus.test.ts",
+        "tests/mcp-studio-continuity-review.test.ts",
+        "tests/studio-continuity-review-control.test.ts",
+        "tests/mcp-studio-continuity-review-control.test.ts",
+        "tests/studio-continuity-review-ui.test.ts",
+        "tests/studio-continuity-review-desktop-integration.test.ts",
+        "tests/studio-command-routing.test.ts",
+        "--reporter=verbose"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-18T02:35:43.528Z",
+      "finishedAt": "2026-07-18T02:37:11.457Z",
+      "durationMs": 87930,
+      "exitCode": 0,
+      "timedOut": false,
+      "outputOverflow": false,
+      "capturedBytes": 18779,
+      "maximumCapturedBytes": 4194304,
+      "log": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p7-continuity-review-final-20260718-02/targeted-core-tests.log",
+        "sizeBytes": 19792,
+        "mtimeMs": 1784342231457.9763,
+        "sha256": "ba0e086dbc25d8006e2bbedda1a1de51bb23fdbabd0dbdeea78c1aa916beb1c4"
+      },
+      "testSummary": {
+        "filesPassed": 15,
+        "filesFailed": 0,
+        "testsPassed": 80,
+        "testsFailed": 0,
+        "filesSkipped": 0,
+        "testsSkipped": 0,
+        "testsTodo": 0,
+        "filesTotal": 15,
+        "testsTotal": 80
+      }
+    },
+    "checkpoint": {
+      "name": "checkpoint-tests",
+      "argv": [
+        "/Users/hxx/Documents/无限画布/node_modules/.bin/vitest",
+        "run",
+        "tests/studio-generation-checkpoint.test.ts",
+        "--reporter=verbose"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-18T02:37:11.458Z",
+      "finishedAt": "2026-07-18T02:39:06.216Z",
+      "durationMs": 114758,
+      "exitCode": 0,
+      "timedOut": false,
+      "outputOverflow": false,
+      "capturedBytes": 584,
+      "maximumCapturedBytes": 4194304,
+      "log": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p7-continuity-review-final-20260718-02/checkpoint-tests.log",
+        "sizeBytes": 958,
+        "mtimeMs": 1784342346216.788,
+        "sha256": "47a9cbddbd81b02119e5a053a16f15b07dbbf2592751630c7ac6821efd47cae7"
+      },
+      "testSummary": {
+        "filesPassed": 1,
+        "filesFailed": 0,
+        "testsPassed": 1,
+        "testsFailed": 0,
+        "filesSkipped": 0,
+        "testsSkipped": 0,
+        "testsTodo": 0,
+        "filesTotal": 1,
+        "testsTotal": 1
+      }
+    },
+    "full": {
+      "name": "full-tests",
+      "argv": [
+        "npm",
+        "test"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-18T02:39:06.217Z",
+      "finishedAt": "2026-07-18T02:43:51.894Z",
+      "durationMs": 285677,
+      "exitCode": 0,
+      "timedOut": false,
+      "outputOverflow": false,
+      "capturedBytes": 12845,
+      "maximumCapturedBytes": 4194304,
+      "log": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p7-continuity-review-final-20260718-02/full-tests.log",
+        "sizeBytes": 13101,
+        "mtimeMs": 1784342631894.4138,
+        "sha256": "dd6fb4aa3862ab311fad03a8d89e5a12644eb420e2619aaceb1b8d08c7143ced"
+      },
+      "testSummary": {
+        "filesPassed": 101,
+        "filesFailed": 0,
+        "testsPassed": 594,
+        "testsFailed": 0,
+        "filesSkipped": 0,
+        "testsSkipped": 0,
+        "testsTodo": 0,
+        "filesTotal": 101,
+        "testsTotal": 594
+      }
+    },
+    "build": {
+      "name": "production-build",
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-18T02:43:51.894Z",
+      "finishedAt": "2026-07-18T02:44:06.780Z",
+      "durationMs": 14887,
+      "exitCode": 0,
+      "timedOut": false,
+      "outputOverflow": false,
+      "capturedBytes": 7979,
+      "maximumCapturedBytes": 4194304,
+      "log": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p7-continuity-review-final-20260718-02/production-build.log",
+        "sizeBytes": 8241,
+        "mtimeMs": 1784342646780.9434,
+        "sha256": "d0ff18ebf867d81586e0cb732cf68ae417bc542d55f58c1e7323ecbf56ef1b37"
+      }
+    },
+    "buildMcp": {
+      "name": "mcp-build",
+      "argv": [
+        "npm",
+        "run",
+        "build:mcp"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-18T02:44:06.781Z",
+      "finishedAt": "2026-07-18T02:44:09.841Z",
+      "durationMs": 3060,
+      "exitCode": 0,
+      "timedOut": false,
+      "outputOverflow": false,
+      "capturedBytes": 117,
+      "maximumCapturedBytes": 4194304,
+      "log": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p7-continuity-review-final-20260718-02/mcp-build.log",
+        "sizeBytes": 382,
+        "mtimeMs": 1784342649841.6318,
+        "sha256": "5ebe1d0992254040dab732c5142a9a8b6637317d2bc4b234a2270ebca0133e5b"
+      }
+    },
+    "compiledMcp": {
+      "name": "compiled-mcp",
+      "argv": [
+        "/Users/hxx/Documents/无限画布/node_modules/.bin/tsx",
+        "scripts/mcp-smoke.ts",
+        "dist-mcp/mcp/server.js"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-18T02:44:09.850Z",
+      "finishedAt": "2026-07-18T02:44:10.273Z",
+      "durationMs": 424,
+      "exitCode": 0,
+      "timedOut": false,
+      "outputOverflow": false,
+      "capturedBytes": 11715,
+      "maximumCapturedBytes": 4194304,
+      "log": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p7-continuity-review-final-20260718-02/compiled-mcp.log",
+        "sizeBytes": 12064,
+        "mtimeMs": 1784342650273.8838,
+        "sha256": "e3646520424af8729cb98bef9be5c92b49ded220e27a66a314e35a1d5a8ae901"
+      }
+    },
+    "compiledMcpSchema": {
+      "name": "compiled-mcp-p7-schema",
+      "argv": [
+        "/Users/hxx/.nvm/versions/node/v22.22.2/bin/node",
+        "/Users/hxx/Documents/无限画布/docs/evidence/runs/p7-continuity-review-final-20260718-02/compiled-mcp-p7-schema-probe.mjs",
+        "/Users/hxx/Documents/无限画布/dist-mcp/mcp/server.js"
+      ],
+      "cwd": "/Users/hxx/Documents/无限画布",
+      "startedAt": "2026-07-18T02:44:10.275Z",
+      "finishedAt": "2026-07-18T02:44:10.601Z",
+      "durationMs": 326,
+      "exitCode": 0,
+      "timedOut": false,
+      "outputOverflow": false,
+      "capturedBytes": 566,
+      "maximumCapturedBytes": 4194304,
+      "log": {
+        "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p7-continuity-review-final-20260718-02/compiled-mcp-p7-schema.log",
+        "sizeBytes": 1043,
+        "mtimeMs": 1784342650601.5828,
+        "sha256": "787aa1c7428c3534cc72d11750964827eb7adb962d2a5297ca14476c3437aa5b"
+      }
+    }
+  },
+  "testDiscovery": {
+    "include": "tests/**/*.test.ts",
+    "discoveredFiles": 101,
+    "files": [
+      "tests/adaptation.test.ts",
+      "tests/advanced.test.ts",
+      "tests/asset-registry.test.ts",
+      "tests/asset-review.test.ts",
+      "tests/cache.test.ts",
+      "tests/canonical-assets.test.ts",
+      "tests/canvas-state.test.ts",
+      "tests/codex-generation-pack.test.ts",
+      "tests/codex.test.ts",
+      "tests/comfyui-local.test.ts",
+      "tests/command-bus.test.ts",
+      "tests/continuation.test.ts",
+      "tests/continuity-timeline.test.ts",
+      "tests/editor-effect-transition.test.ts",
+      "tests/editor-nested-continuation.test.ts",
+      "tests/editor-nested.test.ts",
+      "tests/editor.test.ts",
+      "tests/existing-production-recovery.test.ts",
+      "tests/formal-drama.test.ts",
+      "tests/full-workflow.test.ts",
+      "tests/fusion-asset-consistency.test.ts",
+      "tests/fusion-package.test.ts",
+      "tests/fusion-production.test.ts",
+      "tests/fusion-storyboard-grid.test.ts",
+      "tests/fusion-storyboard-sheet-migration.test.ts",
+      "tests/fusion-storyboard-sheet-store.test.ts",
+      "tests/fusion-storyboard-sheet.test.ts",
+      "tests/fusion-visual-constraints.test.ts",
+      "tests/fusion-visual-generation.test.ts",
+      "tests/fusion-visual-review.test.ts",
+      "tests/http-submission-reconciliation.test.ts",
+      "tests/importer.test.ts",
+      "tests/isolated-package-guards.test.ts",
+      "tests/keyframe-curve.test.ts",
+      "tests/locks.test.ts",
+      "tests/managed-project-create-ui.test.ts",
+      "tests/managed-project-service.test.ts",
+      "tests/managed-project.test.ts",
+      "tests/material-studio-identity.test.ts",
+      "tests/material-studio-pagination.test.ts",
+      "tests/material-studio.test.ts",
+      "tests/mcp-canonical-assets.test.ts",
+      "tests/mcp-editor-effect-transition.test.ts",
+      "tests/mcp-editor-nested.test.ts",
+      "tests/mcp-empty-project-workflow.test.ts",
+      "tests/mcp-fusion-production.test.ts",
+      "tests/mcp-generation-observation.test.ts",
+      "tests/mcp-headless-workflow.test.ts",
+      "tests/mcp-managed-studio.test.ts",
+      "tests/mcp-scan-cancel.test.ts",
+      "tests/mcp-studio-binding-control.test.ts",
+      "tests/mcp-studio-continuity-review-control.test.ts",
+      "tests/mcp-studio-continuity-review.test.ts",
+      "tests/mcp.test.ts",
+      "tests/media-runtime.test.ts",
+      "tests/novel-analysis-provider.test.ts",
+      "tests/novel-analysis-run.test.ts",
+      "tests/p5-canonical-migration-reconcile.test.ts",
+      "tests/panel-reference-resolution-core.test.ts",
+      "tests/production.test.ts",
+      "tests/publication.test.ts",
+      "tests/reviews.test.ts",
+      "tests/scanner-fusion-batch.test.ts",
+      "tests/scanner.test.ts",
+      "tests/service.test.ts",
+      "tests/sidecar.test.ts",
+      "tests/story.test.ts",
+      "tests/studio-asset-bindings.test.ts",
+      "tests/studio-asset-knowledge.test.ts",
+      "tests/studio-binding-atomic-receipts.test.ts",
+      "tests/studio-binding-command-bus.test.ts",
+      "tests/studio-binding-control.test.ts",
+      "tests/studio-binding-desktop-integration.test.ts",
+      "tests/studio-binding-retrieval-benchmark.test.ts",
+      "tests/studio-binding-workbench.test.ts",
+      "tests/studio-command-bus.test.ts",
+      "tests/studio-command-envelope.test.ts",
+      "tests/studio-command-routing.test.ts",
+      "tests/studio-confirmed-empty.test.ts",
+      "tests/studio-continuity-command-bus.test.ts",
+      "tests/studio-continuity-contract.test.ts",
+      "tests/studio-continuity-ledger.test.ts",
+      "tests/studio-continuity-review-control.test.ts",
+      "tests/studio-continuity-review-desktop-integration.test.ts",
+      "tests/studio-continuity-review-ui.test.ts",
+      "tests/studio-generation-checkpoint.test.ts",
+      "tests/studio-generation-continuity-gate.test.ts",
+      "tests/studio-generation-ledger.test.ts",
+      "tests/studio-generation-review-stale.test.ts",
+      "tests/studio-generation-review.test.ts",
+      "tests/studio-generation.test.ts",
+      "tests/studio-identity-lexical-index.test.ts",
+      "tests/studio-media-derivatives.test.ts",
+      "tests/studio-media-protocol.test.ts",
+      "tests/studio-panel-source-spans.test.ts",
+      "tests/studio-production.test.ts",
+      "tests/studio-script-section-command-bus.test.ts",
+      "tests/studio-script-section-recovery.test.ts",
+      "tests/timeline-interaction.test.ts",
+      "tests/timeline-preview.test.ts",
+      "tests/timeline.test.ts"
+    ],
+    "targetedCoreFiles": [
+      "tests/studio-continuity-contract.test.ts",
+      "tests/studio-continuity-ledger.test.ts",
+      "tests/panel-reference-resolution-core.test.ts",
+      "tests/studio-generation-continuity-gate.test.ts",
+      "tests/studio-generation.test.ts",
+      "tests/studio-generation-ledger.test.ts",
+      "tests/studio-generation-review.test.ts",
+      "tests/studio-generation-review-stale.test.ts",
+      "tests/studio-continuity-command-bus.test.ts",
+      "tests/mcp-studio-continuity-review.test.ts",
+      "tests/studio-continuity-review-control.test.ts",
+      "tests/mcp-studio-continuity-review-control.test.ts",
+      "tests/studio-continuity-review-ui.test.ts",
+      "tests/studio-continuity-review-desktop-integration.test.ts",
+      "tests/studio-command-routing.test.ts"
+    ],
+    "checkpointFiles": [
+      "tests/studio-generation-checkpoint.test.ts"
+    ],
+    "targetedCombined": {
+      "filesPassed": 16,
+      "filesFailed": 0,
+      "testsPassed": 81,
+      "testsFailed": 0,
+      "filesSkipped": 0,
+      "testsSkipped": 0,
+      "testsTodo": 0,
+      "filesTotal": 16,
+      "testsTotal": 81
+    },
+    "minimumThresholds": {
+      "targetedCoreFiles": 15,
+      "targetedCoreTests": 80,
+      "checkpointFiles": 1,
+      "checkpointTests": 1,
+      "targetedTotalFiles": 16,
+      "targetedTotalTests": 81,
+      "fullFiles": 101,
+      "fullTests": 594
+    },
+    "checkpointRunSeparatelyToAvoidParallelFixtureFlake": true,
+    "noFailuresNoSkipsNoTodoRequired": true,
+    "countsAreParsedFromVitestOutput": true,
+    "hardCodedObservedCountIsOnlyMinimum": true
+  },
+  "specializedRuntimeMarkers": {
+    "occurrences": {
+      "P7_DETERMINISTIC_FIXTURE_CONTRACT": 1,
+      "P7_DISCONTINUOUS_SPAN_GAPS": 1,
+      "P7_REVIEW_APPEND_ONLY_CAS": 1,
+      "P7_REVIEW_STALE_HISTORICAL_ONLY": 1,
+      "P7_REVIEW_CAS_RECOVERY_CURSOR": 1
+    },
+    "fixture": {
+      "temporaryOnly": true,
+      "sourceRootsEmpty": true,
+      "units": 2,
+      "panels": 8,
+      "sixPanelDurationsMilliseconds": [
+        2500,
+        2500,
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "canonicalAssets": 3,
+      "bindingSets": 8,
+      "rawLabeledPairs": 8,
+      "visualReviewClaimed": false
+    },
+    "discontinuousSpans": {
+      "fields": [
+        "costume",
+        "injury",
+        "heldObject",
+        "position",
+        "facing",
+        "emotion",
+        "layout",
+        "lighting",
+        "referenceSha256"
+      ],
+      "fieldCount": 9,
+      "halfOpen": true,
+      "explicitSpanCount": 2,
+      "gapAtMilliseconds": 3000,
+      "gapFilled": false,
+      "gapBlockers": [
+        [
+          2500,
+          5000
+        ],
+        [
+          7500,
+          15000
+        ]
+      ],
+      "panelMinimum": 2,
+      "panelMaximum": 6,
+      "unitDurationMilliseconds": 15000
+    },
+    "reviewAppendOnly": {
+      "history": 2,
+      "upstreamMutationCount": 0
+    },
+    "reviewStale": {
+      "drifted": [
+        "script",
+        "binding-set",
+        "authority"
+      ],
+      "historyCount": 2,
+      "headRevision": 1,
+      "staleAdvancedHead": false,
+      "upstreamMutationByReview": false
+    },
+    "reviewCasRecovery": {
+      "concurrentFulfilled": 1,
+      "concurrentRejected": 1,
+      "historyAfterOperationConflict": 2,
+      "restoredHeadRevision": 2,
+      "crossRunCursorRejected": true,
+      "upstreamMutationByReview": false
+    },
+    "verboseContracts": [
+      "保留 source-shot 离散半开区间与真实空档，readiness 不填洞且阻断 unresolved",
+      "提供 operation idempotency、同键异载荷拒绝与 head CAS，失败时不遗留半事务 receipt",
+      "持久化重叠异值 conflict，不做 last-write-wins，并由 correction 显式解决",
+      "上一格已验收 raw 作为 continuity-frame 进入同一闭包，但不重复计算 identity 覆盖",
+      "九字段缺失时失败关闭；显式 seeding 后只渲染 ledger resolved/not-applicable，不采信 legacy continuityState",
+      "previous raw 只在显式 current pass Review 且同集紧邻时注入，跨单元边界也可机械证明",
+      "schema v3 pack 仅历史读取；dispatch/register/promotion 均失败且不改写旧 CAS",
+      "预检读取后 script/BindingSet/Authority 漂移时，correction 只追加历史且不移动 Head",
+      "同 Head 并发 correction 仅一个成功，同 operationId 异载荷零写，重启可恢复且 cursor 不串 run",
+      "Observation 与 Correction 使用 request hash 回执、同键回放并拒绝异载荷和私有字段",
+      "Generation Review 支持 user 写面、同键回放，并在崩溃后只凭 Review operation receipt 对账",
+      "只扩展统一 execute_command schema，Codex Review reviewer 固定且真实写入走中心分类器",
+      "在 /tmp fixture 上显示九字段缺口，显式 seed 后变为 ready 且时间线只返回请求页",
+      "纯分页器面对万项投影也只返回受控窗口，不把大列表传给 UI/MCP",
+      "只新增严格只读命名工具，限制六资产与所有列表页，不新增命名写工具",
+      "组件惰性读取并直接渲染 Core nextAction，不在前端维护第二套业务状态",
+      "素材中心第三个 tab 才惰性加载控制面，默认仍停留素材库"
+    ],
+    "checkpointVerboseContracts": [
+      "六槽阻断第七槽，pass 解锁；Review correction 使旧批准派生失效并要求重批准"
+    ]
+  },
+  "temporaryFixtureProof": {
+    "rootPolicy": "/tmp only",
+    "sourceRootsEmpty": true,
+    "deterministicFixture": {
+      "temporaryOnly": true,
+      "sourceRootsEmpty": true,
+      "units": 2,
+      "panels": 8,
+      "sixPanelDurationsMilliseconds": [
+        2500,
+        2500,
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "canonicalAssets": 3,
+      "bindingSets": 8,
+      "rawLabeledPairs": 8,
+      "visualReviewClaimed": false
+    },
+    "discontinuousSpansAndGaps": {
+      "fields": [
+        "costume",
+        "injury",
+        "heldObject",
+        "position",
+        "facing",
+        "emotion",
+        "layout",
+        "lighting",
+        "referenceSha256"
+      ],
+      "fieldCount": 9,
+      "halfOpen": true,
+      "explicitSpanCount": 2,
+      "gapAtMilliseconds": 3000,
+      "gapFilled": false,
+      "gapBlockers": [
+        [
+          2500,
+          5000
+        ],
+        [
+          7500,
+          15000
+        ]
+      ],
+      "panelMinimum": 2,
+      "panelMaximum": 6,
+      "unitDurationMilliseconds": 15000
+    },
+    "reviewAppendOnlyCas": {
+      "history": 2,
+      "upstreamMutationCount": 0
+    },
+    "staleHistoricalOnly": {
+      "drifted": [
+        "script",
+        "binding-set",
+        "authority"
+      ],
+      "historyCount": 2,
+      "headRevision": 1,
+      "staleAdvancedHead": false,
+      "upstreamMutationByReview": false
+    },
+    "reviewCasRecovery": {
+      "concurrentFulfilled": 1,
+      "concurrentRejected": 1,
+      "historyAfterOperationConflict": 2,
+      "restoredHeadRevision": 2,
+      "crossRunCursorRejected": true,
+      "upstreamMutationByReview": false
+    },
+    "checkpointRealDispatchAndDurableReceipt": [
+      "六槽阻断第七槽，pass 解锁；Review correction 使旧批准派生失效并要求重批准"
+    ],
+    "businessLogicReimplementedByValidator": false
+  },
+  "electronUi": {
+    "explicitlyProvidedByCli": true,
+    "selectedSequence": 1,
+    "latestEvidenceVerified": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p7-continuity-review-ui-smoke-20260718-01.json",
+      "sizeBytes": 2715,
+      "mtimeMs": 1784340725782.0063,
+      "sha256": "bd439f88230ba053773b4622bcc4bf0ca0a16b0bd25be21fe387aa955c0ae79f"
+    },
+    "candidatePaths": [
+      "/Users/hxx/Documents/无限画布/docs/evidence/p7-continuity-review-ui-smoke-20260718-01.json"
+    ],
+    "screenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/p7-continuity-review-ui-smoke-20260718-01.png",
+      "sizeBytes": 252559,
+      "mtimeMs": 1784340725574.093,
+      "sha256": "57db49646f3caccfbed28964df9bb1fe2eefc28b91b5dd1a93401fc41ff73532"
+    },
+    "screenshotInspection": {
+      "width": 3456,
+      "height": 2058,
+      "format": "png",
+      "stdev": 16.51249947075094
+    },
+    "uiInputs": {
+      "files": 115,
+      "latestMtimeMs": 1784340705684.9338,
+      "aggregateSha256": "63924e90ed5e8864ee806b425a810c397a2a40e677eb43676064860b2d4db456"
+    },
+    "smoke": {
+      "continuityTabNotPreloadedAtStartup": true,
+      "continuityChunkLazyLoaded": true,
+      "unresolvedBeforeSeed": {
+        "assetCount": 3,
+        "readyCount": 0,
+        "fieldCount": 27,
+        "missingFieldCount": 27,
+        "generationStatus": "blocked",
+        "nextActionCode": "record-continuity-state",
+        "nextActionLabel": "补齐连续性状态"
+      },
+      "readyAfterSeed": {
+        "assetCount": 3,
+        "readyCount": 3,
+        "fieldCount": 27,
+        "resolvedFieldCount": 27,
+        "generationStatus": "ready",
+        "nextActionCode": "freeze-generation-pack",
+        "nextActionLabel": "冻结当前宫格生成包",
+        "nextActionReason": "九字段连续性已就绪，且不存在未通过的六图停检。",
+        "nextActionCommand": "freeze_studio_generation_pack"
+      },
+      "reviewControlVisible": true,
+      "checkpointControlVisible": true,
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "rendererCrashes": 0,
+      "externalRequests": 0,
+      "formalProjectAccesses": 0
+    }
+  },
+  "compiledMcp": {
+    "toolCount": 181,
+    "requiredTools": [
+      "get_studio_binding_control",
+      "get_studio_generation_control",
+      "get_studio_continuity_review_control",
+      "execute_command"
+    ],
+    "forbiddenNamedWriteTools": [
+      "append_studio_continuity_observation",
+      "append_studio_continuity_correction",
+      "submit_studio_generation_review",
+      "refresh_studio_generation_checkpoint",
+      "attest_studio_generation_checkpoint"
+    ],
+    "requiredCommandMarkers": [
+      "get_studio_continuity_review_control",
+      "append_studio_continuity_observation",
+      "append_studio_continuity_correction",
+      "submit_studio_generation_review",
+      "refresh_studio_generation_checkpoint",
+      "attest_studio_generation_checkpoint",
+      "MCP/Codex 的 Studio 裁决 reviewer 必须是 codex"
+    ],
+    "schemaProbeScript": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p7-continuity-review-final-20260718-02/compiled-mcp-p7-schema-probe.mjs",
+      "sizeBytes": 7398,
+      "mtimeMs": 1784342650275.1257,
+      "sha256": "f6ff07140e09fadc4a12a89016851bbefe04121afeb9ef1dc16b40dd532c5e62"
+    },
+    "schemaProbe": {
+      "status": "pass",
+      "serverPath": "/Users/hxx/Documents/无限画布/dist-mcp/mcp/server.js",
+      "toolCount": 181,
+      "uniqueToolCount": 181,
+      "readTool": "get_studio_continuity_review_control",
+      "readLimits": {
+        "assets": 6,
+        "timeline": 36,
+        "conflicts": 36,
+        "reviews": 20,
+        "checkpoints": 12
+      },
+      "executeCommands": [
+        "append_studio_continuity_observation",
+        "append_studio_continuity_correction",
+        "submit_studio_generation_review",
+        "refresh_studio_generation_checkpoint",
+        "attest_studio_generation_checkpoint"
+      ],
+      "namedWriteTools": [],
+      "privateFieldsExposed": false,
+      "reviewerBoundary": "codex",
+      "stderrBytes": 169
+    },
+    "coreContracts": [
+      {
+        "file": {
+          "path": "/Users/hxx/Documents/无限画布/dist-mcp/core/studio-continuity.js",
+          "sizeBytes": 17811,
+          "mtimeMs": 1784342649517.0107,
+          "sha256": "b2b0c876cb1e026f4f4b62fe85f4b4df1e6260f9fb049e60364219cc9fc3dc6b"
+        },
+        "markers": [
+          "studio-continuity-entry",
+          "referenceSha256",
+          "required-state-gap"
+        ]
+      },
+      {
+        "file": {
+          "path": "/Users/hxx/Documents/无限画布/dist-mcp/core/studio-continuity-ledger.js",
+          "sizeBytes": 59982,
+          "mtimeMs": 1784342649524.6382,
+          "sha256": "5efeb8758e1e327918072b107a9c79cfd02ab1754df4ae3fb911fc7d06d92248"
+        },
+        "markers": [
+          "continuity entries are append-only",
+          "studio_continuity_operation_receipts"
+        ]
+      },
+      {
+        "file": {
+          "path": "/Users/hxx/Documents/无限画布/dist-mcp/core/panel-reference-resolution-core.js",
+          "sizeBytes": 73566,
+          "mtimeMs": 1784342649514.1372,
+          "sha256": "3d9322fababb89b9b70035fe0fc1f6df6f43339a068cf14fa1463b85dcc8a939"
+        },
+        "markers": [
+          "panel-reference-resolution-core-v3",
+          "continuity-frame",
+          "overflowControlReferences"
+        ]
+      },
+      {
+        "file": {
+          "path": "/Users/hxx/Documents/无限画布/dist-mcp/core/studio-generation.js",
+          "sizeBytes": 84149,
+          "mtimeMs": 1784342649538.7551,
+          "sha256": "901fb08f74b2cc3135741c76ccec33cd658864d9f676e65dd486e821be04a94c"
+        },
+        "markers": [
+          "previousApprovedRawReviewId",
+          "continuityFrame",
+          "continuity-not-ready"
+        ]
+      },
+      {
+        "file": {
+          "path": "/Users/hxx/Documents/无限画布/dist-mcp/core/studio-generation-ledger.js",
+          "sizeBytes": 53305,
+          "mtimeMs": 1784342649551.9536,
+          "sha256": "daf7819751856f2663eebeb83e78ae39179955339b2d52e913c3efb97dcd98d6"
+        },
+        "markers": [
+          "assertStudioGenerationCheckpointDispatchAllowed",
+          "pack-schema-unsupported"
+        ]
+      },
+      {
+        "file": {
+          "path": "/Users/hxx/Documents/无限画布/dist-mcp/core/studio-generation-review.js",
+          "sizeBytes": 32418,
+          "mtimeMs": 1784342649528.5002,
+          "sha256": "eedfb953273ec3bbb783cfb892f3a216d16e2e7bbac042e0f91336de4a391646"
+        },
+        "markers": [
+          "generation review events are append-only",
+          "必须与该结果对所属冻结包的真实连续性快照一致"
+        ]
+      },
+      {
+        "file": {
+          "path": "/Users/hxx/Documents/无限画布/dist-mcp/core/studio-generation-checkpoint.js",
+          "sizeBytes": 56052,
+          "mtimeMs": 1784342649545.9568,
+          "sha256": "d196960aab2e7cf2d66d08243dad154e971c37b8bd4d2f7d83017079f797eefe"
+        },
+        "markers": [
+          "generation checkpoint snapshots are append-only",
+          "studio_generation_checkpoint_operation_receipts"
+        ]
+      },
+      {
+        "file": {
+          "path": "/Users/hxx/Documents/无限画布/dist-mcp/core/studio-continuity-review-control.js",
+          "sizeBytes": 16274,
+          "mtimeMs": 1784342649767.0166,
+          "sha256": "15d32788d858edfa6dd84ad21ea0cd50e9e5a4841cbde8ee5e7c097cad506324"
+        },
+        "markers": [
+          "resolve-generation-input",
+          "freeze-generation-pack"
+        ]
+      }
+    ],
+    "server": {
+      "path": "/Users/hxx/Documents/无限画布/dist-mcp/mcp/server.js",
+      "sizeBytes": 305709,
+      "mtimeMs": 1784342649816.0483,
+      "sha256": "9a82c78727dbcb4258dabad5bdfc87fbdb26ce9cdb7e5799625357ba96d8b168"
+    },
+    "isolatedRegistryPath": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p7-continuity-review-final-20260718-02/compiled-mcp-isolated-registry.json"
+  },
+  "source": {
+    "before": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "after": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "unchanged": true
+  },
+  "buildIdentity": {
+    "workspaceSourceBefore": {
+      "files": 325,
+      "aggregateSha256": "f6de46cad0890449dae8dee89fe5d4cdd694b777fe229c8295ba127f67d63453"
+    },
+    "workspaceSourceAfter": {
+      "files": 325,
+      "aggregateSha256": "f6de46cad0890449dae8dee89fe5d4cdd694b777fe229c8295ba127f67d63453"
+    },
+    "unchanged": true,
+    "packageLock": {
+      "path": "/Users/hxx/Documents/无限画布/package-lock.json",
+      "sizeBytes": 361999,
+      "mtimeMs": 1783922925278.7944,
+      "sha256": "04d8601d35063b44810d2b6d921f408de399ee4ccce45eaf62b71f757a007269"
+    },
+    "compiled": {
+      "files": [
+        {
+          "relativePath": "dist-mcp/core/acceptance.js",
+          "sizeBytes": 3289,
+          "sha256": "1f94e5e632de056bfed7d15a1f7538afa8d53f5227ad0a2a79e58940cb934875"
+        },
+        {
+          "relativePath": "dist-mcp/core/adaptation.js",
+          "sizeBytes": 48099,
+          "sha256": "334d0c8b27b755c5b5dccfd2d673097669677e407c64b2fd348244cd49a1c127"
+        },
+        {
+          "relativePath": "dist-mcp/core/asset-registry.js",
+          "sizeBytes": 12301,
+          "sha256": "9657eb423c3a57947d98d37f778eb4044d7a997eb42a515d04651f2029ed1231"
+        },
+        {
+          "relativePath": "dist-mcp/core/cache.js",
+          "sizeBytes": 4755,
+          "sha256": "23ae112e13f755bfd82e6da5cf321e691a43e88b05fd392fc81de72c874df1bc"
+        },
+        {
+          "relativePath": "dist-mcp/core/canonical-assets.js",
+          "sizeBytes": 106687,
+          "sha256": "7763d7536d085aafe8d4e3271beede96f4152fe26985047291d53c84f71fb7ab"
+        },
+        {
+          "relativePath": "dist-mcp/core/canvas-state.js",
+          "sizeBytes": 12734,
+          "sha256": "9fbd8066fff260249399ed7cf013d73ed275e22003bb2696864e6a9431a26a1a"
+        },
+        {
+          "relativePath": "dist-mcp/core/codex-generation-pack.js",
+          "sizeBytes": 33711,
+          "sha256": "0522d24269e523906c64734a1505d6c79a6a962eeb17e2a8d90973da2738f0b9"
+        },
+        {
+          "relativePath": "dist-mcp/core/codex.js",
+          "sizeBytes": 133313,
+          "sha256": "2adfae6f25a1f0e1fae7fed8f8dd99a8b3a6166784aa04b1af0cba0bb104698f"
+        },
+        {
+          "relativePath": "dist-mcp/core/command-bus.js",
+          "sizeBytes": 125500,
+          "sha256": "d676a4a5d9d2db0d0455451ce516f1dd85cae8ce0c2626ad8ea39c2d1e694842"
+        },
+        {
+          "relativePath": "dist-mcp/core/command-outcome.js",
+          "sizeBytes": 3679,
+          "sha256": "0b04924095c45b99203c428153c701dadc5530487c1ca84e113b4ba7ba3a9e8a"
+        },
+        {
+          "relativePath": "dist-mcp/core/constants.js",
+          "sizeBytes": 1613,
+          "sha256": "c9d381586ee7074a7f346e53beb317859a461cbe85f07d96b528124b32bf2501"
+        },
+        {
+          "relativePath": "dist-mcp/core/continuity.js",
+          "sizeBytes": 7566,
+          "sha256": "d65877918a8601466a5f645a5f81b1fd767d611a6ef9a44443b8997c582cfb4a"
+        },
+        {
+          "relativePath": "dist-mcp/core/documents.js",
+          "sizeBytes": 6657,
+          "sha256": "046e800f3a7b1ddb539226242fdab33a7fbf4fd04a0a1c1a491d886723c2ef7a"
+        },
+        {
+          "relativePath": "dist-mcp/core/editor.js",
+          "sizeBytes": 234580,
+          "sha256": "0d062fa8655b323677c2fdcc0b45ae29f20fed83582830c730ac947a61f8c756"
+        },
+        {
+          "relativePath": "dist-mcp/core/formal-drama.js",
+          "sizeBytes": 21314,
+          "sha256": "bffc18ed51be38a30874966ba84f839dea73f747754be7575fd53216dc76540a"
+        },
+        {
+          "relativePath": "dist-mcp/core/fusion-asset-consistency.js",
+          "sizeBytes": 48791,
+          "sha256": "6a5ca7d242f70e13ec3feb2c0735eb5a35e8efb6f74547d089523e650b3a7dc7"
+        },
+        {
+          "relativePath": "dist-mcp/core/fusion-package.js",
+          "sizeBytes": 32687,
+          "sha256": "075328cf8d4133a50002c519b6906a954eaf7a7ea3628f14c6ba3d56f38ac310"
+        },
+        {
+          "relativePath": "dist-mcp/core/fusion-panel-references.js",
+          "sizeBytes": 90392,
+          "sha256": "0e5d46beb6717b5bb752b4f55ba86665a28a6ab9629d2d9d3f4124ea31414c08"
+        },
+        {
+          "relativePath": "dist-mcp/core/fusion-production.js",
+          "sizeBytes": 33142,
+          "sha256": "8588162626a844105e713be1b13c46168e8ccb87c0da5e3d725b7d384efce2f4"
+        },
+        {
+          "relativePath": "dist-mcp/core/fusion-references.js",
+          "sizeBytes": 23842,
+          "sha256": "91957d3238a77a3c17c3f59c3295514672830c63da32925cbae85a8427c1239c"
+        },
+        {
+          "relativePath": "dist-mcp/core/fusion-storyboard-evidence.js",
+          "sizeBytes": 49844,
+          "sha256": "a5825b604a6643f829493c8838c93857392dde31548ec143838d4ab2b2f3257e"
+        },
+        {
+          "relativePath": "dist-mcp/core/fusion-storyboard-grid.js",
+          "sizeBytes": 38989,
+          "sha256": "333fac0f5d0bec2f04ef1412c00ea49212d6922c5baec496f2fcb2d4db2b1b62"
+        },
+        {
+          "relativePath": "dist-mcp/core/fusion-storyboard-migration.js",
+          "sizeBytes": 9468,
+          "sha256": "e8874f34288b21e74e70dca4ddb79457437e8df75ff0521f676ef57d7ca1e193"
+        },
+        {
+          "relativePath": "dist-mcp/core/fusion-storyboard-production.js",
+          "sizeBytes": 30873,
+          "sha256": "ad72a289826d13ee7a13e374fe3a3696c037ac1b691c18831a43e9664973ad02"
+        },
+        {
+          "relativePath": "dist-mcp/core/fusion-storyboard-sheet-evidence.js",
+          "sizeBytes": 23611,
+          "sha256": "6afc93be3f4e516d27b4bff7b74cf2e1b7b2ac12bed36b3f262788a3292c964a"
+        },
+        {
+          "relativePath": "dist-mcp/core/fusion-storyboard-sheet-migration.js",
+          "sizeBytes": 18491,
+          "sha256": "d72257e016349cca4af954303ed1fb3bb6b7f0b586e4a34ed1474771b41f2a1b"
+        },
+        {
+          "relativePath": "dist-mcp/core/fusion-storyboard-sheet-store.js",
+          "sizeBytes": 43372,
+          "sha256": "667631dafc97410735b6a173b876929213596c752c320ad59c8f4b5140a81e72"
+        },
+        {
+          "relativePath": "dist-mcp/core/fusion-storyboard-sheet.js",
+          "sizeBytes": 42721,
+          "sha256": "1601938cc356e5636d14d0d45c08a636259e1379aed6a60c5d7eb8914c99c38e"
+        },
+        {
+          "relativePath": "dist-mcp/core/fusion-visual-constraint-store.js",
+          "sizeBytes": 20616,
+          "sha256": "f902bf74f4f6500a92cb18bca4d99f3f536cb3b947cc8485822a50ac2fc0e4a5"
+        },
+        {
+          "relativePath": "dist-mcp/core/fusion-visual-constraints.js",
+          "sizeBytes": 60217,
+          "sha256": "9f0884bec9ddadfac6be900fdcd9d76fcd65227f4a965bf04b005337c4150055"
+        },
+        {
+          "relativePath": "dist-mcp/core/generation.js",
+          "sizeBytes": 353722,
+          "sha256": "b5f7654766af8b7a8c836a8599c8caf8db007671587606702a0ea76df85b46e1"
+        },
+        {
+          "relativePath": "dist-mcp/core/importer.js",
+          "sizeBytes": 14069,
+          "sha256": "9abc2cf86c8cfd05596e7afcf89ac0413bc766fcff8d66c7a09729a54d45005d"
+        },
+        {
+          "relativePath": "dist-mcp/core/keyframe-curve.js",
+          "sizeBytes": 29504,
+          "sha256": "e7458aa169a3d9050e2ba776ac11c6f72c2eef0bd05c31abed57bcf5cb6bdafc"
+        },
+        {
+          "relativePath": "dist-mcp/core/locks.js",
+          "sizeBytes": 6839,
+          "sha256": "63df41528b9bae01ae066e4ba760008ea167666dbcb5b80d46b6ce18c9c878e9"
+        },
+        {
+          "relativePath": "dist-mcp/core/managed-project.js",
+          "sizeBytes": 27620,
+          "sha256": "5544d732d57b2f14f7db1d6e152be5b15a1dac2aa05f18ef34d206d672850641"
+        },
+        {
+          "relativePath": "dist-mcp/core/material-studio.js",
+          "sizeBytes": 124583,
+          "sha256": "1f43d5c13cee54054b0fe321abb7f6bffddb1b48e18668a2b3571ed76fd7a3c4"
+        },
+        {
+          "relativePath": "dist-mcp/core/media-runtime.js",
+          "sizeBytes": 22312,
+          "sha256": "afaae3f408bf094b5ee5208d90041aba7f83922b545e136b6f7558da0676ed34"
+        },
+        {
+          "relativePath": "dist-mcp/core/memory.js",
+          "sizeBytes": 18929,
+          "sha256": "90c9291e2ce72a948597aa756c2d7118c234205803a5fe7f6c2bba3994a2d5b9"
+        },
+        {
+          "relativePath": "dist-mcp/core/novel-analysis-provider.js",
+          "sizeBytes": 32715,
+          "sha256": "3dadee09d15315702273c33b316b103705752c217b364469975d01ee58ed5daa"
+        },
+        {
+          "relativePath": "dist-mcp/core/novel-analysis.js",
+          "sizeBytes": 38337,
+          "sha256": "31dbcc12302505f6b7e8c7c1b073725bcf383d76301a99097d642c949bbb73f5"
+        },
+        {
+          "relativePath": "dist-mcp/core/operation-context.js",
+          "sizeBytes": 311,
+          "sha256": "79c10edb8178049a8c1d64abf6c5d96b60bd02ebf31cf8f87d0646de73ea8dd0"
+        },
+        {
+          "relativePath": "dist-mcp/core/panel-reference-resolution-core.js",
+          "sizeBytes": 73566,
+          "sha256": "3d9322fababb89b9b70035fe0fc1f6df6f43339a068cf14fa1463b85dcc8a939"
+        },
+        {
+          "relativePath": "dist-mcp/core/production.js",
+          "sizeBytes": 79514,
+          "sha256": "714e51a1b0df8aa08932acc0a0133d34abdc08236fe61e7567d4ed0eefa07731"
+        },
+        {
+          "relativePath": "dist-mcp/core/publication.js",
+          "sizeBytes": 82253,
+          "sha256": "7ce59500510e2eb4f8ffabd71412097c9e10be6d17d114b2fceab4f824e0b709"
+        },
+        {
+          "relativePath": "dist-mcp/core/review-evidence.js",
+          "sizeBytes": 6814,
+          "sha256": "756715fadb48d5a40afbfda1e9b3394e6a8dac05dcfeddcabde1e99674f1f94f"
+        },
+        {
+          "relativePath": "dist-mcp/core/reviews.js",
+          "sizeBytes": 35452,
+          "sha256": "1d6de27fe5cb4d0d39d5bd4f3aa573f635eddadbec9004a8ddf563086b5d6587"
+        },
+        {
+          "relativePath": "dist-mcp/core/scanner.js",
+          "sizeBytes": 86257,
+          "sha256": "97dc6730f62059135ba181e021142132e6a600f51747d42f3c532dffe101559f"
+        },
+        {
+          "relativePath": "dist-mcp/core/service.js",
+          "sizeBytes": 59659,
+          "sha256": "86add985e02bf1dd3832d2d06f7cbc1a5ae623d0425c35410fc313bec352ba2e"
+        },
+        {
+          "relativePath": "dist-mcp/core/sidecar.js",
+          "sizeBytes": 22999,
+          "sha256": "54de8eab5114365b54e1f7ab0eb6efae7ab5c7c7883161b3283959569f74ee66"
+        },
+        {
+          "relativePath": "dist-mcp/core/skills.js",
+          "sizeBytes": 9894,
+          "sha256": "f01fb6101db1455cd7289003b220222ac5d09b1eed9d019feb77fcee157c79e5"
+        },
+        {
+          "relativePath": "dist-mcp/core/story.js",
+          "sizeBytes": 23003,
+          "sha256": "205d21492045bfe90f3da769fdb577fbba43009f212f52df1c2e7dea673c7dc3"
+        },
+        {
+          "relativePath": "dist-mcp/core/studio-binding-control.js",
+          "sizeBytes": 57962,
+          "sha256": "52956845ddc720aac85888dce16b8117f0cad31b490157e252a2af09a59cd7fa"
+        },
+        {
+          "relativePath": "dist-mcp/core/studio-continuity-ledger.js",
+          "sizeBytes": 59982,
+          "sha256": "5efeb8758e1e327918072b107a9c79cfd02ab1754df4ae3fb911fc7d06d92248"
+        },
+        {
+          "relativePath": "dist-mcp/core/studio-continuity-review-control.js",
+          "sizeBytes": 16274,
+          "sha256": "15d32788d858edfa6dd84ad21ea0cd50e9e5a4841cbde8ee5e7c097cad506324"
+        },
+        {
+          "relativePath": "dist-mcp/core/studio-continuity.js",
+          "sizeBytes": 17811,
+          "sha256": "b2b0c876cb1e026f4f4b62fe85f4b4df1e6260f9fb049e60364219cc9fc3dc6b"
+        },
+        {
+          "relativePath": "dist-mcp/core/studio-generation-checkpoint.js",
+          "sizeBytes": 56052,
+          "sha256": "d196960aab2e7cf2d66d08243dad154e971c37b8bd4d2f7d83017079f797eefe"
+        },
+        {
+          "relativePath": "dist-mcp/core/studio-generation-ledger.js",
+          "sizeBytes": 53305,
+          "sha256": "daf7819751856f2663eebeb83e78ae39179955339b2d52e913c3efb97dcd98d6"
+        },
+        {
+          "relativePath": "dist-mcp/core/studio-generation-review.js",
+          "sizeBytes": 32418,
+          "sha256": "eedfb953273ec3bbb783cfb892f3a216d16e2e7bbac042e0f91336de4a391646"
+        },
+        {
+          "relativePath": "dist-mcp/core/studio-generation.js",
+          "sizeBytes": 84149,
+          "sha256": "901fb08f74b2cc3135741c76ccec33cd658864d9f676e65dd486e821be04a94c"
+        },
+        {
+          "relativePath": "dist-mcp/core/studio-identity-lexical-index.js",
+          "sizeBytes": 7197,
+          "sha256": "5f8a9e46d8bcc36f0e7c6dd9ddd60041bbb12da8a1c6be60dd9b4661a9a357a7"
+        },
+        {
+          "relativePath": "dist-mcp/core/studio-media-derivatives.js",
+          "sizeBytes": 33804,
+          "sha256": "4e295174c925a704f6f0937850e22226ad263905fbc070a98c3cb06b4e0e2130"
+        },
+        {
+          "relativePath": "dist-mcp/core/studio-media-protocol.js",
+          "sizeBytes": 40398,
+          "sha256": "4b9f30b15a7cd48342e00ba077a60260713c220fad19e0ee48da0238969e58e6"
+        },
+        {
+          "relativePath": "dist-mcp/core/studio-production.js",
+          "sizeBytes": 202571,
+          "sha256": "510be2c7c192bd0db10e509258f3b5308c959c676a1092d5f9a5f0fccbd96fa4"
+        },
+        {
+          "relativePath": "dist-mcp/core/timeline.js",
+          "sizeBytes": 5819,
+          "sha256": "2fc90385888bed2be6c8b98d14b7cb4791459c7c4e2da97619386a52c33510ff"
+        },
+        {
+          "relativePath": "dist-mcp/core/types.js",
+          "sizeBytes": 1201,
+          "sha256": "2251ef46f122c5d88b6b70ed5f4e06b897ab79234dbd33c84cd805b6178706a6"
+        },
+        {
+          "relativePath": "dist-mcp/mcp/server.js",
+          "sizeBytes": 305709,
+          "sha256": "9a82c78727dbcb4258dabad5bdfc87fbdb26ce9cdb7e5799625357ba96d8b168"
+        },
+        {
+          "relativePath": "out/main/index.js",
+          "sizeBytes": 2702011,
+          "sha256": "fb8742e5a27c75dd8131ba247fd782ccf696621e865eeb0a586d4df56437a74b"
+        },
+        {
+          "relativePath": "out/preload/index.mjs",
+          "sizeBytes": 24423,
+          "sha256": "ed9703350c64d8b142116818b0575f1383a9fa5cef5e38e717f04fa03726f212"
+        },
+        {
+          "relativePath": "out/renderer/assets/index-C2wZwe00.js",
+          "sizeBytes": 1660734,
+          "sha256": "a70e63493d92569c0d4b90701d0d5ac0d421da82988dccee0baf807cbeafe270"
+        },
+        {
+          "relativePath": "out/renderer/assets/index-RoJ0SJd5.css",
+          "sizeBytes": 263476,
+          "sha256": "36992f135a9287cd24e44150a1eab6fd1b28cbccf8cc11a1c65427f5e0ad4975"
+        },
+        {
+          "relativePath": "out/renderer/assets/StudioBindingWorkbench-Cb_MT7m0.css",
+          "sizeBytes": 16894,
+          "sha256": "0004ccd058edd8738001ead3a25a535dee7e0edc6b8fcb919c16c497fee9949c"
+        },
+        {
+          "relativePath": "out/renderer/assets/StudioBindingWorkbench-Cj9Isj70.js",
+          "sizeBytes": 59003,
+          "sha256": "11621af2a91737a2d4b9cfd0c4216b686b78c2dcd2d99999b07fde146750b646"
+        },
+        {
+          "relativePath": "out/renderer/assets/StudioContinuityReviewView-BFfkhpvF.js",
+          "sizeBytes": 33218,
+          "sha256": "bdfc3ae4f1e2615df0073cfdf7c61023039bab195a5b51386989b65ed21617c7"
+        },
+        {
+          "relativePath": "out/renderer/assets/StudioContinuityReviewView-IWU9Jioc.css",
+          "sizeBytes": 10524,
+          "sha256": "e67f1d66f9fd10f05f38699caf9515279cb2a73bc0831126c3729030bd334d01"
+        },
+        {
+          "relativePath": "out/renderer/index.html",
+          "sizeBytes": 727,
+          "sha256": "a5cecb1819f18a21352b6d5ebd343150c1c62ee5cd94f029deb982d66d46e3e3"
+        }
+      ],
+      "aggregateSha256": "d3f1bf0ba7271622ae7de1fccb96d30648d90dcc29ec3bc9bc7772e36e667162"
+    }
+  },
+  "boundedLogs": {
+    "maximumCapturedBytesPerCommand": 4194304,
+    "overflowFailsValidation": true,
+    "commandLogsAreImmutable": true
+  },
+  "immutableRunRoot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p7-continuity-review-final-20260718-02",
+    "snapshot": {
+      "root": "/Users/hxx/Documents/无限画布/docs/evidence/runs/p7-continuity-review-final-20260718-02",
+      "files": 9,
+      "directories": 0,
+      "bytes": 63358,
+      "entries": [
+        {
+          "relativePath": "checkpoint-tests.log",
+          "type": "file",
+          "sizeBytes": 958,
+          "mtimeMs": 1784342346216.788,
+          "sha256": "47a9cbddbd81b02119e5a053a16f15b07dbbf2592751630c7ac6821efd47cae7"
+        },
+        {
+          "relativePath": "compiled-mcp-p7-schema-probe.mjs",
+          "type": "file",
+          "sizeBytes": 7398,
+          "mtimeMs": 1784342650275.1257,
+          "sha256": "f6ff07140e09fadc4a12a89016851bbefe04121afeb9ef1dc16b40dd532c5e62"
+        },
+        {
+          "relativePath": "compiled-mcp-p7-schema.log",
+          "type": "file",
+          "sizeBytes": 1043,
+          "mtimeMs": 1784342650601.5828,
+          "sha256": "787aa1c7428c3534cc72d11750964827eb7adb962d2a5297ca14476c3437aa5b"
+        },
+        {
+          "relativePath": "compiled-mcp.log",
+          "type": "file",
+          "sizeBytes": 12064,
+          "mtimeMs": 1784342650273.8838,
+          "sha256": "e3646520424af8729cb98bef9be5c92b49ded220e27a66a314e35a1d5a8ae901"
+        },
+        {
+          "relativePath": "full-tests.log",
+          "type": "file",
+          "sizeBytes": 13101,
+          "mtimeMs": 1784342631894.4138,
+          "sha256": "dd6fb4aa3862ab311fad03a8d89e5a12644eb420e2619aaceb1b8d08c7143ced"
+        },
+        {
+          "relativePath": "mcp-build.log",
+          "type": "file",
+          "sizeBytes": 382,
+          "mtimeMs": 1784342649841.6318,
+          "sha256": "5ebe1d0992254040dab732c5142a9a8b6637317d2bc4b234a2270ebca0133e5b"
+        },
+        {
+          "relativePath": "production-build.log",
+          "type": "file",
+          "sizeBytes": 8241,
+          "mtimeMs": 1784342646780.9434,
+          "sha256": "d0ff18ebf867d81586e0cb732cf68ae417bc542d55f58c1e7323ecbf56ef1b37"
+        },
+        {
+          "relativePath": "targeted-core-tests.log",
+          "type": "file",
+          "sizeBytes": 19792,
+          "mtimeMs": 1784342231457.9763,
+          "sha256": "ba0e086dbc25d8006e2bbedda1a1de51bb23fdbabd0dbdeea78c1aa916beb1c4"
+        },
+        {
+          "relativePath": "typecheck.log",
+          "type": "file",
+          "sizeBytes": 379,
+          "mtimeMs": 1784342143528.1516,
+          "sha256": "849a26ead8297d2b3f37513ae4912bb998dcf0c3df78c999dc5f444cdf3536b4"
+        }
+      ],
+      "aggregateSha256": "eff4f6fe3d1730a954d7936791b25cec0b7358fb7a1b0710a116bf26c2eac0ce"
+    },
+    "exclusiveRunRootCreation": true,
+    "validatorOwnedArtifactsUseExclusiveWx": true,
+    "noFurtherRunRootWritesAfterSnapshot": true
+  },
+  "boundaries": {
+    "formalProjectAccessesByUi": 0,
+    "formalProjectWrites": 0,
+    "formalSourceWrites": 0,
+    "formalImagesCreated": 0,
+    "formalVideosCreated": 0,
+    "formalAudioCreated": 0,
+    "externalGenerationCalls": 0,
+    "imagegenCalls": 0,
+    "browserCalls": 0,
+    "uploads": 0,
+    "gitOperations": 0
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "kind": "w4-script-library-search-build-identity",
+  "projectRoot": "/Users/hxx/Documents/无限画布/projects/grok-mvp-qingdeng-mrwc97mu-d0aea463",
+  "search": {
+    "query": "青灯",
+    "hitCount": 3,
+    "documentCount": 3,
+    "sample": [
+      {
+        "id": "script-qingdeng-mvp-mrwca9md",
+        "title": "青灯客·最小15秒"
+      },
+      {
+        "id": "script-qingdeng-mvp-mrwcatrx",
+        "title": "青灯客·最小15秒"
+      },
+      {
+        "id": "text-ab4ff263-6466-46ef-82e1-fbfbcba4a446",
+        "title": "w1-smoke-script"
+      }
+    ]
+  },
+  "libraryIndexCount": 3,
+  "items": [
+    {
+      "id": "script-qingdeng-mvp-mrwca9md",
+      "title": "青灯客·最小15秒"
+    },
+    {
+      "id": "script-qingdeng-mvp-mrwcatrx",
+      "title": "青灯客·最小15秒"
+    },
+    {
+      "id": "text-ab4ff263-6466-46ef-82e1-fbfbcba4a446",
+      "title": "w1-smoke-script"
+    }
+  ],
+  "buildIdentity": {
+    "buildId": "e9f0c41cc29bfa7e2617db6dfdfdde51",
+    "packageVersion": "0.2.0",
+    "sourceDigest": "f764cb0e261e18c8",
+    "builtAt": "2026-07-25T08:58:46.245Z",
+    "hasFingerprint": true
+  },
+  "decoration": {
+    "note": "剧本库装饰/搜索：SSL library-index + search 已验收；不新建平行 UI",
+    "pass": true
+  },
+  "installFingerprint": {
+    "buildId": "e9f0c41cc29bfa7e2617db6dfdfdde51",
+    "hasFingerprint": true,
+    "pass": true
+  },
+  "pass": true,
+  "createdAt": "2026-07-25T08:58:46.389Z"
+}

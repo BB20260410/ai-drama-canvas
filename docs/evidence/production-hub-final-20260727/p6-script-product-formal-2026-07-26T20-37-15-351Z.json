@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "kind": "p6-script-product-formal-electron-smoke",
+  "createdAt": "2026-07-26T20:37:24.492Z",
+  "projectId": "project-b3e5fa60bbcd",
+  "projectRoot": "/Users/hxx/Documents/无限画布/projects/local-import-dudu-world-prologue-b8bfcf14",
+  "detectedEpisode": {
+    "season": "WORLD",
+    "episode": "PROLOGUE"
+  },
+  "libraryDocuments": 1,
+  "diagnosticsText": "CURRENT SCRIPT\nPROLOGUE · 来源分镜剧本\n当前修订\nr1\n正文字符\n4025\n大纲节点\n12\n本集单元\n3\n提示词 / QC 诊断\n\n正文 CAS：e572f35a6878…\n\n已识别 Markdown 场景/章节导航。\n\nearliest 下一步：unit-local-86a821eb5ff4d804635f4207073c85b31abc87cf；已 formal 1/3\n\n向导提示词只有显式物化后才写入 prompt owner；只读建议不会建立正式单元。\n\n打开阅读器",
+  "selectedRange": {
+    "start": 0,
+    "end": 262,
+    "bodyLength": 4025
+  },
+  "wizardPanelCount": 4,
+  "materializeEnabled": true,
+  "materializeClicked": false,
+  "alignSummary": "单元 3\n有图 1\n部分 0\n缺图 2\nearliest 下一步：unit-local-86a821eb5ff4d804635f4207073c85b31abc87cf；已 formal 1/3",
+  "targetUnitId": "unit-local-e61b4628ca1abe8d8752c50d304fdb6e77847b16",
+  "previewSourceProtocol": "aicanvas-studio:",
+  "bindingPointThrough": {
+    "opened": true,
+    "visibleUnitEntries": 3,
+    "visiblePanelEntries": 4
+  },
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalResources": [],
+  "screenshots": {
+    "library": {
+      "path": "output/playwright/p6-script-product-library-2026-07-26T20-37-15-351Z.png",
+      "sha256": "e33459a3df41a8a546d4a68bfa7b31b86173e4a6b0abbdb95cb4138e5d717da7",
+      "sizeBytes": 114875,
+      "width": 1728,
+      "height": 1029,
+      "maxChannelStandardDeviation": 22.829502088590683
+    },
+    "wizard": {
+      "path": "output/playwright/p6-script-product-wizard-2026-07-26T20-37-15-351Z.png",
+      "sha256": "160829266291fb5f5f16cd712b8d238f91079f94363a00e791ac28c71a10e000",
+      "sizeBytes": 178886,
+      "width": 1728,
+      "height": 1029,
+      "maxChannelStandardDeviation": 51.276299234158536
+    },
+    "align": {
+      "path": "output/playwright/p6-script-product-align-2026-07-26T20-37-15-351Z.png",
+      "sha256": "07389647aa70608d4368b0072925015d6d9c67103c8a0c04c62f01d0693fbf00",
+      "sizeBytes": 219701,
+      "width": 1728,
+      "height": 1029,
+      "maxChannelStandardDeviation": 68.73275832455079
+    }
+  },
+  "formalProjectWriteCount": 0,
+  "externalUploadCount": 0,
+  "imageGenerationCount": 0,
+  "paidActionCount": 0
+}

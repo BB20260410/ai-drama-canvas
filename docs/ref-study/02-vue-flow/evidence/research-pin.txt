@@ -1,0 +1,7 @@
+clone_path=/Users/hxx/Documents/_ref-study/vue-flow-17953c329db2d5dc5f5097370cbf5e1173bab520
+sha=17953c329db2d5dc5f5097370cbf5e1173bab520
+license=MIT
+core_pkg_version=1.48.2
+minimap_pkg_version=1.5.4
+our_core=1.48.2
+our_minimap=null

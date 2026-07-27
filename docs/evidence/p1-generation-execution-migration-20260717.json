@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "kind": "p1-generation-execution-migration",
+  "createdAt": "2026-07-16T23:56:53.078Z",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "jobId": "gen-2026-07-16T12-10-57-215Z-892023c0",
+  "backupRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p1-generation-execution-20260717-before-migration",
+  "backupManifest": [
+    {
+      "sourcePath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-jobs.json",
+      "backupPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p1-generation-execution-20260717-before-migration/generation-jobs.json",
+      "bytes": 332482,
+      "sha256": "b958c3f54195cb709816fc11f33fe0fb8a597389c9a922f8ff6581b42264c12c"
+    },
+    {
+      "sourcePath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/publications.json",
+      "backupPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p1-generation-execution-20260717-before-migration/publications.json",
+      "bytes": 82270,
+      "sha256": "eadc1faa75bde0ff88b9142805290ca832d3a286a7f4f3573bb1a1169a0a843e"
+    },
+    {
+      "sourcePath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/events.jsonl",
+      "backupPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p1-generation-execution-20260717-before-migration/events.jsonl",
+      "bytes": 233858,
+      "sha256": "a42e5b6f40028b544399e046555efb2c7d9f69f2b7f1500a7c62c70675e8ee6c"
+    },
+    {
+      "sourcePath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/command-ledger.json",
+      "backupPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p1-generation-execution-20260717-before-migration/command-ledger.json",
+      "bytes": 262786,
+      "sha256": "875bc6e94b62a35012477c4a6b8a4d4099a8559905cf711da8d1580d02c4f113"
+    },
+    {
+      "sourcePath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/index.json",
+      "backupPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p1-generation-execution-20260717-before-migration/index.json",
+      "bytes": 21857599,
+      "sha256": "e3b22e7934a583a8e1929b136590061ecd4a0bb2edf78dcea06616831caead68"
+    },
+    {
+      "sourcePath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/overrides.json",
+      "backupPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p1-generation-execution-20260717-before-migration/overrides.json",
+      "bytes": 9233,
+      "sha256": "0155f1731175ce5a7fdabf279d6493b535c521596d849c5221a8041609f2f31d"
+    },
+    {
+      "sourcePath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-requests/gen-2026-07-16T12-10-57-215Z-892023c0.subagent-imagegen.json",
+      "backupPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/backups/p1-generation-execution-20260717-before-migration/generation-requests/gen-2026-07-16T12-10-57-215Z-892023c0.subagent-imagegen.json",
+      "bytes": 6138,
+      "sha256": "a97b612017f0752960a4478be450792688e24dd9449bce59b1a4bb3b60a5548c"
+    }
+  ],
+  "command": {
+    "requestId": "p1-migrate-generation-execution-892023c0-request-v1",
+    "idempotencyKey": "p1-migrate-generation-execution-892023c0-v1",
+    "status": "succeeded",
+    "requestHash": "cbcb297e4167898a2df2931138b9584b4c8f228edb6e2cb3ddc2eaf2ed35d259",
+    "resultDigest": "d6809accb2273be977e0adb6c3f8127579baedc6a0d666bf01103b888dac8b60",
+    "replayed": false
+  },
+  "before": {
+    "generationJobs": {
+      "bytes": 332482,
+      "sha256": "b958c3f54195cb709816fc11f33fe0fb8a597389c9a922f8ff6581b42264c12c",
+      "count": 30
+    },
+    "publications": {
+      "bytes": 82270,
+      "sha256": "eadc1faa75bde0ff88b9142805290ca832d3a286a7f4f3573bb1a1169a0a843e",
+      "intents": 30,
+      "receipts": 26
+    },
+    "events": {
+      "bytes": 233858,
+      "sha256": "a42e5b6f40028b544399e046555efb2c7d9f69f2b7f1500a7c62c70675e8ee6c",
+      "count": 467
+    },
+    "commandLedger": {
+      "bytes": 262786,
+      "sha256": "875bc6e94b62a35012477c4a6b8a4d4099a8559905cf711da8d1580d02c4f113"
+    },
+    "job": {
+      "id": "gen-2026-07-16T12-10-57-215Z-892023c0",
+      "status": "waiting_external",
+      "attempts": 1,
+      "checkpointRevision": 2,
+      "checkpointStage": "leased",
+      "leaseId": "subagent-lease-109aae14dd1db8b32dba07be",
+      "agentTaskName": "/root/generate_ep01_008_p05_892023c0",
+      "publicationIntentId": "publication-472b11c0-0821-4ed1-8051-32d8f046f565",
+      "expectedOutputPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格05_中间帧_892023c0_raw.png",
+      "expectedCompanionPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格05_中间帧_892023c0_labeled.png"
+    },
+    "downloads": [],
+    "source": {
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    }
+  },
+  "after": {
+    "generationJobs": {
+      "bytes": 333529,
+      "sha256": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182",
+      "count": 30
+    },
+    "publications": {
+      "bytes": 84340,
+      "sha256": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238",
+      "intents": 31,
+      "receipts": 26
+    },
+    "events": {
+      "bytes": 237055,
+      "sha256": "2484eb55c306ee7f8b15464e99bc9021d0ae7da4016858a46a80d8f5871b19e4",
+      "count": 472,
+      "addedTypes": [
+        "command.started",
+        "publication.bundle-extended",
+        "generation.subagent-execution-migrated-unknown",
+        "command.side-effect-committed",
+        "command.executed"
+      ]
+    },
+    "commandLedger": {
+      "bytes": 277586,
+      "sha256": "8a774e773a5c3436ea84737f9d29b34cf4914a27282b1c9a6d0206cd53b933bc"
+    },
+    "job": {
+      "id": "gen-2026-07-16T12-10-57-215Z-892023c0",
+      "status": "generation_unknown",
+      "attempts": 1,
+      "checkpointSchemaVersion": 2,
+      "checkpointRevision": 3,
+      "checkpointStage": "generation_unknown",
+      "unknownCode": "legacy_leased_without_call_receipt",
+      "leaseId": "subagent-lease-109aae14dd1db8b32dba07be",
+      "publicationBundleId": "generation-bundle-gen-2026-07-16T12-10-57-215Z-892023c0",
+      "publicationIntentId": "publication-472b11c0-0821-4ed1-8051-32d8f046f565",
+      "companionPublicationIntentId": "publication-de235c33-2161-4b87-8abd-8bac235e9241",
+      "rawPublicationStatus": "reserved",
+      "companionPublicationStatus": "reserved",
+      "expectedOutputPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格05_中间帧_892023c0_raw.png",
+      "expectedCompanionPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格05_中间帧_892023c0_labeled.png"
+    },
+    "downloads": [],
+    "source": {
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "supplierCallEvents": 0
+  },
+  "assertions": {
+    "sameGenerationJobCount": true,
+    "sameJobId": true,
+    "sameAttempt": true,
+    "legacyLeasePreserved": true,
+    "statusGenerationUnknown": true,
+    "noCallIntentOrReceiptFabricated": true,
+    "rawLabeledBundleReserved": true,
+    "noPublicationReceiptAdded": true,
+    "noFormalOutput": true,
+    "noCandidateAdopted": true,
+    "noSupplierCall": true,
+    "sourceUnchanged": true
+  }
+}

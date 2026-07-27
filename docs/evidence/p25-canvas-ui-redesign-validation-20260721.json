@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "kind": "p25-canvas-ui-redesign-validation",
+  "title": "P25 受管画布 UI/交互优化 · 最终验证",
+  "createdAt": "2026-07-20T19:52:00.000Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "scope": "受管 Studio 画布（ManagedStudioCanvasView.vue + ManagedStudioCanvasNode.vue + managed-canvas-theme.ts）减法改造与两轮独立审查修复；旧画布零改动；仅表现/交互层，业务逻辑/IPC/数据格式未动（P0/P1 修复均带全链测试）。",
+  "design": {
+    "inventory": "docs/evidence/p25-canvas-ui-inventory-20260721.md（全量按钮/入口/面板盘点 + 保留/收纳/合并/移除对照表 + testid 与文本定位锁定清单）",
+    "plan": ".planning/P25_画布UI优化设计.md（问题清单/主题 token 体系/布局改造/可嵌入性/实施记录/后续登记）"
+  },
+  "buildIdentity": {
+    "sourceDigest": "249fcd3887c978944a79ad2c7f9ebb29ec968097c5714ad7027a11591f4a65cb",
+    "sourceFiles": 505,
+    "sourceBytes": 11207398,
+    "buildId": "2011eb7455821541daf1463e0b87b1a5",
+    "mcpToolCount": 186,
+    "baseline": "P19–P24 终态 07287c72（502/11,165,692）→ P25 改造与审查修复后 249fcd38（505/11,207,398）"
+  },
+  "delivered": {
+    "themeSystem": "managed-canvas-theme.ts：浅色（默认）/深色/米色三皮肤，localStorage 键 managed-canvas-theme 配置切换；22×--msc-* token×3 皮肤 + 8 组 kind 色 ×3；Vue Flow Controls/MiniMap 经 scoped :deep 覆写（styles.css 零改动）；组件内无存储字面量（合同红线）",
+    "subtraction": "头部 slim 去双头（eyebrow/工程名归壳）；底栏 12+ 件重构为 撤销/重做/适配 + 情境组 + 「视图」菜单（小地图/工作流切换/刷新/主题三选一；toggle-edges 与清空因 p15 smoke 直点例外常驻）；按钮去边框化；字号下限 9→11px；两 style 块合并",
+    "jargon": "黑话清洗 13 处：原始图/标注图、参考图已锁定、第 N 版、已交给后台生成 等",
+    "embeddability": "props/emits 零变化、无 provide/inject、样式全 scoped——随时可嵌入 App.vue 替换旧画布"
+  },
+  "reviewFixes": {
+    "P0": "extension 格 freeze 落账必炸（assertRequestIntegrity 与 P20 禁 spans 矛盾）→ 按 shotType 豁免 + 命令面 binding-control 三处同步豁免 + 全链测试",
+    "P1": [
+      "退化资产 trace/impact/IPC 硬抛 binding-context-incomplete → fail-safe 归 unexpected（trace 与 IPC 共享 evaluatePackBindingCurrentness）",
+      "选区回读死绑定 @selection-change（Vue Flow 1.48 无此事件）→ @nodes-change（P23 对齐/分布/保存所选复活）"
+    ],
+    "P2": [
+      "P19 consistency 缓存键补 category/isAnimal/structuralChecklist/resultObjectPath + 运行时异常瞬态化不缓存（+2 定向测试）",
+      "P24 trace run terminal 对齐账本 runTerminalState（succeeded=raw+labeled 成对；results 逐页取全防超帽误判；+2 分支测试）",
+      "P23 window blur 拖拽收尾（finalizeDragSession 共用）、末帧吸附 flush、对齐/分布 isDragging 门控",
+      "rebuildGraph 按 id 保留选区（检查器出场加载/账本投影重建不再清用户选区）",
+      "取消连线外科式清描边（stripPendingOutline，不做全量重建，守 P15 合同）；syncPlanNodeStatuses 补 rebuildGraph（投影驱动节点徽标）",
+      "12 处状态残留/复位修补（toggleWorkspaceMode/togglePinnedNode/draftCanvasEdges/onConnect/onNodeClick/切工程 errorMessage·workflowBusy·zoom/零位移不入 undo 栈）",
+      "light accent 对比度加深至 #8a6a0d（≥4.5:1）；底栏 hover 死规则修复"
+    ],
+    "tests": "新增：managed-canvas-theme 7、extension 全链 1、退化 fail-safe 1、terminal 2、consistency 2、画布 UI 合同 2（主题/事件/选区/徽标/描边）"
+  },
+  "validation": {
+    "typecheck": "PASS（vue-tsc + tsc 双项目）",
+    "fullVitest": "175 文件 / 945 测试全部通过，465.20s，退出码 0（2026-07-21 03:40 +08，终态构建）",
+    "electronSmokes": [
+      {"name": "managed-studio 规模画布（1288 单元/4235 宫格/77 资产/10000 媒体）", "result": "PASS（initialDom 16、expandedDom 8、媒体 keyset、十次切工程无串库）", "json": "docs/evidence/p25-managed-scale-canvas-ui-smoke-20260721.json", "jsonSha256": "0fa1ea0e02f68b65358aaa74dd1c25a0aee00cc3fb772cae1c302fc656c0e2e3", "png": "docs/evidence/p25-managed-scale-canvas-ui-smoke-20260721.png", "pngSha256": "b740adb43e56f79d2790652f18b9d3cd360d19e1806dfdccf9653b8f0ab0c2e7"},
+      {"name": "p15 简单画布全交互+派发+重启", "result": "PASS（全部 UI 检查 true、packs 2/派发 2/结果 0、错误路径、重启恢复）", "json": "docs/evidence/p25-p15-canvas-ui-smoke-20260721.json", "jsonSha256": "794f2c4a667e52d484c1c8d5d5d17331616fbbe92e63ef4786d7ad82b1e98933", "png": "docs/evidence/p25-p15-canvas-ui-smoke-20260721.png", "pngSha256": "2728404ba8c91074501eec572c0fed070037c4f7d8ccba83581b6575847fd9d9"},
+      {"name": "p23-p24 探针三相位（单拖吸附/undo/组拖/U1–U4/重启/切工程）", "result": "PASS（full 13 项+restart+switched 全 ok；组拖零参考线+队形像素级保持 delta {55,44}→{55,44}）", "json": "docs/evidence/p25-p23-p24-electron-smoke-20260721.json", "jsonSha256": "4f5bac5ec6e746fde14da0cd3d81552f1ca4132188c48fa70a905a084cfa0624", "png": "docs/evidence/p25-p23-p24-electron-smoke-20260721.png", "pngSha256": "5c2bd1e5ca4c3c2980705461bb5824edb6b2685a6950fe86b106756da1e29502"}
+    ],
+    "themeScreenshots": [
+      {"theme": "light（默认）", "png": "docs/evidence/p25-canvas-theme-light-20260721.png", "sha256": "d8934724b3a2c8291bd9d759f591706111050104e4bdc97ba1da94538b05eda0", "review": "主代理已查看：浅底干净通透，底栏/头部/节点/小地图全部正确着色"},
+      {"theme": "dark", "png": "docs/evidence/p25-canvas-theme-dark-20260721.png", "sha256": "100cd199cfb65398cabcef139f22503ae9e1a0098058894629a2ab32a82e748b", "review": "主代理已查看：与既有深色观感一致"},
+      {"theme": "paper（米色/纸质）", "png": "docs/evidence/p25-canvas-theme-paper-20260721.png", "sha256": "4ab926c99e9745c70b612bb956e49e24a3ae89f2ba05dc00c41be8c88b52ac3f", "review": "主代理已查看：米色纸感，金棕主色协调"}
+    ],
+    "screenshotsEvidenceIndex": {"json": "docs/evidence/p25-canvas-theme-screenshots-20260721.json", "sha256": "dcf83dfc2193fc29ceaa056ef312de524d5e16900b32a1ec2fa89ad5d6ea42c0"}
+  },
+  "mechanicalAcceptance": "PASS：typecheck、全量 945、三类 Electron smoke、三皮肤截图 全过，同属终态摘要 249fcd38",
+  "humanAcceptance": "NOT_RUN：组拖手感/审片体验/剧情合理留用户人工验收；壳头深色与浅肤色块反差已登记",
+  "notRun": ["安装包制作（P19 起不打包）", "正式工程生产推进（checkpoint 冻结保持）", "Grok live（无额度）", "真实 Codex 生图（0 张）"],
+  "safety": {
+    "legacyCanvas": "App.vue 内嵌旧画布零改动",
+    "formalProjectWrites": "无",
+    "gitOperations": "无（21:28 历史 staged 35,333 保留现状，是否 git reset 由用户决定）",
+    "evidenceOverwrite": "历史证据零覆盖（p25 全部新文件名；中途两枚中间态 smoke JSON/PNG 为当日自产文件删后复跑）",
+    "installPackage": "未制作"
+  },
+  "deferredBacklog": [
+    "视图壳（MaterialStudioView）壳头主题化（浅色反差）",
+    "错误翻译统一（共享翻译表覆盖壳/画布/工作流三路）",
+    "弹层焦点管理 + 连线模式横幅 + 素材库空态 + 行为可发现性",
+    "SFC 拆分（素材库/检查器/工作流引擎抽子组件）",
+    "测试提速（checkpoint 单 it 116s、golden 75s 并行化）",
+    "smoke 公共 harness + 一次构建多次复用",
+    "E2-F1 staged 文件处置（用户决策）、P24-X1 qa-dudu 脚本处置（另一窗口状态确认）"
+  ]
+}

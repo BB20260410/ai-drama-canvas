@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "kind": "artlist-sidebrowser-resume-attempt",
+  "createdAt": "2026-07-16T00:28:11Z",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "goal": {
+    "threadId": "019f5c86-44c6-75d1-b522-293a485a8393",
+    "status": "active",
+    "goalComplete": false
+  },
+  "executionSurface": {
+    "id": "codex-in-app-side-browser",
+    "version": "1",
+    "targetUrl": "https://toolkit.artlist.io/image-video-generator?mode=image",
+    "fallbackUsed": false,
+    "chromeUsed": false
+  },
+  "productionCheckpoint": {
+    "jobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+    "itemId": "asset-P01",
+    "status": "waiting_external",
+    "stage": "plan_ready",
+    "revision": 3,
+    "publicationId": "publication-b17a8792-7c31-43ea-ae95-04be4de08f5f",
+    "publicationStatus": "reserved",
+    "allowedUploads": [],
+    "externalTaskId": null,
+    "resultPath": null,
+    "publicationReceiptId": null
+  },
+  "attempts": [
+    {
+      "order": 1,
+      "method": "claim-existing-tab-and-read-snapshot",
+      "result": "control_transport_timeout",
+      "pageMutation": false
+    },
+    {
+      "order": 2,
+      "method": "claim-existing-tab-then-visible-dom",
+      "claimSucceeded": true,
+      "result": "control_transport_timeout",
+      "pageMutation": false
+    },
+    {
+      "order": 3,
+      "method": "fresh-tab-navigation",
+      "freshTabCreated": true,
+      "result": "navigation_not_applied_before_control_transport_timeout",
+      "reconciledUrl": "about:blank",
+      "pageMutation": false
+    },
+    {
+      "order": 4,
+      "method": "bounded-read-only-control-summary",
+      "scope": "at most 30 buttons and 12 inputs",
+      "result": "control_transport_timeout",
+      "pageMutation": false
+    },
+    {
+      "order": 5,
+      "method": "explicit-nonzero-viewport-then-screenshot",
+      "temporaryViewport": {
+        "width": 1512,
+        "height": 1000
+      },
+      "result": "control_transport_timeout",
+      "viewportReset": true,
+      "pageMutation": false
+    }
+  ],
+  "cleanup": {
+    "temporaryViewportReset": true,
+    "blankDiagnosticTabRemoved": true,
+    "artlistTabKeptForHandoff": true
+  },
+  "remoteSideEffects": {
+    "settingsChanged": false,
+    "promptEntered": false,
+    "uploads": 0,
+    "submitIntentPersisted": false,
+    "generateClicks": 0,
+    "remoteIdentityCreated": false,
+    "downloads": 0,
+    "purchases": 0
+  },
+  "blockedAudit": {
+    "code": "in_app_browser_control_transport_unavailable",
+    "sameConditionAsPreviousGoalTurn": true,
+    "consecutiveResumedGoalTurns": 2,
+    "requiredBeforeBlocked": 3,
+    "decision": "keep_goal_active"
+  },
+  "formalOutputs": {
+    "generationDownloadFiles": 0,
+    "rawFiles": 0,
+    "labeledFiles": 0,
+    "storyboardSheets": 0
+  },
+  "sidecarSha256": {
+    "generation": "c885db37f648e6fd4cac43447714e90218dd3ddb1b29e1d34dd69a84a69a9563",
+    "generationJobs": "aa6e2ef31a883db3e1eccbff4b830def896248c4814cacacd5c64cb4345e3dc1",
+    "publications": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+    "assetConsistencyBatches": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7",
+    "commandLedger": "8bf00fd6a1d349c610d45a667b72d74abb8029dbe3daa1d6b10fc94765e85392"
+  },
+  "sourceBoundary": {
+    "mode": "read-only",
+    "controlledFusionInputs": {
+      "files": 1354,
+      "bytes": 14093144,
+      "aggregateSha256": "f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+      "unchanged": true
+    },
+    "fullSourceRoot": {
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26",
+      "unchanged": true
+    }
+  },
+  "nextAction": "下一 Goal 续作先重连并只读观察保留的 Artlist 标签；若控制恢复，继续同一 P01 R3 完成 9:16 / 1 Image、R4 preflight 和 R5 零上传。若同一传输阻塞在第三个连续续作轮次仍成立且无其他安全工作，按 blocked 审计落盘。"
+}

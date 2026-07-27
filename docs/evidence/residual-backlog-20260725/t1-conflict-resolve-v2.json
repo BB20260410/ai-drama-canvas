@@ -1,0 +1,18 @@
+{
+  "resolved": 88,
+  "errs": [],
+  "ready": true,
+  "freeze": {
+    "status": "ready"
+  },
+  "openLeft": 0,
+  "derived": "result_pending_review",
+  "u25": "result_pending_review",
+  "summary": {
+    "pass": 24,
+    "pendingReview": 1,
+    "inProgress": 0,
+    "failed": 0,
+    "blocked": 1
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "kind": "final-validation-p10-build-identity",
+  "status": "PASS",
+  "createdAt": "2026-07-18T04:16:47.249Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "buildIdentity": {
+    "buildId": "8050c08a6801e21ef06258eaaa57f5b8",
+    "sourceDigest": "fa6d8e7fadeb5141bbcef9b7177ba879b442e5a202d97af638378ecaeb2382fa",
+    "packageVersion": "0.1.0",
+    "fingerprint": "0a72188f971d155999fd35395930e3707a311d5c46ecc868d959aa509f12a3e5",
+    "capabilities": {
+      "mcpToolCount": 182,
+      "protocolVersion": "1.1",
+      "studioDashboard": true,
+      "studioBinding": true,
+      "studioContinuity": true,
+      "formalImagegenProvider": "codex-imagegen",
+      "browserGeneration": false,
+      "artlist": false
+    }
+  },
+  "fullCounts": {
+    "files": 111,
+    "tests": 611
+  },
+  "toolCount": 182,
+  "canaryPath": "/Users/hxx/Documents/无限画布/docs/evidence/p10-canary-e2e-20260718-01.json",
+  "p8FinalPath": "/Users/hxx/Documents/无限画布/docs/evidence/final-validation-20260718-p8-production-dashboard.json",
+  "p9FinalPath": "/Users/hxx/Documents/无限画布/docs/evidence/final-validation-20260718-p9-reliability.json",
+  "totalReportPath": "/Users/hxx/Documents/无限画布/docs/验证报告_20260718_P0至P10最终关账.md",
+  "commands": [
+    {
+      "name": "typecheck",
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "logSha256": "8aca887056e876fdc407b955daffd0b0a5dec0c074cd623f6decb7a214530132"
+    },
+    {
+      "name": "p10-targeted",
+      "argv": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/build-identity.test.ts",
+        "tests/project-backup.test.ts"
+      ],
+      "exitCode": 0,
+      "logSha256": "95da9efadf08df66e5c7c5cdcbb2c849d5eccaabc3ec42883f5a243db4df2ce5"
+    },
+    {
+      "name": "build",
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "exitCode": 0,
+      "logSha256": "e218ed2657741b4b827e14839daf49a40eb7eec5f11461d1b2d12faa8f6ff88c"
+    },
+    {
+      "name": "full",
+      "argv": [
+        "npx",
+        "vitest",
+        "run"
+      ],
+      "exitCode": 0,
+      "logSha256": "1e97acb54ffc73edad7b422db7da0cb116ae8680917b2dd315f50dfdf1090398"
+    }
+  ],
+  "imagegen": 0,
+  "browser": 0,
+  "git": 0,
+  "softwareCompleteNotProductionComplete": true
+}

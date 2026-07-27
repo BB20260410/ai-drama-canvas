@@ -1,0 +1,326 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T02:16:19.086Z",
+  "transport": "source-electron-current-build",
+  "fixture": {
+    "kind": "isolated-synthetic",
+    "root": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-subdivision-ui-6qz5VM",
+    "registryPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-subdivision-ui-registry-26299-1783995375145.json",
+    "editProjectId": "edit-796e9a81-7d8a-4475-8acd-6e79fab78c38",
+    "overlayClipId": "clip-ui-subdivision-overlay",
+    "startFrame": 6,
+    "durationFrames": 36,
+    "curve": {
+      "x1": 1,
+      "y1": 0,
+      "x2": 0,
+      "y2": 1
+    }
+  },
+  "revisions": {
+    "fixture": 2,
+    "baseline": 3,
+    "split": 4,
+    "undo": 5,
+    "redo": 6,
+    "pointercancel": 6,
+    "trimStart": 8,
+    "trimStartDelta": 2,
+    "trimEnd": 9,
+    "trimEndDelta": 1
+  },
+  "split": {
+    "left": {
+      "id": "clip-ui-subdivision-overlay",
+      "startFrame": 6,
+      "durationFrames": 7,
+      "keyframe": {
+        "id": "kf-2a6e6b1e-4baf-4dd2-8019-3ba96a6ac8fc",
+        "frame": 7,
+        "timeSeconds": 0.292,
+        "easing": "cubic_bezier",
+        "bezier": {
+          "x1": 0.389295698717362,
+          "y1": 0,
+          "x2": 0.719654842585897,
+          "y2": 0.351048747638334,
+          "mode": "derived_monotone",
+          "sourceWindow": {
+            "x1": 1,
+            "y1": 0,
+            "x2": 0,
+            "y2": 1,
+            "sourceEasing": "cubic_bezier",
+            "startX": 0,
+            "endX": 0.194444444444444,
+            "startFrame": 0,
+            "endFrame": 7,
+            "totalFrames": 36
+          }
+        },
+        "sourceTransform": {
+          "start": {
+            "positionX": -120,
+            "positionY": -80,
+            "scale": 0.3,
+            "rotation": -6
+          },
+          "end": {
+            "positionX": 120,
+            "positionY": 80,
+            "scale": 0.5,
+            "rotation": 6
+          }
+        },
+        "positionX": -116.082634423118,
+        "positionY": -77.388422948745,
+        "scale": 0.303264471314,
+        "rotation": -5.804131721156
+      }
+    },
+    "right": {
+      "id": "clip-ab218d7a-279b-4ea1-ae1c-795b4350be04",
+      "startFrame": 13,
+      "durationFrames": 29,
+      "keyframe": {
+        "id": "kf-0c9dd1fc-752d-45a7-8800-73bfb7107e99",
+        "frame": 29,
+        "timeSeconds": 1.21,
+        "easing": "cubic_bezier",
+        "bezier": {
+          "x1": 0.826290210410301,
+          "y1": 0.131486644211612,
+          "x2": -0.147411383068223,
+          "y2": 1,
+          "mode": "derived_monotone",
+          "sourceWindow": {
+            "x1": 1,
+            "y1": 0,
+            "x2": 0,
+            "y2": 1,
+            "sourceEasing": "cubic_bezier",
+            "startX": 0.194444444444444,
+            "endX": 1,
+            "startFrame": 7,
+            "endFrame": 36,
+            "totalFrames": 36
+          }
+        },
+        "positionX": 120,
+        "positionY": 80,
+        "scale": 0.5,
+        "rotation": 6,
+        "sourceTransform": {
+          "start": {
+            "positionX": -120,
+            "positionY": -80,
+            "scale": 0.3,
+            "rotation": -6
+          },
+          "end": {
+            "positionX": 120,
+            "positionY": 80,
+            "scale": 0.5,
+            "rotation": 6
+          }
+        }
+      }
+    }
+  },
+  "otio": {
+    "split": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-subdivision-split-20260714.otio",
+      "bytes": 15546,
+      "sha256": "2382a662aa214af0c5da04fb2807aad79e8d19c824c7b5e583a6b0ad9352af6f",
+      "contract": "aicanvas.cubic-bezier.v2",
+      "revisionUnchanged": true
+    },
+    "final": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-subdivision-final-20260714.otio",
+      "bytes": 16344,
+      "sha256": "0d325519cfb0c96fc6dfeb86ceead29b2e0d7f5645f5230c3d4640398043b317",
+      "contract": "aicanvas.cubic-bezier.v2",
+      "sourceWindow": {
+        "x1": 1,
+        "y1": 0,
+        "x2": 0,
+        "y2": 1,
+        "sourceEasing": "cubic_bezier",
+        "startX": 0.361111111111111,
+        "endX": 0.833333333333333,
+        "startFrame": 13,
+        "endFrame": 30,
+        "totalFrames": 36
+      }
+    }
+  },
+  "undoRedo": {
+    "undoRestoredSingleClip": true,
+    "redoRestoredSplit": true,
+    "rightClipIdStable": true
+  },
+  "derivedUi": {
+    "keyframeId": "kf-0c9dd1fc-752d-45a7-8800-73bfb7107e99",
+    "selectDisabled": true,
+    "inputsDisabled": true,
+    "controlPoints": [
+      0.826290210410301,
+      0.131486644211612,
+      -0.147411383068223,
+      1
+    ],
+    "outsideUnitRangePreserved": true,
+    "editableHandles": 0,
+    "curvePath": "M8 92 L10.89655172413793 91.48648303924352 L13.793103448275861 90.85553065212717 L16.689655172413794 90.084476955667 L19.586206896551722 89.1427247892555 L22.48275862068966 87.98734220466852 L25.379310344827587 86.55497928114234 L28.27586206896552 84.74553374985459 L31.17241379310345 82.3843642296074 L34.06896551724138 79.11466658856172 L36.96551724137932 73.94877179557682 L39.86206896551724 50.696914258988514 L42.758620689655174 27.44505672240021 L45.6551724137931 22.27916192941531 L48.55172413793104 19.009464288369642 L51.44827586206897 16.64829476812244 L54.3448275862069 14.838849236834704 L57.241379310344826 13.406486313308491 L60.13793103448276 12.251103728721532 L63.03448275862069 11.309351562310027 L65.93103448275863 10.538297865849856 L68.82758620689656 9.907345478733504 L71.72413793103448 9.393828517977028 L74.62068965517241 8.980433710225057 L77.51724137931035 8.653602574018606 L80.41379310344827 8.402495301153124 L83.3103448275862 8.218293240605263 L86.20689655172414 8.09371435283829 L89.10344827586208 8.022667492960963 L92 8",
+    "explanationVisible": true
+  },
+  "pointercancel": {
+    "revisionBefore": 6,
+    "revisionAfter": 6,
+    "projectHashBefore": "8d483b9a475493a0d63a1eccbde33cdb6f511410ae5ea71e643b7d90bad72edf",
+    "projectHashAfter": "8d483b9a475493a0d63a1eccbde33cdb6f511410ae5ea71e643b7d90bad72edf",
+    "styleBefore": "left: 26.016px; width: 58.08px; background-size: cover; background-position: center center;",
+    "styleDuring": "left: 48.048px; width: 46px; background-size: cover; background-position: center center; z-index: 12;",
+    "styleAfter": "left: 26.016px; width: 58.08px; background-size: cover; background-position: center center;",
+    "geometryBefore": {
+      "left": 404.015625,
+      "width": 58.078125
+    },
+    "geometryDuring": {
+      "left": 426.046875,
+      "width": 46
+    },
+    "geometryAfter": {
+      "left": 404.015625,
+      "width": 58.078125
+    },
+    "restored": true,
+    "eventPath": [
+      {
+        "phase": "capture",
+        "type": "pointerdown",
+        "pointerId": 91,
+        "bubbles": true,
+        "target": "trim-start-clip-ab218d7a-279b-4ea1-ae1c-795b4350be04"
+      },
+      {
+        "phase": "capture",
+        "type": "pointermove",
+        "pointerId": 91,
+        "bubbles": true
+      },
+      {
+        "phase": "bubble",
+        "type": "pointermove",
+        "pointerId": 91,
+        "bubbles": true
+      },
+      {
+        "phase": "capture",
+        "type": "pointercancel",
+        "pointerId": 91,
+        "bubbles": true,
+        "target": "trim-start-clip-ab218d7a-279b-4ea1-ae1c-795b4350be04"
+      },
+      {
+        "phase": "bubble",
+        "type": "pointercancel",
+        "pointerId": 91,
+        "bubbles": true,
+        "target": "trim-start-clip-ab218d7a-279b-4ea1-ae1c-795b4350be04"
+      }
+    ],
+    "pageErrors": []
+  },
+  "trims": {
+    "start": {
+      "startFrame": 19,
+      "durationFrames": 23,
+      "sourceWindow": {
+        "x1": 1,
+        "y1": 0,
+        "x2": 0,
+        "y2": 1,
+        "sourceEasing": "cubic_bezier",
+        "startX": 0.361111111111111,
+        "endX": 1,
+        "startFrame": 13,
+        "endFrame": 36,
+        "totalFrames": 36
+      },
+      "sourceTransform": {
+        "start": {
+          "positionX": -120,
+          "positionY": -80,
+          "scale": 0.3,
+          "rotation": -6
+        },
+        "end": {
+          "positionX": 120,
+          "positionY": 80,
+          "scale": 0.5,
+          "rotation": 6
+        }
+      }
+    },
+    "end": {
+      "startFrame": 19,
+      "durationFrames": 17,
+      "sourceWindow": {
+        "x1": 1,
+        "y1": 0,
+        "x2": 0,
+        "y2": 1,
+        "sourceEasing": "cubic_bezier",
+        "startX": 0.361111111111111,
+        "endX": 0.833333333333333,
+        "startFrame": 13,
+        "endFrame": 30,
+        "totalFrames": 36
+      },
+      "sourceTransform": {
+        "start": {
+          "positionX": -120,
+          "positionY": -80,
+          "scale": 0.3,
+          "rotation": -6
+        },
+        "end": {
+          "positionX": 120,
+          "positionY": 80,
+          "scale": 0.5,
+          "rotation": 6
+        }
+      }
+    }
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-subdivision-ui-20260714.png",
+    "bytes": 322800,
+    "sha256": "cb2ff93437c6776ca15651535b46471caedc6329d449048ab74926d5e3dcc637",
+    "width": 1560,
+    "height": 980,
+    "deviceScaleNormalized": true,
+    "captureAttempt": 1,
+    "content": {
+      "pixels": 1528800,
+      "brightPixels": 127201,
+      "brightRatio": 0.0832031658817373,
+      "chromaticPixels": 83296,
+      "chromaticRatio": 0.05448456305599163
+    }
+  },
+  "sourceHashes": {
+    "src/core/types.ts": "789ffc4c048cb2458e6d496c704f92c0bd5f1c552025a5d341c635fc85cebf54",
+    "src/core/keyframe-curve.ts": "dabf66146c642040d1419e11393e2d39461fe2b224ae4037bc04a6d7936172f6",
+    "src/core/editor.ts": "39c537e526ab22249468da1fdab93a4157550e670a731f31a307156fda6fc72f",
+    "src/mcp/server.ts": "1a51cdd02be13e96a53a1b4365928d94b22677590f532be9280c9e448568958e",
+    "src/renderer/src/components/VideoEditorView.vue": "1f0fbeaf44358e33e4dbaec13788a805bc48a002921dd4e0f1bf23d199105e69",
+    "scripts/create-editor-ui-fixture.ts": "ce3f5de67705fbfc7797e4403ad3a043d4bc3220fcf064ef90914642cecc2e41",
+    "scripts/ui-editor-subdivision-smoke.mjs": "de0033eb0c30fe9f4f1e21cfebd4b70dbcf9367efd107ca559d6b9289a0f8d87"
+  },
+  "terminal": {
+    "rootRemoved": true,
+    "registryRemoved": true
+  }
+}

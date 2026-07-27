@@ -1,0 +1,20 @@
+{
+  "kind": "followup-u25-review-pass",
+  "unitId": "S1E2-U25",
+  "generationRunId": "s1e2-u25-mcp-grok-mrxwt3u9",
+  "reviewDecision": "pass",
+  "reviewId": "studio-generation-review-10d2771064c07cb62074732fe839650fc880006d",
+  "afterProjection": {
+    "productionStatus": "result_pending_review",
+    "selectedRawSha256": null,
+    "summary": {
+      "pass": 24,
+      "pendingReview": 1,
+      "inProgress": 0,
+      "failed": 0,
+      "blocked": 1
+    }
+  },
+  "pass": false,
+  "createdAt": "2026-07-25T09:34:33.651Z"
+}

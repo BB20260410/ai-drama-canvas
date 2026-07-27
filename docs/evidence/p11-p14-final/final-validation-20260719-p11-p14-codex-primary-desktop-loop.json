@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 2,
+  "kind": "p11-p14-codex-primary-desktop-loop-final-validation",
+  "status": "PASS",
+  "generatedAt": "2026-07-18T20:39:46.913Z",
+  "validationProfile": {
+    "id": "codex-primary-v1",
+    "requiredLiveProviders": [
+      "codex"
+    ],
+    "offlineCompatibleProviders": [
+      "grok"
+    ],
+    "grokLiveStatus": "NOT_RUN",
+    "grokReasonCode": "USER_SCOPED_OUT_NO_QUOTA",
+    "originalDualAgentPassClaimed": false
+  },
+  "release": {
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "sourceDigest": "1b96b83602ec60a0d1a1c44919453849cc944a90d7bf60445e385262c6a22f2a",
+    "sourceFiles": 459,
+    "sourceBytes": 10303391,
+    "buildId": "eafa84d97331dcb6c50a87ac7fe2ea4f",
+    "buildIdentityFingerprint": "1130a88f77a86a14c2e36f719d895cbcf23a024aeb914b00d5c658164f638117",
+    "releaseManifestFingerprint": "1f7ef7c13f4168b9c95b6973e9f83b4978215593eccc67e6f412f7805ccc466a",
+    "protocolVersion": "1.1",
+    "mcpToolCount": 183,
+    "distribution": "local-only",
+    "installationPath": "/Applications/AI 漫剧画布.app"
+  },
+  "formalProject": {
+    "projectId": "project-2e3b44bc6ac4",
+    "manifestFingerprint": "57e55eaf4b571c8e1ca7f606f79f849d08d0ad074ebd112eb0f82968413c3ac8",
+    "counts": {
+      "assets": 85,
+      "units": 541,
+      "panels": 3246,
+      "media": 1152
+    },
+    "backupFiles": 3448,
+    "formalWritesByValidation": 0
+  },
+  "providerCoverage": {
+    "executorKind": "agent-imagegen",
+    "allowedProviders": [
+      "codex",
+      "grok"
+    ],
+    "codex": {
+      "liveFreshSession": "PASS",
+      "realImagegenCanary": "PASS",
+      "rawSha256": "3891fde18e230b0ab477437492491395b6a5cea13cf91b46f9bdc2e94008dfd8",
+      "labeledSha256": "0e8bf68e2349ae9da73e9b3629e52d73cb9fe81a48c71ce435666a71535e7feb",
+      "review": "pass"
+    },
+    "grok": {
+      "offlineContractAndConfiguration": "PASS",
+      "liveSession": "NOT_RUN",
+      "requiredForPass": false,
+      "reasonCode": "USER_SCOPED_OUT_NO_QUOTA",
+      "cliCalls": 0,
+      "networkCalls": 0
+    }
+  },
+  "goldenMaskAuthority": {
+    "sourcePath": "/Users/hxx/Desktop/豆姐参考图.png",
+    "sha256": "02e9438ecee038f7d14860da37cb315bf358db4a26fa224e342eee5b592b55a9",
+    "formalAssetId": "prop-d01-golden-mask",
+    "revision": 9,
+    "review": "approved",
+    "primaryVersionId": "version-94a47bf4-8161-4e37-b805-e5c60969a6a5",
+    "definitionId": "definition-213bc0fd-da0f-4486-9041-1263203afa72",
+    "canaryMatched": true,
+    "strictNegativeLocks": true
+  },
+  "scale": {
+    "units": 1288,
+    "panels": 4235,
+    "assets": 77,
+    "media": 10000,
+    "verifiedCas": 10000,
+    "verifiedThumbnails": 1000,
+    "mediaPageDomMax": 36,
+    "panelExpansionMax": 6
+  },
+  "endurance": {
+    "requestedMs": 1800000,
+    "actualMs": 1800108,
+    "samples": 72,
+    "projectSwitches": 10,
+    "forceRestart": true,
+    "formalStableFilesUnchanged": true,
+    "stableTailRssDeltaKiB": 80,
+    "stableTailFileDescriptorDelta": 0
+  },
+  "evidence": {
+    "typecheck": {
+      "fileName": "p11-p14-typecheck-20260718-r7.json",
+      "sizeBytes": 1545,
+      "sha256": "5d3d288a12f45e4e6ca081d8ee87670b5d184a8562cb18bbc5d7544fdc7197c7",
+      "gate": "PASS"
+    },
+    "targetedTests": {
+      "fileName": "p11-p14-targeted-tests-20260718-r7.json",
+      "sizeBytes": 2580,
+      "sha256": "a5b264e5519f8a30a22ee98b23b528066dc18267ee69dbf1eca988334f6c4c9c",
+      "gate": "PASS"
+    },
+    "fullTests": {
+      "fileName": "p11-p14-full-tests-20260718-r7.json",
+      "sizeBytes": 1677,
+      "sha256": "9efc37d1a35a3d8811ffa155d7d1a6625084f220753a96ac389c5f248d6979cf",
+      "gate": "PASS"
+    },
+    "productionBuild": {
+      "fileName": "p11-p14-production-build-20260718-r7.json",
+      "sizeBytes": 1557,
+      "sha256": "4492aa2ff38c7a11851c69d6c4828890f83e2fb31a16b51240e44f8acda745e5",
+      "gate": "PASS"
+    },
+    "isolatedPackage": {
+      "fileName": "p14-isolated-package-smoke-20260718-p11p14-r7.json",
+      "sizeBytes": 46869,
+      "sha256": "dc7e7fccccce976bf4022369cba49cd7cbf4748bd895fba7bc1bf4834f5b18e0",
+      "gate": "PASS"
+    },
+    "installedSignature": {
+      "fileName": "p14-installed-signature-20260718-r7.json",
+      "sizeBytes": 1179,
+      "sha256": "7de35c3bfc58cd7be724507524d56ad94c96d550e23eef3cf10353badf8ac079",
+      "gate": "PASS"
+    },
+    "installedProductionLoopUi": {
+      "fileName": "p14-installed-production-loop-ui-20260718-r7.json",
+      "sizeBytes": 6237,
+      "sha256": "a8308abea06156517a51bb013eaf7c069e1f306a727358baece65fbd28a680f0",
+      "gate": "PASS"
+    },
+    "installedScaleCanvasUi": {
+      "fileName": "p14-installed-scale-canvas-ui-20260718-r7.json",
+      "sizeBytes": 2743,
+      "sha256": "a7297f5a74a0b444d4b33cad6fd71edc9f4b3e0ed6ca53ab5438557e0572ca45",
+      "gate": "PASS"
+    },
+    "installedAgentConnectionUi": {
+      "fileName": "p14-installed-agent-connection-ui-20260718-r7.json",
+      "sizeBytes": 2949,
+      "sha256": "36866c38d15df5f48faf29fc91ea7bf9380938a4386be70a2b2bb16b7e69bb03",
+      "gate": "PASS"
+    },
+    "installedRealCanaryUi": {
+      "fileName": "p14-installed-real-canary-ui-20260718-r7.json",
+      "sizeBytes": 7910,
+      "sha256": "b042d1a51c773954ef624247d358b96ca881694370cf8ae08e9bb3447a31bcd7",
+      "gate": "PASS"
+    },
+    "mainAgentVisualReview": {
+      "fileName": "p14-main-agent-original-size-visual-review-20260719-r7.json",
+      "sizeBytes": 2969,
+      "sha256": "f3d0cb7f525d806730c8489097d7dff7ca0829af65858b3ff182f28b918698af",
+      "gate": "PASS"
+    },
+    "codexFreshSessionRead": {
+      "fileName": "p14-codex-fresh-session-read-20260719-r7.json",
+      "sizeBytes": 4956,
+      "sha256": "88a818f780970881d39f5a10596e786bfb1c83ded5b14e99bbf02109e3671332",
+      "gate": "PASS"
+    },
+    "formalBackupRestore": {
+      "fileName": "p14-formal-backup-restore-20260718-r7.json",
+      "sizeBytes": 6560,
+      "sha256": "9916a2b76484580a0d6b38137edcb26b245a907ef34dc9aa165c0962bccbe2fc",
+      "gate": "PASS"
+    },
+    "formalGoldenMaskAuthority": {
+      "fileName": "p14-formal-golden-mask-authority-20260719-r7.json",
+      "sizeBytes": 4338,
+      "sha256": "5188ece832a4075652d98f6e3cfbff3f561a12bcd5dcdacb8ae64fe51194bcef",
+      "gate": "PASS"
+    },
+    "installedSoak": {
+      "fileName": "p14-installed-soak-20260718-r7.json",
+      "sizeBytes": 21795,
+      "sha256": "91b55eedcfc429e9383d5dafb9f41ce1468698e7f5a6525f76d5ee0393359fc9",
+      "gate": "PASS"
+    }
+  },
+  "assertions": {
+    "exactEvidenceSet": true,
+    "allRequiredGatesPassed": true,
+    "sameSourceDigest": true,
+    "sameBuildId": true,
+    "sameBuildIdentityFingerprint": true,
+    "sameReleaseManifestFingerprint": true,
+    "realInstalledApplication": true,
+    "codexFreshSessionReadCurrentProject": true,
+    "codexRealCanaryWrittenBackAndReviewed": true,
+    "mainAgentOriginalSizeVisualReviewPassed": true,
+    "goldenMaskStrictAuthorityLocked": true,
+    "formalBackupRestoreAndRestoredWritePassed": true,
+    "installedScaleAndEndurancePassed": true,
+    "grokOfflineContractCompatible": true,
+    "grokLiveExecutionClaimed": false,
+    "dualAgentFreshSessionPassClaimed": false
+  },
+  "boundaries": {
+    "aggregationOnly": true,
+    "evidenceOverwritten": false,
+    "formalProjectWrites": 0,
+    "userAuthorityWrites": 0,
+    "gitActions": 0,
+    "browserCalls": 0,
+    "uploads": 0,
+    "paidActions": 0,
+    "notarizationPerformed": false,
+    "publicRelease": false,
+    "distribution": "local-only"
+  },
+  "fingerprint": "0caace483850fabb2850e9e0298e37a1e263837a9a60ceb0b6949e2900e1a789"
+}

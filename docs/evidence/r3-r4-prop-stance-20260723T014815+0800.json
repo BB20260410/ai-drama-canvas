@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "kind": "r3-prop-authority-r4-stance-writeback",
+  "updatedAt": "2026-07-23T01:48:15+0800",
+  "projectRoot": "/Users/hxx/Documents/无限画布/projects/grok-mvp-qingdeng-mrwc97mu-d0aea463",
+  "projectId": "project-c78607fac2a4",
+  "r3": {
+    "propId": "prop-qingdeng-lantern",
+    "name": "青灯",
+    "primaryAuthoritySha256": "ccc3cda0fc67075fbf4d2b1604b189f238a7f0bef320e7c615ed574e404cb3b4",
+    "authorityPlatePath": "…/mvp-work/prop-qingdeng-lantern-authority.png",
+    "authorityPlateSha256": "ccc3cda0fc67075fbf4d2b1604b189f238a7f0bef320e7c615ed574e404cb3b4",
+    "note": "独立道具规范资产 + 主权威图；从角色主参考裁切灯区作结构锁"
+  },
+  "r4": {
+    "unitId": "S1E01-U01",
+    "subjects": [
+      "character-qingdeng-ke",
+      "scene-rainy-inn-porch",
+      "prop-qingdeng-lantern"
+    ],
+    "fields": [
+      "costume",
+      "injury",
+      "heldObject",
+      "position",
+      "facing",
+      "emotion",
+      "layout",
+      "lighting",
+      "referenceSha256"
+    ],
+    "stanceFieldsEmphasized": [
+      "position",
+      "facing",
+      "heldObject"
+    ],
+    "correctionsOk": 48,
+    "allPanelsSubjectsReady": true,
+    "readiness": [
+      {
+        "panelId": "S1E01-U01-P1",
+        "subjectId": "character-qingdeng-ke",
+        "ready": true,
+        "fingerprint": "cd8d9f0662b9c20556daf4975bb2afd5a26e3e41928061850e9a4b45e901f9b9",
+        "blockers": []
+      },
+      {
+        "panelId": "S1E01-U01-P1",
+        "subjectId": "scene-rainy-inn-porch",
+        "ready": true,
+        "fingerprint": "8b653e79e504b4bbad66c7b5d976a48325ec45845cd95336a4c8d5844a459b7b",
+        "blockers": []
+      },
+      {
+        "panelId": "S1E01-U01-P1",
+        "subjectId": "prop-qingdeng-lantern",
+        "ready": true,
+        "fingerprint": "980603173dd7852ff71a33d30eba93db22374703191ad5114ff5de27d1cc4fae",
+        "path": "already-ready"
+      },
+      {
+        "panelId": "S1E01-U01-P2",
+        "subjectId": "character-qingdeng-ke",
+        "ready": true,
+        "fingerprint": "d03e58eeac9ae52420878cba64c39ebc47e925abc5f543dc60a939594633b28a",
+        "blockers": []
+      },
+      {
+        "panelId": "S1E01-U01-P2",
+        "subjectId": "scene-rainy-inn-porch",
+        "ready": true,
+        "fingerprint": "7a1b804bf41e14a263ad46412ea8e1b03ba29ca0bd5073a8f4ec7080c92e1545",
+        "blockers": []
+      },
+      {
+        "panelId": "S1E01-U01-P2",
+        "subjectId": "prop-qingdeng-lantern",
+        "ready": true,
+        "fingerprint": "6f2dcab84c083c292fbb60e8b9ad63759f4249581a80b7d1e68bbd630184428d",
+        "path": "already-ready"
+      },
+      {
+        "panelId": "S1E01-U01-P3",
+        "subjectId": "character-qingdeng-ke",
+        "ready": true,
+        "fingerprint": "c3ee66d3e68dddff694a23324f85ae61d38f25d3b1bad48ee9f7d3556534e7c5",
+        "blockers": []
+      },
+      {
+        "panelId": "S1E01-U01-P3",
+        "subjectId": "scene-rainy-inn-porch",
+        "ready": true,
+        "fingerprint": "eafe26357a51861b15a507103286efbbc722579104bac41192f36cd35c8360a8",
+        "blockers": []
+      },
+      {
+        "panelId": "S1E01-U01-P3",
+        "subjectId": "prop-qingdeng-lantern",
+        "ready": true,
+        "fingerprint": "bf7b276e13d9d734bfa827bb74e7ff21988fc4bb7ac677d2e90997ec59de687d",
+        "path": "already-ready"
+      }
+    ]
+  },
+  "duduProtection": {
+    "ledgerSha256": "0998c00f8bc84583f207ae3e434a7171d1597ed177cc21c595082f665bfc54af",
+    "expected": "0998c00f8bc84583f207ae3e434a7171d1597ed177cc21c595082f665bfc54af",
+    "unchanged": true
+  },
+  "nonClaims": [
+    "unit BindingSet 尚未把 prop 纳入每格 assets（下一切片：revise unit + re-freeze binding）",
+    "未重跑三连生图 canary",
+    "未安装/未 Git"
+  ],
+  "status": "R3_R4_DONE_ALL_READY"
+}

@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "kind": "p1-stage1b-review-primary-result",
+  "finishedAt": "2026-07-26T13:51:07.169Z",
+  "steps": [
+    {
+      "id": "b2-scene-star-review",
+      "ok": true,
+      "assetId": "allowed-ref:scene-star",
+      "versionId": "version-df2381b6-6c69-4870-a244-b3d5af2dd922",
+      "revisionAfterReview": 3
+    },
+    {
+      "id": "b2-scene-star-primary",
+      "ok": true,
+      "assetId": "allowed-ref:scene-star",
+      "versionId": "version-df2381b6-6c69-4870-a244-b3d5af2dd922"
+    },
+    {
+      "id": "b2-scene-yazihe-review",
+      "ok": true,
+      "assetId": "allowed-ref:scene-yazihe",
+      "versionId": "version-9d98cd9f-9f84-4a6e-a7db-76060fda78e3",
+      "revisionAfterReview": 3
+    },
+    {
+      "id": "b2-scene-yazihe-primary",
+      "ok": true,
+      "assetId": "allowed-ref:scene-yazihe",
+      "versionId": "version-9d98cd9f-9f84-4a6e-a7db-76060fda78e3"
+    },
+    {
+      "id": "b2-scene-yucun-review",
+      "ok": true,
+      "assetId": "allowed-ref:scene-yucun",
+      "versionId": "version-050fa30e-34e5-4fa2-8e22-68ef672a7fa1",
+      "revisionAfterReview": 3
+    },
+    {
+      "id": "b2-scene-yucun-primary",
+      "ok": true,
+      "assetId": "allowed-ref:scene-yucun",
+      "versionId": "version-050fa30e-34e5-4fa2-8e22-68ef672a7fa1"
+    },
+    {
+      "id": "b2-scene-cave-mouth-review",
+      "ok": true,
+      "assetId": "allowed-ref:scene-cave-mouth",
+      "versionId": "version-e304e9ed-0db2-4ad4-993a-b93dfde44742",
+      "revisionAfterReview": 3
+    },
+    {
+      "id": "b2-scene-cave-mouth-primary",
+      "ok": true,
+      "assetId": "allowed-ref:scene-cave-mouth",
+      "versionId": "version-e304e9ed-0db2-4ad4-993a-b93dfde44742"
+    },
+    {
+      "id": "b2-style-night-review",
+      "ok": true,
+      "assetId": "allowed-ref:style-night",
+      "versionId": "version-04d8bf5a-2466-4d8e-9abb-c39465d224ab",
+      "revisionAfterReview": 3
+    },
+    {
+      "id": "b2-style-night-primary",
+      "ok": true,
+      "assetId": "allowed-ref:style-night",
+      "versionId": "version-04d8bf5a-2466-4d8e-9abb-c39465d224ab"
+    },
+    {
+      "id": "b2-style-cine-review",
+      "ok": true,
+      "assetId": "allowed-ref:style-cine",
+      "versionId": "version-c22c653e-12fe-4f51-8411-dc9da7d93ead",
+      "revisionAfterReview": 3
+    },
+    {
+      "id": "b2-style-cine-primary",
+      "ok": true,
+      "assetId": "allowed-ref:style-cine",
+      "versionId": "version-c22c653e-12fe-4f51-8411-dc9da7d93ead"
+    }
+  ]
+}

@@ -1,0 +1,352 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T15:51:59+08:00",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "goal": {
+    "name": "AI 漫剧无限画布",
+    "status": "active",
+    "mode": "research-and-development"
+  },
+  "priorityRevalidation": {
+    "handoffPriorityAtSliceStart": "third-party-effect-compatibility",
+    "handoffPriorityWasStillValid": true,
+    "reason": "At slice start the capability contract still listed third-party-effect-compatibility as missing, OTIO import rejected every Effect and Transition object, and render, Continuation, MCP and Electron had no positive standard-object gates.",
+    "alreadyVerifiedModulesNotRebuilt": [
+      "comfyui-local-recoverable-adapter",
+      "http-submission-reconciliation",
+      "custom-cubic-bezier-keyframes",
+      "arbitrary-keyframe-boundary-subdivision",
+      "main-track-transform-keyframes",
+      "complex-nested-timelines"
+    ],
+    "completedPriority": "bounded-third-party-effect-transition-compatibility",
+    "nextPriorityAfterSlice": "real-project-nle-validation",
+    "nextPriorityRequiresExplicitAuthorization": true
+  },
+  "slice": {
+    "name": "bounded-third-party-effect-transition-compatibility",
+    "complete": true,
+    "capabilityContract": "aicanvas.otio-effect-transition.v1",
+    "allowlist": {
+      "effects": [
+        {
+          "otioSchema": "LinearTimeWarp.1",
+          "effectName": "LinearTimeWarp",
+          "timeScalarMinimum": 0.1,
+          "timeScalarMaximum": 8,
+          "appliesTo": [
+            "video",
+            "audio"
+          ],
+          "sourceAvailableRangeRequired": true,
+          "sourceAvailableRangeStartFrame": 0
+        }
+      ],
+      "transitions": [
+        {
+          "otioSchema": "Transition.1",
+          "transitionType": "SMPTE_Dissolve",
+          "trackPolicy": "lowest-order-main-visual-track",
+          "shape": "Clip.2 -> Transition.1 -> Clip.2",
+          "integerOffsetsRequired": true,
+          "realSourceHandlesRequired": true,
+          "visualOnly": true,
+          "independentAudioTrackUnchanged": true
+        }
+      ]
+    },
+    "failClosed": [
+      "generic Effect.1",
+      "FreezeFrame.1",
+      "custom transition types",
+      "disabled Transition.1",
+      "opaque third-party metadata semantics",
+      "OTIO markers",
+      "SMPTE dissolve combined with keyframes",
+      "SMPTE dissolve combined with private fade",
+      "SMPTE dissolve combined with LinearTimeWarp"
+    ],
+    "privateFadeCompatibility": "existing fade remains fade-to-background and was not redefined as cross-dissolve",
+    "timeAuthority": "integer project frames with exact reduced rational conversion at OTIO and FFmpeg boundaries",
+    "preflight": [
+      "validate scalar and source available range",
+      "validate adjacency, track order and real source handles",
+      "probe actual local media duration before OTIO import writes",
+      "build and validate an in-memory candidate before any project or registry write"
+    ],
+    "stateConsumers": [
+      "save and reload",
+      "undo and redo",
+      "OTIO import and export",
+      "synchronous render",
+      "background render",
+      "timeline-frame extraction",
+      "fresh-process continuation",
+      "MCP source server",
+      "MCP compiled server",
+      "Electron production build"
+    ],
+    "otio": {
+      "rootMetadataContract": "aicanvas.otio-effect-transition.v1",
+      "roundTrip": true,
+      "linearTimeWarpSchema": "LinearTimeWarp.1",
+      "linearTimeWarpEffectName": "LinearTimeWarp",
+      "transitionSchema": "Transition.1",
+      "transitionType": "SMPTE_Dissolve",
+      "offsetsPreserved": true
+    }
+  },
+  "standardsReferences": [
+    "https://github.com/AcademySoftwareFoundation/OpenTimelineIO/blob/2f3e0a433f22fc92b5341e71893c68b80b2ff935/docs/tutorials/otio-serialized-schema.md#L312-L673",
+    "https://github.com/AcademySoftwareFoundation/OpenTimelineIO/blob/2f3e0a433f22fc92b5341e71893c68b80b2ff935/src/opentimelineio/transition.h#L10-L101",
+    "https://github.com/AcademySoftwareFoundation/OpenTimelineIO/blob/2f3e0a433f22fc92b5341e71893c68b80b2ff935/docs/tutorials/otio-timeline-structure.md#L89-L122",
+    "https://github.com/AcademySoftwareFoundation/OpenTimelineIO/blob/2f3e0a433f22fc92b5341e71893c68b80b2ff935/src/opentimelineio/linearTimeWarp.h#L10-L52"
+  ],
+  "tests": {
+    "typecheck": {
+      "success": true
+    },
+    "targeted": {
+      "success": true,
+      "editorContractTests": 5,
+      "mcpSourceContractTests": 1,
+      "mcpCompiledContractTests": 1,
+      "capabilityRegressionTestFiles": 3,
+      "capabilityRegressionTests": 10
+    },
+    "full": {
+      "success": true,
+      "testFiles": 38,
+      "passedTestFiles": 38,
+      "failedTestFiles": 0,
+      "tests": 216,
+      "passedTests": 216,
+      "failedTests": 0,
+      "durationSeconds": 121.72
+    },
+    "crossProcess": {
+      "fullWorkflow": {
+        "success": true,
+        "restartVerified": true
+      },
+      "mcpHeadless": {
+        "success": true,
+        "commandTypes": 79,
+        "ledgerEntries": 22,
+        "uncertainCommands": 0,
+        "finalDoctorErrors": 0,
+        "finalDoctorWarnings": 0,
+        "runtimeResourcesIdle": true
+      },
+      "realMcpOnCompletedHeadlessRoot": {
+        "success": true,
+        "readOnly": true,
+        "finalDoctorErrors": 0,
+        "finalDoctorWarnings": 0,
+        "activeResources": 0
+      },
+      "mcpEmptyProject": {
+        "success": true,
+        "ledgerEntries": 19,
+        "uncertainCommands": 0,
+        "restartVerified": true
+      }
+    },
+    "realElectron": {
+      "success": true,
+      "productionBuild": true,
+      "humanVisualInspection": true,
+      "fullApplicationRestart": true
+    }
+  },
+  "build": {
+    "success": true,
+    "typecheck": true,
+    "mainBytes": 943952,
+    "preloadBytes": 17526,
+    "rendererJavaScriptBytes": 1300411,
+    "mcpServerBytes": 185760,
+    "signedDmgRebuilt": false
+  },
+  "mcp": {
+    "smokeSuccess": true,
+    "toolCount": 134,
+    "resourceTemplateCount": 9,
+    "promptCount": 7,
+    "commandTypes": 79,
+    "sourceAndCompiledEffectTransitionTests": true,
+    "capabilities": [
+      "otio-linear-time-warp",
+      "otio-smpte-dissolve",
+      "bounded-third-party-effect-transition-compatibility"
+    ],
+    "capabilityMissingForFullNle": [
+      "real-project-nle-validation"
+    ]
+  },
+  "renderSmoke": {
+    "success": true,
+    "evidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/effect-transition-render-smoke-20260714.json",
+    "evidenceSha256": "ef0d853955c948c0119bd241cff30062f3ab8914ff2e46891c7955a219958ecd",
+    "timebase": {
+      "rateNumerator": 24000,
+      "rateDenominator": 1001
+    },
+    "transitionOffsetsFrames": {
+      "in": 5,
+      "out": 7
+    },
+    "synchronous": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/effect-transition-sync-20260714.mp4",
+      "bytes": 31638,
+      "frames": 48,
+      "sha256": "c1b76e3d3ae6cf4f7dd156079a63e476830c0c325062f2598e670714f26b8457"
+    },
+    "background": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/effect-transition-background-20260714.mp4",
+      "bytes": 31638,
+      "frames": 48,
+      "sha256": "c1b76e3d3ae6cf4f7dd156079a63e476830c0c325062f2598e670714f26b8457"
+    },
+    "audio": {
+      "playbackRate": 2,
+      "durationSeconds": 1.001
+    },
+    "timelineFrame": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/effect-transition-midpoint-20260714.png",
+      "bytes": 1858,
+      "sha256": "7d6104e53a2138bd20acc2554396fa06afb31b3af163174f4783064a9cd6c157"
+    },
+    "freshProcessContinuation": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/effect-transition-continuation-20260714.png",
+      "bytes": 1521,
+      "sha256": "74924967b76e010d467b10cf21d9eb145b1bfd4a8aa6be3caa071f778cea0e87",
+      "enqueue": false,
+      "generationJob": null
+    }
+  },
+  "uiSmoke": {
+    "success": true,
+    "script": "npm run ui:editor-effect-transition-smoke",
+    "evidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/editor-effect-transition-ui-smoke-20260714.json",
+    "evidenceSha256": "e4a204820e9456802ff501060379a0b3b0fbe6671b7c44766df4290c66507233",
+    "revisionSequence": [
+      1,
+      2,
+      3,
+      4,
+      4
+    ],
+    "initialTransitionOffsetsFrames": [
+      3,
+      5
+    ],
+    "savedTransitionOffsetsFrames": [
+      2,
+      4
+    ],
+    "undoRedoVerified": true,
+    "freshApplicationRestartVerified": true,
+    "standardOtioExportVerified": true,
+    "dualPreview": {
+      "outgoingCurrentTimeSeconds": 1.167,
+      "incomingCurrentTimeSeconds": 0.167,
+      "outgoingOpacity": 0.625,
+      "incomingOpacity": 0.375,
+      "bothVideoStreamsMuted": true,
+      "independentAudioTrackUnchanged": true
+    },
+    "screenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-effect-transition-ui-20260714.png",
+      "bytes": 254543,
+      "sha256": "c7517d2dce0bb92711d788b5f817fdb68e748e9c71b9b0ec0698692cb62e7c32",
+      "width": 1560,
+      "height": 980,
+      "humanVisualInspection": true,
+      "visibleOutgoingAndIncomingFrames": true,
+      "placeholderOrBlank": false
+    },
+    "pageErrors": 0,
+    "fixtureRemoved": true,
+    "registryRemoved": true
+  },
+  "sourceHashes": {
+    "package.json": "b0a95580c970abf62a2f8f36d42a4a503eb65af7b47d1b0dbf4d74eec7cbfab0",
+    "src/core/types.ts": "c6901f66ba18f3145115cdf8dc4a24ff8d347b034f5eb42a13d2637361ac9c04",
+    "src/core/editor.ts": "f6d75f2d4c7c7b51adc1c5489158ad100ad9c6f55850b24d317545aa144b97a8",
+    "src/core/codex.ts": "989aef1f171d23fa92c43ce1a26640a971fb4ba87919d29e22b1298586feee47",
+    "src/mcp/server.ts": "4a5d18e172effb4d81d65f6346a29443adc2c94713b0d223824018fc493aa03b",
+    "src/renderer/src/components/VideoEditorView.vue": "37d26d9481b1e5917d6ecd9a19c402b1ae39e14d8f64cd53f2d30e190a3885b3",
+    "tests/editor-effect-transition.test.ts": "763ca46b188d18bc3215c017677a86dd44161b96fef457c5090ac4377c372761",
+    "tests/mcp-editor-effect-transition.test.ts": "80d097a735bd5b8e7585e2f24bd3131f63ffde04f773825ce97b66bd406e57f0",
+    "scripts/effect-transition-render-smoke.ts": "a1077170c8bba9dad234a324571181fce5afdbf9af4b7155305035b57c3f80ab",
+    "scripts/create-effect-transition-ui-fixture.ts": "1ea59de33c0efde4c6a680aa8ab8cae970f617a3a8ca6121d742f4f722b80d05",
+    "scripts/ui-editor-effect-transition-smoke.mjs": "a6a584c6cd6381e6c47cf980bc84f99ecc736d746908f76fd1b66059b46564ca"
+  },
+  "documentationHashes": {
+    "README.md": "815daaaf6b37838f233823baa73db8b1260246a2272489a85067d77460eab08b",
+    "docs/CODEX_MCP.md": "2e52cc43d2a858c4137044938232c2f74cfd2ba75d222c38adc86cf996b5548b",
+    "docs/当前开发交接.md": "d93a4cea24b528755f8bc1f4996591ae4ed0bfb9bd6e623cf4d452d2b050e0c0",
+    "docs/验证报告_第三方EffectTransition有界兼容_2026-07-14.md": "fadcb2219164f9132e5a54fa87e119947954846ab05225fc3e21e6042700de3c",
+    "docs/evidence/effect-transition-render-smoke-20260714.json": "ef0d853955c948c0119bd241cff30062f3ab8914ff2e46891c7955a219958ecd",
+    "docs/evidence/editor-effect-transition-ui-smoke-20260714.json": "e4a204820e9456802ff501060379a0b3b0fbe6671b7c44766df4290c66507233",
+    "docs/evidence/editor-effect-transition-ui-20260714.png": "c7517d2dce0bb92711d788b5f817fdb68e748e9c71b9b0ec0698692cb62e7c32"
+  },
+  "signedDmg": {
+    "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+    "bytes": 136652595,
+    "sha256": "ee7c78f16104b3881650353052669fa60c8fd4deb196cc5f49a2f1c765a20972",
+    "touched": false,
+    "containsCurrentSource": false,
+    "notarized": false
+  },
+  "boundaries": {
+    "formalProjectScanned": false,
+    "formalProjectModified": false,
+    "realComfyUiCalled": false,
+    "externalProviderCalled": false,
+    "websiteOpened": false,
+    "uploadPerformed": false,
+    "paidActionPerformed": false,
+    "externalAssetsOverwritten": false,
+    "installationPerformed": false,
+    "releasePerformed": false,
+    "notarizationPerformed": false,
+    "gitCommitPerformed": false,
+    "gitPushPerformed": false,
+    "pullRequestCreated": false
+  },
+  "cleanup": {
+    "electronFixtureRootRemoved": true,
+    "electronFixtureRegistryRemoved": true,
+    "crossProcessSmokeFixturesRemoved": true,
+    "remainingTargetProcesses": 0,
+    "runtimeResourcesIdleAtHeadlessSmoke": true
+  },
+  "git": {
+    "branch": "main",
+    "hasCommits": false,
+    "worktree": "all project files untracked",
+    "commitCreated": false,
+    "pushPerformed": false,
+    "pullRequestCreated": false
+  },
+  "knownLimitations": [
+    "This is an explicit portable allowlist, not general support for arbitrary third-party Effect or Transition objects.",
+    "SMPTE_Dissolve is visual-only in this slice; independent audio remains unchanged.",
+    "Transition combinations with keyframes, private fades or time warps remain rejected.",
+    "Real-project NLE calibration requires an explicitly authorized project root and read-only or write-copy boundary.",
+    "Real ComfyUI, provider sites, upload, payment, Apple notarization and public distribution remain outside this slice."
+  ],
+  "nextUniqueHighestPriority": {
+    "name": "正式 AI 漫剧项目 NLE 校准",
+    "capability": "real-project-nle-validation",
+    "status": "waiting-for-explicit-authorization",
+    "requiredInput": [
+      "formal project root",
+      "read-only or write-copy authorization boundary"
+    ],
+    "substituteLowerPriorityWorkAllowed": false
+  },
+  "success": true
+}

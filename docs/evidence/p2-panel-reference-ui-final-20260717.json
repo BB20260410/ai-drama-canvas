@@ -1,0 +1,1936 @@
+{
+  "schemaVersion": 1,
+  "kind": "p2-panel-reference-ui-smoke",
+  "createdAt": "2026-07-17T07:16:09.857Z",
+  "transport": "electron-current-production-build",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "auditFingerprint": "64651abfbf1f495eb1865eca7819e0f01ab92e9e9803d7905bde550001a76e16",
+  "registryPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-p2-panel-reference-ui-registry-3f66a8f0b4ecaacb.json",
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p2-panel-reference-ui-final-20260717.png",
+    "sha256": "9353b9e5e7f8873b3d878cd933ec85b676c28d428eb54627d68713401ad30b7a",
+    "bytes": 523316,
+    "dimensions": [
+      3456,
+      2058
+    ]
+  },
+  "guardedFiles": {
+    "beforeHashes": {
+      "resolutions": "71d1cc640b50be371aa1f3e5886fc90656747a34fd3ab8d0a9e7c7f4344b5bd1",
+      "selections": "a8ec5e31899a71383bbb514720d0e00f918b9d0efe1a0d4cf408a9013c645ffa",
+      "storyboards": "48351896542028241ea689e930a4aa1df190a18de002d6c432cb4c4b6d9b3a78",
+      "continuity": "62b7a2fd80eefeb28e7b15780f5483df5381ce8dd94573311859e48b6962a20a",
+      "productionAssets": "e693c5477044d9389de19188d14e876ea334c762cea86f9010a3de47f41abeae"
+    },
+    "afterHashes": {
+      "resolutions": "71d1cc640b50be371aa1f3e5886fc90656747a34fd3ab8d0a9e7c7f4344b5bd1",
+      "selections": "a8ec5e31899a71383bbb514720d0e00f918b9d0efe1a0d4cf408a9013c645ffa",
+      "storyboards": "48351896542028241ea689e930a4aa1df190a18de002d6c432cb4c4b6d9b3a78",
+      "continuity": "62b7a2fd80eefeb28e7b15780f5483df5381ce8dd94573311859e48b6962a20a",
+      "productionAssets": "e693c5477044d9389de19188d14e876ea334c762cea86f9010a3de47f41abeae"
+    },
+    "unchanged": true
+  },
+  "apiState": {
+    "currentness": {
+      "current": true,
+      "checkedAt": "2026-07-17T07:15:34.585Z",
+      "storeRevision": 1,
+      "storeFingerprint": "a151dc3c32e12996b3a1f345b9b04f9516fd8d4ceb489797a8d6bafa6eb9c475",
+      "driftedInputs": []
+    },
+    "audit": {
+      "schemaVersion": 1,
+      "resolverVersion": "panel-reference-resolution-v1",
+      "currentContracts": 1288,
+      "panels": 4330,
+      "panelDistribution": {
+        "2": 151,
+        "3": 667,
+        "4": 349,
+        "5": 95,
+        "6": 26
+      },
+      "semanticAssetBindings": 13808,
+      "referenceSlots": 12716,
+      "confirmedEmptyPanels": 10,
+      "generationReadyPanels": 610,
+      "pendingHardLockPanels": 3554,
+      "pendingHardLockReferences": 7480,
+      "pendingDerivedArtifactPanels": 166,
+      "detectedOverflowPanels": 166,
+      "derivedDefinitions": 52,
+      "detectedRowContinuityDifferencePanels": 909,
+      "detectedRowContinuityDifferences": 1990,
+      "unresolvedPanels": 0,
+      "unresolvedReferences": 0,
+      "knownAssetMissingBindingPanels": 0,
+      "knownAssetMissingBindings": 0,
+      "unhandledOverflowPanels": 0,
+      "timeSpanContinuityMismatchPanels": 0,
+      "timeSpanContinuityMismatches": 0,
+      "maximumSemanticAssetsPerPanel": 12,
+      "maximumReferenceSlotsPerPanel": 6,
+      "closurePassed": true,
+      "auditFingerprint": "64651abfbf1f495eb1865eca7819e0f01ab92e9e9803d7905bde550001a76e16"
+    },
+    "page": {
+      "total": 4330,
+      "count": 50,
+      "storeRevision": 1,
+      "storeFingerprint": "a151dc3c32e12996b3a1f345b9b04f9516fd8d4ceb489797a8d6bafa6eb9c475",
+      "auditFingerprint": "64651abfbf1f495eb1865eca7819e0f01ab92e9e9803d7905bde550001a76e16"
+    },
+    "derived": {
+      "total": 52,
+      "count": 52,
+      "storeRevision": 1,
+      "items": [
+        {
+          "id": "derived-reference-02a0ab5509e04e7d7230d440",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C02+C04b+C05+C20+P07+P25+S04",
+          "memberAssetIds": [
+            "C02",
+            "C04b",
+            "C05",
+            "C20",
+            "P07",
+            "P25",
+            "S04"
+          ],
+          "memberDefinitionVersions": {
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C04b": "9724a5e86fa06d17400ab95a54e64cad7da4416dea4956157e32d1f997190145",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C20": "5806a4257a6f7bd7e615fc0331701cffee24d9f76dcdf52555a1d007c8b078fc",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "P25": "149c5565aee2e194a947b30ff33e09850de35bc13292fbacab4c5ab7538f353b",
+            "S04": "0fb91cd9d88d54a684f0a192f73ebf7c46590ff83a2321a8da8c8c8c124b052a"
+          },
+          "definitionFingerprint": "02a0ab5509e04e7d7230d44093b4a0b724e775b66b415a7522ecb2cf309803c5",
+          "definitionReview": {
+            "id": "derived-reference-review-02a0ab5509e04e7d7230d440",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-04c10a517ebb628ab182650b",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C05+P05+P08+P12+P17+P18+S18",
+          "memberAssetIds": [
+            "C05",
+            "P05",
+            "P08",
+            "P12",
+            "P17",
+            "P18",
+            "S18"
+          ],
+          "memberDefinitionVersions": {
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "P05": "ff4b2da5bf2b8697e83adae9569cd6d139b2f4cf69724595003a30418e3088e8",
+            "P08": "8acf00af2f29cf3ee9fd0653171866f45da27b648392f8d0e3c0aa00d024107e",
+            "P12": "493b7be099745081b179152c1410e5aee180e6cece0c80f662311379d6392f61",
+            "P17": "a4ee61c8cace652c28dcfe7218513c0b7b8e5ba4cd6f6618a3bb1cd52c601f62",
+            "P18": "a6de0344faee8c153edfbcbde180a11dbd61d3d163091fb45ca07e9ca8572a8d",
+            "S18": "25869c5f3728b636952aa8a25871c9fb8c96eddef9767269ef44d7cfb075ae84"
+          },
+          "definitionFingerprint": "04c10a517ebb628ab182650b45263942bdc50cd57a9195d65b3b19a53f224503",
+          "definitionReview": {
+            "id": "derived-reference-review-04c10a517ebb628ab182650b",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-06d52b60eeeeb3a117eb79e9",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C03c+C05+P03+P05+P07+P08+P12+S19",
+          "memberAssetIds": [
+            "C03c",
+            "C05",
+            "P03",
+            "P05",
+            "P07",
+            "P08",
+            "P12",
+            "S19"
+          ],
+          "memberDefinitionVersions": {
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "P03": "bd8cac04e37621dc2eda705aeac40a6fb047ded9b2d79f8822d70d024a2c1580",
+            "P05": "ff4b2da5bf2b8697e83adae9569cd6d139b2f4cf69724595003a30418e3088e8",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "P08": "8acf00af2f29cf3ee9fd0653171866f45da27b648392f8d0e3c0aa00d024107e",
+            "P12": "493b7be099745081b179152c1410e5aee180e6cece0c80f662311379d6392f61",
+            "S19": "8f040a6529e766c8ad474451fe782906372f763c9371f68d4a645173a6a9523e"
+          },
+          "definitionFingerprint": "06d52b60eeeeb3a117eb79e99191d5f49df8d34a118ad5db3d74e556e7e38c39",
+          "definitionReview": {
+            "id": "derived-reference-review-06d52b60eeeeb3a117eb79e9",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-0772a98d1757889e88a7b2e3",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03b+C05+C19+C20+S03",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03b",
+            "C05",
+            "C19",
+            "C20",
+            "S03"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03b": "9c1d04d655a74d8c178292c17b8d097d6e64f01345757321530fc2770e2d8c3a",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C19": "74b70e3bfe89ad09af28005a891464e0b83b3fe5d75d278497e6f61fc23bc37d",
+            "C20": "5806a4257a6f7bd7e615fc0331701cffee24d9f76dcdf52555a1d007c8b078fc",
+            "S03": "a10388f20ac37b3b011652e629aa0a73bfabeeddd113aa20bbbf59f4d824f402"
+          },
+          "definitionFingerprint": "0772a98d1757889e88a7b2e384c0c8ccd8abeea26489ca50d6fc258827d687ab",
+          "definitionReview": {
+            "id": "derived-reference-review-0772a98d1757889e88a7b2e3",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-0d8b32fe5f22b43c4324788c",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C06+C17+C18+C21+P14+P19+P20+P21+S18",
+          "memberAssetIds": [
+            "C06",
+            "C17",
+            "C18",
+            "C21",
+            "P14",
+            "P19",
+            "P20",
+            "P21",
+            "S18"
+          ],
+          "memberDefinitionVersions": {
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "C17": "7ba9d114cca2292af8f1c43b2daa8b11bfa337d86a9dc67ce6b29679175dcc2c",
+            "C18": "d27a168947ccefb028f1cccd80f6e8fe984b78bde0a84f5eafef34109803a186",
+            "C21": "3a7e5b33df3bcbbf97823e4b64b7bc95c7bd1e7637ffc56abb3417bc61c2ce16",
+            "P14": "7a303e054f5499817109dac1baacec0089ca7cfb91372a9ee2abfc3846036040",
+            "P19": "4e5a6e1ab10da8533ee7977d7af36a53a6b81b54a204bccdc14b8553bac819f2",
+            "P20": "d12f7051d5114bc5b0979ce9c4a69e041d0a47e81db77bb17b38038cebe739cb",
+            "P21": "728a1550c7da5c7d2f27bc1ad079b632eb7baf5aadbe91dc0dcefef7c397a8f9",
+            "S18": "25869c5f3728b636952aa8a25871c9fb8c96eddef9767269ef44d7cfb075ae84"
+          },
+          "definitionFingerprint": "0d8b32fe5f22b43c4324788caf6fd8bc56256e06d767584702f27224f2dd0792",
+          "definitionReview": {
+            "id": "derived-reference-review-0d8b32fe5f22b43c4324788c",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-0d9a4c3e9a2c868b27ae99c9",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C05+P01+P04+P06+P07+P09",
+          "memberAssetIds": [
+            "C01",
+            "C05",
+            "P01",
+            "P04",
+            "P06",
+            "P07",
+            "P09"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "P01": "52e6dd55e5a5bc548143290c751459da8d6fad13674e23fae9fee66ad0818205",
+            "P04": "79972e17b4bbece6c2b13d6d77169a175e1718b3f38aa3aa0d016b42c3a86902",
+            "P06": "28d90c7653360813527933450e188b7c887d55ca9fa08774ff16304e51286b35",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "P09": "ba9656b4b05fc14c730189eedc29f69dca9451bf6d735c3e0967793798e94278"
+          },
+          "definitionFingerprint": "0d9a4c3e9a2c868b27ae99c94bf19f7d91e024fdf48bc47ec33ce803a413971c",
+          "definitionReview": {
+            "id": "derived-reference-review-0d9a4c3e9a2c868b27ae99c9",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-112c011e6f59c4c6d179c893",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03a+C04a+P03+P10+S03+S08",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03a",
+            "C04a",
+            "P03",
+            "P10",
+            "S03",
+            "S08"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03a": "6c4fef88333faf37243ce1cf5ebdb95afb81c0f92611050b0fb3d70968ec2e14",
+            "C04a": "8aa631c763c4f7b342d6108f62ef2779dbf9ffd1003635c1a54b9be05683c99e",
+            "P03": "bd8cac04e37621dc2eda705aeac40a6fb047ded9b2d79f8822d70d024a2c1580",
+            "P10": "47a8afcf6430a7c5219ab7d5c95311e08a566122788caf9039ccaf9464055c51",
+            "S03": "a10388f20ac37b3b011652e629aa0a73bfabeeddd113aa20bbbf59f4d824f402",
+            "S08": "724f12ce2518ef3388fcd4f9c79e3c1e50937707b007bc644b3d3e54b730db48"
+          },
+          "definitionFingerprint": "112c011e6f59c4c6d179c89326370a03b54a34c3465a1319ba2f3fe98964d11c",
+          "definitionReview": {
+            "id": "derived-reference-review-112c011e6f59c4c6d179c893",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-23222a903a2171961afc1a79",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C05+C06+C20+P09+P14+P15+S12",
+          "memberAssetIds": [
+            "C05",
+            "C06",
+            "C20",
+            "P09",
+            "P14",
+            "P15",
+            "S12"
+          ],
+          "memberDefinitionVersions": {
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "C20": "5806a4257a6f7bd7e615fc0331701cffee24d9f76dcdf52555a1d007c8b078fc",
+            "P09": "ba9656b4b05fc14c730189eedc29f69dca9451bf6d735c3e0967793798e94278",
+            "P14": "7a303e054f5499817109dac1baacec0089ca7cfb91372a9ee2abfc3846036040",
+            "P15": "72e6e48086fce1207d5796fba283fb5f384910b8115e55ee81faea26e3377950",
+            "S12": "ce20be5fadb65669e7f4f32dd3495ea7586a5a466c93431e88a123c71b6f818b"
+          },
+          "definitionFingerprint": "23222a903a2171961afc1a797d4117f683fbea7cfcc8e14c71c3a3db272b40d9",
+          "definitionReview": {
+            "id": "derived-reference-review-23222a903a2171961afc1a79",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-2920b1421e48d87683133036",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03b+C04a+C20+S03+S06",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03b",
+            "C04a",
+            "C20",
+            "S03",
+            "S06"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03b": "9c1d04d655a74d8c178292c17b8d097d6e64f01345757321530fc2770e2d8c3a",
+            "C04a": "8aa631c763c4f7b342d6108f62ef2779dbf9ffd1003635c1a54b9be05683c99e",
+            "C20": "5806a4257a6f7bd7e615fc0331701cffee24d9f76dcdf52555a1d007c8b078fc",
+            "S03": "a10388f20ac37b3b011652e629aa0a73bfabeeddd113aa20bbbf59f4d824f402",
+            "S06": "6018e8180a04506ee543159f5272a30bcde4d7a8b7d5e9e4a8d3554ecd56bc3a"
+          },
+          "definitionFingerprint": "2920b1421e48d87683133036c7ddcc1478357ded5f98e28122ce47a2d100b21b",
+          "definitionReview": {
+            "id": "derived-reference-review-2920b1421e48d87683133036",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-2c75a1b2df0a4cab5238cfd1",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C05+P05+P08+P12+P16+P17+P18",
+          "memberAssetIds": [
+            "C05",
+            "P05",
+            "P08",
+            "P12",
+            "P16",
+            "P17",
+            "P18"
+          ],
+          "memberDefinitionVersions": {
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "P05": "ff4b2da5bf2b8697e83adae9569cd6d139b2f4cf69724595003a30418e3088e8",
+            "P08": "8acf00af2f29cf3ee9fd0653171866f45da27b648392f8d0e3c0aa00d024107e",
+            "P12": "493b7be099745081b179152c1410e5aee180e6cece0c80f662311379d6392f61",
+            "P16": "9f3b27ba56b3f9104311408962d4f0fd1b757d8253bdb1c3fe2c5d45c35c82c8",
+            "P17": "a4ee61c8cace652c28dcfe7218513c0b7b8e5ba4cd6f6618a3bb1cd52c601f62",
+            "P18": "a6de0344faee8c153edfbcbde180a11dbd61d3d163091fb45ca07e9ca8572a8d"
+          },
+          "definitionFingerprint": "2c75a1b2df0a4cab5238cfd18dcc1960b6f02b805976f5a240266020d7bd163e",
+          "definitionReview": {
+            "id": "derived-reference-review-2c75a1b2df0a4cab5238cfd1",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-394745d1e9e023bb064ab1fe",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C05+C06+P11+S13",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C05",
+            "C06",
+            "P11",
+            "S13"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "P11": "9e9e61008f07e26f38f416ca62bf983ffb596cd9bf178503e7f11a019a11a8b6",
+            "S13": "ea84b9ba6c03adb3aa019f3552c3b319610f6aa1d0c6f6d25b2a7455cad2a3d9"
+          },
+          "definitionFingerprint": "394745d1e9e023bb064ab1fe1b90f2dbdbb3c33d20e60630f482ae7511f1e93f",
+          "definitionReview": {
+            "id": "derived-reference-review-394745d1e9e023bb064ab1fe",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-46fea0ddc61b5783f32f898a",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C05+C06+C15+S16",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C05",
+            "C06",
+            "C15",
+            "S16"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "C15": "151c337f50573e865560d9af336afcc5d16e57ba571ba5d40f7987d3ed60b67b",
+            "S16": "370d1f60bdc9a051798e616478a7ea7af92d19b5040e56fd720d09560d8041a8"
+          },
+          "definitionFingerprint": "46fea0ddc61b5783f32f898a1d05ef1a37b5c79f4fe614576ceb3e5c1fab5838",
+          "definitionReview": {
+            "id": "derived-reference-review-46fea0ddc61b5783f32f898a",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-481121c70dd81e45579fd08d",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C05+C06+P08+S14",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C05",
+            "C06",
+            "P08",
+            "S14"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "P08": "8acf00af2f29cf3ee9fd0653171866f45da27b648392f8d0e3c0aa00d024107e",
+            "S14": "ed78e8a6c83e010cb0b42fc43796afac32eebf4851c01cda39a6a8730a820909"
+          },
+          "definitionFingerprint": "481121c70dd81e45579fd08dc6b0d533297845583c171e58ffd3bc209fe4d355",
+          "definitionReview": {
+            "id": "derived-reference-review-481121c70dd81e45579fd08d",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-4b09da50654fbbae12378ad0",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C05+C06+C15+P16+S15",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C05",
+            "C06",
+            "C15",
+            "P16",
+            "S15"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "C15": "151c337f50573e865560d9af336afcc5d16e57ba571ba5d40f7987d3ed60b67b",
+            "P16": "9f3b27ba56b3f9104311408962d4f0fd1b757d8253bdb1c3fe2c5d45c35c82c8",
+            "S15": "158066c074b7f1c37b1b208118283de6094d08623eedfb9a238d160af4023c2e"
+          },
+          "definitionFingerprint": "4b09da50654fbbae12378ad0a33a0f7def5a5acddfa5fa0770965d7a954d9549",
+          "definitionReview": {
+            "id": "derived-reference-review-4b09da50654fbbae12378ad0",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-4cad33487aaed4b8d1f7a62e",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+P01+P07+S01+S11",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "P01",
+            "P07",
+            "S01",
+            "S11"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "P01": "52e6dd55e5a5bc548143290c751459da8d6fad13674e23fae9fee66ad0818205",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "S01": "ce58cfed5199930978c1208697e1b1806bd7f50e671dd5c313a4f9005c847399",
+            "S11": "2c82aa8bc8a1772baaad24787f108fda6312cc125f635cb240d7214804b6db26"
+          },
+          "definitionFingerprint": "4cad33487aaed4b8d1f7a62e6d5debb53c9719bbf2e6a7a7b4046141ed63dc90",
+          "definitionReview": {
+            "id": "derived-reference-review-4cad33487aaed4b8d1f7a62e",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-4e4c19fe8297153b7680f220",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C05+C06+C15+P07+S15",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C05",
+            "C06",
+            "C15",
+            "P07",
+            "S15"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "C15": "151c337f50573e865560d9af336afcc5d16e57ba571ba5d40f7987d3ed60b67b",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "S15": "158066c074b7f1c37b1b208118283de6094d08623eedfb9a238d160af4023c2e"
+          },
+          "definitionFingerprint": "4e4c19fe8297153b7680f220f03821dc540e1abbf2e6ab00bd192598f206c7c6",
+          "definitionReview": {
+            "id": "derived-reference-review-4e4c19fe8297153b7680f220",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-57b6e35de8ff61e1c8b87359",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03b+C03c+C04a+C05+P01+P03+P05+P06+S03+S11",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03b",
+            "C03c",
+            "C04a",
+            "C05",
+            "P01",
+            "P03",
+            "P05",
+            "P06",
+            "S03",
+            "S11"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03b": "9c1d04d655a74d8c178292c17b8d097d6e64f01345757321530fc2770e2d8c3a",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C04a": "8aa631c763c4f7b342d6108f62ef2779dbf9ffd1003635c1a54b9be05683c99e",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "P01": "52e6dd55e5a5bc548143290c751459da8d6fad13674e23fae9fee66ad0818205",
+            "P03": "bd8cac04e37621dc2eda705aeac40a6fb047ded9b2d79f8822d70d024a2c1580",
+            "P05": "ff4b2da5bf2b8697e83adae9569cd6d139b2f4cf69724595003a30418e3088e8",
+            "P06": "28d90c7653360813527933450e188b7c887d55ca9fa08774ff16304e51286b35",
+            "S03": "a10388f20ac37b3b011652e629aa0a73bfabeeddd113aa20bbbf59f4d824f402",
+            "S11": "2c82aa8bc8a1772baaad24787f108fda6312cc125f635cb240d7214804b6db26"
+          },
+          "definitionFingerprint": "57b6e35de8ff61e1c8b873593ea0a7d0d903d85cd21c7620a2a89d8ee355a959",
+          "definitionReview": {
+            "id": "derived-reference-review-57b6e35de8ff61e1c8b87359",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-5fbe37626185c1083f1b535d",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C05+C06+C15+S18",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C05",
+            "C06",
+            "C15",
+            "S18"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "C15": "151c337f50573e865560d9af336afcc5d16e57ba571ba5d40f7987d3ed60b67b",
+            "S18": "25869c5f3728b636952aa8a25871c9fb8c96eddef9767269ef44d7cfb075ae84"
+          },
+          "definitionFingerprint": "5fbe37626185c1083f1b535dfeadbfd3d9041a44d1c0babc2d25879de8a031f6",
+          "definitionReview": {
+            "id": "derived-reference-review-5fbe37626185c1083f1b535d",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-60cb3fdbbf5362edbd7f4378",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C05+C06+P14+S14",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C05",
+            "C06",
+            "P14",
+            "S14"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "P14": "7a303e054f5499817109dac1baacec0089ca7cfb91372a9ee2abfc3846036040",
+            "S14": "ed78e8a6c83e010cb0b42fc43796afac32eebf4851c01cda39a6a8730a820909"
+          },
+          "definitionFingerprint": "60cb3fdbbf5362edbd7f4378ded40339ad491a8f62fd889bb8cb27371e8a1588",
+          "definitionReview": {
+            "id": "derived-reference-review-60cb3fdbbf5362edbd7f4378",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-67ee4d137f5d6e239dcb5ac0",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C04b+C06+P12+S07+S08+S12",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C04b",
+            "C06",
+            "P12",
+            "S07",
+            "S08",
+            "S12"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C04b": "9724a5e86fa06d17400ab95a54e64cad7da4416dea4956157e32d1f997190145",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "P12": "493b7be099745081b179152c1410e5aee180e6cece0c80f662311379d6392f61",
+            "S07": "9b7a81cdcc72d4a162da615046f267c73c67b74bc2332c38221767a1669c7d4a",
+            "S08": "724f12ce2518ef3388fcd4f9c79e3c1e50937707b007bc644b3d3e54b730db48",
+            "S12": "ce20be5fadb65669e7f4f32dd3495ea7586a5a466c93431e88a123c71b6f818b"
+          },
+          "definitionFingerprint": "67ee4d137f5d6e239dcb5ac06a3899d82efdf57edaeabbb098f21b23a90d0cb5",
+          "definitionReview": {
+            "id": "derived-reference-review-67ee4d137f5d6e239dcb5ac0",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-6b47c5df8eb5e548ff381476",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C03c+C05+C20+P07+P09+P24+S03",
+          "memberAssetIds": [
+            "C03c",
+            "C05",
+            "C20",
+            "P07",
+            "P09",
+            "P24",
+            "S03"
+          ],
+          "memberDefinitionVersions": {
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C20": "5806a4257a6f7bd7e615fc0331701cffee24d9f76dcdf52555a1d007c8b078fc",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "P09": "ba9656b4b05fc14c730189eedc29f69dca9451bf6d735c3e0967793798e94278",
+            "P24": "bab6e8a3ad38e46efe378d2d4e6d50060bd47059ddeca8194ea68853b411fc33",
+            "S03": "a10388f20ac37b3b011652e629aa0a73bfabeeddd113aa20bbbf59f4d824f402"
+          },
+          "definitionFingerprint": "6b47c5df8eb5e548ff3814762da468db80e6d736e3c83f2e7349e68b5dbe0ce9",
+          "definitionReview": {
+            "id": "derived-reference-review-6b47c5df8eb5e548ff381476",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-6efa4e7ad989f705aaf4e419",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C04b+C05+C06+C20+P12+S03",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C04b",
+            "C05",
+            "C06",
+            "C20",
+            "P12",
+            "S03"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C04b": "9724a5e86fa06d17400ab95a54e64cad7da4416dea4956157e32d1f997190145",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "C20": "5806a4257a6f7bd7e615fc0331701cffee24d9f76dcdf52555a1d007c8b078fc",
+            "P12": "493b7be099745081b179152c1410e5aee180e6cece0c80f662311379d6392f61",
+            "S03": "a10388f20ac37b3b011652e629aa0a73bfabeeddd113aa20bbbf59f4d824f402"
+          },
+          "definitionFingerprint": "6efa4e7ad989f705aaf4e419de299dcd01325bf5fa2d7bbed3a4d53d9a429439",
+          "definitionReview": {
+            "id": "derived-reference-review-6efa4e7ad989f705aaf4e419",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-73f23f14380f3874cebe93a3",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C04b+C05+C20+S03+S08+S12",
+          "memberAssetIds": [
+            "C01",
+            "C04b",
+            "C05",
+            "C20",
+            "S03",
+            "S08",
+            "S12"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C04b": "9724a5e86fa06d17400ab95a54e64cad7da4416dea4956157e32d1f997190145",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C20": "5806a4257a6f7bd7e615fc0331701cffee24d9f76dcdf52555a1d007c8b078fc",
+            "S03": "a10388f20ac37b3b011652e629aa0a73bfabeeddd113aa20bbbf59f4d824f402",
+            "S08": "724f12ce2518ef3388fcd4f9c79e3c1e50937707b007bc644b3d3e54b730db48",
+            "S12": "ce20be5fadb65669e7f4f32dd3495ea7586a5a466c93431e88a123c71b6f818b"
+          },
+          "definitionFingerprint": "73f23f14380f3874cebe93a34970d85ee45acbebccb280efba11172851fc8012",
+          "definitionReview": {
+            "id": "derived-reference-review-73f23f14380f3874cebe93a3",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-83b719317b7ba1e4dcbb1997",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C05+C06+C15+S15",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C05",
+            "C06",
+            "C15",
+            "S15"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "C15": "151c337f50573e865560d9af336afcc5d16e57ba571ba5d40f7987d3ed60b67b",
+            "S15": "158066c074b7f1c37b1b208118283de6094d08623eedfb9a238d160af4023c2e"
+          },
+          "definitionFingerprint": "83b719317b7ba1e4dcbb1997536da1329704b4f2c600f6f92fbe3cb6bc751ae1",
+          "definitionReview": {
+            "id": "derived-reference-review-83b719317b7ba1e4dcbb1997",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-93ebdf25da99576423eac377",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+P01+P04+P08+P09+S15",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "P01",
+            "P04",
+            "P08",
+            "P09",
+            "S15"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "P01": "52e6dd55e5a5bc548143290c751459da8d6fad13674e23fae9fee66ad0818205",
+            "P04": "79972e17b4bbece6c2b13d6d77169a175e1718b3f38aa3aa0d016b42c3a86902",
+            "P08": "8acf00af2f29cf3ee9fd0653171866f45da27b648392f8d0e3c0aa00d024107e",
+            "P09": "ba9656b4b05fc14c730189eedc29f69dca9451bf6d735c3e0967793798e94278",
+            "S15": "158066c074b7f1c37b1b208118283de6094d08623eedfb9a238d160af4023c2e"
+          },
+          "definitionFingerprint": "93ebdf25da99576423eac3776cd1d1888bb9d47e60a244b5f4fe83ac861ee02d",
+          "definitionReview": {
+            "id": "derived-reference-review-93ebdf25da99576423eac377",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-99f1f87fd4a1acc42b54af09",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C05+P01+P09+P11+P28",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C05",
+            "P01",
+            "P09",
+            "P11",
+            "P28"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "P01": "52e6dd55e5a5bc548143290c751459da8d6fad13674e23fae9fee66ad0818205",
+            "P09": "ba9656b4b05fc14c730189eedc29f69dca9451bf6d735c3e0967793798e94278",
+            "P11": "9e9e61008f07e26f38f416ca62bf983ffb596cd9bf178503e7f11a019a11a8b6",
+            "P28": "96ea034bc792733a0f9a872e1c46c61e7108da194fd7525513a9d06d3a7f69e6"
+          },
+          "definitionFingerprint": "99f1f87fd4a1acc42b54af092ce2f707b5c620aad59868684596a1bcff8603fe",
+          "definitionReview": {
+            "id": "derived-reference-review-99f1f87fd4a1acc42b54af09",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-9a2ce51657e8421d4a9f8285",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C15+C21+P07+P16+P17+P18+S18",
+          "memberAssetIds": [
+            "C15",
+            "C21",
+            "P07",
+            "P16",
+            "P17",
+            "P18",
+            "S18"
+          ],
+          "memberDefinitionVersions": {
+            "C15": "151c337f50573e865560d9af336afcc5d16e57ba571ba5d40f7987d3ed60b67b",
+            "C21": "3a7e5b33df3bcbbf97823e4b64b7bc95c7bd1e7637ffc56abb3417bc61c2ce16",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "P16": "9f3b27ba56b3f9104311408962d4f0fd1b757d8253bdb1c3fe2c5d45c35c82c8",
+            "P17": "a4ee61c8cace652c28dcfe7218513c0b7b8e5ba4cd6f6618a3bb1cd52c601f62",
+            "P18": "a6de0344faee8c153edfbcbde180a11dbd61d3d163091fb45ca07e9ca8572a8d",
+            "S18": "25869c5f3728b636952aa8a25871c9fb8c96eddef9767269ef44d7cfb075ae84"
+          },
+          "definitionFingerprint": "9a2ce51657e8421d4a9f8285bbf2413321efa74881d512eb67e80215f77928a6",
+          "definitionReview": {
+            "id": "derived-reference-review-9a2ce51657e8421d4a9f8285",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-9b854d8185c52ebfed16db27",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C03c+C05+C06+P01+P08+P09+P14",
+          "memberAssetIds": [
+            "C01",
+            "C03c",
+            "C05",
+            "C06",
+            "P01",
+            "P08",
+            "P09",
+            "P14"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "P01": "52e6dd55e5a5bc548143290c751459da8d6fad13674e23fae9fee66ad0818205",
+            "P08": "8acf00af2f29cf3ee9fd0653171866f45da27b648392f8d0e3c0aa00d024107e",
+            "P09": "ba9656b4b05fc14c730189eedc29f69dca9451bf6d735c3e0967793798e94278",
+            "P14": "7a303e054f5499817109dac1baacec0089ca7cfb91372a9ee2abfc3846036040"
+          },
+          "definitionFingerprint": "9b854d8185c52ebfed16db27250b13134395f7d8361218a0200271d7f164e6b7",
+          "definitionReview": {
+            "id": "derived-reference-review-9b854d8185c52ebfed16db27",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-9c6676e3f7e1972c1ec0ca69",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C06+P01+P12+P15+S01+S08+S12",
+          "memberAssetIds": [
+            "C01",
+            "C06",
+            "P01",
+            "P12",
+            "P15",
+            "S01",
+            "S08",
+            "S12"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "P01": "52e6dd55e5a5bc548143290c751459da8d6fad13674e23fae9fee66ad0818205",
+            "P12": "493b7be099745081b179152c1410e5aee180e6cece0c80f662311379d6392f61",
+            "P15": "72e6e48086fce1207d5796fba283fb5f384910b8115e55ee81faea26e3377950",
+            "S01": "ce58cfed5199930978c1208697e1b1806bd7f50e671dd5c313a4f9005c847399",
+            "S08": "724f12ce2518ef3388fcd4f9c79e3c1e50937707b007bc644b3d3e54b730db48",
+            "S12": "ce20be5fadb65669e7f4f32dd3495ea7586a5a466c93431e88a123c71b6f818b"
+          },
+          "definitionFingerprint": "9c6676e3f7e1972c1ec0ca6919df4e61106cf739627ef216db3c6887cd9f4ac9",
+          "definitionReview": {
+            "id": "derived-reference-review-9c6676e3f7e1972c1ec0ca69",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-9cef7dc5a07f3f70bd796438",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C03c+C06+C21+P05+P09+P19+P20+P21+S19",
+          "memberAssetIds": [
+            "C03c",
+            "C06",
+            "C21",
+            "P05",
+            "P09",
+            "P19",
+            "P20",
+            "P21",
+            "S19"
+          ],
+          "memberDefinitionVersions": {
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "C21": "3a7e5b33df3bcbbf97823e4b64b7bc95c7bd1e7637ffc56abb3417bc61c2ce16",
+            "P05": "ff4b2da5bf2b8697e83adae9569cd6d139b2f4cf69724595003a30418e3088e8",
+            "P09": "ba9656b4b05fc14c730189eedc29f69dca9451bf6d735c3e0967793798e94278",
+            "P19": "4e5a6e1ab10da8533ee7977d7af36a53a6b81b54a204bccdc14b8553bac819f2",
+            "P20": "d12f7051d5114bc5b0979ce9c4a69e041d0a47e81db77bb17b38038cebe739cb",
+            "P21": "728a1550c7da5c7d2f27bc1ad079b632eb7baf5aadbe91dc0dcefef7c397a8f9",
+            "S19": "8f040a6529e766c8ad474451fe782906372f763c9371f68d4a645173a6a9523e"
+          },
+          "definitionFingerprint": "9cef7dc5a07f3f70bd796438a82c2478f084947a525f9a5de241e7ed6be419e4",
+          "definitionReview": {
+            "id": "derived-reference-review-9cef7dc5a07f3f70bd796438",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-9ea85d74b13664b395dfcf2e",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C05+C06+C15+P18+S16+S17",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C05",
+            "C06",
+            "C15",
+            "P18",
+            "S16",
+            "S17"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "C15": "151c337f50573e865560d9af336afcc5d16e57ba571ba5d40f7987d3ed60b67b",
+            "P18": "a6de0344faee8c153edfbcbde180a11dbd61d3d163091fb45ca07e9ca8572a8d",
+            "S16": "370d1f60bdc9a051798e616478a7ea7af92d19b5040e56fd720d09560d8041a8",
+            "S17": "b73b313709bb957f1193dfb148a50dfe2f474b6a47d5dc28d9e9425a8f63dd45"
+          },
+          "definitionFingerprint": "9ea85d74b13664b395dfcf2eb876be7fc85e2800dd968ba842359a4976860e6c",
+          "definitionReview": {
+            "id": "derived-reference-review-9ea85d74b13664b395dfcf2e",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-a25094a72f9dacc1f79bc936",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C21+P01+P16+P17+P18+S18",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C21",
+            "P01",
+            "P16",
+            "P17",
+            "P18",
+            "S18"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C21": "3a7e5b33df3bcbbf97823e4b64b7bc95c7bd1e7637ffc56abb3417bc61c2ce16",
+            "P01": "52e6dd55e5a5bc548143290c751459da8d6fad13674e23fae9fee66ad0818205",
+            "P16": "9f3b27ba56b3f9104311408962d4f0fd1b757d8253bdb1c3fe2c5d45c35c82c8",
+            "P17": "a4ee61c8cace652c28dcfe7218513c0b7b8e5ba4cd6f6618a3bb1cd52c601f62",
+            "P18": "a6de0344faee8c153edfbcbde180a11dbd61d3d163091fb45ca07e9ca8572a8d",
+            "S18": "25869c5f3728b636952aa8a25871c9fb8c96eddef9767269ef44d7cfb075ae84"
+          },
+          "definitionFingerprint": "a25094a72f9dacc1f79bc936b87d59208812b699e2f2d2b772c07ff1245dadd9",
+          "definitionReview": {
+            "id": "derived-reference-review-a25094a72f9dacc1f79bc936",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-a85a91483c49f54f1fce9e3f",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C05+C16+C17+C18+P07+P31+S19",
+          "memberAssetIds": [
+            "C05",
+            "C16",
+            "C17",
+            "C18",
+            "P07",
+            "P31",
+            "S19"
+          ],
+          "memberDefinitionVersions": {
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C16": "3b41494ce70e52ef89d7e82f67470aefc093d7ddc3b076e8371371810b3c8d46",
+            "C17": "7ba9d114cca2292af8f1c43b2daa8b11bfa337d86a9dc67ce6b29679175dcc2c",
+            "C18": "d27a168947ccefb028f1cccd80f6e8fe984b78bde0a84f5eafef34109803a186",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "P31": "c4c7433accaac729402ca38d7451c5bbeac10573cd22aebda41ab6d66ec0ea43",
+            "S19": "8f040a6529e766c8ad474451fe782906372f763c9371f68d4a645173a6a9523e"
+          },
+          "definitionFingerprint": "a85a91483c49f54f1fce9e3f6ff4b69909214bebd5325e298e0f71da0c65a0d2",
+          "definitionReview": {
+            "id": "derived-reference-review-a85a91483c49f54f1fce9e3f",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-aa6600e572e8881e9319852c",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C05+C06+C15+P08+P09+P16+S16",
+          "memberAssetIds": [
+            "C05",
+            "C06",
+            "C15",
+            "P08",
+            "P09",
+            "P16",
+            "S16"
+          ],
+          "memberDefinitionVersions": {
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "C15": "151c337f50573e865560d9af336afcc5d16e57ba571ba5d40f7987d3ed60b67b",
+            "P08": "8acf00af2f29cf3ee9fd0653171866f45da27b648392f8d0e3c0aa00d024107e",
+            "P09": "ba9656b4b05fc14c730189eedc29f69dca9451bf6d735c3e0967793798e94278",
+            "P16": "9f3b27ba56b3f9104311408962d4f0fd1b757d8253bdb1c3fe2c5d45c35c82c8",
+            "S16": "370d1f60bdc9a051798e616478a7ea7af92d19b5040e56fd720d09560d8041a8"
+          },
+          "definitionFingerprint": "aa6600e572e8881e9319852c77d2fe516a0ad73af51e9713f73949fc6d673c57",
+          "definitionReview": {
+            "id": "derived-reference-review-aa6600e572e8881e9319852c",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-add6420ae16632af3ba7a68e",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C03c+C21+P19+P20+P21+S18",
+          "memberAssetIds": [
+            "C01",
+            "C03c",
+            "C21",
+            "P19",
+            "P20",
+            "P21",
+            "S18"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C21": "3a7e5b33df3bcbbf97823e4b64b7bc95c7bd1e7637ffc56abb3417bc61c2ce16",
+            "P19": "4e5a6e1ab10da8533ee7977d7af36a53a6b81b54a204bccdc14b8553bac819f2",
+            "P20": "d12f7051d5114bc5b0979ce9c4a69e041d0a47e81db77bb17b38038cebe739cb",
+            "P21": "728a1550c7da5c7d2f27bc1ad079b632eb7baf5aadbe91dc0dcefef7c397a8f9",
+            "S18": "25869c5f3728b636952aa8a25871c9fb8c96eddef9767269ef44d7cfb075ae84"
+          },
+          "definitionFingerprint": "add6420ae16632af3ba7a68ecbf9e1fc42aaa95f99a589ff8eb0590b58b42010",
+          "definitionReview": {
+            "id": "derived-reference-review-add6420ae16632af3ba7a68e",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-b0365810a52fbc826939d434",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C05+C18+C21+P07+P08+P18+S18",
+          "memberAssetIds": [
+            "C05",
+            "C18",
+            "C21",
+            "P07",
+            "P08",
+            "P18",
+            "S18"
+          ],
+          "memberDefinitionVersions": {
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C18": "d27a168947ccefb028f1cccd80f6e8fe984b78bde0a84f5eafef34109803a186",
+            "C21": "3a7e5b33df3bcbbf97823e4b64b7bc95c7bd1e7637ffc56abb3417bc61c2ce16",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "P08": "8acf00af2f29cf3ee9fd0653171866f45da27b648392f8d0e3c0aa00d024107e",
+            "P18": "a6de0344faee8c153edfbcbde180a11dbd61d3d163091fb45ca07e9ca8572a8d",
+            "S18": "25869c5f3728b636952aa8a25871c9fb8c96eddef9767269ef44d7cfb075ae84"
+          },
+          "definitionFingerprint": "b0365810a52fbc826939d43406290fc4a29ade7283e613138b86b2f131734e50",
+          "definitionReview": {
+            "id": "derived-reference-review-b0365810a52fbc826939d434",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-b09f1e38c74a2c69da6ac6a6",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C05+C21+P08+P16+P17+P18+S18",
+          "memberAssetIds": [
+            "C05",
+            "C21",
+            "P08",
+            "P16",
+            "P17",
+            "P18",
+            "S18"
+          ],
+          "memberDefinitionVersions": {
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C21": "3a7e5b33df3bcbbf97823e4b64b7bc95c7bd1e7637ffc56abb3417bc61c2ce16",
+            "P08": "8acf00af2f29cf3ee9fd0653171866f45da27b648392f8d0e3c0aa00d024107e",
+            "P16": "9f3b27ba56b3f9104311408962d4f0fd1b757d8253bdb1c3fe2c5d45c35c82c8",
+            "P17": "a4ee61c8cace652c28dcfe7218513c0b7b8e5ba4cd6f6618a3bb1cd52c601f62",
+            "P18": "a6de0344faee8c153edfbcbde180a11dbd61d3d163091fb45ca07e9ca8572a8d",
+            "S18": "25869c5f3728b636952aa8a25871c9fb8c96eddef9767269ef44d7cfb075ae84"
+          },
+          "definitionFingerprint": "b09f1e38c74a2c69da6ac6a6fbf9a3af504a223165319b284df3d9e5ae5e866d",
+          "definitionReview": {
+            "id": "derived-reference-review-b09f1e38c74a2c69da6ac6a6",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-b3b43f245ecfa93642b5af9f",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C05+C06+P06+P07+P15",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C05",
+            "C06",
+            "P06",
+            "P07",
+            "P15"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "P06": "28d90c7653360813527933450e188b7c887d55ca9fa08774ff16304e51286b35",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "P15": "72e6e48086fce1207d5796fba283fb5f384910b8115e55ee81faea26e3377950"
+          },
+          "definitionFingerprint": "b3b43f245ecfa93642b5af9f20002c7aca3aeb65a705f78277cab651e2a3b8d2",
+          "definitionReview": {
+            "id": "derived-reference-review-b3b43f245ecfa93642b5af9f",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-b54f3aa3e7f562a018f903b0",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C05+C06+C15+P01+P16+S15",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C05",
+            "C06",
+            "C15",
+            "P01",
+            "P16",
+            "S15"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "C15": "151c337f50573e865560d9af336afcc5d16e57ba571ba5d40f7987d3ed60b67b",
+            "P01": "52e6dd55e5a5bc548143290c751459da8d6fad13674e23fae9fee66ad0818205",
+            "P16": "9f3b27ba56b3f9104311408962d4f0fd1b757d8253bdb1c3fe2c5d45c35c82c8",
+            "S15": "158066c074b7f1c37b1b208118283de6094d08623eedfb9a238d160af4023c2e"
+          },
+          "definitionFingerprint": "b54f3aa3e7f562a018f903b0dd01800bc8f5fb53c50d4a57918103db01e5dec0",
+          "definitionReview": {
+            "id": "derived-reference-review-b54f3aa3e7f562a018f903b0",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-b8de72582d5a72a7e7c64740",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C04b+C05+P07+P09+P22+P25+S08",
+          "memberAssetIds": [
+            "C04b",
+            "C05",
+            "P07",
+            "P09",
+            "P22",
+            "P25",
+            "S08"
+          ],
+          "memberDefinitionVersions": {
+            "C04b": "9724a5e86fa06d17400ab95a54e64cad7da4416dea4956157e32d1f997190145",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "P09": "ba9656b4b05fc14c730189eedc29f69dca9451bf6d735c3e0967793798e94278",
+            "P22": "700cae0cb205c42b49ff43e6f29cd85d68db9fb374330fccd4d9fd3d6d9c6644",
+            "P25": "149c5565aee2e194a947b30ff33e09850de35bc13292fbacab4c5ab7538f353b",
+            "S08": "724f12ce2518ef3388fcd4f9c79e3c1e50937707b007bc644b3d3e54b730db48"
+          },
+          "definitionFingerprint": "b8de72582d5a72a7e7c647406803203f72c69daa84f98c78863e1bf00aef7ff9",
+          "definitionReview": {
+            "id": "derived-reference-review-b8de72582d5a72a7e7c64740",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-c66db64a3d251edda9072854",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C03c+C04b+C20+P07+P27+P33+S03",
+          "memberAssetIds": [
+            "C03c",
+            "C04b",
+            "C20",
+            "P07",
+            "P27",
+            "P33",
+            "S03"
+          ],
+          "memberDefinitionVersions": {
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C04b": "9724a5e86fa06d17400ab95a54e64cad7da4416dea4956157e32d1f997190145",
+            "C20": "5806a4257a6f7bd7e615fc0331701cffee24d9f76dcdf52555a1d007c8b078fc",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "P27": "0ecc431b0e73d5b7bc3ea9ec8a934584818e2397e4cc03c7f84c38d587673f57",
+            "P33": "6e45e0e2f4dc8dd5928bfc1f10c42b62d1cd66b6d80a15c2bed7f3341431f475",
+            "S03": "a10388f20ac37b3b011652e629aa0a73bfabeeddd113aa20bbbf59f4d824f402"
+          },
+          "definitionFingerprint": "c66db64a3d251edda9072854a235feda10a3e90b61d9d56f5bd1e9f10de73943",
+          "definitionReview": {
+            "id": "derived-reference-review-c66db64a3d251edda9072854",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-cb198d2076bdd8d918e3b622",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C03c+C05+P07+P08+P09+S16",
+          "memberAssetIds": [
+            "C01",
+            "C03c",
+            "C05",
+            "P07",
+            "P08",
+            "P09",
+            "S16"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "P08": "8acf00af2f29cf3ee9fd0653171866f45da27b648392f8d0e3c0aa00d024107e",
+            "P09": "ba9656b4b05fc14c730189eedc29f69dca9451bf6d735c3e0967793798e94278",
+            "S16": "370d1f60bdc9a051798e616478a7ea7af92d19b5040e56fd720d09560d8041a8"
+          },
+          "definitionFingerprint": "cb198d2076bdd8d918e3b622b5d613bef8bf916d46e75b3ee97316919c29c976",
+          "definitionReview": {
+            "id": "derived-reference-review-cb198d2076bdd8d918e3b622",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-ceac31610de7e0ac5e5b89c2",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C06+C21+S13+S18",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C06",
+            "C21",
+            "S13",
+            "S18"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "C21": "3a7e5b33df3bcbbf97823e4b64b7bc95c7bd1e7637ffc56abb3417bc61c2ce16",
+            "S13": "ea84b9ba6c03adb3aa019f3552c3b319610f6aa1d0c6f6d25b2a7455cad2a3d9",
+            "S18": "25869c5f3728b636952aa8a25871c9fb8c96eddef9767269ef44d7cfb075ae84"
+          },
+          "definitionFingerprint": "ceac31610de7e0ac5e5b89c2e128bb80305e4b1e214030320145549cfa0eb705",
+          "definitionReview": {
+            "id": "derived-reference-review-ceac31610de7e0ac5e5b89c2",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-cfb3ad073dea8b84b2e82b57",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C03c+C05+P06+P07+P09+P33",
+          "memberAssetIds": [
+            "C01",
+            "C03c",
+            "C05",
+            "P06",
+            "P07",
+            "P09",
+            "P33"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "P06": "28d90c7653360813527933450e188b7c887d55ca9fa08774ff16304e51286b35",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "P09": "ba9656b4b05fc14c730189eedc29f69dca9451bf6d735c3e0967793798e94278",
+            "P33": "6e45e0e2f4dc8dd5928bfc1f10c42b62d1cd66b6d80a15c2bed7f3341431f475"
+          },
+          "definitionFingerprint": "cfb3ad073dea8b84b2e82b571cdc90ecff4e6352544a8f0f6726d7921ec77998",
+          "definitionReview": {
+            "id": "derived-reference-review-cfb3ad073dea8b84b2e82b57",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-d39c48669a5296c10ee42a51",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C03c+C04b+C05+C06+P07+S12",
+          "memberAssetIds": [
+            "C01",
+            "C03c",
+            "C04b",
+            "C05",
+            "C06",
+            "P07",
+            "S12"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C04b": "9724a5e86fa06d17400ab95a54e64cad7da4416dea4956157e32d1f997190145",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "S12": "ce20be5fadb65669e7f4f32dd3495ea7586a5a466c93431e88a123c71b6f818b"
+          },
+          "definitionFingerprint": "d39c48669a5296c10ee42a518aab2beca701cb5e7276430fe799d62457cd2b3c",
+          "definitionReview": {
+            "id": "derived-reference-review-d39c48669a5296c10ee42a51",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-e46718a2964ecaf50b66ebfb",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C06+C21+P19+P20+P21+S18+S19",
+          "memberAssetIds": [
+            "C06",
+            "C21",
+            "P19",
+            "P20",
+            "P21",
+            "S18",
+            "S19"
+          ],
+          "memberDefinitionVersions": {
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "C21": "3a7e5b33df3bcbbf97823e4b64b7bc95c7bd1e7637ffc56abb3417bc61c2ce16",
+            "P19": "4e5a6e1ab10da8533ee7977d7af36a53a6b81b54a204bccdc14b8553bac819f2",
+            "P20": "d12f7051d5114bc5b0979ce9c4a69e041d0a47e81db77bb17b38038cebe739cb",
+            "P21": "728a1550c7da5c7d2f27bc1ad079b632eb7baf5aadbe91dc0dcefef7c397a8f9",
+            "S18": "25869c5f3728b636952aa8a25871c9fb8c96eddef9767269ef44d7cfb075ae84",
+            "S19": "8f040a6529e766c8ad474451fe782906372f763c9371f68d4a645173a6a9523e"
+          },
+          "definitionFingerprint": "e46718a2964ecaf50b66ebfb8db0fd5d23cd17180a16f88ab97597df97c40ece",
+          "definitionReview": {
+            "id": "derived-reference-review-e46718a2964ecaf50b66ebfb",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-eb9f4ee5226ea733cf2e8e07",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C06+C21+P14+P19+P20+P21+S18",
+          "memberAssetIds": [
+            "C06",
+            "C21",
+            "P14",
+            "P19",
+            "P20",
+            "P21",
+            "S18"
+          ],
+          "memberDefinitionVersions": {
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "C21": "3a7e5b33df3bcbbf97823e4b64b7bc95c7bd1e7637ffc56abb3417bc61c2ce16",
+            "P14": "7a303e054f5499817109dac1baacec0089ca7cfb91372a9ee2abfc3846036040",
+            "P19": "4e5a6e1ab10da8533ee7977d7af36a53a6b81b54a204bccdc14b8553bac819f2",
+            "P20": "d12f7051d5114bc5b0979ce9c4a69e041d0a47e81db77bb17b38038cebe739cb",
+            "P21": "728a1550c7da5c7d2f27bc1ad079b632eb7baf5aadbe91dc0dcefef7c397a8f9",
+            "S18": "25869c5f3728b636952aa8a25871c9fb8c96eddef9767269ef44d7cfb075ae84"
+          },
+          "definitionFingerprint": "eb9f4ee5226ea733cf2e8e076f650bc516716f1ba57954167a830889a00e623f",
+          "definitionReview": {
+            "id": "derived-reference-review-eb9f4ee5226ea733cf2e8e07",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-eeb94f5f1738e504f9f5d45a",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C05+C16+C17+C18+P19+P20+P21+S18",
+          "memberAssetIds": [
+            "C05",
+            "C16",
+            "C17",
+            "C18",
+            "P19",
+            "P20",
+            "P21",
+            "S18"
+          ],
+          "memberDefinitionVersions": {
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C16": "3b41494ce70e52ef89d7e82f67470aefc093d7ddc3b076e8371371810b3c8d46",
+            "C17": "7ba9d114cca2292af8f1c43b2daa8b11bfa337d86a9dc67ce6b29679175dcc2c",
+            "C18": "d27a168947ccefb028f1cccd80f6e8fe984b78bde0a84f5eafef34109803a186",
+            "P19": "4e5a6e1ab10da8533ee7977d7af36a53a6b81b54a204bccdc14b8553bac819f2",
+            "P20": "d12f7051d5114bc5b0979ce9c4a69e041d0a47e81db77bb17b38038cebe739cb",
+            "P21": "728a1550c7da5c7d2f27bc1ad079b632eb7baf5aadbe91dc0dcefef7c397a8f9",
+            "S18": "25869c5f3728b636952aa8a25871c9fb8c96eddef9767269ef44d7cfb075ae84"
+          },
+          "definitionFingerprint": "eeb94f5f1738e504f9f5d45a798d165f5fb559b0abd3a2d20a64ee8aaff6ab41",
+          "definitionReview": {
+            "id": "derived-reference-review-eeb94f5f1738e504f9f5d45a",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-f02223f68e971f6854ca07bf",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C06+P01+P12+P15+S08+S12",
+          "memberAssetIds": [
+            "C01",
+            "C06",
+            "P01",
+            "P12",
+            "P15",
+            "S08",
+            "S12"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "P01": "52e6dd55e5a5bc548143290c751459da8d6fad13674e23fae9fee66ad0818205",
+            "P12": "493b7be099745081b179152c1410e5aee180e6cece0c80f662311379d6392f61",
+            "P15": "72e6e48086fce1207d5796fba283fb5f384910b8115e55ee81faea26e3377950",
+            "S08": "724f12ce2518ef3388fcd4f9c79e3c1e50937707b007bc644b3d3e54b730db48",
+            "S12": "ce20be5fadb65669e7f4f32dd3495ea7586a5a466c93431e88a123c71b6f818b"
+          },
+          "definitionFingerprint": "f02223f68e971f6854ca07bf57f219d762a4cc07cd176d55e4cdfd0928beec01",
+          "definitionReview": {
+            "id": "derived-reference-review-f02223f68e971f6854ca07bf",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-f533611564f03adbbbd760ca",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C04b+C05+C20+P07+P27",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C04b",
+            "C05",
+            "C20",
+            "P07",
+            "P27"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C04b": "9724a5e86fa06d17400ab95a54e64cad7da4416dea4956157e32d1f997190145",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C20": "5806a4257a6f7bd7e615fc0331701cffee24d9f76dcdf52555a1d007c8b078fc",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "P27": "0ecc431b0e73d5b7bc3ea9ec8a934584818e2397e4cc03c7f84c38d587673f57"
+          },
+          "definitionFingerprint": "f533611564f03adbbbd760ca19e11c353550c5f71ae87901a6e201797b8ebf16",
+          "definitionReview": {
+            "id": "derived-reference-review-f533611564f03adbbbd760ca",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-f57a26cfaf53243e10b612c9",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C03c+C05+C13+P07+P09+S03",
+          "memberAssetIds": [
+            "C01",
+            "C03c",
+            "C05",
+            "C13",
+            "P07",
+            "P09",
+            "S03"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C13": "e6b4b8f2cacab2aa287344bd57da3212fdae603d47713da70ce850036bc999cc",
+            "P07": "1cbd3eaf4394b808cc9848c2ac5c49060616f42b024771ce48277c604aa254d2",
+            "P09": "ba9656b4b05fc14c730189eedc29f69dca9451bf6d735c3e0967793798e94278",
+            "S03": "a10388f20ac37b3b011652e629aa0a73bfabeeddd113aa20bbbf59f4d824f402"
+          },
+          "definitionFingerprint": "f57a26cfaf53243e10b612c9175d7c48811d15a3e685054e9cf881bb64285619",
+          "definitionReview": {
+            "id": "derived-reference-review-f57a26cfaf53243e10b612c9",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        },
+        {
+          "id": "derived-reference-fc17d6888f934e1680961e03",
+          "version": 1,
+          "kind": "mixed-composite",
+          "name": "混合组合·C01+C02+C03c+C05+C06+P06+S14",
+          "memberAssetIds": [
+            "C01",
+            "C02",
+            "C03c",
+            "C05",
+            "C06",
+            "P06",
+            "S14"
+          ],
+          "memberDefinitionVersions": {
+            "C01": "3fd0688a59feeea19c1593cabf19ae4deab22163d7cc70ca0010fc5902f5d3d5",
+            "C02": "b8d4b52d95f3e1fd357c6882440e2f98044c7090085b03aea9d7a97ff1afeccd",
+            "C03c": "fc398ec722659479ea3c4854d8d30a6d35da609c78507279f9645c7b0ac74407",
+            "C05": "40cc180b2f6d570411ebb154af60854a2f4e0c6d4a0fa1f862cc585614fbab59",
+            "C06": "4856453f584110370d233e56f6efe5439686b4924d020ecdff0a854976c8632b",
+            "P06": "28d90c7653360813527933450e188b7c887d55ca9fa08774ff16304e51286b35",
+            "S14": "ed78e8a6c83e010cb0b42fc43796afac32eebf4851c01cda39a6a8730a820909"
+          },
+          "definitionFingerprint": "fc17d6888f934e1680961e03e5838b4cee9bfbd6a994b743de58854f8c3e76fd",
+          "definitionReview": {
+            "id": "derived-reference-review-fc17d6888f934e1680961e03",
+            "status": "approved",
+            "reviewedBy": "codex-p2-migration",
+            "reviewedAt": "2026-07-15T11:16:44.150Z",
+            "basis": "P2 逐宫格引用闭包迁移：完整覆盖超出六槽的语义集合；该结构审核不替代组合图视觉验收。"
+          },
+          "status": "definition-approved"
+        }
+      ]
+    }
+  },
+  "currentnessUi": "CURRENT · r1 · a151dc3c32…",
+  "auditUi": {
+    "verdict": "闭包通过1,288 单元 / 4,330 宫格审计指纹 64651abfbf1f495e…",
+    "production": [
+      "可进入生成610",
+      "待硬锁3,5547,480 项引用",
+      "待组合图16652 个定义"
+    ],
+    "closureErrors": [
+      "未解析面板0",
+      "已知资产缺绑定0",
+      "未处理超限0",
+      "时间段不一致0"
+    ]
+  },
+  "derivedUi": {
+    "total": 52,
+    "pagesVisited": 6,
+    "selectedId": "derived-reference-f57a26cfaf53243e10b612c9",
+    "listText": "混合组合·C01+C03c+C05+C13+P07+P09+S03定义已审C01、C03c、C05、C13、P07、P09、S03mixed-composite · f57a26cfaf5324…未登记视觉产物",
+    "detailText": "DERIVED DETAIL混合组合·C01+C03c+C05+C13+P07+P09+S03定义已审ID / 状态derived-reference-f57a26cfaf53243e10b612c9 · definition-approved定义审核derived-reference-review-f57a26cfaf53243e10b612c9 · codex-p2-migration成员C01、C03c、C05、C13、P07、P09、S03视觉产物未登记；当前不得作为已就绪参考板。"
+  },
+  "detailUi": {
+    "heading": "EP02 · 032 · 宫格 1",
+    "identityLines": [
+      "panel-reference-af81dc696ab91ff3b95adb13ed33",
+      "af81dc696ab91ff3b95adb13ed3387274f8d4e68e965e93d1697f216d130689f"
+    ],
+    "semanticAssets": 8,
+    "referenceSlots": 1,
+    "derivedVisible": true,
+    "issuesSection": true,
+    "exclusionsSection": true,
+    "reconciliationsSection": true
+  },
+  "layout": {
+    "rootOverflow": false,
+    "workbenchOverflow": false,
+    "navLabels": [
+      "生产画布",
+      "故事图谱",
+      "自动改编",
+      "生产设计",
+      "分集剧本",
+      "单元清单",
+      "镜头时间线",
+      "连续性",
+      "引用闭包",
+      "导演剪辑台",
+      "资产库",
+      "视频工作台",
+      "导演验收",
+      "Codex 接续",
+      "生成队列",
+      "任务中心",
+      "项目设置"
+    ]
+  },
+  "pageErrors": [],
+  "assertions": {
+    "fullSeasonCountsVisible": true,
+    "fourClosureErrorsVisibleAndZero": true,
+    "generationReadinessSeparated": true,
+    "filtersAndPaginationOperational": true,
+    "derivedAssetsFullyPaginated": true,
+    "storeIdentityBoundAcrossReads": true,
+    "exactResolutionEvidenceVisible": true,
+    "issuesExclusionsAndReconciliationsVisible": true,
+    "derivedVisualEvidenceFieldsVisible": true,
+    "derivedAssetsVisible": true,
+    "supplierSlotsNeverExceedSix": true,
+    "readOnlyUiDidNotWrite": true
+  }
+}

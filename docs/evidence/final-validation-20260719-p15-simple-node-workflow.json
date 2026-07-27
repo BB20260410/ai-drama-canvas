@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "kind": "p15-simple-node-workflow-final-validation",
+  "status": "pass",
+  "createdAt": "2026-07-19T02:57:55Z",
+  "scope": "simple-pippit-inspired-canvas-formal-binding-preflight-codex-dispatch-installed-scale",
+  "release": {
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "sourceDigest": "4a80aea02f97ced7820a759951a6a8974455309f61362ad23c321c185a7e1b4a",
+    "buildId": "08c6a495b4801f1b47966f17c502f53c",
+    "buildIdentityFingerprint": "8dc7c02f135e9bb192ce3b1d6978c20ea4720a0fcc750819d1bb3a4e95843680",
+    "releaseManifestFingerprint": "6108e64632462df903465fb623dcfd02f4ed20aa87c11bd3df70fd8463635b4b",
+    "mcpToolCount": 183,
+    "distribution": "local-only",
+    "releaseManifestSha256": "b29671671b130d3e1fc8d69a5722a89bebaeb4ea46f2a6964f039ca9e916ee3c",
+    "dmgSha256": "67c396b9c8fb557d6459a43c01443162c9dd2a1ff25d8a32f651346695abcfcf"
+  },
+  "acceptance": {
+    "simpleEntrypoints": [
+      "添加",
+      "素材库",
+      "连线",
+      "开始"
+    ],
+    "libraryCollapsedByDefault": true,
+    "freeDrag": true,
+    "connectionHandles": true,
+    "clickToConnect": true,
+    "characterScenePropPinnedTogether": true,
+    "crossCategoryPinnedAssets": 3,
+    "layoutPersisted": true,
+    "restartPreserved": true,
+    "clearWorkspaceViewOnly": true,
+    "draftIsNotBindingSource": true,
+    "formalBindingExactMatchRequired": true,
+    "allTargetsPreflightBeforeSideEffects": true,
+    "formalFreezeRebuiltByExistingOwner": true,
+    "provider": "codex",
+    "installedApplicationPassed": true,
+    "installedApplicationPath": "/Applications/AI 漫剧画布.app",
+    "installedApplicationRequiresSystemNode": false
+  },
+  "simpleCanvasSmoke": {
+    "runtimeVariants": [
+      "workspace-build",
+      "installed-app"
+    ],
+    "targetPanels": 2,
+    "packsAdded": 2,
+    "dispatchesAdded": 2,
+    "resultsAdded": 0,
+    "visibleNodeCount": 12,
+    "maxNodeWidth": 123,
+    "maxNodeHeight": 137,
+    "panelRowsSeparated": true,
+    "externalRequests": 0,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "rendererCrashed": false,
+    "realImageGenerated": false,
+    "visualReviewClaimed": false
+  },
+  "scaleSmoke": {
+    "runtimeVariants": [
+      "workspace-electron",
+      "installed-application"
+    ],
+    "assets": 77,
+    "units": 1288,
+    "panels": 4235,
+    "media": 10000,
+    "verifiedCas": 10000,
+    "verifiedThumbnails": 1000,
+    "filesystemScans": 0,
+    "sourceRoots": [],
+    "initialDom": 16,
+    "expandedDom": 8,
+    "maximumDomNodes": 74,
+    "mediaPageDom": 36,
+    "viewportCullingEnabled": true,
+    "installedReadyMs": 2981,
+    "projectSwitchCrossLeak": false,
+    "externalRequests": 0,
+    "pageErrors": 0,
+    "consoleErrors": 0
+  },
+  "tests": {
+    "typecheck": "pass",
+    "targetedFiles": 8,
+    "targetedTests": 44,
+    "p13UiRegressionFiles": 1,
+    "p13UiRegressionTests": 4,
+    "fullFiles": 155,
+    "fullTests": 783,
+    "buildMcp": "pass",
+    "productionBuild": "pass",
+    "isolatedPackageSmoke": "pass",
+    "macPackage": "pass",
+    "developerIdDeepStrictSignature": "pass"
+  },
+  "activeFormalProject": {
+    "projectId": "project-2e3b44bc6ac4",
+    "projectName": "Codex AI 短剧素材中心",
+    "projectRoot": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio",
+    "counts": {
+      "canonicalAssets": 85,
+      "units": 541,
+      "panels": 3246,
+      "media": 1152,
+      "scriptDocuments": 541,
+      "promptDocuments": 541
+    },
+    "nextAction": {
+      "code": "complete-checkpoint",
+      "label": "完成第 1 批六图停检",
+      "command": "attest_studio_generation_checkpoint"
+    },
+    "modifiedByP15Smoke": false
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/p15-simple-canvas-ui-smoke-20260719-v6.json",
+      "sha256": "3733c38efb4c4bfdf18a61a3b912a655e29eac40bca40b54728493efae4a63a4"
+    },
+    {
+      "path": "docs/evidence/p15-simple-canvas-ui-smoke-20260719-v6.png",
+      "sha256": "fed0d283876932bdc6513529c24f1929ea6b13857d647be21e39b1bd17de4e3a"
+    },
+    {
+      "path": "docs/evidence/p15-simple-canvas-installed-ui-smoke-20260719-r3.json",
+      "sha256": "93c997aab372108d360754ef0a5c5bb2ec89c445e16b5fb4c62f3dd34f42710f"
+    },
+    {
+      "path": "docs/evidence/p15-simple-canvas-installed-ui-smoke-20260719-r3.png",
+      "sha256": "f54faaaa777073fc6b271041a2dd828972933978ff086c4ccedf0ed1b21b5934"
+    },
+    {
+      "path": "docs/evidence/managed-studio-scale-canvas-ui-smoke-20260719-p15-r2.json",
+      "sha256": "49b1c4eed7f8e645904023244f0bcbb835c7833638c179b114275f3e0199b5c5"
+    },
+    {
+      "path": "docs/evidence/managed-studio-scale-canvas-ui-smoke-20260719-p15-r2.png",
+      "sha256": "36c74a24fe7e6bab462370585fe724d18957654f27f41f01a890c963771cf153"
+    },
+    {
+      "path": "docs/evidence/managed-studio-scale-canvas-installed-ui-smoke-20260719-p15-r2.json",
+      "sha256": "f42cc9bf1e653955f79cf637bd9604c4bffe99e826851557944ac7bff3ac434f"
+    },
+    {
+      "path": "docs/evidence/managed-studio-scale-canvas-installed-ui-smoke-20260719-p15-r2.png",
+      "sha256": "8f66725f6abdbd2e144da69f623970a7553ab5a72662a856632e4e14c3901602"
+    },
+    {
+      "path": "docs/evidence/p15-installed-signature-20260719-r2.json",
+      "sha256": "d7326165b83ab7334956774e00c4bff11a3b40c9d450936b53b8e21761b1ed5d"
+    },
+    {
+      "path": "docs/evidence/isolated-package-smoke-latest.json",
+      "sha256": "40bd6b7d6edf2433f3dee1257dfe8d2be5f1155b34686755411be3a9a64c6d6c"
+    },
+    {
+      "path": "docs/验证报告_20260719_P15简单自由画布与Codex派发.md",
+      "sha256": "6af2eba361258f02d0a06c4880546065e034a3b0cd736d2e90da8f0563fb1c42"
+    },
+    {
+      "path": "docs/参考项目与小云雀界面对表实施_20260719.md",
+      "sha256": "bd3d42174557ded56a661d0e3eb9a17bfa0b0da8798c4d21b591e20af5edd581"
+    },
+    {
+      "path": "docs/当前开发交接.md",
+      "sha256": "ed2193d5157710f1eaa78a5f75d4a24af7a1a56b3e93cf3ba33bac643a5f9cf4"
+    }
+  ],
+  "manualVisualInspection": {
+    "performedBy": "primary-agent",
+    "originalSize": true,
+    "simpleCanvasReadable": true,
+    "scaleCanvasReadable": true,
+    "nodeOverlapObserved": false,
+    "blankOrPlaceholderScreenshot": false,
+    "generatedImageReviewed": false
+  },
+  "boundaries": {
+    "thirdPartySourceCopied": false,
+    "cleanRoomBehavioralAdaptationOnly": true,
+    "formalImageGenerationCalls": 0,
+    "grokCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0,
+    "payments": 0,
+    "publishes": 0,
+    "notarization": 0,
+    "gitStage": 0,
+    "gitCommit": 0,
+    "gitPush": 0,
+    "pullRequest": 0,
+    "externalAuthorityFilesModified": false
+  },
+  "supersedesForP15Final": [
+    "docs/evidence/p15-simple-canvas-ui-smoke-20260719-v2.json",
+    "docs/evidence/p15-simple-canvas-ui-smoke-20260719-v3.json",
+    "docs/evidence/p15-simple-canvas-ui-smoke-20260719-v4.json",
+    "docs/evidence/p15-simple-canvas-ui-smoke-20260719-v5.json",
+    "docs/evidence/p15-simple-canvas-installed-ui-smoke-20260719-r2.json",
+    "docs/evidence/managed-studio-scale-canvas-ui-smoke-20260719-p15.json"
+  ]
+}

@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "kind": "p5-canonical-assets-fresh-profile-ui-smoke",
+  "createdAt": "2026-07-17T17:36:41.809Z",
+  "passed": true,
+  "transport": "electron-current-production-build-fresh-profile",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "freshProfile": {
+    "path": "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-p5-ui-KVu4tI/fresh-profile",
+    "filesBeforeLaunch": 0,
+    "filesAfterClose": 40,
+    "cleaned": true
+  },
+  "localPageUrl": "file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/out/renderer/index.html",
+  "openedProject": {
+    "id": "gushujuan-s3-f1a688020bfb7af6",
+    "name": "蜀道山·古蜀卷 第三季"
+  },
+  "probeInstallation": {
+    "installed": true,
+    "installedBy": "ipcMain-handler",
+    "handlerCount": 165
+  },
+  "catalog": {
+    "storeRevision": 2,
+    "storeFingerprint": "a4e1aa3588e690d272d0c8b3efae2b8335968f9e0a2b98c67b4f7afe9aa5a672",
+    "counts": {
+      "assets": 77,
+      "aliases": 154,
+      "definitionVersions": 77,
+      "contractVersions": 77,
+      "versions": 21,
+      "authorities": 21,
+      "relations": 0,
+      "media": 39,
+      "assetsWithVersions": 20,
+      "assetsWithoutVersions": 57,
+      "primaryAuthorities": 20,
+      "supportingAuthorities": 1,
+      "byCategory": {
+        "character": 24,
+        "scene": 20,
+        "prop": 33
+      }
+    },
+    "uiMetrics": {
+      "全部资产": "77",
+      "角色": "24",
+      "场景": "20",
+      "道具": "33",
+      "已有版本": "20",
+      "待生成": "57",
+      "Store Revision": "r2"
+    }
+  },
+  "pagination": {
+    "uiPageSize": 24,
+    "pages": [
+      {
+        "count": 24,
+        "range": "1–24 / 77",
+        "first": "C01",
+        "last": "C21"
+      },
+      {
+        "count": 24,
+        "range": "25–48 / 77",
+        "first": "P01",
+        "last": "P24"
+      },
+      {
+        "count": 24,
+        "range": "49–72 / 77",
+        "first": "P25",
+        "last": "S15"
+      },
+      {
+        "count": 5,
+        "range": "73–77 / 77",
+        "first": "S16",
+        "last": "S20"
+      }
+    ],
+    "uniqueAssetsVisited": 77,
+    "ipcMaximum": 100,
+    "overLimitRejected": true
+  },
+  "race": {
+    "staleSuccess": {
+      "calls": [
+        {
+          "category": "character",
+          "startOrder": 7,
+          "finishOrder": 8,
+          "delayedMs": 900,
+          "total": 24
+        },
+        {
+          "category": "scene",
+          "startOrder": 8,
+          "finishOrder": 7,
+          "delayedMs": 20,
+          "total": 20
+        }
+      ],
+      "final": {
+        "activeCategory": "场景",
+        "totalLabel": "20 项",
+        "count": 20,
+        "allExplicitScene": true,
+        "staleErrorVisible": false
+      }
+    },
+    "staleError": {
+      "calls": [
+        {
+          "category": "character",
+          "startOrder": 10,
+          "finishOrder": 11,
+          "delayedMs": 900,
+          "error": "P5 injected stale list error"
+        },
+        {
+          "category": "scene",
+          "startOrder": 11,
+          "finishOrder": 10,
+          "delayedMs": 20,
+          "total": 20
+        }
+      ],
+      "final": {
+        "activeCategory": "场景",
+        "totalLabel": "20 项",
+        "count": 20,
+        "allExplicitScene": true,
+        "staleErrorVisible": false
+      }
+    }
+  },
+  "search": {
+    "query": "P01",
+    "total": 1,
+    "resultId": "P01"
+  },
+  "lazyDetail": {
+    "callsBeforeSelection": 0,
+    "callsAfterSelection": 1
+  },
+  "p01": {
+    "heading": "阿航胸前布囊 ★面具铁律替代资产",
+    "primary": {
+      "id": "asset-authority-P01-74f50610a9c15b822c4ee3cedb92fb20",
+      "role": "production-hard-lock",
+      "exposure": "allowed",
+      "usage": "generation-reference",
+      "crossProject": false,
+      "assetVersionId": "asset-version-P01-a6585f981d3566a0cae0fcf1a009026d"
+    },
+    "hiddenSupporting": {
+      "id": "asset-authority-P01-285cbf881b0c87cbe5a1a8897eb45dc7",
+      "role": "supporting-identity",
+      "exposure": "forbidden",
+      "usage": "human-review-only",
+      "crossProject": false,
+      "assetVersionId": "asset-version-P01-408d397da5bbf9b78ce9c39d9cac4251",
+      "exposeToGeneration": false
+    },
+    "uiAuthorities": [
+      {
+        "forbidden": true,
+        "text": "辅助身份权威user-provided · 禁止上传/生成asset-version-P01-408d397da5bbf9b78ce9c39d9cac4251"
+      },
+      {
+        "forbidden": false,
+        "text": "生产硬锁reviewed-hard-lock · 可用于生成asset-version-P01-a6585f981d3566a0cae0fcf1a009026d"
+      }
+    ],
+    "versionRepresentations": [
+      "supporting-reference",
+      "production-output"
+    ],
+    "generationOrUploadActions": 0
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p5-canonical-assets-ui-smoke-20260718.png",
+    "bytes": 430212,
+    "sha256": "4322820e2794ae20296e957abe82f66fb1953d9908c97f31ddfd223dc980214c",
+    "width": 3456,
+    "height": 2058,
+    "standardDeviation": 42.20624613779867
+  },
+  "guarded": {
+    "unchanged": true,
+    "files": {
+      "canonicalAssets": "ea41c4c77e852b5fab58774a5aaa99a73e4a3d63b6fe18bf83330430528b798b",
+      "project": "dd8407c6fe4b6598f18a737ababcd7987a0be340590fa0027be014f9a8597482",
+      "index": "c2ec3a04c7a786c53ff132582f2dc29b29faa47779aa3c738bc0f834e37abd3c",
+      "productionAssets": "e693c5477044d9389de19188d14e876ea334c762cea86f9010a3de47f41abeae",
+      "overrides": "0155f1731175ce5a7fdabf279d6493b535c521596d849c5221a8041609f2f31d",
+      "jobs": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182",
+      "publications": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238",
+      "reviews": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97",
+      "panelReferences": "02c9b7f89a571296cfd01498cbf922e95091908e04795a1759bad33339973de1",
+      "panelConstraints": "184aca16415ed8b070fa09a543f9601180795ed9a483b69952ed72ae71a41854",
+      "sheetIndex": "11533501e7a2a6dedd1dbfa6f108c3a4e8f02141bafbaa16aa706125832e3fd6",
+      "commandLedger": "aad07883b81bf60a4e4696990104bdd36027d04caa721ffacf78b75f0e77662a",
+      "events": "c5e1069bdab525466bb2f0489d47138591bf04fea51946e9af275817a9d21d88"
+    }
+  },
+  "externalWebpages": 0,
+  "pageErrors": 0,
+  "writes": {
+    "formalProject": false,
+    "migration": false,
+    "generation": false,
+    "upload": false,
+    "review": false
+  },
+  "assertions": {
+    "formalProjectOpened": true,
+    "exactCounts77And24_20_33": true,
+    "uiPagination24AndAll77Visited": true,
+    "ipcPaginationMaximum100Enforced": true,
+    "searchP01Exact": true,
+    "detailLazyLoadedAfterSelection": true,
+    "primaryAuthorityAuditable": true,
+    "hiddenSupportingAuthorityAuditableButGenerationForbidden": true,
+    "staleAsyncFilterResponseDiscarded": true,
+    "freshProfileUsedAndRemoved": true,
+    "formalProjectUnchanged": true
+  }
+}

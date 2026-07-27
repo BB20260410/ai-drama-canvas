@@ -1,0 +1,46 @@
+{
+  "kind": "w3-thumbnail-priority",
+  "projectRoot": "/Users/hxx/Documents/无限画布/projects/grok-mvp-qingdeng-mrwc97mu-d0aea463",
+  "imageCount": 7,
+  "withThumbnailCount": 7,
+  "samples": [
+    {
+      "sha256": "6e0dfead7cdc437e",
+      "hasThumbnail": true,
+      "thumbRecipe": "material-studio-thumb:v1:autorotate:inside-512:no-enlarge:webp-q82",
+      "thumbW": 288,
+      "thumbH": 512
+    },
+    {
+      "sha256": "81185521f52e1787",
+      "hasThumbnail": true,
+      "thumbRecipe": "material-studio-thumb:v1:autorotate:inside-512:no-enlarge:webp-q82",
+      "thumbW": 512,
+      "thumbH": 288
+    },
+    {
+      "sha256": "925f606d18e0a7d2",
+      "hasThumbnail": true,
+      "thumbRecipe": "material-studio-thumb:v1:autorotate:inside-512:no-enlarge:webp-q82",
+      "thumbW": 288,
+      "thumbH": 512
+    },
+    {
+      "sha256": "ab3c65706a90a847",
+      "hasThumbnail": true,
+      "thumbRecipe": "material-studio-thumb:v1:autorotate:inside-512:no-enlarge:webp-q82",
+      "thumbW": 288,
+      "thumbH": 512
+    },
+    {
+      "sha256": "aed5cc05a0df3c09",
+      "hasThumbnail": true,
+      "thumbRecipe": "material-studio-thumb:v1:autorotate:inside-512:no-enlarge:webp-q82",
+      "thumbW": 288,
+      "thumbH": 512
+    }
+  ],
+  "policy": "listStudioMedia 提供 thumbnail 元数据；主进程暴露 studioMediaUrl(thumbnail)；UI 懒加载缩略图优先于原图",
+  "pass": true,
+  "createdAt": "2026-07-25T08:34:07.012Z"
+}

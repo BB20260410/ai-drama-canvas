@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "kind": "personal-use-labeled-layout-slice",
+  "status": "pass",
+  "createdAt": "2026-07-18T06:38:00.000Z",
+  "userContext": {
+    "usage": "personal-non-commercial",
+    "licenseStance": "personal-use-reclassification-20260718"
+  },
+  "slice": {
+    "name": "studio-local-labeled-layout",
+    "owner": "studio-generation / material pipeline (no new DB)",
+    "files": [
+      "src/core/studio-labeled-layout.ts",
+      "tests/studio-labeled-layout.test.ts",
+      "scripts/run-real-imagegen-canary.ts"
+    ],
+    "recipe": "chinese-panel-chrome-v1",
+    "inspiration": "clean-room panel chrome for review boards (ArcReel/Huobao/Toonflow UX need)",
+    "copiedThirdPartySource": false
+  },
+  "verification": {
+    "typecheck": "pass",
+    "tests": "tests/studio-labeled-layout.test.ts 2/2 pass",
+    "continuityImportFix": "studio-continuity-ledger missing imports restored (typecheck gate)"
+  },
+  "boundaries": {
+    "rebuildP8": false,
+    "formalProjectTouched": false,
+    "finalValidationOverwritten": false,
+    "gitStage": false
+  }
+}

@@ -1,0 +1,308 @@
+{
+  "schemaVersion": 1,
+  "kind": "l33-dual-provider-real-readiness-projection",
+  "capturedAt": "2026-07-23T00:32:17.641Z",
+  "projectRoot": "/Users/hxx/Documents/无限画布/projects/grok-mvp-qingdeng-mrwc97mu-d0aea463",
+  "unitId": "S1E01-U01",
+  "captureMethod": "queryStudioUnitGridGenerationFreeze + buildStudioUnitGridAgentImagegenBrief (dist-mcp shipped)",
+  "readiness": {
+    "status": "ready",
+    "packId": "studio-generation-freeze-093616079dd0778f247b32ecfdb286a1",
+    "fingerprint": "093616079dd0778f247b32ecfdb286a163f708cbb055491388a853ca7872408c",
+    "controlReferenceCount": 3,
+    "continuityFingerprint": "de21ea816dfba4468098234e34668a198f45791d793bdcb0ac11844b63b1f1c5",
+    "panelCount": 3,
+    "unitRevision": 2,
+    "allowedProviders": [
+      "codex",
+      "grok"
+    ]
+  },
+  "briefs": {
+    "codex": {
+      "kind": "studio-agent-imagegen-brief",
+      "provider": "codex",
+      "exactlyOneImage": true,
+      "maxCalls": 1,
+      "layout": "9:16-vertical-ordered-grid",
+      "referenceCount": 3,
+      "referencePathSource": "pack-operation-controlReferences-only",
+      "controlReferences": [
+        {
+          "assetId": "character-qingdeng-ke",
+          "mediaSha256": "81185521f52e17872ad4758bab9262223244237fb7a0fa91056c2f20118df87d",
+          "categories": [
+            "character"
+          ],
+          "roles": [
+            "主体"
+          ],
+          "fingerprint": "98c5b151fea7893386d67589e53760626c33a8929da4955b50f1b0ce57eb426d"
+        },
+        {
+          "assetId": "scene-rainy-inn-porch",
+          "mediaSha256": "c9de966d40888818f3638809194b6143210c98b00719c3e3373998f5b3f998b4",
+          "categories": [
+            "scene"
+          ],
+          "roles": [
+            "场景"
+          ],
+          "fingerprint": "0d4cb86187a9a9da65f0432269c2c60098e1ffae245934ce44be8fd38052ab6f"
+        },
+        {
+          "assetId": "prop-qingdeng-lantern",
+          "mediaSha256": "ccc3cda0fc67075fbf4d2b1604b189f238a7f0bef320e7c615ed574e404cb3b4",
+          "categories": [
+            "prop"
+          ],
+          "roles": [
+            "手持青灯"
+          ],
+          "fingerprint": "37f7a57b6cf3644d28bd50442a80c878c8dbe6dc26dca554fb6ae2bf3d211825"
+        }
+      ],
+      "continuityFingerprint": "de21ea816dfba4468098234e34668a198f45791d793bdcb0ac11844b63b1f1c5",
+      "continuityNineFieldSummaryCount": 9,
+      "continuityNineFieldSample": [
+        {
+          "panelId": "S1E01-U01-P1",
+          "assetId": "character-qingdeng-ke",
+          "fields": {
+            "costume": "靛青斗篷+素白交领+半束发蓝丝带",
+            "injury": "无伤情",
+            "heldObject": "双手护持青灯于胸前偏左",
+            "position": "客栈廊下湿青石阶上，身体居中偏右，右脚略前",
+            "facing": "躯干四分之三朝镜头左前",
+            "emotion": "警觉而安静",
+            "layout": "前景雨丝，中景人物，背景木门廊柱",
+            "lighting": "灯暖上照脸+雨夜冷环境光",
+            "referenceSha256": "81185521f52e17872ad4758bab9262223244237fb7a0fa91056c2f20118df87d"
+          },
+          "requiredFields": [
+            "costume",
+            "injury",
+            "heldObject",
+            "position",
+            "facing",
+            "emotion",
+            "layout",
+            "lighting",
+            "referenceSha256"
+          ],
+          "readinessFingerprint": "9914a43bb2a5c5d1ff3cf6a9a920c8463afa2d3a9f3d08fb613b50138cd8b79b"
+        },
+        {
+          "panelId": "S1E01-U01-P1",
+          "assetId": "prop-qingdeng-lantern",
+          "fields": {
+            "costume": "道具不适用costume",
+            "injury": "道具不适用injury",
+            "heldObject": "双手护持青灯于胸前偏左",
+            "position": "青灯相对人物：双手护持青灯于胸前偏左",
+            "facing": "道具不适用facing",
+            "emotion": "道具不适用emotion",
+            "layout": "灯为局部暖源罩面冷青不变",
+            "lighting": "暖芯局部照明",
+            "referenceSha256": "ccc3cda0fc67075fbf4d2b1604b189f238a7f0bef320e7c615ed574e404cb3b4"
+          },
+          "requiredFields": [
+            "costume",
+            "injury",
+            "heldObject",
+            "position",
+            "facing",
+            "emotion",
+            "layout",
+            "lighting",
+            "referenceSha256"
+          ],
+          "readinessFingerprint": "f14cefba8b04d4ccbcb60d0970fd8c3223bcb5a563ff13b952321d90a868650e"
+        },
+        {
+          "panelId": "S1E01-U01-P1",
+          "assetId": "scene-rainy-inn-porch",
+          "fields": {
+            "costume": "场景不适用costume",
+            "injury": "场景不适用injury",
+            "heldObject": "场景不适用heldObject",
+            "position": "雨夜客栈廊下固定空间",
+            "facing": "场景不适用facing",
+            "emotion": "场景不适用emotion",
+            "layout": "廊下柱网与门布局锁定",
+            "lighting": "雨夜青灯冷环境",
+            "referenceSha256": "c9de966d40888818f3638809194b6143210c98b00719c3e3373998f5b3f998b4"
+          },
+          "requiredFields": [
+            "costume",
+            "injury",
+            "heldObject",
+            "position",
+            "facing",
+            "emotion",
+            "layout",
+            "lighting",
+            "referenceSha256"
+          ],
+          "readinessFingerprint": "92a08c8aafcf62492f0f6f64ae033c7f5834e4d1d5556b843191ed2f28f0bbec"
+        }
+      ],
+      "tool": {
+        "primaryTool": "image_gen（Codex / OpenAI 图像能力）",
+        "maxImages": 1,
+        "notes": [
+          "严格只调用一次生图工具，只产出一张图。",
+          "人物/场景/道具只能来自冻结 pack 的 controlReferences 与 modelPayload。",
+          "禁止浏览器、Artlist、ComfyUI、网页自动化旁路。"
+        ]
+      },
+      "promptPrefix": "只生成一张 9:16 竖屏、电影写实的 3 宫格完整故事板；整板只是一张图片、一次生成。\n按剧情时间从上到下依次排列 3 格，每格边界清晰，身份、服装、场景布局、道具、光线和动作连续。\n画面内禁止标题、格号、时长、对白文字、字幕、水印、UI、标识和任何伪文字；不得增加未冻结主体。\n本单元真实总时长 15 秒；以下“第N格”仅用于模型理解顺序，绝对不能画成文字。\n第1格（0–5秒，仅作布局指令）：停步护灯。青灯客停步，双手护住青灯\n第1格景别与构图：中景，左侧廊柱，人物居中偏右"
+    },
+    "grok": {
+      "kind": "studio-agent-imagegen-brief",
+      "provider": "grok",
+      "exactlyOneImage": true,
+      "maxCalls": 1,
+      "layout": "9:16-vertical-ordered-grid",
+      "referenceCount": 3,
+      "referencePathSource": "pack-operation-controlReferences-only",
+      "controlReferences": [
+        {
+          "assetId": "character-qingdeng-ke",
+          "mediaSha256": "81185521f52e17872ad4758bab9262223244237fb7a0fa91056c2f20118df87d",
+          "categories": [
+            "character"
+          ],
+          "roles": [
+            "主体"
+          ],
+          "fingerprint": "98c5b151fea7893386d67589e53760626c33a8929da4955b50f1b0ce57eb426d"
+        },
+        {
+          "assetId": "scene-rainy-inn-porch",
+          "mediaSha256": "c9de966d40888818f3638809194b6143210c98b00719c3e3373998f5b3f998b4",
+          "categories": [
+            "scene"
+          ],
+          "roles": [
+            "场景"
+          ],
+          "fingerprint": "0d4cb86187a9a9da65f0432269c2c60098e1ffae245934ce44be8fd38052ab6f"
+        },
+        {
+          "assetId": "prop-qingdeng-lantern",
+          "mediaSha256": "ccc3cda0fc67075fbf4d2b1604b189f238a7f0bef320e7c615ed574e404cb3b4",
+          "categories": [
+            "prop"
+          ],
+          "roles": [
+            "手持青灯"
+          ],
+          "fingerprint": "37f7a57b6cf3644d28bd50442a80c878c8dbe6dc26dca554fb6ae2bf3d211825"
+        }
+      ],
+      "continuityFingerprint": "de21ea816dfba4468098234e34668a198f45791d793bdcb0ac11844b63b1f1c5",
+      "continuityNineFieldSummaryCount": 9,
+      "continuityNineFieldSample": [
+        {
+          "panelId": "S1E01-U01-P1",
+          "assetId": "character-qingdeng-ke",
+          "fields": {
+            "costume": "靛青斗篷+素白交领+半束发蓝丝带",
+            "injury": "无伤情",
+            "heldObject": "双手护持青灯于胸前偏左",
+            "position": "客栈廊下湿青石阶上，身体居中偏右，右脚略前",
+            "facing": "躯干四分之三朝镜头左前",
+            "emotion": "警觉而安静",
+            "layout": "前景雨丝，中景人物，背景木门廊柱",
+            "lighting": "灯暖上照脸+雨夜冷环境光",
+            "referenceSha256": "81185521f52e17872ad4758bab9262223244237fb7a0fa91056c2f20118df87d"
+          },
+          "requiredFields": [
+            "costume",
+            "injury",
+            "heldObject",
+            "position",
+            "facing",
+            "emotion",
+            "layout",
+            "lighting",
+            "referenceSha256"
+          ],
+          "readinessFingerprint": "9914a43bb2a5c5d1ff3cf6a9a920c8463afa2d3a9f3d08fb613b50138cd8b79b"
+        },
+        {
+          "panelId": "S1E01-U01-P1",
+          "assetId": "prop-qingdeng-lantern",
+          "fields": {
+            "costume": "道具不适用costume",
+            "injury": "道具不适用injury",
+            "heldObject": "双手护持青灯于胸前偏左",
+            "position": "青灯相对人物：双手护持青灯于胸前偏左",
+            "facing": "道具不适用facing",
+            "emotion": "道具不适用emotion",
+            "layout": "灯为局部暖源罩面冷青不变",
+            "lighting": "暖芯局部照明",
+            "referenceSha256": "ccc3cda0fc67075fbf4d2b1604b189f238a7f0bef320e7c615ed574e404cb3b4"
+          },
+          "requiredFields": [
+            "costume",
+            "injury",
+            "heldObject",
+            "position",
+            "facing",
+            "emotion",
+            "layout",
+            "lighting",
+            "referenceSha256"
+          ],
+          "readinessFingerprint": "f14cefba8b04d4ccbcb60d0970fd8c3223bcb5a563ff13b952321d90a868650e"
+        },
+        {
+          "panelId": "S1E01-U01-P1",
+          "assetId": "scene-rainy-inn-porch",
+          "fields": {
+            "costume": "场景不适用costume",
+            "injury": "场景不适用injury",
+            "heldObject": "场景不适用heldObject",
+            "position": "雨夜客栈廊下固定空间",
+            "facing": "场景不适用facing",
+            "emotion": "场景不适用emotion",
+            "layout": "廊下柱网与门布局锁定",
+            "lighting": "雨夜青灯冷环境",
+            "referenceSha256": "c9de966d40888818f3638809194b6143210c98b00719c3e3373998f5b3f998b4"
+          },
+          "requiredFields": [
+            "costume",
+            "injury",
+            "heldObject",
+            "position",
+            "facing",
+            "emotion",
+            "layout",
+            "lighting",
+            "referenceSha256"
+          ],
+          "readinessFingerprint": "92a08c8aafcf62492f0f6f64ae033c7f5834e4d1d5556b843191ed2f28f0bbec"
+        }
+      ],
+      "tool": {
+        "primaryTool": "image_gen",
+        "referenceTool": "image_edit（有参考图时优先图生图保持一致性）",
+        "maxImages": 1,
+        "notes": [
+          "严格只生成一张 9:16 分镜；有权威参考时用 image_edit 绑定角色/场景/道具。",
+          "不得替换冻结包外的身份；不得把字幕/分屏画进 raw。",
+          "禁止浏览器、Artlist、网页自动化旁路。"
+        ]
+      },
+      "promptPrefix": "只生成一张 9:16 竖屏、电影写实的 3 宫格完整故事板；整板只是一张图片、一次生成。\n按剧情时间从上到下依次排列 3 格，每格边界清晰，身份、服装、场景布局、道具、光线和动作连续。\n画面内禁止标题、格号、时长、对白文字、字幕、水印、UI、标识和任何伪文字；不得增加未冻结主体。\n本单元真实总时长 15 秒；以下“第N格”仅用于模型理解顺序，绝对不能画成文字。\n第1格（0–5秒，仅作布局指令）：停步护灯。青灯客停步，双手护住青灯\n第1格景别与构图：中景，左侧廊柱，人物居中偏右"
+    }
+  },
+  "call22d2": {
+    "callId": "studio-imagegen-call-22d2e50d4918b3559fc22f74b7d2501b6509af6c",
+    "status": "not-invoked",
+    "provider": "codex",
+    "callAllowed": false
+  }
+}

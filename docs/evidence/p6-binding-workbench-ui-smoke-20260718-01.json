@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "kind": "p6-binding-workbench-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-17T22:55:38.032Z",
+  "fixture": {
+    "projectId": "project-278c5e439961",
+    "sourceRoots": [],
+    "units": 1,
+    "panels": 2,
+    "canonicalAssets": 3
+  },
+  "ui": {
+    "startupDefaultLibrary": true,
+    "bindingChunkLazyLoaded": true,
+    "sourceExcerptVisible": true,
+    "exactAliasPendingHumanAccept": true,
+    "ambiguousCandidateCount": 2,
+    "silentAmbiguitySelection": 0,
+    "bindingSetCurrent": true,
+    "generationReady": true,
+    "nextActionAfterFreeze": "宫格 2：解析当前宫格的剧本实体。",
+    "readyMs": 1228,
+    "pageErrors": 0,
+    "externalRequests": 0
+  },
+  "bindingSet": {
+    "id": "asset-binding-set-ad59df32374120e605be397dc069c851455e0366",
+    "fingerprint": "ad59df32374120e605be397dc069c851455e03665f9f2643aa272573e956dd5d",
+    "bindings": 2
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p6-binding-workbench-ui-smoke-20260718-01.png",
+    "sizeBytes": 347344,
+    "sha256": "1b0d2c82f52143dde2e7d81d5028bf19a07cd6532822034984bf2a49e590213e",
+    "width": 3456,
+    "height": 2058,
+    "format": "png",
+    "stdev": 94.36079080473328
+  },
+  "boundaries": {
+    "formalProjectWrites": 0,
+    "filesystemScans": 0,
+    "imageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0
+  }
+}

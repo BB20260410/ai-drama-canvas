@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 2,
+  "kind": "managed-studio-scale-canvas-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-20T15:17:15.018Z",
+  "buildIdentity": {
+    "version": "0.2.0",
+    "buildId": "22799978873662ee4e46fec84e36213f",
+    "sourceDigest": "07287c72ebcb0c43f33f0efb2e7c2ea5ccd66697731bc8986f27b2e7d8108293",
+    "fingerprint": "fada6c114eef2a5181c24fae14b7344f4e1083c5a98f2b6f38c3dd0059760217",
+    "releaseManifestFingerprint": null,
+    "source": "workspace-source"
+  },
+  "fixture": {
+    "fixtureMs": 8729,
+    "large": {
+      "projectId": "project-3b7791d97646",
+      "units": 1288,
+      "panels": 4235,
+      "assets": 77,
+      "media": {
+        "existing": 77,
+        "seeded": 9923,
+        "verifiedCas": 10000,
+        "verifiedThumbnails": 1000,
+        "total": 10000
+      },
+      "startupPolicy": "no-filesystem-scan",
+      "sourceRoots": []
+    },
+    "small": {
+      "projectId": "project-096dc8aa2192",
+      "units": 4,
+      "panels": 16,
+      "assets": 6
+    }
+  },
+  "startup": {
+    "readyMs": 2848,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "externalRequests": 0
+  },
+  "runtime": {
+    "kind": "workspace-electron",
+    "executable": "/Users/hxx/.nvm/versions/node/v22.22.2/bin/node",
+    "systemNodeRequired": false
+  },
+  "canvas": {
+    "logicalPageLimit": 36,
+    "assetPageLimit": 6,
+    "unitPageLimit": 36,
+    "panelExpansionLimit": 6,
+    "pipelineNodeLimit": 18,
+    "maximumDomNodes": 78,
+    "initialDom": 16,
+    "expandedDom": 8,
+    "pipelineDom": 0,
+    "expandedLogicalCounts": "当前 DOM：6 资产 · 36 单元 · 6 宫格 · 18 结果/审片 · 2 文稿 有图节点 6 缩放 129% 默认布局",
+    "unitPageReplaced": true,
+    "assetCategoryCounts": {
+      "character": 24,
+      "scene": 20,
+      "prop": 33
+    },
+    "assetCategoryProjectionReplaced": true,
+    "characterNextPageCorrectlyDisabled": true,
+    "viewportCullingEnabled": true,
+    "panelExpansionBound": 6
+  },
+  "mediaLibrary": {
+    "exactCount": 10000,
+    "firstPageDom": 36,
+    "scrolledDom": 36,
+    "secondPageDom": 36,
+    "keysetPageReplaced": true,
+    "previousPageRestored": true
+  },
+  "projectSwitch": {
+    "count": 10,
+    "largeToSmall": true,
+    "smallToLarge": true,
+    "crossProjectLeak": false,
+    "smallMetrics": "项目概览 6 资产 4 单元 16 宫格 6 媒体 2 文稿",
+    "restoredMetrics": "项目概览 77 资产 1288 单元 4235 宫格 10000 媒体 2 文稿"
+  },
+  "runtimeStability": {
+    "samples": [
+      {
+        "phase": "before-switches",
+        "pids": [
+          34032,
+          34033,
+          34034,
+          34035
+        ],
+        "rssKiB": 668672,
+        "fileDescriptors": 250,
+        "mediaRequestCount": 146
+      },
+      {
+        "phase": "switch-1",
+        "pids": [
+          34032,
+          34033,
+          34034,
+          34035
+        ],
+        "rssKiB": 676480,
+        "fileDescriptors": 250,
+        "mediaRequestCount": 152
+      },
+      {
+        "phase": "switch-2",
+        "pids": [
+          34032,
+          34033,
+          34034,
+          34035
+        ],
+        "rssKiB": 695360,
+        "fileDescriptors": 251,
+        "mediaRequestCount": 158
+      },
+      {
+        "phase": "switch-3",
+        "pids": [
+          34032,
+          34033,
+          34034,
+          34035
+        ],
+        "rssKiB": 700160,
+        "fileDescriptors": 251,
+        "mediaRequestCount": 158
+      },
+      {
+        "phase": "switch-4",
+        "pids": [
+          34032,
+          34033,
+          34034,
+          34035
+        ],
+        "rssKiB": 708144,
+        "fileDescriptors": 251,
+        "mediaRequestCount": 164
+      },
+      {
+        "phase": "switch-5",
+        "pids": [
+          34032,
+          34033,
+          34034,
+          34035
+        ],
+        "rssKiB": 709136,
+        "fileDescriptors": 251,
+        "mediaRequestCount": 164
+      },
+      {
+        "phase": "switch-6",
+        "pids": [
+          34032,
+          34033,
+          34034,
+          34035
+        ],
+        "rssKiB": 713296,
+        "fileDescriptors": 251,
+        "mediaRequestCount": 164
+      },
+      {
+        "phase": "switch-7",
+        "pids": [
+          34032,
+          34033,
+          34034,
+          34035
+        ],
+        "rssKiB": 714800,
+        "fileDescriptors": 251,
+        "mediaRequestCount": 170
+      },
+      {
+        "phase": "switch-8",
+        "pids": [
+          34032,
+          34033,
+          34034,
+          34035
+        ],
+        "rssKiB": 728768,
+        "fileDescriptors": 251,
+        "mediaRequestCount": 170
+      },
+      {
+        "phase": "switch-9",
+        "pids": [
+          34032,
+          34033,
+          34034,
+          34035
+        ],
+        "rssKiB": 729904,
+        "fileDescriptors": 251,
+        "mediaRequestCount": 176
+      },
+      {
+        "phase": "switch-10",
+        "pids": [
+          34032,
+          34033,
+          34034,
+          34035
+        ],
+        "rssKiB": 730752,
+        "fileDescriptors": 251,
+        "mediaRequestCount": 176
+      }
+    ],
+    "rssDeltaKiB": 62080,
+    "fileDescriptorDelta": 1,
+    "idleMediaRequestsStable": true
+  },
+  "screenshot": {
+    "relativePath": "docs/evidence/p24-global-scale-canvas-ui-smoke-20260720.png",
+    "sizeBytes": 448462,
+    "sha256": "2212eb079086bfb63a16dcbbd7b4ec94fd1a98d30265bbb8a62c5ccebd56fbb8",
+    "width": 1728,
+    "height": 1029,
+    "format": "png",
+    "stdev": 34.50856528011421
+  },
+  "boundaries": {
+    "filesystemScans": 0,
+    "formalStudioTouched": false,
+    "formalImageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0,
+    "gitStage": 0
+  }
+}

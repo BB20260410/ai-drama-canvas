@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "kind": "p14-installed-agent-repair-ui-smoke",
+  "status": "PASS",
+  "runtime": {
+    "installedBundle": true,
+    "localOnly": true,
+    "executablePathSha256": "7c3b526711a78b8350ff20f3585879b75f96c8e3d390bdd88c668c2f416aba17",
+    "sourceDigest": "6e5e275010e6e9d0cada9997d21f2dcd572ad9e342819145f89b43c583eb20bc",
+    "buildId": "9e035198e3847e6d6ae7fec57517f6f0",
+    "mcpToolCount": 183
+  },
+  "project": {
+    "projectRootPathSha256": "d7bd34d064171fd29af314ff87bde3b99ee56a61e3b72c19d73528bed81a2906",
+    "managed": true,
+    "explicitActiveProject": true,
+    "defaultRegistry": true,
+    "before": {
+      "files": 3448,
+      "bytes": 1151431616,
+      "aggregateSha256": "2130a8193f151d0107b7c17e5a481e13437aaf7928b9211458553331f41339e0"
+    },
+    "after": {
+      "files": 3448,
+      "bytes": 1151431616,
+      "aggregateSha256": "2130a8193f151d0107b7c17e5a481e13437aaf7928b9211458553331f41339e0"
+    },
+    "unchanged": true
+  },
+  "agents": {
+    "repairButtonClicked": true,
+    "repairIpcCompletedAfterGrokDoctor": true,
+    "codexCurrent": true,
+    "grokCurrent": true,
+    "codexConfiguredRuntimeStarted": true,
+    "codexRuntimeToolCount": 183
+  },
+  "backup": {
+    "newDirectoryCount": 1,
+    "directoryPathSha256": "caa66a3deed057284c449594a79dd7137e7f367be3adc63a3446e43e9a672da7",
+    "directoryMode": "0700",
+    "files": [
+      {
+        "role": "codex-config",
+        "originalState": "present",
+        "sha256": "b6c4491c1dae5b8d5fcaa49619eb080dd2d31d649e98bff090c086b645fe008d",
+        "mode": "0600",
+        "matchesPreRepairSnapshot": true
+      },
+      {
+        "role": "grok-config",
+        "originalState": "present",
+        "sha256": "e31fa2429350a44e54400edde14bc8719a3f792296ebda7eb8bbc8d48fa2e738",
+        "mode": "0600",
+        "matchesPreRepairSnapshot": true
+      }
+    ],
+    "preserved": true
+  },
+  "repairedConfigs": {
+    "codex": {
+      "state": "present",
+      "sha256": "42716b2ed619a762684d69bea40de5ad843f3089b6ac299ec5f92c634b9bae0c",
+      "mode": "0600"
+    },
+    "grok": {
+      "state": "present",
+      "sha256": "e3eacdd705562dd1a9eaf1405ffeac0d0e8cc800ef8d373cf6a52069d130ddce",
+      "mode": "0600"
+    }
+  },
+  "ui": {
+    "screenshot": {
+      "fileName": "01-agent-connection-repaired.png",
+      "sha256": "b73b5ddd03558266bfab259cd7eb89cd5815a22876f72a252d8f26532562b4fc",
+      "width": 1728,
+      "height": 1029,
+      "sizeBytes": 85727,
+      "maxChannelStandardDeviation": 17.542432253415782
+    },
+    "pageErrorCount": 0,
+    "consoleErrorCount": 0,
+    "externalRequestCount": 0,
+    "highEntropyValueCount": 0
+  },
+  "boundaries": {
+    "realHome": true,
+    "isolatedUserData": true,
+    "noProjectWrites": true,
+    "noConfigContentsInEvidence": true,
+    "noSecretEnvironmentForwardedToMcpProbe": true,
+    "failureKeepsBackup": true
+  },
+  "fingerprint": "7e01a2dc9f6de2fcd95f2a49fbf8a22093db4b8725d501df8e283ff28573f8e9"
+}

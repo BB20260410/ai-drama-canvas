@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "kind": "third-season-artlist-sidebrowser-r3-slice-final-validation",
+  "createdAt": "2026-07-16T08:06:02+08:00",
+  "result": "passed",
+  "sliceComplete": true,
+  "goalComplete": false,
+  "goalStatus": "active",
+  "goalBlockerStrike": 1,
+  "project": {
+    "id": "gushujuan-s3-f1a688020bfb7af6",
+    "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6"
+  },
+  "sourceBoundary": {
+    "readOnly": true,
+    "controlled": {
+      "files": 1354,
+      "bytes": 14093144,
+      "aggregateSha256": "f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c"
+    },
+    "full": {
+      "files": 3344,
+      "bytes": 24570877,
+      "aggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    }
+  },
+  "softwareSlice": {
+    "executionSurface": {
+      "id": "codex-in-app-side-browser",
+      "version": "1"
+    },
+    "providerSettingsRevision": 3,
+    "sameJobRefreshPlan": true,
+    "mechanicalPreflightComparison": true,
+    "textOnlyZeroThumbnailGate": true,
+    "downloadIdentityGate": true,
+    "formalImageMechanicalGate": true,
+    "uiDisplaysExecutionSurface": true
+  },
+  "p01": {
+    "jobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+    "itemId": "asset-P01",
+    "status": "waiting_external",
+    "browserState": "plan_ready",
+    "checkpointRevision": 3,
+    "publicationIntentId": "publication-b17a8792-7c31-43ea-ae95-04be4de08f5f",
+    "publicationStatus": "reserved",
+    "promptSha256": "c65e978c4d509b659bebaccb23598b6ef4bf364ee96b1a484deb3039526ea826",
+    "executionSnapshotHash": "740a494e0b8ffe8ef94dc8d25d2ba9c4b4c1944cc6d56fb9e6367b1e39f29d58",
+    "browserPlanSha256": "47a50b853351655aeb95f9021ae9725e2b4c0d468aeae8215a43c5f5daccda8c",
+    "allowedUploads": [],
+    "parameters": {
+      "model": "GPT Image 2",
+      "mode": "text",
+      "aspectRatio": "9:16",
+      "resolution": "Medium",
+      "quality": "Medium",
+      "imageCount": 1
+    },
+    "externalTaskId": null,
+    "publicationReceiptId": null,
+    "downloadedArtifact": null
+  },
+  "sideEffects": {
+    "uploads": 0,
+    "promptFilled": false,
+    "submitIntentPersisted": false,
+    "generateClicks": 0,
+    "remoteTasksCreated": 0,
+    "downloads": 0,
+    "publicationReceipts": 0
+  },
+  "formalOutputs": {
+    "raw": 0,
+    "labeled": 0,
+    "chineseStoryboardSheets": 0
+  },
+  "verification": {
+    "typecheck": "passed",
+    "targetedTests": {
+      "files": 4,
+      "tests": 29,
+      "failed": 0
+    },
+    "fullTests": {
+      "files": 49,
+      "tests": 292,
+      "failed": 0,
+      "durationSeconds": 107.47
+    },
+    "productionBuild": "passed",
+    "mcpSmoke": {
+      "tools": 148,
+      "passed": true
+    },
+    "doctor": {
+      "healthy": true,
+      "errors": 0,
+      "warnings": 1,
+      "ok": 26
+    },
+    "uiSmoke": {
+      "passed": true,
+      "checkpointText": "网页 plan_ready · R3 · codex-in-app-side-browser@1",
+      "pageErrors": 0,
+      "overflow": false,
+      "sidecarsUnchanged": true
+    }
+  },
+  "sidecarSha256": {
+    "generationJobs": "aa6e2ef31a883db3e1eccbff4b830def896248c4814cacacd5c64cb4345e3dc1",
+    "publications": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+    "assetConsistencyBatches": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7",
+    "commandLedger": "8bf00fd6a1d349c610d45a667b72d74abb8029dbe3daa1d6b10fc94765e85392",
+    "generationSettings": "c885db37f648e6fd4cac43447714e90218dd3ddb1b29e1d34dd69a84a69a9563",
+    "browserPlan": "47a50b853351655aeb95f9021ae9725e2b4c0d468aeae8215a43c5f5daccda8c"
+  },
+  "currentExternalCondition": {
+    "code": "in_app_browser_control_transport_unavailable",
+    "artlistPageReadableEarlier": true,
+    "artlistGenerateEnabledEarlier": true,
+    "frozenPlanMatchesObservedPage": false,
+    "requiredPageChanges": [
+      "aspect ratio 16:9 to 9:16",
+      "image count 4 to 1"
+    ],
+    "chromeFallbackUsed": false,
+    "safeToResumeSameJob": true,
+    "nextSuccessfulCheckpointRevision": 4
+  },
+  "evidence": {
+    "report": "/Users/hxx/Documents/无限画布/docs/验证报告_侧边浏览器执行面迁移与P01可恢复预检_2026-07-16.md",
+    "resumeAttempt": "/Users/hxx/Documents/无限画布/docs/evidence/artlist-sidebrowser-resume-attempt-20260716.json",
+    "browserBeforeScreenshot": "/Users/hxx/Documents/无限画布/docs/evidence/artlist-sidebrowser-preflight-before-20260716.png",
+    "uiSmoke": "/Users/hxx/Documents/无限画布/docs/evidence/artlist-sidebrowser-plan-ui-smoke-20260716.json",
+    "uiScreenshot": "/Users/hxx/Documents/无限画布/docs/evidence/artlist-sidebrowser-plan-ui-smoke-20260716.png"
+  },
+  "resumeInvariant": "Resume the same P01 R3 in the existing Codex side-browser Artlist tab; read current page state first, never requeue, never switch to Chrome, never purchase credits, and persist submit_intent before exactly one Generate click."
+}

@@ -1,0 +1,25 @@
+{
+  "kind": "p1-unit-retro",
+  "unitId": "S1E01-U01",
+  "unit_retro": "PASS",
+  "R1_angles": [
+    {
+      "role": "producer",
+      "note": "formal pass + raw 在投影；正式环曾跑 readiness/freeze/dispatch/commit/Review"
+    },
+    {
+      "role": "continuity",
+      "note": "controlRefs 冻结约束 canary；不宣称永不漂"
+    }
+  ],
+  "R2_gaps": [
+    "仅 1 单元 canary，非批量产线",
+    "Grok live 未跑（书面降级）",
+    "media catalog unitId 仍可能 null"
+  ],
+  "R3_p0_bugs": [],
+  "R4_status": "PASS",
+  "advances_next_unit": false,
+  "note": "P1 验收复用隔离 canary；复盘闸关闭，不连刷 Un+1",
+  "createdAt": "2026-07-25T09:27:12.378Z"
+}

@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "kind": "p29-frontend-complete-final-validation",
+  "status": "PASS",
+  "createdAt": "2026-07-21T16:20:00Z",
+  "conclusion": "P29 前端全链路终极完善：受管 Studio 全视图统一三主题 token 体系（素白/墨/纸），J1–J8 用户旅程全部真实走通；P0/P1 为 0，核心 P2 关闭；997 项既有回归零减少（999 全绿）。",
+  "buildIdentity": {
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "sourceDigest": "6f16e8d1d6a594863b8b4418e783422395881601dbd56b7eff8eb7be0a73b62c",
+    "sourceFiles": 514,
+    "sourceBytes": 11331358,
+    "buildId": "c12819cd47e8243f4b8eefb58a6eed0a",
+    "releaseManifestFingerprint": "f46f74f95140826318c6a7bc38196a64f727d34bed5768285f795546ec7d9856",
+    "protocolVersion": "1.1",
+    "mcpToolCount": 186,
+    "builtAt": "2026-07-21T16:02:00Z",
+    "distribution": "local-only"
+  },
+  "contract": ".planning/P29_K3前端全链路融合执行规范.md",
+  "freezeHistory": [
+    { "digest": "0e4c866c12abefe4f839c6c1e103928581f618ab9c989ead5395690b74e6d2e1", "note": "初冻（S4 完成）" },
+    { "digest": "ee05757f192a30ccfbe084beacc7ce147c7af91b789d058c50934904e20adba6", "note": "E-14 模板 $emit 修复（typecheck 拦截）" },
+    { "digest": "fd4468d99a7292a2f5e2d29088ea99262262814083e5a08b2077d143d49daf4c", "note": "plan-ui 文案断言修复（「状态只来自本地账本」合意回归）" },
+    { "digest": "0c8c69045ea199af922832d80dd636d619ad045f7ac58fb63e6469be08c1e911", "note": "p15 smoke 选择器同步「移出画布」" },
+    { "digest": "6f16e8d1d6a594863b8b4418e783422395881601dbd56b7eff8eb7be0a73b62c", "note": "终态：双路终审必修项（color-scheme light 级联、--ui-stale、RAW/LABELED 按钮、alt/标注描边/预览文字色/scan-time）" }
+  ],
+  "modules": {
+    "J0-token-base": "design-tokens.css 三主题 --ui-*；syncDocumentCanvasTheme 单点写入；main.ts 启动同步",
+    "J1-first-run": "首屏/项目中心/topbar/module-nav token 化（E-16/E-09 关闭）",
+    "J2-script": "素材库剧本模式 token 化 146+4 处；黑话清洗",
+    "J3-assets": "D-C 条件列三栏（.studio-body.with-detail，未选中不渲染详情）；E-25/E-05 关闭",
+    "J4-canvas": "节点轻量收敛（去投影/锁角标/选中主色环）；rail 轻量化+lucide；E-03 实证修正（夹具色块非设计债）",
+    "J5-binding": "teal→墨金 57 处 token 并入；歧义紫 → --ui-stale（R1-F02）",
+    "J6-generation": "74 处 token；E-02 人话+诊断详情；E-06 零态引导；E-19 core 文案",
+    "J7-review": "197+5 处 token；媒体区 --ui-preview-bg 恒深（D-1）；E-14 空态行动钮；RAW/LABELED→原始图/标注图（R1-F03/04）",
+    "J8-dashboard-support": "dashboard 14 hex+17 rgba+3 文本色；E-02 dashboard 同款；E-08 仅诊断文案；support 48 处"
+  },
+  "reviewArchive": {
+    "R1": { "path": ".planning/reviews/P29/P29-R1-正确性盲审-20260721.md", "sha256": "a61ee02f0a0eccfecdc5542f85502838925d9941ca3b632177c95adf534cf641", "verdict": "PASS（3 项 P2 必修 + 8 项 P3，必修项全部关闭）" },
+    "R2": { "path": ".planning/reviews/P29/P29-R2-证据边界盲审-20260721.md", "sha256": "a83de9893cf93c45cae551a02b0c03274ccd7a63cdcff3f8d69e77f8da0f0f36", "verdict": "PASS（6 项发现，全部处置）" }
+  },
+  "validation": [
+    { "command": "npm run typecheck", "status": "PASS", "sourceDigest": "6f16e8d1d6a594863b8b4418e783422395881601dbd56b7eff8eb7be0a73b62c" },
+    { "command": "npx vitest run（P29 受影响 16 文件）", "status": "PASS", "files": 16, "tests": 87 },
+    { "command": "npm test（全量，冻结 fd4468d9）", "status": "PASS", "files": 179, "tests": 999, "durationSeconds": 580.24 },
+    { "command": "npm test（全量第二轮，终态 6f16e8d1）", "status": "PASS", "files": 179, "tests": 999, "durationSeconds": 580.02 },
+    { "command": "npm run build:mcp", "status": "PASS" },
+    { "command": "npm run build:identity", "status": "PASS", "note": "release-manifest 重生成，live==manifest==6f16e8d1" },
+    { "command": "npx electron-vite build", "status": "PASS" }
+  ],
+  "regressionBaseline": { "p28Tests": 997, "p29Tests": 999, "delta": "+2（managed-canvas-theme 同步机制新增 2 例）", "noReduction": true },
+  "uiEvidence": {
+    "journey": {
+      "status": "PASS",
+      "index": "docs/evidence/p29-journey-screenshots-20260721-v2.json",
+      "indexSha256": "bd1e356aba009dd6280c799bd18085a1c04a281472dd0ff5e399739eb95aa094",
+      "screens": ["j1-project-center", "j2-script", "j3-assets", "j4-canvas", "j5-binding", "j6-generation", "j7-review", "j8-dashboard", "j8-agent", "j8-help"],
+      "boundDigest": "6f16e8d1d6a594863b8b4418e783422395881601dbd56b7eff8eb7be0a73b62c"
+    },
+    "themes": {
+      "status": "PASS",
+      "index": "docs/evidence/p29-canvas-theme-screenshots-20260721-v2.json",
+      "indexSha256": "bc095bffcd24b70713095952fa2772c0f6dd7464fdfe693d07b117fca04461fd",
+      "screenshots": [
+        { "theme": "light", "path": "docs/evidence/p29-canvas-theme-light-20260721-v2.png", "sha256": "efe35b672ff8f87ee3d80a71feabb55e6969b23b3cbb51c4fdf0ea8eb1133512" },
+        { "theme": "dark", "path": "docs/evidence/p29-canvas-theme-dark-20260721-v2.png", "sha256": "0525523591887e6e617fdb65c83d47e8267d12f81d128505d05e1c85fae1bf07" },
+        { "theme": "paper", "path": "docs/evidence/p29-canvas-theme-paper-20260721-v2.png", "sha256": "4ac6f9a00e787b694be58a660435560ec7219adaf9a5d568ed8a11c938234e04" }
+      ]
+    },
+    "p15": {
+      "status": "PASS",
+      "json": "docs/evidence/p29-p15-simple-canvas-ui-smoke-20260721-v2.json",
+      "jsonSha256": "59f8a254c24bed5581adb837e9c97740bf798cec2c92617ac07d9a8729589305",
+      "screenshot": "docs/evidence/p29-p15-simple-canvas-ui-smoke-20260721-v2.png",
+      "screenshotSha256": "de760c38cf672f3ae446706d0efce5068e45ef43a16ad41bbab9939ac98171fd",
+      "realImageGeneration": false
+    },
+    "p23p24": {
+      "status": "PASS",
+      "json": "docs/evidence/p29-p23-p24-electron-smoke-20260721-v2.json",
+      "jsonSha256": "e196425a0a6d254fb04a07708a7e22c031553d2b332fdf1a25fd97057ea958a0",
+      "screenshot": "docs/evidence/p29-p23-p24-electron-smoke-20260721-v2.png",
+      "screenshotSha256": "b769c76475b935ac84035a69a5a15603a3f510e72640d6a2c3432c84fd240470",
+      "phases": { "full": true, "restart": true, "switched": true }
+    },
+    "scale": {
+      "status": "PASS",
+      "json": "docs/evidence/p29-managed-studio-scale-canvas-ui-smoke-20260721-v2.json",
+      "jsonSha256": "0698e8044b052c05f4320a7e1da6289e0f253f9cb9c9ff61af57ffda8b9f38f9",
+      "screenshot": "docs/evidence/p29-managed-studio-scale-canvas-ui-smoke-20260721-v2.png",
+      "screenshotSha256": "68c1ad502e2569fa2ad026ac94829b194915232387c91745d2bc831e158b9f45",
+      "counts": { "assets": 77, "units": 1288, "panels": 4235, "media": 10000 },
+      "bounds": { "initialDom": 44, "expandedDom": 44, "maximumDomNodes": 78, "mediaKeysetPageDom": 36, "fileDescriptorDelta": 0, "projectSwitches": 10, "crossProjectLeak": false }
+    },
+    "mainAgentOriginalSizeInspection": {
+      "status": "PASS_MECHANICAL_VISUAL",
+      "inspected": ["journey×10（v1+v2）", "theme-light/dark/paper（v1+v2）", "scale", "p15", "p23p24", "j1-first-run×3主题", "j1-project-center×2主题", "节点特写×4", "对齐工具", "连线态", "视图菜单", "素材详情", "dashboard", "agent", "review-empty"],
+      "nonClaims": ["user-subjective-hand-feel", "generated-image-quality", "story-quality"]
+    }
+  },
+  "supersededEvidence": [
+    { "path": "docs/evidence/p29-journey-screenshots-20260721.json（及同批 10 张 v1 PNG）", "supersededBy": "docs/evidence/p29-journey-screenshots-20260721-v2.json", "reason": "R1 必修项后重冻，v2 改绑终态 digest" },
+    { "path": "docs/evidence/p29-canvas-theme-screenshots-20260721.json（及同批 3 张 v1 PNG）", "supersededBy": "docs/evidence/p29-canvas-theme-screenshots-20260721-v2.json", "reason": "同上" },
+    { "path": "docs/evidence/p29-p15-simple-canvas-ui-smoke-20260721.json（及 v1 PNG）", "supersededBy": "docs/evidence/p29-p15-simple-canvas-ui-smoke-20260721-v2.json", "reason": "v1 buildIdentity 为已取代 manifest" },
+    { "path": "docs/evidence/p29-p23-p24-electron-smoke-20260721.json（及 v1 PNG）", "supersededBy": "docs/evidence/p29-p23-p24-electron-smoke-20260721-v2.json", "reason": "统一改绑终态 digest" },
+    { "path": "docs/evidence/p29-managed-studio-scale-canvas-ui-smoke-20260721.json（及 v1 PNG）", "supersededBy": "docs/evidence/p29-managed-studio-scale-canvas-ui-smoke-20260721-v2.json", "reason": "统一改绑终态 digest" }
+  ],
+  "boundaries": {
+    "formalProjectWritten": false,
+    "externalAuthorityFilesWritten": false,
+    "realImageGeneration": false,
+    "grokUsed": false,
+    "browserOrArtlistUsed": false,
+    "uploadPaymentPublishNotarization": false,
+    "installedAppBuiltOrReplaced": false,
+    "gitStageCommitPushPr": false,
+    "oldEvidenceOverwritten": false,
+    "dependenciesAdded": false
+  },
+  "notRun": [
+    { "item": "真实生图与生成画面质量", "completionGate": false },
+    { "item": "审片有结果对比区视觉（无夹具可造，不真实生图）", "completionGate": false, "note": "对比区代码零逻辑改动，样式 token 化经空态与代码审查核验" },
+    { "item": "用户主观手感/组拖体感", "completionGate": false },
+    { "item": "安装版 P29 验证", "completionGate": false, "reason": "不制作安装包（合同 D-1）" }
+  ],
+  "checklist": ".planning/P29_前端全交互验收清单.md",
+  "findingsRegister": ".planning/P29_探索发现.md（E-01~E-28 全部销项/登记不做）",
+  "nextAction": "P29 前端全链路关账；后续可选：受管画布嵌入 App.vue 替换旧画布、P30 文案深度层、安装版更新（另行授权）。"
+}

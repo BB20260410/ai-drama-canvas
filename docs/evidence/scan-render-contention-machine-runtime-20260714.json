@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "root": "/tmp/ai-canvas-scan-render-contention-machine-20260714",
+  "unitCount": 24,
+  "clipCount": 24,
+  "baseline": {
+    "scanId": "8d3a0e1e-a571-4bde-8d00-94a8c5097c0e",
+    "durationMs": 1045,
+    "stats": {
+      "discoveredFiles": 48,
+      "candidateFiles": 48,
+      "reservedPublicationFilesSkipped": 0,
+      "referenceAssets": 0,
+      "inspectedChecks": 48,
+      "reusedChecks": 0,
+      "textFilesRead": 24,
+      "includeHashes": false,
+      "inspectionConcurrency": 6
+    }
+  },
+  "contention": {
+    "scanId": "8e101236-ef4d-424f-90b8-041e8886f3bc",
+    "durationMs": 2289,
+    "wallDurationMs": 2344,
+    "stats": {
+      "discoveredFiles": 49,
+      "candidateFiles": 48,
+      "reservedPublicationFilesSkipped": 1,
+      "referenceAssets": 0,
+      "inspectedChecks": 48,
+      "reusedChecks": 0,
+      "textFilesRead": 24,
+      "includeHashes": true,
+      "inspectionConcurrency": 6
+    },
+    "skippedOutputPath": "/tmp/ai-canvas-scan-render-contention-machine-20260714/成片输出/EP01_15s_099_并发验收成片_20260713T175959255Z_v001.mp4",
+    "outputIndexedWhileReserved": false,
+    "renderAliveAtScanStart": true,
+    "renderAliveAtScanCompletion": false,
+    "overlapObserved": true,
+    "machineAtScanStart": {
+      "capacity": 4,
+      "activeWeight": 3,
+      "availableWeight": 1,
+      "queueDepth": 0,
+      "weights": {
+        "ffprobe": 1,
+        "foregroundFfmpeg": 2,
+        "renderFfmpeg": 3
+      },
+      "algorithm": "strict-weighted-fifo",
+      "currentProjectKey": "ffc645f7ef0e29c46917",
+      "currentProjectActive": [
+        {
+          "id": "media-05f2ab1a-a1b0-4f29-98f0-9839dc04626e",
+          "ownerPid": 32336,
+          "projectKey": "ffc645f7ef0e29c46917",
+          "tool": "ffmpeg",
+          "stage": "edit-render-background",
+          "weight": 3,
+          "enqueuedAt": "2026-07-13T17:59:59.277Z",
+          "acquiredAt": "2026-07-13T17:59:59.281Z",
+          "heartbeatAt": "2026-07-13T17:59:59.286Z",
+          "childPid": 33037,
+          "processGroupId": 33037,
+          "timeoutAt": "2026-07-13T23:59:59.281Z",
+          "ownerAlive": true
+        }
+      ],
+      "currentProjectQueued": [],
+      "activeStages": [
+        {
+          "projectKey": "ffc645f7ef0e29c46917",
+          "tool": "ffmpeg",
+          "stage": "edit-render-background",
+          "weight": 3,
+          "ownerPid": 32336,
+          "childPid": 33037,
+          "timeoutAt": "2026-07-13T23:59:59.281Z",
+          "ownerAlive": true
+        }
+      ],
+      "queuedStages": [],
+      "metrics": {
+        "granted": 26,
+        "succeeded": 25,
+        "failed": 0,
+        "cancelled": 0,
+        "timedOut": 0,
+        "acquisitionTimeouts": 0,
+        "orphanedLeasesReaped": 0,
+        "orphanedQueueEntriesReaped": 0,
+        "maxObservedWeight": 4,
+        "totalWaitMs": 4378
+      }
+    },
+    "registeredOutputIndexedAfterCompletion": true,
+    "registeredArtifactId": "main-ep01-unit099-cd00568d4a02"
+  },
+  "render": {
+    "id": "render-2e30c85b-8f5f-4802-ba65-ffa23cc55fb1",
+    "pid": 33037,
+    "status": "succeeded",
+    "durationSeconds": 36,
+    "outputPath": "/tmp/ai-canvas-scan-render-contention-machine-20260714/成片输出/EP01_15s_099_并发验收成片_20260713T175959255Z_v001.mp4",
+    "outputSize": 18676028,
+    "publicationIntentId": "publication-806300f9-6a41-413c-85bf-ba8655e9a501",
+    "publicationReceiptId": "receipt-cff1d59d-8542-4c64-88f9-b0e759e81aef",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video",
+          "width": 1280,
+          "height": 720
+        }
+      ],
+      "format": {
+        "duration": "36.000000"
+      }
+    }
+  },
+  "recovery": {
+    "finalScanId": "154917c5-4ecb-4733-b1c4-8fb0c75a445e",
+    "finalStats": {
+      "discoveredFiles": 49,
+      "candidateFiles": 49,
+      "reservedPublicationFilesSkipped": 0,
+      "referenceAssets": 0,
+      "inspectedChecks": 1,
+      "reusedChecks": 48,
+      "textFilesRead": 24,
+      "includeHashes": true,
+      "inspectionConcurrency": 6
+    },
+    "activeScan": false,
+    "activeRenderIds": [],
+    "blockedActions": [],
+    "locks": []
+  },
+  "verifiedAt": "2026-07-13T18:00:01.957Z"
+}

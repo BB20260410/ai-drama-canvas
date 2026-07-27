@@ -1,0 +1,312 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T05:55:35Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "slice": {
+    "id": "complex-nested-timelines",
+    "title": "复杂嵌套时间线核心纵向切片",
+    "complete": true,
+    "reusedStateMachines": [
+      "EditProject",
+      "EditClip",
+      "revision-cas",
+      "history",
+      "command-ledger",
+      "Publication",
+      "Continuation",
+      "machine-media-runtime"
+    ]
+  },
+  "priorityRevalidation": {
+    "handoffPriorityAtSliceStart": "complex-nested-timelines",
+    "handoffPriorityWasStillValid": true,
+    "reason": "Capabilities still listed complex-nested-timelines as missing, OTIO rejected nested Stack input, EditClip had no frozen child-project reference, and preview/render/Continuation/MCP/Electron had no positive nested gate.",
+    "nextPriorityAfterSlice": "third-party-effect-transition-compatibility"
+  },
+  "contracts": {
+    "capability": {
+      "features": [
+        "complex-nested-timelines",
+        "frozen-nested-timeline-snapshots"
+      ],
+      "contract": "aicanvas.nested-timeline.v1",
+      "renderContract": "aicanvas.nested-timeline.ffmpeg.v1",
+      "maximumDepth": 8,
+      "missingForFullNle": [
+        "third-party-effect-compatibility",
+        "real-project-nle-validation"
+      ]
+    },
+    "editing": {
+      "operations": [
+        "add_nested_timeline",
+        "refresh_nested_timeline"
+      ],
+      "revisionCas": true,
+      "genericPatchCannotForgeReference": true,
+      "splitTrimMoveRipple": true,
+      "undoRedo": true
+    },
+    "snapshot": {
+      "contentAddressedSha256": true,
+      "immutable": true,
+      "independentFromFiniteHistory": true,
+      "refreshPolicy": "explicit-current-child-revision",
+      "frozenIdentity": [
+        "childEditProjectId",
+        "childEditProjectRevision",
+        "childTimebase",
+        "childCanvas",
+        "sourceOffset",
+        "sourceStep",
+        "sourceDuration",
+        "childSnapshotSha256"
+      ]
+    },
+    "timeMapping": {
+      "parentAuthority": "integer-frame",
+      "childAuthority": "reduced-rational-source-offset-and-step",
+      "arithmetic": "BigInt-cross-multiplication",
+      "fractionalTimebases": true,
+      "coveredRates": [
+        "24",
+        "25",
+        "24000/1001",
+        "30000/1001"
+      ],
+      "mappedCacheSemanticVersion": "mapped.frames-v2"
+    },
+    "failurePolicy": [
+      "reject-self-reference",
+      "reject-cycle",
+      "reject-depth-over-8",
+      "reject-missing-current-child",
+      "reject-missing-snapshot",
+      "reject-snapshot-tamper",
+      "reject-child-revision-drift",
+      "reject-render-plan-tamper",
+      "reject-unprovable-or-out-of-range-duration"
+    ],
+    "resolver": {
+      "consumers": [
+        "synchronous-render",
+        "background-render",
+        "timeline-frame",
+        "timeline-continuation",
+        "publication-provenance",
+        "electron-preview"
+      ],
+      "businessCache": "FFV1+PCM",
+      "browserPreview": "H264+AAC-faststart-MP4",
+      "recursiveLineage": true,
+      "audioMixedOnce": true
+    },
+    "otio": {
+      "contract": "aicanvas.nested-timeline.v1",
+      "container": "Stack.1-private-subset",
+      "roundTrip": true,
+      "canonicalChildrenRebuiltFromFrozenSnapshot": true,
+      "unknownStackTimelineEffectTransitionMarkerPolicy": "reject-before-project-create"
+    },
+    "commandAudit": {
+      "typedPreCommitRejection": "RejectedCommandFailure",
+      "ledgerOutcome": "failed",
+      "committed": false,
+      "uncertainExecutionErrorsRemain": "unknown"
+    }
+  },
+  "realMedia": {
+    "threeLevelTimeline": {
+      "leafRate": "25",
+      "middleRate": "24",
+      "rootRate": "30000/1001",
+      "leafMedia": [
+        "H264-main-video",
+        "picture-in-picture-overlay",
+        "subtitle",
+        "523Hz-WAV"
+      ],
+      "recursiveVisualCompositionVerified": true,
+      "recursiveSourceClipRefsVerified": true,
+      "nestedAudioNotDuplicated": true,
+      "publicationReceiptMetadataVerified": true
+    },
+    "dynamicFrameMapping": {
+      "framemd5ComparedPerParentFrame": true,
+      "rates": [
+        "30-to-24",
+        "24000/1001-to-30000/1001",
+        "25-to-24"
+      ],
+      "firstFrameOffsetRegressionFixed": true
+    },
+    "continuation": {
+      "sameProcessReplay": true,
+      "freshNodeReplay": true,
+      "sameExtractionPackArtifactManifestPlan": true,
+      "snapshotTamperFailsBeforeNewExtractionOrPack": true,
+      "renderPlanTamperFailsBeforeNewExtractionOrPack": true
+    }
+  },
+  "tests": {
+    "targeted": {
+      "success": true,
+      "testFiles": 8,
+      "tests": 41,
+      "durationSeconds": 29.48,
+      "files": [
+        "tests/editor-nested.test.ts",
+        "tests/editor-nested-continuation.test.ts",
+        "tests/editor.test.ts",
+        "tests/timeline-preview.test.ts",
+        "tests/codex.test.ts",
+        "tests/mcp-editor-nested.test.ts",
+        "tests/mcp.test.ts",
+        "tests/mcp-scan-cancel.test.ts"
+      ]
+    },
+    "full": {
+      "success": true,
+      "testFiles": 36,
+      "passedTestFiles": 36,
+      "failedTestFiles": 0,
+      "tests": 210,
+      "passedTests": 210,
+      "failedTests": 0,
+      "durationSeconds": 80.48
+    },
+    "sourceMcp": {
+      "success": true,
+      "testFiles": 3,
+      "tests": 3,
+      "durationSeconds": 7.67
+    },
+    "compiledMcp": {
+      "success": true,
+      "testFiles": 3,
+      "tests": 3,
+      "durationSeconds": 7.53,
+      "serverPath": "/Users/hxx/Documents/无限画布/dist-mcp/mcp/server.js"
+    }
+  },
+  "build": {
+    "success": true,
+    "typecheck": true,
+    "mainBytes": 919029,
+    "preloadBytes": 17526,
+    "rendererJavaScriptBytes": 1286697,
+    "mcpServerBytes": 185412
+  },
+  "mcp": {
+    "smokeSuccess": true,
+    "toolCount": 134,
+    "resourceTemplateCount": 9,
+    "promptCount": 7,
+    "nestedOperations": [
+      "add_nested_timeline",
+      "refresh_nested_timeline"
+    ],
+    "idempotentReplayVerified": true,
+    "staleCasLedgerFailedVerified": true,
+    "childDriftAndRefreshVerified": true,
+    "sourceAndCompiledEntryPointsVerified": true
+  },
+  "electron": {
+    "success": true,
+    "script": "npm run ui:editor-nested-smoke",
+    "evidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/editor-nested-ui-smoke-20260714.json",
+    "evidenceSha256": "29e7e8ffc3191d0999fa9aefa2c9203cd89e4ea3134c68ae0b0270aae5c012ba",
+    "parentRevisions": {
+      "fixture": 1,
+      "attached": 2,
+      "undone": 3,
+      "redone": 4,
+      "trimmed": 6,
+      "dirtyRejected": 6,
+      "refreshed": 7
+    },
+    "childRevisions": {
+      "fixture": 1,
+      "updated": 2
+    },
+    "trimFrames": {
+      "before": 120,
+      "after": 114
+    },
+    "dirtyDraftRefreshRejectedWithoutDiskWrite": true,
+    "explicitRefreshChangedSnapshotAndPreservedTrim": true,
+    "freshApplicationRestartVerified": true,
+    "preview": {
+      "codec": "H264+AAC",
+      "width": 540,
+      "height": 960,
+      "durationSeconds": 4.004,
+      "bytes": 394803,
+      "sha256": "5b645f582545a743013302cc9f6586d19c77f02cd2d8987b1cdbba20a65260d2",
+      "mediaError": null
+    },
+    "screenshot": {
+      "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-nested-ui-20260714.png",
+      "bytes": 311714,
+      "sha256": "17c6af4e1652716db22e477e96a8220d9854fd3251de736ea52cdcb146fffdeb",
+      "width": 1560,
+      "height": 980,
+      "humanVisualInspection": true
+    },
+    "pageErrors": 0,
+    "fixtureRootRemoved": true,
+    "fixtureRegistryRemoved": true
+  },
+  "crossProcess": {
+    "fullWorkflow": {
+      "success": true,
+      "restartVerified": true
+    },
+    "mcpHeadless": {
+      "success": true,
+      "toolCount": 134,
+      "commandTypes": 79,
+      "ledgerEntries": 22,
+      "uncertainCommands": 0,
+      "finalDoctorErrors": 0,
+      "finalDoctorWarnings": 0,
+      "runtimeResourcesIdle": true
+    },
+    "mcpEmptyProject": {
+      "success": true,
+      "ledgerEntries": 19,
+      "uncertainCommands": 0,
+      "restartVerified": true
+    }
+  },
+  "cleanup": {
+    "electronFixtureRemoved": true,
+    "crossProcessSmokeRootsAndRegistriesRemoved": true,
+    "remainingTargetProcesses": 0
+  },
+  "boundaries": {
+    "formalProjectScanned": false,
+    "formalProjectModified": false,
+    "realComfyUiCalled": false,
+    "externalProviderCalled": false,
+    "websiteOpened": false,
+    "uploadPerformed": false,
+    "paidActionPerformed": false,
+    "externalAssetsOverwritten": false,
+    "installationPerformed": false,
+    "releasePerformed": false,
+    "notarizationPerformed": false,
+    "gitCommitPerformed": false,
+    "gitPushPerformed": false,
+    "pullRequestCreated": false
+  },
+  "knownLimitations": [
+    "OTIO nested support is the AI Canvas private Stack.1 subset, not general third-party nested NLE compatibility.",
+    "Third-party Effect and Transition objects remain fail-closed.",
+    "Dirty parent drafts must be saved or reloaded before explicit nested refresh.",
+    "Nested preview preparation is correctness-verified but not benchmarked for many simultaneous timeline clips.",
+    "Formal real-project NLE calibration was not authorized or performed.",
+    "Real ComfyUI, Provider/site, Apple notarization and public distribution remain outside this slice."
+  ],
+  "success": true
+}

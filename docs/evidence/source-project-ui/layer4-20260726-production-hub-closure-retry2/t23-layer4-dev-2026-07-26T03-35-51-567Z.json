@@ -1,0 +1,264 @@
+{
+  "schemaVersion": 1,
+  "kind": "t23-layer4-project-ui-verify",
+  "createdAt": "2026-07-26T03:35:59.321Z",
+  "ok": true,
+  "mode": "dev",
+  "project": {
+    "id": "project-b3e5fa60bbcd",
+    "name": "《嘟嘟》世界观概念序章",
+    "root": "/Users/hxx/Documents/无限画布/projects/local-import-dudu-world-prologue-b8bfcf14"
+  },
+  "expectations": {
+    "derivedUnits": 1
+  },
+  "timings": {
+    "launchToStudioViewMs": 3672,
+    "launchToFirstUnitNodeMs": 4529,
+    "totalMs": 7754,
+    "firstUnitNodeSoftBudgetMs": 1500
+  },
+  "assertions": [
+    {
+      "id": "a-startup-managed-canvas",
+      "title": "应用启动后直达受管工程画布（非首启/默认页）",
+      "status": "PASS",
+      "detail": "直达「《嘟嘟》世界观概念序章」受管画布，url=http://localhost:5173/",
+      "durationMs": 3032
+    },
+    {
+      "id": "b-timeline-units",
+      "title": "时间线渲染工程单元",
+      "status": "PASS",
+      "detail": "指标单元数=1，期望=1；首屏渲染单元节点 1 个；通用工程未启用双编号硬门",
+      "durationMs": 23
+    },
+    {
+      "id": "c-media-load",
+      "title": "媒体加载失败数=0（aicanvas-studio: 协议失败 / HTTP≥400 / img 解码失败）",
+      "status": "PASS",
+      "detail": "aicanvas-studio 请求 0 次，失败 0",
+      "durationMs": 13
+    },
+    {
+      "id": "c2-all-pass-raw-decode",
+      "title": "全部 Core PASS raw 图片实际解码且 naturalWidth>0",
+      "status": "SKIP",
+      "detail": "当前工程投影没有 Core PASS raw。",
+      "durationMs": 504
+    },
+    {
+      "id": "g-build-identity",
+      "title": "构建身份/指纹展示读取",
+      "status": "PASS",
+      "detail": "来源=data-testid，值=构建身份 v0.2.0 · buildId:85e0b31203d0 · sourceDigest:65b1f5460af0"
+    },
+    {
+      "id": "g2-runtime-write-gate",
+      "title": "源码运行时门禁完成核验且未误报必须重启",
+      "status": "PASS",
+      "detail": "data-runtime-write-gate-state=allowed；重启横幅不可见"
+    },
+    {
+      "id": "i-multimedia-timeline",
+      "title": "四媒体时间线真实界面可读取并可返回画布",
+      "status": "PASS",
+      "detail": "剧本/图片/视频/音频四轨可见；剧本 可用 图片 缺失 视频 缺失 音频 缺失",
+      "durationMs": 1379
+    },
+    {
+      "id": "e-screenshot-nonblank",
+      "title": "截图落盘且 sharp 方差校验防空白",
+      "status": "PASS",
+      "detail": "3456×2054，266659B，stdev=20.54",
+      "durationMs": 148
+    },
+    {
+      "id": "f-perf-first-screen",
+      "title": "首屏到首批单元卡渲染耗时（软目标 ≤1500ms，超时 WARN 不 FAIL）",
+      "status": "PASS",
+      "detail": "launch→material-studio-view 3672ms；launch→首个单元卡 4529ms（WARN：超软目标）",
+      "warnings": [
+        "首屏到首批单元卡 4529ms 超过软目标 1500ms（dev 模式含 vite 编译为预期；真实硬门待性能波次）"
+      ]
+    },
+    {
+      "id": "d-console-clean",
+      "title": "页面 console error=0（良性名单可配置）且 pageerror=0",
+      "status": "PASS",
+      "detail": "原始 console error 0 条，忽略 0 条后 0"
+    },
+    {
+      "id": "h-readonly-guard",
+      "title": "只读护栏：存在的六项候选工程哨兵 SHA-256、bytes、mtime 全程不变",
+      "status": "PASS",
+      "detail": "逐项复核 .aicanvas/managed-project.json[sha256=68b4747ca2c8…,bytes=1414,mtimeMs=1784988532217]；.aicanvas/project.json[sha256=0294f210f97a…,bytes=831,mtimeMs=1784988532077]；.aicanvas/studio-production.sqlite[sha256=74c53995dcf2…,bytes=557056,mtimeMs=1785035952824]；.aicanvas/studio-generation-ledger.sqlite[sha256=8ba7dcfd1c72…,bytes=323584,mtimeMs=1784988532362]；.aicanvas/material-studio.sqlite[sha256=78f890cfe523…,bytes=577536,mtimeMs=1785035958117]；mtime 精度=integer-millisecond"
+    },
+    {
+      "id": "h2-readonly-full-tree",
+      "title": "只读护栏：正式工程全树元数据与关键数据库内容 SHA 不变",
+      "status": "PASS",
+      "detail": "814 项全树节点未变化"
+    }
+  ],
+  "media": {
+    "studioRequests": 0,
+    "failures": []
+  },
+  "console": {
+    "rawErrors": [],
+    "ignoredErrors": [],
+    "effectiveErrors": [],
+    "pageErrors": []
+  },
+  "network": {
+    "externalRequests": []
+  },
+  "screenshot": {
+    "sha256": "9ef567397666d9c79c805fe1ad2ec47d29003e9780c75f97678b75918210022f",
+    "sizeBytes": 266659,
+    "width": 3456,
+    "height": 2054,
+    "maxChannelStandardDeviation": 20.54374604750552,
+    "path": "docs/evidence/source-project-ui/layer4-20260726-production-hub-closure-retry2/t23-layer4-dev-2026-07-26T03-35-51-567Z.png"
+  },
+  "readonlySentinels": {
+    "ok": true,
+    "candidateRelativePaths": [
+      ".aicanvas/managed-project.json",
+      ".aicanvas/project.json",
+      ".aicanvas/studio-production.sqlite",
+      ".aicanvas/studio-generation-ledger.sqlite",
+      ".aicanvas/material-studio.sqlite",
+      ".aicanvas/studio-canvas-layout.json"
+    ],
+    "includedExistingCount": 5,
+    "mtimePrecision": "integer-millisecond",
+    "items": [
+      {
+        "relativePath": ".aicanvas/managed-project.json",
+        "status": "PASS",
+        "changedFields": [],
+        "before": {
+          "relativePath": ".aicanvas/managed-project.json",
+          "exists": true,
+          "bytes": 1414,
+          "mtimeMs": 1784988532217,
+          "sha256": "68b4747ca2c83db5a77eeb574c2e8fcb0364e4b3457e987a314cd9eaeea9b5ac"
+        },
+        "after": {
+          "relativePath": ".aicanvas/managed-project.json",
+          "exists": true,
+          "bytes": 1414,
+          "mtimeMs": 1784988532217,
+          "sha256": "68b4747ca2c83db5a77eeb574c2e8fcb0364e4b3457e987a314cd9eaeea9b5ac"
+        }
+      },
+      {
+        "relativePath": ".aicanvas/project.json",
+        "status": "PASS",
+        "changedFields": [],
+        "before": {
+          "relativePath": ".aicanvas/project.json",
+          "exists": true,
+          "bytes": 831,
+          "mtimeMs": 1784988532077,
+          "sha256": "0294f210f97ad4a76c90f293c089f0ea8eac9c442f621e4c94b2c2dbbe1cddfa"
+        },
+        "after": {
+          "relativePath": ".aicanvas/project.json",
+          "exists": true,
+          "bytes": 831,
+          "mtimeMs": 1784988532077,
+          "sha256": "0294f210f97ad4a76c90f293c089f0ea8eac9c442f621e4c94b2c2dbbe1cddfa"
+        }
+      },
+      {
+        "relativePath": ".aicanvas/studio-production.sqlite",
+        "status": "PASS",
+        "changedFields": [],
+        "before": {
+          "relativePath": ".aicanvas/studio-production.sqlite",
+          "exists": true,
+          "bytes": 557056,
+          "mtimeMs": 1785035952824,
+          "sha256": "74c53995dcf22e7e94a5a21b2169231bd9fc0b2a4ec16fe3db9a9f18d223c590"
+        },
+        "after": {
+          "relativePath": ".aicanvas/studio-production.sqlite",
+          "exists": true,
+          "bytes": 557056,
+          "mtimeMs": 1785035952824,
+          "sha256": "74c53995dcf22e7e94a5a21b2169231bd9fc0b2a4ec16fe3db9a9f18d223c590"
+        }
+      },
+      {
+        "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+        "status": "PASS",
+        "changedFields": [],
+        "before": {
+          "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+          "exists": true,
+          "bytes": 323584,
+          "mtimeMs": 1784988532362,
+          "sha256": "8ba7dcfd1c72e87894bd553913b4117a1b585bbd330b3c62fe55d92f14a2a1f9"
+        },
+        "after": {
+          "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+          "exists": true,
+          "bytes": 323584,
+          "mtimeMs": 1784988532362,
+          "sha256": "8ba7dcfd1c72e87894bd553913b4117a1b585bbd330b3c62fe55d92f14a2a1f9"
+        }
+      },
+      {
+        "relativePath": ".aicanvas/material-studio.sqlite",
+        "status": "PASS",
+        "changedFields": [],
+        "before": {
+          "relativePath": ".aicanvas/material-studio.sqlite",
+          "exists": true,
+          "bytes": 577536,
+          "mtimeMs": 1785035958117,
+          "sha256": "78f890cfe5239ee17175d4febaa26f64076490ceec3d1433764e637bfe3cee38"
+        },
+        "after": {
+          "relativePath": ".aicanvas/material-studio.sqlite",
+          "exists": true,
+          "bytes": 577536,
+          "mtimeMs": 1785035958117,
+          "sha256": "78f890cfe5239ee17175d4febaa26f64076490ceec3d1433764e637bfe3cee38"
+        }
+      }
+    ]
+  },
+  "readonlyProjectTree": {
+    "ok": true,
+    "beforeFingerprint": "bd060dd8279709b8cd5740e7d0226274106170a18686daead8f7480cab148fdc",
+    "afterFingerprint": "bd060dd8279709b8cd5740e7d0226274106170a18686daead8f7480cab148fdc",
+    "beforeEntryCount": 814,
+    "afterEntryCount": 814,
+    "changedPaths": [],
+    "addedPaths": [],
+    "removedPaths": [],
+    "criticalContentChangedPaths": []
+  },
+  "warnings": [
+    "首屏到首批单元卡 4529ms 超过软目标 1500ms（dev 模式含 vite 编译为预期；真实硬门待性能波次）"
+  ],
+  "boundaries": {
+    "readonlyJourney": true,
+    "writeButtonClicks": 0,
+    "executeCommandWrites": 0,
+    "viewportMoves": 0,
+    "isolatedUserData": true,
+    "isolatedRegistryCopy": true,
+    "isolatedProjectCopy": true,
+    "isolatedManagedProjectsRoot": true,
+    "isolatedMediaRuntime": true,
+    "isolatedRuntimeCleaned": true,
+    "formalProjectWrites": 0,
+    "buildPerformedByScript": false,
+    "gitActions": 0
+  }
+}

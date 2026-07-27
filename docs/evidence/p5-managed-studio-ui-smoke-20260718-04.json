@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "kind": "p5-managed-studio-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-17T21:40:25.474Z",
+  "buildIdentity": {
+    "files": [
+      {
+        "relativePath": "out/main/index.js",
+        "sizeBytes": 2183643,
+        "sha256": "60f6218ebfb468c51ae9c6e1de863c7e2c956e2270489fc8b838c3c746b4ee08"
+      },
+      {
+        "relativePath": "out/preload/index.mjs",
+        "sizeBytes": 24017,
+        "sha256": "539275a49afbe394b794a7c9b7c62d39d3b68aeb4b0f0ae143cb0a8aa10510de"
+      },
+      {
+        "relativePath": "out/renderer/assets/index-5Z6LItUh.js",
+        "sizeBytes": 1625811,
+        "sha256": "fb83108e1b7704a4b15b085e511300464785d77941e7208a75304f17a16c0de1"
+      },
+      {
+        "relativePath": "out/renderer/assets/index-B2on2HqS.css",
+        "sizeBytes": 262443,
+        "sha256": "1f0de58030d8d6d99c8b53b9bbf95103d823d6e00cb6c4c0a23fc45657dc236b"
+      },
+      {
+        "relativePath": "out/renderer/index.html",
+        "sizeBytes": 727,
+        "sha256": "8f680bdbc636403119769b7ddb47ef3b0ffc42f671af4b323ca6b1c450a139ed"
+      }
+    ]
+  },
+  "project": {
+    "id": "project-0815f527e427",
+    "startupPolicy": "no-filesystem-scan",
+    "legacyRoots": []
+  },
+  "startup": {
+    "readyMs": 551,
+    "oldProjectGuardUnchanged": true,
+    "legacyIndexAndCacheUnchanged": true,
+    "externalRequests": 0,
+    "pageErrors": 0,
+    "studioMediaRequests": 4,
+    "studioMediaFailures": [],
+    "watcherSwitch": {
+      "legacyWatcherStarted": true,
+      "switchedToManaged": true,
+      "postSwitchRelevantMutationWaitMs": 1800,
+      "errors": [],
+      "legacySidecarCreated": false
+    }
+  },
+  "ui": {
+    "managedStudioVisible": true,
+    "legacyNavigationHidden": true,
+    "strictFifteenSecondTimelineVisible": true,
+    "panelCount": 2,
+    "assetWorkflow": [
+      "create",
+      "append-pending",
+      "approve",
+      "promote-authority"
+    ],
+    "applicabilityVisible": true,
+    "applicability": {
+      "episodes": [
+        "EP01"
+      ],
+      "units": [
+        "unit-ep01-001"
+      ],
+      "tags": [
+        "UI smoke",
+        "石室"
+      ]
+    },
+    "relationWorkflow": [
+      "append-reference-of",
+      "render-current-relation"
+    ],
+    "relationRevisionWorkflow": [
+      "render-stale",
+      "rebase-current",
+      "retain-superseded-history"
+    ],
+    "textDocumentWorkflow": [
+      "list-prompt",
+      "open-frozen-prompt-body"
+    ],
+    "managedProjectCreationEntryVisible": true,
+    "managedProjectCreatedAndOpened": true,
+    "managedProjectCreation": {
+      "differentRoot": true,
+      "parentMatches": true,
+      "slugMatches": true,
+      "activePointerMatches": true,
+      "projectId": "project-a35a71eb163d",
+      "projectName": "P5 UI 新建空白受管工程",
+      "projectRoot": "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-managed-studio-ui-ASqmWl/projects/p5-ui-created-managed-22d021a0",
+      "sourceRoots": [],
+      "outputRoots": [
+        "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-managed-studio-ui-ASqmWl/projects/p5-ui-created-managed-22d021a0"
+      ],
+      "startupPolicy": "no-filesystem-scan",
+      "manifestFingerprint": "42670b152019456264f096c8474137ea6cc14b6a898aaf04124c0c9bab13a614",
+      "materialCounts": {
+        "media": 0,
+        "mediaImports": 0,
+        "canonicalAssets": 0,
+        "characters": 0,
+        "scenes": 0,
+        "props": 0,
+        "assetVersions": 0,
+        "assetDefinitions": 0,
+        "primaryAuthorities": 0,
+        "authorityEvents": 0,
+        "versionReviews": 0,
+        "assetRelations": 0
+      },
+      "productionCounts": {
+        "textDocuments": 0,
+        "scriptDocuments": 0,
+        "promptDocuments": 0,
+        "textRevisions": 0,
+        "units": 0,
+        "unitRevisions": 0
+      },
+      "generationCounts": {
+        "packs": 0,
+        "results": 0,
+        "pendingResults": 0
+      },
+      "bootstrap": {
+        "total": 0,
+        "items": 0,
+        "artifacts": 0,
+        "discoveredFiles": 0
+      },
+      "managedCreatedEventCount": 1,
+      "originalFixtureAndLegacySentinelUnchanged": true
+    },
+    "materialCounts": {
+      "media": 4,
+      "mediaImports": 4,
+      "canonicalAssets": 4,
+      "characters": 1,
+      "scenes": 2,
+      "props": 1,
+      "assetVersions": 5,
+      "assetDefinitions": 4,
+      "primaryAuthorities": 4,
+      "authorityEvents": 5,
+      "versionReviews": 5,
+      "assetRelations": 2
+    },
+    "productionCounts": {
+      "textDocuments": 2,
+      "scriptDocuments": 1,
+      "promptDocuments": 1,
+      "textRevisions": 2,
+      "units": 1,
+      "unitRevisions": 1
+    },
+    "mediaDomCount": 2,
+    "decodedImageCount": 4
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p5-managed-studio-ui-smoke-20260718-04.png",
+    "sizeBytes": 474039,
+    "mtimeMs": 1784324425012.0698,
+    "sha256": "d733f47611d4d4607964449ecd4ef79ffccdb16ed2f0cb25e54548614f7dab8f",
+    "width": 3456,
+    "height": 2058,
+    "format": "png",
+    "stdev": 21.585765593876104
+  },
+  "boundaries": {
+    "formalImageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0,
+    "sourceWrites": 0
+  }
+}

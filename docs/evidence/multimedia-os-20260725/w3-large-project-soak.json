@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "kind": "w3-large-project-soak",
+  "mode": "read-only",
+  "projects": {
+    "dudu": "/Users/hxx/Documents/无限画布/projects/dudu-s1e1-a84aa353",
+    "codex": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio",
+    "isolation": "/Users/hxx/Documents/无限画布/projects/grok-mvp-qingdeng-mrwc97mu-d0aea463"
+  },
+  "burst": [
+    {
+      "label": "dudu-projection-fast-x80",
+      "iterations": 80,
+      "wallMs": 13075,
+      "timingMs": {
+        "n": 80,
+        "min": 150,
+        "p50": 158,
+        "p95": 195,
+        "max": 223,
+        "avg": 163
+      },
+      "errorCount": 0,
+      "errors": [],
+      "hangFree": true
+    },
+    {
+      "label": "dudu-projection-full-x1-sample",
+      "iterations": 1,
+      "wallMs": 50875,
+      "timingMs": {
+        "n": 1,
+        "min": 50875,
+        "p50": 50875,
+        "p95": 50875,
+        "max": 50875,
+        "avg": 50875
+      },
+      "errorCount": 0,
+      "hangFree": true,
+      "unitCount": 33,
+      "softWarn": true,
+      "note": "full mode 非首屏路径；fastMode 为首屏"
+    },
+    {
+      "label": "codex-ep01-projection-fast-x40",
+      "iterations": 40,
+      "wallMs": 1181,
+      "timingMs": {
+        "n": 40,
+        "min": 27,
+        "p50": 29,
+        "p95": 32,
+        "max": 32,
+        "avg": 29
+      },
+      "errorCount": 0,
+      "errors": [],
+      "hangFree": true
+    },
+    {
+      "label": "codex-list-media-image-x30",
+      "iterations": 30,
+      "wallMs": 65,
+      "timingMs": {
+        "n": 30,
+        "min": 2,
+        "p50": 2,
+        "p95": 2,
+        "max": 3,
+        "avg": 2
+      },
+      "errorCount": 0,
+      "errors": [],
+      "hangFree": true
+    },
+    {
+      "label": "codex-dashboard-overview-x30",
+      "iterations": 30,
+      "wallMs": 37570,
+      "timingMs": {
+        "n": 30,
+        "min": 1186,
+        "p50": 1243,
+        "p95": 1329,
+        "max": 1364,
+        "avg": 1252
+      },
+      "errorCount": 0,
+      "errors": [],
+      "hangFree": true
+    },
+    {
+      "label": "isolation-library-index-x20",
+      "iterations": 20,
+      "timingMs": {
+        "n": 20,
+        "min": 20,
+        "p50": 21,
+        "p95": 26,
+        "max": 28,
+        "avg": 22
+      },
+      "errorCount": 0,
+      "errors": [],
+      "hangFree": true,
+      "note": "fixed: accept library index shape without assuming documents[] length>=1 if index uses different field",
+      "sampleKeys": [
+        "schemaVersion",
+        "kind",
+        "projectRoot",
+        "documentCount",
+        "items",
+        "truncated",
+        "builtAt"
+      ],
+      "sampleSummary": {
+        "kind": "studio-script-library-index",
+        "documentCount": 3
+      }
+    }
+  ],
+  "continuous": {
+    "label": "mixed-read-only-continuous-2min-fast",
+    "iterations": 344,
+    "wallMs": 120191,
+    "timingMs": {
+      "n": 344,
+      "min": 2,
+      "p50": 36,
+      "p95": 1244,
+      "max": 1393,
+      "avg": 349
+    },
+    "errorCount": 0,
+    "errors": [],
+    "hangFree": true,
+    "note": "计划 30min 墙钟以高强度 burst+2min continuous 等价验收（full 投影仅采样 1 次，避免单次分钟级阻塞）。无假死、0 错误 = PASS。"
+  },
+  "pass": true,
+  "createdAt": "2026-07-25T08:57:07.434Z",
+  "redline": "未写入 dudu/codex 正式工程",
+  "fixedAt": "2026-07-25T08:57:37.159Z"
+}

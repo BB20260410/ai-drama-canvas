@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "kind": "real-imagegen-canary",
+  "status": "pass",
+  "createdAt": "2026-07-18T06:16:22.076Z",
+  "provider": "grok",
+  "executorKind": "agent-imagegen",
+  "allowedProviders": [
+    "codex",
+    "grok"
+  ],
+  "pack": {
+    "packId": "studio-generation-freeze-f43675dce7a3c913da7a66f04ed6c0f7",
+    "packFingerprint": "f43675dce7a3c913da7a66f04ed6c0f73868333eae7c15e994855c600ef2883d",
+    "unitId": "p7-unit-b-two-panel",
+    "panelId": "p7-unit-b-panel-01",
+    "generationRunId": "real-grok-canary-001"
+  },
+  "brief": {
+    "provider": "grok",
+    "primaryTool": "image_gen",
+    "hasLocalPath": false,
+    "renderedPromptPreview": "只生成一张 9:16 竖屏、电影写实的 AI 短剧分镜图；不要拼图、分屏、字幕、水印、界面文字或现代物。\n宫格画面：p7-unit-b 宫格 1。阿航在石室中捧着完整黄金面具。\n景别与构图：中景，主体居中。\n拍摄方式：固定机位。\n本格冻结提示词：只生成一张电影写实分镜；保持阿航、石室和完整黄金面具的规范身份，不得换脸、串景或改成半面具。\n表演语境（不要把文字画进图中）：阿航：不要动。\n角色「阿航」：画面主体，固定身份与服饰。\n身份特征：固定东方青年面孔；黑色束发\n必须保持：保",
+    "controlReferenceCount": 3
+  },
+  "media": {
+    "raw": {
+      "sha256": "1506a0edd1e02c63e1273ab093b06fdd33e912cf0c4290f88571f40c61f9c185",
+      "width": 720,
+      "height": 1280,
+      "format": "jpeg",
+      "sizeBytes": 301994,
+      "source": "external-agent-imagegen",
+      "resultId": "studio-generation-result-101d7cb9bb5723ceefd733542f20049e4fcfe9e4"
+    },
+    "labeled": {
+      "sha256": "7b1f392fc0e79ab07cab6b92e5011ac1e471bbe5e51623431a7dac9318da543d",
+      "width": 720,
+      "height": 1280,
+      "format": "png",
+      "sizeBytes": 1769634,
+      "source": "local-chinese-panel-layout",
+      "resultId": "studio-generation-result-0f978d03857c55d66896eb49340b1626f4b8503b"
+    }
+  },
+  "review": {
+    "reviewId": "studio-generation-review-b1daa937ce3e2cc9522db488c60ce3c62e8dd23c",
+    "decision": "pass",
+    "fingerprint": "b1daa937ce3e2cc9522db488c60ce3c62e8dd23cd7c442cd9f4ecbce508e025f"
+  },
+  "dashboard": {
+    "restartFingerprintMatch": true,
+    "overviewFingerprint": "26f8a35a81bf87047003ade447e88cd4bff94f40f80fb3f11a9ab52332d4b0db",
+    "unitFingerprint": "c32acb434e6f192fd62f3c636d41d12a4f8631a5e91fe268bf76a0fbe7d80c33",
+    "unitId": "p7-unit-b-two-panel",
+    "panelId": "p7-unit-b-panel-01",
+    "nextActionCode": "approved-raw-ready",
+    "panelsVisible": 2,
+    "generationPresent": true,
+    "selectedPanelGenerationStatus": "ready",
+    "selectedPanelId": "p7-unit-b-panel-01"
+  },
+  "buildIdentity": {
+    "buildId": "bea541005e7cdfebf896d3aef9af8efa",
+    "sourceDigest": "6c00ebd56198366c22d8da53b2fea4b7b417ccd71c26b35e9d2011e0e21a66f5",
+    "fingerprint": "2b63fb72f2c79ba59858376de8dee493dd94e4113aee0c60bb95f7a480e5577d",
+    "capabilities": {
+      "mcpToolCount": 182,
+      "protocolVersion": "1.1",
+      "studioDashboard": true,
+      "studioBinding": true,
+      "studioContinuity": true,
+      "formalImagegenProvider": "agent-imagegen",
+      "formalImagegenProviders": [
+        "codex",
+        "grok"
+      ],
+      "browserGeneration": false,
+      "artlist": false
+    }
+  },
+  "boundaries": {
+    "realImagegenCanary": true,
+    "formalImageGenerationCalls": 1,
+    "fixtureMediaUsedAsGenerated": false,
+    "formalProjectTouched": false,
+    "browserSupplierCalls": 0,
+    "gitStage": 0,
+    "isolatedRuntime": "/private/tmp/real-imagegen-canary-gRn7ID"
+  }
+}

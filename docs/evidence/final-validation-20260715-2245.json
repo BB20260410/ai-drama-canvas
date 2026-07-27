@@ -1,0 +1,281 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-15T22:45:00+08:00",
+  "status": "passed",
+  "slice": "gushujuan-s3-artlist-recoverable-preflight-blocked",
+  "summary": "Artlist 真实预检确认已登录但积分不足、Generate 禁用，且当前生成参数与冻结合同不一致；软件已补齐 preflight_blocked Core/MCP/Doctor/Snapshot/UI 可恢复纵向切片，并将同一 P01 幂等持久化为 R2。零上传、零 submit-intent、零 Generate、零远端身份、零正式输出。",
+  "goal": {
+    "status": "active",
+    "complete": false,
+    "reason": "本轮完成可恢复网页预检检查点；仍需完成 EP01 的 18 项新资产、71 对逐格 raw/labeled、34 张正式中文板，并逐集扩展至全季 1288 单元。"
+  },
+  "priorityAudit": {
+    "historicalTask": "EP22 Artlist",
+    "historicalTaskFrozen": true,
+    "previousLoginBlockerStillValid": false,
+    "nextUniqueHighestPriorityStillValid": true,
+    "nextUniqueHighestPriority": {
+      "title": "恢复同一 P01 布囊 Artlist job 并完成首批6项",
+      "status": "waiting_user_credit_recovery",
+      "existingJobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+      "checkpoint": "preflight_blocked",
+      "checkpointRevision": 2,
+      "mustNotRequeue": true,
+      "userAction": "自行恢复 Artlist 可用额度后回复 Artlist 额度已恢复",
+      "purchaseAuthorized": false
+    }
+  },
+  "sourceBoundary": {
+    "root": "/Users/hxx/Documents/古蜀卷第三季",
+    "mode": "read-only",
+    "writeback": false,
+    "fullDirectory": {
+      "files": 3344,
+      "bytes": 24570877,
+      "beforeAggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26",
+      "afterAggregateSha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26",
+      "unchanged": true
+    },
+    "controlledFusionInputs": {
+      "files": 1354,
+      "bytes": 14093144,
+      "beforeAggregateSha256": "f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+      "afterAggregateSha256": "f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+      "unchanged": true
+    }
+  },
+  "isolatedProject": {
+    "projectId": "gushujuan-s3-f1a688020bfb7af6",
+    "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+    "sourceContentAddress": "sha256:f1a688020bfb7af6a39e2d9e7f383f773fdd4fdc27a9562695017509a1600a8c",
+    "counts": {
+      "episodes": 32,
+      "units": 1288,
+      "sourceShots": 1472,
+      "storyboardRows": 2640,
+      "assets": 77,
+      "characters": 24,
+      "scenes": 20,
+      "props": 33,
+      "continuityTracks": 77,
+      "continuitySpans": 4287
+    },
+    "episode01StoryboardContract": {
+      "units": 34,
+      "twoPanelUnits": 31,
+      "threePanelUnits": 3,
+      "rawImages": 71,
+      "labeledImages": 71,
+      "chineseSheets": 34,
+      "sheetPixels": "2160x3840"
+    }
+  },
+  "artlistObservation": {
+    "url": "https://toolkit.artlist.io/image-video-generator?mode=image",
+    "loginVerified": true,
+    "pageReady": true,
+    "balanceChecked": true,
+    "creditMessage": "您的积分不足以生成奖励。",
+    "generateEnabled": false,
+    "observedGeneration": {
+      "model": "纳米香蕉 2",
+      "aspectRatio": "16:9",
+      "resolution": "2K",
+      "imageCount": 1
+    },
+    "frozenContract": {
+      "model": "GPT Image 2",
+      "aspectRatio": "9:16",
+      "resolution": "Medium",
+      "quality": "Medium",
+      "imageCount": 1,
+      "concurrency": 1,
+      "referenceMode": "text-only",
+      "allowedUploads": []
+    },
+    "blockers": [
+      "insufficient_credits",
+      "generation_mode_mismatch"
+    ],
+    "stoppedBefore": [
+      "parameter change",
+      "upload",
+      "prompt entry",
+      "submit_intent",
+      "Generate",
+      "purchase",
+      "download"
+    ]
+  },
+  "recoverableCheckpoint": {
+    "jobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+    "itemId": "asset-P01",
+    "jobStatus": "waiting_external",
+    "browserState": "preflight_blocked",
+    "browserStage": "preflight_blocked",
+    "revision": 2,
+    "publicationStatus": "reserved",
+    "publicationReceipts": 0,
+    "externalTaskIdAbsent": true,
+    "resultPathAbsent": true,
+    "sameJobRecoverableToPreflight": true,
+    "uploadAndSubmissionFailClosed": true,
+    "idempotencyKey": "artlist-preflight-blocked-p01-20260715-2212-v1"
+  },
+  "implementation": {
+    "core": [
+      "structured browser preflight blockers and observed generation state",
+      "recoverable preflight_blocked state transitions",
+      "insufficient-credit and mode-mismatch semantic validation",
+      "same job and Publication preservation",
+      "continuation projection"
+    ],
+    "mcp": [
+      "direct and execute_command schemas expose preflight_blocked",
+      "blockers and observedGeneration are validated and sanitized",
+      "run_browser_generation guidance resumes the same job"
+    ],
+    "doctorSnapshot": [
+      "recoverable blocked preflights counted separately from submission_unknown",
+      "same-job repair chain exposed",
+      "sanitized checkpoint evidence projected"
+    ],
+    "electronUi": [
+      "preflight blocked status label",
+      "credit and generation-mode blocker summary",
+      "orange blocked styling"
+    ]
+  },
+  "formalState": {
+    "generationJobs": 6,
+    "assetConsistencyBatch": {
+      "id": "fusion-asset-batch-001",
+      "status": "generating",
+      "sealed": true,
+      "memberCount": 6,
+      "readyCount": 0,
+      "hardLockCount": 0,
+      "members": [
+        "P01",
+        "S01",
+        "P30",
+        "S02",
+        "C07",
+        "P29"
+      ],
+      "seventhAssetBlocked": true
+    },
+    "sidecarSha256": {
+      "generationJobs": "3fc7dd327fb0d4c51feefab39d568e89d3248f26925cb89732f9188b436919f7",
+      "publications": "6d7a0d603abc669c3e400fe3edeefa0301f2293350f02f99056f7ef38f5dd70c",
+      "assetConsistencyBatches": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7",
+      "commandLedger": "671120e72b6eb40df3385ada746bdd571d8a582e8871ab936dd83a05cfa5ebd7"
+    }
+  },
+  "validation": {
+    "targeted": {
+      "command": "npx vitest run tests/advanced.test.ts tests/mcp.test.ts tests/codex.test.ts",
+      "testFiles": 3,
+      "testsPassed": 24,
+      "testsFailed": 0
+    },
+    "fullTest": {
+      "command": "npm test",
+      "testFiles": 49,
+      "testsPassed": 286,
+      "testsFailed": 0,
+      "durationSeconds": 104.07
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "passed": true
+    },
+    "productionBuild": {
+      "command": "npm run build",
+      "passed": true,
+      "built": [
+        "electron main",
+        "preload",
+        "renderer",
+        "compiled MCP"
+      ],
+      "warningsOnly": [
+        "existing Vite dynamic and static import chunk notices"
+      ]
+    },
+    "mcpSmoke": {
+      "command": "npm run mcp:smoke",
+      "passed": true,
+      "toolCount": 148
+    },
+    "formalValidation": {
+      "command": "npm run fusion:validate-asset-consistency -- <project> docs/evidence/artlist-preflight-blocked-formal-20260715.json",
+      "passed": true,
+      "sourceDoubleSnapshotUnchanged": true
+    },
+    "electronSmoke": {
+      "command": "npm run ui:artlist-preflight-blocked-smoke",
+      "passed": true,
+      "transport": "electron-current-production-build",
+      "pageErrors": 0,
+      "pageOverflowX": false,
+      "pageOverflowY": false,
+      "guardedSidecarsUnchanged": true
+    },
+    "doctorScopeNote": "generation check correctly reports one recoverable blocked preflight and zero submission_unknown; whole-project healthy is not claimed"
+  },
+  "productionState": {
+    "formalNewAssetImages": 0,
+    "formalEpisode01PanelImages": 0,
+    "formalEpisode01ChineseSheets": 0,
+    "remoteIdentities": 0,
+    "downloadedResults": 0,
+    "publicationReceipts": 0,
+    "uploadCount": 0,
+    "submitIntentCount": 0,
+    "generateClicks": 0,
+    "creditsPurchased": false
+  },
+  "evidence": [
+    {
+      "path": "docs/evidence/artlist-credit-preflight-20260715-2212.json",
+      "sha256": "8ca6a168c5ccd78b38281042b1b9a7c4ca27a8f1de7bddaf691c112170a8a2c7",
+      "role": "Chrome authenticated page, credit blocker and click-before-stop observation"
+    },
+    {
+      "path": "docs/evidence/artlist-preflight-blocked-formal-20260715.json",
+      "sha256": "f45bde2d6541b7e95005fe43af54f8fa74becc88821ff747c5e1fe272d9a70ec",
+      "role": "formal P01 R2, Publication preservation, batch state and source double snapshot"
+    },
+    {
+      "path": "docs/evidence/artlist-preflight-blocked-ui-smoke-20260715.json",
+      "sha256": "e619190dc92d60c94d673cd72fce5a88af8a058a09b81bdee96fba8324939ee6",
+      "role": "current production Electron UI and guarded sidecars"
+    },
+    {
+      "path": "docs/evidence/artlist-preflight-blocked-ui-smoke-20260715.png",
+      "sha256": "b3516cb59ef6e3cbcc779e75bf60175f19e64a7d57a7bf1e9572a14fa68cf24b",
+      "role": "visible preflight blocked R2 state"
+    },
+    {
+      "path": "docs/evidence/final-validation-20260715-2154.json",
+      "role": "preceding six-asset consistency slice"
+    }
+  ],
+  "prohibitedSubstitutions": [
+    "software preflight checkpoint as proof of remote image generation",
+    "EP01 as proof of full-season completion",
+    "requeueing existing P01",
+    "buying credits without new explicit authorization",
+    "uploading the hidden-mask authority image for text-only P01",
+    "writing back to third-season or second-season source roots"
+  ],
+  "git": {
+    "branch": "main",
+    "commitsExist": false,
+    "worktree": "all project files untracked",
+    "staged": false,
+    "committed": false,
+    "pushed": false
+  }
+}

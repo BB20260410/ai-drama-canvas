@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "kind": "p3-visual-constraints-mcp-smoke",
+  "createdAt": "2026-07-17T11:08:52.141Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "toolCount": 162,
+  "store": {
+    "revision": 1,
+    "fingerprint": "95f836f3f4b4458b1bbd698cefc775c7ff5f3d48d5917421c015531a3eea2e1b",
+    "current": true
+  },
+  "audit": {
+    "schemaVersion": 1,
+    "builderVersion": "panel-visual-constraint-v1",
+    "contracts": 1288,
+    "expectedPanels": 4330,
+    "constraints": 4330,
+    "missingConstraints": 0,
+    "extraConstraints": 0,
+    "invalidConstraints": 0,
+    "duplicateConstraintIds": 0,
+    "onScreenAssets": 12502,
+    "continuityOnlyAssets": 1310,
+    "optionalOffscreenAssets": 0,
+    "unresolvedIdentityLocks": 8331,
+    "unresolvedSpatialLocks": 24992,
+    "unresolvedContinuityLocks": 440,
+    "invalidModelFingerprints": 0,
+    "invalidReviewRulesFingerprints": 0,
+    "modelPromptLeakPanels": 0,
+    "modelPathLeakPanels": 0,
+    "concealedMaskPanels": 304,
+    "revealAuthorizedPanels": 0,
+    "warningCounts": {
+      "AHANG_IDENTITY": 1415,
+      "DUDU_MARKINGS": 924,
+      "HIDDEN_MASK_DISCLOSURE": 304,
+      "OCR_OR_TEXT": 4330,
+      "WATERMARK_OR_UI": 4330,
+      "MODERN_OBJECT": 4330,
+      "COLLAGE_OR_SPLIT": 4330,
+      "PROP_STRUCTURE": 2665,
+      "SCENE_LAYOUT": 2574,
+      "EXTRA_CHARACTER": 4330,
+      "AMBIGUOUS_VISIBILITY": 776,
+      "SPATIAL_LOCK_UNKNOWN": 4330
+    },
+    "warningsWithoutReviewRules": 0,
+    "closurePassed": true,
+    "auditFingerprint": "794c699bd7eed74b3328069ee9b51db6880b797a558a85901eb68020841bba22"
+  },
+  "sample": {
+    "constraintId": "panel-visual-814cfd40609563145152432d9495",
+    "gridContractId": "grid-6c02035d032128e0f62a",
+    "panelId": "season-三-ep01-unit001-panel-01",
+    "episodeNumber": 1,
+    "modelPromptSha256": "1d527ffbd16597be7eaafe5c87c19e32cd0f6453833a8d62ba6f9c02023458b9",
+    "modelNegativePromptSha256": "86fe5ccc322033a82a49cf51ce45905d2b4b0ce6eca9e712aa212d7a3fbcaa2d",
+    "localPathOrHiddenIdentityLeak": false,
+    "reviewRules": 7,
+    "warnings": 7
+  },
+  "guardedFiles": {
+    "before": {
+      "visualConstraints": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/panel-visual-constraints.json",
+        "bytes": 78768303,
+        "sha256": "6eb445f84f38c0c2e4e6e6d56b3f1195bdbf5643c624246f9500566a5af8ffd8"
+      },
+      "panelReferences": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/panel-reference-resolutions.json",
+        "bytes": 32695281,
+        "sha256": "35aa251d9b6f767190924d697e7dd03a58cc198ded0918ad4fd89508217f877b"
+      },
+      "generationSettings": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation.json",
+        "bytes": 3102,
+        "sha256": "2ccd6f6fd8b431ca8d851dbad8e3b3eb642edd8b582c3a3df0f4fe5d32172b0e"
+      },
+      "generationJobs": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-jobs.json",
+        "bytes": 333529,
+        "sha256": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182"
+      },
+      "publications": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/publications.json",
+        "bytes": 84340,
+        "sha256": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238"
+      },
+      "reviews": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/reviews.json",
+        "bytes": 85063,
+        "sha256": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97"
+      },
+      "gridSelections": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboard-grid-selections.json",
+        "bytes": 539782,
+        "sha256": "a8ec5e31899a71383bbb514720d0e00f918b9d0efe1a0d4cf408a9013c645ffa"
+      },
+      "projectIndex": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/index.json",
+        "bytes": 25228150,
+        "sha256": "1da3342f3aa624d05a89588ca8d88393c881f39d5be8f6a5962b85422c95c826"
+      },
+      "events": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/events.jsonl",
+        "bytes": 241940,
+        "sha256": "a7691608d2c4c3b898c5214a5a2cad81beb50c37232def7fa09968379f597e05"
+      },
+      "commandLedger": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/command-ledger.json",
+        "bytes": 283081,
+        "sha256": "f1c1e669298591c59ae3a93b1b599fc5c9bb4b03308404a587cc3be4fabe6286"
+      }
+    },
+    "after": {
+      "visualConstraints": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/panel-visual-constraints.json",
+        "bytes": 78768303,
+        "sha256": "6eb445f84f38c0c2e4e6e6d56b3f1195bdbf5643c624246f9500566a5af8ffd8"
+      },
+      "panelReferences": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/panel-reference-resolutions.json",
+        "bytes": 32695281,
+        "sha256": "35aa251d9b6f767190924d697e7dd03a58cc198ded0918ad4fd89508217f877b"
+      },
+      "generationSettings": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation.json",
+        "bytes": 3102,
+        "sha256": "2ccd6f6fd8b431ca8d851dbad8e3b3eb642edd8b582c3a3df0f4fe5d32172b0e"
+      },
+      "generationJobs": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-jobs.json",
+        "bytes": 333529,
+        "sha256": "25b389c5217abe32ee47628ecccac6052b572b2ea5e3a6e754d40edc5f8ee182"
+      },
+      "publications": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/publications.json",
+        "bytes": 84340,
+        "sha256": "0a35a2c4ed276461f437b524b258728baee6e32fe6e30c7c1960ddc30b4c2238"
+      },
+      "reviews": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/reviews.json",
+        "bytes": 85063,
+        "sha256": "9ff20f9f1fd1ef14e093a83664d6c7a4a7cd0e9c951e7e0fc3865ed2976a6f97"
+      },
+      "gridSelections": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/storyboard-grid-selections.json",
+        "bytes": 539782,
+        "sha256": "a8ec5e31899a71383bbb514720d0e00f918b9d0efe1a0d4cf408a9013c645ffa"
+      },
+      "projectIndex": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/index.json",
+        "bytes": 25228150,
+        "sha256": "1da3342f3aa624d05a89588ca8d88393c881f39d5be8f6a5962b85422c95c826"
+      },
+      "events": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/events.jsonl",
+        "bytes": 241940,
+        "sha256": "a7691608d2c4c3b898c5214a5a2cad81beb50c37232def7fa09968379f597e05"
+      },
+      "commandLedger": {
+        "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/command-ledger.json",
+        "bytes": 283081,
+        "sha256": "f1c1e669298591c59ae3a93b1b599fc5c9bb4b03308404a587cc3be4fabe6286"
+      }
+    },
+    "unchanged": true
+  },
+  "serverStderrTail": [
+    "(node:22189) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+    "(Use `node --trace-warnings ...` to show where the warning was created)"
+  ],
+  "vendorOrGenerationInvoked": false,
+  "passed": true
+}

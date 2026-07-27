@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "kind": "p1-stage2c-targeted-result",
+  "finishedAt": "2026-07-26T14:29:13.391Z",
+  "panelOutcomes": {
+    "W00_G01": "完成（generation-ready，confirmed-empty）",
+    "W00_G02": "完成（generation-ready，confirmed-empty）",
+    "W00_G03": "完成（generation-ready，confirmed-empty）",
+    "W00_G04": "完成（generation-ready，confirmed-empty）",
+    "W01_G01": "完成（generation-ready，confirmed-empty）",
+    "W01_G02": "完成（generation-ready，confirmed-empty）",
+    "W01_G03": "完成（generation-ready，confirmed-empty）",
+    "W02_G01": "完成（generation-ready，confirmed-empty）",
+    "W02_G02": "完成（generation-ready，confirmed-empty）",
+    "W02_G03": "完成（generation-ready，confirmed-empty）"
+  },
+  "steps": [
+    {
+      "at": "2026-07-26T14:29:02.615Z",
+      "id": "p1c-W00_G04-resolve-83009259-59031ddc",
+      "command": "resolve_studio_entity_proposal",
+      "ok": true
+    },
+    {
+      "at": "2026-07-26T14:29:05.233Z",
+      "id": "p1c-W00_G04-resolve-df256dcc-2d33066e",
+      "command": "resolve_studio_entity_proposal",
+      "ok": true
+    },
+    {
+      "at": "2026-07-26T14:29:08.007Z",
+      "id": "p1c-W00_G04-freeze-a6849a55",
+      "command": "freeze_studio_asset_binding_set",
+      "ok": true
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 5,
+  "kind": "studio-agent-imagegen-result-bundle-outcome",
+  "projectId": "project-1abfd57f23eb",
+  "manifestFingerprint": "f2e1a2b3216e5afd129d9c0365fc9e12312f8bd62436bade464082bdfd5a5e04",
+  "generationRunId": "s1e2-u25-residual-ms06qhp1",
+  "packId": "studio-generation-freeze-62abe22b2848da8740ef0133e6ce7812",
+  "packFingerprint": "62abe22b2848da8740ef0133e6ce781256daa5dfdeb18d397cce8f8dec54a03d",
+  "provider": "codex",
+  "target": {
+    "targetKind": "unit-grid",
+    "targetKey": "unit-grid:S1E2-U25",
+    "panelCount": 5
+  },
+  "executionReceiptFingerprint": "f8156fc88b275d3ab31200efb7f540c0f6c210f430e51d87efe2ea9eaec29a05",
+  "writebackReceiptFingerprint": "056859c6506436bf1c94a5059a80dfbc5836f0d0bc5f60621cca8ab27c61b7bd",
+  "media": {
+    "raw": {
+      "sha256": "353850d35ef3d40221a6a4f79550210334d3a7108efafbb163b846d263d15f56",
+      "width": 720,
+      "height": 1280,
+      "aspectRatio": 0.5625
+    },
+    "labeled": {
+      "sha256": "3791ad32e14113de86749757cb54b333f8b32c2a199ec78ede7f50d9fadb4296",
+      "width": 720,
+      "height": 1280
+    }
+  },
+  "results": {
+    "schemaVersion": 5,
+    "kind": "studio-generation-result-bundle",
+    "generationRunId": "s1e2-u25-residual-ms06qhp1",
+    "packId": "studio-generation-freeze-62abe22b2848da8740ef0133e6ce7812",
+    "packFingerprint": "62abe22b2848da8740ef0133e6ce781256daa5dfdeb18d397cce8f8dec54a03d",
+    "provider": "codex",
+    "status": "pending-review",
+    "pairComplete": true,
+    "inputCurrent": true,
+    "raw": {
+      "sequence": 56,
+      "resultId": "studio-generation-result-c42ccf3c2d6356a2e9bfbc51b790ed9f42bceea9",
+      "generationRunId": "s1e2-u25-residual-ms06qhp1",
+      "variant": "raw",
+      "status": "pending",
+      "mediaSha256": "353850d35ef3d40221a6a4f79550210334d3a7108efafbb163b846d263d15f56",
+      "dispatchId": "studio-generation-dispatch-b88b3e970f7f9ca0751994c9fedbc80de640a3ca",
+      "provider": "codex",
+      "dispatchProvenance": "local-dispatch-intent",
+      "dispatchedAt": "2026-07-25T09:47:17.326Z",
+      "packId": "studio-generation-freeze-62abe22b2848da8740ef0133e6ce7812",
+      "packFingerprint": "62abe22b2848da8740ef0133e6ce781256daa5dfdeb18d397cce8f8dec54a03d",
+      "unitId": "S1E2-U25",
+      "unitRevision": 1,
+      "targetKind": "unit-grid",
+      "targetKey": "unit-grid:S1E2-U25",
+      "pairComplete": true,
+      "inputCurrent": true,
+      "promotionEligible": true,
+      "staleReasons": [],
+      "createdAt": "2026-07-25T09:51:08.280Z"
+    },
+    "labeled": {
+      "sequence": 57,
+      "resultId": "studio-generation-result-dd85b1002f38cfcef0cc4f5c0c8427ee87450536",
+      "generationRunId": "s1e2-u25-residual-ms06qhp1",
+      "variant": "labeled",
+      "status": "pending",
+      "mediaSha256": "3791ad32e14113de86749757cb54b333f8b32c2a199ec78ede7f50d9fadb4296",
+      "dispatchId": "studio-generation-dispatch-b88b3e970f7f9ca0751994c9fedbc80de640a3ca",
+      "provider": "codex",
+      "dispatchProvenance": "local-dispatch-intent",
+      "dispatchedAt": "2026-07-25T09:47:17.326Z",
+      "packId": "studio-generation-freeze-62abe22b2848da8740ef0133e6ce7812",
+      "packFingerprint": "62abe22b2848da8740ef0133e6ce781256daa5dfdeb18d397cce8f8dec54a03d",
+      "unitId": "S1E2-U25",
+      "unitRevision": 1,
+      "targetKind": "unit-grid",
+      "targetKey": "unit-grid:S1E2-U25",
+      "pairComplete": true,
+      "inputCurrent": true,
+      "promotionEligible": true,
+      "staleReasons": [],
+      "createdAt": "2026-07-25T09:51:08.280Z"
+    },
+    "createdAt": "2026-07-25T09:51:08.280Z",
+    "fingerprint": "b9f422b2879246986ceee33eb55f58a7f5bb7df6a2f8a13c9aeb8d64898be180"
+  },
+  "review": {
+    "status": "pending",
+    "autoApproved": false,
+    "instruction": "机械验收与 raw/labeled 成对已完成；必须在 Review owner 中独立进行原尺寸视觉审片。"
+  },
+  "fingerprint": "72d61ed6bbf72eeea2eae2d6540fc21fbb1d2fc8a09f825e14895a96cdc2a1fc"
+}

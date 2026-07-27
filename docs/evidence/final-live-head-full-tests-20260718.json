@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "final-live-head-full-tests",
+  "status": "pass",
+  "startedAt": "2026-07-18T08:15:49.030Z",
+  "endedAt": "2026-07-18T08:21:46.761Z",
+  "durationMs": 357771,
+  "argv": [
+    "npx",
+    "vitest",
+    "run"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "16b6788f7a99df7ea3086fe2efc80979",
+      "sourceDigest": "36303dadc8c4f17b5fc984126d0eb1f8cca549aee039ea66dfbb0febf258433e"
+    },
+    "after": {
+      "buildId": "16b6788f7a99df7ea3086fe2efc80979",
+      "sourceDigest": "36303dadc8c4f17b5fc984126d0eb1f8cca549aee039ea66dfbb0febf258433e"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/runs/final-live-head-full-tests-20260718.log",
+    "sizeBytes": 14997,
+    "sha256": "fed9ca68021b45f6d1b1a9695d23e9e8f1b6e9bb1c426e8a72944f1285c62100"
+  },
+  "testCounts": {
+    "files": 132,
+    "tests": 680
+  }
+}

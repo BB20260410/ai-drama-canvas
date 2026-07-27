@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "kind": "p7-continuity-review-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-18T02:12:05.778Z",
+  "fixture": {
+    "projectId": "project-3a08d3672eb5",
+    "sourceRoots": [],
+    "units": 2,
+    "panels": 8,
+    "canonicalAssets": 3,
+    "queriedUnitId": "p7-unit-a-six-panel",
+    "queriedPanelId": "p7-unit-a-panel-01",
+    "queriedAssetIds": [
+      "character-ahang",
+      "prop-complete-golden-mask",
+      "scene-stone-room"
+    ],
+    "continuityWriteCount": 216,
+    "readinessFingerprintCount": 24,
+    "visualReviewClaimed": false,
+    "fixtureCleaned": true,
+    "runtimeRootCleaned": true
+  },
+  "ui": {
+    "compiledElectronBuild": true,
+    "startupDefaultLibrary": true,
+    "continuityTabNotPreloadedAtStartup": true,
+    "continuityChunkLazyLoaded": true,
+    "lazyChunkFiles": [
+      "StudioContinuityReviewView-BFfkhpvF.js",
+      "StudioContinuityReviewView-IWU9Jioc.css"
+    ],
+    "unresolvedBeforeSeed": {
+      "assetCount": 3,
+      "readyCount": 0,
+      "fieldCount": 27,
+      "missingFieldCount": 27,
+      "generationStatus": "blocked",
+      "nextActionCode": "record-continuity-state",
+      "nextActionLabel": "补齐连续性状态"
+    },
+    "readyAfterSeed": {
+      "assetCount": 3,
+      "readyCount": 3,
+      "fieldCount": 27,
+      "resolvedFieldCount": 27,
+      "generationStatus": "ready",
+      "nextActionCode": "freeze-generation-pack",
+      "nextActionLabel": "冻结当前宫格生成包",
+      "nextActionReason": "九字段连续性已就绪，且不存在未通过的六图停检。",
+      "nextActionCommand": "freeze_studio_generation_pack"
+    },
+    "reviewControlVisible": true,
+    "reviewControlText": "GENERATION REVIEW\n画面验收写回\n未指定 run\n未填写 generation run ID，因此没有加载 Review Head 或历史。",
+    "checkpointControlVisible": true,
+    "checkpointControlText": "SIX IMAGE CHECKPOINT\n每六图一致性停检\n允许新增生产槽\n完整批次 0\n当前收集 0/6",
+    "readyMs": 12302,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "rendererCrashes": 0,
+    "externalRequests": 0
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p7-continuity-review-ui-smoke-20260718-01.png",
+    "sizeBytes": 252559,
+    "sha256": "57db49646f3caccfbed28964df9bb1fe2eefc28b91b5dd1a93401fc41ff73532",
+    "width": 3456,
+    "height": 2058,
+    "format": "png",
+    "stdev": 16.51249947075094
+  },
+  "boundaries": {
+    "temporaryFixtureOnly": true,
+    "isolatedRegistry": true,
+    "formalProjectAccesses": 0,
+    "formalProjectWrites": 0,
+    "filesystemScans": 0,
+    "imageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0
+  }
+}

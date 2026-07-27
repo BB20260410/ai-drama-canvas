@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "kind": "p14-formal-golden-mask-authority-evidence",
+  "status": "PASS",
+  "createdAt": "2026-07-18T20:26:36.445Z",
+  "project": {
+    "projectId": "project-2e3b44bc6ac4",
+    "manifestFingerprint": "57e55eaf4b571c8e1ca7f606f79f849d08d0ad074ebd112eb0f82968413c3ac8",
+    "sourceDigest": "1b96b83602ec60a0d1a1c44919453849cc944a90d7bf60445e385262c6a22f2a"
+  },
+  "authority": {
+    "assetId": "prop-d01-golden-mask",
+    "name": "完整黄金面具D01（豆姐唯一权威）",
+    "category": "prop",
+    "revision": 9,
+    "primaryVersionId": "version-94a47bf4-8161-4e37-b805-e5c60969a6a5",
+    "versionOrdinal": 2,
+    "definitionId": "definition-213bc0fd-da0f-4486-9041-1263203afa72",
+    "definitionOrdinal": 3,
+    "definitionAssetRevision": 9,
+    "review": {
+      "id": "review-991be2db-3414-4e4b-8850-448e87134794",
+      "status": "approved",
+      "assetRevision": 7,
+      "note": "已按用户明确指令做原尺寸核验：正/侧/后三视图结构清晰，作为唯一主权威。",
+      "createdAt": "2026-07-18T15:29:13.680Z"
+    },
+    "source": {
+      "path": "/Users/hxx/Desktop/豆姐参考图.png",
+      "sha256": "02e9438ecee038f7d14860da37cb315bf358db4a26fa224e342eee5b592b55a9",
+      "sizeBytes": 2367597,
+      "mtimeMs": 1782373316697.9963
+    },
+    "cas": {
+      "relativePath": ".aicanvas/objects/sha256/02/02e9438ecee038f7d14860da37cb315bf358db4a26fa224e342eee5b592b55a9",
+      "sha256": "02e9438ecee038f7d14860da37cb315bf358db4a26fa224e342eee5b592b55a9",
+      "sizeBytes": 2367597,
+      "mimeType": "image/png"
+    },
+    "identityFeatures": [
+      "完整覆盖全脸的刚性黄金面具",
+      "平直微内凹额顶轮廓，无冠无角",
+      "深色古纹双眉带与杏仁形眼孔",
+      "中央长而窄的直鼻梁",
+      "小型闭合嘴唇与短圆下颏",
+      "左右侧缘完整，沿侧缘纵向排列圆形铆孔",
+      "锤揲旧金凹凸纹理与背面中央纵向古蜀纹样"
+    ],
+    "positiveLocks": [
+      "唯一权威：豆姐参考图.png，SHA-256 02e9438ecee038f7d14860da37cb315bf358db4a26fa224e342eee5b592b55a9",
+      "必须保持权威正视、侧视、后视中的同一张完整结构",
+      "必须保持平直微内凹额顶、深色弯眉带、杏仁眼孔、长窄直鼻梁、小闭口、短圆下颏和侧缘铆孔",
+      "必须保持厚实锤揲旧金材质、完整左右边缘与背面中央纵向古蜀纹样",
+      "正式成片仅允许一张独立完整面具，不与人物或其他道具融合"
+    ],
+    "negativeLocks": [
+      "禁止高额冠、冠冕、尖角、兽耳、夸张外展耳翼或把侧缘铆孔误画成耳朵",
+      "禁止长下颌、长颈、颈部护甲、头盔或改变完整全脸比例",
+      "禁止半面具、裂面具、缺口、破损、张口、口型、表情、活体化或熔化",
+      "禁止改变深色双眉带、杏仁眼孔、长窄鼻梁、小闭口、短下颏、侧缘铆孔和背面神纹",
+      "禁止复制第二张面具，禁止与人物、犬、能量体融合",
+      "禁止卡通、塑料、镜面新金、现代工业面罩或用相似道具替代",
+      "正式成片禁止出现权威图标题、标注、规格文字、三视图排版和黑色说明底板"
+    ]
+  },
+  "assertions": {
+    "assetIdExact": true,
+    "categoryProp": true,
+    "revisionNine": true,
+    "primaryVersionExact": true,
+    "definitionExact": true,
+    "definitionOrdinalThree": true,
+    "definitionBoundToRevisionNine": true,
+    "reviewApproved": true,
+    "reviewMatchesPrimary": true,
+    "sourcePathExact": true,
+    "sourceOrdinaryFile": true,
+    "casOrdinaryFile": true,
+    "sourceShaExact": true,
+    "casShaExact": true,
+    "sourceAndCasSameBytes": true,
+    "sizeMatchesDb": true,
+    "mimePng": true,
+    "positiveLocksPresent": true,
+    "negativeLocksPresent": true,
+    "forbidsCrownAnglesEars": true,
+    "forbidsHalfCrackedTalking": true,
+    "forbidsLongNeck": true,
+    "locksFlatTop": true,
+    "locksSideRivets": true
+  },
+  "boundaries": {
+    "formalProjectWrites": 0,
+    "sourceWrites": 0,
+    "sourceReadOnly": true,
+    "databaseReadOnly": true,
+    "oldAuthorityOverwritten": false,
+    "browserCalls": 0,
+    "uploads": 0,
+    "gitActions": 0
+  },
+  "fingerprint": "9e61db490cb884a8399d616b91df25120e115f0c529fb472749529e71d95bf19"
+}

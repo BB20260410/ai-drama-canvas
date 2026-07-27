@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 2,
+  "kind": "managed-studio-scale-canvas-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-18T07:58:01.412Z",
+  "buildIdentity": {
+    "buildId": "3eb0d839ced4bfb92a9d3ad3346eae5e",
+    "sourceDigest": "4b4fa1b3455dda6263f25e20e7485801edd6b5cdc7b1efd6c9a2a320f4444b86",
+    "fingerprint": "6fd7d1496b092a719e1dc26a55fa71b272ed4ad0f13268b721ecd3a9f2b93729"
+  },
+  "fixture": {
+    "fixtureMs": 7824,
+    "large": {
+      "projectId": "project-d3c7a35b4b25",
+      "units": 1288,
+      "panels": 4235,
+      "assets": 77,
+      "media": {
+        "existing": 77,
+        "seeded": 9923,
+        "verifiedCas": 9923,
+        "verifiedThumbnails": 1000,
+        "total": 10000
+      },
+      "startupPolicy": "no-filesystem-scan",
+      "sourceRoots": []
+    },
+    "small": {
+      "projectId": "project-995c531197e5",
+      "units": 4,
+      "panels": 16,
+      "assets": 6
+    }
+  },
+  "startup": {
+    "readyMs": 2518,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "externalRequests": 0
+  },
+  "canvas": {
+    "logicalPageLimit": 36,
+    "initialDom": 72,
+    "expandedDom": 78,
+    "expandedLogicalCounts": "当前 DOM：36 资产 · 36 单元 · 6 宫格 缩放 32% 布局已加载",
+    "unitPageReplaced": true,
+    "assetPageReplaced": true,
+    "viewportCullingEnabled": true,
+    "panelExpansionBound": 6
+  },
+  "mediaLibrary": {
+    "exactCount": 10000,
+    "firstPageDom": 36,
+    "scrolledDom": 36,
+    "secondPageDom": 36,
+    "keysetPageReplaced": true,
+    "previousPageRestored": true
+  },
+  "projectSwitch": {
+    "largeToSmall": true,
+    "smallToLarge": true,
+    "crossProjectLeak": false,
+    "smallMetrics": "6 资产 4 单元 16 宫格 6 媒体",
+    "restoredMetrics": "77 资产 1288 单元 4235 宫格 10000 媒体"
+  },
+  "screenshot": {
+    "relativePath": "docs/evidence/managed-studio-scale-canvas-ui-smoke-20260718-after-browser-boundary.png",
+    "sizeBytes": 150655,
+    "sha256": "b58a39e7a406388f8f51f7cbec1b453503a5024f2bf48fa11b4dcc5893069326",
+    "width": 1728,
+    "height": 1029,
+    "format": "png",
+    "stdev": 30.684812790402844
+  },
+  "boundaries": {
+    "filesystemScans": 0,
+    "formalStudioTouched": false,
+    "formalImageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0,
+    "gitStage": 0
+  }
+}

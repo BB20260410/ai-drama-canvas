@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 2,
+  "kind": "t23-source-project-raw-sha-ui-verify",
+  "createdAt": "2026-07-25T13:00:58.996Z",
+  "ok": true,
+  "mode": "build",
+  "sourceProjectRoot": "/Users/hxx/Documents/无限画布/projects/dudu-s1e1-a84aa353",
+  "runtimeProjectRoot": "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/t23-layer4-project-ui-ftsZer/project-copy/dudu-s1e1-a84aa353",
+  "scope": {
+    "season": "S1",
+    "episode": "S1E1"
+  },
+  "core": {
+    "unitCount": 33,
+    "passCount": 33,
+    "summary": {
+      "pass": 33,
+      "pendingReview": 0,
+      "inProgress": 0,
+      "failed": 0,
+      "blocked": 0
+    }
+  },
+  "ui": {
+    "loading": false,
+    "attrRawCount": 33,
+    "corePassSetExact": true,
+    "corePassUnitIds": [
+      "S1E01-U00",
+      "S1E01-U01",
+      "S1E01-U02",
+      "S1E01-U03",
+      "S1E01-U04",
+      "S1E01-U05",
+      "S1E01-U06",
+      "S1E01-U07",
+      "S1E01-U08",
+      "S1E01-U09",
+      "S1E01-U10",
+      "S1E01-U11",
+      "S1E01-U12",
+      "S1E01-U13",
+      "S1E01-U14",
+      "S1E01-U15",
+      "S1E01-U16",
+      "S1E01-U17",
+      "S1E01-U18",
+      "S1E01-U19",
+      "S1E01-U20",
+      "S1E01-U21",
+      "S1E01-U22",
+      "S1E01-U23",
+      "S1E01-U24",
+      "S1E01-U25",
+      "S1E01-U26",
+      "S1E01-U27",
+      "S1E01-U28",
+      "S1E01-U29",
+      "S1E01-U30",
+      "S1E01-U31",
+      "S1E01-U32"
+    ],
+    "observedRows": 47
+  },
+  "comparison": {
+    "ok": true,
+    "expectedCount": 33,
+    "observedUnitCount": 33,
+    "matchedCount": 33,
+    "missingUnitIds": [],
+    "strayUnitIds": [],
+    "invalidExpectedUnitIds": [],
+    "invalidObserved": [],
+    "mismatches": []
+  },
+  "screenshot": {
+    "sha256": "aaea582924ea74b7476b4660d527eab4fbc10ce2616214010234020fe1134397",
+    "sizeBytes": 1523261,
+    "width": 3456,
+    "height": 2054,
+    "maxChannelStandardDeviation": 46.41387947815809,
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/source-product-standard-20260725-final/s1e1-raw-sha/raw-sha-S1-S1E1-build-1784984458733.png"
+  },
+  "boundaries": {
+    "sourceOnly": true,
+    "installedAppUsed": false,
+    "isolatedProjectCopy": true,
+    "formalProjectWrites": 0,
+    "imageGenerationCalls": 0
+  }
+}

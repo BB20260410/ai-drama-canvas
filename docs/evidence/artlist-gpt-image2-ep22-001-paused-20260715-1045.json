@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "artlist-browser-calibration-paused",
+  "status": "blocked_manual_reference_upload_required",
+  "complete": false,
+  "checkedAt": "2026-07-15T02:45:33.305Z",
+  "lastAuditedAt": "2026-07-15T05:23:20.000Z",
+  "workspaceRoot": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729",
+  "authorization": {
+    "site": "https://toolkit.artlist.io/new?mode=image",
+    "existingLoginOnly": true,
+    "provider": "GPT Image 2",
+    "maxExternalSubmissions": 1,
+    "maxImages": 1,
+    "creditPurchaseAllowed": false,
+    "sourceRootReadOnly": "/Users/hxx/Desktop/豆包版本/剧本_封神篇",
+    "credentialsReadOrPersisted": false
+  },
+  "sourceBoundary": {
+    "fileCount": 30,
+    "totalBytes": 2436824,
+    "episodeCount": 23,
+    "shotCount": 968,
+    "durationSeconds": 8637,
+    "aggregateSha256": "bcbd8aca412c6f48021624ef07d9b627e9635c17095adb70fc47f8487f7ec0c0",
+    "hasAicanvasSidecar": false,
+    "unchangedFromFinalValidation0759": true
+  },
+  "existingProductionRecovery": {
+    "workflowRevision": 1,
+    "ordinaryStageStatuses": "15_of_15_not_started",
+    "baselineId": "existing-production-bf0c4369018aedbc8e6a402f",
+    "baselineDigest": "bf0c4369018aedbc8e6a402f6b03ac1d4a18f7d035a634bed1494360dd8a90cc",
+    "evidenceFingerprint": "1020289bdcb9b65cdc981710ed6df7f7576e97dfd144a426b61d9d8f9e5291de",
+    "itemIds": [
+      "main-ep22-unit001"
+    ],
+    "allowedTargets": [
+      "image"
+    ],
+    "scopeExpansionAllowed": false,
+    "doctor": {
+      "healthy": true,
+      "errors": 0,
+      "warnings": 1,
+      "ok": 24,
+      "recoveryLevel": "warning"
+    }
+  },
+  "reference": {
+    "path": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/EP22_15s_001_缓推·大远景·新朝刑场/EP22_15s_001_首帧_raw.png",
+    "artifactId": "main-ep22-unit001-d58f24ebc1b3",
+    "role": "first_frame",
+    "order": 0,
+    "width": 1920,
+    "height": 1080,
+    "bytes": 221423,
+    "sha256": "d6718fb6b65e71e3bd69939cd3e6724c227af4cfc1610960362c50ab2d0939cc"
+  },
+  "generationJob": {
+    "jobId": "gen-2026-07-15T02-22-13-148Z-3e0a0e68",
+    "itemId": "main-ep22-unit001",
+    "providerId": "artlist-gpt-image2-browser",
+    "status": "waiting_external",
+    "checkpointRevision": 2,
+    "checkpointStage": "preflight",
+    "externalTaskId": null,
+    "parameters": {
+      "model": "GPT Image 2",
+      "mode": "first_frame",
+      "aspectRatio": "16:9",
+      "resolution": "Medium",
+      "imageCount": 1
+    },
+    "expectedOutputPath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/evidence/artlist-gpt-image2-ep22-001-20260715-084108/downloads/AI画布生成/EP22_15s_001_尾帧_3e0a0e68_raw.png",
+    "expectedCompanionPath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/evidence/artlist-gpt-image2-ep22-001-20260715-084108/downloads/AI画布生成/EP22_15s_001_尾帧_3e0a0e68_labeled.png",
+    "rawOutputExists": false,
+    "labeledOutputExists": false,
+    "downloadFileCount": 0
+  },
+  "browserPreflight": {
+    "observedHost": "toolkit.artlist.io",
+    "loginVerified": true,
+    "pageReady": true,
+    "generationModeVerified": true,
+    "balanceChecked": true,
+    "paidActionRequired": false,
+    "paidActionAuthorized": false,
+    "visibleSettingsObservedByPrimaryAgent": {
+      "model": "GPT Image 2",
+      "aspectRatio": "16:9",
+      "quality": "Medium",
+      "numberOfImages": 1,
+      "balanceLabel": "Unlimited"
+    },
+    "composerScreenshot": {
+      "path": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/evidence/artlist-gpt-image2-ep22-001-20260715-084108/browser-evidence/artlist-composer-ready.png",
+      "width": 370,
+      "height": 943,
+      "bytes": 35723,
+      "sha256": "c9e0e945bba1472fad39c0db1c37e405ed9de1f46efa83c3cd9ca5944ebc208b",
+      "proves": [
+        "Artlist composer page ready",
+        "Image mode visible",
+        "Image Reference control visible",
+        "Unlimited label visible",
+        "no purchase or error modal visible"
+      ],
+      "doesNotProve": [
+        "reference uploaded",
+        "external submission",
+        "downloaded result"
+      ]
+    },
+    "latestPageAudit": {
+      "auditSequence": 4,
+      "checkedAt": "2026-07-15T05:23:20.000Z",
+      "tabId": null,
+      "title": null,
+      "url": null,
+      "tabPresent": false,
+      "pageContentReadSucceeded": false,
+      "referenceThumbnailVisible": null,
+      "visibleSettings": null,
+      "lastProvenVisibleAudit": {
+        "checkedAt": "2026-07-15T03:18:00.000Z",
+        "tabId": "2",
+        "url": "https://toolkit.artlist.io/image-video-generator?mode=image",
+        "existingLoginSessionAvailable": true,
+        "referenceThumbnailVisible": false,
+        "visibleSettings": {
+          "model": "Nano Banana 2",
+          "aspectRatio": "16:9",
+          "quality": "2K",
+          "numberOfImages": 1,
+          "balanceLabel": "Unlimited"
+        }
+      },
+      "sessionDiscovery": {
+        "existingSessionTabs": 0,
+        "userOpenTabs": 0,
+        "postNavigationTabId": "1",
+        "postNavigationTabUrl": "about:blank",
+        "blankTabFinalized": true
+      },
+      "readOnlyAttempts": {
+        "redirectUrlNavigation": "timed_out_and_kernel_reset",
+        "directFinalUrlNavigation": "timed_out_and_kernel_reset",
+        "postTimeoutTabAudit": "about_blank_only"
+      },
+      "modelChangeConfirmed": false,
+      "interactionDiagnosis": "no existing Artlist tab was available; both allowlisted URL navigation paths timed out and final read-only reconciliation found only about:blank; no page write action was attempted",
+      "generateClicked": false
+    }
+  },
+  "uploadCapabilityEvidence": {
+    "fileChooser": {
+      "supported": false,
+      "error": "File uploads are not supported by Codex In-app Browser."
+    },
+    "binaryClipboard": {
+      "writeCompleted": false,
+      "readBackItemCount": 0,
+      "referenceTransmitted": false
+    },
+    "nativePickerOpened": false,
+    "uploadCheckpointWritten": false
+  },
+  "implementation": {
+    "existingProductionScopedRecovery": true,
+    "imageFirstFrameBrowserPlanFix": true,
+    "mcpToolCount": 136,
+    "newMcpTools": [
+      "preview_existing_production_recovery",
+      "commit_existing_production_recovery"
+    ]
+  },
+  "verification": {
+    "typecheck": "passed",
+    "targetedTests": {
+      "files": 1,
+      "tests": 5,
+      "passed": 5
+    },
+    "fullTests": {
+      "files": 41,
+      "tests": 252,
+      "passed": 252,
+      "exitCode": 0,
+      "durationSeconds": 101.38
+    },
+    "build": "passed",
+    "continuationAudit4": {
+      "checkedAt": "2026-07-15T05:25:06.000Z",
+      "typecheck": "passed",
+      "targetedTests": {
+        "command": "npx vitest run tests/existing-production-recovery.test.ts --maxWorkers=1",
+        "files": 1,
+        "tests": 5,
+        "passed": 5,
+        "exitCode": 0
+      },
+      "productSourceChanged": false,
+      "fullSuiteOrPackageRepeated": false
+    },
+    "externalSubmissionCount": 0,
+    "creditPurchaseCount": 0
+  },
+  "latestFilesystemAudit": {
+    "referenceExists": true,
+    "referenceBytes": 221423,
+    "referenceSha256": "d6718fb6b65e71e3bd69939cd3e6724c227af4cfc1610960362c50ab2d0939cc",
+    "rawOutputExists": false,
+    "labeledOutputExists": false
+  },
+  "goalState": {
+    "status": "blocked",
+    "reason": "runtime goal remains blocked from the prior three-confirmation audit; a subsequent ordinary 继续 message did not resume it, and continuation audit 1 found no existing Artlist tab or successfully loaded replacement page",
+    "notComplete": true,
+    "runtimeResumeObserved": false,
+    "continuationAuditsAfterBlocked": 1,
+    "externalSubmissionCount": 0,
+    "creditPurchaseCount": 0,
+    "resumeWhen": "user reopens the logged-in Artlist image page, selects GPT Image 2, manually uploads the single allowlisted reference, sees one thumbnail, does not click Generate, and explicitly runs /goal resume"
+  },
+  "resumeContract": {
+    "singleManualAction": "重新打开已登录的 Artlist 图片页，选择 GPT Image 2，再点击 Image Reference 并选择唯一白名单 raw 参考图；看到唯一缩略图后不要点击 Generate，并显式执行 /goal resume。",
+    "manualUploadPath": "/Users/hxx/Documents/无限画布/formal-calibration/fengshen-bcbd8aca-20260715-0729/EP22_15s_001_缓推·大远景·新朝刑场/EP22_15s_001_首帧_raw.png",
+    "nextExpectedCheckpointRevision": 2,
+    "nextCheckpointStage": "uploaded",
+    "doNotReenqueue": true,
+    "doNotReuseCancelledJob": "gen-2026-07-15T02-19-47-844Z-d8975bed",
+    "doNotClickGenerateBeforeSubmitIntent": true
+  }
+}

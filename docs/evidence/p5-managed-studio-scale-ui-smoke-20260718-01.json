@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "kind": "p5-managed-studio-scale-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-17T21:40:52.404Z",
+  "buildIdentity": {
+    "files": [
+      {
+        "relativePath": "out/main/index.js",
+        "sizeBytes": 2183643,
+        "sha256": "60f6218ebfb468c51ae9c6e1de863c7e2c956e2270489fc8b838c3c746b4ee08"
+      },
+      {
+        "relativePath": "out/preload/index.mjs",
+        "sizeBytes": 24017,
+        "sha256": "539275a49afbe394b794a7c9b7c62d39d3b68aeb4b0f0ae143cb0a8aa10510de"
+      },
+      {
+        "relativePath": "out/renderer/assets/index-5Z6LItUh.js",
+        "sizeBytes": 1625811,
+        "sha256": "fb83108e1b7704a4b15b085e511300464785d77941e7208a75304f17a16c0de1"
+      },
+      {
+        "relativePath": "out/renderer/assets/index-B2on2HqS.css",
+        "sizeBytes": 262443,
+        "sha256": "1f0de58030d8d6d99c8b53b9bbf95103d823d6e00cb6c4c0a23fc45657dc236b"
+      },
+      {
+        "relativePath": "out/renderer/index.html",
+        "sizeBytes": 727,
+        "sha256": "8f680bdbc636403119769b7ddb47ef3b0ffc42f671af4b323ca6b1c450a139ed"
+      }
+    ]
+  },
+  "fixture": {
+    "metadataDocuments": 10001,
+    "scriptDocuments": 10000,
+    "promptDocuments": 1,
+    "sourceRoots": [],
+    "startupPolicy": "no-filesystem-scan"
+  },
+  "startup": {
+    "readyMs": 490,
+    "pageErrors": 0,
+    "externalRequests": 0
+  },
+  "ui": {
+    "pageLimit": 36,
+    "maximumMaterialEntryDomCount": 36,
+    "pageOneDomCount": 36,
+    "pageTwoDomCount": 36,
+    "previousRestored": true,
+    "kindSwitchReset": true,
+    "promptKindCount": 1,
+    "pageOneFirstEntry": "剧本剧本元数据 00000剧本修订 v0等待首个修订01/01",
+    "pageTwoFirstEntry": "剧本剧本元数据 00036剧本修订 v0等待首个修订01/01"
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/p5-managed-studio-scale-ui-smoke-20260718-01.png",
+    "sizeBytes": 281988,
+    "sha256": "3a91e5fb11d34ba0ef3b351e765a84d46a238f6c881157ab59b69c507ecc0cd8",
+    "width": 3360,
+    "height": 2040,
+    "format": "png",
+    "stdev": 23.089837083354077
+  },
+  "boundaries": {
+    "filesystemScans": 0,
+    "formalImageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0
+  }
+}

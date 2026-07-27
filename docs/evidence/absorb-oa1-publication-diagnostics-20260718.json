@@ -1,0 +1,8 @@
+{
+  "project": "OpenAssetIO",
+  "slice": "OA-1",
+  "module": "src/core/studio-publication-preflight-diagnostics.ts",
+  "typecheck": "pass",
+  "vitest": "3 passed",
+  "date": "2026-07-18"
+}

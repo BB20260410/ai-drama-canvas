@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "kind": "redline-project-sentinel",
+  "mode": "read-only",
+  "createdAt": "2026-07-25T09:35:12.078Z",
+  "pass": true,
+  "failed": 0,
+  "checks": [
+    {
+      "id": "dudu-s1e1-formal",
+      "project": "/Users/hxx/Documents/无限画布/projects/dudu-s1e1-a84aa353",
+      "expect": {
+        "units": 33,
+        "unitCount": 33,
+        "pass": 33
+      },
+      "actual": {
+        "units": 33,
+        "unitCount": 33,
+        "pass": 33
+      },
+      "pass": true,
+      "sampleRaw": [
+        "6b99dc21cf04ca050ca9eedb861625114aef910ca5194887b30831855df74c52",
+        "178a32de255724a0a1350bd1f46e265c1ef2ff3b9306214f78cc2ccefcc944af",
+        "f530c72f82fb4cf67cc099bc327df4f24ef822974535aa39bc44b90e96a4f47b"
+      ]
+    },
+    {
+      "id": "codex-ai-drama-studio-counts",
+      "project": "/Users/hxx/Documents/无限画布/projects/codex-ai-drama-studio",
+      "expect": {
+        "units": 541
+      },
+      "actual": {
+        "units": 541,
+        "panels": 3246,
+        "panelsEstimated": 3246,
+        "scriptDocuments": 541,
+        "promptDocuments": 541,
+        "characters": 33,
+        "scenes": 33,
+        "props": 19,
+        "canonicalAssets": 85,
+        "media": 1152,
+        "assetBindingSets": 156,
+        "mentionProposals": 2262
+      },
+      "pass": true,
+      "note": "只读 counts；不读/改 PASS raw"
+    },
+    {
+      "id": "isolation-snapshot",
+      "present": true,
+      "projectId": "project-c78607fac2a4",
+      "unitCount": 1,
+      "summary": {
+        "pass": 1,
+        "pendingReview": 0,
+        "inProgress": 0,
+        "failed": 0,
+        "blocked": 0
+      },
+      "note": "隔离 canary 可写；本哨兵只读快照",
+      "pass": true
+    },
+    {
+      "id": "build-identity",
+      "buildId": "f743c82478f9cf6ed7081ee08f24ba3b",
+      "packageVersion": "0.2.0",
+      "hasFingerprint": true,
+      "pass": true
+    }
+  ]
+}

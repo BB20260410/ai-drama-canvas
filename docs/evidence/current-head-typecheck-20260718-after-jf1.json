@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "current-head-after-jf1-typecheck",
+  "status": "pass",
+  "startedAt": "2026-07-18T07:52:23.158Z",
+  "endedAt": "2026-07-18T07:52:33.846Z",
+  "durationMs": 10737,
+  "argv": [
+    "npm",
+    "run",
+    "typecheck"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "feebaf32e0df7abe6f97d40992a15c64",
+      "sourceDigest": "fd8936cc3cf76d3bb50e0d18af751eeb1e6cbe8b551b7c23f5d06307d5a25700"
+    },
+    "after": {
+      "buildId": "feebaf32e0df7abe6f97d40992a15c64",
+      "sourceDigest": "fd8936cc3cf76d3bb50e0d18af751eeb1e6cbe8b551b7c23f5d06307d5a25700"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/runs/current-head-typecheck-20260718-after-jf1.log",
+    "sizeBytes": 114,
+    "sha256": "8aca887056e876fdc407b955daffd0b0a5dec0c074cd623f6decb7a214530132"
+  }
+}

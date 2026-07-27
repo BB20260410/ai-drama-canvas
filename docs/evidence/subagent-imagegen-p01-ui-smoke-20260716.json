@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "kind": "subagent-imagegen-p01-ui-smoke",
+  "createdAt": "2026-07-16T01:50:04.240Z",
+  "transport": "electron-current-production-build",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "jobId": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+  "registryPath": "/tmp/ai-canvas-subagent-imagegen-p01-ui-registry-20260716.json",
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/subagent-imagegen-p01-ui-smoke-20260716.png",
+    "sha256": "e02c4f721b7e7bfe00b1a195a72ba9c0af1a3e935b7bdb9ca71981e879e706bb"
+  },
+  "guardedFiles": {
+    "beforeHashes": {
+      "generationJobs": "223b1bc53ababd0dc40886e8c1855d1fd048d9f58c4fff93a11a8577d7c7060a",
+      "generationSettings": "6815df33ee0c0f420a9be6ee640ffb7e2c208d44066f02c1878e23032da433e1",
+      "publications": "41ae470f89b3781bb9956819f483a78ffbb5ef931c82bcce54e29c3fe81eee4b",
+      "reviews": "3619a3c31e21096339af6d613a0ecaf16935036a53a30942c67afd09ac89351d",
+      "overrides": "028911a283e8744fbd305138ab6b95a183cc8e24c588fca1d77d6b3a54a74062",
+      "consistency": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7",
+      "commandLedger": "4c3671b529f9aa617816372c299070eb25460271dd20e3dff2b659ababcd7745",
+      "subagentPlan": "14ed247e71fde249e9635bff1b742e98decd2694e1da9e1ba7e64db7d1b03082"
+    },
+    "afterHashes": {
+      "generationJobs": "223b1bc53ababd0dc40886e8c1855d1fd048d9f58c4fff93a11a8577d7c7060a",
+      "generationSettings": "6815df33ee0c0f420a9be6ee640ffb7e2c208d44066f02c1878e23032da433e1",
+      "publications": "41ae470f89b3781bb9956819f483a78ffbb5ef931c82bcce54e29c3fe81eee4b",
+      "reviews": "3619a3c31e21096339af6d613a0ecaf16935036a53a30942c67afd09ac89351d",
+      "overrides": "028911a283e8744fbd305138ab6b95a183cc8e24c588fca1d77d6b3a54a74062",
+      "consistency": "9fbff5e15cfbc305ce943f49464719fd53489bf634da9b22e528b2eb21afe9a7",
+      "commandLedger": "4c3671b529f9aa617816372c299070eb25460271dd20e3dff2b659ababcd7745",
+      "subagentPlan": "14ed247e71fde249e9635bff1b742e98decd2694e1da9e1ba7e64db7d1b03082"
+    },
+    "unchanged": true
+  },
+  "apiState": {
+    "jobCount": 6,
+    "settingsRevision": 4,
+    "job": {
+      "id": "gen-2026-07-15T11-19-38-303Z-23ac427f",
+      "itemId": "asset-P01",
+      "status": "succeeded",
+      "providerId": "codex-subagent-gpt-image-2",
+      "model": "GPT Image 2",
+      "parameters": {
+        "mode": "text",
+        "aspectRatio": "9:16",
+        "resolution": "Medium",
+        "quality": "Medium",
+        "imageCount": 1
+      },
+      "referencePaths": [],
+      "resultPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P01_阿航胸前布囊_★面具铁律替代资产/AI画布生成/P01_资产_23ac427f_raw.png",
+      "resultSha256": "907e96df267d3520c302ea2dad36afa5f6c42181f28492bd35a22450e5ad70a5",
+      "companionPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/assets/P01_阿航胸前布囊_★面具铁律替代资产/AI画布生成/P01_资产_23ac427f_labeled.png",
+      "publicationIntentId": "publication-b17a8792-7c31-43ea-ae95-04be4de08f5f",
+      "publicationReceiptId": "receipt-608d4bb2-19c5-43c0-a11a-fb921d9f9a64",
+      "browserCheckpoint": {
+        "revision": 3,
+        "stage": "plan_ready",
+        "updatedAt": "2026-07-15T23:47:13.506Z",
+        "executionSurface": {
+          "id": "codex-in-app-side-browser",
+          "version": "1"
+        },
+        "note": "迁移到 Codex 应用内侧边浏览器；保留原 job、Publication、提示词、白名单和输出路径，旧 Chrome 预检证据失效。"
+      },
+      "subagentCheckpoint": {
+        "schemaVersion": 1,
+        "revision": 4,
+        "stage": "verified",
+        "updatedAt": "2026-07-16T01:36:18.288Z",
+        "remoteIdentityRequired": false,
+        "oneImagePerAgent": true,
+        "migratedFrom": {
+          "providerId": "artlist-gpt-image-2",
+          "adapter": "codex-browser",
+          "executionSnapshotHash": "740a494e0b8ffe8ef94dc8d25d2ba9c4b4c1944cc6d56fb9e6367b1e39f29d58",
+          "browserCheckpointRevision": 3,
+          "browserCheckpointStage": "plan_ready"
+        },
+        "note": "机械验收、不可覆盖 Publication 与确定性 labeled 派生均已完成；等待主代理内容绑定视觉 Review。",
+        "lease": {
+          "leaseId": "subagent-lease-6ca6b57d7b00fa6d4fbea3a7",
+          "agentTaskName": "/root/generate_p01_23ac427f",
+          "claimedAt": "2026-07-16T01:26:53.785Z",
+          "oneImageOnly": true,
+          "promptSha256": "c65e978c4d509b659bebaccb23598b6ef4bf364ee96b1a484deb3039526ea826",
+          "parametersSha256": "e86bdb62dadaee16f220e09e789a43f0506c3db2c97f293ce9a59243335f4f86",
+          "referencesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "executionSnapshotHash": "5052a194259adf4bce3d14d87f3424bdb0ac1a3df86d106a3d21d3d6959f38e9"
+        },
+        "output": {
+          "leaseId": "subagent-lease-6ca6b57d7b00fa6d4fbea3a7",
+          "agentTaskName": "/root/generate_p01_23ac427f",
+          "agentRunId": "019f6889-e572-70c1-9a5f-cc1a710b6035",
+          "sourcePath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/subagent-staging/subagent-lease-6ca6b57d7b00fa6d4fbea3a7/P01_candidate.png",
+          "sourceSha256": "907e96df267d3520c302ea2dad36afa5f6c42181f28492bd35a22450e5ad70a5",
+          "isolatedPath": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/.aicanvas/generation-downloads/gen-2026-07-15T11-19-38-303Z-23ac427f/subagent-r3-907e96df267d3520.png",
+          "isolatedSha256": "907e96df267d3520c302ea2dad36afa5f6c42181f28492bd35a22450e5ad70a5",
+          "bytes": 1615604,
+          "magic": "image/png",
+          "recordedAt": "2026-07-16T01:36:17.404Z"
+        }
+      }
+    },
+    "provider": {
+      "id": "codex-subagent-gpt-image-2",
+      "name": "Codex 一图一子代理 · GPT Image 2",
+      "adapter": "codex-subagent-imagegen",
+      "kinds": [
+        "image"
+      ],
+      "model": "GPT Image 2",
+      "capabilities": {
+        "referenceModes": [
+          "text",
+          "multi_image"
+        ],
+        "maxReferenceImages": 6,
+        "maxReferenceVideos": 0,
+        "supportedDurations": [],
+        "supportedAspectRatios": [
+          "9:16"
+        ],
+        "supportedResolutions": [
+          "Medium"
+        ],
+        "models": [
+          "GPT Image 2"
+        ],
+        "maxConcurrency": 1,
+        "supportsCancel": false
+      },
+      "subagentInstructions": "总执行合同：每张图只能由一个唯一 canonical 子代理领取租约，严格串行；每个代理只调用一次内置 image_gen、只生成一张图，只写 Core 指定的隔离候选路径。代理无权验收、硬锁、覆盖正式 raw/labeled、改提示词、删减参考图或启动第二代理。\n冻结身份 C01 阿航：权威图 /Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/authorities/ahang/阿航_青年_三视图_.jpg；SHA-256 5132d4320f956cf2a2320e52fae941ef15ffb243ad79343045006a8773f4548e。固定同脸、约25岁中国青年、清瘦挺拔、黑色古装、黑色长发结髻、左侧醒目银白挑染；覆盖源文字中的灰褐衣与赤红鬓发。\n冻结身份 C02 嘟嘟：权威图 /Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/authorities/dudu/嘟嘟参考图.png；SHA-256 d6759fbd03df6d3b9c83e193130bea6073c15865a5f9cf7d308b069ea2b131cd。固定犬种、脸型、黑白棕花纹与白色卷尾；永不拟人、不说人话。\n冻结道具 黄金面具：权威图 /Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/authorities/golden-mask/D01_整张三星堆黄金面具_真人实拍三视图.png；SHA-256 91b074b882113d6c0bdde156e6d38adf7883e8388ba4064168d6c32ade8e2253。只允许完整结构，禁止半面具、裂面具、口型；第三季 EP32 前实体绝不露出。P01 中只可表现为厚实不透明布囊内部沉重圆形轮廓，禁止任何金色边缘、金属、纹样、眼口或光。\n统一风格与世界：电影级写实，中国神话史诗质感，商周/西周初年考据，戏剧性自然光影；人物脸、年龄、发型、服装、犬纹、道具结构、场景空间方向和时代物件必须继承已验收资产。禁止现代物、字幕、文字、水印、边框、拼图、分屏、多余人物、混脸串脸、卡通或塑料质感。\n参考门禁：只使用计划 JSON 中逐项列出的已验收参考，逐文件核对绝对路径、角色、槽位与 SHA；每镜最多6项，绝不静默丢弃。若计划 references 为空，必须 text-only，禁止自行加入图。\n输出边界：画幅 9:16、Medium、1 Image。候选文件必须是真 PNG、可解码、竖屏、非占位图；生成后仅报告候选绝对路径、SHA、字节与尺寸，最终视觉 Review 和 Publication 只由主代理执行。"
+    }
+  },
+  "rendered": {
+    "status": "机械验收通过",
+    "checkpoint": "一图一代理 verified · R4 · /root/generate_p01_23ac427f",
+    "lease": "唯一租约 subagent-lease-6ca… · 单图",
+    "output": "隔离 SHA 907e96df267d3520 · 1615604 bytes",
+    "browserHistory": "网页历史 plan_ready · R3 · codex-in-app-side-browser@1",
+    "rawButton": true,
+    "labeledButton": true,
+    "pageOverflowX": false,
+    "pageOverflowY": false
+  },
+  "providerRendered": {
+    "hasAdapterOption": true,
+    "selectedAdapter": "codex-subagent-imagegen",
+    "instructions": "[frozen; see generation settings]",
+    "fixedConcurrency": "1",
+    "instructionsSha256": "9aa10143b4c86b9049d35e5c5da773c9a31a1d3c4a3321e7acc178bbc1a54c93"
+  },
+  "pageErrors": []
+}

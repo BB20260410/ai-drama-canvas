@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-13T21:26:12.144Z",
+  "transport": "source-electron-current-build",
+  "projectRoot": "/tmp/ai-canvas-editor-bezier-ui-20260714",
+  "registryPath": "/tmp/ai-canvas-editor-bezier-ui-registry-20260714.json",
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-bezier-20260714.png",
+    "bytes": 313838,
+    "sha256": "af0b31500496323146e71f539cc51cbe3425dcb68a7bb8292a2ea04ba0af4959",
+    "width": 1560,
+    "height": 980,
+    "content": {
+      "captureAttempt": 1,
+      "pixels": 1528800,
+      "brightPixels": 124958,
+      "brightRatio": 0.08173600209314495,
+      "chromaticPixels": 82045,
+      "chromaticRatio": 0.05366627420198849
+    }
+  },
+  "compactScreenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-bezier-1280-20260714.png",
+    "bytes": 236512,
+    "sha256": "bb0b5e2aed3ee81fbaf93b8150af5239224b883e6aef7cc5fa70ea6dcfb511a9",
+    "width": 1280,
+    "height": 760,
+    "content": {
+      "captureAttempt": 1,
+      "pixels": 972800,
+      "brightPixels": 109289,
+      "brightRatio": 0.11234477796052632,
+      "chromaticPixels": 75569,
+      "chromaticRatio": 0.07768194901315789
+    }
+  },
+  "curve": {
+    "ownership": "destination-keyframe-controls-entering-segment",
+    "curveA": {
+      "x1": 0.25,
+      "y1": 0.1,
+      "x2": 0.25,
+      "y2": 1
+    },
+    "curveAPath": "M8 92 C29 83.60000000000001,29 8,92 8",
+    "curveB": {
+      "x1": 0.42,
+      "y1": 0,
+      "x2": 0.58,
+      "y2": 1
+    },
+    "curveBPath": "M8 92 C43.28 92,56.72 8,92 8",
+    "transformA": "matrix(0.459557, 0.0291452, -0.0291452, 0.459557, 27.2163, 18.1442)",
+    "transformB": "matrix(0.4, 0, 0, 0.4, 0, 0)",
+    "invalidRevisionRejected": true,
+    "reloaded": true,
+    "undoCurve": {
+      "x1": 0.25,
+      "y1": 0.1,
+      "x2": 0.25,
+      "y2": 1
+    },
+    "redoCurve": {
+      "x1": 0.42,
+      "y1": 0,
+      "x2": 0.58,
+      "y2": 1
+    },
+    "revisions": {
+      "beforeInvalid": 7,
+      "afterInvalid": 7,
+      "savedB": 8,
+      "undoA": 9,
+      "redoB": 10
+    }
+  },
+  "projectAfterSplit": {
+    "id": "edit-0e762b6b-038d-4e36-9509-16af96083549",
+    "revision": 4,
+    "timebase": {
+      "rateNumerator": 24000,
+      "rateDenominator": 1001
+    },
+    "mainClipFrames": [
+      {
+        "startFrame": 0,
+        "durationFrames": 12
+      },
+      {
+        "startFrame": 12,
+        "durationFrames": 36
+      },
+      {
+        "startFrame": 48,
+        "durationFrames": 48
+      }
+    ]
+  },
+  "timebaseText": "540×960 · 24000/1001 · F0",
+  "rangeStep": 0.04170833333333333,
+  "compactFit": {
+    "innerWidth": 1280,
+    "innerHeight": 760,
+    "documentOverflowX": false,
+    "body": {
+      "left": 0,
+      "right": 1280,
+      "top": 145.5,
+      "bottom": 689.5
+    },
+    "tools": {
+      "left": 230,
+      "right": 1166.9140625,
+      "top": 566.6953125,
+      "bottom": 606.6953125
+    }
+  },
+  "sourceHashes": {
+    "src/core/keyframe-curve.ts": "dabf66146c642040d1419e11393e2d39461fe2b224ae4037bc04a6d7936172f6",
+    "src/core/editor.ts": "39c537e526ab22249468da1fdab93a4157550e670a731f31a307156fda6fc72f",
+    "src/renderer/src/components/VideoEditorView.vue": "1f0fbeaf44358e33e4dbaec13788a805bc48a002921dd4e0f1bf23d199105e69"
+  }
+}

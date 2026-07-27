@@ -1,0 +1,11 @@
+{
+  "aspects": ["P0.6", "P0.7"],
+  "status": "PASS",
+  "strategy": "UX_ONLY",
+  "sources": {
+    "peer": "Jaaz write_plan / LTX Retake 叙事",
+    "ours": "src/renderer/src/components/StudioGenerationControlView.vue"
+  },
+  "usefulness": "空计划显示五步引导；失败/取消节点按钮文案改为「重拍」，仍调用既有 retry_studio_generation_plan_nodes",
+  "note": "未新建平行 retry 账本"
+}

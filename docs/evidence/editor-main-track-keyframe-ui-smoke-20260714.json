@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-13T21:24:30.150Z",
+  "transport": "source-electron-current-build",
+  "fixture": {
+    "kind": "isolated-synthetic",
+    "root": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-main-track-ui-CCVtbc",
+    "registryPath": "/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/ai-canvas-editor-main-track-ui-registry-80989-1783977866424.json",
+    "editProjectId": "edit-af7d487a-e519-4668-ba63-3cca35c5e279",
+    "mainClipId": "clip-aaf54d0b-8704-4f8d-a68d-8139bdeb73b8",
+    "frameRate": 23.976023976023978,
+    "backgroundColor": "#18314f"
+  },
+  "preview": {
+    "frame0": {
+      "transform": "matrix(0.40373, -0.115768, 0.115768, 0.40373, -16.875, -26.25)",
+      "opacity": "0.72"
+    },
+    "frame18": {
+      "transform": "matrix(0.53498, 0.0046687, -0.0046687, 0.53498, -1.875, -1.875)",
+      "opacity": "0.72"
+    },
+    "changedByKeyframes": true,
+    "opacityApplied": true,
+    "projectBackground": "rgb(24, 49, 79)"
+  },
+  "inspector": {
+    "title": "主画面变换",
+    "fields": [
+      "positionX",
+      "positionY",
+      "scale",
+      "rotation",
+      "opacity"
+    ],
+    "addKeyframeVisible": true
+  },
+  "validation": {
+    "invalidScale": 5,
+    "revisionBefore": 2,
+    "revisionAfter": 2,
+    "rejectedWithoutRevision": true
+  },
+  "persistence": {
+    "addedKeyframe": {
+      "id": "kf-1fea98fa-d1a5-48a1-810b-3b05cf567ed1",
+      "easing": "ease_in_out",
+      "timeSeconds": 0.375,
+      "frame": 9,
+      "positionX": -30,
+      "positionY": 20,
+      "scale": 0.55,
+      "rotation": 8
+    },
+    "opacity": 0.68,
+    "reloaded": true,
+    "revisions": {
+      "fixture": 2,
+      "saved": 3,
+      "undo": 4,
+      "redo": 5
+    }
+  },
+  "split": {
+    "frame": 13,
+    "clips": [
+      {
+        "id": "clip-aaf54d0b-8704-4f8d-a68d-8139bdeb73b8",
+        "startFrame": 0,
+        "durationFrames": 13,
+        "keyframes": [
+          {
+            "id": "kf-ui-main-transform-start",
+            "frame": 0,
+            "timeSeconds": 0,
+            "easing": "hold",
+            "positionX": -45,
+            "positionY": -70,
+            "scale": 0.42,
+            "rotation": -16
+          },
+          {
+            "id": "kf-1fea98fa-d1a5-48a1-810b-3b05cf567ed1",
+            "easing": "ease_in_out",
+            "timeSeconds": 0.375,
+            "frame": 9,
+            "positionX": -30,
+            "positionY": 20,
+            "scale": 0.55,
+            "rotation": 8
+          },
+          {
+            "id": "kf-9233abde-233e-420c-8d63-04dd3f2c87d4",
+            "frame": 13,
+            "timeSeconds": 0.542,
+            "easing": "cubic_bezier",
+            "bezier": {
+              "x1": 0.373048145187812,
+              "y1": 0,
+              "x2": 0.704862240411753,
+              "y2": 0.346084563403025,
+              "mode": "derived_monotone",
+              "sourceWindow": {
+                "x1": 1,
+                "y1": 0,
+                "x2": 0,
+                "y2": 1,
+                "sourceEasing": "cubic_bezier",
+                "startX": 0,
+                "endX": 0.148148148148148,
+                "startFrame": 0,
+                "endFrame": 4,
+                "totalFrames": 27
+              }
+            },
+            "sourceTransform": {
+              "start": {
+                "positionX": -30,
+                "positionY": 20,
+                "scale": 0.55,
+                "rotation": 8
+              },
+              "end": {
+                "positionX": 35,
+                "positionY": 60,
+                "scale": 0.65,
+                "rotation": 17
+              }
+            },
+            "positionX": -29.426341606546,
+            "positionY": 20.353020549818,
+            "scale": 0.550882551375,
+            "rotation": 8.079429623709
+          }
+        ]
+      },
+      {
+        "id": "clip-e589fcf1-6656-416c-b08e-ef166c38d9fc",
+        "startFrame": 13,
+        "durationFrames": 23,
+        "keyframes": [
+          {
+            "id": "kf-b9cc64b9-762d-46a4-b9f5-3e5eceebd20d",
+            "frame": 23,
+            "timeSeconds": 0.959,
+            "easing": "cubic_bezier",
+            "bezier": {
+              "x1": 0.877415262537087,
+              "y1": 0.099531310894919,
+              "x2": -0.109035105184728,
+              "y2": 1,
+              "mode": "derived_monotone",
+              "sourceWindow": {
+                "x1": 1,
+                "y1": 0,
+                "x2": 0,
+                "y2": 1,
+                "sourceEasing": "cubic_bezier",
+                "startX": 0.148148148148148,
+                "endX": 1,
+                "startFrame": 4,
+                "endFrame": 27,
+                "totalFrames": 27
+              }
+            },
+            "positionX": 35,
+            "positionY": 60,
+            "scale": 0.65,
+            "rotation": 17,
+            "sourceTransform": {
+              "start": {
+                "positionX": -30,
+                "positionY": 20,
+                "scale": 0.55,
+                "rotation": 8
+              },
+              "end": {
+                "positionX": 35,
+                "positionY": 60,
+                "scale": 0.65,
+                "rotation": 17
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "undoRevision": 7,
+    "redoRevision": 8,
+    "rightClipIdStable": true
+  },
+  "otio": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-main-track-keyframe-split-20260714.otio",
+    "bytes": 10510,
+    "sha256": "01c95460a580f9cc0d99b9c493c4bc47986fcfe6122163b44646b118402163ad",
+    "contract": "aicanvas.cubic-bezier.v2"
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/editor-main-track-keyframe-ui-20260714.png",
+    "bytes": 294345,
+    "sha256": "aff7b138174e1bc83cfdb7be148eddc3e16ee9e4109a54edb1b9ab18fd3b5a10",
+    "width": 1560,
+    "height": 980,
+    "deviceScaleNormalized": true,
+    "captureAttempt": 1,
+    "content": {
+      "pixels": 1528800,
+      "brightPixels": 123712,
+      "brightRatio": 0.08092098377812663,
+      "chromaticPixels": 80182,
+      "chromaticRatio": 0.0524476713762428
+    }
+  },
+  "pageErrors": [],
+  "sourceHashes": {
+    "src/core/editor.ts": "39c537e526ab22249468da1fdab93a4157550e670a731f31a307156fda6fc72f",
+    "src/core/keyframe-curve.ts": "dabf66146c642040d1419e11393e2d39461fe2b224ae4037bc04a6d7936172f6",
+    "src/renderer/src/components/VideoEditorView.vue": "1f0fbeaf44358e33e4dbaec13788a805bc48a002921dd4e0f1bf23d199105e69",
+    "scripts/create-editor-ui-fixture.ts": "ce3f5de67705fbfc7797e4403ad3a043d4bc3220fcf064ef90914642cecc2e41",
+    "scripts/ui-editor-main-track-smoke.mjs": "4fc52a0ee927f7568e3ae57febbd7c863da83f1592dcce9ed0ca9ad155f25a8f",
+    "package.json": "99b6f640fc7ccfac4f1c9bbfd8b45a0fae4dd998e64bcf4edbddbaf60b81ac15"
+  },
+  "terminal": {
+    "rootRemoved": true,
+    "registryRemoved": true
+  }
+}

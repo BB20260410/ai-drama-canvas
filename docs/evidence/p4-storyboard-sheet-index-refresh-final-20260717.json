@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "kind": "p4-storyboard-sheet-index-refresh",
+  "createdAt": "2026-07-17T14:39:39.489Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+  "sourceRoot": "/Users/hxx/Documents/古蜀卷第三季",
+  "source": {
+    "before": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "sha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "after": {
+      "root": "/Users/hxx/Documents/古蜀卷第三季",
+      "files": 3344,
+      "bytes": 24570877,
+      "sha256": "649160f22663ca4c45ee4a4084e278ef0edc61ec66db01bb84da38cbea3f8d26"
+    },
+    "unchanged": true
+  },
+  "protectedProject": {
+    "before": {
+      "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+      "files": 11111,
+      "bytes": 799646465,
+      "sha256": "7669bbdf145bd3c5e6630213f8b5172f4b621ff09618f4287821557d12fe1b10"
+    },
+    "after": {
+      "root": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6",
+      "files": 11111,
+      "bytes": 799646465,
+      "sha256": "7669bbdf145bd3c5e6630213f8b5172f4b621ff09618f4287821557d12fe1b10"
+    },
+    "unchanged": true,
+    "allowedWrites": [
+      ".aicanvas/project.json",
+      ".aicanvas/index.json",
+      ".aicanvas/events.jsonl",
+      ".aicanvas/cache.sqlite*",
+      ".aicanvas/locks/**",
+      "00_画布进度.md"
+    ]
+  },
+  "index": {
+    "before": {
+      "bytes": 25237819,
+      "mtimeMs": 1784299011717.8992,
+      "sha256": "9aa39373e8d2b0717bc93adf865e81f6f4991239b2f2a6150d4fd284cb66336f"
+    },
+    "after": {
+      "bytes": 25237819,
+      "mtimeMs": 1784299164086.7214,
+      "sha256": "b0f29abbbd80e417389cc39fae8dc193a3936afadce11156c057b400cda38884"
+    },
+    "scanId": "11af3d89-10db-429f-a81b-79c5535ea960"
+  },
+  "summary": {
+    "current": 0,
+    "stale": 1,
+    "invalid": 0,
+    "legacyInvalid": 1,
+    "pages": 1
+  },
+  "projection": [
+    {
+      "id": "season-三-ep01-unit001-9bd736c523d5",
+      "itemId": "season-三-ep01-unit001",
+      "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a_review-524182a558ec9aff.json",
+      "role": "receipt",
+      "sheetId": "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+      "status": "stale",
+      "reasons": [
+        "legacy-v1-never-promotable-under-p4",
+        "schema-v1 历史板绑定旧 Review/requirement，但未冻结 P4 当前完整证据，只能登记为 stale"
+      ],
+      "check": {
+        "inspectionVersion": 1,
+        "ok": true,
+        "exists": true,
+        "decodable": true,
+        "size": 3843,
+        "sha256": "7cb26385590c783a6d3af4318a3c53586b15ef5b38e7336425960fbc2e2e6f44",
+        "modifiedAt": "2026-07-16T19:19:19.220Z",
+        "ctimeMs": 1784229559228.3901,
+        "issues": []
+      },
+      "authoritative": false,
+      "accepted": false,
+      "deprecated": false
+    },
+    {
+      "id": "season-三-ep01-unit001-c654b2a21860",
+      "itemId": "season-三-ep01-unit001",
+      "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.json",
+      "role": "receipt",
+      "sheetId": "legacy-sheet-d75625366c9b08f7fbbb8802741789b0",
+      "status": "legacy-invalid",
+      "reasons": [
+        "pre-p4-receipt-does-not-freeze-current-p3-evidence",
+        "schema-v1 历史 receipt 未同时绑定 Review/requirement，只登记 receipt 且永久 legacy-invalid"
+      ],
+      "check": {
+        "inspectionVersion": 1,
+        "ok": true,
+        "exists": true,
+        "decodable": true,
+        "size": 3589,
+        "sha256": "f509797e0aef7793fcbf8e72a7b58a0b49e039cd247399032edde5227d0d1148",
+        "modifiedAt": "2026-07-16T09:54:13.549Z",
+        "ctimeMs": 1784195653559.1807,
+        "issues": []
+      },
+      "authoritative": false,
+      "accepted": false,
+      "deprecated": false
+    },
+    {
+      "id": "season-三-ep01-unit001-02df667a4d51",
+      "itemId": "season-三-ep01-unit001",
+      "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.png",
+      "role": "png",
+      "sheetId": "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+      "status": "stale",
+      "reasons": [
+        "legacy-v1-never-promotable-under-p4",
+        "schema-v1 历史板绑定旧 Review/requirement，但未冻结 P4 当前完整证据，只能登记为 stale"
+      ],
+      "check": {
+        "inspectionVersion": 1,
+        "ok": true,
+        "exists": true,
+        "decodable": true,
+        "width": 2160,
+        "height": 3840,
+        "size": 4472760,
+        "sha256": "8600c46fe40ad797927c68c1bc09072556646a423f5edeb8a14fa90697e1e06e",
+        "modifiedAt": "2026-07-16T09:54:13.535Z",
+        "ctimeMs": 1784195653546.2678,
+        "issues": []
+      },
+      "authoritative": false,
+      "accepted": false,
+      "deprecated": false
+    },
+    {
+      "id": "season-三-ep01-unit001-934407a817b5",
+      "itemId": "season-三-ep01-unit001",
+      "path": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6/production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.svg",
+      "role": "svg",
+      "sheetId": "legacy-sheet-0b0da42a1e2aaaee9918eeeb331a78ec",
+      "status": "stale",
+      "reasons": [
+        "legacy-v1-never-promotable-under-p4",
+        "schema-v1 历史板绑定旧 Review/requirement，但未冻结 P4 当前完整证据，只能登记为 stale"
+      ],
+      "check": {
+        "inspectionVersion": 1,
+        "ok": true,
+        "exists": true,
+        "decodable": true,
+        "size": 1184873,
+        "sha256": "420d0cc54a7685a4d58e9f5b3145e8cf1c8248a31483d45d19e61a334b0448de",
+        "modifiedAt": "2026-07-16T09:54:13.533Z",
+        "ctimeMs": 1784195653542.7673,
+        "issues": []
+      },
+      "authoritative": false,
+      "accepted": false,
+      "deprecated": false
+    }
+  ],
+  "readOnlyReplayMatchesPersisted": true,
+  "passed": true
+}

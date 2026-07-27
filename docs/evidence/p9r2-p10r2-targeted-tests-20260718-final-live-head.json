@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "p9r2-p10r2-final-live-head-targeted",
+  "status": "fail",
+  "startedAt": "2026-07-18T08:12:22.636Z",
+  "endedAt": "2026-07-18T08:13:27.557Z",
+  "durationMs": 64978,
+  "argv": [
+    "npx",
+    "vitest",
+    "run",
+    "tests/build-identity.test.ts",
+    "tests/mcp-build-currentness-gate.test.ts",
+    "tests/project-backup.test.ts",
+    "tests/studio-continuity-pagination.test.ts",
+    "tests/studio-production-dashboard.test.ts",
+    "tests/studio-production-dashboard-ui.test.ts",
+    "tests/studio-production-dashboard-scale.test.ts",
+    "tests/studio-production-dashboard-desktop-integration.test.ts",
+    "tests/mcp-studio-production-dashboard.test.ts",
+    "tests/managed-studio-canvas-ui.test.ts",
+    "tests/studio-canvas-layout.test.ts",
+    "tests/studio-canvas-layout-store.test.ts",
+    "tests/studio-canvas-locator.test.ts",
+    "tests/studio-canvas-pipeline-graph.test.ts",
+    "tests/studio-canvas-edge-validation.test.ts",
+    "tests/studio-canvas-workflow-runner.test.ts",
+    "tests/studio-canvas-workflow-groups.test.ts",
+    "tests/studio-canvas-workflow-groups-browser.test.ts",
+    "tests/studio-panel-preparation-checklist.test.ts",
+    "tests/real-imagegen-canary-v2.test.ts",
+    "tests/legacy-real-imagegen-canary-disabled.test.ts",
+    "tests/mcp-managed-studio.test.ts",
+    "tests/studio-scale-fixture.test.ts",
+    "tests/studio-reliability.test.ts",
+    "tests/material-studio.test.ts",
+    "tests/material-studio-identity.test.ts",
+    "tests/material-studio-pagination.test.ts",
+    "tests/generation-queue-lumen-tabs-ui.test.ts",
+    "tests/studio-generation-queue-view.test.ts",
+    "tests/studio-publication-preflight-diagnostics.test.ts"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": false,
+  "buildIdentity": {
+    "before": {
+      "buildId": "735e6e6bb392590d46b3b8a963ccef61",
+      "sourceDigest": "2c100ebb68bb957c03dc338b6665b03dd4f6cf2d9650552cc0218f7158918544"
+    },
+    "after": {
+      "buildId": "16b6788f7a99df7ea3086fe2efc80979",
+      "sourceDigest": "36303dadc8c4f17b5fc984126d0eb1f8cca549aee039ea66dfbb0febf258433e"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/runs/p9r2-p10r2-targeted-tests-20260718-final-live-head.log",
+    "sizeBytes": 2761,
+    "sha256": "99e6c08067bfd537ce1cb15203730e2367909cce081d58c2ccf90dbb0c05f1e7"
+  },
+  "testCounts": {
+    "files": 30,
+    "tests": 94
+  }
+}

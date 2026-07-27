@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "kind": "p18-final-validation",
+  "title": "P18 画布性能与易用性增量 · 最终验证（四路独立审核后修订）",
+  "createdAt": "2026-07-19T14:28:30.000Z",
+  "workspace": "/Users/hxx/Documents/无限画布",
+  "scope": "仅旧生产画布（App.vue production-flow）的缩放重建链路与节点媒体链路，以及烟测基建修复；受管画布经实测健康，未改动。不重做 P0–P17 任何 owner。",
+  "buildIdentity": {
+    "sourceDigest": "34dc9fddec7953b7a3e9011a4c61ab223389f5d2d7c03bbc242b5c7e96d47e00",
+    "buildId": "f6c300c02d64f83157825a0f89a1befb",
+    "buildIdentityFingerprint": "151b615d9b1274d7e5790ccdb88cb55c4842a7f8a035700b7e782bc38723054d",
+    "releaseManifestFingerprint": "8ece65da6d4bf3d374745eda93435fb9b8d4f68e37f42c924483fbc03d599b0d",
+    "builtAt": "2026-07-19T14:25:58.971Z",
+    "source": { "files": 471, "bytes": 10619878 },
+    "digestClosure": "live 源码只读重算 == release-manifest.json，均为 34dc9fdd（2026-07-19 22:29 +08 核对）"
+  },
+  "hypotheses": {
+    "M1_zoom_rebuild": {
+      "claim": "旧画布每次缩放手势触发全量 rebuildFlow 并伴随一次 loadLayout IPC",
+      "measured": "400 单元夹具连续 100 次缩放（0.62↔0.80）产生 101 个 DOM 重建批次 / 200 个节点替换；受管画布 100 次真实控件缩放为 0 重建（健康）。contextBridge 禁止运行时包装，IPC 次数按 rebuildFlow 内 loadLayout 调用 1:1 结构推断。",
+      "verdict": "旧画布实锤；受管画布不成立（无需修）"
+    },
+    "M2_original_images": {
+      "claim": "旧画布节点直接解码 MB 级原图",
+      "measured": "可见节点图全部指向 3840×2160 原图文件（单张 14,276,545 B；实测确认解码 10 张，2 张 lazy 未完成），平移换入新节点出现 58.5ms 帧尖峰；受管画布节点为 aicanvas-studio://thumbnail 缩略图（48×72，健康）。",
+      "verdict": "旧画布实锤；受管画布不成立（无需修）"
+    },
+    "M3_main_chunk": {
+      "claim": "1.72MB 主 chunk 影响启动",
+      "measured": "异步分包已由 P17 验收（主 chunk 743–744KB）；当前构建 5 次冷启动 wall load 均值 317.6ms、TTI 均值 410.6ms（首次 509ms 含冷缓存）、DCL ~90ms、首绘均值 132.8ms，绝对值无问题。",
+      "verdict": "已由 P17 关闭，P18 无进一步动作"
+    }
+  },
+  "fixes": {
+    "fix1_zoom_rebuild": {
+      "files": ["src/renderer/src/App.vue"],
+      "changes": [
+        "watch([visibleItems, viewKey, zoom, showNarrative], …, {deep:true}) → watch([visibleItems, viewKey, compactZoom], …)，仅在跨越 0.35 紧凑阈值时重建；移除 deep 遍历",
+        "loadLayout IPC 从 rebuildFlow 剥离为按 projectRoot::viewKey 缓存（ensureLayoutPositions；IPC 失败不记键可重试），三处 saveLayout 收敛为 persistLayoutPositions（先并缓存后落盘，消除拖拽存盘窗口内弹回旧坐标的竞态）",
+        "nodes/edges 由深层 ref 改 shallowRef（对齐受管画布先例）"
+      ]
+    },
+    "fix2_thumbnails": {
+      "files": ["src/core/legacy-thumbnails.ts", "src/main/index.ts", "src/renderer/src/utils.ts", "src/renderer/src/components/ProductionNode.vue"],
+      "changes": [
+        "新增 legacy-thumbnails：512px WebP sharp 配方（复用受管侧），缓存于 userData（不写工程目录），键为 路径+mtime+大小 SHA-256，请求到达时懒生成；缓存目录不可写/损坏条目时回退原图（mkdir 在 try 内，损坏条目删除自愈）",
+        "aicanvas-asset 协议新增 thumb=1 分支；utils 新增 assetThumbnailUrl；ProductionNode 三处 img 改用缩略图"
+      ]
+    },
+    "harness_fixes": {
+      "files": ["scripts/large-canvas-ui-smoke.ts", "src/main/index.ts"],
+      "changes": [
+        "夹具显式 setActiveProjectRegistration（应用不再猜测登记表第一项，否则探针落在首屏全空）",
+        "性能探针写盘前有界等待（45s）+ 截图延迟 45s + 执行超时 120s",
+        "AI_CANVAS_PERF_PROBE=1 时 setBackgroundThrottling(false)：根因——后台/被遮挡窗口 rAF 被 Chromium 节流冻结，探针 paint() 双 rAF 永久挂起（修复前 4 次失败 0 数据，修复后连续稳定 PASS）",
+        "large-canvas 烟测增加 --user-data-dir 隔离（此前污染真实应用配置目录 2204 个缩略图缓存，已清理）"
+      ]
+    }
+  },
+  "beforeAfter": {
+    "zoomInMs": { "before": 149.7, "after": [80.6, 78.2, 86.2, 83.7], "delta": "≈ -46%" },
+    "zoomOutMs": { "before": 112.8, "after": [92.2, 88.6, 88.0, 91.1], "delta": "≈ -21%" },
+    "showAllEpisodesMs": { "before": 261.2, "after": [166.3, 170.7, 177.0, 168.4], "delta": "≈ -34%" },
+    "filterMs": { "before": 160.8, "after": [125.3, 115.7, 117.1, 118.0], "delta": "≈ -25%" },
+    "nodeImageDecode": { "before": "3840×2160 原图（单张 14.3MB），平移帧尖峰 58.5ms", "after": "512px WebP 缩略图，缓存命中零生成开销" },
+    "framesP95Ms": { "before": 9.0, "after": [9.1, 9.1, 8.9, 8.7], "note": "原本就有界，保持不变即正确" }
+  },
+  "verification": {
+    "typecheck": "PASS（vue-tsc web + tsc node）",
+    "fullTests": "159 files / 813 tests PASS（含 tests/legacy-thumbnails.test.ts 5 项、tests/p18-canvas-performance-contract.test.ts 4 项）",
+    "electronSmokes": {
+      "large-canvas": "PASS ×4（修复后连续稳定；9/9 checks；最终 -04 含 userData 隔离）",
+      "p15-simple-canvas": "PASS（-03，对最终构建 34dc9fdd 复测，连线/拖拽/切工程/重启恢复全项）",
+      "managed-studio-scale": "PASS（-03，initialDom 16 / expandedDom 8 / media 10000）"
+    },
+    "productionBuild": "PASS（typecheck + build:mcp + build:identity + electron-vite）"
+  },
+  "reviewAudit": {
+    "method": "完成后派 4 个独立子代理交叉审核（代码正确性 / 证据一致性 / 测试覆盖 / 边界合规），无严重项",
+    "fixedAfterReview": [
+      "legacy-thumbnails mkdir 在 try 外：缓存目录不可写时 thumb 请求 404 破图 → 已修（回退原图），补合同断言",
+      "persistLayoutPositions 拖拽存盘窗口内 rebuild 弹回旧坐标 → 改为先并缓存后落盘",
+      "ensureLayoutPositions IPC 失败缓存空结果整会话 → 失败不记键可重试",
+      "fix1 零回归覆盖 → 新增 tests/p18-canvas-performance-contract.test.ts 4 项合同",
+      "缩略图用例 4 形同虚设断言 → 改为真实创建工程目录并断言无 webp 写入",
+      "large-canvas 烟测污染真实 userData（2204 缓存文件）→ 增加 --user-data-dir 隔离并清理",
+      "final-validation/交接的 buildIdentityFingerprint 字段误填为 releaseManifestFingerprint → 已更正",
+      "performance-baseline 证据 p17AcceptedSourceDigest 误写 P17 中期值 863db9d1 → 勘误为 5c8bee97"
+    ],
+    "acceptedNotes": [
+      "compactZoom 存在 ≤0.04 的阈值感知死区（与旧 zoom watch 迟滞等价，非回退）",
+      "并发首载可能各发一次 loadLayout（同键同数据，无害）",
+      "缩略图缓存无淘汰策略（512px WebP 量级小，接受）",
+      "四个 p17-* 20:12 证据与 scripts/ui-p6-binding-workbench-smoke.ts 20:14 改动属 GPT5.6 主线关账动作，非 P18 产物"
+    ]
+  },
+  "evidence": {
+    "measurement": "docs/evidence/p18-performance-baseline-20260719.json",
+    "baselineReference": "docs/evidence/frontend-opt-baseline-20260719.json",
+    "largeCanvasRuns": [
+      "docs/evidence/p18-large-canvas-ui-smoke-20260719-01.json",
+      "docs/evidence/p18-large-canvas-ui-smoke-20260719-02.json",
+      "docs/evidence/p18-large-canvas-ui-smoke-20260719-03.json",
+      "docs/evidence/p18-large-canvas-ui-smoke-20260719-04.json"
+    ],
+    "p15": [
+      "docs/evidence/p18-p15-simple-canvas-ui-smoke-20260719-02.json",
+      "docs/evidence/p18-p15-simple-canvas-ui-smoke-20260719-02.png",
+      "docs/evidence/p18-p15-simple-canvas-ui-smoke-20260719-03.json",
+      "docs/evidence/p18-p15-simple-canvas-ui-smoke-20260719-03.png"
+    ],
+    "managedScale": [
+      "docs/evidence/p18-managed-studio-scale-canvas-ui-smoke-20260719-02.json",
+      "docs/evidence/p18-managed-studio-scale-canvas-ui-smoke-20260719-02.png",
+      "docs/evidence/p18-managed-studio-scale-canvas-ui-smoke-20260719-03.json",
+      "docs/evidence/p18-managed-studio-scale-canvas-ui-smoke-20260719-03.png"
+    ]
+  },
+  "safety": {
+    "noInstallPackage": true,
+    "noDataContractChanges": "未改 DB/CAS/MCP 生产合同、冻结包、账本",
+    "noAuthoritativeAssetsTouched": true,
+    "noGitOperations": true,
+    "noP17EvidenceOverwritten": "P17 及更早证据未修改；本人此前失败运行的中间态垃圾输出（同一文件名、内容为异常栈）已声明并替换为通过数据",
+    "isolatedFixturesOnly": "全部夹具在 mkdtemp 临时目录；真实 userData 污染已清理并改为隔离",
+    "residueCleaned": "out/p18/、/tmp/p18-*、$TMPDIR 下 P18 夹具目录均已清理"
+  },
+  "nonClaims": [
+    "App.vue 异步分包系 P17 验收内容，本报告不计为 P18 收益",
+    "zoomIn/zoomOut 的测量含探针 waitUntil 轮询与 paint 开销，真实每步成本更低（调试环境实测 ~17ms）",
+    "缩略图管线仅覆盖旧画布节点；受管画布本已使用缩略图，未改动",
+    "本验收不覆盖安装版（/Applications 仍为 P15 构建），未制作安装包"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "aspect": "P0.5",
+  "status": "PASS",
+  "strategy": "CLEAN_ROOM",
+  "sources": {
+    "peer": ".tmp-competitor-study/huobao-drama/backend/src/services/ffmpeg-compose.ts",
+    "ours": "src/core/studio-shot-compose.ts"
+  },
+  "commands": [
+    {"cmd": "npx vitest run tests/studio-shot-compose.test.ts", "result": "PASS", "tests": 4}
+  ],
+  "usefulness": "单镜合成计划可校验（静帧必时长、禁路径穿越、SRT 基线生成）；真实 ffmpeg 执行层可后续接线且不污染 CAS",
+  "note": "本项为合同+可测计划层；真实 ffmpeg 合成文件进 CAS 列为 P2 增强"
+}

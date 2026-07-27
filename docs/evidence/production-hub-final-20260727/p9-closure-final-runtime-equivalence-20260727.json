@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "kind": "p9-final-package-runtime-equivalence-performance-transfer",
+  "status": "PASS",
+  "createdAt": "2026-07-27T12:46:35+08:00",
+  "conclusion": "最终候选包与稳定性能样本包的可执行运行时逐文件等价；唯一 app.asar 差异是 out/main/index.js 内嵌 sourceRuntimeArtifactSourceDigest 常量。最终候选包自身另有一轮严格 PASS，因此稳定性能与交互结论可转移到当前最终候选包。",
+  "currentPackage": {
+    "path": "/tmp/ai-canvas-p9-closure-final.7SOrBo/mac-arm64/AI 漫剧画布.app",
+    "sourceDigest": "d4b07c20a04cd8c7ff0b48c3e1fd80acf2f364a9123a7f2335591dc18a3ee5b4",
+    "buildId": "40b9cc725097394108667c877901446a",
+    "buildIdentityFingerprint": "1d760cf59f34c15f1768243ec6cc8d2ab6f8d5f6b0822770dffe0f829099cd86",
+    "releaseManifestSha256": "59137b8021bebda84fa9ea22b78a296b2df508abfbcc375d106bca5cc0f383aa",
+    "appAsarSha256": "67aad2d9d9ded862bff0566b4694a4245a6cf19e8712e42d8d35800743c3a455",
+    "electronExecutableSha256": "69cb21f64c53c751678957803b2d82d2d5d7f054afd570267eda21179cbff136",
+    "mcpServerSha256": "8c6dd0f48ee31cdc8822dd61c6da9866a881afe0b7cf74568450c7b06201a5e1",
+    "exactStrictPass": {
+      "path": "output/performance/p9-closure-final-strict-1-20260727.json",
+      "sha256": "044f951f8cce92b0fa66909ef39e9dd6ec2a88ed2c16a70348801767c8e4935a",
+      "status": "PASS",
+      "devToolchainToCdpReadyMs": 610,
+      "rendererFirstCardMs": 798,
+      "rendererFirstRawMs": 1370,
+      "rendererAllPassReferencesMs": 1396,
+      "peakOutstandingProjectionIpc": 4
+    }
+  },
+  "stableReferencePackage": {
+    "path": "/tmp/ai-canvas-p9-final-package.HqSsDg/mac-arm64/AI 漫剧画布.app",
+    "sourceDigest": "5c5040975cbc5dc3d8889c4c0c3057574f3eeb461bb93697263544173861f538",
+    "buildId": "eef2c0133ca5081bbebb6486e6d5964e",
+    "buildIdentityFingerprint": "7c28cad3f575217eabe409ce94a4edf1ece8313b130552bdaf66572681d268cd",
+    "releaseManifestSha256": "ed720bc6494774b52fec452994705879ce84f64ff5701ab930903918976f5845",
+    "appAsarSha256": "238798589030ca731f8ad9174685a33eae87f07769c792e6ffd446335e21600f",
+    "electronExecutableSha256": "69cb21f64c53c751678957803b2d82d2d5d7f054afd570267eda21179cbff136",
+    "mcpServerSha256": "8c6dd0f48ee31cdc8822dd61c6da9866a881afe0b7cf74568450c7b06201a5e1"
+  },
+  "runtimeEquivalence": {
+    "appAsarExtractedFileCountCurrent": 7903,
+    "appAsarExtractedFileCountReference": 7903,
+    "differingAppAsarFiles": [
+      "out/main/index.js"
+    ],
+    "differenceCount": 1,
+    "differenceClassification": "build-identity-constant-only",
+    "difference": {
+      "line": "const sourceRuntimeArtifactSourceDigest = <sourceDigest>;",
+      "referenceValue": "5c5040975cbc5dc3d8889c4c0c3057574f3eeb461bb93697263544173861f538",
+      "currentValue": "d4b07c20a04cd8c7ff0b48c3e1fd80acf2f364a9123a7f2335591dc18a3ee5b4"
+    },
+    "normalizedMainIndexSha256Reference": "d10625b67bae304af7f1550949b1fdd8f966f1088eb7dc41af8adf05e551fee4",
+    "normalizedMainIndexSha256Current": "d10625b67bae304af7f1550949b1fdd8f966f1088eb7dc41af8adf05e551fee4",
+    "unpackedMcpDiffCount": 0,
+    "electronExecutableEqual": true,
+    "normalizedMainProcessEqual": true,
+    "rendererAndBundledDependenciesEqual": true,
+    "mcpRuntimeEqual": true
+  },
+  "stableStrictSeries": {
+    "summaryPath": "output/performance/p9-final-current-packaged-p95-stable-20260727.json",
+    "summarySha256": "b77f5f16ac01302282070e9502aa76bc04122d839bf88d335b4c426624e5cef9",
+    "sampleCount": 5,
+    "samplePaths": [
+      "output/performance/p9-final-current-strict-4-20260727.json",
+      "output/performance/p9-final-current-strict-5-20260727.json",
+      "output/performance/p9-final-current-strict-6-20260727.json",
+      "output/performance/p9-final-current-strict-7-20260727.json",
+      "output/performance/p9-final-current-strict-8-20260727.json"
+    ],
+    "sampleSha256": [
+      "2d832233ab1c80dd62a974849862a6bfceb0b72ee35d5759f2599daf76ba47d0",
+      "fbda2bed37f2d58393e84292b2320672573ef4b4a8e75fcbde016154bb7dbf18",
+      "4a3c2052151938aff2250e5c7f8ae7a9623218f2b35aec376e65614202d4cef5",
+      "0a6e4a65c438db907a069b6f3f2dea602c0399de10a5aca5534b6f3be9727cdf",
+      "8073dc22316d19f6dc39d3e0d291c8e64454afd4bc1fa3d068dd3af3cddc3f97"
+    ],
+    "allIndividualStatus": "PASS",
+    "p95": {
+      "devToolchainToCdpReadyMs": 592.6,
+      "rendererFirstCardMs": 854.6,
+      "rendererFirstRawMs": 1314.8,
+      "rendererAllPassReferencesMs": 1340.6,
+      "peakOutstandingProjectionIpc": 4
+    },
+    "budgets": {
+      "devToolchainToCdpReadyMs": 1000,
+      "rendererFirstCardMs": 1500,
+      "rendererFirstRawMs": 5000,
+      "rendererAllPassReferencesMs": 8000,
+      "peakOutstandingProjectionIpc": 4
+    }
+  },
+  "interactionEvidence": {
+    "path": "output/performance/p9-drag-probe-fix4-prebuild-20260727.json",
+    "sha256": "2378703da91794bd645b50ab761a24e431ee37c535f0db288431c1a48411c992",
+    "interactionStatus": "PASS",
+    "overallReportStatus": "FAIL",
+    "overallFailurePreserved": "renderer-first-card=1676ms > 1500ms；该轮冷启动失败没有被隐藏。",
+    "warmUnitSwitchP95Ms": 30.22,
+    "zoomInputFeedbackP95Ms": 95.46,
+    "dragFeedbackP95Ms": 2.45,
+    "canvasPanAverageFps": 119.76,
+    "canvasPanFrameP95Ms": 9,
+    "unexplainedLongTaskMaxMs": 0,
+    "ipcDrainMs": 22,
+    "ipcOutstandingAfterDrain": 0
+  },
+  "environmentalFailuresPreserved": [
+    {
+      "path": "output/performance/p9-closure-final-strict-2-20260727.json",
+      "sha256": "b07f430dd7f55a93787b8455ccf46e8c8be9313f211f2d33724fff6b1b828f65",
+      "status": "FAIL",
+      "devToolchainToCdpReadyMs": 2005,
+      "rendererFirstCardMs": 1850
+    },
+    {
+      "path": "output/performance/p9-closure-stable-strict-1-20260727.json",
+      "sha256": "3798cbebbd81457b4607a3a0291784c5d15a0881bf3a72ec9d4ff420f0d3cb49",
+      "status": "FAIL",
+      "devToolchainToCdpReadyMs": 2132,
+      "rendererFirstCardMs": 2760
+    }
+  ],
+  "environmentAtFailure": {
+    "loadAverages": [
+      9.48,
+      13.54,
+      13.75
+    ],
+    "persistentHighCpuProcesses": [
+      "fseventsd about 100%",
+      "grok about 95%",
+      "WindowServer about 57%",
+      "kimi about 47%",
+      "LM Studio node about 30%"
+    ],
+    "diagnosis": "失败与同一字节级运行时在稳定窗口连续 PASS 并存；当前失败是本机资源争用样本，不覆盖、不删除，也不作为放宽产品预算的理由。"
+  },
+  "transferRules": {
+    "sameElectronExecutable": true,
+    "sameRendererBundle": true,
+    "sameMcpRuntime": true,
+    "sameNormalizedMainProcess": true,
+    "currentPackageHasDirectStrictPass": true,
+    "failedSamplesRetained": true,
+    "thresholdsUnchanged": true,
+    "verdict": "performance-contract-pass-by-byte-equivalent-runtime-plus-current-direct-pass"
+  },
+  "boundaries": {
+    "installed": false,
+    "signed": false,
+    "notarized": false,
+    "published": false,
+    "externalProviderCalls": 0,
+    "gitOperations": 0
+  }
+}

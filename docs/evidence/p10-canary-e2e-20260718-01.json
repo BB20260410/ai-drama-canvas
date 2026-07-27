@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "kind": "p10-canary-e2e",
+  "status": "pass",
+  "createdAt": "2026-07-18T04:03:26.805Z",
+  "buildIdentity": {
+    "buildId": "edc6d952a44c4e4be1c12a8aa7e9c63c",
+    "sourceDigest": "228de6f3f274438de7a8c105181cbd3cf955a576d0b2c9f9722d69d38fd39f9f",
+    "fingerprint": "2b5526431052b5b190b277edc8a835208d82ab6a8393e546cb03e9175155239e"
+  },
+  "mcp": {
+    "toolCount": 182,
+    "capabilitiesToolCount": 182,
+    "capabilitiesBuildId": "e3dac3a820992bdbcc8ceb4f1c3afb0f"
+  },
+  "canary": {
+    "twoPanelUnitId": "p7-unit-b-two-panel",
+    "sixPanelUnitId": "p7-unit-a-six-panel",
+    "longChinesePresent": true,
+    "twoPanelNextAction": "freeze-generation-pack",
+    "sixPanelCount": 6,
+    "sixNextAction": "freeze-generation-pack",
+    "restartFingerprintMatch": true,
+    "legacyNotApplicable": {
+      "sourceShot": "not-applicable",
+      "fusionStoryboardSheet": "not-applicable",
+      "p3VisualConstraints": "not-applicable",
+      "publication": "not-applicable"
+    }
+  },
+  "backupRestore": {
+    "backupFingerprint": "070516d50ba1615f7d5e4a32a832738b8f94d29523385d817d8b3dc61c03e857",
+    "restoredProjectId": "project-090423107519"
+  },
+  "boundaries": {
+    "formalImageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "gitStage": 0
+  }
+}

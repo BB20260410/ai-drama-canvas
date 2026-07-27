@@ -1,0 +1,24 @@
+{
+  "pass": true,
+  "u25": {
+    "status": "pass",
+    "raw": "353850d35ef3d40221a6a4f79550210334d3a7108efafbb163b846d263d15f56",
+    "run": "s1e2-u25-residual-ms06qhp1"
+  },
+  "summary": {
+    "pass": 25,
+    "pendingReview": 0,
+    "inProgress": 0,
+    "failed": 0,
+    "blocked": 1
+  },
+  "review": {
+    "decision": "pass",
+    "advancesHead": true,
+    "current": true,
+    "stale": []
+  },
+  "runId": "s1e2-u25-residual-ms06qhp1",
+  "packId": "studio-generation-freeze-62abe22b2848da8740ef0133e6ce7812",
+  "rawSha": "353850d35ef3d40221a6a4f79550210334d3a7108efafbb163b846d263d15f56"
+}

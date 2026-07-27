@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "kind": "real-imagegen-canary-dashboard-replay",
+  "status": "pass",
+  "createdAt": "2026-07-27T05:19:07Z",
+  "sourceEvidence": "real-imagegen-canary-20260727-grok-current-source.json",
+  "purpose": "原 live canary 的首次 Dashboard 重读触发 fail-safe generation-projection-degraded 后，以已落盘 Grok raw/labeled 做全新隔离机械回放，判断是否存在可稳定复现的投影缺陷；不再次调用生图模型。",
+  "buildIdentity": {
+    "sourceDigest": "d4b07c20a04cd8c7ff0b48c3e1fd80acf2f364a9123a7f2335591dc18a3ee5b4",
+    "buildId": "40b9cc725097394108667c877901446a",
+    "mcpToolCount": 202
+  },
+  "reusedMedia": {
+    "rawSha256": "5cd5b448374fb60f59d86fc2023702be0af2e6d439f649b6863b0a40829c84ae",
+    "labeledSha256": "694b7d74c6329b8d4cf09f91c2f06266473ee1fa1e3318e41b84413a10ae8299"
+  },
+  "replay": {
+    "provider": "grok",
+    "generationRunId": "real-grok-canary-v2-001",
+    "packFingerprint": "c82dd561d7e5e36df4b4b8533c7db0e360b66da2b3020d3181c912e58f421e46",
+    "reviewDecision": "pass",
+    "approvedRawEligible": true,
+    "dashboardReads": [
+      {
+        "index": 1,
+        "elapsedMilliseconds": 2375.1,
+        "selectedPanelGenerationStatus": "ready",
+        "nextActionCode": "approved-raw-ready"
+      },
+      {
+        "index": 2,
+        "elapsedMilliseconds": 2304.5,
+        "selectedPanelGenerationStatus": "ready",
+        "nextActionCode": "approved-raw-ready"
+      },
+      {
+        "index": 3,
+        "elapsedMilliseconds": 2312.1,
+        "selectedPanelGenerationStatus": "ready",
+        "nextActionCode": "approved-raw-ready"
+      }
+    ]
+  },
+  "conclusion": {
+    "stableDeterministicRegressionReproduced": false,
+    "failSafeWorked": true,
+    "duplicateImageGenerationAvoided": true,
+    "note": "原运行的 degraded 只能定性为单次 fail-safe 降级；全新同源隔离回放连续三次恢复 approved-raw-ready。由于原临时 runtime 已按成功流程清理，不能把回放冒充同一 runtime 原位恢复。"
+  },
+  "boundaries": {
+    "formalImageGenerationCalls": 0,
+    "formalProjectTouched": false,
+    "secondProviderEvidence": false,
+    "productionContinuityPassed": false,
+    "gitStage": 0
+  }
+}

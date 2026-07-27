@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "kind": "agent-imagegen-visual-review",
+  "scope": "synthetic-canary-contract",
+  "rawSha256": "d6bff7f86ee00322daf105a02c86bf62f3cebc44e533abf9cca26332ab894875",
+  "packFingerprint": "3b91ba54398ffe4e50e99442fe3bc8b497c868ce6def034c59f74ede6f47ba7d",
+  "decision": "pass",
+  "reviewer": "/root/original-size-visual-review",
+  "reviewedAt": "2026-07-18T07:25:59Z",
+  "note": "原尺寸 941x1672 检查：单张竖屏写实画面；一名黑色束发古装青年在灰黑石室中双手持完整对称黄金面具，左侧火光成立；无字幕、水印、分屏、现代物或额外人物。合成色块参考仅证明白名单传递，不证明真实人物身份一致性。",
+  "criteria": [
+    {
+      "code": "prompt-contract",
+      "status": "pass",
+      "note": "单张 9:16 竖屏电影写实画面，主体居中并双手持完整黄金面具。"
+    },
+    {
+      "code": "prop-scene-consistency",
+      "status": "pass",
+      "note": "面具完整、对称、无裂缝或半面结构；灰黑巨石室与左侧火光清晰，未换为室外。"
+    },
+    {
+      "code": "forbidden-content",
+      "status": "pass",
+      "note": "未见拼图、分屏、字幕、水印、界面文字、现代物或未声明人物。"
+    },
+    {
+      "code": "image-quality",
+      "status": "pass",
+      "note": "PNG 可解码，941x1672，曝光与主体细节清楚，手部、面具和石室结构可辨。"
+    }
+  ]
+}

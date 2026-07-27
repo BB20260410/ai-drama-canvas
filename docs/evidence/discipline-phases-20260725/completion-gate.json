@@ -1,0 +1,44 @@
+{
+  "kind": "discipline-phases-completion-gate",
+  "P0": {
+    "pass": true,
+    "evidence": [
+      "P0_日常8步操作卡.md",
+      "p0-redline-sentinel.json",
+      "p0-active-project-probe.json"
+    ]
+  },
+  "P1": {
+    "pass": true,
+    "evidence": [
+      "p1-isolation-formal-bond.json",
+      "p1-unit-retro.json"
+    ]
+  },
+  "P2": {
+    "pass": true,
+    "evidence": [
+      "p2-assist-metrics.json"
+    ]
+  },
+  "P3": {
+    "pass": true,
+    "evidence": [
+      "p3-experience-gate.json"
+    ]
+  },
+  "P4": {
+    "pass": true,
+    "evidence": [
+      "p4-product-boundary.json"
+    ]
+  },
+  "redline": {
+    "pass": true,
+    "evidence": [
+      "p0-redline-sentinel.json"
+    ]
+  },
+  "allPass": true,
+  "createdAt": "2026-07-25T09:27:29.154Z"
+}

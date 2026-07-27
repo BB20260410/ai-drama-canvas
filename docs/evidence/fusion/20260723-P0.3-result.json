@@ -1,0 +1,17 @@
+{
+  "aspect": "P0.3",
+  "status": "PASS",
+  "strategy": "CLEAN_ROOM + reuse planExplicitBindingDecision",
+  "sources": {
+    "peer": "LTX Elements narrative; 火宝属集",
+    "ours": "src/core/studio-elements-bind.ts"
+  },
+  "commands": [
+    {
+      "cmd": "npx vitest run tests/studio-elements-bind.test.ts",
+      "result": "PASS",
+      "tests": 6
+    }
+  ],
+  "usefulness": "Elements 三栏类型推断 + 拖入允许集才 bind；跨集/类型错/空资产/歧义未消歧均 blocked，禁止 candidates[0]"
+}
