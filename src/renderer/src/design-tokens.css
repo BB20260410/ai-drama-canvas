@@ -1,0 +1,85 @@
+/**
+ * P29 全局设计 token 层（合同 §4）：素白 light（默认）/ 墨 dark / 纸 paper 三主题。
+ * 作用域：`:root` + `:root[data-theme]`，由 managed-canvas-theme.ts 的
+ * syncDocumentCanvasTheme 单点切换；与 styles.css 旧画布暗色变量（--surface/--gold 等）
+ * 并存——旧画布继续消费旧变量，新代码一律消费 --ui-*（§3.3 有界壳层）。
+ */
+
+:root {
+  color-scheme: light;
+  /* 色板 · 素白 */
+  --ui-bg: #f7f7f5;
+  --ui-surface: #ffffff;
+  --ui-surface-2: #efefeb;
+  --ui-text: #20241f;
+  --ui-text-2: #5c635c;
+  --ui-text-3: #8a9189;
+  --ui-line: #e2e3de;
+  --ui-accent: #8a6a0d;
+  --ui-accent-strong: #7c5f0a;
+  --ui-accent-soft: rgba(138, 106, 13, 0.12);
+  --ui-accent-contrast: #ffffff;
+  --ui-ok: #3f7d4e;
+  --ui-danger: #b44434;
+  --ui-shadow-pop: 0 8px 24px rgba(32, 36, 31, 0.1);
+  /* 媒体预览区恒深（D-1：行业惯例，深色衬托内容，不随主题漂白） */
+  --ui-preview-bg: #121313;
+  --ui-preview-text: #eceee9;
+  /* 过期/歧义语义色（绑定状态层，随主题可读） */
+  --ui-stale: #6b4f96;
+  /* 字栈（§4.2 中文排版） */
+  --ui-font-sans: ui-sans-serif, system-ui, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  --ui-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  /* 圆角三级（§4.3） */
+  --ui-radius-ctl: 8px;
+  --ui-radius-card: 10px;
+  --ui-radius-panel: 14px;
+  /* 焦点环（§4.5） */
+  --ui-focus-ring: 0 0 0 3px var(--ui-accent-soft);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ui-bg: #101211;
+  --ui-surface: #171917;
+  --ui-surface-2: #232623;
+  --ui-text: #f2f1ec;
+  --ui-text-2: #8f9591;
+  --ui-text-3: #6b716c;
+  --ui-line: #2b2e2c;
+  --ui-accent: #d7b85c;
+  --ui-accent-strong: #e3c567;
+  --ui-accent-soft: rgba(215, 184, 92, 0.16);
+  --ui-accent-contrast: #241d08;
+  --ui-ok: #6f9d78;
+  --ui-danger: #d99182;
+  --ui-shadow-pop: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --ui-preview-bg: #0b0c0b;
+  --ui-preview-text: #e6e8e2;
+  --ui-stale: #b39ddb;
+}
+
+:root[data-theme="paper"] {
+  color-scheme: light;
+  --ui-bg: #f5f0e4;
+  --ui-surface: #fdfaf1;
+  --ui-surface-2: #f0e8d5;
+  --ui-text: #2e2a21;
+  --ui-text-2: #6e6759;
+  --ui-text-3: #98907e;
+  --ui-line: #e2d9c4;
+  --ui-accent: #8f6a1e;
+  --ui-accent-strong: #7a5a14;
+  --ui-accent-soft: rgba(143, 106, 30, 0.16);
+  --ui-accent-contrast: #ffffff;
+  --ui-ok: #4f7a3d;
+  --ui-danger: #a6482f;
+  --ui-shadow-pop: 0 8px 24px rgba(80, 66, 38, 0.14);
+  --ui-preview-bg: #14120e;
+  --ui-preview-text: #f0ead9;
+  --ui-stale: #7a5aa0;
+}

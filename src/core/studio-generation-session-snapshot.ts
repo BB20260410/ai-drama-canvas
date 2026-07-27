@@ -1,0 +1,347 @@
+import { createHash } from "node:crypto";
+import {
+  buildStudioProductionProjectionBundle,
+  type StudioProjectionFrozenReference,
+} from "./studio-production-projection-bundle.js";
+import {
+  listStudioGenerationLatestUnitGridRuns,
+  readAnyStudioGenerationFrozenPack,
+  type AnyStudioGenerationFreezePack,
+} from "./studio-generation-ledger.js";
+import { queryStudioGenerationFreeze } from "./studio-generation.js";
+import type {
+  StudioDashboardCurrentness,
+  StudioDashboardNextAction,
+} from "./studio-production-dashboard.js";
+import type { NextShotContinuitySnapshot } from "./studio-next-shot-continuity.js";
+import type { StudioPostResultObservedActualState } from "./studio-post-result-observation.js";
+
+export const STUDIO_GENERATION_SESSION_SNAPSHOT_SCHEMA_VERSION = 1 as const;
+
+export interface StudioGenerationSessionReference {
+  assetId: string;
+  category: "character" | "scene" | "prop" | "style";
+  presence: "required" | "optional" | "forbidden";
+  role: string;
+  mediaSha256: string;
+  sourceFingerprint: string;
+}
+
+export interface StudioGenerationSessionSnapshot {
+  schemaVersion: typeof STUDIO_GENERATION_SESSION_SNAPSHOT_SCHEMA_VERSION;
+  kind: "studio-generation-session-snapshot";
+  projectId: string;
+  manifestFingerprint: string;
+  unit: {
+    unitId: string;
+    unitRevision: number;
+    panelId: string;
+    panelIndex: number;
+    panelCount: number;
+    unitLocalStartSeconds?: number;
+    unitLocalEndSeconds?: number;
+    episodeAbsoluteStartSeconds?: number;
+    episodeAbsoluteEndSeconds?: number;
+    durationSeconds?: number;
+  };
+  scriptSpans: Array<{
+    scriptRevisionId: string;
+    scriptSha256: string;
+    startOffsetUtf16: number;
+    endOffsetUtf16: number;
+    surfaceSha256: string;
+  }>;
+  binding: {
+    status: string;
+    bindingSet?: {
+      id: string;
+      fingerprint: string;
+      currentness: "current" | "stale";
+      frozenAt: string;
+    };
+  };
+  referenceRoles: {
+    canonicalIdentity: StudioGenerationSessionReference[];
+    continuationSource: StudioGenerationSessionReference[];
+    compositionHint: StudioGenerationSessionReference[];
+    forbidden: StudioGenerationSessionReference[];
+    unclassified: StudioGenerationSessionReference[];
+  };
+  previousActualTail?: {
+    generationRunId?: string;
+    status: "missing" | "current" | "stale";
+    continuationEligible: boolean;
+    observedState?: StudioPostResultObservedActualState;
+    continuitySnapshot?: NextShotContinuitySnapshot;
+    fingerprint: string;
+  };
+  camera: {
+    current?: {
+      shotComposition: string;
+      filmingMethod: string;
+      shotType: "original" | "extension";
+    };
+    previous?: {
+      axisLine?: string;
+      screenDirection?: string;
+      cutExit?: string;
+    };
+  };
+  topRisk: {
+    code: string;
+    message: string;
+    severity: "blocking" | "warning";
+    source: "generation-unknown" | "binding" | "freeze" | "observation";
+  } | null;
+  nextAction: StudioDashboardNextAction;
+  currentness: StudioDashboardCurrentness | "blocked";
+  fingerprint: string;
+  builtAt: string;
+}
+
+function stable(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stable);
+  if (!value || typeof value !== "object") return value;
+  return Object.fromEntries(Object.entries(value as Record<string, unknown>)
+    .filter(([, entry]) => entry !== undefined)
+    .sort(([left], [right]) => left.localeCompare(right, "en"))
+    .map(([key, entry]) => [key, stable(entry)]));
+}
+
+function digest(value: unknown): string {
+  return createHash("sha256").update(JSON.stringify(stable(value)), "utf8").digest("hex");
+}
+
+function panelPack(
+  pack: AnyStudioGenerationFreezePack | null,
+  panelId: string,
+) {
+  if (!pack) return undefined;
+  if (pack.provenance === "asset-binding-set") {
+    return pack.target.panelId === panelId ? pack : undefined;
+  }
+  return pack.panels.find((panel) => panel.panelId === panelId)?.panelPack;
+}
+
+function referenceFromFrozen(
+  reference: StudioProjectionFrozenReference,
+): StudioGenerationSessionReference {
+  return {
+    assetId: reference.assetId,
+    category: reference.category,
+    presence: reference.presence,
+    role: reference.role,
+    mediaSha256: reference.media.mediaSha256,
+    sourceFingerprint: reference.sourceFingerprint,
+  };
+}
+
+function referenceRoles(
+  references: StudioGenerationSessionReference[],
+): StudioGenerationSessionSnapshot["referenceRoles"] {
+  const sorted = [...references].sort((left, right) =>
+    left.assetId.localeCompare(right.assetId, "en")
+    || left.role.localeCompare(right.role, "en"));
+  const canonicalIdentity = sorted.filter((entry) =>
+    entry.presence !== "forbidden"
+    && (entry.role === "canonical_identity" || entry.role === "canonical-identity"));
+  const continuationSource = sorted.filter((entry) =>
+    entry.presence !== "forbidden"
+    && (entry.role === "continuation_source" || entry.role === "continuation-source"));
+  const compositionHint = sorted.filter((entry) =>
+    entry.presence !== "forbidden"
+    && (entry.role === "composition_hint" || entry.role === "composition-hint"));
+  const forbidden = sorted.filter((entry) => entry.presence === "forbidden");
+  const classified = new Set([
+    ...canonicalIdentity,
+    ...continuationSource,
+    ...compositionHint,
+    ...forbidden,
+  ].map((entry) => entry.sourceFingerprint));
+  return {
+    canonicalIdentity,
+    continuationSource,
+    compositionHint,
+    forbidden,
+    unclassified: sorted.filter((entry) => !classified.has(entry.sourceFingerprint)),
+  };
+}
+
+/**
+ * Codex 决策前态势快照。它只编排既有 owner 的只读投影，不拥有状态，
+ * 不返回 localPath/objectPath/SQLite 路径，也不替代 freeze pack。
+ */
+export async function buildStudioGenerationSessionSnapshot(
+  projectRoot: string,
+  query: { unitId: string; panelId?: string },
+): Promise<StudioGenerationSessionSnapshot> {
+  const bundle = await buildStudioProductionProjectionBundle(projectRoot, query);
+  const selectedPanelId = query.panelId
+    ?? bundle.currentUnit.selectedPanelId
+    ?? bundle.currentUnit.panels[0]?.panelId;
+  const panel = bundle.currentUnit.panels.find((entry) => entry.panelId === selectedPanelId);
+  if (!selectedPanelId || !panel) {
+    throw new Error(`单元 ${query.unitId} 没有可用于生成会话的当前宫格。`);
+  }
+
+  // readiness 返回的是当前态候选包，尚未执行 freeze 时不会出现在账本里。
+  // 会话快照必须直接使用这份内存候选，不能把“未持久化”误判成缺少剧本/
+  // 参考资产；只有当前 readiness 已阻断时，才用正式 PASS 绑定的历史包补充
+  // 只读上下文，而且 topRisk/currentness 仍保持 blocked。
+  const readiness = await queryStudioGenerationFreeze(projectRoot, {
+    unitId: query.unitId,
+    panelId: selectedPanelId,
+  });
+  const persistedPackId = bundle.currentUnit.frozenPackIdentity?.id;
+  const persistedPack = readiness.status === "blocked" && persistedPackId
+    ? await readAnyStudioGenerationFrozenPack(projectRoot, persistedPackId)
+    : null;
+  const pack: AnyStudioGenerationFreezePack | null = readiness.status === "ready"
+    ? readiness.pack
+    : persistedPack;
+  const frozenPanel = panelPack(pack, selectedPanelId);
+  const latestRun = (await listStudioGenerationLatestUnitGridRuns(projectRoot, [query.unitId]))[0]?.latestRun;
+
+  const frozenReferences = frozenPanel
+    ? [
+        ...frozenPanel.assets.map((entry) => ({
+          assetId: entry.assetId,
+          category: entry.category,
+          presence: entry.presence,
+          role: entry.role,
+          mediaSha256: entry.version.mediaSha256,
+          sourceFingerprint: entry.sourceFingerprint,
+        })),
+        ...frozenPanel.forbiddenAssets.map((entry) => ({
+          assetId: entry.assetId,
+          category: entry.category,
+          presence: entry.presence,
+          role: entry.role,
+          mediaSha256: entry.version.mediaSha256,
+          sourceFingerprint: entry.sourceFingerprint,
+        })),
+      ]
+    : bundle.currentUnit.frozenReferences
+      .filter((entry) => entry.panelId === selectedPanelId)
+      .map(referenceFromFrozen);
+
+  const bindingBlocking = panel.binding.blockers.find((entry) => entry.severity === "blocking");
+  const bindingWarning = panel.binding.blockers.find((entry) => entry.severity === "warning");
+  const incoming = bundle.observation.incoming;
+  const topRisk: StudioGenerationSessionSnapshot["topRisk"] =
+    latestRun?.callStatus === "generation_unknown"
+      ? {
+          code: "generation-unknown",
+          message: `run ${latestRun.generationRunId} 的调用状态不明，必须先对账，禁止重派。`,
+          severity: "blocking",
+          source: "generation-unknown",
+        }
+      : bindingBlocking
+        ? {
+            code: bindingBlocking.code,
+            message: bindingBlocking.message,
+            severity: "blocking",
+            source: "binding",
+          }
+        : panel.generationFreeze.status === "blocked"
+          ? {
+              code: "freeze-blocked",
+              message: "当前宫格冻结准入被 Core 阻断；按 nextAction 修复后重新读取。",
+              severity: "blocking",
+              source: "freeze",
+            }
+          : incoming?.status === "stale" || (incoming?.blockers.length ?? 0) > 0
+            ? {
+                code: "previous-actual-tail-stale",
+                message: incoming?.blockers[0] ?? "上一镜实际末态已陈旧。",
+                severity: "blocking",
+                source: "observation",
+              }
+            : bindingWarning
+              ? {
+                  code: bindingWarning.code,
+                  message: bindingWarning.message,
+                  severity: "warning",
+                  source: "binding",
+                }
+              : null;
+
+  const target = frozenPanel?.target;
+  const previousSnapshot = incoming?.continuitySnapshot;
+  const body = {
+    schemaVersion: STUDIO_GENERATION_SESSION_SNAPSHOT_SCHEMA_VERSION,
+    kind: "studio-generation-session-snapshot" as const,
+    projectId: bundle.projectId,
+    manifestFingerprint: bundle.manifestFingerprint,
+    unit: {
+      unitId: bundle.currentUnit.unitId,
+      unitRevision: bundle.currentUnit.revision,
+      panelId: selectedPanelId,
+      panelIndex: panel.panelIndex,
+      panelCount: bundle.currentUnit.panels.length,
+      ...(target
+        ? {
+            unitLocalStartSeconds: target.unitLocalStartSeconds,
+            unitLocalEndSeconds: target.unitLocalEndSeconds,
+            episodeAbsoluteStartSeconds: target.episodeAbsoluteStartSeconds,
+            episodeAbsoluteEndSeconds: target.episodeAbsoluteEndSeconds,
+            durationSeconds: target.durationSeconds,
+          }
+        : {}),
+    },
+    scriptSpans: frozenPanel?.assetBinding.bindingSet.sourceSpans ?? [],
+    binding: {
+      status: panel.binding.status,
+      bindingSet: panel.binding.bindingSet,
+    },
+    referenceRoles: referenceRoles(frozenReferences),
+    previousActualTail: incoming
+      ? {
+          generationRunId: incoming.generationRunId,
+          status: incoming.status,
+          continuationEligible: incoming.continuationEligible,
+          observedState: incoming.observedState,
+          continuitySnapshot: incoming.continuitySnapshot,
+          fingerprint: incoming.stamp.fingerprint,
+        }
+      : undefined,
+    camera: {
+      current: frozenPanel
+        ? {
+            shotComposition: frozenPanel.panel.shotComposition,
+            filmingMethod: frozenPanel.panel.filmingMethod,
+            shotType: frozenPanel.panel.shotType,
+          }
+        : undefined,
+      previous: previousSnapshot
+        ? {
+            axisLine: previousSnapshot.scene.axisLine,
+            screenDirection: previousSnapshot.scene.screenDirection,
+            cutExit: previousSnapshot.scene.cutExit,
+          }
+        : undefined,
+    },
+    topRisk,
+    nextAction: bundle.nextAction,
+    currentness: topRisk?.severity === "blocking"
+      ? "blocked" as const
+      : !panel.binding.bindingSet
+        ? "missing" as const
+        : bundle.currentness,
+    builtAt: new Date().toISOString(),
+  };
+  return {
+    ...body,
+    fingerprint: digest({
+      unit: body.unit,
+      scriptSpans: body.scriptSpans,
+      binding: body.binding.bindingSet
+        ? { id: body.binding.bindingSet.id, fingerprint: body.binding.bindingSet.fingerprint }
+        : null,
+      referenceRoles: body.referenceRoles,
+      previousActualTail: body.previousActualTail,
+      camera: body.camera,
+      topRiskCode: body.topRisk?.code ?? null,
+    }),
+  };
+}

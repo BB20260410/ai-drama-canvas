@@ -1,0 +1,156 @@
+<template>
+  <section class="continuation-view">
+    <header class="continuation-header">
+      <div><span class="eyebrow">Codex 接续</span><h2>项目记忆与执行规则</h2><p>从真实文件生成下一任务、关联上下文和可复制接续提示词。</p></div>
+      <nav><button v-for="entry in tabs" :key="entry.id" type="button" :data-testid="`continuation-tab-${entry.id}`" :class="{ active: tab === entry.id }" @click="tab = entry.id"><component :is="entry.icon" :size="14" />{{ entry.label }}</button></nav>
+      <button class="refresh-button" type="button" :disabled="loading" @click="loadAll"><RefreshCw :size="14" :class="{ spinning: loading }" /> 刷新</button>
+    </header>
+
+    <div v-if="loading && !snapshot" class="continuation-empty"><LoaderCircle class="spinning" :size="24" />正在读取真实进度与项目记忆…</div>
+
+    <div v-else-if="tab === 'brief' && snapshot" class="brief-layout">
+      <aside class="queue-rail">
+        <header><span>下一任务</span><b>{{ snapshot.nextItems.length }}</b></header>
+        <button v-for="item in snapshot.nextItems" :key="item.id" type="button" :class="{ active: snapshot.focusItem?.id === item.id }" @click="selectFocus(item.id)"><span>EP{{ pad(item.episode) }} · 15s {{ pad(item.unit,3) }}</span><b>{{ item.title }}</b><small>{{ item.status }}</small><i></i></button>
+        <div v-if="!snapshot.nextItems.length" class="rail-empty">暂无可领取单元</div>
+        <section class="blocker-list"><header><span>阻塞</span><b>{{ snapshot.blockers.length }}</b></header><article v-for="item in snapshot.blockers.slice(0,8)" :key="item.id"><b>{{ item.title }}</b><small>{{ item.failureReason || item.nextAction }}</small></article></section>
+      </aside>
+
+      <main class="brief-main">
+        <section v-if="snapshot.generationRecovery.length" class="recovery-banner">
+          <header><div><span>中断恢复优先</span><h3>{{ snapshot.generationRecovery.length }} 个生成任务必须先对账</h3></div><b>禁止自动重提</b></header>
+          <article v-for="job in snapshot.generationRecovery" :key="job.jobId"><div><b>{{ job.jobId }}</b><small>{{ job.providerId }} · {{ job.kind }} · {{ job.browserCheckpoint?.stage || job.status }} · R{{ job.browserCheckpoint?.revision || '—' }}</small></div><span>clientJobId {{ job.browserCheckpoint?.submissionIntent?.clientJobId || job.jobId }}</span></article>
+          <p>先查供应商任务列表、clientJobId 或浏览器历史；找到后登记 externalTaskId，确认不存在后关闭旧任务并创建新版本。</p>
+        </section>
+        <section class="focus-sheet">
+          <header><div><span>当前焦点</span><h3>{{ snapshot.focusItem?.title || '等待选择任务' }}</h3><p>{{ snapshot.focusItem?.id || '没有未完成生产单元' }}</p></div><b :class="snapshot.focusItem ? statusClass(snapshot.focusItem.status) : ''">{{ snapshot.focusItem?.status || '空闲' }}</b></header>
+          <div class="focus-action"><span>下一动作</span><p>{{ snapshot.focusItem?.nextAction || '项目当前没有可领取任务。' }}</p></div>
+          <dl><div><dt>真实快照</dt><dd>{{ formatTime(snapshot.scannedAt) }}</dd></div><div><dt>待续做</dt><dd>{{ snapshot.summary.active }}</dd></div><div><dt>机械异常</dt><dd>{{ snapshot.summary.mechanicalFailures }}</dd></div><div><dt>启用 Skill</dt><dd>{{ snapshot.activeSkills.length }}</dd></div></dl>
+        </section>
+        <section class="context-strip"><header><span>关联上下文</span><small>记忆、节点、硬锁、验收与事件联合检索</small></header><div><article v-for="hit in snapshot.relatedContext.slice(0,8)" :key="`${hit.source}-${hit.id}`"><i :class="hit.source">{{ sourceLabel(hit.source) }}</i><div><b>{{ hit.title }}</b><p>{{ hit.excerpt }}</p><small v-if="hit.path">{{ hit.path }}</small></div></article><p v-if="!snapshot.relatedContext.length" class="no-content">尚无关联项目记忆</p></div></section>
+        <section class="activity-strip"><header><span>最近活动</span><small>{{ snapshot.recentEvents.length }} 条</small></header><div><article v-for="event in snapshot.recentEvents.slice(0,10)" :key="event.id"><i></i><div><b>{{ eventLabel(event.type) }}</b><span>{{ formatTime(event.at) }} · {{ event.actor }}</span><small>{{ event.itemId || event.taskId || '' }}</small></div></article></div></section>
+      </main>
+
+      <aside class="prompt-rail">
+        <header><div><span>接续提示词</span><small>{{ snapshot.prompt.length }} 字</small></div><button type="button" @click="copyPrompt"><Copy :size="13" /> {{ copied ? '已复制' : '复制' }}</button></header>
+        <pre>{{ snapshot.prompt }}</pre>
+        <footer><button type="button" class="handoff-button" :disabled="creatingHandoff" @click="createHandoff"><FileOutput :size="14" /> {{ creatingHandoff ? '正在落盘' : '生成接续文件' }}</button><p>保存到 .aicanvas/handoffs，可在新 Codex 任务直接继续。</p></footer>
+      </aside>
+    </div>
+
+    <div v-else-if="tab === 'memory'" class="memory-layout">
+      <aside class="memory-index">
+        <header><span>项目记忆</span><button type="button" data-testid="new-context" @click="newContext"><Plus :size="14" /></button></header>
+        <label class="memory-search"><Search :size="13" /><input v-model="contextQuery" placeholder="角色、设定、问题或节点" /></label>
+        <select v-model="contextKindFilter"><option value="all">全部类型</option><option v-for="kind in contextKinds" :key="kind" :value="kind">{{ kindLabel(kind) }}</option></select>
+        <button v-for="entry in filteredContext" :key="entry.id" type="button" data-testid="context-row" :data-context-id="entry.id" :class="{ active: contextDraft.id === entry.id }" @click="selectContext(entry)"><i :class="entry.kind"></i><div><span>{{ kindLabel(entry.kind) }} · r{{ entry.revision }}</span><b>{{ entry.title }}</b><small>{{ entry.content }}</small></div></button>
+        <div v-if="!filteredContext.length" class="rail-empty">没有匹配的项目记忆</div>
+      </aside>
+
+      <main class="memory-editor">
+        <header><div><span>{{ contextDraft.id ? '编辑项目记忆' : '新建项目记忆' }}</span><h3>{{ contextDraft.title || '未命名记忆' }}</h3></div><div><button v-if="contextDraft.id" type="button" class="danger-action" data-testid="delete-context" @click="removeContext"><Trash2 :size="13" /> 删除</button><button type="button" class="save-action" data-testid="save-context" :disabled="savingContext || !contextDraft.title.trim()" @click="saveContext"><Save :size="13" /> {{ savingContext ? '保存中' : '保存' }}</button></div></header>
+        <div class="memory-form"><div class="memory-meta"><label><span>类型</span><select v-model="contextDraft.kind"><option v-for="kind in contextKinds" :key="kind" :value="kind">{{ kindLabel(kind) }}</option></select></label><label><span>标题</span><input v-model="contextDraft.title" /></label></div><label><span>内容</span><textarea v-model="contextDraft.content" rows="16" placeholder="写清确定事实、适用范围和不能违反的条件。"></textarea></label><label><span>标签</span><input v-model="contextDraft.tagsText" placeholder="阿航, 黄金面具, 祭坛" /></label><label><span>关联节点 ID</span><textarea v-model="contextDraft.itemIdsText" rows="3" placeholder="每行一个 WorkItem ID"></textarea></label><label><span>来源路径</span><textarea v-model="contextDraft.sourcePathsText" rows="3" placeholder="每行一个真实文件路径"></textarea></label></div>
+      </main>
+
+      <aside class="search-results">
+        <header><span>真实关联</span><small>{{ searchHits.length }} 条</small></header>
+        <p class="search-hint">检索范围包含显式记忆、生产节点、硬锁、视觉验收和事件。</p>
+        <article v-for="hit in searchHits" :key="`${hit.source}-${hit.id}`"><i :class="hit.source">{{ sourceLabel(hit.source) }}</i><div><b>{{ hit.title }}</b><p>{{ hit.excerpt }}</p><small v-if="hit.itemId">{{ hit.itemId }}</small></div></article>
+        <div v-if="contextQuery && !searchHits.length" class="rail-empty">没有真实关联结果</div>
+      </aside>
+    </div>
+
+    <div v-else class="skills-layout">
+      <aside class="skill-index">
+        <header><span>项目 Skill</span><button type="button" @click="newSkill"><Plus :size="14" /></button></header>
+        <button v-for="skill in skills" :key="skill.id" type="button" :class="{ active: skillDraft.id === skill.id }" @click="selectSkill(skill)"><i :class="{ enabled: skill.enabled }"></i><div><span>{{ categoryLabel(skill.category) }} · r{{ skill.revision }}</span><b>{{ skill.name }}</b><small>{{ skill.description }}</small></div></button>
+      </aside>
+
+      <main class="skill-editor">
+        <header><div><span>Markdown Skill</span><h3>{{ skillDraft.name || '新建项目 Skill' }}</h3></div><button type="button" class="save-action" :disabled="savingSkill || !skillDraft.id || !skillDraft.name.trim()" @click="saveSkill"><Save :size="13" /> {{ savingSkill ? '保存中' : '保存并备份旧版' }}</button></header>
+        <div class="skill-meta"><label><span>ID</span><input v-model="skillDraft.id" :disabled="Boolean(skillDraft.updatedAt)" placeholder="custom-skill" /></label><label><span>类别</span><select v-model="skillDraft.category"><option v-for="category in skillCategories" :key="category" :value="category">{{ categoryLabel(category) }}</option></select></label><label class="skill-enabled"><span>启用</span><input v-model="skillDraft.enabled" type="checkbox" /></label></div>
+        <label class="wide-field"><span>名称</span><input v-model="skillDraft.name" /></label><label class="wide-field"><span>用途说明</span><input v-model="skillDraft.description" /></label><label class="skill-body"><span>执行规则</span><textarea v-model="skillDraft.content" spellcheck="false"></textarea></label>
+      </main>
+
+      <aside class="skill-inspector">
+        <header><span>执行边界</span><small>{{ skillDraft.enabled ? '已启用' : '已停用' }}</small></header>
+        <dl><div><dt>当前版本</dt><dd>r{{ skillDraft.revision || 0 }}</dd></div><div><dt>文件</dt><dd>{{ skillDraft.path || '保存后生成' }}</dd></div><div><dt>最后更新</dt><dd>{{ skillDraft.updatedAt ? formatTime(skillDraft.updatedAt) : '未保存' }}</dd></div></dl>
+        <section><b>如何生效</b><p>启用的 Skill 会写入新任务包，并出现在 Codex 接续提示词中。Codex 必须先读取 Skill 文件，再执行生产任务。</p></section>
+        <section><b>版本安全</b><p>每次保存前，旧版自动备份到 `.aicanvas/history/skills/`；并发更新会拒绝静默覆盖。</p></section>
+        <button v-if="skillDraft.path" type="button" @click="revealSkill"><FolderOpen :size="13" /> 在 Finder 中查看</button>
+      </aside>
+    </div>
+  </section>
+</template>
+
+<script setup lang="ts">
+import { computed, markRaw, onMounted, reactive, ref, watch } from "vue";
+import { BookOpenText, Brain, Copy, FileOutput, FolderOpen, LoaderCircle, Plus, RefreshCw, Save, Search, SlidersHorizontal, Trash2 } from "lucide-vue-next";
+import type { AgentSkill, AgentSkillCategory, ContextSearchHit, ContinuationSnapshot, ProjectContextEntry, ProjectContextKind, ProjectEvent } from "@core/types";
+import { statusClass } from "../utils";
+
+const props = defineProps<{ projectRoot: string }>();
+const emit = defineEmits<{ changed: [message: string]; failed: [message: string] }>();
+const tabs = [{ id: "brief" as const, label: "接续简报", icon: markRaw(BookOpenText) }, { id: "memory" as const, label: "项目记忆", icon: markRaw(Brain) }, { id: "skills" as const, label: "Skill 规则", icon: markRaw(SlidersHorizontal) }];
+const tab = ref<"brief" | "memory" | "skills">("brief");
+const loading = ref(true);
+const snapshot = ref<ContinuationSnapshot | null>(null);
+const contextEntries = ref<ProjectContextEntry[]>([]);
+const searchHits = ref<ContextSearchHit[]>([]);
+const skills = ref<AgentSkill[]>([]);
+const copied = ref(false);
+const creatingHandoff = ref(false);
+const savingContext = ref(false);
+const savingSkill = ref(false);
+const contextQuery = ref("");
+const contextKindFilter = ref<ProjectContextKind | "all">("all");
+const contextKinds: ProjectContextKind[] = ["canon", "character", "location", "prop", "continuity", "decision", "issue", "handoff"];
+const skillCategories: AgentSkillCategory[] = ["orchestration", "production", "continuity", "review", "custom"];
+type ContextDraft = { id?: string; kind: ProjectContextKind; title: string; content: string; tagsText: string; itemIdsText: string; sourcePathsText: string; revision?: number };
+type SkillDraft = { id: string; name: string; description: string; category: AgentSkillCategory; enabled: boolean; content: string; revision: number; path: string; updatedAt: string };
+const contextDraft = reactive<ContextDraft>(emptyContext());
+const skillDraft = reactive<SkillDraft>(emptySkill());
+let searchTimer: ReturnType<typeof setTimeout> | undefined;
+
+const filteredContext = computed(() => contextEntries.value.filter((entry) => contextKindFilter.value === "all" || entry.kind === contextKindFilter.value).filter((entry) => !contextQuery.value.trim() || `${entry.title} ${entry.content} ${entry.tags.join(" ")}`.toLowerCase().includes(contextQuery.value.trim().toLowerCase())));
+watch(contextQuery, () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => void search(), 180); });
+watch(tab, (value) => { if (value === "memory" && !contextDraft.id && contextEntries.value[0]) selectContext(contextEntries.value[0]); if (value === "skills" && !skillDraft.id && skills.value[0]) selectSkill(skills.value[0]); });
+onMounted(() => void loadAll());
+
+async function loadAll() {
+  loading.value = true;
+  try {
+    const [nextSnapshot, nextContext, nextSkills] = await Promise.all([window.canvasApi.getContinuation(props.projectRoot), window.canvasApi.listContext(props.projectRoot), window.canvasApi.listSkills(props.projectRoot)]);
+    snapshot.value = nextSnapshot; contextEntries.value = nextContext; skills.value = nextSkills;
+    if (!contextDraft.id && nextContext[0]) selectContext(nextContext[0]);
+    if (!skillDraft.id && nextSkills[0]) selectSkill(nextSkills[0]);
+  } catch (error) { emit("failed", message(error)); }
+  finally { loading.value = false; }
+}
+async function selectFocus(itemId: string) { loading.value = true; try { snapshot.value = await window.canvasApi.getContinuation(props.projectRoot, { itemId }); } catch(error){ emit("failed",message(error)); } finally{ loading.value=false; } }
+async function copyPrompt() { if (!snapshot.value) return; await window.canvasApi.copyText(snapshot.value.prompt); copied.value=true; setTimeout(()=>copied.value=false,1500); }
+async function createHandoff() { if (!snapshot.value) return; creatingHandoff.value=true; try { const result=await window.canvasApi.createHandoff(props.projectRoot,{ itemId:snapshot.value.focusItem?.id }); emit("changed",`接续文件已生成：${result.path}`); await window.canvasApi.showInFolder(result.path); } catch(error){emit("failed",message(error));} finally{creatingHandoff.value=false;} }
+async function search() { const query=contextQuery.value.trim(); searchHits.value=query ? await window.canvasApi.searchContext(props.projectRoot,query,30) : contextDraft.id ? await window.canvasApi.searchContext(props.projectRoot,`${contextDraft.title} ${contextDraft.tagsText}`,30) : []; }
+function emptyContext():ContextDraft{return{kind:"continuity",title:"",content:"",tagsText:"",itemIdsText:"",sourcePathsText:""};}
+function newContext(){Object.assign(contextDraft,emptyContext());searchHits.value=[];}
+function selectContext(entry:ProjectContextEntry){Object.assign(contextDraft,{id:entry.id,kind:entry.kind,title:entry.title,content:entry.content,tagsText:entry.tags.join(", "),itemIdsText:entry.itemIds.join("\n"),sourcePathsText:entry.sourcePaths.join("\n"),revision:entry.revision});void search();}
+async function saveContext(){savingContext.value=true;try{const fields={kind:contextDraft.kind,title:contextDraft.title,content:contextDraft.content,tags:contextDraft.tagsText.split(/,|，|\n/).map(v=>v.trim()).filter(Boolean),itemIds:contextDraft.itemIdsText.split("\n").map(v=>v.trim()).filter(Boolean),sourcePaths:contextDraft.sourcePathsText.split("\n").map(v=>v.trim()).filter(Boolean)};const saved=contextDraft.id?await window.canvasApi.upsertContext(props.projectRoot,{...fields,id:contextDraft.id,expectedRevision:contextDraft.revision!}):await window.canvasApi.upsertContext(props.projectRoot,fields);contextEntries.value=await window.canvasApi.listContext(props.projectRoot);selectContext(saved);snapshot.value=await window.canvasApi.getContinuation(props.projectRoot,{itemId:snapshot.value?.focusItem?.id});emit("changed",`项目记忆已保存：${saved.title}`);}catch(error){emit("failed",message(error));}finally{savingContext.value=false;}}
+async function removeContext(){if(!contextDraft.id||contextDraft.revision===undefined||!window.confirm("删除这条项目记忆？不会删除任何素材文件。"))return;try{await window.canvasApi.deleteContext(props.projectRoot,{contextId:contextDraft.id,expectedRevision:contextDraft.revision});contextEntries.value=await window.canvasApi.listContext(props.projectRoot);newContext();searchHits.value=[];emit("changed","项目记忆已删除");}catch(error){emit("failed",message(error));}}
+function emptySkill():SkillDraft{return{id:"",name:"",description:"",category:"custom",enabled:true,content:"# 新项目 Skill\n\n写清触发条件、执行规则和停止条件。",revision:0,path:"",updatedAt:""};}
+function newSkill(){Object.assign(skillDraft,{...emptySkill(),id:`custom-${Date.now().toString(36)}`});}
+function selectSkill(skill:AgentSkill){Object.assign(skillDraft,{id:skill.id,name:skill.name,description:skill.description,category:skill.category,enabled:skill.enabled,content:skill.content,revision:skill.revision,path:skill.path,updatedAt:skill.updatedAt});}
+async function saveSkill(){savingSkill.value=true;try{const saved=await window.canvasApi.saveSkill(props.projectRoot,{id:skillDraft.id,name:skillDraft.name,description:skillDraft.description,category:skillDraft.category,enabled:skillDraft.enabled,content:skillDraft.content,expectedUpdatedAt:skillDraft.updatedAt||undefined});skills.value=await window.canvasApi.listSkills(props.projectRoot);selectSkill(saved);snapshot.value=await window.canvasApi.getContinuation(props.projectRoot,{itemId:snapshot.value?.focusItem?.id});emit("changed",`Skill 已保存：${saved.name} · r${saved.revision}`);}catch(error){emit("failed",message(error));}finally{savingSkill.value=false;}}
+function revealSkill(){if(skillDraft.path)void window.canvasApi.showInFolder(skillDraft.path);}
+function kindLabel(kind:ProjectContextKind){return({canon:"世界观",character:"角色",location:"场景",prop:"道具",continuity:"连续性",decision:"决策",issue:"问题",handoff:"交接"})[kind];}
+function categoryLabel(category:AgentSkillCategory){return({orchestration:"编排",production:"生产",continuity:"连续性",review:"验收",custom:"自定义"})[category];}
+function sourceLabel(source:ContextSearchHit["source"]){return({memory:"记",item:"节点","hard-lock":"锁",review:"验",event:"事"})[source];}
+function eventLabel(type:string){return({"project.imported":"项目导入","project.scanned":"真实扫描","item.status_updated":"状态更新","review.submitted":"视觉验收","skill.saved":"Skill 更新","context.upserted":"项目记忆更新","handoff.created":"接续文件生成"}as Record<string,string>)[type]??type;}
+function pad(value?:number,length=2){return String(value??0).padStart(length,"0");}
+function formatTime(value:string){return new Date(value).toLocaleString("zh-CN",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"});}
+function message(error:unknown){return error instanceof Error?error.message:String(error);}
+</script>
+
+<style scoped>
+.continuation-view{height:100%;display:grid;grid-template-rows:84px minmax(0,1fr);background:#10110e}.continuation-header{display:grid;grid-template-columns:minmax(260px,1fr) auto minmax(260px,1fr);align-items:center;padding:0 24px;border-bottom:1px solid #30322c;background:#151613}.continuation-header h2{margin:6px 0 3px;font-size:18px}.continuation-header p{margin:0;color:#6e7168;font-size:8px}.continuation-header nav{display:flex;align-self:end;height:42px}.continuation-header nav button{display:flex;align-items:center;gap:6px;padding:0 15px;border:0;border-bottom:2px solid transparent;background:transparent;color:#777a70;font-size:8px;cursor:pointer}.continuation-header nav button.active{border-bottom-color:#d7af55;color:#d7af55}.refresh-button{justify-self:end;height:30px;display:flex;align-items:center;gap:6px;border:1px solid #373931;background:transparent;color:#96998e;font-size:8px}.continuation-empty{display:grid;place-content:center;justify-items:center;gap:10px;color:#65685f;font-size:9px}.brief-layout{min-height:0;display:grid;grid-template-columns:230px minmax(0,1fr) 390px}.queue-rail,.memory-index,.skill-index{min-height:0;overflow:auto;border-right:1px solid #30322c;background:#151613}.queue-rail>header,.blocker-list>header,.memory-index>header,.skill-index>header{height:45px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;border-bottom:1px solid #2e302a;color:#878a80;font-size:8px}.queue-rail>button,.memory-index>button,.skill-index>button{position:relative;width:100%;display:block;padding:13px;border:0;border-bottom:1px solid #292b25;border-left:2px solid transparent;background:transparent;color:#b7b9b0;text-align:left;cursor:pointer}.queue-rail>button:hover,.memory-index>button:hover,.skill-index>button:hover{background:#1b1c18}.queue-rail>button.active,.memory-index>button.active,.skill-index>button.active{border-left-color:#d7af55;background:#202019}.queue-rail>button span,.queue-rail>button b,.queue-rail>button small{display:block}.queue-rail>button span{color:#d7af55;font-size:7px}.queue-rail>button b{margin-top:5px;overflow:hidden;font-size:9px;text-overflow:ellipsis;white-space:nowrap}.queue-rail>button small{margin-top:7px;color:#6a6d64;font-size:7px}.queue-rail>button>i{position:absolute;right:10px;top:12px;width:6px;height:6px;border-radius:50%;background:#d7af55}.blocker-list{margin-top:13px;border-top:1px solid #30322c}.blocker-list article{padding:10px 13px;border-bottom:1px solid #292b25}.blocker-list article b,.blocker-list article small{display:block}.blocker-list article b{font-size:8px}.blocker-list article small{margin-top:5px;color:#805a52;font-size:7px;line-height:1.45}.rail-empty{padding:30px 13px;color:#5e6158;font-size:8px;text-align:center}.brief-main{min-width:0;overflow:auto;padding:24px 27px 60px}.focus-sheet{border-top:1px solid #3a3c34}.focus-sheet>header{min-height:92px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #30322c}.focus-sheet>header span{color:#d7af55;font-size:7px}.focus-sheet>header h3{margin:7px 0 5px;font-size:20px}.focus-sheet>header p{margin:0;color:#5f6259;font:8px Menlo,monospace}.focus-sheet>header>b{color:#9a9d92;font-size:8px}.focus-action{padding:17px 0;border-bottom:1px solid #30322c}.focus-action span{color:#6c6f65;font-size:7px}.focus-action p{margin:7px 0 0;font-size:10px}.focus-sheet dl{display:grid;grid-template-columns:repeat(4,1fr);margin:0;border-bottom:1px solid #30322c}.focus-sheet dl>div{padding:13px 0;border-right:1px solid #2d2f29}.focus-sheet dl>div+div{padding-left:13px}.focus-sheet dt{color:#63665d;font-size:7px}.focus-sheet dd{margin:6px 0 0;font:9px Menlo,monospace}.context-strip,.activity-strip{margin-top:28px}.context-strip>header,.activity-strip>header{display:flex;justify-content:space-between;padding-bottom:9px;border-bottom:1px solid #30322c;color:#85887d;font-size:8px}.context-strip>header small,.activity-strip>header small{color:#5d6057}.context-strip article{display:grid;grid-template-columns:24px 1fr;gap:9px;padding:12px 0;border-bottom:1px solid #292b25}.context-strip article>i,.search-results article>i{width:21px;height:21px;display:grid;place-items:center;border:1px solid #4a4c43;color:#a0a299;font:7px Menlo,monospace;font-style:normal}.context-strip article>i.hard-lock,.search-results article>i.hard-lock{border-color:#6b5830;color:#d7af55}.context-strip article b,.context-strip article p,.context-strip article small{display:block}.context-strip article b{font-size:9px}.context-strip article p{margin:6px 0 0;color:#83867c;font-size:8px;line-height:1.45}.context-strip article small{margin-top:5px;overflow:hidden;color:#55584f;font:6px Menlo,monospace;text-overflow:ellipsis;white-space:nowrap}.activity-strip>div{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.activity-strip article{display:grid;grid-template-columns:12px 1fr;gap:7px;padding:10px 0;border-bottom:1px solid #292b25}.activity-strip article>i{width:5px;height:5px;margin-top:2px;border-radius:50%;background:#686b62}.activity-strip article b,.activity-strip article span,.activity-strip article small{display:block}.activity-strip article b{font-size:8px}.activity-strip article span,.activity-strip article small{margin-top:4px;color:#5e6158;font-size:7px}.prompt-rail{min-height:0;display:grid;grid-template-rows:52px minmax(0,1fr) 96px;border-left:1px solid #30322c;background:#171815}.prompt-rail>header{display:flex;align-items:center;justify-content:space-between;padding:0 15px;border-bottom:1px solid #30322c}.prompt-rail>header span,.prompt-rail>header small{display:block}.prompt-rail>header span{font-size:9px}.prompt-rail>header small{margin-top:3px;color:#5e6158;font-size:7px}.prompt-rail>header button{display:flex;align-items:center;gap:5px;border:0;background:transparent;color:#d7af55;font-size:8px}.prompt-rail pre{overflow:auto;margin:0;padding:17px;color:#a6a89e;font:8px/1.65 Menlo,monospace;white-space:pre-wrap;word-break:break-word}.prompt-rail>footer{padding:13px 15px;border-top:1px solid #30322c}.handoff-button{height:32px;width:100%;display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid #d7af55;background:#d7af55;color:#17130a;font-size:8px;font-weight:700}.prompt-rail>footer p{margin:7px 0 0;color:#5d6057;font-size:7px}.memory-layout{min-height:0;display:grid;grid-template-columns:250px minmax(0,1fr) 340px}.memory-index>header button,.skill-index>header button{border:0;background:transparent;color:#d7af55}.memory-search{height:39px;display:flex;align-items:center;gap:7px;padding:0 11px;border-bottom:1px solid #292b25;color:#65685f}.memory-search input{min-width:0;flex:1;border:0;background:transparent;color:#ddd;outline:0;font-size:8px}.memory-index>select{width:calc(100% - 22px);height:28px;margin:9px 11px;border:1px solid #35372f;background:#191a17;color:#999c92;font-size:8px}.memory-index>button,.skill-index>button{display:grid;grid-template-columns:11px 1fr;gap:7px}.memory-index>button>i,.skill-index>button>i{width:6px;height:6px;margin-top:2px;border-radius:50%;background:#777970}.memory-index>button>i.issue{background:#d36b59}.memory-index>button>i.decision,.memory-index>button>i.continuity{background:#d7af55}.skill-index>button>i.enabled{background:#83aa72}.memory-index>button span,.memory-index>button b,.memory-index>button small,.skill-index>button span,.skill-index>button b,.skill-index>button small{display:block}.memory-index>button span,.skill-index>button span{color:#696c63;font-size:7px}.memory-index>button b,.skill-index>button b{margin-top:5px;overflow:hidden;font-size:9px;text-overflow:ellipsis;white-space:nowrap}.memory-index>button small,.skill-index>button small{margin-top:6px;overflow:hidden;color:#5c5f56;font-size:7px;text-overflow:ellipsis;white-space:nowrap}.memory-editor,.skill-editor{min-width:0;overflow:auto;background:#11120f}.memory-editor>header,.skill-editor>header{height:74px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid #30322c;background:#141512}.memory-editor>header span,.skill-editor>header span{color:#d7af55;font-size:7px}.memory-editor>header h3,.skill-editor>header h3{margin:6px 0 0;font-size:15px}.memory-editor>header>div:last-child{display:flex;gap:7px}.save-action,.danger-action{height:30px;display:flex;align-items:center;gap:6px;padding:0 10px;border:1px solid #3a3c34;background:transparent;color:#d7af55;font-size:8px}.danger-action{color:#d36b59;border-color:#4f302b}.memory-form{padding:17px 20px 50px}.memory-meta{display:grid;grid-template-columns:170px 1fr;gap:10px}.memory-form label,.wide-field,.skill-body,.skill-meta label{display:block;margin-bottom:13px}.memory-form label>span,.wide-field>span,.skill-body>span,.skill-meta label>span{display:block;margin-bottom:7px;color:#73766c;font-size:8px}.memory-form input,.memory-form select,.memory-form textarea,.skill-editor input,.skill-editor select,.skill-editor textarea{width:100%;border:1px solid #34362f;outline:0;background:#191a17;color:#deded6;padding:9px;font-size:8px}.memory-form textarea,.skill-editor textarea{resize:vertical;line-height:1.55}.memory-form input:focus,.memory-form textarea:focus,.skill-editor input:focus,.skill-editor textarea:focus{border-color:#66572f}.search-results,.skill-inspector{min-height:0;overflow:auto;border-left:1px solid #30322c;background:#171815}.search-results>header,.skill-inspector>header{height:47px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid #30322c;color:#85887d;font-size:8px}.search-hint{margin:0;padding:12px 14px;border-bottom:1px solid #292b25;color:#5e6158;font-size:7px;line-height:1.45}.search-results article{display:grid;grid-template-columns:23px 1fr;gap:8px;padding:12px 14px;border-bottom:1px solid #292b25}.search-results article b,.search-results article p,.search-results article small{display:block}.search-results article b{font-size:8px}.search-results article p{margin:5px 0 0;color:#7e8177;font-size:7px;line-height:1.45}.search-results article small{margin-top:5px;color:#55584f;font:6px Menlo,monospace}.skills-layout{min-height:0;display:grid;grid-template-columns:250px minmax(0,1fr) 300px}.skill-editor>header{position:sticky;top:0;z-index:2}.skill-editor>header .save-action{border-color:#d7af55;background:#d7af55;color:#17130a}.skill-meta{display:grid;grid-template-columns:1fr 170px 70px;gap:10px;padding:17px 20px 0}.skill-enabled input{width:auto;margin-top:9px;accent-color:#d7af55}.wide-field{padding:0 20px}.skill-body{height:calc(100% - 270px);min-height:380px;padding:0 20px 35px}.skill-body textarea{height:100%;min-height:350px;resize:none;font:9px/1.7 Menlo,monospace}.skill-inspector dl{margin:0;padding:0 14px}.skill-inspector dl>div{padding:12px 0;border-bottom:1px solid #292b25}.skill-inspector dt{color:#62655c;font-size:7px}.skill-inspector dd{margin:5px 0 0;overflow-wrap:anywhere;color:#a0a299;font:7px/1.45 Menlo,monospace}.skill-inspector section{padding:14px;border-bottom:1px solid #292b25}.skill-inspector section b{font-size:8px}.skill-inspector section p{margin:7px 0 0;color:#71746b;font-size:7px;line-height:1.55}.skill-inspector>button{height:30px;display:flex;align-items:center;gap:6px;margin:13px;border:1px solid #3a3c34;background:transparent;color:#d7af55;font-size:8px}.no-content{padding:22px 0;color:#5d6057;font-size:8px}.spinning{animation:spin .9s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.recovery-banner{margin-bottom:22px;border:1px solid #6d4a2b;background:#1b1610}.recovery-banner>header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #4c3522}.recovery-banner>header span{color:#d58a49;font-size:7px}.recovery-banner>header h3{margin:5px 0 0;font-size:14px}.recovery-banner>header>b{color:#d58a49;font-size:8px}.recovery-banner article{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 16px;border-bottom:1px solid #35281c}.recovery-banner article b,.recovery-banner article small{display:block}.recovery-banner article b{font:8px Menlo,monospace}.recovery-banner article small{margin-top:5px;color:#8c8277;font-size:7px}.recovery-banner article>span{overflow:hidden;color:#d0a56a;font:7px Menlo,monospace;text-overflow:ellipsis;white-space:nowrap}.recovery-banner>p{margin:0;padding:11px 16px;color:#9b8d7d;font-size:8px;line-height:1.5}
+</style>

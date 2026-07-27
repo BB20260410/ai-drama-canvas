@@ -11,3 +11,11 @@
 *.json text eol=lf
 *.yaml text eol=lf
 *.yml text eol=lf
+
+# Preserve the validated candidate byte-for-byte while still checking source
+# trailing spaces; several legacy files intentionally contain a final blank line.
+*.ts whitespace=-blank-at-eof
+*.tsx whitespace=-blank-at-eof
+*.js whitespace=-blank-at-eof
+*.mjs whitespace=-blank-at-eof
+*.vue whitespace=-blank-at-eof
