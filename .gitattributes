@@ -19,3 +19,8 @@
 *.js whitespace=-blank-at-eof
 *.mjs whitespace=-blank-at-eof
 *.vue whitespace=-blank-at-eof
+
+# These validated generator sources contain intentional Markdown/template
+# trailing spaces; keep their candidate bytes unchanged.
+scripts/grok-mvp-authority-bind-freeze.mjs whitespace=-trailing-space
+scripts/validate-p8-production-dashboard-final.ts whitespace=-trailing-space

@@ -1,0 +1,734 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-07-20T13:18:20.012Z",
+  "sourceDigest": "28dc56ad8d7bf3f1f1d558d9021f2aaf31cd5ca0fe0b213b827f77ead9ca9294",
+  "note": "P24 固定样本 baseline（3 格型×5 差异×2 分类=30 case）。只能经本脚本显式审核更新；runner 只比对不写。差异类映射说明（附录 D F-R2-03）：asset/binding-set 共享 rebind 触发器、continuity 以 script-changed 呈现、source-spans 以 unit-changed 呈现——BindingSet 词表仅有 4 种可区分观测，覆盖为真但非五路独立词。",
+  "cases": {
+    "two-prompt-expected": {
+      "classification": "expected",
+      "expectedContains": [
+        "prompt-changed",
+        "unit-changed"
+      ],
+      "unexpectedContains": [],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "expected"
+    },
+    "two-prompt-unexpected": {
+      "classification": "unexpected",
+      "expectedContains": [
+        "prompt-changed",
+        "unit-changed"
+      ],
+      "unexpectedContains": [
+        "asset-semantic-changed:character-ahang"
+      ],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "unexpected"
+    },
+    "two-asset-expected": {
+      "classification": "expected",
+      "expectedContains": [
+        "analysis-head-changed",
+        "binding-set-not-head"
+      ],
+      "unexpectedContains": [],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "expected"
+    },
+    "two-asset-unexpected": {
+      "classification": "unexpected",
+      "expectedContains": [],
+      "unexpectedContains": [
+        "asset-semantic-changed:character-ahang"
+      ],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "unexpected"
+    },
+    "two-continuity-expected": {
+      "classification": "expected",
+      "expectedContains": [
+        "script-changed",
+        "unit-changed"
+      ],
+      "unexpectedContains": [],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "expected"
+    },
+    "two-continuity-unexpected": {
+      "classification": "unexpected",
+      "expectedContains": [
+        "script-changed",
+        "unit-changed"
+      ],
+      "unexpectedContains": [
+        "asset-semantic-changed:scene-stone-room"
+      ],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "unexpected"
+    },
+    "two-source-spans-expected": {
+      "classification": "expected",
+      "expectedContains": [
+        "unit-changed"
+      ],
+      "unexpectedContains": [],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "expected"
+    },
+    "two-source-spans-unexpected": {
+      "classification": "unexpected",
+      "expectedContains": [
+        "unit-changed"
+      ],
+      "unexpectedContains": [
+        "asset-semantic-changed:character-ahang"
+      ],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "unexpected"
+    },
+    "two-binding-set-expected": {
+      "classification": "expected",
+      "expectedContains": [
+        "analysis-head-changed",
+        "binding-set-not-head"
+      ],
+      "unexpectedContains": [],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "expected"
+    },
+    "two-binding-set-unexpected": {
+      "classification": "unexpected",
+      "expectedContains": [],
+      "unexpectedContains": [
+        "asset-semantic-changed:character-ahang"
+      ],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "unexpected"
+    },
+    "four-prompt-expected": {
+      "classification": "expected",
+      "expectedContains": [
+        "prompt-changed",
+        "unit-changed"
+      ],
+      "unexpectedContains": [],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "expected"
+    },
+    "four-prompt-unexpected": {
+      "classification": "unexpected",
+      "expectedContains": [
+        "prompt-changed",
+        "unit-changed"
+      ],
+      "unexpectedContains": [
+        "asset-semantic-changed:character-ahang"
+      ],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "unexpected"
+    },
+    "four-asset-expected": {
+      "classification": "expected",
+      "expectedContains": [
+        "analysis-head-changed",
+        "binding-set-not-head"
+      ],
+      "unexpectedContains": [],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "expected"
+    },
+    "four-asset-unexpected": {
+      "classification": "unexpected",
+      "expectedContains": [],
+      "unexpectedContains": [
+        "asset-semantic-changed:character-ahang"
+      ],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "unexpected"
+    },
+    "four-continuity-expected": {
+      "classification": "expected",
+      "expectedContains": [
+        "script-changed",
+        "unit-changed"
+      ],
+      "unexpectedContains": [],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "expected"
+    },
+    "four-continuity-unexpected": {
+      "classification": "unexpected",
+      "expectedContains": [
+        "script-changed",
+        "unit-changed"
+      ],
+      "unexpectedContains": [
+        "asset-semantic-changed:scene-stone-room"
+      ],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "unexpected"
+    },
+    "four-source-spans-expected": {
+      "classification": "expected",
+      "expectedContains": [
+        "unit-changed"
+      ],
+      "unexpectedContains": [],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "expected"
+    },
+    "four-source-spans-unexpected": {
+      "classification": "unexpected",
+      "expectedContains": [
+        "unit-changed"
+      ],
+      "unexpectedContains": [
+        "asset-semantic-changed:character-ahang"
+      ],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "unexpected"
+    },
+    "four-binding-set-expected": {
+      "classification": "expected",
+      "expectedContains": [
+        "analysis-head-changed",
+        "binding-set-not-head"
+      ],
+      "unexpectedContains": [],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "expected"
+    },
+    "four-binding-set-unexpected": {
+      "classification": "unexpected",
+      "expectedContains": [],
+      "unexpectedContains": [
+        "asset-semantic-changed:character-ahang"
+      ],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "unexpected"
+    },
+    "six-prompt-expected": {
+      "classification": "expected",
+      "expectedContains": [
+        "prompt-changed",
+        "unit-changed"
+      ],
+      "unexpectedContains": [],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "expected"
+    },
+    "six-prompt-unexpected": {
+      "classification": "unexpected",
+      "expectedContains": [
+        "prompt-changed",
+        "unit-changed"
+      ],
+      "unexpectedContains": [
+        "asset-semantic-changed:character-ahang"
+      ],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "unexpected"
+    },
+    "six-asset-expected": {
+      "classification": "expected",
+      "expectedContains": [
+        "analysis-head-changed",
+        "binding-set-not-head"
+      ],
+      "unexpectedContains": [],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "expected"
+    },
+    "six-asset-unexpected": {
+      "classification": "unexpected",
+      "expectedContains": [],
+      "unexpectedContains": [
+        "asset-semantic-changed:character-ahang"
+      ],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "unexpected"
+    },
+    "six-continuity-expected": {
+      "classification": "expected",
+      "expectedContains": [
+        "script-changed",
+        "unit-changed"
+      ],
+      "unexpectedContains": [],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "expected"
+    },
+    "six-continuity-unexpected": {
+      "classification": "unexpected",
+      "expectedContains": [
+        "script-changed",
+        "unit-changed"
+      ],
+      "unexpectedContains": [
+        "asset-semantic-changed:scene-stone-room"
+      ],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "unexpected"
+    },
+    "six-source-spans-expected": {
+      "classification": "expected",
+      "expectedContains": [
+        "unit-changed"
+      ],
+      "unexpectedContains": [],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "expected"
+    },
+    "six-source-spans-unexpected": {
+      "classification": "unexpected",
+      "expectedContains": [
+        "unit-changed"
+      ],
+      "unexpectedContains": [
+        "asset-semantic-changed:character-ahang"
+      ],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "unexpected"
+    },
+    "six-binding-set-expected": {
+      "classification": "expected",
+      "expectedContains": [
+        "analysis-head-changed",
+        "binding-set-not-head"
+      ],
+      "unexpectedContains": [],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "expected"
+    },
+    "six-binding-set-unexpected": {
+      "classification": "unexpected",
+      "expectedContains": [],
+      "unexpectedContains": [
+        "asset-semantic-changed:character-ahang"
+      ],
+      "atTheTime": {
+        "promptRevisionId": "text-revision-b76fd944d25e19fb3f29794588b6ee28ff0df675",
+        "scriptRevisionId": "text-revision-bab76bb511419517fa15934aa4e1688233693098",
+        "spans": [
+          {
+            "startOffsetUtf16": 0,
+            "endOffsetUtf16": 44
+          }
+        ],
+        "promptPreserved": true,
+        "scriptPreserved": true,
+        "bindingSetPreserved": true,
+        "continuityPreserved": true
+      },
+      "impactPackHit": true,
+      "impactClassification": "unexpected"
+    }
+  }
+}

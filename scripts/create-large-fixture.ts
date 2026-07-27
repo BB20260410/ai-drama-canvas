@@ -1,0 +1,33 @@
+import { mkdir, writeFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
+import os from "node:os";
+import path from "node:path";
+import { performance } from "node:perf_hooks";
+import sharp from "sharp";
+import { scanAndPersist } from "../src/core/service.js";
+import { ensureSidecar, getSidecarPaths, writeJsonAtomic } from "../src/core/sidecar.js";
+import { resetOwnedFixtureRoot } from "./lib/owned-fixture-root.js";
+
+const count = Math.max(1, Math.min(2_000, Number(process.argv[2]) || 400));
+const root = path.resolve(process.argv[3] || path.join(os.tmpdir(), `ai-canvas-large-${count}-${process.pid}-${randomUUID()}`));
+const withThumbnails = process.argv.includes("--thumbnails");
+await resetOwnedFixtureRoot(root, "create-large-fixture");
+const config = await ensureSidecar(root);
+config.name = `AI 漫剧画布 · ${count} 单元压力测试`;
+config.sourceRoots = [];
+config.outputRoots = [root];
+await writeJsonAtomic(getSidecarPaths(root).config, config);
+const thumbnail = withThumbnails ? await sharp({ create: { width: 270, height: 480, channels: 3, background: "#314653" } }).composite([{ input: Buffer.from(`<svg width="270" height="480" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g"><stop stop-color="#91b3c3"/><stop offset="1" stop-color="#152027"/></linearGradient><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="3" seed="29"/></filter></defs><rect width="270" height="480" fill="url(#g)"/><circle cx="195" cy="120" r="85" fill="#d7af55" opacity=".24"/><path d="M0 340 Q70 240 150 335 T270 300 V480 H0Z" fill="#101613" opacity=".64"/><rect width="270" height="480" filter="url(#n)" opacity=".055"/></svg>`) }]).png({ compressionLevel: 9 }).toBuffer() : undefined;
+await Promise.all(Array.from({ length: count }, async (_, index) => {
+  const episode = Math.floor(index / 40) + 1;
+  const unit = index % 40 + 1;
+  const stem = `EP${String(episode).padStart(2, "0")}_15s_${String(unit).padStart(3, "0")}`;
+  const directory = path.join(root, `${stem}_压力测试镜头_${String(index + 1).padStart(4, "0")}`);
+  await mkdir(directory, { recursive: true });
+  await writeFile(path.join(directory, "00_信息.md"), `# ${stem}\n首帧提示词：电影写实，第 ${index + 1} 个压力测试镜头。\n尾帧提示词：保持角色、道具、场景和光线连续。\n`, "utf8");
+  if (thumbnail) await writeFile(path.join(directory, `${stem}_首帧_raw.png`), thumbnail);
+}));
+const started = performance.now();
+const index = await scanAndPersist(root);
+const elapsedMs = Math.round(performance.now() - started);
+process.stdout.write(`${JSON.stringify({ root, requested: count, recognized: index.summary.total, episodes: Object.keys(index.summary.byEpisode).length, thumbnails: withThumbnails ? count : 0, thumbnailBytes: thumbnail?.length ?? 0, scanDurationMs: index.scanDurationMs, scanStats: index.scanStats, elapsedMs }, null, 2)}\n`);
