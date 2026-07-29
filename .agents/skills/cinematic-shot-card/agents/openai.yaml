@@ -1,0 +1,4 @@
+interface:
+  display_name: "电影级分镜 Shot Card"
+  short_description: "把锁版剧本拆成真实时长的可生成 Shot Card 与连续性检查"
+  default_prompt: "Use $cinematic-shot-card to convert this locked scene into real-duration Shot Cards with speech timing and continuity references."

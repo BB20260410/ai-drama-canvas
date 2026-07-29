@@ -67,6 +67,13 @@
 
 社区 vendors 与本机 skill 镜像仅供参考；**不得**把 Playwright/网页生图 skill 接入正式供应链。
 
+## 剧本、分镜与小说技能自动路由
+
+- 自动选用规则以全局 `~/.codex/AGENTS.md` 的“创作技能自动路由”为唯一通用路由表；本仓库不维护第二份完整映射。
+- 本项目的结构层和分镜层分别以 `cinematic-screenplay-structure`、`cinematic-shot-card` 为项目内唯一源；微短剧正文、小说正文及连续性按全局路由选择对应技能。
+- 剧本与分镜同任务时必须先锁定剧本，再拆 Shot Card；分镜技能不得覆盖锁版对白、旁白、事件顺序或正典。
+- 项目 `AGENTS.md`、锁版源稿、资产硬锁与当前生产合同始终高于通用 Skill；每次只加载满足任务所需的最小技能集合。
+
 ## 正式生图执行面（Codex 主供应，Grok 离线兼容）
 
 - 冻结包 `executorKind = agent-imagegen`，`allowedProviders = ["codex","grok"]`。

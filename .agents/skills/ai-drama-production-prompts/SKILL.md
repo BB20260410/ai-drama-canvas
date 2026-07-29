@@ -1,6 +1,6 @@
 ---
 name: ai-drama-production-prompts
-description: 为 AI 短剧内容生产做人物/角色提取、别名归一、非人实体登记、角色圣经、参考图、3x3 九宫格多角度覆盖、电影分镜、15 秒 2–6 宫格、Nano Banana 横竖屏适配、连续性锁与漂移 QA 时使用。优先读本仓库 community-research 与本地 short-drama/seedance 镜像。触发：人物提取、角色提取、人物设定板、三视图、九宫格、3x3、多角度、多机位、分镜提示词、角色一致性、连续性、Nano Banana、Seedance、宫格故事板、BindingSet 冻结输入。
+description: 在 AI 短剧已进入资产或模型提示词生产阶段时使用：从源稿提取人物/非人实体，建立角色圣经与参考图/3x3 多角度资产板，消费已完成的 Shot Card 生成正式分镜生图或视频提示词，适配 Nano Banana/Seedance，并冻结 BindingSet 与连续性锁。触发：人物提取、角色提取、人物设定板、三视图、参考图提示词、九宫格资产板、3x3、多角度覆盖、正式分镜提示词、生图提示词、视频提示词、Nano Banana、Seedance、BindingSet 冻结输入、生成包。只写普通分镜、Shot Card、镜头表或宫格故事板而不交付资产板、BindingSet 或模型提示词时，不使用本技能，改用 cinematic-shot-card。
 ---
 
 # AI 短剧生产提示词（本仓库适配版）
