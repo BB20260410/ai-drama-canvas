@@ -133,6 +133,7 @@ import {
   freezeStudioAssetBindingSetFromControl,
   proveStudioBindingOperationOutcome,
   resolveStudioEntityProposal,
+  StudioBindingControlError,
   type StudioBindingAnalyzeInput,
   type StudioBindingConfirmEmptyInput,
   type StudioBindingFreezeInput,
@@ -209,6 +210,7 @@ import {
   StudioAgentImagegenBundleError,
   type CommitAgentImagegenResultBundleInput,
 } from "./studio-agent-imagegen-result-bundle.js";
+import { StudioLabeledLayoutError } from "./studio-labeled-layout.js";
 import {
   ActiveManagedStudioContextError,
   assertActiveManagedStudioContextToken,
@@ -2286,6 +2288,15 @@ async function markDurableRecoveryRejected(input: {
   return stored;
 }
 
+function deterministicStudioTimelineRejection(
+  request: Extract<CommandRequest, { command: "attach_studio_multimedia_timeline_media" }>,
+): string | undefined {
+  if (request.payload.role === "storyboard" && request.payload.panelIndex === undefined) {
+    return "storyboard 绑定必须显式提供 panelIndex。";
+  }
+  return undefined;
+}
+
 async function recoverCommandFromDurableState(input: {
   projectRoot: string;
   storageRoot: string;
@@ -2297,6 +2308,31 @@ async function recoverCommandFromDurableState(input: {
   const storageRoot = path.resolve(input.storageRoot);
   if (input.record.command !== input.request.command || input.record.requestHash !== commandRequestHash(root, input.request)) return undefined;
   let proof = await proveDurableOutcome(root, input.request);
+  if (!proof && input.request.command === "attach_studio_multimedia_timeline_media") {
+    const rejection = deterministicStudioTimelineRejection(input.request);
+    if (rejection) {
+      return markDurableRecoveryRejected({
+        projectRoot: root,
+        storageRoot,
+        record: input.record,
+        message: rejection,
+      });
+    }
+    return markDurableRecoveryRejected({
+      projectRoot: root,
+      storageRoot,
+      record: input.record,
+      message: "attach_studio_multimedia_timeline_media 未找到与 requestHash 原子绑定的 timeline operation receipt；业务事务未提交，可明确记为失败。",
+    });
+  }
+  if (!proof && isStudioBindingOperationCommand(input.request.command)) {
+    return markDurableRecoveryRejected({
+      projectRoot: root,
+      storageRoot,
+      record: input.record,
+      message: `${input.request.command} 未找到与 requestHash 原子绑定的 studio_binding_operation_receipts；业务事务未提交，可明确记为失败。`,
+    });
+  }
   if (!proof && input.request.command === "materialize_local_creative_production_units") {
     // 保留判别联合的窄化结果，避免进入异步锁回调后退化成整个
     // CommandRequest.payload 联合。
@@ -2411,6 +2447,24 @@ function rejectFusionVisualConstraintPrecondition(error: unknown, payload?: { ex
     reason,
     expectedStoreRevision: payload?.expectedStoreRevision,
     expectedConstraintId: payload?.expectedConstraintId,
+  });
+}
+
+function rejectStudioBindingPrecondition(
+  error: unknown,
+  input: { unitId: string; panelId: string; expectedRevisionToken: string },
+): never {
+  if (isRejectedCommandFailure(error)) throw error;
+  if (!(error instanceof StudioBindingControlError) && !(error instanceof StudioProductionConflictError)) throw error;
+  const code = error instanceof StudioBindingControlError ? error.code : "revision-conflict";
+  throw new RejectedCommandFailure(error.message, {
+    schemaVersion: 1,
+    applied: false,
+    entityType: "studio_asset_binding",
+    reason: code,
+    unitId: input.unitId,
+    panelId: input.panelId,
+    expectedRevisionToken: input.expectedRevisionToken,
   });
 }
 
@@ -2561,6 +2615,17 @@ function rejectStudioAgentImagegenBundlePrecondition(
       ...context,
     });
   }
+  // labeled 在 CAS/media/ledger 任一写入前先以内存渲染；其校验、解码或渲染错误
+  // 均是已确认的写前失败，不能锁成 OUTCOME_UNKNOWN。
+  if (error instanceof StudioLabeledLayoutError) {
+    rejectStudioGenerationCommand({
+      entityType: "studio_generation_result_bundle",
+      reason: "validation_failed",
+      code: `labeled-${error.code}`,
+      message: error.message,
+      ...context,
+    });
+  }
   throw error;
 }
 
@@ -2669,10 +2734,28 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
     }
     case "attach_studio_multimedia_timeline_media": {
       await inspectManagedProject(projectRoot);
-      return attachStudioMultimediaTimelineMedia(projectRoot, {
-        ...request.payload,
-        operationId: commandRequestHash(projectRoot, request),
-      });
+      const deterministicRejection = deterministicStudioTimelineRejection(request);
+      if (deterministicRejection) {
+        throw new RejectedCommandFailure(deterministicRejection, {
+          code: "INVALID_STORYBOARD_TIMELINE_BINDING",
+          committed: false,
+        });
+      }
+      try {
+        return await attachStudioMultimediaTimelineMedia(projectRoot, {
+          ...request.payload,
+          operationId: commandRequestHash(projectRoot, request),
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (/^(?:媒体时码越出(?:单元范围| panel \d+ 的范围)|storyboard 绑定必须显式提供 panelIndex)/u.test(message)) {
+          throw new RejectedCommandFailure(message, {
+            code: "INVALID_STUDIO_TIMELINE_RANGE",
+            committed: false,
+          });
+        }
+        throw error;
+      }
     }
     case "create_studio_asset": {
       await inspectManagedProject(projectRoot);
@@ -2740,7 +2823,26 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
     }
     case "revise_studio_production_unit": {
       await inspectManagedProject(projectRoot);
-      return reviseStudioProductionUnit(projectRoot, request.payload);
+      try {
+        return await reviseStudioProductionUnit(projectRoot, request.payload);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (error instanceof StudioProductionConflictError
+          || /生产单元宫格总时长必须严格等于声明时长|宫格时间.+(?:空洞|重叠)|起止时间与时长不一致|durationSeconds 必须大于 0|宫格 id 重复|重复提及资产|禁止携带 sourceSpans|必须提供至少一条非空 sourceSpans|extension (?:不得作为首格|仅允许作为单元末尾)/u.test(message)) {
+          throw new RejectedCommandFailure(message, {
+            schemaVersion: 1,
+            applied: false,
+            entityType: "studio_production_unit",
+            reason: error instanceof StudioProductionConflictError ? "revision_conflict" : "validation_failed",
+            unitId: request.payload.unitId,
+            expectedRevision: request.payload.expectedRevision,
+            ...(error instanceof StudioProductionConflictError
+              ? { currentRevision: error.actualRevision }
+              : {}),
+          });
+        }
+        throw error;
+      }
     }
     case "materialize_local_creative_production_units": {
       await inspectManagedProject(projectRoot);
@@ -2751,31 +2853,47 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
     }
     case "analyze_studio_script_entities": {
       await inspectManagedProject(projectRoot);
-      return analyzeStudioScriptEntities(projectRoot, request.payload, {
-        requestHash: commandRequestHash(projectRoot, request),
-        reviewer: "codex",
-      });
+      try {
+        return await analyzeStudioScriptEntities(projectRoot, request.payload, {
+          requestHash: commandRequestHash(projectRoot, request),
+          reviewer: "codex",
+        });
+      } catch (error) {
+        rejectStudioBindingPrecondition(error, request.payload);
+      }
     }
     case "resolve_studio_entity_proposal": {
       await inspectManagedProject(projectRoot);
-      return resolveStudioEntityProposal(projectRoot, request.payload, {
-        requestHash: commandRequestHash(projectRoot, request),
-        reviewer: request.payload.reviewer,
-      });
+      try {
+        return await resolveStudioEntityProposal(projectRoot, request.payload, {
+          requestHash: commandRequestHash(projectRoot, request),
+          reviewer: request.payload.reviewer,
+        });
+      } catch (error) {
+        rejectStudioBindingPrecondition(error, request.payload);
+      }
     }
     case "confirm_studio_panel_empty": {
       await inspectManagedProject(projectRoot);
-      return confirmStudioPanelEmptyFromControl(projectRoot, request.payload, {
-        requestHash: commandRequestHash(projectRoot, request),
-        reviewer: request.payload.reviewer,
-      });
+      try {
+        return await confirmStudioPanelEmptyFromControl(projectRoot, request.payload, {
+          requestHash: commandRequestHash(projectRoot, request),
+          reviewer: request.payload.reviewer,
+        });
+      } catch (error) {
+        rejectStudioBindingPrecondition(error, request.payload);
+      }
     }
     case "freeze_studio_asset_binding_set": {
       await inspectManagedProject(projectRoot);
-      return freezeStudioAssetBindingSetFromControl(projectRoot, request.payload, {
-        requestHash: commandRequestHash(projectRoot, request),
-        reviewer: "codex",
-      });
+      try {
+        return await freezeStudioAssetBindingSetFromControl(projectRoot, request.payload, {
+          requestHash: commandRequestHash(projectRoot, request),
+          reviewer: "codex",
+        });
+      } catch (error) {
+        rejectStudioBindingPrecondition(error, request.payload);
+      }
     }
     case "freeze_studio_generation_pack": {
       await inspectManagedProject(projectRoot);
@@ -4076,6 +4194,86 @@ export async function reconcileCommand(projectRoot: string, input: { idempotency
     const record = ledger.entries.find((entry) => entry.idempotencyKey === input.idempotencyKey);
     if (!record) throw new Error(`命令账本中找不到幂等键：${input.idempotencyKey}`);
     if (record.status === "succeeded" || record.status === "failed" || record.status === "cancelled") return { record: { ...record, replayed: true }, mirrorRoot: undefined as string | undefined };
+    if (record.status === "unknown"
+      && record.command === "revise_studio_production_unit"
+      && record.execution?.phase === "executing"
+      && /生产单元宫格总时长必须严格等于声明时长/u.test(record.error?.message ?? "")) {
+      const reconciledAt = new Date().toISOString();
+      record.status = "failed";
+      record.result = {
+        schemaVersion: 1,
+        applied: false,
+        entityType: "studio_production_unit",
+        reason: "validation_failed",
+        reconciled: true,
+      };
+      record.error = {
+        message: record.error?.message ?? "生产单元时长校验失败。",
+        observedAt: reconciledAt,
+      };
+      record.executedAt = reconciledAt;
+      ledger.updatedAt = reconciledAt;
+      await persistCommandLedgerSnapshot(root, ledger);
+      await appendEvent(root, {
+        actor: "codex",
+        type: "command.reconciled",
+        requestId: record.requestId,
+        idempotencyKey: record.idempotencyKey,
+        command: record.command,
+        data: {
+          evidenceEventIds: [],
+          evidenceSource: "deterministic-studio-production-validation",
+          reconciledAt,
+          outcomeStatus: "failed",
+        },
+      });
+      return {
+        record: { ...record, replayed: true },
+        mirrorRoot: record.storageRoot && path.resolve(record.storageRoot) !== root
+          ? record.storageRoot
+          : undefined,
+      };
+    }
+    if (record.status === "unknown"
+      && record.command === "commit_agent_imagegen_result_bundle"
+      && record.execution?.phase === "executing"
+      && /labels\.subtitle 过长（>120）/u.test(record.error?.message ?? "")) {
+      const reconciledAt = new Date().toISOString();
+      record.status = "failed";
+      record.result = {
+        schemaVersion: 1,
+        applied: false,
+        entityType: "studio_generation_result_bundle",
+        reason: "validation_failed",
+        reconciled: true,
+      };
+      record.error = {
+        message: record.error?.message ?? "labeled 字幕输入校验失败。",
+        observedAt: reconciledAt,
+      };
+      record.executedAt = reconciledAt;
+      ledger.updatedAt = reconciledAt;
+      await persistCommandLedgerSnapshot(root, ledger);
+      await appendEvent(root, {
+        actor: "codex",
+        type: "command.reconciled",
+        requestId: record.requestId,
+        idempotencyKey: record.idempotencyKey,
+        command: record.command,
+        data: {
+          evidenceEventIds: [],
+          evidenceSource: "deterministic-studio-labeled-prewrite-validation",
+          reconciledAt,
+          outcomeStatus: "failed",
+        },
+      });
+      return {
+        record: { ...record, replayed: true },
+        mirrorRoot: record.storageRoot && path.resolve(record.storageRoot) !== root
+          ? record.storageRoot
+          : undefined,
+      };
+    }
     const events = await findEventsByIdempotencyKey(root, input.idempotencyKey, 200);
     const evidence = events.filter((event) => event.type === "command.side-effect-committed"
       && event.requestId === record.requestId

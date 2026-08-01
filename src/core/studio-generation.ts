@@ -3,8 +3,8 @@ import {
   evaluateStudioAssetApplicability,
   getStudioCanonicalAssetKnowledgeSnapshot,
   getStudioCanonicalAsset,
-  getStudioMedia,
-  verifyStudioMediaObject,
+  getStudioMedia as getStudioMediaUncached,
+  verifyStudioMediaObject as verifyStudioMediaObjectUncached,
   type StudioAssetApplicability,
   type StudioAssetApplicabilityEvaluation,
   type StudioAssetApplicabilityTarget,
@@ -58,6 +58,11 @@ import {
   type StudioProductionPanel,
   type StudioTextRevision,
 } from "./studio-production.js";
+import {
+  StudioUnitGridReadEpochDriftError,
+  memoStudioUnitGridRead,
+  verifyStudioUnitGridMediaOnce,
+} from "./studio-unit-grid-read-epoch.js";
 
 const SHA256_PATTERN = /^[a-f0-9]{64}$/u;
 /** 内部账本定位串不是可供模型执行的视觉状态，禁止被当作已解析连续性。 */
@@ -156,6 +161,61 @@ export interface StudioFrozenAssetDefinition {
   defaultPrompt: string;
   applicability: StudioAssetApplicability;
   createdAt: string;
+}
+
+/**
+ * 单张控制参考的执行用途。首版从当前资产 definition 的受控约定推导，
+ * 因而无需新增第二事实源或立即迁移 Binding SQLite。
+ */
+export interface StudioReferenceUsage {
+  purpose: "identity" | "continuity" | "composition-hint" | "scale-reference";
+  inheritOnly: string[];
+  excludeFromOutput: string[];
+  carrierPolicy: "none" | "reference-only";
+}
+
+type StudioReferenceUsageDefinitionInput = Pick<
+  StudioFrozenAssetDefinition,
+  "description" | "identityFeatures" | "positiveLocks" | "negativeLocks" | "defaultPrompt"
+>;
+
+const DEFAULT_STUDIO_REFERENCE_USAGE: StudioReferenceUsage = {
+  purpose: "identity",
+  inheritOnly: ["all"],
+  excludeFromOutput: [],
+  carrierPolicy: "none",
+};
+
+/**
+ * Material Studio 现有 definition 的最小兼容适配器。
+ * `reference-only + 尺度载体` 是显式 opt-in；未命中约定的历史资产保持 identity/all。
+ */
+export function deriveStudioReferenceUsage(
+  definition: StudioReferenceUsageDefinitionInput,
+): StudioReferenceUsage {
+  const corpus = [
+    definition.description,
+    ...definition.identityFeatures,
+    ...definition.positiveLocks,
+    ...definition.negativeLocks,
+    definition.defaultPrompt,
+  ].join("\n");
+  if (!/reference-only/iu.test(corpus) || !/(?:尺度|标尺)(?:标定)?载体|尺度参考/iu.test(corpus)) {
+    return structuredClone(DEFAULT_STUDIO_REFERENCE_USAGE);
+  }
+  const excludeFromOutput = [
+    /手套/iu.test(corpus) ? "手套" : "",
+    /手指|指尖/iu.test(corpus) ? "手指" : "",
+    /夹持姿势|夹持动作/iu.test(corpus) ? "夹持姿势" : "",
+    /灯笼|冥灯/iu.test(corpus) ? "灯笼" : "",
+    /背景/iu.test(corpus) ? "背景" : "",
+  ].filter((entry): entry is string => entry.length > 0);
+  return {
+    purpose: "scale-reference",
+    inheritOnly: ["碎片形制", "材质", "指纹", "相对尺度"],
+    excludeFromOutput,
+    carrierPolicy: "reference-only",
+  };
 }
 
 export interface StudioFrozenAssetRelationEndpointCurrentness {
@@ -274,6 +334,7 @@ export interface StudioFrozenAssetReference {
   category: StudioAssetCategory;
   presence: "required" | "optional";
   role: string;
+  referenceUsage: StudioReferenceUsage;
   continuity: StudioFrozenAssetContinuitySnapshot;
   applicabilityEvaluation: StudioAssetApplicabilityEvaluation;
   relations: StudioFrozenAssetRelationProvenance[];
@@ -355,6 +416,11 @@ export interface StudioGenerationPanelInstruction {
 
 export interface StudioCodexModelPayload {
   exactlyOneImage: true;
+  /**
+   * 单镜 RAW 画幅；新包必须显式写入。schema v4 历史包可能缺少该字段，
+   * 只读/trace/Review 时按旧合同解释为 9:16，禁止为补字段改写历史 CAS。
+   */
+  layout?: "9:16-vertical" | "cinematic-wide";
   renderedPrompt: string;
   target: StudioGenerationTarget;
   panel: StudioGenerationPanelInstruction;
@@ -368,6 +434,7 @@ export interface StudioCodexModelPayload {
     category: StudioAssetCategory;
     presence: "required" | "optional";
     role: string;
+    referenceUsage?: StudioReferenceUsage;
     definitionVersionId: string;
     assetVersionId: string;
     authorityEventId: string;
@@ -403,6 +470,7 @@ export interface StudioCodexControlReference {
   category: StudioAssetCategory;
   presence: "required" | "optional";
   role: string;
+  referenceUsage?: StudioReferenceUsage;
   definitionVersionId: string;
   authorityEventId: string;
   assetVersionId: string;
@@ -630,6 +698,53 @@ function stableValue(value: unknown): unknown {
 
 function stableDigest(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(stableValue(value)), "utf8").digest("hex");
+}
+
+function readStudioMedia(
+  projectRoot: string,
+  mediaSha256: string,
+): ReturnType<typeof getStudioMediaUncached> {
+  return memoStudioUnitGridRead(
+    projectRoot,
+    `material:media:${mediaSha256}`,
+    () => getStudioMediaUncached(projectRoot, mediaSha256),
+  );
+}
+
+function verifyStudioMedia(
+  projectRoot: string,
+  mediaSha256: string,
+  objectPath: string,
+): Promise<boolean> {
+  return verifyStudioUnitGridMediaOnce(
+    projectRoot,
+    mediaSha256,
+    objectPath,
+    () => verifyStudioMediaObjectUncached(projectRoot, mediaSha256),
+  );
+}
+
+function readStudioProductionUnitSnapshot(
+  projectRoot: string,
+  unitId: string,
+): ReturnType<typeof getStudioProductionUnitSnapshot> {
+  return memoStudioUnitGridRead(
+    projectRoot,
+    `production:unit-snapshot:${unitId}`,
+    () => getStudioProductionUnitSnapshot(projectRoot, unitId),
+  );
+}
+
+function readStudioMentionIdentityKeyFingerprint(
+  projectRoot: string,
+  surfaceText: string,
+  category: Parameters<typeof getStudioMentionIdentityKeyFingerprint>[2],
+): ReturnType<typeof getStudioMentionIdentityKeyFingerprint> {
+  return memoStudioUnitGridRead(
+    projectRoot,
+    `material:identity-key:${stableDigest({ surfaceText, category })}`,
+    () => getStudioMentionIdentityKeyFingerprint(projectRoot, surfaceText, category),
+  );
 }
 
 function requiredId(value: string, field: string): string {
@@ -868,7 +983,7 @@ interface StudioBindingAssetInput {
   role: string;
 }
 
-async function loadCanonicalKnowledge(
+async function loadCanonicalKnowledgeUncached(
   projectRoot: string,
   mention: StudioBindingAssetInput,
   target: StudioAssetApplicabilityTarget,
@@ -924,6 +1039,18 @@ async function loadCanonicalKnowledge(
   };
 }
 
+function loadCanonicalKnowledge(
+  projectRoot: string,
+  mention: StudioBindingAssetInput,
+  target: StudioAssetApplicabilityTarget,
+): Promise<StudioLoadedCanonicalKnowledge> {
+  return memoStudioUnitGridRead(
+    projectRoot,
+    `material:canonical-knowledge:${stableDigest({ mention, target })}`,
+    () => loadCanonicalKnowledgeUncached(projectRoot, mention, target),
+  );
+}
+
 async function assertCanonicalKnowledgeUnchanged(
   projectRoot: string,
   mention: StudioBindingAssetInput,
@@ -961,9 +1088,9 @@ async function freezeForbiddenAsset(
   const frozenVersion = freezeVersion(version);
   const authorityEvent = currentAuthorityEvent(loaded.detail, version.id);
   const frozenAuthority = freezeAuthority(authorityEvent);
-  const media = await getStudioMedia(projectRoot, frozenVersion.mediaSha256);
+  const media = await readStudioMedia(projectRoot, frozenVersion.mediaSha256);
   if (!media) fail("media-missing", `禁止资产 ${loaded.detail.id} 的主权威媒体 ${frozenVersion.mediaSha256} 不存在。`);
-  if (!await verifyStudioMediaObject(projectRoot, frozenVersion.mediaSha256)) {
+  if (!await verifyStudioMedia(projectRoot, frozenVersion.mediaSha256, media.objectPath)) {
     fail("media-drift", `禁止资产 ${loaded.detail.id} 的项目内媒体 CAS 当前 SHA 校验失败。`, [media.objectPath]);
   }
   await assertCanonicalKnowledgeUnchanged(projectRoot, mention, target, loaded.sourceFingerprint);
@@ -1007,10 +1134,10 @@ async function freezeAllowedAsset(
   if (authorityEvent.assetRevision > detail.revision) {
     fail("input-drift", `资产 ${detail.id} 的 authority 修订超过当前资产修订。`);
   }
-  const media = await getStudioMedia(projectRoot, frozenVersion.mediaSha256);
+  const media = await readStudioMedia(projectRoot, frozenVersion.mediaSha256);
   if (!media) fail("media-missing", `资产 ${detail.id} 的主权威媒体 ${frozenVersion.mediaSha256} 不存在。`);
   if (media.sha256 !== frozenVersion.mediaSha256) fail("input-drift", `资产 ${detail.id} 媒体索引 SHA 已漂移。`);
-  if (!await verifyStudioMediaObject(projectRoot, media.sha256)) {
+  if (!await verifyStudioMedia(projectRoot, media.sha256, media.objectPath)) {
     fail("media-drift", `资产 ${detail.id} 的项目内媒体 CAS 当前 SHA 校验失败。`, [media.objectPath]);
   }
 
@@ -1026,7 +1153,7 @@ async function freezeAllowedAsset(
   const currentLoaded = await assertCanonicalKnowledgeUnchanged(projectRoot, mention, target, loaded.sourceFingerprint);
   const currentVersion = freezeVersion(selectAuthorityVersion(currentLoaded.detail));
   const currentAuthority = freezeAuthority(currentAuthorityEvent(currentLoaded.detail, currentVersion.id));
-  const currentMediaRecord = await getStudioMedia(projectRoot, currentVersion.mediaSha256);
+  const currentMediaRecord = await readStudioMedia(projectRoot, currentVersion.mediaSha256);
   if (!currentMediaRecord) fail("media-missing", `资产 ${detail.id} 的当前主权威媒体 ${currentVersion.mediaSha256} 不存在。`);
   const currentMedia = freezeMedia(currentMediaRecord);
   if (allowedAssetSourceFingerprint({
@@ -1043,6 +1170,7 @@ async function freezeAllowedAsset(
     category: detail.category,
     presence: mention.presence as "required" | "optional",
     role: mention.role,
+    referenceUsage: deriveStudioReferenceUsage(frozenDefinition),
     continuity,
     applicabilityEvaluation: loaded.applicabilityEvaluation,
     relations: loaded.relations,
@@ -1389,9 +1517,9 @@ async function freezePreviousApprovedRaw(
       ],
     );
   }
-  const rawMedia = await getStudioMedia(projectRoot, raw.mediaSha256);
+  const rawMedia = await readStudioMedia(projectRoot, raw.mediaSha256);
   if (!rawMedia || rawMedia.kind !== "image" || rawMedia.derivativeStatus !== "ready"
-    || !await verifyStudioMediaObject(projectRoot, raw.mediaSha256)) {
+    || !await verifyStudioMedia(projectRoot, raw.mediaSha256, rawMedia.objectPath)) {
     fail("previous-raw-invalid", `上一格 raw ${raw.resultId} 的 media CAS 无效。`);
   }
   const rawIdentity = {
@@ -1521,9 +1649,12 @@ function renderStudioPrompt(input: {
   promptRevision: StudioFrozenPromptRevision;
   assets: StudioFrozenAssetReference[];
   forbiddenAssets: StudioFrozenForbiddenAsset[];
+  layout: StudioCodexModelPayload["layout"];
 }): string {
   const lines = [
-    "只生成一张 9:16 竖屏、电影写实的 AI 短剧分镜图；不要拼图、分屏、字幕、水印、界面文字或现代物。",
+    input.layout === "cinematic-wide"
+      ? "只生成一张电影宽银幕横幅、电影写实的 AI 短剧分镜图；保持横屏，不要竖屏、拼图、分屏、字幕、水印、界面文字或现代物。"
+      : "只生成一张 9:16 竖屏、电影写实的 AI 短剧分镜图；不要拼图、分屏、字幕、水印、界面文字或现代物。",
     `宫格画面：${input.panel.title}。${input.panel.visualAction}`,
     `景别与构图：${input.panel.shotComposition}`,
     `拍摄方式：${input.panel.filmingMethod}`,
@@ -1542,6 +1673,9 @@ function renderStudioPrompt(input: {
       `身份特征：${asset.definition.identityFeatures.join("；") || "以控制参考图为准"}`,
       `必须保持：${asset.definition.positiveLocks.join("；") || "以当前 approved 权威版本为准"}`,
       `禁止偏移：${asset.definition.negativeLocks.join("；") || "不得偏离当前权威版本"}`,
+      `参考用途「${asset.definition.name}」：${asset.referenceUsage.purpose}`,
+      `只继承「${asset.definition.name}」：${asset.referenceUsage.inheritOnly.join("；") || "none"}`,
+      `禁止复制载体「${asset.definition.name}」：${asset.referenceUsage.excludeFromOutput.join("；") || "none"}`,
     );
     allNegativeLocks.push(...asset.definition.negativeLocks);
     for (const head of asset.continuity.heads) {
@@ -1564,8 +1698,26 @@ function renderStudioPrompt(input: {
       `禁止约束：${asset.definition.negativeLocks.join("；")}`,
     );
   }
-  lines.push("严格按已提供的 approved 控制参考图保持人物、场景、道具和风格一致性；不得自行换脸、换造型、改空间布局、改画风或增加未声明主体。");
+  lines.push("按逐参考“用途/只继承/禁止复制载体”合同使用 approved 控制参考；identity 参考保持身份一致，reference-only 参考的载体排除优先且不得被本句覆盖；不得自行换脸、换造型、改空间布局、改画风或增加未声明主体。");
   return lines.join("\n");
+}
+
+export function inferStudioPanelImageLayout(input: {
+  visualAction: string;
+  shotComposition: string;
+  promptText: string;
+}): NonNullable<StudioCodexModelPayload["layout"]> {
+  const explicit = `${input.visualAction}\n${input.shotComposition}\n${input.promptText}`;
+  if (/(?:电影宽银幕|电影横幅|横幅单幅|横屏|21\s*:\s*9|2\.(?:3[0-9]|4)\s*:\s*1)/u.test(explicit)) {
+    return "cinematic-wide";
+  }
+  return "9:16-vertical";
+}
+
+export function effectiveStudioPanelImageLayout(
+  modelPayload: Pick<StudioCodexModelPayload, "layout">,
+): NonNullable<StudioCodexModelPayload["layout"]> {
+  return modelPayload.layout ?? "9:16-vertical";
 }
 
 function buildRequest(input: {
@@ -1581,9 +1733,15 @@ function buildRequest(input: {
   assets: StudioFrozenAssetReference[];
   forbiddenAssets: StudioFrozenForbiddenAsset[];
 }): StudioCodexGenerationRequest {
+  const layout = inferStudioPanelImageLayout({
+    visualAction: input.panel.visualAction,
+    shotComposition: input.panel.shotComposition,
+    promptText: input.promptRevision.body,
+  });
   const modelPayload: StudioCodexModelPayload = {
     exactlyOneImage: true,
-    renderedPrompt: renderStudioPrompt(input),
+    layout,
+    renderedPrompt: renderStudioPrompt({ ...input, layout }),
     target: input.target,
     panel: input.panel,
     prompt: {
@@ -1596,6 +1754,7 @@ function buildRequest(input: {
       category: asset.category,
       presence: asset.presence,
       role: asset.role,
+      referenceUsage: structuredClone(asset.referenceUsage),
       definitionVersionId: asset.definition.id,
       assetVersionId: asset.version.id,
       authorityEventId: asset.authority.eventId,
@@ -1693,6 +1852,7 @@ function buildRequest(input: {
       category: asset.category,
       presence: asset.presence,
       role: asset.role,
+      referenceUsage: structuredClone(asset.referenceUsage),
       definitionVersionId: asset.definition.id,
       authorityEventId: asset.authority.eventId,
       assetVersionId: asset.version.id,
@@ -1746,9 +1906,9 @@ export async function buildStudioAssetBindingSourceSnapshot(
   const version = selectAuthorityVersion(loaded.detail);
   const frozenVersion = freezeVersion(version);
   const authority = currentAuthorityEvent(loaded.detail, version.id);
-  const media = await getStudioMedia(projectRoot, version.mediaSha256);
+  const media = await readStudioMedia(projectRoot, version.mediaSha256);
   if (!media) fail("media-missing", `BindingSet 资产 ${input.assetId} 的权威媒体不存在。`);
-  if (!await verifyStudioMediaObject(projectRoot, media.sha256)) {
+  if (!await verifyStudioMedia(projectRoot, media.sha256, media.objectPath)) {
     fail("media-drift", `BindingSet 资产 ${input.assetId} 的权威媒体 CAS 已漂移。`, [media.objectPath]);
   }
   return {
@@ -1857,7 +2017,7 @@ function assertBindingResolutionComplete(
   return byProposal;
 }
 
-async function freezeCurrentAssetBinding(
+async function freezeCurrentAssetBindingUncached(
   projectRoot: string,
   unitId: string,
   panel: StudioProductionPanel,
@@ -1897,7 +2057,7 @@ async function freezeCurrentAssetBinding(
   const identityKeyFingerprints: Record<string, string> = {};
   for (const proposal of analysis.proposals) {
     const key = studioIdentityDependencyKey(proposal.surfaceText, proposal.category);
-    const fingerprint = await getStudioMentionIdentityKeyFingerprint(
+    const fingerprint = await readStudioMentionIdentityKeyFingerprint(
       projectRoot,
       proposal.surfaceText,
       proposal.category,
@@ -2022,25 +2182,56 @@ async function freezeCurrentAssetBinding(
   };
 }
 
+function freezeCurrentAssetBinding(
+  projectRoot: string,
+  unitId: string,
+  panel: StudioProductionPanel,
+  panelBindingScopeFingerprint: string,
+  target: StudioAssetApplicabilityTarget,
+): ReturnType<typeof freezeCurrentAssetBindingUncached> {
+  return memoStudioUnitGridRead(
+    projectRoot,
+    `production:current-asset-binding:${stableDigest({
+      unitId,
+      panelId: panel.id,
+      panelIndex: panel.index,
+      panelBindingScopeFingerprint,
+      target,
+    })}`,
+    () => freezeCurrentAssetBindingUncached(
+      projectRoot,
+      unitId,
+      panel,
+      panelBindingScopeFingerprint,
+      target,
+    ),
+  );
+}
+
 async function buildFreezePackInternal(
   projectRoot: string,
   input: StudioGenerationQueryInput,
+  preflightShell?: Awaited<ReturnType<typeof inspectManagedProject>>,
 ): Promise<StudioGenerationFreezePack> {
   const unitId = requiredId(input.unitId, "unitId");
   const panelId = requiredId(input.panelId, "panelId");
   let shell: Awaited<ReturnType<typeof inspectManagedProject>>;
-  try {
-    shell = await inspectManagedProject(projectRoot);
-  } catch (error) {
-    throw new StudioGenerationFreezeError(
-      "unmanaged-project",
-      "Codex 一致性冻结包只允许读取通过验证的受管项目。",
-      [error instanceof Error ? error.message : String(error)],
-      { cause: error },
-    );
+  if (preflightShell) {
+    shell = preflightShell;
+  } else {
+    try {
+      shell = await inspectManagedProject(projectRoot);
+    } catch (error) {
+      throw new StudioGenerationFreezeError(
+        "unmanaged-project",
+        "Codex 一致性冻结包只允许读取通过验证的受管项目。",
+        [error instanceof Error ? error.message : String(error)],
+        { cause: error },
+      );
+    }
   }
   const root = shell.paths.root;
-  const snapshot = await getStudioProductionUnitSnapshot(root, unitId);
+  const snapshot = await readStudioProductionUnitSnapshot(root, unitId);
   if (!snapshot) fail("unit-not-found", `15 秒生产单元不存在：${unitId}`);
   const panelCandidates = snapshot.panels.filter((candidate) => candidate.id === panelId);
   if (panelCandidates.length === 0) fail("panel-not-found", `生产单元 ${unitId} 不包含 panel ${panelId}。`);
@@ -2157,7 +2348,7 @@ async function buildFreezePackInternal(
     fail("asset-binding-ambiguous", `BindingSet ${binding.bindingSet.id} 的引用闭包与派生控制平面不一致。`);
   }
 
-  const currentSnapshot = await getStudioProductionUnitSnapshot(root, unitId);
+  const currentSnapshot = await readStudioProductionUnitSnapshot(root, unitId);
   const currentPanel = currentSnapshot?.panels.find((candidate) => candidate.id === panelId);
   if (!currentSnapshot || !currentPanel
     || createStudioPanelBindingScopeFingerprint(currentSnapshot, currentPanel.index) !== panelBindingScopeFingerprint) {
@@ -2235,6 +2426,29 @@ export async function buildStudioGenerationFreezePack(
   }
 }
 
+/**
+ * @internal unit-grid 已在 read epoch 外完成受管工程 preflight；逐格构建复用同一
+ * 只读 shell，避免每格重新初始化 generation ledger。普通 panel API 不走此入口。
+ */
+export async function buildStudioGenerationFreezePackForUnitGridReadEpoch(
+  projectRoot: string,
+  input: StudioGenerationQueryInput,
+  preflightShell: Awaited<ReturnType<typeof inspectManagedProject>>,
+): Promise<StudioGenerationFreezePack> {
+  try {
+    return await buildFreezePackInternal(projectRoot, input, preflightShell);
+  } catch (error) {
+    if (error instanceof StudioGenerationFreezeError
+      || error instanceof StudioUnitGridReadEpochDriftError) throw error;
+    throw new StudioGenerationFreezeError(
+      "storage-invalid",
+      "生产快照或素材库无法通过 unit-grid 只读冻结验证。",
+      [error instanceof Error ? error.message : String(error)],
+      { cause: error },
+    );
+  }
+}
+
 /** 查询入口：blocked 结果绝不包含 request，防止调用方绕过失败关闭。 */
 export async function queryStudioGenerationFreeze(
   projectRoot: string,
@@ -2246,6 +2460,30 @@ export async function queryStudioGenerationFreeze(
   } catch (error) {
     if (!(error instanceof StudioGenerationFreezeError)) throw error;
     return { status: "blocked", code: error.code, message: error.message, details: [...error.details] };
+  }
+}
+
+const STUDIO_REFERENCE_PURPOSES = new Set<StudioReferenceUsage["purpose"]>([
+  "identity",
+  "continuity",
+  "composition-hint",
+  "scale-reference",
+]);
+
+function assertStudioReferenceUsage(
+  usage: StudioReferenceUsage,
+  label: string,
+): void {
+  if (!STUDIO_REFERENCE_PURPOSES.has(usage.purpose)
+    || (usage.carrierPolicy !== "none" && usage.carrierPolicy !== "reference-only")
+    || !Array.isArray(usage.inheritOnly) || usage.inheritOnly.length === 0
+    || usage.inheritOnly.some((entry) => typeof entry !== "string" || entry.trim() !== entry || !entry)
+    || new Set(usage.inheritOnly).size !== usage.inheritOnly.length
+    || !Array.isArray(usage.excludeFromOutput)
+    || usage.excludeFromOutput.some((entry) => typeof entry !== "string" || entry.trim() !== entry || !entry)
+    || new Set(usage.excludeFromOutput).size !== usage.excludeFromOutput.length
+    || (usage.carrierPolicy === "reference-only" && usage.excludeFromOutput.length === 0)) {
+    fail("input-drift", `${label} 的 referenceUsage 无效。`);
   }
 }
 
@@ -2274,6 +2512,11 @@ function assertRequestIntegrity(request: StudioCodexGenerationRequest): void {
   }
   if (request.exactlyOneImage !== true || request.maxCalls !== 1) {
     fail("input-drift", "正式 Agent 生图必须 exactlyOneImage=true 且 maxCalls=1。");
+  }
+  if (request.modelPayload.layout !== undefined
+    && request.modelPayload.layout !== "9:16-vertical"
+    && request.modelPayload.layout !== "cinematic-wide") {
+    fail("input-drift", "单镜 Agent 生图 layout 必须是 9:16-vertical 或 cinematic-wide。");
   }
   const { id: _id, fingerprint: _fingerprint, ...semantic } = request;
   const fingerprint = stableDigest(requestSemantic(semantic));
@@ -2329,6 +2572,37 @@ function assertRequestIntegrity(request: StudioCodexGenerationRequest): void {
     const continuity = continuityByAsset.get(asset.assetId);
     if (!continuity || stableDigest(asset.continuity) !== stableDigest(continuity)) {
       fail("continuity-drift", `Codex 请求资产 ${asset.assetId} 的 continuity snapshot 不一致。`);
+    }
+  }
+  const usageContractPresent = request.modelPayload.assets.some((asset) => asset.referenceUsage !== undefined)
+    || request.controlReferences.some((reference) => reference.referenceUsage !== undefined);
+  if (usageContractPresent) {
+    if (request.modelPayload.assets.some((asset) => asset.referenceUsage === undefined)
+      || request.controlReferences.some((reference) => reference.referenceUsage === undefined)) {
+      fail("input-drift", "Codex 请求的 referenceUsage 合同不完整。");
+    }
+    const modelAssetById = new Map(request.modelPayload.assets.map((asset) => [asset.assetId, asset] as const));
+    if (modelAssetById.size !== request.controlReferences.length) {
+      fail("input-drift", "Codex 请求的 referenceUsage 资产闭包与控制引用数量不一致。");
+    }
+    for (const reference of request.controlReferences) {
+      const modelAsset = modelAssetById.get(reference.assetId);
+      if (!modelAsset?.referenceUsage || !reference.referenceUsage) {
+        fail("input-drift", `Codex 请求控制引用 ${reference.assetId} 缺少 referenceUsage。`);
+      }
+      assertStudioReferenceUsage(modelAsset.referenceUsage, `模型资产 ${reference.assetId}`);
+      assertStudioReferenceUsage(reference.referenceUsage, `控制引用 ${reference.assetId}`);
+      const expected = deriveStudioReferenceUsage({
+        description: "",
+        identityFeatures: modelAsset.identityFeatures,
+        positiveLocks: modelAsset.positiveLocks,
+        negativeLocks: modelAsset.negativeLocks,
+        defaultPrompt: modelAsset.defaultPrompt,
+      });
+      if (stableDigest(modelAsset.referenceUsage) !== stableDigest(expected)
+        || stableDigest(reference.referenceUsage) !== stableDigest(expected)) {
+        fail("input-drift", `Codex 请求控制引用 ${reference.assetId} 的 referenceUsage 与当前冻结 definition 不一致。`);
+      }
     }
   }
   const safetyIds = new Set(request.safetyConstraints.map((constraint) => constraint.assetId));
@@ -2391,6 +2665,7 @@ export interface StudioAgentImagegenBrief {
     category: string;
     presence: string;
     role: string;
+    referenceUsage: StudioReferenceUsage;
     mediaSha256: string;
   }>;
   continuityFrame?: {
@@ -2446,7 +2721,7 @@ export function buildStudioAgentImagegenBrief(
       referenceTool: "image_edit（有参考图时优先图生图保持一致性）",
       maxImages: 1 as const,
       notes: [
-        "严格只生成一张 9:16 分镜；有权威参考时用 image_edit 绑定角色/场景/道具/风格。",
+        `严格只生成一张${effectiveStudioPanelImageLayout(pack.request.modelPayload) === "cinematic-wide" ? "电影宽银幕横幅" : "9:16 竖屏"}分镜；有权威参考时用 image_edit 绑定角色/场景/道具/风格。`,
         "参考图 localPath 只来自 pack 操作的 verified controlReferences，不使用 brief 内路径。",
         "不得替换冻结包外的身份；不得把字幕/分屏画进 raw。",
         "禁止浏览器、Artlist、网页自动化旁路。",
@@ -2470,6 +2745,7 @@ export function buildStudioAgentImagegenBrief(
       category: ref.category,
       presence: ref.presence,
       role: ref.role,
+      referenceUsage: structuredClone(ref.referenceUsage ?? DEFAULT_STUDIO_REFERENCE_USAGE),
       mediaSha256: ref.mediaSha256,
     })),
     ...(pack.request.continuityFrame

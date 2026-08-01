@@ -56,6 +56,13 @@ import {
   appendCanvasProjectionEvent,
   ensureCanvasProjectionOutboxSchema,
 } from "./studio-canvas-projection-outbox.js";
+import {
+  hasStudioRequestSchemaValidation,
+  isStudioRequestSqliteValidationUnchanged,
+  markStudioRequestSqliteValidationIfUnchanged,
+  studioRequestSqliteValidationKey,
+  withStudioRequestSchemaCache,
+} from "./studio-request-schema-cache.js";
 
 const SCHEMA_VERSION = 7;
 const V6_SCHEMA_VERSION = 6;
@@ -930,7 +937,42 @@ async function managedLedgerPaths(projectRoot: string): Promise<{ paths: LedgerP
     packCasRoot: path.join(shell.paths.root, PACK_CAS_RELATIVE_ROOT),
     packCasTempRoot: path.join(shell.paths.root, PACK_CAS_TEMP_RELATIVE_ROOT),
   };
-  const sourceIdentity = await preflightGenerationDatabase(basePaths.database);
+  const preflightCacheKey = studioRequestSqliteValidationKey(
+    `studio-generation-preflight-v${SCHEMA_VERSION}`,
+    basePaths.database,
+  );
+  let sourceIdentity: SqliteSourceBindingIdentity | null;
+  if (hasStudioRequestSchemaValidation(preflightCacheKey) && existsSync(basePaths.database)) {
+    assertSafeSqliteSidecars(basePaths.database, "generation ledger");
+    const probe = new DatabaseSync(basePaths.database, { readOnly: true });
+    try {
+      const version = probe.prepare(
+        "SELECT value FROM studio_generation_ledger_meta WHERE key = 'schema_version'",
+      ).get() as { value?: string } | undefined;
+      if (version?.value !== String(SCHEMA_VERSION)) {
+        fail("storage-invalid", `generation ledger schema_version 已漂移：${version?.value ?? "缺失"}。`);
+      }
+    } finally {
+      probe.close();
+    }
+    sourceIdentity = inspectSqliteSourceBindingIdentity(basePaths.database, "generation ledger");
+    if (!isStudioRequestSqliteValidationUnchanged(
+      preflightCacheKey,
+      `studio-generation-preflight-v${SCHEMA_VERSION}`,
+      basePaths.database,
+    )) {
+      fail("storage-invalid", "generation ledger 在只读 preflight cache-hit 复核期间发生 SQLite 身份漂移。");
+    }
+  } else {
+    sourceIdentity = await preflightGenerationDatabase(basePaths.database);
+    if (!markStudioRequestSqliteValidationIfUnchanged(
+      preflightCacheKey,
+      `studio-generation-preflight-v${SCHEMA_VERSION}`,
+      basePaths.database,
+    )) {
+      fail("storage-invalid", "generation ledger 在只读快照深验期间发生 SQLite 身份漂移。");
+    }
+  }
   const packCasRoot = await ensureConfinedDirectory(basePaths.root, basePaths.packCasRoot);
   const packCasTempRoot = await ensureConfinedDirectory(basePaths.root, basePaths.packCasTempRoot);
   const paths: LedgerPaths = {
@@ -2529,13 +2571,19 @@ function assertGenerationSchema(
       ON d.dispatch_id = i.dispatch_id AND d.generation_run_id = i.generation_run_id
     LEFT JOIN studio_generation_dispatch_protocols protocol
       ON protocol.dispatch_id = d.dispatch_id AND protocol.generation_run_id = d.generation_run_id
+    LEFT JOIN studio_generation_packs p
+      ON p.pack_id = i.pack_id AND p.fingerprint = i.pack_fingerprint
     LEFT JOIN studio_generation_pack_targets target
       ON target.pack_id = i.pack_id AND target.pack_fingerprint = i.pack_fingerprint
-    WHERE d.dispatch_id IS NULL OR protocol.dispatch_id IS NULL OR target.pack_id IS NULL
+    WHERE d.dispatch_id IS NULL OR p.pack_id IS NULL OR protocol.dispatch_id IS NULL
        OR protocol.protocol_version <> 2 OR protocol.requires_call_intent <> 1
        OR i.pack_id <> d.pack_id OR i.pack_fingerprint <> d.pack_fingerprint
        OR i.executor_provider <> d.executor_provider
-       OR i.target_kind <> target.target_kind OR i.target_key <> target.target_key
+       OR (target.pack_id IS NOT NULL AND (i.target_kind <> target.target_kind OR i.target_key <> target.target_key))
+       OR (target.pack_id IS NULL AND (
+            i.target_kind <> 'panel'
+            OR i.target_key <> 'panel:' || p.unit_id || ':' || p.panel_id
+          ))
     LIMIT 1
   `).get() as { call_id?: string } | undefined;
   if (invalidIntent) fail("storage-invalid", `generation call intent 与 dispatch 不一致：${invalidIntent.call_id}`);
@@ -2546,7 +2594,8 @@ function assertGenerationSchema(
     LEFT JOIN studio_generation_dispatch_protocols protocol
       ON protocol.dispatch_id = d.dispatch_id AND protocol.generation_run_id = d.generation_run_id
     WHERE (target.pack_id IS NOT NULL AND protocol.dispatch_id IS NULL)
-       OR (target.pack_id IS NULL AND protocol.dispatch_id IS NOT NULL)
+       OR (protocol.dispatch_id IS NOT NULL
+          AND (protocol.protocol_version <> 2 OR protocol.requires_call_intent <> 1))
     LIMIT 1
   `).get() as { dispatch_id?: string } | undefined;
   if (invalidProtocol) fail("storage-invalid", `generation dispatch protocol 与 target 类型不一致：${invalidProtocol.dispatch_id}`);
@@ -2830,6 +2879,12 @@ function openDatabase(paths: LedgerPaths): DatabaseSync {
     const version = db.prepare(
       "SELECT value FROM studio_generation_ledger_meta WHERE key = 'schema_version'",
     ).get() as { value?: string } | undefined;
+    const schemaCacheKey = studioRequestSqliteValidationKey(
+      `studio-generation-schema-v${SCHEMA_VERSION}`,
+      databasePath,
+    );
+    const schemaAlreadyValidated = version?.value === String(SCHEMA_VERSION)
+      && hasStudioRequestSchemaValidation(schemaCacheKey);
     if (!version) {
       fail("storage-invalid", "generation ledger schema_version 缺失，禁止猜测修复。");
     } else if (version.value === String(LEGACY_SCHEMA_VERSION)) {
@@ -2853,16 +2908,50 @@ function openDatabase(paths: LedgerPaths): DatabaseSync {
     } else {
       fail("storage-invalid", `不支持的 generation ledger schema_version：${version.value}。`);
     }
-    assertCurrentSchema(db);
-    // T11 outbox：画布投影事件表独立于 core-owned schema_version 断言集（同
-    // review/continuity 扩展表模式），老库迁移后在此处幂等补表。
-    ensureCanvasProjectionOutboxSchema(db);
-    ensureContinuationWaiverReceiptSchema(db);
+    if (!schemaAlreadyValidated) {
+      assertCurrentSchema(db);
+      // T11 outbox：画布投影事件表独立于 core-owned schema_version 断言集（同
+      // review/continuity 扩展表模式），老库迁移后在此处幂等补表。
+      ensureCanvasProjectionOutboxSchema(db);
+      ensureContinuationWaiverReceiptSchema(db);
+    }
     const foreignKeys = db.prepare("PRAGMA foreign_keys").get() as { foreign_keys?: number } | undefined;
     if (foreignKeys?.foreign_keys !== 1) fail("storage-invalid", "generation ledger foreign_keys 未启用。");
     db.exec("PRAGMA synchronous=NORMAL");
     const journal = db.prepare("PRAGMA journal_mode").get() as { journal_mode?: string } | undefined;
     if (journal?.journal_mode?.toLowerCase() !== "wal") db.exec("PRAGMA journal_mode=WAL");
+    if (schemaAlreadyValidated) {
+      if (!isStudioRequestSqliteValidationUnchanged(
+        schemaCacheKey,
+        `studio-generation-schema-v${SCHEMA_VERSION}`,
+        databasePath,
+      )) {
+        fail("storage-invalid", "generation ledger 在 schema cache-hit 复核期间发生 SQLite 身份漂移。");
+      }
+    } else {
+      // migrations/ensure* 允许在前一阶段幂等写入；缓存只覆盖其后这个完整且
+      // 身份稳定的最终验证窗口。
+      const stableValidationKey = studioRequestSqliteValidationKey(
+        `studio-generation-schema-v${SCHEMA_VERSION}`,
+        databasePath,
+      );
+      assertCurrentSchema(db);
+      ensureCanvasProjectionOutboxSchema(db);
+      ensureContinuationWaiverReceiptSchema(db);
+      const finalVersion = db.prepare(
+        "SELECT value FROM studio_generation_ledger_meta WHERE key = 'schema_version'",
+      ).get() as { value?: string } | undefined;
+      if (finalVersion?.value !== String(SCHEMA_VERSION)) {
+        fail("storage-invalid", `generation ledger schema_version 已漂移：${finalVersion?.value ?? "缺失"}。`);
+      }
+      if (!markStudioRequestSqliteValidationIfUnchanged(
+        stableValidationKey,
+        `studio-generation-schema-v${SCHEMA_VERSION}`,
+        databasePath,
+      )) {
+        fail("storage-invalid", "generation ledger 在最终 schema 深验期间发生 SQLite 身份漂移。");
+      }
+    }
     return db;
   } catch (error) {
     db.close();
@@ -3576,6 +3665,15 @@ export async function freezeAndPersistStudioUnitGridGenerationPack(
   projectRoot: string,
   input: StudioUnitGridGenerationQueryInput,
 ): Promise<FreezeAndPersistStudioUnitGridGenerationPackResult> {
+  return withStudioRequestSchemaCache(
+    () => freezeAndPersistStudioUnitGridGenerationPackInternal(projectRoot, input),
+  );
+}
+
+async function freezeAndPersistStudioUnitGridGenerationPackInternal(
+  projectRoot: string,
+  input: StudioUnitGridGenerationQueryInput,
+): Promise<FreezeAndPersistStudioUnitGridGenerationPackResult> {
   const { paths, projectId } = await managedLedgerPaths(projectRoot);
   const pack = await buildStudioUnitGridGenerationFreezePack(paths.root, input);
   const { assertStudioFormalGenerationPackDiscipline } = await import("./studio-generation-execution-gate.js");
@@ -3588,7 +3686,6 @@ export async function freezeAndPersistStudioUnitGridGenerationPack(
     layout: "9:16-vertical-ordered-grid",
   });
   assertAnyPackDispatchable(pack);
-  await assertStudioUnitGridGenerationFreezePackCurrent(paths.root, pack);
   if (pack.projectId !== projectId) fail("pack-index-conflict", "unit-grid generation pack 不属于当前受管项目。");
   const firstPanel = pack.panels[0];
   if (!firstPanel || firstPanel.panelIndex !== 1) {
@@ -4790,8 +4887,11 @@ function dispatchSyncCore(writeDb: DatabaseSync, input: {
           || Number(protocol.protocol_version) !== 2 || Number(protocol.requires_call_intent) !== 1) {
           fail("storage-invalid", `unit-grid dispatch ${concurrent.dispatch_id} 缺少 protocol v2。`);
         }
-      } else if (protocol) {
-        fail("storage-invalid", `panel dispatch ${concurrent.dispatch_id} 不应存在 unit-grid protocol。`);
+      } else if (protocol
+        && (protocol.dispatch_id !== concurrent.dispatch_id
+          || Number(protocol.protocol_version) !== 2
+          || Number(protocol.requires_call_intent) !== 1)) {
+        fail("storage-invalid", `panel dispatch ${concurrent.dispatch_id} 的可选 protocol v2 无效。`);
       }
       return dispatchRecord(concurrent);
     }
@@ -5832,6 +5932,7 @@ async function inspectStudioImagegenQuarantineEvidence(input: {
   projectRoot: string;
   call: CallIntentRow;
   dispatch: DispatchRow;
+  layout: "9:16-vertical" | "cinematic-wide";
 }): Promise<StudioImagegenQuarantineEvidence> {
   const grant = imagegenCallQuarantineGrant(input.projectRoot, input.call.input_fingerprint);
   if (path.basename(grant.rootPath) !== input.call.call_id) {
@@ -5871,11 +5972,15 @@ async function inspectStudioImagegenQuarantineEvidence(input: {
   const candidateWidth = candidateInfo.width ?? 0;
   const candidateHeight = candidateInfo.height ?? 0;
   const candidateAspectRatio = candidateWidth / candidateHeight;
-  if (candidateWidth < 64 || candidateHeight < 64 || candidateHeight <= candidateWidth
-    || Math.abs(candidateAspectRatio - 9 / 16) > 0.025) {
+  const aspectValid = input.layout === "cinematic-wide"
+    ? candidateWidth > candidateHeight
+      && Math.abs(candidateAspectRatio - 2.39) <= 0.18
+    : candidateHeight > candidateWidth
+      && Math.abs(candidateAspectRatio - 9 / 16) <= 0.025;
+  if (candidateWidth < 64 || candidateHeight < 64 || !aspectValid) {
     fail(
       "call-intent-conflict",
-      `imagegen call ${input.call.call_id} 的 quarantine candidate 必须是可解码的 9:16 竖屏图，实际 ${candidateWidth}x${candidateHeight}。`,
+      `imagegen call ${input.call.call_id} 的 quarantine candidate 必须符合 ${input.layout}，实际 ${candidateWidth}x${candidateHeight}。`,
     );
   }
   let parsed: Record<string, unknown>;
@@ -6181,18 +6286,22 @@ export async function prepareStudioImagegenCall(
   }
   if (!packRow) fail("pack-not-found", `持久冻结包不存在：${packId}`);
   if (packRow.fingerprint !== packFingerprint) fail("pack-index-conflict", `packId ${packId} 与 packFingerprint 不匹配。`);
-  if (!targetRow) fail("call-intent-required", "pre-call intent 当前只用于 protocol v2 unit-grid dispatch。");
   if (!dispatch) fail("dispatch-not-found", `generationRunId=${generationRunId} 尚无 dispatch intent。`);
   assertDispatchRowIntegrity(dispatch);
   if (dispatch.pack_id !== packId || dispatch.pack_fingerprint !== packFingerprint || dispatch.executor_provider !== provider) {
     fail("dispatch-conflict", `generationRunId=${generationRunId} 与请求 pack/provider 不一致。`);
   }
-  if (!protocol || protocol.dispatch_id !== dispatch.dispatch_id
-    || Number(protocol.protocol_version) !== 2 || Number(protocol.requires_call_intent) !== 1) {
-    fail("call-intent-required", `generationRunId=${generationRunId} 缺少 protocol v2 call-intent 合同。`);
-  }
   const pack = await readAnyPackFromRow(paths, packRow);
-  if (!isUnitGridFreezePack(pack)) fail("target-extension-invalid", `protocol v2 pack ${packId} 不是 unit-grid。`);
+  const unitGrid = isUnitGridFreezePack(pack);
+  if (unitGrid && !targetRow) fail("target-extension-invalid", `unit-grid pack ${packId} 缺少 target extension。`);
+  if (!unitGrid && targetRow) fail("target-extension-invalid", `panel pack ${packId} 不应存在 unit-grid target extension。`);
+  if (protocol && (protocol.dispatch_id !== dispatch.dispatch_id
+    || Number(protocol.protocol_version) !== 2 || Number(protocol.requires_call_intent) !== 1)) {
+    fail("call-intent-required", `generationRunId=${generationRunId} 的 protocol v2 call-intent 合同无效。`);
+  }
+  if (unitGrid && !protocol) {
+    fail("call-intent-required", `unit-grid generationRunId=${generationRunId} 缺少 protocol v2 call-intent 合同。`);
+  }
   assertAnyPackDispatchable(pack);
   const target = targetIdentityFromRows(packRow, targetRow);
   const inputFingerprint = imagegenCallInputFingerprint({
@@ -6233,7 +6342,7 @@ export async function prepareStudioImagegenCall(
   try {
     return runTransaction(writeDb, () => {
       const currentDispatch = dispatchRowByRun(writeDb, generationRunId);
-      const currentProtocol = dispatchProtocolRowByRun(writeDb, generationRunId);
+      let currentProtocol = dispatchProtocolRowByRun(writeDb, generationRunId);
       const concurrent = callIntentRowByRun(writeDb, generationRunId);
       if (concurrent) {
         if (concurrent.call_id !== callId || concurrent.input_fingerprint !== inputFingerprint) {
@@ -6244,14 +6353,28 @@ export async function prepareStudioImagegenCall(
         }
         return callIntentRecord(paths.root, writeDb, concurrent, { callAllowed: false, idempotentReplay: true });
       }
-      if (!currentDispatch || currentDispatch.dispatch_id !== dispatch!.dispatch_id
-        || !currentProtocol || currentProtocol.dispatch_id !== dispatch!.dispatch_id) {
-        fail("dispatch-conflict", `generationRunId=${generationRunId} 的 dispatch/protocol 在 prepare 期间漂移。`);
+      if (!currentDispatch || currentDispatch.dispatch_id !== dispatch!.dispatch_id) {
+        fail("dispatch-conflict", `generationRunId=${generationRunId} 的 dispatch 在 prepare 期间漂移。`);
+      }
+      if (!currentProtocol) {
+        if (unitGrid) fail("dispatch-conflict", `unit-grid generationRunId=${generationRunId} 的 protocol 在 prepare 期间丢失。`);
+        const now = new Date().toISOString();
+        writeDb.prepare(`
+          INSERT INTO studio_generation_dispatch_protocols(
+            dispatch_id, generation_run_id, protocol_version, requires_call_intent, created_at
+          ) VALUES(?, ?, 2, 1, ?)
+        `).run(currentDispatch.dispatch_id, generationRunId, now);
+        currentProtocol = dispatchProtocolRowByRun(writeDb, generationRunId);
+      }
+      if (!currentProtocol || currentProtocol.dispatch_id !== dispatch!.dispatch_id
+        || Number(currentProtocol.protocol_version) !== 2
+        || Number(currentProtocol.requires_call_intent) !== 1) {
+        fail("dispatch-conflict", `generationRunId=${generationRunId} 的 protocol 在 prepare 期间漂移。`);
       }
       if (runTerminalState(writeDb, generationRunId) !== null) {
         fail("run-terminal", `generationRunId=${generationRunId} 已终态，禁止准备 imagegen 调用。`);
       }
-      assertUnitGridContinuationCurrentInIntentTransaction(writeDb, pack, contextTokenHash);
+      if (unitGrid) assertUnitGridContinuationCurrentInIntentTransaction(writeDb, pack, contextTokenHash);
       const now = new Date().toISOString();
       writeDb.prepare(`
         INSERT INTO studio_generation_call_intents(
@@ -6423,11 +6546,12 @@ export async function rebindStudioImagegenCallContext(
     dispatch = dispatchRowByRun(readDb, generationRunId);
     packRow = packRowById(readDb, packId);
     target = packRow ? packTargetRowById(readDb, packId) : undefined;
+    const targetIdentity = packRow ? targetIdentityFromRows(packRow, target) : undefined;
     if (call.generation_run_id !== generationRunId
       || call.pack_id !== packId
       || call.pack_fingerprint !== packFingerprint
       || call.input_fingerprint !== inputFingerprint
-      || call.target_kind !== "unit-grid"
+      || (call.target_kind !== "unit-grid" && call.target_kind !== "panel")
       || !dispatch
       || dispatch.dispatch_id !== call.dispatch_id
       || dispatch.pack_id !== packId
@@ -6435,9 +6559,9 @@ export async function rebindStudioImagegenCallContext(
       || dispatch.executor_provider !== call.executor_provider
       || !packRow
       || packRow.fingerprint !== packFingerprint
-      || !target
-      || target.target_kind !== "unit-grid"
-      || target.target_key !== call.target_key) {
+      || !targetIdentity
+      || targetIdentity.targetKind !== call.target_kind
+      || targetIdentity.targetKey !== call.target_key) {
       fail("call-intent-conflict", `imagegen call ${callId} 的 call/run/dispatch/pack/target/inputFingerprint 不一致。`);
     }
     if (call.context_token_hash === toContextTokenHash) {
@@ -6514,6 +6638,9 @@ export async function rebindStudioImagegenCallContext(
     projectRoot: paths.root,
     call: call!,
     dispatch: dispatch!,
+    layout: isUnitGridFreezePack(pack)
+      ? "9:16-vertical"
+      : pack.request.modelPayload.layout ?? "9:16-vertical",
   });
   if (quarantineEvidence.candidateSha256 !== candidateSha256
     || quarantineEvidence.receiptSha256 !== receiptSha256) {
@@ -6561,6 +6688,9 @@ export async function rebindStudioImagegenCallContext(
       const currentDispatch = dispatchRowByRun(writeDb, generationRunId);
       const currentPack = packRowById(writeDb, packId);
       const currentTarget = currentPack ? packTargetRowById(writeDb, packId) : undefined;
+      const currentIdentity = currentPack
+        ? targetIdentityFromRows(currentPack, currentTarget)
+        : undefined;
       const existing = currentCall ? contextRebindEvents(writeDb, currentCall) : [];
       const expectedFrom = existing.length > 0
         ? existing[existing.length - 1]!.detail.toContextTokenHash
@@ -6577,8 +6707,9 @@ export async function rebindStudioImagegenCallContext(
         || currentDispatch.executor_provider !== expectedDetail.provider
         || !currentPack
         || currentPack.fingerprint !== packFingerprint
-        || !currentTarget
-        || currentTarget.target_key !== currentCall.target_key) {
+        || !currentIdentity
+        || currentIdentity.targetKind !== currentCall.target_kind
+        || currentIdentity.targetKey !== currentCall.target_key) {
         fail("call-intent-conflict", `imagegen call ${callId} 在 context rebind 期间发生身份漂移。`);
       }
       // 幂等：完全相同的最新 rebind 命令
@@ -6650,11 +6781,13 @@ export async function verifyStudioImagegenCallContextRebindEvidence(
   const db = openDatabase(paths);
   let call: CallIntentRow | undefined;
   let dispatch: DispatchRow | undefined;
+  let packRow: PackRow | undefined;
   let rebind: StudioImagegenCallContextRebindRecord | null = null;
   try {
     call = callIntentRowByRun(db, generationRunId);
     if (!call) return null;
     dispatch = dispatchRowByRun(db, generationRunId);
+    packRow = packRowById(db, call.pack_id);
     const matches = contextRebindEvents(db, call);
     if (matches.length === 0) return null;
     // 链式 rebind：复核最新一环（quarantine 与最新 token 授权）
@@ -6665,7 +6798,9 @@ export async function verifyStudioImagegenCallContextRebindEvidence(
       || rebind.packId !== call.pack_id
       || rebind.packFingerprint !== call.pack_fingerprint
       || rebind.provider !== dispatch.executor_provider
-      || rebind.inputFingerprint !== call.input_fingerprint) {
+      || rebind.inputFingerprint !== call.input_fingerprint
+      || !packRow
+      || packRow.fingerprint !== call.pack_fingerprint) {
       fail("storage-invalid", `imagegen call ${call.call_id} 的 context rebind 与 call/dispatch 不一致。`);
     }
     // 首环 from 必须是原始 token；后续环由 contextRebindEvents 链校验
@@ -6675,10 +6810,14 @@ export async function verifyStudioImagegenCallContextRebindEvidence(
   } finally {
     db.close();
   }
+  const pack = await readAnyPackFromRow(paths, packRow!);
   const observed = await inspectStudioImagegenQuarantineEvidence({
     projectRoot: paths.root,
     call: call!,
     dispatch: dispatch!,
+    layout: isUnitGridFreezePack(pack)
+      ? "9:16-vertical"
+      : pack.request.modelPayload.layout ?? "9:16-vertical",
   });
   if (observed.candidateSha256 !== rebind!.candidateSha256
     || observed.receiptSha256 !== rebind!.receiptSha256
@@ -7087,22 +7226,23 @@ export async function registerStudioGenerationResultBundle(
       `bundle provider=${provider} 与 dispatch provider=${dispatchRow.executor_provider} 不一致。`,
     );
   }
-  const protocolV2 = Boolean(targetRow);
+  const protocolV2 = Boolean(dispatchProtocol);
   let callId: string | undefined;
   if (protocolV2) {
     if (!dispatchProtocol || dispatchProtocol.dispatch_id !== dispatchRow.dispatch_id
       || Number(dispatchProtocol.protocol_version) !== 2 || Number(dispatchProtocol.requires_call_intent) !== 1) {
-      fail("call-intent-required", `unit-grid generationRunId=${generationRunId} 缺少 protocol v2。`);
+      fail("call-intent-required", `generationRunId=${generationRunId} 缺少有效 protocol v2。`);
     }
     if (input.callId === undefined) {
-      fail("call-intent-required", `unit-grid generationRunId=${generationRunId} 写回必须携带 pre-call callId。`);
+      fail("call-intent-required", `generationRunId=${generationRunId} 写回必须携带 pre-call callId。`);
     }
     callId = normalizeId(input.callId, "callId");
     if (!callIntent || callIntent.call_id !== callId
       || callIntent.dispatch_id !== dispatchRow.dispatch_id
       || callIntent.pack_id !== packId
       || callIntent.pack_fingerprint !== packFingerprint
-      || callIntent.executor_provider !== provider) {
+      || callIntent.executor_provider !== provider
+      || callIntent.target_kind !== (targetRow ? "unit-grid" : "panel")) {
       fail("call-intent-conflict", `callId=${callId} 与 generationRunId=${generationRunId} 的 intent 不一致。`);
     }
     await assertStudioGenerationRawNotDetachedCandidate(paths.root, {
@@ -7112,9 +7252,9 @@ export async function registerStudioGenerationResultBundle(
     });
   } else {
     if (dispatchProtocol || callIntent) {
-      fail("storage-invalid", `panel generationRunId=${generationRunId} 不应存在 protocol v2/call intent。`);
+      fail("storage-invalid", `legacy panel generationRunId=${generationRunId} 不应存在孤立 call intent。`);
     }
-    if (input.callId !== undefined) fail("invalid-input", "panel v4 bundle 不接受 callId。 ");
+    if (input.callId !== undefined) fail("invalid-input", "legacy panel v4 bundle 不接受 callId。 ");
   }
 
   for (const [variant, mediaSha256] of [["raw", rawMediaSha256], ["labeled", labeledMediaSha256]] as const) {
@@ -7180,11 +7320,12 @@ export async function registerStudioGenerationResultBundle(
         fail("dispatch-conflict", `generationRunId=${generationRunId} 的 dispatch 在 bundle 登记期间漂移。`);
       }
       if (protocolV2) {
-        if (!latestTarget || !latestProtocol || !latestCall
+        if (!latestProtocol || !latestCall
           || latestProtocol.dispatch_id !== latestDispatch.dispatch_id
           || latestCall.call_id !== callId
-          || latestCall.dispatch_id !== latestDispatch.dispatch_id) {
-          fail("call-intent-conflict", `generationRunId=${generationRunId} 的 target/protocol/call intent 在 bundle 登记期间漂移。`);
+          || latestCall.dispatch_id !== latestDispatch.dispatch_id
+          || latestCall.target_kind !== (latestTarget ? "unit-grid" : "panel")) {
+          fail("call-intent-conflict", `generationRunId=${generationRunId} 的 protocol/call intent 在 bundle 登记期间漂移。`);
         }
         assertDetachedCandidateShaNotReused(writeDb, rawMediaSha256);
       } else if (latestTarget || latestProtocol || latestCall) {
@@ -7209,7 +7350,7 @@ export async function registerStudioGenerationResultBundle(
             resultId: resultIds.labeled,
           })) {
           if (protocolV2 && callIntentStatus(writeDb, latestCall!) !== "result-committed") {
-            fail("storage-invalid", `unit-grid generationRunId=${generationRunId} 已有结果但缺少原子 result-committed call event。`);
+            fail("storage-invalid", `generationRunId=${generationRunId} 已有结果但缺少原子 result-committed call event。`);
           }
           return [existingRaw, existingLabeled];
         }
@@ -7304,7 +7445,7 @@ export async function registerStudioGenerationResultBundle(
           rawMediaSha256,
           labeledResultId: resultIds.labeled,
           labeledMediaSha256,
-          targetKind: protocolV2 ? "unit-grid" : "panel",
+          targetKind: latestTarget ? "unit-grid" : "panel",
         },
       });
       return [

@@ -13,6 +13,12 @@ import {
   persistConfinedBytesNoReplace,
 } from "./confined-project-storage.js";
 import { RejectedCommandFailure } from "./command-outcome.js";
+import {
+  hasStudioRequestSchemaValidation,
+  isStudioRequestSqliteValidationUnchanged,
+  markStudioRequestSqliteValidationIfUnchanged,
+  studioRequestSqliteValidationKey,
+} from "./studio-request-schema-cache.js";
 
 const SCHEMA_VERSION = 1;
 const DATABASE_RELATIVE_PATH = ".aicanvas/material-studio.sqlite";
@@ -1206,6 +1212,32 @@ function openDatabase(databasePath: string): DatabaseSync {
   db.exec(`PRAGMA busy_timeout=${BUSY_TIMEOUT_MS}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
   const journal = db.prepare("PRAGMA journal_mode").get() as { journal_mode?: string } | undefined;
   if (journal?.journal_mode?.toLowerCase() !== "wal") db.exec("PRAGMA journal_mode=WAL");
+  const requestSchemaKey = studioRequestSqliteValidationKey("material-studio-schema-v1", databasePath);
+  if (hasStudioRequestSchemaValidation(requestSchemaKey)) {
+    const version = db.prepare("SELECT value FROM studio_meta WHERE key = 'schema_version'")
+      .get() as { value?: string } | undefined;
+    const relationVersion = db.prepare("SELECT value FROM studio_meta WHERE key = 'asset_scope_relation_schema'")
+      .get() as { value?: string } | undefined;
+    const categoryVersion = db.prepare("SELECT value FROM studio_meta WHERE key = 'asset_category_schema'")
+      .get() as { value?: string } | undefined;
+    const foreignKeys = db.prepare("PRAGMA foreign_keys").get() as { foreign_keys?: number } | undefined;
+    if (version?.value !== String(SCHEMA_VERSION)
+      || relationVersion?.value !== "2"
+      || categoryVersion?.value !== "2"
+      || foreignKeys?.foreign_keys !== 1) {
+      db.close();
+      throw new Error("素材库 schema marker 或 foreign_keys 已漂移，拒绝继续。");
+    }
+    if (!isStudioRequestSqliteValidationUnchanged(
+      requestSchemaKey,
+      "material-studio-schema-v1",
+      databasePath,
+    )) {
+      db.close();
+      throw new Error("素材库在 schema cache-hit 复核期间发生 SQLite 身份漂移。");
+    }
+    return db;
+  }
   // N-2（复查）：建表 DDL 失败时关库，防 fd 泄漏。
   try {
     db.exec(`
@@ -1535,6 +1567,17 @@ function openDatabase(databasePath: string): DatabaseSync {
     db.close();
     throw error;
   }
+  const stableValidationKey = studioRequestSqliteValidationKey("material-studio-schema-v1", databasePath);
+  // 自身迁移写入已经结束；在稳定窗口内重新跑完整 owner ensure，只有这个窗口
+  // 前后 SQLite 身份一致才允许缓存。
+  try {
+    ensureAssetRelationSchemaV2(db);
+    ensureStudioAssetCategorySchemaV2(db);
+    ensureStudioIdentityIndexV1(db);
+  } catch (error) {
+    db.close();
+    throw error;
+  }
   const version = db.prepare("SELECT value FROM studio_meta WHERE key = 'schema_version'").get() as { value?: string } | undefined;
   if (version?.value !== String(SCHEMA_VERSION)) {
     db.close();
@@ -1554,6 +1597,14 @@ function openDatabase(databasePath: string): DatabaseSync {
   if (foreignKeys?.foreign_keys !== 1) {
     db.close();
     throw new Error("素材库 foreign_keys 未启用，拒绝继续。");
+  }
+  if (!markStudioRequestSqliteValidationIfUnchanged(
+    stableValidationKey,
+    "material-studio-schema-v1",
+    databasePath,
+  )) {
+    db.close();
+    throw new Error("素材库在 schema 验证期间发生 SQLite 身份漂移，拒绝缓存验证结论。");
   }
   return db;
 }

@@ -217,6 +217,71 @@ describe("P6 追加式剧本资产提案与 BindingSet", () => {
     db.close();
   });
 
+  it("同一宫格重析可保留未变化提案并追加新提案，历史 proposal 身份不冲突", async () => {
+    const projectRoot = await root();
+    const seeded = await fixture(projectRoot);
+    await createStudioCanonicalAsset(projectRoot, {
+      id: "prop-golden-mask",
+      category: "prop",
+      name: "黄金面具",
+      expectedRevision: 0,
+    });
+    const body = seeded.scriptRevision.body;
+    const ahangStart = body.indexOf("阿航");
+    const maskStart = body.indexOf("黄金面具");
+    const first = await analyzeStudioPanelAssetMentions(projectRoot, {
+      unitId: seeded.unit.unit.id,
+      unitRevision: 1,
+      unitFingerprint: seeded.unit.fingerprint,
+      panelIndex: 1,
+      scriptRevisionId: seeded.scriptRevision.id,
+      scriptSha256: seeded.scriptRevision.bodySha256,
+      expectedHeadRevision: 0,
+      mentions: [{
+        id: "mention-ahang",
+        surfaceText: "阿航",
+        startOffsetUtf16: ahangStart,
+        endOffsetUtf16: ahangStart + "阿航".length,
+        category: "character",
+        presence: "required",
+        role: "主角",
+      }],
+    });
+    const second = await analyzeStudioPanelAssetMentions(projectRoot, {
+      unitId: seeded.unit.unit.id,
+      unitRevision: 1,
+      unitFingerprint: seeded.unit.fingerprint,
+      panelIndex: 1,
+      scriptRevisionId: seeded.scriptRevision.id,
+      scriptSha256: seeded.scriptRevision.bodySha256,
+      expectedHeadRevision: 1,
+      mentions: [{
+        id: "mention-ahang",
+        surfaceText: "阿航",
+        startOffsetUtf16: ahangStart,
+        endOffsetUtf16: ahangStart + "阿航".length,
+        category: "character",
+        presence: "required",
+        role: "主角",
+      }, {
+        id: "mention-mask",
+        surfaceText: "黄金面具",
+        startOffsetUtf16: maskStart,
+        endOffsetUtf16: maskStart + "黄金面具".length,
+        category: "prop",
+        presence: "forbidden",
+        role: "本镜不得露出",
+      }],
+    });
+    expect(first.revision).toBe(1);
+    expect(second.revision).toBe(2);
+    expect(second.proposals).toHaveLength(2);
+    expect(second.proposals.find((proposal) => proposal.mentionId === "mention-ahang")?.id)
+      .not.toBe(first.proposals[0]?.id);
+    expect(second.proposals.find((proposal) => proposal.mentionId === "mention-mask"))
+      .toMatchObject({ status: "matched", candidates: [{ assetId: "prop-golden-mask" }] });
+  });
+
   it("歧义与模型建议不自动匹配，人工 select/exclude 生效，forbidden 未决阻断", async () => {
     const projectRoot = await root();
     const seeded = await fixture(projectRoot);

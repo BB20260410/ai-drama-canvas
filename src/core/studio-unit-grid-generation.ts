@@ -1,19 +1,31 @@
 import { createHash } from "node:crypto";
-import { getStudioMedia, verifyStudioMediaObject } from "./material-studio.js";
-import { inspectManagedProject } from "./managed-project.js";
+import { lstat } from "node:fs/promises";
+import path from "node:path";
+import { DatabaseSync } from "node:sqlite";
+import {
+  getStudioMedia as getStudioMediaUncached,
+  initializeMaterialStudio,
+  verifyStudioMediaObject as verifyStudioMediaObjectUncached,
+} from "./material-studio.js";
+import {
+  inspectManagedProject,
+  inspectManagedProjectReadOnly,
+} from "./managed-project.js";
 import {
   StudioGenerationFreezeError,
   assertStudioGenerationFreezePackCurrent,
-  buildStudioGenerationFreezePack,
+  buildStudioGenerationFreezePackForUnitGridReadEpoch,
   type StudioCodexControlReference,
   type StudioFrozenAssetReference,
   type StudioGenerationFreezeErrorCode,
   type StudioGenerationFreezePack,
   type StudioGenerationPanelInstruction,
+  type StudioReferenceUsage,
 } from "./studio-generation.js";
 import {
   getStudioProductionContractProfile,
   getStudioProductionUnitSnapshot,
+  initializeStudioProduction,
   listStudioProductionUnits,
   type StudioProductionContractProfile,
   type StudioProductionUnitSnapshot,
@@ -23,6 +35,18 @@ import {
   nextShotContinuityContinuationGaps,
   type NextShotContinuitySnapshot,
 } from "./studio-next-shot-continuity.js";
+import {
+  clearStudioRequestSchemaCache,
+  withFreshStudioRequestSchemaCache,
+  withStudioRequestSchemaCache,
+} from "./studio-request-schema-cache.js";
+import {
+  StudioUnitGridReadEpochDriftError,
+  memoStudioUnitGridRead,
+  verifyStudioUnitGridMediaOnce,
+  withFreshStudioUnitGridReadEpoch,
+  withStudioUnitGridReadEpoch,
+} from "./studio-unit-grid-read-epoch.js";
 
 /** P30：一个生产单元、一次模型调用、一张 2–6 格整板图。 */
 export interface StudioUnitGridGenerationQueryInput {
@@ -77,6 +101,10 @@ export interface StudioUnitGridControlReference {
   coveredAssetIds: string[];
   categories: string[];
   roles: string[];
+  referenceUsages?: Array<{
+    assetId: string;
+    usage: StudioReferenceUsage;
+  }>;
   fingerprint: string;
 }
 
@@ -269,6 +297,11 @@ export interface StudioUnitGridCodexGenerationRequest {
     layout: "9:16-vertical-ordered-grid";
     renderedPrompt: string;
     target: StudioUnitGridGenerationTarget;
+    referenceUsages?: Array<{
+      referenceId: string;
+      assetId: string;
+      usage: StudioReferenceUsage;
+    }>;
     panels: Array<{
       order: number;
       panelId: string;
@@ -345,6 +378,161 @@ function stableDigest(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(stableValue(value)), "utf8").digest("hex");
 }
 
+async function inspectStudioUnitGridManagedProject(
+  projectRoot: string,
+): Promise<Awaited<ReturnType<typeof inspectManagedProject>>> {
+  try {
+    return await inspectManagedProjectReadOnly(projectRoot);
+  } catch (error) {
+    throw new StudioGenerationFreezeError(
+      "unmanaged-project",
+      "unit-grid 冻结包只允许读取通过验证的受管项目。",
+      [],
+      { cause: error },
+    );
+  }
+}
+
+async function assertStudioUnitGridPreflightFootprint(projectRoot: string): Promise<void> {
+  const databaseRoot = path.join(projectRoot, ".aicanvas");
+  const material = path.join(databaseRoot, "material-studio.sqlite");
+  const production = path.join(databaseRoot, "studio-production.sqlite");
+  const generation = path.join(databaseRoot, "studio-generation-ledger.sqlite");
+  const generationTemporary = path.join(
+    databaseRoot,
+    "studio-generation",
+    "objects",
+    ".tmp",
+  );
+  const required = [
+    [material, "file"],
+    [production, "file"],
+    [generation, "file"],
+    [generationTemporary, "directory"],
+  ] as const;
+  for (const [target, kind] of required) {
+    const metadata = await lstat(target).catch(() => null);
+    const valid = metadata
+      && !metadata.isSymbolicLink()
+      && (kind === "file" ? metadata.isFile() : metadata.isDirectory());
+    if (!valid) {
+      throw new StudioGenerationFreezeError(
+        "storage-invalid",
+        `unit-grid owner preflight 缺少安全的 ${kind === "file" ? "数据库" : "临时目录"}足迹。`,
+      );
+    }
+  }
+
+  const markerChecks = [
+    [material, "SELECT value FROM studio_meta WHERE key = 'schema_version'", "material"],
+    [production, "SELECT value FROM studio_production_meta WHERE key = 'schema_version'", "production"],
+    [generation, "SELECT value FROM studio_generation_ledger_meta WHERE key = 'schema_version'", "generation"],
+    [
+      generation,
+      "SELECT value FROM studio_generation_ledger_meta WHERE key = 'studio_continuity_schema_version'",
+      "continuity",
+    ],
+  ] as const;
+  for (const [databasePath, sql, owner] of markerChecks) {
+    let db: DatabaseSync | undefined;
+    try {
+      db = new DatabaseSync(databasePath, { readOnly: true });
+      const marker = db.prepare(sql).get() as { value?: string } | undefined;
+      if (!marker?.value) {
+        if (owner === "continuity") {
+          const existing = db.prepare(
+            "SELECT name FROM sqlite_master WHERE name GLOB 'studio_continuity_*' LIMIT 1",
+          ).get() as { name?: string } | undefined;
+          // 一个从未启用 continuity owner 的受管工程允许在 identity barrier
+          // 之前由既有 initializer 建立首次 schema；若已经出现任何 continuity
+          // 对象却丢失 marker，则仍按损坏失败关闭，禁止静默修复。
+          if (!existing?.name) continue;
+        }
+        throw new Error("marker-missing");
+      }
+    } catch (error) {
+      throw new StudioGenerationFreezeError(
+        "storage-invalid",
+        `unit-grid ${owner} owner schema marker 缺失或不可读，拒绝隐式修复。`,
+        [],
+        { cause: error },
+      );
+    } finally {
+      db?.close();
+    }
+  }
+}
+
+async function preflightStudioUnitGridOwners(
+  projectRoot: string,
+): Promise<Awaited<ReturnType<typeof inspectManagedProject>>> {
+  const shell = await inspectStudioUnitGridManagedProject(projectRoot);
+  await assertStudioUnitGridPreflightFootprint(shell.paths.root);
+  try {
+    await initializeMaterialStudio(shell.paths.root);
+    await initializeStudioProduction(shell.paths.root);
+    const generation = await import("./studio-generation-ledger.js");
+    await generation.initializeStudioGenerationLedger(shell.paths.root);
+    const continuity = await import("./studio-continuity-ledger.js");
+    await continuity.initializeStudioContinuityLedger(shell.paths.root);
+  } catch (error) {
+    if (error instanceof StudioGenerationFreezeError) throw error;
+    throw new StudioGenerationFreezeError(
+      "storage-invalid",
+      "unit-grid owner preflight 未通过，拒绝进入只读 epoch。",
+      [],
+      { cause: error },
+    );
+  }
+  return shell;
+}
+
+function readStudioMedia(
+  projectRoot: string,
+  mediaSha256: string,
+): ReturnType<typeof getStudioMediaUncached> {
+  return memoStudioUnitGridRead(
+    projectRoot,
+    `material:media:${mediaSha256}`,
+    () => getStudioMediaUncached(projectRoot, mediaSha256),
+  );
+}
+
+function verifyStudioMedia(
+  projectRoot: string,
+  mediaSha256: string,
+  objectPath: string,
+): Promise<boolean> {
+  return verifyStudioUnitGridMediaOnce(
+    projectRoot,
+    mediaSha256,
+    objectPath,
+    () => verifyStudioMediaObjectUncached(projectRoot, mediaSha256),
+  );
+}
+
+function readStudioProductionUnitSnapshot(
+  projectRoot: string,
+  unitId: string,
+): ReturnType<typeof getStudioProductionUnitSnapshot> {
+  return memoStudioUnitGridRead(
+    projectRoot,
+    `production:unit-snapshot:${unitId}`,
+    () => getStudioProductionUnitSnapshot(projectRoot, unitId),
+  );
+}
+
+function readStudioProductionContractProfile(
+  projectRoot: string,
+  input: { season: string; episode: string },
+): ReturnType<typeof getStudioProductionContractProfile> {
+  return memoStudioUnitGridRead(
+    projectRoot,
+    `production:contract-profile:${stableDigest(input)}`,
+    () => getStudioProductionContractProfile(projectRoot, input),
+  );
+}
+
 function fail(code: StudioGenerationFreezeErrorCode, message: string, details: string[] = []): never {
   throw new StudioGenerationFreezeError(code, message, details);
 }
@@ -413,6 +601,7 @@ function mergeControlReferences(panelPacks: StudioGenerationFreezePack[]): Studi
     assetIds: Set<string>;
     categories: Set<string>;
     roles: Set<string>;
+    referenceUsages: Map<string, StudioReferenceUsage>;
   }>();
   const mediaByAsset = new Map<string, string>();
   for (const pack of panelPacks) {
@@ -431,6 +620,7 @@ function mergeControlReferences(panelPacks: StudioGenerationFreezePack[]): Studi
         assetIds: new Set<string>(),
         categories: new Set<string>(),
         roles: new Set<string>(),
+        referenceUsages: new Map<string, StudioReferenceUsage>(),
       };
       if (entry.localPath !== reference.localPath) {
         fail("media-drift", `同一控制参考 SHA 指向不同 CAS 路径：${reference.mediaSha256}`);
@@ -438,6 +628,17 @@ function mergeControlReferences(panelPacks: StudioGenerationFreezePack[]): Studi
       entry.assetIds.add(reference.assetId);
       entry.categories.add(reference.category);
       entry.roles.add(reference.role);
+      const usage = reference.referenceUsage ?? {
+        purpose: "identity" as const,
+        inheritOnly: ["all"],
+        excludeFromOutput: [],
+        carrierPolicy: "none" as const,
+      };
+      const previousUsage = entry.referenceUsages.get(reference.assetId);
+      if (previousUsage && stableDigest(previousUsage) !== stableDigest(usage)) {
+        fail("asset-binding-drift", `unit-grid 资产 ${reference.assetId} 在不同宫格冻结到不同 referenceUsage。`);
+      }
+      entry.referenceUsages.set(reference.assetId, structuredClone(usage));
       byMedia.set(reference.mediaSha256, entry);
     }
   }
@@ -451,6 +652,9 @@ function mergeControlReferences(panelPacks: StudioGenerationFreezePack[]): Studi
         coveredAssetIds: [...entry.assetIds].sort((a, b) => a.localeCompare(b, "en")),
         categories: [...entry.categories].sort((a, b) => a.localeCompare(b, "en")),
         roles: [...entry.roles].sort((a, b) => a.localeCompare(b, "en")),
+        referenceUsages: [...entry.referenceUsages.entries()]
+          .sort(([left], [right]) => left.localeCompare(right, "en"))
+          .map(([assetId, usage]) => ({ assetId, usage })),
       };
       return { ...semantic, fingerprint: stableDigest(semantic) };
     });
@@ -465,17 +669,24 @@ async function listEpisodeUnitSnapshots(
   const summaries: Awaited<ReturnType<typeof listStudioProductionUnits>>["items"] = [];
   let cursor: string | undefined;
   for (let page = 0; page < 50; page += 1) {
-    const batch = await listStudioProductionUnits(projectRoot, {
+    const query = {
       season: current.unit.season,
       episode: current.unit.episode,
       limit: 100,
       ...(cursor ? { cursor } : {}),
-    });
+    };
+    const batch = await memoStudioUnitGridRead(
+      projectRoot,
+      `production:episode-units:${stableDigest(query)}`,
+      () => listStudioProductionUnits(projectRoot, query),
+    );
     summaries.push(...batch.items);
     if (!batch.nextCursor) break;
     cursor = batch.nextCursor;
   }
-  const snapshots = await Promise.all(summaries.map((unit) => getStudioProductionUnitSnapshot(projectRoot, unit.id)));
+  const snapshots = await Promise.all(
+    summaries.map((unit) => readStudioProductionUnitSnapshot(projectRoot, unit.id)),
+  );
   return snapshots.filter((unit): unit is StudioProductionUnitSnapshot => Boolean(unit));
 }
 
@@ -770,15 +981,19 @@ async function freezePreviousUnitContinuationSource(
   }
 
   const [rawMedia, evidenceMedia] = await Promise.all([
-    getStudioMedia(projectRoot, authority.rawSha256),
-    getStudioMedia(projectRoot, observation.head.evidenceSha256),
+    readStudioMedia(projectRoot, authority.rawSha256),
+    readStudioMedia(projectRoot, observation.head.evidenceSha256),
   ]);
   if (!rawMedia || rawMedia.kind !== "image" || rawMedia.derivativeStatus !== "ready"
-    || !await verifyStudioMediaObject(projectRoot, authority.rawSha256)) {
+    || !await verifyStudioMedia(projectRoot, authority.rawSha256, rawMedia.objectPath)) {
     fail("previous-raw-invalid", `上一单元 ${previous.unit.id} 的 raw 媒体 CAS/SHA 无效。`);
   }
   if (!evidenceMedia || evidenceMedia.kind !== "image" || evidenceMedia.derivativeStatus !== "ready"
-    || !await verifyStudioMediaObject(projectRoot, observation.head.evidenceSha256)) {
+    || !await verifyStudioMedia(
+      projectRoot,
+      observation.head.evidenceSha256,
+      evidenceMedia.objectPath,
+    )) {
     fail("previous-raw-invalid", `上一单元 ${previous.unit.id} 的 actual-tail 证据不是有效 image CAS。`);
   }
   const currentAssets = unitGridAssetIds(currentPanelPacks);
@@ -853,6 +1068,15 @@ async function freezePreviousUnitContinuationSource(
     coveredAssetIds,
     categories: ["continuity"],
     roles: ["continuation_source"],
+    referenceUsages: coveredAssetIds.map((assetId) => ({
+      assetId,
+      usage: {
+        purpose: "continuity" as const,
+        inheritOnly: ["上一镜实际尾态"],
+        excludeFromOutput: ["旧剧情", "宫格边框"],
+        carrierPolicy: "reference-only" as const,
+      },
+    })),
   };
   const controlReference: StudioUnitGridControlReference = {
     ...referenceSemantic,
@@ -1010,13 +1234,16 @@ function renderUnitGridPrompt(
         `身份特征：${asset.definition.identityFeatures.join("；") || "以 approved 控制参考图为准"}`,
         `必须保持：${asset.definition.positiveLocks.join("；") || "保持当前 approved 权威版本"}`,
         `禁止偏移：${asset.definition.negativeLocks.join("；") || "不得偏离当前权威版本"}`,
+        `参考用途「${asset.definition.name}」：${asset.referenceUsage.purpose}`,
+        `只继承「${asset.definition.name}」：${asset.referenceUsage.inheritOnly.join("；") || "none"}`,
+        `禁止复制载体「${asset.definition.name}」：${asset.referenceUsage.excludeFromOutput.join("；") || "none"}`,
       );
     }
     for (const asset of pack.forbiddenAssets) {
       lines.push(`第${offset + 1}格禁止出画「${asset.definition.name}」：${asset.role}；${asset.definition.negativeLocks.join("；")}`);
     }
   }
-  lines.push("严格只使用冻结控制参考；同一资产跨格必须保持同一身份，不得因为宫格布局而复制、换脸、串景或改变权威结构。");
+  lines.push("严格只使用冻结控制参考；逐参考“用途/只继承/禁止复制载体”合同优先，reference-only 排除项不得被一致性要求覆盖；同一资产跨格必须保持同一身份，不得因为宫格布局而复制、换脸、串景或改变权威结构。");
   return lines.join("\n");
 }
 
@@ -1115,6 +1342,33 @@ function assertPackIntegrity(pack: StudioUnitGridGenerationFreezePack): void {
   const canonicalRequestReferences = request.controlReferences.filter((reference) => (
     reference.referenceId !== pack.continuationSource?.referenceId
   ));
+  const referenceUsageContractPresent = request.controlReferences.some((reference) =>
+    reference.referenceUsages !== undefined)
+    || request.modelPayload.referenceUsages !== undefined;
+  if (referenceUsageContractPresent) {
+    if (request.controlReferences.some((reference) =>
+      !reference.referenceUsages || reference.referenceUsages.length === 0)
+      || !request.modelPayload.referenceUsages) {
+      fail("input-drift", "unit-grid referenceUsage 合同不完整。");
+    }
+    for (const reference of request.controlReferences) {
+      const covered = new Set(reference.coveredAssetIds);
+      const usageIds = reference.referenceUsages!.map((entry) => entry.assetId);
+      if (new Set(usageIds).size !== usageIds.length
+        || usageIds.some((assetId) => !covered.has(assetId))) {
+        fail("input-drift", `unit-grid 控制引用 ${reference.referenceId} 的 referenceUsage 资产闭包无效。`);
+      }
+    }
+    const expectedModelUsages = request.controlReferences.flatMap((reference) =>
+      reference.referenceUsages!.map(({ assetId, usage }) => ({
+        referenceId: reference.referenceId,
+        assetId,
+        usage,
+      })));
+    if (stableDigest(request.modelPayload.referenceUsages) !== stableDigest(expectedModelUsages)) {
+      fail("input-drift", "unit-grid modelPayload 与控制引用的 referenceUsage 不一致。");
+    }
+  }
   if (request.controlReferences.length > UNIT_GRID_MAX_TOTAL_REFERENCE_IMAGES) {
     fail("too-many-references", `unit-grid 总参考图超过模型上限 ${UNIT_GRID_MAX_TOTAL_REFERENCE_IMAGES}。`);
   }
@@ -1149,20 +1403,25 @@ async function buildStudioUnitGridGenerationFreezePackInternal(
   projectRoot: string,
   input: StudioUnitGridGenerationQueryInput,
   options: BuildStudioUnitGridGenerationFreezePackOptions = {},
+  preflightShell?: Awaited<ReturnType<typeof inspectManagedProject>>,
 ): Promise<StudioUnitGridGenerationFreezePack> {
   const unitId = requiredId(input.unitId, "unitId");
   let shell: Awaited<ReturnType<typeof inspectManagedProject>>;
-  try {
-    shell = await inspectManagedProject(projectRoot);
-  } catch (error) {
-    throw new StudioGenerationFreezeError(
-      "unmanaged-project",
-      "unit-grid 冻结包只允许读取通过验证的受管项目。",
-      [error instanceof Error ? error.message : String(error)],
-      { cause: error },
-    );
+  if (preflightShell) {
+    shell = preflightShell;
+  } else {
+    try {
+      shell = await inspectManagedProject(projectRoot);
+    } catch (error) {
+      throw new StudioGenerationFreezeError(
+        "unmanaged-project",
+        "unit-grid 冻结包只允许读取通过验证的受管项目。",
+        [error instanceof Error ? error.message : String(error)],
+        { cause: error },
+      );
+    }
   }
-  const snapshot = await getStudioProductionUnitSnapshot(shell.paths.root, unitId);
+  const snapshot = await readStudioProductionUnitSnapshot(shell.paths.root, unitId);
   if (!snapshot) fail("unit-not-found", `生产单元不存在：${unitId}`);
   if (snapshot.panels.length < 2 || snapshot.panels.length > 6
     || snapshot.panels.length !== snapshot.unit.panelCount) {
@@ -1170,16 +1429,20 @@ async function buildStudioUnitGridGenerationFreezePackInternal(
   }
   const panelPacks: StudioGenerationFreezePack[] = [];
   for (const panel of [...snapshot.panels].sort((left, right) => left.index - right.index)) {
-    panelPacks.push(await buildStudioGenerationFreezePack(shell.paths.root, {
-      unitId,
-      panelId: panel.id,
-    }));
+    panelPacks.push(await buildStudioGenerationFreezePackForUnitGridReadEpoch(
+      shell.paths.root,
+      {
+        unitId,
+        panelId: panel.id,
+      },
+      shell,
+    ));
   }
-  const current = await getStudioProductionUnitSnapshot(shell.paths.root, unitId);
+  const current = await readStudioProductionUnitSnapshot(shell.paths.root, unitId);
   if (!current || current.fingerprint !== snapshot.fingerprint) {
     fail("revision-drift", `生产单元 ${unitId} 在 unit-grid 冻结期间发生修订漂移。`);
   }
-  const profile = await getStudioProductionContractProfile(shell.paths.root, {
+  const profile = await readStudioProductionContractProfile(shell.paths.root, {
     season: snapshot.unit.season,
     episode: snapshot.unit.episode,
   });
@@ -1311,6 +1574,12 @@ async function buildStudioUnitGridGenerationFreezePackInternal(
       layout: "9:16-vertical-ordered-grid",
       renderedPrompt,
       target,
+      referenceUsages: requestControlReferences.flatMap((reference) =>
+        (reference.referenceUsages ?? []).map(({ assetId, usage }) => ({
+          referenceId: reference.referenceId,
+          assetId,
+          usage: structuredClone(usage),
+        }))),
       panels: panels.map((panel) => ({
         order: panel.order,
         panelId: panel.panelId,
@@ -1375,7 +1644,40 @@ export async function buildStudioUnitGridGenerationFreezePack(
   projectRoot: string,
   input: StudioUnitGridGenerationQueryInput,
 ): Promise<StudioUnitGridGenerationFreezePack> {
-  return buildStudioUnitGridGenerationFreezePackInternal(projectRoot, input);
+  try {
+    return await withStudioRequestSchemaCache(
+      async () => {
+        // 四个既有 owner 的初始化/迁移只允许发生在 identity barrier 之前，
+        // 且与随后读 epoch 承接同一个请求级 schema cache。
+        const shell = await preflightStudioUnitGridOwners(projectRoot);
+        return withStudioUnitGridReadEpoch(
+          shell.paths.root,
+          () => buildStudioUnitGridGenerationFreezePackInternal(
+            shell.paths.root,
+            input,
+            {},
+            shell,
+          ),
+        );
+      },
+    );
+  } catch (error) {
+    if (error instanceof StudioGenerationFreezeError) throw error;
+    if (error instanceof StudioUnitGridReadEpochDriftError) {
+      throw new StudioGenerationFreezeError(
+        "revision-drift",
+        "unit-grid 初建只读 epoch 期间输入身份发生漂移，拒绝冻结。",
+        [],
+        { cause: error },
+      );
+    }
+    throw new StudioGenerationFreezeError(
+      "storage-invalid",
+      "unit-grid 冻结包无法通过受管工程或只读存储验证。",
+      [error instanceof Error ? error.message : String(error)],
+      { cause: error },
+    );
+  }
 }
 
 export async function queryStudioUnitGridGenerationFreeze(
@@ -1404,25 +1706,45 @@ export async function assertStudioUnitGridGenerationFreezePackCurrent(
       "历史 unit-grid pack 没有 actual-tail 或显式豁免，只允许读取；正式派发前必须重新冻结。",
     );
   }
-  const current = await buildStudioUnitGridGenerationFreezePackInternal(projectRoot, {
-    targetKind: "unit-grid",
-    unitId: pack.target.unitId,
-    ...(pack.continuationWaiver
-      ? pack.continuationWaiver.authorityKind === "user-authorization"
-        ? {
-            continuationWaiver: {
-              receiptId: pack.continuationWaiver.receiptId,
-              receiptFingerprint: pack.continuationWaiver.fingerprint,
-            },
-          }
-        : {
-            verifiedHistoricalImportContinuationWaiver: {
-              receiptId: pack.continuationWaiver.receiptId,
-              receiptFingerprint: pack.continuationWaiver.fingerprint,
-            },
-          }
-      : {}),
-  }, options);
+  let current: StudioUnitGridGenerationFreezePack;
+  try {
+    current = await withFreshStudioRequestSchemaCache(
+      async () => {
+        // fresh currentness 使用另一套 schema cache + owner preflight + read epoch。
+        const shell = await preflightStudioUnitGridOwners(projectRoot);
+        return withFreshStudioUnitGridReadEpoch(
+          shell.paths.root,
+          () => buildStudioUnitGridGenerationFreezePackInternal(shell.paths.root, {
+            targetKind: "unit-grid",
+            unitId: pack.target.unitId,
+            ...(pack.continuationWaiver
+              ? pack.continuationWaiver.authorityKind === "user-authorization"
+                ? {
+                    continuationWaiver: {
+                      receiptId: pack.continuationWaiver.receiptId,
+                      receiptFingerprint: pack.continuationWaiver.fingerprint,
+                    },
+                  }
+                : {
+                    verifiedHistoricalImportContinuationWaiver: {
+                      receiptId: pack.continuationWaiver.receiptId,
+                      receiptFingerprint: pack.continuationWaiver.fingerprint,
+                    },
+                  }
+              : {}),
+          }, options, shell),
+        );
+      },
+    );
+  } catch (error) {
+    if (error instanceof StudioGenerationFreezeError) throw error;
+    if (error instanceof StudioUnitGridReadEpochDriftError) {
+      fail("revision-drift", "unit-grid 最终 currentness 只读 epoch 期间输入身份发生漂移。");
+    }
+    throw error;
+  } finally {
+    clearStudioRequestSchemaCache();
+  }
   // current pack 的完整重建已经逐格重建并校验所有 panel pack；最终
   // unit-grid/request 指纹相等即覆盖 panel Head、连续性、actual-tail 与媒体
   // 闭包。此前在重建前再逐格 assert 会重复相同工作，并把 2–6 格 MCP

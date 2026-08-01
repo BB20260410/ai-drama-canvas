@@ -2,7 +2,10 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import { afterEach, describe, expect, it } from "vitest";
-import { buildStudioUnitGridAgentImagegenBrief } from "../src/core/codex.js";
+import {
+  buildStudioUnitGridAgentImagegenBrief,
+  getStudioGenerationControlEnvelope,
+} from "../src/core/codex.js";
 import {
   finalizeDuduReadonlyManagedProject,
   stageDuduReadonlyManagedProject,
@@ -29,6 +32,9 @@ import {
   buildStudioUnitGridGenerationFreezePack,
 } from "../src/core/studio-unit-grid-generation.js";
 import {
+  __setStudioRequestSchemaCacheObserverForTests,
+} from "../src/core/studio-request-schema-cache.js";
+import {
   buildAndVerifyStudioVideoPackage,
   prepareStudioVideoPackageExport,
   prepareStudioVideoPackageSource,
@@ -45,11 +51,94 @@ let fixture: StudioP7Fixture | undefined;
 
 afterEach(async () => {
   __setBeforeImagegenIntentTransactionHookForTests(null);
+  __setStudioRequestSchemaCacheObserverForTests(null);
   await fixture?.cleanup();
   fixture = undefined;
 });
 
 describe("unit-grid 上一单元 actual-tail 连续来源", () => {
+  it("六格 build 每个 SQLite 深验域只执行一次，final currentness 使用全新 epoch", async () => {
+    fixture = await createStudioP7Fixture();
+    await seedStudioP7ResolvedContinuity(fixture);
+    const marks: string[] = [];
+    __setStudioRequestSchemaCacheObserverForTests((event) => {
+      if (event.kind === "mark") marks.push(event.cacheKey.split("\u0000", 1)[0]!);
+    });
+
+    const pack = await buildStudioUnitGridGenerationFreezePack(fixture.root, {
+      targetKind: "unit-grid",
+      unitId: fixture.units.sixPanel.unit.id,
+    });
+    const namespaces = [
+      "material-studio-schema-v1",
+      "studio-production-schema-v6",
+      "studio-generation-preflight-v7",
+      "studio-generation-schema-v7",
+      "studio-continuity-schema-v1",
+      "studio-continuity-content-v1",
+    ];
+    for (const namespace of namespaces) {
+      expect(marks.filter((entry) => entry === namespace), namespace).toHaveLength(1);
+    }
+
+    await assertStudioUnitGridGenerationFreezePackCurrent(fixture.root, pack);
+    for (const namespace of namespaces) {
+      expect(marks.filter((entry) => entry === namespace), namespace).toHaveLength(2);
+    }
+
+    marks.length = 0;
+    const readiness = await getStudioGenerationControlEnvelope(fixture.root, {
+      operation: "readiness",
+      targetKind: "unit-grid",
+      unitId: fixture.units.sixPanel.unit.id,
+    });
+    expect(readiness).toMatchObject({ status: "ready", targetKind: "unit-grid" });
+    // 初建 epoch + final currentness fresh epoch；逐格 media CAS 复核不能触发额外
+    // material 全量 schema 初始化。
+    expect(marks.filter((entry) => entry === "material-studio-schema-v1")).toHaveLength(2);
+    expect(marks.filter((entry) => entry === "studio-production-schema-v6")).toHaveLength(3);
+    for (const namespace of namespaces.slice(2)) {
+      expect(marks.filter((entry) => entry === namespace), namespace).toHaveLength(2);
+    }
+
+  }, 120_000);
+
+  it("六格 freeze 与 pack 投影复用请求内深验且保留 final fresh epoch", async () => {
+    fixture = await createStudioP7Fixture();
+    await seedStudioP7ResolvedContinuity(fixture);
+    const marks: string[] = [];
+    __setStudioRequestSchemaCacheObserverForTests((event) => {
+      if (event.kind === "mark") marks.push(event.cacheKey.split("\u0000", 1)[0]!);
+    });
+    const persisted = await freezeAndPersistStudioUnitGridGenerationPack(fixture.root, {
+      targetKind: "unit-grid",
+      unitId: fixture.units.sixPanel.unit.id,
+    });
+    expect(marks.filter((entry) => entry === "material-studio-schema-v1")).toHaveLength(2);
+    expect(marks.filter((entry) => entry === "studio-production-schema-v6")).toHaveLength(2);
+    expect(marks.filter((entry) => entry === "studio-continuity-schema-v1")).toHaveLength(2);
+    expect(marks.filter((entry) => entry === "studio-continuity-content-v1")).toHaveLength(2);
+    expect(marks.filter((entry) => entry === "studio-generation-preflight-v7")).toHaveLength(2);
+    expect(marks.filter((entry) => entry === "studio-generation-schema-v7")).toHaveLength(4);
+
+    marks.length = 0;
+    const projectedPack = await getStudioGenerationControlEnvelope(fixture.root, {
+      operation: "pack",
+      packId: persisted.packId,
+    });
+    expect(projectedPack).toMatchObject({
+      status: "ready",
+      targetKind: "unit-grid",
+      controlReferencesExposed: true,
+    });
+    expect(marks.filter((entry) => entry === "material-studio-schema-v1")).toHaveLength(2);
+    expect(marks.filter((entry) => entry === "studio-production-schema-v6")).toHaveLength(1);
+    expect(marks.filter((entry) => entry === "studio-continuity-schema-v1")).toHaveLength(1);
+    expect(marks.filter((entry) => entry === "studio-continuity-content-v1")).toHaveLength(1);
+    expect(marks.filter((entry) => entry === "studio-generation-preflight-v7")).toHaveLength(2);
+    expect(marks.filter((entry) => entry === "studio-generation-schema-v7")).toHaveLength(2);
+  }, 180_000);
+
   it("sequence > 1 默认缺 actual-tail 即阻断；显式审计豁免进入 pack 指纹", async () => {
     fixture = await createStudioP7Fixture();
     await seedStudioP7ResolvedContinuity(fixture);

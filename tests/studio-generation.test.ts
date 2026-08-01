@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
+import { lstat, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -42,7 +42,11 @@ import {
 import {
   StudioGenerationFreezeError,
   assertStudioGenerationFreezePackCurrent,
+  buildStudioAgentImagegenBrief,
   buildStudioGenerationFreezePack as buildStudioGenerationFreezePackRaw,
+  deriveStudioReferenceUsage,
+  effectiveStudioPanelImageLayout,
+  inferStudioPanelImageLayout,
   isStudioOpaqueContinuityLocator,
   queryStudioGenerationFreeze,
   serializeStudioGenerationRequest,
@@ -145,8 +149,14 @@ function panelInputs(
   });
 }
 
-async function createUnit(root: string, count: 2 | 6, includeOptionalScene = true, id = `unit-${count}`) {
-  const text = await textFixture(root);
+async function createUnit(
+  root: string,
+  count: 2 | 6,
+  includeOptionalScene = true,
+  id = `unit-${count}`,
+  promptBody?: string,
+) {
+  const text = await textFixture(root, promptBody);
   const snapshot = await createStudioProductionUnit(root, {
     id,
     expectedRevision: 0,
@@ -427,9 +437,9 @@ async function seedResolvedContinuityForPanel(root: string, unitId: string, pane
   }
 }
 
-async function readyTwoPanelProject() {
+async function readyTwoPanelProject(promptBody?: string) {
   const root = await managedProject();
-  const unit = await createUnit(root, 2);
+  const unit = await createUnit(root, 2, true, "unit-2", promptBody);
   const forbiddenMask = await createForbiddenMaskDefinition(root);
   const character = await materializeAsset(root, {
     id: "character-ahang",
@@ -662,6 +672,20 @@ describe("P6 AssetBindingSet 一致性冻结包", () => {
       "character-ahang",
       "scene-stone-room",
     ]);
+    expect(pack.request.controlReferences.map((reference) => reference.referenceUsage)).toEqual([
+      {
+        purpose: "identity",
+        inheritOnly: ["all"],
+        excludeFromOutput: [],
+        carrierPolicy: "none",
+      },
+      {
+        purpose: "identity",
+        inheritOnly: ["all"],
+        excludeFromOutput: [],
+        carrierPolicy: "none",
+      },
+    ]);
     expect(pack.request.controlReferences.some((reference) => reference.assetId === "prop-complete-mask")).toBe(false);
     expect(pack.request.safetyConstraints.map((constraint) => constraint.assetId)).toEqual(["prop-complete-mask"]);
     expect(pack.assetBinding).toMatchObject({
@@ -696,6 +720,7 @@ describe("P6 AssetBindingSet 一致性冻结包", () => {
       }),
     ]));
     expect(pack.request.modelPayload.renderedPrompt).toContain("只生成一张 9:16 竖屏");
+    expect(pack.request.modelPayload.layout).toBe("9:16-vertical");
     expect(pack.request.modelPayload.renderedPrompt).toContain("禁止换脸");
     expect(pack.request.modelPayload.renderedPrompt).toContain("禁止出画资产「完整黄金面具」");
     expect(pack.request.modelPayload.renderedPrompt).not.toContain(fixture.character.media.objectPath);
@@ -711,6 +736,98 @@ describe("P6 AssetBindingSet 一致性冻结包", () => {
     ]);
     expect(serialized).toContain("startOffsetUtf16");
     expect(serialized).toContain("endOffsetUtf16");
+  });
+
+  it("definition 中的 reference-only 尺度载体约定自动冻结为结构化 usage，并防止载体语义被篡改", async () => {
+    const fixture = await readyTwoPanelProject();
+    const current = await getStudioCanonicalAsset(fixture.root, fixture.scene.detail.id);
+    if (!current) throw new Error("missing reference-usage fixture asset");
+    await updateStudioCanonicalAsset(fixture.root, {
+      assetId: current.id,
+      expectedRevision: current.revision,
+      description: "微型暗铁硬壳碎片；approved Authority 用厚手套指尖提供实物尺度。手套、手指和夹持姿势仅是尺度载体，不属于碎片身份。",
+      identityFeatures: [
+        "微型暗铁硬壳碎片",
+        "一端斜切尖角",
+        "另一端半月缺口",
+        "内部唯一红黑双脉",
+      ],
+      positiveLocks: [
+        "只继承碎片本体的形制、材质、指纹和微小相对尺度",
+      ],
+      negativeLocks: [
+        "不得复制 Authority 中用于标定尺度的手套、手指、夹持姿势或微距背景",
+      ],
+      defaultPrompt: "Authority 中手套、手指、夹持动作和背景均为 reference-only 标尺载体，必须排除。",
+    });
+
+    const expectedUsage = {
+      purpose: "scale-reference" as const,
+      inheritOnly: ["碎片形制", "材质", "指纹", "相对尺度"],
+      excludeFromOutput: ["手套", "手指", "夹持姿势", "背景"],
+      carrierPolicy: "reference-only" as const,
+    };
+    expect(deriveStudioReferenceUsage({
+      description: "E-R1 尺度载体",
+      identityFeatures: ["微型碎片"],
+      positiveLocks: ["继承形制材质指纹相对尺度"],
+      negativeLocks: ["排除手套、手指、夹持姿势和背景"],
+      defaultPrompt: "reference-only 标尺载体",
+    })).toEqual(expectedUsage);
+    expect(deriveStudioReferenceUsage({
+      description: "E-R1 与冥灯比例控制；冥灯只是尺度载体，不属于物证身份。",
+      identityFeatures: ["E-R1 最长边约为灯笼主体宽度五分之一"],
+      positiveLocks: ["只继承 E-R1 与灯笼的相对尺度"],
+      negativeLocks: ["不得复制冥灯或背景"],
+      defaultPrompt: "灯笼和背景均为 reference-only 尺度载体，必须排除。",
+    })).toEqual({
+      purpose: "scale-reference",
+      inheritOnly: ["碎片形制", "材质", "指纹", "相对尺度"],
+      excludeFromOutput: ["灯笼", "背景"],
+      carrierPolicy: "reference-only",
+    });
+
+    const pack = await buildStudioGenerationFreezePack(fixture.root, {
+      unitId: fixture.unit.snapshot.unit.id,
+      panelId: "panel-01",
+    });
+    const frozen = pack.assets.find((asset) => asset.assetId === fixture.scene.detail.id)!;
+    const modelAsset = pack.request.modelPayload.assets.find((asset) => asset.assetId === fixture.scene.detail.id)!;
+    const control = pack.request.controlReferences.find((reference) => reference.assetId === fixture.scene.detail.id)!;
+    expect(frozen.referenceUsage).toEqual(expectedUsage);
+    expect(modelAsset.referenceUsage).toEqual(expectedUsage);
+    expect(control.referenceUsage).toEqual(expectedUsage);
+    expect(pack.request.modelPayload.renderedPrompt).toContain("参考用途「古蜀石室」：scale-reference");
+    expect(pack.request.modelPayload.renderedPrompt).toContain("只继承「古蜀石室」：碎片形制；材质；指纹；相对尺度");
+    expect(pack.request.modelPayload.renderedPrompt).toContain("禁止复制载体「古蜀石室」：手套；手指；夹持姿势；背景");
+    expect(pack.request.modelPayload.renderedPrompt).toContain("reference-only 参考的载体排除优先且不得被本句覆盖");
+    expect(buildStudioAgentImagegenBrief(pack, "codex").controlReferences
+      .find((reference) => reference.assetId === fixture.scene.detail.id)?.referenceUsage)
+      .toEqual(expectedUsage);
+
+    const tampered = structuredClone(pack.request);
+    tampered.controlReferences.find((reference) => reference.assetId === fixture.scene.detail.id)!
+      .referenceUsage!.excludeFromOutput = ["背景"];
+    const { id: _tamperedId, fingerprint: _tamperedFingerprint, ...tamperedSemantic } = tampered;
+    tampered.fingerprint = digest(tamperedSemantic);
+    tampered.id = `studio-codex-request-${tampered.fingerprint.slice(0, 32)}`;
+    expect(() => serializeStudioGenerationRequest(tampered)).toThrow(/referenceUsage.*不一致/u);
+  });
+
+  it("历史 schema v4 请求缺 layout 时保留原内容地址并按 9:16 双读", async () => {
+    const fixture = await readyTwoPanelProject();
+    const frozen = await buildStudioGenerationFreezePack(fixture.root, {
+      unitId: "unit-2",
+      panelId: "panel-01",
+    });
+    const legacy = structuredClone(frozen.request);
+    delete legacy.modelPayload.layout;
+    const { id: _requestId, fingerprint: _requestFingerprint, ...semantic } = legacy;
+    legacy.fingerprint = digest(semantic);
+    legacy.id = `studio-codex-request-${legacy.fingerprint.slice(0, 32)}`;
+
+    expect(effectiveStudioPanelImageLayout(legacy.modelPayload)).toBe("9:16-vertical");
+    expect(JSON.parse(serializeStudioGenerationRequest(legacy))).toEqual(legacy);
   });
 
   it("source span 越界或与 BindingSet 来源链不一致时，即使重算内容地址也失败关闭", async () => {
@@ -1458,5 +1575,80 @@ describe("P6 AssetBindingSet 一致性冻结包", () => {
       .rejects.toBeInstanceOf(StudioGenerationFreezeError);
     await expect(buildStudioGenerationFreezePackRaw(root, { unitId: "unit-2", panelId: "panel-01" }))
       .rejects.toMatchObject({ code: "unmanaged-project" });
+    await expect(buildStudioUnitGridGenerationFreezePack(root, {
+      targetKind: "unit-grid",
+      unitId: "unit-2",
+    })).rejects.toMatchObject({ code: "unmanaged-project" });
+  });
+
+  it("普通 panel 媒体文件缺失时保留 media-drift，而不是 epoch storage-invalid", async () => {
+    const fixture = await readyTwoPanelProject();
+    await bindLegacyPanel(fixture.root, "unit-2", "panel-01");
+    await seedResolvedContinuityForPanel(fixture.root, "unit-2", "panel-01");
+    await rm(fixture.character.media.objectPath);
+
+    await expect(buildStudioGenerationFreezePackRaw(fixture.root, {
+      unitId: "unit-2",
+      panelId: "panel-01",
+    })).rejects.toMatchObject({ code: "media-drift" });
+  });
+
+  it("unit-grid 缺 generation tmp 或 continuity marker 时零写失败关闭", async () => {
+    const fixture = await readyUnitGridProject(2);
+    const database = path.join(fixture.root, ".aicanvas", "studio-generation-ledger.sqlite");
+    const temporary = path.join(
+      fixture.root,
+      ".aicanvas",
+      "studio-generation",
+      "objects",
+      ".tmp",
+    );
+
+    const db = new DatabaseSync(database);
+    db.prepare(
+      "DELETE FROM studio_generation_ledger_meta WHERE key = 'studio_continuity_schema_version'",
+    ).run();
+    db.close();
+    const databaseBefore = await readFile(database);
+    await expect(buildStudioUnitGridGenerationFreezePack(fixture.root, {
+      targetKind: "unit-grid",
+      unitId: fixture.snapshot.unit.id,
+    })).rejects.toMatchObject({ code: "storage-invalid" });
+    expect(await readFile(database)).toEqual(databaseBefore);
+
+    await rm(temporary, { recursive: true });
+    await expect(buildStudioUnitGridGenerationFreezePack(fixture.root, {
+      targetKind: "unit-grid",
+      unitId: fixture.snapshot.unit.id,
+    })).rejects.toMatchObject({ code: "storage-invalid" });
+    expect(await lstat(temporary).catch(() => null)).toBeNull();
+  });
+});
+
+describe("单镜画幅合同", () => {
+  it("显式电影横幅语义冻结为 cinematic-wide，未声明时保持历史 9:16 默认", () => {
+    expect(inferStudioPanelImageLayout({
+      visualAction: "电影横幅单幅无字 RAW，近景物证。",
+      shotComposition: "100mm 微距",
+      promptText: "保持人物与道具一致。",
+    })).toBe("cinematic-wide");
+    expect(inferStudioPanelImageLayout({
+      visualAction: "电影写实分镜。",
+      shotComposition: "中景",
+      promptText: "保持人物与道具一致。",
+    })).toBe("9:16-vertical");
+  });
+
+  it("真实 panel freeze 将显式电影横幅合同写入 request 与 renderedPrompt", async () => {
+    const fixture = await readyTwoPanelProject(
+      "只生成一张电影横幅单幅无字 RAW；保持阿航面孔与石室光线连续。",
+    );
+    const pack = await buildStudioGenerationFreezePack(fixture.root, {
+      unitId: "unit-2",
+      panelId: "panel-01",
+    });
+    expect(pack.request.modelPayload.layout).toBe("cinematic-wide");
+    expect(pack.request.modelPayload.renderedPrompt).toContain("只生成一张电影宽银幕横幅");
+    expect(pack.request.modelPayload.renderedPrompt).not.toContain("只生成一张 9:16 竖屏");
   });
 });

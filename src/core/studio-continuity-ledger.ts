@@ -28,6 +28,12 @@ import {
   type StudioContinuityTimeline,
 } from "./studio-continuity.js";
 import { initializeStudioGenerationLedger } from "./studio-generation-ledger.js";
+import {
+  hasStudioRequestSchemaValidation,
+  isStudioRequestSqliteValidationUnchanged,
+  markStudioRequestSqliteValidationIfUnchanged,
+  studioRequestSqliteValidationKey,
+} from "./studio-request-schema-cache.js";
 
 const CONTINUITY_SCHEMA_VERSION = 1 as const;
 const CONTINUITY_SCHEMA_MARKER = "studio_continuity_schema_version";
@@ -624,8 +630,42 @@ function openContinuityDatabase(databasePath: string, initialize: boolean): Data
     if (!tableExists(db, "studio_generation_ledger_meta")) {
       fail("storage-invalid", "studio generation ledger meta 缺失，禁止建立独立 continuity 存储。 ");
     }
+    const schemaCacheKey = studioRequestSqliteValidationKey(
+      `studio-continuity-schema-v${CONTINUITY_SCHEMA_VERSION}`,
+      databasePath,
+    );
+    if (hasStudioRequestSchemaValidation(schemaCacheKey)) {
+      const marker = db.prepare("SELECT value FROM studio_generation_ledger_meta WHERE key = ?")
+        .get(CONTINUITY_SCHEMA_MARKER) as { value?: string } | undefined;
+      const foreignKeys = db.prepare("PRAGMA foreign_keys").get() as { foreign_keys?: number } | undefined;
+      if (marker?.value !== String(CONTINUITY_SCHEMA_VERSION)) {
+        fail("storage-invalid", `continuity schema marker 已漂移：${marker?.value ?? "缺失"}。`);
+      }
+      if (foreignKeys?.foreign_keys !== 1) {
+        fail("storage-invalid", "continuity foreign_keys 已漂移。");
+      }
+      if (!isStudioRequestSqliteValidationUnchanged(
+        schemaCacheKey,
+        `studio-continuity-schema-v${CONTINUITY_SCHEMA_VERSION}`,
+        databasePath,
+      )) {
+        fail("storage-invalid", "continuity ledger 在 schema cache-hit 复核期间发生 SQLite 身份漂移。");
+      }
+      return db;
+    }
     if (initialize) ensureContinuitySchema(db);
+    const stableValidationKey = studioRequestSqliteValidationKey(
+      `studio-continuity-schema-v${CONTINUITY_SCHEMA_VERSION}`,
+      databasePath,
+    );
     assertContinuitySchema(db);
+    if (!markStudioRequestSqliteValidationIfUnchanged(
+      stableValidationKey,
+      `studio-continuity-schema-v${CONTINUITY_SCHEMA_VERSION}`,
+      databasePath,
+    )) {
+      fail("storage-invalid", "continuity ledger 在最终 schema 深验期间发生 SQLite 身份漂移。");
+    }
     return db;
   } catch (error) {
     db.close();
@@ -1681,8 +1721,30 @@ export async function initializeStudioContinuityLedger(projectRoot: string): Pro
   const generation = await initializeStudioGenerationLedger(projectRoot);
   const db = openContinuityDatabase(generation.databasePath, true);
   try {
-    validateStoredContents(db);
-    return stateFromDatabase(generation.databasePath, db);
+    const contentCacheKey = studioRequestSqliteValidationKey(
+      `studio-continuity-content-v${CONTINUITY_SCHEMA_VERSION}`,
+      generation.databasePath,
+    );
+    const contentAlreadyValidated = hasStudioRequestSchemaValidation(contentCacheKey);
+    if (!contentAlreadyValidated) {
+      validateStoredContents(db);
+      if (!markStudioRequestSqliteValidationIfUnchanged(
+        contentCacheKey,
+        `studio-continuity-content-v${CONTINUITY_SCHEMA_VERSION}`,
+        generation.databasePath,
+      )) {
+        fail("storage-invalid", "continuity ledger 在内容深验期间发生 SQLite 身份漂移。");
+      }
+    }
+    const state = stateFromDatabase(generation.databasePath, db);
+    if (contentAlreadyValidated && !isStudioRequestSqliteValidationUnchanged(
+      contentCacheKey,
+      `studio-continuity-content-v${CONTINUITY_SCHEMA_VERSION}`,
+      generation.databasePath,
+    )) {
+      fail("storage-invalid", "continuity ledger 在内容 cache-hit 复核期间发生 SQLite 身份漂移。");
+    }
+    return state;
   } finally {
     db.close();
   }

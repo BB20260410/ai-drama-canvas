@@ -90,6 +90,15 @@ function minimalUnitGridPack(options?: {
       coveredAssetIds: ["character-qingdeng-ke"],
       categories: ["character"],
       roles: ["主体"],
+      referenceUsages: [{
+        assetId: "character-qingdeng-ke",
+        usage: {
+          purpose: "identity" as const,
+          inheritOnly: ["all"],
+          excludeFromOutput: [],
+          carrierPolicy: "none" as const,
+        },
+      }],
       fingerprint: SHA_C,
     }, {
       referenceId: "ref-scene",
@@ -98,6 +107,15 @@ function minimalUnitGridPack(options?: {
       coveredAssetIds: ["scene-rainy-inn"],
       categories: ["scene"],
       roles: ["场景"],
+      referenceUsages: [{
+        assetId: "scene-rainy-inn",
+        usage: {
+          purpose: "scale-reference" as const,
+          inheritOnly: ["碎片形制", "材质", "指纹", "相对尺度"],
+          excludeFromOutput: ["手套", "手指", "夹持姿势", "背景"],
+          carrierPolicy: "reference-only" as const,
+        },
+      }],
       fingerprint: SHA_C,
     }];
 
@@ -224,6 +242,12 @@ function minimalUnitGridPack(options?: {
           episodeAbsoluteStartSeconds: 0,
           episodeAbsoluteEndSeconds: 15,
         },
+        referenceUsages: controlReferences.flatMap((reference) =>
+          reference.referenceUsages.map(({ assetId, usage }) => ({
+            referenceId: reference.referenceId,
+            assetId,
+            usage,
+          }))),
         panels: [],
       },
       controlReferences,
@@ -252,6 +276,15 @@ describe("buildStudioUnitGridAgentImagegenBrief (shipped runtime)", () => {
         mediaSha256: SHA_A,
         categories: ["character"],
         roles: ["主体"],
+        referenceUsages: [{
+          assetId: "character-qingdeng-ke",
+          usage: {
+            purpose: "identity",
+            inheritOnly: ["all"],
+            excludeFromOutput: [],
+            carrierPolicy: "none",
+          },
+        }],
         fingerprint: SHA_C,
       },
       {
@@ -259,6 +292,15 @@ describe("buildStudioUnitGridAgentImagegenBrief (shipped runtime)", () => {
         mediaSha256: SHA_B,
         categories: ["scene"],
         roles: ["场景"],
+        referenceUsages: [{
+          assetId: "scene-rainy-inn",
+          usage: {
+            purpose: "scale-reference",
+            inheritOnly: ["碎片形制", "材质", "指纹", "相对尺度"],
+            excludeFromOutput: ["手套", "手指", "夹持姿势", "背景"],
+            carrierPolicy: "reference-only",
+          },
+        }],
         fingerprint: SHA_C,
       },
     ]);

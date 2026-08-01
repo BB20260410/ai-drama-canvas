@@ -67,6 +67,7 @@ import {
   AI_CANVAS_APPLICATION_VERSION,
   AI_CANVAS_PROTOCOL_VERSION,
 } from "./release-manifest.js";
+import { withStudioRequestSchemaCache } from "./studio-request-schema-cache.js";
 
 export { AI_CANVAS_PROTOCOL_VERSION } from "./release-manifest.js";
 
@@ -186,6 +187,15 @@ export function buildStudioUnitGridAgentImagegenBrief(
     mediaSha256: reference.mediaSha256,
     categories: reference.categories,
     roles: reference.roles,
+    referenceUsages: reference.referenceUsages ?? reference.coveredAssetIds.map((assetId) => ({
+      assetId,
+      usage: {
+        purpose: reference.categories.includes("continuity") ? "continuity" as const : "identity" as const,
+        inheritOnly: ["all"],
+        excludeFromOutput: [],
+        carrierPolicy: "none" as const,
+      },
+    })),
     fingerprint: reference.fingerprint,
   }));
   // 九字段站位摘要：从各格 panelPack continuity heads 投影，供 Agent 保持一致性。
@@ -299,7 +309,9 @@ async function verifiedStudioControlReferences(
       && asset.version.id === reference.assetVersionId
       && asset.version.mediaSha256 === reference.mediaSha256
       && asset.media.sha256 === reference.mediaSha256
-      && asset.media.objectPath === reference.localPath);
+      && asset.media.objectPath === reference.localPath
+      && (reference.referenceUsage === undefined
+        || JSON.stringify(asset.referenceUsage) === JSON.stringify(reference.referenceUsage)));
     if (matches.length !== 1) {
       throw new Error(`Codex generation 控制引用 ${reference.assetId} 与冻结包资产绑定不一致。`);
     }
@@ -370,6 +382,7 @@ async function verifiedStudioUnitGridControlReferences(
     assetIds: Set<string>;
     categories: Set<string>;
     roles: Set<string>;
+    referenceUsages: Map<string, NonNullable<StudioCodexControlReference["referenceUsage"]>>;
   }>();
   for (const panel of pack.panels) {
     // unit-grid readiness 已在本次请求内刚刚构建全部 panel pack；这里仅复核
@@ -386,6 +399,7 @@ async function verifiedStudioUnitGridControlReferences(
         assetIds: new Set<string>(),
         categories: new Set<string>(),
         roles: new Set<string>(),
+        referenceUsages: new Map(),
       };
       if (entry.localPath !== reference.localPath) {
         throw new Error(`Codex unit-grid 控制引用 ${reference.mediaSha256} 的 CAS 路径不一致。`);
@@ -393,6 +407,12 @@ async function verifiedStudioUnitGridControlReferences(
       entry.assetIds.add(reference.assetId);
       entry.categories.add(reference.category);
       entry.roles.add(reference.role);
+      entry.referenceUsages.set(reference.assetId, reference.referenceUsage ?? {
+        purpose: "identity",
+        inheritOnly: ["all"],
+        excludeFromOutput: [],
+        carrierPolicy: "none",
+      });
       merged.set(reference.mediaSha256, entry);
     }
   }
@@ -436,7 +456,13 @@ async function verifiedStudioUnitGridControlReferences(
       || expected.localPath !== reference.localPath
       || !sameSortedStrings(reference.coveredAssetIds, [...expected.assetIds])
       || !sameSortedStrings(reference.categories, [...expected.categories])
-      || !sameSortedStrings(reference.roles, [...expected.roles])) {
+      || !sameSortedStrings(reference.roles, [...expected.roles])
+      || (reference.referenceUsages !== undefined
+        && JSON.stringify(reference.referenceUsages) !== JSON.stringify(
+          [...expected.referenceUsages.entries()]
+            .sort(([left], [right]) => left.localeCompare(right, "en"))
+            .map(([assetId, usage]) => ({ assetId, usage })),
+        ))) {
       throw new Error(`Codex unit-grid 控制引用 ${reference.referenceId} 与逐格冻结闭包不一致。`);
     }
 
@@ -490,94 +516,96 @@ export async function getStudioGenerationControlEnvelope(
   }
   if (query.operation === "readiness") {
     if (query.targetKind === "unit-grid") {
-      const readiness = await queryStudioUnitGridGenerationFreeze(projectRoot, {
-        targetKind: "unit-grid",
-        unitId: query.unitId,
-        ...(query.continuationWaiver ? { continuationWaiver: query.continuationWaiver } : {}),
+      return withStudioRequestSchemaCache(async () => {
+        const readiness = await queryStudioUnitGridGenerationFreeze(projectRoot, {
+          targetKind: "unit-grid",
+          unitId: query.unitId,
+          ...(query.continuationWaiver ? { continuationWaiver: query.continuationWaiver } : {}),
+        });
+        if (readiness.status === "blocked") {
+          return {
+            schemaVersion: 1 as const,
+            kind: STUDIO_GENERATION_CONTROL_KIND,
+            operation: "readiness" as const,
+            status: "blocked" as const,
+            targetKind: "unit-grid" as const,
+            code: readiness.code,
+            message: readiness.message,
+            detailCount: readiness.details.length,
+            controlReferencesExposed: false as const,
+          };
+        }
+        try {
+          const controlReferences = await verifiedStudioUnitGridControlReferences(projectRoot, readiness.pack);
+          const currentSnapshot = await getStudioProductionUnitSnapshot(projectRoot, readiness.pack.target.unitId);
+          if (!currentSnapshot) throw new Error("Studio unit-grid 就绪单元在生成命令前消失。");
+          return {
+            schemaVersion: 1 as const,
+            kind: STUDIO_GENERATION_CONTROL_KIND,
+            operation: "readiness" as const,
+            status: "ready" as const,
+            targetKind: "unit-grid" as const,
+            candidate: {
+              packId: readiness.packId,
+              fingerprint: readiness.fingerprint,
+              projectId: readiness.pack.projectId,
+              managedManifestFingerprint: readiness.pack.managedManifestFingerprint,
+              unitSnapshotFingerprint: readiness.pack.unitSnapshotFingerprint,
+              continuityFingerprint: readiness.pack.continuityFingerprint,
+              target: readiness.pack.target,
+              requestId: readiness.request.id,
+              requestFingerprint: readiness.request.fingerprint,
+              executorKind: readiness.request.executorKind,
+              allowedProviders: readiness.request.allowedProviders,
+              controlReferenceCount: controlReferences.length,
+              panelCount: readiness.pack.panels.length,
+              forbiddenAssetCount: readiness.pack.panels.reduce(
+                (count, panel) => count + panel.panelPack.forbiddenAssets.length,
+                0,
+              ),
+            },
+            agentExecution: {
+              formalProviders: STUDIO_FORMAL_IMAGEGEN_ALLOWED_PROVIDERS,
+              next: "freeze → plan → dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback",
+              briefs: {
+                codex: buildStudioUnitGridAgentImagegenBrief(readiness.pack, "codex"),
+                grok: buildStudioUnitGridAgentImagegenBrief(readiness.pack, "grok"),
+              },
+            },
+            persistence: "execute-command-required" as const,
+            writeCommand: {
+              tool: "execute_command" as const,
+              command: "freeze_studio_generation_pack" as const,
+              payload: {
+                targetKind: "unit-grid" as const,
+                unitId: readiness.pack.target.unitId,
+                ...(readiness.pack.continuationWaiver
+                  ? {
+                      continuationWaiver: {
+                        receiptId: readiness.pack.continuationWaiver.receiptId,
+                        receiptFingerprint: readiness.pack.continuationWaiver.fingerprint,
+                      },
+                    }
+                  : {}),
+                expectedRevision: currentSnapshot.unit.revision,
+              },
+            },
+            controlReferencesExposed: false as const,
+          };
+        } catch {
+          return {
+            schemaVersion: 1 as const,
+            kind: STUDIO_GENERATION_CONTROL_KIND,
+            operation: "readiness" as const,
+            status: "blocked" as const,
+            targetKind: "unit-grid" as const,
+            code: "control-reference-invalid" as const,
+            message: "Codex unit-grid 控制引用未通过逐格闭包、受管 media CAS 路径与 SHA 校验。",
+            detailCount: 0,
+            controlReferencesExposed: false as const,
+          };
+        }
       });
-      if (readiness.status === "blocked") {
-        return {
-          schemaVersion: 1 as const,
-          kind: STUDIO_GENERATION_CONTROL_KIND,
-          operation: "readiness" as const,
-          status: "blocked" as const,
-          targetKind: "unit-grid" as const,
-          code: readiness.code,
-          message: readiness.message,
-          detailCount: readiness.details.length,
-          controlReferencesExposed: false as const,
-        };
-      }
-      try {
-        const controlReferences = await verifiedStudioUnitGridControlReferences(projectRoot, readiness.pack);
-        const currentSnapshot = await getStudioProductionUnitSnapshot(projectRoot, readiness.pack.target.unitId);
-        if (!currentSnapshot) throw new Error("Studio unit-grid 就绪单元在生成命令前消失。");
-        return {
-          schemaVersion: 1 as const,
-          kind: STUDIO_GENERATION_CONTROL_KIND,
-          operation: "readiness" as const,
-          status: "ready" as const,
-          targetKind: "unit-grid" as const,
-          candidate: {
-            packId: readiness.packId,
-            fingerprint: readiness.fingerprint,
-            projectId: readiness.pack.projectId,
-            managedManifestFingerprint: readiness.pack.managedManifestFingerprint,
-            unitSnapshotFingerprint: readiness.pack.unitSnapshotFingerprint,
-            continuityFingerprint: readiness.pack.continuityFingerprint,
-            target: readiness.pack.target,
-            requestId: readiness.request.id,
-            requestFingerprint: readiness.request.fingerprint,
-            executorKind: readiness.request.executorKind,
-            allowedProviders: readiness.request.allowedProviders,
-            controlReferenceCount: controlReferences.length,
-            panelCount: readiness.pack.panels.length,
-            forbiddenAssetCount: readiness.pack.panels.reduce(
-              (count, panel) => count + panel.panelPack.forbiddenAssets.length,
-              0,
-            ),
-          },
-          agentExecution: {
-            formalProviders: STUDIO_FORMAL_IMAGEGEN_ALLOWED_PROVIDERS,
-            next: "freeze → plan → dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback",
-            briefs: {
-              codex: buildStudioUnitGridAgentImagegenBrief(readiness.pack, "codex"),
-              grok: buildStudioUnitGridAgentImagegenBrief(readiness.pack, "grok"),
-            },
-          },
-          persistence: "execute-command-required" as const,
-          writeCommand: {
-            tool: "execute_command" as const,
-            command: "freeze_studio_generation_pack" as const,
-            payload: {
-              targetKind: "unit-grid" as const,
-              unitId: readiness.pack.target.unitId,
-              ...(readiness.pack.continuationWaiver
-                ? {
-                    continuationWaiver: {
-                      receiptId: readiness.pack.continuationWaiver.receiptId,
-                      receiptFingerprint: readiness.pack.continuationWaiver.fingerprint,
-                    },
-                  }
-                : {}),
-              expectedRevision: currentSnapshot.unit.revision,
-            },
-          },
-          controlReferencesExposed: false as const,
-        };
-      } catch {
-        return {
-          schemaVersion: 1 as const,
-          kind: STUDIO_GENERATION_CONTROL_KIND,
-          operation: "readiness" as const,
-          status: "blocked" as const,
-          targetKind: "unit-grid" as const,
-          code: "control-reference-invalid" as const,
-          message: "Codex unit-grid 控制引用未通过逐格闭包、受管 media CAS 路径与 SHA 校验。",
-          detailCount: 0,
-          controlReferencesExposed: false as const,
-        };
-      }
     }
 
     const readiness = await queryStudioGenerationFreeze(projectRoot, {
@@ -833,94 +861,96 @@ export async function getStudioGenerationControlEnvelope(
     };
   }
 
-  const shell = await inspectManagedProject(projectRoot);
-  const pack = await readAnyStudioGenerationFrozenPack(shell.paths.root, query.packId);
-  if (!pack) {
-    return {
-      schemaVersion: 1 as const,
-      kind: STUDIO_GENERATION_CONTROL_KIND,
-      operation: "pack" as const,
-      status: "not_found" as const,
-      packId: query.packId,
-      controlReferencesExposed: false as const,
-    };
-  }
-  if (isStudioUnitGridGenerationPack(pack)) {
-    const controlReferences = await verifiedStudioUnitGridControlReferences(shell.paths.root, pack);
-    const request: StudioUnitGridCodexGenerationRequest = { ...pack.request, controlReferences };
+  return withStudioRequestSchemaCache(async () => {
+    const shell = await inspectManagedProject(projectRoot);
+    const pack = await readAnyStudioGenerationFrozenPack(shell.paths.root, query.packId);
+    if (!pack) {
+      return {
+        schemaVersion: 1 as const,
+        kind: STUDIO_GENERATION_CONTROL_KIND,
+        operation: "pack" as const,
+        status: "not_found" as const,
+        packId: query.packId,
+        controlReferencesExposed: false as const,
+      };
+    }
+    if (isStudioUnitGridGenerationPack(pack)) {
+      const controlReferences = await verifiedStudioUnitGridControlReferences(shell.paths.root, pack);
+      const request: StudioUnitGridCodexGenerationRequest = { ...pack.request, controlReferences };
+      return {
+        schemaVersion: 1 as const,
+        kind: STUDIO_GENERATION_CONTROL_KIND,
+        operation: "pack" as const,
+        status: "ready" as const,
+        targetKind: "unit-grid" as const,
+        projection: "frozen-pack-with-verified-control-local-paths" as const,
+        pack: projectedStudioUnitGridGenerationPack(pack, request),
+        request,
+        agentExecution: {
+          formalProviders: STUDIO_FORMAL_IMAGEGEN_ALLOWED_PROVIDERS,
+          executorKind: request.executorKind,
+          allowedProviders: request.allowedProviders,
+          briefs: {
+            codex: buildStudioUnitGridAgentImagegenBrief(pack, "codex"),
+            grok: buildStudioUnitGridAgentImagegenBrief(pack, "grok"),
+          },
+          dispatchPayloadTemplate: {
+            command: "dispatch_studio_generation_pack" as const,
+            required: ["packId", "packFingerprint", "generationRunId", "provider", "expectedRevision"],
+            providerEnum: ["codex", "grok"],
+          },
+          preCallPayloadTemplate: {
+            command: "prepare_studio_imagegen_call" as const,
+            required: ["projectContextToken", "packId", "packFingerprint", "generationRunId", "provider", "expectedRevision"],
+            expectedRevision: 0 as const,
+            authorization: "only-first-success-may-return-callAllowed-true" as const,
+          },
+        },
+        verification: {
+          managedProject: true as const,
+          currentFreezeInputs: true as const,
+          panelBindingContinuityClosure: true as const,
+          mediaCasContainment: true as const,
+          mediaSha256: true as const,
+          verifiedControlReferenceCount: controlReferences.length,
+        },
+        controlReferencesExposed: true as const,
+      };
+    }
+    const controlReferences = await verifiedStudioControlReferences(shell.paths.root, pack);
+    const request: StudioCodexGenerationRequest = { ...pack.request, controlReferences };
     return {
       schemaVersion: 1 as const,
       kind: STUDIO_GENERATION_CONTROL_KIND,
       operation: "pack" as const,
       status: "ready" as const,
-      targetKind: "unit-grid" as const,
       projection: "frozen-pack-with-verified-control-local-paths" as const,
-      pack: projectedStudioUnitGridGenerationPack(pack, request),
+      pack: projectedStudioGenerationPack(pack, request),
       request,
       agentExecution: {
         formalProviders: STUDIO_FORMAL_IMAGEGEN_ALLOWED_PROVIDERS,
         executorKind: request.executorKind,
         allowedProviders: request.allowedProviders,
         briefs: {
-          codex: buildStudioUnitGridAgentImagegenBrief(pack, "codex"),
-          grok: buildStudioUnitGridAgentImagegenBrief(pack, "grok"),
+          codex: buildStudioAgentImagegenBrief(pack, "codex"),
+          grok: buildStudioAgentImagegenBrief(pack, "grok"),
         },
         dispatchPayloadTemplate: {
           command: "dispatch_studio_generation_pack" as const,
           required: ["packId", "packFingerprint", "generationRunId", "provider", "expectedRevision"],
           providerEnum: ["codex", "grok"],
         },
-        preCallPayloadTemplate: {
-          command: "prepare_studio_imagegen_call" as const,
-          required: ["projectContextToken", "packId", "packFingerprint", "generationRunId", "provider", "expectedRevision"],
-          expectedRevision: 0 as const,
-          authorization: "only-first-success-may-return-callAllowed-true" as const,
-        },
       },
       verification: {
         managedProject: true as const,
         currentFreezeInputs: true as const,
-        panelBindingContinuityClosure: true as const,
         mediaCasContainment: true as const,
         mediaSha256: true as const,
         verifiedControlReferenceCount: controlReferences.length,
       },
       controlReferencesExposed: true as const,
     };
-  }
-  const controlReferences = await verifiedStudioControlReferences(shell.paths.root, pack);
-  const request: StudioCodexGenerationRequest = { ...pack.request, controlReferences };
-  return {
-    schemaVersion: 1 as const,
-    kind: STUDIO_GENERATION_CONTROL_KIND,
-    operation: "pack" as const,
-    status: "ready" as const,
-    projection: "frozen-pack-with-verified-control-local-paths" as const,
-    pack: projectedStudioGenerationPack(pack, request),
-    request,
-    agentExecution: {
-      formalProviders: STUDIO_FORMAL_IMAGEGEN_ALLOWED_PROVIDERS,
-      executorKind: request.executorKind,
-      allowedProviders: request.allowedProviders,
-      briefs: {
-        codex: buildStudioAgentImagegenBrief(pack, "codex"),
-        grok: buildStudioAgentImagegenBrief(pack, "grok"),
-      },
-      dispatchPayloadTemplate: {
-        command: "dispatch_studio_generation_pack" as const,
-        required: ["packId", "packFingerprint", "generationRunId", "provider", "expectedRevision"],
-        providerEnum: ["codex", "grok"],
-      },
-    },
-    verification: {
-      managedProject: true as const,
-      currentFreezeInputs: true as const,
-      mediaCasContainment: true as const,
-      mediaSha256: true as const,
-      verifiedControlReferenceCount: controlReferences.length,
-    },
-    controlReferencesExposed: true as const,
-  };
+  });
 }
 
 function compactItem(item: WorkItem) {

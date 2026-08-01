@@ -171,6 +171,48 @@ async function fixture(): Promise<{ root: string; scriptBody: string }> {
       note: "P6 绑定测试主权威。",
     },
   });
+  await executeSetup(root, 11, {
+    command: "create_studio_asset",
+    payload: {
+      id: "character-ahang-control",
+      category: "character",
+      name: "阿航仅主体控制图",
+      aliases: ["阿航控制"],
+      identityFeatures: ["只作为派生控制候选"],
+      positiveLocks: ["固定脸"],
+      negativeLocks: ["不得替代父资产"],
+      expectedRevision: 0,
+    },
+  });
+  const controlVersion = await executeSetup(root, 12, {
+    command: "append_studio_asset_version",
+    payload: {
+      assetId: "character-ahang-control",
+      mediaSha256: media.sha256,
+      reviewStatus: "pending",
+      sourceNote: "P6 混合 exact/model 候选测试。",
+      expectedRevision: 1,
+    },
+  });
+  const controlReview = await executeSetup(root, 13, {
+    command: "review_studio_asset_version",
+    payload: {
+      assetId: "character-ahang-control",
+      versionId: controlVersion.version.id,
+      decision: "approved",
+      expectedRevision: controlVersion.assetRevision,
+      note: "P6 混合候选测试控制图审核通过。",
+    },
+  });
+  await executeSetup(root, 14, {
+    command: "set_studio_primary_authority",
+    payload: {
+      assetId: "character-ahang-control",
+      versionId: controlVersion.version.id,
+      expectedRevision: controlReview.revision,
+      note: "P6 混合候选测试控制图主权威。",
+    },
+  });
   return { root, scriptBody };
 }
 
@@ -206,20 +248,31 @@ describe("P6 Studio binding 命令总线", () => {
     const { root, scriptBody } = await fixture();
     const initial = await getStudioBindingControl(root, { unitId: "unit-p6-binding-001" });
     const mysteryStart = scriptBody.indexOf("神秘人");
+    const ahangStart = scriptBody.indexOf("阿航");
     const analyzeRequest = {
       command: "analyze_studio_script_entities" as const,
       payload: {
         unitId: "unit-p6-binding-001",
         panelId: "panel-01",
         expectedRevisionToken: initial.revisionToken,
-        extractedMentions: [{
-          startOffsetUtf16: mysteryStart,
-          endOffsetUtf16: mysteryStart + "神秘人".length,
-          category: "character" as const,
-          presence: "optional" as const,
-          role: "Codex 待审角色提议",
-          candidateAssetIds: ["character-ahang"],
-        }],
+        extractedMentions: [
+          {
+            startOffsetUtf16: mysteryStart,
+            endOffsetUtf16: mysteryStart + "神秘人".length,
+            category: "character" as const,
+            presence: "optional" as const,
+            role: "Codex 待审角色提议",
+            candidateAssetIds: ["character-ahang"],
+          },
+          {
+            startOffsetUtf16: ahangStart,
+            endOffsetUtf16: ahangStart + "阿航".length,
+            category: "character" as const,
+            presence: "required" as const,
+            role: "阿航派生控制候选测试",
+            candidateAssetIds: ["character-ahang-control"],
+          },
+        ],
       },
     };
 
@@ -248,12 +301,67 @@ describe("P6 Studio binding 命令总线", () => {
     const ahang = panel.proposals.find((proposal) => proposal.entityText === "阿航")!;
     const suggested = panel.proposals.find((proposal) => proposal.entityText === "神秘人")!;
     expect(ahang).toMatchObject({ status: "matched", matchedAssetId: "character-ahang" });
+    expect(ahang.candidates).toEqual(expect.arrayContaining([
+      expect.objectContaining({ assetId: "character-ahang" }),
+      expect.objectContaining({ assetId: "character-ahang-control", matchKind: "model" }),
+    ]));
     expect(ahang).not.toHaveProperty("resolvedAssetId");
     expect(suggested).toMatchObject({
       status: "unmatched",
       candidates: [{ assetId: "character-ahang", matchKind: "model" }],
     });
     expect(suggested).not.toHaveProperty("resolvedAssetId");
+    const invalidAccept = envelope(115, {
+      command: "resolve_studio_entity_proposal",
+      payload: {
+        unitId: "unit-p6-binding-001",
+        panelId: "panel-01",
+        proposalId: suggested.id,
+        decision: "accept",
+        selectedAssetId: "character-ahang",
+        presence: "optional",
+        role: "Codex 待审角色提议",
+        expectedRevisionToken: analyzed.revisionToken,
+        reviewer: "codex",
+      },
+    });
+    await expect(executeIdempotentCommand(root, invalidAccept)).rejects.toThrow(/accept 只允许确认唯一 exact matched/u);
+    expect((await listCommandLedger(root)).find((entry) => entry.idempotencyKey === invalidAccept.idempotencyKey))
+      .toMatchObject({
+        status: "failed",
+        result: {
+          applied: false,
+          entityType: "studio_asset_binding",
+          reason: "decision-invalid",
+        },
+      });
+
+    const invalidMixedAccept = envelope(116, {
+      command: "resolve_studio_entity_proposal",
+      payload: {
+        unitId: "unit-p6-binding-001",
+        panelId: "panel-01",
+        proposalId: ahang.id,
+        decision: "accept",
+        selectedAssetId: "character-ahang-control",
+        presence: "required",
+        role: "错误地把 model 候选当作唯一 exact 候选接受",
+        expectedRevisionToken: analyzed.revisionToken,
+        reviewer: "codex",
+      },
+    });
+    await expect(executeIdempotentCommand(root, invalidMixedAccept))
+      .rejects.toThrow(/accept 只允许确认唯一 exact matched/u);
+    expect((await listCommandLedger(root)).find(
+      (entry) => entry.idempotencyKey === invalidMixedAccept.idempotencyKey,
+    )).toMatchObject({
+      status: "failed",
+      result: {
+        applied: false,
+        entityType: "studio_asset_binding",
+        reason: "decision-invalid",
+      },
+    });
 
     const resolveRequest = {
       command: "resolve_studio_entity_proposal" as const,

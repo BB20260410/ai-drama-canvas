@@ -319,12 +319,8 @@ describe.sequential("生图入口正式门禁 · 负数审计", () => {
     });
     expect(await readStudioGenerationResultBundle(fixture.root, run1)).toBeNull();
 
-    // ── 负数 3c（旧 panel v4 登记路径的隔离边界）：
-    // panel 包拿不到 call intent —— prepare 只服务 protocol v2 unit-grid dispatch
-    //（ledger:5344 call-intent-required）；且 panel run 上非 fixture 回执的 commit
-    // 也被 call-intent-required 拒绝（bundle:847-848）。即旧 register 旁路无法升级成
-    // "看起来经过一次性闸"的写回，protocol v2 run 走 register 也被
-    // call-intent-requires-bundle 拒绝（ledger:6007-6012，由 3b 间接覆盖）。
+    // ── 正数 3c：panel v4 dispatch 可在 prepare 时追加 protocol v2 扩展，
+    // 获得与 unit-grid 相同的一次性 call intent，并只从 quarantine 原子写回。
     const panelUnit = fixture.units.sixPanel;
     const panel = panelUnit.panels[0]!;
     await seedStudioP7ResolvedPanelContinuity(fixture.root, {
@@ -343,7 +339,7 @@ describe.sequential("生图入口正式门禁 · 负数审计", () => {
       generationRunId: panelRun,
       provider: "codex",
     });
-    await expect(executeIdempotentCommand(fixture.root, envelope("prepare-panel-v4", {
+    const panelPreparedCommand = await executeIdempotentCommand(fixture.root, envelope("prepare-panel-v4", {
       command: "prepare_studio_imagegen_call",
       payload: {
         packId: panelFrozen.packId,
@@ -353,11 +349,26 @@ describe.sequential("生图入口正式门禁 · 负数审计", () => {
         projectContextToken: context.projectContextToken,
         expectedRevision: 0,
       },
-    }))).rejects.toMatchObject({
-      name: "RejectedCommandFailure",
-      result: { code: "call-intent-required" },
+    }));
+    expect(panelPreparedCommand).toMatchObject({
+      status: "succeeded",
+      result: { callAllowed: true, idempotentReplay: false, targetKind: "panel" },
     });
-    await expect(executeIdempotentCommand(fixture.root, envelope("commit-panel-live-receipt", {
+    const panelPrepared = panelPreparedCommand.result as {
+      callId: string;
+      quarantine: { candidatePath: string };
+    };
+    const panelWide = panelFrozen.pack.request.modelPayload.layout === "cinematic-wide";
+    await sharp({
+      create: {
+        width: panelWide ? 1919 : 900,
+        height: panelWide ? 820 : 1600,
+        channels: 3,
+        background: "#243a4b",
+      },
+    }).png({ compressionLevel: 0 }).toFile(panelPrepared.quarantine.candidatePath);
+    const panelCandidateSha = sha256(await readFile(panelPrepared.quarantine.candidatePath));
+    const panelCommitted = await executeIdempotentCommand(fixture.root, envelope("commit-panel-live-receipt", {
       command: "commit_agent_imagegen_result_bundle",
       payload: {
         projectContextToken: context.projectContextToken,
@@ -365,19 +376,28 @@ describe.sequential("生图入口正式门禁 · 负数审计", () => {
         packFingerprint: panelFrozen.fingerprint,
         generationRunId: panelRun,
         provider: "codex",
-        rawPath: path.join(fixture.root, "fixture-inputs", "ghost.png"),
-        rawSha256: "0".repeat(64),
+        rawPath: panelPrepared.quarantine.candidatePath,
+        rawSha256: panelCandidateSha,
         expectedRevision: panelFrozen.pack.target.unitRevision,
         executionReceipt: {
           schemaVersion: 1, kind: "agent-imagegen-execution-receipt", provider: "codex",
           source: "codex-imagegen", attestationLevel: "agent-session-direct",
-          cryptographicProviderReceipt: false, callId: "gate-audit-panel-live-call",
+          cryptographicProviderReceipt: false, callId: panelPrepared.callId,
           model: "built-in image_gen", generatedAt: "2026-07-25T00:00:00.000Z",
         },
       },
-    }))).rejects.toMatchObject({
-      name: "RejectedCommandFailure",
-      result: { entityType: "studio_generation_result_bundle", code: "call-intent-required" },
+    }));
+    expect(panelCommitted).toMatchObject({
+      status: "succeeded",
+      result: {
+        generationRunId: panelRun,
+        results: {
+          status: "pending-review",
+          pairComplete: true,
+          raw: { targetKind: "panel" },
+        },
+        review: { status: "pending", autoApproved: false },
+      },
     });
 
     // 正式 prepare run-0001：唯一一次 callAllowed=true。

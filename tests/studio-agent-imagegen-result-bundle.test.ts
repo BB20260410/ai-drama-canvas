@@ -13,6 +13,7 @@ import {
 import {
   commitAgentImagegenResultBundle,
   proveAgentImagegenResultBundleOutcome,
+  validateStudioRawAspectRatio,
 } from "../src/core/studio-agent-imagegen-result-bundle.js";
 import {
   dispatchStudioGenerationPack,
@@ -52,6 +53,15 @@ afterEach(async () => {
 function sha256(bytes: Buffer): string {
   return createHash("sha256").update(bytes).digest("hex");
 }
+
+describe("Agent imagegen RAW 画幅合同", () => {
+  it("分别接受 9:16 竖屏与约 21:9 宽银幕，并拒绝交叉画幅", () => {
+    expect(validateStudioRawAspectRatio(90, 160, "9:16-vertical").valid).toBe(true);
+    expect(validateStudioRawAspectRatio(1919, 820, "cinematic-wide").valid).toBe(true);
+    expect(validateStudioRawAspectRatio(1919, 820, "9:16-vertical").valid).toBe(false);
+    expect(validateStudioRawAspectRatio(90, 160, "cinematic-wide").valid).toBe(false);
+  });
+});
 
 function envelope(index: string, request: IdempotentCommandInput["request"]): IdempotentCommandInput {
   return {

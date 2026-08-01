@@ -1305,6 +1305,24 @@ export async function resolveStudioEntityProposal(
   if (input.decision !== "accept" && input.decision !== "select" && input.decision !== "exclude") {
     throw new StudioBindingControlError("decision-invalid", "decision 无效。");
   }
+  const exactCandidates = proposal.candidates.filter((candidate) => candidate.kind !== "model");
+  if (
+    input.decision === "accept"
+    && (
+      proposal.status !== "matched"
+      || exactCandidates.length !== 1
+      || input.selectedAssetId !== exactCandidates[0]?.assetId
+    )
+  ) {
+    throw new StudioBindingControlError("decision-invalid", "accept 只允许确认唯一 exact matched 提案。");
+  }
+  if (input.decision === "select"
+    && (!input.selectedAssetId || !proposal.candidates.some((candidate) => candidate.assetId === input.selectedAssetId))) {
+    throw new StudioBindingControlError("decision-invalid", "select 必须显式选择 exact 或 model 待审候选中的资产。");
+  }
+  if (input.decision === "exclude" && input.selectedAssetId) {
+    throw new StudioBindingControlError("decision-invalid", "exclude 决策不能携带 selectedAssetId。");
+  }
   if (input.presence !== "required" && input.presence !== "optional" && input.presence !== "forbidden") {
     throw new StudioBindingControlError("decision-invalid", "presence 无效。");
   }

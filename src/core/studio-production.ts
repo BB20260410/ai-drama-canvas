@@ -14,6 +14,12 @@ import {
   persistConfinedBytesNoReplace,
   type ConfinedDirectoryIdentity,
 } from "./confined-project-storage.js";
+import {
+  hasStudioRequestSchemaValidation,
+  isStudioRequestSqliteValidationUnchanged,
+  markStudioRequestSqliteValidationIfUnchanged,
+  studioRequestSqliteValidationKey,
+} from "./studio-request-schema-cache.js";
 
 const SCHEMA_VERSION = 6;
 const DATABASE_RELATIVE_PATH = ".aicanvas/studio-production.sqlite";
@@ -1236,6 +1242,25 @@ function openDatabase(databasePath: string): DatabaseSync {
   db.exec(`PRAGMA busy_timeout=${BUSY_TIMEOUT_MS}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
   const journal = db.prepare("PRAGMA journal_mode").get() as { journal_mode?: string } | undefined;
   if (journal?.journal_mode?.toLowerCase() !== "wal") db.exec("PRAGMA journal_mode=WAL");
+  const requestSchemaKey = studioRequestSqliteValidationKey("studio-production-schema-v6", databasePath);
+  if (hasStudioRequestSchemaValidation(requestSchemaKey)) {
+    const version = db.prepare("SELECT value FROM studio_production_meta WHERE key = 'schema_version'")
+      .get() as { value?: string } | undefined;
+    const foreignKeys = db.prepare("PRAGMA foreign_keys").get() as { foreign_keys?: number } | undefined;
+    if (version?.value !== String(SCHEMA_VERSION) || foreignKeys?.foreign_keys !== 1) {
+      db.close();
+      throw new Error("生产知识库 schema_version 或 foreign_keys 已漂移，拒绝继续。");
+    }
+    if (!isStudioRequestSqliteValidationUnchanged(
+      requestSchemaKey,
+      "studio-production-schema-v6",
+      databasePath,
+    )) {
+      db.close();
+      throw new Error("生产知识库在 schema cache-hit 复核期间发生 SQLite 身份漂移。");
+    }
+    return db;
+  }
   const existingMeta = db.prepare(
     "SELECT 1 AS found FROM sqlite_master WHERE type = 'table' AND name = 'studio_production_meta' LIMIT 1",
   ).get() as { found?: number } | undefined;
@@ -1779,6 +1804,13 @@ function openDatabase(databasePath: string): DatabaseSync {
   }
   try {
     runTransaction(db, () => {
+      // BEGIN IMMEDIATE 已阻断并发 writer；从这里到 mark 运行原有完整迁移/结构/
+      // 数据不变量验证。当前完整 schema 不应产生写入，因而 before/after key 相等；
+      // 真实迁移若改变 WAL 只是不缓存本次，下一次稳定打开再建立 marker。
+      const stableValidationKey = studioRequestSqliteValidationKey(
+        "studio-production-schema-v6",
+        databasePath,
+      );
       // P30：保持两张 legacy unit 表及其 duration=15000 CHECK 原样；真实时长
       // 由同一 production owner 的纯增 extension 行权威表达。DDL 也在迁移事务内，
       // 因而后续任何历史数据校验失败都会连同本表完整回滚。
@@ -1976,17 +2008,33 @@ function openDatabase(databasePath: string): DatabaseSync {
         CREATE INDEX IF NOT EXISTS studio_production_units_episode_season_sequence_id_idx
           ON studio_production_units(episode, season, sequence, id);
       `);
-      db.prepare("INSERT INTO studio_production_meta(key, value) VALUES('schema_version', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value")
+      db.prepare(`INSERT INTO studio_production_meta(key, value) VALUES('schema_version', ?)
+        ON CONFLICT(key) DO UPDATE SET value = excluded.value
+        WHERE studio_production_meta.value <> excluded.value`)
         .run(String(SCHEMA_VERSION));
+      const finalVersion = db.prepare(
+        "SELECT value FROM studio_production_meta WHERE key = 'schema_version'",
+      ).get() as { value?: string } | undefined;
+      const foreignKeys = db.prepare("PRAGMA foreign_keys").get() as { foreign_keys?: number } | undefined;
+      if (finalVersion?.value !== String(SCHEMA_VERSION) || foreignKeys?.foreign_keys !== 1) {
+        throw new Error("生产知识库 schema_version 或 foreign_keys 无效，拒绝缓存验证结论。");
+      }
+      markStudioRequestSqliteValidationIfUnchanged(
+        stableValidationKey,
+        "studio-production-schema-v6",
+        databasePath,
+      );
     });
   } catch (error) {
     db.close();
     throw error;
   }
+  const finalVersion = db.prepare("SELECT value FROM studio_production_meta WHERE key = 'schema_version'")
+    .get() as { value?: string } | undefined;
   const foreignKeys = db.prepare("PRAGMA foreign_keys").get() as { foreign_keys?: number } | undefined;
-  if (foreignKeys?.foreign_keys !== 1) {
+  if (finalVersion?.value !== String(SCHEMA_VERSION) || foreignKeys?.foreign_keys !== 1) {
     db.close();
-    throw new Error("生产知识库 foreign_keys 未启用，拒绝继续。");
+    throw new Error("生产知识库 schema_version 或 foreign_keys 无效，拒绝继续。");
   }
   return db;
 }
@@ -4573,11 +4621,13 @@ export async function analyzeStudioPanelAssetMentions(
         candidateSetFingerprint,
         candidates,
       };
-      // 提案 fingerprint 必须按 unit+panel 隔离：同 surface/role 跨宫格合法共存。
-      // 旧实现仅内容寻址导致 UNIQUE(fingerprint) 在多格重分析时误撞（S1E2 共生环实踩）。
+      // 提案属于某一追加式 analysis revision。相同 mention 在同一宫格重析时
+      // 必须生成新的 proposal 身份；否则全局 UNIQUE(fingerprint) 会与历史提案
+      // 冲突，使“保留旧提案并新增一项”无法落盘。
       const fingerprint = sha256(stableJson({
         unitId,
         panelIndex: input.panelIndex,
+        analysisRevision: input.expectedHeadRevision + 1,
         ...semantic,
       }));
       return { semantic, fingerprint, id: `mention-proposal-${fingerprint.slice(0, 40)}` };

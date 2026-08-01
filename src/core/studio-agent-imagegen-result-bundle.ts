@@ -56,8 +56,10 @@ const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,254}$/u;
 const WRITEBACK_ROOT = ".aicanvas/studio-generation/writebacks";
 const RECEIPT_ROOT = ".aicanvas/studio-generation/writeback-receipts/sha256";
 const MAX_RECEIPT_BYTES = 256 * 1024;
-const TARGET_ASPECT_RATIO = 9 / 16;
+const TARGET_VERTICAL_ASPECT_RATIO = 9 / 16;
+const TARGET_CINEMATIC_WIDE_ASPECT_RATIO = 21 / 9;
 const ASPECT_RATIO_TOLERANCE = 0.025;
+const CINEMATIC_WIDE_ASPECT_RATIO_TOLERANCE = 0.15;
 
 export type StudioAgentImagegenBundleErrorCode =
   | "invalid-input"
@@ -314,7 +316,33 @@ async function sha256File(filePath: string): Promise<string> {
   return hash.digest("hex");
 }
 
-async function inspectRaw(rawPath: string, expectedSha256: string, expectedPath?: string): Promise<RawInspection> {
+export function validateStudioRawAspectRatio(
+  width: number,
+  height: number,
+  layout: "9:16-vertical" | "cinematic-wide",
+): { valid: boolean; aspectRatio: number; expected: string } {
+  const aspectRatio = width / height;
+  if (layout === "cinematic-wide") {
+    return {
+      valid: width > height
+        && Math.abs(aspectRatio - TARGET_CINEMATIC_WIDE_ASPECT_RATIO) <= CINEMATIC_WIDE_ASPECT_RATIO_TOLERANCE,
+      aspectRatio,
+      expected: "电影宽银幕横幅（约 21:9）",
+    };
+  }
+  return {
+    valid: height > width && Math.abs(aspectRatio - TARGET_VERTICAL_ASPECT_RATIO) <= ASPECT_RATIO_TOLERANCE,
+    aspectRatio,
+    expected: "9:16 竖屏",
+  };
+}
+
+async function inspectRaw(
+  rawPath: string,
+  expectedSha256: string,
+  expectedPath: string | undefined,
+  layout: "9:16-vertical" | "cinematic-wide",
+): Promise<RawInspection> {
   if (typeof rawPath !== "string" || !rawPath.trim() || !path.isAbsolute(rawPath.trim())) {
     fail("invalid-input", "rawPath 必须是绝对路径。");
   }
@@ -356,18 +384,18 @@ async function inspectRaw(rawPath: string, expectedSha256: string, expectedPath?
   const width = metadata.width ?? 0;
   const height = metadata.height ?? 0;
   if (width < 64 || height < 64) fail("raw-decode-failed", `raw 尺寸无效：${width}x${height}`);
-  const aspectRatio = width / height;
-  if (height <= width || Math.abs(aspectRatio - TARGET_ASPECT_RATIO) > ASPECT_RATIO_TOLERANCE) {
+  const aspect = validateStudioRawAspectRatio(width, height, layout);
+  if (!aspect.valid) {
     fail(
       "raw-aspect-ratio-invalid",
-      `raw 必须是 9:16 竖屏，实际 ${width}x${height}（${aspectRatio.toFixed(4)}）。`,
+      `raw 必须是${aspect.expected}，实际 ${width}x${height}（${aspect.aspectRatio.toFixed(4)}）。`,
     );
   }
   const sha256 = await sha256File(canonicalPath);
   if (sha256 !== expectedSha256) {
     fail("raw-sha-mismatch", `raw SHA 不匹配：期望 ${expectedSha256}，实际 ${sha256}。`);
   }
-  return { canonicalPath, sha256, width, height, aspectRatio };
+  return { canonicalPath, sha256, width, height, aspectRatio: aspect.aspectRatio };
 }
 
 async function inspectGrokExecutionReceiptFile(input: {
@@ -413,7 +441,7 @@ function assertGrokExecutionReceiptMatchesCall(input: {
   raw: RawInspection;
 }): void {
   if (input.receipt.source !== "grok-build-imagine") return;
-  if (!input.callIntent) fail("call-intent-required", "grok-build-imagine 只允许写回已 pre-call 的 unit-grid。");
+  if (!input.callIntent) fail("call-intent-required", "grok-build-imagine 只允许写回已 pre-call 的正式生成目标。");
   if (input.receipt.inputFingerprint !== input.callIntent.inputFingerprint) {
     fail("call-intent-conflict", "Grok receipt inputFingerprint 与 pre-call intent 不一致。");
   }
@@ -458,18 +486,16 @@ async function verifyPackAndDispatch(input: {
   if (dispatch.provider !== input.provider) {
     fail("provider-mismatch", `dispatch provider=${dispatch.provider} 与写回 provider=${input.provider} 不一致。`);
   }
-  if (isUnitGridPack(pack)) {
-    const callIntent = await readStudioImagegenCallIntentByRun(input.projectRoot, input.generationRunId);
+  const callIntent = await readStudioImagegenCallIntentByRun(input.projectRoot, input.generationRunId);
+  if (callIntent) {
     const contextRebind = await readStudioImagegenCallContextRebindByRun(input.projectRoot, input.generationRunId);
     const requestedContextTokenHash = studioImagegenContextTokenHash(input.projectContextToken);
-    if (!callIntent) {
-      fail("call-intent-required", `unit-grid generationRunId=${input.generationRunId} 缺少 pre-call intent。`);
-    }
+    const expectedTargetKind = isUnitGridPack(pack) ? "unit-grid" : "panel";
     if (callIntent.callId !== input.callId
       || callIntent.packId !== input.packId
       || callIntent.packFingerprint !== input.packFingerprint
       || callIntent.provider !== input.provider
-      || callIntent.targetKind !== "unit-grid"
+      || callIntent.targetKind !== expectedTargetKind
       || (!contextRebind && callIntent.contextTokenHash !== requestedContextTokenHash)
       || (contextRebind && (contextRebind.callId !== input.callId
         || contextRebind.generationRunId !== input.generationRunId
@@ -480,13 +506,17 @@ async function verifyPackAndDispatch(input: {
         // 链式 rebind 时 latest.from 可能是上一环 to，不必等于 call 原始 token hash
         || contextRebind.toContextTokenHash !== requestedContextTokenHash))
       || callIntent.status === "not-invoked") {
-      fail("call-intent-conflict", `executionReceipt.callId=${input.callId} 与 unit-grid pre-call intent 不一致。`);
+      fail("call-intent-conflict", `executionReceipt.callId=${input.callId} 与 ${expectedTargetKind} pre-call intent 不一致。`);
     }
-    await assertStudioUnitGridGenerationFreezePackCurrent(
-      input.projectRoot,
-      pack,
-      contextRebind ? { afterPaidCallIntent: true } : {},
-    );
+    if (isUnitGridPack(pack)) {
+      await assertStudioUnitGridGenerationFreezePackCurrent(
+        input.projectRoot,
+        pack,
+        contextRebind ? { afterPaidCallIntent: true } : {},
+      );
+    } else {
+      await assertStudioGenerationFreezePackCurrent(input.projectRoot, pack);
+    }
     if (contextRebind) {
       let verifiedRebind: StudioImagegenCallContextRebindRecord | null;
       try {
@@ -504,9 +534,11 @@ async function verifyPackAndDispatch(input: {
       }
     }
     return { pack, callIntent, ...(contextRebind ? { contextRebind } : {}) };
-  } else {
-    await assertStudioGenerationFreezePackCurrent(input.projectRoot, pack);
   }
+  if (isUnitGridPack(pack)) {
+    fail("call-intent-required", `unit-grid generationRunId=${input.generationRunId} 缺少 pre-call intent。`);
+  }
+  await assertStudioGenerationFreezePackCurrent(input.projectRoot, pack);
   return { pack };
 }
 
@@ -554,7 +586,12 @@ async function renderLabeled(input: {
             `${input.pack.target.seasonId}/${input.pack.target.episodeId}/${input.pack.target.unitId}`,
             input.pack.target.panelIndex,
           ),
-          subtitle: input.pack.panel.subtitle || input.pack.panel.dialogue || input.pack.panel.visualAction,
+          // Labeled owner 的输入合同上限是 120；正式镜头 visualAction 可以远长于此。
+          // 排版层实际只显示 48 字，因此在调用 owner 前确定性裁剪，禁止把纯输入校验
+          // 误升级为可能已经写入的 outcome_unknown。
+          subtitle: (input.pack.panel.subtitle
+            || input.pack.panel.dialogue
+            || input.pack.panel.visualAction).slice(0, 120),
           badge: input.provider,
         },
       });
@@ -849,13 +886,18 @@ export async function commitAgentImagegenResultBundle(
   const pack = verified.pack;
   const liveCall = executionReceipt.source !== "fixture-canary" ? verified.callIntent : undefined;
   if (executionReceipt.source !== "fixture-canary" && !liveCall) {
-    fail("call-intent-required", "真实 Agent imagegen 结果只允许写回已 pre-call 的 unit-grid quarantine。");
+    fail("call-intent-required", "真实 Agent imagegen 结果只允许写回已 pre-call 的正式 quarantine。");
   }
   if (verified.contextRebind
     && verified.contextRebind.executionReceiptFingerprint !== executionReceipt.fingerprint) {
     fail("receipt-drift", "context rebind 授权的 execution receipt 与提交内联回执不一致。");
   }
-  const raw = await inspectRaw(input.rawPath, rawSha256, liveCall?.quarantine.candidatePath);
+  const rawLayout = isUnitGridPack(pack)
+    ? "9:16-vertical"
+    : pack.request.modelPayload.layout === "cinematic-wide"
+      ? "cinematic-wide"
+      : "9:16-vertical";
+  const raw = await inspectRaw(input.rawPath, rawSha256, liveCall?.quarantine.candidatePath, rawLayout);
   await assertStudioGenerationRawNotDetachedCandidate(projectRoot, {
     packId,
     packFingerprint,
@@ -887,8 +929,8 @@ export async function commitAgentImagegenResultBundle(
   }
   const prior = await readStudioGenerationResultBundle(projectRoot, generationRunId);
   if (prior) {
-    if (isUnitGridPack(pack) && verified.callIntent?.status !== "result-committed") {
-      fail("call-intent-conflict", `unit-grid generationRunId=${generationRunId} 已有结果，但 call 未处于 result-committed。`);
+    if (verified.callIntent && verified.callIntent.status !== "result-committed") {
+      fail("call-intent-conflict", `generationRunId=${generationRunId} 已有结果，但 call 未处于 result-committed。`);
     }
     if (prior.packId !== packId
       || prior.packFingerprint !== packFingerprint
@@ -926,8 +968,8 @@ export async function commitAgentImagegenResultBundle(
       results: prior,
     });
   }
-  if (isUnitGridPack(pack) && verified.callIntent?.status !== "generation_unknown") {
-    fail("call-intent-conflict", `unit-grid callId=${executionReceipt.callId} 已终态，禁止新增结果。`);
+  if (verified.callIntent && verified.callIntent.status !== "generation_unknown") {
+    fail("call-intent-conflict", `callId=${executionReceipt.callId} 已终态，禁止新增结果。`);
   }
   const renderedLabeled = await renderLabeled({
     pack,
@@ -971,7 +1013,7 @@ export async function commitAgentImagegenResultBundle(
     provider: input.provider,
     rawMediaSha256: raw.sha256,
     labeledMediaSha256: labeled.sha256,
-    ...(isUnitGridPack(pack) ? { callId: executionReceipt.callId } : {}),
+    ...(verified.callIntent ? { callId: executionReceipt.callId } : {}),
   });
   return outcomeFrom({
     context,
@@ -1007,8 +1049,8 @@ export async function proveAgentImagegenResultBundleOutcome(
       || results.raw.mediaSha256 !== rawSha256
       || results.raw.status !== "pending"
       || results.labeled.status !== "pending") return null;
-    if (results.schemaVersion === 5) {
-      const callIntent = await readStudioImagegenCallIntentByRun(projectRoot, generationRunId);
+    const callIntent = await readStudioImagegenCallIntentByRun(projectRoot, generationRunId);
+    if (callIntent) {
       const contextRebind = await readStudioImagegenCallContextRebindByRun(projectRoot, generationRunId);
       const verifiedRebind = contextRebind
         ? await verifyStudioImagegenCallContextRebindEvidence(projectRoot, generationRunId)
@@ -1019,7 +1061,7 @@ export async function proveAgentImagegenResultBundleOutcome(
         || callIntent.packId !== packId
         || callIntent.packFingerprint !== packFingerprint
         || callIntent.provider !== input.provider
-        || callIntent.targetKind !== "unit-grid"
+        || callIntent.targetKind !== results.raw.targetKind
         || (!contextRebind && callIntent.contextTokenHash !== requestedContextTokenHash)
         // verifyStudioImagegenCallContextRebindEvidence 已复核首环从原 call token
         // 起步且整条 from/to 连续；恢复只应要求 latest.to 命中当前 token。
@@ -1029,6 +1071,8 @@ export async function proveAgentImagegenResultBundleOutcome(
           || !verifiedRebind
           || verifiedRebind.eventId !== contextRebind.eventId))
         || callIntent.status !== "result-committed") return null;
+    } else if (executionReceipt.source !== "fixture-canary") {
+      return null;
     }
     const matching = await loadWritebackReceipt(projectRoot, writebackReceiptLocator({
       context,
