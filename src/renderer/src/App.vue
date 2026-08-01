@@ -351,6 +351,7 @@ import { createProjectScopedActionGate, type ProjectScopedActionToken } from "./
 import { statusClass } from "./utils";
 import type { ProjectShell } from "@core/managed-project";
 import type { ListedProjectSummary } from "@core/service";
+import type { ReuseStudioGlobalResourceResult } from "@core/studio-global-resource-reuse";
 
 // 首屏只需要画布与节点组件；其余模块视图按需异步加载，避免全部打进主 chunk（沿用 MaterialStudioView 内部先例）。
 const MaterialStudioView = defineAsyncComponent(async () => {
@@ -1034,6 +1035,25 @@ const materialStudioApi: MaterialStudioUiApi = {
   openProjectCenter,
   // P24 U4：文稿修订历史（只读通道，≤20 条）。
   listTextRevisions: (root, query) => window.canvasApi.listStudioTextRevisions(root, query),
+  listGlobalResourceImages(query) {
+    return window.canvasApi.listGlobalStudioImageResources(query);
+  },
+  listGlobalMediaResources(query) {
+    return window.canvasApi.listGlobalStudioMediaResources(query);
+  },
+  async reuseGlobalResource(targetRoot, input) {
+    const result = await window.canvasApi.executeStudioCommand(
+      targetRoot,
+      await createStudioCommandEnvelope({
+        command: "reuse_studio_global_resource",
+        payload: input,
+      }),
+    );
+    if (result.status !== "succeeded" || !result.result) {
+      throw new Error(result.error?.message || "总资源调用失败。");
+    }
+    return result.result as ReuseStudioGlobalResourceResult;
+  },
   async getOverview(root) {
     const [shell, material, production, dashboardOverview] = await Promise.all([
       window.canvasApi.getManagedProjectShell(root),
@@ -1139,6 +1159,91 @@ const materialStudioApi: MaterialStudioUiApi = {
         nextCursor: page.nextCursor,
       };
     }
+    if (query.scope === "all") {
+      if (query.representation === "images") {
+        const page = await window.canvasApi.listGlobalStudioAssetImages({
+          category: query.section,
+          search: query.search,
+          cursor: query.cursor,
+          limit: query.limit,
+        });
+        return {
+          items: page.items.map((image): MaterialStudioUiEntry => {
+            const names = [...new Set(image.associations.map((association) => association.name))];
+            const approvedCount = image.associations.filter((association) => association.reviewStatus === "approved").length;
+            const primaryCount = image.associations.filter((association) => association.isPrimary).length;
+            return {
+              id: `global-resource-image:${image.sourceProject.id}:${image.mediaSha256}`,
+              kind: image.category,
+              title: names.join(" / "),
+              subtitle: image.sourceBasename,
+              summary: image.associations.map((association) => association.description).filter(Boolean).join("；"),
+              meta: `${image.associations.length} 条版本关联 · ${approvedCount} 条已通过 · ${primaryCount} 条 Primary`,
+              thumbnailUrl: `aicanvas-studio://thumbnail/${image.thumbnailRecipeKey}?projectRoot=${encodeURIComponent(image.sourceProject.primaryRoot)}`,
+              mediaSha256: image.mediaSha256,
+              authorityState: primaryCount ? "locked" : "candidate",
+              updatedAt: image.updatedAt,
+              sourceProjectId: image.sourceProject.id,
+              sourceProjectName: image.sourceProject.name,
+              sourceProjectRoot: image.sourceProject.primaryRoot,
+              sourceEntryId: `resource-image:${image.mediaSha256}`,
+              resourceImage: {
+                mediaSha256: image.mediaSha256,
+                associations: image.associations.map((association) => ({
+                  assetId: association.assetId,
+                  name: association.name,
+                  category: association.category,
+                  versionId: association.versionId,
+                  versionOrdinal: association.versionOrdinal,
+                  reviewStatus: association.reviewStatus,
+                  isPrimary: association.isPrimary,
+                })),
+              },
+            };
+          }),
+          nextCursor: page.nextCursor,
+          total: page.total,
+          counts: page.assetCounts,
+          resourceCounts: page.resourceCounts,
+          imageCoverage: page.imageCoverage,
+          registeredProjectCount: page.registeredProjectCount,
+          readableProjectCount: page.readableProjectCount,
+          unavailableProjects: page.unavailableProjects,
+        };
+      }
+      const page = await window.canvasApi.listGlobalStudioAssets({
+        category: query.section,
+        search: query.search,
+        cursor: query.cursor,
+        limit: query.limit,
+      });
+      return {
+        items: page.items.map((asset): MaterialStudioUiEntry => ({
+          id: `global-asset:${asset.sourceProject.id}:${asset.assetId}`,
+          kind: asset.category,
+          title: asset.name,
+          subtitle: asset.aliases.filter((alias) => alias !== asset.name).slice(0, 3).join(" · "),
+          summary: asset.description,
+          meta: `${asset.versionCount} 个参考版本 · ${asset.primaryAuthority ? "权威已锁定" : "等待权威图"}`,
+          thumbnailUrl: asset.primaryAuthority?.thumbnailRecipeKey
+            ? `aicanvas-studio://thumbnail/${asset.primaryAuthority.thumbnailRecipeKey}?projectRoot=${encodeURIComponent(asset.sourceProject.primaryRoot)}`
+            : undefined,
+          authorityState: asset.primaryAuthority ? "locked" : asset.versionCount ? "candidate" : "missing",
+          updatedAt: asset.updatedAt,
+          sourceProjectId: asset.sourceProject.id,
+          sourceProjectName: asset.sourceProject.name,
+          sourceProjectRoot: asset.sourceProject.primaryRoot,
+          sourceEntryId: `asset:${asset.assetId}`,
+        })),
+        nextCursor: page.nextCursor,
+        total: page.total,
+        counts: page.counts,
+        imageCoverage: page.imageCoverage,
+        registeredProjectCount: page.registeredProjectCount,
+        readableProjectCount: page.readableProjectCount,
+        unavailableProjects: page.unavailableProjects,
+      };
+    }
     const page = await window.canvasApi.listStudioAssets(root, {
       category: query.section,
       search: query.search,
@@ -1169,6 +1274,59 @@ const materialStudioApi: MaterialStudioUiApi = {
     if (scope === "asset") {
       const asset = await window.canvasApi.getStudioAsset(root, id);
       return asset ? assetDetailForStudio(asset, root) : null;
+    }
+    if (scope === "resource-image") {
+      const image = await window.canvasApi.getGlobalStudioAssetImage(root, id);
+      if (!image) return null;
+      const names = [...new Set(image.associations.map((association) => association.name))];
+      const maximumRevision = image.associations.reduce(
+        (highest, association) => Math.max(highest, association.assetRevision),
+        1,
+      );
+      return {
+        id: image.mediaSha256,
+        kind: "image",
+        title: names.join(" / "),
+        description: `${image.associations.length} 条资产版本关联；同一来源工程内按图片 SHA 去重，全部名称、版本、Review 与 Primary 状态均保留。`,
+        revision: maximumRevision,
+        authorityThumbnailUrl: `aicanvas-studio://thumbnail/${image.thumbnailRecipeKey}?projectRoot=${encodeURIComponent(root)}`,
+        mediaPreview: {
+          status: "not-required",
+          message: "列表和详情默认只读取冻结缩略图；受管 CAS 原图仅在明确打开单图检查时读取。",
+          previewUrl: `aicanvas-studio://thumbnail/${image.thumbnailRecipeKey}?projectRoot=${encodeURIComponent(root)}`,
+          mimeType: image.mimeType,
+        },
+        resourceImage: {
+          mediaSha256: image.mediaSha256,
+          sourceBasename: image.sourceBasename,
+          mimeType: image.mimeType,
+          sizeBytes: image.sizeBytes,
+          associations: image.associations.map((association) => ({
+            assetId: association.assetId,
+            name: association.name,
+            category: association.category,
+            versionId: association.versionId,
+            versionOrdinal: association.versionOrdinal,
+            reviewStatus: association.reviewStatus,
+            isPrimary: association.isPrimary,
+            sourceNote: association.sourceNote || undefined,
+          })),
+        },
+        versions: image.associations.map((association) => ({
+          id: association.versionId,
+          ordinal: association.versionOrdinal,
+          ownerAssetId: association.assetId,
+          ownerName: association.name,
+          ownerCategory: association.category,
+          mediaSha256: image.mediaSha256,
+          thumbnailUrl: `aicanvas-studio://thumbnail/${image.thumbnailRecipeKey}?projectRoot=${encodeURIComponent(root)}`,
+          mediaUrl: `aicanvas-studio://media/${image.mediaSha256}?projectRoot=${encodeURIComponent(root)}`,
+          reviewStatus: association.reviewStatus,
+          isPrimary: association.isPrimary,
+          sourceNote: association.sourceNote || undefined,
+          createdAt: association.createdAt,
+        })),
+      };
     }
     if (scope === "media") {
       const media = await window.canvasApi.getStudioMedia(root, id);

@@ -33,10 +33,10 @@ const reviewerEnvelope = (command: "confirm_studio_panel_empty", reviewer: "user
 });
 
 describe("Studio 命令运行时唯一 schema owner", () => {
-  it("46 条 public 与 2 条 internal 精确分离，三种 actor 由同一名单派生", () => {
-    expect(STUDIO_PUBLIC_COMMAND_NAMES).toHaveLength(46);
+  it("47 条 public 与 2 条 internal 精确分离，三种 actor 由同一名单派生", () => {
+    expect(STUDIO_PUBLIC_COMMAND_NAMES).toHaveLength(47);
     expect(STUDIO_INTERNAL_COMMAND_NAMES).toEqual(["initialize_material_studio", "initialize_studio_production"]);
-    expect(new Set(STUDIO_PUBLIC_COMMAND_NAMES).size).toBe(46);
+    expect(new Set(STUDIO_PUBLIC_COMMAND_NAMES).size).toBe(47);
     expect(STUDIO_PUBLIC_COMMAND_NAMES.some((name) => STUDIO_INTERNAL_COMMAND_NAMES.includes(name as never))).toBe(false);
     expect(optionNames(STUDIO_ANY_ACTOR_PUBLIC_COMMAND_SCHEMA_OPTIONS)).toEqual([...STUDIO_PUBLIC_COMMAND_NAMES]);
     expect(optionNames(STUDIO_CODEX_PUBLIC_COMMAND_SCHEMA_OPTIONS as typeof STUDIO_ANY_ACTOR_PUBLIC_COMMAND_SCHEMA_OPTIONS)).toEqual([...STUDIO_PUBLIC_COMMAND_NAMES]);
@@ -49,6 +49,52 @@ describe("Studio 命令运行时唯一 schema owner", () => {
 
   it("覆盖缺口登记：第 40 条命令 reconcile_dudu_readonly_historical_passes 在 public 名单内", () => {
     expect(STUDIO_PUBLIC_COMMAND_NAMES).toContain("reconcile_dudu_readonly_historical_passes");
+  });
+
+  it("总资源调用使用 asset/audio/video 严格判别联合并拒绝私有字段", () => {
+    const common = {
+      sourceProjectRoot: "/tmp/source-managed-project",
+      expectedSourceProjectId: "source-project-001",
+      targetExpectedRevision: 0 as const,
+    };
+    const asset = {
+      command: "reuse_studio_global_resource" as const,
+      payload: {
+        resourceKind: "asset" as const,
+        ...common,
+        sourceAssetId: "character-001",
+        sourceVersionId: "version-001",
+        expectedSourceAssetRevision: 3,
+      },
+    };
+    const audio = {
+      command: "reuse_studio_global_resource" as const,
+      payload: {
+        resourceKind: "audio" as const,
+        ...common,
+        sourceMediaSha256: "a".repeat(64),
+        expectedSourceMediaSizeBytes: 123,
+      },
+    };
+    const video = {
+      ...audio,
+      payload: { ...audio.payload, resourceKind: "video" as const },
+    };
+    expect(parseStudioCommandRequestForCore(asset)).toEqual(asset);
+    expect(parseStudioCommandRequestForCore(audio)).toEqual(audio);
+    expect(parseStudioCommandRequestForCore(video)).toEqual(video);
+    for (const payload of [
+      { ...asset.payload, sourceMediaSha256: "a".repeat(64) },
+      { ...audio.payload, sourceAssetId: "character-001" },
+      { ...audio.payload, targetExpectedRevision: 1 },
+      { ...audio.payload, expectedSourceMediaSizeBytes: 0 },
+      { ...audio.payload, sourceProjectRoot: "relative/source" },
+    ]) {
+      expect(() => parseStudioCommandRequestForCore({
+        command: "reuse_studio_global_resource",
+        payload,
+      })).toThrow("载荷不符合合同");
+    }
   });
 
   it("本地创作单元物化只接受当前预览指纹与最多三个唯一候选", () => {

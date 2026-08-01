@@ -159,7 +159,10 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain("raw+labeled 成对 · 人工审片通过");
     expect(canvas).toContain("图生视频提交包待建立");
     expect(canvas).toContain("历史导入正式 raw 未建立图生视频提交包");
-    expect(canvas).toContain("unitGridVideoPackagePipeline.value = new Map(unitGridVideoPackagePipeline.value)");
+    expect(canvas).toContain("const UNIT_GRID_ENRICHMENT_CONCURRENCY = 4");
+    expect(canvas).toContain("runBoundedAsyncTasks");
+    expect(canvas).toContain("unitGridVideoPackagePipeline.value = nextVideoPackages");
+    expect(canvas).toContain("unitGridPostResultObservationPipeline.value = nextPostResultObservations");
     expect(canvas).toContain("const continuityReadable = continuity.opaqueFieldCount === 0");
     expect(canvas).toContain("末格计划状态 · ${observationStatus}");
     expect(canvas).toContain("末格计划状态待人工补全 · ${observationStatus}");
@@ -241,8 +244,10 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain('data-testid="managed-canvas-layout-status"');
     expect(canvas).not.toMatch(/sqlite|localStorage|sessionStorage/);
     const node = source("src/renderer/src/components/ManagedStudioCanvasNode.vue");
-    // 缩略图默认禁止浏览器拖出；export 武装时才允许 :draggable
-    expect(node).toMatch(/:draggable="exportArmed"|draggable="false"/);
+    // 缩略图始终禁止浏览器拖出；独立 nodrag/nopan 手柄才触发 OS 原生复制。
+    expect(node).toContain('draggable="false"');
+    expect(node).toContain('class="media-export-handle nodrag nopan"');
+    expect(node).toContain('data-testid="managed-canvas-media-export-handle"');
     expect(node).toContain("-webkit-user-drag: none");
     const preload = source("src/preload/index.ts");
     expect(preload).toContain("loadStudioCanvasLayout");
@@ -381,10 +386,28 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain("pinnedAssetsPage");
     expect(canvas).toMatch(/operation:\s*"assets" as const,[\s\S]{0,120}assetIds,[\s\S]{0,120}limit:\s*6/u);
     expect(canvas).toMatch(/async function loadAssets\(\): Promise<void> \{[\s\S]{0,1200}if \(workspaceMode\.value !== "workflow"\) rebuildGraph\(\);/u);
-    expect(canvas).toMatch(/const enteringWorkflow = workspaceMode\.value !== "workflow";[\s\S]{0,1500}await loadPinnedAssets\(\{ rebuild: !enteringWorkflow \}\);[\s\S]{0,1200}if \(enteringWorkflow\) \{[\s\S]{0,160}workspaceMode\.value = "workflow";[\s\S]{0,240}rebuildGraph\(\);[\s\S]{0,160}await nextTick\(\);[\s\S]{0,120}await fitCanvas\(\);/u);
+    const togglePinned = canvas.slice(
+      canvas.indexOf("async function togglePinnedNode"),
+      canvas.indexOf("async function addUnitToWorkspace"),
+    );
+    const enteringWorkflow = togglePinned.indexOf('const enteringWorkflow = workspaceMode.value !== "workflow";');
+    const pinnedAssets = togglePinned.indexOf("await loadPinnedAssets({ rebuild: !enteringWorkflow });");
+    const enterBranch = togglePinned.indexOf("if (enteringWorkflow) {");
+    const switchMode = togglePinned.indexOf('workspaceMode.value = "workflow";', enterBranch);
+    const rebuild = togglePinned.indexOf("rebuildGraph();", switchMode);
+    const nextTick = togglePinned.indexOf("await nextTick();", rebuild);
+    const fit = togglePinned.indexOf("void fitCanvas().catch", nextTick);
+    expect([enteringWorkflow, pinnedAssets, enterBranch, switchMode, rebuild, nextTick, fit].every((index) => index >= 0)).toBe(true);
+    expect(enteringWorkflow).toBeLessThan(pinnedAssets);
+    expect(pinnedAssets).toBeLessThan(enterBranch);
+    expect(enterBranch).toBeLessThan(switchMode);
+    expect(switchMode).toBeLessThan(rebuild);
+    expect(rebuild).toBeLessThan(nextTick);
+    expect(nextTick).toBeLessThan(fit);
+    expect(togglePinned).toContain("它不得占住固定节点的唯一 busy owner");
     expect(canvas).toContain("loadPinnedUnit");
     expect(canvas).toContain("loadUnitDetailById");
-    expect(canvas).toMatch(/await loadPinnedTextDocuments\(\);[\s\S]{0,160}await loadPinnedUnit\(\);/u);
+    expect(canvas).toMatch(/await loadPinnedTextDocuments\(\);[\s\S]{0,220}await loadPinnedMedia\(\{ rebuild: false \}\);[\s\S]{0,160}await loadPinnedUnit\(\);/u);
     const node = source("src/renderer/src/components/ManagedStudioCanvasNode.vue");
     expect(node).toContain("overflow: visible");
   });
@@ -453,6 +476,10 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(selectAssetByIdBlock).not.toContain("getDashboard(props.projectRoot");
     const canvasSwitchBlock = canvas.match(/watch\(\(\) => props\.projectRoot,[\s\S]*?await refreshAll\(\);\n\}\);/u)?.[0] ?? "";
     expect(canvasSwitchBlock).toContain("loading.value = false");
+    expect(canvasSwitchBlock.lastIndexOf("loading.value = true"))
+      .toBeGreaterThan(canvasSwitchBlock.indexOf("loading.value = false"));
+    expect(canvasSwitchBlock.lastIndexOf("loading.value = true"))
+      .toBeLessThan(canvasSwitchBlock.indexOf("await previousLayoutFlush"));
     expect(canvas).toContain("guardedActionGate.invalidate()");
     expect(canvas).toContain("guardedActionGate.dispose()");
     const leaseBlock = canvas.match(/async function refreshUnitLeaseDisplay[\s\S]*?\n\}/u)?.[0] ?? "";
@@ -521,6 +548,10 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain("const local: StudioCanvasLayoutSemanticSnapshot = {");
     expect(canvas).toContain("workflowGroups: plainWorkflowGroups(workflowGroups.value)");
     expect(canvas).toContain("saveStudioCanvasLayoutWithCasMerge");
+    expect(canvas).toContain("createStudioCanvasLayoutSaveCoordinator");
+    expect(canvas).toContain("layoutSaveCoordinator.saveLatest");
+    expect(canvas).toContain("layoutSaveCoordinator.saveExclusive");
+    expect(canvas).toContain("persistLayoutNow(layoutSaveGeneration, projectRoot, { force: true })");
     expect(canvas).toContain("persistedLayoutBase");
     expect(canvas).toContain("const persistedLayoutBase = shallowRef<StudioCanvasLayout | null>(null)");
     expect(casMerge).toContain("mergeStudioCanvasLayoutThreeWay");
@@ -565,7 +596,7 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(thumbnailScheduler).toContain("mediaKind === \"image\"");
     expect(thumbnailScheduler).toContain("ensureStudioImageThumbnail");
     expect(thumbnailScheduler).not.toContain(".finally");
-    expect(node).toContain('kind: "asset" | "reference" | "unit" | "panel" | "script" | "prompt" | "raw" | "labeled" | "review"');
+    expect(node).toContain('kind: "asset" | "reference" | "unit" | "panel" | "script" | "prompt" | "image" | "raw" | "labeled" | "review" | "video" | "audio"');
     const dash = source("src/core/studio-production-dashboard.ts");
     expect(dash).toContain("authorityThumbnailRecipeKey");
   });

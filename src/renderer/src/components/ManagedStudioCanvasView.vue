@@ -181,8 +181,157 @@
       <button type="button" aria-label="关闭错误" @click="errorMessage = ''">×</button>
     </div>
 
-    <div class="canvas-layout" :class="{ 'library-open': libraryOpen, 'inspector-open': Boolean(selection) }">
-      <aside v-if="libraryOpen" id="managed-canvas-library" class="canvas-library" aria-label="素材库">
+    <div
+      class="canvas-layout"
+      :class="{
+        'library-open': libraryOpen,
+        'global-resources-open': libraryOpen && libraryMode === 'global',
+        'inspector-open': Boolean(selection),
+      }">
+      <aside
+        v-if="libraryOpen && libraryMode === 'global'"
+        id="managed-canvas-global-resource-library"
+        class="canvas-library global-resource-library"
+        aria-label="全部剧本版本图片"
+        data-testid="managed-canvas-global-resource-library">
+        <header>
+          <div>
+            <span class="eyebrow">剧本资源</span>
+            <h3>全部剧本版本图片</h3>
+            <small class="readonly-badge">只读 · 不写入当前工程</small>
+          </div>
+          <div class="global-resource-header-actions">
+            <button
+              type="button"
+              data-testid="managed-canvas-open-resource-center"
+              @click="emit('openResourceCenter')">
+              打开总资源中心
+            </button>
+            <button type="button" aria-label="关闭剧本资源" @click="closeLibrary">×</button>
+          </div>
+        </header>
+
+        <p
+          v-if="globalResourcePage"
+          class="global-resource-summary"
+          data-testid="managed-canvas-global-resource-summary">
+          共 <b>{{ globalResourceCounts.total }}</b> 张：
+          人物 {{ globalResourceCounts.character }} ·
+          场景 {{ globalResourceCounts.scene }} ·
+          道具 {{ globalResourceCounts.prop }} ·
+          风格 {{ globalResourceCounts.style }}。
+          已读取 {{ globalResourcePage.readableProjectCount ?? 0 }} /
+          {{ globalResourcePage.registeredProjectCount ?? 0 }} 个受管剧本。
+          <template v-if="globalResourcePage.unavailableProjects?.length">
+            {{ globalResourcePage.unavailableProjects.length }} 个剧本暂不可读取。
+          </template>
+        </p>
+        <p v-else class="global-resource-summary">人物、场景、道具和风格按名称归类；每页最多显示 36 张。</p>
+
+        <nav class="library-tabs global-resource-tabs" aria-label="剧本资源类型">
+          <button
+            v-for="category in globalResourceCategories"
+            :key="category.kind"
+            type="button"
+            :data-testid="`managed-canvas-global-resource-${category.kind}`"
+            :class="{ active: globalResourceCategory === category.kind }"
+            :disabled="globalResourceLoading"
+            @click="openGlobalResourcesFor(category.kind)">
+            {{ category.label }}
+            <small v-if="globalResourceCounts[category.kind]">{{ globalResourceCounts[category.kind] }}</small>
+          </button>
+        </nav>
+
+        <section class="library-section global-resource-section">
+          <label>
+            <span>搜索图片对应的人物、场景、道具名称或 SHA</span>
+            <input
+              v-model.trim="globalResourceSearch"
+              type="search"
+              placeholder="输入名称或 SHA，按回车搜索"
+              @input="invalidateGlobalResourceRequest"
+              @keyup.enter="resetGlobalResources" />
+          </label>
+          <p v-if="!globalResourceApi" class="library-empty" role="alert">当前桌面适配层未接入全部剧本资源。</p>
+          <p v-else-if="globalResourceLoading && !globalResourcePage" class="library-note" role="status">正在读取全部剧本版本图片…</p>
+          <p v-else-if="globalResourceError" class="library-empty" role="alert">{{ globalResourceError }}</p>
+          <p v-else-if="globalResourcePage && globalResourcePage.items.length === 0" class="library-empty">
+            {{ globalResourceSearch ? `没有找到与「${globalResourceSearch}」匹配的${globalResourceCategoryLabel(globalResourceCategory)}` : `还没有已归类的${globalResourceCategoryLabel(globalResourceCategory)}图片` }}
+          </p>
+
+          <div
+            v-if="globalResourcePage?.items.length"
+            class="global-resource-list-viewport"
+            data-testid="managed-canvas-global-resource-viewport">
+            <ul class="global-resource-list" aria-label="全部剧本版本图片列表">
+              <li
+                v-for="entry in globalResourcePage.items"
+                :key="entry.id"
+                :data-resource-key="entry.id"
+                class="global-resource-card"
+                data-testid="managed-canvas-global-resource-item">
+                <figure>
+                  <img
+                    v-if="entry.thumbnailUrl"
+                    :src="entry.thumbnailUrl"
+                    :alt="`${entry.title}缩略图`"
+                    loading="lazy"
+                    decoding="async" />
+                  <span v-else>{{ globalResourceCategoryLabel(globalResourceCategory).slice(0, 1) }}</span>
+                </figure>
+                <article>
+                  <div class="global-resource-card-heading">
+                    <b>{{ entry.title }}</b>
+                    <em>只读</em>
+                  </div>
+                  <small class="global-resource-source">来源剧本：{{ globalResourceSourceLabel(entry) }}</small>
+                  <ul
+                    v-if="entry.resourceImage?.associations.length"
+                    class="global-resource-associations"
+                    data-testid="managed-canvas-global-resource-associations">
+                    <li
+                      v-for="association in entry.resourceImage.associations"
+                      :key="`${association.assetId}:${association.versionId}`">
+                      <b>{{ association.name }}</b>
+                      <span>
+                        {{ globalResourceCategoryLabel(association.category) }} ·
+                        v{{ association.versionOrdinal }} ·
+                        {{ globalResourceReviewLabel(association.reviewStatus) }} ·
+                        {{ association.isPrimary ? "Primary" : "非 Primary" }}
+                      </span>
+                    </li>
+                  </ul>
+                  <small v-else>{{ entry.subtitle || entry.mediaSha256?.slice(0, 12) || "未登记版本关系" }}</small>
+                </article>
+              </li>
+            </ul>
+          </div>
+
+          <div v-if="globalResourcePage?.items.length" class="pager global-resource-pager">
+            <button
+              type="button"
+              data-testid="managed-canvas-global-resources-prev"
+              :disabled="!globalResourceCursorStack.length || globalResourceLoading"
+              @click="globalResourcesPrevious">
+              上一页
+            </button>
+            <span class="pager-position">
+              第 {{ globalResourceCursorStack.length + 1 }} 页 ·
+              本页 {{ globalResourcePage.items.length }} /
+              共 {{ globalResourcePage.total ?? globalResourcePage.items.length }} 张
+            </span>
+            <button
+              type="button"
+              data-testid="managed-canvas-global-resources-next"
+              :disabled="!globalResourcePage.nextCursor || globalResourceLoading"
+              @click="globalResourcesNext">
+              {{ globalResourceLoading ? "读取中…" : "下一页" }}
+            </button>
+          </div>
+        </section>
+      </aside>
+
+      <aside v-else-if="libraryOpen" id="managed-canvas-library" class="canvas-library" aria-label="素材库">
         <header>
           <div><span class="eyebrow">素材库</span><h3>放到画布</h3></div>
           <button type="button" aria-label="关闭素材库" @click="libraryOpen = false">×</button>
@@ -230,6 +379,74 @@
           </ul>
         </section>
 
+        <section v-else-if="libraryTab === 'media'" class="library-section" data-testid="managed-canvas-media-library">
+          <label>
+            <span>搜索当前工程图片、视频或音频</span>
+            <input
+              v-model.trim="mediaSearch"
+              type="search"
+              placeholder="名称、类型或 SHA，按回车搜索"
+              @keyup.enter="resetMedia" />
+          </label>
+          <div class="facet-row">
+            <select v-model="mediaKindFilter" aria-label="媒体类型" @change="resetMedia">
+              <option value="all">全部媒体</option>
+              <option value="image">图片</option>
+              <option value="video">视频</option>
+              <option value="audio">音频</option>
+            </select>
+          </div>
+          <p class="library-note">添加到画布后，使用节点上的“拖出”手柄复制到桌面或其他软件；画布原件不会删除。</p>
+          <p v-if="loading && !mediaPage" class="library-note" role="status">正在加载媒体…</p>
+          <p v-else-if="mediaPage && mediaPage.items.length === 0" class="library-empty">
+            {{ mediaSearch ? `没有找到与「${mediaSearch}」匹配的媒体` : "当前工程还没有此类媒体" }}
+          </p>
+          <ul v-else class="library-list media-library-list">
+            <li v-for="media in mediaPage?.items ?? []" :key="media.sha256">
+              <div class="library-item media-library-item">
+                <span class="item-thumb">
+                  <img
+                    v-if="media.kind === 'image' && media.thumbnail?.url"
+                    :src="media.thumbnail.url"
+                    :alt="media.sourceBasename"
+                    loading="lazy"
+                    decoding="async" />
+                  <i v-else>{{ mediaKindMark(media.kind) }}</i>
+                </span>
+                <span>
+                  <b>{{ media.sourceBasename }}</b>
+                  <small>{{ mediaKindLabel(media.kind) }} · {{ formatCanvasMediaBytes(media.sizeBytes) }} · {{ media.sha256.slice(0, 12) }}</small>
+                </span>
+              </div>
+              <button
+                type="button"
+                class="pin-button"
+                :disabled="loading || pinActionBusy"
+                :data-testid="`managed-canvas-pin-media-${media.kind}`"
+                @click="togglePinnedNode(mediaNodeId(media.sha256))">
+                {{ isPinned(mediaNodeId(media.sha256)) ? "移出画布" : "添加" }}
+              </button>
+            </li>
+          </ul>
+          <div class="pager">
+            <button
+              type="button"
+              data-testid="managed-canvas-media-prev"
+              :disabled="!mediaCursorStack.length || loading"
+              @click="mediaPrevious">
+              上一页
+            </button>
+            <span class="pager-position">第 {{ mediaCursorStack.length + 1 }} 页 · 每页最多 36 项</span>
+            <button
+              type="button"
+              data-testid="managed-canvas-media-next"
+              :disabled="!mediaPage?.nextCursor || loading"
+              @click="mediaNext">
+              下一页
+            </button>
+          </div>
+        </section>
+
         <section v-else class="library-section">
           <div class="facet-row">
             <select v-model="seasonFilter" aria-label="季" @change="resetUnits"><option value="">全部季</option><option v-for="season in unitsPage?.seasons ?? []" :key="season.id" :value="season.id">{{ season.label }}</option></select>
@@ -266,7 +483,27 @@
               <button v-for="tab in libraryTabs" :key="tab.kind" type="button" @click="chooseAddKind(tab.kind)"><i>{{ tab.mark }}</i>{{ tab.label }}</button>
             </div>
           </div>
-          <button type="button" data-testid="managed-canvas-open-library" :aria-expanded="libraryOpen" aria-controls="managed-canvas-library" @click="toggleLibrary"><LibraryBig :size="16" aria-hidden="true" /><span>素材库</span></button>
+          <button
+            type="button"
+            data-testid="managed-canvas-open-library"
+            :class="{ active: libraryOpen && libraryMode === 'current' }"
+            :aria-expanded="libraryOpen && libraryMode === 'current'"
+            aria-controls="managed-canvas-library"
+            @click="toggleLibrary">
+            <LibraryBig :size="16" aria-hidden="true" /><span>素材库</span>
+          </button>
+          <button
+            type="button"
+            data-testid="managed-canvas-open-global-resources"
+            :class="{ active: libraryOpen && libraryMode === 'global' }"
+            :aria-expanded="libraryOpen && libraryMode === 'global'"
+            aria-controls="managed-canvas-global-resource-library"
+            title="查看所有受管剧本中已归类的人物、场景、道具和风格版本图片"
+            @click="toggleGlobalResourceLibrary">
+            <LibraryBig :size="16" aria-hidden="true" />
+            <span>剧本资源</span>
+            <small v-if="globalResourceCounts.total">{{ globalResourceCounts.total }}</small>
+          </button>
           <button type="button" data-testid="managed-canvas-connect-mode" :class="{ active: connectMode }" :aria-pressed="connectMode" @click="toggleConnectMode"><ArrowUpRight :size="16" aria-hidden="true" /><span>连线</span></button>
           <button ref="helpTriggerEl" type="button" :aria-expanded="helpOpen" aria-controls="managed-canvas-help-card" @click="helpOpen = !helpOpen"><CircleHelp :size="16" aria-hidden="true" /><span>帮助</span></button>
         </nav>
@@ -380,7 +617,8 @@
         <div v-if="helpOpen" id="managed-canvas-help-card" class="help-card" role="dialog" aria-label="画布帮助">
           <button type="button" aria-label="关闭帮助" @click="helpOpen = false">×</button>
           <h3>三步准备一格</h3>
-          <ol><li>从“添加”或“素材库”放入剧本、提示词、角色、场景、道具、风格和 15 秒分镜。</li><li>点击任一节点左侧或右侧的“＋”，再点击另一节点的“＋”完成连线；如果使用连线，每个宫格必须连齐正式绑定中的全部人物、场景、道具、风格、当前剧本和提示词。</li><li>点击顶部“准备并记录派发”；后台重新核对锁定资产和正式绑定，写入冻结包、生成计划和派发记录。此步骤不会直接生成图片，需等待所选 Codex/Grok Agent 领取。</li></ol>
+          <ol><li>从“添加”或“素材库”放入剧本、提示词、角色、场景、道具、风格、图片/视频/音频和 15 秒分镜。</li><li>媒体节点右上角“拖出”手柄会复制原文件到桌面或其他软件，画布与 CAS 原件始终保留。</li><li>点击任一节点左侧或右侧的“＋”，再点击另一节点的“＋”完成连线；如果使用连线，每个宫格必须连齐正式绑定中的全部人物、场景、道具、风格、当前剧本和提示词。</li><li>点击顶部“准备并记录派发”；后台重新核对锁定资产和正式绑定，写入冻结包、生成计划和派发记录。此步骤不会直接生成图片，需等待所选 Codex/Grok Agent 领取。</li></ol>
+          <p>“剧本资源”按人物、场景、道具和风格分页展示全部受管剧本的版本图片；它是只读目录，不会把跨剧本图片静默写入当前工程，也不会一次把全部图片挂成画布节点。</p>
           <p>画布连线不会修改正式资产；错误会在派发记录写入前停止。Agent 回写 raw/labeled 后，结果节点才会出现在画布上。Review、音频和视频未接入本按钮工作流，需分别进入审片与媒体入口处理。双击单元或资产节点可打开驾驶舱详情；点击“原始图/标注图/审片”节点可直达审片。</p>
           <p>画布编辑：左键拖框选、Cmd/Ctrl+点击多选、选中后整组拖动；多选（≥2）可用底栏对齐、≥3 可用等距分布；拖动单个节点靠近其他节点时显示对齐参考线并吸附（整组拖动时不吸附，保持队形）；⌘Z 撤销、⌘⇧Z/Ctrl+Y 重做布局位置（仅当前会话、只含位置，不含正式数据）。</p>
         </div>
@@ -448,6 +686,12 @@ import ManagedStudioCanvasNode from "./ManagedStudioCanvasNode.vue";
 import CanvasInspectorPanel from "./CanvasInspectorPanel.vue";
 import DirectorActionPanel from "./DirectorActionPanel.vue";
 import type { DirectorAction } from "../director-action-panel.js";
+import type {
+  MaterialStudioAssetCategory,
+  MaterialStudioReviewStatus,
+  MaterialStudioUiEntry,
+  MaterialStudioUiPage,
+} from "./MaterialStudioView.vue";
 import { createThumbnailLru } from "../use-thumbnail-lru.js";
 import { computeVirtualListWindow, sliceVirtualWindow } from "../use-virtual-list.js";
 import {
@@ -489,6 +733,7 @@ import {
   saveStudioCanvasLayoutWithCasMerge,
   type StudioCanvasLayoutSemanticSnapshot,
 } from "../studio-canvas-layout-cas-merge";
+import { createStudioCanvasLayoutSaveCoordinator } from "../studio-canvas-layout-save-coordinator";
 import {
   applyStudioCanvasTimelinePositions,
   buildStudioCanvasTimelineLayout,
@@ -542,11 +787,15 @@ import {
   type ProjectScopedActionToken,
 } from "../project-scoped-action-gate";
 import { isCurrentApprovedUnitGridResultIdentity } from "../unit-grid-selected-result-identity";
+import { runBoundedAsyncTasks } from "../bounded-async-runner";
+import type { StudioMediaIpcItem, StudioMediaIpcPage } from "../../../preload/index";
 
 const LAYOUT_SAVE_DEBOUNCE_MS = 450;
+const UNIT_GRID_ENRICHMENT_CONCURRENCY = 4;
 const EXTERNAL_MEDIA_EXTENSIONS = new Set([
   ".png", ".jpg", ".jpeg", ".webp", ".gif", ".avif", ".tif", ".tiff",
   ".mp4", ".mov", ".mkv", ".webm", ".m4v",
+  ".mp3", ".wav", ".m4a", ".aac", ".flac", ".ogg",
 ]);
 
 export interface ManagedStudioCanvasLayoutApi {
@@ -568,10 +817,26 @@ export interface ManagedStudioCanvasLayoutApi {
   ): Promise<{ layout: StudioCanvasLayout; created: boolean }>;
 }
 
+export interface ManagedStudioCanvasGlobalResourceApi {
+  listEntries(
+    projectRoot: string,
+    query: {
+      section: MaterialStudioAssetCategory;
+      scope: "all";
+      representation: "images";
+      search?: string;
+      cursor?: string;
+      limit: number;
+    },
+  ): Promise<MaterialStudioUiPage>;
+}
+
 const props = defineProps<{
   projectRoot: string;
   projectName?: string;
   api: StudioProductionDashboardUiApi;
+  /** 复用 Material Studio 的全部剧本逐图只读 owner；禁止据此写入当前工程。 */
+  globalResourceApi?: ManagedStudioCanvasGlobalResourceApi;
   /** 由 Material Studio 显式选择；Core dispatch 会再次校验。 */
   generationProvider: "codex" | "grok";
   /** 可选注入；桌面端默认走 preload IPC */
@@ -586,6 +851,8 @@ const emit = defineEmits<{
   /** 打开剧本绑定工作台（非驾驶舱） */
   openBinding: [focus: { unitId?: string; panelId?: string; fromMode: "canvas" }];
   openReview: [focus: StudioContinuityReviewFocus];
+  /** 画布抽屉保持只读；跨项目调用统一进入独立总资源中心。 */
+  openResourceCenter: [];
   requestGeneration: [focus: { unitId?: string; panelId?: string; fromMode: "canvas" }];
 }>();
 const controller = createDashboardLoadController();
@@ -719,7 +986,7 @@ const nodeStatusStore = createStudioCanvasNodeStatusStore();
 const nodeStatusTick = ref(0);
 let studioGenerationProgressUnsubscribe: (() => void) | undefined;
 const actionPanelOpen = ref(true);
-type StudioCanvasLibraryTab = "character" | "scene" | "prop" | "style" | "script" | "prompt" | "unit";
+type StudioCanvasLibraryTab = "character" | "scene" | "prop" | "style" | "script" | "prompt" | "media" | "unit";
 const libraryTabs: ReadonlyArray<{ kind: StudioCanvasLibraryTab; label: string; mark: string }> = [
   { kind: "character", label: "角色", mark: "人" },
   { kind: "scene", label: "场景", mark: "景" },
@@ -727,10 +994,46 @@ const libraryTabs: ReadonlyArray<{ kind: StudioCanvasLibraryTab; label: string; 
   { kind: "style", label: "风格", mark: "风" },
   { kind: "script", label: "剧本", mark: "剧" },
   { kind: "prompt", label: "提示词", mark: "词" },
+  { kind: "media", label: "媒体", mark: "媒" },
   { kind: "unit", label: "15 秒分镜", mark: "格" },
 ];
+type CanvasLibraryMode = "current" | "global";
+const libraryMode = ref<CanvasLibraryMode>("current");
 const libraryOpen = ref(false);
 const addMenuOpen = ref(false);
+const GLOBAL_RESOURCE_PAGE_LIMIT = 36;
+const globalResourceCategories: ReadonlyArray<{ kind: MaterialStudioAssetCategory; label: string }> = [
+  { kind: "character", label: "人物" },
+  { kind: "scene", label: "场景" },
+  { kind: "prop", label: "道具" },
+  { kind: "style", label: "风格" },
+];
+const emptyGlobalResourceCounts = (): {
+  total: number;
+  character: number;
+  scene: number;
+  prop: number;
+  style: number;
+} => ({
+  total: 0,
+  character: 0,
+  scene: 0,
+  prop: 0,
+  style: 0,
+});
+const globalResourceCategory = ref<MaterialStudioAssetCategory>("character");
+const globalResourceSearch = ref("");
+const globalResourcePage = shallowRef<MaterialStudioUiPage | null>(null);
+const globalResourceCursor = ref<string | undefined>();
+const globalResourceCursorStack = ref<string[]>([]);
+const globalResourceLoading = ref(false);
+const globalResourceError = ref("");
+const globalResourceCounts = computed(() => (
+  globalResourcePage.value?.resourceCounts
+  ?? globalResourcePage.value?.counts
+  ?? emptyGlobalResourceCounts()
+));
+let globalResourceLoadSequence = 0;
 /** Qwen D5：导演动作面板（只读导航） */
 const directorPanelOpen = ref(false);
 const directorHotkeys = createGatedHotkeyRegistry(DEFAULT_DIRECTOR_HOTKEYS);
@@ -787,6 +1090,15 @@ function onGlobalPointerDown(event: PointerEvent): void {
   if (viewMenuEl.value?.hasAttribute("open") && !target.closest(".view-menu")) closeViewMenu();
 }
 const libraryTab = ref<StudioCanvasLibraryTab>("character");
+type StudioCanvasMediaFilter = "all" | "image" | "video" | "audio";
+const STUDIO_CANVAS_MEDIA_PAGE_LIMIT = 36;
+const STUDIO_CANVAS_PINNED_MEDIA_LIMIT = 12;
+const mediaPage = shallowRef<StudioMediaIpcPage | null>(null);
+const pinnedMediaItems = shallowRef<Map<string, StudioMediaIpcItem>>(new Map());
+const mediaKindFilter = ref<StudioCanvasMediaFilter>("all");
+const mediaSearch = ref("");
+const mediaCursor = ref<string | undefined>();
+const mediaCursorStack = ref<string[]>([]);
 type CanvasTextDocument = { id: string; kind: "script" | "prompt"; title: string; bodyPreview: string; revision: number };
 const MAX_CANVAS_TEXT_DOCUMENTS = 12;
 const pagedTextDocuments = ref<CanvasTextDocument[]>([]);
@@ -858,6 +1170,11 @@ interface UnitGridContinuityProjection {
 interface UnitGridVideoPackageProjection {
   status: "not-prepared" | "resolved" | "conflict";
   subtitle: string;
+}
+interface UnitGridEnrichmentResult {
+  unitId: string;
+  videoPackage: UnitGridVideoPackageProjection;
+  postResultObservation?: StudioPostResultObservationControl;
 }
 /** 非 PASS 整板只显示真实验收状态，不展示 raw 缩略图、参考边或导出入口。 */
 interface UnitGridNonPassProjection {
@@ -1062,6 +1379,49 @@ async function loadPinnedTextDocuments(): Promise<void> {
     scheduleLayoutPersist();
   }
 }
+
+async function loadPinnedMedia(options: { rebuild?: boolean } = {}): Promise<void> {
+  const projectRoot = props.projectRoot;
+  const requestSequence = ++pinnedMediaLoadSequence;
+  const requested = pinnedNodeIds.value
+    .filter((nodeId) => nodeId.startsWith("library-media:"))
+    .map((nodeId) => ({
+      nodeId,
+      mediaSha256: nodeId.slice("library-media:".length),
+    }))
+    .filter((item) => /^[a-f0-9]{64}$/u.test(item.mediaSha256))
+    .slice(0, STUDIO_CANVAS_PINNED_MEDIA_LIMIT);
+  if (!requested.length) {
+    if (projectRoot === props.projectRoot && requestSequence === pinnedMediaLoadSequence) {
+      pinnedMediaItems.value = new Map();
+      if (options.rebuild !== false) rebuildGraph();
+    }
+    return;
+  }
+  const tasks = requested.map(({ nodeId, mediaSha256 }) => async () => {
+    try {
+      const media = await window.canvasApi.getStudioMedia(projectRoot, mediaSha256);
+      return { nodeId, media };
+    } catch {
+      return { nodeId, media: null };
+    }
+  });
+  const loaded = await runBoundedAsyncTasks(tasks, 4);
+  if (projectRoot !== props.projectRoot || requestSequence !== pinnedMediaLoadSequence) return;
+  pinnedMediaItems.value = new Map(
+    loaded
+      .filter((item): item is { nodeId: string; media: StudioMediaIpcItem } => Boolean(item.media))
+      .map((item) => [item.media.sha256, item.media] as const),
+  );
+  const missing = new Set(loaded.filter((item) => !item.media).map((item) => item.nodeId));
+  if (missing.size) {
+    pinnedNodeIds.value = pinnedNodeIds.value.filter((nodeId) => !missing.has(nodeId));
+    pruneDraftEdgesForRemovedNodes(missing);
+    scheduleLayoutPersist();
+  }
+  if (options.rebuild !== false) rebuildGraph();
+}
+
 const hasPersistedLayout = computed(() => Object.keys(persistedLayoutNodes.value).length > 0 || layoutFingerprint.value !== undefined);
 const defaultViewport = computed(() => ({
   x: layoutViewport.value.x,
@@ -1078,11 +1438,12 @@ const layoutStatusLabel = computed(() => {
 
 let layoutSaveTimer: ReturnType<typeof setTimeout> | undefined;
 let layoutSaveGeneration = 0;
-let layoutSaveInFlight: Promise<void> | undefined;
 let clearConfirmationTimer: number | undefined;
 let layoutLoadSequence = 0;
 let textDocumentLoadSequence = 0;
 let pinnedTextDocumentLoadSequence = 0;
+let pinnedMediaLoadSequence = 0;
+let mediaLoadSequence = 0;
 let unitDetailLoadSequence = 0;
 let panelPipelineLoadSequence = 0;
 interface QueuedUnitSelection {
@@ -1099,6 +1460,41 @@ let planStatusLoadSequence = 0;
 let controlViewportSequence = 0;
 let controlViewportTimer: number | undefined;
 let canvasDisposed = false;
+const layoutSaveCoordinator = createStudioCanvasLayoutSaveCoordinator({
+  persist: async ({ projectRoot, base, local, expectedFingerprint }) => {
+    const api = resolveLayoutApi();
+    if (!api) throw new Error("布局 API 不可用。");
+    return saveStudioCanvasLayoutWithCasMerge({
+      api,
+      projectRoot,
+      base,
+      local,
+      ...(expectedFingerprint ? { expectedFingerprint } : {}),
+    });
+  },
+  isRequestCurrent: (request) => (
+    request.projectRoot === props.projectRoot
+    && request.generation === layoutSaveGeneration
+  ),
+  isProjectCurrent: (projectRoot) => (
+    !canvasDisposed && projectRoot === props.projectRoot
+  ),
+  onAutomaticAccepted: (request, result, context) => {
+    // 即使 debounce generation 已推进，本窗口先前成功写入仍必须成为下一次 CAS
+    // 的 base/fingerprint；只有最新请求才允许把 merge 后语义应用到可见画布。
+    acceptPersistedLayout(result.layout, {
+      applyMergedSemantic: result.merged && context.requestCurrent,
+    });
+    if (context.requestCurrent && !context.superseded) {
+      layoutSaveState.value = "saved";
+    }
+  },
+  onAutomaticError: (request, error) => {
+    if (request.generation !== layoutSaveGeneration) return;
+    layoutSaveState.value = "error";
+    errorMessage.value = `布局保存失败：${message(error)}`;
+  },
+});
 const workflowActionGate = createProjectScopedActionGate();
 // 固定节点、添加单元和外部导入互不覆盖：同 lane 最新动作胜出，跨 lane 并行不互相失效。
 const pinActionGate = createProjectScopedActionGate();
@@ -1207,6 +1603,28 @@ async function refreshTimelineProjectionForUnits(
 }
 
 const filteredTextDocuments = computed(() => textDocuments.value.filter((doc) => doc.kind === libraryTab.value));
+
+function mediaNodeId(mediaSha256: string): string {
+  return `library-media:${mediaSha256}`;
+}
+
+function mediaKindMark(kind: StudioMediaIpcItem["kind"]): string {
+  if (kind === "image") return "图";
+  if (kind === "video") return "视";
+  return "音";
+}
+
+function mediaKindLabel(kind: StudioMediaIpcItem["kind"]): string {
+  if (kind === "image") return "图片";
+  if (kind === "video") return "视频";
+  return "音频";
+}
+
+function formatCanvasMediaBytes(value: number): string {
+  if (value < 1_024) return `${value} B`;
+  if (value < 1_024 * 1_024) return `${(value / 1_024).toFixed(1)} KiB`;
+  return `${(value / 1_024 / 1_024).toFixed(1)} MiB`;
+}
 const simpleWorkflowStatus = computed(() => {
   if (workflowBusy.value) return "正在预检并记录派发";
   if (errorMessage.value) return "需要处理";
@@ -1378,6 +1796,18 @@ function workflowFailureMessage(error: unknown): string {
 
 function assetCategoryLabel(category: string): string {
   return category === "character" ? "角色" : category === "scene" ? "场景" : category === "prop" ? "道具" : category === "style" ? "风格" : "资产";
+}
+
+function globalResourceCategoryLabel(category: MaterialStudioAssetCategory): string {
+  return category === "character" ? "人物" : category === "scene" ? "场景" : category === "prop" ? "道具" : "风格";
+}
+
+function globalResourceReviewLabel(status: MaterialStudioReviewStatus): string {
+  return status === "approved" ? "已通过" : status === "rejected" ? "已拒绝" : "待审";
+}
+
+function globalResourceSourceLabel(entry: MaterialStudioUiEntry): string {
+  return entry.sourceProjectName?.trim() || entry.sourceProjectId?.trim() || "来源剧本未命名";
 }
 
 function currentnessLabel(currentness: string): string {
@@ -1823,7 +2253,11 @@ function plainNodePositions(input: Record<string, StudioCanvasNodePosition>): Re
 function boundedLayoutNodes(input: Record<string, StudioCanvasNodePosition>): Record<string, StudioCanvasNodePosition> {
   const visible = new Set(nodes.value.map((node) => node.id));
   return Object.fromEntries(Object.entries(input).filter(([nodeId]) => (
-    (!nodeId.startsWith("panel:") && !nodeId.startsWith("media:") && !nodeId.startsWith("reference:")) || visible.has(nodeId)
+    (!nodeId.startsWith("panel:")
+      && !nodeId.startsWith("media:")
+      && !nodeId.startsWith("reference:")
+      && !nodeId.startsWith("library-media:"))
+    || visible.has(nodeId)
   )));
 }
 
@@ -1862,7 +2296,8 @@ async function togglePinnedNode(nodeId: string): Promise<void> {
   const normalized = nodeId.trim();
   if (!normalized || pinActionBusy.value) return;
   const current = new Set(pinnedNodeIds.value);
-  if (!current.has(normalized)) {
+  const wasPinned = current.has(normalized);
+  if (!wasPinned) {
     const prefix = normalized.split(":", 1)[0];
     if (prefix === "asset" && [...current].filter((id) => id.startsWith("asset:")).length >= 36) {
       errorMessage.value = "一个 15 秒单元最多可固定 36 项素材（每格仍严格最多 6 项）；请先移除不再使用的素材。";
@@ -1875,6 +2310,11 @@ async function togglePinnedNode(nodeId: string): Promise<void> {
         return;
       }
     }
+    if (prefix === "library-media"
+      && [...current].filter((id) => id.startsWith("library-media:")).length >= STUDIO_CANVAS_PINNED_MEDIA_LIMIT) {
+      errorMessage.value = `画布最多固定 ${STUDIO_CANVAS_PINNED_MEDIA_LIMIT} 个独立媒体节点；请先移出不再使用的媒体。`;
+      return;
+    }
   }
   const projectRoot = props.projectRoot;
   const scope = {
@@ -1883,10 +2323,11 @@ async function togglePinnedNode(nodeId: string): Promise<void> {
     actionId: `pin:${normalized}`,
   };
   const previousPinnedNodeIds = [...pinnedNodeIds.value];
+  const previousPinnedMediaItems = new Map(pinnedMediaItems.value);
   const enteringWorkflow = workspaceMode.value !== "workflow";
   pinActionBusy.value = true;
   try {
-    if (current.has(normalized)) {
+    if (wasPinned) {
       current.delete(normalized);
       pruneDraftEdgesForRemovedNodes(new Set([normalized]));
     } else {
@@ -1913,6 +2354,30 @@ async function togglePinnedNode(nodeId: string): Promise<void> {
       await loadPinnedTextDocuments();
       if (!canvasUiActionIsCurrent(pinActionGate, scope)) return;
       if (!enteringWorkflow) rebuildGraph();
+    } else if (normalized.startsWith("library-media:")) {
+      try {
+        const sha256 = normalized.slice("library-media:".length);
+        const nextMedia = new Map(pinnedMediaItems.value);
+        if (wasPinned) {
+          nextMedia.delete(sha256);
+        } else {
+          const media = mediaPage.value?.items.find((item) => item.sha256 === sha256)
+            ?? await window.canvasApi.getStudioMedia(projectRoot, sha256);
+          if (!media) throw new Error("媒体已不存在。");
+          nextMedia.set(sha256, media);
+        }
+        if (!canvasUiActionIsCurrent(pinActionGate, scope)) return;
+        pinnedMediaItems.value = nextMedia;
+        if (!enteringWorkflow) rebuildGraph();
+      } catch (error) {
+        if (!canvasUiActionIsCurrent(pinActionGate, scope)) return;
+        pinnedNodeIds.value = previousPinnedNodeIds;
+        pinnedMediaItems.value = previousPinnedMediaItems;
+        errorMessage.value = `固定媒体读取失败：${message(error)}`;
+        emit("failed", errorMessage.value);
+        rebuildGraph();
+        return;
+      }
     } else if (!enteringWorkflow) {
       rebuildGraph();
     }
@@ -1923,7 +2388,14 @@ async function togglePinnedNode(nodeId: string): Promise<void> {
       // 节点留在屏幕外，并被 only-render-visible-elements 剔除，用户看起来像添加失败。
       await nextTick();
       if (!canvasUiActionIsCurrent(pinActionGate, scope)) return;
-      await fitCanvas();
+      // 适配视口是纯视觉动画；Vue Flow 在部分 Electron 窗口中可能长期不
+      // resolve 动画 Promise。它不得占住固定节点的唯一 busy owner，否则
+      // 第一项已经进画布后，后续图片/视频/音频会永久保持“添加”禁用。
+      void fitCanvas().catch((error) => {
+        if (!canvasUiActionIsCurrent(pinActionGate, scope)) return;
+        errorMessage.value = `节点已添加，但画布自动适配失败：${message(error)}`;
+        emit("failed", errorMessage.value);
+      });
     }
     if (!canvasUiActionIsCurrent(pinActionGate, scope)) return;
     scheduleLayoutPersist();
@@ -1975,22 +2447,168 @@ async function addUnitToWorkspace(unit: StudioDashboardUnitSummary): Promise<voi
   }
 }
 
+function globalResourceQueryFingerprint(input: {
+  projectRoot: string;
+  category: MaterialStudioAssetCategory;
+  search: string;
+  cursor?: string;
+}): string {
+  return JSON.stringify([
+    input.projectRoot,
+    "global",
+    input.category,
+    input.search,
+    input.cursor ?? "",
+    GLOBAL_RESOURCE_PAGE_LIMIT,
+  ]);
+}
+
+let globalResourcePendingFingerprint = "";
+
+function invalidateGlobalResourceRequest(): void {
+  globalResourceLoadSequence += 1;
+  globalResourcePendingFingerprint = "";
+  globalResourceLoading.value = false;
+  globalResourceError.value = "";
+  globalResourcePage.value = null;
+  globalResourceCursor.value = undefined;
+  globalResourceCursorStack.value = [];
+}
+
+function releaseGlobalResourceState(): void {
+  invalidateGlobalResourceRequest();
+  globalResourceSearch.value = "";
+}
+
+function closeLibrary(): void {
+  if (libraryMode.value === "global") releaseGlobalResourceState();
+  libraryOpen.value = false;
+}
+
+async function loadGlobalResources(cursor?: string): Promise<boolean> {
+  const resourceApi = props.globalResourceApi;
+  if (!resourceApi) {
+    invalidateGlobalResourceRequest();
+    globalResourceError.value = "当前桌面适配层未接入全部剧本资源。";
+    return false;
+  }
+  const projectRoot = props.projectRoot;
+  const category = globalResourceCategory.value;
+  const search = globalResourceSearch.value.trim();
+  const fingerprint = globalResourceQueryFingerprint({
+    projectRoot,
+    category,
+    search,
+    cursor,
+  });
+  const requestSequence = ++globalResourceLoadSequence;
+  globalResourcePendingFingerprint = fingerprint;
+  globalResourceLoading.value = true;
+  globalResourceError.value = "";
+  const isCurrent = (): boolean => (
+    !canvasDisposed
+    && requestSequence === globalResourceLoadSequence
+    && globalResourcePendingFingerprint === fingerprint
+    && projectRoot === props.projectRoot
+    && libraryOpen.value
+    && libraryMode.value === "global"
+    && category === globalResourceCategory.value
+    && search === globalResourceSearch.value.trim()
+  );
+  try {
+    const page = await resourceApi.listEntries(projectRoot, {
+      section: category,
+      scope: "all",
+      representation: "images",
+      ...(search ? { search } : {}),
+      ...(cursor ? { cursor } : {}),
+      limit: GLOBAL_RESOURCE_PAGE_LIMIT,
+    });
+    if (!isCurrent()) return false;
+    globalResourcePage.value = {
+      ...page,
+      // Core 已限 36；renderer 再做边界保护，禁止异常适配层把 549 项一次挂入 DOM。
+      items: page.items.slice(0, GLOBAL_RESOURCE_PAGE_LIMIT),
+    };
+    globalResourceCursor.value = cursor;
+    return true;
+  } catch (error) {
+    if (!isCurrent()) return false;
+    const detail = message(error);
+    globalResourceError.value = detail.includes("cursor")
+      ? `剧本资源目录已变化，请重新从第一页读取。${detail}`
+      : `剧本资源读取失败：${detail}`;
+    return false;
+  } finally {
+    if (isCurrent()) globalResourceLoading.value = false;
+  }
+}
+
+async function resetGlobalResources(): Promise<void> {
+  globalResourceCursor.value = undefined;
+  globalResourceCursorStack.value = [];
+  globalResourcePage.value = null;
+  await loadGlobalResources();
+}
+
+async function openGlobalResourcesFor(category: MaterialStudioAssetCategory): Promise<void> {
+  if (globalResourceLoading.value) return;
+  globalResourceCategory.value = category;
+  await resetGlobalResources();
+}
+
+async function globalResourcesNext(): Promise<void> {
+  if (globalResourceLoading.value) return;
+  const next = globalResourcePage.value?.nextCursor;
+  if (!next) return;
+  const previousCursor = globalResourceCursor.value ?? "";
+  if (await loadGlobalResources(next)) {
+    globalResourceCursorStack.value = [...globalResourceCursorStack.value, previousCursor];
+  }
+}
+
+async function globalResourcesPrevious(): Promise<void> {
+  if (globalResourceLoading.value) return;
+  const previous = globalResourceCursorStack.value.at(-1);
+  if (previous === undefined) return;
+  if (await loadGlobalResources(previous || undefined)) {
+    globalResourceCursorStack.value = globalResourceCursorStack.value.slice(0, -1);
+  }
+}
+
 async function openLibraryFor(kind: StudioCanvasLibraryTab): Promise<void> {
+  if (libraryMode.value === "global") releaseGlobalResourceState();
+  libraryMode.value = "current";
   libraryTab.value = kind;
   libraryOpen.value = true;
   addMenuOpen.value = false;
   if (kind === "character" || kind === "scene" || kind === "prop" || kind === "style") {
     assetCategory.value = kind;
     await resetAssets();
+  } else if (kind === "media") {
+    await resetMedia();
   }
 }
 
 async function toggleLibrary(): Promise<void> {
-  if (libraryOpen.value) {
-    libraryOpen.value = false;
+  if (libraryOpen.value && libraryMode.value === "current") {
+    closeLibrary();
     return;
   }
   await openLibraryFor(libraryTab.value);
+}
+
+async function toggleGlobalResourceLibrary(): Promise<void> {
+  if (libraryOpen.value && libraryMode.value === "global") {
+    closeLibrary();
+    return;
+  }
+  if (globalResourceLoading.value) invalidateGlobalResourceRequest();
+  libraryMode.value = "global";
+  libraryOpen.value = true;
+  addMenuOpen.value = false;
+  selection.value = null;
+  await resetGlobalResources();
 }
 
 function chooseAddKind(kind: StudioCanvasLibraryTab): void {
@@ -2185,6 +2803,7 @@ function clearWorkflowCanvas(): void {
   pinnedNodeIds.value = [];
   pinnedAssetsPage.value = null;
   pinnedTextDocuments.value = [];
+  pinnedMediaItems.value = new Map();
   draftCanvasEdges.value = [];
   workflowGroups.value = [];
   selectedPanelIds.value = [];
@@ -2706,7 +3325,7 @@ async function loadApprovedUnitGridRawProjection(
   const referenceRows: Array<readonly [string, UnitGridReferenceProjection[]]> = [];
   const continuityRows: Array<readonly [string, UnitGridContinuityProjection]> = [];
   const nonPassRows: Array<readonly [string, UnitGridNonPassProjection]> = [];
-  const enrichmentTasks: Array<() => Promise<void>> = [];
+  const enrichmentTasks: Array<() => Promise<UnitGridEnrichmentResult | undefined>> = [];
   const ledgerAttested = new Map<string, UnitGridRawProjection>();
   // 核心判 PASS 的可见单元集合：rebuildGraph 据此把“核心已通过但投影未落”与
   // “等待检查”严格分开，UI 不出现核心 PASS 却显示等待验收的分裂状态。
@@ -2937,47 +3556,48 @@ async function loadApprovedUnitGridRawProjection(
             // 不得延迟正式 raw 上画布。观察只跟随核心选中的 run，不用 latestRunId 猜归属。
             const observationRunId = identity.generationRunId;
             const reviewIdForVideo = identity.reviewId;
-            enrichmentTasks.push(() => Promise.all([
-              reviewIdForVideo
-                ? readUnitGridProjectionWithin(
-                  "图生视频包状态",
-                  unit.id,
-                  (signal) => ipcUnderSignal(signal, () => loadVideoPackageProjection(projectRoot, reviewIdForVideo)),
-                ).catch(() => ({
-                  status: "not-prepared" as const,
-                  subtitle: "图生视频提交包状态读取失败",
-                }))
-                : Promise.resolve({
-                  status: "not-prepared" as const,
-                  subtitle: core.selectedResultSource === "historical-import"
-                    ? "历史导入正式 raw 未建立图生视频提交包"
-                    : "正式 raw 未建立图生视频提交包",
-                }),
-              observationRunId && identity.postResultObservationHeadPresent !== false
-                ? readUnitGridProjectionWithin(
-                  "实际末态观察控制",
-                  unit.id,
-                  (signal) => ipcUnderSignal(
-                    signal,
-                    () => window.canvasApi.getStudioPostResultObservationControl(projectRoot, observationRunId),
-                  ),
-                ).catch((observationError) => {
-                  if (isCurrent()) {
-                    rawReferenceProjectionIssue.value = `${unit.id} 实际末态观察控制不可读：${message(observationError)}；计划终态仍禁止作为下一镜实际起态。`;
-                  }
-                  return undefined;
-                })
-                : Promise.resolve(undefined),
-            ]).then(([videoPackage, postResultObservation]) => {
-              if (!isCurrent()) return;
-              unitGridVideoPackagePipeline.value = new Map(unitGridVideoPackagePipeline.value)
-                .set(unit.id, videoPackage);
-              if (postResultObservation) {
-                unitGridPostResultObservationPipeline.value = new Map(unitGridPostResultObservationPipeline.value)
-                  .set(unit.id, postResultObservation);
-              }
-              scheduleUnitGridGraphRebuild();
-            }));
+            enrichmentTasks.push(async () => {
+              // 有界 worker 领取任务时再次核对 generation/root；旧批次不再启动新 IPC。
+              if (!isCurrent()) return undefined;
+              const [videoPackage, postResultObservation] = await Promise.all([
+                reviewIdForVideo
+                  ? readUnitGridProjectionWithin(
+                    "图生视频包状态",
+                    unit.id,
+                    (signal) => ipcUnderSignal(signal, () => loadVideoPackageProjection(projectRoot, reviewIdForVideo)),
+                  ).catch(() => ({
+                    status: "not-prepared" as const,
+                    subtitle: "图生视频提交包状态读取失败",
+                  }))
+                  : Promise.resolve({
+                    status: "not-prepared" as const,
+                    subtitle: core.selectedResultSource === "historical-import"
+                      ? "历史导入正式 raw 未建立图生视频提交包"
+                      : "正式 raw 未建立图生视频提交包",
+                  }),
+                observationRunId && identity.postResultObservationHeadPresent !== false
+                  ? readUnitGridProjectionWithin(
+                    "实际末态观察控制",
+                    unit.id,
+                    (signal) => ipcUnderSignal(
+                      signal,
+                      () => window.canvasApi.getStudioPostResultObservationControl(projectRoot, observationRunId),
+                    ),
+                  ).catch((observationError) => {
+                    if (isCurrent()) {
+                      rawReferenceProjectionIssue.value = `${unit.id} 实际末态观察控制不可读：${message(observationError)}；计划终态仍禁止作为下一镜实际起态。`;
+                    }
+                    return undefined;
+                  })
+                  : Promise.resolve(undefined),
+              ]);
+              if (!isCurrent()) return undefined;
+              return {
+                unitId: unit.id,
+                videoPackage,
+                ...(postResultObservation ? { postResultObservation } : {}),
+              };
+            });
             continue;
           }
           // 核心未判 PASS：不展示任何 raw；非 PASS 状态只翻译核心投影结果，
@@ -3021,7 +3641,32 @@ async function loadApprovedUnitGridRawProjection(
     // 继续核对但不再让它们把“参考仍在加载”虚报数秒。
     rawReferenceProjectionLoading.value = false;
     flushUnitGridGraphRebuild();
-    await Promise.all(enrichmentTasks.map((task) => task()));
+    const enrichmentResults = await runBoundedAsyncTasks(
+      enrichmentTasks,
+      UNIT_GRID_ENRICHMENT_CONCURRENCY,
+    );
+    if (!isCurrent()) return;
+    // 后台增强结果整批提交：最多替换两张 Map、安排一次整图重建，避免每个单元
+    // 返回时各自触发一次 Vue 响应式更新和 rAF rebuild。
+    const nextVideoPackages = new Map(unitGridVideoPackagePipeline.value);
+    const nextPostResultObservations = new Map(unitGridPostResultObservationPipeline.value);
+    let hasEnrichmentResult = false;
+    for (const enrichment of enrichmentResults) {
+      if (!enrichment) continue;
+      hasEnrichmentResult = true;
+      nextVideoPackages.set(enrichment.unitId, enrichment.videoPackage);
+      if (enrichment.postResultObservation) {
+        nextPostResultObservations.set(
+          enrichment.unitId,
+          enrichment.postResultObservation,
+        );
+      }
+    }
+    if (hasEnrichmentResult) {
+      unitGridVideoPackagePipeline.value = nextVideoPackages;
+      unitGridPostResultObservationPipeline.value = nextPostResultObservations;
+      scheduleUnitGridGraphRebuild();
+    }
   } finally {
     if (isCurrent()) rawReferenceProjectionLoading.value = false;
   }
@@ -3085,6 +3730,13 @@ function rebuildGraph(): void {
   const assets = workflowView
     ? (pinnedAssetsPage.value?.page.items ?? []).filter((asset) => pinned.has(`asset:${asset.id}`))
     : (assetsPage.value?.page.items ?? []).slice(0, 6);
+  const mediaItems = workflowView
+    ? pinnedNodeIds.value
+      .filter((nodeId) => nodeId.startsWith("library-media:"))
+      .map((nodeId) => pinnedMediaItems.value.get(nodeId.slice("library-media:".length)))
+      .filter((media): media is StudioMediaIpcItem => Boolean(media))
+      .slice(0, STUDIO_CANVAS_PINNED_MEDIA_LIMIT)
+    : [];
   const pinnedUnitId = pinnedNodeIds.value.find((nodeId) => nodeId.startsWith("unit:"))?.slice("unit:".length);
   const pinnedUnit = pinnedUnitId
     ? (unitDetail.value?.unit.id === pinnedUnitId
@@ -3155,10 +3807,38 @@ function rebuildGraph(): void {
         projectRoot: props.projectRoot,
         ...(asset.authorityMediaSha256
           ? {
+            mediaSha256: asset.authorityMediaSha256,
             exportMediaSha256: asset.authorityMediaSha256,
             exportFileName: `${asset.name || asset.id}-authority`,
           }
           : {}),
+      },
+      draggable: true,
+    });
+  });
+  const mediaBaseY = 80 + Math.ceil(assets.length / 2) * 150;
+  mediaItems.forEach((media, index) => {
+    const id = mediaNodeId(media.sha256);
+    const mediaKind = media.kind;
+    nextNodes.push({
+      id,
+      type: "managedStudio",
+      position: fallbackPos(id, {
+        x: 40 + (index % 2) * 210,
+        y: mediaBaseY + Math.floor(index / 2) * 150,
+      }),
+      class: ["managed-node", "library-media-node", `media-${mediaKind}`],
+      data: {
+        kind: mediaKind,
+        kindLabel: mediaKindLabel(mediaKind),
+        title: media.sourceBasename,
+        subtitle: `${formatCanvasMediaBytes(media.sizeBytes)} · ${media.mimeType} · 拖出为复制体`,
+        thumbnailUrl: mediaKind === "image" ? media.thumbnail?.url : undefined,
+        id: media.sha256,
+        projectRoot: props.projectRoot,
+        mediaSha256: media.sha256,
+        exportMediaSha256: media.sha256,
+        exportFileName: media.sourceBasename,
       },
       draggable: true,
     });
@@ -3672,16 +4352,19 @@ async function hydrateLayoutFromDisk(projectRoot = props.projectRoot): Promise<b
     const layout = await api.loadLayout(projectRoot);
     if (!isCurrent()) return false;
     if (!layout) {
+      layoutSaveCoordinator.setBaseline(projectRoot, null);
       layoutFingerprint.value = undefined;
       persistedLayoutNodes.value = {};
       persistedLayoutBase.value = null;
       workspaceMode.value = "projection";
       pinnedNodeIds.value = [];
       pinnedAssetsPage.value = null;
+      pinnedMediaItems.value = new Map();
       draftCanvasEdges.value = [];
       workflowGroups.value = [];
       return true;
     }
+    layoutSaveCoordinator.setBaseline(projectRoot, layout);
     layoutFingerprint.value = layout.fingerprint;
     persistedLayoutNodes.value = { ...layout.nodes };
     persistedLayoutBase.value = structuredClone(layout);
@@ -3803,18 +4486,38 @@ async function persistWorkflow(
     draftCanvasEdges: plainDraftEdges(),
     workflowGroups: plainWorkflowGroups(nextGroups),
   };
-  const result = await saveStudioCanvasLayoutWithCasMerge({
-    api,
+  const workflowLayoutGeneration = layoutSaveGeneration;
+  const result = await layoutSaveCoordinator.saveExclusive({
     projectRoot: scope.projectRoot,
-    base: persistedLayoutBase.value ? structuredClone(persistedLayoutBase.value) : null,
+    generation: workflowLayoutGeneration,
     local,
-    ...(layoutFingerprint.value ? { expectedFingerprint: layoutFingerprint.value } : {}),
+    force: true,
   });
   if (!workflowActionIsCurrent(scope)) {
     throw new Error("工程或单元已切换；旧工作流结果未写入当前界面。");
   }
-  acceptPersistedLayout(result.layout, { applyMergedSemantic: result.merged });
+  acceptPersistedLayout(result.layout, {
+    applyMergedSemantic: result.merged
+      && workflowLayoutGeneration === layoutSaveGeneration,
+  });
   workflowGroups.value = [...result.layout.workflowGroups];
+  const reflectedNodes = collectStudioCanvasNodePositions(
+    nodes.value.map((node) => ({
+      id: node.id,
+      position: { x: node.position.x, y: node.position.y },
+    })),
+  );
+  layoutSaveCoordinator.setReflectedSemantic(scope.projectRoot, {
+    viewport: { ...layoutViewport.value, zoom: zoom.value },
+    nodes: plainNodePositions(boundedLayoutNodes({
+      ...persistedLayoutNodes.value,
+      ...reflectedNodes,
+    })),
+    workspaceMode: workspaceMode.value,
+    pinnedNodeIds: [...pinnedNodeIds.value],
+    draftCanvasEdges: plainDraftEdges(),
+    workflowGroups: plainWorkflowGroups(workflowGroups.value),
+  });
   lastWorkflowTitle.value = created.title;
   layoutSaveState.value = "saved";
   return created;
@@ -4185,15 +4888,15 @@ function scheduleLayoutPersist(): void {
   const projectRoot = props.projectRoot;
   layoutSaveTimer = setTimeout(() => {
     layoutSaveTimer = undefined;
-    const operation = persistLayoutNow(generation, projectRoot);
-    layoutSaveInFlight = operation;
-    void operation.finally(() => {
-      if (layoutSaveInFlight === operation) layoutSaveInFlight = undefined;
-    });
+    void persistLayoutNow(generation, projectRoot);
   }, LAYOUT_SAVE_DEBOUNCE_MS);
 }
 
-async function persistLayoutNow(generation: number, projectRoot = props.projectRoot): Promise<void> {
+async function persistLayoutNow(
+  generation: number,
+  projectRoot = props.projectRoot,
+  options: { force?: boolean } = {},
+): Promise<void> {
   const api = resolveLayoutApi();
   if (!api) return;
   if (generation !== layoutSaveGeneration) return;
@@ -4211,38 +4914,26 @@ async function persistLayoutNow(generation: number, projectRoot = props.projectR
     draftCanvasEdges: plainDraftEdges(),
     workflowGroups: plainWorkflowGroups(workflowGroups.value),
   };
-  const base = persistedLayoutBase.value ? structuredClone(persistedLayoutBase.value) : null;
-  const expectedFingerprint = layoutFingerprint.value;
-  try {
-    const result = await saveStudioCanvasLayoutWithCasMerge({
-      api,
-      projectRoot,
-      base,
-      local,
-      ...(expectedFingerprint ? { expectedFingerprint } : {}),
-    });
-    if (isCurrentProject()) {
-      acceptPersistedLayout(result.layout, { applyMergedSemantic: result.merged });
-      layoutSaveState.value = "saved";
-    }
-  } catch (error) {
-    if (generation !== layoutSaveGeneration) return;
-    const text = message(error);
-    if (isCurrentProject()) {
-      layoutSaveState.value = "error";
-      errorMessage.value = `布局保存失败：${text}`;
-    }
-  }
+  layoutSaveCoordinator.saveLatest({
+    projectRoot,
+    generation,
+    local,
+    ...(options.force ? { force: true } : {}),
+  });
+  await layoutSaveCoordinator.flush();
 }
 
 async function flushPendingLayout(projectRoot = props.projectRoot): Promise<void> {
   if (layoutSaveTimer) {
     clearTimeout(layoutSaveTimer);
     layoutSaveTimer = undefined;
-    await persistLayoutNow(layoutSaveGeneration, projectRoot);
+    await persistLayoutNow(layoutSaveGeneration, projectRoot, { force: true });
     return;
   }
-  if (layoutSaveInFlight) await layoutSaveInFlight;
+  await layoutSaveCoordinator.flush({
+    projectRoot,
+    force: true,
+  });
 }
 
 async function loadOverview(): Promise<void> {
@@ -4317,6 +5008,18 @@ async function loadAssets(): Promise<void> {
     // 事件反向覆盖，表现为“已添加但节点消失”。
     if (workspaceMode.value !== "workflow") rebuildGraph();
   }
+}
+
+async function loadMediaPage(projectRoot = props.projectRoot): Promise<void> {
+  const requestSequence = ++mediaLoadSequence;
+  const result = await window.canvasApi.listStudioMedia(projectRoot, {
+    ...(mediaKindFilter.value !== "all" ? { kind: mediaKindFilter.value } : {}),
+    ...(mediaSearch.value ? { search: mediaSearch.value } : {}),
+    ...(mediaCursor.value ? { cursor: mediaCursor.value } : {}),
+    limit: STUDIO_CANVAS_MEDIA_PAGE_LIMIT,
+  });
+  if (projectRoot !== props.projectRoot || requestSequence !== mediaLoadSequence) return;
+  mediaPage.value = result;
 }
 
 async function loadPinnedAssets(options: { rebuild?: boolean } = {}): Promise<void> {
@@ -4413,7 +5116,7 @@ async function onExternalDrop(event: DragEvent): Promise<void> {
     }
   }
   if (!paths.length) {
-    errorMessage.value = "只能拖入图片或视频文件（png/jpg/webp/gif/mp4/mov/webm 等）。";
+    errorMessage.value = "只能拖入图片、视频或音频文件（png/jpg/mp4/mov/mp3/wav 等）。";
     return;
   }
   externalImportBusy.value = true;
@@ -4643,6 +5346,8 @@ async function refreshAll(): Promise<void> {
     if (!isCurrent()) return;
     await loadPinnedTextDocuments();
     if (!isCurrent()) return;
+    await loadPinnedMedia({ rebuild: false });
+    if (!isCurrent()) return;
     await loadPinnedUnit();
     if (!isCurrent()) return;
     // T12: loadUnits 已按当前页面唯一季集刷新批量投影；多季集混排不猜测。
@@ -4676,6 +5381,12 @@ async function resetAssets(): Promise<void> {
   assetCursor.value = undefined;
   assetCursorStack.value = [];
   await guarded("assets", () => loadAssets());
+}
+
+async function resetMedia(): Promise<void> {
+  mediaCursor.value = undefined;
+  mediaCursorStack.value = [];
+  await guarded("media", ({ projectRoot }) => loadMediaPage(projectRoot));
 }
 
 async function guarded(
@@ -4726,6 +5437,21 @@ async function assetsPrevious(): Promise<void> {
   if (previous === undefined) return;
   assetCursor.value = previous || undefined;
   await guarded("assets", () => loadAssets());
+}
+
+async function mediaNext(): Promise<void> {
+  const next = mediaPage.value?.nextCursor;
+  if (!next) return;
+  mediaCursorStack.value.push(mediaCursor.value ?? "");
+  mediaCursor.value = next;
+  await guarded("media", ({ projectRoot }) => loadMediaPage(projectRoot));
+}
+
+async function mediaPrevious(): Promise<void> {
+  const previous = mediaCursorStack.value.pop();
+  if (previous === undefined) return;
+  mediaCursor.value = previous || undefined;
+  await guarded("media", ({ projectRoot }) => loadMediaPage(projectRoot));
 }
 
 async function loadAppearances(assetId: string, projectRoot = props.projectRoot): Promise<void> {
@@ -5411,6 +6137,8 @@ function invalidateCanvasRequests(): void {
   layoutLoadSequence += 1;
   textDocumentLoadSequence += 1;
   pinnedTextDocumentLoadSequence += 1;
+  pinnedMediaLoadSequence += 1;
+  mediaLoadSequence += 1;
   unitDetailLoadSequence += 1;
   panelPipelineLoadSequence += 1;
   invalidateQueuedUnitSelection();
@@ -5431,6 +6159,7 @@ function invalidateCanvasRequests(): void {
   controller.invalidate();
   pinnedAssetController.invalidate();
   guardedActionGate.invalidate();
+  invalidateGlobalResourceRequest();
 }
 
 watch(() => unitDetail.value?.unit.id, (unitId, previousUnitId) => {
@@ -5451,6 +6180,12 @@ watch(() => props.projectRoot, async (_projectRoot, previousProjectRoot) => {
   localProductionPreviewLoading.value = false;
   unitsPage.value = null;
   assetsPage.value = null;
+  mediaPage.value = null;
+  globalResourceSearch.value = "";
+  globalResourceCategory.value = "character";
+  mediaSearch.value = "";
+  mediaKindFilter.value = "all";
+  libraryMode.value = "current";
   // P30：切工程时清空旧工程宫格/整板会话状态并以新工程账本投影重建。
   for (const key of Object.keys(nodeStatusStore.snapshot())) {
     if (key.startsWith("panel:") || key.startsWith("unit:")) nodeStatusStore.clear(key);
@@ -5468,6 +6203,7 @@ watch(() => props.projectRoot, async (_projectRoot, previousProjectRoot) => {
   pinnedAssetsPage.value = null;
   pagedTextDocuments.value = [];
   pinnedTextDocuments.value = [];
+  pinnedMediaItems.value = new Map();
   unitDetail.value = null;
   unitGridRawPipeline.value = new Map();
   unitGridReferencePipeline.value = new Map();
@@ -5485,9 +6221,11 @@ watch(() => props.projectRoot, async (_projectRoot, previousProjectRoot) => {
   unitCursor.value = undefined;
   assetCursor.value = undefined;
   appearanceCursor.value = undefined;
+  mediaCursor.value = undefined;
   unitCursorStack.value = [];
   assetCursorStack.value = [];
   appearanceCursorStack.value = [];
+  mediaCursorStack.value = [];
   nodes.value = [];
   edges.value = [];
   layoutFingerprint.value = undefined;
@@ -5530,6 +6268,10 @@ watch(() => props.projectRoot, async (_projectRoot, previousProjectRoot) => {
   layoutViewport.value = { x: 30, y: 36, zoom: 0.72 };
   zoom.value = 0.72;
   layoutSaveState.value = "idle";
+  // 先清掉旧工程各 lane 的 busy，再在同一同步任务内进入切换 busy。
+  // 这里必须早于布局 flush 的首个 await，避免画布以 aria-busy=false 暴露
+  // 已清空但尚未读取新工程的瞬态 0/0/0 投影。
+  loading.value = true;
   await previousLayoutFlush;
   await refreshAll();
 });
@@ -5546,8 +6288,15 @@ onMounted(async () => {
         loading: boolean;
         /** 当前 VueFlow nodes store 中实际存在的单元节点；不读取后端 overview metrics。 */
         unitNodeIds: string[];
+        /** 画布内只读剧本资源验收：抽屉操作不得改变节点、边、固定关系或布局身份。 */
+        allNodeIds: string[];
+        edgeIds: string[];
+        pinnedNodeIds: string[];
+        layoutFingerprint?: string;
         corePassUnitIds: string[];
         referenceCount: number;
+        /** 正式 raw 的后置视频包/实际末态增强也已闭合；用于只读 UI 验收等待稳定图。 */
+        formalProjectionInFlight: boolean;
         referenceUnitIds: string[];
         raws: Array<{
           unitId: string;
@@ -5571,9 +6320,14 @@ onMounted(async () => {
       unitNodeIds: nodes.value
         .filter((node) => node.id.startsWith("unit:"))
         .map((node) => node.id.slice("unit:".length)),
+      allNodeIds: nodes.value.map((node) => node.id),
+      edgeIds: edges.value.map((edge) => edge.id),
+      pinnedNodeIds: [...pinnedNodeIds.value],
+      ...(layoutFingerprint.value ? { layoutFingerprint: layoutFingerprint.value } : {}),
       corePassUnitIds: [...unitGridCorePassUnits.value],
       referenceCount: [...unitGridReferencePipeline.value.values()]
         .reduce((total, references) => total + references.length, 0),
+      formalProjectionInFlight: Boolean(unitGridRawProjectionInFlight),
       referenceUnitIds: [...unitGridReferencePipeline.value.keys()],
       raws: [...unitGridRawPipeline.value.entries()].map(([unitId, raw]) => ({
         unitId,
@@ -5895,8 +6649,10 @@ button { color: inherit; }
 .canvas-error button { border: 0; background: transparent; cursor: pointer; }
 .canvas-layout { min-height: 0; flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); }
 .canvas-layout.library-open { grid-template-columns: 292px minmax(0, 1fr); }
+.canvas-layout.library-open.global-resources-open { grid-template-columns: 390px minmax(0, 1fr); }
 .canvas-layout.inspector-open { grid-template-columns: minmax(0, 1fr) 286px; }
 .canvas-layout.library-open.inspector-open { grid-template-columns: 292px minmax(0, 1fr) 286px; }
+.canvas-layout.library-open.global-resources-open.inspector-open { grid-template-columns: 390px minmax(0, 1fr) 286px; }
 .canvas-library, .canvas-inspector { min-width: 0; overflow: auto; background: var(--msc-surface); }
 .canvas-library { border-right: 1px solid var(--msc-line); padding: 14px; }
 .canvas-library > header { display: flex; justify-content: space-between; align-items: center; }
@@ -5927,6 +6683,8 @@ button { color: inherit; }
 .library-item > span:last-child { min-width: 0; display: grid; gap: 2px; }
 .library-item b { overflow: hidden; color: var(--msc-text); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
 .library-item small { color: var(--msc-text-3); font-size: 10px; }
+.media-library-list { max-height: 360px; overflow: auto; padding-right: 2px; }
+.media-library-item { cursor: default; }
 .item-thumb { width: 38px; height: 38px; flex: 0 0 38px; display: grid; place-items: center; overflow: hidden; border-radius: 6px; background: var(--msc-surface-2); color: var(--msc-accent); }
 .item-thumb img { width: 100%; height: 100%; object-fit: cover; }
 .item-type { width: 34px; height: 34px; flex: 0 0 34px; display: grid; place-items: center; border-radius: 6px; background: var(--msc-surface-2); color: var(--msc-accent); font-size: 11px; }
@@ -5935,6 +6693,114 @@ button { color: inherit; }
 .pager { grid-template-columns: 1fr auto 1fr; align-items: center; }
 .pager-position { color: var(--msc-text-3); font-size: 10px; text-align: center; white-space: nowrap; }
 .library-empty { margin: 18px 4px; color: var(--msc-text-3); font-size: 11px; line-height: 1.6; text-align: center; }
+.global-resource-library { overflow: hidden; }
+.global-resource-library > header { gap: 12px; }
+.global-resource-library > header > div { min-width: 0; }
+.global-resource-library h3 { margin-bottom: 4px; }
+.global-resource-header-actions { display: flex; align-items: center; gap: 6px; }
+.global-resource-header-actions button:first-child {
+  width: auto;
+  min-width: 0;
+  padding: 5px 7px;
+  border: 1px solid var(--msc-accent);
+  color: var(--msc-text);
+  background: var(--msc-accent-soft);
+  font-size: 8px;
+  white-space: nowrap;
+}
+.readonly-badge {
+  display: inline-flex;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: var(--msc-accent-soft);
+  color: var(--msc-accent-strong);
+  font-size: 9px;
+  font-weight: 650;
+}
+.global-resource-summary {
+  margin: 12px 0 10px;
+  padding: 9px 10px;
+  border: 1px solid var(--msc-line);
+  border-radius: 9px;
+  background: var(--msc-bg);
+  color: var(--msc-text-2);
+  font-size: 10px;
+  line-height: 1.6;
+}
+.global-resource-summary b { color: var(--msc-text); }
+.global-resource-tabs { grid-template-columns: repeat(4, 1fr); }
+.global-resource-tabs button { display: grid; gap: 1px; }
+.global-resource-tabs button small { color: inherit; font-size: 8px; font-weight: 500; }
+.global-resource-list-viewport {
+  min-height: 260px;
+  max-height: calc(100vh - 385px);
+  margin: 10px 0;
+  overflow: auto;
+  border: 1px solid var(--msc-line);
+  border-radius: 9px;
+  background: var(--msc-bg);
+}
+.global-resource-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+}
+.global-resource-card {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid var(--msc-line);
+  border-radius: 9px;
+  background: var(--msc-surface);
+}
+.global-resource-card > figure {
+  width: 84px;
+  height: 112px;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 7px;
+  background: var(--msc-surface-2);
+  color: var(--msc-accent-strong);
+  font-weight: 700;
+}
+.global-resource-card > figure img { width: 100%; height: 100%; object-fit: cover; }
+.global-resource-card > article { min-width: 0; display: grid; align-content: start; gap: 4px; }
+.global-resource-card-heading { min-width: 0; display: flex; align-items: start; gap: 6px; }
+.global-resource-card-heading > b {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+  color: var(--msc-text);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.global-resource-card-heading > em {
+  flex: 0 0 auto;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: var(--msc-surface-2);
+  color: var(--msc-text-3);
+  font-size: 8px;
+  font-style: normal;
+}
+.global-resource-source { color: var(--msc-text-3); font-size: 9px; line-height: 1.35; }
+.global-resource-associations { display: grid; gap: 4px; margin: 2px 0 0; padding: 0; list-style: none; }
+.global-resource-associations li {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+  padding-top: 4px;
+  border-top: 1px dashed var(--msc-line);
+}
+.global-resource-associations b { overflow-wrap: anywhere; color: var(--msc-text-2); font-size: 10px; }
+.global-resource-associations span { color: var(--msc-text-3); font-size: 8px; line-height: 1.4; }
+.global-resource-pager { margin-top: 8px; }
 .flow-shell { position: relative; min-width: 0; overflow: hidden; isolation: isolate; background: var(--msc-bg); }
 .flow-shell.external-drop-active {
   outline: 2px dashed var(--msc-accent);
@@ -5942,7 +6808,7 @@ button { color: inherit; }
   background: color-mix(in srgb, var(--msc-accent) 8%, var(--msc-bg));
 }
 .flow-shell.external-drop-active::after {
-  content: "松开以导入图片/视频";
+  content: "松开以导入图片/视频/音频";
   position: absolute;
   z-index: 30;
   left: 50%;
@@ -5985,6 +6851,7 @@ button { color: inherit; }
 }
 .floating-tools button.active { background: var(--msc-accent-soft); color: var(--msc-accent-strong); border-color: var(--msc-accent); }
 .floating-tools button span { color: inherit; font-size: 10px; }
+.floating-tools > button > small { color: var(--msc-text-3); font-size: 8px; line-height: 1; }
 .add-menu-wrap { position: relative; }
 .add-menu {
   position: absolute;
@@ -6105,6 +6972,7 @@ button { color: inherit; }
 @media (max-width: 1180px) {
   .canvas-layout.inspector-open { grid-template-columns: minmax(0, 1fr); }
   .canvas-layout.library-open.inspector-open { grid-template-columns: 270px minmax(0, 1fr); }
+  .canvas-layout.library-open.global-resources-open.inspector-open { grid-template-columns: 360px minmax(0, 1fr); }
   .canvas-inspector { position: absolute; z-index: 26; top: 85px; right: 0; bottom: 0; width: 270px; box-sizing: border-box; box-shadow: var(--msc-shadow-pop); }
 }
 @media (max-width: 860px) {
@@ -6112,6 +6980,7 @@ button { color: inherit; }
   .canvas-metrics { display: none; }
   .canvas-layout.library-open { grid-template-columns: minmax(0, 1fr); }
   .canvas-library { position: absolute; z-index: 25; top: 85px; left: 0; bottom: 0; width: 280px; box-sizing: border-box; box-shadow: var(--msc-shadow-pop); }
+  .canvas-library.global-resource-library { width: min(360px, calc(100% - 24px)); }
 }
 
 /* T12/T15/T21: 时间线投影摘要 + 单元租约 banner */

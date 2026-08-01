@@ -26,6 +26,13 @@ export const RUNTIME_GATE_READ_ONLY_CHANNELS = new Set<string>([
   "canvas:get-default-managed-projects-root",
   "canvas:get-managed-project-operation-state",
   "canvas:get-local-creative-project-ingest-status",
+  "canvas:list-global-studio-assets",
+  "canvas:list-global-studio-asset-images",
+  "canvas:get-global-studio-asset-image",
+  "canvas:list-global-studio-image-resources",
+  "canvas:get-global-studio-image-resource",
+  "canvas:list-global-studio-media-resources",
+  "canvas:get-global-studio-media-resource",
   "canvas:load-studio-canvas-layout",
   "canvas:get-studio-unit-write-leases",
 ]);

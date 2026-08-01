@@ -81,6 +81,9 @@ async function listPackagedMcpTools(input: {
       AI_CANVAS_RECORDED_RUNTIME_ARTIFACT_SHA256: input.runtimeArtifactSha256,
       AI_CANVAS_BUILD_TIMESTAMP: input.builtAt,
       AI_CANVAS_REGISTRY_PATH: input.registryPath,
+      // 安装验收使用隔离 registry 且只读取工具清单；不得与用户正在使用的
+      // MCP owner 争夺全局单进程锁，也不要求结束现有连接。
+      AI_CANVAS_MCP_ALLOW_MULTI: "1",
     },
     stderr: "pipe",
   });

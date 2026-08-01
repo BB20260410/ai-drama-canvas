@@ -567,6 +567,7 @@ export const STUDIO_PUBLIC_COMMAND_NAMES = [
   "set_studio_primary_authority",
   "export_studio_cross_project_asset_package",
   "import_studio_cross_project_asset_package",
+  "reuse_studio_global_resource",
   "create_studio_script_document",
   "create_studio_prompt_document",
   "append_studio_script_revision",
@@ -680,6 +681,48 @@ function publicCommandVariants(actor: StudioReviewerActor) {
       targetCategory: z.enum(["character", "scene", "prop", "style"]).optional(),
       targetName: z.string().trim().min(1).max(256).optional(),
     }).strict() }),
+    z.object({
+      command: z.literal("reuse_studio_global_resource"),
+      payload: z.discriminatedUnion("resourceKind", [
+        z.object({
+          resourceKind: z.literal("asset"),
+          sourceProjectRoot: z.string().trim().min(1)
+            .refine((value) => path.isAbsolute(value), "sourceProjectRoot 必须是绝对路径"),
+          expectedSourceProjectId: studioStableIdSchema,
+          sourceAssetId: studioAssetIdSchema,
+          sourceVersionId: studioStableIdSchema,
+          expectedSourceAssetRevision: z.number().int().positive(),
+          targetExpectedRevision: z.literal(0),
+        }).strict(),
+        z.object({
+          resourceKind: z.literal("image"),
+          sourceProjectRoot: z.string().trim().min(1)
+            .refine((value) => path.isAbsolute(value), "sourceProjectRoot 必须是绝对路径"),
+          expectedSourceProjectId: studioStableIdSchema,
+          sourceMediaSha256: studioSha256Schema,
+          expectedSourceMediaSizeBytes: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+          targetExpectedRevision: z.literal(0),
+        }).strict(),
+        z.object({
+          resourceKind: z.literal("audio"),
+          sourceProjectRoot: z.string().trim().min(1)
+            .refine((value) => path.isAbsolute(value), "sourceProjectRoot 必须是绝对路径"),
+          expectedSourceProjectId: studioStableIdSchema,
+          sourceMediaSha256: studioSha256Schema,
+          expectedSourceMediaSizeBytes: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+          targetExpectedRevision: z.literal(0),
+        }).strict(),
+        z.object({
+          resourceKind: z.literal("video"),
+          sourceProjectRoot: z.string().trim().min(1)
+            .refine((value) => path.isAbsolute(value), "sourceProjectRoot 必须是绝对路径"),
+          expectedSourceProjectId: studioStableIdSchema,
+          sourceMediaSha256: studioSha256Schema,
+          expectedSourceMediaSizeBytes: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+          targetExpectedRevision: z.literal(0),
+        }).strict(),
+      ]),
+    }),
     z.object({ command: z.literal("create_studio_script_document"), payload: z.object({
       id: studioStableIdSchema.optional(),
       title: z.string().trim().min(1).max(500),

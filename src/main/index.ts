@@ -1,12 +1,12 @@
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { createHash, randomUUID } from "node:crypto";
-import { constants as fsConstants, existsSync } from "node:fs";
+import { constants as fsConstants, existsSync, lstatSync, type BigIntStats } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { access, chmod, copyFile, lstat, mkdir, open, readFile, realpath, rename, rm, stat, writeFile } from "node:fs/promises";
+import { access, chmod, lstat, mkdir, open, readFile, realpath, rename, rm, stat, writeFile } from "node:fs/promises";
 import { Readable } from "node:stream";
-import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeImage, net, protocol, shell } from "electron";
+import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeImage, net, protocol, shell, type NativeImage } from "electron";
 import chokidar, { type FSWatcher } from "chokidar";
 import { DEFAULT_PROJECT_ROOT } from "../core/constants.js";
 import {
@@ -125,6 +125,27 @@ import {
   type StudioMediaListQuery,
 } from "../core/material-studio.js";
 import {
+  getGlobalStudioAssetResourceImage,
+  getGlobalStudioMediaResource,
+  listGlobalStudioAssetCatalog,
+  listGlobalStudioAssetResourceImages,
+  listGlobalStudioMediaResources,
+  type GlobalStudioAssetCatalogQuery,
+  type GlobalStudioAssetResourceImageQuery,
+  type GlobalStudioMediaResourceQuery,
+} from "../core/studio-global-asset-catalog.js";
+import {
+  getGlobalStudioImageResource,
+  listGlobalStudioImageResources,
+  type GlobalStudioImageResourceQuery,
+} from "../core/studio-global-image-resource-catalog.js";
+import { prepareStudioNativeMediaDragCopy } from "../core/studio-native-media-drag.js";
+import {
+  cleanupStaleStudioNativeMediaDragDirectories,
+  StudioNativeMediaDragResourceManager,
+  type StudioNativeMediaDragOwnedEntry,
+} from "./studio-native-media-drag-resources.js";
+import {
   getStudioProductionState,
   getStudioProductionUnitSnapshot,
   getLatestStudioTextRevisionMetadata,
@@ -234,6 +255,53 @@ const activeProjectListControllers = new Map<string, AbortController>();
 const activeScanPromises = new Set<Promise<unknown>>();
 const activeEditorSessions = new Map<string, string>();
 let quitSessionCleanupStarted = false;
+
+interface PreparedNativeMediaDrag extends StudioNativeMediaDragOwnedEntry {
+  webContentsId: number;
+  projectRoot: string;
+  mediaSha256: string;
+  exportPath: string;
+  fileName: string;
+  kind: "image" | "video" | "audio";
+  mimeType: string;
+  sizeBytes: number;
+  identity: {
+    dev: bigint;
+    ino: bigint;
+    size: bigint;
+    mtimeNs: bigint;
+    ctimeNs: bigint;
+  };
+  icon: NativeImage;
+}
+
+let studioNativeMediaDragResources:
+  | StudioNativeMediaDragResourceManager<PreparedNativeMediaDrag>
+  | null = null;
+
+function studioMediaExportTempRoot(): string {
+  return path.join(app.getPath("temp"), "ai-drama-canvas-export");
+}
+
+async function initializeStudioNativeMediaDragResources(): Promise<void> {
+  const cleanup = await cleanupStaleStudioNativeMediaDragDirectories({
+    exportRoot: studioMediaExportTempRoot(),
+  });
+  if (cleanup.failed > 0) {
+    console.warn(`[native-media-drag] ${cleanup.failed} 个陈旧临时目录未能安全清理。`);
+  }
+  studioNativeMediaDragResources = new StudioNativeMediaDragResourceManager({
+    exportRoot: cleanup.exportRoot,
+  });
+}
+
+function requireStudioNativeMediaDragResources():
+  StudioNativeMediaDragResourceManager<PreparedNativeMediaDrag> {
+  if (!studioNativeMediaDragResources) {
+    throw new Error("拖出复制体资源管理器尚未就绪。");
+  }
+  return studioNativeMediaDragResources;
+}
 
 function parseProjectListRequestOptions(value: unknown): ListProjectsRequestOptions {
   if (value === undefined || value === null) return {};
@@ -1687,6 +1755,32 @@ function registerIpc(): void {
     await requireManagedStudioProject(projectRoot);
     return listStudioCanonicalAssets(projectRoot, query);
   });
+  ipcMain.handle("canvas:list-global-studio-assets", async (_event, query: GlobalStudioAssetCatalogQuery) => (
+    listGlobalStudioAssetCatalog(query)
+  ));
+  ipcMain.handle("canvas:list-global-studio-asset-images", async (_event, query: GlobalStudioAssetResourceImageQuery) => (
+    listGlobalStudioAssetResourceImages(query)
+  ));
+  ipcMain.handle("canvas:get-global-studio-asset-image", async (_event, projectRoot: string, mediaSha256: string) => (
+    getGlobalStudioAssetResourceImage(projectRoot, mediaSha256)
+  ));
+  ipcMain.handle("canvas:list-global-studio-image-resources", async (
+    _event,
+    query: GlobalStudioImageResourceQuery,
+  ) => listGlobalStudioImageResources(query));
+  ipcMain.handle("canvas:get-global-studio-image-resource", async (
+    _event,
+    projectRoot: string,
+    mediaSha256: string,
+  ) => getGlobalStudioImageResource(projectRoot, mediaSha256));
+  ipcMain.handle("canvas:list-global-studio-media-resources", async (_event, query: GlobalStudioMediaResourceQuery) => (
+    listGlobalStudioMediaResources(query)
+  ));
+  ipcMain.handle("canvas:get-global-studio-media-resource", async (
+    _event,
+    projectRoot: string,
+    mediaSha256: string,
+  ) => getGlobalStudioMediaResource(projectRoot, mediaSha256));
   ipcMain.handle("canvas:get-studio-asset", async (_event, projectRoot: string, assetId: string) => {
     await requireManagedStudioProject(projectRoot);
     return getStudioCanonicalAsset(projectRoot, assetId);
@@ -2472,92 +2566,117 @@ function registerIpc(): void {
     const canonicalPath = await assertShellPathAllowed(filePath, { forOpen: true });
     return shell.openPath(canonicalPath);
   });
-  /** 画布拖出：把 CAS 媒体物化为带扩展名的临时文件，供 OS 原生拖拽到桌面/其他 App。 */
-  const MEDIA_MIME_EXTENSION: Record<string, string> = {
-    "image/png": ".png",
-    "image/jpeg": ".jpg",
-    "image/webp": ".webp",
-    "image/gif": ".gif",
-    "image/avif": ".avif",
-    "image/tiff": ".tif",
-    "video/mp4": ".mp4",
-    "video/quicktime": ".mov",
-    "video/webm": ".webm",
-    "video/x-matroska": ".mkv",
-    "video/x-m4v": ".m4v",
-    "audio/mpeg": ".mp3",
-    "audio/wav": ".wav",
-    "audio/mp4": ".m4a",
-    "audio/aac": ".aac",
-    "audio/flac": ".flac",
-    "audio/ogg": ".ogg",
-  };
-  function studioMediaExportTempRoot(): string {
-    return path.join(app.getPath("temp"), "ai-drama-canvas-export");
+  /**
+   * 画布原生拖出会写入 App 私有临时目录，但不修改工程/CAS。
+   * renderer 只能拿到绑定 sender 的短期一次性 token，永远拿不到临时绝对路径。
+   */
+  const nativeMediaDragResources = requireStudioNativeMediaDragResources();
+
+  function samePreparedDragIdentity(
+    entry: PreparedNativeMediaDrag,
+    metadata: BigIntStats,
+  ): boolean {
+    return metadata.isFile()
+      && !metadata.isSymbolicLink()
+      && metadata.dev === entry.identity.dev
+      && metadata.ino === entry.identity.ino
+      && metadata.size === entry.identity.size
+      && metadata.mtimeNs === entry.identity.mtimeNs
+      && metadata.ctimeNs === entry.identity.ctimeNs;
   }
-  function sanitizeExportBasename(value: string | undefined, fallback: string): string {
-    const raw = (value ?? "").trim() || fallback;
-    return raw
-      .replace(/\.[^.]+$/u, "")
-      .replace(/[^\w\u4e00-\u9fff._-]+/gu, "_")
-      .replace(/_+/gu, "_")
-      .replace(/^_|_$/gu, "")
-      .slice(0, 80) || fallback;
+
+  async function nativeDragIcon(
+    exportPath: string,
+    kind: "image" | "video" | "audio",
+  ): Promise<NativeImage> {
+    if (kind === "image") {
+      const image = nativeImage.createFromPath(exportPath);
+      if (!image.isEmpty()) return image.resize({ width: 64, height: 64 });
+    }
+    const fileIcon = await app.getFileIcon(exportPath, { size: "normal" });
+    if (!fileIcon.isEmpty()) return fileIcon;
+    if (process.platform === "darwin") {
+      const systemIcon = nativeImage.createFromNamedImage("NSImageNameMultipleDocuments");
+      if (!systemIcon.isEmpty()) return systemIcon;
+    }
+    throw new Error("系统无法建立拖拽图标。");
   }
+
   ipcMain.handle(
     "canvas:prepare-studio-media-export",
-    async (_event, projectRoot: string, mediaSha256: string, suggestedName?: string) => {
+    async (event, projectRoot: string, mediaSha256: string, suggestedName?: string) => {
       await requireManagedStudioProject(projectRoot);
-      if (typeof mediaSha256 !== "string" || !/^[a-f0-9]{64}$/i.test(mediaSha256.trim())) {
-        throw new Error("mediaSha256 无效");
-      }
-      const media = await getStudioMedia(projectRoot, mediaSha256.trim().toLowerCase());
-      if (!media) throw new Error("媒体不存在。");
-      if (media.kind !== "image" && media.kind !== "video") {
-        throw new Error("仅支持拖出图片或视频。");
-      }
-      const objectMeta = await lstat(media.objectPath).catch(() => null);
-      if (!objectMeta || objectMeta.isSymbolicLink() || !objectMeta.isFile()) {
-        throw new Error("媒体文件不可读。");
-      }
-      const fromBasename = path.extname(media.sourceBasename || "");
-      const ext =
-        MEDIA_MIME_EXTENSION[media.mimeType]
-        || (fromBasename && fromBasename.length <= 8 ? fromBasename.toLowerCase() : "")
-        || (media.kind === "video" ? ".mp4" : ".png");
-      const base = sanitizeExportBasename(suggestedName ?? media.sourceBasename, media.sha256.slice(0, 12));
-      const exportDir = studioMediaExportTempRoot();
-      await mkdir(exportDir, { recursive: true });
-      const fileName = `${base}${ext.startsWith(".") ? ext : `.${ext}`}`;
-      const exportPath = path.join(exportDir, fileName);
-      await copyFile(media.objectPath, exportPath);
+      const managed = await nativeMediaDragResources.prepare(async () => {
+        const prepared = await prepareStudioNativeMediaDragCopy({
+          projectRoot,
+          mediaSha256,
+          exportRoot: nativeMediaDragResources.exportRoot,
+          suggestedName,
+        });
+        try {
+          const metadata = lstatSync(prepared.exportPath, { bigint: true });
+          if (!metadata.isFile() || metadata.isSymbolicLink()) {
+            throw new Error("拖出复制体不可读。");
+          }
+          const icon = await nativeDragIcon(prepared.exportPath, prepared.kind);
+          return {
+            token: randomUUID(),
+            webContentsId: event.sender.id,
+            projectRoot: path.resolve(projectRoot),
+            mediaSha256: prepared.sha256,
+            exportPath: prepared.exportPath,
+            temporaryDirectory: prepared.temporaryDirectory,
+            fileName: prepared.fileName,
+            kind: prepared.kind,
+            mimeType: prepared.mimeType,
+            sizeBytes: prepared.sizeBytes,
+            identity: {
+              dev: metadata.dev,
+              ino: metadata.ino,
+              size: metadata.size,
+              mtimeNs: metadata.mtimeNs,
+              ctimeNs: metadata.ctimeNs,
+            },
+            icon,
+          };
+        } catch (error) {
+          await rm(prepared.temporaryDirectory, { recursive: true, force: true }).catch(() => undefined);
+          throw error;
+        }
+      });
       return {
-        exportPath,
-        fileName,
-        kind: media.kind,
-        mimeType: media.mimeType,
-        sha256: media.sha256,
-        sizeBytes: media.sizeBytes,
+        token: managed.entry.token,
+        fileName: managed.entry.fileName,
+        kind: managed.entry.kind,
+        mimeType: managed.entry.mimeType,
+        sha256: managed.entry.mediaSha256,
+        sizeBytes: managed.entry.sizeBytes,
+        expiresAt: new Date(managed.expiresAt).toISOString(),
       };
     },
   );
-  /** 原生文件拖出：必须在 dragstart 同链路上同步调用 webContents.startDrag。 */
-  ipcMain.on("canvas:start-native-file-drag", (event, exportPath: string) => {
-    if (typeof exportPath !== "string" || !exportPath.trim() || !path.isAbsolute(exportPath)) return;
-    const resolved = path.resolve(exportPath);
-    const exportRoot = path.resolve(studioMediaExportTempRoot());
-    if (resolved !== exportRoot && !resolved.startsWith(`${exportRoot}${path.sep}`)) return;
-    let icon = nativeImage.createEmpty();
-    try {
-      const image = nativeImage.createFromPath(resolved);
-      if (!image.isEmpty()) icon = image.resize({ width: 64, height: 64 });
-    } catch {
-      /* 视频等无法解码为图标时用空图标 */
+
+  /** 原生文件拖出：dragstart 同链路同步消费一次性 token；任何路径输入都无效。 */
+  ipcMain.on("canvas:start-native-file-drag", (event, token: string) => {
+    if (typeof token !== "string" || !/^[a-f0-9-]{36}$/iu.test(token)) return;
+    const claimed = nativeMediaDragResources.takePrepared(token);
+    if (!claimed) return;
+    const prepared = claimed.entry;
+    if (prepared.webContentsId !== event.sender.id) {
+      void nativeMediaDragResources.discard(prepared);
+      return;
     }
     try {
-      event.sender.startDrag({ file: resolved, icon });
+      const metadata = lstatSync(prepared.exportPath, { bigint: true });
+      if (!samePreparedDragIdentity(prepared, metadata)) {
+        void nativeMediaDragResources.discard(prepared);
+        return;
+      }
+      nativeMediaDragResources.beginOsHandoff(prepared);
+      event.sender.startDrag({ file: prepared.exportPath, icon: prepared.icon });
+      nativeMediaDragResources.finishOsHandoff(prepared);
     } catch {
-      /* 手势已结束或系统拒绝时静默 */
+      void nativeMediaDragResources.discard(prepared);
     }
   });
   ipcMain.handle("canvas:get-managed-project-operation-state", () => managedProjectOperationState);
@@ -3029,6 +3148,7 @@ if (!app.requestSingleInstanceLock()) {
 
   app.whenReady().then(async () => {
   await startSourceRuntimeGateWatchers();
+  await initializeStudioNativeMediaDragResources();
   protocol.handle("aicanvas-studio", async (request) => {
     try {
       const url = new URL(request.url);
@@ -3135,7 +3255,11 @@ app.on("window-all-closed", () => {
 });
 
 app.on("before-quit", (event) => {
-  if (!quitSessionCleanupStarted && (activeEditorSessions.size > 0 || activeScanPromises.size > 0)) {
+  const nativeMediaDragCleanupNeeded = studioNativeMediaDragResources?.needsExitCleanup() ?? false;
+  if (!quitSessionCleanupStarted
+    && (activeEditorSessions.size > 0
+      || activeScanPromises.size > 0
+      || nativeMediaDragCleanupNeeded)) {
     event.preventDefault();
     quitSessionCleanupStarted = true;
     if (watcherTimer) clearTimeout(watcherTimer);
@@ -3148,6 +3272,7 @@ app.on("before-quit", (event) => {
       semanticWatcher?.close(),
       generationLedgerWatcher?.close(),
       closeSourceRuntimeGateWatchers(),
+      studioNativeMediaDragResources?.cleanupForExit(),
       ...scans,
     ]).finally(() => app.quit());
     return;
@@ -3160,4 +3285,5 @@ app.on("before-quit", (event) => {
   void semanticWatcher?.close();
   void generationLedgerWatcher?.close();
   void closeSourceRuntimeGateWatchers();
+  void studioNativeMediaDragResources?.cleanupForExit();
 });

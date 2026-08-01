@@ -10,6 +10,7 @@ const auditedExceptions = new Map<string, string>([
   ["scripts/build-icon.mjs::iconset", "固定 build/icon.iconset 仅为仓库构建派生目录，由 build-icon 单一 owner 重建。"],
   ["scripts/lib/owned-fixture-root.ts::tombstone", "删除前已校验 marker/canonical/inode 并原子 rename 为本次 UUID tombstone。"],
   ["scripts/measure-p24-trace-scale.ts::fixture.root", "fixture 由 fresh mkdtemp parent 下的 createStudioP7Fixture 创建。"],
+  ["scripts/ui-native-media-drag-smoke.ts::directory", "目录来自隔离 App 私有 exportRoot 的前后差集，已严格复验 drag 目录与唯一普通文件；应用退出清理后仅作兜底回收。"],
 ]);
 
 function targetHasFreshMkdtempBinding(source: string, target: string): boolean {

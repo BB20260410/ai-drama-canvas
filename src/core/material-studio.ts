@@ -288,6 +288,42 @@ export interface ImportStudioMediaInput {
   expectedSha256?: string;
 }
 
+export interface StudioGlobalResourceReuseProvenance {
+  id: string;
+  sourceProjectId: string;
+  sourceProjectName: string;
+  sourceManifestFingerprint: string;
+  sourceMediaSha256: string;
+  targetMediaSha256: string;
+  mediaKind: StudioMediaKind;
+  sourceMediaSizeBytes: number;
+  sourceMimeType: string;
+  sourceBasename: string;
+  commandRequestHash: string;
+  importedAt: string;
+}
+
+export interface ImportStudioGlobalResourceMediaInput {
+  sourceObjectPath: string;
+  kind: StudioMediaKind;
+  mimeType: string;
+  sourceBasename: string;
+  expectedSha256: string;
+  expectedSizeBytes: number;
+  provenance: {
+    sourceProjectId: string;
+    sourceProjectName: string;
+    sourceManifestFingerprint: string;
+    commandRequestHash: string;
+  };
+}
+
+export interface ImportStudioGlobalResourceMediaResult {
+  media: StudioMediaMetadata;
+  provenance: StudioGlobalResourceReuseProvenance;
+  disposition: "imported" | "already-present";
+}
+
 export interface StudioMediaListQuery {
   search?: string;
   kind?: StudioMediaKind;
@@ -485,6 +521,21 @@ interface MediaImportRow {
   source_basename: string;
   source_size_bytes: number;
   expected_sha256: string | null;
+  imported_at: string;
+}
+
+interface GlobalResourceReuseProvenanceRow {
+  id: string;
+  source_project_id: string;
+  source_project_name: string;
+  source_manifest_fingerprint: string;
+  source_media_sha256: string;
+  target_media_sha256: string;
+  media_kind: StudioMediaKind;
+  source_media_size_bytes: number;
+  source_mime_type: string;
+  source_basename: string;
+  command_request_hash: string;
   imported_at: string;
 }
 
@@ -1185,6 +1236,160 @@ function ensureStudioIdentityIndexV1(db: DatabaseSync): void {
   }
 }
 
+function globalResourceReuseSchemaReady(db: DatabaseSync): boolean {
+  const marker = db.prepare("SELECT value FROM studio_meta WHERE key = 'global_resource_reuse_schema'")
+    .get() as { value?: string } | undefined;
+  if (marker?.value !== "1") return false;
+  const rows = db.prepare(`
+    SELECT type, name
+    FROM sqlite_master
+    WHERE (type = 'table' AND name = 'studio_global_resource_reuse_provenance')
+       OR (type = 'trigger' AND name IN (
+         'studio_global_resource_reuse_provenance_no_update',
+         'studio_global_resource_reuse_provenance_no_delete'
+       ))
+  `).all() as Array<{ type: string; name: string }>;
+  return rows.length === 3;
+}
+
+function ensureGlobalResourceReuseSchemaV1(db: DatabaseSync): void {
+  const stored = db.prepare("SELECT value FROM studio_meta WHERE key = 'global_resource_reuse_schema'")
+    .get() as { value?: string } | undefined;
+  if (stored?.value !== undefined && stored.value !== "1") {
+    throw new Error(`不支持的总资源复用来源 schema：${stored.value}。`);
+  }
+  if (globalResourceReuseSchemaReady(db)) return;
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS studio_global_resource_reuse_provenance (
+        id TEXT PRIMARY KEY,
+        source_project_id TEXT NOT NULL CHECK(length(source_project_id) > 0),
+        source_project_name TEXT NOT NULL CHECK(length(source_project_name) > 0),
+        source_manifest_fingerprint TEXT NOT NULL CHECK(length(source_manifest_fingerprint) = 64),
+        source_media_sha256 TEXT NOT NULL CHECK(length(source_media_sha256) = 64),
+        target_media_sha256 TEXT NOT NULL CHECK(length(target_media_sha256) = 64),
+        media_kind TEXT NOT NULL CHECK(media_kind IN ('audio', 'video')),
+        source_media_size_bytes INTEGER NOT NULL CHECK(source_media_size_bytes > 0),
+        source_mime_type TEXT NOT NULL CHECK(length(source_mime_type) > 0),
+        source_basename TEXT NOT NULL CHECK(length(source_basename) > 0),
+        command_request_hash TEXT NOT NULL CHECK(length(command_request_hash) = 64),
+        imported_at TEXT NOT NULL,
+        UNIQUE(
+          source_project_id,
+          source_manifest_fingerprint,
+          source_media_sha256,
+          target_media_sha256,
+          media_kind
+        ),
+        FOREIGN KEY(target_media_sha256) REFERENCES studio_media(sha256) ON DELETE RESTRICT
+      ) STRICT;
+
+      CREATE TRIGGER IF NOT EXISTS studio_global_resource_reuse_provenance_no_update
+      BEFORE UPDATE ON studio_global_resource_reuse_provenance
+      BEGIN
+        SELECT RAISE(ABORT, 'studio_global_resource_reuse_provenance is append-only');
+      END;
+
+      CREATE TRIGGER IF NOT EXISTS studio_global_resource_reuse_provenance_no_delete
+      BEFORE DELETE ON studio_global_resource_reuse_provenance
+      BEGIN
+        SELECT RAISE(ABORT, 'studio_global_resource_reuse_provenance is append-only');
+      END;
+
+      INSERT OR IGNORE INTO studio_meta(key, value)
+      VALUES('global_resource_reuse_schema', '1');
+    `);
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    throw error;
+  }
+  if (!globalResourceReuseSchemaReady(db)) {
+    throw new Error("总资源复用来源 schema 未完整建立。");
+  }
+}
+
+function globalImageResourceReuseSchemaReady(db: DatabaseSync): boolean {
+  const marker = db.prepare(
+    "SELECT value FROM studio_meta WHERE key = 'global_image_resource_reuse_schema'",
+  ).get() as { value?: string } | undefined;
+  if (marker?.value !== "1") return false;
+  const rows = db.prepare(`
+    SELECT type, name
+    FROM sqlite_master
+    WHERE (type = 'table' AND name = 'studio_global_image_resource_reuse_provenance')
+       OR (type = 'trigger' AND name IN (
+         'studio_global_image_resource_reuse_provenance_no_update',
+         'studio_global_image_resource_reuse_provenance_no_delete'
+       ))
+  `).all() as Array<{ type: string; name: string }>;
+  return rows.length === 3;
+}
+
+/**
+ * 图片复用使用独立的增量 schema，避免重建已经落盘且仅允许 audio/video 的
+ * v1 provenance 表。表只在目标工程首次实际调用图片资源时建立。
+ */
+function ensureGlobalImageResourceReuseSchemaV1(db: DatabaseSync): void {
+  const stored = db.prepare(
+    "SELECT value FROM studio_meta WHERE key = 'global_image_resource_reuse_schema'",
+  ).get() as { value?: string } | undefined;
+  if (stored?.value !== undefined && stored.value !== "1") {
+    throw new Error(`不支持的总图片资源复用来源 schema：${stored.value}。`);
+  }
+  if (globalImageResourceReuseSchemaReady(db)) return;
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS studio_global_image_resource_reuse_provenance (
+        id TEXT PRIMARY KEY,
+        source_project_id TEXT NOT NULL CHECK(length(source_project_id) > 0),
+        source_project_name TEXT NOT NULL CHECK(length(source_project_name) > 0),
+        source_manifest_fingerprint TEXT NOT NULL CHECK(length(source_manifest_fingerprint) = 64),
+        source_media_sha256 TEXT NOT NULL CHECK(length(source_media_sha256) = 64),
+        target_media_sha256 TEXT NOT NULL CHECK(length(target_media_sha256) = 64),
+        media_kind TEXT NOT NULL CHECK(media_kind = 'image'),
+        source_media_size_bytes INTEGER NOT NULL CHECK(source_media_size_bytes > 0),
+        source_mime_type TEXT NOT NULL CHECK(length(source_mime_type) > 0),
+        source_basename TEXT NOT NULL CHECK(length(source_basename) > 0),
+        command_request_hash TEXT NOT NULL CHECK(length(command_request_hash) = 64),
+        imported_at TEXT NOT NULL,
+        UNIQUE(
+          source_project_id,
+          source_manifest_fingerprint,
+          source_media_sha256,
+          target_media_sha256,
+          media_kind
+        ),
+        FOREIGN KEY(target_media_sha256) REFERENCES studio_media(sha256) ON DELETE RESTRICT
+      ) STRICT;
+
+      CREATE TRIGGER IF NOT EXISTS studio_global_image_resource_reuse_provenance_no_update
+      BEFORE UPDATE ON studio_global_image_resource_reuse_provenance
+      BEGIN
+        SELECT RAISE(ABORT, 'studio_global_image_resource_reuse_provenance is append-only');
+      END;
+
+      CREATE TRIGGER IF NOT EXISTS studio_global_image_resource_reuse_provenance_no_delete
+      BEFORE DELETE ON studio_global_image_resource_reuse_provenance
+      BEGIN
+        SELECT RAISE(ABORT, 'studio_global_image_resource_reuse_provenance is append-only');
+      END;
+
+      INSERT OR IGNORE INTO studio_meta(key, value)
+      VALUES('global_image_resource_reuse_schema', '1');
+    `);
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    throw error;
+  }
+  if (!globalImageResourceReuseSchemaReady(db)) {
+    throw new Error("总图片资源复用来源 schema 未完整建立。");
+  }
+}
+
 function openDatabase(databasePath: string): DatabaseSync {
   // P28：未来 schema 必须在任何写式 PRAGMA/DDL 前只读拒绝；旧程序不得先改库再报不支持。
   if (existsSync(databasePath)) {
@@ -1202,6 +1407,17 @@ function openDatabase(databasePath: string): DatabaseSync {
           .get() as { value?: string } | undefined;
         if (categoryVersion?.value !== undefined && categoryVersion.value !== "1" && categoryVersion.value !== "2") {
           throw new Error(`不支持的素材类别 schema：${categoryVersion.value}。`);
+        }
+        const globalReuseVersion = probe.prepare("SELECT value FROM studio_meta WHERE key = 'global_resource_reuse_schema'")
+          .get() as { value?: string } | undefined;
+        if (globalReuseVersion?.value !== undefined && globalReuseVersion.value !== "1") {
+          throw new Error(`不支持的总资源复用来源 schema：${globalReuseVersion.value}。`);
+        }
+        const globalImageReuseVersion = probe.prepare(
+          "SELECT value FROM studio_meta WHERE key = 'global_image_resource_reuse_schema'",
+        ).get() as { value?: string } | undefined;
+        if (globalImageReuseVersion?.value !== undefined && globalImageReuseVersion.value !== "1") {
+          throw new Error(`不支持的总图片资源复用来源 schema：${globalImageReuseVersion.value}。`);
         }
       }
     } finally {
@@ -1531,6 +1747,7 @@ function openDatabase(databasePath: string): DatabaseSync {
     BEGIN
       SELECT RAISE(ABORT, 'studio_media_imports is append-only');
     END;
+
   `);
   } catch (error) {
     db.close();
@@ -1965,6 +2182,313 @@ export async function importStudioMedia(projectRoot: string, input: ImportStudio
     });
     const row = db.prepare("SELECT * FROM studio_media WHERE sha256 = ?").get(copied.sha256) as unknown as MediaRow;
     return mediaFromRow(paths.root, row);
+  } finally {
+    db.close();
+  }
+}
+
+function globalResourceReuseProvenanceFromRow(
+  row: GlobalResourceReuseProvenanceRow,
+): StudioGlobalResourceReuseProvenance {
+  return {
+    id: row.id,
+    sourceProjectId: row.source_project_id,
+    sourceProjectName: row.source_project_name,
+    sourceManifestFingerprint: normalizeSha256(
+      row.source_manifest_fingerprint,
+      "sourceManifestFingerprint",
+    ),
+    sourceMediaSha256: normalizeSha256(row.source_media_sha256, "sourceMediaSha256"),
+    targetMediaSha256: normalizeSha256(row.target_media_sha256, "targetMediaSha256"),
+    mediaKind: row.media_kind,
+    sourceMediaSizeBytes: Number(row.source_media_size_bytes),
+    sourceMimeType: row.source_mime_type,
+    sourceBasename: row.source_basename,
+    commandRequestHash: normalizeSha256(row.command_request_hash, "commandRequestHash"),
+    importedAt: row.imported_at,
+  };
+}
+
+function normalizeGlobalResourceReuseText(
+  value: string,
+  field: string,
+  maximumLength: number,
+): string {
+  const normalized = value.normalize("NFKC").trim();
+  if (!normalized || normalized.length > maximumLength) {
+    throw new Error(`${field} 必须是 1-${maximumLength} 个字符。`);
+  }
+  return normalized;
+}
+
+/**
+ * 总资源图片、音频、视频进入目标工程的唯一低层 owner。
+ *
+ * `sourceObjectPath` 只允许由上层 registry + 只读来源库现场解析后传入本函数；
+ * 它不会进入 studio_media_imports，也不会作为可复用来源持久化。媒体行与结构化
+ * provenance 在同一个目标 SQLite 事务中提交，CAS 对象仍保持内容寻址幂等。
+ * 图片在提交媒体行前生成确定性 ready WebP 缩略图；不会创建规范资产、Review
+ * 或 Primary。
+ */
+export async function importStudioGlobalResourceMedia(
+  projectRoot: string,
+  input: ImportStudioGlobalResourceMediaInput,
+): Promise<ImportStudioGlobalResourceMediaResult> {
+  if (input.kind !== "image" && input.kind !== "audio" && input.kind !== "video") {
+    throw new Error("总资源跨项目媒体只接受 image、audio 或 video。");
+  }
+  if (!Number.isSafeInteger(input.expectedSizeBytes) || input.expectedSizeBytes < 1) {
+    throw new Error("expectedSizeBytes 必须是正安全整数。");
+  }
+  const expectedSha256 = normalizeSha256(input.expectedSha256, "expectedSha256");
+  const sourceManifestFingerprint = normalizeSha256(
+    input.provenance.sourceManifestFingerprint,
+    "sourceManifestFingerprint",
+  );
+  const commandRequestHash = normalizeSha256(
+    input.provenance.commandRequestHash,
+    "commandRequestHash",
+  );
+  const sourceProjectId = normalizeGlobalResourceReuseText(
+    input.provenance.sourceProjectId,
+    "sourceProjectId",
+    256,
+  );
+  const sourceProjectName = normalizeGlobalResourceReuseText(
+    input.provenance.sourceProjectName,
+    "sourceProjectName",
+    512,
+  );
+  const sourceBasename = normalizeGlobalResourceReuseText(
+    input.sourceBasename,
+    "sourceBasename",
+    1_024,
+  );
+  if (path.basename(sourceBasename) !== sourceBasename) {
+    throw new Error("sourceBasename 必须是文件名，不能包含路径。");
+  }
+  const mimeType = normalizeGlobalResourceReuseText(input.mimeType, "mimeType", 256);
+  if (!mimeType.toLocaleLowerCase("en-US").startsWith(`${input.kind}/`)) {
+    throw new Error(`mimeType 与 ${input.kind} 不一致。`);
+  }
+  if (!path.isAbsolute(input.sourceObjectPath)) {
+    throw new Error("sourceObjectPath 必须是绝对路径。");
+  }
+  const requestedSourcePath = path.resolve(input.sourceObjectPath);
+  const sourceMetadata = await lstat(requestedSourcePath, { bigint: true });
+  const sourceObjectPath = path.normalize(await realpath(requestedSourcePath));
+  if (!sourceMetadata.isFile()
+    || sourceMetadata.isSymbolicLink()
+    || sourceMetadata.nlink !== 1n
+    || sourceMetadata.size !== BigInt(input.expectedSizeBytes)
+    || sourceObjectPath !== requestedSourcePath) {
+    throw new Error("总资源来源 CAS 必须是身份稳定的单链接普通文件。");
+  }
+  const verifiedSource = await sha256File(sourceObjectPath);
+  if (verifiedSource.sha256 !== expectedSha256
+    || verifiedSource.sizeBytes !== input.expectedSizeBytes) {
+    throw new Error("总资源来源 CAS 的 SHA/size 与调用预期不一致。");
+  }
+
+  const paths = await ensureStudioDirectories(projectRoot);
+  const provenanceSemantic = {
+    sourceProjectId,
+    sourceManifestFingerprint,
+    sourceMediaSha256: expectedSha256,
+    targetMediaSha256: expectedSha256,
+    mediaKind: input.kind,
+  };
+  const provenanceId = `${input.kind === "image"
+    ? "global-image-resource-reuse"
+    : "global-resource-reuse"}-${createHash("sha256")
+    .update(stableJson(provenanceSemantic), "utf8")
+    .digest("hex")}`;
+  const provenanceTable = input.kind === "image"
+    ? "studio_global_image_resource_reuse_provenance"
+    : "studio_global_resource_reuse_provenance";
+
+  let existingMedia: MediaRow | undefined;
+  let existingProvenance: GlobalResourceReuseProvenanceRow | undefined;
+  let db = openDatabase(paths.database);
+  try {
+    if (input.kind === "image") ensureGlobalImageResourceReuseSchemaV1(db);
+    else ensureGlobalResourceReuseSchemaV1(db);
+    existingMedia = db.prepare("SELECT * FROM studio_media WHERE sha256 = ?")
+      .get(expectedSha256) as unknown as MediaRow | undefined;
+    existingProvenance = db.prepare(`
+      SELECT *
+      FROM ${provenanceTable}
+      WHERE id = ?
+    `).get(provenanceId) as unknown as GlobalResourceReuseProvenanceRow | undefined;
+  } finally {
+    db.close();
+  }
+
+  if (existingMedia) {
+    if (existingMedia.kind !== input.kind
+      || Number(existingMedia.size_bytes) !== input.expectedSizeBytes
+      || existingMedia.object_relpath !== relativeToProject(
+        paths.root,
+        path.join(paths.objectRoot, expectedSha256.slice(0, 2), expectedSha256),
+      )) {
+      throw new Error("目标工程同一 SHA 的媒体身份与总资源来源冲突。");
+    }
+    const verified = await sha256File(fromProjectRelative(paths.root, existingMedia.object_relpath));
+    if (verified.sha256 !== expectedSha256 || verified.sizeBytes !== input.expectedSizeBytes) {
+      throw new Error("目标工程既有媒体 CAS 已漂移，拒绝把它当作总资源复用结果。");
+    }
+  }
+
+  let importedObject: Awaited<ReturnType<typeof importConfinedFileToSha256Cas>> | undefined;
+  if (!existingMedia) {
+    const objectRoot = await ensureSharedConfinedDirectory(paths.root, paths.objectRoot);
+    importedObject = await importConfinedFileToSha256Cas(
+      objectRoot,
+      sourceObjectPath,
+      expectedSha256,
+    );
+    if (importedObject.size !== input.expectedSizeBytes) {
+      throw new Error("总资源来源 CAS 的 size 与调用预期不一致。");
+    }
+  }
+
+  const targetObjectPath = importedObject?.absolutePath
+    ?? fromProjectRelative(paths.root, existingMedia!.object_relpath);
+  const thumbnail = input.kind === "image"
+    ? await materializeThumbnail(paths.root, targetObjectPath, expectedSha256)
+    : undefined;
+  if (existingMedia && input.kind === "image") {
+    if (existingMedia.derivative_status !== "ready"
+      || existingMedia.thumbnail_recipe_key !== thumbnail!.recipeKey
+      || existingMedia.thumbnail_relpath !== relativeToProject(paths.root, thumbnail!.path)
+      || Number(existingMedia.thumbnail_width) !== thumbnail!.width
+      || Number(existingMedia.thumbnail_height) !== thumbnail!.height) {
+      throw new Error("目标工程既有图片的 ready 缩略图身份与确定性配方不一致。");
+    }
+  }
+  if (existingMedia && existingProvenance) {
+    return {
+      media: mediaFromRow(paths.root, existingMedia),
+      provenance: globalResourceReuseProvenanceFromRow(existingProvenance),
+      disposition: "already-present",
+    };
+  }
+
+  db = openDatabase(paths.database);
+  try {
+    const importedAt = new Date().toISOString();
+    const outcome = runTransaction(db, () => {
+      db.prepare(`
+        INSERT OR IGNORE INTO studio_media(
+          sha256, kind, size_bytes, mime_type, source_basename, object_relpath,
+          derivative_status, thumbnail_recipe_key, thumbnail_relpath,
+          thumbnail_width, thumbnail_height, created_at
+        ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        expectedSha256,
+        input.kind,
+        input.expectedSizeBytes,
+        mimeType,
+        sourceBasename,
+        relativeToProject(paths.root, targetObjectPath),
+        input.kind === "image" ? "ready" : "pending",
+        thumbnail?.recipeKey ?? null,
+        thumbnail ? relativeToProject(paths.root, thumbnail.path) : null,
+        thumbnail?.width ?? null,
+        thumbnail?.height ?? null,
+        importedAt,
+      );
+      const media = db.prepare("SELECT * FROM studio_media WHERE sha256 = ?")
+        .get(expectedSha256) as unknown as MediaRow | undefined;
+      if (!media
+        || media.kind !== input.kind
+        || Number(media.size_bytes) !== input.expectedSizeBytes
+        || media.object_relpath !== relativeToProject(paths.root, targetObjectPath)
+        || (input.kind === "image" && (
+          media.derivative_status !== "ready"
+          || media.thumbnail_recipe_key !== thumbnail!.recipeKey
+          || media.thumbnail_relpath !== relativeToProject(paths.root, thumbnail!.path)
+          || Number(media.thumbnail_width) !== thumbnail!.width
+          || Number(media.thumbnail_height) !== thumbnail!.height
+        ))) {
+        throw new Error("目标工程同一 SHA 的媒体元数据与总资源来源冲突。");
+      }
+      db.prepare(`
+        INSERT OR IGNORE INTO ${provenanceTable}(
+          id,
+          source_project_id,
+          source_project_name,
+          source_manifest_fingerprint,
+          source_media_sha256,
+          target_media_sha256,
+          media_kind,
+          source_media_size_bytes,
+          source_mime_type,
+          source_basename,
+          command_request_hash,
+          imported_at
+        ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        provenanceId,
+        sourceProjectId,
+        sourceProjectName,
+        sourceManifestFingerprint,
+        expectedSha256,
+        media.sha256,
+        input.kind,
+        input.expectedSizeBytes,
+        mimeType,
+        sourceBasename,
+        commandRequestHash,
+        importedAt,
+      );
+      const provenance = db.prepare(`
+        SELECT *
+        FROM ${provenanceTable}
+        WHERE id = ?
+      `).get(provenanceId) as unknown as GlobalResourceReuseProvenanceRow | undefined;
+      if (!provenance) throw new Error("总资源复用来源记录未能原子落盘。");
+      return { media, provenance };
+    });
+    return {
+      media: mediaFromRow(paths.root, outcome.media),
+      provenance: globalResourceReuseProvenanceFromRow(outcome.provenance),
+      disposition: existingMedia ? "already-present" : "imported",
+    };
+  } finally {
+    db.close();
+  }
+}
+
+export async function listStudioGlobalResourceReuseProvenance(
+  projectRoot: string,
+  mediaSha256: string,
+): Promise<StudioGlobalResourceReuseProvenance[]> {
+  const paths = await ensureStudioDirectories(projectRoot);
+  const normalizedSha256 = normalizeSha256(mediaSha256, "mediaSha256");
+  const db = openDatabase(paths.database);
+  try {
+    const rows: GlobalResourceReuseProvenanceRow[] = [];
+    if (globalResourceReuseSchemaReady(db)) {
+      rows.push(...db.prepare(`
+        SELECT *
+        FROM studio_global_resource_reuse_provenance
+        WHERE target_media_sha256 = ?
+      `).all(normalizedSha256) as unknown as GlobalResourceReuseProvenanceRow[]);
+    }
+    if (globalImageResourceReuseSchemaReady(db)) {
+      rows.push(...db.prepare(`
+        SELECT *
+        FROM studio_global_image_resource_reuse_provenance
+        WHERE target_media_sha256 = ?
+      `).all(normalizedSha256) as unknown as GlobalResourceReuseProvenanceRow[]);
+    }
+    return rows
+      .sort((left, right) =>
+        left.imported_at.localeCompare(right.imported_at) || left.id.localeCompare(right.id)
+      )
+      .slice(0, 100)
+      .map(globalResourceReuseProvenanceFromRow);
   } finally {
     db.close();
   }

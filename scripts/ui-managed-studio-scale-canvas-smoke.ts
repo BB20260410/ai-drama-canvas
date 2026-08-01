@@ -57,6 +57,7 @@ const CANVAS_PANEL_LIMIT = 6;
 const CANVAS_PIPELINE_LIMIT = 18;
 const CANVAS_TEXT_LIMIT = 12;
 const CANVAS_MAX_DOM = CANVAS_ASSET_LIMIT + CANVAS_UNIT_LIMIT + CANVAS_PANEL_LIMIT + CANVAS_PIPELINE_LIMIT + CANVAS_TEXT_LIMIT;
+const ASSET_LIBRARY_ROW_HEIGHT = 56;
 const installedExecutable = process.env.AI_CANVAS_INSTALLED_APP_EXECUTABLE?.trim()
   ? path.resolve(process.env.AI_CANVAS_INSTALLED_APP_EXECUTABLE.trim())
   : undefined;
@@ -223,6 +224,23 @@ async function waitCanvasReady(page: Page, projectName: string): Promise<void> {
   }, projectName, { timeout: 120_000 });
 }
 
+async function waitVirtualizedAssetLibrary(page: Page, logicalCount: number): Promise<number> {
+  await page.waitForFunction(({ count, rowHeight }) => {
+    const spacer = document.querySelector<HTMLElement>(
+      '[data-testid="managed-canvas-assets-virtual-viewport"] .library-list-spacer',
+    );
+    const mounted = document.querySelectorAll(
+      '[data-testid="managed-canvas-assets-virtual-viewport"] .library-list li',
+    ).length;
+    return spacer?.style.height === `${count * rowHeight}px`
+      && mounted > 0
+      && mounted < count;
+  }, { count: logicalCount, rowHeight: ASSET_LIBRARY_ROW_HEIGHT }, { timeout: 120_000 });
+  return page.locator(
+    '[data-testid="managed-canvas-assets-virtual-viewport"] .library-list li',
+  ).count();
+}
+
 function firstText(values: string[]): string {
   return values.map((value) => value.trim()).find(Boolean) ?? "";
 }
@@ -371,16 +389,16 @@ try {
   ), initialUnitFirst);
 
   await page.locator(".library-tabs button").filter({ hasText: "角色" }).click();
-  await page.waitForFunction(() => document.querySelectorAll(".canvas-library .library-list li").length === 24);
+  const characterLibraryDom = await waitVirtualizedAssetLibrary(page, 24);
   const characterFirst = firstText(await assetNodes.allTextContents());
   if (!await page.locator('[data-testid="managed-canvas-assets-next"]').isDisabled()) {
     throw new Error("24 个角色不应伪造第二页。");
   }
   await page.locator(".library-tabs button").filter({ hasText: "场景" }).click();
-  await page.waitForFunction(() => document.querySelectorAll(".canvas-library .library-list li").length === 20);
+  const sceneLibraryDom = await waitVirtualizedAssetLibrary(page, 20);
   const sceneFirst = firstText(await assetNodes.allTextContents());
   await page.locator(".library-tabs button").filter({ hasText: "道具" }).click();
-  await page.waitForFunction(() => document.querySelectorAll(".canvas-library .library-list li").length === 33);
+  const propLibraryDom = await waitVirtualizedAssetLibrary(page, 33);
   const propFirst = firstText(await assetNodes.allTextContents());
   if (new Set([characterFirst, sceneFirst, propFirst]).size !== 3 || await assetNodes.count() > CANVAS_ASSET_LIMIT) {
     throw new Error(`资产分类投影没有按 24/20/33 替换且保持 6 节点上限：${JSON.stringify({ initialAssetFirst, characterFirst, sceneFirst, propFirst, dom: await assetNodes.count() })}`);
@@ -421,8 +439,11 @@ try {
   const mediaRestored = await mediaEntries.allTextContents();
   if (JSON.stringify(mediaRestored) !== JSON.stringify(mediaPageOne)) throw new Error("媒体上一页未稳定恢复。");
 
-  // 首次打开素材库与缩略图会建立正常缓存；资源稳定性只比较十次切工程自身，
-  // 不把前面功能遍历产生的必要缓存误报成项目切换泄漏。
+  // 切工程会按产品合同回到无限画布；采样前也必须回到同一视图，不能把素材中心
+  // →画布的一次性 Chromium/V8/GPU 挂载成本误报成十次切工程泄漏。
+  await page.locator('[data-testid="studio-mode-canvas"]').click();
+  await waitCanvasReady(page, large.shell.project.name);
+  await page.waitForTimeout(500);
   runtimeSamples.push(await processMetrics(application.process().pid!, mediaRequestCount, "before-switches"));
   let switchCount = 0;
   const switchProject = async (name: string): Promise<string> => {
@@ -447,11 +468,13 @@ try {
   }
   const firstRuntime = runtimeSamples[0]!;
   const finalRuntime = runtimeSamples.at(-1)!;
-  if (finalRuntime.rssKiB - firstRuntime.rssKiB > 128 * 1024) {
-    throw new Error("十次切工程后 RSS 增长超过 128 MiB。");
+  const rssDeltaKiB = finalRuntime.rssKiB - firstRuntime.rssKiB;
+  const fileDescriptorDelta = finalRuntime.fileDescriptors - firstRuntime.fileDescriptors;
+  if (rssDeltaKiB > 128 * 1024) {
+    throw new Error(`十次切工程后 RSS 增长超过 128 MiB：${rssDeltaKiB} KiB；样本=${JSON.stringify(runtimeSamples)}`);
   }
-  if (finalRuntime.fileDescriptors - firstRuntime.fileDescriptors > 64) {
-    throw new Error("十次切工程后文件描述符增长超过 64。");
+  if (fileDescriptorDelta > 64) {
+    throw new Error(`十次切工程后文件描述符增长超过 64：${fileDescriptorDelta}；样本=${JSON.stringify(runtimeSamples)}`);
   }
   const mediaRequestsBeforeIdle = mediaRequestCount;
   await page.waitForTimeout(1_000);
@@ -545,6 +568,12 @@ try {
       expandedLogicalCounts,
       unitPageReplaced: initialUnitFirst !== unitPageTwoFirst,
       assetCategoryCounts: { character: 24, scene: 20, prop: 33 },
+      assetLibraryMountedDom: {
+        character: characterLibraryDom,
+        scene: sceneLibraryDom,
+        prop: propLibraryDom,
+      },
+      assetLibraryVirtualized: true,
       assetCategoryProjectionReplaced: new Set([characterFirst, sceneFirst, propFirst]).size === 3,
       characterNextPageCorrectlyDisabled: true,
       viewportCullingEnabled: true,
@@ -568,8 +597,8 @@ try {
     },
     runtimeStability: {
       samples: runtimeSamples,
-      rssDeltaKiB: finalRuntime.rssKiB - firstRuntime.rssKiB,
-      fileDescriptorDelta: finalRuntime.fileDescriptors - firstRuntime.fileDescriptors,
+      rssDeltaKiB,
+      fileDescriptorDelta,
       idleMediaRequestsStable: true,
     },
     screenshot: {

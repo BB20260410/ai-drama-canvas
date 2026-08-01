@@ -9,7 +9,13 @@
       <div class="project-identity">
         <span class="product-mark">AI 漫剧画布</span>
         <h1>{{ overview?.projectName || projectName || "Codex AI 短剧素材中心" }}</h1>
-        <p>受管项目 · 仅访问当前工程 · 原媒体安全存放</p>
+        <p>{{
+          activeMode === "global-resources"
+            ? "全部受管项目总资源 · 调用目标为当前工程"
+            : isGlobalAssetScope
+              ? "全部剧本资产只读总览 · 原媒体安全存放"
+              : "受管项目 · 仅访问当前工程 · 原媒体安全存放"
+        }}</p>
         <nav class="studio-mode-switch production-steps" role="navigation" aria-label="AI 短剧生产流程" data-testid="studio-production-steps">
           <button id="studio-step-script" type="button" data-testid="studio-step-script" aria-controls="studio-library-pane" :class="{ active: activeMode === 'library' && (activeSection === 'script' || activeSection === 'prompt') }" :disabled="Boolean(pendingAction)" @click="selectProductionStep('script')">1 剧本</button>
           <button id="studio-step-assets" type="button" data-testid="studio-step-assets" aria-controls="studio-library-pane" :class="{ active: activeMode === 'library' && ['character','scene','prop','style','media'].includes(activeSection) }" :disabled="Boolean(pendingAction)" @click="selectProductionStep('assets')">2 资产</button>
@@ -18,6 +24,7 @@
           <button id="studio-step-review" type="button" data-testid="studio-step-review" aria-controls="studio-continuity-review-pane" :class="{ active: activeMode === 'continuity-review' }" :disabled="!continuityReviewApi || Boolean(pendingAction)" @click="selectProductionStep('review')">5 审片</button>
         </nav>
         <nav class="studio-utility-switch" aria-label="工程视图">
+          <button id="studio-mode-global-resources" type="button" data-testid="studio-mode-global-resources" aria-controls="studio-global-resources-pane" :class="{ active: activeMode === 'global-resources' }" :disabled="!globalResourceCenterAvailable || Boolean(pendingAction)" @click="selectStudioMode('global-resources')">总资源</button>
           <button id="studio-mode-canvas" type="button" data-testid="studio-mode-canvas" aria-controls="studio-canvas-pane" :class="{ active: activeMode === 'canvas' }" :disabled="!dashboardApi || Boolean(pendingAction)" @click="selectStudioMode('canvas')">无限画布</button>
           <button id="studio-mode-dashboard" type="button" data-testid="studio-mode-dashboard" aria-controls="studio-dashboard-pane" :class="{ active: activeMode === 'dashboard' }" :disabled="!dashboardApi || Boolean(pendingAction)" @click="selectStudioMode('dashboard')">驾驶舱</button>
           <button id="studio-mode-multimedia-timeline" type="button" data-testid="studio-mode-multimedia-timeline" aria-controls="studio-multimedia-timeline-pane" :class="{ active: activeMode === 'multimedia-timeline' }" :disabled="!multimediaTimelineApi || Boolean(pendingAction)" @click="selectStudioMode('multimedia-timeline')">媒体时间线</button>
@@ -28,10 +35,18 @@
       </div>
 
       <div v-if="activeMode === 'library'" class="project-counts" aria-label="素材统计">
-        <div><strong>{{ overview?.counts.total ?? 0 }}</strong><span>全部素材</span></div>
-        <div><strong>{{ overview?.counts.textDocuments ?? 0 }}</strong><span>剧本 / 提示词</span></div>
-        <div><strong>{{ overview?.counts.canonicalAssets ?? 0 }}</strong><span>规范资产</span></div>
-        <div><strong>{{ overview?.counts.media ?? 0 }}</strong><span>媒体</span></div>
+        <template v-if="isGlobalAssetScope">
+          <div><strong>{{ globalDisplayCounts?.total ?? 0 }}</strong><span>{{ assetRepresentation === "images" ? "全部版本图片" : "全部规范资产" }}</span></div>
+          <div><strong>{{ globalDisplayCounts?.character ?? 0 }}</strong><span>人物</span></div>
+          <div><strong>{{ globalDisplayCounts?.scene ?? 0 }}</strong><span>场景</span></div>
+          <div><strong>{{ globalDisplayCounts?.prop ?? 0 }}</strong><span>道具</span></div>
+        </template>
+        <template v-else>
+          <div><strong>{{ overview?.counts.total ?? 0 }}</strong><span>全部素材</span></div>
+          <div><strong>{{ overview?.counts.textDocuments ?? 0 }}</strong><span>剧本 / 提示词</span></div>
+          <div><strong>{{ overview?.counts.canonicalAssets ?? 0 }}</strong><span>规范资产</span></div>
+          <div><strong>{{ overview?.counts.media ?? 0 }}</strong><span>媒体</span></div>
+        </template>
       </div>
 
       <div class="next-action" aria-live="polite">
@@ -47,7 +62,7 @@
             <option value="grok">Grok</option>
           </select>
         </label>
-        <button type="button" class="primary-action continue-action" data-testid="studio-continue-action" :disabled="loading || Boolean(pendingAction) || !overview?.nextActionControl" @click="continueFromCore">
+        <button type="button" class="primary-action continue-action" data-testid="studio-continue-action" :disabled="loading || Boolean(pendingAction) || !overview?.nextActionControl || (isGlobalAssetScope && overview?.nextActionControl?.requiresWrite)" :title="isGlobalAssetScope && overview?.nextActionControl?.requiresWrite ? globalWriteBlockedText : undefined" @click="continueFromCore">
           <ChevronRight :size="16" aria-hidden="true" /><span>继续</span>
         </button>
         <button v-if="api.openProjectCenter" type="button" class="quiet-action" data-testid="studio-open-project-center" :disabled="Boolean(pendingAction)" @click="api.openProjectCenter()">
@@ -58,7 +73,7 @@
           <RefreshCw :size="15" :class="{ spinning: loading }" aria-hidden="true" />
           <span>刷新</span>
         </button>
-        <button v-if="activeMode === 'library'" type="button" class="primary-action" :disabled="Boolean(pendingAction)" @click="importMedia">
+        <button v-if="activeMode === 'library'" type="button" class="primary-action" :disabled="Boolean(pendingAction) || isGlobalAssetScope" :title="isGlobalAssetScope ? globalWriteBlockedText : undefined" @click="importMedia">
           <FileInput :size="16" aria-hidden="true" />
           <span>导入媒体</span>
         </button>
@@ -66,7 +81,31 @@
     </header>
 
     <div
-      v-if="activeMode === 'canvas'"
+      v-if="activeMode === 'global-resources'"
+      id="studio-global-resources-pane"
+      class="binding-mode"
+      role="tabpanel"
+      aria-labelledby="studio-mode-global-resources"
+      data-testid="studio-global-resources-pane">
+      <Suspense v-if="globalResourceCenterAvailable">
+        <AsyncGlobalResourceCenterView
+          :target-project-root="projectRoot"
+          :target-project-name="overview?.projectName || projectName"
+          :api="api"
+          @failed="onDashboardFailed"
+          @reused="onGlobalResourceReused" />
+        <template #fallback>
+          <div class="binding-loading" role="status">
+            <LoaderCircle :size="22" class="spinning" aria-hidden="true" />
+            <span>正在加载总资源中心…</span>
+          </div>
+        </template>
+      </Suspense>
+      <div v-else class="binding-loading" role="alert">当前桌面适配层未接入总资源目录与调用命令。</div>
+    </div>
+
+    <div
+      v-else-if="activeMode === 'canvas'"
       id="studio-canvas-pane"
       class="binding-mode"
       role="tabpanel"
@@ -76,12 +115,14 @@
           :project-root="projectRoot"
           :project-name="projectName"
           :api="dashboardApi"
+          :global-resource-api="api"
           :generation-provider="generationProvider"
           :focus="canvasFocus"
           @failed="onDashboardFailed"
           @open-dashboard="onCanvasOpenDashboard"
           @open-binding="onCanvasOpenBinding"
           @open-review="onCanvasOpenReview"
+          @open-resource-center="selectStudioMode('global-resources')"
           @request-generation="onCanvasRequestGeneration" />
         <template #fallback>
           <div class="binding-loading" role="status">
@@ -171,8 +212,8 @@
       aria-labelledby="studio-step-script">
       <nav class="section-rail" aria-label="素材分类">
         <div class="rail-heading">
-          <span>工程素材</span>
-          <small>本地受管</small>
+          <span>{{ isGlobalAssetScope ? "全部剧本资产" : "工程素材" }}</span>
+          <small>{{ isGlobalAssetScope ? "只读聚合" : "本地受管" }}</small>
         </div>
         <button
           v-for="section in sections"
@@ -190,15 +231,18 @@
 
         <div class="rail-create">
           <span>建立规范资产</span>
-          <button type="button" :disabled="Boolean(pendingAction)" @click="openCreateDialog('character')"><UserRound :size="14" aria-hidden="true" />角色</button>
-          <button type="button" :disabled="Boolean(pendingAction)" @click="openCreateDialog('scene')"><Mountain :size="14" aria-hidden="true" />场景</button>
-          <button type="button" :disabled="Boolean(pendingAction)" @click="openCreateDialog('prop')"><Package :size="14" aria-hidden="true" />道具</button>
-          <button type="button" :disabled="Boolean(pendingAction)" @click="openCreateDialog('style')"><Palette :size="14" aria-hidden="true" />风格</button>
+          <button type="button" :disabled="Boolean(pendingAction) || isGlobalAssetScope" :title="isGlobalAssetScope ? globalWriteBlockedText : undefined" @click="openCreateDialog('character')"><UserRound :size="14" aria-hidden="true" />角色</button>
+          <button type="button" :disabled="Boolean(pendingAction) || isGlobalAssetScope" :title="isGlobalAssetScope ? globalWriteBlockedText : undefined" @click="openCreateDialog('scene')"><Mountain :size="14" aria-hidden="true" />场景</button>
+          <button type="button" :disabled="Boolean(pendingAction) || isGlobalAssetScope" :title="isGlobalAssetScope ? globalWriteBlockedText : undefined" @click="openCreateDialog('prop')"><Package :size="14" aria-hidden="true" />道具</button>
+          <button type="button" :disabled="Boolean(pendingAction) || isGlobalAssetScope" :title="isGlobalAssetScope ? globalWriteBlockedText : undefined" @click="openCreateDialog('style')"><Palette :size="14" aria-hidden="true" />风格</button>
         </div>
 
         <div class="isolation-note">
           <ShieldCheck :size="16" aria-hidden="true" />
-          <p><b>已隔离旧工程</b><span>打开时不扫描其他项目或原媒体目录。</span></p>
+          <p>
+            <b>{{ isGlobalAssetScope ? "注册剧本只读聚合" : "已隔离旧工程" }}</b>
+            <span>{{ isGlobalAssetScope ? "只读查询受管索引，不扫描或回写原媒体目录。" : "打开时不扫描其他项目或原媒体目录。" }}</span>
+          </p>
         </div>
       </nav>
 
@@ -218,7 +262,55 @@
             </button>
           </label>
 
-          <span class="result-scope">{{ sectionLabel(activeSection) }} · {{ visibleTotal }} 项</span>
+          <div
+            v-if="isAssetSection(activeSection)"
+            class="asset-scope-switch"
+            role="group"
+            aria-label="资产剧本范围"
+            data-testid="material-asset-scope-switch">
+            <button
+              type="button"
+              data-testid="material-asset-scope-current"
+              :class="{ active: assetScope === 'current' }"
+              :aria-pressed="assetScope === 'current'"
+              :disabled="Boolean(pendingAction)"
+              @click="setAssetScope('current')"
+            >当前剧本</button>
+            <button
+              type="button"
+              data-testid="material-asset-scope-all"
+              :class="{ active: assetScope === 'all' }"
+              :aria-pressed="assetScope === 'all'"
+              :disabled="Boolean(pendingAction)"
+              @click="setAssetScope('all')"
+            >全部剧本</button>
+          </div>
+
+          <div
+            v-if="isGlobalAssetScope"
+            class="asset-scope-switch asset-representation-switch"
+            role="group"
+            aria-label="全部剧本素材显示层"
+            data-testid="material-asset-representation-switch">
+            <button
+              type="button"
+              data-testid="material-asset-representation-images"
+              :class="{ active: assetRepresentation === 'images' }"
+              :aria-pressed="assetRepresentation === 'images'"
+              :disabled="Boolean(pendingAction)"
+              @click="setAssetRepresentation('images')"
+            >版本图片</button>
+            <button
+              type="button"
+              data-testid="material-asset-representation-assets"
+              :class="{ active: assetRepresentation === 'assets' }"
+              :aria-pressed="assetRepresentation === 'assets'"
+              :disabled="Boolean(pendingAction)"
+              @click="setAssetRepresentation('assets')"
+            >资产实体</button>
+          </div>
+
+          <span class="result-scope">{{ isGlobalAssetScope ? "全部剧本 · " : "" }}{{ sectionLabel(activeSection) }} · {{ visibleTotal }} 项</span>
           <div class="view-switch" aria-label="显示方式">
             <button type="button" :class="{ active: viewMode === 'grid' }" :aria-pressed="viewMode === 'grid'" aria-label="宫格显示" @click="viewMode = 'grid'">
               <Grid2X2 :size="15" aria-hidden="true" />
@@ -226,6 +318,33 @@
             <button type="button" :class="{ active: viewMode === 'list' }" :aria-pressed="viewMode === 'list'" aria-label="列表显示" @click="viewMode = 'list'">
               <List :size="16" aria-hidden="true" />
             </button>
+          </div>
+        </div>
+
+        <div
+          v-if="isGlobalAssetScope"
+          class="global-asset-summary"
+          data-testid="material-global-asset-summary"
+          role="status">
+          <ShieldCheck :size="16" aria-hidden="true" />
+          <div>
+            <b>全部剧本只读素材总览</b>
+            <span v-if="globalCatalogSummary">
+              已读取 {{ globalCatalogSummary.readableProjectCount ?? 0 }} / {{ globalCatalogSummary.registeredProjectCount ?? 0 }} 个受管剧本
+              <template v-if="globalCatalogSummary.imageCoverage">
+                · 已进入剧本资源 {{ globalCatalogSummary.imageCoverage.assetVersionImages }} 张 / 全部图片 {{ globalCatalogSummary.imageCoverage.totalImages }}
+              </template>
+            </span>
+            <span v-if="globalCatalogSummary?.counts && globalCatalogSummary?.resourceCounts">
+              {{ globalCatalogSummary.counts.total }} 个资产实体对应 {{ globalCatalogSummary.resourceCounts.total }} 张版本图片；共享图片保留全部名称与版本关系。
+            </span>
+            <span v-if="globalCatalogSummary?.imageCoverage?.ordinaryImages" class="coverage-warning">
+              仍有 {{ globalCatalogSummary.imageCoverage.ordinaryImages }} 张普通图片未归入人物、场景、道具或风格资产。
+            </span>
+            <span v-if="globalCatalogSummary?.unavailableProjects?.length" class="coverage-warning">
+              {{ globalCatalogSummary.unavailableProjects.length }} 个剧本暂不可读取，未冒充完整覆盖。
+            </span>
+            <strong>{{ globalWriteBlockedText }}</strong>
           </div>
         </div>
 
@@ -237,20 +356,28 @@
         <p v-if="notice" class="operation-notice" role="status">{{ notice }}</p>
 
         <section class="entries-region" :aria-label="`${sectionLabel(activeSection)}素材`">
+          <p
+            v-if="loading && entries.length"
+            class="library-refresh-status"
+            data-testid="material-library-refresh-status"
+            role="status">
+            正在刷新当前项目素材；现有列表会保留到新结果成功返回。
+          </p>
           <div v-if="loading && !entries.length" class="loading-state" role="status">
             <LoaderCircle :size="22" class="spinning" aria-hidden="true" />
-            <span>正在读取当前工程的轻量索引…</span>
+            <span>{{ isGlobalAssetScope ? "正在读取全部剧本的轻量资产索引…" : "正在读取当前工程的轻量索引…" }}</span>
           </div>
 
           <div v-else-if="!entries.length" class="empty-state">
             <component :is="activeSectionIcon" :size="32" aria-hidden="true" />
             <h2>{{ searchQuery ? "没有匹配结果" : `${sectionLabel(activeSection)}还是空的` }}</h2>
             <p v-if="searchQuery">换一个名称、别名或用途关键词。</p>
+            <p v-else-if="isGlobalAssetScope">全部剧本只读索引中没有这一类资产；{{ globalWriteBlockedText }}</p>
             <p v-else-if="isAssetSection(activeSection)">先建立资产身份，再附加已审核的参考版本。</p>
             <p v-else-if="activeSection === 'script'">导入剧本后，正文会保存为历史版本（不可改）。</p>
             <p v-else-if="activeSection === 'prompt'">导入提示词后，可按名称检索并查看冻结正文与来源。</p>
             <p v-else>导入图片、视频或音频；列表只读缩略图和轻量元数据。</p>
-            <button v-if="isAssetSection(activeSection)" type="button" class="primary-action" @click="openCreateDialog(activeSection)">
+            <button v-if="isAssetSection(activeSection)" type="button" class="primary-action" :disabled="isGlobalAssetScope" :title="isGlobalAssetScope ? globalWriteBlockedText : undefined" @click="openCreateDialog(activeSection)">
               <Plus :size="15" aria-hidden="true" />创建{{ sectionLabel(activeSection) }}
             </button>
             <button v-else-if="activeSection === 'script'" type="button" class="primary-action" :disabled="Boolean(pendingAction)" @click="importScript">
@@ -267,12 +394,12 @@
           <div v-else class="entry-collection" :class="viewMode">
             <button
               v-for="entry in entries"
-              :key="entry.id"
+              :key="entrySelectionId(entry)"
               type="button"
               class="material-entry"
-              :class="{ selected: selectedId === entry.id, 'source-selected': selectedMedia?.entryId === entry.id }"
-              :aria-pressed="selectedId === entry.id"
-              :disabled="Boolean(pendingAction)"
+              :class="{ selected: selectedId === entrySelectionId(entry), 'source-selected': selectedMedia?.entryId === entry.id }"
+              :aria-pressed="selectedId === entrySelectionId(entry)"
+              :disabled="loading || Boolean(pendingAction)"
               @click="selectEntry(entry)">
               <figure>
                 <img
@@ -288,6 +415,22 @@
               <div class="entry-copy">
                 <span>{{ kindLabel(entry.kind) }}<template v-if="entry.episode"> · EP{{ String(entry.episode).padStart(2, "0") }}</template></span>
                 <strong>{{ entry.title }}</strong>
+                <small v-if="isGlobalAssetScope" class="entry-source-project" data-testid="material-entry-source-project">来源剧本：{{ entrySourceProjectLabel(entry) }}</small>
+                <ul
+                  v-if="entry.resourceImage"
+                  class="resource-image-associations"
+                  data-testid="material-resource-image-associations">
+                  <li
+                    v-for="association in entry.resourceImage.associations"
+                    :key="`${association.assetId}:${association.versionId}`">
+                    <b>{{ association.name }}</b>
+                    <span>
+                      {{ kindLabel(association.category) }} · v{{ association.versionOrdinal }} · {{ reviewLabel(association.reviewStatus) }}
+                      <em v-if="association.isPrimary">Primary</em>
+                      <em v-else>非 Primary</em>
+                    </span>
+                  </li>
+                </ul>
                 <p>{{ entry.subtitle || entry.summary || "尚未填写说明" }}</p>
                 <footer><small>{{ entry.meta || authorityLabel(entry.authorityState) }}</small><time v-if="entry.updatedAt">{{ formatDate(entry.updatedAt) }}</time></footer>
               </div>
@@ -334,6 +477,46 @@
             <h2>{{ detail.title }}</h2>
             <p>{{ detail.description || "尚未填写资产说明。" }}</p>
           </header>
+
+          <section v-if="isGlobalAssetScope" class="global-readonly-detail" data-testid="material-global-readonly-detail">
+            <ShieldCheck :size="16" aria-hidden="true" />
+            <div>
+              <b>来源剧本：{{ selectedEntry ? entrySourceProjectLabel(selectedEntry) : "未知来源" }}</b>
+              <span>全部剧本详情为只读；{{ globalWriteBlockedText }}</span>
+            </div>
+          </section>
+
+          <section
+            v-if="detail.resourceImage"
+            class="detail-section resource-image-detail"
+            data-testid="material-resource-image-detail">
+            <div class="section-title">
+              <span>图片对应名称与版本</span>
+              <b>{{ detail.resourceImage.associations.length }} 条关联</b>
+            </div>
+            <article
+              v-for="association in detail.resourceImage.associations"
+              :key="`${association.assetId}:${association.versionId}`">
+              <div>
+                <b>{{ association.name }}</b>
+                <span>{{ kindLabel(association.category) }} · v{{ association.versionOrdinal }}</span>
+              </div>
+              <div>
+                <span :class="`review-${association.reviewStatus}`">{{ reviewLabel(association.reviewStatus) }}</span>
+                <em>{{ association.isPrimary ? "Primary" : "非 Primary" }}</em>
+              </div>
+              <p v-if="association.sourceNote">{{ association.sourceNote }}</p>
+            </article>
+            <details class="technical-diagnostics">
+              <summary>诊断详情</summary>
+              <dl>
+                <dt>图片 SHA</dt><dd>{{ detail.resourceImage.mediaSha256 }}</dd>
+                <dt>原始文件名</dt><dd>{{ detail.resourceImage.sourceBasename }}</dd>
+                <dt>类型</dt><dd>{{ detail.resourceImage.mimeType }}</dd>
+                <dt>大小</dt><dd>{{ formatBytes(detail.resourceImage.sizeBytes) }}</dd>
+              </dl>
+            </details>
+          </section>
 
           <section v-if="detail.textDocument" class="detail-section text-document-section">
             <div class="section-title">
@@ -403,7 +586,7 @@
             <details v-if="detail.primaryAuthority" class="technical-diagnostics"><summary>诊断详情</summary><dl><dt>版本 ID</dt><dd>{{ detail.primaryAuthority.versionId }}</dd><dt>SHA</dt><dd>{{ shortSha(detail.primaryAuthority.mediaSha256) }}</dd></dl></details>
           </section>
 
-          <section v-if="isAssetKind(detail.kind)" class="detail-section cross-project-reuse" data-testid="cross-project-asset-reuse">
+          <section v-if="isAssetKind(detail.kind) && !isGlobalAssetScope" class="detail-section cross-project-reuse" data-testid="cross-project-asset-reuse">
             <div class="section-title"><span>跨工程复用</span><b>目标项目重新审核</b></div>
             <p>导出为只读内容寻址快照；导入永远先成为目标工程 pending 候选，不会沿用源工程 Primary。</p>
             <div class="reuse-actions">
@@ -438,7 +621,7 @@
             </div>
           </section>
 
-          <section v-if="isAssetKind(detail.kind)" class="detail-section version-intake">
+          <section v-if="isAssetKind(detail.kind) && !isGlobalAssetScope" class="detail-section version-intake">
             <div class="section-title"><span>追加参考版本</span><b>先存为待审核</b></div>
             <template v-if="selectedMedia && selectedMediaCanBecomeAuthority">
               <div class="selected-source">
@@ -510,7 +693,7 @@
                 <small v-if="relation.role || relation.note">{{ relation.role }}{{ relation.role && relation.note ? " · " : "" }}{{ relation.note }}</small>
                 <details class="technical-diagnostics"><summary>诊断详情</summary><code>{{ relation.id }} · {{ relationOtherAsset(relation, detail.id) }} · r{{ relation.revision }}</code><small v-if="relation.supersedesRelationId">替代 {{ relation.supersedesRelationId }}</small><small v-if="relation.supersededByRelationId">已由 {{ relation.supersededByRelationId }} 替代</small></details>
                 <button
-                  v-if="relation.head && relation.status === 'stale' && api.rebaseAssetRelation"
+                  v-if="!isGlobalAssetScope && relation.head && relation.status === 'stale' && api.rebaseAssetRelation"
                   type="button"
                   class="relation-rebase-action"
                   :disabled="Boolean(pendingAction)"
@@ -522,7 +705,7 @@
               </article>
             </div>
             <p v-else class="relation-empty">尚无派生或组合来源；普通独立资产可以保持为空。</p>
-            <details class="asset-relation-editor" @toggle="onRelationEditorToggle"><summary>关联另一个资产</summary><div class="relation-intake">
+            <details v-if="!isGlobalAssetScope" class="asset-relation-editor" @toggle="onRelationEditorToggle"><summary>关联另一个资产</summary><div class="relation-intake">
               <label><span>关系类型</span><select v-model="relationDraft.kind" :disabled="Boolean(pendingAction)">
                 <option value="derived_from">派生自</option>
                 <option value="variant_of">变体自</option>
@@ -542,28 +725,33 @@
                 <Plus v-else :size="14" aria-hidden="true" />追加关系
               </button>
             </div></details>
-            <small v-if="!api.appendAssetRelation">当前接入层尚未启用关系写入。</small>
+            <small v-if="!isGlobalAssetScope && !api.appendAssetRelation">当前接入层尚未启用关系写入。</small>
           </section>
 
           <section v-if="detail.versions?.length" class="detail-section versions-section">
             <h3>版本历史</h3>
-            <p v-if="hasPendingVersions && !api.reviewPendingAssetVersion" class="workflow-disabled-note">当前接入层尚未启用版本审核。</p>
+            <p v-if="!isGlobalAssetScope && hasPendingVersions && !api.reviewPendingAssetVersion" class="workflow-disabled-note">当前接入层尚未启用版本审核。</p>
             <article v-for="version in detail.versions" :key="version.id" :class="[version.reviewStatus, { primary: version.isPrimary }]">
               <header>
-                <div><b>v{{ version.ordinal }}</b><span :class="`review-${version.reviewStatus}`">{{ reviewLabel(version.reviewStatus) }}</span><em v-if="version.isPrimary">当前权威</em></div>
+                <div>
+                  <b>{{ version.ownerName ? `${version.ownerName} · v${version.ordinal}` : `v${version.ordinal}` }}</b>
+                  <small v-if="version.ownerCategory">{{ kindLabel(version.ownerCategory) }}</small>
+                  <span :class="`review-${version.reviewStatus}`">{{ reviewLabel(version.reviewStatus) }}</span>
+                  <em v-if="version.isPrimary">当前权威</em>
+                </div>
                 <div class="version-meta"><time v-if="version.createdAt">{{ formatDate(version.createdAt) }}</time><details class="technical-diagnostics"><summary>诊断详情</summary><code>{{ version.id }} · {{ shortSha(version.mediaSha256) }}</code></details></div>
               </header>
               <button
                 v-if="version.mediaUrl"
                 type="button"
                 class="version-visual"
-                :aria-label="`按原图检查 ${detail.title} v${version.ordinal}`"
+                :aria-label="`按原图检查 ${version.ownerName || detail.title} v${version.ordinal}`"
                 :disabled="Boolean(pendingAction)"
                 @click="openVersionPreview(version)">
                 <img
                   v-if="version.thumbnailUrl"
                   :src="version.thumbnailUrl"
-                  :alt="`${detail.title} v${version.ordinal} 待审缩略图`"
+                  :alt="`${version.ownerName || detail.title} v${version.ordinal} 待审缩略图`"
                   loading="lazy"
                   decoding="async" />
                 <span v-else><ImageIcon :size="24" aria-hidden="true" />缩略图未就绪，点击按需检查受管原图</span>
@@ -571,7 +759,7 @@
               </button>
               <p v-if="version.sourceNote" class="source-note"><b>来源</b>{{ version.sourceNote }}</p>
               <p v-if="version.reviewNote" class="review-note"><b>审核</b>{{ version.reviewNote }}</p>
-              <div v-if="version.reviewStatus === 'pending'" class="review-controls">
+              <div v-if="version.reviewStatus === 'pending' && !isGlobalAssetScope" class="review-controls">
                 <label>
                   <span>审核说明</span>
                   <textarea v-model="reviewDrafts[version.id]" rows="2" maxlength="4000" :disabled="Boolean(pendingAction)" placeholder="记录一致性核对依据，批准或拒绝时必填。" />
@@ -582,7 +770,7 @@
                 </div>
               </div>
               <button
-                v-if="version.reviewStatus === 'approved' && !version.isPrimary && isAssetKind(detail.kind)"
+                v-if="version.reviewStatus === 'approved' && !version.isPrimary && isAssetKind(detail.kind) && !isGlobalAssetScope"
                 type="button"
                 class="promote-action"
                 :disabled="Boolean(pendingAction)"
@@ -714,12 +902,12 @@
         <header>
           <div>
             <span>MANAGED CAS ORIGINAL</span>
-            <h2 id="version-preview-title">{{ detail?.title }} · v{{ versionPreview.ordinal }}</h2>
+            <h2 id="version-preview-title">{{ versionPreview.ownerName || detail?.title }} · v{{ versionPreview.ordinal }}</h2>
           </div>
           <button type="button" aria-label="关闭原图检查" @click="closeVersionPreview"><X :size="17" aria-hidden="true" /></button>
         </header>
         <figure>
-          <img :src="versionPreview.mediaUrl" :alt="`${detail?.title || '资产'} v${versionPreview.ordinal} 受管原图`" />
+          <img :src="versionPreview.mediaUrl" :alt="`${versionPreview.ownerName || detail?.title || '资产'} v${versionPreview.ordinal} 受管原图`" />
         </figure>
         <footer>
           <span>{{ reviewLabel(versionPreview.reviewStatus) }}</span>
@@ -729,7 +917,7 @@
       </section>
     </div>
 
-    <div v-if="createDialogOpen" class="dialog-backdrop" role="presentation" @mousedown.self="closeCreateDialog">
+    <div v-if="createDialogOpen && !isGlobalAssetScope" class="dialog-backdrop" role="presentation" @mousedown.self="closeCreateDialog">
       <form class="create-dialog" role="dialog" aria-modal="true" aria-labelledby="create-asset-title" @submit.prevent="createAsset">
         <header>
           <div><span>CANONICAL ASSET</span><h2 id="create-asset-title">创建规范资产</h2></div>
@@ -834,6 +1022,18 @@ import type {
   StudioMultimediaTimelineProjection,
   StudioMultimediaTimelineRole,
 } from "@core/studio-multimedia-timeline";
+import type {
+  GlobalStudioMediaResourcePage,
+  GlobalStudioMediaResourceQuery,
+} from "@core/studio-global-asset-catalog";
+import type {
+  GlobalStudioImageResourcePage,
+  GlobalStudioImageResourceQuery,
+} from "@core/studio-global-image-resource-catalog";
+import type {
+  ReuseStudioGlobalResourceInput,
+  ReuseStudioGlobalResourceResult,
+} from "@core/studio-global-resource-reuse";
 import { toUserFacingErrorText } from "../user-facing-error";
 import {
   MANAGED_CANVAS_THEME_CHANGED_EVENT,
@@ -863,9 +1063,12 @@ const AsyncStudioGenerationControlView = defineAsyncComponent(() => import("./St
 const AsyncDesktopSupportView = defineAsyncComponent(() => import("./DesktopSupportView.vue"));
 const AsyncScriptMediaAlignView = defineAsyncComponent(() => import("./ScriptMediaAlignView.vue"));
 const AsyncStudioMultimediaTimelineView = defineAsyncComponent(() => import("./StudioMultimediaTimelineView.vue"));
+const AsyncGlobalResourceCenterView = defineAsyncComponent(() => import("./GlobalResourceCenterView.vue"));
 
 export type MaterialStudioSection = "script" | "prompt" | "character" | "scene" | "prop" | "style" | "media";
 export type MaterialStudioAssetCategory = "character" | "scene" | "prop" | "style";
+export type MaterialStudioAssetScope = "current" | "all";
+export type MaterialStudioAssetRepresentation = "images" | "assets";
 export type MaterialStudioReviewStatus = "pending" | "approved" | "rejected";
 export type MaterialStudioAuthorityState = "locked" | "candidate" | "missing";
 export type MaterialStudioAssetRelationKind = "derived_from" | "variant_of" | "reference_of" | "composite_member";
@@ -957,17 +1160,77 @@ export interface MaterialStudioUiEntry {
   mediaSha256?: string;
   authorityState?: MaterialStudioAuthorityState;
   updatedAt?: string;
+  /** scope=all 时必填；普通当前工程列表保持可选以兼容既有 adapter。 */
+  sourceProjectId?: string;
+  /** scope=all 卡片向用户展示的来源剧本名，不以路径替代。 */
+  sourceProjectName?: string;
+  /** scope=all 只读详情的真实受管工程根；不得用当前 projectRoot 代替。 */
+  sourceProjectRoot?: string;
+  /** scope=all 在来源工程内读取详情的原始 entry ID。 */
+  sourceEntryId?: string;
+  /** scope=all + images 时保留一张图对应的全部资产/版本语义。 */
+  resourceImage?: {
+    mediaSha256: string;
+    associations: Array<{
+      assetId: string;
+      name: string;
+      category: MaterialStudioAssetCategory;
+      versionId: string;
+      versionOrdinal: number;
+      reviewStatus: MaterialStudioReviewStatus;
+      isPrimary: boolean;
+    }>;
+  };
+}
+
+export interface MaterialStudioUiAssetCounts {
+  total: number;
+  character: number;
+  scene: number;
+  prop: number;
+  style: number;
+}
+
+export interface MaterialStudioUiImageCoverage {
+  totalImages: number;
+  assetVersionImages: number;
+  ordinaryImages: number;
+}
+
+export interface MaterialStudioUiUnavailableProject {
+  id: string;
+  name: string;
+  reason: "not-managed" | "material-database-invalid";
 }
 
 export interface MaterialStudioUiPage {
   items: MaterialStudioUiEntry[];
   nextCursor?: string;
   total?: number;
+  counts?: MaterialStudioUiAssetCounts;
+  resourceCounts?: MaterialStudioUiAssetCounts;
+  imageCoverage?: MaterialStudioUiImageCoverage;
+  registeredProjectCount?: number;
+  readableProjectCount?: number;
+  unavailableProjects?: MaterialStudioUiUnavailableProject[];
+}
+
+interface MaterialStudioGlobalCatalogSummary {
+  counts?: MaterialStudioUiAssetCounts;
+  resourceCounts?: MaterialStudioUiAssetCounts;
+  imageCoverage?: MaterialStudioUiImageCoverage;
+  registeredProjectCount?: number;
+  readableProjectCount?: number;
+  unavailableProjects?: MaterialStudioUiUnavailableProject[];
 }
 
 export interface MaterialStudioUiVersion {
   id: string;
   ordinal: number;
+  /** 逐图资源存在同 SHA 多资产关系时，用于区分各自独立的 vN。 */
+  ownerAssetId?: string;
+  ownerName?: string;
+  ownerCategory?: MaterialStudioAssetCategory;
   mediaSha256: string;
   /** 列表/卡片只加载轻量缩略图；原图只在用户打开单图检查层时加载。 */
   thumbnailUrl?: string;
@@ -997,6 +1260,22 @@ export interface MaterialStudioUiDetail {
     mimeType: string;
   };
   versions?: MaterialStudioUiVersion[];
+  resourceImage?: {
+    mediaSha256: string;
+    sourceBasename: string;
+    mimeType: string;
+    sizeBytes: number;
+    associations: Array<{
+      assetId: string;
+      name: string;
+      category: MaterialStudioAssetCategory;
+      versionId: string;
+      versionOrdinal: number;
+      reviewStatus: MaterialStudioReviewStatus;
+      isPrimary: boolean;
+      sourceNote?: string;
+    }>;
+  };
   identityFeatures?: string[];
   positiveLocks?: string[];
   negativeLocks?: string[];
@@ -1020,6 +1299,8 @@ export interface MaterialStudioUiDetail {
 
 export interface MaterialStudioUiListQuery {
   section: MaterialStudioSection;
+  scope: MaterialStudioAssetScope;
+  representation: MaterialStudioAssetRepresentation;
   search?: string;
   cursor?: string;
   limit: number;
@@ -1075,6 +1356,16 @@ export interface MaterialStudioReviewPendingVersionInput {
 
 export interface MaterialStudioUiApi {
   openProjectCenter?(): void;
+  listGlobalResourceImages?(
+    query: GlobalStudioImageResourceQuery,
+  ): Promise<GlobalStudioImageResourcePage>;
+  listGlobalMediaResources?(
+    query: GlobalStudioMediaResourceQuery,
+  ): Promise<GlobalStudioMediaResourcePage>;
+  reuseGlobalResource?(
+    targetProjectRoot: string,
+    input: ReuseStudioGlobalResourceInput,
+  ): Promise<ReuseStudioGlobalResourceResult>;
   getOverview(projectRoot: string): Promise<MaterialStudioProjectOverview>;
   listEntries(projectRoot: string, query: MaterialStudioUiListQuery): Promise<MaterialStudioUiPage>;
   getEntryDetail(projectRoot: string, entryId: string): Promise<MaterialStudioUiDetail | null>;
@@ -1217,6 +1508,7 @@ export default defineComponent({
     AsyncDesktopSupportView,
     AsyncScriptMediaAlignView,
     AsyncStudioMultimediaTimelineView,
+    AsyncGlobalResourceCenterView,
   },
   props: {
     projectRoot: { type: String, required: true },
@@ -1307,10 +1599,27 @@ export default defineComponent({
     ];
     const assetCategories = sections.filter((section): section is SectionDefinition & { id: MaterialStudioAssetCategory } => isAssetSection(section.id));
     const activeSection = ref<MaterialStudioSection>("script");
-    type StudioUiMode = "canvas" | "dashboard" | "multimedia-timeline" | "script-align" | "library" | "binding" | "continuity-review" | "generation" | "agent" | "help";
+    type StudioUiMode = "global-resources" | "canvas" | "dashboard" | "multimedia-timeline" | "script-align" | "library" | "binding" | "continuity-review" | "generation" | "agent" | "help";
     const activeMode = ref<StudioUiMode>(
       props.dashboardApi ? "canvas" : "library",
     );
+    const assetScope = ref<MaterialStudioAssetScope>("current");
+    const assetRepresentation = ref<MaterialStudioAssetRepresentation>("images");
+    const effectiveListScope = computed<MaterialStudioAssetScope>(() => (
+      isAssetSection(activeSection.value) ? assetScope.value : "current"
+    ));
+    const effectiveAssetRepresentation = computed<MaterialStudioAssetRepresentation>(() => (
+      effectiveListScope.value === "all" ? assetRepresentation.value : "assets"
+    ));
+    const isGlobalAssetScope = computed(() => (
+      activeMode.value === "library" && effectiveListScope.value === "all"
+    ));
+    const globalResourceCenterAvailable = computed(() => Boolean(
+      props.api.listGlobalResourceImages
+      && props.api.listGlobalMediaResources
+      && props.api.reuseGlobalResource
+    ));
+    const globalWriteBlockedText = "如需创建、附加版本、Review、关系写入或跨项目复用，请切回当前剧本后操作。";
     /**
      * 正式派发供应方只是一项显式、会话内 UI 选择；Core/ledger 仍是最终事实源。
      * 切工程时恢复 Codex，避免隔离 canary 的 Grok 选择泄漏到其他受管工程。
@@ -1441,11 +1750,14 @@ export default defineComponent({
     }, { deep: true });
     const viewMode = ref<"grid" | "list">("grid");
     const overview = ref<MaterialStudioProjectOverview | null>(null);
+    const currentLibraryRefreshPending = ref(false);
     const entries = ref<MaterialStudioUiEntry[]>([]);
     const pageCursors = reactive(createMaterialStudioCursorState());
     const nextCursor = ref<string>();
     const pageTotal = ref<number>();
+    const globalCatalogSummary = ref<MaterialStudioGlobalCatalogSummary | null>(null);
     const selectedId = ref("");
+    const selectedEntry = ref<MaterialStudioUiEntry | null>(null);
     const selectedMedia = ref<SelectedMediaReference | null>(null);
     const detail = ref<MaterialStudioUiDetail | null>(null);
     const crossProjectPackage = ref<{
@@ -1517,6 +1829,8 @@ export default defineComponent({
     let searchTimer: ReturnType<typeof setTimeout> | undefined;
     let relationSearchTimer: ReturnType<typeof setTimeout> | undefined;
     let overviewRequest = 0;
+    let globalReuseOverviewRequest = 0;
+    let currentLibraryRefreshRequest = 0;
     let listRequest = 0;
     let detailRequest = 0;
     let mutationRefreshRequest = 0;
@@ -1531,6 +1845,97 @@ export default defineComponent({
       actionId: string;
     }
 
+    interface FrozenMaterialListRequest {
+      request: number;
+      projectRoot: string;
+      scope: MaterialStudioAssetScope;
+      query: Readonly<MaterialStudioUiListQuery>;
+      queryFingerprint: string;
+    }
+
+    interface FrozenMaterialDetailRequest {
+      request: number;
+      projectRoot: string;
+      scope: MaterialStudioAssetScope;
+      query: Readonly<{
+        section: MaterialStudioSection;
+        search: string;
+        selectionId: string;
+        detailProjectRoot: string;
+        detailEntryId: string;
+      }>;
+      queryFingerprint: string;
+    }
+
+    function listQueryFingerprint(projectRoot: string, query: Readonly<MaterialStudioUiListQuery>): string {
+      return JSON.stringify([
+        projectRoot,
+        query.scope,
+        query.representation,
+        query.section,
+        query.search ?? "",
+        query.cursor ?? "",
+        query.limit,
+      ]);
+    }
+
+    function detailQueryFingerprint(
+      projectRoot: string,
+      scope: MaterialStudioAssetScope,
+      query: FrozenMaterialDetailRequest["query"],
+    ): string {
+      return JSON.stringify([
+        projectRoot,
+        scope,
+        query.section,
+        query.search,
+        query.selectionId,
+        query.detailProjectRoot,
+        query.detailEntryId,
+      ]);
+    }
+
+    function beginListRequest(query: MaterialStudioUiListQuery): FrozenMaterialListRequest {
+      const projectRoot = props.projectRoot;
+      const frozenQuery = Object.freeze({ ...query });
+      return {
+        request: ++listRequest,
+        projectRoot,
+        scope: frozenQuery.scope,
+        query: frozenQuery,
+        queryFingerprint: listQueryFingerprint(projectRoot, frozenQuery),
+      };
+    }
+
+    function listRequestIsCurrent(scope: FrozenMaterialListRequest): boolean {
+      const currentQuery = Object.freeze({
+        ...scope.query,
+        section: activeSection.value,
+        scope: effectiveListScope.value,
+        representation: effectiveAssetRepresentation.value,
+        search: searchQuery.value || undefined,
+      });
+      return !disposed
+        && scope.request === listRequest
+        && scope.projectRoot === props.projectRoot
+        && scope.scope === effectiveListScope.value
+        && scope.queryFingerprint === listQueryFingerprint(props.projectRoot, currentQuery);
+    }
+
+    function detailRequestIsCurrent(scope: FrozenMaterialDetailRequest): boolean {
+      const currentQuery = Object.freeze({
+        ...scope.query,
+        section: activeSection.value,
+        search: searchQuery.value,
+        selectionId: selectedEntry.value ? entrySelectionId(selectedEntry.value, scope.scope) : "",
+      });
+      return !disposed
+        && scope.request === detailRequest
+        && scope.projectRoot === props.projectRoot
+        && scope.scope === effectiveListScope.value
+        && scope.queryFingerprint === detailQueryFingerprint(props.projectRoot, effectiveListScope.value, currentQuery);
+    }
+
     function materialActionIsCurrent(scope: FrozenMaterialActionScope): boolean {
       return !disposed && actionGate.isCurrent(
         scope.token,
@@ -1540,6 +1945,11 @@ export default defineComponent({
     }
 
     const visibleTotal = computed(() => pageTotal.value ?? (overview.value ? countFor(activeSection.value) : entries.value.length));
+    const globalDisplayCounts = computed(() => (
+      effectiveAssetRepresentation.value === "images"
+        ? globalCatalogSummary.value?.resourceCounts
+        : globalCatalogSummary.value?.counts
+    ));
     const canLoadPrevious = computed(() => pageCursors.previousCursors.length > 0);
     const currentPageNumber = computed(() => pageCursors.previousCursors.length + 1);
     const hasPendingVersions = computed(() => detail.value?.versions?.some((version) => version.reviewStatus === "pending") ?? false);
@@ -1571,6 +1981,8 @@ export default defineComponent({
     onBeforeUnmount(() => {
       disposed = true;
       overviewRequest += 1;
+      globalReuseOverviewRequest += 1;
+      currentLibraryRefreshRequest += 1;
       listRequest += 1;
       detailRequest += 1;
       mutationRefreshRequest += 1;
@@ -1586,6 +1998,8 @@ export default defineComponent({
 
     function resetWorkspace(): void {
       overviewRequest += 1;
+      globalReuseOverviewRequest += 1;
+      currentLibraryRefreshRequest += 1;
       listRequest += 1;
       detailRequest += 1;
       mutationRefreshRequest += 1;
@@ -1598,19 +2012,24 @@ export default defineComponent({
       searchTimer = undefined;
       relationSearchTimer = undefined;
       overview.value = null;
+      currentLibraryRefreshPending.value = false;
       canvasFocus.value = null;
       dashboardFocus.value = null;
       bindingFocus.unitId = "";
       bindingFocus.panelId = "";
       reviewFocus.value = null;
       entries.value = [];
+      assetScope.value = "current";
+      assetRepresentation.value = "images";
       // 初次挂载与切工程都会走这里；有 dashboard owner 时必须回到受管无限画布，
       // 否则 setup 的 canvas 默认值会被 immediate watcher 静默覆盖。
       activeMode.value = props.dashboardApi ? "canvas" : "library";
       resetMaterialStudioCursorState(pageCursors);
       nextCursor.value = undefined;
       pageTotal.value = undefined;
+      globalCatalogSummary.value = null;
       selectedId.value = "";
+      selectedEntry.value = null;
       selectedMedia.value = null;
       versionSourceNote.value = "";
       resetRelationDraft();
@@ -1641,7 +2060,10 @@ export default defineComponent({
         const next = await props.api.getOverview(root);
         if (disposed || request !== overviewRequest || root !== props.projectRoot) return;
         overview.value = next;
-        await loadFirstPage();
+        const loaded = await loadFirstPage();
+        if (loaded && activeMode.value === "library") {
+          currentLibraryRefreshPending.value = false;
+        }
       } catch (reason) {
         if (request === overviewRequest && root === props.projectRoot) fail(reason);
       } finally {
@@ -1649,119 +2071,286 @@ export default defineComponent({
       }
     }
 
-    async function loadFirstPage(): Promise<boolean> {
-      const request = ++listRequest;
+    async function refreshCurrentLibraryIfNeeded(): Promise<void> {
+      if (!currentLibraryRefreshPending.value || activeMode.value !== "library") return;
+      const request = ++currentLibraryRefreshRequest;
       const root = props.projectRoot;
+      const loaded = await loadFirstPage();
+      if (
+        !loaded
+        || disposed
+        || request !== currentLibraryRefreshRequest
+        || root !== props.projectRoot
+        || activeMode.value !== "library"
+      ) return;
+      currentLibraryRefreshPending.value = false;
+    }
+
+    async function loadFirstPage(): Promise<boolean> {
       resetMaterialStudioCursorState(pageCursors);
       nextCursor.value = undefined;
       loadingMore.value = false;
+      const request = beginListRequest({
+        section: activeSection.value,
+        scope: effectiveListScope.value,
+        representation: effectiveAssetRepresentation.value,
+        search: searchQuery.value || undefined,
+        limit: MATERIAL_STUDIO_PAGE_LIMIT,
+      });
       loading.value = true;
       error.value = "";
       try {
-        const page = await props.api.listEntries(root, {
-          section: activeSection.value,
-          search: searchQuery.value || undefined,
-          limit: MATERIAL_STUDIO_PAGE_LIMIT,
-        });
-        if (disposed || request !== listRequest || root !== props.projectRoot) return false;
+        const page = await props.api.listEntries(request.projectRoot, request.query);
+        if (!listRequestIsCurrent(request)) return false;
         entries.value = boundedMaterialStudioEntries(page.items);
         commitMaterialStudioFirstPage(pageCursors, page.nextCursor);
         nextCursor.value = materialStudioNextCursor(pageCursors);
         pageTotal.value = page.total;
+        updateGlobalCatalogSummary(page, request.scope, true);
         clearHiddenSelection();
         return true;
       } catch (reason) {
-        if (request === listRequest && root === props.projectRoot) fail(reason);
+        if (listRequestIsCurrent(request)) fail(reason);
         return false;
       } finally {
-        if (request === listRequest && root === props.projectRoot) loading.value = false;
+        if (listRequestIsCurrent(request)) loading.value = false;
       }
     }
 
     async function loadNextPage(): Promise<void> {
       if (!nextCursor.value || loadingMore.value) return;
-      const request = ++listRequest;
-      const root = props.projectRoot;
       const cursor = nextCursor.value;
+      const request = beginListRequest({
+        section: activeSection.value,
+        scope: effectiveListScope.value,
+        representation: effectiveAssetRepresentation.value,
+        search: searchQuery.value || undefined,
+        cursor,
+        limit: MATERIAL_STUDIO_PAGE_LIMIT,
+      });
       loadingMore.value = true;
       error.value = "";
       try {
-        const page = await props.api.listEntries(root, {
-          section: activeSection.value,
-          search: searchQuery.value || undefined,
-          cursor,
-          limit: MATERIAL_STUDIO_PAGE_LIMIT,
-        });
-        if (disposed || request !== listRequest || root !== props.projectRoot) return;
+        const page = await props.api.listEntries(request.projectRoot, request.query);
+        if (!listRequestIsCurrent(request)) return;
         entries.value = boundedMaterialStudioEntries(page.items);
         commitMaterialStudioNextPage(pageCursors, cursor, page.nextCursor);
         nextCursor.value = materialStudioNextCursor(pageCursors);
         pageTotal.value = page.total ?? pageTotal.value;
+        updateGlobalCatalogSummary(page, request.scope);
         clearHiddenSelection();
       } catch (reason) {
-        if (request === listRequest && root === props.projectRoot) fail(reason);
+        if (listRequestIsCurrent(request)) fail(reason);
       } finally {
-        if (request === listRequest && root === props.projectRoot) loadingMore.value = false;
+        if (listRequestIsCurrent(request)) loadingMore.value = false;
       }
     }
 
     async function loadPreviousPage(): Promise<void> {
       if (!pageCursors.previousCursors.length || loadingMore.value) return;
-      const request = ++listRequest;
-      const root = props.projectRoot;
       const cursor = materialStudioPreviousCursor(pageCursors);
+      const request = beginListRequest({
+        section: activeSection.value,
+        scope: effectiveListScope.value,
+        representation: effectiveAssetRepresentation.value,
+        search: searchQuery.value || undefined,
+        ...(cursor ? { cursor } : {}),
+        limit: MATERIAL_STUDIO_PAGE_LIMIT,
+      });
       loadingMore.value = true;
       error.value = "";
       try {
-        const page = await props.api.listEntries(root, {
-          section: activeSection.value,
-          search: searchQuery.value || undefined,
-          ...(cursor ? { cursor } : {}),
-          limit: MATERIAL_STUDIO_PAGE_LIMIT,
-        });
-        if (disposed || request !== listRequest || root !== props.projectRoot) return;
+        const page = await props.api.listEntries(request.projectRoot, request.query);
+        if (!listRequestIsCurrent(request)) return;
         entries.value = boundedMaterialStudioEntries(page.items);
         commitMaterialStudioPreviousPage(pageCursors, cursor, page.nextCursor);
         nextCursor.value = materialStudioNextCursor(pageCursors);
         pageTotal.value = page.total ?? pageTotal.value;
+        updateGlobalCatalogSummary(page, request.scope);
         clearHiddenSelection();
       } catch (reason) {
-        if (request === listRequest && root === props.projectRoot) fail(reason);
+        if (listRequestIsCurrent(request)) fail(reason);
       } finally {
-        if (request === listRequest && root === props.projectRoot) loadingMore.value = false;
+        if (listRequestIsCurrent(request)) loadingMore.value = false;
       }
     }
 
+    function updateGlobalCatalogSummary(
+      page: MaterialStudioUiPage,
+      scope: MaterialStudioAssetScope,
+      replace = false,
+    ): void {
+      if (scope !== "all") {
+        globalCatalogSummary.value = null;
+        return;
+      }
+      const previous = replace ? null : globalCatalogSummary.value;
+      globalCatalogSummary.value = {
+        ...(previous ?? {}),
+        ...(page.counts ? { counts: page.counts } : {}),
+        ...(page.resourceCounts ? { resourceCounts: page.resourceCounts } : {}),
+        ...(page.imageCoverage ? { imageCoverage: page.imageCoverage } : {}),
+        ...(page.registeredProjectCount !== undefined ? { registeredProjectCount: page.registeredProjectCount } : {}),
+        ...(page.readableProjectCount !== undefined ? { readableProjectCount: page.readableProjectCount } : {}),
+        ...(page.unavailableProjects ? { unavailableProjects: page.unavailableProjects } : {}),
+      };
+    }
+
     function clearHiddenSelection(): void {
-      if (!selectedId.value || entries.value.some((entry) => entry.id === selectedId.value)) return;
+      if (!selectedId.value || entries.value.some((entry) => entrySelectionId(entry) === selectedId.value)) return;
       selectedId.value = "";
+      selectedEntry.value = null;
+      selectedMedia.value = null;
       detail.value = null;
       detailRequest += 1;
+      detailLoading.value = false;
+      versionPreview.value = null;
+    }
+
+    function setAssetScope(scope: MaterialStudioAssetScope): void {
+      if (!isAssetSection(activeSection.value) || assetScope.value === scope || pendingAction.value) return;
+      listRequest += 1;
+      detailRequest += 1;
+      mutationRefreshRequest += 1;
+      relationCandidateRequest += 1;
+      textRevisionsToken += 1;
+      assetScope.value = scope;
+      if (scope === "all") assetRepresentation.value = "images";
+      entries.value = [];
+      resetMaterialStudioCursorState(pageCursors);
+      nextCursor.value = undefined;
+      pageTotal.value = undefined;
+      globalCatalogSummary.value = null;
+      selectedId.value = "";
+      selectedEntry.value = null;
+      selectedMedia.value = null;
+      detail.value = null;
+      detailLoading.value = false;
+      versionPreview.value = null;
+      versionSourceNote.value = "";
+      createDialogOpen.value = false;
+      crossProjectPackage.value = null;
+      resetRelationDraft();
+      clearReviewDrafts();
+      clearFeedback();
+      notice.value = scope === "all"
+        ? `已切换到全部剧本只读素材总览。${globalWriteBlockedText}`
+        : "已切回当前剧本，可继续执行受管资产操作。";
+      void loadFirstPage();
+    }
+
+    function setAssetRepresentation(representation: MaterialStudioAssetRepresentation): void {
+      if (!isGlobalAssetScope.value || assetRepresentation.value === representation || pendingAction.value) return;
+      listRequest += 1;
+      detailRequest += 1;
+      mutationRefreshRequest += 1;
+      relationCandidateRequest += 1;
+      textRevisionsToken += 1;
+      assetRepresentation.value = representation;
+      entries.value = [];
+      resetMaterialStudioCursorState(pageCursors);
+      nextCursor.value = undefined;
+      pageTotal.value = undefined;
+      globalCatalogSummary.value = null;
+      selectedId.value = "";
+      selectedEntry.value = null;
+      selectedMedia.value = null;
+      detail.value = null;
+      detailLoading.value = false;
+      versionPreview.value = null;
+      resetRelationDraft();
+      clearReviewDrafts();
+      clearFeedback();
+      notice.value = representation === "images"
+        ? "已显示全部剧本中逐张登记的版本图片；同工程重复 SHA 合并为一张并保留全部名称与版本关系。"
+        : "已切换为规范资产实体视图；每个角色、场景、道具或风格只显示一张身份卡。";
+      void loadFirstPage();
+    }
+
+    function refreshSelectedLibrarySectionIfNeeded(): void {
+      if (currentLibraryRefreshPending.value && activeMode.value === "library") {
+        void refreshCurrentLibraryIfNeeded();
+      }
     }
 
     function selectSection(section: MaterialStudioSection): void {
-      if (activeSection.value === section) return;
+      if (activeSection.value === section) return refreshSelectedLibrarySectionIfNeeded();
+      detailRequest += 1;
+      textRevisionsToken += 1;
       activeSection.value = section;
       selectedId.value = "";
+      selectedEntry.value = null;
+      selectedMedia.value = null;
       detail.value = null;
+      detailLoading.value = false;
+      versionPreview.value = null;
       versionSourceNote.value = "";
       resetRelationDraft();
       clearReviewDrafts();
       searchInput.value = "";
       searchQuery.value = "";
-      entries.value = [];
+      // 总资源调用后保留现有卡片，直到当前工程的新页成功替换，避免切回素材库出现空白。
+      if (!currentLibraryRefreshPending.value) entries.value = [];
       resetMaterialStudioCursorState(pageCursors);
       nextCursor.value = undefined;
       pageTotal.value = undefined;
-      void loadFirstPage();
+      globalCatalogSummary.value = null;
+      if (currentLibraryRefreshPending.value && activeMode.value === "library") {
+        void refreshCurrentLibraryIfNeeded();
+      } else {
+        void loadFirstPage();
+      }
+    }
+
+    function entrySelectionId(
+      entry: MaterialStudioUiEntry,
+      scope: MaterialStudioAssetScope = effectiveListScope.value,
+    ): string {
+      if (scope !== "all") return entry.id;
+      const sourceProjectId = entry.sourceProjectId?.trim() || "source-project-id-missing";
+      const sourceProjectRoot = entry.sourceProjectRoot?.trim() || "source-project-root-missing";
+      const sourceEntry = entry.sourceEntryId?.trim() || entry.id;
+      return JSON.stringify([sourceProjectId, sourceProjectRoot, sourceEntry]);
+    }
+
+    function entrySourceProjectLabel(entry: MaterialStudioUiEntry): string {
+      return entry.sourceProjectName?.trim()
+        || entry.sourceProjectId?.trim()
+        || "来源剧本未知";
     }
 
     async function selectEntry(entry: MaterialStudioUiEntry, allowDuringAction = false): Promise<void> {
       if (pendingAction.value && !allowDuringAction) return;
-      const request = ++detailRequest;
-      const root = props.projectRoot;
+      const scope = effectiveListScope.value;
+      const projectRoot = props.projectRoot;
+      const selectionId = entrySelectionId(entry, scope);
+      const detailProjectRoot = scope === "all" ? entry.sourceProjectRoot?.trim() : projectRoot;
+      const detailEntryId = scope === "all" ? entry.sourceEntryId?.trim() : entry.id;
+      if (!detailProjectRoot || !detailEntryId) {
+        selectedId.value = selectionId;
+        selectedEntry.value = entry;
+        detail.value = null;
+        detailLoading.value = false;
+        fail(new Error("全部剧本资产缺少来源工程或来源条目标识，已拒绝使用当前工程代读详情。"));
+        return;
+      }
+      const query = Object.freeze({
+        section: activeSection.value,
+        search: searchQuery.value,
+        selectionId,
+        detailProjectRoot,
+        detailEntryId,
+      });
+      const request: FrozenMaterialDetailRequest = {
+        request: ++detailRequest,
+        projectRoot,
+        scope,
+        query,
+        queryFingerprint: detailQueryFingerprint(projectRoot, scope, query),
+      };
       const previousId = selectedId.value;
-      selectedId.value = entry.id;
+      selectedId.value = selectionId;
+      selectedEntry.value = entry;
       detail.value = null;
       if (isMediaKind(entry.kind)) {
         const mediaSha256 = mediaShaForEntry(entry);
@@ -1774,24 +2363,24 @@ export default defineComponent({
             ...(entry.thumbnailUrl ? { thumbnailUrl: entry.thumbnailUrl } : {}),
           };
         }
-      } else if (previousId !== entry.id) {
+      } else if (previousId !== selectionId) {
         versionSourceNote.value = "";
         resetRelationDraft();
       }
       clearReviewDrafts();
       detailLoading.value = true;
       error.value = "";
-      emit("selectionChanged", entry.id);
+      emit("selectionChanged", selectionId);
       try {
-        const next = await props.api.getEntryDetail(root, entry.id);
-        if (disposed || request !== detailRequest || root !== props.projectRoot || selectedId.value !== entry.id) return;
+        const next = await props.api.getEntryDetail(detailProjectRoot, detailEntryId);
+        if (!detailRequestIsCurrent(request) || selectedId.value !== selectionId) return;
         detail.value = next;
         if (!next) throw new Error("素材详情不存在或已被替换。");
-        syncReviewDrafts(next);
+        if (scope === "current") syncReviewDrafts(next);
       } catch (reason) {
-        if (request === detailRequest && root === props.projectRoot) fail(reason);
+        if (detailRequestIsCurrent(request)) fail(reason);
       } finally {
-        if (request === detailRequest && root === props.projectRoot) detailLoading.value = false;
+        if (detailRequestIsCurrent(request)) detailLoading.value = false;
       }
     }
 
@@ -1847,6 +2436,7 @@ export default defineComponent({
     }
 
     function openCreateDialog(category: MaterialStudioAssetCategory): void {
+      if (blockGlobalAssetWrite()) return;
       resetCreateDraft(category);
       createDialogOpen.value = true;
       void nextTick(() => createNameInput.value?.focus());
@@ -1858,6 +2448,7 @@ export default defineComponent({
     }
 
     async function createAsset(): Promise<void> {
+      if (blockGlobalAssetWrite()) return;
       const frozenDraft = {
         category: createDraft.category,
         name: createDraft.name.trim(),
@@ -1895,6 +2486,7 @@ export default defineComponent({
     }
 
     async function exportCurrentAssetPackage(): Promise<void> {
+      if (blockGlobalAssetWrite()) return;
       const asset = detail.value;
       if (!asset || !isAssetKind(asset.kind) || !asset.primaryAuthority
         || !props.api.exportCrossProjectAssetPackage) return;
@@ -1910,6 +2502,7 @@ export default defineComponent({
     }
 
     async function pickCrossProjectAssetPackage(): Promise<void> {
+      if (blockGlobalAssetWrite()) return;
       if (!props.api.pickCrossProjectAssetPackage || pendingAction.value) return;
       clearFeedback();
       try {
@@ -1927,6 +2520,7 @@ export default defineComponent({
       sourceVersionId: string,
       category: MaterialStudioAssetCategory,
     ): Promise<void> {
+      if (blockGlobalAssetWrite()) return;
       const selectedPackage = crossProjectPackage.value;
       if (!selectedPackage || !props.api.importCrossProjectAssetPackage) return;
       await runAction(`cross-project-import:${sourceAssetId}`, "", async (scope) => {
@@ -1967,6 +2561,7 @@ export default defineComponent({
     }
 
     function scheduleRelationCandidateSearch(): void {
+      if (blockGlobalAssetWrite()) return;
       if (relationSearchTimer) clearTimeout(relationSearchTimer);
       relationSearchTimer = setTimeout(() => void loadRelationCandidates(), 220);
     }
@@ -1978,6 +2573,7 @@ export default defineComponent({
     }
 
     async function loadRelationCandidates(): Promise<void> {
+      if (blockGlobalAssetWrite()) return;
       const request = ++relationCandidateRequest;
       const root = props.projectRoot;
       relationCandidatesLoading.value = true;
@@ -1985,6 +2581,8 @@ export default defineComponent({
         const search = relationSearch.value.trim() || undefined;
         const pages = await Promise.all((["character", "scene", "prop", "style"] as const).map((section) => props.api.listEntries(root, {
           section,
+          scope: "current",
+          representation: "assets",
           ...(search ? { search } : {}),
           limit: 12,
         })));
@@ -2004,6 +2602,7 @@ export default defineComponent({
     }
 
     async function appendRelation(): Promise<void> {
+      if (blockGlobalAssetWrite()) return;
       const asset = detail.value;
       const append = props.api.appendAssetRelation;
       const relatedAssetId = relationDraft.relatedAssetId.trim();
@@ -2029,6 +2628,7 @@ export default defineComponent({
     }
 
     async function rebaseRelation(relation: MaterialStudioUiRelation): Promise<void> {
+      if (blockGlobalAssetWrite()) return;
       const asset = detail.value;
       const rebase = props.api.rebaseAssetRelation;
       if (!asset || !isAssetKind(asset.kind) || !rebase || !relation.head || relation.status !== "stale" || pendingAction.value) return;
@@ -2072,6 +2672,7 @@ export default defineComponent({
 
     function canReviewVersion(version: MaterialStudioUiVersion): boolean {
       return version.reviewStatus === "pending"
+        && !isGlobalAssetScope.value
         && Boolean(detail.value && isAssetKind(detail.value.kind))
         && Boolean(props.api.reviewPendingAssetVersion)
         && !pendingAction.value
@@ -2079,6 +2680,7 @@ export default defineComponent({
     }
 
     async function appendSelectedMediaVersion(): Promise<void> {
+      if (blockGlobalAssetWrite()) return;
       const asset = detail.value;
       const media = selectedMedia.value;
       const append = props.api.appendPendingAssetVersion;
@@ -2102,6 +2704,7 @@ export default defineComponent({
     }
 
     async function reviewVersion(version: MaterialStudioUiVersion, decision: "approved" | "rejected"): Promise<void> {
+      if (blockGlobalAssetWrite()) return;
       const asset = detail.value;
       const review = props.api.reviewPendingAssetVersion;
       const note = reviewDrafts[version.id]?.trim() ?? "";
@@ -2167,6 +2770,7 @@ export default defineComponent({
     }
 
     async function promoteAuthority(version: MaterialStudioUiVersion): Promise<void> {
+      if (blockGlobalAssetWrite()) return;
       if (!detail.value || !isAssetKind(detail.value.kind) || version.reviewStatus !== "approved" || version.isPrimary) return;
       const asset = detail.value;
       const root = props.projectRoot;
@@ -2203,6 +2807,10 @@ export default defineComponent({
       const action = overview.value?.nextActionControl;
       if (!action) {
         fail(new Error("Core 尚未返回可执行的下一步；请刷新当前工程后重试。"));
+        return;
+      }
+      if (isGlobalAssetScope.value && action.requiresWrite) {
+        blockGlobalAssetWrite();
         return;
       }
       const code = action.code;
@@ -2248,12 +2856,16 @@ export default defineComponent({
       focus?: { unitId?: string; panelId?: string; generationRunId?: string } | null,
     ): void {
       if (pendingAction.value) return;
+      if (mode === "global-resources" && !globalResourceCenterAvailable.value) return;
       if ((mode === "canvas" || mode === "dashboard") && !props.dashboardApi) return;
       if (mode === "multimedia-timeline" && !props.multimediaTimelineApi) return;
       if (mode === "binding" && !props.bindingApi) return;
       if (mode === "continuity-review" && !props.continuityReviewApi) return;
       activeMode.value = mode;
       clearFeedback();
+      if (mode === "library" && currentLibraryRefreshPending.value) {
+        void refreshCurrentLibraryIfNeeded();
+      }
       emit("studioContextChanged", {
         mode,
         ...((focus?.unitId || bindingFocus.unitId) ? { unitId: focus?.unitId || bindingFocus.unitId } : {}),
@@ -2263,6 +2875,7 @@ export default defineComponent({
     }
 
     async function openAssetLocator(assetId?: string): Promise<void> {
+      if (blockGlobalAssetWrite()) return;
       selectStudioMode("library");
       if (!assetId?.trim()) {
         selectSection("character");
@@ -2307,11 +2920,30 @@ export default defineComponent({
       emit("failed", message);
     }
 
+    async function onGlobalResourceReused(message: string): Promise<void> {
+      const request = ++globalReuseOverviewRequest;
+      const root = props.projectRoot;
+      currentLibraryRefreshPending.value = true;
+      error.value = "";
+      notice.value = message;
+      try {
+        const next = await props.api.getOverview(root);
+        if (disposed || request !== globalReuseOverviewRequest || root !== props.projectRoot) return;
+        overview.value = next;
+      } catch (reason) {
+        if (request !== globalReuseOverviewRequest || root !== props.projectRoot) return;
+        const detail = toUserFacingErrorText(reason);
+        error.value = `资源调用已经完成，但当前项目概览刷新失败：${detail}`;
+        emit("failed", error.value);
+      }
+    }
+
     async function runAction(
       id: string,
       successNotice: string,
       operation: (scope: FrozenMaterialActionScope) => Promise<void | boolean>,
     ): Promise<void> {
+      if (blockGlobalAssetWrite()) return;
       if (pendingAction.value) return;
       const request = ++actionRequest;
       const root = props.projectRoot;
@@ -2338,12 +2970,24 @@ export default defineComponent({
       notice.value = "";
     }
 
+    function blockGlobalAssetWrite(): boolean {
+      if (!isGlobalAssetScope.value) return false;
+      error.value = "";
+      notice.value = `全部剧本素材只提供只读查看。${globalWriteBlockedText}`;
+      return true;
+    }
+
     function fail(reason: unknown): void {
       error.value = toUserFacingErrorText(reason);
       emit("failed", error.value);
     }
 
     function countFor(section: MaterialStudioSection): number {
+      if (isGlobalAssetScope.value && isAssetSection(section)) {
+        const counts = globalDisplayCounts.value;
+        if (counts) return counts[section];
+        return activeSection.value === section ? (pageTotal.value ?? entries.value.length) : 0;
+      }
       if (!overview.value) return 0;
       if (section === "script") return overview.value.counts.scripts;
       if (section === "prompt") return overview.value.counts.prompts;
@@ -2467,6 +3111,11 @@ export default defineComponent({
     return {
       shellTheme,
       activeSection,
+      assetScope,
+      assetRepresentation,
+      isGlobalAssetScope,
+      globalResourceCenterAvailable,
+      globalWriteBlockedText,
       activeMode,
       generationProvider,
       canvasFocus,
@@ -2486,6 +3135,7 @@ export default defineComponent({
       relationCandidates,
       relationCandidatesLoading,
       detail,
+      selectedEntry,
       textRevisions,
       textRevisionsLoading,
       textRevisionsError,
@@ -2502,6 +3152,8 @@ export default defineComponent({
       notice,
       overview,
       pageTotal,
+      globalCatalogSummary,
+      globalDisplayCounts,
       pendingAction,
       searchInput,
       searchPlaceholder,
@@ -2527,6 +3179,8 @@ export default defineComponent({
       formatDate,
       friendlyMaterialText,
       iconForEntry,
+      entrySelectionId,
+      entrySourceProjectLabel,
       importMedia,
       importPrompt,
       importScript,
@@ -2543,6 +3197,7 @@ export default defineComponent({
       onBindingFailed,
       onContinuityReviewFailed,
       onDashboardFailed,
+      onGlobalResourceReused,
       onCanvasOpenReview,
       onCanvasRequestGeneration,
       onScriptOpenUnit,
@@ -2572,6 +3227,8 @@ export default defineComponent({
       continueFromCore,
       selectStudioMode,
       selectSection,
+      setAssetScope,
+      setAssetRepresentation,
       shortSha,
       compactTextPreview,
     };
@@ -2652,6 +3309,11 @@ button:disabled{cursor:not-allowed;opacity:.46}
 .isolation-note span{margin-top:4px;color:var(--dim);font-size:8px;line-height:1.45}
 .material-browser{min-width:0;min-height:0;display:grid;grid-template-rows:52px auto auto minmax(0,1fr);background:var(--ink-1)}
 .browser-toolbar{display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid var(--line)}
+.asset-scope-switch{height:29px;display:flex;flex:0 0 auto;border:1px solid var(--line)}
+.asset-scope-switch button{min-width:64px;padding:0 9px;border:0;border-right:1px solid var(--line);background:transparent;color:var(--ui-text-3);font-size:8px;cursor:pointer}
+.asset-scope-switch button:last-child{border-right:0}
+.asset-scope-switch button.active{background:var(--ui-accent-soft);color:var(--ui-accent-strong)}
+.asset-scope-switch button:focus-visible{position:relative;z-index:1;outline:2px solid var(--gold);outline-offset:-2px}
 .search-field{width:min(420px,55%);height:31px;display:flex;align-items:center;gap:7px;padding:0 9px;border:1px solid var(--line);background:var(--ink-0);color:var(--dim)}
 .search-field:focus-within{border-color:var(--gold-soft);color:var(--gold)}
 .search-field input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:var(--text);font:11px inherit}
@@ -2666,9 +3328,17 @@ button:disabled{cursor:not-allowed;opacity:.46}
 .error-banner span{flex:1}
 .error-banner button{border:0;background:transparent;color:var(--ui-danger);font-size:9px;text-decoration:underline;cursor:pointer}
 .operation-notice{margin:0;padding:7px 14px;border-bottom:1px solid var(--gold-soft);background:var(--ui-accent-soft);color:var(--ui-accent-strong);font-size:9px}
+.global-asset-summary{display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid var(--ui-accent);background:var(--ui-accent-soft);color:var(--ui-accent-strong)}
+.global-asset-summary>div{min-width:0}
+.global-asset-summary b,.global-asset-summary span,.global-asset-summary strong{display:block}
+.global-asset-summary b{font-size:9px}
+.global-asset-summary span{margin-top:4px;color:var(--ui-text-2);font-size:8px;line-height:1.45}
+.global-asset-summary strong{margin-top:5px;color:var(--ui-accent-strong);font-size:8px;line-height:1.45}
+.global-asset-summary .coverage-warning{color:var(--ui-danger)}
 .entries-region{min-height:0;overflow:auto;scrollbar-color:var(--ui-line) var(--ui-bg);scrollbar-width:thin}
 .loading-state,.empty-state{height:100%;min-height:300px;display:grid;place-content:center;justify-items:center;gap:10px;color:var(--dim);text-align:center}
 .loading-state span{font-size:10px}
+.library-refresh-status{margin:0;padding:8px 12px;border-bottom:1px solid var(--line);color:var(--muted);background:var(--panel);font-size:10px}
 .empty-state h2{margin:3px 0 0;color:var(--ui-text);font-size:17px}
 .empty-state p{max-width:390px;margin:0 0 8px;color:var(--dim);font-size:10px;line-height:1.6}
 .entry-collection.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(174px,1fr));align-content:start}
@@ -2682,13 +3352,21 @@ button:disabled{cursor:not-allowed;opacity:.46}
 .entry-copy{min-height:112px;padding:11px}
 .entry-copy>span{display:block;color:var(--gold-soft);font-size:8px;letter-spacing:.05em}
 .entry-copy>strong{display:block;margin-top:6px;overflow:hidden;color:var(--ui-text);font-size:12px;text-overflow:ellipsis;white-space:nowrap}
+.entry-copy>.entry-source-project{display:block;margin-top:5px;overflow:hidden;color:var(--ui-text-2);font-size:8px;text-overflow:ellipsis;white-space:nowrap}
+.resource-image-associations{margin:8px 0 0;padding:0;display:grid;gap:5px;list-style:none}
+.resource-image-associations li{min-width:0;padding:5px 6px;border-left:2px solid var(--ui-accent);background:var(--ui-surface-2)}
+.resource-image-associations b,.resource-image-associations span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.resource-image-associations b{color:var(--ui-text-2);font-size:8px}
+.resource-image-associations span{margin-top:3px;color:var(--ui-text-3);font-size:7px}
+.resource-image-associations em{margin-left:4px;color:var(--ui-accent-strong);font-style:normal}
 .entry-copy>p{height:30px;margin:6px 0 0;display:-webkit-box;overflow:hidden;color:var(--ui-text-3);font-size:9px;line-height:1.55;-webkit-box-orient:vertical;-webkit-line-clamp:2}
 .entry-copy footer{margin-top:9px;display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--ui-text-3)}
 .entry-copy small,.entry-copy time{overflow:hidden;font-size:8px;text-overflow:ellipsis;white-space:nowrap}
 .entry-collection.list{display:block}
-.entry-collection.list .material-entry{width:100%;height:82px;display:grid;grid-template-columns:104px minmax(0,1fr) 24px;align-items:center;border-right:0}
-.entry-collection.list .material-entry figure{height:81px}
+.entry-collection.list .material-entry{width:100%;min-height:82px;display:grid;grid-template-columns:104px minmax(0,1fr) 24px;align-items:stretch;border-right:0}
+.entry-collection.list .material-entry figure{height:auto;min-height:81px}
 .entry-collection.list .entry-copy{min-height:0;padding:10px 14px}
+.entry-collection.list .resource-image-associations{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
 .entry-collection.list .entry-copy>p{height:auto;white-space:nowrap;text-overflow:ellipsis}
 .row-arrow{color:var(--dim)}
 .load-more{height:52px;display:flex;align-items:center;justify-content:center;gap:16px;border-top:1px solid var(--line);color:var(--dim);font-size:9px}
@@ -2701,7 +3379,24 @@ button:disabled{cursor:not-allowed;opacity:.46}
 .detail-header>span{color:var(--gold);font:8px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.07em}
 .detail-header h2{margin:6px 0;font-size:19px;line-height:1.25}
 .detail-header p{margin:0;color:var(--muted);font-size:10px;line-height:1.55}
+.global-readonly-detail{display:flex;gap:9px;padding:11px 18px;border-bottom:1px solid var(--ui-accent);background:var(--ui-accent-soft);color:var(--ui-accent-strong)}
+.global-readonly-detail b,.global-readonly-detail span{display:block}
+.global-readonly-detail b{font-size:9px}
+.global-readonly-detail span{margin-top:4px;color:var(--ui-text-2);font-size:8px;line-height:1.5}
 .authority-visual,.detail-section{padding:14px 18px;border-bottom:1px solid var(--line)}
+.resource-image-detail>article{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 10px;padding:8px 0;border-top:1px solid var(--line)}
+.resource-image-detail>article:first-of-type{border-top:0}
+.resource-image-detail>article>div:first-child{min-width:0}
+.resource-image-detail>article b,.resource-image-detail>article span{display:block}
+.resource-image-detail>article b{overflow:hidden;color:var(--ui-text);font-size:9px;text-overflow:ellipsis;white-space:nowrap}
+.resource-image-detail>article span{margin-top:3px;color:var(--ui-text-3);font-size:8px}
+.resource-image-detail>article>div:nth-child(2){display:flex;align-items:flex-start;gap:5px}
+.resource-image-detail>article>div:nth-child(2) span,.resource-image-detail>article>div:nth-child(2) em{margin:0;padding:3px 5px;border:1px solid currentColor;font-size:7px;font-style:normal}
+.resource-image-detail .review-approved{color:var(--ui-ok)}
+.resource-image-detail .review-pending{color:var(--ui-accent-strong)}
+.resource-image-detail .review-rejected{color:var(--ui-danger)}
+.resource-image-detail>article>div:nth-child(2) em{color:var(--gold)}
+.resource-image-detail>article>p{grid-column:1/-1;margin:0;color:var(--ui-text-3);font-size:8px;line-height:1.5;white-space:pre-wrap}
 .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
 .section-title span,.detail-section h3{color:var(--ui-text-2);font-size:9px;font-weight:700}
 .section-title b{color:var(--gold);font-size:8px}
@@ -2818,8 +3513,9 @@ button:disabled{cursor:not-allowed;opacity:.46}
 .versions-section article.rejected{border-left-color:var(--ui-danger)}
 .versions-section article.primary{background:linear-gradient(90deg,var(--ui-accent-soft) 0,transparent 75%)}
 .versions-section article>header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.versions-section article>header>div:first-child{min-width:0;display:flex;align-items:center;gap:6px}
-.versions-section article>header b{color:var(--ui-text);font-size:9px}
+.versions-section article>header>div:first-child{min-width:0;display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.versions-section article>header b{min-width:0;flex:1 1 130px;overflow:hidden;color:var(--ui-text);font-size:9px;text-overflow:ellipsis;white-space:nowrap}
+.versions-section article>header small{color:var(--ui-text-3);font-size:7px}
 .versions-section article>header span,.versions-section article>header em{display:inline-flex;align-items:center;min-height:17px;padding:0 5px;border:1px solid currentColor;border-radius:2px;font-size:7px;font-style:normal}
 .versions-section .review-pending{color:var(--ui-accent-strong)}
 .versions-section .review-approved{color:var(--ui-ok)}

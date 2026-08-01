@@ -105,6 +105,10 @@ import {
   type ExportStudioCrossProjectAssetPackageInput,
   type ImportStudioCrossProjectAssetPackageInput,
 } from "./studio-cross-project-asset-reuse.js";
+import {
+  reuseStudioGlobalResource,
+  type ReuseStudioGlobalResourceInput,
+} from "./studio-global-resource-reuse.js";
 import { inspectManagedProject, isManagedProject } from "./managed-project.js";
 import {
   appendStudioPromptRevision,
@@ -316,6 +320,7 @@ export type CommandRequest =
   | { command: "set_studio_primary_authority"; payload: SetStudioPrimaryAuthorityInput }
   | { command: "export_studio_cross_project_asset_package"; payload: ExportStudioCrossProjectAssetPackageInput }
   | { command: "import_studio_cross_project_asset_package"; payload: ImportStudioCrossProjectAssetPackageInput }
+  | { command: "reuse_studio_global_resource"; payload: ReuseStudioGlobalResourceInput }
   | { command: "initialize_studio_production"; payload: Record<string, never> }
   | { command: "create_studio_script_document"; payload: CreateStudioScriptDocumentInput }
   | { command: "create_studio_prompt_document"; payload: CreateStudioPromptDocumentInput }
@@ -528,6 +533,7 @@ export type StudioCommandRequest = Extract<CommandRequest, {
     | "set_studio_primary_authority"
     | "export_studio_cross_project_asset_package"
     | "import_studio_cross_project_asset_package"
+    | "reuse_studio_global_resource"
     | "initialize_studio_production"
     | "create_studio_script_document"
     | "create_studio_prompt_document"
@@ -2788,6 +2794,12 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
     case "import_studio_cross_project_asset_package": {
       await inspectManagedProject(projectRoot);
       return importStudioCrossProjectAssetPackage(projectRoot, request.payload);
+    }
+    case "reuse_studio_global_resource": {
+      await inspectManagedProject(projectRoot);
+      return reuseStudioGlobalResource(projectRoot, request.payload, {
+        commandRequestHash: commandRequestHash(projectRoot, request),
+      });
     }
     case "initialize_studio_production": {
       await inspectManagedProject(projectRoot);

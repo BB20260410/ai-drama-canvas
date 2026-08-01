@@ -62,6 +62,17 @@ describe("画布布局 CAS 三方合并", () => {
       .toThrow(StudioCanvasLayoutMergeConflictError);
   });
 
+  it("跨窗口同时修改 viewport 仍失败关闭，不以当前窗口静默覆盖远端", () => {
+    const base = snapshotStudioCanvasLayout(layout());
+    const local = structuredClone(base);
+    const remote = structuredClone(base);
+    local.viewport = { x: 10, y: 20, zoom: 1.1 };
+    remote.viewport = { x: 30, y: 40, zoom: 0.9 };
+
+    expect(() => mergeStudioCanvasLayoutThreeWay(base, local, remote))
+      .toThrow(StudioCanvasLayoutMergeConflictError);
+  });
+
   it("首次 CAS 冲突后重读并合并；二次冲突报告真实重试错误", async () => {
     const baseLayout = layout();
     const remoteLayout = layout({

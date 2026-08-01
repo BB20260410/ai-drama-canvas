@@ -34,14 +34,7 @@
     <div
       v-if="displayThumbnailUrl"
       class="thumb-wrap"
-      :class="{ 'exportable': canExportMedia, 'export-armed': exportArmed }"
-      :title="exportTitle"
       data-testid="managed-canvas-node-thumb-wrap"
-      @pointerdown="onThumbPointerDown"
-      @pointerup="onThumbPointerUp"
-      @pointercancel="onThumbPointerUp"
-      @pointerleave="onThumbPointerLeave"
-      @dragstart="onThumbDragStart"
       @click.stop>
       <img
         class="thumb"
@@ -49,15 +42,31 @@
         :alt="data.title"
         loading="lazy"
         decoding="async"
-        :draggable="exportArmed"
+        draggable="false"
         data-testid="managed-canvas-node-thumb"
         @error="recoverThumbnail"
       />
-      <span v-if="canExportMedia" class="export-hint" aria-hidden="true">{{ exportArmed ? "拖到桌面" : "长按拖出" }}</span>
     </div>
     <div v-else class="thumb-placeholder" aria-hidden="true">
       <span>{{ kindMark }}</span>
     </div>
+    <button
+      v-if="canExportMedia"
+      type="button"
+      class="media-export-handle nodrag nopan"
+      :class="{ ready: exportArmed, preparing: exportPreparing }"
+      draggable="true"
+      :title="exportTitle"
+      :aria-label="exportTitle"
+      data-testid="managed-canvas-media-export-handle"
+      @pointerenter="armExport"
+      @focus="armExport"
+      @pointerdown.stop="onExportPointerDown"
+      @click.stop.prevent="armExport"
+      @dragstart="onExportDragStart">
+      <span aria-hidden="true">{{ exportPreparing ? "…" : "⧉" }}</span>
+      <small>{{ exportHintLabel }}</small>
+    </button>
     <span v-if="data.locked" class="node-badge" role="img" aria-label="参考图已锁定" title="参考图已锁定"><Lock :size="11" aria-hidden="true" /></span>
     <div class="body">
       <span class="kind-label">{{ data.kindLabel }}</span>
@@ -108,7 +117,7 @@ import { Lock } from "lucide-vue-next";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 export interface ManagedStudioCanvasNodeData {
-  kind: "asset" | "reference" | "unit" | "panel" | "script" | "prompt" | "raw" | "labeled" | "review" | "video" | "continuity";
+  kind: "asset" | "reference" | "unit" | "panel" | "script" | "prompt" | "image" | "raw" | "labeled" | "review" | "video" | "audio" | "continuity";
   kindLabel: string;
   title: string;
   subtitle?: string;
@@ -127,31 +136,27 @@ export interface ManagedStudioCanvasNodeData {
   referenceType?: "character" | "scene" | "prop" | "style" | "vfx" | "mixed";
   /** 当前节点实际展示/冻结的媒体身份；完整值由 title 与辅助技术读取保留。 */
   mediaSha256?: string;
-  /** 可拖出的受管媒体 SHA（图/视频） */
+  /** 可拖出的受管媒体 SHA（图片/视频/音频）。 */
   exportMediaSha256?: string;
   exportFileName?: string;
   projectRoot?: string;
 }
 
-const LONG_PRESS_MS = 320;
-
 const props = defineProps<{ data: ManagedStudioCanvasNodeData }>();
 
 const exportArmed = ref(false);
+const exportPreparing = ref(false);
 const exportError = ref("");
-const preparedExportPath = ref<string | null>(null);
+const preparedExportToken = ref<string | null>(null);
 const thumbnailRepairing = ref(false);
 const thumbnailFailed = ref(false);
 const thumbnailRetryNonce = ref(0);
 const thumbnailRepairAttempts = ref(0);
-let pressTimer: ReturnType<typeof setTimeout> | null = null;
 let armExpireTimer: ReturnType<typeof setTimeout> | null = null;
-let preparing = false;
 
 const canExportMedia = computed(() => Boolean(
   props.data.exportMediaSha256
   && props.data.projectRoot
-  && props.data.thumbnailUrl
   && !props.data.missing,
 ));
 
@@ -164,9 +169,15 @@ const displayThumbnailUrl = computed(() => {
 
 const exportTitle = computed(() => {
   if (!canExportMedia.value) return undefined;
+  if (exportPreparing.value) return "正在复验并准备拖出复制体";
   return exportArmed.value
-    ? "已就绪：拖到桌面或其他软件"
-    : "长按缩略图，再拖出图片/视频到桌面或其他软件";
+    ? "已就绪：拖到桌面或其他软件；画布原件会保留"
+    : "拖出图片、视频或音频复制体；画布原件会保留";
+});
+
+const exportHintLabel = computed(() => {
+  if (exportPreparing.value) return "准备中";
+  return exportArmed.value ? "拖出复制体" : "拖出";
 });
 
 const kindMark = computed(() => {
@@ -177,10 +188,12 @@ const kindMark = computed(() => {
     case "panel": return "格";
     case "script": return "剧";
     case "prompt": return "词";
+    case "image": return "图";
     case "raw": return "原";
     case "labeled": return "标";
     case "review": return "审";
     case "video": return "视";
+    case "audio": return "音";
     case "continuity": return "续";
     default: return "·";
   }
@@ -229,13 +242,6 @@ watch(
   },
 );
 
-function clearPressTimer(): void {
-  if (pressTimer) {
-    clearTimeout(pressTimer);
-    pressTimer = null;
-  }
-}
-
 function clearArmExpireTimer(): void {
   if (armExpireTimer) {
     clearTimeout(armExpireTimer);
@@ -244,18 +250,18 @@ function clearArmExpireTimer(): void {
 }
 
 function disarmExport(): void {
-  clearPressTimer();
   clearArmExpireTimer();
   exportArmed.value = false;
-  preparedExportPath.value = null;
+  preparedExportToken.value = null;
   exportError.value = "";
 }
 
 async function armExport(): Promise<void> {
-  if (!canExportMedia.value || preparing) return;
+  if (!canExportMedia.value || exportPreparing.value || preparedExportToken.value) return;
   const projectRoot = props.data.projectRoot!;
   const mediaSha256 = props.data.exportMediaSha256!;
-  preparing = true;
+  const identity = `${projectRoot}\u0000${mediaSha256}`;
+  exportPreparing.value = true;
   exportError.value = "";
   try {
     const prepared = await window.canvasApi.prepareStudioMediaExport(
@@ -263,66 +269,52 @@ async function armExport(): Promise<void> {
       mediaSha256,
       props.data.exportFileName ?? props.data.title,
     );
-    preparedExportPath.value = prepared.exportPath;
+    if (`${props.data.projectRoot ?? ""}\u0000${props.data.exportMediaSha256 ?? ""}` !== identity) return;
+    preparedExportToken.value = prepared.token;
     exportArmed.value = true;
     clearArmExpireTimer();
-    // 武装后 4s 未拖出则自动解除，避免一直锁住节点
+    // 主进程 token 30 秒失效；UI 提前解除，避免用户拖到过期 token。
     armExpireTimer = setTimeout(() => {
       if (exportArmed.value) disarmExport();
-    }, 4_000);
+    }, 25_000);
   } catch (error) {
     exportError.value = error instanceof Error ? error.message : "准备拖出失败";
     exportArmed.value = false;
-    preparedExportPath.value = null;
+    preparedExportToken.value = null;
   } finally {
-    preparing = false;
+    exportPreparing.value = false;
   }
 }
 
-function onThumbPointerDown(event: PointerEvent): void {
+function onExportPointerDown(event: PointerEvent): void {
   if (!canExportMedia.value) return;
   if (event.button !== 0) return;
-  // 阻止 Vue Flow 节点拖移，保留缩略图长按拖出语义
   event.stopPropagation();
-  clearPressTimer();
   exportError.value = "";
-  pressTimer = setTimeout(() => {
-    void armExport();
-  }, LONG_PRESS_MS);
+  if (!preparedExportToken.value) void armExport();
 }
 
-function onThumbPointerUp(): void {
-  clearPressTimer();
-  // 松手且未开始原生拖时解除武装，避免误拖
-  if (!preparing) {
-    // 给 dragstart 留一帧；若用户在武装后立刻拖会走 dragstart
-    window.setTimeout(() => {
-      if (!preparing) {
-        /* keep armed briefly while user starts drag */
-      }
-    }, 0);
-  }
-}
-
-function onThumbPointerLeave(): void {
-  // 指针离开缩略图且未在拖时取消长按计时；已武装保留以便拖出
-  clearPressTimer();
-}
-
-function onThumbDragStart(event: DragEvent): void {
-  if (!exportArmed.value || !preparedExportPath.value) {
+function onExportDragStart(event: DragEvent): void {
+  if (!exportArmed.value || !preparedExportToken.value) {
     event.preventDefault();
+    exportError.value = exportPreparing.value ? "正在准备，请稍后再拖一次。" : "拖出复制体尚未就绪。";
+    if (!exportPreparing.value) void armExport();
     return;
   }
   event.stopPropagation();
   event.preventDefault();
-  window.canvasApi.startNativeFileDrag(preparedExportPath.value);
-  // 一次拖出后解除武装，下次需再长按
+  if (event.dataTransfer) event.dataTransfer.effectAllowed = "copy";
+  window.canvasApi.startNativeFileDrag(preparedExportToken.value);
+  // 一次性 token 已消费；下一次拖出必须重新复验、重新复制。
   window.setTimeout(() => disarmExport(), 50);
 }
 
+watch(
+  () => [props.data.projectRoot, props.data.exportMediaSha256, props.data.exportFileName],
+  () => disarmExport(),
+);
+
 onBeforeUnmount(() => {
-  clearPressTimer();
   clearArmExpireTimer();
 });
 </script>
@@ -366,10 +358,12 @@ onBeforeUnmount(() => {
 .msc-node.kind-panel { border-color: var(--msc-kind-panel); background: color-mix(in srgb, var(--msc-kind-panel) 9%, var(--msc-surface)); }
 .msc-node.kind-script { border-color: var(--msc-kind-script); background: color-mix(in srgb, var(--msc-kind-script) 9%, var(--msc-surface)); }
 .msc-node.kind-prompt { border-color: var(--msc-kind-prompt); background: color-mix(in srgb, var(--msc-kind-prompt) 9%, var(--msc-surface)); }
+.msc-node.kind-image { border-color: var(--msc-kind-raw); background: color-mix(in srgb, var(--msc-kind-raw) 9%, var(--msc-surface)); }
 .msc-node.kind-raw { border-color: var(--msc-kind-raw); background: color-mix(in srgb, var(--msc-kind-raw) 9%, var(--msc-surface)); }
 .msc-node.kind-labeled { border-color: var(--msc-kind-labeled); background: color-mix(in srgb, var(--msc-kind-labeled) 9%, var(--msc-surface)); }
 .msc-node.kind-review { border-color: var(--msc-kind-review); background: color-mix(in srgb, var(--msc-kind-review) 9%, var(--msc-surface)); }
 .msc-node.kind-video { border-color: var(--msc-kind-labeled); background: color-mix(in srgb, var(--msc-kind-labeled) 9%, var(--msc-surface)); }
+.msc-node.kind-audio { border-color: var(--msc-accent); background: color-mix(in srgb, var(--msc-accent) 9%, var(--msc-surface)); }
 .msc-node.kind-continuity { border-color: var(--msc-kind-unit); background: color-mix(in srgb, var(--msc-kind-unit) 9%, var(--msc-surface)); }
 .msc-node.busy { outline: 1px solid var(--msc-accent); }
 .connection-handle {
@@ -410,13 +404,6 @@ onBeforeUnmount(() => {
   overflow: hidden;
   border-radius: 9px 9px 0 0;
 }
-.thumb-wrap.exportable {
-  cursor: grab;
-}
-.thumb-wrap.export-armed {
-  cursor: grabbing;
-  box-shadow: inset 0 0 0 2px var(--msc-accent);
-}
 .thumb {
   width: 100%;
   height: 100%;
@@ -425,21 +412,40 @@ onBeforeUnmount(() => {
   user-select: none;
   -webkit-user-drag: none;
 }
-.thumb-wrap.export-armed .thumb {
-  -webkit-user-drag: element;
-}
-.export-hint {
+.media-export-handle {
   position: absolute;
-  left: 6px;
-  bottom: 6px;
-  z-index: 2;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--msc-surface) 88%, transparent);
+  top: 80px;
+  right: 6px;
+  z-index: 5;
+  height: 23px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 7px;
+  border: 1px solid var(--msc-line);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--msc-surface) 92%, transparent);
   color: var(--msc-text-2);
+  cursor: grab;
+  user-select: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .16);
+}
+.media-export-handle small {
   font-size: 9px;
-  letter-spacing: .02em;
-  pointer-events: none;
+  white-space: nowrap;
+}
+.media-export-handle.ready {
+  border-color: var(--msc-accent);
+  background: var(--msc-accent-soft);
+  color: var(--msc-accent-strong);
+  cursor: grab;
+}
+.media-export-handle.ready:active {
+  cursor: grabbing;
+}
+.media-export-handle.preparing {
+  cursor: wait;
+  opacity: .82;
 }
 .export-error {
   position: absolute;

@@ -12,6 +12,13 @@ describe("源码桌面 IPC 副作用默认拒绝策略", () => {
     expect(runtimeIpcEffect("canvas:get-default-managed-projects-root")).toBe("read-only");
     expect(runtimeIpcEffect("canvas:get-managed-project-operation-state")).toBe("read-only");
     expect(runtimeIpcEffect("canvas:get-local-creative-project-ingest-status")).toBe("read-only");
+    expect(runtimeIpcEffect("canvas:list-global-studio-assets")).toBe("read-only");
+    expect(runtimeIpcEffect("canvas:list-global-studio-asset-images")).toBe("read-only");
+    expect(runtimeIpcEffect("canvas:get-global-studio-asset-image")).toBe("read-only");
+    expect(runtimeIpcEffect("canvas:list-global-studio-image-resources")).toBe("read-only");
+    expect(runtimeIpcEffect("canvas:get-global-studio-image-resource")).toBe("read-only");
+    expect(runtimeIpcEffect("canvas:list-global-studio-media-resources")).toBe("read-only");
+    expect(runtimeIpcEffect("canvas:get-global-studio-media-resource")).toBe("read-only");
     expect(runtimeIpcEffect("canvas:load-studio-canvas-layout")).toBe("read-only");
     expect(runtimeIpcEffect("canvas:get-studio-unit-write-leases")).toBe("read-only");
     expect(runtimeIpcEffect("canvas:pick-managed-projects-parent")).toBe("external-side-effect");
@@ -23,6 +30,13 @@ describe("源码桌面 IPC 副作用默认拒绝策略", () => {
     expect(runtimeIpcGateMode("canvas:get-runtime-write-gate")).toBe("bypass");
     expect(runtimeIpcGateMode("canvas:get-runtime-build-identity")).toBe("bypass");
     expect(runtimeIpcGateMode("canvas:get-active-project")).toBe("cached-read");
+    expect(runtimeIpcGateMode("canvas:list-global-studio-assets")).toBe("cached-read");
+    expect(runtimeIpcGateMode("canvas:list-global-studio-asset-images")).toBe("cached-read");
+    expect(runtimeIpcGateMode("canvas:get-global-studio-asset-image")).toBe("cached-read");
+    expect(runtimeIpcGateMode("canvas:list-global-studio-image-resources")).toBe("cached-read");
+    expect(runtimeIpcGateMode("canvas:get-global-studio-image-resource")).toBe("cached-read");
+    expect(runtimeIpcGateMode("canvas:list-global-studio-media-resources")).toBe("cached-read");
+    expect(runtimeIpcGateMode("canvas:get-global-studio-media-resource")).toBe("cached-read");
     expect(runtimeIpcGateMode("canvas:get-index")).toBe("strong");
     expect(runtimeIpcGateMode("canvas:pick-managed-projects-parent")).toBe("strong");
   });

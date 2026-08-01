@@ -156,6 +156,13 @@ const api = {
   getStudioMediaDerivatives: (projectRoot: string, sha256: string): Promise<StudioMediaDerivativeIpcItem[]> => ipcRenderer.invoke("canvas:get-studio-media-derivatives", projectRoot, sha256),
   prepareStudioMediaDerivatives: (projectRoot: string, sha256: string): Promise<StudioMediaDerivativeIpcResult> => ipcRenderer.invoke("canvas:prepare-studio-media-derivatives", projectRoot, sha256),
   listStudioAssets: (projectRoot: string, query: import("../core/material-studio.js").StudioCanonicalAssetListQuery = {}): ReturnType<typeof import("../core/material-studio.js").listStudioCanonicalAssets> => ipcRenderer.invoke("canvas:list-studio-assets", projectRoot, query),
+  listGlobalStudioAssets: (query: import("../core/studio-global-asset-catalog.js").GlobalStudioAssetCatalogQuery): ReturnType<typeof import("../core/studio-global-asset-catalog.js").listGlobalStudioAssetCatalog> => ipcRenderer.invoke("canvas:list-global-studio-assets", query),
+  listGlobalStudioAssetImages: (query: import("../core/studio-global-asset-catalog.js").GlobalStudioAssetResourceImageQuery): ReturnType<typeof import("../core/studio-global-asset-catalog.js").listGlobalStudioAssetResourceImages> => ipcRenderer.invoke("canvas:list-global-studio-asset-images", query),
+  getGlobalStudioAssetImage: (projectRoot: string, mediaSha256: string): ReturnType<typeof import("../core/studio-global-asset-catalog.js").getGlobalStudioAssetResourceImage> => ipcRenderer.invoke("canvas:get-global-studio-asset-image", projectRoot, mediaSha256),
+  listGlobalStudioImageResources: (query: import("../core/studio-global-image-resource-catalog.js").GlobalStudioImageResourceQuery): ReturnType<typeof import("../core/studio-global-image-resource-catalog.js").listGlobalStudioImageResources> => ipcRenderer.invoke("canvas:list-global-studio-image-resources", query),
+  getGlobalStudioImageResource: (projectRoot: string, mediaSha256: string): ReturnType<typeof import("../core/studio-global-image-resource-catalog.js").getGlobalStudioImageResource> => ipcRenderer.invoke("canvas:get-global-studio-image-resource", projectRoot, mediaSha256),
+  listGlobalStudioMediaResources: (query: import("../core/studio-global-asset-catalog.js").GlobalStudioMediaResourceQuery): ReturnType<typeof import("../core/studio-global-asset-catalog.js").listGlobalStudioMediaResources> => ipcRenderer.invoke("canvas:list-global-studio-media-resources", query),
+  getGlobalStudioMediaResource: (projectRoot: string, mediaSha256: string): ReturnType<typeof import("../core/studio-global-asset-catalog.js").getGlobalStudioMediaResource> => ipcRenderer.invoke("canvas:get-global-studio-media-resource", projectRoot, mediaSha256),
   getStudioAsset: (projectRoot: string, assetId: string): ReturnType<typeof import("../core/material-studio.js").getStudioCanonicalAsset> => ipcRenderer.invoke("canvas:get-studio-asset", projectRoot, assetId),
   getStudioProductionState: (projectRoot: string): ReturnType<typeof import("../core/studio-production.js").getStudioProductionState> => ipcRenderer.invoke("canvas:get-studio-production-state", projectRoot),
   getStudioGenerationLedgerState: (projectRoot: string): ReturnType<typeof import("../core/studio-generation-ledger.js").getStudioGenerationLedgerState> => ipcRenderer.invoke("canvas:get-studio-generation-ledger-state", projectRoot),
@@ -430,22 +437,23 @@ const api = {
   submitReview: (projectRoot: string, input: SubmitReviewInput) => ipcRenderer.invoke("canvas:submit-review", projectRoot, input),
   showInFolder: (filePath: string) => ipcRenderer.invoke("canvas:show-in-folder", filePath),
   openPath: (filePath: string) => ipcRenderer.invoke("canvas:open-path", filePath),
-  /** 把受管媒体物化为临时可拖出文件（含扩展名）。 */
+  /** 主进程复验并物化拖出复制体；renderer 仅接收一次性 token，不接收任何路径。 */
   prepareStudioMediaExport: (
     projectRoot: string,
     mediaSha256: string,
     suggestedName?: string,
   ): Promise<{
-    exportPath: string;
+    token: string;
     fileName: string;
     kind: "image" | "video" | "audio";
     mimeType: string;
     sha256: string;
     sizeBytes: number;
+    expiresAt: string;
   }> => ipcRenderer.invoke("canvas:prepare-studio-media-export", projectRoot, mediaSha256, suggestedName),
-  /** OS 原生拖出：须在 thumb dragstart 内同步调用。 */
-  startNativeFileDrag: (exportPath: string): void => {
-    ipcRenderer.send("canvas:start-native-file-drag", exportPath);
+  /** OS 原生拖出：须在独立拖出手柄的 dragstart 内同步调用。 */
+  startNativeFileDrag: (token: string): void => {
+    ipcRenderer.send("canvas:start-native-file-drag", token);
   },
   backupManagedProject: (projectRoot: string): Promise<{ canceled: true } | { canceled: false; backupRoot: string; fileCount: number; fingerprint: string; createdAt: string }> => ipcRenderer.invoke("canvas:backup-managed-project", projectRoot),
   restoreManagedProject: (): Promise<{ canceled: true } | { canceled: false; projectRoot: string; projectName: string; fileCount: number; fingerprint: string }> => ipcRenderer.invoke("canvas:restore-managed-project"),
