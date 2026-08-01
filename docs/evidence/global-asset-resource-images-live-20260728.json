@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "kind": "global-asset-resource-images-live-audit",
+  "status": "PASS",
+  "checkedAt": "2026-07-28T04:04:04.972Z",
+  "checks": {
+    "registeredProjects": 28,
+    "readableProjects": 26,
+    "unavailableProjects": [
+      {
+        "id": "gushujuan-s3-f1a688020bfb7af6",
+        "name": "蜀道山·古蜀卷 第三季",
+        "reason": "not-managed"
+      },
+      {
+        "id": "project-db859b8c6696",
+        "name": "蜀道山·古蜀卷 第三季",
+        "reason": "not-managed"
+      }
+    ],
+    "canonicalAssetCounts": {
+      "total": 457,
+      "character": 338,
+      "scene": 65,
+      "prop": 51,
+      "style": 3
+    },
+    "resourceCounts": {
+      "total": 549,
+      "character": 396,
+      "scene": 100,
+      "prop": 50,
+      "style": 3
+    },
+    "categoryQueryTotals": {
+      "character": 396,
+      "scene": 100,
+      "prop": 50,
+      "style": 3
+    },
+    "uniqueProjectImageResources": 549,
+    "versionAssociations": 552,
+    "reviewAssociations": {
+      "pending": 310,
+      "approved": 242,
+      "rejected": 0
+    },
+    "primaryAssociations": 148,
+    "imageCoverage": {
+      "totalImages": 8793,
+      "assetVersionImages": 549,
+      "ordinaryImages": 8244
+    },
+    "pageSizeLimit": 36,
+    "pagesRead": {
+      "character": 11,
+      "scene": 3,
+      "prop": 2,
+      "style": 1
+    },
+    "allNamesNonBlank": true,
+    "allSha256Valid": true,
+    "allThumbnailRecipesPresent": true,
+    "registryAndDatabasesUnchanged": true
+  },
+  "registryFingerprint": "87df1586050d84698f957ef834299614e1173af327d51f9d0c49102bdd04c12f",
+  "guardedFileCount": 27
+}

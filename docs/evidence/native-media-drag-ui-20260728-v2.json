@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "verdict": "PASS",
+  "testedAt": "2026-07-28T08:23:16.534Z",
+  "isolation": {
+    "registeredProjects": 1,
+    "formalProjectTouched": false,
+    "externalRequests": []
+  },
+  "build": {
+    "buildId": "c307eaba01557cafa72e2684bbe383ef",
+    "sourceDigest": "5ddecb0428c0a652a9de6e986e2d22a1afe54885a726b5f9e67c2cc5798935f1",
+    "mcpToolCount": 202
+  },
+  "mediaLibrary": {
+    "pageLimit": 36,
+    "displayedKinds": [
+      "image",
+      "video",
+      "audio"
+    ],
+    "canvasNodeCount": 3,
+    "copySemanticsVisible": true
+  },
+  "dragPreparation": [
+    {
+      "kind": "image",
+      "sourceBasename": "拖出图片样本.png",
+      "sha256": "c7a8bca7208184891ac3ddb0572b041140bebc97c85c08db2c173fe71aa52117",
+      "sizeBytes": 17185,
+      "exportedFileName": "拖出图片样本.png",
+      "extension": ".png",
+      "independentCopy": true,
+      "symbolicLink": false,
+      "sourceCasUnchanged": true
+    },
+    {
+      "kind": "video",
+      "sourceBasename": "拖出视频样本.mp4",
+      "sha256": "c8c5af84ac765d911a9ab05bc9a19d15d0b1bc5cf0654eff4469ce536410654e",
+      "sizeBytes": 24,
+      "exportedFileName": "拖出视频样本.mp4",
+      "extension": ".mp4",
+      "independentCopy": true,
+      "symbolicLink": false,
+      "sourceCasUnchanged": true
+    },
+    {
+      "kind": "audio",
+      "sourceBasename": "拖出音频样本.wav",
+      "sha256": "4f8734c5e13ac599e168cf247a51c1dd0758537ce00bf16d7fed1a3d14d07041",
+      "sizeBytes": 44,
+      "exportedFileName": "拖出音频样本.wav",
+      "extension": ".wav",
+      "independentCopy": true,
+      "symbolicLink": false,
+      "sourceCasUnchanged": true
+    }
+  ],
+  "nativeDragBridge": {
+    "calls": [
+      {
+        "kind": "image",
+        "fileName": "拖出图片样本.png",
+        "nonEmptyIcon": true
+      },
+      {
+        "kind": "video",
+        "fileName": "拖出视频样本.mp4",
+        "nonEmptyIcon": true
+      },
+      {
+        "kind": "audio",
+        "fileName": "拖出音频样本.wav",
+        "nonEmptyIcon": true
+      }
+    ],
+    "rendererReceivedAbsolutePath": false,
+    "tokenBoundOneUseContract": true
+  },
+  "ui": {
+    "thumbnailDraggable": "false",
+    "readyHandleCount": 3,
+    "screenshot": {
+      "relativePath": "docs/evidence/native-media-drag-ui-20260728-v2.png",
+      "sizeBytes": 191894,
+      "sha256": "9388e6f6934e2c823c305bce3dbb4259b88c72f33b622ddcfd86427a8a605d60"
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  }
+}

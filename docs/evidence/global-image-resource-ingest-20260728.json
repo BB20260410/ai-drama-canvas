@@ -1,0 +1,415 @@
+{
+  "schemaVersion": 1,
+  "kind": "global-image-resource-ingest-evidence",
+  "generatedAt": "2026-07-28T06:22:17.384Z",
+  "conclusion": "PASS",
+  "policy": {
+    "globalCatalog": "federated-registry-project-sqlite-cas",
+    "sourceMutation": "none",
+    "importOwner": "executeIdempotentCommand/import_studio_media",
+    "classificationAuthorityPromotion": "none",
+    "legacyAllowedRoots": [
+      "assets",
+      "authorities",
+      "production"
+    ],
+    "legacyExcludedPrivateTree": ".aicanvas"
+  },
+  "imported": {
+    "managedMissingCount": 4,
+    "legacyFormalCount": 57,
+    "hiddenLegacyPrivateImagesExcluded": 72,
+    "mirrorProjectId": "project-3ff7c5c17db2",
+    "mirrorProjectName": "《蜀道山·古蜀卷》第三季·总资源受管镜像",
+    "mirrorProjectRoot": "/Users/hxx/Documents/无限画布/projects/global-resource-legacy-gushujuan-s3-4404be66",
+    "sources": [
+      {
+        "sourceGroup": "managed-missing",
+        "relativePath": "imports/visual-locks/scenes/style-cloudsea_board.jpg",
+        "sha256": "b5473852d6ead485c53895619cec695c247f975b148f585646e362caeb66f776",
+        "sizeBytes": 282711
+      },
+      {
+        "sourceGroup": "managed-missing",
+        "relativePath": "imports/visual-locks/scenes/style-golden-palace_board.jpg",
+        "sha256": "f8e624519fafd7f2cb5ec2a550820a554926a5e7b7289b7c593aa766b030816a",
+        "sizeBytes": 876597
+      },
+      {
+        "sourceGroup": "managed-missing",
+        "relativePath": "imports/visual-locks/styles/LOCK_R-CINE_approved_daily_family.jpg",
+        "sha256": "138fcb5c9d306b32c2c1c06fd798bf86a5c9c47669a4b73b24877714299d8034",
+        "sizeBytes": 296080
+      },
+      {
+        "sourceGroup": "managed-missing",
+        "relativePath": "imports/visual-locks/styles/LOCK_R-NIGHT_approved_night_battle.jpg",
+        "sha256": "c63fe54405dcf5b1d0a88ae57ea0f1570c9420c471d812cdde01c49ad028c1db",
+        "sizeBytes": 257762
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/C03a_禾安·婴儿/AI画布生成/C03a_资产_2ae3b748_labeled.png",
+        "sha256": "4d017dfd03f2f8696a3e2e0c7deaf9761cee71517561d8a514e2d0c64c3780d6",
+        "sizeBytes": 2695888
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/C03a_禾安·婴儿/AI画布生成/C03a_资产_2ae3b748_raw.png",
+        "sha256": "5491fc11fa7fd85c7040e36adf8603b5ba8bf24021159dfd32aa985e91d19227",
+        "sizeBytes": 1983096
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/C04a_榛母·中年/AI画布生成/C04a_资产_ae6fbbb8_labeled.png",
+        "sha256": "c77ef4e52c77cabad4733f54673e510b76cacb836faebab83de77cc8bab012ad",
+        "sizeBytes": 2180967
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/C04a_榛母·中年/AI画布生成/C04a_资产_ae6fbbb8_raw.png",
+        "sha256": "bb77ec684d012b904cd6af0fb744582e87b06cc7f6199395d8f16147edaed709",
+        "sizeBytes": 1901920
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/C07_姜子牙/AI画布生成/C07_资产_d9861f39_labeled.png",
+        "sha256": "70ff3f5b6e4ce6ca6aa0231a86897980222030dafad1633e9da37996f2e97c3a",
+        "sizeBytes": 2737920
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/C07_姜子牙/AI画布生成/C07_资产_d9861f39_raw.png",
+        "sha256": "a92bddc6ff58ab70fb3b453a391f630f05f8cf967d9898b93d1021709eaca97c",
+        "sizeBytes": 2602033
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/C09_管牍长者(铜匠长者)/AI画布生成/C09_资产_864dc4e4_labeled.png",
+        "sha256": "1978140c4ef8ceb5da36b67801da109447cc786f65e3202bb3b2e29c5d1be2c5",
+        "sizeBytes": 1715418
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/C09_管牍长者(铜匠长者)/AI画布生成/C09_资产_864dc4e4_raw.png",
+        "sha256": "6831af44de777117cd9bb61f30e36fc9c0e488281e487fee107d08451bceda71",
+        "sizeBytes": 1375248
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/C12_产婆/AI画布生成/C12_资产_48d2ac40_labeled.png",
+        "sha256": "6a6ec3d6c6487ca81b94cacb65408bffb7541df228307d7c9756ce89ec8d3153",
+        "sizeBytes": 2270423
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/C12_产婆/AI画布生成/C12_资产_48d2ac40_raw.png",
+        "sha256": "f037ae8befee31670789b3e5cc6ebbe449c359870df05811ca3ca8146d4a8223",
+        "sizeBytes": 1683604
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P01_阿航胸前布囊_★面具铁律替代资产/AI画布生成/P01_资产_23ac427f_labeled.png",
+        "sha256": "efc6bf7e3c33470d2f4d78245caceb956840611c5db1209af702c36ebdabedfc",
+        "sizeBytes": 2002008
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P01_阿航胸前布囊_★面具铁律替代资产/AI画布生成/P01_资产_23ac427f_raw.png",
+        "sha256": "907e96df267d3520c302ea2dad36afa5f6c42181f28492bd35a22450e5ad70a5",
+        "sizeBytes": 1615604
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P03_半璧(随魂素玉)/AI画布生成/P03_资产_6474db01_labeled.png",
+        "sha256": "1e83761ba5020ccc9a3fd4b503ba56da8c78544bf73b8ed764bd8c6b6dfc377e",
+        "sizeBytes": 1479577
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P03_半璧(随魂素玉)/AI画布生成/P03_资产_6474db01_raw.png",
+        "sha256": "e499749c5362379f067604a22d67c2072cc64e570e49cb69c1c67b2c1fa5db6f",
+        "sizeBytes": 1112291
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P07_记名木牍(通用)/AI画布生成/P07_资产_2ce8aa79_labeled.png",
+        "sha256": "746700790161a28bc5fd4165eaafa99c16c64b3484f95c79ba015e6249b6fc76",
+        "sizeBytes": 2610350
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P07_记名木牍(通用)/AI画布生成/P07_资产_2ce8aa79_raw.png",
+        "sha256": "e9a9e74dc533ac651d46281aa9edb86f5260dd989e28bd681686a4603f7a4219",
+        "sizeBytes": 2090020
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P09_青铜刻刀/AI画布生成/P09_资产_9646965b_labeled.png",
+        "sha256": "94dc69b8a706806e309566cf3a5fa5d077edd464576558636bcadf3f052de7d8",
+        "sizeBytes": 1303652
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P09_青铜刻刀/AI画布生成/P09_资产_9646965b_raw.png",
+        "sha256": "ebd254c68967cb3738db00430f39b8c4da961eadfa0d4e9a4fddfb86a1a04f67",
+        "sizeBytes": 1166914
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P10_「无名医」木牌/AI画布生成/P10_资产_5c528d9a_labeled.png",
+        "sha256": "972b47d81a9b09f8e935d70f14120a5533f7dfb9c29ee02a74cbbb5ea6b928fc",
+        "sizeBytes": 2211952
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P10_「无名医」木牌/AI画布生成/P10_资产_5c528d9a_raw.png",
+        "sha256": "d21c92306216f92e7c627eb751c4855c998cc8a257c63bc05beaddd64b65afd0",
+        "sizeBytes": 1650675
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P11_阿航行医装备组/AI画布生成/P11_资产_743ecb95_labeled.png",
+        "sha256": "bf58ec209333ba66959af05829aaf21a84b0d8e9a8e535948f55cb0a97baa634",
+        "sizeBytes": 2829749
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P11_阿航行医装备组/AI画布生成/P11_资产_743ecb95_raw.png",
+        "sha256": "89d301fbf829d6d653f9c5fef7afa1d5bcb410165f8d5f1cfd5322637167b8ed",
+        "sizeBytes": 2304267
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P29_姜子牙木杖/AI画布生成/P29_资产_c9b89a3b_labeled.png",
+        "sha256": "b7da4744b951d45a682facb9c6d0817f7ae841d9459247991eee30a685046a0f",
+        "sizeBytes": 822447
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P29_姜子牙木杖/AI画布生成/P29_资产_c9b89a3b_raw.png",
+        "sha256": "6c554348cacd6cfb0bba96e4e067c293df93ea83ebdcf01b102f1a7d56710822",
+        "sizeBytes": 778133
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P30_天庭职司牌/AI画布生成/P30_资产_c7ecc0a0_labeled.png",
+        "sha256": "08cffce611ea3b78aa03268ab835cc1ee0ac2f46affb7cbacddd464de9ff128f",
+        "sizeBytes": 1755309
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/P30_天庭职司牌/AI画布生成/P30_资产_c7ecc0a0_raw.png",
+        "sha256": "9cccfe5836edb841f0f4b5889f8c9c7f11458690bc6b396055418a6952415616",
+        "sizeBytes": 1638201
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/S01_岐山封神台·封神榜空白格(神魔层)/AI画布生成/S01_资产_a654d3da_labeled.png",
+        "sha256": "157db6e5a2e04ba1e698db96902f2cb359e8210d9b5cd586aef389ef0c19aba2",
+        "sizeBytes": 3022413
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/S01_岐山封神台·封神榜空白格(神魔层)/AI画布生成/S01_资产_a654d3da_raw.png",
+        "sha256": "bac348616e2ce336d439b8b58ba5d166f2d80acbecb4c6c58116bb77335af017",
+        "sizeBytes": 2886295
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/S02_天庭云署·职司牌阵(神魔层)/AI画布生成/S02_资产_788bc493_labeled.png",
+        "sha256": "39001e89cbd6649ef78eef6e52bf25a82001f2d3f6a28e26c68791ae3d22ab19",
+        "sizeBytes": 4127734
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/S02_天庭云署·职司牌阵(神魔层)/AI画布生成/S02_资产_788bc493_raw.png",
+        "sha256": "c8224304ab4dc97ecf2172068703558aa01ce1929c166ab06da543a8cd791634",
+        "sizeBytes": 2551491
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/S03_周原青铜作坊(院落主场景)/AI画布生成/S03_资产_93de2f22_labeled.png",
+        "sha256": "7e101183811eb9ccfd00dbb136cdb46fc631b3bd34ccc6823e6ed894e59735a7",
+        "sizeBytes": 3516938
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/S03_周原青铜作坊(院落主场景)/AI画布生成/S03_资产_93de2f22_raw.png",
+        "sha256": "4fcf9fdbf17ce1ad3559a69692c0cc78b6c812c207c2c474c3c8aac02f6d1dd1",
+        "sizeBytes": 2455061
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/S07_榛母家(含产房)/AI画布生成/S07_资产_0ae2988b_labeled.png",
+        "sha256": "9ef369bb005ded89510627bb5fcc11b9b7c8329756aaeafd388b37089e68b8fe",
+        "sizeBytes": 3449421
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/S07_榛母家(含产房)/AI画布生成/S07_资产_0ae2988b_raw.png",
+        "sha256": "b7fc40ece9b761f90ff0abb1a94af0ff60d6b8cc9e6c5f7869bc8ddc1cf5beeb",
+        "sizeBytes": 2421750
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/S08_阿航药棚/AI画布生成/S08_资产_08f97395_labeled.png",
+        "sha256": "4f5c92d3fda7173c71fa193495ff3354175f2a5cb0d06a06660e41c1b04b29cc",
+        "sizeBytes": 3898071
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "assets/S08_阿航药棚/AI画布生成/S08_资产_08f97395_raw.png",
+        "sha256": "986738b7078995c35581a6ac8c5f754a0a65fa43c277107928a7c013e3ece398",
+        "sizeBytes": 2753122
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "authorities/ahang/阿航_青年_三视图_.jpg",
+        "sha256": "5132d4320f956cf2a2320e52fae941ef15ffb243ad79343045006a8773f4548e",
+        "sizeBytes": 892422
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "authorities/dudu/嘟嘟参考图.png",
+        "sha256": "d6759fbd03df6d3b9c83e193130bea6073c15865a5f9cf7d308b069ea2b131cd",
+        "sizeBytes": 1825618
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "authorities/golden-mask/D01_整张三星堆黄金面具_真人实拍三视图.png",
+        "sha256": "91b074b882113d6c0bdde156e6d38adf7883e8388ba4064168d6c32ade8e2253",
+        "sizeBytes": 1322937
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格01_首帧_0e3ed496_labeled.png",
+        "sha256": "83b1323b2ac426f924582a39774f7168e16c5672eddd4d48baf6d62f12aab4b8",
+        "sizeBytes": 3845508
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格01_首帧_0e3ed496_raw.png",
+        "sha256": "1fc7eb955a7da6bef6ee07bd0a3eb9aeaa89d97a3f8950dacc1850443abcec1b",
+        "sizeBytes": 2525533
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格02_中间帧_f12f122c_labeled.png",
+        "sha256": "b500ee52d0e6abf34bf8c235b62b93c6f9ab8dde92a2c7004f7670320717b00a",
+        "sizeBytes": 3355288
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格02_中间帧_f12f122c_raw.png",
+        "sha256": "3e4b48a288a53b498768bb4a7001ad0b07b1fb2eec9a6fc2cf923ec800b95890",
+        "sizeBytes": 2387138
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格03_中间帧_c90796be_labeled.png",
+        "sha256": "f93dc909b2792cfc3c5c14bd5dbec64dc03086e15fd495ae8078f657d80eaad7",
+        "sizeBytes": 3881350
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格03_中间帧_c90796be_raw.png",
+        "sha256": "9b96b1275c2edef502ea10cd995c803898319edca4a3147d9399930ad38c1e37",
+        "sizeBytes": 3083765
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格04_尾帧_cb99b5f6_labeled.png",
+        "sha256": "99932b6132ef239edd1a1e71103388d2d2929b9d36dc92e646d10ea19cb0de2f",
+        "sizeBytes": 3792341
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_宫格04_尾帧_cb99b5f6_raw.png",
+        "sha256": "a0e98acee77fe8efd2a5694340be3b5a70e3e387c205e3f9233ea6215586748f",
+        "sizeBytes": 2833125
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.png",
+        "sha256": "8600c46fe40ad797927c68c1bc09072556646a423f5edeb8a14fa90697e1e06e",
+        "sizeBytes": 4472760
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_001_承第二季EP23彩蛋第三/AI画布生成/EP01_15s_001_中文分镜故事板_grid-6c02035d032128e0f62a.svg",
+        "sha256": "420d0cc54a7685a4d58e9f5b3145e8cf1c8248a31483d45d19e61a334b0448de",
+        "sizeBytes": 1184873
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格01_首帧_7d096dcd_labeled.png",
+        "sha256": "f6a26afb3da23add545c7e0141449186176b5d2c8659e73b5d54e32b2e9a0e5b",
+        "sizeBytes": 3558166
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格01_首帧_7d096dcd_raw.png",
+        "sha256": "d328401822b16f9aeedc705d2edd67c7022e7125439769f0dc3405defeca421b",
+        "sizeBytes": 2477201
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格02_中间帧_402d132b_labeled.png",
+        "sha256": "32c7a6428ad43cfd9ee3d7d7edecd2bd7a1b3c2d5ef5c5d312c63ecf297c9832",
+        "sizeBytes": 3512927
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格02_中间帧_402d132b_raw.png",
+        "sha256": "217908c7bd04d55949d7fc6512ec17884111d29a446071a4d8efa9a1fbe616ec",
+        "sizeBytes": 2273741
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格03_中间帧_ddbce3ce_labeled.png",
+        "sha256": "8827a26b7a760471ea95b083c8e831cb9a701e17e2ca1306e706e7fd18179f43",
+        "sizeBytes": 3362986
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格03_中间帧_ddbce3ce_raw.png",
+        "sha256": "9103d855edb5b3d37b5bbbe7d6c5eaeee256224dff0c4e266a55962c95fbbe25",
+        "sizeBytes": 2163838
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格04_中间帧_0020493e_labeled.png",
+        "sha256": "37ce17619649ad544aac1b0379abdefeb231b8d269061f20171f098f08adb2a2",
+        "sizeBytes": 3676799
+      },
+      {
+        "sourceGroup": "legacy-formal",
+        "relativePath": "production/蜀道山古蜀卷第三季_EP01_榜缝_9x16_漫剧/04_15秒融合分镜/EP01_15s_008_面具沉睡嘟嘟先闻到第三世/AI画布生成/EP01_15s_008_宫格04_中间帧_0020493e_raw.png",
+        "sha256": "4dfa9cc50cfa9d6357f5926d8e1f70eaf0e21820c1453239554be49d45b81dc1",
+        "sizeBytes": 2643341
+      }
+    ]
+  },
+  "liveAudit": {
+    "registeredProjectCount": 29,
+    "readableManagedProjectCount": 27,
+    "unavailableProjectCount": 2,
+    "projectImageEntries": 8854,
+    "uniqueContentSha256": 8696,
+    "expectedMinimumProjectImageEntries": 8854,
+    "expectedMinimumUniqueContentSha256": 8696,
+    "unavailable": [
+      {
+        "projectId": "project-db859b8c6696",
+        "projectName": "gushujuan-s3-f1a688020bfb7af6",
+        "projectRoot": "/private/tmp/ai-canvas-continuity-ui-smoke-targets/gushujuan-s3-f1a688020bfb7af6"
+      },
+      {
+        "projectId": "gushujuan-s3-f1a688020bfb7af6",
+        "projectName": "蜀道山·古蜀卷 第三季",
+        "projectRoot": "/Users/hxx/Documents/无限画布/productions/gushujuan-s3-f1a688020bfb7af6"
+      }
+    ]
+  }
+}

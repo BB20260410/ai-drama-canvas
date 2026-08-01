@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "kind": "global-asset-catalog-live-inventory",
+  "status": "PASS_WITH_OPEN_CLASSIFICATION_WORK",
+  "checkedAt": "2026-07-28T03:29:58Z",
+  "source": {
+    "registryEntries": 28,
+    "readableManagedProjects": 26,
+    "unavailableProjects": 2
+  },
+  "namedCanonicalAssets": {
+    "total": 457,
+    "character": 338,
+    "scene": 65,
+    "prop": 51,
+    "style": 3,
+    "blankNames": 0
+  },
+  "authorityCoverage": {
+    "total": 457,
+    "primaryAuthority": 148,
+    "withoutPrimaryAuthority": 309
+  },
+  "imageCoverage": {
+    "totalImages": 8793,
+    "assetVersionImages": 549,
+    "ordinaryImages": 8244
+  },
+  "readOnlyDatabaseIdentityCheck": {
+    "databaseFiles": 26,
+    "changedFiles": 0,
+    "comparedFields": [
+      "size",
+      "mtimeNs"
+    ]
+  },
+  "paginationProbe": {
+    "category": "character",
+    "pageSize": 5,
+    "pageOneItems": 5,
+    "pageTwoItems": 5,
+    "duplicateItems": 0,
+    "total": 338
+  },
+  "searchProbe": {
+    "query": "阿航",
+    "characterMatches": 3,
+    "sceneMatches": 0,
+    "propMatches": 0
+  },
+  "boundary": {
+    "globalCatalogOnlyUsesNamedCanonicalAssets": true,
+    "ordinaryCompositeImagesAreNotSilentlyForcedIntoOneCategory": true,
+    "visualMultiEntityClassificationRemaining": 8244
+  }
+}

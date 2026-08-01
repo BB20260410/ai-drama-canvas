@@ -1,8 +1,128 @@
-# STATUS · 当前源码生产中枢（P0—P9 CLOSED）
+# STATUS · 当前源码生产中枢（P0—P9 CLOSED / MCP_CLIENT_RESTART_PASS）
 
-> 当前恢复结论：截至 2026-07-27 14:55 CST，**P0—P9 已在源码 + 隔离本机候选包范围关账，Git 安全基线也已建立并验收**。最终源码身份 `sourceDigest=d4b07c20…`、`buildId=40b9cc72…`、MCP 202 tools；正式 Dudu 工程真实 Codex 受管生图完成 attempt 1 rework → attempt 2 pass，四轨媒体、剧本产品环、跨项目资产复用、性能硬门、30 分钟 soak、六阶段 SIGKILL 恢复、非 Dudu 真实工程隔离 canary 和 302 files / 1699 tests 均闭合。用户随后授权的 **Grok current-source live 隔离 canary 也已 PASS**；最终报告与追加证据见 `docs/验证报告_20260727_P0至P9生产中枢最终验收.md`。
+## 2026-07-31 23:43 · Git 研发收口（软件增量已提交）
+
+| 字段 | 当前事实 |
+|---|---|
+| 结论 | **已完成（既有软件研发改动范围）**：生产可靠性与总资源/画布闭环已拆成两个可审计提交；过时中间证据已可恢复隔离 |
+| 提交一 | `da3bd84` · `fix(studio): 固化生成冻结一致性并收敛失败恢复` |
+| 提交二 | `8a534d3` · `feat(studio): 交付总资源中心与画布媒体复用闭环` |
+| 验证 | `typecheck` PASS；fast `188 files / 941 tests` PASS；medium `90 files / 719 tests` PASS；build PASS，buildId `38dbb556ec8ff28a7e669ba2e72b8e8b`，MCP `202 tools` |
+| 清理 | 7 份无报告引用且已有后继版本的 JSON 已移至 `/Users/hxx/Documents/无限画布_清理隔离/2026-07-31-git-audit/obsolete-evidence/`，未直接删除 |
+| 并行边界 | 小说记忆库 P0 正由另一活动计划 `.planning/2026-07-31-novel-memory-library-v1` 持续写入；其文件未暂存、未提交、未清理 |
+| Git 边界 | 仅本地 commit；未 push、未建 PR、未发布、未部署，也未改写正式项目素材 |
+
+## 2026-07-29 09:25 · 《嘟嘟》108/108 BindingSet current
+
+| 字段 | 当前事实 |
+|---|---|
+| 结论 | **已完成（BindingSet 范围）**：108/108 current，stale=0，noBindingSet=0，未决提案=0 |
+| 起始基线 | 实时控制面为 current=0 / stale=8 / noBindingSet=100；历史“8 份已有 BindingSet”均已 stale |
+| 当前规模 | 22 units / 108 panels / 129 份 BindingSet 历史记录；当前 108 个 head 全部 current |
+| 实体决策 | 1646/1646 proposal 已明确 accept 或 exclude；逐格正向资产 397 项，涉及 13 个唯一资产 |
+| Authority | 全库 16 canonical / 15 有 Primary；当前实际绑定的 13 项全部 approved，Primary SHA 与版本 SHA 闭合 |
+| 命令范围 | 43 份报告、1872 条命令；仅 analyze / resolve / freeze BindingSet；4 次中间 fail-closed 已受控恢复 |
+| 零生图副作用 | 首批前到最终：generation ledger、generation tree、downloads、requests、正式 RAW tree 五项全部不变 |
+| 当前构建 | sourceDigest `b4439e7bd9032caf8a0c511c6016dc46e868d0ebd2e3561db8486b0a32801d22` / 202 tools / build+runtime current |
+| 证据 | `.planning/2026-07-28-dudu-six-realm-battle-completion/binding-set-108-final-validation.json`，12 gates 全 true |
+| 非结论 | BindingSet `generation-ready` ≠ 正式 reference envelope / RAW / Review ready；9 格正向资产超过参考上限 6 |
+| 继续阻断 | K20-S01～S03 仍 generation_unknown / PLAN_ONLY / BLOCKED；前镜、精确视图、E-R1 版本仍须逐镜闭合 |
+| 边界 | 未生图、未派发 generation pack、未提交 raw/labeled 或 Review；未 Git stage / commit / push / PR |
+
+## 2026-07-28 22:56 · 最终签名 App 与规模验收
+
+| 字段 | 当前事实 |
+|---|---|
+| 结论 | **部分完成**：软件修复、自动化、签名封包、安装版启动和 10k 规模 PASS；真人鼠标 Finder / 其他 App 物理落点仍未 PASS |
+| 最终安装版 | `/Applications/AI 漫剧画布.app`，version 0.2.0，arm64 |
+| 构建身份 | buildId `38dbb556ec8ff28a7e669ba2e72b8e8b` / sourceDigest `b4439e7b…` / 202 tools |
+| 签名 | Developer ID `YIHANG LI (3JS43BTTJ3)`，codesign deep / strict PASS |
+| 归档 | `/Users/hxx/Documents/无限画布_交付归档/app-build-20260728-38dbb556ec8ff28a7e669ba2e72b8e8b` |
+| DMG | SHA-256 `b26e19dd8c3b…b7651`；`hdiutil verify` PASS；local-only，未公证 / 发布 |
+| 安装验证 | App 自带 Electron runtime 启动；系统 Node 非必需；MCP 实际 202 tools |
+| 规模验证 | 77 assets / 1288 units / 4235 panels / 10000 media；10 次切工程无串库；RSS +56848 KiB；FD +1 |
+| 最终 fast | 188 files / 941 tests PASS |
+| 本轮修复 | viewport 保存串行化、总资源统一快照、拖出资源上界、切工程 busy 竞态、规模 / 安装验收工具 |
+| 物理门 | `sky.drag` 无按住 / 分段 / 松键时序；Finder 只获焦、0 文件，结构化状态 `blocked`，不得报 PASS |
+| 报告 | `docs/验证报告_20260728_总资源缓存媒体拖出与安装版最终验收.md` |
+| 边界 | 正式项目零写；未公证、发布、上传、付费；未 Git stage / commit / push / PR |
+
+## 2026-07-28 16:34 · 并行软件增量：总资源快照与媒体拖出
+
+| 字段 | 当前事实 |
+|---|---|
+| 只读门禁 | 7 个总资源 IPC 通道已登记为只读 / 缓存读取；未知通道保持 mutation / strong |
+| 跨项目缓存 | 进程内目录快照；29 注册工程 / 27 可读 DB；图片冷建只扫描 27 DB 一次，分类、搜索、翻页热读不重扫 |
+| 后台增强 | 固定并发 4；切工程 / 刷新后停止剩余 IPC，迟到结果不提交 |
+| 媒体拖出 | 图片 / 视频 / 音频独立复制体；一次性 sender-bound token；Main `startDrag`；CAS / 画布原件保留 |
+| 定向回归 | 11 files / 77 tests PASS；`git diff --check` PASS |
+| 构建 | buildId `c307eaba01557cafa72e2684bbe383ef` / sourceDigest `5ddecb04…` / 202 tools |
+| Electron | 隔离 v2 PASS，三媒体 native bridge、复制体和安全边界通过 |
+| 未完成 | Finder / 其他 App 物理落点因用户新消息中止；`viewport` 保存竞态已定位但未修复 |
+| 边界 | 正式项目零写；未安装 / 发布；未 Git stage / commit / push / PR |
+
+## 2026-07-28 07:42 · 活动 Goal：真实生图驱动无限画布改进
+
+> **当前唯一活动目标**：`.planning/2026-07-28-dudu-six-realm-battle-completion/task_plan.md`。北星已按用户要求重排为“所有正式生图继续使用无限画布；真实生产暴露缺口后修成通用产品能力、验证同一候选恢复，再回到下一镜”，禁止为了赶图绕开画布。
+
+| 字段 | 当前事实 |
+|---|---|
+| 活动工程 | `projects/local-import-dudu-six-realm-battle-403d9043` / `project-0e5a8942e3bf` |
+| 当前镜头 | K12-S05 attempt 1 已唯一调用一次 Codex imagegen；正式 raw/labeled 原子 commit，待 Review REJECT |
+| 视觉裁决 | 主体/灯/丝/场景成立；E-R1 被放大成大块斧刃状残片，违反米粒级且小于灯笼的硬锁 |
+| 本轮产品修复 | panel 宽银幕、protocol v2 call、labeled 长字幕、确定性 unknown 对账、panel build rebind/同候选恢复 |
+| 当前候选 | `mcp-candidate-fa860c6dedf88a46-65803ddf54c53d45-9a3a2967`；sourceDigest `fa860c6d…`；buildId `50f3e173…`；202 tools |
+| 同候选恢复证据 | K12-S05 候选 SHA `ffbc5c8d…980e3`；rebind 后 raw/labeled SHA `ffbc5c8d…980e3` / `61ab0670…091b` |
+| 当前下一动作 | Review REJECT → 对账清零 → attempt 2 correction/retry → 同画布全链复验 → K12-S06 |
+| 边界 | 未二次生图、未复制到正式源 RAW、未 Git stage/commit/push、未安装/发布 |
+
+> 当前恢复结论：截至 2026-07-28 03:38 CST，历史 P0—P9、最终源码候选、5/5 历史 live 探针和 3 单元 / 10 宫格视觉样本均保持 PASS；ChatGPT/Codex 已完成客户端重启，当前 app-server 实际拉起最终 `e9756c… / 4575ff48… / 202 tools` 候选，五键身份门与活动工程全部匹配。`MCP_CLIENT_RESTART_PASS`，无需再次重启。
 >
-> **边界**：候选包已持久化为 `/Users/hxx/Documents/无限画布_交付归档/0.2.0-40b9cc725097394108667c877901446a/AI 漫剧画布.app`，local-only，未安装、未签名、未公证、未发布；未上传。Grok 只在全新隔离合成工程调用一次 `image_gen`，没有写正式 Dudu；其 Review scope 为 `synthetic-canary-contract`，不冒充正式生产连续性或用户本人批准。Git 仅建立本机 `main` 基线，没有 remote、push、PR、gc 或 prune；正式工程/CAS/raw/labeled 仍在忽略边界外，未删除、未迁移。
+> **边界**：当前不可变 MCP 候选仅为 local-only 源码运行候选；未替换历史归档 App，未安装、签名、公证或发布。本轮三单元样本未使用 Grok、未上传、付费或生成视频。Git 未 stage/commit/push/PR；当前源码/测试/报告修改有意保持未提交，正式工程/CAS/raw/labeled 未删除、未迁移。
+
+## 2026-07-28 03:38 · MCP 客户端重启 PASS
+
+| 字段 | 当前事实 |
+|---|---|
+| 磁盘配置 | 指向最终 `mcp-candidate-e9756c…`，recorded sourceDigest/入口 SHA 正确 |
+| 当前源码 | `e9756c099e6b1ec7…`，与最终候选一致 |
+| 当前 app-server | PID 27305，03:33 启动 |
+| 当前运行 MCP | PID 27940，argv 指向最终 `mcp-candidate-e9756c…` |
+| 单写锁 | PID 27940 持有，锁内 argv0 与最终候选入口一致 |
+| get_capabilities | buildId=`4575ff48…`、sourceDigest=`e9756c…`、server.toolCount=`202`、runtime restartRequired=false |
+| 活动工程 | `/Users/hxx/Documents/无限画布/projects/local-import-dudu-world-prologue-b8bfcf14` |
+| 只读探针 | 候选完整性、capabilities、活动工程、物理零写 4/4 PASS；drift 探针按只读边界未重跑 |
+| 裁决 | `MCP_CLIENT_RESTART_PASS`；无需再次重启，可在后续明确任务中按门禁恢复正常操作 |
+
+## 历史待办 · 2026-07-28 03:20（已由上方重启 PASS 接替）
+
+| 字段 | 当前事实 |
+|---|---|
+| 磁盘配置 | 指向最终 `mcp-candidate-e9756c…`，recorded sourceDigest/入口 SHA 正确 |
+| 当前源码 | `e9756c099e6b1ec7…`，与最终候选一致 |
+| 当前运行 MCP | PID 84576，实际为旧 `mcp-candidate-db96767…` |
+| 父进程 | PID 94983，ChatGPT/Codex `app-server`，启动于配置切换前 |
+| 单写锁 | 当前仍由 PID 84576 持有 |
+| 裁决 | 必须完整退出并重开 ChatGPT/Codex；无需重启 Mac 或 AI 漫剧画布.app |
+| 重启后完成门 | argv=e9756c 候选、buildId=4575ff48、sourceDigest=e9756c、202 tools、活动工程=local-import-dudu-world-prologue-b8bfcf14 |
+| 重启前边界 | 禁止 mutation、生图、重放 U03 unknown、清理工作树 |
+
+## 2026-07-28 00:09 · 最终 MCP 候选与三单元真实连续样本
+
+| 字段 | 当前事实 |
+|---|---|
+| MCP 候选 | `.aicanvas-runtime/mcp-candidates/mcp-candidate-e9756c099e6b1ec7-1597537cee368347-9888aa8b` |
+| 构建身份 | version 0.2.0 / sourceDigest `e9756c099e6b1ec7…` / buildId `4575ff48b3b96e236b68a46bc00149dd` / 202 tools |
+| 切换与重连 | Codex 配置已指新候选；旧 PID 20996 精确核验后停止；新候选 singleton 握手与锁身份 PASS |
+| live 探针 | 5/5 PASS：候选完整性、capabilities、活动工程、物理零写、drift fail-closed |
+| 真实样本 | `output/final-real-continuity-20260727/run-01`；3 单元 / 10 宫格；成年阿航 + 神权密室 + 唯一完整 D01 |
+| U01 | attempt 1 REWORK 保留；attempt 2 PASS/current/approvedRawEligible |
+| U02 / U03 | attempt 1 PASS/current/approvedRawEligible |
+| 生图终态 | 三条接受调用均为 provider=codex 且有 `result-committed`；无待重试生图 unknown |
+| 视觉验收 | 三张 941×1672 raw、三张 labeled 与 10 宫格联系表原尺寸复核 PASS |
+| 可选例外 | U03 video-package prepare command=`unknown`；进程已死、export intent=0、not-prepared、无副作用，未重放 |
+| 活动/租约 | 活动工程已恢复《嘟嘟》；样本 lease 已释放 |
+| 验证 | 三套 typecheck、生产回归、continuation、immutable/currentness/runtime gate 均 PASS；独立审计 GO |
 
 ## 2026-07-27 14:47 · Git 安全收尾
 

@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 2,
+  "kind": "managed-studio-scale-canvas-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-07-28T14:53:24.946Z",
+  "buildIdentity": {
+    "version": "0.2.0",
+    "buildId": "38dbb556ec8ff28a7e669ba2e72b8e8b",
+    "sourceDigest": "b4439e7bd9032caf8a0c511c6016dc46e868d0ebd2e3561db8486b0a32801d22",
+    "fingerprint": "3ae23b49444975906462303a3495a8adeaff1e31d4de869e2f6488b1c639ca87",
+    "releaseManifestFingerprint": "ee943835bce1610035816f0ad182f69a55509eb797073a0542e67342f8630f62",
+    "source": "installed-app-resources-release-manifest"
+  },
+  "fixture": {
+    "fixtureMs": 25603,
+    "large": {
+      "projectId": "project-d807eca0fe8e",
+      "units": 1288,
+      "panels": 4235,
+      "assets": 77,
+      "media": {
+        "existing": 77,
+        "seeded": 9923,
+        "verifiedCas": 10000,
+        "verifiedThumbnails": 1000,
+        "total": 10000
+      },
+      "startupPolicy": "no-filesystem-scan",
+      "sourceRoots": []
+    },
+    "small": {
+      "projectId": "project-cf35877d0ded",
+      "units": 4,
+      "panels": 16,
+      "assets": 6
+    }
+  },
+  "startup": {
+    "readyMs": 2174,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "externalRequests": 0
+  },
+  "runtime": {
+    "kind": "installed-application",
+    "executable": "/Applications/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+    "systemNodeRequired": false
+  },
+  "canvas": {
+    "logicalPageLimit": 36,
+    "assetPageLimit": 6,
+    "unitPageLimit": 36,
+    "panelExpansionLimit": 6,
+    "pipelineNodeLimit": 18,
+    "maximumDomNodes": 78,
+    "initialDom": 7,
+    "expandedDom": 3,
+    "pipelineDom": 0,
+    "expandedLogicalCounts": "当前 DOM：6 资产 · 36 单元 · 6 宫格 · 0 结果/审片 · 2 文稿 有图节点 6 缩放 121% 布局已落盘",
+    "unitPageReplaced": true,
+    "assetCategoryCounts": {
+      "character": 24,
+      "scene": 20,
+      "prop": 33
+    },
+    "assetLibraryMountedDom": {
+      "character": 11,
+      "scene": 11,
+      "prop": 11
+    },
+    "assetLibraryVirtualized": true,
+    "assetCategoryProjectionReplaced": true,
+    "characterNextPageCorrectlyDisabled": true,
+    "viewportCullingEnabled": true,
+    "panelExpansionBound": 6
+  },
+  "mediaLibrary": {
+    "exactCount": 10000,
+    "firstPageDom": 36,
+    "scrolledDom": 36,
+    "secondPageDom": 36,
+    "keysetPageReplaced": true,
+    "previousPageRestored": true
+  },
+  "projectSwitch": {
+    "count": 10,
+    "largeToSmall": true,
+    "smallToLarge": true,
+    "crossProjectLeak": false,
+    "smallMetrics": "项目概览 6 资产 4 单元 16 宫格 6 媒体 2 文稿 0 通过 0 待审 4 进行中 0 失败 0 阻塞 投影于 14:53:22 构建身份 v0.2.0 · buildId:38dbb556ec8f · sourceDigest:b4439e7bd903",
+    "restoredMetrics": "项目概览 77 资产 1288 单元 4235 宫格 10000 媒体 2 文稿 构建身份 v0.2.0 · buildId:38dbb556ec8f · sourceDigest:b4439e7bd903"
+  },
+  "runtimeStability": {
+    "samples": [
+      {
+        "phase": "before-switches",
+        "pids": [
+          98508,
+          98512,
+          98513,
+          98515
+        ],
+        "rssKiB": 810016,
+        "fileDescriptors": 248,
+        "mediaRequestCount": 129
+      },
+      {
+        "phase": "switch-1",
+        "pids": [
+          98508,
+          98512,
+          98513,
+          98515
+        ],
+        "rssKiB": 828656,
+        "fileDescriptors": 248,
+        "mediaRequestCount": 135
+      },
+      {
+        "phase": "switch-2",
+        "pids": [
+          98508,
+          98512,
+          98513,
+          98515
+        ],
+        "rssKiB": 826384,
+        "fileDescriptors": 252,
+        "mediaRequestCount": 138
+      },
+      {
+        "phase": "switch-3",
+        "pids": [
+          98508,
+          98512,
+          98513,
+          98515
+        ],
+        "rssKiB": 833472,
+        "fileDescriptors": 252,
+        "mediaRequestCount": 138
+      },
+      {
+        "phase": "switch-4",
+        "pids": [
+          98508,
+          98512,
+          98513,
+          98515
+        ],
+        "rssKiB": 836464,
+        "fileDescriptors": 252,
+        "mediaRequestCount": 141
+      },
+      {
+        "phase": "switch-5",
+        "pids": [
+          98508,
+          98512,
+          98513,
+          98515
+        ],
+        "rssKiB": 840768,
+        "fileDescriptors": 249,
+        "mediaRequestCount": 144
+      },
+      {
+        "phase": "switch-6",
+        "pids": [
+          98508,
+          98512,
+          98513,
+          98515
+        ],
+        "rssKiB": 837520,
+        "fileDescriptors": 252,
+        "mediaRequestCount": 144
+      },
+      {
+        "phase": "switch-7",
+        "pids": [
+          98508,
+          98512,
+          98513,
+          98515
+        ],
+        "rssKiB": 841872,
+        "fileDescriptors": 252,
+        "mediaRequestCount": 147
+      },
+      {
+        "phase": "switch-8",
+        "pids": [
+          98508,
+          98512,
+          98513,
+          98515
+        ],
+        "rssKiB": 847824,
+        "fileDescriptors": 251,
+        "mediaRequestCount": 147
+      },
+      {
+        "phase": "switch-9",
+        "pids": [
+          98508,
+          98512,
+          98513,
+          98515
+        ],
+        "rssKiB": 851536,
+        "fileDescriptors": 251,
+        "mediaRequestCount": 150
+      },
+      {
+        "phase": "switch-10",
+        "pids": [
+          98508,
+          98512,
+          98513,
+          98515
+        ],
+        "rssKiB": 866864,
+        "fileDescriptors": 249,
+        "mediaRequestCount": 150
+      }
+    ],
+    "rssDeltaKiB": 56848,
+    "fileDescriptorDelta": 1,
+    "idleMediaRequestsStable": true
+  },
+  "screenshot": {
+    "relativePath": "docs/evidence/managed-studio-scale-installed-20260728-build-38dbb556.png",
+    "sizeBytes": 194657,
+    "sha256": "e80de3321ff1f4a974cf7b1f6cc715a6d59684f3d2b2d932b222bf140bf9d38e",
+    "width": 1728,
+    "height": 1029,
+    "format": "png",
+    "stdev": 41.791716509773345
+  },
+  "boundaries": {
+    "filesystemScans": 0,
+    "formalStudioTouched": false,
+    "formalImageGenerationCalls": 0,
+    "browserSupplierCalls": 0,
+    "uploads": 0,
+    "gitStage": 0
+  }
+}

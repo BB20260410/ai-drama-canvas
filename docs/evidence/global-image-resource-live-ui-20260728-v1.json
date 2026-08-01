@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "kind": "global-image-resource-live-ui-smoke",
+  "status": "PASS",
+  "checkedAt": "2026-07-28T06:52:20.352Z",
+  "durationMs": 12119,
+  "sourceRuntime": "out Electron build",
+  "buildIdentity": {
+    "buildId": "03ffb9f97a5016c34a0e9b075c881cf5",
+    "sourceDigest": "75ee0be55017e28d580ec5b1b7c542af87baaa769edaaff8ecb6a89f6215287e",
+    "mcpToolCount": 202
+  },
+  "liveCatalog": {
+    "projectImageEntries": 8854,
+    "uniqueContentSha256": 8696,
+    "canonicalImageEntries": 549,
+    "ordinaryImageEntries": 8305,
+    "counts": {
+      "total": 8854,
+      "uniqueContent": 8696,
+      "character": 447,
+      "scene": 124,
+      "prop": 104,
+      "style": 5,
+      "storyboard": 5162,
+      "reference": 404,
+      "other": 2608
+    },
+    "roleCounts": {
+      "asset-reference": 341,
+      "raw": 2250,
+      "labeled": 2028,
+      "source-original": 393,
+      "storyboard-grid": 1022,
+      "shot-frame": 1134,
+      "poster-cover": 0,
+      "reference": 22,
+      "other": 1664
+    },
+    "classificationStateCounts": {
+      "canonical": 549,
+      "metadata-high": 5695,
+      "metadata-ambiguous": 2,
+      "visual-pending": 2608,
+      "manual": 0
+    },
+    "registeredProjectCount": 29,
+    "readableProjectCount": 27,
+    "unavailableProjects": [
+      {
+        "id": "gushujuan-s3-f1a688020bfb7af6",
+        "name": "蜀道山·古蜀卷 第三季",
+        "reason": "not-managed"
+      },
+      {
+        "id": "project-db859b8c6696",
+        "name": "gushujuan-s3-f1a688020bfb7af6",
+        "reason": "not-managed"
+      }
+    ],
+    "classifierVersion": "studio-global-image-classifier-v1"
+  },
+  "checks": {
+    "firstPageDomCount": 36,
+    "perCardClassification": true,
+    "decodedLazyAsyncThumbnails": 12,
+    "realRegistryUnchanged": true,
+    "formalMaterialDatabasesChecked": 27,
+    "formalMaterialDatabasesUnchanged": true,
+    "pageErrors": [],
+    "externalRequests": [],
+    "failedStudioMediaRequests": []
+  },
+  "screenshotPath": "docs/evidence/global-image-resource-live-ui-20260728-v1.png"
+}

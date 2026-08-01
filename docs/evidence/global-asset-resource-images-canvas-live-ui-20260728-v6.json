@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "kind": "global-asset-resource-images-canvas-live-ui-smoke",
+  "status": "PASS",
+  "checkedAt": "2026-07-28T05:12:45.520Z",
+  "durationMs": 11981,
+  "sourceRuntime": "out Electron build",
+  "activeProject": {
+    "id": "project-b3e5fa60bbcd",
+    "name": "《嘟嘟》世界观概念序章",
+    "root": "/Users/hxx/Documents/无限画布/projects/local-import-dudu-world-prologue-b8bfcf14"
+  },
+  "checks": {
+    "registeredProjects": 28,
+    "readableProjects": 26,
+    "unavailableProjects": 2,
+    "resourceImages": {
+      "total": 549,
+      "character": 396,
+      "scene": 100,
+      "prop": 50,
+      "style": 3
+    },
+    "canvasGlobalResourceEntry": true,
+    "firstPageItems": 36,
+    "secondPageItems": 36,
+    "paginationReplacesDom": true,
+    "previousPageRestoresOrder": true,
+    "sharedImageAssociationCount": 2,
+    "sharedImageKeepsAllNames": true,
+    "sourceProjectLabels": true,
+    "thumbnailsLazyAsyncDecoded": true,
+    "globalWritesAbsent": true,
+    "canvasGraphUnchanged": true,
+    "sourceRegistryAndDatabasesUnchanged": true,
+    "isolatedRuntimeRegistry": "/private/var/folders/bt/q4f2706n013cbd5m4h6rb6tr0000gn/T/global-asset-canvas-live-ui-gxcfPw/registry/projects.json",
+    "pageErrors": [],
+    "externalRequests": [],
+    "failedStudioMediaRequests": []
+  },
+  "screenshotPath": "docs/evidence/global-asset-resource-images-canvas-live-ui-20260728-v6.png"
+}

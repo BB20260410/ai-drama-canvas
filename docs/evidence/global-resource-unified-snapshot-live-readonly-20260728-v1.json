@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "kind": "global-resource-unified-snapshot-live-readonly-probe",
+  "status": "PASS",
+  "checkedAt": "2026-07-28T11:06:10.223Z",
+  "command": "npx tsx -e '<inline read-only probe: 4 list endpoints + 3 detail endpoints, then 11 hot classification/search/page/detail reads>'",
+  "source": {
+    "registryPath": "/Users/hxx/.aicanvas/projects.json",
+    "registeredProjects": 29,
+    "existingMaterialDatabases": 27
+  },
+  "cold": {
+    "listEndpointCount": 4,
+    "detailEndpointCount": 3,
+    "durationMs": 1134.4,
+    "detailDurationMs": 7.3,
+    "listTotals": {
+      "canonicalAssetsCharacter": 338,
+      "assetVersionImagesCharacter": 396,
+      "allProjectImages": 8854,
+      "audio": 6
+    },
+    "allThreeDetailsResolved": true,
+    "cacheMisses": 1,
+    "singleflightJoins": 3,
+    "snapshotBuilds": 1,
+    "snapshotBuildAttempts": 1,
+    "snapshotBuildRetries": 0,
+    "projectSqliteStabilizations": 27,
+    "projectSqliteScans": 27,
+    "directedProjectSqliteScans": 0,
+    "directedReadRetries": 0
+  },
+  "hot": {
+    "readCount": 11,
+    "coverage": [
+      "classification",
+      "search",
+      "next-page cursor",
+      "asset image detail",
+      "all image detail",
+      "audio detail",
+      "video list"
+    ],
+    "durationMs": 33,
+    "additionalProjectSqliteScans": 0,
+    "additionalSnapshotBuilds": 0,
+    "finalSnapshotBuilds": 1,
+    "finalProjectSqliteScans": 27
+  },
+  "physicalReadOnly": {
+    "guardedFileCount": 28,
+    "guardedFiles": "registry + 27 material-studio.sqlite main databases",
+    "comparedFields": [
+      "dev",
+      "ino",
+      "size",
+      "mtimeNs",
+      "ctimeNs"
+    ],
+    "registryAndMainDatabasesUnchanged": true,
+    "formalBusinessWrites": false,
+    "casWrites": false,
+    "reviewOrPrimaryWrites": false
+  },
+  "directedValidation": {
+    "nodeTypecheck": "PASS",
+    "tests": "3 files / 10 tests PASS",
+    "contracts": [
+      "7 IPC entries share one cold snapshot",
+      "detail-first calls populate and reuse the unified snapshot",
+      "hot classification/search/page/detail reads add zero SQLite scans",
+      "DB content change invalidates old cursors fail-closed",
+      "DB or registry change rebuilds once under concurrent reads",
+      "Review and Primary associations are preserved"
+    ]
+  }
+}

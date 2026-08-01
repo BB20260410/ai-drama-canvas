@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "kind": "global-asset-resource-images-ui-smoke",
+  "status": "PASS",
+  "checkedAt": "2026-07-28T04:11:11.291Z",
+  "durationMs": 7707,
+  "sourceRuntime": "out Electron build",
+  "checks": {
+    "registeredProjects": 2,
+    "readableProjects": 2,
+    "namedAssetEntities": {
+      "character": 3,
+      "scene": 2,
+      "prop": 2
+    },
+    "resourceImages": {
+      "total": 6,
+      "character": 2,
+      "scene": 2,
+      "prop": 2
+    },
+    "versionAssociations": 7,
+    "imageCoverage": {
+      "totalImages": 8,
+      "assetVersionImages": 6,
+      "ordinaryImages": 2
+    },
+    "defaultRepresentation": "images",
+    "sharedImageKeepsAllNames": true,
+    "representationSwitch": true,
+    "sourceProjectLabels": true,
+    "globalDetailUsesSourceProject": true,
+    "globalWritesBlocked": true,
+    "search": true,
+    "thumbnailDecode": true,
+    "sourceDatabasesUnchanged": true,
+    "pageErrors": [],
+    "externalRequests": [],
+    "failedStudioMediaRequests": []
+  },
+  "screenshotPath": "docs/evidence/global-asset-resource-images-ui-20260728-v4.png"
+}

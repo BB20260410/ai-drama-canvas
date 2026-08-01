@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "kind": "global-resource-center-live-ui-smoke",
+  "status": "PASS",
+  "checkedAt": "2026-07-28T05:49:52.188Z",
+  "durationMs": 26007,
+  "sourceRuntime": "out Electron build",
+  "buildIdentity": {
+    "buildId": "8540bae0cb10b9cd646cfa679abc8b42",
+    "sourceDigest": "cca25aac3b0df2c126e5b992265f60bb71742977635d05fb51f5f1f3d238b742",
+    "mcpToolCount": 202
+  },
+  "fixture": {
+    "registeredProjects": 2,
+    "readableProjects": 2,
+    "characters": 40,
+    "audio": 1,
+    "video": 1,
+    "audioDerivatives": [
+      "audio_waveform"
+    ],
+    "videoDerivatives": [
+      "video_poster",
+      "video_proxy"
+    ]
+  },
+  "checks": {
+    "targetProjectNamed": true,
+    "categories": [
+      "character",
+      "scene",
+      "prop",
+      "style",
+      "audio",
+      "video"
+    ],
+    "characterPagination": {
+      "firstPage": 36,
+      "secondPage": 4,
+      "noDuplicateKeys": true
+    },
+    "sourceProjectNamed": true,
+    "lazyPreviewDecode": true,
+    "assetReuse": {
+      "disposition": "imported-pending",
+      "targetReviewStatus": "pending",
+      "targetPrimaryAuthority": null
+    },
+    "audioReuse": {
+      "disposition": "imported",
+      "targetSha256": "606c9d2c3c94a686d3726ad87435ef2d45ee96368941bef07d423e70bbd4a324",
+      "provenanceRows": 1
+    },
+    "videoReuse": {
+      "disposition": "imported",
+      "targetSha256": "434a0a8c5106fd86b40fc85cf6ca7993e9f2214515a4e1b1212f46f5fc32a72a",
+      "provenanceRows": 1
+    },
+    "differentRequestHashReplay": {
+      "audio": "already-present",
+      "video": "already-present",
+      "targetDatabaseUnchanged": true,
+      "targetCasUnchanged": true,
+      "targetBusinessRowsUnchanged": true
+    },
+    "sourceDatabaseUnchanged": true,
+    "sourceCasUnchanged": true,
+    "sourceDerivativesUnchanged": true,
+    "registryUnchanged": true,
+    "canvasUnchanged": true,
+    "noTimelineBinding": true,
+    "pageErrors": [],
+    "externalRequests": [],
+    "failedStudioMediaRequests": []
+  },
+  "screenshotPath": "docs/evidence/global-resource-center-live-ui-20260728-v1.png"
+}

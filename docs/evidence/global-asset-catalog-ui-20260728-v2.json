@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "kind": "global-asset-catalog-ui-smoke",
+  "status": "PASS",
+  "checkedAt": "2026-07-28T03:27:38.232Z",
+  "durationMs": 4204,
+  "sourceRuntime": "out Electron build",
+  "checks": {
+    "registeredProjects": 2,
+    "readableProjects": 2,
+    "namedAssets": {
+      "character": 2,
+      "scene": 2,
+      "prop": 2
+    },
+    "imageCoverage": {
+      "totalImages": 8,
+      "assetVersionImages": 6,
+      "ordinaryImages": 2
+    },
+    "sourceProjectLabels": true,
+    "globalDetailUsesSourceProject": true,
+    "globalWritesBlocked": true,
+    "search": true,
+    "thumbnailDecode": true,
+    "sourceDatabasesUnchanged": true,
+    "pageErrors": [],
+    "externalRequests": [],
+    "failedStudioMediaRequests": []
+  },
+  "screenshotPath": "docs/evidence/global-asset-catalog-ui-20260728-v2.png"
+}
