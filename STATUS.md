@@ -1,5 +1,21 @@
 # STATUS · 当前源码生产中枢（P0—P9 CLOSED / MCP_CLIENT_RESTART_PASS）
 
+## software_goal: multi-model-quality-20260812（四模型协同整改）
+
+| 字段 | 当前值 |
+|---|---|
+| status | `blocked`（软件候选 PASS；严格四模型终审未闭合） |
+| active_item | `none`：代码、测试、构建和 Electron 巡检已完成；没有在途模型/测试/App 进程 |
+| source | `9a7fde1f… / ac77f767… / 220 tools`；相对 `0fb7a10` 为 9 files、176+/8- |
+| resolved | 4 个 P2：总资源 tabs 无障碍、Review 历史失败/迟到守卫、剪辑搜索名称、小说全文搜索名称 |
+| verification | 4/30 定向；387 files / 2403 tests 全分区；两套 typecheck；audit 0；build；MCP stdio 220/9/8；隐藏 Electron 22 路径均 PASS |
+| model_round3 | Kimi `PASS`；豆包 `PASS`；GLM `BLOCKED`（两次空截断）；Grok `BLOCKED`（非 schema 且含不存在路径） |
+| earliest_next | 只有用户仍要求“四模型 COMPLETE”时，恢复 GLM/Grok 报告通道；不得重跑已绿代码或以多数票覆盖阻塞 |
+| boundaries | 不 push、不安装、不公证、不发布、不上传、不付费生成、不写正式工程；T23 未运行（无性能代码） |
+| evidence | `docs/evidence/multi-model-quality-closeout-20260812-9a7fde1f.json` · `docs/验证报告_20260812_四模型协同整改与机械验收_9a7fde1f.md` |
+
+恢复规则：软件实现与机械验证已经收敛；外部模型报告通道失败不能触发无限代码整改。只有通道能力变化或用户改变验收口径时再继续。
+
 ## software_goal: autonomous-dev-loop-v1（无人干预开发闭环 · 永续循环）
 
 | 字段 | 当前值 |

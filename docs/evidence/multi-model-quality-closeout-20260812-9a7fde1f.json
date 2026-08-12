@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "kind": "multi-model-quality-closeout",
+  "status": "partial",
+  "softwareCandidate": "pass",
+  "fourModelFinalReview": "blocked",
+  "createdAt": "2026-08-12T21:38:10+08:00",
+  "baseline": {
+    "gitCommit": "0fb7a104abaff798ebcf24cb132473fe6b4e702c",
+    "sourceDigest": "0152472cdfe62c75f4d91b8eb923f4984b9ab2fd3892bc4c0127707e7d01339b",
+    "testFiles": 387,
+    "tests": 2397
+  },
+  "candidate": {
+    "gitCommitBeforeCloseout": "d36988e5def3226df08cb18118757c32ab57857b",
+    "sourceDigest": "9a7fde1f572a01d42412488d53f61a42d28bb8757d6d8fa9555f26bee02370dd",
+    "sourceFiles": 1050,
+    "sourceBytes": 20838373,
+    "buildId": "ac77f767e52da926dbf3903b995d20c8",
+    "mcpToolCount": 220,
+    "releaseManifestFingerprint": "a603dcd13a644591e65b0df0c24ad671d701c17fcaada5f4d77eb59a12fe6b0c"
+  },
+  "implementation": {
+    "changedFiles": 9,
+    "insertions": 176,
+    "deletions": 8,
+    "commits": [
+      {
+        "commit": "505b2f0",
+        "title": "fix(ui): 补齐总资源分类页签无障碍合同"
+      },
+      {
+        "commit": "e9a9173",
+        "title": "fix(ui): 区分验收历史失败态与空态"
+      },
+      {
+        "commit": "d36988e",
+        "title": "fix(ui): 补齐剪辑与小说搜索框可访问名称"
+      }
+    ],
+    "resolvedFindings": [
+      "P2-global-resource-tablist-contract",
+      "P2-review-history-read-failure-state",
+      "P2-video-editor-media-search-accessible-name",
+      "P2-novel-fulltext-search-accessible-name"
+    ]
+  },
+  "modelReviews": {
+    "round1": {
+      "kimi": "pass_with_confirmed_p2",
+      "glm": "blocked_empty_truncated_draft_twice",
+      "doubao": "pass_with_confirmed_p2",
+      "grok": "pass_hypotheses_disproved_or_covered"
+    },
+    "round2": {
+      "kimi": "pass_resolved",
+      "doubao": "pass_resolved_with_normalized_schema",
+      "grok": "blocked_invalid_and_hallucinated_report",
+      "glm": "blocked_from_round1"
+    },
+    "round3": {
+      "kimi": {
+        "actualModel": "kimi-k3",
+        "verdict": "PASS",
+        "reportSha256": "c3f6c508043e2cfe4219ae169af3c50a7956f556a477b7eeb0912328821d9262"
+      },
+      "doubao": {
+        "actualModel": "doubao-seed-evolving",
+        "verdict": "PASS",
+        "reportSha256": "2f9f313a6bd7649d5ba443f3ba2fe74af271c33a4b20b28994e14db45ec9d36a"
+      },
+      "glm": {
+        "actualModel": "glm-5-2-260617",
+        "verdict": "BLOCKED",
+        "reason": "two_empty_truncated_draft_results",
+        "reportSha256": "dc7e178bacd3fe8ab1e971b4b240d7ae35107958b7ed6cf134bcbd9b651369b8"
+      },
+      "grok": {
+        "actualModel": "grok-4.5",
+        "verdict": "BLOCKED",
+        "reason": "non_schema_multi_json_and_nonexistent_paths",
+        "reportSha256": "8279bb0a71cf8759a9a07bcf89924738ebeec1cee1937ced69b474897a146256"
+      }
+    }
+  },
+  "verification": {
+    "targeted": {
+      "files": 4,
+      "tests": 30,
+      "status": "pass"
+    },
+    "partitionAudit": {
+      "files": 387,
+      "fingerprint": "6af1e1d172c09742c74f87e0703a98ecb0a220f1d08fe21f7188deb2ccfe1e44",
+      "status": "pass"
+    },
+    "partitions": {
+      "fast": {
+        "files": 255,
+        "tests": 1462,
+        "status": "pass"
+      },
+      "medium": {
+        "files": 91,
+        "tests": 801,
+        "status": "pass"
+      },
+      "integration": {
+        "files": 36,
+        "tests": 123,
+        "status": "pass"
+      },
+      "heavy": {
+        "files": 5,
+        "tests": 17,
+        "status": "pass"
+      },
+      "total": {
+        "files": 387,
+        "tests": 2403,
+        "status": "pass"
+      }
+    },
+    "typecheck": "pass",
+    "typecheckApp": "pass",
+    "productionAudit": {
+      "status": "pass",
+      "vulnerabilities": 0,
+      "productionDependencies": 190,
+      "totalDependencies": 754
+    },
+    "build": "pass",
+    "mcpStdio": {
+      "status": "pass",
+      "tools": 220,
+      "resourceTemplates": 9,
+      "prompts": 8
+    },
+    "hiddenElectron": {
+      "status": "pass",
+      "evidence": "docs/evidence/multi-model-quality-navigation-ui-20260812-9a7fde1f.json",
+      "evidenceSha256": "c1f84210a1cef5e814874cd15820d76a88e3bc488931088ec5760f4d603e026a",
+      "visitedRoutesAndActions": 22,
+      "uiSnapshots": 7,
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalRequests": 0,
+      "showEvents": 0,
+      "focusEvents": 0,
+      "dockHidden": true,
+      "naturalCloseMs": 68,
+      "exitCode": 0,
+      "residualProcesses": 0
+    },
+    "t23": {
+      "status": "not_run",
+      "reason": "no_performance_code_changed"
+    },
+    "diffCheck": "pass"
+  },
+  "completionGate": {
+    "confirmedP0": 0,
+    "confirmedP1": 0,
+    "currentFlowHighValueP2": 0,
+    "mechanicalValidation": "pass",
+    "sameDigestFourModelFinalReports": false,
+    "requiredChannelsWithoutNotVerified": false,
+    "overall": "blocked"
+  },
+  "boundaries": {
+    "installedAppChanged": false,
+    "installedAppSourceDigest": "954ac71a461be527530a96709983741c5f0d1f9ae05a97f57605af5ded39d585",
+    "notarized": false,
+    "published": false,
+    "pushed": false,
+    "paidGeneration": false,
+    "formalProjectWrites": false
+  }
+}

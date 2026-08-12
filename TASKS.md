@@ -1,5 +1,27 @@
 # TASKS · 残留任务清账 2026-07-25
 
+## software_goal: multi-model-quality-20260812
+
+- status: `blocked`（候选实现和机械验收完成；四模型第三轮签字未全部有效）
+- active_item: `none`
+- completed:
+  - [x] Kimi 隔离 worktree 完成 3 个前端提交，Codex 审查后逐个 cherry-pick
+  - [x] 关闭总资源 tab/tabpanel、Review 历史、剪辑搜索、小说搜索 4 个 P2
+  - [x] 4 files / 30 tests；两套 typecheck；分区审计；fast/medium/integration/heavy 合计 387 files / 2403 tests PASS
+  - [x] production audit 0、build、manifest/live digest、MCP stdio 220/9/8、diff check PASS
+  - [x] 隐藏 Electron P17：22 路径、7 UI 快照、0 page/console/external、show/focus 0、68ms 自然退出、无残留
+  - [x] Kimi 与豆包第三轮绑定同一 `9a7fde1f…` 并给出有效 PASS
+  - [x] GLM/Grok 失败通道已按真实状态登记，未静默换模型或伪造报告
+- blocked:
+  - [ ] GLM 5.2：两次 `EMPTY_TRUNCATED_DRAFT`，无可审计终审正文
+  - [ ] Grok 4.5：第三轮输出多 JSON 拼接且引用不存在路径，不能计有效终审
+- earliest_next: 若仍要求四模型 COMPLETE，只补 GLM/Grok 报告通道；不改源码、不重跑全量，同通道必须带来新证据，禁止原样循环
+- boundaries: 不 push、不安装 App、不公证/发布、不生成/上传/付费、不写正式工程；本轮无性能代码，T23 NOT_RUN
+- evidence:
+  - `docs/evidence/multi-model-quality-closeout-20260812-9a7fde1f.json`
+  - `docs/evidence/multi-model-quality-navigation-ui-20260812-9a7fde1f.json`
+  - `docs/验证报告_20260812_四模型协同整改与机械验收_9a7fde1f.md`
+
 ## software_goal: autonomous-dev-loop-v1（无人干预开发闭环 · 2026-08-12）
 
 - status: `completed`（当前周期关账；基础设施休眠，不再自动续跑）
