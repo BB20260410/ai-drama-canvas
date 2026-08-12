@@ -14,9 +14,12 @@ describe("总资源中心隐藏验收证据发布", () => {
     expect(source).toContain("await writeBytesAtomicExclusive(screenshotPath");
     expect(source).toContain("await writeJsonAtomicExclusive(evidencePath, evidence)");
     expect(source).toContain("await evidenceRunLock?.release()");
+    expect(source).toContain("const forcedCleanup = await forceCleanupElectronApplication(app)");
+    expect(source).toContain("if (!forcedCleanup.exited)");
 
     expect(source).not.toMatch(/`\$\{screenshotPath\}\.tmp`/u);
     expect(source).not.toMatch(/`\$\{evidencePath\}\.tmp`/u);
     expect(source).not.toMatch(/rename\(`\$\{(?:screenshotPath|evidencePath)\}\.tmp`/u);
+    expect(source).not.toContain("forceCleanupElectronApplication(app).catch(() => undefined)");
   });
 });

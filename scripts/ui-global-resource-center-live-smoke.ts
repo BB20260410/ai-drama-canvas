@@ -901,7 +901,12 @@ try {
 } finally {
   let cleanupError: unknown;
   try {
-    if (app) await forceCleanupElectronApplication(app).catch(() => undefined);
+    if (app) {
+      const forcedCleanup = await forceCleanupElectronApplication(app);
+      if (!forcedCleanup.exited) {
+        throw new Error(`总资源中心 Electron 强制清理后进程仍存活：pid=${forcedCleanup.pid}`);
+      }
+    }
     if (previousRegistry === undefined) delete process.env.AI_CANVAS_REGISTRY_PATH;
     else process.env.AI_CANVAS_REGISTRY_PATH = previousRegistry;
     await rm(temporaryRoot, { recursive: true, force: true });
