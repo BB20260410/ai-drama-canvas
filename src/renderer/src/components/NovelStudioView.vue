@@ -42,7 +42,7 @@
       <aside class="chapter-rail" data-testid="novel-chapter-rail">
         <label class="search-box">
           <Search :size="15" />
-          <input v-model="searchQuery" data-testid="novel-search-input" placeholder="搜索全部正文" @keyup.enter="searchAllChapters" />
+          <input v-model="searchQuery" data-testid="novel-search-input" aria-label="搜索小说全部正文" placeholder="搜索全部正文" @keyup.enter="searchAllChapters" />
           <button type="button" :disabled="searching || searchQuery.trim().length < 2" data-testid="novel-search-submit" @click="searchAllChapters">
             {{ searching ? "…" : "搜索" }}
           </button>

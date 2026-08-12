@@ -30,7 +30,7 @@
     </div>
     <div v-else class="editor-body">
       <aside class="media-bin">
-        <header><div><span>素材库</span><b>{{ filteredMedia.length }} / {{ mediaTotal }}</b></div><input v-model="mediaSearch" placeholder="搜索镜头或文件" /></header>
+        <header><div><span>素材库</span><b>{{ filteredMedia.length }} / {{ mediaTotal }}</b></div><input v-model="mediaSearch" aria-label="搜索剪辑素材" placeholder="搜索镜头或文件" /></header>
         <div class="media-filter"><button :class="{ active: mediaKind === 'all' }" @click="mediaKind = 'all'">全部</button><button :class="{ active: mediaKind === 'video' }" @click="mediaKind = 'video'">视频</button><button :class="{ active: mediaKind === 'image' }" @click="mediaKind = 'image'">图片</button><button :class="{ active: mediaKind === 'audio' }" @click="mediaKind = 'audio'">音频</button></div>
         <div class="media-list">
           <article v-for="item in filteredMedia" :key="item.id" @mouseenter="ensureMediaPreview(item)" @mouseleave="clearMediaPreviewDemand">

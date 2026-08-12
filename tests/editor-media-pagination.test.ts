@@ -131,6 +131,16 @@ describe("剪辑台媒体服务端游标分页", () => {
     expect(component).not.toContain(".slice(0, 500)");
   });
 
+  it("剪辑台素材搜索输入有明确可访问名称", async () => {
+    const component = await readFile(
+      path.join(workspaceRoot, "src/renderer/src/components/VideoEditorView.vue"),
+      "utf8",
+    );
+    expect(component).toContain(
+      '<input v-model="mediaSearch" aria-label="搜索剪辑素材" placeholder="搜索镜头或文件" />',
+    );
+  });
+
   it("同一扫描的多页只构建一次 catalog 和查询投影，预览索引变化会使旧 cursor 失效", async () => {
     const root = await projectFixture();
     const events: string[] = [];

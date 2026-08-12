@@ -39,6 +39,13 @@ describe("轻量小说工作区", () => {
     ]) expect(source).toContain(`data-testid="${testId}"`);
   });
 
+  it("全文搜索输入有明确可访问名称", () => {
+    const source = novelStudioSource();
+    expect(source).toContain(
+      '<input v-model="searchQuery" data-testid="novel-search-input" aria-label="搜索小说全部正文" placeholder="搜索全部正文" @keyup.enter="searchAllChapters" />',
+    );
+  });
+
   it("正式写入复用 novel command bus，不让 renderer 直接接触文件系统", () => {
     const source = novelStudioSource();
     expect(source).toContain("window.canvasApi.novel.executeNovelCommand");
