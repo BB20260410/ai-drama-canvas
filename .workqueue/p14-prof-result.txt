@@ -1,0 +1,6 @@
+P14PROF createStudioP7Fixture 2054ms total=2054ms
+P14PROF promoteAuthorities 9671ms total=11725ms
+P14PROF register+activate 780ms total=12505ms
+P14PROF createCanaryTargetUnit 574ms total=13079ms
+P14PROF resolveBindingAmbiguity 5057ms total=18136ms
+P14PROF seedContinuity 15429ms total=33565ms

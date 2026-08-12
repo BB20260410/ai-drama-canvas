@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-stability-local-install-final",
+  "status": "passed",
+  "createdAt": "2026-08-11T08:59:44Z",
+  "scope": "local-only-macos-install",
+  "source": {
+    "version": "0.2.0",
+    "sourceDigest": "d5ce49a9fdd9a277cd49c004a68b589d9f038c0b791f49e743e8c75932ff5784",
+    "buildId": "6ed09cc907407bf77b4f41346cef9736",
+    "sourceFiles": 1037,
+    "sourceBytes": 20678817,
+    "mcpToolCount": 220,
+    "releaseManifestSha256": "2ff843ab6e68138eb4c7e503368edd8096d972019ca06ccac0c87ed30e092cf8"
+  },
+  "performanceGate": {
+    "status": "passed",
+    "evidencePath": "docs/evidence/runtime-stability-t23-strict-final-redacted-20260811-d5ce49a9.json",
+    "firstCardMs": 1246,
+    "firstRawMs": 4033,
+    "allReferencesMs": 5201,
+    "ipcPeakOutstanding": 4,
+    "interactionsPassed": true
+  },
+  "productionAudit": {
+    "command": "npm audit --omit=dev --package-lock-only --json --registry=https://registry.npmjs.org",
+    "productionDependencies": 190,
+    "vulnerabilities": 0,
+    "status": "passed"
+  },
+  "mcpCandidate": {
+    "candidateId": "mcp-candidate-d5ce49a9fdd9a277-7eeb2e7c974f57eb-348414e0",
+    "runtimeTreeFingerprint": "7eeb2e7c974f57ebcc037ed43299a47f45c92a22e8c36223ff9ac0daa6a34422",
+    "dependencyClosureFingerprint": "499fc0efe1bc90dcf88d8f7fe9a348faf5f09048e4406fc6030d2d2cab0a270d",
+    "payloadFingerprint": "7941d883743506a1372b15b601f1e89bbc5eec544f2bcf1196512d4b8871d97d",
+    "currentCheck": {
+      "status": "passed",
+      "inspectedCandidates": 16,
+      "invalidCandidates": 0
+    },
+    "stdioSmoke": {
+      "status": "passed",
+      "toolCount": 220,
+      "resourceTemplateCount": 9,
+      "promptCount": 8
+    }
+  },
+  "isolatedPackageSmoke": {
+    "status": "passed",
+    "terminalEvidencePath": "docs/evidence/isolated-package-smoke-20260811T084933Z-d5ce49a9.json",
+    "terminalEvidenceSha256": "a4fa64b2e933435af3a5db6f1b540bddc10e9a2c82e65a973826e4157c60d36c",
+    "completionEvidencePath": "docs/evidence/isolated-package-smoke-20260811T084933Z-d5ce49a9-completion.json",
+    "completionEvidenceSha256": "084cc0f426890e6f0dc25b48c4767c5de9bfe3ed51fcba098c1457708d6fe7ef",
+    "toolCount": 220,
+    "resourceTemplateCount": 9,
+    "promptCount": 8,
+    "emptyProjectRestartVerified": true,
+    "effectTransitionCloseDurationsMs": [175, 194],
+    "reviewStudioCloseDurationsMs": [45, 37],
+    "showEvents": 0,
+    "focusEvents": 0,
+    "forceTerminated": false,
+    "forceKilled": false,
+    "lingeringProcesses": 0,
+    "tempRootRemoved": true
+  },
+  "installedApp": {
+    "path": "/Applications/AI 漫剧画布.app",
+    "bundleIdentifier": "com.hxx.aidramacanvas",
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "distribution": "local-only",
+    "releaseManifestSha256": "2ff843ab6e68138eb4c7e503368edd8096d972019ca06ccac0c87ed30e092cf8",
+    "appAsarSha256": "56519e88e3992576f2026549cd7d3056ea812925b0ca1c32ce419e4e74e6dae1",
+    "workspaceDistMatchesInstalled": true,
+    "signing": {
+      "deepStrict": true,
+      "identity": "Developer ID Application: YIHANG LI (3JS43BTTJ3)",
+      "teamIdentifier": "3JS43BTTJ3"
+    },
+    "verificationEvidencePath": "docs/evidence/installed-local-verify-20260811T085603Z-d5ce49a9.json",
+    "verificationEvidenceSha256": "5a841a0bc51f5aa3e100b64f6bcacce68c737c46f2fc4fe79e6ab20f188c2e4a",
+    "packagedMcpStartedWithAppElectronRuntime": true,
+    "toolCount": 220,
+    "activationPolicy": "accessory",
+    "dockVisible": false,
+    "showEvents": 0,
+    "focusEvents": 0,
+    "closeDurationMs": 52,
+    "gracefulExit": true,
+    "forceTerminated": false,
+    "forceKilled": false,
+    "exitCode": 0
+  },
+  "rollback": {
+    "archiveRoot": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260811T085335Z-d5ce49a9",
+    "previousInstalledSourceDigest": "c9bb2c8788bc600e24d1952f696fb558d1fe6469fdf6afe0cf9b362547332942",
+    "previousInstalledBuildId": "02a1bf9d8764bff2fb960be0cad17cd4",
+    "previousInstalledSignatureValid": true,
+    "previousWorkspaceDistPreserved": true
+  },
+  "oldAppCleanup": {
+    "sourcePath": "/Applications/本地画布.app",
+    "bundleIdentifier": "com.hxx.localcanvas",
+    "version": "0.1.0",
+    "releaseManifestPresent": false,
+    "operation": "moved-to-trash",
+    "recoverablePath": "/Users/hxx/.Trash/AI漫剧画布_旧版清理_20260811T085603Z/本地画布.app",
+    "permanentlyDeleted": false
+  },
+  "finalIndependentReview": {
+    "status": "clean",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "historicalCleanupWordingCorrected": true
+  },
+  "boundaries": {
+    "notarized": false,
+    "dmgGenerated": false,
+    "published": false,
+    "uploaded": false,
+    "paidActionUsed": false,
+    "formalProjectWritten": false,
+    "gitStaged": false,
+    "gitCommitted": false,
+    "gitPushed": false,
+    "candidateHistoryPruned": false,
+    "deliveryArchivesPruned": false,
+    "appRunningAfterVerification": false
+  }
+}

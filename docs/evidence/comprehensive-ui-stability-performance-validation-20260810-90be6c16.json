@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "kind": "comprehensive-ui-stability-performance-validation",
+  "status": "pass",
+  "createdAt": "2026-08-10T19:39:18+08:00",
+  "release": {
+    "version": "0.2.0",
+    "sourceDigest": "90be6c16c8eeb6e866745b26bbbec066f1250ea0d3cb7b70e88e95387e121ade",
+    "buildId": "8babc483fc80f221d3532154b4e3385a",
+    "mcpToolCount": 220,
+    "architecture": "arm64",
+    "distribution": "local-only",
+    "notarized": false
+  },
+  "testInventory": {
+    "partitionFiles": 359,
+    "fastFiles": 228,
+    "mediumFiles": 91,
+    "integrationFiles": 35,
+    "heavyFiles": 5,
+    "vueFiles": 39,
+    "staticButtonElements": 547,
+    "imageElements": 39,
+    "audioVideoElements": 10
+  },
+  "mechanicalValidation": {
+    "typecheck": "pass",
+    "typecheckApp": "pass",
+    "build": "pass",
+    "diffCheck": "pass",
+    "productionAuditVulnerabilities": 0,
+    "fastInitial": {
+      "passed": 1260,
+      "failed": 4,
+      "disposition": "四项均已定位并由定向回归关闭；按有界复验要求未重新启动完整 fast 分区"
+    },
+    "medium": {
+      "files": 91,
+      "tests": 788,
+      "status": "pass"
+    },
+    "integration": {
+      "files": 35,
+      "tests": 119,
+      "status": "pass"
+    },
+    "heavy": {
+      "files": 5,
+      "tests": 17,
+      "status": "pass"
+    },
+    "finalFocused": {
+      "files": 6,
+      "tests": 71,
+      "status": "pass"
+    },
+    "rendererContract": {
+      "allStaticButtonsNamedAndWired": true,
+      "allFormButtonsHaveExplicitType": true,
+      "allImagesHaveAltAndAsyncDecoding": true,
+      "allAudioVideoHavePreloadPolicy": true
+    }
+  },
+  "fixedDefects": [
+    "生成队列总数和进行中计数不再被 36 项可见切片截断",
+    "Vue Flow 缩放、适配和交互按钮具有可访问名称",
+    "小地图不再复制业务节点 id 形成重复 DOM id",
+    "点击带缩略图节点的图片主体可正常选中节点并打开下一步操作",
+    "人物、场景、道具、审片、剪辑和项目对话框的图标按钮补齐可访问名称",
+    "图片统一提供 alt 与异步解码，长列表补齐 content-visibility 和固有尺寸占位",
+    "10k 规模验收显式进入素材列表并使用独立 Electron user-data，避免污染日常窗口状态",
+    "四个过期或脆弱基线测试改为验证稳定业务合同，并收紧原生拖出夹具的安全清理边界"
+  ],
+  "runtimeValidation": {
+    "navigationEvidence": "docs/evidence/comprehensive-navigation-ui-20260810-90be6c16.json",
+    "navigationEvidenceSha256": "910eda18236816c5660d3c6bd16b496dade11543e5e9c607bdd080d6e3ce41ca",
+    "visitedPaths": 22,
+    "nodeActionsExecuted": 6,
+    "auditedPageStates": 7,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "externalRequests": 0,
+    "horizontalOverflowPx": 0,
+    "unnamedVisibleButtons": 0,
+    "duplicateDomIds": 0,
+    "readyDurationMs": 5367,
+    "gracefulCloseMs": 45,
+    "windowShowEvents": 0,
+    "windowFocusEvents": 0
+  },
+  "scaleValidation": {
+    "evidence": "docs/evidence/comprehensive-scale-canvas-ui-20260810-90be6c16.json",
+    "evidenceSha256": "fe3fff6267b46568d132ee0ff795a7fb563458996fff5b5112d538488a4d4292",
+    "units": 1288,
+    "panels": 4235,
+    "assets": 77,
+    "media": 10000,
+    "verifiedCas": 10000,
+    "verifiedThumbnails": 1000,
+    "readyMs": 4392,
+    "projectSwitches": 10,
+    "crossProjectLeak": false,
+    "rssDeltaKiB": -9376,
+    "fileDescriptorDelta": 0,
+    "idleMediaRequestsStable": true,
+    "maximumCanvasDomContract": 78,
+    "mediaPageDom": 36
+  },
+  "packagedValidation": {
+    "evidence": "docs/evidence/isolated-package-smoke-20260810T113144557Z-62637-23bc628d.json",
+    "evidenceSha256": "e5c7b031476ac8ceca56bc3b36ae3c904c581afdd1ce894cbfe3dcef19e473c6",
+    "status": "pass",
+    "packagedMcpTools": 220,
+    "resourceTemplates": 9,
+    "prompts": 8,
+    "effectTransitionRestartVerified": true,
+    "reviewRestartVerified": true,
+    "gracefulCloseRuns": 4,
+    "forcedTerminationRuns": 0,
+    "showOrFocusEvents": 0,
+    "lingeringProcesses": 0
+  },
+  "installedValidation": {
+    "path": "/Applications/AI 漫剧画布.app",
+    "evidence": "docs/evidence/comprehensive-installed-app-20260810-90be6c16.json",
+    "evidenceSha256": "a2a43e8317c3a7955d590bd676ba3cd1cf79cfa664d35784baf854452e7853b2",
+    "developerIdDeepStrict": true,
+    "bundledMcpTools": 220,
+    "launchWithoutSystemNode": true,
+    "gracefulCloseMs": 38,
+    "showEvents": 0,
+    "focusEvents": 0
+  },
+  "mcpCandidate": {
+    "candidateId": "mcp-candidate-90be6c16c8eeb6e8-72d86dbdc23378ea-755ff34a",
+    "inspectedCandidates": 13,
+    "invalidCandidates": 0,
+    "dependencyClosureFingerprint": "cfa0faaf83fd7294fd98a7a195faee8e0a8f72effc0fd51dfe15b161eef0985c"
+  },
+  "cleanup": {
+    "removedOldInstalledApp": "/Applications/本地画布.app",
+    "removedOldInstalledVersion": "0.1.0",
+    "removedInstaller": "dist/AI 漫剧画布-0.2.0-arm64.dmg",
+    "removedBlockmap": "dist/AI 漫剧画布-0.2.0-arm64.dmg.blockmap",
+    "remainingMatchingInstalledApps": [
+      "/Applications/AI 漫剧画布.app"
+    ],
+    "remainingInstallerPackages": 0,
+    "recoverable": false
+  },
+  "boundaries": {
+    "allStaticButtonsChecked": true,
+    "allDynamicDestructiveButtonsPhysicallyClicked": false,
+    "reason": "备份恢复的确认分支、正式生成、上传、付费、删除和 Finder 物理拖放不会为了测试而对用户真实数据或前台桌面产生副作用；其安全取消分支、合同、IPC、历史物理验收及代表性真实按钮链已覆盖",
+    "formalProjectTouched": false,
+    "paidGeneration": false,
+    "upload": false,
+    "browserAutomation": false,
+    "notarization": false,
+    "gitStageCommitPush": false,
+    "appClosedAtEnd": true
+  },
+  "residualRisks": [
+    "Vite 仍报告部分 core 模块同时静态与动态导入；当前不导致错误，但主进程包约 5.8 MB，后续可单独做打包边界整理",
+    "Finder 真实物理拖放无法在完全不抢前台的约束下重跑；当前版本复验了原生拖出 IPC/资源保留合同，既有物理验收保留为历史证据",
+    "Higgsfield Unlimited 程序化能力仍由供应方阻塞，不属于本轮 UI/稳定性修复完成条件"
+  ]
+}

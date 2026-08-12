@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-08-10T13:20:00+08:00",
+  "status": "partially_passed",
+  "scope": "performance-and-reliability-bounded-remediation",
+  "findings": {
+    "reviewed": 14,
+    "sourceFixesCompleted": 14,
+    "p1": 6,
+    "p2": 8
+  },
+  "verification": {
+    "higgsfieldQueue": "7/7 passed",
+    "latestFocusedCombination": "15/15 passed",
+    "videoEditorDirty": "3/3 passed",
+    "isolatedPackageGuards": "13/13 passed",
+    "impactedAssertions": "111 passed; 5 pre-existing FFmpeg-heavy timeout-budget failures in full editor file",
+    "narrowedEditorAndNovel": "2/2 passed",
+    "typecheck": "passed",
+    "typecheckApp": "passed",
+    "build": "passed",
+    "diffCheck": "passed",
+    "productionAudit": {
+      "status": "passed",
+      "dependencies": 189,
+      "vulnerabilities": 0
+    }
+  },
+  "currentCandidate": {
+    "candidateId": "mcp-candidate-16fd01e99315d011-4305080585cf35c4-87d72760",
+    "sourceDigest": "16fd01e99315d0112e6f26f157aae83bd2d89e02fb2d5e1c0badc60165f00be7",
+    "buildId": "5df3308042939006c350c3bbf1fa4a0d",
+    "mcpToolCount": 220,
+    "inspectedCandidates": 11,
+    "invalidCandidates": 0,
+    "dependencyClosureFingerprint": "cfa0faaf83fd7294fd98a7a195faee8e0a8f72effc0fd51dfe15b161eef0985c"
+  },
+  "packagedAppSmoke": {
+    "status": "failed",
+    "attemptLimitReached": true,
+    "finalEvidence": "docs/evidence/isolated-package-smoke-20260810T051143493Z-55875-f8a6249c.json",
+    "finalFailurePhase": "before-app-launch",
+    "finalErrorClass": "lockfile-electron-binary-missing",
+    "visibleWindowStarted": false,
+    "previousEvidence": [
+      "docs/evidence/isolated-package-smoke-20260810T043804740Z-34732-39247da5.json",
+      "docs/evidence/isolated-package-smoke-20260810T045258250Z-44008-2e9bd013.json"
+    ]
+  },
+  "loopGuard": {
+    "fastOrMediumFullPartitionRerun": false,
+    "morePackageSmokeAllowedInThisSlice": false,
+    "nextAllowedScope": "electron-binary-provenance-fixture-only"
+  },
+  "sideEffects": {
+    "higgsfieldCalls": 0,
+    "uploads": 0,
+    "creditsConsumed": 0,
+    "formalProjectWrites": 0,
+    "installedAppReplaced": false,
+    "notarized": false,
+    "gitStagedOrCommittedOrPushed": false,
+    "lingeringElectronOrPlaywrightProcesses": 0
+  }
+}

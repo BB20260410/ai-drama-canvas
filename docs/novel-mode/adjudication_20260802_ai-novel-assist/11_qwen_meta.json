@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "role": "qwen",
+  "model": "qwen3.8-max-preview",
+  "elapsed_sec": 401.95,
+  "usage": {
+    "prompt_tokens": 3142,
+    "total_tokens": 23169,
+    "completion_tokens": 20027,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 3142
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 9958,
+      "text_tokens": 20027
+    }
+  },
+  "finish_reason": "stop",
+  "content_chars": 21675,
+  "client_timeout_sec": 0.0,
+  "output": "/Users/hxx/Documents/无限画布/docs/novel-mode/adjudication_20260802_ai-novel-assist/11_qwen.txt"
+}

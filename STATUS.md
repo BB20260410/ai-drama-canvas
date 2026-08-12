@@ -1,5 +1,297 @@
 # STATUS · 当前源码生产中枢（P0—P9 CLOSED / MCP_CLIENT_RESTART_PASS）
 
+## software_goal: autonomous-dev-loop-v1（无人干预开发闭环 · 永续循环）
+
+| 字段 | 当前值 |
+|---|---|
+| status | `completed`（基础设施保留但不再自动续跑）：**2026-08-12 16:43**——7 项全部 closed，无 parked/open/claimed；只有新复现或用户新目标才能开启下一周期 |
+| active_item | `none`：`WORKQUEUE_EMPTY`，无遗留票、无在途测试/App/MCP 进程 |
+| earliest_next | 仅在出现新复现或用户明确要求时运行 `npm run patrol`；当前不得无理由再次全面审查或重跑全量 |
+| infra | `scripts/auto-triage.ts` · `scripts/workqueue-ops.ts` · `WORKQUEUE.json` · `docs/GOAL_无人干预开发闭环与工作队列协议_20260812.md` · `scripts/goal-resume-prompt.txt` v3 |
+| last_patrol | `.workqueue/patrol-summary-2026-08-12T01-08-26-137Z.json`（fast PASS）；本次另完成 fast/medium/integration/heavy 全分区与 wq-0007 严格门验证，`patrol-health=IDLE` |
+| handoff | wq-0001…0007 全部闭合；wq-0007 已恢复 P14 60s、小说 401 章 20s、full-workflow 120s 严格门，3 files / 8 tests PASS 后正式 close |
+| fixes_this_cycle | C6：补齐中断后 heavy 3 批并闭合全分区；重测 P14 47.8s，恢复三条严格性能门；WORKQUEUE closed=7；完成敏感/大文件扫描、构建与 Git 收口 |
+| probes_added | 全覆盖：四测试分区（fast/medium/integration/heavy）+build-full+mcp-handshake+双套 typecheck+分区审计+金丝雀+dep-audit；协议含「多会话协调」章 |
+| boundaries | 不重建 owner；不写正式工程；不外部调用/上传/付费/公证/发布；本轮用户明确授权本地 Git stage/commit，不 push |
+| completion_gate | 当前周期：`stats={closed:7}`、`WORKQUEUE_EMPTY`、全测试分区/严格性能门/类型/构建/审计/diff 全绿、Git 干净 |
+| evidence | `.workqueue/verify-wq-0007-1786523422811.log` · `.workqueue/p14-prof-result.txt` · 本轮 Git 提交与 `docs/当前开发交接.md` |
+
+恢复规则：本周期已完成，基础设施仅作为休眠工具保留。只有新复现或新产品目标才运行巡检；禁止因“还能优化”自动重开已闭合 owner。
+
+## software_goal: bounded-improvement-local-delivery-20260811
+
+| 字段 | 当前值 |
+|---|---|
+| status | `completed`：有界整改、唯一 candidate/package、可回滚签名安装与隐藏验收全部通过 |
+| active_item | `none`：本 Goal 已关账，App 已关闭 |
+| earliest_next | `none`：无新复现不得重跑 candidate/package/install；Higgsfield Unlimited 仍按独立供应方边界处理 |
+| plan | `.planning/2026-08-11-untitled-71abd207/task_plan.md`（gated/attested；每切片最多两轮同范围纠正） |
+| source_baseline | frozen `954ac71a… / c7cb5cee… / 220`（1046 files / 20,793,529 bytes）；build、audit 0、diff 与独立终审 CLEAN |
+| delivery | candidate `mcp-candidate-954ac71a461be527-3962c60699c5bbcd-d3674875`；current invalid=0；stdio `220/89/9/8`；唯一隐藏 package smoke PASS |
+| installed_baseline | `/Applications/AI 漫剧画布.app` = `954ac71a… / c7cb5cee… / 220`；arm64、Developer ID deep/strict、隐藏验收 PASS，App 已关闭 |
+| selected_scope | P1 原子互斥；watcher latest-only single drain；VideoEditor nested preview 惰性加载与 hover 有界队列；冻结后唯一 candidate/package/install |
+| anti_loop | 同一失败不原样重跑；长命令只轮询原进程；candidate/package/installed verify 各一轮正式新身份；源码漂移即退回验证 |
+| boundaries | 不重建 owner；不改正式工程；不外部调用/上传/付费/公证/发布；不 Git stage/commit/push；测试与 App 全程后台隐藏 |
+| completion_gate | selected P1/P2=0；定向/相邻测试、两套 typecheck、build、audit、diff、独立终审、candidate、hidden package、签名安装与 hidden verify 全 PASS |
+| rollback | `/Users/hxx/Documents/无限画布_交付归档/local-install-20260811T135947Z-954ac71a`；旧 d5 installed/dist 均保留并验签 |
+| evidence | `docs/evidence/bounded-improvement-local-install-final-20260811-954ac71a.json`；`docs/验证报告_20260811_有界改良与本机安装闭环_954ac71a.md` |
+
+恢复规则：本 Goal 已完成。不得重新全面审查或重跑 candidate/package/install；只有新复现才进入对应 owner。
+
+## software_goal: bounded-maintenance-four-slices-20260811
+
+| 字段 | 当前值 |
+|---|---|
+| status | `completed`：四项有界优化及独立终审全部通过 |
+| active_item | `none`：Review latest-only、Projection 去重、npm 语义门、SQLite busy/deadline 已收口 |
+| earliest_next | `none`：源码整改已关账；若用户要安装 `4cffddd6…`，另开 local-only 交付切片 |
+| source | `4cffddd6… / 69b49cfa… / 220 tools`；live digest 与 release manifest 一致 |
+| verification | 7 files / 37 tests；SQLite 邻接 4 files / 58 tests；两套 typecheck、build、audit 0、diff PASS |
+| dependency_health | 真实 npm 树仅 3 个 sharp optional WASM 项获 lockfile 路径/版本证明；unknown/missing/invalid/错路径/prerelease 均拒绝 |
+| final_review | `CLEAN`：P0=0、P1=0、P2=0 |
+| installed_app | 仍为已验收 `d5ce49a9… / 6ed09cc9… / 220`，本轮未替换 |
+| boundaries | 未重跑 T23/candidate/package/install；无窗口、正式数据、外部调用、上传、付费或 Git 写操作 |
+| evidence | `docs/evidence/bounded-maintenance-four-slices-20260811-4cffddd6.json`；`docs/验证报告_20260811_四项有界优化整改_4cffddd6.md` |
+
+恢复规则：本整改已完成；不得继续“再审查一轮”。只有新复现或明确安装授权才开启新的有界任务。
+
+## software_goal: runtime-stability-local-delivery-d5
+
+| 字段 | 当前值 |
+|---|---|
+| status | `completed`：严格性能门通过的 d5 源码已完成本机 local-only 交付与安装验收 |
+| active_item | `none`：candidate、current/stdio、唯一隐藏 package smoke、签名、安装和旧版可恢复清理均已完成 |
+| earliest_next | `none`：无新复现不得重跑 candidate/package/install；候选历史与归档 GC 需另开只读审计切片 |
+| source | `d5ce49a9… / 6ed09cc9… / 220 tools`；release manifest SHA `2ff843ab…` |
+| mcp | candidate `mcp-candidate-d5ce49a9fdd9a277-7eeb2e7c974f57eb-348414e0`；current invalid=0；stdio `220/9/8` PASS |
+| isolated_package | 唯一隐藏 smoke PASS；四次 App 自然退出 `175/194/45/37ms`，show/focus=0，无强杀/残留 |
+| installed_app | `/Applications/AI 漫剧画布.app` = `d5ce49a9… / 6ed09cc9… / 220`；arm64；Developer ID deep/strict；52ms 自然退出 |
+| rollback | `无限画布_交付归档/local-install-20260811T085335Z-d5ce49a9`；旧 c9 App 与旧 dist 均保留且验签通过 |
+| cleanup | `/Applications/本地画布.app` 0.1.0 已移入废纸篓，可恢复；未清 candidate/历史归档 |
+| boundaries | local-only、不公证、不生成 DMG、不发布；正式数据/上传/付费/Git 写操作均为 0；App 已关闭 |
+| evidence | `docs/evidence/runtime-stability-local-install-final-20260811-d5ce49a9.json`；`docs/验证报告_20260811_严格性能版本本机安装闭环_d5ce49a9.md` |
+
+恢复规则：本交付 Goal 已完成。不得把安装验收当成公开发行或公证；只有新的可复现缺陷才进入对应 owner。
+
+## software_goal: runtime-stability-refactor-v1
+
+| 字段 | 当前值 |
+|---|---|
+| status | `completed`：冷启动严格性能门、units 匿名取证与 T23 证据脱敏全部通过 |
+| active_item | `none`：当前源码身份已完成唯一隐藏 strict 终验，禁止无新复现重跑 |
+| earliest_next | `none`：严格门及其独立本机交付均已关账；仅新复现或新的明确产品目标可开启有界切片 |
+| completed_items | 既有两项 P1 与分页/投影整改；startup fail-close/恢复校验；startup reconcile 锁粒度；对账后 exact units 预取；单调 raw/reference span；同 Renderer 原子取证；units 请求级匿名阶段/查询计数；成功/失败证据白名单脱敏 |
+| deferred_items | 替代 preload 兼容残差；units phase 名防御性白名单；T23 早期 console/page error 监听 P2；GlobalResource harness no-clobber P2；未选中的其他 P2/P3 |
+| blockers | `none`：首卡 `1246ms`、首 raw `4033ms`、全参考 `5201ms`、IPC 峰值 4 与全部交互门 PASS |
+| evidence | `docs/evidence/runtime-stability-t23-strict-final-redacted-20260811-d5ce49a9.json`；`docs/验证报告_20260811_units只读热路径取证与严格性能关账_d5ce49a9.md`；`docs/evidence/runtime-stability-local-install-final-20260811-d5ce49a9.json` |
+| correction_round | `units_probe=1`；`evidence_redaction=1`；新源码身份 strict 只运行一次，未循环重试 |
+| source | `d5ce49a9… / 6ed09cc9… / 220 tools`；5 files / 50 tests、两套 typecheck、build、diff、strict interactions、交付链与独立终审 PASS |
+| installed_app | `/Applications/AI 漫剧画布.app` 已更新为 `d5ce49a9… / 6ed09cc9… / 220 tools`；Developer ID arm64；App 已关闭 |
+| completion_gate | `known_p0=0`; `selected_p1=0`; `selected_performance_items=completed`; `targeted_tests=50_pass`; `typecheck=pass`; `typecheck_app=pass`; `build=pass`; `diff_check=pass`; `final_review=clean`; `strict_t23=pass_1246_4033_5201`; `interactions=pass`; `evidence_redaction=pass`; `package_smoke=pass`; `installed_app_identity=current_d5`; `installed_hidden_verify=pass`; `formal_data_untouched=yes`; `external_paid_calls=0`; `git_stage_commit_push=0`; `app_closed=yes`; `evidence_index=nonempty`; `STATUS/TASKS=updated` |
+
+恢复规则：本 software Goal 与独立本机交付均已完成。不得重跑 `d5ce49a9…` 的 T23、candidate、package smoke 或安装；
+只有新复现才进入对应 owner 的有界切片。
+
+## software_goal: whole-project-behavior-preserving-refactor-v1
+
+| 字段 | 当前值 |
+|---|---|
+| status | `completed`：Phase A–H 与最终同身份交付验收全部通过 |
+| active_item | `none`：本重构计划已关账，禁止无新证据重跑 |
+| earliest_next | `none`：最新版已安装并关闭；只有新复现才开启新切片 |
+| Phase A | 解除 Higgsfield 两节点运行时环；小说共享快照归位纯类型；向导资产和画布文稿读取并发上限 4 |
+| Phase B | 8 个 Active Studio owner 共用 canonical JSON 内核；历史 hash/pretty bytes/P24 golden 不变 |
+| Phase C | 220 MCP 工具改为显式 registrar；ABI/effect/gate/guarded-write 组合顺序不变 |
+| Phase D | generation v7 schema/storage 与业务分层；DDL/迁移字节不变；Active Studio SCC 解除 |
+| Phase E | Material Studio 类型/read mapper 与旧画布纯投影分层；分页/token/nextAction/PASS 保持 |
+| Phase F | Studio 58 条 executor 与可靠性壳分层；7 条全局资源 read IPC 抽取；ABI 不变 |
+| Phase G | candidate stage/cutover 与两阶段 package terminal 分层；并发回收/提交后错误闭合 |
+| dependency_graph | Core 运行时 SCC `3 → 1`，大小 `[15,4,2] → [15]`；仅保留历史 legacy/fusion 环 |
+| Phase H | 冻结 `c9bb2c87…`；26/179、build、audit、candidate、stdio、隐藏隔离 App、安装与证据终结 PASS |
+| verification | A–H 与独立终审 PASS；安装版 220 tools、show/focus=0、41ms 自然退出 |
+| evidence | `whole-project-refactor-final-20260811-c9bb2c87.json`；`whole-project-refactor-local-install-20260811-c9bb2c87.json` |
+| installation | `/Applications/AI 漫剧画布.app` = `c9bb2c87… / 02a1bf9d… / 220 tools`；Developer ID arm64 |
+| boundaries | 正式数据/外部调用/上传/付费/Git 写操作均为 0；local-only、不公证；App 已关闭 |
+
+恢复规则：本 Goal 与本机安装均已完成，不得重复 A–H、candidate、package smoke 或安装。
+只有新的可复现问题才进入对应 owner 的有界修复。
+
+## 2026-08-10 22:12 · 运行速度、稳定性与安全边界有界整改：部分完成 / 最新 App 已安装
+
+| 字段 | 当前事实 |
+|---|---|
+| 结论 | **部分完成**：已知 P0/P1=0，两项性能整改有实测收益，交付链 PASS；首卡 `2094ms > 1500ms` 在两轮后保持 blocked |
+| 当前身份 | sourceDigest `0d17eb62…`；buildId `6067ff07…`；220 tools；arm64；local-only |
+| 安全 | DNS pin、公网 HTTPS、TLS、代理/重定向、敏感响应及 pre/post dispatch 错误投影均闭合；独立 Max 终审 CLEAN |
+| 性能收益 | 投影 IPC 峰值 `5→3`（-40%）；节点选择与展开 `10126.97→8648.52ms`（-14.6%） |
+| 性能阻塞 | 首卡 `1747→1794→2094ms`，预算 1500ms；无收益 units-first 已回退，禁止第三轮 |
+| 验证 | Provider 3 files/63、command bus 17、两套 typecheck、build、diff、audit 0、candidate、唯一 package smoke 均 PASS |
+| 安装版 | `/Applications/AI 漫剧画布.app`；Developer ID deep/strict；220 tools；隐藏启动 show/focus=0；49ms 自然退出；无残留 |
+| 回滚 | `/Users/hxx/Documents/无限画布_交付归档/local-install-20260810T141117Z-0d17eb62` |
+| 边界 | 未公证/DMG/发布/上传/付费/正式数据写入；未 Git stage/commit/push；App 已关闭 |
+| 证据 | `docs/evidence/runtime-stability-refactor-final-20260810-0d17eb62.json` |
+
+## 2026-08-10 20:58 · 小说分析 Provider 出站安全重构 PASS（源码范围）
+
+| 字段 | 当前事实 |
+|---|---|
+| 结论 | **已完成（源码与无窗口验证范围）**：DNS rebinding/SSRF、公网 HTTP 明文与相邻 TLS/错误落盘缺口均关闭 |
+| 安全合同 | 单次 DNS 快照绑定；每请求独立 Agent；代理隔离；3xx 拒绝；显式 TLS 验签；IPv4/IPv6 fail-closed；安全错误摘要 |
+| 状态机 | intent 前策略失败保持 prepared；request_dispatched 后网络/HTTP/解析/本地提交错误保持 submission_unknown，禁止自动重提 |
+| 验证 | 3 files / 56 tests、typecheck、typecheck:app、build、undici direct、official audit 0、旧构建字符串清零、diff check PASS |
+| 当前源码 | sourceDigest `3517c0cb…`；buildId `1ba67472…`；220 tools |
+| 依赖 | `undici@7.29.0` 精确直接生产依赖；7.28.0 因高危公告未交付 |
+| 终审 | `sol_final_max` CLEAN；剩余 P0=0、P1=0 |
+| 边界 | 未跑全量分区；未建 candidate；未打包/安装/启动 App；未写正式数据；未 Git stage/commit/push |
+| 证据 | `docs/evidence/novel-analysis-provider-outbound-security-20260810-3517c0cb.json` |
+
+防循环：本安全切片已经源码关账；安装新版只能作为后续独立切片执行。
+
+## 2026-08-10 19:39 · 全面 UI/功能/稳定性/性能复验与本机更新 PASS
+
+| 字段 | 当前事实 |
+|---|---|
+| 结论 | **已完成（本机 local-only）**：真实隐藏 UI、规模画布、隔离 App、安装版和最终复盘均 PASS |
+| 当前身份 | sourceDigest `90be6c16…`；buildId `8babc483…`；220 tools；arm64 |
+| 机械基线 | medium 91/788、integration 35/119、heavy 5/17 全通过；fast 首轮 1260 通过/4 失败，4 项均以定向回归关闭；最终 6 files / 71 tests PASS |
+| 全局 UI | 39 个 Vue 页面、547 个静态按钮、39 张图片、10 个音视频均通过可访问性/操作/解码合同 |
+| 真实 UI | 22 条路径、6 类节点动作、7 个页面状态；page/console/external error 均 0，show/focus=0，45ms 自然退出 |
+| 规模 | 1288 单元 / 4235 宫格 / 77 资产 / 10000 媒体；10 次跨工程切换无串库，FD +0，RSS -9376 KiB |
+| 打包安装 | 隔离 App 4 次自然退出、零强杀/残留；安装版 Developer ID deep/strict、220 tools、38ms 自然关闭 PASS |
+| 清理 | 历史当时删除 `/Applications/本地画布.app` 0.1.0 与本轮 DMG/blockmap；2026-08-11 再次发现同 bundle ID 旧版后已移入废纸篓，可恢复 |
+| 边界 | 不公证、不发布、不上传、不付费、不写正式项目、不做 Git stage/commit/push；App 已关闭 |
+| 报告 | `docs/验证报告_20260810_全面UI功能稳定性性能复验与本机更新.md` |
+| 总证据 | `docs/evidence/comprehensive-ui-stability-performance-validation-20260810-90be6c16.json` |
+
+防循环：本任务已经关账，不再重跑 fast/medium/integration/heavy、candidate、隔离 package smoke 或安装；只有新的具体复现才开启新切片。
+
+## 2026-08-10 17:12 · 最新 App 保持与旧构建清理 PASS
+
+| 字段 | 当前事实 |
+|---|---|
+| 结论 | **已完成（本机 local-only）**：当前安装版已是最新版，无需重复安装；旧 App 与旧安装包已做可恢复清理 |
+| 当前安装版 | `/Applications/AI 漫剧画布.app`；sourceDigest `a12f5095…`；buildId `3626bb27…`；220 tools；arm64；Developer ID deep/strict PASS |
+| 同源证明 | 安装版与 `dist/mac-arm64` App 的 release manifest 字节一致，`app.asar` SHA-256 同为 `14d59def…3d11` |
+| 清理结果 | 9 个旧 App + 4 个旧 DMG + 5 个旧 blockmap，共 18 项 / 约 3.96 GiB，已移入废纸篓 |
+| 旧包纠正 | 原 `dist` DMG 实为 `265498ff…` / 218 tools 的旧构建，已移走，防止误装降级 |
+| 当前库存 | 受检路径仅保留 `/Applications` 当前 App 与 `dist/mac-arm64` 同身份最新版 App；旧 App/安装包为 0 |
+| 恢复边界 | 废纸篓目录 `/Users/hxx/.Trash/AI漫剧画布_旧版清理_20260810-171036`，未清空，仍可恢复 |
+| 数据边界 | 未改源码、正式项目、素材、CAS/SQLite、既有 final-validation；未公证、发布或 Git stage/commit/push；App 已关闭 |
+| 证据 | `docs/evidence/local-app-latest-old-artifact-cleanup-20260810-a12f5095.json` |
+
+## 2026-08-10 15:42 · 性能可靠性修复与本机安装最终闭环 PASS
+
+| 字段 | 当前事实 |
+|---|---|
+| 结论 | **已完成（本机 local-only）**：上一轮 Electron binary 阻塞已关闭，源码、candidate、隔离 App 与安装版身份统一并验收通过 |
+| 根因修复 | Electron 43.1.0 无 postinstall；隔离安装现显式调用 lockfile `install-electron`，并以 `checksums.json` 验证缓存、arm64、版本、权限、ZIP 与解包哈希 |
+| 验证 | provenance fixture PASS；2 files / 16 tests、两套 typecheck、build、diff check PASS；唯一最终隔离 App smoke PASS |
+| 当前 candidate | `mcp-candidate-a12f50958060b54f-4305080585cf35c4-9f84926b`；sourceDigest `a12f5095…`；buildId `3626bb27…`；220 tools；12 candidates / invalid 0 |
+| 当前安装版 | `/Applications/AI 漫剧画布.app`；arm64；Developer ID deep/strict PASS；bundled MCP 220 tools；47ms 自然退出 |
+| 后台证明 | 隔离包 8 个观察点及安装版均 show/focus=0、Dock hidden；无残留进程 |
+| 回滚 | `无限画布_交付归档/local-install-20260810-153921-a12f5095/previous-installed/AI 漫剧画布.app`，签名复验 PASS |
+| 边界 | 未公证、未上传/发布、未调用 Higgsfield、未写正式数据、未 Git stage/commit/push；App 已关闭 |
+| 报告 | `docs/验证报告_20260810_性能可靠性修复与本机安装最终闭环.md` |
+
+## 2026-08-10 13:20 · 运行性能与可靠性有界修复：源码 PASS / 隔离 App smoke BLOCKED
+
+| 字段 | 当前事实 |
+|---|---|
+| 结论 | **部分完成**：14 项新审查问题已修复并完成影响范围验证；最终隔离 App smoke 在启动前失败，未安装当前源码 |
+| 性能 | 剪辑台 6 小时核心上限、横向虚拟化、索引化热路径；嵌套预览/画布缩略图并发 2；旧画布搜索合并并移除主要 O(n²)；素材库首屏延迟加载；小说 FTS 热查询缓存 |
+| 可靠性 | Higgsfield 队列可恢复/可对账/owner 终检；总资源瞬时 SQLite 错误不再缓存为损坏；隔离包改由 lockfile `npm ci` 重建依赖 |
+| 验证 | 队列 7/7、最新组合 15/15、dirty 3/3、package guards 13/13、影响范围 111 assertions PASS；两套 typecheck、build、audit 0、diff check PASS |
+| 最终 candidate | `mcp-candidate-16fd01e99315d011-4305080585cf35c4-87d72760`；sourceDigest `16fd01e9…`；buildId `5df33080…`；220 tools；invalid 0 |
+| 未通过门禁 | 最终 smoke 证据 `isolated-package-smoke-20260810T051143493Z-55875-f8a6249c.json`：隔离安装后的 Electron binary 缺失，App 未启动 |
+| 停止规则 | 本切片不再重跑；下一切片只能先做 Electron binary provenance 小型 fixture，再允许唯一一次 package smoke |
+| 边界 | 未开窗口、未替换 `/Applications`、未公证、未调用 Higgsfield、未写正式数据、未 Git stage/commit/push |
+| 报告 | `docs/验证报告_20260810_运行性能与可靠性有界修复.md` |
+
+## 2026-08-10 10:42 · 无限画布首屏分包性能优化 PASS
+
+| 字段 | 当前事实 |
+|---|---|
+| 结论 | **已完成（源码与无窗口构建范围）**：旧版 VueFlow 运行时和 6 个旧画布组件不再静态进入所有工作区首屏 |
+| 实测收益 | renderer 主 JS `807,753 B → 437,455 B`，减少 `370,298 B / 45.84%`；gzip `175,471 B → 98,418 B`，减少 `43.91%` |
+| 分包结果 | VueFlow core 成为 `335,377 B` 独立懒加载块；项目中心、小说和不使用旧画布的路径不再预付该运行时代价 |
+| 验证 | 影响范围 `4 files / 42 tests` PASS；`npm run build`（两套 typecheck、MCP、identity、renderer）PASS；`git diff --check` PASS |
+| 当前源码构建 | version `0.2.0` / sourceDigest `5ed202c0c29e3aa698f9b4533ce6741d3bb535bda1e8b31715a869338d457c93` / buildId `d7c6c6f0d41aedf175d8b9ee1fd02ca0` / MCP `220 tools` |
+| 边界 | 未打开 App、未写正式工程/CAS/SQLite、未替换 `/Applications` 安装版；未打包/签名/公证，未 Git stage/commit/push |
+| 证据 | `docs/验证报告_20260810_无限画布首屏分包性能优化.md`；`docs/evidence/renderer-legacy-canvas-lazy-load-20260810.json` |
+
+## 2026-08-10 07:55 · Higgsfield 画布图片/视频排队桥已安装 / 真实免费生成仍阻塞
+
+| 字段 | 当前事实 |
+|---|---|
+| 结论 | **部分完成**：无限画布内图片、视频排队入口、Codex 工作队列、免费预检、一次性授权和提交回执已交付并安装；真实生成仍被供应方阻塞 |
+| 画布入口 | 正式图片 run 可“用 Higgsfield 排队”；具备 unit-grid/video package 的受管工程可“加入 Higgsfield 视频队列”；blocked 可重新排队 |
+| Agent 桥 | 新增 `get_studio_connector_work_queue`；用户 enqueue，Codex claim/preflight/authorize/record；同一 generation ledger，无平行 DB/CAS |
+| 免费门禁 | `use_unlim=true`、零扣费、无 adjustments、请求/profile/workspace/TTL 全绑定；不确定或非零立即 `blocked_by_provider`，禁止积分回退 |
+| 当前身份 | version `0.2.0` / arm64 / sourceDigest `bf4dbb751f21ab05e76bc43a6f85288844d2f8a6e3cc2ddd3e671b585357cfd7` / buildId `019ba25fbcea817acb3c7984234fe0c6` / MCP `220 tools` |
+| 验证 | 8 files / 48 tests、两套 typecheck、diff check、final candidate/current、真实 stdio 握手、唯一隐藏隔离 smoke、安装版独立验收均 PASS；终审允许作为失败关闭排队桥安装 |
+| 安装版 | `/Applications/AI 漫剧画布.app`；Developer ID deep/strict PASS；后台 show/focus=0、53ms 自然退出；按用户要求未公证 |
+| 回滚副本 | `/Users/hxx/Documents/无限画布_交付归档/local-install-20260810-075412-bf4dbb75/previous-installed/AI 漫剧画布.app` |
+| 外部副作用 | 生成=0、上传=0、credits 消耗=0、网页自动化=0、正式工程/CAS/Review 写入=0 |
+| 尚未完成 | 供应方尚未给出可验证 Unlimited 免费能力；真实 poll/download/校验/CAS/时间线/Review 未实现，不得把排队桥写成完整生成闭环 |
+| 证据 | `docs/验证报告_20260810_Higgsfield画布图片视频排队桥本机交付.md`；`docs/evidence/higgsfield-canvas-connector-queue-20260810-bf4dbb75.json` |
+
+## 2026-08-10 06:58 · Ultra 会员已确认 / 程序化 Unlimited 仍被供应方阻塞
+
+| 字段 | 当前事实 |
+|---|---|
+| 会员与工作区 | Connector、CLI、唯一 workspace 均识别为 `ultra`；没有错账号/错工作区/授权过期证据 |
+| 最新 CLI | 已从 1.1.20 更新至官方 npm 1.1.23；Seedance 2.5、Seedance 2.0、GPT Image 2 合同仍无 `use_unlim`，传参均被拒绝 |
+| Connector 图片 | 4 个候选中 2 个返回非零 nominal credits，2 个明确拒绝 Unlimited；没有 cost=0 或 Unlimited receipt |
+| Connector 视频 | Seedance 2.5 与目录标记的 5 个 Unlimited 视频候选全部被费用后端明确拒绝 |
+| 裁决 | **BLOCKED_BY_PROVIDER**：用户会员真实，但网页 Unlimited 未投影到 connector/API/CLI；App 保持 Unlimited-only 失败关闭 |
+| 外部副作用 | 生成=0、上传=0、credits 消耗=0、浏览器自动化=0、正式工程写入=0 |
+| 证据 | `docs/验证报告_20260810_Higgsfield会员Unlimited程序化复核.md`；`docs/evidence/higgsfield-unlimited-membership-programmatic-recheck-20260810.json` |
+
+## 2026-08-10 06:48 · Higgsfield Seedance 2.5 Unlimited 软件桥 PASS / 供应方阻塞
+
+| 字段 | 当前事实 |
+|---|---|
+| 结论 | **部分完成**：上一任务已收尾；本地软件桥、candidate、隐藏隔离 App、本机安装均 PASS；真实 Unlimited 视频未生成，阻塞在 Higgsfield 当前能力 |
+| 真实供应方门禁 | connector 返回 `unlim_available=false`；Seedance 2.5 无 `supports_unlim=true`；`use_unlim:true` 预检为 `INVALID_ARGUMENT`；普通队列为 130 credits，已禁止回退 |
+| 软件能力 | 既有 generation ledger 上新增 Codex-only capability/prepare/record；固定 `seedance_2_5 / References / 20s / 720p / audio / Unlimited-only / concurrency 1`；unknown 禁止重提 |
+| 安全边界 | 活动工程 token+fence、Studio 写租约、受控 source-closure 路径、一次性许可不落账、远端回执脱敏、Renderer 无提交旁路 |
+| 当前身份 | version `0.2.0` / arm64 / sourceDigest `f893b386dca3c97bb11aa856f53685e0395894c6cff52c3af67745880c47b6ec` / buildId `249252297e368251f29b75b3c23177cf` / MCP `219 tools` |
+| 验证 | 4 files / 21 tests PASS；两套 typecheck、diff check、candidate/current、真实 MCP 握手、唯一隐藏隔离 smoke、安装版验收均 PASS；独立终审 CLEAN |
+| 安装版 | `/Applications/AI 漫剧画布.app`；Developer ID deep/strict PASS；后台 show/focus=0，48ms 自然退出；按用户要求未公证 |
+| 回滚副本 | `/Users/hxx/Documents/无限画布_交付归档/local-install-20260810-064700-f893b386/previous-installed/AI 漫剧画布.app` |
+| 外部副作用 | 参考图上传=0、视频 job=0、credits 消耗=0、网页自动化=0、正式项目写入=0 |
+| 尚未完成 | 供应方开放程序化 Unlimited 后，仍需补真实 job poll/download/20s-720p 校验/CAS/时间线 commit 与一次隔离 canary；当前不得用付费队列冒充完成 |
+| 证据 | `docs/验证报告_20260810_Higgsfield_Seedance25_Unlimited接入与供应方阻塞.md`；`docs/evidence/higgsfield-seedance25-unlimited-integration-20260810-f893b386.json` |
+
+## 2026-08-10 05:58 · 再次代码审查、修复与本机安装 PASS
+
+| 字段 | 当前事实 |
+|---|---|
+| 结论 | **已完成（本机 local-only 范围）**：前次 9 项审查问题均保持修复；本轮新增 3 个 P1、4 个 P2 已全部修复，三路独立终审最终 CLEAN |
+| 关键修复 | paid-call 注销 fence、启动早期 close bridge、安装证据包外门禁、VideoEditor session 代次、recoverable 退出裁决、SDK 精确身份、后台有界安装验收 |
+| 当前身份 | version `0.2.0` / arm64 / sourceDigest `d8e48caa6e635332eae06d49717f23a21d3d433613e488d3f49e2c42baecb20f` / buildId `0324e11699f994eafc697bb5a74865bd` / MCP `218 tools` |
+| 定向验证 | 8 files / 65 tests PASS；`typecheck`、`typecheck:app`、`git diff --check` PASS；最终 candidate/current/真实 MCP 握手 PASS |
+| 隔离 App | 唯一一次 smoke PASS；4 次自然退出均 exit 0；8 份快照 show/focus=0、Dock hidden；无 TERM/KILL、无残留进程 |
+| 安装版 | `/Applications/AI 漫剧画布.app`；Developer ID deep/strict PASS；主可执行 SHA `7ab1eddb…3c97`，`app.asar` SHA `3fa35fb4…3c5` |
+| 回滚副本 | `/Users/hxx/Documents/无限画布_交付归档/local-install-20260810-055700-d8e48caa/previous-installed/AI 漫剧画布.app` |
+| 证据 | `docs/验证报告_20260810_再次代码审查对比与本机安装闭环.md`；`docs/evidence/code-review-comparison-remediation-20260810-d8e48caa.json` |
+| 分发边界 | 仅此 Mac 本地使用；按用户要求不公证；`spctl` 的 Unnotarized 拒绝符合预期；未上传、发布、配置自动更新或生成新 DMG |
+| 数据/Git 边界 | 未修改正式项目、素材、CAS/SQLite；未 stage/commit/push/reset/clean；验收后 App 已关闭 |
+
+## 2026-08-10 05:16 · 本机安装版更新与物理拖出关账 PASS
+
+| 字段 | 当前事实 |
+|---|---|
+| 结论 | **已完成（本机本地使用范围）**：当前源码 App 已安装到 `/Applications`；关闭 ACK、窗口销毁异常、真实跨应用拖出和安装版独立启动均通过 |
+| 安装版身份 | version `0.2.0` / arm64 / sourceDigest `a4312c768158bee4f6c64a3d1764ecf0b455f6a0e541fcfe0b217b4274433bda` / buildId `e0197b69e9c27800f65e68d9c8ab7173` / MCP `218 tools` |
+| 安装校验 | App 自带 Electron runtime 启动 MCP；系统 Node 非必需；Developer ID deep/strict PASS；后台隐藏首启 PASS |
+| 真实拖出 | 图片、视频、音频到 Finder，图片到独立 AppKit 接收器；副本 SHA/解码/inode、源 CAS、画布节点、媒体登记与 pinned node 全部 PASS |
+| 旧版回滚 | `/Users/hxx/Documents/无限画布_交付归档/local-install-20260810-051406-a4312c76/previous-installed/AI 漫剧画布.app` |
+| 安装证据 | `docs/evidence/installed-local-verify-20260809T211523Z-a4312c76.json` |
+| 拖出证据 | `docs/evidence/native-media-drag-physical-20260809T202248842Z-40022.json` 与同名 `-core.json` |
+| 分发边界 | 仅此 Mac 本地使用；用户明确不公证；未生成新 DMG、未上传、未发布、未配置自动更新 |
+| Git/数据边界 | 未 stage/commit/push；正式项目、素材、CAS/SQLite 未因安装或验收发生写入 |
+
 ## 2026-07-31 23:43 · Git 研发收口（软件增量已提交）
 
 | 字段 | 当前事实 |

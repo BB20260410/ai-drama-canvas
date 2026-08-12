@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-writing-os-desktop-p0-electron-smoke",
+  "verdict": "PASS",
+  "capturedAt": "2026-08-02T10:50:51.195Z",
+  "scope": {
+    "isolatedManagedFixture": true,
+    "formalNovelSourcesTouched": false,
+    "remoteServicesUsed": false,
+    "gitMutationPerformed": false
+  },
+  "build": {
+    "sourceDigest": "d620485e86000fd8b2ff6cfdc1ad921641a29f4dc691c93b2c97f32daa1935d3",
+    "buildId": "870a64ff4da1462d2f2be03528fc03ec"
+  },
+  "checks": {
+    "stateDebtVisibleBeforeReview": true,
+    "machineConflictVisibleBeforeReview": true,
+    "eightFieldDiffVisible": true,
+    "humanUiAcceptedCandidate": true,
+    "completionCommittedAfterReview": true,
+    "probePassedAfterReview": true,
+    "pendingCandidateRemovedAfterReview": true,
+    "fixedReviewerInjectedByMain": true
+  },
+  "runtimeState": {
+    "projectId": "project-865e6bb71cdb",
+    "readyForPrepare": false,
+    "currentThroughChapterId": "ad78deba-4781-59f8-95fd-12b632f0e5e4",
+    "selectedCompletion": "committed",
+    "probeStatus": "pass",
+    "pendingCandidateCount": 0
+  },
+  "decision": {
+    "candidateId": "novel-state-candidate-b7adcde06a4963c68a0bbec3",
+    "decision": "accepted",
+    "reviewer": "desktop-human-owner",
+    "fingerprint": "eefee500e19213335a450de6df09cbe12cd78503fa84f1917c5e64de94b35b8b"
+  },
+  "diagnostics": {
+    "pageErrors": [],
+    "consoleErrors": [],
+    "externalRequests": []
+  },
+  "screenshots": [
+    {
+      "relativePath": "docs/evidence/novel-mode-v1/writing-os-desktop-p0/desktop-writing-os-p0-20260802-r4/01-dashboard-state-debt.png",
+      "bytes": 138209,
+      "sha256": "1458d6279f717716b3644d10ea3b3abac9818b45e29b2e03ad3417b50ead26ac",
+      "width": 1728,
+      "height": 1029,
+      "entropy": 2.4247753386680415
+    },
+    {
+      "relativePath": "docs/evidence/novel-mode-v1/writing-os-desktop-p0/desktop-writing-os-p0-20260802-r4/02-candidate-diff.png",
+      "bytes": 141582,
+      "sha256": "c6edfbfde8d3e2d63528015ca12d3c3c442dfcdddc8e74da10d1d9e0df29ab0f",
+      "width": 1728,
+      "height": 1029,
+      "entropy": 2.23226025774602
+    },
+    {
+      "relativePath": "docs/evidence/novel-mode-v1/writing-os-desktop-p0/desktop-writing-os-p0-20260802-r4/03-state-accepted.png",
+      "bytes": 137218,
+      "sha256": "369b996e0aca7fcb83a87d2ad6a4987dbbb411875f0a9af982ffc3cf8fb22837",
+      "width": 1728,
+      "height": 1029,
+      "entropy": 2.0537977385592967
+    }
+  ]
+}

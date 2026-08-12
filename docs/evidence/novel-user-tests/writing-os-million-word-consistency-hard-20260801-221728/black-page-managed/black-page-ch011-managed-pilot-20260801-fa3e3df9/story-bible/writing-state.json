@@ -1,0 +1,3755 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-writing-state",
+  "projectId": "project-79b2b0acb554",
+  "revision": 2,
+  "baselineStatus": "provisional",
+  "sourceTreeAggregateSha256": "97e8fde0ee0ea8ce8529c3db7db4d2d412cbaf0b8f7ff1e837d185f01b89bada",
+  "currentThroughChapterId": "fb4a0877-d99d-51f5-ab8d-53f4eca1f754",
+  "historyBaseChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+  "sources": [
+    {
+      "sourceId": "source-3c12f5f1e6471afd1779",
+      "displayPath": "设定/正典锁_P0补丁.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/b5ba9e0329e6d21c6e099a7193aa05452b7aada7b75c913f9339e481cca38f9f.md",
+      "sha256": "b5ba9e0329e6d21c6e099a7193aa05452b7aada7b75c913f9339e481cca38f9f",
+      "byteLength": 6045
+    },
+    {
+      "sourceId": "source-3fe5f33e9c8a1b4bf266",
+      "displayPath": "设定/正典裁决台账.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/b7e265d2f8fa40c1c16b4c5118573d89eb7c7305e9a0b4625b0ef48f63011f10.md",
+      "sha256": "b7e265d2f8fa40c1c16b4c5118573d89eb7c7305e9a0b4625b0ef48f63011f10",
+      "byteLength": 2141
+    },
+    {
+      "sourceId": "source-09c7579e5147a1678e16",
+      "displayPath": "设定/人物/角色卡分级与动态协议.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/2270dc90360c9dce1b9ef51cfed65e3d298937a806b6dd055a820f5c08ba2c44.md",
+      "sha256": "2270dc90360c9dce1b9ef51cfed65e3d298937a806b6dd055a820f5c08ba2c44",
+      "byteLength": 5114
+    },
+    {
+      "sourceId": "source-c770332738d278960259",
+      "displayPath": "追踪/角色状态.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/dd1c246ba22e29c5bbd75cc7d63029ce5e5c4d41c81681ca3b2f1d90a7a966bd.md",
+      "sha256": "dd1c246ba22e29c5bbd75cc7d63029ce5e5c4d41c81681ca3b2f1d90a7a966bd",
+      "byteLength": 7183
+    },
+    {
+      "sourceId": "source-54f45502b13d855f26e6",
+      "displayPath": "追踪/知情账.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/6c1eb7169e7878eb37e6a849868743251f130a2948fb940087a84c6acf140144.md",
+      "sha256": "6c1eb7169e7878eb37e6a849868743251f130a2948fb940087a84c6acf140144",
+      "byteLength": 1965
+    },
+    {
+      "sourceId": "source-8a7745cc26aaea27df7c",
+      "displayPath": "追踪/卷一D1-D7日历.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/a003e10369c41b3f836fd36d8b0a8e4ce2edcc50cd56420be4cf7edaca66a32b.md",
+      "sha256": "a003e10369c41b3f836fd36d8b0a8e4ce2edcc50cd56420be4cf7edaca66a32b",
+      "byteLength": 2387
+    },
+    {
+      "sourceId": "source-5a285fd1efc1a88348ba",
+      "displayPath": "追踪/时间线.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/ca6b375cebd2bbd7b71abfc2d83f0df7653f0ec2528b40894f825dd73989781c.md",
+      "sha256": "ca6b375cebd2bbd7b71abfc2d83f0df7653f0ec2528b40894f825dd73989781c",
+      "byteLength": 1084
+    },
+    {
+      "sourceId": "source-351038e0fa1ec3efaf0d",
+      "displayPath": "追踪/伏笔.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/a306472bc343a88c1a4aa5a32209d46ee4cce8d6b3e056fdcf826aa139990bab.md",
+      "sha256": "a306472bc343a88c1a4aa5a32209d46ee4cce8d6b3e056fdcf826aa139990bab",
+      "byteLength": 2263
+    },
+    {
+      "sourceId": "source-5d991cd8c74f779da0d6",
+      "displayPath": "大纲/细纲_第001-020章.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/4ec79e652b1bc7159a6b59c2393779578415f300b4d8e8b7d1418fb3952d0371.md",
+      "sha256": "4ec79e652b1bc7159a6b59c2393779578415f300b4d8e8b7d1418fb3952d0371",
+      "byteLength": 5463
+    },
+    {
+      "sourceId": "source-a28890709a85469f46b9",
+      "displayPath": "设定/人物/单卡/刀疤.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/c4824fde1e31e08d2b7ee77533d82ab312de1ff432b9ebe03067d0a1deeccac0.md",
+      "sha256": "c4824fde1e31e08d2b7ee77533d82ab312de1ff432b9ebe03067d0a1deeccac0",
+      "byteLength": 4447
+    },
+    {
+      "sourceId": "source-eecc027654526bec1a48",
+      "displayPath": "设定/人物/单卡/吴姐.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/574dd7c85435a3df9617d5b03ec182918d184a45c35dcb617cb34bedd1b94206.md",
+      "sha256": "574dd7c85435a3df9617d5b03ec182918d184a45c35dcb617cb34bedd1b94206",
+      "byteLength": 1309
+    },
+    {
+      "sourceId": "source-bbcc310bd944b6bd74ce",
+      "displayPath": "设定/人物/单卡/崔七.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/f299d4da21d16c1b4867de459355c7a8555489e2dc0f494b06ad6a1866ed2c76.md",
+      "sha256": "f299d4da21d16c1b4867de459355c7a8555489e2dc0f494b06ad6a1866ed2c76",
+      "byteLength": 4812
+    },
+    {
+      "sourceId": "source-c674a832a290da3d44a2",
+      "displayPath": "设定/人物/单卡/易秀.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/1922271136acb84c8a21b77e62a929f1701bfd46f049bb958a714adb6c416412.md",
+      "sha256": "1922271136acb84c8a21b77e62a929f1701bfd46f049bb958a714adb6c416412",
+      "byteLength": 7265
+    },
+    {
+      "sourceId": "source-427a8d8faba73ed9e5b7",
+      "displayPath": "设定/人物/单卡/易航.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/31b6e4b204589d4391eb4e3a4a825709230453810c7d2e40af217109ee1f66f6.md",
+      "sha256": "31b6e4b204589d4391eb4e3a4a825709230453810c7d2e40af217109ee1f66f6",
+      "byteLength": 1932
+    },
+    {
+      "sourceId": "source-33cc45b02beabc4f46f9",
+      "displayPath": "设定/人物/单卡/李强.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/92017db4a7cc2ab3668d99b748381fd45cbcddf75465f463397938b39c27bb02.md",
+      "sha256": "92017db4a7cc2ab3668d99b748381fd45cbcddf75465f463397938b39c27bb02",
+      "byteLength": 4998
+    },
+    {
+      "sourceId": "source-b89fae7b0a62260d4c88",
+      "displayPath": "设定/人物/单卡/李飞.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/9552af4c7dced4d800a25e8d7665743fd5346beba22c7230a0eb11a8405447ad.md",
+      "sha256": "9552af4c7dced4d800a25e8d7665743fd5346beba22c7230a0eb11a8405447ad",
+      "byteLength": 5050
+    },
+    {
+      "sourceId": "source-b81b3c4d8cbbe5853994",
+      "displayPath": "设定/人物/单卡/梁景衡.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/c0481a778c87ff323e63ad96a3986d5ae817f68d4fa581dfbfc1052dd7669ecb.md",
+      "sha256": "c0481a778c87ff323e63ad96a3986d5ae817f68d4fa581dfbfc1052dd7669ecb",
+      "byteLength": 5187
+    },
+    {
+      "sourceId": "source-be87afac0f68310802de",
+      "displayPath": "设定/人物/单卡/檀溪.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/72a35024c076d24560ea23bc4c18072548347b349efa30bd2224984beece323d.md",
+      "sha256": "72a35024c076d24560ea23bc4c18072548347b349efa30bd2224984beece323d",
+      "byteLength": 9580
+    },
+    {
+      "sourceId": "source-65da1906079edc53fa61",
+      "displayPath": "设定/人物/单卡/石头.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/7fc481adfdfcfd6fadecdc924b0b6e1d149c41bacf5e583ce5eb564f2508c5e9.md",
+      "sha256": "7fc481adfdfcfd6fadecdc924b0b6e1d149c41bacf5e583ce5eb564f2508c5e9",
+      "byteLength": 1354
+    },
+    {
+      "sourceId": "source-fcf95cd9670dab5aaa74",
+      "displayPath": "设定/人物/单卡/肖龙.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/42f8b3d19410339fa2692caa7889729f076fdbc861eac68a6a868241f2e94bc8.md",
+      "sha256": "42f8b3d19410339fa2692caa7889729f076fdbc861eac68a6a868241f2e94bc8",
+      "byteLength": 4279
+    },
+    {
+      "sourceId": "source-daec227d4f5dd25c0fa6",
+      "displayPath": "设定/人物/单卡/赵姐.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/affaf860fac68e83c5d4d10e1bf4a2f44a9db324074c5d2ec911afad3235c5d8.md",
+      "sha256": "affaf860fac68e83c5d4d10e1bf4a2f44a9db324074c5d2ec911afad3235c5d8",
+      "byteLength": 1062
+    },
+    {
+      "sourceId": "source-a9af51553fe34c498491",
+      "displayPath": "设定/人物/单卡/邓依.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/8225cb8b6fd52c807df2127cf2e3c06fae813d2acc6be328d67716437aad18f0.md",
+      "sha256": "8225cb8b6fd52c807df2127cf2e3c06fae813d2acc6be328d67716437aad18f0",
+      "byteLength": 8943
+    },
+    {
+      "sourceId": "source-365a7c9c8c1e7684cfa4",
+      "displayPath": "设定/人物/单卡/郭周堂.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/db20c5076221c483c21c1763b2dd6a0fa34e2906e5a335a4e3dd52f0ecadfcf3.md",
+      "sha256": "db20c5076221c483c21c1763b2dd6a0fa34e2906e5a335a4e3dd52f0ecadfcf3",
+      "byteLength": 5352
+    },
+    {
+      "sourceId": "source-1d554c43a41726ce95cf",
+      "displayPath": "设定/人物/单卡/阿大.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/2ddc0ce672593bece7ca738eb2be43b33187d48f9f1b7ccf1b38bac6433f5067.md",
+      "sha256": "2ddc0ce672593bece7ca738eb2be43b33187d48f9f1b7ccf1b38bac6433f5067",
+      "byteLength": 3867
+    },
+    {
+      "sourceId": "source-489b4dd81d64b1fdeaf7",
+      "displayPath": "设定/人物/单卡/陈宏远.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/0566d93fb07834ef7654098093c1b315b74da444738a89510bcaf451b3988d6e.md",
+      "sha256": "0566d93fb07834ef7654098093c1b315b74da444738a89510bcaf451b3988d6e",
+      "byteLength": 5509
+    },
+    {
+      "sourceId": "source-8905f33ef4abf3a47d57",
+      "displayPath": "设定/人物/单卡/顾棠.md",
+      "objectRelativePath": ".aicanvas/novel/writing-source-objects/sha256/09e3097d19dc1d7ed6b11ac7eab1039f7603f9a7adedd87c080c4a3543d9754b.md",
+      "sha256": "09e3097d19dc1d7ed6b11ac7eab1039f7603f9a7adedd87c080c4a3543d9754b",
+      "byteLength": 1013
+    }
+  ],
+  "entities": [
+    {
+      "entityId": "character-db3aa493e5d1487702a0",
+      "name": "刀疤",
+      "aliases": [],
+      "level": "L2",
+      "baseSummary": "- 姓名：刀疤（街头外号；正典正文默认「刀疤」。户籍名可后补，不抢戏）；- 身份职业：信汇资产催收组打手 / 外勤「协助执行」；无编制，吃风险金与私单；- 所属势力：信汇资产（执行末梢）← 春禾外包指令可越级（卷一 025 任务语音）；上游可被弃；- 核心：暴力实用主义——信「账是要拿身体记的」；怕文斗、怕录像、怕自己变成弃子；- 口癖/习惯动作：「签字比喊疼快」；动手前先吐一口痰或甩腕；被反杀时先骂李强不是先骂债；- 绝不会做的事：在直播镜头前主动当门面；为梁景衡的漂亮话卖命到底；无报酬替信汇背整条链；- 要什么：活着拿钱；不被写成「个人违规」唯一背锅人；中期可要一份「不被再过手」的喘息；- 怕什么：上游追责落到自己账户；债纹/过手让暴力成本回流；牢狱与被灭口同等恐惧；- 底线：可打可跪可交账户；不主动当人肉炸弹替陈宏远挡终局（层级不够也轮不到）；- 知：李强私收套路；哪几条巷子好动手；春禾有时直接派活（不完全明白壳层）；- 不知：陈宏远是谁；清算中心与基金的收益闭环全貌；易航黑页真相；- 误信：只要打服家属、砸掉证据，文斗那套就碰不到自己",
+      "sourceIds": [
+        "source-a28890709a85469f46b9",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-4839b6d049e7d24523b7",
+      "name": "吴姐",
+      "aliases": [],
+      "level": "L2",
+      "baseSummary": "- 姓名：吴姐（全名可「吴敏」）；- 口癖：「不是我不帮你」；- 绝不会：因欠费拔管、把患者当筹码；不知外包窗卖名单（泄露源≠正式医护）；- 要：病区秩序与患者基础治疗；- 怕：事故、被投诉、催收进治疗区；- 底线：急救不停；- 知：欠费与排班规则；- 不知：债纹/春禾黑幕；- 误信：以为只是钱的问题",
+      "sourceIds": [
+        "source-eecc027654526bec1a48",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-d2341ff50a0bb271fbb5",
+      "name": "崔七",
+      "aliases": [],
+      "level": "L2",
+      "baseSummary": "- 姓名：崔七（市井名；可称「七哥」；禁止取阴差/判官式称号）；- 身份职业：活人灰市掮客；对外名片/话术——「特殊资产撮合 / 不良债权咨询」；旧码头账市规矩人；- 所属势力：地下账市（临川旧码头场子）；与春禾/信汇/清算中心有买卖接口但非编制；洗白方向可碰「合规处置」外壳；- 核心：规则贩子——信「灰市比黑拳公平，因为价签写在明面上」；冷血撮合，但护自己定的规矩；- 口癖/习惯动作：「门票先结」；「这单打包了」；用指腹蹭价签角；谁坏规矩谁先被取消进场资格；- 绝不会做的事：自称阴差/替死人收债；免费带生人逛核心库；在邓依镜头前承认「我们在拍卖人」；- 要什么：场子不塌、抽成不断、规矩仍由他解释；必要时用「洗白合规」把灰市接进半官方管道多活几年；- 怕什么：拍品被证「卖方无处分权」导致连环流标；清算中心一刀切取缔；陈系把账市当弃子整锅端；- 底线：可帮易航、可卖易航；不卖自己的规矩解释权；不替任何人无代价洗白成圣人；- 知：打包债怎么标价；哪些残页能拍；进场谁带刀谁带U盘；春禾/信汇偶发货源；- 不知：易秀按签全貌；陈宏远完整受益链；黑页作者层真相；- 误信：只要价签清楚、双方签字，道德就不归他管；易航付得起人价就会一直是好客户",
+      "sourceIds": [
+        "source-bbcc310bd944b6bd74ce",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "name": "易秀",
+      "aliases": [],
+      "level": "L1",
+      "baseSummary": "- 姓名：易秀；- 身份职业：市三院肾内科/过渡病房长期住院患者；昏迷—浅昏迷间歇；规律透析依赖。年轻时曾入清偿侧（清算/担保相关岗位或合作方一线），笔迹与签章曾出现在官方/半官方担保文书上；- 所属势力：无现役归属。历史：清偿侧旧人；现被陈宏远系伪债链挂为永久担保节点；身体在市三院（医院不作恶）；- 核心：记账癖 + 复杂母职——爱儿子是真的，爱「账平」也是真的；非纯白圣母。清醒时冷静、克制、话少，习惯用流水账压情绪；对「免费好事」本能警惕，却又曾默认用系统规则（含别人的代价）维持担保结构；- 口癖/习惯动作：；- 口癖（清醒/浅醒）：「记上。」「这笔……不圆。」「先别签字。」「航航，拿本子。」；- 绝不会做的事：；- 要什么：；- 怕什么：；- 底线：；- 知：（作者/潜意识层）曾签过救命相关文书；流水账习惯；对儿子有强烈保护欲；隐约知道「系统会吃人」；- 误信（若浅醒片段）：费用「还过得去」；签字「只是手续」；以为瞒住履历就能护住儿子",
+      "sourceIds": [
+        "source-c674a832a290da3d44a2",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "name": "易航",
+      "aliases": [],
+      "level": "L1",
+      "baseSummary": "- 姓名：易航；- 身份职业：市三院第三方派驻护工 → 清算中心编外/外勤 → 记账的人；- 所属势力：个人 → 清算中心（紧箍）→ 港湾；- 核心：怂着忍、内里算账；求活与救母优先；- 口癖：您再想想。；少骂人；- 绝不会：无代价卖队友；当众称王；主动造假契；- 要：救易秀；搞清黑页；拒绝被善意收割；- 怕：母死；自己变成收割者；捷径成瘾失控；- 底线：页不能假洗白；证据不毁；- 知：母病重、欠费；自幼能见世界边缘噪点，D1 触流水账「担—」才首次清晰见纹；- 不知：黑页明细、按签、陈宏远；- 误信：医院/慈善可能单纯",
+      "sourceIds": [
+        "source-427a8d8faba73ed9e5b7",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-5f870ef57d06c847d830",
+      "name": "李强",
+      "aliases": [],
+      "level": "L2",
+      "baseSummary": "- 姓名：李强；- 身份职业：信汇资产催收组长；合法外衣讨债头目；- 所属势力：信汇资产催收条线；手下可带 刀疤；话术与导流可挂 春禾/梁景衡 链；怂真正的上司与后台；- 核心：嗓门大、爱拍桌、怂上司；对下威、对上软；合法话术挂嘴边，私收藏袖子里；- 口癖/习惯动作：「别逼我走程序！」/「这是债权转让，懂不懂？」/ 砸暖壶、拍桌、用文件夹扇风；败时「上面叫我」；- 绝不会做的事：主动扛锅替真债主出镜；在证据链闭合后还硬刚（会逃/会卖）；对梁景衡/信汇高层叫板",
+      "sourceIds": [
+        "source-33cc45b02beabc4f46f9",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-881a94cad29d9cab12d7",
+      "name": "李飞",
+      "aliases": [],
+      "level": "L1",
+      "baseSummary": "- 姓名：李飞；- 身份职业：清算中心与易航同期外勤；竞争编制；账市对手苗；- 所属势力：清算中心编制线（郭周堂体系内）→ 后期向免债会/销账捷径倾斜；S2 可升主对手；- 核心：要强、爱面子、手腕比易航脏半寸；不是天生大恶，是「不想当第二」把捷径走穿；- 口癖/习惯动作：嘲讽版「你再装呢？」；抢功时拍肩「这次我来」；学易航「您再想想」反过来阴阳（F20）；- 绝不会做的事：当众承认自己技不如人；在编制竞争里主动让功；轻易承认腕上「无负数」是交易来的",
+      "sourceIds": [
+        "source-b89fae7b0a62260d4c88",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-2aed92b009af8b44913b",
+      "name": "梁景衡",
+      "aliases": [],
+      "level": "L1",
+      "baseSummary": "- 姓名：梁景衡（正典；原方案名「李易峰」已废，禁止写回）；- 身份职业：春禾互助基金公关总监 / 对外「慈善明星脸」；康济系对外发言人；- 所属势力：春禾/康济系门面 → 真后台 陈宏远；与 信汇资产有关联交易话术链；- 核心：人模人样、台词漂亮；最恨被当众拆穿；镜头前做好人，镜头后导流催收与担保；- 口癖/习惯动作：「我们先把人救起来再说。」/「善意也要有闭环。」/ 拍肩、递名片、对镜头说「困难群众」；- 绝不会做的事：在直播/公开场合亲口认「恩债农场」；主动对陈宏远叫板；把真后台暴露给媒体",
+      "sourceIds": [
+        "source-b81b3c4d8cbbe5853994",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-0ee4284c96c30d57e582",
+      "name": "檀溪",
+      "aliases": [],
+      "level": "L1",
+      "baseSummary": "# 檀溪 · 单卡（灰区锚 / 第二女配）",
+      "sourceIds": [
+        "source-be87afac0f68310802de",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-a1aca9fd68a97328d974",
+      "name": "石头",
+      "aliases": [],
+      "level": "L2",
+      "baseSummary": "- 姓名：石头（小名；大名可后定「石磊」）；- 口癖：少；关键句「我会学会算你的命」；- 绝不会：轻易原谅「为大局牺牲他家」的解释；- 要：讨回公道/学会记账反杀；- 怕：再次被当数字抹掉；- 底线：不信免债会空话（可先信后醒）；- 知：家毁因债；- 不知：易航全部动机；- 误信：易航=收割者之一",
+      "sourceIds": [
+        "source-65da1906079edc53fa61",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-e623e2461a2e54305cd2",
+      "name": "肖龙",
+      "aliases": [],
+      "level": "L2",
+      "baseSummary": "- 姓名：肖龙；- 身份职业：临川工职院/临川大学计算机相关（在读或刚毕业）；兼职网吧网管；技术外援；- 所属势力：无编制；普通人侧；可被清算中心接口「蹭到」但不入伙；- 核心：正常人视角；嘴硬心软；信数据不信「我感觉」；- 口癖/习惯动作：；- 绝不会做的事：；- 要什么：还易航当年救命/挡债人情；证明「普通人也能用合法信息拆局」；自己别再掉进网贷坑；- 怕什么：再次被校园贷/网贷链条咬住；怕易航把人「算死」后自己也成帮凶；- 底线：公开信息能查尽查；一旦要碰非法入口就停，并明确说「我帮到这」；- 知：；- 不知：；- 误信：",
+      "sourceIds": [
+        "source-fcf95cd9670dab5aaa74",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-8fad145923a925dc9202",
+      "name": "赵姐",
+      "aliases": [],
+      "level": "L2",
+      "baseSummary": "- 口癖：谢谢你啊谢谢你；- 绝不会：主动害孩子；- 要：活下去、孩子上学；- 怕：恩债到期、被社区指点；- 底线：孩子；- 知：自己签过救助；- 不知：上层如何打包；- 误信：慈善是好人",
+      "sourceIds": [
+        "source-daec227d4f5dd25c0fa6",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-1afad7588e4a646b8c53",
+      "name": "邓依",
+      "aliases": [],
+      "level": "L1",
+      "baseSummary": "# 邓依 · 单卡（程序锚 / 第一女配）",
+      "sourceIds": [
+        "source-a9af51553fe34c498491",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-bb8571d82f235b860cde",
+      "name": "郭周堂",
+      "aliases": [],
+      "level": "L1",
+      "baseSummary": "- 姓名：郭周堂；- 身份职业：清算中心主任（半官方壳的一把手脸）；签批外勤预登记、高风险档案、从业契相关；- 所属势力：清算中心 / 与风险办接口；上接更大庙堂（陈宏远系有渗透，他非纯走狗）；- 核心：体制人格化——非纯反派；把人当刀也给人壳；一切要「过会」；- 口癖/习惯动作：；- 绝不会做的事：；- 要什么：；- 怕什么：；- 底线：中心不能崩在自己任上；必要时可牺牲外勤与脏单，但留一条「程序上能退」的缝；- 知：；- 误信/自欺：",
+      "sourceIds": [
+        "source-365a7c9c8c1e7684cfa4",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-2e42d46808e40d48ae11",
+      "name": "阿大",
+      "aliases": [],
+      "level": "L1",
+      "baseSummary": "- 姓名：阿大（本名可后补；正文默认「阿大」）；- 身份职业：市三院门口看车/跑腿；前地下账贩；腿有旧伤；- 所属势力：无编制；医院门口灰色烟火区；与清算中心、灰市均有旧隙不入伙；- 核心：损人护人；信规矩不信情分；用刻薄挡住真心；- 口癖/习惯动作：；- 绝不会做的事：；- 要什么：把自己当年没算清的教训传给「下一个蠢到要沾手的人」；换口烟、换个不被清算系统点名的晚年；- 怕什么：再信一次「情分能顶账」；怕易航走成当年的自己（腿伤 + 被卖）；- 底线：关键时刻可替易航挡一刀（身价/寿元/名价），但事后仍要「过手费」——香烟与方便面，不许感动式白嫖；- 知：；- 不知：；- 误信：",
+      "sourceIds": [
+        "source-1d554c43a41726ce95cf",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-010633895296bcb53306",
+      "name": "陈宏远",
+      "aliases": [],
+      "level": "L1",
+      "baseSummary": "- 姓名：陈宏远；- 身份职业：宏远系/陈氏商会幕后；春禾互助基金真后台；多壳公司最终受益人；对外可挂「顾问 / 理事 / 商会名誉职」；- 所属势力：陈氏/宏远系（真债主）→ 控 春禾互助基金（门面梁景衡）→ 导流 信汇资产（催收）→ 与 清算中心 收益接口咬合；- 核心：理性暴君——相信「债必须有人扛，不如由会扛的人设计系统」；极少吼叫，用规则与人墙压人；- 口癖/习惯动作：「这是效率」「为了城的稳定」；递名片前先问「你现在坐的是哪一边」；- 绝不会做的事：当众动手；承认「我在偷担保同意权」；在镜头前与信汇暴力同框；- 要什么：全城债链的解释权与最终受益权——谁的应收能被遮盖、谁的坏账能被打包、谁的「救助」能转成可收利息的担保；- 怕什么：受益穿透被公开；易秀案按签链坐实；港湾式多方复核拆掉他的单点遮盖权；遮盖利息把链条拖得太长（每遮一层多一个节点/证人，不能一键灭证）；- 底线：可弃梁景衡、可弃李强/刀疤、可拿小额债户做人盾；不轻易弃自己设计的利息顺位与壳层结构；- 知：春禾–信汇–中心收益闭环；易秀旧案可利用；易航黑页/能力的威胁等级（中后期升级评估）；- 误信：只要「城需要稳定」，普通人会接受他的遮盖；易航终将被编制/恩债/免债会收编",
+      "sourceIds": [
+        "source-489b4dd81d64b1fdeaf7",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    },
+    {
+      "entityId": "character-50606cacd7c6e48c92a7",
+      "name": "顾棠",
+      "aliases": [],
+      "level": "L2",
+      "baseSummary": "- 口癖：少形容词；- 绝不会：无契约帮闲；- 要：拿回旁支被夺权益；- 怕：被当活抵押烧掉；- 底线：不卖自己人给炉子；- 知：豪门打包债结构一半；- 不知：易航黑页真相；- 误信：钱能解决大部分",
+      "sourceIds": [
+        "source-8905f33ef4abf3a47d57",
+        "source-09c7579e5147a1678e16"
+      ],
+      "revision": 1
+    }
+  ],
+  "hardCanon": [
+    {
+      "ruleId": "canon-p0-8b4ec5e5359b651c",
+      "text": "0. 派笔权威顺序（卷一）\n1. `设定/能力/债纹统一规则_v1.md` + **本文件** + `债纹铁律.md`  \n2. `大纲/黄金三章_锁版Beat_P1.1.md`（仅 001–003）  \n3. `设定/人物/00_角色总表.md`  \n4. `大纲/卷一_分幕与章纲.md`  \n5. `大纲/细纲_第001-020章.md`（经 P1.1 修订后）  \n6. `大纲/黄金三章_细纲加强_kimi.md`（**只吸收钩与读感**）  \n7. `大纲/03_结构席完善稿_A-D.md` 中 `proposed`  \n8. `大纲/细纲001-010_qwen加强原稿.md` → **【ARCHIVED 非正典】**  \n\n---",
+      "priority": 1000,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3c12f5f1e6471afd1779"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "canon-p0-3351d7c9b0f51cbc",
+      "text": "1. 四价结算唯一口径\n1. 四价**类别与额度由规则决定**，易航**不能**点菜单选最便宜。  \n2. 操作前只见**模糊预警**（如「身价偏重」），不见完整价目表。  \n3. **一次**超自然操作只结算**一种**规则价。  \n4. 同场可有现实后果（被剪辑网暴），须标明≠第二笔规则价。  \n5. **名价**＝信誉/身份/记录；**人价**＝亲缘遗忘/关系断裂（易秀忘他归人价）。  \n6. 卷一前段代价阶梯：**身（试刀）→ 名（015/016 社死）→ 人（卷四）**。003 禁止付人价。  \n\n---",
+      "priority": 999,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3c12f5f1e6471afd1779"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "canon-p0-b96856408320016d",
+      "text": "2. 操作唯一释义\n| 操作 | 释义 |\n|------|------|\n| 看价 | 看见既有关系可能产生的代价，**不造债** |\n| 认债 | 确认事实与凭证，**不改债** |\n| 过手 | 把错挂/遮蔽的结算压力**显回真实责任节点**；不改金额、不塞无辜、≠卖债 |\n| 烧应收 | **只烧自己依法/依事实享有的追讨权**；不烧证据与第三方债 |\n| 吞账 | 经契约成为**并列承责**；原责任人不因此免责 |\n| 烧光（卷六） | **多笔**烧应收+弃权限的**序列**，非新技能；每笔仍只付一种价；累计可称「全价」 |\n| 归零 | 指可调用的应收与操作权限归零，**不是**个人债务清零；黑页与真实担保**烧不掉** |\n\n成立条件：事实关系 + 责任主体可识别 + 至少一项可复核凭证。\n\n---",
+      "priority": 998,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3c12f5f1e6471afd1779"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "canon-p0-1cc28f733d0690a2",
+      "text": "3. 黑页显示字段（分离）\n| 字段 | 含义 | 卷一怎么写 |\n|------|------|------------|\n| **到期** | 独立倒计时 | 「-7」「还剩七天」——**不是**总负债金额 |\n| **债额** | 清算压力等级（可显示负数感） | 不与天数混用；不写精确人民币命价 |\n| **明细** | 涂黑 | 002 可给「整页黑」初视；008 碰母时跳一下 |\n| **权限痕迹** | 被谁遮盖 | 卷8前不揭真相 |\n\n「-7→-6」等天数跳变须间隔≥约**一天叙事时间**，并写清「还剩」。  \n**卷一锚**：D1（约 001–003）整段保持 -7；进入 D2（约 004 起）才到 -6。  \n（旧稿「016 章跳天」作废；016 按日历已是更后的天数。）\n\n---",
+      "priority": 997,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3c12f5f1e6471afd1779"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "canon-p0-43275753b80a9100",
+      "text": "4. 卷八真相（作者层 · 卷八前勿完整公开）\n1. **原始事实债**：易航幼年致死危机，易秀清醒时自愿签**一次性、有限额、不得转让**的救命担保；原始标的＝**易航的命**。  \n2. **身体根**：易秀承担持续性身价损耗，与后来透析线埋根；疾病仍按现实病程写，不纯诅咒。  \n3. **伪造扩张**：陈宏远系在易秀意识受损时**托手按签**，扩成永久担保，并非法加入姓名/身份/收益权。  \n4. **双层账**：债纹只认真实救命事实；中心账本执行被扩写伪债 → 黑页＝真实欠+非法遮盖。  \n5. **郭周堂**：掌握废签/风险，招易航既为控也有翻案出口。  \n6. **母子冲突点**：不是「救了儿子」有罪，而是她曾入清偿侧、长期隐瞒，并默许系统用**别人的代价**维持担保。  \n\n---",
+      "priority": 996,
+      "canonStatus": "canon",
+      "visibility": "author_only",
+      "sourceIds": [
+        "source-3c12f5f1e6471afd1779"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "canon-p0-ffa35d2d9745111c",
+      "text": "5. 市三院现实边界\n- 易秀：肾内/过渡病房；不长期写成公共透析大厅永久躺尸位。  \n- **医院不作恶**：不停必要急救；经济死线＝后续疗程/药耗/排班/生活费，**不写因欠费当场拔管**。  \n- 李强＝院外催收，**无权医嘱**；堵门在接待区/后门/院外；保安与吴姐有反应。  \n- 春禾只利用缺钱与授权陷阱，不代表医院。  \n\n---",
+      "priority": 995,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3c12f5f1e6471afd1779"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "canon-p0-539579c0fb67c09b",
+      "text": "6. 港湾机制（卷十胜利条件）\n港湾≠免债王国，四层：\n\n1. **证据港**：纸档+哈希+多人见证  \n2. **生存桥**：争议期治疗/租住/学费限期垫付  \n3. **清算席**：受益穿透、异议、期限复核（多方签章）  \n4. **权限笼**：任何涂黑必有遮盖者/理由/期限/日志  \n\n胜利：冻陈系接口；公开受益链护隐私；私权→多方复核；易航交一人全城明细权；**黑页保留**作第一宗历史异议案。  \n\n---",
+      "priority": 994,
+      "canonStatus": "canon",
+      "visibility": "author_only",
+      "sourceIds": [
+        "source-3c12f5f1e6471afd1779"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "canon-p0-89c85d4e21941944",
+      "text": "7. 烧光归零（对齐卷六）\n见 §2「烧光」：先固化证据→切断假受益→逐笔烧应收与权限；母债与黑页不灭。  \n\n---",
+      "priority": 993,
+      "canonStatus": "canon",
+      "visibility": "author_only",
+      "sourceIds": [
+        "source-3c12f5f1e6471afd1779"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "canon-p0-326263d9224de524",
+      "text": "8. 地名\n- 主城：**临川市**（架空沿海二线）  \n- 删除「江城临川区」含糊表述；院校用「临川工职院/临川大学」  \n\n---",
+      "priority": 992,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3c12f5f1e6471afd1779"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "canon-p0-ccac3fed901f8e2c",
+      "text": "9. P1 增补（2026-08-01 · 四席完备审查后）\n权威文件（开写前必读）：\n\n1. `设定/能力/债纹统一规则_v1.md` — 双层账、无负数、见债、证人纹、遮盖利息  \n2. `设定/能力/债纹视觉词典.md` — 纹型禁止漂移  \n3. `设定/证据与程序闭环.md` — 证据三级与公权力  \n4. `设定/债务/易家开书债务与D0现金流.md` — 钱账与 -7 合同  \n5. `追踪/卷一D1-D7日历.md` — 黄金三章时间轴  \n6. `设定/世界观/异常债务社会认知.md`  \n7. `设定/港湾机制.md` v0.2  \n8. `设定/势力/免债会与门票债_简则.md`  \n9. `设定/人物/医院配角团_简卡.md`  \n10. `设定/正典裁决台账.md`  \n\n### 开写硬禁（增）\n\n- 001 禁止完整《救助确认书》；只用名片/转介  \n- 禁止「后门钥匙」；肖龙只公开/授权  \n- 禁止「李总」指梁景衡；用**梁总**  \n- 阿大挡刀＝**现实重伤**，不替付人价  \n- 医院泄露源＝护工公司+外包窗，非正式医护",
+      "priority": 991,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3c12f5f1e6471afd1779"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-书名",
+      "text": "CAN-书名：《黑页：记账人》。旧写法禁止：《欠债的都得还》。依据：书名锁定。",
+      "priority": 2000,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-城",
+      "text": "CAN-城：临川市。旧写法禁止：江城/江城临川区。依据：P0 §8。",
+      "priority": 1999,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-梁",
+      "text": "CAN-梁：梁景衡。旧写法禁止：李易峰/李总。依据：P0 过签。",
+      "priority": 1998,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-春禾文书",
+      "text": "CAN-春禾文书：001=名片；029+=确认书。旧写法禁止：001 完整援助书。依据：P0 援助序。",
+      "priority": 1997,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-肖龙技",
+      "text": "CAN-肖龙技：公开/授权导出。旧写法禁止：后门钥匙。依据：单卡硬禁。",
+      "priority": 1996,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-烧光",
+      "text": "CAN-烧光：序列多笔各一价。旧写法禁止：一键「全」。依据：P0 §2。",
+      "priority": 1995,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-卷八情",
+      "text": "CAN-卷八情：恨瞒/恨被垫。旧写法禁止：恨救。依据：P0 §4。",
+      "priority": 1994,
+      "canonStatus": "canon",
+      "visibility": "author_only",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-四价",
+      "text": "CAN-四价：规则定，不可选。旧写法禁止：付哪一价像菜单。依据：P0 §1。",
+      "priority": 1993,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-过手",
+      "text": "CAN-过手：显回责任节点。旧写法禁止：转嫁/引债。依据：P0 §2。",
+      "priority": 1992,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-无负数",
+      "text": "CAN-无负数：销登记非消本源。旧写法禁止：消债纹。依据：统一规则 v1。",
+      "priority": 1991,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-知情",
+      "text": "CAN-知情：允许人价遗忘。旧写法禁止：只许不知→知。依据：审查。",
+      "priority": 1990,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-担保标的",
+      "text": "CAN-担保标的：原始=命；名/收益=伪扩。旧写法禁止：命/名混写。依据：P0 §4。",
+      "priority": 1989,
+      "canonStatus": "canon",
+      "visibility": "author_only",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-阿大挡刀",
+      "text": "CAN-阿大挡刀：现实重伤。旧写法禁止：替付人价。依据：审查。",
+      "priority": 1988,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-018-020",
+      "text": "CAN-018-020：催收收束；援助029。旧写法禁止：假善铺垫。依据：章纲。",
+      "priority": 1987,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-001-003",
+      "text": "CAN-001-003：锁版 Beat P1.1。旧写法禁止：细纲/日历互杀。依据：二轮。",
+      "priority": 1986,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-跳天",
+      "text": "CAN-跳天：D1→D2 才 -7→-6。旧写法禁止：旧「016跳天」。依据：二轮。",
+      "priority": 1985,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-李飞纹",
+      "text": "CAN-李飞纹：登记空+本源淡纹。旧写法禁止：完全无显示。依据：二轮。",
+      "priority": 1984,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-见纹前史",
+      "text": "CAN-见纹前史：自幼噪点→D1聚焦。旧写法禁止：空白。依据：二轮。",
+      "priority": 1983,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    },
+    {
+      "ruleId": "CAN-章均字数",
+      "text": "CAN-章均字数：2200–3500；高潮可×2≈7000。旧写法禁止：旧 2800–3200。依据：owner 2026-08-01。",
+      "priority": 1982,
+      "canonStatus": "canon",
+      "visibility": "writer",
+      "sourceIds": [
+        "source-3fe5f33e9c8a1b4bf266"
+      ],
+      "revision": 1
+    }
+  ],
+  "characterStates": [
+    {
+      "stateId": "state-02d4f0a89bb0bf6aeb9a",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "throughChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "fields": {
+        "body": "夜班透支常态；门口对峙后站稳；无明显重伤。指尖/腕对黑页敏感（涂黑角曾似「翻身」，未追价）。",
+        "emotion": "冷、短、压着抖；镜头对准时先想挡脸又放下（怕被剪成心虚）。对「免费好事 / 陪哭」过敏加强。",
+        "known": [
+          "黑页：总额感 + 明细涂黑 + 到期字段 -4",
+          "李强是「手指」非源头",
+          "清晰版已到手",
+          "八点前合法影像在云盘",
+          "信汇 ↔ 春禾公开往来可咬",
+          "093 为私人码线",
+          "担保链短信存在",
+          "母亲曾指动一次",
+          "涂黑角有异动未解",
+          "阿大规矩：催收/窗口/基金话别搅一锅",
+          "镜头的人最会哭"
+        ],
+        "unknown": [
+          "担保链完整结构与「更大的手」是谁",
+          "黑页明细何时可翻",
+          "涂黑角含义",
+          "易秀担保人真相 / 春禾与母的深层绑定（禁揭至正典章）",
+          "邓依/郭周堂编制线尚未绑定",
+          "檀溪未露面"
+        ],
+        "relationships": [
+          "阿大：师徒式规矩已立，借款与烟火人情在",
+          "肖龙：公开证据+八点拍摄，友情承压（「我也可能被找麻烦」）",
+          "李强：公开敌意，被逼半步，可能换刀",
+          "梁景衡：镜头/声线层，本人未对等谈判",
+          "易秀：床边守夜",
+          "指动后更不敢离开床过久"
+        ],
+        "goals": [
+          "凑满门槛钱",
+          "备份证据",
+          "收指摸担保链",
+          "011 只列方案不抢闭环"
+        ],
+        "psychology": "从「把单叠整齐」→「账不能再只叠整齐」；数袋里的纸成仪式；活着比赢镜头重要",
+        "unresolved": [
+          "是否点开/回担保链",
+          "是否与梁总当面谈",
+          "预支与阿大钱的动用优先级",
+          "要不要再拖肖龙下水",
+          "源残留冲突：日历导语仍写016发生-7→-6；P0与CAN-跳天已裁决D1→D2跳天，待清理低权威旧句。"
+        ]
+      },
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "sourceChapter": {
+        "chapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+        "chapterRevision": 1,
+        "chapterSha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07"
+      },
+      "revision": 1
+    },
+    {
+      "stateId": "state-e4d03e0dd4728d9493fc",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "throughChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "fields": {
+        "body": "昏迷透析通道；指尖曾极轻一动（008），之后未再确认持续清醒",
+        "emotion": "（不可写内心全知）体征层安静；指动对易航是钩子不是对话",
+        "known": [
+          "（角色视角）昏迷，不参与知情"
+        ],
+        "unknown": [
+          "全文对她封闭"
+        ],
+        "relationships": [
+          "仍是北极星与床边锚",
+          "腕带条码=不肯结算的编号感"
+        ],
+        "goals": [
+          "（无主动目标）"
+        ],
+        "psychology": "",
+        "unresolved": [
+          "担保/名单/黑页与母线真相 未解锁"
+        ]
+      },
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "sourceChapter": {
+        "chapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+        "chapterRevision": 1,
+        "chapterSha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07"
+      },
+      "revision": 1
+    },
+    {
+      "stateId": "state-2e42d46808e40d48ae11",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "throughChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "fields": {
+        "body": "腿旧伤；门口烟火位",
+        "emotion": "损人护犊；警惕基金镜头",
+        "known": [
+          "易航在沾账",
+          "催收/窗口/基金须分线",
+          "借出过小额"
+        ],
+        "unknown": [
+          "黑页细节、担保链结构、清晰版全文"
+        ],
+        "relationships": [
+          "已建立「过手费/规矩」师友",
+          "非干儿子"
+        ],
+        "goals": [
+          "盯易航别陪镜头哭、别搅锅"
+        ],
+        "psychology": "从劝别沾 → 你既然沾了就按规矩走",
+        "unresolved": [
+          "挡刀时机未到",
+          "自身旧账未揭"
+        ]
+      },
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "sourceChapter": {
+        "chapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+        "chapterRevision": 1,
+        "chapterSha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07"
+      },
+      "revision": 1
+    },
+    {
+      "stateId": "state-e623e2461a2e54305cd2",
+      "entityId": "character-e623e2461a2e54305cd2",
+      "throughChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "fields": {
+        "body": "正常；可能被找麻烦的预期压力",
+        "emotion": "毒舌义气；怕但没撤",
+        "known": [
+          "公开关联截图逻辑",
+          "八点影像已拍已传云",
+          "易航在医院门口硬刚"
+        ],
+        "unknown": [
+          "债纹本体、担保链后台、春禾内部账"
+        ],
+        "relationships": [
+          "死党加码",
+          "「连累你了 / 少废话」"
+        ],
+        "goals": [
+          "自保备份",
+          "必要时停手边界未谈死"
+        ],
+        "psychology": "普通人卷入取证链的恐惧上升",
+        "unresolved": [
+          "还能帮到哪一步",
+          "是否见光死"
+        ]
+      },
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "sourceChapter": {
+        "chapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+        "chapterRevision": 1,
+        "chapterSha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07"
+      },
+      "revision": 1
+    },
+    {
+      "stateId": "state-5f870ef57d06c847d830",
+      "entityId": "character-5f870ef57d06c847d830",
+      "throughChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "fields": {
+        "body": "正常；门口对峙后心理溃半步",
+        "emotion": "狠话撑场面；怂上级",
+        "known": [
+          "易航有影像/清晰版压力",
+          "分期/担保链话术用过"
+        ],
+        "unknown": [
+          "易航腕上黑页",
+          "肖龙全链路",
+          "真正后台指令全文"
+        ],
+        "relationships": [
+          "卷一主对立面",
+          "可能换刀/被弃"
+        ],
+        "goals": [
+          "补刀或甩锅（待写）"
+        ],
+        "psychology": "从拍桌到被镜头反咬",
+        "unresolved": [
+          "对上听谁的",
+          "清晰版外泄后果"
+        ]
+      },
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "sourceChapter": {
+        "chapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+        "chapterRevision": 1,
+        "chapterSha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07"
+      },
+      "revision": 1
+    },
+    {
+      "stateId": "state-2aed92b009af8b44913b",
+      "entityId": "character-2aed92b009af8b44913b",
+      "throughChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "fields": {
+        "body": "（未正面肉搏）",
+        "emotion": "镜头人设仍稳；录音里有笑",
+        "known": [
+          "易航侧有接触意向/材料压力（具体以已出场戏为准）"
+        ],
+        "unknown": [
+          "易航已握八点影像与清晰版的完整杀伤力（可错估）"
+        ],
+        "relationships": [
+          "假善意门面",
+          "未完成「您再想想」级摊牌"
+        ],
+        "goals": [
+          "维持镜头叙事",
+          "导流不沾血"
+        ],
+        "psychology": "（少写内心）",
+        "unresolved": [
+          "与陈宏远指令差",
+          "与檀溪内鬼线未开"
+        ]
+      },
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "sourceChapter": {
+        "chapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+        "chapterRevision": 1,
+        "chapterSha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07"
+      },
+      "revision": 1
+    },
+    {
+      "stateId": "state-db3aa493e5d1487702a0",
+      "entityId": "character-db3aa493e5d1487702a0",
+      "throughChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "fields": {
+        "body": "可出场受伤痕迹以正文为准；010 时多不在视野",
+        "emotion": "打手头目层",
+        "known": [
+          "跟李强堵门逻辑"
+        ],
+        "unknown": [
+          "取证链、担保链"
+        ],
+        "relationships": [
+          "暴力工具",
+          "可转弃子"
+        ],
+        "goals": [
+          "听命"
+        ],
+        "psychology": "",
+        "unresolved": [
+          "是否再上场"
+        ]
+      },
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "sourceChapter": {
+        "chapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+        "chapterRevision": 1,
+        "chapterSha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07"
+      },
+      "revision": 1
+    },
+    {
+      "stateId": "state-4839b6d049e7d24523b7",
+      "entityId": "character-4839b6d049e7d24523b7",
+      "throughChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "fields": {
+        "body": "正常值班",
+        "emotion": "烦催收烦请假；护工眼红会骂",
+        "known": [
+          "易航班次与母情况表层"
+        ],
+        "unknown": [
+          "债纹、证据袋"
+        ],
+        "relationships": [
+          "协作/骂醒",
+          "不站队"
+        ],
+        "goals": [
+          "排班别死人"
+        ],
+        "psychology": "",
+        "unresolved": []
+      },
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "sourceChapter": {
+        "chapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+        "chapterRevision": 1,
+        "chapterSha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07"
+      },
+      "revision": 1
+    },
+    {
+      "stateId": "state-02d4f0a89bb0bf6aeb9a",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "throughChapterId": "fb4a0877-d99d-51f5-ab8d-53f4eca1f754",
+      "fields": {
+        "body": "夜班透支常态；门口对峙后站稳；无明显重伤。指尖/腕对黑页敏感（涂黑角曾似「翻身」，未追价）。",
+        "emotion": "冷、短、压着抖；镜头对准时先想挡脸又放下（怕被剪成心虚）。对「免费好事 / 陪哭」过敏加强。",
+        "known": [
+          "黑页：总额感 + 明细涂黑 + 到期字段 -4",
+          "李强是「手指」非源头",
+          "清晰版已到手",
+          "八点前合法影像在云盘",
+          "信汇 ↔ 春禾公开往来可咬",
+          "093 为私人码线",
+          "担保链短信存在",
+          "母亲曾指动一次",
+          "涂黑角有异动未解",
+          "阿大规矩：催收/窗口/基金话别搅一锅",
+          "镜头的人最会哭"
+        ],
+        "unknown": [
+          "担保链完整结构与「更大的手」是谁",
+          "黑页明细何时可翻",
+          "涂黑角含义",
+          "易秀担保人真相 / 春禾与母的深层绑定（禁揭至正典章）",
+          "邓依/郭周堂编制线尚未绑定",
+          "檀溪未露面"
+        ],
+        "relationships": [
+          "阿大：师徒式规矩已立，借款与烟火人情在",
+          "肖龙：公开证据+八点拍摄，友情承压（「我也可能被找麻烦」）",
+          "李强：公开敌意，被逼半步，可能换刀",
+          "梁景衡：镜头/声线层，本人未对等谈判",
+          "易秀：床边守夜",
+          "指动后更不敢离开床过久"
+        ],
+        "goals": [
+          "先打账，不硬刚刀疤",
+          "继续收指摸担保链"
+        ],
+        "psychology": "证据分线后决定先打账；仍不抢过手闭环",
+        "unresolved": [
+          "是否点开/回担保链",
+          "是否与梁总当面谈",
+          "预支与阿大钱的动用优先级",
+          "要不要再拖肖龙下水",
+          "源残留冲突：日历导语仍写016发生-7→-6；P0与CAN-跳天已裁决D1→D2跳天，待清理低权威旧句。"
+        ]
+      },
+      "sourceIds": [],
+      "sourceChapter": {
+        "chapterId": "fb4a0877-d99d-51f5-ab8d-53f4eca1f754",
+        "chapterRevision": 2,
+        "chapterSha256": "bd69e411aa746ff73f4f4ff405edc4b182cf50391f8e6284c7834de1dd00323f"
+      },
+      "revision": 2
+    }
+  ],
+  "knowledge": [
+    {
+      "knowledgeId": "knowledge-dynamic-8292f09f481349291b5c",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "黑页：总额感 + 明细涂黑 + 到期字段 -4",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-e31f0f80679635ae6f79",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "李强是「手指」非源头",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-be237b11c8bec0e62a85",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "清晰版已到手",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-13e0f757cde39d814114",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "八点前合法影像在云盘",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-a102b0cf12fb21b63ce0",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "信汇 ↔ 春禾公开往来可咬",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-331ec8e4ebf452ad11c8",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "093 为私人码线",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-243a515f1a4d9f2ed868",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "担保链短信存在",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-b6867ce68f1c5e84a4ce",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "母亲曾指动一次",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-55cab57ccb601ebe2029",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "涂黑角有异动未解",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-9ba7c1ec9f79e14c24c1",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "阿大规矩：催收/窗口/基金话别搅一锅",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-20223677d01695c7502e",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "镜头的人最会哭",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-736cc8e7964ee5983832",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "担保链完整结构与「更大的手」是谁",
+      "status": "unknown",
+      "rawValue": "动态卡·未知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-232f73ca24c88f60005d",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "黑页明细何时可翻",
+      "status": "unknown",
+      "rawValue": "动态卡·未知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-00bde7d1c379f8be2acb",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "涂黑角含义",
+      "status": "unknown",
+      "rawValue": "动态卡·未知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-2ff15366a7b1a1845875",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "易秀担保人真相 / 春禾与母的深层绑定（禁揭至正典章）",
+      "status": "unknown",
+      "rawValue": "动态卡·未知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-f7e9636c2ee6b7df1e52",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "邓依/郭周堂编制线尚未绑定",
+      "status": "unknown",
+      "rawValue": "动态卡·未知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-3d5721a07c974cfd8f49",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "檀溪未露面",
+      "status": "unknown",
+      "rawValue": "动态卡·未知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-25819a1839b49b7d2c3b",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "（角色视角）昏迷，不参与知情",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-6b42ce8426a4d0e45f92",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "全文对她封闭",
+      "status": "unknown",
+      "rawValue": "动态卡·未知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-06abb08f93b8bff21d83",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "易航在沾账",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-69560e38c07fcec587c3",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "催收/窗口/基金须分线",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-a1b8c17cfcc725c11cce",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "借出过小额",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-4b4ee11001202d1c30bb",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "黑页细节、担保链结构、清晰版全文",
+      "status": "unknown",
+      "rawValue": "动态卡·未知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-f093204a4825d772482b",
+      "entityId": "character-e623e2461a2e54305cd2",
+      "fact": "公开关联截图逻辑",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-4b6fa560c9dc0848829e",
+      "entityId": "character-e623e2461a2e54305cd2",
+      "fact": "八点影像已拍已传云",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-304095b86045580f7bf9",
+      "entityId": "character-e623e2461a2e54305cd2",
+      "fact": "易航在医院门口硬刚",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-298beb307d2f8881e32a",
+      "entityId": "character-e623e2461a2e54305cd2",
+      "fact": "债纹本体、担保链后台、春禾内部账",
+      "status": "unknown",
+      "rawValue": "动态卡·未知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-d03e9a69249fc38ea772",
+      "entityId": "character-5f870ef57d06c847d830",
+      "fact": "易航有影像/清晰版压力",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-1111b1186d23178bd39a",
+      "entityId": "character-5f870ef57d06c847d830",
+      "fact": "分期/担保链话术用过",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-a06fcd7b884963b1264d",
+      "entityId": "character-5f870ef57d06c847d830",
+      "fact": "易航腕上黑页",
+      "status": "unknown",
+      "rawValue": "动态卡·未知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-309d288df12df4fcb218",
+      "entityId": "character-5f870ef57d06c847d830",
+      "fact": "肖龙全链路",
+      "status": "unknown",
+      "rawValue": "动态卡·未知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-fc10af102ce155e9fb6a",
+      "entityId": "character-5f870ef57d06c847d830",
+      "fact": "真正后台指令全文",
+      "status": "unknown",
+      "rawValue": "动态卡·未知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-f4cdc571dca86a1e1421",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "易航侧有接触意向/材料压力（具体以已出场戏为准）",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-b7d7cdd3c541a31dafba",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "易航已握八点影像与清晰版的完整杀伤力（可错估）",
+      "status": "unknown",
+      "rawValue": "动态卡·未知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-073a711688e6c4a68f95",
+      "entityId": "character-db3aa493e5d1487702a0",
+      "fact": "跟李强堵门逻辑",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-b34d6fdb383c4e6d7ee3",
+      "entityId": "character-db3aa493e5d1487702a0",
+      "fact": "取证链、担保链",
+      "status": "unknown",
+      "rawValue": "动态卡·未知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-270d860ed047ba244e19",
+      "entityId": "character-4839b6d049e7d24523b7",
+      "fact": "易航班次与母情况表层",
+      "status": "known",
+      "rawValue": "动态卡·已知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-dynamic-b1734812a179a8bfc462",
+      "entityId": "character-4839b6d049e7d24523b7",
+      "fact": "债纹、证据袋",
+      "status": "unknown",
+      "rawValue": "动态卡·未知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-a86541c93bba5845d657",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "易航能见债纹",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-66ecb376ded0d35d6956",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "易航能见债纹",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-3b14282c0236c64ba23c",
+      "entityId": "character-1afad7588e4a646b8c53",
+      "fact": "易航能见债纹",
+      "status": "planned_later",
+      "rawValue": "后知",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-f1b91377dffa9ae676e1",
+      "entityId": "character-0ee4284c96c30d57e582",
+      "fact": "易航能见债纹",
+      "status": "planned_later",
+      "rawValue": "后知",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-62a2685e7422262df6bb",
+      "entityId": "character-bb8571d82f235b860cde",
+      "fact": "易航能见债纹",
+      "status": "partial",
+      "rawValue": "部分",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-90f75eb89831e2a81b78",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "易航能见债纹",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-96c3133cb8381cbd81df",
+      "entityId": "character-010633895296bcb53306",
+      "fact": "易航能见债纹",
+      "status": "partial",
+      "rawValue": "部分",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-3fee1d4268f7be82c083",
+      "entityId": "character-881a94cad29d9cab12d7",
+      "fact": "易航能见债纹",
+      "status": "planned_later",
+      "rawValue": "后知",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-d3f5f9bf7b28719fd20e",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "易航能见债纹",
+      "status": "partial",
+      "rawValue": "部分",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-ce5f8a8425228803b5bd",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "黑页明细涂黑",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-6b096542ee6ce303fc89",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "黑页明细涂黑",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-a151cbc0720e093b5f39",
+      "entityId": "character-1afad7588e4a646b8c53",
+      "fact": "黑页明细涂黑",
+      "status": "planned_later",
+      "rawValue": "后知",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-8b546abb8f10668adb97",
+      "entityId": "character-0ee4284c96c30d57e582",
+      "fact": "黑页明细涂黑",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-d7b92474627148ac266b",
+      "entityId": "character-bb8571d82f235b860cde",
+      "fact": "黑页明细涂黑",
+      "status": "unresolved",
+      "rawValue": "知系统黑",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-5615d48fe18cd9b3e18d",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "黑页明细涂黑",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-106601f0db9c07978b7f",
+      "entityId": "character-010633895296bcb53306",
+      "fact": "黑页明细涂黑",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-8705faa265e6a5553094",
+      "entityId": "character-881a94cad29d9cab12d7",
+      "fact": "黑页明细涂黑",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-f61a2fbf171533872e7a",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "黑页明细涂黑",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-11437ae742aace0e1476",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "母有到期死线压力",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-29fb06ede03cfdb00ca3",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "母有到期死线压力",
+      "status": "unknown",
+      "rawValue": "昏迷",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-fec2e4dae1290ec9ed86",
+      "entityId": "character-1afad7588e4a646b8c53",
+      "fact": "母有到期死线压力",
+      "status": "planned_later",
+      "rawValue": "后",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-163f99e4482c50f6b1d7",
+      "entityId": "character-0ee4284c96c30d57e582",
+      "fact": "母有到期死线压力",
+      "status": "planned_later",
+      "rawValue": "后",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-04b67f2f1db943e36761",
+      "entityId": "character-bb8571d82f235b860cde",
+      "fact": "母有到期死线压力",
+      "status": "planned_later",
+      "rawValue": "后",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-eb9373b2d8a43d08c3c3",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "母有到期死线压力",
+      "status": "unresolved",
+      "rawValue": "利用",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-3dce7f9afb626316ea3a",
+      "entityId": "character-010633895296bcb53306",
+      "fact": "母有到期死线压力",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-c2ca82daf7ffca57a248",
+      "entityId": "character-881a94cad29d9cab12d7",
+      "fact": "母有到期死线压力",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-c36a9eb97621dc02fdd0",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "母有到期死线压力",
+      "status": "partial",
+      "rawValue": "知大概",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-2aa2911111334533e136",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "李强私收",
+      "status": "partial",
+      "rawValue": "渐知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-0546ba5063941759279d",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "李强私收",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-5dcfd19ffd52bc6e7f55",
+      "entityId": "character-1afad7588e4a646b8c53",
+      "fact": "李强私收",
+      "status": "partial",
+      "rawValue": "可查",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-415caea42a1a14f491a3",
+      "entityId": "character-0ee4284c96c30d57e582",
+      "fact": "李强私收",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-772348b0acf941824b0b",
+      "entityId": "character-bb8571d82f235b860cde",
+      "fact": "李强私收",
+      "status": "partial",
+      "rawValue": "可查",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-7436362a9cd83d26c037",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "李强私收",
+      "status": "unresolved",
+      "rawValue": "知可弃",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-bf4f34dd5d0d9a5e9bf9",
+      "entityId": "character-010633895296bcb53306",
+      "fact": "李强私收",
+      "status": "unresolved",
+      "rawValue": "不在意",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-4d8f7abd7240ea32728e",
+      "entityId": "character-881a94cad29d9cab12d7",
+      "fact": "李强私收",
+      "status": "partial",
+      "rawValue": "可查",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-3dda430a5c4d61ccd643",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "李强私收",
+      "status": "unresolved",
+      "rawValue": "懂行",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-37e485334515920508bc",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "春禾夹层担保",
+      "status": "partial",
+      "rawValue": "渐知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-e3a3d27b9bb92815496f",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "春禾夹层担保",
+      "status": "unresolved",
+      "rawValue": "曾签",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-4a09738a1561be9d476e",
+      "entityId": "character-1afad7588e4a646b8c53",
+      "fact": "春禾夹层担保",
+      "status": "partial",
+      "rawValue": "查",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-54fd9d2cd31b85cb3b5a",
+      "entityId": "character-0ee4284c96c30d57e582",
+      "fact": "春禾夹层担保",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-0f925980988110987243",
+      "entityId": "character-bb8571d82f235b860cde",
+      "fact": "春禾夹层担保",
+      "status": "partial",
+      "rawValue": "部分",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-66e96ab284f1a88df5c4",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "春禾夹层担保",
+      "status": "known",
+      "rawValue": "执行",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-86959607194e487d83bc",
+      "entityId": "character-010633895296bcb53306",
+      "fact": "春禾夹层担保",
+      "status": "known",
+      "rawValue": "设计",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-f077de30101a1d793193",
+      "entityId": "character-881a94cad29d9cab12d7",
+      "fact": "春禾夹层担保",
+      "status": "planned_later",
+      "rawValue": "后",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-e6dfb74b8e89dd6af30d",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "春禾夹层担保",
+      "status": "partial",
+      "rawValue": "疑",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-dd2ea5c7495dbf1e8b5a",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "易秀一次性真担保",
+      "status": "planned_later",
+      "rawValue": "卷8",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-32c2d29c3e0379fdd1f1",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "易秀一次性真担保",
+      "status": "unresolved",
+      "rawValue": "知/残",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-0a47bd31ce73d6712afe",
+      "entityId": "character-1afad7588e4a646b8c53",
+      "fact": "易秀一次性真担保",
+      "status": "planned_later",
+      "rawValue": "后",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-317eea2d61411ce1ca16",
+      "entityId": "character-0ee4284c96c30d57e582",
+      "fact": "易秀一次性真担保",
+      "status": "planned_later",
+      "rawValue": "后",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-242fc6988a285120701c",
+      "entityId": "character-bb8571d82f235b860cde",
+      "fact": "易秀一次性真担保",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-01f9f8494230c2028654",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "易秀一次性真担保",
+      "status": "partial",
+      "rawValue": "部分",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-76f085709dc32a4889bd",
+      "entityId": "character-010633895296bcb53306",
+      "fact": "易秀一次性真担保",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-597c2a95661808555c37",
+      "entityId": "character-881a94cad29d9cab12d7",
+      "fact": "易秀一次性真担保",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-675af1f196411aa624b6",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "易秀一次性真担保",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-4e9d21076d95b6de1e4e",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "按签扩写伪债",
+      "status": "planned_later",
+      "rawValue": "卷8",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-ab85e29d44ee5c33b4c7",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "按签扩写伪债",
+      "status": "unresolved",
+      "rawValue": "受害",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-70004c6b43605d5308ff",
+      "entityId": "character-1afad7588e4a646b8c53",
+      "fact": "按签扩写伪债",
+      "status": "planned_later",
+      "rawValue": "后",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-294410e5c629feaf12de",
+      "entityId": "character-0ee4284c96c30d57e582",
+      "fact": "按签扩写伪债",
+      "status": "planned_later",
+      "rawValue": "后",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-e4745dd92645b92bf5f5",
+      "entityId": "character-bb8571d82f235b860cde",
+      "fact": "按签扩写伪债",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-82b1d62c405a58cbd59e",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "按签扩写伪债",
+      "status": "unresolved",
+      "rawValue": "执行链",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-bd14f9e1888ac3398d5f",
+      "entityId": "character-010633895296bcb53306",
+      "fact": "按签扩写伪债",
+      "status": "known",
+      "rawValue": "主使",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-c4bc4876a8d2ad3bda57",
+      "entityId": "character-881a94cad29d9cab12d7",
+      "fact": "按签扩写伪债",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-16d9a66fd3d18563f764",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "按签扩写伪债",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-6c2605cca35fb8a05a79",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "郭有废签",
+      "status": "planned_later",
+      "rawValue": "后",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-2d117959f4df0605f027",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "郭有废签",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-5e398fcdcfffb927e7be",
+      "entityId": "character-1afad7588e4a646b8c53",
+      "fact": "郭有废签",
+      "status": "planned_later",
+      "rawValue": "后",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-73dc08c29c1e7ae5c067",
+      "entityId": "character-0ee4284c96c30d57e582",
+      "fact": "郭有废签",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-162784b5029cef24a6ce",
+      "entityId": "character-bb8571d82f235b860cde",
+      "fact": "郭有废签",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-cc71e572cf9a8cab6da9",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "郭有废签",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-16fff1913714ff25ef21",
+      "entityId": "character-010633895296bcb53306",
+      "fact": "郭有废签",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-f9b84835465517dcba70",
+      "entityId": "character-881a94cad29d9cab12d7",
+      "fact": "郭有废签",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-5c14411b6f17aed6ba43",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "郭有废签",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-4c7584ad0d01d350139b",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "陈系闭环",
+      "status": "partial",
+      "rawValue": "渐",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-423fd50b1a327a157ad5",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "陈系闭环",
+      "status": "unresolved",
+      "rawValue": "旧识",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-b3bd87bd01eaba16d363",
+      "entityId": "character-1afad7588e4a646b8c53",
+      "fact": "陈系闭环",
+      "status": "partial",
+      "rawValue": "查",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-a43d4dfad0755c0226e8",
+      "entityId": "character-0ee4284c96c30d57e582",
+      "fact": "陈系闭环",
+      "status": "partial",
+      "rawValue": "部分",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-9f4bfed5584bcb4df6e9",
+      "entityId": "character-bb8571d82f235b860cde",
+      "fact": "陈系闭环",
+      "status": "partial",
+      "rawValue": "部分",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-40b71c4722423a2d974a",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "陈系闭环",
+      "status": "unresolved",
+      "rawValue": "门面",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-850c41c9e17ffc98f9cb",
+      "entityId": "character-010633895296bcb53306",
+      "fact": "陈系闭环",
+      "status": "known",
+      "rawValue": "操盘",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-5c81aec0e25b8e396c64",
+      "entityId": "character-881a94cad29d9cab12d7",
+      "fact": "陈系闭环",
+      "status": "planned_later",
+      "rawValue": "后",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-759f6782535fd0ef70b3",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "陈系闭环",
+      "status": "partial",
+      "rawValue": "疑",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-849eb69fdcdfa2791018",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "清算中心非纯白",
+      "status": "partial",
+      "rawValue": "渐",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-0f72415a2bcb28b2be65",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "清算中心非纯白",
+      "status": "unresolved",
+      "rawValue": "旧",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-463ae73eeb201f95ad63",
+      "entityId": "character-1afad7588e4a646b8c53",
+      "fact": "清算中心非纯白",
+      "status": "unresolved",
+      "rawValue": "挣扎",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-d3f121a710fcec53df00",
+      "entityId": "character-0ee4284c96c30d57e582",
+      "fact": "清算中心非纯白",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-8a6824334712a948f028",
+      "entityId": "character-bb8571d82f235b860cde",
+      "fact": "清算中心非纯白",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-1faa4a290f900068d1fe",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "清算中心非纯白",
+      "status": "unresolved",
+      "rawValue": "利用",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-43bef5b34200afa8368e",
+      "entityId": "character-010633895296bcb53306",
+      "fact": "清算中心非纯白",
+      "status": "unresolved",
+      "rawValue": "利用",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-72eb08ca865e0f79865d",
+      "entityId": "character-881a94cad29d9cab12d7",
+      "fact": "清算中心非纯白",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-9fd910d065c567702e5f",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "清算中心非纯白",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-4d8d23ed61d72b725c64",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "从业契紧箍",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-7f244dde639b66280c51",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "从业契紧箍",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-b7474321581926f5d54b",
+      "entityId": "character-1afad7588e4a646b8c53",
+      "fact": "从业契紧箍",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-2433c65a5a7a5edb957d",
+      "entityId": "character-0ee4284c96c30d57e582",
+      "fact": "从业契紧箍",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-0f8a28d9b153e81a3356",
+      "entityId": "character-bb8571d82f235b860cde",
+      "fact": "从业契紧箍",
+      "status": "known",
+      "rawValue": "设",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-593720fe616663503c6e",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "从业契紧箍",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-619e6c13e803c64ab19c",
+      "entityId": "character-010633895296bcb53306",
+      "fact": "从业契紧箍",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-c9528ec48459e318c100",
+      "entityId": "character-881a94cad29d9cab12d7",
+      "fact": "从业契紧箍",
+      "status": "known",
+      "rawValue": "知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-af58bfceda561d23673c",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "从业契紧箍",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-c4dd32391aba5caf534f",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "灰市人价规则",
+      "status": "planned_later",
+      "rawValue": "卷4",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-67e89146361efea643c0",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "灰市人价规则",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-f109efa29c40b60e6fee",
+      "entityId": "character-1afad7588e4a646b8c53",
+      "fact": "灰市人价规则",
+      "status": "unresolved",
+      "rawValue": "反对",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-55317b5015d6921504dd",
+      "entityId": "character-0ee4284c96c30d57e582",
+      "fact": "灰市人价规则",
+      "status": "known",
+      "rawValue": "熟",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-d0e561fc027326bebc63",
+      "entityId": "character-bb8571d82f235b860cde",
+      "fact": "灰市人价规则",
+      "status": "unresolved",
+      "rawValue": "默许",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-8941cda14292c8e2d300",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "灰市人价规则",
+      "status": "unresolved",
+      "rawValue": "间接",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-2a842d05f6445adf3c70",
+      "entityId": "character-010633895296bcb53306",
+      "fact": "灰市人价规则",
+      "status": "unresolved",
+      "rawValue": "吃利",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-1e25f36e84ae4f1be6dd",
+      "entityId": "character-881a94cad29d9cab12d7",
+      "fact": "灰市人价规则",
+      "status": "unresolved",
+      "rawValue": "下场",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-3f8638bf1b77cc262459",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "灰市人价规则",
+      "status": "unresolved",
+      "rawValue": "旧识",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-a9d84219efeb9cd73161",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "李飞销登记「无负数」（本源淡纹可在）",
+      "status": "planned_later",
+      "rawValue": "后",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-41a2745340686845294f",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "李飞销登记「无负数」（本源淡纹可在）",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-b1f3ada39c5e3ee307c0",
+      "entityId": "character-1afad7588e4a646b8c53",
+      "fact": "李飞销登记「无负数」（本源淡纹可在）",
+      "status": "planned_later",
+      "rawValue": "后",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-12225f50a87e74b61db3",
+      "entityId": "character-0ee4284c96c30d57e582",
+      "fact": "李飞销登记「无负数」（本源淡纹可在）",
+      "status": "planned_later",
+      "rawValue": "后",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-a2cabad0e66815c4de51",
+      "entityId": "character-bb8571d82f235b860cde",
+      "fact": "李飞销登记「无负数」（本源淡纹可在）",
+      "status": "planned_later",
+      "rawValue": "后",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-c99d4e9bc350fa542632",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "李飞销登记「无负数」（本源淡纹可在）",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-977283e5a741d8fa60ea",
+      "entityId": "character-010633895296bcb53306",
+      "fact": "李飞销登记「无负数」（本源淡纹可在）",
+      "status": "unresolved",
+      "rawValue": "可能供",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-2ba39a4d1969d4dd5074",
+      "entityId": "character-881a94cad29d9cab12d7",
+      "fact": "李飞销登记「无负数」（本源淡纹可在）",
+      "status": "misbelieved",
+      "rawValue": "知/误",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-7ea7024b5ccb5d5196b4",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "李飞销登记「无负数」（本源淡纹可在）",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-a212c7ab003702b99c6c",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "免债会灭证",
+      "status": "planned_later",
+      "rawValue": "卷9",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-f6cc8ef7c8596c3ea33b",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "免债会灭证",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-8d0085fcfa44b3815fb0",
+      "entityId": "character-1afad7588e4a646b8c53",
+      "fact": "免债会灭证",
+      "status": "partial",
+      "rawValue": "查",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-930b99fb087bcc2fdec6",
+      "entityId": "character-0ee4284c96c30d57e582",
+      "fact": "免债会灭证",
+      "status": "unresolved",
+      "rawValue": "可供",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-689977758678712b6080",
+      "entityId": "character-bb8571d82f235b860cde",
+      "fact": "免债会灭证",
+      "status": "partial",
+      "rawValue": "部分",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-6bd80e1a4df81ecdf6a9",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "免债会灭证",
+      "status": "unresolved",
+      "rawValue": "可勾",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-ba8eeeca491fa05c111d",
+      "entityId": "character-010633895296bcb53306",
+      "fact": "免债会灭证",
+      "status": "unresolved",
+      "rawValue": "可勾",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-5843c5399ae6a99f879c",
+      "entityId": "character-881a94cad29d9cab12d7",
+      "fact": "免债会灭证",
+      "status": "unresolved",
+      "rawValue": "卷入",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-154aa39772bfa182ba6b",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "免债会灭证",
+      "status": "unresolved",
+      "rawValue": "反对",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-fe64ba638b64923eeb12",
+      "entityId": "character-02d4f0a89bb0bf6aeb9a",
+      "fact": "港湾目标",
+      "status": "partial",
+      "rawValue": "形成",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-45874520fd8b4375777c",
+      "entityId": "character-e4d03e0dd4728d9493fc",
+      "fact": "港湾目标",
+      "status": "unknown",
+      "rawValue": "不知",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-1e7d5bdf24080fa50e37",
+      "entityId": "character-1afad7588e4a646b8c53",
+      "fact": "港湾目标",
+      "status": "unresolved",
+      "rawValue": "共",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-f77190e196dd027bbf1c",
+      "entityId": "character-0ee4284c96c30d57e582",
+      "fact": "港湾目标",
+      "status": "unresolved",
+      "rawValue": "犹豫",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-b8a872853c866ede528b",
+      "entityId": "character-bb8571d82f235b860cde",
+      "fact": "港湾目标",
+      "status": "unresolved",
+      "rawValue": "阻/反戈",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-d3303714421393048995",
+      "entityId": "character-2aed92b009af8b44913b",
+      "fact": "港湾目标",
+      "status": "unresolved",
+      "rawValue": "敌",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-82700db496d0e5f697a0",
+      "entityId": "character-010633895296bcb53306",
+      "fact": "港湾目标",
+      "status": "unresolved",
+      "rawValue": "敌",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-42fc37735b2912476e23",
+      "entityId": "character-881a94cad29d9cab12d7",
+      "fact": "港湾目标",
+      "status": "unresolved",
+      "rawValue": "敌/变",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    },
+    {
+      "knowledgeId": "knowledge-ledger-42bfe4f736cafa1b440d",
+      "entityId": "character-2e42d46808e40d48ae11",
+      "fact": "港湾目标",
+      "status": "unresolved",
+      "rawValue": "挺",
+      "effectiveFromChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-54f45502b13d855f26e6"
+      ],
+      "revision": 1
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipId": "relationship-7a8db8051b82aa6159e6",
+      "fromEntityId": "character-02d4f0a89bb0bf6aeb9a",
+      "toEntityId": "character-2e42d46808e40d48ae11",
+      "relation": "阿大：师徒式规矩已立，借款与烟火人情在",
+      "state": "阿大：师徒式规矩已立，借款与烟火人情在",
+      "throughChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "sourceChapter": {
+        "chapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+        "chapterRevision": 1,
+        "chapterSha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07"
+      },
+      "revision": 1
+    },
+    {
+      "relationshipId": "relationship-6e72e201c8383e94fce8",
+      "fromEntityId": "character-02d4f0a89bb0bf6aeb9a",
+      "toEntityId": "character-e623e2461a2e54305cd2",
+      "relation": "肖龙：公开证据+八点拍摄，友情承压（「我也可能被找麻烦」）",
+      "state": "肖龙：公开证据+八点拍摄，友情承压（「我也可能被找麻烦」）",
+      "throughChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "sourceChapter": {
+        "chapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+        "chapterRevision": 1,
+        "chapterSha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07"
+      },
+      "revision": 1
+    },
+    {
+      "relationshipId": "relationship-9f169074b978301e4ed7",
+      "fromEntityId": "character-02d4f0a89bb0bf6aeb9a",
+      "toEntityId": "character-5f870ef57d06c847d830",
+      "relation": "李强：公开敌意，被逼半步，可能换刀",
+      "state": "李强：公开敌意，被逼半步，可能换刀",
+      "throughChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "sourceChapter": {
+        "chapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+        "chapterRevision": 1,
+        "chapterSha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07"
+      },
+      "revision": 1
+    },
+    {
+      "relationshipId": "relationship-da9a24e3b9944f86ca4e",
+      "fromEntityId": "character-02d4f0a89bb0bf6aeb9a",
+      "toEntityId": "character-2aed92b009af8b44913b",
+      "relation": "梁景衡：镜头/声线层，本人未对等谈判",
+      "state": "梁景衡：镜头/声线层，本人未对等谈判",
+      "throughChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "sourceChapter": {
+        "chapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+        "chapterRevision": 1,
+        "chapterSha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07"
+      },
+      "revision": 1
+    },
+    {
+      "relationshipId": "relationship-4bd0b58202ffdb9a43f1",
+      "fromEntityId": "character-02d4f0a89bb0bf6aeb9a",
+      "toEntityId": "character-e4d03e0dd4728d9493fc",
+      "relation": "易秀：床边守夜",
+      "state": "易秀：床边守夜",
+      "throughChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-c770332738d278960259"
+      ],
+      "sourceChapter": {
+        "chapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+        "chapterRevision": 1,
+        "chapterSha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07"
+      },
+      "revision": 1
+    }
+  ],
+  "timeline": [
+    {
+      "timelineId": "timeline-d1",
+      "storyTime": "D1",
+      "summary": "-7；见 大纲/黄金三章_锁版Beat_P1.1.md：叠单→见纹→李强→过手失败；三章同夜；证据=E01/E02；转介/口头梁总；敌我=李强+刀疤侧；吴姐接待区",
+      "startChapterId": "75568856-c6fe-5598-bffb-20ae3dddd558",
+      "endChapterId": "1bc641ee-8d6d-5df3-95a9-906df2fe260c",
+      "disclosureChapterId": "1bc641ee-8d6d-5df3-95a9-906df2fe260c",
+      "sourceIds": [
+        "source-8a7745cc26aaea27df7c"
+      ],
+      "revision": 1
+    },
+    {
+      "timelineId": "timeline-d2",
+      "storyTime": "D2",
+      "summary": "-6；门槛/回执；阿大香烟课；夜班双线母账；证据=E03 萌芽；软纸条；敌我=李强",
+      "startChapterId": "6fa056e8-e3c7-5ee6-8852-e0b6d06883a0",
+      "endChapterId": "23cde3e7-eebc-5804-968d-be9c15f8232d",
+      "disclosureChapterId": "23cde3e7-eebc-5804-968d-be9c15f8232d",
+      "sourceIds": [
+        "source-8a7745cc26aaea27df7c"
+      ],
+      "revision": 1
+    },
+    {
+      "timelineId": "timeline-d3",
+      "storyTime": "D3",
+      "summary": "-5；梁总镜头；肖龙公开关联；指动；涂黑角；证据=公开截图；护理记录；敌我=春禾镜头；肖龙",
+      "startChapterId": "7e3a9167-d478-56e7-b875-fabbbb8d77ab",
+      "endChapterId": "80c25c2d-350d-5776-947e-664e06585170",
+      "disclosureChapterId": "80c25c2d-350d-5776-947e-664e06585170",
+      "sourceIds": [
+        "source-8a7745cc26aaea27df7c"
+      ],
+      "revision": 1
+    },
+    {
+      "timelineId": "timeline-d4",
+      "storyTime": "D4",
+      "summary": "-4；093尾号；八点门口对峙；清晰版；担保链短信；证据=093；清晰版；敌我=李强镜头战",
+      "startChapterId": "64941259-8c44-5643-9035-2139881d2eee",
+      "endChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "disclosureChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "sourceIds": [
+        "source-8a7745cc26aaea27df7c"
+      ],
+      "revision": 1
+    },
+    {
+      "timelineId": "timeline-anchor-0428e8e3eab8288d",
+      "storyTime": "T-幼",
+      "summary": "易航致死危机；易秀清醒签一次性有限额救命担保（标的=命）",
+      "sourceIds": [
+        "source-5a285fd1efc1a88348ba"
+      ],
+      "revision": 1
+    },
+    {
+      "timelineId": "timeline-anchor-406882e738293e62",
+      "storyTime": "T-父",
+      "summary": "父亲从登记/叙述中被「涂掉」（侧写；卷八可挂）",
+      "sourceIds": [
+        "source-5a285fd1efc1a88348ba"
+      ],
+      "revision": 1
+    },
+    {
+      "timelineId": "timeline-anchor-393b30512b866c65",
+      "storyTime": "T-长",
+      "summary": "易秀入清偿侧边缘；身体损耗累积",
+      "sourceIds": [
+        "source-5a285fd1efc1a88348ba"
+      ],
+      "revision": 1
+    },
+    {
+      "timelineId": "timeline-anchor-e6c4faf12c53ba68",
+      "storyTime": "T-近",
+      "summary": "按签扩写伪债；易秀病情加重",
+      "sourceIds": [
+        "source-5a285fd1efc1a88348ba"
+      ],
+      "revision": 1
+    },
+    {
+      "timelineId": "timeline-anchor-46011b8cecdec47f",
+      "storyTime": "卷一 D1",
+      "summary": "见纹；-7；欠费约 32700；现金约 1872",
+      "startChapterId": "75568856-c6fe-5598-bffb-20ae3dddd558",
+      "endChapterId": "1bc641ee-8d6d-5df3-95a9-906df2fe260c",
+      "disclosureChapterId": "75568856-c6fe-5598-bffb-20ae3dddd558",
+      "sourceIds": [
+        "source-5a285fd1efc1a88348ba"
+      ],
+      "revision": 1
+    },
+    {
+      "timelineId": "timeline-anchor-85ce161ff5691f0f",
+      "storyTime": "卷一 D1–D7",
+      "summary": "倒计时主轴；催收；暴力窗 D6；援助主戏 029+",
+      "startChapterId": "75568856-c6fe-5598-bffb-20ae3dddd558",
+      "endChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "disclosureChapterId": "75568856-c6fe-5598-bffb-20ae3dddd558",
+      "sourceIds": [
+        "source-5a285fd1efc1a88348ba"
+      ],
+      "revision": 1
+    },
+    {
+      "timelineId": "timeline-anchor-bc8a6d4b415b101c",
+      "storyTime": "卷一末",
+      "summary": "清算中心招手",
+      "sourceIds": [
+        "source-5a285fd1efc1a88348ba"
+      ],
+      "revision": 1
+    }
+  ],
+  "foreshadowing": [
+    {
+      "foreshadowingId": "F01",
+      "summary": "腕上负数总额",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F02",
+      "summary": "明细涂黑",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F03",
+      "summary": "担保人易秀笔迹",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F04",
+      "summary": "第三方收易秀账",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F05",
+      "summary": "恩债农场",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F06",
+      "summary": "李飞腕无负数",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F07",
+      "summary": "泼漆街坊搬走",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F08",
+      "summary": "易秀指月动",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F09",
+      "summary": "从业契违约金",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F10",
+      "summary": "归零后母债仍滚",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F11",
+      "summary": "易秀与陈宏远同框",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F12",
+      "summary": "外城账本",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F13",
+      "summary": "石头遗属",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F14",
+      "summary": "阿大旧伤来源",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F15",
+      "summary": "邓依家族小债",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F16",
+      "summary": "檀溪第一笔脏账",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F17",
+      "summary": "肖龙公开接口/授权导出留痕",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F18",
+      "summary": "郭周堂缺指/旧伤",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F19",
+      "summary": "数字17/出生空档",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F20",
+      "summary": "「您再想想」被李飞学去嘲讽",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F21",
+      "summary": "易秀旧手写流水账缺最后一页",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F22",
+      "summary": "别人称易航「记账的」诨号",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F23",
+      "summary": "中心系统：他的页也是黑的",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F24",
+      "summary": "「账可以烧，页不能黑」",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F25",
+      "summary": "梁景衡名表=老人债",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F26",
+      "summary": "（并入 F15）邓依小债 · 勿重复埋",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F27",
+      "summary": "（并入 F16）檀溪第一笔脏账 · 勿重复埋",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    },
+    {
+      "foreshadowingId": "F28",
+      "summary": "黑页在人价时「跳一下」",
+      "status": "planned",
+      "maintenanceChapterIds": [],
+      "sourceIds": [
+        "source-351038e0fa1ec3efaf0d"
+      ],
+      "revision": 1
+    }
+  ],
+  "chapterBriefs": [
+    {
+      "chapterId": "fb4a0877-d99d-51f5-ab8d-53f4eca1f754",
+      "summary": "方案：整章偏短高潮前蓄力；列证据；阿大给半个「账贩规矩」；决定不硬刚刀疤先打账；章末=天亮",
+      "mustDo": [
+        "整章偏短高潮前蓄力",
+        "列证据",
+        "阿大给半个「账贩规矩」",
+        "决定不硬刚刀疤先打账",
+        "章末落到：天亮"
+      ],
+      "mustNotDo": [
+        "空手套过手闭环",
+        "提前完成担保链闭环",
+        "让梁景衡本人提前正面出场"
+      ],
+      "requiredCharacterIds": [
+        "character-02d4f0a89bb0bf6aeb9a",
+        "character-2e42d46808e40d48ae11"
+      ],
+      "sourceIds": [
+        "source-5d991cd8c74f779da0d6",
+        "source-c770332738d278960259",
+        "source-3c12f5f1e6471afd1779"
+      ],
+      "revision": 1
+    }
+  ],
+  "characterProfiles": [],
+  "chapterCompletions": [
+    {
+      "chapterId": "75568856-c6fe-5598-bffb-20ae3dddd558",
+      "chapterRevision": 1,
+      "chapterSha256": "c182ad81e2cb5337e5399b3fee896bf5d0876a6e08fae931122ea4ed4135ff92",
+      "stateCommitId": "novel-state-commit-seed-d3c487fe07424cbebf06bdd7",
+      "committedAt": "2026-08-02T06:15:01.717Z"
+    },
+    {
+      "chapterId": "499d6e63-3f7c-5416-bd12-e20e2cb0d2c5",
+      "chapterRevision": 1,
+      "chapterSha256": "9c5f25e0e17a28942af9abed9bf9eb798be85e0a23b3474525c45e56445edfdf",
+      "stateCommitId": "novel-state-commit-seed-ad4af8eb1f9c1cd3102ac4d4",
+      "committedAt": "2026-08-02T06:15:01.718Z"
+    },
+    {
+      "chapterId": "1bc641ee-8d6d-5df3-95a9-906df2fe260c",
+      "chapterRevision": 1,
+      "chapterSha256": "cee4a7c874d7ef03bd5cab9096691bc0bb12d1387340c948e12d710c99ca3e01",
+      "stateCommitId": "novel-state-commit-seed-d9014e6d33a36f58d7532c2d",
+      "committedAt": "2026-08-02T06:15:01.719Z"
+    },
+    {
+      "chapterId": "6fa056e8-e3c7-5ee6-8852-e0b6d06883a0",
+      "chapterRevision": 1,
+      "chapterSha256": "68f25635d31e50723e42851266d6dd298c23e6f527136e48c74066fa5018cfed",
+      "stateCommitId": "novel-state-commit-seed-91944822487ca64038a3aa54",
+      "committedAt": "2026-08-02T06:15:01.720Z"
+    },
+    {
+      "chapterId": "23cde3e7-eebc-5804-968d-be9c15f8232d",
+      "chapterRevision": 1,
+      "chapterSha256": "1c74d0f9cff2850a85534b86194cb8616bd4642e3287a8224f5c3db0ee1face8",
+      "stateCommitId": "novel-state-commit-seed-18e3da4c300a8e0966f86661",
+      "committedAt": "2026-08-02T06:15:01.721Z"
+    },
+    {
+      "chapterId": "7e3a9167-d478-56e7-b875-fabbbb8d77ab",
+      "chapterRevision": 1,
+      "chapterSha256": "f67219679b4984732c5d9cf289ea21a51f099a6a363c2737629050362ac0eaba",
+      "stateCommitId": "novel-state-commit-seed-1bcd561fb5b28e5d6d54ae9d",
+      "committedAt": "2026-08-02T06:15:01.722Z"
+    },
+    {
+      "chapterId": "298fe6a0-c11b-5111-af92-c954dc1822a6",
+      "chapterRevision": 1,
+      "chapterSha256": "19f37c36231858b80fdfd4768b338cbf144e0cdf4a7c32807d34939f54894876",
+      "stateCommitId": "novel-state-commit-seed-e4d7f40dca0301f079b12c38",
+      "committedAt": "2026-08-02T06:15:01.723Z"
+    },
+    {
+      "chapterId": "80c25c2d-350d-5776-947e-664e06585170",
+      "chapterRevision": 1,
+      "chapterSha256": "88a60527b9a31cd4370638800071302131c2a2b7163ee1586dd238d0af8b4bd4",
+      "stateCommitId": "novel-state-commit-seed-df6c5a35dd1ca78f239bb918",
+      "committedAt": "2026-08-02T06:15:01.724Z"
+    },
+    {
+      "chapterId": "64941259-8c44-5643-9035-2139881d2eee",
+      "chapterRevision": 1,
+      "chapterSha256": "96fb290fc1989d7e75aacd9416c47ebc24d1d718acf1d6c6c12eb2a91e4bdea0",
+      "stateCommitId": "novel-state-commit-seed-8e47a54b86cf04b84aecd95b",
+      "committedAt": "2026-08-02T06:15:01.725Z"
+    },
+    {
+      "chapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "chapterRevision": 1,
+      "chapterSha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07",
+      "stateCommitId": "novel-state-commit-seed-30a07a75c639f7c1a6129b58",
+      "committedAt": "2026-08-02T06:15:01.726Z"
+    },
+    {
+      "chapterId": "fb4a0877-d99d-51f5-ab8d-53f4eca1f754",
+      "chapterRevision": 2,
+      "chapterSha256": "bd69e411aa746ff73f4f4ff405edc4b182cf50391f8e6284c7834de1dd00323f",
+      "stateCommitId": "novel-state-commit-8ba571f773342b4809ed1bce",
+      "candidateId": "novel-state-candidate-867138f7c778c706ddde83e2",
+      "committedAt": "2026-08-02T06:15:01.717Z"
+    }
+  ],
+  "appliedCandidateIds": [
+    "novel-state-candidate-867138f7c778c706ddde83e2"
+  ],
+  "createdAt": "2026-08-02T06:15:01.716Z",
+  "updatedAt": "2026-08-02T06:15:01.717Z",
+  "fingerprint": "371072010870058d347c4987c0bf1254220232e6388921cda302ccf487a33c7f"
+}

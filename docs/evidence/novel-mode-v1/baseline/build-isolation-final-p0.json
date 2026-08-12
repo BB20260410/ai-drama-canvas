@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 2,
+  "kind": "novel-mode-build-isolation-evidence",
+  "capturedAt": "2026-08-01T07:21:25Z",
+  "correctedAt": "2026-08-01T08:30:19Z",
+  "correctionReason": "Independent review found that the required workspace build rewrote generated outputs and that a second active MCP process used the mutable dist-mcp path. The original workspaceRootUnchanged and single-writer statements were therefore false and have been replaced with the observed boundary.",
+  "commandRecord": "docs/evidence/novel-mode-v1/baseline/commands/build-final-p0.json",
+  "commandLog": "docs/evidence/novel-mode-v1/baseline/commands/build-final-p0.log",
+  "supplementalIsolatedBuild": {
+    "failedAttemptRecord": "docs/evidence/novel-mode-v1/baseline/commands/build-isolated-snapshot-final-p0.json",
+    "failedAttemptReason": "snapshot omitted two root tsconfig files and correctly failed source identity equality",
+    "passRecord": "docs/evidence/novel-mode-v1/baseline/commands/build-isolated-snapshot-final-p0-v2.json",
+    "passLog": "docs/evidence/novel-mode-v1/baseline/commands/build-isolated-snapshot-final-p0-v2.log",
+    "status": "pass",
+    "liveDistAggregateUnchanged": true,
+    "liveReleaseManifestUnchanged": true
+  },
+  "result": {
+    "status": "pass-with-disclosed-runtime-boundary-incident",
+    "exitCode": 0,
+    "sourceIdentityInputsStable": true,
+    "workspaceRootUnchanged": false,
+    "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4",
+    "buildId": "08b8f8168b32a84ef6ad515b00bd65fb"
+  },
+  "workspaceBuild": {
+    "temporaryHome": true,
+    "temporaryTmpdir": true,
+    "temporaryRegistry": true,
+    "writeLeaseMode": "require",
+    "mcpAllowMulti": "unset",
+    "mcpSingletonOverride": "unset",
+    "temporaryDirectoryDisposition": "moved-recoverably-to-user-trash",
+    "generatedOutputsRewritten": [
+      "dist-mcp/**",
+      "out/**",
+      "release-manifest.json"
+    ],
+    "trackedGeneratedArtifactModified": "release-manifest.json",
+    "protectedProjectOrFormalSourceWrite": false
+  },
+  "activeWriters": [
+    {
+      "pid": 40383,
+      "aliveAfterBuild": true,
+      "executableClass": "sealed-immutable-mcp-candidate",
+      "stoppedOrSignalled": false,
+      "workspaceBuildCouldRewriteExecutableTree": false
+    },
+    {
+      "pid": 51269,
+      "aliveAfterBuild": true,
+      "executableClass": "mutable-workspace-dist-mcp",
+      "stoppedOrSignalled": false,
+      "workspaceBuildCouldRewriteExecutableTree": true,
+      "crossGenerationDynamicImportState": "not-provable-after-the-fact",
+      "disposition": "incident disclosed; no process control was authorized or attempted; subsequent build rerun used an isolated source snapshot"
+    }
+  ],
+  "releaseManifest": {
+    "relativePath": "release-manifest.json",
+    "sha256": "e82a92ac2d96c02328847db41186dce4af3920bcb00a42333a96b0a04de22132",
+    "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4",
+    "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+    "protocolVersion": "1.1",
+    "mcpToolCount": 202,
+    "localOnly": true
+  },
+  "externalEffects": {
+    "protectedProjectWrites": 0,
+    "formalNovelSourceWrites": 0,
+    "installedApplicationReplacements": 0,
+    "externalModelCalls": 0,
+    "gitMutationsByThisGoal": 0,
+    "mutableLiveRuntimeTreesRewritten": 1
+  }
+}

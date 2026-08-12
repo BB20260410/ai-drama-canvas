@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-manuscript-mutation-intent",
+  "operationId": "35d68af6-bd9e-5f44-9e58-31dfa99327cf",
+  "requestHash": "29d09b7c7863639241f0e11320f3a0e5840172bdcfbe66d8f5dc42987b176401",
+  "command": "create",
+  "projectId": "project-79b2b0acb554",
+  "beforeManifestSha256": "f4303aac626d876d1833aac7a28e93a7162baf12c3dfec25f63da9c4bc13aabe",
+  "afterManifestSha256": "8e60e8cb9a262ae9309997dd83fafe45b62e9869302d3b5db8ac9dc38a5d233d",
+  "fileMutation": {
+    "kind": "create",
+    "targetLocator": "manuscript/volumes/55698912-330a-4535-86ca-faf2c7373919/80c25c2d-350d-5776-947e-664e06585170.md",
+    "afterSha256": "88a60527b9a31cd4370638800071302131c2a2b7163ee1586dd238d0af8b4bd4",
+    "afterSize": 8300,
+    "contentObjectName": "after-content.bin"
+  },
+  "createdAt": "2026-08-02T06:15:01.724Z",
+  "fingerprint": "aa232443a030542a5a3873b4975db82919f287ed430fe08b8e4a1b79680848de"
+}

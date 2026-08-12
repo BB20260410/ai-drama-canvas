@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 2,
+  "kind": "ai-canvas-managed-project",
+  "projectId": "project-5261558adfaf",
+  "projectName": "black-page-ch011-managed-pilot-20260801",
+  "rootRealpath": "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958/managed/black-page-ch011-managed-pilot-20260801-448e209f",
+  "storageMode": "managed",
+  "startupPolicy": "no-filesystem-scan",
+  "mediaMode": "project-local-cas",
+  "legacyRoots": [],
+  "projectConfigSha256": "ca6aa974571acd4863199f2728f8592cf0e6eec9df412c705c02922b8efe6654",
+  "bootstrapIndexSha256": "8f1340065c1e6924d136d56b0b8d885d6ca83b15ed44d0865a54913adf182ff3",
+  "bootstrapScanId": "managed-bootstrap-448e209f",
+  "relativePaths": {
+    "config": ".aicanvas/project.json",
+    "index": ".aicanvas/index.json",
+    "cache": ".aicanvas/cache-v2.sqlite",
+    "materialDatabase": ".aicanvas/material-studio.sqlite",
+    "productionDatabase": ".aicanvas/studio-production.sqlite",
+    "textCas": ".aicanvas/studio-production/objects/sha256",
+    "generationDatabase": ".aicanvas/studio-generation-ledger.sqlite",
+    "generationPackCas": ".aicanvas/studio-generation/objects/sha256",
+    "mediaCas": ".aicanvas/objects/sha256",
+    "mediaPreviews": ".aicanvas/derived/thumb",
+    "mediaProxies": ".aicanvas/derived/proxy",
+    "mediaWaveforms": ".aicanvas/derived/waveform"
+  },
+  "workspaceMode": "novel",
+  "minimumWriterSchemaVersion": 2,
+  "createdAt": "2026-08-02T00:20:07.240Z",
+  "novelManifest": ".aicanvas/novel/manifest.json",
+  "fingerprint": "60ac8f3a9561a436bf76b937a33d1e5fec83fff9e7acfd464e0cd39a6749db4b"
+}

@@ -1,0 +1,381 @@
+{
+  "schemaVersion": 1,
+  "kind": "black-page-ch011-managed-writing-pilot",
+  "baselineStatus": "provisional",
+  "formalSourceRootPersisted": false,
+  "formalSourceTreeAggregateSha256": "97e8fde0ee0ea8ce8529c3db7db4d2d412cbaf0b8f7ff1e837d185f01b89bada",
+  "managedProjectRelativePath": "docs/evidence/novel-user-tests/writing-os-million-word-consistency-hard-20260801-221728/black-page-managed/black-page-ch011-managed-pilot-20260801-fa3e3df9",
+  "managedProjectId": "project-79b2b0acb554",
+  "sourceChecks": {
+    "selectedFiles": 36,
+    "files": [
+      {
+        "relativePath": "正文/第001章_缴费单与黑页.md",
+        "sha256": "c182ad81e2cb5337e5399b3fee896bf5d0876a6e08fae931122ea4ed4135ff92",
+        "byteLength": 10242
+      },
+      {
+        "relativePath": "正文/第002章_皮鞋与工牌.md",
+        "sha256": "9c5f25e0e17a28942af9abed9bf9eb798be85e0a23b3474525c45e56445edfdf",
+        "byteLength": 10237
+      },
+      {
+        "relativePath": "正文/第003章_您再想想.md",
+        "sha256": "cee4a7c874d7ef03bd5cab9096691bc0bb12d1387340c948e12d710c99ca3e01",
+        "byteLength": 9059
+      },
+      {
+        "relativePath": "正文/第004章_阿大的旧账.md",
+        "sha256": "68f25635d31e50723e42851266d6dd298c23e6f527136e48c74066fa5018cfed",
+        "byteLength": 9526
+      },
+      {
+        "relativePath": "正文/第005章_夜班债纹.md",
+        "sha256": "1c74d0f9cff2850a85534b86194cb8616bd4642e3287a8224f5c3db0ee1face8",
+        "byteLength": 9284
+      },
+      {
+        "relativePath": "正文/第006章_春禾镜头.md",
+        "sha256": "f67219679b4984732c5d9cf289ea21a51f099a6a363c2737629050362ac0eaba",
+        "byteLength": 9117
+      },
+      {
+        "relativePath": "正文/第007章_肖龙.md",
+        "sha256": "19f37c36231858b80fdfd4768b338cbf144e0cdf4a7c32807d34939f54894876",
+        "byteLength": 8622
+      },
+      {
+        "relativePath": "正文/第008章_指动.md",
+        "sha256": "88a60527b9a31cd4370638800071302131c2a2b7163ee1586dd238d0af8b4bd4",
+        "byteLength": 8300
+      },
+      {
+        "relativePath": "正文/第009章_尾号093.md",
+        "sha256": "96fb290fc1989d7e75aacd9416c47ebc24d1d718acf1d6c6c12eb2a91e4bdea0",
+        "byteLength": 9362
+      },
+      {
+        "relativePath": "正文/第010章_八点前.md",
+        "sha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07",
+        "byteLength": 8568
+      },
+      {
+        "relativePath": "设定/正典锁_P0补丁.md",
+        "sha256": "b5ba9e0329e6d21c6e099a7193aa05452b7aada7b75c913f9339e481cca38f9f",
+        "byteLength": 6045
+      },
+      {
+        "relativePath": "设定/正典裁决台账.md",
+        "sha256": "b7e265d2f8fa40c1c16b4c5118573d89eb7c7305e9a0b4625b0ef48f63011f10",
+        "byteLength": 2141
+      },
+      {
+        "relativePath": "追踪/知情账.md",
+        "sha256": "6c1eb7169e7878eb37e6a849868743251f130a2948fb940087a84c6acf140144",
+        "byteLength": 1965
+      },
+      {
+        "relativePath": "追踪/卷一D1-D7日历.md",
+        "sha256": "a003e10369c41b3f836fd36d8b0a8e4ce2edcc50cd56420be4cf7edaca66a32b",
+        "byteLength": 2387
+      },
+      {
+        "relativePath": "追踪/角色状态.md",
+        "sha256": "dd1c246ba22e29c5bbd75cc7d63029ce5e5c4d41c81681ca3b2f1d90a7a966bd",
+        "byteLength": 7183
+      },
+      {
+        "relativePath": "追踪/伏笔.md",
+        "sha256": "a306472bc343a88c1a4aa5a32209d46ee4cce8d6b3e056fdcf826aa139990bab",
+        "byteLength": 2263
+      },
+      {
+        "relativePath": "大纲/细纲_第001-020章.md",
+        "sha256": "4ec79e652b1bc7159a6b59c2393779578415f300b4d8e8b7d1418fb3952d0371",
+        "byteLength": 5463
+      },
+      {
+        "relativePath": "追踪/时间线.md",
+        "sha256": "ca6b375cebd2bbd7b71abfc2d83f0df7653f0ec2528b40894f825dd73989781c",
+        "byteLength": 1084
+      },
+      {
+        "relativePath": "设定/人物/角色卡分级与动态协议.md",
+        "sha256": "2270dc90360c9dce1b9ef51cfed65e3d298937a806b6dd055a820f5c08ba2c44",
+        "byteLength": 5114
+      },
+      {
+        "relativePath": "设定/人物/单卡/刀疤.md",
+        "sha256": "c4824fde1e31e08d2b7ee77533d82ab312de1ff432b9ebe03067d0a1deeccac0",
+        "byteLength": 4447
+      },
+      {
+        "relativePath": "设定/人物/单卡/吴姐.md",
+        "sha256": "574dd7c85435a3df9617d5b03ec182918d184a45c35dcb617cb34bedd1b94206",
+        "byteLength": 1309
+      },
+      {
+        "relativePath": "设定/人物/单卡/崔七.md",
+        "sha256": "f299d4da21d16c1b4867de459355c7a8555489e2dc0f494b06ad6a1866ed2c76",
+        "byteLength": 4812
+      },
+      {
+        "relativePath": "设定/人物/单卡/易秀.md",
+        "sha256": "1922271136acb84c8a21b77e62a929f1701bfd46f049bb958a714adb6c416412",
+        "byteLength": 7265
+      },
+      {
+        "relativePath": "设定/人物/单卡/李飞.md",
+        "sha256": "9552af4c7dced4d800a25e8d7665743fd5346beba22c7230a0eb11a8405447ad",
+        "byteLength": 5050
+      },
+      {
+        "relativePath": "设定/人物/单卡/李强.md",
+        "sha256": "92017db4a7cc2ab3668d99b748381fd45cbcddf75465f463397938b39c27bb02",
+        "byteLength": 4998
+      },
+      {
+        "relativePath": "设定/人物/单卡/易航.md",
+        "sha256": "31b6e4b204589d4391eb4e3a4a825709230453810c7d2e40af217109ee1f66f6",
+        "byteLength": 1932
+      },
+      {
+        "relativePath": "设定/人物/单卡/梁景衡.md",
+        "sha256": "c0481a778c87ff323e63ad96a3986d5ae817f68d4fa581dfbfc1052dd7669ecb",
+        "byteLength": 5187
+      },
+      {
+        "relativePath": "设定/人物/单卡/檀溪.md",
+        "sha256": "72a35024c076d24560ea23bc4c18072548347b349efa30bd2224984beece323d",
+        "byteLength": 9580
+      },
+      {
+        "relativePath": "设定/人物/单卡/赵姐.md",
+        "sha256": "affaf860fac68e83c5d4d10e1bf4a2f44a9db324074c5d2ec911afad3235c5d8",
+        "byteLength": 1062
+      },
+      {
+        "relativePath": "设定/人物/单卡/肖龙.md",
+        "sha256": "42f8b3d19410339fa2692caa7889729f076fdbc861eac68a6a868241f2e94bc8",
+        "byteLength": 4279
+      },
+      {
+        "relativePath": "设定/人物/单卡/邓依.md",
+        "sha256": "8225cb8b6fd52c807df2127cf2e3c06fae813d2acc6be328d67716437aad18f0",
+        "byteLength": 8943
+      },
+      {
+        "relativePath": "设定/人物/单卡/郭周堂.md",
+        "sha256": "db20c5076221c483c21c1763b2dd6a0fa34e2906e5a335a4e3dd52f0ecadfcf3",
+        "byteLength": 5352
+      },
+      {
+        "relativePath": "设定/人物/单卡/阿大.md",
+        "sha256": "2ddc0ce672593bece7ca738eb2be43b33187d48f9f1b7ccf1b38bac6433f5067",
+        "byteLength": 3867
+      },
+      {
+        "relativePath": "设定/人物/单卡/陈宏远.md",
+        "sha256": "0566d93fb07834ef7654098093c1b315b74da444738a89510bcaf451b3988d6e",
+        "byteLength": 5509
+      },
+      {
+        "relativePath": "设定/人物/单卡/石头.md",
+        "sha256": "7fc481adfdfcfd6fadecdc924b0b6e1d149c41bacf5e583ce5eb564f2508c5e9",
+        "byteLength": 1354
+      },
+      {
+        "relativePath": "设定/人物/单卡/顾棠.md",
+        "sha256": "09e3097d19dc1d7ed6b11ac7eab1039f7603f9a7adedd87c080c4a3543d9754b",
+        "byteLength": 1013
+      }
+    ]
+  },
+  "manuscript": {
+    "chapters": [
+      {
+        "number": 1,
+        "chapterId": "75568856-c6fe-5598-bffb-20ae3dddd558",
+        "title": "第001章 缴费单与黑页",
+        "revision": 1,
+        "sha256": "c182ad81e2cb5337e5399b3fee896bf5d0876a6e08fae931122ea4ed4135ff92",
+        "sourceSha256": "c182ad81e2cb5337e5399b3fee896bf5d0876a6e08fae931122ea4ed4135ff92",
+        "rehearsal": false
+      },
+      {
+        "number": 2,
+        "chapterId": "499d6e63-3f7c-5416-bd12-e20e2cb0d2c5",
+        "title": "第002章 皮鞋与工牌",
+        "revision": 1,
+        "sha256": "9c5f25e0e17a28942af9abed9bf9eb798be85e0a23b3474525c45e56445edfdf",
+        "sourceSha256": "9c5f25e0e17a28942af9abed9bf9eb798be85e0a23b3474525c45e56445edfdf",
+        "rehearsal": false
+      },
+      {
+        "number": 3,
+        "chapterId": "1bc641ee-8d6d-5df3-95a9-906df2fe260c",
+        "title": "第003章 您再想想",
+        "revision": 1,
+        "sha256": "cee4a7c874d7ef03bd5cab9096691bc0bb12d1387340c948e12d710c99ca3e01",
+        "sourceSha256": "cee4a7c874d7ef03bd5cab9096691bc0bb12d1387340c948e12d710c99ca3e01",
+        "rehearsal": false
+      },
+      {
+        "number": 4,
+        "chapterId": "6fa056e8-e3c7-5ee6-8852-e0b6d06883a0",
+        "title": "第004章 阿大的旧账",
+        "revision": 1,
+        "sha256": "68f25635d31e50723e42851266d6dd298c23e6f527136e48c74066fa5018cfed",
+        "sourceSha256": "68f25635d31e50723e42851266d6dd298c23e6f527136e48c74066fa5018cfed",
+        "rehearsal": false
+      },
+      {
+        "number": 5,
+        "chapterId": "23cde3e7-eebc-5804-968d-be9c15f8232d",
+        "title": "第005章 夜班债纹",
+        "revision": 1,
+        "sha256": "1c74d0f9cff2850a85534b86194cb8616bd4642e3287a8224f5c3db0ee1face8",
+        "sourceSha256": "1c74d0f9cff2850a85534b86194cb8616bd4642e3287a8224f5c3db0ee1face8",
+        "rehearsal": false
+      },
+      {
+        "number": 6,
+        "chapterId": "7e3a9167-d478-56e7-b875-fabbbb8d77ab",
+        "title": "第006章 春禾镜头",
+        "revision": 1,
+        "sha256": "f67219679b4984732c5d9cf289ea21a51f099a6a363c2737629050362ac0eaba",
+        "sourceSha256": "f67219679b4984732c5d9cf289ea21a51f099a6a363c2737629050362ac0eaba",
+        "rehearsal": false
+      },
+      {
+        "number": 7,
+        "chapterId": "298fe6a0-c11b-5111-af92-c954dc1822a6",
+        "title": "第007章 肖龙",
+        "revision": 1,
+        "sha256": "19f37c36231858b80fdfd4768b338cbf144e0cdf4a7c32807d34939f54894876",
+        "sourceSha256": "19f37c36231858b80fdfd4768b338cbf144e0cdf4a7c32807d34939f54894876",
+        "rehearsal": false
+      },
+      {
+        "number": 8,
+        "chapterId": "80c25c2d-350d-5776-947e-664e06585170",
+        "title": "第008章 指动",
+        "revision": 1,
+        "sha256": "88a60527b9a31cd4370638800071302131c2a2b7163ee1586dd238d0af8b4bd4",
+        "sourceSha256": "88a60527b9a31cd4370638800071302131c2a2b7163ee1586dd238d0af8b4bd4",
+        "rehearsal": false
+      },
+      {
+        "number": 9,
+        "chapterId": "64941259-8c44-5643-9035-2139881d2eee",
+        "title": "第009章 尾号093",
+        "revision": 1,
+        "sha256": "96fb290fc1989d7e75aacd9416c47ebc24d1d718acf1d6c6c12eb2a91e4bdea0",
+        "sourceSha256": "96fb290fc1989d7e75aacd9416c47ebc24d1d718acf1d6c6c12eb2a91e4bdea0",
+        "rehearsal": false
+      },
+      {
+        "number": 10,
+        "chapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+        "title": "第010章 八点前",
+        "revision": 1,
+        "sha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07",
+        "sourceSha256": "55c9c3b4ec8e2fa7b0398a66539e11a0eba820edf5746c9dbbe5bbd223073f07",
+        "rehearsal": false
+      },
+      {
+        "number": 11,
+        "chapterId": "fb4a0877-d99d-51f5-ab8d-53f4eca1f754",
+        "title": "第011章 方案（隔离演练）",
+        "revision": 2,
+        "sha256": "bd69e411aa746ff73f4f4ff405edc4b182cf50391f8e6284c7834de1dd00323f",
+        "sourceSha256": null,
+        "rehearsal": true
+      },
+      {
+        "number": 12,
+        "chapterId": "022be142-6e95-5ad4-9d22-bd95a9a772ef",
+        "title": "第012章 幕一尾钩（隔离演练）",
+        "revision": 1,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceSha256": null,
+        "rehearsal": true
+      }
+    ]
+  },
+  "mapping": {
+    "writingStateRevisionSeeded": 1,
+    "writingStateFingerprintSeeded": "0471613c3c90f561e9c9e265b96c1cd291250763bb1d39416a6a6c5f4060c708",
+    "sources": 26,
+    "entities": 17,
+    "dynamicStates": 8,
+    "knowledge": 173,
+    "relationships": 5,
+    "timeline": 11,
+    "foreshadowing": 28,
+    "hardCanon": 29,
+    "diagnostics": [
+      "源残留冲突：日历导语仍写016发生-7→-6；P0与CAN-跳天已裁决D1→D2跳天，待清理低权威旧句。",
+      "知情账非二元rawValue已保留；planned_later无生效章时不进入过去时投影。",
+      "伏笔状态按源台账保留，未根据正文自动晋级。"
+    ],
+    "failedPilotArtifactsRetained": [
+      "首轮隔离pilot在D4备注章号解析处失败；失败工程保留于同级pilots目录，未写正式源。"
+    ]
+  },
+  "chapter11": {
+    "beforeProjection": {
+      "cutoffChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "yihangThroughChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+      "characterStateCount": 2,
+      "writerCanonCount": 24,
+      "seededAuthorOnlyCanonCount": 5,
+      "chapter11StateVisible": false,
+      "authorOnlyVisible": false
+    },
+    "contextPackFingerprint": "f3c8a7b7f08febcdd8542bf199c36459caa1264e76aa90cce049877d6886b4ea",
+    "cutoffChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+    "budget": {
+      "maximumCharacters": 60000,
+      "usedCharacters": 16535,
+      "reservedCharacters": 3130,
+      "truncated": false,
+      "omitted": []
+    },
+    "sectionCounts": {
+      "hardCanon": 24,
+      "taskBrief": 1,
+      "entities": 2,
+      "characterProfiles": 0,
+      "characterStates": 2,
+      "knowledge": 45,
+      "relationships": 6,
+      "timeline": 11,
+      "foreshadowing": 28
+    },
+    "excerptChapterIds": [
+      "80c25c2d-350d-5776-947e-664e06585170",
+      "64941259-8c44-5643-9035-2139881d2eee",
+      "2dc9be48-b563-571a-8779-2f9e89dcdfa6"
+    ],
+    "preflightId": "novel-write-preflight-e1435c3034a9505cce4d0909",
+    "saveRevision": 2,
+    "staleReplayReason": "context_preflight_stale",
+    "reviewTicketId": "novel-review-d6985455a5f2eddb699c5643",
+    "candidateId": "novel-state-candidate-867138f7c778c706ddde83e2",
+    "decisionId": "novel-state-decision-01e28a5df2e0b87f7a8f2608",
+    "committedStateRevision": 2,
+    "committedThroughChapterId": "fb4a0877-d99d-51f5-ab8d-53f4eca1f754"
+  },
+  "chapter12": {
+    "contextPackFingerprint": "09002cbe44d95d2f46e963160831c6f5333e62d7a621a59a6f7d8a8fb58b2325",
+    "preflightId": "novel-write-preflight-7fb7ce6d2168e11e89d07514",
+    "ready": true
+  },
+  "boundaries": {
+    "formalSourceWritten": false,
+    "remoteModelsCalled": false,
+    "feesIncurred": false,
+    "rehearsalBodySyncedToFormalSource": false
+  }
+}

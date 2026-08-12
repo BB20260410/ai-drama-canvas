@@ -1,0 +1,3848 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-readonly-tree-manifest",
+  "label": "black-page-ch011-pilot-after",
+  "rootPersisted": false,
+  "pathEncoding": "posix-relative-utf8",
+  "hashAlgorithm": "sha256",
+  "aggregateAlgorithm": "sha256-json-lines-v1",
+  "summary": {
+    "entries": 547,
+    "directories": 39,
+    "files": 507,
+    "symlinks": 1,
+    "fileBytes": 5943649
+  },
+  "entries": [
+    {
+      "path": ".",
+      "type": "directory",
+      "size": 608,
+      "mtimeNs": "1785603729819622149",
+      "sha256": null
+    },
+    {
+      "path": ".DS_Store",
+      "type": "file",
+      "size": 10244,
+      "mtimeNs": "1785601920398928753",
+      "sha256": "31f8904929ce2925fb846d9302c25decef1f774c75d7558107dc023b758d16ed"
+    },
+    {
+      "path": "01_七猫200万字方案议事",
+      "type": "directory",
+      "size": 1216,
+      "mtimeNs": "1785601920404166532",
+      "sha256": null
+    },
+    {
+      "path": "01_七猫200万字方案议事/.DS_Store",
+      "type": "file",
+      "size": 10244,
+      "mtimeNs": "1785601920404470195",
+      "sha256": "4f9a1ae54543ee7ac5102b392583ff186428a7f3f70fb09485946e88145c24f5"
+    },
+    {
+      "path": "01_七猫200万字方案议事/00_codex_brief.md",
+      "type": "file",
+      "size": 767,
+      "mtimeNs": "1785585338262105758",
+      "sha256": "4026da6dfb22bd67ea59100f0a1662e5deedbb61c3d4258953107d556f703fb4"
+    },
+    {
+      "path": "01_七猫200万字方案议事/00_prompt_doubao.md",
+      "type": "file",
+      "size": 2135,
+      "mtimeNs": "1785585319243846532",
+      "sha256": "3f6044c5468354f7bdef53c7bba0cc578267cf2544c6c40c6af8c4c2e2f2c654"
+    },
+    {
+      "path": "01_七猫200万字方案议事/00_prompt_glm.md",
+      "type": "file",
+      "size": 2124,
+      "mtimeNs": "1785585319243792907",
+      "sha256": "76bbc2873ffa4b87ce1c30ae7dfb9f9b078878f1a32ff5163771761dc87c3360"
+    },
+    {
+      "path": "01_七猫200万字方案议事/00_prompt_kimi_r1.md",
+      "type": "file",
+      "size": 2480,
+      "mtimeNs": "1785585475940005917",
+      "sha256": "bf655def888a4e9a9e34f0fd9ab3e5c2d1dc13e2b20b24066df7c035a9e1e39e"
+    },
+    {
+      "path": "01_七猫200万字方案议事/00_prompt_qwen.md",
+      "type": "file",
+      "size": 2111,
+      "mtimeNs": "1785585319243705489",
+      "sha256": "01d8f83a12c3a96e1ff93c02569ba987a6814ecc52680140d3225eb69b55f169"
+    },
+    {
+      "path": "01_七猫200万字方案议事/00_prompt_r2_template.md",
+      "type": "file",
+      "size": 828,
+      "mtimeNs": "1785585497681441912",
+      "sha256": "988c5e1d40adba95b9749a03f8b29ee45cbb82e96bbfbfd24c9e9a2815bb7217"
+    },
+    {
+      "path": "01_七猫200万字方案议事/00_prompt_r3_template.md",
+      "type": "file",
+      "size": 645,
+      "mtimeNs": "1785585497681451370",
+      "sha256": "5cd89a43bbf73457532cedadc2958f7d8623498bf2ae46f222a62e718e3ce29e"
+    },
+    {
+      "path": "01_七猫200万字方案议事/00_三轮议事协议.md",
+      "type": "file",
+      "size": 1295,
+      "mtimeNs": "1785585475940163919",
+      "sha256": "a51b11fff2f0e1838f89d1ffacff85ad5b98fdd981a89491b0817397791bfd52"
+    },
+    {
+      "path": "01_七猫200万字方案议事/00_议题包.md",
+      "type": "file",
+      "size": 1971,
+      "mtimeNs": "1785585319228030045",
+      "sha256": "50fc357232885c7f7f28321e7f08d665171f3d159cd9dd5795bd8cab9d074ca5"
+    },
+    {
+      "path": "01_七猫200万字方案议事/01_qwen.launch.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785585742023191067",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "01_七猫200万字方案议事/01_qwen.txt",
+      "type": "file",
+      "size": 39140,
+      "mtimeNs": "1785586187830162563",
+      "sha256": "ae3b94406e1d92ead4e9fa026666b65ea1f93491e2e863c8aad1d3248b6bc495"
+    },
+    {
+      "path": "01_七猫200万字方案议事/01_qwen_meta.json",
+      "type": "file",
+      "size": 576,
+      "mtimeNs": "1785586187830377855",
+      "sha256": "53d101968c3a9b0de389904c0d0e32e13b34ce919ab1fcbea4209e272b8cc2c5"
+    },
+    {
+      "path": "01_七猫200万字方案议事/01_终报.md",
+      "type": "file",
+      "size": 11754,
+      "mtimeNs": "1785586336694374550",
+      "sha256": "0d4dd2eb494ed133d9a22791a83e4f07c299932691a2e99e8856cdbc22d5aacc"
+    },
+    {
+      "path": "01_七猫200万字方案议事/02_glm.txt",
+      "type": "file",
+      "size": 22725,
+      "mtimeNs": "1785585497261459360",
+      "sha256": "7f634b1a107cf455bb6a82d9d13b71d0c86ecd1540dc824e1f573a0ef903824d"
+    },
+    {
+      "path": "01_七猫200万字方案议事/02_glm_meta.json",
+      "type": "file",
+      "size": 504,
+      "mtimeNs": "1785585497261806363",
+      "sha256": "4fd9fbc3b13eee7bc8c1fc446286a2a36815b0469811f016e0b95c76ea2332db"
+    },
+    {
+      "path": "01_七猫200万字方案议事/03_doubao.txt",
+      "type": "file",
+      "size": 23601,
+      "mtimeNs": "1785585696789135008",
+      "sha256": "2ed3cf9fecfe7140e59e976422963ba740da75c4e20d59130f213b6cb900982d"
+    },
+    {
+      "path": "01_七猫200万字方案议事/03_doubao_meta.json",
+      "type": "file",
+      "size": 527,
+      "mtimeNs": "1785585696789588804",
+      "sha256": "fd715a675862fcda9ddaa6a83486a8dc694ea9b2af9489430e9b828b6d09abae"
+    },
+    {
+      "path": "01_七猫200万字方案议事/04_gpt-5_6-luna.err",
+      "type": "file",
+      "size": 66498,
+      "mtimeNs": "1785586104776629966",
+      "sha256": "11a9542409f5a2d1b19913878ec070e8218db84b8da0ba0f2469ac3d6ff3e548"
+    },
+    {
+      "path": "01_七猫200万字方案议事/04_gpt-5_6-luna.txt",
+      "type": "file",
+      "size": 17162,
+      "mtimeNs": "1785586104776888135",
+      "sha256": "0593f890163203d9eb9b20b18c38e9af7aef41e76416e4f2236a915d84d8e906"
+    },
+    {
+      "path": "01_七猫200万字方案议事/04_gpt-5_6-sol.err",
+      "type": "file",
+      "size": 324517,
+      "mtimeNs": "1785585733131316190",
+      "sha256": "446dab4008cbafec1d0df3d270e917b50b51f1a50d10626040c6326f742af125"
+    },
+    {
+      "path": "01_七猫200万字方案议事/04_gpt-5_6-sol.txt",
+      "type": "file",
+      "size": 22202,
+      "mtimeNs": "1785585733131458692",
+      "sha256": "85bce391dd8a4a3806868fba989e8671cc5aa604f04da1381ce43752fc9b799a"
+    },
+    {
+      "path": "01_七猫200万字方案议事/04_gpt-5_6-terra.err",
+      "type": "file",
+      "size": 204089,
+      "mtimeNs": "1785585915184808028",
+      "sha256": "0f4730db7e52b5148289fa949d3613ec193c7d93bdb806dc4d8de579fd4879dc"
+    },
+    {
+      "path": "01_七猫200万字方案议事/04_gpt-5_6-terra.txt",
+      "type": "file",
+      "size": 17696,
+      "mtimeNs": "1785585915184939863",
+      "sha256": "385268f0388209ca5c6e0db5d958661ca9518cba5a6dfca7a30bcb82f6d801b1"
+    },
+    {
+      "path": "01_七猫200万字方案议事/05_kimi_r1.launch.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785585476227069465",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "01_七猫200万字方案议事/05_kimi_r1.txt",
+      "type": "file",
+      "size": 12603,
+      "mtimeNs": "1785585633697881148",
+      "sha256": "353022cc2c3682c6c5163cd8d888114e319e07e111a48a9deea7a2142f9997cc"
+    },
+    {
+      "path": "01_七猫200万字方案议事/05_kimi_r1_meta.json",
+      "type": "file",
+      "size": 509,
+      "mtimeNs": "1785585633698178526",
+      "sha256": "6ad5c6c48b9982b61e5cbc6699f92fe3dfcdca3651c3eb9ecfa65c316e125e90"
+    },
+    {
+      "path": "01_七猫200万字方案议事/R1_CORE_READY",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785586195499179867",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "01_七猫200万字方案议事/STATUS.md",
+      "type": "file",
+      "size": 2685,
+      "mtimeNs": "1785586287788580219",
+      "sha256": "b384db6daeeefe4099eef12334d126d4b6badc0288c3f0e3b91d6589715bb238"
+    },
+    {
+      "path": "01_七猫200万字方案议事/TASKS.md",
+      "type": "file",
+      "size": 574,
+      "mtimeNs": "1785586287788693178",
+      "sha256": "e54e8a8bbfdb7081565f30830b5536453daeb9adfbe6e19805e0b9e9ed410ae1"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r1_digest.md",
+      "type": "file",
+      "size": 9025,
+      "mtimeNs": "1785586137432224905",
+      "sha256": "edf8264b718e2e9f5681b6363d94cbd5ac362fbc008b5adeee30a17f6d503e2c"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r1_watch.log",
+      "type": "file",
+      "size": 1618,
+      "mtimeNs": "1785586195495332025",
+      "sha256": "6b6ce7a4b31be8342603488ed2ad59bee9c2aa6f206530b094c5270706c8e6a6"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2",
+      "type": "directory",
+      "size": 704,
+      "mtimeNs": "1785586323957995146",
+      "sha256": null
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/doubao.launch.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785585899906669446",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/doubao.txt",
+      "type": "file",
+      "size": 27507,
+      "mtimeNs": "1785586256512644432",
+      "sha256": "9f885e5b93d01184b66eff90a19fa7784ef2dac4c5f60b0390df4e483ff9d223"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/doubao_meta.json",
+      "type": "file",
+      "size": 528,
+      "mtimeNs": "1785586256512910474",
+      "sha256": "ad285d87cebd38e629e038301f18deab859c5f5c61a8ced9d7512f927a8b1a41"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/glm.launch.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785585899906221567",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/glm.txt",
+      "type": "file",
+      "size": 15127,
+      "mtimeNs": "1785586020492242660",
+      "sha256": "915c0e4a1628995706f0a2e65815a3ed5e2d87945b350984dd9ad4106370af04"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/glm_meta.json",
+      "type": "file",
+      "size": 506,
+      "mtimeNs": "1785586020492459829",
+      "sha256": "edc9941ec398448941bfee29f4fe98b72f5d5d4f2b14f260fccf1a5b5f0294e7"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/gpt-5_6-sol.done",
+      "type": "file",
+      "size": 7,
+      "mtimeNs": "1785586143700341486",
+      "sha256": "4bef30cdfc89fa687fcb49b5e4c26c6c375903005d1ff63fe05b9d4b7265b8b4"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/gpt-5_6-sol.err",
+      "type": "file",
+      "size": 96802,
+      "mtimeNs": "1785586143331746499",
+      "sha256": "b28cf568b47c1b0ad1f948270802f587f604603c6ea8f4412692535af9264c69"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/gpt-5_6-sol.txt",
+      "type": "file",
+      "size": 19735,
+      "mtimeNs": "1785586143331850416",
+      "sha256": "3150ddef29715abfbea3108c3268dbec8a296130e644a09ed00bcca3a0722c41"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/kimi.launch.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785585899907202993",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/kimi.txt",
+      "type": "file",
+      "size": 10427,
+      "mtimeNs": "1785586022085688192",
+      "sha256": "da8e906c0d60bbb013e74ad485d37266d9a5d26ddc0f10748ab615258721d167"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/kimi_meta.json",
+      "type": "file",
+      "size": 508,
+      "mtimeNs": "1785586022085846485",
+      "sha256": "71efcab50c5cc98f7618f74a05145b745e534a99eeb083436744e210225e30f4"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/prompt_doubao.md",
+      "type": "file",
+      "size": 8170,
+      "mtimeNs": "1785585899903231246",
+      "sha256": "4ca3b57525291d9e8dae7f4a5f1849f6a6c2b43f9c926aa99b5c2ebdf1dc4f3c"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/prompt_glm.md",
+      "type": "file",
+      "size": 8167,
+      "mtimeNs": "1785585899903164704",
+      "sha256": "4af67debc1add286d9b98b93c2b48cdb193dda19f7d71d78f22888ec56969134"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/prompt_gpt-5_6-sol.md",
+      "type": "file",
+      "size": 8039,
+      "mtimeNs": "1785585899925826092",
+      "sha256": "7e71625aaa7595b7aa79cb8a11cdfa3358ba2b20a4c54fa62c64f94633a1a848"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/prompt_kimi.md",
+      "type": "file",
+      "size": 8168,
+      "mtimeNs": "1785585899903286372",
+      "sha256": "5117c3df16044b7a4d9808e2d6f63ef7cb2159ce1c8269d2bb2137823373f382"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/prompt_qwen.md",
+      "type": "file",
+      "size": 8168,
+      "mtimeNs": "1785585899903058828",
+      "sha256": "e37426d709c9fb618dcbfdac9687c14e62f44d4a006dc4a846a7a75b00c8b149"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/qwen.launch.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785585899907657748",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/qwen.txt",
+      "type": "file",
+      "size": 37417,
+      "mtimeNs": "1785586323957636937",
+      "sha256": "17cf87c639503fb6d332a7e42768e30e8f77fc45c780f8544efc872a8744efce"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2/qwen_meta.json",
+      "type": "file",
+      "size": 577,
+      "mtimeNs": "1785586323958107063",
+      "sha256": "4fc39f5b280dcfd411a4619e476ea18afc675089cdbf15220b843f3f7d4bbb13"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r2_digest.md",
+      "type": "file",
+      "size": 4510,
+      "mtimeNs": "1785586182391759415",
+      "sha256": "b6932155d73ea0f7a32c0b67facb2016d2bb6130b3d3f856016c01e99d650c01"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r3",
+      "type": "directory",
+      "size": 384,
+      "mtimeNs": "1785586176729622148",
+      "sha256": null
+    },
+    {
+      "path": "01_七猫200万字方案议事/r3/glm.launch.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785586106720896250",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r3/glm.txt",
+      "type": "file",
+      "size": 10146,
+      "mtimeNs": "1785586176729482981",
+      "sha256": "8d7998097c61b10ad5917664d8e1c0d4dafa473bc7f31f2a5ed408a771b38645"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r3/glm_meta.json",
+      "type": "file",
+      "size": 504,
+      "mtimeNs": "1785586176729678439",
+      "sha256": "17c60e2618a48e833fce239b95ef7832b68b78bc271b2adf51920e69f4cb6098"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r3/kimi.launch.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785586106720438621",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r3/kimi.txt",
+      "type": "file",
+      "size": 4192,
+      "mtimeNs": "1785586170575226672",
+      "sha256": "941d6f61787d5a3e7be9e7abb20102288add7867c4dbbc2dd6d51679c2e084dc"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r3/kimi_meta.json",
+      "type": "file",
+      "size": 506,
+      "mtimeNs": "1785586170575517215",
+      "sha256": "dcf32b1d44404fda2fa06cee90d5f9373be4c8469a2fb7f7a23564bc7e22bba4"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r3/prompt_doubao.md",
+      "type": "file",
+      "size": 4840,
+      "mtimeNs": "1785586106717296257",
+      "sha256": "b2804a2bd26dad51a29cfaceffc626fb2e6f01ca7ea6a990e6ec039ed3a55130"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r3/prompt_glm.md",
+      "type": "file",
+      "size": 4837,
+      "mtimeNs": "1785586106717236714",
+      "sha256": "f95b3d82167de75fd9c393468bfbdf1bfb35cdf67e6dd7d0c5ae850ccded2b78"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r3/prompt_kimi.md",
+      "type": "file",
+      "size": 4838,
+      "mtimeNs": "1785586106717136088",
+      "sha256": "ebc728bd4e80f9e591135db81e8cb88884f0049463786fd8aa247b6006f3761e"
+    },
+    {
+      "path": "01_七猫200万字方案议事/r3/prompt_qwen.md",
+      "type": "file",
+      "size": 4838,
+      "mtimeNs": "1785586106717350716",
+      "sha256": "a0bc57aa567812067668d5db60d4e153223007175a430aee90b8cfacd6a2015e"
+    },
+    {
+      "path": "01_七猫200万字方案议事/scripts",
+      "type": "directory",
+      "size": 128,
+      "mtimeNs": "1785585611959726685",
+      "sha256": null
+    },
+    {
+      "path": "01_七猫200万字方案议事/scripts/launch_r2.sh",
+      "type": "file",
+      "size": 2149,
+      "mtimeNs": "1785585611959746144",
+      "sha256": "d4a90421ebd0215e02673dec831d2520129a11cbbf16e98b3c06cca918fdd955"
+    },
+    {
+      "path": "01_七猫200万字方案议事/scripts/launch_r3.sh",
+      "type": "file",
+      "size": 1906,
+      "mtimeNs": "1785585611959778186",
+      "sha256": "ea8525c224a23225e7b21af5f50aa7305869695537896245ea3fa82c85a04622"
+    },
+    {
+      "path": "02_主笔分工推理强度议事",
+      "type": "directory",
+      "size": 448,
+      "mtimeNs": "1785601920400571028",
+      "sha256": null
+    },
+    {
+      "path": "02_主笔分工推理强度议事/.DS_Store",
+      "type": "file",
+      "size": 6148,
+      "mtimeNs": "1785601920400890024",
+      "sha256": "302640706e2e69062610a96d90bcf0068bf8fcd68cce6fb678b10d8b6230f82d"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/00_prompt_r2.md",
+      "type": "file",
+      "size": 600,
+      "mtimeNs": "1785586579472604209",
+      "sha256": "afcef473ebe13a696251a86a19118a4fdb002a46cd9f4440ee9f919f1c0ffc42"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/00_三轮协议.md",
+      "type": "file",
+      "size": 819,
+      "mtimeNs": "1785586554967560598",
+      "sha256": "44acf5dcfdd6c603edd07fee93d8a434ebe63d9cc374d0c311945bdfba62407e"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/00_现行栈摘录.md",
+      "type": "file",
+      "size": 4161,
+      "mtimeNs": "1785586501739556532",
+      "sha256": "6755f508ef3a2161c8c062ef4bc7d7687541d16e1a89ff9ea29782b0055782b2"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/00_议题.md",
+      "type": "file",
+      "size": 1402,
+      "mtimeNs": "1785586501741425911",
+      "sha256": "2954da8e7aaec92a507c3ad9c9a987a888f710430808854f5328ad5e9d9c316f"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/01_产线定栈终报.md",
+      "type": "file",
+      "size": 6952,
+      "mtimeNs": "1785589504495481150",
+      "sha256": "179f991c3bc4dbacb2f17bb97dd99051a4c9bbcc5583e0aa59bfeee20e5ce6bd"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/STATUS.md",
+      "type": "file",
+      "size": 341,
+      "mtimeNs": "1785586729173936272",
+      "sha256": "8984103916a813c0745dfa523e854cbcd28be6b806e9d115e2f685299333367f"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1",
+      "type": "directory",
+      "size": 992,
+      "mtimeNs": "1785586704571018916",
+      "sha256": null
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/codex_loop.log",
+      "type": "file",
+      "size": 87,
+      "mtimeNs": "1785586704566767282",
+      "sha256": "6cf7713b336c297eb5a982a437d279d101a86f089677743aa40b0bf3790b9cba"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/deepseek.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785586555238210855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/deepseek.txt",
+      "type": "file",
+      "size": 3117,
+      "mtimeNs": "1785586581982654192",
+      "sha256": "bd123e11bea7f7fd407add6122263b884c81e0acf90b1812a1bb2fb5ce1ac1fb"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/deepseek_meta.json",
+      "type": "file",
+      "size": 524,
+      "mtimeNs": "1785586581982973026",
+      "sha256": "ba1a78c9ee8cb79455a761b3e2214e2e2560e6b0fdd0c4948a9b7a27da9f6176"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/doubao.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785586555237323395",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/doubao.txt",
+      "type": "file",
+      "size": 3299,
+      "mtimeNs": "1785586650911925354",
+      "sha256": "ec4b77d173f76e80c76b7fe2e86f749afced9598e7bdcc8ec75b61961aaf465f"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/doubao_meta.json",
+      "type": "file",
+      "size": 526,
+      "mtimeNs": "1785586650912085063",
+      "sha256": "3e2871a4d71a00686a75830ed1bff48301d079c60165cd714a7d4ab801108deb"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/glm.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785586555236960602",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/glm.txt",
+      "type": "file",
+      "size": 7353,
+      "mtimeNs": "1785586595809910766",
+      "sha256": "ac6d6f82932de925ae77513baf399df2449d0ccc8c56801106790eecd04c7e3a"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/glm_meta.json",
+      "type": "file",
+      "size": 506,
+      "mtimeNs": "1785586595810182392",
+      "sha256": "ed611247f2fa5ac8c93baf000fa283e7ba42c145363f5ad9c920c7d0be5ce264"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/gpt-5_6-luna.err",
+      "type": "file",
+      "size": 58339,
+      "mtimeNs": "1785586818358662002",
+      "sha256": "09a84b8578e993b0ce0cabd9f01527e474d3f8e73638c6494c34aa47e904d627"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/gpt-5_6-luna.txt",
+      "type": "file",
+      "size": 3684,
+      "mtimeNs": "1785586818358687002",
+      "sha256": "dc1cf8c3500075c68ebdcdbc226035015aeb22cc7c68740a323ed37d17bd14e5"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/gpt-5_6-sol.err",
+      "type": "file",
+      "size": 124540,
+      "mtimeNs": "1785586655494694821",
+      "sha256": "5b004740c3cdd3f63873d06af02429e3201ff9c5a52a7de3c52823daa1968388"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/gpt-5_6-sol.txt",
+      "type": "file",
+      "size": 4234,
+      "mtimeNs": "1785586655494752071",
+      "sha256": "6d8063af6cb09ea2aac4a6b16a71a608649a1be6e8e59760ac9f23b5abf2f68a"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/gpt-5_6-terra.err",
+      "type": "file",
+      "size": 26946,
+      "mtimeNs": "1785586701600891263",
+      "sha256": "b5a83cb3489d0477efb843aa9760e6fe677e5d95bb0965b02de171a48982d312"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/gpt-5_6-terra.txt",
+      "type": "file",
+      "size": 2656,
+      "mtimeNs": "1785586701600982222",
+      "sha256": "31ef0907d907ce8136d7b1551ddb2d03e027be7a3a4c67a3575a37ec8cf2086e"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/grok_self.txt",
+      "type": "file",
+      "size": 1630,
+      "mtimeNs": "1785586579472591084",
+      "sha256": "0869681c8c392c2d1a68890d7bde688988660bccecdc83cfd00715822ee7f83d"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/kimi.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785586555237847354",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/kimi.txt",
+      "type": "file",
+      "size": 3116,
+      "mtimeNs": "1785586604637749295",
+      "sha256": "1fc2096cf78b819d68fb8014ed4667db6f1a635abde9754fcbd190caf986ddce"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/kimi_meta.json",
+      "type": "file",
+      "size": 506,
+      "mtimeNs": "1785586604637882671",
+      "sha256": "c529a3bc4720813ef9eea07117c37ab1f9569ad917404afdea07c38f71b1615c"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/prompt_codex.md",
+      "type": "file",
+      "size": 545,
+      "mtimeNs": "1785586501759447993",
+      "sha256": "d78cfd5d001b93c85192f9c15ea639dc40e7bd78f3af9c4100d9cf4100adf5d3"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/prompt_deepseek.md",
+      "type": "file",
+      "size": 1536,
+      "mtimeNs": "1785586501757670655",
+      "sha256": "8c64dcde5db4db84bb2fd512cdba08fac69c8f7fc551d0b3948d8d1c42e48564"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/prompt_doubao.md",
+      "type": "file",
+      "size": 1532,
+      "mtimeNs": "1785586501750870265",
+      "sha256": "71cc6d9b4bfd918ca351e5815c9b524dc1920b16ebd4afcb598c4851a3abaadd"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/prompt_glm.md",
+      "type": "file",
+      "size": 1528,
+      "mtimeNs": "1785586501747554342",
+      "sha256": "b5c4a7743b6b60b3c51d84500411b0164161f05bbc835e1f05d43be2f38755fc"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/prompt_kimi.md",
+      "type": "file",
+      "size": 1535,
+      "mtimeNs": "1785586501754184939",
+      "sha256": "acff1ab52da409a788089c559f236d9caa253918c109b8137a1017e0bbfd38f6"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/prompt_qwen.md",
+      "type": "file",
+      "size": 1541,
+      "mtimeNs": "1785586501744771544",
+      "sha256": "f8387b99dcc0d78887176a896bbba51f138dd2b1135ccc1d0c68b744b9482d94"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/qwen.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785586555236604643",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/qwen.txt",
+      "type": "file",
+      "size": 13502,
+      "mtimeNs": "1785586685163337281",
+      "sha256": "ff5d9ee7c2518b21d92569c9b565a6e09445318fcab0bb02bc2fa07215751edd"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1/qwen_meta.json",
+      "type": "file",
+      "size": 575,
+      "mtimeNs": "1785586685163696240",
+      "sha256": "2bdf4808969ad508a4d061f85e5aa9db5ddf4be4bbd330c216745d7898088375"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r1_digest.md",
+      "type": "file",
+      "size": 3728,
+      "mtimeNs": "1785586769493886161",
+      "sha256": "830a087b5572c5b4809fecdf942c21595c15ec21418a83fca05d6020e31c069f"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2",
+      "type": "directory",
+      "size": 800,
+      "mtimeNs": "1785586962455649073",
+      "sha256": null
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/deepseek.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785586756874730352",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/deepseek.txt",
+      "type": "file",
+      "size": 3205,
+      "mtimeNs": "1785586787717220292",
+      "sha256": "aeb62aa77939695f07788406ecebb64cd253bd1ce948e15b1175a590242965e5"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/deepseek_meta.json",
+      "type": "file",
+      "size": 522,
+      "mtimeNs": "1785586787717440543",
+      "sha256": "0fca1f87793885376b6dadd500aa1e61e2f70b27cb3fe4c2bd2b7d1acef07752"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/doubao.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785586756875642395",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/doubao.txt",
+      "type": "file",
+      "size": 5968,
+      "mtimeNs": "1785586931515795503",
+      "sha256": "589ff254d94842114dccd77b534669a9a95d6dac5f1795bec8a2455a96acbd08"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/doubao_meta.json",
+      "type": "file",
+      "size": 523,
+      "mtimeNs": "1785586931516151295",
+      "sha256": "d0f77e70c5b0020d50a755202c6b5b8c2974983d4f743dcd5c4d58a2ac069a2d"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/glm.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785586756872934473",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/glm.txt",
+      "type": "file",
+      "size": 5464,
+      "mtimeNs": "1785586797035781435",
+      "sha256": "d1abed8d7666102baa02f29c95475abf0df194fbc061c9b40d020c222f0914eb"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/glm_meta.json",
+      "type": "file",
+      "size": 499,
+      "mtimeNs": "1785586797036041311",
+      "sha256": "9265aed4b623bec615f2be73591dba7b7fdfe711b723fd9eb6e28d8fb9633379"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/gpt-5_6-sol.err",
+      "type": "file",
+      "size": 13576,
+      "mtimeNs": "1785586870070712313",
+      "sha256": "46644e3ebc771e231b75d429971429aff046c9e17228c080d80725a452093114"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/gpt-5_6-sol.txt",
+      "type": "file",
+      "size": 5416,
+      "mtimeNs": "1785586870070732396",
+      "sha256": "53970884cf967be25510507aae6557efb4caf4731227fb3e90979888b55ad9dc"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/kimi.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785586756873739850",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/kimi.txt",
+      "type": "file",
+      "size": 3411,
+      "mtimeNs": "1785586791955550465",
+      "sha256": "715404192cff85bf71f6c96719c8d5deb4f46678e81341ab13001e4a3447f65d"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/kimi_meta.json",
+      "type": "file",
+      "size": 505,
+      "mtimeNs": "1785586791955768424",
+      "sha256": "10f95f14250d57b82c925dfac12ed8df50e877ff54fec09a8da896c0ce60f09e"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/prompt_deepseek.md",
+      "type": "file",
+      "size": 4086,
+      "mtimeNs": "1785586705053233011",
+      "sha256": "aead62fb76c5018eaad807d1c283c5d6bf1edce07e12dbfc7ac9503999876768"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/prompt_doubao.md",
+      "type": "file",
+      "size": 4084,
+      "mtimeNs": "1785586705053120303",
+      "sha256": "1d662b4592f002874459861447b25fa94bdc36a581dbe3587ac098f26dc4edca"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/prompt_glm.md",
+      "type": "file",
+      "size": 4081,
+      "mtimeNs": "1785586705053065844",
+      "sha256": "28d1d4751a80d94ba45edb696b2ae55e699cfd98051c0c823dcbe3ef91e2b895"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/prompt_gpt-5_6-sol.md",
+      "type": "file",
+      "size": 4197,
+      "mtimeNs": "1785586705053410512",
+      "sha256": "e0f3e2aaa7e8b8e2b1e1e8869a317c1cf72c14ba9f57101e83c61e09df8e51e7"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/prompt_kimi.md",
+      "type": "file",
+      "size": 4082,
+      "mtimeNs": "1785586705053191220",
+      "sha256": "879205314c5eebc9fcf147c02bce342d05a8fe0db597f482991ac0dbba599408"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/prompt_qwen.md",
+      "type": "file",
+      "size": 4082,
+      "mtimeNs": "1785586705053002261",
+      "sha256": "4e7e6016cdf033f2bf8a831844c50c9ad7bb0b618019ed382f24180a6931a288"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/qwen.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785586756876369189",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/qwen.txt",
+      "type": "file",
+      "size": 7299,
+      "mtimeNs": "1785586962455522073",
+      "sha256": "88f6d946943394b76300b49d6de1654c5a599a1a67d9c1499a455281156e95bf"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2/qwen_meta.json",
+      "type": "file",
+      "size": 575,
+      "mtimeNs": "1785586962455687281",
+      "sha256": "2c410f752395b6f6c3625968f2b52e5fa33166ed9d3c416e8fa35e167f36c72e"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r2_digest.md",
+      "type": "file",
+      "size": 1389,
+      "mtimeNs": "1785586988127834598",
+      "sha256": "96539611ece597056f0e4dcb7b5b017464b1ec59b092aa6493ffa9785973975d"
+    },
+    {
+      "path": "02_主笔分工推理强度议事/r3",
+      "type": "directory",
+      "size": 64,
+      "mtimeNs": "1785586501735515399",
+      "sha256": null
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol",
+      "type": "directory",
+      "size": 352,
+      "mtimeNs": "1785601920402787463",
+      "sha256": null
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/.DS_Store",
+      "type": "file",
+      "size": 6148,
+      "mtimeNs": "1785601920403073668",
+      "sha256": "543e9622461528e85a1faaae9d5ddbc347157276f6f2563e0d65dc00f01fa530"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/00_章卡_统一.md",
+      "type": "file",
+      "size": 1524,
+      "mtimeNs": "1785587423694105368",
+      "sha256": "63ea63a0f0b288b8a1360c4cb4e7990e398e84f9404e70434670db5127fb4ad4"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/01_盲测终报.md",
+      "type": "file",
+      "size": 6409,
+      "mtimeNs": "1785588411417624898",
+      "sha256": "7248abf69d39d98025dbf9654bd9de80e6834c1c780ccb7103d87630f5c5c303"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/STATUS.md",
+      "type": "file",
+      "size": 504,
+      "mtimeNs": "1785588420834567775",
+      "sha256": "c193d46396938bb05204e20a36031e9dc3b120007ed002407c692b73dd01253e"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/drafts",
+      "type": "directory",
+      "size": 416,
+      "mtimeNs": "1785588112910881046",
+      "sha256": null
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/drafts/KEY_DO_NOT_SHOW_REVIEWERS.json",
+      "type": "file",
+      "size": 31,
+      "mtimeNs": "1785588112910902713",
+      "sha256": "cd267ac28466e48422579bef483edbb48d2a6a96c146d51645ecc26bc8e1838a"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/drafts/blind_A.txt",
+      "type": "file",
+      "size": 11241,
+      "mtimeNs": "1785588112910758712",
+      "sha256": "d99f13771d6e466cbc7f0b6c27e44bd6f5705fbb761ae50021ebbc4283c7d308"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/drafts/blind_B.txt",
+      "type": "file",
+      "size": 9617,
+      "mtimeNs": "1785588112910846921",
+      "sha256": "1b9db93343db10b5387166d232fa330f06a772f1f092a1e6b820c26d40803312"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/drafts/clean_qwen.txt",
+      "type": "file",
+      "size": 11241,
+      "mtimeNs": "1785588112910298543",
+      "sha256": "d99f13771d6e466cbc7f0b6c27e44bd6f5705fbb761ae50021ebbc4283c7d308"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/drafts/clean_sol.txt",
+      "type": "file",
+      "size": 9617,
+      "mtimeNs": "1785588112910415668",
+      "sha256": "1b9db93343db10b5387166d232fa330f06a772f1f092a1e6b820c26d40803312"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/drafts/qwen_write.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785587726541859381",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/drafts/raw_qwen.txt",
+      "type": "file",
+      "size": 11240,
+      "mtimeNs": "1785588030626368732",
+      "sha256": "14b0c601e257b5ca06f7cff310f7e3abbc63cc91371c152127f82c6a71a3651e"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/drafts/raw_qwen_meta.json",
+      "type": "file",
+      "size": 577,
+      "mtimeNs": "1785588030626696651",
+      "sha256": "35f57a06284d4a9547c2cca9cebef11e9f8af90c7069d084013a05f971b7a73e"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/drafts/raw_sol.err",
+      "type": "file",
+      "size": 349238,
+      "mtimeNs": "1785588065153279943",
+      "sha256": "2d358678fc05b73ef81b6d3ea413811c7a0f3b8e1b8eace3ec767324f7930327"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/drafts/raw_sol.txt",
+      "type": "file",
+      "size": 9617,
+      "mtimeNs": "1785588065153485903",
+      "sha256": "1b9db93343db10b5387166d232fa330f06a772f1f092a1e6b820c26d40803312"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/drafts/sol_write_launch.log",
+      "type": "file",
+      "size": 18,
+      "mtimeNs": "1785588065577145841",
+      "sha256": "d98efa8b2699a95313b8037a2eb4926c90509fa990b0c6ece68fd363649ee4c0"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/params",
+      "type": "directory",
+      "size": 384,
+      "mtimeNs": "1785587726542518885",
+      "sha256": null
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/params/00_锁定说明.md",
+      "type": "file",
+      "size": 557,
+      "mtimeNs": "1785587607670524097",
+      "sha256": "02693a745c3aab2860b212cfae1e07d69b282cea74d36f74bae5f2ca68158d14"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/params/USED.md",
+      "type": "file",
+      "size": 61,
+      "mtimeNs": "1785587726542690011",
+      "sha256": "17cc2a8617f8a7ae0b9022be4e0620bdfbeb8ad6e2f920d809dabea56ffafb55"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/params/qwen_locked_for_ch2.md",
+      "type": "file",
+      "size": 3798,
+      "mtimeNs": "1785587726538782696",
+      "sha256": "15e0441fb7bf7b44a84afb06e6f7ed8a0618d73c91fcdba4cdd115f41653b9e4"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/params/qwen_self.log",
+      "type": "file",
+      "size": 452,
+      "mtimeNs": "1785587747988703317",
+      "sha256": "92acafa9849df2794817e2ff48892385f8c07fb7e02ab741733ca1d90632aac0"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/params/qwen_self.txt",
+      "type": "file",
+      "size": 4199,
+      "mtimeNs": "1785587747988113230",
+      "sha256": "e509539af3fad1d3604570b45c540d6539c97ecb739f1d3e8250ec99d4f707ca"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/params/qwen_self_meta.json",
+      "type": "file",
+      "size": 572,
+      "mtimeNs": "1785587747988590107",
+      "sha256": "5584e011891e2ea2fde9f628d788442e433f48b88f7512f84040c5cdc3e77709"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/params/sol_locked_for_ch2.md",
+      "type": "file",
+      "size": 2304,
+      "mtimeNs": "1785587726538853404",
+      "sha256": "1538f8d6c649c843c1ff9fe1622e8c6e377688ba03d4cee26e72d75d3eaabb79"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/params/sol_p0_launch.log",
+      "type": "file",
+      "size": 7,
+      "mtimeNs": "1785587462240535304",
+      "sha256": "4bef30cdfc89fa687fcb49b5e4c26c6c375903005d1ff63fe05b9d4b7265b8b4"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/params/sol_self.err",
+      "type": "file",
+      "size": 3456,
+      "mtimeNs": "1785587459558340991",
+      "sha256": "50cee149efe0321444d55dac1821c5a5b57867124bfc72a2af2b6569d4e5521d"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/params/sol_self.txt",
+      "type": "file",
+      "size": 2101,
+      "mtimeNs": "1785587459558443284",
+      "sha256": "73020665432485f849746b47319ee97fd0d9f368f0f3fba9a93d5125b02594b7"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/prompts",
+      "type": "directory",
+      "size": 256,
+      "mtimeNs": "1785588112910952422",
+      "sha256": null
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/prompts/p0_self_params.md",
+      "type": "file",
+      "size": 834,
+      "mtimeNs": "1785587423695656919",
+      "sha256": "980d4b618dc05e9f3199dbd3d50ce3477877898b13f4ba7540c416e116b1728c"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/prompts/p1_qwen.md",
+      "type": "file",
+      "size": 5661,
+      "mtimeNs": "1785587726538935488",
+      "sha256": "ecd3fb16d461461967dcf59dd3eccc18c0dfbaaa513f8e455f624446112fd360"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/prompts/p1_sol.md",
+      "type": "file",
+      "size": 4167,
+      "mtimeNs": "1785587726538991697",
+      "sha256": "8cc8ce571742e8c92ab47cc3886d080db5257d571ede43acccb0a45fdd6c13b1"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/prompts/p1_write.md",
+      "type": "file",
+      "size": 365,
+      "mtimeNs": "1785587449515703904",
+      "sha256": "44618edfa541ba2f8869b92573437cffb48a83142c30f99f545c3392cc80ffe3"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/prompts/p2_review.md",
+      "type": "file",
+      "size": 1235,
+      "mtimeNs": "1785587449515823655",
+      "sha256": "ae9ecd2c9ca91dd9df64231b30e558e71675df21521edd6244474f9593a180a8"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/prompts/p2_review_filled.md",
+      "type": "file",
+      "size": 22071,
+      "mtimeNs": "1785588112911009255",
+      "sha256": "b8384ecd9ab6efc3fcbaf1d1db8bdabdc33e328b8f7f8130b1ee9894a4530d30"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/reviews",
+      "type": "directory",
+      "size": 512,
+      "mtimeNs": "1785588327336625991",
+      "sha256": null
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/reviews/deepseek.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785588127641714799",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/reviews/deepseek.txt",
+      "type": "file",
+      "size": 2791,
+      "mtimeNs": "1785588167886533612",
+      "sha256": "3c7863cdbf1195c9389e89388553639163767feabe2c97556e663c7822d33385"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/reviews/deepseek_meta.json",
+      "type": "file",
+      "size": 517,
+      "mtimeNs": "1785588167886842905",
+      "sha256": "11ca7d4d2ead9b1ae0f0bd068600cf867bab1aeef94295b03790220a7b746312"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/reviews/doubao.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785588127642597679",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/reviews/doubao.txt",
+      "type": "file",
+      "size": 3460,
+      "mtimeNs": "1785588327336333948",
+      "sha256": "ca3b357d6eff9e0071d5b5e618684be4f20cae0c73f0bfa5e05e14a1c425a8ea"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/reviews/doubao_meta.json",
+      "type": "file",
+      "size": 522,
+      "mtimeNs": "1785588327336742659",
+      "sha256": "468ede72f6416eb930edbc900de1438cff14c411cf5dc55c24e525df1699282b"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/reviews/glm.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785588127639843996",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/reviews/glm.txt",
+      "type": "file",
+      "size": 2446,
+      "mtimeNs": "1785588171466276844",
+      "sha256": "9a346fecbbd3e714fd7c94bd13ebe9a02f673be8d907e840f785c35ec89a2838"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/reviews/glm_meta.json",
+      "type": "file",
+      "size": 501,
+      "mtimeNs": "1785588171466634680",
+      "sha256": "a410efba222f0400004819f0d616702e3faaf704c3010d14f6bc0fe795558c3e"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/reviews/kimi.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785588127640668084",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/reviews/kimi.txt",
+      "type": "file",
+      "size": 2674,
+      "mtimeNs": "1785588202608241573",
+      "sha256": "e0650c00e668759e3d40d3a8a2dd8266d2dda5282710ba6c55ba7c3680e21ce7"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/reviews/kimi_meta.json",
+      "type": "file",
+      "size": 503,
+      "mtimeNs": "1785588202608435741",
+      "sha256": "84e03efc6fbae17bd6d56971590934caa68abbdf8639a2e0adfe40374f9921bc"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/reviews/terra.err",
+      "type": "file",
+      "size": 42403,
+      "mtimeNs": "1785588169511534863",
+      "sha256": "efc8b2a1dcb3058cfb843950adfb0d5021a2d13d7eeb62a01ea203c463c75e5f"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/reviews/terra.txt",
+      "type": "file",
+      "size": 2671,
+      "mtimeNs": "1785588169511605072",
+      "sha256": "1978e025fd1172f473e3de7daa36e6c20cce99807674e2d5a9d073d8b29b756a"
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/scripts",
+      "type": "directory",
+      "size": 96,
+      "mtimeNs": "1785587607670537139",
+      "sha256": null
+    },
+    {
+      "path": "03_主笔盲测_qwen_vs_sol/scripts/run_p1_writes.sh",
+      "type": "file",
+      "size": 3014,
+      "mtimeNs": "1785587607670597556",
+      "sha256": "7ab91c34f7fc1a32540e918f4d3b576f5e51538785a15f6689c147e325dba064"
+    },
+    {
+      "path": "04_书名研讨",
+      "type": "directory",
+      "size": 1184,
+      "mtimeNs": "1785590848438610357",
+      "sha256": null
+    },
+    {
+      "path": "04_书名研讨/00_brief.md",
+      "type": "file",
+      "size": 1163,
+      "mtimeNs": "1785590268642366253",
+      "sha256": "8d769b75545a69befbbe4e64957786fc67529248181a129aed359060ebc458b9"
+    },
+    {
+      "path": "04_书名研讨/00_brief_r2_多面.md",
+      "type": "file",
+      "size": 1230,
+      "mtimeNs": "1785590625163989384",
+      "sha256": "28d5f6185b3511cfcfc2a186fcb62cb278bfbded5d93c4d8b68944a33c95c700"
+    },
+    {
+      "path": "04_书名研讨/01_书名终裁建议.md",
+      "type": "file",
+      "size": 3085,
+      "mtimeNs": "1785590480044716495",
+      "sha256": "8aeec033b406d7582b759eea20a3d836c71af92aea6adab2579b93b85892713b"
+    },
+    {
+      "path": "04_书名研讨/02_多面书名总表.md",
+      "type": "file",
+      "size": 5481,
+      "mtimeNs": "1785590869651476308",
+      "sha256": "66d883c1a0efffdbcb5a88bd5741f35d26717a8e4b61a03640abc97d71787715"
+    },
+    {
+      "path": "04_书名研讨/doubao.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785590268646264315",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "04_书名研讨/doubao.txt",
+      "type": "file",
+      "size": 6189,
+      "mtimeNs": "1785590427017287620",
+      "sha256": "8db6fb2801ce6efb9bf36532f41d8988813ee0322c8df9419033ffe9c036285d"
+    },
+    {
+      "path": "04_书名研讨/doubao_meta.json",
+      "type": "file",
+      "size": 500,
+      "mtimeNs": "1785590427017462163",
+      "sha256": "e06bc799d11d71f5f0777c559de505034dce26303b9107a1e91fe452142b01d7"
+    },
+    {
+      "path": "04_书名研讨/glm.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785590268644733390",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "04_书名研讨/glm.txt",
+      "type": "file",
+      "size": 6015,
+      "mtimeNs": "1785590344212198470",
+      "sha256": "846c2ccccf445ecb3f4d5cbcf87d5d875eba09e648f85812a4437084202556ac"
+    },
+    {
+      "path": "04_书名研讨/glm_meta.json",
+      "type": "file",
+      "size": 484,
+      "mtimeNs": "1785590344212468180",
+      "sha256": "f777fa1fe78815a14dafcda7b2f5f1633a91c391793b6869ae2ddf21f47c713b"
+    },
+    {
+      "path": "04_书名研讨/kimi.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785590268645323018",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "04_书名研讨/kimi.txt",
+      "type": "file",
+      "size": 3425,
+      "mtimeNs": "1785590335137751209",
+      "sha256": "b1f1f0bcdc91ef9203a9e8d0046590950d5ce44ed5d3dffbc89d6fa8b7647965"
+    },
+    {
+      "path": "04_书名研讨/kimi_meta.json",
+      "type": "file",
+      "size": 482,
+      "mtimeNs": "1785590335137865460",
+      "sha256": "1ac0e058ff4cc345555eff0251d135dcc26f5ada84aa9595ab8aa12bd717eb10"
+    },
+    {
+      "path": "04_书名研讨/qwen.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785590268644002803",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "04_书名研讨/qwen.txt",
+      "type": "file",
+      "size": 7532,
+      "mtimeNs": "1785590427608084975",
+      "sha256": "0422c51ff029978925f422d3bfe8e3772e673e2e7d0440baaf9347a80420aefc"
+    },
+    {
+      "path": "04_书名研讨/qwen_meta.json",
+      "type": "file",
+      "size": 548,
+      "mtimeNs": "1785590427608559686",
+      "sha256": "c93a1a2f111d7e539c09a5a83c0652e6cead8334e060c97933b67b29a74f9adc"
+    },
+    {
+      "path": "04_书名研讨/r2_doubao.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785590625168132738",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "04_书名研讨/r2_doubao.txt",
+      "type": "file",
+      "size": 8100,
+      "mtimeNs": "1785590833982661108",
+      "sha256": "50a17ff2730ce644fc403ff471fa29b57e3c08e4f0c4c9ad4b683f05fd13235c"
+    },
+    {
+      "path": "04_书名研讨/r2_doubao_meta.json",
+      "type": "file",
+      "size": 505,
+      "mtimeNs": "1785590833983078152",
+      "sha256": "ef6b89fc4fc19cc3dc6c429c19a603f2c960200a6293a214766796770ecd4caf"
+    },
+    {
+      "path": "04_书名研讨/r2_glm.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785590625166267604",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "04_书名研讨/r2_glm.txt",
+      "type": "file",
+      "size": 8033,
+      "mtimeNs": "1785590748061352964",
+      "sha256": "c8cd4ba0b9a035f25049535cd0a726fecb76b55cd4a2103992d439d4f5ffa58f"
+    },
+    {
+      "path": "04_书名研讨/r2_glm_meta.json",
+      "type": "file",
+      "size": 488,
+      "mtimeNs": "1785590748061605841",
+      "sha256": "33d79b1048e619c52dee95cdb56ab383686579287e404b2ef788ea51e3e70c5e"
+    },
+    {
+      "path": "04_书名研讨/r2_gpt-5_6-sol.err",
+      "type": "file",
+      "size": 19827,
+      "mtimeNs": "1785590767146115298",
+      "sha256": "ae2b31633d50c065ef18eea97b308f7ead48c90975e1f6670647d19dfac9ff54"
+    },
+    {
+      "path": "04_书名研讨/r2_gpt-5_6-sol.txt",
+      "type": "file",
+      "size": 6569,
+      "mtimeNs": "1785590767146217715",
+      "sha256": "38ed22d2c6751354217eea7c44f6fb66b5790309424e773bef15b0286dd3f2b8"
+    },
+    {
+      "path": "04_书名研讨/r2_gpt-5_6-terra.err",
+      "type": "file",
+      "size": 19538,
+      "mtimeNs": "1785590691089643013",
+      "sha256": "70a3c2ba90cd0df897371e535969ce3f2dabe9e024747b4f1cbb2f9465a660c1"
+    },
+    {
+      "path": "04_书名研讨/r2_gpt-5_6-terra.txt",
+      "type": "file",
+      "size": 6196,
+      "mtimeNs": "1785590691089786847",
+      "sha256": "04d46570254e1be34a09885beabf31f716ede2e123b3e5daead043e2009a1189"
+    },
+    {
+      "path": "04_书名研讨/r2_kimi.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785590625167056400",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "04_书名研讨/r2_kimi.txt",
+      "type": "file",
+      "size": 5123,
+      "mtimeNs": "1785590701704851513",
+      "sha256": "2e14e6a766a37f26462f6197223889ed54fdb63cd4ce6e1d2e890395e1811da3"
+    },
+    {
+      "path": "04_书名研讨/r2_kimi_meta.json",
+      "type": "file",
+      "size": 484,
+      "mtimeNs": "1785590701705136640",
+      "sha256": "791542b445868e681a224bb50dab32eb2f08f9f535d4676cbd383185c3420623"
+    },
+    {
+      "path": "04_书名研讨/r2_qwen.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785590625165449350",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "04_书名研讨/r2_qwen.txt",
+      "type": "file",
+      "size": 7318,
+      "mtimeNs": "1785590833348458028",
+      "sha256": "30a4139ee7f864f7311e9e1910fcfdcec8d285f8ad280a27311b4c4b75d68237"
+    },
+    {
+      "path": "04_书名研讨/r2_qwen_meta.json",
+      "type": "file",
+      "size": 552,
+      "mtimeNs": "1785590833348766947",
+      "sha256": "5f7c7dd77769bab33349edb2879b693124633ecc6de0cdf030a0c112746e2a56"
+    },
+    {
+      "path": "04_书名研讨/r2_书名收割.txt",
+      "type": "file",
+      "size": 5219,
+      "mtimeNs": "1785590847103170058",
+      "sha256": "6d90880d247563c91a919b5360e6b1d7d4e7bf7103d91725162ecb1a08844867"
+    },
+    {
+      "path": "04_书名研讨/sol.err",
+      "type": "file",
+      "size": 18268,
+      "mtimeNs": "1785590436234366412",
+      "sha256": "a712a9b44ede5605dfbc3d610566a241757c3b8e48d48c765d5e2795d0baea0a"
+    },
+    {
+      "path": "04_书名研讨/sol.txt",
+      "type": "file",
+      "size": 4928,
+      "mtimeNs": "1785590436234626789",
+      "sha256": "63ee2a81675e78eaa226e4aa9d1773669b751331054b5bf851745caa1879562c"
+    },
+    {
+      "path": "05_多模完善设定大纲",
+      "type": "directory",
+      "size": 896,
+      "mtimeNs": "1785591700406654958",
+      "sha256": null
+    },
+    {
+      "path": "05_多模完善设定大纲/00_正典摘要.md",
+      "type": "file",
+      "size": 734,
+      "mtimeNs": "1785592601771789836",
+      "sha256": "38de02a8f157ef86b3cd370f6acca587554fb8cb0836d0b38e242e02c593b965"
+    },
+    {
+      "path": "05_多模完善设定大纲/01_完善并入说明.md",
+      "type": "file",
+      "size": 666,
+      "mtimeNs": "1785591700407790081",
+      "sha256": "6dfacaf3751a6046a13e2390ca56c2d6f0b11e19975f93ab1d1bb1fb9dba1566"
+    },
+    {
+      "path": "05_多模完善设定大纲/full_doubao.md",
+      "type": "file",
+      "size": 1075,
+      "mtimeNs": "1785592601771190709",
+      "sha256": "7682e68a542498680c7b5c48f11d5769eb04dfb4a96cbcf227f7b81b15509ca7"
+    },
+    {
+      "path": "05_多模完善设定大纲/full_glm.md",
+      "type": "file",
+      "size": 1140,
+      "mtimeNs": "1785592601769928370",
+      "sha256": "b7a27a11b6e49abf15952c1468383d94ba432521f7cba7d11866f71e85fc7c04"
+    },
+    {
+      "path": "05_多模完善设定大纲/full_kimi.md",
+      "type": "file",
+      "size": 1160,
+      "mtimeNs": "1785592601770660832",
+      "sha256": "8e4d554bd71f26e81442d90ee0e47b68753d8913d393c7d13a74765f0c52c9c4"
+    },
+    {
+      "path": "05_多模完善设定大纲/full_qwen.md",
+      "type": "file",
+      "size": 1060,
+      "mtimeNs": "1785592601770576123",
+      "sha256": "b7b12633e43a483ee537b6f339ae28f43d422dbee5987960676ac33566f0acb4"
+    },
+    {
+      "path": "05_多模完善设定大纲/full_sol.md",
+      "type": "file",
+      "size": 1339,
+      "mtimeNs": "1785592601770185871",
+      "sha256": "19b4d98d6c16dbf9cb60d05c4da38969a374f99da53dabd23e84e33fabb26166"
+    },
+    {
+      "path": "05_多模完善设定大纲/out_doubao.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785591168541468400",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "05_多模完善设定大纲/out_doubao.txt",
+      "type": "file",
+      "size": 8582,
+      "mtimeNs": "1785592601771444335",
+      "sha256": "557eca17242a565a4c9f56d2c776efff214b8d5c0848096906351c917cfe59a3"
+    },
+    {
+      "path": "05_多模完善设定大纲/out_doubao_meta.json",
+      "type": "file",
+      "size": 519,
+      "mtimeNs": "1785591426795307287",
+      "sha256": "aacbf2f3a23fc16006a066c27b0065e638a2c56c79562b548d01f9b72d23b809"
+    },
+    {
+      "path": "05_多模完善设定大纲/out_glm.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785591168539819153",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "05_多模完善设定大纲/out_glm.txt",
+      "type": "file",
+      "size": 19864,
+      "mtimeNs": "1785592601770860791",
+      "sha256": "6d6e1172da19d9d58d9f31530decaaca6ac03c4ff58002bae585239a549e445d"
+    },
+    {
+      "path": "05_多模完善设定大纲/out_glm_meta.json",
+      "type": "file",
+      "size": 501,
+      "mtimeNs": "1785591319605272417",
+      "sha256": "1ef36eeca3cd5bcb554c28f7941f62a6a9ebe3f458ef4d3c32a4a91bc558e0b0"
+    },
+    {
+      "path": "05_多模完善设定大纲/out_kimi.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785591168540653776",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "05_多模完善设定大纲/out_kimi.txt",
+      "type": "file",
+      "size": 7661,
+      "mtimeNs": "1785591270663884621",
+      "sha256": "44697606f5180900de88f015432b9e9675ecf567c4e9e39da285dbd823e91676"
+    },
+    {
+      "path": "05_多模完善设定大纲/out_kimi_meta.json",
+      "type": "file",
+      "size": 498,
+      "mtimeNs": "1785591270664221496",
+      "sha256": "141465dea07c5b1532974cec1a34253e3ec66f358fffd4a02b1cd38f990ff5ff"
+    },
+    {
+      "path": "05_多模完善设定大纲/out_qwen.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785591168539145154",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "05_多模完善设定大纲/out_qwen.txt",
+      "type": "file",
+      "size": 36116,
+      "mtimeNs": "1785592601770410081",
+      "sha256": "5b7b4fa1c3c4a7680b2e9c3c5216d825b87fa8715987605b6c1055b567fbc8d1"
+    },
+    {
+      "path": "05_多模完善设定大纲/out_qwen_meta.json",
+      "type": "file",
+      "size": 568,
+      "mtimeNs": "1785591641687901219",
+      "sha256": "d93fa64474c024937468c030f47c2525b2a83afd13527edd9a8ff582db3f498c"
+    },
+    {
+      "path": "05_多模完善设定大纲/out_sol.err",
+      "type": "file",
+      "size": 469041,
+      "mtimeNs": "1785591731610346148",
+      "sha256": "12c0b99428e18d060e643638953bcc2ec62047700df4c6a9097c140b17e96de5"
+    },
+    {
+      "path": "05_多模完善设定大纲/out_sol.txt",
+      "type": "file",
+      "size": 799,
+      "mtimeNs": "1785591731610490648",
+      "sha256": "6dcce29d172244e19c5a7cb7aa397c2bf330215c06eeb7c583426753dcc1669b"
+    },
+    {
+      "path": "05_多模完善设定大纲/prompt_doubao.md",
+      "type": "file",
+      "size": 341,
+      "mtimeNs": "1785592601770731749",
+      "sha256": "413571485f0986302c9cb5eb781457f2c6ba0ea36b2fb706126f166881b59a0c"
+    },
+    {
+      "path": "05_多模完善设定大纲/prompt_glm.md",
+      "type": "file",
+      "size": 406,
+      "mtimeNs": "1785592601769833828",
+      "sha256": "c8d8a9c73d7efde8de4112bb2d6a896e51598e3f60bdbf9e4f46a6b46ed63dd0"
+    },
+    {
+      "path": "05_多模完善设定大纲/prompt_kimi.md",
+      "type": "file",
+      "size": 426,
+      "mtimeNs": "1785591168523770350",
+      "sha256": "4b619149c29d43417fd7c33eb05d4a9c26592b5bfac7b74584f11d781c57d1b3"
+    },
+    {
+      "path": "05_多模完善设定大纲/prompt_qwen.md",
+      "type": "file",
+      "size": 326,
+      "mtimeNs": "1785591168528151008",
+      "sha256": "027c31a20abd6d6d8d9e993c062ba65e60a2a6ba4e03f6d797bd742cfd9c647e"
+    },
+    {
+      "path": "05_多模完善设定大纲/prompt_sol.md",
+      "type": "file",
+      "size": 605,
+      "mtimeNs": "1785591168520054065",
+      "sha256": "3f3fd917d59dc80800658365e43a049dfd15044fb355c3cedb89096416a0c28b"
+    },
+    {
+      "path": "06_多模查漏补缺",
+      "type": "directory",
+      "size": 960,
+      "mtimeNs": "1785592601445701984",
+      "sha256": null
+    },
+    {
+      "path": "06_多模查漏补缺/00_卷宗.md",
+      "type": "file",
+      "size": 86308,
+      "mtimeNs": "1785592601768241697",
+      "sha256": "0e8b79afbcadd3c6441beeba03c9ff9f323086148b9f7d74f063cf741e6a4e9e"
+    },
+    {
+      "path": "06_多模查漏补缺/00_卷宗_精简.md",
+      "type": "file",
+      "size": 30232,
+      "mtimeNs": "1785592601768862783",
+      "sha256": "192fc58d00b56c26b85db04c24a894d264e4894a0459fa6e91a3736006d4a70a"
+    },
+    {
+      "path": "06_多模查漏补缺/01_查漏补缺总报.md",
+      "type": "file",
+      "size": 1754,
+      "mtimeNs": "1785592601769621536",
+      "sha256": "79448171ab1c4bcb5d27c17d5cf17a1323a8379a4cb2c380a107970688afe3d9"
+    },
+    {
+      "path": "06_多模查漏补缺/audit_doubao.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785591998887390296",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "06_多模查漏补缺/audit_doubao.txt",
+      "type": "file",
+      "size": 5586,
+      "mtimeNs": "1785592601767932654",
+      "sha256": "0af8bbaa03f85319a0e4a43b9a90ad708d3bfa1b48a96ba0955990801a81e3f7"
+    },
+    {
+      "path": "06_多模查漏补缺/audit_doubao_meta.json",
+      "type": "file",
+      "size": 515,
+      "mtimeNs": "1785592141804456658",
+      "sha256": "3df6e782e5cc6bfea85f910bafa1ca6baa39e064bda6a56337bec54ae0a45e8b"
+    },
+    {
+      "path": "06_多模查漏补缺/audit_glm.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785591998885734533",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "06_多模查漏补缺/audit_glm.txt",
+      "type": "file",
+      "size": 8517,
+      "mtimeNs": "1785592089317961086",
+      "sha256": "5177983b7a85a647a353edc878ae4ea9b4e3022e9307dd60dea534bd6302a48c"
+    },
+    {
+      "path": "06_多模查漏补缺/audit_glm_meta.json",
+      "type": "file",
+      "size": 499,
+      "mtimeNs": "1785592089318397213",
+      "sha256": "8244d1ab14117f455b08a4be06148fb0a30b2575985982b78f1859a110b6eb10"
+    },
+    {
+      "path": "06_多模查漏补缺/audit_kimi.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785591998886425205",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "06_多模查漏补缺/audit_kimi.txt",
+      "type": "file",
+      "size": 6484,
+      "mtimeNs": "1785592601769338493",
+      "sha256": "54e37f629fc1830d6664ae9cd818562722f9d02a8eb82ce26268bd6c256d3087"
+    },
+    {
+      "path": "06_多模查漏补缺/audit_kimi_meta.json",
+      "type": "file",
+      "size": 497,
+      "mtimeNs": "1785592294199925413",
+      "sha256": "44cbd7667317c9a0da6fccc94e1b96c13aa1c7c33d17698ae18e49bd42338fc1"
+    },
+    {
+      "path": "06_多模查漏补缺/audit_qwen.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785591998885165570",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "06_多模查漏补缺/audit_qwen.txt",
+      "type": "file",
+      "size": 24249,
+      "mtimeNs": "1785592601768662282",
+      "sha256": "ce385f52b562cc488643001703c0eb13a39322c3dcffdb6179a2c831db7a0f8b"
+    },
+    {
+      "path": "06_多模查漏补缺/audit_qwen_meta.json",
+      "type": "file",
+      "size": 568,
+      "mtimeNs": "1785592358218207180",
+      "sha256": "e3af164edf835e58a1d347363171622dca44f1e3bfffc2ba13f4cb3584daee25"
+    },
+    {
+      "path": "06_多模查漏补缺/audit_sol.err",
+      "type": "file",
+      "size": 250573,
+      "mtimeNs": "1785592484512613394",
+      "sha256": "0c8a7cee6005ceedb8fbfe7cbd0d439637bba8b49e7e1cc28723169cf686ab65"
+    },
+    {
+      "path": "06_多模查漏补缺/audit_sol.txt",
+      "type": "file",
+      "size": 22697,
+      "mtimeNs": "1785592601767625695",
+      "sha256": "8b52f55e791ca5be38709e94702b0d5c83aa4ab6158db5c1674fca31ab8a9674"
+    },
+    {
+      "path": "06_多模查漏补缺/full_doubao.md",
+      "type": "file",
+      "size": 30463,
+      "mtimeNs": "1785592601769500702",
+      "sha256": "5426914396cf0d917b4c8a634167a641bc512968351be266202386a27d225b18"
+    },
+    {
+      "path": "06_多模查漏补缺/full_glm.md",
+      "type": "file",
+      "size": 30534,
+      "mtimeNs": "1785592601767821154",
+      "sha256": "cb2d1735e15a80d05afe9cb20cee72148fd621e924f5618a944235f2ff26e8bb"
+    },
+    {
+      "path": "06_多模查漏补缺/full_kimi.md",
+      "type": "file",
+      "size": 30460,
+      "mtimeNs": "1785592601769190909",
+      "sha256": "eaf195940cecb6b9f2b9246f127f93fac20e60c421630e9b4634e30939584eb9"
+    },
+    {
+      "path": "06_多模查漏补缺/full_qwen.md",
+      "type": "file",
+      "size": 30428,
+      "mtimeNs": "1785592601769033742",
+      "sha256": "4ebf24bd97179a970f242d471e61d5f02babf8b744ec0ac6cc927591fc8359b3"
+    },
+    {
+      "path": "06_多模查漏补缺/full_sol.md",
+      "type": "file",
+      "size": 87544,
+      "mtimeNs": "1785592601768527532",
+      "sha256": "757509cbc0413063c9b267bcd747b8592c3b685fc549822be043528d0f11882e"
+    },
+    {
+      "path": "06_多模查漏补缺/prompt_doubao.md",
+      "type": "file",
+      "size": 229,
+      "mtimeNs": "1785591998849615745",
+      "sha256": "b2ef13077ebca044598283fbb7f6316326a25f5074a8393be320dd7a68391311"
+    },
+    {
+      "path": "06_多模查漏补缺/prompt_glm.md",
+      "type": "file",
+      "size": 300,
+      "mtimeNs": "1785591998846311094",
+      "sha256": "4f83b1539152ce0ae48e3654967aeab4129e7794385d8ace8be94ac4de1422b0"
+    },
+    {
+      "path": "06_多模查漏补缺/prompt_kimi.md",
+      "type": "file",
+      "size": 226,
+      "mtimeNs": "1785591998847893731",
+      "sha256": "a992da0b279efc270682a84cf7af59284f1f9a0d62f78a429cbcb7dfc9fbca3a"
+    },
+    {
+      "path": "06_多模查漏补缺/prompt_qwen.md",
+      "type": "file",
+      "size": 194,
+      "mtimeNs": "1785591998851267675",
+      "sha256": "04d694773b417d28e3a6990811268983478cc8a767554c8bc002d1f2e56bc0f5"
+    },
+    {
+      "path": "06_多模查漏补缺/prompt_sol.md",
+      "type": "file",
+      "size": 1235,
+      "mtimeNs": "1785592601767466194",
+      "sha256": "342fb15b369738a45124feddaafbc2c7773b05dff9ad2e36857afdba565ca1ec"
+    },
+    {
+      "path": "06_多模查漏补缺/sol_launch.log",
+      "type": "file",
+      "size": 7,
+      "mtimeNs": "1785592484969946923",
+      "sha256": "4bef30cdfc89fa687fcb49b5e4c26c6c375903005d1ff63fe05b9d4b7265b8b4"
+    },
+    {
+      "path": "07_设定完备审查",
+      "type": "directory",
+      "size": 864,
+      "mtimeNs": "1785594788144202893",
+      "sha256": null
+    },
+    {
+      "path": "07_设定完备审查/00_审查包.md",
+      "type": "file",
+      "size": 129480,
+      "mtimeNs": "1785593575339796232",
+      "sha256": "3c74776152695eae228c3925d410dd3396ac77cf2b51dbb1d21e01e5055018eb"
+    },
+    {
+      "path": "07_设定完备审查/00_清单.md",
+      "type": "file",
+      "size": 2209,
+      "mtimeNs": "1785593575338976104",
+      "sha256": "12c0b61eac4e301ef1e6ca7b17200db75e97dc56041a326b1a17467d2ab9cf17"
+    },
+    {
+      "path": "07_设定完备审查/01_设定完备审查总报.md",
+      "type": "file",
+      "size": 6344,
+      "mtimeNs": "1785594041585228131",
+      "sha256": "67046481ffc279a5b64fb2ca9ef68527ceaa2535cc9a69fbc3c161d80158d84e"
+    },
+    {
+      "path": "07_设定完备审查/02_P1补丁落盘说明.md",
+      "type": "file",
+      "size": 1155,
+      "mtimeNs": "1785594325434584006",
+      "sha256": "b5caac8e28b0c7e6c5d4b1f154956cac554ae71269fc28c5e64c2cb987b7c40d"
+    },
+    {
+      "path": "07_设定完备审查/03_二轮总报.md",
+      "type": "file",
+      "size": 2752,
+      "mtimeNs": "1785594788144251777",
+      "sha256": "d1f99e2463faac3217852b2f5c2737115579f1e9c821e6fd3a8b1cbd5b6a1394"
+    },
+    {
+      "path": "07_设定完备审查/audit_doubao.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785593575349055518",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "07_设定完备审查/audit_doubao.txt",
+      "type": "file",
+      "size": 20203,
+      "mtimeNs": "1785593853074433821",
+      "sha256": "8e46c7d64a9a3a8c384fd302806e33bf750e0409127579f297982b7f94f2df1e"
+    },
+    {
+      "path": "07_设定完备审查/audit_doubao_meta.json",
+      "type": "file",
+      "size": 516,
+      "mtimeNs": "1785593853074595109",
+      "sha256": "67df65b895a8d38285f9587f7e3660e5b2a5406028d3c526633672b76205c11e"
+    },
+    {
+      "path": "07_设定完备审查/audit_gpt-5_6-sol.err",
+      "type": "file",
+      "size": 334312,
+      "mtimeNs": "1785593968714607763",
+      "sha256": "e355d0da2bbee49b15614950aa296adfac98b50094039735ffa97768dc4d504b"
+    },
+    {
+      "path": "07_设定完备审查/audit_gpt-5_6-sol.txt",
+      "type": "file",
+      "size": 16058,
+      "mtimeNs": "1785593968714921306",
+      "sha256": "1a15f4860fa4b2d747e3fda2343ede2ed1bdf22aa81ecf3f110977125194a3fc"
+    },
+    {
+      "path": "07_设定完备审查/audit_gpt-5_6-terra.err",
+      "type": "file",
+      "size": 354213,
+      "mtimeNs": "1785593756440802269",
+      "sha256": "5a38dd4f833452578a88dad75c001d7de50d2e7163f0200d3899bf14a1e36655"
+    },
+    {
+      "path": "07_设定完备审查/audit_gpt-5_6-terra.txt",
+      "type": "file",
+      "size": 10666,
+      "mtimeNs": "1785593756441279104",
+      "sha256": "4403ded6629770a741a107638bfc854737f1cfa602aeace44786c6ef5998a0d0"
+    },
+    {
+      "path": "07_设定完备审查/audit_kimi.log",
+      "type": "file",
+      "size": 0,
+      "mtimeNs": "1785593575349666812",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "07_设定完备审查/audit_kimi.txt",
+      "type": "file",
+      "size": 14176,
+      "mtimeNs": "1785593849152035425",
+      "sha256": "7f5e9af4ed20b4f4e6c804517a4417f17bf53a043920fde123026db644d2d969"
+    },
+    {
+      "path": "07_设定完备审查/audit_kimi_meta.json",
+      "type": "file",
+      "size": 498,
+      "mtimeNs": "1785593849152248292",
+      "sha256": "e633f0776b2dbb5d017b3749f07573f72949b0cda6b6dfd03039a2a5f67f2fcb"
+    },
+    {
+      "path": "07_设定完备审查/full_prompt.md",
+      "type": "file",
+      "size": 130253,
+      "mtimeNs": "1785593575345443587",
+      "sha256": "82173a2e80dc510c2543380e09c345bef19e4ce57c45da4d5d2fd66d6327d6a9"
+    },
+    {
+      "path": "07_设定完备审查/prompt_audit.md",
+      "type": "file",
+      "size": 773,
+      "mtimeNs": "1785593575343839122",
+      "sha256": "d0557e3debb32c7389f3bb472216ccb63c3f87fb7dfc7ea2ac51984075550822"
+    },
+    {
+      "path": "07_设定完备审查/round2_doubao.txt",
+      "type": "file",
+      "size": 6777,
+      "mtimeNs": "1785594544360242550",
+      "sha256": "fe8813e7c5224a88638379dc1d2f982eba6b9c8b06cbde9f3238a2dd232d87e3"
+    },
+    {
+      "path": "07_设定完备审查/round2_doubao_meta.json",
+      "type": "file",
+      "size": 517,
+      "mtimeNs": "1785594544360506384",
+      "sha256": "fd7102a35109e96735873f41380d770f2c39257c3e1d973d4946449641dc11c3"
+    },
+    {
+      "path": "07_设定完备审查/round2_kimi.txt",
+      "type": "file",
+      "size": 7583,
+      "mtimeNs": "1785594681392625877",
+      "sha256": "190685a2ced40a5cbc20114945a1f0a551b4373d5207699ef3ced969a57ae445"
+    },
+    {
+      "path": "07_设定完备审查/round2_kimi_meta.json",
+      "type": "file",
+      "size": 499,
+      "mtimeNs": "1785594681392791419",
+      "sha256": "bb840c24df6ecf2ff93425b29d8cdc50cd6d616d99e1d8c15a9ead0dd153c9e1"
+    },
+    {
+      "path": "07_设定完备审查/round2_pack.md",
+      "type": "file",
+      "size": 41015,
+      "mtimeNs": "1785594325735779826",
+      "sha256": "a760da65707a0cc0d73da1d887c238929f6b46f28b3bdc1cd6e9d20853c0f295"
+    },
+    {
+      "path": "07_设定完备审查/round2_pids.txt",
+      "type": "file",
+      "size": 18,
+      "mtimeNs": "1785594325744438728",
+      "sha256": "b86c3860e71c6c2b6e0a51d2016fd6d0cf103ce578224cad7476320734ff52b9"
+    },
+    {
+      "path": "07_设定完备审查/round2_terra.err",
+      "type": "file",
+      "size": 175607,
+      "mtimeNs": "1785594471129639338",
+      "sha256": "503b6a21fbdf3c35b54336010cea4bb4ed4994a706d634064ed4fb26bf63e1f4"
+    },
+    {
+      "path": "07_设定完备审查/round2_terra.txt",
+      "type": "file",
+      "size": 7558,
+      "mtimeNs": "1785594471129725047",
+      "sha256": "1174e09374163e475095fd743f4a5b970257a72989a674da39626f56e653585a"
+    },
+    {
+      "path": "STATUS.md",
+      "type": "file",
+      "size": 2257,
+      "mtimeNs": "1785608816059635728",
+      "sha256": "3a2dbbe3dbe5e76df3bec627c3e17669be43d5c36248b6266b56f95cefb4c4e1"
+    },
+    {
+      "path": "TASKS.md",
+      "type": "file",
+      "size": 633,
+      "mtimeNs": "1785608816063255973",
+      "sha256": "c2254b6a1de71d69c46ec4276c71c657020dada02e4b62e04b29205cc040c2b3"
+    },
+    {
+      "path": "config",
+      "type": "directory",
+      "size": 96,
+      "mtimeNs": "1785589504490102539",
+      "sha256": null
+    },
+    {
+      "path": "config/GROK_DARK_WRITE_ROLE.md",
+      "type": "file",
+      "size": 1317,
+      "mtimeNs": "1785589504491418587",
+      "sha256": "543fabcf54026fa6f88bd931082b884bccb1d0d88775c70fc45d7e4b8081efad"
+    },
+    {
+      "path": "drafts",
+      "type": "directory",
+      "size": 96,
+      "mtimeNs": "1785603729819651650",
+      "sha256": null
+    },
+    {
+      "path": "drafts/opus_polish",
+      "type": "directory",
+      "size": 704,
+      "mtimeNs": "1785608553519819701",
+      "sha256": null
+    },
+    {
+      "path": "drafts/opus_polish/00_Opus终润协议.md",
+      "type": "file",
+      "size": 862,
+      "mtimeNs": "1785603729821806112",
+      "sha256": "7bef132f44e9361c29d15f9728e898c8527883d7aec360224e8852d8ebace25f"
+    },
+    {
+      "path": "drafts/opus_polish/00_全量大纲与设定_必读.md",
+      "type": "file",
+      "size": 73971,
+      "mtimeNs": "1785603729844349486",
+      "sha256": "d5db27bf5ce67508fa70a9e957a8e4987082e0b1c5c8753f6bc6949ab8f19c8c"
+    },
+    {
+      "path": "drafts/opus_polish/CH001_note.md",
+      "type": "file",
+      "size": 3015,
+      "mtimeNs": "1785607103668244958",
+      "sha256": "6439302b4d7902863d77f01c596e42ab71bc081cbe15720e527d6834fcefbc11"
+    },
+    {
+      "path": "drafts/opus_polish/CH001_opus_log.txt",
+      "type": "file",
+      "size": 618,
+      "mtimeNs": "1785607112201065468",
+      "sha256": "1ff6f3dcd41b12f8f377fb4dcd4967df2ae9a8871c41ae04049a630aa69cd86d"
+    },
+    {
+      "path": "drafts/opus_polish/CH002_note.md",
+      "type": "file",
+      "size": 2595,
+      "mtimeNs": "1785607360576777323",
+      "sha256": "f5ed75dd46f7b1e9a70e59568373fcc017716996873bf6b0adc3b00b8c33d128"
+    },
+    {
+      "path": "drafts/opus_polish/CH002_opus_log.txt",
+      "type": "file",
+      "size": 461,
+      "mtimeNs": "1785607368532732784",
+      "sha256": "c780e0e2ed351373c432371fb41b8a27aed1b8f6b897f232d50d8a0b7efc7d49"
+    },
+    {
+      "path": "drafts/opus_polish/CH003_note.md",
+      "type": "file",
+      "size": 2726,
+      "mtimeNs": "1785607637563737534",
+      "sha256": "cfa6e70752b9ee392649be9efda9d19ee6ad9e78bd276efcecc84f2d15572520"
+    },
+    {
+      "path": "drafts/opus_polish/CH003_opus_log.txt",
+      "type": "file",
+      "size": 648,
+      "mtimeNs": "1785607647811067773",
+      "sha256": "cd4589c1a0b62690394df58b1d463ed75af6fbfb9b39e7b10c69cb0e64fa8307"
+    },
+    {
+      "path": "drafts/opus_polish/CH004_note.md",
+      "type": "file",
+      "size": 2283,
+      "mtimeNs": "1785607904491096118",
+      "sha256": "29caaa49e6e37da02de26e9aaddca75809c44c97347273bc68cad69af2e3c6f7"
+    },
+    {
+      "path": "drafts/opus_polish/CH004_opus_log.txt",
+      "type": "file",
+      "size": 159,
+      "mtimeNs": "1785607907871109585",
+      "sha256": "fff6e3bd218ca559e49f993c04fd86c0c4af68762b2bc9b7e02ee69c0a7a69f5"
+    },
+    {
+      "path": "drafts/opus_polish/CH005_note.md",
+      "type": "file",
+      "size": 3386,
+      "mtimeNs": "1785608248762757765",
+      "sha256": "05f9b5fb8b5b8f34b700311bcb5d7084efa0fb1839ae0dae3cf0f7c3d0e49fe1"
+    },
+    {
+      "path": "drafts/opus_polish/CH005_opus_log.txt",
+      "type": "file",
+      "size": 437,
+      "mtimeNs": "1785608254721555572",
+      "sha256": "c79ae5fe8114c50a0616dc33be5addf2f2ca2d4c825bb7a91513f020539db886"
+    },
+    {
+      "path": "drafts/opus_polish/CH006_opus_log.txt",
+      "type": "file",
+      "size": 70,
+      "mtimeNs": "1785608537093285270",
+      "sha256": "693ef624d11f9ee5a95a30ceeb597fec8b6036741527024103e7763422a7dca8"
+    },
+    {
+      "path": "drafts/opus_polish/CH007_opus_log.txt",
+      "type": "file",
+      "size": 70,
+      "mtimeNs": "1785608542497139146",
+      "sha256": "693ef624d11f9ee5a95a30ceeb597fec8b6036741527024103e7763422a7dca8"
+    },
+    {
+      "path": "drafts/opus_polish/CH008_opus_log.txt",
+      "type": "file",
+      "size": 70,
+      "mtimeNs": "1785608547967070756",
+      "sha256": "693ef624d11f9ee5a95a30ceeb597fec8b6036741527024103e7763422a7dca8"
+    },
+    {
+      "path": "drafts/opus_polish/CH009_opus_log.txt",
+      "type": "file",
+      "size": 70,
+      "mtimeNs": "1785608552965854450",
+      "sha256": "693ef624d11f9ee5a95a30ceeb597fec8b6036741527024103e7763422a7dca8"
+    },
+    {
+      "path": "drafts/opus_polish/CH010_opus_log.txt",
+      "type": "file",
+      "size": 70,
+      "mtimeNs": "1785608557475533171",
+      "sha256": "693ef624d11f9ee5a95a30ceeb597fec8b6036741527024103e7763422a7dca8"
+    },
+    {
+      "path": "drafts/opus_polish/batch_run.log",
+      "type": "file",
+      "size": 4911,
+      "mtimeNs": "1785608558055972839",
+      "sha256": "1afb288d3184103204958d32bf216ae5331939511af66055134c9651cd15ef60"
+    },
+    {
+      "path": "drafts/opus_polish/nohup.out",
+      "type": "file",
+      "size": 4911,
+      "mtimeNs": "1785608558055975881",
+      "sha256": "1afb288d3184103204958d32bf216ae5331939511af66055134c9651cd15ef60"
+    },
+    {
+      "path": "drafts/opus_polish/run_opus_final.sh",
+      "type": "file",
+      "size": 3079,
+      "mtimeNs": "1785603729849065453",
+      "sha256": "53b833894a115b396b697384c60010475be0eade8c82ec4a4c2ce6ad57011b16"
+    },
+    {
+      "path": "书核终报.md",
+      "type": "symlink",
+      "size": 43,
+      "mtimeNs": "1785586756882941120",
+      "sha256": "07d6b8819fba2b0bdfe7c060854d211f3b36132cc01a97fd6005a898b4e31e81"
+    },
+    {
+      "path": "大纲",
+      "type": "directory",
+      "size": 512,
+      "mtimeNs": "1785594788144229773",
+      "sha256": null
+    },
+    {
+      "path": "大纲/00_大纲目录.md",
+      "type": "file",
+      "size": 2229,
+      "mtimeNs": "1785591729267208278",
+      "sha256": "577c4ddd79afd95d0047df2227d890ba8706a18539f7bd25c35a494ab777182c"
+    },
+    {
+      "path": "大纲/01_第一季总纲_10卷.md",
+      "type": "file",
+      "size": 7544,
+      "mtimeNs": "1785597600965180656",
+      "sha256": "74abb5158ff4016c3b036ebe53495661660f268fbc627de715aa43f1c174c8a2"
+    },
+    {
+      "path": "大纲/02_感情线_对手戏.md",
+      "type": "file",
+      "size": 2764,
+      "mtimeNs": "1785592601772452422",
+      "sha256": "6ff1127ec12e116354cf8004de6b3af96f9b68e768db4cd32d3664e07ef464dc"
+    },
+    {
+      "path": "大纲/03_结构席完善稿_A-D.md",
+      "type": "file",
+      "size": 29649,
+      "mtimeNs": "1785592601772830632",
+      "sha256": "9410cf9b03608c7c3a7efedac7aff867423eda8d5fac7b36490436d148bd8a9b"
+    },
+    {
+      "path": "大纲/卷一_分幕与章纲.md",
+      "type": "file",
+      "size": 2845,
+      "mtimeNs": "1785597665515386083",
+      "sha256": "822b5d8dac4ccd3b1148d9f8da128aad5ef4644aefc2e5351217f79e5e04ddc8"
+    },
+    {
+      "path": "大纲/卷一_短剧与黑暗清单_doubao.md",
+      "type": "file",
+      "size": 2401,
+      "mtimeNs": "1785592601772030295",
+      "sha256": "674a867cb0cab1c3abb9430f2ac540e20c0397cbbf8bac2b7a8d26e61de2ea11"
+    },
+    {
+      "path": "大纲/卷二至十_剧情单元纲.md",
+      "type": "file",
+      "size": 7151,
+      "mtimeNs": "1785594260349595550",
+      "sha256": "8a93367d19c2a286b8e51a379deefa00eda76309a69ac8c5597b1adc8d6b621b"
+    },
+    {
+      "path": "大纲/开写前检查表.md",
+      "type": "file",
+      "size": 1350,
+      "mtimeNs": "1785594898568682685",
+      "sha256": "c74656bd8579b755485348ad4bde61c2e61a38ae4e890cb32b1b7e2b4966a3d6"
+    },
+    {
+      "path": "大纲/细纲001-010_qwen加强原稿.md",
+      "type": "file",
+      "size": 540,
+      "mtimeNs": "1785592601772370005",
+      "sha256": "7fe5a82b4739bab7818e2a6e165b103d38f8121211757b1c4419b621a4e2cb99"
+    },
+    {
+      "path": "大纲/细纲_第001-020章.md",
+      "type": "file",
+      "size": 5463,
+      "mtimeNs": "1785597600965641490",
+      "sha256": "4ec79e652b1bc7159a6b59c2393779578415f300b4d8e8b7d1418fb3952d0371"
+    },
+    {
+      "path": "大纲/细纲_第021-065章_卷一其余.md",
+      "type": "file",
+      "size": 2497,
+      "mtimeNs": "1785592601793957589",
+      "sha256": "3b8cef0f33507234d1af56ed33e72ed8f2a4005652c90b2cd4f19db04a0aba6a"
+    },
+    {
+      "path": "大纲/黄金三章_细纲加强_kimi.md",
+      "type": "file",
+      "size": 2485,
+      "mtimeNs": "1785591700139305176",
+      "sha256": "01ffc41466fcff56a00b08e1a75e297f8093f2b9c717ceb166a0816ee77110fc"
+    },
+    {
+      "path": "大纲/黄金三章_锁版Beat_P1.1.md",
+      "type": "file",
+      "size": 3988,
+      "mtimeNs": "1785594788144303702",
+      "sha256": "3abcde878cf4fdcf1cb5d0f206024450facdf547fedf3c528aa4f9170cb0a8d9"
+    },
+    {
+      "path": "大纲/黑页母题_十卷兑现.md",
+      "type": "file",
+      "size": 1296,
+      "mtimeNs": "1785591221876562697",
+      "sha256": "2db9fdb9dab60f6bd2befb2b92e51c7e5734b3bc3b115956fb0bf01dcd0bd9bc"
+    },
+    {
+      "path": "正文",
+      "type": "directory",
+      "size": 448,
+      "mtimeNs": "1785608528871930754",
+      "sha256": null
+    },
+    {
+      "path": "正文/archive_pre_polish",
+      "type": "directory",
+      "size": 384,
+      "mtimeNs": "1785600292482473559",
+      "sha256": null
+    },
+    {
+      "path": "正文/archive_pre_polish/第001章_缴费单与黑页.md",
+      "type": "file",
+      "size": 8411,
+      "mtimeNs": "1785600292451983841",
+      "sha256": "a55d5e2031913cddb08539067f225282d5f667ce9ec22cec579d8cade1364a31"
+    },
+    {
+      "path": "正文/archive_pre_polish/第002章_皮鞋与工牌.md",
+      "type": "file",
+      "size": 8647,
+      "mtimeNs": "1785600292455514141",
+      "sha256": "c1478b0f55975f79f5604db3cda1f5acd83a185f97085aed7ab3a81a7c751159"
+    },
+    {
+      "path": "正文/archive_pre_polish/第003章_您再想想.md",
+      "type": "file",
+      "size": 8260,
+      "mtimeNs": "1785600292459510979",
+      "sha256": "d456947c430c72255d8e83df59488934a00c2b4662d6e1220813bae2a80a15df"
+    },
+    {
+      "path": "正文/archive_pre_polish/第004章_阿大的旧账.md",
+      "type": "file",
+      "size": 9194,
+      "mtimeNs": "1785600292462779366",
+      "sha256": "33d247fc27c33a9cbf51d962aa01226492c69e73c2699681a167f6ad1fa0504e"
+    },
+    {
+      "path": "正文/archive_pre_polish/第005章_夜班债纹.md",
+      "type": "file",
+      "size": 8434,
+      "mtimeNs": "1785600292466015086",
+      "sha256": "c6ad71970cffc547191e513b4aeaa361fc8ad6aecacf4c7b11cca609e5e9823e"
+    },
+    {
+      "path": "正文/archive_pre_polish/第006章_春禾镜头.md",
+      "type": "file",
+      "size": 8433,
+      "mtimeNs": "1785600292469164140",
+      "sha256": "4df51410bd9881702c7dca557e87011d6e016a284055330d1cff1d92d5012077"
+    },
+    {
+      "path": "正文/archive_pre_polish/第007章_肖龙.md",
+      "type": "file",
+      "size": 8676,
+      "mtimeNs": "1785600292472446318",
+      "sha256": "3caf9a8f48b4c0eb55239a7d7b05e7f01f800bc1e4c1fd41e4af58e13ee270b4"
+    },
+    {
+      "path": "正文/archive_pre_polish/第008章_指动.md",
+      "type": "file",
+      "size": 8159,
+      "mtimeNs": "1785600292475807204",
+      "sha256": "582a29769a9e17c329b7c9c1cc000cf870fe8ccc5ba96d0a54895fc24a544614"
+    },
+    {
+      "path": "正文/archive_pre_polish/第009章_尾号093.md",
+      "type": "file",
+      "size": 8575,
+      "mtimeNs": "1785600292479036174",
+      "sha256": "181b613ae6d3511c81436a48b4437b4f6f12c1f4434feb3cd42fc6bfbfce8de7"
+    },
+    {
+      "path": "正文/archive_pre_polish/第010章_八点前.md",
+      "type": "file",
+      "size": 8801,
+      "mtimeNs": "1785600292482526683",
+      "sha256": "06c3aae0fe87652341f498db5b5ea671fcbc217bb6c8bc540e9128c3e7323119"
+    },
+    {
+      "path": "正文/第001章_缴费单与黑页.md",
+      "type": "file",
+      "size": 10242,
+      "mtimeNs": "1785607065678675186",
+      "sha256": "c182ad81e2cb5337e5399b3fee896bf5d0876a6e08fae931122ea4ed4135ff92"
+    },
+    {
+      "path": "正文/第002章_皮鞋与工牌.md",
+      "type": "file",
+      "size": 10237,
+      "mtimeNs": "1785607325546801758",
+      "sha256": "9c5f25e0e17a28942af9abed9bf9eb798be85e0a23b3474525c45e56445edfdf"
+    },
+    {
+      "path": "正文/第003章_您再想想.md",
+      "type": "file",
+      "size": 9059,
+      "mtimeNs": "1785607601517860908",
+      "sha256": "cee4a7c874d7ef03bd5cab9096691bc0bb12d1387340c948e12d710c99ca3e01"
+    },
+    {
+      "path": "正文/第004章_阿大的旧账.md",
+      "type": "file",
+      "size": 9526,
+      "mtimeNs": "1785607869494963802",
+      "sha256": "68f25635d31e50723e42851266d6dd298c23e6f527136e48c74066fa5018cfed"
+    },
+    {
+      "path": "正文/第005章_夜班债纹.md",
+      "type": "file",
+      "size": 9284,
+      "mtimeNs": "1785608206087971134",
+      "sha256": "1c74d0f9cff2850a85534b86194cb8616bd4642e3287a8224f5c3db0ee1face8"
+    },
+    {
+      "path": "正文/第006章_春禾镜头.md",
+      "type": "file",
+      "size": 9117,
+      "mtimeNs": "1785608528869354050",
+      "sha256": "f67219679b4984732c5d9cf289ea21a51f099a6a363c2737629050362ac0eaba"
+    },
+    {
+      "path": "正文/第007章_肖龙.md",
+      "type": "file",
+      "size": 8356,
+      "mtimeNs": "1785608824044989765",
+      "sha256": "e996e19edad51929e1f8bd31b30b472be16ef984d153bf4cc22718d202bdff21"
+    },
+    {
+      "path": "正文/第008章_指动.md",
+      "type": "file",
+      "size": 7647,
+      "mtimeNs": "1785603261115577972",
+      "sha256": "06286b8453e8c0d6a1dffb7401934b70bf07292893c68f22b35091840fda1243"
+    },
+    {
+      "path": "正文/第009章_尾号093.md",
+      "type": "file",
+      "size": 9229,
+      "mtimeNs": "1785606015162164786",
+      "sha256": "1552a4a3f7d8a4dce1cec0b48ca2fcb90772490c14750de4de086a9525ea225d"
+    },
+    {
+      "path": "正文/第010章_八点前.md",
+      "type": "file",
+      "size": 8801,
+      "mtimeNs": "1785599609173666822",
+      "sha256": "06c3aae0fe87652341f498db5b5ea671fcbc217bb6c8bc540e9128c3e7323119"
+    },
+    {
+      "path": "正文/评审",
+      "type": "directory",
+      "size": 1408,
+      "mtimeNs": "1785600292446566057",
+      "sha256": null
+    },
+    {
+      "path": "正文/评审/00_互评与去AI味总报.md",
+      "type": "file",
+      "size": 1708,
+      "mtimeNs": "1785597108710271481",
+      "sha256": "8c3733dc920769b07ce7e0f1eef2cf7fe46cf2e1cf40718b6c8e87b93aff4ccb"
+    },
+    {
+      "path": "正文/评审/01_验收总报_补字后.md",
+      "type": "file",
+      "size": 1939,
+      "mtimeNs": "1785598150768284063",
+      "sha256": "be28115af8ac91c76a045155c2aea51e5e87c7c2eb6656265f807ce238114d4c"
+    },
+    {
+      "path": "正文/评审/02_前十章全面验收总报.md",
+      "type": "file",
+      "size": 2784,
+      "mtimeNs": "1785599832728557779",
+      "sha256": "849ba5677334d862bc596f6ab8c4ff06570bdecf3eabe1bb84e4f4177b9772a4"
+    },
+    {
+      "path": "正文/评审/CH001-010_doubao.txt",
+      "type": "file",
+      "size": 12553,
+      "mtimeNs": "1785599625985645681",
+      "sha256": "a37c27647ca38753be12675b3d98db0b750b55ff9e686247ac4bb036e9e2fe51"
+    },
+    {
+      "path": "正文/评审/CH001-010_doubao_meta.json",
+      "type": "file",
+      "size": 513,
+      "mtimeNs": "1785599625985805804",
+      "sha256": "9977b6ffb4e2a597e78d2360b9dd81b4133355af92584b9f3621bece57b4289c"
+    },
+    {
+      "path": "正文/评审/CH001-010_full_pack.md",
+      "type": "file",
+      "size": 87365,
+      "mtimeNs": "1785599348900051599",
+      "sha256": "fa3b4f4b7df5c90387a8e0cd02790c5d4f952c30cd3eccc8b7729f2f124467d9"
+    },
+    {
+      "path": "正文/评审/CH001-010_glm.txt",
+      "type": "file",
+      "size": 11255,
+      "mtimeNs": "1785599547675696930",
+      "sha256": "0fdd4f3d41835a0fdea0216b67a9fbd250b434e00f1ccacf380a7af6604af8b8"
+    },
+    {
+      "path": "正文/评审/CH001-010_glm_meta.json",
+      "type": "file",
+      "size": 497,
+      "mtimeNs": "1785599547675924678",
+      "sha256": "1457b28042c6b6032f8d2b9103c22bb0f1bc68e7bca04698c0441c63d5018bcf"
+    },
+    {
+      "path": "正文/评审/CH001-010_kimi.txt",
+      "type": "file",
+      "size": 5320,
+      "mtimeNs": "1785599558706863681",
+      "sha256": "622cc5b9fbf71ebd447a816c07f328691322fb2abd6c8b413bfb800cd5300f68"
+    },
+    {
+      "path": "正文/评审/CH001-010_kimi_meta.json",
+      "type": "file",
+      "size": 494,
+      "mtimeNs": "1785599558707058971",
+      "sha256": "d2a237091ad7bbb35ed30a5a405e6360d00e0448806574a347ac7218ce295980"
+    },
+    {
+      "path": "正文/评审/CH001-010_qwen.txt",
+      "type": "file",
+      "size": 24038,
+      "mtimeNs": "1785599701048165880",
+      "sha256": "576f4df0351b9ea67e79887098a8469ea9dbfa1894f45fe64ac949947857f971"
+    },
+    {
+      "path": "正文/评审/CH001-010_qwen_meta.json",
+      "type": "file",
+      "size": 563,
+      "mtimeNs": "1785599701048395544",
+      "sha256": "49362a9017f03e28bfc459ebca9a9534b92f74cde4127bb14e52eef9e6cbe3f6"
+    },
+    {
+      "path": "正文/评审/CH004-005_doubao.txt",
+      "type": "file",
+      "size": 5563,
+      "mtimeNs": "1785598917122931559",
+      "sha256": "0d775eb1e2d08ed0ca9f7fecca023e953c3f01442e5555632142e16e4955af84"
+    },
+    {
+      "path": "正文/评审/CH004-005_doubao_meta.json",
+      "type": "file",
+      "size": 512,
+      "mtimeNs": "1785598917123223098",
+      "sha256": "f8a66339e385e8a95f3ee273f28c7916a0ac846983be8f8bf4dbbb99fe8c0abd"
+    },
+    {
+      "path": "正文/评审/CH004-005_glm.txt",
+      "type": "file",
+      "size": 6671,
+      "mtimeNs": "1785598821762644753",
+      "sha256": "f599d61326d208d513f7a05e34ac94bddf2e4035fa15a612281ee3b7d34cbee4"
+    },
+    {
+      "path": "正文/评审/CH004-005_glm_meta.json",
+      "type": "file",
+      "size": 495,
+      "mtimeNs": "1785598821762904209",
+      "sha256": "a46e6f5bbedf0d8f06aeabf8287c9627b9bc4cc5bac0a98d0d2a5093bde0a405"
+    },
+    {
+      "path": "正文/评审/CH004-005_kimi.txt",
+      "type": "file",
+      "size": 3894,
+      "mtimeNs": "1785598835276460372",
+      "sha256": "400730f99e25a38639fd13b1538a22e971bb0ea29af3f05a978d371d3481a569"
+    },
+    {
+      "path": "正文/评审/CH004-005_kimi_meta.json",
+      "type": "file",
+      "size": 491,
+      "mtimeNs": "1785598835276669204",
+      "sha256": "659828231d42a6173f93dac1671d6b9d6910cc635b2e0a85dfd2ea359ce6a9d9"
+    },
+    {
+      "path": "正文/评审/CH004-005_pack.md",
+      "type": "file",
+      "size": 20872,
+      "mtimeNs": "1785598698525193895",
+      "sha256": "6394d93395c37716d17d42eca7e4b8c1f03fdca0cc7629a5b9c093a659a12e43"
+    },
+    {
+      "path": "正文/评审/CH004-005_qwen.txt",
+      "type": "file",
+      "size": 18294,
+      "mtimeNs": "1785599016166906626",
+      "sha256": "5bf170f2cf1984c1666db556faae8f0b55c42a52cad54e03df3aa33997d0812c"
+    },
+    {
+      "path": "正文/评审/CH004-005_qwen_meta.json",
+      "type": "file",
+      "size": 561,
+      "mtimeNs": "1785599016167198123",
+      "sha256": "2e8674830b831181f23fc1757a7b2af365d21a19ed89ce706054a62924e6351c"
+    },
+    {
+      "path": "正文/评审/accept_doubao.txt",
+      "type": "file",
+      "size": 3102,
+      "mtimeNs": "1785597860829027482",
+      "sha256": "05c9d9e65c9c6465ae39d5d949d544945930e5086145c507fb34796a494a94aa"
+    },
+    {
+      "path": "正文/评审/accept_doubao_meta.json",
+      "type": "file",
+      "size": 507,
+      "mtimeNs": "1785597860829237231",
+      "sha256": "405a29383e5788d50e182af3a653f6b83eb3b8cd9f77c3f9d7affd9c6e176d19"
+    },
+    {
+      "path": "正文/评审/accept_glm.txt",
+      "type": "file",
+      "size": 5626,
+      "mtimeNs": "1785597882436339956",
+      "sha256": "29b65cc801d821caa0b3b7527d2d5e05eeeb4b9c97cf90c271fdbdabddde6e1e"
+    },
+    {
+      "path": "正文/评审/accept_glm_meta.json",
+      "type": "file",
+      "size": 492,
+      "mtimeNs": "1785597882436797120",
+      "sha256": "0c43e3a3f0b26b98c51142528b69eb8f3599acfffbd11fe2efc75a4a3d56777c"
+    },
+    {
+      "path": "正文/评审/accept_kimi.txt",
+      "type": "file",
+      "size": 2751,
+      "mtimeNs": "1785597823058057314",
+      "sha256": "afb50e4e5488756766bc3040589661b3536622a1d240ba4d13cdf011b5a60ddf"
+    },
+    {
+      "path": "正文/评审/accept_kimi_meta.json",
+      "type": "file",
+      "size": 489,
+      "mtimeNs": "1785597823058225063",
+      "sha256": "457254d1a8ede8289acfcd3914e5eb04b74877776c126b48b3aef38721cd1a5e"
+    },
+    {
+      "path": "正文/评审/accept_pack.md",
+      "type": "file",
+      "size": 31465,
+      "mtimeNs": "1785597750946352425",
+      "sha256": "6f452d77865bd9d8ccd596fa7136907e046e7fc7bd57ac92ed1b51d501d8b289"
+    },
+    {
+      "path": "正文/评审/accept_qwen.txt",
+      "type": "file",
+      "size": 2835,
+      "mtimeNs": "1785598005161613198",
+      "sha256": "5fc3b20000dd0d9c708ba222c5b1d9aaa3ba149b21122017cebd50226779fcce"
+    },
+    {
+      "path": "正文/评审/accept_qwen_meta.json",
+      "type": "file",
+      "size": 559,
+      "mtimeNs": "1785598005161766031",
+      "sha256": "19cc5572f20fafed37b21fc58853d9b4e28be4dc9e3cde75632747838114db9a"
+    },
+    {
+      "path": "正文/评审/polish",
+      "type": "directory",
+      "size": 1984,
+      "mtimeNs": "1785606354800353060",
+      "sha256": null
+    },
+    {
+      "path": "正文/评审/polish/in_001.md",
+      "type": "file",
+      "size": 9156,
+      "mtimeNs": "1785600292491605225",
+      "sha256": "857de25e69ba6989b64d0892cac887f5632561108d6b6b0f3aceb778ac376530"
+    },
+    {
+      "path": "正文/评审/polish/in_002.md",
+      "type": "file",
+      "size": 9392,
+      "mtimeNs": "1785600673482843805",
+      "sha256": "c27214fa136783000646c75d3f171bb8d6c5d99a87aae87c9736f739dd28ca70"
+    },
+    {
+      "path": "正文/评审/polish/in_003.md",
+      "type": "file",
+      "size": 9005,
+      "mtimeNs": "1785601049381655271",
+      "sha256": "258b8ac24843a29ddae74b3724212c00e11d51839e332b898b322326b7583321"
+    },
+    {
+      "path": "正文/评审/polish/in_004.md",
+      "type": "file",
+      "size": 9939,
+      "mtimeNs": "1785601554503864854",
+      "sha256": "4b7bec5e346b4523372bb6aa784c0548e93bc623785712837b4622c5dc94b61a"
+    },
+    {
+      "path": "正文/评审/polish/in_005.md",
+      "type": "file",
+      "size": 9179,
+      "mtimeNs": "1785602000892558122",
+      "sha256": "90cdb8817e21b1c16bba432a01b2e80b7afc03e04ba2156f9216b17e1ef83317"
+    },
+    {
+      "path": "正文/评审/polish/in_006.md",
+      "type": "file",
+      "size": 9178,
+      "mtimeNs": "1785602223869561112",
+      "sha256": "3d3536b31988ad88ca085a3326a09ccdb144a2dcdbc52dc773dc730d32f20ce9"
+    },
+    {
+      "path": "正文/评审/polish/in_007.md",
+      "type": "file",
+      "size": 9421,
+      "mtimeNs": "1785602486340339603",
+      "sha256": "e7576e983c470f7941795457e7bf46fc662358414187bcb24473a86013a2919b"
+    },
+    {
+      "path": "正文/评审/polish/in_008.md",
+      "type": "file",
+      "size": 8904,
+      "mtimeNs": "1785602882704996589",
+      "sha256": "4f4bf6280f1c0579509dfa9ea60c18449fc3450afb721dee4c53e779219557ea"
+    },
+    {
+      "path": "正文/评审/polish/in_009.md",
+      "type": "file",
+      "size": 9320,
+      "mtimeNs": "1785603261127836553",
+      "sha256": "4f0411cfaf952bdbad5fcc7c41d5451c67919b8fc923fd80896516846fc51800"
+    },
+    {
+      "path": "正文/评审/polish/in_010.md",
+      "type": "file",
+      "size": 9546,
+      "mtimeNs": "1785603514727860149",
+      "sha256": "5d541458973a6616bd2ab12fd2caa8ce4473f0972dcb106b6dcf27d3409851ce"
+    },
+    {
+      "path": "正文/评审/polish/in_r2_006.md",
+      "type": "file",
+      "size": 9303,
+      "mtimeNs": "1785604168859570880",
+      "sha256": "53fc9046a1d829600d75f4f261d6663f263b96430c49d6753ac647dd6d1a73d2"
+    },
+    {
+      "path": "正文/评审/polish/in_r2_007.md",
+      "type": "file",
+      "size": 9546,
+      "mtimeNs": "1785604806850527430",
+      "sha256": "df5be002e282c570a66f171dee9e124de9e323f87fcd3e9731e2218967ab71e4"
+    },
+    {
+      "path": "正文/评审/polish/in_r2_009.md",
+      "type": "file",
+      "size": 9445,
+      "mtimeNs": "1785605501423660414",
+      "sha256": "8e37620bcdea87154c4a0b09ab66c0469e86688f8cea922329ee9160572da396"
+    },
+    {
+      "path": "正文/评审/polish/in_r2_010.md",
+      "type": "file",
+      "size": 9671,
+      "mtimeNs": "1785606354800679564",
+      "sha256": "5b200682e7d264dfd042808c06a139b010786c807bfbb520801e669595fd353b"
+    },
+    {
+      "path": "正文/评审/polish/in_retry_006.md",
+      "type": "file",
+      "size": 9283,
+      "mtimeNs": "1785604173893529336",
+      "sha256": "5120ea902c30f4c7441a5465a523afe5da93db0f575c8021b67e7965d36d364d"
+    },
+    {
+      "path": "正文/评审/polish/in_retry_007.md",
+      "type": "file",
+      "size": 9526,
+      "mtimeNs": "1785604908531498094",
+      "sha256": "4a36538c28269d862ae105c315ac30677b5cc6484834651b7c53d1630d21b176"
+    },
+    {
+      "path": "正文/评审/polish/in_retry_009.md",
+      "type": "file",
+      "size": 9425,
+      "mtimeNs": "1785605461877446642",
+      "sha256": "52bb5b735a597f445af8934b478f909dbf934813c0d0b0c11ae77f7d325c56e8"
+    },
+    {
+      "path": "正文/评审/polish/meta_001.json",
+      "type": "file",
+      "size": 560,
+      "mtimeNs": "1785600673426567184",
+      "sha256": "d0c71d101d39a2d606213f29b0abac6de8ff3c8b1249efc6e77e2664888f4a55"
+    },
+    {
+      "path": "正文/评审/polish/meta_002.json",
+      "type": "file",
+      "size": 561,
+      "mtimeNs": "1785601049330830130",
+      "sha256": "02ff4d09e3566ce0276fb179c8ed75b4a2eeffc912cd76f81b0cc45dd17f289f"
+    },
+    {
+      "path": "正文/评审/polish/meta_003.json",
+      "type": "file",
+      "size": 561,
+      "mtimeNs": "1785601554442097952",
+      "sha256": "e179851d52b28e7a8c33bc462fd9b87686de473138c168055732469aebddd522"
+    },
+    {
+      "path": "正文/评审/polish/meta_004.json",
+      "type": "file",
+      "size": 561,
+      "mtimeNs": "1785602000837732523",
+      "sha256": "b1ae9602b177ccf7b9e6e65a288e9f2055c8c29f639c41c3dd28df7c8fdae579"
+    },
+    {
+      "path": "正文/评审/polish/meta_005.json",
+      "type": "file",
+      "size": 560,
+      "mtimeNs": "1785602223807950583",
+      "sha256": "84118c7c1ffa06f96fe3a14d87903d8f002f2016f4ff1ebf2a90a75aa9206071"
+    },
+    {
+      "path": "正文/评审/polish/meta_006.json",
+      "type": "file",
+      "size": 561,
+      "mtimeNs": "1785602486280901188",
+      "sha256": "8018b873ee6da362f17ef847979185e4f2b5d99194db9843ed43b3a0aa3c6e1f"
+    },
+    {
+      "path": "正文/评审/polish/meta_007.json",
+      "type": "file",
+      "size": 561,
+      "mtimeNs": "1785602882661967535",
+      "sha256": "ab9a34916924230fdcca0ad8d11138c918f252751305ff88555ae5c39e7906c5"
+    },
+    {
+      "path": "正文/评审/polish/meta_008.json",
+      "type": "file",
+      "size": 561,
+      "mtimeNs": "1785603261072262670",
+      "sha256": "325c1af112bc5a729da4bb8fe1698226848e487219bb828cf9c733fa43191728"
+    },
+    {
+      "path": "正文/评审/polish/meta_009.json",
+      "type": "file",
+      "size": 561,
+      "mtimeNs": "1785603514674035592",
+      "sha256": "087ff84a43574c180666ef0175aea148e052ef75cad5904abd049b9d5214dad2"
+    },
+    {
+      "path": "正文/评审/polish/meta_r2_006.json",
+      "type": "file",
+      "size": 567,
+      "mtimeNs": "1785604439322173878",
+      "sha256": "f3edade0739372196fbedda0f0978104e819816428944e070ff861cb7948d53f"
+    },
+    {
+      "path": "正文/评审/polish/meta_r2_007.json",
+      "type": "file",
+      "size": 567,
+      "mtimeNs": "1785605214132454197",
+      "sha256": "7ae8a660181e2776e18af3fc4ac7ee03fda440ce941a555f6a99245a097e63d5"
+    },
+    {
+      "path": "正文/评审/polish/meta_r2_009.json",
+      "type": "file",
+      "size": 567,
+      "mtimeNs": "1785606015152704102",
+      "sha256": "be9bdacce35a7a606ec18dc2c0801a33fe818413e058539a7de8137da48f8ccd"
+    },
+    {
+      "path": "正文/评审/polish/meta_r2_010.json",
+      "type": "file",
+      "size": 567,
+      "mtimeNs": "1785606654222170850",
+      "sha256": "7d688bffc833831ccd140a9cbb2279de42128ef594847acec2b90404cbd89e92"
+    },
+    {
+      "path": "正文/评审/polish/meta_retry_006.json",
+      "type": "file",
+      "size": 570,
+      "mtimeNs": "1785604549018345082",
+      "sha256": "450d99bfc8aea4d7c64e48346b0edd3910119e8ebaab55834b18c4d8d2c9fa6c"
+    },
+    {
+      "path": "正文/评审/polish/meta_retry_007.json",
+      "type": "file",
+      "size": 569,
+      "mtimeNs": "1785605213882957114",
+      "sha256": "a6064cd96ee226a8ffa35d27f56beee75428f25c0390bbee313e3286bde3553a"
+    },
+    {
+      "path": "正文/评审/polish/meta_retry_009.json",
+      "type": "file",
+      "size": 570,
+      "mtimeNs": "1785605837404050074",
+      "sha256": "12c3dd0a2d3d7f6259f63cd1ef6d536fc7a8f269651c67ac222d1c0e8057073b"
+    },
+    {
+      "path": "正文/评审/polish/out_001.md",
+      "type": "file",
+      "size": 10025,
+      "mtimeNs": "1785600673426270395",
+      "sha256": "e9b642288b3cee778001e9c69fc67f677752d34c41b64594987c98ac13148002"
+    },
+    {
+      "path": "正文/评审/polish/out_002.md",
+      "type": "file",
+      "size": 9213,
+      "mtimeNs": "1785601049330590091",
+      "sha256": "d5e6bd8caed304826f2cf9d2f3bc0ddd3217542942575c26afaece389f184d54"
+    },
+    {
+      "path": "正文/评审/polish/out_003.md",
+      "type": "file",
+      "size": 8858,
+      "mtimeNs": "1785601554441695207",
+      "sha256": "c2fe4a931726d7b9d07ed08a92d92ac2ff9334102db422ce7c23b7c74aec04b2"
+    },
+    {
+      "path": "正文/评审/polish/out_004.md",
+      "type": "file",
+      "size": 9052,
+      "mtimeNs": "1785602000837456610",
+      "sha256": "b25c242f2c2e95a8dbd92bd42ec100d48cccca954e2e86c6f1726e0d228b474c"
+    },
+    {
+      "path": "正文/评审/polish/out_005.md",
+      "type": "file",
+      "size": 8462,
+      "mtimeNs": "1785602223807545671",
+      "sha256": "a47095bc7873fc952276fe153aa6b1edcc81f3c7982e0a6a4cc2ff6b8c8dce8f"
+    },
+    {
+      "path": "正文/评审/polish/out_006.md",
+      "type": "file",
+      "size": 6704,
+      "mtimeNs": "1785602486280580358",
+      "sha256": "06e13793e93effd2126e0142052b64791e16dcf559af6e2900334a1b2f7cf850"
+    },
+    {
+      "path": "正文/评审/polish/out_007.md",
+      "type": "file",
+      "size": 7025,
+      "mtimeNs": "1785602882661794245",
+      "sha256": "a217c115e0183313f2f79d482cf198aa3417d99059522ddeec4d7d1f54cf7c56"
+    },
+    {
+      "path": "正文/评审/polish/out_008.md",
+      "type": "file",
+      "size": 7646,
+      "mtimeNs": "1785603261072021839",
+      "sha256": "26f2c837552a7e4f210c0cc506eb2f12fbb139d0ebe77f8d70d556529e7831d5"
+    },
+    {
+      "path": "正文/评审/polish/out_009.md",
+      "type": "file",
+      "size": 7040,
+      "mtimeNs": "1785603514673830592",
+      "sha256": "cb26e4fa2083f0284c8cf3b75a9a49bc292c4fee9dc54c026ef8bffe136a1dba"
+    },
+    {
+      "path": "正文/评审/polish/out_r2_006.md",
+      "type": "file",
+      "size": 7026,
+      "mtimeNs": "1785604439321977419",
+      "sha256": "f8f79c4f7d4254f42dc68b43fb9808b0ca09430c8b2ef978082c31147e2bd3fb"
+    },
+    {
+      "path": "正文/评审/polish/out_r2_007.md",
+      "type": "file",
+      "size": 8314,
+      "mtimeNs": "1785605214132242988",
+      "sha256": "a19c75c983a1750ea7159e8ef8858ffd8185187e8b2d8ba1029304d8cf25b122"
+    },
+    {
+      "path": "正文/评审/polish/out_r2_009.md",
+      "type": "file",
+      "size": 9228,
+      "mtimeNs": "1785606015152465268",
+      "sha256": "6f51dc10bb36bfde4ab1ee77ff4fd26b661a748b940fe6cda0eb59c993b69558"
+    },
+    {
+      "path": "正文/评审/polish/out_r2_010.md",
+      "type": "file",
+      "size": 6473,
+      "mtimeNs": "1785606654221806678",
+      "sha256": "17c7ab1644692bec213d234376e9ffe0990307c50addbad8a264f90e2d9ea605"
+    },
+    {
+      "path": "正文/评审/polish/out_retry_006.md",
+      "type": "file",
+      "size": 8663,
+      "mtimeNs": "1785604549017964414",
+      "sha256": "b48b68382bccd6cdadf52b6525d40994169301de31af58232b7d2f1789acad26"
+    },
+    {
+      "path": "正文/评审/polish/out_retry_007.md",
+      "type": "file",
+      "size": 7443,
+      "mtimeNs": "1785605213882723488",
+      "sha256": "ebf926031d34652d317029185f6ed10d706310a0033d17c1dc14d95da2981641"
+    },
+    {
+      "path": "正文/评审/polish/out_retry_009.md",
+      "type": "file",
+      "size": 7756,
+      "mtimeNs": "1785605837403650449",
+      "sha256": "e5589d88e7e9776f73307df060e616dd7cf6d5681e3ff8829aadf43e9c4aeb2f"
+    },
+    {
+      "path": "正文/评审/polish/reject_006.md",
+      "type": "file",
+      "size": 6704,
+      "mtimeNs": "1785602486327295532",
+      "sha256": "06e13793e93effd2126e0142052b64791e16dcf559af6e2900334a1b2f7cf850"
+    },
+    {
+      "path": "正文/评审/polish/reject_007.md",
+      "type": "file",
+      "size": 7025,
+      "mtimeNs": "1785602882692547718",
+      "sha256": "a217c115e0183313f2f79d482cf198aa3417d99059522ddeec4d7d1f54cf7c56"
+    },
+    {
+      "path": "正文/评审/polish/reject_009.md",
+      "type": "file",
+      "size": 7040,
+      "mtimeNs": "1785603514715530127",
+      "sha256": "cb26e4fa2083f0284c8cf3b75a9a49bc292c4fee9dc54c026ef8bffe136a1dba"
+    },
+    {
+      "path": "正文/评审/polish/reject_r2_006.md",
+      "type": "file",
+      "size": 7026,
+      "mtimeNs": "1785604439331950646",
+      "sha256": "f8f79c4f7d4254f42dc68b43fb9808b0ca09430c8b2ef978082c31147e2bd3fb"
+    },
+    {
+      "path": "正文/评审/polish/reject_r2_007.md",
+      "type": "file",
+      "size": 8314,
+      "mtimeNs": "1785605214143485217",
+      "sha256": "a19c75c983a1750ea7159e8ef8858ffd8185187e8b2d8ba1029304d8cf25b122"
+    },
+    {
+      "path": "正文/评审/polish/reject_r2_009.md",
+      "type": "file",
+      "size": 6871,
+      "mtimeNs": "1785605501423347789",
+      "sha256": "53129bc22f58e60df108de2cd8ba899d262b6894f3001876fa0e88e738c1619f"
+    },
+    {
+      "path": "正文/评审/polish/reject_r2_010.md",
+      "type": "file",
+      "size": 6473,
+      "mtimeNs": "1785606654238340188",
+      "sha256": "17c7ab1644692bec213d234376e9ffe0990307c50addbad8a264f90e2d9ea605"
+    },
+    {
+      "path": "正文/评审/polish/reject_retry_006.md",
+      "type": "file",
+      "size": 6499,
+      "mtimeNs": "1785604173893375919",
+      "sha256": "9d8071574d3fa35f8ce1443c48284c2a267be4a7d19370ff5bcd3ac1d923f0bc"
+    },
+    {
+      "path": "正文/评审/polish/reject_retry_007.md",
+      "type": "file",
+      "size": 7443,
+      "mtimeNs": "1785605213892253464",
+      "sha256": "ebf926031d34652d317029185f6ed10d706310a0033d17c1dc14d95da2981641"
+    },
+    {
+      "path": "正文/评审/polish/reject_retry_009.md",
+      "type": "file",
+      "size": 7756,
+      "mtimeNs": "1785605837419271477",
+      "sha256": "e5589d88e7e9776f73307df060e616dd7cf6d5681e3ff8829aadf43e9c4aeb2f"
+    },
+    {
+      "path": "正文/评审/polish/system_polish.md",
+      "type": "file",
+      "size": 675,
+      "mtimeNs": "1785600292484332333",
+      "sha256": "95f833ee9d0e245f1f99c116ced2c52e271f49a808274bcccb4954d8927aa5ef"
+    },
+    {
+      "path": "正文/评审/polish_canon_brief.md",
+      "type": "file",
+      "size": 15117,
+      "mtimeNs": "1785600260375336192",
+      "sha256": "852a8d480a76b8356840890251c9527b43a0dfafffde98309d1bd653f36c853d"
+    },
+    {
+      "path": "正文/评审/review_doubao.txt",
+      "type": "file",
+      "size": 8951,
+      "mtimeNs": "1785596874795565069",
+      "sha256": "d08fd09b080155ba5e9e24c7fa4399e6893a47eac09904f988d3ccec9fb27f1b"
+    },
+    {
+      "path": "正文/评审/review_doubao_meta.json",
+      "type": "file",
+      "size": 509,
+      "mtimeNs": "1785596874796171195",
+      "sha256": "cdf3ec90407d59d71a58ef714d30b281ddf95400134cc4710556185ebd3d43f9"
+    },
+    {
+      "path": "正文/评审/review_glm.txt",
+      "type": "file",
+      "size": 5220,
+      "mtimeNs": "1785596675641790502",
+      "sha256": "16539fb05011204296c96e4207ec898b8dd7d8c362e5972317fc596079709694"
+    },
+    {
+      "path": "正文/评审/review_glm_meta.json",
+      "type": "file",
+      "size": 491,
+      "mtimeNs": "1785596675642204337",
+      "sha256": "c9fc1bba1b6918470086dbdcf28480860b69926b4aebe12619660126e195adc1"
+    },
+    {
+      "path": "正文/评审/review_kimi.txt",
+      "type": "file",
+      "size": 7225,
+      "mtimeNs": "1785596769133122131",
+      "sha256": "88409ac2a47d77de9acf6385690b97b4e29e3ad51b2d39609c66704ea30c6e28"
+    },
+    {
+      "path": "正文/评审/review_kimi_meta.json",
+      "type": "file",
+      "size": 490,
+      "mtimeNs": "1785596769133670876",
+      "sha256": "dcae9c4c079fdc673b15781d277ac661bf4ec43c8d84c4414cb18dc965bbe5f9"
+    },
+    {
+      "path": "正文/评审/review_pack.md",
+      "type": "file",
+      "size": 28416,
+      "mtimeNs": "1785596610333182354",
+      "sha256": "19843a50a40e3498710de972a16514394aa79fc0d267dc7f4aae2a3d62855253"
+    },
+    {
+      "path": "正文/评审/review_qwen.txt",
+      "type": "file",
+      "size": 16397,
+      "mtimeNs": "1785596893636483539",
+      "sha256": "c07e3fddb30e51a51de40ce7c1305638f9d2e9369deccb09dabfca9a70a229f5"
+    },
+    {
+      "path": "正文/评审/review_qwen_meta.json",
+      "type": "file",
+      "size": 558,
+      "mtimeNs": "1785596893636786914",
+      "sha256": "5edd808e87bd62be088243eeb16fc60ed45a63ae80fd8b0ae67c60f8ed517e5b"
+    },
+    {
+      "path": "正文/评审/章验收台账.md",
+      "type": "file",
+      "size": 1350,
+      "mtimeNs": "1785599703711702936",
+      "sha256": "990cf84ebf836354a8901052e7716ae5ed27af0913f257e8d978f053f4775e17"
+    },
+    {
+      "path": "设定",
+      "type": "directory",
+      "size": 576,
+      "mtimeNs": "1785601920397176563",
+      "sha256": null
+    },
+    {
+      "path": "设定/.DS_Store",
+      "type": "file",
+      "size": 6148,
+      "mtimeNs": "1785601920397634475",
+      "sha256": "2b91d7187ace316464df16c7d45c56bcfb272fdb2047ecfac70a49fff6ef4bad"
+    },
+    {
+      "path": "设定/00_设定索引.md",
+      "type": "file",
+      "size": 1659,
+      "mtimeNs": "1785608815751493358",
+      "sha256": "18cc07bf05593278189c51cd4319c789f2fbcce106ef5ab6c356ba22c7bc3bc5"
+    },
+    {
+      "path": "设定/世界观",
+      "type": "directory",
+      "size": 96,
+      "mtimeNs": "1785594191955123005",
+      "sha256": null
+    },
+    {
+      "path": "设定/世界观/异常债务社会认知.md",
+      "type": "file",
+      "size": 1683,
+      "mtimeNs": "1785594191955245506",
+      "sha256": "177a6985158518142f437f69f5bc46f0add2d8e40d4350df876b0cfe66cfee10"
+    },
+    {
+      "path": "设定/书名锁定.md",
+      "type": "file",
+      "size": 514,
+      "mtimeNs": "1785591182236784847",
+      "sha256": "9c678fa3416626f38177aa729466913b83a20436643db52a2cd0c1dc609cb54d"
+    },
+    {
+      "path": "设定/人物",
+      "type": "directory",
+      "size": 352,
+      "mtimeNs": "1785608732710821402",
+      "sha256": null
+    },
+    {
+      "path": "设定/人物/00_角色总表.md",
+      "type": "file",
+      "size": 10962,
+      "mtimeNs": "1785608815751615191",
+      "sha256": "587b966adf9603022647b3e725a70a8f49c40ed4ed6a1da068a7a8df822d1a1d"
+    },
+    {
+      "path": "设定/人物/关系矩阵.md",
+      "type": "file",
+      "size": 8397,
+      "mtimeNs": "1785593368885923422",
+      "sha256": "28520644539e3e564986c8dfc1b37cdb1735c7bba09ce872e58b512d1ab28064"
+    },
+    {
+      "path": "设定/人物/医院配角团_简卡.md",
+      "type": "file",
+      "size": 1252,
+      "mtimeNs": "1785594234997183694",
+      "sha256": "4868d4fb6a4162a01918cd5a0b26f430e34bf885e84bd26413a091de983e8a3d"
+    },
+    {
+      "path": "设定/人物/单卡",
+      "type": "directory",
+      "size": 768,
+      "mtimeNs": "1785608732711706401",
+      "sha256": null
+    },
+    {
+      "path": "设定/人物/单卡/_模板.md",
+      "type": "file",
+      "size": 413,
+      "mtimeNs": "1785608815751603608",
+      "sha256": "0aac43b5cbc40014a6831d9057eabfdb05d1b1b4b7e851f3f0916d6971d31b87"
+    },
+    {
+      "path": "设定/人物/单卡/_模板_L1完整.md",
+      "type": "file",
+      "size": 911,
+      "mtimeNs": "1785608732710995152",
+      "sha256": "9c89d675ad5611e3e41dcfa2862fdc3d7775d78f9b4cbb15403a858854da75bb"
+    },
+    {
+      "path": "设定/人物/单卡/_模板_L2中型.md",
+      "type": "file",
+      "size": 404,
+      "mtimeNs": "1785608732711022652",
+      "sha256": "5e95d611567ecae53265ba71e62794d02694188b785a9906a5f76858fb83c2e0"
+    },
+    {
+      "path": "设定/人物/单卡/_模板_L3迷你.md",
+      "type": "file",
+      "size": 300,
+      "mtimeNs": "1785608732711783776",
+      "sha256": "2b670402ec8c2c881f08977f01fbad877db24217193e47b4cb638a52f72f708c"
+    },
+    {
+      "path": "设定/人物/单卡/_模板_L4临时.md",
+      "type": "file",
+      "size": 335,
+      "mtimeNs": "1785608732710984527",
+      "sha256": "74919c05649dd303b7ffed9ba57375d17cecd1cf28a87e9c2cbcc51c4afce30d"
+    },
+    {
+      "path": "设定/人物/单卡/刀疤.md",
+      "type": "file",
+      "size": 4447,
+      "mtimeNs": "1785595076257997154",
+      "sha256": "c4824fde1e31e08d2b7ee77533d82ab312de1ff432b9ebe03067d0a1deeccac0"
+    },
+    {
+      "path": "设定/人物/单卡/吴姐.md",
+      "type": "file",
+      "size": 1309,
+      "mtimeNs": "1785595122970771855",
+      "sha256": "574dd7c85435a3df9617d5b03ec182918d184a45c35dcb617cb34bedd1b94206"
+    },
+    {
+      "path": "设定/人物/单卡/崔七.md",
+      "type": "file",
+      "size": 4812,
+      "mtimeNs": "1785595076245857982",
+      "sha256": "f299d4da21d16c1b4867de459355c7a8555489e2dc0f494b06ad6a1866ed2c76"
+    },
+    {
+      "path": "设定/人物/单卡/易秀.md",
+      "type": "file",
+      "size": 7265,
+      "mtimeNs": "1785593394045296108",
+      "sha256": "1922271136acb84c8a21b77e62a929f1701bfd46f049bb958a714adb6c416412"
+    },
+    {
+      "path": "设定/人物/单卡/易航.md",
+      "type": "file",
+      "size": 1932,
+      "mtimeNs": "1785594947721357509",
+      "sha256": "31b6e4b204589d4391eb4e3a4a825709230453810c7d2e40af217109ee1f66f6"
+    },
+    {
+      "path": "设定/人物/单卡/李强.md",
+      "type": "file",
+      "size": 4998,
+      "mtimeNs": "1785594979599542622",
+      "sha256": "92017db4a7cc2ab3668d99b748381fd45cbcddf75465f463397938b39c27bb02"
+    },
+    {
+      "path": "设定/人物/单卡/李飞.md",
+      "type": "file",
+      "size": 5050,
+      "mtimeNs": "1785594979614093220",
+      "sha256": "9552af4c7dced4d800a25e8d7665743fd5346beba22c7230a0eb11a8405447ad"
+    },
+    {
+      "path": "设定/人物/单卡/梁景衡.md",
+      "type": "file",
+      "size": 5187,
+      "mtimeNs": "1785594979599389163",
+      "sha256": "c0481a778c87ff323e63ad96a3986d5ae817f68d4fa581dfbfc1052dd7669ecb"
+    },
+    {
+      "path": "设定/人物/单卡/檀溪.md",
+      "type": "file",
+      "size": 9580,
+      "mtimeNs": "1785595048345821561",
+      "sha256": "72a35024c076d24560ea23bc4c18072548347b349efa30bd2224984beece323d"
+    },
+    {
+      "path": "设定/人物/单卡/石头.md",
+      "type": "file",
+      "size": 1354,
+      "mtimeNs": "1785593575315071385",
+      "sha256": "7fc481adfdfcfd6fadecdc924b0b6e1d149c41bacf5e583ce5eb564f2508c5e9"
+    },
+    {
+      "path": "设定/人物/单卡/肖龙.md",
+      "type": "file",
+      "size": 4279,
+      "mtimeNs": "1785594260349036965",
+      "sha256": "42f8b3d19410339fa2692caa7889729f076fdbc861eac68a6a868241f2e94bc8"
+    },
+    {
+      "path": "设定/人物/单卡/赵姐.md",
+      "type": "file",
+      "size": 1062,
+      "mtimeNs": "1785593575314945052",
+      "sha256": "affaf860fac68e83c5d4d10e1bf4a2f44a9db324074c5d2ec911afad3235c5d8"
+    },
+    {
+      "path": "设定/人物/单卡/邓依.md",
+      "type": "file",
+      "size": 8943,
+      "mtimeNs": "1785595039779413803",
+      "sha256": "8225cb8b6fd52c807df2127cf2e3c06fae813d2acc6be328d67716437aad18f0"
+    },
+    {
+      "path": "设定/人物/单卡/郭周堂.md",
+      "type": "file",
+      "size": 5352,
+      "mtimeNs": "1785593398759000289",
+      "sha256": "db20c5076221c483c21c1763b2dd6a0fa34e2906e5a335a4e3dd52f0ecadfcf3"
+    },
+    {
+      "path": "设定/人物/单卡/阿大.md",
+      "type": "file",
+      "size": 3867,
+      "mtimeNs": "1785593398758920706",
+      "sha256": "2ddc0ce672593bece7ca738eb2be43b33187d48f9f1b7ccf1b38bac6433f5067"
+    },
+    {
+      "path": "设定/人物/单卡/陈宏远.md",
+      "type": "file",
+      "size": 5509,
+      "mtimeNs": "1785595076245967732",
+      "sha256": "0566d93fb07834ef7654098093c1b315b74da444738a89510bcaf451b3988d6e"
+    },
+    {
+      "path": "设定/人物/单卡/顾棠.md",
+      "type": "file",
+      "size": 1013,
+      "mtimeNs": "1785593575315014719",
+      "sha256": "09e3097d19dc1d7ed6b11ac7eab1039f7603f9a7adedd87c080c4a3543d9754b"
+    },
+    {
+      "path": "设定/人物/易航.md",
+      "type": "file",
+      "size": 7822,
+      "mtimeNs": "1785594947721332468",
+      "sha256": "2add70c392840b6bf452d9bdaf553a6f10b050b8082a3b91ec5d8e7fc2280ffb"
+    },
+    {
+      "path": "设定/人物/易航_声口备忘_qwen.md",
+      "type": "file",
+      "size": 6238,
+      "mtimeNs": "1785592601774673931",
+      "sha256": "35c49bc43e55002ec106a163b2fcd7124b6754867fc2c96922197b89c5755fdd"
+    },
+    {
+      "path": "设定/人物/补位卡.md",
+      "type": "file",
+      "size": 777,
+      "mtimeNs": "1785589425187309840",
+      "sha256": "0ea8c8711c5a2a6edb06386d969b65b47a86e65b377bb6e63b86c1dc377ef4ff"
+    },
+    {
+      "path": "设定/人物/角色卡分级与动态协议.md",
+      "type": "file",
+      "size": 5114,
+      "mtimeNs": "1785608732710980527",
+      "sha256": "2270dc90360c9dce1b9ef51cfed65e3d298937a806b6dd055a820f5c08ba2c44"
+    },
+    {
+      "path": "设定/人物/配角卡_用户点名.md",
+      "type": "file",
+      "size": 930,
+      "mtimeNs": "1785592601774387388",
+      "sha256": "04b45a4330ba349cf7a5ed05c1443c6d42ba7b6032cda3046eb6c00487abe406"
+    },
+    {
+      "path": "设定/债务",
+      "type": "directory",
+      "size": 96,
+      "mtimeNs": "1785594157387357968",
+      "sha256": null
+    },
+    {
+      "path": "设定/债务/易家开书债务与D0现金流.md",
+      "type": "file",
+      "size": 5172,
+      "mtimeNs": "1785594847585945483",
+      "sha256": "16b2743d37bd54e0eefa9936e2db569936e699697069ef4227089d81a52b6fd9"
+    },
+    {
+      "path": "设定/势力",
+      "type": "directory",
+      "size": 192,
+      "mtimeNs": "1785594222950963968",
+      "sha256": null
+    },
+    {
+      "path": "设定/势力/免债会与门票债_简则.md",
+      "type": "file",
+      "size": 2158,
+      "mtimeNs": "1785594222951024802",
+      "sha256": "66b3c27a7eed47d2128693ab9f20c2f4259e782b5009d8ccf7ee5e267285d3d9"
+    },
+    {
+      "path": "设定/势力/势力总表.md",
+      "type": "file",
+      "size": 1043,
+      "mtimeNs": "1785594248471274270",
+      "sha256": "20cc708b7781f00ef2274d0edb523d542349b0ba77e61fa4ecb5bcd0b8e7fde1"
+    },
+    {
+      "path": "设定/势力/商业闭环_陈系.md",
+      "type": "file",
+      "size": 12231,
+      "mtimeNs": "1785593565645230787",
+      "sha256": "f90c7e5a46d720e725d0f53a15fcf372fa874b0c6e2dac535a7b91e831d0f836"
+    },
+    {
+      "path": "设定/势力/机构细则.md",
+      "type": "file",
+      "size": 13631,
+      "mtimeNs": "1785593565645016744",
+      "sha256": "f9e623a652aea3781189d2fe83d0ae1912535657ed4dd20c49e40864753cf78b"
+    },
+    {
+      "path": "设定/地点",
+      "type": "directory",
+      "size": 96,
+      "mtimeNs": "1785593536765950662",
+      "sha256": null
+    },
+    {
+      "path": "设定/地点/临川地图.md",
+      "type": "file",
+      "size": 13390,
+      "mtimeNs": "1785593565645008994",
+      "sha256": "bfc673a95a733f8f0f2856108cb6af54fd1733c0b20441efc4871955c45fbbf2"
+    },
+    {
+      "path": "设定/文风",
+      "type": "directory",
+      "size": 192,
+      "mtimeNs": "1785598673313118764",
+      "sha256": null
+    },
+    {
+      "path": "设定/文风/文风红线.md",
+      "type": "file",
+      "size": 959,
+      "mtimeNs": "1785597600965470948",
+      "sha256": "d20b982cf94e3477322c3b4e24ff951dcba225c601ebae6efd67d9995af86e4e"
+    },
+    {
+      "path": "设定/文风/每章多模产线.md",
+      "type": "file",
+      "size": 2781,
+      "mtimeNs": "1785608815761474801",
+      "sha256": "7a69c0a2076e1e179693e84c3b90be84f4225b61c4c29e2729e4df72cb915355"
+    },
+    {
+      "path": "设定/文风/派工标注.md",
+      "type": "file",
+      "size": 932,
+      "mtimeNs": "1785598673313284049",
+      "sha256": "614b2cb44a8f9ff0f8363b0ac821a175c8df6ec9232f80c717242fd14e5ad652"
+    },
+    {
+      "path": "设定/文风/章均字数.md",
+      "type": "file",
+      "size": 915,
+      "mtimeNs": "1785597600965570698",
+      "sha256": "760bcfb80f3798456442c20afd52eb870bdf61dca26ec828eec5e760264a26b1"
+    },
+    {
+      "path": "设定/术语",
+      "type": "directory",
+      "size": 96,
+      "mtimeNs": "1785593469544656789",
+      "sha256": null
+    },
+    {
+      "path": "设定/术语/术语表.md",
+      "type": "file",
+      "size": 810,
+      "mtimeNs": "1785593536766113538",
+      "sha256": "8584bdbed4c00e2b39783c11a057f393bdfad93ab9138f976ce751e449e2a853"
+    },
+    {
+      "path": "设定/正典裁决台账.md",
+      "type": "file",
+      "size": 2141,
+      "mtimeNs": "1785597600965563407",
+      "sha256": "b7e265d2f8fa40c1c16b4c5118573d89eb7c7305e9a0b4625b0ef48f63011f10"
+    },
+    {
+      "path": "设定/正典锁_P0补丁.md",
+      "type": "file",
+      "size": 6045,
+      "mtimeNs": "1785594874761623279",
+      "sha256": "b5ba9e0329e6d21c6e099a7193aa05452b7aada7b75c913f9339e481cca38f9f"
+    },
+    {
+      "path": "设定/港湾机制.md",
+      "type": "file",
+      "size": 2309,
+      "mtimeNs": "1785594208440093811",
+      "sha256": "7f94e881aaba7a0bc5c3887530b644634c7b995efeee1544df46c5e717f793b2"
+    },
+    {
+      "path": "设定/能力",
+      "type": "directory",
+      "size": 288,
+      "mtimeNs": "1785594096153266665",
+      "sha256": null
+    },
+    {
+      "path": "设定/能力/代价案例库.md",
+      "type": "file",
+      "size": 9352,
+      "mtimeNs": "1785595017106435939",
+      "sha256": "d5a6799947b151f8821a99db0eb431a08b95915d0697e39475c5be921ee67e0a"
+    },
+    {
+      "path": "设定/能力/债纹统一规则_v1.md",
+      "type": "file",
+      "size": 7143,
+      "mtimeNs": "1785594847599331668",
+      "sha256": "fa4c8c319c1cf3307cfa4befa33b90648e1f3ad0d5ccea506ddb0bacffb3b674"
+    },
+    {
+      "path": "设定/能力/债纹视觉词典.md",
+      "type": "file",
+      "size": 2104,
+      "mtimeNs": "1785594847585571439",
+      "sha256": "f9da797ea798b5cbddbbdf5adfff2b44bfb2eb590cbb4a44d477bb98404dc7b7"
+    },
+    {
+      "path": "设定/能力/债纹铁律.md",
+      "type": "file",
+      "size": 2164,
+      "mtimeNs": "1785595017105101892",
+      "sha256": "605a81321a31e984700b954771b0a7190f7d204faa16ded36546c1a29f294ff2"
+    },
+    {
+      "path": "设定/能力/成长台阶_S1.md",
+      "type": "file",
+      "size": 1151,
+      "mtimeNs": "1785591221876557781",
+      "sha256": "a8afb38f507912b1ee85bb90f4659b4c06e1e0786f81a29c78f7b5edfcda0450"
+    },
+    {
+      "path": "设定/能力/操作与禁则_glm补强.md",
+      "type": "file",
+      "size": 1835,
+      "mtimeNs": "1785592601773987594",
+      "sha256": "b3702fa6b1aea4f7ba202047c18b7589f6a303c483a8f521e7bb304047c8e390"
+    },
+    {
+      "path": "设定/能力/能力圣经.md",
+      "type": "file",
+      "size": 10715,
+      "mtimeNs": "1785595001851987534",
+      "sha256": "7b2a4b169502259b77b9408cc4c5491c256df0dab56920c2ae43cbda12872666"
+    },
+    {
+      "path": "设定/证据与程序闭环.md",
+      "type": "file",
+      "size": 4147,
+      "mtimeNs": "1785594125043395235",
+      "sha256": "218747ef41a125264cf747ba942583e9730638be2f096b9098ae85eeb5fe226a"
+    },
+    {
+      "path": "设定/道具",
+      "type": "directory",
+      "size": 96,
+      "mtimeNs": "1785592601851237020",
+      "sha256": null
+    },
+    {
+      "path": "设定/道具/道具表.md",
+      "type": "file",
+      "size": 9169,
+      "mtimeNs": "1785595096593936304",
+      "sha256": "8dfe2fc590fb229d33da361683461870603161f9ef9901392395806f37174798"
+    },
+    {
+      "path": "追踪",
+      "type": "directory",
+      "size": 224,
+      "mtimeNs": "1785594178227687595",
+      "sha256": null
+    },
+    {
+      "path": "追踪/伏笔.md",
+      "type": "file",
+      "size": 2263,
+      "mtimeNs": "1785594279282148487",
+      "sha256": "a306472bc343a88c1a4aa5a32209d46ee4cce8d6b3e056fdcf826aa139990bab"
+    },
+    {
+      "path": "追踪/卷一D1-D7日历.md",
+      "type": "file",
+      "size": 2387,
+      "mtimeNs": "1785599840128619574",
+      "sha256": "a003e10369c41b3f836fd36d8b0a8e4ce2edcc50cd56420be4cf7edaca66a32b"
+    },
+    {
+      "path": "追踪/时间线.md",
+      "type": "file",
+      "size": 1084,
+      "mtimeNs": "1785594325434749715",
+      "sha256": "ca6b375cebd2bbd7b71abfc2d83f0df7653f0ec2528b40894f825dd73989781c"
+    },
+    {
+      "path": "追踪/知情账.md",
+      "type": "file",
+      "size": 1965,
+      "mtimeNs": "1785595141207912835",
+      "sha256": "6c1eb7169e7878eb37e6a849868743251f130a2948fb940087a84c6acf140144"
+    },
+    {
+      "path": "追踪/角色状态.md",
+      "type": "file",
+      "size": 7183,
+      "mtimeNs": "1785608815751297442",
+      "sha256": "dd1c246ba22e29c5bbd75cc7d63029ce5e5c4d41c81681ca3b2f1d90a7a966bd"
+    }
+  ],
+  "aggregateSha256": "67da96a088bc83a60b8a1d3c716c19d2ae484cd575a4ac4f31c4114789fcfd70"
+}

@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-writing-os-sequential-scale-acceptance",
+  "verdict": "PASS",
+  "createdAt": "2026-08-02T16:43:50.518Z",
+  "environment": {
+    "node": "v26.3.1",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "scale": {
+    "targetChapters": 500,
+    "managedChaptersIncludingBootstrap": 501,
+    "requestedSourceCharacters": 1000000,
+    "actualSourceCharacters": 1014334,
+    "retconFromChapter": 200
+  },
+  "sourceReadOnly": {
+    "before": {
+      "sha256": "bf6808d4fa3c58905cc740596b949cee218187120fa856cbff52f304c4ba0269",
+      "byteLength": 3027416,
+      "charCount": 1014334
+    },
+    "after": {
+      "sha256": "bf6808d4fa3c58905cc740596b949cee218187120fa856cbff52f304c4ba0269",
+      "byteLength": 3027416,
+      "charCount": 1014334
+    },
+    "unchanged": true
+  },
+  "import": {
+    "durationMs": 30927,
+    "chapterCount": 501
+  },
+  "originalSequentialLoop": {
+    "cycles": 500,
+    "operation": "prepare(formal+lease) -> CAS save -> evidence candidate -> owner accept",
+    "durationMs": 3810561,
+    "latency": {
+      "minimumMs": 2015.77,
+      "p50Ms": 7489.51,
+      "p95Ms": 12732.71,
+      "maximumMs": 14382.17,
+      "meanMs": 7621.12
+    },
+    "externalMcpEquivalentCommandBusCheckpoints": [
+      1,
+      250,
+      500
+    ],
+    "restartProof": {
+      "atChapter": 250,
+      "newProcessCliExitCode": 0,
+      "recoveredHead": "ac24c730-876e-5fde-96c0-99729b687abc"
+    }
+  },
+  "retconRebuild": {
+    "targetChapter": 200,
+    "affectedChapters": 301,
+    "beforeSnapshotLocator": ".aicanvas/novel/state-rebuilds/novel-state-rebuild-4e62aa9d946f0e3e2f54266d/before.json",
+    "cycles": 301,
+    "durationMs": 832407,
+    "latency": {
+      "minimumMs": 2308.14,
+      "p50Ms": 2779.3,
+      "p95Ms": 3167.74,
+      "maximumMs": 3328.26,
+      "meanMs": 2765.47
+    },
+    "restartProof": {
+      "atChapter": 350,
+      "newProcessCliExitCode": 0,
+      "recoveredHead": "fc19e700-eae3-52af-a1a3-20bf5f22468f"
+    },
+    "finalHeadChapter": 500,
+    "rebuildCleared": true
+  },
+  "faultInjection": {
+    "expected": {
+      "doubleWriter": "chapter_write_lease_conflict",
+      "emptyDelta": "state_delta_required",
+      "unknownEntity": "invalid_reference",
+      "wrongCast": "invalid_reference",
+      "agentSelfAccept": "actor_forbidden",
+      "rebuildOutOfOrder": "state_rebuild_out_of_order"
+    },
+    "actual": {
+      "doubleWriter": "chapter_write_lease_conflict",
+      "emptyDelta": "state_delta_required",
+      "unknownEntity": "invalid_reference",
+      "wrongCast": "invalid_reference",
+      "agentSelfAccept": "actor_forbidden",
+      "rebuildOutOfOrder": "state_rebuild_out_of_order"
+    },
+    "allFailedClosed": true,
+    "futureSecretAbsentFromPack": true
+  },
+  "cutoffOracle": [
+    {
+      "label": "before-retcon-history",
+      "actual": "稳定-original-199",
+      "expected": "稳定-original-199",
+      "pass": true
+    },
+    {
+      "label": "retcon-boundary-before",
+      "actual": "稳定-original-199",
+      "expected": "稳定-original-199",
+      "pass": true
+    },
+    {
+      "label": "retcon-boundary-through",
+      "actual": "稳定-rebuild-200",
+      "expected": "稳定-rebuild-200",
+      "pass": true
+    },
+    {
+      "label": "final-through",
+      "actual": "稳定-rebuild-500",
+      "expected": "稳定-rebuild-500",
+      "pass": true
+    }
+  ],
+  "storage": {
+    "writingStateBytes": 915062,
+    "writingStateRevision": 803,
+    "characterStateHistoryRecords": 501,
+    "chapterCompletions": 501,
+    "immutableCandidates": 801,
+    "immutableDecisions": 801,
+    "rebuildLineages": 1,
+    "historyEvents": 802,
+    "historyCheckpoints": 803,
+    "fullLineageVerifiedEvents": 802,
+    "leaseFileBytes": 1162,
+    "liveOrStaleLeaseRecordsAfterPruning": 1,
+    "peakRssBytes": 615858176
+  },
+  "programGuarantees": [
+    "cutoff projection and future-secret filtering",
+    "required cast plus structured character profile formal gate",
+    "chapter lease plus revision/SHA CAS",
+    "evidence-bound state candidate plus human owner decision",
+    "append-only dynamic history and ordered retcon rebuild",
+    "append-only state events/checkpoints plus shadow rebuild and full-lineage verification",
+    "new-process durable state recovery"
+  ],
+  "limitations": [
+    "规模循环使用确定性夹具，不代表真实文学质量或真实外部模型表现。",
+    "中间章节使用同一 Repository/Core 写锁路径以控制验收时长；第1、中点、末章额外穿过 command bus actor/lease 外层。",
+    "机械 PASS 不证明人物魅力、心理真实、节奏或文风，仍需独立模型与人工审稿。"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-manuscript-mutation-receipt",
+  "operationId": "aadf60d6-9988-5dc2-aa94-909ed2012965",
+  "requestHash": "a56c3d719185ce2f39c5eaab1af58066d45b01525262f9490285e2fefba99316",
+  "command": "create",
+  "projectId": "project-79b2b0acb554",
+  "manifestRevision": 4,
+  "manifestSha256": "bd09990e5451323d3f832c6442edaaf929c91c154d64bd28d44bcbeb3cddc8cd",
+  "completedAt": "2026-08-02T06:15:05.060Z",
+  "intentFingerprint": "055b112283b45076832580fce213de7693c4dd82c27c648800e4c8190f4a6492",
+  "fingerprint": "657d530d3510d1f4f91b57ef485e32043e6f141d3b0791793d56444ac52b179e"
+}

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "novel-p0-fts5-live-final",
+  "status": "pass",
+  "startedAt": "2026-08-01T08:26:35.624Z",
+  "endedAt": "2026-08-01T08:26:36.215Z",
+  "durationMs": 658,
+  "argv": [
+    "bash",
+    "-lc",
+    "set -euo pipefail; novel_probe=\"scripts/probe-novel-fts5-runtime.mjs\"; novel_tmp=$(mktemp -d /tmp/novel-p0-fts-main.XXXXXX); novel_base=$(basename \"$novel_tmp\"); novel_check() { novel_label=\"$1\"; shift; novel_out=$(\"$@\"); printf \"%s\\n\" \"{\\\"distribution\\\":\\\"$novel_label\\\"}\" \"$novel_out\"; printf \"%s\\n\" \"$novel_out\" | jq -e \".ok == true and .inMemory == true and .parameterBinding == true and .query == \\\"嘟嘟\\\" and .matchIds == [\\\"chapter-001\\\"]\" >/dev/null; }; novel_check system-node env -u ELECTRON_RUN_AS_NODE node \"$novel_probe\"; novel_check workspace-electron-run-as-node env ELECTRON_RUN_AS_NODE=1 node_modules/electron/dist/Electron.app/Contents/MacOS/Electron \"$novel_probe\"; novel_check workspace-electron-main env -u ELECTRON_RUN_AS_NODE node_modules/electron/dist/Electron.app/Contents/MacOS/Electron \"--user-data-dir=$novel_tmp/userdata\" --disable-gpu \"$novel_probe\"; novel_check installed-application-runtime-readonly env ELECTRON_RUN_AS_NODE=1 \"/Applications/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布\" \"$novel_probe\"; novel_check current-dist-packaged-runtime-readonly env ELECTRON_RUN_AS_NODE=1 \"dist/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布\" \"$novel_probe\"; novel_trash=\"/Users/hxx/.Trash/$novel_base\"; test ! -e \"$novel_trash\"; mv \"$novel_tmp\" \"$novel_trash\"; printf \"%s\\n\" \"{\\\"cleanup\\\":\\\"moved-recoverably-to-user-trash\\\",\\\"temporaryBasename\\\":\\\"$novel_base\\\",\\\"runtimeCount\\\":5,\\\"allPassed\\\":true,\\\"projectWrites\\\":0,\\\"externalModelCalls\\\":0}\""
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+      "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4"
+    },
+    "after": {
+      "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+      "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/novel-mode-v1/baseline/commands/fts5-live-final-p0.log",
+    "sizeBytes": 2108,
+    "sha256": "b105ecf75086b7675c3d9b852d8f6e93d4dbe5b6dce1be477c847d91b8da434f"
+  }
+}

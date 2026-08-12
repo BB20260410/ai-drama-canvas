@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-chapter-manifest",
+  "projectId": "project-79b2b0acb554",
+  "revision": 3,
+  "volumes": [
+    {
+      "volumeId": "55698912-330a-4535-86ca-faf2c7373919",
+      "title": "第一卷",
+      "order": 0,
+      "revision": 1
+    }
+  ],
+  "chapters": [
+    {
+      "chapterId": "75568856-c6fe-5598-bffb-20ae3dddd558",
+      "volumeId": "55698912-330a-4535-86ca-faf2c7373919",
+      "title": "第001章 缴费单与黑页",
+      "order": 0,
+      "relativePath": "manuscript/volumes/55698912-330a-4535-86ca-faf2c7373919/75568856-c6fe-5598-bffb-20ae3dddd558.md",
+      "sha256": "c182ad81e2cb5337e5399b3fee896bf5d0876a6e08fae931122ea4ed4135ff92",
+      "byteLength": 10242,
+      "charCount": 3662,
+      "offsetEncoding": "utf16-code-unit",
+      "revision": 1,
+      "createdAt": "2026-08-02T06:15:01.717Z",
+      "updatedAt": "2026-08-02T06:15:01.717Z"
+    },
+    {
+      "chapterId": "499d6e63-3f7c-5416-bd12-e20e2cb0d2c5",
+      "volumeId": "55698912-330a-4535-86ca-faf2c7373919",
+      "title": "第002章 皮鞋与工牌",
+      "order": 1,
+      "relativePath": "manuscript/volumes/55698912-330a-4535-86ca-faf2c7373919/499d6e63-3f7c-5416-bd12-e20e2cb0d2c5.md",
+      "sha256": "9c5f25e0e17a28942af9abed9bf9eb798be85e0a23b3474525c45e56445edfdf",
+      "byteLength": 10237,
+      "charCount": 3649,
+      "offsetEncoding": "utf16-code-unit",
+      "revision": 1,
+      "createdAt": "2026-08-02T06:15:01.718Z",
+      "updatedAt": "2026-08-02T06:15:01.718Z"
+    }
+  ],
+  "updatedAt": "2026-08-02T06:15:01.718Z"
+}

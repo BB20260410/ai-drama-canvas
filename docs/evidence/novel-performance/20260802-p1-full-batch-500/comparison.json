@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-writing-os-performance-comparison",
+  "verdict": "PASS",
+  "scope": "same 1014334-character / 500-chapter / retcon-200 acceptance fixture",
+  "beforeEvidence": "../../novel-user-tests/writing-os-critical-memory-hardening-20260802/sequential-500-retcon-200.json",
+  "afterEvidence": "evidence.json",
+  "normalSequentialLoop": {
+    "before": {
+      "p50Ms": 7489.51,
+      "p95Ms": 12732.71,
+      "maximumMs": 14382.17,
+      "meanMs": 7621.12
+    },
+    "after": {
+      "p50Ms": 2064.19,
+      "p95Ms": 2196.55,
+      "maximumMs": 4329.67,
+      "meanMs": 2080.22
+    },
+    "reductionPercent": {
+      "p50": 72.44,
+      "p95": 82.75,
+      "maximum": 69.90,
+      "mean": 72.70
+    },
+    "firstWindow": {
+      "cycles": "1-50",
+      "meanMs": 2132.03,
+      "p95Ms": 2353.58
+    },
+    "lastWindow": {
+      "cycles": "451-500",
+      "meanMs": 2147.72,
+      "p95Ms": 2199.81
+    },
+    "tailChangePercent": {
+      "mean": 0.74,
+      "p95": -6.53
+    }
+  },
+  "retconRebuild": {
+    "before": {
+      "p50Ms": 2779.30,
+      "p95Ms": 3167.74,
+      "meanMs": 2765.47
+    },
+    "after": {
+      "p50Ms": 966.36,
+      "p95Ms": 995.18,
+      "meanMs": 960.59
+    },
+    "reductionPercent": {
+      "p50": 65.23,
+      "p95": 68.58,
+      "mean": 65.26
+    },
+    "firstWindow": {
+      "cycles": "1-31",
+      "meanMs": 929.50,
+      "p95Ms": 957.05
+    },
+    "lastWindow": {
+      "cycles": "280-301",
+      "meanMs": 981.34,
+      "p95Ms": 999.33
+    }
+  },
+  "peakRssBytes": {
+    "before": 615858176,
+    "after": 556990464,
+    "reductionPercent": 9.56
+  },
+  "correctnessClosure": {
+    "sourceUnchanged": true,
+    "historyEvents": 802,
+    "historyCheckpoints": 803,
+    "fullLineageVerifiedEvents": 802,
+    "faultInjectionFailedClosed": true,
+    "cutoffOraclePassed": true,
+    "newProcessRecoveryPassed": true
+  }
+}

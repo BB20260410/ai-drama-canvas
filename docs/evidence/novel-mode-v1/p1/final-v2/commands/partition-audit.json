@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "p1-partition-audit-final-v3",
+  "status": "pass",
+  "startedAt": "2026-08-01T10:13:17.630Z",
+  "endedAt": "2026-08-01T10:13:17.971Z",
+  "durationMs": 442,
+  "argv": [
+    "npm",
+    "run",
+    "test:partitions:audit"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "3b39d7592ceaaaeb65d709d64c33736d",
+      "sourceDigest": "f3e186cdaea97298dc7654a4f9729dd4b3d69e02c719e4708cc00a80c8a5c1d0"
+    },
+    "after": {
+      "buildId": "3b39d7592ceaaaeb65d709d64c33736d",
+      "sourceDigest": "f3e186cdaea97298dc7654a4f9729dd4b3d69e02c719e4708cc00a80c8a5c1d0"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/novel-mode-v1/p1/final-v2/commands/partition-audit.log",
+    "sizeBytes": 428,
+    "sha256": "687387087644b42b2a20b68a4b22d9d2245901d26f9530714281a7aaa03cef29"
+  }
+}

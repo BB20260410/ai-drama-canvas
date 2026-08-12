@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "kind": "higgsfield-canvas-connector-queue-local-delivery",
+  "status": "partial_provider_blocked",
+  "createdAt": "2026-08-09T23:55:07Z",
+  "software": {
+    "requestKinds": [
+      "image",
+      "video"
+    ],
+    "ledger": ".aicanvas/studio-generation-ledger.sqlite",
+    "userCommand": "enqueue_studio_higgsfield_connector_request",
+    "codexCommands": [
+      "claim_studio_higgsfield_connector_request",
+      "preflight_studio_higgsfield_connector_request",
+      "authorize_studio_higgsfield_connector_request",
+      "record_studio_higgsfield_connector_submission"
+    ],
+    "readTool": "get_studio_connector_work_queue",
+    "imageProfile": {
+      "model": "gpt_image_2",
+      "resolution": "1k",
+      "quality": "low",
+      "count": 1,
+      "useUnlim": true
+    },
+    "videoProfile": {
+      "model": "seedance_2_5",
+      "mode": "omni_reference",
+      "aspectRatio": "16:9",
+      "resolution": "720p",
+      "durationSeconds": 20,
+      "generateAudio": true,
+      "count": 1,
+      "useUnlim": true
+    },
+    "properties": {
+      "sameGenerationLedger": true,
+      "parallelDatabaseCreated": false,
+      "codexOnlyExternalCommands": true,
+      "activeProjectFence": true,
+      "writeLeaseRequired": true,
+      "oneTimeAuthorization": true,
+      "authorizationTtlMinutes": 5,
+      "submissionUnknownPreventsRetry": true,
+      "ordinaryReadsExposeLocalPaths": false,
+      "commandLedgerPersistsClaimToken": false,
+      "commandLedgerPersistsSubmissionNonce": false,
+      "commandLedgerPersistsConnectorRequest": false,
+      "paidFallbackAllowed": false
+    }
+  },
+  "provider": {
+    "membership": "ultra",
+    "unlimitedEntitlementAvailable": false,
+    "seedance25UnlimitedAccepted": false,
+    "blockingErrorCode": "INVALID_ARGUMENT",
+    "generationRequestsCreated": 0,
+    "uploads": 0,
+    "creditsConsumed": 0,
+    "browserAutomationUsed": false
+  },
+  "verification": {
+    "focusedTests": {
+      "files": 8,
+      "tests": 48,
+      "passed": true
+    },
+    "typecheck": true,
+    "typecheckApp": true,
+    "diffCheck": true,
+    "candidate": {
+      "candidateId": "mcp-candidate-bf4dbb751f21ab05-c53573f495670007-1caabe28",
+      "sourceDigest": "bf4dbb751f21ab05e76bc43a6f85288844d2f8a6e3cc2ddd3e671b585357cfd7",
+      "buildId": "019ba25fbcea817acb3c7984234fe0c6",
+      "mcpToolCount": 220,
+      "currentCheck": true,
+      "invalidCandidates": 0,
+      "stdioHandshake": true,
+      "workQueueToolListed": true
+    },
+    "isolatedPackageSmoke": {
+      "path": "docs/evidence/isolated-package-smoke-20260809T234949877Z-36303-42a2d294.json",
+      "sha256": "3aed601e1e02465af6923c6c66498979209cc0674f4004c1392dd53062718301",
+      "status": "passed",
+      "uiLaunches": 4,
+      "showEvents": 0,
+      "focusEvents": 0,
+      "forceTerminations": 0,
+      "lingeringProcesses": 0
+    }
+  },
+  "installation": {
+    "path": "/Applications/AI 漫剧画布.app",
+    "architecture": "arm64",
+    "developerIdDeepStrict": true,
+    "notarized": false,
+    "mainExecutableSha256": "13f5c26d8a3ed389a2a4ad03ff5236fbe60a68a6b46b1522128f3f1cdd296fc3",
+    "appAsarSha256": "92b27f97f619894581f8266f56104069e08adb707f2d846b68ec51f24d8c17e9",
+    "verificationEvidence": "docs/evidence/installed-local-verify-20260809T235436Z-bf4dbb75.json",
+    "verificationEvidenceSha256": "37a5461bf59d4cd083d141564bd9200b00e9738940aed0adc4693c8f902168bf",
+    "backgroundShowEvents": 0,
+    "backgroundFocusEvents": 0,
+    "naturalExitMilliseconds": 53,
+    "rollbackCopy": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260810-075412-bf4dbb75/previous-installed/AI 漫剧画布.app"
+  },
+  "notCompleted": [
+    "Higgsfield connector does not currently prove Unlimited zero-credit execution for the requested models",
+    "no real remote image or video job was created",
+    "remote polling, result download, media validation, CAS import, timeline binding and Review writeback remain a separate slice"
+  ],
+  "boundaries": {
+    "localOnly": true,
+    "formalProjectWritten": false,
+    "formalMediaWritten": false,
+    "gitStaged": false,
+    "gitCommitted": false,
+    "gitPushed": false,
+    "published": false
+  }
+}

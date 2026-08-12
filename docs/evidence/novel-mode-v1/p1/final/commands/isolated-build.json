@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "p1-isolated-build-final-v2",
+  "status": "pass",
+  "startedAt": "2026-08-01T10:08:34.820Z",
+  "endedAt": "2026-08-01T10:09:02.825Z",
+  "durationMs": 28099,
+  "argv": [
+    "npx",
+    "tsx",
+    "scripts/build-novel-mode-isolated.ts",
+    "--snapshot-root",
+    "/tmp/novel-mode-isolated-build.eFDD1m",
+    "--protected-pid",
+    "51269"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "293b50202680f19fc069208392fef394",
+      "sourceDigest": "2f158843a10205128a0d0d36e0f5d934832e50608a46e79b9b44fbc837696ff2"
+    },
+    "after": {
+      "buildId": "293b50202680f19fc069208392fef394",
+      "sourceDigest": "2f158843a10205128a0d0d36e0f5d934832e50608a46e79b9b44fbc837696ff2"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/novel-mode-v1/p1/final/commands/isolated-build.log",
+    "sizeBytes": 28572,
+    "sha256": "e5b44ab94f8345e3e5e9bcade3f97cf208d6ffc2027098241ab320147b59177c"
+  }
+}

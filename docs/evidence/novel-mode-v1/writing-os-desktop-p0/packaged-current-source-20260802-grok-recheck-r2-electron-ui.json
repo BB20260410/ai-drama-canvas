@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-02T11:37:35.991Z",
+  "status": "passed",
+  "transport": "packaged-electron-current-source",
+  "executablePath": "/private/tmp/aic-pkg-oLN6ct/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+  "userDataPath": "/private/tmp/aic-pkg-oLN6ct/t/ai-canvas-editor-effect-transition-ui-4nG8Un/project/electron-user-data",
+  "fixture": {
+    "root": "/private/tmp/aic-pkg-oLN6ct/t/ai-canvas-editor-effect-transition-ui-4nG8Un/project",
+    "registryPath": "/private/tmp/aic-pkg-oLN6ct/t/ai-canvas-editor-effect-transition-ui-4nG8Un/registry.json",
+    "editProjectId": "edit-57b0c977-942a-490d-aba2-23de86d86242",
+    "revision": 1,
+    "outgoingClipId": "clip-60b5c3b6-1527-49c4-9df5-1766197bade9",
+    "incomingClipId": "clip-c426d0f1-fb76-402e-97ad-b25d1fdf11f1",
+    "inOffsetFrames": 3,
+    "outOffsetFrames": 5,
+    "timebase": {
+      "rateNumerator": 24,
+      "rateDenominator": 1
+    }
+  },
+  "inspector": {
+    "initial": {
+      "transition": "smpte_dissolve",
+      "inOffsetFrames": 3,
+      "outOffsetFrames": 5,
+      "playbackDisabled": true,
+      "keyframeDisabled": true
+    },
+    "restart": {
+      "inOffsetFrames": 2,
+      "outOffsetFrames": 4
+    }
+  },
+  "preview": {
+    "initial": {
+      "outgoing": {
+        "currentTime": 1.167,
+        "opacity": 0.625,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-oLN6ct%2Ft%2Fai-canvas-editor-effect-transition-ui-4nG8Un%2Fproject%2FEP01_15s_001_UI%E8%BD%AC%E5%9C%BA%E5%89%8D%E9%A1%B9%2FEP01_15s_001_v1.mp4"
+      },
+      "incoming": {
+        "currentTime": 0.167,
+        "opacity": 0.375,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-oLN6ct%2Ft%2Fai-canvas-editor-effect-transition-ui-4nG8Un%2Fproject%2FEP01_15s_002_UI%E8%BD%AC%E5%9C%BA%E5%90%8E%E9%A1%B9%2FEP01_15s_002_v1.mp4"
+      }
+    },
+    "afterRedo": {
+      "outgoing": {
+        "currentTime": 1.167,
+        "opacity": 0.625,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-oLN6ct%2Ft%2Fai-canvas-editor-effect-transition-ui-4nG8Un%2Fproject%2FEP01_15s_001_UI%E8%BD%AC%E5%9C%BA%E5%89%8D%E9%A1%B9%2FEP01_15s_001_v1.mp4"
+      },
+      "incoming": {
+        "currentTime": 0.167,
+        "opacity": 0.375,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-oLN6ct%2Ft%2Fai-canvas-editor-effect-transition-ui-4nG8Un%2Fproject%2FEP01_15s_002_UI%E8%BD%AC%E5%9C%BA%E5%90%8E%E9%A1%B9%2FEP01_15s_002_v1.mp4"
+      }
+    },
+    "afterApplicationRestart": {
+      "outgoing": {
+        "currentTime": 1.167,
+        "opacity": 0.666667,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-oLN6ct%2Ft%2Fai-canvas-editor-effect-transition-ui-4nG8Un%2Fproject%2FEP01_15s_001_UI%E8%BD%AC%E5%9C%BA%E5%89%8D%E9%A1%B9%2FEP01_15s_001_v1.mp4"
+      },
+      "incoming": {
+        "currentTime": 0.165999,
+        "opacity": 0.333333,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-oLN6ct%2Ft%2Fai-canvas-editor-effect-transition-ui-4nG8Un%2Fproject%2FEP01_15s_002_UI%E8%BD%AC%E5%9C%BA%E5%90%8E%E9%A1%B9%2FEP01_15s_002_v1.mp4"
+      }
+    }
+  },
+  "revisions": {
+    "fixture": 1,
+    "saved": 2,
+    "undone": 3,
+    "redone": 4,
+    "afterApplicationRestart": 4
+  },
+  "undoRedo": {
+    "undoRestoredOffsets": [
+      3,
+      5
+    ],
+    "redoRestoredOffsets": [
+      2,
+      4
+    ]
+  },
+  "otioExport": {
+    "path": "/private/tmp/aic-pkg-oLN6ct/t/ai-canvas-editor-effect-transition-ui-4nG8Un/project/.aicanvas/editor/otio/UI 标准 Effect Transition_r4_1785670652817.otio",
+    "transition": {
+      "OTIO_SCHEMA": "Transition.1",
+      "name": "SMPTE Dissolve",
+      "transition_type": "SMPTE_Dissolve",
+      "in_offset": {
+        "OTIO_SCHEMA": "RationalTime.1",
+        "value": 2,
+        "rate": 24
+      },
+      "out_offset": {
+        "OTIO_SCHEMA": "RationalTime.1",
+        "value": 4,
+        "rate": 24
+      },
+      "enabled": true,
+      "metadata": {
+        "aicanvas": {
+          "contract": "aicanvas.otio-effect-transition.v1"
+        }
+      }
+    },
+    "contract": "aicanvas.otio-effect-transition.v1"
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/novel-mode-v1/writing-os-desktop-p0/packaged-current-source-20260802-grok-recheck-r2-electron-ui.png",
+    "bytes": 252811,
+    "sha256": "5bf77d71fad65a978cd61669e157d080b81088b5c02fed6a00922dd0b4bdfad1",
+    "width": 1560,
+    "height": 980,
+    "captureAttempt": 1,
+    "content": {
+      "pixels": 1528800,
+      "brightRatio": 0.19925104657247514,
+      "chromaticRatio": 0.05061420722135008
+    }
+  },
+  "pageErrors": [],
+  "sourceHashes": {
+    "src/core/types.ts": "82384e95a925a17beb329a4d40b82bb7bcab411d8930d9b005672d1df4443cb9",
+    "src/core/editor.ts": "6e26bbe5a876f4d07f018b3730da9533791a14cab6f21bdf53e9e381f204ec0a",
+    "src/core/codex.ts": "452c5be712bdb8c5cc677e0270f9fa666d6262679a52bf795140c35a2f0420de",
+    "src/mcp/server.ts": "c180920b84526e0c7ec183eaac276876029226c3829f0c4e3f09ebc8955dc85f",
+    "src/renderer/src/components/VideoEditorView.vue": "be4483f1d828f1664f6b806dc30c2955f4e159c9ed60a8b8a1472a94991ad236",
+    "scripts/create-effect-transition-ui-fixture.ts": "2bf0c2f4e3a5d46b0b72ca7c82e035e0d6010cea739d98f3176ff86f5f39294a",
+    "scripts/ui-editor-effect-transition-smoke.mjs": "27fd10c6647574f87ebdb6ab52b9ee2dbbcf8642f25d711e6c11e14fb3d4ece8"
+  },
+  "terminal": {
+    "rootRemoved": true,
+    "registryRemoved": true,
+    "userDataRemoved": true
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-lite-long1m-electron-smoke",
+  "verdict": "PASS",
+  "capturedAt": "2026-08-09T08:01:40.763Z",
+  "scope": {
+    "profile": "long1m",
+    "targetCharacters": 1000000,
+    "chapterCount": 500,
+    "originalSourceReadOnly": true,
+    "remoteServicesUsed": false,
+    "installedApplicationReplaced": false
+  },
+  "timingsMs": {
+    "preflight": 30,
+    "import": 46388,
+    "workspaceReady": 2348,
+    "fullTextSearch": 1017,
+    "editSave": 4413
+  },
+  "runtimeState": {
+    "projectId": "project-60c8e9810204",
+    "chapterCount": 500,
+    "totalCharacters": 999013,
+    "manifestRevision": 2,
+    "navigationDom": {
+      "volumeButtons": 1,
+      "chapterButtons": 100
+    },
+    "searchConsistency": {
+      "durationMs": 173,
+      "manifestRevision": 2,
+      "scannedChapters": 500,
+      "skippedExternalChanges": 0,
+      "hitCount": 1
+    }
+  },
+  "sourceIdentity": {
+    "bytes": 2990000,
+    "sha256": "4d04fd9aa17d197e7614e3f95e3de004817caa1d3d106ec40e7d21b96bfde4c6"
+  },
+  "sourceStableAfterImportAndUi": true,
+  "diagnostics": {
+    "pageErrors": [],
+    "consoleErrors": [],
+    "externalRequests": []
+  },
+  "screenshot": {
+    "relativePath": "docs/evidence/novel-mode-lite-v1/full-review-pagination-20260809.png",
+    "bytes": 620618,
+    "sha256": "e047d92267fef0f4107eb71a7fc229ea7847cb04bc7062dd068bdf56b1300973",
+    "width": 1728,
+    "height": 1029,
+    "entropy": 3.0663126585113787
+  }
+}

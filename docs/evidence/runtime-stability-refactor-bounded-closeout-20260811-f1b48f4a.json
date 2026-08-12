@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-stability-refactor-bounded-closeout",
+  "createdAt": "2026-08-11T02:28:17.037Z",
+  "status": "partial_blocked",
+  "softwareGoalId": "runtime-stability-refactor-v1",
+  "sourceIdentity": {
+    "version": "0.2.0",
+    "sourceDigest": "f1b48f4a982831765d03be5b43e21945d5c6585903a7b502ed560ce885da3ca1",
+    "buildId": "6ffb87211e92d54df036cfaecd2a725e",
+    "mcpToolCount": 220
+  },
+  "installedAppIdentity": {
+    "path": "/Applications/AI 漫剧画布.app",
+    "sourceDigest": "c9bb2c8788bc600e24d1952f696fb558d1fe6469fdf6afe0cf9b362547332942",
+    "buildId": "02a1bf9d8764bff2fb960be0cad17cd4",
+    "mcpToolCount": 220,
+    "updatedByThisRun": false,
+    "closed": true
+  },
+  "issues": [
+    {
+      "issueId": "P1-NOVEL-PATH-BINDING-01",
+      "severity": "P1",
+      "status": "completed",
+      "rootCause": "小说分析任务曾信任可篡改的绝对路径，任务目录软链和预检后绑定漂移可导致越界写入或读取错误正文。",
+      "affectedFiles": [
+        "src/core/novel-analysis-task-binding.ts",
+        "src/core/novel-analysis.ts",
+        "src/core/novel-analysis-provider.ts",
+        "src/core/story.ts"
+      ],
+      "before": "软链任务目录可写到工程外；预检后替换任务路径仍可能产生外部 POST。",
+      "after": "任务路径由受限 ID 派生并 no-replace 写入；Story/章节证据分类稳定；execution intent 前在锁内复验完整绑定，漂移时零 POST。",
+      "testResults": "独立安全定向与相邻回归通过，最终复核 CLEAN。"
+    },
+    {
+      "issueId": "P1-HIGGSFIELD-SELF-ATTESTATION-01",
+      "severity": "P1",
+      "status": "completed",
+      "rootCause": "普通 MCP 调用方能够提交自洽但不可证明来自供应方的 Unlimited/零扣费声明。",
+      "affectedFiles": [
+        "src/core/studio-higgsfield-connector-queue.ts",
+        "src/core/studio-command-runtime.ts",
+        "src/core/command-bus.ts",
+        "src/mcp/server.ts"
+      ],
+      "before": "调用方可用公开字段自行构造 capability/zero-credit 观察并尝试取得一次性授权。",
+      "after": "不可信的公开写命令不再具备外部调用授权效力；队列只保留失败关闭的诊断投影，真实程序化 Unlimited 继续由供应方能力阻断。",
+      "testResults": "定向合同测试与独立复核通过。"
+    },
+    {
+      "issueId": "P2-EDITOR-MEDIA-PAGINATION-01",
+      "severity": "P2",
+      "status": "completed",
+      "rootCause": "剪辑台媒体列表每次全量读取、物化和排序，且同工程连续刷新存在迟到结果覆盖新结果的窗口。",
+      "affectedFiles": [
+        "src/core/editor.ts",
+        "src/renderer/src/components/VideoEditorView.vue"
+      ],
+      "before": "翻页重复解析全量索引；并发刷新没有完整的 root/scan/sequence 回填门禁。",
+      "after": "采用有界进程内快照查询缓存、游标绑定文件身份及 latest-wins 回填门禁；搜索和分类切换重置分页。",
+      "testResults": "分页、游标、缓存漂移和 UI 相邻测试通过。"
+    },
+    {
+      "issueId": "PERF-PROJECTION-BUNDLE-01",
+      "severity": "P2",
+      "status": "completed_with_measured_gain",
+      "rootCause": "生产投影 bundle 重复执行 unit dashboard/freeze 深查询。",
+      "affectedFiles": [
+        "src/core/studio-production-projection-bundle.ts",
+        "src/core/studio-production-dashboard.ts",
+        "src/core/studio-projection-phase-timeline.ts"
+      ],
+      "before": {
+        "coreTotalMs": 2945.26,
+        "panelFanoutMs": 1404.7
+      },
+      "after": {
+        "coreTotalMs": 2401.39,
+        "panelFanoutMs": 1049.18
+      },
+      "performanceDelta": {
+        "coreTotalPercent": -18.5,
+        "panelFanoutPercent": -25.3,
+        "scope": "同一确定性夹具单次前后对照，不外推为所有项目的通用比例"
+      },
+      "testResults": "投影内容、blocked stamp/fingerprint 等价与阶段探针测试通过；独立复核 CLEAN。"
+    },
+    {
+      "issueId": "PERF-FIRST-COLD-CANVAS-01",
+      "severity": "P2",
+      "status": "blocked",
+      "rootCause": "冷启动的初始单元/概览与深投影链仍含高延迟同步 SQLite/投影阶段；两轮请求排序与去重优化后仍未满足严格首卡和首张原图预算。",
+      "affectedFiles": [
+        "src/renderer/src/components/ManagedStudioCanvasView.vue",
+        "src/preload/t23-ipc-performance-probe.ts",
+        "scripts/t23-scale-performance-dev-smoke.ts"
+      ],
+      "before": {
+        "evidence": "docs/evidence/runtime-stability-t23-phases-final-20260811T021900Z-f5fee3b7.json",
+        "rendererFirstCardMs": 4564,
+        "rendererFirstRawMs": 7238,
+        "rendererAllPassReferencesMs": 10649,
+        "peakOutstandingProjectionIpc": 3
+      },
+      "after": {
+        "evidence": "docs/evidence/runtime-stability-t23-phases-correction-final-20260811T022806Z-f1b48f4a.json",
+        "rendererFirstCardMs": 3339,
+        "rendererFirstRawMs": 5647,
+        "rendererAllPassReferencesMs": 7473,
+        "peakOutstandingProjectionIpc": 4,
+        "projectionCoreTotalMs": 5673.20175
+      },
+      "performanceDelta": {
+        "rendererFirstCardMs": -1225,
+        "rendererFirstCardPercent": -26.8,
+        "rendererFirstRawMs": -1591,
+        "rendererFirstRawPercent": -22.0,
+        "rendererAllPassReferencesMs": -3176,
+        "rendererAllPassReferencesPercent": -29.8
+      },
+      "failedBudgets": [
+        "rendererFirstCardMs 3339 > 1500",
+        "rendererFirstRawMs 5647 > 5000"
+      ],
+      "passedRuntimeChecks": [
+        "36/36 单元投影",
+        "4/4 raw 与 4/4 references 唯一且可解码",
+        "全部 references 7473ms <= 8000ms",
+        "IPC peak 4 <= 4 且 outstanding 归零",
+        "暖切 p95 98.53ms",
+        "缩放反馈 p95 59.96ms",
+        "拖拽反馈 p95 2.85ms",
+        "平移 119.19fps、帧 p95 9.5ms",
+        "long tasks 0、page/console errors 0"
+      ],
+      "blocker": "已达到两轮纠正上限；按防循环合同不再做第三次修改或 T23 重跑。"
+    }
+  ],
+  "testsRun": [
+    "最终有界矩阵：17 files / 178 tests PASS",
+    "独立相邻复验：6 files / 31 tests PASS",
+    "T23 探针与清理：2 files / 21 tests PASS",
+    "受管画布加载顺序：1 file / 37 tests PASS",
+    "npm run typecheck PASS",
+    "npm run typecheck:app PASS",
+    "npm run build PASS",
+    "npm audit --omit=dev --registry=https://registry.npmjs.org：0 vulnerabilities",
+    "git diff --check PASS",
+    "最终隐藏 T23 strict/interactions：FAIL（仅两个冷路径预算）"
+  ],
+  "finalReview": "selected P1 and implemented projection/probe/cleanup slices CLEAN; final cold-path runtime gate remains blocked by measured budgets",
+  "packageSmoke": {
+    "status": "not_run",
+    "reason": "源码运行门 T23 未通过；合同要求不得进入唯一 package smoke。"
+  },
+  "installation": {
+    "status": "not_updated",
+    "reason": "package smoke 未执行，因此不得打包、签名或替换已安装 App。"
+  },
+  "dataIntegrity": {
+    "formalProjectWrites": 0,
+    "formalAssetWrites": 0,
+    "casWrites": 0,
+    "reviewWrites": 0,
+    "temporaryFixturesOnly": true
+  },
+  "externalSideEffects": {
+    "paidCalls": 0,
+    "uploads": 0,
+    "externalGeneration": 0,
+    "publications": 0,
+    "notarization": 0
+  },
+  "git": {
+    "stage": 0,
+    "commit": 0,
+    "push": 0
+  },
+  "cleanup": {
+    "t23OwnedProcesses": 0,
+    "t23TemporaryRoots": 0,
+    "appClosed": true
+  },
+  "remainingRisks": [
+    "冷启动首卡和首张原图仍超过严格预算。",
+    "GlobalResource hidden harness 默认输出名的并发 no-clobber P2 仍 deferred。",
+    "当前源码构建未进入 package smoke，也未安装；日常 App 仍为 c9bb2c87… 已验收版本。"
+  ]
+}

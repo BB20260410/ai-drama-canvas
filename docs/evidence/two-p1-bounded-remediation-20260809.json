@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "kind": "two-p1-bounded-remediation-evidence",
+  "generatedAt": "2026-08-09T14:19:19Z",
+  "status": "blocked",
+  "scope": {
+    "requestedP1": [
+      "novel-analysis-remote-submit-reconciliation",
+      "packaged-app-graceful-close"
+    ],
+    "fastOrMediumRerun": false,
+    "finalCandidateBuildInvocations": 1,
+    "isolatedPackageSmokeInvocations": 1
+  },
+  "novelAnalysis": {
+    "status": "passed",
+    "remotePostCount": 1,
+    "failureClassification": "submission_unknown",
+    "replacementWithoutConfirmationRejected": true,
+    "secondExecuteRejected": true,
+    "test": {
+      "file": "tests/novel-analysis-provider.test.ts",
+      "files": 1,
+      "tests": 10,
+      "passed": 10
+    },
+    "independentReview": "clean"
+  },
+  "appClose": {
+    "targetedStatus": "passed",
+    "finalPhysicalStatus": "failed",
+    "targetedTests": {
+      "newCloseContracts": {
+        "files": 3,
+        "tests": 9,
+        "passed": 9
+      },
+      "impactSet": {
+        "files": 9,
+        "tests": 36,
+        "passed": 36,
+        "note": "首次 35/36；唯一失败为旧源码字符串断言，校正聚合 owner 合同后失败文件 3/3 通过。"
+      },
+      "editorCore": {
+        "files": 1,
+        "tests": 14,
+        "passed": 14
+      }
+    },
+    "staticChecks": {
+      "typecheck": "passed",
+      "typecheckApp": "passed",
+      "partitionAuditOnly": "passed",
+      "nodeCheckScripts": 3,
+      "gitDiffCheck": "passed"
+    }
+  },
+  "candidate": {
+    "status": "passed",
+    "candidateId": "mcp-candidate-2f88613d1365f227-387e092d86f5b405-ac04465b",
+    "sourceDigest": "2f88613d1365f22726f36c904c3714711833a44671fa93ab606745cf7fcadbd3",
+    "buildId": "61de78028943d439a24fb437975704bb",
+    "toolCount": 218,
+    "runtimeTreeFingerprint": "387e092d86f5b405dfad5a5c8f0b636c9ba55f6da4712d49ed0bcf26d766b152",
+    "dependencyClosureFingerprint": "cfa0faaf83fd7294fd98a7a195faee8e0a8f72effc0fd51dfe15b161eef0985c",
+    "currentCheck": {
+      "ok": true,
+      "inspectedCandidates": 3,
+      "invalidCandidates": 0
+    },
+    "sdkHandshake": {
+      "status": "passed",
+      "toolCount": 218,
+      "resourcesListed": true,
+      "resourceTemplatesListed": true,
+      "promptsListed": true
+    }
+  },
+  "isolatedPackageSmoke": {
+    "status": "failed",
+    "command": "npm run package:isolated-smoke",
+    "invocations": 1,
+    "failedStage": "packaged Effect/Transition Electron UI final graceful close",
+    "timeoutMs": 20000,
+    "rootPid": 67601,
+    "closePhases": [
+      "awaiting_renderer",
+      "renderer_approved",
+      "exiting"
+    ],
+    "forceCleanup": {
+      "forceTerminated": true,
+      "forceKilled": true,
+      "exited": true,
+      "countedAsPass": false
+    },
+    "primaryObservedError": "chokidar UNKNOWN while watching project/electron-user-data/SingletonSocket",
+    "rootCause": [
+      "Effect smoke placed Chromium userData inside the recursively watched project root.",
+      "The second launch reused that profile and exposed SingletonSocket to the legacy chokidar watcher.",
+      "The final before-quit path still permits unbounded or duplicate fire-and-forget watcher close outside the staged cleanup owner."
+    ],
+    "rendererAckReached": true,
+    "dirtyGateFailure": false,
+    "playwrightCloseFailure": false,
+    "temporaryRootRemoved": true,
+    "residualProcesses": 0,
+    "evidenceJsonWrittenBySmoke": false
+  },
+  "silentExecution": {
+    "requestArrivedAfterSmokeHadAlreadyLaunchedElectron": true,
+    "runningTestPidHiddenImmediately": 67601,
+    "hideCommandSucceeded": true,
+    "currentVisibleTestWindows": 0
+  },
+  "boundaries": {
+    "installedAppExecutableSha256Before": "e308b8b40ad5421769a0c48a71f38ce0af9983b8fe566406b0c82b6335b17e0b",
+    "installedAppExecutableSha256After": "e308b8b40ad5421769a0c48a71f38ce0af9983b8fe566406b0c82b6335b17e0b",
+    "installedAppReplaced": false,
+    "formalProjectsModified": false,
+    "formalAssetsModified": false,
+    "gitStageCommitPush": false
+  },
+  "nextAuthorityRequired": {
+    "reason": "The single authorized candidate build and isolated smoke have already been consumed; source repair would invalidate the current candidate and requires one new bounded candidate plus one new silent smoke.",
+    "requiredFixes": [
+      "Move Effect smoke userData beside the project root.",
+      "Make main watcher cleanup single-owner and idempotent, and bypass duplicate cleanup once phase is exiting.",
+      "Add error handling for legacy and semantic chokidar watchers."
+    ]
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "kind": "whole-project-behavior-preserving-refactor-phase-evidence",
+  "phase": "D",
+  "status": "passed",
+  "programStatus": "in_progress",
+  "completedAt": "2026-08-10T15:48:03Z",
+  "scope": {
+    "behaviorPreserving": true,
+    "databaseSchemaVersionBefore": 7,
+    "databaseSchemaVersionAfter": 7,
+    "databasePathChanged": false,
+    "formalProjectDatabaseOpened": false,
+    "formalProjectDataWritten": false
+  },
+  "changes": [
+    "extracted-generation-ledger-contract-with-compatible-reexports",
+    "extracted-v7-schema-bootstrap-storage-owner",
+    "moved-continuity-initialization-dependency-to-storage",
+    "removed-active-studio-four-module-runtime-cycle",
+    "added-error-class-hook-and-runtime-boundary-regressions"
+  ],
+  "identityContract": {
+    "schemaVersion": 7,
+    "databaseRelativePath": ".aicanvas/studio-generation-ledger.sqlite",
+    "createCurrentSchemaSha256": "dda5eefdcb742dc52fa35ca9520656ee2d713090b396cdd55d252c65b9be07c8",
+    "byteEqualSchemaAndMigrationFunctions": 9,
+    "generationBusyTimeoutMs": 120000,
+    "continuityBusyTimeoutMs": 5000,
+    "errorClassConstructorIdentityPreserved": true,
+    "writableOpenHookSingletonPreserved": true,
+    "imagegenIntentHookRemainsBusinessOwned": true
+  },
+  "dependencyGraph": {
+    "activeStudioRuntimeSccBefore": 4,
+    "activeStudioRuntimeSccAfter": 0,
+    "remainingRuntimeSccCount": 1,
+    "remainingRuntimeSccSize": 15,
+    "remainingRuntimeSccKind": "legacy-fusion"
+  },
+  "verification": {
+    "sourceBoundaries": { "tests": 7, "status": "passed" },
+    "generationLedger": { "tests": 35, "status": "passed" },
+    "continuityAdjacent": { "files": 3, "tests": 23, "status": "passed" },
+    "mainAdjacentReplay": { "files": 4, "tests": 30, "status": "passed" },
+    "schemaMigrationByteComparison": { "functions": 9, "status": "passed" },
+    "typecheck": "passed",
+    "typecheckApp": "passed",
+    "diffCheck": "passed",
+    "independentReview": "clean-sol-final-max"
+  },
+  "fileHashes": {
+    "src/core/studio-generation-ledger-contract.ts": "bcf3495479f4aa962b1536649b2cbda967571e9de94d4d529deb4cc8b10242a9",
+    "src/core/studio-generation-ledger-storage.ts": "e7cef66c5a6a27a437504ad5d5a9b3073737e819073f34b4375b9b8d50de569f",
+    "tests/source-module-boundaries.test.ts": "f85c5d49e69095725a30371634bee21b94714ae8861c8a2877348f3a75fcf30b"
+  },
+  "notRun": [
+    "full-test-partitions",
+    "production-build",
+    "immutable-mcp-candidate",
+    "isolated-package-smoke",
+    "installed-app-replacement"
+  ],
+  "boundaries": {
+    "externalCalls": 0,
+    "uploads": 0,
+    "paidGenerations": 0,
+    "gitStageCommitPush": 0,
+    "appLaunched": false,
+    "notarized": false
+  },
+  "roadmap": "docs/全项目行为保持重构路线图_20260810.md"
+}

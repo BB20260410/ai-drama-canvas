@@ -1,0 +1,110 @@
+[
+  {
+    "chapterId": "92c7aa53-32d0-52d2-8cb6-1a62d7f5bc9f",
+    "title": "第001章 缴费单与黑页",
+    "revision": 1,
+    "sha256": "c182ad81e2cb5337e5399b3fee896bf5d0876a6e08fae931122ea4ed4135ff92",
+    "charCount": 3662,
+    "order": 0,
+    "byteLength": 10242
+  },
+  {
+    "chapterId": "d9e2b422-6912-5e10-9c97-116bd6e71e46",
+    "title": "第002章 皮鞋与工牌",
+    "revision": 1,
+    "sha256": "9c5f25e0e17a28942af9abed9bf9eb798be85e0a23b3474525c45e56445edfdf",
+    "charCount": 3649,
+    "order": 1,
+    "byteLength": 10237
+  },
+  {
+    "chapterId": "de1efe1e-c53e-52c8-9a23-b588e507fa61",
+    "title": "第003章 您再想想",
+    "revision": 1,
+    "sha256": "cee4a7c874d7ef03bd5cab9096691bc0bb12d1387340c948e12d710c99ca3e01",
+    "charCount": 3219,
+    "order": 2,
+    "byteLength": 9059
+  },
+  {
+    "chapterId": "9b0379b4-78d2-5a6d-b857-0045b267b828",
+    "title": "第004章 阿大的旧账",
+    "revision": 1,
+    "sha256": "68f25635d31e50723e42851266d6dd298c23e6f527136e48c74066fa5018cfed",
+    "charCount": 3388,
+    "order": 3,
+    "byteLength": 9526
+  },
+  {
+    "chapterId": "03327bf2-bb69-5233-ab13-7909a34f9769",
+    "title": "第005章 夜班债纹",
+    "revision": 1,
+    "sha256": "1c74d0f9cff2850a85534b86194cb8616bd4642e3287a8224f5c3db0ee1face8",
+    "charCount": 3269,
+    "order": 4,
+    "byteLength": 9284
+  },
+  {
+    "chapterId": "68797693-d86b-5eab-930d-e7e5a5808fb1",
+    "title": "第006章 春禾镜头",
+    "revision": 1,
+    "sha256": "f67219679b4984732c5d9cf289ea21a51f099a6a363c2737629050362ac0eaba",
+    "charCount": 3273,
+    "order": 5,
+    "byteLength": 9117
+  },
+  {
+    "chapterId": "53caf6ef-2347-591b-b0d0-6867caf881f2",
+    "title": "第007章 肖龙",
+    "revision": 1,
+    "sha256": "e996e19edad51929e1f8bd31b30b472be16ef984d153bf4cc22718d202bdff21",
+    "charCount": 2960,
+    "order": 6,
+    "byteLength": 8356
+  },
+  {
+    "chapterId": "02c68950-c8ad-587f-9c99-ed66ab8bb96e",
+    "title": "第008章 指动",
+    "revision": 1,
+    "sha256": "06286b8453e8c0d6a1dffb7401934b70bf07292893c68f22b35091840fda1243",
+    "charCount": 2743,
+    "order": 7,
+    "byteLength": 7647
+  },
+  {
+    "chapterId": "ecb4e08f-4107-53d9-908e-a24504e8ac6a",
+    "title": "第009章 尾号093",
+    "revision": 1,
+    "sha256": "1552a4a3f7d8a4dce1cec0b48ca2fcb90772490c14750de4de086a9525ea225d",
+    "charCount": 3405,
+    "order": 8,
+    "byteLength": 9229
+  },
+  {
+    "chapterId": "3698fec0-3b81-533a-aa85-6acbc9904453",
+    "title": "第010章 八点前",
+    "revision": 1,
+    "sha256": "06c3aae0fe87652341f498db5b5ea671fcbc217bb6c8bc540e9128c3e7323119",
+    "charCount": 3139,
+    "order": 9,
+    "byteLength": 8801
+  },
+  {
+    "chapterId": "c617bef1-6979-536c-9360-ba0945102bc4",
+    "title": "第011章 方案（隔离演练）",
+    "revision": 2,
+    "sha256": "bd69e411aa746ff73f4f4ff405edc4b182cf50391f8e6284c7834de1dd00323f",
+    "charCount": 56,
+    "order": 10,
+    "byteLength": 162
+  },
+  {
+    "chapterId": "f4ff96c2-8338-5330-bf50-98c519ce0306",
+    "title": "第012章 幕一尾钩（隔离演练）",
+    "revision": 1,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "charCount": 0,
+    "order": 11,
+    "byteLength": 0
+  }
+]

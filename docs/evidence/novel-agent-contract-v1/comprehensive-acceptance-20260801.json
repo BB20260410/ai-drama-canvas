@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-agent-comprehensive-acceptance",
+  "generatedAt": "2026-08-01T18:10:35Z",
+  "verdict": "PASS",
+  "summary": {
+    "sourceContractPassed": true,
+    "freshBuildPassed": true,
+    "currentLiveMcpUpdated": true,
+    "oldRuntimePreventionEnabled": true,
+    "millionCharacterWorkflowPassed": true,
+    "p0Open": 0,
+    "p1Open": 0,
+    "p2Open": 0
+  },
+  "contract": {
+    "name": "aicanvas.novel-agent",
+    "schemaVersion": 1,
+    "sharedReadService": true,
+    "mcpReadTools": 5,
+    "managedWriteCommands": 8,
+    "secondAuthorityStoreAdded": false,
+    "humanUiExpandedByRemediation": false
+  },
+  "tests": {
+    "partitionAudit": {
+      "status": "PASS",
+      "allFiles": 340,
+      "fastFiles": 210,
+      "mediumFiles": 90,
+      "integrationFiles": 35,
+      "heavyFiles": 5,
+      "fingerprint": "edccb92df6e9b6f49c8d4195fae9f9098f3d0987b7c4ffffae5cdb12ae688b08"
+    },
+    "novelAndDependenciesBaseline": {
+      "status": "PASS",
+      "files": 30,
+      "tests": 279,
+      "passed": 279,
+      "failed": 0
+    },
+    "remediationDirected": {
+      "status": "PASS",
+      "files": 9,
+      "tests": 31,
+      "passed": 31,
+      "failed": 0,
+      "durationMilliseconds": 10190
+    },
+    "fastPartition": {
+      "status": "PASS",
+      "files": 210,
+      "tests": 1144,
+      "passed": 1144,
+      "failed": 0,
+      "pending": 0,
+      "durationMilliseconds": 236530,
+      "originalFailedFilesNowPassing": [
+        "tests/p13-desktop-production-loop-ui.test.ts",
+        "tests/packaged-mcp-runtime.test.ts",
+        "tests/script-recursive-cleanup-contract.test.ts"
+      ]
+    },
+    "typecheck": {
+      "status": "PASS",
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    "packagedMcpRuntime": {
+      "status": "PASS",
+      "tests": 1,
+      "toolCount": 207,
+      "requiredNovelToolsPresent": 5
+    }
+  },
+  "agentSmoke": {
+    "evidenceRelativePath": "docs/evidence/novel-agent-contract-v1/ai-first-v1-acceptance-r4.json",
+    "evidenceSha256": "317305c2732934fe6c7e8a596b79b7c6f3ef386e32c3a1dc7330f1bd87dda1ad",
+    "status": "PASS",
+    "mcpToolCount": 207,
+    "shortReadEquivalence": {
+      "workspace": true,
+      "list": true,
+      "range": true,
+      "search": true,
+      "context": true
+    },
+    "crossInterfaceIdempotentReplay": true,
+    "staleCasRejected": true,
+    "million": {
+      "sourceUtf16Characters": 1000000,
+      "chapters": 500,
+      "hotSearchMilliseconds": 90,
+      "scannedChapters": 500,
+      "skippedExternalChanges": 0,
+      "hitCount": 1,
+      "contextLocatorRoundTrip": true,
+      "sourceUnchanged": true
+    }
+  },
+  "currentCandidate": {
+    "status": "CURRENT",
+    "candidateId": "mcp-candidate-dc83a3bfcd946134-b4ada03692a089a0-d7c158e3",
+    "sourceDigest": "dc83a3bfcd946134b55671f68834f7eda13667b420e41a219072978374ee621c",
+    "sourceFiles": 935,
+    "sourceBytes": 18941955,
+    "buildId": "888504be50c74ed9e5be526da817d58d",
+    "mcpToolCount": 207,
+    "builtAt": "2026-08-01T17:57:35.220Z",
+    "entrySha256": "4fc9cd250ffe77e3f2bba29a935e18c459be4fab44db2ec90e970e112b8c21fd",
+    "runtimeTree": {
+      "files": 426,
+      "bytes": 12648384,
+      "fingerprint": "b4ada03692a089a0a35b0be2211f10c1870a7b5ef6f7a84eeb3423d957816d79"
+    }
+  },
+  "deployment": {
+    "status": "PASS",
+    "liveManifestToolCount": 207,
+    "liveManifestBuildId": "888504be50c74ed9e5be526da817d58d",
+    "liveTreeMatchesCandidate": true,
+    "oldRuntimeBackup": ".aicanvas-runtime/mcp-live-backups/2026-08-01T17-57-35Z-dc83a3bf",
+    "oldRuntimeBackupToolCount": 202,
+    "terminatedOldMcpPids": [8162, 51269, 16916]
+  },
+  "oldRuntimePrevention": {
+    "status": "PASS",
+    "launcher": "scripts/launch-current-mcp-candidate.ts",
+    "selectionOwner": "src/core/current-mcp-runtime.ts",
+    "candidateIntegrityOwner": "src/core/immutable-mcp-runtime-candidate.ts",
+    "policy": "Only a sealed candidate matching live sourceDigest, source files, source bytes, and declared MCP tool count may start; otherwise startup exits before handshake.",
+    "missingCandidateExitCode": 1,
+    "missingCandidateErrorCode": "CURRENT_MCP_CANDIDATE_NOT_FOUND",
+    "recoveryCommand": "npm run mcp:candidate:build"
+  },
+  "agentConnections": {
+    "codexConfiguredToStableLauncher": true,
+    "grokConfiguredToStableLauncher": true,
+    "configModes": "0600",
+    "grokDoctor": {
+      "status": "PASS",
+      "handshake": true,
+      "toolCount": 207,
+      "healthyCount": 1,
+      "failingCount": 0
+    },
+    "newSessionEvidence": {
+      "codexCandidatePidObserved": 1991,
+      "grokCandidatePidObserved": 2979,
+      "candidateId": "mcp-candidate-dc83a3bfcd946134-b4ada03692a089a0-d7c158e3"
+    },
+    "configBackupDirectory": "/Users/hxx/.aicanvas/agent-config-backups/2026-08-01T17-57-35Z-workspace-current-launcher"
+  },
+  "resolvedFindings": [
+    {
+      "id": "P1-LIVE-MCP-STALE",
+      "previousPriority": "P1",
+      "status": "RESOLVED",
+      "evidence": "Live manifest/runtime now expose 207 tools; packaged Electron runtime passes; old 202-tool processes were terminated."
+    },
+    {
+      "id": "P2-FIRST-RUN-COPY-TEST",
+      "previousPriority": "P2",
+      "status": "RESOLVED",
+      "evidence": "Test now locks 新建本地工程 and 可选择小说或短剧; the full fast partition passes."
+    },
+    {
+      "id": "P2-RECURSIVE-CLEANUP-STATIC-CONTRACT",
+      "previousPriority": "P2",
+      "status": "RESOLVED",
+      "evidence": "Smoke removes the exact empty CAS leaf with non-recursive rmdir; no global exception was added; static owner test passes."
+    }
+  ],
+  "operationalNotes": [
+    "Two already-running Grok TUI sessions cached the former direct dist-mcp target. Their replacement child processes were created after the live 207-tool deployment, so they do not run the old 202-tool files; reopen those old Grok sessions to make their argv use the stable launcher.",
+    "New Codex and Grok sessions were observed using the stable launcher and current immutable candidate.",
+    "No medium, integration, or heavy partition was rerun in full; the complete fast partition, all novel dependency tests from the baseline, directed runtime tests, typecheck, real MCP sessions, and million-character smoke were covered."
+  ],
+  "notPerformed": [
+    "No Git stage, commit, push, pull request, external upload, publication, or paid model action was performed.",
+    "No user Grok or Codex host process was terminated; only exact MCP child processes were stopped.",
+    "No formal novel source or imported source document was modified."
+  ]
+}

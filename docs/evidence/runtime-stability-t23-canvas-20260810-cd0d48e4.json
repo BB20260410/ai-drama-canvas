@@ -1,0 +1,589 @@
+{
+  "schemaVersion": 1,
+  "kind": "t23-source-dev-scale-performance",
+  "status": "FAIL",
+  "ok": false,
+  "mode": "build",
+  "budgetProfile": "p7-strict",
+  "createdAt": "2026-08-10T13:26:38.907Z",
+  "fixture": {
+    "kind": "deterministic-synthetic-mechanical-fixture",
+    "visualAcceptance": false,
+    "aiImageGeneration": false,
+    "isolatedTemporaryProject": true,
+    "unitCount": 36,
+    "passRawCount": 4,
+    "note": "所有图均为 sharp 生成的可解码纯色 PNG；PASS 仅表示测试账本闭环，不代表视觉质量。"
+  },
+  "consoleErrors": [],
+  "pageErrors": [],
+  "performance": {
+    "ok": false,
+    "status": "FAIL",
+    "budget": {
+      "minUnitCount": 36,
+      "minProjectedUnitNodeCount": 36,
+      "minUniqueProjectedUnitNodeCount": 36,
+      "minPassRawCount": 4,
+      "minUniqueRawShaCount": 4,
+      "minUniqueRawUrlCount": 4,
+      "minReferenceCount": 4,
+      "minUniqueReferenceShaCount": 4,
+      "minUniqueReferenceUrlCount": 4,
+      "maxDevToolchainToCdpReadyMs": 30000,
+      "maxRendererFirstCardMs": 1500,
+      "maxRendererFirstRawMs": 5000,
+      "maxRendererAllPassReferencesMs": 8000,
+      "maxOutstandingProjectionIpc": 4
+    },
+    "measurements": {
+      "fixtureUnitCount": 36,
+      "projectedUnitNodeCount": 36,
+      "uniqueProjectedUnitNodeCount": 36,
+      "passRawCount": 4,
+      "uniqueRawShaCount": 4,
+      "uniqueRawUrlCount": 4,
+      "referenceCount": 4,
+      "uniqueReferenceShaCount": 4,
+      "uniqueReferenceUrlCount": 4,
+      "devToolchainToCdpReadyMs": 638,
+      "rendererFirstCardMs": 1747,
+      "rendererFirstRawMs": 3817,
+      "rendererAllPassReferencesMs": 3837,
+      "peakOutstandingProjectionIpc": 5
+    },
+    "checks": [
+      {
+        "id": "fixture-unit-count",
+        "status": "PASS",
+        "actual": 36,
+        "comparator": ">=",
+        "budget": 36
+      },
+      {
+        "id": "renderer-unit-node-count",
+        "status": "PASS",
+        "actual": 36,
+        "comparator": ">=",
+        "budget": 36
+      },
+      {
+        "id": "renderer-unique-unit-node-count",
+        "status": "PASS",
+        "actual": 36,
+        "comparator": ">=",
+        "budget": 36
+      },
+      {
+        "id": "fixture-pass-raw-count",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": ">=",
+        "budget": 4
+      },
+      {
+        "id": "fixture-unique-raw-sha-count",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": ">=",
+        "budget": 4
+      },
+      {
+        "id": "renderer-unique-raw-url-count",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": ">=",
+        "budget": 4
+      },
+      {
+        "id": "fixture-reference-count",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": ">=",
+        "budget": 4
+      },
+      {
+        "id": "fixture-unique-reference-sha-count",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": ">=",
+        "budget": 4
+      },
+      {
+        "id": "renderer-unique-reference-url-count",
+        "status": "PASS",
+        "actual": 4,
+        "comparator": ">=",
+        "budget": 4
+      },
+      {
+        "id": "dev-toolchain-to-cdp",
+        "status": "PASS",
+        "actual": 638,
+        "comparator": "<=",
+        "budget": 30000
+      },
+      {
+        "id": "renderer-first-card",
+        "status": "FAIL",
+        "actual": 1747,
+        "comparator": "<=",
+        "budget": 1500
+      },
+      {
+        "id": "renderer-first-raw",
+        "status": "PASS",
+        "actual": 3817,
+        "comparator": "<=",
+        "budget": 5000
+      },
+      {
+        "id": "renderer-all-pass-references",
+        "status": "PASS",
+        "actual": 3837,
+        "comparator": "<=",
+        "budget": 8000
+      },
+      {
+        "id": "peak-outstanding-projection-ipc",
+        "status": "FAIL",
+        "actual": 5,
+        "comparator": "<=",
+        "budget": 4
+      }
+    ]
+  },
+  "ui": {
+    "visibleUnitNodeCount": 2,
+    "projectedUnitNodeCount": 36,
+    "rendererProbe": {
+      "projectedUnitNodeCount": 36,
+      "uniqueProjectedUnitNodeCount": 36,
+      "passRawCount": 4,
+      "uniqueRawShaCount": 4,
+      "uniqueRawUrlCount": 4,
+      "referenceCount": 4,
+      "uniqueReferenceShaCount": 4,
+      "uniqueReferenceUrlCount": 4
+    },
+    "projectMetricsText": "项目概览 5 资产 36 单元 72 宫格 13 媒体 2 文稿 4 通过 0 待审 32 进行中 0 失败 0 阻塞 投影于 13:27:12 构建身份 v0.2.0 · buildId:53e9c474a4db · sourceDigest:cd0d48e4a208 详细诊断",
+    "buildIdentityText": "构建身份 v0.2.0 · buildId:53e9c474a4db · sourceDigest:cd0d48e4a208",
+    "rawSnapshot": {
+      "loading": false,
+      "unitNodeIds": [
+        "S1E01-U00",
+        "S1E01-U01",
+        "S1E01-U02",
+        "S1E01-U03",
+        "S1E01-U04",
+        "S1E01-U05",
+        "S1E01-U06",
+        "S1E01-U07",
+        "S1E01-U08",
+        "S1E01-U09",
+        "S1E01-U10",
+        "S1E01-U11",
+        "S1E01-U12",
+        "S1E01-U13",
+        "S1E01-U14",
+        "S1E01-U15",
+        "S1E01-U16",
+        "S1E01-U17",
+        "S1E01-U18",
+        "S1E01-U19",
+        "S1E01-U20",
+        "S1E01-U21",
+        "S1E01-U22",
+        "S1E01-U23",
+        "S1E01-U24",
+        "S1E01-U25",
+        "S1E01-U26",
+        "S1E01-U27",
+        "S1E01-U28",
+        "S1E01-U29",
+        "S1E01-U30",
+        "S1E01-U31",
+        "S1E01-U32",
+        "S1E01-U33",
+        "S1E01-U34",
+        "S1E01-U35"
+      ],
+      "allNodeIds": [
+        "prompt:prompt-main",
+        "script:script-main",
+        "asset:character-ahang",
+        "asset:character-t23-02",
+        "asset:character-t23-03",
+        "asset:character-t23-04",
+        "asset:prop-complete-mask",
+        "unit:S1E01-U00",
+        "media:unit-grid-raw:S1E01-U00",
+        "continuity:out:S1E01-U00",
+        "reference:S1E01-U00:unit-grid-reference-c19ad503bc7b4b9ed076e3da60540de6",
+        "unit:S1E01-U01",
+        "media:unit-grid-raw:S1E01-U01",
+        "continuity:out:S1E01-U01",
+        "reference:S1E01-U01:unit-grid-reference-492e3fbd23795141ddbf934c023ceb5a",
+        "unit:S1E01-U02",
+        "media:unit-grid-raw:S1E01-U02",
+        "continuity:out:S1E01-U02",
+        "reference:S1E01-U02:unit-grid-reference-70b2816cc1a88a73ffcc5e3f1d59b8e0",
+        "unit:S1E01-U03",
+        "media:unit-grid-raw:S1E01-U03",
+        "continuity:out:S1E01-U03",
+        "reference:S1E01-U03:unit-grid-reference-4f6f2c452434f5c95f3e66de48a8cb56",
+        "unit:S1E01-U04",
+        "unit:S1E01-U05",
+        "unit:S1E01-U06",
+        "unit:S1E01-U07",
+        "unit:S1E01-U08",
+        "unit:S1E01-U09",
+        "unit:S1E01-U10",
+        "unit:S1E01-U11",
+        "unit:S1E01-U12",
+        "unit:S1E01-U13",
+        "unit:S1E01-U14",
+        "unit:S1E01-U15",
+        "unit:S1E01-U16",
+        "unit:S1E01-U17",
+        "unit:S1E01-U18",
+        "unit:S1E01-U19",
+        "unit:S1E01-U20",
+        "unit:S1E01-U21",
+        "unit:S1E01-U22",
+        "unit:S1E01-U23",
+        "unit:S1E01-U24",
+        "unit:S1E01-U25",
+        "unit:S1E01-U26",
+        "unit:S1E01-U27",
+        "unit:S1E01-U28",
+        "unit:S1E01-U29",
+        "unit:S1E01-U30",
+        "unit:S1E01-U31",
+        "unit:S1E01-U32",
+        "unit:S1E01-U33",
+        "unit:S1E01-U34",
+        "unit:S1E01-U35"
+      ],
+      "edgeIds": [
+        "system:unit-raw:S1E01-U00",
+        "system:raw-continuity:S1E01-U00",
+        "system:reference-raw:S1E01-U00:unit-grid-reference-c19ad503bc7b4b9ed076e3da60540de6",
+        "system:unit-raw:S1E01-U01",
+        "system:raw-continuity:S1E01-U01",
+        "system:reference-raw:S1E01-U01:unit-grid-reference-492e3fbd23795141ddbf934c023ceb5a",
+        "system:unit-raw:S1E01-U02",
+        "system:raw-continuity:S1E01-U02",
+        "system:reference-raw:S1E01-U02:unit-grid-reference-70b2816cc1a88a73ffcc5e3f1d59b8e0",
+        "system:unit-raw:S1E01-U03",
+        "system:raw-continuity:S1E01-U03",
+        "system:reference-raw:S1E01-U03:unit-grid-reference-4f6f2c452434f5c95f3e66de48a8cb56",
+        "system:unit-next:S1E01-U00:S1E01-U01",
+        "system:unit-next:S1E01-U01:S1E01-U02",
+        "system:unit-next:S1E01-U02:S1E01-U03",
+        "system:unit-next:S1E01-U03:S1E01-U04",
+        "system:unit-next:S1E01-U04:S1E01-U05",
+        "system:unit-next:S1E01-U05:S1E01-U06",
+        "system:unit-next:S1E01-U06:S1E01-U07",
+        "system:unit-next:S1E01-U07:S1E01-U08",
+        "system:unit-next:S1E01-U08:S1E01-U09",
+        "system:unit-next:S1E01-U09:S1E01-U10",
+        "system:unit-next:S1E01-U10:S1E01-U11",
+        "system:unit-next:S1E01-U11:S1E01-U12",
+        "system:unit-next:S1E01-U12:S1E01-U13",
+        "system:unit-next:S1E01-U13:S1E01-U14",
+        "system:unit-next:S1E01-U14:S1E01-U15",
+        "system:unit-next:S1E01-U15:S1E01-U16",
+        "system:unit-next:S1E01-U16:S1E01-U17",
+        "system:unit-next:S1E01-U17:S1E01-U18",
+        "system:unit-next:S1E01-U18:S1E01-U19",
+        "system:unit-next:S1E01-U19:S1E01-U20",
+        "system:unit-next:S1E01-U20:S1E01-U21",
+        "system:unit-next:S1E01-U21:S1E01-U22",
+        "system:unit-next:S1E01-U22:S1E01-U23",
+        "system:unit-next:S1E01-U23:S1E01-U24",
+        "system:unit-next:S1E01-U24:S1E01-U25",
+        "system:unit-next:S1E01-U25:S1E01-U26",
+        "system:unit-next:S1E01-U26:S1E01-U27",
+        "system:unit-next:S1E01-U27:S1E01-U28",
+        "system:unit-next:S1E01-U28:S1E01-U29",
+        "system:unit-next:S1E01-U29:S1E01-U30",
+        "system:unit-next:S1E01-U30:S1E01-U31",
+        "system:unit-next:S1E01-U31:S1E01-U32",
+        "system:unit-next:S1E01-U32:S1E01-U33",
+        "system:unit-next:S1E01-U33:S1E01-U34",
+        "system:unit-next:S1E01-U34:S1E01-U35"
+      ],
+      "pinnedNodeIds": [],
+      "layoutFingerprint": "34462ff062977d3fd9d3603a4e17e55d4516f466ec8d6eb50130ea3d6f16a6a3",
+      "corePassUnitIds": [
+        "S1E01-U00",
+        "S1E01-U01",
+        "S1E01-U02",
+        "S1E01-U03"
+      ],
+      "referenceCount": 4,
+      "formalProjectionInFlight": true,
+      "referenceUnitIds": [
+        "S1E01-U00",
+        "S1E01-U03",
+        "S1E01-U01",
+        "S1E01-U02"
+      ],
+      "raws": [
+        {
+          "unitId": "S1E01-U00",
+          "rawMediaSha256": "df51e7789c4b3f20acb081d09728a5710fbc3d685f2761de1a400983bc30a4d2",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/fef0fb6d445c1e2950372e2971a4019f5bfeeb0714472cb7f2ee563284ab9841?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-g447pa%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-aa516d58",
+          "verification": "deep-verified",
+          "provenance": "generated"
+        },
+        {
+          "unitId": "S1E01-U03",
+          "rawMediaSha256": "47bbc3981fe69860192f97dcc8c1f68aa1c8d40ddcaaccc894a7bb170698fb92",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/beb6bcbd02b67e9e758d6b9fb1d93444a5e000487441d5962135084b0f761a6f?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-g447pa%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-aa516d58",
+          "verification": "deep-verified",
+          "provenance": "generated"
+        },
+        {
+          "unitId": "S1E01-U01",
+          "rawMediaSha256": "91f73ae2170d8e79a4711cd32a3cd404a4a27ec536897b3e7c416922388445e8",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/7841d66f369d2602e56f766761580bd926a296336b26b469f426e281f18435c1?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-g447pa%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-aa516d58",
+          "verification": "deep-verified",
+          "provenance": "generated"
+        },
+        {
+          "unitId": "S1E01-U02",
+          "rawMediaSha256": "5fabac25c51a58288276d9dc8464325307ca7ccc689fea0d7cdcf161c69390f1",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/4aa28b8f8e3ec82328d423ac7cf36f09de816045b6ebff1f3b15eec82a6a75aa?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-g447pa%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-aa516d58",
+          "verification": "deep-verified",
+          "provenance": "generated"
+        }
+      ],
+      "references": [
+        {
+          "unitId": "S1E01-U00",
+          "referenceId": "unit-grid-reference-c19ad503bc7b4b9ed076e3da60540de6",
+          "mediaSha256": "c19ad503bc7b4b9ed076e3da60540de6db31a0396f91096aac47d3a5e18b0ac9",
+          "referenceType": "character",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/3e60280c3a86f13c78152a3fb0ff7c2f057cbdaff5e4243dd447d6eeeb1a93ac?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-g447pa%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-aa516d58"
+        },
+        {
+          "unitId": "S1E01-U03",
+          "referenceId": "unit-grid-reference-4f6f2c452434f5c95f3e66de48a8cb56",
+          "mediaSha256": "4f6f2c452434f5c95f3e66de48a8cb567e069f2f38f92f6d26e305705f474e63",
+          "referenceType": "character",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/4fd323ad5ea67b7afe090c7b50a6dde1e95556e8a84c2389d58625026266ad02?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-g447pa%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-aa516d58"
+        },
+        {
+          "unitId": "S1E01-U01",
+          "referenceId": "unit-grid-reference-492e3fbd23795141ddbf934c023ceb5a",
+          "mediaSha256": "492e3fbd23795141ddbf934c023ceb5a5c43f1e113c2122548bb6ba68b5b2ac0",
+          "referenceType": "character",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/782acc4197cfabc41efb1b8b1ebdad0e96ec0dfcdd6722be404f8087b2c9f10e?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-g447pa%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-aa516d58"
+        },
+        {
+          "unitId": "S1E01-U02",
+          "referenceId": "unit-grid-reference-70b2816cc1a88a73ffcc5e3f1d59b8e0",
+          "mediaSha256": "70b2816cc1a88a73ffcc5e3f1d59b8e038f7427fa128b7cc32192b8421be0765",
+          "referenceType": "character",
+          "thumbnailUrl": "aicanvas-studio://thumbnail/ae8d15a91518029e86759bd758a5dc72d1023521258296e51931169739e23bbd?projectRoot=%2Fprivate%2Fvar%2Ffolders%2Fbt%2Fq4f2706n013cbd5m4h6rb6tr0000gn%2FT%2Ft23-source-dev-scale-g447pa%2Ffixture-projects%2Funit-grid-%E5%A4%B9%E5%85%B7%E5%B7%A5%E7%A8%8B-aa516d58"
+        }
+      ]
+    },
+    "decodedRawThumbnailCount": 4,
+    "decodedReferenceThumbnailCount": 4
+  },
+  "ipcProbe": {
+    "enabled": true,
+    "totalCalls": 29,
+    "completedCalls": 29,
+    "currentOutstanding": 0,
+    "peakOutstanding": 5,
+    "totalDurationMs": 20183.20000000298,
+    "averageDurationMs": 695.9724137932062,
+    "maxDurationMs": 4172,
+    "lastDurationMs": 4172,
+    "channels": [
+      {
+        "channel": "canvas:get-approved-timeline-projection",
+        "totalCalls": 2,
+        "completedCalls": 2,
+        "currentOutstanding": 0,
+        "peakOutstanding": 1,
+        "totalDurationMs": 921.2000000029802,
+        "maxDurationMs": 499.09999999403954,
+        "lastDurationMs": 499.09999999403954,
+        "averageDurationMs": 460.6000000014901
+      },
+      {
+        "channel": "canvas:get-studio-frozen-pack",
+        "totalCalls": 8,
+        "completedCalls": 8,
+        "currentOutstanding": 0,
+        "peakOutstanding": 4,
+        "totalDurationMs": 3199.800000011921,
+        "maxDurationMs": 427.6000000089407,
+        "lastDurationMs": 427.6000000089407,
+        "averageDurationMs": 399.9750000014901
+      },
+      {
+        "channel": "canvas:get-studio-media",
+        "totalCalls": 12,
+        "completedCalls": 12,
+        "currentOutstanding": 0,
+        "peakOutstanding": 4,
+        "totalDurationMs": 6933.999999970198,
+        "maxDurationMs": 1065.199999988079,
+        "lastDurationMs": 1065.199999988079,
+        "averageDurationMs": 577.8333333308498
+      },
+      {
+        "channel": "canvas:get-studio-production-dashboard",
+        "totalCalls": 6,
+        "completedCalls": 6,
+        "currentOutstanding": 0,
+        "peakOutstanding": 3,
+        "totalDurationMs": 4956.200000017881,
+        "maxDurationMs": 1497.7999999970198,
+        "lastDurationMs": 1497.7999999970198,
+        "averageDurationMs": 826.0333333363136
+      },
+      {
+        "channel": "canvas:get-studio-production-projection-bundle",
+        "totalCalls": 1,
+        "completedCalls": 1,
+        "currentOutstanding": 0,
+        "peakOutstanding": 1,
+        "totalDurationMs": 4172,
+        "maxDurationMs": 4172,
+        "lastDurationMs": 4172,
+        "averageDurationMs": 4172
+      }
+    ]
+  },
+  "ipcDrain": {
+    "budgetMs": 5000,
+    "durationMs": 5,
+    "currentOutstanding": 0,
+    "status": "PASS"
+  },
+  "interactions": {
+    "status": "PASS",
+    "budgets": {
+      "warmUnitSwitchP95Ms": 500,
+      "inputFeedbackP95Ms": 100,
+      "dragFeedbackP95Ms": 100,
+      "panAverageFpsMin": 50,
+      "panAverageFpsMax": 60,
+      "panFrameP95Ms": 20,
+      "unexplainedLongTaskMaxMs": 200
+    },
+    "warmUnitSwitch": {
+      "count": 10,
+      "p50Ms": 16.05,
+      "p95Ms": 80.69,
+      "maxMs": 108.5,
+      "meanMs": 30.52,
+      "sampleCount": 10,
+      "unitIds": [
+        "S1E01-U01",
+        "S1E01-U00",
+        "S1E01-U01",
+        "S1E01-U00",
+        "S1E01-U01",
+        "S1E01-U00",
+        "S1E01-U01",
+        "S1E01-U00",
+        "S1E01-U01",
+        "S1E01-U00"
+      ]
+    },
+    "zoomInputFeedback": {
+      "count": 100,
+      "p50Ms": 14.85,
+      "p95Ms": 57.97,
+      "maxMs": 145.8,
+      "meanMs": 20.42,
+      "sampleCount": 100
+    },
+    "dragFeedback": {
+      "count": 10,
+      "p50Ms": 1.7,
+      "p95Ms": 1.8,
+      "maxMs": 1.8,
+      "meanMs": 1.69,
+      "sampleCount": 10,
+      "nodeId": "unit:S1E01-U00"
+    },
+    "canvasPan": {
+      "sampleDurationMs": 3853.2,
+      "frameCount": 464,
+      "frameIntervals": {
+        "count": 464,
+        "p50Ms": 8.3,
+        "p95Ms": 8.9,
+        "maxMs": 9.4,
+        "meanMs": 8.33
+      },
+      "averageFps": 120.05
+    },
+    "longTasks": {
+      "supported": true,
+      "count": 0,
+      "maxMs": 0,
+      "overBudget": []
+    },
+    "checks": [
+      {
+        "id": "warm-unit-switch-p95",
+        "status": "PASS",
+        "actual": 80.69,
+        "comparator": "<=",
+        "budget": 500
+      },
+      {
+        "id": "zoom-input-feedback-p95",
+        "status": "PASS",
+        "actual": 57.97,
+        "comparator": "<=",
+        "budget": 100
+      },
+      {
+        "id": "drag-feedback-p95",
+        "status": "PASS",
+        "actual": 1.8,
+        "comparator": "<=",
+        "budget": 100
+      },
+      {
+        "id": "canvas-pan-average-fps",
+        "status": "PASS",
+        "actual": 120.05,
+        "comparator": ">=",
+        "budget": 50
+      },
+      {
+        "id": "canvas-pan-frame-p95",
+        "status": "PASS",
+        "actual": 8.9,
+        "comparator": "<=",
+        "budget": 20
+      },
+      {
+        "id": "unexplained-long-task-max",
+        "status": "PASS",
+        "actual": 0,
+        "comparator": "<=",
+        "budget": 200
+      },
+      {
+        "id": "long-task-observer-supported",
+        "status": "PASS",
+        "actual": true,
+        "comparator": "===",
+        "budget": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "kind": "ai-drama-canvas-local-app-old-artifact-cleanup",
+  "status": "passed",
+  "generatedAt": "2026-08-10T17:12:19+08:00",
+  "scope": "local-only",
+  "currentApp": {
+    "path": "/Applications/AI 漫剧画布.app",
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "bundleIdentifier": "com.hxx.aidramacanvas",
+    "sourceDigest": "a12f50958060b54fc0de56e7c95eaf794c4da3f5700abe6749871e0794508e57",
+    "buildId": "3626bb271124bcf39ed86a77e0ce6558",
+    "mcpToolCount": 220,
+    "codesignDeepStrict": "passed",
+    "runningAfterCleanup": false
+  },
+  "preserved": [
+    "/Applications/AI 漫剧画布.app",
+    "/Users/hxx/Documents/无限画布/dist/mac-arm64/AI 漫剧画布.app"
+  ],
+  "latestBundleEquivalence": {
+    "releaseManifestByteIdentical": true,
+    "appAsarSha256": "14d59def80ee6ab8d2a82be9b41afe528cb9732bfc69420bcace92ee983c3d11",
+    "bothCodesignDeepStrict": "passed"
+  },
+  "cleanup": {
+    "method": "moved-to-trash",
+    "trashRoot": "/Users/hxx/.Trash/AI漫剧画布_旧版清理_20260810-171036",
+    "recoverableUntilTrashEmptied": true,
+    "oldAppBundles": 9,
+    "oldDmgFiles": 4,
+    "oldBlockmapFiles": 5,
+    "totalArtifacts": 18,
+    "allocatedKiB": 4150472,
+    "allocatedGiB": 3.958
+  },
+  "movedAppBundles": [
+    {
+      "source": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260810-153921-a12f5095/previous-installed/AI 漫剧画布.app",
+      "sourceDigest": "bf4dbb751f21ab05e76bc43a6f85288844d2f8a6e3cc2ddd3e671b585357cfd7",
+      "destination": "/Users/hxx/.Trash/AI漫剧画布_旧版清理_20260810-171036/apps/local-install-153921-previous-bf4dbb75.app"
+    },
+    {
+      "source": "/Users/hxx/Documents/无限画布_交付归档/app-build-20260728-e3d4bc6a4f71c6803a5b47da18b3520c/mac-arm64/AI 漫剧画布.app",
+      "sourceDigest": "3bb9e2b0a35121bd7e3f95dea89879b2e22d79744659ad2abda71d66001d5c7e",
+      "destination": "/Users/hxx/.Trash/AI漫剧画布_旧版清理_20260810-171036/apps/app-build-20260728-e3d4bc6a.app"
+    },
+    {
+      "source": "/Users/hxx/Documents/无限画布_交付归档/app-build-20260728-6ef4ca3eafdda7fe95f5861256750a7f/mac-arm64/AI 漫剧画布.app",
+      "sourceDigest": "c6ed34388030309004864d4034ccb4e9d6780a1646e72adc863499c6b2d2958d",
+      "destination": "/Users/hxx/.Trash/AI漫剧画布_旧版清理_20260810-171036/apps/app-build-20260728-6ef4ca3e.app"
+    },
+    {
+      "source": "/Users/hxx/Documents/无限画布_交付归档/app-build-20260728-38dbb556ec8ff28a7e669ba2e72b8e8b/mac-arm64/AI 漫剧画布.app",
+      "sourceDigest": "b4439e7bd9032caf8a0c511c6016dc46e868d0ebd2e3561db8486b0a32801d22",
+      "destination": "/Users/hxx/.Trash/AI漫剧画布_旧版清理_20260810-171036/apps/app-build-20260728-38dbb556.app"
+    },
+    {
+      "source": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260810-064700-f893b386/previous-installed/AI 漫剧画布.app",
+      "sourceDigest": "d8e48caa6e635332eae06d49717f23a21d3d433613e488d3f49e2c42baecb20f",
+      "destination": "/Users/hxx/.Trash/AI漫剧画布_旧版清理_20260810-171036/apps/local-install-064700-previous-d8e48caa.app"
+    },
+    {
+      "source": "/Users/hxx/Documents/无限画布_交付归档/0.2.0-40b9cc725097394108667c877901446a/AI 漫剧画布.app",
+      "sourceDigest": "d4b07c20a04cd8c7ff0b48c3e1fd80acf2f364a9123a7f2335591dc18a3ee5b4",
+      "destination": "/Users/hxx/.Trash/AI漫剧画布_旧版清理_20260810-171036/apps/archive-0.2.0-40b9cc72.app"
+    },
+    {
+      "source": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260810-075412-bf4dbb75/previous-installed/AI 漫剧画布.app",
+      "sourceDigest": "f893b386dca3c97bb11aa856f53685e0395894c6cff52c3af67745880c47b6ec",
+      "destination": "/Users/hxx/.Trash/AI漫剧画布_旧版清理_20260810-171036/apps/local-install-075412-previous-f893b386.app"
+    },
+    {
+      "source": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260810-051406-a4312c76/previous-installed/AI 漫剧画布.app",
+      "sourceDigest": "b4439e7bd9032caf8a0c511c6016dc46e868d0ebd2e3561db8486b0a32801d22",
+      "destination": "/Users/hxx/.Trash/AI漫剧画布_旧版清理_20260810-171036/apps/local-install-051406-previous-38dbb556.app"
+    },
+    {
+      "source": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260810-055700-d8e48caa/previous-installed/AI 漫剧画布.app",
+      "sourceDigest": "a4312c768158bee4f6c64a3d1764ecf0b455f6a0e541fcfe0b217b4274433bda",
+      "destination": "/Users/hxx/.Trash/AI漫剧画布_旧版清理_20260810-171036/apps/local-install-055700-previous-a4312c76.app"
+    }
+  ],
+  "movedInstallerArtifacts": [
+    "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg.blockmap",
+    "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.2.0-arm64.dmg",
+    "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.2.0-arm64.dmg.blockmap",
+    "/Users/hxx/Documents/无限画布_交付归档/app-build-20260728-e3d4bc6a4f71c6803a5b47da18b3520c/AI 漫剧画布-0.2.0-arm64.dmg",
+    "/Users/hxx/Documents/无限画布_交付归档/app-build-20260728-e3d4bc6a4f71c6803a5b47da18b3520c/AI 漫剧画布-0.2.0-arm64.dmg.blockmap",
+    "/Users/hxx/Documents/无限画布_交付归档/app-build-20260728-6ef4ca3eafdda7fe95f5861256750a7f/AI 漫剧画布-0.2.0-arm64.dmg",
+    "/Users/hxx/Documents/无限画布_交付归档/app-build-20260728-6ef4ca3eafdda7fe95f5861256750a7f/AI 漫剧画布-0.2.0-arm64.dmg.blockmap",
+    "/Users/hxx/Documents/无限画布_交付归档/app-build-20260728-38dbb556ec8ff28a7e669ba2e72b8e8b/AI 漫剧画布-0.2.0-arm64.dmg",
+    "/Users/hxx/Documents/无限画布_交付归档/app-build-20260728-38dbb556ec8ff28a7e669ba2e72b8e8b/AI 漫剧画布-0.2.0-arm64.dmg.blockmap"
+  ],
+  "staleDistDmg": {
+    "sourceDigest": "265498ff24f4ac593bf7a30c48ce5258a558387a9929f4cb184b13c337348af0",
+    "buildId": "c2b5bd2ac0960e73337ac6b7148bbcba",
+    "mcpToolCount": 218,
+    "reasonMoved": "The package predated and did not match the installed 220-tool build."
+  },
+  "postCleanupInventory": {
+    "installedAppCopies": [
+      "/Applications/AI 漫剧画布.app"
+    ],
+    "workspaceLatestAppCopies": [
+      "/Users/hxx/Documents/无限画布/dist/mac-arm64/AI 漫剧画布.app"
+    ],
+    "oldAppBundlesInScopedRoots": 0,
+    "installerArtifactsInScopedRoots": 0
+  },
+  "boundaries": {
+    "sourceModified": false,
+    "formalProjectsModified": false,
+    "evidenceHistoryDeleted": false,
+    "notarized": false,
+    "published": false,
+    "gitStageCommitPush": false,
+    "trashEmptied": false
+  }
+}

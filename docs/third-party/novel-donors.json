@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "purpose": "novel-mode-v1-source-provenance",
+  "auditedAt": "2026-07-31",
+  "policy": {
+    "codeCopyGate": "No upstream implementation may be copied before its exact source file is recorded here and the repository license is present in licenses/.",
+    "allowedLicenses": [
+      "MIT",
+      "Apache-2.0"
+    ],
+    "agplPolicy": "behavioral-reference-only-no-copy-no-link-no-translation",
+    "assetsPolicy": "Do not copy logos, trademarks, screenshots, example novels, or unrelated assets."
+  },
+  "donors": [
+    {
+      "name": "CharacterArc",
+      "repository": "https://github.com/uu201/character-arc",
+      "commit": "c0fabfc743a9a3f3aa12af9add9d3208bd13d871",
+      "tree": "fbe1c3ad4bbc89e2923beff713114e139afe5ab0",
+      "license": {
+        "spdx": "MIT",
+        "upstreamPath": "LICENSE",
+        "upstreamSha256": "d53e396570581aeda22c0dfd6a9fb12cf6c69a99814161668b2a104ee6cddf9f",
+        "upstreamBytes": 1067,
+        "localPath": "licenses/MIT-CharacterArc.txt",
+        "localSha256": "d53e396570581aeda22c0dfd6a9fb12cf6c69a99814161668b2a104ee6cddf9f",
+        "localBytes": 1067,
+        "normalization": "byte-identical",
+        "noticePaths": []
+      },
+      "status": "audited-planned-not-copied",
+      "containsUpstreamImplementation": false,
+      "sourceFiles": [
+        {
+          "path": "electron/main/story-state-store.ts",
+          "sha256": "4b33f1f79925f42439b3c6f7662c3455168ff2941afbfbecc1dd38f5cb20bba9",
+          "plannedLocalTargets": ["src/core/novel-state.ts", "src/core/novel-derived-index.ts"],
+          "adaptation": "Port selected state normalization concepts to file-authoritative temporal projections with mandatory target-chapter filtering."
+        },
+        {
+          "path": "electron/main/ai/state-backfill-store.ts",
+          "sha256": "18ae6bbf86de32c980cf6ee24d7191d45586a31dc0083afc08bf05517f21b2bd",
+          "plannedLocalTargets": ["src/core/novel-summary-service.ts", "src/core/novel-index-jobs.ts"],
+          "adaptation": "Adapt checkpoint and backfill ideas; accepted files remain authoritative and every source SHA invalidates dependencies."
+        },
+        {
+          "path": "electron/main/ai/runtime-v2/context-builder.ts",
+          "sha256": "3513a98ceaa46b803de5605217ad21038f4b57e41a589ad671b33c7e707d2fb2",
+          "plannedLocalTargets": ["src/core/novel-context-builder.ts"],
+          "adaptation": "Adapt budget accounting while enforcing past-only temporal visibility in Core and SQL."
+        },
+        {
+          "path": "electron/main/ai/runtime-v2/staged-changes-store.ts",
+          "sha256": "a4eaf5619d7e2dc2f3d2291108b1aaeb5387570ff1a518f6ef539be775f8bfb8",
+          "plannedLocalTargets": ["src/core/novel-change-set.ts"],
+          "adaptation": "Adapt staged-change lifecycle to command-bus idempotency, expectedRevision, expectedSha256, and atomic file writes."
+        },
+        {
+          "path": "renderer/src/components/GlobalAssistantDiffReviewDialog.vue",
+          "sha256": "b03add784c481b69f59c64c9cca26185e61c754dbf92ca7e25852da0c9d906d7",
+          "plannedLocalTargets": ["src/renderer/src/components/NovelChangeReviewDialog.vue"],
+          "adaptation": "Adapt review interaction only; novel prose must support per-segment decisions and may not expose accept-all."
+        }
+      ],
+      "forbiddenPatterns": [
+        "SQLite as canon",
+        "global latest-state queries without targetChapterId",
+        "current-only relationships",
+        "plaintext API keys"
+      ]
+    },
+    {
+      "name": "OpenFic",
+      "repository": "https://github.com/syrizelink/OpenFic",
+      "commit": "90f26c16a764c941124a3e70c8b2693b32a5f1d9",
+      "tree": "bb402904075474d74a30c71c559ee2c123ade45f",
+      "license": {
+        "spdx": "Apache-2.0",
+        "upstreamPath": "LICENSE",
+        "upstreamSha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+        "upstreamBytes": 11357,
+        "localPath": "licenses/Apache-2.0-OpenFic.txt",
+        "localSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "localBytes": 11358,
+        "normalization": "legal text is identical; one terminal LF was appended",
+        "duplicateLicensePaths": ["backend/LICENSE"],
+        "noticePaths": []
+      },
+      "status": "audited-planned-not-copied",
+      "containsUpstreamImplementation": false,
+      "sourceFiles": [
+        {
+          "path": "backend/app/memory/chapter/context_builder.py",
+          "sha256": "df50b96f86ac21645d40746a7a38020e63a731a62cccb7aad2a990b8bcd093d9",
+          "plannedLocalTargets": ["src/core/novel-context-builder.ts"],
+          "adaptation": "Reimplement layered recent-full, mid-summary, remote-summary context in TypeScript with a deterministic trace and temporal cutoff."
+        },
+        {
+          "path": "backend/app/memory/chapter/summary_service.py",
+          "sha256": "6bbbc22d6a66352d712a85c150f44b63cea1d17e44ef67070b1826c37a0f8f3c",
+          "plannedLocalTargets": ["src/core/novel-summary-service.ts"],
+          "adaptation": "Reimplement summary windows and source-hash staleness without making summaries canonical."
+        },
+        {
+          "path": "backend/app/retrieval/internal/indexing/chunking.py",
+          "sha256": "436723562708d6846a68e5f60dcfa9c1435d144016b5bbc10d7afd53e495f2ce",
+          "plannedLocalTargets": ["src/core/novel-derived-index.ts", "src/core/novel-tokenization.ts"],
+          "adaptation": "Reimplement deterministic chunking and source offsets for node:sqlite FTS5; do not import Python runtime."
+        },
+        {
+          "path": "backend/app/retrieval/internal/query/ranking.py",
+          "sha256": "80562d9f48f9e0cdba0d7ae12e0f2a673f3b280dbe0cb751a8abae7fb9ae7f6b",
+          "plannedLocalTargets": ["src/core/novel-retrieval.ts"],
+          "adaptation": "Use ranking concepts only after deterministic keyword/FTS gates; vectors remain optional and derived."
+        },
+        {
+          "path": "backend/app/agent_runtime/revisions.py",
+          "sha256": "df9aa34dc71d11bb9d37c4eb1d8702751ae720cf1d9c378921b194325659fde7",
+          "plannedLocalTargets": ["src/core/novel-change-set.ts"],
+          "adaptation": "Map revision concepts onto existing command bus, file history, and CAS rather than a database authority."
+        },
+        {
+          "path": "backend/app/agent_runtime/tools/impls/chapter/diff_preview.py",
+          "sha256": "d0c4c658ca375538fc32f7612be6e725b01b10c79849307a66ac5415efc99aee",
+          "plannedLocalTargets": ["src/renderer/src/components/NovelChangeReviewDialog.vue"],
+          "adaptation": "Reimplement preview semantics in the existing Electron/Vue stack; any copied Apache code must carry a prominent modification notice."
+        }
+      ],
+      "forbiddenPatterns": [
+        "Python/FastAPI/LanceDB/LangGraph runtime import",
+        "database as manuscript authority",
+        "summary reuse after source SHA changes",
+        "future chapter inclusion during back-edit"
+      ]
+    }
+  ],
+  "excludedImplementationSources": [
+    {
+      "name": "InkOS",
+      "license": "AGPL-3.0",
+      "policy": "Behavioral specification reference only. No source copy, line-by-line translation, linking, or dependency."
+    },
+    {
+      "name": "51mazi",
+      "license": "MIT",
+      "policy": "Not a core donor. Do not copy its unsafe Electron, monolithic storage, or untested persistence patterns."
+    }
+  ]
+}

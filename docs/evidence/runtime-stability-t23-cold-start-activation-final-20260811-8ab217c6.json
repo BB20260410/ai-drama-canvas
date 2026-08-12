@@ -1,0 +1,333 @@
+{
+  "schemaVersion": 1,
+  "kind": "t23-source-dev-scale-performance",
+  "status": "FAIL",
+  "ok": false,
+  "mode": "dev",
+  "budgetProfile": "p7-strict",
+  "createdAt": "2026-08-11T05:28:42.729Z",
+  "fixture": {
+    "kind": "deterministic-synthetic-mechanical-fixture",
+    "visualAcceptance": false,
+    "aiImageGeneration": false,
+    "isolatedTemporaryProject": true,
+    "unitCount": 36,
+    "passRawCount": 4,
+    "note": "所有图均为 sharp 生成的可解码纯色 PNG；PASS 仅表示测试账本闭环，不代表视觉质量。"
+  },
+  "consoleErrors": [],
+  "pageErrors": [],
+  "error": "Error: page.waitForFunction: ReferenceError: __name is not defined\n    at eval (eval at predicate (eval at evaluate (:303:30)), <anonymous>:1:923)\n    at predicate (eval at evaluate (:303:30), <anonymous>:7:27)\n    at next (eval at evaluate (:303:30), <anonymous>:29:33)",
+  "failureDiagnostics": {
+    "pageUrl": "http://localhost:5173/",
+    "bodyText": "AI 漫剧画布 unit-grid 夹具工程 受管项目 · 仅访问当前工程 · 原媒体安全存放 1 剧本 2 资产 3 绑定 4 生成 5 审片 总资源 无限画布 驾驶舱 媒体时间线 图文对照 Agent 连接 帮助 / 备份 唯一下一步 在驾驶舱选择下一格并冻结生图包：素材与单元已就绪；由 驾驶舱 打开单元视图，按 系统 投影处理阻塞宫格。 生图 Agent Codex Grok 继续 项目 添加素材和 15 秒分镜，然后准备并记录派发 项目概览 5 资产 36 单元 72 宫格 13 媒体 2 文稿 4 通过 0 待审 32 进行中 0 失败 0 阻塞 投影于 05:29:18 导演 准备派发 请选择 15 秒分镜 从左侧“添加”放入角色、场景、道具、风格、文稿和分镜 生成账本已同步 进度搜索 全部状态 待处理 通过 返工 拒绝 待生 高级操作 添加 素材库 剧本资源 连线 帮助 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 下一单元 单 生产单元 009｜S1E01-U08 15 秒 · 2 格 · 等待检查 单 生产单元 010｜S1E01-U09 15 秒 · 2 格 · 等待检查 单 生产单元 011｜S1E01-U10 15 秒 · 2 格 · 等待检查 单 生产单元 012｜S1E01-U11 15 秒 · 2 格 · 等待检查 单 生产单元 013｜S1E01-U12 15 秒 · 2 格 · 等待检查 单 生产单元 014｜S1E01-U13 15 秒 · 2 格 · 等待检查 单 生产单元 015｜S1E01-U14 15 秒 · 2 格 · 等待检查 单 生产单元 016｜S1E01-U15 15 秒 · 2 格 · 等待检查 单 生产单元 017｜S1E01-U16 15 秒 · 2 格 · 等待检查 单 生产单元 018｜S1E01-U17 15 秒 · 2 格 · 等待检查 单 生产单元 019｜S1E01-U18 15 秒 · 2 格 · 等待检查 单 生产单元 020｜S1E01-U19 15 秒 · 2 格 · 等待检查 单 生产单元 021｜S1E01-U20 15 秒 · 2 格 · 等待检查 单 生产单元 022｜S1E01-U21 15 秒 · 2 格 · 等待检查 单 生产单元 023｜S1E01-U22 15 秒 · 2 格 · 等待检查 单 生产单元 024｜S1E01-U23 15 秒 · 2 格 · 等待检查 单 生产单元 025｜S1E01-U24 15 秒 · 2 格 · 等待检查 单 生产单元 026｜S1E01-U25 15 秒 · 2 格 · 等待检查 单 生产单元 027｜S1E01-U26 15 秒 · 2 格 · 等待检查 单 生产单元 028｜S1E01-U27 15 秒 · 2 格 · 等待检查 放大画布 缩小画布 适配全部节点 锁定画布交互 适配 撤销 重做 隐藏连线 按时间线排布 强制时间线 视图 诊断详情",
+    "rawSnapshot": {
+      "loading": true,
+      "unitNodeIds": [
+        "S1E01-U00",
+        "S1E01-U01",
+        "S1E01-U02",
+        "S1E01-U03",
+        "S1E01-U04",
+        "S1E01-U05",
+        "S1E01-U06",
+        "S1E01-U07",
+        "S1E01-U08",
+        "S1E01-U09",
+        "S1E01-U10",
+        "S1E01-U11",
+        "S1E01-U12",
+        "S1E01-U13",
+        "S1E01-U14",
+        "S1E01-U15",
+        "S1E01-U16",
+        "S1E01-U17",
+        "S1E01-U18",
+        "S1E01-U19",
+        "S1E01-U20",
+        "S1E01-U21",
+        "S1E01-U22",
+        "S1E01-U23",
+        "S1E01-U24",
+        "S1E01-U25",
+        "S1E01-U26",
+        "S1E01-U27",
+        "S1E01-U28",
+        "S1E01-U29",
+        "S1E01-U30",
+        "S1E01-U31",
+        "S1E01-U32",
+        "S1E01-U33",
+        "S1E01-U34",
+        "S1E01-U35"
+      ],
+      "allNodeIds": [
+        "asset:character-ahang",
+        "asset:character-t23-02",
+        "asset:character-t23-03",
+        "asset:character-t23-04",
+        "asset:prop-complete-mask",
+        "unit:S1E01-U00",
+        "unit:S1E01-U01",
+        "unit:S1E01-U02",
+        "unit:S1E01-U03",
+        "unit:S1E01-U04",
+        "unit:S1E01-U05",
+        "unit:S1E01-U06",
+        "unit:S1E01-U07",
+        "unit:S1E01-U08",
+        "unit:S1E01-U09",
+        "unit:S1E01-U10",
+        "unit:S1E01-U11",
+        "unit:S1E01-U12",
+        "unit:S1E01-U13",
+        "unit:S1E01-U14",
+        "unit:S1E01-U15",
+        "unit:S1E01-U16",
+        "unit:S1E01-U17",
+        "unit:S1E01-U18",
+        "unit:S1E01-U19",
+        "unit:S1E01-U20",
+        "unit:S1E01-U21",
+        "unit:S1E01-U22",
+        "unit:S1E01-U23",
+        "unit:S1E01-U24",
+        "unit:S1E01-U25",
+        "unit:S1E01-U26",
+        "unit:S1E01-U27",
+        "unit:S1E01-U28",
+        "unit:S1E01-U29",
+        "unit:S1E01-U30",
+        "unit:S1E01-U31",
+        "unit:S1E01-U32",
+        "unit:S1E01-U33",
+        "unit:S1E01-U34",
+        "unit:S1E01-U35"
+      ],
+      "edgeIds": [
+        "system:unit-next:S1E01-U00:S1E01-U01",
+        "system:unit-next:S1E01-U01:S1E01-U02",
+        "system:unit-next:S1E01-U02:S1E01-U03",
+        "system:unit-next:S1E01-U03:S1E01-U04",
+        "system:unit-next:S1E01-U04:S1E01-U05",
+        "system:unit-next:S1E01-U05:S1E01-U06",
+        "system:unit-next:S1E01-U06:S1E01-U07",
+        "system:unit-next:S1E01-U07:S1E01-U08",
+        "system:unit-next:S1E01-U08:S1E01-U09",
+        "system:unit-next:S1E01-U09:S1E01-U10",
+        "system:unit-next:S1E01-U10:S1E01-U11",
+        "system:unit-next:S1E01-U11:S1E01-U12",
+        "system:unit-next:S1E01-U12:S1E01-U13",
+        "system:unit-next:S1E01-U13:S1E01-U14",
+        "system:unit-next:S1E01-U14:S1E01-U15",
+        "system:unit-next:S1E01-U15:S1E01-U16",
+        "system:unit-next:S1E01-U16:S1E01-U17",
+        "system:unit-next:S1E01-U17:S1E01-U18",
+        "system:unit-next:S1E01-U18:S1E01-U19",
+        "system:unit-next:S1E01-U19:S1E01-U20",
+        "system:unit-next:S1E01-U20:S1E01-U21",
+        "system:unit-next:S1E01-U21:S1E01-U22",
+        "system:unit-next:S1E01-U22:S1E01-U23",
+        "system:unit-next:S1E01-U23:S1E01-U24",
+        "system:unit-next:S1E01-U24:S1E01-U25",
+        "system:unit-next:S1E01-U25:S1E01-U26",
+        "system:unit-next:S1E01-U26:S1E01-U27",
+        "system:unit-next:S1E01-U27:S1E01-U28",
+        "system:unit-next:S1E01-U28:S1E01-U29",
+        "system:unit-next:S1E01-U29:S1E01-U30",
+        "system:unit-next:S1E01-U30:S1E01-U31",
+        "system:unit-next:S1E01-U31:S1E01-U32",
+        "system:unit-next:S1E01-U32:S1E01-U33",
+        "system:unit-next:S1E01-U33:S1E01-U34",
+        "system:unit-next:S1E01-U34:S1E01-U35"
+      ],
+      "pinnedNodeIds": [],
+      "corePassUnitIds": [
+        "S1E01-U00",
+        "S1E01-U01",
+        "S1E01-U02",
+        "S1E01-U03"
+      ],
+      "referenceCount": 0,
+      "formalProjectionInFlight": true,
+      "referenceUnitIds": [],
+      "raws": [],
+      "references": []
+    },
+    "ipcProbe": {
+      "enabled": true,
+      "totalCalls": 7,
+      "completedCalls": 4,
+      "currentOutstanding": 3,
+      "peakOutstanding": 3,
+      "totalDurationMs": 2255.5999999940395,
+      "averageDurationMs": 563.8999999985099,
+      "maxDurationMs": 631.2999999821186,
+      "lastDurationMs": 631.2999999821186,
+      "channels": [
+        {
+          "channel": "canvas:get-approved-timeline-projection",
+          "totalCalls": 1,
+          "completedCalls": 1,
+          "currentOutstanding": 0,
+          "peakOutstanding": 1,
+          "totalDurationMs": 631.2999999821186,
+          "maxDurationMs": 631.2999999821186,
+          "lastDurationMs": 631.2999999821186,
+          "averageDurationMs": 631.2999999821186
+        },
+        {
+          "channel": "canvas:get-studio-media",
+          "totalCalls": 3,
+          "completedCalls": 0,
+          "currentOutstanding": 3,
+          "peakOutstanding": 3,
+          "totalDurationMs": 0,
+          "maxDurationMs": null,
+          "lastDurationMs": null,
+          "averageDurationMs": null
+        },
+        {
+          "channel": "canvas:get-studio-production-dashboard",
+          "totalCalls": 3,
+          "completedCalls": 3,
+          "currentOutstanding": 0,
+          "peakOutstanding": 1,
+          "totalDurationMs": 1624.300000011921,
+          "maxDurationMs": 612.3000000119209,
+          "lastDurationMs": 595.4000000059605,
+          "averageDurationMs": 541.433333337307
+        }
+      ],
+      "rendererStartupTimeline": {
+        "schemaVersion": 1,
+        "milestones": [
+          {
+            "milestone": "app-module-evaluated",
+            "atMs": 203.40000000596046
+          },
+          {
+            "milestone": "app-mounted",
+            "atMs": 209.80000001192093
+          },
+          {
+            "milestone": "app-runtime-gate-start",
+            "atMs": 209.80000001192093
+          },
+          {
+            "milestone": "app-runtime-gate-ready",
+            "atMs": 551
+          },
+          {
+            "milestone": "app-bootstrap-reads-start",
+            "atMs": 551
+          },
+          {
+            "milestone": "app-managed-shell-start",
+            "atMs": 552.8000000119209
+          },
+          {
+            "milestone": "app-managed-shell-ready",
+            "atMs": 554.4000000059605
+          },
+          {
+            "milestone": "app-managed-studio-chunks-start",
+            "atMs": 554.4000000059605
+          },
+          {
+            "milestone": "app-startup-reconcile-start",
+            "atMs": 554.5999999940395
+          },
+          {
+            "milestone": "app-managed-studio-chunks-ready",
+            "atMs": 888.4000000059605
+          },
+          {
+            "milestone": "app-startup-reconcile-ready",
+            "atMs": 1065.5999999940395
+          },
+          {
+            "milestone": "app-bootstrap-reads-ready",
+            "atMs": 1065.699999988079
+          },
+          {
+            "milestone": "material-setup",
+            "atMs": 1066.9000000059605
+          },
+          {
+            "milestone": "material-workspace-reset",
+            "atMs": 1067.0999999940395
+          },
+          {
+            "milestone": "canvas-mounted",
+            "atMs": 1092.5999999940395
+          },
+          {
+            "milestone": "canvas-refresh-start",
+            "atMs": 1092.800000011921
+          },
+          {
+            "milestone": "canvas-runtime-gate-start",
+            "atMs": 1092.800000011921
+          },
+          {
+            "milestone": "canvas-runtime-gate-ready",
+            "atMs": 1097.199999988079
+          },
+          {
+            "milestone": "canvas-layout-start",
+            "atMs": 1097.199999988079
+          },
+          {
+            "milestone": "canvas-units-start",
+            "atMs": 1097.300000011921
+          },
+          {
+            "milestone": "canvas-layout-ready",
+            "atMs": 1099.800000011921
+          },
+          {
+            "milestone": "canvas-units-ready",
+            "atMs": 1725.699999988079
+          },
+          {
+            "milestone": "canvas-first-card-dom-ready",
+            "atMs": 1725.800000011921
+          },
+          {
+            "milestone": "canvas-first-card-dom-unit:S1E01-U00",
+            "atMs": 1725.800000011921
+          },
+          {
+            "milestone": "canvas-dashboard-overview-start",
+            "atMs": 1725.800000011921
+          },
+          {
+            "milestone": "material-overview-start",
+            "atMs": 1726
+          },
+          {
+            "milestone": "canvas-dashboard-overview-ready",
+            "atMs": 2142.800000011921
+          },
+          {
+            "milestone": "canvas-units-overview-ready",
+            "atMs": 2142.800000011921
+          },
+          {
+            "milestone": "canvas-raw-activation-start",
+            "atMs": 2142.800000011921
+          },
+          {
+            "milestone": "material-overview-ready",
+            "atMs": 2650.4000000059605
+          },
+          {
+            "milestone": "canvas-raw-span-start:1",
+            "atMs": 2775.699999988079
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-v2-old-writer-fence-evidence",
+  "verdict": "PASS",
+  "capturedAt": "2026-08-01T10:06:56.240Z",
+  "currentWriter": {
+    "sourceDigest": "2f158843a10205128a0d0d36e0f5d934832e50608a46e79b9b44fbc837696ff2",
+    "sourceFiles": 905,
+    "sourceBytes": 18086041,
+    "schemaVersion": 2,
+    "activePointerSchemaVersion": 3,
+    "currentWriterLockEntered": true
+  },
+  "oldWriter": {
+    "commit": "1e8e9d9c8cb055987d53b8fa0b503fb80538b3f5",
+    "tree": "eee06f8cff5f9676593322d46d508c151633e6b6",
+    "buildId": "38dbb556ec8ff28a7e669ba2e72b8e8b",
+    "sourceDigest": "b4439e7bd9032caf8a0c511c6016dc46e868d0ebd2e3561db8486b0a32801d22",
+    "sourceFiles": 885,
+    "sourceBytes": 17754703,
+    "fingerprint": "3ae23b49444975906462303a3495a8adeaff1e31d4de869e2f6488b1c639ca87",
+    "execution": "immutable git archive executed through repository-pinned tsx",
+    "scriptSha256": "4fa905021038b3ff7caa29f7768a3e57df16bccdb26b057310e719601ec36872",
+    "stdoutSha256": "39b89b6c9205247a453659a033d508546306a78d9c41a4d2025c4152db4b6c92",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "exitCode": 0
+  },
+  "reachability": {
+    "targetVisibleInLegacyRegistry": false,
+    "visibleProjectIds": [
+      "project-fdedefcaba51"
+    ],
+    "activate": {
+      "accepted": false,
+      "error": "项目尚未登记，不能设为活动项目：<v2-project-root>"
+    },
+    "storyFirstPrepare": {
+      "accepted": false,
+      "error": "项目配置 JSON 结构无效，已停止写入：<v2-project-root>/.aicanvas/project.json"
+    },
+    "storyFirstCommit": {
+      "accepted": false,
+      "error": "项目配置 JSON 结构无效，已停止写入：<v2-project-root>/.aicanvas/project.json"
+    },
+    "settingsSave": {
+      "accepted": false,
+      "error": "项目配置 JSON 结构无效，已停止写入：<v2-project-root>/.aicanvas/index.json"
+    },
+    "layoutLoad": {
+      "accepted": false,
+      "error": "file is not a database"
+    },
+    "layoutSave": {
+      "accepted": false,
+      "error": "file is not a database"
+    },
+    "explicitRootUpsert": {
+      "accepted": false,
+      "error": "受管目录包含符号链接或非目录节点：.aicanvas/locks"
+    }
+  },
+  "backupCopyFence": {
+    "held": true,
+    "oldWriterScriptSha256": "55cca1a007f6c3cc748f82e43160d3a5322d7da120719a8312635bd1d9de1435",
+    "oldWriterStdoutSha256": "a1a46e3106f7b16587bf76afa24cc12de260c6dd43201a83f1a935bf6e774716",
+    "sqliteSnapshotTreatsLegacyFenceAsOrdinary": true,
+    "layoutLoad": {
+      "accepted": false,
+      "error": "file is not a database"
+    },
+    "layoutSave": {
+      "accepted": false,
+      "error": "file is not a database"
+    },
+    "before": {
+      "entries": 54,
+      "files": 12,
+      "bytes": 1112019,
+      "aggregateSha256": "895a8ee167df3039e5fdcb8d5986432797a032f60fb3d507e7a034ba9761fc0c"
+    },
+    "after": {
+      "entries": 54,
+      "files": 12,
+      "bytes": 1112019,
+      "aggregateSha256": "895a8ee167df3039e5fdcb8d5986432797a032f60fb3d507e7a034ba9761fc0c"
+    }
+  },
+  "dramaCompatibility": {
+    "compatible": true,
+    "oldWriterScriptSha256": "4443288ec11995fd82441af0afca8dfef4ac661e4532c7fa715f3d85b1a3e139",
+    "oldWriterStdoutSha256": "b8388cc0db0fa3c6d4dab2f3ef1fbc7e72c292a508ca4a1869833dd9a0bf1511",
+    "rawActiveBeforeOld": {
+      "schemaVersion": 2,
+      "primaryRoot": "<v1-project-root>",
+      "embedsWorkspacePreferences": false
+    },
+    "oldWriter": {
+      "before": {
+        "id": "project-fdedefcaba51",
+        "primaryRoot": "<v1-project-root>",
+        "available": true
+      },
+      "activated": {
+        "id": "project-fdedefcaba51",
+        "primaryRoot": "<v1-project-root>",
+        "available": true
+      }
+    },
+    "rawActiveAfterOld": {
+      "schemaVersion": 2,
+      "primaryRoot": "<v1-project-root>",
+      "embedsWorkspacePreferences": false
+    },
+    "v2PreferencesBytesUnchanged": true
+  },
+  "invariants": {
+    "projectTreeUnchangedAfterOldWriter": true,
+    "registryTreeUnchangedAfterOldWriter": true,
+    "manifestBytesUnchanged": true,
+    "writerFenceBytesUnchanged": true,
+    "legacyCacheFenceBytesUnchanged": true,
+    "v2CacheBytesUnchanged": true,
+    "legacyRegistryBytesUnchangedAfterV2OldWriter": true,
+    "v2RegistryBytesUnchangedAfterV2OldWriter": true,
+    "activePointerBytesUnchangedAfterV2OldWriter": true
+  },
+  "identities": {
+    "projectBefore": {
+      "entries": 54,
+      "files": 12,
+      "bytes": 1112019,
+      "aggregateSha256": "f1762ac49ee7c718cc8fb33afa076df361bc005b5a0a8429de606fdd7c85edb8"
+    },
+    "projectAfterOldWriter": {
+      "entries": 54,
+      "files": 12,
+      "bytes": 1112019,
+      "aggregateSha256": "f1762ac49ee7c718cc8fb33afa076df361bc005b5a0a8429de606fdd7c85edb8"
+    },
+    "registryBefore": {
+      "entries": 4,
+      "files": 3,
+      "bytes": 1322,
+      "aggregateSha256": "243af8076d2188b375cd0a3d730daf8c0c0d62da39d39bd1c665e42ae4361ab1"
+    },
+    "registryAfterOldWriter": {
+      "entries": 4,
+      "files": 3,
+      "bytes": 1322,
+      "aggregateSha256": "243af8076d2188b375cd0a3d730daf8c0c0d62da39d39bd1c665e42ae4361ab1"
+    },
+    "manifestSha256": "249552d399267ca8c132f115eb8e5fd2bc54d296ab97bbd24e23914e6fb72c0a",
+    "writerFenceSha256": "528e25c00fecf60e1c87a3afeae1f81b6cdf5dd8caf860c39667aede32d93973",
+    "legacyCacheFenceSha256": "0364b3c3ff36cc1db4624e37f68fd8d28bae70a838246d35204892a22a5ecfa8",
+    "v2CacheSha256": "11fed835cc89cba0972b990083102e9a42e16a48a68aeba3bc5a1ce2bcd29c9c",
+    "legacyRegistrySha256": "c93c81e9bd46ecc5b36c9e6c031fa22145dbf6317d633a1f0ce17d75da4e3d30",
+    "v2RegistrySha256": "3ec6311768c4c285374688843d6ef99f4fd0499c897ce15d0647017e2d90ed69",
+    "activePointerSha256": "85d38b97069807bee87b901f7ea08fd1b5c9a7eeefdabe1b9a987030a8026b5e",
+    "projectRootSha256": "6d29f4b8b13f81bfe512063eb749153ca961ff5c9eb10685a56320af9522e614",
+    "registryRootSha256": "f37b377efa10887eab3b0669835a15879b8dce0f91159dd2834b9fbbfb7bc189"
+  }
+}

@@ -3,17 +3,17 @@
   "kind": "ai-drama-canvas-release-manifest",
   "version": "0.2.0",
   "architecture": "arm64",
-  "sourceDigest": "b4439e7bd9032caf8a0c511c6016dc46e868d0ebd2e3561db8486b0a32801d22",
-  "buildId": "38dbb556ec8ff28a7e669ba2e72b8e8b",
-  "buildIdentityFingerprint": "3ae23b49444975906462303a3495a8adeaff1e31d4de869e2f6488b1c639ca87",
+  "sourceDigest": "0152472cdfe62c75f4d91b8eb923f4984b9ab2fd3892bc4c0127707e7d01339b",
+  "buildId": "61ec96a95bda70f1897eec3e730c8bbd",
+  "buildIdentityFingerprint": "927fc493bd0e50088ec58d932a4822a64c2ecc3c53e1aa0aff73b97a78763985",
   "protocolVersion": "1.1",
-  "mcpToolCount": 202,
-  "builtAt": "2026-08-01T06:01:02.747Z",
+  "mcpToolCount": 220,
+  "builtAt": "2026-08-12T08:43:55.295Z",
   "distribution": "local-only",
   "localOnly": true,
   "source": {
-    "files": 885,
-    "bytes": 17754703
+    "files": 1049,
+    "bytes": 20830620
   },
-  "fingerprint": "b75e2aff8bdfc8715a0e2dc344133d05a83e990de447e5853bd1cec635100c54"
+  "fingerprint": "c287c1c3a358da9898fb306f35223f36b2d06ff8e31276a4842c77a7e44c617e"
 }

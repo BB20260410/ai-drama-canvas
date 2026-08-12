@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-mode-readonly-tree-comparison",
+  "phase": "P0",
+  "capturedAt": "2026-08-01T08:27:05Z",
+  "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4",
+  "formalNovelSource": {
+    "before": "docs/evidence/novel-mode-v1/real-project/formal-novel-p0-before.json",
+    "after": "docs/evidence/novel-mode-v1/real-project/formal-novel-p0-after.json",
+    "summary": {
+      "entries": 1353,
+      "directories": 197,
+      "files": 1156,
+      "symlinks": 0,
+      "fileBytes": 127886439
+    },
+    "aggregateSha256": "b7afb7aa236d37f3f1654f8a1ecc1da75da2891dfdbd952714fa869c421c227c",
+    "entriesByteEquivalent": true,
+    "unchanged": true
+  },
+  "activeProductionProject": {
+    "before": "docs/evidence/novel-mode-v1/real-project/active-production-p0-before.json",
+    "after": "docs/evidence/novel-mode-v1/real-project/active-production-p0-after.json",
+    "summary": {
+      "entries": 838,
+      "directories": 317,
+      "files": 521,
+      "symlinks": 0,
+      "fileBytes": 494157728
+    },
+    "aggregateSha256": "5395f2cbc2aead35812fa0984f04e65489db91956a2fdfd2a4239903d149b0b5",
+    "entriesByteEquivalent": true,
+    "unchanged": true
+  },
+  "rootPersistedInManifests": false,
+  "verdict": "pass-zero-write"
+}

@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "kind": "whole-project-behavior-preserving-refactor-phase-evidence",
+  "phase": "A",
+  "status": "passed",
+  "programStatus": "in_progress",
+  "completedAt": "2026-08-10T14:49:14Z",
+  "scope": {
+    "behaviorPreserving": true,
+    "databaseSchemaChanged": false,
+    "casChanged": false,
+    "ipcContractChanged": false,
+    "mcpContractChanged": false,
+    "formalProjectDataWritten": false
+  },
+  "baseline": {
+    "sourceFiles": 315,
+    "sourceTypeScriptVueLines": 220715,
+    "runtimeStronglyConnectedComponents": {
+      "before": 3,
+      "beforeSizes": [15, 4, 2],
+      "after": 2,
+      "afterSizes": [15, 4]
+    }
+  },
+  "changes": [
+    "extracted-higgsfield-pure-connector-contract",
+    "removed-higgsfield-queue-video-runtime-cycle",
+    "moved-novel-workspace-snapshot-to-domain-types-with-compatible-reexport",
+    "bounded-storyboard-wizard-asset-reads-to-four",
+    "bounded-managed-canvas-text-reads-to-four",
+    "added-source-module-boundary-regression"
+  ],
+  "verification": {
+    "higgsfield": { "files": 4, "tests": 28, "status": "passed" },
+    "renderer": { "files": 5, "tests": 47, "status": "passed" },
+    "novel": { "files": 3, "tests": 60, "status": "passed" },
+    "boundaryFinal": { "files": 2, "tests": 4, "status": "passed" },
+    "typecheck": "passed",
+    "typecheckApp": "passed",
+    "diffCheck": "passed",
+    "independentReview": "clean"
+  },
+  "notRun": [
+    "full-test-partitions",
+    "production-build",
+    "immutable-mcp-candidate",
+    "isolated-package-smoke",
+    "installed-app-replacement"
+  ],
+  "boundaries": {
+    "externalCalls": 0,
+    "uploads": 0,
+    "paidGenerations": 0,
+    "gitStageCommitPush": 0,
+    "appLaunched": false,
+    "notarized": false
+  },
+  "roadmap": "docs/全项目行为保持重构路线图_20260810.md"
+}

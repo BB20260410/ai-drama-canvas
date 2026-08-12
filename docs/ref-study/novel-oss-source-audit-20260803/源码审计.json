@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-oss-source-audit",
+  "auditDate": "2026-08-02",
+  "auditTimezone": "America/Los_Angeles",
+  "auditMode": "STATIC_SOURCE_AUDIT_ONLY",
+  "verdict": "ARCHITECTURE_WORTH_LEARNING_CODE_NOT_FOR_DIRECT_INTEGRATION",
+  "canvasVerdict": "KEEP_CANVAS_AS_SOLE_WRITING_OS_OWNER",
+  "boundaries": {
+    "externalDependenciesInstalled": false,
+    "externalScriptsRun": false,
+    "externalTestsRun": false,
+    "externalServicesStarted": false,
+    "externalModelsCalled": false,
+    "externalCodeCopiedIntoCanvas": false,
+    "canvasProductSourceModifiedByAudit": false,
+    "formalNovelSourceModified": false,
+    "gitStageCommitPushOrPr": false
+  },
+  "formalSourceEvidence": {
+    "before": "docs/evidence/novel-mode-v1/real-project/black-page-cleanroom-delta-final-20260803.json",
+    "after": "docs/evidence/novel-mode-v1/real-project/black-page-novel-oss-source-audit-final-20260803.json",
+    "comparison": "FULL_MANIFEST_EQUAL_EXCEPT_LABEL",
+    "entries": 566,
+    "aggregateSha256": "97e8fde0ee0ea8ce8529c3db7db4d2d412cbaf0b8f7ff1e837d185f01b89bada"
+  },
+  "repositories": [
+    {
+      "name": "InkOS",
+      "repository": "https://github.com/Narcooo/inkos",
+      "commit": "0da8637099369f59c12377267ec2e5bdc8c4985f",
+      "license": "AGPL-3.0",
+      "trackedFiles": 835,
+      "testLikePaths": 296,
+      "workflowFiles": 2,
+      "identity": "CONFIRMED",
+      "decision": "ADAPT_TRACE_AND_POLICY_ONLY"
+    },
+    {
+      "name": "AI-Novel-Writer",
+      "repository": "https://github.com/EthanYoQ/AI-Novel-Writer",
+      "commit": "2dc3d45ba4f1953c11b132dae584b62d8089f934",
+      "license": "GPL-3.0",
+      "trackedFiles": 540,
+      "testLikePaths": 147,
+      "workflowFiles": 3,
+      "identity": "CONFIRMED",
+      "decision": "HIGHEST_VALUE_CLEAN_ROOM_ENGINEERING_REFERENCE"
+    },
+    {
+      "name": "NovWr",
+      "repository": "https://github.com/Hurricane0698/novelwriter",
+      "commit": "d7c53073a8e7a6544465d9781b51f247adb37f54",
+      "license": "AGPL-3.0",
+      "trackedFiles": 756,
+      "testLikePaths": 202,
+      "workflowFiles": 5,
+      "identity": "CONFIRMED",
+      "decision": "ADAPT_DURABLE_RUN_AND_INDEX_LIFECYCLE"
+    },
+    {
+      "name": "OCNovel",
+      "repository": "https://github.com/wenjiazhu1980/OCNovel",
+      "commit": "50ec3679291504784cda2f3c5d0cd96a13934390",
+      "license": "MIT",
+      "trackedFiles": 178,
+      "testLikePaths": 69,
+      "workflowFiles": 2,
+      "identity": "PROBABLE_MATCH_NOT_OWNER_PINNED",
+      "decision": "ADAPT_QUALITY_TAXONOMY_ONLY"
+    },
+    {
+      "name": "AI_NovelGenerator",
+      "repository": "https://github.com/YILING0013/AI_NovelGenerator",
+      "commit": "f9aefef90b1493c579d7f72547efb4a3d8a0da25",
+      "license": "AGPL-3.0",
+      "trackedFiles": 53,
+      "testLikePaths": 4,
+      "workflowFiles": 0,
+      "identity": "CONFIRMED",
+      "decision": "REFERENCE_ONLY"
+    },
+    {
+      "name": "RWKV-Runner",
+      "repository": "https://github.com/josStorer/RWKV-Runner",
+      "commit": "3e10340342b9267f468ddde366b9b6e350d350d0",
+      "license": "MIT",
+      "trackedFiles": 491,
+      "testLikePaths": 21,
+      "workflowFiles": 3,
+      "identity": "CONFIRMED",
+      "decision": "PROVIDER_REFERENCE_ONLY"
+    },
+    {
+      "name": "MuMuAINovel-ddys",
+      "repository": "https://github.com/ddys9621/MuMuAINovel",
+      "commit": "8f105e2087e0161120c316266571c4c14be5f937",
+      "license": "GPL-3.0",
+      "trackedFiles": 342,
+      "testLikePaths": 43,
+      "workflowFiles": 0,
+      "identity": "CONFIRMED_DISTINCT_REPOSITORY",
+      "decision": "DOMAIN_MODEL_REFERENCE_ONLY"
+    },
+    {
+      "name": "MuMuAINovel-xiamuceer",
+      "repository": "https://github.com/xiamuceer-j/MuMuAINovel",
+      "commit": "e3f3d7d22b631a368da46811e831ba563cf10295",
+      "license": "GPL-3.0",
+      "trackedFiles": 344,
+      "testLikePaths": 0,
+      "workflowFiles": 1,
+      "identity": "CONFIRMED_DISTINCT_REPOSITORY",
+      "decision": "UX_AND_DOMAIN_REFERENCE_ONLY"
+    },
+    {
+      "name": "MaliangAINovalWriter",
+      "repository": "https://github.com/Deng-m1/MaliangAINovalWriter",
+      "commit": "08894a21e1a5e9145e41f38b66c07d90554b8c52",
+      "license": "NO_LICENSE_FILE_AT_AUDITED_COMMIT",
+      "trackedFiles": 1,
+      "testLikePaths": 0,
+      "workflowFiles": 0,
+      "identity": "CONFIRMED_REPOSITORY_UNVERIFIED_IMPLEMENTATION",
+      "decision": "UNVERIFIED_IMPLEMENTATION_DO_NOT_LEARN_FROM_CLAIMS"
+    }
+  ],
+  "canvasConfirmedStrengths": [
+    "EXACT_PREVIOUS_CHAPTER_CUTOFF",
+    "HARD_CANON_AND_REQUIRED_CAST_FAIL_CLOSE",
+    "CONTEXT_PACK_AND_PREFLIGHT_FINGERPRINT",
+    "CHAPTER_REVISION_SHA_DISK_CAS_AND_WRITE_LEASE",
+    "EVIDENCE_BOUND_STATE_CANDIDATE",
+    "HUMAN_ACCEPT_REJECT_STATE_COMMIT",
+    "APPEND_ONLY_STATE_HISTORY_AND_SHADOW_REBUILD",
+    "SOURCE_AND_PROVIDER_REVISION_PINNED_ANALYSIS_RUNS"
+  ],
+  "canvasConfirmedGaps": [
+    {
+      "id": "NOVEL-DERIVED-SEARCH-GENERATION",
+      "evidence": "src/core/novel-manuscript.ts#searchChapters",
+      "finding": "Search reads allowed chapter bodies and performs String.indexOf without a persistent derived generation.",
+      "priority": "P1"
+    },
+    {
+      "id": "NOVEL-ANALYSIS-EXECUTION-RECONCILIATION",
+      "evidence": "src/core/novel-analysis-provider.ts#executeNovelAnalysisTask",
+      "finding": "A crash after persisting executing/submitting can leave a task without TTL, heartbeat, or a legal reconciliation transition.",
+      "priority": "P1"
+    },
+    {
+      "id": "KERNEL-PACK-TRACE-SURFACE",
+      "evidence": "Existing pack receipts contain sources, budgets, reasons and fingerprints but the full selection and override trace is not surfaced as one owner-readable projection.",
+      "priority": "P1"
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "NOVEL-DERIVED-SEARCH-GENERATION",
+      "decision": "ADAPT",
+      "priority": "P1",
+      "sourcePatterns": ["AI-Novel-Writer vector generation", "NovWr index lifecycle"],
+      "canvasRule": "Canvas-owned FTS5 first; isolated build, coverage probe, atomic active switch, linear scan fallback; no second canon."
+    },
+    {
+      "id": "NOVEL-ANALYSIS-EXECUTION-RECONCILIATION",
+      "decision": "ADAPT",
+      "priority": "P1",
+      "sourcePatterns": ["NovWr continuation claim and stale reclaim"],
+      "canvasRule": "Expired executions transition only to human reconciliation; never auto retry a possibly dispatched request."
+    },
+    {
+      "id": "KERNEL-PACK-TRACE-SURFACE",
+      "decision": "ADAPT",
+      "priority": "P1",
+      "sourcePatterns": ["InkOS composition trace and rule override edges"],
+      "canvasRule": "Read-only projection of existing pack receipts; no new author-intent or current-focus owner."
+    },
+    {
+      "id": "KNOWLEDGE-PROVENANCE",
+      "decision": "DEFER_PENDING_CORPUS_EVIDENCE",
+      "priority": "P2",
+      "sourcePatterns": ["MuMu ddys CharacterKnownInfo"],
+      "canvasRule": "Only extend existing knowledge records through evidence candidates and human acceptance after real-corpus benefit is proven."
+    },
+    {
+      "id": "NARRATIVE-OBLIGATION-DIAGNOSTICS",
+      "decision": "DEFER_PENDING_CORPUS_EVIDENCE",
+      "priority": "P2",
+      "sourcePatterns": ["MuMu ddys NarrativePromise and ChapterCausalLink"],
+      "canvasRule": "Start as derived diagnostics and owner candidates; never auto-settle durable canon."
+    }
+  ],
+  "rejected": [
+    "SECOND_CANON_DATABASE_OR_TRUTH_TREE",
+    "AUTOMATIC_LLM_STATE_SETTLEMENT",
+    "EXTERNAL_RUNTIME_DOUBLE_WRITE",
+    "GPL_OR_AGPL_CODE_COPY_OR_RUNTIME_LINKAGE",
+    "FIXED_GENRE_SPECIFIC_QUALITY_THRESHOLDS_AS_SAVE_GATES",
+    "README_CLAIMS_AS_ARCHITECTURE_EVIDENCE",
+    "MODEL_MEMORY_AS_A_REPLACEMENT_FOR_CONTEXT_PACK_AND_CANON_OWNER"
+  ],
+  "millionWordConclusion": {
+    "canExternalSoftwareAloneGuaranteeConsistency": false,
+    "canCanvasBenefit": true,
+    "requiredNextEvidence": [
+      "FTS5 generation implementation and 500/1000 chapter build/query benchmarks",
+      "analysis execution crash-injection and no-auto-retry reconciliation tests",
+      "pack trace projection determinism and non-leak tests",
+      "real-manuscript retrieval, continuity, retcon and multi-writer acceptance"
+    ],
+    "currentRiskLabel": "VERIFIED_WITH_PERFORMANCE_AND_LONG_RUN_RECOVERY_RISK"
+  }
+}

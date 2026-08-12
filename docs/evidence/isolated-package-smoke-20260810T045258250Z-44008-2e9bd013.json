@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "kind": "current-source-isolated-unpacked-app-validation",
+  "runId": "isolated-package-smoke-20260810T045258250Z-44008-2e9bd013",
+  "startedAt": "2026-08-10T04:52:58.251Z",
+  "completedAt": "2026-08-10T05:01:38.702Z",
+  "status": "failed",
+  "error": "electron-builder 隔离 unpacked App 失败：{\"code\":1,\"message\":\"Command failed: /private/tmp/aic-pkg-xbO3nt/stage/node_modules/.bin/electron-builder --mac --dir --publish never -c.directories.output=/private/tmp/aic-pkg-xbO3nt/stage/builder-output -c.mac.identity=null -c.mac.notarize=false -c.forceCodeSigning=false -c.npmRebuild=false -c.electronDist=/private/tmp/aic-pkg-xbO3nt/stage/node_modules/electron/dist\\n\",\"stdoutTail\":\"• electron-builder  version=26.0.12 os=25.5.0\\n  • loaded configuration  file=package.json (\\\"build\\\" field)\\n  • skipped dependencies rebuild  reason=npmRebuild is set to false\\n  • packaging       platform=darwin arch=arm64 electron=43.1.0 appOutDir=builder-output/mac-arm64\\n  • custom electronDist provided but no zip found; assuming unpacked electron directory.  electronDist=node_modules/electron/dist expectedFile=electron-v43.1.0-darwin-arm64.zip\\n  • copying Electron  source=/private/tmp/aic-pkg-xbO3nt/stage/node_modules/electron/dist/Electron.app destination=/private/tmp/aic-pkg-xbO3nt/stage/builder-output/mac-arm64/Electron.app\\n  ⨯ corrupted Electron dist  failedTask=build stackTrace=Error: corrupted Electron dist\\n    at createMacApp (/private/tmp/aic-pkg-xbO3nt/stage/node_modules/app-builder-lib/src/electron/electronMac.ts:82:11)\\n    at beforeCopyExtraFiles (/private/tmp/aic-pkg-xbO3nt/stage/node_modules/app-builder-lib/src/electron/ElectronFramework.ts:86:5)\\n    at MacPackager.doPack (/private/tmp/aic-pkg-xbO3nt/stage/node_modules/app-builder-lib/src/platformPackager.ts:331:7)\\n    at MacPackager.pack (/private/tmp/aic-pkg-xbO3nt/stage/node_modules/app-builder-lib/src/macPackager.ts:219:9)\\n    at Packager.doBuild (/private/tmp/aic-pkg-xbO3nt/stage/node_modules/app-builder-lib/src/packager.ts:491:9)\\n    at executeFinally (/private/tmp/aic-pkg-xbO3nt/stage/node_modules/builder-util/src/promise.ts:12:14)\\n    at Packager.build (/private/tmp/aic-pkg-xbO3nt/stage/node_modules/app-builder-lib/src/packager.ts:425:31)\\n    at executeFinally (/private/tmp/aic-pkg-xbO3nt/stage/node_modules/builder-util/src/promise.ts:12:14)\",\"stderrTail\":\"\"}",
+  "outputPaths": {
+    "evidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260810T045258250Z-44008-2e9bd013.json",
+    "packagedUiEvidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260810T045258250Z-44008-2e9bd013-electron-ui.json",
+    "packagedUiScreenshotPath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260810T045258250Z-44008-2e9bd013-electron-ui.png",
+    "packagedReviewEvidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260810T045258250Z-44008-2e9bd013-review-ui.json",
+    "packagedReviewScreenshotPath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260810T045258250Z-44008-2e9bd013-review-ui.png"
+  },
+  "terminal": {
+    "tempRootRemoved": true,
+    "lingeringProcessesBeforeCleanup": [],
+    "lingeringProcessesAfterCleanup": []
+  },
+  "commands": [
+    {
+      "label": "APFS COW clone into isolated stage",
+      "executable": "/bin/cp",
+      "args": [
+        "-cR",
+        "electron.vite.config.ts",
+        "package-lock.json",
+        "package.json",
+        "tsconfig.app.json",
+        "tsconfig.json",
+        "tsconfig.mcp.json",
+        "tsconfig.node.json",
+        "tsconfig.production-runs.json",
+        "tsconfig.web.json",
+        "vitest.config.ts",
+        "src",
+        "scripts",
+        "tests",
+        "build",
+        "/private/tmp/aic-pkg-xbO3nt/stage"
+      ],
+      "durationMs": 655,
+      "stdoutTail": "",
+      "stderrTail": ""
+    },
+    {
+      "label": "isolated lockfile-faithful npm ci",
+      "executable": "/usr/bin/env",
+      "args": [
+        "npm",
+        "ci",
+        "--include=dev",
+        "--no-audit",
+        "--no-fund",
+        "--registry=https://registry.npmjs.org"
+      ],
+      "durationMs": 133326,
+      "stdoutTail": "added 632 packages in 2m",
+      "stderrTail": "npm warn skipping integrity check for git dependency ssh://git@github.com/electron/node-gyp.git\nnpm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported\nnpm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn deprecated @npmcli/move-file@2.0.1: This functionality has been moved to @npmcli/fs\nnpm warn deprecated rimraf@2.6.3: Rimraf versions prior to v4 are no longer supported\nnpm warn deprecated glob@8.1.0: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@8.1.0: Glob versions prior to v9 are no longer supported"
+    },
+    {
+      "label": "isolated production dependency closure",
+      "executable": "/usr/bin/env",
+      "args": [
+        "npm",
+        "ls",
+        "--omit=dev",
+        "--all",
+        "--json"
+      ],
+      "durationMs": 1200,
+      "stdoutTail": "            \"@vue/compiler-ssr\": {\n              \"version\": \"3.5.39\"\n            },\n            \"@vue/shared\": {\n              \"version\": \"3.5.39\"\n            },\n            \"vue\": {\n              \"version\": \"3.5.39\"\n            }\n          }\n        },\n        \"@vue/shared\": {\n          \"version\": \"3.5.39\",\n          \"resolved\": \"https://registry.npmmirror.com/@vue/shared/-/shared-3.5.39.tgz\",\n          \"overridden\": false\n        },\n        \"typescript\": {\n          \"version\": \"5.9.3\",\n          \"resolved\": \"https://registry.npmmirror.com/typescript/-/typescript-5.9.3.tgz\",\n          \"overridden\": false\n        }\n      }\n    },\n    \"zod\": {\n      \"version\": \"4.3.5\",\n      \"resolved\": \"https://registry.npmmirror.com/zod/-/zod-4.3.5.tgz\",\n      \"overridden\": false\n    }\n  }\n}",
+      "stderrTail": ""
+    },
+    {
+      "label": "isolated stage current-source build",
+      "executable": "/usr/bin/env",
+      "args": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "durationMs": 202796,
+      "stdoutTail": "../../out/renderer/assets/DesktopSupportView-BRXS1y_O.js                17.87 kB\n../../out/renderer/assets/ScriptWorkbenchView-PpE4DCZ3.js               18.13 kB\n../../out/renderer/assets/ProjectSettingsView-DXQmf3Ry.js               18.90 kB\n../../out/renderer/assets/ShotTimelineView-CSqcymMN.js                  22.85 kB\n../../out/renderer/assets/ContinuityTimelineView-9eYhnvtK.js            24.08 kB\n../../out/renderer/assets/ProductionWorkspace-BleezPr0.js               25.46 kB\n../../out/renderer/assets/CanonicalAssetLibraryView-Byp5Rmbb.js         27.24 kB\n../../out/renderer/assets/ProjectCenter-C8-gqo6H.js                     30.78 kB\n../../out/renderer/assets/ProjectImportWizard-erMnKD_X.js               36.53 kB\n../../out/renderer/assets/GlobalResourceCenterView-C3zZkGIF.js          38.56 kB\n../../out/renderer/assets/StoryWorkbenchView-DNCsV5-y.js                38.87 kB\n../../out/renderer/assets/ContinuationWorkbenchView-brFd88q8.js         43.01 kB\n../../out/renderer/assets/ScriptMediaAlignView-CRt7_7ll.js              45.47 kB\n../../out/renderer/assets/StudioProductionDashboardView-7MfQbrlx.js     49.38 kB\n../../out/renderer/assets/StudioMultimediaTimelineView-DGod0QAE.js      53.82 kB\n../../out/renderer/assets/ReviewStudioView-BBSuD517.js                  57.18 kB\n../../out/renderer/assets/StudioBindingWorkbench-h4DpQ7jx.js            64.48 kB\n../../out/renderer/assets/PanelReferenceWorkbench-CQluT9iu.js           68.27 kB\n../../out/renderer/assets/StudioGenerationControlView-Brk_en9e.js       70.65 kB\n../../out/renderer/assets/NarrativeAdaptationView-CIjWCtFt.js           75.25 kB\n../../out/renderer/assets/GenerationQueueView-Dg2eIKr2.js               77.75 kB\n../../out/renderer/assets/NovelStudioView-0Yt9nLr5.js                   82.26 kB\n../../out/renderer/assets/ProductionDesignView-DLP19-VL.js             112.89 kB\n../../out/renderer/assets/StudioContinuityReviewView-DTk5Cr2t.js       116.60 kB\n../../out/renderer/assets/VideoEditorView-DZ4H0M_K.js                  181.62 kB\n../../out/renderer/assets/MaterialStudioView-CQlZu2Yt.js               198.14 kB\n../../out/renderer/assets/vue-flow-core-Drbbq7yW.js                    335.38 kB\n../../out/renderer/assets/index-DEalcc4E.js                            438.66 kB\n../../out/renderer/assets/ManagedStudioCanvasView-BKjuBD7q.js          502.17 kB\n✓ built in 13.81s",
+      "stderrTail": "\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-continuity-ledger.ts is dynamically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-unit-grid-generation.ts but also statically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/dudu-readonly-import.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-continuity-review-control.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-generation.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-production-dashboard.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-generation-review.ts is dynamically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-generation.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-unit-grid-generation.ts but also statically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-continuity-review-control.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-generation-checkpoint.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-post-result-observation.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-production-projection-bundle.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-trace.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-video-package-source-adapter.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-video-package.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/main/index.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-post-result-observation.ts is dynamically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-unit-grid-generation.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-production-projection-bundle.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-video-package-source-adapter.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-generation-checkpoint.ts is dynamically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-generation-ledger.ts but also statically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-continuity-review-control.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-episode-earliest.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-production-dashboard.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-production-diagnostics.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/main/index.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-project-write-lease.ts is dynamically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/active-managed-studio-context.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/desktop-write-lease.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-canvas-workflow-runner.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-continuous-generation-state.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-episode-earliest.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-xbO3nt/stage/src/core/active-managed-studio-context.ts is dynamically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-generation-ledger.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-generation-ledger.ts but also statically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-agent-imagegen-result-bundle.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-video-package.ts is dynamically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-post-result-observation.ts but also statically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-higgsfield-connector-queue.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-higgsfield-video-generation.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-production-projection-bundle.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/main/index.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-approved-timeline-projection.ts is dynamically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-episode-earliest.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-multimedia-timeline.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-production-diagnostics.ts, /private/tmp/aic-pkg-xbO3nt/stage/src/core/studio-production-projection-bundle.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-xbO3nt/stage/src/core/local-creative-project-ingest-status.ts is dynamically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/local-creative-production-unit-materializer.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-xbO3nt/stage/src/core/local-creative-production-unit-preview.ts is dynamically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-xbO3nt/stage/src/core/local-creative-production-unit-materializer.ts, dynamic import will not move module into another chunk."
+    },
+    {
+      "label": "isolated stage MCP capability baseline",
+      "executable": "/private/tmp/aic-pkg-xbO3nt/stage/node_modules/.bin/tsx",
+      "args": [
+        "/private/tmp/aic-pkg-xbO3nt/stage/scripts/mcp-smoke.ts",
+        "/private/tmp/aic-pkg-xbO3nt/stage/dist-mcp/mcp/server.js"
+      ],
+      "durationMs": 3856,
+      "stdoutTail": "    \"create_video_continuation\",\n    \"list_video_continuations\",\n    \"update_video_continuation\"\n  ],\n  \"resources\": [\n    \"aicanvas://server/capabilities\",\n    \"aicanvas://projects\"\n  ],\n  \"resourceTemplates\": [\n    \"aicanvas://projects/{projectId}/snapshot\",\n    \"aicanvas://projects/{projectId}/items/{itemId}\",\n    \"aicanvas://projects/{projectId}/artifacts/{artifactId}\",\n    \"aicanvas://projects/{projectId}/canvas\",\n    \"aicanvas://projects/{projectId}/tasks\",\n    \"aicanvas://projects/{projectId}/generation/{jobId}\",\n    \"aicanvas://projects/{projectId}/editor/{editProjectId}\",\n    \"aicanvas://projects/{projectId}/story/chapters/{chapterId}\",\n    \"aicanvas://projects/{projectId}/changes/{cursor}\"\n  ],\n  \"prompts\": [\n    \"managed_studio_lock_generate_writeback\",\n    \"resume_project\",\n    \"produce_next_image_batch\",\n    \"produce_next_video_batch\",\n    \"run_browser_generation\",\n    \"continue_video_from_last_frame\",\n    \"review_visual_batch\",\n    \"recover_interrupted_work\"\n  ]\n}",
+      "stderrTail": "(node:48037) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n[mcp-process-guard] MCP OS 主写进程已登记 pid=48037"
+    }
+  ]
+}

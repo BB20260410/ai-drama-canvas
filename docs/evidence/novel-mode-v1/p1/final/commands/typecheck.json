@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "p1-typecheck-final-v2",
+  "status": "pass",
+  "startedAt": "2026-08-01T10:07:20.964Z",
+  "endedAt": "2026-08-01T10:07:35.783Z",
+  "durationMs": 14887,
+  "argv": [
+    "npm",
+    "run",
+    "typecheck"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "293b50202680f19fc069208392fef394",
+      "sourceDigest": "2f158843a10205128a0d0d36e0f5d934832e50608a46e79b9b44fbc837696ff2"
+    },
+    "after": {
+      "buildId": "293b50202680f19fc069208392fef394",
+      "sourceDigest": "2f158843a10205128a0d0d36e0f5d934832e50608a46e79b9b44fbc837696ff2"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/novel-mode-v1/p1/final/commands/typecheck.log",
+    "sizeBytes": 114,
+    "sha256": "1b39cb0951d130560f744d491a1a4ff92e17403403c51584533ffaa3535afc68"
+  }
+}

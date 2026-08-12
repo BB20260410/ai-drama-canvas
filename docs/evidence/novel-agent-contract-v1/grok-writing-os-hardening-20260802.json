@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-writing-os-grok-hardening-acceptance",
+  "status": "PASS",
+  "generatedAt": "2026-08-02T01:39:22Z",
+  "objective": "建立Codex与Grok的持续只读审查修复闭环，修复黑页Writing OS首测暴露的Agent写入门与preflight参数问题，直到Grok无P0/P1且本地机械验证通过",
+  "scope": {
+    "workspace": "/Users/hxx/Documents/无限画布",
+    "formalNovelSourcePersisted": false,
+    "formalNovelSourceWritten": false,
+    "remoteReview": "Grok CLI",
+    "grokWebSearchEnabled": false,
+    "grokMemoryEnabled": false,
+    "grokSubagentsEnabled": false,
+    "grokPermissionMode": "plan",
+    "gitStageCommitPushPr": false,
+    "publishedOrDeployed": false,
+    "liveDistMcpReplaced": false,
+    "installedApplicationReplaced": false
+  },
+  "resolvedFindings": [
+    {
+      "severity": "P0",
+      "finding": "MCP和JSON CLI可省略aiWriteContext直接novel_save_chapter",
+      "resolution": "command bus默认Agent并在工程探测和账本I/O前拒绝无aiWriteContext的save；桌面Main仅显式human_ui兼容人工保存",
+      "reason": "context_preflight_required"
+    },
+    {
+      "severity": "P1",
+      "finding": "preflight重建pack写死continue_chapter且容易漏传完整组包参数",
+      "resolution": "preflight完整镜像taskType/query/chapterIds/characterIds/maxCharacters/maxSearchHits；pack返回canonical writePreflightInput；stale返回currentWritePreflightInput"
+    },
+    {
+      "severity": "P1",
+      "finding": "Agent可通过novel_create_chapter.content写完整正文绕过Writing OS",
+      "resolution": "默认Agent只能创建空章；非空create在账本I/O前失败关闭，随后必须pack→preflight→带aiWriteContext save"
+    },
+    {
+      "severity": "evidence-correction",
+      "finding": "首测把012事后stale描述为跨进程指纹疑点",
+      "resolution": "确认pack使用maxCharacters=60000而首次preflight漏传后默认12000；完全同参重放得到原fingerprint/preflightId且ready=true"
+    }
+  ],
+  "contracts": {
+    "agentCreate": "empty-body-only",
+    "agentSave": "aiWriteContext-required",
+    "humanDesktop": "explicit-internal-human-ui-actor",
+    "writableTaskTypes": [
+      "continue_chapter",
+      "revise_chapter"
+    ],
+    "reviewWritePreflightInput": null,
+    "canonicalWritePreflightFields": [
+      "taskType",
+      "targetChapterId",
+      "contextPackFingerprint",
+      "query",
+      "chapterIds",
+      "characterIds",
+      "maxCharacters",
+      "maxSearchHits"
+    ],
+    "actorAuthorizationBeforeLedgerReplay": true
+  },
+  "verification": {
+    "directed": {
+      "command": "npx vitest run tests/novel-command-bus.test.ts tests/novel-agent-cli.test.ts tests/novel-writing-state.test.ts tests/novel-ipc-api.test.ts --maxWorkers=1",
+      "files": 4,
+      "tests": 29,
+      "status": "PASS"
+    },
+    "fullNovelRuntimeRegression": {
+      "command": "npx vitest run tests/novel-*.test.ts tests/mcp.test.ts tests/runtime-mcp-effect.test.ts tests/managed-project.test.ts tests/managed-project-service.test.ts --maxWorkers=1",
+      "files": 28,
+      "tests": 258,
+      "durationSeconds": 369.1,
+      "status": "PASS"
+    },
+    "currentnessGate": {
+      "command": "npx vitest run tests/mcp-build-currentness-gate.test.ts --maxWorkers=1",
+      "files": 1,
+      "tests": 4,
+      "status": "PASS"
+    },
+    "typecheck": {
+      "command": "npm run typecheck -- --pretty false",
+      "status": "PASS"
+    },
+    "gitDiffCheck": {
+      "command": "git diff --check",
+      "status": "PASS"
+    },
+    "oldCandidateAgainstNewSource": {
+      "status": "EXPECTED_FAIL_CLOSED",
+      "code": "CURRENT_MCP_CANDIDATE_NOT_FOUND",
+      "currentSourceDigest": "1b6f4a86544e89ff06ce7552e66328634bb226b86563f4a07a9b09c169902da4"
+    }
+  },
+  "runtime": {
+    "candidateId": "mcp-candidate-1b6f4a86544e89ff-3a7f2fd615601270-ef0fd9bc",
+    "sourceDigest": "1b6f4a86544e89ff06ce7552e66328634bb226b86563f4a07a9b09c169902da4",
+    "sourceFiles": 941,
+    "sourceBytes": 19147525,
+    "buildId": "7af833522c34ba9b547935c9339a6153",
+    "mcpToolCount": 209,
+    "entrySha256": "478ec2dd4f39593b608dca5104adbf8029be85d7eca7c831951dcf0e91cf3fb3",
+    "inspectedCandidates": 38,
+    "invalidCandidates": 0,
+    "sourceUnchangedDuringCandidateBuild": true,
+    "liveDistMcp": {
+      "beforeFingerprint": "b4ada03692a089a0a35b0be2211f10c1870a7b5ef6f7a84eeb3423d957816d79",
+      "afterFingerprint": "b4ada03692a089a0a35b0be2211f10c1870a7b5ef6f7a84eeb3423d957816d79",
+      "unchanged": true
+    },
+    "currentStdioProbe": {
+      "status": "PASS",
+      "toolCount": 209,
+      "agentChapterBodyWrites": "empty-create-then-context-pack-preflight-save",
+      "humanDesktopCompatibility": "explicit-human-ui-actor",
+      "preflightTaskTypes": [
+        "continue_chapter",
+        "revise_chapter"
+      ]
+    }
+  },
+  "grokReviews": [
+    {
+      "sessionId": "019fbfec-47c6-7592-b846-f17f7aca3ba6",
+      "outcome": "ACCEPTABLE_WITH_FIXES",
+      "remainingBlocking": true
+    },
+    {
+      "sessionId": "019fc000-dbf5-7353-9d2b-38f846451525",
+      "outcome": "BLOCKING_ISSUES",
+      "finding": "Agent non-empty create_chapter bypass",
+      "remainingBlocking": true
+    },
+    {
+      "sessionId": "019fc00b-5398-77e2-9936-fc36b1578f20",
+      "outcome": "CLEAN",
+      "scope": "code and directed tests",
+      "remainingBlocking": false
+    },
+    {
+      "sessionId": "019fc017-5528-71e2-8008-37feb811f6af",
+      "outcome": "CLEAN",
+      "scope": "current MCP runtime, capabilities, contracts and evidence",
+      "buildCurrentnessAllowed": true,
+      "remainingBlocking": false
+    },
+    {
+      "sessionId": "019fc01c-41cd-76f3-8bb8-3c44bee891c7",
+      "outcome": "CLEAN_WITH_DEBUG_DRAFT_REVIEWED",
+      "scope": "final documentation consistency; visible verdict was CLEAN, leaked debug draft prompted stricter historical-label cleanup",
+      "remainingBlocking": false
+    },
+    {
+      "sessionId": "019fc01f-1a08-76f3-8867-259ebf82d5e5",
+      "outcome": "CLEAN",
+      "scope": "structured final documentation acceptance after historical-label cleanup",
+      "structuredVerdict": {
+        "verdict": "CLEAN",
+        "blockingIssues": []
+      },
+      "remainingBlocking": false
+    }
+  ],
+  "formalSource": {
+    "evidenceLineage": "The three manifests below belong to the earlier formal-source preservation pilot (managed project suffix 385ebea2). The first user test is a separate isolated run (suffix 448e209f) with its own before/after manifests; the IDs are intentionally different and are not interchangeable.",
+    "formalSourcePilotManagedProject": "docs/evidence/novel-mode-v1/real-project/pilots/black-page-ch011-managed-pilot-20260801-385ebea2",
+    "separateFirstUserTestManagedProject": "docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958/managed/black-page-ch011-managed-pilot-20260801-448e209f",
+    "manifestBefore": "docs/evidence/novel-mode-v1/real-project/black-page-ch011-pilot-before.json",
+    "manifestAfterPilot": "docs/evidence/novel-mode-v1/real-project/black-page-ch011-pilot-after.json",
+    "manifestAfterHardening": "docs/evidence/novel-mode-v1/real-project/black-page-post-grok-hardening-20260802.json",
+    "entries": 547,
+    "directories": 39,
+    "files": 507,
+    "symlinks": 1,
+    "fileBytes": 5943649,
+    "aggregateSha256": "67da96a088bc83a60b8a1d3c716c19d2ae484cd575a4ac4f31c4114789fcfd70",
+    "allThreeManifestsEqual": true,
+    "baselineStatus": "provisional",
+    "formalChapter11Written": false
+  },
+  "documents": {
+    "agentContract": "docs/novel-mode/AI_AGENT_CONTRACT_V1.md",
+    "deliveryReport": "docs/novel-mode/07-writing-os-v1-delivery.md",
+    "currentHandoff": "docs/当前开发交接.md",
+    "correctedFirstTestReport": "docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958/测试报告.md",
+    "correctedFirstTestJson": "docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958/测试证据.json"
+  },
+  "git": {
+    "preexistingDirtyWorkPreserved": true,
+    "stagedFiles": 0,
+    "committed": false,
+    "pushed": false,
+    "pullRequestCreated": false
+  },
+  "nonBlockingBoundaries": [
+    "正式黑页仍为provisional，CH006-010终润与字数门尚未锁版",
+    "本轮没有文学质量或人工UI视觉验收",
+    "此前1M/500章性能数字保留为加固前R2基线，本轮未重新计时",
+    "human_ui actor是进程内信任边界，不属于MCP或JSON CLI公共schema"
+  ]
+}

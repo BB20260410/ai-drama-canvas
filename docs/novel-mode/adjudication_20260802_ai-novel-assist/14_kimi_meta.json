@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "role": "kimi",
+  "model": "kimi-k3",
+  "elapsed_sec": 152.39,
+  "usage": {
+    "completion_tokens": 4863,
+    "prompt_tokens": 3016,
+    "total_tokens": 7879,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 1696
+    }
+  },
+  "finish_reason": "stop",
+  "content_chars": 6443,
+  "client_timeout_sec": 0.0,
+  "output": "/Users/hxx/Documents/无限画布/docs/novel-mode/adjudication_20260802_ai-novel-assist/14_kimi.txt"
+}

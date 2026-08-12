@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "kind": "whole-project-behavior-preserving-refactor-phase-evidence",
+  "phase": "E",
+  "status": "passed",
+  "programStatus": "in_progress",
+  "completedAt": "2026-08-10T16:05:16Z",
+  "scope": {
+    "behaviorPreserving": true,
+    "rendererOnly": true,
+    "ipcContractChanged": false,
+    "coreDecisionContractChanged": false,
+    "formalProjectDataWritten": false
+  },
+  "changes": [
+    "extracted-material-studio-ui-type-contract",
+    "extracted-material-studio-read-mapper",
+    "extracted-legacy-canvas-flow-projection",
+    "replaced-nested-narrative-lookups-with-order-preserving-map-set",
+    "added-renderer-pure-boundary-and-equivalence-fixtures"
+  ],
+  "invariants": {
+    "publicTypeDeclarationsBefore": 28,
+    "publicTypeDeclarationsAfter": 28,
+    "publicTypeStructuralDrift": 0,
+    "coreNextActionDerivedInRenderer": false,
+    "completedUnitCountSource": "dashboard-checkpoint-completedSlotCount",
+    "legacyProjectionConsumesVisibleItemsOnly": true,
+    "projectEpochAndLayoutGenerationRemainInApp": true,
+    "managedCanvasPageUnitLimit": 36,
+    "managedCanvasPanelLimit": 6,
+    "managedCanvasControlAssetLimit": 6,
+    "formalPassLogicChanged": false,
+    "mediaShaContractChanged": false
+  },
+  "verification": {
+    "implementationFocused": { "files": 9, "tests": 69, "status": "passed" },
+    "mainFocused": { "files": 6, "tests": 23, "status": "passed" },
+    "publicTypeAstComparison": "passed",
+    "legacyProjectionFieldComparison": "passed",
+    "typecheck": "passed",
+    "typecheckApp": "passed",
+    "diffCheck": "passed",
+    "independentReview": "clean"
+  },
+  "fileHashes": {
+    "src/renderer/src/material-studio-ui-contract.ts": "eb823a1a362dff218176f358ae5c114aaa275da9042ebc5d3868e51d44d93176",
+    "src/renderer/src/material-studio-read-mapper.ts": "bb9ad83e957eed620a66ab56933acd3b553fead62c025fed561fd0ad83e2e65e",
+    "src/renderer/src/legacy-canvas-flow-projection.ts": "6861eb138614d2a9df57710b1e5cb1577b8dd20093fb16194327230db5404033",
+    "tests/material-studio-ui-contract.test.ts": "498faf34cb68bdc0a7280c459e06cfb971339f0cf410121dd999e34425f2a701",
+    "tests/material-studio-read-mapper.test.ts": "27ef070b860f6e92f2c575bc4bae07cec8b2a736608a194ef4c397aeb9454f0d",
+    "tests/legacy-canvas-flow-projection.test.ts": "449a9015009b0c0d12b092348dc8ec89e2bfe4d56c647d7c1ec213c50ba371a8"
+  },
+  "notRun": [
+    "electron-ui-smoke",
+    "full-test-partitions",
+    "production-build",
+    "immutable-mcp-candidate",
+    "isolated-package-smoke",
+    "installed-app-replacement"
+  ],
+  "boundaries": {
+    "externalCalls": 0,
+    "uploads": 0,
+    "paidGenerations": 0,
+    "gitStageCommitPush": 0,
+    "appLaunched": false,
+    "notarized": false
+  },
+  "roadmap": "docs/全项目行为保持重构路线图_20260810.md"
+}

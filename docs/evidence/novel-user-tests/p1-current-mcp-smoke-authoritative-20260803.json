@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "kind": "writing-os-current-runtime-smoke",
+  "status": "PASS",
+  "generatedAt": "2026-08-03T04:22:20.497Z",
+  "projectRelativePath": "docs/evidence/novel-user-tests/writing-os-million-word-consistency-hard-20260801-221728/black-page-managed/black-page-ch011-managed-pilot-20260801-fa3e3df9",
+  "runtime": {
+    "candidateId": "mcp-candidate-c32676d385437104-88c6696054753099-20bcfb2d",
+    "sourceDigest": "c32676d38543710470cc22330af5324af3eb99476f2cf75fa3507c74adf32480",
+    "buildId": "470a1c169ac587684b5c30a33547ae5a",
+    "entrySha256": "425c23be81aba8fb1fcec3328c168f13a2bcaddfd1d526d4a961b5a463490201",
+    "buildCurrentnessAllowed": true,
+    "toolCount": 218,
+    "requiredTools": [
+      "doctor_novel_agent",
+      "prepare_novel_chapter_write",
+      "probe_novel_chapter_consistency",
+      "get_novel_writing_state",
+      "execute_command"
+    ]
+  },
+  "temporalBoundary": {
+    "targetChapterId": "fb4a0877-d99d-51f5-ab8d-53f4eca1f754",
+    "cutoffChapterId": "2dc9be48-b563-571a-8779-2f9e89dcdfa6",
+    "chapter11StateVisible": false,
+    "authorOnlyVisible": false
+  },
+  "doctor": {
+    "targetChapterId": "022be142-6e95-5ad4-9d22-bd95a9a772ef",
+    "readyForPrepare": false,
+    "blockerCodes": [
+      "required_cast_missing"
+    ],
+    "nextToolNames": [
+      "execute_command"
+    ],
+    "fingerprint": "cb61f6a3a67762d953599bcfa441e9a7924077d52d5efa8ae064328a617e603d"
+  },
+  "probe": {
+    "targetChapterId": "fb4a0877-d99d-51f5-ab8d-53f4eca1f754",
+    "machineConflictCodes": [],
+    "reviewRequiredCodes": [
+      "undeclared_cast_candidate"
+    ],
+    "limitationCount": 3,
+    "fingerprint": "c467891009da5ecc6e0e90b9d3aed142358264c8db86ea0622f3356890213358"
+  },
+  "stderrTail": ""
+}

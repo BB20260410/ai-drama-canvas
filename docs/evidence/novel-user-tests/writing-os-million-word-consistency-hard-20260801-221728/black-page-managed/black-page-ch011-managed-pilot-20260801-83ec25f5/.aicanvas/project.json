@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 2,
+  "id": "project-75dbc86bf718",
+  "name": "black-page-ch011-managed-pilot-20260801",
+  "primaryRoot": "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/writing-os-million-word-consistency-hard-20260801-221728/black-page-managed/black-page-ch011-managed-pilot-20260801-83ec25f5",
+  "sourceRoots": [],
+  "outputRoots": [
+    "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/writing-os-million-word-consistency-hard-20260801-221728/black-page-managed/black-page-ch011-managed-pilot-20260801-83ec25f5"
+  ],
+  "ignoreSegments": [
+    "旧版",
+    "弃用",
+    "废弃",
+    "备份",
+    "archive",
+    "deprecated",
+    "__pycache__",
+    ".git",
+    ".aicanvas"
+  ],
+  "namingRules": {
+    "patterns": [],
+    "manualMappings": []
+  },
+  "hardLocks": [],
+  "automation": {
+    "imageBatchSize": 6,
+    "videoBatchSize": 3,
+    "pauseAfterVisualBatch": true,
+    "allowOverwriteAuthoritative": false
+  },
+  "createdAt": "2026-08-02T06:14:32.663Z",
+  "updatedAt": "2026-08-02T06:14:32.660Z",
+  "workspaceMode": "novel",
+  "minimumWriterSchemaVersion": 2
+}

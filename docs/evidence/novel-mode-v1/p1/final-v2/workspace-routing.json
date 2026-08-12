@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-workspace-routing-electron-smoke",
+  "verdict": "PASS",
+  "capturedAt": "2026-08-01T10:15:07.137Z",
+  "buildIdentity": {
+    "sourceDigest": "f3e186cdaea97298dc7654a4f9729dd4b3d69e02c719e4708cc00a80c8a5c1d0",
+    "buildId": "3b39d7592ceaaaeb65d709d64c33736d",
+    "buildIdentityFingerprint": "92d4b1e08f8612faee46a62ec45b7f7813309effa1af1b4427338b989c069ff0",
+    "releaseManifest": {
+      "bytes": 642,
+      "sha256": "a96021f44eed4cd7d07890873df02f6ee942954c28c77bd6a14c882251dc36f3"
+    }
+  },
+  "fixture": {
+    "isolated": true,
+    "formalNovelSourceUsed": false,
+    "activeProductionProjectUsed": false,
+    "temporaryRegistry": true,
+    "temporaryUserData": true
+  },
+  "routes": {
+    "drama": {
+      "projectId": "project-384aaf4be7ee",
+      "manifestSchemaVersion": 1,
+      "declaredWorkspaceMode": "drama",
+      "visibleRoute": "material-studio",
+      "rendererProjectRootSha256": "9ac05b48fa8ebc3b3f1e93a00d9c265a8ec0cc819f57702863b4e037e8bf6e8f",
+      "materialStudioVisible": true,
+      "novelStudioCount": 0
+    },
+    "novel": {
+      "projectId": "project-9a58f2086c58",
+      "manifestSchemaVersion": 2,
+      "minimumWriterSchemaVersion": 2,
+      "declaredWorkspaceMode": "novel",
+      "visibleRoute": "novel-studio",
+      "rendererProjectRootSha256": "53fef01826a09181e70be3d0a8ce2f7d2d14b4bc9282fdc069d1adad03647456",
+      "readonlyBannerVisible": true,
+      "homepageStatusCount": 8,
+      "materialStudioCount": 0
+    },
+    "hybridBeforeRestart": {
+      "projectId": "project-c6bcdf7cf5ea",
+      "rendererProjectRootSha256": "cb21b52cc84922d65f2a63e4b3af54f481e67efe6404a4806ff298ec7e414caa",
+      "projectRootStable": true,
+      "projectIdStable": true,
+      "defaultVisibleRoute": "novel-studio",
+      "switchedVisibleRoute": "material-studio",
+      "persistedPreference": "drama"
+    },
+    "hybridAfterRestart": {
+      "projectId": "project-c6bcdf7cf5ea",
+      "declaredWorkspaceMode": "hybrid",
+      "manifestSchemaVersion": 2,
+      "minimumWriterSchemaVersion": 2,
+      "restoredVisibleRoute": "material-studio",
+      "rendererProjectRootSha256": "cb21b52cc84922d65f2a63e4b3af54f481e67efe6404a4806ff298ec7e414caa",
+      "hybridSwitchVisible": true,
+      "projectRootSharedAcrossModes": true,
+      "projectIdSharedAcrossModes": true
+    }
+  },
+  "diagnostics": {
+    "drama": {
+      "pageErrors": [],
+      "consoleErrors": [],
+      "externalRequests": []
+    },
+    "novel": {
+      "pageErrors": [],
+      "consoleErrors": [],
+      "externalRequests": []
+    },
+    "hybrid-before-switch": {
+      "pageErrors": [],
+      "consoleErrors": [],
+      "externalRequests": []
+    },
+    "hybrid-after-restart": {
+      "pageErrors": [],
+      "consoleErrors": [],
+      "externalRequests": []
+    }
+  },
+  "manifestStable": true,
+  "readOnlyProjectTreesStable": {
+    "novel": true,
+    "hybridBeforeDramaSwitch": true
+  },
+  "hybridDramaWorkspaceTreeDelta": {
+    "expectedLegacyGenerationLedgerOnly": true,
+    "added": [
+      "f\t.aicanvas/studio-generation-ledger.sqlite\t520192\t109d02e7120de3a43f2a65547ea2212425077b6a8cec894ef4279800d964baf4",
+      "f\t.aicanvas/studio-generation-ledger.sqlite-shm\t32768\tfd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+      "f\t.aicanvas/studio-generation-ledger.sqlite-wal\t0\te3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    "removed": [
+      "f\t.aicanvas/studio-generation-ledger.sqlite\t348160\t2568db4998aa0b2a583185addba7af8c19f95f44cf29c49f97c17972eb14599d"
+    ]
+  },
+  "noNovelAuthorityPathsCreated": {
+    "novel": {
+      "manuscript": false,
+      "story-bible": false,
+      ".aicanvas/novel": false
+    },
+    "hybrid": {
+      "manuscript": false,
+      "story-bible": false,
+      ".aicanvas/novel": false
+    }
+  },
+  "pureNovelGenerationLedgerRemainedAbsent": {
+    "database": true,
+    "packCas": true
+  },
+  "screenshots": {
+    "drama": {
+      "relativePath": "docs/evidence/novel-mode-v1/p1/final-v2/drama-workspace.png",
+      "bytes": 123715,
+      "sha256": "688db9fdae636fc7781a1dbafbabbb3baa8f340f9278f6d7c90bfc4d05f21a7e",
+      "width": 1728,
+      "height": 1029,
+      "channels": 3,
+      "entropy": 1.7046050128028583
+    },
+    "novel": {
+      "relativePath": "docs/evidence/novel-mode-v1/p1/final-v2/novel-workspace.png",
+      "bytes": 102081,
+      "sha256": "d28df5cfe8bdfbb6c8ff52c369281b6fae965374da34dbb0d7ed270646dd1b36",
+      "width": 1728,
+      "height": 1029,
+      "channels": 3,
+      "entropy": 1.5768357442575507
+    },
+    "hybridNovelBeforeSwitch": {
+      "relativePath": "docs/evidence/novel-mode-v1/p1/final-v2/hybrid-novel-before-switch.png",
+      "bytes": 102627,
+      "sha256": "993bad1a8e713eb8fc567d08cb8c96e478cb7f59377294fc2368032acc3bc9e1",
+      "width": 1728,
+      "height": 1029,
+      "channels": 3,
+      "entropy": 1.601617092572269
+    },
+    "hybridDramaAfterRestart": {
+      "relativePath": "docs/evidence/novel-mode-v1/p1/final-v2/hybrid-drama-after-restart.png",
+      "bytes": 124853,
+      "sha256": "310337f1dca1e43518913fcee1f346a2e8c3a606d85aafa8c3244f696dfac5f0",
+      "width": 1728,
+      "height": 1029,
+      "channels": 3,
+      "entropy": 1.7642874742359709
+    }
+  }
+}

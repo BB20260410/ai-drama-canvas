@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "novel-p0-build-isolated-snapshot-final-v2",
+  "status": "pass",
+  "startedAt": "2026-08-01T08:29:23.517Z",
+  "endedAt": "2026-08-01T08:29:45.098Z",
+  "durationMs": 21647,
+  "argv": [
+    "bash",
+    "-lc",
+    "set -euo pipefail; novel_root=$(mktemp -d /tmp/novel-p0-isolated-build-v2.XXXXXX); novel_base=$(basename \"$novel_root\"); novel_snapshot=\"$novel_root/workspace\"; novel_runtime=\"$novel_root/runtime\"; mkdir -p \"$novel_snapshot\" \"$novel_runtime/home\" \"$novel_runtime/tmp\" \"$novel_runtime/registry\"; rsync -a src tests scripts package.json package-lock.json tsconfig*.json vitest.config.ts electron.vite.config.ts \"$novel_snapshot/\"; ln -s \"$(pwd)/node_modules\" \"$novel_snapshot/node_modules\"; novel_live_dist_before=$(find dist-mcp -type f -exec shasum -a 256 {} + | LC_ALL=C sort | shasum -a 256 | awk \"{print \\$1}\"); novel_live_manifest_before=$(shasum -a 256 release-manifest.json | awk \"{print \\$1}\"); (cd \"$novel_snapshot\" && env -u AI_CANVAS_MCP_ALLOW_MULTI -u AI_CANVAS_MCP_SINGLETON HOME=\"$novel_runtime/home\" TMPDIR=\"$novel_runtime/tmp\" AI_CANVAS_REGISTRY_PATH=\"$novel_runtime/registry/projects.json\" AI_CANVAS_WORKSPACE=\"$novel_snapshot\" AI_CANVAS_WRITE_LEASE_MODE=require npm run build); novel_snapshot_digest=$(jq -r .sourceDigest \"$novel_snapshot/release-manifest.json\"); novel_snapshot_build=$(jq -r .buildId \"$novel_snapshot/release-manifest.json\"); test \"$novel_snapshot_digest\" = \"69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4\"; test \"$novel_snapshot_build\" = \"08b8f8168b32a84ef6ad515b00bd65fb\"; novel_live_dist_after=$(find dist-mcp -type f -exec shasum -a 256 {} + | LC_ALL=C sort | shasum -a 256 | awk \"{print \\$1}\"); novel_live_manifest_after=$(shasum -a 256 release-manifest.json | awk \"{print \\$1}\"); test \"$novel_live_dist_before\" = \"$novel_live_dist_after\"; test \"$novel_live_manifest_before\" = \"$novel_live_manifest_after\"; kill -0 40383; kill -0 51269; novel_trash=\"/Users/hxx/.Trash/$novel_base\"; test ! -e \"$novel_trash\"; mv \"$novel_root\" \"$novel_trash\"; printf \"%s\\n\" \"{\\\"buildCommand\\\":\\\"npm run build\\\",\\\"snapshotSourceDigest\\\":\\\"$novel_snapshot_digest\\\",\\\"snapshotBuildId\\\":\\\"$novel_snapshot_build\\\",\\\"liveDistAggregateBefore\\\":\\\"$novel_live_dist_before\\\",\\\"liveDistAggregateAfter\\\":\\\"$novel_live_dist_after\\\",\\\"liveReleaseManifestBefore\\\":\\\"$novel_live_manifest_before\\\",\\\"liveReleaseManifestAfter\\\":\\\"$novel_live_manifest_after\\\",\\\"activePidsAliveAfter\\\":[40383,51269],\\\"cleanup\\\":\\\"moved-recoverably-to-user-trash\\\",\\\"temporaryBasename\\\":\\\"$novel_base\\\"}\""
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+      "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4"
+    },
+    "after": {
+      "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+      "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/novel-mode-v1/baseline/commands/build-isolated-snapshot-final-p0-v2.log",
+    "sizeBytes": 28398,
+    "sha256": "007c2bd1727eba51b4198c378b6728377f43f6e155928d6e95be96e019e659c7"
+  }
+}

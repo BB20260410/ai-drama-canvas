@@ -1,0 +1,1120 @@
+## A. 一句话结论
+
+**当前 Writing OS 能让百万字写作“不被 AI 写乱”，但还不足以让百万字人物一致性“自动成立”；它解决了正文 CAS、pack、preflight、人工 commit 的写入门禁，却还缺角色 BindingSet、连续性事件账本、结构化审计、任务接力、长程投影与画布裁决驾驶舱。画布必须把模型从“记忆来源”彻底降格为“候选生成器”，把人物一致性建立在文件、CAS、revision、证据区间和人工 owner 裁决上。**
+
+特别判断：  
+**仅靠现有 Writing OS V1，不能稳定支撑约 100 万字人物一致性。**  
+它能防止“AI 绕过系统乱保存”，但还不能防止“AI 在系统内基于错误人物状态、错误知情边界、错误关系进度、错误禁揭时机写出看似合规的正文”。差的核心不是聊天记忆，而是：  
+1. 角色硬设定还没有成为可投影、可验证、可追踪的 BindingSet；  
+2. writing-state 还更像当前状态文件，缺少长程事件账本与可重放投影；  
+3. 审稿票还是通用反馈，缺少结构化人物一致性规则与阻断门；  
+4. 多模型接力缺少任务票、claim、lease、交接包；  
+5. 画布 UI 还没有把人工 commit 变成高效率裁决，而不是读 JSON 劳动；  
+6. 百万字规模还停留在 smoke PASS，没有变成长期 SLA、索引健康、恢复演练和漂移回归。  
+
+---
+
+## B. 当前能力 vs 真实写作痛点
+
+| # | 真实写作痛点 | 当前 Writing OS V1 已有什么 | 仍然差什么 | 不补的后果 | 优先级 |
+|---|---|---|---|---|---|
+| 1 | 多模型跨会话失忆，靠聊天记忆硬扛 | Context Pack 2.0、preflight、正文 CAS、命令信封 | 每次任务仍需“角色绑定摘要 + 任务票 + 交接包”，而不是只给一段上下文 | 模型每次重新猜人物，前文摘要漂移，换模型就变人 | P0 |
+| 2 | 人物外形/身份硬设定漂移：发色、伤疤、年龄、称呼、阵营乱变 | 有硬正典、源设定 SHA、正文搜索 | 缺 Character BindingSet：appearance tokens、identity anchors、hard flags、change policy、证据链 | 角色换脸、伤疤消失、年龄错乱、阵营反复 | P0 |
+| 3 | 声口漂移：所有人说话一个味 | 正文可读、可搜索，状态可投影 | 缺 voice anchors、称呼矩阵、语域/句长/禁忌词、声口审稿规则 | 角色同质化，千人一声，读者无法靠对白辨认人物 | P0/P1 |
+| 4 | 知情边界破裂：角色未卜先知、泄露别人秘密 | writing-state 有知情、关系、伏笔等动态项 | 缺 per-character knowledge ledger、secret tags、reveal gate、preflight 阻断 | 悬念崩坏，推理不成立，人物关系被提前捅破 | P0 |
+| 5 | 关系进度突变：仇人突然相爱、亲人突然陌路 | 状态候选人工 commit | 缺关系矩阵历史、变化阈值、证据区间、速度限制、人工豁免 | 关系儿戏，情感线像随机跳跃 | P0 |
+| 6 | 八项状态漂移：伤势、精神、目标、欲望、压力无理由变化 | 有八项动态状态与状态候选 | 缺 delta 范围、变化理由、证据绑定、超限报警 | 状态像数值乱跳，人物行动动机失效 | P0 |
+| 7 | 禁揭/伏笔时机失控 | review ticket、人工裁决 | 缺 forbidden reveal flags、due window、章节 cutoff 检查、高危票阻断 | 底牌过早打出，长线伏笔作废 | P0 |
+| 8 | 百万字上下文爆炸：后文吃不到前文 | pack 预算、搜索证据、硬正典优先 | 缺分卷 checkpoint、角色投影、关系快照、索引 SLA、增量重建 | 越写越依赖临时摘要，越后面越漂 | P1 |
+| 9 | 多 AI 接力混乱：重复写、抢写、互相覆盖 | 命令总线、幂等键、revision/SHA 冲突检测 | 缺任务票、claim、lease、交接包、模型 profile | 多代理看似能并行，实际靠人肉协调 | P1 |
+| 10 | 人工裁决慢，候选堆积 | 状态候选、review ticket | 缺画布驾驶舱：diff、证据跳转、高危票队列、一键 accept/reject | owner 被 JSON 和长文淹没，系统退化为半手工 | P0 |
+| 11 | writing-state 单文件长期膨胀 | 项目内单一 CAS 文件作为写作状态权威 | 需要把它明确为“派生投影”，底层由 accepted events 派生，否则百万字后难以追踪、回滚、重建 | 状态文件越来越大，改一处怕崩全局，无法审计 | P0 |
+| 12 | 长期漂移无感知 | smoke 曾 PASS | 缺 golden cases、红队用例、nightly lint、漂移报告 | 慢性崩坏，等到读者发现已经晚了 | P2 |
+
+---
+
+## C. 目标架构：文字组件图
+
+目标不是再造一个“AI 记忆库”，而是建立一套**受管写作操作系统**。核心原则：  
+**正文权威 = managed Markdown + manifest + CAS。**  
+**人物/状态权威 = BindingSet + 连续性事件账本 + 截止章投影。**  
+**模型输出 = 候选，不是正典。**  
+**人工 owner = 唯一裁决者。**
+
+### 1. 五层架构
+
+#### 第一层：正典存储层
+
+负责“唯一真相”。
+
+包含：
+
+- managed Markdown 正文；
+- manuscript manifest；
+- chapter CAS：每章正文不可变对象；
+- source setting CAS：原始设定、硬正典；
+- character binding CAS：角色硬绑定；
+- continuity event CAS：已接受的状态变更事件；
+- review ticket CAS：只读审稿票；
+- task ticket CAS：写作任务票；
+- projection snapshots：章节/卷级状态投影快照。
+
+关键规则：
+
+- 聊天记忆不是真源；
+- 模型摘要不是真源；
+- UI 显示不是真源；
+- 只有 CAS、revision、SHA、manifest、命令账本构成的链路是真源。
+
+#### 第二层：连续性计算层
+
+负责“给模型正确上下文”。
+
+包含：
+
+- Context Pack Compiler；
+- Character Relevance Resolver；
+- State Projector；
+- Knowledge/Relationship/Forbidden Gate；
+- Search Index；
+- Evidence Resolver；
+- Pack Profile Renderer。
+
+职责：
+
+- 根据 targetChapterId 和 cutoff 投影状态；
+- 根据细纲、角色、搜索命中计算相关角色；
+- 把硬正典、角色 BindingSet、知情边界、关系矩阵、禁揭清单装进 pack；
+- 预算不足时先裁正文，硬正典和任务不足则失败关闭；
+- 不允许模型自由决定“哪些硬设定可以省略”。
+
+#### 第三层：命令与门禁层
+
+负责“写入必须受控”。
+
+包含：
+
+- command bus；
+- 命令账本；
+- 锁服务；
+- 幂等服务；
+- preflight 校验器；
+- owner gate；
+- repository owner / human_ui 身份识别。
+
+职责：
+
+- 所有写入走命令信封；
+- AI 写入必须带 preflightId 和 contextPackFingerprint；
+- review pack 不能转写权限；
+- 状态候选未 accepted，不能推进下一章；
+- binding 硬改必须 owner 裁决；
+- 外部漂移先恢复，不猜测。
+
+#### 第四层：协作与 UI 层
+
+负责“人和多模型如何协作”。
+
+包含：
+
+- Novel Cockpit；
+- Character Binding Editor；
+- Candidate Review Pane；
+- Evidence Diff Pane；
+- Conflict Queue；
+- Task Board；
+- Agent Claim/Handoff UI；
+- Review Ticket Inbox。
+
+UI 的核心任务不是漂亮，而是让 owner 在 30 秒内判断：
+
+- 这个候选改了什么；
+- 证据在哪；
+- 是否违反人物设定；
+- 是否超过关系变化阈值；
+- 是否触发禁揭；
+- 该 accept、reject，还是打回重写。
+
+#### 第五层：验证与恢复层
+
+负责“长期不崩”。
+
+包含：
+
+- benchmark runner；
+- index health monitor；
+- projection rebuild；
+- recovery drill；
+- red-team regression；
+- nightly lint；
+- drift report。
+
+职责：
+
+- 把 smoke PASS 变成 SLA；
+- 可重建 writing-state projection；
+- 可恢复 external_change；
+- 可检测人物漂移；
+- 可复现失败。
+
+---
+
+### 2. 主数据流
+
+1. owner 维护硬正典与 Character BindingSet；  
+2. planner/outline 产生目标章任务；  
+3. task ticket 创建，指定 targetChapter、taskType、相关角色、预算；  
+4. writer agent claim 任务；  
+5. MCP 调 `build_novel_context_pack`；  
+6. pack 返回 `writePreflightInput`；  
+7. MCP 调 `preflight_novel_chapter_write`；  
+8. 只有 `ready=true` 才允许模型写；  
+9. writer 通过 `execute_command → novel_save_chapter` 保存正文；  
+10. auditor 用 review pack 产结构化票；  
+11. state extractor 产 `novel_stage_chapter_state_candidate`；  
+12. owner 在画布接受或拒绝；  
+13. accepted candidate 写入连续性事件账本；  
+14. projection 更新 writing-state；  
+15. 下一章 pack 基于新 cutoff 重建。
+
+---
+
+### 3. 画布 UI 与 MCP 的分工
+
+| 面 | 应该承担 | 绝不应该承担 |
+|---|---|---|
+| 画布 UI | 人工裁决、证据可视化、冲突队列、角色驾驶舱、任务板、accept/reject、binding 编辑、diff 审阅 | 绕过 command bus 直接改正典；把 UI 缓存当真源；自动接受候选；替 owner 做文学判断 |
+| MCP | 只读查询、搜索、pack、preflight、命令写入、审稿票、状态候选、投影读取 | 让模型自由读取“全书记忆”后自行总结为正典；让 review pack 获得写权限；让模型自造 fingerprint；让聊天上下文替代 CAS |
+| 模型 | 生成正文候选、审稿票候选、状态候选、细纲候选 | 决定正典、改 binding、接受状态、解除禁揭、关闭高危票、跨章自由推进 |
+
+---
+
+### 4. 与漫剧侧的关系
+
+不推翻 P0–P14 已关账漫剧 owner。  
+小说侧应复用漫剧侧的三个核心思想：
+
+- BindingSet：硬绑定不可自由发挥；
+- 连续性：变化必须带证据和截止点；
+- 驾驶舱：人类 owner 在 UI 中裁决。
+
+但小说侧不能直接照搬生图 BindingSet。  
+小说角色还需要：
+
+- voice anchors；
+- knowledge ledger；
+- relationship matrix；
+- forbidden reveals；
+- eight-state vector；
+- chapter cutoff projection；
+- evidence offsets。
+
+因此目标不是“小说侧附属漫剧”，而是：  
+**共享 owner/BindingSet/连续性语义，扩展小说专有状态机。**
+
+---
+
+## D. Top 10 产品改进
+
+### D1. P0：把人物卡升级为 Character BindingSet
+
+**问题：**  
+现在人物设定多半还是文本硬正典。模型能读到，但系统无法机械验证。发色变了、称呼变了、阵营变了，系统不知道。
+
+**改进：**  
+建立 `characterBindingSet` CAS 对象。每个关键角色必须有 binding。
+
+接口形状应至少包含：
+
+- characterId；
+- schemaVersion；
+- revision；
+- sha256；
+- ownerId；
+- status：locked / provisional；
+- identityAnchors：姓名、别名、性别、年龄、阵营、身份；
+- appearanceTokens：发色、瞳色、体型、伤疤、服饰常态、显著标记；
+- voiceAnchors：称呼习惯、句长、语域、口头禅、禁忌词、情绪表达方式；
+- knowledgePolicy：默认知情范围、保密级别、可获知渠道；
+- relationshipPolicy：初始关系、可变化维度、阈值；
+- forbiddenReveals：禁揭项、最早可揭章、可揭条件；
+- eightStateBaseline：八项状态基线；
+- changePolicy：哪些字段硬锁，哪些允许候选变化；
+- evidenceRefs：来源设定 SHA、章节证据；
+- bindingDigest：进入 Context Pack 的摘要指纹。
+
+**与 Context Pack 的关系：**
+
+- pack 硬区必须包含目标章相关角色的 bindingDigest；
+- 预算不足时不能静默裁掉 binding；
+- 关键角色无 binding，pack 失败关闭；
+- provisional 角色可参与，但必须标记，且不能触发硬正典级事件。
+
+**验收门：**
+
+- 关键角色无 binding 时，`build_novel_context_pack` 失败；
+- bindingDigest 与当前 CAS 不一致时，preflight 返回 stale；
+- 外形硬字段变化无 accepted candidate 时，审稿票为 blocker；
+- 角色称呼/声口样本缺失时，不能进入正式写章，只能进入 provisional 试验；
+- 红队用例：角色瞳色在正文中改变但无事件候选，系统必须产生高危票或阻断。
+
+---
+
+### D2. P0：把 writing-state 从“状态文件”升级为“事件账本 + 投影”
+
+**问题：**  
+百万字下，单一 writing-state.json 会越来越像总账。它可读，但难以追踪“为什么变成这样”。如果状态文件损坏、误改、膨胀，系统恢复能力弱。
+
+**改进：**  
+保留 V1 合同兼容性，但明确：
+
+- writing-state.json 是当前投影；
+- accepted state candidate 是事件来源；
+- 每个 projection 必须带 ledgerDigest；
+- projection 可删除并从事件账本重建；
+- 任何 projection 与 ledgerDigest 不一致，失败关闭。
+
+连续性事件类型至少包括：
+
+- state_candidate_accepted；
+- character_binding_changed；
+- knowledge_acquired；
+- secret_revealed；
+- relationship_changed；
+- eight_state_changed；
+- timeline_event；
+- foreshadow_planted；
+- foreshadow_paid；
+- owner_override。
+
+事件形状至少包括：
+
+- eventId；
+- eventType；
+- chapterId；
+- characterIds；
+- cutoff；
+- payload；
+- evidenceOffsets；
+- sourceChapterRevision；
+- sourceChapterSha256；
+- bindingDigests；
+- ledgerDigest；
+- acceptedBy；
+- acceptedAt。
+
+**验收门：**
+
+- 删除 writing-state.json 后，可从事件账本重建到指定 cutoff；
+- 任意章 before/through 投影可重复生成；
+- ledgerDigest 不匹配时，preflight 失败；
+- accepted candidate 缺少证据区间时，不能写入账本；
+- 1M/500 章规模下，增量投影下一章状态可完成，全量重建可离线完成。
+
+---
+
+### D3. P0：Preflight 增加人物一致性硬门
+
+**问题：**  
+现在 preflight 主要保证 pack、正文、state 身份一致。还不够。它必须进一步检查“人物状态是否允许这样写”。
+
+**新增检查：**
+
+1. bindingDigest 检查  
+   - 目标章相关角色必须带当前 bindingDigest。
+
+2. 知情边界检查  
+   - 角色不能使用、说出、暗示自己未获知的 secret/fact。
+
+3. 禁揭检查  
+   - 目标章 cutoff 早于 forbidden reveal 最早可揭章时，禁止进入写入门。
+
+4. 关系进度检查  
+   - 关系变化超过阈值时，必须存在 accepted event 或 owner waiver。
+
+5. 八项状态 delta 检查  
+   - 状态变化超过允许范围时，必须带理由和证据。
+
+6. 时间/空间检查  
+   - 角色不能在无旅行/传送/时间跳跃证据时跨地出现。
+
+7. 声口最低检查  
+   - voiceAnchors 必须进入 pack；若目标章是对白重章，缺少声口样本应 warn 或 fail。
+
+**接口形状扩展：**
+
+`writePreflightInput` 可保持兼容，但应增加可选字段：
+
+- taskTicketClaimId；
+- characterBindingDigests；
+- modelProfileId；
+- consistencyPolicyId。
+
+preflight 输出应包含：
+
+- ready；
+- blockers；
+- warnings；
+- staleReason；
+- currentWritePreflightInput；
+- missingBindings；
+- knowledgeViolations；
+- forbiddenViolations；
+- relationshipThresholdViolations。
+
+**验收门：**
+
+- 注入“角色 A 在 Ch10 未知秘密，Ch11 直接说出”：preflight 或 auditor 必须阻断；
+- 注入“关系从仇敌到挚爱，无 accepted event”：阻断或高危票；
+- 注入“重伤一夜痊愈，无治疗/时间/能力证据”：阻断或高危票；
+- bindingDigest 过期时，不得只替换 fingerprint，必须重组 pack；
+- review task 不能通过伪装成 continue task 获取写权限。
+
+---
+
+### D4. P0：把 review ticket 从“意见”升级为“结构化一致性票”
+
+**问题：**  
+审稿票如果只是自由文本，人工很难批量裁决，系统也无法阻断。
+
+**改进：**  
+review ticket 必须结构化。
+
+票形状至少包括：
+
+- ticketId；
+- chapterId；
+- chapterRevision；
+- chapterSha256；
+- ruleId；
+- category：appearance / voice / knowledge / relationship / eight_state / forbidden / timeline / foreshadow；
+- severity：blocker / major / minor / info；
+- characterIds；
+- claimedViolation；
+- evidenceOffsets：UTF-16 区间；
+- suggestedAction；
+- auditorModelId；
+- boundPackFingerprint；
+- status：open / waived / resolved / rejected。
+
+规则库示例：
+
+- character_appearance_hard_change_without_event；
+- character_uses_unknown_secret；
+- relationship_jump_exceeds_threshold；
+- voice_register_break；
+- forbidden_reveal_before_allowed_chapter；
+- eight_state_delta_too_large；
+- timeline_location_impossible。
+
+**验收门：**
+
+- reviewer 模型不能改正文，也不能改状态；
+- 每张 blocker 票必须绑定原文证据区间；
+- 无证据区间的高危票无效；
+- 存在未处理 blocker 票时，状态候选 accept 需要 owner 显式 waiver；
+- 票不能自动升格为正典。
+
+---
+
+### D5. P0：画布必须提供“人物一致性驾驶舱”MVP
+
+**问题：**  
+如果 owner 必须读 JSON、读长票、读正文，系统会在真实项目中崩溃。百万字项目的人工裁决必须快。
+
+**驾驶舱必须包含：**
+
+1. 角色卡视图  
+   - 当前 binding；
+   - provisional/locked；
+   - bindingDigest；
+   - 最近变化事件。
+
+2. 候选状态 diff  
+   - old state；
+   - new candidate；
+   - delta；
+   - 是否超阈值；
+   - 证据跳转。
+
+3. 审稿票收件箱  
+   - blocker 优先；
+   - 按角色/规则/章节筛选；
+   - 一键跳转证据区间。
+
+4. accept/reject 面板  
+   - accept with reason；
+   - reject with reason；
+   - request rewrite；
+   - waive blocker with owner decision。
+
+5. 任务板  
+   - 哪个模型 claim 了哪章；
+   - lease 是否过期；
+   - 是否等待审稿；
+   - 是否等待状态 commit。
+
+**验收门：**
+
+- owner 不需要打开原始 JSON 即可完成 accept/reject；
+- 任一候选都能一键看到正文证据；
+- 任一 accept/reject 都写入命令账本；
+- UI 不得绕过 command bus；
+- 高危票未处理时，UI 明确阻断或要求 owner waiver。
+
+---
+
+### D6. P1：多模型 Context Pack Profiles
+
+**问题：**  
+Grok、Claude、千问、豆包、GLM、Codex 的上下文窗口、格式遵从、指令风格不同。不能用一套裸 prompt 硬喂所有模型。
+
+**改进：**  
+建立 model profile。
+
+profile 形状：
+
+- modelId；
+- maxContextTokens；
+- reservedHardBlocks；
+- compressibleSoftBlocks；
+- outputContract；
+- toolCallingMode；
+- rendererTemplateId；
+- validationPolicy。
+
+pack 编译原则：
+
+- canonical pack content 不变；
+- rendered prompt 可不同；
+- hard blocks 永不可裁；
+- 正文证据可按预算裁；
+- rendered pack digest 记录到 aiWriteContext 或审计日志；
+- 模型不得改 pack 内容，只能消费。
+
+hard blocks 至少包括：
+
+- 硬正典摘要；
+- 目标章任务；
+- 相关角色 bindingDigest；
+- 知情边界；
+- 禁揭清单；
+- 关系当前态；
+- preflight 要求。
+
+**验收门：**
+
+- 同一任务在 Claude、Grok、千问三个 profile 下得到相同硬区；
+- 任一 profile 裁掉硬区，构建失败；
+- 模型输出不符合 outputContract，保存失败；
+- 不同 profile 不能产生不同正典，只产生不同候选。
+
+---
+
+### D7. P1：写作任务票与代理接力协议
+
+**问题：**  
+现在命令层有幂等和冲突检测，但没有“谁正在写哪章”的协作层。多 AI 接力会变成人肉调度。
+
+**改进：**  
+引入 task ticket 和 claim lease。
+
+task ticket 形状：
+
+- taskId；
+- projectRoot；
+- chapterId；
+- taskType：continue_chapter / revise_chapter / review_chapter / extract_state；
+- status：open / claimed / writing / auditing / staging / waiting_owner / done / failed；
+- claimedBy；
+- modelId；
+- leaseExpiresAt；
+- packFingerprint；
+- preflightId；
+- requiredBindings；
+- openTicketPolicy；
+- handoffSummaryRef；
+- idempotencyKey。
+
+规则：
+
+- 一个 chapter 同一 taskType 只能有一个 active claim；
+- claim 过期后可重新领取；
+- 无 ticket 的 AI 写入失败关闭；
+- writer 不能同时是最终 owner；
+- auditor 不能写正文；
+- extractor 只能产候选；
+- 交接不得传递聊天记忆，只能传递 ticket、pack fingerprint、cutoff、open tickets、ledgerDigest。
+
+**验收门：**
+
+- 两个 agent 并发 claim 同章，只有一个成功；
+- lease 过期后，第二个 agent 可接管；
+- 中断后使用原 idempotencyKey 可重试；
+- 交接包不含自由摘要作为真源；
+- 未 commit 上一章状态时，下一章任务不能进入 ready。
+
+---
+
+### D8. P1：分卷 checkpoint 与长程投影
+
+**问题：**  
+百万字不能每次都从第一章投影。必须有卷/弧级 checkpoint。
+
+**改进：**  
+在 volume/arc 结束时生成 snapshot。
+
+snapshot 形状：
+
+- snapshotId；
+- volumeId；
+- cutoffChapterId；
+- ledgerDigest；
+- bindingDigests；
+- characterProjections；
+- relationshipMatrix；
+- openArcs；
+- unresolvedTickets；
+- foreshadowOutstanding；
+- calendarState；
+- indexHealth。
+
+pack 组装策略：
+
+- 全局硬正典：始终带；
+- 上一 checkpoint：带摘要；
+- checkpoint 后增量事件：带明细；
+- 最近正文：按预算带；
+- 搜索证据：按任务带。
+
+**验收门：**
+
+- 从最近 snapshot + delta 生成 pack，而不是从第一章全量投影；
+- snapshot 与 ledgerDigest 不一致时失败；
+- 500 章规模下，目标章 pack 构建不必扫描全部正文；
+- 可手动或自动创建 checkpoint，但 checkpoint 不替代人工 owner 裁决；
+- checkpoint 损坏时可从事件账本重建。
+
+---
+
+### D9. P1：搜索索引从 smoke 变成 SLA
+
+**问题：**  
+1M/500 章导入与热搜索 smoke 曾 PASS，但这不等于长期可用。没有索引健康和增量更新，搜索会退化。
+
+**改进：**  
+建立受管索引层。
+
+索引对象：
+
+- chapterId；
+- chapterRevision；
+- chapterSha256；
+- tokens；
+- characterMentions；
+- relationshipMentions；
+- secretMentions；
+- evidenceOffsets；
+- indexVersion。
+
+规则：
+
+- 正文保存成功后触发增量索引；
+- 索引失败不污染正文；
+- 索引 stale 时，搜索返回 degraded 标记；
+- 如果 pack 明确依赖搜索证据而索引 degraded，preflight 应失败或要求 owner waiver；
+- 索引可完全从正文 CAS 重建。
+
+**目标 SLA（可按硬件调，但必须可基准复跑）：**
+
+- workspace 打开：热态 2 秒内；
+- list 500 章：1 秒内；
+- read range 200k 字符：1 秒内；
+- 热搜索 p95：3 秒内；
+- pack 60k 字符预算：5 秒内；
+- preflight：3 秒内；
+- 下一章增量投影：5 秒内；
+- 全量 projection rebuild：可离线完成，且有明确时长基线。
+
+**验收门：**
+
+- 连续 20 章写/审/commit 后，搜索仍返回正确 revision/SHA；
+- 手动破坏索引后可重建；
+- 索引 stale 时不返回假命中；
+- 搜索命中必须能反查正文证据区间；
+- smoke 测试变成可重复 benchmark。
+
+---
+
+### D10. P2：漂移监测与回归测试
+
+**问题：**  
+人物一致性最大的敌人不是一次大错，而是长期小漂。
+
+**改进：**  
+建立 red-team regression。
+
+包含：
+
+- golden character cases；
+- 红队 prompt；
+- 期望阻断；
+- 期望票类型；
+- 历史章节 nightly lint；
+- 漂移报告。
+
+红队用例至少包括：
+
+- 未获知秘密被说出；
+- 禁揭提前泄露；
+- 关系突变；
+- 外形硬字段改变；
+- 八项状态超限变化；
+- 时间空间不可能移动；
+- 声口严重偏离；
+- 模型用旧 pack fingerprint 强写；
+- review pack 伪装 continue；
+- 两个 agent 抢写同章。
+
+**验收门：**
+
+- 所有 P0 红队用例 100% 阻断；
+- nightly lint 只报告，不自动改正典；
+- 漂移报告进入 owner inbox；
+- 回归失败时，新版本不得发布到正式项目；
+- 《黑页》只读镜像可跑检测，但不得被当作正典写回。
+
+---
+
+## E. 人物一致性机械门清单
+
+以下门必须是机械的，而不是靠模型“自觉”。
+
+| 门 | 检查对象 | 机械规则 | 失败动作 |
+|---|---|---|---|
+| 1. 角色存在门 | characterId | 关键角色必须登记，必须有 binding；未登记角色只能 provisional | pack 失败或标记 provisional，不得触发硬正典事件 |
+| 2. Binding 指纹门 | bindingDigest | pack/preflight 必须携带当前 bindingDigest | stale，重组 pack |
+| 3. 外形硬锁门 | appearanceTokens | 发色、瞳色、伤疤、年龄、阵营等硬字段不得正文暗改 | blocker 票；无候选则阻断或要求 owner waiver |
+| 4. 声口门 | voiceAnchors | 对白重章必须带声口样本；审稿模型检查称呼/语域/禁忌词 | major/blocker 票，视规则严重度 |
+| 5. 知情边界门 | knowledge ledger | 角色不得使用/说出/暗示未知 secret/fact | preflight 阻断或 auditor blocker |
+| 6. 禁揭门 | forbiddenReveals | 未到最早可揭章或条件未满足，不得揭示 | preflight 阻断；已写则 blocker |
+| 7. 关系阈值门 | relationship matrix | trust/tension/intimacy 等变化超阈值必须有 accepted event | 阻断或高危票 |
+| 8. 八项状态门 | eight-state vector | delta 超范围必须带理由、证据、时间推进 | 阻断或高危票 |
+| 9. 时间空间门 | calendar/location | 角色不能无证据跨地出现或瞬间恢复 | blocker/major 票 |
+| 10. 证据门 | evidenceOffsets | 所有状态候选必须绑定 UTF-16 原文区间、chapter revision/SHA | 候选无效 |
+| 11. 人工 commit 门 | state candidate | accepted 前不进入正典，不推进下一章 | 下一章 preflight 失败 |
+| 12. 模型身份门 | aiWriteContext | AI save 必须带 preflightId/contextPackFingerprint，可选 modelProfileId | 保存拒绝 |
+| 13. 审稿隔离门 | review task | review pack 不得获得写权限 | 命令拒绝 |
+| 14. owner 裁决门 | hard canon conflict | 硬正典冲突不得自动合并 | 失败关闭，等待 owner |
+
+---
+
+## F. 百万字不崩的工程门
+
+### 1. 规模门：不能把全书塞进上下文
+
+必须采用三层上下文策略：
+
+1. 全局硬层  
+   - 硬正典；
+   - 角色 binding 摘要；
+   - 当前任务；
+   - 禁揭清单；
+   - 关键关系当前态。
+
+2. 卷/弧投影层  
+   - 最近 checkpoint；
+   - 当前卷状态；
+   - 未回收伏笔；
+   - 未解决关系线。
+
+3. 局部证据层  
+   - 最近正文；
+   - 搜索命中；
+   - 目标章细纲；
+   - 相关角色近期事件。
+
+预算规则：
+
+- 正文可裁；
+- 搜索证据可裁；
+- 硬正典不可静默裁；
+- 角色 binding 不可静默裁；
+- 任务目标不可静默裁；
+- 预算不足直接失败，不偷偷降级。
+
+---
+
+### 2. 锁门：多代理不能抢写
+
+需要的锁：
+
+- chapter write lock；
+- state candidate lock；
+- binding set lock；
+- task claim lease；
+- command ledger serial lock；
+- projection rebuild lock。
+
+规则：
+
+- 读操作不阻塞；
+- 写操作互斥；
+- claim 有租约；
+- 租约过期可回收；
+- 幂等键只用于相同输入重试；
+- 输入变化必须新 requestId/idempotencyKey；
+- human_ui 不能被 AI 冒充。
+
+验收：
+
+- 并发写同章，只有一个成功；
+- 并发 accept 同一候选，只有一个成功；
+- agent 崩溃后，任务可被重新 claim；
+- 锁释放失败不产生永久死锁。
+
+---
+
+### 3. 恢复门：任何损坏都能回到一致点
+
+恢复场景：
+
+1. 网络/进程中断  
+   - 相同输入用原 idempotencyKey 重试；
+   - 命令账本返回原结果。
+
+2. 正文外部漂移  
+   - 返回 external_change；
+   - 走受管恢复；
+   - 不猜测磁盘内容。
+
+3. writing-state projection 损坏  
+   - 从事件账本重建；
+   - ledgerDigest 校验。
+
+4. 索引损坏  
+   - 从正文 CAS 重建；
+   - 重建期间搜索 degraded。
+
+5. pack/preflight 过期  
+   - 返回 context_preflight_stale；
+   - 重新读 state、重组 pack、重新 preflight。
+
+6. 状态候选未 commit  
+   - 返回 state_commit_required；
+   - 先补候选与人工 commit。
+
+7. 硬正典冲突  
+   - 返回 hard_canon_conflict；
+   - owner 裁决。
+
+验收：
+
+- 删除 projection 可重建；
+- 删除索引可重建；
+- 外部改正文能被 manifest/SHA 发现；
+- 恢复过程不产生新正典；
+- 恢复后所有读取带 revision/SHA。
+
+---
+
+### 4. 预算门：模型不能无限要上下文
+
+必须限制：
+
+- maxCharacters；
+- maxSearchHits；
+- maxHitsPerChapter；
+- maxCandidates；
+- maxTicketLength；
+- maxStateDeltaItems。
+
+失败策略：
+
+- 硬区放不下：fail；
+- 软区放不下：裁剪并记录；
+- 搜索 degraded 且任务依赖证据：fail 或 owner waiver；
+- 模型请求超预算：拒绝。
+
+---
+
+### 5. 长期 SLA 门
+
+smoke PASS 不够，必须有基线。
+
+建议基线：
+
+| 操作 | 目标 |
+|---|---|
+| 1M/500 章 workspace 打开 | 热态 2 秒内 |
+| list 500 章 | 1 秒内 |
+| read range 200k 字符 | 1 秒内 |
+| 热搜索 p95 | 3 秒内 |
+| build pack 60k 字符 | 5 秒内 |
+| preflight | 3 秒内 |
+| 增量 state projection | 5 秒内 |
+| 全量 projection rebuild | 可离线完成，有固定基线 |
+| 索引重建 | 可重复，且不污染正文 |
+
+验收：
+
+- benchmark 可自动跑；
+- 每次大改前后对比；
+- 性能退化阻断发布；
+- 《黑页》只读镜像可作为压力样本，但不得写回正典。
+
+---
+
+## G. 多 AI 协作协议
+
+核心原则：  
+**谁都可以生成候选，谁都不能单独成为正典。**
+
+### 1. 角色分工
+
+| 角色 | 可由谁承担 | 能做什么 | 不能做什么 |
+|---|---|---|---|
+| Owner | 人类 | 裁决正典、接受状态候选、解除 blocker、改 binding、决定文学方向 | 不应被模型摘要替代判断；不应绕过 command bus |
+| Planner | Claude/Grok/千问/豆包/GLM 等 | 生成细纲候选、任务票候选、章节目标候选 | 不改正文、不改状态、不改 binding |
+| Writer | Claude/Grok/千问/豆包/GLM 等 | claim 任务、生成正文候选、保存草稿 | 不接受状态、不改硬正典、不关闭 blocker |
+| Auditor | 任意模型，但与 writer 分离 | 生成结构化 review ticket | 不改正文、不改状态、不自动升格为正典 |
+| State Extractor | 任意模型，建议与 writer 分离 | 生成状态候选、知情/关系/伏笔 change-set | 不直接 commit，不伪造证据 |
+| Tool/Code Agent | Codex 类 | 改软件、生成脚本、分析日志、建测试 | 不直接改小说正典；若改正文/状态必须走同一命令总线 |
+| UI | 画布 | 展示、diff、裁决、任务板、冲突队列 | 不绕过 command bus，不缓存为正典 |
+
+---
+
+### 2. 单章闭环协议
+
+1. planner 产出章节任务候选；  
+2. owner 确认任务票；  
+3. writer claim；  
+4. writer 调 pack；  
+5. writer 调 preflight；  
+6. preflight ready 后写正文；  
+7. auditor 审稿，产票；  
+8. state extractor 产状态候选；  
+9. owner 处理 blocker；  
+10. owner accept/reject 状态候选；  
+11. accepted candidate 进入事件账本；  
+12. projection 更新；  
+13. 下一章解锁。
+
+---
+
+### 3. 跨模型接力协议
+
+接力包只能包含：
+
+- taskId；
+- chapterId；
+- cutoff；
+- ledgerDigest；
+- bindingDigests；
+- packFingerprint；
+- preflightId；
+- open tickets；
+- unresolved arcs；
+- state candidate status。
+
+绝不能包含：
+
+- “上一个模型记得……”；
+- “聊天里我们约定……”；
+- “模型总结的前情提要”作为真源；
+- 未经 CAS 的自由摘要。
+
+验收：
+
+- Claude 写 ChN，Grok 接 ChN+1，不需要人工复制上下文；
+- 千问审稿，GLM 提取状态，owner 裁决，系统能追踪每个候选来源；
+- 任一模型失败，任务可重新 claim；
+- 任一模型试图绕过 ticket/preflight，命令失败。
+
+---
+
+## H. 明确「软件做不到 / 不该做」
+
+### 1. 软件做不到
+
+1. **不能保证文学质量。**  
+   它能阻止乱改人物设定，但不能保证写得好、有张力、有主题。
+
+2. **不能替代 owner 的文学判断。**  
+   角色该不该死、关系该不该复合、秘密该不该揭开，这是项目规则与作者判断。
+
+3. **不能自动理解所有语义漂移。**  
+   机械门能抓显式违规，但复杂暗示、反讽、隐喻仍需人审。
+
+4. **不能把聊天记忆变成可靠长期记忆。**  
+   聊天记忆不可审计、不可回放、不可追责。
+
+5. **不能在外部项目漂移时自动猜正典。**  
+   只能失败关闭、隔离、恢复、由 owner 裁决。
+
+---
+
+### 2. 软件不该做
+
+1. **不该让模型自由改硬正典。**  
+   binding、阵营、核心关系、禁揭规则不能由模型暗改。
+
+2. **不该让模型自由接受状态候选。**  
+   accepted 必须来自 owner 或明确授权的 human_ui。
+
+3. **不该让 review ticket 自动变正典。**  
+   票只是证据化意见，除非 owner 裁决并走命令。
+
+4. **不该让模型自由决定上下文裁剪硬区。**  
+   硬正典、binding、禁揭、任务目标不能被模型“省掉”。
+
+5. **不该让模型用摘要替代 CAS。**  
+   摘要只能派生，不能反哺为正典。
+
+6. **不该让 UI 绕过 command bus。**  
+   UI 只是入口，不是特权通道。
+
+7. **不该让 AI 冒充 human_ui。**  
+   human_ui 标记只能由桌面 Main 内部入口使用。
+
+8. **不该做无人工门的全自动百万字连写。**  
+   可以批量候选，但正典推进必须有人工 checkpoint。
+
+9. **不该把隔离 pilot 当正典。**  
+   《黑页》外部项目是 provisional，画布隔离 pilot 只能测试，不得自动写回。
+
+10. **不该把“能搜索到”误认为“角色知情”。**  
+   正文搜索证据不等于角色知识，必须经过 knowledge ledger 判定。
+
+---
+
+## I. 90 天路线图
+
+前提：  
+- 不推翻 P0–P14 漫剧 owner；  
+- 不把聊天记忆当真源；  
+- 《黑页》只作为只读压力样本或隔离 pilot，不当正典；  
+- 所有正式正典变更必须由 owner 在受管项目内执行。
+
+---
+
+### 第 1–30 天：P0 人物一致性底盘
+
+目标：  
+**让系统能抓住最基本的人物漂移。**
+
+交付：
+
+1. Character BindingSet schema；
+2. binding CAS 存储；
+3. Context Pack 硬区加入 bindingDigest；
+4. preflight 增加 binding/knowledge/forbidden/relationship/eight-state 基础门；
+5. review ticket 结构化；
+6. 画布 Candidate Review MVP；
+7. 红队用例库 20 条。
+
+MVP 范围：
+
+- 3 个关键角色；
+- 3 章连续闭环；
+- 1 个模型写；
+- 1 个模型审；
+- owner 在 UI accept/reject。
+
+验收门：
+
+- 关键角色无 binding，不能写；
+- bindingDigest 过期，不能写；
+- 未获知秘密被说出，阻断或 blocker；
+- 禁揭提前泄露，阻断或 blocker；
+- 状态候选无证据区间，不能提交；
+- owner 可在 UI 完成裁决，不读原始 JSON；
+- 10/10 P0 红队用例失败关闭。
+
+---
+
+### 第 31–60 天：P1 多模型协作与长程投影
+
+目标：  
+**让不同模型能接力，而不是靠人复制上下文。**
+
+交付：
+
+1. task ticket/claim/lease；
+2. model pack profiles；
+3. auditor/state extractor 分离；
+4. volume checkpoint；
+5. writing-state projection 从事件账本派生；
+6. 索引增量更新；
+7. 画布任务板与票收件箱。
+
+MVP 范围：
+
+- Claude/Grok/千问至少三种 profile；
+- 连续 5 章接力；
+- 每章 writer/auditor/extractor 不同或至少角色隔离；
+- owner 处理 blocker 与状态候选。
+
+验收门：
+
+- 两个 agent 并发 claim 同章，一个失败；
+- 模型中断后，任务可重新 claim；
+- 跨模型接力不需要人工粘贴前情；
+- 任一模型试图用 review pack 写正文，失败；
+- checkpoint 与 ledgerDigest 不一致，失败；
+- 500 章样本下 pack/preflight 达到基础 SLA。
+
+---
+
+### 第 61–90 天：压力、恢复、漂移回归
+
+目标：  
+**把系统从“能跑”变成“敢用于长篇”。**
+
+交付：
+
+1. 1M/500 章 benchmark；
+2. recovery drill；
+3. nightly lint；
+4. drift report；
+5. 《黑页》只读镜像检测；
+6. owner waiver/override 审计；
+7. 正式版 Novel Cockpit。
+
+压力范围：
+
+- 1M 字导入；
+- 500 章列表/搜索/读取；
+- 连续 20 章写/审/状态 commit；
+- 故意制造 external_change、索引损坏、projection 损坏、claim 冲突；
+- 红队回归。
+
+验收门：
+
+- 热搜索、pack、preflight、projection 达到 SLA；
+- projection 可从事件账本重建；
+- 索引可从正文 CAS 重建；
+- 外部漂移能被失败关闭，不污染正典；
+- 所有 blocker 票都有证据区间；
+- 所有 accepted 状态都有章节 revision/SHA 与证据；
+- 漂移报告只报告，不自动改正典；
+- 《黑页》隔离 pilot 不产生正典回写；
+- 多模型连续接力 20 章后，人物硬设定无未裁决变化。
+
+---
+
+## 最终评审意见
+
+**Writing OS V1 是对的，但还不够。**  
+它已经做对了最难的事：不把聊天记忆当真源，所有写入走 CAS、revision、preflight 和人工 commit。  
+但它现在更像“受管正文写入系统”，还不是“百万字人物一致性操作系统”。
+
+要真正辅助 Grok / Claude / Codex / 千问 / 豆包 / GLM 写长篇，画布必须补四件事：
+
+1. **角色 BindingSet**：把人物从文本描述变成可验证硬绑定。  
+2. **连续性事件账本**：把 writing-state 从单文件状态变成可重放投影。  
+3. **结构化审计与机械门**：把人物一致性检查变成 blocker、证据、规则和 owner 裁决。  
+4. **任务接力驾驶舱**：把多模型协作变成 ticket、claim、lease、handoff，而不是聊天接龙。
+
+一句话收束：  
+**让模型负责写候选，让系统负责取证，让画布负责裁决，让 CAS/revision/事件账本负责真相。只有这样，百万字人物一致性才不是靠模型记性，而是靠工程纪律。**

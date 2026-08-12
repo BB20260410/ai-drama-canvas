@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "kind": "native-media-drag-physical-acceptance",
+  "verdict": "PASS",
+  "testedAt": "2026-08-09T20:23:42.615Z",
+  "build": {
+    "schemaVersion": 1,
+    "kind": "ai-drama-canvas-release-manifest",
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "sourceDigest": "a4312c768158bee4f6c64a3d1764ecf0b455f6a0e541fcfe0b217b4274433bda",
+    "buildId": "e0197b69e9c27800f65e68d9c8ab7173",
+    "buildIdentityFingerprint": "a81d0a9543c1b5cfc55d18ccd1c6bee942b9a99b06f955efa59e4f8424a3bae5",
+    "protocolVersion": "1.1",
+    "mcpToolCount": 218,
+    "builtAt": "2026-08-09T20:21:18.817Z",
+    "distribution": "local-only",
+    "localOnly": true,
+    "source": {
+      "files": 970,
+      "bytes": 20057879
+    },
+    "fingerprint": "52e044a557029abd321e85ec5b95b36d1a13430cd77b0d61c5b8bf41b986a48a"
+  },
+  "packagedApp": {
+    "executablePath": "/Users/hxx/Documents/无限画布/dist/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+    "isolatedProject": true,
+    "formalProjectTouched": false
+  },
+  "finder": {
+    "targetFolderName": "finder-drop",
+    "copies": [
+      {
+        "kind": "image",
+        "fileName": "Finder拖出图片.png",
+        "extension": ".png",
+        "sha256": "0c23a3a6a115ebfc2faffa415bd0ab764ee78e5fef8c74e90f7fe1d45265ffe7",
+        "sizeBytes": 24577,
+        "independentCopy": true,
+        "symbolicLink": false,
+        "sourceCasUnchanged": true,
+        "decode": {
+          "format": "png",
+          "width": 960,
+          "height": 540,
+          "fullFrameDecodedBytes": 2073600
+        }
+      },
+      {
+        "kind": "video",
+        "fileName": "Finder拖出视频.mp4",
+        "extension": ".mp4",
+        "sha256": "03cebe10868b26353bc10230e21cdf62258ac48aef50a4783ff034de48cd0202",
+        "sizeBytes": 22786,
+        "independentCopy": true,
+        "symbolicLink": false,
+        "sourceCasUnchanged": true,
+        "decode": {
+          "formatName": "mov,mp4,m4a,3gp,3g2,mj2",
+          "durationSeconds": 2,
+          "streamTypes": [
+            "video",
+            "audio"
+          ],
+          "fullDecodePassed": true
+        }
+      },
+      {
+        "kind": "audio",
+        "fileName": "Finder拖出音频.wav",
+        "extension": ".wav",
+        "sha256": "80758bc82e00fdc8b4c0cd4ee6e24a9594ae57b96895fb6e97a5e23b2bbd604c",
+        "sizeBytes": 176478,
+        "independentCopy": true,
+        "symbolicLink": false,
+        "sourceCasUnchanged": true,
+        "decode": {
+          "formatName": "wav",
+          "durationSeconds": 2,
+          "streamTypes": [
+            "audio"
+          ],
+          "fullDecodePassed": true
+        }
+      }
+    ]
+  },
+  "otherApplication": {
+    "name": "AI Canvas Native Drop Receiver",
+    "acceptedImageFromCanvasDrag": true,
+    "persistedDocument": false,
+    "receipt": {
+      "receivedAt": "2026-08-09T20:23:42.000Z",
+      "fileName": "Finder拖出图片.png",
+      "sha256": "0c23a3a6a115ebfc2faffa415bd0ab764ee78e5fef8c74e90f7fe1d45265ffe7",
+      "sizeBytes": 24577,
+      "independentCopy": true,
+      "decoded": {
+        "format": "png",
+        "width": 960,
+        "height": 540
+      }
+    }
+  },
+  "canvasRetention": {
+    "observedAt": "2026-08-09T20:23:41.770Z",
+    "nodeCount": 3,
+    "exportHandleCount": 3,
+    "mediaKinds": [
+      "audio",
+      "image",
+      "video"
+    ],
+    "armedKinds": [],
+    "persistenceState": {
+      "registeredMedia": [
+        {
+          "kind": "image",
+          "sha256": "0c23a3a6a115ebfc2faffa415bd0ab764ee78e5fef8c74e90f7fe1d45265ffe7",
+          "registered": true
+        },
+        {
+          "kind": "video",
+          "sha256": "03cebe10868b26353bc10230e21cdf62258ac48aef50a4783ff034de48cd0202",
+          "registered": true
+        },
+        {
+          "kind": "audio",
+          "sha256": "80758bc82e00fdc8b4c0cd4ee6e24a9594ae57b96895fb6e97a5e23b2bbd604c",
+          "registered": true
+        }
+      ],
+      "expectedPinnedNodeIds": [
+        "library-media:03cebe10868b26353bc10230e21cdf62258ac48aef50a4783ff034de48cd0202",
+        "library-media:0c23a3a6a115ebfc2faffa415bd0ab764ee78e5fef8c74e90f7fe1d45265ffe7",
+        "library-media:80758bc82e00fdc8b4c0cd4ee6e24a9594ae57b96895fb6e97a5e23b2bbd604c"
+      ],
+      "persistedPinnedNodeIds": [
+        "library-media:03cebe10868b26353bc10230e21cdf62258ac48aef50a4783ff034de48cd0202",
+        "library-media:0c23a3a6a115ebfc2faffa415bd0ab764ee78e5fef8c74e90f7fe1d45265ffe7",
+        "library-media:80758bc82e00fdc8b4c0cd4ee6e24a9594ae57b96895fb6e97a5e23b2bbd604c"
+      ],
+      "allMediaRegistered": true,
+      "allPinnedNodesPersisted": true
+    },
+    "originalsRetainedAfterPhysicalDrops": true
+  },
+  "screenshots": [
+    {
+      "kind": "finder",
+      "relativePath": "docs/evidence/native-media-drag-physical-20260809T202248842Z-40022-finder.png",
+      "sizeBytes": 223659,
+      "sha256": "27414232ce009b7be0df55b18bf37c0e7663fa42d6d7ce59ae30f6d6f4998a23"
+    },
+    {
+      "kind": "otherApp",
+      "relativePath": "docs/evidence/native-media-drag-physical-20260809T202248842Z-40022-receiver.png",
+      "sizeBytes": 269796,
+      "sha256": "f9af2f8dd0fa7d7bc0d13abbc2722f95559758b847fc1216290b98e11837053f"
+    }
+  ],
+  "boundaries": {
+    "rendererReceivedCasPath": false,
+    "sourceCasChanged": false,
+    "imageGenerationCalls": 0,
+    "uploads": 0,
+    "externalRequests": []
+  }
+}

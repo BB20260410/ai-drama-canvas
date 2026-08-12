@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-writing-os-v1-1m-500-acceptance",
+  "status": "PASS",
+  "generatedAt": "2026-08-01T23:55:18.034Z",
+  "scope": {
+    "remoteModelsCalled": false,
+    "feesIncurred": false,
+    "formalNovelSourcesTouched": false,
+    "temporaryProjectsCleanedAfterReport": true
+  },
+  "runtime": {
+    "transport": "source-stdio-and-json-cli",
+    "toolCount": 209,
+    "requiredTools": [
+      "get_novel_manuscript_workspace",
+      "get_novel_writing_state",
+      "build_novel_context_pack",
+      "preflight_novel_chapter_write",
+      "search_novel_manuscript",
+      "read_novel_manuscript_range",
+      "execute_command"
+    ]
+  },
+  "smallVerticalSlice": {
+    "mcpCliEquivalent": {
+      "state": true,
+      "contextPack2": true,
+      "preflight": true
+    },
+    "aiSaveRevision": 2,
+    "crossInterfaceReplay": true,
+    "staleReason": "context_preflight_stale",
+    "reviewTicketAttached": true,
+    "stateCommittedThroughChapter2": true,
+    "chapter3PreflightReady": true
+  },
+  "million": {
+    "scale": "S1",
+    "targetCharacters": 1000000,
+    "utf16Characters": 1000000,
+    "utf8Bytes": 2601296,
+    "chapterCount": 500,
+    "corpusSha256": "b91fb4408eab1a8da414d3ea819c4577894e06278c9e8d58f136f7d23b14a32d",
+    "logicalFingerprint": "487ac752061520db5cd985b9034790b2d7b5902bd53c005de19e35f1eb45e646",
+    "importDurationMs": 33999,
+    "seedDurationMs": 744,
+    "stateRevision": 1,
+    "completionCount": 499,
+    "cutoffChapterId": "4b1b52b5-3c8f-5b88-b07d-349ddc30a448",
+    "contextPack": {
+      "version": 2,
+      "fingerprint": "aca0ff5a6dde679cf9b63dca3a1566a52be7bb71412caf23be4b0038f4c573c7",
+      "deterministicRepeat": true,
+      "maximumCharacters": 4096,
+      "usedCharacters": 4096,
+      "excerptCount": 3,
+      "targetChapterExcluded": true,
+      "locatorRoundTrip": true,
+      "durationMs": 41
+    },
+    "preflight": {
+      "ready": true,
+      "preflightId": "novel-write-preflight-dabb83302aec09f51a900dce"
+    },
+    "search": {
+      "scannedChapters": 500,
+      "skippedExternalChanges": 0,
+      "hitCount": 1,
+      "hotDurationMs": 109
+    },
+    "sourceUnchanged": true
+  }
+}

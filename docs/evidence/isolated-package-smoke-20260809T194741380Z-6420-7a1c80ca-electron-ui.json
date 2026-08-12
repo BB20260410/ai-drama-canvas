@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 1,
+  "runId": "isolated-package-smoke-20260809T194741380Z-6420-7a1c80ca",
+  "generatedAt": "2026-08-09T19:49:50.165Z",
+  "status": "passed",
+  "transport": "packaged-electron-current-source",
+  "executablePath": "/private/tmp/aic-pkg-XomDPU/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+  "userDataPath": "/private/tmp/aic-pkg-XomDPU/t/ai-canvas-editor-effect-transition-ui-qsdkx0/electron-user-data",
+  "fixture": {
+    "root": "/private/tmp/aic-pkg-XomDPU/t/ai-canvas-editor-effect-transition-ui-qsdkx0/project",
+    "registryPath": "/private/tmp/aic-pkg-XomDPU/t/ai-canvas-editor-effect-transition-ui-qsdkx0/registry.json",
+    "editProjectId": "edit-4c2d951c-e44c-4fd2-bd16-3c8f587d9df1",
+    "revision": 1,
+    "outgoingClipId": "clip-964f06ed-bebb-4cba-b755-cc19304d5f18",
+    "incomingClipId": "clip-1d8441f9-92de-4e3b-8226-2a084af955fd",
+    "inOffsetFrames": 3,
+    "outOffsetFrames": 5,
+    "timebase": {
+      "rateNumerator": 24,
+      "rateDenominator": 1
+    }
+  },
+  "inspector": {
+    "initial": {
+      "transition": "smpte_dissolve",
+      "inOffsetFrames": 3,
+      "outOffsetFrames": 5,
+      "playbackDisabled": true,
+      "keyframeDisabled": true
+    },
+    "restart": {
+      "inOffsetFrames": 2,
+      "outOffsetFrames": 4
+    }
+  },
+  "preview": {
+    "initial": {
+      "outgoing": {
+        "currentTime": 1.167,
+        "opacity": 0.625,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-XomDPU%2Ft%2Fai-canvas-editor-effect-transition-ui-qsdkx0%2Fproject%2FEP01_15s_001_UI%E8%BD%AC%E5%9C%BA%E5%89%8D%E9%A1%B9%2FEP01_15s_001_v1.mp4"
+      },
+      "incoming": {
+        "currentTime": 0.167,
+        "opacity": 0.375,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-XomDPU%2Ft%2Fai-canvas-editor-effect-transition-ui-qsdkx0%2Fproject%2FEP01_15s_002_UI%E8%BD%AC%E5%9C%BA%E5%90%8E%E9%A1%B9%2FEP01_15s_002_v1.mp4"
+      }
+    },
+    "afterRedo": {
+      "outgoing": {
+        "currentTime": 1.167,
+        "opacity": 0.625,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-XomDPU%2Ft%2Fai-canvas-editor-effect-transition-ui-qsdkx0%2Fproject%2FEP01_15s_001_UI%E8%BD%AC%E5%9C%BA%E5%89%8D%E9%A1%B9%2FEP01_15s_001_v1.mp4"
+      },
+      "incoming": {
+        "currentTime": 0.167,
+        "opacity": 0.375,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-XomDPU%2Ft%2Fai-canvas-editor-effect-transition-ui-qsdkx0%2Fproject%2FEP01_15s_002_UI%E8%BD%AC%E5%9C%BA%E5%90%8E%E9%A1%B9%2FEP01_15s_002_v1.mp4"
+      }
+    },
+    "afterApplicationRestart": {
+      "outgoing": {
+        "currentTime": 1.167,
+        "opacity": 0.666667,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-XomDPU%2Ft%2Fai-canvas-editor-effect-transition-ui-qsdkx0%2Fproject%2FEP01_15s_001_UI%E8%BD%AC%E5%9C%BA%E5%89%8D%E9%A1%B9%2FEP01_15s_001_v1.mp4"
+      },
+      "incoming": {
+        "currentTime": 0.165999,
+        "opacity": 0.333333,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-XomDPU%2Ft%2Fai-canvas-editor-effect-transition-ui-qsdkx0%2Fproject%2FEP01_15s_002_UI%E8%BD%AC%E5%9C%BA%E5%90%8E%E9%A1%B9%2FEP01_15s_002_v1.mp4"
+      }
+    }
+  },
+  "revisions": {
+    "fixture": 1,
+    "saved": 2,
+    "undone": 3,
+    "redone": 4,
+    "afterApplicationRestart": 4
+  },
+  "undoRedo": {
+    "undoRestoredOffsets": [
+      3,
+      5
+    ],
+    "redoRestoredOffsets": [
+      2,
+      4
+    ]
+  },
+  "otioExport": {
+    "path": "/private/tmp/aic-pkg-XomDPU/t/ai-canvas-editor-effect-transition-ui-qsdkx0/project/.aicanvas/editor/otio/UI 标准 Effect Transition_r4_1786304983947.otio",
+    "transition": {
+      "OTIO_SCHEMA": "Transition.1",
+      "name": "SMPTE Dissolve",
+      "transition_type": "SMPTE_Dissolve",
+      "in_offset": {
+        "OTIO_SCHEMA": "RationalTime.1",
+        "value": 2,
+        "rate": 24
+      },
+      "out_offset": {
+        "OTIO_SCHEMA": "RationalTime.1",
+        "value": 4,
+        "rate": 24
+      },
+      "enabled": true,
+      "metadata": {
+        "aicanvas": {
+          "contract": "aicanvas.otio-effect-transition.v1"
+        }
+      }
+    },
+    "contract": "aicanvas.otio-effect-transition.v1"
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260809T194741380Z-6420-7a1c80ca-electron-ui.png",
+    "bytes": 252968,
+    "sha256": "c4cc380017130779e3383df02800a6b3ef800ed94c909dbb66b43b16e0584c84",
+    "width": 1560,
+    "height": 980,
+    "captureAttempt": 1,
+    "content": {
+      "pixels": 1528800,
+      "brightRatio": 0.1992575876504448,
+      "chromaticRatio": 0.05061420722135008
+    }
+  },
+  "pageErrors": [],
+  "isolation": {
+    "userDataOutsideProjectRoot": true
+  },
+  "backgroundSmoke": {
+    "enabled": true,
+    "bringToFrontUsed": false,
+    "snapshots": [
+      {
+        "label": "Effect/Transition first ready",
+        "enabled": true,
+        "platform": "darwin",
+        "activationPolicy": "accessory",
+        "dockVisible": false,
+        "focusedWindowId": null,
+        "windows": [
+          {
+            "id": 1,
+            "showEvents": 0,
+            "focusEvents": 0,
+            "readyToShowEvents": 1,
+            "visible": false,
+            "focused": false,
+            "destroyed": false
+          }
+        ]
+      },
+      {
+        "label": "Effect/Transition first graceful close:before-close",
+        "enabled": true,
+        "platform": "darwin",
+        "activationPolicy": "accessory",
+        "dockVisible": false,
+        "focusedWindowId": null,
+        "windows": [
+          {
+            "id": 1,
+            "showEvents": 0,
+            "focusEvents": 0,
+            "readyToShowEvents": 1,
+            "visible": false,
+            "focused": false,
+            "destroyed": false
+          }
+        ]
+      },
+      {
+        "label": "Effect/Transition restart ready",
+        "enabled": true,
+        "platform": "darwin",
+        "activationPolicy": "accessory",
+        "dockVisible": false,
+        "focusedWindowId": null,
+        "windows": [
+          {
+            "id": 1,
+            "showEvents": 0,
+            "focusEvents": 0,
+            "readyToShowEvents": 1,
+            "visible": false,
+            "focused": false,
+            "destroyed": false
+          }
+        ]
+      },
+      {
+        "label": "Effect/Transition final graceful close:before-close",
+        "enabled": true,
+        "platform": "darwin",
+        "activationPolicy": "accessory",
+        "dockVisible": false,
+        "focusedWindowId": null,
+        "windows": [
+          {
+            "id": 1,
+            "showEvents": 0,
+            "focusEvents": 0,
+            "readyToShowEvents": 1,
+            "visible": false,
+            "focused": false,
+            "destroyed": false
+          }
+        ]
+      }
+    ]
+  },
+  "sourceHashes": {
+    "src/core/types.ts": "9a34f784c8dc2592f1464f58b2d6bfa9c39f3314903a40b86249807dd9b0ddd5",
+    "src/core/editor.ts": "6e26bbe5a876f4d07f018b3730da9533791a14cab6f21bdf53e9e381f204ec0a",
+    "src/core/codex.ts": "bdf6667892e1b832da4cbdaa35b5473814bc32e21810189977bd441c622f50c0",
+    "src/main/app-close-coordinator.ts": "fd0aab5be7fe7a32b12450979ccf3aa57f44b0d77d59017e0dd93925ff807900",
+    "src/main/index.ts": "0bd1c72e85caec5721d65dea886584c7743dfecd40496f3ae0af169bc09e8e33",
+    "src/mcp/server.ts": "964ab65439b0b590576c11053f9b2ea66cebddb0d15c52db297d18fe663443c2",
+    "src/renderer/src/components/VideoEditorView.vue": "1016f79d875f656a6a6e80db5e43c38408809df5778846db84e98b44f606613f",
+    "scripts/create-effect-transition-ui-fixture.ts": "2bf0c2f4e3a5d46b0b72ca7c82e035e0d6010cea739d98f3176ff86f5f39294a",
+    "scripts/lib/electron-application-close.mjs": "223eeb3f977efad7418b0eeaa37f3dccad259f83cdcc30175abc5b5964f6893a",
+    "scripts/ui-editor-effect-transition-smoke.mjs": "e24f264c56c2a27181c733e49e50f02d654aa696c3c49d17bc6c047f1464b539"
+  },
+  "terminal": {
+    "rootRemoved": true,
+    "registryRemoved": true,
+    "userDataRemoved": true
+  },
+  "closeRuns": [
+    {
+      "label": "Effect/Transition first graceful close",
+      "pid": 8978,
+      "durationMs": 2558,
+      "graceful": true,
+      "forceTerminated": false,
+      "forceKilled": false,
+      "exitCode": 0,
+      "signalCode": null
+    },
+    {
+      "label": "Effect/Transition final graceful close",
+      "pid": 9043,
+      "durationMs": 1586,
+      "graceful": true,
+      "forceTerminated": false,
+      "forceKilled": false,
+      "exitCode": 0,
+      "signalCode": null
+    }
+  ]
+}

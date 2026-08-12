@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "kind": "whole-project-behavior-preserving-refactor-phase-evidence",
+  "phase": "B",
+  "status": "passed",
+  "programStatus": "in_progress",
+  "completedAt": "2026-08-10T15:07:21Z",
+  "scope": {
+    "behaviorPreserving": true,
+    "databaseSchemaChanged": false,
+    "casChanged": false,
+    "ipcContractChanged": false,
+    "mcpContractChanged": false,
+    "formalProjectDataWritten": false
+  },
+  "changes": [
+    "added-active-studio-canonical-json-internal-kernel",
+    "migrated-exactly-eight-byte-equivalent-owners",
+    "removed-eight-local-canonicalize-and-digest-duplicates",
+    "locked-legacy-canonical-bytes-and-sha256-vector",
+    "added-source-boundary-regression"
+  ],
+  "owners": [
+    "studio-generation",
+    "studio-unit-grid-generation",
+    "studio-generation-ledger",
+    "studio-generation-review",
+    "studio-generation-checkpoint",
+    "studio-post-result-observation",
+    "studio-production-dashboard",
+    "studio-video-package"
+  ],
+  "identityContract": {
+    "objectKeyOrder": "localeCompare-en",
+    "arrayOrder": "preserved",
+    "objectUndefined": "omitted",
+    "arrayUndefined": "json-null",
+    "digest": "sha256-utf8-compact-json",
+    "prettyIndent": 2,
+    "prettyTrailingNewline": true,
+    "frozenVectorSha256": "7bf5bb5b0d17bfb7598c45adf5e6af88618181b8c64f1810a4bd860c7a9d0d0d",
+    "p24GoldenChanged": false
+  },
+  "verification": {
+    "focusedOwners": { "files": 10, "tests": 136, "status": "passed" },
+    "boundaryAndKernel": { "files": 2, "tests": 5, "status": "passed" },
+    "typecheck": "passed",
+    "typecheckApp": "passed",
+    "diffCheck": "passed",
+    "independentReview": "clean"
+  },
+  "fileHashes": {
+    "src/core/studio-canonical-json.ts": "543b45e95dc432565b13c88777a053f151a55d89bb878b19ee7c8aa26fe08f24",
+    "tests/studio-canonical-json.test.ts": "9513194ecffa0c299e0392d20e767200a3da89b1ddc045396fe8f05884607970",
+    "tests/source-module-boundaries.test.ts": "a284079d7e7b9c8e7a8574ebb71325c654cc13532c4e0c07556470b77aad0910"
+  },
+  "notRun": [
+    "full-test-partitions",
+    "production-build",
+    "immutable-mcp-candidate",
+    "isolated-package-smoke",
+    "installed-app-replacement"
+  ],
+  "boundaries": {
+    "externalCalls": 0,
+    "uploads": 0,
+    "paidGenerations": 0,
+    "gitStageCommitPush": 0,
+    "appLaunched": false,
+    "notarized": false
+  },
+  "roadmap": "docs/全项目行为保持重构路线图_20260810.md"
+}

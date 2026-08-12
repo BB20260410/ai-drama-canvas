@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-writing-os-sequential-scale-acceptance",
+  "verdict": "PASS",
+  "createdAt": "2026-08-03T00:47:38.570Z",
+  "environment": {
+    "node": "v26.3.1",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "scale": {
+    "targetChapters": 100,
+    "managedChaptersIncludingBootstrap": 101,
+    "requestedSourceCharacters": 200000,
+    "actualSourceCharacters": 202734,
+    "retconFromChapter": 40
+  },
+  "sourceReadOnly": {
+    "before": {
+      "sha256": "c4dbeea7651222e0dc413cbdf6f4209f9f1ad0a9dc0db2ecb1a5311c2b0a9470",
+      "byteLength": 605416,
+      "charCount": 202734
+    },
+    "after": {
+      "sha256": "c4dbeea7651222e0dc413cbdf6f4209f9f1ad0a9dc0db2ecb1a5311c2b0a9470",
+      "byteLength": 605416,
+      "charCount": 202734
+    },
+    "unchanged": true
+  },
+  "import": {
+    "durationMs": 9135,
+    "chapterCount": 101
+  },
+  "originalSequentialLoop": {
+    "cycles": 100,
+    "operation": "prepare(formal+lease) -> CAS save -> evidence candidate -> owner accept",
+    "durationMs": 210462,
+    "latency": {
+      "minimumMs": 1916.06,
+      "p50Ms": 2065.98,
+      "p95Ms": 2219.3,
+      "maximumMs": 4208.15,
+      "meanMs": 2104.62
+    },
+    "phases": {
+      "readChapter": {
+        "durationMs": 402,
+        "latency": {
+          "minimumMs": 3.51,
+          "p50Ms": 3.91,
+          "p95Ms": 4.45,
+          "maximumMs": 11.78,
+          "meanMs": 4.02
+        }
+      },
+      "prepare": {
+        "durationMs": 29098,
+        "latency": {
+          "minimumMs": 236.23,
+          "p50Ms": 289.62,
+          "p95Ms": 314.74,
+          "maximumMs": 331.67,
+          "meanMs": 290.98
+        }
+      },
+      "saveChapter": {
+        "durationMs": 87221,
+        "latency": {
+          "minimumMs": 789.82,
+          "p50Ms": 854.47,
+          "p95Ms": 942.08,
+          "maximumMs": 1472.24,
+          "meanMs": 872.21
+        }
+      },
+      "loadWritingState": {
+        "durationMs": 805,
+        "latency": {
+          "minimumMs": 3.87,
+          "p50Ms": 7.96,
+          "p95Ms": 9.31,
+          "maximumMs": 14.62,
+          "meanMs": 8.05
+        }
+      },
+      "stageCandidate": {
+        "durationMs": 19648,
+        "latency": {
+          "minimumMs": 170.63,
+          "p50Ms": 183.69,
+          "p95Ms": 204.78,
+          "maximumMs": 592.39,
+          "meanMs": 196.48
+        }
+      },
+      "acceptCandidate": {
+        "durationMs": 72746,
+        "latency": {
+          "minimumMs": 660.66,
+          "p50Ms": 713.2,
+          "p95Ms": 797.17,
+          "maximumMs": 1361.92,
+          "meanMs": 727.46
+        }
+      }
+    },
+    "externalMcpEquivalentCommandBusCheckpoints": [
+      1,
+      50,
+      100
+    ],
+    "restartProof": {
+      "atChapter": 50,
+      "newProcessCliExitCode": 0,
+      "recoveredHead": "c3c1c830-12f2-51b8-b601-b4e3754567b6"
+    }
+  },
+  "retconRebuild": {
+    "targetChapter": 40,
+    "affectedChapters": 61,
+    "beforeSnapshotLocator": ".aicanvas/novel/state-rebuilds/novel-state-rebuild-d42cd83eb47690cba4cc1753/before.json",
+    "cycles": 61,
+    "durationMs": 55024,
+    "latency": {
+      "minimumMs": 871.16,
+      "p50Ms": 903.89,
+      "p95Ms": 921.96,
+      "maximumMs": 927.35,
+      "meanMs": 902.03
+    },
+    "phases": {
+      "readChapter": {
+        "durationMs": 239,
+        "latency": {
+          "minimumMs": 3.48,
+          "p50Ms": 3.85,
+          "p95Ms": 4.22,
+          "maximumMs": 7.5,
+          "meanMs": 3.92
+        }
+      },
+      "stageCandidate": {
+        "durationMs": 11681,
+        "latency": {
+          "minimumMs": 183.33,
+          "p50Ms": 191.31,
+          "p95Ms": 200.09,
+          "maximumMs": 206.05,
+          "meanMs": 191.49
+        }
+      },
+      "acceptCandidate": {
+        "durationMs": 43103,
+        "latency": {
+          "minimumMs": 684.07,
+          "p50Ms": 709.09,
+          "p95Ms": 722.28,
+          "maximumMs": 726.54,
+          "meanMs": 706.61
+        }
+      }
+    },
+    "restartProof": {
+      "atChapter": 70,
+      "newProcessCliExitCode": 0,
+      "recoveredHead": "1cd84709-a651-5186-9a7b-8ba74d28205d"
+    },
+    "finalHeadChapter": 100,
+    "rebuildCleared": true
+  },
+  "faultInjection": {
+    "expected": {
+      "doubleWriter": "chapter_write_lease_conflict",
+      "emptyDelta": "state_delta_required",
+      "unknownEntity": "invalid_reference",
+      "wrongCast": "invalid_reference",
+      "agentSelfAccept": "actor_forbidden",
+      "rebuildOutOfOrder": "state_rebuild_out_of_order"
+    },
+    "actual": {
+      "doubleWriter": "chapter_write_lease_conflict",
+      "emptyDelta": "state_delta_required",
+      "unknownEntity": "invalid_reference",
+      "wrongCast": "invalid_reference",
+      "agentSelfAccept": "actor_forbidden",
+      "rebuildOutOfOrder": "state_rebuild_out_of_order"
+    },
+    "allFailedClosed": true,
+    "futureSecretAbsentFromPack": true
+  },
+  "cutoffOracle": [
+    {
+      "label": "before-retcon-history",
+      "actual": "稳定-original-39",
+      "expected": "稳定-original-39",
+      "pass": true
+    },
+    {
+      "label": "retcon-boundary-before",
+      "actual": "稳定-original-39",
+      "expected": "稳定-original-39",
+      "pass": true
+    },
+    {
+      "label": "retcon-boundary-through",
+      "actual": "稳定-rebuild-40",
+      "expected": "稳定-rebuild-40",
+      "pass": true
+    },
+    {
+      "label": "final-through",
+      "actual": "稳定-rebuild-100",
+      "expected": "稳定-rebuild-100",
+      "pass": true
+    }
+  ],
+  "storage": {
+    "writingStateBytes": 186502,
+    "writingStateRevision": 163,
+    "characterStateHistoryRecords": 101,
+    "chapterCompletions": 101,
+    "immutableCandidates": 161,
+    "immutableDecisions": 161,
+    "rebuildLineages": 1,
+    "historyEvents": 162,
+    "historyCheckpoints": 163,
+    "fullLineageVerifiedEvents": 162,
+    "leaseFileBytes": 1162,
+    "liveOrStaleLeaseRecordsAfterPruning": 1,
+    "peakRssBytes": 305037312
+  },
+  "programGuarantees": [
+    "cutoff projection and future-secret filtering",
+    "required cast plus structured character profile formal gate",
+    "chapter lease plus revision/SHA CAS",
+    "evidence-bound state candidate plus human owner decision",
+    "append-only dynamic history and ordered retcon rebuild",
+    "append-only state events/checkpoints plus shadow rebuild and full-lineage verification",
+    "new-process durable state recovery"
+  ],
+  "limitations": [
+    "规模循环使用确定性夹具，不代表真实文学质量或真实外部模型表现。",
+    "中间章节使用同一 Repository/Core 写锁路径以控制验收时长；第1、中点、末章额外穿过 command bus actor/lease 外层。",
+    "机械 PASS 不证明人物魅力、心理真实、节奏或文风，仍需独立模型与人工审稿。"
+  ]
+}

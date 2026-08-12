@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-mode-v1-baseline",
+  "capturedAt": "2026-08-01T06:47:34.620Z",
+  "workspace": ".",
+  "repository": {
+    "head": "1e8e9d9c8cb055987d53b8fa0b503fb80538b3f5",
+    "branch": "main",
+    "dirty": true,
+    "statusCount": 23,
+    "trackedStatusCount": 0,
+    "untrackedStatusCount": 23,
+    "statusSha256": "00b532d69e6cd612fba5f567e24eb31e37e5aa070d35775964329a2ae668c2fa",
+    "statusEntries": [
+      "?? docs/evidence/novel-mode-v1/baseline/change-whitelist.json",
+      "?? docs/evidence/novel-mode-v1/baseline/environment.json",
+      "?? docs/evidence/novel-mode-v1/baseline/fts5-runtime.json",
+      "?? docs/evidence/novel-mode-v1/real-project/active-production-p0-before.json",
+      "?? docs/evidence/novel-mode-v1/real-project/formal-novel-p0-before.json",
+      "?? docs/novel-mode/00-scope-and-authority.md",
+      "?? docs/novel-mode/01-data-contracts.md",
+      "?? docs/novel-mode/02-migration-and-security.md",
+      "?? docs/novel-mode/03-acceptance-spec.md",
+      "?? docs/third-party/novel-donors.json",
+      "?? licenses/Apache-2.0-OpenFic.txt",
+      "?? licenses/MIT-CharacterArc.txt",
+      "?? scripts/capture-novel-mode-baseline.ts",
+      "?? scripts/capture-novel-readonly-tree-manifest.ts",
+      "?? scripts/create-novel-scale-fixtures.ts",
+      "?? scripts/probe-novel-fts5-runtime.mjs",
+      "?? scripts/validate-novel-scale-fixture.ts",
+      "?? tests/fixtures/novel-scale/manifest.json",
+      "?? tests/novel-fts5-runtime-probe.test.ts",
+      "?? tests/novel-readonly-tree-manifest.test.ts",
+      "?? tests/novel-scale-fixture.test.ts",
+      "?? tests/novel-third-party-provenance.test.ts",
+      "?? THIRD_PARTY_NOTICES.md"
+    ],
+    "highOverlapDirtyPaths": []
+  },
+  "runtime": {
+    "node": "v26.3.1",
+    "electronDeclared": "43.1.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "osType": "Darwin",
+    "osRelease": "25.5.0",
+    "macosProductVersion": "26.5.1",
+    "cpuModels": [
+      "Apple M5 Max"
+    ],
+    "logicalCpuCount": 18,
+    "totalMemoryBytes": 137438953472
+  },
+  "package": {
+    "name": "ai-drama-canvas",
+    "version": "0.2.0"
+  },
+  "buildIdentity": {
+    "schemaVersion": 1,
+    "kind": "build-identity",
+    "buildId": "925abae3f3a4bf83e112bc428a1d936e",
+    "sourceDigest": "3b5dd1c45479c101bbc2d90aaba361e146ebba3546ba032f599c66c479794fb6",
+    "packageVersion": "0.2.0",
+    "capabilities": {
+      "mcpToolCount": 202,
+      "protocolVersion": "1.1",
+      "studioDashboard": true,
+      "studioBinding": true,
+      "studioContinuity": true,
+      "formalImagegenProvider": "agent-imagegen",
+      "formalImagegenProviders": [
+        "codex",
+        "grok"
+      ],
+      "browserGeneration": false,
+      "artlist": false
+    },
+    "fingerprint": "286232d2740496895e840617359d309dea12d757fb8208a50ebe300ce2849da9",
+    "roots": {
+      "sourceFiles": 895,
+      "sourceBytes": 17857403
+    }
+  },
+  "safety": {
+    "activeProductionProjectWasOpened": false,
+    "formalNovelSourceWasWritten": false,
+    "gitMutationPerformed": false,
+    "externalNetworkRequestPerformed": false
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-mode-v1-change-whitelist",
+  "planId": "2026-07-31-novel-memory-library-v1",
+  "policy": {
+    "default": "deny",
+    "gitMutationAllowed": false,
+    "externalUploadAllowed": false,
+    "paidOperationAllowed": false,
+    "installedApplicationReplacementAllowed": false
+  },
+  "protectedPaths": [
+    "projects/**",
+    "docs/evidence/** (except docs/evidence/novel-mode-v1/**)",
+    "/Applications/AI 漫剧画布.app/**",
+    "/Users/hxx/Documents/嘟嘟专属剧情。/山海有只小狗_小说项目_20260730/第一季_古蜀十三相_小说化_v1/**"
+  ],
+  "allowedNewPathPrefixes": [
+    "src/core/novel-",
+    "src/renderer/src/components/Novel",
+    "src/renderer/src/composables/use-novel-",
+    "tests/novel-",
+    "tests/fixtures/novel-scale/",
+    "scripts/create-novel-",
+    "scripts/validate-novel-",
+    "scripts/capture-novel-",
+    "scripts/probe-novel-",
+    "scripts/ui-novel-",
+    "docs/novel-mode/",
+    "docs/third-party/novel-donors.json",
+    "docs/evidence/novel-mode-v1/",
+    "licenses/MIT-CharacterArc.txt",
+    "licenses/Apache-2.0-OpenFic.txt"
+  ],
+  "allowedExistingFiles": [
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "dirtyAtP0Start": false,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "package.json",
+      "dirtyAtP0Start": false,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "src/core/managed-project.ts",
+      "dirtyAtP0Start": false,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "src/core/sidecar.ts",
+      "dirtyAtP0Start": false,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "src/core/story.ts",
+      "dirtyAtP0Start": false,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "src/core/types.ts",
+      "dirtyAtP0Start": false,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "src/core/memory.ts",
+      "dirtyAtP0Start": false,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "src/core/adaptation.ts",
+      "dirtyAtP0Start": false,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "src/core/project-backup.ts",
+      "dirtyAtP0Start": false,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "src/core/command-bus.ts",
+      "dirtyAtP0Start": true,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "src/main/index.ts",
+      "dirtyAtP0Start": true,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "src/preload/index.ts",
+      "dirtyAtP0Start": true,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "src/renderer/src/App.vue",
+      "dirtyAtP0Start": true,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "src/renderer/src/components/ProjectCenter.vue",
+      "dirtyAtP0Start": false,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "src/renderer/src/components/StoryWorkbenchView.vue",
+      "dirtyAtP0Start": false,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "src/renderer/src/components/NarrativeAdaptationView.vue",
+      "dirtyAtP0Start": false,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "src/renderer/src/components/ContinuationWorkbenchView.vue",
+      "dirtyAtP0Start": false,
+      "requiresPreimageAndNarrowPatch": true
+    },
+    {
+      "path": "docs/当前开发交接.md",
+      "dirtyAtP0Start": false,
+      "requiresPreimageAndNarrowPatch": true,
+      "phase": "P8-only"
+    }
+  ],
+  "requiredBuildOutputVariance": {
+    "recordedAfterDiscovery": true,
+    "reason": "P0 explicitly requires npm run build; the command rewrites generated outputs that were omitted from the initial default-deny list.",
+    "paths": [
+      {
+        "path": "dist-mcp/**",
+        "tracked": false,
+        "classification": "generated-build-output"
+      },
+      {
+        "path": "out/**",
+        "tracked": false,
+        "classification": "generated-build-output"
+      },
+      {
+        "path": "release-manifest.json",
+        "tracked": true,
+        "dirtyAtP0Start": false,
+        "classification": "generated-build-identity",
+        "currentSha256": "e82a92ac2d96c02328847db41186dce4af3920bcb00a42333a96b0a04de22132"
+      }
+    ],
+    "boundary": "This variance does not authorize changes to source, user content, projects, the formal novel root, installed applications, Git state, uploads, or paid operations.",
+    "futureBuildPolicy": "While PID 51269 uses workspace dist-mcp, run acceptance builds in an isolated source snapshot and prove the live dist/manifest hashes unchanged."
+  }
+}

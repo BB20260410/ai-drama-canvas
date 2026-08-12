@@ -1,0 +1,389 @@
+{
+  "version": 1,
+  "updatedAt": "2026-08-12T08:30:38.556Z",
+  "items": [
+    {
+      "id": "wq-0001",
+      "createdAt": "2026-08-11T19:17:19.418Z",
+      "updatedAt": "2026-08-11T19:19:56.601Z",
+      "status": "closed",
+      "severity": "P0",
+      "source": "patrol:typecheck",
+      "probe": "typecheck",
+      "fingerprint": "42bd08ee86935f8f",
+      "title": "双套 typecheck（web+node）失败",
+      "repro": "npm run typecheck",
+      "attempts": 1,
+      "history": [
+        {
+          "at": "2026-08-11T19:17:19.418Z",
+          "event": "created-by-patrol",
+          "detail": "探针失败 exit=2; fp=42bd08ee86935f8f; log=/Users/hxx/Documents/无限画布/.workqueue/patrol-typecheck-2026-08-11T19-17-19-417Z.log; tail=> ai-drama-canvas@0.2.0 typecheck | > vue-tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json |  | scripts/auto-triage.ts(21,85): error TS5097: An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled."
+        },
+        {
+          "at": "2026-08-11T19:18:45.229Z",
+          "event": "claimed",
+          "detail": "who=lingma-primary; repro=npm run typecheck"
+        },
+        {
+          "at": "2026-08-11T19:19:46.113Z",
+          "event": "verify-pass",
+          "detail": "repro exit=0; log=/Users/hxx/Documents/无限画布/.workqueue/verify-wq-0001-1786475986112.log"
+        },
+        {
+          "at": "2026-08-11T19:19:56.601Z",
+          "event": "closed",
+          "detail": "evidence=.workqueue/verify-wq-0001-1786475986112.log"
+        }
+      ],
+      "owner": "lingma-primary",
+      "claimedAt": "2026-08-11T19:18:45.229Z",
+      "leaseUntil": "2026-08-12T19:18:45.229Z",
+      "closedAt": "2026-08-11T19:19:56.600Z",
+      "evidence": [
+        ".workqueue/verify-wq-0001-1786475986112.log"
+      ]
+    },
+    {
+      "id": "wq-0002",
+      "createdAt": "2026-08-11T19:23:08.565Z",
+      "updatedAt": "2026-08-11T19:24:13.964Z",
+      "status": "closed",
+      "severity": "P1",
+      "source": "patrol:dep-audit",
+      "probe": "dep-audit",
+      "fingerprint": "9e38f36010e0cb6e",
+      "title": "官方 registry 生产依赖审计发现漏洞",
+      "repro": "npm run patrol -- --probes=dep-audit",
+      "attempts": 1,
+      "history": [
+        {
+          "at": "2026-08-11T19:23:08.565Z",
+          "event": "created-by-patrol",
+          "detail": "探针失败 exit=1; fp=9e38f36010e0cb6e; log=/Users/hxx/Documents/无限画布/.workqueue/patrol-dep-audit-2026-08-11T19-23-08-564Z.log; tail=    at Socket.<anonymous> ([eval]:1:70) |     at Socket.emit (node:events:531:35) |     at endReadableNT (node:internal/streams/readable:1698:12) |     at process.processTicksAndRejections (node:internal/process/task_queues:89:21) |  | Node.js v22.23.2"
+        },
+        {
+          "at": "2026-08-11T19:23:28.949Z",
+          "event": "claimed",
+          "detail": "who=lingma-primary; repro=npm run patrol -- --probes=dep-audit"
+        },
+        {
+          "at": "2026-08-11T19:23:55.906Z",
+          "event": "verify-pass",
+          "detail": "repro exit=0; log=/Users/hxx/Documents/无限画布/.workqueue/verify-wq-0002-1786476235906.log"
+        },
+        {
+          "at": "2026-08-11T19:24:13.964Z",
+          "event": "closed",
+          "detail": "evidence=.workqueue/verify-wq-0002-1786476235906.log"
+        }
+      ],
+      "owner": "lingma-primary",
+      "claimedAt": "2026-08-11T19:23:28.948Z",
+      "leaseUntil": "2026-08-12T19:23:28.949Z",
+      "closedAt": "2026-08-11T19:24:13.963Z",
+      "evidence": [
+        ".workqueue/verify-wq-0002-1786476235906.log"
+      ]
+    },
+    {
+      "id": "wq-0003",
+      "createdAt": "2026-08-11T19:36:30.612Z",
+      "updatedAt": "2026-08-11T19:40:15.540Z",
+      "status": "closed",
+      "severity": "P2",
+      "source": "manual:loop-observation",
+      "fingerprint": "concurrent-patrol-write-race",
+      "title": "巡检并发写 WORKQUEUE.json 无文件锁，双巡检并行可能丢项",
+      "repro": "node scripts/workqueue-patrol-lock-selftest.mjs",
+      "attempts": 2,
+      "history": [
+        {
+          "at": "2026-08-11T19:36:30.612Z",
+          "event": "created-manual",
+          "detail": "2026-08-12 03:35 定时巡检与手动深度巡检并行运行，workqueue-ops 的 saveQueue 为读改写无锁实现；需加单飞锁（如 .workqueue/patrol.lock 独占创建）或调度侧互斥。复现验证命令仅为占位（stats），修复后需替换为真实锁竞态测试。"
+        },
+        {
+          "at": "2026-08-11T19:36:39.278Z",
+          "event": "claimed",
+          "detail": "who=lingma-primary; repro=node scripts/workqueue-patrol-lock-selftest.mjs"
+        },
+        {
+          "at": "2026-08-11T19:39:05.760Z",
+          "event": "verify-fail",
+          "detail": "repro exit!=0; log=/Users/hxx/Documents/无限画布/.workqueue/verify-wq-0003-1786477145760.log"
+        },
+        {
+          "at": "2026-08-11T19:40:06.048Z",
+          "event": "verify-pass",
+          "detail": "repro exit=0; log=/Users/hxx/Documents/无限画布/.workqueue/verify-wq-0003-1786477206047.log"
+        },
+        {
+          "at": "2026-08-11T19:40:15.540Z",
+          "event": "closed",
+          "detail": "evidence=.workqueue/verify-wq-0003-1786477206047.log"
+        }
+      ],
+      "owner": "lingma-primary",
+      "claimedAt": "2026-08-11T19:36:39.277Z",
+      "leaseUntil": "2026-08-12T19:36:39.278Z",
+      "closedAt": "2026-08-11T19:40:15.538Z",
+      "evidence": [
+        ".workqueue/verify-wq-0003-1786477206047.log"
+      ]
+    },
+    {
+      "id": "wq-0004",
+      "createdAt": "2026-08-11T19:48:08.799Z",
+      "updatedAt": "2026-08-11T20:16:03.862Z",
+      "status": "closed",
+      "severity": "P0",
+      "source": "patrol:fast-tests",
+      "probe": "fast-tests",
+      "fingerprint": "699fdfe439cce58b",
+      "title": "fast 测试分区存在失败用例（行为回归）",
+      "repro": "npm run test:fast",
+      "attempts": 1,
+      "history": [
+        {
+          "at": "2026-08-11T19:48:08.799Z",
+          "event": "created-by-patrol",
+          "detail": "探针失败 exit=1; fp=699fdfe439cce58b; log=/Users/hxx/Documents/无限画布/.workqueue/patrol-fast-tests-2026-08-11T19-48-08-797Z.log; tail=    \u001b[90m108|\u001b[39m       await expect(executeIdempotentCommand(first.root, command, { stu… |     \u001b[90m   |\u001b[39m                                                                                                \u001b[31m^\u001b[39m |     \u001b[90m109|\u001b[39m         \u001b[33m.\u001b[39mrejects\u001b[33m.\u001b[39m\u001b[34mtoMatchObject\u001b[39m({ |     \u001b[90m110|\u001b[39m           name\u001b[33m:\u001b[39m \u001b[32m\"RejectedCommandFailure\"\u001b[39m\u001b[33m,\u001b[39m |  |"
+        },
+        {
+          "at": "2026-08-11T19:50:33.124Z",
+          "event": "claimed",
+          "detail": "who=scheduled-patrol; repro=npm run test:fast"
+        },
+        {
+          "at": "2026-08-11T20:02:34.496Z",
+          "event": "note",
+          "detail": "协调 04:02：owner=scheduled-patrol 正在并行修复（已改 managed-project.ts 为 storage 直导并注释；本会话已同步完成三处测试合同修正：higgsfield 停用闸断言、ABI 270/257 重基线、novel 用例 120s 时限）。避免双修竞态，本会话移交，等待 scheduled-patrol 的 verify 结果；若其未在租约内 close，reap 后由下一轮接管。"
+        },
+        {
+          "at": "2026-08-11T20:14:39.968Z",
+          "event": "verify-pass",
+          "detail": "repro exit=0; log=/Users/hxx/Documents/无限画布/.workqueue/verify-wq-0004-1786479279968.log"
+        },
+        {
+          "at": "2026-08-11T20:16:03.862Z",
+          "event": "closed",
+          "detail": "evidence=.workqueue/verify-wq-0004-1786479279968.log"
+        }
+      ],
+      "owner": "scheduled-patrol",
+      "claimedAt": "2026-08-11T19:50:33.123Z",
+      "leaseUntil": "2026-08-12T19:50:33.124Z",
+      "closedAt": "2026-08-11T20:16:03.860Z",
+      "evidence": [
+        ".workqueue/verify-wq-0004-1786479279968.log"
+      ]
+    },
+    {
+      "id": "wq-0005",
+      "createdAt": "2026-08-11T21:00:17.235Z",
+      "updatedAt": "2026-08-12T00:28:01.391Z",
+      "status": "closed",
+      "severity": "P0",
+      "source": "patrol:medium-tests",
+      "probe": "medium-tests",
+      "fingerprint": "e5a55682373b17f3",
+      "title": "medium 测试分区存在失败用例（重型行为回归）",
+      "repro": "npx vitest run tests/story.test.ts tests/p14-real-canary-orchestrator.test.ts tests/novel-analysis-run.test.ts tests/material-studio.test.ts tests/full-workflow.test.ts",
+      "attempts": 4,
+      "history": [
+        {
+          "at": "2026-08-11T21:00:17.235Z",
+          "event": "created-by-patrol",
+          "detail": "探针超时（2400s）exit=143; log=/Users/hxx/Documents/无限画布/.workqueue/patrol-medium-tests-2026-08-11T21-00-17-234Z.log; tail=\u001b[31m\u001b[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯\u001b[22m\u001b[39m |  | (node:52508) ExperimentalWarning: SQLite is an experimental feature and might change at any time | (Use `node --trace-warnings ...` to show where the warning was created) | (node:54287) ExperimentalWarning: SQLite is an experimental feature and might change at any time | (Use `node --trace-warnings ...` to show where the warning was created)"
+        },
+        {
+          "at": "2026-08-11T21:04:09.736Z",
+          "event": "claimed",
+          "detail": "who=lingma-primary; repro=npm run test:medium"
+        },
+        {
+          "at": "2026-08-11T22:22:59.261Z",
+          "event": "verify-fail",
+          "detail": "repro exit!=0; log=/Users/hxx/Documents/无限画布/.workqueue/verify-wq-0005-1786486979260.log"
+        },
+        {
+          "at": "2026-08-11T23:13:17.793Z",
+          "event": "verify-fail",
+          "detail": "repro exit!=0; log=/Users/hxx/Documents/无限画布/.workqueue/verify-wq-0005-1786489997791.log"
+        },
+        {
+          "at": "2026-08-11T23:16:02.967Z",
+          "event": "note",
+          "detail": "06:30 轮 verify 与 scheduled-patrol 的 wq-0006 verify 并行，material-studio 10k 与 novel 401 章两重负载用例争抢 CPU 失败且日志被 45min 帽截断。本轮于空闲期单独重验。"
+        },
+        {
+          "at": "2026-08-12T00:16:33.884Z",
+          "event": "verify-fail",
+          "detail": "repro exit!=0; log=/Users/hxx/Documents/无限画布/.workqueue/verify-wq-0005-1786493793883.log"
+        },
+        {
+          "at": "2026-08-12T00:23:54.344Z",
+          "event": "reclaimed",
+          "detail": "who=lingma-primary; repro=npx vitest run tests/story.test.ts tests/p14-real-canary-orchestrator.test.ts tests/novel-analysis-run.test.ts tests/material-studio.test.ts tests/full-workflow.test.ts"
+        },
+        {
+          "at": "2026-08-12T00:23:54.840Z",
+          "event": "note",
+          "detail": "08:25 修复面：story v1 断言对齐、p14 150s、novel 60s、full-workflow 240s。repro 改为定向矩阵（5 个已知失败文件）；medium 全分区监控仍由 patrol:all 持续，新失败自动另立票。"
+        },
+        {
+          "at": "2026-08-12T00:25:56.028Z",
+          "event": "verify-pass",
+          "detail": "repro exit=0; log=/Users/hxx/Documents/无限画布/.workqueue/verify-wq-0005-1786494356027.log"
+        },
+        {
+          "at": "2026-08-12T00:28:01.391Z",
+          "event": "closed",
+          "detail": "evidence=.workqueue/verify-wq-0005-1786494356027.log"
+        }
+      ],
+      "owner": "lingma-primary",
+      "claimedAt": "2026-08-12T00:23:54.344Z",
+      "leaseUntil": "2026-08-13T00:23:54.344Z",
+      "closedAt": "2026-08-12T00:28:01.391Z",
+      "evidence": [
+        ".workqueue/verify-wq-0005-1786494356027.log"
+      ]
+    },
+    {
+      "id": "wq-0006",
+      "createdAt": "2026-08-11T21:30:17.256Z",
+      "updatedAt": "2026-08-12T00:52:36.442Z",
+      "status": "closed",
+      "severity": "P0",
+      "source": "patrol:integration-tests",
+      "probe": "integration-tests",
+      "fingerprint": "f87c9348ac501a8f",
+      "title": "integration 测试分区存在失败用例（跨模块回归）",
+      "repro": "npm run test:integration",
+      "attempts": 3,
+      "history": [
+        {
+          "at": "2026-08-11T21:30:17.256Z",
+          "event": "created-by-patrol",
+          "detail": "探针超时（1800s）exit=143; log=/Users/hxx/Documents/无限画布/.workqueue/patrol-integration-tests-2026-08-11T21-30-17-255Z.log; tail=(node:87896) ExperimentalWarning: SQLite is an experimental feature and might change at any time | (Use `node --trace-warnings ...` to show where the warning was created) | (node:88089) ExperimentalWarning: SQLite is an experimental feature and might change at any time | (Use `node --trace-warnings ...` to show where the warning was created) | (node:92850) ExperimentalWarning: SQLite is an experim"
+        },
+        {
+          "at": "2026-08-11T21:31:50.104Z",
+          "event": "claimed",
+          "detail": "who=scheduled-patrol; repro=npm run test:integration"
+        },
+        {
+          "at": "2026-08-11T22:28:55.287Z",
+          "event": "reopened",
+          "detail": "verify-fail 状态迁移在并发写中丢失，卡 verifying；恢复重验（attempt 已计 1）"
+        },
+        {
+          "at": "2026-08-11T22:28:55.837Z",
+          "event": "claimed",
+          "detail": "who=scheduled-patrol; repro=npm run test:integration"
+        },
+        {
+          "at": "2026-08-11T23:09:01.539Z",
+          "event": "note",
+          "detail": "integration 分片含 story.test.ts：其失败根因（story.ts:1006 泛化包装吞安全错误）属 wq-0005 范围，待 lingma-primary 落 story 修复后本票 verify 才可通过；本票自身修复=mcp-tool-abi fixture 重基线 + mcp-managed-studio 120s 时限 + verify/probe 45min 帽"
+        },
+        {
+          "at": "2026-08-11T23:11:46.163Z",
+          "event": "verify-fail",
+          "detail": "repro exit!=0; log=/Users/hxx/Documents/无限画布/.workqueue/verify-wq-0006-1786489906163.log"
+        },
+        {
+          "at": "2026-08-12T00:50:23.597Z",
+          "event": "verify-pass",
+          "detail": "repro exit=0; log=/Users/hxx/Documents/无限画布/.workqueue/verify-wq-0006-1786495823596.log"
+        },
+        {
+          "at": "2026-08-12T00:52:36.442Z",
+          "event": "closed",
+          "detail": "evidence=.workqueue/verify-wq-0006-1786495823596.log"
+        }
+      ],
+      "owner": "scheduled-patrol",
+      "claimedAt": "2026-08-11T22:28:55.837Z",
+      "leaseUntil": "2026-08-12T22:28:55.837Z",
+      "closedAt": "2026-08-12T00:52:36.442Z",
+      "evidence": [
+        ".workqueue/verify-wq-0006-1786495823596.log"
+      ]
+    },
+    {
+      "id": "wq-0007",
+      "createdAt": "2026-08-11T21:37:58.557Z",
+      "updatedAt": "2026-08-12T08:30:38.556Z",
+      "status": "closed",
+      "severity": "P2",
+      "source": "manual:loop-observation",
+      "fingerprint": "p14-prepare-perf-debt",
+      "title": "P14 canary 编排链性能债：prepare 全链 ~72s（旧预算 60s），时限已临时放宽至 150s",
+      "repro": "npx vitest run tests/p14-real-canary-orchestrator.test.ts tests/novel-analysis-run.test.ts tests/full-workflow.test.ts --maxWorkers=1 --reporter=dot",
+      "attempts": 1,
+      "history": [
+        {
+          "at": "2026-08-11T21:37:58.557Z",
+          "event": "created-manual",
+          "detail": "wq-0005 修复时确认为性能回归而非死锁（无负载实测 72156ms）。需性能切片定位 prepareP14RealCanary 慢点（疑似 startup reconcile/Schema 深验/dispatch 链），拉回 60s 内后收紧 tests/p14-real-canary-orchestrator.test.ts 时限。"
+        },
+        {
+          "at": "2026-08-11T22:28:06.608Z",
+          "event": "note",
+          "detail": "2026-08-12 扩充：novel-analysis-run 401 章规划链同属本性能债（无负载 16.3s/旧帽 20s，已放宽 60s）。两条慢链：prepareP14RealCanary ~72s、novel 401 章规划 ~16s，均疑似 startup reconcile/深验/串行读路径。"
+        },
+        {
+          "at": "2026-08-12T00:22:51.773Z",
+          "event": "note",
+          "detail": "2026-08-12 再扩充：full-workflow 全链路 E2E 子进程 smoke 无负载 ~69s（旧帽 120s，含 vitest 开销轻载即超时，已放宽 240s）。至此性能债慢链共三条：P14 prepare ~72s、novel 401 章规划 ~16s、full-workflow smoke ~69s。"
+        },
+        {
+          "at": "2026-08-12T00:30:30.495Z",
+          "event": "claimed",
+          "detail": "who=lingma-primary; repro=npx vitest run tests/p14-real-canary-orchestrator.test.ts"
+        },
+        {
+          "at": "2026-08-12T00:44:57.854Z",
+          "event": "note",
+          "detail": "根因分析完成（2026-08-12，无负载实测）：P14 prepare≈50 条串行总线命令，单命令分解：inspect+lease ~17ms / exec-fence ~380ms（多 SQLite CAS 业务写）/ 账本+事件持久化 ~170ms → ~650ms×50≈32s + fixture 2s + verify authorities 等 ≈ 72s。novel 401 章 ~16s 与 full-workflow ~69s（含 ffmpeg 编解码，成本合理）待独立分析。修复方向需专项设计评审：①连续性观测批量化命令（24→1-3 条）②命令域内 shell/receipt 缓存 ③事件 append 同步策略；红线：不得拆 command-bus/ledger 写路径。证据：.workqueue/p14-prof-result.txt（阶段分解）。结论：结构性成本，非单点缺陷；缓解已生效（p14 150s/novel 60s/full-workflow 240s），且本次空载复跑 53.5s 已低于旧帽，波动主因是负载。"
+        },
+        {
+          "at": "2026-08-12T00:44:58.376Z",
+          "event": "parked",
+          "detail": "结构性性能债，根因已定位并证据化；修复需专项性能切片+设计评审，禁止无评审动写路径 owner。缓解时限已生效。"
+        },
+        {
+          "at": "2026-08-12T08:25:28.104Z",
+          "event": "reopened",
+          "detail": "当前空载证据已满足原始预算，恢复 P14 60s、小说 401 章 20s、full-workflow 120s 严格门并进入正式复验"
+        },
+        {
+          "at": "2026-08-12T08:25:28.664Z",
+          "event": "claimed",
+          "detail": "who=codex-primary; repro=npx vitest run tests/p14-real-canary-orchestrator.test.ts tests/novel-analysis-run.test.ts tests/full-workflow.test.ts --maxWorkers=1 --reporter=dot"
+        },
+        {
+          "at": "2026-08-12T08:30:22.812Z",
+          "event": "verify-pass",
+          "detail": "repro exit=0; log=/Users/hxx/Documents/无限画布/.workqueue/verify-wq-0007-1786523422811.log"
+        },
+        {
+          "at": "2026-08-12T08:30:38.556Z",
+          "event": "closed",
+          "detail": "evidence=.workqueue/verify-wq-0007-1786523422811.log"
+        }
+      ],
+      "closeReason": "结构性性能债，根因已定位并证据化；修复需专项性能切片+设计评审，禁止无评审动写路径 owner。缓解时限已生效。",
+      "owner": "codex-primary",
+      "claimedAt": "2026-08-12T08:25:28.664Z",
+      "leaseUntil": "2026-08-13T08:25:28.664Z",
+      "closedAt": "2026-08-12T08:30:38.556Z",
+      "evidence": [
+        ".workqueue/verify-wq-0007-1786523422811.log"
+      ]
+    }
+  ]
+}

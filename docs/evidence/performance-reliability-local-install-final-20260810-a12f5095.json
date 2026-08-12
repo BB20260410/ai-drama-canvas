@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "kind": "performance-reliability-local-install-final",
+  "status": "passed",
+  "completedAt": "2026-08-10T15:42:00+08:00",
+  "scope": "this-mac-local-only",
+  "electronBinaryFix": {
+    "rootCause": "electron-43-package-has-no-postinstall-binary-download",
+    "explicitInstaller": "node_modules/.bin/install-electron",
+    "packageVersion": "43.1.0",
+    "lockVersion": "43.1.0",
+    "installedVersion": "43.1.0",
+    "distVersion": "43.1.0",
+    "architecture": "arm64",
+    "officialCacheExpectedSha256": "2ee24f768c41bc2ed9bd580d7797b185dffb550dafca59c2cd08b51965bcda3a",
+    "officialCacheActualSha256": "2ee24f768c41bc2ed9bd580d7797b185dffb550dafca59c2cd08b51965bcda3a",
+    "fixture": {
+      "status": "passed",
+      "appLaunched": false,
+      "archiveBytes": 119731125,
+      "archiveEntryCount": 582,
+      "archiveSha256": "3bf66d6fa0e419d92dffe8a428ff155984592a4a9da4e8513f5a53a170ae64d7",
+      "sourceExecutableSha256": "69cb21f64c53c751678957803b2d82d2d5d7f054afd570267eda21179cbff136",
+      "extractedExecutableSha256": "69cb21f64c53c751678957803b2d82d2d5d7f054afd570267eda21179cbff136"
+    }
+  },
+  "verification": {
+    "focusedTests": "2 files / 16 tests passed",
+    "typecheck": "passed",
+    "typecheckApp": "passed",
+    "diffCheck": "passed",
+    "workspaceBuild": "passed",
+    "isolatedPackageSmoke": {
+      "status": "passed",
+      "evidence": "docs/evidence/isolated-package-smoke-20260810T073107887Z-39734-af61e163.json",
+      "mcpToolCount": 220,
+      "effectCloseDurationMs": [218, 216],
+      "reviewCloseDurationMs": [43, 47],
+      "showEvents": 0,
+      "focusEvents": 0,
+      "dockVisible": false,
+      "lingeringProcesses": 0
+    }
+  },
+  "candidate": {
+    "candidateId": "mcp-candidate-a12f50958060b54f-4305080585cf35c4-9f84926b",
+    "sourceDigest": "a12f50958060b54fc0de56e7c95eaf794c4da3f5700abe6749871e0794508e57",
+    "buildId": "3626bb271124bcf39ed86a77e0ce6558",
+    "mcpToolCount": 220,
+    "inspectedCandidates": 12,
+    "invalidCandidates": 0,
+    "dependencyClosureFingerprint": "cfa0faaf83fd7294fd98a7a195faee8e0a8f72effc0fd51dfe15b161eef0985c"
+  },
+  "installedApp": {
+    "path": "/Applications/AI 漫剧画布.app",
+    "sourceDigest": "a12f50958060b54fc0de56e7c95eaf794c4da3f5700abe6749871e0794508e57",
+    "buildId": "3626bb271124bcf39ed86a77e0ce6558",
+    "mcpToolCount": 220,
+    "architecture": "arm64",
+    "distribution": "local-only",
+    "releaseManifestFingerprint": "f97e5290549184554f6a1642f7159d2439001591f1c05ada11003900aae43c52",
+    "executableSha256": "dfa0bcca4d128e810e5acffadd1e266b30ac9f9175ef04b7eed153050c7f2193",
+    "appAsarSha256": "14d59def80ee6ab8d2a82be9b41afe528cb9732bfc69420bcace92ee983c3d11",
+    "developerIdDeepStrict": true,
+    "notarized": false,
+    "verificationEvidence": "docs/evidence/installed-local-verify-20260810T074100Z-a12f5095.json",
+    "background": {
+      "showEvents": 0,
+      "focusEvents": 0,
+      "dockVisible": false,
+      "closeDurationMs": 47,
+      "exitCode": 0,
+      "forceTerminated": false,
+      "forceKilled": false
+    }
+  },
+  "rollback": {
+    "path": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260810-153921-a12f5095/previous-installed/AI 漫剧画布.app",
+    "sourceDigest": "bf4dbb751f21ab05e76bc43a6f85288844d2f8a6e3cc2ddd3e671b585357cfd7",
+    "buildId": "019ba25fbcea817acb3c7984234fe0c6",
+    "mcpToolCount": 220,
+    "developerIdDeepStrict": true
+  },
+  "boundaries": {
+    "fastMediumIntegrationHeavyRerun": false,
+    "formalProjectWrites": 0,
+    "higgsfieldCalls": 0,
+    "uploads": 0,
+    "creditsConsumed": 0,
+    "notarized": false,
+    "published": false,
+    "gitStagedCommittedOrPushed": false,
+    "appLeftRunning": false
+  }
+}

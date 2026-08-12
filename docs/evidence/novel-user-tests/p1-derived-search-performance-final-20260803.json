@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-derived-search-performance",
+  "generatedAt": "2026-08-03T04:19:55.194Z",
+  "runtime": {
+    "node": "v26.3.1",
+    "platform": "darwin",
+    "architecture": "arm64"
+  },
+  "isolation": {
+    "temporaryRootRemovedAfterRun": true,
+    "formalNovelTouched": false,
+    "note": "全部来源、受管工程、registry 与派生数据库均位于独立临时根。"
+  },
+  "cases": [
+    {
+      "scale": {
+        "label": "chapters-500",
+        "chapterCount": 500,
+        "charactersPerChapter": 2000,
+        "anchorChapter": 377,
+        "anchor": "规模检索锚点五百章唯一证据"
+      },
+      "projectId": "project-10a3826b8627",
+      "sourceBefore": {
+        "byteLength": 2991998,
+        "sha256": "a43a26f9bdc68efbdbbda2752b13defe305fa33faa9fe86765314a4ba53ccdb8"
+      },
+      "sourceAfter": {
+        "byteLength": 2991998,
+        "sha256": "a43a26f9bdc68efbdbbda2752b13defe305fa33faa9fe86765314a4ba53ccdb8"
+      },
+      "manuscriptIdentityBefore": "0bb837de8cd62e43734d02c33e291b02ae40c1245b4dfe6477d2dcee7ce5fe95",
+      "manuscriptIdentityAfter": "0bb837de8cd62e43734d02c33e291b02ae40c1245b4dfe6477d2dcee7ce5fe95",
+      "searchDatabaseBytes": 4456448,
+      "index": {
+        "schemaVersion": 1,
+        "databaseLocator": ".aicanvas/novel/novel-derived.sqlite",
+        "state": "fresh",
+        "expectedManifestRevision": 1,
+        "expectedManifestDigest": "8102f63296e74d5be60fef28bd812af8233c9fd98fc99b3c89e9997ba0ec4498",
+        "pendingGenerationCount": 0,
+        "activeGeneration": {
+          "generationId": "novel-search-8102f63296e74d5b-29f5d469",
+          "projectId": "project-10a3826b8627",
+          "manifestRevision": 1,
+          "manifestDigest": "8102f63296e74d5be60fef28bd812af8233c9fd98fc99b3c89e9997ba0ec4498",
+          "tokenizer": "fts5-trigram-case-sensitive-v1",
+          "status": "active",
+          "chapterCount": 500,
+          "indexedChapterCount": 500,
+          "coverageFingerprint": "3aa882f612ba53613275f766f967f64aa251ae10ce711d6251d2c27a95484df5",
+          "createdAt": "2026-08-03T04:18:50.059Z",
+          "activatedAt": "2026-08-03T04:18:50.084Z"
+        }
+      },
+      "indexedQuery": {
+        "engine": "fts5_trigram",
+        "indexState": "fresh",
+        "indexedChapters": 500,
+        "scannedChapters": 1,
+        "hitCount": 1
+      },
+      "linearBaseline": {
+        "engine": "linear_scan",
+        "fallbackReason": "query_too_short",
+        "scannedChapters": 500,
+        "hitCount": 0
+      },
+      "thresholds": {
+        "rebuildMs": 60000,
+        "indexedP95Ms": 2000,
+        "linearBaselineMs": 30000
+      },
+      "measurements": {
+        "preflightMs": 10.39,
+        "importMs": 31676.86,
+        "rebuildMs": 271.78,
+        "indexedQueryMs": [
+          215.71,
+          215.96,
+          214.84,
+          215.65,
+          219.51,
+          215.12,
+          209.83
+        ],
+        "indexedP50Ms": 215.65,
+        "indexedP95Ms": 219.51,
+        "linearBaselineMs": 115.69,
+        "observedRssBytes": {
+          "rebuildBefore": 320438272,
+          "rebuildPeak": 321568768,
+          "rebuildAfter": 320159744,
+          "indexedPeak": 325451776,
+          "linearBefore": 325451776,
+          "linearPeak": 326352896,
+          "linearAfter": 326352896
+        }
+      },
+      "checks": {
+        "rebuildWithinBudget": true,
+        "indexedP95WithinBudget": true,
+        "linearBaselineWithinBudget": true,
+        "indexedRecallExact": true,
+        "manuscriptIdentityUnchanged": true,
+        "sourceUnchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "scale": {
+        "label": "chapters-1000",
+        "chapterCount": 1000,
+        "charactersPerChapter": 2000,
+        "anchorChapter": 811,
+        "anchor": "规模检索锚点一千章唯一证据"
+      },
+      "projectId": "project-ab085764411c",
+      "sourceBefore": {
+        "byteLength": 5983998,
+        "sha256": "a472bbb3331fcd24b406c2b2856cd9e411c17324f73366547e26e38c6085bb5d"
+      },
+      "sourceAfter": {
+        "byteLength": 5983998,
+        "sha256": "a472bbb3331fcd24b406c2b2856cd9e411c17324f73366547e26e38c6085bb5d"
+      },
+      "manuscriptIdentityBefore": "00d4059bb2848468a92e667c3015a54900806316095f0123d575734b363c44c0",
+      "manuscriptIdentityAfter": "00d4059bb2848468a92e667c3015a54900806316095f0123d575734b363c44c0",
+      "searchDatabaseBytes": 8843264,
+      "index": {
+        "schemaVersion": 1,
+        "databaseLocator": ".aicanvas/novel/novel-derived.sqlite",
+        "state": "fresh",
+        "expectedManifestRevision": 1,
+        "expectedManifestDigest": "7b7123793f8814d3b5276843163b3b5d1c5b3335c0f4f4a0a5863647719dc834",
+        "pendingGenerationCount": 0,
+        "activeGeneration": {
+          "generationId": "novel-search-7b7123793f8814d3-5bd96935",
+          "projectId": "project-ab085764411c",
+          "manifestRevision": 1,
+          "manifestDigest": "7b7123793f8814d3b5276843163b3b5d1c5b3335c0f4f4a0a5863647719dc834",
+          "tokenizer": "fts5-trigram-case-sensitive-v1",
+          "status": "active",
+          "chapterCount": 1000,
+          "indexedChapterCount": 1000,
+          "coverageFingerprint": "8097352d1b9ee807531ce967a98aa4d67095cab050e2c8f223ff3a9bf03d34bf",
+          "createdAt": "2026-08-03T04:19:51.927Z",
+          "activatedAt": "2026-08-03T04:19:51.977Z"
+        }
+      },
+      "indexedQuery": {
+        "engine": "fts5_trigram",
+        "indexState": "fresh",
+        "indexedChapters": 1000,
+        "scannedChapters": 1,
+        "hitCount": 1
+      },
+      "linearBaseline": {
+        "engine": "linear_scan",
+        "fallbackReason": "query_too_short",
+        "scannedChapters": 1000,
+        "hitCount": 0
+      },
+      "thresholds": {
+        "rebuildMs": 120000,
+        "indexedP95Ms": 2000,
+        "linearBaselineMs": 30000
+      },
+      "measurements": {
+        "preflightMs": 18.49,
+        "importMs": 59828.97,
+        "rebuildMs": 405.34,
+        "indexedQueryMs": [
+          418.13,
+          418.96,
+          407.22,
+          420.51,
+          418,
+          417.85,
+          417.33
+        ],
+        "indexedP50Ms": 418,
+        "indexedP95Ms": 420.51,
+        "linearBaselineMs": 221.94,
+        "observedRssBytes": {
+          "rebuildBefore": 347406336,
+          "rebuildPeak": 353173504,
+          "rebuildAfter": 353173504,
+          "indexedPeak": 367378432,
+          "linearBefore": 367378432,
+          "linearPeak": 368558080,
+          "linearAfter": 368558080
+        }
+      },
+      "checks": {
+        "rebuildWithinBudget": true,
+        "indexedP95WithinBudget": true,
+        "linearBaselineWithinBudget": true,
+        "indexedRecallExact": true,
+        "manuscriptIdentityUnchanged": true,
+        "sourceUnchanged": true
+      },
+      "status": "PASS"
+    }
+  ],
+  "status": "PASS",
+  "limitation": "该结果是本机一次确定性基准，不构成任意硬件、任意文风或未来百万字任务的无限期性能保证。"
+}

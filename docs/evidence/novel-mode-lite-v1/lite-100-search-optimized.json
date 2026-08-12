@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-lite-short100-electron-smoke",
+  "verdict": "PASS",
+  "capturedAt": "2026-08-01T15:17:03.230Z",
+  "scope": {
+    "profile": "short100",
+    "targetCharacters": 100,
+    "chapterCount": 1,
+    "originalSourceReadOnly": true,
+    "remoteServicesUsed": false,
+    "installedApplicationReplaced": false
+  },
+  "timingsMs": {
+    "preflight": 2,
+    "import": 3129,
+    "workspaceReady": 1334,
+    "fullTextSearch": 58,
+    "editSave": 1893
+  },
+  "runtimeState": {
+    "projectId": "project-28c76b08e31f",
+    "chapterCount": 1,
+    "totalCharacters": 111,
+    "manifestRevision": 2,
+    "memoryCount": 1,
+    "tracedMemory": true
+  },
+  "sourceIdentity": {
+    "bytes": 280,
+    "sha256": "f796aed0cb87f7b55ddd67ffd1fd36d3dca9fe7df664d3ee6c029f53f6cc3242"
+  },
+  "sourceStableAfterImportAndUi": true,
+  "diagnostics": {
+    "pageErrors": [],
+    "consoleErrors": [],
+    "externalRequests": []
+  },
+  "screenshot": {
+    "relativePath": "docs/evidence/novel-mode-lite-v1/lite-100-search-optimized.png",
+    "bytes": 148308,
+    "sha256": "5f991fb41b6ad94f4ce8b568597d9c19c3f572f875d9288f67d6d2b5ae2c66ae",
+    "width": 1728,
+    "height": 1029,
+    "entropy": 1.8485356098262855
+  }
+}

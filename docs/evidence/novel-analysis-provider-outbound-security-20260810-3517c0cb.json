@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "scope": "novel-analysis-provider-outbound-security",
+  "completedAt": "2026-08-10T12:58:09Z",
+  "sourceIdentity": {
+    "version": "0.2.0",
+    "sourceDigest": "3517c0cb3386466bef4e5ad2cdec936dc7bba946ef9956e5ec3804a3c57ffeaf",
+    "buildId": "1ba674721773dc1f7348c9cb0a089be5",
+    "mcpToolCount": 220,
+    "distribution": "local-only"
+  },
+  "closedFindings": [
+    "DNS 预检与真实连接分离导致的 DNS rebinding / SSRF",
+    "公网 HTTP 明文发送小说正文与 Bearer 凭据",
+    "IPv6 site-local、保留空间和 IPv4-mapped 地址漏判",
+    "宿主 NODE_TLS_REJECT_UNAUTHORIZED=0 降级证书校验",
+    "远端错误正文或本地内部路径进入任务、事件和 Renderer",
+    "TLS 协议错误未归入稳定 TLS 失败码"
+  ],
+  "transportContract": {
+    "dnsResolution": "one-shot-pinned-snapshot",
+    "connectionReuse": "per-request-agent-only",
+    "environmentProxy": "ignored",
+    "redirects": "all-3xx-rejected",
+    "tlsVerification": "explicit-rejectUnauthorized-true",
+    "publicHttp": "rejected",
+    "privateHttp": "allowed-only-when-explicit-and-all-addresses-non-public",
+    "ipv6Policy": "embedded-ipv4-first; otherwise fail-closed outside 2000::/3 plus special denylist",
+    "errorPersistence": "stable-safe-summary-only"
+  },
+  "dependency": {
+    "name": "undici",
+    "requestedVersion": "7.28.0",
+    "deliveredVersion": "7.29.0",
+    "directProductionDependency": true,
+    "reasonForVersionChange": "7.28.0 在官方生产依赖审计中命中高危公告；改用精确修复版 7.29.0",
+    "productionAuditVulnerabilities": 0
+  },
+  "verification": [
+    {
+      "command": "npx vitest run tests/novel-analysis-provider-transport.test.ts tests/novel-analysis-provider.test.ts tests/novel-analysis-run.test.ts --maxWorkers=1 --reporter=dot",
+      "result": "passed",
+      "files": 3,
+      "tests": 56
+    },
+    {
+      "command": "npm run typecheck && npm run typecheck:app",
+      "result": "passed"
+    },
+    {
+      "command": "npm run build",
+      "result": "passed"
+    },
+    {
+      "command": "npm ls --omit=dev undici --all",
+      "result": "passed: undici@7.29.0"
+    },
+    {
+      "command": "npm run audit:production",
+      "result": "passed: 0 vulnerabilities"
+    },
+    {
+      "command": "rg old response.text.slice pattern in out/main and dist-mcp",
+      "result": "passed: absent"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "independentReview": {
+    "role": "sol_final_max",
+    "result": "clean",
+    "remainingP0": 0,
+    "remainingP1": 0
+  },
+  "fileSha256": {
+    "src/core/novel-analysis-transport.ts": "30c4a341239751007410c41816ff0ec2ef18a44a9629442c4bbd88f741e36a6e",
+    "src/core/novel-analysis-provider.ts": "3071b9b8b24754ed1e5de6fc19ecb3ac98d0d36222bea31b163301951de21d89",
+    "tests/novel-analysis-provider-transport.test.ts": "311effee9f141b588a6dd5c7ecb00b42c070ece68877c7f5c9b08cc7d3c36f7f"
+  },
+  "boundaries": {
+    "providerSchemaChanged": false,
+    "ipcOrMcpSchemaChanged": false,
+    "generationTsChanged": false,
+    "formalProjectDataWritten": false,
+    "fullTestPartitionsRun": false,
+    "mcpCandidateBuilt": false,
+    "appPackagedOrInstalled": false,
+    "gitStageCommitPush": false
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "novel-p0-partitions-audit",
+  "status": "pass",
+  "startedAt": "2026-08-01T06:47:34.620Z",
+  "endedAt": "2026-08-01T06:47:34.955Z",
+  "durationMs": 438,
+  "argv": [
+    "npm",
+    "run",
+    "test:partitions:audit"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "925abae3f3a4bf83e112bc428a1d936e",
+      "sourceDigest": "3b5dd1c45479c101bbc2d90aaba361e146ebba3546ba032f599c66c479794fb6"
+    },
+    "after": {
+      "buildId": "925abae3f3a4bf83e112bc428a1d936e",
+      "sourceDigest": "3b5dd1c45479c101bbc2d90aaba361e146ebba3546ba032f599c66c479794fb6"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/novel-mode-v1/baseline/commands/partitions-audit.log",
+    "sizeBytes": 428,
+    "sha256": "17bd5df5fe827e949efc5333143255ec2537553379ee2bab0cd604b965fd0d6a"
+  }
+}

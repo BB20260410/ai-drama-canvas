@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 2,
+  "kind": "ai-canvas-managed-project",
+  "projectId": "project-79b2b0acb554",
+  "projectName": "black-page-ch011-managed-pilot-20260801",
+  "rootRealpath": "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/writing-os-million-word-consistency-hard-20260801-221728/black-page-managed/black-page-ch011-managed-pilot-20260801-fa3e3df9",
+  "storageMode": "managed",
+  "startupPolicy": "no-filesystem-scan",
+  "mediaMode": "project-local-cas",
+  "legacyRoots": [],
+  "projectConfigSha256": "df3562c40104200f292948439f3f4702944ea59c7f604d941fea7be39a72f9a7",
+  "bootstrapIndexSha256": "01e4a3019a729f38820c36e721960a67eaa70d9c9e94d0ca523becaf958ac469",
+  "bootstrapScanId": "managed-bootstrap-fa3e3df9",
+  "relativePaths": {
+    "config": ".aicanvas/project.json",
+    "index": ".aicanvas/index.json",
+    "cache": ".aicanvas/cache-v2.sqlite",
+    "materialDatabase": ".aicanvas/material-studio.sqlite",
+    "productionDatabase": ".aicanvas/studio-production.sqlite",
+    "textCas": ".aicanvas/studio-production/objects/sha256",
+    "generationDatabase": ".aicanvas/studio-generation-ledger.sqlite",
+    "generationPackCas": ".aicanvas/studio-generation/objects/sha256",
+    "mediaCas": ".aicanvas/objects/sha256",
+    "mediaPreviews": ".aicanvas/derived/thumb",
+    "mediaProxies": ".aicanvas/derived/proxy",
+    "mediaWaveforms": ".aicanvas/derived/waveform"
+  },
+  "workspaceMode": "novel",
+  "minimumWriterSchemaVersion": 2,
+  "createdAt": "2026-08-02T06:15:00.878Z",
+  "novelManifest": ".aicanvas/novel/manifest.json",
+  "fingerprint": "707f3b9dce679ac9f67bcb95063de30d780ca692239ab02e7ea3fd52503c4afc"
+}

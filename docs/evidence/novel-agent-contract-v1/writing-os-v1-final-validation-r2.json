@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-writing-os-v1-final-validation",
+  "status": "PASS",
+  "generatedAt": "2026-08-02T00:12:48.211Z",
+  "conclusion": {
+    "softwareWritingLoop": "complete",
+    "blackPageFormalBaseline": "provisional",
+    "blackPageChapter11ProductionWritten": false,
+    "literaryQualityReviewed": false,
+    "humanVisualUiReviewed": false
+  },
+  "formalSource": {
+    "beforeManifest": "docs/evidence/novel-mode-v1/real-project/black-page-ch011-pilot-before.json",
+    "afterManifest": "docs/evidence/novel-mode-v1/real-project/black-page-ch011-pilot-after.json",
+    "entries": 547,
+    "files": 507,
+    "bytes": 5943649,
+    "aggregateSha256": "67da96a088bc83a60b8a1d3c716c19d2ae484cd575a4ac4f31c4114789fcfd70",
+    "completeEntryEquality": true,
+    "rootPersisted": false
+  },
+  "blackPagePilot": {
+    "receipt": "docs/evidence/novel-mode-v1/real-project/black-page-ch011-managed-pilot.json",
+    "project": "docs/evidence/novel-mode-v1/real-project/pilots/black-page-ch011-managed-pilot-20260801-385ebea2",
+    "baselineStatus": "provisional",
+    "chapters": [
+      {
+        "chapterId": "b1910384-fec3-51d5-9a83-f80eb66cae73",
+        "order": 0,
+        "revision": 1,
+        "byteLength": 10242,
+        "charCount": 3662,
+        "sha256": "c182ad81e2cb5337e5399b3fee896bf5d0876a6e08fae931122ea4ed4135ff92"
+      },
+      {
+        "chapterId": "55e35a52-eea0-5ea8-b889-3944756f899c",
+        "order": 1,
+        "revision": 1,
+        "byteLength": 10237,
+        "charCount": 3649,
+        "sha256": "9c5f25e0e17a28942af9abed9bf9eb798be85e0a23b3474525c45e56445edfdf"
+      },
+      {
+        "chapterId": "c6d84bbb-f4e7-5331-94e9-29f3f1d662eb",
+        "order": 2,
+        "revision": 1,
+        "byteLength": 9059,
+        "charCount": 3219,
+        "sha256": "cee4a7c874d7ef03bd5cab9096691bc0bb12d1387340c948e12d710c99ca3e01"
+      },
+      {
+        "chapterId": "f12d4722-b0e2-551b-aa5f-19abdc63c0a2",
+        "order": 3,
+        "revision": 1,
+        "byteLength": 9526,
+        "charCount": 3388,
+        "sha256": "68f25635d31e50723e42851266d6dd298c23e6f527136e48c74066fa5018cfed"
+      },
+      {
+        "chapterId": "571b8e60-cedb-5003-ad1c-da91a5e3ddc9",
+        "order": 4,
+        "revision": 1,
+        "byteLength": 9284,
+        "charCount": 3269,
+        "sha256": "1c74d0f9cff2850a85534b86194cb8616bd4642e3287a8224f5c3db0ee1face8"
+      },
+      {
+        "chapterId": "0698f585-5831-5b07-a646-7cbf570bc617",
+        "order": 5,
+        "revision": 1,
+        "byteLength": 9117,
+        "charCount": 3273,
+        "sha256": "f67219679b4984732c5d9cf289ea21a51f099a6a363c2737629050362ac0eaba"
+      },
+      {
+        "chapterId": "74002042-b951-55ed-954b-688efffe8888",
+        "order": 6,
+        "revision": 1,
+        "byteLength": 8356,
+        "charCount": 2960,
+        "sha256": "e996e19edad51929e1f8bd31b30b472be16ef984d153bf4cc22718d202bdff21"
+      },
+      {
+        "chapterId": "404c0f8e-bcf5-5e84-9ffe-c4fc2940af10",
+        "order": 7,
+        "revision": 1,
+        "byteLength": 7647,
+        "charCount": 2743,
+        "sha256": "06286b8453e8c0d6a1dffb7401934b70bf07292893c68f22b35091840fda1243"
+      },
+      {
+        "chapterId": "c1b502f8-47b1-534f-bec4-ac2ebd8a485e",
+        "order": 8,
+        "revision": 1,
+        "byteLength": 9229,
+        "charCount": 3405,
+        "sha256": "1552a4a3f7d8a4dce1cec0b48ca2fcb90772490c14750de4de086a9525ea225d"
+      },
+      {
+        "chapterId": "36211dad-6080-51d2-aef3-395324b2fb1e",
+        "order": 9,
+        "revision": 1,
+        "byteLength": 8801,
+        "charCount": 3139,
+        "sha256": "06c3aae0fe87652341f498db5b5ea671fcbc217bb6c8bc540e9128c3e7323119"
+      },
+      {
+        "chapterId": "af977c04-44ec-5375-8585-3452f25d18dc",
+        "order": 10,
+        "revision": 2,
+        "byteLength": 162,
+        "charCount": 56,
+        "sha256": "bd69e411aa746ff73f4f4ff405edc4b182cf50391f8e6284c7834de1dd00323f"
+      },
+      {
+        "chapterId": "b66499fe-e4f0-5d8d-92b9-dbf0ab147739",
+        "order": 11,
+        "revision": 1,
+        "byteLength": 0,
+        "charCount": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "sourceChaptersByteIdentical": 10,
+    "writingState": {
+      "revision": 2,
+      "fingerprint": "edec105ec9bc3dee7ef57c79beb7d276f92497add1e7028ecf9f9cf84bcdccf5",
+      "currentThroughChapterId": "af977c04-44ec-5375-8585-3452f25d18dc",
+      "completionCount": 11,
+      "sourceObjects": 26,
+      "entities": 17,
+      "dynamicStates": 8,
+      "knowledge": 173,
+      "relationships": 5,
+      "timeline": 11,
+      "foreshadowing": 28,
+      "hardCanon": 29
+    },
+    "chapter11": {
+      "preflightId": "novel-write-preflight-377b2df81f0bee43747702f5",
+      "contextPackFingerprint": "148f18da769790057ddfaee46812a17a60f30d6182276d8d58f88accb68a521b",
+      "pastOnlyExcerpts": true,
+      "staleReplayReason": "context_preflight_stale",
+      "reviewTicketId": "novel-review-e0605a8a914c77ea07643f37",
+      "candidateId": "novel-state-candidate-84d6b606e7e3e0f01deab2e2",
+      "decisionId": "novel-state-decision-d14877da5737cbaca7144417",
+      "bodyUnchangedByReviewAndCommit": true
+    },
+    "chapter12": {
+      "contextPackDeterministic": true,
+      "preflightId": "novel-write-preflight-63fb36c727899ed016fc946c",
+      "ready": true
+    }
+  },
+  "millionCharacterAcceptance": {
+    "evidence": "docs/evidence/novel-agent-contract-v1/writing-os-v1-1m-500-acceptance.json",
+    "characters": 1000000,
+    "chapters": 500,
+    "importDurationMs": 33999,
+    "stateSeedDurationMs": 744,
+    "contextPackDurationMs": 41,
+    "searchDurationMs": 109,
+    "scannedChapters": 500,
+    "externalChanges": 0,
+    "locatorRoundTrip": true
+  },
+  "runtime": {
+    "sourceDigest": "d42289fc751033362cecc6f7a9c53ae759b084a27a8563ef1141bac6ce4e4e5a",
+    "sourceFiles": 941,
+    "sourceBytes": 19133251,
+    "candidateId": "mcp-candidate-d42289fc75103336-ef9e9fbd9ea70418-507b48c2",
+    "buildId": "3cd6fba86facc24a442368978b7b7536",
+    "mcpToolCount": 209,
+    "invalidCandidates": 0,
+    "liveDistMcpUnchangedByCandidateBuild": true,
+    "installedApplicationReplaced": false
+  },
+  "electron": {
+    "evidence": "docs/evidence/novel-mode-lite-v1/writing-os-v1-ui-smoke.json",
+    "verdict": "PASS",
+    "isolated": true,
+    "importedSearchedEditedAndSaved": true,
+    "screenshots": [
+      "docs/evidence/novel-mode-lite-v1/writing-os-v1-ui-smoke.png"
+    ],
+    "mechanicalOnly": true
+  },
+  "boundaries": {
+    "formalSourceWritten": false,
+    "remoteModelsCalled": false,
+    "feesIncurred": false,
+    "gitStagedOrCommitted": false,
+    "deployedOrPublished": false
+  }
+}

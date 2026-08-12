@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-scale-fixture-verification",
+  "verifiedAt": "2026-08-01T07:02:11Z",
+  "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4",
+  "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+  "generatorVersion": "1.1.0",
+  "validationProfile": "acceptance",
+  "generatorSourceSha256": "3164597462ba164885106b1af52f2477947e8d7d18b7d4c329422a8a3ac7cb49",
+  "seed": "novel-scale-v1-20260731",
+  "runsPerScale": 2,
+  "validation": {
+    "byteIdenticalAcrossRuns": true,
+    "validatorPassedEveryRun": true,
+    "frozenMatrixMatchedEveryField": true,
+    "largeCorpusCommitted": false,
+    "externalModelCalls": 0
+  },
+  "oracleCounts": {
+    "exact": 100,
+    "alias": 100,
+    "state": 100,
+    "future_leakage": 50,
+    "contradiction_candidate_invalidated": 50
+  },
+  "statusCoverage": {
+    "canonStatus": [
+      "canon",
+      "proposed",
+      "conflicted",
+      "retconned",
+      "cut"
+    ],
+    "epistemicStatus": [
+      "confirmed",
+      "inferred",
+      "uncertain"
+    ],
+    "offsetEncoding": "utf16-code-unit"
+  },
+  "scales": {
+    "S1": {
+      "characters": 1000000,
+      "chapters": 500,
+      "utf8Bytes": 2601296,
+      "corpusSha256": "b91fb4408eab1a8da414d3ea819c4577894e06278c9e8d58f136f7d23b14a32d",
+      "goldenAnswersSha256": "ad5aefdb479d290f71e7e6279a5b71100fd271aed5a4955253f2f0a3b9b5f40a",
+      "logicalFingerprint": "487ac752061520db5cd985b9034790b2d7b5902bd53c005de19e35f1eb45e646"
+    },
+    "S3": {
+      "characters": 3000000,
+      "chapters": 1500,
+      "utf8Bytes": 7851080,
+      "corpusSha256": "d59f01e1f392d222dc669c4fc50248b2fc444929f5515d9cd4b6f97031a4286c",
+      "goldenAnswersSha256": "391801381282c290cd38ff46fd2106ab9013564e217bdf6f0ccd4ced306c9250",
+      "logicalFingerprint": "cc602b9b249659370cf72bf555a1999e70fab4f74f2293911c7cd5e8b02fbf9f"
+    },
+    "S5": {
+      "characters": 5000000,
+      "chapters": 2500,
+      "utf8Bytes": 13085700,
+      "corpusSha256": "049cc0e4a4bdce77fc498b79dcc6691e42ed763820994f6082322ad710b8c2c9",
+      "goldenAnswersSha256": "27a8db3c2a29a9307c90f1bd9e3e72c0b64f64d6f8e23171127fb192f2ea2e5f",
+      "logicalFingerprint": "03ca56b1405b10dfd4036618122f5376f2949f81c757d51ecd768a9118331fb0"
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "kind": "full-code-review-bounded-closeout",
+  "status": "BLOCKED",
+  "generatedAt": "2026-08-09T21:18:14+08:00",
+  "planId": "2026-08-09-bounded-closeout-v2",
+  "changes": {
+    "bindingTestSha256": "9dfcaaad47748962c275e4acdceb9cc7af445457dba9e7b144a7e66c509b038e",
+    "isolatedPackageSmokeSha256": "9ee17dfe424df18515efd501dfb6d7694b71c2c0bc97da16a3f9394fd065fac7",
+    "productionRuntimeChangedByCloseout": false
+  },
+  "frozenCheckpoints": {
+    "fast": { "files": 215, "tests": 1187, "status": "PASS" },
+    "medium": { "files": 91, "tests": 787, "status": "PASS" },
+    "integrationBatch1": { "files": 8, "tests": 11, "status": "PASS" },
+    "integrationBatch2": { "files": 8, "tests": 22, "status": "PASS" },
+    "novelCore": { "files": 3, "tests": 54, "status": "PASS" },
+    "novelUiIpc": { "files": 5, "tests": 25, "status": "PASS" },
+    "mediaAssets": { "files": 15, "tests": 96, "status": "PASS" }
+  },
+  "closeoutValidation": {
+    "bindingMcp": { "tests": 2, "status": "PASS" },
+    "studioCommandRuntime": { "tests": 13, "status": "PASS" },
+    "integrationBatch4": { "files": 8, "tests": 38, "status": "PASS", "durationSeconds": 926.25 },
+    "integrationBatch5": { "files": 3, "tests": 34, "status": "PASS", "durationSeconds": 251.33 },
+    "heavy": { "files": 5, "tests": 17, "status": "PASS" },
+    "typecheck": "PASS",
+    "typecheckApp": "PASS",
+    "diffCheck": "PASS",
+    "productionAuditVulnerabilities": 0,
+    "partitionAudit": {
+      "all": 346,
+      "fast": 215,
+      "medium": 91,
+      "integration": 35,
+      "heavy": 5,
+      "fingerprint": "5b626c5bceb1ffeac064f90ca2635162ea97bb29d7b2f17130184455db698c97"
+    }
+  },
+  "mcpRuntime": {
+    "status": "PASS",
+    "candidateId": "mcp-candidate-206df1b1cd3c1b74-361a76bb43194cfc-83371d08",
+    "sourceDigest": "206df1b1cd3c1b74669ba4bd18e51306e6756f5679a9fea318723a32ad1e3e31",
+    "buildId": "552c564b909391f9a7eaaa990ea97283",
+    "entrySha256": "425c23be81aba8fb1fcec3328c168f13a2bcaddfd1d526d4a961b5a463490201",
+    "toolCount": 218,
+    "inspectedCandidates": 2,
+    "invalidCandidates": 0,
+    "dependencyClosureFingerprint": "cfa0faaf83fd7294fd98a7a195faee8e0a8f72effc0fd51dfe15b161eef0985c",
+    "sdkHandshake": "PASS",
+    "liveDistMcpUnchanged": true
+  },
+  "isolatedApp": {
+    "status": "BLOCKED",
+    "architectureGate": "PASS_ARM64",
+    "signature": "IDENTITY_NULL_NOT_DEVELOPER_ID",
+    "build": "PASS",
+    "firstLaunchAndUiOperations": "PASS_TO_FIRST_SCREENSHOT",
+    "gracefulClose": "HUNG_OVER_10_MINUTES",
+    "secondLaunch": "NOT_REACHED",
+    "reviewUi": "NOT_REACHED",
+    "finalEvidenceJson": "NOT_WRITTEN",
+    "temporaryRootRemoved": true,
+    "lingeringProcesses": 0,
+    "persistentAppArtifact": null,
+    "installedAppReplaced": false
+  },
+  "blockingFindings": [
+    {
+      "id": "P1-PACKAGED-APP-CLOSE",
+      "severity": "P1",
+      "summary": "Production quit coordination can silently cancel or wait without an overall deadline; packaged App remained alive for over 10 minutes."
+    },
+    {
+      "id": "P1-NOVEL-ANALYSIS-LOCAL-COMMIT",
+      "severity": "P1",
+      "summary": "After a remote POST returns a valid proposal, local proposal persistence failure is recorded as failed and permits replacement without remote reconciliation."
+    }
+  ],
+  "notRun": [
+    "Finder external drag physical acceptance",
+    "Apple notarization",
+    "installed App replacement",
+    "formal project writes",
+    "Git stage commit push"
+  ]
+}

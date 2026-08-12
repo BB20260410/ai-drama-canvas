@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "role": "doubao",
+  "model": "doubao-seed-evolving",
+  "elapsed_sec": 378.82,
+  "usage": {
+    "completion_tokens": 21136,
+    "prompt_tokens": 3184,
+    "total_tokens": 24320,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 16358
+    }
+  },
+  "finish_reason": "stop",
+  "content_chars": 8687,
+  "client_timeout_sec": 0.0,
+  "output": "/Users/hxx/Documents/无限画布/docs/novel-mode/adjudication_20260802_ai-novel-assist/12_doubao.txt"
+}

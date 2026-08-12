@@ -1,0 +1,418 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-user-writing-os-first-test",
+  "testName": "黑页WritingOS首次隔离测试",
+  "runId": "black-page-writing-os-first-20260801-171958",
+  "generatedAt": "2026-08-02T00:27:23Z",
+  "correctedAt": "2026-08-02T01:26:58Z",
+  "softwareRoot": "/Users/hxx/Documents/无限画布",
+  "formalNovelSource": "/Users/hxx/Desktop/小说/欠债的都得还",
+  "formalSourceRootPersistedInManagedProject": false,
+  "gates": {
+    "SOFTWARE_RUNTIME": "PASS",
+    "SOURCE_UNCHANGED": "PASS",
+    "MANUSCRIPT_IMPORT": "PASS",
+    "SEARCH_AND_LOCATOR": "PASS",
+    "WRITING_STATE": "PROVISIONAL",
+    "CONTEXT_PACK_2": "PASS",
+    "AI_SAVE_PREFLIGHT": "PASS",
+    "REVIEW_AND_STATE_COMMIT": "PASS",
+    "NEXT_CHAPTER_READY": "PASS",
+    "LITERARY_QUALITY": "NOT_REVIEWED"
+  },
+  "mcpCurrentCheck": {
+    "ok": true,
+    "candidateId": "mcp-candidate-d42289fc75103336-ef9e9fbd9ea70418-507b48c2",
+    "buildId": "3cd6fba86facc24a442368978b7b7536",
+    "sourceDigest": "d42289fc751033362cecc6f7a9c53ae759b084a27a8563ef1141bac6ce4e4e5a",
+    "mcpToolCount": 209,
+    "entrySha256": "19adc69638e9be3e3507282cbd1f5102d452c558ba206bb4ddb46b5d96708ce6",
+    "inspectedCandidates": 37,
+    "invalidCandidates": 0
+  },
+  "sessionMcp": {
+    "status": "STALE_OR_MISMATCH",
+    "toolCountReported": 207,
+    "currentCandidateTools": 209,
+    "buildCurrentnessAllowed": false,
+    "note": "仅描述首次测试时那条历史Grok会话；Writing OS完整路径用JSON CLI + 正式pilot脚本验证，未依赖该会话MCP写入口",
+    "historicalAtOriginalTest": true,
+    "followupResolution": {
+      "status": "RESOLVED_BY_NEW_SESSION_AND_NEW_CURRENT_CANDIDATE",
+      "newGrokSessionObservedBeforeHardening": "209 tools / buildCurrentness allowed=true",
+      "postHardeningCandidateId": "mcp-candidate-1b6f4a86544e89ff-3a7f2fd615601270-ef0fd9bc"
+    }
+  },
+  "source": {
+    "before": {
+      "entries": 547,
+      "directories": 39,
+      "files": 507,
+      "symlinks": 1,
+      "fileBytes": 5943649,
+      "aggregateSha256": "67da96a088bc83a60b8a1d3c716c19d2ae484cd575a4ac4f31c4114789fcfd70"
+    },
+    "after": {
+      "entries": 547,
+      "directories": 39,
+      "files": 507,
+      "symlinks": 1,
+      "fileBytes": 5943649,
+      "aggregateSha256": "67da96a088bc83a60b8a1d3c716c19d2ae484cd575a4ac4f31c4114789fcfd70"
+    },
+    "unchanged": true
+  },
+  "isolationProject": {
+    "relativePath": "docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958/managed/black-page-ch011-managed-pilot-20260801-448e209f",
+    "projectId": "project-5261558adfaf",
+    "absolutePath": "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958/managed/black-page-ch011-managed-pilot-20260801-448e209f"
+  },
+  "import": {
+    "chaptersManaged": 12,
+    "formalChaptersImported": 10,
+    "rehearsalChapters": [
+      11,
+      12
+    ],
+    "totalCharCountUtf16": 32763,
+    "importShaMatch001to010": true,
+    "chapters": [
+      {
+        "number": 1,
+        "chapterId": "92c7aa53-32d0-52d2-8cb6-1a62d7f5bc9f",
+        "title": "第001章 缴费单与黑页",
+        "revision": 1,
+        "sha256": "c182ad81e2cb5337e5399b3fee896bf5d0876a6e08fae931122ea4ed4135ff92",
+        "sourceSha256": "c182ad81e2cb5337e5399b3fee896bf5d0876a6e08fae931122ea4ed4135ff92",
+        "rehearsal": false
+      },
+      {
+        "number": 2,
+        "chapterId": "d9e2b422-6912-5e10-9c97-116bd6e71e46",
+        "title": "第002章 皮鞋与工牌",
+        "revision": 1,
+        "sha256": "9c5f25e0e17a28942af9abed9bf9eb798be85e0a23b3474525c45e56445edfdf",
+        "sourceSha256": "9c5f25e0e17a28942af9abed9bf9eb798be85e0a23b3474525c45e56445edfdf",
+        "rehearsal": false
+      },
+      {
+        "number": 3,
+        "chapterId": "de1efe1e-c53e-52c8-9a23-b588e507fa61",
+        "title": "第003章 您再想想",
+        "revision": 1,
+        "sha256": "cee4a7c874d7ef03bd5cab9096691bc0bb12d1387340c948e12d710c99ca3e01",
+        "sourceSha256": "cee4a7c874d7ef03bd5cab9096691bc0bb12d1387340c948e12d710c99ca3e01",
+        "rehearsal": false
+      },
+      {
+        "number": 4,
+        "chapterId": "9b0379b4-78d2-5a6d-b857-0045b267b828",
+        "title": "第004章 阿大的旧账",
+        "revision": 1,
+        "sha256": "68f25635d31e50723e42851266d6dd298c23e6f527136e48c74066fa5018cfed",
+        "sourceSha256": "68f25635d31e50723e42851266d6dd298c23e6f527136e48c74066fa5018cfed",
+        "rehearsal": false
+      },
+      {
+        "number": 5,
+        "chapterId": "03327bf2-bb69-5233-ab13-7909a34f9769",
+        "title": "第005章 夜班债纹",
+        "revision": 1,
+        "sha256": "1c74d0f9cff2850a85534b86194cb8616bd4642e3287a8224f5c3db0ee1face8",
+        "sourceSha256": "1c74d0f9cff2850a85534b86194cb8616bd4642e3287a8224f5c3db0ee1face8",
+        "rehearsal": false
+      },
+      {
+        "number": 6,
+        "chapterId": "68797693-d86b-5eab-930d-e7e5a5808fb1",
+        "title": "第006章 春禾镜头",
+        "revision": 1,
+        "sha256": "f67219679b4984732c5d9cf289ea21a51f099a6a363c2737629050362ac0eaba",
+        "sourceSha256": "f67219679b4984732c5d9cf289ea21a51f099a6a363c2737629050362ac0eaba",
+        "rehearsal": false
+      },
+      {
+        "number": 7,
+        "chapterId": "53caf6ef-2347-591b-b0d0-6867caf881f2",
+        "title": "第007章 肖龙",
+        "revision": 1,
+        "sha256": "e996e19edad51929e1f8bd31b30b472be16ef984d153bf4cc22718d202bdff21",
+        "sourceSha256": "e996e19edad51929e1f8bd31b30b472be16ef984d153bf4cc22718d202bdff21",
+        "rehearsal": false
+      },
+      {
+        "number": 8,
+        "chapterId": "02c68950-c8ad-587f-9c99-ed66ab8bb96e",
+        "title": "第008章 指动",
+        "revision": 1,
+        "sha256": "06286b8453e8c0d6a1dffb7401934b70bf07292893c68f22b35091840fda1243",
+        "sourceSha256": "06286b8453e8c0d6a1dffb7401934b70bf07292893c68f22b35091840fda1243",
+        "rehearsal": false
+      },
+      {
+        "number": 9,
+        "chapterId": "ecb4e08f-4107-53d9-908e-a24504e8ac6a",
+        "title": "第009章 尾号093",
+        "revision": 1,
+        "sha256": "1552a4a3f7d8a4dce1cec0b48ca2fcb90772490c14750de4de086a9525ea225d",
+        "sourceSha256": "1552a4a3f7d8a4dce1cec0b48ca2fcb90772490c14750de4de086a9525ea225d",
+        "rehearsal": false
+      },
+      {
+        "number": 10,
+        "chapterId": "3698fec0-3b81-533a-aa85-6acbc9904453",
+        "title": "第010章 八点前",
+        "revision": 1,
+        "sha256": "06c3aae0fe87652341f498db5b5ea671fcbc217bb6c8bc540e9128c3e7323119",
+        "sourceSha256": "06c3aae0fe87652341f498db5b5ea671fcbc217bb6c8bc540e9128c3e7323119",
+        "rehearsal": false
+      },
+      {
+        "number": 11,
+        "chapterId": "c617bef1-6979-536c-9360-ba0945102bc4",
+        "title": "第011章 方案（隔离演练）",
+        "revision": 2,
+        "sha256": "bd69e411aa746ff73f4f4ff405edc4b182cf50391f8e6284c7834de1dd00323f",
+        "sourceSha256": null,
+        "rehearsal": true
+      },
+      {
+        "number": 12,
+        "chapterId": "f4ff96c2-8338-5330-bf50-98c519ce0306",
+        "title": "第012章 幕一尾钩（隔离演练）",
+        "revision": 1,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceSha256": null,
+        "rehearsal": true
+      }
+    ]
+  },
+  "writingState": {
+    "writingStateRevisionSeeded": 1,
+    "writingStateFingerprintSeeded": "fc3a327a67cea1cdda05ef620494a85bff207fca2ddfc8fa812c8be4989c38cf",
+    "sources": 26,
+    "entities": 17,
+    "dynamicStates": 8,
+    "knowledge": 173,
+    "relationships": 5,
+    "timeline": 11,
+    "foreshadowing": 28,
+    "hardCanon": 29,
+    "diagnostics": [
+      "源残留冲突：日历导语仍写016发生-7→-6；P0与CAN-跳天已裁决D1→D2跳天，待清理低权威旧句。",
+      "知情账非二元rawValue已保留；planned_later无生效章时不进入过去时投影。",
+      "伏笔状态按源台账保留，未根据正文自动晋级。"
+    ],
+    "failedPilotArtifactsRetained": [
+      "首轮隔离pilot在D4备注章号解析处失败；失败工程保留于同级pilots目录，未写正式源。"
+    ],
+    "baselineStatus": "provisional"
+  },
+  "search": [
+    {
+      "query": "易航",
+      "ms": 377.8,
+      "hits": 10,
+      "scanned": 12,
+      "external": 0,
+      "locator_ok": true,
+      "text": "易航",
+      "expected_len": 2,
+      "sha_ok": true,
+      "rev_ok": true,
+      "chapterTitle": "第001章 缴费单与黑页",
+      "offsetEncoding": "utf16-code-unit"
+    },
+    {
+      "query": "黑页",
+      "ms": 378.2,
+      "hits": 10,
+      "scanned": 12,
+      "external": 0,
+      "locator_ok": true,
+      "text": "黑页",
+      "expected_len": 2,
+      "sha_ok": true,
+      "rev_ok": true,
+      "chapterTitle": "第001章 缴费单与黑页",
+      "offsetEncoding": "utf16-code-unit"
+    },
+    {
+      "query": "担保链",
+      "ms": 385.2,
+      "hits": 10,
+      "scanned": 12,
+      "external": 0,
+      "locator_ok": true,
+      "text": "担保链",
+      "expected_len": 3,
+      "sha_ok": true,
+      "rev_ok": true,
+      "chapterTitle": "第001章 缴费单与黑页",
+      "offsetEncoding": "utf16-code-unit"
+    }
+  ],
+  "chapter11Loop": {
+    "contextPackFingerprint": "053d6301a1cff753040dbdc38f83bf7968f3b4b10b5212aac45a2ab01f6abde7",
+    "cutoffChapterId": "3698fec0-3b81-533a-aa85-6acbc9904453",
+    "budget": {
+      "maximumCharacters": 60000,
+      "usedCharacters": 16320,
+      "reservedCharacters": 3070,
+      "truncated": false,
+      "omitted": []
+    },
+    "sectionCounts": {
+      "hardCanon": 24,
+      "taskBrief": 1,
+      "entities": 2,
+      "characterStates": 2,
+      "knowledge": 45,
+      "relationships": 6,
+      "timeline": 11,
+      "foreshadowing": 28
+    },
+    "excerptChapterIds": [
+      "02c68950-c8ad-587f-9c99-ed66ab8bb96e",
+      "ecb4e08f-4107-53d9-908e-a24504e8ac6a",
+      "3698fec0-3b81-533a-aa85-6acbc9904453"
+    ],
+    "preflightId": "novel-write-preflight-132ba92cc183141c46806bac",
+    "saveRevision": 2,
+    "staleReplayReason": "context_preflight_stale",
+    "reviewTicketId": "novel-review-dd1fe0ab649a1a8326103b4a",
+    "candidateId": "novel-state-candidate-d8d46b47397409e62a4f0bca",
+    "decisionId": "novel-state-decision-48c66c8c917f3fce45962178",
+    "committedStateRevision": 2,
+    "committedThroughChapterId": "c617bef1-6979-536c-9360-ba0945102bc4"
+  },
+  "chapter12Loop": {
+    "contextPackFingerprint": "4656b8209c5addb3ab8030f87c25faa9bd790f9b1838cdb5583ad23637880ab2",
+    "preflightId": "novel-write-preflight-e404ab5598edef5bdaf76539",
+    "ready": true
+  },
+  "postHocCli": {
+    "preflight12Independent": {
+      "ready": false,
+      "id": "novel-write-preflight-47ac9f52ff387b6d381c638c",
+      "blockers": [
+        {
+          "code": "context_preflight_stale",
+          "chapterId": "f4ff96c2-8338-5330-bf50-98c519ce0306",
+          "message": "提交的context pack fingerprint已过期或与当前组包参数不一致。",
+          "nextAction": "使用currentContextPackFingerprint对应的新pack重新preflight"
+        }
+      ]
+    },
+    "note": "保留首次观察：pilot过程内ch12 ready=true；首次独立CLI复核漏传pack使用的maxCharacters=60000，preflight采用默认12000而确定性stale。",
+    "status": "RESOLVED_CALLER_PARAMETER_MISMATCH",
+    "rootCause": {
+      "packMaxCharacters": 60000,
+      "firstReplayPreflightMaxCharacters": 12000,
+      "productRandomCrossProcessDrift": false
+    },
+    "correctedReplay": {
+      "sameParameters": true,
+      "contextPackFingerprint": "4656b8209c5addb3ab8030f87c25faa9bd790f9b1838cdb5583ad23637880ab2",
+      "preflightId": "novel-write-preflight-e404ab5598edef5bdaf76539",
+      "ready": true
+    }
+  },
+  "boundaries": {
+    "formalSourceWritten": false,
+    "remoteModelsCalled": false,
+    "feesIncurred": false,
+    "rehearsalBodySyncedToFormalSource": false
+  },
+  "verificationCommands": {
+    "typecheck": "PASS",
+    "vitestNovel": "25 files / 208 tests PASS",
+    "mcpCurrentCheck": {
+      "ok": true,
+      "candidateId": "mcp-candidate-d42289fc75103336-ef9e9fbd9ea70418-507b48c2",
+      "buildId": "3cd6fba86facc24a442368978b7b7536",
+      "sourceDigest": "d42289fc751033362cecc6f7a9c53ae759b084a27a8563ef1141bac6ce4e4e5a",
+      "mcpToolCount": 209,
+      "entrySha256": "19adc69638e9be3e3507282cbd1f5102d452c558ba206bb4ddb46b5d96708ce6",
+      "inspectedCandidates": 37,
+      "invalidCandidates": 0
+    },
+    "gitDiffCheck": "PASS",
+    "hardening20260802": {
+      "directed": "4 files / 29 tests PASS",
+      "fullNovelRuntimeRegression": "28 files / 258 tests PASS",
+      "currentnessGate": "1 file / 4 tests PASS",
+      "typecheck": "PASS",
+      "gitDiffCheck": "PASS",
+      "candidateId": "mcp-candidate-1b6f4a86544e89ff-3a7f2fd615601270-ef0fd9bc",
+      "sourceDigest": "1b6f4a86544e89ff06ce7552e66328634bb226b86563f4a07a9b09c169902da4",
+      "buildId": "7af833522c34ba9b547935c9339a6153",
+      "mcpToolCount": 209,
+      "invalidCandidates": 0,
+      "grokFinalCodeReview": "CLEAN"
+    }
+  },
+  "paths": {
+    "evidenceDir": "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958",
+    "reportMd": "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958/测试报告.md",
+    "evidenceJson": "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958/测试证据.json",
+    "pilotJson": "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958/测试证据-pilot.json",
+    "beforeManifest": "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958/before-source-manifest.json",
+    "afterManifest": "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958/after-source-manifest.json",
+    "managedProject": "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958/managed/black-page-ch011-managed-pilot-20260801-448e209f"
+  },
+  "git": {
+    "staged": 0,
+    "committed": false,
+    "pushed": false,
+    "note": "工作区既有dirty保留；本次仅新增 evidence 目录，未 stage/commit/push"
+  },
+  "negativeTests": [
+    {
+      "name": "stale preflight replay",
+      "expected": "context_preflight_stale",
+      "observed": "context_preflight_stale",
+      "pass": true
+    },
+    {
+      "name": "bad CAS expectedRevision",
+      "expected": "valid-context stale CAS reject",
+      "observed": "首次测试只验证非法preflight形态/旧CAS组合被拒，未独立隔离有效身份下的CAS冲突",
+      "pass": false,
+      "notRunInFirstTest": true
+    },
+    {
+      "name": "review ticket no body change",
+      "expected": "body unchanged",
+      "observed": "pilot review then re-read",
+      "pass": true
+    },
+    {
+      "name": "state candidate not auto canon",
+      "expected": "requires human accept",
+      "observed": "首次测试执行stage后直接accepted，未在accept前独立读取并留证",
+      "pass": false,
+      "notIndependentlyObserved": true
+    },
+    {
+      "name": "future chapter not in continue pack",
+      "expected": "no leak",
+      "observed": "excerpts only 008-010 for ch11",
+      "pass": true
+    },
+    {
+      "name": "hardening Agent non-empty create and contextless save",
+      "expected": "context_preflight_required before ledger I/O",
+      "observed": "command bus and JSON CLI rejected; ledger and manuscript unchanged",
+      "pass": true,
+      "followup20260802": true
+    },
+    {
+      "name": "hardening actor idempotency boundary",
+      "expected": "default Agent cannot replay human_ui contextless save with the same key",
+      "observed": "context_preflight_required before succeeded ledger replay",
+      "pass": true,
+      "followup20260802": true
+    }
+  ]
+}

@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 1,
+  "kind": "canvas-kernel-cleanroom-delta-acceptance",
+  "status": "VERIFIED_CLEANROOM_DELTA",
+  "pathDecision": "CANVAS_KERNEL_PLUS_CLEANROOM_DELTA",
+  "observedAt": "2026-08-03T02:07:38Z",
+  "finalizedAt": "2026-08-03T02:12:35Z",
+  "scope": {
+    "mode": "docs-and-evidence-only",
+    "productImplementation": false,
+    "externalRuntimeEvaluation": false,
+    "formalNovelWrite": false
+  },
+  "existingAuthority": [
+    "THIRD_PARTY_NOTICES.md",
+    "docs/third-party/novel-donors.json",
+    "docs/novel-mode/02-migration-and-security.md",
+    "src/renderer/src/components/NovelStudioView.vue",
+    "src/core/novel-agent-service.ts"
+  ],
+  "externalSources": [
+    {
+      "name": "InkOS",
+      "identityStatus": "CONFIRMED",
+      "repository": "Narcooo/inkos",
+      "url": "https://github.com/Narcooo/inkos",
+      "defaultBranch": "master",
+      "headCommit": "0da8637099369f59c12377267ec2e5bdc8c4985f",
+      "license": "AGPL-3.0",
+      "release": "v1.7.2",
+      "package": "@actalk/inkos@1.7.2",
+      "packageShasum": "ca3bcf7e157268d4369891866413deced7c8939c",
+      "packageIntegrity": "sha512-WaR5n8AReCs4od4aSgQ8K7wGfTrzxLpnkBjnW6w51Nqo9UCrYrESH+r7Xsok0XInLdBiRQyO1gnqWQWGDdOczQ==",
+      "disposition": "METADATA_ONLY_NO_INSTALL"
+    },
+    {
+      "name": "AI-Novel-Writer",
+      "identityStatus": "CONFIRMED",
+      "repository": "EthanYoQ/AI-Novel-Writer",
+      "url": "https://github.com/EthanYoQ/AI-Novel-Writer",
+      "defaultBranch": "master",
+      "headCommit": "2dc3d45ba4f1953c11b132dae584b62d8089f934",
+      "license": "GPL-3.0",
+      "release": "v0.5.2",
+      "asset": "ai-novel-writer-mac-arm64-0.5.2-installer.dmg",
+      "assetBytes": 277144837,
+      "assetDigest": "sha256:caf797a65c659283f09917748d2b216b5dd65ba4bbf68ee70915be75224fcdf4",
+      "disposition": "METADATA_ONLY_NO_DOWNLOAD_NO_RUN"
+    },
+    {
+      "name": "NovWr",
+      "identityStatus": "CONFIRMED",
+      "repository": "Hurricane0698/novelwriter",
+      "url": "https://github.com/Hurricane0698/novelwriter",
+      "defaultBranch": "main",
+      "headCommit": "d7c53073a8e7a6544465d9781b51f247adb37f54",
+      "license": "AGPL-3.0",
+      "release": "v0.4.2",
+      "installScriptBlob": "f481980fe4e6f47db4e49e8b8a987e442a8176d7",
+      "disposition": "METADATA_ONLY_NO_SCRIPT_NO_DOCKER"
+    },
+    {
+      "name": "OCNovel",
+      "identityStatus": "PROBABLE_MATCH_NOT_OWNER_PINNED",
+      "repository": "wenjiazhu1980/OCNovel",
+      "url": "https://github.com/wenjiazhu1980/OCNovel",
+      "defaultBranch": "main",
+      "headCommit": "50ec3679291504784cda2f3c5d0cd96a13934390",
+      "license": "MIT",
+      "release": "v1.0.32",
+      "asset": "OCNovel-macOS-arm64.zip",
+      "assetBytes": 118900073,
+      "assetDigest": "sha256:d9530b834e23163009edc85bdd08b580ad842391d6f379950831a0e4f5efbd15",
+      "disposition": "RESEARCH_ONLY_IDENTITY_UNCONFIRMED_NO_DOWNLOAD"
+    }
+  ],
+  "actions": {
+    "repositoriesCloned": 0,
+    "packagesInstalled": 0,
+    "releaseAssetsDownloaded": 0,
+    "externalExecutablesRun": 0,
+    "dockerStarted": false,
+    "sandboxRuntimeCreated": false,
+    "runtimeDependenciesAdded": 0,
+    "productSourceModifiedByThisTask": false,
+    "formalNovelSourceTouched": false,
+    "gitStaged": false,
+    "gitCommitted": false,
+    "gitPushed": false
+  },
+  "capabilityDisposition": {
+    "reuse": [
+      "writing-os-status-and-readiness",
+      "required-cast-hard-gates",
+      "character-state-candidate-diff",
+      "human-accept-reject",
+      "consistency-probe",
+      "lease-cas-next-actions",
+      "third-party-provenance-gate"
+    ],
+    "recommendedNotImplemented": [
+      {
+        "id": "KERNEL-PACK-TRACE-SURFACE",
+        "priority": "P1",
+        "rule": "read-only projection of existing pack and preflight receipts; no second state owner"
+      }
+    ],
+    "deferred": [
+      {
+        "id": "EXTERNAL-EXECUTOR-ATTESTATION",
+        "condition": "owner later authorizes a real isolated external-executor use case"
+      },
+      {
+        "id": "MILLION_WORD_CAPACITY",
+        "condition": "separate performance and recovery program; not inferred from external-product study"
+      }
+    ]
+  },
+  "bridgeContract": {
+    "order": [
+      "canvas-doctor",
+      "canvas-prepare-pack-preflight-fingerprint",
+      "export-read-only-work-order",
+      "external-draft",
+      "return-untrusted-candidate",
+      "stale-and-cas-save-bound-to-original-fingerprint",
+      "stage-state-candidate",
+      "human-accept-or-reject",
+      "consistency-probe"
+    ],
+    "externalDraftBeforePrepareAllowed": false,
+    "externalDirectWriteAllowed": false,
+    "automaticStateAcceptanceAllowed": false
+  },
+  "verification": {
+    "directedTests": {
+      "status": "PASS",
+      "command": "npx vitest run tests/novel-third-party-provenance.test.ts tests/novel-studio-view.test.ts tests/novel-desktop-writing-os.test.ts --maxWorkers=1",
+      "files": 3,
+      "tests": 9,
+      "durationSeconds": 15.58
+    },
+    "mcpCurrentness": {
+      "status": "PASS",
+      "candidateId": "mcp-candidate-c59b0d6c99ed6103-40f7235ecb87e453-15e567f4",
+      "buildId": "39bc0e1bf2db81bb11d8a9891910379e",
+      "sourceDigest": "c59b0d6c99ed610330c4a47faf38d5636f946b8cd03bef2b696eb53277ccec9a",
+      "entrySha256": "be4372930ed118216c7f2ebe17f94107f0b33d1ba6c1d6e44e2ac8a5bc907444",
+      "toolCount": 216,
+      "inspectedCandidates": 49,
+      "invalidCandidates": 0
+    },
+    "runtimeDependencyScan": {
+      "status": "PASS",
+      "files": [
+        "package.json",
+        "package-lock.json"
+      ],
+      "matchedDependencies": []
+    },
+    "jsonParse": {
+      "status": "PASS",
+      "parser": "jq"
+    },
+    "formalSourceManifest": {
+      "status": "PASS",
+      "baseline": "docs/evidence/novel-mode-v1/real-project/black-page-p1-performance-final-20260802.json",
+      "current": "docs/evidence/novel-mode-v1/real-project/black-page-cleanroom-delta-final-20260803.json",
+      "entries": 566,
+      "aggregateSha256": "97e8fde0ee0ea8ce8529c3db7db4d2d412cbaf0b8f7ff1e837d185f01b89bada",
+      "summaryEntriesAndAggregateEqual": true
+    },
+    "taskSourceBoundary": {
+      "status": "PASS",
+      "changedRootsByThisTask": [
+        ".planning/2026-08-02-canvas-kernel-cleanroom-delta",
+        "docs/ref-study/canvas-kernel-cleanroom-delta-20260803",
+        "docs/evidence/novel-mode-v1/real-project/black-page-cleanroom-delta-final-20260803.json"
+      ],
+      "productSourceModified": false,
+      "packageOrLockfileModified": false,
+      "externalSandboxCreated": false
+    },
+    "gitDiffCheck": {
+      "status": "PASS"
+    }
+  },
+  "limitations": [
+    "No external runtime was installed or executed, so compatibility and literary quality were not evaluated.",
+    "OCNovel owner identity was absent from the Grok brief; the recorded repository remains a probable match.",
+    "KERNEL-PACK-TRACE-SURFACE is a recommendation, not implemented product code.",
+    "This study does not establish million-word capacity or performance."
+  ]
+}

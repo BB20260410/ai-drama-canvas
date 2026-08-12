@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "kind": "code-review-comparison-remediation",
+  "status": "passed",
+  "completedAt": "2026-08-10T05:58:00+08:00",
+  "scope": "current-worktree-delta-review-local-only",
+  "comparisonBaseline": ".planning/2026-08-09-full-code-review-remediation",
+  "identity": {
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "sourceDigest": "d8e48caa6e635332eae06d49717f23a21d3d433613e488d3f49e2c42baecb20f",
+    "buildId": "0324e11699f994eafc697bb5a74865bd",
+    "releaseManifestFingerprint": "37bbb07726f99d543da878367d31baaa16f375764183e7e1936fa25b3e48c300",
+    "mcpToolCount": 218,
+    "mcpResourceTemplateCount": 9,
+    "mcpPromptCount": 8
+  },
+  "previousFindings": [
+    { "id": "CORE-01", "status": "fix-maintained" },
+    { "id": "CORE-02", "status": "fix-maintained" },
+    { "id": "CORE-03", "status": "fix-maintained" },
+    { "id": "UI-01", "status": "fix-maintained" },
+    { "id": "UI-02", "status": "fix-maintained" },
+    { "id": "PERF-01", "status": "fix-maintained" },
+    { "id": "MCP-01", "status": "fix-maintained" },
+    { "id": "MCP-02", "status": "fix-maintained" },
+    { "id": "DEP-01", "status": "fix-maintained" }
+  ],
+  "newFindings": [
+    { "id": "SIDECORE-01", "severity": "P1", "status": "fixed", "summary": "project unregister now shares the paid-call activation fence" },
+    { "id": "LIFE-01", "severity": "P1", "status": "fixed", "summary": "startup close requests are buffered until the preload close bridge is ready" },
+    { "id": "INSTALL-01", "severity": "P1", "status": "fixed", "summary": "installed-App evidence targets cannot resolve inside the signed bundle" },
+    { "id": "EDITOR-01", "severity": "P2", "status": "fixed", "summary": "stale VideoEditor sessions are fenced and reclaimed after unmount or root change" },
+    { "id": "CLOSE-01", "severity": "P2", "status": "fixed", "summary": "recoverable cleanup failure no longer reopens a dismantled runtime" },
+    { "id": "PACKAGE-01", "severity": "P2", "status": "fixed", "summary": "MCP SDK package lock stage and packaged versions must match exactly" },
+    { "id": "VERIFY-01", "severity": "P2", "status": "fixed", "summary": "installed-App verification is background-only and uses bounded graceful close" }
+  ],
+  "finalReview": {
+    "domains": ["core-and-novel", "electron-lifecycle-and-ui", "mcp-and-delivery"],
+    "result": "clean",
+    "remainingConfirmedP0": 0,
+    "remainingConfirmedP1": 0,
+    "remainingConfirmedHighValueP2": 0
+  },
+  "targetedValidation": {
+    "uniqueTestFiles": 8,
+    "uniqueTests": 65,
+    "passed": 65,
+    "failed": 0,
+    "groups": [
+      { "files": ["tests/studio-imagegen-active-project-fence.test.ts"], "passed": 3 },
+      { "files": ["tests/app-close-coordinator.test.ts", "tests/video-editor-dirty-guard.test.ts"], "passed": 15 },
+      { "files": ["tests/isolated-package-guards.test.ts"], "passed": 11 },
+      { "files": ["tests/sidecar.test.ts", "tests/editor.test.ts", "tests/electron-application-close.test.ts", "tests/novel-workspace-routing.test.ts"], "passed": 36 }
+    ],
+    "typecheck": "passed",
+    "typecheckApp": "passed",
+    "diffCheck": "passed",
+    "fullTestPartitionsRerun": false
+  },
+  "candidate": {
+    "id": "mcp-candidate-d8e48caa6e635332-65e654aa2b49d955-ede44659",
+    "builtOnce": true,
+    "currentCheck": "passed",
+    "inspectedPublications": 6,
+    "invalidPublications": 0,
+    "dependencyClosureFingerprint": "cfa0faaf83fd7294fd98a7a195faee8e0a8f72effc0fd51dfe15b161eef0985c",
+    "stdioHandshake": "passed"
+  },
+  "isolatedPackageSmoke": {
+    "runCount": 1,
+    "status": "passed",
+    "evidencePath": "docs/evidence/isolated-package-smoke-20260809T214944761Z-23144-291902d8.json",
+    "closeDurationsMs": [239, 231, 47, 50],
+    "allExitCodesZero": true,
+    "forcedTerminationUsed": false,
+    "backgroundSnapshots": 8,
+    "showEvents": 0,
+    "focusEvents": 0,
+    "dockVisible": false,
+    "lingeringProcessesBeforeCleanup": [],
+    "lingeringProcessesAfterCleanup": []
+  },
+  "installedApp": {
+    "path": "/Applications/AI 漫剧画布.app",
+    "evidencePath": "docs/evidence/installed-local-verify-20260809T215613Z-d8e48caa.json",
+    "executableSha256": "7ab1eddb79d78a141c948cb5e93b2f66681a299bef085147ea07091a88c73c97",
+    "appAsarSha256": "3fa35fb4cc253482c40305951a259bb09ff1acc0bd4b1fe7f165cb0565f083c5",
+    "developerIdDeepStrict": "passed",
+    "teamIdentifier": "3JS43BTTJ3",
+    "backgroundShowEvents": 0,
+    "backgroundFocusEvents": 0,
+    "closeDurationMs": 57,
+    "closeExitCode": 0,
+    "backupPath": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260810-055700-d8e48caa/previous-installed/AI 漫剧画布.app"
+  },
+  "boundaries": {
+    "localOnly": true,
+    "notarized": false,
+    "spctlExpectedResult": "rejected-unnotarized-developer-id",
+    "newDmgGenerated": false,
+    "uploaded": false,
+    "published": false,
+    "autoUpdateConfigured": false,
+    "formalProjectDataModified": false,
+    "gitStaged": false,
+    "gitCommitted": false,
+    "gitPushed": false,
+    "appLeftRunning": false
+  }
+}

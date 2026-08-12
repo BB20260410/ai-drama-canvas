@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-chapter-write-leases",
+  "projectId": "project-177e816e643b",
+  "revision": 1,
+  "leases": [
+    {
+      "chapterId": "b66499fe-e4f0-5d8d-92b9-dbf0ab147739",
+      "leaseId": "novel-write-lease-44a650eeacd9b76f14c02496",
+      "fence": 1,
+      "status": "active",
+      "actorFingerprint": "61c88ed205f0a2ce07d10e560a92e2279893fe85878af8d352c40c2364ca41fe",
+      "tokenSha256": "94d8e0dc4a43e03377072f47c301647794c608f0c6e2d91784b2883dcc82a898",
+      "targetChapterRevision": 1,
+      "targetChapterSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "writingStateRevision": 2,
+      "writingStateFingerprint": "edec105ec9bc3dee7ef57c79beb7d276f92497add1e7028ecf9f9cf84bcdccf5",
+      "contextPackFingerprint": "eeee4ef825b1ff6d72e3695081b3db31800a1fdf5f6018cddfa4d7f9d2944841",
+      "preflightId": "novel-write-preflight-47a7ccc0da1eaa5d502c9958",
+      "expiresAt": "2026-08-02T13:51:15.754Z",
+      "updatedAt": "2026-08-02T13:36:15.754Z"
+    }
+  ],
+  "updatedAt": "2026-08-02T13:36:15.754Z",
+  "fingerprint": "48ccf56c7c1f2b4ac5684607090b4a3c199cb1cff4524637a6803da7acea3750"
+}

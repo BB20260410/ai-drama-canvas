@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "completedAt": "2026-08-10T02:42:33Z",
+  "scope": "renderer legacy canvas lazy loading",
+  "finding": "App.vue statically loaded the legacy VueFlow runtime and six legacy canvas components for every workspace, including the project center, novel workspace and managed studio shell.",
+  "baseline": {
+    "mainChunk": "out/renderer/assets/index-BpPYZvJH.js",
+    "bytes": 807753,
+    "gzipBytes": 175471,
+    "sha256": "281bd623d7eab680c13f1b9bd30532a58e6caa714b1fd497ea4bc321edfade54",
+    "totalJavaScriptBytes": 2930500
+  },
+  "result": {
+    "mainChunk": "out/renderer/assets/index-oTXCZrtt.js",
+    "bytes": 437455,
+    "gzipBytes": 98418,
+    "sha256": "7172192ef3a4a910ec18b27d95d801d04e107505658eee6240adbfb4fe44f2a6",
+    "totalJavaScriptBytes": 2938658,
+    "lazyVueFlowChunk": "out/renderer/assets/vue-flow-core-BJchXfTa.js",
+    "lazyVueFlowBytes": 335377,
+    "lazyVueFlowGzipBytes": 71568,
+    "indexHtmlStaticallyPreloadsVueFlow": false,
+    "legacyComponentChunks": [
+      "ProductionNode",
+      "ZoneNode",
+      "InspectorPanel",
+      "CanvasNoteNode",
+      "CanvasGroupNode",
+      "NarrativeNode",
+      "vue-flow-background",
+      "vue-flow-controls"
+    ]
+  },
+  "delta": {
+    "mainBytesSaved": 370298,
+    "mainBytesSavedPercent": 45.84,
+    "mainGzipBytesSaved": 77053,
+    "mainGzipBytesSavedPercent": 43.91,
+    "totalJavaScriptBytesDelta": 8158,
+    "totalJavaScriptBytesDeltaPercent": 0.28
+  },
+  "verification": [
+    {
+      "command": "npx vitest run tests/legacy-canvas-lazy-loading.test.ts --maxWorkers=1 --reporter=dot",
+      "result": "PASS, 1 file / 1 test"
+    },
+    {
+      "command": "npx vitest run tests/legacy-canvas-lazy-loading.test.ts tests/novel-workspace-routing.test.ts tests/video-editor-dirty-guard.test.ts tests/managed-studio-canvas-ui.test.ts --maxWorkers=1 --reporter=dot",
+      "result": "PASS, 4 files / 42 tests"
+    },
+    {
+      "command": "npm run build",
+      "result": "PASS, includes web and node typecheck, MCP build, release identity and Electron renderer build"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    },
+    {
+      "command": "computeSourceDigest versus release-manifest.json",
+      "result": "PASS, 981 source files and identical sourceDigest"
+    }
+  ],
+  "buildIdentity": {
+    "version": "0.2.0",
+    "sourceDigest": "5ed202c0c29e3aa698f9b4533ce6741d3bb535bda1e8b31715a869338d457c93",
+    "buildId": "d7c6c6f0d41aedf175d8b9ee1fd02ca0",
+    "mcpToolCount": 220
+  },
+  "sideEffects": {
+    "desktopAppLaunched": false,
+    "installedAppChanged": false,
+    "formalProjectOrMediaWrites": false,
+    "gitStageCommitOrPush": false
+  },
+  "limits": [
+    "This verifies bundle shape and affected source contracts; it is not a cold-start wall-clock benchmark.",
+    "Managed Studio still loads VueFlow when its canvas is actually opened because that view legitimately needs it.",
+    "The installed app under /Applications was not replaced in this slice."
+  ]
+}

@@ -1,0 +1,471 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-writing-os-sequential-scale-acceptance",
+  "verdict": "PASS",
+  "createdAt": "2026-08-03T01:24:40.383Z",
+  "environment": {
+    "node": "v26.3.1",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "scale": {
+    "targetChapters": 500,
+    "managedChaptersIncludingBootstrap": 501,
+    "requestedSourceCharacters": 1000000,
+    "actualSourceCharacters": 1014334,
+    "retconFromChapter": 200
+  },
+  "sourceReadOnly": {
+    "before": {
+      "sha256": "bf6808d4fa3c58905cc740596b949cee218187120fa856cbff52f304c4ba0269",
+      "byteLength": 3027416,
+      "charCount": 1014334
+    },
+    "after": {
+      "sha256": "bf6808d4fa3c58905cc740596b949cee218187120fa856cbff52f304c4ba0269",
+      "byteLength": 3027416,
+      "charCount": 1014334
+    },
+    "unchanged": true
+  },
+  "import": {
+    "durationMs": 32822,
+    "chapterCount": 501
+  },
+  "originalSequentialLoop": {
+    "cycles": 500,
+    "operation": "prepare(formal+lease) -> CAS save -> evidence candidate -> owner accept",
+    "durationMs": 1040112,
+    "latency": {
+      "minimumMs": 1956.36,
+      "p50Ms": 2064.19,
+      "p95Ms": 2196.55,
+      "maximumMs": 4329.67,
+      "meanMs": 2080.22
+    },
+    "latencyByWindow": [
+      {
+        "startCycle": 1,
+        "endCycle": 50,
+        "latency": {
+          "minimumMs": 1966.43,
+          "p50Ms": 2035.91,
+          "p95Ms": 2353.58,
+          "maximumMs": 4329.67,
+          "meanMs": 2132.03
+        }
+      },
+      {
+        "startCycle": 51,
+        "endCycle": 100,
+        "latency": {
+          "minimumMs": 1971.16,
+          "p50Ms": 2030.44,
+          "p95Ms": 2169.62,
+          "maximumMs": 2210.36,
+          "meanMs": 2045.63
+        }
+      },
+      {
+        "startCycle": 101,
+        "endCycle": 150,
+        "latency": {
+          "minimumMs": 1973.23,
+          "p50Ms": 2043.5,
+          "p95Ms": 2224.79,
+          "maximumMs": 2237.01,
+          "meanMs": 2053.65
+        }
+      },
+      {
+        "startCycle": 151,
+        "endCycle": 200,
+        "latency": {
+          "minimumMs": 1956.36,
+          "p50Ms": 2007.76,
+          "p95Ms": 2136.13,
+          "maximumMs": 2318.71,
+          "meanMs": 2031.93
+        }
+      },
+      {
+        "startCycle": 201,
+        "endCycle": 250,
+        "latency": {
+          "minimumMs": 2004.31,
+          "p50Ms": 2050.16,
+          "p95Ms": 2129.46,
+          "maximumMs": 3216.46,
+          "meanMs": 2081.09
+        }
+      },
+      {
+        "startCycle": 251,
+        "endCycle": 300,
+        "latency": {
+          "minimumMs": 1988.83,
+          "p50Ms": 2043.24,
+          "p95Ms": 2094.3,
+          "maximumMs": 2112.54,
+          "meanMs": 2044.17
+        }
+      },
+      {
+        "startCycle": 301,
+        "endCycle": 350,
+        "latency": {
+          "minimumMs": 1981.94,
+          "p50Ms": 2067.55,
+          "p95Ms": 2178.09,
+          "maximumMs": 2233.47,
+          "meanMs": 2076.22
+        }
+      },
+      {
+        "startCycle": 351,
+        "endCycle": 400,
+        "latency": {
+          "minimumMs": 2037.55,
+          "p50Ms": 2085.28,
+          "p95Ms": 2138.85,
+          "maximumMs": 2165.96,
+          "meanMs": 2088.24
+        }
+      },
+      {
+        "startCycle": 401,
+        "endCycle": 450,
+        "latency": {
+          "minimumMs": 2044.85,
+          "p50Ms": 2086.49,
+          "p95Ms": 2189.99,
+          "maximumMs": 2243.47,
+          "meanMs": 2101.57
+        }
+      },
+      {
+        "startCycle": 451,
+        "endCycle": 500,
+        "latency": {
+          "minimumMs": 2068.46,
+          "p50Ms": 2114.41,
+          "p95Ms": 2199.81,
+          "maximumMs": 3332.49,
+          "meanMs": 2147.72
+        }
+      }
+    ],
+    "phases": {
+      "readChapter": {
+        "durationMs": 2952,
+        "latency": {
+          "minimumMs": 5,
+          "p50Ms": 5.44,
+          "p95Ms": 9.96,
+          "maximumMs": 14.37,
+          "meanMs": 5.9
+        }
+      },
+      "prepare": {
+        "durationMs": 192267,
+        "latency": {
+          "minimumMs": 283.5,
+          "p50Ms": 381.73,
+          "p95Ms": 430.9,
+          "maximumMs": 449.03,
+          "meanMs": 384.53
+        }
+      },
+      "saveChapter": {
+        "durationMs": 376672,
+        "latency": {
+          "minimumMs": 711.26,
+          "p50Ms": 744.06,
+          "p95Ms": 801.36,
+          "maximumMs": 1413.89,
+          "meanMs": 753.34
+        }
+      },
+      "loadWritingState": {
+        "durationMs": 8396,
+        "latency": {
+          "minimumMs": 5.48,
+          "p50Ms": 16.49,
+          "p95Ms": 22.77,
+          "maximumMs": 31.07,
+          "meanMs": 16.79
+        }
+      },
+      "stageCandidate": {
+        "durationMs": 96184,
+        "latency": {
+          "minimumMs": 178.12,
+          "p50Ms": 188.46,
+          "p95Ms": 205.24,
+          "maximumMs": 608.97,
+          "meanMs": 192.37
+        }
+      },
+      "acceptCandidate": {
+        "durationMs": 363027,
+        "latency": {
+          "minimumMs": 684.01,
+          "p50Ms": 718.62,
+          "p95Ms": 761.56,
+          "maximumMs": 1405.65,
+          "meanMs": 726.05
+        }
+      }
+    },
+    "externalMcpEquivalentCommandBusCheckpoints": [
+      1,
+      250,
+      500
+    ],
+    "restartProof": {
+      "atChapter": 250,
+      "newProcessCliExitCode": 0,
+      "recoveredHead": "4a9952aa-dc9d-594f-b1e6-0667fe718d0c"
+    }
+  },
+  "retconRebuild": {
+    "targetChapter": 200,
+    "affectedChapters": 301,
+    "beforeSnapshotLocator": ".aicanvas/novel/state-rebuilds/novel-state-rebuild-933c9654bb3e732b6a1ac709/before.json",
+    "cycles": 301,
+    "durationMs": 289137,
+    "latency": {
+      "minimumMs": 900.38,
+      "p50Ms": 966.36,
+      "p95Ms": 995.18,
+      "maximumMs": 1056.17,
+      "meanMs": 960.59
+    },
+    "latencyByWindow": [
+      {
+        "startCycle": 1,
+        "endCycle": 31,
+        "latency": {
+          "minimumMs": 900.38,
+          "p50Ms": 926.07,
+          "p95Ms": 957.05,
+          "maximumMs": 958.53,
+          "meanMs": 929.5
+        }
+      },
+      {
+        "startCycle": 32,
+        "endCycle": 62,
+        "latency": {
+          "minimumMs": 903.55,
+          "p50Ms": 943.22,
+          "p95Ms": 989.44,
+          "maximumMs": 1015.64,
+          "meanMs": 946.68
+        }
+      },
+      {
+        "startCycle": 63,
+        "endCycle": 93,
+        "latency": {
+          "minimumMs": 917.64,
+          "p50Ms": 951.35,
+          "p95Ms": 981.12,
+          "maximumMs": 995.65,
+          "meanMs": 952.58
+        }
+      },
+      {
+        "startCycle": 94,
+        "endCycle": 124,
+        "latency": {
+          "minimumMs": 918.81,
+          "p50Ms": 938.68,
+          "p95Ms": 972.63,
+          "maximumMs": 984.3,
+          "meanMs": 942.47
+        }
+      },
+      {
+        "startCycle": 125,
+        "endCycle": 155,
+        "latency": {
+          "minimumMs": 914.29,
+          "p50Ms": 952.1,
+          "p95Ms": 992.64,
+          "maximumMs": 994.4,
+          "meanMs": 952.73
+        }
+      },
+      {
+        "startCycle": 156,
+        "endCycle": 186,
+        "latency": {
+          "minimumMs": 933.46,
+          "p50Ms": 975.94,
+          "p95Ms": 1014.38,
+          "maximumMs": 1016.39,
+          "meanMs": 973.91
+        }
+      },
+      {
+        "startCycle": 187,
+        "endCycle": 217,
+        "latency": {
+          "minimumMs": 961.38,
+          "p50Ms": 975.61,
+          "p95Ms": 1018.04,
+          "maximumMs": 1056.17,
+          "meanMs": 981.06
+        }
+      },
+      {
+        "startCycle": 218,
+        "endCycle": 248,
+        "latency": {
+          "minimumMs": 963.96,
+          "p50Ms": 972.4,
+          "p95Ms": 989.81,
+          "maximumMs": 991,
+          "meanMs": 973.41
+        }
+      },
+      {
+        "startCycle": 249,
+        "endCycle": 279,
+        "latency": {
+          "minimumMs": 962.63,
+          "p50Ms": 974.64,
+          "p95Ms": 1001.82,
+          "maximumMs": 1038.66,
+          "meanMs": 978.23
+        }
+      },
+      {
+        "startCycle": 280,
+        "endCycle": 301,
+        "latency": {
+          "minimumMs": 966.52,
+          "p50Ms": 977.5,
+          "p95Ms": 999.33,
+          "maximumMs": 1006.6,
+          "meanMs": 981.34
+        }
+      }
+    ],
+    "phases": {
+      "readChapter": {
+        "durationMs": 1901,
+        "latency": {
+          "minimumMs": 5.05,
+          "p50Ms": 5.67,
+          "p95Ms": 12.56,
+          "maximumMs": 14.53,
+          "meanMs": 6.31
+        }
+      },
+      "stageCandidate": {
+        "durationMs": 65792,
+        "latency": {
+          "minimumMs": 202.65,
+          "p50Ms": 219.48,
+          "p95Ms": 229.85,
+          "maximumMs": 253.7,
+          "meanMs": 218.58
+        }
+      },
+      "acceptCandidate": {
+        "durationMs": 221443,
+        "latency": {
+          "minimumMs": 691.47,
+          "p50Ms": 739.84,
+          "p95Ms": 764.17,
+          "maximumMs": 809.64,
+          "meanMs": 735.69
+        }
+      }
+    },
+    "restartProof": {
+      "atChapter": 350,
+      "newProcessCliExitCode": 0,
+      "recoveredHead": "5ab32537-b5c8-5bc6-9bba-016d255d60f1"
+    },
+    "finalHeadChapter": 500,
+    "rebuildCleared": true
+  },
+  "faultInjection": {
+    "expected": {
+      "doubleWriter": "chapter_write_lease_conflict",
+      "emptyDelta": "state_delta_required",
+      "unknownEntity": "invalid_reference",
+      "wrongCast": "invalid_reference",
+      "agentSelfAccept": "actor_forbidden",
+      "rebuildOutOfOrder": "state_rebuild_out_of_order"
+    },
+    "actual": {
+      "doubleWriter": "chapter_write_lease_conflict",
+      "emptyDelta": "state_delta_required",
+      "unknownEntity": "invalid_reference",
+      "wrongCast": "invalid_reference",
+      "agentSelfAccept": "actor_forbidden",
+      "rebuildOutOfOrder": "state_rebuild_out_of_order"
+    },
+    "allFailedClosed": true,
+    "futureSecretAbsentFromPack": true
+  },
+  "cutoffOracle": [
+    {
+      "label": "before-retcon-history",
+      "actual": "稳定-original-199",
+      "expected": "稳定-original-199",
+      "pass": true
+    },
+    {
+      "label": "retcon-boundary-before",
+      "actual": "稳定-original-199",
+      "expected": "稳定-original-199",
+      "pass": true
+    },
+    {
+      "label": "retcon-boundary-through",
+      "actual": "稳定-rebuild-200",
+      "expected": "稳定-rebuild-200",
+      "pass": true
+    },
+    {
+      "label": "final-through",
+      "actual": "稳定-rebuild-500",
+      "expected": "稳定-rebuild-500",
+      "pass": true
+    }
+  ],
+  "storage": {
+    "writingStateBytes": 915062,
+    "writingStateRevision": 803,
+    "characterStateHistoryRecords": 501,
+    "chapterCompletions": 501,
+    "immutableCandidates": 801,
+    "immutableDecisions": 801,
+    "rebuildLineages": 1,
+    "historyEvents": 802,
+    "historyCheckpoints": 803,
+    "fullLineageVerifiedEvents": 802,
+    "leaseFileBytes": 1162,
+    "liveOrStaleLeaseRecordsAfterPruning": 1,
+    "peakRssBytes": 556990464
+  },
+  "programGuarantees": [
+    "cutoff projection and future-secret filtering",
+    "required cast plus structured character profile formal gate",
+    "chapter lease plus revision/SHA CAS",
+    "evidence-bound state candidate plus human owner decision",
+    "append-only dynamic history and ordered retcon rebuild",
+    "append-only state events/checkpoints plus shadow rebuild and full-lineage verification",
+    "new-process durable state recovery"
+  ],
+  "limitations": [
+    "规模循环使用确定性夹具，不代表真实文学质量或真实外部模型表现。",
+    "中间章节使用同一 Repository/Core 写锁路径以控制验收时长；第1、中点、末章额外穿过 command bus actor/lease 外层。",
+    "机械 PASS 不证明人物魅力、心理真实、节奏或文风，仍需独立模型与人工审稿。"
+  ]
+}

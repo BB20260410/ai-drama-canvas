@@ -1,0 +1,95 @@
+{
+  "search": [
+    {
+      "query": "易航",
+      "ms": 377.8,
+      "hits": 10,
+      "scanned": 12,
+      "external": 0,
+      "locator_ok": true,
+      "text": "易航",
+      "expected_len": 2,
+      "sha_ok": true,
+      "rev_ok": true,
+      "chapterTitle": "第001章 缴费单与黑页",
+      "offsetEncoding": "utf16-code-unit"
+    },
+    {
+      "query": "黑页",
+      "ms": 378.2,
+      "hits": 10,
+      "scanned": 12,
+      "external": 0,
+      "locator_ok": true,
+      "text": "黑页",
+      "expected_len": 2,
+      "sha_ok": true,
+      "rev_ok": true,
+      "chapterTitle": "第001章 缴费单与黑页",
+      "offsetEncoding": "utf16-code-unit"
+    },
+    {
+      "query": "担保链",
+      "ms": 385.2,
+      "hits": 10,
+      "scanned": 12,
+      "external": 0,
+      "locator_ok": true,
+      "text": "担保链",
+      "expected_len": 3,
+      "sha_ok": true,
+      "rev_ok": true,
+      "chapterTitle": "第001章 缴费单与黑页",
+      "offsetEncoding": "utf16-code-unit"
+    }
+  ],
+  "preflight12": {
+    "ready": false,
+    "id": "novel-write-preflight-47ac9f52ff387b6d381c638c",
+    "blockers": [
+      {
+        "code": "context_preflight_stale",
+        "chapterId": "f4ff96c2-8338-5330-bf50-98c519ce0306",
+        "message": "提交的context pack fingerprint已过期或与当前组包参数不一致。",
+        "nextAction": "使用currentContextPackFingerprint对应的新pack重新preflight"
+      }
+    ]
+  },
+  "pack12": {
+    "fp": "10b60fe7f57f3eb54bf6ebc8a85a837f7b977fd24d52e573626e1a47f7157192",
+    "leak": [],
+    "budget": {
+      "maximumCharacters": 60000,
+      "usedCharacters": 19781,
+      "reservedCharacters": 2957,
+      "truncated": false,
+      "omitted": []
+    },
+    "sections": {
+      "hardCanon": 24,
+      "taskBrief": false,
+      "entities": 17,
+      "characterStates": 8,
+      "knowledge": 150,
+      "relationships": 5,
+      "timeline": 11,
+      "foreshadowing": 28
+    }
+  },
+  "state": {
+    "baseline": "provisional",
+    "through": "c617bef1-6979-536c-9360-ba0945102bc4",
+    "revision": 2,
+    "counts": {
+      "entities": 17,
+      "characterStates": 8,
+      "knowledge": 173,
+      "relationships": 5,
+      "timeline": 11,
+      "foreshadowing": 28,
+      "hardCanon": 29,
+      "sources": 26,
+      "completions": 11
+    }
+  }
+}

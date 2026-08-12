@@ -1,0 +1,1807 @@
+{
+  "schemaVersion": 1,
+  "runId": "isolated-package-smoke-20260811T135156740Z-40707-5cc1e150",
+  "startedAt": "2026-08-11T13:51:56.742Z",
+  "generatedAt": "2026-08-11T13:56:57.076Z",
+  "status": "finalization-pending",
+  "scope": "current-source-isolated-unpacked-app-validation",
+  "authorizationBoundary": {
+    "formalProjectUsed": false,
+    "externalWebsiteUsed": false,
+    "uploadUsed": false,
+    "paidActionUsed": false,
+    "installed": false,
+    "published": false,
+    "dmgGenerated": false,
+    "developerIdSigningRequested": false,
+    "notarizationRequested": false,
+    "workspaceDistOverwritten": false,
+    "closesRealProjectNleValidation": false
+  },
+  "package": {
+    "tempRoot": "/private/tmp/aic-pkg-S2LZob",
+    "stageRoot": "/private/tmp/aic-pkg-S2LZob/stage",
+    "builderOutput": "/private/tmp/aic-pkg-S2LZob/stage/builder-output",
+    "appPath": "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app",
+    "executablePath": "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+    "builderArgs": [
+      "--mac",
+      "--dir",
+      "--publish",
+      "never",
+      "-c.directories.output=/private/tmp/aic-pkg-S2LZob/stage/builder-output",
+      "-c.mac.identity=null",
+      "-c.mac.notarize=false",
+      "-c.forceCodeSigning=false",
+      "-c.npmRebuild=false",
+      "-c.electronDist=/private/tmp/aic-pkg-S2LZob/stage/node_modules/electron/dist"
+    ],
+    "stageInputs": [
+      "electron.vite.config.ts",
+      "package-lock.json",
+      "package.json",
+      "tsconfig.app.json",
+      "tsconfig.json",
+      "tsconfig.mcp.json",
+      "tsconfig.node.json",
+      "tsconfig.production-runs.json",
+      "tsconfig.web.json",
+      "vitest.config.ts",
+      "src",
+      "scripts",
+      "tests",
+      "build"
+    ],
+    "stageSource": {
+      "fileCount": 337,
+      "bytes": 10746313,
+      "sha256": "1a8e19acd13e4c7727fe183967b536404665cb5919f0b63732a271d5b791d6b6"
+    },
+    "workspaceSource": {
+      "fileCount": 337,
+      "bytes": 10746313,
+      "sha256": "1a8e19acd13e4c7727fe183967b536404665cb5919f0b63732a271d5b791d6b6"
+    },
+    "stageSourceIdentity": {
+      "sourceDigest": "954ac71a461be527530a96709983741c5f0d1f9ae05a97f57605af5ded39d585",
+      "sourceFiles": 1046,
+      "sourceBytes": 20793529
+    },
+    "workspaceSourceIdentity": {
+      "sourceDigest": "954ac71a461be527530a96709983741c5f0d1f9ae05a97f57605af5ded39d585",
+      "sourceFiles": 1046,
+      "sourceBytes": 20793529
+    },
+    "workspaceSourceIdentityAfter": {
+      "sourceDigest": "954ac71a461be527530a96709983741c5f0d1f9ae05a97f57605af5ded39d585",
+      "sourceFiles": 1046,
+      "sourceBytes": 20793529
+    },
+    "stageSourceSymlinkCount": 0,
+    "stageInstalledSymlinkCount": 71,
+    "lockfileInstall": {
+      "command": [
+        "npm",
+        "ci",
+        "--include=dev",
+        "--no-audit",
+        "--no-fund",
+        "--registry=https://registry.npmjs.org"
+      ],
+      "registry": "https://registry.npmjs.org",
+      "workspaceNodeModulesCopied": false,
+      "productionDependencyHealth": {
+        "schemaVersion": 1,
+        "status": "passed",
+        "problemCount": 3,
+        "acceptedOptionalProblems": [
+          {
+            "name": "@emnapi/runtime",
+            "version": "1.11.3",
+            "rootDependency": "sharp",
+            "dependencyPath": [
+              "sharp",
+              "@img/sharp-freebsd-wasm32",
+              "@img/sharp-wasm32",
+              "@emnapi/runtime"
+            ],
+            "reason": "lockfile-optional-chain"
+          },
+          {
+            "name": "@img/sharp-wasm32",
+            "version": "0.35.3",
+            "rootDependency": "sharp",
+            "dependencyPath": [
+              "sharp",
+              "@img/sharp-freebsd-wasm32",
+              "@img/sharp-wasm32"
+            ],
+            "reason": "lockfile-optional-chain"
+          },
+          {
+            "name": "tslib",
+            "version": "2.8.1",
+            "rootDependency": "sharp",
+            "dependencyPath": [
+              "sharp",
+              "@img/sharp-freebsd-wasm32",
+              "@img/sharp-wasm32",
+              "@emnapi/runtime",
+              "tslib"
+            ],
+            "reason": "lockfile-optional-chain"
+          }
+        ],
+        "rejectedProblems": []
+      }
+    },
+    "electronArchive": {
+      "path": "/private/tmp/aic-pkg-S2LZob/stage/node_modules/electron/dist/electron-v43.1.0-darwin-arm64.zip",
+      "exists": true,
+      "bytes": 119731125,
+      "mtimeMs": 1786456456839.2869,
+      "sha256": "ee4010b161857b3a0898b0affe3bccd1267173080c4535503904ffd6fbdab942"
+    },
+    "electronBinaryProvenance": {
+      "packageDirectSpec": "43.1.0",
+      "lockEntryVersion": "43.1.0",
+      "installedPackageVersion": "43.1.0",
+      "distVersion": "43.1.0",
+      "executableRelativePath": "Electron.app/Contents/MacOS/Electron",
+      "executableBytes": 33968,
+      "executableMode": 33261,
+      "architectures": [
+        "arm64"
+      ],
+      "archiveName": "electron-v43.1.0-darwin-arm64.zip",
+      "archiveBytes": 119731125,
+      "archiveEntries": [
+        "Electron.app/",
+        "Electron.app/Contents/",
+        "Electron.app/Contents/MacOS/",
+        "Electron.app/Contents/MacOS/Electron",
+        "Electron.app/Contents/Resources/",
+        "Electron.app/Contents/Resources/de.lproj/",
+        "Electron.app/Contents/Resources/ur.lproj/",
+        "Electron.app/Contents/Resources/he.lproj/",
+        "Electron.app/Contents/Resources/ar.lproj/",
+        "Electron.app/Contents/Resources/el.lproj/",
+        "Electron.app/Contents/Resources/ja.lproj/",
+        "Electron.app/Contents/Resources/fa.lproj/",
+        "Electron.app/Contents/Resources/mr.lproj/",
+        "Electron.app/Contents/Resources/en.lproj/",
+        "Electron.app/Contents/Resources/uk.lproj/",
+        "Electron.app/Contents/Resources/es_419.lproj/",
+        "Electron.app/Contents/Resources/gu.lproj/",
+        "Electron.app/Contents/Resources/zh_CN.lproj/",
+        "Electron.app/Contents/Resources/kn.lproj/",
+        "Electron.app/Contents/Resources/electron.icns",
+        "Electron.app/Contents/Resources/nb.lproj/",
+        "Electron.app/Contents/Resources/am.lproj/",
+        "Electron.app/Contents/Resources/es.lproj/",
+        "Electron.app/Contents/Resources/sw.lproj/",
+        "Electron.app/Contents/Resources/sl.lproj/",
+        "Electron.app/Contents/Resources/pt_BR.lproj/",
+        "Electron.app/Contents/Resources/da.lproj/",
+        "Electron.app/Contents/Resources/et.lproj/",
+        "Electron.app/Contents/Resources/it.lproj/",
+        "Electron.app/Contents/Resources/bg.lproj/",
+        "Electron.app/Contents/Resources/sk.lproj/",
+        "Electron.app/Contents/Resources/pt_PT.lproj/",
+        "Electron.app/Contents/Resources/sr.lproj/",
+        "Electron.app/Contents/Resources/ms.lproj/",
+        "Electron.app/Contents/Resources/ta.lproj/",
+        "Electron.app/Contents/Resources/ml.lproj/",
+        "Electron.app/Contents/Resources/sv.lproj/",
+        "Electron.app/Contents/Resources/te.lproj/",
+        "Electron.app/Contents/Resources/cs.lproj/",
+        "Electron.app/Contents/Resources/ko.lproj/",
+        "Electron.app/Contents/Resources/fil.lproj/",
+        "Electron.app/Contents/Resources/hu.lproj/",
+        "Electron.app/Contents/Resources/tr.lproj/",
+        "Electron.app/Contents/Resources/pl.lproj/",
+        "Electron.app/Contents/Resources/zh_TW.lproj/",
+        "Electron.app/Contents/Resources/en_GB.lproj/",
+        "Electron.app/Contents/Resources/vi.lproj/",
+        "Electron.app/Contents/Resources/lv.lproj/",
+        "Electron.app/Contents/Resources/lt.lproj/",
+        "Electron.app/Contents/Resources/ru.lproj/",
+        "Electron.app/Contents/Resources/af.lproj/",
+        "Electron.app/Contents/Resources/fr.lproj/",
+        "Electron.app/Contents/Resources/fi.lproj/",
+        "Electron.app/Contents/Resources/default_app.asar",
+        "Electron.app/Contents/Resources/id.lproj/",
+        "Electron.app/Contents/Resources/nl.lproj/",
+        "Electron.app/Contents/Resources/th.lproj/",
+        "Electron.app/Contents/Resources/bn.lproj/",
+        "Electron.app/Contents/Resources/ro.lproj/",
+        "Electron.app/Contents/Resources/hr.lproj/",
+        "Electron.app/Contents/Resources/hi.lproj/",
+        "Electron.app/Contents/Resources/ca.lproj/",
+        "Electron.app/Contents/Frameworks/",
+        "Electron.app/Contents/Frameworks/Electron Helper (Renderer).app/",
+        "Electron.app/Contents/Frameworks/Electron Helper (Renderer).app/Contents/",
+        "Electron.app/Contents/Frameworks/Electron Helper (Renderer).app/Contents/MacOS/",
+        "Electron.app/Contents/Frameworks/Electron Helper (Renderer).app/Contents/MacOS/Electron Helper (Renderer)",
+        "Electron.app/Contents/Frameworks/Electron Helper (Renderer).app/Contents/Info.plist",
+        "Electron.app/Contents/Frameworks/Electron Helper (Renderer).app/Contents/PkgInfo",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Electron Framework",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Resources",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/id_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/id_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/de.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/de.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sw_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sw_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sw_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sw_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ur.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ur.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/he.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/he.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/he_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/he_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ru_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ru_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sk_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sk_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ar.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ar.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/el.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/el.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ja.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ja.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/th_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/th_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/uk_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/uk_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fa.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fa.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hi_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hi_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/mr.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/mr.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/am_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/am_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/te_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/te_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/gu_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/gu_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ja_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ja_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ja_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ja_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/mr_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/mr_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nb_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nb_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/et_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/et_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sl_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sl_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/he_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/he_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/chrome_200_percent.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/uk.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/uk.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/tr_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/tr_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_419.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_419.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/gu.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/gu.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ko_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ko_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_CN.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_CN.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fi_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fi_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/kn.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/kn.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sv_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sv_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bn_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bn_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nb.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nb.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fil_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fil_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ml_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ml_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lv_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lv_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ms_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ms_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/chrome_100_percent.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/th_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/th_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nl_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nl_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/id_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/id_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/am.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/am.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ro_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ro_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ur_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ur_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/cs_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/cs_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sw.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sw.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/et_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/et_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sl.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sl.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_BR.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_BR.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_PT_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_PT_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/da.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/da.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_CN_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_CN_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/af_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/af_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/kn_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/kn_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fil_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fil_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_TW_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_TW_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/et.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/et.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ms_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ms_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/it.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/it.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bg.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bg.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sk.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sk.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lv_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lv_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/it_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/it_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ta_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ta_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_PT.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_PT.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ta_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ta_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sk_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sk_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ko_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ko_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/icudtl.dat",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/cs_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/cs_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ur_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ur_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/uk_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/uk_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/af_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/af_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ar_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ar_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ml_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ml_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hi_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hi_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/te_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/te_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lt_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lt_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sr.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sr.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ms.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ms.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ca_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ca_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ta.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ta.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/he_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/he_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_419_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_419_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_TW_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_TW_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ml.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ml.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sv.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sv.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/da_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/da_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/kn_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/kn_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sv_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sv_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nl_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nl_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/te.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/te.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/mr_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/mr_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/cs.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/cs.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_GB_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_GB_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_PT_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_PT_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fi_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fi_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ko.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ko.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sl_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sl_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lv_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lv_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fil.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fil.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/da_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/da_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_BR_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_BR_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/th_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/th_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fa_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fa_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nb_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nb_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/MainMenu.nib",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/af_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/af_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ru_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ru_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bg_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bg_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/vi_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/vi_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ca_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ca_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hu.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hu.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/v8_context_snapshot.arm64.bin",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ko_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ko_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hr_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hr_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hu_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hu_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_TW_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_TW_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_PT_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_PT_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ro_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ro_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sr_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sr_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ta_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ta_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/tr.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/tr.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_BR_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_BR_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pl.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pl.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bg_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bg_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_TW.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_TW.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ml_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ml_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ca_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ca_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fr_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fr_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pl_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pl_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ar_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ar_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_GB.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_GB.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_419_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_419_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/resources.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_GB_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_GB_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/mr_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/mr_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/de_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/de_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/vi.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/vi.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/tr_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/tr_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/cs_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/cs_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fil_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fil_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hi_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hi_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_419_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_419_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/it_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/it_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lt_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lt_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lv.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lv.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/kn_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/kn_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lt.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lt.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ru.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ru.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/am_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/am_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/da_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/da_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pl_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pl_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fa_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fa_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/el_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/el_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_CN_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_CN_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lt_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lt_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fr_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fr_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/af.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/af.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_BR_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_BR_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/id_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/id_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ar_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ar_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bg_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bg_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_GB_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_GB_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bn_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bn_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ur_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ur_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ja_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ja_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fr.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fr.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/it_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/it_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fi.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fi.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/id.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/id.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/gu_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/gu_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nl.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nl.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/th.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/th.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fi_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fi_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sv_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sv_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ms_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ms_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nb_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nb_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/am_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/am_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bn.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bn.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/te_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/te_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sl_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sl_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/vi_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/vi_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sk_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sk_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/tr_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/tr_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hr_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hr_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hr_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hr_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hu_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hu_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sr_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sr_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ru_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ru_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ro.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ro.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/et_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/et_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/de_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/de_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/uk_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/uk_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fa_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fa_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/el_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/el_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/de_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/de_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pl_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pl_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/gu_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/gu_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/Info.plist",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bn_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bn_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hu_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hu_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/vi_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/vi_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/el_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/el_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sr_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sr_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sw_FEMININE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sw_FEMININE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hr.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hr.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hi.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hi.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ro_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ro_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ca.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ca.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fr_NEUTER.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fr_NEUTER.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nl_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nl_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_CN_MASCULINE.lproj/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_CN_MASCULINE.lproj/locale.pak",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libEGL.dylib",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/vk_swiftshader_icd.json",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libvk_swiftshader.dylib",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libGLESv2.dylib",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libffmpeg.dylib",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Helpers/",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Helpers/chrome_crashpad_handler",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/Current",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Libraries",
+        "Electron.app/Contents/Frameworks/Electron Framework.framework/Helpers",
+        "Electron.app/Contents/Frameworks/ReactiveObjC.framework/",
+        "Electron.app/Contents/Frameworks/ReactiveObjC.framework/Resources",
+        "Electron.app/Contents/Frameworks/ReactiveObjC.framework/ReactiveObjC",
+        "Electron.app/Contents/Frameworks/ReactiveObjC.framework/Versions/",
+        "Electron.app/Contents/Frameworks/ReactiveObjC.framework/Versions/A/",
+        "Electron.app/Contents/Frameworks/ReactiveObjC.framework/Versions/A/Resources/",
+        "Electron.app/Contents/Frameworks/ReactiveObjC.framework/Versions/A/Resources/Info.plist",
+        "Electron.app/Contents/Frameworks/ReactiveObjC.framework/Versions/A/ReactiveObjC",
+        "Electron.app/Contents/Frameworks/ReactiveObjC.framework/Versions/Current",
+        "Electron.app/Contents/Frameworks/Squirrel.framework/",
+        "Electron.app/Contents/Frameworks/Squirrel.framework/Resources",
+        "Electron.app/Contents/Frameworks/Squirrel.framework/Versions/",
+        "Electron.app/Contents/Frameworks/Squirrel.framework/Versions/A/",
+        "Electron.app/Contents/Frameworks/Squirrel.framework/Versions/A/Resources/",
+        "Electron.app/Contents/Frameworks/Squirrel.framework/Versions/A/Resources/ShipIt",
+        "Electron.app/Contents/Frameworks/Squirrel.framework/Versions/A/Resources/Info.plist",
+        "Electron.app/Contents/Frameworks/Squirrel.framework/Versions/A/Squirrel",
+        "Electron.app/Contents/Frameworks/Squirrel.framework/Versions/Current",
+        "Electron.app/Contents/Frameworks/Squirrel.framework/Squirrel",
+        "Electron.app/Contents/Frameworks/Mantle.framework/",
+        "Electron.app/Contents/Frameworks/Mantle.framework/Mantle",
+        "Electron.app/Contents/Frameworks/Mantle.framework/Resources",
+        "Electron.app/Contents/Frameworks/Mantle.framework/Versions/",
+        "Electron.app/Contents/Frameworks/Mantle.framework/Versions/A/",
+        "Electron.app/Contents/Frameworks/Mantle.framework/Versions/A/Mantle",
+        "Electron.app/Contents/Frameworks/Mantle.framework/Versions/A/Resources/",
+        "Electron.app/Contents/Frameworks/Mantle.framework/Versions/A/Resources/Info.plist",
+        "Electron.app/Contents/Frameworks/Mantle.framework/Versions/Current",
+        "Electron.app/Contents/Frameworks/Electron Helper (Plugin).app/",
+        "Electron.app/Contents/Frameworks/Electron Helper (Plugin).app/Contents/",
+        "Electron.app/Contents/Frameworks/Electron Helper (Plugin).app/Contents/MacOS/",
+        "Electron.app/Contents/Frameworks/Electron Helper (Plugin).app/Contents/MacOS/Electron Helper (Plugin)",
+        "Electron.app/Contents/Frameworks/Electron Helper (Plugin).app/Contents/Info.plist",
+        "Electron.app/Contents/Frameworks/Electron Helper (Plugin).app/Contents/PkgInfo",
+        "Electron.app/Contents/Frameworks/Electron Helper (GPU).app/",
+        "Electron.app/Contents/Frameworks/Electron Helper (GPU).app/Contents/",
+        "Electron.app/Contents/Frameworks/Electron Helper (GPU).app/Contents/MacOS/",
+        "Electron.app/Contents/Frameworks/Electron Helper (GPU).app/Contents/MacOS/Electron Helper (GPU)",
+        "Electron.app/Contents/Frameworks/Electron Helper (GPU).app/Contents/Info.plist",
+        "Electron.app/Contents/Frameworks/Electron Helper (GPU).app/Contents/PkgInfo",
+        "Electron.app/Contents/Frameworks/Electron Helper.app/",
+        "Electron.app/Contents/Frameworks/Electron Helper.app/Contents/",
+        "Electron.app/Contents/Frameworks/Electron Helper.app/Contents/MacOS/",
+        "Electron.app/Contents/Frameworks/Electron Helper.app/Contents/MacOS/Electron Helper",
+        "Electron.app/Contents/Frameworks/Electron Helper.app/Contents/Info.plist",
+        "Electron.app/Contents/Frameworks/Electron Helper.app/Contents/PkgInfo",
+        "Electron.app/Contents/Info.plist",
+        "Electron.app/Contents/PkgInfo"
+      ]
+    },
+    "electronCacheSeed": {
+      "archiveName": "electron-v43.1.0-darwin-arm64.zip",
+      "expectedSha256": "2ee24f768c41bc2ed9bd580d7797b185dffb550dafca59c2cd08b51965bcda3a",
+      "seeded": true,
+      "sourcePath": "/Users/hxx/Library/Caches/electron/a791fa12f2db1c58c084ec41c5caf1ac518de84788ba857a6bebef2fe9349ed3/electron-v43.1.0-darwin-arm64.zip",
+      "targetPath": "/private/tmp/aic-pkg-S2LZob/electron-download-cache/a791fa12f2db1c58c084ec41c5caf1ac518de84788ba857a6bebef2fe9349ed3/electron-v43.1.0-darwin-arm64.zip",
+      "sourceSha256": "2ee24f768c41bc2ed9bd580d7797b185dffb550dafca59c2cd08b51965bcda3a",
+      "targetSha256": "2ee24f768c41bc2ed9bd580d7797b185dffb550dafca59c2cd08b51965bcda3a"
+    },
+    "builderEnvironment": {
+      "HOME": "/private/tmp/aic-pkg-S2LZob/home",
+      "TMPDIR": "/private/tmp/aic-pkg-S2LZob/t",
+      "APP_BUILDER_TMP_DIR": "/private/tmp/aic-pkg-S2LZob/app-builder-tmp",
+      "ELECTRON_BUILDER_CACHE": "/private/tmp/aic-pkg-S2LZob/electron-builder-cache",
+      "electron_config_cache": "/private/tmp/aic-pkg-S2LZob/electron-download-cache",
+      "npm_config_cache": "/private/tmp/aic-pkg-S2LZob/npm-cache",
+      "CSC_IDENTITY_AUTO_DISCOVERY": "false",
+      "clearedSigningEnvironmentKeys": [
+        "CSC_LINK",
+        "CSC_KEY_PASSWORD",
+        "CSC_NAME",
+        "APPLE_ID",
+        "APPLE_APP_SPECIFIC_PASSWORD",
+        "APPLE_TEAM_ID",
+        "APPLE_API_KEY",
+        "APPLE_API_KEY_ID",
+        "APPLE_API_ISSUER",
+        "APPLE_KEYCHAIN",
+        "APPLE_KEYCHAIN_PROFILE"
+      ]
+    },
+    "packagedRuntimeEnvironment": {
+      "HOME": "/private/tmp/aic-pkg-S2LZob/home",
+      "TMPDIR": "/private/tmp/aic-pkg-S2LZob/t",
+      "AI_CANVAS_REGISTRY_PATH": "/private/tmp/aic-pkg-S2LZob/runtime/projects.json",
+      "AI_CANVAS_MEDIA_RUNTIME_DIR": "/private/tmp/aic-pkg-S2LZob/runtime/media-v1",
+      "AI_CANVAS_PROJECT_ROOT": "/private/tmp/aic-pkg-S2LZob/runtime/project-root"
+    },
+    "appBundle": {
+      "fileCount": 8349,
+      "bytes": 390000494,
+      "sha256": "b04461509094e4db80e7e0c0eda45d59346a1f0fcac74cf5311098920dc0d417"
+    },
+    "executable": {
+      "path": "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+      "exists": true,
+      "bytes": 33968,
+      "mtimeMs": 1786456457853.0393,
+      "sha256": "69cb21f64c53c751678957803b2d82d2d5d7f054afd570267eda21179cbff136"
+    },
+    "executableArchitecture": "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布: Mach-O 64-bit executable arm64",
+    "bundleIdentity": {
+      "identifier": "com.hxx.aidramacanvas",
+      "version": "0.2.0",
+      "name": "AI 漫剧画布"
+    },
+    "appAsar": {
+      "path": "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Resources/app.asar",
+      "exists": true,
+      "bytes": 11510212,
+      "mtimeMs": 1786456521877.593,
+      "sha256": "cb66779f7972ce6c49a6c8116957b78a7941bd5ded6bd57538da71df8b9c11ce"
+    },
+    "currentOut": {
+      "fileCount": 108,
+      "bytes": 9392817,
+      "sha256": "e4ff122b57f556ebe5d37dc4e7dff6c508b2720096cb05aa5fb8ccf1af39bcd6"
+    },
+    "packagedOut": {
+      "fileCount": 108,
+      "bytes": 9392817,
+      "sha256": "e4ff122b57f556ebe5d37dc4e7dff6c508b2720096cb05aa5fb8ccf1af39bcd6"
+    },
+    "currentMcp": {
+      "fileCount": 476,
+      "bytes": 13856859,
+      "sha256": "e20b95a3cbf97f938e6a27b59fd5c5f9194cdcafa4eeb48635b8a01f04573c3e"
+    },
+    "packagedMcp": {
+      "fileCount": 476,
+      "bytes": 13856859,
+      "sha256": "e20b95a3cbf97f938e6a27b59fd5c5f9194cdcafa4eeb48635b8a01f04573c3e"
+    },
+    "packagedMcpServer": {
+      "path": "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Resources/app.asar.unpacked/dist-mcp/mcp/server.js",
+      "exists": true,
+      "bytes": 375865,
+      "mtimeMs": 1786456521850.1292,
+      "sha256": "21b67160552e9371a24caf5783a9169ca62224b69e3052f2e051e5dd2dbdaa45"
+    },
+    "packagedMcpSdkVersion": "1.30.0",
+    "stageMcpSdkVersion": "1.30.0",
+    "mcpSdkVersionIdentity": {
+      "dependencyName": "@modelcontextprotocol/sdk",
+      "packageDirectSpec": "1.30.0",
+      "lockRootSpec": "1.30.0",
+      "lockEntryVersion": "1.30.0",
+      "stageInstalledVersion": "1.30.0",
+      "packagedInstalledVersion": "1.30.0"
+    },
+    "directProductionDependencyIdentities": [
+      {
+        "dependencyName": "@modelcontextprotocol/sdk",
+        "packageDirectSpec": "1.30.0",
+        "lockRootSpec": "1.30.0",
+        "lockEntryVersion": "1.30.0",
+        "stageInstalledVersion": "1.30.0",
+        "packagedInstalledVersion": "1.30.0"
+      },
+      {
+        "dependencyName": "@vue-flow/background",
+        "packageDirectSpec": "1.3.2",
+        "lockRootSpec": "1.3.2",
+        "lockEntryVersion": "1.3.2",
+        "stageInstalledVersion": "1.3.2",
+        "packagedInstalledVersion": "1.3.2"
+      },
+      {
+        "dependencyName": "@vue-flow/controls",
+        "packageDirectSpec": "1.1.3",
+        "lockRootSpec": "1.1.3",
+        "lockEntryVersion": "1.1.3",
+        "stageInstalledVersion": "1.1.3",
+        "packagedInstalledVersion": "1.1.3"
+      },
+      {
+        "dependencyName": "@vue-flow/core",
+        "packageDirectSpec": "1.48.2",
+        "lockRootSpec": "1.48.2",
+        "lockEntryVersion": "1.48.2",
+        "stageInstalledVersion": "1.48.2",
+        "packagedInstalledVersion": "1.48.2"
+      },
+      {
+        "dependencyName": "@vue-flow/minimap",
+        "packageDirectSpec": "^1.5.4",
+        "lockRootSpec": "^1.5.4",
+        "lockEntryVersion": "1.5.4",
+        "stageInstalledVersion": "1.5.4",
+        "packagedInstalledVersion": "1.5.4"
+      },
+      {
+        "dependencyName": "chokidar",
+        "packageDirectSpec": "4.0.3",
+        "lockRootSpec": "4.0.3",
+        "lockEntryVersion": "4.0.3",
+        "stageInstalledVersion": "4.0.3",
+        "packagedInstalledVersion": "4.0.3"
+      },
+      {
+        "dependencyName": "fast-glob",
+        "packageDirectSpec": "3.3.3",
+        "lockRootSpec": "3.3.3",
+        "lockEntryVersion": "3.3.3",
+        "stageInstalledVersion": "3.3.3",
+        "packagedInstalledVersion": "3.3.3"
+      },
+      {
+        "dependencyName": "lucide-vue-next",
+        "packageDirectSpec": "0.468.0",
+        "lockRootSpec": "0.468.0",
+        "lockEntryVersion": "0.468.0",
+        "stageInstalledVersion": "0.468.0",
+        "packagedInstalledVersion": "0.468.0"
+      },
+      {
+        "dependencyName": "mammoth",
+        "packageDirectSpec": "^1.12.0",
+        "lockRootSpec": "^1.12.0",
+        "lockEntryVersion": "1.12.0",
+        "stageInstalledVersion": "1.12.0",
+        "packagedInstalledVersion": "1.12.0"
+      },
+      {
+        "dependencyName": "sharp",
+        "packageDirectSpec": "0.35.3",
+        "lockRootSpec": "0.35.3",
+        "lockEntryVersion": "0.35.3",
+        "stageInstalledVersion": "0.35.3",
+        "packagedInstalledVersion": "0.35.3"
+      },
+      {
+        "dependencyName": "undici",
+        "packageDirectSpec": "7.29.0",
+        "lockRootSpec": "7.29.0",
+        "lockEntryVersion": "7.29.0",
+        "stageInstalledVersion": "7.29.0",
+        "packagedInstalledVersion": "7.29.0"
+      },
+      {
+        "dependencyName": "vue",
+        "packageDirectSpec": "3.5.39",
+        "lockRootSpec": "3.5.39",
+        "lockEntryVersion": "3.5.39",
+        "stageInstalledVersion": "3.5.39",
+        "packagedInstalledVersion": "3.5.39"
+      },
+      {
+        "dependencyName": "zod",
+        "packageDirectSpec": "4.3.5",
+        "lockRootSpec": "4.3.5",
+        "lockEntryVersion": "4.3.5",
+        "stageInstalledVersion": "4.3.5",
+        "packagedInstalledVersion": "4.3.5"
+      }
+    ],
+    "releaseManifest": {
+      "schemaVersion": 1,
+      "kind": "ai-drama-canvas-release-manifest",
+      "version": "0.2.0",
+      "architecture": "arm64",
+      "sourceDigest": "954ac71a461be527530a96709983741c5f0d1f9ae05a97f57605af5ded39d585",
+      "buildId": "c7cb5ceec93ad2704422f4657f14f932",
+      "buildIdentityFingerprint": "e3f7696acccd3baaf75699f67ba6451ce28bc76e558c47e0ff295f66fc4679ad",
+      "protocolVersion": "1.1",
+      "mcpToolCount": 220,
+      "builtAt": "2026-08-11T13:53:51.997Z",
+      "distribution": "local-only",
+      "localOnly": true,
+      "source": {
+        "files": 1046,
+        "bytes": 20793529
+      },
+      "fingerprint": "9b28ad12d1f3770bf2ac75791f0f9e36db1357d0267763e3879fba070e459f9c"
+    },
+    "stageMcpCapabilities": {
+      "toolCount": 220,
+      "resourceTemplateCount": 9,
+      "promptCount": 8
+    },
+    "packageJson": {
+      "name": "ai-drama-canvas",
+      "version": "0.2.0",
+      "private": true,
+      "description": "本地优先的 AI 漫剧无限画布与 Codex 接续系统",
+      "author": "hxx",
+      "type": "module",
+      "main": "out/main/index.js",
+      "bin": {
+        "ai-drama-canvas-mcp": "dist-mcp/mcp/server.js"
+      },
+      "dependencies": {
+        "@modelcontextprotocol/sdk": "1.30.0",
+        "@vue-flow/background": "1.3.2",
+        "@vue-flow/controls": "1.1.3",
+        "@vue-flow/core": "1.48.2",
+        "@vue-flow/minimap": "^1.5.4",
+        "chokidar": "4.0.3",
+        "fast-glob": "3.3.3",
+        "lucide-vue-next": "0.468.0",
+        "mammoth": "^1.12.0",
+        "sharp": "0.35.3",
+        "undici": "7.29.0",
+        "vue": "3.5.39",
+        "zod": "4.3.5"
+      }
+    },
+    "dmgOutputs": [],
+    "filesOutsideAppBundles": [],
+    "allowedBuilderDiagnostics": [],
+    "forbiddenPackageOutputs": [],
+    "codeSignature": {
+      "exitCode": 1,
+      "stdoutTail": "",
+      "stderrTail": "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app: code has no resources but signature indicates they must be present"
+    },
+    "signatureDetails": {
+      "exitCode": 0,
+      "stdoutTail": "",
+      "stderrTail": "Executable=/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布\nIdentifier=Electron\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=392 flags=0x20002(adhoc,linker-signed) hashes=9+0 location=embedded\nVersionPlatform=1\nVersionMin=786432\nVersionSDK=1704960\nHash type=sha256 size=32\nCandidateCDHash sha256=282237d8bbbe84a800c1a52b4d60a2909f2d41cc\nCandidateCDHashFull sha256=282237d8bbbe84a800c1a52b4d60a2909f2d41ccf285be51c10793790f66d5c0\nHash choices=sha256\nCMSDigest=282237d8bbbe84a800c1a52b4d60a2909f2d41ccf285be51c10793790f66d5c0\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=16384\nExecutable Segment flags=0x1\nPage size=4096\nCDHash=282237d8bbbe84a800c1a52b4d60a2909f2d41cc\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements=none"
+    },
+    "builderLogTail": {
+      "stdout": "• electron-builder  version=26.0.12 os=25.5.0\n  • loaded configuration  file=package.json (\"build\" field)\n  • skipped dependencies rebuild  reason=npmRebuild is set to false\n  • packaging       platform=darwin arch=arm64 electron=43.1.0 appOutDir=builder-output/mac-arm64\n  • resolved electronDist  dist=/private/tmp/aic-pkg-S2LZob/stage/node_modules/electron/dist zipFile=electron-v43.1.0-darwin-arm64.zip\n  • skipped macOS code signing  reason=identity explicitly is set to null",
+      "stderr": ""
+    }
+  },
+  "packagedMcp": {
+    "runtime": "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+    "serverPath": "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Resources/app.asar.unpacked/dist-mcp/mcp/server.js",
+    "toolCount": 220,
+    "resourceTemplateCount": 9,
+    "promptCount": 8,
+    "resources": [
+      "aicanvas://server/capabilities",
+      "aicanvas://projects"
+    ],
+    "staticResourceCount": 2,
+    "effectTransitionIntegrationPassed": true,
+    "emptyProjectFreshRestart": {
+      "root": "/private/tmp/aic-pkg-S2LZob/empty-project",
+      "registryPath": "/private/tmp/aic-pkg-S2LZob/empty-project-registry.json",
+      "transport": "packaged-electron-node",
+      "desktopUiLaunched": false,
+      "toolCount": 220,
+      "chapters": 2,
+      "facts": 34,
+      "beats": 11,
+      "splitUnits": 4,
+      "storyboardRows": 11,
+      "directorContractPreserved": true,
+      "projectId": "project-03ef3a7b66be",
+      "totalItems": 4,
+      "jsonPath": "/private/tmp/aic-pkg-S2LZob/empty-project/导出/雾河来客_纯MCP分镜_v001.json",
+      "markdownPath": "/private/tmp/aic-pkg-S2LZob/empty-project/导出/雾河来客_纯MCP分镜_v001.md",
+      "ledgerEntries": 19,
+      "uncertainCommands": 0,
+      "restartVerified": true
+    }
+  },
+  "packagedElectronUi": {
+    "evidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260811T135145Z-954ac71a-electron-ui.json",
+    "evidenceSha256": "64db8b41999a101abe5e60ec664ef97df20cedfe50f8e5477d5cdd8582e876f6",
+    "screenshotPath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260811T135145Z-954ac71a-electron-ui.png",
+    "screenshotSha256": "c77eed50a8ef3aba340742f23ec9173c9d65ebccfbc32676cbf9d3507e556dc5",
+    "transport": "packaged-electron-current-source",
+    "userDataPath": "/private/tmp/aic-pkg-S2LZob/t/ai-canvas-editor-effect-transition-ui-CSlBIs/electron-user-data",
+    "userDataRemoved": true,
+    "revisions": {
+      "fixture": 1,
+      "saved": 2,
+      "undone": 3,
+      "redone": 4,
+      "afterApplicationRestart": 4
+    },
+    "closeRuns": [
+      {
+        "label": "Effect/Transition first graceful close",
+        "pid": 44260,
+        "durationMs": 252,
+        "graceful": true,
+        "forceTerminated": false,
+        "forceKilled": false,
+        "exitCode": 0,
+        "signalCode": null
+      },
+      {
+        "label": "Effect/Transition final graceful close",
+        "pid": 44319,
+        "durationMs": 300,
+        "graceful": true,
+        "forceTerminated": false,
+        "forceKilled": false,
+        "exitCode": 0,
+        "signalCode": null
+      }
+    ],
+    "isolation": {
+      "userDataOutsideProjectRoot": true
+    },
+    "backgroundSmoke": {
+      "enabled": true,
+      "bringToFrontUsed": false,
+      "snapshots": [
+        {
+          "label": "Effect/Transition first ready",
+          "enabled": true,
+          "platform": "darwin",
+          "activationPolicy": "accessory",
+          "dockVisible": false,
+          "focusedWindowId": null,
+          "windows": [
+            {
+              "id": 1,
+              "showEvents": 0,
+              "focusEvents": 0,
+              "readyToShowEvents": 1,
+              "visible": false,
+              "focused": false,
+              "destroyed": false
+            }
+          ]
+        },
+        {
+          "label": "Effect/Transition first graceful close:before-close",
+          "enabled": true,
+          "platform": "darwin",
+          "activationPolicy": "accessory",
+          "dockVisible": false,
+          "focusedWindowId": null,
+          "windows": [
+            {
+              "id": 1,
+              "showEvents": 0,
+              "focusEvents": 0,
+              "readyToShowEvents": 1,
+              "visible": false,
+              "focused": false,
+              "destroyed": false
+            }
+          ]
+        },
+        {
+          "label": "Effect/Transition restart ready",
+          "enabled": true,
+          "platform": "darwin",
+          "activationPolicy": "accessory",
+          "dockVisible": false,
+          "focusedWindowId": null,
+          "windows": [
+            {
+              "id": 1,
+              "showEvents": 0,
+              "focusEvents": 0,
+              "readyToShowEvents": 1,
+              "visible": false,
+              "focused": false,
+              "destroyed": false
+            }
+          ]
+        },
+        {
+          "label": "Effect/Transition final graceful close:before-close",
+          "enabled": true,
+          "platform": "darwin",
+          "activationPolicy": "accessory",
+          "dockVisible": false,
+          "focusedWindowId": null,
+          "windows": [
+            {
+              "id": 1,
+              "showEvents": 0,
+              "focusEvents": 0,
+              "readyToShowEvents": 1,
+              "visible": false,
+              "focused": false,
+              "destroyed": false
+            }
+          ]
+        }
+      ]
+    },
+    "terminal": {
+      "rootRemoved": true,
+      "registryRemoved": true,
+      "userDataRemoved": true
+    }
+  },
+  "packagedReviewStudio": {
+    "evidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260811T135145Z-954ac71a-review-ui.json",
+    "evidenceSha256": "465635c1c7e06dd5b6941f0277babde91cdddb8b733f785a7aa3afd6c3c34c64",
+    "screenshotPath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260811T135145Z-954ac71a-review-ui.png",
+    "screenshotSha256": "347fd8fd17d577dc8b44edd03840491092bcccfae8e2fd0fe7cf3077085948f5",
+    "transport": "packaged-electron-current-source",
+    "executablePath": "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+    "assertions": {
+      "staleSubmitRejectedThroughUi": true,
+      "staleAttemptWroteNoReview": true,
+      "staleRejectAutoReloadedHash": true,
+      "staleRejectResetCriteria": true,
+      "visualPassSubmittedThroughUi": true,
+      "passRestoredAfterApplicationRestart": true,
+      "restartHashMatchesPassedContent": true,
+      "samePathArtifactIdStable": true,
+      "shaChanged": true,
+      "stalePassNotCurrent": true,
+      "statusReturnedToVisualReview": true,
+      "cacheBustChanged": true,
+      "historyPreserved": true,
+      "pageErrors": 0,
+      "screenshotCaptureAttempt": 1
+    },
+    "passed": {
+      "status": "待视频",
+      "latestReviewId": "review-2026-08-11T13-56-38-824Z-bb94f0fa",
+      "sha256": "ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412",
+      "historicalReviewCount": 2,
+      "mediaSrc": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-S2LZob%2Ft%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412"
+    },
+    "restarted": {
+      "status": "待视频",
+      "latestReviewId": "review-2026-08-11T13-56-38-824Z-bb94f0fa",
+      "sha256": "ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412",
+      "historicalReviewCount": 2,
+      "mediaSrc": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-S2LZob%2Ft%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412"
+    },
+    "closeRuns": [
+      {
+        "label": "ReviewStudio first graceful close",
+        "pid": 44735,
+        "durationMs": 54,
+        "graceful": true,
+        "forceTerminated": false,
+        "forceKilled": false,
+        "exitCode": 0,
+        "signalCode": null
+      },
+      {
+        "label": "ReviewStudio final graceful close",
+        "pid": 44847,
+        "durationMs": 52,
+        "graceful": true,
+        "forceTerminated": false,
+        "forceKilled": false,
+        "exitCode": 0,
+        "signalCode": null
+      }
+    ],
+    "backgroundSmoke": {
+      "enabled": true,
+      "bringToFrontUsed": false,
+      "snapshots": [
+        {
+          "label": "ReviewStudio first ready",
+          "enabled": true,
+          "platform": "darwin",
+          "activationPolicy": "accessory",
+          "dockVisible": false,
+          "focusedWindowId": null,
+          "windows": [
+            {
+              "id": 1,
+              "showEvents": 0,
+              "focusEvents": 0,
+              "readyToShowEvents": 1,
+              "visible": false,
+              "focused": false,
+              "destroyed": false
+            }
+          ]
+        },
+        {
+          "label": "ReviewStudio first graceful close:before-close",
+          "enabled": true,
+          "platform": "darwin",
+          "activationPolicy": "accessory",
+          "dockVisible": false,
+          "focusedWindowId": null,
+          "windows": [
+            {
+              "id": 1,
+              "showEvents": 0,
+              "focusEvents": 0,
+              "readyToShowEvents": 1,
+              "visible": false,
+              "focused": false,
+              "destroyed": false
+            }
+          ]
+        },
+        {
+          "label": "ReviewStudio restart ready",
+          "enabled": true,
+          "platform": "darwin",
+          "activationPolicy": "accessory",
+          "dockVisible": false,
+          "focusedWindowId": null,
+          "windows": [
+            {
+              "id": 1,
+              "showEvents": 0,
+              "focusEvents": 0,
+              "readyToShowEvents": 1,
+              "visible": false,
+              "focused": false,
+              "destroyed": false
+            }
+          ]
+        },
+        {
+          "label": "ReviewStudio final graceful close:before-close",
+          "enabled": true,
+          "platform": "darwin",
+          "activationPolicy": "accessory",
+          "dockVisible": false,
+          "focusedWindowId": null,
+          "windows": [
+            {
+              "id": 1,
+              "showEvents": 0,
+              "focusEvents": 0,
+              "readyToShowEvents": 1,
+              "visible": false,
+              "focused": false,
+              "destroyed": false
+            }
+          ]
+        }
+      ]
+    },
+    "terminal": {
+      "rootRemoved": true,
+      "registryRemoved": true,
+      "userDataRemoved": true
+    }
+  },
+  "protectedWorkspaceArtifacts": {
+    "oldDmgBefore": {
+      "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+      "exists": false
+    },
+    "oldDmgAfter": {
+      "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+      "exists": false
+    },
+    "unchanged": true,
+    "distTopLevelBefore": [
+      {
+        "name": ".DS_Store",
+        "kind": "file",
+        "bytes": 6148,
+        "mtimeMs": 1785168293722.9617
+      },
+      {
+        "name": "builder-debug.yml",
+        "kind": "file",
+        "bytes": 864,
+        "mtimeMs": 1786438501961.2307
+      },
+      {
+        "name": "mac-arm64",
+        "kind": "directory",
+        "bytes": 96,
+        "mtimeMs": 1786438475235.5803
+      }
+    ],
+    "distTopLevelAfter": [
+      {
+        "name": ".DS_Store",
+        "kind": "file",
+        "bytes": 6148,
+        "mtimeMs": 1785168293722.9617
+      },
+      {
+        "name": "builder-debug.yml",
+        "kind": "file",
+        "bytes": 864,
+        "mtimeMs": 1786438501961.2307
+      },
+      {
+        "name": "mac-arm64",
+        "kind": "directory",
+        "bytes": 96,
+        "mtimeMs": 1786438475235.5803
+      }
+    ],
+    "distManifestBefore": {
+      "fileCount": 8356,
+      "bytes": 391797425,
+      "sha256": "bcc7d1776e3ebf2399114ea0fa9cdbd7008283736fe347aca3ae22a718a0dd9c"
+    },
+    "distManifestAfter": {
+      "fileCount": 8356,
+      "bytes": 391797425,
+      "sha256": "bcc7d1776e3ebf2399114ea0fa9cdbd7008283736fe347aca3ae22a718a0dd9c"
+    },
+    "outManifestBefore": {
+      "fileCount": 108,
+      "bytes": 9392817,
+      "sha256": "e4ff122b57f556ebe5d37dc4e7dff6c508b2720096cb05aa5fb8ccf1af39bcd6"
+    },
+    "outManifestAfter": {
+      "fileCount": 108,
+      "bytes": 9392817,
+      "sha256": "e4ff122b57f556ebe5d37dc4e7dff6c508b2720096cb05aa5fb8ccf1af39bcd6"
+    },
+    "mcpManifestBefore": {
+      "fileCount": 476,
+      "bytes": 13856859,
+      "sha256": "e20b95a3cbf97f938e6a27b59fd5c5f9194cdcafa4eeb48635b8a01f04573c3e"
+    },
+    "mcpManifestAfter": {
+      "fileCount": 476,
+      "bytes": 13856859,
+      "sha256": "e20b95a3cbf97f938e6a27b59fd5c5f9194cdcafa4eeb48635b8a01f04573c3e"
+    },
+    "hostRegistryBefore": {
+      "path": "/Users/hxx/.aicanvas/projects.json",
+      "exists": true,
+      "bytes": 7114,
+      "mtimeMs": 1786408259567.007,
+      "sha256": "ad4ffee3d455c33e7327afe2d85e3c2f9a93afdbc00071be26e9cd955c1a34e0"
+    },
+    "hostRegistryAfterRuntime": {
+      "path": "/Users/hxx/.aicanvas/projects.json",
+      "exists": true,
+      "bytes": 7114,
+      "mtimeMs": 1786408259567.007,
+      "sha256": "ad4ffee3d455c33e7327afe2d85e3c2f9a93afdbc00071be26e9cd955c1a34e0"
+    },
+    "hostMediaRuntimeStateBefore": {
+      "path": "/Users/hxx/.aicanvas/runtime/media-v1/state.json",
+      "exists": true,
+      "bytes": 16813,
+      "mtimeMs": 1786368281709.8943,
+      "sha256": "d843c70a06649aa8a2ef1ef744a9303efa956c4f8085fdc591334c1aa72ffbcf"
+    },
+    "hostMediaRuntimeStateAfterRuntime": {
+      "path": "/Users/hxx/.aicanvas/runtime/media-v1/state.json",
+      "exists": true,
+      "bytes": 16813,
+      "mtimeMs": 1786368281709.8943,
+      "sha256": "d843c70a06649aa8a2ef1ef744a9303efa956c4f8085fdc591334c1aa72ffbcf"
+    }
+  },
+  "sourceHashes": {
+    "package.json": "2f52024066eab9f53a6475ba3b6492cee8659d6012ca99d9644264fb8516d0f6",
+    "src/core/types.ts": "7b94a2b19a6e45d3239a220f0a1212775b22b5e8871d4bcb433e4f8f23aa8e1f",
+    "src/core/editor.ts": "c87469ccf53fc521e7a955571a4339345f9672e03616d6486220fc3bd000cf5b",
+    "src/core/codex.ts": "bdf6667892e1b832da4cbdaa35b5473814bc32e21810189977bd441c622f50c0",
+    "src/core/reviews.ts": "fab75201327d4423b692c21c51e5723329b0d055f4aec069f6b7080a5d388d54",
+    "src/main/app-close-coordinator.ts": "8468031945d013ce2896d174cbcc2f147bbf4e8cfd94f5f998486bb300802e1a",
+    "src/main/index.ts": "3ba0aad23b4e7463ee86f3dc4fff5e59a7583f42e468f92d4db59105f57ba415",
+    "src/mcp/server.ts": "5b613ea630f2459263926d98f18b689c8d4d12a18893b9edc4d2caeee2092469",
+    "src/renderer/src/components/ReviewStudioView.vue": "9701bff1161068b524c8c15027c775ca3fc63cf09990f6638b47ea3bb54174d2",
+    "src/renderer/src/components/VideoEditorView.vue": "6dd30f9dd0f3457077b1209d78e7ce50ef79439dc79e88611ab314daa758d0e7",
+    "scripts/create-review-fixture.ts": "e5f39519dcd75c00887cf967386b54d4b3d692c1d24c56056df0fc57f6294626",
+    "scripts/isolated-package-guards.ts": "47f485a75ddb006ca87b7db5f17b7c89d8251fb13233bb2c27bf58d3ea308b1d",
+    "scripts/isolated-package-smoke.ts": "5d3cacbfe03cc99b638181431a914164df1bd19df29b857d084ab6c9ac6c7a68",
+    "scripts/lib/electron-application-close.mjs": "223eeb3f977efad7418b0eeaa37f3dccad259f83cdcc30175abc5b5964f6893a",
+    "scripts/lib/exclusive-evidence-output.mjs": "1fd65509ac82e9e651b38d4c5085ba1b9599d6d533129ca5e5c1d00373550263",
+    "scripts/lib/isolated-package-terminal-finalizer.mjs": "48a4480277e519bf1c0ebae9fef34bd650777ec2eac0abea833ba4d475288a3d",
+    "scripts/ui-editor-effect-transition-smoke.mjs": "3d37a5db33e4149b04e2ca4c9a546710634dd63a2e6c2c5e37b4a5d2e0fc189f",
+    "scripts/ui-review-content-identity-smoke.mjs": "17b61dd84f2af1b4e430e928abb7db7f0cdb7e689fb357d51c413506250a510b",
+    "tests/isolated-package-guards.test.ts": "17b8351136810ac8c3cf8abc8e1deeda40b76fe534f407913d89184d6a3b0cfe",
+    "tests/isolated-package-terminal-finalizer.test.ts": "77e03c206cdc0232dfad68e3a06236e41c29806e26b5a8ecb0234b94ccb93d9f",
+    "tests/app-close-coordinator.test.ts": "68ce469300fc56fd74b62d12fa0dfe592ff6199f73c5c81598ebaf9e26abfc10",
+    "tests/electron-application-close.test.ts": "26755285eee01244f3493ebc4c177dd03ebf8ece04b40632165a7e762d70f8f0",
+    "tests/mcp-editor-effect-transition.test.ts": "87414f6a3add427bad743a0598f4fb39afdf3a9d18b173bd1c9ffb2703cdfdd0",
+    "tests/reviews.test.ts": "a19488d7f6331c0e313dbfa262750ff4ee1ce4388a3a41adc48a24078d3056d5"
+  },
+  "commands": [
+    {
+      "label": "APFS COW clone into isolated stage",
+      "executable": "/bin/cp",
+      "args": [
+        "-cR",
+        "electron.vite.config.ts",
+        "package-lock.json",
+        "package.json",
+        "tsconfig.app.json",
+        "tsconfig.json",
+        "tsconfig.mcp.json",
+        "tsconfig.node.json",
+        "tsconfig.production-runs.json",
+        "tsconfig.web.json",
+        "vitest.config.ts",
+        "src",
+        "scripts",
+        "tests",
+        "build",
+        "/private/tmp/aic-pkg-S2LZob/stage"
+      ],
+      "durationMs": 380,
+      "stdoutTail": "",
+      "stderrTail": ""
+    },
+    {
+      "label": "isolated lockfile-faithful npm ci",
+      "executable": "/usr/bin/env",
+      "args": [
+        "npm",
+        "ci",
+        "--include=dev",
+        "--no-audit",
+        "--no-fund",
+        "--registry=https://registry.npmjs.org"
+      ],
+      "durationMs": 44426,
+      "stdoutTail": "added 632 packages in 44s",
+      "stderrTail": "npm warn skipping integrity check for git dependency ssh://git@github.com/electron/node-gyp.git\nnpm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported\nnpm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn deprecated @npmcli/move-file@2.0.1: This functionality has been moved to @npmcli/fs\nnpm warn deprecated rimraf@2.6.3: Rimraf versions prior to v4 are no longer supported\nnpm warn deprecated glob@8.1.0: Glob versions prior to v9 are no longer supported\nnpm warn deprecated glob@8.1.0: Glob versions prior to v9 are no longer supported"
+    },
+    {
+      "label": "isolated lockfile Electron binary install",
+      "executable": "/private/tmp/aic-pkg-S2LZob/stage/node_modules/.bin/install-electron",
+      "args": [],
+      "durationMs": 1043,
+      "stdoutTail": "",
+      "stderrTail": ""
+    },
+    {
+      "label": "isolated production dependency closure",
+      "executable": "/usr/bin/env",
+      "args": [
+        "npm",
+        "ls",
+        "--omit=dev",
+        "--all",
+        "--json"
+      ],
+      "durationMs": 532,
+      "stdoutTail": "            \"@vue/compiler-ssr\": {\n              \"version\": \"3.5.39\"\n            },\n            \"@vue/shared\": {\n              \"version\": \"3.5.39\"\n            },\n            \"vue\": {\n              \"version\": \"3.5.39\"\n            }\n          }\n        },\n        \"@vue/shared\": {\n          \"version\": \"3.5.39\",\n          \"resolved\": \"https://registry.npmmirror.com/@vue/shared/-/shared-3.5.39.tgz\",\n          \"overridden\": false\n        },\n        \"typescript\": {\n          \"version\": \"5.9.3\",\n          \"resolved\": \"https://registry.npmmirror.com/typescript/-/typescript-5.9.3.tgz\",\n          \"overridden\": false\n        }\n      }\n    },\n    \"zod\": {\n      \"version\": \"4.3.5\",\n      \"resolved\": \"https://registry.npmmirror.com/zod/-/zod-4.3.5.tgz\",\n      \"overridden\": false\n    }\n  }\n}",
+      "stderrTail": "",
+      "productionDependencyHealth": {
+        "schemaVersion": 1,
+        "status": "passed",
+        "problemCount": 3,
+        "acceptedOptionalProblems": [
+          {
+            "name": "@emnapi/runtime",
+            "version": "1.11.3",
+            "rootDependency": "sharp",
+            "dependencyPath": [
+              "sharp",
+              "@img/sharp-freebsd-wasm32",
+              "@img/sharp-wasm32",
+              "@emnapi/runtime"
+            ],
+            "reason": "lockfile-optional-chain"
+          },
+          {
+            "name": "@img/sharp-wasm32",
+            "version": "0.35.3",
+            "rootDependency": "sharp",
+            "dependencyPath": [
+              "sharp",
+              "@img/sharp-freebsd-wasm32",
+              "@img/sharp-wasm32"
+            ],
+            "reason": "lockfile-optional-chain"
+          },
+          {
+            "name": "tslib",
+            "version": "2.8.1",
+            "rootDependency": "sharp",
+            "dependencyPath": [
+              "sharp",
+              "@img/sharp-freebsd-wasm32",
+              "@img/sharp-wasm32",
+              "@emnapi/runtime",
+              "tslib"
+            ],
+            "reason": "lockfile-optional-chain"
+          }
+        ],
+        "rejectedProblems": []
+      }
+    },
+    {
+      "label": "isolated stage current-source build",
+      "executable": "/usr/bin/env",
+      "args": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "durationMs": 72920,
+      "stdoutTail": "../../out/renderer/assets/DesktopSupportView-ntwHMipV.js                17.87 kB\n../../out/renderer/assets/ScriptWorkbenchView-cKWKecF0.js               18.13 kB\n../../out/renderer/assets/ProjectSettingsView-CdT9uDgL.js               19.05 kB\n../../out/renderer/assets/ShotTimelineView-nRFuYjq7.js                  22.97 kB\n../../out/renderer/assets/ContinuityTimelineView-Bf-PbRMl.js            24.16 kB\n../../out/renderer/assets/ProductionWorkspace-BFnHGxmY.js               25.94 kB\n../../out/renderer/assets/CanonicalAssetLibraryView-LRVNuclt.js         27.28 kB\n../../out/renderer/assets/ProjectCenter-BtG8byKV.js                     30.78 kB\n../../out/renderer/assets/ProjectImportWizard-So2_6xIc.js               36.74 kB\n../../out/renderer/assets/GlobalResourceCenterView-EuOggyEZ.js          38.56 kB\n../../out/renderer/assets/StoryWorkbenchView-46dXCCcy.js                40.81 kB\n../../out/renderer/assets/ContinuationWorkbenchView-7_Ty_KEJ.js         43.12 kB\n../../out/renderer/assets/ScriptMediaAlignView-vSsTy_Lb.js              45.51 kB\n../../out/renderer/assets/StudioProductionDashboardView-ecV7DOM4.js     49.38 kB\n../../out/renderer/assets/StudioMultimediaTimelineView-BkDBEgX4.js      53.82 kB\n../../out/renderer/assets/ReviewStudioView-BtflIFQ8.js                  58.36 kB\n../../out/renderer/assets/StudioBindingWorkbench-D7tEKY4T.js            64.48 kB\n../../out/renderer/assets/PanelReferenceWorkbench-g9mTs6qX.js           68.27 kB\n../../out/renderer/assets/StudioGenerationControlView-DcggYLuX.js       70.63 kB\n../../out/renderer/assets/NarrativeAdaptationView-DZeXoXlr.js           75.27 kB\n../../out/renderer/assets/GenerationQueueView-B47TeGw7.js               77.86 kB\n../../out/renderer/assets/NovelStudioView-B3dGeNYM.js                   82.30 kB\n../../out/renderer/assets/ProductionDesignView-CmC8fO8q.js             113.23 kB\n../../out/renderer/assets/StudioContinuityReviewView-CIzUT6fn.js       116.89 kB\n../../out/renderer/assets/VideoEditorView-DmqKa2Tc.js                  194.42 kB\n../../out/renderer/assets/MaterialStudioView-c4VIkR8_.js               200.13 kB\n../../out/renderer/assets/vue-flow-core-Cq7RGmmE.js                    335.38 kB\n../../out/renderer/assets/index-BkkfinIr.js                            445.08 kB\n../../out/renderer/assets/ManagedStudioCanvasView-LbGmZvTT.js          514.01 kB\n✓ built in 5.12s",
+      "stderrTail": "-pkg-S2LZob/stage/src/core/studio-unit-grid-generation.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-unit-grid-generation.ts, /private/tmp/aic-pkg-S2LZob/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/codex.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/dudu-readonly-import.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-agent-imagegen-result-bundle.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-approved-timeline-projection.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-canvas-workflow-runner.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-command-executor.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-continuity-review-control.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-continuous-generation-state.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-generation-checkpoint.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-generation-plan-progress.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-generation-review.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-generation-session-snapshot.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-generation-target-state.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-higgsfield-connector-queue.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-higgsfield-video-generation.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-post-result-observation.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-production-dashboard.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-production-diagnostics.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-production-projection-bundle.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-script-library-projection.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-trace.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-video-package-source-adapter.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-video-package.ts, /private/tmp/aic-pkg-S2LZob/stage/src/main/index.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-generation-review.ts is dynamically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-generation.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-unit-grid-generation.ts but also statically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-command-executor.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-continuity-review-control.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-generation-checkpoint.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-post-result-observation.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-production-projection-bundle.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-trace.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-video-package-source-adapter.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-video-package.ts, /private/tmp/aic-pkg-S2LZob/stage/src/main/index.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-post-result-observation.ts is dynamically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-unit-grid-generation.ts, /private/tmp/aic-pkg-S2LZob/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-command-executor.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-production-projection-bundle.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-video-package-source-adapter.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-generation-checkpoint.ts is dynamically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-generation-ledger.ts but also statically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-command-executor.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-continuity-review-control.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-episode-earliest.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-production-dashboard.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-production-diagnostics.ts, /private/tmp/aic-pkg-S2LZob/stage/src/main/index.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-project-write-lease.ts is dynamically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-S2LZob/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/active-managed-studio-context.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/desktop-write-lease.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-canvas-workflow-runner.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-continuous-generation-state.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-episode-earliest.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-S2LZob/stage/src/core/active-managed-studio-context.ts is dynamically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-generation-ledger.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-generation-ledger.ts but also statically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-agent-imagegen-result-bundle.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-command-executor.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-video-package.ts is dynamically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-post-result-observation.ts but also statically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-command-executor.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-higgsfield-connector-queue.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-higgsfield-video-generation.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-production-projection-bundle.ts, /private/tmp/aic-pkg-S2LZob/stage/src/main/index.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-approved-timeline-projection.ts is dynamically imported by /private/tmp/aic-pkg-S2LZob/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-episode-earliest.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-multimedia-timeline.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-production-diagnostics.ts, /private/tmp/aic-pkg-S2LZob/stage/src/core/studio-production-projection-bundle.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-S2LZob/stage/src/core/local-creative-project-ingest-status.ts is dynamically imported by /private/tmp/aic-pkg-S2LZob/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/local-creative-production-unit-materializer.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-S2LZob/stage/src/core/local-creative-production-unit-preview.ts is dynamically imported by /private/tmp/aic-pkg-S2LZob/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-S2LZob/stage/src/core/local-creative-production-unit-materializer.ts, dynamic import will not move module into another chunk."
+    },
+    {
+      "label": "isolated stage MCP capability baseline",
+      "executable": "/private/tmp/aic-pkg-S2LZob/stage/node_modules/.bin/tsx",
+      "args": [
+        "/private/tmp/aic-pkg-S2LZob/stage/scripts/mcp-smoke.ts",
+        "/private/tmp/aic-pkg-S2LZob/stage/dist-mcp/mcp/server.js"
+      ],
+      "durationMs": 1413,
+      "stdoutTail": "    \"create_video_continuation\",\n    \"list_video_continuations\",\n    \"update_video_continuation\"\n  ],\n  \"resources\": [\n    \"aicanvas://server/capabilities\",\n    \"aicanvas://projects\"\n  ],\n  \"resourceTemplates\": [\n    \"aicanvas://projects/{projectId}/snapshot\",\n    \"aicanvas://projects/{projectId}/items/{itemId}\",\n    \"aicanvas://projects/{projectId}/artifacts/{artifactId}\",\n    \"aicanvas://projects/{projectId}/canvas\",\n    \"aicanvas://projects/{projectId}/tasks\",\n    \"aicanvas://projects/{projectId}/generation/{jobId}\",\n    \"aicanvas://projects/{projectId}/editor/{editProjectId}\",\n    \"aicanvas://projects/{projectId}/story/chapters/{chapterId}\",\n    \"aicanvas://projects/{projectId}/changes/{cursor}\"\n  ],\n  \"prompts\": [\n    \"managed_studio_lock_generate_writeback\",\n    \"resume_project\",\n    \"produce_next_image_batch\",\n    \"produce_next_video_batch\",\n    \"run_browser_generation\",\n    \"continue_video_from_last_frame\",\n    \"review_visual_batch\",\n    \"recover_interrupted_work\"\n  ]\n}",
+      "stderrTail": "(node:42483) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n[mcp-process-guard] MCP OS 主写进程已登记 pid=42483"
+    },
+    {
+      "label": "inspect lockfile Electron architecture",
+      "executable": "/usr/bin/lipo",
+      "args": [
+        "-archs",
+        "/private/tmp/aic-pkg-S2LZob/stage/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron"
+      ],
+      "durationMs": 352,
+      "stdoutTail": "arm64",
+      "stderrTail": ""
+    },
+    {
+      "label": "repack lockfile Electron distribution",
+      "executable": "/usr/bin/ditto",
+      "args": [
+        "-c",
+        "-k",
+        "--sequesterRsrc",
+        "--keepParent",
+        "/private/tmp/aic-pkg-S2LZob/stage/node_modules/electron/dist/Electron.app",
+        "/private/tmp/aic-pkg-S2LZob/stage/node_modules/electron/dist/electron-v43.1.0-darwin-arm64.zip"
+      ],
+      "durationMs": 13407,
+      "stdoutTail": "",
+      "stderrTail": ""
+    },
+    {
+      "label": "inspect lockfile Electron ZIP layout",
+      "executable": "/usr/bin/unzip",
+      "args": [
+        "-Z1",
+        "/private/tmp/aic-pkg-S2LZob/stage/node_modules/electron/dist/electron-v43.1.0-darwin-arm64.zip"
+      ],
+      "durationMs": 13,
+      "stdoutTail": "Electron.app/Contents/Frameworks/Squirrel.framework/Squirrel\nElectron.app/Contents/Frameworks/Mantle.framework/\nElectron.app/Contents/Frameworks/Mantle.framework/Mantle\nElectron.app/Contents/Frameworks/Mantle.framework/Resources\nElectron.app/Contents/Frameworks/Mantle.framework/Versions/\nElectron.app/Contents/Frameworks/Mantle.framework/Versions/A/\nElectron.app/Contents/Frameworks/Mantle.framework/Versions/A/Mantle\nElectron.app/Contents/Frameworks/Mantle.framework/Versions/A/Resources/\nElectron.app/Contents/Frameworks/Mantle.framework/Versions/A/Resources/Info.plist\nElectron.app/Contents/Frameworks/Mantle.framework/Versions/Current\nElectron.app/Contents/Frameworks/Electron Helper (Plugin).app/\nElectron.app/Contents/Frameworks/Electron Helper (Plugin).app/Contents/\nElectron.app/Contents/Frameworks/Electron Helper (Plugin).app/Contents/MacOS/\nElectron.app/Contents/Frameworks/Electron Helper (Plugin).app/Contents/MacOS/Electron Helper (Plugin)\nElectron.app/Contents/Frameworks/Electron Helper (Plugin).app/Contents/Info.plist\nElectron.app/Contents/Frameworks/Electron Helper (Plugin).app/Contents/PkgInfo\nElectron.app/Contents/Frameworks/Electron Helper (GPU).app/\nElectron.app/Contents/Frameworks/Electron Helper (GPU).app/Contents/\nElectron.app/Contents/Frameworks/Electron Helper (GPU).app/Contents/MacOS/\nElectron.app/Contents/Frameworks/Electron Helper (GPU).app/Contents/MacOS/Electron Helper (GPU)\nElectron.app/Contents/Frameworks/Electron Helper (GPU).app/Contents/Info.plist\nElectron.app/Contents/Frameworks/Electron Helper (GPU).app/Contents/PkgInfo\nElectron.app/Contents/Frameworks/Electron Helper.app/\nElectron.app/Contents/Frameworks/Electron Helper.app/Contents/\nElectron.app/Contents/Frameworks/Electron Helper.app/Contents/MacOS/\nElectron.app/Contents/Frameworks/Electron Helper.app/Contents/MacOS/Electron Helper\nElectron.app/Contents/Frameworks/Electron Helper.app/Contents/Info.plist\nElectron.app/Contents/Frameworks/Electron Helper.app/Contents/PkgInfo\nElectron.app/Contents/Info.plist\nElectron.app/Contents/PkgInfo",
+      "stderrTail": ""
+    },
+    {
+      "label": "electron-builder 隔离 unpacked App",
+      "executable": "/private/tmp/aic-pkg-S2LZob/stage/node_modules/.bin/electron-builder",
+      "args": [
+        "--mac",
+        "--dir",
+        "--publish",
+        "never",
+        "-c.directories.output=/private/tmp/aic-pkg-S2LZob/stage/builder-output",
+        "-c.mac.identity=null",
+        "-c.mac.notarize=false",
+        "-c.forceCodeSigning=false",
+        "-c.npmRebuild=false",
+        "-c.electronDist=/private/tmp/aic-pkg-S2LZob/stage/node_modules/electron/dist"
+      ],
+      "durationMs": 65374,
+      "stdoutTail": "• electron-builder  version=26.0.12 os=25.5.0\n  • loaded configuration  file=package.json (\"build\" field)\n  • skipped dependencies rebuild  reason=npmRebuild is set to false\n  • packaging       platform=darwin arch=arm64 electron=43.1.0 appOutDir=builder-output/mac-arm64\n  • resolved electronDist  dist=/private/tmp/aic-pkg-S2LZob/stage/node_modules/electron/dist zipFile=electron-v43.1.0-darwin-arm64.zip\n  • skipped macOS code signing  reason=identity explicitly is set to null",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged executable architecture",
+      "executable": "/usr/bin/file",
+      "args": [
+        "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布"
+      ],
+      "durationMs": 13,
+      "stdoutTail": "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布: Mach-O 64-bit executable arm64",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged bundle identifier",
+      "executable": "/usr/bin/plutil",
+      "args": [
+        "-extract",
+        "CFBundleIdentifier",
+        "raw",
+        "-o",
+        "-",
+        "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Info.plist"
+      ],
+      "durationMs": 10,
+      "stdoutTail": "com.hxx.aidramacanvas",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged bundle version",
+      "executable": "/usr/bin/plutil",
+      "args": [
+        "-extract",
+        "CFBundleShortVersionString",
+        "raw",
+        "-o",
+        "-",
+        "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Info.plist"
+      ],
+      "durationMs": 6,
+      "stdoutTail": "0.2.0",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged bundle name",
+      "executable": "/usr/bin/plutil",
+      "args": [
+        "-extract",
+        "CFBundleName",
+        "raw",
+        "-o",
+        "-",
+        "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Info.plist"
+      ],
+      "durationMs": 7,
+      "stdoutTail": "AI 漫剧画布",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged MCP capability smoke",
+      "executable": "/Users/hxx/Documents/无限画布/node_modules/.bin/tsx",
+      "args": [
+        "/Users/hxx/Documents/无限画布/scripts/mcp-smoke.ts",
+        "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Resources/app.asar.unpacked/dist-mcp/mcp/server.js"
+      ],
+      "durationMs": 1668,
+      "stdoutTail": "    \"create_video_continuation\",\n    \"list_video_continuations\",\n    \"update_video_continuation\"\n  ],\n  \"resources\": [\n    \"aicanvas://server/capabilities\",\n    \"aicanvas://projects\"\n  ],\n  \"resourceTemplates\": [\n    \"aicanvas://projects/{projectId}/snapshot\",\n    \"aicanvas://projects/{projectId}/items/{itemId}\",\n    \"aicanvas://projects/{projectId}/artifacts/{artifactId}\",\n    \"aicanvas://projects/{projectId}/canvas\",\n    \"aicanvas://projects/{projectId}/tasks\",\n    \"aicanvas://projects/{projectId}/generation/{jobId}\",\n    \"aicanvas://projects/{projectId}/editor/{editProjectId}\",\n    \"aicanvas://projects/{projectId}/story/chapters/{chapterId}\",\n    \"aicanvas://projects/{projectId}/changes/{cursor}\"\n  ],\n  \"prompts\": [\n    \"managed_studio_lock_generate_writeback\",\n    \"resume_project\",\n    \"produce_next_image_batch\",\n    \"produce_next_video_batch\",\n    \"run_browser_generation\",\n    \"continue_video_from_last_frame\",\n    \"review_visual_batch\",\n    \"recover_interrupted_work\"\n  ]\n}",
+      "stderrTail": "[mcp-process-guard] MCP OS 主写进程已登记 pid=43109\n(node:43109) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.\n(Use `AI 漫剧画布 --trace-deprecation ...` to show where the warning was created)"
+    },
+    {
+      "label": "packaged Effect/Transition MCP integration",
+      "executable": "/Users/hxx/Documents/无限画布/node_modules/.bin/vitest",
+      "args": [
+        "run",
+        "tests/mcp-editor-effect-transition.test.ts",
+        "--maxWorkers=1"
+      ],
+      "durationMs": 9491,
+      "stdoutTail": "RUN  v4.1.0 /Users/hxx/Documents/无限画布\n\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n   Start at  21:55:24\n   Duration  9.10s (transform 67ms, setup 35ms, import 158ms, tests 8.77s, environment 0ms)",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged MCP empty-project fresh-restart workflow",
+      "executable": "/Users/hxx/Documents/无限画布/node_modules/.bin/tsx",
+      "args": [
+        "/Users/hxx/Documents/无限画布/scripts/mcp-empty-project-workflow-smoke.ts",
+        "/private/tmp/aic-pkg-S2LZob/empty-project",
+        "/private/tmp/aic-pkg-S2LZob/empty-project-registry.json"
+      ],
+      "durationMs": 21846,
+      "stdoutTail": "{\n  \"root\": \"/private/tmp/aic-pkg-S2LZob/empty-project\",\n  \"registryPath\": \"/private/tmp/aic-pkg-S2LZob/empty-project-registry.json\",\n  \"transport\": \"packaged-electron-node\",\n  \"desktopUiLaunched\": false,\n  \"toolCount\": 220,\n  \"chapters\": 2,\n  \"facts\": 34,\n  \"beats\": 11,\n  \"splitUnits\": 4,\n  \"storyboardRows\": 11,\n  \"directorContractPreserved\": true,\n  \"projectId\": \"project-03ef3a7b66be\",\n  \"totalItems\": 4,\n  \"jsonPath\": \"/private/tmp/aic-pkg-S2LZob/empty-project/导出/雾河来客_纯MCP分镜_v001.json\",\n  \"markdownPath\": \"/private/tmp/aic-pkg-S2LZob/empty-project/导出/雾河来客_纯MCP分镜_v001.md\",\n  \"ledgerEntries\": 19,\n  \"uncertainCommands\": 0,\n  \"restartVerified\": true\n}",
+      "stderrTail": "[mcp-process-guard] MCP OS 主写进程已登记 pid=43551\n[mcp-process-guard] MCP OS 主写进程已登记 pid=43712"
+    },
+    {
+      "label": "packaged Effect/Transition Electron UI full-restart",
+      "executable": "/Users/hxx/.nvm/versions/node/v22.23.2/bin/node",
+      "args": [
+        "/Users/hxx/Documents/无限画布/scripts/ui-editor-effect-transition-smoke.mjs",
+        "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260811T135145Z-954ac71a-electron-ui.json"
+      ],
+      "durationMs": 22856,
+      "stdoutTail": "        \"source\": \"aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-S2LZob%2Ft%2Fai-canvas-editor-effect-transition-ui-CSlBIs%2Fproject%2FEP01_15s_001_UI%E8%BD%AC%E5%9C%BA%E5%89%8D%E9%A1%B9%2FEP01_15s_001_v1.mp4\"\n      },\n      \"incoming\": {\n        \"currentTime\": 0.165999,\n        \"opacity\": 0.333333,\n        \"muted\": true,\n        \"readyState\": 1,\n        \"source\": \"aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-S2LZob%2Ft%2Fai-canvas-editor-effect-transition-ui-CSlBIs%2Fproject%2FEP01_15s_002_UI%E8%BD%AC%E5%9C%BA%E5%90%8E%E9%A1%B9%2FEP01_15s_002_v1.mp4\"\n      }\n    }\n  },\n  \"screenshot\": {\n    \"path\": \"/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260811T135145Z-954ac71a-electron-ui.png\",\n    \"bytes\": 255536,\n    \"sha256\": \"c77eed50a8ef3aba340742f23ec9173c9d65ebccfbc32676cbf9d3507e556dc5\",\n    \"width\": 1560,\n    \"height\": 980,\n    \"captureAttempt\": 1,\n    \"content\": {\n      \"pixels\": 1528800,\n      \"brightRatio\": 0.20923796441653583,\n      \"chromaticRatio\": 0.05063317634746206\n    }\n  },\n  \"terminal\": {\n    \"rootRemoved\": true,\n    \"registryRemoved\": true,\n    \"userDataRemoved\": true\n  }\n}",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged ReviewStudio stale-submit full-restart",
+      "executable": "/Users/hxx/.nvm/versions/node/v22.23.2/bin/node",
+      "args": [
+        "/Users/hxx/Documents/无限画布/scripts/ui-review-content-identity-smoke.mjs",
+        "/private/tmp/aic-pkg-S2LZob/t/review-project",
+        "/private/tmp/aic-pkg-S2LZob/t/review-project-registry.json",
+        "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260811T135145Z-954ac71a-review-ui.json",
+        "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260811T135145Z-954ac71a-review-ui.png"
+      ],
+      "durationMs": 28466,
+      "stdoutTail": "      \"edgeBrightRatios\": {\n        \"top\": 0.6343341182626897,\n        \"left\": 0.1639225797080398,\n        \"right\": 0.20645408163265305\n      }\n    }\n  },\n  \"assertions\": {\n    \"staleSubmitRejectedThroughUi\": true,\n    \"staleAttemptWroteNoReview\": true,\n    \"staleRejectAutoReloadedHash\": true,\n    \"staleRejectResetCriteria\": true,\n    \"visualPassSubmittedThroughUi\": true,\n    \"passRestoredAfterApplicationRestart\": true,\n    \"restartHashMatchesPassedContent\": true,\n    \"samePathArtifactIdStable\": true,\n    \"shaChanged\": true,\n    \"stalePassNotCurrent\": true,\n    \"statusReturnedToVisualReview\": true,\n    \"cacheBustChanged\": true,\n    \"historyPreserved\": true,\n    \"pageErrors\": 0,\n    \"screenshotCaptureAttempt\": 1\n  },\n  \"terminal\": {\n    \"rootRemoved\": true,\n    \"registryRemoved\": true,\n    \"userDataRemoved\": true\n  }\n}",
+      "stderrTail": ""
+    }
+  ],
+  "terminal": {
+    "tempRootRemoved": true,
+    "lingeringProcessesBeforeCleanup": [],
+    "lingeringProcessesAfterCleanup": [],
+    "emptyProjectRemoved": true,
+    "emptyProjectRegistryRemoved": true,
+    "effectTransitionRegistryRemoved": true,
+    "packagedRegistryRemoved": true,
+    "packagedMediaRuntimeRemoved": true,
+    "packagedProjectRootRemoved": true,
+    "packagedReviewProjectRemoved": true,
+    "packagedReviewRegistryRemoved": true,
+    "packagedReviewUserDataRemoved": true,
+    "hostRegistryPostCleanup": {
+      "path": "/Users/hxx/.aicanvas/projects.json",
+      "exists": true,
+      "bytes": 7114,
+      "mtimeMs": 1786408259567.007,
+      "sha256": "ad4ffee3d455c33e7327afe2d85e3c2f9a93afdbc00071be26e9cd955c1a34e0"
+    },
+    "hostMediaRuntimeStatePostCleanup": {
+      "path": "/Users/hxx/.aicanvas/runtime/media-v1/state.json",
+      "exists": true,
+      "bytes": 16813,
+      "mtimeMs": 1786368281709.8943,
+      "sha256": "d843c70a06649aa8a2ef1ef744a9303efa956c4f8085fdc591334c1aa72ffbcf"
+    },
+    "oldDmgFinal": {
+      "path": "/Users/hxx/Documents/无限画布/dist/AI 漫剧画布-0.1.0-arm64.dmg",
+      "exists": false
+    }
+  },
+  "completedAt": "2026-08-11T13:57:02.411Z",
+  "lockPath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260811T135145Z-954ac71a.json.lock",
+  "outcome": "passed",
+  "finalization": {
+    "schemaVersion": 1,
+    "state": "terminal-written-lock-release-pending",
+    "completionMarkerPath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260811T135145Z-954ac71a-completion.json",
+    "lockReleasePending": true,
+    "completed": false
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "kind": "whole-project-behavior-preserving-refactor-phase-evidence",
+  "phase": "C",
+  "status": "passed",
+  "programStatus": "in_progress",
+  "completedAt": "2026-08-10T15:18:34Z",
+  "scope": {
+    "behaviorPreserving": true,
+    "databaseSchemaChanged": false,
+    "casChanged": false,
+    "ipcContractChanged": false,
+    "mcpToolContractChanged": false,
+    "formalProjectDataWritten": false
+  },
+  "changes": [
+    "added-explicit-mcp-tool-registrar",
+    "removed-two-register-tool-monkey-patches",
+    "replaced-220-tool-receivers-with-explicit-registrar",
+    "froze-source-tool-abi-and-effect-gate-classification",
+    "extended-source-tool-count-to-recognize-explicit-registrar"
+  ],
+  "abi": {
+    "toolCount": 220,
+    "toolAbiSha256": "71365a8259901be5c3d24c3e2c08363b7d3b7ecc7b2c14da587fc03e405c5c9c",
+    "resourceCount": 2,
+    "promptCount": 8,
+    "guardedMapEntries": 87,
+    "registeredGuardedTools": 86,
+    "payloadNormalizers": 3,
+    "toolCommandAliases": 4,
+    "legacyUnmatchedGuardedEntryPreserved": "migrate_fusion_storyboard_evidence"
+  },
+  "pipelineOrder": [
+    "runtime-currentness-effect-metric",
+    "guarded-schema-normalizer-ledger",
+    "command-bus-lease-owner-idempotency"
+  ],
+  "verification": {
+    "implementationFocused": { "files": 6, "tests": 18, "status": "passed" },
+    "mainExpandedImpact": { "files": 7, "tests": 22, "status": "passed" },
+    "releaseAndBuildIdentity": { "files": 2, "tests": 8, "status": "passed" },
+    "registrarAbi": { "tests": 4, "status": "passed" },
+    "sourceStdio": { "tools": 220, "resources": 2, "prompts": 8, "status": "passed" },
+    "typecheck": "passed",
+    "typecheckApp": "passed",
+    "diffCheck": "passed",
+    "independentReview": "clean"
+  },
+  "fileHashes": {
+    "src/mcp/tool-registrar.ts": "071dda8e876545e352e48791b2d1e9ba13e75e7abd664a70128d4d522b0dea47",
+    "tests/mcp-tool-registrar.test.ts": "f5581a354f446286205a0e05a2376da78c86f36fd32fd2e605c7355ff10118e9",
+    "tests/fixtures/mcp-tool-abi.json": "96027c059ae3cdfcb95739601616b8f7718529fecce967743bcb3097e45c7db5"
+  },
+  "nonCurrentArtifactObservation": {
+    "command": "npm run mcp:smoke",
+    "status": "not-used-as-source-verification",
+    "reason": "The command reads the intentionally unrebuilt dist-mcp artifact. Phase C forbids build; current source was verified through source stdio instead."
+  },
+  "notRun": [
+    "full-test-partitions",
+    "production-build",
+    "immutable-mcp-candidate",
+    "isolated-package-smoke",
+    "installed-app-replacement"
+  ],
+  "boundaries": {
+    "externalCalls": 0,
+    "uploads": 0,
+    "paidGenerations": 0,
+    "gitStageCommitPush": 0,
+    "appLaunched": false,
+    "notarized": false
+  },
+  "roadmap": "docs/全项目行为保持重构路线图_20260810.md"
+}

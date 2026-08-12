@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-writing-os-p1-cleanroom-deltas",
+  "verdict": "VERIFIED_P1_COMPLETE_WITH_SCALE_BOUNDARY",
+  "generatedAt": "2026-08-03T04:20:16.791Z",
+  "implementation": {
+    "derivedSearchGeneration": {
+      "status": "complete",
+      "databaseLocator": ".aicanvas/novel/novel-derived.sqlite",
+      "explicitRebuildCommand": "novel_rebuild_search_index",
+      "readTool": "get_novel_search_index_status",
+      "engines": [
+        "fts5_trigram",
+        "linear_scan"
+      ],
+      "fallbackReasons": [
+        "index_missing",
+        "index_building",
+        "index_stale",
+        "index_corrupt",
+        "query_too_short",
+        "chapter_identity_changed"
+      ]
+    },
+    "analysisExecutionReconciliation": {
+      "status": "complete",
+      "readTool": "get_novel_analysis_execution_recovery",
+      "commands": [
+        "mark_novel_analysis_execution_reconciliation_required",
+        "reconcile_novel_analysis_execution"
+      ],
+      "automaticRetryAfterExpiry": false,
+      "reconciliationMakesRemoteRequests": false,
+      "lateWorkerFenced": true
+    },
+    "contextPackReceipt": {
+      "status": "complete",
+      "persistedWithChapterWriteLeaseCas": true,
+      "uiRecomputesSelection": false,
+      "changesExistingPackFingerprint": false,
+      "authorOnlyVisible": false,
+      "futureChapterVisible": false,
+      "absolutePathsPersisted": false
+    }
+  },
+  "verification": {
+    "fullRegression": {
+      "status": "PASS",
+      "files": 30,
+      "suites": 61,
+      "tests": 289,
+      "evidence": "docs/evidence/novel-user-tests/p1-full-regression-final-20260803.json"
+    },
+    "directed": [
+      {
+        "name": "context-pack-receipt-and-dashboard",
+        "status": "PASS",
+        "files": 3,
+        "tests": 32
+      },
+      {
+        "name": "allowlist-and-ipc-contract",
+        "status": "PASS",
+        "files": 2,
+        "tests": 17
+      },
+      {
+        "name": "codex-doctor",
+        "status": "PASS",
+        "files": 1,
+        "tests": 8
+      }
+    ],
+    "typecheck": {
+      "status": "PASS",
+      "command": "npm run typecheck"
+    },
+    "diffCheck": {
+      "status": "PASS",
+      "command": "git diff --check"
+    },
+    "scalePerformance": {
+      "status": "PASS",
+      "evidence": "docs/evidence/novel-user-tests/p1-derived-search-performance-final-20260803.json",
+      "cases": [
+        {
+          "chapters": 500,
+          "characters": 1000000,
+          "rebuildMs": 271.78,
+          "indexedP50Ms": 215.65,
+          "indexedP95Ms": 219.51,
+          "scannedChapters": 1,
+          "indexedPeakRssBytes": 325451776
+        },
+        {
+          "chapters": 1000,
+          "characters": 2000000,
+          "rebuildMs": 405.34,
+          "indexedP50Ms": 418,
+          "indexedP95Ms": 420.51,
+          "scannedChapters": 1,
+          "indexedPeakRssBytes": 367378432
+        }
+      ]
+    },
+    "currentMcp": {
+      "status": "PASS",
+      "candidateId": "mcp-candidate-c32676d385437104-88c6696054753099-20bcfb2d",
+      "sourceDigest": "c32676d38543710470cc22330af5324af3eb99476f2cf75fa3507c74adf32480",
+      "buildId": "470a1c169ac587684b5c30a33547ae5a",
+      "entrySha256": "425c23be81aba8fb1fcec3328c168f13a2bcaddfd1d526d4a961b5a463490201",
+      "toolCount": 218,
+      "inspectedCandidates": 52,
+      "invalidCandidates": 0,
+      "buildCurrentnessAllowed": true,
+      "liveDistMcpUnchanged": true,
+      "evidence": "docs/evidence/novel-user-tests/p1-current-mcp-smoke-authoritative-20260803.json"
+    },
+    "formalNovelSource": {
+      "status": "UNCHANGED",
+      "entries": 566,
+      "directories": 40,
+      "files": 525,
+      "symlinks": 1,
+      "fileBytes": 6060122,
+      "aggregateSha256": "97e8fde0ee0ea8ce8529c3db7db4d2d412cbaf0b8f7ff1e837d185f01b89bada",
+      "baseline": "docs/evidence/novel-mode-v1/real-project/black-page-novel-oss-source-audit-final-20260803.json",
+      "after": "docs/evidence/novel-mode-v1/real-project/black-page-novel-p1-final-after-20260803.json",
+      "entryByEntryEqual": true
+    }
+  },
+  "boundaries": {
+    "realExternalNovelProviderTested": false,
+    "literaryQualityReviewed": false,
+    "maximumMeasuredChapters": 1000,
+    "maximumMeasuredCharacters": 2000000,
+    "universalMillionWordGuarantee": false,
+    "externalRepositoryCodeCopied": false,
+    "secondCanonCreated": false,
+    "formalNovelModified": false,
+    "gitStaged": false,
+    "gitCommitted": false,
+    "gitPushed": false,
+    "pullRequestCreated": false,
+    "liveDistMcpReplaced": false,
+    "applicationReplaced": false,
+    "externalUploadOrPublish": false
+  }
+}

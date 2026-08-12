@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "kind": "bounded-improvement-local-install-final",
+  "status": "pass",
+  "generatedAt": "2026-08-11T14:04:41Z",
+  "scope": "connector-formal-atomicity-watcher-single-drain-video-editor-preview-local-install",
+  "source": {
+    "sourceDigest": "954ac71a461be527530a96709983741c5f0d1f9ae05a97f57605af5ded39d585",
+    "sourceFiles": 1046,
+    "sourceBytes": 20793529,
+    "buildId": "c7cb5ceec93ad2704422f4657f14f932",
+    "releaseManifestFingerprint": "fc20e8a59f9e932f35dd0e385f30949b0dfd91882b925db44220fd589667dd8a",
+    "releaseManifestSha256": "28fcb8077dfab92b64ffd67b9c3696589f4178a2ae852bfe3b05d68e55caff07",
+    "mcpToolCount": 220,
+    "architecture": "arm64",
+    "distribution": "local-only"
+  },
+  "remediation": {
+    "selectedP0": 0,
+    "selectedP1": 0,
+    "selectedP2": 0,
+    "connectorFormalTerminalAtomicity": "passed",
+    "generationLedgerWatcherSingleDrain": "passed",
+    "videoEditorNestedAndHoverPreviewBounding": "passed",
+    "independentFinalReview": "clean"
+  },
+  "verification": {
+    "connectorQueueTests": "14/14 passed",
+    "agentBundleAndTargetStateTests": "16/16 passed",
+    "independentCriticalMatrix": "4 files / 37 tests passed",
+    "watcherTests": "6/6 passed",
+    "videoPreviewFocusedTests": "14/14 passed",
+    "typecheck": "passed",
+    "typecheckApp": "passed",
+    "build": "passed",
+    "productionAudit": {
+      "registry": "https://registry.npmjs.org",
+      "productionDependencies": 190,
+      "vulnerabilities": 0
+    },
+    "diffCheck": "passed"
+  },
+  "candidate": {
+    "candidateId": "mcp-candidate-954ac71a461be527-3962c60699c5bbcd-d3674875",
+    "currentCheck": "passed",
+    "inspectedCandidates": 17,
+    "invalidCandidates": 0,
+    "stdio": {
+      "tools": 220,
+      "resources": 89,
+      "resourceTemplates": 9,
+      "prompts": 8
+    },
+    "receiptSha256": "cdf889aea1ec98beb52cd9221c6bae5e8f918e1429f33e6db73267f949714c0b",
+    "publicationSha256": "0d4c2a3e10c4049189352b7682f7a6fce12a9666b991b3f49530880f06ee068f"
+  },
+  "isolatedPackage": {
+    "status": "passed",
+    "runId": "isolated-package-smoke-20260811T135156740Z-40707-5cc1e150",
+    "terminalEvidence": "isolated-package-smoke-20260811T135145Z-954ac71a.json",
+    "terminalEvidenceSha256": "0b5d2d0c2c26e482cb2b1d569a9cc41136692880d898d55327ccafb21e72b18e",
+    "completionMarker": "isolated-package-smoke-20260811T135145Z-954ac71a-completion.json",
+    "completionMarkerSha256": "5aa152d5a3558b7c6a7990ea0956502f9d1488926a81cb27f792997b0fdea8a8",
+    "lockReleased": true,
+    "showEvents": 0,
+    "focusEvents": 0,
+    "gracefulCloseOnly": true,
+    "lingeringProcesses": 0,
+    "formalProjectUsed": false
+  },
+  "signedPackage": {
+    "appPath": "dist/mac-arm64/AI 漫剧画布.app",
+    "bundleIdentifier": "com.hxx.aidramacanvas",
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "developerId": "Developer ID Application: YIHANG LI (3JS43BTTJ3)",
+    "teamIdentifier": "3JS43BTTJ3",
+    "deepStrictVerified": true,
+    "appAsarSha256": "cb66779f7972ce6c49a6c8116957b78a7941bd5ded6bd57538da71df8b9c11ce",
+    "executableSha256": "00a28b47425163713634cae7e717b93ee0fb28599586fb39eacd86bbe6ac05e7",
+    "notarized": false,
+    "dmgGenerated": false
+  },
+  "installation": {
+    "appPath": "/Applications/AI 漫剧画布.app",
+    "status": "passed",
+    "installedEvidence": "installed-local-verify-20260811T135947Z-954ac71a.json",
+    "installedEvidenceSha256": "11c26b353e48600bb37ff07e8889029090d00fb2818b82f3372970833a83caf8",
+    "packagedMcpToolCount": 220,
+    "launchWithoutSystemNode": true,
+    "activationPolicy": "accessory",
+    "dockVisible": false,
+    "showEvents": 0,
+    "focusEvents": 0,
+    "closeDurationMs": 547,
+    "graceful": true,
+    "forceTerminated": false,
+    "forceKilled": false,
+    "appClosedAfterVerify": true
+  },
+  "rollback": {
+    "archiveRoot": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260811T135947Z-954ac71a",
+    "previousInstalledSourceDigest": "d5ce49a9fdd9a277cd49c004a68b589d9f038c0b791f49e743e8c75932ff5784",
+    "previousInstalledPreserved": true,
+    "previousWorkspaceDistPreserved": true,
+    "previousArtifactsDeepStrictVerified": true
+  },
+  "boundaries": {
+    "formalDataWritten": false,
+    "externalGenerationCalls": 0,
+    "uploadUsed": false,
+    "paidActionUsed": false,
+    "notarizationPerformed": false,
+    "publicReleasePerformed": false,
+    "gitStageCommitPush": false,
+    "fullOrMediumPartitionsRun": false,
+    "t23Rerun": false
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-chapter-manifest",
+  "projectId": "project-3721ccea0cd2",
+  "revision": 1,
+  "volumes": [
+    {
+      "volumeId": "e837d661-6763-4164-815d-2e8b6561c049",
+      "title": "第一卷",
+      "order": 0,
+      "revision": 1
+    }
+  ],
+  "chapters": [],
+  "updatedAt": "2026-08-02T06:13:29.680Z"
+}

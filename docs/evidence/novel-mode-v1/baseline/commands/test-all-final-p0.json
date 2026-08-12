@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "novel-p0-test-all-final",
+  "status": "pass",
+  "startedAt": "2026-08-01T07:22:15.526Z",
+  "endedAt": "2026-08-01T08:25:27.297Z",
+  "durationMs": 3791833,
+  "argv": [
+    "npm",
+    "run",
+    "test:all"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+      "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4"
+    },
+    "after": {
+      "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+      "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/novel-mode-v1/baseline/commands/test-all-final-p0.log",
+    "sizeBytes": 6894,
+    "sha256": "e02ab811a6d3ad2adc520be324739b9bf42dbc34ce01969d8baaef129563796a"
+  },
+  "testCounts": {
+    "files": 192,
+    "tests": 960
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-writing-os-desktop-p0-electron-smoke",
+  "verdict": "PASS",
+  "capturedAt": "2026-08-02T17:17:30.042Z",
+  "scope": {
+    "isolatedManagedFixture": true,
+    "formalNovelSourcesTouched": false,
+    "remoteServicesUsed": false,
+    "gitMutationPerformed": false
+  },
+  "build": {
+    "sourceDigest": "ea69ca8aedd5f4ac49e30ee06eb4d735f8eac2f779e5c72f1130b97a65515b40",
+    "buildId": "9fa8c5b993759a4119436507d6862e75"
+  },
+  "checks": {
+    "stateDebtVisibleBeforeReview": true,
+    "machineConflictVisibleBeforeReview": true,
+    "appearanceAuthorityVisible": true,
+    "eightFieldDiffVisible": true,
+    "humanUiAcceptedCandidate": true,
+    "completionCommittedAfterReview": true,
+    "probePassedAfterReview": true,
+    "pendingCandidateRemovedAfterReview": true,
+    "fixedReviewerInjectedByMain": true
+  },
+  "runtimeState": {
+    "projectId": "project-b158f031461a",
+    "readyForPrepare": false,
+    "currentThroughChapterId": "cc810f76-9821-58bf-aadf-48b1ebda9680",
+    "selectedCompletion": "committed",
+    "probeStatus": "pass",
+    "pendingCandidateCount": 0
+  },
+  "decision": {
+    "candidateId": "novel-state-candidate-56fe797f1d99daf45b2f6e02",
+    "decision": "accepted",
+    "reviewer": "desktop-human-owner",
+    "fingerprint": "38b9edc1c9bcb6e5c860420f1bf52d4d0f1a3a863de17ac461319190c03242e7"
+  },
+  "diagnostics": {
+    "pageErrors": [],
+    "consoleErrors": [],
+    "externalRequests": []
+  },
+  "screenshots": [
+    {
+      "relativePath": "docs/evidence/novel-mode-v1/writing-os-desktop-p0/critical-memory-hardening-20260802-r4/01-dashboard-state-debt.png",
+      "bytes": 138209,
+      "sha256": "1458d6279f717716b3644d10ea3b3abac9818b45e29b2e03ad3417b50ead26ac",
+      "width": 1728,
+      "height": 1029,
+      "entropy": 2.4247753386680415
+    },
+    {
+      "relativePath": "docs/evidence/novel-mode-v1/writing-os-desktop-p0/critical-memory-hardening-20260802-r4/02-candidate-diff.png",
+      "bytes": 141582,
+      "sha256": "c6edfbfde8d3e2d63528015ca12d3c3c442dfcdddc8e74da10d1d9e0df29ab0f",
+      "width": 1728,
+      "height": 1029,
+      "entropy": 2.23226025774602
+    },
+    {
+      "relativePath": "docs/evidence/novel-mode-v1/writing-os-desktop-p0/critical-memory-hardening-20260802-r4/03-state-accepted.png",
+      "bytes": 137218,
+      "sha256": "369b996e0aca7fcb83a87d2ad6a4987dbbb411875f0a9af982ffc3cf8fb22837",
+      "width": 1728,
+      "height": 1029,
+      "entropy": 2.0537977385592967
+    }
+  ]
+}

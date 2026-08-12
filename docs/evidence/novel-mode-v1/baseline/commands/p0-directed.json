@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "novel-p0-directed",
+  "status": "pass",
+  "startedAt": "2026-08-01T06:49:23.852Z",
+  "endedAt": "2026-08-01T06:49:25.394Z",
+  "durationMs": 1612,
+  "argv": [
+    "npx",
+    "vitest",
+    "run",
+    "tests/novel-third-party-provenance.test.ts",
+    "tests/novel-fts5-runtime-probe.test.ts",
+    "tests/novel-readonly-tree-manifest.test.ts",
+    "tests/novel-scale-fixture.test.ts",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "925abae3f3a4bf83e112bc428a1d936e",
+      "sourceDigest": "3b5dd1c45479c101bbc2d90aaba361e146ebba3546ba032f599c66c479794fb6"
+    },
+    "after": {
+      "buildId": "925abae3f3a4bf83e112bc428a1d936e",
+      "sourceDigest": "3b5dd1c45479c101bbc2d90aaba361e146ebba3546ba032f599c66c479794fb6"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/novel-mode-v1/baseline/commands/p0-directed.log",
+    "sizeBytes": 218,
+    "sha256": "06ca110ceea98dbd715f21aec68bb68828bac50b6220ce1675ceb2a51d86df35"
+  },
+  "testCounts": {
+    "files": 4,
+    "tests": 20
+  }
+}

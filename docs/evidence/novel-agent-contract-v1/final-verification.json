@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-agent-contract-v1-final-verification",
+  "status": "PASS",
+  "generatedAt": "2026-08-01T16:53:33Z",
+  "acceptanceEvidence": {
+    "relativePath": "docs/evidence/novel-agent-contract-v1/ai-first-v1-acceptance-r2.json",
+    "sha256": "d8d098f4b1ae4663da70aeaddd2f36606522339322cd68431ac56596979e687f",
+    "status": "PASS"
+  },
+  "commands": [
+    {
+      "command": "npx vitest run tests/novel-agent-service.test.ts tests/novel-agent-cli.test.ts tests/novel-command-bus.test.ts tests/novel-manuscript.test.ts tests/mcp.test.ts tests/runtime-mcp-effect.test.ts --maxWorkers=1",
+      "result": "PASS",
+      "files": 6,
+      "tests": 50,
+      "durationSeconds": 125.47
+    },
+    {
+      "command": "npm run typecheck",
+      "result": "PASS"
+    },
+    {
+      "command": "npx tsx scripts/novel-agent-contract-smoke.ts",
+      "result": "PASS",
+      "evidence": "docs/evidence/novel-agent-contract-v1/ai-first-v1-acceptance-r2.json"
+    },
+    {
+      "command": "npx tsx scripts/build-novel-mode-isolated.ts --snapshot-root <new-system-temp-directory> --protected-pid 51269",
+      "innerCommand": "npm run build",
+      "result": "PASS",
+      "liveRuntimeStable": true,
+      "protectedProcessStable": true
+    }
+  ],
+  "isolatedBuild": {
+    "sourceDigest": "646ef3093d6c63da0e35b953f401ab8340b3360f0f2fb02210310f68beba63b3",
+    "sourceFiles": 932,
+    "sourceBytes": 18926723,
+    "buildId": "f379829c026d30b20a4c7cb403d47a56",
+    "buildIdentityFingerprint": "4ceab6a9ff75b5f2af0f548e6e33b1ec24d78c953546d51a9f06bb9768b15009",
+    "mcpToolCount": 207,
+    "releaseManifestSha256": "f66d211150a3a6ad0a43f316ee6bf415da964574d5e594a9b2d3d357196ad7b9",
+    "requiredArtifacts": [
+      "out/main/index.js",
+      "out/preload/index.mjs",
+      "out/renderer/index.html",
+      "dist-mcp/mcp/server.js"
+    ],
+    "warnings": [
+      "Vite reported existing dynamic/static import chunking warnings; build exited successfully."
+    ]
+  },
+  "acceptanceSummary": {
+    "shortNovelCharacters": 100,
+    "mcpCliReadEquivalence": true,
+    "idempotentCrossInterfaceReplay": true,
+    "staleCasRejected": true,
+    "millionNovelUtf16Characters": 1000000,
+    "millionNovelChapters": 500,
+    "millionSearchHotMilliseconds": 98,
+    "millionSearchScannedChapters": 500,
+    "millionSearchSkippedExternalChanges": 0,
+    "millionSourceUnchanged": true
+  },
+  "intentionallyNotPerformed": [
+    "No remote Grok, Claude, or other model call was made.",
+    "No human UI expansion or visual acceptance was required for this AI contract slice.",
+    "No live MCP installation/restart, deployment, Git stage, commit, push, or pull request was performed.",
+    "The whole repository test suite was not run; the directed 50-test suite covers the changed contract, repository, command bus, MCP, CLI, and effect classification paths."
+  ]
+}

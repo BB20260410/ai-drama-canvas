@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 3,
+  "runId": "isolated-package-smoke-20260809T202512736Z-42092-75fea4ba",
+  "generatedAt": "2026-08-09T20:27:43.133Z",
+  "status": "passed",
+  "transport": "packaged-electron-current-source",
+  "executablePath": "/private/tmp/aic-pkg-e8aq76/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+  "projectRoot": "/private/tmp/aic-pkg-e8aq76/t/review-project",
+  "registryPath": "/private/tmp/aic-pkg-e8aq76/t/review-project-registry.json",
+  "userDataPath": "/private/tmp/aic-pkg-e8aq76/t/review-electron-user-data",
+  "initial": {
+    "itemId": "main-ep01-unit001",
+    "targetPath": "/private/tmp/aic-pkg-e8aq76/t/review-project/EP01_15s_001_雾河神落/EP01_15s_001_首帧_raw.png",
+    "targetId": "main-ep01-unit001-f2283ede5089",
+    "sha256": "6a3d6d04ae193fec663d9d387e90dc6708a0367a243da4f356da7e7da2c768f6",
+    "scanId": "f81bf630-543f-4d06-bdc2-552ff14b05ff",
+    "historicalReviewCount": 1,
+    "mediaSrc": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-e8aq76%2Ft%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=6a3d6d04ae193fec663d9d387e90dc6708a0367a243da4f356da7e7da2c768f6"
+  },
+  "staleRejected": {
+    "status": "待视觉验收",
+    "sha256": "ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412",
+    "scanId": "3ae27aa5-0d57-44fc-b468-4c691f031b68",
+    "historicalReviewCount": 1,
+    "attemptedMediaSrc": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-e8aq76%2Ft%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E5%B0%BE%E5%B8%A7_raw.png&sha256=4f63c9d3597dbf4103a14bc3bc94c5256eceb1a1f1f21d76246586802bd4f6c8",
+    "mediaSrc": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-e8aq76%2Ft%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412"
+  },
+  "passed": {
+    "status": "待视频",
+    "latestReviewId": "review-2026-08-09T20-27-36-133Z-60b53738",
+    "sha256": "ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412",
+    "historicalReviewCount": 2,
+    "mediaSrc": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-e8aq76%2Ft%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412"
+  },
+  "restarted": {
+    "status": "待视频",
+    "latestReviewId": "review-2026-08-09T20-27-36-133Z-60b53738",
+    "sha256": "ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412",
+    "historicalReviewCount": 2,
+    "mediaSrc": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-e8aq76%2Ft%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=ecee2a0822bfe96545dc07b4d6df2439cb4950f0841e7f6c67584d64eae24412"
+  },
+  "refreshed": {
+    "status": "待视觉验收",
+    "sha256": "577319c9aa3a0368ac551272561441e8db81cfcd008af2f742f9a44952f280e8",
+    "scanId": "f238ddae-5716-48f6-801f-2ed04d4bfe97",
+    "historicalReviewCount": 2,
+    "mediaSrc": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-e8aq76%2Ft%2Freview-project%2FEP01_15s_001_%E9%9B%BE%E6%B2%B3%E7%A5%9E%E8%90%BD%2FEP01_15s_001_%E9%A6%96%E5%B8%A7_raw.png&sha256=577319c9aa3a0368ac551272561441e8db81cfcd008af2f742f9a44952f280e8"
+  },
+  "pageErrors": [],
+  "backgroundSmoke": {
+    "enabled": true,
+    "bringToFrontUsed": false,
+    "snapshots": [
+      {
+        "label": "ReviewStudio first ready",
+        "enabled": true,
+        "platform": "darwin",
+        "activationPolicy": "accessory",
+        "dockVisible": false,
+        "focusedWindowId": null,
+        "windows": [
+          {
+            "id": 1,
+            "showEvents": 0,
+            "focusEvents": 0,
+            "readyToShowEvents": 1,
+            "visible": false,
+            "focused": false,
+            "destroyed": false
+          }
+        ]
+      },
+      {
+        "label": "ReviewStudio first graceful close:before-close",
+        "enabled": true,
+        "platform": "darwin",
+        "activationPolicy": "accessory",
+        "dockVisible": false,
+        "focusedWindowId": null,
+        "windows": [
+          {
+            "id": 1,
+            "showEvents": 0,
+            "focusEvents": 0,
+            "readyToShowEvents": 1,
+            "visible": false,
+            "focused": false,
+            "destroyed": false
+          }
+        ]
+      },
+      {
+        "label": "ReviewStudio restart ready",
+        "enabled": true,
+        "platform": "darwin",
+        "activationPolicy": "accessory",
+        "dockVisible": false,
+        "focusedWindowId": null,
+        "windows": [
+          {
+            "id": 1,
+            "showEvents": 0,
+            "focusEvents": 0,
+            "readyToShowEvents": 1,
+            "visible": false,
+            "focused": false,
+            "destroyed": false
+          }
+        ]
+      },
+      {
+        "label": "ReviewStudio final graceful close:before-close",
+        "enabled": true,
+        "platform": "darwin",
+        "activationPolicy": "accessory",
+        "dockVisible": false,
+        "focusedWindowId": null,
+        "windows": [
+          {
+            "id": 1,
+            "showEvents": 0,
+            "focusEvents": 0,
+            "readyToShowEvents": 1,
+            "visible": false,
+            "focused": false,
+            "destroyed": false
+          }
+        ]
+      }
+    ]
+  },
+  "assertions": {
+    "staleSubmitRejectedThroughUi": true,
+    "staleAttemptWroteNoReview": true,
+    "staleRejectAutoReloadedHash": true,
+    "staleRejectResetCriteria": true,
+    "visualPassSubmittedThroughUi": true,
+    "passRestoredAfterApplicationRestart": true,
+    "restartHashMatchesPassedContent": true,
+    "samePathArtifactIdStable": true,
+    "shaChanged": true,
+    "stalePassNotCurrent": true,
+    "statusReturnedToVisualReview": true,
+    "cacheBustChanged": true,
+    "historyPreserved": true,
+    "pageErrors": 0,
+    "screenshotCaptureAttempt": 1
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260809T202512736Z-42092-75fea4ba-review-ui.png",
+    "bytes": 224536,
+    "sha256": "63293711a732e12ad2e4d79c840d6c3a9b25a3b2f54d35cc6eedc939b7233aee",
+    "width": 1560,
+    "height": 980,
+    "content": {
+      "pixels": 1528800,
+      "brightPixels": 508344,
+      "brightRatio": 0.33251177394034537,
+      "chromaticPixels": 228973,
+      "chromaticRatio": 0.14977302459445316,
+      "edgeBrightRatios": {
+        "top": 0.6343341182626897,
+        "left": 0.1639225797080398,
+        "right": 0.20645408163265305
+      }
+    }
+  },
+  "terminal": {
+    "rootRemoved": true,
+    "registryRemoved": true,
+    "userDataRemoved": true
+  },
+  "closeRuns": [
+    {
+      "label": "ReviewStudio first graceful close",
+      "pid": 44281,
+      "durationMs": 48,
+      "graceful": true,
+      "forceTerminated": false,
+      "forceKilled": false,
+      "exitCode": 0,
+      "signalCode": null
+    },
+    {
+      "label": "ReviewStudio final graceful close",
+      "pid": 44690,
+      "durationMs": 40,
+      "graceful": true,
+      "forceTerminated": false,
+      "forceKilled": false,
+      "exitCode": 0,
+      "signalCode": null
+    }
+  ]
+}

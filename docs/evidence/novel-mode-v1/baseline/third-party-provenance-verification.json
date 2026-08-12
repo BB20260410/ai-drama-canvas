@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-mode-evidence-envelope",
+  "phase": "P0",
+  "capturedAt": "2026-08-01T07:04:00Z",
+  "buildIdentity": {
+    "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+    "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4"
+  },
+  "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4",
+  "command": "npx vitest run tests/novel-third-party-provenance.test.ts tests/novel-fts5-runtime-probe.test.ts tests/novel-readonly-tree-manifest.test.ts tests/novel-scale-fixture.test.ts --maxWorkers=1",
+  "exitCode": 0,
+  "fixtureCorpusSha256": null,
+  "targetChapter": null,
+  "durationMs": 1712,
+  "errorSummary": [],
+  "evidenceRelativePath": "docs/evidence/novel-mode-v1/baseline/commands/p0-directed-final-p0.json",
+  "testCounts": {
+    "files": 4,
+    "tests": 19
+  },
+  "log": {
+    "relativePath": "docs/evidence/novel-mode-v1/baseline/commands/p0-directed-final-p0.log",
+    "sha256": "761d33a392c82430a062042653b3fa9bdcf6676507380d1622a4543037355a6c"
+  },
+  "verification": {
+    "primarySource": "locked GitHub commit and raw object URLs",
+    "commitsMatched": 2,
+    "treesMatched": 2,
+    "sourceFilesMatched": 11,
+    "licensesMatched": 2,
+    "allMatched": true,
+    "containsUpstreamImplementation": false,
+    "inkosPolicy": "behavioral-reference-only-no-copy-no-link-no-translation"
+  },
+  "artifacts": [
+    {
+      "relativePath": "docs/third-party/novel-donors.json",
+      "bytes": 7474,
+      "sha256": "4930154c73447f203e475939d65b39978114d897691abb5d6e3690a39d763f23"
+    },
+    {
+      "relativePath": "THIRD_PARTY_NOTICES.md",
+      "bytes": 3840,
+      "sha256": "75a377b87000bec43e9c5ef8d691b3abd06bce62a8fb13e186ea66862f7b4815"
+    },
+    {
+      "relativePath": "licenses/MIT-CharacterArc.txt",
+      "bytes": 1067,
+      "sha256": "d53e396570581aeda22c0dfd6a9fb12cf6c69a99814161668b2a104ee6cddf9f"
+    },
+    {
+      "relativePath": "licenses/Apache-2.0-OpenFic.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    }
+  ]
+}

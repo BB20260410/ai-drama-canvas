@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-chapter-state-decision",
+  "decisionId": "novel-state-decision-48c66c8c917f3fce45962178",
+  "projectId": "project-5261558adfaf",
+  "candidateId": "novel-state-candidate-d8d46b47397409e62a4f0bca",
+  "candidateFingerprint": "2c495c080bf9a6d62985813a422c81f5053880e858f500c90cbee1731de72e8a",
+  "decision": "accepted",
+  "reviewer": "human-owner-pilot",
+  "note": "仅接受隔离演练状态，不同步正式源",
+  "writingStateRevision": 2,
+  "writingStateFingerprint": "ab138c6d450da311fb6c826380f4d54e1cea9f55ee7ff6eba34453d7cdb9ff87",
+  "decidedAt": "2026-08-02T00:20:08.077Z",
+  "fingerprint": "92b889a3f134c5566e906d89872eb51f76aa15196a708cf769c43efba0071313"
+}

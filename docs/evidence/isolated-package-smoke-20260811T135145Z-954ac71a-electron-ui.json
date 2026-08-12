@@ -1,0 +1,882 @@
+{
+  "schemaVersion": 1,
+  "runId": "isolated-package-smoke-20260811T135156740Z-40707-5cc1e150",
+  "generatedAt": "2026-08-11T13:56:18.426Z",
+  "status": "passed",
+  "transport": "packaged-electron-current-source",
+  "executablePath": "/private/tmp/aic-pkg-S2LZob/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+  "userDataPath": "/private/tmp/aic-pkg-S2LZob/t/ai-canvas-editor-effect-transition-ui-CSlBIs/electron-user-data",
+  "fixture": {
+    "root": "/private/tmp/aic-pkg-S2LZob/t/ai-canvas-editor-effect-transition-ui-CSlBIs/project",
+    "registryPath": "/private/tmp/aic-pkg-S2LZob/t/ai-canvas-editor-effect-transition-ui-CSlBIs/registry.json",
+    "editProjectId": "edit-503f4a5d-d2db-4dc8-b3f7-6ce24bb59bd7",
+    "revision": 1,
+    "outgoingClipId": "clip-56350211-f2b2-46ca-aa23-5e4fbb2c0492",
+    "incomingClipId": "clip-516bacf6-7452-4847-9c76-65bce4829a1f",
+    "inOffsetFrames": 3,
+    "outOffsetFrames": 5,
+    "timebase": {
+      "rateNumerator": 24,
+      "rateDenominator": 1
+    }
+  },
+  "inspector": {
+    "initial": {
+      "transition": "smpte_dissolve",
+      "inOffsetFrames": 3,
+      "outOffsetFrames": 5,
+      "playbackDisabled": true,
+      "keyframeDisabled": true
+    },
+    "restart": {
+      "inOffsetFrames": 2,
+      "outOffsetFrames": 4
+    }
+  },
+  "preview": {
+    "initial": {
+      "outgoing": {
+        "currentTime": 1.167,
+        "opacity": 0.625,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-S2LZob%2Ft%2Fai-canvas-editor-effect-transition-ui-CSlBIs%2Fproject%2FEP01_15s_001_UI%E8%BD%AC%E5%9C%BA%E5%89%8D%E9%A1%B9%2FEP01_15s_001_v1.mp4"
+      },
+      "incoming": {
+        "currentTime": 0.167,
+        "opacity": 0.375,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-S2LZob%2Ft%2Fai-canvas-editor-effect-transition-ui-CSlBIs%2Fproject%2FEP01_15s_002_UI%E8%BD%AC%E5%9C%BA%E5%90%8E%E9%A1%B9%2FEP01_15s_002_v1.mp4"
+      }
+    },
+    "afterRedo": {
+      "outgoing": {
+        "currentTime": 1.167,
+        "opacity": 0.666667,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-S2LZob%2Ft%2Fai-canvas-editor-effect-transition-ui-CSlBIs%2Fproject%2FEP01_15s_001_UI%E8%BD%AC%E5%9C%BA%E5%89%8D%E9%A1%B9%2FEP01_15s_001_v1.mp4"
+      },
+      "incoming": {
+        "currentTime": 0.165999,
+        "opacity": 0.333333,
+        "muted": true,
+        "readyState": 4,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-S2LZob%2Ft%2Fai-canvas-editor-effect-transition-ui-CSlBIs%2Fproject%2FEP01_15s_002_UI%E8%BD%AC%E5%9C%BA%E5%90%8E%E9%A1%B9%2FEP01_15s_002_v1.mp4"
+      }
+    },
+    "afterApplicationRestart": {
+      "outgoing": {
+        "currentTime": 1.167,
+        "opacity": 0.666667,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-S2LZob%2Ft%2Fai-canvas-editor-effect-transition-ui-CSlBIs%2Fproject%2FEP01_15s_001_UI%E8%BD%AC%E5%9C%BA%E5%89%8D%E9%A1%B9%2FEP01_15s_001_v1.mp4"
+      },
+      "incoming": {
+        "currentTime": 0.165999,
+        "opacity": 0.333333,
+        "muted": true,
+        "readyState": 1,
+        "source": "aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-S2LZob%2Ft%2Fai-canvas-editor-effect-transition-ui-CSlBIs%2Fproject%2FEP01_15s_002_UI%E8%BD%AC%E5%9C%BA%E5%90%8E%E9%A1%B9%2FEP01_15s_002_v1.mp4"
+      }
+    }
+  },
+  "performance": {
+    "firstTimelineOpenMs": 2456.74,
+    "restartTimelineOpenMs": 2471.51,
+    "playheadDragFeedbackMs": 83.77,
+    "playbackFirstProgressMs": 113.69,
+    "playheadFrames": {
+      "before": 24,
+      "afterDrag": 30,
+      "afterPlayback": 18
+    },
+    "playbackFrameIntervals": {
+      "samples": 102,
+      "p95Ms": 9.2,
+      "maxMs": 9.4
+    },
+    "dom": {
+      "label": "timeline-playback",
+      "totalElements": 482,
+      "timelineClips": 2,
+      "rulerTicks": 6,
+      "videoElements": 1,
+      "audioElements": 0
+    },
+    "runtimeStabilitySnapshots": [
+      {
+        "label": "first-timeline-ready",
+        "snapshot": {
+          "schemaVersion": 1,
+          "capturedAt": "2026-08-11T13:56:11.125Z",
+          "processes": [
+            {
+              "pid": 44260,
+              "type": "Browser",
+              "cpuPercent": 0,
+              "idleWakeupsPerSecond": 0,
+              "cumulativeCpuSeconds": 0.985416,
+              "workingSetKiB": 259664,
+              "peakWorkingSetKiB": 259664
+            },
+            {
+              "pid": 44261,
+              "type": "GPU",
+              "cpuPercent": 0,
+              "idleWakeupsPerSecond": 0,
+              "cumulativeCpuSeconds": 0.472551,
+              "workingSetKiB": 116608,
+              "peakWorkingSetKiB": 116624
+            },
+            {
+              "pid": 44262,
+              "type": "Utility",
+              "cpuPercent": 0,
+              "idleWakeupsPerSecond": 0,
+              "cumulativeCpuSeconds": 0.06667,
+              "workingSetKiB": 46592,
+              "peakWorkingSetKiB": 46592
+            },
+            {
+              "pid": 44263,
+              "type": "Tab",
+              "cpuPercent": 0,
+              "idleWakeupsPerSecond": 0,
+              "cumulativeCpuSeconds": 0.52199,
+              "workingSetKiB": 192368,
+              "peakWorkingSetKiB": 192432
+            }
+          ],
+          "ipc": {
+            "capturedAt": "2026-08-11T13:56:11.126Z",
+            "channels": [
+              {
+                "channel": "canvas:activate-project",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 1256.1819160000002,
+                "maxDurationMs": 1256.1819160000002,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:begin-editor-session",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 942.3297499999999,
+                "maxDurationMs": 942.3297499999999,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:probe-video-engine",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 880.8838340000002,
+                "maxDurationMs": 880.8838340000002,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:list-edit-render-jobs",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 438.4406249999997,
+                "maxDurationMs": 438.4406249999997,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:set-editor-session-project",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 246.37187499999982,
+                "maxDurationMs": 246.37187499999982,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-active-project",
+                "effect": "read-only",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 3.9156249999999773,
+                "maxDurationMs": 3.9156249999999773,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:list-edit-media-page",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 3.0562079999999696,
+                "maxDurationMs": 3.0562079999999696,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:list-edit-projects",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 2.990332999999737,
+                "maxDurationMs": 2.990332999999737,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:load-layout",
+                "effect": "mutation",
+                "calls": 2,
+                "failures": 0,
+                "totalDurationMs": 2.5321680000000697,
+                "maxDurationMs": 1.6300840000000107,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-index",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 2.2317920000000413,
+                "maxDurationMs": 2.2317920000000413,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-managed-project-shell",
+                "effect": "read-only",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 1.9057920000000195,
+                "maxDurationMs": 1.9057920000000195,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:start-watch",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 1.8363329999999678,
+                "maxDurationMs": 1.8363329999999678,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:list-projects",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 1.8161249999999427,
+                "maxDurationMs": 1.8161249999999427,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-semantic-state",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 0.9132920000000695,
+                "maxDurationMs": 0.9132920000000695,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-history-info",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 0.6499999999999773,
+                "maxDurationMs": 0.6499999999999773,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-edit-project",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 0.5946669999998448,
+                "maxDurationMs": 0.5946669999998448,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-edit-history-info",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 0.528208000000177,
+                "maxDurationMs": 0.528208000000177,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-adaptation-workspace",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 0.4486249999999927,
+                "maxDurationMs": 0.4486249999999927,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-runtime-write-gate",
+                "effect": "diagnostic-read",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 0.06216600000004746,
+                "maxDurationMs": 0.06216600000004746,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-default-managed-projects-root",
+                "effect": "read-only",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 0.04495900000006259,
+                "maxDurationMs": 0.04495900000006259,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-managed-project-operation-state",
+                "effect": "read-only",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 0.014499999999998181,
+                "maxDurationMs": 0.014499999999998181,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              }
+            ]
+          },
+          "storage": {
+            "managedProjectShellInspections": 2,
+            "sqliteSnapshotRequests": 0,
+            "sqliteStableDatabaseCaptures": 0,
+            "sqliteSnapshotRetries": 0,
+            "sqliteSnapshotsOpened": 0
+          },
+          "watchers": {
+            "sourceRuntimeGate": 0,
+            "legacyActive": 2,
+            "legacyRetained": 0,
+            "generationLedger": 0,
+            "total": 2
+          },
+          "tasks": {
+            "activeOperations": 0,
+            "activeScans": 0,
+            "manualScans": 0,
+            "projectLists": 0,
+            "editorSessions": 1,
+            "watcherDebounceTimers": 0,
+            "watcherScans": 0,
+            "total": 1
+          },
+          "nativeDrag": {
+            "activePreparations": 0,
+            "capacityReservations": 0,
+            "prepared": 0,
+            "claimed": 0,
+            "activeOsHandoffs": 0,
+            "retained": 0,
+            "ownedDirectories": 0,
+            "closing": false
+          },
+          "windowCount": 1
+        }
+      },
+      {
+        "label": "after-playback-idle",
+        "snapshot": {
+          "schemaVersion": 1,
+          "capturedAt": "2026-08-11T13:56:18.421Z",
+          "processes": [
+            {
+              "pid": 44319,
+              "type": "Browser",
+              "cpuPercent": 0,
+              "idleWakeupsPerSecond": 0,
+              "cumulativeCpuSeconds": 0.890259,
+              "workingSetKiB": 265312,
+              "peakWorkingSetKiB": 265312
+            },
+            {
+              "pid": 44320,
+              "type": "GPU",
+              "cpuPercent": 0,
+              "idleWakeupsPerSecond": 0,
+              "cumulativeCpuSeconds": 0.620459,
+              "workingSetKiB": 119120,
+              "peakWorkingSetKiB": 119840
+            },
+            {
+              "pid": 44321,
+              "type": "Utility",
+              "cpuPercent": 0,
+              "idleWakeupsPerSecond": 0,
+              "cumulativeCpuSeconds": 0.050723,
+              "workingSetKiB": 46144,
+              "peakWorkingSetKiB": 46144
+            },
+            {
+              "pid": 44323,
+              "type": "Tab",
+              "cpuPercent": 0,
+              "idleWakeupsPerSecond": 0,
+              "cumulativeCpuSeconds": 0.724269,
+              "workingSetKiB": 210768,
+              "peakWorkingSetKiB": 210768
+            }
+          ],
+          "ipc": {
+            "capturedAt": "2026-08-11T13:56:18.421Z",
+            "channels": [
+              {
+                "channel": "canvas:activate-project",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 1175.458125,
+                "maxDurationMs": 1175.458125,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:probe-video-engine",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 951.5320409999999,
+                "maxDurationMs": 951.5320409999999,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:begin-editor-session",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 885.809875,
+                "maxDurationMs": 885.809875,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:list-edit-render-jobs",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 391.65725,
+                "maxDurationMs": 391.65725,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:set-editor-session-project",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 265.67508399999997,
+                "maxDurationMs": 265.67508399999997,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-edit-project",
+                "effect": "mutation",
+                "calls": 2,
+                "failures": 0,
+                "totalDurationMs": 9.8520410000001,
+                "maxDurationMs": 9.074415999999928,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-active-project",
+                "effect": "read-only",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 6.2769590000000335,
+                "maxDurationMs": 6.2769590000000335,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:list-projects",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 4.201915999999983,
+                "maxDurationMs": 4.201915999999983,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:list-edit-media-page",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 2.500917000000072,
+                "maxDurationMs": 2.500917000000072,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:load-layout",
+                "effect": "mutation",
+                "calls": 2,
+                "failures": 0,
+                "totalDurationMs": 2.464375000000018,
+                "maxDurationMs": 1.3578750000000355,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-managed-project-shell",
+                "effect": "read-only",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 1.850416999999993,
+                "maxDurationMs": 1.850416999999993,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:list-edit-projects",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 1.8038750000000618,
+                "maxDurationMs": 1.8038750000000618,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:start-watch",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 1.7869579999999132,
+                "maxDurationMs": 1.7869579999999132,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-index",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 1.6492920000000595,
+                "maxDurationMs": 1.6492920000000595,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-semantic-state",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 0.691665999999941,
+                "maxDurationMs": 0.691665999999941,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-edit-history-info",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 0.6912499999998545,
+                "maxDurationMs": 0.6912499999998545,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-history-info",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 0.5429159999999911,
+                "maxDurationMs": 0.5429159999999911,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-adaptation-workspace",
+                "effect": "mutation",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 0.38208399999996345,
+                "maxDurationMs": 0.38208399999996345,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-runtime-write-gate",
+                "effect": "diagnostic-read",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 0.055375000000026375,
+                "maxDurationMs": 0.055375000000026375,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-default-managed-projects-root",
+                "effect": "read-only",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 0.03633400000001075,
+                "maxDurationMs": 0.03633400000001075,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              },
+              {
+                "channel": "canvas:get-managed-project-operation-state",
+                "effect": "read-only",
+                "calls": 1,
+                "failures": 0,
+                "totalDurationMs": 0.008041999999932159,
+                "maxDurationMs": 0.008041999999932159,
+                "totalGateDurationMs": 0,
+                "maxGateDurationMs": 0
+              }
+            ]
+          },
+          "storage": {
+            "managedProjectShellInspections": 2,
+            "sqliteSnapshotRequests": 0,
+            "sqliteStableDatabaseCaptures": 0,
+            "sqliteSnapshotRetries": 0,
+            "sqliteSnapshotsOpened": 0
+          },
+          "watchers": {
+            "sourceRuntimeGate": 0,
+            "legacyActive": 2,
+            "legacyRetained": 0,
+            "generationLedger": 0,
+            "total": 2
+          },
+          "tasks": {
+            "activeOperations": 0,
+            "activeScans": 0,
+            "manualScans": 0,
+            "projectLists": 0,
+            "editorSessions": 1,
+            "watcherDebounceTimers": 0,
+            "watcherScans": 0,
+            "total": 1
+          },
+          "nativeDrag": {
+            "activePreparations": 0,
+            "capacityReservations": 0,
+            "prepared": 0,
+            "claimed": 0,
+            "activeOsHandoffs": 0,
+            "retained": 0,
+            "ownedDirectories": 0,
+            "closing": false
+          },
+          "windowCount": 1
+        }
+      }
+    ]
+  },
+  "revisions": {
+    "fixture": 1,
+    "saved": 2,
+    "undone": 3,
+    "redone": 4,
+    "afterApplicationRestart": 4
+  },
+  "undoRedo": {
+    "undoRestoredOffsets": [
+      3,
+      5
+    ],
+    "redoRestoredOffsets": [
+      2,
+      4
+    ]
+  },
+  "otioExport": {
+    "path": "/private/tmp/aic-pkg-S2LZob/t/ai-canvas-editor-effect-transition-ui-CSlBIs/project/.aicanvas/editor/otio/UI 标准 Effect Transition_r4_1786456572166.otio",
+    "transition": {
+      "OTIO_SCHEMA": "Transition.1",
+      "name": "SMPTE Dissolve",
+      "transition_type": "SMPTE_Dissolve",
+      "in_offset": {
+        "OTIO_SCHEMA": "RationalTime.1",
+        "value": 2,
+        "rate": 24
+      },
+      "out_offset": {
+        "OTIO_SCHEMA": "RationalTime.1",
+        "value": 4,
+        "rate": 24
+      },
+      "enabled": true,
+      "metadata": {
+        "aicanvas": {
+          "contract": "aicanvas.otio-effect-transition.v1"
+        }
+      }
+    },
+    "contract": "aicanvas.otio-effect-transition.v1"
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260811T135145Z-954ac71a-electron-ui.png",
+    "bytes": 255536,
+    "sha256": "c77eed50a8ef3aba340742f23ec9173c9d65ebccfbc32676cbf9d3507e556dc5",
+    "width": 1560,
+    "height": 980,
+    "captureAttempt": 1,
+    "content": {
+      "pixels": 1528800,
+      "brightRatio": 0.20923796441653583,
+      "chromaticRatio": 0.05063317634746206
+    }
+  },
+  "pageErrors": [],
+  "isolation": {
+    "userDataOutsideProjectRoot": true
+  },
+  "backgroundSmoke": {
+    "enabled": true,
+    "bringToFrontUsed": false,
+    "snapshots": [
+      {
+        "label": "Effect/Transition first ready",
+        "enabled": true,
+        "platform": "darwin",
+        "activationPolicy": "accessory",
+        "dockVisible": false,
+        "focusedWindowId": null,
+        "windows": [
+          {
+            "id": 1,
+            "showEvents": 0,
+            "focusEvents": 0,
+            "readyToShowEvents": 1,
+            "visible": false,
+            "focused": false,
+            "destroyed": false
+          }
+        ]
+      },
+      {
+        "label": "Effect/Transition first graceful close:before-close",
+        "enabled": true,
+        "platform": "darwin",
+        "activationPolicy": "accessory",
+        "dockVisible": false,
+        "focusedWindowId": null,
+        "windows": [
+          {
+            "id": 1,
+            "showEvents": 0,
+            "focusEvents": 0,
+            "readyToShowEvents": 1,
+            "visible": false,
+            "focused": false,
+            "destroyed": false
+          }
+        ]
+      },
+      {
+        "label": "Effect/Transition restart ready",
+        "enabled": true,
+        "platform": "darwin",
+        "activationPolicy": "accessory",
+        "dockVisible": false,
+        "focusedWindowId": null,
+        "windows": [
+          {
+            "id": 1,
+            "showEvents": 0,
+            "focusEvents": 0,
+            "readyToShowEvents": 1,
+            "visible": false,
+            "focused": false,
+            "destroyed": false
+          }
+        ]
+      },
+      {
+        "label": "Effect/Transition final graceful close:before-close",
+        "enabled": true,
+        "platform": "darwin",
+        "activationPolicy": "accessory",
+        "dockVisible": false,
+        "focusedWindowId": null,
+        "windows": [
+          {
+            "id": 1,
+            "showEvents": 0,
+            "focusEvents": 0,
+            "readyToShowEvents": 1,
+            "visible": false,
+            "focused": false,
+            "destroyed": false
+          }
+        ]
+      }
+    ]
+  },
+  "sourceHashes": {
+    "src/core/types.ts": "7b94a2b19a6e45d3239a220f0a1212775b22b5e8871d4bcb433e4f8f23aa8e1f",
+    "src/core/editor.ts": "c87469ccf53fc521e7a955571a4339345f9672e03616d6486220fc3bd000cf5b",
+    "src/core/codex.ts": "bdf6667892e1b832da4cbdaa35b5473814bc32e21810189977bd441c622f50c0",
+    "src/main/app-close-coordinator.ts": "8468031945d013ce2896d174cbcc2f147bbf4e8cfd94f5f998486bb300802e1a",
+    "src/main/index.ts": "3ba0aad23b4e7463ee86f3dc4fff5e59a7583f42e468f92d4db59105f57ba415",
+    "src/mcp/server.ts": "5b613ea630f2459263926d98f18b689c8d4d12a18893b9edc4d2caeee2092469",
+    "src/renderer/src/components/VideoEditorView.vue": "6dd30f9dd0f3457077b1209d78e7ce50ef79439dc79e88611ab314daa758d0e7",
+    "scripts/create-effect-transition-ui-fixture.ts": "ec687fb89ac52953c814a40b2a85b1ec2a62ab99db2907e7c707cb5693451582",
+    "scripts/lib/electron-application-close.mjs": "223eeb3f977efad7418b0eeaa37f3dccad259f83cdcc30175abc5b5964f6893a",
+    "scripts/ui-editor-effect-transition-smoke.mjs": "3d37a5db33e4149b04e2ca4c9a546710634dd63a2e6c2c5e37b4a5d2e0fc189f"
+  },
+  "terminal": {
+    "rootRemoved": true,
+    "registryRemoved": true,
+    "userDataRemoved": true
+  },
+  "closeRuns": [
+    {
+      "label": "Effect/Transition first graceful close",
+      "pid": 44260,
+      "durationMs": 252,
+      "graceful": true,
+      "forceTerminated": false,
+      "forceKilled": false,
+      "exitCode": 0,
+      "signalCode": null
+    },
+    {
+      "label": "Effect/Transition final graceful close",
+      "pid": 44319,
+      "durationMs": 300,
+      "graceful": true,
+      "forceTerminated": false,
+      "forceKilled": false,
+      "exitCode": 0,
+      "signalCode": null
+    }
+  ]
+}

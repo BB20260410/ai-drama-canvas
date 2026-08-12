@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "kind": "higgsfield-seedance25-unlimited-integration-evidence",
+  "status": "software-bridge-passed-provider-capability-blocked",
+  "createdAt": "2026-08-10T06:48:25+08:00",
+  "requestedProfile": {
+    "provider": "higgsfield-connector",
+    "model": "seedance_2_5",
+    "mode": "omni_reference",
+    "narrativeDurationSeconds": 15,
+    "outputDurationSeconds": 20,
+    "resolution": "720p",
+    "count": 1,
+    "generateAudio": true,
+    "billingMode": "unlimited_only",
+    "useUnlim": true,
+    "concurrency": 1
+  },
+  "previousTaskCloseout": {
+    "status": "passed",
+    "priorReviewFindingsRemainClosed": true,
+    "priorInstalledApplicationWasBackedUpBeforeReplacement": true
+  },
+  "providerVerification": {
+    "source": "live-higgsfield-connector-and-official-cli",
+    "accountUnlimAvailable": false,
+    "modelSupportsUnlim": "not-true-field-missing",
+    "standardQueueCostCredits": 130,
+    "unlimitedCostProbe": {
+      "useUnlim": true,
+      "status": "rejected",
+      "errorCode": "INVALID_ARGUMENT",
+      "error": "Unlimited generations aren't supported for seedance_2_5."
+    },
+    "sideEffects": {
+      "mediaUploaded": false,
+      "videoJobCreated": false,
+      "creditsConsumed": false,
+      "browserAutomationUsed": false,
+      "privateApiUsed": false
+    }
+  },
+  "implementation": {
+    "ledger": ".aicanvas/studio-generation-ledger.sqlite",
+    "parallelDatabaseCreated": false,
+    "commands": [
+      "attest_studio_higgsfield_connector_capability",
+      "prepare_studio_higgsfield_video_generation",
+      "record_studio_higgsfield_video_submission"
+    ],
+    "readTool": "get_studio_video_generation_control",
+    "codexOnly": true,
+    "studioWriteLeaseRequired": true,
+    "activeProjectFenceRequired": true,
+    "unlimitedDoubleGate": true,
+    "paidFallbackAllowed": false,
+    "submissionUnknownBlocksRetry": true,
+    "persistedConnectorRequest": false,
+    "remoteObservationRedactedBeforePersistence": true,
+    "rendererSubmissionEntry": false
+  },
+  "review": {
+    "independentFinalReview": "clean",
+    "closedFindings": [
+      "source-closure-path-projection",
+      "prompt-compile-before-submit-intent",
+      "codex-actor-provenance",
+      "capability-freshness-fingerprint",
+      "persisted-one-shot-capability-revocation",
+      "remote-observation-sensitive-redaction",
+      "capability-attestation-write-lease"
+    ]
+  },
+  "validation": {
+    "focusedTests": {
+      "files": 4,
+      "tests": 21,
+      "status": "passed"
+    },
+    "typecheck": "passed",
+    "typecheckApp": "passed",
+    "diffCheck": "passed",
+    "fullFastMediumSuites": "not-run-by-explicit-scope"
+  },
+  "candidate": {
+    "candidateId": "mcp-candidate-f893b386dca3c97b-7e28b6fd352a08ea-87156694",
+    "sourceDigest": "f893b386dca3c97bb11aa856f53685e0395894c6cff52c3af67745880c47b6ec",
+    "buildId": "249252297e368251f29b75b3c23177cf",
+    "mcpToolCount": 219,
+    "currentCheck": "passed",
+    "inspectedCandidates": 7,
+    "invalidCandidates": 0,
+    "sdkInitializeAndToolsList": "passed"
+  },
+  "isolatedPackageSmoke": {
+    "status": "passed",
+    "evidencePath": "docs/evidence/isolated-package-smoke-20260809T224151641Z-77651-3d018683.json",
+    "evidenceSha256": "e644c03c84c5036384649e0182c49d89917d60d5911f1f5d6056c515d69bbd7e",
+    "naturalExitRuns": 4,
+    "backgroundSnapshots": 8,
+    "showEvents": 0,
+    "focusEvents": 0,
+    "dockVisible": false,
+    "forceTerminated": false,
+    "lingeringProcesses": 0
+  },
+  "installation": {
+    "status": "passed",
+    "path": "/Applications/AI 漫剧画布.app",
+    "architecture": "arm64",
+    "developerIdDeepStrict": true,
+    "notarized": false,
+    "mainExecutableSha256": "e5c02be0af0d115d83020a3a8eac9e74b472de7c29488509e2376282e9ef5de2",
+    "appAsarSha256": "1e24bf6d2f30f0368578b4a2ce35bd62deeefb2f56ba69720d9738351cad7fe9",
+    "evidencePath": "docs/evidence/installed-local-verify-20260809T224800Z-f893b386.json",
+    "evidenceSha256": "377308aa941a528e16e03ef2cd6aef0bb15b62a16bbc43da3fd57f6d288232fd",
+    "backgroundShowEvents": 0,
+    "backgroundFocusEvents": 0,
+    "naturalCloseDurationMs": 48,
+    "rollbackPath": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260810-064700-f893b386/previous-installed/AI 漫剧画布.app"
+  },
+  "remainingBoundary": {
+    "actualUnlimitedVideoGenerated": false,
+    "blocker": "provider-does-not-currently-offer-programmatic-seedance25-unlimited",
+    "remotePollingImplemented": false,
+    "resultDownloadImplemented": false,
+    "videoCasCommitImplemented": false,
+    "timelineBindingImplemented": false,
+    "nextSafeTrigger": "connector-must-report-account-unlim-available-true-and-model-supports-unlim-true"
+  },
+  "dataAndDeliveryBoundary": {
+    "formalProjectWritten": false,
+    "formalMediaOrCasWritten": false,
+    "gitStaged": false,
+    "gitCommitted": false,
+    "gitPushed": false,
+    "uploaded": false,
+    "published": false,
+    "notarizationRequested": false
+  }
+}

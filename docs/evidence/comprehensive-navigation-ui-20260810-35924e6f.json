@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "kind": "p17-navigation-support-ui-smoke",
+  "status": "pass",
+  "createdAt": "2026-08-10T11:20:33.410Z",
+  "buildIdentity": {
+    "schemaVersion": 1,
+    "kind": "ai-drama-canvas-release-manifest",
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "sourceDigest": "35924e6fb52fa0ec59f31ae645d0901dc72369572dddd33d265d43ca6943d55f",
+    "buildId": "9882588df126cf169c7fe8d1bb46f9cb",
+    "buildIdentityFingerprint": "0c16ad459ff33d01d9996f5b5211b42d6db91c6a25229005a721c7eee61a2f41",
+    "protocolVersion": "1.1",
+    "mcpToolCount": 220,
+    "builtAt": "2026-08-10T11:18:29.266Z",
+    "distribution": "local-only",
+    "localOnly": true,
+    "source": {
+      "files": 988,
+      "bytes": 20300403
+    },
+    "fingerprint": "cf42099772fcb4dd5303e2c2b1717091c3b03f4575754d79a7ef5b881af0c6ee"
+  },
+  "projectId": "project-f50425a5290a",
+  "runtime": "workspace-build",
+  "performance": {
+    "readyDurationMs": 3838,
+    "interactionDurationMs": 105658,
+    "renderedTaskLimits": {
+      "generationBucket": 36,
+      "managedAssetPage": 36,
+      "panelsPerUnit": 6
+    }
+  },
+  "ui": {
+    "visited": [
+      "无限画布",
+      "宫格→绑定工作台",
+      "宫格→驾驶舱",
+      "宫格→Agent 生图队列",
+      "节点面板收起与重新打开",
+      "资产→出场时间线",
+      "单元→展开宫格",
+      "总资源分类与搜索",
+      "四媒体时间线刷新",
+      "图文对照刷新",
+      "剧本",
+      "资产",
+      "绑定",
+      "生成",
+      "审片",
+      "驾驶舱",
+      "Agent 连接",
+      "帮助与安全",
+      "备份取消",
+      "恢复取消",
+      "项目中心焦点闭环",
+      "未保存名称二次确认"
+    ],
+    "audits": [
+      {
+        "label": "无限画布初始页",
+        "buttonCount": 43,
+        "unnamedVisibleButtons": [],
+        "duplicateIds": [],
+        "horizontalOverflowPx": 0
+      },
+      {
+        "label": "总资源中心",
+        "buttonCount": 28,
+        "unnamedVisibleButtons": [],
+        "duplicateIds": [],
+        "horizontalOverflowPx": 0
+      },
+      {
+        "label": "四媒体时间线",
+        "buttonCount": 22,
+        "unnamedVisibleButtons": [],
+        "duplicateIds": [],
+        "horizontalOverflowPx": 0
+      },
+      {
+        "label": "图文对照",
+        "buttonCount": 23,
+        "unnamedVisibleButtons": [],
+        "duplicateIds": [],
+        "horizontalOverflowPx": 0
+      },
+      {
+        "label": "生产驾驶舱",
+        "buttonCount": 42,
+        "unnamedVisibleButtons": [],
+        "duplicateIds": [],
+        "horizontalOverflowPx": 0
+      },
+      {
+        "label": "帮助与安全",
+        "buttonCount": 17,
+        "unnamedVisibleButtons": [],
+        "duplicateIds": [],
+        "horizontalOverflowPx": 0
+      },
+      {
+        "label": "1280×760 紧凑窗口",
+        "buttonCount": 17,
+        "unnamedVisibleButtons": [],
+        "duplicateIds": [],
+        "horizontalOverflowPx": 0
+      }
+    ],
+    "canvasNodeCountPreserved": true,
+    "nodeActionsExecuted": [
+      "open-binding",
+      "open-dashboard",
+      "freeze-dispatch",
+      "close-panel",
+      "asset-appearances",
+      "focus-unit"
+    ],
+    "generationPanelCount": 6,
+    "dashboardPanelCount": 6,
+    "reviewBlockedWithoutResult": true,
+    "agentRepairBlockedInDevelopment": true,
+    "backupCancel": true,
+    "restoreCancel": true,
+    "operationShieldDuringBackupRestore": true,
+    "projectCenterFocusTrap": true,
+    "projectCenterUnsavedCloseConfirmation": true,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "externalRequests": 0
+  },
+  "safety": {
+    "isolatedFixture": true,
+    "agentConfigurationWrites": 0,
+    "realImageGenerated": false,
+    "browser": false,
+    "upload": false,
+    "payment": false,
+    "publish": false,
+    "backgroundSnapshot": {
+      "label": "P17 navigation before close",
+      "enabled": true,
+      "platform": "darwin",
+      "activationPolicy": "accessory",
+      "dockVisible": false,
+      "focusedWindowId": null,
+      "windows": [
+        {
+          "id": 1,
+          "showEvents": 0,
+          "focusEvents": 0,
+          "readyToShowEvents": 1,
+          "visible": false,
+          "focused": false,
+          "destroyed": false
+        }
+      ]
+    },
+    "closeEvidence": {
+      "label": "P17 navigation Electron",
+      "pid": 53526,
+      "durationMs": 84,
+      "graceful": true,
+      "forceTerminated": false,
+      "forceKilled": false,
+      "exitCode": 0,
+      "signalCode": null
+    },
+    "runtimeRootRemoved": true
+  },
+  "screenshot": {
+    "path": "/Users/hxx/Documents/无限画布/docs/evidence/comprehensive-navigation-ui-20260810-35924e6f.png",
+    "sizeBytes": 226113,
+    "sha256": "8fa3b154978f05bb48f7c80f056817fb72408a10c7adac62fecab3b102e3cadd",
+    "width": 3456,
+    "height": 2058,
+    "stdev": 21.458104796881983
+  }
+}

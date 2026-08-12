@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-workspace-manifest",
+  "projectId": "project-9a3d8d3fb99e",
+  "sourceMode": "managed_markdown",
+  "chapterManifest": "manuscript/chapters.json",
+  "sourceReceiptIds": [],
+  "revision": 1,
+  "createdAt": "2026-08-01T23:45:25.391Z",
+  "updatedAt": "2026-08-01T23:45:25.391Z",
+  "fingerprint": "0ad4e9cf726f56a074922b507fdd1e2640b736b12b06474ac90707b63f289ba5"
+}

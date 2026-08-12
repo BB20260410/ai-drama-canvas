@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "novel-p0-third-party-upstream-final",
+  "status": "pass",
+  "startedAt": "2026-08-01T07:58:58.156Z",
+  "endedAt": "2026-08-01T07:59:14.720Z",
+  "durationMs": 16632,
+  "argv": [
+    "node",
+    "--input-type=module",
+    "-e",
+    "import {readFile} from \"node:fs/promises\"; import {createHash} from \"node:crypto\"; const doc=JSON.parse(await readFile(\"docs/third-party/novel-donors.json\",\"utf8\")); const results=[]; for (const donor of doc.donors) { const parts=donor.repository.replace(/\\/$/,\"\").split(\"/\"); const owner=parts.at(-2); const repo=parts.at(-1); const headers={\"User-Agent\":\"ai-canvas-novel-provenance-audit\"}; const commitUrl=\"https://api.github.com/repos/\"+owner+\"/\"+repo+\"/git/commits/\"+donor.commit; const commitResponse=await fetch(commitUrl,{headers}); if(!commitResponse.ok) throw new Error(donor.name+\" commit HTTP \"+commitResponse.status); const commitObject=await commitResponse.json(); if(commitObject.sha!==donor.commit||commitObject.tree?.sha!==donor.tree) throw new Error(donor.name+\" commit/tree mismatch\"); const files=[{path:donor.license.upstreamPath,sha256:donor.license.upstreamSha256,bytes:donor.license.upstreamBytes,kind:\"license\"},...donor.sourceFiles.map((file)=>({...file,kind:\"source\"}))]; const fileResults=[]; for (const file of files) { const rawUrl=\"https://raw.githubusercontent.com/\"+owner+\"/\"+repo+\"/\"+donor.commit+\"/\"+file.path.split(\"/\").map(encodeURIComponent).join(\"/\"); const response=await fetch(rawUrl,{headers}); if(!response.ok) throw new Error(donor.name+\" \"+file.path+\" HTTP \"+response.status); const bytes=Buffer.from(await response.arrayBuffer()); const sha256=createHash(\"sha256\").update(bytes).digest(\"hex\"); const expectedBytes=file.bytes??null; if(sha256!==file.sha256||(expectedBytes!==null&&bytes.length!==expectedBytes)) throw new Error(donor.name+\" \"+file.path+\" digest/size mismatch\"); fileResults.push({kind:file.kind,path:file.path,httpStatus:response.status,bytes:bytes.length,sha256}); } results.push({name:donor.name,repository:donor.repository,commit:commitObject.sha,tree:commitObject.tree.sha,commitHttpStatus:commitResponse.status,files:fileResults}); } console.log(JSON.stringify({schemaVersion:1,kind:\"novel-third-party-upstream-live-verification\",verifiedAt:new Date().toISOString(),networkMode:\"read-only-github-api-and-raw\",donors:results,summary:{donors:results.length,commits:results.length,trees:results.length,files:results.reduce((n,d)=>n+d.files.length,0),allMatched:true}},null,2));"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+      "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4"
+    },
+    "after": {
+      "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+      "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/novel-mode-v1/baseline/commands/third-party-upstream-final-p0.log",
+    "sizeBytes": 4151,
+    "sha256": "79026e5bbb4081611b2fa3d5a6956aab469ea7790e26bd9bbc6f5f89c3f48e35"
+  }
+}

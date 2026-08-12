@@ -1,0 +1,189 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-derived-search-performance",
+  "generatedAt": "2026-08-03T03:49:27.778Z",
+  "runtime": {
+    "node": "v26.3.1",
+    "platform": "darwin",
+    "architecture": "arm64"
+  },
+  "isolation": {
+    "temporaryRootRemovedAfterRun": true,
+    "formalNovelTouched": false,
+    "note": "全部来源、受管工程、registry 与派生数据库均位于独立临时根。"
+  },
+  "cases": [
+    {
+      "scale": {
+        "label": "chapters-500",
+        "chapterCount": 500,
+        "charactersPerChapter": 2000,
+        "anchorChapter": 377,
+        "anchor": "规模检索锚点五百章唯一证据"
+      },
+      "projectId": "project-7eca07045d5b",
+      "sourceBefore": {
+        "byteLength": 2991998,
+        "sha256": "a43a26f9bdc68efbdbbda2752b13defe305fa33faa9fe86765314a4ba53ccdb8"
+      },
+      "sourceAfter": {
+        "byteLength": 2991998,
+        "sha256": "a43a26f9bdc68efbdbbda2752b13defe305fa33faa9fe86765314a4ba53ccdb8"
+      },
+      "manuscriptIdentityBefore": "c4ee3aa2426e14064493aaa1d2faa3b7acdf1bbd3441b77d02969f505d92d814",
+      "manuscriptIdentityAfter": "c4ee3aa2426e14064493aaa1d2faa3b7acdf1bbd3441b77d02969f505d92d814",
+      "searchDatabaseBytes": 4452352,
+      "index": {
+        "schemaVersion": 1,
+        "databaseLocator": ".aicanvas/novel/novel-derived.sqlite",
+        "state": "fresh",
+        "expectedManifestRevision": 1,
+        "expectedManifestDigest": "c7f6c141e9fd6da199d3b82aa2c556c79c666e7351e2eefa9e3ff418ae79a8a0",
+        "pendingGenerationCount": 0,
+        "activeGeneration": {
+          "generationId": "novel-search-c7f6c141e9fd6da1-6c710ad5",
+          "projectId": "project-7eca07045d5b",
+          "manifestRevision": 1,
+          "manifestDigest": "c7f6c141e9fd6da199d3b82aa2c556c79c666e7351e2eefa9e3ff418ae79a8a0",
+          "tokenizer": "fts5-trigram-case-sensitive-v1",
+          "status": "active",
+          "chapterCount": 500,
+          "indexedChapterCount": 500,
+          "coverageFingerprint": "fd39d663587dd265d1d878e9d1cad59607acc31e8b2d9250db26cbe8ce20523a",
+          "createdAt": "2026-08-03T03:48:22.822Z",
+          "activatedAt": "2026-08-03T03:48:22.846Z"
+        }
+      },
+      "indexedQuery": {
+        "engine": "fts5_trigram",
+        "indexState": "fresh",
+        "indexedChapters": 500,
+        "scannedChapters": 1,
+        "hitCount": 1
+      },
+      "linearBaseline": {
+        "engine": "linear_scan",
+        "fallbackReason": "query_too_short",
+        "scannedChapters": 500,
+        "hitCount": 0
+      },
+      "thresholds": {
+        "rebuildMs": 60000,
+        "indexedP95Ms": 2000,
+        "linearBaselineMs": 30000
+      },
+      "measurements": {
+        "preflightMs": 9.72,
+        "importMs": 31122.99,
+        "rebuildMs": 260.32,
+        "indexedQueryMs": [
+          218.99,
+          217.26,
+          215.84,
+          219.61,
+          216.51,
+          215.76,
+          218.01
+        ],
+        "indexedP95Ms": 219.61,
+        "linearBaselineMs": 117.56
+      },
+      "checks": {
+        "rebuildWithinBudget": true,
+        "indexedP95WithinBudget": true,
+        "linearBaselineWithinBudget": true,
+        "indexedRecallExact": true,
+        "manuscriptIdentityUnchanged": true,
+        "sourceUnchanged": true
+      },
+      "status": "PASS"
+    },
+    {
+      "scale": {
+        "label": "chapters-1000",
+        "chapterCount": 1000,
+        "charactersPerChapter": 2000,
+        "anchorChapter": 811,
+        "anchor": "规模检索锚点一千章唯一证据"
+      },
+      "projectId": "project-d7a854d6aa96",
+      "sourceBefore": {
+        "byteLength": 5983998,
+        "sha256": "a472bbb3331fcd24b406c2b2856cd9e411c17324f73366547e26e38c6085bb5d"
+      },
+      "sourceAfter": {
+        "byteLength": 5983998,
+        "sha256": "a472bbb3331fcd24b406c2b2856cd9e411c17324f73366547e26e38c6085bb5d"
+      },
+      "manuscriptIdentityBefore": "232936c3ac8b44315485cd0d41a5d4c549f2679413f4677c6cc86f6274eab244",
+      "manuscriptIdentityAfter": "232936c3ac8b44315485cd0d41a5d4c549f2679413f4677c6cc86f6274eab244",
+      "searchDatabaseBytes": 8851456,
+      "index": {
+        "schemaVersion": 1,
+        "databaseLocator": ".aicanvas/novel/novel-derived.sqlite",
+        "state": "fresh",
+        "expectedManifestRevision": 1,
+        "expectedManifestDigest": "01825d10cbe19055556dafdf1da65fd7de5209e3ce100a1458eda00f1733ee0a",
+        "pendingGenerationCount": 0,
+        "activeGeneration": {
+          "generationId": "novel-search-01825d10cbe19055-7562f69a",
+          "projectId": "project-d7a854d6aa96",
+          "manifestRevision": 1,
+          "manifestDigest": "01825d10cbe19055556dafdf1da65fd7de5209e3ce100a1458eda00f1733ee0a",
+          "tokenizer": "fts5-trigram-case-sensitive-v1",
+          "status": "active",
+          "chapterCount": 1000,
+          "indexedChapterCount": 1000,
+          "coverageFingerprint": "73004a3c1fe802f3be50675a8cb5b91b284dfc96b31732f5fa75fb4ee9b5b2a9",
+          "createdAt": "2026-08-03T03:49:24.483Z",
+          "activatedAt": "2026-08-03T03:49:24.535Z"
+        }
+      },
+      "indexedQuery": {
+        "engine": "fts5_trigram",
+        "indexState": "fresh",
+        "indexedChapters": 1000,
+        "scannedChapters": 1,
+        "hitCount": 1
+      },
+      "linearBaseline": {
+        "engine": "linear_scan",
+        "fallbackReason": "query_too_short",
+        "scannedChapters": 1000,
+        "hitCount": 0
+      },
+      "thresholds": {
+        "rebuildMs": 120000,
+        "indexedP95Ms": 2000,
+        "linearBaselineMs": 30000
+      },
+      "measurements": {
+        "preflightMs": 18.02,
+        "importMs": 59601.27,
+        "rebuildMs": 414.4,
+        "indexedQueryMs": [
+          425.24,
+          420.84,
+          407.78,
+          421.97,
+          423.84,
+          422.85,
+          419.75
+        ],
+        "indexedP95Ms": 425.24,
+        "linearBaselineMs": 222.89
+      },
+      "checks": {
+        "rebuildWithinBudget": true,
+        "indexedP95WithinBudget": true,
+        "linearBaselineWithinBudget": true,
+        "indexedRecallExact": true,
+        "manuscriptIdentityUnchanged": true,
+        "sourceUnchanged": true
+      },
+      "status": "PASS"
+    }
+  ],
+  "status": "PASS",
+  "limitation": "该结果是本机一次确定性基准，不构成任意硬件、任意文风或未来百万字任务的无限期性能保证。"
+}

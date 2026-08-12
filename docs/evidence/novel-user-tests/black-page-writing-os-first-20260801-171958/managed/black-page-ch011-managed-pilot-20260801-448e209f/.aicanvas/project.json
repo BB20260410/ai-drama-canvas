@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 2,
+  "id": "project-5261558adfaf",
+  "name": "black-page-ch011-managed-pilot-20260801",
+  "primaryRoot": "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958/managed/black-page-ch011-managed-pilot-20260801-448e209f",
+  "sourceRoots": [],
+  "outputRoots": [
+    "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958/managed/black-page-ch011-managed-pilot-20260801-448e209f"
+  ],
+  "ignoreSegments": [
+    "旧版",
+    "弃用",
+    "废弃",
+    "备份",
+    "archive",
+    "deprecated",
+    "__pycache__",
+    ".git",
+    ".aicanvas"
+  ],
+  "namingRules": {
+    "patterns": [],
+    "manualMappings": []
+  },
+  "hardLocks": [],
+  "automation": {
+    "imageBatchSize": 6,
+    "videoBatchSize": 3,
+    "pauseAfterVisualBatch": true,
+    "allowOverwriteAuthoritative": false
+  },
+  "createdAt": "2026-08-02T00:20:07.242Z",
+  "updatedAt": "2026-08-02T00:20:07.240Z",
+  "workspaceMode": "novel",
+  "minimumWriterSchemaVersion": 2
+}

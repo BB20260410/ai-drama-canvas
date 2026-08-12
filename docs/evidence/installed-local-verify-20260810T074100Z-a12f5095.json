@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "kind": "p14-installed-signature-evidence",
+  "status": "pass",
+  "createdAt": "2026-08-10T07:40:39.307Z",
+  "release": {
+    "version": "0.2.0",
+    "sourceDigest": "a12f50958060b54fc0de56e7c95eaf794c4da3f5700abe6749871e0794508e57",
+    "buildId": "3626bb271124bcf39ed86a77e0ce6558",
+    "releaseManifestFingerprint": "f97e5290549184554f6a1642f7159d2439001591f1c05ada11003900aae43c52",
+    "mcpToolCount": 220
+  },
+  "bundle": {
+    "identifier": "com.hxx.aidramacanvas",
+    "version": "0.2.0",
+    "name": "AI 漫剧画布",
+    "architecture": "arm64"
+  },
+  "signing": {
+    "verified": true,
+    "deepStrict": true,
+    "identityCommonName": "Developer ID Application: YIHANG LI (3JS43BTTJ3)",
+    "teamIdentifier": "3JS43BTTJ3"
+  },
+  "installation": {
+    "path": "/Applications/AI 漫剧画布.app",
+    "launchWithoutSystemNode": true,
+    "packagedMcpStartedWithAppElectronRuntime": true,
+    "actualMcpToolCount": 220,
+    "backgroundSnapshot": {
+      "label": "P14 installed App ready",
+      "enabled": true,
+      "platform": "darwin",
+      "activationPolicy": "accessory",
+      "dockVisible": false,
+      "focusedWindowId": null,
+      "windows": [
+        {
+          "id": 1,
+          "showEvents": 0,
+          "focusEvents": 0,
+          "readyToShowEvents": 1,
+          "visible": false,
+          "focused": false,
+          "destroyed": false
+        }
+      ]
+    },
+    "closeRun": {
+      "label": "P14 installed App",
+      "pid": 48468,
+      "durationMs": 47,
+      "graceful": true,
+      "forceTerminated": false,
+      "forceKilled": false,
+      "exitCode": 0,
+      "signalCode": null
+    }
+  },
+  "distribution": "local-only",
+  "notarization": {
+    "performed": false
+  },
+  "boundaries": {
+    "systemNodeRequired": false,
+    "uploaded": false,
+    "published": false,
+    "autoUpdateConfigured": false
+  }
+}

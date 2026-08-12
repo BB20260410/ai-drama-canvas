@@ -1,0 +1,607 @@
+# 无限画布如何真正辅助多 AI 写小说
+
+---
+
+## A. 一句话结论
+
+**当前 Writing OS V1 是"写入过程一致性"的地基（CAS + preflight + 候选 commit），但不是"人物一致性"的地基——它保证"谁基于什么状态写了什么"可追溯，却不保证"角色声口/知情/伏笔/情感逻辑"在百万字跨模型时不漂；要真正支撑百万字，必须在 writing-state 里补四个机械门（状态变更证据链、知情矩阵+禁揭、声口锚点库、伏笔状态机），并做 state 分片，否则第 200 章后模型只能靠压缩态猜前文，必崩。**
+
+---
+
+## B. 当前能力 vs 真实写作痛点
+
+| 真实痛点 | 当前 V1 能力 | 差距判断 |
+|---|---|---|
+| 角色声口第 300 章还在像第 1 章 | 八项状态可能含"声口"描述字段 | **无锚点样本**。模型拿到的是"角色说话爱用反讽"这种标签，不是从正文抽取的 3 段真实对话。百万字时模型根本不记得角色怎么说话 |
+| 角色 A 不该知道秘密 X，但模型让 A 说出来了 | 有"知情"字段 | **无禁揭机械门**。知情是记录不是校验。preflight 不检查新正文是否让不知情角色说出了秘密。这是网文崩盘第一杀手 |
+| 第 150 章该回收的伏笔被忘了 | 有"伏笔"字段 | **无状态机**。伏笔是列表还是状态机？planted→referenced→resolved→paid_off 的生命周期不存在。无法在 preflight 时注入"本章 deadline 伏笔" |
+| 模型知道 A 现在恨 B，但不知道为什么，写出情感逻辑断裂 | 八项状态记录"当前值" | **无变更证据链**。状态是平面快照，不记录 lastChange 的章节/原因/证据区间。模型只能猜因果关系 |
+| 百万字 500 章，context pack 60K 预算只够塞 5-6 章正文 | 搜索 + 有界读取 + 预算裁剪 | **长程记忆完全依赖状态投影保真度**。但状态投影本身不够保真（见上四条），所以裁正文不是问题，问题是裁完之后留下的压缩态不够用 |
+| writing-state.json 单文件百万字后膨胀到 MB 级 | 单文件 CAS | **读取/diff 性能瓶颈**。500 章 × 50 角色 × 8 项 × 变更链，JSON 可达 5-10MB。每次 preflight 重建 pack 要全量解析 |
+| Grok 写完交棒 Claude，Claude 不知道 Grok 的 pending candidate | 命令账本有幂等键 | **无交接协议**。没有"进入工程前检查 pending candidate"的强制门。Claude 可能基于过时状态组包 |
+| 千问 context window 只有 32K，pack 60K 塞不下 | pack 统一预算 | **无模型能力 profile**。不同模型 context window 和指令遵循能力差异巨大，但 pack 组装不考虑模型能力 |
+| 审稿模型发现 OOC 但无法精确指出前文证据 | review_ticket 绑证据区间 | **基本可用**，但审稿模型的反馈不回灌状态候选。审稿说"角色声口偏了"，状态候选不据此修正 |
+| 画布上能看到什么？状态变更可追溯吗 | 漫剧侧有驾驶舱，小说侧无 | **小说侧无可视化**。owner 审查状态候选只能看 JSON diff，没有时间线/关系图/伏笔面板 |
+
+---
+
+## C. 目标架构
+
+### 组件图（文字）
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        画布 UI 层                                │
+│  (Electron renderer)                                            │
+│                                                                 │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐           │
+│  │状态时间线│ │伏笔追踪  │ │知情矩阵  │ │候选diff  │           │
+│  │面板      │ │面板      │ │热力图    │ │审查器    │           │
+│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘           │
+│       │            │            │            │                  │
+│       └────────────┴────────────┴────────────┘                  │
+│                         │ 所有操作走 command bus                 │
+├─────────────────────────┼───────────────────────────────────────┤
+│                  MCP / JSON CLI 层                               │
+│                         │                                        │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐           │
+│  │workspace │ │writing   │ │context   │ │preflight │           │
+│  │查询      │ │state投影 │ │pack 2.0  │ │写入校验   │           │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘           │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐                       │
+│  │search    │ │review    │ │model     │                        │
+│  │有界搜索  │ │ticket    │ │profile   │                        │
+│  └──────────┘ └──────────┘ └──────────┘                       │
+├─────────────────────────────────────────────────────────────────┤
+│                    Command Bus + CAS 层                          │
+│                                                                 │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐           │
+│  │正文      │ │state     │ │候选      │ │审稿票    │           │
+│  │manuscript│ │writing   │ │staging   │ │review    │           │
+│  │manifest  │ │-state    │ │area      │ │tickets   │           │
+│  │+章节SHA  │ │分片CAS   │ │          │ │          │           │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘           │
+│                                                                 │
+│  ┌──────────────────────────────────────────────┐               │
+│  │          命令账本 (append-only)               │               │
+│  │  幂等键 + requestId + 身份标记 + 副作用记录    │               │
+│  └──────────────────────────────────────────────┘               │
+├─────────────────────────────────────────────────────────────────┤
+│                    文件系统层 (唯一真相)                          │
+│                                                                 │
+│  managed-novel-project/                                        │
+│  ├── manuscript/                    (正文 Markdown + manifest)  │
+│  ├── story-bible/                                                │
+│  │   ├── writing-state.json          (CAS根索引 + 版本)         │
+│  │   ├── state/                                                 │
+│  │   │   ├── characters/                                        │
+│  │   │   │   ├── char-001.json      (八项状态+变更链+声口锚点) │
+│  │   │   │   └── char-002.json                                  │
+│  │   │   ├── relations/                                         │
+│  │   │   │   └── char-001_char-002.json                        │
+│  │   │   ├── foreshadows.json       (伏笔状态机)               │
+│  │   │   ├── knowledge-matrix.json  (知情矩阵+禁揭)            │
+│  │   │   ├── timeline.json          (日历/时间线)              │
+│  │   │   └── voice-anchors/                                     │
+│  │   │       ├── char-001.json      (声口样本)                 │
+│  │   │       └── char-002.json                                  │
+│  │   └── canon/                     (不可变设定对象 SHA-256)   │
+│  └── command-ledger/                 (命令账本)                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 关键设计原则
+
+1. **文件是唯一真相，CAS 是版本指纹，画布是可视化壳**——三层都不独立持有数据
+2. **MCP 是唯一写入路径**——画布 UI 的所有写操作也走 command bus，不开后门
+3. **状态分片**——writing-state.json 降级为根索引，实际状态数据按角色/关系/伏笔/知情分文件
+4. **状态变更链嵌入分片**——每个状态字段携带 lastChange 证据指针，不另建事件库
+
+---
+
+## D. Top 10 产品改进
+
+### P0（不做必崩）
+
+#### 1. 状态变更证据链（state change evidence chain）
+
+**问题**：八项状态是平面快照，模型知道"A恨B"但不知道"为什么"，写出因果断裂。
+
+**方案**：每个状态字段从 `{current: "恨"}` 升级为：
+
+```json
+{
+  "emotion": {
+    "current": "对B怀恨在心",
+    "lastChange": {
+      "chapter": 45,
+      "reason": "B在战斗中抛弃了A",
+      "evidence": {"chapterId": "...", "offset": "3200-3400", "revision": "..."},
+      "changedAt": "2024-01-15T10:00:00Z"
+    },
+    "history": [
+      {"chapter": 1, "value": "信任B", "reason": "初次合作"}
+    ]
+  }
+}
+```
+
+**接口**：`novel_stage_chapter_state_candidate` 的 payload 增加 `evidenceChapterId + evidenceOffset`，缺失时以 `state_evidence_missing` 拒绝。
+
+**验收门**：preflight 返回的 context pack 中，每个活跃角色的状态字段必须携带 lastChange.reason。模型生成正文时可以回答"为什么A现在恨B"。
+
+---
+
+#### 2. 知情矩阵 + 禁揭机械门（knowledge matrix + disclosure guard）
+
+**问题**：知情是记录不是校验。模型让不知情角色说出秘密，系统不拦截。
+
+**方案**：
+
+```json
+{
+  "knowledgeMatrix": {
+    "secrets": [
+      {"id": "sec-001", "desc": "主角是穿越者", "plantedChapter": 1, "status": "active"}
+    ],
+    "matrix": {
+      "char-001": {"sec-001": {"state": "knows", "since": 1, "evidence": "ch1:0-100"}},
+      "char-002": {"sec-001": {"state": "suspects", "since": 45, "evidence": "ch45:200-300"}},
+      "char-003": {"sec-001": {"state": "ignorant"}}
+    }
+  }
+}
+```
+
+**禁揭门**：`novel_save_chapter` 在写入前，对正文中每个对话段执行发言人→知情状态检查。如果 char-003（ignorant）的对话中包含 sec-001 的关键词/语义标记，返回 `disclosure_violation`，附证据区间，拒绝保存。
+
+**验收门**：故意构造一个不知情角色说出秘密的正文，save 必须被拦截，返回违反的角色ID+秘密ID+正文区间。
+
+---
+
+#### 3. 声口锚点库（voice anchor library）
+
+**问题**：百万字时模型记不住角色怎么说话。
+
+**方案**：每个角色维护 3-5 段从正文抽取的代表性对话片段，按"特质标签"索引：
+
+```json
+{
+  "charId": "char-001",
+  "voiceAnchors": {
+    "samples": [
+      {"chapterId": "...", "offset": "1200-1400", "text": "切，又来这套。", "traits": ["反讽", "短句"]},
+      {"chapterId": "...", "offset": "5600-5800", "text": "你说的对，但我不在乎。", "traits": ["冷漠", "拒绝"]},
+      {"chapterId": "...", "offset": "8900-9100", "text": "有意思……说说看。", "traits": ["好奇", "降语速"]}
+    ],
+    "signaturePhrases": ["切", "有意思", "说说看"],
+    "forbiddenPatterns": ["不会用敬语", "不会说'果然'", "不会自言自语超过两句"]
+  }
+}
+```
+
+**注入策略**：context pack 2.0 在"目标角色基础与八项状态"之后注入活跃角色的声口锚点。预算不足时，声口锚点优先级高于正文证据，低于硬正典和任务。
+
+**更新时机**：状态候选 commit 时，如果该章包含该角色的对话，owner 可以标记"选为声口锚点"，系统从正文中抽取并写入 voice-anchors 分片。
+
+**验收门**：给三个不同模型同样的 context pack，要求各自写出 char-001 的一句对话。三个输出都应包含 signaturePhrases 中的至少一个，且不触碰 forbiddenPatterns。
+
+---
+
+#### 4. 伏笔状态机（foreshadow state machine）
+
+**问题**：伏笔是列表不是状态机，无法追踪"哪个伏笔该在这一章回收"。
+
+**方案**：
+
+```json
+{
+  "foreshadows": [
+    {
+      "id": "f-001",
+      "desc": "主角手腕的烧伤疤痕",
+      "status": "referenced",
+      "planted": {"chapter": 1, "evidence": "ch1:500-600"},
+      "references": [{"chapter": 45, "evidence": "ch45:200-250"}],
+      "expectedPayoff": {"arc": "卷三", "deadlineChapter": 300, "hard": true},
+      "resolution": null,
+      "stale": false
+    }
+  ]
+}
+```
+
+**状态流转**：`planted → referenced → resolved → paid_off` 或 `planted → abandoned`。
+
+**preflight 注入**：context pack 中注入"本章 deadline 伏笔"（expectedPayoff.deadlineChapter ≤ 当前章 + 5 且 status ≠ paid_off）和"本章可 reference 的伏笔"（status = planted 且 lastReference 距当前章 > 20 章）。
+
+**预警门**：如果当前章 ≥ deadlineChapter 且 status ≠ paid_off，preflight 返回 `foreshadow_overdue_warning`，但不阻止写入（软门，由 owner 决定是否接受）。
+
+**验收门**：构造一个 deadline=100 的伏笔，在第 100 章 preflight 时必须返回 overdue warning。在状态候选中标记 resolved 后，第 101 章 preflight 不再 warn。
+
+---
+
+#### 5. writing-state 分片（state sharding）
+
+**问题**：单文件 writing-state.json 百万字后膨胀到 MB 级，每次 preflight 全量解析。
+
+**方案**：
+
+```
+story-bible/
+  writing-state.json          # 根索引：版本 + 各分片 SHA + 章节完成状态
+  state/
+    characters/char-XXX.json  # 角色状态+变更链+声口指针
+    relations/XXX_YYY.json    # 双向关系
+    foreshadows.json          # 伏笔状态机
+    knowledge-matrix.json     # 知情矩阵
+    timeline.json             # 日历/时间线
+    voice-anchors/char-XXX.json
+```
+
+writing-state.json 降为根索引：
+
+```json
+{
+  "schemaVersion": 2,
+  "casRoot": "sha-256:...",
+  "shards": {
+    "characters/char-001": {"sha256": "...", "lastModifiedChapter": 150},
+    "foreshadows": {"sha256": "...", "lastModifiedChapter": 148}
+  },
+  "chapterCompletion": {
+    "ch-001": {"stateCommitted": true, "revision": "..."},
+    "ch-002": {"stateCommitted": true, "revision": "..."}
+  }
+}
+```
+
+**读取策略**：`get_novel_writing_state` 按 `characterIds` 参数只读取相关分片，不全量加载。preflight 只组装活跃角色分片。
+
+**验收门**：500 章 × 50 角色工程，`get_novel_writing_state(characterIds=["char-001","char-002"])` 的响应时间 < 500ms。全量 writing-state.json 不超过 50KB。
+
+---
+
+### P1（显著提升一致性）
+
+#### 6. 模型能力 profile + pack 自适应预算
+
+**问题**：不同模型 context window 差异大（Grok 128K vs 千问 32K），但 pack 统一 60K 预算。
+
+**方案**：工程级配置模型 profile：
+
+```json
+{
+  "modelProfiles": {
+    "grok-3": {"maxContextTokens": 131072, "packBudget": 80000, "role": "writer"},
+    "claude-3.5": {"maxContextTokens": 200000, "packBudget": 100000, "role": "writer"},
+    "qwen-max": {"maxContextTokens": 32768, "packBudget": 24000, "role": "writer"},
+    "glm-4": {"maxContextTokens": 131072, "packBudget": 60000, "role": "reviewer"},
+    "doubao": {"maxContextTokens": 32768, "packBudget": 24000, "role": "reviewer"}
+  }
+}
+```
+
+`build_novel_context_pack` 增加 `modelProfile` 入参，按模型能力裁剪预算。千问 24K 预算时，声口锚点只取 1 个样本，正文证据只取 2 章。
+
+**验收门**：同一工程同一目标章，分别传 grok 和 qwen 的 profile，返回的 pack 字符数不超过各自预算的 95%。
+
+---
+
+#### 7. 跨模型交接协议（handoff protocol）
+
+**问题**：模型 A 写完交棒模型 B，B 不知道有 pending candidate。
+
+**方案**：`get_novel_manuscript_workspace` 返回增加 `pendingStateCandidate` 字段。如果有 pending candidate（未 accept/reject），所有写入路径返回 `state_commit_required`，不允许新 pack/preflight。
+
+新增工具 `get_pending_state_candidate`：返回候选的 change-set diff、绑定正文 revision/SHA、提交模型标识。
+
+**交接规则**：
+- pending candidate 必须由 owner resolve 后才能交接
+- 如果 owner 选择 reject，候选丢弃，原 Writer 重新 stage
+- 如果 owner 选择 accept，状态 commit，下一个模型可以进入
+
+**验收门**：模型 A stage candidate 后，模型 B 调用 `build_novel_context_pack` 必须收到 `state_commit_required`。owner accept 后，模型 B 的 pack 正常返回。
+
+---
+
+#### 8. 候选 diff 可视化审查器（candidate diff reviewer）
+
+**问题**：owner 审查状态候选只能看 JSON diff，效率低且容易遗漏。
+
+**方案**：画布 UI 增加候选 diff 面板：
+- **状态变更视图**：八项状态 old → new，并排显示 lastChange 证据区间的高亮正文
+- **知情矩阵变更视图**：矩阵单元格颜色变化（ignorant→suspects 标黄，suspects→knows 标红）
+- **伏笔状态变更视图**：状态流转箭头 + 证据区间
+- **声口锚点候选**：新对话片段高亮，owner 一键选为锚点
+
+**约束**：画布面板只读 + accept/reject 按钮，不提供"直接编辑候选"功能。要改必须 reject 后让模型重新 stage。
+
+**验收门**：owner 在画布上 accept 一个候选，writing-state 分片 SHA 更新，根索引 casRoot 更新，下一章 preflight 不再报 stale。
+
+---
+
+### P2（锦上添花）
+
+#### 9. 禁揭规则引擎升级（从关键词到语义检查）
+
+**问题**：P0 的禁揭门基于关键词匹配，复杂场景（角色用暗示而非直说秘密）无法覆盖。
+
+**方案**：save 前，对每个 `ignorant` 角色的对话段，调用一个轻量语义检查（本地模型或 API），判断是否泄露秘密语义。返回 `disclosure_risk_score`，超过阈值时软警告（不阻止 save，但在 review ticket 中标记）。
+
+**验收门**：构造"角色用隐喻说出秘密"的正文，关键词检查通过但语义检查返回 risk_score > 0.7。
+
+---
+
+#### 10. 时间线冲突检测器（timeline consistency checker）
+
+**问题**：百万字时日历/时间线容易出"昨天还在A城，今天就到B城但没写赶路"的矛盾。
+
+**方案**：timeline.json 记录每个角色的位置序列：
+
+```json
+{
+  "char-001": [
+    {"chapter": 1, "location": "A城", "evidence": "ch1:0-100"},
+    {"chapter": 5, "location": "B城", "evidence": "ch5:500-600", "travelTime": "3天"}
+  ]
+}
+```
+
+preflight 时，如果目标章的角色位置与前一章不同且中间无 travelTime 记录，返回 `timeline_gap_warning`。
+
+**验收门**：第 10 章角色在A城，第 11 章直接在B城出现，preflight 返回 gap warning。
+
+---
+
+## E. 人物一致性机械门清单
+
+以下门是**软件强制**的，不依赖模型自觉：
+
+| # | 门名 | 触发时机 | 拦截/警告 | 检查内容 |
+|---|---|---|---|---|
+| 1 | **知情边界门** | `novel_save_chapter` 写入前 | 硬拦截 `disclosure_violation` | ignorant 角色的对话不得包含对应 secret 的关键词/语义标记 |
+| 2 | **声口禁区门** | `novel_save_chapter` 写入前 | 软警告 `voice_pattern_violation` | 角色对话不得触碰 forbiddenPatterns |
+| 3 | **伏笔 deadline 门** | `preflight_novel_chapter_write` | 软警告 `foreshadow_overdue` | deadlineChapter ≤ 当前章且 status ≠ paid_off |
+| 4 | **状态证据门** | `novel_stage_chapter_state_candidate` | 硬拦截 `state_evidence_missing` | 状态变更必须携带 evidenceChapterId + evidenceOffset |
+| 5 | **关系对称门** | `novel_stage_chapter_state_candidate` | 硬拦截 `relation_asymmetry` | A→B 关系变更时，B→A 关系必须有对应候选（不必对称，但必须显式声明） |
+| 6 | **章序锁门** | `novel_save_chapter` | 硬拦截 `state_commit_required` | 上一章状态未 commit 时，本章不允许写入 |
+| 7 | **preflight 指纹门** | `novel_save_chapter` | 硬拦截 `context_preflight_stale` | pack/preflight/正文/state 任一漂移则拒绝 |
+| 8 | **角色活跃度门** | `build_novel_context_pack` | 裁剪（非拦截） | 超过 20 章未出现的角色不注入完整八项状态，只注入摘要 |
+| 9 | **时间线连续性门** | `preflight_novel_chapter_write` | 软警告 `timeline_gap` | 角色位置与前章不同且无 travel 记录 |
+| 10 | **硬正典冲突门** | `preflight_novel_chapter_write` | 硬拦截 `hard_canon_conflict` | 与 locked 设定对象冲突 |
+
+### 门的设计原则
+
+- **硬拦截**：save/stage 阶段拒绝，不创建命令账本，不改文件。模型必须修改内容或重新组包。
+- **软警告**：preflight 阶段返回 warning 列表，不阻止写入，但写入后 review ticket 自动附带 warning。owner 在审查候选时看到。
+- **裁剪**：pack 组装阶段，不是错误而是减少注入量。模型不知道被裁了什么，但 pack 不会超预算。
+
+### 软件绝不该做的"文学门"
+
+- 不判断"这段对话写得好不好"
+- 不判断"这个情节转折是否精彩"
+- 不判断"角色情感是否真实"
+- 不自动修复 OOC（只检测机械冲突，不修文学层面）
+- 不替代 owner 裁决 hard_canon_conflict
+
+---
+
+## F. 百万字不崩的工程门
+
+### 规模估算
+
+| 维度 | 估算值 | 当前承受力 | 风险 |
+|---|---|---|---|
+| 正文总量 | 100万字 ≈ 5MB UTF-16 | manifest 分章 SHA，无全量加载 | ✅ 安全 |
+| 章节数 | 500 章 | list 分页 ≤500，搜索分章 | ✅ 安全 |
+| 角色数 | 30-80 个 | 单文件 writing-state | ❌ 需分片 |
+| 关系对数 | ~500 对（含历史） | 无独立关系文件 | ❌ 需分片 |
+| 伏笔数 | 100-300 条 | 列表字段 | ❌ 需状态机 |
+| 知情矩阵 | 80 角色×100 秘密 = 8000 格 | 无独立文件 | ❌ 需分片 |
+| writing-state 总量 | 5-10MB JSON | 单文件 CAS | ❌ 解析慢 |
+| context pack 预算 | 24K-100K tokens | 固定 60K | ⚠️ 需自适应 |
+
+### 工程门清单
+
+#### F1. state 分片读取门
+
+**规则**：`get_novel_writing_state` 必须支持按 `characterIds` 过滤，只读取相关分片。未请求的角色状态不进入内存。
+
+**实现**：writing-state.json 根索引记录各分片 SHA。读取时按需加载 `state/characters/char-XXX.json`，不加载全量。
+
+**验收**：500 章工程，请求 3 个角色的 state，响应 < 500ms，内存占用 < 5MB。
+
+#### F2. 正文搜索召回门
+
+**规则**：百万字时 context pack 不塞正文全文，靠 `search_novel_manuscript` 精准召回。
+
+**策略**：pack 组装时，先用目标章的"任务/细纲"提取关键词，搜索正文获取 top-K 证据区间，每章最多 2 个 hit。搜索证据总预算 ≤ pack 预算的 40%。
+
+**验收**：500 章工程，pack 中正文+搜索证据总 token 不超过预算的 40%，且每个搜索 hit 可反查到 revision/SHA/offset。
+
+#### F3. 章序锁门（已有，强化）
+
+**规则**：第 N 章 save 前，第 N-1 章必须 stateCommitted=true。
+
+**强化**：如果 N-1 章正文 revision 与 state candidate 绑定的 revision 不一致（即正文被改过但状态没更新），返回 `state_commit_stale`。
+
+**验收**：修改第 49 章正文后，第 50 章 preflight 返回 `state_commit_stale`，要求重新 stage 第 49 章状态。
+
+#### F4. 幂等恢复门（已有，保持）
+
+**规则**：网络/进程中断后，用原 `idempotencyKey` 重试，命令账本返回原结果。
+
+**验收**：模拟中断后重试，正文不重复写入，状态不重复 commit。
+
+#### F5. 外部漂移检测门（已有，保持）
+
+**规则**：磁盘正文与 manifest 身份不一致时返回 `external_change`。
+
+**验收**：手动修改磁盘 Markdown 后，read/search 返回 `external_change`，要求走受管恢复。
+
+#### F6. 状态候选超时门（新增）
+
+**规则**：pending state candidate 超过 72 小时未 resolve，系统标记为 `stale_candidate`，不再允许 accept（必须 reject 后重新 stage）。
+
+**原因**：防止 owner 忘记 resolve，导致后续章节全部阻塞，模型基于过时信息反复重试。
+
+**验收**：构造 72 小时前的 pending candidate，`novel_review_chapter_state_candidate(decision="accepted")` 返回 `stale_candidate_rejected`。
+
+#### F7. CAS 根校验门（新增）
+
+**规则**：每次 preflight 前，校验 writing-state.json 根索引的 casRoot 与各分片 SHA 是否一致。不一致返回 `state_shard_corrupted`。
+
+**验收**：手动修改某个分片文件，preflight 返回 `state_shard_corrupted`，指明哪个分片不匹配。
+
+---
+
+## G. 多 AI 协作协议
+
+### 角色定义
+
+| 角色 | 允许的命令 | 不允许 | 适合模型 |
+|---|---|---|---|
+| **Writer**（写手） | `build_context_pack`, `preflight_chapter_write`, `novel_save_chapter`, `novel_stage_chapter_state_candidate` | 审稿票、accept/reject 候选 | Grok, Claude, Codex |
+| **Reviewer**（审稿） | `build_context_pack(taskType=review_chapter)`, `novel_attach_review_ticket` | 写正文、stage 候选 | GLM, 豆包, 千问 |
+| **State Auditor**（状态审计） | `get_novel_writing_state`, `read_novel_manuscript_range`, `novel_stage_chapter_state_candidate` | 写正文、审稿 | Codex, Claude |
+| **Owner**（人工） | 全部，特别是 `novel_review_chapter_state_candidate` | — | 人类 |
+
+### 每章标准接力流程
+
+```
+① Owner 创建空章（novel_create_chapter，content 必须为空）
+     ↓
+② Writer: get_writing_state → build_context_pack → preflight → save_chapter → stage_candidate
+     ↓
+③ State Auditor: 读正文 → 校验候选完整性 → 补充遗漏字段 → （如果候选不完整，reject 并附 review_ticket）
+     ↓
+④ Reviewer: build_context_pack(review) → 读正文 → attach_review_ticket（声口/知情/伏笔/节奏意见 + 证据区间）
+     ↓
+⑤ Owner: 查看候选 diff + review tickets → accept 或 reject
+     ↓
+⑥ accept 后：writing-state commit → 下一章可进入 ①
+     reject 后：候选丢弃 → Writer 回到 ② 重新写
+```
+
+### 交接硬门
+
+1. **进入门**：任何模型调用 `build_novel_context_pack` 前，系统检查 `pendingStateCandidate`。有 pending 则返回 `state_commit_required`，不允许组包。
+2. **身份门**：每个命令必须携带 `agentIdentity`（模型标识 + 角色标识）。Writer 角色的模型不能调用 `novel_attach_review_ticket`，Reviewer 角色的模型不能调用 `novel_save_chapter`。
+3. **不可越权门**：`agentIdentity` 不在公共 schema 中，由桌面软件在 MCP 会话初始化时注入。模型不能自行声明身份。
+
+### 模型能力 profile 使用
+
+```
+build_context_pack(modelProfile="qwen-max")
+  → pack 预算 24K
+  → 声口锚点只取 1 个样本
+  → 正文证据只取 2 章
+  → 硬正典压缩为摘要（如果超预算则报错，不静默丢弃）
+```
+
+### 跨模型一致性保证
+
+**核心原则**：一致性不靠模型自觉，靠机械门。
+
+- Writer 写完 → 禁揭门检查知情边界 → 声口禁区门检查对话模式 → 伏笔 deadline 门检查
+- State Auditor 校验候选 → 状态证据门检查变更链完整性
+- Reviewer 审稿 → 只读，不改正文，只提证据化意见
+- Owner 最终裁决
+
+**模型可替换性**：只要走 MCP 工具集 + preflight + save + stage_candidate 全链路，换模型不影响一致性。一致性来自文件 + CAS + 机械门，不来自模型记忆。
+
+---
+
+## H. 软件做不到 / 不该做
+
+### 做不到
+
+| 事项 | 原因 |
+|---|---|
+| 判断正文文学质量 | 软件是机械系统，不是文学批评家。"这段写得好不好"是人的判断 |
+| 保证伏笔被"漂亮地回收" | 能追踪状态（planted→paid_off），不能保证回收的文学效果 |
+| 自动修复 OOC | 能检测声口禁区触碰，不能自动改写对话让角色"像自己" |
+| 保证跨模型风格完全统一 | 声口锚点能减少漂移，但不同模型的生成风格天然不同 |
+| 替代 owner 裁决硬正典冲突 | `hard_canon_conflict` 必须人工裁决，软件不站队 |
+| 判断角情感是否"合理" | 能记录 lastChange.reason，不能判断"基于这个理由，当前情感反应是否合理" |
+| 自动生成设定 | `novel_seed_writing_state` 只能从 owner 提供的设定建立基线，不能自己编设定 |
+
+### 不该做
+
+| 事项 | 原因 |
+|---|---|
+| 让模型自由编辑 writing-state.json | 状态只能走 candidate → owner commit，不能直接改 |
+| 在画布上直接拖拽改正文 | 正文只能走 `novel_save_chapter` 命令，画布不开后门 |
+| 用聊天历史补充 context pack 缺失 | 聊天记忆不是真相源，文件 + CAS 才是 |
+| 自动 accept 状态候选 | 必须人工 commit，软件不替 owner 做决策 |
+| preflight 失败时"自动修复"参数继续 | 必须重新组包 + 重新 preflight，不能用旧身份硬过 |
+| 把《黑页》provisional 数据当正典导入 pilot | 画布隔离 pilot 不得当正典，provisional 数据有污染风险 |
+| 让模型自行声明角色身份 | `agentIdentity` 由桌面注入，模型不能自选 Writer/Reviewer |
+| 在 context pack 中塞入"建议"或"写作指导" | pack 是状态投影 + 证据，不是创作指南。文学判断在书内规则，不在 pack 里 |
+| 用第二份数据库（SQLite）做状态权威 | 正文权威是 Markdown + manifest，状态权威是 CAS 文件，不建第二份真相 |
+
+---
+
+## I. 90 天路线图
+
+### Sprint 1（Day 1-30）：P0 地基层
+
+| 周 | 任务 | 交付物 | 验收 |
+|---|---|---|---|
+| W1-2 | writing-state 分片改造 | 根索引 + 分片文件结构；`get_novel_writing_state` 支持按 characterIds 过滤 | 500 章工程请求 3 角色状态 < 500ms |
+| W2-3 | 状态变更证据链 | 八项状态字段升级为 `{current, lastChange, history}`；`novel_stage_chapter_state_candidate` 强制 evidenceChapterId + evidenceOffset | 缺证据的候选被 `state_evidence_missing` 拒绝 |
+| W3-4 | 伏笔状态机 | foreshadows.json 结构升级为状态机；preflight 注入 deadline 伏笔 | deadline 伏笔在目标章 preflight 返回 overdue warning |
+
+**Sprint 1 交付门**：writing-state schemaVersion=2，分片 CAS 通过，旧 V1 请求走兼容路径。
+
+### Sprint 2（Day 31-60）：P0 机械门层
+
+| 周 | 任务 | 交付物 | 验收 |
+|---|---|---|---|
+| W5-6 | 知情矩阵 + 禁揭门 | knowledge-matrix.json 结构；`novel_save_chapter` 前置禁揭检查 | 不知情角色说出秘密被 `disclosure_violation` 拦截 |
+| W6-7 | 声口锚点库 | voice-anchors 分片；context pack 注入声口样本和 forbiddenPatterns | 三模型同 pack 生成对话，均包含 signaturePhrase |
+| W7-8 | 候选 diff 可视化（MVP） | 画布 UI 候选审查面板：状态变更 old→new + 证据区间高亮 | owner 在画布上 accept 候选，state SHA 更新 |
+
+**Sprint 2 交付门**：四个 P0 机械门全部可用，在一个 50 章 pilot 工程上验证。
+
+### Sprint 3（Day 61-90）：P1 协作层
+
+| 周 | 任务 | 交付物 | 验收 |
+|---|---|---|---|
+| W9-10 | 模型能力 profile + pack 自适应预算 | 工程级 modelProfiles 配置；`build_novel_context_pack` 支持按模型裁剪 | grok 和 qwen 各自 pack 不超预算 95% |
+| W10-11 | 跨模型交接协议 | pending candidate 检查门；`get_pending_state_candidate` 工具；agentIdentity 注入 | Writer A stage 后 Writer B 组包被 `state_commit_required` 拦截 |
+| W11-12 | 多模型接力 pilot | 用 3 个模型（如 Grok 写 + GLM 审 + Codex 校验状态）跑 10 章接力 | 10 章后知情矩阵零违规，伏笔状态机零遗漏，声口锚点命中率 > 80% |
+
+**Sprint 3 交付门**：3 模型 10 章接力零机械违规。在此基础上扩展到 100 章压力测试。
+
+### Sprint 3 后的百万字压力测试（Day 91-120，不计入 90 天但必须排期）
+
+- 用 500 章已有正文导入，`novel_seed_writing_state` 建立基线
+- 从第 501 章开始用 2-3 个模型接力写 50 章
+- 验收指标：
+  - 知情矩阵违规数 = 0（硬门拦截 + 漏检率 < 5%）
+  - 伏笔 deadline 遗漏数 = 0
+  - 声口锚点命中率 > 70%（模型生成对话包含 signaturePhrase 的比例）
+  - preflight 平均响应 < 2s
+  - 状态候选 owner 审查平均时间 < 5 分钟/章
+
+---
+
+## 最终判断
+
+**仅靠当前 Writing OS V1 能否支撑百万字人物一致性？**
+
+**不能。** 当前 V1 解决了"写入过程不崩"（CAS/revision/lock/preflight 指纹/候选 commit），但没有解决"内容层面人物不崩"。
+
+差在四个机械门和一个工程改造：
+
+1. **状态变更证据链**——模型知道"是什么"但不知道"为什么"，百万字时因果逻辑必断
+2. **知情矩阵 + 禁揭门**——知情是记录不是校验，模型让不知情角色说出秘密时无拦截
+3. **声口锚点库**——没有从正文抽取的对话样本，模型靠标签猜声口，200 章后必漂
+4. **伏笔状态机**——没有 planted→paid_off 生命周期，deadline 伏笔会被忘
+5. **state 分片**——单文件 MB 级 JSON，读取和 diff 性能崩溃
+
+画布该补的是：**状态可视化层**（时间线/伏笔面板/知情热力图/候选 diff），让 owner 能高效审查候选，而不是看 JSON 猜变化。画布不该补的是：任何绕过 MCP 命令的写入路径。
+
+模型该做的是：走 pack→preflight→save→stage_candidate 全链路，不跳步、不手抄参数、不缓存 preflight。软件该做的是：在链路上设机械门，拦住可检测的一致性违规，把不可检测的文学判断交还给人。

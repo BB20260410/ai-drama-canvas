@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "kind": "whole-project-behavior-preserving-refactor-final",
+  "status": "passed",
+  "programStatus": "completed",
+  "completedAt": "2026-08-10T17:25:14Z",
+  "scope": {
+    "behaviorPreserving": true,
+    "phases": ["A", "B", "C", "D", "E", "F", "G", "H"],
+    "ownerRebuilds": 0,
+    "schemaMigrations": 0,
+    "formalProjectDataWritten": false,
+    "externalCalls": 0,
+    "uploads": 0,
+    "paidGenerations": 0,
+    "gitStageCommitPush": 0
+  },
+  "sourceIdentity": {
+    "sourceDigest": "c9bb2c8788bc600e24d1952f696fb558d1fe6469fdf6afe0cf9b362547332942",
+    "sourceFiles": 1019,
+    "sourceBytes": 20474104,
+    "buildId": "02a1bf9d8764bff2fb960be0cad17cd4",
+    "buildIdentityFingerprint": "3687c758d9a19a68cec2d167dff48a4a68f7550c9fa369c732815088ecd018aa",
+    "releaseManifestFingerprint": "81a1447c055dec49fe6a7b05926d8471579097354ba07de6a385aa263f710a71",
+    "mcpToolCount": 220,
+    "architecture": "arm64",
+    "distribution": "local-only"
+  },
+  "phaseResults": {
+    "A": "passed: dependency-direction-and-bounded-read-loads",
+    "B": "passed: studio-canonical-json-kernel",
+    "C": "passed: explicit-mcp-tool-registrar",
+    "D": "passed: generation-ledger-storage-layering",
+    "E": "passed: renderer-contract-and-pure-projections",
+    "F": "passed: studio-command-executor-and-main-read-ipc",
+    "G": "passed: immutable-candidate-and-terminal-evidence-orchestration",
+    "H": "passed: same-source-build-candidate-stdio-and-hidden-isolated-app"
+  },
+  "architectureResults": {
+    "runtimeSccBefore": [15, 4, 2],
+    "runtimeSccAfter": [15],
+    "remainingRuntimeScc": "legacy-fusion-only-intentionally-deferred",
+    "studioCommandCases": 58,
+    "mainIpcHandles": 266,
+    "preloadInvokes": 253,
+    "mcpTools": 220
+  },
+  "verification": {
+    "testPartitionInventory": {
+      "status": "passed",
+      "all": 373,
+      "fast": 241,
+      "medium": 91,
+      "integration": 36,
+      "heavy": 5,
+      "fingerprint": "077131f111201dbc29de537c6512d1e2c88799d1e138ef1052dfc225967af730"
+    },
+    "phaseHImpactTests": { "files": 26, "tests": 179, "status": "passed" },
+    "typecheck": "passed",
+    "typecheckApp": "passed",
+    "productionBuild": "passed",
+    "productionDependencyAudit": {
+      "registry": "https://registry.npmjs.org",
+      "productionDependencies": 190,
+      "vulnerabilities": 0,
+      "status": "passed"
+    },
+    "diffCheck": "passed",
+    "sourceDigestRecomputedAfterSmoke": true,
+    "sourceDigestStable": true,
+    "finalIndependentReview": {
+      "status": "clean",
+      "p0": 0,
+      "p1": 0,
+      "p2": 0,
+      "evidence": "docs/evidence/whole-project-refactor-final-review-20260811-c9bb2c87.json"
+    }
+  },
+  "immutableMcpCandidate": {
+    "candidateId": "mcp-candidate-c9bb2c8788bc600e-ae55839f2a81e643-53dc9b74",
+    "status": "current-and-valid",
+    "sourceDigest": "c9bb2c8788bc600e24d1952f696fb558d1fe6469fdf6afe0cf9b362547332942",
+    "runtimeTreeFingerprint": "ae55839f2a81e64389ea16265e1468eec7386e46ce7f860887028ae0e75fd01a",
+    "dependencyClosureFingerprint": "499fc0efe1bc90dcf88d8f7fe9a348faf5f09048e4406fc6030d2d2cab0a270d",
+    "receiptFingerprint": "eb796b9f5dc0def5f474f16bdd9751b7ba78d15e4e16f4c934f8c88872e03120",
+    "publicationFingerprint": "131af6f6f901482b4452cfd38d3d510f070a59ab7e0e42156ed1945d893b72ca",
+    "inspectedCandidates": 15,
+    "invalidCandidates": 0,
+    "stdio": {
+      "initialize": "passed",
+      "tools": 220,
+      "resourceTemplates": 9,
+      "prompts": 8
+    }
+  },
+  "isolatedPackageSmoke": {
+    "runId": "isolated-package-smoke-20260810T172031874Z-77900-37abf7da",
+    "terminalEvidence": "docs/evidence/isolated-package-smoke-20260810T172031874Z-77900-37abf7da.json",
+    "completionEvidence": "docs/evidence/isolated-package-smoke-20260810T172031874Z-77900-37abf7da-completion.json",
+    "terminalStatus": "finalization-pending",
+    "terminalOutcome": "passed",
+    "completionStatus": "passed",
+    "terminalEvidenceSha256": "da9b97e377265b64d0e32a89037a23be30501864f4932eff82b500a60bf85f75",
+    "canonicalLockAbsent": true,
+    "packagedMcp": { "tools": 220, "resourceTemplates": 9, "prompts": 8 },
+    "emptyProjectWorkflow": {
+      "chapters": 2,
+      "facts": 34,
+      "beats": 11,
+      "units": 4,
+      "storyboardRows": 11,
+      "ledgerEntries": 19,
+      "uncertainCommands": 0,
+      "restartVerified": true
+    },
+    "effectTransitionCloseMs": [161, 189],
+    "reviewCloseMs": [44, 35],
+    "allCloseRunsGraceful": true,
+    "showEvents": 0,
+    "focusEvents": 0,
+    "dockVisible": false,
+    "bringToFrontUsed": false,
+    "pageErrors": 0,
+    "lingeringProcessesBeforeCleanup": 0,
+    "lingeringProcessesAfterCleanup": 0,
+    "tempRootRemoved": true,
+    "formalProjectUsed": false,
+    "installed": false,
+    "notarized": false
+  },
+  "installedAppBoundary": {
+    "path": "/Applications/AI 漫剧画布.app",
+    "updatedByThisProgram": false,
+    "sourceDigest": "0d17eb62e277f361673fc66529e6068ad2bb025b111d85d365a708702f383f38",
+    "buildId": "6067ff07d31c65dbd2c19ca63adc18ed",
+    "reason": "the-current-refactor-request-did-not-authorize-replacing-the-daily-installed-app",
+    "note": "the-installed-app-is-not-evidence-for-the-refactored-source"
+  },
+  "reports": [
+    "docs/验证报告_20260810_全项目行为保持重构_PhaseA.md",
+    "docs/验证报告_20260810_全项目行为保持重构_PhaseB.md",
+    "docs/验证报告_20260810_全项目行为保持重构_PhaseC.md",
+    "docs/验证报告_20260810_全项目行为保持重构_PhaseD.md",
+    "docs/验证报告_20260811_全项目行为保持重构_PhaseE.md",
+    "docs/验证报告_20260811_全项目行为保持重构_PhaseF.md",
+    "docs/验证报告_20260811_全项目行为保持重构_PhaseG.md",
+    "docs/验证报告_20260811_全项目行为保持重构_最终闭环.md"
+  ]
+}

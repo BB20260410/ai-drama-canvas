@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 2,
+  "kind": "novel-chapter-state-candidate",
+  "candidateId": "novel-state-candidate-867138f7c778c706ddde83e2",
+  "projectId": "project-79b2b0acb554",
+  "chapter": {
+    "chapterId": "fb4a0877-d99d-51f5-ab8d-53f4eca1f754",
+    "chapterRevision": 2,
+    "chapterSha256": "bd69e411aa746ff73f4f4ff405edc4b182cf50391f8e6284c7834de1dd00323f"
+  },
+  "baseWritingStateRevision": 1,
+  "baseWritingStateFingerprint": "0471613c3c90f561e9c9e265b96c1cd291250763bb1d39416a6a6c5f4060c708",
+  "summary": "011隔离演练章末勾账",
+  "delta": {
+    "characterStates": [
+      {
+        "stateId": "state-02d4f0a89bb0bf6aeb9a",
+        "entityId": "character-02d4f0a89bb0bf6aeb9a",
+        "fields": {
+          "body": "夜班透支常态；门口对峙后站稳；无明显重伤。指尖/腕对黑页敏感（涂黑角曾似「翻身」，未追价）。",
+          "emotion": "冷、短、压着抖；镜头对准时先想挡脸又放下（怕被剪成心虚）。对「免费好事 / 陪哭」过敏加强。",
+          "known": [
+            "黑页：总额感 + 明细涂黑 + 到期字段 -4",
+            "李强是「手指」非源头",
+            "清晰版已到手",
+            "八点前合法影像在云盘",
+            "信汇 ↔ 春禾公开往来可咬",
+            "093 为私人码线",
+            "担保链短信存在",
+            "母亲曾指动一次",
+            "涂黑角有异动未解",
+            "阿大规矩：催收/窗口/基金话别搅一锅",
+            "镜头的人最会哭"
+          ],
+          "unknown": [
+            "担保链完整结构与「更大的手」是谁",
+            "黑页明细何时可翻",
+            "涂黑角含义",
+            "易秀担保人真相 / 春禾与母的深层绑定（禁揭至正典章）",
+            "邓依/郭周堂编制线尚未绑定",
+            "檀溪未露面"
+          ],
+          "relationships": [
+            "阿大：师徒式规矩已立，借款与烟火人情在",
+            "肖龙：公开证据+八点拍摄，友情承压（「我也可能被找麻烦」）",
+            "李强：公开敌意，被逼半步，可能换刀",
+            "梁景衡：镜头/声线层，本人未对等谈判",
+            "易秀：床边守夜",
+            "指动后更不敢离开床过久"
+          ],
+          "goals": [
+            "先打账，不硬刚刀疤",
+            "继续收指摸担保链"
+          ],
+          "psychology": "证据分线后决定先打账；仍不抢过手闭环",
+          "unresolved": [
+            "是否点开/回担保链",
+            "是否与梁总当面谈",
+            "预支与阿大钱的动用优先级",
+            "要不要再拖肖龙下水",
+            "源残留冲突：日历导语仍写016发生-7→-6；P0与CAN-跳天已裁决D1→D2跳天，待清理低权威旧句。"
+          ]
+        }
+      }
+    ],
+    "knowledge": [],
+    "relationships": [],
+    "timeline": [],
+    "foreshadowing": []
+  },
+  "evidenceSpans": [
+    {
+      "evidenceId": "black-page-011-state-evidence",
+      "startOffset": 0,
+      "endOffset": 6,
+      "evidenceExcerpt": "【隔离演练】"
+    }
+  ],
+  "changeEvidence": [
+    {
+      "kind": "character_state",
+      "recordId": "state-02d4f0a89bb0bf6aeb9a",
+      "reason": "隔离演练正文明确表现易航先打账并继续收指摸担保链",
+      "evidenceSpanIds": [
+        "black-page-011-state-evidence"
+      ]
+    }
+  ],
+  "auditScope": {
+    "checkedCharacterIds": [
+      "character-02d4f0a89bb0bf6aeb9a",
+      "character-2e42d46808e40d48ae11"
+    ],
+    "checkedStateKinds": [
+      "character_state",
+      "knowledge",
+      "relationship",
+      "timeline",
+      "foreshadowing"
+    ]
+  },
+  "changeKind": "delta",
+  "offsetEncoding": "utf16-code-unit",
+  "createdAt": "2026-08-02T06:15:01.729Z",
+  "fingerprint": "5b2420a896904ee7da7ff68a701912b0db5c85971505b93b6250c276799e9f25"
+}

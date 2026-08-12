@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-stability-refactor-final-evidence",
+  "softwareGoalId": "runtime-stability-refactor-v1",
+  "status": "partial_blocked",
+  "completedAt": "2026-08-10T14:12:00.000Z",
+  "release": {
+    "version": "0.2.0",
+    "sourceDigest": "0d17eb62e277f361673fc66529e6068ad2bb025b111d85d365a708702f383f38",
+    "buildId": "6067ff07d31c65dbd2c19ca63adc18ed",
+    "mcpToolCount": 220,
+    "architecture": "arm64",
+    "distribution": "local-only",
+    "notarized": false
+  },
+  "issues": [
+    {
+      "issueId": "P1-NET-01",
+      "severity": "P1",
+      "status": "completed",
+      "rootCause": "小说分析 Provider 只在连接前验证 DNS 且允许公网 HTTP，后续本地与远端错误还可能把敏感响应、绝对路径或正文带入任务、命令账本和 Renderer。",
+      "affectedFiles": [
+        "src/core/novel-analysis-transport.ts",
+        "src/core/novel-analysis-provider.ts",
+        "src/core/command-bus.ts",
+        "tests/novel-analysis-provider-transport.test.ts",
+        "tests/novel-analysis-provider.test.ts",
+        "tests/novel-analysis-run.test.ts"
+      ],
+      "before": "DNS 预检与真实连接未绑定；公网 HTTP 可携带正文与 Bearer；错误边界存在原始响应和文件系统文案外泄窗口。",
+      "after": "单次 DNS 地址快照固定到独立 Undici Agent；公网强制 HTTPS；私网 HTTP 仅显式授权；代理与重定向关闭；TLS 显式验证；pre-dispatch、post-intent、post-dispatch 和二次记账失败均只暴露稳定安全码。",
+      "testsRun": [
+        "npx vitest run tests/novel-analysis-provider.test.ts tests/novel-analysis-provider-transport.test.ts tests/novel-analysis-run.test.ts",
+        "npx vitest run tests/command-bus.test.ts --maxWorkers=1"
+      ],
+      "testResults": "最终定向 3 files / 63 tests PASS；相邻 command-bus 17/17 PASS；独立 sol_final_max 终审 CLEAN。",
+      "dataIntegrity": "安全策略失败发生在 execution intent 前时任务保持 prepared；远端 POST 后任何不确定错误保持 submission_unknown；已提交 reviewing 事实不回滚。",
+      "externalSideEffects": "0 次外部 Provider 调用；测试只使用本机隔离服务。",
+      "remainingRisks": "本机可写账户仍属于信任边界；不支持环境代理、自签名证书或公网 HTTP。"
+    },
+    {
+      "issueId": "PERF-PROJECTION-IPC-01",
+      "severity": "P2",
+      "status": "completed",
+      "rootCause": "深层时间线投影 worker 并发占满 4 个 IPC 槽，当前单元详情没有保留余量。",
+      "affectedFiles": [
+        "src/renderer/src/components/ManagedStudioCanvasView.vue",
+        "tests/managed-studio-canvas-ui.test.ts"
+      ],
+      "before": {
+        "peakOutstandingProjectionIpc": 5,
+        "budget": 4
+      },
+      "after": {
+        "peakOutstandingProjectionIpc": 3,
+        "budget": 4
+      },
+      "performanceDelta": {
+        "absolute": -2,
+        "percent": -40
+      },
+      "testsRun": [
+        "hidden T23 canvas baseline and two bounded correction runs"
+      ],
+      "testResults": "投影 IPC 峰值门从 FAIL 改为 PASS；深 raw 4488ms、全部参考 5245ms，仍在 5000/8000ms 预算内。",
+      "dataIntegrity": "只调整单元间并发，不改变单元内裁决、取消、失败隔离或数据 owner。",
+      "externalSideEffects": "仅隔离 fixture 与隐藏 Electron。",
+      "remainingRisks": "单个 production projection bundle 仍约 4.28s，是展开延迟主要剩余成本。"
+    },
+    {
+      "issueId": "PERF-UNIT-SELECTION-01",
+      "severity": "P2",
+      "status": "completed",
+      "rootCause": "同一 root/unit/panel 的节点选择与紧随动作在 drain 生命周期内重复请求详情/投影。",
+      "affectedFiles": [
+        "src/renderer/src/components/ManagedStudioCanvasView.vue",
+        "tests/managed-studio-canvas-ui.test.ts"
+      ],
+      "before": {
+        "canvasNodeSelectAndExpandMs": 10126.97
+      },
+      "after": {
+        "canvasNodeSelectAndExpandMs": 8648.52
+      },
+      "performanceDelta": {
+        "milliseconds": -1478.45,
+        "percent": -14.6
+      },
+      "testsRun": [
+        "hidden P17 navigation baseline and post-fix run"
+      ],
+      "testResults": "同目标只产生 1 次 production projection bundle；展开耗时降低 14.6%。",
+      "dataIntegrity": "key 包含 root/unit/panel；不同目标保持 latest-wins；切工程与卸载会清空队列。",
+      "externalSideEffects": "仅隔离 fixture 与隐藏 Electron。",
+      "remainingRisks": "8648.52ms 仍偏慢，主因是单个深投影包；本 Goal 不继续扩大 owner。"
+    },
+    {
+      "issueId": "PERF-FIRST-CARD-01",
+      "severity": "P2",
+      "status": "blocked_after_two_corrections",
+      "rootCause": "36 单元首卡仍与 dashboard/详情/投影准备竞争；一次 units-first 调度尝试没有产生稳定收益。",
+      "affectedFiles": [
+        "src/renderer/src/components/ManagedStudioCanvasView.vue"
+      ],
+      "before": {
+        "rendererFirstCardMs": 1747,
+        "budgetMs": 1500
+      },
+      "correctionOne": {
+        "rendererFirstCardMs": 1794,
+        "attempt": "units-first 调度加并发 3"
+      },
+      "correctionTwo": {
+        "rendererFirstCardMs": 2094,
+        "attempt": "回退无收益的 units-first，仅保留生产安全的并发与选择合并"
+      },
+      "after": "未达到 1500ms 预算；units-first 代码已回退，避免把回归交付。",
+      "performanceDelta": {
+        "millisecondsVersusBaseline": 347,
+        "percentVersusBaseline": 19.86
+      },
+      "testsRun": [
+        "three unique hidden T23 evidence runs"
+      ],
+      "testResults": "交互、缩放、拖动、平移、深 raw、参考完整性和 IPC drain 均 PASS；只有首卡预算 FAIL。",
+      "dataIntegrity": "无正式数据写入；失败尝试已回退。",
+      "externalSideEffects": "仅隔离 fixture 与隐藏 Electron。",
+      "remainingRisks": "这是 software_goal 未满足 completed 门的唯一选定性能阻塞；按两轮上限冻结，禁止本 Goal 再试。"
+    }
+  ],
+  "performanceBaselines": {
+    "globalResources": {
+      "status": "pass",
+      "openMs": 140.47,
+      "exactSearchMs": 280.13,
+      "clearSearchMs": 284.64,
+      "firstPageCards": 36,
+      "closeMs": 168
+    },
+    "videoEditor": {
+      "status": "pass",
+      "firstOpenMs": 2590.89,
+      "restartOpenMs": 2547.7,
+      "playheadDragFeedbackMs": 71.08,
+      "playbackFrameP95Ms": 9.9,
+      "domElements": 479
+    },
+    "scaleCanvas": {
+      "status": "pass",
+      "units": 1288,
+      "panels": 4235,
+      "media": 10000,
+      "maximumDomNodes": 78,
+      "projectSwitches": 10,
+      "crossProjectLeak": false,
+      "fileDescriptorDelta": 0,
+      "rssDeltaKiB": 23264
+    }
+  },
+  "finalValidation": {
+    "targetedTests": "pass",
+    "adjacentTests": "pass",
+    "typecheck": "pass",
+    "typecheckApp": "pass",
+    "build": "pass",
+    "diffCheck": "pass",
+    "productionAudit": {
+      "status": "pass",
+      "registry": "https://registry.npmjs.org",
+      "vulnerabilities": 0,
+      "note": "依赖冻结后未再改变 package.json 或 package-lock.json。"
+    },
+    "finalReview": "clean",
+    "candidate": {
+      "status": "pass",
+      "candidateId": "mcp-candidate-0d17eb62e277f361-c2aa1d6af6a463f1-d1761992",
+      "inspectedCandidates": 14,
+      "invalidCandidates": 0
+    },
+    "packageSmoke": {
+      "status": "pass",
+      "runId": "isolated-package-smoke-20260810T140632369Z-88883-7948dcf2",
+      "packagedLaunches": 4,
+      "showEvents": 0,
+      "focusEvents": 0,
+      "forceTerminated": 0,
+      "forceKilled": 0,
+      "lingeringProcesses": 0
+    },
+    "installedApp": {
+      "status": "pass",
+      "path": "/Applications/AI 漫剧画布.app",
+      "developerIdVerified": true,
+      "architecture": "arm64",
+      "mcpToolCount": 220,
+      "showEvents": 0,
+      "focusEvents": 0,
+      "naturalCloseMs": 49,
+      "residualProcesses": 0,
+      "appAsarSha256": "ac1f4c0afcbf62616f01509c11bdacefde765118553d73d4e5ff673518e6cb7c"
+    }
+  },
+  "deliveryCorrections": [
+    "Developer ID 构建首次仅因 electron-builder identity 前缀参数被拒，去掉前缀后一次通过；未产生安装副作用。",
+    "安装验收首次仅因证据路径不是绝对路径而在启动前被拒，改为绝对路径后一次通过。"
+  ],
+  "dataIntegrity": {
+    "formalProjectWritten": false,
+    "formalCasWritten": false,
+    "formalReviewWritten": false,
+    "formalGenerationLedgerWritten": false,
+    "fixturesRemoved": true
+  },
+  "externalSideEffects": {
+    "paidCalls": 0,
+    "uploads": 0,
+    "publishes": 0,
+    "notarization": 0,
+    "gitStageCommitPush": 0
+  },
+  "installationRollback": {
+    "archiveRoot": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260810T141117Z-0d17eb62",
+    "oldAppRecoverable": true
+  },
+  "remainingRisks": [
+    "PERF-FIRST-CARD-01 after two corrections: 2094ms > 1500ms budget; software goal remains partial/blocked.",
+    "GlobalResourceCenter hidden harness default-name concurrent no-clobber is deferred P2; this run used explicit unique filenames serially.",
+    "App is local-only and not notarized; Gatekeeper behavior on other Macs was not validated."
+  ],
+  "evidence": [
+    "docs/evidence/novel-analysis-provider-outbound-security-20260810-3517c0cb.json",
+    "docs/evidence/runtime-stability-p17-navigation-20260810-0f61d05d.json",
+    "docs/evidence/runtime-stability-p17-navigation-20260810-afa10d39.json",
+    "docs/evidence/runtime-stability-global-resources-20260810-0f61d05d.json",
+    "docs/evidence/runtime-stability-editor-20260810-cd0d48e4.json",
+    "docs/evidence/runtime-stability-scale-canvas-20260810-cd0d48e4.json",
+    "docs/evidence/runtime-stability-t23-canvas-20260810-cd0d48e4.json",
+    "docs/evidence/runtime-stability-t23-canvas-20260810-4f8a169c.json",
+    "docs/evidence/runtime-stability-t23-canvas-20260810-afa10d39.json",
+    "docs/evidence/isolated-package-smoke-20260810T140632369Z-88883-7948dcf2.json",
+    "docs/evidence/installed-local-verify-20260810T141117Z-0d17eb62.json"
+  ]
+}

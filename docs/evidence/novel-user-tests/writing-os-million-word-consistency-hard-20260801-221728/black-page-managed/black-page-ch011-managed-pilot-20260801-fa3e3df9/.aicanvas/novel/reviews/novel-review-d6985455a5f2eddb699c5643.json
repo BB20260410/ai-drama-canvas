@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-review-ticket",
+  "ticketId": "novel-review-d6985455a5f2eddb699c5643",
+  "projectId": "project-79b2b0acb554",
+  "chapter": {
+    "chapterId": "fb4a0877-d99d-51f5-ab8d-53f4eca1f754",
+    "chapterRevision": 2,
+    "chapterSha256": "bd69e411aa746ff73f4f4ff405edc4b182cf50391f8e6284c7834de1dd00323f"
+  },
+  "startOffset": 0,
+  "endOffset": 6,
+  "evidenceExcerpt": "【隔离演练】",
+  "severity": "P2",
+  "impact": "标记为隔离演练，不得同步正式正文",
+  "minimalFix": "正式生产时由锁版章稿替换",
+  "confidence": 1,
+  "reviewer": "local-pilot-reviewer",
+  "offsetEncoding": "utf16-code-unit",
+  "createdAt": "2026-08-02T06:15:01.729Z",
+  "fingerprint": "f674febe513a62708453c8c558bc1fc4b6938bde13e08219d48033d1f92ad6f8"
+}

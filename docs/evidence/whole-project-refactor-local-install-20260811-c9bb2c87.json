@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "kind": "whole-project-refactor-local-install-final",
+  "status": "passed",
+  "completedAt": "2026-08-10T22:40:51Z",
+  "scope": "this-mac-local-only",
+  "sourceIdentity": {
+    "sourceDigest": "c9bb2c8788bc600e24d1952f696fb558d1fe6469fdf6afe0cf9b362547332942",
+    "buildId": "02a1bf9d8764bff2fb960be0cad17cd4",
+    "releaseManifestFingerprint": "81a1447c055dec49fe6a7b05926d8471579097354ba07de6a385aa263f710a71",
+    "mcpToolCount": 220,
+    "architecture": "arm64",
+    "version": "0.2.0"
+  },
+  "package": {
+    "mode": "electron-builder-mac-dir",
+    "developerIdIdentity": "Developer ID Application: YIHANG LI (3JS43BTTJ3)",
+    "notarization": false,
+    "dmgGenerated": false,
+    "attempts": [
+      {
+        "attempt": 1,
+        "status": "failed-before-signing",
+        "reason": "electron-builder-required-identity-name-without-developer-id-prefix",
+        "installed": false
+      },
+      {
+        "attempt": 2,
+        "status": "passed",
+        "identityArgument": "YIHANG LI (3JS43BTTJ3)"
+      }
+    ]
+  },
+  "installedApp": {
+    "path": "/Applications/AI 漫剧画布.app",
+    "sourceDigest": "c9bb2c8788bc600e24d1952f696fb558d1fe6469fdf6afe0cf9b362547332942",
+    "buildId": "02a1bf9d8764bff2fb960be0cad17cd4",
+    "bundleIdentifier": "com.hxx.aidramacanvas",
+    "mcpToolCount": 220,
+    "architecture": "arm64",
+    "codesignDeepStrict": true,
+    "teamIdentifier": "3JS43BTTJ3",
+    "executableSha256": "2c2babf836864990efbca14d0312e3535efae083bc026ddb9a625c9357f3fd92",
+    "appAsarSha256": "65af8c049a9916d57789f535b194367d983b81f618d91f314cbbb6ae9b443046",
+    "mcpServerSha256": "12cb72569156d0bef1258670371122c4d9b84648e68ec5fe0c70cef565e22ffb"
+  },
+  "workspaceDist": {
+    "path": "dist/mac-arm64/AI 漫剧画布.app",
+    "sameReleaseManifestAsInstalled": true,
+    "sameExecutableSha256AsInstalled": true,
+    "sameAppAsarSha256AsInstalled": true,
+    "sameMcpServerSha256AsInstalled": true,
+    "codesignDeepStrict": true
+  },
+  "installedVerification": {
+    "evidence": "docs/evidence/installed-local-verify-20260811T063507-c9bb2c87.json",
+    "evidenceSha256": "c4999384402992535a4afb895c9aae78718a26f56a7efc12ac2bc47e865aca3e",
+    "status": "pass",
+    "packagedMcpTools": 220,
+    "launchWithoutSystemNode": true,
+    "showEvents": 0,
+    "focusEvents": 0,
+    "dockVisible": false,
+    "visible": false,
+    "focused": false,
+    "closeDurationMs": 41,
+    "graceful": true,
+    "exitCode": 0,
+    "forceTerminated": false,
+    "forceKilled": false,
+    "lingeringProcesses": 0
+  },
+  "rollback": {
+    "archiveRoot": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260811T063507-c9bb2c87",
+    "previousInstalledApp": "previous-installed/AI 漫剧画布.app",
+    "previousWorkspaceDistApp": "previous-workspace-dist/AI 漫剧画布.app",
+    "previousSourceDigest": "0d17eb62e277f361673fc66529e6068ad2bb025b111d85d365a708702f383f38",
+    "previousBuildId": "6067ff07d31c65dbd2c19ca63adc18ed",
+    "previousAppAsarSha256": "ac1f4c0afcbf62616f01509c11bdacefde765118553d73d4e5ff673518e6cb7c",
+    "codesignDeepStrict": true
+  },
+  "cleanup": {
+    "temporaryPackageRootsMovedToTrash": true,
+    "trashPath": "/Users/hxx/.Trash/AI画布安装临时_20260811T063507-c9bb2c87",
+    "recoverableUntilTrashEmptied": true,
+    "appLeftRunning": false
+  },
+  "reusedPriorVerification": {
+    "sourceBuild": true,
+    "immutableCandidate": true,
+    "currentMcpCheck": true,
+    "isolatedPackageSmoke": true,
+    "reranFastMediumIntegrationHeavy": false,
+    "rebuiltCandidate": false,
+    "reranIsolatedPackageSmoke": false
+  },
+  "boundaries": {
+    "formalProjectWrites": 0,
+    "externalCalls": 0,
+    "uploads": 0,
+    "creditsConsumed": 0,
+    "published": false,
+    "notarized": false,
+    "gitStageCommitPush": false
+  }
+}

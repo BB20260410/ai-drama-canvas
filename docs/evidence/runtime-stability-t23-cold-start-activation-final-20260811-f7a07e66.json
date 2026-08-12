@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "kind": "t23-source-dev-scale-performance",
+  "status": "FAIL",
+  "ok": false,
+  "mode": "dev",
+  "budgetProfile": "p7-strict",
+  "createdAt": "2026-08-11T05:47:53.680Z",
+  "fixture": {
+    "kind": "deterministic-synthetic-mechanical-fixture",
+    "visualAcceptance": false,
+    "aiImageGeneration": false,
+    "isolatedTemporaryProject": true,
+    "unitCount": 36,
+    "passRawCount": 4,
+    "note": "所有图均为 sharp 生成的可解码纯色 PNG；PASS 仅表示测试账本闭环，不代表视觉质量。"
+  },
+  "consoleErrors": [],
+  "pageErrors": [],
+  "error": "Error: page.evaluate: Error: 缺少 T23 unit-grid raw 只读核对钩子。\n    at eval (eval at evaluate (:303:30), <anonymous>:1:93)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+  "failureDiagnostics": {
+    "pageUrl": "http://localhost:5173/",
+    "ipcProbe": {
+      "enabled": true,
+      "totalCalls": 0,
+      "completedCalls": 0,
+      "currentOutstanding": 0,
+      "peakOutstanding": 0,
+      "totalDurationMs": 0,
+      "averageDurationMs": null,
+      "maxDurationMs": null,
+      "lastDurationMs": null,
+      "channels": []
+    }
+  }
+}

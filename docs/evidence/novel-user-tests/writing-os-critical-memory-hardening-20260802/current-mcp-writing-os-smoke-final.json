@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "kind": "writing-os-current-runtime-smoke",
+  "status": "PASS",
+  "generatedAt": "2026-08-02T17:18:00.873Z",
+  "projectRelativePath": "docs/evidence/novel-user-tests/black-page-writing-os-first-20260801-171958/managed/black-page-ch011-managed-pilot-20260801-448e209f",
+  "runtime": {
+    "candidateId": "mcp-candidate-ea69ca8aedd5f4ac-77719b7cf314b922-1c0623b3",
+    "sourceDigest": "ea69ca8aedd5f4ac49e30ee06eb4d735f8eac2f779e5c72f1130b97a65515b40",
+    "buildId": "9fa8c5b993759a4119436507d6862e75",
+    "entrySha256": "be4372930ed118216c7f2ebe17f94107f0b33d1ba6c1d6e44e2ac8a5bc907444",
+    "buildCurrentnessAllowed": true,
+    "toolCount": 216,
+    "requiredTools": [
+      "doctor_novel_agent",
+      "prepare_novel_chapter_write",
+      "probe_novel_chapter_consistency",
+      "get_novel_writing_state",
+      "execute_command"
+    ]
+  },
+  "temporalBoundary": {
+    "targetChapterId": "c617bef1-6979-536c-9360-ba0945102bc4",
+    "cutoffChapterId": "3698fec0-3b81-533a-aa85-6acbc9904453",
+    "chapter11StateVisible": false,
+    "authorOnlyVisible": false
+  },
+  "doctor": {
+    "targetChapterId": "f4ff96c2-8338-5330-bf50-98c519ce0306",
+    "readyForPrepare": false,
+    "blockerCodes": [
+      "required_cast_missing"
+    ],
+    "nextToolNames": [
+      "execute_command"
+    ],
+    "fingerprint": "54ccaa63057d817c311ce5be92549d5a06f65dca24bef9ed3ce4c9454c2e250c"
+  },
+  "probe": {
+    "targetChapterId": "c617bef1-6979-536c-9360-ba0945102bc4",
+    "machineConflictCodes": [],
+    "reviewRequiredCodes": [
+      "undeclared_cast_candidate",
+      "undeclared_cast_candidate",
+      "undeclared_cast_candidate"
+    ],
+    "limitationCount": 3,
+    "fingerprint": "4ce5b8d33a098ef56b9efa1bbaa08edfaed7c724b9fbb7349826d3e5b2ace150"
+  },
+  "stderrTail": ""
+}

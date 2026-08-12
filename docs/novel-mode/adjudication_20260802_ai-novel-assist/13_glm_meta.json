@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "role": "glm",
+  "model": "glm-5-2-260617",
+  "elapsed_sec": 175.17,
+  "usage": {
+    "completion_tokens": 12880,
+    "prompt_tokens": 3042,
+    "total_tokens": 15922,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    }
+  },
+  "finish_reason": "stop",
+  "content_chars": 21483,
+  "client_timeout_sec": 0.0,
+  "output": "/Users/hxx/Documents/无限画布/docs/novel-mode/adjudication_20260802_ai-novel-assist/13_glm.txt"
+}

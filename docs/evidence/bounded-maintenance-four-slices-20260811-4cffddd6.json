@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "kind": "bounded-maintenance-four-slices",
+  "status": "passed",
+  "completedAt": "2026-08-11T10:35:39Z",
+  "identity": {
+    "sourceDigest": "4cffddd6449d702998e5a8aa1990b7111f0ddfb74129e7bb658d68de8c64f5a2",
+    "buildId": "69b49cfab7db5f9685138280ad07e2d7",
+    "manifestFingerprint": "b8e31c545a45bceeea134cf8a82082b2d44a85bea7d2d088e73109b127c47a0c",
+    "mcpToolCount": 220,
+    "sourceFileCount": 1043,
+    "sourceBytes": 20724936
+  },
+  "completedSlices": [
+    {
+      "id": "review-history-latest-only",
+      "result": "passed",
+      "proof": "project-scoped request gate prevents stale success or failure from replacing the current Review history"
+    },
+    {
+      "id": "projection-canonical-asset-request-cache",
+      "result": "passed",
+      "proof": "request-local Promise cache, concurrency cap 4, panel order and bundle fingerprint preserved"
+    },
+    {
+      "id": "npm-production-dependency-semantic-gate",
+      "result": "passed",
+      "proof": "node flags, exact node_modules paths, lockfile resolution, versions and stable semver ranges are fail-closed"
+    },
+    {
+      "id": "sqlite-busy-proof-and-deadline",
+      "result": "passed",
+      "proof": "only typed zero-effect busy retries; command and backup share a 5 second absolute deadline; ambiguous effects become unknown"
+    }
+  ],
+  "verification": [
+    {
+      "kind": "targeted-tests",
+      "files": 7,
+      "tests": 37,
+      "status": "passed",
+      "scope": "review, projection, npm health, SQLite contract and delivery wiring"
+    },
+    {
+      "kind": "adjacent-tests",
+      "files": 4,
+      "tests": 58,
+      "status": "passed",
+      "scope": "command bus, command ledger, SQLite busy and project backup"
+    },
+    {
+      "kind": "typecheck",
+      "status": "passed",
+      "commands": ["npm run typecheck", "npm run typecheck:app"]
+    },
+    {
+      "kind": "build",
+      "status": "passed",
+      "command": "npm run build"
+    },
+    {
+      "kind": "live-npm-production-health",
+      "status": "passed",
+      "problemCount": 3,
+      "accepted": ["@emnapi/runtime@1.11.3", "@img/sharp-wasm32@0.35.3", "tslib@2.8.1"],
+      "classification": "lockfile-proven sharp optional WASM chain",
+      "rejectedProblemCount": 0
+    },
+    {
+      "kind": "production-audit",
+      "status": "passed",
+      "vulnerabilities": 0,
+      "registry": "official npm registry"
+    },
+    {
+      "kind": "source-identity",
+      "status": "passed",
+      "liveDigestMatchesManifest": true
+    },
+    {
+      "kind": "diff-check",
+      "status": "passed"
+    }
+  ],
+  "independentReview": {
+    "status": "clean",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0
+  },
+  "deliveryBoundary": {
+    "t23Rerun": false,
+    "candidateBuilt": false,
+    "packageSmokeRun": false,
+    "installedAppReplaced": false,
+    "installedAppIdentity": {
+      "sourceDigest": "d5ce49a9fdd9a277cd49c004a68b589d9f038c0b791f49e743e8c75932ff5784",
+      "buildId": "6ed09cc907407bf77b4f41346cef9736",
+      "mcpToolCount": 220
+    },
+    "guiOpened": false,
+    "formalProjectDataWritten": false,
+    "externalCalls": 0,
+    "uploads": 0,
+    "paidCalls": 0,
+    "gitStageCommitPush": 0
+  }
+}

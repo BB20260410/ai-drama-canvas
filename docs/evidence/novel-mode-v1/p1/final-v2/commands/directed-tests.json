@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "p1-directed-tests-final-v3",
+  "status": "pass",
+  "startedAt": "2026-08-01T10:13:17.604Z",
+  "endedAt": "2026-08-01T10:14:08.061Z",
+  "durationMs": 50522,
+  "argv": [
+    "npx",
+    "vitest",
+    "run",
+    "tests/managed-project.test.ts",
+    "tests/managed-project-service.test.ts",
+    "tests/sidecar.test.ts",
+    "tests/active-managed-studio-context.test.ts",
+    "tests/active-managed-studio-context-readonly.test.ts",
+    "tests/studio-imagegen-active-project-fence.test.ts",
+    "tests/runtime-ipc-effect.test.ts",
+    "tests/managed-project-create-ui.test.ts",
+    "tests/novel-studio-view.test.ts",
+    "tests/novel-workspace-routing.test.ts",
+    "tests/local-creative-project-center-summary-ui.test.ts",
+    "tests/p13-desktop-production-loop-ui.test.ts",
+    "tests/mcp-build-currentness-gate.test.ts",
+    "tests/novel-registry-compatibility.test.ts",
+    "tests/project-backup.test.ts",
+    "tests/locks-cross-process.test.ts"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "3b39d7592ceaaaeb65d709d64c33736d",
+      "sourceDigest": "f3e186cdaea97298dc7654a4f9729dd4b3d69e02c719e4708cc00a80c8a5c1d0"
+    },
+    "after": {
+      "buildId": "3b39d7592ceaaaeb65d709d64c33736d",
+      "sourceDigest": "f3e186cdaea97298dc7654a4f9729dd4b3d69e02c719e4708cc00a80c8a5c1d0"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/novel-mode-v1/p1/final-v2/commands/directed-tests.log",
+    "sizeBytes": 224,
+    "sha256": "5ddd3b41be948c80855b2a27eef851b4ad650b4b91ce3c7f764c223d488bae6f"
+  },
+  "testCounts": {
+    "files": 15,
+    "tests": 97
+  }
+}

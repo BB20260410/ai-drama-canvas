@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "kind": "ai-canvas-local-installed-app-cutover",
+  "status": "pass",
+  "completedAt": "2026-08-10T05:18:24+08:00",
+  "installation": {
+    "path": "/Applications/AI 漫剧画布.app",
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "bundleIdentifier": "com.hxx.aidramacanvas",
+    "sourceDigest": "a4312c768158bee4f6c64a3d1764ecf0b455f6a0e541fcfe0b217b4274433bda",
+    "buildId": "e0197b69e9c27800f65e68d9c8ab7173",
+    "mcpToolCount": 218,
+    "executableSha256": "b514a27ce22fa9213df93be9d4d00034a60f43207fd1b1b9845e3985fa78670b",
+    "appAsarSha256": "65a4098da8cfa0965d739e5fdcc8f5229800037dcd8a06420980b622e52e806a",
+    "releaseManifestSha256": "f622ec4c6344ac4b343f6280e4276aa58e22aab0ac873070075ec25892b56a80",
+    "matchesDistExecutable": true,
+    "matchesDistAppAsar": true
+  },
+  "previousInstallation": {
+    "backupPath": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260810-051406-a4312c76/previous-installed/AI 漫剧画布.app",
+    "executableSha256": "e308b8b40ad5421769a0c48a71f38ce0af9983b8fe566406b0c82b6335b17e0b",
+    "appAsarSha256": "0221689c653895bba3df28c2e1ee98f8416fec3ff6c8b8ba00b8f30af2667dce",
+    "codesignDeepStrictPassed": true,
+    "recoverable": true
+  },
+  "verification": {
+    "codesignDeepStrictPassed": true,
+    "developerId": "Developer ID Application: YIHANG LI (3JS43BTTJ3)",
+    "teamIdentifier": "3JS43BTTJ3",
+    "quarantineAttributePresent": false,
+    "gatekeeper": {
+      "accepted": false,
+      "reason": "Unnotarized Developer ID",
+      "expectedForAuthorizedLocalOnlyBoundary": true
+    },
+    "runtimeEvidencePath": "docs/evidence/installed-local-verify-20260809T211523Z-a4312c76.json",
+    "runtimeEvidenceSha256": "e135e9c22293beaf876f586cbb370892112e4f723d6d9209ebb59307ad3fb57d",
+    "launchedWithBundledElectron": true,
+    "systemNodeRequired": false,
+    "backgroundLaunchPassed": true,
+    "frontApplicationUnaffectedDuringProbe": true,
+    "lingeringInstalledAppProcesses": 0
+  },
+  "sourceRecovery": {
+    "root": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260810-051406-a4312c76/source-recovery",
+    "gitIndexModified": false,
+    "gitCommitCreated": false,
+    "trackedPatchSha256": "afbb53d314193330746ed00febaf112264dc7a82d6ed37d525833249c57251f1",
+    "untrackedArchiveSha256": "188210ff7d271b517c24f149933ca9eed1bf0c8f553dbc6bcf43bc6b471b201d",
+    "untrackedFilesArchived": 974,
+    "archiveListCountMatched": true,
+    "currentCandidateCheckSha256": "7ef922b4e8e4212325c70a70d998aeaefde9876f7fddcdad2a1710ac1ff3ca47"
+  },
+  "boundaries": {
+    "localOnly": true,
+    "notarizationPerformed": false,
+    "dmgGenerated": false,
+    "uploaded": false,
+    "published": false,
+    "autoUpdateConfigured": false,
+    "formalProjectTouched": false,
+    "formalAssetsTouched": false,
+    "gitStaged": false,
+    "gitCommitted": false,
+    "gitPushed": false
+  }
+}

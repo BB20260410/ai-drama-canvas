@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-writing-os-v1-1m-500-acceptance",
+  "status": "PASS",
+  "generatedAt": "2026-08-02T06:05:40.204Z",
+  "scope": {
+    "remoteModelsCalled": false,
+    "feesIncurred": false,
+    "formalNovelSourcesTouched": false,
+    "temporaryProjectsCleanedAfterReport": true
+  },
+  "runtime": {
+    "transport": "source-stdio-and-json-cli",
+    "toolCount": 213,
+    "requiredTools": [
+      "get_novel_manuscript_workspace",
+      "get_novel_writing_state",
+      "build_novel_context_pack",
+      "prepare_novel_chapter_write",
+      "doctor_novel_agent",
+      "preflight_novel_chapter_write",
+      "plan_novel_state_rebuild",
+      "probe_novel_chapter_consistency",
+      "search_novel_manuscript",
+      "read_novel_manuscript_range",
+      "execute_command"
+    ]
+  },
+  "smallVerticalSlice": {
+    "mcpCliEquivalent": {
+      "state": true,
+      "contextPack2": true,
+      "preflight": true
+    },
+    "aiSaveRevision": 2,
+    "crossInterfaceReplay": true,
+    "staleReason": "context_preflight_stale",
+    "reviewTicketAttached": true,
+    "stateCommittedThroughChapter2": true,
+    "chapter3PreflightReady": true
+  },
+  "million": {
+    "scale": "S1",
+    "targetCharacters": 1000000,
+    "utf16Characters": 1000000,
+    "utf8Bytes": 2601296,
+    "chapterCount": 500,
+    "corpusSha256": "b91fb4408eab1a8da414d3ea819c4577894e06278c9e8d58f136f7d23b14a32d",
+    "logicalFingerprint": "487ac752061520db5cd985b9034790b2d7b5902bd53c005de19e35f1eb45e646",
+    "importDurationMs": 28934,
+    "seedDurationMs": 641,
+    "stateRevision": 1,
+    "completionCount": 499,
+    "cutoffChapterId": "89f6cb66-6b11-5a2c-b1ef-bad168329bcd",
+    "contextPack": {
+      "version": 2,
+      "fingerprint": "682ba845f663c9de9386a4a7898e1c17707bfe4d7fd760c64e76ba16972ebe88",
+      "deterministicRepeat": true,
+      "maximumCharacters": 4096,
+      "usedCharacters": 4096,
+      "excerptCount": 3,
+      "targetChapterExcluded": true,
+      "locatorRoundTrip": true,
+      "durationMs": 37
+    },
+    "preflight": {
+      "ready": true,
+      "preflightId": "novel-write-preflight-0cc115278eaa83bbb1bed20d"
+    },
+    "search": {
+      "scannedChapters": 499,
+      "skippedExternalChanges": 0,
+      "hitCount": 1,
+      "hotDurationMs": 94
+    },
+    "sourceUnchanged": true
+  }
+}

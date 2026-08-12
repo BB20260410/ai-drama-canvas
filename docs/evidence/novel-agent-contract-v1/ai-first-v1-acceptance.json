@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-agent-contract-v1-acceptance",
+  "status": "PASS",
+  "generatedAt": "2026-08-01T16:45:09.391Z",
+  "scope": {
+    "aiFirst": true,
+    "uiChanged": false,
+    "remoteModelsCalled": false,
+    "secondAuthorityStoreAdded": false
+  },
+  "mcp": {
+    "sourceProcessStarted": true,
+    "toolCount": 207,
+    "requiredTools": [
+      "get_novel_manuscript_workspace",
+      "list_novel_manuscript_chapters",
+      "read_novel_manuscript_range",
+      "search_novel_manuscript",
+      "build_novel_context_pack",
+      "execute_command"
+    ],
+    "capabilityContract": "aicanvas.novel-agent",
+    "activeProjectSelection": "active"
+  },
+  "short100": {
+    "projectId": "project-1fafdb81d39d",
+    "initialCharacters": 100,
+    "chapterId": "d4063cb9-4712-51a0-87f3-e70418d6f0da",
+    "equivalence": {
+      "workspace": true,
+      "list": true,
+      "range": true,
+      "search": true,
+      "context": true
+    },
+    "cliDurationsMs": {
+      "workspace": 372,
+      "list": 387,
+      "range": 377,
+      "search": 377,
+      "context": 391
+    },
+    "mcpSaveStatus": "succeeded",
+    "crossInterfaceReplay": true,
+    "staleCasRejected": "COMMAND_REJECTED",
+    "finalRevision": 2,
+    "finalCharacters": 103
+  },
+  "million": {
+    "scale": "S1",
+    "projectId": "project-2a41d9b26604",
+    "generatorVersion": "1.1.0",
+    "generatorSourceSha256": "3164597462ba164885106b1af52f2477947e8d7d18b7d4c329422a8a3ac7cb49",
+    "corpusSha256": "b91fb4408eab1a8da414d3ea819c4577894e06278c9e8d58f136f7d23b14a32d",
+    "utf16Characters": 1000000,
+    "utf8Bytes": 2601296,
+    "chapterCount": 500,
+    "importDurationMs": 31337,
+    "search": {
+      "query": "柏玄川·精确见证001",
+      "hotDurationMs": 98,
+      "manifestRevision": 1,
+      "scannedChapters": 500,
+      "skippedExternalChanges": 0,
+      "hitCount": 1
+    },
+    "context": {
+      "maximumCharacters": 512,
+      "usedCharacters": 512,
+      "excerptCount": 1,
+      "locatorRoundTrip": true,
+      "fingerprint": "fad24d1f3a1465a390349ef5c9fd7daf9e5ebb96c213a4a81e6de5f50f2e79c7"
+    },
+    "sourceUnchanged": true
+  }
+}

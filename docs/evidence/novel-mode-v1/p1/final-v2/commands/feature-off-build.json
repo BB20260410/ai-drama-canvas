@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "p1-feature-off-build-final-v3",
+  "status": "pass",
+  "startedAt": "2026-08-01T10:14:19.547Z",
+  "endedAt": "2026-08-01T10:14:45.298Z",
+  "durationMs": 25832,
+  "argv": [
+    "env",
+    "VITE_AI_CANVAS_NOVEL_WORKSPACE=0",
+    "npx",
+    "tsx",
+    "scripts/build-novel-mode-isolated.ts",
+    "--snapshot-root",
+    "/tmp/novel-mode-isolated-build.leIdvg",
+    "--protected-pid",
+    "51269"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "3b39d7592ceaaaeb65d709d64c33736d",
+      "sourceDigest": "f3e186cdaea97298dc7654a4f9729dd4b3d69e02c719e4708cc00a80c8a5c1d0"
+    },
+    "after": {
+      "buildId": "3b39d7592ceaaaeb65d709d64c33736d",
+      "sourceDigest": "f3e186cdaea97298dc7654a4f9729dd4b3d69e02c719e4708cc00a80c8a5c1d0"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/novel-mode-v1/p1/final-v2/commands/feature-off-build.log",
+    "sizeBytes": 28572,
+    "sha256": "596a1afa0978a9a82ef1a106c37a81587ce5b745c838594c89fdcda6ecd1a068"
+  }
+}

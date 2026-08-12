@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-mode-evidence-envelope",
+  "phase": "P0",
+  "capturedAt": "2026-08-01T07:02:11Z",
+  "buildIdentity": {
+    "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+    "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4"
+  },
+  "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4",
+  "command": "npx tsx scripts/capture-novel-readonly-tree-manifest.ts --root <read-only-root> --label <label> --output <novel-mode-real-project-json>",
+  "exitCode": 0,
+  "fixtureCorpusSha256": "b7afb7aa236d37f3f1654f8a1ecc1da75da2891dfdbd952714fa869c421c227c",
+  "targetChapter": null,
+  "durationMs": 1750,
+  "errorSummary": [],
+  "evidenceRelativePath": "docs/evidence/novel-mode-v1/real-project/",
+  "captures": [
+    {
+      "label": "formal-novel-p0-before",
+      "role": "formal-novel-readonly-source",
+      "exitCode": 0,
+      "durationMs": 704,
+      "entries": 1353,
+      "directories": 197,
+      "files": 1156,
+      "symlinks": 0,
+      "fileBytes": 127886439,
+      "aggregateSha256": "b7afb7aa236d37f3f1654f8a1ecc1da75da2891dfdbd952714fa869c421c227c",
+      "evidenceRelativePath": "docs/evidence/novel-mode-v1/real-project/formal-novel-p0-before.json"
+    },
+    {
+      "label": "active-production-p0-before",
+      "role": "active-production-zero-write-control",
+      "exitCode": 0,
+      "durationMs": 1046,
+      "entries": 838,
+      "directories": 317,
+      "files": 521,
+      "symlinks": 0,
+      "fileBytes": 494157728,
+      "aggregateSha256": "5395f2cbc2aead35812fa0984f04e65489db91956a2fdfd2a4239903d149b0b5",
+      "evidenceRelativePath": "docs/evidence/novel-mode-v1/real-project/active-production-p0-before.json"
+    }
+  ]
+}

@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 1,
+  "kind": "current-source-isolated-unpacked-app-validation",
+  "runId": "isolated-package-smoke-20260809T194741380Z-6420-7a1c80ca",
+  "startedAt": "2026-08-09T19:47:41.381Z",
+  "completedAt": "2026-08-09T19:50:40.614Z",
+  "status": "failed",
+  "error": "packaged ReviewStudio stale-submit full-restart 失败：{\"code\":1,\"message\":\"Command failed: /Users/hxx/.nvm/versions/node/v22.23.2/bin/node /Users/hxx/Documents/无限画布/scripts/ui-review-content-identity-smoke.mjs /private/tmp/aic-pkg-XomDPU/t/review-project /private/tmp/aic-pkg-XomDPU/t/review-project-registry.json /Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260809T194741380Z-6420-7a1c80ca-review-ui.json /Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260809T194741380Z-6420-7a1c80ca-review-ui.png\\nfile:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/scripts/lib/electron-application-close.mjs:137\\n    throw new Error(`${label} 正常关闭失败，已按失败路径精准清理；强杀不计 PASS：${JSON.stringify({\\n          ^\\n\\nError: ReviewStudio final graceful close 正常关闭失败，已按失败路径精准清理；强杀不计 PASS：{\\\"cause\\\":\\\"ReviewStudio final graceful close graceful close 超过 20000ms：{\\\\\\\"pid\\\\\\\":9717,\\\\\\\"diagnostics\\\\\\\":{\\\\\\\"diagnosticError\\\\\\\":\\\\\\\"electronApplication.evaluate: Target page, context or browser has been closed\\\\\\\\nBrowser logs:\\\\\\\\n\\\\\\\\n<launching> /private/tmp/aic-pkg-XomDPU/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布 --inspect=0 --remote-debugging-port=0 --user-data-dir=/private/tmp/aic-pkg-XomDPU/t/review-electron-user-data\\\\\\\\n<launched> pid=9717\\\\\\\\n[pid=9717][err] Debugger listening on ws://127.0.0.1:62737/20aed627-c158-4d42-8384-3dbc4f3a3a6e\\\\\\\\n[pid=9717][err] For help, see: https://nodejs.org/learn/getting-started/debugging\\\\\\\\n[pid=9717][err] Debugger attached.\\\\\\\\n[pid=9717][err] \\\\\\\\n[pid=9717][err] DevTools listening on ws://127.0.0.1:62741/devtools/browser/ab7aa6b5-6d2a-4b26-8186-49c6e12ed832\\\\\\\\n[pid=9717][out] [app-close] {\\\\\\\\\\\\\\\"attempt\\\\\\\\\\\\\\\":1,\\\\\\\\\\\\\\\"intent\\\\\\\\\\\\\\\":\\\\\\\\\\\\\\\"app_quit\\\\\\\\\\\\\\\",\\\\\\\\\\\\\\\"requestId\\\\\\\\\\\\\\\":\\\\\\\\\\\\\\\"window-close-f6462a1a-e4fc-4209-a59b-fea7c2b85da3\\\\\\\\\\\\\\\",\\\\\\\\\\\\\\\"phase\\\\\\\\\\\\\\\":\\\\\\\\\\\\\\\"awaiting_renderer\\\\\\\\\\\\\\\",\\\\\\\\\\\\\\\"rendererApproved\\\\\\\\\\\\\\\":false,\\\\\\\\\\\\\\\"criticalCleanupComplete\\\\\\\\\\\\\\\":false,\\\\\\\\\\\\\\\"recoverableCleanupComplete\\\\\\\\\\\\\\\":false,\\\\\\\\\\\\\\\"updatedAt\\\\\\\\\\\\\\\":\\\\\\\\\\\\\\\"2026-08-09T19:50:15.085Z\\\\\\\\\\\\\\\",\\\\\\\\\\\\\\\"history\\\\\\\\\\\\\\\":[{\\\\\\\\\\\\\\\"phase\\\\\\\\\\\\\\\":\\\\\\\\\\\\\\\"awaiting_renderer\\\\\\\\\\\\\\\",\\\\\\\\\\\\\\\"at\\\\\\\\\\\\\\\":\\\\\\\\\\\\\\\"2026-08-09T19:50:15.085Z\\\\\\\\\\\\\\\"}]}\\\\\\\\n[pid=9717][err] Debugger ending on ws://127.0.0.1:62737/20aed627-c158-4d42-8384-3dbc4f3a3a6e\\\\\\\\n[pid=9717][err] For help, see: https://nodejs.org/learn/getting-started/debugging\\\\\\\"}}\\\",\\\"cleanup\\\":{\\\"pid\\\":9717,\\\"forceTerminated\\\":true,\\\"forceKilled\\\":true,\\\"exited\\\":true}}\\n    at closeElectronApplicationOrThrow (file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/scripts/lib/electron-application-close.mjs:137:11)\\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\\n    at async closeCurrentApplication (file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/scripts/ui-review-content-identity-smoke.mjs:53:18)\\n    at async file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/scripts/ui-review-content-identity-smoke.mjs:368:3\\n\\nNode.js v22.23.2\\n\",\"stdoutTail\":\"\",\"stderrTail\":\"file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/scripts/lib/electron-application-close.mjs:137\\n    throw new Error(`${label} 正常关闭失败，已按失败路径精准清理；强杀不计 PASS：${JSON.stringify({\\n          ^\\n\\nError: ReviewStudio final graceful close 正常关闭失败，已按失败路径精准清理；强杀不计 PASS：{\\\"cause\\\":\\\"ReviewStudio final graceful close graceful close 超过 20000ms：{\\\\\\\"pid\\\\\\\":9717,\\\\\\\"diagnostics\\\\\\\":{\\\\\\\"diagnosticError\\\\\\\":\\\\\\\"electronApplication.evaluate: Target page, context or browser has been closed\\\\\\\\nBrowser logs:\\\\\\\\n\\\\\\\\n<launching> /private/tmp/aic-pkg-XomDPU/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布 --inspect=0 --remote-debugging-port=0 --user-data-dir=/private/tmp/aic-pkg-XomDPU/t/review-electron-user-data\\\\\\\\n<launched> pid=9717\\\\\\\\n[pid=9717][err] Debugger listening on ws://127.0.0.1:62737/20aed627-c158-4d42-8384-3dbc4f3a3a6e\\\\\\\\n[pid=9717][err] For help, see: https://nodejs.org/learn/getting-started/debugging\\\\\\\\n[pid=9717][err] Debugger attached.\\\\\\\\n[pid=9717][err] \\\\\\\\n[pid=9717][err] DevTools listening on ws://127.0.0.1:62741/devtools/browser/ab7aa6b5-6d2a-4b26-8186-49c6e12ed832\\\\\\\\n[pid=9717][out] [app-close] {\\\\\\\\\\\\\\\"attempt\\\\\\\\\\\\\\\":1,\\\\\\\\\\\\\\\"intent\\\\\\\\\\\\\\\":\\\\\\\\\\\\\\\"app_quit\\\\\\\\\\\\\\\",\\\\\\\\\\\\\\\"requestId\\\\\\\\\\\\\\\":\\\\\\\\\\\\\\\"window-close-f6462a1a-e4fc-4209-a59b-fea7c2b85da3\\\\\\\\\\\\\\\",\\\\\\\\\\\\\\\"phase\\\\\\\\\\\\\\\":\\\\\\\\\\\\\\\"awaiting_renderer\\\\\\\\\\\\\\\",\\\\\\\\\\\\\\\"rendererApproved\\\\\\\\\\\\\\\":false,\\\\\\\\\\\\\\\"criticalCleanupComplete\\\\\\\\\\\\\\\":false,\\\\\\\\\\\\\\\"recoverableCleanupComplete\\\\\\\\\\\\\\\":false,\\\\\\\\\\\\\\\"updatedAt\\\\\\\\\\\\\\\":\\\\\\\\\\\\\\\"2026-08-09T19:50:15.085Z\\\\\\\\\\\\\\\",\\\\\\\\\\\\\\\"history\\\\\\\\\\\\\\\":[{\\\\\\\\\\\\\\\"phase\\\\\\\\\\\\\\\":\\\\\\\\\\\\\\\"awaiting_renderer\\\\\\\\\\\\\\\",\\\\\\\\\\\\\\\"at\\\\\\\\\\\\\\\":\\\\\\\\\\\\\\\"2026-08-09T19:50:15.085Z\\\\\\\\\\\\\\\"}]}\\\\\\\\n[pid=9717][err] Debugger ending on ws://127.0.0.1:62737/20aed627-c158-4d42-8384-3dbc4f3a3a6e\\\\\\\\n[pid=9717][err] For help, see: https://nodejs.org/learn/getting-started/debugging\\\\\\\"}}\\\",\\\"cleanup\\\":{\\\"pid\\\":9717,\\\"forceTerminated\\\":true,\\\"forceKilled\\\":true,\\\"exited\\\":true}}\\n    at closeElectronApplicationOrThrow (file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/scripts/lib/electron-application-close.mjs:137:11)\\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\\n    at async closeCurrentApplication (file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/scripts/ui-review-content-identity-smoke.mjs:53:18)\\n    at async file:///Users/hxx/Documents/%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83/scripts/ui-review-content-identity-smoke.mjs:368:3\\n\\nNode.js v22.23.2\"}",
+  "outputPaths": {
+    "evidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260809T194741380Z-6420-7a1c80ca.json",
+    "packagedUiEvidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260809T194741380Z-6420-7a1c80ca-electron-ui.json",
+    "packagedUiScreenshotPath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260809T194741380Z-6420-7a1c80ca-electron-ui.png",
+    "packagedReviewEvidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260809T194741380Z-6420-7a1c80ca-review-ui.json",
+    "packagedReviewScreenshotPath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260809T194741380Z-6420-7a1c80ca-review-ui.png"
+  },
+  "terminal": {
+    "tempRootRemoved": true,
+    "lingeringProcessesBeforeCleanup": [],
+    "lingeringProcessesAfterCleanup": []
+  },
+  "commands": [
+    {
+      "label": "APFS COW clone into isolated stage",
+      "executable": "/bin/cp",
+      "args": [
+        "-cR",
+        "electron.vite.config.ts",
+        "package-lock.json",
+        "package.json",
+        "tsconfig.app.json",
+        "tsconfig.json",
+        "tsconfig.mcp.json",
+        "tsconfig.node.json",
+        "tsconfig.production-runs.json",
+        "tsconfig.web.json",
+        "vitest.config.ts",
+        "src",
+        "scripts",
+        "tests",
+        "build",
+        "node_modules",
+        "/private/tmp/aic-pkg-XomDPU/stage"
+      ],
+      "durationMs": 2586,
+      "stdoutTail": "",
+      "stderrTail": ""
+    },
+    {
+      "label": "isolated stage current-source build",
+      "executable": "/usr/bin/env",
+      "args": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "durationMs": 38386,
+      "stdoutTail": "../../out/renderer/assets/TaskCenterView-Dr63OOux.js                    15.61 kB\n../../out/renderer/assets/DesktopSupportView-sGie8Lto.js                17.87 kB\n../../out/renderer/assets/ScriptWorkbenchView-BMeN0qiV.js               18.05 kB\n../../out/renderer/assets/ProjectSettingsView-Cdn06maE.js               18.86 kB\n../../out/renderer/assets/ShotTimelineView-CZ6l9Mdc.js                  22.77 kB\n../../out/renderer/assets/ContinuityTimelineView-DRswleZ7.js            24.08 kB\n../../out/renderer/assets/ProductionWorkspace-B2_59CQQ.js               25.38 kB\n../../out/renderer/assets/CanonicalAssetLibraryView-AVeBedly.js         27.11 kB\n../../out/renderer/assets/ProjectCenter--sJUAnVi.js                     30.78 kB\n../../out/renderer/assets/ProjectImportWizard-BxPpjqy4.js               36.48 kB\n../../out/renderer/assets/GlobalResourceCenterView-Bfnw-Ne0.js          38.41 kB\n../../out/renderer/assets/StoryWorkbenchView-C_rYbtKx.js                38.66 kB\n../../out/renderer/assets/ContinuationWorkbenchView-DDuQ8ATJ.js         42.97 kB\n../../out/renderer/assets/ScriptMediaAlignView-CL2TjrQI.js              45.47 kB\n../../out/renderer/assets/StudioProductionDashboardView-CLCCBuT3.js     49.25 kB\n../../out/renderer/assets/StudioMultimediaTimelineView-D07MmhtD.js      53.82 kB\n../../out/renderer/assets/ReviewStudioView-Bzd-6DBA.js                  57.14 kB\n../../out/renderer/assets/StudioGenerationControlView-J71gQCVO.js       63.94 kB\n../../out/renderer/assets/StudioBindingWorkbench-DPKWGghg.js            64.31 kB\n../../out/renderer/assets/PanelReferenceWorkbench-D139O6H9.js           68.27 kB\n../../out/renderer/assets/NarrativeAdaptationView-BCQqnJFI.js           75.20 kB\n../../out/renderer/assets/GenerationQueueView-CaqsKFge.js               77.75 kB\n../../out/renderer/assets/NovelStudioView-C4NYSk4e.js                   82.26 kB\n../../out/renderer/assets/ProductionDesignView-BlmQtMHv.js             112.89 kB\n../../out/renderer/assets/StudioContinuityReviewView-Bp6Q_FEX.js       116.60 kB\n../../out/renderer/assets/VideoEditorView-BQWtYLA6.js                  175.48 kB\n../../out/renderer/assets/MaterialStudioView-DiJnNrHu.js               197.38 kB\n../../out/renderer/assets/ManagedStudioCanvasView-DIUabp-v.js          500.55 kB\n../../out/renderer/assets/index-C4iRpYJ9.js                            807.74 kB\n✓ built in 3.17s",
+      "stderrTail": "\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-continuity-ledger.ts is dynamically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-unit-grid-generation.ts but also statically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/dudu-readonly-import.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-continuity-review-control.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-generation.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-production-dashboard.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-generation-review.ts is dynamically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-generation.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-unit-grid-generation.ts but also statically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-continuity-review-control.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-generation-checkpoint.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-post-result-observation.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-production-projection-bundle.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-trace.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-video-package-source-adapter.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-video-package.ts, /private/tmp/aic-pkg-XomDPU/stage/src/main/index.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-post-result-observation.ts is dynamically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-unit-grid-generation.ts, /private/tmp/aic-pkg-XomDPU/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-production-projection-bundle.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-video-package-source-adapter.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-generation-checkpoint.ts is dynamically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-generation-ledger.ts but also statically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-continuity-review-control.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-episode-earliest.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-production-dashboard.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-production-diagnostics.ts, /private/tmp/aic-pkg-XomDPU/stage/src/main/index.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-project-write-lease.ts is dynamically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-XomDPU/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/active-managed-studio-context.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/desktop-write-lease.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-canvas-workflow-runner.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-continuous-generation-state.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-episode-earliest.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-XomDPU/stage/src/core/active-managed-studio-context.ts is dynamically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-generation-ledger.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-generation-ledger.ts but also statically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-agent-imagegen-result-bundle.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-video-package.ts is dynamically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-post-result-observation.ts but also statically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/command-bus.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-production-projection-bundle.ts, /private/tmp/aic-pkg-XomDPU/stage/src/main/index.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-approved-timeline-projection.ts is dynamically imported by /private/tmp/aic-pkg-XomDPU/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-episode-earliest.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-multimedia-timeline.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-production-diagnostics.ts, /private/tmp/aic-pkg-XomDPU/stage/src/core/studio-production-projection-bundle.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-XomDPU/stage/src/core/local-creative-project-ingest-status.ts is dynamically imported by /private/tmp/aic-pkg-XomDPU/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/local-creative-production-unit-materializer.ts, dynamic import will not move module into another chunk.\n\n[plugin vite:reporter] \n(!) /private/tmp/aic-pkg-XomDPU/stage/src/core/local-creative-production-unit-preview.ts is dynamically imported by /private/tmp/aic-pkg-XomDPU/stage/src/main/index.ts but also statically imported by /private/tmp/aic-pkg-XomDPU/stage/src/core/local-creative-production-unit-materializer.ts, dynamic import will not move module into another chunk."
+    },
+    {
+      "label": "isolated stage MCP capability baseline",
+      "executable": "/private/tmp/aic-pkg-XomDPU/stage/node_modules/.bin/tsx",
+      "args": [
+        "/private/tmp/aic-pkg-XomDPU/stage/scripts/mcp-smoke.ts",
+        "/private/tmp/aic-pkg-XomDPU/stage/dist-mcp/mcp/server.js"
+      ],
+      "durationMs": 899,
+      "stdoutTail": "    \"create_video_continuation\",\n    \"list_video_continuations\",\n    \"update_video_continuation\"\n  ],\n  \"resources\": [\n    \"aicanvas://server/capabilities\",\n    \"aicanvas://projects\"\n  ],\n  \"resourceTemplates\": [\n    \"aicanvas://projects/{projectId}/snapshot\",\n    \"aicanvas://projects/{projectId}/items/{itemId}\",\n    \"aicanvas://projects/{projectId}/artifacts/{artifactId}\",\n    \"aicanvas://projects/{projectId}/canvas\",\n    \"aicanvas://projects/{projectId}/tasks\",\n    \"aicanvas://projects/{projectId}/generation/{jobId}\",\n    \"aicanvas://projects/{projectId}/editor/{editProjectId}\",\n    \"aicanvas://projects/{projectId}/story/chapters/{chapterId}\",\n    \"aicanvas://projects/{projectId}/changes/{cursor}\"\n  ],\n  \"prompts\": [\n    \"managed_studio_lock_generate_writeback\",\n    \"resume_project\",\n    \"produce_next_image_batch\",\n    \"produce_next_video_batch\",\n    \"run_browser_generation\",\n    \"continue_video_from_last_frame\",\n    \"review_visual_batch\",\n    \"recover_interrupted_work\"\n  ]\n}",
+      "stderrTail": "(node:7279) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n[mcp-process-guard] MCP OS 主写进程已登记 pid=7279"
+    },
+    {
+      "label": "electron-builder 隔离 unpacked App",
+      "executable": "/private/tmp/aic-pkg-XomDPU/stage/node_modules/.bin/electron-builder",
+      "args": [
+        "--mac",
+        "--dir",
+        "--publish",
+        "never",
+        "-c.directories.output=/private/tmp/aic-pkg-XomDPU/stage/builder-output",
+        "-c.mac.identity=null",
+        "-c.mac.notarize=false",
+        "-c.forceCodeSigning=false",
+        "-c.npmRebuild=false",
+        "-c.electronDist=/private/tmp/aic-pkg-XomDPU/stage/node_modules/electron/dist"
+      ],
+      "durationMs": 41205,
+      "stdoutTail": "• electron-builder  version=26.0.12 os=25.5.0\n  • loaded configuration  file=package.json (\"build\" field)\n  • skipped dependencies rebuild  reason=npmRebuild is set to false\n  • packaging       platform=darwin arch=arm64 electron=43.1.0 appOutDir=builder-output/mac-arm64\n  • custom electronDist provided but no zip found; assuming unpacked electron directory.  electronDist=node_modules/electron/dist expectedFile=electron-v43.1.0-darwin-arm64.zip\n  • copying Electron  source=/private/tmp/aic-pkg-XomDPU/stage/node_modules/electron/dist/Electron.app destination=/private/tmp/aic-pkg-XomDPU/stage/builder-output/mac-arm64/Electron.app\n  • skipped macOS code signing  reason=identity explicitly is set to null",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged executable architecture",
+      "executable": "/usr/bin/file",
+      "args": [
+        "/private/tmp/aic-pkg-XomDPU/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布"
+      ],
+      "durationMs": 9,
+      "stdoutTail": "/private/tmp/aic-pkg-XomDPU/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布: Mach-O 64-bit executable arm64",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged bundle identifier",
+      "executable": "/usr/bin/plutil",
+      "args": [
+        "-extract",
+        "CFBundleIdentifier",
+        "raw",
+        "-o",
+        "-",
+        "/private/tmp/aic-pkg-XomDPU/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Info.plist"
+      ],
+      "durationMs": 7,
+      "stdoutTail": "com.hxx.aidramacanvas",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged bundle version",
+      "executable": "/usr/bin/plutil",
+      "args": [
+        "-extract",
+        "CFBundleShortVersionString",
+        "raw",
+        "-o",
+        "-",
+        "/private/tmp/aic-pkg-XomDPU/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Info.plist"
+      ],
+      "durationMs": 3,
+      "stdoutTail": "0.2.0",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged bundle name",
+      "executable": "/usr/bin/plutil",
+      "args": [
+        "-extract",
+        "CFBundleName",
+        "raw",
+        "-o",
+        "-",
+        "/private/tmp/aic-pkg-XomDPU/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Info.plist"
+      ],
+      "durationMs": 4,
+      "stdoutTail": "AI 漫剧画布",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged MCP capability smoke",
+      "executable": "/Users/hxx/Documents/无限画布/node_modules/.bin/tsx",
+      "args": [
+        "/Users/hxx/Documents/无限画布/scripts/mcp-smoke.ts",
+        "/private/tmp/aic-pkg-XomDPU/stage/builder-output/mac-arm64/AI 漫剧画布.app/Contents/Resources/app.asar.unpacked/dist-mcp/mcp/server.js"
+      ],
+      "durationMs": 953,
+      "stdoutTail": "    \"create_video_continuation\",\n    \"list_video_continuations\",\n    \"update_video_continuation\"\n  ],\n  \"resources\": [\n    \"aicanvas://server/capabilities\",\n    \"aicanvas://projects\"\n  ],\n  \"resourceTemplates\": [\n    \"aicanvas://projects/{projectId}/snapshot\",\n    \"aicanvas://projects/{projectId}/items/{itemId}\",\n    \"aicanvas://projects/{projectId}/artifacts/{artifactId}\",\n    \"aicanvas://projects/{projectId}/canvas\",\n    \"aicanvas://projects/{projectId}/tasks\",\n    \"aicanvas://projects/{projectId}/generation/{jobId}\",\n    \"aicanvas://projects/{projectId}/editor/{editProjectId}\",\n    \"aicanvas://projects/{projectId}/story/chapters/{chapterId}\",\n    \"aicanvas://projects/{projectId}/changes/{cursor}\"\n  ],\n  \"prompts\": [\n    \"managed_studio_lock_generate_writeback\",\n    \"resume_project\",\n    \"produce_next_image_batch\",\n    \"produce_next_video_batch\",\n    \"run_browser_generation\",\n    \"continue_video_from_last_frame\",\n    \"review_visual_batch\",\n    \"recover_interrupted_work\"\n  ]\n}",
+      "stderrTail": "[mcp-process-guard] MCP OS 主写进程已登记 pid=7673\n(node:7673) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.\n(Use `AI 漫剧画布 --trace-deprecation ...` to show where the warning was created)"
+    },
+    {
+      "label": "packaged Effect/Transition MCP integration",
+      "executable": "/Users/hxx/Documents/无限画布/node_modules/.bin/vitest",
+      "args": [
+        "run",
+        "tests/mcp-editor-effect-transition.test.ts",
+        "--maxWorkers=1"
+      ],
+      "durationMs": 7058,
+      "stdoutTail": "RUN  v4.1.0 /Users/hxx/Documents/无限画布\n\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n   Start at  03:49:07\n   Duration  6.82s (transform 37ms, setup 19ms, import 90ms, tests 6.63s, environment 0ms)",
+      "stderrTail": ""
+    },
+    {
+      "label": "packaged MCP empty-project fresh-restart workflow",
+      "executable": "/Users/hxx/Documents/无限画布/node_modules/.bin/tsx",
+      "args": [
+        "/Users/hxx/Documents/无限画布/scripts/mcp-empty-project-workflow-smoke.ts",
+        "/private/tmp/aic-pkg-XomDPU/empty-project",
+        "/private/tmp/aic-pkg-XomDPU/empty-project-registry.json"
+      ],
+      "durationMs": 18224,
+      "stdoutTail": "{\n  \"root\": \"/private/tmp/aic-pkg-XomDPU/empty-project\",\n  \"registryPath\": \"/private/tmp/aic-pkg-XomDPU/empty-project-registry.json\",\n  \"transport\": \"packaged-electron-node\",\n  \"desktopUiLaunched\": false,\n  \"toolCount\": 218,\n  \"chapters\": 2,\n  \"facts\": 34,\n  \"beats\": 11,\n  \"splitUnits\": 4,\n  \"storyboardRows\": 11,\n  \"directorContractPreserved\": true,\n  \"projectId\": \"project-691af8eecb7f\",\n  \"totalItems\": 4,\n  \"jsonPath\": \"/private/tmp/aic-pkg-XomDPU/empty-project/导出/雾河来客_纯MCP分镜_v001.json\",\n  \"markdownPath\": \"/private/tmp/aic-pkg-XomDPU/empty-project/导出/雾河来客_纯MCP分镜_v001.md\",\n  \"ledgerEntries\": 19,\n  \"uncertainCommands\": 0,\n  \"restartVerified\": true\n}",
+      "stderrTail": "[mcp-process-guard] MCP OS 主写进程已登记 pid=7829\n[mcp-process-guard] MCP OS 主写进程已登记 pid=8717"
+    },
+    {
+      "label": "packaged Effect/Transition Electron UI full-restart",
+      "executable": "/Users/hxx/.nvm/versions/node/v22.23.2/bin/node",
+      "args": [
+        "/Users/hxx/Documents/无限画布/scripts/ui-editor-effect-transition-smoke.mjs",
+        "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260809T194741380Z-6420-7a1c80ca-electron-ui.json"
+      ],
+      "durationMs": 19099,
+      "stdoutTail": "        \"source\": \"aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-XomDPU%2Ft%2Fai-canvas-editor-effect-transition-ui-qsdkx0%2Fproject%2FEP01_15s_001_UI%E8%BD%AC%E5%9C%BA%E5%89%8D%E9%A1%B9%2FEP01_15s_001_v1.mp4\"\n      },\n      \"incoming\": {\n        \"currentTime\": 0.165999,\n        \"opacity\": 0.333333,\n        \"muted\": true,\n        \"readyState\": 1,\n        \"source\": \"aicanvas-asset://file/?path=%2Fprivate%2Ftmp%2Faic-pkg-XomDPU%2Ft%2Fai-canvas-editor-effect-transition-ui-qsdkx0%2Fproject%2FEP01_15s_002_UI%E8%BD%AC%E5%9C%BA%E5%90%8E%E9%A1%B9%2FEP01_15s_002_v1.mp4\"\n      }\n    }\n  },\n  \"screenshot\": {\n    \"path\": \"/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260809T194741380Z-6420-7a1c80ca-electron-ui.png\",\n    \"bytes\": 252968,\n    \"sha256\": \"c4cc380017130779e3383df02800a6b3ef800ed94c909dbb66b43b16e0584c84\",\n    \"width\": 1560,\n    \"height\": 980,\n    \"captureAttempt\": 1,\n    \"content\": {\n      \"pixels\": 1528800,\n      \"brightRatio\": 0.1992575876504448,\n      \"chromaticRatio\": 0.05061420722135008\n    }\n  },\n  \"terminal\": {\n    \"rootRemoved\": true,\n    \"registryRemoved\": true,\n    \"userDataRemoved\": true\n  }\n}",
+      "stderrTail": ""
+    }
+  ]
+}

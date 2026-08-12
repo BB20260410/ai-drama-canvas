@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "kind": "higgsfield-unlimited-membership-programmatic-recheck",
+  "status": "blocked-by-provider-programmatic-contract",
+  "createdAt": "2026-08-10T06:58:18+08:00",
+  "membership": {
+    "connectorRecognizedPlan": "ultra",
+    "cliRecognizedPlan": "ultra",
+    "workspaceCount": 1,
+    "workspacePlan": "ultra",
+    "wrongWorkspaceEvidence": false,
+    "expiredAuthorizationEvidence": false,
+    "connectorUnlimAvailable": false
+  },
+  "connectorCatalog": {
+    "totalModels": 86,
+    "catalogMarkedUnlimitedImageModels": 11,
+    "catalogMarkedUnlimitedVideoModels": 5,
+    "seedance25SupportsUnlim": "field-missing",
+    "catalogAndCostBackendConsistent": false
+  },
+  "connectorCostMatrix": {
+    "generationOrUploadPerformed": false,
+    "image": [
+      {
+        "model": "nano_banana_2",
+        "useUnlim": true,
+        "result": "nominal-credit-cost",
+        "creditsExact": 1.5,
+        "zeroCostOrUnlimitedReceipt": false
+      },
+      {
+        "model": "gpt_image_2",
+        "useUnlim": true,
+        "result": "nominal-credit-cost",
+        "creditsExact": 0.5,
+        "zeroCostOrUnlimitedReceipt": false
+      },
+      {
+        "model": "seedream_v4_5",
+        "useUnlim": true,
+        "result": "INVALID_ARGUMENT-unlimited-not-supported"
+      },
+      {
+        "model": "flux_2",
+        "useUnlim": true,
+        "result": "INVALID_ARGUMENT-unlimited-not-supported"
+      }
+    ],
+    "video": [
+      "seedance_2_0",
+      "seedance_2_0_mini",
+      "kling3_0",
+      "gemini_omni",
+      "wan2_7"
+    ],
+    "allVideoResults": "INVALID_ARGUMENT-unlimited-not-supported",
+    "seedance25ExactResult": "INVALID_ARGUMENT-unlimited-not-supported",
+    "anyZeroCostResult": false,
+    "anyUnlimitedBillingReceipt": false
+  },
+  "officialCli": {
+    "previousVersion": "1.1.20",
+    "updatedVersion": "1.1.23",
+    "updateSource": "npm:@higgsfield/cli@1.1.23",
+    "modelContractsInspected": [
+      "seedance_2_5",
+      "seedance_2_0",
+      "gpt_image_2"
+    ],
+    "useUnlimParameterPresent": false,
+    "seedance25UseUnlimProbe": "Unknown params: use_unlim",
+    "gptImage2UseUnlimProbe": "Unknown params: use_unlim"
+  },
+  "providerSideEffects": {
+    "generationCreated": false,
+    "mediaUploaded": false,
+    "creditsConsumed": false,
+    "privateApiUsed": false,
+    "browserAutomationUsed": false
+  },
+  "decision": {
+    "membershipClaimAccepted": true,
+    "programmaticUnlimitedProven": false,
+    "safeToGenerateFreeImage": false,
+    "safeToGenerateFreeVideo": false,
+    "reason": "The web membership is recognized as Ultra, but the connector/API and latest official CLI do not expose a verifiable zero-cost Unlimited path.",
+    "requiredProviderChange": "Expose Unlimited entitlement and billing receipt in connector/API, and accept use_unlim for the selected image and video models."
+  }
+}

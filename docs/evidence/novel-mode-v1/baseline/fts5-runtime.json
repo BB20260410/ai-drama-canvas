@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-mode-v1-fts5-runtime-evidence",
+  "phase": "P0",
+  "capturedAt": "2026-08-01T06:34:57Z",
+  "status": "pass",
+  "buildIdentity": {
+    "sourceDigest": "74012cd08890369cba103a4fc3c3d8c20946c0dbbea0db4e5da1b9a41f57c1d3",
+    "sourceFiles": 892,
+    "sourceBytes": 17815000,
+    "buildId": "35a7b63144ce821ad07be6f5152a80aa",
+    "fingerprint": "03173ee69a6efe71924ccd20d8bb1ef51aeaf7ff78a301d52ac3a63f9ab54734"
+  },
+  "probeContract": {
+    "database": ":memory:",
+    "virtualTable": "fts5",
+    "parameterBinding": true,
+    "query": "嘟嘟",
+    "expectedMatchIds": [
+      "chapter-001"
+    ],
+    "externalModelCalls": 0,
+    "projectWrites": 0
+  },
+  "runs": [
+    {
+      "runtime": "system-node",
+      "command": [
+        "node",
+        "scripts/probe-novel-fts5-runtime.mjs"
+      ],
+      "exitCode": 0,
+      "ok": true,
+      "versions": {
+        "node": "26.3.1",
+        "electron": null,
+        "sqlite": "3.53.2"
+      },
+      "matchIds": [
+        "chapter-001"
+      ]
+    },
+    {
+      "runtime": "electron-run-as-node",
+      "distribution": "workspace-node-modules",
+      "command": [
+        "ELECTRON_RUN_AS_NODE=1",
+        "node_modules/electron/dist/Electron.app/Contents/MacOS/Electron",
+        "scripts/probe-novel-fts5-runtime.mjs"
+      ],
+      "exitCode": 0,
+      "ok": true,
+      "versions": {
+        "node": "24.18.0",
+        "electron": "43.1.0",
+        "sqlite": "3.53.1"
+      },
+      "matchIds": [
+        "chapter-001"
+      ]
+    },
+    {
+      "runtime": "electron-main",
+      "distribution": "workspace-node-modules",
+      "commandEvidence": "tests/novel-fts5-runtime-probe.test.ts",
+      "exitCode": 0,
+      "ok": true,
+      "windowCreated": false,
+      "temporaryUserData": true,
+      "versions": {
+        "node": "24.18.0",
+        "electron": "43.1.0",
+        "sqlite": "3.53.1"
+      },
+      "matchIds": [
+        "chapter-001"
+      ]
+    },
+    {
+      "runtime": "electron-run-as-node",
+      "distribution": "installed-application-runtime-readonly",
+      "executable": "/Applications/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+      "exitCode": 0,
+      "ok": true,
+      "versions": {
+        "node": "24.18.0",
+        "electron": "43.1.0",
+        "sqlite": "3.53.1"
+      },
+      "matchIds": [
+        "chapter-001"
+      ],
+      "stderrNote": "Electron reported that Node.js environment variables inherited from other apps are disabled; the isolated in-memory probe still returned PASS with exit code 0."
+    },
+    {
+      "runtime": "electron-run-as-node",
+      "distribution": "current-dist-packaged-runtime-readonly",
+      "executable": "dist/mac-arm64/AI 漫剧画布.app/Contents/MacOS/AI 漫剧画布",
+      "exitCode": 0,
+      "ok": true,
+      "versions": {
+        "node": "24.18.0",
+        "electron": "43.1.0",
+        "sqlite": "3.53.1"
+      },
+      "matchIds": [
+        "chapter-001"
+      ]
+    }
+  ],
+  "directedTest": {
+    "command": "npx vitest run tests/novel-fts5-runtime-probe.test.ts --maxWorkers=1",
+    "exitCode": 0,
+    "filesPassed": 1,
+    "testsPassed": 3,
+    "durationMs": 324
+  },
+  "boundaries": {
+    "rendererIndexHealthUi": "deferred-to-P1-and-P8-real-electron-smoke",
+    "installedApplicationReplaced": false,
+    "installedApplicationUiLaunched": false,
+    "formalNovelSourceWritten": false,
+    "activeProductionProjectWritten": false
+  }
+}

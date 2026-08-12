@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "kind": "writing-os-million-word-consistency-hard-final-evidence",
+  "verdict": "VERIFIED_WITH_BOUNDED_GUARANTEE",
+  "generatedAt": "2026-08-02T06:21:00.000Z",
+  "conclusion": {
+    "unfamiliarAiCanUseSafely": true,
+    "mechanicalLongHorizonConsistency": "VERIFIED",
+    "millionCharacterSequentialWorkflow": "VERIFIED",
+    "absoluteLiteraryCharacterConsistency": "NOT_GUARANTEED",
+    "blackPageFormalProductionReady": false,
+    "blackPageFormalBlocker": "当前隔离映射仍为provisional，且第012章缺chapter brief/required cast；doctor按设计失败关闭"
+  },
+  "runtime": {
+    "status": "PASS",
+    "candidateId": "mcp-candidate-9ea4c6cba97facbe-8fcd695bb9aae63f-e5991644",
+    "sourceDigest": "9ea4c6cba97facbe2635c42a211a0898a96c5777a3293c2bed1e2ccb94b6db26",
+    "buildId": "9362c1099f35c08a3300ec632ab044b9",
+    "entrySha256": "af797780c83dc1eec15c0182169bdc76f9a8abfd9b0886253fd10fc6df9d4dac",
+    "toolCount": 213,
+    "buildCurrentnessAllowed": true,
+    "invalidCandidates": 0,
+    "realCurrentStdioSmoke": "PASS"
+  },
+  "gates": [
+    {
+      "gate": "TEMPORAL_AND_AUTHOR_VISIBILITY",
+      "status": "PASS",
+      "evidence": "011 before精确截止010；011人物状态不可见；author_only不可见"
+    },
+    {
+      "gate": "ACTOR_AND_OWNER_BOUNDARY",
+      "status": "PASS",
+      "evidence": "Agent不能seed/accept/reject/invalidate，owner裁决发生在服务端actor边界"
+    },
+    {
+      "gate": "FORMAL_CAST_PROFILE_STATE",
+      "status": "PASS",
+      "evidence": "formal要求locked、chapter brief、required cast、entity、profile与截止章动态状态；缺项失败关闭"
+    },
+    {
+      "gate": "CAS_LEASE_AND_DOUBLE_WRITER",
+      "status": "PASS",
+      "evidence": "prepare签发token/fence租约；双writer返回chapter_write_lease_conflict；最终lease记录1条"
+    },
+    {
+      "gate": "EVIDENCE_BOUND_STATE_COMMIT",
+      "status": "PASS",
+      "evidence": "候选逐项绑定正文UTF-16 span、完整audit scope和正文身份；空delta/非法引用/Agent自批均失败关闭"
+    },
+    {
+      "gate": "RETCON_REBUILD_RECOVERY",
+      "status": "PASS",
+      "evidence": "第200章retcon后顺序重建200-500共301章；越序阻断；新进程恢复；cutoff oracle全部一致"
+    },
+    {
+      "gate": "MEMORY_AUTHORITY",
+      "status": "PASS",
+      "evidence": "Writing OS Story Bible为唯一写作记忆权威；legacy adaptation memory只读排除，不合并、不独立写入"
+    },
+    {
+      "gate": "POST_WRITE_PROBE",
+      "status": "PASS",
+      "evidence": "deterministic probe分离machine conflict和review required，不自动写回正典、不冒充文学裁决"
+    },
+    {
+      "gate": "UNFAMILIAR_AI_WORKFLOW",
+      "status": "PASS",
+      "evidence": "doctor提供无副作用诊断与nextTools；prepare后固定save-probe-review-owner commit工作流"
+    },
+    {
+      "gate": "FULL_REGRESSION",
+      "status": "PASS",
+      "evidence": "28 files / 268 tests PASS，exit 0，417.43s"
+    },
+    {
+      "gate": "FORMAL_SOURCE_UNCHANGED",
+      "status": "PASS",
+      "evidence": "before/after均566 entries，aggregate 97e8fde0ee0ea8ce8529c3db7db4d2d412cbaf0b8f7ff1e837d185f01b89bada；summary与entries完全一致"
+    },
+    {
+      "gate": "LITERARY_QUALITY",
+      "status": "NOT_REVIEWED",
+      "evidence": "本轮未调用外部写作模型，也未做真人文学审读；机械门不证明人物魅力、节奏、心理真实或文风"
+    }
+  ],
+  "scale": {
+    "targetChapters": 500,
+    "managedChaptersIncludingBootstrap": 501,
+    "actualSourceCharacters": 1014334,
+    "originalSequentialCycles": 500,
+    "originalLatencyMs": {
+      "p50": 4800.52,
+      "p95": 8164.92,
+      "maximum": 9592.23
+    },
+    "retconFromChapter": 200,
+    "retconRebuildCycles": 301,
+    "retconLatencyMs": {
+      "p50": 415.26,
+      "p95": 452.98,
+      "maximum": 478.53
+    },
+    "restartCheckpoints": [
+      250,
+      350
+    ],
+    "writingStateBytes": 914386,
+    "immutableCandidates": 801,
+    "immutableDecisions": 801,
+    "peakRssBytes": 589037568,
+    "sourceUnchanged": true,
+    "allFaultsFailedClosed": true
+  },
+  "blackPagePilot": {
+    "status": "PASS_REHEARSAL",
+    "baselineStatus": "provisional",
+    "cutoffChapter": 10,
+    "requiredCast": [
+      "易航",
+      "阿大"
+    ],
+    "seededAuthorOnlyCanonCount": 5,
+    "authorOnlyVisible": false,
+    "chapter11StateVisibleBeforeWrite": false,
+    "chapter12RehearsalPreflightReady": true,
+    "chapter12DoctorFormalSafety": "required_cast_missing",
+    "formalSourceWritten": false
+  },
+  "performanceBoundary": {
+    "severity": "P1",
+    "decision": "不阻断日常逐章生产，但不宣传为瞬时500章批处理",
+    "reason": "首次顺序循环p95为8.16秒每章，峰值RSS约562MiB；累计state/CAS仍可继续降本"
+  },
+  "evidenceFiles": {
+    "sequentialScale": "500-sequential-acceptance.json",
+    "mcpJsonContract": "mcp-json-contract-smoke.json",
+    "blackPagePilot": "black-page-ch011-pilot.json",
+    "currentRuntime": "current-runtime-smoke-verified.json",
+    "formalSourceBefore": "../../novel-mode-v1/real-project/writing-os-consistency-before-20260801.json",
+    "formalSourceAfter": "../../novel-mode-v1/real-project/writing-os-consistency-after-20260801.json"
+  }
+}

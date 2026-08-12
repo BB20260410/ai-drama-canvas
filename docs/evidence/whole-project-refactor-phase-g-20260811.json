@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "kind": "whole-project-behavior-preserving-refactor-phase-evidence",
+  "phase": "G",
+  "status": "passed",
+  "programStatus": "in_progress",
+  "completedAt": "2026-08-10T17:16:13Z",
+  "scope": {
+    "behaviorPreserving": true,
+    "deliveryOrchestrationOnly": true,
+    "buildIdentityContractChanged": false,
+    "candidatePublicationContractChanged": false,
+    "formalProjectDataWritten": false
+  },
+  "changes": [
+    "extracted-immutable-mcp-candidate-stage-orchestrator",
+    "extracted-immutable-mcp-candidate-cutover-transaction",
+    "typed-post-commit-cutover-errors",
+    "introduced-two-phase-isolated-package-terminal-evidence",
+    "bound-terminal-and-completion-to-run-lock-and-run-id",
+    "serialized-stale-publication-lock-reclamation",
+    "restored-isolated-home-and-empty-npm-userconfig",
+    "covered-all-post-lock-failures-with-terminal-finalization"
+  ],
+  "invariants": {
+    "candidateCommandOrder": [
+      "npm-ci",
+      "launcher-bundle",
+      "build-mcp",
+      "build-identity",
+      "source-and-runtime-currentness",
+      "prune-and-dependency-list",
+      "payload-copy",
+      "receipt-and-tree-verification",
+      "runtime-smoke",
+      "publication",
+      "launcher-rename"
+    ],
+    "sourceDigestFencesRemainInEntry": true,
+    "fixedOutputAndLauncherRootsRemainInEntry": true,
+    "launcherRenameCount": 1,
+    "publicationLockCoversCutover": true,
+    "postCommitFailureIsTyped": true,
+    "postCommitAutomaticRetryAllowed": false,
+    "terminalEvidenceStatusBeforeCompletion": "finalization-pending",
+    "completionRequiresNonEmptyRunId": true,
+    "completionRequiresCanonicalLockAbsent": true,
+    "completionBindsTerminalSha256": true,
+    "evidenceOverwriteAllowed": false,
+    "staleLockReclaimerSerialized": true,
+    "candidateStageHomeIsolated": true,
+    "candidateStageNpmUserConfigEmpty": true,
+    "candidateRegistry": "https://registry.npmjs.org"
+  },
+  "verification": {
+    "postFixFocusedReplay": { "files": 8, "tests": 65, "status": "passed" },
+    "staleLockDeterministicInterleaving": { "tests": 2, "status": "passed" },
+    "terminalGuardsAndDelivery": { "tests": 30, "status": "passed" },
+    "typecheck": "passed",
+    "typecheckApp": "passed",
+    "nodeSyntaxCheck": "passed",
+    "diffCheck": "passed",
+    "initialIndependentReview": { "p0": 0, "p1": 3, "p2": 2, "status": "remediated" },
+    "finalIndependentReview": { "p0": 0, "p1": 0, "p2": 0, "status": "clean" }
+  },
+  "fileHashes": {
+    "scripts/build-immutable-mcp-candidate.ts": "1ef90c8ff46d52d9972307e9f9cab700f30a145e3b8274d288fc229c6ea43877",
+    "scripts/isolated-package-smoke.ts": "2ec14f90b5c8cb3b2587f2543a0bfab6df85714c60b2f4aeb2d8f405f1f510a4",
+    "scripts/lib/immutable-mcp-candidate-stage.ts": "1b6a909dd7c11a6aaf691f9c69172a8321a1358b39c04180cd040441d6da93aa",
+    "scripts/lib/immutable-mcp-candidate-cutover.ts": "1a804af65065c60c9582cc31ca533efd5a5e791fd4b8de3b7b771e6931cad74a",
+    "scripts/lib/isolated-package-terminal-finalizer.mjs": "48a4480277e519bf1c0ebae9fef34bd650777ec2eac0abea833ba4d475288a3d",
+    "scripts/lib/isolated-package-terminal-finalizer.d.mts": "36685786e83e0bbe5a66fbb7b0dc49ba691f77f2de611c2265adeea7d13a6bb8",
+    "src/core/immutable-mcp-publication-lock.ts": "ebe5815c1df0708042f8c68436073ede6a8e8fe08c87dd015f741767543d11ae"
+  },
+  "notRun": [
+    "real-immutable-mcp-candidate-build",
+    "electron-ui-smoke",
+    "full-test-partitions",
+    "production-build",
+    "isolated-package-smoke",
+    "installed-app-replacement"
+  ],
+  "boundaries": {
+    "externalCalls": 0,
+    "uploads": 0,
+    "paidGenerations": 0,
+    "gitStageCommitPush": 0,
+    "appLaunched": false,
+    "notarized": false
+  },
+  "roadmap": "docs/全项目行为保持重构路线图_20260810.md"
+}

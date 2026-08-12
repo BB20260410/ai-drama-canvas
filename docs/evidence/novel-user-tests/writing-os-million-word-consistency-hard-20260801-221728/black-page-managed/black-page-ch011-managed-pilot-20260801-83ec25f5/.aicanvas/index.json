@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "project": {
+    "schemaVersion": 2,
+    "id": "project-75dbc86bf718",
+    "name": "black-page-ch011-managed-pilot-20260801",
+    "primaryRoot": "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/writing-os-million-word-consistency-hard-20260801-221728/black-page-managed/black-page-ch011-managed-pilot-20260801-83ec25f5",
+    "sourceRoots": [],
+    "outputRoots": [
+      "/Users/hxx/Documents/无限画布/docs/evidence/novel-user-tests/writing-os-million-word-consistency-hard-20260801-221728/black-page-managed/black-page-ch011-managed-pilot-20260801-83ec25f5"
+    ],
+    "ignoreSegments": [
+      "旧版",
+      "弃用",
+      "废弃",
+      "备份",
+      "archive",
+      "deprecated",
+      "__pycache__",
+      ".git",
+      ".aicanvas"
+    ],
+    "namingRules": {
+      "patterns": [],
+      "manualMappings": []
+    },
+    "hardLocks": [],
+    "automation": {
+      "imageBatchSize": 6,
+      "videoBatchSize": 3,
+      "pauseAfterVisualBatch": true,
+      "allowOverwriteAuthoritative": false
+    },
+    "createdAt": "2026-08-02T06:14:32.663Z",
+    "updatedAt": "2026-08-02T06:14:32.660Z",
+    "workspaceMode": "novel",
+    "minimumWriterSchemaVersion": 2
+  },
+  "scanId": "managed-bootstrap-83ec25f5",
+  "scannedAt": "2026-08-02T06:14:32.660Z",
+  "scanDurationMs": 0,
+  "scanStats": {
+    "discoveredFiles": 0,
+    "candidateFiles": 0,
+    "reservedPublicationFilesSkipped": 0,
+    "referenceAssets": 0,
+    "productionAssets": 0,
+    "inspectedChecks": 0,
+    "reusedChecks": 0,
+    "textFilesRead": 0,
+    "includeHashes": false,
+    "inspectionConcurrency": 0
+  },
+  "warnings": [],
+  "summary": {
+    "total": 0,
+    "active": 0,
+    "completed": 0,
+    "deprecated": 0,
+    "blocked": 0,
+    "byStatus": {
+      "待规划": 0,
+      "待提示词": 0,
+      "待首帧": 0,
+      "待尾帧": 0,
+      "待机械验收": 0,
+      "待视觉验收": 0,
+      "待视频": 0,
+      "视频生成中": 0,
+      "待视频验收": 0,
+      "已完成": 0,
+      "返工": 0,
+      "阻塞": 0,
+      "弃用": 0
+    },
+    "byEpisode": {},
+    "rawImages": 0,
+    "labeledImages": 0,
+    "videos": 0,
+    "mechanicalFailures": 0
+  },
+  "items": [],
+  "artifacts": []
+}

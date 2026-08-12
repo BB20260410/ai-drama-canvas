@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-chapter-manifest",
+  "projectId": "project-177e816e643b",
+  "revision": 2,
+  "volumes": [
+    {
+      "volumeId": "b905a43e-da20-4216-a12b-d3076db50a75",
+      "title": "第一卷",
+      "order": 0,
+      "revision": 1
+    }
+  ],
+  "chapters": [
+    {
+      "chapterId": "b1910384-fec3-51d5-9a83-f80eb66cae73",
+      "volumeId": "b905a43e-da20-4216-a12b-d3076db50a75",
+      "title": "第001章 缴费单与黑页",
+      "order": 0,
+      "relativePath": "manuscript/volumes/b905a43e-da20-4216-a12b-d3076db50a75/b1910384-fec3-51d5-9a83-f80eb66cae73.md",
+      "sha256": "c182ad81e2cb5337e5399b3fee896bf5d0876a6e08fae931122ea4ed4135ff92",
+      "byteLength": 10242,
+      "charCount": 3662,
+      "offsetEncoding": "utf16-code-unit",
+      "revision": 1,
+      "createdAt": "2026-08-01T23:46:17.671Z",
+      "updatedAt": "2026-08-01T23:46:17.671Z"
+    }
+  ],
+  "updatedAt": "2026-08-01T23:46:17.671Z"
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "novel-p0-close-gates-final",
+  "status": "pass",
+  "startedAt": "2026-08-01T08:31:42.136Z",
+  "endedAt": "2026-08-01T08:31:42.193Z",
+  "durationMs": 122,
+  "argv": [
+    "node",
+    "--input-type=module",
+    "-e",
+    "import {readFileSync,statSync} from \"node:fs\"; import {createHash} from \"node:crypto\"; const digest=\"69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4\"; const buildId=\"08b8f8168b32a84ef6ad515b00bd65fb\"; const recordPaths=[\"partitions-audit-final-p0\",\"typecheck-final-p0\",\"build-final-p0\",\"build-isolated-snapshot-final-p0-v2\",\"p0-directed-final-p0\",\"test-all-final-p0\",\"scale-matrix-live-final-p0\",\"fts5-live-final-p0\",\"third-party-upstream-final-p0\"].map((name)=>\"docs/evidence/novel-mode-v1/baseline/commands/\"+name+\".json\"); const verified=[]; for (const recordPath of recordPaths) { const record=JSON.parse(readFileSync(recordPath,\"utf8\")); if(record.status!==\"pass\"||record.exitCode!==0||record.sourceStable!==true) throw new Error(recordPath+\" is not a stable pass\"); if(record.buildIdentity.before.sourceDigest!==digest||record.buildIdentity.after.sourceDigest!==digest||record.buildIdentity.before.buildId!==buildId||record.buildIdentity.after.buildId!==buildId) throw new Error(recordPath+\" identity mismatch\"); const logPath=record.log.relativePath; const log=readFileSync(logPath); const sha=createHash(\"sha256\").update(log).digest(\"hex\"); if(log.length!==record.log.sizeBytes||sha!==record.log.sha256||statSync(logPath).size!==record.log.sizeBytes) throw new Error(recordPath+\" log mismatch\"); verified.push({recordPath,status:record.status,logSha256:sha}); } const failedSnapshot=JSON.parse(readFileSync(\"docs/evidence/novel-mode-v1/baseline/commands/build-isolated-snapshot-final-p0.json\",\"utf8\")); if(failedSnapshot.status!==\"fail\"||failedSnapshot.sourceStable!==true) throw new Error(\"expected failed isolated snapshot evidence missing\"); const testLog=readFileSync(\"docs/evidence/novel-mode-v1/baseline/commands/test-all-final-p0.log\",\"utf8\"); const blocks=testLog.match(/\\{\\n  \"schemaVersion\": 1,\\n  \"kind\": \"vitest-partition-run\",[\\s\\S]*?\\n\\}/g)?.map((block)=>JSON.parse(block))??[]; const expected={fast:192,medium:90,integration:35,heavy:5}; if(blocks.length!==4) throw new Error(\"partition block count mismatch\"); for(const block of blocks){ if(expected[block.partition]!==block.fileCount||block.status!==\"PASS\"||!Array.isArray(block.failedBatches)||block.failedBatches.length!==0) throw new Error(\"partition mismatch: \"+block.partition); } const compare=(beforePath,afterPath)=>{ const before=JSON.parse(readFileSync(beforePath,\"utf8\")); const after=JSON.parse(readFileSync(afterPath,\"utf8\")); if(before.rootPersisted!==false||after.rootPersisted!==false||JSON.stringify(before.summary)!==JSON.stringify(after.summary)||JSON.stringify(before.entries)!==JSON.stringify(after.entries)||before.aggregateSha256!==after.aggregateSha256) throw new Error(\"readonly tree mismatch: \"+beforePath); return {summary:before.summary,aggregateSha256:before.aggregateSha256,entriesIdentical:true}; }; const formal=compare(\"docs/evidence/novel-mode-v1/real-project/formal-novel-p0-before.json\",\"docs/evidence/novel-mode-v1/real-project/formal-novel-p0-after.json\"); const active=compare(\"docs/evidence/novel-mode-v1/real-project/active-production-p0-before.json\",\"docs/evidence/novel-mode-v1/real-project/active-production-p0-after.json\"); const environment=JSON.parse(readFileSync(\"docs/evidence/novel-mode-v1/baseline/environment-close-p0.json\",\"utf8\")); if(environment.buildIdentity.sourceDigest!==digest||environment.buildIdentity.buildId!==buildId) throw new Error(\"closing environment identity mismatch\"); const isolation=JSON.parse(readFileSync(\"docs/evidence/novel-mode-v1/baseline/build-isolation-final-p0.json\",\"utf8\")); if(isolation.result.workspaceRootUnchanged!==false||isolation.result.sourceIdentityInputsStable!==true||isolation.supplementalIsolatedBuild.status!==\"pass\"||isolation.activeWriters.length!==2) throw new Error(\"corrected build boundary missing\"); console.log(JSON.stringify({schemaVersion:1,kind:\"novel-p0-close-gates\",verifiedAt:new Date().toISOString(),sourceDigest:digest,buildId,stablePassRecords:verified,partitions:blocks.map(({partition,fileCount,batchCount,status,failedBatches})=>({partition,fileCount,batchCount,status,failedBatches})),totalPartitionFiles:blocks.reduce((sum,block)=>sum+block.fileCount,0),knownFailedEvidence:[{record:\"build-isolated-snapshot-final-p0.json\",reason:\"incomplete snapshot source identity\",retained:true}],readonlyTrees:{formal,active},buildBoundary:{workspaceBuildRewroteGeneratedOutputs:true,isolatedSnapshotBuildPass:true,mutableRuntimeIncidentDisclosed:true},verdict:\"pass\"},null,2));"
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+      "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4"
+    },
+    "after": {
+      "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+      "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/novel-mode-v1/baseline/commands/p0-close-gates-final-p0.log",
+    "sizeBytes": 3850,
+    "sha256": "d79d17d4d917ab1cd32e3ee7548f5398b7efc69cea053146f8442deb1090c6e5"
+  }
+}

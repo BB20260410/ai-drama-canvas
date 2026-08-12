@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "kind": "whole-project-behavior-preserving-refactor-phase-evidence",
+  "phase": "F",
+  "status": "passed",
+  "programStatus": "in_progress",
+  "completedAt": "2026-08-10T16:49:02Z",
+  "scope": {
+    "behaviorPreserving": true,
+    "studioCommandExecutorExtracted": true,
+    "mainReadOnlyIpcDomainExtracted": true,
+    "ipcContractChanged": false,
+    "commandReliabilityContractChanged": false,
+    "formalProjectDataWritten": false
+  },
+  "changes": [
+    "derived-studio-command-request-from-authoritative-runtime-union",
+    "extracted-studio-command-executor",
+    "retained-idempotency-lock-lease-fence-and-terminal-shell-in-command-bus",
+    "stabilized-higgsfield-active-context-rejection",
+    "extracted-seven-global-resource-read-ipc-handlers",
+    "bound-decorated-ipc-handle-receiver-explicitly",
+    "added-command-case-set-and-ipc-abi-contract-tests"
+  ],
+  "invariants": {
+    "studioPublicCommands": 56,
+    "studioInternalCommands": 2,
+    "studioExecutorCases": 58,
+    "studioExecutorUniqueCases": 58,
+    "activeProjectFences": 3,
+    "activeProjectFenceCommands": [
+      "prepare_studio_imagegen_call",
+      "authorize_studio_higgsfield_connector_request",
+      "prepare_studio_higgsfield_video_generation"
+    ],
+    "oneTimeCapabilityProjectionRemainsInCommandBus": true,
+    "globalResourceReadIpcChannels": 7,
+    "mainIpcHandleCount": 266,
+    "mainIpcHandleUniqueCount": 266,
+    "mainIpcOnCount": 3,
+    "preloadInvokeCount": 253,
+    "preloadInvokeUniqueCount": 253,
+    "missingPreloadInvokeHandlers": 0,
+    "runtimeIpcEffectChanged": false,
+    "closeTrackingChanged": false
+  },
+  "verification": {
+    "commandRuntimeRoutingAndBus": { "files": 6, "tests": 37, "status": "passed" },
+    "leaseBusyImagegenAndFence": { "files": 4, "tests": 20, "status": "passed" },
+    "higgsfieldAndRuntimeEffects": { "files": 5, "tests": 33, "status": "passed" },
+    "p30ContractMatrix": { "files": 1, "tests": 4, "status": "passed" },
+    "higgsfieldActiveContextRegression": { "files": 1, "tests": 1, "status": "passed" },
+    "commandFinalFocusedReplay": { "files": 4, "tests": 25, "status": "passed" },
+    "mainIpcFocused": { "files": 6, "tests": 30, "status": "passed" },
+    "globalResourceCoreOwners": { "files": 3, "tests": 11, "status": "passed" },
+    "ipcReceiverBindingRegression": { "files": 1, "tests": 2, "status": "passed" },
+    "typecheck": "passed",
+    "typecheckApp": "passed",
+    "diffCheck": "passed",
+    "commandIndependentReview": "clean",
+    "mainIpcIndependentReview": "clean"
+  },
+  "abi": {
+    "mainHandleSetSha256": "ad447f07a307ee550b1977f67bc9d4f8b49d50166e86379f2c744aab4f9e0e3c",
+    "preloadInvokeSetSha256": "65969b57fbf3e075be8d981539a753e646c78b6d4fa8a09c126a7927bfc86a2a"
+  },
+  "fileHashes": {
+    "src/core/command-bus.ts": "f95e1379bd9eea652359c6429a003d8682408ec0efa204e460cce2113c415958",
+    "src/core/studio-command-executor.ts": "93fa05259c40d869eb29623115a383047a86655b8658ab6632294fa5fa301f0f",
+    "src/core/studio-command-errors.ts": "76fc8eae422b58b90f367bd5dd94294674b7a7100d2736cb2423d3922b062ec2",
+    "src/main/index.ts": "92c6f85910ea63237d59c7bd6088c970bdb8aeb2b1d465ff45fd120bf9d9ca",
+    "src/main/studio-global-resource-read-ipc.ts": "37e1a085aae83b029b151db0642ccc63c1b1c1fd7a21f62faf5d88681adaa9b5",
+    "tests/studio-higgsfield-active-context-rejection.test.ts": "e37bca9269c79df05df38db9302b215f8b41eca85bf948c75d6b93efa47fa46f",
+    "tests/studio-global-resource-read-ipc.test.ts": "97909608b3e84fcbbff2ccc3e543f7b1233d7b11f2f7cb0e31e332f3b9e9ac25"
+  },
+  "notRun": [
+    "electron-ui-smoke",
+    "full-test-partitions",
+    "production-build",
+    "immutable-mcp-candidate",
+    "isolated-package-smoke",
+    "installed-app-replacement"
+  ],
+  "boundaries": {
+    "externalCalls": 0,
+    "uploads": 0,
+    "paidGenerations": 0,
+    "gitStageCommitPush": 0,
+    "appLaunched": false,
+    "notarized": false
+  },
+  "roadmap": "docs/全项目行为保持重构路线图_20260810.md"
+}

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "kind": "verified-command-record",
+  "name": "novel-p0-scale-matrix-live-final",
+  "status": "pass",
+  "startedAt": "2026-08-01T08:25:57.893Z",
+  "endedAt": "2026-08-01T08:26:04.086Z",
+  "durationMs": 6260,
+  "argv": [
+    "bash",
+    "-lc",
+    "set -euo pipefail; novel_tmp=$(mktemp -d /tmp/novel-p0-scale-live.XXXXXX); novel_base=$(basename \"$novel_tmp\"); for novel_scale in S1 S3 S5; do novel_a=\"$novel_tmp/${novel_scale}-a\"; novel_b=\"$novel_tmp/${novel_scale}-b\"; npx tsx scripts/create-novel-scale-fixtures.ts --scale \"$novel_scale\" --output \"$novel_a\"; npx tsx scripts/validate-novel-scale-fixture.ts \"$novel_a\"; npx tsx scripts/create-novel-scale-fixtures.ts --scale \"$novel_scale\" --output \"$novel_b\"; npx tsx scripts/validate-novel-scale-fixture.ts \"$novel_b\"; cmp \"$novel_a/corpus.md\" \"$novel_b/corpus.md\"; cmp \"$novel_a/golden-answers.json\" \"$novel_b/golden-answers.json\"; cmp \"$novel_a/manifest.json\" \"$novel_b/manifest.json\"; jq -c \"{scale:.scale,profile:.validationProfile,chapters:.chapterCount,characters:.actualCharacters,utf8Bytes:.utf8Bytes,corpusSha256:.corpusSha256,goldenAnswersSha256:.goldenAnswersSha256,logicalFingerprint:.logicalFingerprint,oracleCounts:.oracleCounts}\" \"$novel_a/manifest.json\"; done; novel_trash=\"/Users/hxx/.Trash/$novel_base\"; test ! -e \"$novel_trash\"; mv \"$novel_tmp\" \"$novel_trash\"; printf \"%s\\n\" \"{\\\"cleanup\\\":\\\"moved-recoverably-to-user-trash\\\",\\\"temporaryBasename\\\":\\\"$novel_base\\\",\\\"allPairsByteIdentical\\\":true,\\\"externalModelCalls\\\":0}\""
+  ],
+  "cwd": "/Users/hxx/Documents/无限画布",
+  "exitCode": 0,
+  "sourceStable": true,
+  "buildIdentity": {
+    "before": {
+      "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+      "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4"
+    },
+    "after": {
+      "buildId": "08b8f8168b32a84ef6ad515b00bd65fb",
+      "sourceDigest": "69865c673a6274552b7b018f3d2736efc0fc61409b786aba48835e3d9295d4e4"
+    }
+  },
+  "log": {
+    "relativePath": "docs/evidence/novel-mode-v1/baseline/commands/scale-matrix-live-final-p0.log",
+    "sizeBytes": 15943,
+    "sha256": "77992fc4aa822ed622de4e6b6463b76604935fa0c37b5403e5bab8d50b416a9a"
+  }
+}

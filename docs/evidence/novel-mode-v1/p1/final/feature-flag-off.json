@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "kind": "novel-workspace-feature-flag-off-electron-smoke",
+  "verdict": "PASS",
+  "capturedAt": "2026-08-01T10:09:19.909Z",
+  "buildIdentity": {
+    "sourceDigest": "2f158843a10205128a0d0d36e0f5d934832e50608a46e79b9b44fbc837696ff2",
+    "buildId": "293b50202680f19fc069208392fef394",
+    "buildIdentityFingerprint": "de2586addad805ab618c24d2a235d55ea07d1f2ef4f8a2845c1015676d5ae56d",
+    "releaseManifestSha256": "37927123a4288ef1576c13518cb416bb6ec283fae870e291385a5f0d90a57876"
+  },
+  "featureFlag": {
+    "name": "VITE_AI_CANVAS_NOVEL_WORKSPACE",
+    "buildValue": "0"
+  },
+  "entryCounts": {
+    "modeFieldset": 0,
+    "novelOption": 0,
+    "hybridOption": 0
+  },
+  "createdProject": {
+    "projectId": "project-d361cd8d7367",
+    "projectRootSha256": "43028b2e2f4aee88ba97d69fc18e38dff38a4ac6815e606abec2aa2e9343d656",
+    "workspaceMode": "drama",
+    "manifestSchemaVersion": 1,
+    "manifestHasWorkspaceMode": false,
+    "manifestSha256": "d3ef191d93f16c11fa1f3fecc5e10eb79b0b0a863e9e5692425b5a10b5b8ade2",
+    "materialStudioVisible": true,
+    "novelStudioCount": 0
+  },
+  "diagnostics": {
+    "pageErrors": [],
+    "consoleErrors": [],
+    "externalRequests": []
+  },
+  "screenshot": {
+    "relativePath": "docs/evidence/novel-mode-v1/p1/final/feature-flag-off-drama.png",
+    "bytes": 130228,
+    "sha256": "498510a8406d47cda50bb23efda85dfc3d45a6cfdc8931747f2245f12a30a02b",
+    "width": 1728,
+    "height": 1029,
+    "entropy": 1.7940982622912998
+  }
+}

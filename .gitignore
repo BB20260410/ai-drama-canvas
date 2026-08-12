@@ -48,6 +48,12 @@
 # Planning 默认属于本机执行态；仅显式强制纳管当前恢复包
 /.planning/
 
+# 自主巡检运行态：队列真相源在根目录 WORKQUEUE.json；最终证据另行显式纳管
+/.workqueue/patrol-*.json
+/.workqueue/*.lock
+/.workqueue/*.tmp
+/.workqueue/*-probe.mts
+
 # 根目录散落的视觉工作文件不属于软件源码
 /*.png
 *.app/
