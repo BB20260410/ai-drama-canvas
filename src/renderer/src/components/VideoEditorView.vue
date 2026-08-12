@@ -241,6 +241,7 @@ import {
 } from "../video-editor-dirty-state";
 import { LatestBoundedTaskQueue } from "../bounded-task-queue";
 import { collectVideoEditorNestedPreviewIds, KeyedPreviewCoordinator, ReferenceCountedPreviewSuspension } from "../video-editor-preview-coordinator";
+import { createVideoEditorPreviewSyncScheduler } from "../video-editor-preview-sync";
 
 type TimelineGestureMode = "move" | "trim-start" | "trim-end";
 type EditorKeyframe = NonNullable<EditClip["keyframes"]>[number];
@@ -491,11 +492,13 @@ const timelineSnapPoints = computed(() => [...timelineSnapPointCounts.value.keys
 const latestRender = computed(() => renders.value.find((job) => job.editProjectId === active.value?.id) ?? null);
 const hasUnsavedDraft = computed(() => hasUnsavedVideoEditorDraft(active.value, persistedProjectBaseline.value));
 
-watch([previewClip, activeDissolve, activeOverlayClips], () => syncPreview(), { flush: "post" });
+// 播放 tick 的 seek 与 post-flush watcher 共用同一调度 owner：同一刷新批次只执行一次 syncPreview。
+const previewSyncScheduler = createVideoEditorPreviewSyncScheduler(syncPreview);
+watch([previewClip, activeDissolve, activeOverlayClips], () => { void previewSyncScheduler.request(); }, { flush: "post" });
 watch(() => active.value?.tracks.flatMap((track) => track.clips.map((clip) => [
   clip.id, clip.startSeconds, clip.durationSeconds, clip.trimStartSeconds, clip.playbackRate,
   clip.muted, clip.volume, clip.opacity, clip.positionX, clip.positionY, clip.scale, clip.rotation,
-])).flat().join("|"), () => syncPreview(), { flush: "post" });
+])).flat().join("|"), () => { void previewSyncScheduler.request(); }, { flush: "post" });
 watch(
   () => [props.projectRoot, props.index.scanId, props.index.scannedAt] as const,
   () => {
@@ -532,6 +535,7 @@ onMounted(() => {
 });
 onBeforeUnmount(() => {
   editorLoadGate.invalidate();
+  previewSyncScheduler.invalidate();
   mediaLoader.invalidate();
   if (mediaSearchTimer) clearTimeout(mediaSearchTimer);
   mediaSearchTimer = null;
@@ -1515,7 +1519,7 @@ function normalizeSelectedClipTiming() {
 function seek(value: number, pause = true) {
   if (pause) stopPlayback();
   playhead.value = quantizeTimelineTime(Number(value) || 0, activeFrameRate.value, 0, totalDuration.value);
-  void nextTick(syncPreview);
+  void previewSyncScheduler.request();
 }
 function syncPreview() {
   const dissolve = activeDissolve.value;
