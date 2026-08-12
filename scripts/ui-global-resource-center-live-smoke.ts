@@ -1,17 +1,13 @@
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
 import {
-  access,
-  copyFile,
   mkdir,
   mkdtemp,
   readFile,
   readdir,
   realpath,
-  rename,
   rm,
   stat,
-  writeFile,
 } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -44,18 +40,29 @@ import {
   closeElectronApplicationOrThrow,
   forceCleanupElectronApplication,
 } from "./lib/electron-application-close.mjs";
+import {
+  acquireEvidenceRunLock,
+  assertFreshOutputSet,
+  createUniqueEvidenceStem,
+  writeBytesAtomicExclusive,
+  writeJsonAtomicExclusive,
+} from "./lib/exclusive-evidence-output.mjs";
 
 const execFileAsync = promisify(execFile);
 const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const evidenceRoot = path.join(workspace, "docs", "evidence");
+const defaultEvidenceStem = createUniqueEvidenceStem("global-resource-center-live-ui");
+const explicitEvidencePath = process.argv[2] ? path.resolve(process.argv[2]) : undefined;
 const evidencePath = path.resolve(
-  process.argv[2]
-    || path.join(workspace, "docs", "evidence", "global-resource-center-live-ui-20260728-v1.json"),
+  explicitEvidencePath || path.join(evidenceRoot, `${defaultEvidenceStem}.json`),
 );
+const explicitEvidenceExtension = explicitEvidencePath ? path.extname(explicitEvidencePath) : "";
 const screenshotPath = path.resolve(
   process.argv[3]
-    || path.join(workspace, "docs", "evidence", "global-resource-center-live-ui-20260728-v1.png"),
+    || (explicitEvidencePath
+      ? `${explicitEvidencePath.slice(0, explicitEvidencePath.length - explicitEvidenceExtension.length)}.png`
+      : path.join(evidenceRoot, `${defaultEvidenceStem}.png`)),
 );
-const evidenceRoot = path.join(workspace, "docs", "evidence");
 const releaseManifestPath = path.join(workspace, "release-manifest.json");
 
 interface FileIdentity {
@@ -102,15 +109,11 @@ async function measure<T>(action: () => Promise<T>): Promise<{ value: T; duratio
   };
 }
 
-async function ensureFreshEvidenceTarget(output: string): Promise<void> {
+function assertEvidenceTargetInRoot(output: string): void {
   const relative = path.relative(evidenceRoot, output);
   if (relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
     throw new Error(`总资源中心证据必须写入 docs/evidence：${output}`);
   }
-  await access(output).then(
-    () => { throw new Error(`总资源中心证据已存在，拒绝覆盖：${output}`); },
-    () => undefined,
-  );
 }
 
 async function fileIdentity(filePath: string): Promise<FileIdentity> {
@@ -314,10 +317,8 @@ async function decodedImages(page: Awaited<ReturnType<Awaited<ReturnType<typeof 
   }
 }
 
-await Promise.all([
-  ensureFreshEvidenceTarget(evidencePath),
-  ensureFreshEvidenceTarget(screenshotPath),
-]);
+assertEvidenceTargetInRoot(evidencePath);
+assertEvidenceTargetInRoot(screenshotPath);
 await mkdir(evidenceRoot, { recursive: true });
 
 const temporaryRoot = await realpath(await mkdtemp(path.join(os.tmpdir(), "global-resource-center-live-")));
@@ -326,7 +327,6 @@ const fixtureRoot = path.join(temporaryRoot, "fixtures");
 const registryPath = path.join(temporaryRoot, "runtime", "projects.json");
 const isolatedUserData = path.join(temporaryRoot, "electron-user-data");
 const temporaryScreenshotPath = path.join(temporaryRoot, "global-resource-center.png");
-const temporaryEvidencePath = path.join(temporaryRoot, "global-resource-center.json");
 await Promise.all([
   mkdir(projectsParent, { recursive: true }),
   mkdir(fixtureRoot, { recursive: true }),
@@ -342,8 +342,16 @@ const backgroundSnapshots: unknown[] = [];
 const runtimeStability: Array<{ label: string; snapshot: unknown }> = [];
 const actionTimings: Record<string, number> = {};
 const domSamples: Array<{ label: string; totalElements: number; cards: number; images: number }> = [];
+const evidenceRunId = createUniqueEvidenceStem("global-resource-center-run");
+let evidenceRunLock: Awaited<ReturnType<typeof acquireEvidenceRunLock>> | undefined;
+let runError: unknown;
 
 try {
+  evidenceRunLock = await acquireEvidenceRunLock(evidencePath, evidenceRunId);
+  await assertFreshOutputSet([
+    { label: "总资源中心 JSON 证据", path: evidencePath },
+    { label: "总资源中心截图证据", path: screenshotPath },
+  ]);
   const startedAt = performance.now();
   const source = await createManagedStudioProject({
     parentRoot: projectsParent,
@@ -884,15 +892,40 @@ try {
     },
     screenshotPath: path.relative(workspace, screenshotPath).split(path.sep).join("/"),
   };
-  await writeFile(temporaryEvidencePath, `${JSON.stringify(evidence, null, 2)}\n`, "utf8");
-  await copyFile(temporaryScreenshotPath, `${screenshotPath}.tmp`);
-  await copyFile(temporaryEvidencePath, `${evidencePath}.tmp`);
-  await rename(`${screenshotPath}.tmp`, screenshotPath);
-  await rename(`${evidencePath}.tmp`, evidencePath);
+  await writeBytesAtomicExclusive(screenshotPath, await readFile(temporaryScreenshotPath));
+  await writeJsonAtomicExclusive(evidencePath, evidence);
   console.log(JSON.stringify(evidence, null, 2));
+} catch (error) {
+  runError = error;
+  throw error;
 } finally {
-  if (app) await forceCleanupElectronApplication(app).catch(() => undefined);
-  if (previousRegistry === undefined) delete process.env.AI_CANVAS_REGISTRY_PATH;
-  else process.env.AI_CANVAS_REGISTRY_PATH = previousRegistry;
-  await rm(temporaryRoot, { recursive: true, force: true });
+  let cleanupError: unknown;
+  try {
+    if (app) await forceCleanupElectronApplication(app).catch(() => undefined);
+    if (previousRegistry === undefined) delete process.env.AI_CANVAS_REGISTRY_PATH;
+    else process.env.AI_CANVAS_REGISTRY_PATH = previousRegistry;
+    await rm(temporaryRoot, { recursive: true, force: true });
+  } catch (error) {
+    cleanupError = error;
+  }
+  try {
+    await evidenceRunLock?.release();
+  } catch (releaseError) {
+    if (runError || cleanupError) {
+      throw new AggregateError(
+        [runError, cleanupError, releaseError].filter((entry) => entry !== undefined),
+        "总资源中心验收失败，且清理或 evidence run lock 释放未完整收敛",
+      );
+    }
+    throw releaseError;
+  }
+  if (cleanupError) {
+    if (runError) {
+      throw new AggregateError(
+        [runError, cleanupError],
+        "总资源中心验收失败，且清理未完整收敛",
+      );
+    }
+    throw cleanupError;
+  }
 }
