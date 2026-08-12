@@ -1,5 +1,31 @@
 # TASKS · 残留任务清账 2026-07-25
 
+## software_goal: multi-model-quality-20260813
+
+- status: `completed`
+- active_item: `none`
+- completed:
+  - [x] 四模型第一轮独立审查；GLM 首轮源码不可见如实记为 NOT_VERIFIED，未伪造结论
+  - [x] Codex 复现并关闭总资源证据发布竞态与 VideoEditor 同批重复同步两个 P2
+  - [x] Kimi 隔离 worktree 实现、Codex 审查集成；GLM/豆包/Grok 交叉复核并补齐两个负向路径
+  - [x] Kimi、GLM、豆包、Grok 第三轮均绑定 `87c24e3b…` 并给出有效 PASS
+  - [x] 定向 31 tests、全分区 389 files / 2411 tests、两套 typecheck、audit 0、build、MCP 220 全 PASS
+  - [x] P17 22 路径、总资源分页/复用、T23 strict interactions 隐藏 Electron 实跑 PASS
+  - [x] 模型越权写入已归档并还原，所有模型/测试/App 进程、临时锁和 Kimi 分支/worktree已清理
+  - [x] 最终证据、报告、STATUS、TASKS、交接与本地提交收口；不 push
+- correction_history:
+  - Kimi CLI 不支持 `--plan + --prompt`；改用一次受支持调用
+  - Grok 不支持 max reasoning；实际 high；首个错误冻结包 NOT_VERIFIED 后只纠正一次
+  - GLM/豆包终审正文只做一次结构格式校正，结论与 findings 未改
+- earliest_next: `none`；没有新复现不得重开已闭合整改或重跑全量
+- installed_app: 历史 `954ac71a… / c7cb5cee… / 220`，本轮明确未安装 `87c24e3b…`
+- boundaries: 无正式工程写入、外部生成、上传、付费、公证、发布、push 或安装
+- evidence:
+  - `docs/evidence/multi-model-three-round-final-20260813-87c24e3b.json`
+  - `docs/验证报告_20260813_四模型三轮协同整改最终闭环_87c24e3b.md`
+
+恢复时只读本区块；旧 `multi-model-quality-20260812` 的 blocked 项已被本轮关闭，不能作为新待办复活。
+
 ## software_goal: multi-model-quality-20260812
 
 - status: `blocked`（候选实现和机械验收完成；四模型第三轮签字未全部有效）

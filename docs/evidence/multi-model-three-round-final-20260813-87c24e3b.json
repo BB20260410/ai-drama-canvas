@@ -1,0 +1,253 @@
+{
+  "schemaVersion": 1,
+  "kind": "multi-model-three-round-quality-closeout",
+  "status": "pass",
+  "completion": "complete",
+  "createdAt": "2026-08-13T02:40:00+08:00",
+  "baseline": {
+    "requestedReferenceCommit": "0fb7a104abaff798ebcf24cb132473fe6b4e702c",
+    "actualCleanStartCommit": "25fb62f8245ce7e5ecd9ff70692c808b25b6ea09",
+    "reason": "The requested reference was already an ancestor of three accepted UI and handoff commits, so the cycle used the then-current clean main commit as its writable baseline."
+  },
+  "candidate": {
+    "codeHeadBeforeCloseoutDocs": "2603ed799176812af0d58adac121459161cc0c70",
+    "sourceDigest": "87c24e3be7fec3bb8f9546c2e19c8b9df6dcb655d1081399c344b7143cd217d9",
+    "buildId": "b5149a5ff95e32667803cb8f42c8a7d3",
+    "buildIdentityFingerprint": "14a951cb0f6c65aae4bdb7961aa475f23e88cd1bed6b8ade7e4766baf3635f0c",
+    "manifestFingerprint": "f643bd0ee5db9c9ae887fd5cee27f0feb3d2885b4c64925073ae18e9c1423cbe",
+    "mcpToolCount": 220,
+    "sourceFiles": 1053,
+    "sourceBytes": 20848869
+  },
+  "changes": [
+    {
+      "id": "MM-UI-EVIDENCE-01",
+      "severity": "P2",
+      "status": "resolved",
+      "summary": "Global resource live-smoke evidence now uses a unique default stem, run lock, freshness gate and exclusive publication; failed Electron cleanup cannot be reported as PASS.",
+      "commits": [
+        "07672a4",
+        "0684695"
+      ]
+    },
+    {
+      "id": "MM-EDITOR-SYNC-01",
+      "severity": "P2",
+      "status": "resolved",
+      "summary": "VideoEditor coalesces same-batch preview synchronization, rearms on the next batch, invalidates late work on unmount, and projects synchronization exceptions to a stopped failed state.",
+      "commits": [
+        "5760a38",
+        "2603ed7"
+      ]
+    }
+  ],
+  "reviewRounds": [
+    {
+      "round": 1,
+      "purpose": "independent blind review",
+      "results": {
+        "kimi": "valid review; frontend implementation ticket selected",
+        "glm": "NOT_VERIFIED because the first source-blind packet did not expose the required source; no finding was fabricated",
+        "doubao": "valid review; two high-value P2 candidates confirmed",
+        "grok": "valid adversarial review"
+      },
+      "codexDecision": "Two reproducible P2 findings entered implementation; unproven hypotheses were deferred."
+    },
+    {
+      "round": 2,
+      "purpose": "cross-review and correction",
+      "results": {
+        "kimi": "implemented the bounded frontend ticket in an isolated worktree",
+        "glm": "requested two missing negative paths: sync exception projection and cleanup failure propagation",
+        "doubao": "PASS",
+        "grok": "PASS"
+      },
+      "codexDecision": "Both negative paths were added, tested and committed without expanding Core, Main, preload, MCP or SQLite scope."
+    },
+    {
+      "round": 3,
+      "purpose": "frozen candidate final review",
+      "candidateSourceDigest": "87c24e3be7fec3bb8f9546c2e19c8b9df6dcb655d1081399c344b7143cd217d9",
+      "results": [
+        {
+          "reviewer": "kimi",
+          "actualModel": "kimi-code/k3",
+          "verdict": "PASS",
+          "findings": [],
+          "scope": [
+            "renderer state and component wiring",
+            "accessibility and focused tests"
+          ],
+          "commands": [
+            "read frozen read-only export",
+            "inspect round3 cycle diff and focused tests"
+          ],
+          "notVerified": [
+            "did not independently rerun the complete mechanical suite"
+          ]
+        },
+        {
+          "reviewer": "glm",
+          "actualModel": "glm-5-2-260617",
+          "verdict": "PASS",
+          "findings": [],
+          "scope": [
+            "evidence transaction ordering",
+            "error projection and cleanup contracts"
+          ],
+          "commands": [
+            "review sanitized frozen packet",
+            "review correction evidence"
+          ],
+          "notVerified": [
+            "did not independently rerun Electron or the full test partitions"
+          ]
+        },
+        {
+          "reviewer": "doubao",
+          "actualModel": "doubao-seed-evolving",
+          "verdict": "PASS",
+          "findings": [],
+          "scope": [
+            "user flows and error states",
+            "evidence and UI acceptance summaries"
+          ],
+          "commands": [
+            "review sanitized frozen packet",
+            "review user-flow acceptance evidence"
+          ],
+          "notVerified": [
+            "did not independently operate the local Electron fixture"
+          ]
+        },
+        {
+          "reviewer": "grok",
+          "actualModel": "grok-4.5-build",
+          "verdict": "PASS",
+          "findings": [],
+          "scope": [
+            "adversarial race and false-PASS review",
+            "frozen build and screenshot evidence"
+          ],
+          "commands": [
+            "inspect corrected frozen read-only export",
+            "inspect exact manifest, cycle diff, JSON evidence and screenshot hashes"
+          ],
+          "notVerified": [
+            "did not independently rerun live local tests"
+          ]
+        }
+      ],
+      "formatCorrections": [
+        "Kimi CLI rejected the unsupported noninteractive --plan plus --prompt combination before model execution; one supported noninteractive call was used.",
+        "Grok CLI rejected reasoning-effort=max because this client supports high, medium and low; the actual final call used high.",
+        "Grok's first final packet contained a stale release manifest and omitted screenshot artifacts; that review was recorded as NOT_VERIFIED, the export was rebuilt, and one corrected final review returned PASS.",
+        "GLM and Doubao substantive final responses were format-normalized once without changing their verdict or findings."
+      ]
+    }
+  ],
+  "mechanicalVerification": {
+    "focused": "5 files / 31 tests PASS",
+    "typecheck": "PASS",
+    "typecheckApp": "PASS",
+    "partitionAudit": {
+      "files": 389,
+      "fast": 257,
+      "medium": 91,
+      "integration": 36,
+      "heavy": 5,
+      "fingerprint": "08cf942f"
+    },
+    "testPartitions": {
+      "fast": "257 files / 1470 tests PASS",
+      "medium": "91 files / 801 tests PASS",
+      "integration": "36 files / 123 tests PASS",
+      "heavy": "5 files / 17 tests PASS",
+      "total": "389 files / 2411 tests PASS"
+    },
+    "productionAudit": "0 vulnerabilities",
+    "build": "PASS",
+    "mcpStdio": "220 tools PASS",
+    "diffCheck": "PASS"
+  },
+  "runtimeEvidence": {
+    "p17Navigation": {
+      "path": "docs/evidence/multi-model-final-p17-navigation-20260812T170151Z-87c24e3b.json",
+      "sha256": "a1e1fc6e987884dfd2b0f34a3e8d3488a8ff2a3a130f927c66058b585891d17d",
+      "status": "pass",
+      "visitedFlows": 22,
+      "uiAudits": 7,
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalRequests": 0,
+      "showEvents": 0,
+      "focusEvents": 0,
+      "gracefulExitCode": 0,
+      "screenshot": {
+        "path": "docs/evidence/multi-model-final-p17-navigation-20260812T170151Z-87c24e3b.png",
+        "sha256": "8fa3b154978f05bb48f7c80f056817fb72408a10c7adac62fecab3b102e3cadd",
+        "tracked": false
+      },
+      "normalization": "The harness originally emitted an absolute screenshot path; only that field was mechanically converted to a repository-relative path after the run."
+    },
+    "globalResource": {
+      "path": "docs/evidence/multi-model-final-global-resource-20260812T170411Z-87c24e3b.json",
+      "sha256": "2a2569d464883652966b28011dc59a47a34fc573e66506e3f2cb19d3ca598b6a",
+      "status": "PASS",
+      "pagination": "36 + 4, no duplicate keys",
+      "showEvents": 0,
+      "focusEvents": 0,
+      "gracefulExitCode": 0,
+      "screenshot": {
+        "path": "docs/evidence/multi-model-final-global-resource-20260812T170411Z-87c24e3b.png",
+        "sha256": "eed78d29323a878cb70c065b8410dd8f54ad9bba7aacee94f6442e29b842076f",
+        "tracked": false
+      }
+    },
+    "t23Strict": {
+      "path": "docs/evidence/multi-model-final-t23-strict-20260813-87c24e3b.json",
+      "sha256": "a21b78b971f91c05daef83c84bcc25e1a8ce3571fb25781d58726146b194720a",
+      "status": "PASS",
+      "rendererFirstCardMs": 1487,
+      "rendererFirstCardBudgetMs": 1500,
+      "rendererFirstRawMs": 4170,
+      "rendererFirstRawBudgetMs": 5000,
+      "rendererAllReferencesMs": 5728,
+      "rendererAllReferencesBudgetMs": 8000,
+      "peakOutstandingIpc": 4,
+      "peakOutstandingIpcBudget": 4,
+      "interactionStatus": "PASS",
+      "risk": "First-card margin is only 13 ms; the strict gate passed but future startup changes should preserve this measurement."
+    }
+  },
+  "safety": {
+    "formalProjectWrites": 0,
+    "externalGenerationCalls": 0,
+    "uploads": 0,
+    "payments": 0,
+    "pushes": 0,
+    "appInstallations": 0,
+    "notarizations": 0,
+    "publications": 0,
+    "projectProcessesRemaining": 0,
+    "temporaryLocksRemaining": 0,
+    "modelWriteIncident": "A read-only Grok process wrote two routing lines into skill files. The exact diff was archived outside the repository, the lines were reverted with a minimal patch, the process was stopped, and no unauthorized change remains in the candidate."
+  },
+  "installedApp": {
+    "sourceDigest": "954ac71a461be527530a96709983741c5f0d1f9ae05a97f57605af5ded39d585",
+    "buildId": "c7cb5ceec93ad2704422f4657f14f932",
+    "mcpToolCount": 220,
+    "updatedByThisCycle": false
+  },
+  "completionGate": {
+    "confirmedP0": 0,
+    "confirmedP1": 0,
+    "selectedHighValueP2": 0,
+    "round3ReviewersBoundToSameDigest": 4,
+    "round3PassVerdicts": 4,
+    "mandatoryChannelsNotVerified": 0,
+    "mechanicalVerification": "pass",
+    "runtimeVerification": "pass",
+    "gitCleanRequiredAfterCloseoutCommit": true
+  }
+}

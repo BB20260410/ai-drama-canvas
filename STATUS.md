@@ -1,5 +1,22 @@
 # STATUS · 当前源码生产中枢（P0—P9 CLOSED / MCP_CLIENT_RESTART_PASS）
 
+## software_goal: multi-model-quality-20260813（三轮四模型协同整改最终闭环）
+
+| 字段 | 当前值 |
+|---|---|
+| status | `completed`：Kimi、GLM、豆包、Grok 三轮审查、两项 P2 整改、交叉复核与冻结终验全部闭合 |
+| active_item | `none`：没有在途模型、测试、Electron、MCP 或临时 worktree |
+| source | `87c24e3b… / b5149a5f… / 220 tools`；live digest 与 release manifest 一致 |
+| resolved | 总资源证据独占/no-clobber/清理失败门；VideoEditor 同批同步去重/卸载失效/异常停止播放 |
+| model_round3 | Kimi `kimi-code/k3` PASS；GLM `glm-5-2-260617` PASS；豆包 `doubao-seed-evolving` PASS；Grok `grok-4.5-build` PASS；全部绑定同一 digest |
+| verification | 5 files / 31 定向；389 files / 2411 tests；两套 typecheck；audit 0；build；MCP 220；隐藏 P17/总资源/T23 全 PASS |
+| performance | 首卡 1487/1500ms、首 raw 4170/5000ms、全参考 5728/8000ms、IPC 峰值 4/4；交互全 PASS |
+| earliest_next | `none`：只有新复现或新产品目标才能开新切片；不得无理由重跑四模型全面审查 |
+| boundaries | 未 push、安装、公证、发布、上传、付费生成或写正式工程；安装版仍为历史 `954ac71a…` |
+| evidence | `docs/evidence/multi-model-three-round-final-20260813-87c24e3b.json` · `docs/验证报告_20260813_四模型三轮协同整改最终闭环_87c24e3b.md` |
+
+恢复规则：本 Goal 已完成。旧 `multi-model-quality-20260812` 的 GLM/Grok 阻塞是历史中间态，已由本区块的有效第三轮报告取代；不得从旧阻塞重新开始。
+
 ## software_goal: multi-model-quality-20260812（四模型协同整改）
 
 | 字段 | 当前值 |
