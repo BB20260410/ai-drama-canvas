@@ -24,7 +24,10 @@ export interface VideoEditorPreviewSyncScheduler {
  * sync through this owner keeps exactly one execution per flush batch without
  * throttling — every batch still syncs, so drift correction is unchanged.
  */
-export function createVideoEditorPreviewSyncScheduler(sync: () => void): VideoEditorPreviewSyncScheduler {
+export function createVideoEditorPreviewSyncScheduler(
+  sync: () => void,
+  onError: (error: unknown) => void = () => undefined,
+): VideoEditorPreviewSyncScheduler {
   let valid = true;
   let pending: Promise<void> | null = null;
   return {
@@ -33,7 +36,13 @@ export function createVideoEditorPreviewSyncScheduler(sync: () => void): VideoEd
       if (!pending) {
         pending = nextTick(() => {
           pending = null;
-          if (valid) sync();
+          if (valid) {
+            try {
+              sync();
+            } catch (error) {
+              onError(error);
+            }
+          }
         });
       }
       return pending;

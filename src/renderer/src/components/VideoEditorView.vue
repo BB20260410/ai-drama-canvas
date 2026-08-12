@@ -493,7 +493,13 @@ const latestRender = computed(() => renders.value.find((job) => job.editProjectI
 const hasUnsavedDraft = computed(() => hasUnsavedVideoEditorDraft(active.value, persistedProjectBaseline.value));
 
 // 播放 tick 的 seek 与 post-flush watcher 共用同一调度 owner：同一刷新批次只执行一次 syncPreview。
-const previewSyncScheduler = createVideoEditorPreviewSyncScheduler(syncPreview);
+const previewSyncScheduler = createVideoEditorPreviewSyncScheduler(
+  syncPreview,
+  (error) => {
+    stopPlayback();
+    emit("failed", `预览同步失败：${message(error)}`);
+  },
+);
 watch([previewClip, activeDissolve, activeOverlayClips], () => { void previewSyncScheduler.request(); }, { flush: "post" });
 watch(() => active.value?.tracks.flatMap((track) => track.clips.map((clip) => [
   clip.id, clip.startSeconds, clip.durationSeconds, clip.trimStartSeconds, clip.playbackRate,

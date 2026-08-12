@@ -84,10 +84,28 @@ describe("视频编辑预览同步调度", () => {
     expect(syncs).toHaveLength(0);
   });
 
+  it("同步异常被稳定投影且不形成未处理拒绝，下一批仍可重新调度", async () => {
+    const errors: unknown[] = [];
+    let calls = 0;
+    const scheduler = createVideoEditorPreviewSyncScheduler(() => {
+      calls += 1;
+      if (calls === 1) throw new Error("media state unavailable");
+    }, (error) => errors.push(error));
+
+    await expect(scheduler.request()).resolves.toBeUndefined();
+    expect(errors).toHaveLength(1);
+    await expect(scheduler.request()).resolves.toBeUndefined();
+    expect(calls).toBe(2);
+    expect(errors).toHaveLength(1);
+  });
+
   it("组件仅将两个 post-flush watcher 与 seek 交给同一调度 owner，卸载时失效", async () => {
     const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
     const component = await readFile(path.join(workspace, "src/renderer/src/components/VideoEditorView.vue"), "utf8");
-    expect(component).toContain("createVideoEditorPreviewSyncScheduler(syncPreview)");
+    expect(component).toContain("const previewSyncScheduler = createVideoEditorPreviewSyncScheduler(");
+    expect(component).toContain("  syncPreview,");
+    expect(component).toContain("预览同步失败：${message(error)}");
+    expect(component).toMatch(/\(error\) => \{\s*stopPlayback\(\);\s*emit\("failed", `预览同步失败：\$\{message\(error\)\}`\);\s*\}/u);
     expect(component).toContain("watch([previewClip, activeDissolve, activeOverlayClips], () => { void previewSyncScheduler.request(); }, { flush: \"post\" });");
     expect(component).toMatch(/watch\(\(\) => active\.value\?\.tracks[\s\S]*?\(\) => \{ void previewSyncScheduler\.request\(\); \}, \{ flush: \"post\" \}\);/);
     expect(component).toMatch(/function seek\([\s\S]*?playhead\.value = quantizeTimelineTime[\s\S]*?void previewSyncScheduler\.request\(\);\n\}/);
