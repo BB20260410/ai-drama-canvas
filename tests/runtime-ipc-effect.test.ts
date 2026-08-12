@@ -9,9 +9,17 @@ describe("源码桌面 IPC 副作用默认拒绝策略", () => {
   it("把诊断、物理读取、写入和外部副作用分开，未知通道默认 mutation", () => {
     expect(runtimeIpcEffect("canvas:get-runtime-write-gate")).toBe("diagnostic-read");
     expect(runtimeIpcEffect("canvas:get-active-project")).toBe("read-only");
+    expect(runtimeIpcEffect("canvas:get-managed-project-shell")).toBe("read-only");
+    expect(runtimeIpcEffect("canvas:get-active-hybrid-workspace-preference")).toBe("read-only");
     expect(runtimeIpcEffect("canvas:get-default-managed-projects-root")).toBe("read-only");
     expect(runtimeIpcEffect("canvas:get-managed-project-operation-state")).toBe("read-only");
     expect(runtimeIpcEffect("canvas:get-local-creative-project-ingest-status")).toBe("read-only");
+    expect(runtimeIpcEffect("canvas:novel-get-workspace")).toBe("read-only");
+    expect(runtimeIpcEffect("canvas:novel-get-navigation")).toBe("read-only");
+    expect(runtimeIpcEffect("canvas:novel-list-chapters")).toBe("read-only");
+    expect(runtimeIpcEffect("canvas:novel-read-chapter")).toBe("read-only");
+    expect(runtimeIpcEffect("canvas:novel-search-chapters")).toBe("read-only");
+    expect(runtimeIpcEffect("canvas:novel-list-facts")).toBe("read-only");
     expect(runtimeIpcEffect("canvas:list-global-studio-assets")).toBe("read-only");
     expect(runtimeIpcEffect("canvas:list-global-studio-asset-images")).toBe("read-only");
     expect(runtimeIpcEffect("canvas:get-global-studio-asset-image")).toBe("read-only");
@@ -30,6 +38,8 @@ describe("源码桌面 IPC 副作用默认拒绝策略", () => {
     expect(runtimeIpcGateMode("canvas:get-runtime-write-gate")).toBe("bypass");
     expect(runtimeIpcGateMode("canvas:get-runtime-build-identity")).toBe("bypass");
     expect(runtimeIpcGateMode("canvas:get-active-project")).toBe("cached-read");
+    expect(runtimeIpcGateMode("canvas:get-managed-project-shell")).toBe("cached-read");
+    expect(runtimeIpcGateMode("canvas:novel-search-chapters")).toBe("cached-read");
     expect(runtimeIpcGateMode("canvas:list-global-studio-assets")).toBe("cached-read");
     expect(runtimeIpcGateMode("canvas:list-global-studio-asset-images")).toBe("cached-read");
     expect(runtimeIpcGateMode("canvas:get-global-studio-asset-image")).toBe("cached-read");

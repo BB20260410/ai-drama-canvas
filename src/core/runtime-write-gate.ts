@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { computeSourceDigest } from "./build-identity.js";
+import { readRuntimeReleaseManifest } from "./release-manifest.js";
 
 type ComputeSourceDigest = typeof computeSourceDigest;
 
@@ -10,6 +11,8 @@ export interface RuntimeWriteGateInspectionDependencies {
    * 仅供确定性测试替换源码摘要计算；正式运行始终使用 build-identity 的真实实现。
    */
   computeSourceDigest?: ComputeSourceDigest;
+  /** 安装态从 App Resources 的 release manifest 复核构建源码身份。 */
+  readReleaseSourceDigest?: () => Promise<string>;
 }
 
 export interface RuntimeBootIdentity {
@@ -18,6 +21,7 @@ export interface RuntimeBootIdentity {
   runtimeBootId: string;
   pid: number;
   startedAt: string;
+  sourceIdentityMode: "workspace" | "release-manifest";
   workspace: string;
   loadedArtifactPath: string;
   loadedArtifactSha256: string;
@@ -83,6 +87,7 @@ export async function captureRuntimeBootIdentity(input: {
     runtimeBootId: input.runtimeBootId ?? randomUUID(),
     pid: input.pid ?? process.pid,
     startedAt: input.startedAt ?? new Date().toISOString(),
+    sourceIdentityMode: "workspace",
     workspace,
     loadedArtifactPath,
     loadedArtifactSha256: sha256(artifactBytes),
@@ -111,7 +116,16 @@ export async function inspectRuntimeWriteGate(
     errors.push(errorText(error));
   }
   try {
-    currentSourceDigest = (await computeCurrentSourceDigest(boot.workspace)).sourceDigest;
+    if (boot.sourceIdentityMode === "release-manifest") {
+      const readReleaseSourceDigest = dependencies.readReleaseSourceDigest ?? (async () => {
+        const manifest = await readRuntimeReleaseManifest();
+        if (!manifest) throw new Error("安装态 release manifest 不可用。");
+        return manifest.sourceDigest;
+      });
+      currentSourceDigest = await readReleaseSourceDigest();
+    } else {
+      currentSourceDigest = (await computeCurrentSourceDigest(boot.workspace)).sourceDigest;
+    }
     if (currentSourceDigest !== boot.bootSourceDigest) reasons.push("source-changed");
   } catch (error) {
     reasons.push("source-unavailable");

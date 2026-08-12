@@ -8,7 +8,7 @@ import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { lstat, readFile, realpath } from "node:fs/promises";
 import path from "node:path";
-import sharp from "sharp";
+import sharp, { type Metadata } from "sharp";
 import {
   assertActiveManagedStudioContextToken,
   type ActiveManagedStudioContext,
@@ -43,6 +43,7 @@ import {
   renderStudioUnitGridLabeledLayoutToBuffer,
 } from "./studio-labeled-layout.js";
 import { assertStudioImagegenCandidatePathAllowed } from "./studio-imagegen-candidate-gate.js";
+import { assertNoActiveStudioHiggsfieldConnectorReservation } from "./studio-higgsfield-connector-queue.js";
 import {
   ensureConfinedDirectory,
   inspectExistingConfinedDirectory,
@@ -375,7 +376,7 @@ async function inspectRaw(
   if (expectedPath && canonicalPath !== path.normalize(path.resolve(expectedPath))) {
     fail("storage-unsafe", "raw 真实路径与授权 quarantine candidatePath 不一致。");
   }
-  let metadata: sharp.Metadata;
+  let metadata: Metadata;
   try {
     metadata = await sharp(canonicalPath, { failOn: "error", limitInputPixels: 100_000_000 }).rotate().metadata();
   } catch (error) {
@@ -871,6 +872,8 @@ export async function commitAgentImagegenResultBundle(
   if (!Number.isSafeInteger(input.expectedRevision) || input.expectedRevision < 1) {
     fail("invalid-input", "expectedRevision 必须是正整数。");
   }
+  // Direct callers must fail before raw inspection, labeled render, material CAS or writeback receipt work.
+  await assertNoActiveStudioHiggsfieldConnectorReservation(projectRoot, generationRunId);
   const context = await assertActiveManagedStudioContextToken(projectRoot, input.projectContextToken);
   const executionReceipt = normalizeExecutionReceipt(input.executionReceipt, input.provider);
   const verified = await verifyPackAndDispatch({

@@ -4,19 +4,24 @@ import {
   access,
   lstat,
   mkdir,
-  mkdtemp,
   readFile,
-  realpath,
-  rm,
   writeFile,
 } from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { _electron as electron, type ElectronApplication, type Page } from "playwright";
 import sharp from "sharp";
-import { importStudioMedia, type StudioMediaMetadata } from "../src/core/material-studio.js";
+import {
+  getStudioMedia,
+  importStudioMedia,
+  type StudioMediaMetadata,
+} from "../src/core/material-studio.js";
 import { createManagedStudioProject } from "../src/core/service.js";
+import { loadStudioCanvasLayout } from "../src/core/studio-canvas-layout-store.js";
+import {
+  mkdtempOwnedFixtureRoot,
+  removeOwnedTemporaryFixtureRoot,
+} from "./lib/owned-fixture-root.js";
 
 const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sessionPath = path.resolve(
@@ -24,6 +29,7 @@ const sessionPath = path.resolve(
 );
 const packagedExecutableInput = process.env.AI_CANVAS_PHYSICAL_APP_EXECUTABLE?.trim();
 const packagedExecutable = packagedExecutableInput ? path.resolve(packagedExecutableInput) : undefined;
+const NATIVE_DRAG_RUNTIME_OWNER = "native-media-drag-physical-harness";
 
 if (packagedExecutable) {
   await access(packagedExecutable).catch(() => {
@@ -92,7 +98,10 @@ async function waitForNodeCount(page: Page, expected: number): Promise<void> {
   );
 }
 
-const runtimeRoot = await realpath(await mkdtemp(path.join(os.tmpdir(), "ai-canvas-native-drag-physical-")));
+const runtimeRoot = (await mkdtempOwnedFixtureRoot(
+  "ai-canvas-native-drag-physical",
+  NATIVE_DRAG_RUNTIME_OWNER,
+)).root;
 const projectsParent = path.join(runtimeRoot, "projects");
 const fixtureRoot = path.join(runtimeRoot, "fixtures");
 const registryPath = path.join(runtimeRoot, "registry", "projects.json");
@@ -129,7 +138,9 @@ async function shutdown(reason: string): Promise<void> {
   canvasObservationTimer = undefined;
   await persistSession({ state: "closed", closeReason: reason }).catch(() => undefined);
   if (application) await application.close().catch(() => undefined);
-  await rm(runtimeRoot, { recursive: true, force: true }).catch(() => undefined);
+  await removeOwnedTemporaryFixtureRoot(runtimeRoot, NATIVE_DRAG_RUNTIME_OWNER).catch((error) => {
+    consoleErrors.push(`runtime-root-cleanup: ${error instanceof Error ? error.message : String(error)}`);
+  });
   if (previousRegistry === undefined) delete process.env.AI_CANVAS_REGISTRY_PATH;
   else process.env.AI_CANVAS_REGISTRY_PATH = previousRegistry;
 }
@@ -270,12 +281,59 @@ try {
     sourceDigest?: string;
     mcpToolCount?: number;
   };
-  const window = await application.evaluate(({ BrowserWindow }) => {
+  const window = await application.evaluate(({ BrowserWindow, screen }) => {
     const current = BrowserWindow.getAllWindows()[0];
-    return current
-      ? { id: current.id, title: current.getTitle(), bounds: current.getBounds(), webContentsId: current.webContents.id }
-      : null;
+    if (!current) return null;
+    const workArea = screen.getPrimaryDisplay().workArea;
+    current.setBounds({
+      x: workArea.x,
+      y: workArea.y,
+      width: 1_180,
+      height: Math.min(900, workArea.height),
+    });
+    current.show();
+    current.focus();
+    return {
+      id: current.id,
+      title: current.getTitle(),
+      bounds: current.getBounds(),
+      contentBounds: current.getContentBounds(),
+      workArea,
+      webContentsId: current.webContents.id,
+    };
   });
+  if (!window) throw new Error("真实拖拽验收没有可用 Electron 窗口。 ");
+  await page.waitForTimeout(500);
+  const localDragHandles = await page.evaluate(() => Array.from(document.querySelectorAll<HTMLElement>(
+    '[data-testid="managed-studio-canvas-node"]',
+  )).map((node) => {
+    const handle = node.querySelector<HTMLElement>('[data-testid="managed-canvas-media-export-handle"]');
+    const rect = handle?.getBoundingClientRect();
+    return {
+      kind: node.dataset.nodeKind ?? "",
+      mediaSha256: node.dataset.mediaSha256 ?? "",
+      ...(rect ? {
+        rect: {
+          x: rect.x,
+          y: rect.y,
+          width: rect.width,
+          height: rect.height,
+        },
+      } : {}),
+    };
+  }));
+  const dragHandles = localDragHandles.map((handle) => ({
+    ...handle,
+    ...(handle.rect ? {
+      screenCenter: {
+        x: Math.round(window.contentBounds.x + handle.rect.x + handle.rect.width / 2),
+        y: Math.round(window.contentBounds.y + handle.rect.y + handle.rect.height / 2),
+      },
+    } : {}),
+  }));
+  if (dragHandles.length !== 3 || dragHandles.some((handle) => !handle.screenCenter)) {
+    throw new Error(`无法冻结三个真实拖拽手柄坐标：${JSON.stringify(dragHandles)}`);
+  }
   const screenshotPath = path.join(runtimeRoot, "physical-harness-ready.png");
   await page.screenshot({ path: screenshotPath, fullPage: true });
   const exportTemp = await application.evaluate(({ app }) => app.getPath("temp"));
@@ -285,14 +343,17 @@ try {
     state: "ready",
     startedAt: new Date().toISOString(),
     workspace,
-    launchMode: packagedExecutable ? "installed-app" : "source-build",
+    launchMode: packagedExecutable ? "packaged-app" : "source-build",
+    applicationPid: application.process().pid,
     executablePath: packagedExecutable ?? null,
     runtimeRoot,
+    runtimeOwnerId: NATIVE_DRAG_RUNTIME_OWNER,
     registryPath,
     projectRoot,
     userDataRoot,
     exportRoot: path.join(exportTemp, "ai-drama-canvas-export"),
     window,
+    dragHandles,
     build: releaseManifest,
     media: Object.fromEntries(orderedKinds.map((kind) => [kind, {
       kind,
@@ -324,8 +385,37 @@ try {
           .map((element) => element.getAttribute("data-node-kind"))
           .filter((value): value is string => Boolean(value))
           .sort(),
+        armedKinds: Array.from(document.querySelectorAll(
+          '[data-testid="managed-studio-canvas-node"].export-armed[data-node-kind]',
+        ))
+          .map((element) => element.getAttribute("data-node-kind"))
+          .filter((value): value is string => Boolean(value))
+          .sort(),
       }));
-      await persistSession({ canvasState });
+      const [registeredMedia, layout] = await Promise.all([
+        Promise.all(orderedKinds.map(async (kind) => ({
+          kind,
+          sha256: imported[kind].sha256,
+          registered: Boolean(await getStudioMedia(projectRoot, imported[kind].sha256)),
+        }))),
+        loadStudioCanvasLayout(projectRoot),
+      ]);
+      const expectedPinnedNodeIds = orderedKinds
+        .map((kind) => `library-media:${imported[kind].sha256}`)
+        .sort();
+      const persistedPinnedNodeIds = (layout?.pinnedNodeIds ?? [])
+        .filter((nodeId) => nodeId.startsWith("library-media:"))
+        .sort();
+      await persistSession({
+        canvasState,
+        persistenceState: {
+          registeredMedia,
+          expectedPinnedNodeIds,
+          persistedPinnedNodeIds,
+          allMediaRegistered: registeredMedia.every((entry) => entry.registered),
+          allPinnedNodesPersisted: expectedPinnedNodeIds.every((nodeId) => persistedPinnedNodeIds.includes(nodeId)),
+        },
+      });
     } catch (error) {
       consoleErrors.push(
         `canvas-retention-observer: ${

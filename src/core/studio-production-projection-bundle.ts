@@ -225,6 +225,13 @@
  */
 
 import { createHash } from "node:crypto";
+import {
+  beginStudioProjectionPhase,
+  finishStudioProjectionPhase,
+  measureStudioProjectionPhase,
+  type StudioProjectionPhaseInstrumentation,
+} from "./studio-projection-phase-timeline.js";
+import { createStudioProjectionAssetReader } from "./studio-projection-asset-reader.js";
 
 // 自查新发现（本轮修正范围外的第 6 处）：上一版这里还 import 了
 // inspectManagedProject（managed-project.js）与 StudioProductionDashboardError
@@ -291,6 +298,7 @@ import {
 
 import {
   getStudioContinuityReviewControl,
+  getStudioContinuityReviewGenerationSource,
   type StudioContinuityReviewControl,
   type StudioContinuityReviewControlInput,
   type StudioContinuityReviewNextAction, // 修正点 2 需要：见下方 continuity 字段重设计
@@ -300,7 +308,6 @@ import {
   queryStudioGenerationFreeze,
   type StudioFrozenAssetReference,
   type StudioFrozenForbiddenAsset,
-  type StudioGenerationQueryInput,
   type StudioGenerationQueryResult,
 } from "./studio-generation.js";
 
@@ -956,6 +963,7 @@ async function buildPanelFrame(
   panel: StudioDashboardPanelSummary, // 修正点 1：类型名对齐真实导出
   bindingPanel: StudioBindingPanelControl | undefined,
   bindingRevisionToken: string,
+  readControlAsset: (assetId: string) => Promise<StudioCanonicalAssetDetail | null>,
 ): Promise<StudioProjectionPanelFrame> {
   // 修正点 3 副带修复：panel.startSeconds/endSeconds/assetIds 都是
   // StudioDashboardPanelSummary 的真实直接字段（见导入处注释），
@@ -970,17 +978,14 @@ async function buildPanelFrame(
     assetIds: panel.assetIds,
   };
 
-  const freezeInput: StudioGenerationQueryInput = { unitId, panelId: panel.id };
-
-  const [continuityReview, freeze, controlAssets] = await Promise.all([
+  const [continuityReview, controlAssets] = await Promise.all([
     getStudioContinuityReviewControl(projectRoot, continuityInput),
-    queryStudioGenerationFreeze(projectRoot, freezeInput),
     // 修正点 4：真正调用 getStudioCanonicalAsset，逐个解析该格的控制资产身份。
     // panel.assetIds 已经是 studioDashboardPanelControlAssetIds 产出的有界
     // （≤ STUDIO_DASHBOARD_ASSET_CONTROL_LIMIT）列表，这里不再二次限流。
     Promise.all(
       panel.assetIds.map(async (assetId): Promise<StudioProjectionControlAssetRef> => {
-        const asset: StudioCanonicalAssetDetail | null = await getStudioCanonicalAsset(projectRoot, assetId);
+        const asset: StudioCanonicalAssetDetail | null = await readControlAsset(assetId);
         return {
           assetId,
           assetName: asset?.name,
@@ -996,6 +1001,10 @@ async function buildPanelFrame(
   // selectedPanel.continuityReview 里确认过同名同源），直接访问，
   // 不再需要 `as unknown as {resolvedGenerationRunId?:string}` 这种过度防御 cast。
   const resolvedGenerationRunId = continuityReview.resolvedGenerationRunId;
+  // 生产路径复用 continuity owner 已完成的同一次原始 generation 查询，避免每格
+  // 重复冻结计算。测试/替身若未经过真实 owner，则安全回落到旧查询入口。
+  const generationSource = getStudioContinuityReviewGenerationSource(continuityReview)
+    ?? await queryStudioGenerationFreeze(projectRoot, { unitId, panelId: panel.id });
 
   let review: StudioProjectionPanelFrame["review"];
   if (resolvedGenerationRunId) {
@@ -1033,9 +1042,14 @@ async function buildPanelFrame(
       stamp: stamp("studio-continuity-review-control", continuityReview.fingerprint),
     },
     generationFreeze: {
-      status: freeze.status,
-      packId: freeze.status === "ready" ? freeze.packId : undefined,
-      stamp: stamp("studio-generation-freeze", freeze.status === "ready" ? freeze.fingerprint : digest(freeze)),
+      status: generationSource.status,
+      packId: generationSource.status === "ready" ? generationSource.packId : undefined,
+      stamp: stamp(
+        "studio-generation-freeze",
+        generationSource.status === "ready"
+          ? generationSource.fingerprint
+          : digest(generationSource),
+      ),
     },
     review,
   };
@@ -1137,21 +1151,28 @@ function projectTimeline(
 export async function buildStudioProductionProjectionBundle(
   projectRoot: string,
   query: StudioProductionProjectionBundleQuery,
+  instrumentation?: StudioProjectionPhaseInstrumentation,
 ): Promise<StudioProductionProjectionBundle> {
-  const unitId = query.unitId;
-  if (!unitId) throw new StudioProjectionBundleError("invalid-input", "unitId 不能为空。");
+  const coreStartedAt = beginStudioProjectionPhase(instrumentation);
+  try {
+    const unitId = query.unitId;
+    if (!unitId) throw new StudioProjectionBundleError("invalid-input", "unitId 不能为空。");
 
   // 步骤 1：dashboard 与 binding 并行只读，各自快照（D3）。
   // 字面量对象直接作为参数传入，触发 TS 对判别式联合参数的上下文类型收窄，
   // 不需要 `as never` 之类的绕过写法（两处 as never 均已移除）。
-  const [dashboardDetail, bindingControl] = await Promise.all([
-    getStudioProductionDashboard(projectRoot, {
-      operation: "unit",
-      unitId,
-      panelId: query.panelId,
-    }),
-    getStudioBindingControl(projectRoot, { unitId }),
-  ]);
+    const [dashboardDetail, bindingControl] = await measureStudioProjectionPhase(
+      instrumentation,
+      "current-dashboard-binding",
+      () => Promise.all([
+        getStudioProductionDashboard(projectRoot, {
+          operation: "unit",
+          unitId,
+          panelId: query.panelId,
+        }),
+        getStudioBindingControl(projectRoot, { unitId }),
+      ]),
+    );
 
   // 保留：函数无重载，返回值不按输入字面量自动收窄，这个 cast 合法必要。
   const unitDetail = dashboardDetail as StudioDashboardUnitDetail;
@@ -1166,17 +1187,35 @@ export async function buildStudioProductionProjectionBundle(
   // 草案上一版用 `as unknown as {panels: StudioDashboardPanelDetail[]}` 硬 cast，
   // 既用错了类型名也是多余的防御——已去掉。
   const panelSourceList = unitDetail.panels.slice(0, STUDIO_DASHBOARD_PANEL_LIMIT);
-  const panels = await Promise.all(
-    panelSourceList.map((panel) =>
-      buildPanelFrame(
-        projectRoot,
-        unitId,
-        unitRevision,
-        panel,
-        bindingPanelById.get(panel.id),
-        bindingControl.revisionToken,
+  let canonicalAssetReadCount = 0;
+  const readControlAsset = createStudioProjectionAssetReader(async (assetId) => {
+    canonicalAssetReadCount += 1;
+    return getStudioCanonicalAsset(projectRoot, assetId);
+  }, 4);
+  let panels: StudioProjectionPanelFrame[] = [];
+  panels = await measureStudioProjectionPhase(
+    instrumentation,
+    "panel-fanout",
+    () => Promise.all(
+      panelSourceList.map((panel) =>
+        buildPanelFrame(
+          projectRoot,
+          unitId,
+          unitRevision,
+          panel,
+          bindingPanelById.get(panel.id),
+          bindingControl.revisionToken,
+          readControlAsset,
+        ),
       ),
     ),
+    () => ({
+      panelCount: panels.length || panelSourceList.length,
+      // finally 在外层 `panels = await ...` 赋值之前运行；使用冻结输入统计本轮
+      // fan-out 的控制资产引用数，避免成功阶段被误记为 0。
+      controlAssetCount: panelSourceList.reduce((total, panel) => total + panel.assetIds.length, 0),
+      canonicalAssetReadCount,
+    }),
   );
 
   // 步骤 3：整单元四轨 Timeline、正式结果选择和前后邻接并行读取。
@@ -1192,13 +1231,17 @@ export async function buildStudioProductionProjectionBundle(
   const successorMapPromise = getStudioCanonicalSuccessorUnitIds(projectRoot, [unitId]);
   const predecessorMapPromise = getStudioCanonicalPredecessorUnitIds(projectRoot, [unitId]);
 
-  const [timelineProjection, approvedTimeline, successorMap, predecessorMap] =
-    await Promise.all([
-      timelineProjectionPromise,
-      approvedTimelinePromise,
-      successorMapPromise,
-      predecessorMapPromise,
-    ]);
+    const [timelineProjection, approvedTimeline, successorMap, predecessorMap] =
+      await measureStudioProjectionPhase(
+        instrumentation,
+        "timeline-approved-neighbors",
+        () => Promise.all([
+          timelineProjectionPromise,
+          approvedTimelinePromise,
+          successorMapPromise,
+          predecessorMapPromise,
+        ]),
+      );
 
   if (!timelineProjection) {
     throw new StudioProjectionBundleError("timeline-missing", `单元 ${unitId} 缺少多媒体时间线投影。`);
@@ -1218,17 +1261,21 @@ export async function buildStudioProductionProjectionBundle(
 
   // Observation 只绑定 unit 级正式 PASS 选择，不跟随 UI 当前选中格；历史 PASS
   // 没有 Studio observation owner 时保持缺失，不把 planned/raw 猜成 actual-tail。
-  const [ownObservationControl, incomingObservationControl, ownReviewControl] = await Promise.all([
-    ownGenerationRunId
-      ? getStudioPostResultObservationControl(projectRoot, ownGenerationRunId)
-      : Promise.resolve(undefined),
-    incomingGenerationRunId
-      ? getStudioPostResultObservationControl(projectRoot, incomingGenerationRunId)
-      : Promise.resolve(undefined),
-    ownGenerationRunId
-      ? getStudioGenerationReviewControl(projectRoot, ownGenerationRunId)
-      : Promise.resolve(undefined),
-  ]);
+    const [ownObservationControl, incomingObservationControl, ownReviewControl] = await measureStudioProjectionPhase(
+      instrumentation,
+      "observation-review",
+      () => Promise.all([
+        ownGenerationRunId
+          ? getStudioPostResultObservationControl(projectRoot, ownGenerationRunId)
+          : Promise.resolve(undefined),
+        incomingGenerationRunId
+          ? getStudioPostResultObservationControl(projectRoot, incomingGenerationRunId)
+          : Promise.resolve(undefined),
+        ownGenerationRunId
+          ? getStudioGenerationReviewControl(projectRoot, ownGenerationRunId)
+          : Promise.resolve(undefined),
+      ]),
+    );
 
   const ownPackId = ownReviewControl?.head?.packId;
   const ownReviewId = ownReviewControl?.head?.reviewId;
@@ -1245,18 +1292,29 @@ export async function buildStudioProductionProjectionBundle(
     : Promise.resolve(undefined);
 
   // 步骤 6：相邻摘要、冻结包和视频包并行读取。
-  const [previousSummary, nextSummary, frozenPack, videoPackageControl] = await Promise.all([
-    buildAdjacentUnitSummary(projectRoot, "previous", previousUnitId, previousApproved),
-    buildAdjacentUnitSummary(
-      projectRoot,
-      "next",
-      nextUnitId,
-      nextUnitId ? approvedByUnit.get(nextUnitId) : undefined,
-    ),
-    frozenPackPromise,
-    videoPackageControlPromise,
-  ]);
-  const frozenReferences = await buildFrozenReferences(projectRoot, frozenPack);
+    const [previousSummary, nextSummary, frozenPack, videoPackageControl] = await measureStudioProjectionPhase(
+      instrumentation,
+      "adjacent-pack-video",
+      () => Promise.all([
+        buildAdjacentUnitSummary(projectRoot, "previous", previousUnitId, previousApproved),
+        buildAdjacentUnitSummary(
+          projectRoot,
+          "next",
+          nextUnitId,
+          nextUnitId ? approvedByUnit.get(nextUnitId) : undefined,
+        ),
+        frozenPackPromise,
+        videoPackageControlPromise,
+      ]),
+      () => ({ neighborCount: Number(Boolean(previousUnitId)) + Number(Boolean(nextUnitId)) }),
+    );
+    let frozenReferences: StudioProjectionFrozenReference[] = [];
+    frozenReferences = await measureStudioProjectionPhase(
+      instrumentation,
+      "frozen-reference-media",
+      () => buildFrozenReferences(projectRoot, frozenPack),
+      () => ({ frozenReferenceCount: frozenReferences.length }),
+    );
 
   const observation: StudioProjectionObservationBundle = {
     own: ownObservationControl ? projectObservationTail(ownObservationControl) : undefined,
@@ -1328,7 +1386,8 @@ export async function buildStudioProductionProjectionBundle(
     }),
   };
 
-  const bodyWithoutFingerprint = {
+    return await measureStudioProjectionPhase(instrumentation, "assemble-digest", async () => {
+      const bodyWithoutFingerprint = {
     schemaVersion: STUDIO_PROJECTION_BUNDLE_SCHEMA_VERSION,
     kind: "studio-production-projection-bundle" as const,
     projectId: unitDetail.projectId,
@@ -1351,8 +1410,12 @@ export async function buildStudioProductionProjectionBundle(
     builtAt: nowIso(),
   };
 
-  return {
-    ...bodyWithoutFingerprint,
-    fingerprint: digest(bodyWithoutFingerprint),
-  };
+      return {
+        ...bodyWithoutFingerprint,
+        fingerprint: digest(bodyWithoutFingerprint),
+      };
+    });
+  } finally {
+    finishStudioProjectionPhase(instrumentation, coreStartedAt, "core-total");
+  }
 }

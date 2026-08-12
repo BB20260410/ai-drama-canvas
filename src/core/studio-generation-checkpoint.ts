@@ -5,9 +5,10 @@
  * 永远属于同一生产槽位。checkpoint 与 attestation 只追加不可变事件，当前指针
  * 通过独立 CAS Head 推进，并与 operation receipt 在同一 SQLite 事务提交。
  */
-import { createHash } from "node:crypto";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
+import { digestStudioCanonicalJson as digest } from "./studio-canonical-json.js";
 import { inspectManagedProject } from "./managed-project.js";
 import {
   assertSafeSqliteSidecars,
@@ -413,19 +414,6 @@ function fail(
   throw new StudioGenerationCheckpointError(code, message, details);
 }
 
-function stableValue(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(stableValue);
-  if (!value || typeof value !== "object") return value;
-  return Object.fromEntries(Object.entries(value as Record<string, unknown>)
-    .filter(([, entry]) => entry !== undefined)
-    .sort(([left], [right]) => left.localeCompare(right, "en"))
-    .map(([key, entry]) => [key, stableValue(entry)]));
-}
-
-function digest(value: unknown): string {
-  return createHash("sha256").update(JSON.stringify(stableValue(value)), "utf8").digest("hex");
-}
-
 function requiredText(value: unknown, label: string, maximum = 8_000): string {
   if (typeof value !== "string") fail("invalid-input", label + " 必须是字符串。");
   const normalized = value.trim();
@@ -743,11 +731,12 @@ async function ensureCheckpointSchema(databasePath: string): Promise<void> {
   assertSqliteSourceBindingIdentity(databasePath, sourceIdentity, "generation checkpoint ledger");
   assertSafeSqliteSidecars(databasePath, "generation checkpoint ledger");
 
-  const db = new DatabaseSync(databasePath, { timeout: BUSY_TIMEOUT_MS });
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
+  const db = new DatabaseSync(databasePath, { timeout: busyTimeoutMs });
   try {
     assertSafeSqliteSidecars(databasePath, "generation checkpoint ledger");
     assertSqliteSourceBindingIdentity(databasePath, sourceIdentity, "generation checkpoint ledger");
-    db.exec("PRAGMA busy_timeout=" + BUSY_TIMEOUT_MS + "; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;");
+    db.exec("PRAGMA busy_timeout=" + busyTimeoutMs + "; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;");
     db.exec("BEGIN IMMEDIATE");
     try {
       assertBaseSchema(db);
@@ -780,11 +769,12 @@ async function ensureCheckpointSchema(databasePath: string): Promise<void> {
 function openDatabase(context: CheckpointDatabaseContext): DatabaseSync {
   assertSafeSqliteSidecars(context.databasePath, "generation checkpoint ledger");
   assertSqliteSourceBindingIdentity(context.databasePath, context.sourceIdentity, "generation checkpoint ledger");
-  const db = new DatabaseSync(context.databasePath, { timeout: BUSY_TIMEOUT_MS });
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
+  const db = new DatabaseSync(context.databasePath, { timeout: busyTimeoutMs });
   try {
     assertSafeSqliteSidecars(context.databasePath, "generation checkpoint ledger");
     assertSqliteSourceBindingIdentity(context.databasePath, context.sourceIdentity, "generation checkpoint ledger");
-    db.exec("PRAGMA busy_timeout=" + BUSY_TIMEOUT_MS + "; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;");
+    db.exec("PRAGMA busy_timeout=" + busyTimeoutMs + "; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;");
     const journal = db.prepare("PRAGMA journal_mode").get() as { journal_mode?: string } | undefined;
     if (journal?.journal_mode?.toLowerCase() !== "wal") fail("storage-invalid", "六图停检必须复用 WAL generation ledger。");
     assertBaseSchema(db);

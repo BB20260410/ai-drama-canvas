@@ -10,14 +10,16 @@ const source = (relative: string): string => readFileSync(path.join(root, relati
 describe("全剧本素材目录 UI / IPC 合同", () => {
   it("main 与 preload 同时暴露资产实体和逐张版本图片的只读 IPC/API", () => {
     const main = source("src/main/index.ts");
+    const registrar = source("src/main/studio-global-resource-read-ipc.ts");
     const preload = source("src/preload/index.ts");
 
-    expect(main).toContain('ipcMain.handle("canvas:list-global-studio-assets"');
-    expect(main).toContain("listGlobalStudioAssetCatalog(query)");
-    expect(main).toContain('ipcMain.handle("canvas:list-global-studio-asset-images"');
-    expect(main).toContain("listGlobalStudioAssetResourceImages(query)");
-    expect(main).toContain('ipcMain.handle("canvas:get-global-studio-asset-image"');
-    expect(main).toContain("getGlobalStudioAssetResourceImage(projectRoot, mediaSha256)");
+    expect(main).toContain("registerStudioGlobalResourceReadIpc(ipcMain.handle.bind(ipcMain));");
+    expect(registrar).toContain('handle("canvas:list-global-studio-assets"');
+    expect(registrar).toContain("services.listGlobalStudioAssetCatalog(query)");
+    expect(registrar).toContain('handle("canvas:list-global-studio-asset-images"');
+    expect(registrar).toContain("services.listGlobalStudioAssetResourceImages(query)");
+    expect(registrar).toContain('handle("canvas:get-global-studio-asset-image"');
+    expect(registrar).toContain("services.getGlobalStudioAssetResourceImage(projectRoot, mediaSha256)");
 
     expect(preload).toContain("listGlobalStudioAssets:");
     expect(preload).toContain('ipcRenderer.invoke("canvas:list-global-studio-assets", query)');

@@ -7,7 +7,7 @@ import { pathToFileURL } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import sharp from "sharp";
 import { seedProductionReady } from "./workflow-helpers.js";
-import { applyEditOperation, beginEditorSession, cancelEditRender, closeEditorSession, createEditProject, createVideoContinuationPack, exportEditProjectOtio, extractLastFrame, extractTimelineFrame, getEditHistoryInfo, getEditProject, getEditorSessionState, importEditProjectOtio, listEditMedia, listEditProjects, listEditRenderJobs, listTimelineFrameExtractions, listVideoContinuationPacks, prepareEditMediaPreview, prepareEditMediaProxy, prepareTimelineVideoContinuation, probeVideoEngine, redoEditProject, renderEditProject, resolveEditorSessionRecovery, saveEditProject, setEditorSessionProject, startEditRender, undoEditProject, updateVideoContinuationPack, waitForEditRender } from "../src/core/editor.js";
+import { MAX_EDIT_TIMELINE_SECONDS, applyEditOperation, beginEditorSession, cancelEditRender, closeEditorSession, createEditProject, createVideoContinuationPack, exportEditProjectOtio, extractLastFrame, extractTimelineFrame, getEditHistoryInfo, getEditProject, getEditorSessionState, importEditProjectOtio, listEditMedia, listEditProjects, listEditRenderJobs, listTimelineFrameExtractions, listVideoContinuationPacks, prepareEditMediaPreview, prepareEditMediaProxy, prepareTimelineVideoContinuation, probeVideoEngine, redoEditProject, renderEditProject, resolveEditorSessionRecovery, saveEditProject, setEditorSessionProject, startEditRender, undoEditProject, updateVideoContinuationPack, waitForEditRender } from "../src/core/editor.js";
 import { listAssetRelations } from "../src/core/asset-registry.js";
 import { executeIdempotentCommand } from "../src/core/command-bus.js";
 import { listGenerationJobs, processGenerationQueue } from "../src/core/generation.js";
@@ -222,6 +222,13 @@ describe("本地成片剪辑工程", () => {
     const media = (await listEditMedia(root, 1)).find((item) => item.kind === "video")!;
     const created = await createEditProject(root, { name: "命令编辑", episode: 1, width: 320, height: 320, fps: 23.976, autoPopulate: false });
     const mainTrack = created.tracks.find((track) => track.kind === "visual")!;
+    await expect(applyEditOperation(root, created.id, created.revision, {
+      type: "add_media_clip",
+      trackId: mainTrack.id,
+      mediaId: media.id,
+      startSeconds: MAX_EDIT_TIMELINE_SECONDS + 1,
+    })).rejects.toThrow(/有界时间线/u);
+    expect((await getEditProject(root, created.id)).revision).toBe(created.revision);
     const added = await applyEditOperation(root, created.id, created.revision, { type: "add_media_clip", trackId: mainTrack.id, mediaId: media.id, startSeconds: 0 });
     expect(added.project.revision).toBe(2);
     const clipId = added.affectedClipIds[0]!;

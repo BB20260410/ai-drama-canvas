@@ -21,7 +21,13 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import sharp from "sharp";
+import { studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
+import sharp, { type Metadata } from "sharp";
+import {
+  canonicalizeStudioJsonValue as stableValue,
+  digestStudioCanonicalJson as digest,
+  serializeStudioCanonicalJsonPretty,
+} from "./studio-canonical-json.js";
 import { getStudioMedia, verifyStudioMediaObject } from "./material-studio.js";
 import { inspectManagedProject, inspectManagedProjectReadOnly, type ProjectShell } from "./managed-project.js";
 import {
@@ -59,7 +65,7 @@ import {
   readDuduFrozenVisualExecutionUnit,
   type DuduParsedPanel,
 } from "./dudu-readonly-source.js";
-import { withFileLock, withProjectLock } from "./locks.js";
+import { withProjectLock } from "./locks.js";
 import { getOperationContext } from "./operation-context.js";
 import { openSqliteReadOnlySnapshot, type SqliteReadOnlySnapshot } from "./sqlite-readonly-snapshot.js";
 
@@ -855,19 +861,6 @@ export async function prepareStudioVideoPackageSource(
   });
 }
 
-function stableValue(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(stableValue);
-  if (!value || typeof value !== "object") return value;
-  return Object.fromEntries(Object.entries(value as Record<string, unknown>)
-    .filter(([, entry]) => entry !== undefined)
-    .sort(([left], [right]) => left.localeCompare(right, "en"))
-    .map(([key, entry]) => [key, stableValue(entry)]));
-}
-
-function digest(value: unknown): string {
-  return createHash("sha256").update(JSON.stringify(stableValue(value)), "utf8").digest("hex");
-}
-
 async function sha256File(filePath: string): Promise<string> {
   return (await readStableFile(filePath)).sha256;
 }
@@ -1095,9 +1088,10 @@ async function generationDatabasePathReadOnly(projectRoot: string): Promise<stri
 }
 
 function openDatabase(databasePath: string, initialize: boolean): DatabaseSync {
-  const db = new DatabaseSync(databasePath, { timeout: BUSY_TIMEOUT_MILLISECONDS, readOnly: !initialize });
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MILLISECONDS);
+  const db = new DatabaseSync(databasePath, { timeout: busyTimeoutMs, readOnly: !initialize });
   try {
-    db.exec(`PRAGMA busy_timeout=${BUSY_TIMEOUT_MILLISECONDS}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
+    db.exec(`PRAGMA busy_timeout=${busyTimeoutMs}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
     const journal = db.prepare("PRAGMA journal_mode").get() as { journal_mode?: string } | undefined;
     if (journal?.journal_mode?.toLowerCase() !== "wal") fail("storage-invalid", "视频包账本必须复用 WAL generation ledger。");
     if (initialize) ensureSchema(db);
@@ -2429,7 +2423,7 @@ async function buildStudioReviewSourceSpec(input: {
     || visual.panels.length !== pack.panels.length)) {
     fail("input-drift", `${input.authority.unitId} 的冻结视觉执行与 Studio unit-grid 不一致。`);
   }
-  let metadata: sharp.Metadata;
+  let metadata: Metadata;
   try {
     metadata = await sharp(input.rawSnapshot.bytes, { failOn: "error", limitInputPixels: 100_000_000 }).metadata();
   } catch (error) {
@@ -2675,7 +2669,7 @@ async function buildStudioReviewSourceSpec(input: {
     panels,
     shots,
   };
-  const bytes = Buffer.from(`${JSON.stringify(stableValue(value), null, 2)}\n`, "utf8");
+  const bytes = Buffer.from(serializeStudioCanonicalJsonPretty(value), "utf8");
   return {
     value,
     snapshot: { bytes, sizeBytes: bytes.byteLength, sha256: createHash("sha256").update(bytes).digest("hex") },
@@ -4508,7 +4502,7 @@ async function writeCoreManagedVideoPackage(
     );
   }
   await writeGenerated(`${authority.unitId}_labeled.png`, external.labeledSnapshot.bytes);
-  const videoJsonBytes = Buffer.from(`${JSON.stringify(stableValue(spec), null, 2)}\n`, "utf8");
+  const videoJsonBytes = Buffer.from(serializeStudioCanonicalJsonPretty(spec), "utf8");
   await writeGenerated(`${authority.unitId}_video.json`, videoJsonBytes);
   const manifest = {
     manifest_version: "2.0",
@@ -4529,7 +4523,7 @@ async function writeCoreManagedVideoPackage(
   };
   await writeFile(
     path.join(packagePath, "manifest.json"),
-    `${JSON.stringify(stableValue(manifest), null, 2)}\n`,
+    serializeStudioCanonicalJsonPretty(manifest),
     { flag: "wx", mode: 0o600 },
   );
 }
@@ -5657,7 +5651,7 @@ async function bindStagedAuthorityLabeled(
     return { ...(entry as Record<string, unknown>), sha256: authority.labeledSha256 };
   });
   if (matched !== 1) fail("verify-failed", "staged 视频包 manifest 未唯一列出总 labeled。 ");
-  await writeFile(manifestPath, `${JSON.stringify(stableValue(manifest), null, 2)}\n`, { flag: "w", mode: 0o600 });
+  await writeFile(manifestPath, serializeStudioCanonicalJsonPretty(manifest), { flag: "w", mode: 0o600 });
 }
 
 async function installStudioReviewProjectionInputs(
@@ -5994,8 +5988,8 @@ export async function buildAndVerifyStudioVideoPackage(
     db.close();
   }
   const shell = await inspectManagedProject(projectRoot);
-  const runBuild = () => withFileLock(
-      path.join(shell.paths.sidecar, "locks"),
+  const runBuild = () => withProjectLock(
+      shell.paths.root,
       `studio-video-package-${intent.unitId}`,
       async () => {
       const authority = await authorityFromIntent(shell.paths.root, intent);
@@ -6235,7 +6229,7 @@ export async function buildAndVerifyStudioVideoPackage(
         return { intent, receipt: inserted.receipt, replayed: inserted.replayed, adoptedExisting };
       });
     },
-      { timeoutMs: 15_000, staleMs: EXECUTION_TIMEOUT_MS * 2, confinementRoot: shell.paths.root },
+      { timeoutMs: 15_000, staleMs: EXECUTION_TIMEOUT_MS * 2 },
     );
   // command-bus 已以 studio-mutation → unit package lock 的固定顺序调用本函数。
   // 直接 Core 调用也必须取得同一项目级 fence，既补齐测试/恢复调用的线性化边界，
@@ -6442,7 +6436,7 @@ export async function publishStudioVideoPackageReplacement(
     initialDb.close();
   }
   const shell = await inspectManagedProject(projectRoot);
-  return withFileLock(path.join(shell.paths.sidecar, "locks"), `studio-video-package-${successor.unitId}`, async () => {
+  return withProjectLock(shell.paths.root, `studio-video-package-${successor.unitId}`, async () => {
     let completed: StudioVideoPackagePublicationReceipt | null = null;
     const lockedDb = openDatabase(databasePath, true);
     try {
@@ -6724,7 +6718,7 @@ export async function publishStudioVideoPackageReplacement(
     } finally {
       receiptDb.close();
     }
-  }, { timeoutMs: 15_000, staleMs: EXECUTION_TIMEOUT_MS * 2, confinementRoot: shell.paths.root });
+  }, { timeoutMs: 15_000, staleMs: EXECUTION_TIMEOUT_MS * 2 });
 }
 
 async function openCoreDatabaseReadOnly(databasePath: string, label: string): Promise<SqliteReadOnlySnapshot> {

@@ -4,13 +4,68 @@ import { constants as fsConstants } from "node:fs";
 import { link, lstat, mkdir, open, readFile, readdir, realpath, rename, rm, unlink } from "node:fs/promises";
 import path from "node:path";
 import { recordManagedProjectShellInspection } from "./runtime-storage-observability.js";
-import { ProjectCache } from "./cache.js";
+import {
+  measureStudioUnitsReadPhase,
+  recordStudioUnitsReadCounter,
+} from "./studio-units-read-phase-timeline.js";
+import {
+  PROJECT_CACHE_V2_FILE,
+  ProjectCache,
+  createLegacyProjectCacheWriterFence,
+  inspectLegacyProjectCacheWriterFence,
+} from "./cache.js";
 import { ensureSidecar, getSidecarPaths, saveIndex, writeJsonAtomic } from "./sidecar.js";
-import type { ProgressSummary, ProjectConfig, ProjectIndex, WorkItemStatus } from "./types.js";
+import type {
+  AttachNovelManifestInput,
+  ProgressSummary,
+  ProjectConfig,
+  ProjectIndex,
+  WorkItemStatus,
+} from "./types.js";
 import { WORK_ITEM_STATUSES } from "./types.js";
 import { initializeMaterialStudio } from "./material-studio.js";
 import { initializeStudioProduction } from "./studio-production.js";
 import { withProjectLock } from "./locks.js";
+import {
+  createManagedProjectWriterFence,
+  inspectManagedProjectWriterFence,
+} from "./managed-writer-fence.js";
+import {
+  inspectExistingConfinedDirectory,
+  readConfinedRegularFileWithIdentity,
+  replaceConfinedBytesCas,
+} from "./confined-project-storage.js";
+import {
+  MANAGED_PROJECT_WRITER_SCHEMA_VERSION,
+  NOVEL_CHAPTER_MANIFEST_RELATIVE_PATH,
+  NOVEL_MANIFEST_RELATIVE_PATH,
+  isNovelSourceMode,
+  isWorkspaceMode,
+  type NovelWorkspaceManifest,
+  type NovelWorkspaceDeclaration,
+  type WorkspaceMode,
+} from "./novel-types.js";
+
+export type { NovelWorkspaceDeclaration, WorkspaceMode } from "./novel-types.js";
+
+interface AttachNovelManifestTestHooks {
+  beforeManagedManifestReplace?: (input: {
+    projectRoot: string;
+    manifestPath: string;
+  }) => void | Promise<void>;
+}
+
+let attachNovelManifestTestHooks: AttachNovelManifestTestHooks = {};
+
+/** 仅供确定性 TOCTOU 测试；产品环境不可启用。 */
+export function __setAttachNovelManifestTestHooksForTests(
+  hooks: AttachNovelManifestTestHooks,
+): () => void {
+  if (process.env.NODE_ENV !== "test") throw new Error("attach novel manifest 测试 hook 只允许测试环境启用。");
+  const previous = attachNovelManifestTestHooks;
+  attachNovelManifestTestHooks = hooks;
+  return () => { attachNovelManifestTestHooks = previous; };
+}
 
 const MANAGED_MANIFEST_FILE = "managed-project.json";
 const MANAGED_BOOTSTRAP_CLAIM_RELATIVE_PATH = ".aicanvas/managed-bootstrap-claim.json";
@@ -20,12 +75,14 @@ const MANAGED_BOOTSTRAP_RECOVERY_RECORD_PATTERN = /^recovery-[a-f0-9]{64}\.json$
 const MAX_BOOTSTRAP_RECOVERY_RECORD_BYTES = 1024 * 1024;
 const MAX_BOOTSTRAP_RECOVERY_ATTEMPTS = 64;
 const MAX_BOOTSTRAP_CLAIM_BYTES = 64 * 1024;
+const MAX_NOVEL_WORKSPACE_MANIFEST_BYTES = 1024 * 1024;
 const MANAGED_NEXT_ACTION = "导入剧本，并建立角色、场景、道具、风格的权威资产与一致性锁定。";
 
 export interface CreateManagedProjectOptions {
   parentRoot: string;
   name: string;
   slug?: string;
+  workspaceMode?: WorkspaceMode;
   /**
    * 可选的创建前不可变归属声明。owner 在任何 sidecar/DB 初始化之前写入固定路径，
    * 供上层在进程崩溃后精确识别完整 orphan；不参与项目注册或活动指针。
@@ -34,10 +91,12 @@ export interface CreateManagedProjectOptions {
 }
 
 export interface ManagedProjectBootstrapClaim {
-  schemaVersion: 2;
+  schemaVersion: 3;
   kind: "managed-project-bootstrap-claim";
   claimId: string;
   projectRoot: string;
+  workspaceMode: WorkspaceMode;
+  minimumWriterSchemaVersion: 1 | typeof MANAGED_PROJECT_WRITER_SCHEMA_VERSION;
   purpose: string;
   payload: Record<string, unknown>;
   createdAt: string;
@@ -59,9 +118,11 @@ export interface ManagedProjectBootstrapRecoveryAttempt {
 }
 
 export interface ManagedProjectBootstrapRecoveryRecord {
-  schemaVersion: 1;
+  schemaVersion: 2;
   kind: "managed-project-bootstrap-recovery";
   originalProjectRoot: string;
+  workspaceMode: WorkspaceMode;
+  minimumWriterSchemaVersion: 1 | typeof MANAGED_PROJECT_WRITER_SCHEMA_VERSION;
   bootstrapPurpose: string;
   bootstrapPayload: Record<string, unknown>;
   attempts: ManagedProjectBootstrapRecoveryAttempt[];
@@ -69,8 +130,7 @@ export interface ManagedProjectBootstrapRecoveryRecord {
   fingerprint: string;
 }
 
-export interface ManagedProjectManifest {
-  schemaVersion: 1;
+interface ManagedProjectManifestBase {
   kind: "ai-canvas-managed-project";
   projectId: string;
   projectName: string;
@@ -85,7 +145,7 @@ export interface ManagedProjectManifest {
   relativePaths: {
     config: ".aicanvas/project.json";
     index: ".aicanvas/index.json";
-    cache: ".aicanvas/cache.sqlite";
+    cache: ".aicanvas/cache.sqlite" | `.aicanvas/${typeof PROJECT_CACHE_V2_FILE}`;
     materialDatabase: ".aicanvas/material-studio.sqlite";
     productionDatabase?: ".aicanvas/studio-production.sqlite";
     textCas?: ".aicanvas/studio-production/objects/sha256";
@@ -99,6 +159,22 @@ export interface ManagedProjectManifest {
   createdAt: string;
   fingerprint: string;
 }
+
+export interface ManagedProjectManifestV1 extends ManagedProjectManifestBase {
+  schemaVersion: 1;
+  workspaceMode?: never;
+  minimumWriterSchemaVersion?: never;
+  novelManifest?: never;
+}
+
+export interface ManagedProjectManifestV2 extends ManagedProjectManifestBase, NovelWorkspaceDeclaration {
+  schemaVersion: 2;
+  workspaceMode: Exclude<WorkspaceMode, "drama">;
+  minimumWriterSchemaVersion: typeof MANAGED_PROJECT_WRITER_SCHEMA_VERSION;
+  novelManifest?: typeof NOVEL_MANIFEST_RELATIVE_PATH;
+}
+
+export type ManagedProjectManifest = ManagedProjectManifestV1 | ManagedProjectManifestV2;
 
 export interface ManagedProjectPaths {
   root: string;
@@ -121,6 +197,7 @@ export interface ManagedProjectPaths {
 
 export interface ProjectShell {
   project: ProjectConfig;
+  workspaceMode: WorkspaceMode;
   counts: {
     total: number;
     items: number;
@@ -131,7 +208,12 @@ export interface ProjectShell {
   };
   nextAction: string;
   manifestFingerprint: string;
-  manifest: Pick<ManagedProjectManifest, "storageMode" | "startupPolicy" | "mediaMode" | "legacyRoots" | "fingerprint">;
+  manifest: Pick<ManagedProjectManifestBase, "storageMode" | "startupPolicy" | "mediaMode" | "legacyRoots" | "fingerprint"> & {
+    schemaVersion: ManagedProjectManifest["schemaVersion"];
+    workspaceMode: WorkspaceMode;
+    minimumWriterSchemaVersion?: typeof MANAGED_PROJECT_WRITER_SCHEMA_VERSION;
+    novelManifest?: typeof NOVEL_MANIFEST_RELATIVE_PATH;
+  };
   paths: ManagedProjectPaths;
 }
 
@@ -156,8 +238,36 @@ function stableValue(value: unknown): unknown {
     .map(([key, entry]) => [key, stableValue(entry)]));
 }
 
-function manifestFingerprint(manifest: Omit<ManagedProjectManifest, "fingerprint">): string {
+type ManagedProjectManifestPayload =
+  | Omit<ManagedProjectManifestV1, "fingerprint">
+  | Omit<ManagedProjectManifestV2, "fingerprint">;
+
+function manifestFingerprint(manifest: ManagedProjectManifestPayload): string {
   return sha256(JSON.stringify(stableValue(manifest)));
+}
+
+function novelWorkspaceManifestFingerprint(
+  manifest: Omit<NovelWorkspaceManifest, "fingerprint">,
+): string {
+  return sha256(JSON.stringify(stableValue(manifest)));
+}
+
+function normalizeWorkspaceMode(value: unknown): WorkspaceMode {
+  if (value === undefined) return "drama";
+  if (!isWorkspaceMode(value)) throw new Error(`受管项目 workspaceMode 无效：${String(value)}`);
+  return value;
+}
+
+function minimumWriterSchemaVersionForWorkspace(
+  workspaceMode: WorkspaceMode,
+): 1 | typeof MANAGED_PROJECT_WRITER_SCHEMA_VERSION {
+  return workspaceMode === "drama" ? 1 : MANAGED_PROJECT_WRITER_SCHEMA_VERSION;
+}
+
+function requireBootstrapRecoveryCompatibleWorkspaceMode(
+  options: Pick<CreateManagedProjectOptions, "workspaceMode" | "bootstrapClaim">,
+): WorkspaceMode {
+  return normalizeWorkspaceMode(options.workspaceMode);
 }
 
 function normalizeBootstrapPurpose(value: string): string {
@@ -173,13 +283,16 @@ function bootstrapClaimFingerprint(value: Omit<ManagedProjectBootstrapClaim, "fi
 async function writeManagedBootstrapClaim(
   projectRoot: string,
   input: NonNullable<CreateManagedProjectOptions["bootstrapClaim"]>,
+  workspaceMode: WorkspaceMode,
 ): Promise<ManagedProjectBootstrapClaim> {
   if (!isRecord(input.payload)) throw new Error("bootstrapClaim.payload 必须是 JSON 对象。");
   const semantic: Omit<ManagedProjectBootstrapClaim, "fingerprint"> = {
-    schemaVersion: 2,
+    schemaVersion: 3,
     kind: "managed-project-bootstrap-claim",
     claimId: randomBytes(16).toString("hex"),
     projectRoot,
+    workspaceMode,
+    minimumWriterSchemaVersion: minimumWriterSchemaVersionForWorkspace(workspaceMode),
     purpose: normalizeBootstrapPurpose(input.purpose),
     payload: structuredClone(input.payload),
     createdAt: new Date().toISOString(),
@@ -247,9 +360,11 @@ async function readManagedProjectBootstrapClaimFromLocation(
     await handle.close();
   }
   const parsed = parseJsonObject(bytes, claimPath);
-  if (parsed.schemaVersion !== 2 || parsed.kind !== "managed-project-bootstrap-claim"
+  if (parsed.schemaVersion !== 3 || parsed.kind !== "managed-project-bootstrap-claim"
     || typeof parsed.claimId !== "string" || !/^[a-f0-9]{32}$/u.test(parsed.claimId)
     || parsed.projectRoot !== canonicalExpectedProjectRoot
+    || !isWorkspaceMode(parsed.workspaceMode)
+    || parsed.minimumWriterSchemaVersion !== minimumWriterSchemaVersionForWorkspace(parsed.workspaceMode)
     || typeof parsed.purpose !== "string" || !isRecord(parsed.payload)
     || typeof parsed.createdAt !== "string" || typeof parsed.fingerprint !== "string") {
     throw new Error("managed bootstrap claim 结构无效。 ");
@@ -268,7 +383,7 @@ export async function readManagedProjectBootstrapClaim(
   return readManagedProjectBootstrapClaimFromLocation(canonicalRoot, canonicalRoot);
 }
 
-function managedPaths(projectRoot: string): ManagedProjectPaths {
+function managedPaths(projectRoot: string, workspaceMode: WorkspaceMode = "drama"): ManagedProjectPaths {
   const sidecar = getSidecarPaths(projectRoot);
   const derivedRoot = path.join(sidecar.root, "derived");
   return {
@@ -276,7 +391,7 @@ function managedPaths(projectRoot: string): ManagedProjectPaths {
     sidecar: sidecar.root,
     config: sidecar.config,
     index: sidecar.index,
-    cache: sidecar.cache,
+    cache: workspaceMode === "drama" ? sidecar.cache : path.join(sidecar.root, PROJECT_CACHE_V2_FILE),
     manifest: path.join(sidecar.root, MANAGED_MANIFEST_FILE),
     materialDatabase: path.join(sidecar.root, "material-studio.sqlite"),
     productionDatabase: path.join(sidecar.root, "studio-production.sqlite"),
@@ -373,10 +488,16 @@ async function getManagedBootstrapQuarantineDirectory(
   return quarantine;
 }
 
-function bootstrapRecoveryNamespaceName(purpose: string, payload: Record<string, unknown>): string {
+function bootstrapRecoveryNamespaceName(
+  purpose: string,
+  payload: Record<string, unknown>,
+  workspaceMode: WorkspaceMode,
+): string {
   return `owner-${sha256(JSON.stringify(stableValue({
     purpose: normalizeBootstrapPurpose(purpose),
     payload,
+    workspaceMode,
+    minimumWriterSchemaVersion: minimumWriterSchemaVersionForWorkspace(workspaceMode),
   })))}`;
 }
 
@@ -384,9 +505,10 @@ async function getManagedBootstrapRecoveryNamespace(
   quarantine: string,
   purpose: string,
   payload: Record<string, unknown>,
+  workspaceMode: WorkspaceMode,
   create: boolean,
 ): Promise<string | null> {
-  const namespace = path.join(quarantine, bootstrapRecoveryNamespaceName(purpose, payload));
+  const namespace = path.join(quarantine, bootstrapRecoveryNamespaceName(purpose, payload, workspaceMode));
   let metadata = await lstat(namespace).catch((error: unknown) => {
     if (error instanceof Error && "code" in error && (error as NodeJS.ErrnoException).code === "ENOENT") return null;
     throw error;
@@ -415,8 +537,10 @@ function validateBootstrapRecoveryRecord(
   parentRoot: string,
   namespace: string,
 ): ManagedProjectBootstrapRecoveryRecord {
-  if (raw.schemaVersion !== 1 || raw.kind !== "managed-project-bootstrap-recovery"
+  if (raw.schemaVersion !== 2 || raw.kind !== "managed-project-bootstrap-recovery"
     || typeof raw.originalProjectRoot !== "string"
+    || !isWorkspaceMode(raw.workspaceMode)
+    || raw.minimumWriterSchemaVersion !== minimumWriterSchemaVersionForWorkspace(raw.workspaceMode)
     || typeof raw.bootstrapPurpose !== "string"
     || !isRecord(raw.bootstrapPayload)
     || !Array.isArray(raw.attempts)
@@ -433,6 +557,13 @@ function validateBootstrapRecoveryRecord(
     throw new Error(`managed bootstrap recovery 原路径越界或身份不一致：${recordPath}`);
   }
   normalizeBootstrapPurpose(record.bootstrapPurpose);
+  if (path.basename(namespace) !== bootstrapRecoveryNamespaceName(
+    record.bootstrapPurpose,
+    record.bootstrapPayload,
+    record.workspaceMode,
+  )) {
+    throw new Error(`managed bootstrap recovery owner namespace 与工作区身份不一致：${recordPath}`);
+  }
   const seenRecoveryIds = new Set<string>();
   const seenQuarantinedRoots = new Set<string>();
   for (const attempt of record.attempts) {
@@ -621,14 +752,112 @@ function parseJsonObject(content: Buffer, filePath: string): Record<string, unkn
   return parsed;
 }
 
-function validateProjectConfig(value: Record<string, unknown>, filePath: string): ProjectConfig {
+function isCanonicalUtcIsoDate(value: unknown): value is string {
+  if (typeof value !== "string") return false;
+  const milliseconds = Date.parse(value);
+  return Number.isFinite(milliseconds) && new Date(milliseconds).toISOString() === value;
+}
+
+function validateNovelWorkspaceManifestForAttachment(
+  value: Record<string, unknown>,
+  filePath: string,
+): NovelWorkspaceManifest {
   if (value.schemaVersion !== 1
+    || value.kind !== "novel-workspace-manifest"
+    || typeof value.projectId !== "string" || value.projectId.length === 0
+    || !isNovelSourceMode(value.sourceMode)
+    || (value.sourceMode === "managed_markdown"
+      ? value.chapterManifest !== NOVEL_CHAPTER_MANIFEST_RELATIVE_PATH
+      : value.chapterManifest !== undefined)
+    || !Array.isArray(value.sourceReceiptIds)
+    || !value.sourceReceiptIds.every((entry) => typeof entry === "string" && entry.length > 0)
+    || new Set(value.sourceReceiptIds).size !== value.sourceReceiptIds.length
+    || typeof value.revision !== "number" || !Number.isSafeInteger(value.revision) || value.revision < 1
+    || !isCanonicalUtcIsoDate(value.createdAt)
+    || !isCanonicalUtcIsoDate(value.updatedAt)
+    || typeof value.fingerprint !== "string" || !/^[a-f0-9]{64}$/u.test(value.fingerprint)) {
+    throw new Error(`novel workspace manifest 结构无效：${filePath}`);
+  }
+  const manifest = value as unknown as NovelWorkspaceManifest;
+  const { fingerprint, ...semantic } = manifest;
+  if (novelWorkspaceManifestFingerprint(semantic) !== fingerprint) {
+    throw new Error(`novel workspace manifest fingerprint 无效：${filePath}`);
+  }
+  return manifest;
+}
+
+async function readNovelWorkspaceManifestForAttachment(
+  projectRoot: string,
+): Promise<NovelWorkspaceManifest> {
+  const manifestPath = path.join(projectRoot, NOVEL_MANIFEST_RELATIVE_PATH);
+  if (path.relative(projectRoot, manifestPath) !== NOVEL_MANIFEST_RELATIVE_PATH) {
+    throw new Error("novel workspace manifest locator 不是固定受管路径。 ");
+  }
+  const manifestDirectory = path.dirname(manifestPath);
+  const directoryMetadata = await lstat(manifestDirectory).catch(() => null);
+  if (!directoryMetadata || !directoryMetadata.isDirectory() || directoryMetadata.isSymbolicLink()
+    || await realpath(manifestDirectory) !== manifestDirectory
+    || !isWithin(manifestDirectory, projectRoot)) {
+    throw new Error(`novel workspace manifest 父目录不是项目内安全真实目录：${manifestDirectory}`);
+  }
+  const metadata = await lstat(manifestPath).catch(() => null);
+  if (!metadata || !metadata.isFile() || metadata.isSymbolicLink()
+    || metadata.nlink !== 1
+    || metadata.size < 2 || metadata.size > MAX_NOVEL_WORKSPACE_MANIFEST_BYTES
+    || await realpath(manifestPath) !== manifestPath) {
+    throw new Error(`novel workspace manifest 不是安全普通文件：${manifestPath}`);
+  }
+  const handle = await open(manifestPath, fsConstants.O_RDONLY | fsConstants.O_NOFOLLOW);
+  let bytes: Buffer;
+  try {
+    const before = await handle.stat();
+    if (!before.isFile() || before.nlink !== 1
+      || before.dev !== metadata.dev || before.ino !== metadata.ino
+      || before.size < 2 || before.size > MAX_NOVEL_WORKSPACE_MANIFEST_BYTES) {
+      throw new Error(`novel workspace manifest 文件身份无效：${manifestPath}`);
+    }
+    bytes = await handle.readFile();
+    const after = await handle.stat();
+    const pathAfter = await lstat(manifestPath);
+    if (!after.isFile() || after.nlink !== 1 || !pathAfter.isFile() || pathAfter.isSymbolicLink()
+      || pathAfter.nlink !== 1
+      || before.dev !== after.dev || before.ino !== after.ino || before.size !== after.size
+      || before.mtimeMs !== after.mtimeMs || before.ctimeMs !== after.ctimeMs
+      || pathAfter.dev !== before.dev || pathAfter.ino !== before.ino
+      || pathAfter.size !== before.size || pathAfter.mtimeMs !== before.mtimeMs
+      || pathAfter.ctimeMs !== before.ctimeMs
+      || bytes.byteLength !== before.size || await realpath(manifestPath) !== manifestPath) {
+      throw new Error(`novel workspace manifest 读取期间发生替换：${manifestPath}`);
+    }
+  } finally {
+    await handle.close();
+  }
+  return validateNovelWorkspaceManifestForAttachment(parseJsonObject(bytes, manifestPath), manifestPath);
+}
+
+function validateProjectConfig(value: Record<string, unknown>, filePath: string): ProjectConfig {
+  if (typeof value.schemaVersion === "number"
+    && Number.isSafeInteger(value.schemaVersion)
+    && value.schemaVersion > MANAGED_PROJECT_WRITER_SCHEMA_VERSION) {
+    throw new Error(
+      `受管项目配置最低 writer v${value.schemaVersion} 高于当前 writer v${MANAGED_PROJECT_WRITER_SCHEMA_VERSION}，已在任何侧车或账本写入前停止：${filePath}`,
+    );
+  }
+  if ((value.schemaVersion !== 1 && value.schemaVersion !== 2)
     || typeof value.id !== "string"
     || typeof value.name !== "string"
     || typeof value.primaryRoot !== "string"
     || !Array.isArray(value.sourceRoots) || !value.sourceRoots.every((entry) => typeof entry === "string")
     || !Array.isArray(value.outputRoots) || !value.outputRoots.every((entry) => typeof entry === "string")) {
     throw new Error(`受管项目配置结构无效：${filePath}`);
+  }
+  if (value.schemaVersion === 1) {
+    if ("workspaceMode" in value || "minimumWriterSchemaVersion" in value) {
+      throw new Error(`schema v1 受管项目配置不得夹带 v2 writer 字段：${filePath}`);
+    }
+  } else if ((value.workspaceMode !== "novel" && value.workspaceMode !== "hybrid")
+    || value.minimumWriterSchemaVersion !== MANAGED_PROJECT_WRITER_SCHEMA_VERSION) {
+    throw new Error(`schema v2 受管项目配置 writer 声明无效：${filePath}`);
   }
   return value as unknown as ProjectConfig;
 }
@@ -646,9 +875,26 @@ function validateIndex(value: Record<string, unknown>, filePath: string): Projec
 }
 
 function validateManifest(value: Record<string, unknown>, filePath: string): ManagedProjectManifest {
+  if (typeof value.schemaVersion === "number"
+    && Number.isSafeInteger(value.schemaVersion)
+    && value.schemaVersion > MANAGED_PROJECT_WRITER_SCHEMA_VERSION) {
+    throw new Error(
+      `受管项目 schema v${value.schemaVersion} 高于当前 writer v${MANAGED_PROJECT_WRITER_SCHEMA_VERSION}，已在任何侧车或账本写入前停止：${filePath}`,
+    );
+  }
+  if (value.schemaVersion !== 1 && value.schemaVersion !== 2) {
+    throw new Error(`受管项目 schemaVersion 不受支持：${filePath}`);
+  }
+  if (value.schemaVersion === 2
+    && typeof value.minimumWriterSchemaVersion === "number"
+    && Number.isSafeInteger(value.minimumWriterSchemaVersion)
+    && value.minimumWriterSchemaVersion > MANAGED_PROJECT_WRITER_SCHEMA_VERSION) {
+    throw new Error(
+      `受管项目最低 writer v${value.minimumWriterSchemaVersion} 高于当前 writer v${MANAGED_PROJECT_WRITER_SCHEMA_VERSION}，已在任何侧车或账本写入前停止：${filePath}`,
+    );
+  }
   const relativePaths = value.relativePaths;
-  if (value.schemaVersion !== 1
-    || value.kind !== "ai-canvas-managed-project"
+  if (value.kind !== "ai-canvas-managed-project"
     || typeof value.projectId !== "string"
     || typeof value.projectName !== "string"
     || typeof value.rootRealpath !== "string"
@@ -664,7 +910,6 @@ function validateManifest(value: Record<string, unknown>, filePath: string): Man
     || !isRecord(relativePaths)
     || relativePaths.config !== ".aicanvas/project.json"
     || relativePaths.index !== ".aicanvas/index.json"
-    || relativePaths.cache !== ".aicanvas/cache.sqlite"
     || relativePaths.materialDatabase !== ".aicanvas/material-studio.sqlite"
     || (relativePaths.productionDatabase !== undefined && relativePaths.productionDatabase !== ".aicanvas/studio-production.sqlite")
     || (relativePaths.textCas !== undefined && relativePaths.textCas !== ".aicanvas/studio-production/objects/sha256")
@@ -675,6 +920,20 @@ function validateManifest(value: Record<string, unknown>, filePath: string): Man
     || relativePaths.mediaProxies !== ".aicanvas/derived/proxy"
     || relativePaths.mediaWaveforms !== ".aicanvas/derived/waveform") {
     throw new Error(`受管项目 manifest 结构或隔离策略无效：${filePath}`);
+  }
+
+  if (value.schemaVersion === 1) {
+    if (relativePaths.cache !== ".aicanvas/cache.sqlite"
+      || "workspaceMode" in value || "minimumWriterSchemaVersion" in value || "novelManifest" in value) {
+      throw new Error(`schema v1 manifest 不得夹带 v2 工作区字段：${filePath}`);
+    }
+  } else {
+    if (relativePaths.cache !== `.aicanvas/${PROJECT_CACHE_V2_FILE}`
+      || (value.workspaceMode !== "novel" && value.workspaceMode !== "hybrid")
+      || value.minimumWriterSchemaVersion !== MANAGED_PROJECT_WRITER_SCHEMA_VERSION
+      || (value.novelManifest !== undefined && value.novelManifest !== NOVEL_MANIFEST_RELATIVE_PATH)) {
+      throw new Error(`schema v2 manifest 的工作区声明无效：${filePath}`);
+    }
   }
   return value as unknown as ManagedProjectManifest;
 }
@@ -726,10 +985,50 @@ async function writeManagedManifest(
   project: ProjectConfig,
   index: ProjectIndex,
   createdAt: string,
+  workspaceMode: WorkspaceMode,
 ): Promise<void> {
   const [configContent, indexContent] = await Promise.all([readFile(paths.config), readFile(paths.index)]);
-  const manifestPayload: Omit<ManagedProjectManifest, "fingerprint"> = {
-    schemaVersion: 1,
+  const relativePaths: ManagedProjectManifestBase["relativePaths"] = {
+    config: ".aicanvas/project.json",
+    index: ".aicanvas/index.json",
+    cache: workspaceMode === "drama" ? ".aicanvas/cache.sqlite" : `.aicanvas/${PROJECT_CACHE_V2_FILE}`,
+    materialDatabase: ".aicanvas/material-studio.sqlite",
+    productionDatabase: ".aicanvas/studio-production.sqlite",
+    textCas: ".aicanvas/studio-production/objects/sha256",
+    generationDatabase: ".aicanvas/studio-generation-ledger.sqlite",
+    generationPackCas: ".aicanvas/studio-generation/objects/sha256",
+    mediaCas: ".aicanvas/objects/sha256",
+    mediaPreviews: ".aicanvas/derived/thumb",
+    mediaProxies: ".aicanvas/derived/proxy",
+    mediaWaveforms: ".aicanvas/derived/waveform",
+  };
+  if (workspaceMode === "drama") {
+    // schema v1 是已发布的 drama 合同；字段与顺序保持原样，不能落盘 v2 投影字段。
+    const manifestPayload: Omit<ManagedProjectManifestV1, "fingerprint"> = {
+      schemaVersion: 1,
+      kind: "ai-canvas-managed-project",
+      projectId: project.id,
+      projectName: project.name,
+      rootRealpath: paths.root,
+      storageMode: "managed",
+      startupPolicy: "no-filesystem-scan",
+      mediaMode: "project-local-cas",
+      legacyRoots: [],
+      projectConfigSha256: sha256(configContent),
+      bootstrapIndexSha256: sha256(indexContent),
+      bootstrapScanId: index.scanId,
+      relativePaths,
+      createdAt,
+    };
+    await writeJsonAtomic(paths.manifest, {
+      ...manifestPayload,
+      fingerprint: manifestFingerprint(manifestPayload),
+    } satisfies ManagedProjectManifestV1);
+    return;
+  }
+
+  const manifestPayload: Omit<ManagedProjectManifestV2, "fingerprint"> = {
+    schemaVersion: 2,
     kind: "ai-canvas-managed-project",
     projectId: project.id,
     projectName: project.name,
@@ -741,33 +1040,26 @@ async function writeManagedManifest(
     projectConfigSha256: sha256(configContent),
     bootstrapIndexSha256: sha256(indexContent),
     bootstrapScanId: index.scanId,
-    relativePaths: {
-      config: ".aicanvas/project.json",
-      index: ".aicanvas/index.json",
-      cache: ".aicanvas/cache.sqlite",
-      materialDatabase: ".aicanvas/material-studio.sqlite",
-      productionDatabase: ".aicanvas/studio-production.sqlite",
-      textCas: ".aicanvas/studio-production/objects/sha256",
-      generationDatabase: ".aicanvas/studio-generation-ledger.sqlite",
-      generationPackCas: ".aicanvas/studio-generation/objects/sha256",
-      mediaCas: ".aicanvas/objects/sha256",
-      mediaPreviews: ".aicanvas/derived/thumb",
-      mediaProxies: ".aicanvas/derived/proxy",
-      mediaWaveforms: ".aicanvas/derived/waveform",
-    },
+    relativePaths,
+    workspaceMode,
+    minimumWriterSchemaVersion: MANAGED_PROJECT_WRITER_SCHEMA_VERSION,
     createdAt,
   };
-  await writeJsonAtomic(paths.manifest, { ...manifestPayload, fingerprint: manifestFingerprint(manifestPayload) } satisfies ManagedProjectManifest);
+  await writeJsonAtomic(paths.manifest, {
+    ...manifestPayload,
+    fingerprint: manifestFingerprint(manifestPayload),
+  } satisfies ManagedProjectManifestV2);
 }
 
 async function materializeManagedProjectRoot(
   projectRoot: string,
   name: string,
   createdAt: string,
+  workspaceMode: WorkspaceMode = "drama",
 ): Promise<ProjectShell> {
-  const paths = managedPaths(projectRoot);
+  const paths = managedPaths(projectRoot, workspaceMode);
   const ensured = await ensureSidecarWithoutGlobalRegistration(projectRoot);
-  const project: ProjectConfig = {
+  const commonProject: ProjectConfig = {
     ...ensured,
     name,
     primaryRoot: projectRoot,
@@ -776,16 +1068,30 @@ async function materializeManagedProjectRoot(
     updatedAt: createdAt,
     automation: { ...ensured.automation, allowOverwriteAuthoritative: false },
   };
+  const project: ProjectConfig = workspaceMode === "drama"
+    ? commonProject
+    : {
+      ...commonProject,
+      schemaVersion: 2,
+      workspaceMode,
+      minimumWriterSchemaVersion: MANAGED_PROJECT_WRITER_SCHEMA_VERSION,
+    };
   await writeJsonAtomic(paths.config, project);
   const suffix = path.basename(projectRoot).split("-").at(-1) ?? randomBytes(4).toString("hex");
   const index = buildEmptyIndex(project, createdAt, suffix);
   await saveIndex(index);
-  const cache = new ProjectCache(projectRoot);
+  const cache = new ProjectCache(projectRoot, {
+    writerSchemaVersion: workspaceMode === "drama" ? 1 : MANAGED_PROJECT_WRITER_SCHEMA_VERSION,
+  });
   try { cache.replaceIndex(index); }
   finally { cache.close(); }
   await materializeManagedStorage(paths);
   maybeInterruptManagedBootstrapForTests("after-storage");
-  await writeManagedManifest(paths, project, index, createdAt);
+  if (workspaceMode !== "drama") {
+    await createLegacyProjectCacheWriterFence(paths.root, project.id);
+    await createManagedProjectWriterFence(paths.root, project.id);
+  }
+  await writeManagedManifest(paths, project, index, createdAt, workspaceMode);
   return inspectManagedProject(projectRoot);
 }
 
@@ -901,11 +1207,14 @@ async function prepareClaimedBootstrapQuarantine(
     quarantine,
     claim.purpose,
     claim.payload,
+    claim.workspaceMode,
     true,
   ))!;
   const recordPath = bootstrapRecoveryRecordPath(namespace, projectRoot);
   const existing = await readBootstrapRecoveryRecord(recordPath, parentRoot, namespace);
   if (existing && (existing.originalProjectRoot !== projectRoot
+    || existing.workspaceMode !== claim.workspaceMode
+    || existing.minimumWriterSchemaVersion !== claim.minimumWriterSchemaVersion
     || existing.bootstrapPurpose !== claim.purpose
     || !sameStableJson(existing.bootstrapPayload, claim.payload))) {
     throw new Error(`managed bootstrap recovery 记录与当前 claim 不一致：${recordPath}`);
@@ -929,9 +1238,11 @@ async function prepareClaimedBootstrapQuarantine(
     preparedAt: new Date().toISOString(),
   };
   const semantic: Omit<ManagedProjectBootstrapRecoveryRecord, "fingerprint"> = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     kind: "managed-project-bootstrap-recovery",
     originalProjectRoot: projectRoot,
+    workspaceMode: claim.workspaceMode,
+    minimumWriterSchemaVersion: claim.minimumWriterSchemaVersion,
     bootstrapPurpose: claim.purpose,
     bootstrapPayload: structuredClone(claim.payload),
     attempts: [...(existing?.attempts ?? []), attempt],
@@ -966,9 +1277,10 @@ async function rebuildManagedBootstrapFromQuarantine(
     record: ManagedProjectBootstrapRecoveryRecord;
     attempt: ManagedProjectBootstrapRecoveryAttempt;
   },
-  options: Pick<CreateManagedProjectOptions, "name" | "bootstrapClaim">,
+  options: Pick<CreateManagedProjectOptions, "name" | "workspaceMode" | "bootstrapClaim">,
 ): Promise<ProjectShell> {
   if (!options.bootstrapClaim) throw new Error("恢复 managed bootstrap 必须提供 bootstrapClaim。 ");
+  const workspaceMode = requireBootstrapRecoveryCompatibleWorkspaceMode(options);
   const { parentRoot, namespace, recordPath, record, attempt } = recovery;
   const originalProjectRoot = record.originalProjectRoot;
   if (path.dirname(originalProjectRoot) !== parentRoot) {
@@ -987,11 +1299,17 @@ async function rebuildManagedBootstrapFromQuarantine(
   );
   if (!quarantinedClaim
     || quarantinedClaim.fingerprint !== attempt.priorClaimFingerprint
+    || quarantinedClaim.workspaceMode !== record.workspaceMode
+    || quarantinedClaim.minimumWriterSchemaVersion !== record.minimumWriterSchemaVersion
     || quarantinedClaim.purpose !== record.bootstrapPurpose
     || !sameStableJson(quarantinedClaim.payload, record.bootstrapPayload)) {
     throw new Error(`managed bootstrap quarantine 中的 claim 与恢复记录不一致：${attempt.quarantinedProjectRoot}`);
   }
   const expectedPurpose = normalizeBootstrapPurpose(options.bootstrapClaim.purpose);
+  if (record.workspaceMode !== workspaceMode
+    || record.minimumWriterSchemaVersion !== minimumWriterSchemaVersionForWorkspace(workspaceMode)) {
+    throw new Error(`managed bootstrap quarantine 工作区身份与恢复请求不一致：${recordPath}`);
+  }
   if (record.bootstrapPurpose !== expectedPurpose
     || !sameStableJson(record.bootstrapPayload, options.bootstrapClaim.payload)) {
     throw new Error(`managed bootstrap quarantine 与恢复请求不一致：${recordPath}`);
@@ -999,7 +1317,11 @@ async function rebuildManagedBootstrapFromQuarantine(
 
   await mkdir(originalProjectRoot, { mode: 0o700 });
   maybeInterruptManagedBootstrapForTests("after-quarantine-replacement-root");
-  const replacementClaim = await writeManagedBootstrapClaim(originalProjectRoot, options.bootstrapClaim);
+  const replacementClaim = await writeManagedBootstrapClaim(
+    originalProjectRoot,
+    options.bootstrapClaim,
+    workspaceMode,
+  );
   maybeInterruptManagedBootstrapForTests("after-quarantine-replacement-claim");
   await updateBootstrapRecoveryAttempt(
     recordPath,
@@ -1016,6 +1338,7 @@ async function rebuildManagedBootstrapFromQuarantine(
     originalProjectRoot,
     normalizeProjectName(options.name),
     replacementClaim.createdAt,
+    workspaceMode,
   );
   await updateBootstrapRecoveryAttempt(
     recordPath,
@@ -1035,10 +1358,17 @@ async function listBootstrapRecoveryRecordsForOwner(
   parentRoot: string,
   purpose: string,
   payload: Record<string, unknown>,
+  workspaceMode: WorkspaceMode,
 ): Promise<Array<{ recordPath: string; record: ManagedProjectBootstrapRecoveryRecord }>> {
   const quarantine = await getManagedBootstrapQuarantineDirectory(parentRoot, false);
   if (!quarantine) return [];
-  const namespace = await getManagedBootstrapRecoveryNamespace(quarantine, purpose, payload, false);
+  const namespace = await getManagedBootstrapRecoveryNamespace(
+    quarantine,
+    purpose,
+    payload,
+    workspaceMode,
+    false,
+  );
   if (!namespace) return [];
   const entries = await readdir(namespace, { withFileTypes: true });
   const records: Array<{ recordPath: string; record: ManagedProjectBootstrapRecoveryRecord }> = [];
@@ -1084,6 +1414,10 @@ export async function reconcileManagedProjectBootstrapRecovery(
     readManagedProjectBootstrapClaim(projectRoot),
   ]);
   if (!claim) return { reconciled: false, recordPath: null };
+  if (claim.workspaceMode !== shell.workspaceMode
+    || claim.minimumWriterSchemaVersion !== minimumWriterSchemaVersionForWorkspace(shell.workspaceMode)) {
+    throw new Error("managed bootstrap claim 与已完成工程的工作区身份不一致。 ");
+  }
   const parentRoot = await assertRealDirectoryWithoutSymlink(path.dirname(projectRoot), "managed bootstrap 父目录");
   const quarantine = await getManagedBootstrapQuarantineDirectory(parentRoot, false);
   if (!quarantine) return { reconciled: false, recordPath: null };
@@ -1091,6 +1425,7 @@ export async function reconcileManagedProjectBootstrapRecovery(
     quarantine,
     claim.purpose,
     claim.payload,
+    claim.workspaceMode,
     false,
   );
   if (!namespace) return { reconciled: false, recordPath: null };
@@ -1098,6 +1433,8 @@ export async function reconcileManagedProjectBootstrapRecovery(
   const record = await readBootstrapRecoveryRecord(recordPath, parentRoot, namespace);
   if (!record) return { reconciled: false, recordPath: null };
   if (record.originalProjectRoot !== projectRoot
+    || record.workspaceMode !== claim.workspaceMode
+    || record.minimumWriterSchemaVersion !== claim.minimumWriterSchemaVersion
     || record.bootstrapPurpose !== claim.purpose
     || !sameStableJson(record.bootstrapPayload, claim.payload)) {
     throw new Error(`managed bootstrap recovery 与当前完成工程身份不一致：${recordPath}`);
@@ -1141,9 +1478,10 @@ export async function reconcileManagedProjectBootstrapRecovery(
  */
 export async function resumeManagedProjectBootstrapFromQuarantine(
   parentRootValue: string,
-  options: Pick<CreateManagedProjectOptions, "name" | "bootstrapClaim"> & { slug: string },
+  options: Pick<CreateManagedProjectOptions, "name" | "workspaceMode" | "bootstrapClaim"> & { slug: string },
 ): Promise<ProjectShell | null> {
   if (!options.bootstrapClaim) throw new Error("恢复 managed bootstrap 必须提供 bootstrapClaim。 ");
+  const workspaceMode = requireBootstrapRecoveryCompatibleWorkspaceMode(options);
   const parentRoot = await assertRealDirectoryWithoutSymlink(parentRootValue, "managed bootstrap 父目录");
   const slug = managedProjectSlug(options.slug);
   const expectedPurpose = normalizeBootstrapPurpose(options.bootstrapClaim.purpose);
@@ -1161,6 +1499,7 @@ export async function resumeManagedProjectBootstrapFromQuarantine(
     quarantine,
     expectedPurpose,
     options.bootstrapClaim.payload,
+    workspaceMode,
     false,
   );
   if (!namespace) return null;
@@ -1168,9 +1507,12 @@ export async function resumeManagedProjectBootstrapFromQuarantine(
     parentRoot,
     expectedPurpose,
     options.bootstrapClaim.payload,
+    workspaceMode,
   )) {
     if (!managedBootstrapCandidateRootName(path.basename(entry.record.originalProjectRoot), slug)) continue;
-    if (entry.record.bootstrapPurpose !== expectedPurpose
+    if (entry.record.workspaceMode !== workspaceMode
+      || entry.record.minimumWriterSchemaVersion !== minimumWriterSchemaVersionForWorkspace(workspaceMode)
+      || entry.record.bootstrapPurpose !== expectedPurpose
       || !sameStableJson(entry.record.bootstrapPayload, options.bootstrapClaim.payload)) {
       throw new Error(`同一 project slug 的 quarantine claim 与恢复请求不一致：${entry.recordPath}`);
     }
@@ -1205,22 +1547,25 @@ export async function resumeManagedProjectBootstrapFromQuarantine(
  */
 export async function resumeManagedProjectBootstrap(
   projectRootValue: string,
-  options: Pick<CreateManagedProjectOptions, "name" | "bootstrapClaim">,
+  options: Pick<CreateManagedProjectOptions, "name" | "workspaceMode" | "bootstrapClaim">,
 ): Promise<ProjectShell> {
   if (!options.bootstrapClaim) throw new Error("恢复 managed bootstrap 必须提供 bootstrapClaim。 ");
+  const workspaceMode = requireBootstrapRecoveryCompatibleWorkspaceMode(options);
   const projectRoot = await assertRealDirectoryWithoutSymlink(projectRootValue, "待恢复 managed bootstrap 根");
   const name = normalizeProjectName(options.name);
   let claim = await readManagedProjectBootstrapClaim(projectRoot);
   if (!claim) {
     await assertRecoverableUnclaimedBootstrapRoot(projectRoot);
-    claim = await writeManagedBootstrapClaim(projectRoot, options.bootstrapClaim);
-  } else if (claim.purpose !== normalizeBootstrapPurpose(options.bootstrapClaim.purpose)
+    claim = await writeManagedBootstrapClaim(projectRoot, options.bootstrapClaim, workspaceMode);
+  } else if (claim.workspaceMode !== workspaceMode
+    || claim.minimumWriterSchemaVersion !== minimumWriterSchemaVersionForWorkspace(workspaceMode)
+    || claim.purpose !== normalizeBootstrapPurpose(options.bootstrapClaim.purpose)
     || JSON.stringify(stableValue(claim.payload)) !== JSON.stringify(stableValue(options.bootstrapClaim.payload))) {
     throw new Error(`managed bootstrap claim 与恢复请求不一致：${projectRoot}`);
   }
   const existing = await inspectManagedProjectReadOnly(projectRoot).catch(() => null);
   if (existing) {
-    if (existing.project.name !== name) {
+    if (existing.project.name !== name || existing.workspaceMode !== workspaceMode) {
       throw new Error(`managed bootstrap 已完成工程名称与恢复请求不一致：${projectRoot}`);
     }
     return existing;
@@ -1234,7 +1579,7 @@ export async function resumeManagedProjectBootstrap(
     claimOnly = false;
   }
   if (claimOnly) {
-    return materializeManagedProjectRoot(projectRoot, name, claim.createdAt);
+    return materializeManagedProjectRoot(projectRoot, name, claim.createdAt, workspaceMode);
   }
 
   const recovery = await prepareClaimedBootstrapQuarantine(projectRoot, claim).catch((qualificationError) => {
@@ -1261,6 +1606,7 @@ function countArtifacts(index: ProjectIndex): ProjectShell["counts"] {
 }
 
 export async function createManagedProject(options: CreateManagedProjectOptions): Promise<ProjectShell> {
+  const workspaceMode = requireBootstrapRecoveryCompatibleWorkspaceMode(options);
   const parentRoot = await assertRealDirectoryWithoutSymlink(options.parentRoot, "受管项目父目录");
   const name = normalizeProjectName(options.name);
   const slug = managedProjectSlug(options.slug?.trim() || name);
@@ -1268,9 +1614,14 @@ export async function createManagedProject(options: CreateManagedProjectOptions)
 
   try {
     const claim = options.bootstrapClaim
-      ? await writeManagedBootstrapClaim(allocated.root, options.bootstrapClaim)
+      ? await writeManagedBootstrapClaim(allocated.root, options.bootstrapClaim, workspaceMode)
       : null;
-    return await materializeManagedProjectRoot(allocated.root, name, claim?.createdAt ?? new Date().toISOString());
+    return await materializeManagedProjectRoot(
+      allocated.root,
+      name,
+      claim?.createdAt ?? new Date().toISOString(),
+      workspaceMode,
+    );
   } catch (error) {
     await rollbackCreatedRoot(allocated.root, allocated.identity);
     throw error;
@@ -1283,19 +1634,30 @@ export async function createManagedProject(options: CreateManagedProjectOptions)
  */
 export async function upgradeEmptyProjectToManaged(projectRoot: string): Promise<ProjectShell> {
   const canonicalRoot = await assertRealDirectoryWithoutSymlink(projectRoot, "待升级项目根目录");
+  const paths = managedPaths(canonicalRoot);
+  const existingManifest = await lstat(paths.manifest).catch((error: unknown) => {
+    if (error instanceof Error && "code" in error && (error as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw error;
+  });
+  if (existingManifest) {
+    // 先做无写校验；future/v2 非 drama 不能先创建项目锁或补任何账本。
+    const current = await inspectManagedProjectReadOnly(canonicalRoot);
+    if (current.workspaceMode !== "drama") {
+      throw new Error("novel/hybrid 工程不得进入旧空工程升级写路径。 ");
+    }
+    return inspectManagedProject(canonicalRoot);
+  }
+
   return withProjectLock(canonicalRoot, "managed-project-upgrade", async () => {
-    const paths = managedPaths(canonicalRoot);
-    const existingManifest = await lstat(paths.manifest).catch((error: unknown) => {
+    const racedManifest = await lstat(paths.manifest).catch((error: unknown) => {
       if (error instanceof Error && "code" in error && (error as NodeJS.ErrnoException).code === "ENOENT") return null;
       throw error;
     });
-    if (existingManifest) {
-      const current = await inspectManagedProject(canonicalRoot);
-      const [manifestContent, indexContent] = await Promise.all([readFile(paths.manifest), readFile(paths.index)]);
-      const manifest = validateManifest(parseJsonObject(manifestContent, paths.manifest), paths.manifest);
-      const index = validateIndex(parseJsonObject(indexContent, paths.index), paths.index);
-      await materializeManagedStorage(paths);
-      await writeManagedManifest(paths, current.project, index, manifest.createdAt);
+    if (racedManifest) {
+      const current = await inspectManagedProjectReadOnly(canonicalRoot);
+      if (current.workspaceMode !== "drama") {
+        throw new Error("novel/hybrid 工程不得进入旧空工程升级写路径。 ");
+      }
       return inspectManagedProject(canonicalRoot);
     }
 
@@ -1314,7 +1676,7 @@ export async function upgradeEmptyProjectToManaged(projectRoot: string): Promise
       throw new Error("只有尚未导入任何单元或产物的空工程可以原地升级；现有内容不会被接管或覆盖。");
     }
     await materializeManagedStorage(paths);
-    await writeManagedManifest(paths, project, index, project.createdAt || new Date().toISOString());
+    await writeManagedManifest(paths, project, index, project.createdAt || new Date().toISOString(), "drama");
     return inspectManagedProject(canonicalRoot);
   });
 }
@@ -1346,6 +1708,16 @@ async function inspectManagedProjectShell(projectRoot: string): Promise<ProjectS
   const index = validateIndex(parseJsonObject(indexContent, paths.index), paths.index);
   const manifest = validateManifest(parseJsonObject(manifestContent, paths.manifest), paths.manifest);
   const { fingerprint, ...manifestPayload } = manifest;
+  const workspaceMode: WorkspaceMode = manifest.schemaVersion === 1 ? "drama" : manifest.workspaceMode;
+  const effectivePaths = managedPaths(canonicalRoot, workspaceMode);
+
+  if (manifest.schemaVersion === 1) {
+    if (project.schemaVersion !== 1) throw new Error("schema v1 受管项目必须使用 schema v1 项目配置。");
+  } else if (project.schemaVersion !== 2
+    || project.workspaceMode !== manifest.workspaceMode
+    || project.minimumWriterSchemaVersion !== manifest.minimumWriterSchemaVersion) {
+    throw new Error("schema v2 受管项目的项目配置与 manifest writer 声明不一致。");
+  }
 
   if (manifestFingerprint(manifestPayload) !== fingerprint) throw new Error("受管项目 manifest fingerprint 不匹配，已停止打开。");
   if (sha256(configContent) !== manifest.projectConfigSha256) throw new Error("受管项目配置 SHA-256 不匹配，已停止打开。");
@@ -1360,6 +1732,9 @@ async function inspectManagedProjectShell(projectRoot: string): Promise<ProjectS
   }
   const indexedProject = validateProjectConfig(index.project as unknown as Record<string, unknown>, paths.index);
   if (indexedProject.id !== project.id
+    || indexedProject.schemaVersion !== project.schemaVersion
+    || indexedProject.workspaceMode !== project.workspaceMode
+    || indexedProject.minimumWriterSchemaVersion !== project.minimumWriterSchemaVersion
     || path.resolve(indexedProject.primaryRoot) !== canonicalRoot
     || indexedProject.sourceRoots.length !== 0
     || indexedProject.outputRoots.length !== 1
@@ -1367,6 +1742,7 @@ async function inspectManagedProjectShell(projectRoot: string): Promise<ProjectS
     throw new Error("受管项目索引中的项目隔离契约已漂移。");
   }
   const storageChecks: Array<Promise<void>> = [
+    assertManagedFile(effectivePaths.cache, canonicalRoot, "项目缓存数据库"),
     assertManagedDirectory(paths.mediaCas, canonicalRoot, "项目本地 CAS 目录"),
     assertManagedDirectory(paths.mediaPreviews, canonicalRoot, "项目预览目录"),
     assertManagedDirectory(paths.mediaProxies, canonicalRoot, "项目代理媒体目录"),
@@ -1381,19 +1757,36 @@ async function inspectManagedProjectShell(projectRoot: string): Promise<ProjectS
   }
   await Promise.all(storageChecks);
 
+  if (manifest.schemaVersion === 2) {
+    await inspectLegacyProjectCacheWriterFence(canonicalRoot, manifest.projectId);
+    const fence = await inspectManagedProjectWriterFence(canonicalRoot);
+    if (fence.projectId !== manifest.projectId) {
+      throw new Error("受管项目 writer fence 与 manifest 项目身份不一致。");
+    }
+  }
+
   return {
     project,
+    workspaceMode,
     counts: countArtifacts(index),
     nextAction: index.items.find((item) => !["已完成", "弃用"].includes(item.status))?.nextAction || MANAGED_NEXT_ACTION,
     manifestFingerprint: manifest.fingerprint,
     manifest: {
+      schemaVersion: manifest.schemaVersion,
+      workspaceMode,
       storageMode: manifest.storageMode,
       startupPolicy: manifest.startupPolicy,
       mediaMode: manifest.mediaMode,
       legacyRoots: manifest.legacyRoots,
       fingerprint: manifest.fingerprint,
+      ...(manifest.schemaVersion === 2
+        ? {
+          minimumWriterSchemaVersion: manifest.minimumWriterSchemaVersion,
+          ...(manifest.novelManifest ? { novelManifest: manifest.novelManifest } : {}),
+        }
+        : {}),
     },
-    paths,
+    paths: effectivePaths,
   };
 }
 
@@ -1405,12 +1798,102 @@ export async function inspectManagedProjectReadOnly(projectRoot: string): Promis
   return inspectManagedProjectShell(projectRoot);
 }
 
+/**
+ * managed-project owner 绑定小说 workspace manifest 的唯一写入口。NovelRepository
+ * 必须先把已签名 manifest 落到固定 locator；本函数只使用 managed
+ * fingerprint CAS 补上引用，不创建或改写小说 manifest。
+ */
+export async function attachNovelManifest(
+  projectRootValue: string,
+  input: AttachNovelManifestInput,
+): Promise<ProjectShell> {
+  const expectedManagedFingerprint = input?.expectedManagedFingerprint;
+  if (typeof expectedManagedFingerprint !== "string" || !/^[a-f0-9]{64}$/u.test(expectedManagedFingerprint)) {
+    throw new Error("attachNovelManifest.expectedManagedFingerprint 必须是 64 位 SHA-256。 ");
+  }
+  const initial = await inspectManagedProjectReadOnly(projectRootValue);
+  if (initial.workspaceMode === "drama" || initial.manifest.schemaVersion !== 2) {
+    throw new Error("drama/schema v1 受管项目不能绑定 novel workspace manifest。 ");
+  }
+  if (initial.manifestFingerprint !== expectedManagedFingerprint) {
+    throw new Error("managed project manifest fingerprint CAS 失败，拒绝绑定 novel manifest。 ");
+  }
+
+  return withProjectLock(initial.paths.root, "novel-manifest-attach", async () => {
+    const shell = await inspectManagedProjectReadOnly(initial.paths.root);
+    if (shell.workspaceMode === "drama" || shell.manifest.schemaVersion !== 2) {
+      throw new Error("drama/schema v1 受管项目不能绑定 novel workspace manifest。 ");
+    }
+    if (shell.manifestFingerprint !== expectedManagedFingerprint) {
+      throw new Error("managed project manifest fingerprint CAS 失败，拒绝绑定 novel manifest。 ");
+    }
+
+    const managedManifestDirectory = await inspectExistingConfinedDirectory(
+      shell.paths.root,
+      path.dirname(shell.paths.manifest),
+    );
+    const managedManifestRead = await readConfinedRegularFileWithIdentity(
+      managedManifestDirectory,
+      path.basename(shell.paths.manifest),
+      256 * 1024,
+    );
+    if (managedManifestRead.nlink !== 1) throw new Error("受管项目 manifest 必须是单链接普通文件。 ");
+    const managedManifestBytes = managedManifestRead.bytes;
+    const managedManifest = validateManifest(
+      parseJsonObject(managedManifestBytes, shell.paths.manifest),
+      shell.paths.manifest,
+    );
+    if (managedManifest.schemaVersion !== 2
+      || managedManifest.fingerprint !== expectedManagedFingerprint
+      || managedManifest.workspaceMode !== shell.workspaceMode) {
+      throw new Error("managed project manifest 在 novel manifest 绑定前发生身份漂移。 ");
+    }
+
+    const novelManifest = await readNovelWorkspaceManifestForAttachment(shell.paths.root);
+    if (novelManifest.projectId !== shell.project.id) {
+      throw new Error("novel workspace manifest projectId 与受管项目不一致。 ");
+    }
+    if (managedManifest.novelManifest === NOVEL_MANIFEST_RELATIVE_PATH) return shell;
+
+    const { fingerprint: _fingerprint, ...currentPayload } = managedManifest;
+    const updatedPayload: Omit<ManagedProjectManifestV2, "fingerprint"> = {
+      ...currentPayload,
+      novelManifest: NOVEL_MANIFEST_RELATIVE_PATH,
+    };
+    const updatedManifest = {
+      ...updatedPayload,
+      fingerprint: manifestFingerprint(updatedPayload),
+    } satisfies ManagedProjectManifestV2;
+    const updatedManifestBytes = Buffer.from(`${JSON.stringify(updatedManifest, null, 2)}\n`, "utf8");
+    await attachNovelManifestTestHooks.beforeManagedManifestReplace?.({
+      projectRoot: shell.paths.root,
+      manifestPath: shell.paths.manifest,
+    });
+    await replaceConfinedBytesCas(
+      managedManifestRead.identity,
+      sha256(managedManifestBytes),
+      managedManifestBytes.byteLength,
+      updatedManifestBytes,
+      0o600,
+    );
+
+    const attached = await inspectManagedProjectReadOnly(shell.paths.root);
+    if (attached.manifest.novelManifest !== NOVEL_MANIFEST_RELATIVE_PATH
+      || attached.manifestFingerprint === expectedManagedFingerprint) {
+      throw new Error("novel workspace manifest 绑定后复验失败。 ");
+    }
+    return attached;
+  });
+}
+
 async function ensureManagedGenerationLedger(shell: ProjectShell): Promise<void> {
   const projectRoot = shell.paths.root;
   if (generationLedgerInitializationContext.getStore()?.has(projectRoot)) return;
+  recordStudioUnitsReadCounter("generationLedgerEnsureCalls");
 
   let pending = generationLedgerInitializations.get(projectRoot);
   if (!pending) {
+    recordStudioUnitsReadCounter("generationLedgerInitializationStarts");
     const roots = new Set(generationLedgerInitializationContext.getStore() ?? []);
     roots.add(projectRoot);
     pending = generationLedgerInitializationContext.run(roots, async () => {
@@ -1425,7 +1908,9 @@ async function ensureManagedGenerationLedger(shell: ProjectShell): Promise<void>
         assertOptionalManagedPath(generationTemporary, projectRoot, "Studio generation 临时目录", "directory"),
       ]);
       // 延迟加载可避免 generation ledger 反向验证 managed project 时形成模块初始化环。
-      const { initializeStudioGenerationLedger } = await import("./studio-generation-ledger.js");
+      // 直指 storage 定义处（而非经 studio-generation-ledger 的再导出），
+      // 避免巨型模块图在循环求值序下再导出绑定读成 undefined。
+      const { initializeStudioGenerationLedger } = await import("./studio-generation-ledger-storage.js");
       const state = await initializeStudioGenerationLedger(projectRoot);
       if (path.resolve(state.databasePath) !== shell.paths.generationDatabase
         || path.resolve(state.packCasRoot) !== shell.paths.generationPackCas) {
@@ -1440,6 +1925,8 @@ async function ensureManagedGenerationLedger(shell: ProjectShell): Promise<void>
       ]);
     });
     generationLedgerInitializations.set(projectRoot, pending);
+  } else {
+    recordStudioUnitsReadCounter("generationLedgerInitializationJoins");
   }
   try {
     await pending;
@@ -1454,7 +1941,13 @@ async function ensureManagedGenerationLedger(shell: ProjectShell): Promise<void>
  * 打开受管项目时只校验固定侧车并幂等初始化本地 generation 账本；不会扫描媒体或旧根。
  */
 export async function inspectManagedProject(projectRoot: string): Promise<ProjectShell> {
-  const shell = await inspectManagedProjectShell(projectRoot);
-  await ensureManagedGenerationLedger(shell);
+  const shell = await measureStudioUnitsReadPhase(
+    "managed-inspect-shell",
+    () => inspectManagedProjectShell(projectRoot),
+  );
+  await measureStudioUnitsReadPhase(
+    "managed-generation-ledger",
+    () => ensureManagedGenerationLedger(shell),
+  );
   return shell;
 }

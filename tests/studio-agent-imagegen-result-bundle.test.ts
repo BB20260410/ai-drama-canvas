@@ -32,6 +32,14 @@ import {
   seedStudioP7ResolvedPanelContinuity,
   type StudioP7Fixture,
 } from "./helpers/studio-p7-fixture.js";
+import {
+  authorizeStudioHiggsfieldConnectorRequest,
+  claimStudioHiggsfieldConnectorRequest,
+  enqueueStudioHiggsfieldConnectorRequest,
+  preflightStudioHiggsfieldConnectorRequest,
+  reconcileStudioHiggsfieldConnectorRequest,
+  recordStudioHiggsfieldConnectorSubmission,
+} from "../src/core/studio-higgsfield-connector-queue.js";
 
 const originalRegistry = process.env.AI_CANVAS_REGISTRY_PATH;
 const originalWorkspace = process.env.AI_CANVAS_WORKSPACE;
@@ -165,6 +173,132 @@ describe.sequential("Agent imagegen v4 原子结果 bundle", () => {
     expect(await readdir(outside)).toEqual([]);
     await rm(path.dirname(process.env.AI_CANVAS_REGISTRY_PATH), { recursive: true, force: true });
   }, 60_000);
+
+  it("remote_succeeded 在 direct 与 command bundle 写回前拒绝，且不新增 ledger、labeled、CAS 或 receipt", async () => {
+    delete process.env.AI_CANVAS_RECORDED_SOURCE_DIGEST;
+    process.env.AI_CANVAS_REGISTRY_PATH = path.join("/tmp", `ai-canvas-bundle-connector-gate-${process.pid}-${Date.now()}`, "projects.json");
+    fixture = await createStudioP7Fixture();
+    const identityWorkspace = path.join(fixture.parentRoot, "stable-build-identity");
+    await mkdir(path.join(identityWorkspace, "src", "mcp"), { recursive: true });
+    await Promise.all([
+      writeFile(path.join(identityWorkspace, "package.json"), `${JSON.stringify({ name: "ai-drama-canvas", version: "0.2.0" })}\n`),
+      writeFile(path.join(identityWorkspace, "src", "mcp", "server.ts"), "server.registerTool(\"fixture\", {}, () => ({}));\n"),
+    ]);
+    process.env.AI_CANVAS_WORKSPACE = identityWorkspace;
+    await registerProject(fixture.shell.project);
+    await setActiveProjectRegistration(fixture.root);
+
+    const unit = fixture.units.twoPanel;
+    const panel = unit.panels[0]!;
+    await seedStudioP7ResolvedPanelContinuity(fixture.root, {
+      unitId: unit.unit.id,
+      panelId: panel.id,
+      assetIds: panel.assets.filter((asset) => asset.presence !== "forbidden").map((asset) => asset.assetId),
+    });
+    const frozen = await freezeAndPersistStudioGenerationPack(fixture.root, { unitId: unit.unit.id, panelId: panel.id });
+    const generationRunId = "bundle-remote-succeeded-direct-command";
+    await dispatchStudioGenerationPack(fixture.root, {
+      packId: frozen.packId,
+      packFingerprint: frozen.fingerprint,
+      generationRunId,
+      provider: "codex",
+    });
+    const context = await getActiveManagedStudioContext();
+    const connector = await enqueueStudioHiggsfieldConnectorRequest(fixture.root, { kind: "image", imageGenerationRunId: generationRunId });
+    const claim = await claimStudioHiggsfieldConnectorRequest(fixture.root, {
+      requestId: connector.requestId,
+      claimantId: "bundle-direct-command-gate",
+      expectedRevision: connector.revision,
+    });
+    const observation = {
+      source: "higgsfield-connector" as const,
+      observedAt: new Date().toISOString(),
+      unlimAvailable: true,
+      supportsUnlim: true,
+      billingMode: "unlimited" as const,
+      zeroCredits: true,
+      model: "gpt_image_2",
+      mode: "image_generation",
+      durationSeconds: 1,
+      resolution: "1k",
+      adjustments: [],
+      requestBindingFingerprint: connector.requestBindingFingerprint,
+      targetProfileFingerprint: connector.targetProfileFingerprint,
+      workspaceSubjectHash: "b".repeat(64),
+    };
+    const ready = await preflightStudioHiggsfieldConnectorRequest(fixture.root, {
+      requestId: connector.requestId,
+      claimToken: claim.claimToken,
+      expectedRevision: claim.revision,
+      observation,
+    });
+    const authorized = await authorizeStudioHiggsfieldConnectorRequest(fixture.root, {
+      requestId: connector.requestId,
+      claimToken: claim.claimToken,
+      expectedRevision: ready.revision,
+      projectContextToken: context.projectContextToken,
+    });
+    const receipt = {
+      schemaVersion: 1,
+      requestBindingFingerprint: connector.requestBindingFingerprint,
+      workspaceSubjectHash: observation.workspaceSubjectHash,
+      billingMode: "unlimited" as const,
+      estimatedCredits: 0 as const,
+    };
+    const submitted = await recordStudioHiggsfieldConnectorSubmission(fixture.root, {
+      requestId: connector.requestId,
+      claimToken: claim.claimToken,
+      expectedRevision: authorized.revision,
+      submissionNonce: authorized.submissionNonce,
+      remoteJobId: "bundle-direct-command-gate-remote",
+      zeroCreditReceipt: {
+        ...receipt,
+        receiptFingerprint: sha256(Buffer.from(JSON.stringify(receipt), "utf8")),
+      },
+    });
+    await reconcileStudioHiggsfieldConnectorRequest(fixture.root, {
+      requestId: connector.requestId,
+      expectedRevision: submitted.revision,
+      resolution: "remote_succeeded",
+      remoteJobId: "bundle-direct-command-gate-remote",
+      evidenceFingerprint: "a".repeat(64),
+    });
+
+    const rawPath = path.join(fixture.root, "fixture-inputs", `${generationRunId}.png`);
+    await sharp({ create: { width: 90, height: 160, channels: 3, background: "#25384f" } }).png().toFile(rawPath);
+    const rawSha256 = sha256(await readFile(rawPath));
+    const payload = {
+      projectContextToken: context.projectContextToken,
+      packId: frozen.packId,
+      packFingerprint: frozen.fingerprint,
+      generationRunId,
+      provider: "codex" as const,
+      rawPath,
+      rawSha256,
+      expectedRevision: frozen.pack.target.unitRevision,
+      executionReceipt: {
+        schemaVersion: 1 as const,
+        kind: "agent-imagegen-execution-receipt" as const,
+        provider: "codex" as const,
+        source: "fixture-canary" as const,
+        attestationLevel: "unverified-external-agent" as const,
+        cryptographicProviderReceipt: false as const,
+        callId: "bundle-direct-command-gate-call",
+        model: "fixture-imagegen",
+        generatedAt: "2026-08-11T00:00:00.000Z",
+      },
+    };
+    await expect(commitAgentImagegenResultBundle(fixture.root, payload)).rejects.toThrow(/Higgsfield connector|绑定/u);
+    await expect(executeIdempotentCommand(fixture.root, envelope("remote-succeeded-bundle-gate", {
+      command: "commit_agent_imagegen_result_bundle",
+      payload,
+    }))).rejects.toThrow(/Higgsfield connector|绑定/u);
+
+    await expect(readStudioGenerationResultBundle(fixture.root, generationRunId)).resolves.toBeNull();
+    await expect(readdir(path.join(fixture.root, ".aicanvas", "studio-generation", "writebacks"))).rejects.toMatchObject({ code: "ENOENT" });
+    await expect(readdir(path.join(fixture.root, ".aicanvas", "studio-generation", "writeback-receipts"))).rejects.toMatchObject({ code: "ENOENT" });
+    await expect(readFile(path.join(fixture.root, ".aicanvas", "objects", "sha256", rawSha256.slice(0, 2), rawSha256))).rejects.toMatchObject({ code: "ENOENT" });
+  }, 120_000);
 
   it("token/provider/pack 完整核验，本地派生 labeled，原子成对登记并从崩溃点幂等恢复", async () => {
     delete process.env.AI_CANVAS_RECORDED_SOURCE_DIGEST;

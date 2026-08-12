@@ -6,12 +6,23 @@
  * 不修改真实 Agent 配置，不生成图片，不访问外网。
  */
 import { createHash } from "node:crypto";
-import { access, mkdir, mkdtemp, readFile, realpath, rm, stat, writeFile } from "node:fs/promises";
-import os from "node:os";
+import { access, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { _electron as electron, type ElectronApplication, type Page } from "playwright";
 import sharp from "sharp";
+import {
+  captureBackgroundElectronStateOrThrow,
+  closeElectronApplicationOrThrow,
+  forceCleanupElectronApplication,
+  type ElectronBackgroundStateEvidence,
+  type ElectronCloseEvidence,
+} from "./lib/electron-application-close.mjs";
+import {
+  mkdtempOwnedFixtureRoot,
+  removeOwnedTemporaryFixtureRoot,
+} from "./lib/owned-fixture-root.js";
 import { registerProject, setActiveProjectRegistration } from "../src/core/sidecar.js";
 import {
   createStudioP7Fixture,
@@ -60,6 +71,56 @@ async function waitReady(page: Page, selector: string): Promise<void> {
   }, selector, { timeout: 60_000 });
 }
 
+async function captureRuntimeStabilitySnapshot(
+  application: ElectronApplication,
+  label: string,
+): Promise<{ label: string; snapshot: unknown }> {
+  const snapshot = await application.evaluate(() => (
+    (globalThis as typeof globalThis & {
+      __AI_CANVAS_RUNTIME_STABILITY_SNAPSHOT__?: () => unknown;
+    }).__AI_CANVAS_RUNTIME_STABILITY_SNAPSHOT__?.()
+  ));
+  if (!snapshot) throw new Error(`${label} 缺少 runtime stability probe。`);
+  return { label, snapshot };
+}
+
+async function measureUiAction<T>(
+  samples: Record<string, number | number[]>,
+  name: string,
+  action: () => Promise<T>,
+): Promise<T> {
+  const startedAt = performance.now();
+  const result = await action();
+  const durationMs = Math.round((performance.now() - startedAt) * 100) / 100;
+  const current = samples[name];
+  if (Array.isArray(current)) current.push(durationMs);
+  else if (typeof current === "number") samples[name] = [current, durationMs];
+  else samples[name] = durationMs;
+  return result;
+}
+
+async function domSnapshot(page: Page, label: string): Promise<{
+  label: string;
+  totalElements: number;
+  vueFlowNodes: number;
+  resourceCards: number;
+  timelineClips: number;
+  images: number;
+  videos: number;
+  audios: number;
+}> {
+  return page.evaluate((snapshotLabel) => ({
+    label: snapshotLabel,
+    totalElements: document.querySelectorAll("*").length,
+    vueFlowNodes: document.querySelectorAll(".vue-flow__node").length,
+    resourceCards: document.querySelectorAll('[data-testid="global-resource-item"]').length,
+    timelineClips: document.querySelectorAll(".timeline-clip").length,
+    images: document.images.length,
+    videos: document.querySelectorAll("video").length,
+    audios: document.querySelectorAll("audio").length,
+  }), label);
+}
+
 async function ensurePanelProjection(page: Page): Promise<void> {
   if (await page.locator(".vue-flow__node.panel-node").count() >= 2) return;
   const unit = page.locator(".vue-flow__node.unit-node").first();
@@ -98,21 +159,57 @@ async function assertOperationShieldSeen(page: Page, label: string): Promise<voi
   if (!seen) throw new Error(`${label}期间未显示全局写入屏障。`);
 }
 
-async function closeApplication(target: ElectronApplication): Promise<void> {
-  let fallback: ReturnType<typeof setTimeout> | undefined;
-  await Promise.race([
-    target.close().catch(() => undefined),
-    new Promise<void>((resolve) => {
-      fallback = setTimeout(() => {
-        target.process().kill();
-        resolve();
-      }, 5_000);
-    }),
-  ]);
-  if (fallback) clearTimeout(fallback);
+interface UiAuditEvidence {
+  label: string;
+  buttonCount: number;
+  unnamedVisibleButtons: string[];
+  duplicateIds: string[];
+  horizontalOverflowPx: number;
 }
 
-const runtimeRoot = await realpath(await mkdtemp(path.join(os.tmpdir(), "ai-canvas-p17-navigation-ui-")));
+async function auditVisibleUi(page: Page, label: string): Promise<UiAuditEvidence> {
+  // 以纯字符串注入，避免 tsx/esbuild 给浏览器闭包插入 Node 侧 __name helper。
+  const audit = await page.evaluate(`(() => {
+    const visibleButtons = [];
+    for (const button of document.querySelectorAll("button")) {
+      const style = getComputedStyle(button);
+      const box = button.getBoundingClientRect();
+      if (style.display !== "none" && style.visibility !== "hidden" && box.width > 0 && box.height > 0) {
+        visibleButtons.push(button);
+      }
+    }
+    const unnamedVisibleButtons = [];
+    for (const button of visibleButtons) {
+      if (!(button.getAttribute("aria-label")?.trim() || button.getAttribute("title")?.trim() || button.textContent?.trim())) {
+        unnamedVisibleButtons.push(button.outerHTML.slice(0, 180));
+      }
+    }
+    const idCounts = new Map();
+    for (const element of document.querySelectorAll("[id]")) {
+      const id = element.id.trim();
+      if (id) idCounts.set(id, (idCounts.get(id) || 0) + 1);
+    }
+    const duplicateIds = [];
+    for (const [id, count] of idCounts.entries()) {
+      if (count > 1) duplicateIds.push(id);
+    }
+    return {
+      label: ${JSON.stringify(label)},
+      buttonCount: visibleButtons.length,
+      unnamedVisibleButtons,
+      duplicateIds,
+      horizontalOverflowPx: Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth),
+    };
+  })()`) as UiAuditEvidence;
+  if (audit.unnamedVisibleButtons.length || audit.duplicateIds.length || audit.horizontalOverflowPx > 1) {
+    throw new Error(`${label} UI 静态运行门禁失败：${JSON.stringify(audit)}`);
+  }
+  return audit;
+}
+
+const fixtureOwnerId = "p17-navigation-support-smoke";
+const runtimeFixture = await mkdtempOwnedFixtureRoot("ai-canvas-p17-navigation-ui", fixtureOwnerId);
+const runtimeRoot = runtimeFixture.root;
 const registryPath = path.join(runtimeRoot, "registry", "projects.json");
 const managedProjectsRoot = path.join(runtimeRoot, "managed-projects");
 const userDataPath = path.join(runtimeRoot, "user-data");
@@ -128,6 +225,9 @@ let fixture: StudioP7Fixture | undefined;
 let application: ElectronApplication | undefined;
 let evidenceWritten = false;
 let screenshotWritten = false;
+let closeEvidence: ElectronCloseEvidence | undefined;
+let backgroundSnapshot: ElectronBackgroundStateEvidence | undefined;
+let runtimeRemoved = false;
 
 try {
   fixture = await createStudioP7Fixture();
@@ -139,6 +239,11 @@ try {
   const consoleErrors: string[] = [];
   const externalRequests: string[] = [];
   const visited: string[] = [];
+  const uiAudits: UiAuditEvidence[] = [];
+  const actionTimings: Record<string, number | number[]> = {};
+  const runtimeStability: Array<{ label: string; snapshot: unknown }> = [];
+  const domSamples: Awaited<ReturnType<typeof domSnapshot>>[] = [];
+  const smokeStartedAt = Date.now();
 
   application = await electron.launch({
     args: [".", `--user-data-dir=${userDataPath}`],
@@ -150,6 +255,8 @@ try {
       AI_CANVAS_MANAGED_PROJECTS_ROOT: managedProjectsRoot,
       AI_CANVAS_WINDOW_WIDTH: "1728",
       AI_CANVAS_WINDOW_HEIGHT: "1029",
+      AI_CANVAS_ELECTRON_BACKGROUND_SMOKE: "1",
+      AI_CANVAS_RUNTIME_STABILITY_PROBE: "1",
       ELECTRON_DISABLE_SECURITY_WARNINGS: "true",
     },
   });
@@ -169,6 +276,11 @@ try {
   });
 
   await waitReady(page, '[data-testid="managed-studio-canvas-view"]');
+  const readyDurationMs = Date.now() - smokeStartedAt;
+  backgroundSnapshot = await captureBackgroundElectronStateOrThrow(application, { label: "P17 navigation ready" });
+  runtimeStability.push(await captureRuntimeStabilitySnapshot(application, "ready"));
+  domSamples.push(await domSnapshot(page, "canvas-ready"));
+  uiAudits.push(await auditVisibleUi(page, "无限画布初始页"));
   visited.push("无限画布");
 
   // 画布的轻量交互不应切走、清空或卡住当前投影。
@@ -231,11 +343,60 @@ try {
   visited.push("资产→出场时间线");
 
   const unitNode = page.locator(".vue-flow__node.unit-node").first();
-  await unitNode.click();
-  await page.locator('[data-testid="managed-canvas-action-focus-unit"]').click();
-  await waitReady(page, '[data-testid="managed-studio-canvas-view"]');
+  runtimeStability.push(await captureRuntimeStabilitySnapshot(application, "before-unit-expand"));
+  await measureUiAction(actionTimings, "canvasNodeSelectAndExpandMs", async () => {
+    await unitNode.click();
+    await page.locator('[data-testid="managed-canvas-action-focus-unit"]').click();
+    await waitReady(page, '[data-testid="managed-studio-canvas-view"]');
+  });
+  runtimeStability.push(await captureRuntimeStabilitySnapshot(application, "after-unit-expand"));
   if (await page.locator(".vue-flow__node.panel-node").count() < 2) throw new Error("展开宫格动作没有保留 2–6 宫格投影。");
   visited.push("单元→展开宫格");
+
+  // 真实操作总资源、媒体时间线与图文对照，覆盖跨项目目录缓存、分页筛选和只读刷新。
+  await measureUiAction(actionTimings, "globalResourcesOpenMs", async () => {
+    await page.locator('[data-testid="studio-mode-global-resources"]').click();
+    await waitReady(page, '[data-testid="global-resource-center-view"]');
+  });
+  const resourceTabs = page.locator('[data-testid^="global-resource-tab-"]');
+  if (await resourceTabs.count() < 4) throw new Error("总资源分类页签不完整。");
+  actionTimings.globalResourceCategoryMs = [];
+  for (let index = 0; index < Math.min(4, await resourceTabs.count()); index += 1) {
+    await measureUiAction(actionTimings, "globalResourceCategoryMs", async () => {
+      await resourceTabs.nth(index).click();
+      await waitReady(page, '[data-testid="global-resource-center-view"]');
+    });
+  }
+  await measureUiAction(actionTimings, "globalResourceSearchNoMatchMs", async () => {
+    await page.locator('[data-testid="global-resource-search"]').fill("P17-无匹配筛选");
+    await page.getByRole("heading", { name: "没有匹配结果" }).waitFor();
+  });
+  await measureUiAction(actionTimings, "globalResourceSearchClearMs", async () => {
+    await page.locator('[data-testid="global-resource-search"]').fill("");
+    await page.getByRole("heading", { name: "没有匹配结果" }).waitFor({ state: "detached" });
+    await waitReady(page, '[data-testid="global-resource-center-view"]');
+  });
+  domSamples.push(await domSnapshot(page, "global-resources"));
+  runtimeStability.push(await captureRuntimeStabilitySnapshot(application, "after-global-resources"));
+  uiAudits.push(await auditVisibleUi(page, "总资源中心"));
+  visited.push("总资源分类与搜索");
+
+  await page.locator('[data-testid="studio-mode-multimedia-timeline"]').click();
+  await waitReady(page, '[data-testid="studio-multimedia-timeline-view"]');
+  await page.locator('[data-testid="multimedia-refresh"]').click();
+  await waitReady(page, '[data-testid="studio-multimedia-timeline-view"]');
+  uiAudits.push(await auditVisibleUi(page, "四媒体时间线"));
+  visited.push("四媒体时间线刷新");
+
+  await page.locator('[data-testid="studio-mode-script-align"]').click();
+  await waitReady(page, '[data-testid="script-media-align-view"]');
+  await page.locator('[data-testid="align-reload"]').click();
+  await waitReady(page, '[data-testid="script-media-align-view"]');
+  uiAudits.push(await auditVisibleUi(page, "图文对照"));
+  visited.push("图文对照刷新");
+
+  await page.locator('[data-testid="studio-mode-canvas"]').click();
+  await waitReady(page, '[data-testid="managed-studio-canvas-view"]');
 
   await page.locator('[data-testid="studio-step-script"]').click();
   await page.locator("#studio-library-pane").waitFor();
@@ -256,7 +417,8 @@ try {
   await page.locator('[data-testid="studio-step-generation"]').click();
   await waitReady(page, '[data-testid="studio-generation-control"]');
   const panels = page.locator('[data-testid="studio-generation-panels"] > button');
-  if (await panels.count() < 2) throw new Error("正式生成页没有显示 2–6 宫格单元。");
+  const generationPanelCount = await panels.count();
+  if (generationPanelCount < 2) throw new Error("正式生成页没有显示 2–6 宫格单元。");
   await panels.nth(1).click();
   await waitReady(page, '[data-testid="studio-generation-control"]');
   if (!(await page.locator('[data-testid="studio-generation-open-review"]').isDisabled())) {
@@ -282,6 +444,7 @@ try {
   await page.locator('[data-testid="dashboard-panel-grid"]').waitFor();
   const dashboardPanels = await page.locator('[data-testid="dashboard-panel-grid"] .panel-card').count();
   if (dashboardPanels < 2 || dashboardPanels > 6) throw new Error(`驾驶舱宫格渲染越界：${dashboardPanels}`);
+  uiAudits.push(await auditVisibleUi(page, "生产驾驶舱"));
   visited.push("驾驶舱");
 
   await page.locator('[data-testid="studio-mode-agent"]').click();
@@ -306,6 +469,7 @@ try {
   await assertOperationShieldSeen(page, "恢复");
   await page.locator('[data-testid="managed-project-operation-shield"]').waitFor({ state: "detached" });
   await waitReady(page, '[data-testid="desktop-support-view"]');
+  uiAudits.push(await auditVisibleUi(page, "帮助与安全"));
   visited.push("帮助与安全", "备份取消", "恢复取消");
 
   await page.locator('[data-testid="studio-open-project-center"]').click();
@@ -324,6 +488,16 @@ try {
   await page.keyboard.press("Escape");
   await projectDialog.waitFor({ state: "detached" });
   visited.push("项目中心焦点闭环", "未保存名称二次确认");
+
+  // 小窗口下复验顶层布局；只允许内部工作区滚动，不允许 document 横向溢出。
+  await page.setViewportSize({ width: 1280, height: 760 });
+  await page.waitForTimeout(120);
+  uiAudits.push(await auditVisibleUi(page, "1280×760 紧凑窗口"));
+  if (!await page.locator('[data-testid="studio-production-steps"]').isVisible()) {
+    throw new Error("紧凑窗口下生产导航不可见。");
+  }
+  await page.setViewportSize({ width: 1728, height: 1029 });
+  await page.waitForTimeout(120);
 
   await application.evaluate(async ({ BrowserWindow }, outputPath) => {
     const target = BrowserWindow.getAllWindows()[0];
@@ -351,19 +525,44 @@ try {
     throw new Error("P17 全导航截图疑似空白或占位图。");
   }
 
+  backgroundSnapshot = await captureBackgroundElectronStateOrThrow(application, { label: "P17 navigation before close" });
+  await page.waitForTimeout(600);
+  runtimeStability.push(await captureRuntimeStabilitySnapshot(application, "idle-before-close"));
+  domSamples.push(await domSnapshot(page, "final-view"));
+  const interactionDurationMs = Date.now() - smokeStartedAt;
+  closeEvidence = await closeElectronApplicationOrThrow(application, {
+    label: "P17 navigation Electron",
+    timeoutMs: 20_000,
+  });
+  application = undefined;
+  const projectId = fixture.shell.project.id;
+  await fixture.cleanup();
+  fixture = undefined;
+  await removeOwnedTemporaryFixtureRoot(runtimeRoot, fixtureOwnerId);
+  runtimeRemoved = true;
+
   const evidence = {
     schemaVersion: 1,
     kind: "p17-navigation-support-ui-smoke",
     status: "pass",
     createdAt: new Date().toISOString(),
     buildIdentity: releaseManifest,
-    projectId: fixture.shell.project.id,
+    projectId,
     runtime: "workspace-build",
+    performance: {
+      readyDurationMs,
+      interactionDurationMs,
+      actionTimings,
+      runtimeStability,
+      domSamples,
+      renderedTaskLimits: { generationBucket: 36, managedAssetPage: 36, panelsPerUnit: 6 },
+    },
     ui: {
       visited,
+      audits: uiAudits,
       canvasNodeCountPreserved: beforeNodes === afterNodes,
       nodeActionsExecuted: ["open-binding", "open-dashboard", "freeze-dispatch", "close-panel", "asset-appearances", "focus-unit"],
-      generationPanelCount: await panels.count(),
+      generationPanelCount,
       dashboardPanelCount: dashboardPanels,
       reviewBlockedWithoutResult: true,
       agentRepairBlockedInDevelopment: true,
@@ -384,6 +583,9 @@ try {
       upload: false,
       payment: false,
       publish: false,
+      backgroundSnapshot,
+      closeEvidence,
+      runtimeRootRemoved: runtimeRemoved,
     },
     screenshot: {
       ...screenshotInfo,
@@ -396,9 +598,9 @@ try {
   evidenceWritten = true;
   process.stdout.write(`${JSON.stringify({ ok: true, evidencePath, screenshotPath, visited }, null, 2)}\n`);
 } finally {
-  if (application) await closeApplication(application).catch(() => undefined);
+  if (application) await forceCleanupElectronApplication(application).catch(() => undefined);
   if (fixture) await fixture.cleanup().catch(() => undefined);
-  await rm(runtimeRoot, { recursive: true, force: true }).catch(() => undefined);
+  if (!runtimeRemoved) await removeOwnedTemporaryFixtureRoot(runtimeRoot, fixtureOwnerId).catch(() => undefined);
   if (previousRegistry === undefined) delete process.env.AI_CANVAS_REGISTRY_PATH;
   else process.env.AI_CANVAS_REGISTRY_PATH = previousRegistry;
   if (!evidenceWritten) await rm(evidencePath, { force: true }).catch(() => undefined);

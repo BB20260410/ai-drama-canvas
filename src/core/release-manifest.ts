@@ -147,7 +147,7 @@ export async function readRuntimeReleaseManifest(): Promise<ReleaseManifest | un
  */
 export async function countDeclaredMcpTools(workspace: string): Promise<number> {
   const serverSource = await readFile(path.join(path.resolve(workspace), "src", "mcp", "server.ts"), "utf8");
-  const count = serverSource.match(/\bserver\.registerTool\s*\(/gu)?.length ?? 0;
+  const count = serverSource.match(/\b(?:server|registrar)\.registerTool\s*\(/gu)?.length ?? 0;
   if (count <= 0) throw new Error("无法从 MCP 注册源计算工具数。");
   return count;
 }

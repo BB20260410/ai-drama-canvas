@@ -141,12 +141,29 @@
 
       <form class="managed-create" data-testid="managed-project-create" @submit.prevent="submitManagedProject">
         <div class="create-heading">
-          <div><span class="eyebrow">新建受管素材工程</span><h3>从空的故事工程开始</h3></div>
+          <div><span class="eyebrow">新建受管工程</span><h3>{{ createModeCopy.heading }}</h3></div>
           <span class="mode-label">全新隔离工程</span>
         </div>
+        <fieldset v-if="novelWorkspaceEnabled" class="workspace-mode-field" data-testid="managed-workspace-mode">
+          <legend>工作区类型</legend>
+          <div class="workspace-mode-switch" role="group" aria-label="工作区类型">
+            <button
+              v-for="option in createModeOptions"
+              :key="option.mode"
+              type="button"
+              :data-testid="`managed-workspace-mode-${option.mode}`"
+              :class="{ active: createDraft.workspaceMode === option.mode }"
+              :aria-pressed="createDraft.workspaceMode === option.mode"
+              :disabled="busy"
+              @click="createDraft.workspaceMode = option.mode">
+              {{ option.label }}
+            </button>
+          </div>
+          <p>{{ createModeCopy.description }}</p>
+        </fieldset>
         <label class="project-name-field">
           <span>工程名称</span>
-          <input v-model="createDraft.name" name="managed-project-name" maxlength="120" placeholder="例如：古蜀卷第三季" :disabled="busy" />
+          <input v-model="createDraft.name" name="managed-project-name" maxlength="120" :placeholder="createModeCopy.placeholder" :disabled="busy" />
         </label>
         <div class="destination-row">
           <div><span>保存位置</span><b>{{ displayFolderName(createDraft.parentRoot || defaultParentRoot || "AI漫剧项目") }}</b></div>
@@ -173,6 +190,8 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 import { FolderKanban, FolderPlus, LoaderCircle, Search, ShieldCheck, Trash2, X } from "lucide-vue-next";
 import { validateManagedStudioCreateDraft } from "../managed-project-create";
+import type { CreateManagedProjectOptions } from "@core/managed-project";
+import type { WorkspaceMode } from "@core/novel-types";
 import type { ListedProjectSummary, LocalCreativeImportProjectSummary } from "@core/service";
 import type {
   DuduReadonlyImportControl,
@@ -195,12 +214,35 @@ const emit = defineEmits<{
   import: [];
   remove: [projectRoot: string];
   chooseParent: [];
-  createManaged: [input: { parentRoot: string; name: string }];
+  createManaged: [input: CreateManagedProjectOptions];
   refresh: [];
   verifySource: [projectRoot: string];
 }>();
 
-const createDraft = reactive({ parentRoot: props.defaultParentRoot || "", name: "" });
+const novelWorkspaceEnabled = import.meta.env.VITE_AI_CANVAS_NOVEL_WORKSPACE !== "0";
+const createModeOptions: ReadonlyArray<{ mode: WorkspaceMode; label: string }> = [
+  { mode: "drama", label: "短剧制作" },
+  { mode: "novel", label: "小说创作" },
+  { mode: "hybrid", label: "小说 + 短剧" },
+];
+const createModeCopyByMode: Record<WorkspaceMode, { heading: string; description: string; placeholder: string }> = {
+  drama: {
+    heading: "从空的故事工程开始",
+    description: "沿用当前短剧素材与生产工作台。",
+    placeholder: "例如：古蜀卷第三季",
+  },
+  novel: {
+    heading: "建立本地小说工作区",
+    description: "按卷章写作、全文搜索，并把选中的原文保存为可追溯记忆。",
+    placeholder: "例如：山海有只小狗",
+  },
+  hybrid: {
+    heading: "建立小说与短剧共用工程",
+    description: "两个工作区共享同一项目根与正典，不复制事实。",
+    placeholder: "例如：山海有只小狗 · 小说与短剧",
+  },
+};
+const createDraft = reactive({ parentRoot: props.defaultParentRoot || "", name: "", workspaceMode: "drama" as WorkspaceMode });
 const submitted = ref(false);
 const dialogElement = ref<HTMLElement | null>(null);
 const removeConfirmationRoot = ref("");
@@ -221,6 +263,7 @@ const busyLabel = computed(() => props.removingRoot
     ? "正在建立隔离工程"
     : "正在安全切换工程");
 const createValidation = computed(() => validateManagedStudioCreateDraft(createDraft));
+const createModeCopy = computed(() => createModeCopyByMode[createDraft.workspaceMode]);
 const createMessage = computed(() => submitted.value ? createValidation.value.message : "");
 const normalizedProjectSearch = computed(() => projectSearch.value.normalize("NFKC").trim().toLocaleLowerCase("zh-CN"));
 const availableProjectCount = computed(() => props.projects.filter((project) => project.available).length);
@@ -246,7 +289,9 @@ function submitManagedProject(): void {
   submitted.value = true;
   const validated = createValidation.value;
   if (!validated.valid || !validated.input) return;
-  emit("createManaged", validated.input);
+  emit("createManaged", createDraft.workspaceMode === "drama"
+    ? validated.input
+    : { ...validated.input, workspaceMode: createDraft.workspaceMode });
 }
 
 function requestClose(): void {
@@ -387,6 +432,10 @@ watch(() => createDraft.name, () => {
   discardConfirmationArmed.value = false;
 });
 
+watch(() => createDraft.workspaceMode, () => {
+  discardConfirmationArmed.value = false;
+});
+
 watch(() => props.projects, () => {
   if (!props.projects.some((project) => project.primaryRoot === removeConfirmationRoot.value)) {
     removeConfirmationRoot.value = "";
@@ -425,6 +474,7 @@ p { margin: 0; color: var(--ui-text-2); font-size: 12px; }
 .project-empty { padding: 70px 0; color: var(--ui-text-3); text-align: center; font-size: 12px; }
 .dudu-recovery{margin:0 24px 18px;border:1px solid var(--ui-line);border-radius:var(--ui-radius-panel);background:var(--ui-surface-2)}.dudu-recovery>header{align-items:center;padding:13px 14px;border-bottom:1px solid var(--ui-line)}.dudu-recovery h3{margin:5px 0 0;font-size:13px}.dudu-recovery>header button{display:flex;align-items:center;gap:5px;min-height:30px;padding:0 9px;border:1px solid var(--ui-line);border-radius:var(--ui-radius-ctl);background:transparent;color:var(--ui-accent);cursor:pointer}.dudu-recovery>header button:disabled{opacity:.45;cursor:not-allowed}.dudu-recovery>p{padding:10px 14px;font-size:10px;line-height:1.5}.dudu-recovery-state{display:grid;gap:4px;padding:10px 14px;border-top:1px solid var(--ui-line)}.dudu-recovery-state b{font-size:11px}.dudu-recovery-state span{color:var(--ui-text-3);font-size:10px}.dudu-recovery-state.ready b{color:var(--ui-ok)}.dudu-recovery-state.blocked b,.dudu-recovery-error{color:var(--ui-danger)}.dudu-recovery-error{border-top:1px solid var(--ui-line)}
 .managed-create{padding:18px 24px;border-top:1px solid var(--ui-line);background:var(--ui-bg)}.create-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}.create-heading h3{margin:6px 0 0;font-size:15px;font-weight:650}.mode-label{padding:4px 7px;border:1px solid var(--ui-accent);border-radius:999px;color:var(--ui-accent);font:10px var(--ui-font-mono)}.managed-create>label{display:block;margin-top:13px}.managed-create label>span{display:block;margin-bottom:6px;color:var(--ui-text-2);font-size:12px}.managed-create input{width:100%;height:40px;box-sizing:border-box;padding:0 12px;border:1px solid var(--ui-line);border-radius:var(--ui-radius-ctl);outline:0;background:var(--ui-surface);color:var(--ui-text);font-size:13px}.managed-create input:focus{border-color:var(--ui-accent);box-shadow:var(--ui-focus-ring)}.destination-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:11px;padding:10px 12px;border:1px solid var(--ui-line);border-radius:var(--ui-radius-ctl);background:var(--ui-surface)}.destination-row div{min-width:0}.destination-row span,.destination-row b{display:block}.destination-row span{color:var(--ui-text-3);font-size:10px}.destination-row b{margin-top:4px;overflow:hidden;color:var(--ui-text-2);font:11px var(--ui-font-mono);text-overflow:ellipsis;white-space:nowrap}.destination-row button{flex:0 0 auto;min-height:30px;padding:0 10px;border:1px solid var(--ui-line);border-radius:var(--ui-radius-ctl);background:transparent;color:var(--ui-accent);font-size:11px;cursor:pointer}.destination-row button:hover{border-color:var(--ui-accent)}.isolation-contract{display:flex;gap:8px;margin-top:13px;padding:10px;border-left:2px solid var(--ui-accent);background:var(--ui-accent-soft);color:var(--ui-text-2);font-size:12px;line-height:1.55}.isolation-contract svg{flex:0 0 auto;color:var(--ui-accent)}.isolation-contract b{display:block;color:var(--ui-text);font-size:12px}.create-message{margin-top:10px;color:var(--ui-ok);font-size:12px}.create-message.error{color:var(--ui-danger)}.create-button{width:100%;height:40px;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--ui-accent);border-radius:var(--ui-radius-ctl);background:var(--ui-accent);color:var(--ui-accent-contrast);font-size:13px;font-weight:650;cursor:pointer}.create-button:hover:not(:disabled){background:var(--ui-accent-strong);border-color:var(--ui-accent-strong)}.create-button:disabled{cursor:not-allowed;opacity:.45}.spinning{animation:project-spin .8s linear infinite}@keyframes project-spin{to{transform:rotate(360deg)}}
+.workspace-mode-field{margin:14px 0 0;padding:0;border:0}.workspace-mode-field legend{margin-bottom:7px;color:var(--ui-text-2);font-size:12px}.workspace-mode-field>p{margin-top:7px;color:var(--ui-text-3);font-size:11px}.workspace-mode-switch{display:flex;border:1px solid var(--ui-line);border-radius:var(--ui-radius-ctl);background:var(--ui-surface);overflow:hidden}.workspace-mode-switch button{min-height:36px;flex:1;border:0;border-right:1px solid var(--ui-line);background:transparent;color:var(--ui-text-2);font-size:11px;cursor:pointer}.workspace-mode-switch button:last-child{border-right:0}.workspace-mode-switch button:hover:not(:disabled){background:var(--ui-surface-2);color:var(--ui-text)}.workspace-mode-switch button.active{background:var(--ui-accent-soft);color:var(--ui-accent-strong);font-weight:650}.workspace-mode-switch button:focus-visible{position:relative;z-index:1;outline:0;box-shadow:inset var(--ui-focus-ring)}.workspace-mode-switch button:disabled{cursor:not-allowed;opacity:.45}
 footer { display: flex; align-items:center; justify-content:space-between; gap:20px; padding: 14px 24px; border-top: 1px solid var(--ui-line); }footer>span{color:var(--ui-text-3);font-size:11px}
 footer .primary-button{background:var(--ui-accent);border-color:var(--ui-accent);color:var(--ui-accent-contrast);border-radius:var(--ui-radius-ctl)}footer .primary-button:hover:not(:disabled){background:var(--ui-accent-strong);border-color:var(--ui-accent-strong)}
 .icon-button{border-color:var(--ui-line);border-radius:var(--ui-radius-ctl);color:var(--ui-text-2)}.icon-button:hover{background:var(--ui-surface-2);color:var(--ui-text)}

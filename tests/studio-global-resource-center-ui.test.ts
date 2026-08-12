@@ -234,6 +234,7 @@ describe("总资源中心 renderer 合同", () => {
   it("App 只经全局只读 IPC 与受管 reuse command 适配三方法", () => {
     const app = source("src/renderer/src/App.vue");
     const material = source("src/renderer/src/components/MaterialStudioView.vue");
+    const contract = source("src/renderer/src/material-studio-ui-contract.ts");
     expect(app).toContain("listGlobalResourceImages(query)");
     expect(app).toContain("window.canvasApi.listGlobalStudioImageResources(query)");
     expect(app).toContain("listGlobalMediaResources(query)");
@@ -243,9 +244,9 @@ describe("总资源中心 renderer 合同", () => {
     expect(app).toContain("payload: input");
     expect(app).toContain("result.result as ReuseStudioGlobalResourceResult");
 
-    expect(material).toContain("listGlobalResourceImages?");
-    expect(material).toContain("listGlobalMediaResources?");
-    expect(material).toContain("reuseGlobalResource?");
+    expect(contract).toContain("listGlobalResourceImages?");
+    expect(contract).toContain("listGlobalMediaResources?");
+    expect(contract).toContain("reuseGlobalResource?");
     expect(material).toContain("props.api.listGlobalResourceImages");
     expect(material).toContain("props.api.listGlobalMediaResources");
     expect(material).toContain("props.api.reuseGlobalResource");

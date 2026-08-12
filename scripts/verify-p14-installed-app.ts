@@ -15,6 +15,13 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { _electron as electron } from "playwright";
 import { readReleaseManifest } from "../src/core/release-manifest.js";
+import { assertFreshEvidenceTargetOutsideApp } from "./isolated-package-guards.js";
+import {
+  captureBackgroundElectronStateOrThrow,
+  closeElectronApplicationOrThrow,
+  type ElectronBackgroundStateEvidence,
+  type ElectronCloseEvidence,
+} from "./lib/electron-application-close.mjs";
 
 const execFileAsync = promisify(execFile);
 const EXPECTED_APP = "/Applications/AI 漫剧画布.app";
@@ -110,6 +117,7 @@ const evidencePath = requiredAbsolute(process.argv[3], "证据路径");
 if (appPath !== EXPECTED_APP) throw new Error(`P14 只验收固定安装位置：${EXPECTED_APP}`);
 const appStat = await stat(appPath).catch(() => null);
 if (!appStat?.isDirectory()) throw new Error(`安装版 App 不存在：${appPath}`);
+await assertFreshEvidenceTargetOutsideApp({ appPath, evidencePath });
 
 const contents = path.join(appPath, "Contents");
 const resourcesPath = path.join(contents, "Resources");
@@ -156,6 +164,8 @@ if (bundleIdentifier !== EXPECTED_IDENTIFIER || bundleVersion !== manifest.versi
 const runtimeRoot = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-installed-release-verify-"));
 let launched = false;
 let windowReady = false;
+let backgroundSnapshot: ElectronBackgroundStateEvidence | null = null;
+let closeRun: ElectronCloseEvidence | null = null;
 try {
   const registryPath = path.join(runtimeRoot, "registry", "projects.json");
   const userDataPath = path.join(runtimeRoot, "user-data");
@@ -188,6 +198,7 @@ try {
       AI_CANVAS_MEDIA_RUNTIME_DIR: path.join(runtimeRoot, "media-runtime"),
       AI_CANVAS_WINDOW_WIDTH: "1280",
       AI_CANVAS_WINDOW_HEIGHT: "800",
+      AI_CANVAS_ELECTRON_BACKGROUND_SMOKE: "1",
       ELECTRON_DISABLE_SECURITY_WARNINGS: "true",
     },
   });
@@ -197,8 +208,14 @@ try {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.locator('[data-testid="first-run-screen"]').waitFor({ timeout: 60_000 });
     windowReady = true;
+    backgroundSnapshot = await captureBackgroundElectronStateOrThrow(application, {
+      label: "P14 installed App ready",
+    });
   } finally {
-    await application.close();
+    closeRun = await closeElectronApplicationOrThrow(application, {
+      label: "P14 installed App",
+      timeoutMs: 20_000,
+    });
   }
 
   const evidence = {
@@ -230,6 +247,8 @@ try {
       launchWithoutSystemNode: launched && windowReady,
       packagedMcpStartedWithAppElectronRuntime: true,
       actualMcpToolCount: toolNames.length,
+      backgroundSnapshot,
+      closeRun,
     },
     distribution: "local-only",
     notarization: { performed: false },

@@ -30,6 +30,7 @@ const otherAppScreenshot = requiredAbsolute(process.argv[5], "其他软件截图
 const otherAppName = process.argv[6]?.trim();
 if (!otherAppName) throw new Error("必须声明其他软件名称。");
 const evidencePath = requiredAbsolute(process.argv[7], "证据路径");
+const otherAppReceiptPath = requiredAbsolute(process.argv[8], "其他软件接收回执");
 const relativeEvidence = path.relative(evidenceRoot, evidencePath);
 if (relativeEvidence === ".." || relativeEvidence.startsWith(`..${path.sep}`) || path.isAbsolute(relativeEvidence)) {
   throw new Error("物理验收证据必须写入 docs/evidence。");
@@ -77,6 +78,14 @@ type PhysicalSession = {
     nodeCount: number;
     exportHandleCount: number;
     mediaKinds: string[];
+    armedKinds?: string[];
+  };
+  persistenceState?: {
+    registeredMedia: Array<{ kind: string; sha256: string; registered: boolean }>;
+    expectedPinnedNodeIds: string[];
+    persistedPinnedNodeIds: string[];
+    allMediaRegistered: boolean;
+    allPinnedNodesPersisted: boolean;
   };
 };
 
@@ -134,8 +143,8 @@ const session = JSON.parse(await readFile(sessionPath, "utf8")) as PhysicalSessi
 if (session.schemaVersion !== 1 || !["ready", "closed"].includes(session.state)) {
   throw new Error(`物理验收会话状态无效：${session.state}`);
 }
-if (session.launchMode !== "installed-app") {
-  throw new Error(`最终物理验收必须使用安装版 App，实际 ${session.launchMode}`);
+if (session.launchMode !== "packaged-app") {
+  throw new Error(`最终物理验收必须使用当前源码打包 App，实际 ${session.launchMode}`);
 }
 if ((session.consoleErrors ?? []).length || (session.pageErrors ?? []).length || (session.externalRequests ?? []).length) {
   throw new Error("安装版验收会话出现 console/page/external request 异常。");
@@ -146,6 +155,14 @@ if (
   || session.canvasState.mediaKinds.join(",") !== "audio,image,video"
 ) {
   throw new Error("真实拖出后画布未保留完整的图片、视频、音频三个节点。");
+}
+if (
+  session.persistenceState?.allMediaRegistered !== true
+  || session.persistenceState.allPinnedNodesPersisted !== true
+  || session.persistenceState.registeredMedia.length !== 3
+  || session.persistenceState.registeredMedia.some((entry) => !entry.registered)
+) {
+  throw new Error("真实拖出后媒体登记或画布固定节点没有完整持久化。 ");
 }
 
 const orderedKinds: Array<"image" | "video" | "audio"> = ["image", "video", "audio"];
@@ -215,6 +232,36 @@ const screenshotEvidence = await Promise.all([
   };
 })));
 
+const otherAppReceipt = JSON.parse(await readFile(otherAppReceiptPath, "utf8")) as {
+  receivedAt?: string;
+  sourcePath?: string;
+  targetPath?: string;
+  fileName?: string;
+};
+const expectedOtherAppImage = session.media.image;
+if (
+  !otherAppReceipt.receivedAt
+  || otherAppReceipt.fileName !== expectedOtherAppImage.sourceBasename
+  || !otherAppReceipt.sourcePath
+  || !otherAppReceipt.targetPath
+) {
+  throw new Error(`其他软件接收回执不完整：${JSON.stringify(otherAppReceipt)}`);
+}
+const otherAppCopy = await fileIdentity(otherAppReceipt.targetPath);
+const imageCasAfterOtherDrop = await fileIdentity(expectedOtherAppImage.casObjectPath);
+if (
+  otherAppCopy.sha256 !== expectedOtherAppImage.sha256
+  || otherAppCopy.sizeBytes !== expectedOtherAppImage.sourceIdentity.sizeBytes
+  || otherAppCopy.isSymbolicLink
+  || (otherAppCopy.dev === imageCasAfterOtherDrop.dev && otherAppCopy.ino === imageCasAfterOtherDrop.ino)
+) {
+  throw new Error("其他软件接收的图片不是与 CAS 内容一致的独立复制体。 ");
+}
+const otherAppImageMetadata = await sharp(otherAppReceipt.targetPath).metadata();
+if (!otherAppImageMetadata.width || !otherAppImageMetadata.height || !otherAppImageMetadata.format) {
+  throw new Error("其他软件接收的图片不可解码。 ");
+}
+
 await mkdir(path.dirname(evidencePath), { recursive: true });
 const temporaryPath = path.join(
   path.dirname(evidencePath),
@@ -226,7 +273,7 @@ const evidence = {
   verdict: "PASS",
   testedAt: new Date().toISOString(),
   build: session.build,
-  installedApp: {
+  packagedApp: {
     executablePath: session.executablePath,
     isolatedProject: true,
     formalProjectTouched: false,
@@ -239,9 +286,22 @@ const evidence = {
     name: otherAppName,
     acceptedImageFromCanvasDrag: true,
     persistedDocument: false,
+    receipt: {
+      receivedAt: otherAppReceipt.receivedAt,
+      fileName: otherAppReceipt.fileName,
+      sha256: otherAppCopy.sha256,
+      sizeBytes: otherAppCopy.sizeBytes,
+      independentCopy: true,
+      decoded: {
+        format: otherAppImageMetadata.format,
+        width: otherAppImageMetadata.width,
+        height: otherAppImageMetadata.height,
+      },
+    },
   },
   canvasRetention: {
     ...session.canvasState,
+    persistenceState: session.persistenceState,
     originalsRetainedAfterPhysicalDrops: true,
   },
   screenshots: screenshotEvidence,

@@ -12,7 +12,7 @@ import type {
   StudioStoryboardWizardSession,
   WizardEditablePanel,
 } from "@core/studio-storyboard-wizard";
-import type { StudioScriptProductUiApi } from "./MaterialStudioView.vue";
+import type { StudioScriptProductUiApi } from "../material-studio-ui-contract";
 
 const props = defineProps<{
   projectRoot: string;
@@ -507,6 +507,7 @@ function shortSha(value: string | null | undefined): string {
             v-if="selectedMediaPreview && selectedAlignRow.rawSha256"
             :src="selectedMediaPreview.thumbnailUrl || selectedMediaPreview.mediaUrl"
             :alt="`${selectedAlignRow.unitId} raw 结果`"
+            decoding="async"
           />
           <div v-else class="preview-placeholder">{{ selectedAlignRow.rawSha256 ? "正在读取本地媒体…" : "当前单元没有 raw 图" }}</div>
           <dl>

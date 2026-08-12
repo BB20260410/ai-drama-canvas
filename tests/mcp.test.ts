@@ -42,6 +42,7 @@ describe("stdio MCP", () => {
           "audit_fusion_visual_constraints",
           "build_fusion_reference_board",
           "build_fusion_storyboard_grid",
+          "build_novel_context_pack",
           "build_story_context",
           "cancel_edit_render",
           "cancel_generation_job",
@@ -50,6 +51,7 @@ describe("stdio MCP", () => {
           "claim_task",
           "commit_existing_production_recovery",
           "commit_project_import",
+          "compare_novel_writing_source_receipts",
           "connect_story_events",
           "create_edit_project",
           "create_handoff",
@@ -61,6 +63,7 @@ describe("stdio MCP", () => {
           "delete_canvas_link",
           "delete_context",
           "discover_dudu_readonly_import_projects",
+          "doctor_novel_agent",
           "doctor_project",
           "enqueue_generation",
           "evaluate_studio_fusion_helper",
@@ -98,8 +101,13 @@ describe("stdio MCP", () => {
           "get_local_creative_project_ingest_status",
           "get_managed_studio_overview",
           "get_next_task",
+          "get_novel_analysis_execution_recovery",
           "get_novel_analysis_providers",
           "get_novel_analysis_runs",
+          "get_novel_manuscript_workspace",
+          "get_novel_search_index_status",
+          "get_novel_state_rebuild_status",
+          "get_novel_writing_state",
           "get_production_workflow",
           "get_progress",
           "get_project_snapshot",
@@ -107,6 +115,7 @@ describe("stdio MCP", () => {
           "get_storyboard",
           "get_studio_asset",
           "get_studio_binding_control",
+          "get_studio_connector_work_queue",
           "get_studio_consistency_evaluation",
           "get_studio_continuity_review_control",
           "get_studio_episode_earliest",
@@ -120,6 +129,7 @@ describe("stdio MCP", () => {
           "get_studio_script_library_projection",
           "get_studio_text_revision",
           "get_studio_trace",
+          "get_studio_video_generation_control",
           "get_studio_video_package_control",
           "get_subagent_image_generation_plan",
           "get_unit_timelines",
@@ -145,6 +155,8 @@ describe("stdio MCP", () => {
           "list_fusion_visual_constraints",
           "list_generation_jobs",
           "list_novel_analysis_reviews",
+          "list_novel_manuscript_chapters",
+          "list_novel_writing_source_receipts",
           "list_projects",
           "list_publications",
           "list_reviews",
@@ -167,20 +179,25 @@ describe("stdio MCP", () => {
           "materialize_fusion_visual_constraints",
           "migrate_fusion_storyboard_sheets",
           "plan_novel_analysis_run",
+          "plan_novel_state_rebuild",
+          "preflight_novel_chapter_write",
           "preflight_publication",
           "prepare_edit_media_preview",
           "prepare_edit_media_proxy",
           "prepare_fusion_asset_consistency_review",
+          "prepare_novel_chapter_write",
           "prepare_timeline_continuation",
           "preview_existing_production_recovery",
           "preview_local_creative_production_units",
           "preview_project_import",
           "preview_scan_project",
           "probe_novel_analysis_provider",
+          "probe_novel_chapter_consistency",
           "probe_video_engine",
           "process_generation_queue",
           "promote_asset_to_hard_lock",
           "query_studio_asset_timeline",
+          "read_novel_manuscript_range",
           "read_script_document",
           "read_skill",
           "read_story_chapter",
@@ -205,6 +222,7 @@ describe("stdio MCP", () => {
           "scan_project",
           "seal_final_fusion_asset_consistency_batch",
           "search_context",
+          "search_novel_manuscript",
           "select_adaptation_plan",
           "set_authoritative_artifact",
           "start_edit_render",
@@ -312,7 +330,12 @@ describe("stdio MCP", () => {
       const executeCommandSchema = tools.tools.find((tool) => tool.name === "execute_command")?.inputSchema as { properties?: { request?: { anyOf?: Array<{ properties?: { command?: { const?: string } } }>; oneOf?: Array<{ properties?: { command?: { const?: string } } }> } } };
       const commandVariants = executeCommandSchema.properties?.request?.anyOf ?? executeCommandSchema.properties?.request?.oneOf ?? [];
       const commandNames = commandVariants.map((variant) => variant.properties?.command?.const).filter(Boolean);
-      expect(commandNames).toEqual(expect.arrayContaining(["review_novel_analysis_batch", "upsert_novel_analysis_provider", "execute_novel_analysis_task", "reconcile_http_generation_submission", "update_subagent_image_generation", "migrate_generation_execution_state", "preflight_publication_bundle", "register_publication_bundle", "cancel_publication_bundle", "fail_publication_bundle", "commit_existing_production_recovery", "freeze_studio_generation_pack", "dispatch_studio_generation_pack", "register_studio_generation_result", "build_fusion_storyboard_grid", "materialize_fusion_panel_references", "materialize_fusion_visual_constraints", "upsert_fusion_visual_constraint_override", "upsert_panel_reference_override", "register_derived_panel_reference_artifact", "migrate_fusion_storyboard_evidence", "migrate_fusion_storyboard_sheets", "prepare_fusion_asset_consistency_review", "submit_fusion_asset_consistency_review", "seal_final_fusion_asset_consistency_batch"]));
+      expect(commandNames).toEqual(expect.arrayContaining(["novel_initialize_manuscript", "novel_create_volume", "novel_create_chapter", "novel_save_chapter", "novel_rename_chapter", "novel_move_chapter", "novel_reorder_chapters", "novel_recover_manuscript", "review_novel_analysis_batch", "upsert_novel_analysis_provider", "execute_novel_analysis_task", "reconcile_http_generation_submission", "update_subagent_image_generation", "migrate_generation_execution_state", "preflight_publication_bundle", "register_publication_bundle", "cancel_publication_bundle", "fail_publication_bundle", "commit_existing_production_recovery", "freeze_studio_generation_pack", "dispatch_studio_generation_pack", "register_studio_generation_result", "build_fusion_storyboard_grid", "materialize_fusion_panel_references", "materialize_fusion_visual_constraints", "upsert_fusion_visual_constraint_override", "upsert_panel_reference_override", "register_derived_panel_reference_artifact", "migrate_fusion_storyboard_evidence", "migrate_fusion_storyboard_sheets", "prepare_fusion_asset_consistency_review", "submit_fusion_asset_consistency_review", "seal_final_fusion_asset_consistency_batch"]));
+      expect(commandNames).toContain("novel_rebuild_search_index");
+      expect(commandNames).toEqual(expect.arrayContaining([
+        "mark_novel_analysis_execution_reconciliation_required",
+        "reconcile_novel_analysis_execution",
+      ]));
       const commandVariant = (name: string) => commandVariants.find((variant) => variant.properties?.command?.const === name) as { properties?: { payload?: { properties?: Record<string, { enum?: string[] }>; required?: string[] } } } | undefined;
       const enqueuePayload = commandVariant("enqueue_generation")?.properties?.payload;
       expect(enqueuePayload?.properties).toHaveProperty("continuation");
@@ -356,11 +379,42 @@ describe("stdio MCP", () => {
       const continuationToolSchema = tools.tools.find((tool) => tool.name === "update_video_continuation")?.inputSchema as { properties?: Record<string, { enum?: string[] }>; required?: string[] };
       expect(continuationToolSchema.required).toEqual(expect.arrayContaining(["expectedRevision", "error"]));
       expect(continuationToolSchema.properties?.status?.enum).toEqual(["failed", "cancelled"]);
+      const sourceReceiptListSchema = tools.tools.find((tool) => tool.name === "list_novel_writing_source_receipts")?.inputSchema as { properties?: Record<string, unknown>; required?: string[] };
+      expect(sourceReceiptListSchema.properties).toEqual(expect.objectContaining({ projectRoot: expect.anything() }));
+      const sourceReceiptCompareSchema = tools.tools.find((tool) => tool.name === "compare_novel_writing_source_receipts")?.inputSchema as { properties?: Record<string, unknown>; required?: string[] };
+      expect(sourceReceiptCompareSchema.properties).toEqual(expect.objectContaining({
+        projectRoot: expect.anything(),
+        baseReceiptId: expect.anything(),
+        currentReceiptId: expect.anything(),
+      }));
+      expect(sourceReceiptCompareSchema.required).toEqual(expect.arrayContaining(["baseReceiptId", "currentReceiptId"]));
+      const stateRebuildStatusSchema = tools.tools.find((tool) => tool.name === "get_novel_state_rebuild_status")?.inputSchema as { properties?: Record<string, unknown> };
+      expect(stateRebuildStatusSchema.properties).toEqual(expect.objectContaining({ projectRoot: expect.anything() }));
       const capabilitiesResult = await client.callTool({ name: "get_capabilities", arguments: {} });
       expect(payload(capabilitiesResult)).toEqual(expect.objectContaining({
         server: expect.objectContaining({ transport: "stdio", toolCount: EXPECTED_MCP_TOOL_COUNT }),
         principles: expect.objectContaining({ neverOverwriteAuthoritative: true }),
-        domains: expect.objectContaining({ managedStudio: expect.arrayContaining(["get_active_managed_studio_context", "get_studio_generation_control"]), fusionProduction: expect.arrayContaining(["materialize_fusion_panel_references", "audit_fusion_panel_references", "list_fusion_panel_reference_resolutions", "get_fusion_panel_reference_resolution", "list_derived_panel_reference_assets", "upsert_panel_reference_override", "register_derived_panel_reference_artifact", "materialize_fusion_visual_constraints", "audit_fusion_visual_constraints", "list_fusion_visual_constraints", "get_fusion_visual_constraint", "upsert_fusion_visual_constraint_override", "get_fusion_storyboard_sheet_state", "list_fusion_storyboard_sheets", "migrate_fusion_storyboard_sheets"]) }),
+        novelAgent: expect.objectContaining({
+          contract: "aicanvas.novel-agent",
+          authority: expect.objectContaining({ writes: "execute-command-only" }),
+          offsets: expect.objectContaining({ encoding: "utf16-code-unit" }),
+          consistency: expect.objectContaining({
+            stateHistory: "append-only-event-checkpoint-with-shadow-rebuild-promotion",
+            stateRecovery: "intent-before-after-cas-fail-on-third-sha",
+          }),
+          operations: expect.objectContaining({
+            controlTools: ["prepare_novel_chapter_write"],
+            controlOperations: [expect.objectContaining({
+              operationId: "prepare_chapter_write",
+              transports: {
+                mcpTool: "prepare_novel_chapter_write",
+                jsonCliOperation: "prepare_novel_chapter_write",
+                jsonCliLegacyAliases: ["prepare_chapter_write"],
+              },
+            })],
+          }),
+        }),
+        domains: expect.objectContaining({ novelManuscript: expect.arrayContaining(["doctor_novel_agent", "get_novel_manuscript_workspace", "list_novel_manuscript_chapters", "read_novel_manuscript_range", "search_novel_manuscript", "get_novel_writing_state", "list_novel_writing_source_receipts", "compare_novel_writing_source_receipts", "plan_novel_state_rebuild", "get_novel_state_rebuild_status", "probe_novel_chapter_consistency", "build_novel_context_pack", "prepare_novel_chapter_write", "preflight_novel_chapter_write", "execute_command"]), managedStudio: expect.arrayContaining(["get_active_managed_studio_context", "get_studio_generation_control"]), fusionProduction: expect.arrayContaining(["materialize_fusion_panel_references", "audit_fusion_panel_references", "list_fusion_panel_reference_resolutions", "get_fusion_panel_reference_resolution", "list_derived_panel_reference_assets", "upsert_panel_reference_override", "register_derived_panel_reference_artifact", "materialize_fusion_visual_constraints", "audit_fusion_visual_constraints", "list_fusion_visual_constraints", "get_fusion_visual_constraint", "upsert_fusion_visual_constraint_override", "get_fusion_storyboard_sheet_state", "list_fusion_storyboard_sheets", "migrate_fusion_storyboard_sheets"]) }),
         managedStudio: expect.objectContaining({
           generationControl: expect.objectContaining({
             tool: "get_studio_generation_control",
@@ -377,8 +431,19 @@ describe("stdio MCP", () => {
         fusionProduction: expect.objectContaining({ canonicalAssets: expect.objectContaining({ store: "content-addressed-project-local", crossProjectSearch: false, migrationCommand: "migrate_canonical_assets" }), panelReferenceClosure: expect.objectContaining({ resolverVersion: "panel-reference-resolution-v1", supplierSlotMaximum: 6, overflowPolicy: "reviewed-derived-composite-no-silent-truncation", closureSeparateFromGenerationReadiness: true, paginatedReads: true, mcpReturnsBinary: false }), visualConstraints: expect.objectContaining({ builderVersion: "panel-visual-constraint-v1", modelReviewSeparation: true, hiddenMaskPolicy: "golden-mask-panel-allowlist-v1", humanVisualReviewRequired: true, casOverrides: ["presence", "golden-mask-reveal"], paginatedReads: true, mcpReturnsBinary: false }), writeCommands: expect.arrayContaining(["migrate_canonical_assets", "materialize_fusion_panel_references", "upsert_panel_reference_override", "register_derived_panel_reference_artifact", "materialize_fusion_visual_constraints", "upsert_fusion_visual_constraint_override", "migrate_fusion_storyboard_sheets"]) }),
         editor: expect.objectContaining({ features: expect.arrayContaining(["complex-nested-timelines", "frozen-nested-timeline-snapshots", "otio-linear-time-warp", "otio-smpte-dissolve"]), nestedTimelines: expect.objectContaining({ contract: "aicanvas.nested-timeline.v1", maximumDepth: 8, failurePolicy: "reject-missing-drifted-tampered-cyclic-overdepth-or-unprovable" }), effectTransitions: expect.objectContaining({ contract: "aicanvas.otio-effect-transition.v1", linearTimeWarp: expect.objectContaining({ schema: "LinearTimeWarp.1" }), smpteDissolve: expect.objectContaining({ transitionType: "SMPTE_Dissolve" }) }), missingForFullNle: [] }),
         generation: expect.objectContaining({ httpRemoteRecovery: expect.objectContaining({ observationStates: ["pending", "succeeded", "confirmed_failed", "retryable_or_unknown"], stableClientJobId: true, automaticPostReplayAfterUnknown: false, isolatedDownloadPerJob: true, verifiedNoClobberPromotion: true, remoteResultExposure: "hostname-only", recoveryScope: "single-job", waitingRemoteRecoveryAction: "process_generation_queue(jobId)", submissionUnknownRecoveryAction: "reconcile_http_generation_submission(jobId,expectedRevision,reconciliation)", submissionUnknownReconciliationCAS: true, submissionUnknownNotFoundRequiresExplicitConfirmation: true, submissionUnknownReconciliationMakesRemoteRequests: false, generationPublicationTerminalRequiresStructuredProvenance: true }), subagentImagegen: expect.objectContaining({ projectConcurrency: 1, providerConcurrency: 1, callIntentBeforeModel: true, callWithoutReceipt: "generation_unknown-no-retry", rawLabeledPublicationBundleRequired: true }) }),
-        commandTypes: expect.arrayContaining(["migrate_canonical_assets", "import_story_file", "import_story_text", "create_novel_analysis_task", "upsert_novel_analysis_provider", "plan_novel_analysis_run", "execute_next_novel_analysis_run_task", "replace_novel_analysis_run_task", "execute_novel_analysis_task", "submit_novel_analysis_proposal", "review_novel_analysis_item", "review_novel_analysis_batch", "analyze_novel_chapters", "generate_adaptation_plans", "regenerate_adaptation_scope", "select_adaptation_plan", "materialize_adaptation_plan", "upsert_novel_fact", "upsert_narrative_beat", "export_adaptation", "create_task_pack", "claim_task", "heartbeat_task", "release_task", "cancel_task", "commit_existing_production_recovery", "freeze_studio_generation_pack", "dispatch_studio_generation_pack", "prepare_studio_imagegen_call", "reconcile_studio_imagegen_call", "abandon_studio_generation_unknown", "abandon_studio_detached_generation_unknown", "rebind_studio_imagegen_call_context", "commit_agent_imagegen_result_bundle", "register_studio_generation_result", "build_fusion_storyboard_grid", "materialize_fusion_panel_references", "materialize_fusion_visual_constraints", "upsert_fusion_visual_constraint_override", "upsert_panel_reference_override", "register_derived_panel_reference_artifact", "migrate_fusion_storyboard_evidence", "migrate_fusion_storyboard_sheets", "render_fusion_storyboard_sheet", "prepare_fusion_asset_consistency_review", "submit_fusion_asset_consistency_review", "seal_final_fusion_asset_consistency_batch", "upsert_generation_provider", "enqueue_generation", "cancel_generation", "update_subagent_image_generation", "migrate_generation_execution_state", "reconcile_http_generation_submission", "preflight_publication", "register_publication", "cancel_publication", "fail_publication", "preflight_publication_bundle", "register_publication_bundle", "cancel_publication_bundle", "fail_publication_bundle", "prepare_timeline_continuation", "start_edit_render", "cancel_edit_render"]),
+        commandTypes: expect.arrayContaining(["novel_initialize_manuscript", "novel_create_volume", "novel_create_chapter", "novel_save_chapter", "novel_rename_chapter", "novel_move_chapter", "novel_reorder_chapters", "novel_recover_manuscript", "novel_seed_writing_state", "novel_stage_chapter_state_candidate", "novel_review_chapter_state_candidate", "novel_stage_story_bible_candidate", "novel_review_story_bible_candidate", "novel_invalidate_writing_state_from", "novel_attach_review_ticket", "migrate_canonical_assets", "import_story_file", "import_story_text", "create_novel_analysis_task", "upsert_novel_analysis_provider", "plan_novel_analysis_run", "execute_next_novel_analysis_run_task", "replace_novel_analysis_run_task", "execute_novel_analysis_task", "submit_novel_analysis_proposal", "review_novel_analysis_item", "review_novel_analysis_batch", "analyze_novel_chapters", "generate_adaptation_plans", "regenerate_adaptation_scope", "select_adaptation_plan", "materialize_adaptation_plan", "upsert_novel_fact", "upsert_narrative_beat", "export_adaptation", "create_task_pack", "claim_task", "heartbeat_task", "release_task", "cancel_task", "commit_existing_production_recovery", "freeze_studio_generation_pack", "dispatch_studio_generation_pack", "prepare_studio_imagegen_call", "reconcile_studio_imagegen_call", "abandon_studio_generation_unknown", "abandon_studio_detached_generation_unknown", "rebind_studio_imagegen_call_context", "commit_agent_imagegen_result_bundle", "register_studio_generation_result", "build_fusion_storyboard_grid", "materialize_fusion_panel_references", "materialize_fusion_visual_constraints", "upsert_fusion_visual_constraint_override", "upsert_panel_reference_override", "register_derived_panel_reference_artifact", "migrate_fusion_storyboard_evidence", "migrate_fusion_storyboard_sheets", "render_fusion_storyboard_sheet", "prepare_fusion_asset_consistency_review", "submit_fusion_asset_consistency_review", "seal_final_fusion_asset_consistency_batch", "upsert_generation_provider", "enqueue_generation", "cancel_generation", "update_subagent_image_generation", "migrate_generation_execution_state", "reconcile_http_generation_submission", "preflight_publication", "register_publication", "cancel_publication", "fail_publication", "preflight_publication_bundle", "register_publication_bundle", "cancel_publication_bundle", "fail_publication_bundle", "prepare_timeline_continuation", "start_edit_render", "cancel_edit_render"]),
         prompts: expect.arrayContaining(["managed_studio_lock_generate_writeback"]),
+      }));
+      expect(payload(capabilitiesResult)).toEqual(expect.objectContaining({
+        domains: expect.objectContaining({
+          novelManuscript: expect.arrayContaining(["get_novel_search_index_status"]),
+          story: expect.arrayContaining(["get_novel_analysis_execution_recovery"]),
+        }),
+        commandTypes: expect.arrayContaining([
+          "novel_rebuild_search_index",
+          "mark_novel_analysis_execution_reconciliation_required",
+          "reconcile_novel_analysis_execution",
+        ]),
       }));
       const resources = await client.listResources();
       expect(resources.resources.map((resource) => resource.uri)).toEqual(expect.arrayContaining(["aicanvas://server/capabilities", "aicanvas://projects"]));

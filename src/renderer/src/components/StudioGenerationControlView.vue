@@ -48,6 +48,7 @@
           </div>
           <div class="node-actions">
             <button v-if="node.status === 'dispatched'" type="button" :disabled="loading || !generationProjectionCurrent || Boolean(actionBusy) || isUnknownBlockedNode(node)" @click="cancelNode(node)">取消</button>
+            <button v-if="node.status === 'dispatched'" type="button" :disabled="loading || higgsfieldQueueBusy || !generationProjectionCurrent || isUnknownBlockedNode(node)" @click="queueHiggsfieldImage(node)">用 Higgsfield 排队</button>
             <button v-if="node.status === 'failed' || node.status === 'cancelled'" type="button" :disabled="loading || !generationProjectionCurrent || Boolean(actionBusy) || isUnknownBlockedNode(node)" @click="retryPlan(group.planId, node.nodeIndex)">重拍</button>
             <button v-if="node.status === 'succeeded' && node.resultId" type="button" :disabled="!generationProjectionCurrent" @click="locateNode(node)">定位结果</button>
           </div>
@@ -178,6 +179,7 @@
             </template>
             <p v-else>尚无可核对的 unit-grid 生成包；不会自动准备、构建、发布或调用视频模型。</p>
           </section>
+          <HiggsfieldSeedanceVideoStep v-if="historyTargetKind === 'unit-grid'" :control="higgsfieldVideoControl" :busy="higgsfieldQueueBusy" @queue-video="queueHiggsfieldVideo" />
           <footer>
             <button type="button" @click="openBinding">检查绑定</button>
             <button type="button" :disabled="!latestReviewPair || generationActionsBlocked" data-testid="studio-generation-open-review" @click="openReview">进入审片</button>
@@ -204,11 +206,13 @@ import type {
   StudioGenerationPlanProgressNode,
 } from "@core/studio-generation-plan-progress";
 import type { StudioVideoPackagePublicControlLookup } from "@core/studio-video-package";
+import type { StudioHiggsfieldVideoControl } from "@core/studio-higgsfield-video-generation";
 import { createStudioCommandEnvelope } from "../studio-command-envelope";
 import type { StudioPublicCommandRequest } from "@core/studio-command-runtime";
 import type { StudioProductionDashboardUiApi } from "../studio-production-dashboard-store";
 import type { StudioContinuityReviewFocus } from "../studio-continuity-review-store";
 import { createProjectScopedActionGate } from "../project-scoped-action-gate";
+import HiggsfieldSeedanceVideoStep from "./HiggsfieldSeedanceVideoStep.vue";
 import {
   createDebouncedDirtyRefreshLoop,
   createLatestRequestGate,
@@ -322,9 +326,11 @@ const generationActionsBlocked = computed(() => (
   && detachedUnknownNodeStates.value[selectedUnitId.value] !== "clear"
 ));
 const videoControl = ref<StudioVideoPackagePublicControlLookup | null>(null);
+const higgsfieldVideoControl = ref<StudioHiggsfieldVideoControl | null>(null);
 const videoControlLoading = ref(false);
 const videoControlError = ref("");
 let videoControlToken = 0;
+const higgsfieldQueueBusy = ref(false);
 
 const selectedPackId = computed(() => {
   if (historyTargetKind.value === "unit-grid") {
@@ -892,9 +898,10 @@ async function loadVideoPackageControl(
 ): Promise<void> {
   const token = ++videoControlToken;
   videoControl.value = null;
+  higgsfieldVideoControl.value = null;
   videoControlError.value = "";
   videoControlLoading.value = false;
-  if (historyTargetKind.value !== "unit-grid" || duduProject.value !== true || generationActionsBlocked.value) return;
+  if (historyTargetKind.value !== "unit-grid" || generationActionsBlocked.value) return;
   const newestResult = items[0];
   const packId = newestResult?.packId
     ?? (progress.value?.nodes ?? []).find((node) => (
@@ -914,12 +921,58 @@ async function loadVideoPackageControl(
     const control = await window.canvasApi.getStudioVideoPackageControl(root, query);
     if (disposed || token !== videoControlToken || parentToken !== requestToken || root !== props.projectRoot) return;
     videoControl.value = control;
+    const intentId = control.selectedIntentId;
+    if (intentId) {
+      const higgsfield = await window.canvasApi.getStudioHiggsfieldVideoGenerationControl(root, intentId);
+      if (disposed || token !== videoControlToken || parentToken !== requestToken || root !== props.projectRoot) return;
+      higgsfieldVideoControl.value = higgsfield;
+    }
   } catch (reason) {
     if (token === videoControlToken && parentToken === requestToken && root === props.projectRoot) {
       videoControlError.value = reason instanceof Error ? reason.message : String(reason);
     }
   } finally {
     if (token === videoControlToken) videoControlLoading.value = false;
+  }
+}
+
+async function queueHiggsfieldVideo(intentId: string): Promise<void> {
+  if (!intentId || higgsfieldQueueBusy.value || generationActionsBlocked.value) return;
+  const root = props.projectRoot;
+  higgsfieldQueueBusy.value = true;
+  try {
+    const envelope = await createStudioCommandEnvelope({
+      command: "enqueue_studio_higgsfield_connector_request",
+      payload: { kind: "video", intentId },
+    });
+    if (root !== props.projectRoot || disposed) return;
+    await window.canvasApi.executeStudioCommand(root, envelope);
+    if (root !== props.projectRoot || disposed) return;
+    await loadVideoPackageControl(root, requestToken, history.value);
+  } catch (reason) {
+    if (root === props.projectRoot && !disposed) fail(reason);
+  } finally {
+    if (root === props.projectRoot) higgsfieldQueueBusy.value = false;
+  }
+}
+
+async function queueHiggsfieldImage(node: StudioGenerationPlanProgressNode): Promise<void> {
+  if (higgsfieldQueueBusy.value || node.status !== "dispatched" || isUnknownBlockedNode(node)) return;
+  const root = props.projectRoot;
+  higgsfieldQueueBusy.value = true;
+  try {
+    const envelope = await createStudioCommandEnvelope({
+      command: "enqueue_studio_higgsfield_connector_request",
+      payload: { kind: "image", imageGenerationRunId: node.generationRunId, executionAdapter: "higgsfield-connector" },
+    });
+    if (root !== props.projectRoot || disposed) return;
+    await window.canvasApi.executeStudioCommand(root, envelope);
+    if (root !== props.projectRoot || disposed) return;
+    await loadProgress(root, requestToken);
+  } catch (reason) {
+    if (root === props.projectRoot && !disposed) fail(reason);
+  } finally {
+    if (root === props.projectRoot) higgsfieldQueueBusy.value = false;
   }
 }
 

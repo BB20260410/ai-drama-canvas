@@ -41,26 +41,52 @@
     </header>
 
     <nav v-if="projectRoot && !managedShell" class="module-nav">
-      <button v-for="entry in moduleEntries" :key="entry.id" type="button" :class="{ active: activeView === entry.id }" @click="activeView = entry.id">
+      <button v-for="entry in moduleEntries" :key="entry.id" type="button" :class="{ active: activeView === entry.id }" @click="switchModuleView(entry.id)">
         <component :is="entry.icon" :size="14" /><span>{{ entry.label }}</span>
       </button>
     </nav>
 
-    <MaterialStudioView
-      v-if="managedShell && projectRoot"
-      :project-root="projectRoot"
-      :project-name="managedShell.project.name"
-      :api="materialStudioApi"
-      :binding-api="studioBindingApi"
-      :continuity-review-api="studioContinuityReviewApi"
-      :dashboard-api="studioDashboardApi"
-      :script-align-api="studioScriptAlignApi"
-      :multimedia-timeline-api="studioMultimediaTimelineApi"
-      :external-mode-request="studioModeRequest"
-      @studio-context-changed="persistStudioContext"
-      @project-restored="openRestoredProject"
-      @binding-changed="showMessage"
-      @failed="showMessage($event, true)" />
+    <section
+      v-if="managedShell && projectRoot && managedWorkspaceView === 'drama'"
+      class="managed-drama-workspace"
+      :class="{ hybrid: managedShell.workspaceMode === 'hybrid' }"
+      data-testid="managed-drama-workspace">
+      <nav
+        v-if="managedShell.workspaceMode === 'hybrid'"
+        class="hybrid-workspace-switch"
+        aria-label="混合工程工作区"
+        data-testid="hybrid-drama-workspace-switch">
+        <span>共用工程</span>
+        <button type="button" aria-pressed="false" data-testid="hybrid-switch-novel" :disabled="managedWorkspaceSwitching || projectSwitching" @click="switchManagedWorkspace('novel')">小说创作</button>
+        <button type="button" class="active" aria-pressed="true" data-testid="hybrid-switch-drama">短剧制作</button>
+      </nav>
+      <MaterialStudioView
+        :project-root="projectRoot"
+        :project-name="managedShell.project.name"
+        :api="materialStudioApi"
+        :binding-api="studioBindingApi"
+        :continuity-review-api="studioContinuityReviewApi"
+        :dashboard-api="studioDashboardApi"
+        :script-align-api="studioScriptAlignApi"
+        :multimedia-timeline-api="studioMultimediaTimelineApi"
+        :external-mode-request="studioModeRequest"
+        @studio-context-changed="persistStudioContext"
+        @project-restored="openRestoredProject"
+        @binding-changed="showMessage"
+        @failed="showMessage($event, true)" />
+    </section>
+
+    <NovelStudioView
+      v-else-if="novelStudioProject"
+      :key="novelStudioProject.projectRoot"
+      ref="novelStudioRef"
+      :project="novelStudioProject"
+      :loading="novelStudioRefreshing || managedWorkspaceSwitching || projectSwitching || Boolean(projectRemovingRoot)"
+      @switch-workspace="switchManagedWorkspace"
+      @open-project-center="openProjectCenter"
+      @refresh="refreshNovelStudio"
+      @imported="openImportedNovelProject"
+      @restored="openRestoredProject" />
 
     <section v-else-if="!projectRoot" class="import-screen first-run-screen" data-testid="first-run-screen" @dragover.prevent @drop.prevent="onProjectDrop">
       <div class="import-symbol"><FolderKanban :size="30" /></div>
@@ -68,7 +94,7 @@
       <h2>从一个剧开始</h2>
       <p>新建工程只需名称；角色、场景、道具、剧本和生成结果都会收在同一个受管工程。</p>
       <div class="first-run-actions">
-        <button class="first-run-card primary" type="button" data-testid="first-run-create" :disabled="projectOperationBusy" @click="openProjectCenter"><FolderPlus :size="22" /><b>新建短剧工程</b><span>只填工程名称</span></button>
+        <button class="first-run-card primary" type="button" data-testid="first-run-create" :disabled="projectOperationBusy" @click="openProjectCenter"><FolderPlus :size="22" /><b>新建本地工程</b><span>可选择小说或短剧</span></button>
         <button class="first-run-card" type="button" data-testid="first-run-recent" :disabled="projectOperationBusy || !projects.some(project => project.available)" @click="openMostRecentProject"><Clock3 :size="22" /><b>{{ projectSwitching ? "正在打开工程" : "打开最近工程" }}</b><span>继续上次位置</span></button>
         <button class="first-run-card" type="button" data-testid="first-run-import" :disabled="projectOperationBusy" @click="importProject"><FolderKanban :size="22" /><b>导入已有工程</b><span>先预检，再接入</span></button>
       </div>
@@ -133,7 +159,7 @@
         </div>
         <div v-if="linkMode" class="link-mode-hint"><MousePointer2 :size="13" /> {{ linkSourceId ? `起点 ${linkSourceId}，请选择目标节点` : '请选择关系线起点' }}</div>
         <div v-if="loading && !index" class="loading-screen"><span></span><p>正在读取真实制作进度…</p></div>
-        <VueFlow
+        <LegacyVueFlow
           v-else
           id="production-flow"
           v-model:nodes="nodes"
@@ -150,10 +176,11 @@
           @node-click="onNodeClick"
           @edge-click="onEdgeClick"
           @node-drag-stop="onNodeDragStop"
+          @pane-ready="onProductionFlowPaneReady"
           @move="onMove">
-          <Background pattern-color="#292b27" :gap="24" :size="1" />
-          <Controls position="bottom-left" />
-        </VueFlow>
+          <LegacyVueFlowBackground pattern-color="#292b27" :gap="24" :size="1" />
+          <LegacyVueFlowControls position="bottom-left" />
+        </LegacyVueFlow>
         <div class="canvas-caption">
           <span>{{ canvasNodeCount }} 个可见节点</span>
           <span>缩放 {{ Math.round(zoom * 100) }}%</span>
@@ -212,6 +239,8 @@
         @failed="showMessage($event, true)" />
       <VideoEditorView
         v-else-if="activeView === 'editor' && index"
+        :key="projectRoot"
+        ref="videoEditorRef"
         :project-root="projectRoot"
         :index="index"
         @changed="showMessage"
@@ -303,7 +332,7 @@
 
     <div v-if="canvasEditor" class="canvas-editor-overlay" @click.self="canvasEditor = null">
       <section class="canvas-editor-dialog">
-        <header><div><span class="eyebrow">{{ canvasEditor.kind === 'note' ? '导演批注' : '自定义分组' }}</span><h2>{{ canvasEditor.id ? '编辑画布实体' : '新建画布实体' }}</h2></div><button class="icon-button" type="button" @click="canvasEditor = null"><X :size="16" /></button></header>
+        <header><div><span class="eyebrow">{{ canvasEditor.kind === 'note' ? '导演批注' : '自定义分组' }}</span><h2>{{ canvasEditor.id ? '编辑画布实体' : '新建画布实体' }}</h2></div><button class="icon-button" type="button" aria-label="关闭画布编辑器" @click="canvasEditor = null"><X :size="16" /></button></header>
         <div class="canvas-editor-form">
           <label><span>标题</span><input v-model="canvasEditor.title" maxlength="120" /></label>
           <label><span>正文 / 说明</span><textarea v-model="canvasEditor.body" rows="6" maxlength="20000"></textarea></label>
@@ -322,18 +351,21 @@
 
 <script setup lang="ts">
 import { computed, defineAsyncComponent, markRaw, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
-import { Background } from "@vue-flow/background";
-import { Controls } from "@vue-flow/controls";
-import { VueFlow, useVueFlow, type Edge, type Node, type NodeDragEvent } from "@vue-flow/core";
+import type { Edge, Node, NodeDragEvent, VueFlowStore } from "@vue-flow/core";
 import { BookOpenCheck, BookOpenText, Boxes, BrainCircuit, Clapperboard, Clock3, FolderKanban, FolderPlus, Frame, GitBranch, LayoutDashboard, LibraryBig, Link2, ListVideo, MousePointer2, Redo2, RefreshCw, Rows3, Save, ScanEye, Scissors, Search, Settings2, ShieldCheck, Sparkles, SquareKanban, StickyNote, Undo2, Workflow, X } from "lucide-vue-next";
 import type { AdaptationStore, Artifact, CanvasEntity, CanvasEntityColor, CanvasEntityKind, CanvasHistoryInfo, CanvasLinkKind, CanvasPosition, CanvasSemanticState, ProjectIndex, WorkItem, WorkItemStatus } from "@core/types";
-import ProductionNode from "./components/ProductionNode.vue";
-import ZoneNode from "./components/ZoneNode.vue";
-import InspectorPanel from "./components/InspectorPanel.vue";
-import CanvasNoteNode from "./components/CanvasNoteNode.vue";
-import CanvasGroupNode from "./components/CanvasGroupNode.vue";
-import NarrativeNode from "./components/NarrativeNode.vue";
-import type { MaterialStudioUiApi, MaterialStudioUiDetail, MaterialStudioUiEntry } from "./components/MaterialStudioView.vue";
+import type { MaterialStudioUiApi, MaterialStudioUiDetail, MaterialStudioUiEntry } from "./material-studio-ui-contract";
+import type {
+  NovelLeaveReason,
+  NovelLeaveResult,
+  NovelStudioExpose,
+  NovelStudioProject,
+} from "./components/NovelStudioView.vue";
+import type {
+  VideoEditorExpose,
+  VideoEditorLeaveReason,
+  VideoEditorLeaveResult,
+} from "./components/VideoEditorView.vue";
 import type { StudioBindingMutationResult, StudioBindingWorkbenchApi } from "./studio-binding-pagination";
 import type { StudioContinuityReviewUiApi } from "./studio-continuity-review-store";
 import {
@@ -342,6 +374,8 @@ import {
 } from "./studio-production-dashboard-store";
 import { createStudioCommandEnvelope } from "./studio-command-envelope";
 import { createProjectListRefreshController } from "./project-list-refresh-controller";
+import { mapMaterialStudioProjectOverview } from "./material-studio-read-mapper";
+import { projectLegacyCanvasFlow } from "./legacy-canvas-flow-projection";
 import {
   createLegacyProjectEpochGate,
   isCurrentLegacyWatcherEvent,
@@ -349,20 +383,41 @@ import {
 } from "./legacy-project-epoch-gate";
 import { createProjectScopedActionGate, type ProjectScopedActionToken } from "./project-scoped-action-gate";
 import { statusClass } from "./utils";
-import type { ProjectShell } from "@core/managed-project";
+import { resolveStoryboardWizardAssets } from "./storyboard-wizard-assets";
+import { markT23RendererStartup } from "./t23-renderer-startup-probe";
+import { createManagedStudioModulePreloader } from "./managed-studio-module-preload";
+import type { CreateManagedProjectOptions, ProjectShell } from "@core/managed-project";
 import type { ListedProjectSummary } from "@core/service";
 import type { ReuseStudioGlobalResourceResult } from "@core/studio-global-resource-reuse";
 
-// 首屏只需要画布与节点组件；其余模块视图按需异步加载，避免全部打进主 chunk（沿用 MaterialStudioView 内部先例）。
-const MaterialStudioView = defineAsyncComponent(async () => {
+markT23RendererStartup("app-module-evaluated");
+
+// 旧版生产画布只服务非受管工程；VueFlow、节点和检查器均按需加载，避免项目中心、
+// 小说工作区与受管画布先解析一套不会使用的运行时。
+const LegacyVueFlow = defineAsyncComponent(async () => (await import("@vue-flow/core")).VueFlow);
+const LegacyVueFlowBackground = defineAsyncComponent(async () => (await import("@vue-flow/background")).Background);
+const LegacyVueFlowControls = defineAsyncComponent(async () => (await import("@vue-flow/controls")).Controls);
+const ProductionNode = defineAsyncComponent(() => import("./components/ProductionNode.vue"));
+const ZoneNode = defineAsyncComponent(() => import("./components/ZoneNode.vue"));
+const InspectorPanel = defineAsyncComponent(() => import("./components/InspectorPanel.vue"));
+const CanvasNoteNode = defineAsyncComponent(() => import("./components/CanvasNoteNode.vue"));
+const CanvasGroupNode = defineAsyncComponent(() => import("./components/CanvasGroupNode.vue"));
+const NarrativeNode = defineAsyncComponent(() => import("./components/NarrativeNode.vue"));
+
+// 其余模块视图同样按需异步加载，避免全部打进主 chunk（沿用 MaterialStudioView 内部先例）。
+const managedStudioModulePreloader = createManagedStudioModulePreloader(async () => {
   // 受管工程默认直达无限画布。素材中心壳与 400KB 级画布 chunk 并行加载，
   // 避免壳先完成后才串行触发第二次动态导入；浏览器模块缓存会被子组件复用。
+  markT23RendererStartup("app-managed-studio-chunks-start");
   const [materialStudio] = await Promise.all([
     import("./components/MaterialStudioView.vue"),
     import("./components/ManagedStudioCanvasView.vue"),
   ]);
+  markT23RendererStartup("app-managed-studio-chunks-ready");
   return materialStudio;
 });
+const MaterialStudioView = defineAsyncComponent(() => managedStudioModulePreloader.load());
+const NovelStudioView = defineAsyncComponent(() => import("./components/NovelStudioView.vue"));
 const ProductionWorkspace = defineAsyncComponent(() => import("./components/ProductionWorkspace.vue"));
 const CanonicalAssetLibraryView = defineAsyncComponent(() => import("./components/CanonicalAssetLibraryView.vue"));
 const ProjectCenter = defineAsyncComponent(() => import("./components/ProjectCenter.vue"));
@@ -381,13 +436,12 @@ const VideoEditorView = defineAsyncComponent(() => import("./components/VideoEdi
 const ProductionDesignView = defineAsyncComponent(() => import("./components/ProductionDesignView.vue"));
 const NarrativeAdaptationView = defineAsyncComponent(() => import("./components/NarrativeAdaptationView.vue"));
 
-const STAGES: WorkItem["stage"][] = ["剧本", "硬锁资产", "首尾帧", "视频", "验收"];
 const STUDIO_TEXT_PREVIEW_CHARACTERS = 20_000;
-const STAGE_X: Record<WorkItem["stage"], number> = { 剧本: 0, 硬锁资产: 350, 首尾帧: 700, 视频: 1_050, 验收: 1_400 };
 // Vue Flow 的节点组件类型要求运行时注入完整 NodeProps；这里由 Vue Flow 负责注入。
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const nodeTypes: any = { production: markRaw(ProductionNode), narrative: markRaw(NarrativeNode), zone: markRaw(ZoneNode), note: markRaw(CanvasNoteNode), group: markRaw(CanvasGroupNode) };
 type ModuleView = "studio" | "canvas" | "story" | "adaptation" | "design" | "scripts" | "shots" | "timeline" | "continuityTracks" | "panelReferences" | "editor" | "assets" | "videos" | "review" | "continuation" | "generation" | "tasks" | "settings";
+type ManagedWorkspaceView = "drama" | "novel";
 const moduleEntries = [
   { id: "canvas" as const, label: "生产画布", icon: markRaw(LayoutDashboard) },
   { id: "story" as const, label: "故事图谱", icon: markRaw(LibraryBig) },
@@ -410,6 +464,11 @@ const moduleEntries = [
 
 const index = ref<ProjectIndex | null>(null);
 const managedShell = ref<ProjectShell | null>(null);
+const managedWorkspaceView = ref<ManagedWorkspaceView>("drama");
+const novelStudioRef = ref<NovelStudioExpose | null>(null);
+const videoEditorRef = ref<VideoEditorExpose | null>(null);
+const novelStudioRefreshing = ref(false);
+const managedWorkspaceSwitching = ref(false);
 // VueFlow 的递归 Node 泛型不适合深层响应式；rebuildFlow 始终整页替换，使用 shallowRef（对齐受管画布先例）。
 const nodes = shallowRef<Node[]>([]);
 const edges = shallowRef<Edge[]>([]);
@@ -439,12 +498,14 @@ const managedProjectOperation = ref<RendererManagedProjectOperation | null>(null
 const externalManagedProjectBusy = computed(() => managedProjectOperation.value?.busy === true);
 const projectOperationBusy = computed(() => creatingManagedProject.value
   || projectSwitching.value
+  || managedWorkspaceSwitching.value
   || Boolean(projectRemovingRoot.value)
   || externalManagedProjectBusy.value);
 const showImportWizard = ref(false);
 const importRoot = ref("");
 const activeView = ref<ModuleView>("canvas");
 const search = ref("");
+const debouncedCanvasSearch = ref("");
 const episodeFilter = ref("all");
 const statusFilter = ref<WorkItemStatus | "all">("all");
 const showShots = ref(false);
@@ -467,7 +528,18 @@ const scanCancelling = ref(false);
 const zoom = ref(0.62);
 const canvasWrap = ref<HTMLElement | null>(null);
 const canvasViewport = ref({ x: 40, y: 30, zoom: 0.62 });
-const productionFlow = useVueFlow("production-flow");
+type LegacyProductionFlowHandle = Pick<VueFlowStore, "getViewport" | "setCenter" | "zoomTo">;
+const productionFlow = shallowRef<LegacyProductionFlowHandle | null>(null);
+
+function onProductionFlowPaneReady(flow: VueFlowStore): void {
+  productionFlow.value = flow;
+}
+
+async function setLegacyCanvasZoom(target: number): Promise<boolean> {
+  const flow = productionFlow.value;
+  return flow ? flow.zoomTo(target, { duration: 0 }) : false;
+}
+
 const canvasState = ref<CanvasSemanticState>({ schemaVersion: 1, revision: 0, entities: [], links: [], updatedAt: new Date(0).toISOString() });
 const canvasHistory = ref<CanvasHistoryInfo>({ canUndo: false, canRedo: false, undoCount: 0, redoCount: 0, revision: 0 });
 const linkMode = ref(false);
@@ -479,10 +551,13 @@ const canvasEditor = ref<CanvasEditorDraft | null>(null);
 const message = ref("");
 const messageIsError = ref(false);
 let messageTimer: ReturnType<typeof setTimeout> | null = null;
+let legacyCanvasSearchTimer: ReturnType<typeof setTimeout> | null = null;
+let legacyFlowRebuildTimer: ReturnType<typeof setTimeout> | null = null;
 let removeIndexListener: (() => void) | undefined;
 let removeErrorListener: (() => void) | undefined;
 let removeSemanticListener: (() => void) | undefined;
 let removeManagedProjectOperationListener: (() => void) | undefined;
+let removeWindowCloseListener: (() => void) | undefined;
 let layoutGeneration = 0;
 let projectSwitchGeneration = 0;
 let projectCenterReturnFocus: HTMLElement | null = null;
@@ -496,6 +571,7 @@ let layoutPositionsKey = "";
 interface ProjectUiSnapshot {
   projectRoot: string;
   managedShell: ProjectShell | null;
+  managedWorkspaceView: ManagedWorkspaceView;
   index: ProjectIndex | null;
   activeView: ModuleView;
   selectedId: string | null;
@@ -511,6 +587,7 @@ interface ProjectUiSnapshot {
 interface StagedProjectUi {
   projectRoot: string;
   managedShell: ProjectShell | null;
+  managedWorkspaceView: ManagedWorkspaceView;
   index: ProjectIndex | null;
   episodeFilter: string;
   adaptationWorkspace: AdaptationStore | null;
@@ -531,6 +608,62 @@ function emptyCanvasState(): CanvasSemanticState {
 
 function emptyCanvasHistory(): CanvasHistoryInfo {
   return { canUndo: false, canRedo: false, undoCount: 0, redoCount: 0, revision: 0 };
+}
+
+function defaultManagedWorkspaceView(shell: ProjectShell): ManagedWorkspaceView {
+  return shell.workspaceMode === "novel" || shell.workspaceMode === "hybrid" ? "novel" : "drama";
+}
+
+async function restoreManagedWorkspaceView(shell: ProjectShell): Promise<ManagedWorkspaceView> {
+  if (shell.workspaceMode !== "hybrid") return defaultManagedWorkspaceView(shell);
+  const preference = await window.canvasApi.getActiveHybridWorkspacePreference(shell.project.id);
+  return preference?.mode ?? "novel";
+}
+
+const novelStudioProject = computed<NovelStudioProject | null>(() => {
+  const shell = managedShell.value;
+  if (!shell || !projectRoot.value || managedWorkspaceView.value !== "novel") return null;
+  if (shell.workspaceMode !== "novel" && shell.workspaceMode !== "hybrid") return null;
+  return {
+    projectId: shell.project.id,
+    projectName: shell.project.name,
+    projectRoot: projectRoot.value,
+    workspaceMode: shell.workspaceMode,
+  };
+});
+
+async function requestNovelStudioLeave(reason: NovelLeaveReason): Promise<NovelLeaveResult> {
+  const studio = novelStudioRef.value;
+  if (!studio) return "proceed";
+  try {
+    return await studio.requestLeave(reason);
+  } catch (error) {
+    showMessage(`未保存正文门禁失败，已取消离开：${error instanceof Error ? error.message : String(error)}`, true);
+    return "save_failed";
+  }
+}
+
+async function requestVideoEditorLeave(reason: VideoEditorLeaveReason): Promise<VideoEditorLeaveResult> {
+  const editor = videoEditorRef.value;
+  if (!editor) return "proceed";
+  try {
+    return await editor.requestLeave(reason);
+  } catch (error) {
+    showMessage(`未保存剪辑门禁失败，已取消离开：${error instanceof Error ? error.message : String(error)}`, true);
+    return "cancelled";
+  }
+}
+
+async function requestActiveWorkspaceLeave(reason: "project_switch" | "window_close" | "workspace_switch"): Promise<"proceed" | "blocked"> {
+  if (await requestNovelStudioLeave(reason) !== "proceed") return "blocked";
+  if (await requestVideoEditorLeave(reason) !== "proceed") return "blocked";
+  return "proceed";
+}
+
+async function switchModuleView(next: ModuleView): Promise<void> {
+  if (next === activeView.value) return;
+  if (activeView.value === "editor" && await requestVideoEditorLeave("module_switch") !== "proceed") return;
+  activeView.value = next;
 }
 
 function captureLegacyProjectToken(root = projectRoot.value): LegacyProjectEpochToken | null {
@@ -882,12 +1015,10 @@ const studioScriptAlignApi = {
       "写入向导提示词修订",
     );
 
-    const assetIds = [...new Set(input.panels.flatMap((panel) => panel.suggestedAssetIds))];
-    const assets = new Map<string, NonNullable<Awaited<ReturnType<typeof window.canvasApi.getStudioAsset>>>>();
-    await Promise.all(assetIds.map(async (assetId) => {
-      const asset = await window.canvasApi.getStudioAsset(root, assetId);
-      if (asset) assets.set(assetId, asset);
-    }));
+    const assets = await resolveStoryboardWizardAssets(
+      input.panels,
+      (assetId) => window.canvasApi.getStudioAsset(root, assetId),
+    );
     const unit = requireResult<{ unit: { id: string; revision: number } }>(
       await window.canvasApi.executeStudioCommand(root, await createStudioCommandEnvelope({
         command: "create_studio_production_unit",
@@ -1013,24 +1144,6 @@ const studioMultimediaTimelineApi = {
   },
 };
 
-function materialTimelineStatus(status: string): "pending" | "current" | "complete" {
-  if (status === "generation-ready") return "complete";
-  if (["ambiguous", "unmatched", "bound", "stale"].includes(status)) return "current";
-  return "pending";
-}
-
-function studioPanelStatusLabel(status: string): string {
-  return ({
-    pending: "待处理",
-    unchecked: "待分析",
-    ambiguous: "待消歧",
-    unmatched: "缺少资产",
-    bound: "已绑定",
-    stale: "需更新",
-    "generation-ready": "可生成",
-  } as Record<string, string>)[status] ?? status;
-}
-
 const materialStudioApi: MaterialStudioUiApi = {
   openProjectCenter,
   // P24 U4：文稿修订历史（只读通道，≤20 条）。
@@ -1055,11 +1168,13 @@ const materialStudioApi: MaterialStudioUiApi = {
     return result.result as ReuseStudioGlobalResourceResult;
   },
   async getOverview(root) {
-    const [shell, material, production, dashboardOverview] = await Promise.all([
+    // Canvas 先发 overview；Material 后加入同一 in-flight Promise。等待共享 Dashboard
+    // 完成后再读取三个壳层 owner，避免它们在首张单元卡前与 units 争用 Main/Core。
+    const dashboardOverview = await studioDashboardApi.getDashboard(root, { operation: "overview" });
+    const [shell, material, production] = await Promise.all([
       window.canvasApi.getManagedProjectShell(root),
       window.canvasApi.getMaterialStudioState(root),
       window.canvasApi.getStudioProductionState(root),
-      studioDashboardApi.getDashboard(root, { operation: "overview" }),
     ]);
     if (!shell) throw new Error("当前项目不是受管素材工程。");
     const nextUnitId = dashboardOverview.operation === "overview"
@@ -1075,48 +1190,16 @@ const materialStudioApi: MaterialStudioUiApi = {
       })
       : null;
     const currentUnit = dashboardUnitResponse?.operation === "unit" ? dashboardUnitResponse : null;
-    const reviewedSlotCount = dashboardOverview.operation === "overview"
-      ? dashboardOverview.checkpoint.completedSlotCount
-      : 0;
-    const counts = {
-      textDocuments: production.counts.textDocuments,
-      scripts: production.counts.scriptDocuments,
-      prompts: production.counts.promptDocuments,
-      character: material.counts.characters,
-      scene: material.counts.scenes,
-      prop: material.counts.props,
-      style: material.counts.styles,
-      media: material.counts.media,
-      canonicalAssets: material.counts.canonicalAssets,
-      total: production.counts.textDocuments + material.counts.canonicalAssets + material.counts.media,
-    };
-    // nextAction 必须来自 Core Dashboard 投影，禁止 UI 自行推导业务动作。
-    const nextAction = dashboardOverview.operation === "overview"
-      ? `${dashboardOverview.nextAction.label}：${dashboardOverview.nextAction.reason}`
-      : "打开生产驾驶舱查看 Core 下一动作。";
-    return {
-      projectName: shell.project.name,
-      nextAction,
-      nextActionControl: dashboardOverview.operation === "overview"
-        ? dashboardOverview.nextAction
-        : undefined,
-      counts,
-      timeline: {
-        currentLabel: currentUnit
-          ? `${currentUnit.unit.episodeId} · ${currentUnit.unit.label} · ${currentUnit.unit.panelCount} 宫格${reviewedSlotCount ? ` · 已审片槽位 ${reviewedSlotCount}` : ""}`
-          : reviewedSlotCount ? `已审片槽位 ${reviewedSlotCount}` : "等待 Core 指定下一分镜",
-        unitCount: production.counts.units,
-        // 旧 UI 合同名仍为 completedUnitCount；值取 Core checkpoint 的真实已审片槽位，
-        // MaterialStudioView 应在独立改动中将展示标签校正为“已审片槽位”。
-        completedUnitCount: reviewedSlotCount,
-        segments: currentUnit?.panels.map((panel) => ({
-          id: panel.id,
-          label: `${panel.ordinal}. ${panel.label} · ${studioPanelStatusLabel(panel.status)}`,
-          durationSeconds: panel.durationSeconds,
-          status: materialTimelineStatus(panel.status),
-        })) ?? [],
-      },
-    };
+    if (dashboardOverview.operation !== "overview") {
+      throw new Error("生产驾驶舱 overview 读取返回了不兼容投影。");
+    }
+    return mapMaterialStudioProjectOverview({
+      shell,
+      material,
+      production,
+      dashboardOverview,
+      currentUnit,
+    });
   },
   async listEntries(root, query) {
     if (query.section === "media") {
@@ -1559,7 +1642,7 @@ const statusEntries = computed(() => {
   return [...counts].map(([status, count]) => ({ status, count }));
 });
 const visibleItems = computed(() => {
-  const needle = search.value.trim().toLowerCase();
+  const needle = debouncedCanvasSearch.value.trim().toLowerCase();
   return (index.value?.items ?? []).filter((item) => {
     if (item.type === "episode") return false;
     if (item.type === "asset" && !showAssets.value) return false;
@@ -1588,9 +1671,32 @@ const viewKey = computed(() => `${episodeFilter.value}-${showShots.value ? "shot
 
 // 仅在跨越 0.35 紧凑阈值时才需要重建节点；缩放本身（zoom 变化）不触发 rebuildFlow（P18 实测：100 次缩放产生 101 次重建）。
 const compactZoom = computed(() => zoom.value < 0.35);
-watch([visibleItems, viewKey, compactZoom], () => void rebuildFlow());
+watch(search, (value) => {
+  if (legacyCanvasSearchTimer) clearTimeout(legacyCanvasSearchTimer);
+  legacyCanvasSearchTimer = setTimeout(() => {
+    legacyCanvasSearchTimer = null;
+    debouncedCanvasSearch.value = value;
+  }, 120);
+});
+
+function scheduleLegacyFlowRebuild(): void {
+  if (legacyFlowRebuildTimer) clearTimeout(legacyFlowRebuildTimer);
+  legacyFlowRebuildTimer = setTimeout(() => {
+    legacyFlowRebuildTimer = null;
+    void rebuildFlow();
+  }, 0);
+}
+
+watch([visibleItems, viewKey, compactZoom], scheduleLegacyFlowRebuild);
 
 onMounted(async () => {
+  markT23RendererStartup("app-mounted");
+  removeWindowCloseListener = window.canvasApi.onWindowCloseRequested(({ requestId }) => {
+    void requestActiveWorkspaceLeave("window_close")
+      .then((result) => window.canvasApi.respondToWindowClose(requestId, result === "proceed"))
+      .catch(() => window.canvasApi.respondToWindowClose(requestId, false));
+  });
+  markT23RendererStartup("app-runtime-gate-start");
   try {
     const gate = await window.canvasApi.getRuntimeWriteGate();
     rootRuntimeGateReasons.value = Array.isArray("reasons" in gate ? gate.reasons : undefined)
@@ -1608,13 +1714,15 @@ onMounted(async () => {
       return;
     }
     rootRuntimeGateState.value = "allowed";
+    markT23RendererStartup("app-runtime-gate-ready");
   } catch (error) {
     rootRuntimeGateState.value = "unknown";
     rootRuntimeGateMessage.value = `运行时诊断失败，已按不安全状态关闭业务访问：${error instanceof Error ? error.message : String(error)}`;
     return;
   }
   try {
-    window.aiCanvasDiagnostics = { snapshot: canvasDiagnosticsSnapshot, focusNode: focusCanvasNode, setZoom: (target) => productionFlow.zoomTo(target, { duration: 0 }) };
+  markT23RendererStartup("app-bootstrap-reads-start");
+  window.aiCanvasDiagnostics = { snapshot: canvasDiagnosticsSnapshot, focusNode: focusCanvasNode, setZoom: setLegacyCanvasZoom };
   removeIndexListener = window.canvasApi.onIndexUpdated((updated) => {
     if (projectSwitching.value || updated.project.primaryRoot !== projectRoot.value) return;
     index.value = updated;
@@ -1632,15 +1740,69 @@ onMounted(async () => {
   });
   window.addEventListener("keydown", onCanvasShortcut);
   removeManagedProjectOperationListener = window.canvasApi.onManagedProjectOperationState(applyManagedProjectOperationState);
-  const [activeProject, registeredProjects, defaultProjectsRoot, operationState] = await Promise.all([
-    window.canvasApi.getActiveProject(),
+  const activeProjectPromise = window.canvasApi.getActiveProject();
+  const startupManagedShellPromise = activeProjectPromise.then(async (activeProject) => {
+    if (!activeProject?.available || !activeProject.primaryRoot) return null;
+    markT23RendererStartup("app-managed-shell-start");
+    const shell = await window.canvasApi.getManagedProjectShell(activeProject.primaryRoot);
+    markT23RendererStartup("app-managed-shell-ready");
+    // reconcile 等待 manifest 只读校验期间，偏好读取和按需 chunk 预热可并行；
+    // 但它们都不提交 managedShell/activeView 这个可写受管 UI。
+    const workspaceViewPromise = shell
+      ? restoreManagedWorkspaceView(shell).then((workspaceView) => {
+        if (workspaceView === "drama") {
+          managedStudioModulePreloader.warm();
+        }
+        return workspaceView;
+      })
+      : Promise.resolve(undefined);
+    // 先登记 rejection handler，避免后续 reconcile/列表读取尚未 await 该 promise 时
+    // 被运行时当作未处理；原 promise 仍在提交前 await，因此错误不会被吞掉。
+    void workspaceViewPromise.catch(() => undefined);
+    return { projectRoot: activeProject.primaryRoot, shell, workspaceViewPromise };
+  });
+  const startupReconcilePromise = Promise.all([activeProjectPromise, startupManagedShellPromise])
+    .then(async ([activeProject, startupManagedShell]) => {
+      if (!activeProject?.available || !activeProject.primaryRoot || !activeProject.activationId) return null;
+      if (activeProject.managedStartupRequired
+        && (!startupManagedShell?.shell || startupManagedShell.projectRoot !== activeProject.primaryRoot)) {
+        throw new Error("受管工程 shell 不可读，已停止启动以避免回退到旧工程路径。 ");
+      }
+      if (!startupManagedShell?.shell || startupManagedShell.projectRoot !== activeProject.primaryRoot) return null;
+      markT23RendererStartup("app-startup-reconcile-start");
+      const shell = await window.canvasApi.reconcileActiveManagedProjectStartup({
+        projectRoot: activeProject.primaryRoot,
+        activationId: activeProject.activationId,
+      });
+      markT23RendererStartup("app-startup-reconcile-ready");
+      const workspaceView = await startupManagedShell.workspaceViewPromise;
+      if (workspaceView === "drama") {
+        // 对账已用 root+activationId CAS 确认活动工程后，才允许预发会确保 generation
+        // watcher 的默认 units IPC。coalescer 只共享仍在进行中的同根同参数请求，不缓存。
+        markT23RendererStartup("app-dashboard-units-prefetch-start");
+        void studioDashboardApi.getDashboard(activeProject.primaryRoot, {
+          operation: "units",
+          limit: 36,
+        }).then(() => {
+          markT23RendererStartup("app-dashboard-units-prefetch-ready");
+        }, () => {
+          markT23RendererStartup("app-dashboard-units-prefetch-failed");
+        });
+      }
+      return { projectRoot: activeProject.primaryRoot, shell };
+    });
+  const [activeProject, registeredProjects, defaultProjectsRoot, operationState, startupManagedShell, startupReconciled] = await Promise.all([
+    activeProjectPromise,
     requestProjectList(),
     window.canvasApi.getDefaultManagedProjectsRoot(),
     window.canvasApi.getManagedProjectOperationState(),
+    startupManagedShellPromise,
+    startupReconcilePromise,
   ]);
   applyManagedProjectOperationState(operationState);
   projects.value = registeredProjects;
   defaultManagedParentRoot.value = defaultProjectsRoot;
+  markT23RendererStartup("app-bootstrap-reads-ready");
   const launchImportRoot = new URLSearchParams(window.location.search).get("importRoot");
   if (launchImportRoot) {
     importRoot.value = launchImportRoot;
@@ -1650,17 +1812,37 @@ onMounted(async () => {
   const recent = activeProject?.available ? activeProject : undefined;
   if (recent?.primaryRoot) {
     const startupRoot = recent.primaryRoot;
-    invalidateLegacyProjectAsyncState();
-    projectRoot.value = startupRoot;
-    const startupToken = captureLegacyProjectToken(startupRoot)!;
-    const startupShell = await window.canvasApi.getManagedProjectShell(startupRoot);
-    if (!isLegacyProjectTokenCurrent(startupToken)) return;
-    managedShell.value = startupShell;
-    if (managedShell.value) {
+    const startupEpoch = invalidateLegacyProjectAsyncState().epoch;
+    const startupShell = startupReconciled?.projectRoot === startupRoot
+      ? startupReconciled.shell
+      : startupManagedShell?.projectRoot === startupRoot
+        ? startupManagedShell.shell
+        : null;
+    if (recent.managedStartupRequired && !startupShell) {
+      throw new Error("受管工程 shell 不可读，已停止启动以避免回退到旧工程路径。 ");
+    }
+    if (startupShell) {
+      const startupWorkspaceView = startupManagedShell?.projectRoot === startupRoot
+        && startupManagedShell.shell?.project.id === startupShell.project.id
+        ? await startupManagedShell.workspaceViewPromise
+        : await restoreManagedWorkspaceView(startupShell);
+      if (!startupWorkspaceView) {
+        throw new Error("受管工程工作区偏好不可读，已停止启动以避免挂载错误工作区。 ");
+      }
+      if (!legacyProjectEpochGate.isEpochCurrent(startupEpoch)) return;
+      if (startupWorkspaceView === "drama") managedStudioModulePreloader.warm();
+      // reconcile 与工作区偏好均已完成后再一次性发布受管 UI；中途不得把默认 drama
+      // 或未经 CAS 的 shell 挂到当前工程上。
+      projectRoot.value = startupRoot;
+      managedShell.value = startupShell;
+      managedWorkspaceView.value = startupWorkspaceView;
       activeView.value = "studio";
       index.value = null;
       loading.value = false;
     } else {
+      projectRoot.value = startupRoot;
+      const startupToken = captureLegacyProjectToken(startupRoot)!;
+      managedWorkspaceView.value = "drama";
       if (!await loadIndex(false, startupToken)) return;
       const startupWatcherIdentity = await window.canvasApi.startWatch(startupRoot);
       if (!isLegacyProjectTokenCurrent(startupToken)) {
@@ -1668,9 +1850,10 @@ onMounted(async () => {
         return;
       }
       activeLegacyWatcherIdentity = startupWatcherIdentity;
+      await window.canvasApi.activateProject(startupRoot);
+      if (!isLegacyProjectTokenCurrent(startupToken)) return;
+      markT23RendererStartup("app-project-activation-ready");
     }
-    await window.canvasApi.activateProject(startupRoot);
-    if (!isLegacyProjectTokenCurrent(startupToken)) return;
   } else {
     loading.value = false;
   }
@@ -1692,8 +1875,12 @@ onBeforeUnmount(() => {
   removeErrorListener?.();
   removeSemanticListener?.();
   removeManagedProjectOperationListener?.();
+  removeWindowCloseListener?.();
   window.removeEventListener("keydown", onCanvasShortcut);
   if (messageTimer) clearTimeout(messageTimer);
+  if (legacyCanvasSearchTimer) clearTimeout(legacyCanvasSearchTimer);
+  if (legacyFlowRebuildTimer) clearTimeout(legacyFlowRebuildTimer);
+  productionFlow.value = null;
   delete window.aiCanvasDiagnostics;
 });
 
@@ -1722,14 +1909,15 @@ function canvasDiagnosticsSnapshot() {
     productionNodeIds: productionNodes.map((node) => node.id),
     duplicatePositionPairs,
     overlapPairs,
-    viewport: productionFlow.getViewport(),
+    viewport: productionFlow.value?.getViewport() ?? canvasViewport.value,
   };
 }
 
 async function focusCanvasNode(nodeId: string, targetZoom = 0.62): Promise<boolean> {
   const node = (nodes.value as Array<{ id: string; type?: string; position: { x: number; y: number } }>).find((candidate) => candidate.id === nodeId && candidate.type === "production");
-  if (!node) return false;
-  const centered = await productionFlow.setCenter(node.position.x + 140, node.position.y + 109, { zoom: targetZoom, duration: 0 });
+  const flow = productionFlow.value;
+  if (!node || !flow) return false;
+  const centered = await flow.setCenter(node.position.x + 140, node.position.y + 109, { zoom: targetZoom, duration: 0 });
   await nextTick();
   await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
   return centered;
@@ -1820,6 +2008,7 @@ function captureProjectUiSnapshot(): ProjectUiSnapshot {
   return {
     projectRoot: projectRoot.value,
     managedShell: managedShell.value,
+    managedWorkspaceView: managedWorkspaceView.value,
     index: index.value,
     activeView: activeView.value,
     selectedId: selectedId.value,
@@ -1836,6 +2025,7 @@ function captureProjectUiSnapshot(): ProjectUiSnapshot {
 function restoreProjectUiSnapshot(snapshot: ProjectUiSnapshot): void {
   projectRoot.value = snapshot.projectRoot;
   managedShell.value = snapshot.managedShell;
+  managedWorkspaceView.value = snapshot.managedWorkspaceView;
   index.value = snapshot.index;
   activeView.value = snapshot.activeView;
   selectedId.value = snapshot.selectedId;
@@ -1868,6 +2058,7 @@ async function stageProjectUi(
     return {
       projectRoot: next,
       managedShell: shell,
+      managedWorkspaceView: defaultManagedWorkspaceView(shell),
       index: null,
       episodeFilter: "all",
       adaptationWorkspace: null,
@@ -1893,6 +2084,7 @@ async function stageProjectUi(
   return {
     projectRoot: next,
     managedShell: null,
+    managedWorkspaceView: "drama",
     index: nextIndex,
     episodeFilter: nextEpisodeFilter,
     adaptationWorkspace: nextAdaptationWorkspace,
@@ -1905,6 +2097,7 @@ function commitProjectUi(staged: StagedProjectUi, generation: number, epoch: num
   assertProjectSwitchCurrent(generation, epoch);
   projectRoot.value = staged.projectRoot;
   managedShell.value = staged.managedShell;
+  managedWorkspaceView.value = staged.managedWorkspaceView;
   index.value = staged.index;
   adaptationWorkspace.value = staged.adaptationWorkspace;
   canvasState.value = staged.canvasState;
@@ -2024,13 +2217,71 @@ async function importProject() {
   showImportWizard.value = true;
 }
 
-async function createNewManagedProject(input: { parentRoot: string; name: string; slug?: string }) {
+async function switchManagedWorkspace(next: ManagedWorkspaceView): Promise<void> {
+  const shell = managedShell.value;
+  const root = projectRoot.value;
+  if (!shell || !root || shell.workspaceMode !== "hybrid" || next === managedWorkspaceView.value
+    || managedWorkspaceSwitching.value || projectSwitching.value || projectRemovingRoot.value) return;
+  managedWorkspaceSwitching.value = true;
+  try {
+    if (await requestActiveWorkspaceLeave("workspace_switch") !== "proceed") return;
+    await window.canvasApi.setActiveHybridWorkspacePreference(shell.project.id, next);
+    if (managedShell.value?.project.id !== shell.project.id
+      || managedShell.value.workspaceMode !== "hybrid"
+      || projectRoot.value !== root) return;
+    managedWorkspaceView.value = next;
+    showMessage(next === "novel" ? "已切换到小说创作；工程根与正典保持不变。" : "已切换到短剧制作；工程根与正典保持不变。");
+  } catch (error) {
+    showMessage(error instanceof Error ? error.message : String(error), true);
+  } finally {
+    managedWorkspaceSwitching.value = false;
+  }
+}
+
+async function refreshNovelStudio(): Promise<void> {
+  const shell = managedShell.value;
+  const root = projectRoot.value;
+  if (!shell || !root || managedWorkspaceView.value !== "novel" || novelStudioRefreshing.value || projectSwitching.value) return;
+  novelStudioRefreshing.value = true;
+  try {
+    const refreshed = await window.canvasApi.getManagedProjectShell(root);
+    if (!refreshed) throw new Error("当前工程不再是可识别的受管项目。");
+    if (projectRoot.value !== root || managedShell.value?.project.id !== shell.project.id) return;
+    const nextWorkspaceView = refreshed.workspaceMode === "hybrid"
+      ? managedWorkspaceView.value
+      : defaultManagedWorkspaceView(refreshed);
+    if (nextWorkspaceView !== managedWorkspaceView.value
+      && await requestActiveWorkspaceLeave("workspace_switch") !== "proceed") return;
+    if (projectRoot.value !== root || managedShell.value?.project.id !== shell.project.id) return;
+    managedShell.value = refreshed;
+    managedWorkspaceView.value = nextWorkspaceView;
+    showMessage("小说工作区身份已只读复核；正文与记忆状态仍待后续 owner 接入。");
+  } catch (error) {
+    showMessage(error instanceof Error ? error.message : String(error), true);
+  } finally {
+    novelStudioRefreshing.value = false;
+  }
+}
+
+async function openImportedNovelProject(projectId: string): Promise<void> {
+  await refreshProjects();
+  const imported = projects.value.find((project) => project.id === projectId && project.available);
+  if (!imported) {
+    showMessage("小说已经导入，但新工程尚未出现在项目列表；请打开项目中心刷新。", true);
+    return;
+  }
+  if (await openProject(imported.primaryRoot, false)) showMessage("小说已导入为受管副本并打开；原始来源未修改。");
+}
+
+async function createNewManagedProject(input: CreateManagedProjectOptions) {
   if (creatingManagedProject.value) return;
   creatingManagedProject.value = true;
   try {
     const shell = await window.canvasApi.createManagedStudioProject(input);
     const opened = await openProject(shell.paths.root, false);
-    if (opened) showMessage(`受管素材工程已建立：${shell.project.name}；未扫描或导入任何旧工程。`);
+    if (opened) showMessage(shell.workspaceMode === "drama"
+      ? `受管素材工程已建立：${shell.project.name}；未扫描或导入任何旧工程。`
+      : `${shell.workspaceMode === "hybrid" ? "混合" : "小说"}工作区已建立：${shell.project.name}；未扫描或导入任何旧工程。`);
     else await refreshProjects().catch(() => undefined);
   } catch (error) {
     showMessage(error instanceof Error ? error.message : String(error), true);
@@ -2040,7 +2291,13 @@ async function createNewManagedProject(input: { parentRoot: string; name: string
 }
 
 async function openRestoredProject(restoredRoot: string) {
-  if (await openProject(restoredRoot, false)) showMessage("备份已恢复到新目录并作为当前工程打开。");
+  try {
+    if (await openProject(restoredRoot, false, { validateRestoredManagedProject: true })) {
+      showMessage("备份已恢复到新目录并作为当前工程打开。");
+    }
+  } catch (error) {
+    showMessage(error instanceof Error ? error.message : String(error), true);
+  }
 }
 
 async function persistStudioContext(context: { mode: string; unitId?: string; panelId?: string }) {
@@ -2076,7 +2333,11 @@ async function onProjectImported(imported: ProjectIndex) {
   }
 }
 
-async function openProject(next: string, refresh = false): Promise<boolean> {
+async function openProject(
+  next: string,
+  refresh = false,
+  options: { validateRestoredManagedProject?: boolean } = {},
+): Promise<boolean> {
   if (projectSwitching.value) {
     showMessage("已有项目切换正在进行，请稍候。", true);
     return false;
@@ -2090,6 +2351,12 @@ async function openProject(next: string, refresh = false): Promise<boolean> {
     showMessage("项目路径不能为空。", true);
     return false;
   }
+  projectSwitching.value = true;
+  if (targetRoot !== projectRoot.value
+    && await requestActiveWorkspaceLeave("project_switch") !== "proceed") {
+    projectSwitching.value = false;
+    return false;
+  }
   const generation = ++projectSwitchGeneration;
   const snapshot = captureProjectUiSnapshot();
   const previousWatcherIdentity = activeLegacyWatcherIdentity;
@@ -2101,13 +2368,18 @@ async function openProject(next: string, refresh = false): Promise<boolean> {
   let targetWatcherIdentity: Awaited<ReturnType<typeof window.canvasApi.startWatch>> | null = null;
   let restoredWatcherIdentity: Awaited<ReturnType<typeof window.canvasApi.startWatch>> | null = null;
   let rebuildToken: LegacyProjectEpochToken | null = null;
-  projectSwitching.value = true;
+  let restoredValidationAcquired = false;
   try {
     [activeProjectBefore] = await Promise.all([
       window.canvasApi.getActiveProject(),
       cancelOldScan,
     ]);
     assertProjectSwitchCurrent(generation, epoch);
+    if (options.validateRestoredManagedProject) {
+      await window.canvasApi.validateRestoredManagedProjectShell(targetRoot);
+      restoredValidationAcquired = true;
+      assertProjectSwitchCurrent(generation, epoch);
+    }
     const staged = await stageProjectUi(targetRoot, refresh, generation, epoch);
     assertProjectSwitchCurrent(generation, epoch);
 
@@ -2117,6 +2389,10 @@ async function openProject(next: string, refresh = false): Promise<boolean> {
     assertProjectSwitchCurrent(generation, epoch);
     await window.canvasApi.activateProject(targetRoot);
     assertProjectSwitchCurrent(generation, epoch);
+    if (staged.managedShell) {
+      staged.managedWorkspaceView = await restoreManagedWorkspaceView(staged.managedShell);
+      assertProjectSwitchCurrent(generation, epoch);
+    }
 
     // 只有 shell/index、监听和活动登记均成功后，才一次性提交渲染状态。
     commitProjectUi(staged, generation, epoch);
@@ -2128,6 +2404,10 @@ async function openProject(next: string, refresh = false): Promise<boolean> {
   } catch (error) {
     const rollbackFailures: string[] = [];
     let restoredPreviousWatch = false;
+    if (restoredValidationAcquired) {
+      await window.canvasApi.releaseRestoredManagedProjectShellValidation(targetRoot)
+        .catch((reason) => rollbackFailures.push(`释放恢复副本校验失败：${reason instanceof Error ? reason.message : String(reason)}`));
+    }
     if (watchTransitionAttempted) {
       await window.canvasApi.stopWatch(targetRoot).catch((reason) => rollbackFailures.push(`停止新监听失败：${reason instanceof Error ? reason.message : String(reason)}`));
       if (generation === projectSwitchGeneration
@@ -2186,6 +2466,10 @@ async function removeProject(root: string) {
   const removingCurrent = projectRoot.value === targetRoot;
   const previousWatcherIdentity = removingCurrent ? activeLegacyWatcherIdentity : null;
   projectRemovingRoot.value = targetRoot;
+  if (removingCurrent && await requestActiveWorkspaceLeave("project_switch") !== "proceed") {
+    projectRemovingRoot.value = "";
+    return;
+  }
   const invalidated = removingCurrent ? invalidateLegacyProjectAsyncState() : null;
   const scope: FrozenProjectRemovalScope = {
     token: projectRemovalGate.begin(targetRoot, targetRoot),
@@ -2209,6 +2493,7 @@ async function removeProject(root: string) {
     if (removingCurrent) {
       projectRoot.value = "";
       managedShell.value = null;
+      managedWorkspaceView.value = "drama";
       index.value = null;
       adaptationWorkspace.value = null;
       canvasState.value = emptyCanvasState();
@@ -2396,6 +2681,10 @@ async function persistLayoutPositions(
 }
 
 async function rebuildFlow(expectedToken?: LegacyProjectEpochToken) {
+  if (legacyFlowRebuildTimer) {
+    clearTimeout(legacyFlowRebuildTimer);
+    legacyFlowRebuildTimer = null;
+  }
   if (projectSwitching.value) return;
   const token = expectedToken ?? captureLegacyProjectToken();
   if (!token || !isLegacyProjectTokenCurrent(token)) return;
@@ -2408,118 +2697,23 @@ async function rebuildFlow(expectedToken?: LegacyProjectEpochToken) {
     || viewKey.value !== frozenViewKey
     || layoutPositionsKey !== `${token.root}::${frozenViewKey}`) return;
   const saved: Record<string, { x: number; y: number }> = layoutPositions.value;
-  const narrativeOffset = showNarrative.value ? 1_120 : 0;
-  const stageItems = Object.fromEntries(STAGES.map((stage) => [stage, items.filter((item) => item.stage === stage)])) as Record<WorkItem["stage"], WorkItem[]>;
-  const maxRows = Math.max(3, ...STAGES.map((stage) => stageItems[stage].length), showNarrative.value ? adaptationWorkspace.value?.beats.length ?? 0 : 0);
-  const laneHeight = Math.max(600, maxRows * 250 + 120);
-  const nextNodes: Node[] = STAGES.map((stage, stageIndex) => ({
-    id: `zone-${stage}`,
-    type: "zone",
-    position: { x: STAGE_X[stage] + narrativeOffset, y: 0 },
-    data: { title: stage, count: stageItems[stage].length, index: `0${stageIndex + 1}`, height: laneHeight },
-    draggable: false,
-    selectable: false,
-    connectable: false,
-    zIndex: -1,
-    style: { width: "320px", height: `${laneHeight}px` },
-  }));
-  const groupByMember = new Map<string, CanvasEntity>();
-  canvasState.value.entities.filter((entity) => entity.kind === "group").forEach((group) => group.memberIds.forEach((memberId) => {
-    if (!groupByMember.has(memberId)) groupByMember.set(memberId, group);
-  }));
-  for (const entity of [...canvasState.value.entities].sort((a, b) => Number(a.kind === "note") - Number(b.kind === "note") || a.createdAt.localeCompare(b.createdAt))) {
-    nextNodes.push({
-      id: entity.id,
-      type: entity.kind,
-      position: entity.position,
-      data: { entity, onEdit: editCanvasEntity, onDelete: removeCanvasEntity },
-      dragHandle: ".canvas-entity-handle",
-      zIndex: entity.kind === "group" ? 0 : 4,
-      style: { width: `${entity.width}px`, height: `${entity.height}px` },
-    });
-  }
-  const narrativeEdges: Edge[] = [];
-  if (showNarrative.value && adaptationWorkspace.value) {
-    const workspace = adaptationWorkspace.value;
-    const eventFacts = workspace.facts.filter((fact) => fact.kind === "event").sort((a, b) => (a.sourceSpans[0]?.startOffset ?? 0) - (b.sourceSpans[0]?.startOffset ?? 0));
-    const sourceIds = [...new Set(eventFacts.map((fact) => fact.sourceSpans[0]?.sourceId).filter((value): value is string => Boolean(value)))];
-    sourceIds.forEach((sourceId, row) => nextNodes.push({ id: `narrative-source-${sourceId}`, type: "narrative", position: { x: 0, y: 72 + row * 150 }, data: { kind: "source", title: `原文 ${row + 1}`, detail: sourceId, meta: `${eventFacts.filter((fact) => fact.sourceSpans[0]?.sourceId === sourceId).length} 个可视事件`, compact: zoom.value < .35 }, draggable: false, zIndex: 2 }));
-    eventFacts.forEach((fact, row) => {
-      const nodeId = `narrative-fact-${fact.id}`;
-      nextNodes.push({ id: nodeId, type: "narrative", position: { x: 280, y: 72 + row * 150 }, data: { kind: "fact", title: fact.statement.slice(0, 72), detail: fact.epistemicStatus === "confirmed" ? "原文确认" : fact.epistemicStatus === "inferred" ? "明确推断" : "待确认", meta: `${fact.id} · R${fact.revision}`, compact: zoom.value < .35 }, draggable: false, zIndex: 2 });
-      const sourceId = fact.sourceSpans[0]?.sourceId;
-      if (sourceId) narrativeEdges.push({ id: `source-${sourceId}-${fact.id}`, source: `narrative-source-${sourceId}`, target: nodeId, type: "smoothstep", style: { stroke: "#666a61", strokeWidth: 1.2 } });
-    });
-    workspace.beats.forEach((beat, row) => {
-      const nodeId = `narrative-beat-${beat.id}`;
-      nextNodes.push({ id: nodeId, type: "narrative", position: { x: 560, y: 72 + row * 150 }, data: { kind: "beat", title: `${String(beat.order).padStart(2, "0")} · ${beat.title.slice(0, 58)}`, detail: beat.narrativePurpose, meta: `${beat.estimatedDurationSeconds.toFixed(1)}s · 强度 ${beat.intensity}/5`, compact: zoom.value < .35 }, draggable: false, zIndex: 2 });
-      beat.factIds.filter((factId) => eventFacts.some((fact) => fact.id === factId)).forEach((factId) => narrativeEdges.push({ id: `fact-${factId}-${beat.id}`, source: `narrative-fact-${factId}`, target: nodeId, type: "smoothstep", style: { stroke: "#667d65", strokeWidth: 1.3 } }));
-    });
-    workspace.plans.slice(0, 2).forEach((plan, row) => {
-      const nodeId = `narrative-plan-${plan.id}`;
-      nextNodes.push({ id: nodeId, type: "narrative", position: { x: 840, y: 72 + row * 190 }, data: { kind: "plan", title: plan.mode === "concise" ? "精简模式" : "拆分模式", detail: `${plan.units.length} 个 15 秒单元 · ${plan.units.reduce((sum, unit) => sum + unit.storyboardRows.length, 0)} 镜`, meta: `${plan.status} · ${plan.validation.hardErrors.length} 硬错误`, compact: zoom.value < .35 }, draggable: false, zIndex: 2 });
-      const beatIds = new Set(plan.units.flatMap((unit) => unit.beatIds));
-      beatIds.forEach((beatId) => narrativeEdges.push({ id: `beat-${beatId}-${plan.id}`, source: `narrative-beat-${beatId}`, target: nodeId, type: "smoothstep", style: { stroke: "#9a7a35", strokeWidth: 1.4 } }));
-      for (const itemId of new Set(plan.units.flatMap((unit) => unit.storyboardRows.map((storyboard) => storyboard.itemId)).filter((id) => !id.startsWith("planned:")))) if (items.some((item) => item.id === itemId)) narrativeEdges.push({ id: `plan-${plan.id}-${itemId}`, source: nodeId, target: itemId, type: "smoothstep", animated: plan.status === "selected", style: { stroke: "#d7af55", strokeWidth: 2 } });
-    });
-  }
-  for (const stage of STAGES) {
-    stageItems[stage]
-      .sort((a, b) => (a.episode ?? 0) - (b.episode ?? 0) || (a.unit ?? 0) - (b.unit ?? 0) || a.id.localeCompare(b.id))
-      .forEach((item, row) => {
-        const artifacts = item.artifactIds.map((id) => artifactMap.value.get(id)).filter((artifact): artifact is Artifact => Boolean(artifact));
-        const globalPosition = saved[item.id] ?? { x: STAGE_X[stage] + narrativeOffset + 20, y: 72 + row * 250 };
-        const parentGroup = groupByMember.get(item.id);
-        const memberOffset = parentGroup?.memberOffsets[item.id] ?? (parentGroup ? { x: globalPosition.x - parentGroup.position.x, y: globalPosition.y - parentGroup.position.y } : undefined);
-        nextNodes.push({
-          id: item.id,
-          type: "production",
-          position: memberOffset ?? globalPosition,
-          parentNode: parentGroup?.id,
-          data: {
-            item,
-            artifacts,
-            compact: zoom.value < 0.35,
-            videoCount: artifacts.filter((artifact) => artifact.kind === "video" && !artifact.deprecated).length,
-          },
-          dragHandle: ".node-header",
-          zIndex: 2,
-        });
-      });
-  }
-  const visibleIds = new Set(items.map((item) => item.id));
-  const nodeIds = new Set([...visibleIds, ...canvasState.value.entities.map((entity) => entity.id)]);
-  const dependencyEdges: Edge[] = items.flatMap((item) =>
-    item.dependencies
-      .filter((dependency) => visibleIds.has(dependency))
-      .map((dependency) => ({
-        id: `${dependency}-${item.id}`,
-        source: dependency,
-        target: item.id,
-        type: "smoothstep",
-        animated: item.status === "视频生成中",
-        style: { stroke: item.status === "已完成" ? "#6d7f62" : "#6c6758", strokeWidth: 1.5 },
-      })),
-  );
-  const linkColors: Record<CanvasLinkKind, string> = { continuity: "#d7af55", reference: "#70a7c5", dependency: "#d36b59", comment: "#b98fdf" };
-  const semanticEdges: Edge[] = canvasState.value.links
-    .filter((link) => nodeIds.has(link.sourceId) && nodeIds.has(link.targetId))
-    .map((link) => ({
-      id: link.id,
-      source: link.sourceId,
-      target: link.targetId,
-      type: "smoothstep",
-      label: link.label || ({ continuity: "连续性", reference: "参考", dependency: "依赖", comment: "说明" } as const)[link.kind],
-      zIndex: 3,
-      style: { stroke: linkColors[link.kind], strokeWidth: 2, strokeDasharray: link.kind === "dependency" ? undefined : "6 4" },
-      labelStyle: { fill: linkColors[link.kind], fontSize: 9 },
-      labelBgStyle: { fill: "#151613", fillOpacity: 0.92 },
-    }));
+  const projection = projectLegacyCanvasFlow({
+    visibleItems: items.map((item) => ({
+      item,
+      artifacts: item.artifactIds.map((id) => artifactMap.value.get(id)).filter((artifact): artifact is Artifact => Boolean(artifact)),
+    })),
+    canvasState: canvasState.value,
+    adaptationWorkspace: adaptationWorkspace.value,
+    positions: saved,
+    showNarrative: showNarrative.value,
+    compact: compactZoom.value,
+    actions: { editCanvasEntity, removeCanvasEntity },
+  });
   if (generation !== layoutGeneration
     || !isLegacyProjectTokenCurrent(token)
     || viewKey.value !== frozenViewKey) return;
-  nodes.value = nextNodes;
-  edges.value = [...narrativeEdges, ...dependencyEdges, ...semanticEdges];
+  nodes.value = projection.nodes;
+  edges.value = projection.edges;
   await nextTick();
 }
 
@@ -2831,6 +3025,7 @@ function showMessage(text: string, error = false) {
 
 <style scoped>
 .root-runtime-gate{position:fixed;inset:0;z-index:400;display:grid;place-items:center;padding:28px;background:#090a08;color:#ebe9df}.root-runtime-gate>div{width:min(560px,calc(100vw - 56px));padding:30px;border:1px solid #765f2d;background:#15150f;box-shadow:0 28px 90px rgba(0,0,0,.72)}.root-runtime-gate svg{color:#d7af55}.root-runtime-gate h2{margin:12px 0 8px;font-size:22px}.root-runtime-gate p{margin:0;color:#b9b6a8;line-height:1.7}.root-runtime-gate small{display:block;margin-top:14px;color:#817a67;font:10px ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-word}
+.managed-drama-workspace{height:100%;min-height:0;display:grid;grid-template-rows:minmax(0,1fr);overflow:hidden}.managed-drama-workspace.hybrid{grid-template-rows:auto minmax(0,1fr)}.hybrid-workspace-switch{min-height:38px;display:flex;align-items:center;justify-content:flex-end;gap:0;padding:0 18px;border-bottom:1px solid var(--ui-line);background:var(--ui-surface);color:var(--ui-text-2)}.hybrid-workspace-switch>span{margin-right:auto;color:var(--ui-text-3);font:9px var(--ui-font-mono);letter-spacing:.06em}.hybrid-workspace-switch button{min-height:28px;padding:0 12px;border:1px solid var(--ui-line);border-right:0;background:transparent;color:var(--ui-text-2);font-size:10px;cursor:pointer}.hybrid-workspace-switch button:last-child{border-right:1px solid var(--ui-line)}.hybrid-workspace-switch button.active{background:var(--ui-accent-soft);color:var(--ui-accent-strong);font-weight:650}.hybrid-workspace-switch button:hover:not(:disabled){border-color:var(--ui-accent);color:var(--ui-accent-strong)}.hybrid-workspace-switch button:focus-visible{position:relative;z-index:1;outline:0;box-shadow:var(--ui-focus-ring)}.hybrid-workspace-switch button:disabled{cursor:wait;opacity:.5}
 .managed-project-operation-shield{position:fixed;inset:0;z-index:260;display:grid;place-items:center;padding:24px;background:rgba(5,6,4,.82);backdrop-filter:blur(7px)}.managed-project-operation-shield>div{width:min(460px,calc(100vw - 48px));display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:center;padding:22px;border:1px solid #6d5b32;background:#15140e;box-shadow:0 26px 80px rgba(0,0,0,.58);color:#d7af55}.managed-project-operation-shield svg{grid-row:1/4}.managed-project-operation-shield strong,.managed-project-operation-shield span,.managed-project-operation-shield small{min-width:0;display:block}.managed-project-operation-shield strong{font-size:13px}.managed-project-operation-shield span{color:#aaa58f;font-size:10px}.managed-project-operation-shield small{overflow:hidden;color:#6f7167;font:8px ui-monospace,SFMono-Regular,Menlo,monospace;text-overflow:ellipsis;white-space:nowrap}
 .canvas-toolbox button:disabled { color: #45473f; cursor: default; }
 .canvas-toolbox button:disabled:hover { background: transparent; color: #45473f; }

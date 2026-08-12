@@ -149,14 +149,19 @@ export function buildStudioGenerationQueueView(
 
   for (const key of ["active", "done", "failed"] as const) {
     tabs[key].sort(byTimeDesc);
-    if (tabs[key].length > maxPer) tabs[key] = tabs[key].slice(0, maxPer);
   }
 
+  // totals 必须来自完整任务集，而不是分页后的可见条目。否则任务数超过
+  // maxPer 时，页签计数和 inFlightCount 会被错误截断，误导并发判断。
   const totals = {
     active: tabs.active.length,
     done: tabs.done.length,
     failed: tabs.failed.length,
   };
+
+  for (const key of ["active", "done", "failed"] as const) {
+    if (tabs[key].length > maxPer) tabs[key] = tabs[key].slice(0, maxPer);
+  }
 
   return {
     schemaVersion: 1,

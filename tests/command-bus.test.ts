@@ -587,16 +587,26 @@ describe("Codex 幂等命令总线", () => {
     await writeFile(fakeProbe, `#!/usr/bin/env node\nimport { writeFileSync } from "node:fs";\nwriteFileSync(${JSON.stringify(pidPath)}, String(process.pid));\nprocess.on("SIGTERM", () => { writeFileSync(${JSON.stringify(markerPath)}, "terminated"); process.exit(143); });\nsetInterval(() => {}, 1000);\n`, "utf8");
     await chmod(fakeProbe, 0o755);
     const previousProbe = process.env.FFPROBE_PATH;
+    const previousMediaRuntime = process.env.AI_CANVAS_MEDIA_RUNTIME_DIR;
     process.env.FFPROBE_PATH = fakeProbe;
+    process.env.AI_CANVAS_MEDIA_RUNTIME_DIR = path.join(root, ".aicanvas", "test-media-runtime");
     const controller = new AbortController();
     const input = { requestId: "request-scan-cancel-001", idempotencyKey: "scan-project-cancel-unit001-v1", request: { command: "scan_project" as const, payload: {} } };
     const progress: string[] = [];
+    let running: ReturnType<typeof executeIdempotentCommand> | undefined;
     try {
-      const running = executeIdempotentCommand(root, input, { signal: controller.signal, onProgress: (value) => progress.push(value.phase) });
-      for (let attempt = 0; attempt < 200; attempt += 1) {
+      running = executeIdempotentCommand(root, input, { signal: controller.signal, onProgress: (value) => progress.push(value.phase) });
+      let runningSettled = false;
+      void running.then(
+        () => { runningSettled = true; },
+        () => { runningSettled = true; },
+      );
+      const startDeadline = Date.now() + 10_000;
+      while (Date.now() < startDeadline && !runningSettled) {
         if (await access(pidPath).then(() => true).catch(() => false)) break;
-        await new Promise((resolve) => setTimeout(resolve, 5));
+        await new Promise((resolve) => setTimeout(resolve, 10));
       }
+      if (runningSettled && !await access(pidPath).then(() => true).catch(() => false)) await running;
       expect(await access(pidPath).then(() => true).catch(() => false)).toBe(true);
       const pid = Number(await readFile(pidPath, "utf8"));
       controller.abort("命令总线扫描取消测试");
@@ -624,8 +634,12 @@ describe("Codex 幂等命令总线", () => {
       const retried = await executeIdempotentCommand(root, { requestId: "request-scan-cancel-003", idempotencyKey: "scan-project-cancel-unit001-v2", request: input.request });
       expect(retried.status).toBe("succeeded");
     } finally {
+      controller.abort("取消测试清理未完成扫描");
+      await running?.catch(() => undefined);
       if (previousProbe === undefined) delete process.env.FFPROBE_PATH;
       else process.env.FFPROBE_PATH = previousProbe;
+      if (previousMediaRuntime === undefined) delete process.env.AI_CANVAS_MEDIA_RUNTIME_DIR;
+      else process.env.AI_CANVAS_MEDIA_RUNTIME_DIR = previousMediaRuntime;
     }
   }, 60_000);
 

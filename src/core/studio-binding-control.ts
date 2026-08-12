@@ -66,6 +66,10 @@ import {
   readLocalCreativeUnitSourceContract,
   type LocalCreativeUnitSourcePanelContract,
 } from "./local-creative-unit-source-contract.js";
+import {
+  measureStudioUnitsReadPhase,
+  measureStudioUnitsReadSyncPhase,
+} from "./studio-units-read-phase-timeline.js";
 
 const UNIT_PAGE_LIMIT = 36;
 const SECTION_PAGE_LIMIT = 100;
@@ -779,63 +783,76 @@ export async function listStudioBindingUnits(
   projectRoot: string,
   query: { seasonId?: string; episodeId?: string; cursor?: string; limit?: number } = {},
 ): Promise<StudioBindingUnitPage> {
-  await inspectManagedProject(projectRoot);
-  const limit = query.limit ?? UNIT_PAGE_LIMIT;
-  if (!Number.isSafeInteger(limit) || limit < 1 || limit > UNIT_PAGE_LIMIT) throw new StudioBindingControlError("invalid-input", `limit 必须为 1-${UNIT_PAGE_LIMIT}。`);
-  const [page, facets] = await Promise.all([
-    listStudioProductionUnits(projectRoot, {
-      ...(query.seasonId ? { season: query.seasonId } : {}),
-      ...(query.episodeId ? { episode: query.episodeId } : {}),
-      ...(query.cursor ? { cursor: query.cursor } : {}),
-      limit,
-    }),
-    getStudioProductionScopeFacets(projectRoot),
-  ]);
-  const summaries = new Map((await getStudioUnitBindingHeadSummaries(projectRoot, page.items.map((item) => item.id)))
-    .map((entry) => [entry.unitId, entry] as const));
-  const successors = await getStudioCanonicalSuccessorUnitIds(projectRoot, page.items.map((item) => item.id));
-  const items = page.items.map((unit): StudioBindingUnitSummary => {
-    const summary = summaries.get(unit.id);
-    let status: StudioBindingTimelineStatus = "pending";
-    let statusReason = "待解析剧本实体。";
-    if (summary?.unresolvedAmbiguousCount) {
-      status = "ambiguous";
-      statusReason = `${summary.unresolvedAmbiguousCount} 项歧义待人工选择。`;
-    } else if (summary?.unresolvedUnmatchedCount) {
-      status = "unmatched";
-      statusReason = `${summary.unresolvedUnmatchedCount} 项未匹配待处理。`;
-    } else if (summary && summary.bindingHeadCount === summary.panelCount) {
-      status = "unchecked";
-      statusReason = "全部宫格均有 BindingSet；列表不做深度当前性推断，请选中核验。";
-    } else if (summary?.analysisHeadCount) {
-      status = "pending";
-      statusReason = summary.unresolvedMatchedCount
-        ? `${summary.unresolvedMatchedCount} 项明确匹配仍待人工确认。`
-        : "解析已完成，待冻结宫格绑定。";
-    }
+  return measureStudioUnitsReadPhase("binding-owner-total", async () => {
+    await measureStudioUnitsReadPhase(
+      "binding-managed-inspect",
+      () => inspectManagedProject(projectRoot),
+    );
+    const limit = query.limit ?? UNIT_PAGE_LIMIT;
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > UNIT_PAGE_LIMIT) throw new StudioBindingControlError("invalid-input", `limit 必须为 1-${UNIT_PAGE_LIMIT}。`);
+    const [page, facets] = await Promise.all([
+      measureStudioUnitsReadPhase("production-page", () => listStudioProductionUnits(projectRoot, {
+        ...(query.seasonId ? { season: query.seasonId } : {}),
+        ...(query.episodeId ? { episode: query.episodeId } : {}),
+        ...(query.cursor ? { cursor: query.cursor } : {}),
+        limit,
+      })),
+      measureStudioUnitsReadPhase(
+        "production-facets",
+        () => getStudioProductionScopeFacets(projectRoot),
+      ),
+    ]);
+    const summaries = new Map((await measureStudioUnitsReadPhase(
+      "binding-heads",
+      () => getStudioUnitBindingHeadSummaries(projectRoot, page.items.map((item) => item.id)),
+    )).map((entry) => [entry.unitId, entry] as const));
+    const successors = await measureStudioUnitsReadPhase(
+      "successors",
+      () => getStudioCanonicalSuccessorUnitIds(projectRoot, page.items.map((item) => item.id)),
+    );
+    const items = measureStudioUnitsReadSyncPhase("binding-map", () => page.items.map((unit): StudioBindingUnitSummary => {
+      const summary = summaries.get(unit.id);
+      let status: StudioBindingTimelineStatus = "pending";
+      let statusReason = "待解析剧本实体。";
+      if (summary?.unresolvedAmbiguousCount) {
+        status = "ambiguous";
+        statusReason = `${summary.unresolvedAmbiguousCount} 项歧义待人工选择。`;
+      } else if (summary?.unresolvedUnmatchedCount) {
+        status = "unmatched";
+        statusReason = `${summary.unresolvedUnmatchedCount} 项未匹配待处理。`;
+      } else if (summary && summary.bindingHeadCount === summary.panelCount) {
+        status = "unchecked";
+        statusReason = "全部宫格均有 BindingSet；列表不做深度当前性推断，请选中核验。";
+      } else if (summary?.analysisHeadCount) {
+        status = "pending";
+        statusReason = summary.unresolvedMatchedCount
+          ? `${summary.unresolvedMatchedCount} 项明确匹配仍待人工确认。`
+          : "解析已完成，待冻结宫格绑定。";
+      }
+      return {
+        id: unit.id,
+        seasonId: unit.season,
+        seasonLabel: unit.season,
+        episodeId: unit.episode,
+        episodeLabel: unit.episode,
+        sequence: unit.sequence,
+        canonicalSuccessorUnitId: successors[unit.id] ?? null,
+        label: `${String(unit.sequence).padStart(3, "0")} · ${unit.title}`,
+        durationSeconds: unit.durationSeconds,
+        panelCount: unit.panelCount,
+        status,
+        statusReason,
+      };
+    }));
     return {
-      id: unit.id,
-      seasonId: unit.season,
-      seasonLabel: unit.season,
-      episodeId: unit.episode,
-      episodeLabel: unit.episode,
-      sequence: unit.sequence,
-      canonicalSuccessorUnitId: successors[unit.id] ?? null,
-      label: `${String(unit.sequence).padStart(3, "0")} · ${unit.title}`,
-      durationSeconds: unit.durationSeconds,
-      panelCount: unit.panelCount,
-      status,
-      statusReason,
+      items,
+      seasons: facets.seasons.map((season) => ({ id: season, label: season })),
+      episodes: facets.episodes.map((entry) => ({ id: entry.episode, seasonId: entry.season, label: entry.episode })),
+      ...(page.nextCursor ? { nextCursor: page.nextCursor } : {}),
+      ...(!query.seasonId && !query.episodeId ? { total: facets.totalUnits } : {}),
+      nextAction: items.length ? "选择单元后按 Core 投影处理第一个阻塞宫格。" : "先建立严格 15 秒、2–6 宫格的生产单元。",
     };
   });
-  return {
-    items,
-    seasons: facets.seasons.map((season) => ({ id: season, label: season })),
-    episodes: facets.episodes.map((entry) => ({ id: entry.episode, seasonId: entry.season, label: entry.episode })),
-    ...(page.nextCursor ? { nextCursor: page.nextCursor } : {}),
-    ...(!query.seasonId && !query.episodeId ? { total: facets.totalUnits } : {}),
-    nextAction: items.length ? "选择单元后按 Core 投影处理第一个阻塞宫格。" : "先建立严格 15 秒、2–6 宫格的生产单元。",
-  };
 }
 
 export async function listStudioBindingSections(

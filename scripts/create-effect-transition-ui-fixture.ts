@@ -6,7 +6,7 @@ import { pathToFileURL } from "node:url";
 import { promisify } from "node:util";
 import { importEditProjectOtio } from "../src/core/editor.js";
 import { commitProjectImport, prepareProjectImport } from "../src/core/importer.js";
-import { scanAndPersist } from "../src/core/service.js";
+import { activateProject, scanAndPersist } from "../src/core/service.js";
 import { mkdtempOwnedFixtureRoot, resetOwnedFixtureRoot } from "./lib/owned-fixture-root.js";
 
 const execFileAsync = promisify(execFile);
@@ -58,6 +58,7 @@ const preview = await prepareProjectImport({ primaryRoot: root, projectMode: "fi
 if (!preview.canImport) throw new Error(preview.issues.map((issue) => issue.message).join("；"));
 await commitProjectImport({ previewId: preview.previewId, config: preview.config, projectMode: "filesystem" });
 await scanAndPersist(root);
+await activateProject(root);
 
 const sourceOtio = path.join(root, "effect-transition-ui.otio");
 const document = {

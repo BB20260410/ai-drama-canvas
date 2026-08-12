@@ -25,7 +25,7 @@ const DATABASE_RELATIVE_PATH = ".aicanvas/material-studio.sqlite";
 const OBJECTS_RELATIVE_ROOT = ".aicanvas/objects/sha256";
 const THUMBNAIL_RELATIVE_ROOT = ".aicanvas/derived/thumb";
 const THUMBNAIL_RECIPE = "material-studio-thumb:v1:autorotate:inside-512:no-enlarge:webp-q82";
-import { STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS } from "./studio-sqlite-busy.js";
+import { STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS, studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
 const BUSY_TIMEOUT_MS = STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS;
 const DEFAULT_PAGE_LIMIT = 50;
 const MAX_PAGE_LIMIT = 100;
@@ -1424,8 +1424,9 @@ function openDatabase(databasePath: string): DatabaseSync {
       probe.close();
     }
   }
-  const db = new DatabaseSync(databasePath, { timeout: BUSY_TIMEOUT_MS });
-  db.exec(`PRAGMA busy_timeout=${BUSY_TIMEOUT_MS}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
+  const db = new DatabaseSync(databasePath, { timeout: busyTimeoutMs });
+  db.exec(`PRAGMA busy_timeout=${busyTimeoutMs}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
   const journal = db.prepare("PRAGMA journal_mode").get() as { journal_mode?: string } | undefined;
   if (journal?.journal_mode?.toLowerCase() !== "wal") db.exec("PRAGMA journal_mode=WAL");
   const requestSchemaKey = studioRequestSqliteValidationKey("material-studio-schema-v1", databasePath);

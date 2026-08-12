@@ -24,7 +24,10 @@ import {
   getStudioGenerationCheckpointControl,
   type StudioGenerationCheckpointBatchControl,
 } from "./studio-generation-checkpoint.js";
-import { queryStudioGenerationFreeze } from "./studio-generation.js";
+import {
+  queryStudioGenerationFreeze,
+  type StudioGenerationQueryResult,
+} from "./studio-generation.js";
 import { listStudioGenerationPanelHistory, readAnyStudioGenerationFrozenPack, readStudioGenerationResultBundle } from "./studio-generation-ledger.js";
 import { getStudioCanonicalAsset, getStudioMedia, type StudioCanonicalAssetCategory } from "./material-studio.js";
 import {
@@ -234,6 +237,21 @@ export interface StudioContinuityReviewControl {
   /** P19 一致性辅助判定：可选段，不进入 semantic/fingerprint；无 generation run 时缺省。 */
   consistency?: StudioContinuityReviewConsistencyControl;
   fingerprint: string;
+}
+
+// 同一次 continuity control 构建所使用的原始 generation 查询只在 Core 进程内复用。
+// WeakMap 不改变公开对象形状、序列化结果或 control fingerprint，也不会把 blocked
+// details 暴露给 Renderer；projection bundle 可据此避免第二次昂贵查询，同时保持旧
+// generation-freeze stamp 的逐字节语义。
+const studioContinuityGenerationSource = new WeakMap<
+  StudioContinuityReviewControl,
+  StudioGenerationQueryResult
+>();
+
+export function getStudioContinuityReviewGenerationSource(
+  control: StudioContinuityReviewControl,
+): StudioGenerationQueryResult | undefined {
+  return studioContinuityGenerationSource.get(control);
 }
 
 function boundedInteger(
@@ -774,5 +792,11 @@ export async function getStudioContinuityReviewControl(
     nextAction,
     ...(generationRunId ? { resolvedGenerationRunId: generationRunId } : {}),
   };
-  return { ...semantic, ...(consistency ? { consistency } : {}), fingerprint: studioContinuityDigest(semantic) };
+  const control: StudioContinuityReviewControl = {
+    ...semantic,
+    ...(consistency ? { consistency } : {}),
+    fingerprint: studioContinuityDigest(semantic),
+  };
+  studioContinuityGenerationSource.set(control, generationSource);
+  return control;
 }

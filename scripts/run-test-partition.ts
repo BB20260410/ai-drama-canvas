@@ -48,6 +48,7 @@ const MEDIUM_TEST_FILES = [
   "tests/material-studio.test.ts",
   "tests/media-runtime.test.ts",
   "tests/novel-analysis-run.test.ts",
+  "tests/novel-writing-state.test.ts",
   "tests/p14-real-canary-orchestrator.test.ts",
   "tests/production.test.ts",
   "tests/project-backup.test.ts",

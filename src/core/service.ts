@@ -12,7 +12,8 @@ import {
   ensureSidecar,
   findEventsByIdempotencyKey,
   getActiveProjectRegistration,
-  getActiveProjectStateReadOnly,
+  getActiveProjectRegistrationSnapshotReadOnly,
+  getRegisteredProjectLaneReadOnly,
   listEvents,
   listTaskPacks,
   loadProjectConfig,
@@ -20,6 +21,8 @@ import {
   loadOverrides,
   readJson,
   readTaskPack,
+  repairProjectRegistryCompatibility,
+  reconcileActiveProjectStartup,
   saveIndex,
   saveOverrides,
   listRegisteredProjects,
@@ -57,6 +60,7 @@ import {
 import {
   createManagedProject,
   inspectManagedProject,
+  inspectManagedProjectReadOnly,
   isManagedProject,
   upgradeEmptyProjectToManaged,
   type CreateManagedProjectOptions,
@@ -78,6 +82,32 @@ export interface PersistedScanOptions {
   includeHashPaths?: string[];
   signal?: AbortSignal;
   onProgress?: (progress: ScanProgress) => void;
+}
+
+/**
+ * v1 没有 registry lane 可以表达“受管必需”。当受管 manifest 已遗失时，不能把
+ * 仍留有受管专用存储的工程误降级到 legacy 启动路径。这里只做目录项证据检查，
+ * 不读取、更不创建任何受管文件；任何非不存在的 lstat 异常同样 fail-close。
+ */
+async function hasManagedStorageEvidence(projectRoot: string): Promise<boolean> {
+  const sidecarRoot = path.join(projectRoot, ".aicanvas");
+  const knownManagedLocations = [
+    path.join(sidecarRoot, "material-studio.sqlite"),
+    path.join(sidecarRoot, "studio-production.sqlite"),
+    path.join(sidecarRoot, "studio-production"),
+    path.join(sidecarRoot, "studio-generation"),
+  ];
+  for (const location of knownManagedLocations) {
+    try {
+      await lstat(location);
+      return true;
+    } catch (error) {
+      if (!(error instanceof Error && "code" in error && (error as NodeJS.ErrnoException).code === "ENOENT")) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 export interface LocalCreativeImportProjectSummary {
@@ -133,6 +163,14 @@ function throwIfScanAborted(signal?: AbortSignal): void {
   throw error;
 }
 
+let afterScanIndexCommitHookForTests: (() => void | Promise<void>) | undefined;
+
+export function __setAfterScanIndexCommitHookForTests(
+  hook: (() => void | Promise<void>) | undefined,
+): void {
+  afterScanIndexCommitHookForTests = hook;
+}
+
 export async function scanAndPersist(projectRoot = DEFAULT_PROJECT_ROOT, options: boolean | PersistedScanOptions = false): Promise<ProjectIndex> {
   const normalized = typeof options === "boolean" ? { includeHashes: options } : options;
   if (await isManagedProject(projectRoot)) {
@@ -154,6 +192,9 @@ export async function scanAndPersist(projectRoot = DEFAULT_PROJECT_ROOT, options
     // 提交点之前允许取消；提交开始后必须完整同步 JSON、SQLite 与事件，避免半份新索引。
     throwIfScanAborted(normalized.signal);
     await saveIndex(index);
+    // test-only fault window: JSON index 已提交、ProjectCache 尚未同步。
+    // 此后任何 busy 都不能被 command bus 解释为整条 scan 零副作用。
+    await afterScanIndexCommitHookForTests?.();
     const cache = new ProjectCache(projectRoot);
     try {
       cache.replaceIndex(index);
@@ -532,22 +573,40 @@ export async function getActiveProjectReadOnly(): Promise<{
   name: string;
   primaryRoot: string;
   updatedAt: string;
+  activationId: string;
+  activatedAt: string;
+  registrationLane: "legacy" | "v2";
+  managedStartupRequired: boolean;
   available: boolean;
   unavailableReason?: string;
 } | null> {
-  const state = await getActiveProjectStateReadOnly();
-  if (!state) return null;
+  const snapshot = await getActiveProjectRegistrationSnapshotReadOnly();
+  const state = snapshot.state;
+  const project = snapshot.registration;
+  const registrationLane = snapshot.registrationLane;
+  if (!state || !project || !registrationLane) return null;
   const activeRoot = path.resolve(state.primaryRoot);
-  const project = (await listRegisteredProjects())
-    .find((candidate) => path.resolve(candidate.primaryRoot) === activeRoot);
-  if (!project) return null;
   try {
     await access(activeRoot);
-    return { ...project, primaryRoot: activeRoot, available: true };
+    const managedStartupRequired = registrationLane === "v2"
+      || await hasManagedStorageEvidence(activeRoot);
+    return {
+      ...project,
+      primaryRoot: activeRoot,
+      activationId: state.activationId,
+      activatedAt: state.activatedAt,
+      registrationLane,
+      managedStartupRequired,
+      available: true,
+    };
   } catch (error) {
     return {
       ...project,
       primaryRoot: activeRoot,
+      activationId: state.activationId,
+      activatedAt: state.activatedAt,
+      registrationLane,
+      managedStartupRequired: registrationLane === "v2",
       available: false,
       unavailableReason: error instanceof Error ? error.message : "活动项目根暂时不可访问",
     };
@@ -557,16 +616,80 @@ export async function getActiveProjectReadOnly(): Promise<{
 export async function activateProject(projectRoot: string): Promise<{ id: string; name: string; primaryRoot: string; updatedAt: string; available: true }> {
   const absoluteRoot = path.resolve(projectRoot);
   await access(absoluteRoot);
-  const project = (await listRegisteredProjects()).find((candidate) => path.resolve(candidate.primaryRoot) === absoluteRoot);
+  // 显式激活也必须先经过与 renderer 相同的只读分类。v2 登记或 v1 专用存储
+  // 证据命中而 manifest 缺失/损坏时，这里会在 compatibility repair 与活动指针
+  // 写入前失败关闭，绝不把受管工程降级为 legacy 激活。
+  await inspectProjectStartupTargetReadOnly(absoluteRoot);
+  // 激活是显式 mutation 边界：在这里修复早期 P1 曾泄漏到 legacy 表的有效 v2
+  // 登记；listProjects/getActiveProjectReadOnly 等物理只读入口不得触发迁移。
+  const project = (await repairProjectRegistryCompatibility())
+    .find((candidate) => path.resolve(candidate.primaryRoot) === absoluteRoot);
   if (!project) throw new Error(`项目尚未登记，不能设为活动项目：${absoluteRoot}`);
+  // 活动指针也是全局可写状态；受管 manifest 必须先以纯只读方式通过当前 writer 门，
+  // 避免 v2/future 工程在 shell 拒绝前先污染 active-project sidecar。
+  if (await isManagedProject(absoluteRoot)) await inspectManagedProjectReadOnly(absoluteRoot);
   await setActiveProjectRegistration(absoluteRoot);
   return { ...project, primaryRoot: absoluteRoot, available: true };
 }
 
+/**
+ * 受管工程冷启动的同根 CAS 对账。它不改变活动 root；只确认 renderer 看到的
+ * root+activationId 仍为当前身份，并在同一锁域内完成必要 repair 与 manifest 只读校验。
+ */
+export async function reconcileActiveManagedProjectStartup(input: {
+  projectRoot: string;
+  activationId: string;
+}): Promise<ProjectShell> {
+  const absoluteRoot = path.resolve(input.projectRoot);
+  const reconciled = await reconcileActiveProjectStartup({
+    primaryRoot: absoluteRoot,
+    activationId: input.activationId,
+  }, async (registration) => {
+    const shell = await inspectManagedProjectReadOnly(absoluteRoot);
+    if (shell.project.id !== registration.id || path.resolve(shell.paths.root) !== absoluteRoot) {
+      throw new Error("活动工程登记与受管 manifest 身份不一致，拒绝冷启动。 ");
+    }
+    return shell;
+  });
+  return reconciled.value;
+}
+
 export async function getManagedProjectShell(projectRoot: string): Promise<ProjectShell | null> {
+  const target = await inspectProjectStartupTargetReadOnly(projectRoot);
+  return target.kind === "managed" ? target.shell : null;
+}
+
+export type ProjectStartupTargetReadOnly = {
+  kind: "legacy";
+} | {
+  kind: "managed";
+  shell: ProjectShell;
+};
+
+/**
+ * 显式打开、冷启动和 renderer stage 共用的只读目标分类。v2 registry lane 或 v1
+ * 受管专用存储任一命中，都会把 manifest 错误视为安全门禁失败，而非 legacy 回退信号。
+ */
+export async function inspectProjectStartupTargetReadOnly(
+  projectRoot: string,
+): Promise<ProjectStartupTargetReadOnly> {
   const absoluteRoot = path.resolve(projectRoot);
-  if (!await isManagedProject(absoluteRoot)) return null;
-  return inspectManagedProject(absoluteRoot);
+  await access(absoluteRoot);
+  const [registrationLane, managedStorageEvidence] = await Promise.all([
+    getRegisteredProjectLaneReadOnly(absoluteRoot),
+    hasManagedStorageEvidence(absoluteRoot),
+  ]);
+  try {
+    return { kind: "managed", shell: await inspectManagedProjectReadOnly(absoluteRoot) };
+  } catch (error) {
+    if (registrationLane === "v2" || managedStorageEvidence) {
+      throw new Error(
+        `受管工程 manifest 缺失或损坏，已拒绝回退到 legacy 打开路径：${error instanceof Error ? error.message : String(error)}`,
+        { cause: error },
+      );
+    }
+    return { kind: "legacy" };
+  }
 }
 
 export interface ManagedProjectCreatedEventReceipt {
@@ -654,6 +777,15 @@ export async function saveProjectConfig(config: ProjectConfig): Promise<ProjectI
   const projectRoot = path.resolve(config.primaryRoot);
   const current = await getProjectIndex(projectRoot);
   if (path.resolve(current.project.primaryRoot) !== projectRoot) throw new Error("项目主根不可通过设置页迁移，请重新导入目录。");
+  if (config.id !== current.project.id
+    || config.schemaVersion !== current.project.schemaVersion
+    || config.workspaceMode !== current.project.workspaceMode
+    || config.minimumWriterSchemaVersion !== current.project.minimumWriterSchemaVersion) {
+    throw new Error("项目身份或 writer schema 不可通过设置页变更，已在任何项目写入前停止。");
+  }
+  if (current.project.schemaVersion === 2) {
+    throw new Error("novel/hybrid 受管项目当前为只读工作区壳，项目配置不得由旧设置页改写。");
+  }
   const namingRules = config.namingRules ?? current.project.namingRules ?? { patterns: [], manualMappings: [] };
   for (const rule of namingRules.patterns) {
     try { new RegExp(rule.pattern, "i"); } catch { throw new Error(`自定义命名规则 ${rule.id} 不是有效正则表达式。`); }

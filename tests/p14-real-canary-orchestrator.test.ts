@@ -191,6 +191,8 @@ describe.sequential("P14 真实单图 canary 本地编排", () => {
       approvedRawEligible: false,
     });
     expect((await reviewP14RealCanary(reviewInput)).fingerprint).toBe(reviewed.fingerprint);
+    // 2026-08-12（wq-0007 收口）：两次空载复验分别约 53.5s / 47.8s，
+    // 已恢复原 60s 严格门；后续若再次越界，应以新证据立票，禁止静默放宽。
   }, 60_000);
 
   it("真实 prepare 缺少三项权威参考时失败关闭", async () => {

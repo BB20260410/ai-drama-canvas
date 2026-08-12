@@ -5,10 +5,11 @@
  * CanonicalAsset、BindingSet、剧本或冻结包。账本与 generation pack/result 共用
  * `.aicanvas/studio-generation-ledger.sqlite`，避免再建一套 Review 事实源。
  */
-import { createHash } from "node:crypto";
 import { lstat } from "node:fs/promises";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
+import { digestStudioCanonicalJson as digest } from "./studio-canonical-json.js";
 import { inspectManagedProject, inspectManagedProjectReadOnly } from "./managed-project.js";
 import {
   assertSafeSqliteSidecars,
@@ -232,19 +233,6 @@ interface OperationRow {
 
 function fail(code: StudioGenerationReviewErrorCode, message: string, details: string[] = []): never {
   throw new StudioGenerationReviewError(code, message, details);
-}
-
-function stableValue(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(stableValue);
-  if (!value || typeof value !== "object") return value;
-  return Object.fromEntries(Object.entries(value as Record<string, unknown>)
-    .filter(([, entry]) => entry !== undefined)
-    .sort(([left], [right]) => left.localeCompare(right, "en"))
-    .map(([key, entry]) => [key, stableValue(entry)]));
-}
-
-function digest(value: unknown): string {
-  return createHash("sha256").update(JSON.stringify(stableValue(value)), "utf8").digest("hex");
 }
 
 function requiredText(value: unknown, label: string, maximum = 8_000): string {
@@ -615,11 +603,12 @@ async function ensureReviewSchema(databasePath: string): Promise<void> {
   assertSqliteSourceBindingIdentity(databasePath, sourceIdentity, "generation review ledger");
   assertSafeSqliteSidecars(databasePath, "generation review ledger");
 
-  const db = new DatabaseSync(databasePath, { timeout: BUSY_TIMEOUT_MS });
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
+  const db = new DatabaseSync(databasePath, { timeout: busyTimeoutMs });
   try {
     assertSafeSqliteSidecars(databasePath, "generation review ledger");
     assertSqliteSourceBindingIdentity(databasePath, sourceIdentity, "generation review ledger");
-    db.exec(`PRAGMA busy_timeout=${BUSY_TIMEOUT_MS}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
+    db.exec(`PRAGMA busy_timeout=${busyTimeoutMs}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
     db.exec("BEGIN IMMEDIATE");
     try {
       assertBaseSchema(db);
@@ -651,11 +640,12 @@ async function ensureReviewSchema(databasePath: string): Promise<void> {
 function openDatabase(context: ReviewDatabaseContext): DatabaseSync {
   assertSafeSqliteSidecars(context.databasePath, "generation review ledger");
   assertSqliteSourceBindingIdentity(context.databasePath, context.sourceIdentity, "generation review ledger");
-  const db = new DatabaseSync(context.databasePath, { timeout: BUSY_TIMEOUT_MS });
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
+  const db = new DatabaseSync(context.databasePath, { timeout: busyTimeoutMs });
   try {
     assertSafeSqliteSidecars(context.databasePath, "generation review ledger");
     assertSqliteSourceBindingIdentity(context.databasePath, context.sourceIdentity, "generation review ledger");
-    db.exec(`PRAGMA busy_timeout=${BUSY_TIMEOUT_MS}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
+    db.exec(`PRAGMA busy_timeout=${busyTimeoutMs}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
     const journal = db.prepare("PRAGMA journal_mode").get() as { journal_mode?: string } | undefined;
     if (journal?.journal_mode?.toLowerCase() !== "wal") fail("storage-invalid", "Review 必须复用 WAL generation ledger。");
     assertBaseSchema(db);

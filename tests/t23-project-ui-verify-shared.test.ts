@@ -3,6 +3,7 @@ import { mkdtemp, mkdir, readFile, realpath, rm, symlink, utimes, writeFile } fr
 import os from "node:os";
 import path from "node:path";
 import {
+  collectT23OwnedProcessIds,
   matchesT23DualUnitLabel,
   parseT23VerifyCli,
   prepareIsolatedRuntime,
@@ -14,6 +15,25 @@ import {
 import { REDLINE_SENTINEL_RELATIVE_PATHS } from "../scripts/lib/redline-project-sentinel-shared.js";
 
 describe("T23 通用季集双编号识别", () => {
+  it("退出清理同时覆盖原进程树和携带隔离 userData 的重挂接 Electron", () => {
+    expect(collectT23OwnedProcessIds([
+      { pid: 100, ppid: 1, command: "electron-vite" },
+      { pid: 101, ppid: 100, command: "launcher" },
+      { pid: 102, ppid: 101, command: "helper" },
+      { pid: 201, ppid: 1, command: "Electron --user-data-dir=/tmp/t23-owned" },
+      { pid: 300, ppid: 1, command: "unrelated Electron" },
+    ], 100, "--user-data-dir=/tmp/t23-owned")).toEqual([201, 102, 101, 100]);
+  });
+
+  it("launcher 已退出时仍收集精确 userData 根及其后代，且不误命中同前缀路径", () => {
+    expect(collectT23OwnedProcessIds([
+      { pid: 201, ppid: 1, command: "Electron --user-data-dir=/tmp/t23-owned" },
+      { pid: 202, ppid: 201, command: "Electron Helper" },
+      { pid: 300, ppid: 1, command: "Electron --user-data-dir=/tmp/t23-owned-other" },
+      { pid: 301, ppid: 300, command: "unrelated helper" },
+    ], 100, "--user-data-dir=/tmp/t23-owned")).toEqual([202, 201]);
+  });
+
   it.each([
     "029｜S1E01-U28",
     "001｜S1E02-U00",

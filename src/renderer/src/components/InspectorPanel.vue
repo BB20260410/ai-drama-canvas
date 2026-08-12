@@ -6,7 +6,7 @@
           <span class="eyebrow">节点检查器</span>
           <h2>{{ item.title }}</h2>
         </div>
-        <button class="icon-button" type="button" @click="$emit('close')"><X :size="18" /></button>
+        <button class="icon-button" type="button" aria-label="关闭详情" @click="$emit('close')"><X :size="18" /></button>
       </header>
 
       <section class="inspector-status">

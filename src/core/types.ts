@@ -76,7 +76,13 @@ export interface ProjectNamingRules {
 }
 
 export interface ProjectConfig {
-  schemaVersion: 1;
+  /**
+   * schema v1 是已发布的剧本工作区合同；schema v2 只用于 novel/hybrid，
+   * 让旧 writer 在任何项目写入前就因配置/索引不兼容而失败关闭。
+   */
+  schemaVersion: 1 | 2;
+  workspaceMode?: "novel" | "hybrid";
+  minimumWriterSchemaVersion?: 2;
   id: string;
   name: string;
   primaryRoot: string;
@@ -93,6 +99,14 @@ export interface ProjectConfig {
   };
   createdAt: string;
   updatedAt: string;
+}
+
+/**
+ * 小说 workspace manifest 由 NovelRepository 先落盘，managed project owner 只在
+ * 调用方持有当前 manifest fingerprint 时才能绑定固定 locator。
+ */
+export interface AttachNovelManifestInput {
+  expectedManagedFingerprint: string;
 }
 
 export interface MechanicalCheck {
@@ -731,7 +745,7 @@ export interface AdaptationChangeImpact {
 
 export type NovelAnalysisProviderKind = "codex" | "external";
 export type NovelAnalysisProviderAdapter = "openai-compatible" | "mock";
-export type NovelAnalysisTaskStatus = "prepared" | "executing" | "submission_unknown" | "reviewing" | "completed" | "failed";
+export type NovelAnalysisTaskStatus = "prepared" | "executing" | "reconciliation_required" | "submission_unknown" | "reviewing" | "completed" | "failed";
 export type NovelAnalysisReviewStatus = "pending" | "accepted" | "rejected";
 
 export interface NovelAnalysisProvider {
@@ -766,14 +780,26 @@ export interface NovelAnalysisExecution {
   id: string;
   providerId: string;
   providerRevision: number;
-  status: "submitting" | "submission_unknown" | "succeeded" | "failed";
+  status: "submitting" | "response_persisted" | "reconciliation_required" | "response_recovered" | "submission_unknown" | "succeeded" | "failed";
   requestHash: string;
   startedAt: string;
+  ownerId?: string;
+  fence?: number;
+  heartbeatAt?: string;
+  leaseUntil?: string;
+  dispatchCheckpoint?: "intent_persisted" | "request_dispatched" | "response_persisted";
   completedAt?: string;
   responseId?: string;
   responseModel?: string;
   proposalPath?: string;
+  proposalSha256?: string;
   usage?: { inputTokens?: number; outputTokens?: number; totalTokens?: number };
+  reconciliation?: {
+    status: "required" | "found" | "not_found";
+    evidenceReference?: string;
+    note: string;
+    reconciledAt: string;
+  };
   error?: string;
 }
 
@@ -832,6 +858,7 @@ export interface NovelAnalysisRunProgress {
   reviewingBatches: number;
   preparedBatches: number;
   executingBatches: number;
+  reconciliationRequiredBatches: number;
   failedBatches: number;
   unknownBatches: number;
   plannedCharacterCount: number;
@@ -2156,6 +2183,24 @@ export interface EditMediaItem {
   accepted: boolean;
   episode?: number;
   unit?: number;
+}
+
+export interface EditMediaQuery {
+  episode?: number;
+  kind?: "all" | "video" | "image" | "audio";
+  search?: string;
+  cursor?: string;
+  limit?: number;
+}
+
+export interface EditMediaPage {
+  schemaVersion: 1;
+  kind: "edit-media-page";
+  items: EditMediaItem[];
+  total: number;
+  scannedAt: string;
+  queryFingerprint: string;
+  nextCursor?: string;
 }
 
 export interface EditMediaPreview {

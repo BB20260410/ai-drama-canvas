@@ -1,7 +1,10 @@
-import { createHash } from "node:crypto";
 import { lstat } from "node:fs/promises";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import {
+  digestStudioCanonicalJson as stableDigest,
+  serializeStudioCanonicalJsonPretty,
+} from "./studio-canonical-json.js";
 import {
   getStudioMedia as getStudioMediaUncached,
   initializeMaterialStudio,
@@ -364,19 +367,6 @@ export interface StudioUnitGridGenerationBlockedResult {
 export type StudioUnitGridGenerationQueryResult =
   | StudioUnitGridGenerationReadyResult
   | StudioUnitGridGenerationBlockedResult;
-
-function stableValue(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(stableValue);
-  if (!value || typeof value !== "object") return value;
-  return Object.fromEntries(Object.entries(value as Record<string, unknown>)
-    .filter(([, entry]) => entry !== undefined)
-    .sort(([left], [right]) => left.localeCompare(right, "en"))
-    .map(([key, entry]) => [key, stableValue(entry)]));
-}
-
-function stableDigest(value: unknown): string {
-  return createHash("sha256").update(JSON.stringify(stableValue(value)), "utf8").digest("hex");
-}
 
 async function inspectStudioUnitGridManagedProject(
   projectRoot: string,
@@ -1764,5 +1754,5 @@ export function serializeStudioUnitGridGenerationRequest(
   if (request.fingerprint !== fingerprint || request.id !== `studio-codex-request-${fingerprint.slice(0, 32)}`) {
     fail("input-drift", "unit-grid Agent 请求内容地址无效。");
   }
-  return `${JSON.stringify(stableValue(request), null, 2)}\n`;
+  return serializeStudioCanonicalJsonPretty(request);
 }

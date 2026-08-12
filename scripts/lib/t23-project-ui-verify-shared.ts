@@ -610,15 +610,108 @@ async function waitForCdp(port: number, child: ChildProcess): Promise<string> {
   throw new Error("源码态 Electron CDP 90 秒内未就绪。");
 }
 
-async function stopProcessGroup(child: ChildProcess | undefined): Promise<void> {
-  if (!child || child.exitCode !== null || !child.pid || child.pid <= 1) return;
-  try { process.kill(-child.pid, "SIGTERM"); } catch { child.kill("SIGTERM"); }
-  await Promise.race([
-    new Promise<void>((resolve) => child.once("exit", () => resolve())),
-    new Promise<void>((resolve) => setTimeout(resolve, 3_000)),
-  ]);
+export interface T23OwnedProcessRow {
+  pid: number;
+  ppid: number;
+  command: string;
+}
+
+export function collectT23OwnedProcessIds(
+  rows: readonly T23OwnedProcessRow[],
+  rootPid: number,
+  commandNeedle?: string,
+): number[] {
+  const hasExactCommandArgument = (command: string, argument: string): boolean => {
+    let cursor = command.indexOf(argument);
+    while (cursor >= 0) {
+      const before = cursor === 0 ? " " : command[cursor - 1]!;
+      const afterIndex = cursor + argument.length;
+      const after = afterIndex >= command.length ? " " : command[afterIndex]!;
+      if (/\s/u.test(before) && /\s/u.test(after)) return true;
+      cursor = command.indexOf(argument, cursor + 1);
+    }
+    return false;
+  };
+  const owned = new Set<number>();
+  if (rows.some((row) => row.pid === rootPid)) owned.add(rootPid);
+  if (commandNeedle) {
+    for (const row of rows) {
+      if (hasExactCommandArgument(row.command, commandNeedle)) owned.add(row.pid);
+    }
+  }
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const row of rows) {
+      if (!owned.has(row.pid) && owned.has(row.ppid)) {
+        owned.add(row.pid);
+        changed = true;
+      }
+    }
+  }
+  owned.delete(process.pid);
+  return [...owned].filter((pid) => Number.isSafeInteger(pid) && pid > 1).sort((left, right) => right - left);
+}
+
+async function t23ProcessSnapshot(): Promise<T23OwnedProcessRow[]> {
+  return new Promise((resolve) => {
+    const probe = spawn("/bin/ps", ["-axo", "pid=,ppid=,command="], { stdio: ["ignore", "pipe", "ignore"] });
+    let output = "";
+    probe.stdout?.on("data", (chunk: Buffer) => { output += chunk.toString("utf8"); });
+    probe.once("error", () => resolve([]));
+    probe.once("exit", () => resolve(output.split(/\r?\n/u).flatMap((line) => {
+      const match = line.match(/^\s*(\d+)\s+(\d+)\s+(.*)$/u);
+      if (!match) return [];
+      return [{ pid: Number(match[1]), ppid: Number(match[2]), command: match[3] ?? "" }];
+    })));
+  });
+}
+
+function signalT23OwnedProcesses(pids: readonly number[], signal: NodeJS.Signals): void {
+  for (const pid of pids) {
+    try { process.kill(pid, signal); } catch { /* process already exited */ }
+  }
+}
+
+function t23ProcessAlive(pid: number): boolean {
+  try { process.kill(pid, 0); return true; } catch { return false; }
+}
+
+async function stopProcessGroup(child: ChildProcess | undefined, commandNeedle?: string): Promise<void> {
+  if (!child || !child.pid || child.pid <= 1) return;
+  const initialRows = await t23ProcessSnapshot();
+  const ownedPids = collectT23OwnedProcessIds(
+    initialRows,
+    child.exitCode === null ? child.pid : 0,
+    commandNeedle,
+  );
   if (child.exitCode === null) {
-    try { process.kill(-child.pid, "SIGKILL"); } catch { child.kill("SIGKILL"); }
+    try { process.kill(-child.pid, "SIGTERM"); } catch { child.kill("SIGTERM"); }
+  }
+  signalT23OwnedProcesses(ownedPids, "SIGTERM");
+  const deadline = Date.now() + 3_000;
+  while (Date.now() < deadline && ownedPids.some(t23ProcessAlive)) {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  const finalRows = await t23ProcessSnapshot();
+  const remaining = collectT23OwnedProcessIds(
+    finalRows,
+    child.exitCode === null ? child.pid : 0,
+    commandNeedle,
+  ).filter(t23ProcessAlive);
+  if (remaining.length || child.exitCode === null) {
+    if (child.exitCode === null) {
+      try { process.kill(-child.pid, "SIGKILL"); } catch { child.kill("SIGKILL"); }
+    }
+    signalT23OwnedProcesses(remaining, "SIGKILL");
+  }
+  const killDeadline = Date.now() + 1_000;
+  while (Date.now() < killDeadline && remaining.some(t23ProcessAlive)) {
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+  const survivors = remaining.filter(t23ProcessAlive);
+  if (survivors.length) {
+    throw new Error(`T23 隔离进程未能退出：${survivors.join(",")}`);
   }
 }
 
@@ -662,12 +755,12 @@ export async function launchDevElectron(input: {
       close: async () => {
         await browser?.close().catch(() => undefined);
         browser = undefined;
-        await stopProcessGroup(child);
+        await stopProcessGroup(child, `--user-data-dir=${input.userDataRoot}`);
       },
     };
   } catch (error) {
     await browser?.close().catch(() => undefined);
-    await stopProcessGroup(child);
+    await stopProcessGroup(child, `--user-data-dir=${input.userDataRoot}`);
     throw error;
   }
 }

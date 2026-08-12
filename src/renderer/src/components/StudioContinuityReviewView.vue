@@ -212,6 +212,7 @@
                   :src="imageUrlOf(source)"
                   :data-review-request="reviewMedia.requestSequence"
                   :alt="source === 'raw' ? '只读原始宫格图' : '只读中文标注图'"
+                  decoding="async"
                   @load="onReviewImageLoad(source, $event)"
                   @error="onReviewImageError(source, $event)" />
                 <div v-else class="media-placeholder">{{ reviewMedia.status === 'error' ? `${source.toUpperCase()} 加载失败` : `正在读取 ${source.toUpperCase()}…` }}</div>
@@ -233,6 +234,7 @@
                 :src="rawImageUrl"
                 :data-review-request="reviewMedia.requestSequence"
                 alt=""
+                decoding="async"
                 @load="onReviewImageLoad('raw', $event)"
                 @error="onReviewImageError('raw', $event)" />
               <img
@@ -241,6 +243,7 @@
                 :src="labeledImageUrl"
                 :data-review-request="reviewMedia.requestSequence"
                 alt=""
+                decoding="async"
                 @load="onReviewImageLoad('labeled', $event)"
                 @error="onReviewImageError('labeled', $event)" />
             </div>
@@ -259,7 +262,8 @@
                     v-if="imageUrlOf(source)"
                     :key="`${reviewMedia.requestSequence}:${source}`"
                     :src="imageUrlOf(source)"
-                    :alt="source === 'raw' ? '原始生成图' : '中文标注图'" />
+                    :alt="source === 'raw' ? '原始生成图' : '中文标注图'"
+                    decoding="async" />
                   <div v-else class="media-placeholder">{{ reviewMedia.status === 'error' ? `${source.toUpperCase()} 加载失败` : `正在读取 ${source.toUpperCase()}…` }}</div>
                   <svg
                     v-if="decodedOf(source)"
@@ -301,7 +305,8 @@
                   v-if="imageUrlOf(abSource)"
                   :key="`${reviewMedia.requestSequence}:ab:${abSource}`"
                   :src="imageUrlOf(abSource)"
-                  :alt="abSource === 'raw' ? '原始生成图' : '中文标注图'" />
+                  :alt="abSource === 'raw' ? '原始生成图' : '中文标注图'"
+                  decoding="async" />
                 <svg v-if="decodedOf(abSource)" class="annotation-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
                   <template v-for="ann in overlayAnnotations(abSource)" :key="ann.key">
                     <rect v-if="ann.kind !== 'point'" :x="ann.x * 100" :y="ann.y * 100" :width="ann.width * 100" :height="ann.height * 100" :class="['ann-rect', ann.tone]" />
@@ -320,8 +325,8 @@
 
             <div v-else-if="compareMode === 'wipe'" class="review-single">
               <div class="wipe-stage" @pointerdown="onWipePointerDown">
-                <img v-if="rawImageUrl" :src="rawImageUrl" alt="raw 原始生成图" class="wipe-base" />
-                <img v-if="labeledImageUrl" :src="labeledImageUrl" alt="中文标注图" class="wipe-top" :style="{ clipPath: `inset(0 ${100 - wipePercent}% 0 0)` }" />
+                <img v-if="rawImageUrl" :src="rawImageUrl" alt="raw 原始生成图" decoding="async" class="wipe-base" />
+                <img v-if="labeledImageUrl" :src="labeledImageUrl" alt="中文标注图" decoding="async" class="wipe-top" :style="{ clipPath: `inset(0 ${100 - wipePercent}% 0 0)` }" />
                 <div
                   class="wipe-divider"
                   :style="{ left: `${wipePercent}%` }"
@@ -448,7 +453,7 @@
 
     <div v-if="originalPreview" class="original-preview" role="dialog" aria-modal="true" aria-label="原尺寸图片查看">
       <header><strong>{{ originalPreview === 'raw' ? '原始图' : '标注图' }} · 原尺寸</strong><button type="button" @click="originalPreview = null">关闭</button></header>
-      <div><img :src="originalPreview === 'raw' ? rawImageUrl : labeledImageUrl" :alt="originalPreview === 'raw' ? '原始图原尺寸' : '标注图原尺寸'" /></div>
+      <div><img :src="originalPreview === 'raw' ? rawImageUrl : labeledImageUrl" :alt="originalPreview === 'raw' ? '原始图原尺寸' : '标注图原尺寸'" decoding="async" /></div>
     </div>
   </section>
 </template>

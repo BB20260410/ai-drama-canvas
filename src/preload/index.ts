@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer, webUtils } from "electron";
 import { createT23IpcPerformanceProbe } from "./t23-ipc-performance-probe.js";
+import { createRendererWindowCloseRequestBridge } from "./window-close-bridge.js";
 import type { EditOperation } from "../core/editor.js";
 import type {
   CanvasPosition,
@@ -12,6 +13,8 @@ import type {
   ContinuationSnapshot,
   ContextSearchHit,
   EditMediaItem,
+  EditMediaPage,
+  EditMediaQuery,
   EditMediaPreview,
   EditNestedTimelinePreview,
   EditProject,
@@ -126,27 +129,128 @@ export type StudioMediaDerivativeIpcResult = Omit<import("../core/studio-media-d
   derivatives: StudioMediaDerivativeIpcItem[];
 };
 
+type NovelCoreCommandRequest = import("../core/novel-command-runtime.js").NovelCommandRequest;
+type NovelCoreImportCommandRequest = Extract<
+  NovelCoreCommandRequest,
+  { command: "novel_import_external_snapshot" }
+>;
+
+export type NovelDesktopImportCommandRequest = {
+  command: "novel_import_external_snapshot";
+  payload: Omit<NovelCoreImportCommandRequest["payload"], "projectsRoot">;
+};
+
+export type NovelDesktopCommandRequest =
+  | Exclude<NovelCoreCommandRequest, { command: "novel_import_external_snapshot" }>
+  | NovelDesktopImportCommandRequest;
+
+export type NovelDesktopCommandInput = Omit<import("../core/command-bus.js").IdempotentCommandInput, "request"> & {
+  request: NovelDesktopCommandRequest;
+};
+
+export type NovelDesktopCommandResult = Omit<
+  import("../core/command-bus.js").IdempotentCommandResult,
+  "storageRoot" | "durableReconciliation"
+>;
+
+export type NovelDesktopPreflightResult = Omit<import("../core/novel-types.js").NovelImportPreflight, "sourcePath" | "sourceRoot"> & {
+  sourceName: string;
+  authorization: import("../core/novel-import.js").NovelImportPreflightAuthorizationTicket | null;
+};
+
+export type NovelDesktopSourceSelection = import("../core/novel-source-selection.js").NovelSourceSelectionTicket;
+export type NovelDesktopDestinationSelection = import("../core/novel-destination-selection.js").NovelDestinationSelectionTicket;
+
+const t23PerformanceProbeEnabled = process.env.AI_CANVAS_T23_PERF_PROBE === "1";
 const t23IpcPerformanceProbe = createT23IpcPerformanceProbe(
-  process.env.AI_CANVAS_T23_PERF_PROBE === "1",
+  t23PerformanceProbeEnabled,
   <T>(channel: string, ...args: unknown[]) => ipcRenderer.invoke(channel, ...args) as Promise<T>,
 );
+const rendererWindowCloseRequestBridge = createRendererWindowCloseRequestBridge();
+ipcRenderer.on("canvas:window-close-requested", (_event, request: { requestId: string }) => {
+  rendererWindowCloseRequestBridge.receive(request);
+});
 
 const api = {
   /** T23 源码 dev 验收只读探针；生产默认 disabled 且不累计。 */
+  t23PerformanceProbeEnabled,
+  recordT23RendererMilestone: (milestone: string): void => {
+    t23IpcPerformanceProbe.recordRendererMilestone(milestone, performance.now());
+  },
   getT23IpcPerformanceProbeSnapshot: () => t23IpcPerformanceProbe.snapshot(),
   listProjects: (
     options?: import("../core/service.js").ListProjectsRequestOptions,
   ): ReturnType<typeof import("../core/service.js").listProjects> => ipcRenderer.invoke("canvas:list-projects", options),
   cancelProjectListRequest: (requestId: string): Promise<boolean> =>
     ipcRenderer.invoke("canvas:cancel-project-list-request", requestId),
-  getActiveProject: (): ReturnType<typeof import("../core/service.js").getActiveProject> => ipcRenderer.invoke("canvas:get-active-project"),
+  getActiveProject: (): ReturnType<typeof import("../core/service.js").getActiveProjectReadOnly> => ipcRenderer.invoke("canvas:get-active-project"),
+  reconcileActiveManagedProjectStartup: (input: Parameters<typeof import("../core/service.js").reconcileActiveManagedProjectStartup>[0]): ReturnType<typeof import("../core/service.js").reconcileActiveManagedProjectStartup> =>
+    ipcRenderer.invoke("canvas:reconcile-active-managed-project-startup", input),
   getManagedProjectOperationState: (): Promise<ManagedProjectOperationIpcState> => ipcRenderer.invoke("canvas:get-managed-project-operation-state"),
   activateProject: (projectRoot: string): ReturnType<typeof import("../core/service.js").activateProject> => ipcRenderer.invoke("canvas:activate-project", projectRoot),
   getManagedProjectShell: (projectRoot: string): ReturnType<typeof import("../core/service.js").getManagedProjectShell> => ipcRenderer.invoke("canvas:get-managed-project-shell", projectRoot),
+  validateRestoredManagedProjectShell: (projectRoot: string): ReturnType<typeof import("../core/managed-project.js").inspectManagedProjectReadOnly> =>
+    ipcRenderer.invoke("canvas:validate-restored-managed-project-shell", projectRoot),
+  releaseRestoredManagedProjectShellValidation: (projectRoot: string): Promise<boolean> =>
+    ipcRenderer.invoke("canvas:release-restored-managed-project-shell-validation", projectRoot),
   createManagedStudioProject: (input: import("../core/managed-project.js").CreateManagedProjectOptions): ReturnType<typeof import("../core/service.js").createManagedStudioProject> => ipcRenderer.invoke("canvas:create-managed-studio-project", input),
   getDefaultManagedProjectsRoot: (): Promise<string> => ipcRenderer.invoke("canvas:get-default-managed-projects-root"),
   pickManagedProjectsParent: (defaultPath?: string): Promise<string | null> => ipcRenderer.invoke("canvas:pick-managed-projects-parent", defaultPath),
   setActiveStudioContext: (projectRoot: string, context: Parameters<typeof import("../core/sidecar.js").setActiveStudioContext>[1]): ReturnType<typeof import("../core/sidecar.js").setActiveStudioContext> => ipcRenderer.invoke("canvas:set-active-studio-context", projectRoot, context),
+  getActiveHybridWorkspacePreference: (projectId: string): ReturnType<typeof import("../core/sidecar.js").getActiveHybridWorkspacePreference> => ipcRenderer.invoke("canvas:get-active-hybrid-workspace-preference", projectId),
+  setActiveHybridWorkspacePreference: (projectId: string, mode: Parameters<typeof import("../core/sidecar.js").setActiveHybridWorkspacePreference>[1]): ReturnType<typeof import("../core/sidecar.js").setActiveHybridWorkspacePreference> => ipcRenderer.invoke("canvas:set-active-hybrid-workspace-preference", projectId, mode),
+  novel: {
+    getWorkspace: (projectRoot: string): ReturnType<typeof import("../core/novel-manuscript.js").getNovelWorkspaceSnapshot> =>
+      ipcRenderer.invoke("canvas:novel-get-workspace", projectRoot),
+    getNavigation: (
+      projectRoot: string,
+      page: { offset: number; limit: number; anchorVolumeId?: string },
+    ): ReturnType<typeof import("../core/novel-manuscript.js").getNovelWorkspaceNavigation> =>
+      ipcRenderer.invoke("canvas:novel-get-navigation", projectRoot, page),
+    listChapters: (
+      projectRoot: string,
+      page: { offset: number; limit: number; volumeId?: string; anchorChapterId?: string },
+    ): ReturnType<typeof import("../core/novel-manuscript.js").listNovelChapters> =>
+      ipcRenderer.invoke("canvas:novel-list-chapters", projectRoot, page),
+    readChapter: (
+      projectRoot: string,
+      chapterId: string,
+    ): ReturnType<typeof import("../core/novel-manuscript.js").readNovelChapter> =>
+      ipcRenderer.invoke("canvas:novel-read-chapter", projectRoot, chapterId),
+    searchChapters: (
+      projectRoot: string,
+      input: import("../core/novel-types.js").SearchNovelChaptersInput,
+    ): ReturnType<typeof import("../core/novel-manuscript.js").searchNovelChapters> =>
+      ipcRenderer.invoke("canvas:novel-search-chapters", projectRoot, input),
+    listFacts: (projectRoot: string): Promise<import("../core/novel-memory-authority.js").NovelMemoryAuthorityProjection> =>
+      ipcRenderer.invoke("canvas:novel-list-facts", projectRoot),
+    getWritingDashboard: (
+      projectRoot: string,
+      input: import("../core/novel-desktop-writing-os.js").NovelDesktopWritingDashboardInput,
+    ): ReturnType<typeof import("../core/novel-desktop-writing-os.js").getNovelDesktopWritingDashboard> =>
+      ipcRenderer.invoke("canvas:novel-get-writing-dashboard", projectRoot, input),
+    reviewStateCandidate: (
+      projectRoot: string,
+      input: import("../core/novel-desktop-writing-os.js").NovelDesktopStateCandidateReviewInput,
+    ): ReturnType<typeof import("../core/novel-desktop-writing-os.js").reviewNovelDesktopStateCandidate> =>
+      ipcRenderer.invoke("canvas:novel-review-state-candidate", projectRoot, input),
+    /** @deprecated managed novel/hybrid 的正典变更必须走 Story Bible candidate + owner review。 */
+    upsertFact: (
+      projectRoot: string,
+      input: Parameters<typeof import("../core/adaptation.js").upsertNovelFact>[1],
+    ): ReturnType<typeof import("../core/adaptation.js").upsertNovelFact> =>
+      ipcRenderer.invoke("canvas:novel-upsert-fact", projectRoot, input),
+    pickSource: (
+      selectionKind: import("../core/novel-source-selection.js").NovelSourceSelectionKind,
+    ): Promise<NovelDesktopSourceSelection | null> =>
+      ipcRenderer.invoke("canvas:novel-pick-source", selectionKind),
+    pickDestination: (): Promise<NovelDesktopDestinationSelection | null> =>
+      ipcRenderer.invoke("canvas:novel-pick-destination"),
+    preflightSource: (destinationId: string, selectionId: string): Promise<NovelDesktopPreflightResult> =>
+      ipcRenderer.invoke("canvas:novel-preflight-source", destinationId, selectionId),
+    executeNovelCommand: (root: string | null, input: NovelDesktopCommandInput): Promise<NovelDesktopCommandResult> =>
+      ipcRenderer.invoke("canvas:novel-execute-command", root, input),
+  },
   upgradeManagedStudioProject: (projectRoot: string): ReturnType<typeof import("../core/service.js").upgradeManagedStudioProject> => ipcRenderer.invoke("canvas:upgrade-managed-studio-project", projectRoot),
   getMaterialStudioState: (projectRoot: string): ReturnType<typeof import("../core/material-studio.js").getMaterialStudioState> => ipcRenderer.invoke("canvas:get-material-studio-state", projectRoot),
   listStudioMedia: (projectRoot: string, query: import("../core/material-studio.js").StudioMediaListQuery = {}): Promise<StudioMediaIpcPage> => ipcRenderer.invoke("canvas:list-studio-media", projectRoot, query),
@@ -170,6 +274,7 @@ const api = {
   getDuduReadonlyImportControl: (projectRoot: string): ReturnType<typeof import("../core/dudu-readonly-import.js").getDuduReadonlyImportControl> => ipcRenderer.invoke("canvas:get-dudu-readonly-import-control", projectRoot),
   discoverDuduReadonlyImportProjects: (projectsRoot: string): ReturnType<typeof import("../core/dudu-readonly-import.js").discoverDuduReadonlyImportProjects> => ipcRenderer.invoke("canvas:discover-dudu-readonly-import-projects", projectsRoot),
   getStudioVideoPackageControl: (projectRoot: string, query: import("../core/studio-video-package.js").StudioVideoPackageControlQuery): Promise<import("../core/studio-video-package.js").StudioVideoPackagePublicControlLookup> => ipcRenderer.invoke("canvas:get-studio-video-package-control", projectRoot, query),
+  getStudioHiggsfieldVideoGenerationControl: (projectRoot: string, intentId: string): Promise<import("../core/studio-higgsfield-video-generation.js").StudioHiggsfieldVideoControl> => ipcRenderer.invoke("canvas:get-studio-higgsfield-video-generation-control", projectRoot, intentId),
   getStudioGenerationControl: (projectRoot: string, query: import("../core/codex.js").StudioGenerationControlQuery): ReturnType<typeof import("../core/codex.js").getStudioGenerationControlEnvelope> => ipcRenderer.invoke("canvas:get-studio-generation-control", projectRoot, query),
   getStudioDetachedUnknownUnitStates: (
     projectRoot: string,
@@ -397,6 +502,7 @@ const api = {
   exportEditOtio: (projectRoot: string, editProjectId: string, expectedRevision: number, outputPath?: string): Promise<{ path: string; editProjectId: string; revision: number; clips: number }> => ipcRenderer.invoke("canvas:export-edit-otio", projectRoot, editProjectId, expectedRevision, outputPath),
   importEditOtio: (projectRoot: string, filePath: string, name?: string): Promise<EditProject> => ipcRenderer.invoke("canvas:import-edit-otio", projectRoot, filePath, name),
   listEditMedia: (projectRoot: string, episode?: number): Promise<EditMediaItem[]> => ipcRenderer.invoke("canvas:list-edit-media", projectRoot, episode),
+  listEditMediaPage: (projectRoot: string, query?: EditMediaQuery): Promise<EditMediaPage> => ipcRenderer.invoke("canvas:list-edit-media-page", projectRoot, query),
   prepareEditMediaPreview: (projectRoot: string, artifactId: string): Promise<EditMediaPreview> => ipcRenderer.invoke("canvas:prepare-edit-media-preview", projectRoot, artifactId),
   prepareEditMediaProxy: (projectRoot: string, artifactId: string): Promise<EditMediaPreview> => ipcRenderer.invoke("canvas:prepare-edit-media-proxy", projectRoot, artifactId),
   prepareNestedTimelinePreview: (projectRoot: string, parentEditProjectId: string, expectedRevision: number, clipId: string): Promise<EditNestedTimelinePreview> => ipcRenderer.invoke("canvas:prepare-nested-timeline-preview", projectRoot, parentEditProjectId, expectedRevision, clipId),
@@ -591,6 +697,12 @@ const api = {
   ): Promise<TaskPack> => ipcRenderer.invoke("canvas:finish-batch", projectRoot, taskId, input),
   startWatch: (projectRoot: string): Promise<LegacyWatcherIdentity> => ipcRenderer.invoke("canvas:start-watch", projectRoot),
   stopWatch: (projectRoot?: string) => ipcRenderer.invoke("canvas:stop-watch", projectRoot),
+  onWindowCloseRequested: (callback: (request: { requestId: string }) => void) => {
+    return rendererWindowCloseRequestBridge.subscribe(callback);
+  },
+  respondToWindowClose: (requestId: string, allow: boolean): void => {
+    ipcRenderer.send("canvas:window-close-response", requestId, allow);
+  },
   onIndexUpdated: (callback: (index: ProjectIndex) => void) => {
     const listener = (_event: Electron.IpcRendererEvent, index: ProjectIndex) => callback(index);
     ipcRenderer.on("canvas:index-updated", listener);
@@ -619,5 +731,8 @@ const api = {
 };
 
 contextBridge.exposeInMainWorld("canvasApi", api);
+// 必须在低层 listener 与 contextBridge 都已就绪后通知 main；close 请求即使先于
+// Vue onMounted 到达，也会由 preload bridge 缓冲。
+ipcRenderer.send("canvas:window-close-bridge-ready");
 
 export type CanvasApi = typeof api;

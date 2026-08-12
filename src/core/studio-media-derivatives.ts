@@ -3,6 +3,7 @@ import { constants as fsConstants, createReadStream } from "node:fs";
 import { access, link, lstat, open, realpath, rm } from "node:fs/promises";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
 import sharp from "sharp";
 import { inspectManagedProject } from "./managed-project.js";
 import { MEDIA_WEIGHTS, mediaStageTimeout, runMediaProcess } from "./media-runtime.js";
@@ -204,9 +205,10 @@ function ensureDerivativeSchema(db: DatabaseSync): void {
 }
 
 function openDerivativeDatabase(projectRoot: string): DatabaseSync {
-  const db = new DatabaseSync(databasePath(projectRoot), { timeout: BUSY_TIMEOUT_MS });
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
+  const db = new DatabaseSync(databasePath(projectRoot), { timeout: busyTimeoutMs });
   try {
-    db.exec(`PRAGMA busy_timeout=${BUSY_TIMEOUT_MS}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
+    db.exec(`PRAGMA busy_timeout=${busyTimeoutMs}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
     const foreignKeys = db.prepare("PRAGMA foreign_keys").get() as { foreign_keys?: number } | undefined;
     if (foreignKeys?.foreign_keys !== 1) throw new StudioMediaDerivativeError("database_drift", "素材派生索引未启用 foreign_keys。");
     ensureDerivativeSchema(db);

@@ -20,6 +20,17 @@ afterEach(async () => {
 });
 
 describe("脚本自有夹具根安全清理", () => {
+  it("macOS canonical /private/tmp 仍受 owner marker 与 inode 保护", async () => {
+    if (process.platform !== "darwin") return;
+    const parent = await mkdtemp("/private/tmp/owned-fixture-canonical-");
+    cleanup.push(parent);
+    const root = path.join(parent, "fixture");
+    const created = await createOwnedFixtureRootAt(root, "fixture-canonical-test");
+    await expect(assertOwnedTemporaryFixtureRoot(root, "fixture-canonical-test"))
+      .resolves.toMatchObject({ root, leaseId: created.leaseId });
+    await removeOwnedTemporaryFixtureRoot(root, "fixture-canonical-test");
+  });
+
   it("owner marker 和 inode 一致时才允许重置", async () => {
     const parent = await mkdtemp(path.join(os.tmpdir(), "owned-fixture-reset-"));
     cleanup.push(parent);

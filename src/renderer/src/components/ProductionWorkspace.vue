@@ -32,8 +32,8 @@
       <button v-for="item in filteredItems" :key="item.id" type="button" class="shot-row" :class="{ selected: selectedIds.has(item.id) }" @click="$emit('select', item.id)">
         <span class="check-cell" @click.stop="toggle(item.id)"><i :class="{ checked: selectedIds.has(item.id) }"></i></span>
         <span class="shot-title"><b>EP{{ pad(item.episode) }} · 15s {{ pad(item.unit, 3) }}</b><small>{{ item.title }}</small></span>
-        <span class="thumb-cell"><img v-if="imageFor(item, 'start')" loading="lazy" :src="assetUrl(imageFor(item, 'start')?.path)" /><em v-else>缺</em></span>
-        <span class="thumb-cell"><img v-if="imageFor(item, 'end')" loading="lazy" :src="assetUrl(imageFor(item, 'end')?.path)" /><em v-else>缺</em></span>
+        <span class="thumb-cell"><img v-if="imageFor(item, 'start')" loading="lazy" decoding="async" :src="assetUrl(imageFor(item, 'start')?.path)" :alt="`${item.title} 首帧`" /><em v-else>缺</em></span>
+        <span class="thumb-cell"><img v-if="imageFor(item, 'end')" loading="lazy" decoding="async" :src="assetUrl(imageFor(item, 'end')?.path)" :alt="`${item.title} 尾帧`" /><em v-else>缺</em></span>
         <span class="state-cell"><b :class="statusClass(item.status)"><i></i>{{ item.status }}</b><small>{{ item.nextAction }}</small></span>
         <span class="file-count">{{ artifactsFor(item).length }}</span>
       </button>
@@ -42,7 +42,7 @@
     <div v-else-if="mode === 'assets'" class="asset-grid">
       <article v-for="item in filteredItems" :key="item.id" class="asset-card">
         <button class="asset-main" type="button" @click="$emit('select', item.id)">
-          <figure><img v-if="item.thumbnailPath" loading="lazy" :src="assetUrl(item.thumbnailPath)" /><span v-else>无预览</span></figure>
+          <figure><img v-if="item.thumbnailPath" loading="lazy" decoding="async" :src="assetUrl(item.thumbnailPath)" :alt="`${item.title} 缩略图`" /><span v-else>无预览</span></figure>
           <div><span>{{ assetGroup(item) }}<template v-if="item.hardLockIds.length"> · 硬锁</template></span><b>{{ item.title }}</b><small>{{ item.sourcePaths[0] }}</small></div>
         </button>
         <footer><button type="button" @click="revealArtifact(item.sourcePaths[0]!)">定位文件</button><button v-if="!item.hardLockIds.length" type="button" @click="promoteAsset(item)">提升为硬锁</button><b v-else><LockKeyhole :size="12" /> 权威参考</b></footer>
@@ -70,9 +70,9 @@
       <div class="video-grid">
       <button v-for="item in filteredItems" :key="item.id" type="button" class="video-card" :class="{ selected: selectedIds.has(item.id) || selectedVideoId === item.id }" @click="selectVideo(item)">
         <div class="video-frames">
-          <img v-if="imageFor(item, 'start')" loading="lazy" :src="assetUrl(imageFor(item, 'start')?.path)" />
+          <img v-if="imageFor(item, 'start')" loading="lazy" decoding="async" :src="assetUrl(imageFor(item, 'start')?.path)" :alt="`${item.title} 视频首帧`" />
           <span v-else>首帧</span>
-          <img v-if="imageFor(item, 'end')" loading="lazy" :src="assetUrl(imageFor(item, 'end')?.path)" />
+          <img v-if="imageFor(item, 'end')" loading="lazy" decoding="async" :src="assetUrl(imageFor(item, 'end')?.path)" :alt="`${item.title} 视频尾帧`" />
           <span v-else>尾帧</span>
           <div v-if="videoFor(item)" class="video-badge"><Film :size="13" /> 已落盘</div>
         </div>
@@ -227,4 +227,7 @@ async function createPack() {
 .video-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(300px,1fr)); gap: 12px; padding: 18px 26px 70px; }.video-card { min-width: 0; padding: 0; border: 1px solid #30322c; background: #181916; text-align: left; cursor: pointer; }.video-card:hover,.video-card.selected { border-color: #5d5132; }.video-frames { height: 154px; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; position: relative; overflow: hidden; background: #30322c; }.video-frames img { width: 100%; height: 100%; object-fit: cover; }.video-frames > span { display: grid; place-items: center; background: #1c1d19; color: #575a51; font-size: 9px; }.video-badge { position: absolute; right: 8px; bottom: 8px; display: flex; align-items: center; gap: 5px; padding: 5px 7px; background: rgba(10,11,9,.86); color: #85b6ce; font-size: 8px; }.video-copy { height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 12px; }.video-copy b,.video-copy small { display: block; }.video-copy b { font-size: 10px; }.video-copy small { margin-top: 5px; color: #777a70; font-size: 8px; }
 .video-preview-stage { display: grid; grid-template-columns: minmax(420px,1.25fr) minmax(340px,1fr); min-height: 360px; border-bottom: 1px solid #30322c; background: #10110f; }.video-player { min-height: 360px; display: grid; place-items: center; border-right: 1px solid #30322c; background: #080907; }.video-player video { width: 100%; height: 360px; object-fit: contain; background: #080907; }.video-player-empty { display: grid; place-content: center; justify-items: center; gap: 10px; color: #62655c; }.video-player-empty span { color: #a7a99f; font-size: 11px; }.video-player-empty small { max-width: 280px; text-align: center; font-size: 8px; line-height: 1.5; }.video-inspection { min-width: 0; padding: 24px; }.video-inspection h3 { margin: 8px 0 5px; font-size: 15px; }.video-inspection > p { margin: 0 0 18px; color: #85887e; font-size: 9px; }.video-version-list article { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 7px 12px; padding: 11px 0; border-top: 1px solid #2d2f29; }.video-version-list article.authoritative { box-shadow: inset 2px 0 #d7af55; padding-left: 10px; }.video-version-list article.deprecated { opacity: .55; }.video-version-list b,.video-version-list small,.video-version-list em { display: block; }.video-version-list b { font-size: 9px; }.video-version-list small { margin-top: 5px; color: #85887e; font-size: 8px; }.video-version-list em { margin-top: 5px; color: #5e6158; font: 7px/1.35 Menlo,monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }.video-version-list span { color: #d07865; font-size: 8px; }.video-version-list span.ok { color: #83aa72; }.video-version-list button { height: 24px; border: 1px solid #3a3c34; background: transparent; color: #aaa; font-size: 7px; cursor: pointer; }
 .module-empty { height: 260px; display: grid; place-content: center; justify-items: center; gap: 11px; color: #5f6259; font-size: 10px; }
+.shot-row { content-visibility: auto; contain-intrinsic-size: auto 76px; }
+.asset-card { content-visibility: auto; contain-intrinsic-size: auto 250px; }
+.video-card { content-visibility: auto; contain-intrinsic-size: auto 210px; }
 </style>

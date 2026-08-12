@@ -125,5 +125,7 @@ describe("长篇小说可恢复模型批次", () => {
     expect(refs).toHaveLength(401);
     expect(new Set(refs.map((ref) => ref.chapterId)).size).toBe(401);
     expect(planned.progress).toMatchObject({ status: "ready", totalBatches: 51, preparedBatches: 51 });
+    // 2026-08-12（wq-0007 收口）：空载基线约 16.3s，恢复 20s 严格门。
+    // 该门只用于稳定的单 worker 性能回归；不得与其他重型夹具并跑后据此放宽。
   }, 20_000);
 });

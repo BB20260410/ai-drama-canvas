@@ -42,7 +42,7 @@
             :class="{ active: selectedAssetId === track.assetId }"
             @click="selectTrack(track.assetId)">
             <figure>
-              <img v-if="assetItem(track.workItemId)?.thumbnailPath" loading="lazy" decoding="async" :src="assetUrl(assetItem(track.workItemId)!.thumbnailPath!)" />
+              <img v-if="assetItem(track.workItemId)?.thumbnailPath" loading="lazy" decoding="async" :src="assetUrl(assetItem(track.workItemId)!.thumbnailPath!)" :alt="`${track.assetId} 连续性缩略图`" />
               <span v-else>{{ track.assetId }}</span>
             </figure>
             <div>

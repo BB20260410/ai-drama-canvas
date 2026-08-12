@@ -24,6 +24,7 @@ import { createManagedProject } from "../src/core/managed-project.js";
 import {
   __getGlobalStudioAssetCatalogCacheMetricsForTests,
   __resetGlobalStudioAssetCatalogCacheForTests,
+  __setGlobalStudioAssetCatalogSnapshotProbeForTests,
   getGlobalStudioAssetResourceImage,
   getGlobalStudioMediaResource,
   listGlobalStudioAssetCatalog,
@@ -896,5 +897,33 @@ describe.sequential("全剧本规范素材只读聚合", () => {
       snapshotBuilds: 3,
       projectSqliteScans: 7,
     });
+  }, 120_000);
+
+  it("冷快照遇到瞬时 SQLITE_BUSY 会整次重试，不能把同一身份缓存成结构损坏", async () => {
+    const project = await createRegisteredProject("瞬时锁剧本", "global-assets-transient-busy");
+    await createAsset(project.paths.root, {
+      id: "character-transient-busy",
+      category: "character",
+      name: "瞬时锁角色",
+    });
+    let probes = 0;
+    __setGlobalStudioAssetCatalogSnapshotProbeForTests((_phase, attempt) => {
+      probes += 1;
+      if (attempt === 1) throw Object.assign(new Error("database is SQLITE_BUSY"), { code: "SQLITE_BUSY" });
+    });
+    const page = await listGlobalStudioAssetCatalog({ category: "character", limit: 36 });
+    expect(page.items.map((item) => item.assetId)).toContain("character-transient-busy");
+    expect(page.unavailableProjects).toEqual([]);
+    expect(__getGlobalStudioAssetCatalogCacheMetricsForTests()).toMatchObject({
+      snapshotBuildAttempts: 2,
+      snapshotBuildRetries: 1,
+      snapshotBuilds: 1,
+      snapshotBuildFailures: 0,
+    });
+    const beforeHotRead = __getGlobalStudioAssetCatalogCacheMetricsForTests().projectSqliteScans;
+    const hot = await listGlobalStudioAssetCatalog({ category: "character", search: "瞬时锁", limit: 36 });
+    expect(hot.total).toBe(1);
+    expect(__getGlobalStudioAssetCatalogCacheMetricsForTests().projectSqliteScans).toBe(beforeHotRead);
+    expect(probes).toBeGreaterThanOrEqual(3);
   }, 120_000);
 });

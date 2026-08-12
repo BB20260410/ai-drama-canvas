@@ -105,7 +105,15 @@ async function reviewCurrentImages(client: Client, projectRoot: string, itemId: 
 export async function runMcpHeadlessWorkflow(projectRoot: string, registryPath: string): Promise<Record<string, unknown>> {
   const root = path.resolve(projectRoot);
   const registry = path.resolve(registryPath);
+  const startedAt = Date.now();
+  const progress = (stage: string) => {
+    if (process.env.AI_CANVAS_SMOKE_PROGRESS === "1") {
+      process.stderr.write(`[mcp-headless-smoke] ${stage} elapsedMs=${Date.now() - startedAt}\n`);
+    }
+  };
+  progress("start");
   const bootstrap = await runFullWorkflow(root, registry);
+  progress("bootstrap-complete");
   const transport = transportFor(root, registry);
   const client = new Client({ name: "ai-drama-canvas-headless-e2e", version: "0.1.0" });
   transport.stderr?.on("data", (chunk) => process.stderr.write(chunk));
@@ -120,6 +128,7 @@ export async function runMcpHeadlessWorkflow(projectRoot: string, registryPath: 
 
   try {
     await client.connect(transport);
+    progress("mcp-connected");
     const [tools, resources, templates, prompts] = await Promise.all([client.listTools(), client.listResources(), client.listResourceTemplates(), client.listPrompts()]);
     const capabilities = parseToolResult(await client.callTool({ name: "get_capabilities", arguments: { projectRoot: root } })) as { server: { toolCount: number }; commandTypes: string[]; editor?: { mediaScheduling?: { foregroundHeavyJobsPerProject?: number; activeRenderBlocksForegroundJobs?: boolean } } };
     const initialDoctor = parseToolResult(await client.callTool({ name: "doctor_project", arguments: { projectRoot: root } })) as { healthy: boolean; summary: { errors: number; warnings: number; ok: number } };
@@ -132,6 +141,7 @@ export async function runMcpHeadlessWorkflow(projectRoot: string, registryPath: 
     if (initialSnapshot.runtimeResources?.scan?.active !== false || initialSnapshot.runtimeResources.editor?.foregroundCapacity !== 1 || initialSnapshot.runtimeResources.editor.renderCapacity !== 1 || initialSnapshot.runtimeResources.blockedActions?.length) throw new Error("统一快照没有返回空闲且可执行的资源状态。 ");
     const initialRepair = initialSnapshot.productionDesign?.evidence?.nextRepair;
     if (initialRepair?.stageId !== "frames" || initialRepair.reason !== "evidence_drift" || !initialRepair.mustRepairEvidenceFirst || initialRepair.executeCommand?.tool !== "execute_command" || initialRepair.executeCommand.request?.command !== "update_workflow_stage" || !Number.isInteger(initialRepair.executeCommand.request.payload?.expectedRevision)) throw new Error("统一快照没有返回可执行的首尾帧证据修复合同。 ");
+    progress("mcp-contracts-verified");
 
     const generationSettings = parseToolResult(await client.callTool({ name: "get_generation_settings", arguments: { projectRoot: root } })) as { revision: number };
     const configuredSettings = await write("upsert_generation_provider", {
@@ -167,6 +177,7 @@ export async function runMcpHeadlessWorkflow(projectRoot: string, registryPath: 
     const processed = await write("process_generation_queue", { jobId: videoJob.id }) as { processedJobId?: string; recent: Array<{ id: string; status: string; publicationReceiptId?: string }> };
     const succeeded = processed.recent.find((job) => job.id === videoJob.id);
     if (succeeded?.status !== "succeeded" || !succeeded.publicationReceiptId) throw new Error("Headless MCP 视频没有完成机械验收与发布登记。 ");
+    progress("generation-complete");
 
     const awaitingReview = await write("finish_batch", {
       taskId: createdTask.task.id,
@@ -189,6 +200,7 @@ export async function runMcpHeadlessWorkflow(projectRoot: string, registryPath: 
       note: "Headless MCP 隔离夹具视频视觉验收通过。",
     }) as { item: { status: string }; record: { id: string } };
     if (unit3Review.item.status !== "已完成") throw new Error("任务包视频验收后节点没有完成。 ");
+    progress("unit3-review-complete");
 
     const editProject = await write("create_edit_project", { name: "Headless MCP EP01", episode: 1, width: 360, height: 640, fps: 23.976, autoPopulate: true }) as { id: string; revision: number; tracks: Array<{ kind: string; clips: Array<{ id: string; kind: string; startSeconds: number; durationSeconds: number }> }>; timebase: { rateNumerator: number; rateDenominator: number } };
     const clip = editProject.tracks.find((track) => track.kind === "visual")?.clips.find((candidate) => candidate.kind === "video");
@@ -201,6 +213,7 @@ export async function runMcpHeadlessWorkflow(projectRoot: string, registryPath: 
     const rendered = await waitForRender(client, root, renderStarted.id);
     if (rendered.status !== "succeeded") throw new Error(`Headless MCP 后台渲染失败：${rendered.error ?? "未知错误"}`);
     await access(rendered.outputPath);
+    progress("render-complete");
 
     const prepared = await write("prepare_timeline_continuation", {
       editProjectId: editProject.id,
@@ -220,6 +233,7 @@ export async function runMcpHeadlessWorkflow(projectRoot: string, registryPath: 
     const continuationPacks = parseToolResult(await client.callTool({ name: "list_video_continuations", arguments: { projectRoot: root, itemId: "main-ep01-unit004" } })) as Array<{ id: string; status: string; outputVideoPath?: string }>;
     const completedPack = continuationPacks.find((pack) => pack.id === prepared.pack.id);
     if (completedPack?.status !== "completed" || !completedPack.outputVideoPath) throw new Error("续接生成成功后包状态没有自动闭合。 ");
+    progress("continuation-complete");
     const workflow = parseToolResult(await client.callTool({ name: "get_production_workflow", arguments: { projectRoot: root } })) as { revision: number; evidenceAudit?: { workflowRevision: number; stages: Array<{ stageId: string; ready: boolean; issues: string[] }> } };
     if (workflow.evidenceAudit?.workflowRevision !== workflow.revision || workflow.evidenceAudit.stages.length !== 15) throw new Error("Headless MCP 没有返回 15 阶段实时证据审计。 ");
     if (!workflow.evidenceAudit.stages.find((stage) => stage.stageId === "frames")?.issues.some((issue) => issue.includes("main-ep01-unit002"))) throw new Error("实时证据审计没有暴露续接首帧造成的局部视觉验收漂移。 ");
@@ -234,6 +248,7 @@ export async function runMcpHeadlessWorkflow(projectRoot: string, registryPath: 
     if (completedVideoStage.stages.find((stage) => stage.id === "video")?.status !== "completed") throw new Error("Headless MCP 没有通过真实视频阶段门禁。 ");
     const completedEditStage = await write("update_production_workflow_stage", { stageId: "edit", status: "completed", expectedRevision: completedVideoStage.revision, evidencePaths: [rendered.outputPath], note: "Headless MCP 后台成片已通过 ffprobe。" }) as { stages: Array<{ id: string; status: string }> };
     if (completedEditStage.stages.find((stage) => stage.id === "edit")?.status !== "completed") throw new Error("Headless MCP 没有通过真实剪辑阶段门禁。 ");
+    progress("workflow-stages-complete");
 
     const chapters = parseToolResult(await client.callTool({ name: "list_story_chapters", arguments: { projectRoot: root, limit: 10 } })) as Array<{ id: string }>;
     const unit3 = parseToolResult(await client.callTool({ name: "get_item", arguments: { projectRoot: root, itemId: "main-ep01-unit003" } })) as { artifacts: Array<{ id: string; kind: string; authoritative: boolean }> };
@@ -256,6 +271,7 @@ export async function runMcpHeadlessWorkflow(projectRoot: string, registryPath: 
       if (!content || !("text" in content) || !content.text.trim()) throw new Error(`Resource 没有返回结构化文本：${uri}`);
       JSON.parse(content.text);
     }
+    progress("resources-complete");
 
     const promptResults = await Promise.all([
       client.getPrompt({ name: "resume_project", arguments: { projectRoot: root, focusItemId: "main-ep01-unit003" } }),
@@ -268,6 +284,7 @@ export async function runMcpHeadlessWorkflow(projectRoot: string, registryPath: 
     ]);
     const promptTexts = promptResults.map(textFromPrompt);
     if (promptTexts.some((text) => text.length < 80) || !promptTexts[3]!.includes("status=preflight") || !promptTexts[3]!.includes("status=uploaded")) throw new Error("MCP Prompts 未返回完整、安全且有序的执行说明。 ");
+    progress("prompts-complete");
 
     const ledger = parseToolResult(await client.callTool({ name: "list_command_ledger", arguments: { projectRoot: root, limit: 500 } })) as Array<{ status: string; idempotencyKey: string }>;
     const finalDoctor = parseToolResult(await client.callTool({ name: "doctor_project", arguments: { projectRoot: root } })) as { healthy: boolean; summary: { errors: number; warnings: number; ok: number }; checks: Array<{ id: string; level: string; detail: string }> };
@@ -278,6 +295,7 @@ export async function runMcpHeadlessWorkflow(projectRoot: string, registryPath: 
       const doctorErrors = finalDoctor.checks.filter((check) => check.level === "error").map((check) => `${check.id}：${check.detail}`).join("；");
       throw new Error(`Headless MCP 闭环结束后仍有未确认命令或 Doctor 错误：uncertainCommands=${uncertainCommands.length}${doctorErrors ? `；${doctorErrors}` : ""}`);
     }
+    progress("complete");
 
     return {
       root,

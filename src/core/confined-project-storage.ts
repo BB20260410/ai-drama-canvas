@@ -18,6 +18,13 @@ export interface ConfinedDirectoryIdentity {
   ino: number;
 }
 
+export interface ConfinedRootIdentityExpectation {
+  projectsRoot: string;
+  canonicalRoot: string;
+  dev: bigint;
+  ino: bigint;
+}
+
 export interface ConfinedFileIdentity {
   directory: ConfinedDirectoryIdentity;
   name: string;
@@ -47,8 +54,26 @@ export interface ConfinedLinkNoReplaceTestHooks {
   afterLink?: () => void | Promise<void>;
 }
 
+export interface ConfinedRegularFileReadTestHooks {
+  /** 仅供确定性竞态测试；产品调用不得传入。 */
+  afterOpen?: () => void | Promise<void>;
+  /** 仅供确定性竞态测试；产品调用不得传入。 */
+  afterRead?: () => void | Promise<void>;
+}
+
 export interface ConfinedPersistedFile {
   created: boolean;
+  identity: ConfinedFileIdentity;
+  sha256: string;
+  size: number;
+}
+
+export interface ConfinedPersistBatchEntry {
+  name: string;
+  bytes: Buffer;
+}
+
+export interface ConfinedMovedFile {
   identity: ConfinedFileIdentity;
   sha256: string;
   size: number;
@@ -75,6 +100,36 @@ function assertBasename(name: string): string {
   return name;
 }
 
+/** 纯只读复验 Main 原生选择冻结的根 inode；不会 mkdir 或打开写句柄。 */
+export async function assertConfinedRootIdentity(
+  expected: ConfinedRootIdentityExpectation,
+): Promise<void> {
+  if (!expected || typeof expected.projectsRoot !== "string"
+    || !path.isAbsolute(expected.projectsRoot)
+    || path.resolve(expected.projectsRoot) !== expected.projectsRoot
+    || typeof expected.canonicalRoot !== "string"
+    || expected.canonicalRoot !== expected.projectsRoot
+    || typeof expected.dev !== "bigint" || typeof expected.ino !== "bigint") {
+    throw new Error("受管根的预期身份无效。");
+  }
+  try {
+    const metadata = await lstat(expected.projectsRoot, { bigint: true });
+    if (!metadata.isDirectory() || metadata.isSymbolicLink()
+      || metadata.dev !== expected.dev || metadata.ino !== expected.ino
+      || await realpath(expected.projectsRoot) !== expected.canonicalRoot) {
+      throw Object.assign(new Error("小说导入目标身份已变化。"), {
+        code: "NOVEL_DESTINATION_CHANGED",
+      });
+    }
+  } catch (error) {
+    if (error && typeof error === "object"
+      && (error as { code?: unknown }).code === "NOVEL_DESTINATION_CHANGED") throw error;
+    throw Object.assign(new Error("小说导入目标身份已变化。", { cause: error }), {
+      code: "NOVEL_DESTINATION_CHANGED",
+    });
+  }
+}
+
 /**
  * 逐级建立并冻结工程内目录身份。Node 没有 openat；调用方必须在每个写入、
  * promote 和删除边界重验返回的 dev/ino，避免把 lexical containment 当真实隔离。
@@ -83,6 +138,7 @@ export async function ensureConfinedDirectory(
   projectRoot: string,
   targetDirectory: string,
   mode = 0o700,
+  expectedRootIdentity?: ConfinedRootIdentityExpectation,
 ): Promise<ConfinedDirectoryIdentity> {
   if (!path.isAbsolute(projectRoot) || !path.isAbsolute(targetDirectory)) {
     throw new Error("受管工程根和目标目录必须是绝对路径。");
@@ -90,18 +146,24 @@ export async function ensureConfinedDirectory(
   const root = path.resolve(projectRoot);
   const target = path.resolve(targetDirectory);
   if (!isWithinOrEqual(target, root)) throw new Error("受管目录逃逸工程根。");
-  const rootMetadata = await lstat(root);
-  if (!rootMetadata.isDirectory() || rootMetadata.isSymbolicLink()) {
+  if (expectedRootIdentity && expectedRootIdentity.projectsRoot !== root) {
+    throw new Error("受管根的预期身份与 projectRoot 不一致。");
+  }
+  if (expectedRootIdentity) await assertConfinedRootIdentity(expectedRootIdentity);
+  const rootMetadata = expectedRootIdentity ? null : await lstat(root, { bigint: true });
+  if (rootMetadata && (!rootMetadata.isDirectory() || rootMetadata.isSymbolicLink())) {
     throw new Error("受管工程根必须是无符号链接的真实目录。");
   }
-  const canonicalRoot = await realpath(root);
+  const canonicalRoot = expectedRootIdentity?.canonicalRoot ?? await realpath(root);
 
   // 已存在目录只做只读身份冻结；真正写边界仍由 dirfd helper 复验同一
   // canonical/dev/ino。避免每次查询或账本打开都启动子进程。
-  try {
-    return await inspectExistingConfinedDirectory(root, target);
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+  if (!expectedRootIdentity) {
+    try {
+      return await inspectExistingConfinedDirectory(root, target);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    }
   }
 
   const relative = path.relative(root, target);
@@ -110,8 +172,8 @@ export async function ensureConfinedDirectory(
     result = await runDarwinDirfdStorage("ensure", [
       root,
       canonicalRoot,
-      String(rootMetadata.dev),
-      String(rootMetadata.ino),
+      String(expectedRootIdentity?.dev ?? rootMetadata!.dev),
+      String(expectedRootIdentity?.ino ?? rootMetadata!.ino),
       relative,
       mode.toString(8),
     ]);
@@ -179,6 +241,44 @@ export async function inspectExistingConfinedDirectory(
   };
 }
 
+/**
+ * 从 Main 冻结的 projectsRoot dirfd 逐段打开已存在目录，全程绝不 mkdir。
+ * 用于 fresh desktop 导入的 completed replay，防止路径 ABA 先锚定 clone。
+ */
+export async function inspectExistingConfinedDirectoryAtExpectedRoot(
+  expectedRoot: ConfinedRootIdentityExpectation,
+  targetDirectory: string,
+): Promise<ConfinedDirectoryIdentity> {
+  const root = path.resolve(expectedRoot.projectsRoot);
+  if (!path.isAbsolute(targetDirectory)) throw new Error("受管目录必须是绝对路径。");
+  const target = path.resolve(targetDirectory);
+  if (root !== expectedRoot.projectsRoot || !isWithinOrEqual(target, root)) {
+    throw new Error("受管目录逃逸预期工程根。");
+  }
+  const result = await runDarwinDirfdStorage("inspect-directory", [
+    root,
+    expectedRoot.canonicalRoot,
+    String(expectedRoot.dev),
+    String(expectedRoot.ino),
+    path.relative(root, target),
+  ]);
+  const canonicalDirectory = String(result.canonicalDirectory ?? "");
+  const dev = Number(result.dev);
+  const ino = Number(result.ino);
+  if (!path.isAbsolute(canonicalDirectory) || !isWithinOrEqual(canonicalDirectory, expectedRoot.canonicalRoot)
+    || !Number.isSafeInteger(dev) || !Number.isSafeInteger(ino)) {
+    throw new Error("dirfd helper 返回无效受管目录身份。");
+  }
+  return {
+    projectRoot: root,
+    canonicalRoot: expectedRoot.canonicalRoot,
+    directory: target,
+    canonicalDirectory,
+    dev,
+    ino,
+  };
+}
+
 export async function revalidateConfinedDirectory(identity: ConfinedDirectoryIdentity): Promise<void> {
   const metadata = await lstat(identity.directory);
   if (!metadata.isDirectory() || metadata.isSymbolicLink()
@@ -242,7 +342,6 @@ export async function persistConfinedBytesNoReplace(
   mode = 0o600,
 ): Promise<ConfinedPersistedFile> {
   const safeName = assertBasename(name);
-  if (bytes.byteLength < 1) throw new Error("受管持久文件不得为空。");
   const sha256 = createHash("sha256").update(bytes).digest("hex");
   const args = [
     directory.directory,
@@ -286,6 +385,277 @@ export async function persistConfinedBytesNoReplace(
   }
 }
 
+/**
+ * 在同一锚定目录内批量发布不可变文件。若指定 commitName，其他文件先全部
+ * rename 并 fsync 目录，commit 文件最后 rename 再 fsync，保持显式提交点。
+ */
+export async function persistConfinedBytesNoReplaceBatch(
+  directory: ConfinedDirectoryIdentity,
+  entries: readonly ConfinedPersistBatchEntry[],
+  options: { commitName?: string; mode?: number; testInterruptAfterName?: string } = {},
+): Promise<ConfinedPersistedFile[]> {
+  if (!entries.length || entries.length > 64) throw new Error("受管批量持久化文件数无效。");
+  const normalized = entries.map((entry) => ({
+    name: assertBasename(entry.name),
+    bytes: entry.bytes,
+  }));
+  if (new Set(normalized.map((entry) => entry.name)).size !== normalized.length) {
+    throw new Error("受管批量持久化文件名重复。");
+  }
+  const commitName = options.commitName ? assertBasename(options.commitName) : undefined;
+  if (commitName && !normalized.some((entry) => entry.name === commitName)) {
+    throw new Error("受管批量持久化提交文件不在 entries 中。");
+  }
+  const testInterruptAfterName = options.testInterruptAfterName
+    ? assertBasename(options.testInterruptAfterName)
+    : undefined;
+  if (testInterruptAfterName && (process.env.NODE_ENV !== "test"
+    || !normalized.some((entry) => entry.name === testInterruptAfterName))) {
+    throw new Error("受管批量持久化测试中断参数无效。");
+  }
+  const ordered = commitName
+    ? [...normalized.filter((entry) => entry.name !== commitName), normalized.find((entry) => entry.name === commitName)!]
+    : normalized;
+  const contracts = ordered.map((entry) => ({
+    ...entry,
+    sha256: createHash("sha256").update(entry.bytes).digest("hex"),
+    size: entry.bytes.byteLength,
+  }));
+  const args = [
+    directory.directory,
+    directory.canonicalDirectory,
+    String(directory.dev),
+    String(directory.ino),
+    commitName ?? "-",
+    testInterruptAfterName ?? "-",
+    (options.mode ?? 0o600).toString(8),
+    String(contracts.length),
+    ...contracts.flatMap((entry) => [entry.name, entry.sha256, String(entry.size)]),
+  ];
+  try {
+    const result = await runDarwinDirfdStorage(
+      "persist-batch",
+      args,
+      Buffer.concat(contracts.map((entry) => entry.bytes)),
+    );
+    const files = result.files;
+    if (!Array.isArray(files) || files.length !== contracts.length) {
+      throw new Error("dirfd persist-batch 回执数量无效。");
+    }
+    return contracts.map((contract, index) => {
+      const receipt = files[index];
+      if (!receipt || typeof receipt !== "object") throw new Error("dirfd persist-batch 回执结构无效。");
+      const value = receipt as Record<string, unknown>;
+      const dev = Number(value.dev);
+      const ino = Number(value.ino);
+      if (value.name !== contract.name || !Number.isSafeInteger(dev) || !Number.isSafeInteger(ino)
+        || Number(value.nlink) !== 1 || Number(value.size) !== contract.size
+        || value.sha256 !== contract.sha256 || typeof value.created !== "boolean") {
+        throw new Error("dirfd persist-batch 回执与输入身份不一致。");
+      }
+      return {
+        created: value.created,
+        identity: { directory, name: contract.name, dev, ino },
+        sha256: contract.sha256,
+        size: contract.size,
+      };
+    });
+  } catch (error) {
+    if (testInterruptAfterName && error instanceof Error
+      && error.message.includes("test-only persist-batch interruption")) throw error;
+    const reconciled = await Promise.all(contracts.map(async (contract) => {
+      const read = await readConfinedRegularFileWithIdentity(directory, contract.name, contract.size);
+      if (!read.bytes.equals(contract.bytes) || read.nlink !== 1) throw error;
+      return {
+        created: false,
+        identity: read.identity,
+        sha256: contract.sha256,
+        size: contract.size,
+      } satisfies ConfinedPersistedFile;
+    })).catch(() => null);
+    if (reconciled) return reconciled;
+    throw error;
+  }
+}
+
+/**
+ * 在同一锚定目录 fd 内以旧 inode + SHA + size 作 CAS，原子替换为新字节。
+ * 调用方必须持有项目写锁，且必须先保存历史版本。
+ */
+export async function replaceConfinedBytesCas(
+  expected: ConfinedFileIdentity,
+  expectedSha256: string,
+  expectedSize: number,
+  bytes: Buffer,
+  mode = 0o600,
+): Promise<ConfinedPersistedFile> {
+  if (!/^[a-f0-9]{64}$/u.test(expectedSha256)
+    || !Number.isSafeInteger(expectedSize) || expectedSize < 0) {
+    throw new Error("受管 CAS 替换参数无效。");
+  }
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  if (sha256 === expectedSha256) throw new Error("受管 CAS 替换不接受相同内容。");
+  const args = [
+    expected.directory.directory,
+    expected.directory.canonicalDirectory,
+    String(expected.directory.dev),
+    String(expected.directory.ino),
+    expected.name,
+    String(expected.dev),
+    String(expected.ino),
+    expectedSha256,
+    String(expectedSize),
+    sha256,
+    String(bytes.byteLength),
+    mode.toString(8),
+  ];
+  try {
+    const result = await runDarwinDirfdStorage("replace", args, bytes);
+    const dev = Number(result.dev);
+    const ino = Number(result.ino);
+    if (!Number.isSafeInteger(dev) || !Number.isSafeInteger(ino)
+      || Number(result.nlink) !== 1 || Number(result.size) !== bytes.byteLength
+      || result.sha256 !== sha256) {
+      throw new Error("dirfd replace 回执与新版本身份不一致。");
+    }
+    return {
+      created: true,
+      identity: { directory: expected.directory, name: expected.name, dev, ino },
+      sha256,
+      size: bytes.byteLength,
+    };
+  } catch (error) {
+    // 替换已提交但回执丢失时，只采用完全相同的新版本；不做命名回滚。
+    const reconciled = await readConfinedRegularFileWithIdentity(
+      expected.directory,
+      expected.name,
+      bytes.byteLength,
+    ).catch(() => null);
+    if (reconciled?.nlink === 1 && reconciled.bytes.equals(bytes)) {
+      return {
+        created: false,
+        identity: reconciled.identity,
+        sha256,
+        size: bytes.byteLength,
+      };
+    }
+    throw error;
+  }
+}
+
+/** 以源 inode + SHA 作 CAS，在两个锚定目录间 no-replace 原子移动。 */
+export async function moveConfinedFileNoReplaceCas(
+  source: ConfinedFileIdentity,
+  expectedSha256: string,
+  expectedSize: number,
+  targetDirectory: ConfinedDirectoryIdentity,
+  targetName: string,
+): Promise<ConfinedMovedFile> {
+  const safeTargetName = assertBasename(targetName);
+  if (!/^[a-f0-9]{64}$/u.test(expectedSha256)
+    || !Number.isSafeInteger(expectedSize) || expectedSize < 0) {
+    throw new Error("受管移动 CAS 参数无效。");
+  }
+  const args = [
+    source.directory.directory,
+    source.directory.canonicalDirectory,
+    String(source.directory.dev),
+    String(source.directory.ino),
+    source.name,
+    String(source.dev),
+    String(source.ino),
+    expectedSha256,
+    String(expectedSize),
+    targetDirectory.directory,
+    targetDirectory.canonicalDirectory,
+    String(targetDirectory.dev),
+    String(targetDirectory.ino),
+    safeTargetName,
+  ];
+  try {
+    const result = await runDarwinDirfdStorage("move", args);
+    const dev = Number(result.dev);
+    const ino = Number(result.ino);
+    if (dev !== source.dev || ino !== source.ino || Number(result.nlink) !== 1
+      || Number(result.size) !== expectedSize || result.sha256 !== expectedSha256) {
+      throw new Error("dirfd move 回执与源文件身份不一致。");
+    }
+    return {
+      identity: { directory: targetDirectory, name: safeTargetName, dev, ino },
+      sha256: expectedSha256,
+      size: expectedSize,
+    };
+  } catch (error) {
+    const target = await hashConfinedRegularFileWithIdentity(
+      targetDirectory,
+      safeTargetName,
+      expectedSize,
+    ).catch(() => null);
+    const sourceStillExists = await lstat(path.join(source.directory.directory, source.name))
+      .then(() => true, (candidate) => {
+        if ((candidate as NodeJS.ErrnoException).code === "ENOENT") return false;
+        throw candidate;
+      });
+    if (!sourceStillExists && target?.nlink === 1
+      && target.identity.dev === source.dev && target.identity.ino === source.ino
+      && target.size === expectedSize && target.sha256 === expectedSha256) {
+      return {
+        identity: target.identity,
+        sha256: expectedSha256,
+        size: expectedSize,
+      };
+    }
+    throw error;
+  }
+}
+
+/** 在两个锚定父目录间 no-replace 原子发布整个受管目录。 */
+export async function moveConfinedDirectoryNoReplace(
+  source: ConfinedDirectoryIdentity,
+  targetParent: ConfinedDirectoryIdentity,
+  targetName: string,
+): Promise<ConfinedDirectoryIdentity> {
+  const safeTargetName = assertBasename(targetName);
+  if (source.projectRoot !== targetParent.projectRoot || source.canonicalRoot !== targetParent.canonicalRoot) {
+    throw new Error("受管目录原子发布禁止跨项目根。");
+  }
+  const sourceName = assertBasename(path.basename(source.directory));
+  const sourceParentPath = path.dirname(source.directory);
+  const sourceParent = await inspectExistingConfinedDirectory(source.projectRoot, sourceParentPath);
+  if (path.join(sourceParent.directory, sourceName) !== source.directory) {
+    throw new Error("受管目录原子发布源父链无效。");
+  }
+  const targetPath = path.join(targetParent.directory, safeTargetName);
+  try {
+    const result = await runDarwinDirfdStorage("move-directory", [
+      sourceParent.directory,
+      sourceParent.canonicalDirectory,
+      String(sourceParent.dev),
+      String(sourceParent.ino),
+      sourceName,
+      String(source.dev),
+      String(source.ino),
+      targetParent.directory,
+      targetParent.canonicalDirectory,
+      String(targetParent.dev),
+      String(targetParent.ino),
+      safeTargetName,
+    ]);
+    if (Number(result.dev) !== source.dev || Number(result.ino) !== source.ino || result.moved !== true) {
+      throw new Error("dirfd 目录发布回执与源身份不一致。");
+    }
+  } catch (error) {
+    const reconciled = await inspectExistingConfinedDirectory(source.projectRoot, targetPath).catch(() => null);
+    const sourceMissing = await lstat(source.directory).then(() => false, (candidate) => {
+      if ((candidate as NodeJS.ErrnoException).code === "ENOENT") return true;
+      throw candidate;
+    });
+    if (sourceMissing && reconciled?.dev === source.dev && reconciled.ino === source.ino) return reconciled;
+    throw error;
+  }
+  return inspectExistingConfinedDirectory(source.projectRoot, targetPath);
+}
+
 /** 从稳定只读源直接流式导入锚定的 sha256 CAS，不创建路径式临时文件。 */
 export async function importConfinedFileToSha256Cas(
   objectRoot: ConfinedDirectoryIdentity,
@@ -295,7 +665,7 @@ export async function importConfinedFileToSha256Cas(
   const sourcePath = path.resolve(sourcePathValue);
   const sourceMetadata = await lstat(sourcePath, { bigint: true });
   const canonicalSource = await realpath(sourcePath);
-  if (!sourceMetadata.isFile() || sourceMetadata.isSymbolicLink() || canonicalSource !== sourcePath
+  if (!sourceMetadata.isFile() || sourceMetadata.isSymbolicLink() || sourceMetadata.nlink !== 1n || canonicalSource !== sourcePath
     || sourceMetadata.size < 1n) {
     throw new Error("素材源必须是规范绝对路径上的非空普通文件。");
   }
@@ -349,6 +719,7 @@ export async function readConfinedRegularFileWithIdentity(
   directory: ConfinedDirectoryIdentity,
   name: string,
   maxBytes = Number.MAX_SAFE_INTEGER,
+  testHooks: ConfinedRegularFileReadTestHooks = {},
 ): Promise<ConfinedRegularFileRead> {
   const safeName = assertBasename(name);
   await revalidateConfinedDirectory(directory);
@@ -359,12 +730,14 @@ export async function readConfinedRegularFileWithIdentity(
   }
   const handle = await open(filePath, constants.O_RDONLY | constants.O_NOFOLLOW);
   try {
+    await testHooks.afterOpen?.();
     const before = await handle.stat();
     if (!before.isFile() || before.dev !== pathMetadata.dev || before.ino !== pathMetadata.ino
       || before.size > maxBytes) {
       throw new Error("受管文件路径与 fd 身份不一致。");
     }
     const bytes = await handle.readFile();
+    await testHooks.afterRead?.();
     const after = await handle.stat();
     if (before.dev !== after.dev || before.ino !== after.ino || before.size !== after.size
       || before.mtimeMs !== after.mtimeMs || before.ctimeMs !== after.ctimeMs
@@ -372,6 +745,14 @@ export async function readConfinedRegularFileWithIdentity(
       throw new Error("受管文件读取期间发生替换。");
     }
     await revalidateConfinedDirectory(directory);
+    const finalPathMetadata = await lstat(filePath);
+    if (!finalPathMetadata.isFile() || finalPathMetadata.isSymbolicLink()
+      || finalPathMetadata.dev !== after.dev || finalPathMetadata.ino !== after.ino
+      || finalPathMetadata.mode !== after.mode || finalPathMetadata.nlink !== after.nlink
+      || finalPathMetadata.size !== after.size || finalPathMetadata.mtimeMs !== after.mtimeMs
+      || finalPathMetadata.ctimeMs !== after.ctimeMs) {
+      throw new Error("受管文件最终路径与 fd 身份不一致。");
+    }
     return {
       bytes,
       identity: { directory, name: safeName, dev: before.dev, ino: before.ino },
@@ -391,6 +772,7 @@ export async function hashConfinedRegularFileWithIdentity(
   directory: ConfinedDirectoryIdentity,
   name: string,
   maxBytes = Number.MAX_SAFE_INTEGER,
+  testHooks: ConfinedRegularFileReadTestHooks = {},
 ): Promise<ConfinedRegularFileHash> {
   const safeName = assertBasename(name);
   await revalidateConfinedDirectory(directory);
@@ -401,6 +783,7 @@ export async function hashConfinedRegularFileWithIdentity(
   }
   const handle = await open(filePath, constants.O_RDONLY | constants.O_NOFOLLOW);
   try {
+    await testHooks.afterOpen?.();
     const before = await handle.stat();
     if (!before.isFile() || before.dev !== pathMetadata.dev || before.ino !== pathMetadata.ino
       || before.size > maxBytes) {
@@ -420,6 +803,7 @@ export async function hashConfinedRegularFileWithIdentity(
       hash.update(chunk.subarray(0, bytesRead));
       offset += bytesRead;
     }
+    await testHooks.afterRead?.();
     const after = await handle.stat();
     if (before.dev !== after.dev || before.ino !== after.ino || before.size !== after.size
       || before.mtimeMs !== after.mtimeMs || before.ctimeMs !== after.ctimeMs
@@ -427,6 +811,14 @@ export async function hashConfinedRegularFileWithIdentity(
       throw new Error("受管文件流式读取期间发生替换。");
     }
     await revalidateConfinedDirectory(directory);
+    const finalPathMetadata = await lstat(filePath);
+    if (!finalPathMetadata.isFile() || finalPathMetadata.isSymbolicLink()
+      || finalPathMetadata.dev !== after.dev || finalPathMetadata.ino !== after.ino
+      || finalPathMetadata.mode !== after.mode || finalPathMetadata.nlink !== after.nlink
+      || finalPathMetadata.size !== after.size || finalPathMetadata.mtimeMs !== after.mtimeMs
+      || finalPathMetadata.ctimeMs !== after.ctimeMs) {
+      throw new Error("受管文件最终路径与 fd 身份不一致。");
+    }
     return {
       identity: { directory, name: safeName, dev: before.dev, ino: before.ino },
       nlink: before.nlink,

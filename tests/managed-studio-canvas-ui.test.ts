@@ -20,12 +20,57 @@ describe("受管 Studio 无限画布 UI 合同", () => {
       canvas.indexOf("async function refreshAll(): Promise<void>"),
       canvas.indexOf("async function resetUnits(): Promise<void>"),
     );
-    const gateIndex = refreshAll.indexOf("await refreshRuntimeBuildIdentity()");
+    const gateIndex = refreshAll.indexOf("await refreshRuntimeWriteGate()");
     const firstBusinessReadIndex = refreshAll.indexOf("await flushPendingLayout(projectRoot)");
     expect(gateIndex).toBeGreaterThanOrEqual(0);
     expect(firstBusinessReadIndex).toBeGreaterThan(gateIndex);
     expect(refreshAll).toContain('runtimeWriteGateState.value !== "allowed") return');
-    expect(refreshAll.match(/refreshRuntimeBuildIdentity\(\)/gu)).toHaveLength(1);
+    expect(refreshAll.match(/refreshRuntimeWriteGate\(\)/gu)).toHaveLength(1);
+    const unitsIndex = refreshAll.indexOf("loadUnitsPage({ deferTimelineProjections: true })");
+    const firstCardIndex = refreshAll.indexOf("await waitForInitialUnitCardDom(");
+    const overviewIndex = refreshAll.indexOf("loadOverview()");
+    const rawIndex = refreshAll.indexOf("void activateUnitTimelineProjections(initialUnits)");
+    const assetsIndex = refreshAll.indexOf("loadAssets()");
+    const textIndex = refreshAll.indexOf("loadTextDocuments()");
+    expect(unitsIndex).toBeGreaterThan(gateIndex);
+    expect(firstCardIndex).toBeGreaterThan(unitsIndex);
+    expect(overviewIndex).toBeGreaterThan(firstCardIndex);
+    expect(rawIndex).toBeGreaterThan(overviewIndex);
+    expect(refreshAll).not.toContain("Promise.all([unitsRead, overviewRead])");
+    expect(assetsIndex).toBeGreaterThan(rawIndex);
+    expect(textIndex).toBeGreaterThan(rawIndex);
+    const identityIndex = refreshAll.indexOf("void refreshRuntimeBuildIdentityDisplay(projectRoot, requestSequence)");
+    expect(identityIndex).toBeGreaterThan(textIndex);
+    const gateFunction = canvas.slice(
+      canvas.indexOf("async function refreshRuntimeWriteGate(): Promise<void>"),
+      canvas.indexOf("async function refreshRuntimeBuildIdentityDisplay("),
+    );
+    expect(gateFunction).toContain("await api.getRuntimeWriteGate()");
+    expect(gateFunction).not.toContain("await api.getRuntimeBuildIdentity()");
+
+    const firstCardObserver = canvas.slice(
+      canvas.indexOf("function recordInitialUnitCardIfReady("),
+      canvas.indexOf("const layoutSaveCoordinator"),
+    );
+    expect(canvas).toContain('const INITIAL_UNIT_CARD_SELECTOR = \'[data-testid="managed-studio-canvas-node"]');
+    expect(firstCardObserver).toContain("document.querySelectorAll<HTMLElement>(INITIAL_UNIT_CARD_SELECTOR)");
+    expect(firstCardObserver).toContain("scope.expectedUnitIds.has(node.dataset.unitId");
+    expect(firstCardObserver).toContain("canvas-first-card-dom-unit:${unitId}");
+    expect(firstCardObserver).not.toContain("t23PerformanceProbeEnabled");
+    expect(canvas).toContain("unitId: unit.id");
+    expect(refreshAll).toContain('emit("initialUnitCardsCommitted"');
+    expect(refreshAll.indexOf("const overviewRead = loadOverview()")).toBeLessThan(
+      refreshAll.indexOf('emit("initialUnitCardsCommitted"'),
+    );
+    expect(refreshAll).toContain("if (canvasDisposed) return");
+    expect(refreshAll).toContain("const isCurrent = () => !canvasDisposed");
+
+    const projectRootWatch = canvas.slice(
+      canvas.indexOf("watch(() => props.projectRoot"),
+      canvas.indexOf("onMounted(async () =>"),
+    );
+    expect(projectRootWatch).toContain("await previousLayoutFlush");
+    expect(projectRootWatch).toMatch(/await previousLayoutFlush;\s*if \(canvasDisposed\) return;\s*await refreshAll\(\)/u);
   });
 
   it("作为 Material Studio 独立入口并默认打开，不替换生产驾驶舱 owner", () => {
@@ -33,9 +78,30 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(parse(material, { filename: "MaterialStudioView.vue" }).errors).toEqual([]);
     expect(material).toContain('data-testid="studio-mode-canvas"');
     expect(material).toContain("AsyncManagedStudioCanvasView");
+    expect(material).toContain('@initial-unit-cards-committed="onInitialUnitCardsCommitted"');
     expect(material).toContain('props.dashboardApi ? "canvas" : "library"');
     expect(material.match(/props\.dashboardApi \? "canvas" : "library"/gu)?.length).toBeGreaterThanOrEqual(2);
     expect(material).toContain("AsyncStudioProductionDashboardView");
+
+    const workspaceWatch = material.slice(
+      material.indexOf("watch([() => props.projectRoot, () => props.api]"),
+      material.indexOf("watch(searchInput"),
+    );
+    expect(workspaceWatch).toContain("initialOverviewReleaseGate.reset(props.projectRoot)");
+    expect(workspaceWatch).not.toContain("void refresh()");
+    expect(material).toContain("function startInitialOverview(");
+    expect(material).toContain("function onInitialUnitCardsCommitted(");
+    expect(material).toMatch(/function onDashboardFailed[\s\S]{0,220}startInitialOverview/u);
+  });
+
+  it("缩略图点击仍交给 Vue Flow 选中节点，避免图片节点无法打开下一步操作", () => {
+    const node = source("src/renderer/src/components/ManagedStudioCanvasNode.vue");
+    expect(parse(node, { filename: "ManagedStudioCanvasNode.vue" }).errors).toEqual([]);
+    const thumbnail = node.slice(
+      node.indexOf('data-testid="managed-canvas-node-thumb-wrap"') - 120,
+      node.indexOf('data-testid="managed-canvas-node-thumb"'),
+    );
+    expect(thumbnail).not.toContain("@click.stop");
   });
 
   it("按 6 资产/36 单元/6 宫格及最多 18 结果节点有界投影，且启用视口剔除", () => {
@@ -142,6 +208,11 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain("深核验随后增量补回");
     expect(canvas).toContain("scheduleUnitGridGraphRebuild");
     expect(canvas).toContain("flushUnitGridGraphRebuild");
+    expect(canvas).toContain("createT23RawReferenceSpanTracker");
+    expect(canvas).toContain("t23RawReferenceSpanTracker.invalidateCurrent");
+    expect(canvas).toContain("t23RawReferenceSpan.markFirstRaw(unit.id)");
+    expect(canvas).toContain("t23RawReferenceSpan.recordPassReference(unitId)");
+    expect(canvas).toContain("t23RawReferenceSpan.complete()");
     expect(canvas).toContain("window.requestAnimationFrame");
     expect(canvas).not.toContain('review.status !== "pass"');
     expect(canvas).not.toContain('review.decision === "pass"');
@@ -569,6 +640,15 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain("unitContextText");
     expect(canvas).toContain("· 正在载入");
     expect(canvas).toContain("invalidateQueuedUnitSelection()");
+    expect(canvas).toContain("latestUnitSelectionKey");
+    expect(canvas).toContain("unitSelectionDrain && latestUnitSelectionKey === requestKey");
+    expect(canvas).toContain("return unitSelectionDrain");
+  });
+
+  it("总投影 IPC 保留一个当前单元详情槽", () => {
+    const canvas = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(canvas).toContain("const TIMELINE_PROJECTION_WORKER_CONCURRENCY = 3");
+    expect(canvas).toContain("Math.min(TIMELINE_PROJECTION_WORKER_CONCURRENCY, projectionUnits.length)");
   });
 
   it("画布图片化：自定义节点 + 权威缩略图 + 剧本/提示词节点", () => {

@@ -5,21 +5,16 @@
  * `dist-mcp`。它逐项复制 computeSourceDigest 的同一输入集合，在 stage 内执行
  * build:mcp → build:identity，再把完整 dist-mcp 发布到只增不改的版本目录。
  */
-import { execFile } from "node:child_process";
-import { constants as fsConstants } from "node:fs";
+import { constants as fsConstants, realpathSync } from "node:fs";
 import {
   chmod,
   copyFile,
   lstat,
   mkdir,
   mkdtemp,
-  open,
   readFile,
-  readdir,
   realpath,
-  rename,
   rm,
-  unlink,
   writeFile,
 } from "node:fs/promises";
 import os from "node:os";
@@ -30,31 +25,35 @@ import {
   listSourceDigestFiles,
 } from "../src/core/build-identity.js";
 import {
-  createImmutableMcpRuntimeCandidateReceipt,
   inspectImmutableMcpRuntimeTree,
-  sealImmutableMcpRuntimeCandidate,
-  serializeImmutableMcpRuntimeCandidateReceipt,
-  verifyImmutableMcpRuntimeCandidate,
   type ImmutableMcpRuntimeCandidateReceipt,
   type ImmutableMcpRuntimeTreeIdentity,
 } from "../src/core/immutable-mcp-runtime-candidate.js";
+import {
+  verifyPublishedImmutableMcpRuntimeCandidate,
+  type ImmutableMcpCandidatePublicationRecord,
+} from "../src/core/immutable-mcp-runtime-publication.js";
+import { sanitizedMcpChildEnvironment } from "../src/core/current-mcp-runtime.js";
+import {
+  makeImmutableMcpCandidateTreeWritableForCleanup,
+  prepareImmutableMcpCandidateStage,
+  type ImmutableMcpCandidateBuildCommandEvidence,
+} from "./lib/immutable-mcp-candidate-stage.js";
+import {
+  publishImmutableMcpCandidateCutover,
+  verifyCommittedImmutableMcpCandidateDelivery,
+} from "./lib/immutable-mcp-candidate-cutover.js";
+
+export type { ImmutableMcpCandidateBuildCommandEvidence } from "./lib/immutable-mcp-candidate-stage.js";
+export { publishImmutableMcpCandidateCutover } from "./lib/immutable-mcp-candidate-cutover.js";
 
 const DEFAULT_OUTPUT_RELATIVE_PATH = ".aicanvas-runtime/mcp-candidates";
-const COMMAND_TIMEOUT_MS = 10 * 60_000;
-
-export interface ImmutableMcpCandidateBuildCommandEvidence {
-  name: "build:mcp" | "build:identity";
-  executable: "/usr/bin/env";
-  args: string[];
-  cwd: string;
-  exitCode: 0;
-  stdoutTail: string;
-  stderrTail: string;
-}
+const DEFAULT_LAUNCHER_RELATIVE_ROOT = ".aicanvas-runtime/mcp-launcher";
 
 export interface BuildImmutableMcpRuntimeCandidateInput {
   workspace?: string;
   outputRoot?: string;
+  launcherRoot?: string;
   /**
    * 只供测试把候选落到系统临时目录；正式 CLI 只允许工作区隐藏候选根。
    */
@@ -67,6 +66,12 @@ export interface BuildImmutableMcpRuntimeCandidateResult {
   candidateRoot: string;
   reused: boolean;
   receipt: ImmutableMcpRuntimeCandidateReceipt;
+  publication: ImmutableMcpCandidatePublicationRecord;
+  launcher: {
+    path: string;
+    sha256: string;
+    externalImports: string[];
+  };
   commands: ImmutableMcpCandidateBuildCommandEvidence[];
   source: {
     before: string;
@@ -80,11 +85,6 @@ export interface BuildImmutableMcpRuntimeCandidateResult {
     afterFingerprint: string | null;
     unchanged: true;
   };
-}
-
-function tail(value: string, maxLines = 20, maxCharacters = 8_000): string {
-  const selected = value.trim().split(/\r?\n/u).slice(-maxLines).join("\n");
-  return selected.length > maxCharacters ? selected.slice(-maxCharacters) : selected;
 }
 
 function isInside(parentValue: string, candidateValue: string): boolean {
@@ -122,60 +122,6 @@ async function runtimeTreeOrNull(distMcpRoot: string): Promise<ImmutableMcpRunti
   }
 }
 
-async function runBuildCommand(
-  name: ImmutableMcpCandidateBuildCommandEvidence["name"],
-  stageRoot: string,
-  environment: NodeJS.ProcessEnv,
-): Promise<ImmutableMcpCandidateBuildCommandEvidence> {
-  const args = ["npm", "run", name];
-  return new Promise((resolve, reject) => {
-    execFile(
-      "/usr/bin/env",
-      args,
-      {
-        cwd: stageRoot,
-        env: environment,
-        encoding: "utf8",
-        maxBuffer: 16 * 1024 * 1024,
-        timeout: COMMAND_TIMEOUT_MS,
-      },
-      (error, stdout, stderr) => {
-        const stdoutTail = tail(stdout);
-        const stderrTail = tail(stderr);
-        if (error) {
-          reject(new Error(
-            `隔离 MCP candidate ${name} 失败：${error.message}\n${stderrTail || stdoutTail}`,
-          ));
-          return;
-        }
-        resolve({
-          name,
-          executable: "/usr/bin/env",
-          args,
-          cwd: stageRoot,
-          exitCode: 0,
-          stdoutTail,
-          stderrTail,
-        });
-      },
-    );
-  });
-}
-
-async function copyDirectoryCow(source: string, destinationParent: string): Promise<void> {
-  await new Promise<void>((resolve, reject) => {
-    execFile(
-      "/bin/cp",
-      ["-cR", source, destinationParent],
-      { encoding: "utf8", maxBuffer: 4 * 1024 * 1024, timeout: COMMAND_TIMEOUT_MS },
-      (error, _stdout, stderr) => {
-        if (error) reject(new Error(`APFS COW clone 失败：${error.message}\n${tail(stderr)}`));
-        else resolve();
-      },
-    );
-  });
-}
-
 async function copySourceDigestInputs(workspace: string, stageRoot: string): Promise<number> {
   const files = await listSourceDigestFiles(workspace);
   for (const sourcePath of files) {
@@ -198,45 +144,20 @@ async function copySourceDigestInputs(workspace: string, stageRoot: string): Pro
   return files.length;
 }
 
-async function makeWritableForCleanup(root: string): Promise<void> {
-  let metadata;
-  try {
-    metadata = await lstat(root);
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") return;
-    throw error;
-  }
-  if (metadata.isDirectory()) {
-    await chmod(root, 0o700);
-    for (const child of await readdir(root)) {
-      await makeWritableForCleanup(path.join(root, child));
-    }
-    return;
-  }
-  if (!metadata.isSymbolicLink()) await chmod(root, 0o600);
-}
-
-async function exists(candidate: string): Promise<boolean> {
-  return lstat(candidate).then(() => true, (error: NodeJS.ErrnoException) => {
-    if (error.code === "ENOENT") return false;
-    throw error;
-  });
-}
-
-function assertOutputBoundary(
+export function assertImmutableMcpCandidateOutputBoundary(
   workspace: string,
   outputRoot: string,
   allowExternalOutputForTests: boolean,
 ): void {
   const defaultRoot = path.join(workspace, ...DEFAULT_OUTPUT_RELATIVE_PATH.split("/"));
   if (allowExternalOutputForTests) {
-    if (process.env.NODE_ENV !== "test" || !isInside(os.tmpdir(), outputRoot)) {
+    if (process.env.NODE_ENV !== "test" || !isInside(realpathSync.native(os.tmpdir()), outputRoot)) {
       throw new Error("外部 MCP candidate 输出只允许 NODE_ENV=test 的系统临时目录。");
     }
     return;
   }
-  if (outputRoot !== defaultRoot && !isInside(defaultRoot, outputRoot)) {
-    throw new Error(`正式 MCP candidate 只能写入工作区隐藏候选根：${defaultRoot}`);
+  if (outputRoot !== defaultRoot) {
+    throw new Error(`正式 MCP candidate 只能写入固定根：${defaultRoot}`);
   }
   for (const protectedPath of [
     workspace,
@@ -252,31 +173,23 @@ function assertOutputBoundary(
   }
 }
 
-async function publishCandidate(
+function assertLauncherBoundary(
+  workspace: string,
   outputRoot: string,
-  temporaryCandidateRoot: string,
-  receipt: ImmutableMcpRuntimeCandidateReceipt,
-): Promise<{ candidateRoot: string; reused: boolean }> {
-  const finalRoot = path.join(outputRoot, receipt.candidateId);
-  const lockPath = `${finalRoot}.publish-lock`;
-  const lock = await open(lockPath, "wx", 0o600);
-  try {
-    if (await exists(finalRoot)) {
-      const existing = await verifyImmutableMcpRuntimeCandidate(finalRoot);
-      if (existing.fingerprint !== receipt.fingerprint) {
-        throw new Error(`同 candidateId 已存在不同 receipt：${finalRoot}`);
-      }
-      await makeWritableForCleanup(temporaryCandidateRoot);
-      await rm(temporaryCandidateRoot, { recursive: true, force: true });
-      return { candidateRoot: finalRoot, reused: true };
+  launcherRoot: string,
+  allowExternalOutputForTests: boolean,
+): void {
+  const defaultRoot = path.join(workspace, ...DEFAULT_LAUNCHER_RELATIVE_ROOT.split("/"));
+  if (allowExternalOutputForTests) {
+    if (process.env.NODE_ENV !== "test"
+      || !isInside(realpathSync.native(os.tmpdir()), launcherRoot)
+      || !(launcherRoot === path.join(outputRoot, ".launcher") || isInside(outputRoot, launcherRoot))) {
+      throw new Error("测试 MCP launcher 只允许写入外部 candidate 临时根内部。");
     }
-    await sealImmutableMcpRuntimeCandidate(temporaryCandidateRoot);
-    await rename(temporaryCandidateRoot, finalRoot);
-    await verifyImmutableMcpRuntimeCandidate(finalRoot);
-    return { candidateRoot: finalRoot, reused: false };
-  } finally {
-    await lock.close();
-    await unlink(lockPath).catch(() => undefined);
+    return;
+  }
+  if (launcherRoot !== defaultRoot) {
+    throw new Error(`正式 MCP launcher 只能写入固定根：${defaultRoot}`);
   }
 }
 
@@ -291,9 +204,18 @@ export async function buildImmutableMcpRuntimeCandidate(
     input.outputRoot
       ?? path.join(workspace, ...DEFAULT_OUTPUT_RELATIVE_PATH.split("/")),
   );
-  assertOutputBoundary(workspace, outputRoot, input.allowExternalOutputForTests === true);
+  const allowExternalOutputForTests = input.allowExternalOutputForTests === true;
+  const launcherRoot = path.resolve(input.launcherRoot
+    ?? (allowExternalOutputForTests
+      ? path.join(outputRoot, ".launcher")
+      : path.join(workspace, ...DEFAULT_LAUNCHER_RELATIVE_ROOT.split("/"))));
+  assertImmutableMcpCandidateOutputBoundary(workspace, outputRoot, allowExternalOutputForTests);
+  assertLauncherBoundary(workspace, outputRoot, launcherRoot, allowExternalOutputForTests);
   await mkdir(outputRoot, { recursive: true, mode: 0o700 });
   const canonicalOutputRoot = await realpath(outputRoot);
+  if (canonicalOutputRoot !== outputRoot) {
+    throw new Error(`MCP candidate 根必须是规范真实目录：${outputRoot}`);
+  }
 
   const liveDistMcpRoot = path.join(workspace, "dist-mcp");
   const [sourceBefore, liveDistBefore] = await Promise.all([
@@ -305,32 +227,29 @@ export async function buildImmutableMcpRuntimeCandidate(
   const stageTempBase = process.platform === "darwin" ? "/tmp" : os.tmpdir();
   const tempRoot = await realpath(await mkdtemp(path.join(stageTempBase, "aic-mcp-stage-")));
   const stageRoot = path.join(tempRoot, "workspace");
-  const stageHome = path.join(tempRoot, "home");
   const stageTmp = path.join(tempRoot, "tmp");
+  const stageNpmCache = path.join(tempRoot, "npm-cache");
+  const stageHome = path.join(tempRoot, "home");
+  const stageNpmUserConfig = path.join(tempRoot, "npmrc");
   const temporaryCandidateRoot = await mkdtemp(path.join(canonicalOutputRoot, ".building-"));
-  const commands: ImmutableMcpCandidateBuildCommandEvidence[] = [];
   let published = false;
+  let tempRootFinalized = false;
 
   try {
     await Promise.all([
       mkdir(stageRoot, { recursive: true, mode: 0o700 }),
-      mkdir(stageHome, { recursive: true, mode: 0o700 }),
       mkdir(stageTmp, { recursive: true, mode: 0o700 }),
+      mkdir(stageNpmCache, { recursive: true, mode: 0o700 }),
+      mkdir(stageHome, { recursive: true, mode: 0o700 }),
     ]);
-    const copiedFiles = await copySourceDigestInputs(workspace, stageRoot);
-    if (copiedFiles !== sourceBefore.sourceFiles) {
-      throw new Error(`隔离 stage 文件数 ${copiedFiles} 与 sourceDigest ${sourceBefore.sourceFiles} 不一致。`);
-    }
-    await copyDirectoryCow(path.join(workspace, "node_modules"), stageRoot);
-    const stageBefore = await computeSourceDigest(stageRoot);
-    if (!sameSourceIdentity(sourceBefore, stageBefore)) {
-      throw new Error("隔离 stage 与 live sourceDigest 输入不一致。");
-    }
-
+    await writeFile(stageNpmUserConfig, "", { encoding: "utf8", flag: "wx", mode: 0o600 });
     const environment: NodeJS.ProcessEnv = {
-      ...process.env,
+      ...sanitizedMcpChildEnvironment(process.env),
       HOME: stageHome,
       TMPDIR: stageTmp,
+      npm_config_cache: stageNpmCache,
+      npm_config_userconfig: stageNpmUserConfig,
+      npm_config_registry: "https://registry.npmjs.org",
       AI_CANVAS_REGISTRY_PATH: path.join(tempRoot, "projects.json"),
       AI_CANVAS_WORKSPACE: stageRoot,
     };
@@ -339,66 +258,105 @@ export async function buildImmutableMcpRuntimeCandidate(
     delete environment.AI_CANVAS_RECORDED_RUNTIME_ARTIFACT_SHA256;
     delete environment.AI_CANVAS_BUILD_TIMESTAMP;
 
-    commands.push(await runBuildCommand("build:mcp", stageRoot, environment));
-    commands.push(await runBuildCommand("build:identity", stageRoot, environment));
-
-    const stageAfter = await computeSourceDigest(stageRoot);
-    if (!sameSourceIdentity(stageBefore, stageAfter)) {
-      throw new Error("隔离 stage 在 build:mcp + build:identity 期间发生源码漂移。");
-    }
-    const sourceBeforePublish = await computeSourceDigest(workspace);
-    if (!sameSourceIdentity(sourceBefore, sourceBeforePublish)) {
-      throw new Error("live 源码在候选构建期间漂移，拒绝发布 candidate。");
-    }
-    const liveDistBeforePublish = await runtimeTreeOrNull(liveDistMcpRoot);
-    if (!sameRuntimeTree(liveDistBefore, liveDistBeforePublish)) {
-      throw new Error("live dist-mcp 在候选构建期间变化，拒绝发布 candidate。");
-    }
-
-    await copyDirectoryCow(path.join(stageRoot, "dist-mcp"), temporaryCandidateRoot);
-    await copyFile(
-      path.join(stageRoot, "release-manifest.json"),
-      path.join(temporaryCandidateRoot, "release-manifest.json"),
-      fsConstants.COPYFILE_FICLONE,
-    );
-    const receipt = await createImmutableMcpRuntimeCandidateReceipt(temporaryCandidateRoot);
-    if (receipt.sourceDigest !== sourceBefore.sourceDigest
-      || receipt.sourceFiles !== sourceBefore.sourceFiles
-      || receipt.sourceBytes !== sourceBefore.sourceBytes) {
-      throw new Error("MCP candidate receipt 未绑定构建开始时的 live sourceDigest。");
-    }
-    await writeFile(
-      path.join(temporaryCandidateRoot, "receipt.json"),
-      serializeImmutableMcpRuntimeCandidateReceipt(receipt),
-      { encoding: "utf8", flag: "wx", mode: 0o444 },
-    );
-    await verifyImmutableMcpRuntimeCandidate(temporaryCandidateRoot, {
-      requireDirectoryName: false,
-      requireReadOnly: false,
+    const prepared = await prepareImmutableMcpCandidateStage({
+      workspace,
+      stageRoot,
+      temporaryRoot: tempRoot,
+      temporaryCandidateRoot,
+      environment,
+      sourceBefore,
+      copySourceInputs: async () => {
+        const copiedFiles = await copySourceDigestInputs(workspace, stageRoot);
+        if (copiedFiles !== sourceBefore.sourceFiles) {
+          throw new Error(`隔离 stage 文件数 ${copiedFiles} 与 sourceDigest ${sourceBefore.sourceFiles} 不一致。`);
+        }
+      },
+      verifyStageSourceBefore: async () => {
+        const stageBefore = await computeSourceDigest(stageRoot);
+        if (!sameSourceIdentity(sourceBefore, stageBefore)) {
+          throw new Error("隔离 stage 与 live sourceDigest 输入不一致。");
+        }
+        return stageBefore;
+      },
+      verifyStageSourceAfter: async (stageBefore) => {
+        const stageAfter = await computeSourceDigest(stageRoot);
+        if (!sameSourceIdentity(stageBefore, stageAfter)) {
+          throw new Error("隔离 stage 在 build:mcp + build:identity 期间发生源码漂移。");
+        }
+        return stageAfter;
+      },
+      verifyLiveSourceBeforePayload: async () => {
+        const sourceBeforePublish = await computeSourceDigest(workspace);
+        if (!sameSourceIdentity(sourceBefore, sourceBeforePublish)) {
+          throw new Error("live 源码在候选构建期间漂移，拒绝发布 candidate。");
+        }
+        const liveDistBeforePublish = await runtimeTreeOrNull(liveDistMcpRoot);
+        if (!sameRuntimeTree(liveDistBefore, liveDistBeforePublish)) {
+          throw new Error("live dist-mcp 在候选构建期间变化，拒绝发布 candidate。");
+        }
+      },
     });
-    const publication = await publishCandidate(canonicalOutputRoot, temporaryCandidateRoot, receipt);
+    const { commands, stageBefore, stageAfter, receipt, publication: publicationRecord, launcher } = prepared;
+    let sourceAfter = sourceBefore;
+    let liveDistAfter = liveDistBefore;
+    const publication = await publishImmutableMcpCandidateCutover(
+      canonicalOutputRoot,
+      launcherRoot,
+      launcher.bundlePath,
+      launcher.sha256,
+      temporaryCandidateRoot,
+      receipt,
+      publicationRecord,
+      {
+        beforeLauncherCutover: async () => {
+          [sourceAfter, liveDistAfter] = await Promise.all([
+            computeSourceDigest(workspace),
+            runtimeTreeOrNull(liveDistMcpRoot),
+          ]);
+          if (!sameSourceIdentity(sourceBefore, sourceAfter)) {
+            throw new Error("live 源码在原子 launcher cutover 前发生变化，旧 launcher 保持不变。");
+          }
+          if (!sameRuntimeTree(liveDistBefore, liveDistAfter)) {
+            throw new Error("live dist-mcp 在原子 launcher cutover 前发生变化，旧 launcher 保持不变。");
+          }
+        },
+      },
+    );
     published = true;
 
-    const [sourceAfter, liveDistAfter] = await Promise.all([
-      computeSourceDigest(workspace),
-      runtimeTreeOrNull(liveDistMcpRoot),
-    ]);
-    if (!sameSourceIdentity(sourceBefore, sourceAfter)) {
-      throw new Error("live 源码在候选发布前后发生变化；candidate 保留但不得切换。");
-    }
-    if (!sameRuntimeTree(liveDistBefore, liveDistAfter)) {
-      throw new Error("live dist-mcp 在候选发布前后发生变化。");
-    }
-    const landed = await verifyImmutableMcpRuntimeCandidate(publication.candidateRoot);
-    if (landed.fingerprint !== receipt.fingerprint) {
-      throw new Error("落盘 MCP candidate receipt 与发布输入不一致。");
-    }
+    const landed = await verifyCommittedImmutableMcpCandidateDelivery({
+      committedResult: publication,
+      verifyLanded: async () => {
+        const verified = await verifyPublishedImmutableMcpRuntimeCandidate(
+          publication.candidateRoot,
+          publication.publication,
+          { launcherPath: publication.launcherPath },
+        );
+        if (verified.fingerprint !== receipt.fingerprint) {
+          throw new Error("落盘 MCP candidate receipt 与发布输入不一致。");
+        }
+        return verified;
+      },
+      cleanupStage: async () => {
+        try {
+          await rm(tempRoot, { recursive: true, force: true });
+        } finally {
+          tempRootFinalized = true;
+        }
+      },
+    });
     return {
       schemaVersion: 1,
       kind: "immutable-mcp-runtime-candidate-build-result",
       candidateRoot: publication.candidateRoot,
       reused: publication.reused,
       receipt: landed,
+      publication: publication.publication,
+      launcher: {
+        path: publication.launcherPath,
+        sha256: launcher.sha256,
+        externalImports: launcher.externalImports,
+      },
       commands,
       source: {
         before: sourceBefore.sourceDigest,
@@ -415,32 +373,25 @@ export async function buildImmutableMcpRuntimeCandidate(
     };
   } finally {
     if (!published) {
-      await makeWritableForCleanup(temporaryCandidateRoot).catch(() => undefined);
+      await makeImmutableMcpCandidateTreeWritableForCleanup(temporaryCandidateRoot).catch(() => undefined);
       await rm(temporaryCandidateRoot, { recursive: true, force: true }).catch(() => undefined);
     }
-    await rm(tempRoot, { recursive: true, force: true });
+    if (!tempRootFinalized) await rm(tempRoot, { recursive: true, force: true });
   }
 }
 
-function parseCliArguments(argv: string[]): BuildImmutableMcpRuntimeCandidateInput {
-  let outputRoot: string | undefined;
-  for (let index = 0; index < argv.length; index += 1) {
-    const argument = argv[index];
-    if (argument === "--output-root") {
-      const value = argv[index + 1];
-      if (!value) throw new Error("--output-root 缺少路径。");
-      outputRoot = path.resolve(value);
-      index += 1;
-      continue;
-    }
-    throw new Error(`未知参数：${argument}`);
-  }
-  return outputRoot ? { outputRoot } : {};
+export function parseImmutableMcpCandidateBuildArguments(
+  argv: string[],
+): BuildImmutableMcpRuntimeCandidateInput {
+  if (argv.length) throw new Error(`未知参数：${argv[0]}`);
+  return {};
 }
 
 const invokedPath = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : "";
 if (import.meta.url === invokedPath) {
-  const result = await buildImmutableMcpRuntimeCandidate(parseCliArguments(process.argv.slice(2)));
+  const result = await buildImmutableMcpRuntimeCandidate(
+    parseImmutableMcpCandidateBuildArguments(process.argv.slice(2)),
+  );
   const manifest = JSON.parse(await readFile(path.join(result.candidateRoot, "release-manifest.json"), "utf8")) as {
     fingerprint?: string;
   };

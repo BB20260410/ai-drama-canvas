@@ -28,7 +28,8 @@ describe("P13 零说明桌面生产闭环 UI", () => {
       'data-testid="first-run-create"',
       'data-testid="first-run-recent"',
       'data-testid="first-run-import"',
-      "新建短剧工程",
+      "新建本地工程",
+      "可选择小说或短剧",
       "打开最近工程",
       "导入已有工程",
     ]) expect(app).toContain(marker);
@@ -39,7 +40,7 @@ describe("P13 零说明桌面生产闭环 UI", () => {
   it("项目切换先完成新工程预检、监听和活动登记，再一次性提交 UI，失败恢复旧工程", () => {
     const app = source("src/renderer/src/App.vue");
     expect(parse(app, { filename: "App.vue" }).errors).toEqual([]);
-    const openStart = app.indexOf("async function openProject(next:");
+    const openStart = app.indexOf("async function openProject(");
     const openEnd = app.indexOf("async function removeProject", openStart);
     const openProject = app.slice(openStart, openEnd);
     expect(openProject).toContain("if (projectSwitching.value)");
@@ -70,8 +71,23 @@ describe("P13 零说明桌面生产闭环 UI", () => {
     expect(recent).toMatch(/const recent = activeProject\?\.available\s*\? activeProject\s*:/u);
     expect(app).toContain("dashboardOverview.nextAction.locator?.unitId");
     expect(app).toContain('operation: "unit"');
-    expect(app).toContain("materialTimelineStatus(panel.status)");
-    expect(app).toContain("studioPanelStatusLabel(panel.status)");
+    expect(app).toContain('import { mapMaterialStudioProjectOverview } from "./material-studio-read-mapper"');
+    const materialOverviewStart = app.indexOf("async getOverview(root)");
+    const materialOverviewEnd = app.indexOf("async listEntries(root", materialOverviewStart);
+    const materialOverview = app.slice(materialOverviewStart, materialOverviewEnd);
+    expect(materialOverview.indexOf('operation: "overview"')).toBeLessThan(materialOverview.indexOf("Promise.all(["));
+    expect(app).toContain("managedStudioModulePreloader.warm()");
+    expect(app).toContain("startupManagedShellPromise");
+    expect(app).toContain("const workspaceViewPromise = shell");
+    expect(app).toContain('restoreManagedWorkspaceView(shell).then((workspaceView) =>');
+    expect(app).toContain('if (workspaceView === "drama") {');
+    expect(app).toContain("managedStudioModulePreloader.warm();");
+    expect(app).toContain("studioDashboardApi.getDashboard(activeProject.primaryRoot");
+    expect(app).toContain("startupManagedShell.workspaceViewPromise");
+    expect(app).toContain("startupReconcilePromise");
+    const mapper = source("src/renderer/src/material-studio-read-mapper.ts");
+    expect(mapper).toContain("materialTimelineStatus(panel.status)");
+    expect(mapper).toContain("studioPanelStatusLabel(panel.status)");
     expect(app).not.toContain("completedUnitCount: 0");
     expect(app).not.toContain('listStudioProductionUnits(root, { limit: 1 })');
   });

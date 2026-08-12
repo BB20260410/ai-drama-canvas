@@ -90,6 +90,25 @@ describe("源码桌面运行身份写闸门", () => {
     });
   });
 
+  it("安装态从 release manifest 复核源码身份而不扫描不存在的源码树", async () => {
+    const test = await fixture();
+    const boot = { ...test.boot, sourceIdentityMode: "release-manifest" as const };
+    const computeSourceDigest = vi.fn(async () => ({
+      sourceDigest: "0".repeat(64),
+      sourceFiles: 0,
+      sourceBytes: 0,
+    }));
+    const readReleaseSourceDigest = vi.fn(async () => boot.bootSourceDigest);
+    await expect(inspectRuntimeWriteGate(boot, { computeSourceDigest, readReleaseSourceDigest }))
+      .resolves.toMatchObject({ allowed: true, reasons: [] });
+    expect(computeSourceDigest).not.toHaveBeenCalled();
+    expect(readReleaseSourceDigest).toHaveBeenCalledTimes(1);
+
+    await expect(inspectRuntimeWriteGate(boot, {
+      readReleaseSourceDigest: async () => "f".repeat(64),
+    })).resolves.toMatchObject({ allowed: false, reasons: ["source-changed"] });
+  });
+
   it("并发同批门禁只计算一次源码 digest，结算后的下一批仍重新核验", async () => {
     const test = await fixture();
     const computeSourceDigest = vi.fn(async () => ({

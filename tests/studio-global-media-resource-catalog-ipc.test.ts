@@ -9,15 +9,17 @@ const source = (relative: string): string => readFileSync(path.join(root, relati
 describe("全局音视频资源 IPC 合同", () => {
   it("main 与 preload 暴露同名只读列表和单项查询", () => {
     const main = source("src/main/index.ts");
+    const registrar = source("src/main/studio-global-resource-read-ipc.ts");
     const preload = source("src/preload/index.ts");
 
-    expect(main).toContain("listGlobalStudioMediaResources,");
-    expect(main).toContain("getGlobalStudioMediaResource,");
-    expect(main).toContain("type GlobalStudioMediaResourceQuery,");
-    expect(main).toContain('ipcMain.handle("canvas:list-global-studio-media-resources"');
-    expect(main).toContain("listGlobalStudioMediaResources(query)");
-    expect(main).toContain('ipcMain.handle("canvas:get-global-studio-media-resource"');
-    expect(main).toContain("getGlobalStudioMediaResource(projectRoot, mediaSha256)");
+    expect(main).toContain("registerStudioGlobalResourceReadIpc(ipcMain.handle.bind(ipcMain));");
+    expect(registrar).toContain("listGlobalStudioMediaResources,");
+    expect(registrar).toContain("getGlobalStudioMediaResource,");
+    expect(registrar).toContain("type GlobalStudioMediaResourceQuery,");
+    expect(registrar).toContain('handle("canvas:list-global-studio-media-resources"');
+    expect(registrar).toContain("services.listGlobalStudioMediaResources(query)");
+    expect(registrar).toContain('handle("canvas:get-global-studio-media-resource"');
+    expect(registrar).toContain("services.getGlobalStudioMediaResource(projectRoot, mediaSha256)");
 
     expect(preload).toContain("listGlobalStudioMediaResources:");
     expect(preload).toContain(

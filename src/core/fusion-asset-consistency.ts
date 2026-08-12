@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { access, mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
-import sharp from "sharp";
+import sharp, { type OverlayOptions } from "sharp";
 import { loadFusionProductionAssets, loadFusionProjectManifest, type FusionMaterializationReceipt, type FusionProductionAssetCatalog, type FusionProductionAssetEntry } from "./fusion-production.js";
 import { reviewCoversArtifacts } from "./review-evidence.js";
 import { getSidecarPaths, loadIndex, loadOverrides, loadProjectConfig, readJson, writeJsonAtomic } from "./sidecar.js";
@@ -705,7 +705,7 @@ async function buildReviewBoard(projectRoot: string, batch: FusionAssetConsisten
   const tileHeight = 1044;
   const imageHeight = 992;
   const images = await Promise.all(batch.members.map(async (member) => sharp(member.evidence!.raw.path, { failOn: "error" }).rotate().resize({ width: tileWidth, height: imageHeight, fit: "cover" }).png().toBuffer()));
-  const composites: sharp.OverlayOptions[] = images.map((input, index) => ({ input, left: gap + (index % 3) * (tileWidth + gap), top: gap + Math.floor(index / 3) * (tileHeight + gap) }));
+  const composites: OverlayOptions[] = images.map((input, index) => ({ input, left: gap + (index % 3) * (tileWidth + gap), top: gap + Math.floor(index / 3) * (tileHeight + gap) }));
   const labels = batch.members.map((member, index) => {
     const left = gap + (index % 3) * (tileWidth + gap);
     const top = gap + Math.floor(index / 3) * (tileHeight + gap) + imageHeight;

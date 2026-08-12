@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { lstat } from "node:fs/promises";
+import { lstat, realpath } from "node:fs/promises";
 import path from "node:path";
 import { upsertAssetRelation, upsertVoiceIdentity } from "./asset-registry.js";
 import { deleteCanvasEntity, deleteCanvasLink, redoCanvasSemanticState, undoCanvasSemanticState, upsertCanvasEntity, upsertCanvasLink } from "./canvas-state.js";
@@ -13,12 +13,14 @@ import { cancelTask, claimTask, createTaskPack, finishBatch, getProjectIndex, he
 import {
   appendEvent,
   findEventsByIdempotencyKey,
+  getProjectRegistryPath,
   getSidecarPaths,
   readJson,
   withActiveProjectActivationFence,
   writeJsonAtomic,
 } from "./sidecar.js";
 import {
+  getCommandLedgerEntriesByRequestHash,
   getCommandLedgerEntryByIdempotencyKey,
   getCommandLedgerEntryByRequestId,
   listCommandLedgerEntries,
@@ -33,11 +35,50 @@ import { analyzeNovelChapters, exportAdaptation, generateAdaptationPlans, materi
 import { createShotTaskPack, saveUnitTimeline } from "./timeline.js";
 import type { AssetRelationKind, BrowserGenerationUpdateStatus, BrowserPreflightInput, BrowserSubmissionReconciliationInput, BrowserUploadInput, CreativeBibleKind, ProductionWorkflowStageId, ProductionWorkflowStageStatus, ReconcileHttpGenerationSubmissionInput, ShotTiming, SubagentImageGenerationUpdateStatus, SubmitReviewInput, WorkItemStatus } from "./types.js";
 import { withProjectLock } from "./locks.js";
-import { isStudioCommandName, parseStudioCommandRequestForCore } from "./studio-command-runtime.js";
-import { ensureConfinedDirectory } from "./confined-project-storage.js";
+import {
+  isStudioCommandName,
+  parseStudioCommandRequestForCore,
+  type StudioRuntimeCommandRequest,
+} from "./studio-command-runtime.js";
+import { executeStudioCommand } from "./studio-command-executor.js";
+import {
+  deterministicStudioTimelineRejection,
+  rejectP30OrchestrationCommand,
+} from "./studio-command-errors.js";
+import {
+  canonicalNovelCommandRequestForPersistence,
+  isNovelImportCommandRequest,
+  isNovelWritingSourceImportCommandRequest,
+  isNovelCommandName,
+  parseNovelCommandRequestForCore,
+  type NovelCommandRequest,
+} from "./novel-command-runtime.js";
+import {
+  inspectNovelImportPreflightAuthorization,
+  reserveNovelImportPreflightAuthorization,
+} from "./novel-import.js";
+import {
+  assertNovelImportDestinationDoesNotOverlapPreflight,
+  commitNovelExternalImport,
+  proveCompletedNovelExternalImport,
+  resolveNovelImportProjectsRoot,
+} from "./novel-import-commit.js";
+import { isNovelPreconditionRejectedError, NovelRepository } from "./novel-manuscript.js";
+import {
+  isNovelWritingStateRejectedError,
+  loadNovelWritingStateOperationProof,
+} from "./novel-writing-state.js";
+import type { NovelActorAttribution } from "./novel-types.js";
+import {
+  assertConfinedRootIdentity,
+  ensureConfinedDirectory,
+} from "./confined-project-storage.js";
 import { commitProjectImport } from "./importer.js";
 import type { EditProject, ProjectConfig, ProjectImportMode, StoryboardRowUpsertInput } from "./types.js";
-import { runWithOperationContext } from "./operation-context.js";
+import {
+  runWithOperationContext,
+  type NovelImportDestinationExecutionIdentity,
+} from "./operation-context.js";
 import {
   cancelPublication,
   cancelPublicationBundle,
@@ -51,9 +92,17 @@ import {
 } from "./publication.js";
 import { enrichPublicationIntentWithDiagnostics } from "./studio-publication-preflight-diagnostics.js";
 import { createNovelAnalysisTask, reviewNovelAnalysisBatch, reviewNovelAnalysisItem, submitNovelAnalysisProposal } from "./novel-analysis.js";
-import { executeNextNovelAnalysisRunTask, executeNovelAnalysisTask, planNovelAnalysisRun, replaceNovelAnalysisRunTask, upsertNovelAnalysisProvider } from "./novel-analysis-provider.js";
+import { executeNextNovelAnalysisRunTask, executeNovelAnalysisTask, isNovelAnalysisExecutionSafetyError, markNovelAnalysisExecutionReconciliationRequired, novelAnalysisExecutionSafeMessage, planNovelAnalysisRun, reconcileNovelAnalysisExecution, replaceNovelAnalysisRunTask, upsertNovelAnalysisProvider } from "./novel-analysis-provider.js";
 import { isConfirmedCommandFailure, isRejectedCommandFailure, RejectedCommandFailure } from "./command-outcome.js";
-import { isSqliteBusyError, sqliteBusyDetailMessage, withSqliteBusyRetry, STUDIO_SQLITE_BUSY_RETRY_BUDGET_MS } from "./studio-sqlite-busy.js";
+import {
+  RetrySafeSqliteBusyError,
+  isRetrySafeSqliteBusyError,
+  isSqliteBusyError,
+  sqliteBusyDetailMessage,
+  withSqliteBusyRetry,
+  withStudioSqliteBusyDeadline,
+  STUDIO_SQLITE_BUSY_RETRY_BUDGET_MS,
+} from "./studio-sqlite-busy.js";
 import { inspectFusionPackage, type FusionPackageExpectedCounts } from "./fusion-package.js";
 import { materializeFusionProject, type FusionAuthorityInput } from "./fusion-production.js";
 import { buildFusionReferenceBoard, type FusionReferenceBoardVariant } from "./fusion-references.js";
@@ -82,139 +131,53 @@ import {
   previewCanonicalAssetMigration,
   type CanonicalAssetSourceSnapshot,
 } from "./canonical-assets.js";
+import { inspectManagedProject, inspectManagedProjectReadOnly, isManagedProject } from "./managed-project.js";
 import {
-  appendStudioAssetRelation,
-  appendStudioAssetVersion,
-  createStudioCanonicalAsset,
-  importStudioMedia,
-  initializeMaterialStudio,
-  reviewStudioAssetVersion,
-  setStudioPrimaryAuthority,
-  updateStudioCanonicalAsset,
-  type AppendStudioAssetVersionInput,
-  type AppendStudioAssetRelationInput,
-  type CreateStudioCanonicalAssetInput,
-  type ImportStudioMediaInput,
-  type ReviewStudioAssetVersionInput,
-  type SetStudioPrimaryAuthorityInput,
-  type UpdateStudioCanonicalAssetInput,
-} from "./material-studio.js";
-import {
-  exportStudioCrossProjectAssetPackage,
-  importStudioCrossProjectAssetPackage,
-  type ExportStudioCrossProjectAssetPackageInput,
-  type ImportStudioCrossProjectAssetPackageInput,
-} from "./studio-cross-project-asset-reuse.js";
-import {
-  reuseStudioGlobalResource,
-  type ReuseStudioGlobalResourceInput,
-} from "./studio-global-resource-reuse.js";
-import { inspectManagedProject, isManagedProject } from "./managed-project.js";
-import {
-  appendStudioPromptRevision,
-  appendStudioScriptSectionRevision,
-  appendStudioScriptRevision,
-  createStudioProductionUnit,
-  createStudioPromptDocument,
-  createStudioScriptDocument,
-  getStudioProductionUnitSnapshot,
-  initializeStudioProduction,
   proveStudioScriptSectionRevisionAppend,
-  reviseStudioProductionUnit,
-  StudioProductionConflictError,
-  StudioScriptSectionLineageError,
-  type AppendStudioScriptSectionRevisionInput,
-  type AppendStudioTextRevisionInput,
-  type CreateStudioProductionUnitInput,
-  type CreateStudioPromptDocumentInput,
-  type CreateStudioScriptDocumentInput,
-  type ReviseStudioProductionUnitInput,
   type StudioBindingOperationCommand,
 } from "./studio-production.js";
 import {
-  analyzeStudioScriptEntities,
-  confirmStudioPanelEmptyFromControl,
-  freezeStudioAssetBindingSetFromControl,
   proveStudioBindingOperationOutcome,
-  resolveStudioEntityProposal,
-  StudioBindingControlError,
-  type StudioBindingAnalyzeInput,
-  type StudioBindingConfirmEmptyInput,
-  type StudioBindingFreezeInput,
-  type StudioBindingResolveInput,
 } from "./studio-binding-control.js";
-import { StudioGenerationFreezeError, type StudioGenerationQueryInput } from "./studio-generation.js";
 import {
-  abandonStudioDetachedGenerationUnknown,
-  abandonStudioGenerationUnknown,
-  authorizeStudioUnitGridContinuationWaiver,
-  cancelStudioGenerationRun,
-  createStudioGenerationPlan,
-  dispatchStudioGenerationPack,
-  failStudioGenerationRun,
-  freezeAndPersistStudioGenerationPack,
-  freezeAndPersistStudioUnitGridGenerationPack,
   getStudioGenerationPlanProjection,
   listStudioGenerationPlanProjections,
-  prepareStudioImagegenCall,
   readStudioImagegenCallContextRebindByRun,
-  readAnyStudioGenerationFrozenPack,
-  readPersistedStudioGenerationPack,
   readStudioImagegenCallEventHistory,
   readStudioImagegenCallIntentByRun,
   readStudioDetachedGenerationUnknownDisposition,
   readStudioGenerationPlanNodeEventHistory,
   readStudioGenerationRunEventHistory,
-  reconcileStudioImagegenCall,
-  rebindStudioImagegenCallContext,
-  registerStudioGenerationResult,
-  retryStudioGenerationPlanNodes,
   sameStudioGenerationUnknownOwnerAbandonDetail,
   studioImagegenContextTokenHash,
-  StudioGenerationLedgerError,
-  StudioGenerationResultConflictError,
   type AbandonStudioGenerationUnknownInput,
   type AbandonStudioDetachedGenerationUnknownInput,
   type AuthorizeStudioUnitGridContinuationWaiverInput,
-  type DispatchStudioGenerationPackInput,
   type PrepareStudioImagegenCallInput,
   type RebindStudioImagegenCallContextInput,
   type ReconcileStudioImagegenCallInput,
-  type RegisterStudioGenerationResultInput,
-  type StudioGenerationPlanNodeInput,
 } from "./studio-generation-ledger.js";
-import type { StudioUnitGridGenerationQueryInput } from "./studio-unit-grid-generation.js";
 import {
-  appendStudioContinuityCorrection,
-  appendStudioContinuityObservation,
   readStudioContinuityOperationReceipt,
   type AppendStudioContinuityCorrectionInput,
   type AppendStudioContinuityObservationInput,
 } from "./studio-continuity-ledger.js";
 import {
   readStudioGenerationReviewOperationOutcome,
-  submitStudioGenerationReview,
   type SubmitStudioGenerationReviewInput,
 } from "./studio-generation-review.js";
 import {
   proveStudioPostResultObservationOutcome,
-  submitStudioPostResultObservation,
   type SubmitStudioPostResultObservationInput,
 } from "./studio-post-result-observation.js";
 import {
-  attestStudioGenerationCheckpoint,
   readStudioGenerationCheckpointOperationReceipt,
-  refreshStudioGenerationCheckpoint,
   type AttestStudioGenerationCheckpointInput,
   type RefreshStudioGenerationCheckpointInput,
 } from "./studio-generation-checkpoint.js";
 import {
-  commitAgentImagegenResultBundle,
   proveAgentImagegenResultBundleOutcome,
-  StudioAgentImagegenBundleError,
-  type CommitAgentImagegenResultBundleInput,
 } from "./studio-agent-imagegen-result-bundle.js";
-import { StudioLabeledLayoutError } from "./studio-labeled-layout.js";
 import {
   ActiveManagedStudioContextError,
   assertActiveManagedStudioContextToken,
@@ -222,9 +185,6 @@ import {
 import {
   DuduReadonlyControlConflictError,
   discoverDuduReadonlyImportProjects,
-  finalizeDuduReadonlyManagedProject,
-  getDuduReadonlyImportControl,
-  reconcileDuduReadonlyHistoricalPasses,
   proveDuduReadonlyFinalizationOutcome,
   proveDuduReadonlyStageCommandOutcome,
   resolveDuduReadonlyImportCommandRoot,
@@ -234,16 +194,20 @@ import {
 } from "./dudu-readonly-import.js";
 import type { DuduReadonlySourceInput } from "./dudu-readonly-source.js";
 import {
-  buildAndVerifyStudioVideoPackage,
   getStudioVideoPackageControl,
-  prepareStudioVideoPackageExport,
   readStudioVideoPackageExportIntentByOperationId,
-  StudioVideoPackageError,
   type StudioVideoPackageAuthorityInput,
   type StudioVideoPackageExpectedManagedSource,
 } from "./studio-video-package.js";
+import type {
+  AttestStudioHiggsfieldConnectorCapabilityInput,
+  RecordStudioHiggsfieldSubmissionInput,
+} from "./studio-higgsfield-video-generation.js";
+import type {
+  reconcileStudioHiggsfieldConnectorRequest,
+  HiggsfieldDirectUnlimitedObservation,
+} from "./studio-higgsfield-connector-queue.js";
 import {
-  attachStudioMultimediaTimelineMedia,
   readStudioMultimediaTimelineBindingByOperationId,
   type AttachStudioMultimediaTimelineMediaInput,
 } from "./studio-multimedia-timeline.js";
@@ -305,59 +269,27 @@ export type BuildStudioVideoPackageCommandPayload = {
   expectedAuthorityControlFingerprint: string;
   destinationPolicy: "managed-evidence-only";
 };
+export type PrepareStudioHiggsfieldVideoGenerationCommandPayload = {
+  intentId: string;
+  expectedVideoPackageControlFingerprint: string;
+  projectContextToken: string;
+};
+export type RecordStudioHiggsfieldVideoSubmissionCommandPayload = RecordStudioHiggsfieldSubmissionInput;
+export type AttestStudioHiggsfieldConnectorCapabilityCommandPayload = AttestStudioHiggsfieldConnectorCapabilityInput;
+export type EnqueueStudioHiggsfieldConnectorRequestCommandPayload =
+  | { kind: "video"; intentId: string }
+  | { kind: "image"; imageGenerationRunId: string; executionAdapter: "higgsfield-connector" };
+export type ClaimStudioHiggsfieldConnectorRequestCommandPayload = { requestId: string; claimantId: string; expectedRevision: number };
+export type PreflightStudioHiggsfieldConnectorRequestCommandPayload = { requestId: string; claimToken: string; expectedRevision: number; observation: HiggsfieldDirectUnlimitedObservation };
+export type AuthorizeStudioHiggsfieldConnectorRequestCommandPayload = { requestId: string; claimToken: string; expectedRevision: number; projectContextToken: string };
+export type RecordStudioHiggsfieldConnectorSubmissionCommandPayload = { requestId: string; claimToken: string; expectedRevision: number; submissionNonce: string; remoteJobId: string | null; zeroCreditReceipt?: import("./studio-higgsfield-connector-queue.js").HiggsfieldZeroCreditReceipt; remoteStatus?: string };
+export type ReconcileStudioHiggsfieldConnectorRequestCommandPayload = Parameters<typeof reconcileStudioHiggsfieldConnectorRequest>[1];
 
 export type CommandRequest =
+  | NovelCommandRequest
   | { command: "scan_project"; payload: Record<string, never> }
   | { command: "stage_dudu_readonly_managed_project"; payload: StageDuduReadonlyManagedProjectCommandPayload }
-  | { command: "reconcile_dudu_readonly_historical_passes"; payload: ReconcileDuduReadonlyHistoricalPassesCommandPayload }
-  | { command: "initialize_material_studio"; payload: Record<string, never> }
-  | { command: "import_studio_media"; payload: ImportStudioMediaInput }
-  | { command: "create_studio_asset"; payload: CreateStudioCanonicalAssetInput }
-  | { command: "update_studio_asset"; payload: UpdateStudioCanonicalAssetInput }
-  | { command: "append_studio_asset_relation"; payload: AppendStudioAssetRelationInput }
-  | { command: "append_studio_asset_version"; payload: AppendStudioAssetVersionInput }
-  | { command: "review_studio_asset_version"; payload: ReviewStudioAssetVersionInput }
-  | { command: "set_studio_primary_authority"; payload: SetStudioPrimaryAuthorityInput }
-  | { command: "export_studio_cross_project_asset_package"; payload: ExportStudioCrossProjectAssetPackageInput }
-  | { command: "import_studio_cross_project_asset_package"; payload: ImportStudioCrossProjectAssetPackageInput }
-  | { command: "reuse_studio_global_resource"; payload: ReuseStudioGlobalResourceInput }
-  | { command: "initialize_studio_production"; payload: Record<string, never> }
-  | { command: "create_studio_script_document"; payload: CreateStudioScriptDocumentInput }
-  | { command: "create_studio_prompt_document"; payload: CreateStudioPromptDocumentInput }
-  | { command: "append_studio_script_revision"; payload: AppendStudioTextRevisionInput }
-  | { command: "append_studio_script_section_revision"; payload: AppendStudioScriptSectionRevisionInput }
-  | { command: "append_studio_prompt_revision"; payload: AppendStudioTextRevisionInput }
-  | { command: "create_studio_production_unit"; payload: CreateStudioProductionUnitInput }
-  | { command: "revise_studio_production_unit"; payload: ReviseStudioProductionUnitInput }
-  | { command: "materialize_local_creative_production_units"; payload: MaterializeLocalCreativeProductionUnitsCommandPayload }
-  | { command: "analyze_studio_script_entities"; payload: StudioBindingAnalyzeInput }
-  | { command: "resolve_studio_entity_proposal"; payload: StudioBindingResolveInput }
-  | { command: "confirm_studio_panel_empty"; payload: StudioBindingConfirmEmptyInput }
-  | { command: "freeze_studio_asset_binding_set"; payload: StudioBindingFreezeInput }
-  | { command: "freeze_studio_generation_pack"; payload: (StudioGenerationQueryInput | StudioUnitGridGenerationQueryInput) & { expectedRevision: number } }
-  | { command: "dispatch_studio_generation_pack"; payload: DispatchStudioGenerationPackInput & { expectedRevision: number } }
-  | { command: "register_studio_generation_result"; payload: RegisterStudioGenerationResultInput & { expectedRevision: number } }
-  | { command: "authorize_studio_unit_grid_continuation_waiver"; payload: AuthorizeStudioUnitGridContinuationWaiverCommandPayload }
-  | { command: "prepare_studio_imagegen_call"; payload: PrepareStudioImagegenCallCommandPayload }
-  | { command: "reconcile_studio_imagegen_call"; payload: ReconcileStudioImagegenCallCommandPayload }
-  | { command: "abandon_studio_generation_unknown"; payload: AbandonStudioGenerationUnknownCommandPayload }
-  | { command: "abandon_studio_detached_generation_unknown"; payload: AbandonStudioDetachedGenerationUnknownCommandPayload }
-  | { command: "rebind_studio_imagegen_call_context"; payload: RebindStudioImagegenCallContextCommandPayload }
-  | { command: "commit_agent_imagegen_result_bundle"; payload: CommitAgentImagegenResultBundleInput }
-  | { command: "create_studio_generation_plan"; payload: { nodes: StudioGenerationPlanNodeInput[] } }
-  | { command: "fail_studio_generation_run"; payload: { generationRunId: string; errorClass: string; detail?: string } }
-  | { command: "cancel_studio_generation_run"; payload: { generationRunId: string; reason?: string } }
-  | { command: "retry_studio_generation_plan_nodes"; payload: { planId: string; nodeIndexes?: number[] } }
-  | { command: "append_studio_continuity_observation"; payload: AppendStudioContinuityObservationCommandPayload }
-  | { command: "append_studio_continuity_correction"; payload: AppendStudioContinuityCorrectionCommandPayload }
-  | { command: "submit_studio_generation_review"; payload: SubmitStudioGenerationReviewCommandPayload }
-  | { command: "submit_studio_post_result_observation"; payload: SubmitStudioPostResultObservationCommandPayload }
-  | { command: "refresh_studio_generation_checkpoint"; payload: RefreshStudioGenerationCheckpointCommandPayload }
-  | { command: "attest_studio_generation_checkpoint"; payload: AttestStudioGenerationCheckpointCommandPayload }
-  | { command: "finalize_dudu_readonly_managed_project"; payload: FinalizeDuduReadonlyManagedProjectCommandPayload }
-  | { command: "prepare_studio_video_package_export"; payload: PrepareStudioVideoPackageExportCommandPayload }
-  | { command: "build_studio_video_package"; payload: BuildStudioVideoPackageCommandPayload }
-  | { command: "attach_studio_multimedia_timeline_media"; payload: AttachStudioMultimediaTimelineMediaCommandPayload }
+  | StudioRuntimeCommandRequest
   | { command: "materialize_fusion_project"; payload: { packageRoot: string; sourceRoot?: string; indexPath?: string; assetLibraryPath?: string; expectedCounts?: Partial<FusionPackageExpectedCounts>; targetParent: string; authorities?: FusionAuthorityInput[] } }
   | { command: "build_fusion_reference_board"; payload: { itemId: string; variant?: FusionReferenceBoardVariant } }
   | { command: "build_fusion_storyboard_grid"; payload: { itemId: string; override?: FusionStoryboardGridOverride; referenceOverride?: FusionStoryboardGridReferenceOverride } }
@@ -495,6 +427,8 @@ export type CommandRequest =
   | { command: "execute_novel_analysis_task"; payload: Parameters<typeof executeNovelAnalysisTask>[1] }
   | { command: "execute_next_novel_analysis_run_task"; payload: Parameters<typeof executeNextNovelAnalysisRunTask>[1] }
   | { command: "replace_novel_analysis_run_task"; payload: Parameters<typeof replaceNovelAnalysisRunTask>[1] }
+  | { command: "mark_novel_analysis_execution_reconciliation_required"; payload: Parameters<typeof markNovelAnalysisExecutionReconciliationRequired>[1] }
+  | { command: "reconcile_novel_analysis_execution"; payload: Parameters<typeof reconcileNovelAnalysisExecution>[1] }
   | { command: "save_skill"; payload: Parameters<typeof saveAgentSkill>[1] }
   | { command: "create_handoff"; payload: { itemId?: string } }
   | { command: "save_unit_timeline"; payload: { unitId: string; timings: ShotTiming[] } }
@@ -522,55 +456,7 @@ export type CommandRequest =
   | { command: "prepare_edit_media_proxy"; payload: { artifactId: string } };
 
 export type StudioCommandRequest = Extract<CommandRequest, {
-  command:
-    | "initialize_material_studio"
-    | "import_studio_media"
-    | "create_studio_asset"
-    | "update_studio_asset"
-    | "append_studio_asset_relation"
-    | "append_studio_asset_version"
-    | "review_studio_asset_version"
-    | "set_studio_primary_authority"
-    | "export_studio_cross_project_asset_package"
-    | "import_studio_cross_project_asset_package"
-    | "reuse_studio_global_resource"
-    | "initialize_studio_production"
-    | "create_studio_script_document"
-    | "create_studio_prompt_document"
-    | "append_studio_script_revision"
-    | "append_studio_script_section_revision"
-    | "append_studio_prompt_revision"
-    | "create_studio_production_unit"
-    | "revise_studio_production_unit"
-    | "materialize_local_creative_production_units"
-    | "analyze_studio_script_entities"
-    | "resolve_studio_entity_proposal"
-    | "confirm_studio_panel_empty"
-    | "freeze_studio_asset_binding_set"
-    | "freeze_studio_generation_pack"
-    | "dispatch_studio_generation_pack"
-    | "register_studio_generation_result"
-    | "authorize_studio_unit_grid_continuation_waiver"
-    | "prepare_studio_imagegen_call"
-    | "reconcile_studio_imagegen_call"
-    | "abandon_studio_generation_unknown"
-    | "abandon_studio_detached_generation_unknown"
-    | "rebind_studio_imagegen_call_context"
-    | "commit_agent_imagegen_result_bundle"
-    | "create_studio_generation_plan"
-    | "fail_studio_generation_run"
-    | "cancel_studio_generation_run"
-    | "retry_studio_generation_plan_nodes"
-    | "append_studio_continuity_observation"
-    | "append_studio_continuity_correction"
-    | "submit_studio_generation_review"
-    | "submit_studio_post_result_observation"
-    | "refresh_studio_generation_checkpoint"
-    | "attest_studio_generation_checkpoint"
-    | "finalize_dudu_readonly_managed_project"
-    | "reconcile_dudu_readonly_historical_passes"
-    | "prepare_studio_video_package_export"
-    | "build_studio_video_package";
+  command: StudioRuntimeCommandRequest["command"];
 }>;
 
 /**
@@ -579,6 +465,14 @@ export type StudioCommandRequest = Extract<CommandRequest, {
  */
 export function isStudioCommandRequest(request: CommandRequest): request is StudioCommandRequest {
   return isStudioCommandName(request.command);
+}
+
+export function isNovelCommandRequest(request: CommandRequest): request is NovelCommandRequest {
+  return isNovelCommandName(request.command);
+}
+
+function isNovelAnalysisExecutionCommand(request: CommandRequest): boolean {
+  return request.command === "execute_novel_analysis_task" || request.command === "execute_next_novel_analysis_run_task";
 }
 
 export interface IdempotentCommandInput {
@@ -597,6 +491,11 @@ export interface IdempotentCommandResult {
   requestHash: string;
   execution?: { pid: number; phase: "registered" | "executing" | "side_effect_committed"; heartbeatAt: string };
   durableReconciliation?: DurableCommandReconciliationSnapshot;
+  /**
+   * 小说导入业务树与首次成功账本之间的跨 owner 不可变锚点。即使状态降为
+   * unknown 也必须保留，后续 durable proof 不能用当前自洽闭包覆盖它。
+   */
+  novelImportResultAnchor?: NovelImportResultAnchor;
   storageRoot?: string;
   result?: unknown;
   // busyUncommitted：SQLite 瞬时锁导致的失败且事务确认未提交（busy 只可能在
@@ -607,8 +506,24 @@ export interface IdempotentCommandResult {
   executedAt?: string;
 }
 
+interface NovelImportResultAnchor {
+  schemaVersion: 1;
+  kind: "novel-import-result-anchor";
+  receiptId: string;
+  projectId: string;
+  receiptFingerprint: string;
+  stateChainFingerprint: string;
+  chapterManifestSha256: string;
+  canonicalReceiptSha256: string;
+}
+
 type DurableReconciliationCommandRequest = Extract<CommandRequest,
   { command:
+      | "novel_import_external_snapshot"
+      | "novel_import_writing_source_snapshot"
+      | "novel_review_chapter_state_candidate"
+      | "novel_review_story_bible_candidate"
+      | "novel_invalidate_writing_state_from"
       | "stage_dudu_readonly_managed_project"
       | "finalize_dudu_readonly_managed_project"
       | "reconcile_dudu_readonly_historical_passes"
@@ -648,12 +563,17 @@ interface DurableCommandReconciliationSnapshot {
 }
 
 interface DurableCommandProof {
-  source: "dudu_readonly_import_receipts" | "local_creative_production_unit_receipts" | "studio_video_package_ledger" | "studio_multimedia_timeline_bindings" | "fusion-storyboard-sheet-store" | "fusion-storyboard-sheet-migration-candidate-fingerprint" | "canonical-asset-store" | "studio_script_section_revisions" | "studio_binding_operation_receipts" | "studio_continuity_operation_receipts" | "studio_generation_review_operation_receipts" | "studio_post_result_observation_operation_receipts" | "studio_generation_checkpoint_operation_receipts" | "studio_agent_imagegen_writeback_receipts" | "studio_generation_plan_run_ledger" | "studio_generation_call_ledger" | "studio_generation_detached_disposition_ledger";
+  source: "novel_import_receipts" | "novel_writing_source_snapshot_receipts" | "novel_writing_state_operation_receipts" | "dudu_readonly_import_receipts" | "local_creative_production_unit_receipts" | "studio_video_package_ledger" | "studio_multimedia_timeline_bindings" | "fusion-storyboard-sheet-store" | "fusion-storyboard-sheet-migration-candidate-fingerprint" | "canonical-asset-store" | "studio_script_section_revisions" | "studio_binding_operation_receipts" | "studio_continuity_operation_receipts" | "studio_generation_review_operation_receipts" | "studio_post_result_observation_operation_receipts" | "studio_generation_checkpoint_operation_receipts" | "studio_agent_imagegen_writeback_receipts" | "studio_generation_plan_run_ledger" | "studio_generation_call_ledger" | "studio_generation_detached_disposition_ledger";
   identity: Record<string, unknown>;
   result: unknown;
 }
 
 const DURABLE_RECONCILIATION_COMMAND_NAMES = new Set<DurableReconciliationCommandRequest["command"]>([
+  "novel_import_external_snapshot",
+  "novel_import_writing_source_snapshot",
+  "novel_review_chapter_state_candidate",
+  "novel_review_story_bible_candidate",
+  "novel_invalidate_writing_state_from",
   "stage_dudu_readonly_managed_project",
   "finalize_dudu_readonly_managed_project",
   "reconcile_dudu_readonly_historical_passes",
@@ -711,9 +631,18 @@ async function readCommandLedger(projectRoot: string): Promise<CommandLedger> {
  * 可重放命令账本。旧账本若曾写入 true，所有读取面也在投影时强制降权。
  */
 function revokePersistedImagegenCallCapability(record: IdempotentCommandResult): IdempotentCommandResult {
-  if (record.command !== "prepare_studio_imagegen_call"
+  if (!(["prepare_studio_imagegen_call", "prepare_studio_higgsfield_video_generation", "claim_studio_higgsfield_connector_request", "authorize_studio_higgsfield_connector_request"] as const).includes(record.command as never)
     || !record.result || typeof record.result !== "object" || Array.isArray(record.result)) {
     return { ...record };
+  }
+  if (record.command === "prepare_studio_higgsfield_video_generation") {
+    return {
+      ...record,
+      result: projectHiggsfieldPrepareResultForPersistence(record.result),
+    };
+  }
+  if (record.command === "claim_studio_higgsfield_connector_request" || record.command === "authorize_studio_higgsfield_connector_request") {
+    return { ...record, result: projectHiggsfieldConnectorQueueResultForPersistence(record.command, record.result) };
   }
   return {
     ...record,
@@ -725,13 +654,45 @@ function revokePersistedImagegenCallCapability(record: IdempotentCommandResult):
   };
 }
 
-function revokeImagegenCallCapabilityFromResult(result: unknown): unknown {
+/** Queue 的 claim/nonce 与受控路径只允许首个调用栈可见，账本和重放一律删除。 */
+export function projectHiggsfieldConnectorQueueResultForPersistence(command: string, result: unknown): unknown {
   if (!result || typeof result !== "object" || Array.isArray(result)) return result;
-  return {
+  const projected = { ...(result as Record<string, unknown>) };
+  if (command === "claim_studio_higgsfield_connector_request") delete (projected as { claimToken?: unknown }).claimToken;
+  if (command === "authorize_studio_higgsfield_connector_request") {
+    delete (projected as { submissionNonce?: unknown }).submissionNonce;
+    delete (projected as { connectorRequest?: unknown }).connectorRequest;
+    (projected as { callAllowed?: unknown }).callAllowed = false;
+  }
+  return projected;
+}
+
+/**
+ * Higgsfield 的 connectorRequest 含本机受控参考路径，只能存在于首次调用栈。
+ * 任何持久账本、重放、列表或恢复投影都必须删除整个调用单并撤销一次性许可。
+ */
+export function projectHiggsfieldPrepareResultForPersistence(result: unknown): unknown {
+  if (!result || typeof result !== "object" || Array.isArray(result)) return result;
+  const projected = {
     ...(result as Record<string, unknown>),
     callAllowed: false,
     idempotentReplay: true,
   };
+  delete (projected as { connectorRequest?: unknown }).connectorRequest;
+  return projected;
+}
+
+function revokeImagegenCallCapabilityFromResult(result: unknown): unknown {
+  if (!result || typeof result !== "object" || Array.isArray(result)) return result;
+  const projected = {
+    ...(result as Record<string, unknown>),
+    callAllowed: false,
+    idempotentReplay: true,
+  };
+  if ((result as { connectorRequest?: unknown }).connectorRequest !== undefined) {
+    delete (projected as { connectorRequest?: unknown }).connectorRequest;
+  }
+  return projected;
 }
 
 async function getCommandByIdempotencyKey(
@@ -787,8 +748,17 @@ function canonicalAssetSemanticSourceIdentity(snapshot: CanonicalAssetSourceSnap
   };
 }
 
+function commandRequestForPersistence(request: CommandRequest): CommandRequest {
+  return isNovelCommandRequest(request)
+    ? canonicalNovelCommandRequestForPersistence(request) as CommandRequest
+    : request;
+}
+
 function commandRequestHash(projectRoot: string, request: CommandRequest): string {
-  return createHash("sha256").update(stable({ projectRoot: path.resolve(projectRoot), request })).digest("hex");
+  return createHash("sha256").update(stable({
+    projectRoot: path.resolve(projectRoot),
+    request: commandRequestForPersistence(request),
+  })).digest("hex");
 }
 
 function isStudioBindingOperationCommand(command: CommandRequest["command"]): command is StudioBindingOperationCommand {
@@ -1254,42 +1224,13 @@ function assertP30OrchestrationPublicPayload(request: CommandRequest): void {
   }
 }
 
-function rejectStudioScriptSectionConflict(error: unknown): never {
-  if (error instanceof StudioProductionConflictError) {
-    throw new RejectedCommandFailure(error.message, {
-      schemaVersion: 1,
-      applied: false,
-      entityType: "studio_script_section",
-      entityId: error.entityId,
-      sectionId: error.entityId,
-      reason: "revision_conflict",
-      expectedRevision: error.expectedRevision,
-      currentRevision: error.actualRevision,
-    });
-  }
-  if (error instanceof StudioScriptSectionLineageError) {
-    throw new RejectedCommandFailure(error.message, {
-      schemaVersion: 1,
-      applied: false,
-      entityType: "studio_script_section",
-      entityId: error.sectionId,
-      sectionId: error.sectionId,
-      reason: "lineage_conflict",
-      invariant: error.invariant,
-      expectedValue: error.expectedValue,
-      actualValue: error.actualValue,
-    });
-  }
-  throw error;
-}
-
 function isDurableReconciliationCommand(request: CommandRequest): request is DurableReconciliationCommandRequest {
   return DURABLE_RECONCILIATION_COMMAND_NAMES.has(request.command as DurableReconciliationCommandRequest["command"]);
 }
 
 function durableReconciliationSnapshot(request: CommandRequest): DurableCommandReconciliationSnapshot | undefined {
   return isDurableReconciliationCommand(request)
-    ? { schemaVersion: 1, request: structuredClone(request) }
+    ? { schemaVersion: 1, request: structuredClone(commandRequestForPersistence(request)) as DurableReconciliationCommandRequest }
     : undefined;
 }
 
@@ -1317,8 +1258,195 @@ function reconciliationRequestFromRecord(projectRoot: string, record: Idempotent
   return snapshot.request;
 }
 
+function novelImportResultAnchorFromResult(result: unknown): NovelImportResultAnchor {
+  if (!result || typeof result !== "object" || Array.isArray(result)) {
+    throw new Error("小说导入账本结果缺少可验证 receipt 锚点。");
+  }
+  const receipt = (result as Record<string, unknown>).receipt;
+  if (!receipt || typeof receipt !== "object" || Array.isArray(receipt)) {
+    throw new Error("小说导入账本结果缺少 receipt 对象。");
+  }
+  const value = receipt as Record<string, unknown>;
+  for (const key of [
+    "receiptId", "projectId", "fingerprint", "stateChainFingerprint", "chapterManifestSha256",
+  ] as const) {
+    if (typeof value[key] !== "string" || !value[key]) {
+      throw new Error(`小说导入账本 receipt 缺少 ${key} 锚点。`);
+    }
+  }
+  return {
+    schemaVersion: 1,
+    kind: "novel-import-result-anchor",
+    receiptId: String(value.receiptId),
+    projectId: String(value.projectId),
+    receiptFingerprint: String(value.fingerprint),
+    stateChainFingerprint: String(value.stateChainFingerprint),
+    chapterManifestSha256: String(value.chapterManifestSha256),
+    canonicalReceiptSha256: createHash("sha256").update(stable(receipt)).digest("hex"),
+  };
+}
+
+function assertNovelImportResultMatchesAnchor(
+  result: unknown,
+  expected: NovelImportResultAnchor,
+): void {
+  const actual = novelImportResultAnchorFromResult(result);
+  if (stable(actual) !== stable(expected)) {
+    throw new Error("小说导入当前 registered 闭包与首次成功账本锚点不一致。");
+  }
+}
+
+function existingNovelImportResultAnchor(record: IdempotentCommandResult): NovelImportResultAnchor | null {
+  const persisted = record.novelImportResultAnchor;
+  if (persisted) {
+    if (persisted.schemaVersion !== 1 || persisted.kind !== "novel-import-result-anchor") {
+      throw new Error("小说导入账本锚点结构无效。");
+    }
+    if (record.result !== undefined) assertNovelImportResultMatchesAnchor(record.result, persisted);
+    return persisted;
+  }
+  return record.result === undefined ? null : novelImportResultAnchorFromResult(record.result);
+}
+
+function expectedNovelImportResultAnchor(record: IdempotentCommandResult): NovelImportResultAnchor {
+  const existing = existingNovelImportResultAnchor(record);
+  if (!existing) throw new Error("小说导入 succeeded 账本缺少首次结果锚点。");
+  return existing;
+}
+
+async function uniqueNovelImportRequestAnchor(
+  storageRoot: string,
+  requestHash: string,
+): Promise<NovelImportResultAnchor | null> {
+  const records = (await getCommandLedgerEntriesByRequestHash(storageRoot, requestHash))
+    .filter((entry) => entry.command === "novel_import_external_snapshot") as IdempotentCommandResult[];
+  let unique: NovelImportResultAnchor | null = null;
+  for (const record of records) {
+    const candidate = existingNovelImportResultAnchor(record);
+    if (!candidate) continue;
+    if (unique && stable(unique) !== stable(candidate)) {
+      throw new Error("同一小说导入 requestHash 存在互相冲突的历史结果锚点，拒绝继续。");
+    }
+    unique = candidate;
+  }
+  return unique;
+}
+
+async function proveSafeCompletedNovelImportResult(
+  request: Extract<NovelCommandRequest, { command: "novel_import_external_snapshot" }>,
+  requestHash: string,
+  ledgerRecord: IdempotentCommandResult,
+): Promise<unknown> {
+  const completed = await proveCompletedNovelExternalImport(request.payload, requestHash);
+  if (!completed) {
+    throw new Error("小说导入账本虽标记 succeeded，但未找到完整 registered 业务闭包；拒绝按账本伪成功重放。");
+  }
+  const { projectRoot: _absoluteProjectRoot, ...safeResult } = completed;
+  const replay = { ...safeResult, replayed: true };
+  assertNovelImportResultMatchesAnchor(replay, expectedNovelImportResultAnchor(ledgerRecord));
+  return replay;
+}
+
+async function downgradeSucceededNovelImportClosureDrift(
+  storageRoot: string,
+  record: IdempotentCommandResult,
+  error: unknown,
+): Promise<IdempotentCommandResult | undefined> {
+  const observedAt = new Date().toISOString();
+  const message = `小说导入 succeeded 账本与 registered 业务闭包漂移：${error instanceof Error ? error.message : String(error)}`;
+  const drifted = await withProjectLock(storageRoot, "command-bus", async () => {
+    const current = await getCommandByIdempotencyKey(storageRoot, record.idempotencyKey);
+    if (!current || current.requestHash !== record.requestHash || current.command !== record.command) return current;
+    if (current.status === "succeeded") {
+      current.novelImportResultAnchor ??= expectedNovelImportResultAnchor(current);
+      current.status = "unknown";
+      current.result = undefined;
+      current.error = { message, observedAt };
+      current.executedAt = observedAt;
+      await persistCommandLedgerEntry(storageRoot, current, observedAt);
+    }
+    return current;
+  });
+  if (drifted?.status === "unknown") {
+    await appendEvent(storageRoot, {
+      actor: "codex",
+      type: "command.outcome-drift",
+      requestId: drifted.requestId,
+      idempotencyKey: drifted.idempotencyKey,
+      command: drifted.command,
+      data: {
+        requestHash: drifted.requestHash,
+        observedAt,
+        reason: "registered-business-closure-invalid",
+      },
+    });
+  }
+  return drifted;
+}
+
 async function proveDurableOutcome(projectRoot: string, request: DurableReconciliationCommandRequest): Promise<DurableCommandProof | undefined> {
   try {
+    if (request.command === "novel_import_external_snapshot") {
+      const operationId = commandRequestHash(projectRoot, request);
+      const outcome = await runWithOperationContext(
+        {
+          requestId: `reconcile-${operationId.slice(0, 32)}`,
+          idempotencyKey: `novel-import-reconcile-${operationId.slice(0, 32)}`,
+          requestHash: operationId,
+          command: request.command,
+        },
+        () => commitNovelExternalImport(request.payload),
+      );
+      const { projectRoot: _absoluteProjectRoot, ...safeOutcome } = outcome;
+      return {
+        source: "novel_import_receipts",
+        identity: {
+          operationId,
+          receiptId: outcome.receipt.receiptId,
+          projectId: outcome.receipt.projectId,
+          receiptFingerprint: outcome.receipt.fingerprint,
+          stateChainFingerprint: outcome.receipt.stateChainFingerprint,
+        },
+        result: { ...safeOutcome, replayed: true, reconciled: true },
+      };
+    }
+    if (request.command === "novel_import_writing_source_snapshot") {
+      const operationId = commandRequestHash(projectRoot, request);
+      const outcome = await runWithOperationContext(
+        {
+          requestId: `reconcile-${operationId.slice(0, 32)}`,
+          idempotencyKey: `writing-source-reconcile-${operationId.slice(0, 32)}`,
+          requestHash: operationId,
+          command: request.command,
+        },
+        () => new NovelRepository(projectRoot).importWritingSourceSnapshot(request.payload),
+      );
+      return {
+        source: "novel_writing_source_snapshot_receipts",
+        identity: {
+          operationId,
+          receiptId: outcome.receipt.receiptId,
+          projectId: outcome.receipt.projectId,
+          receiptFingerprint: outcome.receipt.fingerprint,
+        },
+        result: { ...outcome, replayed: true, reconciled: true },
+      };
+    }
+    if (request.command === "novel_review_chapter_state_candidate"
+      || request.command === "novel_review_story_bible_candidate"
+      || request.command === "novel_invalidate_writing_state_from") {
+      const operationId = commandRequestHash(projectRoot, request);
+      const proof = await loadNovelWritingStateOperationProof(projectRoot, operationId);
+      if (!proof || proof.command !== request.command) return undefined;
+      const result = proof.result && typeof proof.result === "object" && !Array.isArray(proof.result)
+        ? { ...proof.result as Record<string, unknown>, replayed: true, reconciled: true }
+        : proof.result;
+      return {
+        source: "novel_writing_state_operation_receipts",
+        identity: { operationId, projectId: proof.projectId, command: proof.command },
+        result,
+      };
+    }
     if (request.command === "stage_dudu_readonly_managed_project") {
       const operationId = commandRequestHash(projectRoot, request);
       const {
@@ -2211,6 +2339,16 @@ async function proveDurableOutcome(projectRoot: string, request: DurableReconcil
   }
 }
 
+async function proveDurableOutcomeWithMutationFence(
+  projectRoot: string,
+  request: DurableReconciliationCommandRequest,
+): Promise<DurableCommandProof | undefined> {
+  if (request.command === "novel_import_external_snapshot") {
+    return withProjectLock(projectRoot, "novel-import-mutation", () => proveDurableOutcome(projectRoot, request));
+  }
+  return proveDurableOutcome(projectRoot, request);
+}
+
 function abortError(signal?: AbortSignal): Error {
   const message = typeof signal?.reason === "string" ? signal.reason : signal?.reason instanceof Error ? signal.reason.message : "命令已取消。";
   const error = new Error(message);
@@ -2294,15 +2432,6 @@ async function markDurableRecoveryRejected(input: {
   return stored;
 }
 
-function deterministicStudioTimelineRejection(
-  request: Extract<CommandRequest, { command: "attach_studio_multimedia_timeline_media" }>,
-): string | undefined {
-  if (request.payload.role === "storyboard" && request.payload.panelIndex === undefined) {
-    return "storyboard 绑定必须显式提供 panelIndex。";
-  }
-  return undefined;
-}
-
 async function recoverCommandFromDurableState(input: {
   projectRoot: string;
   storageRoot: string;
@@ -2313,7 +2442,16 @@ async function recoverCommandFromDurableState(input: {
   const root = path.resolve(input.projectRoot);
   const storageRoot = path.resolve(input.storageRoot);
   if (input.record.command !== input.request.command || input.record.requestHash !== commandRequestHash(root, input.request)) return undefined;
-  let proof = await proveDurableOutcome(root, input.request);
+  let proof = await proveDurableOutcomeWithMutationFence(root, input.request);
+  if (proof && input.request.command === "novel_import_external_snapshot") {
+    const recordAnchor = existingNovelImportResultAnchor(input.record);
+    const requestAnchor = await uniqueNovelImportRequestAnchor(storageRoot, input.record.requestHash);
+    if (recordAnchor && requestAnchor && stable(recordAnchor) !== stable(requestAnchor)) {
+      throw new Error("小说导入当前命令锚点与同 requestHash 历史锚点冲突。");
+    }
+    const existing = recordAnchor ?? requestAnchor;
+    if (existing) assertNovelImportResultMatchesAnchor(proof.result, existing);
+  }
   if (!proof && input.request.command === "attach_studio_multimedia_timeline_media") {
     const rejection = deterministicStudioTimelineRejection(input.request);
     if (rejection) {
@@ -2375,6 +2513,17 @@ async function recoverCommandFromDurableState(input: {
     if (current.status === "failed" && !recoverableFailed) return undefined;
     if (current.status === "cancelled") return undefined;
     if (current.status === "running" && processAlive(current.execution?.pid)) return undefined;
+    if (input.request.command === "novel_import_external_snapshot") {
+      const recordAnchor = existingNovelImportResultAnchor(current);
+      const requestAnchor = await uniqueNovelImportRequestAnchor(storageRoot, current.requestHash);
+      if (recordAnchor && requestAnchor && stable(recordAnchor) !== stable(requestAnchor)) {
+        throw new Error("小说导入恢复账本锚点与同 requestHash 历史锚点冲突。");
+      }
+      const existing = recordAnchor ?? requestAnchor;
+      const expected = existing ?? novelImportResultAnchorFromResult(proof.result);
+      if (existing) assertNovelImportResultMatchesAnchor(proof.result, existing);
+      current.novelImportResultAnchor = expected;
+    }
     current.status = "succeeded";
     current.result = proof.result;
     current.error = undefined;
@@ -2456,202 +2605,141 @@ function rejectFusionVisualConstraintPrecondition(error: unknown, payload?: { ex
   });
 }
 
-function rejectStudioBindingPrecondition(
-  error: unknown,
-  input: { unitId: string; panelId: string; expectedRevisionToken: string },
-): never {
-  if (isRejectedCommandFailure(error)) throw error;
-  if (!(error instanceof StudioBindingControlError) && !(error instanceof StudioProductionConflictError)) throw error;
-  const code = error instanceof StudioBindingControlError ? error.code : "revision-conflict";
-  throw new RejectedCommandFailure(error.message, {
-    schemaVersion: 1,
-    applied: false,
-    entityType: "studio_asset_binding",
-    reason: code,
-    unitId: input.unitId,
-    panelId: input.panelId,
-    expectedRevisionToken: input.expectedRevisionToken,
-  });
-}
-
-type StudioGenerationCommandEntity = "studio_generation_pack" | "studio_generation_dispatch" | "studio_generation_call" | "studio_generation_result" | "studio_generation_result_bundle" | "studio_generation_plan" | "studio_generation_run";
-
-function rejectStudioGenerationCommand(input: {
-  entityType: StudioGenerationCommandEntity;
-  reason: string;
-  message: string;
-  code?: string;
-  unitId?: string;
-  panelId?: string;
-  packId?: string;
-  expectedRevision?: unknown;
-  currentRevision?: number;
-}): never {
-  const result: Record<string, unknown> = {
-    schemaVersion: 1,
-    applied: false,
-    entityType: input.entityType,
-    reason: input.reason,
-  };
-  if (input.code !== undefined) result.code = input.code;
-  if (input.unitId !== undefined) result.unitId = input.unitId;
-  if (input.panelId !== undefined) result.panelId = input.panelId;
-  if (input.packId !== undefined) result.packId = input.packId;
-  if (input.expectedRevision !== undefined) result.expectedRevision = input.expectedRevision;
-  if (input.currentRevision !== undefined) result.currentRevision = input.currentRevision;
-  throw new RejectedCommandFailure(input.message, result);
-}
-
-function assertStudioGenerationExpectedRevision(
-  entityType: StudioGenerationCommandEntity,
-  expectedRevision: unknown,
-  context: { unitId?: string; panelId?: string; packId?: string },
-): asserts expectedRevision is number {
-  if (!Number.isSafeInteger(expectedRevision) || (expectedRevision as number) < 1) {
-    rejectStudioGenerationCommand({
-      entityType,
-      reason: "invalid_revision",
-      message: "Studio generation expectedRevision 必须是正整数。",
-      expectedRevision,
-      ...context,
-    });
+async function executeNovelRepositoryCommand(projectRoot: string, request: NovelCommandRequest, options: {
+  novelWriteActor?: "agent" | "agent_reviewer" | "human_owner" | "human_ui";
+  novelWriteLeaseToken?: string;
+  novelActorAttribution?: NovelActorAttribution;
+} = {}): Promise<unknown> {
+  if (request.command === "novel_import_external_snapshot") {
+    const outcome = await commitNovelExternalImport(request.payload);
+    const { projectRoot: _absoluteProjectRoot, ...safeOutcome } = outcome;
+    return safeOutcome;
+  }
+  const repository = new NovelRepository(projectRoot);
+  try {
+    switch (request.command) {
+      case "novel_initialize_manuscript": return await repository.initialize(request.payload.sourceMode ?? "managed_markdown");
+      case "novel_create_volume": return await repository.createVolume(request.payload);
+      case "novel_create_chapter": return await repository.createChapter(request.payload);
+      case "novel_save_chapter": return await repository.saveChapter(request.payload, {
+        requireWriteLease: options.novelWriteActor !== "human_owner"
+          && options.novelWriteActor !== "human_ui"
+          && (request.payload.aiWriteContext?.workflowMode ?? "formal") === "formal",
+        ...(options.novelWriteLeaseToken && options.novelActorAttribution ? {
+          writeLease: {
+            leaseToken: options.novelWriteLeaseToken,
+            attribution: options.novelActorAttribution,
+          },
+        } : {}),
+      });
+      case "novel_rename_chapter": return await repository.renameChapter(request.payload);
+      case "novel_move_chapter": return await repository.moveChapter(request.payload);
+      case "novel_reorder_chapters": return await repository.reorderChapters(request.payload);
+      case "novel_rebuild_search_index": return await repository.rebuildSearchIndex();
+      case "novel_recover_manuscript": return { recoveredOperations: await repository.recoverIncompleteOperations() };
+      case "novel_recover_writing_state": return { recoveredOperations: await repository.recoverWritingStateOperations() };
+      case "novel_seed_writing_state": return await repository.seedWritingState(request.payload);
+      case "novel_import_writing_source_snapshot": return await repository.importWritingSourceSnapshot(request.payload);
+      case "novel_stage_chapter_state_candidate": return await repository.stageChapterStateCandidate(request.payload);
+      case "novel_review_chapter_state_candidate": return await repository.reviewChapterStateCandidate(request.payload);
+      case "novel_stage_story_bible_candidate": return await repository.stageStoryBibleCandidate(request.payload);
+      case "novel_review_story_bible_candidate": return await repository.reviewStoryBibleCandidate(request.payload);
+      case "novel_invalidate_writing_state_from": return await repository.invalidateWritingStateFrom(request.payload);
+      case "novel_attach_review_ticket": return await repository.attachReviewTicket(request.payload);
+    }
+  } catch (error) {
+    // 只有 Repository 在任何本命令写入前明确分类的状态前置条件，才可落
+    // failed(committed=false)。恢复证据损坏、写中/写后异常继续原样上抛，
+    // 由 command bus 保持 unknown，禁止把不确定副作用误报成安全拒绝。
+    if (isNovelPreconditionRejectedError(error)) {
+      throw new RejectedCommandFailure(error.message, error.result);
+    }
+    if (isNovelWritingStateRejectedError(error)) {
+      throw new RejectedCommandFailure(error.message, error.result);
+    }
+    throw error;
   }
 }
 
-function isStudioUnitGridGenerationQuery(
-  input: StudioGenerationQueryInput | StudioUnitGridGenerationQueryInput,
-): input is StudioUnitGridGenerationQueryInput {
-  return (input as { targetKind?: unknown }).targetKind === "unit-grid";
-}
-
-async function assertStudioGenerationUnitRevision(input: {
-  projectRoot: string;
-  entityType: StudioGenerationCommandEntity;
-  unitId: string;
-  panelId?: string;
-  packId?: string;
-  expectedRevision: number;
-}): Promise<void> {
-  const snapshot = await getStudioProductionUnitSnapshot(input.projectRoot, input.unitId);
-  if (!snapshot) {
-    rejectStudioGenerationCommand({
-      entityType: input.entityType,
-      reason: "not_found",
-      message: `15 秒生产单元不存在：${input.unitId}`,
-      unitId: input.unitId,
-      panelId: input.panelId,
-      packId: input.packId,
-      expectedRevision: input.expectedRevision,
-    });
+async function execute(projectRoot: string, request: CommandRequest, options: Pick<PersistedScanOptions, "signal" | "onProgress"> & {
+  operationId?: string;
+  novelWriteActor?: "agent" | "agent_reviewer" | "human_owner" | "human_ui";
+  novelWriteLeaseToken?: string;
+  novelActorAttribution?: NovelActorAttribution;
+} = {}): Promise<unknown> {
+  if (isNovelCommandName(request.command)) {
+    return executeNovelRepositoryCommand(projectRoot, request as NovelCommandRequest, options);
   }
-  if (snapshot.unit.revision !== input.expectedRevision) {
-    rejectStudioGenerationCommand({
-      entityType: input.entityType,
-      reason: "revision_conflict",
-      message: `生产单元 ${input.unitId} 已被其他窗口更新（当前 revision ${snapshot.unit.revision}），请重新冻结。`,
-      unitId: input.unitId,
-      panelId: input.panelId,
-      packId: input.packId,
-      expectedRevision: input.expectedRevision,
-      currentRevision: snapshot.unit.revision,
-    });
+  if (isStudioCommandRequest(request)) {
+    // 可靠性壳在 operation context 内、业务 executor 前复检受管工程。
+    // executor 不持有 managed shell、锁、lease、busy retry 或命令账本。
+    await inspectManagedProject(projectRoot);
+    const operationId = options.operationId ?? commandRequestHash(projectRoot, request);
+    const executeStudio = () => executeStudioCommand(projectRoot, request, operationId);
+    if (request.command === "prepare_studio_imagegen_call") {
+      try {
+        return await withActiveProjectActivationFence(async () => {
+          await assertActiveManagedStudioContextToken(projectRoot, request.payload.projectContextToken);
+          return executeStudio();
+        });
+      } catch (error) {
+        if (error instanceof ActiveManagedStudioContextError) {
+          throw new RejectedCommandFailure(error.message, {
+            schemaVersion: 1,
+            applied: false,
+            entityType: "studio_generation_call",
+            reason: "project_context_conflict",
+            code: error.code,
+            packId: request.payload.packId,
+            expectedRevision: request.payload.expectedRevision,
+          });
+        }
+        throw error;
+      }
+    }
+    if (request.command === "authorize_studio_higgsfield_connector_request") {
+      try {
+        return await withActiveProjectActivationFence(async () => {
+          await assertActiveManagedStudioContextToken(projectRoot, request.payload.projectContextToken);
+          return executeStudio();
+        });
+      } catch (error) {
+        if (error instanceof ActiveManagedStudioContextError) {
+          throw new RejectedCommandFailure(error.message, {
+            schemaVersion: 1,
+            applied: false,
+            entityType: "studio_higgsfield_connector_request",
+            reason: "project_context_conflict",
+            code: error.code,
+            requestId: request.payload.requestId,
+            expectedRevision: request.payload.expectedRevision,
+          });
+        }
+        throw error;
+      }
+    }
+    if (request.command === "prepare_studio_higgsfield_video_generation") {
+      try {
+        return await withActiveProjectActivationFence(async () => {
+          await assertActiveManagedStudioContextToken(projectRoot, request.payload.projectContextToken);
+          return executeStudio();
+        });
+      } catch (error) {
+        if (error instanceof ActiveManagedStudioContextError) {
+          throw new RejectedCommandFailure(error.message, {
+            schemaVersion: 1,
+            applied: false,
+            entityType: "studio_higgsfield_video_generation",
+            reason: "project_context_conflict",
+            code: error.code,
+            intentId: request.payload.intentId,
+          });
+        }
+        throw error;
+      }
+    }
+    return executeStudio();
   }
-}
-
-function rejectStudioGenerationPrecondition(
-  error: unknown,
-  entityType: StudioGenerationCommandEntity,
-  context: { unitId?: string; panelId?: string; packId?: string; expectedRevision?: number },
-): never {
-  if (isRejectedCommandFailure(error)) throw error;
-  if (!(error instanceof StudioGenerationFreezeError) && !(error instanceof StudioGenerationLedgerError)) throw error;
-  const code = error.code;
-  const storageFailure = code === "storage-invalid"
-    || code === "pack-cas-drift"
-    || code === "result-media-drift"
-    || code === "media-drift";
-  const reason = storageFailure
-    ? undefined
-    : error instanceof StudioGenerationResultConflictError
-      ? "result_conflict"
-      : code === "unit-not-found" || code === "panel-not-found" || code === "pack-not-found"
-        ? "not_found"
-        : code.includes("conflict") || code.includes("drift")
-          ? "revision_conflict"
-          : "validation_failed";
-  // 存储或实测 SHA 损坏的提交结果不能被误记为安全的写前拒绝。
-  if (!reason) throw error;
-  rejectStudioGenerationCommand({
-    entityType,
-    reason,
-    code,
-    message: error.message,
-    ...context,
-  });
-}
-
-function rejectStudioAgentImagegenBundlePrecondition(
-  error: unknown,
-  context: { packId: string; expectedRevision: number },
-): never {
-  if (isRejectedCommandFailure(error)) throw error;
-  if (error instanceof StudioGenerationFreezeError || error instanceof StudioGenerationLedgerError) {
-    rejectStudioGenerationPrecondition(error, "studio_generation_result_bundle", context);
-  }
-  if (error instanceof ActiveManagedStudioContextError) {
-    rejectStudioGenerationCommand({
-      entityType: "studio_generation_result_bundle",
-      reason: "project_context_conflict",
-      code: error.code,
-      message: error.message,
-      ...context,
-    });
-  }
-  if (error instanceof StudioAgentImagegenBundleError) {
-    const conflict = error.code === "pack-conflict"
-      || error.code === "provider-mismatch"
-      || error.code === "result-conflict"
-      || error.code === "receipt-drift"
-      || error.code === "labeled-conflict";
-    rejectStudioGenerationCommand({
-      entityType: "studio_generation_result_bundle",
-      reason: conflict ? "revision_conflict" : "validation_failed",
-      code: error.code,
-      message: error.message,
-      ...context,
-    });
-  }
-  // labeled 在 CAS/media/ledger 任一写入前先以内存渲染；其校验、解码或渲染错误
-  // 均是已确认的写前失败，不能锁成 OUTCOME_UNKNOWN。
-  if (error instanceof StudioLabeledLayoutError) {
-    rejectStudioGenerationCommand({
-      entityType: "studio_generation_result_bundle",
-      reason: "validation_failed",
-      code: `labeled-${error.code}`,
-      message: error.message,
-      ...context,
-    });
-  }
-  throw error;
-}
-
-function rejectP30OrchestrationCommand(input: {
-  entityType: "dudu_readonly_import" | "studio_video_package";
-  reason: "invalid_revision" | "revision_conflict" | "control_conflict" | "validation_failed";
-  message: string;
-  expectedRevision?: number;
-  currentRevision?: number;
-  expectedFingerprint?: string;
-  currentFingerprint?: string;
-}): never {
-  throw new RejectedCommandFailure(input.message, {
-    schemaVersion: 1,
-    applied: false,
-    ...input,
-  });
-}
-
-async function execute(projectRoot: string, request: CommandRequest, options: Pick<PersistedScanOptions, "signal" | "onProgress"> = {}): Promise<unknown> {
   switch (request.command) {
     case "scan_project": return summarizeForMcp(await scanAndPersist(projectRoot, options));
     case "stage_dudu_readonly_managed_project": {
@@ -2713,761 +2801,6 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
         }
         throw error;
       }
-    }
-    case "initialize_material_studio": {
-      await inspectManagedProject(projectRoot);
-      return initializeMaterialStudio(projectRoot);
-    }
-    case "import_studio_media": {
-      await inspectManagedProject(projectRoot);
-      const media = await importStudioMedia(projectRoot, request.payload);
-      return {
-        sha256: media.sha256,
-        kind: media.kind,
-        sizeBytes: media.sizeBytes,
-        mimeType: media.mimeType,
-        sourceBasename: media.sourceBasename,
-        derivativeStatus: media.derivativeStatus,
-        thumbnail: media.thumbnail ? {
-          recipe: media.thumbnail.recipe,
-          recipeKey: media.thumbnail.recipeKey,
-          width: media.thumbnail.width,
-          height: media.thumbnail.height,
-          format: media.thumbnail.format,
-        } : undefined,
-        createdAt: media.createdAt,
-      };
-    }
-    case "attach_studio_multimedia_timeline_media": {
-      await inspectManagedProject(projectRoot);
-      const deterministicRejection = deterministicStudioTimelineRejection(request);
-      if (deterministicRejection) {
-        throw new RejectedCommandFailure(deterministicRejection, {
-          code: "INVALID_STORYBOARD_TIMELINE_BINDING",
-          committed: false,
-        });
-      }
-      try {
-        return await attachStudioMultimediaTimelineMedia(projectRoot, {
-          ...request.payload,
-          operationId: commandRequestHash(projectRoot, request),
-        });
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        if (/^(?:媒体时码越出(?:单元范围| panel \d+ 的范围)|storyboard 绑定必须显式提供 panelIndex)/u.test(message)) {
-          throw new RejectedCommandFailure(message, {
-            code: "INVALID_STUDIO_TIMELINE_RANGE",
-            committed: false,
-          });
-        }
-        throw error;
-      }
-    }
-    case "create_studio_asset": {
-      await inspectManagedProject(projectRoot);
-      return createStudioCanonicalAsset(projectRoot, request.payload);
-    }
-    case "update_studio_asset": {
-      await inspectManagedProject(projectRoot);
-      return updateStudioCanonicalAsset(projectRoot, request.payload);
-    }
-    case "append_studio_asset_relation": {
-      await inspectManagedProject(projectRoot);
-      return appendStudioAssetRelation(projectRoot, request.payload);
-    }
-    case "append_studio_asset_version": {
-      await inspectManagedProject(projectRoot);
-      return appendStudioAssetVersion(projectRoot, request.payload);
-    }
-    case "review_studio_asset_version": {
-      await inspectManagedProject(projectRoot);
-      return reviewStudioAssetVersion(projectRoot, request.payload);
-    }
-    case "set_studio_primary_authority": {
-      await inspectManagedProject(projectRoot);
-      return setStudioPrimaryAuthority(projectRoot, request.payload);
-    }
-    case "export_studio_cross_project_asset_package": {
-      await inspectManagedProject(projectRoot);
-      return exportStudioCrossProjectAssetPackage(projectRoot, request.payload);
-    }
-    case "import_studio_cross_project_asset_package": {
-      await inspectManagedProject(projectRoot);
-      return importStudioCrossProjectAssetPackage(projectRoot, request.payload);
-    }
-    case "reuse_studio_global_resource": {
-      await inspectManagedProject(projectRoot);
-      return reuseStudioGlobalResource(projectRoot, request.payload, {
-        commandRequestHash: commandRequestHash(projectRoot, request),
-      });
-    }
-    case "initialize_studio_production": {
-      await inspectManagedProject(projectRoot);
-      return initializeStudioProduction(projectRoot);
-    }
-    case "create_studio_script_document": {
-      await inspectManagedProject(projectRoot);
-      return createStudioScriptDocument(projectRoot, request.payload);
-    }
-    case "create_studio_prompt_document": {
-      await inspectManagedProject(projectRoot);
-      return createStudioPromptDocument(projectRoot, request.payload);
-    }
-    case "append_studio_script_revision": {
-      await inspectManagedProject(projectRoot);
-      return appendStudioScriptRevision(projectRoot, request.payload);
-    }
-    case "append_studio_script_section_revision": {
-      await inspectManagedProject(projectRoot);
-      try {
-        return await appendStudioScriptSectionRevision(projectRoot, request.payload);
-      } catch (error) {
-        rejectStudioScriptSectionConflict(error);
-      }
-    }
-    case "append_studio_prompt_revision": {
-      await inspectManagedProject(projectRoot);
-      return appendStudioPromptRevision(projectRoot, request.payload);
-    }
-    case "create_studio_production_unit": {
-      await inspectManagedProject(projectRoot);
-      return createStudioProductionUnit(projectRoot, request.payload);
-    }
-    case "revise_studio_production_unit": {
-      await inspectManagedProject(projectRoot);
-      try {
-        return await reviseStudioProductionUnit(projectRoot, request.payload);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        if (error instanceof StudioProductionConflictError
-          || /生产单元宫格总时长必须严格等于声明时长|宫格时间.+(?:空洞|重叠)|起止时间与时长不一致|durationSeconds 必须大于 0|宫格 id 重复|重复提及资产|禁止携带 sourceSpans|必须提供至少一条非空 sourceSpans|extension (?:不得作为首格|仅允许作为单元末尾)/u.test(message)) {
-          throw new RejectedCommandFailure(message, {
-            schemaVersion: 1,
-            applied: false,
-            entityType: "studio_production_unit",
-            reason: error instanceof StudioProductionConflictError ? "revision_conflict" : "validation_failed",
-            unitId: request.payload.unitId,
-            expectedRevision: request.payload.expectedRevision,
-            ...(error instanceof StudioProductionConflictError
-              ? { currentRevision: error.actualRevision }
-              : {}),
-          });
-        }
-        throw error;
-      }
-    }
-    case "materialize_local_creative_production_units": {
-      await inspectManagedProject(projectRoot);
-      return materializeLocalCreativeProductionUnits(projectRoot, {
-        ...request.payload,
-        idempotencyKey: commandRequestHash(projectRoot, request),
-      });
-    }
-    case "analyze_studio_script_entities": {
-      await inspectManagedProject(projectRoot);
-      try {
-        return await analyzeStudioScriptEntities(projectRoot, request.payload, {
-          requestHash: commandRequestHash(projectRoot, request),
-          reviewer: "codex",
-        });
-      } catch (error) {
-        rejectStudioBindingPrecondition(error, request.payload);
-      }
-    }
-    case "resolve_studio_entity_proposal": {
-      await inspectManagedProject(projectRoot);
-      try {
-        return await resolveStudioEntityProposal(projectRoot, request.payload, {
-          requestHash: commandRequestHash(projectRoot, request),
-          reviewer: request.payload.reviewer,
-        });
-      } catch (error) {
-        rejectStudioBindingPrecondition(error, request.payload);
-      }
-    }
-    case "confirm_studio_panel_empty": {
-      await inspectManagedProject(projectRoot);
-      try {
-        return await confirmStudioPanelEmptyFromControl(projectRoot, request.payload, {
-          requestHash: commandRequestHash(projectRoot, request),
-          reviewer: request.payload.reviewer,
-        });
-      } catch (error) {
-        rejectStudioBindingPrecondition(error, request.payload);
-      }
-    }
-    case "freeze_studio_asset_binding_set": {
-      await inspectManagedProject(projectRoot);
-      try {
-        return await freezeStudioAssetBindingSetFromControl(projectRoot, request.payload, {
-          requestHash: commandRequestHash(projectRoot, request),
-          reviewer: "codex",
-        });
-      } catch (error) {
-        rejectStudioBindingPrecondition(error, request.payload);
-      }
-    }
-    case "freeze_studio_generation_pack": {
-      await inspectManagedProject(projectRoot);
-      const { expectedRevision, ...query } = request.payload;
-      assertStudioGenerationExpectedRevision("studio_generation_pack", expectedRevision, query);
-      if (isStudioUnitGridGenerationQuery(query)) {
-        await assertStudioGenerationUnitRevision({
-          projectRoot,
-          entityType: "studio_generation_pack",
-          unitId: query.unitId,
-          expectedRevision,
-        });
-        try {
-          return await freezeAndPersistStudioUnitGridGenerationPack(projectRoot, query);
-        } catch (error) {
-          rejectStudioGenerationPrecondition(error, "studio_generation_pack", {
-            unitId: query.unitId,
-            expectedRevision,
-          });
-        }
-      }
-      await assertStudioGenerationUnitRevision({
-        projectRoot,
-        entityType: "studio_generation_pack",
-        unitId: query.unitId,
-        panelId: query.panelId,
-        expectedRevision,
-      });
-      try {
-        // pack.target.unitRevision 锚定目标宫格 BindingSet 的历史修订；同单元其他宫格
-        // 的无关修订不会改变该目标身份，因此不能把两者强行等同。
-        // pack 是 Codex 本地生成所需的显式冻结数据；账本数据库和 pack CAS 路径不进入命令结果。
-        return await freezeAndPersistStudioGenerationPack(projectRoot, query);
-      } catch (error) {
-        rejectStudioGenerationPrecondition(error, "studio_generation_pack", {
-          unitId: query.unitId,
-          panelId: query.panelId,
-          expectedRevision,
-        });
-      }
-    }
-    case "dispatch_studio_generation_pack": {
-      await inspectManagedProject(projectRoot);
-      const { expectedRevision, ...dispatch } = request.payload;
-      assertStudioGenerationExpectedRevision("studio_generation_dispatch", expectedRevision, { packId: dispatch.packId });
-      try {
-        const pack = await readAnyStudioGenerationFrozenPack(projectRoot, dispatch.packId);
-        if (!pack) {
-          rejectStudioGenerationCommand({
-            entityType: "studio_generation_dispatch",
-            reason: "not_found",
-            message: `持久冻结包不存在：${dispatch.packId}`,
-            packId: dispatch.packId,
-            expectedRevision,
-          });
-        }
-        if (pack.fingerprint !== dispatch.packFingerprint) {
-          const panelId = pack.schemaVersion === 5 ? undefined : pack.target.panelId;
-          rejectStudioGenerationCommand({
-            entityType: "studio_generation_dispatch",
-            reason: "revision_conflict",
-            code: "pack-index-conflict",
-            message: `packId ${dispatch.packId} 与 packFingerprint 不匹配。`,
-            unitId: pack.target.unitId,
-            ...(panelId ? { panelId } : {}),
-            packId: dispatch.packId,
-            expectedRevision,
-            currentRevision: pack.target.unitRevision,
-          });
-        }
-        if (pack.target.unitRevision !== expectedRevision) {
-          const panelId = pack.schemaVersion === 5 ? undefined : pack.target.panelId;
-          rejectStudioGenerationCommand({
-            entityType: "studio_generation_dispatch",
-            reason: "revision_conflict",
-            code: "pack-drift",
-            message: `冻结包 ${dispatch.packId} 属于 unit revision ${pack.target.unitRevision}，与 expectedRevision ${expectedRevision} 不一致。`,
-            unitId: pack.target.unitId,
-            ...(panelId ? { panelId } : {}),
-            packId: dispatch.packId,
-            expectedRevision,
-            currentRevision: pack.target.unitRevision,
-          });
-        }
-        return await dispatchStudioGenerationPack(projectRoot, dispatch);
-      } catch (error) {
-        rejectStudioGenerationPrecondition(error, "studio_generation_dispatch", {
-          packId: dispatch.packId,
-          expectedRevision,
-        });
-      }
-    }
-    case "prepare_studio_imagegen_call": {
-      await inspectManagedProject(projectRoot);
-      try {
-        // pre-call 是唯一模型调用授权闸。与活动工程切换共享跨工程 fence，确保
-        // token 首检、异步门禁、quarantine 准备和 call intent 落盘属于同一 activation。
-        return await withActiveProjectActivationFence(async () => {
-          await assertActiveManagedStudioContextToken(projectRoot, request.payload.projectContextToken);
-          return prepareStudioImagegenCall(projectRoot, {
-            ...request.payload,
-            commandRequestId: commandRequestHash(projectRoot, request),
-          });
-        });
-      } catch (error) {
-        if (error instanceof ActiveManagedStudioContextError) {
-          rejectStudioGenerationCommand({
-            entityType: "studio_generation_call",
-            reason: "project_context_conflict",
-            code: error.code,
-            message: error.message,
-            packId: request.payload.packId,
-            expectedRevision: request.payload.expectedRevision,
-          });
-        }
-        rejectStudioGenerationPrecondition(error, "studio_generation_call", {
-          packId: request.payload.packId,
-          expectedRevision: request.payload.expectedRevision,
-        });
-      }
-    }
-    case "authorize_studio_unit_grid_continuation_waiver": {
-      await inspectManagedProject(projectRoot);
-      try {
-        return await authorizeStudioUnitGridContinuationWaiver(projectRoot, request.payload);
-      } catch (error) {
-        if (error instanceof ActiveManagedStudioContextError) {
-          rejectStudioGenerationCommand({
-            entityType: "studio_generation_pack",
-            reason: "project_context_conflict",
-            code: error.code,
-            message: error.message,
-            unitId: request.payload.unitId,
-            expectedRevision: request.payload.expectedUnitRevision,
-          });
-        }
-        rejectStudioGenerationPrecondition(error, "studio_generation_pack", {
-          unitId: request.payload.unitId,
-          expectedRevision: request.payload.expectedUnitRevision,
-        });
-      }
-    }
-    case "reconcile_studio_imagegen_call": {
-      await inspectManagedProject(projectRoot);
-      if (request.payload.expectedRevision !== 0) {
-        rejectStudioGenerationCommand({
-          entityType: "studio_generation_call",
-          reason: "invalid_revision",
-          message: "Studio imagegen call reconcile expectedRevision 必须为 0。",
-          expectedRevision: request.payload.expectedRevision,
-        });
-      }
-      const { expectedRevision: _expectedRevision, ...reconciliation } = request.payload;
-      try {
-        await assertActiveManagedStudioContextToken(projectRoot, request.payload.projectContextToken);
-        return await reconcileStudioImagegenCall(projectRoot, reconciliation);
-      } catch (error) {
-        if (error instanceof ActiveManagedStudioContextError) {
-          rejectStudioGenerationCommand({
-            entityType: "studio_generation_call",
-            reason: "project_context_conflict",
-            code: error.code,
-            message: error.message,
-            expectedRevision: request.payload.expectedRevision,
-          });
-        }
-        rejectStudioGenerationPrecondition(error, "studio_generation_call", {});
-      }
-    }
-    case "abandon_studio_generation_unknown": {
-      await inspectManagedProject(projectRoot);
-      if (request.payload.expectedRevision !== 0) {
-        rejectStudioGenerationCommand({
-          entityType: "studio_generation_call",
-          reason: "invalid_revision",
-          message: "Studio generation_unknown owner abandon expectedRevision 必须为 0。",
-          expectedRevision: request.payload.expectedRevision,
-        });
-      }
-      const { expectedRevision: _expectedRevision, ...abandonment } = request.payload;
-      try {
-        await assertActiveManagedStudioContextToken(projectRoot, request.payload.projectContextToken);
-        return await abandonStudioGenerationUnknown(projectRoot, abandonment);
-      } catch (error) {
-        if (error instanceof ActiveManagedStudioContextError) {
-          rejectStudioGenerationCommand({
-            entityType: "studio_generation_call",
-            reason: "project_context_conflict",
-            code: error.code,
-            message: error.message,
-            expectedRevision: request.payload.expectedRevision,
-          });
-        }
-        rejectStudioGenerationPrecondition(error, "studio_generation_call", {
-          expectedRevision: request.payload.expectedRevision,
-        });
-      }
-    }
-    case "abandon_studio_detached_generation_unknown": {
-      await inspectManagedProject(projectRoot);
-      if (request.payload.expectedRevision !== 0) {
-        rejectStudioGenerationCommand({
-          entityType: "studio_generation_call",
-          reason: "invalid_revision",
-          message: "Studio detached generation_unknown owner abandon expectedRevision 必须为 0。",
-          expectedRevision: request.payload.expectedRevision,
-        });
-      }
-      const { expectedRevision: _expectedRevision, ...abandonment } = request.payload;
-      try {
-        const activeContext = await assertActiveManagedStudioContextToken(
-          projectRoot,
-          request.payload.projectContextToken,
-        );
-        return await abandonStudioDetachedGenerationUnknown(projectRoot, {
-          ...abandonment,
-          activeContext: {
-            projectId: activeContext.projectId,
-            manifestFingerprint: activeContext.manifestFingerprint,
-            buildId: activeContext.build.buildId,
-            sourceDigest: activeContext.build.sourceDigest,
-          },
-        });
-      } catch (error) {
-        if (error instanceof ActiveManagedStudioContextError) {
-          rejectStudioGenerationCommand({
-            entityType: "studio_generation_call",
-            reason: "project_context_conflict",
-            code: error.code,
-            message: error.message,
-            expectedRevision: request.payload.expectedRevision,
-          });
-        }
-        rejectStudioGenerationPrecondition(error, "studio_generation_call", {
-          expectedRevision: request.payload.expectedRevision,
-        });
-      }
-    }
-    case "rebind_studio_imagegen_call_context": {
-      await inspectManagedProject(projectRoot);
-      if (request.payload.expectedRevision !== 0) {
-        rejectStudioGenerationCommand({
-          entityType: "studio_generation_call",
-          reason: "invalid_revision",
-          message: "Studio imagegen context rebind expectedRevision 必须为 0。",
-          expectedRevision: request.payload.expectedRevision,
-        });
-      }
-      const { expectedRevision: _expectedRevision, ...rebind } = request.payload;
-      try {
-        await assertActiveManagedStudioContextToken(projectRoot, request.payload.projectContextToken);
-        return await rebindStudioImagegenCallContext(projectRoot, rebind);
-      } catch (error) {
-        if (error instanceof ActiveManagedStudioContextError) {
-          rejectStudioGenerationCommand({
-            entityType: "studio_generation_call",
-            reason: "project_context_conflict",
-            code: error.code,
-            message: error.message,
-            expectedRevision: request.payload.expectedRevision,
-          });
-        }
-        rejectStudioGenerationPrecondition(error, "studio_generation_call", {
-          expectedRevision: request.payload.expectedRevision,
-        });
-      }
-    }
-    case "register_studio_generation_result": {
-      await inspectManagedProject(projectRoot);
-      const { expectedRevision, ...registration } = request.payload;
-      assertStudioGenerationExpectedRevision("studio_generation_result", expectedRevision, { packId: registration.packId });
-      try {
-        const pack = await readPersistedStudioGenerationPack(projectRoot, registration.packId);
-        if (!pack) {
-          rejectStudioGenerationCommand({
-            entityType: "studio_generation_result",
-            reason: "not_found",
-            message: `持久冻结包不存在：${registration.packId}`,
-            packId: registration.packId,
-            expectedRevision,
-          });
-        }
-        if (pack.fingerprint !== registration.packFingerprint) {
-          rejectStudioGenerationCommand({
-            entityType: "studio_generation_result",
-            reason: "revision_conflict",
-            code: "pack-index-conflict",
-            message: `packId ${registration.packId} 与 packFingerprint 不匹配。`,
-            unitId: pack.target.unitId,
-            panelId: pack.target.panelId,
-            packId: registration.packId,
-            expectedRevision,
-            currentRevision: pack.target.unitRevision,
-          });
-        }
-        if (pack.target.unitRevision !== expectedRevision) {
-          rejectStudioGenerationCommand({
-            entityType: "studio_generation_result",
-            reason: "revision_conflict",
-            code: "pack-drift",
-            message: `冻结包 ${registration.packId} 属于 unit revision ${pack.target.unitRevision}，与 expectedRevision ${expectedRevision} 不一致。`,
-            unitId: pack.target.unitId,
-            panelId: pack.target.panelId,
-            packId: registration.packId,
-            expectedRevision,
-            currentRevision: pack.target.unitRevision,
-          });
-        }
-        return await registerStudioGenerationResult(projectRoot, registration);
-      } catch (error) {
-        rejectStudioGenerationPrecondition(error, "studio_generation_result", {
-          packId: registration.packId,
-          expectedRevision,
-        });
-      }
-    }
-    case "commit_agent_imagegen_result_bundle": {
-      await inspectManagedProject(projectRoot);
-      const { packId, expectedRevision } = request.payload;
-      assertStudioGenerationExpectedRevision(
-        "studio_generation_result_bundle",
-        expectedRevision,
-        { packId },
-      );
-      try {
-        return await commitAgentImagegenResultBundle(projectRoot, request.payload);
-      } catch (error) {
-        rejectStudioAgentImagegenBundlePrecondition(error, { packId, expectedRevision });
-      }
-    }
-    case "create_studio_generation_plan": {
-      await inspectManagedProject(projectRoot);
-      try {
-        return await createStudioGenerationPlan(projectRoot, {
-          nodes: request.payload.nodes,
-          sourceCommandRequestId: commandRequestHash(projectRoot, request),
-        });
-      } catch (error) {
-        rejectStudioGenerationPrecondition(error, "studio_generation_plan", {});
-      }
-    }
-    case "fail_studio_generation_run": {
-      await inspectManagedProject(projectRoot);
-      try {
-        return await failStudioGenerationRun(projectRoot, request.payload);
-      } catch (error) {
-        rejectStudioGenerationPrecondition(error, "studio_generation_run", {});
-      }
-    }
-    case "cancel_studio_generation_run": {
-      await inspectManagedProject(projectRoot);
-      try {
-        return await cancelStudioGenerationRun(projectRoot, request.payload);
-      } catch (error) {
-        rejectStudioGenerationPrecondition(error, "studio_generation_run", {});
-      }
-    }
-    case "retry_studio_generation_plan_nodes": {
-      await inspectManagedProject(projectRoot);
-      try {
-        return await retryStudioGenerationPlanNodes(projectRoot, request.payload);
-      } catch (error) {
-        rejectStudioGenerationPrecondition(error, "studio_generation_plan", {});
-      }
-    }
-    case "append_studio_continuity_observation": {
-      await inspectManagedProject(projectRoot);
-      return appendStudioContinuityObservation(projectRoot, {
-        ...request.payload,
-        operationId: commandRequestHash(projectRoot, request),
-      });
-    }
-    case "append_studio_continuity_correction": {
-      await inspectManagedProject(projectRoot);
-      return appendStudioContinuityCorrection(projectRoot, {
-        ...request.payload,
-        operationId: commandRequestHash(projectRoot, request),
-      });
-    }
-    case "submit_studio_generation_review": {
-      await inspectManagedProject(projectRoot);
-      return submitStudioGenerationReview(projectRoot, {
-        ...request.payload,
-        operationId: commandRequestHash(projectRoot, request),
-      });
-    }
-    case "submit_studio_post_result_observation": {
-      await inspectManagedProject(projectRoot);
-      return submitStudioPostResultObservation(projectRoot, {
-        ...request.payload,
-        operationId: commandRequestHash(projectRoot, request),
-      });
-    }
-    case "refresh_studio_generation_checkpoint": {
-      await inspectManagedProject(projectRoot);
-      return refreshStudioGenerationCheckpoint(projectRoot, {
-        ...request.payload,
-        operationId: commandRequestHash(projectRoot, request),
-      });
-    }
-    case "attest_studio_generation_checkpoint": {
-      await inspectManagedProject(projectRoot);
-      return attestStudioGenerationCheckpoint(projectRoot, {
-        ...request.payload,
-        operationId: commandRequestHash(projectRoot, request),
-      });
-    }
-    case "finalize_dudu_readonly_managed_project": {
-      await inspectManagedProject(projectRoot);
-      const discovery = await discoverDuduReadonlyImportProjects(path.dirname(projectRoot));
-      if (discovery.fingerprint !== request.payload.expectedDiscoveryFingerprint
-        || discovery.status !== "single"
-        || discovery.candidates.length !== 1
-        || discovery.candidates[0]!.projectRoot !== path.resolve(projectRoot)) {
-        rejectP30OrchestrationCommand({
-          entityType: "dudu_readonly_import",
-          reason: "control_conflict",
-          message: "Dudu finalize discovery 已变化或存在多候选，禁止选择第一个。",
-          expectedFingerprint: request.payload.expectedDiscoveryFingerprint,
-          currentFingerprint: discovery.fingerprint,
-        });
-      }
-      const control = await getDuduReadonlyImportControl(projectRoot);
-      if (request.payload.expectedRevision !== 0) {
-        rejectP30OrchestrationCommand({
-          entityType: "dudu_readonly_import",
-          reason: "invalid_revision",
-          message: "Dudu finalize expectedRevision 必须为 0。",
-          expectedRevision: request.payload.expectedRevision,
-        });
-      }
-      if (control.fingerprint !== request.payload.expectedControlFingerprint
-        || control.identity.importReceiptFingerprint !== request.payload.expectedImportFingerprint) {
-        rejectP30OrchestrationCommand({
-          entityType: "dudu_readonly_import",
-          reason: "control_conflict",
-          message: "Dudu finalize control/import 身份已变化，请重新读取只读控制面。",
-          expectedFingerprint: request.payload.expectedControlFingerprint,
-          currentFingerprint: control.fingerprint,
-        });
-      }
-      return finalizeDuduReadonlyManagedProject(projectRoot, request.payload.source, {
-        commandRequestHash: commandRequestHash(projectRoot, request),
-      });
-    }
-    case "reconcile_dudu_readonly_historical_passes": {
-      await inspectManagedProject(projectRoot);
-      const control = await getDuduReadonlyImportControl(projectRoot);
-      if (request.payload.expectedRevision !== 0 || control.status !== "active"
-        || control.fingerprint !== request.payload.expectedControlFingerprint) {
-        rejectP30OrchestrationCommand({
-          entityType: "dudu_readonly_import",
-          reason: "control_conflict",
-          message: "Dudu 历史 PASS 回填控制面已变化或并非 active，禁止写入。",
-          expectedFingerprint: request.payload.expectedControlFingerprint,
-          currentFingerprint: control.fingerprint,
-        });
-      }
-      return reconcileDuduReadonlyHistoricalPasses(projectRoot, request.payload.source);
-    }
-    case "prepare_studio_video_package_export": {
-      await inspectManagedProject(projectRoot);
-      const control = await getStudioVideoPackageControl(projectRoot, {
-        by: "authority-latest",
-        authority: request.payload.authority,
-      });
-      if (control.fingerprint !== request.payload.expectedControlFingerprint) {
-        rejectP30OrchestrationCommand({
-          entityType: "studio_video_package",
-          reason: "control_conflict",
-          message: "视频包 authority 控制面已变化，请重新读取后再 prepare。",
-          expectedFingerprint: request.payload.expectedControlFingerprint,
-          currentFingerprint: control.fingerprint,
-        });
-      }
-      if (control.status === "conflict" || control.nextAction === "resolve-video-package-ledger-conflict") {
-        rejectP30OrchestrationCommand({
-          entityType: "studio_video_package",
-          reason: "control_conflict",
-          message: "视频包 authority 存在目的地或换代链冲突，禁止 prepare 并选择任一候选。",
-          expectedFingerprint: request.payload.expectedControlFingerprint,
-          currentFingerprint: control.fingerprint,
-        });
-      }
-      try {
-        return await prepareStudioVideoPackageExport(projectRoot, {
-          operationId: commandRequestHash(projectRoot, request),
-          authority: request.payload.authority,
-          expectedRevision: request.payload.expectedRevision,
-          ...(request.payload.expectedManagedSource
-            ? { expectedManagedSource: request.payload.expectedManagedSource }
-            : {}),
-        });
-      } catch (error) {
-        if (error instanceof StudioVideoPackageError) {
-          rejectP30OrchestrationCommand({
-            entityType: "studio_video_package",
-            reason: error.code === "operation-conflict" ? "revision_conflict" : "validation_failed",
-            message: error.message,
-            expectedRevision: request.payload.expectedRevision,
-          });
-        }
-        throw error;
-      }
-    }
-    case "build_studio_video_package": {
-      await inspectManagedProject(projectRoot);
-      const intentLookup = await getStudioVideoPackageControl(projectRoot, {
-        by: "intent",
-        intentId: request.payload.intentId,
-      });
-      if (intentLookup.fingerprint !== request.payload.expectedIntentControlFingerprint) {
-        rejectP30OrchestrationCommand({
-          entityType: "studio_video_package",
-          reason: "control_conflict",
-          message: "视频包 intent 控制面已变化，请重新读取后再 build。",
-          expectedFingerprint: request.payload.expectedIntentControlFingerprint,
-          currentFingerprint: intentLookup.fingerprint,
-        });
-      }
-      const intent = intentLookup.control?.intent;
-      if (!intent || intent.intentId !== request.payload.intentId) {
-        rejectP30OrchestrationCommand({
-          entityType: "studio_video_package",
-          reason: "control_conflict",
-          message: "视频包 intent 控制面未解析到唯一 intent。",
-        });
-      }
-      if (intent.unitRevision !== request.payload.expectedRevision) {
-        rejectP30OrchestrationCommand({
-          entityType: "studio_video_package",
-          reason: "revision_conflict",
-          message: "视频包 intent unit revision 已变化，请刷新后再 build。",
-          expectedRevision: request.payload.expectedRevision,
-          currentRevision: intent.unitRevision,
-        });
-      }
-      const authority: StudioVideoPackageAuthorityInput = intent.authorityKind === "historical-import"
-        ? { kind: "historical-import", packId: intent.packId }
-        : { kind: "studio-review", reviewId: intent.authorityId };
-      const authorityLookup = await getStudioVideoPackageControl(projectRoot, {
-        by: "authority-latest",
-        authority,
-      });
-      if (authorityLookup.fingerprint !== request.payload.expectedAuthorityControlFingerprint
-        || authorityLookup.status !== "resolved"
-        || authorityLookup.selectedIntentId !== intent.intentId
-        || authorityLookup.selectedIsDestinationHead !== true
-        || authorityLookup.control?.intent.intentId !== intent.intentId) {
-        rejectP30OrchestrationCommand({
-          entityType: "studio_video_package",
-          reason: "control_conflict",
-          message: "视频包 intent 已不是 authority-latest/destination head，拒绝 build。",
-          expectedFingerprint: request.payload.expectedAuthorityControlFingerprint,
-          currentFingerprint: authorityLookup.fingerprint,
-        });
-      }
-      return buildAndVerifyStudioVideoPackage(projectRoot, request.payload.intentId, {
-        expectedRevision: request.payload.expectedRevision,
-        destinationPolicy: request.payload.destinationPolicy,
-        commandRequestHash: commandRequestHash(projectRoot, request),
-      });
     }
     case "materialize_fusion_project": {
       const { targetParent, authorities, ...inspectionOptions } = request.payload;
@@ -3748,6 +3081,8 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
     case "execute_novel_analysis_task": return executeNovelAnalysisTask(projectRoot, request.payload);
     case "execute_next_novel_analysis_run_task": return executeNextNovelAnalysisRunTask(projectRoot, request.payload);
     case "replace_novel_analysis_run_task": return replaceNovelAnalysisRunTask(projectRoot, request.payload);
+    case "mark_novel_analysis_execution_reconciliation_required": return markNovelAnalysisExecutionReconciliationRequired(projectRoot, request.payload);
+    case "reconcile_novel_analysis_execution": return reconcileNovelAnalysisExecution(projectRoot, request.payload);
     case "upsert_novel_fact": return upsertNovelFact(projectRoot, request.payload);
     case "upsert_narrative_beat": return upsertNarrativeBeat(projectRoot, request.payload);
     case "export_adaptation": return exportAdaptation(projectRoot, request.payload);
@@ -3787,15 +3122,188 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
 // 记录某 command+idempotencyKey 已注入的 busy 次数，键隔离避免跨用例串扰。
 const testBusyExecuteAttempts = new Map<string, number>();
 
-export async function executeIdempotentCommand(projectRoot: string, input: IdempotentCommandInput, options: {
+/** 小说外部导入的命令账本 owner 固定在应用 registry 目录，与业务 projectsRoot 分离。 */
+export function getNovelImportCommandOwnerRoot(): string {
+  return path.join(path.dirname(getProjectRegistryPath()), "novel-import-command");
+}
+
+function sameOrDescendant(candidate: string, ancestor: string): boolean {
+  const relative = path.relative(ancestor, candidate);
+  return relative === ""
+    || (relative !== ".." && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative));
+}
+
+function assertNovelImportOwnerAndProjectsDisjoint(ownerRoot: string, projectsRoot: string): void {
+  if (sameOrDescendant(ownerRoot, projectsRoot) || sameOrDescendant(projectsRoot, ownerRoot)) {
+    throw new Error("小说导入 command owner 与业务 projectsRoot 必须完全分离。");
+  }
+}
+
+async function assertCanonicalNovelImportOwnerParent(ownerRoot: string): Promise<void> {
+  const parent = path.dirname(ownerRoot);
+  const metadata = await lstat(parent);
+  if (!metadata.isDirectory() || metadata.isSymbolicLink() || await realpath(parent) !== parent) {
+    throw new Error("小说导入 command owner 父目录必须是无符号链接的规范真实目录。");
+  }
+}
+
+function matchesNovelImportReplayRecord(
+  record: IdempotentCommandResult,
+  requestHash: string,
+): boolean {
+  return record.command === "novel_import_external_snapshot" && record.requestHash === requestHash;
+}
+
+function allowsNovelImportTokenlessReplay(record: IdempotentCommandResult): boolean {
+  if (record.status === "succeeded" || record.status === "unknown" || record.status === "running") return true;
+  return record.status === "failed" && record.execution?.phase === "side_effect_committed";
+}
+
+/**
+ * 必须在 owner mkdir、isManagedProject、lock 和 ledger 写入之前完成。有 capability
+ * 时绑定服务端冻结预检并验证所有双向重叠；无 capability 时只读已有
+ * app-owner 账本，不允许首次调用创建任何文件。
+ */
+async function authorizeNovelImportCommandBeforeLedger(input: {
+  root: string;
+  storageRoot: string;
+  destinationIdentity?: NovelImportDestinationExecutionIdentity;
+  envelope: IdempotentCommandInput & {
+    request: Extract<NovelCommandRequest, { command: "novel_import_external_snapshot" }>;
+  };
+}): Promise<void> {
+  const ownerRoot = path.resolve(getNovelImportCommandOwnerRoot());
+  if (input.root !== ownerRoot || input.storageRoot !== ownerRoot) {
+    throw new Error("小说外部导入必须以应用专用 transaction owner 作为 projectRoot/storageRoot。");
+  }
+  const requestHash = commandRequestHash(ownerRoot, input.envelope.request);
+  const payload = input.envelope.request.payload;
+  if (payload.preflightAuthorization === undefined) {
+    // 只读重放也先锁定 owner 自身身份，避免 ledger 读取跟随被替换的符号链接。
+    const metadata = await lstat(ownerRoot);
+    if (!metadata.isDirectory() || metadata.isSymbolicLink() || await realpath(ownerRoot) !== ownerRoot) {
+      throw new Error("小说导入 command owner 身份已变化或尚不存在。");
+    }
+    const [keyed, requested] = await Promise.all([
+      getCommandByIdempotencyKey(ownerRoot, input.envelope.idempotencyKey),
+      getCommandByRequestId(ownerRoot, input.envelope.requestId),
+    ]);
+    const candidates = [keyed, requested].filter((record): record is IdempotentCommandResult => Boolean(record));
+    if (!candidates.length || candidates.some((record) => (
+      !matchesNovelImportReplayRecord(record, requestHash) || !allowsNovelImportTokenlessReplay(record)
+    ))) {
+      throw new Error("无 preflight authorization 的小说导入只允许重放已有 app-owner 账本中的已完成、unknown 或待恢复命令。");
+    }
+    return;
+  }
+
+  // 纯内存 capability 解析必须先于任何 owner 文件系统写入。
+  const preflight = inspectNovelImportPreflightAuthorization(payload.preflightAuthorization);
+  if (preflight.preflightId !== payload.preflightId
+    || preflight.fingerprint !== payload.preflightFingerprint
+    || preflight.sourceTreeAggregateSha256 !== payload.sourceTreeAggregateSha256) {
+    throw new Error("小说导入的稳定预检身份与 opaque authorization 不一致。");
+  }
+  const projectsRoot = await resolveNovelImportProjectsRoot(payload.projectsRoot);
+  if (input.destinationIdentity) {
+    if (input.destinationIdentity.projectsRoot !== projectsRoot
+      || input.destinationIdentity.canonicalRoot !== projectsRoot) {
+      throw new Error("小说导入命令的临时目标身份与服务端 projectsRoot 不一致。");
+    }
+    // Main-only 临时能力在 owner/ledger 任何写入前首次复验。
+    await assertConfinedRootIdentity(input.destinationIdentity);
+  }
+  assertNovelImportDestinationDoesNotOverlapPreflight(projectsRoot, preflight);
+  assertNovelImportDestinationDoesNotOverlapPreflight(ownerRoot, preflight);
+  assertNovelImportOwnerAndProjectsDisjoint(ownerRoot, projectsRoot);
+  await assertCanonicalNovelImportOwnerParent(ownerRoot);
+  // 到此所有路径/身份检查仍是只读。现在原子钉住 capability 与稳定请求哈希，
+  // 必须成功后才允许创建 owner 或命令账本；Core claim 复用同一 reservation。
+  const reserved = reserveNovelImportPreflightAuthorization(
+    payload.preflightAuthorization,
+    requestHash,
+  );
+  if (reserved.preflightId !== preflight.preflightId
+    || reserved.fingerprint !== preflight.fingerprint
+    || reserved.sourceTreeAggregateSha256 !== preflight.sourceTreeAggregateSha256) {
+    throw new Error("小说导入预检 authorization 在写前 reservation 期间发生变化。");
+  }
+  const owner = await ensureConfinedDirectory(path.dirname(ownerRoot), ownerRoot);
+  if (owner.directory !== ownerRoot || owner.canonicalDirectory !== ownerRoot) {
+    throw new Error("小说导入 command owner 规范身份不一致。");
+  }
+}
+
+async function authorizeNovelWritingSourceImportBeforeLedger(input: {
+  root: string;
+  storageRoot: string;
+  envelope: IdempotentCommandInput & {
+    request: Extract<NovelCommandRequest, { command: "novel_import_writing_source_snapshot" }>;
+  };
+}): Promise<void> {
+  if (input.storageRoot !== input.root) {
+    throw new Error("writing source snapshot 命令账本必须固定在当前受管小说工程。");
+  }
+  const metadata = await lstat(input.root);
+  if (!metadata.isDirectory() || metadata.isSymbolicLink() || await realpath(input.root) !== input.root) {
+    throw new Error("writing source snapshot 目标必须是无符号链接的规范受管工程。");
+  }
+  const requestHash = commandRequestHash(input.root, input.envelope.request);
+  const payload = input.envelope.request.payload;
+  if (!payload.preflightAuthorization) {
+    const [keyed, requested] = await Promise.all([
+      getCommandByIdempotencyKey(input.root, input.envelope.idempotencyKey),
+      getCommandByRequestId(input.root, input.envelope.requestId),
+    ]);
+    const candidates = [keyed, requested].filter((record): record is IdempotentCommandResult => Boolean(record));
+    if (!candidates.length || candidates.some((record) => (
+      record.command !== "novel_import_writing_source_snapshot"
+      || record.requestHash !== requestHash
+      || !allowsNovelImportTokenlessReplay(record)
+    ))) {
+      throw new Error("无 preflight authorization 的 writing source 导入只允许重放已有同身份命令。");
+    }
+    return;
+  }
+  const preflight = inspectNovelImportPreflightAuthorization(payload.preflightAuthorization);
+  if (preflight.preflightId !== payload.preflightId
+    || preflight.fingerprint !== payload.preflightFingerprint
+    || preflight.sourceTreeAggregateSha256 !== payload.sourceTreeAggregateSha256) {
+    throw new Error("writing source 导入的稳定预检身份与 opaque authorization 不一致。");
+  }
+  assertNovelImportDestinationDoesNotOverlapPreflight(input.root, preflight);
+  const reserved = reserveNovelImportPreflightAuthorization(payload.preflightAuthorization, requestHash);
+  if (reserved.preflightId !== preflight.preflightId || reserved.fingerprint !== preflight.fingerprint) {
+    throw new Error("writing source 预检 authorization 在写前 reservation 期间发生变化。");
+  }
+}
+
+export interface ExecuteIdempotentCommandOptions {
   storageRoot?: string;
   waitForRunningMs?: number;
+  /** 同一命令内账本、业务 owner 与终态写回共享的绝对 SQLite 截止时间。 */
+  deadlineAtMs?: number;
   signal?: AbortSignal;
   onProgress?: PersistedScanOptions["onProgress"];
   /** 跨代理写租约：有租约时生图相关写命令必须匹配 */
   writeLeaseHolderId?: string;
   writeLeaseToken?: string;
-} = {}): Promise<IdempotentCommandResult> {
+  /** Main 原生目录选择冻结的短期 inode；不进请求、哈希、账本或事件。 */
+  novelImportDestinationIdentity?: NovelImportDestinationExecutionIdentity;
+  /**
+   * 小说正文保存的入口身份。默认按 Agent 失败关闭；只有桌面 Main 的人工编辑器
+   * 可以显式声明 human_ui，以兼容不带 Writing OS preflight 的手工保存。
+   * 该入口身份不进业务请求哈希或 durable 账本，但必须在账本读取前完成授权检查。
+   */
+  novelWriteActor?: "agent" | "agent_reviewer" | "human_owner" | "human_ui";
+  /** prepare_novel_chapter_write 返回的短期能力；仅内存传递，禁止写入账本。 */
+  novelWriteLeaseToken?: string;
+  /** 模型/会话归因不是 owner 授权，只与租约 token 一起绑定正式 Agent 保存。 */
+  novelActorAttribution?: NovelActorAttribution;
+  studioWriteActor?: "codex" | "user";
+}
+
+async function executeIdempotentCommandWithinDeadline(projectRoot: string, input: IdempotentCommandInput, options: ExecuteIdempotentCommandOptions = {}): Promise<IdempotentCommandResult> {
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._:-]{7,159}$/.test(input.requestId)) throw new Error("requestId 必须为 8–160 位稳定标识。 ");
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._:-]{7,199}$/.test(input.idempotencyKey)) throw new Error("idempotencyKey 必须为 8–200 位稳定标识。 ");
   // Studio 的公开命令与 2 条 Core-only 初始化命令必须在任何工程探测、
@@ -3807,16 +3315,154 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
     // later guard, hash, ledger row and owner call instead of the raw envelope.
     input = { ...input, request: parsedStudioRequest as CommandRequest };
   }
+  if ((["claim_studio_higgsfield_connector_request", "preflight_studio_higgsfield_connector_request", "authorize_studio_higgsfield_connector_request", "record_studio_higgsfield_connector_submission", "reconcile_studio_higgsfield_connector_request", "prepare_studio_higgsfield_video_generation", "record_studio_higgsfield_video_submission", "attest_studio_higgsfield_connector_capability"] as const).includes(input.request.command as never)
+    && options.studioWriteActor !== "codex") {
+    throw new Error("Higgsfield connector 写命令只允许 Codex actor；必须在任何账本 I/O 前拒绝。");
+  }
+  const parsedNovelRequest = parseNovelCommandRequestForCore(input.request);
+  if (parsedNovelRequest) {
+    // novel parser 与 Studio 一样是 owner 边界：canonical 对象必须驱动
+    // 后续分类、请求哈希、账本和 Repository 调用。
+    input = { ...input, request: parsedNovelRequest as CommandRequest };
+  }
+  if (parsedNovelRequest?.command === "novel_save_chapter"
+    && parsedNovelRequest.payload.aiWriteContext?.workflowMode === "rehearsal") {
+    throw new RejectedCommandFailure("rehearsal 只用于上下文与写前检查，禁止同步到权威小说正文。", {
+      schemaVersion: 1,
+      applied: false,
+      entityType: "novel_writing_state",
+      reason: "workflow_mode_forbidden",
+      chapterId: parsedNovelRequest.payload.chapterId,
+      nextAction: "保留演练结果为外部草稿；如需写入权威正文，请重新执行 formal context pack、preflight 与章节写租约流程",
+    });
+  }
+  if (parsedNovelRequest?.command === "novel_save_chapter"
+    && options.novelWriteActor !== "human_ui"
+    && !parsedNovelRequest.payload.aiWriteContext) {
+    throw new RejectedCommandFailure("Agent 保存小说正文必须携带有效的 aiWriteContext；请先组装 context pack 并完成写前 preflight。", {
+      schemaVersion: 1,
+      applied: false,
+      entityType: "novel_writing_state",
+      reason: "context_preflight_required",
+      chapterId: parsedNovelRequest.payload.chapterId,
+      nextAction: "build_context_pack → preflight_chapter_write → 原样携带 aiWriteContext 保存",
+    });
+  }
+  if (parsedNovelRequest?.command === "novel_save_chapter"
+    && options.novelWriteActor === "agent_reviewer") {
+    throw new RejectedCommandFailure("小说审稿 Agent 没有正文写权限；只能提交审稿票。", {
+      schemaVersion: 1,
+      applied: false,
+      entityType: "novel_writing_state",
+      reason: "actor_forbidden",
+      chapterId: parsedNovelRequest.payload.chapterId,
+      nextAction: "使用 novel_attach_review_ticket；由被授权主笔处理正文",
+      nextTools: [{
+        tool: "execute_command",
+        argsMode: "partial",
+        args: { request: { command: "novel_attach_review_ticket", payload: { chapterId: parsedNovelRequest.payload.chapterId } } },
+        requiredArgs: ["projectRoot", "requestId", "idempotencyKey", "request.payload"],
+        purpose: "只提交正文证据化审稿票，不修改正文",
+      }],
+    });
+  }
+  if (parsedNovelRequest?.command === "novel_save_chapter"
+    && options.novelWriteActor !== "human_owner"
+    && options.novelWriteActor !== "human_ui"
+    && (parsedNovelRequest.payload.aiWriteContext?.workflowMode ?? "formal") === "formal"
+    && (!parsedNovelRequest.payload.aiWriteContext?.leaseId
+      || !parsedNovelRequest.payload.aiWriteContext.leaseFence
+      || !parsedNovelRequest.payload.aiWriteContext.actorFingerprint
+      || !options.novelWriteLeaseToken
+      || !options.novelActorAttribution)) {
+    throw new RejectedCommandFailure("正式 Agent 保存小说正文必须携带 prepare 签发的章节写租约与 actor 归因。", {
+      schemaVersion: 1,
+      applied: false,
+      entityType: "novel_writing_state",
+      reason: "chapter_write_lease_required",
+      chapterId: parsedNovelRequest.payload.chapterId,
+      nextAction: "执行 prepare_novel_chapter_write，并原样携带 aiWriteContext、novelWriteLeaseToken、novelActorAttribution",
+      nextTools: [{
+        tool: "prepare_novel_chapter_write",
+        argsMode: "partial",
+        args: { targetChapterId: parsedNovelRequest.payload.chapterId },
+        requiredArgs: ["projectRoot", "attribution"],
+        purpose: "重新生成 pack/preflight 并获取章级 fence/token",
+      }],
+    });
+  }
+  if (parsedNovelRequest?.command === "novel_create_chapter"
+    && options.novelWriteActor !== "human_ui"
+    && (parsedNovelRequest.payload.content?.length ?? 0) > 0) {
+    throw new RejectedCommandFailure("Agent 创建小说章节时不得直接写入正文；请先创建空章，再完成 context pack 与写前 preflight 后保存正文。", {
+      schemaVersion: 1,
+      applied: false,
+      entityType: "novel_writing_state",
+      reason: "context_preflight_required",
+      nextAction: "以空正文创建章节 → build_context_pack → preflight_chapter_write → 携带 aiWriteContext 保存正文",
+    });
+  }
+  if (parsedNovelRequest
+    && (parsedNovelRequest.command === "novel_seed_writing_state"
+      || parsedNovelRequest.command === "novel_import_writing_source_snapshot"
+      || parsedNovelRequest.command === "novel_review_chapter_state_candidate"
+      || parsedNovelRequest.command === "novel_review_story_bible_candidate"
+      || parsedNovelRequest.command === "novel_invalidate_writing_state_from")
+    && options.novelWriteActor !== "human_owner"
+    && options.novelWriteActor !== "human_ui") {
+    throw new RejectedCommandFailure("该小说状态命令只允许受信任的人类 owner 执行；Agent 只能提交候选或审稿票。", {
+      schemaVersion: 1,
+      applied: false,
+      entityType: "novel_writing_state",
+      reason: "actor_forbidden",
+      nextAction: "由桌面 owner 审核后执行；Agent 不得在 payload 中自称 human-owner",
+    });
+  }
   assertStudioBindingPublicPayload(input.request);
   assertStudioScriptSectionPublicPayload(input.request);
   assertStudioContinuityReviewPublicPayload(input.request);
   assertP30OrchestrationPublicPayload(input.request);
   const root = path.resolve(projectRoot);
   const studioCommand = isStudioCommandRequest(input.request);
+  const novelCommand = isNovelCommandRequest(input.request);
+  const novelImportRequest = isNovelCommandRequest(input.request) && isNovelImportCommandRequest(input.request)
+    ? input.request
+    : null;
+  const novelImportCommand = novelImportRequest !== null;
+  const novelWritingSourceImportRequest = isNovelCommandRequest(input.request)
+    && isNovelWritingSourceImportCommandRequest(input.request)
+    ? input.request
+    : null;
+  if (options.novelImportDestinationIdentity && !novelImportCommand) {
+    throw new Error("小说导入目标身份只允许用于 novel_import_external_snapshot。");
+  }
   const duduBootstrapCommand = input.request.command === "stage_dudu_readonly_managed_project";
-  const managedProject = await isManagedProject(root);
-  if (managedProject && !studioCommand) {
+  const storageRoot = path.resolve(options.storageRoot ?? root);
+  if (novelImportCommand) {
+    await authorizeNovelImportCommandBeforeLedger({
+      root,
+      storageRoot,
+      envelope: input as IdempotentCommandInput & {
+        request: Extract<NovelCommandRequest, { command: "novel_import_external_snapshot" }>;
+      },
+      destinationIdentity: options.novelImportDestinationIdentity,
+    });
+  }
+  if (novelWritingSourceImportRequest) {
+    await authorizeNovelWritingSourceImportBeforeLedger({
+      root,
+      storageRoot,
+      envelope: input as IdempotentCommandInput & {
+        request: Extract<NovelCommandRequest, { command: "novel_import_writing_source_snapshot" }>;
+      },
+    });
+  }
+  const managedProject = novelImportCommand ? false : await isManagedProject(root);
+  if (managedProject && !studioCommand && !novelCommand) {
     throw new Error(`受管素材工程拒绝旧命令 ${input.request.command}；请使用素材中心专用命令，避免扫描或写入平行事实源。`);
+  }
+  if (novelCommand && !novelImportCommand && !managedProject) {
+    throw new Error("novel 命令只允许写入 schema v2 novel/hybrid 受管工程。 ");
   }
   // Studio 命令在写统一命令账本前先验证受管壳，避免把普通/legacy 目录静默接管。
   // 正式写根强制为当前受管工程；禁止隐式跨根 storageRoot。
@@ -3830,10 +3476,15 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
       holderId: options.writeLeaseHolderId,
       leaseToken: options.writeLeaseToken,
     });
+  } else if (novelCommand && !novelImportCommand) {
+    managedShell = await inspectManagedProjectReadOnly(root);
+    if (managedShell.manifest.schemaVersion !== 2
+      || (managedShell.workspaceMode !== "novel" && managedShell.workspaceMode !== "hybrid")) {
+      throw new Error("novel 命令只允许写入 schema v2 novel/hybrid 受管工程。 ");
+    }
   }
-  const storageRoot = path.resolve(options.storageRoot ?? root);
-  if (studioCommand && path.resolve(storageRoot) !== root) {
-    throw new Error("受管素材工程禁止隐式跨根 command storageRoot；写入口必须固定 projectRoot。");
+  if ((studioCommand || novelCommand) && storageRoot !== root) {
+    throw new Error("受管工程禁止隐式跨根 command storageRoot；写入口必须固定 projectRoot。");
   }
   if (studioCommand && managedShell) {
     const payload = (input.request as { payload?: Record<string, unknown> }).payload;
@@ -3858,7 +3509,22 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
   const signal = input.request.command === "scan_project" ? options.signal : undefined;
   throwIfAborted(signal);
   const requestHash = commandRequestHash(root, input.request);
-  const registration = await withProjectLock(storageRoot, "command-bus", async (): Promise<{ action: "execute"; record: IdempotentCommandResult } | { action: "replay"; record: IdempotentCommandResult } | { action: "recover"; record: IdempotentCommandResult } | { action: "wait" }> => {
+  const verifyNovelImportReplay = async (
+    record: IdempotentCommandResult,
+  ): Promise<IdempotentCommandResult> => {
+    if (!novelImportRequest) return record;
+    try {
+      return {
+        ...record,
+        replayed: true,
+        result: await proveSafeCompletedNovelImportResult(novelImportRequest, requestHash, record),
+      };
+    } catch (error) {
+      await downgradeSucceededNovelImportClosureDrift(storageRoot, record, error);
+      throw new Error("小说导入 registered 业务闭包漂移；本次拒绝重放并将账本降为 unknown。", { cause: error });
+    }
+  };
+  const registration = await withSqliteBusyRetry(() => withProjectLock(storageRoot, "command-bus", async (): Promise<{ action: "execute"; record: IdempotentCommandResult } | { action: "replay"; record: IdempotentCommandResult } | { action: "recover"; record: IdempotentCommandResult } | { action: "wait" }> => {
     const keyed = await getCommandByIdempotencyKey(storageRoot, input.idempotencyKey);
     if (keyed) {
       if (keyed.requestHash !== requestHash) throw new Error("幂等键已用于不同参数；拒绝执行以避免重复或错写。 ");
@@ -3881,11 +3547,23 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
             result: undefined,
             error: undefined,
             executedAt: undefined,
-            execution: { pid: process.pid, phase: "registered", heartbeatAt: restartedAt },
+            // 登记事务本身就是“该进程接下来可能进入 domain execute”的唯一耐久
+            // 边界。直接持久化 executing，避免登记后再做第二次 SQLite phase 写；
+            // 若进程在真正调用 owner 前退出，恢复路径保守按 uncertain 处理。
+            execution: { pid: process.pid, phase: "executing", heartbeatAt: restartedAt },
             startedAt: restartedAt,
           };
           await persistCommandLedgerEntry(storageRoot, record, restartedAt);
-          await appendEvent(storageRoot, { actor: "codex", type: "command.started", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { requestHash, projectRoot: root, retryAfterBusyUncommitted: true } });
+          await appendEvent(storageRoot, {
+            actor: "codex",
+            type: "command.started",
+            requestId: input.requestId,
+            idempotencyKey: input.idempotencyKey,
+            command: input.request.command,
+            data: isNovelAnalysisExecutionCommand(input.request)
+              ? { requestHash, retryAfterBusyUncommitted: true }
+              : { requestHash, projectRoot: root, retryAfterBusyUncommitted: true },
+          });
           return { action: "execute", record };
         }
         throw new Error(`命令 ${keyed.command} 已明确失败：${keyed.error?.message ?? "已记录失败终态"}；原幂等键不会重放。`);
@@ -3911,17 +3589,31 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
       throw new Error(`requestId 对应命令结果为 ${requested.status}；禁止自动重放。请先对账。`);
     }
     const startedAt = new Date().toISOString();
-    const record: IdempotentCommandResult = { schemaVersion: 1, requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, status: "running", replayed: false, requestHash, execution: { pid: process.pid, phase: "registered", heartbeatAt: startedAt }, durableReconciliation: durableReconciliationSnapshot(input.request), storageRoot: storageRoot !== root ? storageRoot : undefined, startedAt };
+    const record: IdempotentCommandResult = { schemaVersion: 1, requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, status: "running", replayed: false, requestHash, execution: { pid: process.pid, phase: "executing", heartbeatAt: startedAt }, durableReconciliation: durableReconciliationSnapshot(input.request), storageRoot: storageRoot !== root ? storageRoot : undefined, startedAt };
     await persistCommandLedgerEntry(storageRoot, record, startedAt);
-    await appendEvent(storageRoot, { actor: "codex", type: "command.started", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { requestHash, projectRoot: root } });
+    await appendEvent(storageRoot, {
+      actor: "codex",
+      type: "command.started",
+      requestId: input.requestId,
+      idempotencyKey: input.idempotencyKey,
+      command: input.request.command,
+      data: isNovelAnalysisExecutionCommand(input.request) ? { requestHash } : { requestHash, projectRoot: root },
+    });
     return { action: "execute", record };
-  });
-  if (registration.action === "replay") return registration.record;
+  }).catch((error: unknown) => {
+    // command ledger entry/meta 现在同事务提交；登记失败发生在 domain execute 前，
+    // 因而只有这一处能把原始 busy 提升为可安全重试的 typed proof。
+    if (isSqliteBusyError(error)) {
+      throw new RetrySafeSqliteBusyError(error, { kind: "before_domain_execute" });
+    }
+    throw error;
+  }));
+  if (registration.action === "replay") return verifyNovelImportReplay(registration.record);
   if (registration.action === "recover") {
     const recovered = isDurableReconciliationCommand(input.request)
       ? await recoverCommandFromDurableState({ projectRoot: root, storageRoot, record: registration.record, request: input.request, replayRequestId: input.requestId })
       : undefined;
-    if (recovered) return revokePersistedImagegenCallCapability(recovered);
+    if (recovered) return verifyNovelImportReplay(revokePersistedImagegenCallCapability(recovered));
     const unresolved = registration.record.status === "running"
       ? await markLostDurableExecutorUnknown({ projectRoot: root, storageRoot, record: registration.record })
       : registration.record;
@@ -3936,11 +3628,13 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
         ?? (await getCommandByRequestId(storageRoot, input.requestId));
       if (!current) throw new Error("命令等待期间账本记录消失；已停止执行以避免重复副作用。 ");
       if (current.requestHash !== requestHash) throw new Error("命令等待期间请求哈希发生冲突；拒绝继续。 ");
-      if (current.status === "succeeded") return { ...current, requestId: input.requestId, replayed: true };
+      if (current.status === "succeeded") {
+        return verifyNovelImportReplay({ ...current, requestId: input.requestId, replayed: true });
+      }
       if (current.status === "failed") {
         if (isDurableReconciliationCommand(input.request) && current.execution?.phase === "side_effect_committed") {
           const recovered = await recoverCommandFromDurableState({ projectRoot: root, storageRoot, record: current, request: input.request, replayRequestId: input.requestId });
-          if (recovered) return recovered;
+          if (recovered) return verifyNovelImportReplay(recovered);
         }
         if (current.error?.busyUncommitted === true) {
           // 等待中目击到 busyUncommitted 失败终态：事务确认未提交，可安全重试。
@@ -3958,13 +3652,13 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
       if (current.status === "unknown") {
         if (isDurableReconciliationCommand(input.request)) {
           const recovered = await recoverCommandFromDurableState({ projectRoot: root, storageRoot, record: current, request: input.request, replayRequestId: input.requestId });
-          if (recovered) return recovered;
+          if (recovered) return verifyNovelImportReplay(recovered);
         }
         throw new Error(`命令 ${current.command} 的执行结果为 unknown；禁止自动重放。请先读取命令账本和真实文件进行结果对账。`);
       }
       if (isDurableReconciliationCommand(input.request) && current.status === "running" && !processAlive(current.execution?.pid)) {
         const recovered = await recoverCommandFromDurableState({ projectRoot: root, storageRoot, record: current, request: input.request, replayRequestId: input.requestId });
-        if (recovered) return recovered;
+        if (recovered) return verifyNovelImportReplay(recovered);
         await markLostDurableExecutorUnknown({ projectRoot: root, storageRoot, record: current });
         throw new Error(`命令 ${current.command} 的执行进程已退出，且不可变证据不足；保持 unknown，禁止自动重放。`);
       }
@@ -3983,8 +3677,6 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
     return next;
   });
 
-  record.execution = { pid: process.pid, phase: "executing", heartbeatAt: new Date().toISOString() };
-  await persistRecord();
   let heartbeatChain = Promise.resolve();
   const heartbeat = setInterval(() => {
     heartbeatChain = heartbeatChain.then(async () => {
@@ -4000,13 +3692,20 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
   };
 
   let busyAttempts = 0;
-  let executeReturned = false;
   try {
     if (process.env.AI_CANVAS_TEST_COMMAND_DELAY_COMMAND === input.request.command) {
       await wait(Math.max(0, Math.min(5_000, Number(process.env.AI_CANVAS_TEST_COMMAND_DELAY_MS) || 0)), signal);
     }
     const runCommand = () => runWithOperationContext(
-      { requestId: input.requestId, idempotencyKey: input.idempotencyKey, requestHash, command: input.request.command },
+      {
+        requestId: input.requestId,
+        idempotencyKey: input.idempotencyKey,
+        requestHash,
+        command: input.request.command,
+        ...(novelImportCommand && options.novelImportDestinationIdentity
+          ? { novelImportDestinationIdentity: options.novelImportDestinationIdentity }
+          : {}),
+      },
       () => {
         // 测试注入：前 N 次执行抛 SQLITE_BUSY（errcode=5），模拟事务前/提交期瞬时写锁。
         if (process.env.AI_CANVAS_TEST_COMMAND_BUSY_COMMAND === input.request.command) {
@@ -4015,10 +3714,18 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
           const injectTimes = Math.max(0, Math.min(12, Number(process.env.AI_CANVAS_TEST_COMMAND_BUSY_EXECUTE_TIMES) || 0));
           if (injected < injectTimes) {
             testBusyExecuteAttempts.set(busyKey, injected + 1);
-            throw Object.assign(new Error("database is locked"), { errcode: 5 });
+            const busy = Object.assign(new Error("database is locked"), { errcode: 5 });
+            throw new RetrySafeSqliteBusyError(busy, { kind: "before_domain_execute" });
           }
         }
-        return execute(root, input.request, { signal, onProgress: options.onProgress });
+        return execute(root, input.request, {
+          operationId: requestHash,
+          signal,
+          onProgress: options.onProgress,
+          novelWriteActor: options.novelWriteActor,
+          novelWriteLeaseToken: options.novelWriteLeaseToken,
+          novelActorAttribution: options.novelActorAttribution,
+        });
       },
     );
     // Studio 业务横跨 material / production / generation SQLite。所有公开 Studio 写入
@@ -4039,23 +3746,42 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
       })
       : duduBootstrapCommand
         ? () => withProjectLock(root, "dudu-bootstrap-mutation", runCommand)
-        : runCommand;
-    // SQLITE_BUSY/SQLITE_LOCKED 只可能在 COMMIT 成功前抛出，即抛出该错误的事务确认
-    // 未提交；仅在此未提交窗口内做有界指数退避（≤3 次、总预算 ≤5s）。重试沿用同一
-    // requestId/idempotencyKey 的 running 账本记录，不产生重复派发或新账本键；
-    // execute 返回后（副作用已提交）的 busy 不再重试，走 outcome_unknown 对账。
+        : novelImportCommand
+          // 外部导入的业务写入横跨 transaction、项目 bootstrap 与 registry；
+          // 在应用 owner 下全局串行，避免污染 projectsRoot 的锁目录。
+          ? () => withProjectLock(root, "novel-import-mutation", runCommand)
+          : runCommand;
+    // 只有 typed RetrySafeSqliteBusyError 携带 owner 给出的零副作用证明时才重试。
+    // 任意业务 owner 冒出的原始 SQLITE_BUSY 默认 outcome_unknown，不能从
+    // “顶层 execute 尚未返回”推断跨 CAS/文件/多 SQLite owner 均未提交。
     const result = await withSqliteBusyRetry(executeOnce, {
       onAttempt: (attempt) => { busyAttempts = attempt; },
       sleep: (milliseconds) => wait(milliseconds, signal),
     });
-    executeReturned = true;
     await stopHeartbeat();
     if (process.env.AI_CANVAS_TEST_COMMAND_CRASH_BEFORE_COMMIT_EVENT === input.request.command) throw new Error("TEST_ONLY_CRASH_BEFORE_COMMIT_EVENT");
-    const persistedResult = input.request.command === "prepare_studio_imagegen_call"
-      ? revokeImagegenCallCapabilityFromResult(result)
-      : result;
+    const persistedResult = input.request.command === "prepare_studio_higgsfield_video_generation"
+      ? projectHiggsfieldPrepareResultForPersistence(result)
+      : (["claim_studio_higgsfield_connector_request", "authorize_studio_higgsfield_connector_request"] as const).includes(input.request.command as never)
+        ? projectHiggsfieldConnectorQueueResultForPersistence(input.request.command, result)
+      : input.request.command === "prepare_studio_imagegen_call"
+        ? revokeImagegenCallCapabilityFromResult(result)
+        : result;
+    if (novelImportCommand) {
+      await withProjectLock(root, "novel-import-mutation", async () => {
+        const actual = novelImportResultAnchorFromResult(persistedResult);
+        const historical = await uniqueNovelImportRequestAnchor(storageRoot, requestHash);
+        if (historical) assertNovelImportResultMatchesAnchor(persistedResult, historical);
+        record.novelImportResultAnchor = historical ?? actual;
+        record.execution = { pid: process.pid, phase: "side_effect_committed", heartbeatAt: new Date().toISOString() };
+        await persistRecord();
+      });
+    }
     const resultDigest = createHash("sha256").update(stable(persistedResult)).digest("hex");
     record.execution = { pid: process.pid, phase: "side_effect_committed", heartbeatAt: new Date().toISOString() };
+    // 导入业务副作用已经闭合，先把首次 receipt 锚点与 side_effect_committed
+    // 阶段持久化；即使随后响应丢失，unknown 恢复也不能采用另一套自洽闭包。
+    // novel import 已在 mutation fence 内连同跨 key anchor 一起持久化。
     const terminalData = { requestHash, command: input.request.command, resultDigest, projectRoot: root };
     await appendEvent(storageRoot, { actor: "codex", type: "command.side-effect-committed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: terminalData });
     if (storageRoot !== root) {
@@ -4072,9 +3798,11 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
     if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
     await appendEvent(storageRoot, { actor: "codex", type: "command.executed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { requestHash, projectRoot: root } });
     // 首次成功调用栈可以消费唯一一次 true；任何账本、事件、等待者与后续重放都只见 false。
-    if (input.request.command === "prepare_studio_imagegen_call"
+    if ((["prepare_studio_imagegen_call", "prepare_studio_higgsfield_video_generation", "claim_studio_higgsfield_connector_request", "authorize_studio_higgsfield_connector_request"] as const).includes(input.request.command as never)
       && result && typeof result === "object" && !Array.isArray(result)
-      && (result as { callAllowed?: unknown }).callAllowed === true) {
+      && (input.request.command === "claim_studio_higgsfield_connector_request"
+        || input.request.command === "authorize_studio_higgsfield_connector_request"
+        || (result as { callAllowed?: unknown }).callAllowed === true)) {
       return { ...stored, result };
     }
     return stored;
@@ -4088,10 +3816,28 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
       record.error = { message: cancellation.message, observedAt };
       record.executedAt = observedAt;
       const stored = await persistRecord();
-      if (stored.status === "succeeded") return { ...stored, replayed: true };
+      if (stored.status === "succeeded") return verifyNovelImportReplay({ ...stored, replayed: true });
       if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
       await appendEvent(storageRoot, { actor: "codex", type: "command.cancelled", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { requestHash, error: record.error.message, projectRoot: root, committed: false } });
       throw cancellation;
+    }
+    if (isNovelAnalysisExecutionCommand(input.request) && isNovelAnalysisExecutionSafetyError(error)) {
+      // 小说正文外发通道的 pre-dispatch 与 post-dispatch 错误只能进入稳定投影。
+      // 特别是不能复用通用 command 事件的 projectRoot 字段：它会把本机绝对路径
+      // 和底层错误一起暴露给账本读取面或 Renderer。
+      const safeMessage = novelAnalysisExecutionSafeMessage(error);
+      const preDispatch = error.phase === "pre_dispatch";
+      record.status = preDispatch ? "failed" : "unknown";
+      record.result = undefined;
+      record.error = { message: safeMessage, observedAt };
+      record.executedAt = observedAt;
+      const stored = await persistRecord();
+      if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
+      const eventType = preDispatch ? "command.failed" : "command.outcome-unknown";
+      const eventData = { requestHash, error: safeMessage, novelAnalysisSafetyCode: error.code, phase: error.phase };
+      await appendEvent(storageRoot, { actor: "codex", type: eventType, requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: eventData });
+      if (storageRoot !== root) await appendEvent(root, { actor: "codex", type: eventType, requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: eventData });
+      throw error;
     }
     if (isRejectedCommandFailure(error)) {
       record.status = "failed";
@@ -4105,7 +3851,7 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
     }
     if (isConfirmedCommandFailure(error)) {
       const durableProof = isDurableReconciliationCommand(input.request)
-        ? await proveDurableOutcome(root, input.request)
+        ? await proveDurableOutcomeWithMutationFence(root, input.request)
         : undefined;
       if (durableProof) {
         const resultDigest = createHash("sha256").update(stable(durableProof.result)).digest("hex");
@@ -4128,7 +3874,7 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
         const stored = await persistRecord();
         if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
         await appendEvent(storageRoot, { actor: "codex", type: "command.reconciled", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { evidenceEventIds: [], evidenceSource: durableProof.source, durableIdentity: durableProof.identity, reconciledAt: observedAt } });
-        return stored;
+        return verifyNovelImportReplay(stored);
       }
       const failureMessage = error.message;
       const resultDigest = createHash("sha256").update(stable(error.result)).digest("hex");
@@ -4145,20 +3891,15 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
       await appendEvent(storageRoot, { actor: "codex", type: "command.failed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { requestHash, error: failureMessage, projectRoot: root, committed: true } });
       throw error;
     }
-    if (isSqliteBusyError(error) && !executeReturned) {
-      // busy 只可能在 COMMIT 成功前抛出：抛出该错误的事务确认未提交（连接关闭即回滚）。
-      // 标记 failed(busyUncommitted) 而非 unknown——调用方可用同一 idempotencyKey
-      // 受控重试（登记分支已放行）；重试次数与预算留账，MCP 侧分类 RESOURCE_BUSY。
-      // execute 已返回后的 busy（executeReturned=true）落入下方 unknown 对账路径。
-      // AggregateError（withFileLock 临界区与释放双失败）取首个 busy 成员文案，
-      // 保证下方抛出与账本留存的 message 稳定命中 RESOURCE_BUSY 文本分类。
+    if (isRetrySafeSqliteBusyError(error)) {
+      // 只有 typed proof 才能标记 failed(busyUncommitted) 并允许同键重试。
       const busyMessage = sqliteBusyDetailMessage(error);
       record.status = "failed";
       record.result = undefined;
       record.error = { message: busyMessage, observedAt, busyUncommitted: true, attempts: Math.max(1, busyAttempts), retryBudgetMs: STUDIO_SQLITE_BUSY_RETRY_BUDGET_MS };
       record.executedAt = observedAt;
       const stored = await persistRecord();
-      if (stored.status === "succeeded") return { ...stored, replayed: true };
+      if (stored.status === "succeeded") return verifyNovelImportReplay({ ...stored, replayed: true });
       if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
       await appendEvent(storageRoot, { actor: "codex", type: "command.failed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { requestHash, error: busyMessage, projectRoot: root, committed: false, busyUncommitted: true, attempts: Math.max(1, busyAttempts) } });
       throw new Error(`数据库瞬时锁在 ${Math.max(1, busyAttempts)} 次受控重试（预算 ${STUDIO_SQLITE_BUSY_RETRY_BUDGET_MS}ms）后仍未释放（command=${input.request.command}，事务未提交）：${busyMessage}`);
@@ -4167,11 +3908,23 @@ export async function executeIdempotentCommand(projectRoot: string, input: Idemp
     record.error = { message: error instanceof Error ? error.message : String(error), observedAt };
     record.executedAt = observedAt;
     const stored = await persistRecord();
-    if (stored.status === "succeeded") return { ...stored, replayed: true };
+    if (stored.status === "succeeded") return verifyNovelImportReplay({ ...stored, replayed: true });
     if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
     await appendEvent(storageRoot, { actor: "codex", type: "command.outcome-unknown", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { requestHash, error: record.error.message, projectRoot: root } });
     throw new Error(`命令执行结果未确认，已锁定幂等键防止重复副作用：${record.error.message}`);
   }
+}
+
+export async function executeIdempotentCommand(
+  projectRoot: string,
+  input: IdempotentCommandInput,
+  options: ExecuteIdempotentCommandOptions = {},
+): Promise<IdempotentCommandResult> {
+  const now = Date.now();
+  const defaultDeadlineAtMs = now + STUDIO_SQLITE_BUSY_RETRY_BUDGET_MS;
+  const deadlineAtMs = Math.min(options.deadlineAtMs ?? defaultDeadlineAtMs, defaultDeadlineAtMs);
+  return withStudioSqliteBusyDeadline(deadlineAtMs, () =>
+    executeIdempotentCommandWithinDeadline(projectRoot, input, options));
 }
 
 export async function reconcileCommand(projectRoot: string, input: { idempotencyKey: string }): Promise<IdempotentCommandResult> {
@@ -4191,6 +3944,23 @@ export async function reconcileCommand(projectRoot: string, input: { idempotency
     return { ...record };
   });
   const durableRequest = reconciliationRequestFromRecord(root, durableCandidate);
+  if (durableRequest?.command === "novel_import_external_snapshot"
+    && durableCandidate.status === "succeeded") {
+    try {
+      return {
+        ...durableCandidate,
+        replayed: true,
+        result: await proveSafeCompletedNovelImportResult(
+          durableRequest as Extract<NovelCommandRequest, { command: "novel_import_external_snapshot" }>,
+          durableCandidate.requestHash,
+          durableCandidate,
+        ),
+      };
+    } catch (error) {
+      await downgradeSucceededNovelImportClosureDrift(root, durableCandidate, error);
+      throw new Error("小说导入 registered 业务闭包漂移；reconcile 拒绝返回 succeeded 并将账本降为 unknown。", { cause: error });
+    }
+  }
   if (durableRequest
     && (durableCandidate.status === "unknown"
       || durableCandidate.status === "running"
@@ -4199,7 +3969,25 @@ export async function reconcileCommand(projectRoot: string, input: { idempotency
       ? path.resolve(durableCandidate.storageRoot)
       : root;
     const recovered = await recoverCommandFromDurableState({ projectRoot: root, storageRoot: durableStorageRoot, record: durableCandidate, request: durableRequest });
-    if (recovered) return recovered;
+    if (recovered) {
+      if (durableRequest.command === "novel_import_external_snapshot") {
+        try {
+          return {
+            ...recovered,
+            replayed: true,
+            result: await proveSafeCompletedNovelImportResult(
+              durableRequest as Extract<NovelCommandRequest, { command: "novel_import_external_snapshot" }>,
+              durableCandidate.requestHash,
+              recovered,
+            ),
+          };
+        } catch (error) {
+          await downgradeSucceededNovelImportClosureDrift(durableStorageRoot, recovered, error);
+          throw new Error("小说导入恢复后 registered 业务闭包仍不完整；reconcile 拒绝返回 succeeded。", { cause: error });
+        }
+      }
+      return recovered;
+    }
   }
   const reconciled = await withProjectLock(root, "command-bus", async () => {
     const ledger = await readCommandLedger(root);

@@ -5,6 +5,7 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import { Readable } from "node:stream";
 import { DatabaseSync } from "node:sqlite";
+import { studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
 
 const DATABASE_RELATIVE_PATH = ".aicanvas/material-studio.sqlite";
 const OBJECTS_RELATIVE_ROOT = ".aicanvas/objects/sha256";
@@ -477,8 +478,9 @@ async function assertDatabaseFiles(canonicalRoot: string): Promise<string> {
 function readMediaRow(databasePath: string, target: "media" | "thumbnail", key: string): MediaRow {
   let database: DatabaseSync | undefined;
   try {
-    database = new DatabaseSync(databasePath, { readOnly: true, timeout: BUSY_TIMEOUT_MS });
-    database.exec(`PRAGMA query_only=ON; PRAGMA busy_timeout=${BUSY_TIMEOUT_MS};`);
+    const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
+    database = new DatabaseSync(databasePath, { readOnly: true, timeout: busyTimeoutMs });
+    database.exec(`PRAGMA query_only=ON; PRAGMA busy_timeout=${busyTimeoutMs};`);
     const version = database.prepare("SELECT value FROM studio_meta WHERE key = 'schema_version'").get() as { value?: unknown } | undefined;
     if (version?.value !== SCHEMA_VERSION) throw integrityViolation("素材库 schema_version 缺失或不受支持。");
     const columns = database.prepare("PRAGMA table_info(studio_media)").all() as Array<{ name?: unknown }>;
@@ -504,8 +506,9 @@ function readMediaRow(databasePath: string, target: "media" | "thumbnail", key: 
 function readDerivativeRow(databasePath: string, recipeKey: string): DerivativeRow {
   let database: DatabaseSync | undefined;
   try {
-    database = new DatabaseSync(databasePath, { readOnly: true, timeout: BUSY_TIMEOUT_MS });
-    database.exec(`PRAGMA query_only=ON; PRAGMA busy_timeout=${BUSY_TIMEOUT_MS};`);
+    const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
+    database = new DatabaseSync(databasePath, { readOnly: true, timeout: busyTimeoutMs });
+    database.exec(`PRAGMA query_only=ON; PRAGMA busy_timeout=${busyTimeoutMs};`);
     const version = database.prepare("SELECT value FROM studio_meta WHERE key = 'schema_version'").get() as { value?: unknown } | undefined;
     if (version?.value !== SCHEMA_VERSION) throw integrityViolation("素材库 schema_version 缺失或不受支持。");
     const columns = database.prepare("PRAGMA table_info(studio_media_derivatives)").all() as Array<{ name?: unknown }>;

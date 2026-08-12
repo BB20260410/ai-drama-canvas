@@ -101,7 +101,7 @@ try {
   const externalRequests: string[] = [];
   const launchedAt = performance.now();
   application = await electron.launch({
-    args: ["."],
+    args: [".", `--user-data-dir=${path.join(temporaryRoot, "electron-user-data")}`],
     cwd: workspace,
     env: {
       ...process.env,
@@ -109,6 +109,7 @@ try {
       AI_CANVAS_REGISTRY_PATH: registryPath,
       AI_CANVAS_WINDOW_WIDTH: "1680",
       AI_CANVAS_WINDOW_HEIGHT: "1020",
+      AI_CANVAS_ELECTRON_BACKGROUND_SMOKE: "1",
     },
   });
   const page = await application.firstWindow();
@@ -120,6 +121,9 @@ try {
 
   const studio = page.locator('[data-testid="material-studio-view"]');
   await studio.waitFor();
+  // 正式 App 默认打开无限画布；规模测试必须显式走真实“剧本”入口，
+  // 不能在隐藏的素材面板上空等分页标记。
+  await page.locator('[data-testid="studio-step-script"]').click();
   await page.locator('[data-testid="material-page-indicator"]').filter({ hasText: `共 ${SCRIPT_COUNT} 项` }).waitFor();
   const readyMs = Math.round(performance.now() - launchedAt);
   const entries = page.locator(".material-entry");
@@ -214,4 +218,3 @@ try {
   if (priorRegistry === undefined) delete process.env.AI_CANVAS_REGISTRY_PATH;
   else process.env.AI_CANVAS_REGISTRY_PATH = priorRegistry;
 }
-

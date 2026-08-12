@@ -1,30 +1,97 @@
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
-import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { _electron as electron } from "playwright";
 import sharp from "sharp";
+import {
+  captureBackgroundElectronStateOrThrow,
+  closeElectronApplicationOrThrow,
+} from "./lib/electron-application-close.mjs";
+import {
+  assertFreshOutputSet,
+  createUniqueEvidenceStem,
+  writeBytesAtomicExclusive,
+  writeJsonAtomicExclusive,
+} from "./lib/exclusive-evidence-output.mjs";
 
 const execFileAsync = promisify(execFile);
 const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const evidencePath = path.resolve(process.argv[2] || path.join(workspace, "docs", "evidence", "editor-effect-transition-ui-smoke-20260714.json"));
+const runId = process.env.AI_CANVAS_EVIDENCE_RUN_ID?.trim()
+  || createUniqueEvidenceStem("editor-effect-transition-ui-smoke");
+const evidencePath = path.resolve(process.argv[2] || path.join(workspace, "docs", "evidence", `${runId}.json`));
 const evidenceDirectory = path.dirname(evidencePath);
 const packagedExecutable = process.env.AI_CANVAS_ELECTRON_EXECUTABLE?.trim();
 const screenshotPath = process.env.AI_CANVAS_UI_SCREENSHOT_PATH?.trim()
   ? path.resolve(process.env.AI_CANVAS_UI_SCREENSHOT_PATH)
-  : path.join(evidenceDirectory, packagedExecutable ? "editor-effect-transition-packaged-ui-20260714.png" : "editor-effect-transition-ui-20260714.png");
+  : path.join(evidenceDirectory, `${path.basename(evidencePath, path.extname(evidencePath))}.png`);
 const fixtureScript = path.join(workspace, "scripts", "create-effect-transition-ui-fixture.ts");
 const tsxExecutable = path.join(workspace, "node_modules", ".bin", "tsx");
+const backgroundSmokeEnabled = process.env.AI_CANVAS_ELECTRON_BACKGROUND_SMOKE === "1";
+await mkdir(evidenceDirectory, { recursive: true });
+await assertFreshOutputSet([
+  { label: "Effect/Transition UI 证据", path: evidencePath },
+  { label: "Effect/Transition UI 截图", path: screenshotPath },
+]);
 const runtimeRoot = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-editor-effect-transition-ui-"));
 const root = path.join(runtimeRoot, "project");
-const userDataPath = path.join(root, "electron-user-data");
+const userDataPath = path.join(runtimeRoot, "electron-user-data");
 const registryPath = path.join(runtimeRoot, "registry.json");
-await mkdir(evidenceDirectory, { recursive: true });
+const userDataRelativeToProject = path.relative(root, userDataPath);
+const userDataOutsideProjectRoot = userDataRelativeToProject === ".."
+  || userDataRelativeToProject.startsWith(`..${path.sep}`);
+if (!userDataOutsideProjectRoot) throw new Error("Effect/Transition user-data 不得位于被监听项目根内。");
 let app;
 let evidence;
+const closeRuns = [];
+const backgroundSnapshots = [];
+let bringToFrontUsed = false;
+const runtimeStabilitySnapshots = [];
+const performanceSamples = {};
+
+async function captureRuntimeStabilitySnapshot(application, label) {
+  const snapshot = await application.evaluate(() => globalThis.__AI_CANVAS_RUNTIME_STABILITY_SNAPSHOT__?.());
+  if (!snapshot) throw new Error(`${label} 缺少 runtime stability probe。`);
+  runtimeStabilitySnapshots.push({ label, snapshot });
+}
+
+async function measure(name, action) {
+  const startedAt = performance.now();
+  const result = await action();
+  performanceSamples[name] = Math.round((performance.now() - startedAt) * 100) / 100;
+  return result;
+}
+
+async function editorDomSnapshot(page, label) {
+  return page.evaluate((snapshotLabel) => ({
+    label: snapshotLabel,
+    totalElements: document.querySelectorAll("*").length,
+    timelineClips: document.querySelectorAll(".timeline-clip").length,
+    rulerTicks: document.querySelectorAll(".ruler span").length,
+    videoElements: document.querySelectorAll("video").length,
+    audioElements: document.querySelectorAll("audio").length,
+  }), label);
+}
+
+async function closeCurrentApplication(label) {
+  if (!app) return;
+  const current = app;
+  app = undefined;
+  let backgroundError;
+  if (backgroundSmokeEnabled) {
+    try {
+      backgroundSnapshots.push(await captureBackgroundElectronStateOrThrow(current, { label: `${label}:before-close` }));
+    } catch (error) {
+      backgroundError = error;
+    }
+  }
+  closeRuns.push(await closeElectronApplicationOrThrow(current, { label, timeoutMs: 20_000 }));
+  if (backgroundError) throw backgroundError;
+}
 
 function sha256Buffer(buffer) {
   return createHash("sha256").update(buffer).digest("hex");
@@ -54,13 +121,20 @@ async function screenshotContent(filePath) {
 async function captureStableUi(page) {
   let content;
   for (let attempt = 1; attempt <= 3; attempt += 1) {
-    await page.bringToFront();
+    if (!backgroundSmokeEnabled) {
+      bringToFrontUsed = true;
+      await page.bringToFront();
+    }
     await page.waitForTimeout(700);
     const viewport = await page.evaluate(() => ({ width: window.innerWidth, height: window.innerHeight }));
     const raw = await page.screenshot({ type: "png", animations: "disabled" });
-    await sharp(raw).resize(viewport.width, viewport.height, { fit: "fill" }).png().toFile(screenshotPath);
-    content = await screenshotContent(screenshotPath);
-    if (content.brightRatio >= .01 && content.chromaticRatio >= .005) return { attempt, content };
+    const candidatePath = path.join(runtimeRoot, `effect-screenshot-${attempt}.png`);
+    await sharp(raw).resize(viewport.width, viewport.height, { fit: "fill" }).png().toFile(candidatePath);
+    content = await screenshotContent(candidatePath);
+    if (content.brightRatio >= .01 && content.chromaticRatio >= .005) {
+      await writeBytesAtomicExclusive(screenshotPath, await readFile(candidatePath));
+      return { attempt, content };
+    }
   }
   throw new Error(`永久截图连续三次内容覆盖不足：${JSON.stringify(content)}`);
 }
@@ -80,7 +154,14 @@ async function openEditor(page, projectId) {
   await page.waitForLoadState("domcontentloaded");
   const firstRun = page.getByTestId("first-run-screen");
   if (await firstRun.isVisible().catch(() => false)) {
-    await page.getByTestId("first-run-recent").click();
+    await page.waitForFunction(() => {
+      const screen = document.querySelector('[data-testid="first-run-screen"]');
+      const recent = document.querySelector('[data-testid="first-run-recent"]');
+      return !screen || (recent instanceof HTMLButtonElement && !recent.disabled);
+    }, undefined, { timeout: 30_000 });
+    if (await firstRun.isVisible().catch(() => false)) {
+      await page.getByTestId("first-run-recent").click();
+    }
   }
   await page.getByRole("button", { name: "导演剪辑台" }).click();
   await page.getByRole("heading", { name: "导演剪辑台" }).waitFor();
@@ -123,6 +204,7 @@ async function launchApplication() {
       AI_CANVAS_REGISTRY_PATH: registryPath,
       AI_CANVAS_WINDOW_WIDTH: "1560",
       AI_CANVAS_WINDOW_HEIGHT: "980",
+      AI_CANVAS_RUNTIME_STABILITY_PROBE: "1",
     },
   });
 }
@@ -136,7 +218,11 @@ try {
   const page = await app.firstWindow();
   const pageErrors = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
-  await openEditor(page, fixture.editProjectId);
+  await measure("firstTimelineOpenMs", () => openEditor(page, fixture.editProjectId));
+  if (backgroundSmokeEnabled) {
+    backgroundSnapshots.push(await captureBackgroundElectronStateOrThrow(app, { label: "Effect/Transition first ready" }));
+  }
+  await captureRuntimeStabilitySnapshot(app, "first-timeline-ready");
   await page.getByTestId(`timeline-clip-${fixture.outgoingClipId}`).click();
   await page.getByTestId("edit-dissolve-fields").waitFor();
   const initialInspector = {
@@ -176,13 +262,15 @@ try {
   const screenshot = await imageEvidence(screenshotPath);
   if (screenshot.bytes < 20_000 || screenshot.width !== 1560 || screenshot.height !== 980 || pageErrors.length) throw new Error(`首次 Electron UI 证据异常：${JSON.stringify({ screenshot, pageErrors })}`);
 
-  await app.close();
-  app = undefined;
+  await closeCurrentApplication("Effect/Transition first graceful close");
   app = await launchApplication();
   const restartPage = await app.firstWindow();
   const restartPageErrors = [];
   restartPage.on("pageerror", (error) => restartPageErrors.push(error.message));
-  await openEditor(restartPage, fixture.editProjectId);
+  await measure("restartTimelineOpenMs", () => openEditor(restartPage, fixture.editProjectId));
+  if (backgroundSmokeEnabled) {
+    backgroundSnapshots.push(await captureBackgroundElectronStateOrThrow(app, { label: "Effect/Transition restart ready" }));
+  }
   await restartPage.getByTestId(`timeline-clip-${fixture.outgoingClipId}`).click();
   const restartInspector = { inOffsetFrames: Number(await restartPage.getByTestId("edit-transition-in-offset").inputValue()), outOffsetFrames: Number(await restartPage.getByTestId("edit-transition-out-offset").inputValue()) };
   await seekFrame(restartPage, 24);
@@ -190,10 +278,61 @@ try {
   const restartProject = await restartPage.evaluate(async ({ root, projectId }) => window.canvasApi.getEditProject(root, projectId), { root, projectId: fixture.editProjectId });
   if (restartProject.revision !== redone.revision || restartInspector.inOffsetFrames !== 2 || restartInspector.outOffsetFrames !== 4 || restartPageErrors.length) throw new Error(`应用重启后标准转场漂移：${JSON.stringify({ restartProject, restartInspector, restartPageErrors })}`);
 
-  const sourceFiles = ["src/core/types.ts", "src/core/editor.ts", "src/core/codex.ts", "src/mcp/server.ts", "src/renderer/src/components/VideoEditorView.vue", "scripts/create-effect-transition-ui-fixture.ts", "scripts/ui-editor-effect-transition-smoke.mjs"];
+  const transportRange = restartPage.locator(".transport input[type=range]");
+  const rangeBox = await transportRange.boundingBox();
+  if (!rangeBox) throw new Error("剪辑时间线播放头拖动区域不可用。");
+  const beforeDragFrame = Number((await restartPage.locator(".transport span").innerText()).match(/F(\d+)/u)?.[1] ?? -1);
+  await measure("playheadDragFeedbackMs", async () => {
+    await restartPage.mouse.move(rangeBox.x + rangeBox.width * 0.25, rangeBox.y + rangeBox.height / 2);
+    await restartPage.mouse.down();
+    await restartPage.mouse.move(rangeBox.x + rangeBox.width * 0.62, rangeBox.y + rangeBox.height / 2, { steps: 8 });
+    await restartPage.mouse.up();
+    await restartPage.waitForFunction((previous) => {
+      const text = document.querySelector(".transport span")?.textContent ?? "";
+      const frame = Number(text.match(/F(\d+)/u)?.[1] ?? -1);
+      return frame >= 0 && frame !== previous;
+    }, beforeDragFrame);
+  });
+  const afterDragFrame = Number((await restartPage.locator(".transport span").innerText()).match(/F(\d+)/u)?.[1] ?? -1);
+  if (afterDragFrame < 0 || afterDragFrame === beforeDragFrame) throw new Error("剪辑时间线播放头拖动没有产生反馈。");
+
+  await seekFrame(restartPage, 0);
+  await restartPage.evaluate(() => {
+    const target = window;
+    target.__editorRuntimeFrameIntervals = [];
+    let previous = performance.now();
+    const sample = (now) => {
+      target.__editorRuntimeFrameIntervals.push(now - previous);
+      previous = now;
+      if (target.__editorRuntimeFrameIntervals.length < 180) requestAnimationFrame(sample);
+    };
+    requestAnimationFrame(sample);
+  });
+  const beforePlaybackFrame = Number((await restartPage.locator(".transport span").innerText()).match(/F(\d+)/u)?.[1] ?? -1);
+  await measure("playbackFirstProgressMs", async () => {
+    await restartPage.getByRole("button", { name: "播放预览" }).click();
+    await restartPage.getByRole("button", { name: "暂停预览" }).waitFor();
+    await restartPage.waitForFunction((previous) => {
+      const text = document.querySelector(".transport span")?.textContent ?? "";
+      const frame = Number(text.match(/F(\d+)/u)?.[1] ?? -1);
+      return frame > previous;
+    }, beforePlaybackFrame);
+  });
+  await restartPage.waitForTimeout(700);
+  const playbackFrame = Number((await restartPage.locator(".transport span").innerText()).match(/F(\d+)/u)?.[1] ?? -1);
+  await restartPage.getByRole("button", { name: "暂停预览" }).click();
+  const frameIntervals = await restartPage.evaluate(() => [...(window.__editorRuntimeFrameIntervals ?? [])]);
+  frameIntervals.sort((left, right) => left - right);
+  const frameP95Ms = frameIntervals[Math.min(frameIntervals.length - 1, Math.floor(frameIntervals.length * 0.95))] ?? 0;
+  const editorDom = await editorDomSnapshot(restartPage, "timeline-playback");
+  await restartPage.waitForTimeout(600);
+  await captureRuntimeStabilitySnapshot(app, "after-playback-idle");
+
+  const sourceFiles = ["src/core/types.ts", "src/core/editor.ts", "src/core/codex.ts", "src/main/app-close-coordinator.ts", "src/main/index.ts", "src/mcp/server.ts", "src/renderer/src/components/VideoEditorView.vue", "scripts/create-effect-transition-ui-fixture.ts", "scripts/lib/electron-application-close.mjs", "scripts/ui-editor-effect-transition-smoke.mjs"];
   const sourceHashes = Object.fromEntries(await Promise.all(sourceFiles.map(async (relative) => [relative, sha256Buffer(await readFile(path.join(workspace, relative)))])));
   evidence = {
     schemaVersion: 1,
+    runId,
     generatedAt: new Date().toISOString(),
     status: "passed",
     transport: packagedExecutable ? "packaged-electron-current-source" : "electron-current-production-build",
@@ -202,15 +341,32 @@ try {
     fixture,
     inspector: { initial: initialInspector, restart: restartInspector },
     preview: { initial: initialPreview, afterRedo: previewAfterRedo, afterApplicationRestart: restartPreview },
+    performance: {
+      ...performanceSamples,
+      playheadFrames: { before: beforeDragFrame, afterDrag: afterDragFrame, afterPlayback: playbackFrame },
+      playbackFrameIntervals: {
+        samples: frameIntervals.length,
+        p95Ms: Math.round(frameP95Ms * 100) / 100,
+        maxMs: Math.round((frameIntervals.at(-1) ?? 0) * 100) / 100,
+      },
+      dom: editorDom,
+      runtimeStabilitySnapshots,
+    },
     revisions: { fixture: fixture.revision, saved: saved.revision, undone: undone.revision, redone: redone.revision, afterApplicationRestart: restartProject.revision },
     undoRedo: { undoRestoredOffsets: [3, 5], redoRestoredOffsets: [2, 4] },
     otioExport: { path: exported.path, transition: exportedTransition, contract: exportedDocument.metadata.aicanvas.effectTransitionContract },
     screenshot: { ...screenshot, captureAttempt: screenshotCapture.attempt, content: screenshotCapture.content },
     pageErrors: [...pageErrors, ...restartPageErrors],
+    isolation: { userDataOutsideProjectRoot },
+    backgroundSmoke: {
+      enabled: backgroundSmokeEnabled,
+      bringToFrontUsed,
+      snapshots: backgroundSnapshots,
+    },
     sourceHashes,
   };
 } finally {
-  if (app) await app.close();
+  await closeCurrentApplication("Effect/Transition final graceful close");
   await rm(runtimeRoot, { recursive: true, force: true });
 }
 
@@ -220,5 +376,6 @@ const registryRemoved = await access(registryPath).then(() => false, () => true)
 const userDataRemoved = await access(userDataPath).then(() => false, () => true);
 if (!rootRemoved || !registryRemoved || !userDataRemoved) throw new Error(`隔离夹具未清理：${JSON.stringify({ rootRemoved, registryRemoved, userDataRemoved })}`);
 evidence.terminal = { rootRemoved, registryRemoved, userDataRemoved };
-await writeFile(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, "utf8");
+evidence.closeRuns = closeRuns;
+await writeJsonAtomicExclusive(evidencePath, evidence);
 process.stdout.write(`${JSON.stringify({ evidencePath, status: evidence.status, revisions: evidence.revisions, inspector: evidence.inspector, preview: evidence.preview, screenshot: evidence.screenshot, terminal: evidence.terminal }, null, 2)}\n`);

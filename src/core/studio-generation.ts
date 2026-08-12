@@ -1,5 +1,9 @@
 import { createHash } from "node:crypto";
 import {
+  digestStudioCanonicalJson as stableDigest,
+  serializeStudioCanonicalJsonPretty,
+} from "./studio-canonical-json.js";
+import {
   evaluateStudioAssetApplicability,
   getStudioCanonicalAssetKnowledgeSnapshot,
   getStudioCanonicalAsset,
@@ -685,19 +689,6 @@ export type StudioGenerationQueryResult = StudioGenerationReadyResult | StudioGe
 
 function fail(code: StudioGenerationFreezeErrorCode, message: string, details: string[] = []): never {
   throw new StudioGenerationFreezeError(code, message, details);
-}
-
-function stableValue(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(stableValue);
-  if (!value || typeof value !== "object") return value;
-  return Object.fromEntries(Object.entries(value as Record<string, unknown>)
-    .filter(([, entry]) => entry !== undefined)
-    .sort(([left], [right]) => left.localeCompare(right, "en"))
-    .map(([key, entry]) => [key, stableValue(entry)]));
-}
-
-function stableDigest(value: unknown): string {
-  return createHash("sha256").update(JSON.stringify(stableValue(value)), "utf8").digest("hex");
 }
 
 function readStudioMedia(
@@ -2639,7 +2630,7 @@ function assertRequestIntegrity(request: StudioCodexGenerationRequest): void {
 /** 返回键序稳定、可重现的 JSON；不加入当前时间或伪造 source span。 */
 export function serializeStudioGenerationRequest(request: StudioCodexGenerationRequest): string {
   assertRequestIntegrity(request);
-  return `${JSON.stringify(stableValue(request), null, 2)}\n`;
+  return serializeStudioCanonicalJsonPretty(request);
 }
 
 /**

@@ -22,7 +22,7 @@ describe("画布媒体原生拖出 IPC 合同", () => {
     expect(main).toContain("prepareStudioNativeMediaDragCopy");
     expect(main).toContain("StudioNativeMediaDragResourceManager");
     expect(main).toContain("cleanupStaleStudioNativeMediaDragDirectories");
-    expect(main).toContain("await initializeStudioNativeMediaDragResources()");
+    expect(main).toContain("initializeNativeMediaDragResources: initializeStudioNativeMediaDragResources");
     expect(main).toContain("nativeMediaDragResources.prepare(async () =>");
     expect(main).toContain("webContentsId: event.sender.id");
     expect(main).toContain("prepared.webContentsId !== event.sender.id");

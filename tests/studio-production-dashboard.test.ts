@@ -3,6 +3,10 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { createManagedProject } from "../src/core/managed-project.js";
+import {
+  __setStudioRequestSchemaCacheObserverForTests,
+} from "../src/core/studio-request-schema-cache.js";
+import { withStudioUnitsReadProbe } from "../src/core/studio-units-read-phase-timeline.js";
 import type { StudioBindingPanelControl } from "../src/core/studio-binding-control.js";
 import {
   STUDIO_DASHBOARD_UNIT_PAGE_LIMIT,
@@ -25,6 +29,7 @@ const roots: string[] = [];
 let fixture: StudioP7Fixture | undefined;
 
 afterEach(async () => {
+  __setStudioRequestSchemaCacheObserverForTests(null);
   delete process.env.AI_CANVAS_TEST_DASHBOARD_GENERATION_DELAY_LABEL;
   delete process.env.AI_CANVAS_TEST_DASHBOARD_GENERATION_DELAY_MS;
   await fixture?.cleanup();
@@ -33,6 +38,85 @@ afterEach(async () => {
 });
 
 describe("P8 StudioProductionDashboard Core", () => {
+  it("每个顶层 Dashboard units 请求只做一次 production schema 深验", async () => {
+    const temporaryRoot = await realpath(await mkdtemp(path.join(os.tmpdir(), "studio-p8-schema-cache-")));
+    roots.push(temporaryRoot);
+    const project = await createManagedProject({ parentRoot: temporaryRoot, name: "P8 请求缓存" });
+    const events: Array<{ kind: "hit" | "miss" | "mark"; cacheKey: string }> = [];
+    __setStudioRequestSchemaCacheObserverForTests((event) => events.push(event));
+
+    await getStudioProductionDashboard(project.paths.root, { operation: "units", limit: 36 });
+    const firstRequestEvents = events.filter((event) => event.cacheKey.startsWith("studio-production-schema-v6\u0000"));
+    expect(firstRequestEvents.filter((event) => event.kind === "mark")).toHaveLength(1);
+    expect(firstRequestEvents.filter((event) => event.kind === "hit").length).toBeGreaterThanOrEqual(1);
+
+    events.length = 0;
+    await getStudioProductionDashboard(project.paths.root, { operation: "units", limit: 36 });
+    const nextRequestEvents = events.filter((event) => event.cacheKey.startsWith("studio-production-schema-v6\u0000"));
+    expect(nextRequestEvents.filter((event) => event.kind === "mark")).toHaveLength(1);
+  });
+
+  it("units 请求探针只记录匿名阶段与当前 N+1 计数，不改变业务投影", async () => {
+    fixture = await createStudioP7Fixture();
+    const plain = await getStudioProductionDashboard(
+      fixture.root,
+      { operation: "units", limit: 36 },
+    ) as StudioDashboardUnitsPage;
+    const probed = await withStudioUnitsReadProbe(true, () => getStudioProductionDashboard(
+      fixture!.root,
+      { operation: "units", limit: 36 },
+    ));
+
+    expect(probed.value).toEqual(plain);
+    const snapshot = probed.snapshot!;
+    const phases = new Set(snapshot.phases.map((phase) => phase.phase));
+    for (const phase of [
+      "dashboard-core-total",
+      "dashboard-readonly-shell",
+      "binding-owner-total",
+      "binding-managed-inspect",
+      "managed-inspect-shell",
+      "managed-generation-ledger",
+      "production-page",
+      "production-facets",
+      "binding-heads",
+      "successors",
+      "binding-map",
+      "dashboard-map-digest",
+    ]) expect(phases.has(phase as never)).toBe(true);
+
+    const unitCount = plain.page.items.length;
+    expect(snapshot.counters).toMatchObject({
+      managedProjectShellInspections: 3,
+      generationLedgerEnsureCalls: 1,
+      generationLedgerInitializationStarts: 1,
+      generationLedgerInitializationJoins: 0,
+      productionDirectoryEnsureCalls: 4,
+      productionOpenDatabaseCalls: 4,
+      productionReadOnlyProbeConnections: 4,
+      productionOwnerConnections: 4,
+      productionBusinessSqlExecutions: 6 + 2 * unitCount,
+      unitPageQueries: 1,
+      unitTimingQueries: unitCount,
+      episodeStartQueries: unitCount,
+      facetQueries: 3,
+      bindingHeadQueries: 1,
+      successorQueries: 1,
+      productionSchemaCacheHits: 3,
+      productionSchemaCacheMisses: 1,
+      returnedUnitCount: unitCount,
+    });
+    for (const phase of snapshot.phases) {
+      expect(Number.isFinite(phase.startOffsetMs)).toBe(true);
+      expect(phase.startOffsetMs).toBeGreaterThanOrEqual(0);
+      expect(Number.isFinite(phase.durationMs)).toBe(true);
+      expect(phase.durationMs).toBeGreaterThanOrEqual(0);
+    }
+    const serialized = JSON.stringify(snapshot);
+    expect(serialized).not.toContain(fixture.root);
+    expect(serialized).not.toMatch(/\.sqlite|SELECT|p7-/u);
+  });
+
   it("forbidden Binding 只保留为安全约束，不进入 Dashboard 控制资产或连续性 nextAction", () => {
     const proposal = (
       assetId: string,

@@ -25,6 +25,22 @@ describe("studio-generation-queue-view（LumenX LX-1）", () => {
     expect(view.visible.map((t) => t.id)).toEqual(["2", "1"]); // newest first
   });
 
+  it("分页只限制可见条目，不截断页签总数和进行中计数", () => {
+    const view = buildStudioGenerationQueueView(
+      Array.from({ length: 40 }, (_, index) => ({
+        id: `active-${index}`,
+        status: "processing",
+        createdAt: index,
+      })),
+      { activeTab: "active", maxPerBucket: 36 },
+    );
+    expect(view.totals.active).toBe(40);
+    expect(view.inFlightCount).toBe(40);
+    expect(view.tabs.active).toHaveLength(36);
+    expect(view.visible).toHaveLength(36);
+    expect(view.visible[0]?.id).toBe("active-39");
+  });
+
   it("preflight 预览：准备未闭环则不可 dispatch", () => {
     const blocked = buildStudioGenerationPreflightPreview({
       unitId: "u1",
@@ -100,4 +116,3 @@ describe("studio-generation-queue-view（LumenX LX-1）", () => {
     })).toEqual({ kind: "unit", targetId: "unit-2", unitId: "unit-2" });
   });
 });
-

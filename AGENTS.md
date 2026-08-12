@@ -12,15 +12,19 @@
 **壳层/工程化裁决（Goal 内）：`docs/GOAL_Qwen建议多代理裁决与长期任务_20260724.md`** — 改写采纳 Phase D/E；禁整包照搬；工程化不打断 A formal。
 1. **禁止**切片完成就 `update_goal(completed=true)`；仅整目标关账后可 completed。  
 2. **回合末禁止**只输出「下一步」清单；必须工具续做，或 STATUS 已写真阻塞（仅用户能解）。  
-3. 基础设施（已落盘）：  
-   - Stop 闸 `~/.grok/bin/goal-stop-continue.sh` + `~/.grok/hooks/goal-continue-stop.json`  
+3. 基础设施：  
+   - **仓库内落点**：Stop 闸行为合同与最小执行约束见 `docs/仓库内权威约束镜像_Stop闸_严谨执行_创作技能路由.md` §1（始终需要）。  
+   - 可选增强（Grok 客户端运行时）：Stop 闸 `~/.grok/bin/goal-stop-continue.sh` + `~/.grok/hooks/goal-continue-stop.json`；缺失时纪律仍有效，按镜像 §1.2 重建。  
    - 持久 scheduler（2m / durable / foreground）读 STATUS 续跑  
 4. compact / 新会话：先读 STATUS earliest，立刻干，不从零问目标。  
 5. Skeptic/修 bug 结束后立刻回产线 earliest，禁止停在解释。  
 6. **双轨（owner 终局）**：一边 Grok/Codex 按剧本生图，一边完善无限画布对生图的关键辅助——**角色 / 场景 / 站位（及同级）一致性**，目标互补到高契合；有序 formal PASS **≠** 产品 100% 完美契合。产线卡点暴露的辅助缺口必须同会话收敛后再回 earliest。  
-7. **剧本产品环（owner 2026-07-23）**：存放剧本、阅读、一键剧本↔图对照、15 秒分镜设计 — 计划 `docs/GOAL_剧本库与15秒分镜产品计划_20260723.md`；复用 script revision / `suggest_studio_storyboard_draft` / trace，禁止平行剧本库。## 严谨执行（2026-07-18 起）
+7. **剧本产品环（owner 2026-07-23）**：存放剧本、阅读、一键剧本↔图对照、15 秒分镜设计 — 计划 `docs/GOAL_剧本库与15秒分镜产品计划_20260723.md`；复用 script revision / `suggest_studio_storyboard_draft` / trace，禁止平行剧本库。
 
-- 全局方法：`~/.grok/memory/rigorous-execution-mode.md` 与 `~/.grok/memory/MEMORY.md`。
+## 严谨执行（2026-07-18 起）
+
+- **仓库内落点（始终需要）**：六维完成门、审计者自检、结论枚举等常需要点见 `docs/仓库内权威约束镜像_Stop闸_严谨执行_创作技能路由.md` §2。
+- 可选增强（用户全局完整原文）：`~/.grok/memory/rigorous-execution-mode.md` 与 `~/.grok/memory/MEMORY.md`；不存在或不可读时以仓库内镜像为准。
 - **窗口交接唯一入口：`docs/当前开发交接.md`**。
 - **软件关账事实源**：`docs/验证报告_20260718_P0至P10最终关账.md`、  
   `docs/验证报告_20260718_P9R2_P10R2与受管无限画布最终收尾.md`、
@@ -61,16 +65,19 @@
 
 - `docs/community-research/INDEX.md`
 - `docs/community-research/全网社区技能与规范分析_20260718.md`
-- `.grok/skills/ai-drama-canvas-agent` — 软件研发边界（**P8 已关账**）
-- `.grok/skills/ai-drama-production-prompts` — 短剧提示词/连续性/宫格
-- `.grok/skills/canvas-scale-performance` — 画布规模性能
+- `.agents/skills/ai-drama-canvas-agent` — 软件研发边界（**P8 已关账**）
+- `.agents/skills/ai-drama-production-prompts` — 短剧提示词/连续性/宫格
+- `.agents/skills/canvas-scale-performance` — 画布规模性能
+
+`.grok/skills/` 下存在同名副本，供 Grok 客户端加载：`canvas-scale-performance` 与 `.agents/skills` 逐字节一致；`ai-drama-canvas-agent`、`ai-drama-production-prompts` 为 Grok 版变体（含 Goal 双轨北星等客户端增强，内容等价方向但非逐字节相同）。本清单以 `.agents/skills` 为引用基准。
 
 社区 vendors 与本机 skill 镜像仅供参考；**不得**把 Playwright/网页生图 skill 接入正式供应链。
 
 ## 剧本、分镜与小说技能自动路由
 
-- 自动选用规则以全局 `~/.codex/AGENTS.md` 的“创作技能自动路由”为唯一通用路由表；本仓库不维护第二份完整映射。
-- 本项目的结构层和分镜层分别以 `cinematic-screenplay-structure`、`cinematic-shot-card` 为项目内唯一源；微短剧正文、小说正文及连续性按全局路由选择对应技能。
+- **仓库内权威最小路由表（始终需要）**：`docs/仓库内权威约束镜像_Stop闸_严谨执行_创作技能路由.md` §3（2026-08-12 快照，源为 `story-production-router` 统一路由技能）。日常选技能以该表为准。
+- 可选增强（完整路由与套件审计）：`story-production-router` 技能原文（用户目录，经 `~/.agents/skills` 同源分发）。注：旧版引用的「全局 `~/.codex/AGENTS.md` 的创作技能自动路由」段已不在该文件内（2026-08-12 核实），不再作为解析入口。
+- 本项目的结构层和分镜层分别以 `cinematic-screenplay-structure`、`cinematic-shot-card` 为项目内唯一源；微短剧正文、小说正文及连续性按仓库内路由表（镜像 §3.1）选择对应技能。
 - 剧本与分镜同任务时必须先锁定剧本，再拆 Shot Card；分镜技能不得覆盖锁版对白、旁白、事件顺序或正典。
 - 项目 `AGENTS.md`、锁版源稿、资产硬锁与当前生产合同始终高于通用 Skill；每次只加载满足任务所需的最小技能集合。
 

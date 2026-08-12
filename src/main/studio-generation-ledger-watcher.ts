@@ -58,27 +58,62 @@ export function createStudioGenerationLedgerWatcher(input: {
   let lastHash: string | undefined;
   let timer: NodeJS.Timeout | null = null;
   let closed = false;
-  let computeSequence = 0;
-  let computeChain: Promise<void> = Promise.resolve();
+  let closePromise: Promise<void> | null = null;
+  let requestEpoch = 0;
+  let dirty = false;
+  let drainPromise: Promise<void> | null = null;
+  let recoveryEpoch: number | null = null;
 
-  const computeAndSend = async (): Promise<void> => {
-    const sequence = ++computeSequence;
+  const reportError = (error: unknown): void => {
+    try {
+      input.onError?.(error instanceof Error ? error.message : String(error));
+    } catch {
+      // 错误上报不得让 watcher 的 drain 留下未处理 rejection。
+    }
+  };
+
+  const computeAndSend = async (epoch: number): Promise<void> => {
     const projectId = await input.resolveProjectId();
-    if (closed || sequence !== computeSequence || !projectId) return;
+    if (closed || epoch !== requestEpoch || !projectId) return;
     const progress = await buildStudioGenerationPlanProgress(input.projectRoot);
     const reviewProjectionHash = reviewHeadsProjectionHash(input.projectRoot);
     const projectionHash = createHash("sha256")
       .update(`${progress.projectionHash}\u0000${reviewProjectionHash}`, "utf8")
       .digest("hex");
-    if (closed || sequence !== computeSequence || projectionHash === lastHash) return;
-    lastHash = projectionHash;
+    if (closed || epoch !== requestEpoch || projectionHash === lastHash) return;
     input.send({ projectId, projectionHash });
+    lastHash = projectionHash;
   };
 
-  const enqueueCompute = (): Promise<void> => {
-    const next = computeChain.then(computeAndSend);
-    computeChain = next.catch(() => undefined);
-    return next;
+  const requestCompute = (): Promise<void> => {
+    if (closed) return Promise.resolve();
+    requestEpoch += 1;
+    dirty = true;
+    if (drainPromise) return drainPromise;
+
+    drainPromise = (async () => {
+      while (!closed) {
+        if (!dirty) {
+          // 清理与复查同在 drain 内部，避免 promise 已完成但 finally 尚未执行时丢失新 dirty。
+          drainPromise = null;
+          if (!closed && dirty) continue;
+          return;
+        }
+        const epoch = requestEpoch;
+        dirty = false;
+        try {
+          await computeAndSend(epoch);
+        } catch (error) {
+          reportError(error);
+          if (!closed && epoch === requestEpoch && recoveryEpoch !== epoch) {
+            recoveryEpoch = epoch;
+            dirty = true;
+          }
+        }
+      }
+      drainPromise = null;
+    })();
+    return drainPromise;
   };
 
   const emit = (): void => {
@@ -86,9 +121,7 @@ export function createStudioGenerationLedgerWatcher(input: {
     if (timer) clearTimeout(timer);
     timer = setTimeout(() => {
       timer = null;
-      void enqueueCompute().catch((error: unknown) => {
-        input.onError?.(error instanceof Error ? error.message : String(error));
-      });
+      void requestCompute().catch(reportError);
     }, input.debounceMs ?? 250);
   };
 
@@ -102,7 +135,7 @@ export function createStudioGenerationLedgerWatcher(input: {
   });
   watcher.on("add", emit).on("change", emit).on("unlink", emit);
   watcher.on("error", (error) => {
-    input.onError?.(error instanceof Error ? error.message : String(error));
+    reportError(error);
   });
 
   return {
@@ -112,16 +145,26 @@ export function createStudioGenerationLedgerWatcher(input: {
         clearTimeout(timer);
         timer = null;
       }
-      await enqueueCompute();
+      await requestCompute();
     },
-    async close(): Promise<void> {
-      closed = true;
-      computeSequence += 1;
-      if (timer) {
-        clearTimeout(timer);
-        timer = null;
+    close(): Promise<void> {
+      if (!closePromise) {
+        closed = true;
+        dirty = false;
+        requestEpoch += 1;
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+        const watcherClose = Promise.resolve().then(() => watcher.close());
+        const activeDrain = drainPromise ?? Promise.resolve();
+        closePromise = Promise.allSettled([watcherClose, activeDrain]).then((results) => {
+          for (const result of results) {
+            if (result.status === "rejected") throw result.reason;
+          }
+        });
       }
-      await watcher.close();
+      return closePromise;
     },
   };
 }

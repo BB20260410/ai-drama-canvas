@@ -1,3 +1,5 @@
+import { recordStudioUnitsReadCounter } from "./studio-units-read-phase-timeline.js";
+
 export interface RuntimeStorageReadMetrics {
   managedProjectShellInspections: number;
   sqliteSnapshotRequests: number;
@@ -16,6 +18,7 @@ const metrics: RuntimeStorageReadMetrics = {
 
 export function recordManagedProjectShellInspection(): void {
   metrics.managedProjectShellInspections += 1;
+  recordStudioUnitsReadCounter("managedProjectShellInspections");
 }
 
 export function recordSqliteSnapshotRequest(): void {

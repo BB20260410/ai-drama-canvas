@@ -76,9 +76,13 @@ async function allowedTemporaryRoots(): Promise<AllowedTemporaryRoot[]> {
 
 async function selectTemporaryRoot(candidate: string): Promise<AllowedTemporaryRoot> {
   const allowed = await allowedTemporaryRoots();
-  const selected = allowed.find((entry) => within(candidate, entry.lexical));
-  if (!selected) throw new Error("夹具根必须是系统临时目录下的专用子目录。");
-  return selected;
+  for (const entry of allowed) {
+    if (within(candidate, entry.lexical)) return entry;
+    if (within(candidate, entry.canonical)) {
+      return { lexical: entry.canonical, canonical: entry.canonical };
+    }
+  }
+  throw new Error("夹具根必须是系统临时目录下的专用子目录。");
 }
 
 async function readSmallJsonNoFollow(filePath: string): Promise<unknown | undefined> {

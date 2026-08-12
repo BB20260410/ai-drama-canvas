@@ -30,31 +30,32 @@ export interface StudioProductionDashboardUiApi {
 }
 
 /**
- * 同一工程的 overview 在同一时刻只向 Core 请求一次。
+ * 同一工程的 overview，以及参数完全相同的 units，在同一时刻只向 Core 请求一次。
  *
- * Material Studio 外壳与 Dashboard 子视图会在首屏同时读取 overview；共享进行中的
- * Promise 可避免重复扫描大型工程。请求完成后立即释放，不缓存业务结果，因而不会把
- * 旧工程状态带入下一次刷新。其他 operation 保持各自原有的请求与取消语义。
+ * Material Studio 外壳与 Dashboard 子视图会在首屏同时读取 overview；App 冷启动也会
+ * 在确认 drama 工作区后预发默认 units。共享进行中的 Promise 可把 Core 深读取与模块
+ * 预热并行，又不会缓存业务结果或跨工程复用。其他 operation 保持原有请求语义。
  */
 export function createStudioDashboardRequestCoalescer(
   api: StudioProductionDashboardUiApi,
 ): StudioProductionDashboardUiApi {
-  const overviewInFlight = new Map<string, Promise<StudioProductionDashboardResponse>>();
+  const inFlight = new Map<string, Promise<StudioProductionDashboardResponse>>();
   return {
     ...api,
     getDashboard(projectRoot, query) {
-      if (query.operation !== "overview") {
+      if (query.operation !== "overview" && query.operation !== "units") {
         return api.getDashboard(projectRoot, query);
       }
-      const existing = overviewInFlight.get(projectRoot);
+      const key = dashboardRequestToken(projectRoot, query);
+      const existing = inFlight.get(key);
       if (existing) return existing;
       const request = api.getDashboard(projectRoot, query);
       const shared = request.finally(() => {
-        if (overviewInFlight.get(projectRoot) === shared) {
-          overviewInFlight.delete(projectRoot);
+        if (inFlight.get(key) === shared) {
+          inFlight.delete(key);
         }
       });
-      overviewInFlight.set(projectRoot, shared);
+      inFlight.set(key, shared);
       return shared;
     },
   };

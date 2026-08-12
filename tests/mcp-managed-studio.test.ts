@@ -789,7 +789,9 @@ describe("受管素材中心 MCP", () => {
     } finally {
       await client.close();
     }
-  }, 30_000);
+    // 空载实测约 24.5s，贴近 30s 旧帽；integration 分区并发负载下必撞顶（wq-0006 verify 实测）。
+    // 断言合同不变，仅显式放宽本用例时限。
+  }, 120_000);
 
   it("P30 unit-grid 通过同一 generation control/MCP 命令总线冻结、读取安全参考和计划投影", async () => {
     const runtimeRoot = await realpath(await mkdtemp(path.join(os.tmpdir(), "ai-canvas-mcp-unit-grid-")));

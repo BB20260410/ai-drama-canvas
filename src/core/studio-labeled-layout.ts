@@ -10,7 +10,7 @@
 import { createHash } from "node:crypto";
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import sharp from "sharp";
+import sharp, { type Metadata } from "sharp";
 
 export type StudioLabeledLayoutErrorCode =
   | "invalid-input"
@@ -153,7 +153,7 @@ export async function renderStudioLabeledLayoutToBuffer(
     fail("source-unreadable", `无法读取 raw：${rawPath}`);
   }
 
-  let meta: sharp.Metadata;
+  let meta: Metadata;
   try {
     meta = await sharp(rawPath).rotate().metadata();
   } catch (error) {
@@ -287,7 +287,7 @@ export async function renderStudioUnitGridLabeledLayoutToBuffer(
   } catch {
     fail("source-unreadable", `无法读取 raw：${rawPath}`);
   }
-  let meta: sharp.Metadata;
+  let meta: Metadata;
   try {
     meta = await sharp(rawPath).rotate().metadata();
   } catch (error) {

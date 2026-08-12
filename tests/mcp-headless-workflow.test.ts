@@ -48,5 +48,7 @@ describe("应用关闭时的 stdio MCP 生产闭环", () => {
     expect(result.continuation).toEqual(expect.objectContaining({ status: "completed", outputPath: expect.stringContaining(root), reviewStatus: "已完成" }));
     expect(result.workflow).toEqual({ video: "completed", edit: "completed" });
     expect(result.finalDoctor.errors).toBe(0);
-  }, 120_000);
+    // 2026-08-09 真实 source-stdio 全链实测约 155 秒，其中 bootstrap 约 93 秒；
+    // 240 秒保留负载抖动空间，同时仍对死锁保持明确上界。
+  }, 240_000);
 });

@@ -13,9 +13,17 @@ describe("P18 旧画布性能合同", () => {
 
   it("画布 watch 不再包含 zoom 源，也不做 deep 遍历", () => {
     expect(app).toContain("const compactZoom = computed(() => zoom.value < 0.35)");
-    expect(app).toContain("watch([visibleItems, viewKey, compactZoom], () => void rebuildFlow())");
+    expect(app).toContain("watch([visibleItems, viewKey, compactZoom], scheduleLegacyFlowRebuild)");
     expect(app).not.toContain("watch([visibleItems, viewKey, zoom");
     expect(app).not.toContain("watch([visibleItems, viewKey, compactZoom], () => void rebuildFlow(), { deep: true })");
+    const scheduleStart = app.indexOf("function scheduleLegacyFlowRebuild");
+    const scheduleEnd = app.indexOf("watch([visibleItems, viewKey, compactZoom]", scheduleStart);
+    expect(scheduleStart).toBeGreaterThan(-1);
+    expect(scheduleEnd).toBeGreaterThan(scheduleStart);
+    const schedule = app.slice(scheduleStart, scheduleEnd);
+    expect(schedule).toContain("clearTimeout(legacyFlowRebuildTimer)");
+    expect(schedule).toContain("setTimeout(() =>");
+    expect(schedule).toContain("void rebuildFlow()");
   });
 
   it("nodes/edges 使用 shallowRef（整页替换语义，避免深层响应式）", () => {

@@ -1,9 +1,14 @@
-import { chmod, lstat, mkdir, mkdtemp, readFile, readdir, realpath, rename, rm, stat, writeFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { chmod, copyFile, lstat, mkdir, mkdtemp, readFile, readdir, realpath, rename, rm, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { randomUUID } from "node:crypto";
+import { promisify } from "node:util";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { afterEach, describe, expect, it } from "vitest";
-import { computeSourceDigest } from "../src/core/build-identity.js";
+import { computeSourceDigest, listSourceDigestFiles } from "../src/core/build-identity.js";
 import {
   createImmutableMcpRuntimeCandidateReceipt,
   inspectImmutableMcpRuntimeTree,
@@ -12,16 +17,29 @@ import {
   verifyImmutableMcpRuntimeCandidate,
 } from "../src/core/immutable-mcp-runtime-candidate.js";
 import {
+  immutableMcpPublicationPath,
+  inspectImmutableMcpDependencyTree,
+  verifyPublishedImmutableMcpRuntimeCandidate,
+} from "../src/core/immutable-mcp-runtime-publication.js";
+import {
   AI_CANVAS_APPLICATION_VERSION,
   AI_CANVAS_PROTOCOL_VERSION,
   RELEASE_MANIFEST_SCHEMA_VERSION,
   releaseManifestDigest,
   type ReleaseManifest,
 } from "../src/core/release-manifest.js";
-import { buildImmutableMcpRuntimeCandidate } from "../scripts/build-immutable-mcp-candidate.js";
+import {
+  assertImmutableMcpCandidateOutputBoundary,
+  buildImmutableMcpRuntimeCandidate,
+  parseImmutableMcpCandidateBuildArguments,
+  publishImmutableMcpCandidateCutover,
+} from "../scripts/build-immutable-mcp-candidate.js";
+import { withImmutableMcpPublicationLock } from "../src/core/immutable-mcp-publication-lock.js";
+import { sanitizedMcpChildEnvironment } from "../src/core/current-mcp-runtime.js";
 
 const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const roots: string[] = [];
+const execFileAsync = promisify(execFile);
 
 async function makeWritableForCleanup(root: string): Promise<void> {
   let metadata;
@@ -95,6 +113,116 @@ async function createFixtureCandidate(): Promise<{
 }
 
 describe("不可变 MCP candidate receipt", () => {
+  it("正式构建 CLI 与 outputRoot 固定，只有测试可显式使用系统临时根", () => {
+    expect(parseImmutableMcpCandidateBuildArguments([])).toEqual({});
+    expect(() => parseImmutableMcpCandidateBuildArguments(["--output-root", "/tmp/escape"]))
+      .toThrow(/未知参数：--output-root/u);
+    expect(() => assertImmutableMcpCandidateOutputBoundary(
+      workspace,
+      path.join(workspace, ".aicanvas-runtime", "mcp-candidates", "nested"),
+      false,
+    )).toThrow(/只能写入固定根/u);
+  });
+
+  it("publication lock 回收死亡 PID，存活 PID 锁则失败关闭", async () => {
+    const outputRoot = await realpath(await mkdtemp(path.join(os.tmpdir(), "mcp-publication-lock-test-")));
+    roots.push(outputRoot);
+    const lockPath = path.join(outputRoot, ".publish-lock");
+    const lockRecord = (pid: number) => `${JSON.stringify({
+      schemaVersion: 1,
+      kind: "immutable-mcp-publication-lock",
+      pid,
+      token: randomUUID(),
+      startedAt: new Date().toISOString(),
+    })}\n`;
+    await writeFile(lockPath, lockRecord(2_147_483_647), { mode: 0o600 });
+    await expect(withImmutableMcpPublicationLock(outputRoot, async () => "recovered", {
+      maxWaitMs: 50,
+      pollMs: 10,
+    })).resolves.toBe("recovered");
+
+    await writeFile(lockPath, lockRecord(process.pid), { mode: 0o600 });
+    await expect(withImmutableMcpPublicationLock(outputRoot, async () => "should-not-run", {
+      maxWaitMs: 20,
+      pollMs: 10,
+    })).rejects.toThrow(/存活进程持有/u);
+  });
+
+  it("死亡锁 reaper 竞争时只有一个回收者，另一方确定性等待后串行进入", async () => {
+    const outputRoot = await realpath(await mkdtemp(path.join(os.tmpdir(), "mcp-publication-reaper-race-")));
+    roots.push(outputRoot);
+    const lockPath = path.join(outputRoot, ".publish-lock");
+    await writeFile(lockPath, `${JSON.stringify({
+      schemaVersion: 1,
+      kind: "immutable-mcp-publication-lock",
+      pid: 2_147_483_647,
+      token: randomUUID(),
+      startedAt: new Date().toISOString(),
+    })}\n`, { mode: 0o600 });
+
+    let releaseFirstReaper!: () => void;
+    const firstReaperGate = new Promise<void>((resolve) => { releaseFirstReaper = resolve; });
+    let firstReaperAcquired!: () => void;
+    const firstReaperObserved = new Promise<void>((resolve) => { firstReaperAcquired = resolve; });
+    let busyObserved!: () => void;
+    const secondObservedBusy = new Promise<void>((resolve) => { busyObserved = resolve; });
+    const actions: string[] = [];
+    const first = withImmutableMcpPublicationLock(outputRoot, async () => {
+      actions.push("first");
+      return "first";
+    }, {
+      maxWaitMs: 500,
+      pollMs: 10,
+      testHooks: {
+        async afterDeadLockReaperAcquired() {
+          firstReaperAcquired();
+          await firstReaperGate;
+        },
+      },
+    });
+    await firstReaperObserved;
+    const second = withImmutableMcpPublicationLock(outputRoot, async () => {
+      actions.push("second");
+      return "second";
+    }, {
+      maxWaitMs: 500,
+      pollMs: 10,
+      testHooks: { async onDeadLockReaperBusy() { busyObserved(); } },
+    });
+    await secondObservedBusy;
+    expect(actions).toEqual([]);
+    releaseFirstReaper();
+
+    await expect(Promise.all([first, second])).resolves.toEqual(["first", "second"]);
+    expect(actions).toEqual(["first", "second"]);
+  });
+
+  it("持有 reaper 后重新读取主锁；交错替换成存活 owner 时拒绝 rename", async () => {
+    const outputRoot = await realpath(await mkdtemp(path.join(os.tmpdir(), "mcp-publication-reaper-recheck-")));
+    roots.push(outputRoot);
+    const lockPath = path.join(outputRoot, ".publish-lock");
+    const deadRecord = {
+      schemaVersion: 1,
+      kind: "immutable-mcp-publication-lock",
+      pid: 2_147_483_647,
+      token: randomUUID(),
+      startedAt: new Date().toISOString(),
+    };
+    const liveRecord = { ...deadRecord, pid: process.pid, token: randomUUID() };
+    await writeFile(lockPath, `${JSON.stringify(deadRecord)}\n`, { mode: 0o600 });
+
+    await expect(withImmutableMcpPublicationLock(outputRoot, async () => "must-not-run", {
+      maxWaitMs: 20,
+      pollMs: 10,
+      testHooks: {
+        async afterDeadLockReaperAcquired() {
+          await writeFile(lockPath, `${JSON.stringify(liveRecord)}\n`, "utf8");
+        },
+      },
+    })).rejects.toThrow(/存活进程持有/u);
+    expect(JSON.parse(await readFile(lockPath, "utf8"))).toMatchObject({ token: liveRecord.token });
+  });
+
   it("完整树通过；只改传递 core 文件也会被 tree fingerprint 拒绝", async () => {
     const fixture = await createFixtureCandidate();
     const receipt = await verifyImmutableMcpRuntimeCandidate(fixture.staging, {
@@ -127,7 +255,7 @@ describe("不可变 MCP candidate receipt", () => {
   });
 
   it("真实隔离 stage 依次 build:mcp + build:identity，且 live dist-mcp 不变", async () => {
-    const outputParent = await mkdtemp(path.join(os.tmpdir(), "immutable-mcp-candidate-build-test-"));
+    const outputParent = await realpath(await mkdtemp(path.join(os.tmpdir(), "immutable-mcp-candidate-build-test-")));
     roots.push(outputParent);
     const outputRoot = path.join(outputParent, "candidates");
     await mkdir(outputRoot, { recursive: true });
@@ -150,7 +278,15 @@ describe("不可变 MCP candidate receipt", () => {
       stat(liveEntryPath),
       verifyImmutableMcpRuntimeCandidate(result.candidateRoot),
     ]);
-    expect(result.commands.map((command) => command.name)).toEqual(["build:mcp", "build:identity"]);
+    expect(result.commands.map((command) => command.name)).toEqual([
+      "npm:ci",
+      "build:launcher",
+      "build:mcp",
+      "build:identity",
+      "npm:prune-production",
+      "npm:ls-production",
+      "runtime:smoke",
+    ]);
     expect(result.commands.every((command) => command.exitCode === 0)).toBe(true);
     expect(result.source).toMatchObject({
       before: sourceBefore.sourceDigest,
@@ -170,6 +306,18 @@ describe("不可变 MCP candidate receipt", () => {
     expect(landedReceipt).toEqual(result.receipt);
     expect(landedReceipt.sourceDigest).toBe(sourceBefore.sourceDigest);
     expect(landedReceipt.entrySha256).not.toBe("");
+    await expect(verifyPublishedImmutableMcpRuntimeCandidate(
+      result.candidateRoot,
+      result.publication,
+      { launcherPath: result.launcher.path },
+    )).resolves.toEqual(result.receipt);
+    expect(result.launcher.externalImports.every((entry) => entry.startsWith("node:")
+      || ["events", "fs", "os", "path", "stream", "util"].includes(entry))).toBe(true);
+    const dependencyTree = await inspectImmutableMcpDependencyTree(path.join(result.candidateRoot, "node_modules"));
+    expect(dependencyTree).toMatchObject({
+      files: result.publication.dependencyClosure.files,
+      fingerprint: result.publication.dependencyClosure.fingerprint,
+    });
 
     const candidateCoreFiles = (await inspectImmutableMcpRuntimeTree(
       path.join(result.candidateRoot, "dist-mcp"),
@@ -182,5 +330,87 @@ describe("不可变 MCP candidate receipt", () => {
       sourceDigest: sourceBefore.sourceDigest,
       mcpToolCount: landedReceipt.mcpToolCount,
     });
+
+    const launcherBeforeRejectedCutover = await stat(result.launcher.path, { bigint: true });
+    const retryCandidateRoot = path.join(outputRoot, `.retry-${randomUUID()}`);
+    await execFileAsync("/bin/cp", ["-cR", result.candidateRoot, retryCandidateRoot]);
+    await expect(publishImmutableMcpCandidateCutover(
+      outputRoot,
+      path.dirname(result.launcher.path),
+      result.launcher.path,
+      result.launcher.sha256,
+      retryCandidateRoot,
+      result.receipt,
+      result.publication,
+      { beforeLauncherCutover: async () => { throw new Error("injected-source-drift"); } },
+    )).rejects.toThrow(/injected-source-drift/u);
+    const launcherAfterRejectedCutover = await stat(result.launcher.path, { bigint: true });
+    expect({
+      dev: launcherAfterRejectedCutover.dev,
+      ino: launcherAfterRejectedCutover.ino,
+      mtimeNs: launcherAfterRejectedCutover.mtimeNs,
+    }).toEqual({
+      dev: launcherBeforeRejectedCutover.dev,
+      ino: launcherBeforeRejectedCutover.ino,
+      mtimeNs: launcherBeforeRejectedCutover.mtimeNs,
+    });
+
+    const runtimeWorkspace = path.join(outputParent, "runtime-workspace");
+    const runtimeCandidatesRoot = path.join(runtimeWorkspace, ".aicanvas-runtime", "mcp-candidates");
+    const runtimeLauncherPath = path.join(runtimeWorkspace, ".aicanvas-runtime", "mcp-launcher", "current.mjs");
+    await Promise.all([
+      mkdir(path.join(runtimeCandidatesRoot, ".published"), { recursive: true }),
+      mkdir(path.dirname(runtimeLauncherPath), { recursive: true }),
+    ]);
+    for (const sourcePath of await listSourceDigestFiles(workspace)) {
+      const targetPath = path.join(runtimeWorkspace, path.relative(workspace, sourcePath));
+      await mkdir(path.dirname(targetPath), { recursive: true });
+      await copyFile(sourcePath, targetPath);
+    }
+    await chmod(result.candidateRoot, 0o700);
+    const runtimeCandidateRoot = path.join(runtimeCandidatesRoot, result.receipt.candidateId);
+    await rename(result.candidateRoot, runtimeCandidateRoot);
+    await chmod(runtimeCandidateRoot, 0o555);
+    await Promise.all([
+      copyFile(
+        immutableMcpPublicationPath(outputRoot, result.receipt.candidateId),
+        immutableMcpPublicationPath(runtimeCandidatesRoot, result.receipt.candidateId),
+      ),
+      copyFile(result.launcher.path, runtimeLauncherPath),
+    ]);
+    const runtimeEnvironment = sanitizedMcpChildEnvironment({
+      ...process.env,
+      AI_CANVAS_MCP_ALLOW_MULTI: "1",
+      AI_CANVAS_REGISTRY_PATH: path.join(outputParent, "runtime-registry.json"),
+    });
+    const check = await execFileAsync(process.execPath, [runtimeLauncherPath, "--check"], {
+      cwd: runtimeWorkspace,
+      env: runtimeEnvironment,
+      encoding: "utf8",
+      timeout: 30_000,
+    });
+    expect(JSON.parse(check.stdout)).toMatchObject({
+      ok: true,
+      candidateId: result.receipt.candidateId,
+      mcpToolCount: result.receipt.mcpToolCount,
+    });
+
+    const transport = new StdioClientTransport({
+      command: process.execPath,
+      args: [runtimeLauncherPath],
+      cwd: runtimeWorkspace,
+      env: runtimeEnvironment,
+      stderr: "pipe",
+    });
+    const client = new Client({ name: "immutable-mcp-stable-launcher-test", version: "1.0.0" });
+    try {
+      await client.connect(transport);
+      const tools = await client.listTools();
+      expect(tools.tools).toHaveLength(result.receipt.mcpToolCount);
+      expect(tools.tools.map((entry) => entry.name)).toContain("get_capabilities");
+    } finally {
+      await client.close().catch(() => undefined);
+      await transport.close().catch(() => undefined);
+    }
   }, 240_000);
 });

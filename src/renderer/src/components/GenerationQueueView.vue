@@ -66,7 +66,7 @@
       </section>
 
       <aside v-if="settingsOpen" class="provider-settings">
-        <header><div><span class="eyebrow">适配器</span><h3>供应商与桥接</h3></div><button type="button" @click="addProvider"><Plus :size="15" /></button></header>
+        <header><div><span class="eyebrow">适配器</span><h3>供应商与桥接</h3></div><button type="button" aria-label="新增供应商" @click="addProvider"><Plus :size="15" /></button></header>
         <div class="settings-scroll">
           <section v-for="provider in settings?.providers" :key="provider.id" class="provider-editor">
             <div class="provider-head"><input v-model="provider.name" /><label><input v-model="provider.enabled" type="checkbox" /> 启用</label></div>

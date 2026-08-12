@@ -8,14 +8,14 @@
       </div>
       <div class="editor-actions">
         <span :class="['engine-state', { offline: !engine?.available }]">{{ engine?.available ? 'FFmpeg 就绪' : 'FFmpeg 未就绪' }}</span>
-        <select v-model="activeProjectId" @change="openProject(activeProjectId)">
+        <select v-model="activeProjectId" @change="selectEditProject(activeProjectId)">
           <option value="">选择剪辑工程</option>
           <option v-for="entry in projects" :key="entry.id" :value="entry.id">{{ entry.name }} · v{{ entry.revision }}</option>
         </select>
         <button class="ghost-button icon-history" type="button" title="撤销剪辑" :disabled="!active || !historyInfo.canUndo" @click="undoEditor"><Undo2 :size="14" /></button>
         <button class="ghost-button icon-history" type="button" title="重做剪辑" :disabled="!active || !historyInfo.canRedo" @click="redoEditor"><Redo2 :size="14" /></button>
         <button class="ghost-button" type="button" @click="showCreate = true"><Plus :size="14" /> 新建</button>
-        <button class="ghost-button" type="button" :disabled="!active || saving" @click="save"><Save :size="14" /> {{ saving ? '保存中' : '保存' }}</button>
+        <button class="ghost-button" type="button" :disabled="!active || saving" @click="save()"><Save :size="14" /> {{ saving ? '保存中' : '保存' }}</button>
         <button v-if="rendering" class="ghost-button render-cancel" type="button" @click="cancelRender"><Square :size="13" /> 取消导出</button>
         <button class="primary-button" type="button" :disabled="!active || !visualClips.length || rendering || !engine?.available" @click="render">
           <Download :size="14" /> {{ rendering ? '正在导出' : '导出 MP4' }}
@@ -30,15 +30,16 @@
     </div>
     <div v-else class="editor-body">
       <aside class="media-bin">
-        <header><div><span>素材库</span><b>{{ filteredMedia.length }}</b></div><input v-model="mediaSearch" placeholder="搜索镜头或文件" /></header>
+        <header><div><span>素材库</span><b>{{ filteredMedia.length }} / {{ mediaTotal }}</b></div><input v-model="mediaSearch" placeholder="搜索镜头或文件" /></header>
         <div class="media-filter"><button :class="{ active: mediaKind === 'all' }" @click="mediaKind = 'all'">全部</button><button :class="{ active: mediaKind === 'video' }" @click="mediaKind = 'video'">视频</button><button :class="{ active: mediaKind === 'image' }" @click="mediaKind = 'image'">图片</button><button :class="{ active: mediaKind === 'audio' }" @click="mediaKind = 'audio'">音频</button></div>
         <div class="media-list">
-          <article v-for="item in filteredMedia" :key="item.id" @mouseenter="ensureMediaPreview(item)">
-            <figure><img v-if="item.waveformPath || item.thumbnailPath" :src="assetUrl(item.waveformPath || item.thumbnailPath!)" loading="lazy" /><span v-else><LoaderCircle v-if="previewLoading.has(item.artifactId)" class="spinning" :size="16" /><Music2 v-else-if="item.kind === 'audio'" :size="18" /><Film v-else :size="18" /></span><em>{{ item.kind.toUpperCase() }}</em></figure>
+          <article v-for="item in filteredMedia" :key="item.id" @mouseenter="ensureMediaPreview(item)" @mouseleave="clearMediaPreviewDemand">
+            <figure><img v-if="item.waveformPath || item.thumbnailPath" :src="assetUrl(item.waveformPath || item.thumbnailPath!)" :alt="`${item.name} ${item.kind === 'audio' ? '波形' : '缩略图'}`" loading="lazy" decoding="async" /><span v-else><LoaderCircle v-if="previewLoading.has(item.artifactId)" class="spinning" :size="16" /><Music2 v-else-if="item.kind === 'audio'" :size="18" /><Film v-else :size="18" /></span><em>{{ item.kind.toUpperCase() }}</em></figure>
             <div><b>{{ item.name }}</b><small>{{ mediaMeta(item) }}</small><code>{{ item.path }}</code></div>
             <div class="media-actions"><button v-if="item.kind==='video'" type="button" :class="{ready:item.proxyPath}" :title="item.proxyPath?'剪辑代理已就绪':'生成最长边 1280 的本地剪辑代理'" :disabled="proxyLoading.has(item.artifactId)" @click="prepareProxy(item)"><LoaderCircle v-if="proxyLoading.has(item.artifactId)" class="spinning" :size="12" /><span v-else>P</span></button><button type="button" title="追加到主画面" @click="addMedia(item)"><Plus :size="15" /></button></div>
           </article>
           <p v-if="!filteredMedia.length" class="bin-empty">没有匹配的可解码素材</p>
+          <button v-if="mediaNextCursor" class="media-load-more" type="button" :disabled="mediaPageLoading" @click="loadMedia(false)">{{ mediaPageLoading ? "读取中…" : "加载更多" }}</button>
         </div>
       </aside>
 
@@ -47,12 +48,12 @@
           <div class="preview-stage">
             <div class="preview-frame" :style="previewAspect">
               <video v-if="previewClip && ['video','timeline'].includes(previewClip.kind) && clipPreviewPath(previewClip)" :key="`${previewClip.id}-${clipPreviewPath(previewClip)}`" ref="videoElement" class="preview-main" data-testid="preview-main-video" :data-dissolve-role="activeDissolve ? 'outgoing' : undefined" :src="assetUrl(clipPreviewPath(previewClip))" playsinline preload="auto" :style="mainPreviewStyle(previewClip, activeDissolve ? 1 - activeDissolve.progress : 1)" @loadedmetadata="onPreviewMediaLoaded(previewClip)" @error="onPreviewMediaError(previewClip, $event)"></video>
-              <img v-else-if="previewClip?.kind === 'image'" class="preview-main" data-testid="preview-main-image" :src="assetUrl(previewClip.sourcePath!)" :style="mainPreviewStyle(previewClip)" />
+              <img v-else-if="previewClip?.kind === 'image'" class="preview-main" data-testid="preview-main-image" :src="assetUrl(previewClip.sourcePath!)" :alt="`${previewClip.name} 主预览`" decoding="async" :style="mainPreviewStyle(previewClip)" />
               <div v-else class="preview-empty"><Clapperboard :size="30" /><span>播放头当前位置没有画面</span></div>
               <video v-if="activeDissolve && clipPreviewPath(activeDissolve.incoming)" :key="`dissolve-${activeDissolve.incoming.id}-${clipPreviewPath(activeDissolve.incoming)}`" ref="incomingVideoElement" class="preview-main preview-transition-incoming" data-testid="preview-transition-incoming" :src="assetUrl(clipPreviewPath(activeDissolve.incoming))" playsinline muted preload="auto" :style="mainPreviewStyle(activeDissolve.incoming, activeDissolve.progress)" @loadedmetadata="syncPreview" @error="onPreviewMediaError(activeDissolve.incoming, $event)"></video>
               <template v-for="clip in activeOverlayClips" :key="clip.id">
                 <video v-if="['video','timeline'].includes(clip.kind) && clipPreviewPath(clip)" :ref="(element) => setOverlayVideoElement(clip.id, element)" class="preview-overlay" :src="assetUrl(clipPreviewPath(clip))" playsinline preload="auto" :style="overlayPreviewStyle(clip)" @loadedmetadata="onPreviewMediaLoaded(clip)" @error="onPreviewMediaError(clip, $event)"></video>
-                <img v-else-if="clip.kind === 'image'" class="preview-overlay" :src="assetUrl(clip.sourcePath!)" :style="overlayPreviewStyle(clip)" />
+                <img v-else-if="clip.kind === 'image'" class="preview-overlay" :src="assetUrl(clip.sourcePath!)" :alt="`${clip.name} 叠加预览`" decoding="async" :style="overlayPreviewStyle(clip)" />
               </template>
               <div v-if="activeSubtitle" class="preview-subtitle" :style="{ color: activeSubtitle.fontColor || '#fff', fontSize: `${Math.max(12, (activeSubtitle.fontSize || 48) * previewScale)}px`, background: `${activeSubtitle.subtitleBackground || '#000'}b8` }">{{ activeSubtitle.text }}</div>
               <div class="preview-time">{{ timecode(playhead) }} / {{ timecode(totalDuration) }}</div>
@@ -63,7 +64,7 @@
           </div>
           <div class="transport">
             <button type="button" title="回到开头" @click="seek(0)"><SkipBack :size="16" /></button>
-            <button class="play" type="button" @click="togglePlayback"><Pause v-if="playing" :size="18" /><Play v-else :size="18" /></button>
+            <button class="play" type="button" :aria-label="playing ? '暂停预览' : '播放预览'" @click="togglePlayback"><Pause v-if="playing" :size="18" /><Play v-else :size="18" /></button>
             <button type="button" title="跳到结尾" @click="seek(totalDuration)"><SkipForward :size="16" /></button>
             <input :value="playhead" type="range" min="0" :max="Math.max(totalDuration, frameDuration)" :step="frameDuration" @input="seek(Number(($event.target as HTMLInputElement).value))" />
             <span>{{ active.width }}×{{ active.height }} · {{ timebaseLabel }} · F{{ playheadFrame }}</span>
@@ -75,7 +76,7 @@
             <div><button type="button" @click="addOverlayTrack"><Layers3 :size="14" /> 画中画轨</button><button type="button" @click="addSubtitle"><Captions :size="14" /> 字幕</button><select v-model="selectedNestedProjectId" data-testid="nested-project-select" title="选择要冻结插入的子剪辑工程"><option value="">子时间线</option><option v-for="entry in availableNestedProjects" :key="entry.id" :value="entry.id">{{ entry.name }} · v{{ entry.revision }}</option></select><button type="button" data-testid="add-nested-timeline" :disabled="nestedAdding || !selectedNestedProjectId" @click="addNestedTimeline"><Layers3 :size="14" /> {{ nestedAdding ? '冻结中' : '插入子时间线' }}</button><button class="tool-emphasis" type="button" title="在播放头分割当前片段（⌘B）" :disabled="!canSplitSelected" @click="splitSelectedAtPlayhead"><Scissors :size="14" /> 分割</button><button class="danger" type="button" title="删除当前片段并收拢后续未锁定轨道（⇧⌫）" :disabled="!selectedClip" @click="rippleDeleteSelected"><Trash2 :size="14" /> Ripple 删除</button><button type="button" :disabled="extractingFrame" @click="extractCurrentFrame"><ImageDown :size="14" /> {{ extractingFrame ? '合成中' : '导出当前帧' }}</button><select v-model="continuationTargetId" title="选择要登记新首帧的下一个 15 秒单元"><option value="">续接目标</option><option v-for="item in continuationUnits" :key="item.id" :value="item.id">EP{{String(item.episode).padStart(2,'0')}}-{{String(item.unit).padStart(3,'0')}} {{item.title}}</option></select><button type="button" :disabled="preparingContinuation||!continuationTargetId" @click="prepareTimelineContinuation"><Link2 :size="14" /> {{preparingContinuation?'准备中':'末帧续视频'}}</button><button type="button" @click="importOtio"><FileUp :size="14" /> OTIO</button><button type="button" :disabled="!active" @click="exportOtio"><FileDown :size="14" /> OTIO</button><button type="button" :disabled="!selectedClip || selectedTrack?.kind !== 'visual' || selectedTrack?.order !== 0" @click="moveClip(-1)"><ChevronLeft :size="14" /> 前移</button><button type="button" :disabled="!selectedClip || selectedTrack?.kind !== 'visual' || selectedTrack?.order !== 0" @click="moveClip(1)">后移 <ChevronRight :size="14" /></button><button type="button" :disabled="!selectedClip" @click="removeClip"><X :size="14" /> 普通移除</button></div>
             <div class="timeline-scale"><span>拖动片段 · 边缘裁切 · 自动吸附</span><label>缩放 <input v-model.number="pixelsPerSecond" type="range" min="24" max="120" step="4" /></label></div>
           </header>
-          <div class="timeline-scroll">
+          <div ref="timelineScrollElement" class="timeline-scroll" @scroll.passive="onTimelineScroll">
             <div class="timeline-surface" :style="timelineWidth" @click="onTimelineClick">
               <div class="ruler">
                 <span v-for="tick in rulerTicks" :key="tick" :style="{ left: `${tick * pixelsPerSecond}px` }">{{ tick }}s</span>
@@ -86,7 +87,7 @@
                 <header :class="{ selected: track.id === selectedTrackId }" @click.stop="selectedTrackId = track.id"><span>{{ track.kind === 'visual' ? (track.order === 0 ? 'V' : 'P') : track.kind === 'audio' ? 'A' : 'T' }}</span><div><b>{{ track.name }}</b><small>{{ track.clips.length }} clips</small></div><button v-if="track.kind === 'visual' && track.order > 0 && !track.clips.length" type="button" title="删除空叠加轨" @click.stop="removeTrack(track.id)"><X :size="11" /></button></header>
                 <div class="track-lane">
                   <button
-                    v-for="clip in track.clips"
+                    v-for="clip in visibleTrackClips(track)"
                     :key="clip.id"
                     type="button"
                     :class="['timeline-clip', clip.kind, { selected: clip.id === selectedClipId, dragging: timelineGesture?.clipId === clip.id, locked: track.locked }]"
@@ -117,7 +118,7 @@
         <section v-if="selectedClip" class="selected-fields">
           <div class="inspector-label">当前片段</div><h3>{{ selectedClip.name }}</h3><code>{{ selectedClip.kind === 'timeline' ? `${selectedClip.nestedTimeline?.childEditProjectId} · 冻结 v${selectedClip.nestedTimeline?.childEditProjectRevision}` : selectedClip.sourcePath }}</code>
           <div v-if="selectedClip.kind === 'timeline'" class="nested-inspector" data-testid="nested-timeline-inspector"><small>快照 {{ selectedClip.nestedTimeline?.childSnapshotSha256.slice(0,12) }} · {{ selectedClip.nestedTimeline?.childTimebase.rateNumerator }}/{{ selectedClip.nestedTimeline?.childTimebase.rateDenominator }}</small><small v-if="nestedPreviewErrors.get(selectedClip.id)" role="alert">{{ nestedPreviewErrors.get(selectedClip.id) }}</small><button type="button" data-testid="refresh-nested-timeline" :disabled="nestedAdding" @click="refreshNestedTimeline">显式刷新到子工程当前修订</button></div>
-          <label><span>成片时长 · {{ clipDurationFrames(selectedClip) }} 帧</span><input v-model.number="selectedClip.durationSeconds" type="number" :min="frameDuration" :step="frameDuration" @change="normalizeSelectedClipTiming" /></label>
+          <label><span>成片时长 · {{ clipDurationFrames(selectedClip) }} 帧</span><input v-model.number="selectedClip.durationSeconds" type="number" :min="frameDuration" :max="MAX_EDIT_TIMELINE_SECONDS" :step="frameDuration" @change="normalizeSelectedClipTiming" /></label>
           <label v-if="['video','audio'].includes(selectedClip.kind)"><span>源片裁切起点 · F{{ clipTrimStartFrame(selectedClip) }}</span><input v-model.number="selectedClip.trimStartSeconds" type="number" min="0" :step="frameDuration" @change="normalizeSelectedClipTiming" /></label>
           <label v-if="['video','audio'].includes(selectedClip.kind)"><span>播放速率</span><input v-model.number="selectedClip.playbackRate" data-testid="edit-playback-rate" type="number" min="0.1" max="8" step="0.1" :disabled="clipParticipatesInDissolve(selectedClip)" /></label>
           <template v-if="selectedClip.kind === 'audio'">
@@ -201,7 +202,7 @@
 
     <div v-if="showCreate" class="editor-modal" @click.self="showCreate = false">
       <section>
-        <header><div><span class="eyebrow">新建剪辑工程</span><h2>建立成片时间线</h2></div><button type="button" @click="showCreate = false"><X :size="16" /></button></header>
+        <header><div><span class="eyebrow">新建剪辑工程</span><h2>建立成片时间线</h2></div><button type="button" aria-label="关闭新建剪辑工程" @click="showCreate = false"><X :size="16" /></button></header>
         <label><span>工程名称</span><input v-model="draft.name" placeholder="例如：EP01 成片" /></label>
         <label><span>分集范围</span><select v-model="draft.episode"><option value="">全项目</option><option v-for="episode in episodes" :key="episode" :value="String(episode)">EP{{ String(episode).padStart(2, '0') }}</option></select></label>
         <div class="modal-grid"><label><span>宽</span><input v-model.number="draft.width" type="number" min="256" max="7680" /></label><label><span>高</span><input v-model.number="draft.height" type="number" min="256" max="7680" /></label><label><span>帧率</span><input v-model.number="draft.fps" type="number" min="12" max="120" step="0.001" /></label></div>
@@ -212,15 +213,34 @@
   </section>
 </template>
 
+<script lang="ts">
+export type VideoEditorLeaveReason = "edit_project_switch" | "history_navigation" | "module_switch" | "project_switch" | "window_close" | "workspace_switch";
+export type VideoEditorLeaveResult = "proceed" | "cancelled";
+
+export interface VideoEditorExpose {
+  requestLeave: (reason: VideoEditorLeaveReason) => Promise<VideoEditorLeaveResult>;
+}
+</script>
+
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, toRaw, watch } from "vue";
 import { AlertTriangle, Captions, ChevronLeft, ChevronRight, Clapperboard, Clock3, DiamondPlus, Download, FileDown, FileUp, Film, FolderOpen, ImageDown, Layers3, Link2, LoaderCircle, MousePointer2, Music2, Pause, Play, Plus, Redo2, Save, Scissors, ShieldCheck, SkipBack, SkipForward, Square, Trash2, Undo2, X } from "lucide-vue-next";
-import type { EditClip, EditMediaItem, EditNestedTimelinePreview, EditProject, EditRenderJob, EditorRecoveryInfo, ProjectIndex, VideoEngineInfo } from "@core/types";
+import type { EditClip, EditMediaItem, EditMediaPage, EditMediaQuery, EditNestedTimelinePreview, EditProject, EditRenderJob, EditorRecoveryInfo, ProjectIndex, VideoEngineInfo } from "@core/types";
 import type { EditOperation } from "@core/editor";
+import { MAX_EDIT_TIMELINE_SECONDS } from "@core/editor-limits";
 import { DEFAULT_EDIT_CUBIC_BEZIER, editKeyframeCurveIssue, editKeyframeSourceTransformIssue, evaluateEditKeyframeEasing, evaluateEditKeyframeEasingAtFrame, evaluateEditTransformAtFrame } from "@core/keyframe-curve";
 import { assetUrl } from "../utils";
 import { calculateTimelineMove, calculateTimelineTrimEnd, calculateTimelineTrimStart, quantizeTimelineTime, timelineFrameForSeconds, timelineFrameRate, timelineReorderIndex, timelineSecondsForFrame } from "../timeline-interaction";
 import { syncTimelineMedia } from "../timeline-preview";
+import {
+  captureVideoEditorDraftBaseline,
+  createLatestVideoEditorMediaLoader,
+  createVideoEditorLoadGate,
+  hasUnsavedVideoEditorDraft,
+  type VideoEditorLoadToken,
+} from "../video-editor-dirty-state";
+import { LatestBoundedTaskQueue } from "../bounded-task-queue";
+import { collectVideoEditorNestedPreviewIds, KeyedPreviewCoordinator, ReferenceCountedPreviewSuspension } from "../video-editor-preview-coordinator";
 
 type TimelineGestureMode = "move" | "trim-start" | "trim-end";
 type EditorKeyframe = NonNullable<EditClip["keyframes"]>[number];
@@ -254,16 +274,33 @@ interface DissolveEligibility {
   maxOutFrames: number;
   issue?: string;
 }
+interface NestedPreviewScope {
+  projectRoot: string;
+  projectId: string;
+  revision: number;
+}
+interface MediaPreviewScope {
+  projectRoot: string;
+  scanId: string;
+  scannedAt: string;
+  pageGeneration: number;
+  queryFingerprint: string;
+  artifactIds: Set<string>;
+}
 
 const props = defineProps<{ projectRoot: string; index: ProjectIndex }>();
 const emit = defineEmits<{ changed: [message: string]; failed: [message: string] }>();
 const projects = ref<EditProject[]>([]);
 const active = ref<EditProject | null>(null);
+const persistedProjectBaseline = ref("");
 const activeProjectId = ref("");
 const editorSessionId = ref("");
 const editorRecovery = ref<EditorRecoveryInfo | null>(null);
 const resolvingRecovery = ref(false);
 const media = ref<EditMediaItem[]>([]);
+const mediaTotal = ref(0);
+const mediaNextCursor = ref<string | undefined>();
+const mediaPageLoading = ref(false);
 const engine = ref<VideoEngineInfo | null>(null);
 const renders = ref<EditRenderJob[]>([]);
 const selectedClipId = ref("");
@@ -288,6 +325,9 @@ const creating = ref(false);
 const showCreate = ref(false);
 const videoElement = ref<HTMLVideoElement | null>(null);
 const incomingVideoElement = ref<HTMLVideoElement | null>(null);
+const timelineScrollElement = ref<HTMLDivElement | null>(null);
+const timelineScrollLeft = ref(0);
+const timelineViewportWidth = ref(900);
 const overlayVideoElements = new Map<string, HTMLVideoElement>();
 const audioElements = new Map<string, HTMLAudioElement>();
 const previewLoading = reactive(new Set<string>());
@@ -298,6 +338,80 @@ const draft = reactive({ name: "", episode: "", width: 1080, height: 1920, fps: 
 const historyInfo = reactive({ canUndo: false, canRedo: false, pastCount: 0, futureCount: 0 });
 let playbackTimer: ReturnType<typeof setInterval> | null = null;
 let suppressClipClick = false;
+const editorLoadGate = createVideoEditorLoadGate();
+interface MediaPageLoadInput {
+  projectRoot: string;
+  query: EditMediaQuery;
+  append: boolean;
+}
+const mediaLoader = createLatestVideoEditorMediaLoader<EditMediaPage, MediaPageLoadInput>(
+  (input) => window.canvasApi.listEditMediaPage(input.projectRoot, input.query),
+  (page, input) => {
+    if (props.projectRoot !== input.projectRoot) return;
+    media.value = input.append
+      ? [...new Map([...media.value, ...page.items].map((item) => [item.artifactId, item])).values()]
+      : page.items;
+    mediaTotal.value = page.total;
+    mediaNextCursor.value = page.nextCursor;
+    if (!previewWorkSuspended) activateMediaPreviewScope();
+  },
+);
+let mediaPreviewScope: MediaPreviewScope | null = null;
+let mediaPreviewPageGeneration = 0;
+let previewWorkSuspended = false;
+const sharedPreviewExecutionQueue = new LatestBoundedTaskQueue(2);
+const nestedPreviewCoordinator = new KeyedPreviewCoordinator<string, EditNestedTimelinePreview, NestedPreviewScope>({
+  execute: (clipId, scope) => window.canvasApi.prepareNestedTimelinePreview(scope.projectRoot, scope.projectId, scope.revision, clipId),
+  onSuccess: (clipId, preview) => {
+    nestedPreviews.set(clipId, preview);
+    nestedPreviewErrors.delete(clipId);
+    void nextTick(syncPreview);
+  },
+  onError: (clipId, error) => nestedPreviewErrors.set(clipId, message(error)),
+  isEligible: (clipId, scope) => props.projectRoot === scope.projectRoot
+    && active.value?.id === scope.projectId
+    && active.value.revision === scope.revision
+    && nestedPreviewWantedKeys().includes(clipId),
+}, 2, sharedPreviewExecutionQueue);
+const mediaPreviewCoordinator = new KeyedPreviewCoordinator<string, Partial<EditMediaItem>, MediaPreviewScope>({
+  execute: (artifactId, scope) => window.canvasApi.prepareEditMediaPreview(scope.projectRoot, artifactId),
+  onStart: (artifactId) => previewLoading.add(artifactId),
+  onSuccess: (artifactId, preview) => {
+    const current = media.value.find((entry) => entry.artifactId === artifactId);
+    if (current) Object.assign(current, preview);
+  },
+  onError: (_artifactId, error) => emit("failed", message(error)),
+  onSettled: (artifactId) => previewLoading.delete(artifactId),
+  isEligible: (artifactId, scope) => mediaPreviewScope === scope
+    && mediaPreviewScope.pageGeneration === scope.pageGeneration
+    && props.projectRoot === scope.projectRoot
+    && props.index.scanId === scope.scanId
+    && props.index.scannedAt === scope.scannedAt
+    && scope.queryFingerprint === mediaPreviewQueryFingerprint()
+    && scope.artifactIds.has(artifactId)
+    && media.value.some((entry) => entry.artifactId === artifactId),
+}, 2, sharedPreviewExecutionQueue);
+const previewWorkLease = new ReferenceCountedPreviewSuspension(
+  async () => {
+    previewWorkSuspended = true;
+    invalidateNestedPreviews();
+    mediaPreviewCoordinator.invalidate();
+    mediaPreviewScope = null;
+    previewLoading.clear();
+    // 两个 coordinator 共用该物理队列：queued work 立即取消，至多等待两个 in-flight 自然收敛。
+    sharedPreviewExecutionQueue.invalidate();
+    await sharedPreviewExecutionQueue.whenIdle();
+  },
+  () => {
+    previewWorkSuspended = false;
+    if (media.value.length) activateMediaPreviewScope();
+    activateNestedPreviews();
+  },
+);
+let mountedProjectRoot = "";
+let timelineResizeObserver: ResizeObserver | null = null;
+let mediaSearchTimer: ReturnType<typeof setTimeout> | null = null;
+let mediaLoadingSequence = 0;
 
 const episodes = computed(() => [...new Set(props.index.items.map((item) => item.episode).filter((value): value is number => Boolean(value)))].sort((a, b) => a - b));
 const continuationUnits = computed(() => props.index.items.filter((item) => item.type === "unit" && item.status !== "弃用").sort((a, b) => (a.episode ?? 0) - (b.episode ?? 0) || (a.unit ?? 0) - (b.unit ?? 0)));
@@ -306,13 +420,18 @@ const visualTracks = computed(() => active.value?.tracks.filter((track) => track
 const visualTrack = computed(() => visualTracks.value[0] ?? null);
 const overlayVisualTracks = computed(() => visualTracks.value.slice(1).filter((track) => !track.hidden && !track.muted));
 const visualClips = computed(() => visualTrack.value?.clips.slice().sort((a, b) => a.startSeconds - b.startSeconds) ?? []);
+const visualClipById = computed(() => new Map(visualClips.value.map((clip) => [clip.id, clip])));
+const mediaByArtifactId = computed(() => new Map(media.value.map((item) => [item.artifactId, item])));
 const selectedClip = computed(() => active.value?.tracks.flatMap((track) => track.clips).find((clip) => clip.id === selectedClipId.value) ?? null);
 const selectedTrack = computed(() => active.value?.tracks.find((track) => track.id === (selectedClip.value?.trackId ?? selectedTrackId.value)) ?? null);
 const activeFrameRate = computed(() => active.value ? timelineFrameRate(active.value) : 24);
 const frameDuration = computed(() => 1 / activeFrameRate.value);
 const playheadFrame = computed(() => timelineFrameForSeconds(playhead.value, activeFrameRate.value));
 const canSplitSelected = computed(() => Boolean(selectedClip.value && playheadFrame.value > clipStartFrame(selectedClip.value) && playheadFrame.value < clipEndFrame(selectedClip.value)));
-const totalDurationFrames = computed(() => Math.max(0, ...visualClips.value.map(clipEndFrame)));
+const totalDurationFrames = computed(() => Math.min(
+  Math.ceil(MAX_EDIT_TIMELINE_SECONDS * activeFrameRate.value),
+  Math.max(0, ...visualClips.value.map(clipEndFrame)),
+));
 const totalDuration = computed(() => timelineSecondsForFrame(totalDurationFrames.value, activeFrameRate.value));
 const timebaseLabel = computed(() => active.value?.timebase ? `${active.value.timebase.rateNumerator}/${active.value.timebase.rateDenominator}` : `${active.value?.fps ?? 24}fps`);
 const activeDissolve = computed<ActiveDissolvePreview | null>(() => {
@@ -320,7 +439,7 @@ const activeDissolve = computed<ActiveDissolvePreview | null>(() => {
   for (const outgoing of visualClips.value) {
     const transition = outgoing.transitionOut === "smpte_dissolve" ? outgoing.transition : undefined;
     if (!transition || outgoing.muted) continue;
-    const incoming = visualClips.value.find((clip) => clip.id === transition.targetClipId);
+    const incoming = visualClipById.value.get(transition.targetClipId);
     if (!incoming || incoming.muted) continue;
     const cutFrame = clipEndFrame(outgoing);
     const startFrame = cutFrame - transition.inOffsetFrames;
@@ -343,62 +462,272 @@ const previewAudioClips = computed(() => active.value ? [
 ] : []);
 const previewScale = computed(() => Math.min(1, 360 * ((active.value?.width ?? 1080) / (active.value?.height ?? 1920)) / (active.value?.width ?? 1080)));
 const previewAspect = computed(() => ({ aspectRatio: `${active.value?.width ?? 16} / ${active.value?.height ?? 9}`, backgroundColor: active.value?.backgroundColor ?? "#000000" }));
-const filteredMedia = computed(() => {
-  const query = mediaSearch.value.trim().toLowerCase();
-  return media.value.filter((item) => (mediaKind.value === "all" || item.kind === mediaKind.value) && (!query || `${item.name} ${item.path}`.toLowerCase().includes(query))).slice(0, 500);
-});
+const filteredMedia = computed(() => media.value);
 const timelineWidth = computed(() => ({ width: `${Math.max(900, totalDuration.value * pixelsPerSecond.value + 180)}px` }));
-const rulerTicks = computed(() => Array.from({ length: Math.ceil(totalDuration.value / 5) + 2 }, (_, index) => index * 5));
+const visibleTimelineRange = computed(() => {
+  const start = Math.max(0, (timelineScrollLeft.value - 108) / pixelsPerSecond.value - 5);
+  const end = Math.min(MAX_EDIT_TIMELINE_SECONDS, (timelineScrollLeft.value + timelineViewportWidth.value) / pixelsPerSecond.value + 5);
+  return { start, end };
+});
+const rulerTicks = computed(() => {
+  const first = Math.max(0, Math.floor(visibleTimelineRange.value.start / 5) * 5);
+  const last = Math.min(MAX_EDIT_TIMELINE_SECONDS, Math.ceil(visibleTimelineRange.value.end / 5) * 5);
+  return Array.from({ length: Math.max(1, Math.floor((last - first) / 5) + 1) }, (_, index) => first + index * 5);
+});
+const timelineSnapPointCounts = computed(() => {
+  const counts = new Map<number, number>();
+  for (const track of active.value?.tracks ?? []) {
+    if (track.hidden) continue;
+    for (const clip of track.clips) {
+      for (const point of [clip.startSeconds, clip.startSeconds + clip.durationSeconds]) {
+        const value = quantizeTimelineTime(point, activeFrameRate.value);
+        counts.set(value, (counts.get(value) ?? 0) + 1);
+      }
+    }
+  }
+  return counts;
+});
+const timelineSnapPoints = computed(() => [...timelineSnapPointCounts.value.keys()].sort((left, right) => left - right));
 const latestRender = computed(() => renders.value.find((job) => job.editProjectId === active.value?.id) ?? null);
+const hasUnsavedDraft = computed(() => hasUnsavedVideoEditorDraft(active.value, persistedProjectBaseline.value));
 
 watch([previewClip, activeDissolve, activeOverlayClips], () => syncPreview(), { flush: "post" });
-watch(active, () => syncPreview(), { deep: true, flush: "post" });
-watch(() => props.index.scannedAt, () => { void loadMedia().catch((error: unknown) => emit("failed", error instanceof Error ? error.message : String(error))); });
-onMounted(() => { void load(); window.addEventListener("keydown", onEditorShortcut); });
-onBeforeUnmount(() => { renderPollActive = false; stopPlayback(); cancelTimelineGesture(); overlayVideoElements.clear(); audioElements.clear(); window.removeEventListener("keydown", onEditorShortcut); if (editorSessionId.value) void window.canvasApi.closeEditorSession(props.projectRoot, editorSessionId.value); });
+watch(() => active.value?.tracks.flatMap((track) => track.clips.map((clip) => [
+  clip.id, clip.startSeconds, clip.durationSeconds, clip.trimStartSeconds, clip.playbackRate,
+  clip.muted, clip.volume, clip.opacity, clip.positionX, clip.positionY, clip.scale, clip.rotation,
+])).flat().join("|"), () => syncPreview(), { flush: "post" });
+watch(
+  () => [props.projectRoot, props.index.scanId, props.index.scannedAt] as const,
+  () => {
+    invalidateNestedPreviews();
+    invalidateMediaPaging();
+    void loadMedia(true).catch((error: unknown) => emit("failed", error instanceof Error ? error.message : String(error)));
+  },
+);
+watch(mediaKind, () => {
+  invalidateMediaPaging();
+  void loadMedia(true).catch((error: unknown) => emit("failed", message(error)));
+});
+watch(mediaSearch, () => {
+  invalidateMediaPaging();
+  if (mediaSearchTimer) clearTimeout(mediaSearchTimer);
+  mediaSearchTimer = setTimeout(() => {
+    mediaSearchTimer = null;
+    void loadMedia(true).catch((error: unknown) => emit("failed", message(error)));
+  }, 250);
+});
+watch(() => nestedPreviewWantedKeys().join("|"), () => reconcileNestedPreviews(), { flush: "post" });
+onMounted(() => {
+  const token = editorLoadGate.begin(props.projectRoot);
+  mountedProjectRoot = token.projectRoot;
+  void load(token);
+  window.addEventListener("keydown", onEditorShortcut);
+  void nextTick(() => {
+    syncTimelineViewport();
+    if (timelineScrollElement.value && typeof ResizeObserver !== "undefined") {
+      timelineResizeObserver = new ResizeObserver(syncTimelineViewport);
+      timelineResizeObserver.observe(timelineScrollElement.value);
+    }
+  });
+});
+onBeforeUnmount(() => {
+  editorLoadGate.invalidate();
+  mediaLoader.invalidate();
+  if (mediaSearchTimer) clearTimeout(mediaSearchTimer);
+  mediaSearchTimer = null;
+  openProjectSequence += 1;
+  renderPollActive = false;
+  stopPlayback();
+  cancelTimelineGesture();
+  overlayVideoElements.clear();
+  audioElements.clear();
+  nestedPreviewCoordinator.dispose();
+  mediaPreviewCoordinator.dispose();
+  sharedPreviewExecutionQueue.dispose();
+  previewLoading.clear();
+  timelineResizeObserver?.disconnect();
+  timelineResizeObserver = null;
+  window.removeEventListener("keydown", onEditorShortcut);
+  const sessionId = editorSessionId.value;
+  editorSessionId.value = "";
+  if (sessionId) {
+    void window.canvasApi.closeEditorSession(mountedProjectRoot || props.projectRoot, sessionId)
+      .catch((error: unknown) => console.warn("[video-editor] 卸载时关闭 session 失败：", message(error)));
+  }
+});
 
-async function load() {
+function acceptPersistedProject(project: EditProject): void {
+  hydrateVisualClips(project);
+  active.value = project;
+  persistedProjectBaseline.value = captureVideoEditorDraftBaseline(project);
+}
+
+async function requestLeave(reason: VideoEditorLeaveReason): Promise<VideoEditorLeaveResult> {
+  if (!hasUnsavedDraft.value) return "proceed";
+  if (saving.value || nestedAdding.value || timelineGesture.value) {
+    emit("failed", "剪辑工程仍在保存或处理操作，已取消离开；请稍候重试。");
+    return "cancelled";
+  }
+  const action = reason === "window_close"
+    ? "关闭应用"
+    : reason === "module_switch"
+      ? "离开导演剪辑台"
+      : reason === "edit_project_switch"
+        ? "切换剪辑工程"
+        : reason === "history_navigation"
+          ? "切换持久历史版本"
+          : reason === "workspace_switch"
+            ? "切换工作区"
+            : "切换项目";
+  return window.confirm(`当前剪辑工程有未保存修改。\n\n确定放弃这些修改并${action}吗？`)
+    ? "proceed"
+    : "cancelled";
+}
+
+defineExpose<VideoEditorExpose>({ requestLeave });
+
+async function load(token: VideoEditorLoadToken) {
   loading.value = true;
   try {
-    const session = await window.canvasApi.beginEditorSession(props.projectRoot);
+    const session = await window.canvasApi.beginEditorSession(token.projectRoot);
+    if (!editorLoadGate.isCurrent(token)) {
+      await window.canvasApi.closeEditorSession(token.projectRoot, session.state.sessionId);
+      return;
+    }
     editorSessionId.value = session.state.sessionId;
     editorRecovery.value = session.recovery ?? null;
-    [projects.value, engine.value, renders.value] = await Promise.all([
-      window.canvasApi.listEditProjects(props.projectRoot),
+    const [nextProjects, nextEngine, nextRenders] = await Promise.all([
+      window.canvasApi.listEditProjects(token.projectRoot),
       window.canvasApi.probeVideoEngine(),
-      window.canvasApi.listEditRenderJobs(props.projectRoot),
+      window.canvasApi.listEditRenderJobs(token.projectRoot),
+      loadMedia(true, token.projectRoot),
     ]);
-    await loadMedia();
+    if (!editorLoadGate.isCurrent(token)) return;
+    projects.value = nextProjects;
+    engine.value = nextEngine;
+    renders.value = nextRenders;
     if (!editorRecovery.value && projects.value[0]) await openProject(projects.value[0].id);
-  } catch (error) { emit("failed", message(error)); }
-  finally { loading.value = false; }
+  } catch (error) { if (editorLoadGate.isCurrent(token)) emit("failed", message(error)); }
+  finally { if (editorLoadGate.isCurrent(token)) loading.value = false; }
 }
-async function loadMedia() { media.value = await window.canvasApi.listEditMedia(props.projectRoot); }
-async function prepareNestedPreviews() {
+async function loadMedia(reset = true, projectRoot = props.projectRoot): Promise<void> {
+  if (!reset && (mediaPageLoading.value || !mediaNextCursor.value)) return;
+  const cursor = reset ? undefined : mediaNextCursor.value;
+  if (reset) mediaNextCursor.value = undefined;
+  const sequence = ++mediaLoadingSequence;
+  mediaPageLoading.value = true;
+  try {
+    await mediaLoader.load({
+      projectRoot,
+      append: !reset,
+      query: {
+        kind: mediaKind.value,
+        search: mediaSearch.value,
+        limit: 60,
+        ...(cursor ? { cursor } : {}),
+      },
+    });
+  } finally {
+    if (sequence === mediaLoadingSequence) mediaPageLoading.value = false;
+  }
+}
+
+function invalidateMediaPaging(): void {
+  mediaLoader.invalidate();
+  mediaPreviewCoordinator.invalidate();
+  mediaPreviewScope = null;
+  previewLoading.clear();
+  mediaNextCursor.value = undefined;
+  mediaLoadingSequence += 1;
+  mediaPageLoading.value = false;
+}
+function mediaPreviewQueryFingerprint(): string {
+  return `${mediaKind.value}\u0000${mediaSearch.value.trim().toLocaleLowerCase()}`;
+}
+function activateMediaPreviewScope(): void {
+  const scope: MediaPreviewScope = {
+    projectRoot: props.projectRoot,
+    scanId: props.index.scanId,
+    scannedAt: props.index.scannedAt,
+    pageGeneration: ++mediaPreviewPageGeneration,
+    queryFingerprint: mediaPreviewQueryFingerprint(),
+    artifactIds: new Set(media.value.map((item) => item.artifactId)),
+  };
+  mediaPreviewScope = scope;
+  previewLoading.clear();
+  mediaPreviewCoordinator.activate(scope);
+}
+function invalidateNestedPreviews(): void {
+  nestedPreviewCoordinator.invalidate();
   nestedPreviews.clear();
   nestedPreviewErrors.clear();
-  if (!active.value) return;
-  const projectId = active.value.id;
-  const revision = active.value.revision;
-  const clips = active.value.tracks.flatMap((track) => track.clips).filter((clip) => clip.kind === "timeline");
-  await Promise.all(clips.map(async (clip) => {
-    try {
-      const preview = await window.canvasApi.prepareNestedTimelinePreview(props.projectRoot, projectId, revision, clip.id);
-      if (active.value?.id === projectId && active.value.revision === revision) nestedPreviews.set(clip.id, preview);
-    } catch (error) {
-      if (active.value?.id === projectId && active.value.revision === revision) nestedPreviewErrors.set(clip.id, message(error));
-    }
-  }));
-  await nextTick(syncPreview);
 }
-async function ensureMediaPreview(item: EditMediaItem) {
-  if (previewLoading.has(item.artifactId) || (item.kind === "audio" ? item.waveformPath : item.kind === "video" ? item.filmstripPath : item.thumbnailPath)) return;
-  previewLoading.add(item.artifactId);
-  try {
-    const preview = await window.canvasApi.prepareEditMediaPreview(props.projectRoot, item.artifactId);
-    Object.assign(item, preview);
-  } catch (error) { emit("failed", message(error)); }
-  finally { previewLoading.delete(item.artifactId); }
+function activateNestedPreviews(): void {
+  if (previewWorkSuspended) return;
+  if (!active.value) { invalidateNestedPreviews(); return; }
+  const scope: NestedPreviewScope = {
+    projectRoot: props.projectRoot,
+    projectId: active.value.id,
+    revision: active.value.revision,
+  };
+  nestedPreviews.clear();
+  nestedPreviewErrors.clear();
+  nestedPreviewCoordinator.activate(scope);
+  reconcileNestedPreviews();
+}
+function nestedPreviewWantedKeys(): string[] {
+  if (!active.value) return [];
+  return collectVideoEditorNestedPreviewIds({
+    priorityClips: [
+      selectedClip.value,
+      previewClip.value,
+      activeDissolve.value?.outgoing,
+      activeDissolve.value?.incoming,
+      ...activeOverlayClips.value,
+    ],
+    tracks: active.value.tracks,
+    gestureClipId: timelineGesture.value?.clipId ?? "",
+    visibleStart: visibleTimelineRange.value.start,
+    visibleEnd: visibleTimelineRange.value.end,
+  });
+}
+function reconcileNestedPreviews(): void {
+  if (!active.value) return;
+  nestedPreviewCoordinator.reconcile(nestedPreviewWantedKeys());
+}
+
+function syncTimelineViewport(): void {
+  const element = timelineScrollElement.value;
+  if (!element) return;
+  timelineScrollLeft.value = element.scrollLeft;
+  timelineViewportWidth.value = Math.max(1, element.clientWidth);
+}
+
+function onTimelineScroll(): void {
+  syncTimelineViewport();
+}
+
+function visibleTrackClips(track: EditProject["tracks"][number]): EditClip[] {
+  const { start, end } = visibleTimelineRange.value;
+  const selectedId = selectedClipId.value;
+  const gestureId = timelineGesture.value?.clipId;
+  return track.clips.filter((clip) => clip.id === selectedId || clip.id === gestureId
+    || (clip.startSeconds < end && clip.startSeconds + clip.durationSeconds > start));
+}
+function ensureMediaPreview(item: EditMediaItem): void {
+  if (previewWorkSuspended) return;
+  if ((item.kind === "audio" ? item.waveformPath : item.kind === "video" ? item.filmstripPath : item.thumbnailPath)) return;
+  // hover 是 latest-demand：快速扫过一页时，只保留最后一个未启动需求。
+  mediaPreviewCoordinator.reconcile([item.artifactId]);
+}
+function clearMediaPreviewDemand(): void {
+  mediaPreviewCoordinator.reconcile([]);
+}
+async function suspendPreviewWork(): Promise<void> {
+  await previewWorkLease.acquire();
+}
+function resumePreviewWork(): void {
+  previewWorkLease.release();
 }
 async function prepareProxy(item: EditMediaItem) {
   if (item.kind !== "video" || proxyLoading.has(item.artifactId)) return;
@@ -412,31 +741,42 @@ async function prepareProxy(item: EditMediaItem) {
   finally { proxyLoading.delete(item.artifactId); }
 }
 let openProjectSequence = 0;
-async function openProject(id: string) {
+async function openProject(id: string): Promise<boolean> {
   // FE-02：代际守卫——快速连切工程时旧响应不得覆盖新工程（A→B 竞态）。
   const sequence = ++openProjectSequence;
   const isCurrent = () => sequence === openProjectSequence;
-  if (!id) { active.value = null; nestedPreviews.clear(); nestedPreviewErrors.clear(); return; }
+  invalidateNestedPreviews();
+  if (!id) { active.value = null; persistedProjectBaseline.value = ""; return true; }
   try {
     const project = await window.canvasApi.getEditProject(props.projectRoot, id);
-    if (!isCurrent()) return;
-    active.value = project;
+    if (!isCurrent()) return false;
+    acceptPersistedProject(project);
     if (editorSessionId.value) await window.canvasApi.setEditorSessionProject(props.projectRoot, editorSessionId.value, id);
-    if (!isCurrent()) return;
-    hydrateVisualClips(active.value);
+    if (!isCurrent()) return false;
     activeProjectId.value = id;
-    selectedClipId.value = active.value.tracks.flatMap((track) => track.clips)[0]?.id ?? "";
-    selectedTrackId.value = active.value.tracks[0]?.id ?? "";
-    selectedNestedProjectId.value = projects.value.find((entry) => entry.id !== active.value?.id)?.id ?? "";
-    const sourceIds = new Set(active.value.tracks.flatMap((track) => track.clips).map((clip) => clip.itemId).filter(Boolean));
+    selectedClipId.value = project.tracks.flatMap((track) => track.clips)[0]?.id ?? "";
+    selectedTrackId.value = project.tracks[0]?.id ?? "";
+    selectedNestedProjectId.value = projects.value.find((entry) => entry.id !== project.id)?.id ?? "";
+    const sourceIds = new Set(project.tracks.flatMap((track) => track.clips).map((clip) => clip.itemId).filter(Boolean));
     const lastSourceIndex = Math.max(-1, ...continuationUnits.value.map((item, index) => sourceIds.has(item.id) ? index : -1));
     continuationTargetId.value = continuationUnits.value[lastSourceIndex + 1]?.id ?? continuationUnits.value.find((item) => !sourceIds.has(item.id))?.id ?? "";
     seek(0);
     const history = await window.canvasApi.getEditHistoryInfo(props.projectRoot, id);
-    if (!isCurrent()) return;
+    if (!isCurrent()) return false;
     Object.assign(historyInfo, history);
-    await prepareNestedPreviews();
-  } catch (error) { if (isCurrent()) emit("failed", message(error)); }
+    activateNestedPreviews();
+    return isCurrent();
+  } catch (error) { if (isCurrent()) emit("failed", message(error)); return false; }
+}
+async function selectEditProject(id: string): Promise<void> {
+  const currentId = active.value?.id ?? "";
+  if (id === currentId) return;
+  if (await requestLeave("edit_project_switch") !== "proceed") {
+    activeProjectId.value = currentId;
+    return;
+  }
+  const opened = await openProject(id);
+  if (!opened && activeProjectId.value === id) activeProjectId.value = active.value?.id ?? currentId;
 }
 async function resolveRecovery(choice: "stable" | "latest") {
   if (!editorRecovery.value || !editorSessionId.value) return;
@@ -451,6 +791,7 @@ async function resolveRecovery(choice: "stable" | "latest") {
   finally { resolvingRecovery.value = false; }
 }
 async function createProject() {
+  if (await requestLeave("edit_project_switch") !== "proceed") return;
   creating.value = true;
   try {
     const project = await window.canvasApi.createEditProject(props.projectRoot, {
@@ -578,12 +919,11 @@ async function refreshNestedTimeline() {
     const draft = structuredClone(toRaw(active.value));
     if (JSON.stringify(draft) !== JSON.stringify(persisted)) throw new Error("父剪辑工程存在未保存改动；为避免丢失，已拒绝刷新。请先保存或重新载入后再试。");
     const result = await window.canvasApi.applyEditOperation(props.projectRoot, persisted.id, persisted.revision, { type: "refresh_nested_timeline", clipId: clip.id, childExpectedRevision: child.revision });
-    active.value = result.project;
-    hydrateVisualClips(active.value);
+    acceptPersistedProject(result.project);
     projects.value = await window.canvasApi.listEditProjects(props.projectRoot);
     Object.assign(historyInfo, await window.canvasApi.getEditHistoryInfo(props.projectRoot, active.value.id));
     if (editorSessionId.value) await window.canvasApi.setEditorSessionProject(props.projectRoot, editorSessionId.value, active.value.id);
-    await prepareNestedPreviews();
+    activateNestedPreviews();
     emit("changed", `已显式刷新嵌套时间线到 ${child.name} v${child.revision}`);
   } catch (error) { emit("failed", message(error)); }
   finally { nestedAdding.value = false; }
@@ -606,40 +946,55 @@ function removeTrack(trackId: string) {
   active.value.tracks.forEach((entry, order) => entry.order = order);
   selectedTrackId.value = active.value.tracks[0]?.id ?? "";
 }
-async function save() {
+async function save(options: { scheduleNestedPreviews?: boolean } = {}) {
   if (!active.value) return false;
+  await suspendPreviewWork();
+  let previewLeaseHeld = true;
+  let persisted = false;
   saving.value = true;
   try {
     reflowVisual();
     const revision = active.value.revision;
     const snapshot = structuredClone(toRaw(active.value));
-    active.value = await window.canvasApi.saveEditProject(props.projectRoot, snapshot, revision);
+    acceptPersistedProject(await window.canvasApi.saveEditProject(props.projectRoot, snapshot, revision));
     projects.value = await window.canvasApi.listEditProjects(props.projectRoot);
     activeProjectId.value = active.value.id;
     emit("changed", `剪辑工程已保存为修订 v${active.value.revision}`);
     Object.assign(historyInfo, await window.canvasApi.getEditHistoryInfo(props.projectRoot, active.value.id));
     if (editorSessionId.value) await window.canvasApi.setEditorSessionProject(props.projectRoot, editorSessionId.value, active.value.id);
-    await prepareNestedPreviews();
+    persisted = true;
+    if (options.scheduleNestedPreviews !== false) {
+      resumePreviewWork();
+      previewLeaseHeld = false;
+    }
     return true;
   } catch (error) { emit("failed", message(error)); return false; }
-  finally { saving.value = false; }
+  finally {
+    saving.value = false;
+    // 前台操作的 false 由调用方 finally 恢复；保存失败不能把编辑器永久暂停。
+    if (!persisted && previewLeaseHeld) resumePreviewWork();
+  }
 }
 async function undoEditor() {
   if (!active.value || !historyInfo.canUndo) return;
-  try { active.value = await window.canvasApi.undoEditProject(props.projectRoot, active.value.id, active.value.revision); hydrateVisualClips(active.value); Object.assign(historyInfo, await window.canvasApi.getEditHistoryInfo(props.projectRoot, active.value.id)); if (editorSessionId.value) await window.canvasApi.setEditorSessionProject(props.projectRoot, editorSessionId.value, active.value.id); projects.value = await window.canvasApi.listEditProjects(props.projectRoot); await prepareNestedPreviews(); emit("changed", `已撤销到新修订 v${active.value.revision}`); }
+  if (await requestLeave("history_navigation") !== "proceed") return;
+  try { acceptPersistedProject(await window.canvasApi.undoEditProject(props.projectRoot, active.value.id, active.value.revision)); Object.assign(historyInfo, await window.canvasApi.getEditHistoryInfo(props.projectRoot, active.value.id)); if (editorSessionId.value) await window.canvasApi.setEditorSessionProject(props.projectRoot, editorSessionId.value, active.value.id); projects.value = await window.canvasApi.listEditProjects(props.projectRoot); activateNestedPreviews(); emit("changed", `已撤销到新修订 v${active.value.revision}`); }
   catch (error) { emit("failed", message(error)); }
 }
 async function redoEditor() {
   if (!active.value || !historyInfo.canRedo) return;
-  try { active.value = await window.canvasApi.redoEditProject(props.projectRoot, active.value.id, active.value.revision); hydrateVisualClips(active.value); Object.assign(historyInfo, await window.canvasApi.getEditHistoryInfo(props.projectRoot, active.value.id)); if (editorSessionId.value) await window.canvasApi.setEditorSessionProject(props.projectRoot, editorSessionId.value, active.value.id); projects.value = await window.canvasApi.listEditProjects(props.projectRoot); await prepareNestedPreviews(); emit("changed", `已重做到新修订 v${active.value.revision}`); }
+  if (await requestLeave("history_navigation") !== "proceed") return;
+  try { acceptPersistedProject(await window.canvasApi.redoEditProject(props.projectRoot, active.value.id, active.value.revision)); Object.assign(historyInfo, await window.canvasApi.getEditHistoryInfo(props.projectRoot, active.value.id)); if (editorSessionId.value) await window.canvasApi.setEditorSessionProject(props.projectRoot, editorSessionId.value, active.value.id); projects.value = await window.canvasApi.listEditProjects(props.projectRoot); activateNestedPreviews(); emit("changed", `已重做到新修订 v${active.value.revision}`); }
   catch (error) { emit("failed", message(error)); }
 }
 async function exportOtio() {
-  if (!active.value || !await save()) return;
+  if (!active.value || !await save({ scheduleNestedPreviews: false })) return;
   try { const result = await window.canvasApi.exportEditOtio(props.projectRoot, active.value.id, active.value.revision); emit("changed", `OTIO 已导出：${result.path}`); await window.canvasApi.showInFolder(result.path); }
   catch (error) { emit("failed", message(error)); }
+  finally { resumePreviewWork(); }
 }
 async function importOtio() {
+  if (await requestLeave("edit_project_switch") !== "proceed") return;
   const filePath = await window.canvasApi.pickOtio();
   if (!filePath) return;
   try { const project = await window.canvasApi.importEditOtio(props.projectRoot, filePath); projects.value = await window.canvasApi.listEditProjects(props.projectRoot); await openProject(project.id); emit("changed", `OTIO 已导入为新工程：${project.name}`); }
@@ -652,7 +1007,7 @@ function onEditorShortcut(event: KeyboardEvent) {
   if (event.metaKey && event.key.toLowerCase() === "z") { event.preventDefault(); if (event.shiftKey) void redoEditor(); else void undoEditor(); }
 }
 async function render() {
-  if (!active.value || !await save()) return;
+  if (!active.value || !await save({ scheduleNestedPreviews: false })) return;
   rendering.value = true;
   renderPollActive = true;
   stopPlayback();
@@ -674,7 +1029,7 @@ async function render() {
     if (result.status === "cancelled") emit("changed", "成片导出已取消");
     else emit("changed", `成片已导出：${result.outputPath}`);
   } catch (error) { emit("failed", message(error)); }
-  finally { rendering.value = false; activeRenderId.value = ""; }
+  finally { rendering.value = false; activeRenderId.value = ""; resumePreviewWork(); }
 }
 let renderPollActive = false;
 async function cancelRender() {
@@ -683,7 +1038,7 @@ async function cancelRender() {
   catch (error) { emit("failed", message(error)); }
 }
 async function extractCurrentFrame() {
-  if (!active.value || !totalDuration.value || !await save()) return;
+  if (!active.value || !totalDuration.value || !await save({ scheduleNestedPreviews: false })) return;
   extractingFrame.value = true;
   try {
     const timeSeconds = Math.min(playhead.value, Math.max(0, totalDuration.value - frameDuration.value));
@@ -691,16 +1046,16 @@ async function extractCurrentFrame() {
     emit("changed", `已导出时间线合成帧：${frame.framePath}`);
     await window.canvasApi.showInFolder(frame.framePath);
   } catch (error) { emit("failed", message(error)); }
-  finally { extractingFrame.value = false; }
+  finally { extractingFrame.value = false; resumePreviewWork(); }
 }
 async function prepareTimelineContinuation() {
-  if (!active.value || !continuationTargetId.value || !await save()) return;
+  if (!active.value || !continuationTargetId.value || !await save({ scheduleNestedPreviews: false })) return;
   preparingContinuation.value = true;
   try {
     const result = await window.canvasApi.prepareTimelineContinuation(props.projectRoot, { editProjectId: active.value.id, targetItemId: continuationTargetId.value, expectedRevision: active.value.revision, enqueue: true });
     emit("changed", `时间线末帧已登记为续接首帧，视频任务已入队：${result.pack.id}`);
   } catch (error) { emit("failed", message(error)); }
-  finally { preparingContinuation.value = false; }
+  finally { preparingContinuation.value = false; resumePreviewWork(); }
 }
 function beginTimelineGesture(event: PointerEvent, trackId: string, clipId: string, mode: TimelineGestureMode) {
   if (event.button !== 0 || !active.value) return;
@@ -856,8 +1211,24 @@ function restoreTimelineGesture(event?: PointerEvent) {
   void nextTick(syncPreview);
 }
 function timelineSnapTargets(excludedClipId: string, candidate: number): number[] {
-  const targets = active.value?.tracks.filter((track) => !track.hidden).flatMap((track) => track.clips).filter((clip) => clip.id !== excludedClipId).flatMap((clip) => [clip.startSeconds, clip.startSeconds + clip.durationSeconds]) ?? [];
-  return [...new Set([...targets, Math.round(candidate), 0, totalDuration.value, playhead.value].map((value) => quantizeTimelineTime(value, activeFrameRate.value)))];
+  const gesture = timelineGesture.value?.clipId === excludedClipId ? timelineGesture.value : null;
+  const excludedPoints = gesture
+    ? [gesture.initialStart, gesture.initialStart + gesture.initialDuration].map((point) => quantizeTimelineTime(point, activeFrameRate.value))
+    : [];
+  const points = timelineSnapPoints.value;
+  let low = 0;
+  let high = points.length;
+  while (low < high) {
+    const middle = (low + high) >>> 1;
+    if (points[middle]! < candidate) low = middle + 1;
+    else high = middle;
+  }
+  const nearby = points.slice(Math.max(0, low - 3), Math.min(points.length, low + 4)).filter((point) => {
+    const removed = excludedPoints.filter((excludedPoint) => excludedPoint === point).length;
+    return (timelineSnapPointCounts.value.get(point) ?? 0) > removed;
+  });
+  return [...new Set([...nearby, Math.round(candidate), 0, totalDuration.value, playhead.value]
+    .map((value) => quantizeTimelineTime(value, activeFrameRate.value)))];
 }
 function maximumOutputDuration(clip: EditClip, trimStart: number, playbackRate: number): number {
   if (clip.kind === "timeline") {
@@ -872,7 +1243,7 @@ function maximumOutputDuration(clip: EditClip, trimStart: number, playbackRate: 
     } catch { return clip.durationSeconds; }
   }
   if (!["video", "audio"].includes(clip.kind)) return Math.max(3_600, clip.durationSeconds);
-  const sourceDuration = media.value.find((item) => item.artifactId === clip.artifactId)?.durationSeconds;
+  const sourceDuration = clip.artifactId ? mediaByArtifactId.value.get(clip.artifactId)?.durationSeconds : undefined;
   if (!sourceDuration) return Math.max(3_600, clip.durationSeconds);
   return Math.max(.1, (sourceDuration - trimStart) / Math.max(.1, playbackRate));
 }
@@ -903,19 +1274,18 @@ function removeClip() {
   if (track.kind === "visual" && track.order === 0) reflowVisual();
 }
 async function runAtomicEditOperation(operation: EditOperation, successMessage: string): Promise<{ affectedClipIds: string[] } | null> {
-  if (!active.value || !await save()) return null;
+  if (!active.value || !await save({ scheduleNestedPreviews: false })) return null;
   try {
     const result = await window.canvasApi.applyEditOperation(props.projectRoot, active.value.id, active.value.revision, operation);
-    active.value = result.project;
-    hydrateVisualClips(active.value);
+    acceptPersistedProject(result.project);
     projects.value = await window.canvasApi.listEditProjects(props.projectRoot);
     Object.assign(historyInfo, await window.canvasApi.getEditHistoryInfo(props.projectRoot, active.value.id));
     if (editorSessionId.value) await window.canvasApi.setEditorSessionProject(props.projectRoot, editorSessionId.value, active.value.id);
     emit("changed", `${successMessage} · 修订 v${active.value.revision}`);
-    await prepareNestedPreviews();
+    resumePreviewWork();
     await nextTick(syncPreview);
     return { affectedClipIds: result.affectedClipIds };
-  } catch (error) { emit("failed", message(error)); return null; }
+  } catch (error) { resumePreviewWork(); emit("failed", message(error)); return null; }
 }
 async function splitSelectedAtPlayhead() {
   const clip = selectedClip.value;
@@ -1126,6 +1496,12 @@ function clipActiveAtPlayhead(clip: EditClip): boolean {
 function normalizeSelectedClipTiming() {
   const clip = selectedClip.value;
   if (!clip) return;
+  clip.startSeconds = Math.max(0, Math.min(MAX_EDIT_TIMELINE_SECONDS - frameDuration.value, Number(clip.startSeconds) || 0));
+  clip.durationSeconds = Math.max(frameDuration.value, Math.min(
+    MAX_EDIT_TIMELINE_SECONDS - clip.startSeconds,
+    Number(clip.durationSeconds) || frameDuration.value,
+  ));
+  clip.trimStartSeconds = Math.max(0, Math.min(MAX_EDIT_TIMELINE_SECONDS, Number(clip.trimStartSeconds) || 0));
   clip.durationFrames = clipDurationFrames(clip);
   clip.durationSeconds = timelineSecondsForFrame(clip.durationFrames, activeFrameRate.value);
   clip.trimStartFrame = clipTrimStartFrame(clip);
@@ -1220,7 +1596,7 @@ function onTimelineClick(event: MouseEvent) {
   seek((event.clientX - rect.left - 108) / pixelsPerSecond.value);
 }
 function clipStyle(clip: EditClip) {
-  const source = media.value.find((item) => item.artifactId === clip.artifactId);
+  const source = clip.artifactId ? mediaByArtifactId.value.get(clip.artifactId) : undefined;
   const preview = clip.kind === "audio" ? source?.waveformPath : source?.filmstripPath ?? source?.thumbnailPath;
   const gesture = timelineGesture.value?.clipId === clip.id ? timelineGesture.value : null;
   return {
@@ -1282,7 +1658,7 @@ function overlayPreviewStyle(clip: EditClip) {
   };
 }
 function mediaMeta(item: EditMediaItem) { return `${item.episode ? `EP${String(item.episode).padStart(2, '0')} · ` : ''}${item.durationSeconds ? `${item.durationSeconds.toFixed(2)}s · ` : ''}${item.width && item.height ? `${item.width}×${item.height}` : item.authoritative ? '权威版本' : '可用版本'}`; }
-function clipPreviewPath(clip: EditClip): string { return clip.kind === "timeline" ? nestedPreviews.get(clip.id)?.path ?? "" : media.value.find((item) => item.artifactId === clip.artifactId)?.proxyPath ?? clip.sourcePath ?? ""; }
+function clipPreviewPath(clip: EditClip): string { return clip.kind === "timeline" ? nestedPreviews.get(clip.id)?.path ?? "" : (clip.artifactId ? mediaByArtifactId.value.get(clip.artifactId) : undefined)?.proxyPath ?? clip.sourcePath ?? ""; }
 function timecode(seconds: number) {
   const nominalRate = Math.max(1, Math.round(activeFrameRate.value));
   const frames = timelineFrameForSeconds(Math.max(0, seconds), activeFrameRate.value);
@@ -1311,4 +1687,5 @@ function message(error: unknown) { return error instanceof Error ? error.message
 .media-list article{grid-template-columns:68px minmax(0,1fr) 58px}.media-list article>.media-actions{display:flex;gap:3px}.media-actions button{width:26px;height:26px;display:grid;place-items:center;border:1px solid #3d4037;background:transparent;color:#d7af55;font:7px Menlo,monospace}.media-actions button.ready{border-color:#53684a;color:#83aa72}.media-actions button:disabled{opacity:.45}
 .recovery-modal>section{width:min(680px,calc(100vw - 70px));padding:0 24px 22px}.recovery-modal>section>header>svg{color:#d7af55}.recovery-summary{padding:20px 0 4px}.recovery-summary>p{max-width:580px;margin:0;color:#b9bbb2;font-size:10px;line-height:1.7}.recovery-summary dl{display:grid;grid-template-columns:1fr 1fr;margin:18px 0;border-top:1px solid #30322c;border-bottom:1px solid #30322c}.recovery-summary dl>div{display:grid;grid-template-columns:76px 1fr;gap:8px;padding:10px 0}.recovery-summary dl>div:nth-child(odd){border-right:1px solid #30322c}.recovery-summary dt{color:#666960;font-size:7px}.recovery-summary dd{margin:0;color:#d5d6ce;font:8px Menlo,monospace}.recovery-renders{display:grid;grid-template-columns:130px 1fr;gap:5px 10px;margin:12px 0;padding:10px;border-left:2px solid #d7af55;background:#1c1b16}.recovery-renders span{grid-row:1/-1;color:#8e9187;font-size:8px}.recovery-renders code{overflow:hidden;color:#d7af55;font:7px Menlo,monospace;text-overflow:ellipsis;white-space:nowrap}.recovery-summary>small{display:block;margin-top:13px;color:#62655c;font-size:7px;line-height:1.5}.recovery-modal footer{justify-content:space-between}.recovery-modal footer button{min-width:220px;justify-content:center}.recovery-modal footer button:disabled{opacity:.35}
 .preview-frame .preview-main{position:absolute!important;inset:0;z-index:1;width:100%!important;height:100%!important;object-fit:contain;pointer-events:none}.preview-frame .preview-transition-incoming{z-index:2}.preview-time{z-index:40}.dissolve-fields{margin:0 0 11px;padding:9px;border:1px solid #66572f;background:#1d1b14}.dissolve-fields small,.dissolve-issue{display:block;color:#9f9169;font:6px Menlo,monospace;line-height:1.55}.dissolve-issue{margin:-4px 0 11px;color:#d08370}.selected-fields input:disabled{opacity:.48;cursor:not-allowed}
+.media-list article{content-visibility:auto;contain-intrinsic-size:auto 70px}
 </style>

@@ -20,12 +20,13 @@ import {
   markStudioRequestSqliteValidationIfUnchanged,
   studioRequestSqliteValidationKey,
 } from "./studio-request-schema-cache.js";
+import { recordStudioUnitsReadCounter } from "./studio-units-read-phase-timeline.js";
 
 const SCHEMA_VERSION = 6;
 const DATABASE_RELATIVE_PATH = ".aicanvas/studio-production.sqlite";
 const TEXT_CAS_RELATIVE_ROOT = ".aicanvas/studio-production/objects/sha256";
 const TEXT_CAS_TEMP_RELATIVE_ROOT = ".aicanvas/studio-production/objects/.tmp";
-import { STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS } from "./studio-sqlite-busy.js";
+import { STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS, studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
 const BUSY_TIMEOUT_MS = STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS;
 const DEFAULT_PAGE_LIMIT = 50;
 const MAX_PAGE_LIMIT = 100;
@@ -1037,6 +1038,7 @@ function productionPaths(projectRoot: string): Omit<StudioPaths, "storageIdentit
 }
 
 async function ensureProductionDirectories(projectRoot: string): Promise<StudioPaths> {
+  recordStudioUnitsReadCounter("productionDirectoryEnsureCalls");
   const paths = productionPaths(projectRoot);
   const sidecar = await ensureConfinedDirectory(paths.root, paths.sidecar);
   const textCasRoot = await ensureConfinedDirectory(paths.root, paths.textCasRoot);
@@ -1214,11 +1216,13 @@ function migrateStudioAssetCategoryConstraintsForStyle(db: DatabaseSync): void {
 }
 
 function openDatabase(databasePath: string): DatabaseSync {
+  recordStudioUnitsReadCounter("productionOpenDatabaseCalls");
   // P28：先以只读连接探测版本；未来 schema 在任何 PRAGMA/DDL/迁移前失败关闭。
   if (existsSync(databasePath)) {
     const metadata = lstatSync(databasePath);
     if (metadata.isSymbolicLink() || !metadata.isFile()) throw new Error("生产知识库数据库必须是无符号链接的普通文件。");
     const probe = new DatabaseSync(databasePath, { readOnly: true });
+    recordStudioUnitsReadCounter("productionReadOnlyProbeConnections");
     try {
       const hasMeta = probe.prepare("SELECT 1 AS found FROM sqlite_master WHERE type = 'table' AND name = 'studio_production_meta' LIMIT 1").get();
       if (hasMeta) {
@@ -1238,12 +1242,16 @@ function openDatabase(databasePath: string): DatabaseSync {
       probe.close();
     }
   }
-  const db = new DatabaseSync(databasePath, { timeout: BUSY_TIMEOUT_MS });
-  db.exec(`PRAGMA busy_timeout=${BUSY_TIMEOUT_MS}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
+  const db = new DatabaseSync(databasePath, { timeout: busyTimeoutMs });
+  recordStudioUnitsReadCounter("productionOwnerConnections");
+  db.exec(`PRAGMA busy_timeout=${busyTimeoutMs}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
   const journal = db.prepare("PRAGMA journal_mode").get() as { journal_mode?: string } | undefined;
   if (journal?.journal_mode?.toLowerCase() !== "wal") db.exec("PRAGMA journal_mode=WAL");
   const requestSchemaKey = studioRequestSqliteValidationKey("studio-production-schema-v6", databasePath);
-  if (hasStudioRequestSchemaValidation(requestSchemaKey)) {
+  const schemaCacheHit = hasStudioRequestSchemaValidation(requestSchemaKey);
+  recordStudioUnitsReadCounter(schemaCacheHit ? "productionSchemaCacheHits" : "productionSchemaCacheMisses");
+  if (schemaCacheHit) {
     const version = db.prepare("SELECT value FROM studio_production_meta WHERE key = 'schema_version'")
       .get() as { value?: string } | undefined;
     const foreignKeys = db.prepare("PRAGMA foreign_keys").get() as { foreign_keys?: number } | undefined;
@@ -2933,6 +2941,8 @@ function unitTimingRow(
   unitId: string,
   unitRevision: number,
 ): UnitTimingRow | undefined {
+  recordStudioUnitsReadCounter("unitTimingQueries");
+  recordStudioUnitsReadCounter("productionBusinessSqlExecutions");
   return db.prepare(`SELECT * FROM studio_production_unit_timings
     WHERE unit_id = ? AND unit_revision = ?`)
     .get(unitId, unitRevision) as unknown as UnitTimingRow | undefined;
@@ -2964,6 +2974,8 @@ function episodeStartMilliseconds(
   sequence: number,
   excludeUnitId: string,
 ): number {
+  recordStudioUnitsReadCounter("episodeStartQueries");
+  recordStudioUnitsReadCounter("productionBusinessSqlExecutions");
   const row = db.prepare(`
     SELECT COALESCE(SUM(COALESCE(t.duration_ms, u.duration_ms)), 0) AS known_start_ms,
            COUNT(*) AS known_count
@@ -3235,6 +3247,8 @@ export async function listStudioProductionUnits(
       parameters.push(after.season, after.episode, after.sequence, after.id);
     }
     const where = clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "";
+    recordStudioUnitsReadCounter("unitPageQueries");
+    recordStudioUnitsReadCounter("productionBusinessSqlExecutions");
     const rows = db.prepare(`
       SELECT * FROM studio_production_units
       ${where}
@@ -3263,6 +3277,8 @@ export async function getStudioProductionScopeFacets(projectRoot: string): Promi
   const paths = await ensureProductionDirectories(projectRoot);
   const db = openDatabase(paths.database);
   try {
+    recordStudioUnitsReadCounter("facetQueries", 3);
+    recordStudioUnitsReadCounter("productionBusinessSqlExecutions", 3);
     const seasons = (db.prepare("SELECT DISTINCT season FROM studio_production_units ORDER BY season").all() as Array<{ season: string }>)
       .map((row) => row.season);
     const episodes = (db.prepare(`SELECT DISTINCT season, episode FROM studio_production_units
@@ -3398,6 +3414,8 @@ export async function getStudioUnitBindingHeadSummaries(
   const paths = await ensureProductionDirectories(projectRoot);
   const db = openDatabase(paths.database);
   try {
+    recordStudioUnitsReadCounter("bindingHeadQueries");
+    recordStudioUnitsReadCounter("productionBusinessSqlExecutions");
     const requestedValues = ids.map((_, index) => `(?, ${index})`).join(", ");
     const rows = db.prepare(`WITH requested(unit_id, ordinal) AS (VALUES ${requestedValues}),
       analysis_counts AS (
@@ -3750,6 +3768,8 @@ export async function getStudioCanonicalSuccessorUnitIds(
   const paths = await ensureProductionDirectories(projectRoot);
   const db = openDatabase(paths.database);
   try {
+    recordStudioUnitsReadCounter("successorQueries");
+    recordStudioUnitsReadCounter("productionBusinessSqlExecutions");
     const placeholders = normalized.map(() => "?").join(",");
     const rows = db.prepare(`
       SELECT current.id AS unit_id, (

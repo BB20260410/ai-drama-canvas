@@ -604,6 +604,15 @@ export const STUDIO_PUBLIC_COMMAND_NAMES = [
   "reconcile_dudu_readonly_historical_passes",
   "prepare_studio_video_package_export",
   "build_studio_video_package",
+  "enqueue_studio_higgsfield_connector_request",
+  "claim_studio_higgsfield_connector_request",
+  "preflight_studio_higgsfield_connector_request",
+  "authorize_studio_higgsfield_connector_request",
+  "record_studio_higgsfield_connector_submission",
+  "reconcile_studio_higgsfield_connector_request",
+  "prepare_studio_higgsfield_video_generation",
+  "record_studio_higgsfield_video_submission",
+  "attest_studio_higgsfield_connector_capability",
   "attach_studio_multimedia_timeline_media",
 ] as const;
 
@@ -614,6 +623,33 @@ export const STUDIO_INTERNAL_COMMAND_NAMES = [
 
 export type StudioPublicCommandName = typeof STUDIO_PUBLIC_COMMAND_NAMES[number];
 export type StudioInternalCommandName = typeof STUDIO_INTERNAL_COMMAND_NAMES[number];
+
+/**
+ * 这些旧命令把 Connector 观测、零扣费回执或远端结论作为调用方 payload 接收。
+ * 普通 MCP/Renderer 即使自称 Codex 也能自行构造这些字段，因而在真正的本机
+ * trusted connector adapter 落地前必须从所有公开 schema 移除。Core 仍保留
+ * 历史类型/owner 以只读恢复既有账本，但不得把它们当成新的执行入口。
+ */
+export const STUDIO_UNTRUSTED_HIGGSFIELD_COMMAND_NAMES = [
+  "claim_studio_higgsfield_connector_request",
+  "preflight_studio_higgsfield_connector_request",
+  "authorize_studio_higgsfield_connector_request",
+  "record_studio_higgsfield_connector_submission",
+  "reconcile_studio_higgsfield_connector_request",
+  "prepare_studio_higgsfield_video_generation",
+  "record_studio_higgsfield_video_submission",
+  "attest_studio_higgsfield_connector_capability",
+] as const;
+
+const STUDIO_UNTRUSTED_HIGGSFIELD_COMMAND_NAME_SET = new Set<string>(
+  STUDIO_UNTRUSTED_HIGGSFIELD_COMMAND_NAMES,
+);
+
+export function isStudioUntrustedHiggsfieldCommandName(
+  value: unknown,
+): value is typeof STUDIO_UNTRUSTED_HIGGSFIELD_COMMAND_NAMES[number] {
+  return typeof value === "string" && STUDIO_UNTRUSTED_HIGGSFIELD_COMMAND_NAME_SET.has(value);
+}
 
 const PUBLIC_COMMAND_NAME_SET = new Set<string>(STUDIO_PUBLIC_COMMAND_NAMES);
 const INTERNAL_COMMAND_NAME_SET = new Set<string>(STUDIO_INTERNAL_COMMAND_NAMES);
@@ -1018,6 +1054,68 @@ function publicCommandVariants(actor: StudioReviewerActor) {
       expectedAuthorityControlFingerprint: studioSha256Schema,
       destinationPolicy: z.literal("managed-evidence-only"),
     }).strict() }),
+    z.object({ command: z.literal("enqueue_studio_higgsfield_connector_request"), payload: z.discriminatedUnion("kind", [
+      z.object({ kind: z.literal("video"), intentId: studioStableIdSchema }).strict(),
+      z.object({ kind: z.literal("image"), imageGenerationRunId: studioStableIdSchema, executionAdapter: z.literal("higgsfield-connector") }).strict(),
+    ]) }),
+    ...(actor === "codex" ? [z.object({ command: z.literal("claim_studio_higgsfield_connector_request"), payload: z.object({
+      requestId: studioStableIdSchema, claimantId: studioStableIdSchema, expectedRevision: z.number().int().positive(),
+    }).strict() })] : []),
+    ...(actor === "codex" ? [z.object({ command: z.literal("preflight_studio_higgsfield_connector_request"), payload: z.object({
+      requestId: studioStableIdSchema, claimToken: z.string().trim().regex(/^higgsclaim-[a-f0-9]{32}$/u), expectedRevision: z.number().int().positive(),
+      observation: z.object({ source: z.literal("higgsfield-connector"), observedAt: z.string().datetime({ offset: false }),
+        unlimAvailable: z.boolean(), supportsUnlim: z.boolean(), billingMode: z.literal("unlimited"), zeroCredits: z.boolean(),
+        model: z.string().trim().min(1).max(100), mode: z.string().trim().min(1).max(100), durationSeconds: z.number().int().positive().max(120),
+        resolution: z.string().trim().min(1).max(30), adjustments: z.array(z.string().trim().min(1).max(300)).max(20),
+        requestBindingFingerprint: studioSha256Schema, targetProfileFingerprint: studioSha256Schema, workspaceSubjectHash: studioSha256Schema,
+      }).strict(),
+    }).strict() })] : []),
+    ...(actor === "codex" ? [z.object({ command: z.literal("authorize_studio_higgsfield_connector_request"), payload: z.object({
+      requestId: studioStableIdSchema, claimToken: z.string().trim().regex(/^higgsclaim-[a-f0-9]{32}$/u), expectedRevision: z.number().int().positive(),
+      projectContextToken: z.string().trim().regex(/^studioctx-v1-[a-f0-9]{64}$/u),
+    }).strict() })] : []),
+    ...(actor === "codex" ? [z.object({ command: z.literal("record_studio_higgsfield_connector_submission"), payload: z.object({
+      requestId: studioStableIdSchema, claimToken: z.string().trim().regex(/^higgsclaim-[a-f0-9]{32}$/u), expectedRevision: z.number().int().positive(),
+      submissionNonce: z.string().trim().regex(/^higgsnonce-[a-f0-9]{32}$/u), remoteJobId: studioStableIdSchema.nullable(),
+      zeroCreditReceipt: z.object({ requestBindingFingerprint: studioSha256Schema, workspaceSubjectHash: studioSha256Schema,
+        billingMode: z.literal("unlimited"), estimatedCredits: z.literal(0), receiptFingerprint: studioSha256Schema }).strict().optional(),
+      remoteStatus: z.string().trim().min(1).max(200).optional(),
+    }).strict() })] : []),
+    ...(actor === "codex" ? [z.object({ command: z.literal("reconcile_studio_higgsfield_connector_request"), payload: z.object({
+      requestId: studioStableIdSchema,
+      expectedRevision: z.number().int().positive(),
+      resolution: z.enum(["remote_running", "remote_succeeded", "remote_failed", "remote_cancelled", "not_submitted"]),
+      remoteJobId: studioStableIdSchema.optional(),
+      remoteStatus: z.string().trim().min(1).max(200).optional(),
+      evidenceFingerprint: studioSha256Schema,
+      confirmNoRemoteSubmission: z.literal(true).optional(),
+    }).strict() })] : []),
+    // capability 不由公开请求声称：当前 App 只能使用已核实的 connector 观察，
+    // 因此这里不允许传 use_unlim/credits/queue 等可被伪造的字段。
+    ...(actor === "codex" ? [z.object({ command: z.literal("prepare_studio_higgsfield_video_generation"), payload: z.object({
+      intentId: studioStableIdSchema,
+      expectedVideoPackageControlFingerprint: studioSha256Schema,
+      projectContextToken: z.string().trim().regex(/^studioctx-v1-[a-f0-9]{64}$/u),
+    }).strict() })] : []),
+    ...(actor === "codex" ? [z.object({ command: z.literal("record_studio_higgsfield_video_submission"), payload: z.object({
+      runId: studioStableIdSchema,
+      expectedRevision: z.number().int().positive(),
+      remoteJobId: studioStableIdSchema.nullable(),
+      remoteStatus: z.string().trim().min(1).max(200).optional(),
+      adjustments: z.array(z.string().trim().min(1).max(300)).max(20).optional(),
+    }).strict() })] : []),
+    ...(actor === "codex" ? [z.object({ command: z.literal("attest_studio_higgsfield_connector_capability"), payload: z.object({
+      source: z.literal("higgsfield-connector"),
+      observedAt: z.string().datetime({ offset: false }),
+      unlimAvailable: z.boolean(),
+      supportsUnlim: z.boolean(),
+      model: z.string().trim().min(1).max(100),
+      mode: z.string().trim().min(1).max(100),
+      durationSeconds: z.number().int().positive().max(120),
+      resolution: z.string().trim().min(1).max(30),
+      adjustments: z.array(z.string().trim().min(1).max(300)).max(20),
+      evidenceFingerprint: studioSha256Schema,
+    }).strict() })] : []),
     z.object({
       command: z.literal("attach_studio_multimedia_timeline_media"),
       payload: studioMultimediaTimelineAttachPayloadSchema,
@@ -1026,7 +1124,9 @@ function publicCommandVariants(actor: StudioReviewerActor) {
   // Payload schemas are strict, but a plain command-level z.object strips
   // unknown keys. Keep the variants flat for MCP JSON-schema parity while
   // making every { command, payload } envelope fail closed as well.
-  return variants.map((variant) => variant.strict()) as unknown as typeof variants;
+  return variants
+    .map((variant) => variant.strict())
+    .filter((variant) => !isStudioUntrustedHiggsfieldCommandName(variant.shape.command.value)) as unknown as typeof variants;
 }
 
 export const STUDIO_CODEX_PUBLIC_COMMAND_SCHEMA_OPTIONS = publicCommandVariants("codex");
@@ -1076,8 +1176,16 @@ function formatIssues(error: z.ZodError): string {
 export function parseStudioCommandRequestForCore(value: unknown): StudioRuntimeCommandRequest | undefined {
   if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
   const command = (value as { command?: unknown }).command;
+  if (isStudioUntrustedHiggsfieldCommandName(command)) {
+    throw new Error(`Studio 命令 ${command} 已停用：尚未建立受信任的 Higgsfield 本机适配器；调用方自报的 Unlimited 观测、零扣费回执和远端结论均不可信。`);
+  }
   if (isStudioPublicCommandName(command)) {
-    const parsed = studioAnyActorPublicCommandRequestSchema.safeParse(value);
+    // capability attestation 是唯一必须由 Codex connector 归因的公开写命令；
+    // Core 也不得因 any-actor 兼容解析而放宽它。
+    const schema = (["claim_studio_higgsfield_connector_request", "preflight_studio_higgsfield_connector_request", "authorize_studio_higgsfield_connector_request", "record_studio_higgsfield_connector_submission", "reconcile_studio_higgsfield_connector_request", "attest_studio_higgsfield_connector_capability", "prepare_studio_higgsfield_video_generation", "record_studio_higgsfield_video_submission"] as const).includes(command as never)
+      ? studioCodexPublicCommandRequestSchema
+      : studioAnyActorPublicCommandRequestSchema;
+    const parsed = schema.safeParse(value);
     if (!parsed.success) throw new Error(`Studio 命令 ${command} 的载荷不符合合同：${formatIssues(parsed.error)}`);
     return parsed.data;
   }

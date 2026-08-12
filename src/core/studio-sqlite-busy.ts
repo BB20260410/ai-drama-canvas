@@ -1,3 +1,5 @@
+import { AsyncLocalStorage } from "node:async_hooks";
+
 /**
  * SQLite busy_timeout 统一常量（对照 qmd 等本地优先实现的 120s 量级）。
  * 写路径高峰（生图回写/ledger）时 5s 过短易 SQLITE_BUSY。
@@ -17,6 +19,66 @@ export const STUDIO_SQLITE_BUSY_RETRY_BUDGET_MS = 5_000;
 /** busy 瞬时锁受控重试：指数退避基数 */
 export const STUDIO_SQLITE_BUSY_RETRY_BASE_DELAY_MS = 120;
 
+interface StudioSqliteBusyDeadlineContext {
+  deadlineAtMs: number;
+}
+
+const studioSqliteBusyDeadlineContext = new AsyncLocalStorage<StudioSqliteBusyDeadlineContext>();
+
+export type SqliteRetryProof =
+  | { kind: "before_domain_execute" }
+  | { kind: "atomic_transaction_rolled_back"; owner: string; operationId: string };
+
+/**
+ * 只有 owner 能证明整条 domain operation 尚未产生副作用时，才允许构造此错误。
+ * 原始 SQLITE_BUSY/LOCKED 一律不是该类型，必须按 outcome_unknown 对账。
+ */
+export class RetrySafeSqliteBusyError extends Error {
+  readonly code = "SQLITE_BUSY";
+  readonly outcome = "retry_safe_no_effect";
+  readonly retryProof: SqliteRetryProof;
+
+  constructor(cause: unknown, retryProof: SqliteRetryProof) {
+    super(sqliteBusyDetailMessage(cause), { cause });
+    this.name = "RetrySafeSqliteBusyError";
+    this.retryProof = retryProof;
+  }
+}
+
+export function isRetrySafeSqliteBusyError(error: unknown): error is RetrySafeSqliteBusyError {
+  return error instanceof RetrySafeSqliteBusyError
+    && error.outcome === "retry_safe_no_effect"
+    && isSqliteBusyError(error);
+}
+
+/** 纯函数：把连接级 busy timeout 限制在同一绝对 deadline 的剩余墙钟内。 */
+export function sqliteBusyTimeoutWithinDeadline(
+  configuredMs: number,
+  deadlineAtMs: number | undefined,
+  nowMs = Date.now(),
+): number {
+  const configured = Math.max(1, Math.floor(configuredMs));
+  if (deadlineAtMs === undefined || !Number.isFinite(deadlineAtMs)) return configured;
+  return Math.max(1, Math.min(configured, Math.floor(deadlineAtMs - nowMs)));
+}
+
+/** 读取当前 command-scoped deadline；不在命令上下文时保持 owner 原有 timeout。 */
+export function studioSqliteBusyTimeoutMs(configuredMs = STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS): number {
+  return sqliteBusyTimeoutWithinDeadline(
+    configuredMs,
+    studioSqliteBusyDeadlineContext.getStore()?.deadlineAtMs,
+  );
+}
+
+/**
+ * 为一次完整命令（含账本登记、业务 owner、终态写回）绑定同一绝对截止时间。
+ * 只影响显式调用 studioSqliteBusyTimeoutMs 的 SQLite 连接，不改变请求哈希或持久合同。
+ */
+export function withStudioSqliteBusyDeadline<T>(deadlineAtMs: number, work: () => T): T {
+  if (!Number.isFinite(deadlineAtMs)) throw new Error("SQLite deadlineAtMs 必须为有限时间戳。");
+  return studioSqliteBusyDeadlineContext.run({ deadlineAtMs }, work);
+}
+
 /**
  * 判断错误是否为 SQLite 瞬时写锁（SQLITE_BUSY=5 / SQLITE_LOCKED=6）。
  * node:sqlite DatabaseSync 抛出的错误带 errcode；message 兜底匹配
@@ -24,9 +86,10 @@ export const STUDIO_SQLITE_BUSY_RETRY_BASE_DELAY_MS = 120;
  * AggregateError（如 withFileLock 临界区与锁释放双失败）把原始 busy 收进
  * errors 数组：浅查一层成员的 errcode/message，不再向下递归，避免漏判进 unknown。
  *
- * 语义边界：SQLITE_BUSY/SQLITE_LOCKED 抛出时 COMMIT 未成功，抛出该错误的
- * 事务确认未提交（连接关闭即回滚）；已提交后丢失响应不属于本判定，必须走
- * 命令账本 outcome_unknown / receipt 对账路径。
+ * 语义边界：原始 SQLITE_BUSY/SQLITE_LOCKED 只能说明发生错误的那条 SQLite
+ * 语句没有成功，不能证明同一跨 owner 命令此前没有文件、账本或其他数据库
+ * 副作用。只有 RetrySafeSqliteBusyError 携带的窄化证明才允许自动重试；其余
+ * 一律走命令账本 outcome_unknown / receipt 对账路径。
  */
 export function isSqliteBusyError(error: unknown): boolean {
   let current: unknown = error;
@@ -74,12 +137,16 @@ export interface SqliteBusyRetryOptions {
   sleep?: (milliseconds: number) => Promise<void>;
   /** 每次尝试前回调（1 起），供调用方记录 attempts */
   onAttempt?: (attempt: number) => void;
+  /** 绝对 deadline；默认继承 command-scoped SQLite deadline。 */
+  deadlineAtMs?: number;
+  /** 仅显式证明零副作用的 typed busy 可重试；默认 fail-closed。 */
+  shouldRetry?: (error: unknown) => boolean;
 }
 
 /**
- * 对"确认未提交"的瞬时 busy 做有界指数退避重试：
- * 最多 maxAttempts 次、退避与执行总预算不超过 budgetMs；非 busy 错误立即抛出，
- * 重试仍失败则原样抛出最后一次 busy 错误，由上层按 RESOURCE_BUSY 分类。
+ * 对"已证明本次尝试零副作用"的瞬时 busy 做有界指数退避重试：
+ * 最多 maxAttempts 次、退避与执行总预算不超过 budgetMs；原始 busy 与其他错误
+ * 均立即抛出。重试仍失败时原样抛出 typed busy，由上层按 RESOURCE_BUSY 分类。
  */
 export async function withSqliteBusyRetry<T>(
   work: () => Promise<T>,
@@ -89,14 +156,20 @@ export async function withSqliteBusyRetry<T>(
   const budgetMs = Math.max(0, options?.budgetMs ?? STUDIO_SQLITE_BUSY_RETRY_BUDGET_MS);
   const baseDelayMs = Math.max(1, options?.baseDelayMs ?? STUDIO_SQLITE_BUSY_RETRY_BASE_DELAY_MS);
   const sleep = options?.sleep ?? ((milliseconds: number) => new Promise<void>((resolve) => setTimeout(resolve, milliseconds)));
+  const shouldRetry = options?.shouldRetry ?? isRetrySafeSqliteBusyError;
   const startedAt = Date.now();
+  const inheritedDeadlineAtMs = studioSqliteBusyDeadlineContext.getStore()?.deadlineAtMs;
+  const deadlineAtMs = Math.min(
+    startedAt + budgetMs,
+    options?.deadlineAtMs ?? inheritedDeadlineAtMs ?? Number.POSITIVE_INFINITY,
+  );
   for (let attempt = 1; ; attempt += 1) {
     options?.onAttempt?.(attempt);
     try {
       return await work();
     } catch (error) {
-      if (!isSqliteBusyError(error) || attempt >= maxAttempts) throw error;
-      const remaining = budgetMs - (Date.now() - startedAt);
+      if (!shouldRetry(error) || attempt >= maxAttempts) throw error;
+      const remaining = deadlineAtMs - Date.now();
       if (remaining <= 0) throw error;
       // 指数退避 + 小抖动；封顶到剩余预算，总耗时绝不突破 budgetMs。
       const delay = Math.min(baseDelayMs * 2 ** (attempt - 1) + Math.random() * 25, remaining);

@@ -3,6 +3,7 @@ import { existsSync } from "node:fs";
 import { lstat } from "node:fs/promises";
 import path from "node:path";
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
+import { studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
 import { inspectManagedProjectReadOnly } from "./managed-project.js";
 import type { StudioCanonicalAssetCategory } from "./material-studio.js";
 import {
@@ -26,6 +27,7 @@ const DEFAULT_PAGE_LIMIT = 36;
 const MAX_PAGE_LIMIT = 36;
 const MAX_REGISTERED_PROJECTS = 200;
 const MAX_CATALOG_SNAPSHOT_BUILD_ATTEMPTS = 3;
+const CATALOG_SQLITE_BUSY_TIMEOUT_MS = 750;
 const DATABASE_RELATIVE_PATH = ".aicanvas/material-studio.sqlite";
 
 export interface GlobalStudioAssetCatalogCounts {
@@ -425,6 +427,16 @@ export function __setGlobalStudioAssetCatalogSnapshotProbeForTests(
 export function __getGlobalStudioAssetCatalogCacheMetricsForTests():
 GlobalStudioAssetCatalogCacheMetrics {
   return { ...globalAssetCatalogCacheMetrics };
+}
+
+function isTransientCatalogReadError(error: unknown): boolean {
+  const code = error instanceof Error && "code" in error
+    ? String((error as NodeJS.ErrnoException).code ?? "").toUpperCase()
+    : "";
+  const message = error instanceof Error ? error.message.toUpperCase() : String(error).toUpperCase();
+  return ["SQLITE_BUSY", "SQLITE_LOCKED", "SQLITE_IOERR", "EBUSY", "EAGAIN", "EINTR", "ETIMEDOUT", "EMFILE", "ENFILE"].some((value) => (
+    code === value || message.includes(value)
+  ));
 }
 
 /** 兼容既有音视频测试名称；两者现在共享同一份稳定快照。 */
@@ -1161,9 +1173,10 @@ GlobalStudioAssetCatalogSnapshot,
     }
     let db: DatabaseSync | undefined;
     try {
-      db = new DatabaseSync(databasePath, { readOnly: true });
+      const busyTimeoutMs = studioSqliteBusyTimeoutMs(CATALOG_SQLITE_BUSY_TIMEOUT_MS);
+      db = new DatabaseSync(databasePath, { readOnly: true, timeout: busyTimeoutMs });
       globalAssetCatalogCacheMetrics.projectSqliteScans += 1;
-      db.exec("PRAGMA query_only = ON");
+      db.exec(`PRAGMA query_only = ON; PRAGMA busy_timeout = ${busyTimeoutMs}`);
 
       if (requiredTablesExist(db)) {
         try {
@@ -1187,7 +1200,8 @@ GlobalStudioAssetCatalogSnapshot,
           addImageCoverage(assets.imageCoverage, projectCoverage);
           assets.items.push(...projectItems);
           markProjectionReadable(assets, project, "ready");
-        } catch {
+        } catch (error) {
+          if (isTransientCatalogReadError(error)) throw error;
           markProjectionUnavailable(
             assets,
             project,
@@ -1231,7 +1245,8 @@ GlobalStudioAssetCatalogSnapshot,
           addImageCoverage(resourceImages.imageCoverage, projectCoverage);
           resourceImages.items.push(...projectItems);
           markProjectionReadable(resourceImages, project, "ready");
-        } catch {
+        } catch (error) {
+          if (isTransientCatalogReadError(error)) throw error;
           markProjectionUnavailable(
             resourceImages,
             project,
@@ -1282,7 +1297,8 @@ GlobalStudioAssetCatalogSnapshot,
           media.previewCoverage.audioWaveformReady += projectPreviewCoverage.audioWaveformReady;
           media.items.push(...projectItems);
           markProjectionReadable(media, project, "ready");
-        } catch {
+        } catch (error) {
+          if (isTransientCatalogReadError(error)) throw error;
           markProjectionUnavailable(
             media,
             project,
@@ -1307,7 +1323,8 @@ GlobalStudioAssetCatalogSnapshot,
           imageResourceProjectStates.set(project.primaryRoot, "ready");
           imageResourceReadableProjectRoots.add(project.primaryRoot);
           imageResourceReadableProjectCount += 1;
-        } catch {
+        } catch (error) {
+          if (isTransientCatalogReadError(error)) throw error;
           imageResourceProjectStates.set(project.primaryRoot, "material-database-invalid");
           imageResourceUnavailableProjects.push({
             id: project.id,
@@ -1323,7 +1340,8 @@ GlobalStudioAssetCatalogSnapshot,
           reason: "material-database-invalid",
         });
       }
-    } catch {
+    } catch (error) {
+      if (isTransientCatalogReadError(error)) throw error;
       for (const projection of projections) {
         if (!projection.projectStates.has(project.primaryRoot)) {
           markProjectionUnavailable(
@@ -1391,9 +1409,20 @@ Promise<GlobalStudioAssetCatalogSnapshot> {
     const projects = normalizeRegisteredProjects(registered);
     await stabilizeMediaProjectMaterialReadState(projects);
     const projectMaterialIdentitiesBefore = await captureMediaProjectMaterialIdentities(projects);
-    await globalAssetCatalogSnapshotProbe?.("after-before-identities", attempt);
-    const scanned = await scanGlobalAssetCatalogProjects(projects);
-    await globalAssetCatalogSnapshotProbe?.("before-after-identities", attempt);
+    let scanned: Awaited<ReturnType<typeof scanGlobalAssetCatalogProjects>>;
+    try {
+      await globalAssetCatalogSnapshotProbe?.("after-before-identities", attempt);
+      scanned = await scanGlobalAssetCatalogProjects(projects);
+      await globalAssetCatalogSnapshotProbe?.("before-after-identities", attempt);
+    } catch (error) {
+      if (isTransientCatalogReadError(error) && attempt < MAX_CATALOG_SNAPSHOT_BUILD_ATTEMPTS) {
+        globalAssetCatalogCacheMetrics.snapshotBuildRetries += 1;
+        await new Promise((resolve) => setTimeout(resolve, attempt * 25));
+        continue;
+      }
+      globalAssetCatalogCacheMetrics.snapshotBuildFailures += 1;
+      throw error;
+    }
     const [registryIdentityAfter, projectMaterialIdentitiesAfter] = await Promise.all([
       mediaCatalogStableFileIdentity(registryPath),
       captureMediaProjectMaterialIdentities(projects),

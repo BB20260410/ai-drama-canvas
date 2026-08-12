@@ -8,6 +8,7 @@ import {
   listCommandLedgerEntries,
   loadCommandLedger,
   getCommandLedgerEntryByIdempotencyKey,
+  getCommandLedgerEntriesByRequestHash,
   getCommandLedgerEntryByRequestId,
   upsertCommandLedgerEntry,
 } from "../src/core/command-ledger-store.js";
@@ -235,6 +236,54 @@ describe("P9 增量 command ledger", () => {
 
     const busList = await listCommandLedger(root, 20);
     expect(busList.some((entry) => entry.idempotencyKey === "idem-create-script-001")).toBe(true);
+  });
+
+  it("requestHash 别名查询使用复合索引，旧 v1 库只读兼容并在下一次写入时原子补索引", async () => {
+    const parent = await realpath(await mkdtemp(path.join("/tmp", "p9-ledger-request-hash-index-")));
+    roots.push(parent);
+    const project = await createManagedProject({ parentRoot: parent, name: "P9 Request Hash Index" });
+    const requestHash = "7".repeat(64);
+    const first = {
+      schemaVersion: 1 as const,
+      requestId: "request-hash-index-001",
+      idempotencyKey: "idem-hash-index-001",
+      command: "request_hash_probe",
+      status: "succeeded" as const,
+      replayed: false,
+      requestHash,
+      startedAt: "2026-07-22T00:00:00.000Z",
+    };
+    await upsertCommandLedgerEntry(project.paths.root, first);
+    const databasePath = path.join(project.paths.root, ".aicanvas", "command-ledger.sqlite");
+    const legacy = new DatabaseSync(databasePath);
+    legacy.exec("DROP INDEX idx_command_ledger_request_hash_started_at");
+    legacy.close();
+
+    // 纯读保持零迁移，且 legacy v1 仍可按 requestHash 精确读取。
+    expect(await getCommandLedgerEntriesByRequestHash(project.paths.root, requestHash)).toEqual([first]);
+    const beforeWrite = new DatabaseSync(databasePath, { readOnly: true });
+    expect((beforeWrite.prepare("PRAGMA index_list(command_ledger_entries)").all() as Array<{ name: string }>)
+      .some((entry) => entry.name === "idx_command_ledger_request_hash_started_at")).toBe(false);
+    beforeWrite.close();
+
+    await upsertCommandLedgerEntry(project.paths.root, {
+      ...first,
+      requestId: "request-hash-index-002",
+      idempotencyKey: "idem-hash-index-002",
+      startedAt: "2026-07-22T00:00:01.000Z",
+    });
+    const migrated = new DatabaseSync(databasePath, { readOnly: true });
+    const indexNames = (migrated.prepare("PRAGMA index_list(command_ledger_entries)").all() as Array<{ name: string }>)
+      .map((entry) => entry.name);
+    expect(indexNames).toContain("idx_command_ledger_request_hash_started_at");
+    const queryPlan = migrated.prepare(`EXPLAIN QUERY PLAN
+      SELECT payload_json FROM command_ledger_entries
+      WHERE request_hash = ?
+      ORDER BY started_at ASC, idempotency_key ASC`).all(requestHash) as Array<{ detail: string }>;
+    expect(queryPlan.some((row) => row.detail.includes("idx_command_ledger_request_hash_started_at"))).toBe(true);
+    migrated.close();
+    expect((await getCommandLedgerEntriesByRequestHash(project.paths.root, requestHash))
+      .map((entry) => entry.idempotencyKey)).toEqual(["idem-hash-index-001", "idem-hash-index-002"]);
   });
 
   it("拒绝跨根 storageRoot 与 projectId 漂移", async () => {

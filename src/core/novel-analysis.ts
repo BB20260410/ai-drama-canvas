@@ -1,10 +1,11 @@
 import { createHash, randomUUID } from "node:crypto";
-import { mkdir, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
 import { loadAdaptationStore, saveAdaptationStore } from "./adaptation.js";
 import { withProjectLock } from "./locks.js";
-import { appendEvent, getSidecarPaths, readJson, writeJsonAtomic, writeTextAtomic } from "./sidecar.js";
+import { assertNovelAnalysisChapterBinding, createNovelAnalysisTaskBindingFiles, freezeNovelAnalysisTaskBinding, novelAnalysisTaskPaths } from "./novel-analysis-task-binding.js";
+import { appendEvent } from "./sidecar.js";
+import { loadStoryAnalysisChapterSnapshot, loadStoryLibrarySnapshot } from "./story.js";
 import type {
   AdaptationStore,
   NarrativeBeat,
@@ -24,6 +25,8 @@ export type BeatProposal = Omit<NarrativeBeat, "schemaVersion" | "id" | "revisio
 export interface NovelAnalysisProposalInput {
   taskId: string;
   expectedRevision: number;
+  executionId?: string;
+  expectedExecutionFence?: number;
   facts: FactProposal[];
   beats: BeatProposal[];
   executionReceipt?: { responseId?: string; responseModel?: string; proposalPath?: string; inputTokens?: number; outputTokens?: number; totalTokens?: number };
@@ -86,8 +89,8 @@ function stableId(prefix: string, value: string): string {
 }
 
 async function loadLibrary(projectRoot: string): Promise<StoryLibrary> {
-  const library = await readJson<StoryLibrary | null>(getSidecarPaths(projectRoot).storyIndex, null);
-  if (!library || library.schemaVersion !== 1 || !Array.isArray(library.chapters)) throw new Error("没有真实章节索引，请先导入小说。 ");
+  const library = await loadStoryLibrarySnapshot(projectRoot);
+  if (!library.chapters.length) throw new Error("没有真实章节索引，请先导入小说。 ");
   return library;
 }
 
@@ -132,9 +135,9 @@ export async function createNovelAnalysisTask(projectRoot: string, input: { expe
     if (selectedIds.size && selectedIds.size !== chapters.length) throw new Error("部分 chapterIds 不存在，拒绝创建不完整任务。 ");
     const timestamp = now();
     const id = `analysis-${randomUUID()}`;
-    const directory = path.join(getSidecarPaths(projectRoot).storyAnalysisTasks, id);
-    const taskJsonPath = path.join(directory, "task.json");
-    const taskMarkdownPath = path.join(directory, "任务说明.md");
+    const taskPaths = novelAnalysisTaskPaths(projectRoot, id);
+    const taskJsonPath = taskPaths.taskJsonPath;
+    const taskMarkdownPath = taskPaths.taskMarkdownPath;
     const task: NovelAnalysisTask = {
       schemaVersion: 1,
       id,
@@ -150,9 +153,7 @@ export async function createNovelAnalysisTask(projectRoot: string, input: { expe
       createdAt: timestamp,
       updatedAt: timestamp,
     };
-    await mkdir(directory, { recursive: true });
-    await writeJsonAtomic(taskJsonPath, taskContract(task));
-    await writeTextAtomic(taskMarkdownPath, taskMarkdown(task));
+    await createNovelAnalysisTaskBindingFiles(projectRoot, task, taskContract(task), taskMarkdown(task));
     store.analysisTasks.unshift(task);
     store.revision += 1;
     store.updatedAt = timestamp;
@@ -193,8 +194,8 @@ function splitBoundary(text: string, start: number, maximumEnd: number): number 
   return best >= minimum ? best + bestLength : maximumEnd;
 }
 
-async function chapterSegments(chapter: StoryChapter, targetCharacters: number): Promise<NovelAnalysisChapterRef[]> {
-  const text = normalizedChapterText(await readFile(chapter.path, "utf8"));
+function chapterSegments(chapter: StoryChapter, serialized: string, targetCharacters: number): NovelAnalysisChapterRef[] {
+  const text = normalizedChapterText(serialized);
   if (createHash("sha256").update(text).digest("hex") !== chapter.sha256) throw new Error(`章节快照哈希不匹配，停止规划：${chapter.id}`);
   if (!text.length) throw new Error(`章节内容为空，停止规划：${chapter.id}`);
   const ranges: Array<{ start: number; end: number }> = [];
@@ -235,8 +236,21 @@ export async function createNovelAnalysisRun(projectRoot: string, input: CreateN
     if (selectedIds.size && selectedIds.size !== chapters.length) throw new Error("部分 chapterIds 不存在或不属于指定 sourceId，拒绝创建不完整运行。 ");
     chapters = [...chapters].sort((left, right) => left.sourceId.localeCompare(right.sourceId) || left.index - right.index || left.id.localeCompare(right.id));
 
+    const snapshot = await loadStoryAnalysisChapterSnapshot(projectRoot, chapters.map((chapter) => chapter.id));
+    if (snapshot.library.revision !== library.revision) throw new Error("章节库在分析规划期间发生变化，请重试。");
+    const snapshotById = new Map(snapshot.chapters.map((entry) => [entry.chapter.id, entry]));
     const refs: NovelAnalysisChapterRef[] = [];
-    for (const chapter of chapters) refs.push(...await chapterSegments(chapter, targetCharacters));
+    for (const selected of chapters) {
+      const current = snapshotById.get(selected.id);
+      assertNovelAnalysisChapterBinding({
+        chapterId: selected.id,
+        sourceId: selected.sourceId,
+        revision: selected.revision,
+        sha256: selected.sha256,
+        path: selected.path,
+      }, current?.chapter);
+      refs.push(...chapterSegments(current.chapter, current.content, targetCharacters));
+    }
     const batches: NovelAnalysisChapterRef[][] = [];
     let current: NovelAnalysisChapterRef[] = [];
     let currentCharacters = 0;
@@ -260,7 +274,7 @@ export async function createNovelAnalysisRun(projectRoot: string, input: CreateN
     const runId = `analysis-run-${randomUUID()}`;
     const tasks = batches.map((chapterRefs, batchOffset): NovelAnalysisTask => {
       const id = `analysis-${randomUUID()}`;
-      const directory = path.join(getSidecarPaths(projectRoot).storyAnalysisTasks, id);
+      const taskPaths = novelAnalysisTaskPaths(projectRoot, id);
       return {
         schemaVersion: 1,
         id,
@@ -277,35 +291,25 @@ export async function createNovelAnalysisRun(projectRoot: string, input: CreateN
         providerRevisionSnapshot: input.providerRevision,
         maxInputCharactersSnapshot: input.maxInputCharacters,
         attempt: 1,
-        taskJsonPath: path.join(directory, "task.json"),
-        taskMarkdownPath: path.join(directory, "任务说明.md"),
+        taskJsonPath: taskPaths.taskJsonPath,
+        taskMarkdownPath: taskPaths.taskMarkdownPath,
         reviewItemIds: [],
         revision: 1,
         createdAt: timestamp,
         updatedAt: timestamp,
       };
     });
-    const createdDirectories: string[] = [];
-    let committed = false;
+    for (const task of tasks) {
+      await createNovelAnalysisTaskBindingFiles(projectRoot, task, taskContract(task), taskMarkdown(task));
+    }
     try {
-      for (const task of tasks) {
-        const directory = path.dirname(task.taskJsonPath);
-        await mkdir(directory, { recursive: true });
-        createdDirectories.push(directory);
-        await writeJsonAtomic(task.taskJsonPath, taskContract(task));
-        await writeTextAtomic(task.taskMarkdownPath, taskMarkdown(task));
-      }
       store.analysisTasks.unshift(...tasks);
       store.revision += 1;
       store.updatedAt = timestamp;
       await saveAdaptationStore(projectRoot, store);
-      committed = true;
       await appendEvent(projectRoot, { actor: "codex", type: "adaptation.analysis-run-created", data: { runId, providerId: input.providerId, providerRevision: input.providerRevision, targetCharacters, maxChaptersPerBatch, sourceIds: [...new Set(chapters.map((chapter) => chapter.sourceId))], taskIds: tasks.map((task) => task.id), batchCount: tasks.length, characterCount: tasks.reduce((sum, task) => sum + (task.plannedCharacterCount ?? 0), 0), revision: store.revision } });
       return { workspace: store, runId, tasks };
-    } catch (error) {
-      if (!committed) await Promise.all(createdDirectories.map((directory) => rm(directory, { recursive: true, force: true })));
-      throw error;
-    }
+    } catch (error) { throw error; }
   });
 }
 
@@ -323,15 +327,20 @@ export async function replaceNovelAnalysisRunTaskAttempt(projectRoot: string, in
     if (previous.status === "submission_unknown" && !input.confirmNoRemoteResult) throw new Error("回执不明批次可能已经产生远端结果；必须先人工对账并显式确认远端无可回收结果。 ");
     const library = await loadLibrary(projectRoot);
     if (library.revision !== previous.sourceLibraryRevision) throw new Error("章节库修订已变化，不能复用旧批次；请重新规划。 ");
+    await freezeNovelAnalysisTaskBinding(projectRoot, previous);
+    const sourceSnapshot = await loadStoryAnalysisChapterSnapshot(projectRoot, previous.chapterRefs.map((chapter) => chapter.chapterId));
+    if (sourceSnapshot.library.revision !== library.revision) throw new Error("章节库在替换批次期间发生变化，请重试。");
+    const currentChapters = new Map(sourceSnapshot.chapters.map((entry) => [entry.chapter.id, entry.chapter]));
+    for (const chapter of previous.chapterRefs) assertNovelAnalysisChapterBinding(chapter, currentChapters.get(chapter.chapterId));
     const timestamp = now();
     const id = `analysis-${randomUUID()}`;
-    const directory = path.join(getSidecarPaths(projectRoot).storyAnalysisTasks, id);
+    const taskPaths = novelAnalysisTaskPaths(projectRoot, id);
     const task: NovelAnalysisTask = {
       ...previous,
       id,
       status: "prepared",
-      taskJsonPath: path.join(directory, "task.json"),
-      taskMarkdownPath: path.join(directory, "任务说明.md"),
+      taskJsonPath: taskPaths.taskJsonPath,
+      taskMarkdownPath: taskPaths.taskMarkdownPath,
       reviewItemIds: [],
       execution: undefined,
       attempt: (previous.attempt ?? 1) + 1,
@@ -343,40 +352,37 @@ export async function replaceNovelAnalysisRunTaskAttempt(projectRoot: string, in
       updatedAt: timestamp,
       completedAt: undefined,
     };
-    let committed = false;
     try {
-      await mkdir(directory, { recursive: true });
-      await writeJsonAtomic(task.taskJsonPath, taskContract(task));
-      await writeTextAtomic(task.taskMarkdownPath, taskMarkdown(task));
+      await createNovelAnalysisTaskBindingFiles(projectRoot, task, taskContract(task), taskMarkdown(task));
       const replacedTask: NovelAnalysisTask = { ...previous, replacedByTaskId: task.id, revision: previous.revision + 1, updatedAt: timestamp };
       store.analysisTasks = [task, ...store.analysisTasks.map((candidate) => candidate.id === previous.id ? replacedTask : candidate)];
       store.revision += 1;
       store.updatedAt = timestamp;
       await saveAdaptationStore(projectRoot, store);
-      committed = true;
       await appendEvent(projectRoot, { actor: "user", type: "adaptation.analysis-run-task-replaced", data: { runId: input.runId, batchIndex: input.batchIndex, previousTaskId: previous.id, taskId: task.id, attempt: task.attempt, previousStatus: previous.status, confirmNoRemoteResult: Boolean(input.confirmNoRemoteResult), reason, revision: store.revision } });
       return { workspace: store, replacedTask, task };
-    } catch (error) {
-      if (!committed) await rm(directory, { recursive: true, force: true });
-      throw error;
-    }
+    } catch (error) { throw error; }
   });
 }
 
-async function evidenceIssues(projectRoot: string, spans: SourceSpan[], task: NovelAnalysisTask, library: StoryLibrary): Promise<string[]> {
+async function evidenceIssues(
+  spans: SourceSpan[],
+  task: NovelAnalysisTask,
+  library: StoryLibrary,
+  content: ReadonlyMap<string, string>,
+): Promise<string[]> {
   const issues: string[] = [];
   if (!spans.length) return ["缺少原文来源证据"];
   const allowed = new Set(task.chapterRefs.map((chapter) => chapter.chapterId));
   const chapters = new Map(library.chapters.map((chapter) => [chapter.id, chapter]));
-  const content = new Map<string, string>();
   for (const span of spans) {
     const chapter = chapters.get(span.chapterId);
     if (!allowed.has(span.chapterId)) { issues.push(`章节不在任务范围：${span.chapterId}`); continue; }
     if (!chapter || chapter.sourceId !== span.sourceId || chapter.revision !== span.chapterRevision || chapter.sha256 !== span.chapterSha256) { issues.push(`章节修订或哈希失效：${span.chapterId}`); continue; }
     const ranges = task.chapterRefs.filter((ref) => ref.chapterId === span.chapterId).map((ref) => ({ start: ref.startOffset ?? 0, end: ref.endOffset ?? chapter.charCount }));
     if (!ranges.some((range) => span.startOffset >= range.start && span.endOffset <= range.end)) { issues.push(`字符区间不在任务分段内：${span.chapterId}`); continue; }
-    if (!content.has(chapter.id)) content.set(chapter.id, await readFile(chapter.path, "utf8"));
-    const text = content.get(chapter.id)!;
+    const text = content.get(chapter.id);
+    if (text === undefined) { issues.push(`章节权威正文缺失：${span.chapterId}`); continue; }
     if (span.startOffset < 0 || span.endOffset <= span.startOffset || span.endOffset > text.length) issues.push(`字符区间越界：${span.chapterId}`);
     else if (text.slice(span.startOffset, span.endOffset) !== span.text) issues.push(`原文摘录与字符区间不匹配：${span.chapterId}`);
   }
@@ -389,10 +395,31 @@ export async function submitNovelAnalysisProposal(projectRoot: string, input: No
     if (store.revision !== input.expectedRevision) throw new Error(`改编工作区修订冲突，当前为 ${store.revision}。`);
     const task = store.analysisTasks.find((candidate) => candidate.id === input.taskId);
     if (!task) throw new Error(`找不到模型分析任务：${input.taskId}`);
-    if (!["prepared", "executing"].includes(task.status)) throw new Error("该模型分析任务已经提交过提案或执行结果不明，不能静默覆盖。 ");
+    const taskBinding = await freezeNovelAnalysisTaskBinding(projectRoot, task);
+    const recoveredResponse = task.status === "reconciliation_required"
+      && task.execution?.status === "response_recovered"
+      && task.execution.reconciliation?.status === "found";
+    if (!["prepared", "executing"].includes(task.status) && !recoveredResponse) {
+      throw new Error("该模型分析任务已经提交过提案或执行结果不明，不能静默覆盖。 ");
+    }
+    if (task.execution) {
+      if (input.executionId !== task.execution.id
+        || input.expectedExecutionFence !== task.execution.fence) {
+        throw new Error("模型分析 execution fence 已变化；旧 worker 或旧对账结果不得回写 proposal。 ");
+      }
+    } else if (input.executionId !== undefined || input.expectedExecutionFence !== undefined) {
+      throw new Error("未执行的手工分析任务不得携带 execution fence。 ");
+    }
     if (input.facts.length > 500 || input.beats.length > 300 || (!input.facts.length && !input.beats.length)) throw new Error("模型提案数量为空或超过单次上限。 ");
-    const library = await loadLibrary(projectRoot);
+    const snapshot = await loadStoryAnalysisChapterSnapshot(projectRoot, task.chapterRefs.map((chapter) => chapter.chapterId));
+    const library = snapshot.library;
     if (library.revision !== task.sourceLibraryRevision) throw new Error("章节在模型分析期间发生变化，必须创建新任务。 ");
+    const snapshotById = new Map(snapshot.chapters.map((entry) => [entry.chapter.id, entry]));
+    for (const chapter of task.chapterRefs) assertNovelAnalysisChapterBinding(chapter, snapshotById.get(chapter.chapterId)?.chapter);
+    const chapterContent = new Map(snapshot.chapters.map((entry) => [entry.chapter.id, normalizedChapterText(entry.content)]));
+    if (input.executionReceipt?.proposalPath && path.resolve(input.executionReceipt.proposalPath) !== path.resolve(taskBinding.proposalPath)) {
+      throw new Error("模型分析 proposal 路径与任务身份不一致。");
+    }
     const timestamp = now();
     const factIds = new Map<string, string>();
     const reviews: NovelAnalysisReviewItem[] = [];
@@ -401,7 +428,7 @@ export async function submitNovelAnalysisProposal(projectRoot: string, input: No
       const normalizedId = stableId("model-fact", `${task.id}:${proposalId}`);
       factIds.set(proposalId, normalizedId);
       const fact = { ...proposal, id: normalizedId, statement: proposal.statement.trim().slice(0, 20_000), tags: clean(proposal.tags, 100), sourceSpans: proposal.sourceSpans.slice(0, 100) };
-      const issues = await evidenceIssues(projectRoot, fact.sourceSpans, task, library);
+      const issues = await evidenceIssues(fact.sourceSpans, task, library, chapterContent);
       reviews.push({ schemaVersion: 1, id: stableId("review", `${task.id}:fact:${proposalId}`), taskId: task.id, kind: "fact", status: "pending", fact, evidenceIssues: issues, revision: 1, createdAt: timestamp, updatedAt: timestamp });
     }
     const knownFactIds = new Set([...store.facts.map((fact) => fact.id), ...factIds.values()]);
@@ -409,7 +436,7 @@ export async function submitNovelAnalysisProposal(projectRoot: string, input: No
       const proposalId = proposal.id?.trim() || `proposed-beat-${index + 1}`;
       const beatId = stableId("model-beat", `${task.id}:${proposalId}`);
       const mappedFactIds = proposal.factIds.map((id) => factIds.get(id) ?? id);
-      const issues = await evidenceIssues(projectRoot, proposal.sourceSpans, task, library);
+      const issues = await evidenceIssues(proposal.sourceSpans, task, library, chapterContent);
       for (const id of mappedFactIds) if (!knownFactIds.has(id)) issues.push(`引用不存在的事实：${id}`);
       const beat = { ...proposal, id: beatId, order: (task.beatOrderBase ?? 0) + Math.max(1, Math.min(999, Math.trunc(proposal.order))), title: proposal.title.trim().slice(0, 180), summary: proposal.summary.trim().slice(0, 20_000), factIds: clean(mappedFactIds, 200), mustKeep: clean(proposal.mustKeep, 100), sourceSpans: proposal.sourceSpans.slice(0, 100) };
       reviews.push({ schemaVersion: 1, id: stableId("review", `${task.id}:beat:${proposalId}`), taskId: task.id, kind: "beat", status: "pending", beat, evidenceIssues: clean(issues), revision: 1, createdAt: timestamp, updatedAt: timestamp });
@@ -425,7 +452,7 @@ export async function submitNovelAnalysisProposal(projectRoot: string, input: No
         completedAt: timestamp,
         responseId: receipt?.responseId?.slice(0, 500),
         responseModel: receipt?.responseModel?.slice(0, 500),
-        proposalPath: receipt?.proposalPath,
+        proposalPath: receipt?.proposalPath ? taskBinding.proposalPath : undefined,
         usage: receipt ? { inputTokens: receipt.inputTokens, outputTokens: receipt.outputTokens, totalTokens: receipt.totalTokens } : undefined,
         error: undefined,
       } : undefined,

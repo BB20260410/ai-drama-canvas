@@ -11,7 +11,7 @@ import { enqueueGeneration } from "../src/core/generation.js";
 import { ensureSidecar, getSidecarPaths, listEvents, writeJsonAtomic } from "../src/core/sidecar.js";
 import { seedProductionReady } from "./workflow-helpers.js";
 import { getReviewQueue, submitReview } from "../src/core/reviews.js";
-import { importStoryFile } from "../src/core/story.js";
+import { importStoryFile, listStorySources } from "../src/core/story.js";
 import type { ReviewCriterionKey } from "../src/core/types.js";
 
 const roots: string[] = [];
@@ -109,6 +109,7 @@ describe("内容生产状态机与正式分镜", () => {
     await seedProductionReady(root, "storyboard");
 
     await writeFile(imported.source.snapshotPath, "# 第一章\n\n快照被外部改写。\n", "utf8");
+    await expect(listStorySources(root)).rejects.toThrow("story v1 来源快照 SHA/字数与索引不一致");
     const audited = await getProductionWorkflow(root, { includeEvidenceAudit: true });
     const sourceAudit = audited.evidenceAudit?.stages.find((stage) => stage.stageId === "source");
     expect(sourceAudit).toMatchObject({ ready: false, statusEvidenceValid: false, legacyUnverified: false });

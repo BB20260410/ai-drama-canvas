@@ -4,6 +4,7 @@
  * 只在现有 studio-generation-ledger.sqlite 内追加连续性表；本模块不连接生成、命令总线、MCP 或 UI。
  */
 import { DatabaseSync } from "node:sqlite";
+import { studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
 import {
   createStudioContinuityConflictDraft,
   createStudioContinuityReadiness,
@@ -27,7 +28,7 @@ import {
   type StudioContinuityScopeInput,
   type StudioContinuityTimeline,
 } from "./studio-continuity.js";
-import { initializeStudioGenerationLedger } from "./studio-generation-ledger.js";
+import { initializeStudioGenerationLedger } from "./studio-generation-ledger-storage.js";
 import {
   hasStudioRequestSchemaValidation,
   isStudioRequestSqliteValidationUnchanged,
@@ -620,9 +621,10 @@ function assertContinuitySchema(db: DatabaseSync): void {
 }
 
 function openContinuityDatabase(databasePath: string, initialize: boolean): DatabaseSync {
-  const db = new DatabaseSync(databasePath, { timeout: BUSY_TIMEOUT_MILLISECONDS });
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MILLISECONDS);
+  const db = new DatabaseSync(databasePath, { timeout: busyTimeoutMs });
   try {
-    db.exec(`PRAGMA busy_timeout=${BUSY_TIMEOUT_MILLISECONDS}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
+    db.exec(`PRAGMA busy_timeout=${busyTimeoutMs}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
     const journal = db.prepare("PRAGMA journal_mode").get() as { journal_mode?: string } | undefined;
     if (journal?.journal_mode?.toLowerCase() !== "wal") {
       fail("storage-invalid", "continuity 必须复用 WAL 模式的 studio generation ledger。 ");

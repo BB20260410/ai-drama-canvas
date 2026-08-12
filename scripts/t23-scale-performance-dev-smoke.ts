@@ -41,9 +41,14 @@ import {
   type T23ScalePerformanceEvaluation,
 } from "./lib/t23-scale-performance-contract.js";
 import {
+  assertT23ScaleExactPassBindings,
+  redactT23ScaleRendererProbeForEvidence,
   summarizeT23ScaleRendererProbe,
+  type T23ScaleExpectedPassBinding,
+  type T23ScaleRendererProbeEvidenceSnapshot,
   type T23ScaleRendererProbeSummary,
 } from "./lib/t23-scale-performance-probe.js";
+import { t23RendererCyclePageFunction } from "./lib/t23-renderer-cycle-page-function.mjs";
 
 const UNIT_COUNT = 36;
 const PASS_RAW_COUNT = 4;
@@ -85,7 +90,83 @@ interface IpcProbeSnapshot {
     totalCalls: number;
     currentOutstanding: number;
     peakOutstanding: number;
+    lastDurationMs?: number | null;
   }>;
+  projectionTimeline?: {
+    schemaVersion: 1;
+    phases: Array<{
+      phase: string;
+      durationMs: number;
+      panelCount?: number;
+      controlAssetCount?: number;
+      neighborCount?: number;
+      frozenReferenceCount?: number;
+    }>;
+  };
+  unitsReadTimeline?: {
+    schemaVersion: 1;
+    phases: Array<{
+      phase: string;
+      startOffsetMs: number;
+      durationMs: number;
+    }>;
+    counters: {
+      managedProjectShellInspections: number;
+      generationLedgerEnsureCalls: number;
+      generationLedgerInitializationStarts: number;
+      generationLedgerInitializationJoins: number;
+      productionDirectoryEnsureCalls: number;
+      productionOpenDatabaseCalls: number;
+      productionReadOnlyProbeConnections: number;
+      productionOwnerConnections: number;
+      productionBusinessSqlExecutions: number;
+      unitPageQueries: number;
+      unitTimingQueries: number;
+      episodeStartQueries: number;
+      facetQueries: number;
+      bindingHeadQueries: number;
+      successorQueries: number;
+      productionSchemaCacheHits: number;
+      productionSchemaCacheMisses: number;
+      returnedUnitCount: number;
+    };
+  };
+  rendererStartupTimeline?: {
+    schemaVersion: 1;
+    milestones: Array<{
+      milestone: string;
+      atMs: number;
+    }>;
+  };
+}
+
+type RendererCyclePageResult = {
+  ok: true;
+  timeOrigin: number;
+  rendererFirstCardMs: number;
+  rendererFirstRawMs: number;
+  rendererAllPassReferencesMs: number;
+  drainDurationMs: number;
+  rawSnapshot: UnitGridRawSnapshot;
+  ipcProbe: IpcProbeSnapshot;
+} | {
+  ok: false;
+  error: "product-hook-missing" | "ipc-drain-timeout";
+  timeOrigin: number;
+  drainDurationMs?: number;
+  rawSnapshot?: UnitGridRawSnapshot;
+  ipcProbe?: IpcProbeSnapshot;
+};
+
+interface RendererCycleSnapshot {
+  timeOrigin: number;
+  rendererFirstCardMs: number;
+  rendererFirstRawMs: number;
+  rendererAllPassReferencesMs: number;
+  drainDurationMs: number;
+  rawSnapshot: UnitGridRawSnapshot;
+  ipcProbe: IpcProbeSnapshot;
+  contextAttempts: number;
 }
 
 interface InteractionProbeSnapshot {
@@ -153,7 +234,7 @@ interface InteractionPerformanceEvidence {
 
 interface SmokeReport {
   schemaVersion: 1;
-  kind: "t23-source-dev-scale-performance";
+  kind: "t23-scale-performance";
   status: "PASS" | "FAIL";
   ok: boolean;
   mode: "dev" | "build" | "packaged";
@@ -177,7 +258,7 @@ interface SmokeReport {
     rendererProbe: T23ScaleRendererProbeSummary;
     projectMetricsText: string;
     buildIdentityText: string;
-    rawSnapshot: UnitGridRawSnapshot;
+    rawSnapshot: T23ScaleRendererProbeEvidenceSnapshot;
     decodedRawThumbnailCount: number;
     decodedReferenceThumbnailCount: number;
   };
@@ -189,12 +270,16 @@ interface SmokeReport {
     status: "PASS" | "FAIL";
   };
   interactions?: InteractionPerformanceEvidence;
+  rendererDocument?: {
+    timeOrigin: number;
+    contextAttempts: number;
+    reloadCount: number;
+  };
   consoleErrors: string[];
   pageErrors: string[];
   failureDiagnostics?: {
-    pageUrl?: string;
-    bodyText?: string;
-    rawSnapshot?: UnitGridRawSnapshot;
+    errorKind: "Error" | "TypeError" | "RangeError" | "UnknownError";
+    rawSnapshot?: T23ScaleRendererProbeEvidenceSnapshot;
     ipcProbe?: IpcProbeSnapshot;
   };
   error?: string;
@@ -202,6 +287,13 @@ interface SmokeReport {
 
 function unitId(sequence: number): string {
   return `S1E01-U${String(sequence - 1).padStart(2, "0")}`;
+}
+
+function t23EvidenceErrorKind(error: unknown): NonNullable<SmokeReport["failureDiagnostics"]>["errorKind"] {
+  if (error instanceof TypeError) return "TypeError";
+  if (error instanceof RangeError) return "RangeError";
+  if (error instanceof Error) return "Error";
+  return "UnknownError";
 }
 
 function parseReportPath(): string {
@@ -279,6 +371,243 @@ async function readIpcProbe(launched: LaunchedUi): Promise<IpcProbeSnapshot> {
     }
     return api.getT23IpcPerformanceProbeSnapshot();
   });
+}
+
+function assertProjectionTimeline(probe: IpcProbeSnapshot): void {
+  const projectionTimeline = probe.projectionTimeline;
+  const expectedProjectionPhases = [
+    "main-managed-project-preflight",
+    "current-dashboard-binding",
+    "panel-fanout",
+    "timeline-approved-neighbors",
+    "observation-review",
+    "adjacent-pack-video",
+    "frozen-reference-media",
+    "assemble-digest",
+    "core-total",
+  ];
+  if (!projectionTimeline
+    || expectedProjectionPhases.some((phase) => !projectionTimeline.phases.some((entry) => entry.phase === phase))) {
+    throw new Error("T23 深投影分阶段计时不完整。 ");
+  }
+  const mainPreflightMs = projectionTimeline.phases.find((entry) => entry.phase === "main-managed-project-preflight")!.durationMs;
+  const coreTotalMs = projectionTimeline.phases.find((entry) => entry.phase === "core-total")!.durationMs;
+  const bundleRoundtripMs = probe.channels.find((entry) => entry.channel === "canvas:get-studio-production-projection-bundle")?.lastDurationMs;
+  if (typeof bundleRoundtripMs === "number" && mainPreflightMs + coreTotalMs > bundleRoundtripMs + 5) {
+    throw new Error(`深投影阶段计时超过 IPC 往返：main=${mainPreflightMs} core=${coreTotalMs} ipc=${bundleRoundtripMs}`);
+  }
+}
+
+function assertUnitsReadTimeline(probe: IpcProbeSnapshot): void {
+  const timeline = probe.unitsReadTimeline;
+  const expectedPhases = [
+    "request-total",
+    "main-managed-project-preflight",
+    "dashboard-core-total",
+    "dashboard-readonly-shell",
+    "binding-owner-total",
+    "binding-managed-inspect",
+    "managed-inspect-shell",
+    "managed-generation-ledger",
+    "production-page",
+    "production-facets",
+    "binding-heads",
+    "successors",
+    "binding-map",
+    "dashboard-map-digest",
+  ];
+  if (!timeline || expectedPhases.some(
+    (phase) => !timeline.phases.some((entry) => entry.phase === phase),
+  )) {
+    throw new Error("T23 units 请求级分阶段计时不完整。 ");
+  }
+  const counters = timeline.counters;
+  const expectedBusinessQueries = 6 + 2 * counters.returnedUnitCount;
+  if (counters.returnedUnitCount !== UNIT_COUNT
+    || counters.productionBusinessSqlExecutions !== expectedBusinessQueries
+    || counters.unitPageQueries !== 1
+    || counters.unitTimingQueries !== counters.returnedUnitCount
+    || counters.episodeStartQueries !== counters.returnedUnitCount
+    || counters.facetQueries !== 3
+    || counters.bindingHeadQueries !== 1
+    || counters.successorQueries !== 1) {
+    throw new Error(
+      `T23 units 匿名查询计数不闭合：units=${counters.returnedUnitCount} business=${counters.productionBusinessSqlExecutions}/${expectedBusinessQueries}`,
+    );
+  }
+  const requestTotalMs = timeline.phases.find((entry) => entry.phase === "request-total")!.durationMs;
+  const mainPreflightMs = timeline.phases.find((entry) => entry.phase === "main-managed-project-preflight")!.durationMs;
+  const coreTotalMs = timeline.phases.find((entry) => entry.phase === "dashboard-core-total")!.durationMs;
+  if (mainPreflightMs + coreTotalMs > requestTotalMs + 5) {
+    throw new Error(
+      `units 阶段计时超过请求总时长：main=${mainPreflightMs} core=${coreTotalMs} total=${requestTotalMs}`,
+    );
+  }
+}
+
+interface T23RawReferenceSpanTimeline {
+  spanId: number;
+  firstRawReadyAt?: number;
+  allPassReferencesReadyAt?: number;
+  completeAt?: number;
+  passReferenceUnitIds: string[];
+}
+
+/**
+ * 从 renderer 自己写入 probe 的精确事件中锁定最新未失效 span。
+ * 不接受 CDP 观察/轮询完成时刻；ready 缺失时完整阶段一律失败关闭。
+ */
+function readLatestT23RawReferenceSpan(
+  timeline: NonNullable<IpcProbeSnapshot["rendererStartupTimeline"]>,
+): T23RawReferenceSpanTimeline | null {
+  const starts = timeline.milestones
+    .map((entry) => ({ entry, match: /^canvas-raw-span-start:(\d+)$/u.exec(entry.milestone) }))
+    .filter((item): item is { entry: { milestone: string; atMs: number }; match: RegExpExecArray } => Boolean(item.match));
+  const invalidated = new Set(timeline.milestones
+    .map((entry) => /^canvas-raw-span-invalidated:(\d+)$/u.exec(entry.milestone)?.[1])
+    .filter((spanId): spanId is string => Boolean(spanId)));
+  const latest = starts
+    .sort((left, right) => Number(left.match[1]) - Number(right.match[1]))
+    .at(-1);
+  if (!latest || invalidated.has(latest.match[1]!)) return null;
+  const spanId = Number(latest.match[1]);
+  const findUniqueAt = (pattern: RegExp): number | undefined => {
+    const matches = timeline.milestones.filter((entry) => pattern.test(entry.milestone));
+    return matches.length === 1 ? matches[0]!.atMs : undefined;
+  };
+  return {
+    spanId,
+    firstRawReadyAt: findUniqueAt(new RegExp(`^canvas-first-raw-ready:${spanId}$`, "u")),
+    allPassReferencesReadyAt: findUniqueAt(new RegExp(`^canvas-all-pass-references-ready:${spanId}$`, "u")),
+    completeAt: findUniqueAt(new RegExp(`^canvas-raw-span-complete:${spanId}$`, "u")),
+    passReferenceUnitIds: timeline.milestones
+      .map((entry) => new RegExp(`^canvas-all-pass-reference-unit:${spanId}:(.+)$`, "u").exec(entry.milestone)?.[1])
+      .filter((unitId): unitId is string => Boolean(unitId)),
+  };
+}
+
+function assertCompleteT23RawReferenceSpan(
+  timeline: NonNullable<IpcProbeSnapshot["rendererStartupTimeline"]>,
+  expectedPassUnitIds: ReadonlySet<string>,
+): T23RawReferenceSpanTimeline {
+  const span = readLatestT23RawReferenceSpan(timeline);
+  if (!span || span.firstRawReadyAt === undefined
+    || span.allPassReferencesReadyAt === undefined
+    || span.completeAt === undefined
+    || span.firstRawReadyAt > span.allPassReferencesReadyAt
+    || span.allPassReferencesReadyAt > span.completeAt
+    || span.passReferenceUnitIds.length !== expectedPassUnitIds.size
+    || new Set(span.passReferenceUnitIds).size !== expectedPassUnitIds.size
+    || span.passReferenceUnitIds.some((unitId, index) => (
+      unitId !== [...expectedPassUnitIds].sort((left, right) => left.localeCompare(right))[index]
+    ))) {
+    throw new Error("T23 raw/reference 精确 span 未完整闭合或 fixture PASS 单元不精确。");
+  }
+  return span;
+}
+
+function assertRendererStartupTimeline(
+  probe: IpcProbeSnapshot,
+  expectedUnitIds: ReadonlySet<string>,
+  expectedPassUnitIds: ReadonlySet<string>,
+): void {
+  const timeline = probe.rendererStartupTimeline;
+  const requiredMilestones = [
+    "app-mounted",
+    "app-runtime-gate-start",
+    "app-runtime-gate-ready",
+    "app-bootstrap-reads-start",
+    "app-bootstrap-reads-ready",
+    "app-managed-shell-start",
+    "app-managed-shell-ready",
+    "app-startup-reconcile-start",
+    "app-startup-reconcile-ready",
+    "app-managed-studio-chunks-start",
+    "app-managed-studio-chunks-ready",
+    "canvas-mounted",
+    "canvas-runtime-gate-start",
+    "canvas-runtime-gate-ready",
+    "canvas-units-start",
+    "canvas-units-ready",
+    "canvas-first-card-dom-ready",
+    "canvas-dashboard-overview-start",
+    "canvas-dashboard-overview-ready",
+    "material-overview-start",
+    "canvas-raw-activation-start",
+  ];
+  if (!timeline || timeline.schemaVersion !== 1) {
+    throw new Error("T23 renderer 冷启动时间线缺失。");
+  }
+  const firstAt = new Map<string, number>();
+  for (const entry of timeline.milestones) {
+    if (!firstAt.has(entry.milestone)) firstAt.set(entry.milestone, entry.atMs);
+  }
+  const missing = requiredMilestones.filter((milestone) => !firstAt.has(milestone));
+  if (missing.length) {
+    throw new Error(`T23 renderer 冷启动时间线不完整：${missing.join(",")}`);
+  }
+  const firstCardMilestones = timeline.milestones.filter(
+    (entry) => entry.milestone === "canvas-first-card-dom-ready",
+  );
+  const firstCardUnitMilestones = timeline.milestones.filter(
+    (entry) => entry.milestone.startsWith("canvas-first-card-dom-unit:"),
+  );
+  const firstCardUnitId = firstCardUnitMilestones[0]?.milestone.slice(
+    "canvas-first-card-dom-unit:".length,
+  );
+  if (firstCardMilestones.length !== 1
+    || firstCardUnitMilestones.length !== 1
+    || !firstCardUnitId
+    || !expectedUnitIds.has(firstCardUnitId)
+    || Math.abs(firstCardMilestones[0]!.atMs - firstCardUnitMilestones[0]!.atMs) > 2) {
+    throw new Error("T23 首卡里程碑未唯一绑定当前 fixture 单元。");
+  }
+  for (const [start, ready] of [
+    ["app-runtime-gate-start", "app-runtime-gate-ready"],
+    ["app-bootstrap-reads-start", "app-bootstrap-reads-ready"],
+    ["app-managed-shell-start", "app-managed-shell-ready"],
+    ["app-managed-shell-ready", "app-startup-reconcile-start"],
+    ["app-startup-reconcile-start", "app-startup-reconcile-ready"],
+    ["app-startup-reconcile-ready", "canvas-mounted"],
+    ["app-managed-shell-ready", "app-managed-studio-chunks-start"],
+    ["app-managed-studio-chunks-start", "app-bootstrap-reads-ready"],
+    ["app-managed-studio-chunks-start", "app-managed-studio-chunks-ready"],
+    ["app-managed-studio-chunks-ready", "canvas-mounted"],
+    ["canvas-runtime-gate-start", "canvas-runtime-gate-ready"],
+    ["canvas-units-start", "canvas-units-ready"],
+    ["canvas-units-ready", "canvas-first-card-dom-ready"],
+    ["canvas-first-card-dom-ready", "canvas-dashboard-overview-start"],
+    ["canvas-first-card-dom-ready", "material-overview-start"],
+    ["canvas-dashboard-overview-start", "canvas-dashboard-overview-ready"],
+    ["canvas-dashboard-overview-ready", "canvas-raw-activation-start"],
+  ] as const) {
+    const startAt = firstAt.get(start);
+    const readyAt = firstAt.get(ready);
+    if (startAt === undefined || readyAt === undefined || readyAt < startAt) {
+      throw new Error(`T23 renderer 冷启动阶段顺序异常：${start} -> ${ready}`);
+    }
+  }
+  for (const [start, ready] of [
+    ["material-overview-start", "material-overview-ready"],
+    ["canvas-layout-start", "canvas-layout-ready"],
+    ["canvas-build-identity-start", "canvas-build-identity-ready"],
+  ] as const) {
+    const startAt = firstAt.get(start);
+    const readyAt = firstAt.get(ready);
+    if (startAt !== undefined && readyAt !== undefined && readyAt < startAt) {
+      throw new Error(`T23 renderer 后台阶段顺序异常：${start} -> ${ready}`);
+    }
+  }
+  const firstCardAt = firstAt.get("canvas-first-card-dom-ready");
+  const identityStartAt = firstAt.get("canvas-build-identity-start");
+  if (firstCardAt !== undefined && identityStartAt !== undefined && identityStartAt < firstCardAt) {
+    throw new Error("T23 完整构建身份不得重新进入首卡关键路径。");
+  }
+  const rawReferenceSpan = assertCompleteT23RawReferenceSpan(timeline, expectedPassUnitIds);
+  if (firstCardAt === undefined || rawReferenceSpan.firstRawReadyAt === undefined
+    || rawReferenceSpan.firstRawReadyAt < firstCardAt) {
+    throw new Error("T23 raw/reference 精确 span 不能早于首卡。");
+  }
 }
 
 function percentileType7(values: readonly number[], percentile: number): number {
@@ -725,48 +1054,31 @@ async function measureInteractions(
   };
 }
 
-async function waitForRendererMilestone(
+async function waitForRendererCycle(
   launched: LaunchedUi,
-  predicate: "first-card" | "first-raw" | "all-pass-references",
-): Promise<number> {
-  const handle = await launched.page.waitForFunction((input) => {
-    if (input.predicate === "first-card") {
-      return document.querySelector(".vue-flow__node.unit-node")
-        ? Math.round(performance.now())
-        : false;
+  expectedPassUnitIds: readonly string[],
+): Promise<RendererCycleSnapshot> {
+  const pageInput = {
+    expectedPassUnitIds,
+    drainBudgetMs: 5_000,
+  };
+  // 使用未经过 tsx/esbuild 改写的原生 .mjs 函数对象。Playwright 负责序列化并传参，
+  // 不触发应用 CSP 的 unsafe-eval，也不会引用宿主 __name helper。
+  const handle = await launched.page.waitForFunction(
+    t23RendererCyclePageFunction,
+    pageInput,
+    { timeout: 30_000 },
+  );
+  const result = await handle.jsonValue() as RendererCyclePageResult;
+  if (!result.ok) {
+    if (result.error === "product-hook-missing") {
+      throw new Error("T23 同一 Renderer 文档已完成 raw/reference，但产品只读核对钩子缺失。");
     }
-    const hook = (window as unknown as {
-      __aiCanvasManagedStudioVerify?: {
-        getUnitGridRawSnapshot?: () => UnitGridRawSnapshot;
-      };
-    }).__aiCanvasManagedStudioVerify;
-    const snapshot = hook?.getUnitGridRawSnapshot?.();
-    if (!snapshot) return false;
-    if (input.predicate === "first-raw") {
-      return snapshot.raws.some((raw) => (
-        raw.verification === "deep-verified" && Boolean(raw.thumbnailUrl)
-      ))
-        ? Math.round(performance.now())
-        : false;
-    }
-    const deepRawUnitIds = new Set(snapshot.raws
-      .filter((raw) => raw.verification === "deep-verified" && Boolean(raw.thumbnailUrl))
-      .map((raw) => raw.unitId));
-    const referenceUnitIds = new Set(snapshot.references
-      .filter((reference) => Boolean(reference.thumbnailUrl))
-      .map((reference) => reference.unitId));
-    const allPassReady = snapshot.corePassUnitIds.length >= input.passRawCount
-      && snapshot.corePassUnitIds.every((unit) => (
-        deepRawUnitIds.has(unit) && referenceUnitIds.has(unit)
-      ));
-    return allPassReady && !snapshot.loading
-      ? Math.round(performance.now())
-      : false;
-  }, {
-    predicate,
-    passRawCount: PASS_RAW_COUNT,
-  }, { timeout: T23_SCALE_PERFORMANCE_BUDGET.maxRendererAllPassReferencesMs });
-  return handle.jsonValue() as Promise<number>;
+    throw new Error(
+      `T23 投影 IPC 未在 5000ms 内排空：outstanding=${result.ipcProbe?.currentOutstanding ?? "unknown"}`,
+    );
+  }
+  return { ...result, contextAttempts: 1 };
 }
 
 async function decodeThumbnails(
@@ -791,6 +1103,7 @@ async function createScaleFixture(
   passUnitIds: string[];
   passRawSha256s: string[];
   passReferenceSha256s: string[];
+  expectedPassBindings: T23ScaleExpectedPassBinding[];
 }> {
   const first = await createUnitGridFixtureProject(fixtureParent, {
     unitId: unitId(1),
@@ -837,6 +1150,7 @@ async function createScaleFixture(
 
   const passUnitIds = Array.from({ length: PASS_RAW_COUNT }, (_, index) => unitId(index + 1));
   const passRawSha256s: string[] = [];
+  const expectedPassBindings: T23ScaleExpectedPassBinding[] = [];
   for (const [index, currentUnitId] of passUnitIds.entries()) {
     // 首单元没有上一镜，Core 明确禁止伪造 continuation waiver；
     // 仅后续测试单元使用显式 fixture receipt。
@@ -871,6 +1185,11 @@ async function createScaleFixture(
       );
     }
     passRawSha256s.push(bundle.raw.mediaSha256);
+    expectedPassBindings.push({
+      unitId: currentUnitId,
+      rawMediaSha256: bundle.raw.mediaSha256,
+      referenceMediaSha256: passReferenceSha256s[index]!,
+    });
     await Promise.all([
       ensureStudioImageThumbnail(first.root, bundle.raw.mediaSha256),
       ensureStudioImageThumbnail(first.root, bundle.labeled.mediaSha256),
@@ -889,7 +1208,13 @@ async function createScaleFixture(
   if (new Set(passRawSha256s).size !== PASS_RAW_COUNT) {
     throw new Error(`合成 fixture raw SHA 不唯一：${new Set(passRawSha256s).size}/${PASS_RAW_COUNT}`);
   }
-  return { root: first.root, passUnitIds, passRawSha256s, passReferenceSha256s };
+  return {
+    root: first.root,
+    passUnitIds,
+    passRawSha256s,
+    passReferenceSha256s,
+    expectedPassBindings,
+  };
 }
 
 async function main(): Promise<number> {
@@ -922,6 +1247,7 @@ async function main(): Promise<number> {
     "AI_CANVAS_MANAGED_PROJECTS_ROOT",
     "AI_CANVAS_MEDIA_RUNTIME_DIR",
     "AI_CANVAS_T23_PERF_PROBE",
+    "AI_CANVAS_ELECTRON_BACKGROUND_SMOKE",
   ] as const;
   const previousEnvironment = new Map(
     environmentKeys.map((key) => [key, process.env[key]]),
@@ -930,13 +1256,14 @@ async function main(): Promise<number> {
   process.env.AI_CANVAS_MANAGED_PROJECTS_ROOT = managedProjectsRoot;
   process.env.AI_CANVAS_MEDIA_RUNTIME_DIR = mediaRuntimeRoot;
   process.env.AI_CANVAS_T23_PERF_PROBE = "1";
+  process.env.AI_CANVAS_ELECTRON_BACKGROUND_SMOKE = "1";
 
   let launched: LaunchedUi | undefined;
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
   let report: SmokeReport = {
     schemaVersion: 1,
-    kind: "t23-source-dev-scale-performance",
+    kind: "t23-scale-performance",
     status: "FAIL",
     ok: false,
     mode,
@@ -978,6 +1305,7 @@ async function main(): Promise<number> {
       AI_CANVAS_MANAGED_PROJECTS_ROOT: managedProjectsRoot,
       AI_CANVAS_MEDIA_RUNTIME_DIR: mediaRuntimeRoot,
       AI_CANVAS_T23_PERF_PROBE: "1",
+      AI_CANVAS_ELECTRON_BACKGROUND_SMOKE: "1",
       AI_CANVAS_WINDOW_WIDTH: "1728",
       AI_CANVAS_WINDOW_HEIGHT: "1029",
       ELECTRON_DISABLE_SECURITY_WARNINGS: "true",
@@ -1001,35 +1329,33 @@ async function main(): Promise<number> {
       if (message.type() === "error") consoleErrors.push(message.text());
     });
     launched.page.on("pageerror", (error) => pageErrors.push(error.message));
-
-    const rendererFirstCardMs = await waitForRendererMilestone(launched, "first-card");
-    const rendererFirstRawMs = await waitForRendererMilestone(launched, "first-raw");
-    const rendererAllPassReferencesMs = await waitForRendererMilestone(
-      launched,
-      "all-pass-references",
-    );
-    const drainStartedAt = performance.now();
-    let drainStatus: "PASS" | "FAIL" = "PASS";
-    try {
-      await launched.page.waitForFunction(async () => {
-        const api = (window as unknown as {
-          canvasApi?: {
-            getT23IpcPerformanceProbeSnapshot?: () => Promise<IpcProbeSnapshot>;
-          };
-        }).canvasApi;
-        const snapshot = await api?.getT23IpcPerformanceProbeSnapshot?.();
-        return snapshot?.currentOutstanding === 0;
-      }, undefined, { timeout: 5_000 });
-    } catch {
-      drainStatus = "FAIL";
+    if (launched.page.url() === "about:blank") {
+      await launched.page.waitForURL((url) => url.toString() !== "about:blank", { timeout: 30_000 });
     }
-    let drainDurationMs = Math.round(performance.now() - drainStartedAt);
-    const rawSnapshot = await readRawSnapshot(launched);
-    let probe = await readIpcProbe(launched);
+    const initialRendererTimeOrigin = await launched.page.evaluate(() => performance.timeOrigin);
+    let rendererDocumentReloadCount = 0;
+    const onMainFrameNavigated = (frame: { url(): string }) => {
+      if (frame !== launched?.page.mainFrame()) return;
+      rendererDocumentReloadCount += 1;
+    };
+    launched.page.on("framenavigated", onMainFrameNavigated);
+
+    const rendererCycle = await waitForRendererCycle(launched, fixture.passUnitIds);
+    const {
+      rendererFirstCardMs,
+      rendererFirstRawMs,
+      rendererAllPassReferencesMs,
+      rawSnapshot,
+    } = rendererCycle;
+    let drainDurationMs = rendererCycle.drainDurationMs;
+    let probe = rendererCycle.ipcProbe;
+    let drainStatus: "PASS" | "FAIL" = "PASS";
     if (!probe.enabled) throw new Error("T23 IPC 探针未启用。");
+    assertUnitsReadTimeline(probe);
+    const expectedUnitIds = new Set(Array.from({ length: UNIT_COUNT }, (_, index) => unitId(index + 1)));
+    assertRendererStartupTimeline(probe, expectedUnitIds, new Set(fixture.passUnitIds));
     const rendererProbe = summarizeT23ScaleRendererProbe(rawSnapshot, fixture.passUnitIds);
     const projectedUnitIds = new Set(rawSnapshot.unitNodeIds);
-    const expectedUnitIds = new Set(Array.from({ length: UNIT_COUNT }, (_, index) => unitId(index + 1)));
     if (rawSnapshot.unitNodeIds.length !== UNIT_COUNT
       || projectedUnitIds.size !== UNIT_COUNT
       || [...expectedUnitIds].some((id) => !projectedUnitIds.has(id))) {
@@ -1037,25 +1363,10 @@ async function main(): Promise<number> {
         `renderer 实际 unit 节点不闭合：rows=${rawSnapshot.unitNodeIds.length} unique=${projectedUnitIds.size}/${UNIT_COUNT}`,
       );
     }
-    const observedRawSha256s = new Set(rawSnapshot.raws
-      .filter((raw) => fixture.passUnitIds.includes(raw.unitId))
-      .map((raw) => raw.rawMediaSha256));
-    const observedReferenceSha256s = new Set(rawSnapshot.references
-      .filter((reference) => fixture.passUnitIds.includes(reference.unitId))
-      .map((reference) => reference.mediaSha256));
-    if (fixture.passRawSha256s.some((sha256) => !observedRawSha256s.has(sha256))) {
-      throw new Error("renderer raw SHA 集合未包含全部 fixture 唯一正式 raw。");
-    }
-    if (fixture.passReferenceSha256s.some((sha256) => !observedReferenceSha256s.has(sha256))) {
-      throw new Error("renderer 冻结参考 SHA 集合未包含全部 fixture 唯一权威图。");
-    }
-
-    const rawUrls = rawSnapshot.raws
-      .filter((raw) => fixture.passUnitIds.includes(raw.unitId))
-      .flatMap((raw) => raw.thumbnailUrl ? [raw.thumbnailUrl] : []);
-    const referenceUrls = rawSnapshot.references
-      .filter((reference) => fixture.passUnitIds.includes(reference.unitId))
-      .flatMap((reference) => reference.thumbnailUrl ? [reference.thumbnailUrl] : []);
+    const {
+      rawThumbnailUrls: rawUrls,
+      referenceThumbnailUrls: referenceUrls,
+    } = assertT23ScaleExactPassBindings(rawSnapshot, fixture.expectedPassBindings);
     const [decodedRawThumbnailCount, decodedReferenceThumbnailCount] = await Promise.all([
       decodeThumbnails(launched, rawUrls),
       decodeThumbnails(launched, referenceUrls),
@@ -1090,8 +1401,8 @@ async function main(): Promise<number> {
       }
       drainDurationMs += Math.round(performance.now() - interactionDrainStartedAt);
       probe = await readIpcProbe(launched);
+      assertProjectionTimeline(probe);
     }
-
     const evaluation = evaluateT23ScalePerformance({
       fixtureUnitCount: projection.unitCount,
       ...rendererProbe,
@@ -1120,6 +1431,15 @@ async function main(): Promise<number> {
         `renderer 出现错误：console=${consoleErrors.length} page=${pageErrors.length}`,
       );
     }
+    const finalRendererTimeOrigin = await launched.page.evaluate(() => performance.timeOrigin);
+    if (rendererCycle.timeOrigin !== initialRendererTimeOrigin
+      || finalRendererTimeOrigin !== rendererCycle.timeOrigin
+      || rendererDocumentReloadCount > 0) {
+      throw new Error(
+        `T23 Renderer 在严格测量期间发生重载：reloads=${rendererDocumentReloadCount}`,
+      );
+    }
+    launched.page.off("framenavigated", onMainFrameNavigated);
     const ipcDrain: NonNullable<SmokeReport["ipcDrain"]> = {
       budgetMs: 5_000,
       durationMs: drainDurationMs,
@@ -1137,13 +1457,18 @@ async function main(): Promise<number> {
         rendererProbe,
         projectMetricsText,
         buildIdentityText,
-        rawSnapshot,
+        rawSnapshot: redactT23ScaleRendererProbeForEvidence(rawSnapshot),
         decodedRawThumbnailCount,
         decodedReferenceThumbnailCount,
       },
       ipcProbe: probe,
       ipcDrain,
       ...(interactions ? { interactions } : {}),
+      rendererDocument: {
+        timeOrigin: rendererCycle.timeOrigin,
+        contextAttempts: rendererCycle.contextAttempts,
+        reloadCount: rendererDocumentReloadCount,
+      },
     };
     if (ipcDrain.status !== "PASS") {
       report.status = "FAIL";
@@ -1156,20 +1481,19 @@ async function main(): Promise<number> {
       report.error = "P7 交互性能硬门未通过。";
     }
   } catch (error) {
-    report.error = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+    const rawError = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+    process.stderr.write(`[t23-scale-performance] ${rawError}\n`);
+    report.error = "T23_SMOKE_FAILED";
     if (launched) {
-      const [pageUrl, bodyText, rawSnapshot, ipcProbe] = await Promise.all([
-        Promise.resolve(launched.page.url()).catch(() => undefined),
-        launched.page.locator("body").innerText({ timeout: 2_000 })
-          .then((value) => value.replace(/\s+/gu, " ").trim().slice(0, 2_000))
-          .catch(() => undefined),
+      const [rawSnapshot, ipcProbe] = await Promise.all([
         readRawSnapshot(launched).catch(() => undefined),
         readIpcProbe(launched).catch(() => undefined),
       ]);
       report.failureDiagnostics = {
-        ...(pageUrl ? { pageUrl } : {}),
-        ...(bodyText ? { bodyText } : {}),
-        ...(rawSnapshot ? { rawSnapshot } : {}),
+        errorKind: t23EvidenceErrorKind(error),
+        ...(rawSnapshot
+          ? { rawSnapshot: redactT23ScaleRendererProbeForEvidence(rawSnapshot) }
+          : {}),
         ...(ipcProbe ? { ipcProbe } : {}),
       };
     }

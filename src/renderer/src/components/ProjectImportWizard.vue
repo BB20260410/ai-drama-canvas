@@ -3,7 +3,7 @@
     <section class="import-wizard">
       <header class="wizard-header">
         <div><span class="eyebrow">项目入库</span><h2>把真实制作目录接入画布</h2><p>预检只读取文件；最后确认后才建立或更新 .aicanvas。</p></div>
-        <button class="icon-button" type="button" @click="emit('cancel')"><X :size="18" /></button>
+        <button class="icon-button" type="button" aria-label="关闭导入向导" @click="emit('cancel')"><X :size="18" /></button>
       </header>
 
       <nav class="step-rail" aria-label="导入步骤">
@@ -22,11 +22,11 @@
             <div class="root-editor">
               <div class="editor-heading"><div><b>附加来源根</b><small>剧本、参考图或其他生产目录</small></div><button type="button" @click="addRoot('source')"><Plus :size="14" /> 添加</button></div>
               <div v-if="!draft.sourceRoots.length" class="empty-line">当前只扫描项目主根</div>
-              <div v-for="(root, index) in draft.sourceRoots" :key="`source-${index}`" class="path-row"><span>S{{ index + 1 }}</span><input v-model="draft.sourceRoots[index]" /><button type="button" @click="draft.sourceRoots.splice(index, 1)"><X :size="14" /></button></div>
+              <div v-for="(root, index) in draft.sourceRoots" :key="`source-${index}`" class="path-row"><span>S{{ index + 1 }}</span><input v-model="draft.sourceRoots[index]" /><button type="button" :aria-label="`移除来源 ${index + 1}`" @click="draft.sourceRoots.splice(index, 1)"><X :size="14" /></button></div>
             </div>
             <div class="root-editor output-editor">
               <div class="editor-heading"><div><b>额外输出根</b><small>Codex 允许写入的新版本位置</small></div><button type="button" @click="addRoot('output')"><Plus :size="14" /> 添加</button></div>
-              <div v-for="(root, index) in extraOutputRoots" :key="`output-${index}`" class="path-row"><span>O{{ index + 1 }}</span><input :value="root" @input="updateOutput(index, ($event.target as HTMLInputElement).value)" /><button type="button" @click="removeOutput(index)"><X :size="14" /></button></div>
+              <div v-for="(root, index) in extraOutputRoots" :key="`output-${index}`" class="path-row"><span>O{{ index + 1 }}</span><input :value="root" @input="updateOutput(index, ($event.target as HTMLInputElement).value)" /><button type="button" :aria-label="`移除输出 ${index + 1}`" @click="removeOutput(index)"><X :size="14" /></button></div>
             </div>
           </section>
 

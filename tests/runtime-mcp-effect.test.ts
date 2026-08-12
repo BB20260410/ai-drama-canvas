@@ -12,6 +12,13 @@ describe("源码 MCP 物理副作用分类", () => {
     expect(runtimeMcpGateMode("get_active_managed_studio_context")).toBe("cached-read");
     expect(runtimeMcpEffect("get_canvas_state")).toBe("read-only");
     expect(runtimeMcpEffect("read_story_chapter")).toBe("read-only");
+    expect(runtimeMcpEffect("get_novel_manuscript_workspace")).toBe("read-only");
+    expect(runtimeMcpEffect("list_novel_manuscript_chapters")).toBe("read-only");
+    expect(runtimeMcpEffect("read_novel_manuscript_range")).toBe("read-only");
+    expect(runtimeMcpEffect("search_novel_manuscript")).toBe("read-only");
+    expect(runtimeMcpEffect("get_novel_search_index_status")).toBe("read-only");
+    expect(runtimeMcpEffect("get_novel_analysis_execution_recovery")).toBe("read-only");
+    expect(runtimeMcpEffect("build_novel_context_pack")).toBe("read-only");
   });
 
   it("外部动作与未知工具都保持强门禁", () => {

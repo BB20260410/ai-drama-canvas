@@ -1,14 +1,34 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { chmod, mkdtemp, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readFile, readdir, realpath, rm, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { appendEvent, assertProjectRegistryWriteIsIsolated, diagnoseProjectRegistryEntries, ensureSidecar, getSidecarPaths, listEvents, listTaskPacks, pruneUnavailableRegisteredProjects, readJson, registerProject, saveRegisteredProjects, unregisterProject, writeJsonAtomic, writeTextAtomic } from "../src/core/sidecar.js";
+import { appendEvent, assertProjectRegistryWriteIsIsolated, diagnoseProjectRegistryEntries, ensureSidecar, getActiveHybridWorkspacePreference, getActiveProjectRegistrationSnapshot, getActiveProjectRegistrationSnapshotReadOnly, getActiveProjectStateReadOnly, getProjectRegistryV2Path, getSidecarPaths, getWorkspacePreferencesV2Path, listEvents, listRegisteredProjects, listTaskPacks, pruneUnavailableRegisteredProjects, readJson, registerProject, saveRegisteredProjects, setActiveHybridWorkspacePreference, setActiveProjectRegistration, setActiveStudioContext, unregisterProject, writeJsonAtomic, writeTextAtomic } from "../src/core/sidecar.js";
 import { activateProject, getActiveProject, listProjects } from "../src/core/service.js";
+import { createManagedProject } from "../src/core/managed-project.js";
 
 const roots: string[] = [];
 const execFileAsync = promisify(execFile);
+
+async function writeManagedWorkspaceManifest(
+  projectRoot: string,
+  projectId: string,
+  workspaceMode: "drama" | "novel" | "hybrid",
+): Promise<string> {
+  const manifestPath = path.join(getSidecarPaths(projectRoot).root, "managed-project.json");
+  await writeFile(manifestPath, `${JSON.stringify({
+    schemaVersion: workspaceMode === "drama" ? 1 : 2,
+    kind: "ai-canvas-managed-project",
+    projectId,
+    ...(workspaceMode === "drama" ? {} : {
+      workspaceMode,
+      minimumWriterSchemaVersion: 2,
+    }),
+    fingerprint: `fixture-${projectId}`,
+  }, null, 2)}\n`, "utf8");
+  return manifestPath;
+}
 
 afterEach(async () => Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true }))));
 
@@ -153,6 +173,77 @@ describe("侧车持久化", () => {
     }
   });
 
+  it("schema v2 novel/hybrid 只进入带 writer fence 的独立注册表，当前 writer 可合并列出、激活和注销", async () => {
+    const base = await mkdtemp(path.join(await realpath(os.tmpdir()), "ai-canvas-registry-v2-fence-"));
+    roots.push(base);
+    const registryPath = path.join(base, "registry", "projects.json");
+    const activeProjectPath = path.join(path.dirname(registryPath), "active-project.json");
+    const previousRegistryPath = process.env.AI_CANVAS_REGISTRY_PATH;
+    process.env.AI_CANVAS_REGISTRY_PATH = registryPath;
+    try {
+      const parent = path.join(base, "projects");
+      await mkdir(parent, { recursive: true });
+      const drama = await createManagedProject({ parentRoot: parent, name: "Legacy Drama" });
+      const novel = await createManagedProject({ parentRoot: parent, name: "Novel V2", workspaceMode: "novel" });
+      const hybrid = await createManagedProject({ parentRoot: parent, name: "Hybrid V2", workspaceMode: "hybrid" });
+
+      await registerProject(drama.project);
+      await setActiveProjectRegistration(drama.paths.root);
+      const legacyRegistryBeforeV2 = await readFile(registryPath);
+      const legacyActiveBeforeV2 = await readFile(activeProjectPath);
+      expect(await readJson<Record<string, unknown>>(activeProjectPath, {})).toMatchObject({
+        schemaVersion: 2,
+        primaryRoot: drama.paths.root,
+      });
+
+      await registerProject(novel.project);
+      await registerProject(hybrid.project);
+      expect(await readFile(registryPath)).toEqual(legacyRegistryBeforeV2);
+      expect(await readFile(activeProjectPath)).toEqual(legacyActiveBeforeV2);
+      expect(await readJson<Array<{ primaryRoot: string }>>(registryPath, [])).toEqual([
+        expect.objectContaining({ primaryRoot: drama.paths.root }),
+      ]);
+
+      const registryV2Path = getProjectRegistryV2Path();
+      expect(await readJson<Record<string, unknown>>(registryV2Path, {})).toMatchObject({
+        schemaVersion: 2,
+        kind: "ai-canvas-project-registry",
+        minimumWriterSchemaVersion: 2,
+        projects: [
+          expect.objectContaining({ id: hybrid.project.id, primaryRoot: hybrid.paths.root }),
+          expect.objectContaining({ id: novel.project.id, primaryRoot: novel.paths.root }),
+        ],
+      });
+      expect(new Set((await listRegisteredProjects()).map((project) => project.primaryRoot))).toEqual(
+        new Set([drama.paths.root, novel.paths.root, hybrid.paths.root]),
+      );
+
+      await activateProject(novel.paths.root);
+      const novelActiveRaw = await readJson<Record<string, unknown>>(activeProjectPath, {});
+      expect(novelActiveRaw).toMatchObject({
+        schemaVersion: 3,
+        primaryRoot: novel.paths.root,
+      });
+      expect(novelActiveRaw).not.toHaveProperty("workspacePreferences");
+      await expect(getActiveProjectRegistrationSnapshot()).resolves.toMatchObject({
+        registration: { id: novel.project.id, primaryRoot: novel.paths.root },
+      });
+      await expect(getActiveProjectRegistrationSnapshotReadOnly()).resolves.toMatchObject({
+        registration: { id: novel.project.id, primaryRoot: novel.paths.root },
+      });
+
+      const legacyBeforeV2Unregister = await readFile(registryPath);
+      await unregisterProject(hybrid.paths.root);
+      expect(await readFile(registryPath)).toEqual(legacyBeforeV2Unregister);
+      expect(await readJson<Record<string, unknown>>(registryV2Path, {})).toMatchObject({
+        projects: [expect.objectContaining({ primaryRoot: novel.paths.root })],
+      });
+    } finally {
+      if (previousRegistryPath === undefined) delete process.env.AI_CANVAS_REGISTRY_PATH;
+      else process.env.AI_CANVAS_REGISTRY_PATH = previousRegistryPath;
+    }
+  });
+
   it("清理失效项目与并发注销不会用旧快照复活已注销项目", async () => {
     const base = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-registry-prune-"));
     roots.push(base);
@@ -213,6 +304,186 @@ describe("侧车持久化", () => {
       await unregisterProject(first.primaryRoot);
       expect(await getActiveProject()).toBeNull();
       expect((await listProjects()).map((project) => project.primaryRoot)).toEqual([second.primaryRoot]);
+    } finally {
+      if (previousRegistryPath === undefined) delete process.env.AI_CANVAS_REGISTRY_PATH;
+      else process.env.AI_CANVAS_REGISTRY_PATH = previousRegistryPath;
+    }
+  });
+
+  it("hybrid 桌面偏好按 projectId 保存，切换、刷新读取和 Studio 更新都不丢失", async () => {
+    const base = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-hybrid-workspace-preference-"));
+    roots.push(base);
+    const registryPath = path.join(base, "registry", "projects.json");
+    const activeProjectPath = path.join(path.dirname(registryPath), "active-project.json");
+    const previousRegistryPath = process.env.AI_CANVAS_REGISTRY_PATH;
+    process.env.AI_CANVAS_REGISTRY_PATH = registryPath;
+    try {
+      const first = await ensureSidecar(path.join(base, "first"));
+      const second = await ensureSidecar(path.join(base, "second"));
+      const drama = await ensureSidecar(path.join(base, "drama"));
+      const firstManifestPath = await writeManagedWorkspaceManifest(first.primaryRoot, first.id, "hybrid");
+      await writeManagedWorkspaceManifest(second.primaryRoot, second.id, "hybrid");
+      await registerProject(first);
+      await registerProject(second);
+      await registerProject(drama);
+      const firstManifestBefore = await readFile(firstManifestPath);
+
+      await setActiveProjectRegistration(first.primaryRoot);
+      const firstActiveRaw = await readJson<Record<string, unknown>>(activeProjectPath, {});
+      expect(firstActiveRaw).toMatchObject({
+        schemaVersion: 3,
+        primaryRoot: first.primaryRoot,
+      });
+      expect(firstActiveRaw).not.toHaveProperty("workspacePreferences");
+      const activationIdBeforePreference = (await getActiveProjectStateReadOnly())?.activationId;
+
+      const activeBeforeGet = await readFile(activeProjectPath);
+      await expect(getActiveHybridWorkspacePreference(first.id)).resolves.toBeNull();
+      expect(await readFile(activeProjectPath)).toEqual(activeBeforeGet);
+      await expect(setActiveHybridWorkspacePreference(second.id, "drama")).rejects.toThrow("当前活动工程");
+      expect(await readFile(activeProjectPath)).toEqual(activeBeforeGet);
+
+      await expect(setActiveHybridWorkspacePreference(first.id, "novel")).resolves.toMatchObject({
+        projectId: first.id,
+        mode: "novel",
+      });
+      expect(await readJson<Record<string, unknown>>(activeProjectPath, {})).not.toHaveProperty("workspacePreferences");
+      expect(await readJson<Record<string, unknown>>(getWorkspacePreferencesV2Path(), {})).toMatchObject({
+        schemaVersion: 2,
+        kind: "ai-canvas-workspace-preferences",
+        preferences: { [first.id]: { mode: "novel" } },
+      });
+      expect((await getActiveProjectStateReadOnly())?.activationId).toBe(activationIdBeforePreference);
+      expect(await readFile(firstManifestPath)).toEqual(firstManifestBefore);
+      await expect(stat(path.join(first.primaryRoot, "manuscript"))).rejects.toMatchObject({ code: "ENOENT" });
+      await expect(stat(path.join(first.primaryRoot, "story-bible"))).rejects.toMatchObject({ code: "ENOENT" });
+      await expect(stat(path.join(getSidecarPaths(first.primaryRoot).root, "novel"))).rejects.toMatchObject({ code: "ENOENT" });
+
+      await setActiveStudioContext(first.primaryRoot, { mode: "dashboard", focus: { unitId: "unit-001" } });
+      expect(await readJson<Record<string, unknown>>(activeProjectPath, {})).toMatchObject({
+        schemaVersion: 3,
+        studio: { mode: "dashboard", focus: { unitId: "unit-001" } },
+      });
+      expect(await readJson<Record<string, unknown>>(activeProjectPath, {})).not.toHaveProperty("workspacePreferences");
+
+      await setActiveProjectRegistration(second.primaryRoot);
+      await expect(setActiveHybridWorkspacePreference(second.id, "drama")).resolves.toMatchObject({
+        projectId: second.id,
+        mode: "drama",
+      });
+      await setActiveProjectRegistration(first.primaryRoot);
+      await expect(getActiveHybridWorkspacePreference(first.id)).resolves.toMatchObject({
+        projectId: first.id,
+        mode: "novel",
+      });
+      const restartedProjection = await getActiveProjectStateReadOnly();
+      expect(restartedProjection?.workspacePreferences).toEqual({
+        [first.id]: expect.objectContaining({ mode: "novel" }),
+        [second.id]: expect.objectContaining({ mode: "drama" }),
+      });
+
+      await setActiveProjectRegistration(drama.primaryRoot);
+      const dramaActiveRaw = await readJson<Record<string, unknown>>(activeProjectPath, {});
+      expect(dramaActiveRaw).toMatchObject({ schemaVersion: 2, primaryRoot: drama.primaryRoot });
+      expect(dramaActiveRaw).not.toHaveProperty("workspacePreferences");
+      await setActiveProjectRegistration(first.primaryRoot);
+      await expect(getActiveHybridWorkspacePreference(first.id)).resolves.toMatchObject({ mode: "novel" });
+    } finally {
+      if (previousRegistryPath === undefined) delete process.env.AI_CANVAS_REGISTRY_PATH;
+      else process.env.AI_CANVAS_REGISTRY_PATH = previousRegistryPath;
+    }
+  });
+
+  it("drama/novel 工程和非法值不能写 hybrid 偏好，也不创建小说目录", async () => {
+    const base = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-nonhybrid-workspace-preference-"));
+    roots.push(base);
+    const registryPath = path.join(base, "registry", "projects.json");
+    const activeProjectPath = path.join(path.dirname(registryPath), "active-project.json");
+    const previousRegistryPath = process.env.AI_CANVAS_REGISTRY_PATH;
+    process.env.AI_CANVAS_REGISTRY_PATH = registryPath;
+    try {
+      const drama = await ensureSidecar(path.join(base, "drama"));
+      const novel = await ensureSidecar(path.join(base, "novel"));
+      const dramaManifestPath = await writeManagedWorkspaceManifest(drama.primaryRoot, drama.id, "drama");
+      const novelManifestPath = await writeManagedWorkspaceManifest(novel.primaryRoot, novel.id, "novel");
+      await registerProject(drama);
+      await registerProject(novel);
+      const dramaManifestBefore = await readFile(dramaManifestPath);
+      const novelManifestBefore = await readFile(novelManifestPath);
+
+      await setActiveProjectRegistration(drama.primaryRoot);
+      await expect(getActiveHybridWorkspacePreference(drama.id)).rejects.toThrow("只有 schema v2 hybrid");
+      await expect(setActiveHybridWorkspacePreference(drama.id, "novel")).rejects.toThrow("只有 schema v2 hybrid");
+      expect(await readJson<Record<string, unknown>>(activeProjectPath, {})).toMatchObject({ schemaVersion: 2 });
+
+      await setActiveProjectRegistration(novel.primaryRoot);
+      await expect(setActiveHybridWorkspacePreference(novel.id, "drama")).rejects.toThrow("只有 schema v2 hybrid");
+      await expect(setActiveHybridWorkspacePreference(novel.id, "canvas" as never)).rejects.toThrow("mode 无效");
+      expect(await readJson<Record<string, unknown>>(activeProjectPath, {})).toMatchObject({ schemaVersion: 3 });
+
+      expect(await readFile(dramaManifestPath)).toEqual(dramaManifestBefore);
+      expect(await readFile(novelManifestPath)).toEqual(novelManifestBefore);
+      for (const projectRoot of [drama.primaryRoot, novel.primaryRoot]) {
+        await expect(stat(path.join(projectRoot, "manuscript"))).rejects.toMatchObject({ code: "ENOENT" });
+        await expect(stat(path.join(projectRoot, "story-bible"))).rejects.toMatchObject({ code: "ENOENT" });
+        await expect(stat(path.join(getSidecarPaths(projectRoot).root, "novel"))).rejects.toMatchObject({ code: "ENOENT" });
+      }
+    } finally {
+      if (previousRegistryPath === undefined) delete process.env.AI_CANVAS_REGISTRY_PATH;
+      else process.env.AI_CANVAS_REGISTRY_PATH = previousRegistryPath;
+    }
+  });
+
+  it("旧 v1/v2 sidecar 只读时保持原字节，v2 工程后续写入升级 v3，future schema 失败关闭", async () => {
+    const base = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-workspace-preference-schema-"));
+    roots.push(base);
+    const registryPath = path.join(base, "registry", "projects.json");
+    const activeProjectPath = path.join(path.dirname(registryPath), "active-project.json");
+    const previousRegistryPath = process.env.AI_CANVAS_REGISTRY_PATH;
+    process.env.AI_CANVAS_REGISTRY_PATH = registryPath;
+    try {
+      const hybrid = await ensureSidecar(path.join(base, "hybrid"));
+      await writeManagedWorkspaceManifest(hybrid.primaryRoot, hybrid.id, "hybrid");
+      await registerProject(hybrid);
+      const legacyUpdatedAt = "2026-08-01T00:00:00.000Z";
+      await writeJsonAtomic(activeProjectPath, {
+        schemaVersion: 1,
+        primaryRoot: hybrid.primaryRoot,
+        updatedAt: legacyUpdatedAt,
+      });
+
+      const legacyBeforeGet = await readFile(activeProjectPath);
+      await expect(getActiveHybridWorkspacePreference(hybrid.id)).resolves.toBeNull();
+      expect(await readFile(activeProjectPath)).toEqual(legacyBeforeGet);
+      expect(await getActiveProjectStateReadOnly()).toMatchObject({
+        schemaVersion: 3,
+        primaryRoot: hybrid.primaryRoot,
+        workspacePreferences: {},
+      });
+
+      await setActiveStudioContext(hybrid.primaryRoot, { mode: "canvas" });
+      expect(await readJson<Record<string, unknown>>(activeProjectPath, {})).toMatchObject({
+        schemaVersion: 3,
+        studio: { mode: "canvas" },
+      });
+      expect(await readJson<Record<string, unknown>>(activeProjectPath, {})).not.toHaveProperty("workspacePreferences");
+
+      await setActiveHybridWorkspacePreference(hybrid.id, "novel");
+      const versionThree = await readJson<Record<string, unknown>>(activeProjectPath, {});
+      expect(versionThree).toMatchObject({
+        schemaVersion: 3,
+      });
+      expect(versionThree).not.toHaveProperty("workspacePreferences");
+      expect(await readJson<Record<string, unknown>>(getWorkspacePreferencesV2Path(), {})).toMatchObject({
+        preferences: { [hybrid.id]: { mode: "novel" } },
+      });
+
+      await writeJsonAtomic(activeProjectPath, { ...versionThree, schemaVersion: 4 });
+      const futureBeforeRead = await readFile(activeProjectPath);
+      await expect(getActiveProjectStateReadOnly()).rejects.toThrow("活动项目状态已损坏");
+      await expect(getActiveHybridWorkspacePreference(hybrid.id)).rejects.toThrow("活动项目状态已损坏");
+      await expect(setActiveHybridWorkspacePreference(hybrid.id, "drama")).rejects.toThrow("活动项目状态已损坏");
+      expect(await readFile(activeProjectPath)).toEqual(futureBeforeRead);
     } finally {
       if (previousRegistryPath === undefined) delete process.env.AI_CANVAS_REGISTRY_PATH;
       else process.env.AI_CANVAS_REGISTRY_PATH = previousRegistryPath;

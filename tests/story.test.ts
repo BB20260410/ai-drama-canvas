@@ -1,14 +1,20 @@
-import { access, copyFile, mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { access, copyFile, link, mkdtemp, mkdir, readFile, rename, rm, symlink, unlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { seedProductionReady } from "./workflow-helpers.js";
 import { createTaskPack, scanAndPersist } from "../src/core/service.js";
 import { getSidecarPaths } from "../src/core/sidecar.js";
-import { buildStoryContext, connectStoryEvents, importStoryFile, importStoryText, listStoryChapters, listStoryEvents, listStorySources, readStoryChapter, splitStoryChapters, upsertStoryEvent } from "../src/core/story.js";
+import { __setStoryMigrationTestHooksForTests, buildStoryContext, connectStoryEvents, importStoryFile, importStoryText, listStoryChapters, listStoryEvents, listStorySources, readStoryChapter, splitStoryChapters, upsertStoryEvent } from "../src/core/story.js";
+import type { StoryLibrary } from "../src/core/types.js";
 
 const roots: string[] = [];
-afterEach(async () => Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true }))));
+let resetStoryHooks: () => void = () => undefined;
+afterEach(async () => {
+  resetStoryHooks();
+  resetStoryHooks = () => undefined;
+  await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
+});
 
 async function project(): Promise<string> {
   const root = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-story-"));
@@ -87,5 +93,86 @@ describe("原文、章节与故事事件图", () => {
     const first = await upsertStoryEvent(root, { chapterId: source.chapters[0]!.id, title: "进入祭坛", description: "阿航进入祭坛", sourceExcerpt: "阿航进入祭坛。", status: "confirmed" });
     const second = await upsertStoryEvent(root, { chapterId: source.chapters[0]!.id, title: "门外守候", description: "嘟嘟守在门外", sourceExcerpt: "嘟嘟守在门外。", dependencyIds: [first.id], status: "confirmed" });
     await expect(upsertStoryEvent(root, { ...first, dependencyIds: [second.id], expectedRevision: first.revision })).rejects.toThrow("依赖形成循环");
+  });
+});
+
+describe("legacy story v1 只读证据边界", () => {
+  // 2026-08-10 安全收敛：章节证据失败对外只抛稳定摘要（不泄漏路径/细节），
+  // 原始安全检查经 cause 保留；断言同时验证外层摘要与内层细节（wq-0005 有界修复）。
+  const evidenceRejection = (detail: string) => (err: unknown): boolean =>
+    err instanceof Error
+    && err.message.includes("SHA/字数与索引不一致或证据不可用")
+    && err.cause instanceof Error
+    && err.cause.message.includes(detail);
+
+  it("先解析 v1 结构，再拒绝越出项目根的章节路径", async () => {
+    const root = await project();
+    const imported = await importStoryText(root, { title: "越根测试", content: "第一章 神落\n阿航从雾河醒来。" });
+    const paths = getSidecarPaths(root);
+    const outsideParent = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-story-outside-"));
+    roots.push(outsideParent);
+    const outside = path.join(outsideParent, "secret.txt");
+    await writeFile(outside, "不得被 renderer 读取的本机文件", "utf8");
+    const library = JSON.parse(await readFile(paths.storyIndex, "utf8")) as StoryLibrary;
+    library.chapters[0]!.path = outside;
+    await writeFile(paths.storyIndex, `${JSON.stringify(library, null, 2)}\n`, "utf8");
+
+    await expect(readStoryChapter(root, imported.chapters[0]!.id)).rejects.toSatisfy(evidenceRejection("越出项目根"));
+
+    const malformed = JSON.parse(await readFile(paths.storyIndex, "utf8")) as Record<string, unknown>;
+    malformed.chapters = [{ path: outside }];
+    await writeFile(paths.storyIndex, `${JSON.stringify(malformed, null, 2)}\n`, "utf8");
+    await expect(listStorySources(root)).rejects.toThrow("chapter[0] 结构无效");
+  });
+
+  it.each(["symlink", "hardlink"] as const)("拒绝章节 %s，不跟随也不接受多链接 inode", async (kind) => {
+    const root = await project();
+    const imported = await importStoryText(root, { title: `${kind} 测试`, content: "第一章 神落\n阿航从雾河醒来。" });
+    const chapterPath = imported.chapters[0]!.path;
+    if (kind === "symlink") {
+      const outsideParent = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-story-link-target-"));
+      roots.push(outsideParent);
+      const target = path.join(outsideParent, "secret.txt");
+      await writeFile(target, "阿航从雾河醒来。\n", "utf8");
+      await unlink(chapterPath);
+      await symlink(target, chapterPath);
+      await expect(listStoryChapters(root)).rejects.toSatisfy(evidenceRejection("无符号链接的普通文件"));
+    } else {
+      await link(chapterPath, `${chapterPath}.hardlink`);
+      await expect(listStoryChapters(root)).rejects.toSatisfy(evidenceRejection("单链接普通文件"));
+    }
+  });
+
+  it.each(["symlink", "hardlink"] as const)("拒绝来源快照 %s，列表接口也必须验证全部 v1 证据", async (kind) => {
+    const root = await project();
+    const imported = await importStoryText(root, { title: `${kind} 快照测试`, content: "第一章 神落\n阿航从雾河醒来。" });
+    const snapshotPath = imported.source.snapshotPath;
+    if (kind === "symlink") {
+      const outsideParent = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-story-snapshot-target-"));
+      roots.push(outsideParent);
+      const target = path.join(outsideParent, "snapshot.txt");
+      await writeFile(target, await readFile(snapshotPath));
+      await unlink(snapshotPath);
+      await symlink(target, snapshotPath);
+      await expect(listStorySources(root)).rejects.toThrow("无符号链接的普通文件");
+    } else {
+      await link(snapshotPath, `${snapshotPath}.hardlink`);
+      await expect(listStorySources(root)).rejects.toThrow("单链接普通文件");
+    }
+  });
+
+  it("首轮证据冻结后即使换入同 SHA 文件，也因 inode 复验失败关闭", async () => {
+    const root = await project();
+    const imported = await importStoryText(root, { title: "TOCTOU 测试", content: "第一章 神落\n阿航从雾河醒来。" });
+    const chapterPath = imported.chapters[0]!.path;
+    const replacement = `${chapterPath}.replacement`;
+    await writeFile(replacement, await readFile(chapterPath));
+    resetStoryHooks = __setStoryMigrationTestHooksForTests({
+      afterLegacyStoryEvidenceFreeze: async () => {
+        await rename(replacement, chapterPath);
+      },
+    });
+
+    await expect(listStorySources(root)).rejects.toThrow("章节证据在复验期间发生变化");
   });
 });

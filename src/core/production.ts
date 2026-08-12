@@ -441,13 +441,42 @@ export async function assertProductionWorkflowGate(
 
 type ProductionEvidenceContext = Awaited<ReturnType<typeof loadProductionEvidenceContext>>;
 
+function storyEvidenceAuditIssue(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  if (/story v1 来源快照 SHA\/字数与索引不一致/u.test(message)) {
+    return `原文快照哈希失配：${message.split("：").at(-1) ?? "未知来源"}`;
+  }
+  if (/story v1 章节 SHA\/字数与索引不一致|story v1 章节区间与来源快照不一致/u.test(message)) {
+    return `章节快照哈希失配：${message.split("：").at(-1) ?? "未知章节"}`;
+  }
+  return `原文证据闭包无法安全读取：${message}`;
+}
+
+async function loadProductionStoryEvidence(projectRoot: string) {
+  try {
+    const [storySources, storyChapters, storyEvents] = await Promise.all([
+      listStorySources(projectRoot),
+      listStoryChapters(projectRoot),
+      listStoryEvents(projectRoot, { includeOrphans: true }),
+    ]);
+    return { storySources, storyChapters, storyEvents, storyEvidenceReadIssue: undefined };
+  } catch (error) {
+    // Story Core 的普通读取必须继续 fail-closed；生产审计只把同一失败翻译成
+    // 可呈现的失效证据，绝不回退 raw cast 或继续信任受损索引中的路径。
+    return {
+      storySources: [] as Awaited<ReturnType<typeof listStorySources>>,
+      storyChapters: [] as Awaited<ReturnType<typeof listStoryChapters>>,
+      storyEvents: [] as Awaited<ReturnType<typeof listStoryEvents>>,
+      storyEvidenceReadIssue: storyEvidenceAuditIssue(error),
+    };
+  }
+}
+
 async function loadProductionEvidenceContext(projectRoot: string) {
   const sidecar = getSidecarPaths(projectRoot);
-  const [index, storySources, storyChapters, storyEvents, storyboard, bibles, reviewRecords, editProjects, renderJobs, publicationReceipts, adaptation, library, config] = await Promise.all([
+  const [index, storyEvidence, storyboard, bibles, reviewRecords, editProjects, renderJobs, publicationReceipts, adaptation, library, config] = await Promise.all([
     getProjectIndex(projectRoot),
-    listStorySources(projectRoot),
-    listStoryChapters(projectRoot),
-    listStoryEvents(projectRoot, { includeOrphans: true }),
+    loadProductionStoryEvidence(projectRoot),
     getStoryboard(projectRoot),
     listCreativeBibles(projectRoot),
     listReviewRecords(projectRoot, { limit: 1_000 }),
@@ -458,7 +487,7 @@ async function loadProductionEvidenceContext(projectRoot: string) {
     readJson<StoryLibrary | null>(sidecar.storyIndex, null),
     loadProjectConfig(projectRoot),
   ]);
-  return { index, storySources, storyChapters, storyEvents, storyboard, bibles, reviewRecords, editProjects, renderJobs, publicationReceipts, adaptation, library, config };
+  return { index, ...storyEvidence, storyboard, bibles, reviewRecords, editProjects, renderJobs, publicationReceipts, adaptation, library, config };
 }
 
 function normalizedStoryText(value: string): string {
@@ -518,6 +547,9 @@ async function stageCompletionIssues(projectRoot: string, stageId: ProductionWor
   const issues: string[] = [];
   const context = contextInput ?? await loadProductionEvidenceContext(projectRoot);
   const { index, storySources, storyChapters, storyEvents, storyboard, bibles, reviewRecords, editProjects, renderJobs, publicationReceipts, adaptation, library } = context;
+  if (context.storyEvidenceReadIssue && ["source", "chapters", "events", "skeleton", "adaptation"].includes(stageId)) {
+    issues.push(context.storyEvidenceReadIssue);
+  }
   const paths = [...new Set(evidencePaths.map((candidate) => path.resolve(candidate)))];
   const missing = await Promise.all(paths.map(async (candidate) => ({ candidate, valid: await readableNonEmpty(candidate) })));
   if (missing.some((entry) => !entry.valid)) issues.push(`证据路径不存在、不是文件或为空：${missing.filter((entry) => !entry.valid).map((entry) => entry.candidate).join("、")}`);

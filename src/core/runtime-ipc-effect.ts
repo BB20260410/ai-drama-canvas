@@ -23,9 +23,17 @@ export const RUNTIME_GATE_DIAGNOSTIC_READ_CHANNELS = new Set<string>([
  */
 export const RUNTIME_GATE_READ_ONLY_CHANNELS = new Set<string>([
   "canvas:get-active-project",
+  "canvas:get-active-hybrid-workspace-preference",
+  "canvas:get-managed-project-shell",
   "canvas:get-default-managed-projects-root",
   "canvas:get-managed-project-operation-state",
   "canvas:get-local-creative-project-ingest-status",
+  "canvas:novel-get-workspace",
+  "canvas:novel-get-navigation",
+  "canvas:novel-list-chapters",
+  "canvas:novel-read-chapter",
+  "canvas:novel-search-chapters",
+  "canvas:novel-list-facts",
   "canvas:list-global-studio-assets",
   "canvas:list-global-studio-asset-images",
   "canvas:get-global-studio-asset-image",
@@ -52,6 +60,16 @@ export const RUNTIME_GATE_EXTERNAL_SIDE_EFFECT_CHANNELS = new Set<string>([
   "canvas:copy-text",
 ]);
 
+/**
+ * 启动/恢复的这些通道即使健康路径通常只读，也可能持有 activation fence、推进
+ * pending restore 或执行必要 compatibility repair，必须始终走强门禁。
+ */
+export const RUNTIME_GATE_MUTATION_CHANNELS = new Set<string>([
+  "canvas:reconcile-active-managed-project-startup",
+  "canvas:validate-restored-managed-project-shell",
+  "canvas:release-restored-managed-project-shell-validation",
+]);
+
 /** 兼容旧调用方；语义仅代表“wrapper 不能无条件绕过门禁”。 */
 export function runtimeGateRequiredForIpc(channel: string): boolean {
   return runtimeIpcGateMode(channel) !== "bypass";
@@ -61,6 +79,7 @@ export function runtimeIpcEffect(channel: string): RuntimeIpcEffect {
   if (RUNTIME_GATE_DIAGNOSTIC_READ_CHANNELS.has(channel)) return "diagnostic-read";
   if (RUNTIME_GATE_READ_ONLY_CHANNELS.has(channel)) return "read-only";
   if (RUNTIME_GATE_EXTERNAL_SIDE_EFFECT_CHANNELS.has(channel)) return "external-side-effect";
+  if (RUNTIME_GATE_MUTATION_CHANNELS.has(channel)) return "mutation";
   return "mutation";
 }
 

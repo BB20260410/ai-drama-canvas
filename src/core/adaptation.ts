@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
-import { access, mkdir, readFile, realpath } from "node:fs/promises";
+import { access, mkdir, realpath } from "node:fs/promises";
 import path from "node:path";
 import { getStoryboard, upsertStoryboardRow } from "./production.js";
 import { getProjectIndex, scanAndPersist } from "./service.js";
 import { appendEvent, getSidecarPaths, loadProjectConfig, readJson, writeJsonAtomic, writeTextAtomic } from "./sidecar.js";
 import { withProjectLock } from "./locks.js";
+import { loadStoryAnalysisSnapshot, loadStoryLibrarySnapshot } from "./story.js";
 import type {
   AdaptationChangeImpact,
   AdaptationPlan,
@@ -91,8 +92,8 @@ const loadStore = loadAdaptationStore;
 const saveStore = saveAdaptationStore;
 
 async function loadLibrary(projectRoot: string): Promise<StoryLibrary> {
-  const library = await readJson<StoryLibrary | null>(getSidecarPaths(projectRoot).storyIndex, null);
-  if (!library || library.schemaVersion !== 1 || !Array.isArray(library.sources) || !Array.isArray(library.chapters) || !Number.isInteger(library.revision)) throw new Error("没有可分析的真实章节索引，请先导入小说原文。 ");
+  const library = await loadStoryLibrarySnapshot(projectRoot);
+  if (!library.sources.length || !library.chapters.length) throw new Error("没有可分析的真实章节索引，请先导入小说原文。 ");
   return library;
 }
 
@@ -147,7 +148,9 @@ function sentenceSpans(content: string): Array<{ text: string; start: number; en
 
 export async function analyzeNovelChapters(projectRoot: string, input: { expectedRevision: number }): Promise<AdaptationStore> {
   return withProjectLock(projectRoot, "adaptation", async () => {
-    const library = await loadLibrary(projectRoot);
+    const analysisSnapshot = await loadStoryAnalysisSnapshot(projectRoot);
+    const library = analysisSnapshot.library;
+    if (!library.sources.length || !library.chapters.length) throw new Error("没有可分析的真实章节索引，请先导入小说原文。 ");
     const store = await loadStore(projectRoot);
     if (store.revision !== input.expectedRevision) throw new Error(`改编工作区修订冲突，当前为 ${store.revision}。`);
     const existingFacts = new Map(store.facts.map((fact) => [fact.id, fact]));
@@ -155,10 +158,10 @@ export async function analyzeNovelChapters(projectRoot: string, input: { expecte
     const facts: NovelFact[] = [];
     const beats: NarrativeBeat[] = [];
     let beatOrder = 1;
-    for (const chapter of [...library.chapters].sort((a, b) => a.sourceId.localeCompare(b.sourceId) || a.index - b.index)) {
-      const raw = await readFile(chapter.path, "utf8");
-      const content = raw.endsWith("\n") ? raw.slice(0, -1) : raw;
-      if (hash(content, 64) !== chapter.sha256) throw new Error(`章节快照哈希不匹配，停止分析：${chapter.id}`);
+    for (const frozen of [...analysisSnapshot.chapters].sort((left, right) =>
+      left.chapter.sourceId.localeCompare(right.chapter.sourceId) || left.chapter.index - right.chapter.index)) {
+      const chapter = frozen.chapter;
+      const content = frozen.content.endsWith("\n") ? frozen.content.slice(0, -1) : frozen.content;
       for (const sentence of sentenceSpans(content)) {
         const span: SourceSpan = { sourceId: chapter.sourceId, chapterId: chapter.id, chapterRevision: chapter.revision, chapterSha256: chapter.sha256, startOffset: sentence.start, endOffset: sentence.end, text: sentence.text };
         const sentenceFacts = factDrafts(sentence.text).map((draft) => {

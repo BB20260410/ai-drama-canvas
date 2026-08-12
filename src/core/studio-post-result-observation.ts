@@ -10,6 +10,8 @@ import { constants as fsConstants } from "node:fs";
 import { lstat, open, realpath } from "node:fs/promises";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
+import { digestStudioCanonicalJson as digest } from "./studio-canonical-json.js";
 import { inspectManagedProject, inspectManagedProjectReadOnly } from "./managed-project.js";
 import {
   assertSafeSqliteSidecars,
@@ -301,19 +303,6 @@ function fail(
   details: string[] = [],
 ): never {
   throw new StudioPostResultObservationError(code, message, details);
-}
-
-function stableValue(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(stableValue);
-  if (!value || typeof value !== "object") return value;
-  return Object.fromEntries(Object.entries(value as Record<string, unknown>)
-    .filter(([, entry]) => entry !== undefined)
-    .sort(([left], [right]) => left.localeCompare(right, "en"))
-    .map(([key, entry]) => [key, stableValue(entry)]));
-}
-
-function digest(value: unknown): string {
-  return createHash("sha256").update(JSON.stringify(stableValue(value)), "utf8").digest("hex");
 }
 
 function requiredText(value: unknown, label: string, maximum = 8_000): string {
@@ -985,11 +974,12 @@ async function ensureSchema(databasePath: string): Promise<void> {
 
   assertSqliteSourceBindingIdentity(databasePath, sourceIdentity, "post-result observation ledger");
   assertSafeSqliteSidecars(databasePath, "post-result observation ledger");
-  const db = new DatabaseSync(databasePath, { timeout: BUSY_TIMEOUT_MS });
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
+  const db = new DatabaseSync(databasePath, { timeout: busyTimeoutMs });
   try {
     assertSafeSqliteSidecars(databasePath, "post-result observation ledger");
     assertSqliteSourceBindingIdentity(databasePath, sourceIdentity, "post-result observation ledger");
-    db.exec(`PRAGMA busy_timeout=${BUSY_TIMEOUT_MS}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
+    db.exec(`PRAGMA busy_timeout=${busyTimeoutMs}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
     db.exec("BEGIN IMMEDIATE");
     try {
       assertBaseSchema(db);
@@ -1220,11 +1210,12 @@ async function inspectEvidenceMediaIdentity(
 function openDatabase(context: DatabaseContext): DatabaseSync {
   assertSafeSqliteSidecars(context.databasePath, "post-result observation ledger");
   assertSqliteSourceBindingIdentity(context.databasePath, context.sourceIdentity, "post-result observation ledger");
-  const db = new DatabaseSync(context.databasePath, { timeout: BUSY_TIMEOUT_MS });
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
+  const db = new DatabaseSync(context.databasePath, { timeout: busyTimeoutMs });
   try {
     assertSafeSqliteSidecars(context.databasePath, "post-result observation ledger");
     assertSqliteSourceBindingIdentity(context.databasePath, context.sourceIdentity, "post-result observation ledger");
-    db.exec(`PRAGMA busy_timeout=${BUSY_TIMEOUT_MS}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
+    db.exec(`PRAGMA busy_timeout=${busyTimeoutMs}; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;`);
     const journal = db.prepare("PRAGMA journal_mode").get() as { journal_mode?: string } | undefined;
     if (journal?.journal_mode?.toLowerCase() !== "wal") {
       fail("storage-invalid", "实际末态观察必须复用 WAL generation ledger。");

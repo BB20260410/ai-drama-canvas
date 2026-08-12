@@ -70,7 +70,7 @@
             :data-asset-id="item.id"
             @click="selectAsset(item.id)">
             <figure>
-              <img v-if="item.thumbnail" loading="lazy" :src="assetUrl(item.thumbnail.path, item.thumbnail.sha256)" :alt="`${item.id} ${item.canonicalName}`" />
+              <img v-if="item.thumbnail" loading="lazy" decoding="async" :src="assetUrl(item.thumbnail.path, item.thumbnail.sha256)" :alt="`${item.id} ${item.canonicalName}`" />
               <span v-else><ImageIcon :size="22" />尚无权威图片</span>
             </figure>
             <div class="card-copy">

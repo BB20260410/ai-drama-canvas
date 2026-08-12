@@ -4,6 +4,7 @@ import {
   STUDIO_CODEX_PUBLIC_COMMAND_SCHEMA_OPTIONS,
   STUDIO_INTERNAL_COMMAND_NAMES,
   STUDIO_PUBLIC_COMMAND_NAMES,
+  STUDIO_UNTRUSTED_HIGGSFIELD_COMMAND_NAMES,
   STUDIO_USER_PUBLIC_COMMAND_SCHEMA_OPTIONS,
   isStudioCommandName,
   isStudioInternalCommandName,
@@ -33,14 +34,17 @@ const reviewerEnvelope = (command: "confirm_studio_panel_empty", reviewer: "user
 });
 
 describe("Studio 命令运行时唯一 schema owner", () => {
-  it("47 条 public 与 2 条 internal 精确分离，三种 actor 由同一名单派生", () => {
-    expect(STUDIO_PUBLIC_COMMAND_NAMES).toHaveLength(47);
+  it("56 条已知 public 与 2 条 internal 精确分离，8 条不可信 connector 命令从全部公开 actor schema 移除", () => {
+    const disabled = [...STUDIO_UNTRUSTED_HIGGSFIELD_COMMAND_NAMES];
+    const sharedPublic = STUDIO_PUBLIC_COMMAND_NAMES.filter((name) => !disabled.includes(name as never));
+    expect(STUDIO_PUBLIC_COMMAND_NAMES).toHaveLength(56);
     expect(STUDIO_INTERNAL_COMMAND_NAMES).toEqual(["initialize_material_studio", "initialize_studio_production"]);
-    expect(new Set(STUDIO_PUBLIC_COMMAND_NAMES).size).toBe(47);
+    expect(new Set(STUDIO_PUBLIC_COMMAND_NAMES).size).toBe(56);
     expect(STUDIO_PUBLIC_COMMAND_NAMES.some((name) => STUDIO_INTERNAL_COMMAND_NAMES.includes(name as never))).toBe(false);
-    expect(optionNames(STUDIO_ANY_ACTOR_PUBLIC_COMMAND_SCHEMA_OPTIONS)).toEqual([...STUDIO_PUBLIC_COMMAND_NAMES]);
-    expect(optionNames(STUDIO_CODEX_PUBLIC_COMMAND_SCHEMA_OPTIONS as typeof STUDIO_ANY_ACTOR_PUBLIC_COMMAND_SCHEMA_OPTIONS)).toEqual([...STUDIO_PUBLIC_COMMAND_NAMES]);
-    expect(optionNames(STUDIO_USER_PUBLIC_COMMAND_SCHEMA_OPTIONS as typeof STUDIO_ANY_ACTOR_PUBLIC_COMMAND_SCHEMA_OPTIONS)).toEqual([...STUDIO_PUBLIC_COMMAND_NAMES]);
+    expect(optionNames(STUDIO_CODEX_PUBLIC_COMMAND_SCHEMA_OPTIONS as typeof STUDIO_ANY_ACTOR_PUBLIC_COMMAND_SCHEMA_OPTIONS)).toEqual(sharedPublic);
+    expect(optionNames(STUDIO_ANY_ACTOR_PUBLIC_COMMAND_SCHEMA_OPTIONS)).toEqual(sharedPublic);
+    expect(optionNames(STUDIO_USER_PUBLIC_COMMAND_SCHEMA_OPTIONS as typeof STUDIO_ANY_ACTOR_PUBLIC_COMMAND_SCHEMA_OPTIONS)).toEqual(sharedPublic);
+    expect(STUDIO_PUBLIC_COMMAND_NAMES.filter((name) => !sharedPublic.includes(name))).toEqual(disabled);
     expect(STUDIO_PUBLIC_COMMAND_NAMES.every(isStudioPublicCommandName)).toBe(true);
     expect(STUDIO_INTERNAL_COMMAND_NAMES.every(isStudioInternalCommandName)).toBe(true);
     expect([...STUDIO_PUBLIC_COMMAND_NAMES, ...STUDIO_INTERNAL_COMMAND_NAMES].every(isStudioCommandName)).toBe(true);

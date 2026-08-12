@@ -8,6 +8,7 @@ import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { inspectManagedProject } from "./managed-project.js";
 import { getMaterialStudioState } from "./material-studio.js";
+import { studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
 
 export const STUDIO_MEDIA_GC_SCHEMA_VERSION = 1 as const;
 
@@ -52,8 +53,9 @@ async function listFilesRecursive(root: string, prefix = ""): Promise<Array<{ re
 }
 
 function openMaterialDb(databasePath: string): DatabaseSync {
-  const db = new DatabaseSync(databasePath);
-  db.exec("PRAGMA busy_timeout=5000;");
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(5_000);
+  const db = new DatabaseSync(databasePath, { timeout: busyTimeoutMs });
+  db.exec(`PRAGMA busy_timeout=${busyTimeoutMs};`);
   return db;
 }
 

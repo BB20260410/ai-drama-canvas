@@ -18,7 +18,7 @@ import { listCommandLedger } from "./command-bus.js";
 import { resolveRuntimeBuildIdentity, type BuildIdentity } from "./build-identity.js";
 import { assertRuntimeBuildCurrentness } from "./project-backup.js";
 import { getAdaptationWorkspace } from "./adaptation.js";
-import { getNovelAnalysisProviderSettings, listNovelAnalysisRunProgress } from "./novel-analysis-provider.js";
+import { getNovelAnalysisExecutionRecoveryStatus, getNovelAnalysisProviderSettings, listNovelAnalysisRunProgress } from "./novel-analysis-provider.js";
 import { getCanvasHistoryInfo, getCanvasSemanticState } from "./canvas-state.js";
 import { getFusionAssetConsistencyState, type FusionAssetConsistencyState } from "./fusion-asset-consistency.js";
 import { getUnitTimelines } from "./timeline.js";
@@ -68,6 +68,7 @@ import {
   AI_CANVAS_PROTOCOL_VERSION,
 } from "./release-manifest.js";
 import { withStudioRequestSchemaCache } from "./studio-request-schema-cache.js";
+import { NOVEL_AGENT_CAPABILITIES } from "./novel-agent-service.js";
 
 export { AI_CANVAS_PROTOCOL_VERSION } from "./release-manifest.js";
 
@@ -1127,7 +1128,7 @@ export async function getCapabilities(
   } else {
     buildCurrentness = runtime.buildCurrentness ?? undefined;
   }
-  return {
+  const capabilities = {
     server: {
       name: "ai-drama-canvas",
       version: AI_CANVAS_APPLICATION_VERSION,
@@ -1171,6 +1172,7 @@ export async function getCapabilities(
       visualReviewGate: true,
       binaryPayloadsInMcp: false,
     },
+    novelAgent: NOVEL_AGENT_CAPABILITIES,
     domains: {
       import: ["list_projects", "preview_project_import", "commit_project_import", "preview_scan_project", "scan_project"],
       orchestration: ["get_progress", "get_project_snapshot", "doctor_project", "get_next_task", "create_task_pack", "claim_task", "heartbeat_task", "release_task", "cancel_task", "finish_batch"],
@@ -1183,6 +1185,7 @@ export async function getCapabilities(
       publication: ["list_publications", "preflight_publication", "register_publication", "cancel_publication", "fail_publication"],
       review: ["get_review_queue", "submit_review", "list_reviews"],
       story: ["import_story_file", "import_story_text", "list_story_sources", "list_story_chapters", "read_story_chapter", "list_story_events", "upsert_story_event", "connect_story_events", "build_story_context", "get_adaptation_workspace", "create_novel_analysis_task", "get_novel_analysis_providers", "upsert_novel_analysis_provider", "probe_novel_analysis_provider", "plan_novel_analysis_run", "get_novel_analysis_runs", "execute_next_novel_analysis_run_task", "replace_novel_analysis_run_task", "execute_novel_analysis_task", "submit_novel_analysis_proposal", "list_novel_analysis_reviews", "review_novel_analysis_item", "review_novel_analysis_batch", "analyze_novel_chapters", "upsert_novel_fact", "upsert_narrative_beat", "generate_adaptation_plans", "validate_adaptation_plan", "analyze_adaptation_impact", "regenerate_adaptation_scope", "select_adaptation_plan", "materialize_adaptation_plan", "export_adaptation"],
+      novelManuscript: ["doctor_novel_agent", "get_novel_manuscript_workspace", "list_novel_manuscript_chapters", "read_novel_manuscript_range", "search_novel_manuscript", "get_novel_search_index_status", "get_novel_writing_state", "plan_novel_state_rebuild", "probe_novel_chapter_consistency", "build_novel_context_pack", "prepare_novel_chapter_write", "preflight_novel_chapter_write", "execute_command"],
       productionDesign: ["get_production_workflow", "preview_existing_production_recovery", "commit_existing_production_recovery", "update_production_workflow_stage", "list_creative_bibles", "upsert_creative_bible", "get_storyboard", "upsert_storyboard_row", "analyze_change_impact"],
       documents: ["list_script_documents", "read_script_document", "save_script_document"],
       timeline: ["get_unit_timelines", "save_unit_timeline", "create_shot_task_pack"],
@@ -1190,7 +1193,7 @@ export async function getCapabilities(
       canvas: ["get_canvas_state", "upsert_canvas_entity", "delete_canvas_entity", "upsert_canvas_link", "delete_canvas_link", "undo_canvas", "redo_canvas"],
       editor: ["probe_video_engine", "list_edit_projects", "get_edit_project", "list_edit_media", "prepare_edit_media_preview", "prepare_edit_media_proxy", "create_edit_project", "apply_edit_operation", "save_edit_project", "get_edit_history_info", "undo_edit_project", "redo_edit_project", "export_edit_otio", "import_edit_otio", "start_edit_render", "get_edit_render_job", "cancel_edit_render", "list_edit_render_jobs", "extract_timeline_frame", "list_timeline_frames", "prepare_timeline_continuation", "extract_last_frame", "create_video_continuation", "list_video_continuations", "update_video_continuation"],
     },
-    commandTypes: ["scan_project", "stage_dudu_readonly_managed_project", "import_studio_media", "create_studio_asset", "update_studio_asset", "append_studio_asset_relation", "append_studio_asset_version", "review_studio_asset_version", "set_studio_primary_authority", "reuse_studio_global_resource", "create_studio_script_document", "create_studio_prompt_document", "append_studio_script_revision", "append_studio_script_section_revision", "append_studio_prompt_revision", "create_studio_production_unit", "revise_studio_production_unit", "materialize_local_creative_production_units", "analyze_studio_script_entities", "resolve_studio_entity_proposal", "confirm_studio_panel_empty", "freeze_studio_asset_binding_set", "freeze_studio_generation_pack", "dispatch_studio_generation_pack", "prepare_studio_imagegen_call", "reconcile_studio_imagegen_call", "abandon_studio_generation_unknown", "abandon_studio_detached_generation_unknown", "rebind_studio_imagegen_call_context", "register_studio_generation_result", "commit_agent_imagegen_result_bundle", "append_studio_continuity_observation", "append_studio_continuity_correction", "submit_studio_generation_review", "submit_studio_post_result_observation", "refresh_studio_generation_checkpoint", "attest_studio_generation_checkpoint", "create_studio_generation_plan", "fail_studio_generation_run", "cancel_studio_generation_run", "retry_studio_generation_plan_nodes", "finalize_dudu_readonly_managed_project", "prepare_studio_video_package_export", "build_studio_video_package", "attach_studio_multimedia_timeline_media", "materialize_fusion_project", "migrate_canonical_assets", "build_fusion_reference_board", "build_fusion_storyboard_grid", "materialize_fusion_panel_references", "materialize_fusion_visual_constraints", "upsert_fusion_visual_constraint_override", "upsert_panel_reference_override", "register_derived_panel_reference_artifact", "migrate_fusion_storyboard_evidence", "migrate_fusion_storyboard_sheets", "render_fusion_storyboard_sheet", "prepare_fusion_asset_consistency_review", "submit_fusion_asset_consistency_review", "seal_final_fusion_asset_consistency_batch", "commit_project_import", "commit_existing_production_recovery", "update_status", "claim_task", "heartbeat_task", "release_task", "cancel_task", "finish_batch", "create_task_pack", "create_shot_task_pack", "save_unit_timeline", "register_artifact", "verify_item", "set_authoritative_artifact", "promote_asset_to_hard_lock", "upsert_generation_provider", "enqueue_generation", "process_generation_queue", "cancel_generation", "update_browser_generation", "update_subagent_image_generation", "migrate_generation_execution_state", "reconcile_http_generation_submission", "preflight_publication", "register_publication", "cancel_publication", "fail_publication", "preflight_publication_bundle", "register_publication_bundle", "cancel_publication_bundle", "fail_publication_bundle", "submit_review", "upsert_context", "delete_context", "import_story_file", "import_story_text", "create_novel_analysis_task", "upsert_novel_analysis_provider", "plan_novel_analysis_run", "execute_next_novel_analysis_run_task", "replace_novel_analysis_run_task", "execute_novel_analysis_task", "submit_novel_analysis_proposal", "review_novel_analysis_item", "review_novel_analysis_batch", "analyze_novel_chapters", "generate_adaptation_plans", "regenerate_adaptation_scope", "select_adaptation_plan", "materialize_adaptation_plan", "upsert_novel_fact", "upsert_narrative_beat", "export_adaptation", "upsert_story_event", "connect_story_events", "update_workflow_stage", "upsert_creative_bible", "upsert_storyboard_row", "upsert_asset_relation", "upsert_voice_identity", "upsert_canvas_entity", "delete_canvas_entity", "upsert_canvas_link", "delete_canvas_link", "undo_canvas", "redo_canvas", "save_skill", "create_handoff", "save_script_document", "create_edit_project", "save_edit_project", "apply_edit_operation", "undo_edit_project", "redo_edit_project", "export_edit_otio", "import_edit_otio", "start_edit_render", "cancel_edit_render", "prepare_edit_media_preview", "prepare_edit_media_proxy", "extract_timeline_frame", "extract_last_frame", "create_video_continuation", "prepare_timeline_continuation", "update_video_continuation"],
+    commandTypes: ["novel_initialize_manuscript", "novel_create_volume", "novel_create_chapter", "novel_save_chapter", "novel_rename_chapter", "novel_move_chapter", "novel_reorder_chapters", "novel_recover_manuscript", "novel_seed_writing_state", "novel_stage_chapter_state_candidate", "novel_review_chapter_state_candidate", "novel_stage_story_bible_candidate", "novel_review_story_bible_candidate", "novel_invalidate_writing_state_from", "novel_attach_review_ticket", "scan_project", "stage_dudu_readonly_managed_project", "import_studio_media", "create_studio_asset", "update_studio_asset", "append_studio_asset_relation", "append_studio_asset_version", "review_studio_asset_version", "set_studio_primary_authority", "reuse_studio_global_resource", "create_studio_script_document", "create_studio_prompt_document", "append_studio_script_revision", "append_studio_script_section_revision", "append_studio_prompt_revision", "create_studio_production_unit", "revise_studio_production_unit", "materialize_local_creative_production_units", "analyze_studio_script_entities", "resolve_studio_entity_proposal", "confirm_studio_panel_empty", "freeze_studio_asset_binding_set", "freeze_studio_generation_pack", "dispatch_studio_generation_pack", "prepare_studio_imagegen_call", "reconcile_studio_imagegen_call", "abandon_studio_generation_unknown", "abandon_studio_detached_generation_unknown", "rebind_studio_imagegen_call_context", "register_studio_generation_result", "commit_agent_imagegen_result_bundle", "append_studio_continuity_observation", "append_studio_continuity_correction", "submit_studio_generation_review", "submit_studio_post_result_observation", "refresh_studio_generation_checkpoint", "attest_studio_generation_checkpoint", "create_studio_generation_plan", "fail_studio_generation_run", "cancel_studio_generation_run", "retry_studio_generation_plan_nodes", "finalize_dudu_readonly_managed_project", "prepare_studio_video_package_export", "build_studio_video_package", "attach_studio_multimedia_timeline_media", "materialize_fusion_project", "migrate_canonical_assets", "build_fusion_reference_board", "build_fusion_storyboard_grid", "materialize_fusion_panel_references", "materialize_fusion_visual_constraints", "upsert_fusion_visual_constraint_override", "upsert_panel_reference_override", "register_derived_panel_reference_artifact", "migrate_fusion_storyboard_evidence", "migrate_fusion_storyboard_sheets", "render_fusion_storyboard_sheet", "prepare_fusion_asset_consistency_review", "submit_fusion_asset_consistency_review", "seal_final_fusion_asset_consistency_batch", "commit_project_import", "commit_existing_production_recovery", "update_status", "claim_task", "heartbeat_task", "release_task", "cancel_task", "finish_batch", "create_task_pack", "create_shot_task_pack", "save_unit_timeline", "register_artifact", "verify_item", "set_authoritative_artifact", "promote_asset_to_hard_lock", "upsert_generation_provider", "enqueue_generation", "process_generation_queue", "cancel_generation", "update_browser_generation", "update_subagent_image_generation", "migrate_generation_execution_state", "reconcile_http_generation_submission", "preflight_publication", "register_publication", "cancel_publication", "fail_publication", "preflight_publication_bundle", "register_publication_bundle", "cancel_publication_bundle", "fail_publication_bundle", "submit_review", "upsert_context", "delete_context", "import_story_file", "import_story_text", "create_novel_analysis_task", "upsert_novel_analysis_provider", "plan_novel_analysis_run", "execute_next_novel_analysis_run_task", "replace_novel_analysis_run_task", "execute_novel_analysis_task", "submit_novel_analysis_proposal", "review_novel_analysis_item", "review_novel_analysis_batch", "analyze_novel_chapters", "generate_adaptation_plans", "regenerate_adaptation_scope", "select_adaptation_plan", "materialize_adaptation_plan", "upsert_novel_fact", "upsert_narrative_beat", "export_adaptation", "upsert_story_event", "connect_story_events", "update_workflow_stage", "upsert_creative_bible", "upsert_storyboard_row", "upsert_asset_relation", "upsert_voice_identity", "upsert_canvas_entity", "delete_canvas_entity", "upsert_canvas_link", "delete_canvas_link", "undo_canvas", "redo_canvas", "save_skill", "create_handoff", "save_script_document", "create_edit_project", "save_edit_project", "apply_edit_operation", "undo_edit_project", "redo_edit_project", "export_edit_otio", "import_edit_otio", "start_edit_render", "cancel_edit_render", "prepare_edit_media_preview", "prepare_edit_media_proxy", "extract_timeline_frame", "extract_last_frame", "create_video_continuation", "prepare_timeline_continuation", "update_video_continuation"],
     limits: { imageBatchMax: 6, videoBatchMax: 3, crossEpisodeBatch: false, storyboardShotsPerUnitMax: 6, unitDurationSecondsMax: 15, mcpReturnsBinary: false },
     managedStudio: {
       projectRoot: "explicit-or-zero-param-active-managed-context",
@@ -1550,6 +1553,44 @@ export async function getCapabilities(
     },
     project,
   };
+  capabilities.domains.novelManuscript.splice(
+    6,
+    0,
+    "list_novel_writing_source_receipts",
+    "compare_novel_writing_source_receipts",
+  );
+  capabilities.domains.novelManuscript.splice(
+    capabilities.domains.novelManuscript.indexOf("plan_novel_state_rebuild") + 1,
+    0,
+    "get_novel_state_rebuild_status",
+  );
+  capabilities.domains.story.splice(
+    capabilities.domains.story.indexOf("get_novel_analysis_runs") + 1,
+    0,
+    "get_novel_analysis_execution_recovery",
+  );
+  capabilities.commandTypes.splice(
+    capabilities.commandTypes.indexOf("novel_recover_manuscript"),
+    0,
+    "novel_rebuild_search_index",
+  );
+  capabilities.commandTypes.splice(
+    capabilities.commandTypes.indexOf("novel_recover_manuscript") + 1,
+    0,
+    "novel_recover_writing_state",
+  );
+  capabilities.commandTypes.splice(
+    capabilities.commandTypes.indexOf("novel_attach_review_ticket") + 1,
+    0,
+    "novel_import_writing_source_snapshot",
+  );
+  capabilities.commandTypes.splice(
+    capabilities.commandTypes.indexOf("replace_novel_analysis_run_task") + 1,
+    0,
+    "mark_novel_analysis_execution_reconciliation_required",
+    "reconcile_novel_analysis_execution",
+  );
+  return capabilities;
 }
 
 export async function getProjectChanges(projectRoot: string, cursor?: string, limit = 200) {
@@ -2021,12 +2062,14 @@ export async function doctorProject(projectRoot: string) {
     const planErrors = adaptationWorkspace.plans.reduce((sum, plan) => sum + plan.validation.hardErrors.length, 0);
     const pendingAnalysisReviews = adaptationWorkspace.analysisReviews.filter((review) => review.status === "pending");
     const evidenceIssueReviews = pendingAnalysisReviews.filter((review) => review.evidenceIssues.length);
-    const uncertainAnalysisTasks = adaptationWorkspace.analysisTasks.filter((task) => task.status === "executing" || task.status === "submission_unknown");
+    const uncertainAnalysisTasks = adaptationWorkspace.analysisTasks.filter((task) => ["executing", "reconciliation_required", "submission_unknown"].includes(task.status));
+    const analysisExecutionRecovery = await getNovelAnalysisExecutionRecoveryStatus(root).catch(() => null);
+    const reconciliationCandidates = analysisExecutionRecovery?.candidates.length ?? 0;
     const analysisRuns = await listNovelAnalysisRunProgress(root).catch(() => []);
     const blockedAnalysisRuns = analysisRuns.filter((run) => run.status === "blocked" || run.status === "stale");
     const missingAnalysisTaskFiles = (await Promise.all(adaptationWorkspace.analysisTasks.flatMap((task) => [task.taskJsonPath, task.taskMarkdownPath]).map(async (filePath) => await canAccess(filePath, fsConstants.R_OK) ? "" : filePath))).filter(Boolean);
-    const adaptationWarning = Boolean(planErrors || evidenceIssueReviews.length || missingAnalysisTaskFiles.length || uncertainAnalysisTasks.length || blockedAnalysisRuns.length);
-    checks.push({ id: "adaptation-workspace", level: adaptationWarning ? "warning" : "ok", title: "小说自动改编", detail: `${adaptationWorkspace.facts.length} 条事实、${adaptationWorkspace.beats.length} 个节拍、${adaptationWorkspace.plans.length} 个方案；${analysisRuns.length} 个长篇分析运行，其中 ${blockedAnalysisRuns.length} 个阻塞或失效；${pendingAnalysisReviews.length} 个模型提案待确认，其中 ${evidenceIssueReviews.length} 个证据异常；${uncertainAnalysisTasks.length} 个模型执行中或回执不明；${missingAnalysisTaskFiles.length} 个任务文件缺失；${planErrors} 个方案硬错误。`, suggestedAction: uncertainAnalysisTasks.length ? "读取任务执行记录、命令账本和 Provider 后台对账；禁止自动重提。" : blockedAnalysisRuns.length ? "调用 get_novel_analysis_runs 读取阻塞原因；章节或 Provider 修订漂移时重新规划未执行内容。" : missingAnalysisTaskFiles.length ? "重新创建模型分析任务，不要根据丢失任务包继续提交。" : evidenceIssueReviews.length ? "在人工确认队列核对原文字符区间；证据异常提案不能接受。" : planErrors ? "调用 validate_adaptation_plan，修复来源修订、时长、对白或硬锁冲突后再物化。" : undefined, paths: [paths.storyAdaptation, ...missingAnalysisTaskFiles.slice(0, 20)] });
+    const adaptationWarning = Boolean(planErrors || evidenceIssueReviews.length || missingAnalysisTaskFiles.length || uncertainAnalysisTasks.length || blockedAnalysisRuns.length || reconciliationCandidates);
+    checks.push({ id: "adaptation-workspace", level: adaptationWarning ? "warning" : "ok", title: "小说自动改编", detail: `${adaptationWorkspace.facts.length} 条事实、${adaptationWorkspace.beats.length} 个节拍、${adaptationWorkspace.plans.length} 个方案；${analysisRuns.length} 个长篇分析运行，其中 ${blockedAnalysisRuns.length} 个阻塞或失效；${pendingAnalysisReviews.length} 个模型提案待确认，其中 ${evidenceIssueReviews.length} 个证据异常；${uncertainAnalysisTasks.length} 个模型执行中/待对账/回执不明，其中 ${reconciliationCandidates} 个需要恢复对账；${missingAnalysisTaskFiles.length} 个任务文件缺失；${planErrors} 个方案硬错误。`, suggestedAction: reconciliationCandidates ? "先调用 get_novel_analysis_execution_recovery，按 execution fence 与 request hash 人工对账；禁止重 POST 或自动 replacement。" : uncertainAnalysisTasks.length ? "读取任务执行记录、命令账本和 Provider 后台对账；禁止自动重提。" : blockedAnalysisRuns.length ? "调用 get_novel_analysis_runs 读取阻塞原因；章节或 Provider 修订漂移时重新规划未执行内容。" : missingAnalysisTaskFiles.length ? "重新创建模型分析任务，不要根据丢失任务包继续提交。" : evidenceIssueReviews.length ? "在人工确认队列核对原文字符区间；证据异常提案不能接受。" : planErrors ? "调用 validate_adaptation_plan，修复来源修订、时长、对白或硬锁冲突后再物化。" : undefined, paths: [paths.storyAdaptation, ...missingAnalysisTaskFiles.slice(0, 20)] });
   }
 
   const artifactIds = new Set(index.artifacts.map((artifact) => artifact.id));

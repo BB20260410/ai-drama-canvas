@@ -1,7 +1,12 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, readdir, type FileHandle } from "node:fs/promises";
+import { lstat, mkdir, readdir, type FileHandle } from "node:fs/promises";
 import path from "node:path";
 import { SIDECAR_DIR } from "./constants.js";
+import {
+  MANAGED_WRITER_FENCE_FILE,
+  managedProjectRequiresWriterFence,
+  managedV2LockDirectory,
+} from "./managed-writer-fence.js";
 import {
   ensureConfinedDirectory,
   inspectExistingConfinedDirectory,
@@ -66,6 +71,45 @@ function safeLockName(name: string): string {
 
 function lockDirectory(projectRoot: string): string {
   return path.join(path.resolve(projectRoot), SIDECAR_DIR, "locks");
+}
+
+async function projectLockDirectory(projectRoot: string): Promise<string> {
+  const root = path.resolve(projectRoot);
+  const legacyDirectory = lockDirectory(root);
+  const sidecarPath = path.join(root, SIDECAR_DIR);
+  try {
+    const sidecarMetadata = await lstat(sidecarPath);
+    if (sidecarMetadata.isSymbolicLink()) throw new Error("项目侧车目录禁止使用符号链接。");
+    if (!sidecarMetadata.isDirectory()) throw new Error("项目侧车路径必须是目录。");
+  } catch (error) {
+    if (errorCode(error) === "ENOENT") return legacyDirectory;
+    throw error;
+  }
+  try {
+    await inspectExistingConfinedDirectory(root, legacyDirectory);
+    if (await managedProjectRequiresWriterFence(root)) {
+      throw new Error("schema v2 项目的 writer fence 被目录替换，拒绝退回旧锁协议。");
+    }
+    return legacyDirectory;
+  } catch (error) {
+    if (errorCode(error) === "ENOENT") {
+      if (await managedProjectRequiresWriterFence(root)) {
+        throw new Error("schema v2 项目缺少 writer fence，拒绝退回旧锁协议。");
+      }
+      return legacyDirectory;
+    }
+    if (error instanceof Error && error.message.includes("拒绝退回旧锁协议")) throw error;
+  }
+
+  // `.aicanvas/locks` 不是目录时只接受完整、与 schema v2 manifest 绑定的
+  // writer fence。符号链接、特殊节点、损坏载荷和伪造 manifest 一律失败关闭。
+  const metadata = await lstat(legacyDirectory);
+  if (metadata.isSymbolicLink()) throw new Error("项目锁目录或 writer fence 禁止使用符号链接。");
+  if (!metadata.isFile()) throw new Error("项目锁目录不是目录，且不是有效 writer fence 普通文件。");
+  if (path.basename(legacyDirectory) !== MANAGED_WRITER_FENCE_FILE) {
+    throw new Error("项目 writer fence 路径约定已漂移。");
+  }
+  return managedV2LockDirectory(root);
 }
 
 function wait(milliseconds: number): Promise<void> {
@@ -355,7 +399,7 @@ async function ensureLockDirectory(directory: string, confinementRoot?: string):
 }
 
 export async function listProjectLocks(projectRoot: string, staleMs = DEFAULT_STALE_MS): Promise<ProjectLockInfo[]> {
-  const directoryPath = lockDirectory(projectRoot);
+  const directoryPath = await projectLockDirectory(projectRoot);
   let directory: ConfinedDirectoryIdentity;
   try {
     directory = await inspectExistingConfinedDirectory(path.resolve(projectRoot), directoryPath);
@@ -494,5 +538,5 @@ export async function withProjectLock<T>(
   options: Omit<FileLockOptions, "confinementRoot"> = {},
 ): Promise<T> {
   const root = path.resolve(projectRoot);
-  return withFileLock(lockDirectory(root), name, work, { ...options, confinementRoot: root });
+  return withFileLock(await projectLockDirectory(root), name, work, { ...options, confinementRoot: root });
 }

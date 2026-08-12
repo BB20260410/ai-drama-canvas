@@ -1,19 +1,27 @@
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   STUDIO_SQLITE_BUSY_RETRY_BUDGET_MS,
   STUDIO_SQLITE_BUSY_RETRY_MAX_ATTEMPTS,
   STUDIO_SQLITE_READ_BUSY_TIMEOUT_MS,
   STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS,
+  RetrySafeSqliteBusyError,
+  isRetrySafeSqliteBusyError,
   isSqliteBusyError,
   sqliteBusyDetailMessage,
   withSqliteBusyRetry,
 } from "../src/core/studio-sqlite-busy.js";
+import {
+  __setBeforeCommandLedgerWritableOpenHookForTests,
+  commandLedgerSqlitePathFor,
+  upsertCommandLedgerEntry,
+} from "../src/core/command-ledger-store.js";
 import { classifyToolError } from "../src/core/tool-error-classification.js";
 import { executeIdempotentCommand, listCommandLedger, reconcileCommand } from "../src/core/command-bus.js";
-import { scanAndPersist } from "../src/core/service.js";
+import { __setAfterScanIndexCommitHookForTests, getProjectIndex, scanAndPersist } from "../src/core/service.js";
 import { ensureSidecar, getSidecarPaths, listTaskPacks, writeJsonAtomic } from "../src/core/sidecar.js";
 import { seedProductionReady } from "./workflow-helpers.js";
 
@@ -25,6 +33,8 @@ afterEach(async () => {
   delete process.env.AI_CANVAS_TEST_COMMAND_BUSY_AFTER_EXECUTE;
   delete process.env.AI_CANVAS_TEST_COMMAND_DELAY_COMMAND;
   delete process.env.AI_CANVAS_TEST_COMMAND_DELAY_MS;
+  __setBeforeCommandLedgerWritableOpenHookForTests(null);
+  __setAfterScanIndexCommitHookForTests(undefined);
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
 });
 
@@ -73,13 +83,23 @@ describe("studio-sqlite-busy", () => {
     expect(isSqliteBusyError(undefined)).toBe(false);
   });
 
-  it("withSqliteBusyRetry 有界：busy 打满 maxAttempts 后抛出，非 busy 不重试", async () => {
+  it("withSqliteBusyRetry 仅重试 typed 零副作用 busy；原始 busy 与非 busy 都只执行一次", async () => {
     let busyCalls = 0;
     await expect(withSqliteBusyRetry(() => {
       busyCalls += 1;
       return Promise.reject(new Error("database is locked"));
     })).rejects.toThrow("database is locked");
-    expect(busyCalls).toBe(STUDIO_SQLITE_BUSY_RETRY_MAX_ATTEMPTS);
+    expect(busyCalls).toBe(1);
+
+    let safeBusyCalls = 0;
+    await expect(withSqliteBusyRetry(() => {
+      safeBusyCalls += 1;
+      return Promise.reject(new RetrySafeSqliteBusyError(
+        Object.assign(new Error("database is locked"), { errcode: 5 }),
+        { kind: "before_domain_execute" },
+      ));
+    })).rejects.toThrow("database is locked");
+    expect(safeBusyCalls).toBe(STUDIO_SQLITE_BUSY_RETRY_MAX_ATTEMPTS);
 
     let otherCalls = 0;
     await expect(withSqliteBusyRetry(() => {
@@ -91,7 +111,12 @@ describe("studio-sqlite-busy", () => {
     let eventualCalls = 0;
     const value = await withSqliteBusyRetry(() => {
       eventualCalls += 1;
-      return eventualCalls < 3 ? Promise.reject(new Error("database is locked")) : Promise.resolve("ok");
+      return eventualCalls < 3
+        ? Promise.reject(new RetrySafeSqliteBusyError(
+          Object.assign(new Error("database is locked"), { errcode: 5 }),
+          { kind: "before_domain_execute" },
+        ))
+        : Promise.resolve("ok");
     });
     expect(value).toBe("ok");
     expect(eventualCalls).toBe(3);
@@ -116,6 +141,43 @@ describe("studio-sqlite-busy", () => {
     const replayed = await executeIdempotentCommand(root, { ...input, requestId: "request-busy-before-002" });
     expect(replayed.replayed).toBe(true);
     expect(await listTaskPacks(root)).toHaveLength(1);
+  });
+
+  it("command ledger 登记锁竞争继承短 deadline，且 domain 副作用为零", async () => {
+    const root = await fixture();
+    const timestamp = new Date().toISOString();
+    await upsertCommandLedgerEntry(root, {
+      schemaVersion: 1,
+      requestId: "request-ledger-seed-001",
+      idempotencyKey: "ledger-seed-key-001",
+      command: "test_seed",
+      status: "failed",
+      replayed: false,
+      requestHash: "b".repeat(64),
+      error: { message: "seed", observedAt: timestamp },
+      startedAt: timestamp,
+      executedAt: timestamp,
+    }, timestamp);
+    const owner = new DatabaseSync(commandLedgerSqlitePathFor(root));
+    owner.exec("BEGIN IMMEDIATE");
+    const startedAt = Date.now();
+    let failure: unknown;
+    try {
+      failure = await executeIdempotentCommand(
+        root,
+        taskPackInput("request-ledger-busy-001", "ledger-busy-taskpack-unit001-v1"),
+        { deadlineAtMs: Date.now() + 80 },
+      ).catch((error: unknown) => error);
+    } finally {
+      owner.exec("ROLLBACK");
+      owner.close();
+    }
+    expect(isRetrySafeSqliteBusyError(failure)).toBe(true);
+    expect(Date.now() - startedAt).toBeLessThan(800);
+    expect(await listTaskPacks(root)).toHaveLength(0);
+    expect((await listCommandLedger(root)).map((entry) => entry.idempotencyKey)).toEqual([
+      "ledger-seed-key-001",
+    ]);
   });
 
   it("busy-during-commit：重试预算耗尽后分类 RESOURCE_BUSY/retryable=true，绝不 VALIDATION_ERROR；同键受控重试放行", async () => {
@@ -181,6 +243,61 @@ describe("studio-sqlite-busy", () => {
     expect(await listTaskPacks(root)).toHaveLength(1);
   });
 
+  it("登记后没有 try 外 execution-phase 写；第二次 ledger busy 只能落 unknown，不遗留 running", async () => {
+    const root = await fixture();
+    let writableOpenCount = 0;
+    __setBeforeCommandLedgerWritableOpenHookForTests(() => {
+      writableOpenCount += 1;
+      __setBeforeCommandLedgerWritableOpenHookForTests(() => {
+        writableOpenCount += 1;
+        throw Object.assign(new Error("database is locked"), { errcode: 5 });
+      });
+    });
+    const input = taskPackInput(
+      "request-ledger-phase-busy-001",
+      "ledger-phase-busy-taskpack-unit001-v1",
+    );
+    const failure: unknown = await executeIdempotentCommand(root, input)
+      .catch((error: unknown) => error);
+    expect(failure).toBeInstanceOf(Error);
+    expect((failure as Error).message).toContain("结果未确认");
+    expect(writableOpenCount).toBe(2);
+    expect(await listTaskPacks(root)).toHaveLength(1);
+    const ledger = await listCommandLedger(root);
+    expect(ledger).toHaveLength(1);
+    expect(ledger[0]?.status).toBe("unknown");
+    expect(ledger[0]?.execution?.phase).toBe("side_effect_committed");
+  });
+
+  it("scan JSON 提交后 cache busy：只执行一次并锁定 unknown，禁止同键自动重跑", async () => {
+    const root = await fixture();
+    const before = await getProjectIndex(root);
+    await writeFile(path.join(root, "EP01_15s_002_新增单元.md"), "首帧提示词：新增。\n", "utf8");
+    let hookCalls = 0;
+    __setAfterScanIndexCommitHookForTests(() => {
+      hookCalls += 1;
+      throw Object.assign(new Error("database is locked"), { errcode: 5 });
+    });
+    const input = {
+      requestId: "request-scan-partial-busy-001",
+      idempotencyKey: "scan-partial-busy-unit001-v1",
+      request: { command: "scan_project" as const, payload: {} },
+    };
+    const failure: unknown = await executeIdempotentCommand(root, input).catch((error: unknown) => error);
+    expect(failure).toBeInstanceOf(Error);
+    expect((failure as Error).message).toContain("结果未确认");
+    expect(hookCalls).toBe(1);
+    const after = await getProjectIndex(root);
+    expect(after.scanId).not.toBe(before.scanId);
+    expect((await listCommandLedger(root))[0]?.status).toBe("unknown");
+
+    __setAfterScanIndexCommitHookForTests(undefined);
+    await expect(executeIdempotentCommand(root, {
+      ...input,
+      requestId: "request-scan-partial-busy-002",
+    })).rejects.toThrow(/禁止自动重放|unknown/u);
+  });
+
   it("AggregateError 包裹 busy（withFileLock 双失败形态）：识别为 busy，细节文案稳定分类 RESOURCE_BUSY", () => {
     const busy = Object.assign(new Error("database is locked"), { errcode: 5 });
     const cleanup = new Error("项目写锁 studio-mutation ownership 已丢失，已保留替换节点。");
@@ -202,10 +319,10 @@ describe("studio-sqlite-busy", () => {
   });
 
   it("AggregateError 包裹 busy：withSqliteBusyRetry 受控重试后成功，副作用只产生一次", async () => {
-    const aggregate = () => new AggregateError(
+    const aggregate = () => new RetrySafeSqliteBusyError(new AggregateError(
       [Object.assign(new Error("database is locked"), { errcode: 5 }), new Error("锁释放失败")],
       "临界区与释放均失败。",
-    );
+    ), { kind: "before_domain_execute" });
     let calls = 0;
     const value = await withSqliteBusyRetry(() => {
       calls += 1;

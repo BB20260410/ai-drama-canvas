@@ -112,12 +112,12 @@ describe("项目医生损坏侧车诊断", () => {
     await writeFile(novelPath, "# 第一章\n\n阿航握紧完整黄金面具，走入雾中。\n", "utf8");
     const imported = await importStoryFile(root, novelPath);
     await updateProductionWorkflowStage(root, { stageId: "source", status: "completed", evidencePaths: [imported.source.snapshotPath], expectedRevision: 0 });
-    await writeFile(imported.source.snapshotPath, "# 第一章\n\n外部程序改写了快照。\n", "utf8");
+    await writeFile(novelPath, "# 第一章\n\n外部程序改写了原始导入文件。\n", "utf8");
 
     const report = await doctorProject(root);
     expect(report.healthy).toBe(false);
     expect(report.checks).toEqual(expect.arrayContaining([
-      expect.objectContaining({ id: "production-evidence-drift", level: "error", detail: expect.stringContaining("原文快照哈希失配") }),
+      expect.objectContaining({ id: "production-evidence-drift", level: "error", detail: expect.stringContaining("原始导入文件内容已变化") }),
       expect.objectContaining({ id: "production-evidence-verification", level: "ok" }),
     ]));
     expect(report.productionEvidence).toMatchObject({ repairRequired: true, counts: { invalidCompleted: 1, legacyUnverified: 0 }, blockers: [expect.objectContaining({ stageId: "source", statusEvidenceValid: false })], nextRepair: { stageId: "source", reason: "evidence_drift", mustRepairEvidenceFirst: true, executeCommand: { tool: "execute_command", requestIdHint: "request-production-source-r1", idempotencyKeyHint: "production-evidence-source-r1", request: { command: "update_workflow_stage", payload: { stageId: "source", status: "completed", expectedRevision: 1 } } } } });
@@ -125,7 +125,7 @@ describe("项目医生损坏侧车诊断", () => {
 
     const snapshot = await getProjectSnapshot(root);
     expect(snapshot.nextItems).toEqual([]);
-    expect(snapshot.productionDesign.evidence).toMatchObject({ repairRequired: true, blockers: [expect.objectContaining({ stageId: "source", issues: expect.arrayContaining([expect.stringContaining("原文快照哈希失配")]) })] });
+    expect(snapshot.productionDesign.evidence).toMatchObject({ repairRequired: true, blockers: [expect.objectContaining({ stageId: "source", issues: expect.arrayContaining([expect.stringContaining("原始导入文件内容已变化")]) })] });
     expect(snapshot.productionDesign.workflow).not.toHaveProperty("evidenceAudit");
     expect(snapshot.suggestedNextCalls).toEqual(["get_production_workflow", "execute_command", "doctor_project"]);
   });

@@ -3,7 +3,7 @@ import { existsSync, lstatSync, readFileSync } from "node:fs";
 import { access, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import sharp from "sharp";
+import sharp, { type PngOptions } from "sharp";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import {
   evaluateStudioConsistency,
@@ -284,7 +284,7 @@ describe("P19 §7-3 归一化（EXIF/CMYK/灰度/16bit/alpha 归一后同图关�
     const alphaPath = path.join(root, "alpha.png");
     await sharp(pair.resultPath).toColourspace("cmyk").jpeg().toFile(cmykPath);
     await sharp(pair.resultPath).greyscale().png().toFile(grayPath);
-    await sharp(pair.resultPath).png({ bitdepth: 16 } as sharp.PngOptions).toFile(sixteenPath);
+    await sharp(pair.resultPath).png({ bitdepth: 16 } as PngOptions).toFile(sixteenPath);
     await sharp(pair.resultPath).ensureAlpha(0.6).png().toFile(alphaPath);
 
     for (const [label, candidate] of [["CMYK", cmykPath], ["灰度", grayPath], ["16bit", sixteenPath], ["alpha 透明", alphaPath]] as const) {

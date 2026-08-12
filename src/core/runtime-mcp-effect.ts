@@ -27,6 +27,17 @@ export const RUNTIME_GATE_READ_ONLY_MCP_TOOLS = new Set<string>([
   "list_story_events",
   "list_voice_identities",
   "list_asset_relations",
+  "get_novel_manuscript_workspace",
+  "list_novel_manuscript_chapters",
+  "read_novel_manuscript_range",
+  "search_novel_manuscript",
+  "get_novel_search_index_status",
+  "get_novel_analysis_execution_recovery",
+  "get_novel_writing_state",
+  "build_novel_context_pack",
+  "preflight_novel_chapter_write",
+  "get_studio_connector_work_queue",
+  "get_studio_video_generation_control",
 ]);
 
 /**

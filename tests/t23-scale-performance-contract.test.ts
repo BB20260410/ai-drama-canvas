@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   evaluateT23ScalePerformance,
   T23_SCALE_PERFORMANCE_BUDGET,
   type T23ScalePerformanceMeasurements,
 } from "../scripts/lib/t23-scale-performance-contract.js";
+import { t23RendererCyclePageFunction } from "../scripts/lib/t23-renderer-cycle-page-function.mjs";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 const passingMeasurements: T23ScalePerformanceMeasurements = {
   fixtureUnitCount: 36,
@@ -23,6 +29,174 @@ const passingMeasurements: T23ScalePerformanceMeasurements = {
 };
 
 describe("T23 源码 dev 规模硬预算", () => {
+  it("同一 Renderer 文档必须原子返回里程碑、IPC 与 raw 快照", () => {
+    const source = t23RendererCyclePageFunction.toString();
+
+    const timeline = {
+      schemaVersion: 1 as const,
+      milestones: [
+        { milestone: "canvas-first-card-dom-ready", atMs: 123.4 },
+        { milestone: "canvas-raw-span-start:7", atMs: 150 },
+        { milestone: "canvas-first-raw-unit:7:S1E01-U01", atMs: 234 },
+        { milestone: "canvas-first-raw-ready:7", atMs: 345.6 },
+        { milestone: "canvas-all-pass-reference-unit:7:S1E01-U01", atMs: 456 },
+        { milestone: "canvas-all-pass-reference-unit:7:S1E01-U02", atMs: 457 },
+        { milestone: "canvas-all-pass-references-ready:7", atMs: 567.8 },
+        { milestone: "canvas-raw-span-complete:7", atMs: 678 },
+      ],
+    };
+    const rawSnapshot = {
+      loading: false,
+      unitNodeIds: ["S1E01-U01", "S1E01-U02"],
+      corePassUnitIds: ["S1E01-U01", "S1E01-U02"],
+      referenceCount: 2,
+      referenceUnitIds: ["S1E01-U01", "S1E01-U02"],
+      raws: [],
+      references: [],
+    };
+    const probe = {
+      enabled: true,
+      totalCalls: 8,
+      currentOutstanding: 0,
+      peakOutstanding: 3,
+      channels: [],
+      rendererStartupTimeline: timeline,
+    };
+    const pageWindow = {
+      canvasApi: {
+        getT23IpcPerformanceProbeSnapshot: () => probe,
+      },
+      __aiCanvasManagedStudioVerify: {
+        getUnitGridRawSnapshot: () => rawSnapshot,
+      },
+    };
+    // new Function 模拟 Playwright 把函数源码送入隔离页面；没有 tsx 宿主 __name。
+    const input = { expectedPassUnitIds: ["S1E01-U01", "S1E01-U02"], drainBudgetMs: 5_000 };
+    const predicate = new Function("window", "performance", `return (${source});`)(
+      pageWindow,
+      { timeOrigin: 1_000, now: () => 700 },
+    ) as typeof t23RendererCyclePageFunction;
+    const result = predicate(input);
+
+    expect(result)
+      .toMatchObject({
+        ok: true,
+        timeOrigin: 1_000,
+        rendererFirstCardMs: 123,
+        rendererFirstRawMs: 346,
+        rendererAllPassReferencesMs: 568,
+        rawSnapshot,
+        ipcProbe: probe,
+      });
+    expect(source).not.toContain("__name");
+  });
+
+  it("新文档空探针必须等待，同文档完整 timeline 缺 hook 必须明确失败", () => {
+    const source = t23RendererCyclePageFunction.toString();
+    const createPredicate = (pageWindow: object) => new Function(
+      "window",
+      "performance",
+      `return (${source});`,
+    )(pageWindow, { timeOrigin: 2_000, now: () => 900 }) as (
+      input: { expectedPassUnitIds: string[]; drainBudgetMs: number },
+    ) => unknown;
+
+    expect(createPredicate({
+      canvasApi: { getT23IpcPerformanceProbeSnapshot: () => ({ enabled: true, totalCalls: 0 }) },
+    })({ expectedPassUnitIds: ["S1E01-U01"], drainBudgetMs: 5_000 })).toBe(false);
+
+    const completeTimeline = {
+      schemaVersion: 1,
+      milestones: [
+        { milestone: "canvas-first-card-dom-ready", atMs: 100 },
+        { milestone: "canvas-raw-span-start:1", atMs: 200 },
+        { milestone: "canvas-first-raw-unit:1:S1E01-U01", atMs: 300 },
+        { milestone: "canvas-first-raw-ready:1", atMs: 400 },
+        { milestone: "canvas-all-pass-reference-unit:1:S1E01-U01", atMs: 500 },
+        { milestone: "canvas-all-pass-references-ready:1", atMs: 600 },
+        { milestone: "canvas-raw-span-complete:1", atMs: 700 },
+      ],
+    };
+    expect(createPredicate({
+      canvasApi: {
+        getT23IpcPerformanceProbeSnapshot: () => ({
+          enabled: true,
+          totalCalls: 8,
+          currentOutstanding: 0,
+          rendererStartupTimeline: completeTimeline,
+        }),
+      },
+    })({ expectedPassUnitIds: ["S1E01-U01"], drainBudgetMs: 5_000 })).toMatchObject({
+      ok: false,
+      error: "product-hook-missing",
+      timeOrigin: 2_000,
+    });
+  });
+
+  it("App 文档出现后禁止重载重计时，等待总时限固定为 30 秒", () => {
+    const smoke = readFileSync(path.join(root, "scripts/t23-scale-performance-dev-smoke.ts"), "utf8");
+    expect(smoke).toContain("{ timeout: 30_000 }");
+    expect(smoke).toContain("rendererDocumentReloadCount > 0");
+    expect(smoke).toContain("rendererCycle.timeOrigin !== initialRendererTimeOrigin");
+    expect(smoke).toContain("T23 Renderer 在严格测量期间发生重载");
+    expect(smoke).toContain("await launched.page.waitForFunction(");
+    expect(smoke).toContain("t23RendererCyclePageFunction,");
+    expect(smoke).not.toContain("T23_RENDERER_CYCLE_PAGE_FUNCTION");
+    expect(smoke).not.toContain("const expression =");
+    expect(smoke).not.toMatch(/contextAttempts\s*<=\s*2/u);
+  });
+
+  it("真实首卡必须早于 Canvas/Material overview，raw 必须晚于必要 overview", () => {
+    const smoke = readFileSync(path.join(root, "scripts/t23-scale-performance-dev-smoke.ts"), "utf8");
+    expect(smoke).toContain('"canvas-raw-activation-start"');
+    expect(smoke).toContain('"app-startup-reconcile-start"');
+    expect(smoke).toContain('"app-startup-reconcile-ready"');
+    expect(smoke).toContain('["app-managed-shell-ready", "app-startup-reconcile-start"]');
+    expect(smoke).toContain('["app-startup-reconcile-start", "app-startup-reconcile-ready"]');
+    expect(smoke).toContain('["app-startup-reconcile-ready", "canvas-mounted"]');
+    expect(smoke).not.toContain('["app-startup-reconcile-ready", "app-managed-studio-chunks-start"]');
+    expect(smoke).toContain('["canvas-first-card-dom-ready", "canvas-dashboard-overview-start"]');
+    expect(smoke).toContain('["canvas-first-card-dom-ready", "material-overview-start"]');
+    expect(smoke).toContain('["canvas-dashboard-overview-ready", "canvas-raw-activation-start"]');
+    expect(smoke).toContain('["app-managed-shell-ready", "app-managed-studio-chunks-start"]');
+    expect(smoke).toContain('["app-managed-studio-chunks-start", "app-bootstrap-reads-ready"]');
+    expect(smoke).toContain('["app-managed-studio-chunks-ready", "canvas-mounted"]');
+    expect(smoke).toContain('entry.milestone.startsWith("canvas-first-card-dom-unit:")');
+    expect(smoke).toContain("expectedUnitIds.has(firstCardUnitId)");
+    expect(smoke).toContain("readLatestT23RawReferenceSpan");
+    expect(smoke).toContain("assertCompleteT23RawReferenceSpan");
+    expect(smoke).toContain("canvas-raw-span-start");
+    expect(smoke).toContain("canvas-first-raw-ready");
+    expect(smoke).toContain("canvas-all-pass-references-ready");
+    expect(smoke).toContain("canvas-raw-span-complete");
+    expect(smoke).not.toContain("app-project-activation-ready");
+  });
+
+  it("strict smoke 必须从同一 Renderer 快照验收 units 匿名阶段与查询计数", () => {
+    const smoke = readFileSync(path.join(root, "scripts/t23-scale-performance-dev-smoke.ts"), "utf8");
+    expect(smoke).toContain("unitsReadTimeline?:");
+    expect(smoke).toContain("function assertUnitsReadTimeline");
+    expect(smoke).toContain("assertUnitsReadTimeline(probe)");
+    expect(smoke).toContain('"main-managed-project-preflight"');
+    expect(smoke).toContain('"managed-generation-ledger"');
+    expect(smoke).toContain('"production-page"');
+    expect(smoke).toContain("productionBusinessSqlExecutions");
+    expect(smoke).toContain("unitTimingQueries");
+    expect(smoke).toContain("episodeStartQueries");
+    expect(smoke).toContain("6 + 2 * counters.returnedUnitCount");
+  });
+
+  it("成功与失败证据都只能保存脱敏后的 raw/reference 绑定", () => {
+    const smoke = readFileSync(path.join(root, "scripts/t23-scale-performance-dev-smoke.ts"), "utf8");
+    const redactionCalls = smoke.match(/redactT23ScaleRendererProbeForEvidence\(rawSnapshot\)/gu) ?? [];
+
+    expect(redactionCalls).toHaveLength(2);
+    expect(smoke).not.toContain("pageUrl?: string");
+    expect(smoke).not.toContain("bodyText?: string");
+    expect(smoke).not.toContain("report.error = error instanceof Error");
+    expect(smoke).toContain('report.error = "T23_SMOKE_FAILED"');
+  });
+
   it("全部满足时才 PASS", () => {
     expect(evaluateT23ScalePerformance(passingMeasurements)).toMatchObject({
       ok: true,

@@ -25,10 +25,13 @@ import {
 import { cancelPublication, failPublication, getPublicationIntent, preflightPublication, registerPublication } from "./publication.js";
 import { appendEvent, ensureSidecar, getSidecarPaths, loadProjectConfig, readJson, writeJsonAtomic, writeJsonAtomicExclusive } from "./sidecar.js";
 import { getProjectIndex, registerArtifact } from "./service.js";
-import type { Artifact, EditClip, EditKeyframe, EditKeyframeSourceTransform, EditMediaItem, EditMediaPreview, EditNestedTimelinePreview, EditNestedTimelineRef, EditProject, EditRationalFrame, EditRenderDependencyRef, EditRenderJob, EditorRecoveryInfo, EditorSessionOpenResult, EditorSessionResolution, EditorSessionState, EditTrack, GenerationJob, LastFrameExtraction, TimelineFrameExtraction, VideoContinuationPack, VideoEngineInfo, WorkItem } from "./types.js";
+import type { Artifact, EditClip, EditKeyframe, EditKeyframeSourceTransform, EditMediaItem, EditMediaPage, EditMediaPreview, EditMediaQuery, EditNestedTimelinePreview, EditNestedTimelineRef, EditProject, EditRationalFrame, EditRenderDependencyRef, EditRenderJob, EditorRecoveryInfo, EditorSessionOpenResult, EditorSessionResolution, EditorSessionState, EditTrack, GenerationJob, LastFrameExtraction, ProjectIndex, TimelineFrameExtraction, VideoContinuationPack, VideoEngineInfo, WorkItem } from "./types.js";
 import { withProjectLock } from "./locks.js";
 import { MEDIA_WEIGHTS, mediaStageTimeout, reapMachineMediaRuntime, runMediaProcess, startManagedMediaProcess, terminateProcessTree, type ManagedMediaProcess, type ManagedMediaProcessResult, type MediaTool } from "./media-runtime.js";
 import { probeStudioOtioDocument } from "./studio-otio-capability-matrix.js";
+import { MAX_EDIT_TIMELINE_SECONDS } from "./editor-limits.js";
+
+export { MAX_EDIT_TIMELINE_SECONDS } from "./editor-limits.js";
 
 const MAX_TRACKS = 16;
 const MAX_CLIPS = 1_000;
@@ -320,15 +323,81 @@ async function withEditorMediaCapacity<T>(projectRoot: string, action: string, w
   }, { timeoutMs: EDITOR_MEDIA_CAPACITY_TIMEOUT_MS, staleMs: 300_000 });
 }
 
-export async function listEditMedia(projectRoot: string, episode?: number): Promise<EditMediaItem[]> {
-  const index = await getProjectIndex(projectRoot);
-  const previewStore = await readJson<{ schemaVersion: 1; previews: Record<string, EditMediaPreview> }>(getSidecarPaths(projectRoot).editorPreviewIndex, { schemaVersion: 1, previews: {} });
+function editMediaSort(left: EditMediaItem, right: EditMediaItem): number {
+  return Number(right.authoritative) - Number(left.authoritative)
+    || Number(right.accepted) - Number(left.accepted)
+    || (left.episode ?? 0) - (right.episode ?? 0)
+    || (left.unit ?? 0) - (right.unit ?? 0)
+    || left.name.localeCompare(right.name, "zh-CN", { numeric: true })
+    || left.artifactId.localeCompare(right.artifactId, "en");
+}
+
+type EditMediaPreviewStore = { schemaVersion: 1; previews: Record<string, EditMediaPreview> };
+
+interface EditMediaQueryProjection {
+  items: readonly EditMediaItem[];
+  ordinalByArtifactId: ReadonlyMap<string, number>;
+}
+
+interface EditMediaCatalogSnapshot {
+  projectRoot: string;
+  projectId: string;
+  scanId: string;
+  scannedAt: string;
+  indexFileIdentity: string;
+  previewFileIdentity: string;
+  fingerprint: string;
+  items: readonly EditMediaItem[];
+  queryProjections: Map<string, EditMediaQueryProjection>;
+}
+
+const EDIT_MEDIA_CATALOG_CACHE_PROJECTS = 4;
+const EDIT_MEDIA_QUERY_CACHE_ENTRIES = 16;
+const editMediaCatalogSnapshots = new Map<string, EditMediaCatalogSnapshot>();
+const editMediaCatalogBuilds = new Map<string, Promise<EditMediaCatalogSnapshot>>();
+let editMediaCatalogCacheObserverForTests: ((event: "catalog-built" | "catalog-hit" | "catalog-retry" | "query-built" | "query-hit") => void) | undefined;
+
+export function __setEditMediaCatalogCacheObserverForTests(
+  observer?: (event: "catalog-built" | "catalog-hit" | "catalog-retry" | "query-built" | "query-hit") => void,
+): void {
+  editMediaCatalogSnapshots.clear();
+  editMediaCatalogBuilds.clear();
+  editMediaCatalogCacheObserverForTests = observer;
+}
+
+async function editMediaOwnerFileIdentity(filePath: string): Promise<string> {
+  try {
+    const metadata = await stat(filePath, { bigint: true });
+    return [metadata.dev, metadata.ino, metadata.mode, metadata.size, metadata.mtimeNs, metadata.ctimeNs].join(":");
+  } catch (error) {
+    if (error instanceof Error && "code" in error && (error as NodeJS.ErrnoException).code === "ENOENT") return "missing";
+    throw error;
+  }
+}
+
+async function editMediaOwnerIdentities(projectRoot: string): Promise<{ index: string; preview: string }> {
+  const paths = getSidecarPaths(projectRoot);
+  const [index, preview] = await Promise.all([
+    editMediaOwnerFileIdentity(paths.index),
+    editMediaOwnerFileIdentity(paths.editorPreviewIndex),
+  ]);
+  return { index, preview };
+}
+
+function sameEditMediaOwnerIdentities(
+  left: { index: string; preview: string },
+  right: { index: string; preview: string },
+): boolean {
+  return left.index === right.index && left.preview === right.preview;
+}
+
+function loadEditMediaCatalog(index: ProjectIndex, previewStore: EditMediaPreviewStore): EditMediaItem[] {
   const itemMap = new Map(index.items.map((item) => [item.id, item]));
   return index.artifacts
     .filter((artifact) => !artifact.deprecated && artifact.check.ok && ["video", "audio", "raw-image", "labeled-image"].includes(artifact.kind))
     .map((artifact): EditMediaItem | null => {
       const item = itemMap.get(artifact.itemId);
-      if (!item || (episode !== undefined && item.episode !== episode)) return null;
+      if (!item) return null;
       const cached = previewStore.previews[artifact.id]?.sourceModifiedAt === artifact.modifiedAt ? previewStore.previews[artifact.id] : undefined;
       return {
         id: `media-${artifact.id}`,
@@ -351,7 +420,236 @@ export async function listEditMedia(projectRoot: string, episode?: number): Prom
       };
     })
     .filter((item): item is EditMediaItem => Boolean(item))
-    .sort((a, b) => Number(b.authoritative) - Number(a.authoritative) || Number(b.accepted) - Number(a.accepted) || (a.episode ?? 0) - (b.episode ?? 0) || (a.unit ?? 0) - (b.unit ?? 0) || a.name.localeCompare(b.name, "zh-CN", { numeric: true }));
+    .sort(editMediaSort);
+}
+
+function rememberEditMediaCatalogSnapshot(snapshot: EditMediaCatalogSnapshot): void {
+  editMediaCatalogSnapshots.delete(snapshot.projectRoot);
+  editMediaCatalogSnapshots.set(snapshot.projectRoot, snapshot);
+  while (editMediaCatalogSnapshots.size > EDIT_MEDIA_CATALOG_CACHE_PROJECTS) {
+    const oldest = editMediaCatalogSnapshots.keys().next().value as string | undefined;
+    if (!oldest) break;
+    editMediaCatalogSnapshots.delete(oldest);
+  }
+}
+
+async function buildEditMediaCatalogSnapshot(projectRoot: string): Promise<EditMediaCatalogSnapshot> {
+  const paths = getSidecarPaths(projectRoot);
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const before = await editMediaOwnerIdentities(projectRoot);
+    const [index, previewStore] = await Promise.all([
+      getProjectIndex(projectRoot),
+      readJson<EditMediaPreviewStore>(paths.editorPreviewIndex, { schemaVersion: 1, previews: {} }),
+    ]);
+    const items = loadEditMediaCatalog(index, previewStore);
+    const after = await editMediaOwnerIdentities(projectRoot);
+    if (!sameEditMediaOwnerIdentities(before, after)) {
+      editMediaCatalogCacheObserverForTests?.("catalog-retry");
+      continue;
+    }
+    const fingerprint = createHash("sha256").update(JSON.stringify({
+      schemaVersion: 1,
+      projectRoot,
+      projectId: index.project.id,
+      scanId: index.scanId,
+      scannedAt: index.scannedAt,
+      indexFileIdentity: after.index,
+      previewFileIdentity: after.preview,
+    }), "utf8").digest("hex");
+    const snapshot: EditMediaCatalogSnapshot = {
+      projectRoot,
+      projectId: index.project.id,
+      scanId: index.scanId,
+      scannedAt: index.scannedAt,
+      indexFileIdentity: after.index,
+      previewFileIdentity: after.preview,
+      fingerprint,
+      items,
+      queryProjections: new Map(),
+    };
+    rememberEditMediaCatalogSnapshot(snapshot);
+    editMediaCatalogCacheObserverForTests?.("catalog-built");
+    return snapshot;
+  }
+  throw new Error("剪辑素材索引在读取期间持续变化，请稍后重试。 ");
+}
+
+async function getEditMediaCatalogSnapshot(projectRootValue: string): Promise<EditMediaCatalogSnapshot> {
+  const projectRoot = path.resolve(projectRootValue);
+  const identities = await editMediaOwnerIdentities(projectRoot);
+  const cached = editMediaCatalogSnapshots.get(projectRoot);
+  if (cached
+    && cached.indexFileIdentity === identities.index
+    && cached.previewFileIdentity === identities.preview) {
+    rememberEditMediaCatalogSnapshot(cached);
+    editMediaCatalogCacheObserverForTests?.("catalog-hit");
+    return cached;
+  }
+  const activeBuild = editMediaCatalogBuilds.get(projectRoot);
+  if (activeBuild) {
+    await activeBuild;
+    return getEditMediaCatalogSnapshot(projectRoot);
+  }
+  const build = buildEditMediaCatalogSnapshot(projectRoot);
+  editMediaCatalogBuilds.set(projectRoot, build);
+  try {
+    return await build;
+  } finally {
+    if (editMediaCatalogBuilds.get(projectRoot) === build) editMediaCatalogBuilds.delete(projectRoot);
+  }
+}
+
+export async function listEditMedia(projectRoot: string, episode?: number): Promise<EditMediaItem[]> {
+  const snapshot = await getEditMediaCatalogSnapshot(projectRoot);
+  return snapshot.items
+    .filter((item) => episode === undefined || item.episode === episode)
+    .map((item) => ({ ...item }));
+}
+
+const EDIT_MEDIA_DEFAULT_PAGE_LIMIT = 60;
+const EDIT_MEDIA_MAX_PAGE_LIMIT = 100;
+const EDIT_MEDIA_MAX_SEARCH_LENGTH = 200;
+
+function normalizedEditMediaSearch(value: string | undefined): string {
+  const normalized = (value ?? "").trim().normalize("NFKC").toLocaleLowerCase("zh-CN");
+  if (normalized.length > EDIT_MEDIA_MAX_SEARCH_LENGTH) throw new Error(`剪辑素材 search 最多 ${EDIT_MEDIA_MAX_SEARCH_LENGTH} 字符。`);
+  return normalized;
+}
+
+function editMediaCursor(input: { queryFingerprint: string; lastArtifactId: string }): string {
+  return Buffer.from(JSON.stringify({ schemaVersion: 1, ...input }), "utf8").toString("base64url");
+}
+
+function parseEditMediaCursor(value: string): { queryFingerprint: string; lastArtifactId: string } {
+  if (!value || value.length > 2_048 || !/^[A-Za-z0-9_-]+$/u.test(value)) throw new Error("剪辑素材 cursor 无效。");
+  let parsed: unknown;
+  try { parsed = JSON.parse(Buffer.from(value, "base64url").toString("utf8")) as unknown; }
+  catch { throw new Error("剪辑素材 cursor 无效。"); }
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("剪辑素材 cursor 无效。");
+  const record = parsed as Record<string, unknown>;
+  if (Object.keys(record).sort().join(",") !== "lastArtifactId,queryFingerprint,schemaVersion"
+    || record.schemaVersion !== 1
+    || typeof record.queryFingerprint !== "string" || !/^[a-f0-9]{64}$/u.test(record.queryFingerprint)
+    || typeof record.lastArtifactId !== "string" || !record.lastArtifactId || record.lastArtifactId.length > 300) {
+    throw new Error("剪辑素材 cursor 无效。");
+  }
+  return { queryFingerprint: record.queryFingerprint, lastArtifactId: record.lastArtifactId };
+}
+
+interface NormalizedEditMediaQuery {
+  episode?: number;
+  kind: "all" | "video" | "image" | "audio";
+  search: string;
+  limit: number;
+}
+
+function normalizeEditMediaQuery(query: EditMediaQuery): NormalizedEditMediaQuery {
+  const limit = query.limit ?? EDIT_MEDIA_DEFAULT_PAGE_LIMIT;
+  if (!Number.isInteger(limit) || limit < 1 || limit > EDIT_MEDIA_MAX_PAGE_LIMIT) {
+    throw new Error(`剪辑素材 limit 必须是 1–${EDIT_MEDIA_MAX_PAGE_LIMIT}。`);
+  }
+  if (query.episode !== undefined && (!Number.isSafeInteger(query.episode) || query.episode < 1)) {
+    throw new Error("剪辑素材 episode 必须是正整数。");
+  }
+  const kind = query.kind ?? "all";
+  if (!(["all", "video", "image", "audio"] as const).includes(kind)) throw new Error("剪辑素材 kind 无效。");
+  return { ...(query.episode === undefined ? {} : { episode: query.episode }), kind, search: normalizedEditMediaSearch(query.search), limit };
+}
+
+function editMediaQueryFingerprint(
+  indexIdentity: Pick<ProjectIndex, "scanId" | "scannedAt">,
+  normalized: NormalizedEditMediaQuery,
+  snapshotScope?: { projectRoot: string; projectId: string; fingerprint: string },
+): string {
+  return createHash("sha256").update(JSON.stringify({
+    schemaVersion: 1,
+    ...(snapshotScope ?? {}),
+    scanId: indexIdentity.scanId,
+    scannedAt: indexIdentity.scannedAt,
+    episode: normalized.episode ?? null,
+    kind: normalized.kind,
+    search: normalized.search,
+  }), "utf8").digest("hex");
+}
+
+function filterSortedEditMediaItems(
+  items: readonly EditMediaItem[],
+  normalized: NormalizedEditMediaQuery,
+): EditMediaQueryProjection {
+  const filtered = items
+    .filter((item) => normalized.episode === undefined || item.episode === normalized.episode)
+    .filter((item) => normalized.kind === "all" || item.kind === normalized.kind)
+    .filter((item) => !normalized.search || `${item.name} ${item.path}`.normalize("NFKC").toLocaleLowerCase("zh-CN").includes(normalized.search));
+  return {
+    items: filtered,
+    ordinalByArtifactId: new Map(filtered.map((item, index) => [item.artifactId, index])),
+  };
+}
+
+function pageEditMediaProjection(
+  projection: EditMediaQueryProjection,
+  scannedAt: string,
+  queryFingerprint: string,
+  normalized: NormalizedEditMediaQuery,
+  cursorValue?: string,
+): EditMediaPage {
+  let start = 0;
+  if (cursorValue) {
+    const cursor = parseEditMediaCursor(cursorValue);
+    if (cursor.queryFingerprint !== queryFingerprint) throw new Error("剪辑素材 cursor 与当前查询或扫描不一致。");
+    const index = projection.ordinalByArtifactId.get(cursor.lastArtifactId);
+    if (index === undefined) throw new Error("剪辑素材 cursor 已失效，请从第一页重新读取。");
+    start = index + 1;
+  }
+  const selected = projection.items.slice(start, start + normalized.limit);
+  const pageItems = selected.map((item) => ({ ...item }));
+  const hasMore = start + selected.length < projection.items.length;
+  return {
+    schemaVersion: 1,
+    kind: "edit-media-page",
+    items: pageItems,
+    total: projection.items.length,
+    scannedAt,
+    queryFingerprint,
+    ...(hasMore && selected.length ? { nextCursor: editMediaCursor({ queryFingerprint, lastArtifactId: selected.at(-1)!.artifactId }) } : {}),
+  };
+}
+
+export function paginateEditMediaItems(
+  items: readonly EditMediaItem[],
+  indexIdentity: Pick<ProjectIndex, "scanId" | "scannedAt">,
+  query: EditMediaQuery = {},
+): EditMediaPage {
+  const normalized = normalizeEditMediaQuery(query);
+  const queryFingerprint = editMediaQueryFingerprint(indexIdentity, normalized);
+  const sorted = items.slice().sort(editMediaSort);
+  return pageEditMediaProjection(filterSortedEditMediaItems(sorted, normalized), indexIdentity.scannedAt, queryFingerprint, normalized, query.cursor);
+}
+
+export async function listEditMediaPage(projectRoot: string, query: EditMediaQuery = {}): Promise<EditMediaPage> {
+  const snapshot = await getEditMediaCatalogSnapshot(projectRoot);
+  const normalized = normalizeEditMediaQuery(query);
+  const queryFingerprint = editMediaQueryFingerprint(snapshot, normalized, {
+    projectRoot: snapshot.projectRoot,
+    projectId: snapshot.projectId,
+    fingerprint: snapshot.fingerprint,
+  });
+  let projection = snapshot.queryProjections.get(queryFingerprint);
+  if (projection) {
+    snapshot.queryProjections.delete(queryFingerprint);
+    snapshot.queryProjections.set(queryFingerprint, projection);
+    editMediaCatalogCacheObserverForTests?.("query-hit");
+  } else {
+    projection = filterSortedEditMediaItems(snapshot.items, normalized);
+    snapshot.queryProjections.set(queryFingerprint, projection);
+    while (snapshot.queryProjections.size > EDIT_MEDIA_QUERY_CACHE_ENTRIES) {
+      const oldest = snapshot.queryProjections.keys().next().value as string | undefined;
+      if (!oldest) break;
+      snapshot.queryProjections.delete(oldest);
+    }
+    editMediaCatalogCacheObserverForTests?.("query-built");
+  }
+  return pageEditMediaProjection(projection, snapshot.scannedAt, queryFingerprint, normalized, query.cursor);
 }
 
 async function prepareEditMediaPreviewUnlocked(projectRoot: string, artifactId: string): Promise<EditMediaPreview> {
@@ -786,6 +1084,12 @@ async function validateEditProject(projectRoot: string, project: EditProject, op
         if (!Number.isFinite(value)) throw new Error(`${clip.name} 的${label}不是有效数字。`);
       }
       if (clip.startSeconds < 0 || clip.durationSeconds <= 0 || clip.trimStartSeconds < 0 || clip.playbackRate < .1 || clip.playbackRate > 8) throw new Error(`${clip.name} 的时间参数无效；播放速率必须在 0.1–8 之间。`);
+      if (clip.startSeconds > MAX_EDIT_TIMELINE_SECONDS
+        || clip.durationSeconds > MAX_EDIT_TIMELINE_SECONDS
+        || clip.trimStartSeconds > MAX_EDIT_TIMELINE_SECONDS
+        || clip.startSeconds + clip.durationSeconds > MAX_EDIT_TIMELINE_SECONDS) {
+        throw new Error(`${clip.name} 超过单工程 ${MAX_EDIT_TIMELINE_SECONDS} 秒的有界时间线。`);
+      }
       if (clip.kind === "timeline" && ((clip.trimStartFrame ?? 0) !== 0 || clip.trimStartSeconds !== 0)) throw new Error(`${clip.name} 的嵌套源偏移必须只由有理 sourceOffset 表达。`);
       clip.startFrame = authoritativeClipFrame(project, clip.startFrame, clip.startSeconds, 0);
       clip.durationFrames = authoritativeClipFrame(project, clip.durationFrames, clip.durationSeconds, 1);
@@ -793,6 +1097,11 @@ async function validateEditProject(projectRoot: string, project: EditProject, op
       clip.startSeconds = roundTime(clip.startFrame / frameRate);
       clip.durationSeconds = roundTime(clip.durationFrames / frameRate);
       clip.trimStartSeconds = roundTime(clip.trimStartFrame / frameRate);
+      if (!Number.isSafeInteger(clip.startFrame) || !Number.isSafeInteger(clip.durationFrames)
+        || !Number.isSafeInteger(clip.trimStartFrame)
+        || clip.startFrame + clip.durationFrames > Math.ceil(MAX_EDIT_TIMELINE_SECONDS * frameRate)) {
+        throw new Error(`${clip.name} 的帧范围超过有界时间线。`);
+      }
       if (clip.sourceAvailableRange !== undefined) {
         if (!Number.isSafeInteger(clip.sourceAvailableRange.startFrame) || clip.sourceAvailableRange.startFrame < 0 || !Number.isSafeInteger(clip.sourceAvailableRange.durationFrames) || clip.sourceAvailableRange.durationFrames < 1) throw new Error(`${clip.name} 的 source available range 必须是非负起点和正安全整数帧时长。`);
       }

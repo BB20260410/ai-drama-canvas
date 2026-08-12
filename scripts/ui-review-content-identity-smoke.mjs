@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
-import { access, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, rm, stat } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,18 +8,51 @@ import { promisify } from "node:util";
 import { _electron as electron } from "playwright";
 import sharp from "sharp";
 import {
+  captureBackgroundElectronStateOrThrow,
+  closeElectronApplicationOrThrow,
+} from "./lib/electron-application-close.mjs";
+import {
+  assertFreshOutputSet,
+  createUniqueEvidenceStem,
+  writeBytesAtomicExclusive,
+  writeJsonAtomicExclusive,
+} from "./lib/exclusive-evidence-output.mjs";
+import {
   removeOwnedTemporaryFixtureRoot,
   resetOwnedFixtureRoot,
 } from "./lib/owned-fixture-root.ts";
 
 const execFileAsync = promisify(execFile);
 const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const runId = process.env.AI_CANVAS_EVIDENCE_RUN_ID?.trim()
+  || createUniqueEvidenceStem("review-content-identity-ui-smoke");
 const projectRoot = path.resolve(process.argv[2] || "/tmp/ai-canvas-review-content-identity-ui");
 const registryPath = path.resolve(process.argv[3] || "/tmp/ai-canvas-review-content-identity-registry.json");
-const evidencePath = path.resolve(process.argv[4] || path.join(workspace, "docs", "evidence", "review-content-identity-ui-20260714.json"));
-const screenshotPath = path.resolve(process.argv[5] || path.join(workspace, "docs", "evidence", "review-content-identity-ui-20260714.png"));
+const evidencePath = path.resolve(process.argv[4] || path.join(workspace, "docs", "evidence", `${runId}.json`));
+const screenshotPath = path.resolve(process.argv[5] || path.join(workspace, "docs", "evidence", `${runId}.png`));
 const packagedExecutable = process.env.AI_CANVAS_ELECTRON_EXECUTABLE?.trim();
 const userDataPath = path.resolve(process.env.AI_CANVAS_ELECTRON_USER_DATA_PATH?.trim() || `${projectRoot}-electron-user-data`);
+const backgroundSmokeEnabled = process.env.AI_CANVAS_ELECTRON_BACKGROUND_SMOKE === "1";
+const closeRuns = [];
+const backgroundSnapshots = [];
+let bringToFrontUsed = false;
+let app;
+
+async function closeCurrentApplication(label) {
+  if (!app) return;
+  const current = app;
+  app = undefined;
+  let backgroundError;
+  if (backgroundSmokeEnabled) {
+    try {
+      backgroundSnapshots.push(await captureBackgroundElectronStateOrThrow(current, { label: `${label}:before-close` }));
+    } catch (error) {
+      backgroundError = error;
+    }
+  }
+  closeRuns.push(await closeElectronApplicationOrThrow(current, { label, timeoutMs: 20_000 }));
+  if (backgroundError) throw backgroundError;
+}
 
 function isTemporaryPath(candidate) {
   return [os.tmpdir(), "/tmp", "/private/tmp"].map((base) => path.resolve(base)).some((base) => {
@@ -36,6 +69,10 @@ await access(registryPath).then(
 );
 await mkdir(path.dirname(evidencePath), { recursive: true });
 await mkdir(path.dirname(screenshotPath), { recursive: true });
+await assertFreshOutputSet([
+  { label: "ReviewStudio UI 证据", path: evidencePath },
+  { label: "ReviewStudio UI 截图", path: screenshotPath },
+]);
 await resetOwnedFixtureRoot(userDataPath, "ui-review-content-identity-user-data");
 
 async function screenshotContent(filePath) {
@@ -75,15 +112,22 @@ async function screenshotContent(filePath) {
 async function captureStableUi(page) {
   let content;
   for (let attempt = 1; attempt <= 3; attempt += 1) {
-    await page.bringToFront();
+    if (!backgroundSmokeEnabled) {
+      bringToFrontUsed = true;
+      await page.bringToFront();
+    }
     await page.waitForTimeout(700);
     const viewport = await page.evaluate(() => ({ width: window.innerWidth, height: window.innerHeight }));
     const raw = await page.screenshot({ type: "png", animations: "disabled" });
-    await sharp(raw).resize(viewport.width, viewport.height, { fit: "fill" }).png().toFile(screenshotPath);
-    content = await screenshotContent(screenshotPath);
+    const candidatePath = path.join(userDataPath, `review-screenshot-${attempt}.png`);
+    await sharp(raw).resize(viewport.width, viewport.height, { fit: "fill" }).png().toFile(candidatePath);
+    content = await screenshotContent(candidatePath);
     if (content.brightRatio >= .01
       && content.chromaticRatio >= .005
-      && Object.values(content.edgeBrightRatios).every((ratio) => ratio >= .003)) return { attempt, content };
+      && Object.values(content.edgeBrightRatios).every((ratio) => ratio >= .003)) {
+      await writeBytesAtomicExclusive(screenshotPath, await readFile(candidatePath));
+      return { attempt, content };
+    }
   }
   throw new Error(`ReviewStudio UI 截图连续三次内容覆盖不足：${JSON.stringify(content)}`);
 }
@@ -107,10 +151,18 @@ async function launchApplication() {
 async function openReviewStudio(page, options = {}) {
   await page.waitForLoadState("domcontentloaded");
   const firstRun = page.getByTestId("first-run-screen");
-  if (await firstRun.isVisible().catch(() => false)) {
-    await page.getByTestId("first-run-recent").click();
+  const reviewButton = page.getByRole("button", { name: "导演验收" });
+  if (await firstRun.isVisible().catch(() => false) && !await reviewButton.isVisible().catch(() => false)) {
+    const recent = page.getByTestId("first-run-recent");
+    await recent.waitFor({ state: "visible", timeout: 10_000 }).catch(() => undefined);
+    if (await recent.isVisible().catch(() => false)) {
+      // The project may auto-open between the visibility check and click. In
+      // that case the final ReviewStudio button below remains the hard gate.
+      await recent.click({ timeout: 10_000 }).catch(() => undefined);
+    }
   }
-  await page.getByRole("button", { name: "导演验收" }).click();
+  await reviewButton.waitFor({ state: "visible", timeout: 90_000 });
+  await reviewButton.click();
   await page.getByRole("heading", { name: "版本对照与视觉结论" }).waitFor();
   if (options.includeResolved) await page.locator(".queue-filter input[type=checkbox]").check();
   await page.locator(".media-frame img").first().waitFor();
@@ -124,13 +176,15 @@ await execFileAsync(fixtureExecutable, ["scripts/create-review-fixture.ts", proj
 });
 
 const pageErrors = [];
-let app;
 let evidence;
 try {
   app = await launchApplication();
   const page = await app.firstWindow();
   page.on("pageerror", (error) => pageErrors.push(`initial:${error.message}`));
   await openReviewStudio(page);
+  if (backgroundSmokeEnabled) {
+    backgroundSnapshots.push(await captureBackgroundElectronStateOrThrow(app, { label: "ReviewStudio first ready" }));
+  }
 
   const initial = await page.evaluate(async ({ projectRoot }) => {
     const queue = await window.canvasApi.getReviewQueue(projectRoot, { includeResolved: true });
@@ -206,12 +260,14 @@ try {
     throw new Error(`重新检查后的视觉通过没有绑定当前 SHA：${JSON.stringify({ passed, passedMediaSrc, staleRejected })}`);
   }
 
-  await app.close();
-  app = undefined;
+  await closeCurrentApplication("ReviewStudio first graceful close");
   app = await launchApplication();
   const restartPage = await app.firstWindow();
   restartPage.on("pageerror", (error) => pageErrors.push(`restart:${error.message}`));
   await openReviewStudio(restartPage, { includeResolved: true });
+  if (backgroundSmokeEnabled) {
+    backgroundSnapshots.push(await captureBackgroundElectronStateOrThrow(app, { label: "ReviewStudio restart ready" }));
+  }
   await restartPage.locator(".review-item-heading > b").filter({ hasText: "待视频" }).waitFor();
   const restarted = await restartPage.evaluate(async ({ projectRoot, itemId, targetId }) => {
     const queue = await window.canvasApi.getReviewQueue(projectRoot, { includeResolved: true });
@@ -262,6 +318,7 @@ try {
   const screenshotStat = await stat(screenshotPath);
   evidence = {
     schemaVersion: 3,
+    runId,
     generatedAt: new Date().toISOString(),
     status: "passed",
     transport: packagedExecutable ? "packaged-electron-current-source" : "source-electron-current-build",
@@ -275,6 +332,11 @@ try {
     restarted: { ...restarted, mediaSrc: restartedMediaSrc },
     refreshed: { ...refreshed, mediaSrc: refreshedMediaSrc },
     pageErrors,
+    backgroundSmoke: {
+      enabled: backgroundSmokeEnabled,
+      bringToFrontUsed,
+      snapshots: backgroundSnapshots,
+    },
     assertions: {
       staleSubmitRejectedThroughUi: true,
       staleAttemptWroteNoReview: staleRejected.historicalReviewCount === initial.historicalReviewCount,
@@ -303,7 +365,7 @@ try {
   };
   if (pageErrors.length || evidence.screenshot.bytes < 20_000 || evidence.screenshot.width !== 1560 || evidence.screenshot.height !== 980) throw new Error(`ReviewStudio UI 证据异常：${JSON.stringify({ pageErrors, screenshot: evidence.screenshot })}`);
 } finally {
-  if (app) await app.close();
+  await closeCurrentApplication("ReviewStudio final graceful close");
   if (cleanupFixture) {
     if (await access(projectRoot).then(() => true, () => false)) {
       await removeOwnedTemporaryFixtureRoot(projectRoot, "create-review-fixture");
@@ -321,5 +383,6 @@ const terminal = {
 };
 if (packagedExecutable && (!terminal.rootRemoved || !terminal.registryRemoved || !terminal.userDataRemoved)) throw new Error(`packaged ReviewStudio 隔离夹具未清理：${JSON.stringify(terminal)}`);
 evidence.terminal = terminal;
-await writeFile(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, "utf8");
+evidence.closeRuns = closeRuns;
+await writeJsonAtomicExclusive(evidencePath, evidence);
 process.stdout.write(`${JSON.stringify({ evidencePath, status: evidence.status, transport: evidence.transport, screenshot: evidence.screenshot, assertions: evidence.assertions, terminal }, null, 2)}\n`);

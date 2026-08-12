@@ -2,8 +2,8 @@
  * P8 无限画布生产驾驶舱：单一只读聚合投影。
  * 复用 P5–P7 owner，不建立 Dashboard DB/JSON，不恢复 Scanner。
  */
-import { createHash } from "node:crypto";
-import { inspectManagedProject } from "./managed-project.js";
+import { inspectManagedProject, inspectManagedProjectReadOnly } from "./managed-project.js";
+import { digestStudioCanonicalJson as digest } from "./studio-canonical-json.js";
 import {
   getMaterialStudioState,
   getStudioCanonicalAsset,
@@ -33,7 +33,6 @@ import {
   getStudioGenerationCheckpointControl,
   type StudioGenerationCheckpointDashboardGate,
 } from "./studio-generation-checkpoint.js";
-import { queryStudioGenerationFreeze } from "./studio-generation.js";
 import {
   listStudioGenerationLatestUnitGridRuns,
 } from "./studio-generation-ledger.js";
@@ -52,6 +51,12 @@ import {
   type StudioAssetTimelineItem,
   type StudioProductionUnitSummary,
 } from "./studio-production.js";
+import { withStudioRequestSchemaCache } from "./studio-request-schema-cache.js";
+import {
+  measureStudioUnitsReadPhase,
+  measureStudioUnitsReadSyncPhase,
+  recordStudioUnitsReadCounter,
+} from "./studio-units-read-phase-timeline.js";
 
 export const STUDIO_DASHBOARD_SCHEMA_VERSION = 1 as const;
 export const STUDIO_DASHBOARD_UNIT_PAGE_LIMIT = 36 as const;
@@ -354,19 +359,6 @@ export class StudioProductionDashboardError extends Error {
     this.name = "StudioProductionDashboardError";
     this.code = code;
   }
-}
-
-function stableValue(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(stableValue);
-  if (!value || typeof value !== "object") return value;
-  return Object.fromEntries(Object.entries(value as Record<string, unknown>)
-    .filter(([, entry]) => entry !== undefined)
-    .sort(([left], [right]) => left.localeCompare(right, "en"))
-    .map(([key, entry]) => [key, stableValue(entry)]));
-}
-
-function digest(value: unknown): string {
-  return createHash("sha256").update(JSON.stringify(stableValue(value)), "utf8").digest("hex");
 }
 
 function requiredId(value: string, field: string): string {
@@ -1213,50 +1205,61 @@ async function buildUnits(
   projectRoot: string,
   query: Extract<StudioProductionDashboardQuery, { operation: "units" }>,
 ): Promise<StudioDashboardUnitsPage> {
-  const shell = await inspectManagedProject(projectRoot);
   const limit = boundedLimit(query.limit, STUDIO_DASHBOARD_UNIT_PAGE_LIMIT, STUDIO_DASHBOARD_UNIT_PAGE_LIMIT, "limit");
-  const page = await listStudioBindingUnits(projectRoot, {
-    ...(query.season ? { seasonId: query.season } : {}),
-    ...(query.episode ? { episodeId: query.episode } : {}),
-    ...(query.cursor ? { cursor: query.cursor } : {}),
-    limit,
-  });
-  const items = page.items.map((unit) => mapUnitSummary(shell.project.id, unit));
-  const nextAction: StudioDashboardNextAction = items[0]
-    ? {
-      code: "open-unit",
-      label: "打开单元详情",
-      reason: page.nextAction ?? "选择单元后按 Core 投影处理第一个阻塞宫格。",
-      requiresWrite: false,
-      locator: items[0].locator,
-    }
-    : {
-      code: "create-production-units",
-      label: "建立生产单元",
-      reason: "当前筛选下没有单元。",
-      requiresWrite: true,
-      command: "create_studio_production_unit",
-      locator: projectLocator(shell.project.id),
-    };
-  const body = {
-    schemaVersion: STUDIO_DASHBOARD_SCHEMA_VERSION,
-    kind: "studio-production-dashboard" as const,
-    operation: "units" as const,
-    projectId: shell.project.id,
-    projectName: shell.project.name,
-    manifestFingerprint: shell.manifestFingerprint,
-    nextAction,
-    locator: projectLocator(shell.project.id),
-    seasons: page.seasons,
-    episodes: page.episodes,
-    page: {
-      items,
+  // units 是纯读取：外层只需要受管工程身份。Binding owner 内部仍执行完整
+  // inspectManagedProject，因此 generation ledger 缺失/损坏继续失败关闭；这里只把
+  // 重复的完整初始化降为只读检查，并与列表读取并行，缩短冷启动首卡关键路径。
+  const [shell, page] = await Promise.all([
+    measureStudioUnitsReadPhase(
+      "dashboard-readonly-shell",
+      () => inspectManagedProjectReadOnly(projectRoot),
+    ),
+    listStudioBindingUnits(projectRoot, {
+      ...(query.season ? { seasonId: query.season } : {}),
+      ...(query.episode ? { episodeId: query.episode } : {}),
+      ...(query.cursor ? { cursor: query.cursor } : {}),
       limit,
-      ...(page.nextCursor ? { nextCursor: page.nextCursor } : {}),
-      ...(page.total === undefined ? {} : { total: page.total }),
-    },
-  };
-  return { ...body, fingerprint: digest(body) };
+    }),
+  ]);
+  return measureStudioUnitsReadSyncPhase("dashboard-map-digest", () => {
+    const items = page.items.map((unit) => mapUnitSummary(shell.project.id, unit));
+    recordStudioUnitsReadCounter("returnedUnitCount", items.length);
+    const nextAction: StudioDashboardNextAction = items[0]
+      ? {
+        code: "open-unit",
+        label: "打开单元详情",
+        reason: page.nextAction ?? "选择单元后按 Core 投影处理第一个阻塞宫格。",
+        requiresWrite: false,
+        locator: items[0].locator,
+      }
+      : {
+        code: "create-production-units",
+        label: "建立生产单元",
+        reason: "当前筛选下没有单元。",
+        requiresWrite: true,
+        command: "create_studio_production_unit",
+        locator: projectLocator(shell.project.id),
+      };
+    const body = {
+      schemaVersion: STUDIO_DASHBOARD_SCHEMA_VERSION,
+      kind: "studio-production-dashboard" as const,
+      operation: "units" as const,
+      projectId: shell.project.id,
+      projectName: shell.project.name,
+      manifestFingerprint: shell.manifestFingerprint,
+      nextAction,
+      locator: projectLocator(shell.project.id),
+      seasons: page.seasons,
+      episodes: page.episodes,
+      page: {
+        items,
+        limit,
+        ...(page.nextCursor ? { nextCursor: page.nextCursor } : {}),
+        ...(page.total === undefined ? {} : { total: page.total }),
+      },
+    };
+    return { ...body, fingerprint: digest(body) };
+  });
 }
 
 async function buildUnit(
@@ -1348,7 +1351,7 @@ async function buildUnit(
       };
     } else {
       try {
-        const [continuityReview, freeze] = await readGenerationProjectionWithin(Promise.all([
+        const continuityReview = await readGenerationProjectionWithin(
           getStudioContinuityReviewControl(projectRoot, {
             unitId,
             unitRevision: snapshot.unit.revision,
@@ -1357,8 +1360,8 @@ async function buildUnit(
             endMilliseconds,
             assetIds,
           }),
-          queryStudioGenerationFreeze(projectRoot, { unitId, panelId: selectedPanelId }),
-        ]), "宫格连续性与生成投影");
+          "宫格连续性与生成投影",
+        );
         // 仅在无 unit-grid 终态门禁时才回落到 panel continuity nextAction。
         if (!unitGridNext) {
           nextAction = continuityNextActionToDashboard(
@@ -1381,15 +1384,17 @@ async function buildUnit(
             conflicts: continuityReview.conflicts,
             ...(continuityReview.resolvedGenerationRunId ? { resolvedGenerationRunId: continuityReview.resolvedGenerationRunId } : {}),
           },
-          generation: freeze.status === "ready"
-            ? { status: "ready", packId: freeze.packId, fingerprint: freeze.fingerprint }
-            : freeze.status === "blocked"
-              ? {
-                status: "blocked",
-                code: freeze.code,
-                message: freeze.message,
-              }
-              : { status: "missing", message: "尚无冻结 generation pack。" },
+          generation: continuityReview.generation.status === "ready"
+            ? {
+              status: "ready",
+              packId: continuityReview.generation.packId,
+              fingerprint: continuityReview.generation.fingerprint,
+            }
+            : {
+              status: "blocked",
+              code: continuityReview.generation.code,
+              message: continuityReview.generation.message,
+            },
           legacy: {
             sourceShot: "not-applicable",
             fusionStoryboardSheet: "not-applicable",
@@ -1688,28 +1693,33 @@ export async function getStudioProductionDashboard(
   projectRoot: string,
   query: StudioProductionDashboardQuery,
 ): Promise<StudioProductionDashboardResponse> {
-  if (!query || typeof query !== "object" || !("operation" in query)) {
-    throw new StudioProductionDashboardError("invalid-input", "query.operation 必填。");
-  }
-  switch (query.operation) {
-    case "overview":
-      return buildOverview(projectRoot);
-    case "units":
-      return buildUnits(projectRoot, query);
-    case "unit":
-      return buildUnit(projectRoot, query);
-    case "assets":
-      return buildAssets(projectRoot, query);
-    case "appearances":
-      return buildAppearances(projectRoot, query);
-    case "queue":
-      return buildQueue(projectRoot, query);
-    default: {
-      const exhaustive: never = query;
-      throw new StudioProductionDashboardError(
-        "invalid-input",
-        `未知 operation：${String((exhaustive as { operation?: string }).operation)}`,
-      );
+  return withStudioRequestSchemaCache(async () => {
+    if (!query || typeof query !== "object" || !("operation" in query)) {
+      throw new StudioProductionDashboardError("invalid-input", "query.operation 必填。");
     }
-  }
+    switch (query.operation) {
+      case "overview":
+        return buildOverview(projectRoot);
+      case "units":
+        return measureStudioUnitsReadPhase(
+          "dashboard-core-total",
+          () => buildUnits(projectRoot, query),
+        );
+      case "unit":
+        return buildUnit(projectRoot, query);
+      case "assets":
+        return buildAssets(projectRoot, query);
+      case "appearances":
+        return buildAppearances(projectRoot, query);
+      case "queue":
+        return buildQueue(projectRoot, query);
+      default: {
+        const exhaustive: never = query;
+        throw new StudioProductionDashboardError(
+          "invalid-input",
+          `未知 operation：${String((exhaustive as { operation?: string }).operation)}`,
+        );
+      }
+    }
+  });
 }

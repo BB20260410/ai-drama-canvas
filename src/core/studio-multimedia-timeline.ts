@@ -16,7 +16,7 @@ import {
   type StudioMediaDerivativeKind,
 } from "./studio-media-derivatives.js";
 import { resolveStudioMediaRequest } from "./studio-media-protocol.js";
-import { STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS } from "./studio-sqlite-busy.js";
+import { STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS, studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
 
 const SCHEMA_VERSION = 1 as const;
 const DATABASE_RELATIVE_PATH = ".aicanvas/studio-production.sqlite";
@@ -294,8 +294,8 @@ function databasePath(projectRoot: string): string {
   return path.join(projectRoot, DATABASE_RELATIVE_PATH);
 }
 
-function configureDatabase(db: DatabaseSync, readOnly: boolean): void {
-  db.exec(`PRAGMA busy_timeout=${STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS}; PRAGMA foreign_keys=ON;`);
+function configureDatabase(db: DatabaseSync, readOnly: boolean, busyTimeoutMs: number): void {
+  db.exec(`PRAGMA busy_timeout=${busyTimeoutMs}; PRAGMA foreign_keys=ON;`);
   if (readOnly) db.exec("PRAGMA query_only=ON;");
   const foreignKeys = db.prepare("PRAGMA foreign_keys").get() as { foreign_keys?: number } | undefined;
   if (foreignKeys?.foreign_keys !== 1) throw new Error("四媒体时间线数据库未启用 foreign_keys。");
@@ -396,9 +396,10 @@ function assertSchema(db: DatabaseSync): void {
 }
 
 function openWriteDatabase(projectRoot: string): DatabaseSync {
-  const db = new DatabaseSync(databasePath(projectRoot), { timeout: STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS });
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS);
+  const db = new DatabaseSync(databasePath(projectRoot), { timeout: busyTimeoutMs });
   try {
-    configureDatabase(db, false);
+    configureDatabase(db, false, busyTimeoutMs);
     ensureSchema(db);
     return db;
   } catch (error) {
@@ -410,9 +411,10 @@ function openWriteDatabase(projectRoot: string): DatabaseSync {
 function openReadDatabase(projectRoot: string): DatabaseSync | null {
   const target = databasePath(projectRoot);
   if (!existsSync(target)) return null;
-  const db = new DatabaseSync(target, { readOnly: true, timeout: STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS });
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS);
+  const db = new DatabaseSync(target, { readOnly: true, timeout: busyTimeoutMs });
   try {
-    configureDatabase(db, true);
+    configureDatabase(db, true, busyTimeoutMs);
     if (!hasSchema(db)) {
       db.close();
       return null;

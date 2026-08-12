@@ -43,7 +43,7 @@ export interface CommandLedgerSnapshot {
   backend: "sqlite" | "json-legacy";
 }
 
-import { STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS } from "./studio-sqlite-busy.js";
+import { STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS, studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
 const BUSY_TIMEOUT_MS = STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS;
 const COMMAND_LEDGER_SCHEMA_VERSION = 1;
 
@@ -92,7 +92,12 @@ function tableColumns(db: DatabaseSync, table: string): SchemaColumn[] {
     .map(({ name, type, notnull, pk }) => ({ name, type: type.toUpperCase(), notnull, pk }));
 }
 
-function assertSchema(db: DatabaseSync, allowUnmarkedLegacy: boolean): { markerPresent: boolean } {
+const REQUEST_HASH_INDEX = "idx_command_ledger_request_hash_started_at";
+
+function assertSchema(db: DatabaseSync, allowUnmarkedLegacy: boolean): {
+  markerPresent: boolean;
+  requestHashIndexPresent: boolean;
+} {
   const tables = db.prepare(`
     SELECT name, type FROM sqlite_master
     WHERE name IN ('command_ledger_entries', 'command_ledger_meta')
@@ -117,9 +122,10 @@ function assertSchema(db: DatabaseSync, allowUnmarkedLegacy: boolean): { markerP
       throw new Error(`命令账本 schema 缺少索引：${expected}。`);
     }
   }
+  const requestHashIndexPresent = indexes.some((entry) => entry.name === REQUEST_HASH_INDEX && entry.unique === 0);
   const expectedSchema = new DatabaseSync(":memory:");
   try {
-    createSchema(expectedSchema);
+    createSchema(expectedSchema, requestHashIndexPresent);
     assertSqliteSchemaContract({
       actual: db,
       expected: expectedSchema,
@@ -128,6 +134,7 @@ function assertSchema(db: DatabaseSync, allowUnmarkedLegacy: boolean): { markerP
         "command_ledger_meta",
         "idx_command_ledger_request_id",
         "idx_command_ledger_started_at",
+        ...(requestHashIndexPresent ? [REQUEST_HASH_INDEX] : []),
       ],
       tableNames: ["command_ledger_entries", "command_ledger_meta"],
       ownedObjectPrefixes: ["command_ledger_", "idx_command_ledger_"],
@@ -142,17 +149,17 @@ function assertSchema(db: DatabaseSync, allowUnmarkedLegacy: boolean): { markerP
   ).get() as { value?: string } | undefined;
   if (!marker) {
     if (!allowUnmarkedLegacy) throw new Error("命令账本 schema_version 缺失。");
-    return { markerPresent: false };
+    return { markerPresent: false, requestHashIndexPresent };
   }
   if (marker.value !== String(COMMAND_LEDGER_SCHEMA_VERSION)) {
     throw new Error(`不支持的命令账本 schema_version：${marker.value}。`);
   }
   const foreignKeyViolations = db.prepare("PRAGMA foreign_key_check").all();
   if (foreignKeyViolations.length > 0) throw new Error("命令账本存在外键孤儿。");
-  return { markerPresent: true };
+  return { markerPresent: true, requestHashIndexPresent };
 }
 
-function createSchema(db: DatabaseSync): void {
+function createSchema(db: DatabaseSync, includeRequestHashIndex = true): void {
   db.exec(`
     CREATE TABLE command_ledger_entries (
       idempotency_key TEXT PRIMARY KEY,
@@ -167,6 +174,8 @@ function createSchema(db: DatabaseSync): void {
     );
     CREATE INDEX idx_command_ledger_request_id ON command_ledger_entries(request_id);
     CREATE INDEX idx_command_ledger_started_at ON command_ledger_entries(started_at DESC);
+    ${includeRequestHashIndex ? `CREATE INDEX ${REQUEST_HASH_INDEX}
+      ON command_ledger_entries(request_hash, started_at ASC, idempotency_key ASC);` : ""}
     CREATE TABLE command_ledger_meta (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
@@ -177,6 +186,7 @@ function createSchema(db: DatabaseSync): void {
 
 async function preflightExistingDatabase(filePath: string): Promise<{
   markerPresent: boolean;
+  requestHashIndexPresent: boolean;
   sourceIdentity: SqliteSourceBindingIdentity;
 }> {
   let snapshot: Awaited<ReturnType<typeof openSqliteReadOnlySnapshot>> | null = null;
@@ -202,7 +212,8 @@ async function openWritableDb(projectRoot: string): Promise<DatabaseSync> {
   } else if (existsSync(filePath)) {
     throw new Error("命令账本在空库预检后被并发创建，禁止写打开。");
   }
-  const db = new DatabaseSync(filePath, { timeout: BUSY_TIMEOUT_MS });
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
+  const db = new DatabaseSync(filePath, { timeout: busyTimeoutMs });
   try {
     assertSafeSqliteSidecars(filePath, "command ledger");
     if (preflight) {
@@ -211,7 +222,7 @@ async function openWritableDb(projectRoot: string): Promise<DatabaseSync> {
       inspectSqliteSourceBindingIdentity(filePath, "command ledger");
     }
     // 连接级 PRAGMA 不落盘；schema 只在隔离快照预检与 inode 复验后处理。
-    db.exec(`PRAGMA busy_timeout=${BUSY_TIMEOUT_MS}; PRAGMA foreign_keys=ON;`);
+    db.exec(`PRAGMA busy_timeout=${busyTimeoutMs}; PRAGMA foreign_keys=ON;`);
     if (!existed) {
       db.exec("BEGIN IMMEDIATE");
       try {
@@ -224,16 +235,24 @@ async function openWritableDb(projectRoot: string): Promise<DatabaseSync> {
       }
     } else {
       const current = assertSchema(db, true);
-      if (current.markerPresent !== preflight?.markerPresent) {
+      if (current.markerPresent !== preflight?.markerPresent
+        || current.requestHashIndexPresent !== preflight?.requestHashIndexPresent) {
         throw new Error("命令账本在预检后发生身份漂移，禁止写入。");
       }
-      if (!current.markerPresent) {
+      if (!current.markerPresent || !current.requestHashIndexPresent) {
         db.exec("BEGIN IMMEDIATE");
         try {
-          assertSchema(db, true);
-          db.prepare("INSERT INTO command_ledger_meta(key, value) VALUES('schema_version', ?)")
-            .run(String(COMMAND_LEDGER_SCHEMA_VERSION));
-          assertSchema(db, false);
+          const beforeMigration = assertSchema(db, true);
+          if (!beforeMigration.markerPresent) {
+            db.prepare("INSERT INTO command_ledger_meta(key, value) VALUES('schema_version', ?)")
+              .run(String(COMMAND_LEDGER_SCHEMA_VERSION));
+          }
+          if (!beforeMigration.requestHashIndexPresent) {
+            db.exec(`CREATE INDEX ${REQUEST_HASH_INDEX}
+              ON command_ledger_entries(request_hash, started_at ASC, idempotency_key ASC)`);
+          }
+          const migrated = assertSchema(db, false);
+          if (!migrated.requestHashIndexPresent) throw new Error("命令账本 requestHash 索引迁移失败。");
           db.exec("COMMIT");
         } catch (error) {
           db.exec("ROLLBACK");
@@ -399,7 +418,9 @@ export async function upsertCommandLedgerEntry(
   const db = await openWritableDb(root);
   try {
     await migrateFromJsonIfNeeded(root, db);
-    db.prepare(`
+    db.exec("BEGIN IMMEDIATE");
+    try {
+      db.prepare(`
       INSERT INTO command_ledger_entries(
         idempotency_key, request_id, command, status, request_hash, started_at, executed_at, updated_at, payload_json
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -412,18 +433,27 @@ export async function upsertCommandLedgerEntry(
         executed_at=excluded.executed_at,
         updated_at=excluded.updated_at,
         payload_json=excluded.payload_json
-    `).run(
-      entry.idempotencyKey,
-      entry.requestId,
-      entry.command,
-      entry.status,
-      entry.requestHash,
-      entry.startedAt,
-      entry.executedAt ?? null,
-      updatedAt,
-      JSON.stringify(entry),
-    );
-    db.prepare("INSERT OR REPLACE INTO command_ledger_meta(key, value) VALUES('updatedAt', ?)").run(updatedAt);
+      `).run(
+        entry.idempotencyKey,
+        entry.requestId,
+        entry.command,
+        entry.status,
+        entry.requestHash,
+        entry.startedAt,
+        entry.executedAt ?? null,
+        updatedAt,
+        JSON.stringify(entry),
+      );
+      db.prepare("INSERT OR REPLACE INTO command_ledger_meta(key, value) VALUES('updatedAt', ?)").run(updatedAt);
+      db.exec("COMMIT");
+    } catch (error) {
+      try {
+        db.exec("ROLLBACK");
+      } catch (rollbackError) {
+        throw new AggregateError([error, rollbackError], "命令账本 entry/meta 事务与回滚均失败。");
+      }
+      throw error;
+    }
   } finally {
     db.close();
   }
@@ -497,6 +527,24 @@ export async function getCommandLedgerEntryByRequestId(
   });
   if (sqlite.databasePresent) return sqlite.value;
   return (await readLegacySnapshot(root))?.entries.find((entry) => entry.requestId === requestId) ?? null;
+}
+
+/** 按稳定请求身份读取全部账本别名；小说导入用它跨 idempotencyKey 复用首次结果锚点。 */
+export async function getCommandLedgerEntriesByRequestHash(
+  projectRoot: string,
+  requestHash: string,
+): Promise<CommandLedgerEntry[]> {
+  const root = path.resolve(projectRoot);
+  const sqlite = await readSqlite(root, (db) => {
+    const rows = db.prepare(`
+      SELECT payload_json FROM command_ledger_entries
+      WHERE request_hash = ?
+      ORDER BY started_at ASC, idempotency_key ASC
+    `).all(requestHash) as Array<{ payload_json: string }>;
+    return rows.map((row) => parseEntry(row.payload_json));
+  });
+  if (sqlite.databasePresent) return sqlite.value;
+  return (await readLegacySnapshot(root))?.entries.filter((entry) => entry.requestHash === requestHash) ?? [];
 }
 
 export async function listCommandLedgerEntries(

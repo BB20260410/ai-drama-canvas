@@ -129,6 +129,60 @@ describe("P10-R 备份恢复与旧构建拒绝", () => {
       .rejects.toThrow(/已存在/);
   });
 
+  it.each(["novel", "hybrid"] as const)("schema v2 %s 备份保留 writer fence、排除瞬态锁并可恢复到新根", async (workspaceMode) => {
+    const parent = await realpath(await mkdtemp(path.join("/tmp", `p1-v2-${workspaceMode}-backup-`)));
+    roots.push(parent);
+    const project = await createManagedProject({
+      parentRoot: parent,
+      name: `P1 ${workspaceMode} backup`,
+      workspaceMode,
+    });
+    const sourceFencePath = path.join(project.paths.sidecar, "locks");
+    const sourceFence = JSON.parse(await readFile(sourceFencePath, "utf8")) as Record<string, unknown>;
+    const sourceCacheFence = await readFile(path.join(project.paths.sidecar, "cache.sqlite"));
+    const backup = await createManagedProjectBackup(project.paths.root, path.join(parent, "backups"));
+    const backupRelativePaths = backup.manifest.files.map((entry) => entry.relativePath);
+
+    expect(backupRelativePaths).toContain(".aicanvas/locks");
+    expect(backupRelativePaths).toContain(".aicanvas/cache.sqlite");
+    expect(backupRelativePaths).toContain(".aicanvas/cache-v2.sqlite");
+    expect(backup.manifest.snapshot?.sqliteDatabases).toContain(".aicanvas/cache-v2.sqlite");
+    expect(backup.manifest.snapshot?.sqliteDatabases).not.toContain(".aicanvas/cache.sqlite");
+    expect(backupRelativePaths.some((relativePath) => relativePath.startsWith(".aicanvas/locks-v2/"))).toBe(false);
+    expect(backupRelativePaths.some((relativePath) => relativePath.endsWith(".lock"))).toBe(false);
+    expect(JSON.parse(await readFile(path.join(backup.backupRoot, "project", ".aicanvas", "locks"), "utf8")))
+      .toEqual(sourceFence);
+    const backupCacheFencePath = path.join(backup.backupRoot, "project", ".aicanvas", "cache.sqlite");
+    expect(await readFile(backupCacheFencePath)).toEqual(sourceCacheFence);
+    expect((await stat(backupCacheFencePath)).mode & 0o222).toBe(0);
+    const oldCacheProbe = new DatabaseSync(backupCacheFencePath);
+    try {
+      expect(() => oldCacheProbe.exec("PRAGMA busy_timeout=5000; PRAGMA synchronous=NORMAL"))
+        .toThrow(/not a database/u);
+    } finally {
+      oldCacheProbe.close();
+    }
+
+    const restored = await restoreManagedProjectBackup(backup.backupRoot, path.join(parent, "restores"));
+    const shell = await inspectManagedProject(restored.projectRoot);
+    const restoredFence = JSON.parse(await readFile(path.join(shell.paths.sidecar, "locks"), "utf8")) as Record<string, unknown>;
+    expect(shell).toMatchObject({
+      workspaceMode,
+      manifest: { schemaVersion: 2, workspaceMode, minimumWriterSchemaVersion: 2 },
+    });
+    expect(restoredFence).toMatchObject({
+      kind: "ai-canvas-managed-writer-fence",
+      projectId: project.project.id,
+      rootRealpath: restored.projectRoot,
+      minimumWriterSchemaVersion: 2,
+      lockDirectory: ".aicanvas/locks-v2",
+    });
+    expect(restoredFence.rootRealpath).not.toBe(sourceFence.rootRealpath);
+    expect(restoredFence.fingerprint).toMatch(/^[a-f0-9]{64}$/u);
+    expect(path.basename(shell.paths.cache)).toBe("cache-v2.sqlite");
+    expect((await stat(path.join(shell.paths.sidecar, "cache.sqlite"))).mode & 0o222).toBe(0);
+  });
+
   it("同一目标并发恢复只允许一个原子认领，失败调用不得删除成功副本", async () => {
     const parent = await realpath(await mkdtemp(path.join("/tmp", "p28-restore-race-")));
     roots.push(parent);
@@ -269,6 +323,27 @@ describe("P10-R 备份恢复与旧构建拒绝", () => {
     }
     expect(await readdir(backupParent)).toEqual([]);
   });
+
+  it("默认写屏障等待受同一 5 秒 absolute deadline 约束并清理 staging", async () => {
+    const parent = await realpath(await mkdtemp(path.join("/tmp", "p10r-backup-default-deadline-")));
+    roots.push(parent);
+    const project = await seedProject(parent);
+    const blocker = new DatabaseSync(project.paths.materialDatabase, { timeout: 50 });
+    blocker.exec("BEGIN IMMEDIATE");
+    const backupParent = path.join(parent, "deadline-backups");
+    const startedAt = Date.now();
+    try {
+      await expect(createManagedProjectBackup(project.paths.root, backupParent))
+        .rejects.toThrow(/无法锁定 SQLite 数据库|一致性备份已停止/);
+    } finally {
+      blocker.exec("ROLLBACK");
+      blocker.close();
+    }
+    const elapsedMs = Date.now() - startedAt;
+    expect(elapsedMs).toBeGreaterThanOrEqual(4_000);
+    expect(elapsedMs).toBeLessThan(7_000);
+    expect(await readdir(backupParent)).toEqual([]);
+  }, 10_000);
 
   it("写屏障获取注入 busy 后经受控重试成功，且不产生重复副作用", async () => {
     const parent = await realpath(await mkdtemp(path.join("/tmp", "p10r-backup-busy-retry-")));

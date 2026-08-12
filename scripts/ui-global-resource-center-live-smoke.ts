@@ -15,6 +15,7 @@ import {
 } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { performance } from "node:perf_hooks";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
@@ -38,6 +39,11 @@ import {
   type ReuseStudioGlobalResourceInput,
 } from "../src/core/studio-global-resource-reuse.js";
 import { getStudioProductionState } from "../src/core/studio-production.js";
+import {
+  captureBackgroundElectronStateOrThrow,
+  closeElectronApplicationOrThrow,
+  forceCleanupElectronApplication,
+} from "./lib/electron-application-close.mjs";
 
 const execFileAsync = promisify(execFile);
 const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -72,6 +78,28 @@ interface CharacterFixture {
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
+}
+
+async function captureRuntimeStabilitySnapshot(
+  application: Awaited<ReturnType<typeof electron.launch>>,
+  label: string,
+): Promise<{ label: string; snapshot: unknown }> {
+  const snapshot = await application.evaluate(() => (
+    (globalThis as typeof globalThis & {
+      __AI_CANVAS_RUNTIME_STABILITY_SNAPSHOT__?: () => unknown;
+    }).__AI_CANVAS_RUNTIME_STABILITY_SNAPSHOT__?.()
+  ));
+  if (!snapshot) throw new Error(`${label} 缺少 runtime stability probe。`);
+  return { label, snapshot };
+}
+
+async function measure<T>(action: () => Promise<T>): Promise<{ value: T; durationMs: number }> {
+  const startedAt = performance.now();
+  const value = await action();
+  return {
+    value,
+    durationMs: Math.round((performance.now() - startedAt) * 100) / 100,
+  };
 }
 
 async function ensureFreshEvidenceTarget(output: string): Promise<void> {
@@ -309,6 +337,11 @@ await Promise.all([
 const previousRegistry = process.env.AI_CANVAS_REGISTRY_PATH;
 process.env.AI_CANVAS_REGISTRY_PATH = registryPath;
 let app: Awaited<ReturnType<typeof electron.launch>> | undefined;
+let closeEvidence: Awaited<ReturnType<typeof closeElectronApplicationOrThrow>> | undefined;
+const backgroundSnapshots: unknown[] = [];
+const runtimeStability: Array<{ label: string; snapshot: unknown }> = [];
+const actionTimings: Record<string, number> = {};
+const domSamples: Array<{ label: string; totalElements: number; cards: number; images: number }> = [];
 
 try {
   const startedAt = performance.now();
@@ -370,6 +403,8 @@ try {
       AI_CANVAS_MANAGED_PROJECTS_ROOT: projectsParent,
       AI_CANVAS_WINDOW_WIDTH: "1720",
       AI_CANVAS_WINDOW_HEIGHT: "1120",
+      AI_CANVAS_ELECTRON_BACKGROUND_SMOKE: "1",
+      AI_CANVAS_RUNTIME_STABILITY_PROBE: "1",
     },
   });
   const page = await app.firstWindow();
@@ -398,9 +433,13 @@ try {
       cause: error,
     });
   }
-  await page.locator('[data-testid="studio-mode-global-resources"]').click();
   const center = page.locator('[data-testid="global-resource-center-view"]');
-  await center.waitFor();
+  actionTimings.openCenterMs = (await measure(async () => {
+    await page.locator('[data-testid="studio-mode-global-resources"]').click();
+    await center.waitFor();
+  })).durationMs;
+  backgroundSnapshots.push(await captureBackgroundElectronStateOrThrow(app, { label: "Global resource center ready" }));
+  runtimeStability.push(await captureRuntimeStabilitySnapshot(app, "ready"));
   await center.locator('[data-testid="global-resource-target-project"]')
     .filter({ hasText: target.project.name })
     .waitFor();
@@ -434,13 +473,21 @@ try {
     "全部图片第一页资源键不完整或不唯一。",
   );
   await decodedImages(page);
+  domSamples.push(await page.evaluate(() => ({
+    label: "image-first-page",
+    totalElements: document.querySelectorAll("*").length,
+    cards: document.querySelectorAll('[data-testid="global-resource-item"]').length,
+    images: document.images.length,
+  })));
 
-  await center.locator('[data-testid="global-resource-next"]').click();
-  await page.waitForFunction((previousKeys) => {
-    const keys = [...document.querySelectorAll<HTMLElement>('[data-testid="global-resource-item"]')]
-      .map((item) => item.dataset.resourceKey || "");
-    return keys.length === 4 && keys.every((key) => !previousKeys.includes(key));
-  }, firstPageKeys);
+  actionTimings.nextPageMs = (await measure(async () => {
+    await center.locator('[data-testid="global-resource-next"]').click();
+    await page.waitForFunction((previousKeys) => {
+      const keys = [...document.querySelectorAll<HTMLElement>('[data-testid="global-resource-item"]')]
+        .map((item) => item.dataset.resourceKey || "");
+      return keys.length === 4 && keys.every((key) => !previousKeys.includes(key));
+    }, firstPageKeys);
+  })).durationMs;
   const secondPageKeys = await cards.evaluateAll((items) => items.map((item) => (
     (item as HTMLElement).dataset.resourceKey || ""
   )));
@@ -449,12 +496,29 @@ try {
     && secondPageKeys.every((key) => !firstPageKeys.includes(key)),
     "全部图片第二页不是余下 4 项，或与第一页重复。",
   );
-  await center.locator('[data-testid="global-resource-prev"]').click();
-  await page.waitForFunction((expected) => {
-    const keys = [...document.querySelectorAll<HTMLElement>('[data-testid="global-resource-item"]')]
-      .map((item) => item.dataset.resourceKey || "");
-    return JSON.stringify(keys) === JSON.stringify(expected);
-  }, firstPageKeys);
+  actionTimings.previousPageMs = (await measure(async () => {
+    await center.locator('[data-testid="global-resource-prev"]').click();
+    await page.waitForFunction((expected) => {
+      const keys = [...document.querySelectorAll<HTMLElement>('[data-testid="global-resource-item"]')]
+        .map((item) => item.dataset.resourceKey || "");
+      return JSON.stringify(keys) === JSON.stringify(expected);
+    }, firstPageKeys);
+  })).durationMs;
+
+  const resourceSearch = center.locator('[data-testid="global-resource-search"]');
+  actionTimings.searchExactMs = (await measure(async () => {
+    await resourceSearch.fill(characters[0]!.name);
+    await page.waitForFunction(() => (
+      document.querySelectorAll('[data-testid="global-resource-item"]').length === 1
+    ));
+  })).durationMs;
+  actionTimings.searchClearMs = (await measure(async () => {
+    await resourceSearch.fill("");
+    await page.waitForFunction(() => (
+      document.querySelectorAll('[data-testid="global-resource-item"]').length === 36
+    ));
+  })).durationMs;
+  runtimeStability.push(await captureRuntimeStabilitySnapshot(app, "after-search-and-pagination"));
 
   const characterCard = cards.first();
   await characterCard.waitFor();
@@ -480,10 +544,12 @@ try {
     .waitFor();
   await characterCallButton.filter({ hasText: "已调用，待审核" }).waitFor();
 
-  await center.locator('[data-testid="global-resource-tab-audio"]').click();
-  await page.waitForFunction(() => (
-    document.querySelectorAll('[data-testid="global-resource-item"]').length === 1
-  ));
+  actionTimings.audioCategoryMs = (await measure(async () => {
+    await center.locator('[data-testid="global-resource-tab-audio"]').click();
+    await page.waitForFunction(() => (
+      document.querySelectorAll('[data-testid="global-resource-item"]').length === 1
+    ));
+  })).durationMs;
   const audioCard = cards.filter({ hasText: audio.sourceBasename });
   await audioCard.filter({ hasText: "已有波形" }).waitFor();
   await decodedImages(page);
@@ -494,10 +560,12 @@ try {
     .waitFor();
   await audioCallButton.filter({ hasText: "已调用" }).waitFor();
 
-  await center.locator('[data-testid="global-resource-tab-video"]').click();
-  await page.waitForFunction(() => (
-    document.querySelectorAll('[data-testid="global-resource-item"]').length === 1
-  ));
+  actionTimings.videoCategoryMs = (await measure(async () => {
+    await center.locator('[data-testid="global-resource-tab-video"]').click();
+    await page.waitForFunction(() => (
+      document.querySelectorAll('[data-testid="global-resource-item"]').length === 1
+    ));
+  })).durationMs;
   const videoCard = cards.filter({ hasText: video.sourceBasename });
   await videoCard.filter({ hasText: "已有封面" }).filter({ hasText: "已有轻量视频代理" }).waitFor();
   await decodedImages(page);
@@ -509,7 +577,19 @@ try {
   await videoCallButton.filter({ hasText: "已调用" }).waitFor();
   await page.screenshot({ path: temporaryScreenshotPath, fullPage: true });
 
-  await app.close();
+  domSamples.push(await page.evaluate(() => ({
+    label: "video-category",
+    totalElements: document.querySelectorAll("*").length,
+    cards: document.querySelectorAll('[data-testid="global-resource-item"]').length,
+    images: document.images.length,
+  })));
+  await page.waitForTimeout(600);
+  runtimeStability.push(await captureRuntimeStabilitySnapshot(app, "idle-before-close"));
+  backgroundSnapshots.push(await captureBackgroundElectronStateOrThrow(app, { label: "Global resource center before close" }));
+  closeEvidence = await closeElectronApplicationOrThrow(app, {
+    label: "Global resource center Electron",
+    timeoutMs: 20_000,
+  });
   app = undefined;
 
   checkpointDatabase(target.paths.materialDatabase);
@@ -724,6 +804,11 @@ try {
     status: "PASS",
     checkedAt: new Date().toISOString(),
     durationMs: Math.round(performance.now() - startedAt),
+    performance: {
+      actionTimings,
+      runtimeStability,
+      domSamples,
+    },
     sourceRuntime: "out Electron build",
     buildIdentity: {
       buildId: releaseManifest.buildId ?? null,
@@ -794,6 +879,8 @@ try {
       pageErrors,
       externalRequests,
       failedStudioMediaRequests,
+      backgroundSnapshots,
+      closeEvidence,
     },
     screenshotPath: path.relative(workspace, screenshotPath).split(path.sep).join("/"),
   };
@@ -804,7 +891,7 @@ try {
   await rename(`${evidencePath}.tmp`, evidencePath);
   console.log(JSON.stringify(evidence, null, 2));
 } finally {
-  await app?.close().catch(() => undefined);
+  if (app) await forceCleanupElectronApplication(app).catch(() => undefined);
   if (previousRegistry === undefined) delete process.env.AI_CANVAS_REGISTRY_PATH;
   else process.env.AI_CANVAS_REGISTRY_PATH = previousRegistry;
   await rm(temporaryRoot, { recursive: true, force: true });

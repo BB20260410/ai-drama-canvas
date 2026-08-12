@@ -118,6 +118,7 @@
           :global-resource-api="api"
           :generation-provider="generationProvider"
           :focus="canvasFocus"
+          @initial-unit-cards-committed="onInitialUnitCardsCommitted"
           @failed="onDashboardFailed"
           @open-dashboard="onCanvasOpenDashboard"
           @open-binding="onCanvasOpenBinding"
@@ -907,7 +908,7 @@
           <button type="button" aria-label="关闭原图检查" @click="closeVersionPreview"><X :size="17" aria-hidden="true" /></button>
         </header>
         <figure>
-          <img :src="versionPreview.mediaUrl" :alt="`${versionPreview.ownerName || detail?.title || '资产'} v${versionPreview.ordinal} 受管原图`" />
+          <img :src="versionPreview.mediaUrl" :alt="`${versionPreview.ownerName || detail?.title || '资产'} v${versionPreview.ordinal} 受管原图`" decoding="async" />
         </figure>
         <footer>
           <span>{{ reviewLabel(versionPreview.reviewStatus) }}</span>
@@ -1054,6 +1055,8 @@ import {
   createEmptyMaterialStudioCreateDraft,
   resetMaterialStudioCreateDraft,
 } from "../material-studio-create-draft";
+import { markT23RendererStartup } from "../t23-renderer-startup-probe";
+import { createStudioInitialOverviewReleaseGate } from "../studio-initial-overview-release-gate";
 
 const AsyncStudioBindingWorkbench = defineAsyncComponent(() => import("./StudioBindingWorkbench.vue"));
 const AsyncStudioContinuityReviewView = defineAsyncComponent(() => import("./StudioContinuityReviewView.vue"));
@@ -1065,342 +1068,74 @@ const AsyncScriptMediaAlignView = defineAsyncComponent(() => import("./ScriptMed
 const AsyncStudioMultimediaTimelineView = defineAsyncComponent(() => import("./StudioMultimediaTimelineView.vue"));
 const AsyncGlobalResourceCenterView = defineAsyncComponent(() => import("./GlobalResourceCenterView.vue"));
 
-export type MaterialStudioSection = "script" | "prompt" | "character" | "scene" | "prop" | "style" | "media";
-export type MaterialStudioAssetCategory = "character" | "scene" | "prop" | "style";
-export type MaterialStudioAssetScope = "current" | "all";
-export type MaterialStudioAssetRepresentation = "images" | "assets";
-export type MaterialStudioReviewStatus = "pending" | "approved" | "rejected";
-export type MaterialStudioAuthorityState = "locked" | "candidate" | "missing";
-export type MaterialStudioAssetRelationKind = "derived_from" | "variant_of" | "reference_of" | "composite_member";
-
-export interface MaterialStudioApplicability {
-  projects: string[];
-  seasons: string[];
-  episodes: string[];
-  units: string[];
-  timeRanges: Array<{
-    scope: "episode" | "unit";
-    scopeId: string;
-    startSeconds: number;
-    endSeconds: number;
-    label?: string;
-  }>;
-  tags: string[];
-}
-
-export interface MaterialStudioUiRelation {
-  id: string;
-  seriesId: string;
-  revision: number;
-  supersedesRelationId?: string;
-  supersededByRelationId?: string;
-  head: boolean;
-  status: "current" | "stale" | "superseded";
-  kind: MaterialStudioAssetRelationKind;
-  subjectAssetId: string;
-  objectAssetId: string;
-  subjectRevision: number;
-  objectRevision: number;
-  ordinal?: number;
-  role: string;
-  note: string;
-  fingerprint: string;
-}
-
-export interface MaterialStudioUiCounts {
-  total: number;
-  textDocuments: number;
-  scripts: number;
-  prompts: number;
-  character: number;
-  scene: number;
-  prop: number;
-  style: number;
-  media: number;
-  canonicalAssets: number;
-}
-
-export interface MaterialStudioTimelineSegment {
-  id: string;
-  label: string;
-  durationSeconds: number;
-  status: "pending" | "current" | "complete";
-}
-
-export interface MaterialStudioProjectOverview {
-  projectName: string;
-  nextAction: string;
-  nextActionControl?: {
-    code: string;
-    label: string;
-    reason: string;
-    requiresWrite: boolean;
-    locator?: { kind: string; unitId?: string; panelId?: string; assetId?: string; queue?: string; itemId?: string };
-  };
-  counts: MaterialStudioUiCounts;
-  timeline: {
-    currentLabel?: string;
-    unitCount: number;
-    completedUnitCount: number;
-    segments: MaterialStudioTimelineSegment[];
-  };
-}
-
-export interface MaterialStudioUiEntry {
-  id: string;
-  kind: MaterialStudioSection | "image" | "video" | "audio";
-  title: string;
-  subtitle?: string;
-  summary?: string;
-  meta?: string;
-  episode?: number;
-  /** 列表层唯一允许的视觉 URL；不得传入原媒体 URL。 */
-  thumbnailUrl?: string;
-  /** 媒体条目的内容寻址 ID；只传递 SHA，不传递媒体内容。 */
-  mediaSha256?: string;
-  authorityState?: MaterialStudioAuthorityState;
-  updatedAt?: string;
-  /** scope=all 时必填；普通当前工程列表保持可选以兼容既有 adapter。 */
-  sourceProjectId?: string;
-  /** scope=all 卡片向用户展示的来源剧本名，不以路径替代。 */
-  sourceProjectName?: string;
-  /** scope=all 只读详情的真实受管工程根；不得用当前 projectRoot 代替。 */
-  sourceProjectRoot?: string;
-  /** scope=all 在来源工程内读取详情的原始 entry ID。 */
-  sourceEntryId?: string;
-  /** scope=all + images 时保留一张图对应的全部资产/版本语义。 */
-  resourceImage?: {
-    mediaSha256: string;
-    associations: Array<{
-      assetId: string;
-      name: string;
-      category: MaterialStudioAssetCategory;
-      versionId: string;
-      versionOrdinal: number;
-      reviewStatus: MaterialStudioReviewStatus;
-      isPrimary: boolean;
-    }>;
-  };
-}
-
-export interface MaterialStudioUiAssetCounts {
-  total: number;
-  character: number;
-  scene: number;
-  prop: number;
-  style: number;
-}
-
-export interface MaterialStudioUiImageCoverage {
-  totalImages: number;
-  assetVersionImages: number;
-  ordinaryImages: number;
-}
-
-export interface MaterialStudioUiUnavailableProject {
-  id: string;
-  name: string;
-  reason: "not-managed" | "material-database-invalid";
-}
-
-export interface MaterialStudioUiPage {
-  items: MaterialStudioUiEntry[];
-  nextCursor?: string;
-  total?: number;
-  counts?: MaterialStudioUiAssetCounts;
-  resourceCounts?: MaterialStudioUiAssetCounts;
-  imageCoverage?: MaterialStudioUiImageCoverage;
-  registeredProjectCount?: number;
-  readableProjectCount?: number;
-  unavailableProjects?: MaterialStudioUiUnavailableProject[];
-}
+import type {
+  MaterialStudioApplicability,
+  MaterialStudioAppendPendingVersionInput,
+  MaterialStudioAppendRelationInput,
+  MaterialStudioAssetCategory,
+  MaterialStudioAssetRelationKind,
+  MaterialStudioAssetRepresentation,
+  MaterialStudioAssetScope,
+  MaterialStudioAuthorityState,
+  MaterialStudioCreateAssetInput,
+  MaterialStudioImportResult,
+  MaterialStudioProjectOverview,
+  MaterialStudioRebaseRelationInput,
+  MaterialStudioReviewPendingVersionInput,
+  MaterialStudioReviewStatus,
+  MaterialStudioSection,
+  MaterialStudioUiApi,
+  MaterialStudioUiAssetCounts,
+  MaterialStudioUiCounts,
+  MaterialStudioUiDetail,
+  MaterialStudioUiEntry,
+  MaterialStudioUiImageCoverage,
+  MaterialStudioUiListQuery,
+  MaterialStudioUiPage,
+  MaterialStudioUiRelation,
+  MaterialStudioUiUnavailableProject,
+  MaterialStudioUiVersion,
+  MaterialStudioTimelineSegment,
+  StudioScriptProductUiApi,
+} from "../material-studio-ui-contract";
+export type {
+  MaterialStudioApplicability,
+  MaterialStudioAppendPendingVersionInput,
+  MaterialStudioAppendRelationInput,
+  MaterialStudioAssetCategory,
+  MaterialStudioAssetRelationKind,
+  MaterialStudioAssetRepresentation,
+  MaterialStudioAssetScope,
+  MaterialStudioAuthorityState,
+  MaterialStudioCreateAssetInput,
+  MaterialStudioImportResult,
+  MaterialStudioProjectOverview,
+  MaterialStudioRebaseRelationInput,
+  MaterialStudioReviewPendingVersionInput,
+  MaterialStudioReviewStatus,
+  MaterialStudioSection,
+  MaterialStudioUiApi,
+  MaterialStudioUiAssetCounts,
+  MaterialStudioUiCounts,
+  MaterialStudioUiDetail,
+  MaterialStudioUiEntry,
+  MaterialStudioUiImageCoverage,
+  MaterialStudioUiListQuery,
+  MaterialStudioUiPage,
+  MaterialStudioUiRelation,
+  MaterialStudioUiUnavailableProject,
+  MaterialStudioUiVersion,
+  MaterialStudioTimelineSegment,
+  StudioScriptProductUiApi,
+} from "../material-studio-ui-contract";
 
 interface MaterialStudioGlobalCatalogSummary {
-  counts?: MaterialStudioUiAssetCounts;
-  resourceCounts?: MaterialStudioUiAssetCounts;
-  imageCoverage?: MaterialStudioUiImageCoverage;
+  counts?: import("../material-studio-ui-contract").MaterialStudioUiAssetCounts;
+  resourceCounts?: import("../material-studio-ui-contract").MaterialStudioUiAssetCounts;
+  imageCoverage?: import("../material-studio-ui-contract").MaterialStudioUiImageCoverage;
   registeredProjectCount?: number;
   readableProjectCount?: number;
-  unavailableProjects?: MaterialStudioUiUnavailableProject[];
-}
-
-export interface MaterialStudioUiVersion {
-  id: string;
-  ordinal: number;
-  /** 逐图资源存在同 SHA 多资产关系时，用于区分各自独立的 vN。 */
-  ownerAssetId?: string;
-  ownerName?: string;
-  ownerCategory?: MaterialStudioAssetCategory;
-  mediaSha256: string;
-  /** 列表/卡片只加载轻量缩略图；原图只在用户打开单图检查层时加载。 */
-  thumbnailUrl?: string;
-  mediaUrl?: string;
-  reviewStatus: MaterialStudioReviewStatus;
-  isPrimary: boolean;
-  sourceNote?: string;
-  reviewNote?: string;
-  createdAt?: string;
-}
-
-export interface MaterialStudioUiDetail {
-  id: string;
-  kind: MaterialStudioSection | "image" | "video" | "audio";
-  title: string;
-  description?: string;
-  revision: number;
-  aliases?: string[];
-  /** 详情层也只接受权威图的缩略 URL。 */
-  authorityThumbnailUrl?: string;
-  primaryAuthority?: { versionId: string; mediaSha256: string };
-  mediaPreview?: {
-    status: "ready" | "blocked" | "failed" | "not-required";
-    message: string;
-    previewUrl?: string;
-    playbackUrl?: string;
-    mimeType: string;
-  };
-  versions?: MaterialStudioUiVersion[];
-  resourceImage?: {
-    mediaSha256: string;
-    sourceBasename: string;
-    mimeType: string;
-    sizeBytes: number;
-    associations: Array<{
-      assetId: string;
-      name: string;
-      category: MaterialStudioAssetCategory;
-      versionId: string;
-      versionOrdinal: number;
-      reviewStatus: MaterialStudioReviewStatus;
-      isPrimary: boolean;
-      sourceNote?: string;
-    }>;
-  };
-  identityFeatures?: string[];
-  positiveLocks?: string[];
-  negativeLocks?: string[];
-  applicability?: MaterialStudioApplicability;
-  relations?: MaterialStudioUiRelation[];
-  prompt?: {
-    positive?: string;
-    negative?: string;
-    frozenPackId?: string;
-  };
-  textDocument?: {
-    kind: "script" | "prompt";
-    bodyPreview: string;
-    bodySizeBytes: number;
-    bodySha256: string;
-    source: string;
-    sourceVersion: string;
-    truncated: boolean;
-  };
-}
-
-export interface MaterialStudioUiListQuery {
-  section: MaterialStudioSection;
-  scope: MaterialStudioAssetScope;
-  representation: MaterialStudioAssetRepresentation;
-  search?: string;
-  cursor?: string;
-  limit: number;
-}
-
-export interface MaterialStudioCreateAssetInput {
-  category: MaterialStudioAssetCategory;
-  name: string;
-  description?: string;
-  aliases?: string[];
-  identityFeatures?: string[];
-  positiveLocks?: string[];
-  negativeLocks?: string[];
-  defaultPrompt?: string;
-  applicability?: Partial<MaterialStudioApplicability>;
-  expectedRevision: 0;
-}
-
-export interface MaterialStudioAppendRelationInput {
-  assetId: string;
-  relatedAssetId: string;
-  kind: MaterialStudioAssetRelationKind;
-  ordinal?: number;
-  role?: string;
-  note?: string;
-  expectedRevision: number;
-}
-
-export interface MaterialStudioRebaseRelationInput {
-  assetId: string;
-  relation: MaterialStudioUiRelation;
-}
-
-export interface MaterialStudioImportResult {
-  imported: boolean;
-  entryId?: string;
-}
-
-export interface MaterialStudioAppendPendingVersionInput {
-  assetId: string;
-  mediaSha256: string;
-  expectedRevision: number;
-  sourceNote: string;
-}
-
-export interface MaterialStudioReviewPendingVersionInput {
-  assetId: string;
-  versionId: string;
-  decision: "approved" | "rejected";
-  expectedRevision: number;
-  note: string;
-}
-
-export interface MaterialStudioUiApi {
-  openProjectCenter?(): void;
-  listGlobalResourceImages?(
-    query: GlobalStudioImageResourceQuery,
-  ): Promise<GlobalStudioImageResourcePage>;
-  listGlobalMediaResources?(
-    query: GlobalStudioMediaResourceQuery,
-  ): Promise<GlobalStudioMediaResourcePage>;
-  reuseGlobalResource?(
-    targetProjectRoot: string,
-    input: ReuseStudioGlobalResourceInput,
-  ): Promise<ReuseStudioGlobalResourceResult>;
-  getOverview(projectRoot: string): Promise<MaterialStudioProjectOverview>;
-  listEntries(projectRoot: string, query: MaterialStudioUiListQuery): Promise<MaterialStudioUiPage>;
-  getEntryDetail(projectRoot: string, entryId: string): Promise<MaterialStudioUiDetail | null>;
-  /** P24 U4：文稿修订历史（只读，≤20 条）。 */
-  listTextRevisions?(projectRoot: string, query: { documentId: string; limit?: number }): Promise<{ items: Array<{ id: string; ordinal: number; bodySha256: string }>; nextCursor?: string }>;
-  chooseAndImportScript(projectRoot: string): Promise<MaterialStudioImportResult>;
-  chooseAndImportPrompt(projectRoot: string): Promise<MaterialStudioImportResult>;
-  chooseAndImportMedia(projectRoot: string): Promise<MaterialStudioImportResult>;
-  createAsset(projectRoot: string, input: MaterialStudioCreateAssetInput): Promise<{ assetId: string }>;
-  /** 新版本必须以 pending 状态追加，由后续审核单独决策。 */
-  appendPendingAssetVersion?(projectRoot: string, input: MaterialStudioAppendPendingVersionInput): Promise<MaterialStudioUiDetail>;
-  reviewPendingAssetVersion?(projectRoot: string, input: MaterialStudioReviewPendingVersionInput): Promise<MaterialStudioUiDetail>;
-  promoteApprovedAuthority(projectRoot: string, input: { assetId: string; versionId: string; expectedRevision: number }): Promise<MaterialStudioUiDetail>;
-  appendAssetRelation?(projectRoot: string, input: MaterialStudioAppendRelationInput): Promise<MaterialStudioUiDetail>;
-  rebaseAssetRelation?(projectRoot: string, input: MaterialStudioRebaseRelationInput): Promise<MaterialStudioUiDetail>;
-  exportCrossProjectAssetPackage?(
-    projectRoot: string,
-    input: { assetId: string; expectedRevision: number },
-  ): Promise<ExportStudioCrossProjectAssetPackageResult | null>;
-  pickCrossProjectAssetPackage?(): Promise<{
-    packageRoot: string;
-    manifest: CrossProjectAssetExportManifest;
-  } | null>;
-  importCrossProjectAssetPackage?(
-    projectRoot: string,
-    input: {
-      packageRoot: string;
-      expectedPackageFingerprint: string;
-      expectedSourceProjectId: string;
-      sourceAssetId: string;
-      sourceVersionId: string;
-      targetExpectedRevision: 0;
-    },
-  ): Promise<ImportStudioCrossProjectAssetPackageResult>;
-  openTimeline(projectRoot: string): Promise<void>;
+  unavailableProjects?: import("../material-studio-ui-contract").MaterialStudioUiUnavailableProject[];
 }
 
 interface SectionDefinition {
@@ -1415,64 +1150,6 @@ interface SelectedMediaReference {
   title: string;
   kind: "image" | "video" | "audio" | "media";
   thumbnailUrl?: string;
-}
-
-export interface StudioScriptProductUiApi {
-  listUnits(
-    projectRoot: string,
-    query: StudioProductionUnitListQuery,
-  ): Promise<StudioProductionUnitPage>;
-  getLibraryIndex(
-    projectRoot: string,
-    query: { limit?: number; kind?: "script" | "prompt" },
-  ): Promise<ScriptLibraryIndex>;
-  getReaderView(
-    projectRoot: string,
-    query: {
-      documentId?: string;
-      revisionId?: string;
-      season?: string;
-      episode?: string;
-      includeBody?: boolean;
-      evidenceDir?: string;
-    },
-  ): Promise<ScriptReaderView>;
-  getStudioScriptMediaAlignBoard(
-    projectRoot: string,
-    query: { season: string; episode: string },
-  ): Promise<import("@core/studio-script-media-align").ScriptMediaAlignBoard>;
-  openStoryboardWizard(
-    projectRoot: string,
-    input: {
-      scriptRevisionId: string;
-      panelCount?: number;
-      sourceRange?: { startOffsetUtf16: number; endOffsetUtf16: number };
-    },
-  ): Promise<StudioStoryboardWizardSession>;
-  getMediaPreview(
-    projectRoot: string,
-    sha256: string,
-  ): Promise<{ mediaUrl: string; thumbnailUrl?: string; kind: string } | null>;
-  importScript(
-    projectRoot: string,
-  ): Promise<{ imported: boolean; entryId?: string; unchanged?: boolean; revision?: unknown }>;
-  materializeStoryboardWizard(
-    projectRoot: string,
-    input: {
-      season: string;
-      episode: string;
-      sequence: number;
-      unitTitle: string;
-      scriptRevisionId: string;
-      panels: WizardEditablePanel[];
-    },
-  ): Promise<{
-    unitId: string;
-    unitRevision: number;
-    promptDocumentId: string;
-    promptRevisionId: string;
-    panelStatuses: Array<{ panelId: string; panelIndex: number; status: string }>;
-  }>;
 }
 
 export default defineComponent({
@@ -1581,6 +1258,7 @@ export default defineComponent({
     studioContextChanged: (_context: { mode: string; unitId?: string; panelId?: string; generationRunId?: string }) => true,
   },
   setup(props, { emit }) {
+    markT23RendererStartup("material-setup");
     // P25/P26：壳头跟随受管画布主题（同一主题键 + 变更事件；仅壳头换肤，子视图不动）。
     const shellTheme = ref<ManagedCanvasThemeId>(readManagedCanvasTheme());
     const onCanvasThemeChanged = (event: Event): void => {
@@ -1837,6 +1515,7 @@ export default defineComponent({
     let actionRequest = 0;
     let relationCandidateRequest = 0;
     let disposed = false;
+    const initialOverviewReleaseGate = createStudioInitialOverviewReleaseGate();
     const actionGate = createProjectScopedActionGate();
 
     interface FrozenMaterialActionScope {
@@ -1966,15 +1645,19 @@ export default defineComponent({
     } satisfies Record<MaterialStudioSection, string>)[activeSection.value]);
 
     watch([() => props.projectRoot, () => props.api], () => {
+      markT23RendererStartup("material-workspace-reset");
       resetWorkspace();
-      void refresh();
+      initialOverviewReleaseGate.reset(props.projectRoot);
+      // 没有 Dashboard/Canvas owner 的旧入口保持原行为；受管 Canvas 等真实首卡释放。
+      if (!props.dashboardApi) startInitialOverview(props.projectRoot);
     }, { immediate: true });
 
     watch(searchInput, (value) => {
       if (searchTimer) clearTimeout(searchTimer);
       searchTimer = setTimeout(() => {
         searchQuery.value = value.trim();
-        void loadFirstPage();
+        if (activeMode.value === "library") void loadFirstPage();
+        else currentLibraryRefreshPending.value = true;
       }, 260);
     });
 
@@ -2012,7 +1695,7 @@ export default defineComponent({
       searchTimer = undefined;
       relationSearchTimer = undefined;
       overview.value = null;
-      currentLibraryRefreshPending.value = false;
+      currentLibraryRefreshPending.value = Boolean(props.dashboardApi);
       canvasFocus.value = null;
       dashboardFocus.value = null;
       bindingFocus.unitId = "";
@@ -2051,18 +1734,38 @@ export default defineComponent({
       notice.value = "";
     }
 
+    function startInitialOverview(expectedProjectRoot = props.projectRoot): void {
+      if (disposed || !initialOverviewReleaseGate.tryRelease(expectedProjectRoot)) return;
+      void refresh();
+    }
+
+    function onInitialUnitCardsCommitted(payload: {
+      projectRoot: string;
+      refreshSequence: number;
+      unitCount: number;
+    }): void {
+      startInitialOverview(payload.projectRoot);
+    }
+
     async function refresh(): Promise<void> {
       const request = ++overviewRequest;
       const root = props.projectRoot;
+      // 用户手动刷新先取得一次性释放权，迟到首卡/失败事件不得重复发 overview。
+      initialOverviewReleaseGate.markReleased(root);
       loading.value = true;
       clearFeedback();
+      markT23RendererStartup("material-overview-start");
       try {
         const next = await props.api.getOverview(root);
         if (disposed || request !== overviewRequest || root !== props.projectRoot) return;
         overview.value = next;
-        const loaded = await loadFirstPage();
-        if (loaded && activeMode.value === "library") {
-          currentLibraryRefreshPending.value = false;
+        markT23RendererStartup("material-overview-ready");
+        if (activeMode.value === "library") {
+          const loaded = await loadFirstPage();
+          if (loaded) currentLibraryRefreshPending.value = false;
+        } else {
+          // 默认无限画布首屏只读取 overview；素材分页延迟到用户真正打开素材库。
+          currentLibraryRefreshPending.value = true;
         }
       } catch (reason) {
         if (request === overviewRequest && root === props.projectRoot) fail(reason);
@@ -2297,8 +2000,10 @@ export default defineComponent({
       globalCatalogSummary.value = null;
       if (currentLibraryRefreshPending.value && activeMode.value === "library") {
         void refreshCurrentLibraryIfNeeded();
-      } else {
+      } else if (activeMode.value === "library") {
         void loadFirstPage();
+      } else {
+        currentLibraryRefreshPending.value = true;
       }
     }
 
@@ -2863,6 +2568,9 @@ export default defineComponent({
       if (mode === "continuity-review" && !props.continuityReviewApi) return;
       activeMode.value = mode;
       clearFeedback();
+      if (mode !== "canvas" && mode !== "global-resources" && mode !== "agent" && mode !== "help") {
+        startInitialOverview(props.projectRoot);
+      }
       if (mode === "library" && currentLibraryRefreshPending.value) {
         void refreshCurrentLibraryIfNeeded();
       }
@@ -2917,6 +2625,8 @@ export default defineComponent({
     }
 
     function onDashboardFailed(message: string): void {
+      // Canvas 首次 units/DOM 失败时，恢复素材壳 overview；一次性门防止重复请求。
+      startInitialOverview(props.projectRoot);
       emit("failed", message);
     }
 
@@ -3197,6 +2907,7 @@ export default defineComponent({
       onBindingFailed,
       onContinuityReviewFailed,
       onDashboardFailed,
+      onInitialUnitCardsCommitted,
       onGlobalResourceReused,
       onCanvasOpenReview,
       onCanvasRequestGeneration,

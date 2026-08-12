@@ -27,3 +27,17 @@ description: 当用户说“继续当前 AI 漫剧项目”、要求 Codex 或 G
 ## 无生图条件
 
 模型不可用、无额度或输出状态不明时，保持 dispatch/pending 真实状态并报告阻塞；不用占位图、夹具或虚构回执冒充真实结果。
+
+## Higgsfield 连接器队列（本机桥接）
+
+当桌面端把图片或视频加入 Higgsfield 队列时，Codex 宿主按以下顺序消费；Electron 不直接读取 OAuth、Cookie 或连接器令牌：
+
+1. 调用 `get_active_managed_studio_context`，再调用 `get_studio_connector_work_queue`，每次只领取一个请求。
+2. 获取当前工程写租约，执行 `claim_studio_higgsfield_connector_request`。不得伪造 claim token、workspace 身份或供应方观测。
+3. 在同一 Codex 会话中真实调用 Higgsfield 的余额、模型详情和精确成本预检，所有请求固定 `use_unlim=true`。只有响应明确证明 Unlimited 可用、零扣费且无参数调整时，才执行 `preflight_studio_higgsfield_connector_request` 的 ready 分支；否则记录 `blocked_by_provider` 并停止。
+4. 紧邻真实上传/提交前执行 `authorize_studio_higgsfield_connector_request`。只使用该次授权返回的 prompt、参数和受控参考路径；授权过期、切换工程、租约失效或输入漂移时重新预检，禁止沿用旧 nonce。
+5. 外部提交拿到 job ID 后立即执行 `record_studio_higgsfield_connector_submission`。若请求可能已送达但没有可靠 job ID，必须记录 `submission_unknown`，禁止重新生成。
+
+图片请求仍绑定既有正式 `provider=codex` 的 generation run；视频固定 Seedance 2.5、References、16:9、720p、20 秒、音频开启与 Unlimited-only。当前队列桥只覆盖“请求、领取、免费预检、一次性授权、提交回执”；远端轮询、结果下载、CAS 导入、时间线绑定和 Review 未闭环前，不得把 `submitted` 写成“生成完成”。
+
+如果 Higgsfield 返回非零积分、缺少明确 Unlimited 回执、自动改模型/时长/清晰度或不能证明不扣费，必须失败关闭。会员截图和模型目录标签不能替代本次请求的真实成本预检。

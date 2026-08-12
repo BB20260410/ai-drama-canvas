@@ -17,7 +17,7 @@
         <p>用于关联剧本、参考图和外部资产，不作为默认输出目录。</p>
         <div v-for="(_root, index) in draft.sourceRoots" :key="index" class="path-row">
           <input v-model="draft.sourceRoots[index]" placeholder="绝对路径" />
-          <button type="button" @click="draft.sourceRoots.splice(index, 1)"><X :size="15" /></button>
+          <button type="button" :aria-label="`移除来源 ${index + 1}`" @click="draft.sourceRoots.splice(index, 1)"><X :size="15" /></button>
         </div>
         <button class="text-button" type="button" @click="draft.sourceRoots.push('')"><Plus :size="14" /> 添加来源根</button>
       </section>
@@ -27,7 +27,7 @@
         <p>Codex 只能登记这些目录内的新文件，项目主根始终保留。</p>
         <div v-for="(_root, index) in draft.outputRoots" :key="index" class="path-row">
           <input v-model="draft.outputRoots[index]" :disabled="index === 0" />
-          <button v-if="index > 0" type="button" @click="draft.outputRoots.splice(index, 1)"><X :size="15" /></button>
+          <button v-if="index > 0" type="button" :aria-label="`移除输出 ${index + 1}`" @click="draft.outputRoots.splice(index, 1)"><X :size="15" /></button>
         </div>
         <button class="text-button" type="button" @click="draft.outputRoots.push('')"><Plus :size="14" /> 添加输出根</button>
       </section>

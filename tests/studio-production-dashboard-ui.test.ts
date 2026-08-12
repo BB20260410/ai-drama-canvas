@@ -107,6 +107,39 @@ describe("P8 Dashboard UI 源码合同", () => {
     expect(overviewCalls).toBe(2);
   });
 
+  it("冷启动默认 units 只共享同根同参数的进行中请求，完成后不缓存", async () => {
+    type DashboardResponse = Awaited<ReturnType<StudioProductionDashboardUiApi["getDashboard"]>>;
+    let unitsCalls = 0;
+    let resolveUnits!: (value: DashboardResponse) => void;
+    const firstUnits = new Promise<DashboardResponse>((resolve) => {
+      resolveUnits = resolve;
+    });
+    const api = createStudioDashboardRequestCoalescer({
+      getDashboard: async (_projectRoot, query) => {
+        if (query.operation === "units") {
+          unitsCalls += 1;
+          if (unitsCalls === 1) return firstUnits;
+        }
+        return { operation: query.operation } as DashboardResponse;
+      },
+    });
+
+    const prefetched = api.getDashboard("/tmp/project-a", { operation: "units", limit: 36 });
+    const canvasRead = api.getDashboard("/tmp/project-a", { operation: "units", limit: 36 });
+    const differentCursor = api.getDashboard("/tmp/project-a", {
+      operation: "units",
+      limit: 36,
+      cursor: "next",
+    });
+    const differentProject = api.getDashboard("/tmp/project-b", { operation: "units", limit: 36 });
+    expect(unitsCalls).toBe(3);
+
+    resolveUnits({ operation: "units" } as DashboardResponse);
+    await expect(Promise.all([prefetched, canvasRead, differentCursor, differentProject])).resolves.toHaveLength(4);
+    await api.getDashboard("/tmp/project-a", { operation: "units", limit: 36 });
+    expect(unitsCalls).toBe(4);
+  });
+
   it("宫格选择与打开画布是同级按钮，异常队列和资产出场均可双向翻页", () => {
     const view = dashboardSource();
     const parsed = parse(view, { filename: "StudioProductionDashboardView.vue" });

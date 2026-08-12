@@ -249,10 +249,12 @@ describe("P6 Studio binding MCP", () => {
           },
         },
       };
-      expect(await rejected(client.callTool({
+      const invalidReviewerError = await rejected(client.callTool({
         name: "execute_command",
         arguments: confirmBase,
-      }))).toMatch(/reviewer.*codex|MCP\/Codex/i);
+      }));
+      expect(invalidReviewerError).toMatch(/reviewer/i);
+      expect(invalidReviewerError).toMatch(/codex|MCP\/Codex/i);
       expect(await rejected(client.callTool({
         name: "execute_command",
         arguments: {

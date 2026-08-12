@@ -103,7 +103,7 @@
         <button type="button" class="new-provider" @click="newProvider">＋ 新建连接</button>
       </div>
       <form class="provider-editor" @submit.prevent="saveProvider">
-        <div class="provider-warning"><ShieldCheck :size="14" /><p>密钥值不会落盘，只保存环境变量名。真实正文外发必须显式授权；本机 LM Studio 等地址还需开启私网访问。</p></div>
+        <div class="provider-warning"><ShieldCheck :size="14" /><p>密钥值不会落盘，只保存环境变量名。真实正文外发必须显式授权；公网必须使用 HTTPS，HTTP 仅允许显式授权的本机或私网服务。</p></div>
         <div class="form-pair"><label><span>Provider ID</span><input v-model="providerDraft.id" :disabled="Boolean(providerDraft.revision)" required /></label><label><span>显示名称</span><input v-model="providerDraft.name" required /></label></div>
         <div class="form-pair"><label><span>协议</span><select v-model="providerDraft.adapter"><option value="openai-compatible">OpenAI Compatible</option><option value="mock">本地测试 Mock</option></select></label><label><span>模型名</span><input v-model="providerDraft.model" required placeholder="例如 qwen3-30b-a3b" /></label></div>
         <label v-if="providerDraft.adapter==='openai-compatible'"><span>Base URL（包含 /v1）</span><input v-model="providerDraft.baseUrl" required placeholder="http://127.0.0.1:1234/v1" /></label>

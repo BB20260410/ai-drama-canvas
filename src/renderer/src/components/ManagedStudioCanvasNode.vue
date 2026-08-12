@@ -34,8 +34,7 @@
     <div
       v-if="displayThumbnailUrl"
       class="thumb-wrap"
-      data-testid="managed-canvas-node-thumb-wrap"
-      @click.stop>
+      data-testid="managed-canvas-node-thumb-wrap">
       <img
         class="thumb"
         :src="displayThumbnailUrl"
@@ -153,6 +152,9 @@ const thumbnailFailed = ref(false);
 const thumbnailRetryNonce = ref(0);
 const thumbnailRepairAttempts = ref(0);
 let armExpireTimer: ReturnType<typeof setTimeout> | null = null;
+let thumbnailIdentityGeneration = 0;
+let exportIdentityGeneration = 0;
+let nodeDisposed = false;
 
 const canExportMedia = computed(() => Boolean(
   props.data.exportMediaSha256
@@ -217,6 +219,7 @@ async function recoverThumbnail(): Promise<void> {
     return;
   }
   const identity = `${projectRoot}\u0000${mediaSha256}\u0000${sourceUrl}`;
+  const generation = thumbnailIdentityGeneration;
   thumbnailRepairAttempts.value += 1;
   thumbnailRepairing.value = true;
   thumbnailFailed.value = false;
@@ -226,15 +229,16 @@ async function recoverThumbnail(): Promise<void> {
     if (currentIdentity !== identity) return;
     thumbnailRetryNonce.value += 1;
   } catch {
-    thumbnailFailed.value = true;
+    if (!nodeDisposed && generation === thumbnailIdentityGeneration) thumbnailFailed.value = true;
   } finally {
-    thumbnailRepairing.value = false;
+    if (!nodeDisposed && generation === thumbnailIdentityGeneration) thumbnailRepairing.value = false;
   }
 }
 
 watch(
   () => [props.data.projectRoot, props.data.mediaSha256, props.data.thumbnailUrl],
   () => {
+    thumbnailIdentityGeneration += 1;
     thumbnailRepairing.value = false;
     thumbnailFailed.value = false;
     thumbnailRetryNonce.value = 0;
@@ -250,8 +254,10 @@ function clearArmExpireTimer(): void {
 }
 
 function disarmExport(): void {
+  exportIdentityGeneration += 1;
   clearArmExpireTimer();
   exportArmed.value = false;
+  exportPreparing.value = false;
   preparedExportToken.value = null;
   exportError.value = "";
 }
@@ -261,6 +267,7 @@ async function armExport(): Promise<void> {
   const projectRoot = props.data.projectRoot!;
   const mediaSha256 = props.data.exportMediaSha256!;
   const identity = `${projectRoot}\u0000${mediaSha256}`;
+  const generation = exportIdentityGeneration;
   exportPreparing.value = true;
   exportError.value = "";
   try {
@@ -269,7 +276,8 @@ async function armExport(): Promise<void> {
       mediaSha256,
       props.data.exportFileName ?? props.data.title,
     );
-    if (`${props.data.projectRoot ?? ""}\u0000${props.data.exportMediaSha256 ?? ""}` !== identity) return;
+    if (nodeDisposed || generation !== exportIdentityGeneration
+      || `${props.data.projectRoot ?? ""}\u0000${props.data.exportMediaSha256 ?? ""}` !== identity) return;
     preparedExportToken.value = prepared.token;
     exportArmed.value = true;
     clearArmExpireTimer();
@@ -278,11 +286,13 @@ async function armExport(): Promise<void> {
       if (exportArmed.value) disarmExport();
     }, 25_000);
   } catch (error) {
-    exportError.value = error instanceof Error ? error.message : "准备拖出失败";
-    exportArmed.value = false;
-    preparedExportToken.value = null;
+    if (!nodeDisposed && generation === exportIdentityGeneration) {
+      exportError.value = error instanceof Error ? error.message : "准备拖出失败";
+      exportArmed.value = false;
+      preparedExportToken.value = null;
+    }
   } finally {
-    exportPreparing.value = false;
+    if (!nodeDisposed && generation === exportIdentityGeneration) exportPreparing.value = false;
   }
 }
 
@@ -315,6 +325,9 @@ watch(
 );
 
 onBeforeUnmount(() => {
+  nodeDisposed = true;
+  thumbnailIdentityGeneration += 1;
+  exportIdentityGeneration += 1;
   clearArmExpireTimer();
 });
 </script>

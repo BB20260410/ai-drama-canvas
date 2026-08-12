@@ -50,5 +50,7 @@ describe("小说到视频续接的隔离全链路", () => {
     expect(result.editRevision).toBeGreaterThan(1);
     expect(result.restart).toEqual(expect.objectContaining({ planRestored: true, completedUnits: 1, storyboardValid: true, editClipCount: 2, continuationStatus: "completed", timebase: { rateNumerator: 24_000, rateDenominator: 1_001 } }));
     expect([result.renderPath, result.continuationOutputPath, result.jsonPath, result.markdownPath].every((value) => value.startsWith(root))).toBe(true);
+    // 2026-08-12（wq-0007 收口）：空载全链约 69s，恢复 120s 严格门。
+    // 该测试必须单 worker 串行；资源争抢造成的外部抖动不得用永久放宽掩盖。
   }, 120_000);
 });

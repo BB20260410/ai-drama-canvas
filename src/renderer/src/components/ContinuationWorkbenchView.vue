@@ -40,7 +40,7 @@
 
     <div v-else-if="tab === 'memory'" class="memory-layout">
       <aside class="memory-index">
-        <header><span>项目记忆</span><button type="button" data-testid="new-context" @click="newContext"><Plus :size="14" /></button></header>
+        <header><span>项目记忆</span><button type="button" data-testid="new-context" aria-label="新建项目记忆" @click="newContext"><Plus :size="14" /></button></header>
         <label class="memory-search"><Search :size="13" /><input v-model="contextQuery" placeholder="角色、设定、问题或节点" /></label>
         <select v-model="contextKindFilter"><option value="all">全部类型</option><option v-for="kind in contextKinds" :key="kind" :value="kind">{{ kindLabel(kind) }}</option></select>
         <button v-for="entry in filteredContext" :key="entry.id" type="button" data-testid="context-row" :data-context-id="entry.id" :class="{ active: contextDraft.id === entry.id }" @click="selectContext(entry)"><i :class="entry.kind"></i><div><span>{{ kindLabel(entry.kind) }} · r{{ entry.revision }}</span><b>{{ entry.title }}</b><small>{{ entry.content }}</small></div></button>
@@ -62,7 +62,7 @@
 
     <div v-else class="skills-layout">
       <aside class="skill-index">
-        <header><span>项目 Skill</span><button type="button" @click="newSkill"><Plus :size="14" /></button></header>
+        <header><span>项目 Skill</span><button type="button" aria-label="新建项目 Skill" @click="newSkill"><Plus :size="14" /></button></header>
         <button v-for="skill in skills" :key="skill.id" type="button" :class="{ active: skillDraft.id === skill.id }" @click="selectSkill(skill)"><i :class="{ enabled: skill.enabled }"></i><div><span>{{ categoryLabel(skill.category) }} · r{{ skill.revision }}</span><b>{{ skill.name }}</b><small>{{ skill.description }}</small></div></button>
       </aside>
 

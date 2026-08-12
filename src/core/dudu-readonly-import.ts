@@ -87,7 +87,7 @@ import {
   type StudioDetachedGenerationUnknownObservation,
 } from "./studio-generation-ledger.js";
 import { queryStudioUnitGridGenerationFreeze } from "./studio-unit-grid-generation.js";
-import { withFileLock } from "./locks.js";
+import { withFileLock, withProjectLock } from "./locks.js";
 import { openSqliteReadOnlySnapshot, type SqliteReadOnlySnapshot } from "./sqlite-readonly-snapshot.js";
 import {
   assertDuduPromptTextPathFree,
@@ -2983,7 +2983,7 @@ export async function finalizeDuduReadonlyManagedProject(
     || discovery.candidates[0]!.projectRoot !== initialShell.paths.root) {
     throw new Error("Dudu finalize 要求 projectsRoot 中恰有当前一个候选；冲突状态禁止选择第一个。 ");
   }
-  return withFileLock(path.join(initialShell.paths.sidecar, "locks"), "dudu-readonly-finalize", async () => {
+  return withProjectLock(initialShell.paths.root, "dudu-readonly-finalize", async () => {
   const reactivationRecovery = await tryFinalizeDuduPostRegistrationReactivation(
     initialShell.paths.root,
     source,
@@ -3134,7 +3134,7 @@ export async function finalizeDuduReadonlyManagedProject(
     });
   }
   return result;
-  }, { timeoutMs: 30_000, staleMs: 2 * 60 * 60 * 1_000, confinementRoot: initialShell.paths.root });
+  }, { timeoutMs: 30_000, staleMs: 2 * 60 * 60 * 1_000 });
   }, { timeoutMs: 30_000, staleMs: 2 * 60 * 60 * 1_000, confinementRoot: projectsRoot });
 }
 
@@ -3416,7 +3416,7 @@ export async function reconcileDuduReadonlyHistoricalPasses(
   source: DuduReadonlySourceInput,
 ): Promise<DuduReadonlyHistoricalPassReconciliationResult> {
   const shell = await inspectManagedProject(projectRoot);
-  return withFileLock(path.join(shell.paths.sidecar, "locks"), "dudu-historical-pass-reconciliation", async () => {
+  return withProjectLock(shell.paths.root, "dudu-historical-pass-reconciliation", async () => {
     const verified = await verifyDuduImmutableImportIdentity(shell.paths.root);
     const identity = await getActiveDuduReadonlyProjectIdentity(shell.paths.root);
     await verifyDuduEvolvingOwnerBaseline({ shell, intent: verified.intent, receipt: verified.receipt });
@@ -3502,7 +3502,7 @@ export async function reconcileDuduReadonlyHistoricalPasses(
       imported,
       sourceMachineProjectionFingerprint: inspection.sourceManifestFingerprint,
     };
-  }, { timeoutMs: 30_000, staleMs: 2 * 60 * 60 * 1_000, confinementRoot: shell.paths.root });
+  }, { timeoutMs: 30_000, staleMs: 2 * 60 * 60 * 1_000 });
 }
 
 async function verifyDuduImmutableImportIdentity(projectRoot: string, readOnly = false): Promise<{

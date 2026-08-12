@@ -25,24 +25,172 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function createDeferred<T>(): {
+  promise: Promise<T>;
+  resolve: (value: T) => void;
+  reject: (reason?: unknown) => void;
+} {
+  let resolve!: (value: T) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
+    resolve = resolvePromise;
+    reject = rejectPromise;
+  });
+  return { promise, resolve, reject };
+}
+
 describe("P21 §4-10 ledger watcher", () => {
-  it("close 会使仍在等待 projectId 的旧计算失效，禁止关闭后迟到发送", async () => {
+  it("同一 drain 合并首轮等待期间的 50 次 emitNow，只发送最终身份", async () => {
     const fixture = await createStudioP7Fixture();
     fixtures.push(fixture);
     const sent: Array<{ projectId: string; projectionHash: string }> = [];
-    let releaseProjectId!: (projectId: string) => void;
-    const projectId = new Promise<string>((resolve) => { releaseProjectId = resolve; });
+    const firstProjectId = createDeferred<string>();
+    let resolverCalls = 0;
     const handle = createStudioGenerationLedgerWatcher({
       projectRoot: fixture.root,
-      resolveProjectId: () => projectId,
+      resolveProjectId: async () => {
+        resolverCalls += 1;
+        return resolverCalls === 1 ? firstProjectId.promise : "project-id-latest";
+      },
+      send: (payload) => { sent.push(payload); },
+      debounceMs: 10,
+    });
+    try {
+      const first = handle.emitNow();
+      await Promise.resolve();
+      const pending = Array.from({ length: 50 }, () => handle.emitNow());
+      firstProjectId.resolve("project-id-stale");
+      await Promise.all([first, ...pending]);
+
+      expect(resolverCalls).toBeLessThanOrEqual(2);
+      expect(sent).toHaveLength(1);
+      expect(sent[0]).toMatchObject({
+        projectId: "project-id-latest",
+        projectionHash: expect.stringMatching(/^[a-f0-9]{64}$/u),
+      });
+    } finally {
+      await handle.close();
+    }
+  });
+
+  it("单次 resolver 失败也会有界自动补一轮成功，不依赖并发 emitNow", async () => {
+    const fixture = await createStudioP7Fixture();
+    fixtures.push(fixture);
+    const sent: Array<{ projectId: string; projectionHash: string }> = [];
+    const errors: string[] = [];
+    let resolverCalls = 0;
+    const handle = createStudioGenerationLedgerWatcher({
+      projectRoot: fixture.root,
+      resolveProjectId: async () => {
+        resolverCalls += 1;
+        if (resolverCalls === 1) throw new Error("first resolver failed");
+        return "project-id-after-error";
+      },
+      send: (payload) => { sent.push(payload); },
+      onError: (message) => { errors.push(message); },
+      debounceMs: 10,
+    });
+    try {
+      await handle.emitNow();
+
+      expect(errors).toEqual(["first resolver failed"]);
+      expect(resolverCalls).toBe(2);
+      expect(sent).toHaveLength(1);
+      expect(sent[0]?.projectId).toBe("project-id-after-error");
+    } finally {
+      await handle.close();
+    }
+  });
+
+  it("send 失败不提前提交 lastHash，补一轮会重发同一投影", async () => {
+    const fixture = await createStudioP7Fixture();
+    fixtures.push(fixture);
+    const sent: Array<{ projectId: string; projectionHash: string }> = [];
+    const errors: string[] = [];
+    let resolverCalls = 0;
+    let sendCalls = 0;
+    const handle = createStudioGenerationLedgerWatcher({
+      projectRoot: fixture.root,
+      resolveProjectId: async () => {
+        resolverCalls += 1;
+        return fixture.shell.project.id;
+      },
+      send: (payload) => {
+        sendCalls += 1;
+        if (sendCalls === 1) throw new Error("first send failed");
+        sent.push(payload);
+      },
+      onError: (message) => { errors.push(message); },
+      debounceMs: 10,
+    });
+    try {
+      await handle.emitNow();
+
+      expect(errors).toEqual(["first send failed"]);
+      expect(resolverCalls).toBe(2);
+      expect(sendCalls).toBe(2);
+      expect(sent).toHaveLength(1);
+      expect(sent[0]?.projectionHash).toMatch(/^[a-f0-9]{64}$/u);
+    } finally {
+      await handle.close();
+    }
+  });
+
+  it("持续失败最多自动补一轮后收敛，不会无限 drain", async () => {
+    const fixture = await createStudioP7Fixture();
+    fixtures.push(fixture);
+    const errors: string[] = [];
+    let resolverCalls = 0;
+    const handle = createStudioGenerationLedgerWatcher({
+      projectRoot: fixture.root,
+      resolveProjectId: async () => {
+        resolverCalls += 1;
+        throw new Error(`resolver failed ${resolverCalls}`);
+      },
+      send: () => { throw new Error("send must not run"); },
+      onError: (message) => { errors.push(message); },
+      debounceMs: 10,
+    });
+    try {
+      await handle.emitNow();
+
+      expect(resolverCalls).toBe(2);
+      expect(errors).toEqual(["resolver failed 1", "resolver failed 2"]);
+    } finally {
+      await handle.close();
+    }
+  });
+
+  it("close 等待在途 drain，复用同一 promise，并禁止关闭后迟到发送", async () => {
+    const fixture = await createStudioP7Fixture();
+    fixtures.push(fixture);
+    const sent: Array<{ projectId: string; projectionHash: string }> = [];
+    const projectId = createDeferred<string>();
+    let resolverCalls = 0;
+    const handle = createStudioGenerationLedgerWatcher({
+      projectRoot: fixture.root,
+      resolveProjectId: () => {
+        resolverCalls += 1;
+        return projectId.promise;
+      },
       send: (payload) => { sent.push(payload); },
       debounceMs: 10,
     });
     const pending = handle.emitNow();
-    await handle.close();
-    releaseProjectId(fixture.shell.project.id);
-    await pending;
+    await Promise.resolve();
+    const firstClose = handle.close();
+    const secondClose = handle.close();
+    expect(secondClose).toBe(firstClose);
+    let closeSettled = false;
+    void firstClose.then(() => { closeSettled = true; });
+    await Promise.resolve();
+    expect(closeSettled).toBe(false);
+    projectId.resolve(fixture.shell.project.id);
+    await Promise.all([firstClose, secondClose, pending]);
     expect(sent).toEqual([]);
+    const resolverCallsAfterClose = resolverCalls;
+    await handle.emitNow();
+    expect(resolverCalls).toBe(resolverCallsAfterClose);
   });
 
   it("写 sqlite/-wal 触发有界失效信号；无关文件不触发；哈希去重；emitNow 快路径；close 后静默", async () => {

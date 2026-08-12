@@ -22,11 +22,20 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 import { backup as backupSqliteDatabase, DatabaseSync } from "node:sqlite";
+import { createLegacyProjectCacheWriterFence } from "./cache.js";
 import { inspectManagedProject } from "./managed-project.js";
+import { managedProjectWriterFenceValue } from "./managed-writer-fence.js";
 import { writeJsonAtomic } from "./sidecar.js";
 import { resolveRuntimeBuildIdentity } from "./build-identity.js";
 import { withProjectLock } from "./locks.js";
-import { withSqliteBusyRetry } from "./studio-sqlite-busy.js";
+import {
+  RetrySafeSqliteBusyError,
+  STUDIO_SQLITE_BUSY_RETRY_BUDGET_MS,
+  isSqliteBusyError,
+  studioSqliteBusyTimeoutMs,
+  withStudioSqliteBusyDeadline,
+  withSqliteBusyRetry,
+} from "./studio-sqlite-busy.js";
 
 export const PROJECT_BACKUP_SCHEMA_VERSION = 2 as const;
 
@@ -152,7 +161,7 @@ async function walkFiles(
     for (const entry of entries) {
       const absolute = path.join(current, entry.name);
       const relativePath = portableRelative(root, absolute);
-      if (options.skipSnapshotExcludedDirectories && isExcludedSnapshotDirectory(relativePath)) continue;
+      if (options.skipSnapshotExcludedDirectories && entry.isDirectory() && isExcludedSnapshotDirectory(relativePath)) continue;
       if (entry.isSymbolicLink()) {
         throw new Error(`受管工程备份禁止符号链接：${relativePath}`);
       }
@@ -172,13 +181,18 @@ function portableRelative(root: string, absolute: string): string {
 function isExcludedSnapshotDirectory(relativePath: string): boolean {
   const segments = relativePath.split("/");
   return segments.includes("node_modules")
-    || (segments[0] === ".aicanvas" && segments[1] === "locks");
+    || (segments[0] === ".aicanvas" && (segments[1] === "locks" || segments[1] === "locks-v2"));
 }
 
-function isExcludedSnapshotPath(relativePath: string): boolean {
+function isExcludedSnapshotPath(relativePath: string, legacyCacheFence = false): boolean {
   if (!relativePath) return false;
+  if (legacyCacheFence && relativePath === ".aicanvas/cache.sqlite") return false;
   const segments = relativePath.split("/");
-  if (isExcludedSnapshotDirectory(relativePath)) return true;
+  if (segments.includes("node_modules")) return true;
+  // `.aicanvas/locks` 在 schema v2 是必须备份的普通 writer fence；只排除
+  // legacy locks 目录内部和当前 writer 的 locks-v2 瞬态目录。
+  if (segments[0] === ".aicanvas"
+    && ((segments[1] === "locks" && segments.length > 2) || segments[1] === "locks-v2")) return true;
   const name = segments.at(-1) ?? "";
   return name.endsWith(SQLITE_DATABASE_SUFFIX)
     || SQLITE_TRANSIENT_SUFFIXES.some((suffix) => name.endsWith(suffix));
@@ -186,7 +200,7 @@ function isExcludedSnapshotPath(relativePath: string): boolean {
 
 async function inventoryProjectTree(
   projectRoot: string,
-  options: { excludeSnapshotSpecialFiles?: boolean } = {},
+  options: { excludeSnapshotSpecialFiles?: boolean; legacyCacheFence?: boolean } = {},
 ): Promise<ProjectBackupFileEntry[]> {
   const files = await walkFiles(projectRoot, {
     skipSnapshotExcludedDirectories: options.excludeSnapshotSpecialFiles,
@@ -194,7 +208,7 @@ async function inventoryProjectTree(
   const entries: ProjectBackupFileEntry[] = [];
   for (const absolute of files) {
     const relativePath = portableRelative(projectRoot, absolute);
-    if (options.excludeSnapshotSpecialFiles && isExcludedSnapshotPath(relativePath)) continue;
+    if (options.excludeSnapshotSpecialFiles && isExcludedSnapshotPath(relativePath, options.legacyCacheFence)) continue;
     const snapshot = await snapshotRegularFile(absolute);
     entries.push({
       relativePath,
@@ -221,13 +235,14 @@ function assertStringListsEqual(before: string[], after: string[], label: string
   }
 }
 
-async function discoverSqliteDatabases(projectRoot: string): Promise<string[]> {
+async function discoverSqliteDatabases(projectRoot: string, legacyCacheFence = false): Promise<string[]> {
   return (await walkFiles(projectRoot, { skipSnapshotExcludedDirectories: true }))
     .map((absolute) => portableRelative(projectRoot, absolute))
     .filter((relativePath) => {
       const segments = relativePath.split("/");
       return !segments.includes("node_modules")
-        && !(segments[0] === ".aicanvas" && segments[1] === "locks")
+        && !(segments[0] === ".aicanvas" && (segments[1] === "locks" || segments[1] === "locks-v2"))
+        && !(legacyCacheFence && relativePath === ".aicanvas/cache.sqlite")
         && relativePath.endsWith(SQLITE_DATABASE_SUFFIX);
     })
     .sort((left, right) => left.localeCompare(right, "en"));
@@ -263,7 +278,10 @@ async function acquireSqliteWriteBarriers(
   const injected = testBackupBusyAttempts.get(projectRoot) ?? 0;
   if (injected < injectTimes) {
     testBackupBusyAttempts.set(projectRoot, injected + 1);
-    throw Object.assign(new Error("database is locked"), { errcode: 5 });
+    throw new RetrySafeSqliteBusyError(
+      Object.assign(new Error("database is locked"), { errcode: 5 }),
+      { kind: "before_domain_execute" },
+    );
   }
   const locked: LockedSqliteDatabase[] = [];
   try {
@@ -289,6 +307,13 @@ async function acquireSqliteWriteBarriers(
     return locked;
   } catch (error) {
     await releaseSqliteWriteBarriers(locked);
+    if (isSqliteBusyError(error)) {
+      throw new RetrySafeSqliteBusyError(error, {
+        kind: "atomic_transaction_rolled_back",
+        owner: "project-backup-write-barrier",
+        operationId: projectRoot,
+      });
+    }
     throw error;
   }
 }
@@ -361,33 +386,54 @@ async function createConsistentProjectSnapshot(
   projectRoot: string,
   projectCopy: string,
   options: CreateManagedProjectBackupOptions,
+  legacyCacheFence = false,
 ): Promise<ProjectBackupManifest["snapshot"]> {
-  const timeoutMs = Math.max(50, Math.min(60_000, Math.trunc(
+  const configuredTimeoutMs = Math.max(50, Math.min(60_000, Math.trunc(
     options.sqliteBusyTimeoutMs ?? DEFAULT_SQLITE_BUSY_TIMEOUT_MS,
   )));
-  const sqliteDatabases = await discoverSqliteDatabases(projectRoot);
+  const sqliteDatabases = await discoverSqliteDatabases(projectRoot, legacyCacheFence);
   if (sqliteDatabases.length === 0) {
     throw new Error("受管工程未发现 SQLite 数据库，拒绝建立不完整备份。 ");
   }
   // 写屏障不经 studio-mutation fence（备份走 project-backup 锁），可与命令写路径
   // 瞬时争库；busy 抛出时 BEGIN IMMEDIATE 确认未提交且失败路径已释放部分屏障，
-  // 故对获取整体做有界退避重试（预算沿用 helper 默认）。既有 per-DB timeout 不变：
+  // acquireSqliteWriteBarriers 已把这项局部零副作用证明投影成 typed busy，故可对
+  // 获取整体做有界退避重试（预算沿用 helper 默认）。既有 per-DB timeout 不变：
   // 若首次尝试已烧尽预算则按原样抛出，语义与超时保持一致。
-  const locked = await withSqliteBusyRetry(() => acquireSqliteWriteBarriers(projectRoot, sqliteDatabases, timeoutMs));
+  const deadlineAtMs = Date.now() + STUDIO_SQLITE_BUSY_RETRY_BUDGET_MS;
+  const locked = await withStudioSqliteBusyDeadline(
+    deadlineAtMs,
+    () => withSqliteBusyRetry(
+      () => acquireSqliteWriteBarriers(
+        projectRoot,
+        sqliteDatabases,
+        studioSqliteBusyTimeoutMs(configuredTimeoutMs),
+      ),
+      { deadlineAtMs },
+    ),
+  );
   try {
     await assertLockedSqliteIdentities(projectRoot, locked);
     assertStringListsEqual(
       sqliteDatabases,
-      await discoverSqliteDatabases(projectRoot),
+      await discoverSqliteDatabases(projectRoot, legacyCacheFence),
       "SQLite 数据库集合",
     );
-    const ordinaryBefore = await inventoryProjectTree(projectRoot, { excludeSnapshotSpecialFiles: true });
+    const ordinaryBefore = await inventoryProjectTree(projectRoot, {
+      excludeSnapshotSpecialFiles: true,
+      legacyCacheFence,
+    });
     await cp(projectRoot, projectCopy, {
       verbatimSymlinks: true,
       recursive: true,
       filter: (source) => {
         const relativePath = portableRelative(projectRoot, source);
-        return !isExcludedSnapshotPath(relativePath);
+        if (relativePath === ".aicanvas/locks") {
+          // schema v2 fence 是普通文件，schema v1 同名节点是锁目录。cp filter
+          // 支持 Promise；只保留前者，避免在 v1 备份里制造空锁目录。
+          return lstat(source).then((metadata) => metadata.isFile() && !metadata.isSymbolicLink());
+        }
+        return !isExcludedSnapshotPath(relativePath, legacyCacheFence);
       },
     });
     for (const relativePath of sqliteDatabases) {
@@ -396,12 +442,18 @@ async function createConsistentProjectSnapshot(
     await assertLockedSqliteIdentities(projectRoot, locked);
     assertStringListsEqual(
       sqliteDatabases,
-      await discoverSqliteDatabases(projectRoot),
+      await discoverSqliteDatabases(projectRoot, legacyCacheFence),
       "SQLite 数据库集合",
     );
-    const ordinaryAfter = await inventoryProjectTree(projectRoot, { excludeSnapshotSpecialFiles: true });
+    const ordinaryAfter = await inventoryProjectTree(projectRoot, {
+      excludeSnapshotSpecialFiles: true,
+      legacyCacheFence,
+    });
     assertInventoriesEqual(ordinaryBefore, ordinaryAfter, "工程普通文件");
-    const copiedOrdinary = await inventoryProjectTree(projectCopy, { excludeSnapshotSpecialFiles: true });
+    const copiedOrdinary = await inventoryProjectTree(projectCopy, {
+      excludeSnapshotSpecialFiles: true,
+      legacyCacheFence,
+    });
     assertInventoriesEqual(ordinaryBefore, copiedOrdinary, "备份普通文件副本");
     return {
       strategy: "sqlite-online-backup-write-barrier-v1",
@@ -488,7 +540,12 @@ export async function createManagedProjectBackup(
     const projectCopy = path.join(stagingRoot, "project");
     await mkdir(stagingRoot, { recursive: false });
     try {
-      const snapshot = await createConsistentProjectSnapshot(shell.paths.root, projectCopy, options);
+      const snapshot = await createConsistentProjectSnapshot(
+        shell.paths.root,
+        projectCopy,
+        options,
+        shell.workspaceMode !== "drama",
+      );
       const files = await inventoryProjectTree(projectCopy);
       const aggregateSha256 = aggregateFromFiles(files);
 
@@ -616,6 +673,14 @@ async function rewriteRestoredManagedIdentity(
   };
   const fingerprint = createHash("sha256").update(JSON.stringify(stable(nextManaged))).digest("hex");
   await writeJsonAtomic(managedPath, { ...nextManaged, fingerprint });
+  if (managed.schemaVersion === 2) {
+    await rm(path.join(sidecar, "cache.sqlite"), { force: true });
+    await createLegacyProjectCacheWriterFence(canonicalRoot, config.id);
+    await writeJsonAtomic(
+      path.join(sidecar, "locks"),
+      managedProjectWriterFenceValue(canonicalRoot, config.id),
+    );
+  }
   void previousRoot;
 }
 

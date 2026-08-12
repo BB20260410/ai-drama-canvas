@@ -67,7 +67,7 @@
               :class="['shot-clip', { selected: entry.item.id === selectedShotId }]"
               @click="selectedShotId = entry.item.id">
               <figure>
-                <img v-if="entry.item.thumbnailPath" loading="lazy" :src="assetUrl(entry.item.thumbnailPath)" />
+                <img v-if="entry.item.thumbnailPath" loading="lazy" decoding="async" :src="assetUrl(entry.item.thumbnailPath)" :alt="`${entry.item.title} 镜头缩略图`" />
                 <span v-else><ImageOff :size="20" /> 暂无画面</span>
                 <em>{{ index + 1 }}</em>
               </figure>
@@ -223,4 +223,5 @@ function message(error: unknown) { return error instanceof Error ? error.message
 .shot-inspector { min-width: 700px; margin-top: 20px; display: grid; grid-template-columns: minmax(240px,.8fr) minmax(320px,1.2fr) auto; gap: 22px; padding: 19px 0; border-top: 1px solid #34362e; border-bottom: 1px solid #292b25; }.shot-inspector-title > span { color: #d7af55; font-size: 8px; }.shot-inspector-title h3 { margin: 6px 0; font-size: 13px; }.shot-inspector-title p { margin: 0; color: #777a70; font-size: 8px; }.shot-facts { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: #2b2d27; }.shot-facts div { min-width: 0; padding: 10px; background: #171815; }.shot-facts span,.shot-facts b { display: block; }.shot-facts span { color: #696c63; font-size: 7px; }.shot-facts b { margin-top: 6px; overflow: hidden; font-size: 8px; white-space: nowrap; text-overflow: ellipsis; }.shot-excerpt { grid-column: 1/3; margin: 0; color: #9b9d94; font-size: 9px; line-height: 1.6; white-space: pre-line; }.shot-path { grid-column: 1/3; overflow: hidden; color: #5f6259; font: 8px Menlo,monospace; white-space: nowrap; text-overflow: ellipsis; }.shot-inspector-actions { grid-row: 1/4; grid-column: 3; display: grid; align-content: start; gap: 7px; }.shot-inspector-actions button { height: 30px; display: flex; align-items: center; gap: 7px; padding: 0 10px; border: 1px solid #3b3d35; background: transparent; color: #aaa; font-size: 8px; cursor: pointer; }
 .timeline-empty { height: 100%; display: grid; place-content: center; justify-items: center; gap: 10px; color: #60635a; font-size: 10px; }.timeline-empty.embedded { height: 240px; min-width: 700px; }.spinning { animation: spin .8s linear infinite; }
 @media (max-width: 1280px) { .timeline-header p { display: none; }.timeline-header-actions .timeline-verdict { display: none; } }
+.unit-list button { content-visibility: auto; contain-intrinsic-size: auto 70px; }
 </style>

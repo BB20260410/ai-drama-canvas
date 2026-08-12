@@ -539,8 +539,39 @@
           @move="onMove"
           @move-end="onMoveEnd">
           <Background :pattern-color="canvasThemeAssets.patternColor" :gap="24" :size="1" />
-          <Controls position="bottom-left" @zoom-in="onControlViewportChanged" @zoom-out="onControlViewportChanged" @fit-view="onControlViewportChanged" />
-          <MiniMap v-if="showMiniMap" data-testid="managed-canvas-minimap" position="bottom-right" :pannable="true" :zoomable="true" :mask-color="canvasThemeAssets.minimapMaskColor" :node-color="canvasThemeAssets.minimapNodeColor" />
+          <Controls position="bottom-left" @zoom-in="onControlViewportChanged" @zoom-out="onControlViewportChanged" @fit-view="onControlViewportChanged">
+            <template #icon-zoom-in><Plus :size="14" aria-hidden="true" /><span class="sr-only">放大画布</span></template>
+            <template #icon-zoom-out><Minus :size="14" aria-hidden="true" /><span class="sr-only">缩小画布</span></template>
+            <template #icon-fit-view><Scan :size="14" aria-hidden="true" /><span class="sr-only">适配全部节点</span></template>
+            <template #icon-unlock><LockOpen :size="14" aria-hidden="true" /><span class="sr-only">锁定画布交互</span></template>
+            <template #icon-lock><Lock :size="14" aria-hidden="true" /><span class="sr-only">启用画布交互</span></template>
+          </Controls>
+          <MiniMap
+            v-if="showMiniMap"
+            data-testid="managed-canvas-minimap"
+            position="bottom-right"
+            aria-label="画布节点小地图"
+            :pannable="true"
+            :zoomable="true"
+            :mask-color="canvasThemeAssets.minimapMaskColor"
+            :node-color="canvasThemeAssets.minimapNodeColor">
+            <!-- Vue Flow 默认 MiniMapNode 会把业务节点 id 复制到 SVG rect，和主画布节点形成重复 DOM id。 -->
+            <template #node-managedStudio="{ position, dimensions, color, selected, dragging }">
+              <rect
+                class="vue-flow__minimap-node"
+                :class="{ selected, dragging }"
+                :x="position.x"
+                :y="position.y"
+                :rx="5"
+                :ry="5"
+                :width="dimensions.width"
+                :height="dimensions.height"
+                :fill="color"
+                stroke="transparent"
+                :stroke-width="2"
+                shape-rendering="crispEdges" />
+            </template>
+          </MiniMap>
         </VueFlow>
 
         <div v-if="connectMode" class="connect-banner" role="status">
@@ -678,8 +709,12 @@ import {
   ArrowUpRight,
   CircleHelp,
   LibraryBig,
+  Lock,
+  LockOpen,
+  Minus,
   Plus,
   Redo2,
+  Scan,
   Undo2,
 } from "lucide-vue-next";
 import ManagedStudioCanvasNode from "./ManagedStudioCanvasNode.vue";
@@ -691,14 +726,17 @@ import type {
   MaterialStudioReviewStatus,
   MaterialStudioUiEntry,
   MaterialStudioUiPage,
-} from "./MaterialStudioView.vue";
+} from "../material-studio-ui-contract";
 import { createThumbnailLru } from "../use-thumbnail-lru.js";
 import { computeVirtualListWindow, sliceVirtualWindow } from "../use-virtual-list.js";
+import { LatestBoundedTaskQueue } from "../bounded-task-queue.js";
 import {
   createGatedHotkeyRegistry,
   DEFAULT_DIRECTOR_HOTKEYS,
 } from "../use-gated-hotkeys.js";
 import { directorActionByHotkey } from "../director-action-panel.js";
+import { markT23RendererStartup } from "../t23-renderer-startup-probe";
+import { createT23RawReferenceSpanTracker } from "../t23-raw-reference-span";
 import type {
   StudioDashboardAppearancesPage,
   StudioDashboardAssetSummary,
@@ -792,6 +830,9 @@ import type { StudioMediaIpcItem, StudioMediaIpcPage } from "../../../preload/in
 
 const LAYOUT_SAVE_DEBOUNCE_MS = 450;
 const UNIT_GRID_ENRICHMENT_CONCURRENCY = 4;
+// 单元详情的聚合投影可能与当前页时间线投影并行；保留一个 IPC 槽给详情，
+// 避免两条真实用户路径叠加后突破全局峰值 4。
+const TIMELINE_PROJECTION_WORKER_CONCURRENCY = 3;
 const EXTERNAL_MEDIA_EXTENSIONS = new Set([
   ".png", ".jpg", ".jpeg", ".webp", ".gif", ".avif", ".tif", ".tiff",
   ".mp4", ".mov", ".mkv", ".webm", ".m4v",
@@ -847,6 +888,11 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   failed: [message: string];
+  initialUnitCardsCommitted: [payload: {
+    projectRoot: string;
+    refreshSequence: number;
+    unitCount: number;
+  }];
   openDashboard: [focus: import("@core/studio-canvas-locator").StudioCanvasFocusLocator];
   /** 打开剧本绑定工作台（非驾驶舱） */
   openBinding: [focus: { unitId?: string; panelId?: string; fromMode: "canvas" }];
@@ -1202,6 +1248,10 @@ const UNIT_GRID_RAW_PROJECTION_READ_TIMEOUT_MS = UNIT_GRID_RAW_PROJECTION_READ_T
 /** 当前深核验批次的取消控制器：新序列/切工程时 abort，停止后续协作读取。 */
 let unitGridRawProjectionAbort: AbortController | null = null;
 const unitGridRawProjectionFlight = createUnitGridProjectionFlightGate();
+/** T23 专用：绑定 root + raw flight 的精确提交时刻；生产探针关闭时零数据积累。 */
+const t23RawReferenceSpanTracker = createT23RawReferenceSpanTracker({
+  mark: (milestone) => markT23RendererStartup(milestone),
+});
 
 /**
  * 有界可取消读取：start(signal) 在 abort 后不得再把结果写回投影。
@@ -1331,7 +1381,10 @@ async function loadTextDocuments(): Promise<void> {
   try {
     const page = await bridge.listStudioTextDocuments(projectRoot, { limit: MAX_CANVAS_TEXT_DOCUMENTS });
     const items = page.items ?? [];
-    const loaded = await Promise.all(items.slice(0, MAX_CANVAS_TEXT_DOCUMENTS).map((doc) => enrichTextDocument(bridge, projectRoot, doc)));
+    const loaded = await runBoundedAsyncTasks(
+      items.slice(0, MAX_CANVAS_TEXT_DOCUMENTS).map((doc) => () => enrichTextDocument(bridge, projectRoot, doc)),
+      4,
+    );
     if (projectRoot === props.projectRoot && requestSequence === textDocumentLoadSequence) pagedTextDocuments.value = loaded;
   } catch {
     if (projectRoot === props.projectRoot && requestSequence === textDocumentLoadSequence) pagedTextDocuments.value = [];
@@ -1355,7 +1408,7 @@ async function loadPinnedTextDocuments(): Promise<void> {
     }
     return;
   }
-  const loaded = await Promise.all(requested.map(async ({ nodeId, documentId }) => {
+  const loaded = await runBoundedAsyncTasks(requested.map(({ nodeId, documentId }) => async () => {
     try {
       const doc = await bridge.getStudioTextDocument!(projectRoot, documentId);
       if (!doc || `${doc.kind}:${doc.id}` !== nodeId) return { nodeId, doc: null, unavailable: false };
@@ -1369,7 +1422,7 @@ async function loadPinnedTextDocuments(): Promise<void> {
         unavailable: true,
       };
     }
-  }));
+  }), 4);
   if (projectRoot !== props.projectRoot || requestSequence !== pinnedTextDocumentLoadSequence) return;
   pinnedTextDocuments.value = loaded.map((item) => item.doc).filter((doc): doc is CanvasTextDocument => Boolean(doc));
   const missing = new Set(loaded.filter((item) => !item.doc && !item.unavailable).map((item) => item.nodeId));
@@ -1454,12 +1507,104 @@ interface QueuedUnitSelection {
 }
 let queuedUnitSelection: QueuedUnitSelection | null = null;
 let unitSelectionDrain: Promise<void> | null = null;
+let latestUnitSelectionKey: string | null = null;
 let refreshSequence = 0;
+let runtimeBuildIdentitySequence = 0;
 let localSourceVerificationSequence = 0;
 let planStatusLoadSequence = 0;
 let controlViewportSequence = 0;
 let controlViewportTimer: number | undefined;
 let canvasDisposed = false;
+let initialUnitCardObserver: MutationObserver | undefined;
+let initialUnitCardObserverScope: {
+  projectRoot: string;
+  refreshSequence: number;
+  expectedUnitIds: Set<string>;
+  promise: Promise<boolean>;
+  resolve: (observed: boolean) => void;
+} | undefined;
+
+const INITIAL_UNIT_CARD_SELECTOR = '[data-testid="managed-studio-canvas-node"][data-node-kind="unit"]';
+
+function cancelInitialUnitCardObserver(): void {
+  initialUnitCardObserver?.disconnect();
+  initialUnitCardObserver = undefined;
+  const scope = initialUnitCardObserverScope;
+  initialUnitCardObserverScope = undefined;
+  scope?.resolve(false);
+}
+
+function recordInitialUnitCardIfReady(): boolean {
+  const scope = initialUnitCardObserverScope;
+  if (!scope) return false;
+  if (
+    canvasDisposed
+    || scope.projectRoot !== props.projectRoot
+    || scope.refreshSequence !== refreshSequence
+  ) {
+    cancelInitialUnitCardObserver();
+    return false;
+  }
+  if (!scope.expectedUnitIds.size) return false;
+  const matchingNode = [...document.querySelectorAll<HTMLElement>(INITIAL_UNIT_CARD_SELECTOR)]
+    .find((node) => scope.expectedUnitIds.has(node.dataset.unitId ?? ""));
+  const unitId = matchingNode?.dataset.unitId;
+  if (!unitId) return false;
+  initialUnitCardObserver?.disconnect();
+  initialUnitCardObserver = undefined;
+  initialUnitCardObserverScope = undefined;
+  markT23RendererStartup("canvas-first-card-dom-ready");
+  markT23RendererStartup(`canvas-first-card-dom-unit:${unitId}`);
+  scope.resolve(true);
+  return true;
+}
+
+function armInitialUnitCardObserver(projectRoot: string, requestSequence: number): void {
+  cancelInitialUnitCardObserver();
+  let resolve!: (observed: boolean) => void;
+  const promise = new Promise<boolean>((next) => {
+    resolve = next;
+  });
+  initialUnitCardObserverScope = {
+    projectRoot,
+    refreshSequence: requestSequence,
+    expectedUnitIds: new Set(),
+    promise,
+    resolve,
+  };
+  initialUnitCardObserver = new MutationObserver(() => {
+    recordInitialUnitCardIfReady();
+  });
+  initialUnitCardObserver.observe(document.body, { childList: true, subtree: true });
+}
+
+async function waitForInitialUnitCardDom(
+  projectRoot: string,
+  requestSequence: number,
+  unitIds: readonly string[],
+): Promise<boolean> {
+  if (!unitIds.length) {
+    cancelInitialUnitCardObserver();
+    return false;
+  }
+  const scope = initialUnitCardObserverScope;
+  if (
+    !scope
+    || scope.projectRoot !== projectRoot
+    || scope.refreshSequence !== requestSequence
+  ) return false;
+  scope.expectedUnitIds = new Set(unitIds);
+  if (recordInitialUnitCardIfReady()) return true;
+
+  // VueFlow 通常在当前微任务或下一帧挂载首卡。两帧后仍不可见时，Canvas overview
+  // 可以继续，避免持久 viewport 无可见节点时卡住；Material 则延后到 overview 完成。
+  const twoFrames = new Promise<boolean>((resolve) => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => resolve(false));
+    });
+  });
+  return Promise.race([scope.promise, twoFrames]);
+}
 const layoutSaveCoordinator = createStudioCanvasLayoutSaveCoordinator({
   persist: async ({ projectRoot, base, local, expectedFingerprint }) => {
     const api = resolveLayoutApi();
@@ -2933,6 +3078,7 @@ type FrozenReferenceThumbnailResult =
 /** 正在后台派生缩略图的媒体（root + sha 去重），避免每次刷新重复触发同一派生。 */
 const studioThumbnailDerivationInFlight = new Set<string>();
 const studioThumbnailDerivationFailed = new Set<string>();
+const studioThumbnailDerivationQueue = new LatestBoundedTaskQueue(2);
 
 /**
  * 后台触发缩略图派生（prepare-studio-media-derivatives，preload 已暴露）。派生完成后
@@ -2945,17 +3091,21 @@ function scheduleStudioThumbnailDerivation(
 ): void {
   const key = `${projectRoot}|${mediaSha256}`;
   if (studioThumbnailDerivationInFlight.has(key) || studioThumbnailDerivationFailed.has(key)) return;
-  const operation = mediaKind === "image"
-    ? window.canvasApi.ensureStudioImageThumbnail(projectRoot, mediaSha256)
-    : window.canvasApi.prepareStudioMediaDerivatives(projectRoot, mediaSha256);
   studioThumbnailDerivationInFlight.add(key);
-  void operation.then(() => {
+  void studioThumbnailDerivationQueue.schedule<unknown>(async () => {
+    if (mediaKind === "image") return window.canvasApi.ensureStudioImageThumbnail(projectRoot, mediaSha256);
+    return window.canvasApi.prepareStudioMediaDerivatives(projectRoot, mediaSha256);
+  }).then((result) => {
       studioThumbnailDerivationFailed.delete(key);
       studioThumbnailDerivationInFlight.delete(key);
-      if (projectRoot !== props.projectRoot || canvasDisposed) return;
+      if (result.status === "rejected") {
+        studioThumbnailDerivationFailed.add(key);
+        return;
+      }
+      if (result.status !== "fulfilled" || projectRoot !== props.projectRoot || canvasDisposed) return;
       scheduleGenerationProjectionRefresh();
-    })
-    .catch(() => {
+    }).catch(() => {
+      // scheduler 本身不应 reject；保守清理 key，允许后续显式刷新再试。
       studioThumbnailDerivationInFlight.delete(key);
       studioThumbnailDerivationFailed.add(key);
     });
@@ -3314,6 +3464,11 @@ async function loadApprovedUnitGridRawProjection(
   // （seq 失效）后旧读取一律不写回，禁止旧/新请求并发写同一投影状态。
   const isCurrent = () => projectRoot === props.projectRoot && !canvasDisposed
     && unitGridRawProjectionFlight.isCurrent(requestSequence);
+  const t23RawReferenceSpan = t23RawReferenceSpanTracker.begin({
+    projectRoot,
+    flightSequence: requestSequence,
+    isCurrent,
+  });
   if (isCurrent()) {
     rawReferenceProjectionLoading.value = true;
     rawReferenceProjectionIssue.value = undefined;
@@ -3367,6 +3522,7 @@ async function loadApprovedUnitGridRawProjection(
     for (const unit of units.slice(0, 36)) {
       if (coreByUnitId.get(unit.id)?.productionStatus === "pass") corePassUnitIds.add(unit.id);
     }
+    t23RawReferenceSpan.setExpectedPassUnitIds([...corePassUnitIds]);
     unitGridCorePassUnits.value = corePassUnitIds;
     // 核心快照一到即先裁掉已消失、已非 PASS 或 selected SHA 已变化的旧正式链，
     // 深核验随后增量补回；不能让旧 raw 在 36 单元核验完成前继续可引用。
@@ -3551,6 +3707,11 @@ async function loadApprovedUnitGridRawProjection(
                 unitGridContinuityPipeline.value = new Map(unitGridContinuityPipeline.value).set(unit.id, continuity);
               }
               scheduleUnitGridGraphRebuild();
+              // T23 首 raw 只记录已提交进响应式 Map、已安排图重建的 deep-verified
+              // 缩略图；不能用 worker 返回、IPC 完成或轮询观察替代。
+              if (approvedRaw.verification === "deep-verified" && approvedRaw.rawThumbnailUrl) {
+                t23RawReferenceSpan.markFirstRaw(unit.id);
+              }
             }
             // 已验真的 raw/冻结参考先增量显示；实际末态是其后的有界只读后台核对，
             // 不得延迟正式 raw 上画布。观察只跟随核心选中的 run，不用 latestRunId 猜归属。
@@ -3624,8 +3785,10 @@ async function loadApprovedUnitGridRawProjection(
         }
       }
     };
-    // 4 路有界并发（并发度 4）：worker 数不超过单元数；Promise.all 等全部单元闭环后再汇总。
-    await Promise.all(Array.from({ length: Math.min(4, projectionUnits.length) }, () => rawProjectionWorker()));
+    // 有界并发：worker 数不超过单元数；给当前单元详情的聚合投影保留一个 IPC 槽。
+    await Promise.all(Array.from({
+      length: Math.min(TIMELINE_PROJECTION_WORKER_CONCURRENCY, projectionUnits.length),
+    }, () => rawProjectionWorker()));
     if (!isCurrent()) return;
     const resolved = new Map(ledgerAttested);
     for (const [unitId, projection] of rows) {
@@ -3641,6 +3804,19 @@ async function loadApprovedUnitGridRawProjection(
     // 继续核对但不再让它们把“参考仍在加载”虚报数秒。
     rawReferenceProjectionLoading.value = false;
     flushUnitGridGraphRebuild();
+    // 三个有界 worker 已全部结束，最终 Map 已一次性提交、loading 已关闭且图已 flush。
+    // 只有每个核心 PASS 都同时具备 deep raw 缩略图与至少一张冻结参考缩略图，才可
+    // 形成完整 span；否则不写 ready/complete，性能验收失败关闭。
+    for (const unitId of corePassUnitIds) {
+      const raw = resolved.get(unitId);
+      const references = unitGridReferencePipeline.value.get(unitId) ?? [];
+      if (raw?.verification === "deep-verified"
+        && Boolean(raw.rawThumbnailUrl)
+        && references.some((reference) => Boolean(reference.thumbnailUrl))) {
+        t23RawReferenceSpan.recordPassReference(unitId);
+      }
+    }
+    t23RawReferenceSpan.complete();
     const enrichmentResults = await runBoundedAsyncTasks(
       enrichmentTasks,
       UNIT_GRID_ENRICHMENT_CONCURRENCY,
@@ -3669,6 +3845,7 @@ async function loadApprovedUnitGridRawProjection(
     }
   } finally {
     if (isCurrent()) rawReferenceProjectionLoading.value = false;
+    else t23RawReferenceSpan.invalidate();
   }
 }
 
@@ -3687,6 +3864,9 @@ function scheduleApprovedUnitGridRawProjection(
   // 不能每次刷新都递增 sequence 把一条尚未跑到 U28/U29 的读取链取消。
   const begun = unitGridRawProjectionFlight.begin(projectRoot, units.map((unit) => unit.id));
   if (!begun) return;
+  // 新 flight 先使旧 T23 scope 失效；迟到 IPC 即使随后 resolve 也无法写出 current
+  // raw/reference 里程碑。
+  t23RawReferenceSpanTracker.invalidateCurrent();
   // 一旦开始新一轮核心核对，上一轮正式链立即失效；同 SHA 也可能来自不同
   // run/pack/review，不能在新身份尚未证明时继续显示为 current。
   if (projectRoot === props.projectRoot) {
@@ -3880,6 +4060,9 @@ function rebuildGraph(): void {
         title: getUnitDualLabel(unit.id) || unit.label,
         subtitle: `${unit.durationSeconds} 秒 · ${unit.panelCount} 格 · ${canvasStatus}`,
         id: unit.id,
+        // 首卡作用域探针与节点 DOM 只读取显式 unitId；不能把任意节点的通用 id
+        // 冒充当前 fixture 单元。该字段也让测试/辅助功能可稳定识别真实单元卡。
+        unitId: unit.id,
         busy: Boolean(busy),
         busyMessage: busy?.message,
       },
@@ -4797,7 +4980,7 @@ async function runLastWorkflowGroup(): Promise<void> {
   };
   workflowBusy.value = true;
   try {
-    await refreshRuntimeBuildIdentity();
+    await refreshRuntimeWriteGate();
     if (!workflowActionIsCurrent(scope)) return;
     if (runtimeWriteBlocked.value) {
       errorMessage.value = "运行工件或源码身份不可确认；已停止工作流派发，请重启源码无限画布。";
@@ -4838,7 +5021,7 @@ async function primaryStart(): Promise<void> {
     return;
   }
   try {
-    await refreshRuntimeBuildIdentity();
+    await refreshRuntimeWriteGate();
     if (!workflowActionIsCurrent(scope)) return;
     if (runtimeWriteBlocked.value) {
       errorMessage.value = "运行工件或源码身份不可确认；已停止正式派发，请重启源码无限画布。";
@@ -5194,8 +5377,8 @@ async function refreshProductionDiagnostics(): Promise<void> {
   }
 }
 
-/** 加载运行时构建身份（与安装包 release-manifest / 开发态源码 digest 对齐）。 */
-async function refreshRuntimeBuildIdentity(): Promise<void> {
+/** 写门禁决定业务是否可读写；完整 build identity 只用于界面诊断，不得阻塞首卡。 */
+async function refreshRuntimeWriteGate(): Promise<void> {
   const api = (window as any).canvasApi;
   runtimeWriteGateState.value = "checking";
   if (!api?.getRuntimeBuildIdentity || typeof api.getRuntimeWriteGate !== "function") {
@@ -5204,14 +5387,8 @@ async function refreshRuntimeBuildIdentity(): Promise<void> {
     runtimeWriteGateState.value = "unavailable";
     return;
   }
-  // 两个只读诊断彼此独立；源码态都会读取构建身份，串行会在首屏重复等待。
-  // 并行仍要求 write gate 明确 allowed 后才进入任何业务 IPC，不放宽失败关闭。
-  const [gateResult, identityResult] = await Promise.allSettled([
-    api.getRuntimeWriteGate(),
-    api.getRuntimeBuildIdentity(),
-  ]);
-  if (gateResult.status === "fulfilled") {
-    const gate = gateResult.value;
+  try {
+    const gate = await api.getRuntimeWriteGate();
     runtimeWriteGate.value = gate
       ? {
         allowed: gate.allowed === true,
@@ -5223,12 +5400,33 @@ async function refreshRuntimeBuildIdentity(): Promise<void> {
       }
       : null;
     runtimeWriteGateState.value = runtimeWriteGate.value?.allowed === true ? "allowed" : "blocked";
-  } else {
+  } catch {
     runtimeWriteGate.value = null;
     runtimeWriteGateState.value = "unavailable";
   }
-  if (identityResult.status === "fulfilled") {
-    const identity = identityResult.value;
+}
+
+/** 首屏链收敛后再补完整构建身份；迟到结果不得回填到已切换的工程。 */
+async function refreshRuntimeBuildIdentityDisplay(
+  projectRoot = props.projectRoot,
+  requestSequence = refreshSequence,
+): Promise<void> {
+  const api = (window as any).canvasApi;
+  const identitySequence = ++runtimeBuildIdentitySequence;
+  const isCurrent = () => (
+    !canvasDisposed
+    && projectRoot === props.projectRoot
+    && requestSequence === refreshSequence
+    && identitySequence === runtimeBuildIdentitySequence
+  );
+  if (typeof api?.getRuntimeBuildIdentity !== "function") {
+    if (isCurrent()) runtimeBuildIdentity.value = null;
+    return;
+  }
+  try {
+    markT23RendererStartup("canvas-build-identity-start");
+    const identity = await api.getRuntimeBuildIdentity();
+    if (!isCurrent()) return;
     runtimeBuildIdentity.value = identity
       ? {
         packageVersion: String(identity.packageVersion ?? ""),
@@ -5237,8 +5435,9 @@ async function refreshRuntimeBuildIdentity(): Promise<void> {
         fingerprint: String(identity.fingerprint ?? ""),
       }
       : null;
-  } else {
-    runtimeBuildIdentity.value = null;
+    markT23RendererStartup("canvas-build-identity-ready");
+  } catch {
+    if (isCurrent()) runtimeBuildIdentity.value = null;
   }
 }
 
@@ -5305,43 +5504,92 @@ async function verifyLocalProductionSource(): Promise<void> {
 }
 
 async function refreshAll(): Promise<void> {
+  if (canvasDisposed) return;
   const projectRoot = props.projectRoot;
   const requestSequence = ++refreshSequence;
-  const isCurrent = () => projectRoot === props.projectRoot && requestSequence === refreshSequence;
+  const isCurrent = () => !canvasDisposed
+    && projectRoot === props.projectRoot
+    && requestSequence === refreshSequence;
+  cancelInitialUnitCardObserver();
   loading.value = true;
   errorMessage.value = "";
+  markT23RendererStartup("canvas-refresh-start");
   try {
     // 运行时身份诊断是唯一允许绕过写闸门的只读通道，必须先于 overview、资产、
     // 文稿、单元和布局 IPC。若源码/工件已经漂移，先请求业务 IPC 会被 Core 拒绝，
     // 并让 UI 永久停在 checking，用户反而看不到真正的重启/不可用诊断。
-    await refreshRuntimeBuildIdentity();
+    markT23RendererStartup("canvas-runtime-gate-start");
+    await refreshRuntimeWriteGate();
     if (!isCurrent() || runtimeWriteGateState.value !== "allowed") return;
+    markT23RendererStartup("canvas-runtime-gate-ready");
     // 布局视图读取与只读生产清单互不依赖；并行后单元卡可先落首屏，布局完成时
     // 再按持久坐标重建。写闸仍已在二者之前明确 allowed，未放宽业务入口门禁。
     const layoutHydration = (async () => {
+      markT23RendererStartup("canvas-layout-start");
       // 先把拖拽、连线和固定节点的 debounce 状态写完，再从磁盘重新读取。
       await flushPendingLayout(projectRoot);
       if (!isCurrent()) return false;
       const hydrated = await hydrateLayoutFromDisk(projectRoot);
       if (hydrated && isCurrent() && unitsPage.value) rebuildGraph();
+      if (isCurrent()) markT23RendererStartup("canvas-layout-ready");
       return hydrated;
     })();
-    // 单元列表与 overview/资产/文稿并行，首屏不再串行多等一次 Dashboard。
-    // 深度 unit-grid/historical raw 投影仍等 overview/checkpoint 完成后才启动，
-    // 避免只读快照互相判漂移。
-    const [layoutHydrated, [, , , initialUnits]] = await Promise.all([
+    // Main/Core 的 SQLite 读取包含同步区段：即使 Renderer Promise.all，较早发起的
+    // overview/资产/文稿仍会让首张单元卡排队。先发单元列表、再发 overview，既让
+    // 首卡最早落地，也保留“overview/checkpoint 完成后才启动 raw 深核验”的安全顺序。
+    const waitForInitialCard = unitsPage.value === null;
+    if (waitForInitialCard) armInitialUnitCardObserver(projectRoot, requestSequence);
+    const unitsRead = (async () => {
+      markT23RendererStartup("canvas-units-start");
+      const units = await loadUnitsPage({ deferTimelineProjections: true });
+      if (!isCurrent()) return units;
+      markT23RendererStartup("canvas-units-ready");
+      return units;
+    })();
+    const initialUnits = await unitsRead;
+    if (!isCurrent()) return;
+    const initialUnitCardObserved = waitForInitialCard
+      ? await waitForInitialUnitCardDom(
+        projectRoot,
+        requestSequence,
+        initialUnits.map((unit) => unit.id),
+      )
+      : false;
+    if (!isCurrent()) return;
+
+    markT23RendererStartup("canvas-dashboard-overview-start");
+    const overviewRead = loadOverview();
+    if (initialUnitCardObserved) {
+      emit("initialUnitCardsCommitted", {
+        projectRoot,
+        refreshSequence: requestSequence,
+        unitCount: initialUnits.length,
+      });
+    }
+    await overviewRead;
+    if (!isCurrent()) return;
+    markT23RendererStartup("canvas-dashboard-overview-ready");
+    if (waitForInitialCard && !initialUnitCardObserved) {
+      cancelInitialUnitCardObserver();
+      emit("initialUnitCardsCommitted", {
+        projectRoot,
+        refreshSequence: requestSequence,
+        unitCount: initialUnits.length,
+      });
+    }
+    markT23RendererStartup("canvas-units-overview-ready");
+    markT23RendererStartup("canvas-raw-activation-start");
+    void activateUnitTimelineProjections(initialUnits);
+    // 资产、文稿与布局不是首卡/raw 的输入，移到深核验启动之后并行补齐；它们仍在
+    // refreshAll 结束前收敛，失败/切工程 gate 与原来一致。
+    const [layoutHydrated] = await Promise.all([
       layoutHydration,
-      Promise.all([
-        loadOverview(),
-        loadAssets(),
-        loadTextDocuments(),
-        loadUnitsPage({ deferTimelineProjections: true }),
-      ]),
+      loadAssets(),
+      loadTextDocuments(),
     ]);
     if (!isCurrent()) return;
     // 布局属于视图层；读取失败保留默认坐标并继续生产投影，不把视图故障冒充业务阻塞。
     if (!layoutHydrated && !errorMessage.value) errorMessage.value = "布局读取未完成，当前使用默认坐标。";
-    void activateUnitTimelineProjections(initialUnits);
     await loadPinnedAssets();
     if (!isCurrent()) return;
     await loadPinnedTextDocuments();
@@ -5362,11 +5610,17 @@ async function refreshAll(): Promise<void> {
     await applyInitialTimelineLayoutIfNeeded(projectRoot);
   } catch (error) {
     if (isCurrent()) {
+      cancelInitialUnitCardObserver();
       errorMessage.value = message(error);
       emit("failed", errorMessage.value);
     }
   } finally {
-    if (isCurrent()) loading.value = false;
+    if (isCurrent()) {
+      loading.value = false;
+      // 完整源码 digest 仅用于展示。等首屏、raw 启动及必要只读补齐后再计算，
+      // 避免与 units/冻结包在 Main/Core 上争用；写门禁已经在入口前单独通过。
+      void refreshRuntimeBuildIdentityDisplay(projectRoot, requestSequence);
+    }
   }
 }
 
@@ -5598,6 +5852,7 @@ async function loadUnitDetailById(
 function invalidateQueuedUnitSelection(): void {
   queuedUnitSelection?.resolve();
   queuedUnitSelection = null;
+  latestUnitSelectionKey = null;
 }
 
 async function drainLatestUnitSelection(): Promise<void> {
@@ -5629,6 +5884,12 @@ function enqueueLatestUnitSelection(
   unit: StudioDashboardUnitSummary,
   panelId?: string,
 ): Promise<void> {
+  const requestKey = `${props.projectRoot}\u0000${unit.id}\u0000${panelId ?? ""}`;
+  // 节点点击会立即打开动作面板；用户紧接着点“展开宫格”时，两个动作可能
+  // 在同一次详情请求完成前重叠。同根、同单元、同宫格直接共用当前 drain，
+  // 避免串行重复 Dashboard + ProjectionBundle。
+  if (unitSelectionDrain && latestUnitSelectionKey === requestKey) return unitSelectionDrain;
+  latestUnitSelectionKey = requestKey;
   selection.value = { kind: "unit", unit };
   unitDetailLoadSequence += 1;
   panelPipelineLoadSequence += 1;
@@ -5649,6 +5910,7 @@ function enqueueLatestUnitSelection(
     if (!unitSelectionDrain) {
       unitSelectionDrain = drainLatestUnitSelection().finally(() => {
         unitSelectionDrain = null;
+        latestUnitSelectionKey = null;
       });
     }
   });
@@ -6128,6 +6390,7 @@ function onCanvasKeydown(event: KeyboardEvent): void {
 }
 
 function invalidateCanvasRequests(): void {
+  cancelInitialUnitCardObserver();
   workflowActionGate.invalidate();
   pinActionGate.invalidate();
   addUnitActionGate.invalidate();
@@ -6144,6 +6407,7 @@ function invalidateCanvasRequests(): void {
   invalidateQueuedUnitSelection();
   currentProductionBundle.value = null;
   unitGridRawProjectionFlight.invalidate();
+  t23RawReferenceSpanTracker.invalidateCurrent();
   unitGridRawProjectionAbort?.abort(new UnitGridRawProjectionAborted("画布请求已失效"));
   unitGridRawProjectionAbort = null;
   if (unitGridGraphRebuildRafId) {
@@ -6167,6 +6431,8 @@ watch(() => unitDetail.value?.unit.id, (unitId, previousUnitId) => {
 });
 
 watch(() => props.projectRoot, async (_projectRoot, previousProjectRoot) => {
+  studioThumbnailDerivationQueue.invalidate();
+  studioThumbnailDerivationInFlight.clear();
   invalidateCanvasRequests();
   // flush 调用会在首个 await 前同步冻结旧工程布局；随后立即撤下旧工程可见状态，
   // 不让慢 CAS 保存把旧 raw/节点滞留在已经切换的新 projectRoot 下。
@@ -6273,10 +6539,12 @@ watch(() => props.projectRoot, async (_projectRoot, previousProjectRoot) => {
   // 已清空但尚未读取新工程的瞬态 0/0/0 投影。
   loading.value = true;
   await previousLayoutFlush;
+  if (canvasDisposed) return;
   await refreshAll();
 });
 
 onMounted(async () => {
+  markT23RendererStartup("canvas-mounted");
   window.addEventListener("keydown", onCanvasKeydown);
   window.addEventListener("blur", onWindowBlur);
   document.addEventListener("pointerdown", onGlobalPointerDown, true);
@@ -6364,6 +6632,9 @@ watch(() => props.focus, async () => {
 
 onBeforeUnmount(() => {
   canvasDisposed = true;
+  cancelInitialUnitCardObserver();
+  studioThumbnailDerivationQueue.dispose();
+  studioThumbnailDerivationInFlight.clear();
   workflowActionGate.dispose();
   pinActionGate.dispose();
   addUnitActionGate.dispose();

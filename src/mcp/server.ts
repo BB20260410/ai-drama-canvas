@@ -52,7 +52,7 @@ import { isRejectedCommandFailure } from "../core/command-outcome.js";
 import { classifyToolError } from "../core/tool-error-classification.js";
 import {
   acquireStudioProjectWriteLease,
-  getStudioProjectWriteLease,
+  getStudioProjectWriteLeasePublic,
   heartbeatStudioProjectWriteLease,
   recommendGenerationUnknownDisposition,
   releaseStudioProjectWriteLease,
@@ -67,7 +67,26 @@ import { listAssetRelations, listVoiceIdentities, upsertAssetRelation, upsertVoi
 import type { EditProject, GenerationJob, GenerationProvider, GenerationSettings } from "../core/types.js";
 import { PUBLICATION_KINDS, PUBLICATION_PURPOSES, PUBLICATION_VARIANTS, listPublicationIntents, listPublicationReceipts } from "../core/publication.js";
 import { createNovelAnalysisTask, listNovelAnalysisReviews, reviewNovelAnalysisBatch, reviewNovelAnalysisItem, submitNovelAnalysisProposal } from "../core/novel-analysis.js";
-import { getNovelAnalysisProviderSettings, getNovelAnalysisRunProgress, listNovelAnalysisRunProgress, probeNovelAnalysisProvider } from "../core/novel-analysis-provider.js";
+import {
+  buildNovelContextPack,
+  compareNovelWritingSourceReceipts,
+  doctorNovelAgent,
+  getNovelManuscriptWorkspace,
+  getNovelSearchIndexStatus,
+  getNovelStateRebuildStatus,
+  getNovelWritingState,
+  listNovelManuscriptChapters,
+  listNovelWritingSourceReceipts,
+  planNovelStateRebuild,
+  probeNovelChapterConsistency,
+  preflightNovelChapterWrite,
+  prepareNovelChapterWrite,
+  readNovelManuscriptRange,
+  searchNovelManuscript,
+} from "../core/novel-agent-service.js";
+import { isNovelWritingStateRejectedError } from "../core/novel-writing-state.js";
+import { NOVEL_MANUSCRIPT_COMMAND_SCHEMA_OPTIONS } from "../core/novel-command-runtime.js";
+import { getNovelAnalysisExecutionRecoveryStatus, getNovelAnalysisProviderSettings, getNovelAnalysisRunProgress, listNovelAnalysisRunProgress, probeNovelAnalysisProvider } from "../core/novel-analysis-provider.js";
 import type { ScanProgress } from "../core/scanner.js";
 import { inspectFusionPackage } from "../core/fusion-package.js";
 import { loadFusionProductionAssets } from "../core/fusion-production.js";
@@ -168,9 +187,13 @@ import {
   getStudioVideoPackageControl,
   type StudioVideoPackageAuthorityInput,
 } from "../core/studio-video-package.js";
-import { AI_CANVAS_APPLICATION_VERSION } from "../core/release-manifest.js";
+import { getStudioHiggsfieldVideoGenerationControl } from "../core/studio-higgsfield-video-generation.js";
+import { getStudioHiggsfieldConnectorWorkQueue } from "../core/studio-higgsfield-connector-queue.js";
+import { projectHiggsfieldPrepareConnectorRequestForMcp } from "../core/studio-higgsfield-mcp-projection.js";
+import { AI_CANVAS_APPLICATION_VERSION, readRuntimeReleaseManifest } from "../core/release-manifest.js";
 import { STUDIO_CODEX_PUBLIC_COMMAND_SCHEMA_OPTIONS, studioSha256Schema } from "../core/studio-command-runtime.js";
 import { ensureConfinedDirectory } from "../core/confined-project-storage.js";
+import { createMcpToolRegistrar } from "./tool-registrar.js";
 
 const server = new McpServer({
   name: "ai-drama-canvas",
@@ -186,7 +209,6 @@ const server = new McpServer({
   ].join(" "),
 });
 
-const rawRegisterTool = server.registerTool.bind(server);
 const MCP_RUNTIME_ARTIFACT_PATH = fileURLToPath(import.meta.url);
 const MCP_RUNTIME_ARTIFACT_SHA256 = readFile(MCP_RUNTIME_ARTIFACT_PATH)
   .then((bytes) => createHash("sha256").update(bytes).digest("hex"));
@@ -195,22 +217,33 @@ const MCP_RUNTIME_WORKSPACE = path.resolve(
     || path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../.."),
 );
 const MCP_RUNTIME_BUILD_IDENTITY = resolveRuntimeBuildIdentity(MCP_RUNTIME_WORKSPACE);
+const MCP_RUNTIME_RELEASE_MANIFEST = readRuntimeReleaseManifest();
 const MCP_RUNTIME_BOOT_IDENTITY: Promise<RuntimeBootIdentity> = Promise.all([
   MCP_RUNTIME_BUILD_IDENTITY,
   MCP_RUNTIME_ARTIFACT_SHA256,
-]).then(([identity, loadedArtifactSha256]) => ({
+  MCP_RUNTIME_RELEASE_MANIFEST,
+]).then(([identity, loadedArtifactSha256, releaseManifest]) => {
+  const explicitManifestPath = process.env.AI_CANVAS_RELEASE_MANIFEST_PATH?.trim();
+  const sourceIdentityMode = releaseManifest
+    && explicitManifestPath
+    && path.dirname(path.resolve(explicitManifestPath)) === MCP_RUNTIME_WORKSPACE
+    ? "release-manifest" as const
+    : "workspace" as const;
+  return ({
   schemaVersion: 1,
   kind: "runtime-boot-identity",
   runtimeBootId: `mcp-${process.pid}-${Date.now()}`,
   pid: process.pid,
   startedAt: new Date().toISOString(),
+  sourceIdentityMode,
   workspace: MCP_RUNTIME_WORKSPACE,
   loadedArtifactPath: MCP_RUNTIME_ARTIFACT_PATH,
   loadedArtifactSha256,
   artifactSourceDigest: process.env.AI_CANVAS_RECORDED_SOURCE_DIGEST?.trim()
     || identity.sourceDigest,
   bootSourceDigest: identity.sourceDigest,
-}));
+  });
+});
 const MCP_RUNTIME_GATE = createRuntimeGateController();
 const MCP_RUNTIME_PERFORMANCE = createRuntimeMcpPerformanceProbe();
 let mcpRuntimeGateWatchers: FSWatcher[] = [];
@@ -292,49 +325,6 @@ async function assertMcpToolRuntimeCurrent(name: string): Promise<void> {
     throw new Error(`BUILD_CURRENTNESS_MISMATCH：${reason} 请先更新构建；仅 get_capabilities 可用于诊断。`);
   }
 }
-
-// McpServer 没有公开全局 tool middleware；在注册边界统一包裹回调，确保新增工具
-// 默认继承失败关闭，而不是依赖每个 handler 自觉检查。
-server.registerTool = ((name: string, config: unknown, callback: (...args: unknown[]) => unknown) => rawRegisterTool(
-  name,
-  config as never,
-  (async (...args: unknown[]) => {
-    const effect = runtimeMcpEffect(name);
-    const mode = runtimeMcpGateMode(name);
-    const startedAt = performance.now();
-    let gateDurationMs = 0;
-    let failed = false;
-    try {
-      if (mode !== "bypass") {
-        const gateStartedAt = performance.now();
-        try {
-          await assertMcpToolRuntimeCurrent(name);
-        } finally {
-          // 门禁抛错也必须记录真实 gate 耗时，否则观测面会把拒绝成本低报为 0。
-          gateDurationMs = performance.now() - gateStartedAt;
-        }
-      }
-      const result = await callback(...args);
-      // MCP 合同下 handler 以 isError=true 返回 toolError 而非抛异常；不判定
-      // 该路径会把几乎全部真实失败低报为成功。
-      if (typeof result === "object" && result !== null && (result as { isError?: unknown }).isError === true) {
-        failed = true;
-      }
-      return result;
-    } catch (error) {
-      failed = true;
-      return toolError(error);
-    } finally {
-      MCP_RUNTIME_PERFORMANCE.record({
-        tool: name,
-        effect,
-        durationMs: performance.now() - startedAt,
-        gateDurationMs,
-        failed,
-      });
-    }
-  }) as never,
-)) as McpServer["registerTool"];
 
 async function startMcpRuntimeGateWatchers(): Promise<void> {
   if (mcpRuntimeGateWatchers.length > 0) return;
@@ -1025,7 +1015,7 @@ function normalizeAbsolutePathsInMessage(message: string): string {
 }
 
 function toolError(error: unknown, context?: { requestId?: string; idempotencyKey?: string; command?: string }) {
-  if (isRejectedCommandFailure(error)) {
+  if (isRejectedCommandFailure(error) || isNovelWritingStateRejectedError(error)) {
     // 纯前置 CAS/输入拒绝：账本只落 failed、键不毒化成 unknown；MCP 面显式给出
     // 机器可读 reason 与可重试语义，不得把 CAS 冲突误标为不可重试的输入错误。
     const result = error.result && typeof error.result === "object" && !Array.isArray(error.result)
@@ -1033,8 +1023,20 @@ function toolError(error: unknown, context?: { requestId?: string; idempotencyKe
       : undefined;
     const reason = result && typeof result.reason === "string" ? result.reason : "validation_failed";
     const message = normalizeAbsolutePathsInMessage(sanitizeDiagnosticText(error.message) ?? error.message);
-    const conflict = reason === "revision_conflict" || reason === "control_conflict";
+    const conflict = ["revision_conflict", "control_conflict", "context_preflight_stale", "chapter_write_lease_conflict", "chapter_write_lease_stale"].includes(reason);
     const code = conflict ? "CONFLICT" : reason === "not_found" ? "NOT_FOUND" : "VALIDATION_ERROR";
+    const nextAction = result && typeof result.nextAction === "string" ? result.nextAction : undefined;
+    const projectedNextTools = result && Array.isArray(result.nextTools)
+      ? result.nextTools
+      : (["context_preflight_stale", "chapter_write_lease_required", "chapter_write_lease_conflict", "chapter_write_lease_stale"].includes(reason)
+        ? [{
+          tool: "prepare_novel_chapter_write",
+          argsMode: "partial",
+          args: typeof result?.chapterId === "string" ? { targetChapterId: result.chapterId } : {},
+          requiredArgs: ["projectRoot", "attribution"],
+          purpose: nextAction ?? "重新准备目标章并获取新租约",
+        }]
+        : []);
     const structuredContent = {
       error: {
         code,
@@ -1045,6 +1047,9 @@ function toolError(error: unknown, context?: { requestId?: string; idempotencyKe
           : "修正输入后使用新的幂等键重试；原键不会重放。",
         applied: false,
         reason,
+        ...(nextAction ? { nextAction } : {}),
+        ...(projectedNextTools.length ? { nextTools: projectedNextTools } : {}),
+        ...((result?.requiresHumanOwner === true || reason === "actor_forbidden") ? { requiresHumanOwner: true } : {}),
       },
     };
     return {
@@ -1185,58 +1190,33 @@ const GUARDED_PAYLOAD_NORMALIZERS: Partial<Record<string, (payload: Record<strin
 };
 
 // 所有可映射的直接写工具统一进入持久幂等命令账本，避免平铺工具绕过修订、跨进程锁和崩溃窗口保护。
-const registerToolOriginal = server.registerTool.bind(server) as (...args: any[]) => any;
-(server as unknown as { registerTool: (...args: any[]) => any }).registerTool = (name: string, config: any, handler: any) => {
-  const command = GUARDED_WRITE_COMMANDS[name];
-  if (!command) return registerToolOriginal(name, config, handler);
-  const guardShape = { requestId: z.string().min(8).max(160), idempotencyKey: z.string().min(8).max(200) };
-  const guardedInputSchema = typeof config.inputSchema?.safeExtend === "function"
-    ? config.inputSchema.safeExtend(guardShape)
-    : { ...config.inputSchema, ...guardShape };
-  const leaseShape = {
-    writeLeaseHolderId: z.string().trim().min(1).max(128).optional(),
-    writeLeaseToken: z.string().trim().regex(/^lease-[a-f0-9]{32}$/u).optional(),
-  };
-  const guardedWithLease = typeof guardedInputSchema?.safeExtend === "function"
-    ? guardedInputSchema.safeExtend(leaseShape)
-    : { ...guardedInputSchema, ...leaseShape };
-  return registerToolOriginal(name, {
-    ...config,
-    description: `${config.description ?? ""} 必须携带稳定 requestId 与 idempotencyKey；执行前写入跨进程命令账本。生产 require 模式：生图相关写必须先 acquire 并带 writeLeaseHolderId+writeLeaseToken（无租约不准写）。`,
-    inputSchema: guardedWithLease,
-    annotations: { ...(config.annotations ?? {}), readOnlyHint: false, idempotentHint: true },
-  }, async (args: Record<string, unknown>, extra: ToolRequestExtra) => {
-    const {
-      projectRoot,
-      requestId,
-      idempotencyKey,
-      writeLeaseHolderId,
-      writeLeaseToken,
-      ...rawPayload
-    } = args;
-    const scanBridge = createScanRequestBridge(extra, command === "scan_project");
-    try {
-      const payload = (GUARDED_PAYLOAD_NORMALIZERS[command]?.(rawPayload) ?? rawPayload) as Record<string, unknown>;
-      // union 闸口校验：命名工具载荷错配在账本前给出确定性失败（F15；execute_command 直调由 SDK 同 schema 拦截）。
-      const parsed = commandRequestSchema.safeParse({ command, payload });
-      if (!parsed.success) {
-        return toolError(new Error(`命令 ${command} 的载荷不符合合同：${parsed.error.issues.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("；")}`));
-      }
-      const record = await executeIdempotentCommand(String(projectRoot ?? DEFAULT_PROJECT_ROOT), {
-        requestId: String(requestId),
-        idempotencyKey: String(idempotencyKey),
-        request: { command, payload } as CommandRequest,
-      }, {
-        signal: scanBridge.signal,
-        onProgress: scanBridge.onProgress,
-        ...(typeof writeLeaseHolderId === "string" ? { writeLeaseHolderId } : {}),
-        ...(typeof writeLeaseToken === "string" ? { writeLeaseToken } : {}),
-      });
-      return structuredResult(sanitizeCommandRecord(record, typeof payload.jobId === "string" ? payload.jobId : undefined));
-    } catch (error) { return toolError(error); }
-    finally { await scanBridge.flush(); }
-  });
-};
+// registrar 保持 runtime currentness/effect/metric 在外、guarded schema/ledger 在内；此处只提供既有本地合同与 owner。
+const registrar = createMcpToolRegistrar({
+  rawRegisterTool: server.registerTool.bind(server),
+  runtimeMcpEffect,
+  runtimeMcpGateMode,
+  assertRuntimeCurrent: assertMcpToolRuntimeCurrent,
+  recordRuntimePerformance: (entry) => MCP_RUNTIME_PERFORMANCE.record(entry),
+  toolError,
+  guardedWriteCommands: GUARDED_WRITE_COMMANDS,
+  guardedPayloadNormalizers: GUARDED_PAYLOAD_NORMALIZERS,
+  getCommandRequestSchema: () => commandRequestSchema,
+  createGuardedWriteBridge: (command, extra) => createScanRequestBridge(extra as ToolRequestExtra | undefined, command === "scan_project"),
+  executeGuardedWrite: async ({ command, projectRoot, requestId, idempotencyKey, writeLeaseHolderId, writeLeaseToken, payload, bridge }) => {
+    const scanBridge = bridge as ReturnType<typeof createScanRequestBridge>;
+    const record = await executeIdempotentCommand(String(projectRoot ?? DEFAULT_PROJECT_ROOT), {
+      requestId: String(requestId),
+      idempotencyKey: String(idempotencyKey),
+      request: { command: command as CommandRequest["command"], payload } as CommandRequest,
+    }, {
+      signal: scanBridge.signal,
+      onProgress: scanBridge.onProgress,
+      ...(typeof writeLeaseHolderId === "string" ? { writeLeaseHolderId } : {}),
+      ...(typeof writeLeaseToken === "string" ? { writeLeaseToken } : {}),
+    });
+    return structuredResult(sanitizeCommandRecord(record, typeof payload.jobId === "string" ? payload.jobId : undefined));
+  },
+});
 
 function remoteResultHost(value: string | undefined): string | undefined {
   if (!value) return undefined;
@@ -1386,7 +1366,7 @@ function sanitizedGenerationCommandResult(command: CommandRequest["command"], va
   return value;
 }
 
-function sanitizeCommandRecord<T extends Awaited<ReturnType<typeof executeIdempotentCommand>>>(record: T, focusJobId?: string): T {
+function sanitizeCommandRecord<T extends Awaited<ReturnType<typeof executeIdempotentCommand>>>(record: T, focusJobId?: string, projectRoot?: string): T {
   const generationCommand = ["upsert_generation_provider", "enqueue_generation", "process_generation_queue", "cancel_generation", "update_browser_generation", "update_subagent_image_generation", "migrate_generation_execution_state", "reconcile_http_generation_submission"].includes(record.command);
   const p30OrchestrationCommand = [
     "stage_dudu_readonly_managed_project",
@@ -1394,12 +1374,19 @@ function sanitizeCommandRecord<T extends Awaited<ReturnType<typeof executeIdempo
     "prepare_studio_video_package_export",
     "build_studio_video_package",
   ].includes(record.command);
+  const isHiggsfieldPrepare = record.command === "prepare_studio_higgsfield_video_generation";
+  const isHiggsfieldAuthorize = record.command === "authorize_studio_higgsfield_connector_request";
+  const preparedResult = (isHiggsfieldPrepare || isHiggsfieldAuthorize)
+    ? projectHiggsfieldPrepareConnectorRequestForMcp(record.result, projectRoot ?? record.storageRoot ?? "")
+    : record.result;
   const result = generationCommand
-    ? sanitizedGenerationCommandResult(record.command, record.result, focusJobId)
+    ? sanitizedGenerationCommandResult(record.command, preparedResult, focusJobId)
+    : isHiggsfieldPrepare || isHiggsfieldAuthorize
+      ? preparedResult
     : isManagedStudioCommand(record.command) || p30OrchestrationCommand
-      ? sanitizeManagedStudioValue(record.result)
-      : record.result;
-  if (isManagedStudioCommand(record.command) || p30OrchestrationCommand) assertManagedStudioProjectionSafe(result);
+      ? sanitizeManagedStudioValue(preparedResult)
+      : preparedResult;
+  if (!isHiggsfieldPrepare && !isHiggsfieldAuthorize && (isManagedStudioCommand(record.command) || p30OrchestrationCommand)) assertManagedStudioProjectionSafe(result);
   // durableReconciliation 含完整写入 payload，storageRoot 暴露内部账本拓扑；二者仅供
   // 本机 Core 崩溃恢复，绝不进入 MCP 公共响应。
   const { durableReconciliation: _durableReconciliation, storageRoot: _storageRoot, ...publicRecord } = record;
@@ -1713,7 +1700,7 @@ function panelVisualConstraintResponsePolicy() {
   return "列表仅返回分页身份、锁计数、警告码和门禁摘要；单格详情才返回模型提示与人工审核规则。永不返回图片、base64 或 4330 格全量数组。";
 }
 
-server.registerTool(
+registrar.registerTool(
   "get_capabilities",
   {
     title: "读取画布能力清单",
@@ -1743,7 +1730,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_active_managed_studio_context",
   {
     title: "读取当前桌面受管工程",
@@ -1761,7 +1748,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_project_write_lease",
   {
     title: "读取项目写租约",
@@ -1770,12 +1757,12 @@ server.registerTool(
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
   async ({ projectRoot }) => {
-    try { return structuredResult(await getStudioProjectWriteLease(projectRoot)); }
+    try { return structuredResult(await getStudioProjectWriteLeasePublic(projectRoot)); }
     catch (error) { return toolError(error); }
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "acquire_studio_project_write_lease",
   {
     title: "获取项目写租约",
@@ -1809,7 +1796,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "heartbeat_studio_project_write_lease",
   {
     title: "续心跳写租约",
@@ -1829,7 +1816,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "release_studio_project_write_lease",
   {
     title: "释放项目写租约",
@@ -1848,7 +1835,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_generation_unknown_disposition",
   {
     title: "generation_unknown 只读处置建议",
@@ -1900,7 +1887,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_episode_earliest",
   {
     title: "集级 earliest 单元（人机同一真相）",
@@ -1920,7 +1907,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "doctor_project",
   {
     title: "体检项目与运行环境",
@@ -1934,7 +1921,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_project_snapshot",
   {
     title: "读取 Codex 统一项目快照",
@@ -1948,7 +1935,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "inspect_fusion_package",
   {
     title: "只读预检第三季融合包",
@@ -1962,7 +1949,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_canonical_asset_catalog_state",
   {
     title: "读取规范资产库状态",
@@ -1976,7 +1963,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_canonical_assets",
   {
     title: "分页列出规范资产",
@@ -1997,7 +1984,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_canonical_asset",
   {
     title: "读取规范资产详情",
@@ -2014,7 +2001,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_fusion_production_assets",
   {
     title: "列出融合工程生产资产",
@@ -2037,7 +2024,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_continuity_tracks",
   {
     title: "列出角色与场景连续性轨道",
@@ -2059,7 +2046,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_continuity_spans",
   {
     title: "读取资产连续性秒段",
@@ -2082,7 +2069,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "audit_fusion_panel_references",
   {
     title: "审计全季逐格引用闭包",
@@ -2099,7 +2086,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_fusion_panel_reference_resolutions",
   {
     title: "分页列出逐格引用解析",
@@ -2133,7 +2120,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_fusion_panel_reference_resolution",
   {
     title: "读取单个逐格引用解析",
@@ -2151,7 +2138,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "audit_fusion_visual_constraints",
   {
     title: "审计全季逐格视觉约束",
@@ -2167,7 +2154,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_fusion_visual_constraints",
   {
     title: "分页列出逐格视觉约束",
@@ -2202,7 +2189,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_fusion_visual_constraint",
   {
     title: "读取单格结构化视觉约束",
@@ -2222,7 +2209,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "materialize_fusion_visual_constraints",
   {
     title: "幂等物化全季逐格视觉约束",
@@ -2233,7 +2220,7 @@ server.registerTool(
   async () => toolError(new Error("materialize_fusion_visual_constraints 必须通过幂等命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "upsert_fusion_visual_constraint_override",
   {
     title: "使用 CAS 修订逐格视觉约束",
@@ -2244,7 +2231,7 @@ server.registerTool(
   async () => toolError(new Error("upsert_fusion_visual_constraint_override 必须通过幂等命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_derived_panel_reference_assets",
   {
     title: "分页列出派生组合引用资产",
@@ -2279,7 +2266,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "materialize_fusion_panel_references",
   {
     title: "幂等物化全季逐格引用闭包",
@@ -2290,7 +2277,7 @@ server.registerTool(
   async () => toolError(new Error("materialize_fusion_panel_references 必须通过幂等命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "upsert_panel_reference_override",
   {
     title: "使用 CAS 修订逐格引用",
@@ -2310,7 +2297,7 @@ server.registerTool(
   async () => toolError(new Error("upsert_panel_reference_override 必须通过幂等命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "register_derived_panel_reference_artifact",
   {
     title: "登记已视觉验收的派生组合引用图",
@@ -2330,7 +2317,7 @@ server.registerTool(
   async () => toolError(new Error("register_derived_panel_reference_artifact 必须通过幂等命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "materialize_fusion_project",
   {
     title: "幂等物化第三季融合工程",
@@ -2346,7 +2333,7 @@ server.registerTool(
   async () => toolError(new Error("materialize_fusion_project 必须通过幂等命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "build_fusion_reference_board",
   {
     title: "幂等构建融合参考板",
@@ -2361,7 +2348,7 @@ server.registerTool(
   async () => toolError(new Error("build_fusion_reference_board 必须通过幂等命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "build_fusion_storyboard_grid",
   {
     title: "幂等构建 15 秒宫格分镜合同",
@@ -2386,7 +2373,7 @@ server.registerTool(
   async () => toolError(new Error("build_fusion_storyboard_grid 必须通过幂等命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_fusion_storyboard_sheet_state",
   {
     title: "读取正式中文分镜板状态",
@@ -2405,7 +2392,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_fusion_storyboard_sheets",
   {
     title: "分页列出正式中文分镜板版本",
@@ -2427,7 +2414,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "migrate_fusion_storyboard_sheets",
   {
     title: "幂等登记旧中文分镜板历史",
@@ -2443,7 +2430,7 @@ server.registerTool(
   async () => toolError(new Error("migrate_fusion_storyboard_sheets 必须通过幂等命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "render_fusion_storyboard_sheet",
   {
     title: "幂等生成本地中文分镜故事板",
@@ -2460,7 +2447,7 @@ server.registerTool(
   async () => toolError(new Error("render_fusion_storyboard_sheet 必须通过幂等命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_fusion_asset_consistency",
   {
     title: "读取六张资产一致性门禁",
@@ -2474,7 +2461,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "prepare_fusion_asset_consistency_review",
   {
     title: "幂等准备六张一致性复核板",
@@ -2485,7 +2472,7 @@ server.registerTool(
   async () => toolError(new Error("prepare_fusion_asset_consistency_review 必须通过幂等命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "submit_fusion_asset_consistency_review",
   {
     title: "提交六张资产一致性复核",
@@ -2505,7 +2492,7 @@ server.registerTool(
   async () => toolError(new Error("submit_fusion_asset_consistency_review 必须通过幂等命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "seal_final_fusion_asset_consistency_batch",
   {
     title: "封存全季最终不足六项批次",
@@ -2516,7 +2503,7 @@ server.registerTool(
   async () => toolError(new Error("seal_final_fusion_asset_consistency_batch 必须通过幂等命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_projects",
   {
     title: "列出 AI 漫剧画布项目",
@@ -2527,7 +2514,7 @@ server.registerTool(
   async () => { try { return textResult(await listProjects()); } catch (error) { return toolError(error); } }
 );
 
-server.registerTool(
+registrar.registerTool(
   "scan_project",
   {
     title: "扫描真实项目文件",
@@ -2544,7 +2531,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "preview_scan_project",
   {
     title: "只读预检项目",
@@ -2585,7 +2572,7 @@ const importOptionsSchema = {
   }).optional().describe("无法匹配默认 EP/15s/镜头命名时使用的自定义正则和手工路径映射"),
 };
 
-server.registerTool(
+registrar.registerTool(
   "preview_project_import",
   {
     title: "预检项目导入",
@@ -2599,7 +2586,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "commit_project_import",
   {
     title: "确认导入项目",
@@ -2615,7 +2602,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_progress",
   {
     title: "读取项目进度",
@@ -2632,7 +2619,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_context",
   {
     title: "列出项目记忆",
@@ -2646,7 +2633,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "search_context",
   {
     title: "检索项目上下文",
@@ -2660,7 +2647,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "upsert_context",
   {
     title: "写入项目记忆",
@@ -2674,7 +2661,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "delete_context",
   {
     title: "删除项目记忆",
@@ -2688,7 +2675,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_skills",
   {
     title: "列出项目 Skill",
@@ -2702,7 +2689,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "read_skill",
   {
     title: "读取项目 Skill",
@@ -2716,7 +2703,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "save_skill",
   {
     title: "保存项目 Skill",
@@ -2730,7 +2717,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_continuation",
   {
     title: "生成 Codex 接续快照",
@@ -2744,7 +2731,327 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+const novelAgentProjectRootSchema = z.string().trim().min(1).optional()
+  .describe("可选受管 novel/hybrid 工程绝对路径；省略时只使用桌面明确登记的活动工程，绝不从项目列表偷选");
+const novelActorAttributionSchema = z.object({
+  actorId: z.string().trim().min(1).max(500),
+  provider: z.string().trim().min(1).max(500),
+  model: z.string().trim().min(1).max(500),
+  sessionId: z.string().trim().min(1).max(500),
+  transport: z.enum(["mcp", "json_cli", "main", "internal"]),
+}).strict();
+
+registrar.registerTool(
+  "doctor_novel_agent",
+  {
+    title: "诊断受管小说写章就绪度",
+    description: "陌生 AI 的只读第一入口。自动解析活动/显式工程、推荐下一章，检查 locked、brief、required cast、人物声口/结构化外形/动态状态、上一章 completion、rebuild queue 与活动写租约，并返回可直接调用的 nextTools。不会获取租约或修改正文。",
+    inputSchema: {
+      projectRoot: novelAgentProjectRootSchema,
+      targetChapterId: z.string().min(1).optional(),
+      workflowMode: z.enum(["formal", "rehearsal"]).default("formal"),
+    },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot, targetChapterId, workflowMode }) => {
+    try { return structuredResult(await doctorNovelAgent(projectRoot, { targetChapterId, workflowMode })); }
+    catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "get_novel_manuscript_workspace",
+  {
+    title: "读取受管小说 Agent 工作区",
+    description: "AI 小说推荐入口。返回合同版本、权威来源、项目身份、卷章计数、manifest revision 和字符规模；不返回整本正文。projectRoot 省略时只认桌面明确活动工程。",
+    inputSchema: { projectRoot: novelAgentProjectRootSchema },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot }) => {
+    try { return structuredResult(await getNovelManuscriptWorkspace(projectRoot)); }
+    catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "list_novel_manuscript_chapters",
+  {
+    title: "分页列出受管小说章节",
+    description: "按卷章顺序返回稳定 chapterId、相对 locator、revision、SHA-256 和字数；不返回正文。先读取 workspace，再按 nextOffset 翻页。",
+    inputSchema: {
+      projectRoot: novelAgentProjectRootSchema,
+      targetChapterId: z.string().min(1).describe("当前任务目标章；列表只返回其 cutoff 内章节"),
+      cutoff: z.enum(["before", "through"]).default("before"),
+      offset: z.number().int().min(0).default(0),
+      limit: z.number().int().min(1).max(500).default(100),
+    },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot, targetChapterId, cutoff, offset, limit }) => {
+    try { return structuredResult(await listNovelManuscriptChapters(projectRoot, { offset, limit, taskScope: { targetChapterId, cutoff } })); }
+    catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "read_novel_manuscript_range",
+  {
+    title: "按 UTF-16 区间读取小说章节",
+    description: "有界读取一个 managed manuscript 章节。返回 chapter revision/SHA、UTF-16 半开区间与截断状态；外部改写时只返回 external_change，不把漂移正文交给 AI。",
+    inputSchema: {
+      projectRoot: novelAgentProjectRootSchema,
+      targetChapterId: z.string().min(1).describe("当前任务目标章；读取不得越过其 cutoff"),
+      cutoff: z.enum(["before", "through"]).default("before"),
+      chapterId: z.string().min(1),
+      startOffset: z.number().int().min(0).default(0),
+      maxCharacters: z.number().int().min(1).max(200_000).default(12_000),
+    },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot, targetChapterId, cutoff, chapterId, startOffset, maxCharacters }) => {
+    try { return structuredResult(await readNovelManuscriptRange(projectRoot, { chapterId, startOffset, maxCharacters, taskScope: { targetChapterId, cutoff } })); }
+    catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "search_novel_manuscript",
+  {
+    title: "搜索受管小说全文",
+    description: "在正文 SHA/字节/字符和 manifest revision 一致性校验下搜索 managed manuscript；优先使用 Canvas-owned FTS5 派生索引，缺失、陈旧、损坏、短词或正文身份漂移时安全回退全扫，并返回 engine/indexState/fallbackReason 审计字段。",
+    inputSchema: {
+      projectRoot: novelAgentProjectRootSchema,
+      targetChapterId: z.string().min(1).describe("当前任务目标章；搜索不得越过其 cutoff"),
+      cutoff: z.enum(["before", "through"]).default("before"),
+      query: z.string().trim().min(2).max(200),
+      limit: z.number().int().min(1).max(200).default(50),
+      maxHitsPerChapter: z.number().int().min(1).max(20).default(5),
+    },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot, targetChapterId, cutoff, query, limit, maxHitsPerChapter }) => {
+    try { return structuredResult(await searchNovelManuscript(projectRoot, { query, limit, maxHitsPerChapter, taskScope: { targetChapterId, cutoff } })); }
+    catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "get_novel_search_index_status",
+  {
+    title: "读取小说全文索引状态",
+    description: "物理零写读取 Canvas-owned 派生全文索引的 missing/building/fresh/stale/corrupt 状态、active generation 与覆盖计数；需要重建时只通过 execute_command(novel_rebuild_search_index) 显式执行。",
+    inputSchema: {
+      projectRoot: novelAgentProjectRootSchema,
+    },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot }) => {
+    try { return structuredResult(await getNovelSearchIndexStatus(projectRoot)); }
+    catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "get_novel_writing_state",
+  {
+    title: "读取小说时态正典与人物状态",
+    description: "按目标章before/through截止语义读取来源可追溯的硬正典、人物声口与外形 Authority、角色八项动态状态、知情、关系、日历与伏笔；不读取未来章正文，不修改canon。",
+    inputSchema: {
+      projectRoot: novelAgentProjectRootSchema,
+      targetChapterId: z.string().min(1),
+      cutoff: z.enum(["before", "through"]),
+      characterIds: z.array(z.string().min(1).max(240)).max(1_000).optional(),
+    },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot, targetChapterId, cutoff, characterIds }) => {
+    try { return structuredResult(await getNovelWritingState(projectRoot, { targetChapterId, cutoff, characterIds })); }
+    catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "list_novel_writing_source_receipts",
+  {
+    title: "列出小说写作资料快照回执",
+    description: "列出由 human owner 一次性只读导入、已复制到工程内 raw/text CAS 的资料快照及 suggestedSourceId。绝不返回原外部目录绝对路径，也不自动把资料内容提升为正典。",
+    inputSchema: { projectRoot: novelAgentProjectRootSchema },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot }) => {
+    try { return structuredResult(await listNovelWritingSourceReceipts(projectRoot)); }
+    catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "compare_novel_writing_source_receipts",
+  {
+    title: "比较小说写作资料快照",
+    description: "确定性比较两份不可变 writing source receipt，分类 unchanged、modified、唯一内容身份 rename、deleted 与 untracked；只返回安全相对路径和哈希，不回读或暴露原外部目录。",
+    inputSchema: {
+      projectRoot: novelAgentProjectRootSchema,
+      baseReceiptId: z.string().regex(/^novel-writing-source-receipt-[a-f0-9]{32}$/u),
+      currentReceiptId: z.string().regex(/^novel-writing-source-receipt-[a-f0-9]{32}$/u),
+    },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot, baseReceiptId, currentReceiptId }) => {
+    try { return structuredResult(await compareNovelWritingSourceReceipts(projectRoot, { baseReceiptId, currentReceiptId })); }
+    catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "plan_novel_state_rebuild",
+  {
+    title: "规划小说状态重建",
+    description: "只读计算从旧章开始的受影响章节、可信历史覆盖与确定性 plan fingerprint；不会修改正文或状态。",
+    inputSchema: {
+      projectRoot: novelAgentProjectRootSchema,
+      targetChapterId: z.string().min(1),
+    },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot, targetChapterId }) => {
+    try { return structuredResult(await planNovelStateRebuild(projectRoot, { targetChapterId })); }
+    catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "get_novel_state_rebuild_status",
+  {
+    title: "读取小说状态谱系与重建状态",
+    description: "只读返回公开 head、shadow rebuild cursor、历史闭包健康度和未完成 state operation；recoveryRequired 时按 nextTools 调用 novel_recover_writing_state，禁止覆盖分叉。",
+    inputSchema: { projectRoot: novelAgentProjectRootSchema },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot }) => {
+    try { return structuredResult(await getNovelStateRebuildStatus(projectRoot)); }
+    catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "probe_novel_chapter_consistency",
+  {
+    title: "探测小说章节机械一致性",
+    description: "写后只读探针：核对正文身份、状态提交、required cast、声口/外形 Authority、硬正典禁词、知情边界候选、身体/关系/时间线/伏笔生命周期。外形只扫描 owner 明确登记的矛盾词；启发式命中不冒充文学质量裁决。",
+    inputSchema: {
+      projectRoot: novelAgentProjectRootSchema,
+      targetChapterId: z.string().min(1),
+      workflowMode: z.enum(["formal", "rehearsal"]).default("formal"),
+    },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot, targetChapterId, workflowMode }) => {
+    try { return structuredResult(await probeNovelChapterConsistency(projectRoot, { targetChapterId, workflowMode })); }
+    catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "build_novel_context_pack",
+  {
+    title: "组装可追溯小说上下文包",
+    description: "V1兼容按章节/搜索组正文；提供taskType+targetChapterId时启用2.0，formal 不可裁剪硬正典、任务、目标角色基础卡/声口/外形/动态状态/知情以及时态关键记忆，再用余量加入截止章前正文。",
+    inputSchema: {
+      projectRoot: novelAgentProjectRootSchema,
+      query: z.string().trim().min(2).max(200).optional(),
+      chapterIds: z.array(z.string().min(1)).max(50).optional(),
+      cutoffChapterId: z.string().min(1).optional(),
+      maxCharacters: z.number().int().min(256).max(200_000).default(12_000),
+      maxSearchHits: z.number().int().min(1).max(50).default(20),
+      taskType: z.enum(["continue_chapter", "revise_chapter", "review_chapter"]).optional(),
+      targetChapterId: z.string().min(1).optional(),
+      characterIds: z.array(z.string().min(1).max(240)).max(1_000).optional(),
+      workflowMode: z.enum(["formal", "rehearsal"]).default("formal")
+        .describe("formal 要求 locked 基线与完整 required cast；provisional 隔离演练必须显式 rehearsal"),
+    },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot, query, chapterIds, cutoffChapterId, maxCharacters, maxSearchHits, taskType, targetChapterId, characterIds, workflowMode }) => {
+    try {
+      return structuredResult(await buildNovelContextPack(projectRoot, {
+        query,
+        chapterIds,
+        cutoffChapterId,
+        maxCharacters,
+        maxSearchHits,
+        taskType,
+        targetChapterId,
+        characterIds,
+        workflowMode,
+      }));
+    } catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "prepare_novel_chapter_write",
+  {
+    title: "一键准备受管小说写章",
+    description: "陌生 AI 推荐唯一写章入口：一次完成 locked/cast 检查、Context Pack 2.0、preflight 与章级写租约；返回正文保存所需的完整 aiWriteContext 和 partial nextTools。",
+    inputSchema: {
+      projectRoot: novelAgentProjectRootSchema,
+      taskType: z.enum(["continue_chapter", "revise_chapter"]).default("continue_chapter"),
+      targetChapterId: z.string().min(1),
+      query: z.string().trim().min(2).max(200).optional(),
+      chapterIds: z.array(z.string().min(1)).max(50).optional(),
+      characterIds: z.array(z.string().min(1).max(240)).max(1_000).optional(),
+      maxCharacters: z.number().int().min(256).max(200_000).default(12_000),
+      maxSearchHits: z.number().int().min(1).max(50).default(20),
+      workflowMode: z.enum(["formal", "rehearsal"]).default("formal"),
+      attribution: novelActorAttributionSchema,
+      ttlSeconds: z.number().int().min(60).max(1_800).default(900),
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+  },
+  async ({ projectRoot, ...input }) => {
+    try { return structuredResult(await prepareNovelChapterWrite(projectRoot, input)); }
+    catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "preflight_novel_chapter_write",
+  {
+    title: "预检AI小说写章身份",
+    description: "重建Context Pack 2.0并检查目标章、上一章状态commit、正文manifest、writing-state与硬正典冲突；返回可绑定novel_save_chapter的稳定preflightId。",
+    inputSchema: {
+      projectRoot: novelAgentProjectRootSchema,
+      taskType: z.enum(["continue_chapter", "revise_chapter"]).default("continue_chapter"),
+      targetChapterId: z.string().min(1),
+      contextPackFingerprint: z.string().regex(/^[a-f0-9]{64}$/u),
+      query: z.string().trim().min(2).max(200).optional(),
+      chapterIds: z.array(z.string().min(1)).max(50).optional(),
+      characterIds: z.array(z.string().min(1).max(240)).max(1_000).optional(),
+      maxCharacters: z.number().int().min(256).max(200_000).default(12_000),
+      maxSearchHits: z.number().int().min(1).max(50).default(20),
+      workflowMode: z.enum(["formal", "rehearsal"]).default("formal")
+        .describe("正式写作使用 formal；未锁版隔离演练必须显式 rehearsal"),
+    },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot, taskType, targetChapterId, contextPackFingerprint, query, chapterIds, characterIds, maxCharacters, maxSearchHits, workflowMode }) => {
+    try {
+      return structuredResult(await preflightNovelChapterWrite(projectRoot, {
+        taskType,
+        targetChapterId,
+        contextPackFingerprint,
+        query,
+        chapterIds,
+        characterIds,
+        maxCharacters,
+        maxSearchHits,
+        workflowMode,
+      }));
+    } catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
   "import_story_file",
   {
     title: "导入小说或剧本原文",
@@ -2758,7 +3065,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_story_sources",
   {
     title: "列出原文来源",
@@ -2769,7 +3076,7 @@ server.registerTool(
   async ({ projectRoot }) => { try { return textResult(await listStorySources(projectRoot)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_story_chapters",
   {
     title: "列出原文章节",
@@ -2780,7 +3087,7 @@ server.registerTool(
   async ({ projectRoot, sourceId }) => { try { return textResult(await listStoryChapters(projectRoot, sourceId)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "read_story_chapter",
   {
     title: "读取一个原文章节",
@@ -2792,7 +3099,7 @@ server.registerTool(
 );
 
 const storyStatusSchema = z.enum(["draft", "confirmed", "deprecated"]);
-server.registerTool(
+registrar.registerTool(
   "list_story_events",
   {
     title: "列出故事事件图",
@@ -2817,7 +3124,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "upsert_story_event",
   {
     title: "写入故事事件",
@@ -2828,7 +3135,7 @@ server.registerTool(
   async ({ projectRoot, ...input }) => { try { return textResult(await upsertStoryEvent(projectRoot, input, "codex")); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "connect_story_events",
   {
     title: "连接故事事件依赖",
@@ -2839,7 +3146,7 @@ server.registerTool(
   async ({ projectRoot, sourceEventId, targetEventId }) => { try { return textResult(await connectStoryEvents(projectRoot, sourceEventId, targetEventId, "codex")); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "build_story_context",
   {
     title: "生成生产节点故事上下文",
@@ -2850,7 +3157,7 @@ server.registerTool(
   async ({ projectRoot, itemId }) => { try { return textResult(await buildStoryContext(projectRoot, itemId)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "import_story_text",
   {
     title: "导入粘贴小说文本",
@@ -2861,7 +3168,7 @@ server.registerTool(
   async ({ projectRoot, ...input }) => { try { return textResult(await importStoryText(projectRoot, input)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_adaptation_workspace",
   {
     title: "读取小说自动改编工作区",
@@ -2888,7 +3195,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "create_novel_analysis_task",
   {
     title: "创建可替换模型的小说分析任务",
@@ -2899,18 +3206,18 @@ server.registerTool(
   async ({ projectRoot, requestId, idempotencyKey, ...payload }) => { try { return structuredResult(await executeIdempotentCommand(projectRoot, { requestId, idempotencyKey, request: { command: "create_novel_analysis_task", payload } })); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "submit_novel_analysis_proposal",
   {
     title: "提交模型事实与节拍提案",
     description: "验证原文字符区间、章节修订和事实引用后写入人工确认队列；不直接修改事实、节拍或分镜。",
-    inputSchema: { projectRoot: projectRootSchema, requestId: z.string().min(8).max(160), idempotencyKey: z.string().min(8).max(200), taskId: z.string().min(1), expectedRevision: z.number().int().min(0), facts: z.array(novelFactProposalSchema).max(500), beats: z.array(narrativeBeatProposalSchema).max(300) },
+    inputSchema: { projectRoot: projectRootSchema, requestId: z.string().min(8).max(160), idempotencyKey: z.string().min(8).max(200), taskId: z.string().min(1), expectedRevision: z.number().int().min(0), executionId: z.string().min(1).max(200).optional(), expectedExecutionFence: z.number().int().min(0).optional(), facts: z.array(novelFactProposalSchema).max(500), beats: z.array(narrativeBeatProposalSchema).max(300) },
     annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
   },
   async ({ projectRoot, requestId, idempotencyKey, ...payload }) => { try { return structuredResult(await executeIdempotentCommand(projectRoot, { requestId, idempotencyKey, request: { command: "submit_novel_analysis_proposal", payload } })); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_novel_analysis_reviews",
   {
     title: "读取模型分析人工确认队列",
@@ -2935,7 +3242,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "review_novel_analysis_item",
   {
     title: "接受或拒绝模型分析提案",
@@ -2946,7 +3253,7 @@ server.registerTool(
   async ({ projectRoot, requestId, idempotencyKey, ...payload }) => { try { return structuredResult(await executeIdempotentCommand(projectRoot, { requestId, idempotencyKey, request: { command: "review_novel_analysis_item", payload } })); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "review_novel_analysis_batch",
   {
     title: "批量审核模型分析提案",
@@ -2960,7 +3267,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_novel_analysis_providers",
   {
     title: "读取小说分析模型配置",
@@ -2971,7 +3278,7 @@ server.registerTool(
   async ({ projectRoot }) => { try { return structuredResult(await getNovelAnalysisProviderSettings(projectRoot)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "upsert_novel_analysis_provider",
   {
     title: "保存小说分析模型配置",
@@ -2985,7 +3292,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "probe_novel_analysis_provider",
   {
     title: "探测小说分析模型服务",
@@ -2996,7 +3303,7 @@ server.registerTool(
   async ({ projectRoot, providerId }) => { try { return structuredResult(await probeNovelAnalysisProvider(projectRoot, providerId)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "plan_novel_analysis_run",
   {
     title: "规划长篇小说模型分析运行",
@@ -3010,7 +3317,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_novel_analysis_runs",
   {
     title: "读取长篇小说分析运行进度",
@@ -3024,7 +3331,21 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
+  "get_novel_analysis_execution_recovery",
+  {
+    title: "读取小说分析执行恢复状态",
+    description: "物理零写列出 lease 已过期或已隔离的 analysis execution、fence、request hash 与 dispatch checkpoint。只允许人工对账；不会重 POST、不会自动 failed、不会自动创建 replacement。",
+    inputSchema: { projectRoot: projectRootSchema },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot }) => {
+    try { return structuredResult(await getNovelAnalysisExecutionRecoveryStatus(projectRoot)); }
+    catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
   "execute_next_novel_analysis_run_task",
   {
     title: "执行长篇小说分析下一批",
@@ -3038,7 +3359,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "replace_novel_analysis_run_task",
   {
     title: "显式替换失败的长篇分析批次",
@@ -3052,7 +3373,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "execute_novel_analysis_task",
   {
     title: "执行小说模型分析任务",
@@ -3066,7 +3387,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "analyze_novel_chapters",
   {
     title: "分析小说事实与剧情节拍",
@@ -3077,7 +3398,7 @@ server.registerTool(
   async ({ projectRoot, expectedRevision }) => { try { return structuredResult(await analyzeNovelChapters(projectRoot, { expectedRevision })); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "upsert_novel_fact",
   {
     title: "局部保存小说事实",
@@ -3088,7 +3409,7 @@ server.registerTool(
   async ({ projectRoot, ...input }) => { try { return textResult(await upsertNovelFact(projectRoot, input)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "upsert_narrative_beat",
   {
     title: "局部保存剧情节拍",
@@ -3099,7 +3420,7 @@ server.registerTool(
   async ({ projectRoot, ...input }) => { try { return textResult(await upsertNarrativeBeat(projectRoot, input)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "generate_adaptation_plans",
   {
     title: "生成精简与拆分改编方案",
@@ -3110,7 +3431,7 @@ server.registerTool(
   async ({ projectRoot, ...input }) => { try { return structuredResult(await generateAdaptationPlans(projectRoot, input)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "validate_adaptation_plan",
   {
     title: "校验小说改编方案",
@@ -3121,7 +3442,7 @@ server.registerTool(
   async ({ projectRoot, planId }) => { try { const workspace = await getAdaptationWorkspace(projectRoot); const plan = workspace.plans.find((candidate) => candidate.id === planId); if (!plan) throw new Error(`找不到改编计划：${planId}`); return structuredResult(await validateAdaptationPlan(projectRoot, plan, workspace)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "analyze_adaptation_impact",
   {
     title: "分析小说改编局部影响",
@@ -3132,7 +3453,7 @@ server.registerTool(
   async ({ projectRoot, factIds, beatIds }) => { try { return structuredResult(await analyzeAdaptationChangeImpact(projectRoot, { factIds, beatIds })); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "regenerate_adaptation_scope",
   {
     title: "只重生成受影响的小说分镜单元",
@@ -3143,7 +3464,7 @@ server.registerTool(
   async ({ projectRoot, ...input }) => { try { return structuredResult(await regenerateAdaptationScope(projectRoot, input)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "select_adaptation_plan",
   {
     title: "选定小说改编方案",
@@ -3154,7 +3475,7 @@ server.registerTool(
   async ({ projectRoot, planId, expectedRevision }) => { try { return structuredResult(await selectAdaptationPlan(projectRoot, planId, expectedRevision)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "materialize_adaptation_plan",
   {
     title: "物化真实15秒单元与草稿镜头",
@@ -3165,7 +3486,7 @@ server.registerTool(
   async ({ projectRoot, expectedRevision }) => { try { return structuredResult(await materializeSelectedAdaptationPlan(projectRoot, { expectedRevision })); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "export_adaptation",
   {
     title: "导出小说改编JSON或Markdown",
@@ -3218,7 +3539,7 @@ const existingProductionRecoveryInputSchema = {
   note: z.string().max(8_000).optional(),
 };
 
-server.registerTool(
+registrar.registerTool(
   "preview_existing_production_recovery",
   {
     title: "预检既有制作包接管",
@@ -3232,7 +3553,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "commit_existing_production_recovery",
   {
     title: "确认既有制作包接管",
@@ -3250,7 +3571,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_production_workflow",
   {
     title: "读取内容生产状态机",
@@ -3261,7 +3582,7 @@ server.registerTool(
   async ({ projectRoot }) => { try { return structuredResult(await getProductionWorkflow(projectRoot, { includeEvidenceAudit: true })); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "update_production_workflow_stage",
   {
     title: "更新内容生产阶段",
@@ -3272,7 +3593,7 @@ server.registerTool(
   async ({ projectRoot, ...input }) => { try { return structuredResult(await updateProductionWorkflowStage(projectRoot, input, "codex")); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_creative_bibles",
   {
     title: "读取导演与视觉 Bible",
@@ -3283,7 +3604,7 @@ server.registerTool(
   async ({ projectRoot, kind }) => { try { return textResult(await listCreativeBibles(projectRoot, kind)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "upsert_creative_bible",
   {
     title: "保存导演或视觉 Bible",
@@ -3294,7 +3615,7 @@ server.registerTool(
   async ({ projectRoot, ...input }) => { try { return textResult(await upsertCreativeBible(projectRoot, input as Parameters<typeof upsertCreativeBible>[1], "codex")); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_storyboard",
   {
     title: "读取正式分镜表",
@@ -3324,7 +3645,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "upsert_storyboard_row",
   {
     title: "创建或安全修订正式分镜行",
@@ -3335,7 +3656,7 @@ server.registerTool(
   async ({ projectRoot, ...input }) => { try { return textResult(await upsertStoryboardRow(projectRoot, input, "codex")); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "analyze_change_impact",
   {
     title: "分析创作变更影响",
@@ -3346,7 +3667,7 @@ server.registerTool(
   async ({ projectRoot, targetType, targetId }) => { try { return structuredResult(await analyzeChangeImpact(projectRoot, { targetType, targetId })); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "create_handoff",
   {
     title: "落盘 Codex 接续文件",
@@ -3360,7 +3681,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_canvas_state",
   {
     title: "读取画布语义层",
@@ -3386,7 +3707,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "upsert_canvas_entity",
   {
     title: "创建或编辑画布批注与分组",
@@ -3415,7 +3736,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "delete_canvas_entity",
   {
     title: "删除画布批注或分组",
@@ -3429,7 +3750,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "upsert_canvas_link",
   {
     title: "创建或编辑画布关系线",
@@ -3450,7 +3771,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "delete_canvas_link",
   {
     title: "删除画布关系线",
@@ -3464,7 +3785,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "undo_canvas",
   {
     title: "撤销画布操作",
@@ -3478,7 +3799,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "redo_canvas",
   {
     title: "重做画布操作",
@@ -3492,7 +3813,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_next_task",
   {
     title: "获取下一生产任务",
@@ -3532,7 +3853,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_review_queue",
   {
     title: "读取导演验收队列",
@@ -3572,7 +3893,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_reviews",
   {
     title: "读取视觉验收历史",
@@ -3586,7 +3907,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "submit_review",
   {
     title: "提交视觉验收结论",
@@ -3612,7 +3933,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_item",
   {
     title: "读取生产节点",
@@ -3629,7 +3950,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "claim_task",
   {
     title: "领取任务包",
@@ -3646,7 +3967,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "heartbeat_task",
   {
     title: "续租任务包",
@@ -3660,7 +3981,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "release_task",
   {
     title: "释放任务包",
@@ -3674,7 +3995,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "cancel_task",
   {
     title: "取消未开始或过期任务",
@@ -3688,7 +4009,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "create_task_pack",
   {
     title: "创建 Codex 任务包",
@@ -3711,7 +4032,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_unit_timelines",
   {
     title: "读取 15 秒原镜头时间线",
@@ -3756,7 +4077,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "save_unit_timeline",
   {
     title: "保存原镜头顺序与时长",
@@ -3777,7 +4098,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "create_shot_task_pack",
   {
     title: "创建原镜头任务包",
@@ -3798,7 +4119,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "register_artifact",
   {
     title: "登记新素材",
@@ -3822,7 +4143,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "verify_item",
   {
     title: "验收生产节点",
@@ -3839,7 +4160,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "update_status",
   {
     title: "更新节点状态",
@@ -3862,7 +4183,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "finish_batch",
   {
     title: "结束自动化批次",
@@ -3889,7 +4210,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_script_documents",
   {
     title: "列出分集制作文档",
@@ -3907,7 +4228,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "read_script_document",
   {
     title: "读取分集制作文档",
@@ -3925,7 +4246,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "save_script_document",
   {
     title: "保存分集制作文档",
@@ -3942,7 +4263,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "set_authoritative_artifact",
   {
     title: "选择权威素材版本",
@@ -3959,7 +4280,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "promote_asset_to_hard_lock",
   {
     title: "提升资产为显式硬锁",
@@ -3976,7 +4297,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_asset_relations",
   {
     title: "读取资产衍生血缘",
@@ -3987,7 +4308,7 @@ server.registerTool(
   async ({ projectRoot, itemId, artifactId, kind }) => { try { return textResult(await listAssetRelations(projectRoot, { itemId, artifactId, kind })); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "upsert_asset_relation",
   {
     title: "保存资产衍生关系",
@@ -3998,7 +4319,7 @@ server.registerTool(
   async ({ projectRoot, ...input }) => { try { return textResult(await upsertAssetRelation(projectRoot, input as Parameters<typeof upsertAssetRelation>[1], "codex")); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_voice_identities",
   {
     title: "读取角色音色身份",
@@ -4009,7 +4330,7 @@ server.registerTool(
   async ({ projectRoot }) => { try { return textResult(await listVoiceIdentities(projectRoot)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "upsert_voice_identity",
   {
     title: "保存角色音色身份",
@@ -4020,7 +4341,7 @@ server.registerTool(
   async ({ projectRoot, ...input }) => { try { return textResult(await upsertVoiceIdentity(projectRoot, input as Parameters<typeof upsertVoiceIdentity>[1], "codex")); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_generation_settings",
   {
     title: "读取生成供应商配置",
@@ -4048,7 +4369,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_generation_provider",
   {
     title: "读取单个生成供应商",
@@ -4065,7 +4386,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "upsert_generation_provider",
   {
     title: "新增或更新生成供应商",
@@ -4079,7 +4400,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_generation_jobs",
   {
     title: "列出生成队列",
@@ -4096,7 +4417,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_publications",
   {
     title: "读取发布合同与回执",
@@ -4113,7 +4434,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "preflight_publication",
   {
     title: "预留新版本发布路径",
@@ -4124,7 +4445,7 @@ server.registerTool(
   async () => toolError(new Error("发布预留必须通过命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "register_publication",
   {
     title: "登记发布结果",
@@ -4135,7 +4456,7 @@ server.registerTool(
   async () => toolError(new Error("发布登记必须通过命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "cancel_publication",
   {
     title: "取消发布意图",
@@ -4146,7 +4467,7 @@ server.registerTool(
   async () => toolError(new Error("发布取消必须通过命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "fail_publication",
   {
     title: "终结失败发布意图",
@@ -4157,7 +4478,7 @@ server.registerTool(
   async () => toolError(new Error("发布失败登记必须通过命令账本执行。")),
 );
 
-server.registerTool(
+registrar.registerTool(
   "enqueue_generation",
   {
     title: "加入生成队列",
@@ -4174,7 +4495,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "process_generation_queue",
   {
     title: "提交并轮询生成队列",
@@ -4193,7 +4514,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "reconcile_http_generation_submission",
   {
     title: "对账 HTTP 提交不明任务",
@@ -4207,7 +4528,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_browser_generation_plan",
   {
     title: "读取 Codex 网页生成计划",
@@ -4221,7 +4542,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_subagent_image_generation_plan",
   {
     title: "读取一图一子代理生图计划",
@@ -4235,7 +4556,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "cancel_generation_job",
   {
     title: "取消生成任务",
@@ -4249,7 +4570,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "update_browser_generation_job",
   {
     title: "回写网页生成进度",
@@ -4263,7 +4584,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "update_subagent_image_generation_job",
   {
     title: "迁移并推进可归因的一图一子代理任务",
@@ -4299,7 +4620,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "probe_video_engine",
   {
     title: "检查本地视频引擎",
@@ -4310,7 +4631,7 @@ server.registerTool(
   async () => textResult(await probeVideoEngine()),
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_edit_projects",
   {
     title: "列出本地剪辑工程",
@@ -4336,7 +4657,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_edit_project",
   {
     title: "读取剪辑工程",
@@ -4350,7 +4671,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "create_edit_project",
   {
     title: "创建本地剪辑工程",
@@ -4372,7 +4693,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "save_edit_project",
   {
     title: "保存本地剪辑工程",
@@ -4448,7 +4769,7 @@ const editOperationSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("remove_clip"), clipId: z.string().min(1) }),
 ]);
 
-server.registerTool(
+registrar.registerTool(
   "apply_edit_operation",
   {
     title: "原子执行剪辑操作",
@@ -4462,7 +4783,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_edit_history_info",
   {
     title: "读取剪辑撤销历史",
@@ -4473,7 +4794,7 @@ server.registerTool(
   async ({ projectRoot, editProjectId }) => { try { return textResult(await getEditHistoryInfo(projectRoot, editProjectId)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "undo_edit_project",
   {
     title: "撤销剪辑操作",
@@ -4484,7 +4805,7 @@ server.registerTool(
   async ({ projectRoot, editProjectId, expectedRevision }) => { try { return textResult(await undoEditProject(projectRoot, editProjectId, expectedRevision, "codex")); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "redo_edit_project",
   {
     title: "重做剪辑操作",
@@ -4495,7 +4816,7 @@ server.registerTool(
   async ({ projectRoot, editProjectId, expectedRevision }) => { try { return textResult(await redoEditProject(projectRoot, editProjectId, expectedRevision, "codex")); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "export_edit_otio",
   {
     title: "导出 OpenTimelineIO",
@@ -4506,7 +4827,7 @@ server.registerTool(
   async ({ projectRoot, editProjectId, expectedRevision, outputPath }) => { try { return textResult(await exportEditProjectOtio(projectRoot, editProjectId, expectedRevision, outputPath)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "import_edit_otio",
   {
     title: "导入 OpenTimelineIO",
@@ -4517,7 +4838,7 @@ server.registerTool(
   async ({ projectRoot, filePath, name }) => { try { return textResult(await importEditProjectOtio(projectRoot, filePath, name)); } catch (error) { return toolError(error); } },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_managed_studio_overview",
   {
     title: "读取受管素材中心概览",
@@ -4548,7 +4869,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_local_creative_project_ingest_status",
   {
     title: "读取本机创作项目导入与参考链状态",
@@ -4571,7 +4892,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "preview_local_creative_production_units",
   {
     title: "预览本机项目的受管生产单元",
@@ -4595,7 +4916,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_studio_assets",
   {
     title: "分页搜索受管角色场景道具",
@@ -4617,7 +4938,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_studio_media",
   {
     title: "分页搜索受管媒体",
@@ -4639,7 +4960,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_studio_media_import_origins",
   {
     title: "分页追溯受管媒体导入来源",
@@ -4660,7 +4981,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_studio_text_documents",
   {
     title: "分页搜索受管剧本与提示词",
@@ -4687,7 +5008,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_studio_production_units",
   {
     title: "分页读取 15 秒生产单元",
@@ -4709,7 +5030,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "query_studio_asset_timeline",
   {
     title: "分页读取资产连续性时间线",
@@ -4730,7 +5051,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_asset",
   {
     title: "读取受管资产详情",
@@ -4748,7 +5069,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_text_revision",
   {
     title: "读取冻结文本修订",
@@ -4775,7 +5096,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_production_unit_snapshot",
   {
     title: "读取 1–15 秒单元冻结快照",
@@ -4793,7 +5114,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_trace",
   {
     title: "Studio 生成全链双向追溯（只读）",
@@ -4846,7 +5167,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_production_projection_bundle",
   {
     title: "读取当前单元聚合投影（单元驾驶舱）",
@@ -4868,7 +5189,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_binding_control",
   {
     title: "读取 Studio 剧本资产绑定控制",
@@ -4905,7 +5226,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_continuity_review_control",
   {
     title: "读取 Studio 连续性与 Review 控制面",
@@ -4951,7 +5272,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_script_library_projection",
   {
     title: "剧本库只读投影（SSL-0/1/2/3）",
@@ -5058,7 +5379,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_consistency_evaluation",
   {
     title: "读取生成结果一致性辅助判定（P19）",
@@ -5088,7 +5409,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "suggest_studio_storyboard_draft",
   {
     title: "生成 15 秒宫格拆格建议（P20）",
@@ -5115,7 +5436,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "evaluate_studio_fusion_helper",
   {
     title: "融合合同助手（只读）",
@@ -5151,7 +5472,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "execute_studio_shot_compose_local",
   {
     title: "本机单镜合成（ffmpeg）",
@@ -5195,7 +5516,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_generation_control",
   {
     title: "读取 Codex 生成一致性控制封装",
@@ -5214,7 +5535,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "discover_dudu_readonly_import_projects",
   {
     title: "发现《嘟嘟》隔离导入工程（P30）",
@@ -5231,7 +5552,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_dudu_readonly_import_control",
   {
     title: "读取《嘟嘟》隔离导入状态（P30）",
@@ -5246,7 +5567,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_video_package_control",
   {
     title: "读取 Studio 视频包控制状态（P30）",
@@ -5271,6 +5592,41 @@ server.registerTool(
           : { by, authority: authority as StudioVideoPackageAuthorityInput },
       ));
     } catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "get_studio_connector_work_queue",
+  {
+    title: "读取 Higgsfield connector 本地工作队列",
+    description: "只读返回有界的本地画布→Codex connector 请求状态。不会返回路径、claim token、nonce、预检原文或任何凭据；不会上传、调用生成或消耗 credits。",
+    inputSchema: {
+      projectRoot: managedStudioProjectRootSchema,
+      statuses: z.array(z.enum(["queued", "blocked_by_provider", "claimed", "authorized", "submitted", "submission_unknown", "succeeded", "failed", "cancelled"])).max(9).optional(),
+      limit: z.number().int().min(1).max(36).optional(),
+    },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot, statuses, limit }) => {
+    try { return managedStudioResult(await getStudioHiggsfieldConnectorWorkQueue(projectRoot, { statuses, limit })); }
+    catch (error) { return toolError(error); }
+  },
+);
+
+registrar.registerTool(
+  "get_studio_video_generation_control",
+  {
+    title: "读取 Higgsfield Seedance 2.5 Unlimited 视频控制状态",
+    description: "纯只读：返回固定 20 秒/720p/Unlimited-only profile、已机械验证视频包的参考数量、当前 run 和 connector capability 门禁。当前 connector 没有同时确认 unlimAvailable/supportsUnlim 时会明确 blocked；不会上传参考、调用生成、消耗 credits 或回退 priority 队列。",
+    inputSchema: {
+      projectRoot: managedStudioProjectRootSchema,
+      intentId: studioStableIdSchema,
+    },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  async ({ projectRoot, intentId }) => {
+    try { return managedStudioResult(await getStudioHiggsfieldVideoGenerationControl(projectRoot, intentId)); }
+    catch (error) { return toolError(error); }
   },
 );
 
@@ -5309,7 +5665,7 @@ const studioProductionDashboardQuerySchema = z.discriminatedUnion("operation", [
   }).strict(),
 ]);
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_production_dashboard",
   {
     title: "读取无限画布生产驾驶舱投影",
@@ -5331,7 +5687,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_studio_multimedia_timeline",
   {
     title: "读取 Studio 四媒体单元时间线",
@@ -5407,6 +5763,7 @@ const commandRequestSchema = z.discriminatedUnion("command", [
     expectedDiscoveryFingerprint: studioSha256Schema,
   }).strict() }),
   ...STUDIO_CODEX_PUBLIC_COMMAND_SCHEMA_OPTIONS,
+  ...NOVEL_MANUSCRIPT_COMMAND_SCHEMA_OPTIONS,
   z.object({ command: z.literal("materialize_fusion_project"), payload: z.object({
     ...fusionInspectionInputShape,
     targetParent: z.string().min(1),
@@ -5561,7 +5918,9 @@ const commandRequestSchema = z.discriminatedUnion("command", [
   z.object({ command: z.literal("execute_novel_analysis_task"), payload: z.object({ taskId: z.string().min(1), providerId: z.string().min(1).max(120), expectedRevision: z.number().int().min(0) }) }),
   z.object({ command: z.literal("execute_next_novel_analysis_run_task"), payload: z.object({ runId: z.string().min(1), expectedRevision: z.number().int().min(0) }) }),
   z.object({ command: z.literal("replace_novel_analysis_run_task"), payload: z.object({ runId: z.string().min(1), batchIndex: z.number().int().positive(), expectedRevision: z.number().int().min(0), reason: z.string().trim().min(3).max(4_000), confirmNoRemoteResult: z.boolean().optional() }) }),
-  z.object({ command: z.literal("submit_novel_analysis_proposal"), payload: z.object({ taskId: z.string().min(1), expectedRevision: z.number().int().min(0), facts: z.array(novelFactProposalSchema).max(500), beats: z.array(narrativeBeatProposalSchema).max(300) }) }),
+  z.object({ command: z.literal("mark_novel_analysis_execution_reconciliation_required"), payload: z.object({ taskId: z.string().min(1), executionId: z.string().min(1).max(200), expectedRevision: z.number().int().min(0), expectedTaskRevision: z.number().int().positive(), expectedExecutionFence: z.number().int().min(0), expectedLeaseUntil: z.string().datetime(), note: z.string().trim().min(3).max(4_000) }) }),
+  z.object({ command: z.literal("reconcile_novel_analysis_execution"), payload: z.object({ taskId: z.string().min(1), executionId: z.string().min(1).max(200), expectedRevision: z.number().int().min(0), expectedTaskRevision: z.number().int().positive(), expectedExecutionFence: z.number().int().min(0), result: z.enum(["found", "not_found"]), evidenceReference: z.string().trim().min(3).max(2_000), note: z.string().trim().min(3).max(4_000) }) }),
+  z.object({ command: z.literal("submit_novel_analysis_proposal"), payload: z.object({ taskId: z.string().min(1), expectedRevision: z.number().int().min(0), executionId: z.string().min(1).max(200).optional(), expectedExecutionFence: z.number().int().min(0).optional(), facts: z.array(novelFactProposalSchema).max(500), beats: z.array(narrativeBeatProposalSchema).max(300) }) }),
   z.object({ command: z.literal("review_novel_analysis_item"), payload: z.object({ reviewId: z.string().min(1), decision: z.enum(["accepted", "rejected"]), expectedRevision: z.number().int().min(0), reviewExpectedRevision: z.number().int().positive(), note: z.string().max(4_000).optional() }) }),
   z.object({ command: z.literal("review_novel_analysis_batch"), payload: z.object({ expectedRevision: z.number().int().min(0), decisions: z.array(z.object({ reviewId: z.string().min(1), decision: z.enum(["accepted", "rejected"]), reviewExpectedRevision: z.number().int().positive(), note: z.string().max(4_000).optional() })).min(1).max(200) }) }),
   z.object({ command: z.literal("save_skill"), payload: z.object({ id: z.string().min(1), name: z.string().min(1).max(160), description: z.string().max(2_000), category: z.enum(["orchestration", "production", "continuity", "review", "custom"]), enabled: z.boolean(), content: z.string().max(200_000), expectedUpdatedAt: z.string().optional() }) }),
@@ -5610,7 +5969,7 @@ const commandRequestSchema = z.discriminatedUnion("command", [
   z.object({ command: z.literal("prepare_edit_media_proxy"), payload: z.object({ artifactId: z.string().min(1) }) }),
 ]);
 
-server.registerTool(
+registrar.registerTool(
   "execute_command",
   {
     title: "执行幂等写命令",
@@ -5622,10 +5981,12 @@ server.registerTool(
       request: commandRequestSchema,
       writeLeaseHolderId: z.string().trim().min(1).max(128).optional(),
       writeLeaseToken: z.string().trim().regex(/^lease-[a-f0-9]{32}$/u).optional(),
+      novelWriteLeaseToken: z.string().regex(/^novel-lease-token-[A-Za-z0-9_-]{43}$/u).optional(),
+      novelActorAttribution: novelActorAttributionSchema.optional(),
     },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   },
-  async ({ projectRoot, requestId, idempotencyKey, request, writeLeaseHolderId, writeLeaseToken }, extra) => {
+  async ({ projectRoot, requestId, idempotencyKey, request, writeLeaseHolderId, writeLeaseToken, novelWriteLeaseToken, novelActorAttribution }, extra) => {
     const scanBridge = createScanRequestBridge(extra, request.command === "scan_project");
     try {
       if (isManagedStudioCommand(request.command)) await inspectManagedProject(projectRoot);
@@ -5665,16 +6026,19 @@ server.registerTool(
         onProgress: scanBridge.onProgress,
         ...(writeLeaseHolderId ? { writeLeaseHolderId } : {}),
         ...(writeLeaseToken ? { writeLeaseToken } : {}),
+        ...(novelWriteLeaseToken ? { novelWriteLeaseToken } : {}),
+        ...(novelActorAttribution ? { novelActorAttribution } : {}),
+        studioWriteActor: "codex",
       });
       const focusJobId = request.command === "process_generation_queue" ? request.payload.jobId : undefined;
-      return structuredResult(sanitizeCommandRecord(record, focusJobId));
+      return structuredResult(sanitizeCommandRecord(record, focusJobId, executionRoot));
     }
     catch (error) { return toolError(error, { requestId, idempotencyKey, command: request.command }); }
     finally { await scanBridge.flush(); }
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_command_ledger",
   {
     title: "读取幂等命令账本",
@@ -5697,7 +6061,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "reconcile_command",
   {
     title: "对账未确认命令",
@@ -5720,7 +6084,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_edit_media",
   {
     title: "列出剪辑素材库",
@@ -5736,7 +6100,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "prepare_edit_media_preview",
   {
     title: "按需生成剪辑媒体预览",
@@ -5750,7 +6114,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "prepare_edit_media_proxy",
   {
     title: "生成本地剪辑代理",
@@ -5764,7 +6128,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "start_edit_render",
   {
     title: "后台启动剪辑导出",
@@ -5778,7 +6142,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "get_edit_render_job",
   {
     title: "读取后台导出进度",
@@ -5792,7 +6156,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "cancel_edit_render",
   {
     title: "取消后台剪辑导出",
@@ -5806,7 +6170,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_edit_render_jobs",
   {
     title: "读取剪辑导出记录",
@@ -5820,7 +6184,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "extract_timeline_frame",
   {
     title: "提取时间线合成帧",
@@ -5834,7 +6198,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "prepare_timeline_continuation",
   {
     title: "从时间线末帧准备续视频",
@@ -5848,7 +6212,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_timeline_frames",
   {
     title: "读取合成帧来源历史",
@@ -5862,7 +6226,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "extract_last_frame",
   {
     title: "提取视频最后一帧",
@@ -5876,7 +6240,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "create_video_continuation",
   {
     title: "创建末帧续视频任务包",
@@ -5890,7 +6254,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "list_video_continuations",
   {
     title: "列出末帧续视频任务",
@@ -5904,7 +6268,7 @@ server.registerTool(
   },
 );
 
-server.registerTool(
+registrar.registerTool(
   "update_video_continuation",
   {
     title: "放弃未入队的末帧续视频包",

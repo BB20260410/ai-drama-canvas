@@ -690,10 +690,16 @@ function parsePublicationStore(value: unknown): PublicationStore {
 
 function parseProject(value: unknown): ProjectConfig {
   if (!isRecord(value)
-    || value.schemaVersion !== 1
+    || (value.schemaVersion !== 1 && value.schemaVersion !== 2)
     || typeof value.id !== "string"
     || !Array.isArray(value.hardLocks)) {
     throw new Error("project 结构无效。 ");
+  }
+  if ((value.schemaVersion === 1 && ("workspaceMode" in value || "minimumWriterSchemaVersion" in value))
+    || (value.schemaVersion === 2
+      && ((value.workspaceMode !== "novel" && value.workspaceMode !== "hybrid")
+        || value.minimumWriterSchemaVersion !== 2))) {
+    throw new Error("project writer 声明无效。 ");
   }
   for (const [index, hardLock] of value.hardLocks.entries()) {
     if (!isRecord(hardLock)

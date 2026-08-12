@@ -9,7 +9,6 @@ import {
   readdir,
   rm,
   stat,
-  writeFile,
 } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -18,8 +17,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import asar from "@electron/asar";
+import { computeSourceDigest, listSourceDigestFiles } from "../src/core/build-identity.js";
 import { assertReleaseManifest, type ReleaseManifest } from "../src/core/release-manifest.js";
 import {
+  assertBackgroundSmokeEvidence,
+  assertDirectDependencyVersionIdentity,
+  assertElectronBinaryProvenance,
+  assertExactDependencyVersionIdentity,
   assertOnlyStaticPackagedResources,
   assertPackagedReviewEvidence,
   assertImmutableFileUnchanged,
@@ -29,14 +33,36 @@ import {
   type ImmutableFileSnapshot,
   type PackagedReviewEvidence,
 } from "./isolated-package-guards.js";
+import {
+  acquireEvidenceRunLock,
+  assertFreshOutputSet,
+  createUniqueEvidenceStem,
+} from "./lib/exclusive-evidence-output.mjs";
+import { seedVerifiedElectronCache } from "./lib/electron-binary-cache.js";
+import {
+  finalizeIsolatedPackageTerminalEvidence,
+  isolatedPackageCompletionMarkerPath,
+} from "./lib/isolated-package-terminal-finalizer.mjs";
+import {
+  assertNpmProductionDependencyHealth,
+  type NpmLsJson,
+  type NpmProductionDependencyHealthSummary,
+  type PackageLockJson,
+} from "./lib/npm-production-dependency-health.js";
 
 const execFileAsync = promisify(execFile);
 const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const runId = createUniqueEvidenceStem("isolated-package-smoke");
+const startedAt = new Date().toISOString();
 const evidencePath = path.resolve(
-  process.argv[2] || path.join(workspace, "docs", "evidence", "isolated-package-smoke-latest.json"),
+  process.argv[2] || path.join(workspace, "docs", "evidence", `${runId}.json`),
 );
+if (path.basename(evidencePath) === "isolated-package-smoke-latest.json") {
+  throw new Error("拒绝使用已退休的 isolated-package-smoke-latest.json；每次验收必须使用唯一新文件名。");
+}
 const evidenceDirectory = path.dirname(evidencePath);
 const evidenceStem = path.basename(evidencePath, path.extname(evidencePath));
+const completionMarkerPath = isolatedPackageCompletionMarkerPath(evidencePath);
 const packagedUiEvidencePath = path.join(evidenceDirectory, `${evidenceStem}-electron-ui.json`);
 const packagedUiScreenshotPath = path.join(evidenceDirectory, `${evidenceStem}-electron-ui.png`);
 const packagedReviewEvidencePath = path.join(evidenceDirectory, `${evidenceStem}-review-ui.json`);
@@ -45,14 +71,28 @@ const oldDmgPath = path.join(workspace, "dist", "AI 漫剧画布-0.1.0-arm64.dmg
 const workspaceDistPath = path.join(workspace, "dist");
 const tsxExecutable = path.join(workspace, "node_modules", ".bin", "tsx");
 const vitestExecutable = path.join(workspace, "node_modules", ".bin", "vitest");
-const tempRoot = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-current-source-package-"));
+// Keep the real path short enough for tsx's Unix-domain IPC socket and
+// electron-builder's generated ASAR unpack glob on macOS. The per-user cache
+// TMPDIR is already long enough to overflow both limits for current packages.
+const packageTempBase = process.platform === "darwin" ? "/private/tmp" : os.tmpdir();
+await mkdir(evidenceDirectory, { recursive: true });
+await assertFreshOutputSet([
+  { label: "顶层隔离 App 证据", path: evidencePath },
+  { label: "顶层隔离 App completion marker", path: completionMarkerPath },
+  { label: "Effect/Transition UI 证据", path: packagedUiEvidencePath },
+  { label: "Effect/Transition UI 截图", path: packagedUiScreenshotPath },
+  { label: "ReviewStudio UI 证据", path: packagedReviewEvidencePath },
+  { label: "ReviewStudio UI 截图", path: packagedReviewScreenshotPath },
+]);
+const tempRoot = await mkdtemp(path.join(packageTempBase, "aic-pkg-"));
 const stageRoot = path.join(tempRoot, "stage");
 const builderOutput = path.join(stageRoot, "builder-output");
 const builderExecutable = path.join(stageRoot, "node_modules", ".bin", "electron-builder");
 const isolatedHome = path.join(tempRoot, "home");
-const isolatedTmp = path.join(tempRoot, "tmp");
+const isolatedTmp = path.join(tempRoot, "t");
 const appBuilderTmp = path.join(tempRoot, "app-builder-tmp");
 const electronBuilderCache = path.join(tempRoot, "electron-builder-cache");
+const electronDownloadCache = path.join(tempRoot, "electron-download-cache");
 const npmCache = path.join(tempRoot, "npm-cache");
 const emptyProjectRoot = path.join(tempRoot, "empty-project");
 const emptyProjectRegistryPath = path.join(tempRoot, "empty-project-registry.json");
@@ -84,6 +124,7 @@ interface CommandRunEvidence {
   durationMs: number;
   stdoutTail: string;
   stderrTail: string;
+  productionDependencyHealth?: NpmProductionDependencyHealthSummary;
 }
 
 interface CommandRunResult {
@@ -376,13 +417,16 @@ assertPathInsidePackageRoot(packagedReviewUserDataPath, tempRoot, "packaged Revi
 await mkdir(evidenceDirectory, { recursive: true });
 
 const oldDmgBefore = await snapshotImmutableFile(oldDmgPath);
-if (!oldDmgBefore.exists) throw new Error(`受保护的旧 DMG 不存在：${oldDmgPath}`);
+// The legacy DMG is optional build history, not a prerequisite for validating
+// the current package. Preserve whichever state was observed (present or
+// absent) and fail later if the isolated run changes it.
 const hostRegistryBefore = await snapshotImmutableFile(hostRegistryPath);
 const hostMediaRuntimeStateBefore = await snapshotImmutableFile(hostMediaRuntimeStatePath);
 const distBefore = await topLevelSnapshot(workspaceDistPath);
 const workspaceDistManifestBefore = await fileManifest(workspaceDistPath);
 const workspaceOutManifestBefore = await fileManifest(path.join(workspace, "out"));
 const workspaceMcpManifestBefore = await fileManifest(path.join(workspace, "dist-mcp"));
+const evidenceRunLock = await acquireEvidenceRunLock(evidencePath, runId);
 
 try {
   await Promise.all([
@@ -391,34 +435,37 @@ try {
     mkdir(isolatedTmp, { recursive: true }),
     mkdir(appBuilderTmp, { recursive: true }),
     mkdir(electronBuilderCache, { recursive: true }),
+    mkdir(electronDownloadCache, { recursive: true }),
     mkdir(npmCache, { recursive: true }),
     mkdir(path.dirname(packagedRegistryPath), { recursive: true }),
     mkdir(packagedMediaRuntimeDirectory, { recursive: true }),
     mkdir(packagedProjectRoot, { recursive: true }),
   ]);
-  const stageInputs = [
-    "package.json",
-    "package-lock.json",
-    "electron.vite.config.ts",
-    "tsconfig.json",
-    "tsconfig.mcp.json",
-    "tsconfig.node.json",
-    "tsconfig.web.json",
+  const rootSourceInputs = (await listSourceDigestFiles(workspace))
+    .map((filePath) => path.relative(workspace, filePath))
+    .filter((relativePath) => !relativePath.includes(path.sep));
+  const stageInputs = [...new Set([
+    ...rootSourceInputs,
     "src",
     "scripts",
     "tests",
-    "vitest.config.ts",
     "build",
-    "node_modules",
-  ];
+  ])];
   await runCommand("APFS COW clone into isolated stage", "/bin/cp", ["-cR", ...stageInputs, stageRoot], {
     cwd: workspace,
     timeout: 10 * 60_000,
   });
-  const stageSymlinkCount = await assertNoExternalSymlinks(stageRoot);
+  const stageSourceSymlinkCount = await assertNoExternalSymlinks(stageRoot);
   const workspaceSourceManifest = await fileManifest(path.join(workspace, "src"));
   const stageSourceManifest = await fileManifest(path.join(stageRoot, "src"));
   assertSameManifest(workspaceSourceManifest, stageSourceManifest, "临时 stage 与当前 src");
+  const [workspaceSourceIdentity, stageSourceIdentity] = await Promise.all([
+    computeSourceDigest(workspace),
+    computeSourceDigest(stageRoot),
+  ]);
+  if (JSON.stringify(workspaceSourceIdentity) !== JSON.stringify(stageSourceIdentity)) {
+    throw new Error(`临时 stage 与当前完整源码摘要不一致：${JSON.stringify({ workspaceSourceIdentity, stageSourceIdentity })}`);
+  }
 
   const signingEnvironmentKeys = [
     "CSC_LINK",
@@ -450,6 +497,9 @@ try {
     TMPDIR: isolatedTmp,
     APP_BUILDER_TMP_DIR: appBuilderTmp,
     ELECTRON_BUILDER_CACHE: electronBuilderCache,
+    electron_config_cache: electronDownloadCache,
+    ELECTRON_INSTALL_PLATFORM: "darwin",
+    ELECTRON_INSTALL_ARCH: "arm64",
     npm_config_cache: npmCache,
     npm_config_update_notifier: "false",
     npm_config_audit: "false",
@@ -457,6 +507,61 @@ try {
     CSC_IDENTITY_AUTO_DISCOVERY: "false",
     DEBUG: "",
   });
+  for (const key of ["ELECTRON_MIRROR", "npm_config_electron_mirror"]) delete packageEnvironment[key];
+  const npmCiArgs = [
+    "npm",
+    "ci",
+    "--include=dev",
+    "--no-audit",
+    "--no-fund",
+    "--registry=https://registry.npmjs.org",
+  ];
+  await runCommand("isolated lockfile-faithful npm ci", "/usr/bin/env", npmCiArgs, {
+    cwd: stageRoot,
+    env: packageEnvironment,
+    timeout: 20 * 60_000,
+  });
+  const [stageElectronPackage, stagePackageForElectron, stagePackageLockForElectron] = await Promise.all([
+    readFile(path.join(stageRoot, "node_modules", "electron", "package.json"), "utf8")
+      .then((value) => JSON.parse(value) as { version?: string }),
+    readFile(path.join(stageRoot, "package.json"), "utf8")
+      .then((value) => JSON.parse(value) as { devDependencies?: Record<string, string> }),
+    readFile(path.join(stageRoot, "package-lock.json"), "utf8")
+      .then((value) => JSON.parse(value) as {
+        packages?: Record<string, { version?: string; devDependencies?: Record<string, string> }>;
+      }),
+  ]);
+  if (!/^\d+\.\d+\.\d+$/u.test(stageElectronPackage.version ?? "")) {
+    throw new Error(`隔离 Electron package 版本无效：${String(stageElectronPackage.version)}`);
+  }
+  const electronCacheSeed = await seedVerifiedElectronCache({
+    electronPackageRoot: path.join(stageRoot, "node_modules", "electron"),
+    archiveName: `electron-v${stageElectronPackage.version}-darwin-arm64.zip`,
+    sourceCacheRoots: [
+      path.join(os.homedir(), "Library", "Caches", "electron"),
+      path.join(os.homedir(), ".cache", "electron"),
+    ],
+    targetCacheRoot: electronDownloadCache,
+  });
+  const installElectronExecutable = path.join(stageRoot, "node_modules", ".bin", "install-electron");
+  await runCommand(
+    "isolated lockfile Electron binary install",
+    installElectronExecutable,
+    [],
+    { cwd: stageRoot, env: packageEnvironment, timeout: 15 * 60_000 },
+  );
+  const stageInstalledSymlinkCount = await assertNoExternalSymlinks(stageRoot);
+  const productionDependencyRun = await runCommand(
+    "isolated production dependency closure",
+    "/usr/bin/env",
+    ["npm", "ls", "--omit=dev", "--all", "--json"],
+    { cwd: stageRoot, env: packageEnvironment, timeout: 5 * 60_000 },
+  );
+  const productionDependencyHealth = assertNpmProductionDependencyHealth(
+    JSON.parse(productionDependencyRun.stdout) as NpmLsJson,
+    JSON.parse(await readFile(path.join(stageRoot, "package-lock.json"), "utf8")) as PackageLockJson,
+  );
+  productionDependencyRun.evidence.productionDependencyHealth = productionDependencyHealth;
   await runCommand("isolated stage current-source build", "/usr/bin/env", ["npm", "run", "build"], {
     cwd: stageRoot,
     env: packageEnvironment,
@@ -489,6 +594,65 @@ try {
   if (stageMcpCapabilities.toolCount !== currentReleaseManifest.mcpToolCount) {
     throw new Error("隔离 stage MCP 工具数与 release manifest 不一致。");
   }
+  const electronArchiveName = `electron-v${stageElectronPackage.version}-darwin-arm64.zip`;
+  const electronArchivePath = path.join(stageRoot, "node_modules", "electron", "dist", electronArchiveName);
+  const electronExecutableRelativePath = "Electron.app/Contents/MacOS/Electron";
+  const electronExecutablePath = path.join(
+    stageRoot,
+    "node_modules",
+    "electron",
+    "dist",
+    ...electronExecutableRelativePath.split("/"),
+  );
+  const electronArchitectureRun = await runCommand(
+    "inspect lockfile Electron architecture",
+    "/usr/bin/lipo",
+    ["-archs", electronExecutablePath],
+    { cwd: stageRoot, env: packageEnvironment, timeout: 60_000 },
+  );
+  await runCommand(
+    "repack lockfile Electron distribution",
+    "/usr/bin/ditto",
+    [
+      "-c",
+      "-k",
+      "--sequesterRsrc",
+      "--keepParent",
+      path.join(stageRoot, "node_modules", "electron", "dist", "Electron.app"),
+      electronArchivePath,
+    ],
+    { cwd: stageRoot, env: packageEnvironment, timeout: 10 * 60_000 },
+  );
+  const electronArchive = await snapshotImmutableFile(electronArchivePath);
+  if (!electronArchive.exists || !electronArchive.bytes || electronArchive.bytes < 1_000_000) {
+    throw new Error(`隔离 Electron ZIP 不完整：${JSON.stringify(electronArchive)}`);
+  }
+  const electronArchiveEntriesRun = await runCommand(
+    "inspect lockfile Electron ZIP layout",
+    "/usr/bin/unzip",
+    ["-Z1", electronArchivePath],
+    { cwd: stageRoot, env: packageEnvironment, timeout: 60_000, maxBuffer: 16 * 1024 * 1024 },
+  );
+  const electronExecutableStat = await stat(electronExecutablePath);
+  const electronBinaryProvenance = assertElectronBinaryProvenance({
+    packageDirectSpec: stagePackageForElectron.devDependencies?.electron ?? "",
+    lockEntryVersion: stagePackageLockForElectron.packages?.["node_modules/electron"]?.version ?? "",
+    installedPackageVersion: stageElectronPackage.version ?? "",
+    distVersion: (await readFile(
+      path.join(stageRoot, "node_modules", "electron", "dist", "version"),
+      "utf8",
+    )).trim(),
+    executableRelativePath: (await readFile(
+      path.join(stageRoot, "node_modules", "electron", "path.txt"),
+      "utf8",
+    )).trim(),
+    executableBytes: electronExecutableStat.size,
+    executableMode: electronExecutableStat.mode,
+    architectures: electronArchitectureRun.stdout.trim().split(/\s+/u).filter(Boolean),
+    archiveName: electronArchiveName,
+    archiveBytes: electronArchive.bytes,
+    archiveEntries: electronArchiveEntriesRun.stdout.split(/\r?\n/u).filter(Boolean),
+  });
   const builderArgs = [
     "--mac",
     "--dir",
@@ -554,7 +718,14 @@ try {
   const packagedMcpRoot = path.join(unpackedRoot, "dist-mcp");
   const packagedMcpServerPath = path.join(packagedMcpRoot, "mcp", "server.js");
   const packagedMcpSdkPackagePath = path.join(unpackedRoot, "node_modules", "@modelcontextprotocol", "sdk", "package.json");
-  await Promise.all([access(appAsarPath), access(packagedMcpServerPath), access(packagedMcpSdkPackagePath), access(packagedReleaseManifestPath)]);
+  const stageMcpSdkPackagePath = path.join(stageRoot, "node_modules", "@modelcontextprotocol", "sdk", "package.json");
+  await Promise.all([
+    access(appAsarPath),
+    access(packagedMcpServerPath),
+    access(packagedMcpSdkPackagePath),
+    access(stageMcpSdkPackagePath),
+    access(packagedReleaseManifestPath),
+  ]);
   const packagedReleaseManifest = JSON.parse(await readFile(packagedReleaseManifestPath, "utf8")) as ReleaseManifest;
   assertReleaseManifest(packagedReleaseManifest);
   if (JSON.stringify(packagedReleaseManifest) !== JSON.stringify(currentReleaseManifest)) {
@@ -576,12 +747,57 @@ try {
     name?: string;
     version?: string;
     main?: string;
+    dependencies?: Record<string, string>;
   };
   if (packagedPackage.name !== "ai-drama-canvas" || packagedPackage.version !== currentReleaseManifest.version || packagedPackage.main !== "out/main/index.js") {
     throw new Error(`app.asar/package.json 身份错误：${JSON.stringify(packagedPackage)}`);
   }
-  const packagedSdkPackage = JSON.parse(await readFile(packagedMcpSdkPackagePath, "utf8")) as { version?: string };
-  if (packagedSdkPackage.version !== "1.29.0") throw new Error(`packaged MCP SDK 版本错误：${packagedSdkPackage.version}`);
+  const [packagedSdkPackage, stageSdkPackage, stagePackage, stagePackageLock] = await Promise.all([
+    readFile(packagedMcpSdkPackagePath, "utf8").then((value) => JSON.parse(value) as { version?: string }),
+    readFile(stageMcpSdkPackagePath, "utf8").then((value) => JSON.parse(value) as { version?: string }),
+    readFile(path.join(stageRoot, "package.json"), "utf8").then((value) => JSON.parse(value) as {
+      dependencies?: Record<string, string>;
+    }),
+    readFile(path.join(stageRoot, "package-lock.json"), "utf8").then((value) => JSON.parse(value) as {
+      packages?: Record<string, { version?: string; dependencies?: Record<string, string> }>;
+    }),
+  ]);
+  const mcpSdkVersionIdentity = assertExactDependencyVersionIdentity({
+    dependencyName: "@modelcontextprotocol/sdk",
+    packageDirectSpec: stagePackage.dependencies?.["@modelcontextprotocol/sdk"] ?? "",
+    lockRootSpec: stagePackageLock.packages?.[""]?.dependencies?.["@modelcontextprotocol/sdk"] ?? "",
+    lockEntryVersion: stagePackageLock.packages?.["node_modules/@modelcontextprotocol/sdk"]?.version ?? "",
+    stageInstalledVersion: stageSdkPackage.version ?? "",
+    packagedInstalledVersion: packagedSdkPackage.version ?? "",
+  });
+  if (packagedPackage.dependencies?.["@modelcontextprotocol/sdk"] !== mcpSdkVersionIdentity.packageDirectSpec) {
+    throw new Error(`app.asar/package.json 的 MCP SDK direct spec 与隔离源码不一致：${JSON.stringify({
+      packaged: packagedPackage.dependencies?.["@modelcontextprotocol/sdk"],
+      stage: mcpSdkVersionIdentity.packageDirectSpec,
+    })}`);
+  }
+  const directProductionDependencyIdentities = await Promise.all(
+    Object.entries(stagePackage.dependencies ?? {})
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(async ([dependencyName, packageDirectSpec]) => {
+        const packageRelativePath = path.join("node_modules", ...dependencyName.split("/"), "package.json");
+        const [stageInstalledPackage, packagedInstalledPackage] = await Promise.all([
+          readFile(path.join(stageRoot, packageRelativePath), "utf8").then((value) => JSON.parse(value) as { version?: string }),
+          readFile(path.join(unpackedRoot, packageRelativePath), "utf8").then((value) => JSON.parse(value) as { version?: string }),
+        ]);
+        return assertDirectDependencyVersionIdentity({
+          dependencyName,
+          packageDirectSpec,
+          lockRootSpec: stagePackageLock.packages?.[""]?.dependencies?.[dependencyName] ?? "",
+          lockEntryVersion: stagePackageLock.packages?.[`node_modules/${dependencyName}`]?.version ?? "",
+          stageInstalledVersion: stageInstalledPackage.version ?? "",
+          packagedInstalledVersion: packagedInstalledPackage.version ?? "",
+        });
+      }),
+  );
+  if (JSON.stringify(packagedPackage.dependencies ?? {}) !== JSON.stringify(stagePackage.dependencies ?? {})) {
+    throw new Error("app.asar/package.json 的直接生产依赖声明与隔离源码不一致。");
+  }
 
   const codeSignature = await probeCommand("/usr/bin/codesign", ["--verify", "--deep", "--strict", appPath]);
   if (codeSignature.exitCode === 0) throw new Error("identity=null 的临时 App 意外形成了可验证签名。 ");
@@ -667,12 +883,16 @@ try {
       env: {
         ...packagedEnvironment,
         AI_CANVAS_ELECTRON_EXECUTABLE: appExecutable,
+        AI_CANVAS_ELECTRON_BACKGROUND_SMOKE: "1",
+        AI_CANVAS_EVIDENCE_RUN_ID: runId,
         AI_CANVAS_UI_SCREENSHOT_PATH: packagedUiScreenshotPath,
       },
+      timeout: 4 * 60_000,
     },
   );
   const packagedUiEvidence = JSON.parse(await readFile(packagedUiEvidencePath, "utf8")) as {
     status?: string;
+    runId?: string;
     transport?: string;
     executablePath?: string;
     userDataPath?: string;
@@ -680,10 +900,15 @@ try {
     screenshot?: { path?: string; bytes?: number; sha256?: string; width?: number; height?: number };
     terminal?: { rootRemoved?: boolean; registryRemoved?: boolean; userDataRemoved?: boolean };
     revisions?: { redone?: number; afterApplicationRestart?: number };
+    closeRuns?: Array<{ graceful?: boolean; forceTerminated?: boolean; forceKilled?: boolean; durationMs?: number; exitCode?: number | null; signalCode?: string | null }>;
+    isolation?: { userDataOutsideProjectRoot?: boolean };
+    backgroundSmoke?: Parameters<typeof assertBackgroundSmokeEvidence>[0];
   };
+  assertBackgroundSmokeEvidence(packagedUiEvidence.backgroundSmoke, "packaged Effect/Transition");
   const packagedUiUserDataRemoved = packagedUiEvidence.userDataPath ? !(await exists(packagedUiEvidence.userDataPath)) : false;
   if (
     packagedUiEvidence.status !== "passed"
+    || packagedUiEvidence.runId !== runId
     || packagedUiEvidence.transport !== "packaged-electron-current-source"
     || packagedUiEvidence.executablePath !== appExecutable
     || packagedUiEvidence.pageErrors?.length
@@ -691,7 +916,16 @@ try {
     || !packagedUiEvidence.terminal?.registryRemoved
     || !packagedUiEvidence.terminal?.userDataRemoved
     || !packagedUiUserDataRemoved
+    || packagedUiEvidence.isolation?.userDataOutsideProjectRoot !== true
     || packagedUiEvidence.revisions?.redone !== packagedUiEvidence.revisions?.afterApplicationRestart
+    || packagedUiEvidence.closeRuns?.length !== 2
+    || !packagedUiEvidence.closeRuns.every((run) => run.graceful === true
+      && run.forceTerminated === false
+      && run.forceKilled === false
+      && run.exitCode === 0
+      && run.signalCode === null
+      && typeof run.durationMs === "number"
+      && run.durationMs < 20_000)
     || packagedUiEvidence.screenshot?.path !== packagedUiScreenshotPath
     || (packagedUiEvidence.screenshot?.bytes || 0) < 20_000
     || packagedUiEvidence.screenshot?.width !== 1560
@@ -714,18 +948,38 @@ try {
       env: {
         ...packagedEnvironment,
         AI_CANVAS_ELECTRON_EXECUTABLE: appExecutable,
+        AI_CANVAS_ELECTRON_BACKGROUND_SMOKE: "1",
+        AI_CANVAS_EVIDENCE_RUN_ID: runId,
         AI_CANVAS_ELECTRON_USER_DATA_PATH: packagedReviewUserDataPath,
       },
+      timeout: 4 * 60_000,
     },
   );
   const packagedReviewEvidence = JSON.parse(await readFile(packagedReviewEvidencePath, "utf8")) as PackagedReviewEvidence & {
+    runId?: string;
     passed?: { latestReviewId?: string; sha256?: string; status?: string };
     restarted?: { latestReviewId?: string; sha256?: string; status?: string };
+    closeRuns?: Array<{ graceful?: boolean; forceTerminated?: boolean; forceKilled?: boolean; durationMs?: number; exitCode?: number | null; signalCode?: string | null }>;
+    backgroundSmoke?: Parameters<typeof assertBackgroundSmokeEvidence>[0];
   };
+  assertBackgroundSmokeEvidence(packagedReviewEvidence.backgroundSmoke, "packaged ReviewStudio");
+  if (packagedReviewEvidence.runId !== runId) {
+    throw new Error(`packaged ReviewStudio runId 与本轮不一致：${String(packagedReviewEvidence.runId)}`);
+  }
   assertPackagedReviewEvidence(packagedReviewEvidence, {
     executablePath: appExecutable,
     screenshotPath: packagedReviewScreenshotPath,
   });
+  if (packagedReviewEvidence.closeRuns?.length !== 2
+    || !packagedReviewEvidence.closeRuns.every((run) => run.graceful === true
+      && run.forceTerminated === false
+      && run.forceKilled === false
+      && run.exitCode === 0
+      && run.signalCode === null
+      && typeof run.durationMs === "number"
+      && run.durationMs < 20_000)) {
+    throw new Error(`packaged ReviewStudio close 证据错误：${JSON.stringify(packagedReviewEvidence.closeRuns)}`);
+  }
   if (await exists(packagedReviewProjectRoot) || await exists(packagedReviewRegistryPath) || await exists(packagedReviewUserDataPath)) {
     throw new Error(`packaged ReviewStudio 夹具仍残留：${JSON.stringify({
       project: await exists(packagedReviewProjectRoot),
@@ -750,6 +1004,13 @@ try {
   assertSameManifest(workspaceDistManifestBefore, workspaceDistManifestAfter, "工作区 dist");
   assertSameManifest(workspaceOutManifestBefore, workspaceOutManifestAfter, "工作区 out");
   assertSameManifest(workspaceMcpManifestBefore, workspaceMcpManifestAfter, "工作区 dist-mcp");
+  const workspaceSourceIdentityAfter = await computeSourceDigest(workspace);
+  if (JSON.stringify(workspaceSourceIdentity) !== JSON.stringify(workspaceSourceIdentityAfter)) {
+    throw new Error(`隔离 App smoke 期间源码身份发生漂移：${JSON.stringify({
+      before: workspaceSourceIdentity,
+      after: workspaceSourceIdentityAfter,
+    })}`);
+  }
 
   const appBundleManifest = await fileManifest(appPath);
   const asarSnapshot = await snapshotImmutableFile(appAsarPath);
@@ -757,6 +1018,8 @@ try {
   const packagedMcpServerSnapshot = await snapshotImmutableFile(packagedMcpServerPath);
   evidenceCore = {
     schemaVersion: 1,
+    runId,
+    startedAt,
     generatedAt: new Date().toISOString(),
     status: "passed",
     scope: "current-source-isolated-unpacked-app-validation",
@@ -783,12 +1046,26 @@ try {
       stageInputs,
       stageSource: manifestSummary(stageSourceManifest),
       workspaceSource: manifestSummary(workspaceSourceManifest),
-      stageSymlinkCount,
+      stageSourceIdentity,
+      workspaceSourceIdentity,
+      workspaceSourceIdentityAfter,
+      stageSourceSymlinkCount,
+      stageInstalledSymlinkCount,
+      lockfileInstall: {
+        command: npmCiArgs,
+        registry: "https://registry.npmjs.org",
+        workspaceNodeModulesCopied: false,
+        productionDependencyHealth,
+      },
+       electronArchive,
+       electronBinaryProvenance,
+       electronCacheSeed,
       builderEnvironment: {
         HOME: isolatedHome,
         TMPDIR: isolatedTmp,
         APP_BUILDER_TMP_DIR: appBuilderTmp,
-        ELECTRON_BUILDER_CACHE: electronBuilderCache,
+         ELECTRON_BUILDER_CACHE: electronBuilderCache,
+         electron_config_cache: electronDownloadCache,
         npm_config_cache: npmCache,
         CSC_IDENTITY_AUTO_DISCOVERY: "false",
         clearedSigningEnvironmentKeys: signingEnvironmentKeys,
@@ -811,6 +1088,9 @@ try {
       packagedMcp: manifestSummary(packagedMcpManifest),
       packagedMcpServer: packagedMcpServerSnapshot,
       packagedMcpSdkVersion: packagedSdkPackage.version,
+      stageMcpSdkVersion: stageSdkPackage.version,
+      mcpSdkVersionIdentity,
+      directProductionDependencyIdentities,
       releaseManifest: packagedReleaseManifest,
       stageMcpCapabilities: {
         toolCount: stageMcpCapabilities.toolCount,
@@ -846,6 +1126,9 @@ try {
       userDataPath: packagedUiEvidence.userDataPath,
       userDataRemoved: packagedUiUserDataRemoved,
       revisions: packagedUiEvidence.revisions,
+      closeRuns: packagedUiEvidence.closeRuns,
+      isolation: packagedUiEvidence.isolation,
+      backgroundSmoke: packagedUiEvidence.backgroundSmoke,
       terminal: packagedUiEvidence.terminal,
     },
     packagedReviewStudio: {
@@ -858,6 +1141,8 @@ try {
       assertions: packagedReviewEvidence.assertions,
       passed: packagedReviewEvidence.passed,
       restarted: packagedReviewEvidence.restarted,
+      closeRuns: packagedReviewEvidence.closeRuns,
+      backgroundSmoke: packagedReviewEvidence.backgroundSmoke,
       terminal: packagedReviewEvidence.terminal,
     },
     protectedWorkspaceArtifacts: {
@@ -883,15 +1168,23 @@ try {
       "src/core/editor.ts",
       "src/core/codex.ts",
       "src/core/reviews.ts",
+      "src/main/app-close-coordinator.ts",
+      "src/main/index.ts",
       "src/mcp/server.ts",
       "src/renderer/src/components/ReviewStudioView.vue",
       "src/renderer/src/components/VideoEditorView.vue",
       "scripts/create-review-fixture.ts",
       "scripts/isolated-package-guards.ts",
       "scripts/isolated-package-smoke.ts",
+      "scripts/lib/electron-application-close.mjs",
+      "scripts/lib/exclusive-evidence-output.mjs",
+      "scripts/lib/isolated-package-terminal-finalizer.mjs",
       "scripts/ui-editor-effect-transition-smoke.mjs",
       "scripts/ui-review-content-identity-smoke.mjs",
       "tests/isolated-package-guards.test.ts",
+      "tests/isolated-package-terminal-finalizer.test.ts",
+      "tests/app-close-coordinator.test.ts",
+      "tests/electron-application-close.test.ts",
       "tests/mcp-editor-effect-transition.test.ts",
       "tests/reviews.test.ts",
     ]),
@@ -902,71 +1195,147 @@ try {
 } finally {
   try {
     await terminateProcessesReferencing(tempRoot);
+    if (lingeringProcessesBeforeCleanup.length) {
+      runError ||= new Error(`隔离 stage 依赖 finally 强制清理残留进程：${JSON.stringify(lingeringProcessesBeforeCleanup)}`);
+    }
     if (lingeringProcessesAfterCleanup.length) {
       runError ||= new Error(`隔离 stage 仍有残留进程：${JSON.stringify(lingeringProcessesAfterCleanup)}`);
     }
   } catch (cleanupError) {
     runError ||= cleanupError;
   }
-  await rm(tempRoot, { recursive: true, force: true });
+  try {
+    await rm(tempRoot, { recursive: true, force: true });
+  } catch (cleanupError) {
+    runError ||= new Error(`隔离打包临时根目录清理失败：${cleanupError instanceof Error ? cleanupError.message : String(cleanupError)}`);
+  }
 }
 
-const tempRootRemoved = !(await exists(tempRoot));
-const oldDmgPostCleanup = await snapshotImmutableFile(oldDmgPath);
-const hostRegistryPostCleanup = await snapshotImmutableFile(hostRegistryPath);
-const hostMediaRuntimeStatePostCleanup = await snapshotImmutableFile(hostMediaRuntimeStatePath);
-const distPostCleanup = await fileManifest(workspaceDistPath);
-const outPostCleanup = await fileManifest(path.join(workspace, "out"));
-const mcpPostCleanup = await fileManifest(path.join(workspace, "dist-mcp"));
-try {
+async function collectIsolatedPackagePostCleanupEvidence() {
+  const tempRootRemoved = !(await exists(tempRoot));
+  const oldDmgPostCleanup = await snapshotImmutableFile(oldDmgPath);
+  const hostRegistryPostCleanup = await snapshotImmutableFile(hostRegistryPath);
+  const hostMediaRuntimeStatePostCleanup = await snapshotImmutableFile(hostMediaRuntimeStatePath);
+  const distPostCleanup = await fileManifest(workspaceDistPath);
+  const outPostCleanup = await fileManifest(path.join(workspace, "out"));
+  const mcpPostCleanup = await fileManifest(path.join(workspace, "dist-mcp"));
   assertImmutableFileUnchanged(oldDmgBefore, oldDmgPostCleanup, "隔离烟测结束后的现有旧 DMG");
   assertImmutableFileUnchanged(hostRegistryBefore, hostRegistryPostCleanup, "隔离烟测结束后的宿主项目 registry");
   assertImmutableFileUnchanged(hostMediaRuntimeStateBefore, hostMediaRuntimeStatePostCleanup, "隔离烟测结束后的宿主媒体运行时状态");
   assertSameManifest(workspaceDistManifestBefore, distPostCleanup, "隔离烟测结束后的工作区 dist");
   assertSameManifest(workspaceOutManifestBefore, outPostCleanup, "隔离烟测结束后的工作区 out");
   assertSameManifest(workspaceMcpManifestBefore, mcpPostCleanup, "隔离烟测结束后的工作区 dist-mcp");
-} catch (invariantError) {
-  runError = new Error(`隔离烟测工作区保护门禁失败；原错误：${runError instanceof Error ? runError.message : String(runError)}；保护错误：${invariantError instanceof Error ? invariantError.message : String(invariantError)}`);
+  return {
+    tempRootRemoved,
+    oldDmgPostCleanup,
+    hostRegistryPostCleanup,
+    hostMediaRuntimeStatePostCleanup,
+    emptyProjectRemoved: !(await exists(emptyProjectRoot)),
+    emptyProjectRegistryRemoved: !(await exists(emptyProjectRegistryPath)),
+    effectTransitionRegistryRemoved: !(await exists(effectTransitionRegistryPath)),
+    packagedRegistryRemoved: !(await exists(packagedRegistryPath)),
+    packagedMediaRuntimeRemoved: !(await exists(packagedMediaRuntimeDirectory)),
+    packagedProjectRootRemoved: !(await exists(packagedProjectRoot)),
+    packagedReviewProjectRemoved: !(await exists(packagedReviewProjectRoot)),
+    packagedReviewRegistryRemoved: !(await exists(packagedReviewRegistryPath)),
+    packagedReviewUserDataRemoved: !(await exists(packagedReviewUserDataPath)),
+  };
 }
-if (runError) {
-  await Promise.all([
-    rm(packagedUiEvidencePath, { force: true }),
-    rm(packagedUiScreenshotPath, { force: true }),
-    rm(packagedReviewEvidencePath, { force: true }),
-    rm(packagedReviewScreenshotPath, { force: true }),
-  ]);
-  throw runError;
-}
-if (!evidenceCore) throw new Error("隔离打包烟测未生成证据对象。 ");
-if (!tempRootRemoved) throw new Error(`隔离打包临时根目录未清理：${tempRoot}`);
 
-const oldDmgFinal = oldDmgPostCleanup;
-assertImmutableFileUnchanged(oldDmgBefore, oldDmgFinal, "临时目录清理后的现有旧 DMG");
-evidenceCore.terminal = {
-  tempRootRemoved,
-  lingeringProcessesBeforeCleanup,
-  lingeringProcessesAfterCleanup,
-  emptyProjectRemoved: !(await exists(emptyProjectRoot)),
-  emptyProjectRegistryRemoved: !(await exists(emptyProjectRegistryPath)),
-  effectTransitionRegistryRemoved: !(await exists(effectTransitionRegistryPath)),
-  packagedRegistryRemoved: !(await exists(packagedRegistryPath)),
-  packagedMediaRuntimeRemoved: !(await exists(packagedMediaRuntimeDirectory)),
-  packagedProjectRootRemoved: !(await exists(packagedProjectRoot)),
-  packagedReviewProjectRemoved: !(await exists(packagedReviewProjectRoot)),
-  packagedReviewRegistryRemoved: !(await exists(packagedReviewRegistryPath)),
-  packagedReviewUserDataRemoved: !(await exists(packagedReviewUserDataPath)),
-  hostRegistryPostCleanup,
-  hostMediaRuntimeStatePostCleanup,
-  oldDmgFinal,
-};
-await writeFile(evidencePath, `${JSON.stringify(evidenceCore, null, 2)}\n`, "utf8");
+let postCleanupEvidence: Awaited<ReturnType<typeof collectIsolatedPackagePostCleanupEvidence>> | undefined;
+try {
+  postCleanupEvidence = await collectIsolatedPackagePostCleanupEvidence();
+} catch (postCleanupError) {
+  const previousError = runError instanceof Error ? runError.message : runError ? String(runError) : "无";
+  runError = new Error(`隔离烟测 post-cleanup 证据收集或保护门禁失败；原错误：${previousError}；保护错误：${postCleanupError instanceof Error ? postCleanupError.message : String(postCleanupError)}`);
+}
+if (postCleanupEvidence && !postCleanupEvidence.tempRootRemoved) {
+  runError ||= new Error(`隔离打包临时根目录未清理：${tempRoot}`);
+}
+if (!evidenceCore) {
+  runError ||= new Error("隔离打包烟测未生成证据对象。 ");
+}
+
+let terminalEvidence: Record<string, unknown>;
+if (runError || !evidenceCore) {
+  terminalEvidence = {
+    schemaVersion: 1,
+    kind: "current-source-isolated-unpacked-app-validation",
+    runId,
+    startedAt,
+    completedAt: new Date().toISOString(),
+    status: "failed",
+    error: runError instanceof Error ? runError.message : String(runError),
+    outputPaths: {
+      evidencePath,
+      completionMarkerPath,
+      packagedUiEvidencePath,
+      packagedUiScreenshotPath,
+      packagedReviewEvidencePath,
+      packagedReviewScreenshotPath,
+    },
+    terminal: {
+      tempRootRemoved: postCleanupEvidence?.tempRootRemoved ?? false,
+      postCleanupEvidenceCollected: Boolean(postCleanupEvidence),
+      lingeringProcessesBeforeCleanup,
+      lingeringProcessesAfterCleanup,
+    },
+    commands: commandRuns,
+  };
+} else {
+  const completedPostCleanup = postCleanupEvidence!;
+  const oldDmgFinal = completedPostCleanup.oldDmgPostCleanup;
+  evidenceCore.terminal = {
+    tempRootRemoved: completedPostCleanup.tempRootRemoved,
+    lingeringProcessesBeforeCleanup,
+    lingeringProcessesAfterCleanup,
+    emptyProjectRemoved: completedPostCleanup.emptyProjectRemoved,
+    emptyProjectRegistryRemoved: completedPostCleanup.emptyProjectRegistryRemoved,
+    effectTransitionRegistryRemoved: completedPostCleanup.effectTransitionRegistryRemoved,
+    packagedRegistryRemoved: completedPostCleanup.packagedRegistryRemoved,
+    packagedMediaRuntimeRemoved: completedPostCleanup.packagedMediaRuntimeRemoved,
+    packagedProjectRootRemoved: completedPostCleanup.packagedProjectRootRemoved,
+    packagedReviewProjectRemoved: completedPostCleanup.packagedReviewProjectRemoved,
+    packagedReviewRegistryRemoved: completedPostCleanup.packagedReviewRegistryRemoved,
+    packagedReviewUserDataRemoved: completedPostCleanup.packagedReviewUserDataRemoved,
+    hostRegistryPostCleanup: completedPostCleanup.hostRegistryPostCleanup,
+    hostMediaRuntimeStatePostCleanup: completedPostCleanup.hostMediaRuntimeStatePostCleanup,
+    oldDmgFinal,
+  };
+  evidenceCore.completedAt = new Date().toISOString();
+  terminalEvidence = evidenceCore;
+}
+
+let finalization: Awaited<ReturnType<typeof finalizeIsolatedPackageTerminalEvidence>>;
+try {
+  finalization = await finalizeIsolatedPackageTerminalEvidence({
+    evidencePath,
+    lockPath: evidenceRunLock.path,
+    runId,
+    outcome: runError ? "failed" : "passed",
+    terminalEvidence,
+    releaseLock: () => evidenceRunLock.release(),
+  });
+} catch (finalizationError) {
+  if (runError) {
+    throw new AggregateError(
+      [runError, finalizationError],
+      "隔离 package smoke 失败且 terminal finalization 未完整收敛",
+    );
+  }
+  throw finalizationError;
+}
+if (runError) throw runError;
+
 process.stdout.write(`${JSON.stringify({
+  runId,
   evidencePath,
-  status: evidenceCore.status,
-  scope: evidenceCore.scope,
-  packagedMcp: evidenceCore.packagedMcp,
-  packagedElectronUi: evidenceCore.packagedElectronUi,
-  packagedReviewStudio: evidenceCore.packagedReviewStudio,
-  authorizationBoundary: evidenceCore.authorizationBoundary,
-  terminal: evidenceCore.terminal,
+  completionMarkerPath: finalization.completionMarkerPath,
+  status: finalization.completion.status,
+  scope: terminalEvidence.scope,
+  packagedMcp: terminalEvidence.packagedMcp,
+  packagedElectronUi: terminalEvidence.packagedElectronUi,
+  packagedReviewStudio: terminalEvidence.packagedReviewStudio,
+  authorizationBoundary: terminalEvidence.authorizationBoundary,
+  terminal: terminalEvidence.terminal,
 }, null, 2)}\n`);

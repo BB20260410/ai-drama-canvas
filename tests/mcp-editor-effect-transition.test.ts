@@ -115,7 +115,7 @@ describe("stdio MCP OTIO Effect / Transition", () => {
       await client.connect(transport);
       expect((await client.listTools()).tools).toHaveLength(EXPECTED_MCP_TOOL_COUNT);
       const scan = await client.callTool({ name: "scan_project", arguments: { projectRoot: root, requestId: "request-mcp-effect-scan-001", idempotencyKey: "mcp-effect-scan-v1" } });
-      expect(scan.isError).not.toBe(true);
+      expect(scan.isError, JSON.stringify(scan)).not.toBe(true);
 
       const importedRaw = await client.callTool({ name: "import_edit_otio", arguments: { projectRoot: root, requestId: "request-mcp-effect-import-001", idempotencyKey: "mcp-effect-import-v1", filePath: inputOtio, name: "MCP 标准兼容" } });
       if (importedRaw.isError) throw new Error(JSON.stringify(importedRaw));

@@ -8,6 +8,20 @@ import { access, chmod, lstat, mkdir, open, readFile, realpath, rename, rm, stat
 import { Readable } from "node:stream";
 import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeImage, net, protocol, shell, type NativeImage } from "electron";
 import chokidar, { type FSWatcher } from "chokidar";
+import {
+  createAppCloseTracker,
+  createAppQuitOperationAdmission,
+  runGuardedAppStartupPrerequisites,
+  runBoundedAppQuitCleanup,
+  scheduleRendererCloseRequestDelivery,
+  settleLabeledCloseTasks,
+  type AppClosePhase,
+} from "./app-close-coordinator.js";
+import {
+  closeRetriableWatcherHandles,
+  createAsyncExclusiveQueue,
+  retryWatcherCloseOnce,
+} from "./watcher-owner-coordinator.js";
 import { DEFAULT_PROJECT_ROOT } from "../core/constants.js";
 import {
   activateProject,
@@ -18,6 +32,7 @@ import {
   heartbeatTask,
   getActiveProject,
   getActiveProjectReadOnly,
+  reconcileActiveManagedProjectStartup,
   getManagedProjectShell,
   getItem,
   getProjectIndex,
@@ -36,7 +51,7 @@ import {
   upgradeManagedStudioProject,
   type ListProjectsRequestOptions,
 } from "../core/service.js";
-import { inspectManagedProjectReadOnly, isManagedProject } from "../core/managed-project.js";
+import { inspectManagedProjectReadOnly, isManagedProject, type CreateManagedProjectOptions } from "../core/managed-project.js";
 import { createScriptDocument, listScriptDocuments, readScriptDocument, saveScriptDocument } from "../core/documents.js";
 import {
   cancelGenerationJob,
@@ -61,7 +76,15 @@ import {
   inspectFusionPanelVisualConstraintCurrentness,
 } from "../core/fusion-visual-constraint-store.js";
 import { deleteCanvasEntity, deleteCanvasLink, getCanvasHistoryInfo, getCanvasSemanticState, moveCanvasEntities, redoCanvasSemanticState, undoCanvasSemanticState, upsertCanvasEntity, upsertCanvasLink } from "../core/canvas-state.js";
-import { getSidecarPaths, listRegisteredProjects, loadProjectConfig, registerProject, setActiveStudioContext } from "../core/sidecar.js";
+import {
+  getActiveHybridWorkspacePreference,
+  getSidecarPaths,
+  listRegisteredProjects,
+  loadProjectConfig,
+  registerProject,
+  setActiveHybridWorkspacePreference,
+  setActiveStudioContext,
+} from "../core/sidecar.js";
 import {
   isLegacyUnhashedMediaPathAllowed,
   readLegacyAssetBytes,
@@ -88,7 +111,7 @@ import {
 } from "../core/runtime-ipc-effect.js";
 import { createRuntimeIpcPerformanceProbe } from "../core/runtime-ipc-observability.js";
 import { getRuntimeStorageReadMetrics } from "../core/runtime-storage-observability.js";
-import { applyEditOperation, beginEditorSession, cancelEditRender, closeEditorSession, createEditProject, createVideoContinuationPack, exportEditProjectOtio, extractLastFrame, extractTimelineFrame, getEditHistoryInfo, getEditProject, getEditorSessionState, getEditRenderJob, importEditProjectOtio, listEditMedia, listEditProjects, listEditRenderJobs, listTimelineFrameExtractions, listVideoContinuationPacks, prepareEditMediaPreview, prepareEditMediaProxy, prepareNestedTimelinePreview, prepareTimelineVideoContinuation, probeVideoEngine, redoEditProject, renderEditProject, resolveEditorSessionRecovery, saveEditProject, setEditorSessionProject, startEditRender, undoEditProject, updateVideoContinuationPack, type EditOperation } from "../core/editor.js";
+import { applyEditOperation, beginEditorSession, cancelEditRender, closeEditorSession, createEditProject, createVideoContinuationPack, exportEditProjectOtio, extractLastFrame, extractTimelineFrame, getEditHistoryInfo, getEditProject, getEditorSessionState, getEditRenderJob, importEditProjectOtio, listEditMedia, listEditMediaPage, listEditProjects, listEditRenderJobs, listTimelineFrameExtractions, listVideoContinuationPacks, prepareEditMediaPreview, prepareEditMediaProxy, prepareNestedTimelinePreview, prepareTimelineVideoContinuation, probeVideoEngine, redoEditProject, renderEditProject, resolveEditorSessionRecovery, saveEditProject, setEditorSessionProject, startEditRender, undoEditProject, updateVideoContinuationPack, type EditOperation } from "../core/editor.js";
 import { analyzeChangeImpact, getProductionWorkflow, getStoryboard, listCreativeBibles, updateProductionWorkflowStage, upsertCreativeBible, upsertStoryboardRow } from "../core/production.js";
 import { analyzeAdaptationChangeImpact, analyzeNovelChapters, exportAdaptation, generateAdaptationPlans, getAdaptationWorkspace, materializeSelectedAdaptationPlan, regenerateAdaptationScope, selectAdaptationPlan, upsertNarrativeBeat, upsertNovelFact, validateAdaptationPlan } from "../core/adaptation.js";
 import { listAssetRelations, listVoiceIdentities, upsertAssetRelation, upsertVoiceIdentity } from "../core/asset-registry.js";
@@ -96,13 +119,56 @@ import { createNovelAnalysisTask, listNovelAnalysisReviews, reviewNovelAnalysisB
 import { getNovelAnalysisProviderSettings, getNovelAnalysisRunProgress, listNovelAnalysisRunProgress, probeNovelAnalysisProvider } from "../core/novel-analysis-provider.js";
 import {
   executeIdempotentCommand,
+  getNovelImportCommandOwnerRoot,
+  type IdempotentCommandInput,
+  type IdempotentCommandResult,
 } from "../core/command-bus.js";
+import { getCommandLedgerEntryByIdempotencyKey } from "../core/command-ledger-store.js";
 import { ensureDesktopWriteLeaseForCommand } from "../core/desktop-write-lease.js";
 import {
   parseStudioIdempotentCommandInput,
   type StudioIdempotentCommandInput,
   type StudioPublicCommandRequest,
 } from "../core/studio-command-runtime.js";
+import {
+  parseNovelCommandRequestForCore,
+  type NovelCommandRequest,
+} from "../core/novel-command-runtime.js";
+import { NovelRepository } from "../core/novel-manuscript.js";
+import { getNovelMemoryAuthorityProjection } from "../core/novel-memory-authority.js";
+import {
+  getNovelDesktopWritingDashboard,
+  reviewNovelDesktopStateCandidate,
+  type NovelDesktopStateCandidateReviewInput,
+  type NovelDesktopWritingDashboardInput,
+} from "../core/novel-desktop-writing-os.js";
+import {
+  createAuthorizedNovelImportPreflightFromSelection,
+  revokeNovelImportPreflightAuthorization,
+  type AuthorizedNovelImportPreflight,
+  type NovelImportPreflightAuthorizationTicket,
+} from "../core/novel-import.js";
+import {
+  consumeNovelSourceSelection,
+  issueNovelSourceSelection,
+  type NovelSourceSelectionKind,
+  type NovelSourceSelectionTicket,
+} from "../core/novel-source-selection.js";
+import {
+  bindNovelDestinationToPreflightAuthorization,
+  consumeNovelDestinationForPreflightAuthorization,
+  consumeNovelDestinationSelection,
+  issueNovelDestinationSelection,
+  releaseNovelDestinationPreflightReservation,
+  reserveNovelDestinationForPreflightAuthorization,
+  type NovelDestinationSelectionTicket,
+} from "../core/novel-destination-selection.js";
+import {
+  assertNovelImportDestinationDoesNotOverlapPreflight,
+  resolveNovelImportProjectsRoot,
+} from "../core/novel-import-commit.js";
+import type { NovelImportDestinationExecutionIdentity } from "../core/operation-context.js";
+import type { NovelImportPreflight, SearchNovelChaptersInput } from "../core/novel-types.js";
 import { getFusionAssetConsistencyState } from "../core/fusion-asset-consistency.js";
 import { getCanonicalAsset, getCanonicalAssetCatalogState, listCanonicalAssets, previewCanonicalAssetMigration } from "../core/canonical-assets.js";
 import { FUSION_STORYBOARD_BEAT_ALGORITHM_VERSION, FUSION_STORYBOARD_VISIBLE_TIME_POLICY_VERSION } from "../core/fusion-storyboard-grid.js";
@@ -124,21 +190,6 @@ import {
   type StudioCanonicalAssetListQuery,
   type StudioMediaListQuery,
 } from "../core/material-studio.js";
-import {
-  getGlobalStudioAssetResourceImage,
-  getGlobalStudioMediaResource,
-  listGlobalStudioAssetCatalog,
-  listGlobalStudioAssetResourceImages,
-  listGlobalStudioMediaResources,
-  type GlobalStudioAssetCatalogQuery,
-  type GlobalStudioAssetResourceImageQuery,
-  type GlobalStudioMediaResourceQuery,
-} from "../core/studio-global-asset-catalog.js";
-import {
-  getGlobalStudioImageResource,
-  listGlobalStudioImageResources,
-  type GlobalStudioImageResourceQuery,
-} from "../core/studio-global-image-resource-catalog.js";
 import { prepareStudioNativeMediaDragCopy } from "../core/studio-native-media-drag.js";
 import {
   cleanupStaleStudioNativeMediaDragDirectories,
@@ -186,8 +237,10 @@ import {
   toStudioVideoPackagePublicControlLookup,
   type StudioVideoPackageControlQuery,
 } from "../core/studio-video-package.js";
+import { getStudioHiggsfieldVideoGenerationControl } from "../core/studio-higgsfield-video-generation.js";
 import { buildStudioGenerationPlanProgress } from "../core/studio-generation-plan-progress.js";
 import { createStudioGenerationLedgerWatcher, type StudioGenerationLedgerWatcherHandle } from "./studio-generation-ledger-watcher.js";
+import { registerStudioGlobalResourceReadIpc } from "./studio-global-resource-read-ipc.js";
 import { isRendererNavigationAllowed } from "./renderer-navigation-policy.js";
 import { createManagedProjectBackup, restoreManagedProjectBackup } from "../core/project-backup.js";
 import {
@@ -208,10 +261,21 @@ import {
   getStudioProductionDashboard,
   type StudioProductionDashboardQuery,
 } from "../core/studio-production-dashboard.js";
+import { createRuntimeStabilityProbeSnapshot } from "./runtime-stability-probe.js";
 import {
   buildStudioProductionProjectionBundle,
   type StudioProductionProjectionBundleQuery,
 } from "../core/studio-production-projection-bundle.js";
+import {
+  beginStudioProjectionPhase,
+  finishStudioProjectionPhase,
+  type StudioProjectionPhaseInstrumentation,
+  type StudioProjectionPhaseTiming,
+} from "../core/studio-projection-phase-timeline.js";
+import {
+  measureStudioUnitsReadPhase,
+  withStudioUnitsReadProbe,
+} from "../core/studio-units-read-phase-timeline.js";
 import {
   loadStudioCanvasLayout,
   saveStudioCanvasLayout,
@@ -240,8 +304,6 @@ const sourceRuntimeIpcPerformanceProbe = createRuntimeIpcPerformanceProbe();
 let runtimeBuildIdentityPromise: ReturnType<typeof resolveRuntimeBuildIdentity> | null = null;
 let sourceRuntimeGateWatchers: FSWatcher[] = [];
 let mainWindow: BrowserWindow | null = null;
-let watcher: FSWatcher | null = null;
-let semanticWatcher: FSWatcher | null = null;
 let watcherTimer: NodeJS.Timeout | null = null;
 let watcherScanController: AbortController | null = null;
 let watchedRoot = DEFAULT_PROJECT_ROOT;
@@ -250,11 +312,145 @@ interface LegacyWatcherIdentity {
   projectRoot: string;
   watcherEpoch: number;
 }
+interface LegacyWatcherOwner {
+  identity: LegacyWatcherIdentity;
+  watcher: FSWatcher | null;
+  semanticWatcher: FSWatcher | null;
+  closePromise: Promise<void> | null;
+}
+let legacyWatcherOwner: LegacyWatcherOwner | null = null;
+const retainedLegacyWatcherOwners = new Set<LegacyWatcherOwner>();
+const legacyWatcherQueue = createAsyncExclusiveQueue();
 const manualScanControllers = new Map<string, AbortController>();
 const activeProjectListControllers = new Map<string, AbortController>();
 const activeScanPromises = new Set<Promise<unknown>>();
+const appQuitOperationAdmission = createAppQuitOperationAdmission();
 const activeEditorSessions = new Map<string, string>();
+const APP_CLOSE_RENDERER_ACK_TIMEOUT_MS = 30_000;
+const APP_CLOSE_CRITICAL_CLEANUP_TIMEOUT_MS = 8_000;
+const APP_CLOSE_RECOVERABLE_CLEANUP_TIMEOUT_MS = 5_000;
+const appCloseTracker = createAppCloseTracker();
+const backgroundSmokeMode = process.env.AI_CANVAS_ELECTRON_BACKGROUND_SMOKE === "1";
+const runtimeStabilityProbeMode = process.env.AI_CANVAS_RUNTIME_STABILITY_PROBE === "1";
+if (backgroundSmokeMode && process.platform === "darwin") {
+  app.setActivationPolicy("accessory");
+}
 let quitSessionCleanupStarted = false;
+let finalProcessExitArmed = false;
+let quitAfterRendererApproval = false;
+let rendererWindowCloseApproved = false;
+let closeAfterRendererApproval = false;
+const rendererCloseBridgeReadyWebContentsIds = new Set<number>();
+let pendingRendererCloseRequest: {
+  requestId: string;
+  webContentsId: number;
+  timer: NodeJS.Timeout | null;
+  delivered: boolean;
+  approve: () => void;
+  cancel: () => void;
+} | null = null;
+
+interface BackgroundSmokeWindowMetrics {
+  showEvents: number;
+  focusEvents: number;
+  readyToShowEvents: number;
+}
+
+const backgroundSmokeWindowMetrics = new Map<number, BackgroundSmokeWindowMetrics>();
+
+function recordAppClosePhase(
+  phase: Exclude<AppClosePhase, "idle" | "awaiting_renderer">,
+  patch: Parameters<typeof appCloseTracker.transition>[1] = {},
+): void {
+  const snapshot = appCloseTracker.transition(phase, patch);
+  console.info(`[app-close] ${JSON.stringify(snapshot)}`);
+}
+
+function armRendererCloseRequestTimeout(requestId: string, detail: string): NodeJS.Timeout {
+  return setTimeout(() => {
+    if (pendingRendererCloseRequest?.requestId !== requestId) return;
+    pendingRendererCloseRequest = null;
+    quitAfterRendererApproval = false;
+    rendererWindowCloseApproved = false;
+    const timeoutSnapshot = appCloseTracker.reset(detail);
+    console.error(`[app-close] ${JSON.stringify(timeoutSnapshot)}`);
+  }, APP_CLOSE_RENDERER_ACK_TIMEOUT_MS);
+}
+
+function schedulePendingRendererCloseRequestDelivery(input: {
+  webContentsId: number;
+  isDestroyed(): boolean;
+  send(request: { requestId: string }): void;
+}): void {
+  const pending = pendingRendererCloseRequest;
+  if (!pending || pending.webContentsId !== input.webContentsId || pending.delivered) return;
+  scheduleRendererCloseRequestDelivery({
+    requestId: pending.requestId,
+    webContentsId: input.webContentsId,
+    isPending: (requestId, webContentsId) => (
+      pendingRendererCloseRequest?.requestId === requestId
+      && pendingRendererCloseRequest.webContentsId === webContentsId
+      && !pendingRendererCloseRequest.delivered
+    ),
+    isReady: () => rendererCloseBridgeReadyWebContentsIds.has(input.webContentsId),
+    isDestroyed: input.isDestroyed,
+    send: input.send,
+    onDelivered: () => {
+      const current = pendingRendererCloseRequest;
+      if (!current || current.requestId !== pending.requestId || current.delivered) return;
+      if (current.timer) clearTimeout(current.timer);
+      current.delivered = true;
+      current.timer = armRendererCloseRequestTimeout(current.requestId, "renderer-ack-timeout");
+    },
+  });
+}
+
+(
+  globalThis as typeof globalThis & {
+    __AI_CANVAS_APP_CLOSE_SNAPSHOT__?: () => ReturnType<typeof appCloseTracker.snapshot>;
+  }
+).__AI_CANVAS_APP_CLOSE_SNAPSHOT__ = () => appCloseTracker.snapshot();
+
+(
+  globalThis as typeof globalThis & {
+    __AI_CANVAS_BACKGROUND_SMOKE_SNAPSHOT__?: () => {
+      enabled: boolean;
+      platform: NodeJS.Platform;
+      activationPolicy: "accessory" | "regular";
+      dockVisible: boolean | null;
+      focusedWindowId: number | null;
+      windows: Array<{
+        id: number;
+        showEvents: number;
+        focusEvents: number;
+        readyToShowEvents: number;
+        visible: boolean;
+        focused: boolean;
+        destroyed: boolean;
+      }>;
+    };
+  }
+).__AI_CANVAS_BACKGROUND_SMOKE_SNAPSHOT__ = () => ({
+  enabled: backgroundSmokeMode,
+  platform: process.platform,
+  activationPolicy: backgroundSmokeMode && process.platform === "darwin" ? "accessory" : "regular",
+  dockVisible: process.platform === "darwin" ? (app.dock?.isVisible() ?? false) : null,
+  focusedWindowId: BrowserWindow.getFocusedWindow()?.id ?? null,
+  windows: BrowserWindow.getAllWindows().map((window) => {
+    const metrics = backgroundSmokeWindowMetrics.get(window.id) ?? {
+      showEvents: 0,
+      focusEvents: 0,
+      readyToShowEvents: 0,
+    };
+    return {
+      id: window.id,
+      ...metrics,
+      visible: window.isVisible(),
+      focused: window.isFocused(),
+      destroyed: window.isDestroyed(),
+    };
+  }),
+});
 
 interface PreparedNativeMediaDrag extends StudioNativeMediaDragOwnedEntry {
   webContentsId: number;
@@ -284,9 +480,11 @@ function studioMediaExportTempRoot(): string {
 }
 
 async function initializeStudioNativeMediaDragResources(): Promise<void> {
+  if (appQuitOperationAdmission.isClosed()) return;
   const cleanup = await cleanupStaleStudioNativeMediaDragDirectories({
     exportRoot: studioMediaExportTempRoot(),
   });
+  if (appQuitOperationAdmission.isClosed()) return;
   if (cleanup.failed > 0) {
     console.warn(`[native-media-drag] ${cleanup.failed} 个陈旧临时目录未能安全清理。`);
   }
@@ -361,52 +559,69 @@ let managedProjectOperationState: ManagedProjectOperationState = {
 const pendingRestoredProjects = new Map<string, PendingRestoredProject>();
 type CanonicalAssetIpcListInput = Pick<NonNullable<Parameters<typeof listCanonicalAssets>[1]>, "category" | "search" | "authority"> & { offset: number; limit: number };
 
+async function trackActiveMainMutation<T>(
+  action: string,
+  operation: () => Promise<T> | T,
+): Promise<T> {
+  return appQuitOperationAdmission.run(action, operation);
+}
+
 function installSourceRuntimeWriteGate(): void {
-  if (!sourceRuntimeBootIdentity) return;
   const originalHandle = ipcMain.handle.bind(ipcMain);
   ipcMain.handle = ((channel: string, listener: Parameters<typeof ipcMain.handle>[1]) => originalHandle(
     channel,
     async (...args: Parameters<typeof listener>) => {
       const effect = runtimeIpcEffect(channel);
       const mode = runtimeIpcGateMode(channel);
-      const startedAt = performance.now();
-      let gateDurationMs = 0;
-      let failed = false;
-      try {
-        if (mode !== "bypass") {
-          const gateStartedAt = performance.now();
-          try {
-            const boot = await sourceRuntimeBootIdentity;
-            if (mode === "cached-read") {
-              await sourceRuntimeGateController.assertReadCurrent(boot, channel);
-            } else {
-              await sourceRuntimeGateController.assertMutationCurrent(boot, channel);
+      const invoke = async () => {
+        const startedAt = performance.now();
+        let gateDurationMs = 0;
+        let failed = false;
+        try {
+          if (sourceRuntimeBootIdentity && mode !== "bypass") {
+            const gateStartedAt = performance.now();
+            try {
+              const boot = await sourceRuntimeBootIdentity;
+              if (mode === "cached-read") {
+                await sourceRuntimeGateController.assertReadCurrent(boot, channel);
+              } else {
+                await sourceRuntimeGateController.assertMutationCurrent(boot, channel);
+              }
+            } finally {
+              // 门禁拒绝路径同样要落真实 gate 耗时，与 MCP 侧包装器保持同一观测语义。
+              gateDurationMs = performance.now() - gateStartedAt;
             }
-          } finally {
-            // 门禁拒绝路径同样要落真实 gate 耗时，与 MCP 侧包装器保持同一观测语义。
-            gateDurationMs = performance.now() - gateStartedAt;
           }
+          if (effect === "mutation" || effect === "external-side-effect") {
+            appQuitOperationAdmission.assertOpen(`ipc:${channel}`);
+          }
+          return await listener(...args);
+        } catch (error) {
+          failed = true;
+          throw error;
+        } finally {
+          sourceRuntimeIpcPerformanceProbe.record({
+            channel,
+            effect,
+            durationMs: performance.now() - startedAt,
+            gateDurationMs,
+            failed,
+          });
         }
-        return await listener(...args);
-      } catch (error) {
-        failed = true;
-        throw error;
-      } finally {
-        sourceRuntimeIpcPerformanceProbe.record({
-          channel,
-          effect,
-          durationMs: performance.now() - startedAt,
-          gateDurationMs,
-          failed,
-        });
-      }
+      };
+      return effect === "mutation" || effect === "external-side-effect"
+        ? trackActiveMainMutation(`ipc:${channel}`, invoke)
+        : invoke();
     },
   )) as typeof ipcMain.handle;
 }
 
 async function startSourceRuntimeGateWatchers(): Promise<void> {
-  if (!sourceRuntimeBootIdentity || sourceRuntimeGateWatchers.length > 0) return;
+  if (appQuitOperationAdmission.isClosed()
+    || !sourceRuntimeBootIdentity
+    || sourceRuntimeGateWatchers.length > 0) return;
   const boot = await sourceRuntimeBootIdentity;
+  if (appQuitOperationAdmission.isClosed()) return;
   const watchPaths = sourceDigestWatchPaths(boot.workspace);
   const workspaceRoot = watchPaths[0];
   if (!workspaceRoot) throw new Error("运行时源码 watcher 缺少 workspace 根。");
@@ -420,7 +635,7 @@ async function startSourceRuntimeGateWatchers(): Promise<void> {
       resolve();
     };
     watcher.once("ready", settle);
-    watcher.once("error", (error) => {
+    watcher.on("error", (error) => {
       watcherFailed = true;
       sourceRuntimeGateController.setWatcherHealthy(false);
       console.warn("[runtime-gate] 源码 watcher 失效，已退化为每批完整核验：", error);
@@ -451,6 +666,10 @@ async function startSourceRuntimeGateWatchers(): Promise<void> {
   );
   sourceRuntimeGateWatchers = [shallowRootWatcher, recursiveSourceWatcher];
   await Promise.all(sourceRuntimeGateWatchers.map(observe));
+  if (appQuitOperationAdmission.isClosed()) {
+    await closeSourceRuntimeGateWatchers();
+    return;
+  }
   if (!watcherFailed) sourceRuntimeGateController.setWatcherHealthy(true);
 }
 
@@ -458,20 +677,30 @@ async function closeSourceRuntimeGateWatchers(): Promise<void> {
   const closing = sourceRuntimeGateWatchers;
   sourceRuntimeGateWatchers = [];
   sourceRuntimeGateController.setWatcherHealthy(false);
-  await Promise.all(closing.map((watcherHandle) => watcherHandle.close()));
+  const results = await Promise.allSettled(closing.map((watcherHandle) => watcherHandle.close()));
+  const rejected = results.filter((result): result is PromiseRejectedResult => result.status === "rejected");
+  if (rejected.length) {
+    throw new AggregateError(
+      rejected.map((result) => result.reason),
+      `运行时源码 watcher 关闭失败：${rejected.length}`,
+    );
+  }
 }
 
 async function runRuntimeGatedBackgroundWrite<T>(
   action: string,
   work: () => Promise<T>,
 ): Promise<T> {
-  if (sourceRuntimeBootIdentity) {
-    await sourceRuntimeGateController.assertMutationCurrent(
-      await sourceRuntimeBootIdentity,
-      `background:${action}`,
-    );
-  }
-  return work();
+  return trackActiveMainMutation(`background:${action}`, async () => {
+    if (sourceRuntimeBootIdentity) {
+      await sourceRuntimeGateController.assertMutationCurrent(
+        await sourceRuntimeBootIdentity,
+        `background:${action}`,
+      );
+    }
+    appQuitOperationAdmission.assertOpen(`background:${action}`);
+    return work();
+  });
 }
 
 function requireStudioCommandInput(input: unknown): StudioIdempotentCommandInput & { request: StudioPublicCommandRequest } {
@@ -585,9 +814,9 @@ function beginManagedProjectOperation(kind: ManagedProjectOperationKind, sourceR
       throw new Error(`已有${managedProjectOperationState.kind === "backup" ? "备份" : "恢复"}任务正在执行，请等待完成后重试。`);
     }
     publishManagedProjectOperation({ operationId: "", phase: "idle", busy: false, stage: "上一次任务已超时复位。", updatedAt: new Date().toISOString() });
-    for (const [root, pending] of pendingRestoredProjects) {
-      if (!pending.rendererValidated) pendingRestoredProjects.delete(root);
-    }
+    // renderer 可能在 shell 已验证后崩溃或中止切换；超时复位必须清理全部
+    // pending，而不能因 rendererValidated 残留把下一次恢复永久卡住。
+    for (const root of pendingRestoredProjects.keys()) pendingRestoredProjects.delete(root);
   }
   const operationId = `${kind}-${randomUUID()}`;
   publishManagedProjectOperation({
@@ -701,20 +930,25 @@ function broadcastStudioGenerationProgress(payload: { projectId: string; project
 
 let generationLedgerWatcherChain: Promise<void> = Promise.resolve();
 async function ensureStudioGenerationLedgerWatcher(projectRoot: string): Promise<void> {
+  if (appQuitOperationAdmission.isClosed()) throw new Error("应用正在退出，禁止新建生成账本 watcher。");
   // F-08b（main 审查）：check→close→create 串行化，防并发不同 root 调用产生孤儿 watcher。
-  const next = generationLedgerWatcherChain.then(() => ensureStudioGenerationLedgerWatcherExclusive(projectRoot));
+  const next = generationLedgerWatcherChain.then(() => {
+    if (appQuitOperationAdmission.isClosed()) throw new Error("应用正在退出，禁止新建生成账本 watcher。");
+    return ensureStudioGenerationLedgerWatcherExclusive(projectRoot);
+  });
   generationLedgerWatcherChain = next.catch(() => undefined);
   return next;
 }
 
 async function ensureStudioGenerationLedgerWatcherExclusive(projectRoot: string): Promise<void> {
+  if (appQuitOperationAdmission.isClosed()) throw new Error("应用正在退出，禁止新建生成账本 watcher。");
   const targetRoot = path.resolve(projectRoot);
   if (generationLedgerWatchedRoot === targetRoot && generationLedgerWatcher) return;
-  if (generationLedgerWatcher) {
-    await generationLedgerWatcher.close();
-    generationLedgerWatcher = null;
-  }
-  generationLedgerWatchedRoot = targetRoot;
+  const previous = generationLedgerWatcher;
+  generationLedgerWatcher = null;
+  generationLedgerWatchedRoot = null;
+  await previous?.close();
+  if (appQuitOperationAdmission.isClosed()) throw new Error("应用正在退出，禁止新建生成账本 watcher。");
   generationLedgerWatcher = createStudioGenerationLedgerWatcher({
     projectRoot: targetRoot,
     resolveProjectId: async () => (await getManagedProjectShell(targetRoot))?.project.id ?? null,
@@ -724,6 +958,52 @@ async function ensureStudioGenerationLedgerWatcherExclusive(projectRoot: string)
         if (!window.isDestroyed()) window.webContents.send("canvas:watch-error", message);
       }
     },
+  });
+  generationLedgerWatchedRoot = targetRoot;
+}
+
+async function closeStudioGenerationLedgerWatcher(): Promise<void> {
+  const next = generationLedgerWatcherChain.then(async () => {
+    const closing = generationLedgerWatcher;
+    generationLedgerWatcher = null;
+    generationLedgerWatchedRoot = null;
+    await closing?.close();
+  });
+  generationLedgerWatcherChain = next.catch(() => undefined);
+  return next;
+}
+
+if (runtimeStabilityProbeMode) {
+  (
+    globalThis as typeof globalThis & {
+      __AI_CANVAS_RUNTIME_STABILITY_SNAPSHOT__?: () => ReturnType<typeof createRuntimeStabilityProbeSnapshot>;
+    }
+  ).__AI_CANVAS_RUNTIME_STABILITY_SNAPSHOT__ = () => createRuntimeStabilityProbeSnapshot({
+    capturedAt: new Date().toISOString(),
+    processMetrics: app.getAppMetrics(),
+    ipc: sourceRuntimeIpcPerformanceProbe.snapshot(),
+    storage: getRuntimeStorageReadMetrics(),
+    watchers: {
+      sourceRuntimeGate: sourceRuntimeGateWatchers.length,
+      legacyActive: legacyWatcherOwner
+        ? Number(Boolean(legacyWatcherOwner.watcher)) + Number(Boolean(legacyWatcherOwner.semanticWatcher))
+        : 0,
+      legacyRetained: [...retainedLegacyWatcherOwners].reduce((count, owner) => (
+        count + Number(Boolean(owner.watcher)) + Number(Boolean(owner.semanticWatcher))
+      ), 0),
+      generationLedger: Number(Boolean(generationLedgerWatcher)),
+    },
+    tasks: {
+      activeOperations: appQuitOperationAdmission.snapshotTasks().length,
+      activeScans: activeScanPromises.size,
+      manualScans: manualScanControllers.size,
+      projectLists: activeProjectListControllers.size,
+      editorSessions: activeEditorSessions.size,
+      watcherDebounceTimers: Number(Boolean(watcherTimer)),
+      watcherScans: Number(Boolean(watcherScanController)),
+    },
+    nativeDrag: studioNativeMediaDragResources?.snapshot() ?? null,
+    windowCount: BrowserWindow.getAllWindows().length,
   });
 }
 
@@ -866,6 +1146,727 @@ function requireCanonicalProjectRoot(projectRoot: unknown): string {
   return path.normalize(projectRoot.trim());
 }
 
+export const NOVEL_DESKTOP_IPC_CHANNELS = [
+  "canvas:novel-get-workspace",
+  "canvas:novel-get-navigation",
+  "canvas:novel-list-chapters",
+  "canvas:novel-read-chapter",
+  "canvas:novel-search-chapters",
+  "canvas:novel-list-facts",
+  "canvas:novel-get-writing-dashboard",
+  "canvas:novel-review-state-candidate",
+  "canvas:novel-upsert-fact",
+  "canvas:novel-pick-source",
+  "canvas:novel-pick-destination",
+  "canvas:novel-preflight-source",
+  "canvas:novel-execute-command",
+] as const;
+
+export type NovelDesktopSourceSelection = NovelSourceSelectionTicket;
+export type NovelDesktopDestinationSelection = NovelDestinationSelectionTicket;
+
+type NovelCoreImportCommandRequest = Extract<
+  NovelCommandRequest,
+  { command: "novel_import_external_snapshot" }
+>;
+
+export type NovelDesktopImportCommandRequest = {
+  command: "novel_import_external_snapshot";
+  payload: Omit<NovelCoreImportCommandRequest["payload"], "projectsRoot">;
+};
+
+export type NovelDesktopCommandRequest =
+  | Exclude<NovelCommandRequest, { command: "novel_import_external_snapshot" }>
+  | NovelDesktopImportCommandRequest;
+
+export type NovelDesktopCommandInput = Omit<IdempotentCommandInput, "request"> & {
+  request: NovelDesktopCommandRequest;
+};
+
+export type NovelDesktopPreflightResult = Omit<NovelImportPreflight, "sourcePath" | "sourceRoot"> & {
+  sourceName: string;
+  authorization: NovelImportPreflightAuthorizationTicket | null;
+};
+
+export type NovelDesktopCommandResult = Omit<IdempotentCommandResult, "storageRoot" | "durableReconciliation">;
+
+// NOVEL_DESKTOP_IPC_CONTRACT_START
+const NOVEL_DESKTOP_REQUEST_ID_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9._:-]{7,159}$/u;
+const NOVEL_DESKTOP_IDEMPOTENCY_KEY_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9._:-]{7,199}$/u;
+const NOVEL_DESKTOP_UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
+const NOVEL_DESKTOP_SOURCE_SELECTION_ID_PATTERN = /^novel-source-selection-[A-Za-z0-9_-]{43}$/u;
+const NOVEL_DESKTOP_DESTINATION_SELECTION_ID_PATTERN = /^novel-destination-selection-[A-Za-z0-9_-]{43}$/u;
+const NOVEL_DESKTOP_STATE_CANDIDATE_ID_PATTERN = /^novel-state-candidate-[a-f0-9]{24}$/u;
+const NOVEL_DESKTOP_SHA256_PATTERN = /^[a-f0-9]{64}$/u;
+
+export type NovelDesktopOperationErrorCode =
+  | "NOVEL_SOURCE_PICK_FAILED"
+  | "NOVEL_DESTINATION_PICK_FAILED"
+  | "NOVEL_SOURCE_PREFLIGHT_FAILED"
+  | "NOVEL_IMPORT_COMMAND_FAILED";
+
+export type NovelDesktopPublicErrorCode = NovelDesktopOperationErrorCode
+  | "NOVEL_STORAGE_FULL"
+  | "NOVEL_PERMISSION_DENIED"
+  | "NOVEL_SOURCE_CHANGED"
+  | "NOVEL_DESTINATION_CHANGED"
+  | "NOVEL_RESOURCE_BUSY"
+  | "NOVEL_CLOSURE_DRIFT"
+  | "NOVEL_RECOVERY_REQUIRED"
+  | "NOVEL_VALIDATION_FAILED";
+
+const NOVEL_DESKTOP_PUBLIC_ERROR_MESSAGES: Readonly<Record<NovelDesktopPublicErrorCode, string>> = Object.freeze({
+  NOVEL_SOURCE_PICK_FAILED: "小说来源选择失败，请重新选择。",
+  NOVEL_DESTINATION_PICK_FAILED: "小说目标选择失败，请重新选择。",
+  NOVEL_SOURCE_PREFLIGHT_FAILED: "小说来源预检失败，请重新选择来源后再试。",
+  NOVEL_IMPORT_COMMAND_FAILED: "小说导入失败，请重新预检后再试。",
+  NOVEL_STORAGE_FULL: "存储空间不足，操作已失败关闭。请释放空间后重试。",
+  NOVEL_PERMISSION_DENIED: "没有访问所选位置的权限。请调整权限或重新选择位置。",
+  NOVEL_SOURCE_CHANGED: "小说来源在选择或预检后发生变化。请重新选择并预检。",
+  NOVEL_DESTINATION_CHANGED: "小说目标在选择或预检后发生变化。请重新选择并预检。",
+  NOVEL_RESOURCE_BUSY: "小说资源暂时被占用，本次没有重复执行。请稍后重试。",
+  NOVEL_CLOSURE_DRIFT: "小说数据闭包校验不一致，操作已停止。请先检查项目完整性。",
+  NOVEL_RECOVERY_REQUIRED: "小说操作结果尚未确认，禁止重复执行。请先执行恢复与对账。",
+  NOVEL_VALIDATION_FAILED: "小说请求未通过安全校验。请检查选择和参数后重试。",
+});
+
+function novelDesktopErrorChain(error: unknown): unknown[] {
+  const pending: unknown[] = [error];
+  const output: unknown[] = [];
+  const seen = new Set<object>();
+  while (pending.length && output.length < 12) {
+    const current = pending.shift();
+    output.push(current);
+    if (!current || typeof current !== "object" || seen.has(current)) continue;
+    seen.add(current);
+    const record = current as { cause?: unknown; errors?: unknown };
+    if (record.cause !== undefined) pending.push(record.cause);
+    if (Array.isArray(record.errors)) pending.push(...record.errors.slice(0, 8));
+  }
+  return output;
+}
+
+function novelDesktopInternalErrorMessage(value: unknown): string {
+  return value instanceof Error
+    ? value.message
+    : value && typeof value === "object" && typeof (value as { message?: unknown }).message === "string"
+      ? String((value as { message: string }).message)
+      : "";
+}
+
+/**
+ * 只把内部错误归入有限公开枚举；原 message/cause/stack 从不进入返回对象。
+ * errno/SQLite 结构字段优先，内部消息模式只用于 Core 的稳定中文失败类型。
+ */
+export function classifyNovelDesktopPublicError(
+  error: unknown,
+  fallbackCode: NovelDesktopOperationErrorCode,
+): NovelDesktopPublicErrorCode {
+  const chain = novelDesktopErrorChain(error);
+  const records = chain.filter((value): value is Record<string, unknown> => Boolean(value) && typeof value === "object");
+  const codes = records.map((value) => String(value.code ?? "").toUpperCase());
+  const errcodes = records.map((value) => Number(value.errcode ?? Number.NaN));
+  if (codes.includes("ENOSPC")) return "NOVEL_STORAGE_FULL";
+  if (codes.some((code) => code === "EACCES" || code === "EPERM")) return "NOVEL_PERMISSION_DENIED";
+  if (codes.some((code) => code === "SQLITE_BUSY" || code === "SQLITE_LOCKED")
+    || errcodes.some((value) => value === 5 || value === 6)
+    || records.some((value) => value.busyUncommitted === true)) return "NOVEL_RESOURCE_BUSY";
+  if (codes.some((code) => code === "NOVEL_DESTINATION_CHANGED" || code === "ESTALE")) {
+    return "NOVEL_DESTINATION_CHANGED";
+  }
+  if (codes.includes("ENOENT") && fallbackCode === "NOVEL_DESTINATION_PICK_FAILED") {
+    return "NOVEL_DESTINATION_CHANGED";
+  }
+  if (codes.includes("ENOENT") && fallbackCode !== "NOVEL_IMPORT_COMMAND_FAILED") return "NOVEL_SOURCE_CHANGED";
+
+  const messages = chain.map(novelDesktopInternalErrorMessage).filter(Boolean).join("\n");
+  if (/\b(?:ENOSPC|NO SPACE LEFT)\b|磁盘(?:已满|空间不足)|存储空间不足/iu.test(messages)) {
+    return "NOVEL_STORAGE_FULL";
+  }
+  if (/\b(?:EACCES|EPERM|PERMISSION DENIED|OPERATION NOT PERMITTED)\b|无权限|权限不足|没有.*权限/iu.test(messages)) {
+    return "NOVEL_PERMISSION_DENIED";
+  }
+  if (/\b(?:SQLITE_BUSY|SQLITE_LOCKED|RESOURCE_BUSY)\b|DATABASE IS LOCKED|数据库瞬时锁|资源.*占用/iu.test(messages)) {
+    return "NOVEL_RESOURCE_BUSY";
+  }
+  if (/RECOVERY[ _-]?REQUIRED|OUTCOME[ _-]?UNKNOWN|保持\s*unknown|结果(?:尚)?未确认|禁止自动重放|先.*对账|恢复与对账/iu.test(messages)) {
+    return "NOVEL_RECOVERY_REQUIRED";
+  }
+  if (/CLOSURE[ _-]?DRIFT|闭包|STATE CHAIN|RECEIPT|回执|FINGERPRINT.*(?:无效|不一致)|MANIFEST.*(?:DRIFT|不一致)/iu.test(messages)) {
+    return "NOVEL_CLOSURE_DRIFT";
+  }
+  if (/DESTINATION[ _-]?CHANGED|目标.*(?:变化|改变)|目标.*身份已变化/iu.test(messages)) {
+    return "NOVEL_DESTINATION_CHANGED";
+  }
+  if (/SOURCE[ _-]?CHANGED|TOCTOU|来源.*(?:变化|改变)|身份已变化|预检后已变化|SELECTIONID 已作废|NO SUCH FILE/iu.test(messages)) {
+    return "NOVEL_SOURCE_CHANGED";
+  }
+  if (/VALIDATION|INVALID|无效|不允许|必须|拒绝|UNSUPPORTED|格式|参数|SCHEMA|越根|符号链接|硬链接/iu.test(messages)) {
+    return "NOVEL_VALIDATION_FAILED";
+  }
+  return fallbackCode;
+}
+
+export function createNovelDesktopPublicError(
+  code: NovelDesktopPublicErrorCode,
+): Error & { code: NovelDesktopPublicErrorCode } {
+  const error = Object.assign(new Error(`[${code}] ${NOVEL_DESKTOP_PUBLIC_ERROR_MESSAGES[code]}`), {
+    name: "NovelDesktopPublicError",
+    code,
+  });
+  // Electron 只应得到固定 name/message/code；移除带 Main 本机文件位置的 stack。
+  error.stack = `${error.name}: ${error.message}`;
+  return error;
+}
+
+export async function withNovelDesktopPublicError<T>(
+  fallbackCode: NovelDesktopOperationErrorCode,
+  work: () => T | Promise<T>,
+): Promise<T> {
+  try {
+    return await work();
+  } catch (error) {
+    // 不传 cause，不拼接底层 message；fs、realpath、dialog 与 Core 异常都可能含绝对路径。
+    throw createNovelDesktopPublicError(classifyNovelDesktopPublicError(error, fallbackCode));
+  }
+}
+
+function requireNovelDesktopRecord(value: unknown, label: string): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(`${label}必须是对象。`);
+  }
+  return value as Record<string, unknown>;
+}
+
+function requireNovelDesktopExactKeys(
+  value: Record<string, unknown>,
+  keys: readonly string[],
+  label: string,
+): void {
+  const allowed = new Set(keys);
+  const extra = Object.keys(value).find((key) => !allowed.has(key));
+  if (extra) throw new Error(`${label}包含未支持参数：${extra}`);
+}
+
+export function requireNovelDesktopIpcArgs(
+  args: readonly unknown[],
+  expectedLength: number,
+  label: string,
+): readonly unknown[] {
+  if (args.length !== expectedLength) {
+    throw new Error(`${label}参数数量无效：期望 ${expectedLength}，实际 ${args.length}。`);
+  }
+  return args;
+}
+
+export function parseNovelDesktopProjectRoot(value: unknown): string {
+  if (typeof value !== "string" || !value || value.includes("\0") || !path.isAbsolute(value)) {
+    throw new Error("novel IPC 必须提供非空绝对 projectRoot。");
+  }
+  return path.normalize(value);
+}
+
+export function parseNovelDesktopNavigationPage(value: unknown): {
+  offset: number;
+  limit: number;
+  anchorVolumeId?: string;
+} {
+  const input = requireNovelDesktopRecord(value, "小说卷导航分页参数");
+  requireNovelDesktopExactKeys(input, ["offset", "limit", "anchorVolumeId"], "小说卷导航分页参数");
+  if (!Number.isSafeInteger(input.offset) || Number(input.offset) < 0) {
+    throw new Error("offset 必须是大于等于 0 的安全整数。");
+  }
+  if (!Number.isSafeInteger(input.limit) || Number(input.limit) < 1 || Number(input.limit) > 50) {
+    throw new Error("limit 必须是 1–50 的安全整数。");
+  }
+  if (input.anchorVolumeId !== undefined
+    && (typeof input.anchorVolumeId !== "string" || !NOVEL_DESKTOP_UUID_PATTERN.test(input.anchorVolumeId))) {
+    throw new Error("anchorVolumeId 必须是 UUID。");
+  }
+  return {
+    offset: Number(input.offset),
+    limit: Number(input.limit),
+    ...(input.anchorVolumeId === undefined ? {} : { anchorVolumeId: input.anchorVolumeId.toLowerCase() }),
+  };
+}
+
+export function parseNovelDesktopChapterPage(value: unknown): {
+  offset: number;
+  limit: number;
+  volumeId?: string;
+  anchorChapterId?: string;
+} {
+  const input = requireNovelDesktopRecord(value, "小说章节分页参数");
+  requireNovelDesktopExactKeys(input, ["offset", "limit", "volumeId", "anchorChapterId"], "小说章节分页参数");
+  if (!Number.isSafeInteger(input.offset) || Number(input.offset) < 0) {
+    throw new Error("offset 必须是大于等于 0 的安全整数。");
+  }
+  if (!Number.isSafeInteger(input.limit) || Number(input.limit) < 1 || Number(input.limit) > 100) {
+    throw new Error("limit 必须是 1–100 的安全整数。");
+  }
+  if (input.volumeId !== undefined
+    && (typeof input.volumeId !== "string" || !NOVEL_DESKTOP_UUID_PATTERN.test(input.volumeId))) {
+    throw new Error("volumeId 必须是 UUID。");
+  }
+  if (input.anchorChapterId !== undefined
+    && (typeof input.anchorChapterId !== "string" || !NOVEL_DESKTOP_UUID_PATTERN.test(input.anchorChapterId))) {
+    throw new Error("anchorChapterId 必须是 UUID。");
+  }
+  return {
+    offset: Number(input.offset),
+    limit: Number(input.limit),
+    ...(input.volumeId === undefined ? {} : { volumeId: input.volumeId.toLowerCase() }),
+    ...(input.anchorChapterId === undefined ? {} : { anchorChapterId: input.anchorChapterId.toLowerCase() }),
+  };
+}
+
+export function parseNovelDesktopChapterId(value: unknown): string {
+  if (typeof value !== "string" || !NOVEL_DESKTOP_UUID_PATTERN.test(value)) {
+    throw new Error("chapterId 必须是 UUID。");
+  }
+  return value.toLowerCase();
+}
+
+export function parseNovelDesktopSearchInput(value: unknown): SearchNovelChaptersInput {
+  const input = requireNovelDesktopRecord(value, "小说全文搜索参数");
+  requireNovelDesktopExactKeys(input, ["query", "limit", "maxHitsPerChapter"], "小说全文搜索参数");
+  if (typeof input.query !== "string" || input.query.trim().length < 2 || input.query.trim().length > 200) {
+    throw new Error("query 必须是 2–200 个字符的字符串。");
+  }
+  if (input.limit !== undefined
+    && (!Number.isSafeInteger(input.limit) || Number(input.limit) < 1 || Number(input.limit) > 200)) {
+    throw new Error("limit 必须是 1–200 的安全整数。");
+  }
+  if (input.maxHitsPerChapter !== undefined
+    && (!Number.isSafeInteger(input.maxHitsPerChapter)
+      || Number(input.maxHitsPerChapter) < 1
+      || Number(input.maxHitsPerChapter) > 20)) {
+    throw new Error("maxHitsPerChapter 必须是 1–20 的安全整数。");
+  }
+  return {
+    query: input.query.trim(),
+    ...(input.limit === undefined ? {} : { limit: Number(input.limit) }),
+    ...(input.maxHitsPerChapter === undefined ? {} : { maxHitsPerChapter: Number(input.maxHitsPerChapter) }),
+  };
+}
+
+export function parseNovelDesktopWritingDashboardInput(value: unknown): NovelDesktopWritingDashboardInput {
+  const input = requireNovelDesktopRecord(value, "Writing OS 仪表盘参数");
+  requireNovelDesktopExactKeys(input, ["selectedChapterId", "workflowMode"], "Writing OS 仪表盘参数");
+  if (input.selectedChapterId !== undefined
+    && (typeof input.selectedChapterId !== "string" || !NOVEL_DESKTOP_UUID_PATTERN.test(input.selectedChapterId))) {
+    throw new Error("selectedChapterId 必须是 UUID。");
+  }
+  if (input.workflowMode !== undefined && input.workflowMode !== "formal" && input.workflowMode !== "rehearsal") {
+    throw new Error("workflowMode 必须是 formal 或 rehearsal。");
+  }
+  return {
+    ...(input.selectedChapterId === undefined ? {} : { selectedChapterId: input.selectedChapterId.toLowerCase() }),
+    ...(input.workflowMode === undefined ? {} : { workflowMode: input.workflowMode }),
+  };
+}
+
+export function parseNovelDesktopStateCandidateReviewInput(value: unknown): NovelDesktopStateCandidateReviewInput {
+  const input = requireNovelDesktopRecord(value, "状态候选裁决参数");
+  requireNovelDesktopExactKeys(input, [
+    "candidateId",
+    "expectedCandidateFingerprint",
+    "expectedWritingStateRevision",
+    "expectedWritingStateFingerprint",
+    "decision",
+    "note",
+  ], "状态候选裁决参数");
+  if (typeof input.candidateId !== "string" || !NOVEL_DESKTOP_STATE_CANDIDATE_ID_PATTERN.test(input.candidateId)) {
+    throw new Error("candidateId 必须是受管状态候选 ID。");
+  }
+  if (typeof input.expectedCandidateFingerprint !== "string"
+    || !NOVEL_DESKTOP_SHA256_PATTERN.test(input.expectedCandidateFingerprint)) {
+    throw new Error("expectedCandidateFingerprint 必须是 SHA-256。");
+  }
+  if (!Number.isSafeInteger(input.expectedWritingStateRevision) || Number(input.expectedWritingStateRevision) < 1) {
+    throw new Error("expectedWritingStateRevision 必须是正安全整数。");
+  }
+  if (typeof input.expectedWritingStateFingerprint !== "string"
+    || !NOVEL_DESKTOP_SHA256_PATTERN.test(input.expectedWritingStateFingerprint)) {
+    throw new Error("expectedWritingStateFingerprint 必须是 SHA-256。");
+  }
+  if (input.decision !== "accepted" && input.decision !== "rejected") {
+    throw new Error("decision 必须是 accepted 或 rejected。");
+  }
+  if (input.note !== undefined
+    && (typeof input.note !== "string" || input.note.trim().length < 1 || input.note.trim().length > 2_000
+      || /\p{Cc}/u.test(input.note.trim()))) {
+    throw new Error("note 必须是 1–2000 字符且不含控制字符的文本。");
+  }
+  return {
+    candidateId: input.candidateId,
+    expectedCandidateFingerprint: input.expectedCandidateFingerprint,
+    expectedWritingStateRevision: Number(input.expectedWritingStateRevision),
+    expectedWritingStateFingerprint: input.expectedWritingStateFingerprint,
+    decision: input.decision,
+    ...(input.note === undefined ? {} : { note: input.note.trim() }),
+  };
+}
+
+export function parseNovelDesktopSourceSelectionKind(value: unknown): NovelSourceSelectionKind {
+  if (value !== "file" && value !== "directory") {
+    throw new Error("小说来源选择类型必须是 file 或 directory。");
+  }
+  return value;
+}
+
+export function parseNovelDesktopSelectionId(value: unknown): string {
+  if (typeof value !== "string" || !NOVEL_DESKTOP_SOURCE_SELECTION_ID_PATTERN.test(value)) {
+    throw new Error("小说来源预检必须提供原生选择器签发的 selectionId。");
+  }
+  return value;
+}
+
+export function parseNovelDesktopDestinationId(value: unknown): string {
+  if (typeof value !== "string" || !NOVEL_DESKTOP_DESTINATION_SELECTION_ID_PATTERN.test(value)) {
+    throw new Error("小说来源预检必须提供原生选择器签发的 destinationId。");
+  }
+  return value;
+}
+
+export function parseNovelDesktopCommandInput(
+  value: unknown,
+): NovelDesktopCommandInput {
+  const input = requireNovelDesktopRecord(value, "小说命令信封");
+  requireNovelDesktopExactKeys(input, ["requestId", "idempotencyKey", "request"], "小说命令信封");
+  if (typeof input.requestId !== "string" || !NOVEL_DESKTOP_REQUEST_ID_PATTERN.test(input.requestId)) {
+    throw new Error("requestId 必须是 8–160 位稳定标识。");
+  }
+  if (typeof input.idempotencyKey !== "string" || !NOVEL_DESKTOP_IDEMPOTENCY_KEY_PATTERN.test(input.idempotencyKey)) {
+    throw new Error("idempotencyKey 必须是 8–200 位稳定标识。");
+  }
+  const requestInput = requireNovelDesktopRecord(input.request, "小说命令请求");
+  let request: NovelDesktopCommandRequest | null;
+  if (requestInput.command === "novel_import_external_snapshot") {
+    requireNovelDesktopExactKeys(requestInput, ["command", "payload"], "小说导入请求");
+    const payloadInput = requireNovelDesktopRecord(requestInput.payload, "小说导入载荷");
+    requireNovelDesktopExactKeys(payloadInput, [
+      "projectName",
+      "preflightId",
+      "preflightFingerprint",
+      "sourceTreeAggregateSha256",
+      "duplicateResolution",
+      "convertToManagedMarkdown",
+      "preflightAuthorization",
+    ], "小说导入载荷");
+    // 复用 Core 严格 schema 校验其余字段，但 projectsRoot 只由 Main 于执行前注入。
+    const parsed = parseNovelCommandRequestForCore({
+      command: requestInput.command,
+      payload: {
+        ...payloadInput,
+        projectsRoot: path.resolve(path.sep, ".novel-desktop-authorized-destination"),
+      },
+    });
+    if (!parsed || parsed.command !== "novel_import_external_snapshot") {
+      throw new Error("桌面 novel IPC 只允许受支持的 novel 命令。");
+    }
+    const { projectsRoot: _projectsRoot, ...payload } = parsed.payload;
+    request = { command: parsed.command, payload };
+  } else {
+    request = parseNovelCommandRequestForCore(requestInput);
+  }
+  if (!request) throw new Error("桌面 novel IPC 只允许受支持的 novel 命令。");
+  return {
+    requestId: input.requestId,
+    idempotencyKey: input.idempotencyKey,
+    request,
+  };
+}
+
+function assertNovelDesktopSafeResult(value: unknown, seen = new Set<object>()): void {
+  if (typeof value === "string") {
+    if (path.isAbsolute(value) || path.win32.isAbsolute(value)) {
+      throw new Error("novel IPC 返回值不得包含绝对路径字符串。");
+    }
+    return;
+  }
+  if (!value || typeof value !== "object") return;
+  if (seen.has(value)) throw new Error("novel IPC 返回值不得包含循环引用。");
+  seen.add(value);
+  if (Array.isArray(value)) {
+    value.forEach((entry) => assertNovelDesktopSafeResult(entry, seen));
+    seen.delete(value);
+    return;
+  }
+  for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+    if (["absolutePath", "projectRoot", "storageRoot", "sourcePath", "sourceRoot"].includes(key) && entry !== undefined) {
+      throw new Error(`novel IPC 返回值包含内部绝对 locator：${key}`);
+    }
+    if ((key === "relativePath" || key.endsWith("RelativePath") || key.endsWith("Locator"))
+      && typeof entry === "string"
+      && (path.isAbsolute(entry) || path.win32.isAbsolute(entry))) {
+      throw new Error(`novel IPC 相对 locator 不能是绝对路径：${key}`);
+    }
+    assertNovelDesktopSafeResult(entry, seen);
+  }
+  seen.delete(value);
+}
+
+export function sanitizeNovelDesktopPreflight(
+  authorized: AuthorizedNovelImportPreflight,
+): NovelDesktopPreflightResult {
+  const { preflight, authorization } = authorized;
+  const { sourcePath, sourceRoot: _sourceRoot, ...safe } = preflight;
+  const result = {
+    ...safe,
+    sourceName: path.basename(sourcePath) || path.parse(sourcePath).root,
+    authorization,
+  };
+  assertNovelDesktopSafeResult(result);
+  return result;
+}
+
+export function sanitizeNovelDesktopSourceSelection(
+  ticket: NovelSourceSelectionTicket,
+): NovelDesktopSourceSelection {
+  const result = {
+    selectionId: parseNovelDesktopSelectionId(ticket.selectionId),
+    sourceName: ticket.sourceName,
+    kind: parseNovelDesktopSourceSelectionKind(ticket.kind),
+  };
+  if (typeof result.sourceName !== "string" || !result.sourceName || result.sourceName.includes("\0")
+    || result.sourceName.includes("/") || result.sourceName.includes("\\")
+    || result.sourceName === "." || result.sourceName === "..") {
+    throw new Error("小说来源选择票据缺少安全显示名称。");
+  }
+  assertNovelDesktopSafeResult(result);
+  return result;
+}
+
+export function sanitizeNovelDesktopDestinationSelection(
+  ticket: NovelDestinationSelectionTicket,
+): NovelDesktopDestinationSelection {
+  const result = {
+    destinationId: parseNovelDesktopDestinationId(ticket.destinationId),
+    destinationName: ticket.destinationName,
+  };
+  if (typeof result.destinationName !== "string" || !result.destinationName
+    || result.destinationName.includes("\0") || result.destinationName.includes("/")
+    || result.destinationName.includes("\\") || result.destinationName === "."
+    || result.destinationName === "..") {
+    throw new Error("小说目标选择票据缺少安全显示名称。");
+  }
+  assertNovelDesktopSafeResult(result);
+  return result;
+}
+
+export function sanitizeNovelDesktopCommandResult(
+  record: IdempotentCommandResult,
+): NovelDesktopCommandResult {
+  const {
+    storageRoot: _storageRoot,
+    durableReconciliation: _durableReconciliation,
+    ...safe
+  } = record;
+  assertNovelDesktopSafeResult(safe);
+  return safe;
+}
+
+export async function requireNovelDesktopProjectsRoot(projectRootValue: unknown): Promise<string> {
+  const projectsRoot = parseNovelDesktopProjectRoot(projectRootValue);
+  try {
+    return await resolveNovelImportProjectsRoot(projectsRoot);
+  } catch (error) {
+    throw new Error("小说导入 IPC 只接受已存在、无符号链接的规范 projectsRoot。", { cause: error });
+  }
+}
+
+export function assertNovelDesktopDestinationOwnerDisjoint(
+  projectsRootValue: string,
+  ownerRootValue: string,
+): void {
+  const projectsRoot = parseNovelDesktopProjectRoot(projectsRootValue);
+  const ownerRoot = parseNovelDesktopProjectRoot(ownerRootValue);
+  const isWithinOrEqual = (candidate: string, ancestor: string): boolean => {
+    const relative = path.relative(ancestor, candidate);
+    return relative === ""
+      || (relative !== ".." && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative));
+  };
+  if (isWithinOrEqual(projectsRoot, ownerRoot) || isWithinOrEqual(ownerRoot, projectsRoot)) {
+    throw new Error("小说导入目标与应用 command owner 必须完全分离。");
+  }
+}
+
+export async function requireManagedNovelDesktopProjectRoot(projectRootValue: unknown): Promise<string> {
+  const projectRoot = parseNovelDesktopProjectRoot(projectRootValue);
+  let shell: Awaited<ReturnType<typeof inspectManagedProjectReadOnly>>;
+  try {
+    shell = await inspectManagedProjectReadOnly(projectRoot);
+  } catch (error) {
+    throw new Error("novel IPC 只允许读取受管工程。", { cause: error });
+  }
+  if (shell.manifest.schemaVersion !== 2
+    || (shell.workspaceMode !== "novel" && shell.workspaceMode !== "hybrid")) {
+    throw new Error("novel IPC 只允许 schema v2 novel/hybrid 受管工程。");
+  }
+  return shell.paths.root;
+}
+// NOVEL_DESKTOP_IPC_CONTRACT_END
+
+function sameNovelDesktopImportStablePayload(
+  desktop: NovelDesktopImportCommandRequest["payload"],
+  durable: NovelCoreImportCommandRequest["payload"],
+): boolean {
+  return desktop.projectName === durable.projectName
+    && desktop.preflightId === durable.preflightId
+    && desktop.preflightFingerprint === durable.preflightFingerprint
+    && desktop.sourceTreeAggregateSha256 === durable.sourceTreeAggregateSha256
+    && desktop.duplicateResolution === durable.duplicateResolution
+    && desktop.convertToManagedMarkdown === durable.convertToManagedMarkdown;
+}
+
+function createNovelDesktopImportCoreInput(
+  input: NovelDesktopCommandInput & { request: NovelDesktopImportCommandRequest },
+  projectsRoot: string,
+  preflightAuthorization?: string,
+): IdempotentCommandInput & { request: NovelCoreImportCommandRequest } {
+  const parsed = parseNovelCommandRequestForCore({
+    command: input.request.command,
+    payload: {
+      ...input.request.payload,
+      projectsRoot,
+      ...(preflightAuthorization ? { preflightAuthorization } : {}),
+    },
+  });
+  if (!parsed || parsed.command !== "novel_import_external_snapshot") {
+    throw new Error("小说导入命令服务端绑定失败。");
+  }
+  return { requestId: input.requestId, idempotencyKey: input.idempotencyKey, request: parsed };
+}
+
+async function consumeNovelDesktopBoundDestination(
+  authorizationId: string,
+): Promise<{ projectsRoot: string; destinationIdentity: NovelImportDestinationExecutionIdentity }> {
+  let consumedBinding = false;
+  try {
+    const destination = await consumeNovelDestinationForPreflightAuthorization(authorizationId);
+    consumedBinding = true;
+    const projectsRoot = await resolveNovelImportProjectsRoot(destination.projectsRoot);
+    if (projectsRoot !== destination.projectsRoot) {
+      throw new Error("小说导入目标在授权后不再是规范路径。");
+    }
+    return {
+      projectsRoot,
+      destinationIdentity: {
+        projectsRoot,
+        canonicalRoot: projectsRoot,
+        dev: destination.identity.dev,
+        ino: destination.identity.ino,
+      },
+    };
+  } catch (error) {
+    // 并发输家未消费 binding，不得撤销赢家正要使用的 Core auth。
+    if (consumedBinding) revokeNovelImportPreflightAuthorization(authorizationId);
+    throw error;
+  }
+}
+
+/**
+ * 首次执行只消费与预检 authorization 绑定的 Main 内部目标。同一
+ * idempotencyKey 的重试/崩溃恢复则仅从 app-owner durable snapshot 恢复服务端根，
+ * renderer 在两条路径上都无法提供或替换 projectsRoot。
+ */
+async function resolveNovelDesktopImportCoreInput(
+  input: NovelDesktopCommandInput & { request: NovelDesktopImportCommandRequest },
+): Promise<{
+  coreInput: IdempotentCommandInput & { request: NovelCoreImportCommandRequest };
+  destinationIdentity?: NovelImportDestinationExecutionIdentity;
+}> {
+  const ownerRoot = path.resolve(getNovelImportCommandOwnerRoot());
+  const existing = await getCommandLedgerEntryByIdempotencyKey(ownerRoot, input.idempotencyKey);
+  if (existing) {
+    const durableValue = (existing.durableReconciliation as { request?: unknown } | undefined)?.request;
+    const durableRequest = parseNovelCommandRequestForCore(durableValue);
+    if (!durableRequest || durableRequest.command !== "novel_import_external_snapshot") {
+      throw new Error("同一幂等键缺少可对账的小说导入 durable snapshot，需要恢复与对账。");
+    }
+    if (!sameNovelDesktopImportStablePayload(input.request.payload, durableRequest.payload)) {
+      throw new Error("同一幂等键不允许替换小说导入请求。");
+    }
+    const retryableBusy = existing.status === "failed"
+      && Boolean(existing.error && typeof existing.error === "object"
+        && (existing.error as { busyUncommitted?: unknown }).busyUncommitted === true);
+    if (retryableBusy) {
+      const authorizationId = input.request.payload.preflightAuthorization;
+      if (!authorizationId) {
+        throw new Error("小说导入 busyUncommitted 同键重试必须重新选择来源与目标并预检。");
+      }
+      const rebound = await consumeNovelDesktopBoundDestination(authorizationId);
+      if (rebound.projectsRoot !== durableRequest.payload.projectsRoot) {
+        revokeNovelImportPreflightAuthorization(authorizationId);
+        throw new Error("小说导入同键重试不允许替换 durable 目标根。");
+      }
+      return {
+        coreInput: createNovelDesktopImportCoreInput(input, rebound.projectsRoot, authorizationId),
+        destinationIdentity: rebound.destinationIdentity,
+      };
+    }
+    const projectsRoot = await resolveNovelImportProjectsRoot(durableRequest.payload.projectsRoot);
+    if (projectsRoot !== durableRequest.payload.projectsRoot) {
+      throw new Error("小说导入 durable snapshot 中的目标根不再是规范路径。");
+    }
+    // capability 不持久化；重试由 command bus 的 durable proof 对账，不重放授权。
+    return { coreInput: createNovelDesktopImportCoreInput(input, projectsRoot) };
+  }
+
+  const authorizationId = input.request.payload.preflightAuthorization;
+  if (!authorizationId) {
+    throw new Error("首次小说导入必须提供已绑定目标的预检授权。");
+  }
+  const bound = await consumeNovelDesktopBoundDestination(authorizationId);
+  return {
+    coreInput: createNovelDesktopImportCoreInput(input, bound.projectsRoot, authorizationId),
+    destinationIdentity: bound.destinationIdentity,
+  };
+}
+
+export const LEGACY_STORY_MUTATION_IPC_CHANNELS = [
+  "canvas:import-story-file",
+  "canvas:import-story-text",
+  "canvas:upsert-story-event",
+  "canvas:connect-story-events",
+  "canvas:analyze-novel-chapters",
+  "canvas:generate-adaptation-plans",
+  "canvas:select-adaptation-plan",
+  "canvas:materialize-adaptation-plan",
+  "canvas:regenerate-adaptation-scope",
+  "canvas:upsert-novel-fact",
+  "canvas:upsert-narrative-beat",
+  "canvas:export-adaptation",
+] as const;
+
+// LEGACY_STORY_MUTATION_WORKSPACE_GATE_START
+export function assertLegacyStoryMutationWorkspaceAllowed(
+  projectRoot: string,
+  identity: { managed: boolean; schemaVersion?: number; workspaceMode?: string },
+): string {
+  if (!path.isAbsolute(projectRoot)) throw new Error("legacy Story 写入口必须提供绝对工程根。");
+  if (identity.managed && identity.schemaVersion !== 1) {
+    throw new Error("schema v2 novel/hybrid 工作区禁止桌面 legacy Story/Adaptation 写入；请使用 NovelRepository 正式命令。");
+  }
+  return projectRoot;
+}
+// LEGACY_STORY_MUTATION_WORKSPACE_GATE_END
+
+// LEGACY_STORY_READ_ROOT_GATE_START
+export function assertLegacyStoryRootRegistered(
+  projectRoot: string,
+  registeredRoots: readonly string[],
+): string {
+  if (!path.isAbsolute(projectRoot)) throw new Error("legacy Story 入口必须提供绝对工程根。");
+  const root = path.resolve(projectRoot);
+  if (!registeredRoots.some((registeredRoot) => path.resolve(registeredRoot) === root)) {
+    throw new Error("legacy Story 入口只允许精确匹配当前已登记工程根。");
+  }
+  return root;
+}
+// LEGACY_STORY_READ_ROOT_GATE_END
+
 function requireCanonicalAssetId(assetId: unknown): string {
   if (typeof assetId !== "string" || !assetId.trim() || assetId.trim().length > 200) {
     throw new Error("规范资产请求必须提供 1–200 字符的 assetId。");
@@ -896,15 +1897,17 @@ function requireCanonicalAssetListInput(input: unknown): CanonicalAssetIpcListIn
 async function cleanupActiveEditorSessions(): Promise<void> {
   const entries = [...activeEditorSessions.entries()];
   activeEditorSessions.clear();
-  await Promise.all(entries.map(([projectRoot, sessionId]) => closeEditorSession(projectRoot, sessionId).catch(() => undefined)));
+  await Promise.all(entries.map(([projectRoot, sessionId]) => closeEditorSession(projectRoot, sessionId)));
 }
 
-async function trackActiveScan<T>(operation: Promise<T>): Promise<T> {
-  activeScanPromises.add(operation);
+async function trackActiveScan<T>(operation: () => Promise<T>): Promise<T> {
+  if (appQuitOperationAdmission.isClosed()) throw new Error("应用正在退出，禁止开始新的扫描。");
+  const activeOperation = operation();
+  activeScanPromises.add(activeOperation);
   try {
-    return await operation;
+    return await activeOperation;
   } finally {
-    activeScanPromises.delete(operation);
+    activeScanPromises.delete(activeOperation);
   }
 }
 
@@ -920,6 +1923,7 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 async function createWindow(): Promise<void> {
+  appQuitOperationAdmission.assertOpen("create-window");
   const packagedRendererEntry = path.join(currentDir, "../renderer/index.html");
   // 安装态忽略外部注入的 ELECTRON_RENDERER_URL；只有真实开发进程可以启用 dev origin。
   const devRendererUrl = !app.isPackaged ? process.env.ELECTRON_RENDERER_URL : undefined;
@@ -935,15 +1939,32 @@ async function createWindow(): Promise<void> {
     titleBarStyle: "hiddenInset",
     trafficLightPosition: { x: 18, y: 18 },
     show: false,
+    ...(backgroundSmokeMode ? { paintWhenInitiallyHidden: true } : {}),
     webPreferences: {
       preload: path.join(currentDir, "../preload/index.mjs"),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
+      ...(backgroundSmokeMode ? { backgroundThrottling: false } : {}),
     },
   });
+  rendererWindowCloseApproved = false;
+  quitSessionCleanupStarted = false;
+  closeAfterRendererApproval = false;
+  appCloseTracker.reset("window-created");
 
-  mainWindow.on("ready-to-show", () => mainWindow?.show());
+  const backgroundMetrics: BackgroundSmokeWindowMetrics = {
+    showEvents: 0,
+    focusEvents: 0,
+    readyToShowEvents: 0,
+  };
+  backgroundSmokeWindowMetrics.set(mainWindow.id, backgroundMetrics);
+  mainWindow.on("show", () => { backgroundMetrics.showEvents += 1; });
+  mainWindow.on("focus", () => { backgroundMetrics.focusEvents += 1; });
+  mainWindow.on("ready-to-show", () => {
+    backgroundMetrics.readyToShowEvents += 1;
+    if (!backgroundSmokeMode) mainWindow?.show();
+  });
   // P27（main 审查 F-05）：新窗口与导航纵深防御——外链仅 https 经系统浏览器打开，主 frame 只允许本地文件与本地开发服务器。
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith("https://")) void shell.openExternal(url);
@@ -956,16 +1977,66 @@ async function createWindow(): Promise<void> {
     })) event.preventDefault();
   });
   const currentWindow = mainWindow;
-  let closeAfterSessionCleanup = false;
+  // BrowserWindow 的 `closed` 事件触发时再读取 `.webContents` 会抛出
+  // "Object has been destroyed"；在窗口仍存活时冻结句柄与身份。
+  const currentWebContents = currentWindow.webContents;
+  const currentWebContentsId = currentWebContents.id;
+  currentWebContents.on("did-start-navigation", (_event, _url, _isInPlace, isMainFrame) => {
+    if (isMainFrame) rendererCloseBridgeReadyWebContentsIds.delete(currentWebContentsId);
+  });
   mainWindow.on("close", (event) => {
-    if (closeAfterSessionCleanup || activeEditorSessions.size === 0) return;
+    if (closeAfterRendererApproval) return;
     event.preventDefault();
-    void cleanupActiveEditorSessions().finally(() => {
-      closeAfterSessionCleanup = true;
-      currentWindow.close();
+    if (pendingRendererCloseRequest?.webContentsId === currentWebContentsId) return;
+    const requestId = `window-close-${randomUUID()}`;
+    const closeIntent = quitAfterRendererApproval ? "app_quit" : "window_close";
+    const closeSnapshot = appCloseTracker.start(closeIntent, requestId);
+    console.info(`[app-close] ${JSON.stringify(closeSnapshot)}`);
+    pendingRendererCloseRequest = {
+      requestId,
+      webContentsId: currentWebContentsId,
+      timer: armRendererCloseRequestTimeout(requestId, "renderer-bridge-ready-timeout"),
+      delivered: false,
+      approve: () => {
+        rendererWindowCloseApproved = true;
+        closeAfterRendererApproval = true;
+        recordAppClosePhase("renderer_approved", { rendererApproved: true });
+        if (quitAfterRendererApproval) {
+          app.quit();
+          return;
+        }
+        recordAppClosePhase("recoverable_cleanup");
+        void settleLabeledCloseTasks([
+          { label: "editor-sessions", task: cleanupActiveEditorSessions() },
+        ], APP_CLOSE_RECOVERABLE_CLEANUP_TIMEOUT_MS).then((result) => {
+          if (result.timedOut || result.rejected.length) {
+            console.error(`[app-close] window cleanup incomplete ${JSON.stringify(result)}`);
+          }
+          recordAppClosePhase("exiting", {
+            recoverableCleanupComplete: !result.timedOut && result.rejected.length === 0,
+          });
+        }).finally(() => currentWindow.close());
+      },
+      cancel: () => {
+        quitAfterRendererApproval = false;
+        rendererWindowCloseApproved = false;
+        recordAppClosePhase("cancelled", { detail: "renderer-denied" });
+      },
+    };
+    schedulePendingRendererCloseRequestDelivery({
+      webContentsId: currentWebContentsId,
+      isDestroyed: () => currentWindow.isDestroyed() || currentWebContents.isDestroyed(),
+      send: (request) => {
+        currentWebContents.send("canvas:window-close-requested", request);
+      },
     });
   });
   mainWindow.on("closed", () => {
+    rendererCloseBridgeReadyWebContentsIds.delete(currentWebContentsId);
+    if (pendingRendererCloseRequest?.webContentsId === currentWebContentsId) {
+      if (pendingRendererCloseRequest.timer) clearTimeout(pendingRendererCloseRequest.timer);
+      pendingRendererCloseRequest = null;
+    }
     mainWindow = null;
   });
 
@@ -1516,6 +2587,27 @@ async function createWindow(): Promise<void> {
 
 function registerIpc(): void {
   installSourceRuntimeWriteGate();
+  ipcMain.on("canvas:window-close-bridge-ready", (event) => {
+    const sender = event.sender;
+    rendererCloseBridgeReadyWebContentsIds.add(sender.id);
+    schedulePendingRendererCloseRequestDelivery({
+      webContentsId: sender.id,
+      isDestroyed: () => sender.isDestroyed(),
+      send: (request) => sender.send("canvas:window-close-requested", request),
+    });
+  });
+  ipcMain.on("canvas:window-close-response", (event, requestId: unknown, allow: unknown) => {
+    const pending = pendingRendererCloseRequest;
+    if (!pending
+      || event.sender.id !== pending.webContentsId
+      || typeof requestId !== "string"
+      || requestId !== pending.requestId
+      || typeof allow !== "boolean") return;
+    if (pending.timer) clearTimeout(pending.timer);
+    pendingRendererCloseRequest = null;
+    if (allow) pending.approve();
+    else pending.cancel();
+  });
   ipcMain.handle("canvas:get-runtime-write-gate", async () => {
     if (sourceRuntimeBootIdentity) {
       const status = await sourceRuntimeGateController.checkDiagnostic(
@@ -1570,6 +2662,10 @@ function registerIpc(): void {
     return true;
   });
   ipcMain.handle("canvas:get-active-project", () => getActiveProjectReadOnly());
+  ipcMain.handle("canvas:reconcile-active-managed-project-startup", async (_event, input: {
+    projectRoot: string;
+    activationId: string;
+  }) => reconcileActiveManagedProjectStartup(input));
   ipcMain.handle("canvas:activate-project", async (_event, projectRoot: string) => {
     const absoluteRoot = path.resolve(projectRoot);
     const pending = pendingRestoredProjects.get(absoluteRoot);
@@ -1603,10 +2699,21 @@ function registerIpc(): void {
   });
   ipcMain.handle("canvas:get-managed-project-shell", async (_event, projectRoot: string) => {
     const absoluteRoot = path.resolve(projectRoot);
-    const shell = await getManagedProjectShell(absoluteRoot);
+    // 桌面路由只需要身份投影，不能因为打开/刷新 novel shell 而补 generation
+    // ledger、目录或 marker；真正进入写工作台时由对应 owner 自行初始化。
+    return getManagedProjectShell(absoluteRoot);
+  });
+  ipcMain.handle("canvas:validate-restored-managed-project-shell", async (_event, projectRoot: string) => {
+    const absoluteRoot = path.resolve(projectRoot);
     const pending = pendingRestoredProjects.get(absoluteRoot);
-    if (!pending) return shell;
-    if (!shell) {
+    if (!pending || pending.projectRoot !== absoluteRoot) {
+      throw new Error("恢复副本不在待验证集合中，拒绝激活。 ");
+    }
+    try {
+      const shell = await requireManagedStudioProject(absoluteRoot);
+      pending.rendererValidated = true;
+      return shell;
+    } catch (reason) {
       pendingRestoredProjects.delete(absoluteRoot);
       updateManagedProjectOperation(pending.operationId, {
         phase: "failed",
@@ -1614,12 +2721,25 @@ function registerIpc(): void {
         stage: "恢复副本无法作为受管工程打开，活动工程保持不变",
         targetPath: absoluteRoot,
       });
-      throw new Error("恢复副本无法作为受管工程打开；原活动工程保持不变。");
+      throw new Error(`恢复副本无法作为受管工程打开；原活动工程保持不变：${reason instanceof Error ? reason.message : String(reason)}`);
     }
-    pending.rendererValidated = true;
-    return shell;
   });
-  ipcMain.handle("canvas:create-managed-studio-project", (_event, input: { parentRoot: string; name: string; slug?: string }) =>
+  ipcMain.handle("canvas:release-restored-managed-project-shell-validation", (_event, projectRoot: string) => {
+    const absoluteRoot = path.resolve(projectRoot);
+    const pending = pendingRestoredProjects.get(absoluteRoot);
+    if (!pending || pending.projectRoot !== absoluteRoot) return false;
+    pending.rendererValidated = false;
+    if (managedProjectOperationState.operationId === pending.operationId) {
+      updateManagedProjectOperation(pending.operationId, {
+        phase: "running",
+        busy: true,
+        stage: "恢复副本等待再次由桌面打开并校验",
+        targetPath: absoluteRoot,
+      });
+    }
+    return true;
+  });
+  ipcMain.handle("canvas:create-managed-studio-project", (_event, input: CreateManagedProjectOptions) =>
     createManagedStudioProject(input));
   ipcMain.handle("canvas:get-default-managed-projects-root", () => defaultManagedProjectsRoot());
   ipcMain.handle("canvas:pick-managed-projects-parent", async (_event, defaultPath?: string) => {
@@ -1638,6 +2758,13 @@ function registerIpc(): void {
     await requireManagedStudioProject(projectRoot);
     return setActiveStudioContext(projectRoot, context);
   });
+  ipcMain.handle("canvas:get-active-hybrid-workspace-preference", (_event, projectId: string) =>
+    getActiveHybridWorkspacePreference(projectId));
+  ipcMain.handle("canvas:set-active-hybrid-workspace-preference", (
+    _event,
+    projectId: string,
+    mode: Parameters<typeof setActiveHybridWorkspacePreference>[1],
+  ) => setActiveHybridWorkspacePreference(projectId, mode));
   ipcMain.handle("canvas:upgrade-managed-studio-project", async (_event, projectRoot: string) => {
     await requireManagedStudioProject(projectRoot);
     return upgradeManagedStudioProject(projectRoot);
@@ -1755,32 +2882,7 @@ function registerIpc(): void {
     await requireManagedStudioProject(projectRoot);
     return listStudioCanonicalAssets(projectRoot, query);
   });
-  ipcMain.handle("canvas:list-global-studio-assets", async (_event, query: GlobalStudioAssetCatalogQuery) => (
-    listGlobalStudioAssetCatalog(query)
-  ));
-  ipcMain.handle("canvas:list-global-studio-asset-images", async (_event, query: GlobalStudioAssetResourceImageQuery) => (
-    listGlobalStudioAssetResourceImages(query)
-  ));
-  ipcMain.handle("canvas:get-global-studio-asset-image", async (_event, projectRoot: string, mediaSha256: string) => (
-    getGlobalStudioAssetResourceImage(projectRoot, mediaSha256)
-  ));
-  ipcMain.handle("canvas:list-global-studio-image-resources", async (
-    _event,
-    query: GlobalStudioImageResourceQuery,
-  ) => listGlobalStudioImageResources(query));
-  ipcMain.handle("canvas:get-global-studio-image-resource", async (
-    _event,
-    projectRoot: string,
-    mediaSha256: string,
-  ) => getGlobalStudioImageResource(projectRoot, mediaSha256));
-  ipcMain.handle("canvas:list-global-studio-media-resources", async (_event, query: GlobalStudioMediaResourceQuery) => (
-    listGlobalStudioMediaResources(query)
-  ));
-  ipcMain.handle("canvas:get-global-studio-media-resource", async (
-    _event,
-    projectRoot: string,
-    mediaSha256: string,
-  ) => getGlobalStudioMediaResource(projectRoot, mediaSha256));
+  registerStudioGlobalResourceReadIpc(ipcMain.handle.bind(ipcMain));
   ipcMain.handle("canvas:get-studio-asset", async (_event, projectRoot: string, assetId: string) => {
     await requireManagedStudioProject(projectRoot);
     return getStudioCanonicalAsset(projectRoot, assetId);
@@ -1810,6 +2912,9 @@ function registerIpc(): void {
     projectRoot: string,
     query: StudioVideoPackageControlQuery,
   ) => toStudioVideoPackagePublicControlLookup(await getStudioVideoPackageControl(projectRoot, query)));
+  ipcMain.handle("canvas:get-studio-higgsfield-video-generation-control", async (_event, projectRoot: string, intentId: string) => (
+    getStudioHiggsfieldVideoGenerationControl(projectRoot, intentId)
+  ));
   ipcMain.handle("canvas:get-studio-generation-control", async (
     _event,
     projectRoot: string,
@@ -2038,16 +3143,56 @@ function registerIpc(): void {
     projectRoot: string,
     query: StudioProductionDashboardQuery,
   ) => {
-    await requireManagedStudioProject(projectRoot);
-    return getStudioProductionDashboard(projectRoot, query);
+    if (process.env.AI_CANVAS_T23_PERF_PROBE !== "1"
+      || !query
+      || typeof query !== "object"
+      || query.operation !== "units") {
+      await requireManagedStudioProject(projectRoot);
+      return getStudioProductionDashboard(projectRoot, query);
+    }
+    const probed = await withStudioUnitsReadProbe(true, () => measureStudioUnitsReadPhase(
+      "request-total",
+      async () => {
+        await measureStudioUnitsReadPhase(
+          "main-managed-project-preflight",
+          () => requireManagedStudioProject(projectRoot),
+        );
+        return getStudioProductionDashboard(projectRoot, query);
+      },
+    ));
+    if (!probed.snapshot) throw new Error("T23 units read probe 未产生请求级快照。 ");
+    return {
+      ...probed.value,
+      __t23UnitsReadTimeline: probed.snapshot,
+    };
   });
   ipcMain.handle("canvas:get-studio-production-projection-bundle", async (
     _event,
     projectRoot: string,
     query: StudioProductionProjectionBundleQuery,
   ) => {
-    await requireManagedStudioProject(projectRoot);
-    return buildStudioProductionProjectionBundle(projectRoot, query);
+    if (process.env.AI_CANVAS_T23_PERF_PROBE !== "1") {
+      await requireManagedStudioProject(projectRoot);
+      return buildStudioProductionProjectionBundle(projectRoot, query);
+    }
+    const phases: StudioProjectionPhaseTiming[] = [];
+    const instrumentation: StudioProjectionPhaseInstrumentation = {
+      onPhase: (timing) => phases.push(timing),
+    };
+    const preflightStartedAt = beginStudioProjectionPhase(instrumentation);
+    try {
+      await requireManagedStudioProject(projectRoot);
+    } finally {
+      finishStudioProjectionPhase(instrumentation, preflightStartedAt, "main-managed-project-preflight");
+    }
+    const bundle = await buildStudioProductionProjectionBundle(projectRoot, query, instrumentation);
+    return {
+      ...bundle,
+      __t23ProjectionTimeline: {
+        schemaVersion: 1 as const,
+        phases,
+      },
+    };
   });
   ipcMain.handle("canvas:get-studio-multimedia-timeline", async (
     _event,
@@ -2147,7 +3292,7 @@ function registerIpc(): void {
     await requireManagedStudioProject(projectRoot);
     // require 写租约：桌面 UI 自动持有 desktop-ui-main，不把 token 暴露给 renderer。
     const leaseOpts = await ensureDesktopWriteLeaseForCommand(projectRoot, commandInput.request.command);
-    const record = await executeIdempotentCommand(projectRoot, commandInput, leaseOpts);
+    const record = await executeIdempotentCommand(projectRoot, commandInput, { ...leaseOpts, studioWriteActor: "user" });
     if (STUDIO_GENERATION_PROGRESS_COMMANDS.has(commandInput.request.command)) {
       void generationLedgerWatcher?.emitNow().catch(() => undefined);
     }
@@ -2161,6 +3306,196 @@ function registerIpc(): void {
       });
     }
     return record;
+  });
+  ipcMain.handle("canvas:novel-get-workspace", async (_event, ...args: unknown[]) => {
+    const [projectRootValue] = requireNovelDesktopIpcArgs(args, 1, "读取小说工作区");
+    const projectRoot = await requireManagedNovelDesktopProjectRoot(projectRootValue);
+    const snapshot = await new NovelRepository(projectRoot).snapshot();
+    assertNovelDesktopSafeResult(snapshot);
+    return snapshot;
+  });
+  ipcMain.handle("canvas:novel-get-navigation", async (_event, ...args: unknown[]) => {
+    const [projectRootValue, pageValue] = requireNovelDesktopIpcArgs(args, 2, "读取小说卷导航");
+    const page = parseNovelDesktopNavigationPage(pageValue);
+    const projectRoot = await requireManagedNovelDesktopProjectRoot(projectRootValue);
+    const result = await new NovelRepository(projectRoot).getNavigation(page);
+    assertNovelDesktopSafeResult(result);
+    return result;
+  });
+  ipcMain.handle("canvas:novel-list-chapters", async (_event, ...args: unknown[]) => {
+    const [projectRootValue, pageValue] = requireNovelDesktopIpcArgs(args, 2, "分页读取小说章节");
+    const page = parseNovelDesktopChapterPage(pageValue);
+    const projectRoot = await requireManagedNovelDesktopProjectRoot(projectRootValue);
+    const result = await new NovelRepository(projectRoot).listChapters(page);
+    assertNovelDesktopSafeResult(result);
+    return result;
+  });
+  ipcMain.handle("canvas:novel-read-chapter", async (_event, ...args: unknown[]) => {
+    const [projectRootValue, chapterIdValue] = requireNovelDesktopIpcArgs(args, 2, "读取小说章节");
+    const chapterId = parseNovelDesktopChapterId(chapterIdValue);
+    const projectRoot = await requireManagedNovelDesktopProjectRoot(projectRootValue);
+    const result = await new NovelRepository(projectRoot).readChapter(chapterId);
+    assertNovelDesktopSafeResult(result);
+    return result;
+  });
+  ipcMain.handle("canvas:novel-search-chapters", async (_event, ...args: unknown[]) => {
+    const [projectRootValue, inputValue] = requireNovelDesktopIpcArgs(args, 2, "搜索小说正文");
+    const input = parseNovelDesktopSearchInput(inputValue);
+    const projectRoot = await requireManagedNovelDesktopProjectRoot(projectRootValue);
+    const result = await new NovelRepository(projectRoot).searchChapters(input);
+    assertNovelDesktopSafeResult(result);
+    return result;
+  });
+  ipcMain.handle("canvas:novel-list-facts", async (_event, ...args: unknown[]) => {
+    const [projectRootValue] = requireNovelDesktopIpcArgs(args, 1, "读取小说记忆");
+    const projectRoot = await requireManagedNovelDesktopProjectRoot(projectRootValue);
+    const snapshot = await new NovelRepository(projectRoot).snapshot();
+    const result = await getNovelMemoryAuthorityProjection(projectRoot, snapshot);
+    assertNovelDesktopSafeResult(result);
+    return result;
+  });
+  ipcMain.handle("canvas:novel-get-writing-dashboard", async (_event, ...args: unknown[]) => {
+    const [projectRootValue, inputValue] = requireNovelDesktopIpcArgs(args, 2, "读取 Writing OS 仪表盘");
+    const input = parseNovelDesktopWritingDashboardInput(inputValue);
+    const projectRoot = await requireManagedNovelDesktopProjectRoot(projectRootValue);
+    const result = await getNovelDesktopWritingDashboard(projectRoot, input);
+    assertNovelDesktopSafeResult(result);
+    return result;
+  });
+  ipcMain.handle("canvas:novel-review-state-candidate", async (_event, ...args: unknown[]) => {
+    const [projectRootValue, inputValue] = requireNovelDesktopIpcArgs(args, 2, "裁决 Writing OS 状态候选");
+    const input = parseNovelDesktopStateCandidateReviewInput(inputValue);
+    const projectRoot = await requireManagedNovelDesktopProjectRoot(projectRootValue);
+    const result = await reviewNovelDesktopStateCandidate(projectRoot, input);
+    assertNovelDesktopSafeResult(result);
+    return result;
+  });
+  ipcMain.handle("canvas:novel-upsert-fact", async (_event, ...args: unknown[]) => {
+    const [projectRootValue] = requireNovelDesktopIpcArgs(args, 2, "保存小说记忆");
+    await requireManagedNovelDesktopProjectRoot(projectRootValue);
+    throw new Error("NOVEL_MEMORY_AUTHORITY_CONFLICT：managed novel/hybrid 的唯一正典是 Writing OS Story Bible；此 legacy 直写入口已停用。请调用 novel_stage_story_bible_candidate，再由 human_owner/human_ui 调用 novel_review_story_bible_candidate。 ");
+  });
+  ipcMain.handle("canvas:novel-pick-source", async (_event, ...args: unknown[]) => {
+    return withNovelDesktopPublicError("NOVEL_SOURCE_PICK_FAILED", async () => {
+      const [selectionKindValue] = requireNovelDesktopIpcArgs(args, 1, "选择小说来源");
+      const selectionKind = parseNovelDesktopSourceSelectionKind(selectionKindValue);
+      if (!mainWindow) return null;
+      const picked = await dialog.showOpenDialog(mainWindow, selectionKind === "file"
+        ? {
+          title: "选择小说来源文件",
+          properties: ["openFile"],
+          filters: [{ name: "小说正文", extensions: ["txt", "md", "markdown", "docx"] }],
+        }
+        : {
+          title: "选择小说来源目录",
+          properties: ["openDirectory"],
+        });
+      const selectedPath = picked.filePaths[0];
+      if (picked.canceled || !selectedPath) return null;
+      return sanitizeNovelDesktopSourceSelection(await issueNovelSourceSelection(selectedPath, selectionKind));
+    });
+  });
+  ipcMain.handle("canvas:novel-pick-destination", async (_event, ...args: unknown[]) => {
+    return withNovelDesktopPublicError("NOVEL_DESTINATION_PICK_FAILED", async () => {
+      requireNovelDesktopIpcArgs(args, 0, "选择小说导入目标");
+      if (!mainWindow) return null;
+      const picked = await dialog.showOpenDialog(mainWindow, {
+        title: "选择小说导入项目根目录",
+        properties: ["openDirectory"],
+      });
+      const selectedPath = picked.filePaths[0];
+      if (picked.canceled || !selectedPath) return null;
+      return sanitizeNovelDesktopDestinationSelection(await issueNovelDestinationSelection(selectedPath));
+    });
+  });
+  ipcMain.handle("canvas:novel-preflight-source", async (_event, ...args: unknown[]) => {
+    return withNovelDesktopPublicError("NOVEL_SOURCE_PREFLIGHT_FAILED", async () => {
+      const [destinationIdValue, selectionIdValue] = requireNovelDesktopIpcArgs(args, 2, "小说来源预检");
+      const destinationId = parseNovelDesktopDestinationId(destinationIdValue);
+      const selectionId = parseNovelDesktopSelectionId(selectionIdValue);
+      const destination = await consumeNovelDestinationSelection(destinationId);
+      const selection = await consumeNovelSourceSelection(selectionId);
+      const selectedSource = {
+        sourcePath: selection.sourcePath,
+        sourceRoot: selection.kind === "directory" ? selection.sourcePath : path.dirname(selection.sourcePath),
+      };
+      // 原生票据已消费但尚未执行全树预检/签发 authorization。先用冻结选择身份
+      // 拒绝 projectsRoot 与 app-owner 双向重叠，避免失败请求消耗授权容量。
+      assertNovelImportDestinationDoesNotOverlapPreflight(destination.projectsRoot, selectedSource);
+      assertNovelImportDestinationDoesNotOverlapPreflight(
+        path.resolve(getNovelImportCommandOwnerRoot()),
+        selectedSource,
+      );
+      assertNovelDesktopDestinationOwnerDisjoint(
+        destination.projectsRoot,
+        path.resolve(getNovelImportCommandOwnerRoot()),
+      );
+      const reservation = await reserveNovelDestinationForPreflightAuthorization(destination);
+      let issuedAuthorizationId: string | undefined;
+      try {
+        const authorized = await createAuthorizedNovelImportPreflightFromSelection(selection);
+        issuedAuthorizationId = authorized.authorization?.authorizationId;
+        assertNovelImportDestinationDoesNotOverlapPreflight(destination.projectsRoot, authorized.preflight);
+        // 先完成 renderer 安全投影；投影失败时 Core authorization 可撤销，
+        // 不会留下无法对应 renderer 响应的悬空能力。
+        const safe = sanitizeNovelDesktopPreflight(authorized);
+        if (authorized.authorization) {
+          try {
+            await bindNovelDestinationToPreflightAuthorization(reservation, authorized.authorization);
+          } catch (error) {
+            revokeNovelImportPreflightAuthorization(authorized.authorization.authorizationId);
+            issuedAuthorizationId = undefined;
+            throw error;
+          }
+        } else {
+          releaseNovelDestinationPreflightReservation(reservation);
+        }
+        return safe;
+      } catch (error) {
+        releaseNovelDestinationPreflightReservation(reservation);
+        // sanitize 或绑定前置失败时同样撤销尚未 reservation 的 Core 授权。
+        if (issuedAuthorizationId) revokeNovelImportPreflightAuthorization(issuedAuthorizationId);
+        throw error;
+      }
+    });
+  });
+  ipcMain.handle("canvas:novel-execute-command", async (_event, ...args: unknown[]) => {
+    const [projectRootValue, commandValue] = requireNovelDesktopIpcArgs(args, 2, "执行小说命令");
+    // 信封与 9 条命令的严格 schema 必须先于工程探测、锁和账本 I/O。
+    const commandInput = parseNovelDesktopCommandInput(commandValue);
+    const desktopRequest = commandInput.request;
+    if (desktopRequest.command === "novel_import_external_snapshot") {
+      return withNovelDesktopPublicError("NOVEL_IMPORT_COMMAND_FAILED", async () => {
+        if (projectRootValue !== null) {
+          throw new Error("桌面小说导入不接受 renderer 提供的 projectsRoot。");
+        }
+        const resolved = await resolveNovelDesktopImportCoreInput({
+          requestId: commandInput.requestId,
+          idempotencyKey: commandInput.idempotencyKey,
+          request: desktopRequest,
+        });
+        return sanitizeNovelDesktopCommandResult(await executeIdempotentCommand(
+          getNovelImportCommandOwnerRoot(),
+          resolved.coreInput,
+          resolved.destinationIdentity
+            ? { novelImportDestinationIdentity: resolved.destinationIdentity }
+            : {},
+        ));
+      });
+    }
+    const coreRequest = parseNovelCommandRequestForCore(desktopRequest);
+    if (!coreRequest || coreRequest.command === "novel_import_external_snapshot") {
+      throw new Error("非导入桌面小说命令不符合 Core 严格合同。");
+    }
+    const coreInput: IdempotentCommandInput = {
+      requestId: commandInput.requestId,
+      idempotencyKey: commandInput.idempotencyKey,
+      request: coreRequest,
+    };
+    const projectRoot = await requireManagedNovelDesktopProjectRoot(projectRootValue);
+    return sanitizeNovelDesktopCommandResult(await executeIdempotentCommand(projectRoot, coreInput, {
+      novelWriteActor: "human_ui",
+    }));
   });
   ipcMain.handle("canvas:pick-studio-media-files", async () => {
     if (!mainWindow) return [];
@@ -2274,6 +3609,35 @@ function registerIpc(): void {
     }
     return resolved;
   }
+  async function registeredLegacyStoryRoots(): Promise<string[]> {
+    return (await Promise.all((await listRegisteredProjects()).map(async (project) =>
+      realpath(project.primaryRoot).catch(() => null))))
+      .filter((registeredRoot): registeredRoot is string => registeredRoot !== null);
+  }
+  async function requireLegacyStoryMutationProjectRoot(candidate: string | undefined): Promise<string> {
+    const root = await requireLegacyProjectRoot(candidate);
+    assertLegacyStoryRootRegistered(root, await registeredLegacyStoryRoots());
+    if (!(await isManagedProject(root))) {
+      return assertLegacyStoryMutationWorkspaceAllowed(root, { managed: false });
+    }
+    const shell = await inspectManagedProjectReadOnly(root);
+    return assertLegacyStoryMutationWorkspaceAllowed(root, {
+      managed: true,
+      schemaVersion: shell.manifest.schemaVersion,
+      workspaceMode: shell.workspaceMode,
+    });
+  }
+  async function requireLegacyStoryReadProjectRoot(candidate: string | undefined): Promise<string> {
+    const root = await requireLegacyProjectRoot(candidate);
+    const registeredRoots = await registeredLegacyStoryRoots();
+    assertLegacyStoryRootRegistered(root, registeredRoots);
+    if (await isManagedProject(root)) {
+      // 受管工程先以纯只读方式验证 manifest/workspaceMode。Core 再根据
+      // story index schema 判定：v2 novel/hybrid 如仍是 legacy v1，必须显式迁移。
+      await inspectManagedProjectReadOnly(root);
+    }
+    return root;
+  }
   ipcMain.handle("canvas:get-index", async (_event, projectRoot?: string, refresh = false) => {
     const root = await requireLegacyProjectRoot(projectRoot ? path.resolve(projectRoot) : DEFAULT_PROJECT_ROOT);
     if (refresh && await isManagedProject(root)) throw new Error("受管素材工程采用 SQLite/CAS 增量目录，禁止启动旧文件系统扫描。");
@@ -2286,7 +3650,7 @@ function registerIpc(): void {
     const controller = new AbortController();
     manualScanControllers.set(root, controller);
     try {
-      return await trackActiveScan(scanAndPersist(root, { signal: controller.signal }));
+      return await trackActiveScan(() => scanAndPersist(root, { signal: controller.signal }));
     } finally {
       if (manualScanControllers.get(root) === controller) manualScanControllers.delete(root);
     }
@@ -2321,22 +3685,22 @@ function registerIpc(): void {
   ipcMain.handle("canvas:delete-skill", (_event, projectRoot: string, skillId: string) => deleteAgentSkill(projectRoot, skillId));
   ipcMain.handle("canvas:get-continuation", (_event, projectRoot: string, options?: { itemId?: string }) => getContinuationSnapshot(projectRoot, options));
   ipcMain.handle("canvas:create-handoff", (_event, projectRoot: string, options?: { itemId?: string }) => createContinuationHandoff(projectRoot, options));
-  ipcMain.handle("canvas:import-story-file", async (_event, projectRoot: string, filePath: string, title?: string) => importStoryFile(await requireLegacyProjectRoot(projectRoot), filePath, title));
-  ipcMain.handle("canvas:import-story-text", (_event, projectRoot: string, input: { title: string; content: string; kind?: "text" | "markdown" }) => importStoryText(projectRoot, input));
-  ipcMain.handle("canvas:list-story-sources", (_event, projectRoot: string) => listStorySources(projectRoot));
-  ipcMain.handle("canvas:list-story-chapters", (_event, projectRoot: string, sourceId?: string) => listStoryChapters(projectRoot, sourceId));
-  ipcMain.handle("canvas:read-story-chapter", (_event, projectRoot: string, chapterId: string) => readStoryChapter(projectRoot, chapterId));
-  ipcMain.handle("canvas:list-story-events", (_event, projectRoot: string, options?: { chapterId?: string; itemId?: string; status?: StoryEventStatus; includeOrphans?: boolean }) => listStoryEvents(projectRoot, options));
-  ipcMain.handle("canvas:upsert-story-event", (_event, projectRoot: string, input: Parameters<typeof upsertStoryEvent>[1]) => upsertStoryEvent(projectRoot, input, "user"));
-  ipcMain.handle("canvas:connect-story-events", (_event, projectRoot: string, sourceEventId: string, targetEventId: string) => connectStoryEvents(projectRoot, sourceEventId, targetEventId, "user"));
-  ipcMain.handle("canvas:build-story-context", (_event, projectRoot: string, itemId: string) => buildStoryContext(projectRoot, itemId));
+  ipcMain.handle("canvas:import-story-file", async (_event, projectRoot: string, filePath: string, title?: string) => importStoryFile(await requireLegacyStoryMutationProjectRoot(projectRoot), filePath, title));
+  ipcMain.handle("canvas:import-story-text", async (_event, projectRoot: string, input: { title: string; content: string; kind?: "text" | "markdown" }) => importStoryText(await requireLegacyStoryMutationProjectRoot(projectRoot), input));
+  ipcMain.handle("canvas:list-story-sources", async (_event, projectRoot: string) => listStorySources(await requireLegacyStoryReadProjectRoot(projectRoot)));
+  ipcMain.handle("canvas:list-story-chapters", async (_event, projectRoot: string, sourceId?: string) => listStoryChapters(await requireLegacyStoryReadProjectRoot(projectRoot), sourceId));
+  ipcMain.handle("canvas:read-story-chapter", async (_event, projectRoot: string, chapterId: string) => readStoryChapter(await requireLegacyStoryReadProjectRoot(projectRoot), chapterId));
+  ipcMain.handle("canvas:list-story-events", async (_event, projectRoot: string, options?: { chapterId?: string; itemId?: string; status?: StoryEventStatus; includeOrphans?: boolean }) => listStoryEvents(await requireLegacyStoryReadProjectRoot(projectRoot), options));
+  ipcMain.handle("canvas:upsert-story-event", async (_event, projectRoot: string, input: Parameters<typeof upsertStoryEvent>[1]) => upsertStoryEvent(await requireLegacyStoryMutationProjectRoot(projectRoot), input, "user"));
+  ipcMain.handle("canvas:connect-story-events", async (_event, projectRoot: string, sourceEventId: string, targetEventId: string) => connectStoryEvents(await requireLegacyStoryMutationProjectRoot(projectRoot), sourceEventId, targetEventId, "user"));
+  ipcMain.handle("canvas:build-story-context", async (_event, projectRoot: string, itemId: string) => buildStoryContext(await requireLegacyStoryReadProjectRoot(projectRoot), itemId));
   ipcMain.handle("canvas:get-adaptation-workspace", (_event, projectRoot: string) => getAdaptationWorkspace(projectRoot));
-  ipcMain.handle("canvas:analyze-novel-chapters", (_event, projectRoot: string, input: Parameters<typeof analyzeNovelChapters>[1]) => analyzeNovelChapters(projectRoot, input));
-  ipcMain.handle("canvas:generate-adaptation-plans", (_event, projectRoot: string, input: Parameters<typeof generateAdaptationPlans>[1]) => generateAdaptationPlans(projectRoot, input));
-  ipcMain.handle("canvas:select-adaptation-plan", (_event, projectRoot: string, planId: string, expectedRevision: number) => selectAdaptationPlan(projectRoot, planId, expectedRevision));
-  ipcMain.handle("canvas:materialize-adaptation-plan", (_event, projectRoot: string, input: Parameters<typeof materializeSelectedAdaptationPlan>[1]) => materializeSelectedAdaptationPlan(projectRoot, input));
+  ipcMain.handle("canvas:analyze-novel-chapters", async (_event, projectRoot: string, input: Parameters<typeof analyzeNovelChapters>[1]) => analyzeNovelChapters(await requireLegacyStoryMutationProjectRoot(projectRoot), input));
+  ipcMain.handle("canvas:generate-adaptation-plans", async (_event, projectRoot: string, input: Parameters<typeof generateAdaptationPlans>[1]) => generateAdaptationPlans(await requireLegacyStoryMutationProjectRoot(projectRoot), input));
+  ipcMain.handle("canvas:select-adaptation-plan", async (_event, projectRoot: string, planId: string, expectedRevision: number) => selectAdaptationPlan(await requireLegacyStoryMutationProjectRoot(projectRoot), planId, expectedRevision));
+  ipcMain.handle("canvas:materialize-adaptation-plan", async (_event, projectRoot: string, input: Parameters<typeof materializeSelectedAdaptationPlan>[1]) => materializeSelectedAdaptationPlan(await requireLegacyStoryMutationProjectRoot(projectRoot), input));
   ipcMain.handle("canvas:analyze-adaptation-impact", (_event, projectRoot: string, input: Parameters<typeof analyzeAdaptationChangeImpact>[1]) => analyzeAdaptationChangeImpact(projectRoot, input));
-  ipcMain.handle("canvas:regenerate-adaptation-scope", (_event, projectRoot: string, input: Parameters<typeof regenerateAdaptationScope>[1]) => regenerateAdaptationScope(projectRoot, input));
+  ipcMain.handle("canvas:regenerate-adaptation-scope", async (_event, projectRoot: string, input: Parameters<typeof regenerateAdaptationScope>[1]) => regenerateAdaptationScope(await requireLegacyStoryMutationProjectRoot(projectRoot), input));
   ipcMain.handle("canvas:create-novel-analysis-task", async (_event, projectRoot: string, input: Parameters<typeof createNovelAnalysisTask>[1]) => {
     const idempotencyKey = `ui-analysis-task-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "create_novel_analysis_task", payload: input } });
@@ -2383,9 +3747,9 @@ function registerIpc(): void {
     return result.result;
   });
   ipcMain.handle("canvas:validate-adaptation-plan", (_event, projectRoot: string, planId: string) => getAdaptationWorkspace(projectRoot).then((workspace) => { const plan = workspace.plans.find((candidate) => candidate.id === planId); if (!plan) throw new Error(`找不到改编计划：${planId}`); return validateAdaptationPlan(projectRoot, plan, workspace); }));
-  ipcMain.handle("canvas:upsert-novel-fact", (_event, projectRoot: string, input: Parameters<typeof upsertNovelFact>[1]) => upsertNovelFact(projectRoot, input));
-  ipcMain.handle("canvas:upsert-narrative-beat", (_event, projectRoot: string, input: Parameters<typeof upsertNarrativeBeat>[1]) => upsertNarrativeBeat(projectRoot, input));
-  ipcMain.handle("canvas:export-adaptation", (_event, projectRoot: string, input: Parameters<typeof exportAdaptation>[1]) => exportAdaptation(projectRoot, input));
+  ipcMain.handle("canvas:upsert-novel-fact", async (_event, projectRoot: string, input: Parameters<typeof upsertNovelFact>[1]) => upsertNovelFact(await requireLegacyStoryMutationProjectRoot(projectRoot), input));
+  ipcMain.handle("canvas:upsert-narrative-beat", async (_event, projectRoot: string, input: Parameters<typeof upsertNarrativeBeat>[1]) => upsertNarrativeBeat(await requireLegacyStoryMutationProjectRoot(projectRoot), input));
+  ipcMain.handle("canvas:export-adaptation", async (_event, projectRoot: string, input: Parameters<typeof exportAdaptation>[1]) => exportAdaptation(await requireLegacyStoryMutationProjectRoot(projectRoot), input));
   ipcMain.handle("canvas:get-production-workflow", (_event, projectRoot: string) => getProductionWorkflow(projectRoot, { includeEvidenceAudit: true }));
   ipcMain.handle("canvas:update-production-workflow-stage", (_event, projectRoot: string, input: Parameters<typeof updateProductionWorkflowStage>[1]) => updateProductionWorkflowStage(projectRoot, input, "user"));
   ipcMain.handle("canvas:list-creative-bibles", (_event, projectRoot: string, kind?: Parameters<typeof listCreativeBibles>[1]) => listCreativeBibles(projectRoot, kind));
@@ -2480,6 +3844,7 @@ function registerIpc(): void {
   ipcMain.handle("canvas:export-edit-otio", (_event, projectRoot: string, editProjectId: string, expectedRevision: number, outputPath?: string) => exportEditProjectOtio(projectRoot, editProjectId, expectedRevision, outputPath));
   ipcMain.handle("canvas:import-edit-otio", async (_event, projectRoot: string, filePath: string, name?: string) => importEditProjectOtio(await requireLegacyProjectRoot(projectRoot), filePath, name));
   ipcMain.handle("canvas:list-edit-media", (_event, projectRoot: string, episode?: number) => listEditMedia(projectRoot, episode));
+  ipcMain.handle("canvas:list-edit-media-page", (_event, projectRoot: string, query?: Parameters<typeof listEditMediaPage>[1]) => listEditMediaPage(projectRoot, query));
   ipcMain.handle("canvas:prepare-edit-media-preview", (_event, projectRoot: string, artifactId: string) => prepareEditMediaPreview(projectRoot, artifactId));
   ipcMain.handle("canvas:prepare-edit-media-proxy", (_event, projectRoot: string, artifactId: string) => prepareEditMediaProxy(projectRoot, artifactId));
   ipcMain.handle("canvas:prepare-nested-timeline-preview", (_event, projectRoot: string, parentEditProjectId: string, expectedRevision: number, clipId: string) => prepareNestedTimelinePreview(projectRoot, parentEditProjectId, expectedRevision, clipId));
@@ -2658,6 +4023,7 @@ function registerIpc(): void {
 
   /** 原生文件拖出：dragstart 同链路同步消费一次性 token；任何路径输入都无效。 */
   ipcMain.on("canvas:start-native-file-drag", (event, token: string) => {
+    if (appQuitOperationAdmission.isClosed()) return;
     if (typeof token !== "string" || !/^[a-f0-9-]{36}$/iu.test(token)) return;
     const claimed = nativeMediaDragResources.takePrepared(token);
     if (!claimed) return;
@@ -3023,22 +4389,52 @@ function registerIpc(): void {
   });
 }
 
+function runLegacyWatcherExclusive<T>(operation: () => Promise<T>): Promise<T> {
+  return legacyWatcherQueue.run(operation);
+}
+
+async function closeLegacyWatcherOwner(owner: LegacyWatcherOwner): Promise<void> {
+  return closeRetriableWatcherHandles(owner, [
+    ...(owner.watcher ? [{ label: "legacy", close: () => owner.watcher!.close() }] : []),
+    ...(owner.semanticWatcher ? [{ label: "semantic", close: () => owner.semanticWatcher!.close() }] : []),
+  ]);
+}
+
 async function stopWatcher(projectRoot?: string): Promise<void> {
+  return runLegacyWatcherExclusive(() => stopWatcherExclusive(projectRoot));
+}
+
+async function stopWatcherExclusive(projectRoot?: string): Promise<void> {
   const targetRoot = projectRoot ? path.resolve(projectRoot) : path.resolve(watchedRoot);
   // F-08c（main 审查）：仅当目标是当前监听工程时才停 watcher；其他工程只取消其手动扫描。
   manualScanControllers.get(targetRoot)?.abort("项目已切换，取消旧项目手动扫描。");
   manualScanControllers.delete(targetRoot);
-  if (path.resolve(watchedRoot) !== targetRoot) return;
-  // 即使稍后重新打开相同 root，也必须让旧 watcher incarnation 永久失效（ABA）。
-  watcherEpoch += 1;
-  if (watcherTimer) clearTimeout(watcherTimer);
-  watcherTimer = null;
-  watcherScanController?.abort("项目监听已停止。");
-  watcherScanController = null;
-  await Promise.allSettled([watcher?.close(), semanticWatcher?.close()]);
-  watcher = null;
-  semanticWatcher = null;
-  watchedRoot = DEFAULT_PROJECT_ROOT;
+  if (path.resolve(watchedRoot) === targetRoot) {
+    // 即使稍后重新打开相同 root，也必须让旧 watcher incarnation 永久失效（ABA）。
+    watcherEpoch += 1;
+    if (watcherTimer) clearTimeout(watcherTimer);
+    watcherTimer = null;
+    watcherScanController?.abort("项目监听已停止。");
+    watcherScanController = null;
+    const closingOwner = legacyWatcherOwner;
+    legacyWatcherOwner = null;
+    watchedRoot = DEFAULT_PROJECT_ROOT;
+    if (closingOwner) retainedLegacyWatcherOwners.add(closingOwner);
+  }
+  const closingOwners = [...retainedLegacyWatcherOwners];
+  const results = await Promise.allSettled(closingOwners.map((owner) => closeLegacyWatcherOwner(owner)));
+  const rejected = results
+    .map((result, index) => ({ result, owner: closingOwners[index] }))
+    .filter((entry): entry is { result: PromiseRejectedResult; owner: LegacyWatcherOwner } => entry.result.status === "rejected");
+  results.forEach((result, index) => {
+    if (result.status === "fulfilled") retainedLegacyWatcherOwners.delete(closingOwners[index]!);
+  });
+  if (rejected.length) {
+    throw new AggregateError(
+      rejected.map((entry) => entry.result.reason),
+      `项目 watcher owner 关闭失败：${rejected.length}`,
+    );
+  }
 }
 
 function legacyWatcherIdentityIsCurrent(identity: LegacyWatcherIdentity): boolean {
@@ -3046,8 +4442,26 @@ function legacyWatcherIdentityIsCurrent(identity: LegacyWatcherIdentity): boolea
     && identity.projectRoot === path.resolve(watchedRoot);
 }
 
+function reportLegacyWatcherError(
+  label: "legacy" | "semantic",
+  identity: LegacyWatcherIdentity,
+  error: unknown,
+): void {
+  if (!legacyWatcherIdentityIsCurrent(identity)) return;
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`[watcher:${label}] ${message}`);
+  mainWindow?.webContents.send("canvas:watch-error", `${label} watcher 已停止可靠监听：${message}`);
+}
+
 async function startWatcher(projectRoot: string): Promise<LegacyWatcherIdentity> {
-  await stopWatcher(watchedRoot);
+  if (appQuitOperationAdmission.isClosed()) throw new Error("应用正在退出，禁止新建项目 watcher。");
+  return runLegacyWatcherExclusive(() => startWatcherExclusive(projectRoot));
+}
+
+async function startWatcherExclusive(projectRoot: string): Promise<LegacyWatcherIdentity> {
+  if (appQuitOperationAdmission.isClosed()) throw new Error("应用正在退出，禁止新建项目 watcher。");
+  await stopWatcherExclusive(watchedRoot);
+  if (appQuitOperationAdmission.isClosed()) throw new Error("应用正在退出，禁止新建项目 watcher。");
   const resolvedRoot = path.resolve(projectRoot);
   watchedRoot = resolvedRoot;
   const identity: LegacyWatcherIdentity = {
@@ -3055,12 +4469,25 @@ async function startWatcher(projectRoot: string): Promise<LegacyWatcherIdentity>
     watcherEpoch: ++watcherEpoch,
   };
   if (await isManagedProject(resolvedRoot)) {
-    await getManagedProjectShell(resolvedRoot);
+    // 受管工程只借此入口切换/停止 legacy watcher owner；身份核对必须物理只读，
+    // 尤其 novel/hybrid 壳不能因“打开项目”补任何 generation ledger。
+    await inspectManagedProjectReadOnly(resolvedRoot);
+    if (appQuitOperationAdmission.isClosed()) throw new Error("应用正在退出，禁止新建项目 watcher。");
     if (!legacyWatcherIdentityIsCurrent(identity)) throw new Error("项目监听请求已被更新的工程替代。");
     return identity;
   }
+  if (appQuitOperationAdmission.isClosed()) throw new Error("应用正在退出，禁止新建项目 watcher。");
   if (!legacyWatcherIdentityIsCurrent(identity)) throw new Error("项目监听请求已被更新的工程替代。");
-  watcher = chokidar.watch(resolvedRoot, {
+  let nextWatcher: FSWatcher | null = null;
+  let nextSemanticWatcher: FSWatcher | null = null;
+  const candidateOwner: LegacyWatcherOwner = {
+    identity,
+    watcher: null,
+    semanticWatcher: null,
+    closePromise: null,
+  };
+  try {
+    nextWatcher = chokidar.watch(resolvedRoot, {
     ignoreInitial: true,
     persistent: true,
     awaitWriteFinish: { stabilityThreshold: 700, pollInterval: 120 },
@@ -3069,6 +4496,7 @@ async function startWatcher(projectRoot: string): Promise<LegacyWatcherIdentity>
       return normalized.includes("/.aicanvas/") || normalized.endsWith("/00_画布进度.md") || normalized.includes("/.git/");
     },
   });
+  candidateOwner.watcher = nextWatcher;
   const schedule = (changedPath: string) => {
     if (!legacyWatcherIdentityIsCurrent(identity)) return;
     if (!isRelevantFile(changedPath)) return;
@@ -3081,7 +4509,7 @@ async function startWatcher(projectRoot: string): Promise<LegacyWatcherIdentity>
       try {
         const index = await runRuntimeGatedBackgroundWrite(
           "legacy-project-watcher-scan",
-          () => trackActiveScan(scanAndPersist(identity.projectRoot, { signal: controller.signal })),
+          () => trackActiveScan(() => scanAndPersist(identity.projectRoot, { signal: controller.signal })),
         );
         if (!legacyWatcherIdentityIsCurrent(identity)) return;
         mainWindow?.webContents.send("canvas:index-updated", index);
@@ -3099,14 +4527,19 @@ async function startWatcher(projectRoot: string): Promise<LegacyWatcherIdentity>
       }
     }, 1_200);
   };
-  watcher.on("add", schedule).on("change", schedule).on("unlink", schedule);
+  nextWatcher
+    .on("add", schedule)
+    .on("change", schedule)
+    .on("unlink", schedule)
+    .on("error", (error) => reportLegacyWatcherError("legacy", identity, error));
   const semanticPath = path.resolve(getSidecarPaths(identity.projectRoot).canvasSemantic);
-  semanticWatcher = chokidar.watch(getSidecarPaths(identity.projectRoot).root, {
+  nextSemanticWatcher = chokidar.watch(getSidecarPaths(identity.projectRoot).root, {
     ignoreInitial: true,
     persistent: true,
     depth: 0,
     awaitWriteFinish: { stabilityThreshold: 250, pollInterval: 80 },
   });
+  candidateOwner.semanticWatcher = nextSemanticWatcher;
   const sendSemanticState = async (changedPath: string) => {
     if (!legacyWatcherIdentityIsCurrent(identity)) return;
     if (path.resolve(changedPath) !== semanticPath) return;
@@ -3123,8 +4556,38 @@ async function startWatcher(projectRoot: string): Promise<LegacyWatcherIdentity>
       }
     }
   };
-  semanticWatcher.on("add", sendSemanticState).on("change", sendSemanticState).on("unlink", sendSemanticState);
-  return identity;
+  nextSemanticWatcher
+    .on("add", sendSemanticState)
+    .on("change", sendSemanticState)
+    .on("unlink", sendSemanticState)
+    .on("error", (error) => reportLegacyWatcherError("semantic", identity, error));
+  if (appQuitOperationAdmission.isClosed() || !legacyWatcherIdentityIsCurrent(identity)) {
+    retainedLegacyWatcherOwners.add(candidateOwner);
+    try {
+      await closeLegacyWatcherOwner(candidateOwner);
+      retainedLegacyWatcherOwners.delete(candidateOwner);
+    } catch {
+      // owner 已保留，下一次 stop/quit 会重试；当前 start 仍失败关闭。
+    }
+    throw new Error("应用正在退出或项目监听请求已被替代，禁止发布新 watcher owner。");
+  }
+    legacyWatcherOwner = candidateOwner;
+    return identity;
+  } catch (error) {
+    if (candidateOwner.watcher || candidateOwner.semanticWatcher) {
+      retainedLegacyWatcherOwners.add(candidateOwner);
+      try {
+        await closeLegacyWatcherOwner(candidateOwner);
+        retainedLegacyWatcherOwners.delete(candidateOwner);
+      } catch (closeError) {
+        throw new AggregateError(
+          [error, closeError],
+          "项目 watcher 创建失败，且已创建句柄未能安全关闭；owner 已保留供重试。",
+        );
+      }
+    }
+    throw error;
+  }
 }
 
 function isRelevantFile(filePath: string): boolean {
@@ -3139,6 +4602,7 @@ if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
   app.on("second-instance", () => {
+    if (backgroundSmokeMode || appQuitOperationAdmission.isClosed()) return;
     const window = mainWindow ?? BrowserWindow.getAllWindows()[0];
     if (window) {
       if (window.isMinimized()) window.restore();
@@ -3147,8 +4611,14 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.whenReady().then(async () => {
-  await startSourceRuntimeGateWatchers();
-  await initializeStudioNativeMediaDragResources();
+  const startupAllowed = await runGuardedAppStartupPrerequisites(
+    appQuitOperationAdmission,
+    {
+      startSourceRuntimeWatchers: startSourceRuntimeGateWatchers,
+      initializeNativeMediaDragResources: initializeStudioNativeMediaDragResources,
+    },
+  );
+  if (!startupAllowed) return;
   protocol.handle("aicanvas-studio", async (request) => {
     try {
       const url = new URL(request.url);
@@ -3230,7 +4700,9 @@ if (!app.requestSingleInstanceLock()) {
       return new Response("Not found", { status: 404 });
     }
   });
+  if (appQuitOperationAdmission.isClosed()) return;
   registerIpc();
+  if (appQuitOperationAdmission.isClosed()) return;
   await createWindow();
   // T11 启动重放：对当前活跃工程补缀并重放未消费画布投影事件（重启恢复）。
   // 失败不阻断启动，仅记诊断；消费方按 projectionRevision 幂等应用。
@@ -3245,6 +4717,7 @@ if (!app.requestSingleInstanceLock()) {
       console.warn("[canvas-outbox] 启动重放被运行时写闸门拒绝或失败：", error instanceof Error ? error.message : String(error));
     });
   app.on("activate", async () => {
+    if (backgroundSmokeMode || appQuitOperationAdmission.isClosed()) return;
     if (BrowserWindow.getAllWindows().length === 0) await createWindow();
   });
   });
@@ -3255,35 +4728,105 @@ app.on("window-all-closed", () => {
 });
 
 app.on("before-quit", (event) => {
-  const nativeMediaDragCleanupNeeded = studioNativeMediaDragResources?.needsExitCleanup() ?? false;
-  if (!quitSessionCleanupStarted
-    && (activeEditorSessions.size > 0
-      || activeScanPromises.size > 0
-      || nativeMediaDragCleanupNeeded)) {
+  if (mainWindow && !mainWindow.isDestroyed() && !rendererWindowCloseApproved) {
     event.preventDefault();
-    quitSessionCleanupStarted = true;
-    if (watcherTimer) clearTimeout(watcherTimer);
-    watcherScanController?.abort("应用正在退出。");
-    for (const controller of manualScanControllers.values()) controller.abort("应用正在退出。");
-    const scans = [...activeScanPromises];
-    void Promise.allSettled([
-      cleanupActiveEditorSessions(),
-      watcher?.close(),
-      semanticWatcher?.close(),
-      generationLedgerWatcher?.close(),
-      closeSourceRuntimeGateWatchers(),
-      studioNativeMediaDragResources?.cleanupForExit(),
-      ...scans,
-    ]).finally(() => app.quit());
+    quitAfterRendererApproval = true;
+    mainWindow.close();
     return;
   }
+  if (finalProcessExitArmed) return;
+  if (quitSessionCleanupStarted) {
+    event.preventDefault();
+    return;
+  }
+  event.preventDefault();
+  quitSessionCleanupStarted = true;
+  appQuitOperationAdmission.close();
+  recordAppClosePhase("critical_cleanup");
   if (watcherTimer) clearTimeout(watcherTimer);
+  watcherTimer = null;
   watcherScanController?.abort("应用正在退出。");
+  watcherScanController = null;
   for (const controller of manualScanControllers.values()) controller.abort("应用正在退出。");
   manualScanControllers.clear();
-  void watcher?.close();
-  void semanticWatcher?.close();
-  void generationLedgerWatcher?.close();
-  void closeSourceRuntimeGateWatchers();
-  void studioNativeMediaDragResources?.cleanupForExit();
+  const scans = [...activeScanPromises];
+  const mutations = appQuitOperationAdmission.snapshotTasks();
+
+  void runBoundedAppQuitCleanup({
+    criticalTasks: [
+      ...scans.map((task, index) => ({ label: `active-scan-${index + 1}`, task })),
+      ...mutations,
+    ],
+    criticalTimeoutMs: APP_CLOSE_CRITICAL_CLEANUP_TIMEOUT_MS,
+    recoverableTimeoutMs: APP_CLOSE_RECOVERABLE_CLEANUP_TIMEOUT_MS,
+    recoverableTasks: () => {
+      recordAppClosePhase("recoverable_cleanup", {
+        criticalCleanupComplete: true,
+      });
+      for (const controller of activeProjectListControllers.values()) {
+        controller.abort("应用正在退出。");
+      }
+      activeProjectListControllers.clear();
+      return [
+        { label: "editor-sessions", task: cleanupActiveEditorSessions() },
+        { label: "legacy-watchers", task: retryWatcherCloseOnce(() => stopWatcher()) },
+        { label: "generation-watcher", task: closeStudioGenerationLedgerWatcher() },
+        { label: "runtime-gate-watchers", task: closeSourceRuntimeGateWatchers() },
+        { label: "native-media-drag", task: studioNativeMediaDragResources?.cleanupForExit() },
+      ];
+    },
+  }).then((result) => {
+    if (result.critical.timedOut || result.critical.rejected.length) {
+      console.error(`[app-close] critical cleanup incomplete ${JSON.stringify(result.critical)}`);
+    }
+    if (result.decision === "cancel") {
+      const incomplete = result.critical;
+      const incompleteLabels = [
+        ...incomplete.pending,
+        ...incomplete.rejected.map((entry) => entry.label),
+      ];
+      recordAppClosePhase("cancelled", {
+        rendererApproved: false,
+        criticalCleanupComplete: false,
+        recoverableCleanupComplete: false,
+        detail: `critical-cleanup-incomplete:${incompleteLabels.join(",")}`,
+      });
+      quitSessionCleanupStarted = false;
+      appQuitOperationAdmission.reopen();
+      finalProcessExitArmed = false;
+      quitAfterRendererApproval = false;
+      rendererWindowCloseApproved = false;
+      closeAfterRendererApproval = false;
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send(
+          "canvas:watch-error",
+          "应用退出已取消：后台写入、扫描或 watcher 未能安全停止，请稍后重试；当前窗口和未保存内容均已保留。",
+        );
+      }
+      return;
+    }
+    if (result.recoverable.timedOut || result.recoverable.rejected.length) {
+      console.error(`[app-close] recoverable cleanup incomplete ${JSON.stringify(result.recoverable)}`);
+    }
+    recordAppClosePhase("exiting", {
+      criticalCleanupComplete: true,
+      recoverableCleanupComplete: result.recoverableComplete,
+      detail: result.recoverable.timedOut ? "cleanup-deadline-reached" : undefined,
+    });
+    finalProcessExitArmed = true;
+    app.quit();
+  }).catch((error) => {
+    console.error("[app-close] 退出协调器异常，已取消退出：", error);
+    recordAppClosePhase("cancelled", {
+      rendererApproved: false,
+      criticalCleanupComplete: false,
+      detail: "cleanup-coordinator-error",
+    });
+    quitSessionCleanupStarted = false;
+    appQuitOperationAdmission.reopen();
+    finalProcessExitArmed = false;
+    quitAfterRendererApproval = false;
+    rendererWindowCloseApproved = false;
+    closeAfterRendererApproval = false;
+  });
 });
