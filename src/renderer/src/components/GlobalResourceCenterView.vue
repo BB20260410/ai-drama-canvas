@@ -25,15 +25,19 @@
 
     <nav class="resource-tabs" role="tablist" aria-label="总资源分类">
       <button
-        v-for="entry in categories"
+        v-for="(entry, index) in categories"
         :key="entry.kind"
+        :id="`global-resource-tab-${entry.kind}`"
         type="button"
         role="tab"
+        aria-controls="global-resource-panel"
         :data-testid="`global-resource-tab-${entry.kind}`"
         :aria-selected="activeCategory === entry.kind"
+        :tabindex="activeCategory === entry.kind ? 0 : -1"
         :class="{ active: activeCategory === entry.kind }"
         :disabled="loading || Boolean(pendingReuseKey)"
-        @click="selectCategory(entry.kind)">
+        @click="selectCategory(entry.kind)"
+        @keydown="onTabKeydown($event, index)">
         <component :is="entry.icon" :size="16" aria-hidden="true" />
         <span>{{ entry.label }}</span>
         <small v-if="categoryCount(entry.kind) !== undefined">{{ categoryCount(entry.kind) }}</small>
@@ -97,7 +101,11 @@
       {{ operationNotice }}
     </p>
 
-    <main class="resource-browser">
+    <main
+      id="global-resource-panel"
+      class="resource-browser"
+      role="tabpanel"
+      :aria-labelledby="`global-resource-tab-${activeCategory}`">
       <div v-if="loading && !pageState" class="resource-loading" role="status">
         <LoaderCircle :size="22" class="spinning" aria-hidden="true" />
         <span>正在读取总资源轻量索引…</span>
@@ -366,6 +374,7 @@ import type {
   ReuseStudioGlobalResourceInput,
   ReuseStudioGlobalResourceResult,
 } from "@core/studio-global-resource-reuse";
+import { moveGlobalResourceTabIndex } from "../global-resource-tabs";
 
 export type GlobalResourceCenterCategory =
   | "all"
@@ -633,6 +642,14 @@ async function loadPreviousPage(): Promise<void> {
   if (await loadPage(previous || undefined)) {
     cursorStack.value = cursorStack.value.slice(0, -1);
   }
+}
+
+function onTabKeydown(event: KeyboardEvent, index: number): void {
+  const next = moveGlobalResourceTabIndex(index, categories.length, event.key);
+  if (next === null) return;
+  event.preventDefault();
+  selectCategory(categories[next]!.kind);
+  document.getElementById(`global-resource-tab-${categories[next]!.kind}`)?.focus();
 }
 
 function selectCategory(category: GlobalResourceCenterCategory): void {

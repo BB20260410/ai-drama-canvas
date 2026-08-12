@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "@vue/compiler-sfc";
 import { describe, expect, it } from "vitest";
+import { moveGlobalResourceTabIndex } from "../src/renderer/src/global-resource-tabs.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const source = (relative: string): string => readFileSync(path.join(root, relative), "utf8");
@@ -266,5 +267,41 @@ describe("总资源中心 renderer 合同", () => {
     ]) {
       expect(center).not.toContain(forbidden);
     }
+  });
+});
+
+describe("总资源分类页签 Tab/Panel 无障碍合同", () => {
+  it("index 移动纯函数覆盖左右循环、Home/End，无关键不处理", () => {
+    expect(moveGlobalResourceTabIndex(2, 10, "ArrowRight")).toBe(3);
+    expect(moveGlobalResourceTabIndex(9, 10, "ArrowRight")).toBe(0);
+    expect(moveGlobalResourceTabIndex(3, 10, "ArrowLeft")).toBe(2);
+    expect(moveGlobalResourceTabIndex(0, 10, "ArrowLeft")).toBe(9);
+    expect(moveGlobalResourceTabIndex(5, 10, "Home")).toBe(0);
+    expect(moveGlobalResourceTabIndex(4, 10, "End")).toBe(9);
+    expect(moveGlobalResourceTabIndex(4, 10, "Enter")).toBeNull();
+    expect(moveGlobalResourceTabIndex(4, 10, "ArrowUp")).toBeNull();
+    expect(moveGlobalResourceTabIndex(0, 0, "ArrowRight")).toBeNull();
+  });
+
+  it("tab 有稳定 id/aria-controls/roving tabindex，panel 精确指向当前 tab，键盘同步选择与焦点", () => {
+    const center = source("src/renderer/src/components/GlobalResourceCenterView.vue");
+    expect(center).toContain('from "../global-resource-tabs"');
+    expect(center).toContain(':id="`global-resource-tab-${entry.kind}`"');
+    expect(center).toContain('aria-controls="global-resource-panel"');
+    expect(center).toContain(':tabindex="activeCategory === entry.kind ? 0 : -1"');
+    expect(center).toContain('@keydown="onTabKeydown($event, index)"');
+    expect(center).toContain('id="global-resource-panel"');
+    expect(center).toContain('role="tabpanel"');
+    expect(center).toContain(':aria-labelledby="`global-resource-tab-${activeCategory}`"');
+
+    const handler = center.slice(
+      center.indexOf("function onTabKeydown"),
+      center.indexOf("function selectCategory"),
+    );
+    expect(handler).toContain("moveGlobalResourceTabIndex(index, categories.length, event.key)");
+    expect(handler).toContain("if (next === null) return;");
+    expect(handler).toContain("event.preventDefault()");
+    expect(handler).toContain("selectCategory(categories[next]!.kind)");
+    expect(handler).toContain('document.getElementById(`global-resource-tab-${categories[next]!.kind}`)?.focus()');
   });
 });
