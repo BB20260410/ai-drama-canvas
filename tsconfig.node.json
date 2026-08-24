@@ -35,6 +35,8 @@
     "scripts/s1e2-u04-run.ts",
     "scripts/s1e2-u05-run.ts",
     "scripts/s1e2-u13-run.ts",
-    "scripts/s1e2-u15-run.ts"
+    "scripts/s1e2-u15-run.ts",
+    "tests/character-canvas-pack.test.ts",
+    "tests/canvas-audio-mutex.test.ts"
   ]
 }

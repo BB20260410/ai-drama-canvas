@@ -19,7 +19,7 @@ export const CHARACTER_AUDIO_EXTENSIONS = new Set([
 ]);
 
 export interface CharacterCanvasPackCommandResult {
-  status: "succeeded" | "failed";
+  status: "succeeded" | "failed" | "cancelled" | "running" | "unknown";
   error?: { message?: string };
   result?: unknown;
 }

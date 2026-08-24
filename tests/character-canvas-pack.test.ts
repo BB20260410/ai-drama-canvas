@@ -6,8 +6,8 @@ import {
   isCharacterImagePath,
   splitCanvasAssetAliases,
   type CharacterCanvasPackApi,
-} from "../src/renderer/src/character-canvas-pack";
-import type { VoiceIdentity } from "../src/core/types";
+} from "../src/renderer/src/character-canvas-pack.js";
+import type { VoiceIdentity } from "../src/core/types.js";
 
 const IMAGE_SHA = "a".repeat(64);
 const AUDIO_SHA = "b".repeat(64);
@@ -46,7 +46,7 @@ describe("画布角色库入库", () => {
   it("入库把非空 aliases 写入 create_studio_asset envelope，空则省略", async () => {
     const payloads: Array<Record<string, unknown>> = [];
     const api: CharacterCanvasPackApi = {
-      async executeStudioCommand(_root, envelope) {
+      async executeStudioCommand(_root: string, envelope: Parameters<CharacterCanvasPackApi["executeStudioCommand"]>[1]) {
         const command = envelope.request.command;
         if (command === "create_studio_asset") {
           payloads.push(envelope.request.payload as Record<string, unknown>);
@@ -78,7 +78,7 @@ describe("画布角色库入库", () => {
   it("入库非空 description 覆盖模板，空则保留画布库入库句", async () => {
     const payloads: Array<Record<string, unknown>> = [];
     const api: CharacterCanvasPackApi = {
-      async executeStudioCommand(_root, envelope) {
+      async executeStudioCommand(_root: string, envelope: Parameters<CharacterCanvasPackApi["executeStudioCommand"]>[1]) {
         const command = envelope.request.command;
         if (command === "create_studio_asset") {
           payloads.push(envelope.request.payload as Record<string, unknown>);
@@ -126,7 +126,7 @@ describe("画布角色库入库", () => {
   it("创建角色、锁定参考图并绑定音频 SHA", async () => {
     const commands: string[] = [];
     const api: CharacterCanvasPackApi = {
-      async executeStudioCommand(_root, envelope) {
+      async executeStudioCommand(_root: string, envelope: Parameters<CharacterCanvasPackApi["executeStudioCommand"]>[1]) {
         commands.push(envelope.request.command);
         const command = envelope.request.command;
         if (command === "create_studio_asset") {
@@ -179,7 +179,7 @@ describe("画布角色库入库", () => {
   it("没有音频时仍锁定参考图，不写音色", async () => {
     let upserted = false;
     const api: CharacterCanvasPackApi = {
-      async executeStudioCommand(_root, envelope) {
+      async executeStudioCommand(_root: string, envelope: Parameters<CharacterCanvasPackApi["executeStudioCommand"]>[1]) {
         const command = envelope.request.command;
         if (command === "create_studio_asset") return { status: "succeeded", result: { id: "char-ahang", revision: 1 } };
         if (command === "import_studio_media") return { status: "succeeded", result: { sha256: IMAGE_SHA, kind: "image" } };
@@ -205,7 +205,7 @@ describe("画布角色库入库", () => {
     let upserted = false;
     const categories: string[] = [];
     const api: CharacterCanvasPackApi = {
-      async executeStudioCommand(_root, envelope) {
+      async executeStudioCommand(_root: string, envelope: Parameters<CharacterCanvasPackApi["executeStudioCommand"]>[1]) {
         const command = envelope.request.command;
         if (command === "create_studio_asset") {
           categories.push((envelope.request.payload as { category: string }).category);
@@ -242,7 +242,7 @@ describe("画布角色库入库", () => {
     const notes: string[] = [];
     let authorityCount = 0;
     const api: CharacterCanvasPackApi = {
-      async executeStudioCommand(_root, envelope) {
+      async executeStudioCommand(_root: string, envelope: Parameters<CharacterCanvasPackApi["executeStudioCommand"]>[1]) {
         const command = envelope.request.command;
         const payload = envelope.request.payload as { sourceNote?: string };
         if (command === "create_studio_asset") return { status: "succeeded", result: { id: "char-ahang", revision: 1 } };

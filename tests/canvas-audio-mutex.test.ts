@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   claimCanvasAudioPlayback,
   releaseCanvasAudioPlayback,
-} from "../src/renderer/src/canvas-audio-mutex";
+} from "../src/renderer/src/canvas-audio-mutex.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 

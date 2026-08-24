@@ -768,6 +768,8 @@
 import { Background } from "@vue-flow/background";
 import { ControlButton, Controls } from "@vue-flow/controls";
 import { ConnectionMode, useVueFlow, VueFlow, type Connection, type Edge, type Node, type NodeChange, type NodeMouseEvent, type NodeTypesObject } from "@vue-flow/core";
+
+type CanvasFlowNode = Node & { selected?: boolean };
 import { MiniMap } from "@vue-flow/minimap";
 import { computed, markRaw, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
 import {
@@ -1082,7 +1084,7 @@ const pinnedAssetsPage = ref<StudioDashboardAssetsPage | null>(null);
 const unitDetail = ref<StudioDashboardUnitDetail | null>(null);
 const appearancesPage = ref<StudioDashboardAppearancesPage | null>(null);
 // VueFlow 的递归 Node 泛型不适合 Vue 深层响应式展开；画布整页替换，使用 shallowRef。
-const nodes = shallowRef<Node[]>([]);
+const nodes = shallowRef<CanvasFlowNode[]>([]);
 // P23：布局编辑增量（对齐/分布/吸附/undo）会话态。
 const undoStack = createCanvasUndoStack({ maxEntries: 80 });
 const undoTick = ref(0);

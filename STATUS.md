@@ -4,13 +4,13 @@
 
 | 字段 | 当前值 |
 |---|---|
-| status | `completed`：已公开 Apache-2.0，GitHub 建议已落实 |
+| status | `in_progress`：收口剩余项（CodeQL 超时、补丁依赖、CoC/Security 识别） |
 | remote | https://github.com/BB20260410/ai-drama-canvas |
 | license | Apache-2.0（GitHub 已识别）；无 CLA、无商业双授权 |
 | community | health 100%；secret scanning / push protection / Dependabot 已开 |
-| ci | macOS run `32714879168` **success** |
+| ci | HEAD macOS CI **success** |
 | dependabot_alerts | 打开 0 |
-| earliest_next | 不继续 N124 CV 空转；electron/vue-tsc 补丁 PR 可另开验证 |
+| earliest_next | 推送 CodeQL 加速配置 + electron/zod 补丁，等 CodeQL 绿 |
 
 ## 2026-08-22 19:03 CST · N121–N123 产品切片落地（禁止附录-only）
 

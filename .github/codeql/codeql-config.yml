@@ -1,5 +1,14 @@
 name: ai-drama-canvas
+paths:
+  - src
+  - scripts
+  - tests
+  - package.json
 paths-ignore:
-  - docs/evidence/**
-  - dist-mcp/**
-  - coverage/**
+  - docs
+  - dist-mcp
+  - coverage
+  - .agents
+  - .grok
+  - .claude
+  - node_modules
