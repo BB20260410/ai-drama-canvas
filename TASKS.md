@@ -7,7 +7,8 @@
 - [x] Apache-2.0 LICENSE / NOTICE / README / CONTRIBUTING / SECURITY / CoC / CI
 - [x] 推送到 `BB20260410/ai-drama-canvas` 公开仓库
 - [x] 读取 GitHub 建议：CI 改 macOS、Dependabot 升级、CodeQL
-- [ ] 等待 macOS CI 通过并确认 Dependabot 告警收敛
+- [x] macOS CI 通过（32714879168）；打开 Dependabot 告警 0
+- [x] 关闭会破坏构建的 Dependabot PR（TS 7 / Vite 8 / 顶层 esbuild）
 
 ## software_goal: character-canvas-pack-20260821
 
