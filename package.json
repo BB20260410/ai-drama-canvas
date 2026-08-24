@@ -184,7 +184,7 @@
     "electron-builder": "26.15.3",
     "electron-vite": "5.0.0",
     "esbuild": "0.25.12",
-    "jsdom": "27.4.0",
+    "jsdom": "30.0.1",
     "playwright": "^1.61.1",
     "tsx": "4.23.12",
     "typescript": "5.9.3",
