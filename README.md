@@ -134,7 +134,7 @@ npm run ui:revision-cas-smoke
 真实项目只读链路验证：
 
 ```bash
-npm run mcp:real-smoke -- /Users/hxx/Desktop/Ai漫剧
+npm run mcp:real-smoke -- /path/to/imported-project
 ```
 
 追加 `--create` 会在 `.aicanvas/tasks/` 创建一个待领取任务包，但不会生成或覆盖媒体文件。
@@ -142,7 +142,7 @@ npm run mcp:real-smoke -- /Users/hxx/Desktop/Ai漫剧
 以只读《封神篇》正式剧本和参考板建立全新隔离工程，验证真实长时间线、分数时基、多轨、嵌套、Effect/Transition、OTIO、Publication、Continuation、source/compiled MCP 与 Electron 完整重启：
 
 ```bash
-npm run formal:nle-calibration -- '/Users/hxx/Desktop/豆包版本/剧本_封神篇' "$PWD/formal-calibration/全新内容寻址目录" "$PWD/docs/evidence/全新-core-evidence.json"
+npm run formal:nle-calibration -- '/path/to/readonly-script-root' "$PWD/formal-calibration/全新内容寻址目录" "$PWD/docs/evidence/全新-core-evidence.json"
 npm run build
 npm run formal:nle-mcp-smoke -- "$PWD/formal-calibration/全新内容寻址目录/calibration-state.json" "$PWD/docs/evidence/全新-mcp-evidence.json"
 npm run ui:formal-nle-smoke -- "$PWD/formal-calibration/全新内容寻址目录/calibration-state.json" "$PWD/docs/evidence/全新-ui-evidence.json"

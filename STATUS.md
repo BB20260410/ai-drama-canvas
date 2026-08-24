@@ -10,9 +10,11 @@
 | community | health 100%；secret scanning / push protection / Dependabot 已开 |
 | github_suggestions | Ubuntu CI 失败（需要 macOS dirfd）；Dependabot 开发依赖告警；建议 CodeQL |
 | follow_up | CI 改 macos-latest；electron-builder 26.15.3 / tsx 4.23.12；补 CodeQL |
-| ci_macos | typecheck PASS；fast 1777/1785 过，剩 ffmpeg / Electron 二进制 / dist-mcp / 浅克隆 git 历史 |
+| ci_macos | 上次 32713375028 失败 6 项；8be52e2 已补 ffmpeg/electron/build:mcp/fetch-depth 0 |
+| ci_run | main CI 32714879168 in_progress：checkout/setup-node/ffmpeg/npm ci/electron 已绿，正在 Build MCP → typecheck → fast tests |
+| codeql_run | main CodeQL 32714879170 in_progress（analyze） |
 | local_gate | `typecheck:app` PASS；fast 1784 tests PASS；生产 audit 0 |
-| earliest_next | CI 补 ffmpeg、electron install.js、build:mcp、fetch-depth 0 |
+| earliest_next | 等 32714879168 fast tests；失败则拉日志修 workflow，不 push |
 
 ## 2026-08-22 19:03 CST · N121–N123 产品切片落地（禁止附录-only）
 
