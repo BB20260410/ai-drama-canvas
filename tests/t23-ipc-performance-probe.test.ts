@@ -88,6 +88,24 @@ describe("T23 IPC 性能探针", () => {
     });
   });
 
+  it("结构化记录首卡前冻结、首卡和最终 runtime gate 摘要", () => {
+    const disabled = createT23IpcPerformanceProbe(false, async <T>() => undefined as T);
+    disabled.recordStartupRuntimeGateSnapshot("baseline", 7);
+    expect(disabled.snapshot().startupRuntimeGate).toBeUndefined();
+
+    const enabled = createT23IpcPerformanceProbe(true, async <T>() => undefined as T);
+    enabled.recordStartupRuntimeGateSnapshot("baseline", 7);
+    enabled.recordStartupRuntimeGateSnapshot("first-card", 7);
+    enabled.recordStartupRuntimeGateSnapshot("final", 8);
+    enabled.recordStartupRuntimeGateSnapshot("final", -1);
+    expect(enabled.snapshot().startupRuntimeGate).toEqual({
+      schemaVersion: 1,
+      baselineMutationChecks: 7,
+      firstCardMutationChecks: 7,
+      finalMutationChecks: 8,
+    });
+  });
+
   it("记录全局与逐通道峰值，并在成功/失败后都归零", async () => {
     const first = deferred<string>();
     const second = deferred<string>();

@@ -57,7 +57,8 @@
         aria-label="混合工程工作区"
         data-testid="hybrid-drama-workspace-switch">
         <span>共用工程</span>
-        <button type="button" aria-pressed="false" data-testid="hybrid-switch-novel" :disabled="managedWorkspaceSwitching || projectSwitching" @click="switchManagedWorkspace('novel')">小说创作</button>
+        <small v-if="workspaceSwitchBlockedReason" data-testid="hybrid-workspace-switch-blocked" role="status">{{ workspaceSwitchBlockedReason }}</small>
+        <button type="button" aria-pressed="false" data-testid="hybrid-switch-novel" :disabled="projectOperationBusy" :title="workspaceSwitchBlockedReason || undefined" @click="switchManagedWorkspace('novel')">{{ managedWorkspaceSwitching ? "切换中" : "小说创作" }}</button>
         <button type="button" class="active" aria-pressed="true" data-testid="hybrid-switch-drama">短剧制作</button>
       </nav>
       <MaterialStudioView
@@ -70,6 +71,7 @@
         :script-align-api="studioScriptAlignApi"
         :multimedia-timeline-api="studioMultimediaTimelineApi"
         :external-mode-request="studioModeRequest"
+        @initial-unit-cards-committed="onManagedInitialUnitCardsCommitted"
         @studio-context-changed="persistStudioContext"
         @project-restored="openRestoredProject"
         @binding-changed="showMessage"
@@ -96,7 +98,7 @@
       <div class="first-run-actions">
         <button class="first-run-card primary" type="button" data-testid="first-run-create" :disabled="projectOperationBusy" @click="openProjectCenter"><FolderPlus :size="22" /><b>新建本地工程</b><span>可选择小说或短剧</span></button>
         <button class="first-run-card" type="button" data-testid="first-run-recent" :disabled="projectOperationBusy || !projects.some(project => project.available)" @click="openMostRecentProject"><Clock3 :size="22" /><b>{{ projectSwitching ? "正在打开工程" : "打开最近工程" }}</b><span>继续上次位置</span></button>
-        <button class="first-run-card" type="button" data-testid="first-run-import" :disabled="projectOperationBusy" @click="importProject"><FolderKanban :size="22" /><b>导入已有工程</b><span>先预检，再接入</span></button>
+        <button class="first-run-card" type="button" data-testid="first-run-import" :disabled="projectOperationBusy || pickingProjectRoot" :title="pickingProjectRoot ? '正在处理，不能再选择工程目录' : undefined" @click="importProject"><FolderKanban :size="22" /><b>导入已有工程</b><span>先预检，再接入</span></button>
       </div>
       <small class="first-run-safety">默认保存到 {{ defaultManagedParentRoot || "文稿/AI漫剧项目" }}；不会扫描其他工程。</small>
     </section>
@@ -150,12 +152,12 @@
 
       <section ref="canvasWrap" class="canvas-wrap" :class="{ 'semantic-compact': zoom < 0.35 }">
         <div class="canvas-toolbox">
-          <button type="button" title="添加导演批注" @click="createCanvasEntity('note')"><StickyNote :size="14" /><span>批注</span></button>
-          <button type="button" title="添加自定义分组" @click="createCanvasEntity('group')"><Frame :size="14" /><span>分组</span></button>
-          <button type="button" title="撤销（⌘Z）" :disabled="!canvasHistory.canUndo" @click="undoCanvas"><Undo2 :size="14" /></button>
-          <button type="button" title="重做（⌘⇧Z）" :disabled="!canvasHistory.canRedo" @click="redoCanvas"><Redo2 :size="14" /></button>
+          <button type="button" :disabled="savingCanvasEntity || canvasHistoryBusy" :title="(savingCanvasEntity || canvasHistoryBusy) ? '正在处理，不能再添加导演批注' : '添加导演批注'" @click="createCanvasEntity('note')"><StickyNote :size="14" /><span>批注</span></button>
+          <button type="button" :disabled="savingCanvasEntity || canvasHistoryBusy" :title="(savingCanvasEntity || canvasHistoryBusy) ? '正在处理，不能再添加自定义分组' : '添加自定义分组'" @click="createCanvasEntity('group')"><Frame :size="14" /><span>分组</span></button>
+          <button type="button" :title="(canvasHistoryBusy || savingCanvasEntity) ? '正在处理画布历史，不能再撤销' : '撤销（⌘Z）'" :disabled="!canvasHistory.canUndo || canvasHistoryBusy || savingCanvasEntity" @click="undoCanvas"><Undo2 :size="14" /></button>
+          <button type="button" :title="(canvasHistoryBusy || savingCanvasEntity) ? '正在处理画布历史，不能再重做' : '重做（⌘⇧Z）'" :disabled="!canvasHistory.canRedo || canvasHistoryBusy || savingCanvasEntity" @click="redoCanvas"><Redo2 :size="14" /></button>
           <select v-if="linkMode" v-model="linkKind" title="关系类型"><option value="continuity">连续性</option><option value="reference">参考</option><option value="dependency">依赖</option><option value="comment">说明</option></select>
-          <button type="button" :class="{ active: linkMode }" title="依次点击两个节点建立关系" @click="toggleLinkMode"><Link2 :size="14" /><span>{{ linkSourceId ? '选择目标' : '连线' }}</span></button>
+          <button type="button" :class="{ active: linkMode }" :disabled="savingCanvasEntity || canvasHistoryBusy" :title="(savingCanvasEntity || canvasHistoryBusy) ? '正在处理，不能再建立关系线' : '依次点击两个节点建立关系'" @click="toggleLinkMode"><Link2 :size="14" /><span>{{ linkSourceId ? '选择目标' : '连线' }}</span></button>
         </div>
         <div v-if="linkMode" class="link-mode-hint"><MousePointer2 :size="13" /> {{ linkSourceId ? `起点 ${linkSourceId}，请选择目标节点` : '请选择关系线起点' }}</div>
         <div v-if="loading && !index" class="loading-screen"><span></span><p>正在读取真实制作进度…</p></div>
@@ -314,6 +316,7 @@
       :switching="projectSwitching"
       :removing-root="projectRemovingRoot"
       :refreshing="projectsRefreshing"
+      :picking="pickingProjectRoot"
       :default-parent-root="defaultManagedParentRoot"
       @close="closeProjectCenter"
       @open="openProject"
@@ -339,7 +342,7 @@
           <div class="canvas-editor-grid"><label><span>颜色</span><select v-model="canvasEditor.color"><option value="gold">金色</option><option value="blue">蓝色</option><option value="green">绿色</option><option value="red">红色</option><option value="purple">紫色</option><option value="gray">灰色</option></select></label><label><span>宽度</span><input v-model.number="canvasEditor.width" type="number" min="220" max="2400" /></label><label><span>高度</span><input v-model.number="canvasEditor.height" type="number" min="120" max="1800" /></label></div>
           <label v-if="canvasEditor.kind === 'group'"><span>显式成员节点 ID</span><textarea v-model="canvasEditor.memberText" rows="4" placeholder="每行一个节点 ID；也可仅作为视觉分组框"></textarea></label>
         </div>
-        <footer><button class="ghost-button" type="button" @click="canvasEditor = null">取消</button><button class="primary-button" type="button" :disabled="savingCanvasEntity || !canvasEditor.title.trim()" @click="saveCanvasEntity"><Save :size="14" /> {{ savingCanvasEntity ? '保存中' : '保存到侧车' }}</button></footer>
+        <footer><button class="ghost-button" type="button" @click="canvasEditor = null">取消</button><button class="primary-button" type="button" data-testid="legacy-canvas-save-entity" :disabled="savingCanvasEntity || canvasHistoryBusy || !canvasEditor.title.trim()" :title="(savingCanvasEntity || canvasHistoryBusy) ? '正在处理，不能再保存画布实体' : undefined" @click="saveCanvasEntity"><Save :size="14" /> {{ savingCanvasEntity ? '保存中' : '保存到侧车' }}</button></footer>
       </section>
     </div>
 
@@ -384,7 +387,7 @@ import {
 import { createProjectScopedActionGate, type ProjectScopedActionToken } from "./project-scoped-action-gate";
 import { statusClass } from "./utils";
 import { resolveStoryboardWizardAssets } from "./storyboard-wizard-assets";
-import { markT23RendererStartup } from "./t23-renderer-startup-probe";
+import { markT23RendererStartup, recordT23StartupRuntimeGate } from "./t23-renderer-startup-probe";
 import { createManagedStudioModulePreloader } from "./managed-studio-module-preload";
 import type { CreateManagedProjectOptions, ProjectShell } from "@core/managed-project";
 import type { ListedProjectSummary } from "@core/service";
@@ -480,6 +483,7 @@ const projectsRefreshing = ref(false);
 const rootRuntimeGateState = ref<"checking" | "allowed" | "blocked" | "unknown">("checking");
 const rootRuntimeGateReasons = ref<string[]>([]);
 const rootRuntimeGateMessage = ref("只进行豁免的运行时诊断；核对通过前不会读取或修改任何工程。");
+let t23StartupMutationChecksAtRuntimeGate: number | undefined;
 const creatingManagedProject = ref(false);
 const projectSwitching = ref(false);
 const projectRemovingRoot = ref("");
@@ -496,11 +500,20 @@ type RendererManagedProjectOperation = {
 };
 const managedProjectOperation = ref<RendererManagedProjectOperation | null>(null);
 const externalManagedProjectBusy = computed(() => managedProjectOperation.value?.busy === true);
+const pickingProjectRoot = ref(false);
 const projectOperationBusy = computed(() => creatingManagedProject.value
   || projectSwitching.value
   || managedWorkspaceSwitching.value
   || Boolean(projectRemovingRoot.value)
   || externalManagedProjectBusy.value);
+const workspaceSwitchBlockedReason = computed(() => {
+  if (managedWorkspaceSwitching.value) return "正在切换工作区";
+  if (projectSwitching.value) return "正在切换工程";
+  if (projectRemovingRoot.value) return "正在移除工程，不能切换工作区";
+  if (creatingManagedProject.value) return "正在创建工程";
+  if (externalManagedProjectBusy.value) return "工程操作进行中，不能切换工作区";
+  return "";
+});
 const showImportWizard = ref(false);
 const importRoot = ref("");
 const activeView = ref<ModuleView>("canvas");
@@ -542,6 +555,7 @@ async function setLegacyCanvasZoom(target: number): Promise<boolean> {
 
 const canvasState = ref<CanvasSemanticState>({ schemaVersion: 1, revision: 0, entities: [], links: [], updatedAt: new Date(0).toISOString() });
 const canvasHistory = ref<CanvasHistoryInfo>({ canUndo: false, canRedo: false, undoCount: 0, redoCount: 0, revision: 0 });
+const canvasHistoryBusy = ref(false);
 const linkMode = ref(false);
 const linkSourceId = ref("");
 const linkKind = ref<CanvasLinkKind>("continuity");
@@ -567,6 +581,9 @@ let activeLegacyScanToken: LegacyProjectEpochToken | null = null;
 let activeLegacyWatcherIdentity: Awaited<ReturnType<typeof window.canvasApi.startWatch>> | null = null;
 const layoutPositions = ref<Record<string, { x: number; y: number }>>({});
 let layoutPositionsKey = "";
+const layoutPositionsBusy = ref(false);
+const persistStudioContextBusy = ref(false);
+let pendingStudioContext: { mode: string; unitId?: string; panelId?: string } | null = null;
 
 interface ProjectUiSnapshot {
   projectRoot: string;
@@ -719,6 +736,10 @@ function invalidateLegacyProjectAsyncState(): {
   scanInProgress.value = false;
   scanCancelling.value = false;
   savingCanvasEntity.value = false;
+  canvasHistoryBusy.value = false;
+  layoutPositionsBusy.value = false;
+  persistStudioContextBusy.value = false;
+  pendingStudioContext = null;
   loading.value = false;
   return { epoch, activeScan };
 }
@@ -1699,6 +1720,10 @@ onMounted(async () => {
   markT23RendererStartup("app-runtime-gate-start");
   try {
     const gate = await window.canvasApi.getRuntimeWriteGate();
+    if ("runtimeGateMetrics" in gate && typeof gate.runtimeGateMetrics?.mutationChecks === "number") {
+      t23StartupMutationChecksAtRuntimeGate = gate.runtimeGateMetrics.mutationChecks;
+      recordT23StartupRuntimeGate("baseline", t23StartupMutationChecksAtRuntimeGate);
+    }
     rootRuntimeGateReasons.value = Array.isArray("reasons" in gate ? gate.reasons : undefined)
       ? [...gate.reasons]
       : [];
@@ -1739,6 +1764,7 @@ onMounted(async () => {
     showMessage("画布批注与关系已实时同步");
   });
   window.addEventListener("keydown", onCanvasShortcut);
+  window.addEventListener("focusin", onProductionFlowControlsFocusIn);
   removeManagedProjectOperationListener = window.canvasApi.onManagedProjectOperationState(applyManagedProjectOperationState);
   const activeProjectPromise = window.canvasApi.getActiveProject();
   const startupManagedShellPromise = activeProjectPromise.then(async (activeProject) => {
@@ -1752,6 +1778,16 @@ onMounted(async () => {
       ? restoreManagedWorkspaceView(shell).then((workspaceView) => {
         if (workspaceView === "drama") {
           managedStudioModulePreloader.warm();
+          // units 是纯读取，可与 CAS 对账并行。generation watcher 仍在对账成功后由 main 挂载。
+          markT23RendererStartup("app-dashboard-units-prefetch-start");
+          void studioDashboardApi.getDashboard(activeProject.primaryRoot, {
+            operation: "units",
+            limit: 36,
+          }).then(() => {
+            markT23RendererStartup("app-dashboard-units-prefetch-ready");
+          }, () => {
+            markT23RendererStartup("app-dashboard-units-prefetch-failed");
+          });
         }
         return workspaceView;
       })
@@ -1770,25 +1806,25 @@ onMounted(async () => {
       }
       if (!startupManagedShell?.shell || startupManagedShell.projectRoot !== activeProject.primaryRoot) return null;
       markT23RendererStartup("app-startup-reconcile-start");
-      const shell = await window.canvasApi.reconcileActiveManagedProjectStartup({
+      const preflight = await window.canvasApi.preflightActiveManagedProjectStartup({
         projectRoot: activeProject.primaryRoot,
         activationId: activeProject.activationId,
       });
-      markT23RendererStartup("app-startup-reconcile-ready");
-      const workspaceView = await startupManagedShell.workspaceViewPromise;
-      if (workspaceView === "drama") {
-        // 对账已用 root+activationId CAS 确认活动工程后，才允许预发会确保 generation
-        // watcher 的默认 units IPC。coalescer 只共享仍在进行中的同根同参数请求，不缓存。
-        markT23RendererStartup("app-dashboard-units-prefetch-start");
-        void studioDashboardApi.getDashboard(activeProject.primaryRoot, {
-          operation: "units",
-          limit: 36,
-        }).then(() => {
-          markT23RendererStartup("app-dashboard-units-prefetch-ready");
-        }, () => {
-          markT23RendererStartup("app-dashboard-units-prefetch-failed");
+      // 只有只读 preflight 明确给出 compatibility repair-required，才跨过 strong
+      // reconcile 边界。错误、未知或 manifest/CAS 漂移绝不回退为写路径。
+      let shell;
+      if (preflight.kind === "healthy") {
+        shell = preflight.shell;
+      } else if (preflight.kind === "repair-required") {
+        shell = await window.canvasApi.reconcileActiveManagedProjectStartup({
+          projectRoot: activeProject.primaryRoot,
+          activationId: activeProject.activationId,
         });
+      } else {
+        throw new Error("受管工程启动预检返回未知状态，拒绝进入 compatibility repair。 ");
       }
+      markT23RendererStartup("app-startup-reconcile-ready");
+      await startupManagedShell.workspaceViewPromise;
       return { projectRoot: activeProject.primaryRoot, shell };
     });
   const [activeProject, registeredProjects, defaultProjectsRoot, operationState, startupManagedShell, startupReconciled] = await Promise.all([
@@ -1877,6 +1913,7 @@ onBeforeUnmount(() => {
   removeManagedProjectOperationListener?.();
   removeWindowCloseListener?.();
   window.removeEventListener("keydown", onCanvasShortcut);
+  window.removeEventListener("focusin", onProductionFlowControlsFocusIn);
   if (messageTimer) clearTimeout(messageTimer);
   if (legacyCanvasSearchTimer) clearTimeout(legacyCanvasSearchTimer);
   if (legacyFlowRebuildTimer) clearTimeout(legacyFlowRebuildTimer);
@@ -1963,6 +2000,7 @@ async function loadIndex(
 }
 
 async function scanNow() {
+  if (projectOperationBusy.value) return;
   if (projectSwitching.value || activeLegacyScanToken) return;
   const token = captureLegacyProjectToken();
   if (!token || !isLegacyProjectTokenCurrent(token)) return;
@@ -2000,7 +2038,12 @@ async function cancelScanNow() {
   const token = activeLegacyScanToken;
   if (!token || !isLegacyProjectTokenCurrent(token) || scanCancelling.value) return;
   scanCancelling.value = true;
-  const accepted = await window.canvasApi.cancelScan(token.root).catch(() => false);
+  const accepted = await window.canvasApi.cancelScan(token.root).catch((error) => {
+    if (isLegacyProjectTokenCurrent(token)) {
+      showMessage(`扫描没取消掉：${error instanceof Error ? error.message : String(error)}`, true);
+    }
+    return false;
+  });
   if (isLegacyProjectTokenCurrent(token) && !accepted) scanCancelling.value = false;
 }
 
@@ -2159,6 +2202,35 @@ function requestProjectList(): Promise<ListedProjectSummary[]> {
   return projectListRefreshController.requestList();
 }
 
+function onManagedInitialUnitCardsCommitted(payload: {
+  projectRoot: string;
+  startupMutationChecks?: number;
+}): void {
+  // 首卡已经提交到 DOM 后才启动 strong CAS+watcher 生命周期；不得 await 它或把
+  // watcher 创建串回 units 首卡路径。activationId 从只读活动投影重取，避免工程
+  // 已切换时用旧 UI 闭包挂错 watcher。
+  void (async () => {
+    const active = await window.canvasApi.getActiveProject();
+    if (!active?.available || active.primaryRoot !== payload.projectRoot || !active.activationId) return;
+    if (typeof t23StartupMutationChecksAtRuntimeGate === "number"
+      && typeof payload.startupMutationChecks === "number") {
+      recordT23StartupRuntimeGate("first-card", payload.startupMutationChecks);
+      markT23RendererStartup(
+        `app-first-card-startup-mutation-checks:${t23StartupMutationChecksAtRuntimeGate}:${payload.startupMutationChecks}`,
+      );
+    }
+    markT23RendererStartup("app-generation-watcher-lifecycle-start");
+    await window.canvasApi.ensureActiveManagedProjectGenerationWatcher({
+      projectRoot: active.primaryRoot,
+      activationId: active.activationId,
+    });
+    markT23RendererStartup("app-generation-watcher-lifecycle-ready");
+  })().catch(() => {
+    // watcher 是首卡后的增强；失败不倒灌首卡，T23 时间线会保留失败状态供门禁拒绝。
+    markT23RendererStartup("app-generation-watcher-lifecycle-failed");
+  });
+}
+
 async function refreshProjects(): Promise<void> {
   await requestProjectList();
 }
@@ -2203,18 +2275,28 @@ async function openMostRecentProject() {
 }
 
 async function chooseManagedParentRoot() {
-  if (projectOperationBusy.value) return;
-  const picked = await window.canvasApi.pickManagedProjectsParent(defaultManagedParentRoot.value);
-  if (picked && !projectOperationBusy.value) defaultManagedParentRoot.value = picked;
+  if (projectOperationBusy.value || pickingProjectRoot.value) return;
+  pickingProjectRoot.value = true;
+  try {
+    const picked = await window.canvasApi.pickManagedProjectsParent(defaultManagedParentRoot.value);
+    if (picked && !projectOperationBusy.value) defaultManagedParentRoot.value = picked;
+  } finally {
+    pickingProjectRoot.value = false;
+  }
 }
 
 async function importProject() {
-  if (projectOperationBusy.value) return;
-  const next = await window.canvasApi.pickProject("选择 AI 漫剧项目主根");
-  if (!next || projectOperationBusy.value) return;
-  importRoot.value = next;
-  hideProjectCenter();
-  showImportWizard.value = true;
+  if (projectOperationBusy.value || pickingProjectRoot.value) return;
+  pickingProjectRoot.value = true;
+  try {
+    const next = await window.canvasApi.pickProject("选择 AI 漫剧项目主根");
+    if (!next || projectOperationBusy.value) return;
+    importRoot.value = next;
+    hideProjectCenter();
+    showImportWizard.value = true;
+  } finally {
+    pickingProjectRoot.value = false;
+  }
 }
 
 async function switchManagedWorkspace(next: ManagedWorkspaceView): Promise<void> {
@@ -2301,18 +2383,33 @@ async function openRestoredProject(restoredRoot: string) {
 }
 
 async function persistStudioContext(context: { mode: string; unitId?: string; panelId?: string }) {
-  if (!projectRoot.value || !managedShell.value) return;
-  const mode = context.mode === "generation" ? "dashboard"
-    : context.mode === "agent" || context.mode === "help" ? "canvas"
-      : context.mode;
-  if (!["canvas", "dashboard", "library", "binding", "continuity-review"].includes(mode)) return;
-  await window.canvasApi.setActiveStudioContext(projectRoot.value, {
-    mode: mode as "canvas" | "dashboard" | "library" | "binding" | "continuity-review",
-    focus: {
-      ...(context.unitId ? { unitId: context.unitId } : {}),
-      ...(context.panelId ? { panelId: context.panelId } : {}),
-    },
-  }).catch((reason) => showMessage(reason instanceof Error ? reason.message : String(reason), true));
+  pendingStudioContext = context;
+  if (persistStudioContextBusy.value || projectSwitching.value || projectRemovingRoot.value) return;
+  persistStudioContextBusy.value = true;
+  try {
+    while (pendingStudioContext) {
+      const next = pendingStudioContext;
+      pendingStudioContext = null;
+      const root = projectRoot.value;
+      if (!root || !managedShell.value) return;
+      const mode = next.mode === "generation" ? "dashboard"
+        : next.mode === "agent" || next.mode === "help" ? "canvas"
+          : next.mode;
+      if (!["canvas", "dashboard", "library", "binding", "continuity-review"].includes(mode)) continue;
+      await window.canvasApi.setActiveStudioContext(root, {
+        mode: mode as "canvas" | "dashboard" | "library" | "binding" | "continuity-review",
+        focus: {
+          ...(next.unitId ? { unitId: next.unitId } : {}),
+          ...(next.panelId ? { panelId: next.panelId } : {}),
+        },
+      }).catch((reason) => showMessage(reason instanceof Error ? reason.message : String(reason), true));
+    }
+  } finally {
+    persistStudioContextBusy.value = false;
+    if (pendingStudioContext && !projectSwitching.value && !projectRemovingRoot.value) {
+      void persistStudioContext(pendingStudioContext);
+    }
+  }
 }
 
 async function onProjectDrop(event: DragEvent) {
@@ -2663,20 +2760,30 @@ async function persistLayoutPositions(
   expectedToken?: LegacyProjectEpochToken,
 ): Promise<boolean> {
   if (projectSwitching.value || projectRemovingRoot.value) return false;
+  if (layoutPositionsBusy.value) {
+    showMessage("正在保存布局，不能再改卡片位置", true);
+    return false;
+  }
   const token = expectedToken ?? captureLegacyProjectToken();
   if (!token || !isLegacyProjectTokenCurrent(token)) return false;
-  const frozenViewKey = viewKey.value;
-  const key = `${token.root}::${frozenViewKey}`;
-  // 先并入缓存：拖拽存盘的 IPC 窗口内若触发 rebuild，也能读到新坐标而不是弹回旧坐标（审核轻#1）。
-  if (layoutPositionsKey === key) {
-    layoutPositions.value = { ...layoutPositions.value, ...positions };
-  }
+  // 专用 layout busy：saveCanvasEntity/removeCanvasEntity 已持有别的锁再调本函数，复用 canvasHistoryBusy 会自锁。
+  layoutPositionsBusy.value = true;
   try {
-    await window.canvasApi.saveLayout(token.root, frozenViewKey, positions);
-    return isLegacyProjectTokenCurrent(token);
-  } catch (error) {
-    if (isLegacyProjectTokenCurrent(token)) throw error;
-    return false;
+    const frozenViewKey = viewKey.value;
+    const key = `${token.root}::${frozenViewKey}`;
+    // 先并入缓存：拖拽存盘的 IPC 窗口内若触发 rebuild，也能读到新坐标而不是弹回旧坐标（审核轻#1）。
+    if (layoutPositionsKey === key) {
+      layoutPositions.value = { ...layoutPositions.value, ...positions };
+    }
+    try {
+      await window.canvasApi.saveLayout(token.root, frozenViewKey, positions);
+      return isLegacyProjectTokenCurrent(token);
+    } catch (error) {
+      if (isLegacyProjectTokenCurrent(token)) throw error;
+      return false;
+    }
+  } finally {
+    if (isLegacyProjectTokenCurrent(token)) layoutPositionsBusy.value = false;
   }
 }
 
@@ -2760,6 +2867,7 @@ function canvasCenter(kind: CanvasEntityKind) {
 }
 
 function createCanvasEntity(kind: CanvasEntityKind) {
+  if (savingCanvasEntity.value || canvasHistoryBusy.value) return;
   canvasEditor.value = {
     kind,
     title: kind === "note" ? "新导演批注" : "新制作分组",
@@ -2774,19 +2882,20 @@ function createCanvasEntity(kind: CanvasEntityKind) {
 }
 
 function editCanvasEntity(entity: CanvasEntity) {
+  if (savingCanvasEntity.value || canvasHistoryBusy.value) return;
   canvasEditor.value = { ...entity, position: { ...entity.position }, memberOffsets: { ...entity.memberOffsets }, memberText: entity.memberIds.join("\n") };
 }
 
 async function saveCanvasEntity() {
-  if (projectSwitching.value || projectRemovingRoot.value) return;
+  if (projectSwitching.value || projectRemovingRoot.value || savingCanvasEntity.value || canvasHistoryBusy.value) return;
   const token = captureLegacyProjectToken();
   if (!canvasEditor.value || !token || !isLegacyProjectTokenCurrent(token)) return;
+  savingCanvasEntity.value = true;
   const draft: CanvasEditorDraft = {
     ...canvasEditor.value,
     position: { ...canvasEditor.value.position },
     memberOffsets: { ...canvasEditor.value.memberOffsets },
   };
-  savingCanvasEntity.value = true;
   try {
     const memberIds = draft.memberText.split(/[\n,，]+/).map((value) => value.trim()).filter(Boolean);
     const previous = draft.id ? canvasState.value.entities.find((entity) => entity.id === draft.id) : undefined;
@@ -2838,8 +2947,13 @@ async function saveCanvasEntity() {
 
 async function saveCanvasEntityMove(id: string, position: { x: number; y: number }) {
   if (projectSwitching.value || projectRemovingRoot.value) return;
+  if (canvasHistoryBusy.value || savingCanvasEntity.value) {
+    showMessage("正在处理，不能再移动画布实体", true);
+    return;
+  }
   const token = captureLegacyProjectToken();
   if (!token || !isLegacyProjectTokenCurrent(token)) return;
+  canvasHistoryBusy.value = true;
   try {
     const nextState = await window.canvasApi.moveCanvasEntities(token.root, {
       [id]: { x: position.x, y: position.y },
@@ -2849,15 +2963,22 @@ async function saveCanvasEntityMove(id: string, position: { x: number; y: number
     await refreshCanvasHistory(token);
   } catch (error) {
     if (isLegacyProjectTokenCurrent(token)) showMessage(error instanceof Error ? error.message : String(error), true);
+  } finally {
+    if (isLegacyProjectTokenCurrent(token)) canvasHistoryBusy.value = false;
   }
 }
 
 async function saveGroupMemberOffset(groupId: string, memberId: string, position: { x: number; y: number }) {
   if (projectSwitching.value || projectRemovingRoot.value) return;
+  if (canvasHistoryBusy.value || savingCanvasEntity.value) {
+    showMessage("正在处理，不能再移动组内卡片", true);
+    return;
+  }
   const token = captureLegacyProjectToken();
   if (!token || !isLegacyProjectTokenCurrent(token)) return;
   const group = canvasState.value.entities.find((entity) => entity.id === groupId && entity.kind === "group");
   if (!group) return;
+  canvasHistoryBusy.value = true;
   try {
     const result = await window.canvasApi.upsertCanvasEntity(token.root, {
       ...group,
@@ -2870,16 +2991,20 @@ async function saveGroupMemberOffset(groupId: string, memberId: string, position
     await refreshCanvasHistory(token);
   } catch (error) {
     if (isLegacyProjectTokenCurrent(token)) showMessage(error instanceof Error ? error.message : String(error), true);
+  } finally {
+    if (isLegacyProjectTokenCurrent(token)) canvasHistoryBusy.value = false;
   }
 }
 
 async function removeCanvasEntity(id: string) {
-  if (projectSwitching.value || projectRemovingRoot.value) return;
+  if (projectSwitching.value || projectRemovingRoot.value || canvasHistoryBusy.value || savingCanvasEntity.value) return;
   const token = captureLegacyProjectToken();
   if (!token || !isLegacyProjectTokenCurrent(token)) return;
   const entity = canvasState.value.entities.find((candidate) => candidate.id === id);
-  if (!entity || !window.confirm(`删除画布${entity.kind === "note" ? "批注" : "分组"}“${entity.title}”？\n不会删除任何素材文件。`)) return;
+  if (!entity) return;
+  canvasHistoryBusy.value = true;
   try {
+    if (!window.confirm(`删除画布${entity.kind === "note" ? "批注" : "分组"}“${entity.title}”？\n不会删除任何素材文件。`)) return;
     if (entity.kind === "group") {
       const releasedPositions = Object.fromEntries(entity.memberIds.flatMap((memberId) => {
         const offset = entity.memberOffsets[memberId];
@@ -2898,16 +3023,19 @@ async function removeCanvasEntity(id: string) {
     showMessage("画布实体已删除，素材文件未改动");
   } catch (error) {
     if (isLegacyProjectTokenCurrent(token)) showMessage(error instanceof Error ? error.message : String(error), true);
+  } finally {
+    if (isLegacyProjectTokenCurrent(token)) canvasHistoryBusy.value = false;
   }
 }
 
 function toggleLinkMode() {
+  if (savingCanvasEntity.value || canvasHistoryBusy.value) return;
   linkMode.value = !linkMode.value;
   linkSourceId.value = "";
 }
 
 async function chooseLinkEndpoint(nodeId: string) {
-  if (projectSwitching.value || projectRemovingRoot.value) return;
+  if (projectSwitching.value || projectRemovingRoot.value || canvasHistoryBusy.value || savingCanvasEntity.value) return;
   if (!linkSourceId.value) {
     linkSourceId.value = nodeId;
     showMessage("已选择关系线起点，请点击目标节点");
@@ -2921,6 +3049,7 @@ async function chooseLinkEndpoint(nodeId: string) {
   if (!token || !isLegacyProjectTokenCurrent(token)) return;
   const sourceId = linkSourceId.value;
   const kind = linkKind.value;
+  canvasHistoryBusy.value = true;
   try {
     const labels: Record<CanvasLinkKind, string> = { continuity: "人工连续性", reference: "人工参考", dependency: "人工依赖", comment: "人工说明" };
     const result = await window.canvasApi.upsertCanvasLink(token.root, {
@@ -2939,17 +3068,20 @@ async function chooseLinkEndpoint(nodeId: string) {
     showMessage("人工关系线已写入画布侧车");
   } catch (error) {
     if (isLegacyProjectTokenCurrent(token)) showMessage(error instanceof Error ? error.message : String(error), true);
+  } finally {
+    if (isLegacyProjectTokenCurrent(token)) canvasHistoryBusy.value = false;
   }
 }
 
 async function onEdgeClick(event: { edge: Edge }) {
-  if (projectSwitching.value || projectRemovingRoot.value) return;
+  if (projectSwitching.value || projectRemovingRoot.value || canvasHistoryBusy.value || savingCanvasEntity.value) return;
   const token = captureLegacyProjectToken();
   if (!token || !isLegacyProjectTokenCurrent(token)) return;
   const link = canvasState.value.links.find((candidate) => candidate.id === event.edge.id);
   if (!link) return;
-  if (!window.confirm(`删除关系线“${link.label || link.kind}”？\n不会修改生产节点或素材文件。`)) return;
+  canvasHistoryBusy.value = true;
   try {
+    if (!window.confirm(`删除关系线“${link.label || link.kind}”？\n不会修改生产节点或素材文件。`)) return;
     const nextState = await window.canvasApi.deleteCanvasLink(token.root, link.id);
     if (!isLegacyProjectTokenCurrent(token)) return;
     canvasState.value = nextState;
@@ -2959,6 +3091,8 @@ async function onEdgeClick(event: { edge: Edge }) {
     showMessage("人工关系线已删除");
   } catch (error) {
     if (isLegacyProjectTokenCurrent(token)) showMessage(error instanceof Error ? error.message : String(error), true);
+  } finally {
+    if (isLegacyProjectTokenCurrent(token)) canvasHistoryBusy.value = false;
   }
 }
 
@@ -2972,9 +3106,10 @@ async function refreshCanvasHistory(expectedToken?: LegacyProjectEpochToken): Pr
 }
 
 async function undoCanvas() {
-  if (projectSwitching.value || projectRemovingRoot.value) return;
+  if (projectSwitching.value || projectRemovingRoot.value || canvasHistoryBusy.value || savingCanvasEntity.value) return;
   const token = captureLegacyProjectToken();
   if (!token || !isLegacyProjectTokenCurrent(token) || !canvasHistory.value.canUndo) return;
+  canvasHistoryBusy.value = true;
   try {
     const result = await window.canvasApi.undoCanvasSemanticState(token.root);
     if (!isLegacyProjectTokenCurrent(token)) return;
@@ -2985,13 +3120,16 @@ async function undoCanvas() {
     showMessage("已撤销上一项画布操作");
   } catch (error) {
     if (isLegacyProjectTokenCurrent(token)) showMessage(error instanceof Error ? error.message : String(error), true);
+  } finally {
+    canvasHistoryBusy.value = false;
   }
 }
 
 async function redoCanvas() {
-  if (projectSwitching.value || projectRemovingRoot.value) return;
+  if (projectSwitching.value || projectRemovingRoot.value || canvasHistoryBusy.value || savingCanvasEntity.value) return;
   const token = captureLegacyProjectToken();
   if (!token || !isLegacyProjectTokenCurrent(token) || !canvasHistory.value.canRedo) return;
+  canvasHistoryBusy.value = true;
   try {
     const result = await window.canvasApi.redoCanvasSemanticState(token.root);
     if (!isLegacyProjectTokenCurrent(token)) return;
@@ -3002,15 +3140,69 @@ async function redoCanvas() {
     showMessage("已重做画布操作");
   } catch (error) {
     if (isLegacyProjectTokenCurrent(token)) showMessage(error instanceof Error ? error.message : String(error), true);
+  } finally {
+    canvasHistoryBusy.value = false;
   }
+}
+
+function productionFlowControlsButtons(): HTMLButtonElement[] {
+  return Array.from(document.querySelectorAll<HTMLButtonElement>("#production-flow .vue-flow__controls-button"));
+}
+
+function syncProductionFlowControlsTabIndex(active?: Element | null): void {
+  const items = productionFlowControlsButtons();
+  if (!items.length) return;
+  const index = items.findIndex((el) => el === active || el.contains(active ?? null));
+  const current = index >= 0 ? index : 0;
+  items.forEach((el, i) => {
+    el.tabIndex = i === current ? 0 : -1;
+  });
+}
+
+function onProductionFlowControlsFocusIn(event: FocusEvent): void {
+  const target = event.target as HTMLElement | null;
+  if (!target?.closest("#production-flow .vue-flow__controls-button")) return;
+  syncProductionFlowControlsTabIndex(target);
+}
+
+function moveProductionFlowControlsFocus(key: string): void {
+  const items = productionFlowControlsButtons();
+  if (!items.length) return;
+  const active = document.activeElement;
+  const index = items.findIndex((el) => el === active || el.contains(active));
+  const current = index >= 0 ? index : 0;
+  const next = key === "ArrowDown"
+    ? (current + 1) % items.length
+    : key === "ArrowUp"
+      ? (current - 1 + items.length) % items.length
+      : key === "Home"
+        ? 0
+        : key === "End"
+          ? items.length - 1
+          : current;
+  syncProductionFlowControlsTabIndex(items[next]);
+  items[next]?.focus();
 }
 
 function onCanvasShortcut(event: KeyboardEvent) {
   const target = event.target as HTMLElement | null;
   // P23：受管壳下旧语义画布 undo（正式业务数据）一律早退，杜绝与布局 undo 的跨域双撤销。
   if (!projectRoot.value || managedShell.value || activeView.value !== "canvas" || target?.matches("input,textarea,select,[contenteditable='true']")) return;
+  if (
+    target?.closest("#production-flow .vue-flow__controls-button")
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveProductionFlowControlsFocus(event.key);
+    return;
+  }
   if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "z") return;
   event.preventDefault();
+  if (canvasHistoryBusy.value || savingCanvasEntity.value) return;
   if (event.shiftKey) void redoCanvas();
   else void undoCanvas();
 }
@@ -3025,7 +3217,7 @@ function showMessage(text: string, error = false) {
 
 <style scoped>
 .root-runtime-gate{position:fixed;inset:0;z-index:400;display:grid;place-items:center;padding:28px;background:#090a08;color:#ebe9df}.root-runtime-gate>div{width:min(560px,calc(100vw - 56px));padding:30px;border:1px solid #765f2d;background:#15150f;box-shadow:0 28px 90px rgba(0,0,0,.72)}.root-runtime-gate svg{color:#d7af55}.root-runtime-gate h2{margin:12px 0 8px;font-size:22px}.root-runtime-gate p{margin:0;color:#b9b6a8;line-height:1.7}.root-runtime-gate small{display:block;margin-top:14px;color:#817a67;font:10px ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-word}
-.managed-drama-workspace{height:100%;min-height:0;display:grid;grid-template-rows:minmax(0,1fr);overflow:hidden}.managed-drama-workspace.hybrid{grid-template-rows:auto minmax(0,1fr)}.hybrid-workspace-switch{min-height:38px;display:flex;align-items:center;justify-content:flex-end;gap:0;padding:0 18px;border-bottom:1px solid var(--ui-line);background:var(--ui-surface);color:var(--ui-text-2)}.hybrid-workspace-switch>span{margin-right:auto;color:var(--ui-text-3);font:9px var(--ui-font-mono);letter-spacing:.06em}.hybrid-workspace-switch button{min-height:28px;padding:0 12px;border:1px solid var(--ui-line);border-right:0;background:transparent;color:var(--ui-text-2);font-size:10px;cursor:pointer}.hybrid-workspace-switch button:last-child{border-right:1px solid var(--ui-line)}.hybrid-workspace-switch button.active{background:var(--ui-accent-soft);color:var(--ui-accent-strong);font-weight:650}.hybrid-workspace-switch button:hover:not(:disabled){border-color:var(--ui-accent);color:var(--ui-accent-strong)}.hybrid-workspace-switch button:focus-visible{position:relative;z-index:1;outline:0;box-shadow:var(--ui-focus-ring)}.hybrid-workspace-switch button:disabled{cursor:wait;opacity:.5}
+.managed-drama-workspace{height:100%;min-height:0;display:grid;grid-template-rows:minmax(0,1fr);overflow:hidden}.managed-drama-workspace.hybrid{grid-template-rows:auto minmax(0,1fr)}.hybrid-workspace-switch{min-height:38px;display:flex;align-items:center;justify-content:flex-end;gap:0;padding:0 18px;border-bottom:1px solid var(--ui-line);background:var(--ui-surface);color:var(--ui-text-2)}.hybrid-workspace-switch>span{margin-right:auto;color:var(--ui-text-3);font:9px var(--ui-font-mono);letter-spacing:.06em}.hybrid-workspace-switch button{min-height:28px;padding:0 12px;border:1px solid var(--ui-line);border-right:0;background:transparent;color:var(--ui-text-2);font-size:10px;cursor:pointer}.hybrid-workspace-switch button:last-child{border-right:1px solid var(--ui-line)}.hybrid-workspace-switch button.active{background:var(--ui-accent-soft);color:var(--ui-accent-strong);font-weight:650}.hybrid-workspace-switch button:hover:not(:disabled){border-color:var(--ui-accent);color:var(--ui-accent-strong)}.hybrid-workspace-switch button:focus-visible{position:relative;z-index:1;outline:0;box-shadow:var(--ui-focus-ring)}.hybrid-workspace-switch small{margin-right:10px;color:var(--ui-text-3);font-size:9px}.hybrid-workspace-switch button:disabled{cursor:wait;opacity:.5}
 .managed-project-operation-shield{position:fixed;inset:0;z-index:260;display:grid;place-items:center;padding:24px;background:rgba(5,6,4,.82);backdrop-filter:blur(7px)}.managed-project-operation-shield>div{width:min(460px,calc(100vw - 48px));display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:center;padding:22px;border:1px solid #6d5b32;background:#15140e;box-shadow:0 26px 80px rgba(0,0,0,.58);color:#d7af55}.managed-project-operation-shield svg{grid-row:1/4}.managed-project-operation-shield strong,.managed-project-operation-shield span,.managed-project-operation-shield small{min-width:0;display:block}.managed-project-operation-shield strong{font-size:13px}.managed-project-operation-shield span{color:#aaa58f;font-size:10px}.managed-project-operation-shield small{overflow:hidden;color:#6f7167;font:8px ui-monospace,SFMono-Regular,Menlo,monospace;text-overflow:ellipsis;white-space:nowrap}
 .canvas-toolbox button:disabled { color: #45473f; cursor: default; }
 .canvas-toolbox button:disabled:hover { background: transparent; color: #45473f; }

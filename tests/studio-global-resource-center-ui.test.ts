@@ -204,6 +204,18 @@ describe("总资源中心 renderer 合同", () => {
     expect(reuseMedia).toContain("if (isCurrentProjectResource(item.sourceProject.primaryRoot)) return;");
   });
 
+  it("runReuse 在 pendingReuseKey 时 fail-closed：同 tick 连点不会重复调用", () => {
+    const center = source("src/renderer/src/components/GlobalResourceCenterView.vue");
+    const runReuse = center.slice(
+      center.indexOf("async function runReuse("),
+      center.indexOf("\nfunction ", center.indexOf("async function runReuse(") + 10),
+    );
+    expect(runReuse).toContain("if (!props.api.reuseGlobalResource || pendingReuseKey.value || reuseCompleted(key)) return;");
+    expect(runReuse.indexOf("pendingReuseKey.value || reuseCompleted(key)) return;")).toBeLessThan(
+      runReuse.indexOf("pendingReuseKey.value = key;"),
+    );
+  });
+
   it("调用成功后刷新目标工程概览，并在回到素材库时保留旧页直至新页替换", () => {
     const material = source("src/renderer/src/components/MaterialStudioView.vue");
     const reusedHandler = material.slice(
@@ -303,5 +315,14 @@ describe("总资源分类页签 Tab/Panel 无障碍合同", () => {
     expect(handler).toContain("event.preventDefault()");
     expect(handler).toContain("selectCategory(categories[next]!.kind)");
     expect(handler).toContain('document.getElementById(`global-resource-tab-${categories[next]!.kind}`)?.focus()');
+  });
+});
+
+describe("总资源卡片视口剔除", () => {
+  it("resource-card 使用 content-visibility，离屏卡片跳过同步布局", () => {
+    const center = source("src/renderer/src/components/GlobalResourceCenterView.vue");
+    expect(center).toContain("content-visibility: auto;");
+    expect(center).toContain("contain-intrinsic-size: auto 152px;");
+    expect(center).not.toMatch(/\.resource-card \{[^}]*content-visibility:\s*hidden/);
   });
 });

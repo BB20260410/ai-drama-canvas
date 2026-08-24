@@ -2,7 +2,7 @@
   <section class="settings-view">
     <header class="module-header">
       <div><span class="eyebrow">项目设置</span><h2>扫描范围与自动化边界</h2><p>配置只写入当前项目的 .aicanvas/project.json。</p></div>
-      <button class="primary-button" type="button" :disabled="saving" @click="save"><Save :size="16" /> {{ saving ? "保存中" : "保存并重扫" }}</button>
+      <button class="primary-button" type="button" data-testid="project-settings-save" :disabled="saving" :title="saving ? '正在处理，不能再保存并重扫' : undefined" @click="save"><Save :size="16" /> {{ saving ? "保存中" : "保存并重扫" }}</button>
     </header>
 
     <div class="settings-body">
@@ -123,6 +123,7 @@ function addLock() {
 }
 
 async function save() {
+  if (saving.value) return;
   saving.value = true;
   try {
     draft.sourceRoots = draft.sourceRoots.map((root) => root.trim()).filter(Boolean);

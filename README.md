@@ -1,5 +1,29 @@
 # AI 漫剧无限画布
 
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-22+-green.svg)](package.json)
+
+本地优先的 AI 短剧生产工作台。源码按 **Apache License 2.0** 发布，**完全免费开源**：可自由使用、复制、修改、分发，也可用于商业，无需付费、无需 CLA、没有商业双授权。
+
+本仓库只含软件源码、测试与开发文档。剧本、参考图、CAS 媒体和受管工程（`projects/`）是本机事实源，**不会也不应进入 Git**。应用不内嵌模型、不收集遥测；密钥只走本机环境变量名，从不写入项目目录。
+
+## 快速开始
+
+需要 Node.js 22+。媒体验收与剪辑还需要本机 `ffmpeg` / `ffprobe`。
+
+```bash
+git clone https://github.com/BB20260410/ai-drama-canvas.git
+cd ai-drama-canvas
+npm install
+npm run typecheck:app
+npm test
+npm run dev
+```
+
+许可证见 [LICENSE](LICENSE)，第三方归因见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)，贡献见 [CONTRIBUTING.md](CONTRIBUTING.md)，安全披露见 [SECURITY.md](SECURITY.md)。
+
+---
+
 面向本机 AI 短剧生产的文件驱动工作台。应用扫描真实素材目录，将剧本、硬锁资产、首尾帧、视频和验收状态映射到无限画布，并通过本地 stdio MCP 让 Codex 领取和回写任务。
 
 当前桌面端包含：生产画布、故事图谱、生产设计、分集/原镜头提示词编辑器、15 秒单元清单、原镜头时间线、导演剪辑台、资产库、视频工作台、导演验收、Codex 接续台、可恢复生成队列、任务中心、项目中心和项目设置。文件系统始终是完成状态的事实来源。
@@ -10,7 +34,7 @@
 
 新开 Codex 后只需说“继续当前 AI 漫剧项目”，标准链路固定为：`get_capabilities → get_active_managed_studio_context → readiness / freeze / dispatch(provider=codex) → commit_agent_imagegen_result_bundle → Review`。MCP 工具数量从 `release-manifest.json` 动态读取；已安装 0.2.0（P15）为 183，源码构建自 P19 起为 186，历史文档中的 134/165/180/181 只表示当时快照。合同层仍离线兼容 Grok，但当前正式执行默认且已验收的是 Codex；浏览器、Artlist 和网页自动化不得进入正式供应链。
 
-黄金面具唯一权威图是 `/Users/hxx/Desktop/豆姐参考图.png`，SHA-256 `02e9438ecee038f7d14860da37cb315bf358db4a26fa224e342eee5b592b55a9`；正式资产 `prop-d01-golden-mask` 当前为 revision 9、`approved`。旧 D01 Binding、连续性、冻结包和结果均为 stale 历史，不得提升或覆盖该权威版本。
+权威参考图与硬锁资产保存在本机受管工程里，不在本开源仓库中。旧 Binding、连续性、冻结包和结果不得覆盖当前已批准版本。
 
 生产设计把“原文→章节→故事事件→故事骨架→改编策略→分集剧本→导演规划→视觉圣经→角色/场景/道具/音色资产→正式分镜→首尾帧→视频→成片剪辑→导演总验收→发布版本”保存为 15 阶段显式状态机；每阶段都有明确输入、输出、验收条件、失败路径和 Codex 下一动作。同时维护导演、视觉、角色、世界观 Bible，每单元最多 6 镜、累计不超过 15 秒的正式分镜表，以及父子派生/版本/参考资产关系和角色音色硬锁。Codex 可在修改节点、故事事件、硬锁或 Bible 前分析下游任务、生成结果、分镜和剪辑片段影响。
 

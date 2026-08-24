@@ -1,3 +1,7 @@
+import { createHash } from "node:crypto";
+import { lstat, readFile, readdir } from "node:fs/promises";
+import path from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   executeIdempotentCommand,
@@ -10,8 +14,11 @@ import {
 import {
   initializeStudioContinuityLedger,
   readStudioContinuityOperationReceipt,
+  readStudioContinuityOperationReceiptReadOnly,
   type StudioContinuityWriteResult,
 } from "../src/core/studio-continuity-ledger.js";
+import { withStudioUnitsReadProbe } from "../src/core/studio-units-read-phase-timeline.js";
+import { __setBeforeGenerationWritableOpenHookForTests } from "../src/core/studio-generation-ledger-storage.js";
 import {
   dispatchStudioGenerationPack,
   freezeAndPersistStudioGenerationPack,
@@ -29,6 +36,51 @@ import {
 } from "./helpers/studio-p7-fixture.js";
 
 let fixture: StudioP7Fixture | undefined;
+
+async function generationOwnerFilesystemSnapshot(projectRoot: string): Promise<Record<string, unknown>> {
+  const aicanvas = path.join(projectRoot, ".aicanvas");
+  const snapshot: Record<string, unknown> = {};
+  async function visit(relative: string): Promise<void> {
+    const absolute = path.join(aicanvas, relative);
+    let metadata;
+    try {
+      metadata = await lstat(absolute);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        snapshot[relative] = null;
+        return;
+      }
+      throw error;
+    }
+    const identity = {
+      dev: String(metadata.dev),
+      ino: String(metadata.ino),
+      size: metadata.size,
+      mtimeMs: metadata.mtimeMs,
+      ctimeMs: metadata.ctimeMs,
+    };
+    if (metadata.isDirectory()) {
+      snapshot[relative] = { kind: "directory", ...identity };
+      for (const name of (await readdir(absolute)).sort((left, right) => left.localeCompare(right, "en"))) {
+        await visit(`${relative}/${name}`);
+      }
+      return;
+    }
+    if (!metadata.isFile()) throw new Error(`generation owner 出现非普通文件：${relative}`);
+    snapshot[relative] = {
+      kind: "file",
+      ...identity,
+      sha256: createHash("sha256").update(await readFile(absolute)).digest("hex"),
+    };
+  }
+  for (const relative of [
+    "studio-generation-ledger.sqlite",
+    "studio-generation-ledger.sqlite-wal",
+    "studio-generation-ledger.sqlite-shm",
+    "studio-generation",
+  ]) await visit(relative);
+  return snapshot;
+}
 
 afterEach(async () => {
   delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE;
@@ -57,12 +109,17 @@ async function crashThenRecover(
   } finally {
     delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE;
   }
-  expect((await listCommandLedger(root)).find((entry) => entry.idempotencyKey === first.idempotencyKey))
-    .toMatchObject({
-      status: "unknown",
-      execution: { phase: "side_effect_committed" },
-      durableReconciliation: { schemaVersion: 1, request },
-    });
+  const crashed = (await listCommandLedger(root)).find((entry) => entry.idempotencyKey === first.idempotencyKey);
+  expect(crashed).toMatchObject({
+    status: "unknown",
+    execution: { phase: "side_effect_committed" },
+  });
+  expect(crashed?.durableReconciliation).toBeUndefined();
+  const persisted = JSON.stringify(crashed);
+  expect(persisted).not.toContain("方向修正");
+  expect(persisted).not.toContain("等待逐帧人工核验表情");
+  expect(persisted).not.toContain("崩溃前业务事务已提交的返工修正");
+  expect(persisted).not.toContain("逐帧身份一致");
   const recovered = viaExplicitReconciliation
     ? await reconcileCommand(root, { idempotencyKey: first.idempotencyKey })
     : await executeIdempotentCommand(root, {
@@ -146,6 +203,15 @@ describe("P7 Studio continuity / Review 命令总线", () => {
       replayed: false,
       head: { revision: 1 },
     });
+    const persistedObservation = (await listCommandLedger(fixture.root))
+      .find((entry) => entry.idempotencyKey === firstEnvelope.idempotencyKey);
+    expect(persistedObservation?.result).toMatchObject({
+      schemaVersion: 1,
+      kind: "studio-operation-result-locator",
+      operation: "continuity-observation",
+      entry: { id: observation.entry.id, fingerprint: observation.entry.fingerprint },
+    });
+    expect(JSON.stringify(persistedObservation)).not.toMatch(/石室中央|provenance|P7 命令总线确定性证据/u);
     expect(await readStudioContinuityOperationReceipt(fixture.root, first.requestHash))
       .toMatchObject({ receiptId: observation.receiptId, operationId: first.requestHash, replayed: true });
 
@@ -194,6 +260,33 @@ describe("P7 Studio continuity / Review 命令总线", () => {
       ...correctionEnvelope,
       requestId: "p7-command-request-continuity-correction-replay",
     })).toMatchObject({ replayed: true, result: { receiptId: correction.receiptId } });
+
+    const historicalReplay = await withStudioUnitsReadProbe(true, () => executeIdempotentCommand(fixture!.root, {
+      ...firstEnvelope,
+      requestId: "p7-command-request-continuity-observation-after-correction",
+    }));
+    expect(historicalReplay.value).toMatchObject({
+      status: "succeeded",
+      replayed: true,
+      result: {
+        receiptId: observation.receiptId,
+        operationId: first.requestHash,
+        entry: { id: observation.entry.id },
+        head: { revision: 1 },
+      },
+    });
+    expect((historicalReplay.value.result as StudioContinuityWriteResult).entry).toEqual(observation.entry);
+    expect((historicalReplay.value.result as StudioContinuityWriteResult).head).toEqual(observation.head);
+    const strictReceipt = await withStudioUnitsReadProbe(true, () =>
+      readStudioContinuityOperationReceiptReadOnly(fixture!.root, first.requestHash));
+    expect(strictReceipt.snapshot?.counters).toMatchObject({
+      generationLedgerEnsureCalls: 0,
+      generationLedgerInitializationStarts: 0,
+      productionDirectoryEnsureCalls: 0,
+      productionOpenDatabaseCalls: 0,
+      productionOwnerConnections: 0,
+    });
+    expect(strictReceipt.value).toMatchObject({ receiptId: observation.receiptId, head: { revision: 1 } });
 
     const crashRequest = {
       ...observationRequest,
@@ -247,6 +340,31 @@ describe("P7 Studio continuity / Review 命令总线", () => {
       .rejects.toThrow(/受管素材工程拒绝旧命令 submit_review/u);
     const rejectedKeys = new Set(["p7-command-key-private-operation", "p7-command-key-private-state", "p7-command-key-legacy-review"]);
     expect((await listCommandLedger(fixture.root)).some((entry) => rejectedKeys.has(entry.idempotencyKey))).toBe(false);
+
+    const tamperDb = new DatabaseSync(path.join(fixture.root, ".aicanvas", "studio-generation-ledger.sqlite"));
+    try {
+      tamperDb.exec("DROP TRIGGER studio_continuity_operation_receipts_no_update");
+      tamperDb.exec(`
+        CREATE TRIGGER studio_continuity_operation_receipts_no_update
+        BEFORE UPDATE ON studio_continuity_operation_receipts
+        BEGIN SELECT 1; END
+      `);
+    } finally {
+      tamperDb.close();
+    }
+    const ownerBeforeTamperedReplay = await generationOwnerFilesystemSnapshot(fixture.root);
+    let generationWritableOpens = 0;
+    __setBeforeGenerationWritableOpenHookForTests(() => { generationWritableOpens += 1; });
+    try {
+      await expect(executeIdempotentCommand(fixture.root, {
+        ...firstEnvelope,
+        requestId: "p7-command-request-continuity-observation-tampered-trigger",
+      })).rejects.toThrow(/generation ledger 严格只读 proof 失败/u);
+    } finally {
+      __setBeforeGenerationWritableOpenHookForTests(null);
+    }
+    expect(generationWritableOpens).toBe(0);
+    expect(await generationOwnerFilesystemSnapshot(fixture.root)).toEqual(ownerBeforeTamperedReplay);
   }, 60_000);
 
   it("Generation Review 支持 user 写面、同键回放，并在崩溃后只凭 Review operation receipt 对账", async () => {
@@ -284,13 +402,34 @@ describe("P7 Studio continuity / Review 命令总线", () => {
       headRevision: 1,
       reviewer: "user",
       head: true,
+      current: true,
+      approvedRawEligible: true,
     });
+    const persistedReview = (await listCommandLedger(fixture.root))
+      .find((entry) => entry.idempotencyKey === firstEnvelope.idempotencyKey);
+    expect(persistedReview?.result).toMatchObject({
+      schemaVersion: 1,
+      kind: "studio-operation-result-locator",
+      operation: "generation-review",
+      reviewId: observation.reviewId,
+    });
+    expect(JSON.stringify(persistedReview)).not.toMatch(/桌面用户完成首次生成验收|逐帧身份一致/u);
     expect(await readStudioGenerationReviewOperationOutcome(fixture.root, first.requestHash))
       .toMatchObject({ reviewId: observation.reviewId, fingerprint: observation.fingerprint });
-    expect(await executeIdempotentCommand(fixture.root, {
+    const observationReplay = await executeIdempotentCommand(fixture.root, {
       ...firstEnvelope,
       requestId: "p7-command-request-review-observation-replay",
-    })).toMatchObject({ replayed: true, result: { reviewId: observation.reviewId } });
+    });
+    expect(observationReplay).toMatchObject({
+      replayed: true,
+      result: {
+        reviewId: observation.reviewId,
+        head: true,
+        current: false,
+        approvedRawEligible: false,
+        currentStaleReasons: ["strict-recovery-currentness-not-proven"],
+      },
+    });
     await expect(executeIdempotentCommand(fixture.root, {
       ...firstEnvelope,
       requestId: "p7-command-request-review-observation-different",
@@ -328,6 +467,23 @@ describe("P7 Studio continuity / Review 命令总线", () => {
       generationRunId: pair.generationRunId,
       limit: 10,
     })).items).toHaveLength(2);
+    const staleHistoricalReplay = await executeIdempotentCommand(fixture.root, {
+      ...firstEnvelope,
+      requestId: "p7-command-request-review-observation-after-correction",
+    });
+    expect(staleHistoricalReplay).toMatchObject({
+      replayed: true,
+      result: {
+        reviewId: observation.reviewId,
+        head: false,
+        current: false,
+        approvedRawEligible: false,
+        currentStaleReasons: [
+          "not-current-review-head",
+          "strict-recovery-currentness-not-proven",
+        ],
+      },
+    });
 
     const operationInjection = {
       ...observationRequest,
@@ -344,6 +500,31 @@ describe("P7 Studio continuity / Review 命令总线", () => {
     const ledger = await listCommandLedger(fixture.root);
     expect(ledger.some((entry) => entry.idempotencyKey === "p7-command-key-private-review-operation"
       || entry.idempotencyKey === "p7-command-key-private-reviewer")).toBe(false);
+
+    const ownerDb = new DatabaseSync(path.join(fixture.root, ".aicanvas", "studio-generation-ledger.sqlite"));
+    try {
+      ownerDb.exec(`
+        DROP TRIGGER studio_generation_review_receipts_no_update;
+        CREATE TRIGGER studio_generation_review_receipts_no_update
+          BEFORE UPDATE ON studio_generation_review_operation_receipts
+          BEGIN SELECT 1; END;
+      `);
+    } finally {
+      ownerDb.close();
+    }
+    const ownerBeforeTamperedReplay = await generationOwnerFilesystemSnapshot(fixture.root);
+    let generationWritableOpens = 0;
+    __setBeforeGenerationWritableOpenHookForTests(() => { generationWritableOpens += 1; });
+    try {
+      await expect(executeIdempotentCommand(fixture.root, {
+        ...firstEnvelope,
+        requestId: "p7-command-request-review-tampered-trigger",
+      })).rejects.toThrow(/generation ledger 严格只读 proof 失败/u);
+    } finally {
+      __setBeforeGenerationWritableOpenHookForTests(null);
+    }
+    expect(generationWritableOpens).toBe(0);
+    expect(await generationOwnerFilesystemSnapshot(fixture.root)).toEqual(ownerBeforeTamperedReplay);
   }, 60_000);
 });
 
@@ -445,6 +626,12 @@ describe("P22 v2 批注提交的重放与崩溃对账", () => {
     const replay = await executeIdempotentCommand(fixture.root, envelope("p22-ann-replay", request));
     expect(replay).toMatchObject({ status: "succeeded", replayed: true });
     expect((replay.result as { reviewId: string }).reviewId).toBe((first.result as { reviewId: string }).reviewId);
+    expect(replay.result).toMatchObject({
+      annotations: v2Annotations,
+      current: false,
+      approvedRawEligible: false,
+      currentStaleReasons: ["strict-recovery-currentness-not-proven"],
+    });
 
     const crashEnvelope = envelope("p22-ann-crash", request);
     process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE = "submit_studio_generation_review";
@@ -452,7 +639,12 @@ describe("P22 v2 批注提交的重放与崩溃对账", () => {
     delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE;
     const reconciled = await reconcileCommand(fixture.root, { idempotencyKey: crashEnvelope.idempotencyKey });
     expect(reconciled).toMatchObject({ status: "succeeded" });
-    expect(JSON.stringify(reconciled.result)).toContain("ann-replay-0001");
+    expect(reconciled.result).toMatchObject({
+      annotations: v2Annotations,
+      current: false,
+      approvedRawEligible: false,
+      currentStaleReasons: ["strict-recovery-currentness-not-proven"],
+    });
 
     await fixture.cleanup();
   }, 120_000);

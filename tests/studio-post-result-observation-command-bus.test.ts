@@ -15,6 +15,7 @@ import {
 } from "../src/core/studio-generation-ledger.js";
 import { submitStudioGenerationReview } from "../src/core/studio-generation-review.js";
 import { readStudioPostResultObservationOutcomeByOperationId } from "../src/core/studio-post-result-observation.js";
+import { __setBeforeGenerationWritableOpenHookForTests } from "../src/core/studio-generation-ledger-storage.js";
 import { buildNextShotContinuitySnapshot } from "../src/core/studio-next-shot-continuity.js";
 import {
   createStudioP7Fixture,
@@ -202,14 +203,30 @@ describe("实际末态观察命令总线", () => {
         fingerprint: (written.result as { fingerprint: string }).fingerprint,
       });
 
-    await expect(executeIdempotentCommand(fixture!.root, {
+    const replay = await executeIdempotentCommand(fixture!.root, {
       ...input,
       requestId: "post-result-command-request-normal-replay",
-    })).resolves.toMatchObject({
+    });
+    expect(replay).toMatchObject({
       status: "succeeded",
       replayed: true,
-      result: { observationId: (written.result as { observationId: string }).observationId },
+      result: {
+        observationId: (written.result as { observationId: string }).observationId,
+        current: false,
+        continuationEligible: false,
+        currentStaleReasons: ["strict-recovery-currentness-not-proven"],
+      },
     });
+    expect((replay.result as { continuationIneligibleReasons: string[] }).continuationIneligibleReasons)
+      .not.toContain("strict-recovery-currentness-not-proven");
+    const persisted = (await listCommandLedger(fixture!.root))
+      .find((entry) => entry.idempotencyKey === input.idempotencyKey)!;
+    expect(persisted.result).toMatchObject({
+      schemaVersion: 1,
+      kind: "studio-operation-result-locator",
+      operation: "post-result-observation",
+    });
+    expect(JSON.stringify(persisted)).not.toMatch(/actual|实际画面|continuitySnapshot|observer|note|evidenceKind/u);
     await expect(executeIdempotentCommand(fixture!.root, {
       ...input,
       requestId: "post-result-command-request-normal-conflict",
@@ -257,8 +274,11 @@ describe("实际末态观察命令总线", () => {
     expect(unknown).toMatchObject({
       status: "unknown",
       execution: { phase: "side_effect_committed" },
-      durableReconciliation: { request },
     });
+    expect(unknown.durableReconciliation).toBeUndefined();
+    const persistedUnknown = JSON.stringify(unknown);
+    expect(persistedUnknown).not.toContain("实际画面主体位于画面中央");
+    expect(persistedUnknown).not.toContain("只记录从当前 PASS raw 观察到的实际末态");
     await expect(readStudioPostResultObservationOutcomeByOperationId(fixture!.root, unknown.requestHash))
       .resolves.toMatchObject({ generationRunId: prepared.generationRunId });
 
@@ -269,6 +289,9 @@ describe("实际末态观察命令总线", () => {
       result: {
         generationRunId: prepared.generationRunId,
         reconciled: true,
+        current: false,
+        continuationEligible: false,
+        currentStaleReasons: ["strict-recovery-currentness-not-proven"],
       },
     });
     const db = new DatabaseSync(path.join(fixture!.root, ".aicanvas/studio-generation-ledger.sqlite"));
@@ -277,5 +300,30 @@ describe("实际末态观察命令总线", () => {
     expect(db.prepare("SELECT COUNT(*) AS count FROM studio_post_result_observation_operation_receipts").get())
       .toEqual({ count: 1 });
     db.close();
+
+    const commandLedgerDb = new DatabaseSync(path.join(fixture!.root, ".aicanvas", "command-ledger.sqlite"));
+    try {
+      const row = commandLedgerDb.prepare(
+        "SELECT payload_json FROM command_ledger_entries WHERE idempotency_key = ?",
+      ).get(input.idempotencyKey) as { payload_json: string };
+      const tampered = JSON.parse(row.payload_json) as { result: Record<string, unknown> };
+      tampered.result.fingerprint = "9".repeat(64);
+      commandLedgerDb.prepare(
+        "UPDATE command_ledger_entries SET payload_json = ? WHERE idempotency_key = ?",
+      ).run(JSON.stringify(tampered), input.idempotencyKey);
+    } finally {
+      commandLedgerDb.close();
+    }
+    let generationWritableOpens = 0;
+    __setBeforeGenerationWritableOpenHookForTests(() => { generationWritableOpens += 1; });
+    try {
+      await expect(executeIdempotentCommand(fixture!.root, {
+        ...input,
+        requestId: "post-result-command-request-crash-tampered-locator",
+      })).rejects.toThrow(/摘要|冲突|locator|回执/u);
+    } finally {
+      __setBeforeGenerationWritableOpenHookForTests(null);
+    }
+    expect(generationWritableOpens).toBe(0);
   }, 90_000);
 });

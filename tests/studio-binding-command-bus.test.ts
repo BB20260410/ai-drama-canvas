@@ -227,7 +227,7 @@ async function crashThenRecover(root: string, index: number, request: StudioComm
   expect((await listCommandLedger(root)).find((entry) => entry.idempotencyKey === first.idempotencyKey))
     .toMatchObject({
       status: "unknown",
-      durableReconciliation: { schemaVersion: 1, request },
+      durableReconciliation: undefined,
     });
   const recovered = viaReconcileCommand
     ? await reconcileCommand(root, { idempotencyKey: first.idempotencyKey })
@@ -295,7 +295,14 @@ describe("P6 Studio binding 命令总线", () => {
     } as unknown as StudioCommandRequest))).rejects.toThrow(/载荷不符合合同.*expectedAnalysisHeadRevision/u);
     expect((await listCommandLedger(root)).some((entry) => entry.idempotencyKey === "studio-binding-key-0100" || entry.idempotencyKey === "studio-binding-key-0101")).toBe(false);
 
-    await crashThenRecover(root, 110, analyzeRequest);
+    const analyzeRecovered = await crashThenRecover(root, 110, analyzeRequest);
+    expect(analyzeRecovered.result).toMatchObject({
+      analysisId: expect.any(String),
+      analysisRevision: 1,
+      analysisFingerprint: expect.stringMatching(/^[a-f0-9]{64}$/u),
+      unitId: "unit-p6-binding-001",
+      panelId: "panel-01",
+    });
     const analyzed = await getStudioBindingControl(root, { unitId: "unit-p6-binding-001" });
     const panel = analyzed.panels.find((entry) => entry.id === "panel-01")!;
     const ahang = panel.proposals.find((proposal) => proposal.entityText === "阿航")!;
@@ -363,6 +370,7 @@ describe("P6 Studio binding 命令总线", () => {
       },
     });
 
+    const sensitiveResolveNote = "R2-resolve-note-must-not-enter-command-ledger";
     const resolveRequest = {
       command: "resolve_studio_entity_proposal" as const,
       payload: {
@@ -375,9 +383,18 @@ describe("P6 Studio binding 命令总线", () => {
         role: "主角",
         expectedRevisionToken: analyzed.revisionToken,
         reviewer: "codex" as const,
+        note: sensitiveResolveNote,
       },
     };
-    await crashThenRecover(root, 120, resolveRequest, true);
+    const resolveRecovered = await crashThenRecover(root, 120, resolveRequest, true);
+    expect(resolveRecovered.result).toMatchObject({
+      decisionId: expect.any(String),
+      decisionRevision: 1,
+      decisionFingerprint: expect.stringMatching(/^[a-f0-9]{64}$/u),
+      proposalId: ahang.id,
+      unitId: "unit-p6-binding-001",
+      panelId: "panel-01",
+    });
 
     const resolved = await getStudioBindingControl(root, { unitId: "unit-p6-binding-001" });
     expect(resolved.panels.find((entry) => entry.id === "panel-01")?.freezeAllowed).toBe(true);
@@ -389,12 +406,46 @@ describe("P6 Studio binding 命令总线", () => {
         expectedRevisionToken: resolved.revisionToken,
       },
     };
-    await crashThenRecover(root, 130, freezeRequest);
+    const freezeRecovered = await crashThenRecover(root, 130, freezeRequest);
+    expect(freezeRecovered.result).toMatchObject({
+      bindingSetId: expect.any(String),
+      bindingSetRevision: 1,
+      bindingSetFingerprint: expect.stringMatching(/^[a-f0-9]{64}$/u),
+      unitId: "unit-p6-binding-001",
+      panelId: "panel-01",
+    });
     const ready = await getStudioBindingControl(root, { unitId: "unit-p6-binding-001" });
     expect(ready.panels.find((entry) => entry.id === "panel-01")).toMatchObject({
       status: "generation-ready",
       freezeAllowed: false,
       bindingSet: { currentness: "current" },
+    });
+
+    const normalAnalyzeEnvelope = envelope(140, {
+      command: "analyze_studio_script_entities",
+      payload: {
+        unitId: "unit-p6-binding-001",
+        panelId: "panel-02",
+        expectedRevisionToken: ready.revisionToken,
+      },
+    });
+    const normalAnalyze = await executeIdempotentCommand(root, normalAnalyzeEnvelope);
+    expect(normalAnalyze.result).toMatchObject({
+      analysisId: expect.any(String),
+      analysisRevision: 1,
+      panelId: "panel-02",
+    });
+    const normalAnalyzeLedger = (await listCommandLedger(root))
+      .find((entry) => entry.idempotencyKey === normalAnalyzeEnvelope.idempotencyKey);
+    expect(normalAnalyzeLedger).toMatchObject({
+      status: "succeeded",
+      durableReconciliation: undefined,
+      result: {
+        schemaVersion: 1,
+        kind: "studio-operation-result-locator",
+        operation: "binding-analyze",
+        operationId: normalAnalyzeLedger?.requestHash,
+      },
     });
 
     const db = new DatabaseSync(path.join(root, ".aicanvas", "studio-production.sqlite"), { readOnly: true });
@@ -405,10 +456,42 @@ describe("P6 Studio binding 命令总线", () => {
       "analyze_studio_script_entities",
       "resolve_studio_entity_proposal",
       "freeze_studio_asset_binding_set",
+      "analyze_studio_script_entities",
     ]);
     expect(receipts.every((receipt) => String(receipt.request_hash).length === 64 && String(receipt.outcome_fingerprint).length === 64)).toBe(true);
     const recoveredEvents = (await listCommandLedger(root)).filter((entry) => [110, 120, 130]
       .map((index) => `studio-binding-key-${String(index).padStart(4, "0")}`).includes(entry.idempotencyKey));
     expect(recoveredEvents.every((entry) => entry.status === "succeeded" && entry.result && (entry.result as { reconciled?: boolean }).reconciled)).toBe(true);
+    expect(recoveredEvents.map((entry) => (entry.result as { operation?: string }).operation).sort()).toEqual([
+      "binding-analyze",
+      "binding-freeze",
+      "binding-resolve",
+    ]);
+    for (const entry of recoveredEvents) {
+      expect(entry.result).toMatchObject({
+        schemaVersion: 1,
+        kind: "studio-operation-result-locator",
+        operationId: entry.requestHash,
+      });
+      expect(entry.durableReconciliation).toBeUndefined();
+    }
+    expect(JSON.stringify(recoveredEvents)).not.toContain(sensitiveResolveNote);
+
+    const freezeEntry = recoveredEvents.find((entry) => entry.command === "freeze_studio_asset_binding_set")!;
+    const ledgerDb = new DatabaseSync(path.join(root, ".aicanvas", "command-ledger.sqlite"));
+    try {
+      const row = ledgerDb.prepare("SELECT payload_json FROM command_ledger_entries WHERE idempotency_key = ?")
+        .get(freezeEntry.idempotencyKey) as { payload_json: string };
+      const tampered = JSON.parse(row.payload_json) as { result: Record<string, unknown> };
+      tampered.result.bindingSetFingerprint = "9".repeat(64);
+      ledgerDb.prepare("UPDATE command_ledger_entries SET payload_json = ? WHERE idempotency_key = ?")
+        .run(JSON.stringify(tampered), freezeEntry.idempotencyKey);
+    } finally {
+      ledgerDb.close();
+    }
+    await expect(executeIdempotentCommand(root, {
+      ...envelope(130, freezeRequest),
+      requestId: "studio-binding-request-0130-tamper-replay",
+    })).rejects.toThrow(/摘要|冲突|locator|回执/u);
   }, 30_000);
 });

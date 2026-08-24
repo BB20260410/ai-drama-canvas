@@ -387,6 +387,22 @@ function assertRegular(stats: BigIntStats, label: string): void {
   if (!stats.isFile()) throw integrityViolation(`${label} 必须是普通文件。`);
 }
 
+let afterManagedPathFinalLstatHookForTests:
+  | ((input: { candidate: string; label: string }) => boolean | void | Promise<boolean | void>)
+  | undefined;
+
+/**
+ * 仅用于覆盖 final lstat 与 realpath 之间的 TOCTOU 窗口；生产运行不得安装。
+ */
+export function __setAfterManagedPathFinalLstatHookForTests(
+  hook: typeof afterManagedPathFinalLstatHookForTests,
+): void {
+  if (process.env.NODE_ENV !== "test") {
+    throw new Error("managed path TOCTOU hook 仅允许测试环境。");
+  }
+  afterManagedPathFinalLstatHookForTests = hook;
+}
+
 async function canonicalProjectRoot(projectRoot: string): Promise<string> {
   const requested = path.resolve(projectRoot);
   let requestedStats: BigIntStats;
@@ -414,6 +430,7 @@ async function assertManagedPath(
   candidate: string,
   label: string,
   expectedType: "file" | "directory" = "file",
+  identityPolicy: "stable" | "mutable" = "stable",
 ): Promise<BigIntStats> {
   const relative = relativePathInside(canonicalRoot, candidate);
   const parts = relative.split(path.sep);
@@ -436,14 +453,47 @@ async function assertManagedPath(
   if (!finalStats) throw integrityViolation(`${label} 路径无效。`);
   if (expectedType === "file") assertRegular(finalStats, label);
   else if (!finalStats.isDirectory()) throw integrityViolation(`${label} 必须是目录。`);
+  const hook = afterManagedPathFinalLstatHookForTests;
+  if (hook && await hook({ candidate, label })) afterManagedPathFinalLstatHookForTests = undefined;
   let resolved: string;
   try {
     resolved = await realpath(candidate);
-  } catch {
+  } catch (error) {
+    if (isMissing(error)) {
+      // realpath 的 ENOENT 既可能是 SQLite sidecar 合法消失，也可能是 final
+      // lstat 后被替换为悬空 symlink。必须复核候选路径：只有复核也缺失才允许
+      // companion 的瞬态分支吞掉；仍存在的 link/目录一律保持完整性失败。
+      try {
+        const afterMissing = await lstat(candidate, { bigint: true });
+        if (afterMissing.isSymbolicLink()) throw integrityViolation(`${label} 不能是符号链接。`);
+        if (expectedType === "file") assertRegular(afterMissing, label);
+        else if (!afterMissing.isDirectory()) throw integrityViolation(`${label} 必须是目录。`);
+      } catch (recheckError) {
+        if (recheckError instanceof StudioMediaProtocolError) throw recheckError;
+        if (isMissing(recheckError)) throw integrityViolation(`${label} 缺失。`);
+        throw integrityViolation(`无法安全复核${label}。`);
+      }
+      throw integrityViolation(`无法解析${label}真实路径。`);
+    }
     throw integrityViolation(`无法解析${label}真实路径。`);
   }
   relativePathInside(canonicalRoot, resolved);
   if (resolved !== candidate) throw integrityViolation(`${label}真实路径与规范路径不一致。`);
+  let resolvedStats: BigIntStats;
+  try {
+    resolvedStats = await lstat(candidate, { bigint: true });
+  } catch (error) {
+    if (isMissing(error)) throw integrityViolation(`${label} 缺失。`);
+    throw integrityViolation(`无法安全复核${label}。`);
+  }
+  if (expectedType === "file") assertRegular(resolvedStats, label);
+  else if (!resolvedStats.isDirectory()) throw integrityViolation(`${label} 必须是目录。`);
+  // SQLite 的 WAL/SHM/journal 允许在数据库连接存续期间正常追加或 checkpoint。
+  // 这些 optional sidecar 仍必须每次通过规范路径、realpath、非链接和普通文件校验，
+  // 但不能把内容/mtime 的自然变化误报为 TOCTOU 替换。主 DB、CAS 与媒体保持 stable。
+  if (identityPolicy === "stable" && !identitiesEqual(identity(finalStats), identity(resolvedStats))) {
+    throw integrityViolation(`${label} 在安全解析期间发生变化。`);
+  }
   return finalStats;
 }
 
@@ -460,7 +510,7 @@ async function assertDatabaseFiles(canonicalRoot: string): Promise<string> {
   for (const suffix of ["-wal", "-shm", "-journal"] as const) {
     const companion = `${databasePath}${suffix}`;
     try {
-      await assertManagedPath(canonicalRoot, companion, "素材库伴随文件");
+      await assertManagedPath(canonicalRoot, companion, "素材库伴随文件", "file", "mutable");
     } catch (error) {
       if (isMissing(error)) continue;
       // WAL/SHM 由 SQLite 在最后一个连接关闭时自动移除。并发缩略图读取中，文件可能在

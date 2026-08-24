@@ -55,3 +55,59 @@ describe("受管 Studio 正式生图页", () => {
     expect(eventHandler).not.toContain(".then(() => loadHistory");
   });
 });
+
+describe("正式生图页列表视口剔除", () => {
+  it("unit-rail 与 panel-list 行使用 content-visibility，离屏单元/宫格跳过同步布局", () => {
+    const view = read("src/renderer/src/components/StudioGenerationControlView.vue");
+    expect(view).toContain(".unit-rail>button{width:100%;display:grid;gap:5px;padding:11px 14px;border:0;border-bottom:1px solid var(--ui-line);background:transparent;color:var(--ui-text-2);text-align:left;cursor:pointer;content-visibility:auto;contain-intrinsic-size:auto 56px}");
+    expect(view).toContain(".panel-list>button{min-height:96px;display:grid;grid-template-columns:30px 1fr;align-items:start;gap:9px;padding:14px;border:0;border-right:1px solid var(--ui-line);border-bottom:1px solid var(--ui-line);background:var(--ui-bg);color:var(--ui-text-2);text-align:left;cursor:pointer;content-visibility:auto;contain-intrinsic-size:auto 96px}");
+    expect(view).not.toMatch(/\.unit-rail>button\{[^}]*content-visibility:hidden/);
+    expect(view).not.toMatch(/\.panel-list>button\{[^}]*content-visibility:hidden/);
+  });
+
+  it("plan-node 使用 content-visibility，离屏计划节点跳过同步布局", () => {
+    const view = read("src/renderer/src/components/StudioGenerationControlView.vue");
+    expect(view).toContain('v-for="node in group.nodes"');
+    expect(view).toContain(".generation-plans{border-bottom:1px solid var(--ui-line);background:var(--ui-surface);max-height:220px;overflow:auto}");
+    expect(view).toContain(
+      ".plan-node{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:10px;align-items:center;padding:5px 18px;content-visibility:auto;contain-intrinsic-size:auto 32px}",
+    );
+    expect(view).not.toMatch(/\.plan-node\{[^}]*content-visibility:hidden/);
+    expect(view).not.toMatch(/\.result-row\{[^}]*content-visibility/);
+  });
+});
+
+describe("正式生图页 Higgsfield 图片排队", () => {
+  it("queueHiggsfieldImage 在 generationActionsBlocked 时 fail-closed：不能边核验未知节点边排队", () => {
+    const view = read("src/renderer/src/components/StudioGenerationControlView.vue");
+    expect(view).toContain(':disabled="loading || higgsfieldQueueBusy || !generationProjectionCurrent || generationActionsBlocked || isUnknownBlockedNode(node)"');
+    expect(view).toContain("正在处理，不能再用 Higgsfield 排队");
+    const start = view.indexOf("async function queueHiggsfieldImage(");
+    const end = view.indexOf("async function nextUnits()", start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const handler = view.slice(start, end);
+    expect(handler).toContain("if (higgsfieldQueueBusy.value || generationActionsBlocked.value || node.status !== \"dispatched\" || isUnknownBlockedNode(node)) return;");
+    expect(handler.indexOf("generationActionsBlocked.value")).toBeLessThan(handler.indexOf("higgsfieldQueueBusy.value = true"));
+  });
+});
+
+describe("正式生图页计划取消/重拍", () => {
+  it("runPlanAction 在 confirm 前 fail-closed：actionBusy 挡住连点双对话框", () => {
+    const view = read("src/renderer/src/components/StudioGenerationControlView.vue");
+    expect(view).toContain("正在处理，不能再取消该任务");
+    expect(view).toContain("正在处理，不能再重拍节点");
+    expect(view).toContain('@click="cancelNode(node)"');
+    expect(view).toContain("@click=\"retryPlan(group.planId)\"");
+    expect(view).toContain("@click=\"retryPlan(group.planId, node.nodeIndex)\"");
+    const start = view.indexOf("async function runPlanAction(");
+    const end = view.indexOf("function cancelNode(", start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const handler = view.slice(start, end);
+    expect(handler).toContain("if (actionBusy.value) return;");
+    expect(handler).toContain("window.confirm(confirmText)");
+    expect(handler.indexOf("if (actionBusy.value) return;")).toBeLessThan(handler.indexOf("window.confirm(confirmText)"));
+    expect(handler.indexOf("if (actionBusy.value) return;")).toBeLessThan(handler.indexOf("actionBusy.value = request.command"));
+  });
+});

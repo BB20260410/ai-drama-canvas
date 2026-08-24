@@ -3,9 +3,9 @@
     <header class="module-header">
       <div><span class="eyebrow">Codex 接续</span><h2>任务中心</h2><p>每个任务包都可在应用关闭后由本地 MCP 继续领取。</p></div>
       <div class="module-actions">
-        <button class="ghost-button" type="button" :disabled="loading" @click="refresh"><RefreshCw :size="15" /> 刷新</button>
-        <button class="primary-button" type="button" :disabled="loading" @click="create('image')"><PackagePlus :size="15" /> 下一图片批次</button>
-        <button class="ghost-button" type="button" :disabled="loading" @click="create('video')"><Film :size="15" /> 下一视频批次</button>
+        <button class="ghost-button" type="button" data-testid="task-center-refresh" :disabled="loading || Boolean(busyId)" :title="(loading || busyId) ? '正在处理，不能再刷新' : undefined" @click="refresh"><RefreshCw :size="15" /> 刷新</button>
+        <button class="primary-button" type="button" data-testid="task-center-create-image" :disabled="loading || Boolean(busyId)" :title="(loading || busyId) ? '正在处理，不能再创建图片批次' : undefined" @click="create('image')"><PackagePlus :size="15" /> 下一图片批次</button>
+        <button class="ghost-button" type="button" data-testid="task-center-create-video" :disabled="loading || Boolean(busyId)" :title="(loading || busyId) ? '正在处理，不能再创建视频批次' : undefined" @click="create('video')"><Film :size="15" /> 下一视频批次</button>
       </div>
     </header>
 
@@ -22,7 +22,7 @@
           <ul><li v-for="item in task.itemSnapshots" :key="item.id"><span>{{ item.type === 'shot' ? `镜${item.shot} · ` : '' }}{{ item.title }}</span><small>{{ item.nextAction }}<template v-if="item.referencePaths?.length"> · {{ item.referencePaths.length }} 份参考</template></small></li></ul>
           <footer>
             <time>{{ formatTime(task.createdAt) }}</time>
-            <button v-if="task.status === 'ready'" type="button" :disabled="busyId===task.id" @click="claim(task)">领取</button>
+            <button v-if="task.status === 'ready'" type="button" :disabled="loading || Boolean(busyId)" :title="(loading || busyId) ? '正在处理，不能再领取' : undefined" @click="claim(task)">领取</button>
             <button v-if="task.status === 'claimed' && task.lease?.owner === DESKTOP_AGENT" type="button" :disabled="busyId===task.id" @click="finish(task)">提交视觉验收</button>
             <button v-if="task.status === 'claimed' && task.lease?.owner === DESKTOP_AGENT" type="button" :disabled="busyId===task.id" @click="release(task)">释放</button>
             <button type="button" @click="revealTask(task.id)">文件</button>
@@ -59,15 +59,53 @@ onMounted(() => { void refresh(); heartbeatTimer = setInterval(() => void heartb
 onBeforeUnmount(() => { if (heartbeatTimer) clearInterval(heartbeatTimer); });
 watch(() => props.projectRoot, refresh);
 
+async function loadCenter(): Promise<void> {
+  const result = await window.canvasApi.getTaskCenter(props.projectRoot);
+  tasks.value = result.tasks;
+  events.value = result.events;
+}
 async function refresh() {
+  if (loading.value || busyId.value) return;
   loading.value = true;
-  try { const result = await window.canvasApi.getTaskCenter(props.projectRoot); tasks.value = result.tasks; events.value = result.events; }
+  try { await loadCenter(); }
   finally { loading.value = false; }
 }
-async function create(kind: "image" | "video") { loading.value = true; try { const result = await window.canvasApi.createTaskPack(props.projectRoot, { kind, mode: "autopilot" }); emit("changed", `已创建 ${result.task.itemIds.length} 项${kind === "video" ? "视频" : "图片"}任务包`); await refresh(); } finally { loading.value = false; } }
-async function claim(task: TaskPack) { busyId.value = task.id; try { await window.canvasApi.claimTask(props.projectRoot, task.id, { agentId: DESKTOP_AGENT, leaseSeconds: 900, expectedRevision: task.revision }); emit("changed", "桌面端已领取 15 分钟任务租约"); await refresh(); } catch(error) { emit("failed", message(error)); } finally { busyId.value = ""; } }
-async function finish(task: TaskPack) { if (!task.lease) return; busyId.value = task.id; try { await window.canvasApi.finishBatch(props.projectRoot, task.id, { leaseId: task.lease.id, agentId: DESKTOP_AGENT, expectedRevision: task.revision, status: "completed", completedItemIds: task.itemIds, failedItemIds: [], note: "机械门禁通过，桌面端提交导演视觉验收。" }); emit("changed", "批次已进入导演视觉验收，尚未宣告完成"); await refresh(); } catch(error) { emit("failed", message(error)); } finally { busyId.value = ""; } }
-async function release(task: TaskPack) { if (!task.lease) return; busyId.value = task.id; try { await window.canvasApi.releaseTask(props.projectRoot, task.id, { leaseId: task.lease.id, agentId: DESKTOP_AGENT, expectedRevision: task.revision, reason: "桌面端主动释放" }); emit("changed", "任务租约已释放"); await refresh(); } catch(error) { emit("failed", message(error)); } finally { busyId.value = ""; } }
+async function create(kind: "image" | "video") {
+  if (loading.value || busyId.value) return;
+  loading.value = true;
+  try {
+    const result = await window.canvasApi.createTaskPack(props.projectRoot, { kind, mode: "autopilot" });
+    emit("changed", `已创建 ${result.task.itemIds.length} 项${kind === "video" ? "视频" : "图片"}任务包`);
+    await loadCenter();
+  } finally { loading.value = false; }
+}
+async function claim(task: TaskPack) {
+  if (loading.value || busyId.value) return;
+  busyId.value = task.id;
+  try {
+    await window.canvasApi.claimTask(props.projectRoot, task.id, { agentId: DESKTOP_AGENT, leaseSeconds: 900, expectedRevision: task.revision });
+    emit("changed", "桌面端已领取 15 分钟任务租约");
+    await loadCenter();
+  } catch(error) { emit("failed", message(error)); } finally { busyId.value = ""; }
+}
+async function finish(task: TaskPack) {
+  if (!task.lease || loading.value || busyId.value) return;
+  busyId.value = task.id;
+  try {
+    await window.canvasApi.finishBatch(props.projectRoot, task.id, { leaseId: task.lease.id, agentId: DESKTOP_AGENT, expectedRevision: task.revision, status: "completed", completedItemIds: task.itemIds, failedItemIds: [], note: "机械门禁通过，桌面端提交导演视觉验收。" });
+    emit("changed", "批次已进入导演视觉验收，尚未宣告完成");
+    await loadCenter();
+  } catch(error) { emit("failed", message(error)); } finally { busyId.value = ""; }
+}
+async function release(task: TaskPack) {
+  if (!task.lease || loading.value || busyId.value) return;
+  busyId.value = task.id;
+  try {
+    await window.canvasApi.releaseTask(props.projectRoot, task.id, { leaseId: task.lease.id, agentId: DESKTOP_AGENT, expectedRevision: task.revision, reason: "桌面端主动释放" });
+    emit("changed", "任务租约已释放");
+    await loadCenter();
+  } catch(error) { emit("failed", message(error)); } finally { busyId.value = ""; }
+}
 async function heartbeatOwnedTasks() { for (const task of tasks.value.filter((entry) => entry.status === "claimed" && entry.lease?.owner === DESKTOP_AGENT)) { try { const updated = await window.canvasApi.heartbeatTask(props.projectRoot, task.id, { leaseId: task.lease!.id, agentId: DESKTOP_AGENT, leaseSeconds: 900, expectedRevision: task.revision }); tasks.value = tasks.value.map((entry) => entry.id === updated.id ? updated : entry); } catch(error) { emit("failed", message(error)); await refresh(); } } }
 function revealTask(id: string) { void window.canvasApi.showInFolder(`${props.projectRoot}/.aicanvas/tasks/${id}.json`); }
 function statusText(status: TaskPack["status"]) { return ({ ready: "待领取", claimed: "进行中", awaiting_review: "待视觉验收", completed: "已完成", blocked: "阻塞", cancelled: "已取消" })[status]; }
@@ -80,5 +118,5 @@ function eventTitle(type: string) { return ({ "project.imported": "项目导入�
 .task-boundary { display: flex; gap: 5px; margin: 8px 14px 0; }
 .task-boundary span { padding: 4px 6px; border: 1px solid #3b3d35; color: #8b8e83; font-size: 7px; }
 .task-lease { display: flex; gap: 8px; margin: 8px 14px 0; color: #8f927f; font: 7px Menlo,monospace; }
-.task-center-view { height: 100%; overflow: auto; background: #121310; }.module-header { position: sticky; top: 0; z-index: 6; height: 92px; display: flex; align-items: center; justify-content: space-between; padding: 0 26px; border-bottom: 1px solid #30322c; background: rgba(18,19,16,.96); backdrop-filter: blur(12px); }.module-header h2 { margin: 6px 0 3px; font-size: 19px; }.module-header p { margin: 0; color: #83867b; font-size: 10px; }.module-actions { display: flex; gap: 8px; }.task-layout { display: grid; grid-template-columns: minmax(480px,1.5fr) minmax(300px,1fr); min-height: calc(100% - 92px); }.task-column,.event-column { padding: 22px 26px 70px; }.event-column { border-left: 1px solid #30322c; background: #151613; }.section-title { display: flex; justify-content: space-between; padding-bottom: 12px; color: #a6a99e; font-size: 10px; border-bottom: 1px solid #30322c; }.section-title small { color: #666960; }.task-pack { margin-top: 12px; border: 1px solid #34362f; background: #191a17; }.task-pack > header { height: 32px; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; border-bottom: 1px solid #2d2f29; color: #d7af55; font-size: 9px; }.task-pack header b { color: #9da097; }.task-claimed { border-color: #5d5132; }.task-awaiting_review { border-color: #526247; }.task-completed { opacity: .62; }.task-blocked { border-color: #6b3b32; }.task-pack h3 { margin: 14px 14px 0; font-size: 12px; }.task-pack > p { margin: 6px 14px 10px; color: #62655c; font: 8px/1.4 Menlo,monospace; }.task-pack ul { max-height: 190px; overflow: auto; list-style: none; margin: 0; padding: 0 14px; border-top: 1px solid #292b25; }.task-pack li { display: grid; grid-template-columns: minmax(130px,1fr) 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid #292b25; }.task-pack li span { font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }.task-pack li small { color: #777a70; font-size: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }.task-pack footer { min-height: 42px; display: flex; align-items: center; gap: 7px; padding: 0 12px; }.task-pack footer time { margin-right: auto; color: #696c63; font-size: 8px; }.task-pack footer button { height: 26px; border: 1px solid #3b3d35; background: transparent; color: #b9bbb2; font-size: 8px; cursor: pointer; }.task-pack footer button:hover { border-color: #6b5b31; color: #d7af55; }.event-list { list-style: none; margin: 16px 0 0; padding: 0; }.event-list li { display: flex; gap: 11px; min-height: 54px; }.event-list i { flex: 0 0 auto; width: 7px; height: 7px; margin-top: 3px; border-radius: 50%; background: #666960; box-shadow: 0 0 0 4px #242620; }.event-list li:not(:last-child) i::after { content: ""; display: block; width: 1px; height: 48px; margin: 7px 0 0 3px; background: #30322c; }.event-list b,.event-list span,.event-list small { display: block; }.event-list b { font-size: 9px; }.event-list span { margin-top: 4px; color: #777a70; font-size: 8px; }.event-list small { margin-top: 4px; max-width: 270px; color: #5e6158; font: 7px/1.4 Menlo,monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }.empty { padding: 80px 0; color: #62655c; text-align: center; font-size: 10px; }
+.task-center-view { height: 100%; overflow: auto; background: #121310; }.module-header { position: sticky; top: 0; z-index: 6; height: 92px; display: flex; align-items: center; justify-content: space-between; padding: 0 26px; border-bottom: 1px solid #30322c; background: rgba(18,19,16,.96); backdrop-filter: blur(12px); }.module-header h2 { margin: 6px 0 3px; font-size: 19px; }.module-header p { margin: 0; color: #83867b; font-size: 10px; }.module-actions { display: flex; gap: 8px; }.task-layout { display: grid; grid-template-columns: minmax(480px,1.5fr) minmax(300px,1fr); min-height: calc(100% - 92px); }.task-column,.event-column { padding: 22px 26px 70px; }.event-column { border-left: 1px solid #30322c; background: #151613; }.section-title { display: flex; justify-content: space-between; padding-bottom: 12px; color: #a6a99e; font-size: 10px; border-bottom: 1px solid #30322c; }.section-title small { color: #666960; }.task-pack { margin-top: 12px; border: 1px solid #34362f; background: #191a17; }.task-pack > header { height: 32px; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; border-bottom: 1px solid #2d2f29; color: #d7af55; font-size: 9px; }.task-pack header b { color: #9da097; }.task-claimed { border-color: #5d5132; }.task-awaiting_review { border-color: #526247; }.task-completed { opacity: .62; }.task-blocked { border-color: #6b3b32; }.task-pack h3 { margin: 14px 14px 0; font-size: 12px; }.task-pack > p { margin: 6px 14px 10px; color: #62655c; font: 8px/1.4 Menlo,monospace; }.task-pack ul { max-height: 190px; overflow: auto; list-style: none; margin: 0; padding: 0 14px; border-top: 1px solid #292b25; }.task-pack li { display: grid; grid-template-columns: minmax(130px,1fr) 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid #292b25; content-visibility: auto; contain-intrinsic-size: auto 32px; }.task-pack li span { font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }.task-pack li small { color: #777a70; font-size: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }.task-pack footer { min-height: 42px; display: flex; align-items: center; gap: 7px; padding: 0 12px; }.task-pack footer time { margin-right: auto; color: #696c63; font-size: 8px; }.task-pack footer button { height: 26px; border: 1px solid #3b3d35; background: transparent; color: #b9bbb2; font-size: 8px; cursor: pointer; }.task-pack footer button:hover { border-color: #6b5b31; color: #d7af55; }.event-list { list-style: none; margin: 16px 0 0; padding: 0; }.event-list li { display: flex; gap: 11px; min-height: 54px; content-visibility: auto; contain-intrinsic-size: auto 54px; }.event-list i { flex: 0 0 auto; width: 7px; height: 7px; margin-top: 3px; border-radius: 50%; background: #666960; box-shadow: 0 0 0 4px #242620; }.event-list li:not(:last-child) i::after { content: ""; display: block; width: 1px; height: 48px; margin: 7px 0 0 3px; background: #30322c; }.event-list b,.event-list span,.event-list small { display: block; }.event-list b { font-size: 9px; }.event-list span { margin-top: 4px; color: #777a70; font-size: 8px; }.event-list small { margin-top: 4px; max-width: 270px; color: #5e6158; font: 7px/1.4 Menlo,monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }.empty { padding: 80px 0; color: #62655c; text-align: center; font-size: 10px; }
 </style>

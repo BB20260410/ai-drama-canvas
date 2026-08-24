@@ -93,8 +93,25 @@ describe("衍生资产关系与角色音色身份", () => {
     const lock = index.project.hardLocks[0]!;
     const voice = await upsertVoiceIdentity(root, { name: "阿航成年声线", provider: "browser-provider", providerVoiceId: "voice-ahang-v1", language: "zh-CN", description: "低沉、克制", samplePaths: [samplePath], characterItemIds: ["main-ep01-unit001"], hardLockId: lock.id });
     expect(voice.samplePaths).toEqual([samplePath]);
+    expect(voice.characterAssetIds).toEqual([]);
+    expect(voice.sampleMediaSha256s).toEqual([]);
     expect((await listVoiceIdentities(root))[0]?.providerVoiceId).toBe("voice-ahang-v1");
     await expect(upsertVoiceIdentity(root, { name: "坏样本", samplePaths: [path.join(root, "missing.wav")] })).rejects.toThrow("音色样本不存在");
+  });
+
+  it("可以把 CAS 音频 SHA 绑到规范角色资产，供画布自动带出", async () => {
+    const { root } = await fixture();
+    const sha = "ab".repeat(32);
+    const voice = await upsertVoiceIdentity(root, {
+      name: "阿航画布声线",
+      characterAssetIds: ["char-ahang"],
+      sampleMediaSha256s: [sha],
+    });
+    expect(voice.characterAssetIds).toEqual(["char-ahang"]);
+    expect(voice.sampleMediaSha256s).toEqual([sha]);
+    const listed = await listVoiceIdentities(root);
+    expect(listed[0]?.characterAssetIds).toEqual(["char-ahang"]);
+    await expect(upsertVoiceIdentity(root, { name: "坏 SHA", sampleMediaSha256s: ["not-a-hash"] })).rejects.toThrow("无效 SHA-256");
   });
 
   it("Codex 经统一幂等入口写入资产关系且重复请求不二次执行", async () => {

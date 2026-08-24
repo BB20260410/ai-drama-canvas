@@ -204,7 +204,7 @@ describe("Studio 剧本章节修订命令总线", () => {
     }
   });
 
-  it("append 在业务提交后崩溃时只读 immutable section revision 对账，重启恢复不重复追加", async () => {
+  it("append 在业务提交后崩溃时只消费终态收据投影，重启恢复不重复追加", async () => {
     const root = await managedRoot();
     const body = "第一章：阿航抵达石门。";
     await executeIdempotentCommand(root, envelope(20, {
@@ -253,13 +253,15 @@ describe("Studio 剧本章节修订命令总线", () => {
       status: "succeeded",
       replayed: true,
       result: {
+        schemaVersion: 1,
+        kind: "studio-script-section-result-locator",
         sectionId: "chapter-recovery-01",
-        revision: 1,
-        kind: "chapter",
-        reconciled: true,
+        scriptRevisionId: scriptRevision.id,
+        surfaceSha256: expect.stringMatching(/^[a-f0-9]{64}$/),
       },
     });
-    const recoveredSection = recovered.result as { id: string };
+    expect(recovered.result).not.toHaveProperty("title");
+    expect(JSON.stringify(recovered.result)).not.toContain(body);
     const replay = await executeIdempotentCommand(root, {
       ...request,
       requestId: "studio-section-request-recovery-replay",
@@ -267,7 +269,7 @@ describe("Studio 剧本章节修订命令总线", () => {
     expect(replay).toMatchObject({
       status: "succeeded",
       replayed: true,
-      result: { id: recoveredSection.id, reconciled: true },
+      result: { kind: "studio-script-section-result-locator" },
     });
 
     const db = new DatabaseSync(path.join(root, ".aicanvas", "studio-production.sqlite"));
@@ -275,7 +277,7 @@ describe("Studio 剧本章节修订命令总线", () => {
       expect(db.prepare("SELECT COUNT(*) AS count FROM studio_script_section_revisions WHERE section_id = ?")
         .get("chapter-recovery-01")).toMatchObject({ count: 1 });
       expect(db.prepare("SELECT revision, revision_id FROM studio_script_section_heads WHERE section_id = ?")
-        .get("chapter-recovery-01")).toMatchObject({ revision: 1, revision_id: recoveredSection.id });
+        .get("chapter-recovery-01")).toMatchObject({ revision: 1, revision_id: expect.any(String) });
     } finally {
       db.close();
     }

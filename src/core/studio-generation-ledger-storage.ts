@@ -355,6 +355,51 @@ export async function managedLedgerPaths(projectRoot: string): Promise<{ paths: 
   return { paths, projectId: shell.project.id };
 }
 
+/**
+ * Generation recovery/diagnostic 的严格只读入口：只在系统临时目录打开同一份
+ * schema-v7 快照，不调用 managedLedgerPaths、ensureConfinedDirectory 或写库 hook。
+ */
+export async function withStudioGenerationLedgerReadOnlySnapshot<T>(
+  projectRoot: string,
+  label: string,
+  read: (database: DatabaseSync, context: { projectRoot: string; projectId: string }) => T | Promise<T>,
+): Promise<T> {
+  let shell: Awaited<ReturnType<typeof inspectManagedProjectReadOnly>>;
+  try {
+    shell = await inspectManagedProjectReadOnly(projectRoot);
+  } catch (error) {
+    throw new StudioGenerationLedgerError(
+      "unmanaged-project",
+      "Studio generation 只读 proof 只允许读取受管项目。",
+      [error instanceof Error ? error.message : String(error)],
+      { cause: error },
+    );
+  }
+  const databasePath = path.join(shell.paths.root, DATABASE_RELATIVE_PATH);
+  let snapshot: Awaited<ReturnType<typeof openSqliteReadOnlySnapshot>> | null = null;
+  try {
+    snapshot = await openSqliteReadOnlySnapshot(databasePath, label);
+    const version = snapshot.database.prepare(
+      "SELECT value FROM studio_generation_ledger_meta WHERE key = 'schema_version'",
+    ).get() as { value?: string } | undefined;
+    if (version?.value !== String(SCHEMA_VERSION)) {
+      fail("storage-invalid", `generation 只读 proof 要求 schema v${SCHEMA_VERSION}。`);
+    }
+    assertCurrentSchema(snapshot.database);
+    return await read(snapshot.database, { projectRoot: shell.paths.root, projectId: shell.project.id });
+  } catch (error) {
+    if (error instanceof StudioGenerationLedgerError) throw error;
+    throw new StudioGenerationLedgerError(
+      "storage-invalid",
+      "generation ledger 严格只读 proof 失败。",
+      [error instanceof Error ? error.message : String(error)],
+      { cause: error },
+    );
+  } finally {
+    await snapshot?.close();
+  }
+}
+
 function createCurrentSchema(db: DatabaseSync): void {
   db.exec(`
     CREATE TABLE IF NOT EXISTS studio_generation_ledger_meta (
@@ -951,6 +996,89 @@ function ensureContinuationWaiverReceiptSchema(db: DatabaseSync): void {
       "SELECT 1 AS found FROM sqlite_master WHERE type='trigger' AND name=?",
     ).get(triggerName) as { found?: number } | undefined;
     if (trigger?.found !== 1) fail("storage-invalid", `continuation waiver receipt 缺少 ${triggerName}。`);
+  }
+}
+
+/**
+ * retry command 的原子 operation receipt 是 v7 上的 append-only 扩展；由唯一
+ * generation writer 在与 run events 同一事务中写入，不提升 core schema 版本。
+ */
+function ensureGenerationRetryOperationReceiptSchema(db: DatabaseSync): void {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS studio_generation_retry_operation_receipts (
+      operation_id TEXT PRIMARY KEY CHECK(length(operation_id) = 64),
+      request_fingerprint TEXT NOT NULL CHECK(length(request_fingerprint) = 64),
+      plan_id TEXT NOT NULL,
+      outcome_json TEXT NOT NULL CHECK(length(outcome_json) BETWEEN 2 AND 32768),
+      outcome_fingerprint TEXT NOT NULL CHECK(length(outcome_fingerprint) = 64),
+      receipt_fingerprint TEXT NOT NULL UNIQUE CHECK(length(receipt_fingerprint) = 64),
+      created_at TEXT NOT NULL
+    ) STRICT;
+    CREATE TRIGGER IF NOT EXISTS studio_generation_retry_operation_receipts_no_update
+      BEFORE UPDATE ON studio_generation_retry_operation_receipts
+      BEGIN SELECT RAISE(ABORT, 'generation retry operation receipts are append-only'); END;
+    CREATE TRIGGER IF NOT EXISTS studio_generation_retry_operation_receipts_no_delete
+      BEFORE DELETE ON studio_generation_retry_operation_receipts
+      BEGIN SELECT RAISE(ABORT, 'generation retry operation receipts are append-only'); END;
+  `);
+  assertGenerationRetryOperationReceiptSchema(db);
+}
+
+export function assertGenerationRetryOperationReceiptSchema(db: DatabaseSync): void {
+  const table = "studio_generation_retry_operation_receipts";
+  const expected = [
+    { name: "operation_id", type: "TEXT", notnull: 1, pk: 1 },
+    { name: "request_fingerprint", type: "TEXT", notnull: 1, pk: 0 },
+    { name: "plan_id", type: "TEXT", notnull: 1, pk: 0 },
+    { name: "outcome_json", type: "TEXT", notnull: 1, pk: 0 },
+    { name: "outcome_fingerprint", type: "TEXT", notnull: 1, pk: 0 },
+    { name: "receipt_fingerprint", type: "TEXT", notnull: 1, pk: 0 },
+    { name: "created_at", type: "TEXT", notnull: 1, pk: 0 },
+  ];
+  const columns = db.prepare(`PRAGMA table_xinfo(${table})`).all() as Array<{
+    name: string;
+    type: string;
+    notnull: number;
+    pk: number;
+    hidden: number;
+  }>;
+  if (columns.length !== expected.length || columns.some((column, index) => {
+    const wanted = expected[index];
+    return !wanted || column.name !== wanted.name || column.type.toUpperCase() !== wanted.type
+      || Number(column.notnull) !== wanted.notnull || Number(column.pk) !== wanted.pk
+      || Number(column.hidden) !== 0;
+  })) {
+    fail("storage-invalid", "generation retry operation receipt 7 列合同漂移。");
+  }
+  const tableSql = (db.prepare(
+    "SELECT sql FROM sqlite_master WHERE type='table' AND name=?",
+  ).get(table) as { sql?: string } | undefined)?.sql ?? "";
+  const normalizedTableSql = tableSql.replace(/\s+/gu, " ").trim().toLowerCase()
+    .replace(/if not exists /gu, "");
+  const requiredTableClauses = [
+    "create table studio_generation_retry_operation_receipts",
+    "operation_id text primary key check(length(operation_id) = 64)",
+    "request_fingerprint text not null check(length(request_fingerprint) = 64)",
+    "outcome_json text not null check(length(outcome_json) between 2 and 32768)",
+    "outcome_fingerprint text not null check(length(outcome_fingerprint) = 64)",
+    "receipt_fingerprint text not null unique check(length(receipt_fingerprint) = 64)",
+    ") strict",
+  ];
+  if (requiredTableClauses.some((clause) => !normalizedTableSql.includes(clause))) {
+    fail("storage-invalid", "generation retry operation receipt STRICT/CHECK 合同漂移。");
+  }
+  for (const event of ["update", "delete"] as const) {
+    const name = `studio_generation_retry_operation_receipts_no_${event}`;
+    const sql = (db.prepare(
+      "SELECT sql FROM sqlite_master WHERE type='trigger' AND name=?",
+    ).get(name) as { sql?: string } | undefined)?.sql ?? "";
+    const normalized = sql.replace(/\s+/gu, " ").trim().toLowerCase()
+      .replace(/if not exists /gu, "");
+    const expected = `create trigger ${name} before ${event} on ${table} begin select raise(abort, 'generation retry operation receipts are append-only'); end`;
+    const exact = new RegExp(`^${expected.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&")}$`, "u");
+    if (!exact.test(normalized)) {
+      fail("storage-invalid", `generation retry operation receipt no_${event} trigger 漂移。`);
+    }
   }
 }
 
@@ -2276,6 +2404,7 @@ export function openDatabase(paths: LedgerPaths): DatabaseSync {
       // review/continuity 扩展表模式），老库迁移后在此处幂等补表。
       ensureCanvasProjectionOutboxSchema(db);
       ensureContinuationWaiverReceiptSchema(db);
+      ensureGenerationRetryOperationReceiptSchema(db);
     }
     const foreignKeys = db.prepare("PRAGMA foreign_keys").get() as { foreign_keys?: number } | undefined;
     if (foreignKeys?.foreign_keys !== 1) fail("storage-invalid", "generation ledger foreign_keys 未启用。");
@@ -2300,6 +2429,7 @@ export function openDatabase(paths: LedgerPaths): DatabaseSync {
       assertCurrentSchema(db);
       ensureCanvasProjectionOutboxSchema(db);
       ensureContinuationWaiverReceiptSchema(db);
+      ensureGenerationRetryOperationReceiptSchema(db);
       const finalVersion = db.prepare(
         "SELECT value FROM studio_generation_ledger_meta WHERE key = 'schema_version'",
       ).get() as { value?: string } | undefined;

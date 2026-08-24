@@ -2733,6 +2733,40 @@ export async function proveDuduReadonlyStageCommandOutcome(
   }
 }
 
+/**
+ * command-bus 终态 locator 恢复的纯读 owner。不接收 locator 中的工程路径或计数：
+ * 只从 projectsRoot 直接子目录的唯一 operation receipt 候选，结合不可变
+ * import receipt 重建完整结果。多候选或任一 owner 身份不闭合均失败关闭。
+ */
+export async function readDuduReadonlyStageOutcomeByOperationId(
+  projectsRoot: string,
+  commandRequestHash: string,
+): Promise<DuduReadonlyStageCommandOutcome | null> {
+  const discovery = await discoverDuduReadonlyImportProjects(projectsRoot);
+  const matches: DuduReadonlyStageCommandOutcome[] = [];
+  for (const candidate of discovery.candidates) {
+    const operationReceipt = await readCommandOperationReceipt(
+      candidate.projectRoot,
+      "stage_dudu_readonly_managed_project",
+      commandRequestHash,
+    );
+    if (!operationReceipt) continue;
+    const verified = await verifyDuduImmutableImportIdentity(candidate.projectRoot, true);
+    if (operationReceipt.projectId !== verified.shell.project.id
+      || operationReceipt.projectRoot !== verified.shell.paths.root
+      || operationReceipt.importFingerprint !== verified.receipt.fingerprint
+      || candidate.directoryName !== path.basename(verified.shell.paths.root)
+      || path.dirname(verified.shell.paths.root) !== path.resolve(discovery.projectsRoot)) {
+      throw new Error("Dudu stage operation receipt 与不可变 import owner 身份不一致。");
+    }
+    matches.push(duduReadonlyStageOutcome(verified.shell, verified.receipt, true));
+  }
+  if (matches.length > 1) {
+    throw new Error("Dudu stage operationId 命中多个 owner 候选，拒绝选择任意工程。");
+  }
+  return matches[0] ?? null;
+}
+
 function registrationFingerprint(value: Omit<DuduReadonlyRegistrationReceipt, "fingerprint">): string {
   return digest(value);
 }
@@ -3724,6 +3758,54 @@ export async function proveDuduReadonlyFinalizationOutcome(
       projectId: verified.shell.project.id,
       projectRoot: verified.shell.paths.root,
       importFingerprint: expectedImportFingerprint,
+      registered: true,
+      active: true,
+      activationId: activeIdentity.activationId,
+      registration,
+      activation,
+      replayedRegistration: true,
+      replayedActivation: true,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function readDuduReadonlyFinalizationOutcomeByOperationId(
+  projectRoot: string,
+  commandRequestHash: string,
+): Promise<DuduReadonlyFinalizationResult | null> {
+  try {
+    const verified = await verifyDuduImmutableImportIdentity(projectRoot, true);
+    const activeIdentity = await getActiveDuduReadonlyProjectIdentityReadOnly(verified.shell.paths.root);
+    const [registrationValue, activationValue, operationReceipt] = await Promise.all([
+      readJsonFile<DuduReadonlyRegistrationReceipt>(path.join(verified.shell.paths.root, REGISTRATION_RELATIVE_PATH)),
+      readJsonFile<DuduReadonlyActivationReceipt>(path.join(
+        verified.shell.paths.root,
+        activationReceiptRelativePath(activeIdentity.activationId),
+      )),
+      readCommandOperationReceipt(
+        verified.shell.paths.root,
+        "finalize_dudu_readonly_managed_project",
+        commandRequestHash,
+      ),
+    ]);
+    if (!registrationValue || !activationValue || !operationReceipt) return null;
+    const registration = validateRegistrationReceipt(registrationValue);
+    const activation = validateActivationReceipt(activationValue);
+    if (operationReceipt.projectId !== verified.shell.project.id
+      || operationReceipt.importFingerprint !== verified.receipt.fingerprint
+      || operationReceipt.registrationFingerprint !== registration.fingerprint
+      || operationReceipt.activationId !== activation.activationId
+      || operationReceipt.activationFingerprint !== activation.fingerprint
+      || registration.fingerprint !== activeIdentity.registrationFingerprint
+      || activation.fingerprint !== activeIdentity.activationFingerprint) return null;
+    return {
+      schemaVersion: 1,
+      kind: "dudu-readonly-managed-finalization",
+      projectId: verified.shell.project.id,
+      projectRoot: verified.shell.paths.root,
+      importFingerprint: verified.receipt.fingerprint,
       registered: true,
       active: true,
       activationId: activeIdentity.activationId,

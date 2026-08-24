@@ -29,17 +29,36 @@ export interface StudioProductionDashboardUiApi {
   ): ReturnType<typeof import("../../core/studio-generation-checkpoint.js").getStudioGenerationCheckpointCanvasProjection>;
 }
 
+/** 首卡 waiter 可接上刚完成的同参 units prefetch；不是写权限缓存。 */
+export const STUDIO_DASHBOARD_FIRST_CARD_UNITS_HOLD_MS = 1_500;
+
+export interface StudioDashboardRequestCoalescerOptions {
+  now?: () => number;
+  firstCardUnitsHoldMs?: number;
+}
+
 /**
  * 同一工程的 overview，以及参数完全相同的 units，在同一时刻只向 Core 请求一次。
  *
  * Material Studio 外壳与 Dashboard 子视图会在首屏同时读取 overview；App 冷启动也会
  * 在确认 drama 工作区后预发默认 units。共享进行中的 Promise 可把 Core 深读取与模块
- * 预热并行，又不会缓存业务结果或跨工程复用。其他 operation 保持原有请求语义。
+ * 预热并行。units 另外保留刚完成的同参结果一小段时间，只为接住 prefetch 结束后
+ * 才挂上的首卡 waiter；overview 与失败结果不进入这段 hold，也不是写权限缓存。
  */
 export function createStudioDashboardRequestCoalescer(
   api: StudioProductionDashboardUiApi,
+  options: StudioDashboardRequestCoalescerOptions = {},
 ): StudioProductionDashboardUiApi {
   const inFlight = new Map<string, Promise<StudioProductionDashboardResponse>>();
+  const firstCardUnitsHold = new Map<string, {
+    shared: Promise<StudioProductionDashboardResponse>;
+    expiresAt: number;
+  }>();
+  const now = options.now ?? Date.now;
+  const firstCardUnitsHoldMs = options.firstCardUnitsHoldMs ?? STUDIO_DASHBOARD_FIRST_CARD_UNITS_HOLD_MS;
+  if (!Number.isFinite(firstCardUnitsHoldMs) || firstCardUnitsHoldMs < 0) {
+    throw new RangeError("units 首卡 hold 必须是非负有限数。");
+  }
   return {
     ...api,
     getDashboard(projectRoot, query) {
@@ -49,8 +68,24 @@ export function createStudioDashboardRequestCoalescer(
       const key = dashboardRequestToken(projectRoot, query);
       const existing = inFlight.get(key);
       if (existing) return existing;
+      if (query.operation === "units") {
+        const held = firstCardUnitsHold.get(key);
+        if (held && held.expiresAt > now()) {
+          firstCardUnitsHold.delete(key);
+          return held.shared;
+        }
+      }
       const request = api.getDashboard(projectRoot, query);
-      const shared = request.finally(() => {
+      let shared!: Promise<StudioProductionDashboardResponse>;
+      shared = request.then((value) => {
+        if (query.operation === "units") {
+          firstCardUnitsHold.set(key, {
+            shared,
+            expiresAt: now() + firstCardUnitsHoldMs,
+          });
+        }
+        return value;
+      }).finally(() => {
         if (inFlight.get(key) === shared) {
           inFlight.delete(key);
         }

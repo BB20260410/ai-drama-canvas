@@ -891,12 +891,22 @@ function rawActiveProjectSchemaVersion(value: unknown): number | null {
   return recordValue(value) && typeof value.schemaVersion === "number" ? value.schemaVersion : null;
 }
 
-async function repairLegacyV2RegistryLeaksUnderLock(
-  registryPath: string,
+interface ProjectRegistryCompatibilityRepairPlan {
+  leaked: ProjectRegistryEntry[];
+  nextV2: ProjectRegistryEntry[];
+  normalizedActive: ActiveProjectState | null;
+  activeNeedsWriterFence: boolean;
+}
+
+/**
+ * compatibility repair 与只读启动预检共用同一判定，避免快路自行猜测“健康”。
+ * 计划阶段只读；调用方必须在 registry lock 内才可依它写入。
+ */
+async function planProjectRegistryCompatibilityRepair(
   pair: ProjectRegistryPair,
-): Promise<ProjectRegistryPair> {
+  active?: { raw: unknown; normalized: ActiveProjectState | null },
+): Promise<ProjectRegistryCompatibilityRepairPlan> {
   const leaked = await findLegacyV2RegistryLeaks(pair);
-  const leakedRoots = new Set(leaked.map((entry) => path.resolve(entry.primaryRoot)));
   const nextV2 = [...pair.v2];
   for (const entry of leaked) {
     const root = path.resolve(entry.primaryRoot);
@@ -906,14 +916,25 @@ async function repairLegacyV2RegistryLeaksUnderLock(
     }
     if (!existing) nextV2.push({ ...entry });
   }
-
-  const rawActive = await readJson<unknown>(getActiveProjectPath(), null);
-  const normalizedActive = rawActive === null ? null : await readActiveProjectStateWithPreferences();
+  const rawActive = active?.raw ?? await readJson<unknown>(getActiveProjectPath(), null);
+  const normalizedActive = active
+    ? active.normalized
+    : rawActive === null ? null : await readActiveProjectStateWithPreferences();
   const v2Roots = new Set(nextV2.map((entry) => path.resolve(entry.primaryRoot)));
-  const activeNeedsWriterFence = normalizedActive
+  const activeNeedsWriterFence = Boolean(normalizedActive
     && v2Roots.has(path.resolve(normalizedActive.primaryRoot))
-    && rawActiveProjectSchemaVersion(rawActive) !== 3;
-  if (activeNeedsWriterFence) {
+    && rawActiveProjectSchemaVersion(rawActive) !== 3);
+  return { leaked, nextV2, normalizedActive, activeNeedsWriterFence };
+}
+
+async function repairLegacyV2RegistryLeaksUnderLock(
+  registryPath: string,
+  pair: ProjectRegistryPair,
+): Promise<ProjectRegistryPair> {
+  const plan = await planProjectRegistryCompatibilityRepair(pair);
+  const { leaked, nextV2, normalizedActive, activeNeedsWriterFence } = plan;
+  const leakedRoots = new Set(leaked.map((entry) => path.resolve(entry.primaryRoot)));
+  if (activeNeedsWriterFence && normalizedActive) {
     // 先升级活动指针。即使进程随后中断，旧 writer 也会因不认识 schema 3
     // 在任何活动状态改写前失败关闭。
     await writeWorkspacePreferencesV2(normalizedActive.workspacePreferences);
@@ -949,6 +970,99 @@ export interface ActiveProjectStartupReconcileExpectation {
   activationId: string;
 }
 
+export type ActiveProjectStartupReadOnlyPreflight = {
+  kind: "healthy";
+  registration: Pick<ProjectConfig, "id" | "name" | "primaryRoot" | "updatedAt">;
+  registrationLane: ProjectRegistryLane;
+} | {
+  kind: "repair-required";
+  reason: "legacy-v2-registry-leak" | "active-project-writer-fence" | "legacy-registration";
+};
+
+interface ActiveProjectStartupReadOnlySnapshot {
+  rawActive: unknown;
+  state: ActiveProjectState | null;
+  pair: ProjectRegistryPair;
+  repairPlan: ProjectRegistryCompatibilityRepairPlan;
+}
+
+async function readActiveProjectStartupReadOnlySnapshot(
+  registryPath: string,
+): Promise<ActiveProjectStartupReadOnlySnapshot> {
+  // 故意不走 withRegistryLock：取得该锁会创建 locks 目录/文件，破坏首卡快路的
+  // 物理零写合同。双读全快照代替锁；任何不稳定都由调用方失败关闭。
+  const [rawActive, preferences, pair] = await Promise.all([
+    readJson<unknown>(getActiveProjectPath(), null),
+    readWorkspacePreferencesV2(),
+    readProjectRegistryPair(registryPath),
+  ]);
+  const normalized = normalizeActiveProjectState(rawActive);
+  const state = normalized
+    ? { ...normalized, workspacePreferences: { ...normalized.workspacePreferences, ...preferences } }
+    : null;
+  return {
+    rawActive,
+    state,
+    pair,
+    repairPlan: await planProjectRegistryCompatibilityRepair(pair, { raw: rawActive, normalized: state }),
+  };
+}
+
+function activeProjectStartupReadOnlySnapshotKey(snapshot: ActiveProjectStartupReadOnlySnapshot): string {
+  return JSON.stringify({
+    rawActive: snapshot.rawActive,
+    state: snapshot.state,
+    pair: snapshot.pair,
+    repairPlan: {
+      leaked: snapshot.repairPlan.leaked,
+      nextV2: snapshot.repairPlan.nextV2,
+      activeNeedsWriterFence: snapshot.repairPlan.activeNeedsWriterFence,
+    },
+  });
+}
+
+/**
+ * 冷启动快路的严格物理只读预检。它只允许零 compatibility repair 的稳定双读快照；
+ * service 还会双读 managed manifest，以区分可直接放行的 v1 drama/legacy 与 v2。
+ * 任意泄漏、旧 v2 writer fence、未知或并发状态绝不猜测为健康。
+ */
+export async function preflightActiveProjectStartupReadOnly(
+  expected: ActiveProjectStartupReconcileExpectation,
+): Promise<ActiveProjectStartupReadOnlyPreflight> {
+  const expectedRoot = path.resolve(expected.primaryRoot);
+  if (!expected.primaryRoot || expectedRoot !== expected.primaryRoot
+    || typeof expected.activationId !== "string" || !/^[a-f0-9-]{16,64}$/u.test(expected.activationId)) {
+    throw new Error("活动工程启动快照参数无效。 ");
+  }
+  const registryPath = getRegistryPath();
+  const before = await readActiveProjectStartupReadOnlySnapshot(registryPath);
+  const hook = afterActiveProjectStateSnapshotHookForTests;
+  afterActiveProjectStateSnapshotHookForTests = null;
+  await hook?.();
+  const after = await readActiveProjectStartupReadOnlySnapshot(registryPath);
+  if (activeProjectStartupReadOnlySnapshotKey(before) !== activeProjectStartupReadOnlySnapshotKey(after)) {
+    throw new Error("active project startup preflight snapshot changed while reading");
+  }
+  const state = after.state;
+  if (!state || path.resolve(state.primaryRoot) !== expectedRoot || state.activationId !== expected.activationId) {
+    throw new Error("活动工程启动快照已变化，拒绝恢复旧工程。 ");
+  }
+  const registered = findRegisteredProjectInPair(after.pair, expectedRoot);
+  if (!registered) throw new Error(`活动工程登记已丢失，拒绝冷启动：${expectedRoot}`);
+  if (after.repairPlan.leaked.length > 0) return { kind: "repair-required", reason: "legacy-v2-registry-leak" };
+  if (after.repairPlan.activeNeedsWriterFence) return { kind: "repair-required", reason: "active-project-writer-fence" };
+  const rawSchemaVersion = rawActiveProjectSchemaVersion(after.rawActive);
+  if ((registered.lane === "v2" && rawSchemaVersion !== 3)
+    || (registered.lane === "legacy" && rawSchemaVersion !== 2)) {
+    return { kind: "repair-required", reason: "legacy-registration" };
+  }
+  return {
+    kind: "healthy",
+    registration: { ...registered.entry, primaryRoot: expectedRoot },
+    registrationLane: registered.lane,
+  };
+}
+
 /**
  * 冷启动的同根 CAS 对账。调用方只能提供先前纯只读投影中的 root+activationId；
  * 这里从不把旧 root 重新设为活动工程。validate 回调必须保持只读且不能再取
@@ -959,6 +1073,10 @@ export async function reconcileActiveProjectStartup<T>(
   validateManagedProject: (
     registration: Pick<ProjectConfig, "id" | "name" | "primaryRoot" | "updatedAt">,
   ) => Promise<T>,
+  onConfirmedUnderRegistryLock?: (input: {
+    registration: Pick<ProjectConfig, "id" | "name" | "primaryRoot" | "updatedAt">;
+    value: T;
+  }) => Promise<void> | void,
 ): Promise<{ registration: Pick<ProjectConfig, "id" | "name" | "primaryRoot" | "updatedAt">; value: T }> {
   const expectedRoot = path.resolve(expected.primaryRoot);
   if (!expected.primaryRoot || expectedRoot !== expected.primaryRoot
@@ -989,7 +1107,11 @@ export async function reconcileActiveProjectStartup<T>(
     const value = await validateManagedProject({ ...registration, primaryRoot: expectedRoot });
     // A→B→A 不能只按 root 判断；activationId 也必须仍等于初始快照。
     assertExpected(await readActiveProjectStateWithPreferences());
-    return { registration: { ...registration, primaryRoot: expectedRoot }, value };
+    const confirmed = { registration: { ...registration, primaryRoot: expectedRoot }, value };
+    // 进程内生命周期资源可在此挂载：registry CAS 尚未释放，因此 B 激活无法插入
+    // “A 已确认但 watcher 还未归属”的窗口。回调禁止反向取得 registry 锁或写 owner。
+    await onConfirmedUnderRegistryLock?.(confirmed);
+    return confirmed;
   });
 }
 

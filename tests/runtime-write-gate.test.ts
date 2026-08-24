@@ -1,4 +1,5 @@
-import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -287,7 +288,7 @@ describe("源码运行态门禁控制器", () => {
     expect(inspect).toHaveBeenCalledTimes(5);
     expect(controller.getMetrics()).toMatchObject({
       watcherHealthy: false,
-      invalidations: 2,
+      invalidations: 1,
     });
   });
 
@@ -415,5 +416,171 @@ describe("源码运行态门禁控制器", () => {
   it("拒绝非正有限 read TTL", () => {
     expect(() => createRuntimeGateController({ readTtlMs: 0 })).toThrow(/TTL/u);
     expect(() => createRuntimeGateController({ readTtlMs: Number.POSITIVE_INFINITY })).toThrow(/TTL/u);
+  });
+
+  it("unhealthy→healthy 丢弃不健康期间的在途核验，但不抬 epoch", async () => {
+    const test = await fixture();
+    const first = deferred<RuntimeWriteGateStatus>();
+    const inspect = vi.fn()
+      .mockImplementationOnce(() => first.promise)
+      .mockImplementation(async (boot: RuntimeBootIdentity) => gateStatus(boot, true));
+    const controller = createRuntimeGateController({ inspect });
+
+    const staleRead = controller.checkRead(test.boot);
+    await vi.waitFor(() => expect(inspect).toHaveBeenCalledTimes(1));
+    controller.setWatcherHealthy(true);
+    expect(controller.getMetrics()).toMatchObject({
+      watcherHealthy: true,
+      invalidations: 0,
+      invalidationEpoch: 0,
+    });
+
+    const freshRead = controller.checkRead(test.boot);
+    await vi.waitFor(() => expect(inspect).toHaveBeenCalledTimes(2));
+    await expect(freshRead).resolves.toMatchObject({ allowed: true });
+    first.resolve(gateStatus(test.boot, true));
+    await expect(staleRead).resolves.toMatchObject({ allowed: true });
+
+    await controller.checkRead(test.boot);
+    expect(inspect).toHaveBeenCalledTimes(2);
+    expect(controller.getMetrics()).toMatchObject({
+      readCacheHits: 1,
+      invalidationEpoch: 0,
+    });
+  });
+
+  it("watcher 覆盖 boot hash 且无事件时只读复用 boot digest，mutation 仍整树核验", async () => {
+    const test = await fixture();
+    const controller = createRuntimeGateController();
+    controller.noteWatchersRecording();
+    controller.noteBootHashCompleted();
+    controller.setWatcherHealthy(true);
+    expect(controller.getMetrics().bootDigestReusable).toBe(true);
+
+    const status = await controller.checkRead(test.boot);
+    expect(status).toMatchObject({
+      allowed: true,
+      currentSourceDigest: test.boot.bootSourceDigest,
+      currentArtifactSha256: test.boot.loadedArtifactSha256,
+    });
+    expect(controller.getMetrics()).toMatchObject({
+      bootDigestReuses: 1,
+      digestCalls: 0,
+      inspectionCalls: 1,
+    });
+
+    await expect(controller.checkMutation(test.boot)).resolves.toMatchObject({ allowed: true });
+    expect(controller.getMetrics()).toMatchObject({
+      bootDigestReuses: 1,
+      digestCalls: 1,
+      inspectionCalls: 2,
+    });
+  });
+
+  it("hash 先于 watcher ready 或 setup 期间有事件时不复用 boot digest", async () => {
+    const ahead = await fixture();
+    const aheadController = createRuntimeGateController();
+    aheadController.noteBootHashCompleted();
+    aheadController.noteWatchersRecording();
+    aheadController.setWatcherHealthy(true);
+    expect(aheadController.getMetrics().bootDigestReusable).toBe(false);
+    await aheadController.checkRead(ahead.boot);
+    expect(aheadController.getMetrics()).toMatchObject({
+      bootDigestReuses: 0,
+      digestCalls: 1,
+    });
+
+    const interrupted = await fixture();
+    const interruptedController = createRuntimeGateController();
+    interruptedController.noteWatchersRecording();
+    interruptedController.invalidate();
+    interruptedController.noteBootHashCompleted();
+    interruptedController.setWatcherHealthy(true);
+    expect(interruptedController.getMetrics().bootDigestReusable).toBe(false);
+    await interruptedController.checkRead(interrupted.boot);
+    expect(interruptedController.getMetrics()).toMatchObject({
+      bootDigestReuses: 0,
+      digestCalls: 1,
+    });
+  });
+});
+
+describe("boot digest 复用与启动窗口", () => {
+  it("inspectRuntimeWriteGate 在 reuseBootSourceDigest 时不扫描源码树，只复核工件", async () => {
+    const test = await fixture();
+    const computeSourceDigest = vi.fn(async () => ({
+      sourceDigest: "0".repeat(64),
+      sourceFiles: 0,
+      sourceBytes: 0,
+    }));
+    await expect(inspectRuntimeWriteGate(test.boot, {
+      reuseBootSourceDigest: true,
+      computeSourceDigest,
+    })).resolves.toMatchObject({
+      allowed: true,
+      currentSourceDigest: test.boot.bootSourceDigest,
+      reasons: [],
+    });
+    expect(computeSourceDigest).not.toHaveBeenCalled();
+
+    await writeFile(test.artifactPath, "export const runtime = 2;\n", "utf8");
+    await expect(inspectRuntimeWriteGate(test.boot, {
+      reuseBootSourceDigest: true,
+      computeSourceDigest,
+    })).resolves.toMatchObject({
+      allowed: false,
+      reasons: ["runtime-artifact-changed"],
+    });
+    expect(computeSourceDigest).not.toHaveBeenCalled();
+  });
+
+  it("captureRuntimeBootIdentity 启动时仍真实扫描源码树", async () => {
+    const test = await fixture();
+    expect(test.boot.bootSourceDigest).toMatch(/^[a-f0-9]{64}$/u);
+    expect(test.boot.loadedArtifactSha256).toMatch(/^[a-f0-9]{64}$/u);
+    const again = await captureRuntimeBootIdentity({
+      workspace: test.root,
+      loadedArtifactPath: test.artifactPath,
+    });
+    expect(again.bootSourceDigest).toBe(test.boot.bootSourceDigest);
+    await writeFile(path.join(test.root, "src", "extra.ts"), "export const extra = 1;\n", "utf8");
+    const changed = await captureRuntimeBootIdentity({
+      workspace: test.root,
+      loadedArtifactPath: test.artifactPath,
+    });
+    expect(changed.bootSourceDigest).not.toBe(test.boot.bootSourceDigest);
+  });
+
+  it("main 在 boot hash 完成前启动 watcher，并把覆盖窗口交给 controller", async () => {
+    const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+    const main = await readFile(path.join(workspace, "src/main/index.ts"), "utf8");
+    const startFn = main.slice(
+      main.indexOf("async function startSourceRuntimeGateWatchers"),
+      main.indexOf("async function closeSourceRuntimeGateWatchers"),
+    );
+    expect(startFn.indexOf("chokidar.watch")).toBeGreaterThan(-1);
+    expect(startFn).toContain("sourceDigestWatchPaths(sourceRuntimeWorkspace)");
+    expect(startFn).toContain("noteWatchersRecording");
+    expect(startFn).toContain("setWatcherHealthy(true)");
+    const awaitBoot = startFn.indexOf("await sourceRuntimeBootIdentity");
+    const firstWatch = startFn.indexOf("chokidar.watch");
+    expect(awaitBoot).toBe(-1);
+    expect(firstWatch).toBeGreaterThan(-1);
+    expect(main).toContain("noteBootHashCompleted");
+    expect(main).toContain("sourceRuntimeLoadedArtifactPath");
+  });
+
+  it("main 在创建窗口前等待剩余 boot hash，避免 first-card 再付整树 walk", async () => {
+    const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+    const main = await readFile(path.join(workspace, "src/main/index.ts"), "utf8");
+    const readySequence = main.slice(
+      main.indexOf("app.whenReady().then"),
+      main.indexOf('app.on("window-all-closed"'),
+    );
+    const awaitBoot = readySequence.indexOf("await sourceRuntimeBootIdentity");
+    const createWindowCall = readySequence.indexOf("await createWindow()");
+    expect(awaitBoot).toBeGreaterThan(-1);
+    expect(createWindowCall).toBeGreaterThan(awaitBoot);
+    expect(readySequence).toContain("sourceRuntimeBootIdentity.catch");
   });
 });

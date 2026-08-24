@@ -38,7 +38,9 @@ import {
   readStudioUnitGridGenerationFrozenPack,
 } from "./studio-generation-ledger.js";
 import { readStudioGenerationReview } from "./studio-generation-review.js";
-import { getStudioProductionUnitSnapshot } from "./studio-production.js";
+import {
+  readStudioProductionUnitSnapshotReadOnly,
+} from "./studio-production.js";
 import { assertStudioUnitGridGenerationFreezePackCurrent } from "./studio-unit-grid-generation.js";
 import type { StudioUnitGridGenerationFreezePack } from "./studio-unit-grid-generation.js";
 import type { StudioFormalImagegenProvider } from "./studio-imagegen-providers.js";
@@ -3497,6 +3499,54 @@ export async function readStudioVideoPackageExportIntentByOperationId(
   }
 }
 
+/**
+ * succeeded command replay 专用 immutable proof。只读同一 SQLite 物理快照，
+ * 验证 operation alias/direct intent 与 managed-evidence receipt；不做 source
+ * currentness、文件内容验证或 builder/adopt。
+ */
+export async function readStudioVideoPackageBuildReceiptByOperationIdReadOnly(
+  projectRoot: string,
+  operationIdValue: string,
+): Promise<{
+  intent: StudioVideoPackageExportIntent;
+  receipt: StudioVideoPackageVerifyReceipt;
+} | null> {
+  const operationId = normalizeId(operationIdValue, "operationId");
+  const shell = await inspectManagedProjectReadOnly(projectRoot);
+  const databasePath = await generationDatabasePathReadOnly(shell.paths.root);
+  const snapshot = await openSqliteReadOnlySnapshot(databasePath, "video package immutable build receipt");
+  try {
+    const db = snapshot.database;
+    assertSchema(db);
+    const aliasRow = db.prepare("SELECT * FROM studio_video_package_operation_aliases WHERE operation_id=?")
+      .get(operationId) as unknown as OperationAliasRow | undefined;
+    const directRow = db.prepare("SELECT * FROM studio_video_package_export_intents WHERE operation_id=?")
+      .get(operationId) as unknown as IntentRow | undefined;
+    if (aliasRow && directRow) fail("storage-invalid", `operationId=${operationId} 同时占用 intent 与 alias。`);
+    let intentRow = directRow;
+    if (aliasRow) {
+      const alias = operationAliasFromRow(aliasRow);
+      intentRow = intentRowById(db, alias.intent_id);
+      if (!intentRow) fail("storage-invalid", `operationId=${operationId} alias 指向不存在的 intent。`);
+      const aliasedIntent = intentFromRow(intentRow);
+      if (alias.input_fingerprint !== aliasedIntent.inputFingerprint) {
+        fail("storage-invalid", `operationId=${operationId} alias 输入指纹与 intent 不一致。`);
+      }
+    }
+    if (!intentRow) return null;
+    const intent = intentFromRow(intentRow);
+    const receiptRow = receiptRowByIntent(db, intent.intentId);
+    if (!receiptRow) return null;
+    const receipt = receiptFromRow(receiptRow);
+    if (receipt.intentId !== intent.intentId || receipt.storageKind !== "managed-evidence") {
+      fail("storage-invalid", "video package build immutable proof 仅允许匹配 managed-evidence receipt。");
+    }
+    return { intent, receipt };
+  } finally {
+    await snapshot.close();
+  }
+}
+
 export async function prepareStudioVideoPackageExport(
   projectRoot: string,
   input: PrepareStudioVideoPackageExportInput,
@@ -4113,7 +4163,7 @@ async function assertIntentManagedSourceCurrent(
     && intent.authorityKind === "studio-review") {
     try {
       const [unit] = await Promise.all([
-        getStudioProductionUnitSnapshot(projectRoot, intent.unitId),
+        readStudioProductionUnitSnapshotReadOnly(projectRoot, intent.unitId),
         (async () => {
           // Review/result/Observation 与视频包 intent/receipt 共用同一 generation
           // ledger。直接在一个 query-only SQLite 快照里复核 Head CAS，既比

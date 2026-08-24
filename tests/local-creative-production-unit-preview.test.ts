@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
-import { copyFile, mkdir, mkdtemp, readFile, realpath, readdir, rm, symlink, writeFile } from "node:fs/promises";
+import { copyFile, lstat, mkdir, mkdtemp, readFile, realpath, readdir, rm, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import sharp from "sharp";
 import { afterEach, describe, expect, it } from "vitest";
 import { executeIdempotentCommand, listCommandLedger } from "../src/core/command-bus.js";
+import { upsertCommandLedgerEntry } from "../src/core/command-ledger-store.js";
 import { importLocalCreativeProjectContent } from "../src/core/local-creative-project-content-import.js";
 import { materializeLocalCreativeProductionUnits } from "../src/core/local-creative-production-unit-materializer.js";
 import { materializeLocalCreativeProject } from "../src/core/local-creative-project-materializer.js";
@@ -24,6 +25,7 @@ import {
   getStudioProductionState,
   getStudioProductionUnitSnapshot,
 } from "../src/core/studio-production.js";
+import { withStudioUnitsReadProbe } from "../src/core/studio-units-read-phase-timeline.js";
 import {
   prepareLocalCreativeUnitSourceContract,
   readLocalCreativeUnitSourceContract,
@@ -39,6 +41,19 @@ async function directoryNamesOrEmpty(directory: string): Promise<string[]> {
       && (error as NodeJS.ErrnoException).code === "ENOENT") return [];
     throw error;
   }
+}
+
+async function productionSqliteIdentity(projectRoot: string): Promise<Record<string, string>> {
+  const sidecar = path.join(projectRoot, ".aicanvas");
+  const names = (await directoryNamesOrEmpty(sidecar))
+    .filter((name) => name.startsWith("studio-production.sqlite"));
+  return Object.fromEntries(await Promise.all(names.map(async (name) => {
+    const filePath = path.join(sidecar, name);
+    const metadata = await lstat(filePath, { bigint: true });
+    const bytes = await readFile(filePath);
+    return [name, [metadata.dev, metadata.ino, metadata.nlink, metadata.size,
+      metadata.mtimeNs, metadata.ctimeNs, createHash("sha256").update(bytes).digest("hex")].join(":")];
+  })));
 }
 
 afterEach(async () => {
@@ -419,6 +434,79 @@ describe("本机剧情生产单元只读预览", () => {
       code: "binding-blocked",
       message: expect.stringContaining("来源任务已声明参考图"),
     });
+  });
+
+  it("命令首次成功只向账本持久化安全物化 locator，首次响应仍保留完整业务结果", async () => {
+    const test = await duduFixture();
+    const sourcePreview = await inspectLocalCreativeProject({
+      projectKey: "dudu-preview-test",
+      projectName: "嘟嘟预览测试",
+      projectType: "story-production",
+      sourceLayers: [{ role: "PRIMARY_AUTHORITY", rootPath: test.sourceRoot }],
+      computeSha256: true,
+    });
+    await importLocalCreativeProjectContent({
+      projectRoot: test.projectRoot,
+      preview: sourcePreview,
+      authorityPolicy: "FORBID_ALL",
+    });
+    const preview = await previewLocalCreativeProductionUnits(test.projectRoot);
+    const envelope = {
+      requestId: "materialize-normal-success-request-001",
+      idempotencyKey: "materialize-normal-success-key-001",
+      request: {
+        command: "materialize_local_creative_production_units" as const,
+        payload: {
+          expectedPreviewFingerprint: preview.fingerprint,
+          expectedSourceFingerprint: preview.sourceFingerprint!,
+          candidateIds: [preview.units[0]!.candidateId],
+        },
+      },
+    };
+    const first = await executeIdempotentCommand(test.projectRoot, envelope);
+    expect(first).toMatchObject({
+      status: "succeeded",
+      replayed: false,
+      result: { units: [{ candidateId: preview.units[0]!.candidateId, sourceSoundAndText: expect.any(Array) }] },
+    });
+    const ledgerResult = (await listCommandLedger(test.projectRoot))[0]?.result;
+    expect(ledgerResult).toMatchObject({
+      schemaVersion: 1,
+      kind: "local-creative-production-unit-materialization-result-locator",
+      units: [{ candidateId: preview.units[0]!.candidateId }],
+    });
+    const serialized = JSON.stringify(ledgerResult);
+    for (const forbidden of [
+      "projectRoot", "note", "sourceSoundAndText", "existingBoard",
+      "scriptRevisionId", "promptRevisionIds",
+    ]) expect(serialized).not.toContain(forbidden);
+    const storedEntry = (await listCommandLedger(test.projectRoot))[0]!;
+    await upsertCommandLedgerEntry(test.projectRoot, {
+      ...storedEntry,
+      result: {
+        ...(storedEntry.result as Record<string, unknown>),
+        projectRoot: "/ABSOLUTE/LOCATOR/INJECTION",
+        note: "SENSITIVE_LOCATOR_NOTE",
+        sourceSoundAndText: [{ panelId: "W00_G01", value: "SENSITIVE_BODY" }],
+        existingBoard: { prompt: "SENSITIVE_PROMPT" },
+      },
+    }, storedEntry.executedAt ?? storedEntry.startedAt);
+    const replay = await executeIdempotentCommand(test.projectRoot, {
+      ...envelope,
+      requestId: "materialize-normal-success-request-002",
+    });
+    expect(replay).toMatchObject({
+      status: "succeeded",
+      replayed: true,
+      result: {
+        units: [{ candidateId: preview.units[0]!.candidateId, sourceSoundAndText: expect.any(Array) }],
+        replayed: true,
+        reconciled: true,
+      },
+    });
+    expect(JSON.stringify(replay.result)).not.toContain("SENSITIVE");
+    expect(JSON.stringify(replay.result)).not.toContain("/ABSOLUTE/LOCATOR/INJECTION");
+    expect((await getStudioProductionState(test.projectRoot)).counts.units).toBe(1);
   });
 
   it("内部预览完成后来源再变化时，首次受管写之前失败关闭", async () => {
@@ -1268,19 +1356,45 @@ describe("本机剧情生产单元只读预览", () => {
       }),
     ]);
 
-    const recovered = await executeIdempotentCommand(test.projectRoot, {
+    const beforeProduction = await productionSqliteIdentity(test.projectRoot);
+    const strictRecovery = await withStudioUnitsReadProbe(true, () => executeIdempotentCommand(test.projectRoot, {
       ...envelope,
       requestId: "materialize-local-unit-recovery-request",
+    }));
+    const recovered = strictRecovery.value;
+    expect(strictRecovery.snapshot?.counters).toMatchObject({
+      productionDirectoryEnsureCalls: 0,
+      productionOpenDatabaseCalls: 0,
+      productionReadOnlyProbeConnections: 0,
+      productionOwnerConnections: 0,
     });
+    expect(await productionSqliteIdentity(test.projectRoot)).toEqual(beforeProduction);
     expect(recovered).toMatchObject({
       status: "succeeded",
       replayed: true,
       result: {
+        schemaVersion: 1,
+        kind: "local-creative-production-unit-materialization-receipt",
         replayed: true,
         reconciled: true,
         units: [{ candidateId: preview.units[0]!.candidateId }],
       },
     });
+    const recoveredLedger = (await listCommandLedger(test.projectRoot))
+      .find((entry) => entry.idempotencyKey === envelope.idempotencyKey);
+    expect(recoveredLedger?.result).toMatchObject({
+      schemaVersion: 1,
+      kind: "local-creative-production-unit-materialization-result-locator",
+      units: [{ candidateId: preview.units[0]!.candidateId }],
+    });
+    const persistedLocator = JSON.stringify(recoveredLedger?.result);
+    for (const forbidden of [
+      "projectRoot", "note", "sourceSoundAndText", "existingBoard",
+      "scriptRevisionId", "promptRevisionIds",
+    ]) {
+      expect(persistedLocator).not.toContain(forbidden);
+    }
+    expect(Buffer.byteLength(persistedLocator, "utf8")).toBeLessThanOrEqual(8 * 1024);
     const state = await getStudioProductionState(test.projectRoot);
     expect(state.counts).toMatchObject({
       units: 1,
@@ -1289,6 +1403,21 @@ describe("本机剧情生产单元只读预览", () => {
       promptDocuments: 2,
       textRevisions: 3,
     });
+    const replayedLocator = await executeIdempotentCommand(test.projectRoot, {
+      ...envelope,
+      requestId: "materialize-local-unit-locator-replay-request",
+    });
+    expect(replayedLocator).toMatchObject({
+      status: "succeeded",
+      replayed: true,
+      result: {
+        kind: "local-creative-production-unit-materialization-receipt",
+        replayed: true,
+        reconciled: true,
+        units: [{ candidateId: preview.units[0]!.candidateId }],
+      },
+    });
+    expect((await getStudioProductionState(test.projectRoot)).counts.units).toBe(1);
   });
 
   it("多单元在首项提交后崩溃时，同一命令凭批 journal/checkpoint 续完且不保留 durable unknown", async () => {
@@ -1348,8 +1477,26 @@ describe("本机剧情生产单元只读预览", () => {
       units: 2,
       panels: 4,
     });
-    expect((await listCommandLedger(test.projectRoot))
-      .find((entry) => entry.idempotencyKey === envelope.idempotencyKey)?.status)
-      .toBe("succeeded");
+    const recoveredLedger = (await listCommandLedger(test.projectRoot))
+      .find((entry) => entry.idempotencyKey === envelope.idempotencyKey);
+    expect(recoveredLedger).toMatchObject({
+      status: "succeeded",
+      result: {
+        schemaVersion: 1,
+        kind: "local-creative-production-unit-materialization-result-locator",
+        units: [
+          { candidateId: preview.units[0]!.candidateId },
+          { candidateId: preview.units[1]!.candidateId },
+        ],
+      },
+    });
+    const persistedLocator = JSON.stringify(recoveredLedger?.result);
+    expect(Buffer.byteLength(persistedLocator, "utf8")).toBeLessThanOrEqual(8 * 1024);
+    for (const forbidden of [
+      "projectRoot", "note", "sourceSoundAndText", "existingBoard",
+      "scriptRevisionId", "promptRevisionIds",
+    ]) {
+      expect(persistedLocator).not.toContain(forbidden);
+    }
   });
 });

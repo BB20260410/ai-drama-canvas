@@ -37,6 +37,7 @@ import {
   createStudioScriptDocument,
   getStudioProductionUnitSnapshot,
   listStudioProductionUnits,
+  readStudioProductionUnitSnapshotReadOnly,
   readStudioProductionUnitSnapshotForCodex,
   reviseStudioProductionUnit,
   getStudioTextDocument,
@@ -1208,6 +1209,7 @@ function assertReceipt(value: unknown, requestHash: string): LocalCreativeProduc
 async function validateMaterializationItems(
   projectRoot: string,
   items: LocalCreativeProductionUnitMaterializationItem[],
+  snapshotReader: typeof readStudioProductionUnitSnapshotForCodex = readStudioProductionUnitSnapshotForCodex,
 ): Promise<void> {
   for (const item of items) {
     if (typeof item.sourceContractFingerprint !== "string"
@@ -1217,9 +1219,7 @@ async function validateMaterializationItems(
       || item.unitRevision === undefined) {
       throw new Error(`单元物化回执 ${item.unitId} 缺少可验证的来源合同身份。`);
     }
-    const snapshot = item.unitRevision === undefined
-      ? await getStudioProductionUnitSnapshot(projectRoot, item.unitId)
-      : await readStudioProductionUnitSnapshotForCodex(projectRoot, item.unitId, item.unitRevision);
+    const snapshot = await snapshotReader(projectRoot, item.unitId, item.unitRevision);
     if (!snapshot || snapshot.fingerprint !== item.unitFingerprint
       || snapshot.scriptRevision.id !== item.scriptRevisionId
       || JSON.stringify(snapshot.panels.map((panel) => panel.promptRevision.id))
@@ -1249,8 +1249,9 @@ async function validateMaterializationItems(
 async function validateReceiptUnits(
   projectRoot: string,
   receipt: LocalCreativeProductionUnitMaterializationReceipt,
+  snapshotReader: typeof readStudioProductionUnitSnapshotForCodex = readStudioProductionUnitSnapshotForCodex,
 ): Promise<void> {
-  await validateMaterializationItems(projectRoot, receipt.units);
+  await validateMaterializationItems(projectRoot, receipt.units, snapshotReader);
 }
 
 async function validateBatchCheckpoints(
@@ -1485,5 +1486,31 @@ export async function readLocalCreativeProductionUnitMaterializationOutcome(
   if (receipt === null) return null;
   const validated = assertReceipt(receipt, requestHash);
   await validateReceiptUnits(shell.paths.root, validated);
+  return validated;
+}
+
+/**
+ * Command crash/replay 专用严格只读 proof：不触发 production ensure/live DB open。
+ */
+export async function readLocalCreativeProductionUnitMaterializationOutcomeReadOnly(
+  projectRoot: string,
+  rawInput: MaterializeLocalCreativeProductionUnitsInput,
+): Promise<LocalCreativeProductionUnitMaterializationReceipt | null> {
+  const shell = await inspectManagedProjectReadOnly(projectRoot);
+  const input = normalizeInput(rawInput);
+  const requestHash = digest({
+    projectId: shell.project.id,
+    ...input,
+  });
+  const receipt = await readConfinedJsonSidecar<unknown>(
+    shell.paths.root,
+    RECEIPT_DIRECTORY,
+    `${requestHash}.json`,
+    null,
+    MAX_RECEIPT_BYTES,
+  );
+  if (receipt === null) return null;
+  const validated = assertReceipt(receipt, requestHash);
+  await validateReceiptUnits(shell.paths.root, validated, readStudioProductionUnitSnapshotReadOnly);
   return validated;
 }

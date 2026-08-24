@@ -125,6 +125,7 @@ function parseLayoutDocument(raw: string, filePath: string): StudioCanvasLayout 
       pinnedNodeIds: doc.pinnedNodeIds as StudioCanvasLayout["pinnedNodeIds"] | undefined,
       draftCanvasEdges: doc.draftCanvasEdges as StudioCanvasLayout["draftCanvasEdges"] | undefined,
       workflowGroups: doc.workflowGroups as StudioCanvasLayout["workflowGroups"],
+      spatialGroups: doc.spatialGroups as StudioCanvasLayout["spatialGroups"],
       updatedAt: typeof doc.updatedAt === "string" ? doc.updatedAt : undefined,
     });
     // 磁盘 fingerprint 若与内容不一致，以内容为准重算（兼容手改）

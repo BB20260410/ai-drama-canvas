@@ -119,4 +119,53 @@ describe("P21 生成计划与任务 UI 合同", () => {
     // R3-F1 回归：ignored 必须放行被监听根目录（chokidar 对根路径同样应用 ignored 谓词）。
     expect(watcher).toContain("candidate !== aicanvasDir");
   });
+
+  it("生成控制技术消息诊断 summary 含 testid，不改冻结包/结果身份", () => {
+    const view = read("src/renderer/src/components/StudioGenerationControlView.vue");
+    expect(view).toContain("isTechnicalGenerationMessage(detail.selectedPanel.generation.message)");
+    expect(view).toContain('data-testid="studio-generation-message-diagnostics"');
+    expect(view).toContain('<summary data-testid="studio-generation-message-diagnostics">诊断详情</summary>');
+    expect(view).toContain('data-testid="studio-pack-identity"');
+    expect(view).toContain("`studio-result-identity-${item.resultId}`");
+    expect(view).not.toContain("material-studio-diagnostics");
+    expect(view).not.toContain("studio-continuity-next-action-diagnostics");
+  });
+
+  it("生成控制计划 ID 诊断 summary 含共享 testid，不改技术消息与冻结包身份", () => {
+    const view = read("src/renderer/src/components/StudioGenerationControlView.vue");
+    expect(view).toContain('class="plan-group"');
+    expect(view).toContain('class="plan-id-diagnostics"');
+    expect(view).toContain('data-testid="studio-generation-plan-id-diagnostics"');
+    expect(view).toContain('<summary data-testid="studio-generation-plan-id-diagnostics">诊断</summary>');
+    expect(view).toContain("计划 ID {{ group.planId }}");
+    expect(view).not.toContain("studio-generation-plan-id-diagnostics-");
+    expect(view).toContain('data-testid="studio-generation-message-diagnostics"');
+    expect(view).toContain('data-testid="studio-pack-identity"');
+    expect(view).toContain("`studio-result-identity-${item.resultId}`");
+    expect(view).not.toContain("studio-binding-diagnostics");
+  });
+
+  it("冻结包身份 summary 含 testid，details 仍 studio-pack-identity", () => {
+    const view = read("src/renderer/src/components/StudioGenerationControlView.vue");
+    expect(view).toContain('class="technical-diagnostics pack-identity"');
+    expect(view).toContain('data-testid="studio-pack-identity"');
+    expect(view).toContain('data-testid="studio-pack-identity-summary"');
+    expect(view).toContain('<summary data-testid="studio-pack-identity-summary">冻结包身份（生成时版本）</summary>');
+    expect(view).not.toContain("studio-pack-identity-summary-");
+    expect(view).not.toContain('pack-identity" role="dialog"');
+    expect(view).toContain('data-testid="studio-generation-message-diagnostics"');
+    expect(view).toContain('data-testid="studio-generation-plan-id-diagnostics"');
+  });
+
+  it("结果行生成时身份 summary 含共享 testid，不改 per-result details", () => {
+    const view = read("src/renderer/src/components/StudioGenerationControlView.vue");
+    expect(view).toContain('class="technical-diagnostics result-identity"');
+    expect(view).toContain("`studio-result-identity-${item.resultId}`");
+    expect(view).toContain('data-testid="studio-result-identity-summary"');
+    expect(view).toContain('<summary data-testid="studio-result-identity-summary">生成时身份</summary>');
+    expect(view).not.toContain("studio-result-identity-summary-");
+    expect(view).toContain('@toggle="onResultIdentityToggle(item.packId)"');
+    expect(view).toContain('data-testid="studio-pack-identity-summary"');
+    expect(view).toContain('data-testid="studio-generation-message-diagnostics"');
+  });
 });

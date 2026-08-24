@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "kind": "isolated-package-smoke-completion",
+  "runId": "isolated-package-smoke-20260814T152655899Z-52685-ba286ef3",
+  "terminalEvidencePath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260814T152655899Z-52685-ba286ef3.json",
+  "terminalEvidenceSha256": "0fda154f0cea68df3cd2a8c0c62825afcddeae070e7738ef08e175113a1609bb",
+  "lockPath": "/Users/hxx/Documents/无限画布/docs/evidence/isolated-package-smoke-20260814T152655899Z-52685-ba286ef3.json.lock",
+  "lockAbsent": true,
+  "status": "passed",
+  "lockReleased": true,
+  "completedAt": "2026-08-14T15:29:48.407Z"
+}

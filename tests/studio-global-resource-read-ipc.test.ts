@@ -125,21 +125,28 @@ describe("Material Studio 全局资源只读 IPC registrar", () => {
     const mainOns = collectStringChannels(main, "ipcMain", "on");
     const preloadInvokes = collectStringChannels(preload, "ipcRenderer", "invoke");
 
-    // ABI 冻结基线 2026-08-12（wq-0004 有界重基线）：自 2026-08-10 基线后新增 4 个已批准通道：
+    // ABI 冻结基线 2026-08-14（T23 启动快路有界重基线）：自 2026-08-12 基线后新增 2 个已批准通道：
+    //   canvas:preflight-active-managed-project-startup（启动纯读 CAS 预检）
+    //   canvas:ensure-active-managed-project-generation-watcher（首卡后 watcher 生命周期）
+    // 上一次基线已包含：
     //   canvas:get-studio-higgsfield-video-generation-control（Higgsfield 桥只读控制面，2026-08-10 07:55 切片）
     //   canvas:list-edit-media-page（剪辑台媒体分页，运行速度整改 2026-08-10 15:42）
     //   canvas:get/set-active-hybrid-workspace-preference（小说混合工作区，2026-07-31 novel 切片）
     //   其余 reconcile/startup 与 shell-validation 通道属 07-31 前已存在集合；基线经独立终审 CLEAN 后冻结。
-    expect(new Set(allHandles).size).toBe(270);
-    expect(allHandles).toHaveLength(270);
+    expect(allHandles).toContain("canvas:preflight-active-managed-project-startup");
+    expect(allHandles).toContain("canvas:ensure-active-managed-project-generation-watcher");
+    expect(preloadInvokes).toContain("canvas:preflight-active-managed-project-startup");
+    expect(preloadInvokes).toContain("canvas:ensure-active-managed-project-generation-watcher");
+    expect(new Set(allHandles).size).toBe(272);
+    expect(allHandles).toHaveLength(272);
     expect(mainOns).toHaveLength(3);
     expect(new Set(mainOns).size).toBe(3);
-    expect(preloadInvokes).toHaveLength(257);
-    expect(new Set(preloadInvokes).size).toBe(257);
+    expect(preloadInvokes).toHaveLength(259);
+    expect(new Set(preloadInvokes).size).toBe(259);
     expect(createHash("sha256").update([...allHandles].sort().join("\n")).digest("hex"))
-      .toBe("d472cc47d60af0ceae28f52dabc1135fb21b1bb8b7abc7de5f324c67d09e6069");
+      .toBe("ed0a3d99fe3a4906c03bbeb786c0fdd94b2031ce1b03f1628fa1ed5e36017f47");
     expect(createHash("sha256").update([...preloadInvokes].sort().join("\n")).digest("hex"))
-      .toBe("de772fc8a50b83f6155aad8dc54dd400382936494784e5b39658fdd7375098da");
+      .toBe("04b89005be8453ada2e498288e93deb7b0990da21c46eb27b43681e4308975dd");
 
     expect(registrar).not.toMatch(/\bipcMain\b/u);
     expect(collectStringChannels(registrar, "handle", "handle")).toEqual(channels);

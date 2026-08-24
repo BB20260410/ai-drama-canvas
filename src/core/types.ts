@@ -2711,7 +2711,11 @@ export interface VoiceIdentity {
   language: string;
   description: string;
   samplePaths: string[];
+  /** 受管规范角色资产 ID，画布角色库用它把音频跟角色绑在一起。 */
+  characterAssetIds: string[];
   characterItemIds: string[];
+  /** CAS 音频 SHA-256；钉到画布时按这些 SHA 自动带出音频节点。 */
+  sampleMediaSha256s: string[];
   hardLockId?: string;
   tags: string[];
   revision: number;
@@ -2726,7 +2730,9 @@ export interface VoiceIdentityInputFields {
   language?: string;
   description?: string;
   samplePaths?: string[];
+  characterAssetIds?: string[];
   characterItemIds?: string[];
+  sampleMediaSha256s?: string[];
   hardLockId?: string;
   tags?: string[];
 }

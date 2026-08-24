@@ -1,6 +1,9 @@
 import { createHash } from "node:crypto";
 import { realpath } from "node:fs/promises";
+import path from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import { afterEach, describe, expect, it } from "vitest";
+import { __commandRequestHashForTests, executeIdempotentCommand } from "../src/core/command-bus.js";
 import {
   appendStudioAssetVersion,
   getStudioCanonicalAsset,
@@ -27,6 +30,7 @@ import {
   readStudioGenerationResult,
   registerStudioGenerationResult,
 } from "../src/core/studio-generation-ledger.js";
+import { __setBeforeGenerationWritableOpenHookForTests } from "../src/core/studio-generation-ledger-storage.js";
 import {
   getStudioGenerationReviewControl,
   listStudioGenerationReviewHistory,
@@ -385,6 +389,77 @@ describe("P7 Studio generation Review stale/CAS 安全合同", () => {
       [historical.reviewId, false, false],
     ]);
     expect(rereadObservation).toMatchObject({ reviewId: observation.reviewId, head: true, current: false });
+
+    const repeatedStaleRequest = {
+      command: "submit_studio_generation_review" as const,
+      payload: {
+        ...reviewBase(pair),
+        reviewer: "user" as const,
+        kind: "correction" as const,
+        expectedHeadRevision: 1,
+        supersedesReviewId: observation.reviewId,
+        decision: "rework" as const,
+        note: "同一 stale Review 允许由两个不同 operation receipt 绑定。",
+      },
+    };
+    const firstOperation = await submitStudioGenerationReview(fixture.root, {
+      ...repeatedStaleRequest.payload,
+      operationId: "p7-stale-review-direct-operation-0001",
+    });
+    await wait(5);
+    const commandOperationId = __commandRequestHashForTests(fixture.root, repeatedStaleRequest);
+    const secondOperation = await submitStudioGenerationReview(fixture.root, {
+      ...repeatedStaleRequest.payload,
+      operationId: commandOperationId,
+    });
+    expect(secondOperation).toMatchObject({
+      reviewId: firstOperation.reviewId,
+      currentAtSubmission: false,
+      advancesHead: false,
+    });
+    const receiptDb = new DatabaseSync(path.join(fixture.root, ".aicanvas", "studio-generation-ledger.sqlite"), {
+      readOnly: true,
+    });
+    try {
+      expect(receiptDb.prepare(`
+        SELECT COUNT(*) AS count, COUNT(DISTINCT created_at) AS distinctCreatedAt
+        FROM studio_generation_review_operation_receipts
+        WHERE review_id = ?
+      `).get(firstOperation.reviewId)).toEqual({ count: 2, distinctCreatedAt: 2 });
+    } finally {
+      receiptDb.close();
+    }
+    const firstPublic = await executeIdempotentCommand(fixture.root, {
+      requestId: "p7-stale-review-operation-request-0002",
+      idempotencyKey: "p7-stale-review-operation-key-0002",
+      request: repeatedStaleRequest,
+    });
+    expect(firstPublic.result).toMatchObject({
+      reviewId: firstOperation.reviewId,
+      currentAtSubmission: false,
+      advancesHead: false,
+    });
+    let generationWritableOpens = 0;
+    __setBeforeGenerationWritableOpenHookForTests(() => { generationWritableOpens += 1; });
+    try {
+      await expect(executeIdempotentCommand(fixture.root, {
+        requestId: "p7-stale-review-operation-request-0002-replay",
+        idempotencyKey: "p7-stale-review-operation-key-0002",
+        request: repeatedStaleRequest,
+      })).resolves.toMatchObject({
+        status: "succeeded",
+        replayed: true,
+        result: {
+          reviewId: firstOperation.reviewId,
+          current: false,
+          approvedRawEligible: false,
+          currentStaleReasons: expect.arrayContaining(["strict-recovery-currentness-not-proven"]),
+        },
+      });
+    } finally {
+      __setBeforeGenerationWritableOpenHookForTests(null);
+    }
+    expect(generationWritableOpens).toBe(0);
 
     console.log(`P7_REVIEW_STALE_HISTORICAL_ONLY ${JSON.stringify({
       drifted: ["script", "binding-set", "authority"],

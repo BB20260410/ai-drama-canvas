@@ -8,7 +8,7 @@
       </div>
       <div class="module-actions">
         <span v-if="selectedIds.size" class="selection-count">已选 {{ selectedIds.size }}</span>
-        <button v-if="mode !== 'assets'" class="primary-button" type="button" :disabled="creating" @click="createPack">
+        <button v-if="mode !== 'assets'" class="primary-button" type="button" data-testid="production-workspace-create-pack" :disabled="creating" :title="creating ? '正在处理，不能再创建任务包' : undefined" @click="createPack">
           <PackagePlus :size="16" /> {{ creating ? "创建中" : `创建${mode === 'videos' ? '视频' : '图片'}任务包` }}
         </button>
       </div>
@@ -45,7 +45,7 @@
           <figure><img v-if="item.thumbnailPath" loading="lazy" decoding="async" :src="assetUrl(item.thumbnailPath)" :alt="`${item.title} 缩略图`" /><span v-else>无预览</span></figure>
           <div><span>{{ assetGroup(item) }}<template v-if="item.hardLockIds.length"> · 硬锁</template></span><b>{{ item.title }}</b><small>{{ item.sourcePaths[0] }}</small></div>
         </button>
-        <footer><button type="button" @click="revealArtifact(item.sourcePaths[0]!)">定位文件</button><button v-if="!item.hardLockIds.length" type="button" @click="promoteAsset(item)">提升为硬锁</button><b v-else><LockKeyhole :size="12" /> 权威参考</b></footer>
+        <footer><button type="button" @click="revealArtifact(item.sourcePaths[0]!)">定位文件</button><button v-if="!item.hardLockIds.length" type="button" data-testid="production-workspace-promote-asset" :disabled="Boolean(actionBusy)" :title="actionBusy ? '正在处理，不能再提升为硬锁' : undefined" @click="promoteAsset(item)">提升为硬锁</button><b v-else><LockKeyhole :size="12" /> 权威参考</b></footer>
       </article>
     </div>
 
@@ -62,7 +62,7 @@
               <div><b>{{ artifact.authoritative ? '权威版本' : artifact.versionLabel }}</b><small>{{ durationLabel(artifact) }} · {{ artifact.check.width ?? 0 }}×{{ artifact.check.height ?? 0 }} · {{ formatBytes(artifact.check.size) }}</small><em>{{ artifact.path }}</em></div>
               <span :class="{ ok: artifact.check.ok }">{{ artifact.deprecated ? '不计入' : artifact.check.ok ? '机械通过' : artifact.check.issues.join('；') }}</span>
               <button type="button" @click="revealArtifact(artifact.path)">文件</button>
-              <button v-if="!artifact.authoritative && !artifact.deprecated && artifact.check.ok" type="button" @click="setVideoAuthority(artifact)">设为权威</button>
+              <button v-if="!artifact.authoritative && !artifact.deprecated && artifact.check.ok" type="button" data-testid="production-workspace-set-authority" :disabled="Boolean(actionBusy)" :title="actionBusy ? '正在处理，不能再设为权威' : undefined" @click="setVideoAuthority(artifact)">设为权威</button>
             </article>
           </div>
         </div>

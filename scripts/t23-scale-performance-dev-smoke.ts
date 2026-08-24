@@ -49,6 +49,10 @@ import {
   type T23ScaleRendererProbeSummary,
 } from "./lib/t23-scale-performance-probe.js";
 import { t23RendererCyclePageFunction } from "./lib/t23-renderer-cycle-page-function.mjs";
+import {
+  assertWorkspaceRuntimeBuildIdentity,
+  type WorkspaceRuntimeBuildIdentityEvidence,
+} from "./lib/workspace-runtime-build-identity.js";
 
 const UNIT_COUNT = 36;
 const PASS_RAW_COUNT = 4;
@@ -137,6 +141,53 @@ interface IpcProbeSnapshot {
       milestone: string;
       atMs: number;
     }>;
+  };
+  startupRuntimeGate?: {
+    schemaVersion: 1;
+    baselineMutationChecks?: number;
+    firstCardMutationChecks?: number;
+    finalMutationChecks?: number;
+  };
+}
+
+interface RuntimeStartupGateSnapshot {
+  runtimeGateMetrics?: {
+    mutationChecks: number;
+  };
+  runtimeIpcMetrics?: {
+    channels: Array<{
+      channel: string;
+      effect: string;
+      calls: number;
+      failures: number;
+    }>;
+  };
+}
+
+/**
+ * 失败报告只保留 main 端无参数、无路径的门禁/IPC 聚合。不要把 getRuntimeWriteGate
+ * 的完整响应写入证据，以免未来诊断字段扩展后把工程身份误带进 T23 报告。
+ */
+function summarizeRuntimeStartupGate(snapshot: RuntimeStartupGateSnapshot): RuntimeStartupGateSnapshot {
+  const mutationChecks = snapshot.runtimeGateMetrics?.mutationChecks;
+  const channels = snapshot.runtimeIpcMetrics?.channels
+    .filter((entry) => (
+      /^canvas:[a-z0-9-]+$/u.test(entry.channel)
+      && (entry.effect === "read-only" || entry.effect === "mutation")
+      && Number.isSafeInteger(entry.calls) && entry.calls >= 0
+      && Number.isSafeInteger(entry.failures) && entry.failures >= 0
+    ))
+    .map((entry) => ({
+      channel: entry.channel,
+      effect: entry.effect,
+      calls: entry.calls,
+      failures: entry.failures,
+    }));
+  return {
+    ...(typeof mutationChecks === "number" && Number.isSafeInteger(mutationChecks) && mutationChecks >= 0
+      ? { runtimeGateMetrics: { mutationChecks } }
+      : {}),
+    ...(channels ? { runtimeIpcMetrics: { channels } } : {}),
   };
 }
 
@@ -240,6 +291,7 @@ interface SmokeReport {
   mode: "dev" | "build" | "packaged";
   budgetProfile: "t23-compat" | "p7-strict";
   createdAt: string;
+  runtimeBuildIdentity?: WorkspaceRuntimeBuildIdentityEvidence;
   fixture: {
     kind: "deterministic-synthetic-mechanical-fixture";
     visualAcceptance: false;
@@ -281,6 +333,8 @@ interface SmokeReport {
     errorKind: "Error" | "TypeError" | "RangeError" | "UnknownError";
     rawSnapshot?: T23ScaleRendererProbeEvidenceSnapshot;
     ipcProbe?: IpcProbeSnapshot;
+    /** main 进程的安全聚合：仅 gate mutationChecks 与 canvas IPC 计数。 */
+    runtimeStartupGate?: RuntimeStartupGateSnapshot;
   };
   error?: string;
 }
@@ -371,6 +425,59 @@ async function readIpcProbe(launched: LaunchedUi): Promise<IpcProbeSnapshot> {
     }
     return api.getT23IpcPerformanceProbeSnapshot();
   });
+}
+
+async function readRuntimeStartupGate(launched: LaunchedUi): Promise<RuntimeStartupGateSnapshot> {
+  return launched.page.evaluate(async () => {
+    const api = (window as unknown as {
+      canvasApi?: { getRuntimeWriteGate?: () => Promise<RuntimeStartupGateSnapshot> };
+    }).canvasApi;
+    if (!api?.getRuntimeWriteGate) throw new Error("缺少运行时门禁诊断入口。 ");
+    return api.getRuntimeWriteGate();
+  });
+}
+
+function runtimeIpcChannel(snapshot: RuntimeStartupGateSnapshot, channel: string): {
+  channel: string;
+  effect: string;
+  calls: number;
+  failures: number;
+} | undefined {
+  return snapshot.runtimeIpcMetrics?.channels.find((entry) => entry.channel === channel);
+}
+
+function assertStartupRuntimeGateReadback(snapshot: RuntimeStartupGateSnapshot): void {
+  const preflight = runtimeIpcChannel(snapshot, "canvas:preflight-active-managed-project-startup");
+  const reconcile = runtimeIpcChannel(snapshot, "canvas:reconcile-active-managed-project-startup");
+  const lifecycle = runtimeIpcChannel(snapshot, "canvas:ensure-active-managed-project-generation-watcher");
+  const listProjects = runtimeIpcChannel(snapshot, "canvas:list-projects");
+  if (!preflight || preflight.calls !== 1 || preflight.failures !== 0 || preflight.effect !== "read-only") {
+    throw new Error(`T23 健康启动 preflight IPC 不精确：${JSON.stringify(preflight)}`);
+  }
+  if (reconcile && reconcile.calls !== 0) {
+    throw new Error(`T23 健康启动错误进入旧 reconcile：${JSON.stringify(reconcile)}`);
+  }
+  if (!listProjects || listProjects.calls < 1 || listProjects.failures !== 0 || listProjects.effect !== "read-only") {
+    throw new Error(`T23 启动项目列表没有走只读 cached-read：${JSON.stringify(listProjects)}`);
+  }
+  if (!lifecycle || lifecycle.calls !== 1 || lifecycle.failures !== 0 || lifecycle.effect !== "mutation") {
+    throw new Error(`T23 首卡后 watcher 生命周期未真实完成：${JSON.stringify(lifecycle)}`);
+  }
+}
+
+function assertStructuredStartupRuntimeGate(probe: IpcProbeSnapshot): void {
+  const gate = probe.startupRuntimeGate;
+  const baseline = gate?.baselineMutationChecks;
+  const firstCard = gate?.firstCardMutationChecks;
+  const final = gate?.finalMutationChecks;
+  if (!gate || gate.schemaVersion !== 1
+    || typeof baseline !== "number" || !Number.isSafeInteger(baseline)
+    || typeof firstCard !== "number" || !Number.isSafeInteger(firstCard)
+    || typeof final !== "number" || !Number.isSafeInteger(final)
+    || baseline !== firstCard
+    || final < firstCard + 1) {
+    throw new Error(`T23 启动 runtime gate 结构化摘要不闭合：${JSON.stringify(gate)}`);
+  }
 }
 
 function assertProjectionTimeline(probe: IpcProbeSnapshot): void {
@@ -607,6 +714,25 @@ function assertRendererStartupTimeline(
   if (firstCardAt === undefined || rawReferenceSpan.firstRawReadyAt === undefined
     || rawReferenceSpan.firstRawReadyAt < firstCardAt) {
     throw new Error("T23 raw/reference 精确 span 不能早于首卡。");
+  }
+  const startupMutation = timeline.milestones.filter((entry) => (
+    /^app-first-card-startup-mutation-checks:\d+:\d+$/u.test(entry.milestone)
+  ));
+  const watcherStart = firstAt.get("app-generation-watcher-lifecycle-start");
+  const watcherReady = firstAt.get("app-generation-watcher-lifecycle-ready");
+  if (startupMutation.length !== 1
+    || watcherStart === undefined
+    || watcherReady === undefined
+    || firstAt.has("app-generation-watcher-lifecycle-failed")
+    || firstCardAt === undefined
+    || watcherStart < firstCardAt
+    || watcherReady < watcherStart) {
+    throw new Error("T23 首卡后的 watcher 生命周期时间线不完整或错误提前执行。 ");
+  }
+  const [, beforeText, afterText] = /^app-first-card-startup-mutation-checks:(\d+):(\d+)$/u
+    .exec(startupMutation[0]!.milestone) ?? [];
+  if (beforeText === undefined || afterText === undefined || Number(beforeText) !== Number(afterText)) {
+    throw new Error(`T23 首卡前 startup mutationChecks 被读取路径增加：${startupMutation[0]!.milestone}`);
   }
 }
 
@@ -1332,6 +1458,9 @@ async function main(): Promise<number> {
     if (launched.page.url() === "about:blank") {
       await launched.page.waitForURL((url) => url.toString() !== "about:blank", { timeout: 30_000 });
     }
+    const runtimeBuildIdentity = mode === "build"
+      ? await assertWorkspaceRuntimeBuildIdentity(workspace, launched.page)
+      : undefined;
     const initialRendererTimeOrigin = await launched.page.evaluate(() => performance.timeOrigin);
     let rendererDocumentReloadCount = 0;
     const onMainFrameNavigated = (frame: { url(): string }) => {
@@ -1353,7 +1482,39 @@ async function main(): Promise<number> {
     if (!probe.enabled) throw new Error("T23 IPC 探针未启用。");
     assertUnitsReadTimeline(probe);
     const expectedUnitIds = new Set(Array.from({ length: UNIT_COUNT }, (_, index) => unitId(index + 1)));
+    await launched.page.waitForFunction(async () => {
+      const api = (window as unknown as {
+        canvasApi?: { getRuntimeWriteGate?: () => Promise<RuntimeStartupGateSnapshot> };
+      }).canvasApi;
+      const gate = await api?.getRuntimeWriteGate?.();
+      return gate?.runtimeIpcMetrics?.channels.some((entry) => (
+        entry.channel === "canvas:ensure-active-managed-project-generation-watcher"
+        && entry.calls === 1
+        && entry.failures === 0
+      ));
+    }, undefined, { timeout: 20_000 });
+    // lifecycle IPC 的成功记录只会在 main 确认 watcher 已真实挂载后落下；重读
+    // renderer probe 后再断言 ready 里程碑，避免首卡后微任务调度形成假阴性。
+    probe = await readIpcProbe(launched);
     assertRendererStartupTimeline(probe, expectedUnitIds, new Set(fixture.passUnitIds));
+    const runtimeStartupGate = await readRuntimeStartupGate(launched);
+    assertStartupRuntimeGateReadback(runtimeStartupGate);
+    const finalMutationChecks = runtimeStartupGate.runtimeGateMetrics?.mutationChecks;
+    if (typeof finalMutationChecks !== "number" || !Number.isSafeInteger(finalMutationChecks)) {
+      throw new Error("T23 无法读取 final runtime gate mutationChecks。");
+    }
+    await launched.page.evaluate((mutationChecks) => {
+      (window as unknown as {
+        canvasApi?: {
+          recordT23StartupRuntimeGate?: (
+            phase: "final",
+            value: number,
+          ) => void;
+        };
+      }).canvasApi?.recordT23StartupRuntimeGate?.("final", mutationChecks);
+    }, finalMutationChecks);
+    probe = await readIpcProbe(launched);
+    assertStructuredStartupRuntimeGate(probe);
     const rendererProbe = summarizeT23ScaleRendererProbe(rawSnapshot, fixture.passUnitIds);
     const projectedUnitIds = new Set(rawSnapshot.unitNodeIds);
     if (rawSnapshot.unitNodeIds.length !== UNIT_COUNT
@@ -1448,6 +1609,7 @@ async function main(): Promise<number> {
     };
     report = {
       ...report,
+      ...(runtimeBuildIdentity ? { runtimeBuildIdentity } : {}),
       status: evaluation.status,
       ok: evaluation.ok,
       performance: evaluation,
@@ -1485,16 +1647,21 @@ async function main(): Promise<number> {
     process.stderr.write(`[t23-scale-performance] ${rawError}\n`);
     report.error = "T23_SMOKE_FAILED";
     if (launched) {
-      const [rawSnapshot, ipcProbe] = await Promise.all([
+      const [rawSnapshot, ipcProbe, runtimeStartupGate] = await Promise.all([
         readRawSnapshot(launched).catch(() => undefined),
         readIpcProbe(launched).catch(() => undefined),
+        readRuntimeStartupGate(launched).catch(() => undefined),
       ]);
+      if (ipcProbe) report.ipcProbe = ipcProbe;
       report.failureDiagnostics = {
         errorKind: t23EvidenceErrorKind(error),
         ...(rawSnapshot
           ? { rawSnapshot: redactT23ScaleRendererProbeForEvidence(rawSnapshot) }
           : {}),
         ...(ipcProbe ? { ipcProbe } : {}),
+        ...(runtimeStartupGate
+          ? { runtimeStartupGate: summarizeRuntimeStartupGate(runtimeStartupGate) }
+          : {}),
       };
     }
   } finally {

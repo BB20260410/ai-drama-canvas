@@ -15,7 +15,13 @@
           <option v-for="status in WORK_ITEM_STATUSES" :key="status" :value="status">{{ status }}</option>
         </select>
         <textarea v-model="note" rows="2" placeholder="视觉判断或返工说明"></textarea>
-        <button class="primary-button" type="button" :disabled="saving" @click="saveStatus">
+        <button
+          class="primary-button"
+          type="button"
+          data-testid="inspector-save-status"
+          :disabled="saving || Boolean(settingAuthority)"
+          :title="(saving || settingAuthority) ? '正在处理，不能再写回画布' : undefined"
+          @click="saveStatus">
           {{ saving ? "写入中…" : "写回画布" }}
         </button>
       </section>
@@ -70,7 +76,9 @@
             v-if="!artifact.authoritative && !artifact.deprecated && artifact.check.ok && ['raw-image','labeled-image','video'].includes(artifact.kind)"
             class="authority-action"
             type="button"
-            :disabled="settingAuthority === artifact.id"
+            data-testid="inspector-set-authority"
+            :disabled="saving || Boolean(settingAuthority)"
+            :title="(saving || settingAuthority) ? '正在处理，不能再设为权威' : undefined"
             @click="setAuthority(artifact)">设为权威</button>
         </div>
       </section>
@@ -122,7 +130,7 @@ const sortedArtifacts = computed(() =>
 const itemHardLocks = computed(() => props.hardLocks.filter((lock) => props.item?.hardLockIds.includes(lock.id)));
 
 async function saveStatus() {
-  if (!props.item) return;
+  if (!props.item || saving.value || settingAuthority.value) return;
   saving.value = true;
   try {
     await window.canvasApi.updateStatus(props.projectRoot, props.item.id, draftStatus.value, note.value || undefined);
@@ -133,7 +141,7 @@ async function saveStatus() {
 }
 
 async function setAuthority(artifact: Artifact) {
-  if (!props.item) return;
+  if (!props.item || saving.value || settingAuthority.value) return;
   settingAuthority.value = artifact.id;
   try {
     await window.canvasApi.setAuthoritativeArtifact(props.projectRoot, props.item.id, artifact.id, "在节点检查器中人工选择权威版本");

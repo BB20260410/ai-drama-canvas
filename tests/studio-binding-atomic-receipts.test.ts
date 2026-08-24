@@ -23,6 +23,7 @@ import {
   confirmStudioPanelEmptyFromControl,
   freezeStudioAssetBindingSetFromControl,
   getStudioBindingControl,
+  proveStudioBindingOperationOutcome,
   resolveStudioEntityProposal,
 } from "../src/core/studio-binding-control.js";
 import {
@@ -39,6 +40,7 @@ import {
   type StudioBindingOperationCommand,
   type StudioProductionPanelInput,
 } from "../src/core/studio-production.js";
+import { withStudioUnitsReadProbe } from "../src/core/studio-units-read-phase-timeline.js";
 
 const roots: string[] = [];
 const BOUND_TEXT = "阿航走进石室。";
@@ -389,6 +391,33 @@ describe.sequential("P6 Studio binding 原子业务收据", () => {
         note: "已逐字核对冻结剧本范围，只有风与空旷石阶，无需绑定实体。",
       },
     }, async () => (await getCurrentStudioPanelEntityClosureConfirmation(root, unitId, "panel-empty"))?.revision ?? 0);
+
+    const recoveredEntries = (await listCommandLedger(root)).filter((entry) => [101, 102, 103, 104]
+      .map((index) => `binding-atomic-key-${String(index).padStart(4, "0")}`)
+      .includes(entry.idempotencyKey));
+    expect(recoveredEntries).toHaveLength(4);
+    const strictProofs = await withStudioUnitsReadProbe(true, async () => Promise.all(
+      recoveredEntries.map((entry) => proveStudioBindingOperationOutcome(
+        root,
+        entry.requestHash,
+        entry.command as StudioBindingOperationCommand,
+      )),
+    ));
+    expect(strictProofs.value.every(Boolean)).toBe(true);
+    expect(strictProofs.snapshot?.counters).toMatchObject({
+      productionDirectoryEnsureCalls: 0,
+      productionOpenDatabaseCalls: 0,
+      productionReadOnlyProbeConnections: 0,
+      productionOwnerConnections: 0,
+    });
+    for (const entry of recoveredEntries) {
+      expect(entry.result).toMatchObject({
+        schemaVersion: 1,
+        kind: "studio-operation-result-locator",
+        operationId: entry.requestHash,
+      });
+      expect(entry.durableReconciliation).toBeUndefined();
+    }
 
     process.stdout.write(`P6_BINDING_ATOMIC_RECEIPT_MATRIX ${JSON.stringify({
       schemaVersion: 1,

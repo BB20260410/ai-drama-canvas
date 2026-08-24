@@ -9,7 +9,7 @@
     </dl>
     <p :class="control?.availability === 'ready' ? 'ready' : 'blocked'" role="status">{{ control?.availabilityReason ?? "当前实测快照：网页有 Unlimited，但程序化 Seedance 2.5 Unlimited 暂不可用。" }}</p>
     <p v-if="control">参考 {{ control.referenceCount }} 张（预览上限 {{ control.referencePreviewCount }}）· 队列状态 {{ control.connectorRequest?.status ?? "未排队" }}{{ control.connectorRequest?.blockers.length ? ` · ${control.connectorRequest.blockers.join("、")}` : "" }}</p>
-    <button type="button" :disabled="!canQueue || busy" :title="canQueue ? '只写入本地队列；不会上传、调用网页或扣 credits' : '需先完成机械验证视频包；当前 Provider 未证实免费模式时 Codex 会停止在预检门禁'" @click="queueVideo">
+    <button type="button" :disabled="!canQueue || busy" :title="busy ? '正在处理，不能再加入 Higgsfield 视频队列' : canQueue ? '只写入本地队列；不会上传、调用网页或扣 credits' : '需先完成机械验证视频包；当前 Provider 未证实免费模式时 Codex 会停止在预检门禁'" @click="queueVideo">
       {{ control?.connectorRequest?.status === "blocked_by_provider" ? "重新加入 Higgsfield 视频队列" : control?.connectorRequest ? `队列已记录：${control.connectorRequest.status}` : "加入 Higgsfield 视频队列" }}
     </button>
     <small>按钮只写入本地队列；受信任 connector 适配器落地前不能领取或调用，也不会上传或扣 credits。图片复用既有 Codex 生图派发，不在此创建第二个图片 owner。</small>
@@ -23,7 +23,7 @@ const props = defineProps<{ control: StudioHiggsfieldVideoControl | null; busy?:
 const emit = defineEmits<{ queueVideo: [intentId: string] }>();
 const canQueue = computed(() => Boolean((props.control?.connectorRequest === null || props.control?.connectorRequest?.status === "blocked_by_provider") && props.control?.referenceCount > 0));
 function queueVideo(): void {
-  if (!props.control || !canQueue.value) return;
+  if (props.busy || !props.control || !canQueue.value) return;
   // 控制面本身不暴露 intentId；队列由父组件在已解析的视频包上下文内提交。
   emit("queueVideo", props.control.intentId);
 }

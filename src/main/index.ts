@@ -32,7 +32,9 @@ import {
   heartbeatTask,
   getActiveProject,
   getActiveProjectReadOnly,
+  preflightActiveManagedProjectStartupReadOnly,
   reconcileActiveManagedProjectStartup,
+  reconcileActiveManagedProjectStartupWithLifecycle,
   getManagedProjectShell,
   getItem,
   getProjectIndex,
@@ -107,6 +109,7 @@ import {
 } from "../core/runtime-write-gate.js";
 import {
   runtimeIpcEffect,
+  runtimeIpcEffectContextFromInvokeArgs,
   runtimeIpcGateMode,
 } from "../core/runtime-ipc-effect.js";
 import { createRuntimeIpcPerformanceProbe } from "../core/runtime-ipc-observability.js";
@@ -289,6 +292,7 @@ import type { StudioCanvasWorkflowGroup } from "../core/studio-canvas-layout-typ
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url));
 const sourceRuntimeWorkspace = path.resolve(currentDir, "../..");
+const sourceRuntimeLoadedArtifactPath = fileURLToPath(import.meta.url);
 const sourceRuntimeArtifactSourceDigest = (
   globalThis as typeof globalThis & { __AI_CANVAS_BUILD_SOURCE_DIGEST__?: string }
 ).__AI_CANVAS_BUILD_SOURCE_DIGEST__ ?? "";
@@ -296,10 +300,16 @@ const sourceRuntimeBootIdentity = app.isPackaged
   ? undefined
   : captureRuntimeBootIdentity({
     workspace: sourceRuntimeWorkspace,
-    loadedArtifactPath: fileURLToPath(import.meta.url),
+    loadedArtifactPath: sourceRuntimeLoadedArtifactPath,
     artifactSourceDigest: sourceRuntimeArtifactSourceDigest,
   });
 const sourceRuntimeGateController = createRuntimeGateController();
+if (sourceRuntimeBootIdentity) {
+  void sourceRuntimeBootIdentity.then(
+    () => { sourceRuntimeGateController.noteBootHashCompleted(); },
+    () => { /* boot hash 失败由首个诊断/写入核验暴露，不开放复用。 */ },
+  );
+}
 const sourceRuntimeIpcPerformanceProbe = createRuntimeIpcPerformanceProbe();
 let runtimeBuildIdentityPromise: ReturnType<typeof resolveRuntimeBuildIdentity> | null = null;
 let sourceRuntimeGateWatchers: FSWatcher[] = [];
@@ -507,6 +517,10 @@ function parseProjectListRequestOptions(value: unknown): ListProjectsRequestOpti
     throw new Error("项目清单请求参数必须是对象。");
   }
   const record = value as Record<string, unknown>;
+  const allowedKeys = new Set(["refreshSources", "sourceProjectRoot", "requestId"]);
+  if (Object.keys(record).some((key) => !allowedKeys.has(key))) {
+    throw new Error("项目清单请求包含未知字段。");
+  }
   if (record.refreshSources !== undefined && typeof record.refreshSources !== "boolean") {
     throw new Error("refreshSources 必须是布尔值。");
   }
@@ -571,8 +585,9 @@ function installSourceRuntimeWriteGate(): void {
   ipcMain.handle = ((channel: string, listener: Parameters<typeof ipcMain.handle>[1]) => originalHandle(
     channel,
     async (...args: Parameters<typeof listener>) => {
-      const effect = runtimeIpcEffect(channel);
-      const mode = runtimeIpcGateMode(channel);
+      const context = runtimeIpcEffectContextFromInvokeArgs(channel, args);
+      const effect = runtimeIpcEffect(channel, context);
+      const mode = runtimeIpcGateMode(channel, context);
       const invoke = async () => {
         const startedAt = performance.now();
         let gateDurationMs = 0;
@@ -620,9 +635,8 @@ async function startSourceRuntimeGateWatchers(): Promise<void> {
   if (appQuitOperationAdmission.isClosed()
     || !sourceRuntimeBootIdentity
     || sourceRuntimeGateWatchers.length > 0) return;
-  const boot = await sourceRuntimeBootIdentity;
-  if (appQuitOperationAdmission.isClosed()) return;
-  const watchPaths = sourceDigestWatchPaths(boot.workspace);
+  // 不要等 boot hash：watcher 必须覆盖剩余 hash 窗口，否则首个诊断会被迫二次整树 walk。
+  const watchPaths = sourceDigestWatchPaths(sourceRuntimeWorkspace);
   const workspaceRoot = watchPaths[0];
   if (!workspaceRoot) throw new Error("运行时源码 watcher 缺少 workspace 根。");
   const recursiveRoots = watchPaths.slice(1);
@@ -646,8 +660,8 @@ async function startSourceRuntimeGateWatchers(): Promise<void> {
     watcher.on("unlink", invalidateIfRelevant);
   });
   const invalidateIfRelevant = (changedPath: string): void => {
-    if (path.resolve(changedPath) === path.resolve(boot.loadedArtifactPath)
-      || sourceDigestPathIsRelevant(boot.workspace, changedPath)) {
+    if (path.resolve(changedPath) === path.resolve(sourceRuntimeLoadedArtifactPath)
+      || sourceDigestPathIsRelevant(sourceRuntimeWorkspace, changedPath)) {
       sourceRuntimeGateController.invalidate();
     }
   };
@@ -661,7 +675,7 @@ async function startSourceRuntimeGateWatchers(): Promise<void> {
     depth: 0,
   });
   const recursiveSourceWatcher = chokidar.watch(
-    [...recursiveRoots, boot.loadedArtifactPath],
+    [...recursiveRoots, sourceRuntimeLoadedArtifactPath],
     commonOptions,
   );
   sourceRuntimeGateWatchers = [shallowRootWatcher, recursiveSourceWatcher];
@@ -670,7 +684,10 @@ async function startSourceRuntimeGateWatchers(): Promise<void> {
     await closeSourceRuntimeGateWatchers();
     return;
   }
-  if (!watcherFailed) sourceRuntimeGateController.setWatcherHealthy(true);
+  if (!watcherFailed) {
+    sourceRuntimeGateController.noteWatchersRecording();
+    sourceRuntimeGateController.setWatcherHealthy(true);
+  }
 }
 
 async function closeSourceRuntimeGateWatchers(): Promise<void> {
@@ -2662,6 +2679,22 @@ function registerIpc(): void {
     return true;
   });
   ipcMain.handle("canvas:get-active-project", () => getActiveProjectReadOnly());
+  ipcMain.handle("canvas:preflight-active-managed-project-startup", async (_event, input: {
+    projectRoot: string;
+    activationId: string;
+  }) => preflightActiveManagedProjectStartupReadOnly(input));
+  ipcMain.handle("canvas:ensure-active-managed-project-generation-watcher", async (_event, input: {
+    projectRoot: string;
+    activationId: string;
+  }) => {
+    // 首卡后的独立生命周期动作：既有 root+activationId strong CAS 批准后，才真实挂载 watcher。
+    // 它不属于 preflight，也不初始化 generation owner。
+    const shell = await reconcileActiveManagedProjectStartupWithLifecycle(
+      input,
+      async (confirmed) => ensureStudioGenerationLedgerWatcher(confirmed.paths.root),
+    );
+    return { projectId: shell.project.id };
+  });
   ipcMain.handle("canvas:reconcile-active-managed-project-startup", async (_event, input: {
     projectRoot: string;
     activationId: string;
@@ -2669,13 +2702,22 @@ function registerIpc(): void {
   ipcMain.handle("canvas:activate-project", async (_event, projectRoot: string) => {
     const absoluteRoot = path.resolve(projectRoot);
     const pending = pendingRestoredProjects.get(absoluteRoot);
-    if (!pending) return activateProject(absoluteRoot);
+    if (!pending) {
+      const activated = await activateProject(absoluteRoot);
+      if (generationLedgerWatchedRoot && generationLedgerWatchedRoot !== absoluteRoot) {
+        await closeStudioGenerationLedgerWatcher();
+      }
+      return activated;
+    }
     if (!pending.rendererValidated) throw new Error("恢复副本尚未通过桌面受管工程读取校验，禁止激活。");
     const previousActive = await getActiveProject();
     const restoredShell = await requireManagedStudioProject(absoluteRoot);
     try {
       await registerProject(restoredShell.project);
       const activated = await activateProject(absoluteRoot);
+      if (generationLedgerWatchedRoot && generationLedgerWatchedRoot !== absoluteRoot) {
+        await closeStudioGenerationLedgerWatcher();
+      }
       pendingRestoredProjects.delete(absoluteRoot);
       updateManagedProjectOperation(pending.operationId, {
         phase: "succeeded",
@@ -3143,11 +3185,14 @@ function registerIpc(): void {
     projectRoot: string,
     query: StudioProductionDashboardQuery,
   ) => {
+    const admitDashboard = query?.operation === "units"
+      ? requireManagedStudioProjectReadOnly
+      : requireManagedStudioProject;
     if (process.env.AI_CANVAS_T23_PERF_PROBE !== "1"
       || !query
       || typeof query !== "object"
       || query.operation !== "units") {
-      await requireManagedStudioProject(projectRoot);
+      await admitDashboard(projectRoot);
       return getStudioProductionDashboard(projectRoot, query);
     }
     const probed = await withStudioUnitsReadProbe(true, () => measureStudioUnitsReadPhase(
@@ -3155,7 +3200,7 @@ function registerIpc(): void {
       async () => {
         await measureStudioUnitsReadPhase(
           "main-managed-project-preflight",
-          () => requireManagedStudioProject(projectRoot),
+          () => admitDashboard(projectRoot),
         );
         return getStudioProductionDashboard(projectRoot, query);
       },
@@ -4702,6 +4747,13 @@ if (!app.requestSingleInstanceLock()) {
   });
   if (appQuitOperationAdmission.isClosed()) return;
   registerIpc();
+  if (appQuitOperationAdmission.isClosed()) return;
+  if (sourceRuntimeBootIdentity) {
+    // 首个诊断必须等到 boot identity。窗口晚于剩余 hash 创建，
+    // renderer first-card 只付廉价工件复核，而不是把剩余整树 walk 算进 1500ms。
+    // hash 失败不拦截建窗，由 getRuntimeWriteGate 失败关闭业务访问。
+    await sourceRuntimeBootIdentity.catch(() => undefined);
+  }
   if (appQuitOperationAdmission.isClosed()) return;
   await createWindow();
   // T11 启动重放：对当前活跃工程补缀并重放未消费画布投影事件（重启恢复）。

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "kind": "multi-model-glm-p2-codex-verify",
+  "verifier": "codex",
+  "createdAt": "2026-08-14T11:03:11+08:00",
+  "boundSourceDigest": "22bb68378a587777df1acab4b3bb36ed1cae74fa079b6caaa26c95275360ee3f",
+  "liveDigest": "22bb68378a587777df1acab4b3bb36ed1cae74fa079b6caaa26c95275360ee3f",
+  "liveDigestMatched": true,
+  "sourceReviewRelativePath": "docs/evidence/multi-model-glm-review-20260814-22bb6837.json",
+  "packRelativePath": "docs/evidence/multi-model-review-pack-20260814-22bb6837.json",
+  "sourceChanged": false,
+  "committed": false,
+  "overall": "all-already-fail-closed-or-intended-contract",
+  "findings": [
+    {
+      "id": "switchManagedWorkspace-guard-set-narrower-than-button-disabled",
+      "severity": "P2",
+      "verdict": "intended-contract",
+      "evidence": "App.vue hybrid-switch-novel uses :disabled=projectOperationBusy (creatingManagedProject || projectSwitching || managedWorkspaceSwitching || projectRemovingRoot || externalManagedProjectBusy). NovelStudioView novel-switch-drama uses :disabled=Boolean(busy || loading), and App passes loading=novelStudioRefreshing || managedWorkspaceSwitching || projectSwitching || Boolean(projectRemovingRoot). switchManagedWorkspace still only returns early on managedWorkspaceSwitching || projectSwitching || projectRemovingRoot. The disabled sets are supersets of that handler guard, not equals; the 3 handler flags sit inside both button disables, so neither button can look enabled while the handler no-ops. The only call sites are those two buttons. creatingManagedProject keeps ProjectCenter locked (busy disables close/ESC/overlay click; App closeProjectCenter also checks projectOperationBusy). externalManagedProjectBusy has a position:fixed inset:0 shield. The review pack already records the narrower handler plus the shield as this morning's contract; GLM restated that documented split as a hole.",
+      "lockedByTest": "混合工作区切换在工程门禁下禁用并说明原因，避免可点但被静默吞掉"
+    },
+    {
+      "id": "videoeditor-save-success-path-not-resume-preview",
+      "severity": "P2",
+      "verdict": "not-a-hole",
+      "evidence": "The review pack contract only named the fail path (保存失败且仍持有 preview lease 时 resumePreviewWork) and GLM said there was no success-path source evidence. Live VideoEditorView.save() already resumes on success: after persist it calls resumePreviewWork() when scheduleNestedPreviews !== false, then clears previewLeaseHeld. The finally only resumes when !persisted && previewLeaseHeld, so a successful default save does not stay paused. Callers that pass scheduleNestedPreviews:false (exportOtio, render, extractCurrentFrame, prepareTimelineContinuation, runAtomicEditOperation) resume in their own finally/success/catch. The dirty-guard test locks saving=true before the first await, not a missing success resume.",
+      "lockedByTest": "保存在进行中 fail-closed：saving 在首个 await 之前置位，连点不会发出两次 saveEditProject; 组件只将有限需求交给两个独立 coordinator，且业务路径不等待嵌套预览"
+    },
+    {
+      "id": "boot-hash-catch-undefined-semantic-collapse",
+      "severity": "P2",
+      "verdict": "already-fail-closed",
+      "evidence": "whenReady does await sourceRuntimeBootIdentity.catch(() => undefined) then await createWindow(). A reject still creates the window; the catch is only for that await so hash failure does not block first-card. The original promise is unchanged: its then() calls noteBootHashCompleted only on fulfill, and the reject handler does not open reuse. IPC still await sourceRuntimeBootIdentity and fail-closes if it rejects. captureRuntimeBootIdentity is a finite readFile+computeSourceDigest walk that resolves or rejects; it is not waiting for chokidar events. Watchers start without awaiting the hash. Pending vs failed is not collapsed for the gate: failed never notes completion, so writes stay on full inspect.",
+      "lockedByTest": "main 在创建窗口前等待剩余 boot hash，避免 first-card 再付整树 walk; main 在 boot hash 完成前启动 watcher，并把覆盖窗口交给 controller; captureRuntimeBootIdentity 启动时仍真实扫描源码树; watcher 覆盖 boot hash 且无事件时只读复用 boot digest，mutation 仍整树核验; hash 先于 watcher ready 或 setup 期间有事件时不复用 boot digest"
+    }
+  ]
+}

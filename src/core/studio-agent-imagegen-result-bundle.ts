@@ -18,10 +18,13 @@ import {
   assertStudioGenerationRawNotDetachedCandidate,
   readAnyStudioGenerationFrozenPack,
   readStudioImagegenCallContextRebindByRun,
+  readStudioImagegenCallContextRebindHistoryByRunReadOnly,
   verifyStudioImagegenCallContextRebindEvidence,
   readStudioGenerationDispatch,
   readStudioImagegenCallIntentByRun,
+  readStudioImagegenCallIntentByRunReadOnly,
   readStudioGenerationResultBundle,
+  readStudioGenerationResultBundleReadOnly,
   registerStudioGenerationResultBundle,
   studioImagegenContextTokenHash,
   type AnyStudioGenerationFreezePack,
@@ -44,8 +47,10 @@ import {
 } from "./studio-labeled-layout.js";
 import { assertStudioImagegenCandidatePathAllowed } from "./studio-imagegen-candidate-gate.js";
 import { assertNoActiveStudioHiggsfieldConnectorReservation } from "./studio-higgsfield-connector-queue.js";
+import { inspectManagedProjectReadOnly } from "./managed-project.js";
 import {
   ensureConfinedDirectory,
+  hashConfinedRegularFileWithIdentity,
   inspectExistingConfinedDirectory,
   persistConfinedBytesNoReplace,
   readConfinedRegularFileWithIdentity,
@@ -56,7 +61,9 @@ const SHA256_PATTERN = /^[a-f0-9]{64}$/u;
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,254}$/u;
 const WRITEBACK_ROOT = ".aicanvas/studio-generation/writebacks";
 const RECEIPT_ROOT = ".aicanvas/studio-generation/writeback-receipts/sha256";
+const MATERIAL_CAS_RELATIVE_ROOT = ".aicanvas/objects/sha256";
 const MAX_RECEIPT_BYTES = 256 * 1024;
+const MAX_MATERIAL_CAS_BYTES = 64 * 1024 * 1024;
 const TARGET_VERTICAL_ASPECT_RATIO = 9 / 16;
 const TARGET_CINEMATIC_WIDE_ASPECT_RATIO = 21 / 9;
 const ASPECT_RATIO_TOLERANCE = 0.025;
@@ -139,6 +146,8 @@ export interface StudioAgentImagegenResultBundleOutcome {
   target?: { targetKind: "unit-grid"; targetKey: string; panelCount: number };
   executionReceiptFingerprint: string;
   writebackReceiptFingerprint: string;
+  /** 内容寻址 receipt 文件名锚；不包含 token、路径或供应商原始回执。 */
+  writebackReceiptStorageKey: string;
   media: {
     raw: { sha256: string; width: number; height: number; aspectRatio: number };
     labeled: { sha256: string; width: number; height: number };
@@ -150,6 +159,25 @@ export interface StudioAgentImagegenResultBundleOutcome {
     instruction: string;
   };
   fingerprint: string;
+}
+
+export interface StudioAgentImagegenResultBundleLocator {
+  schemaVersion: 1;
+  kind: "studio-agent-imagegen-result-bundle-locator";
+  outcomeSchemaVersion: 4 | 5;
+  projectId: string;
+  manifestFingerprint: string;
+  generationRunId: string;
+  packId: string;
+  packFingerprint: string;
+  provider: StudioFormalImagegenProvider;
+  executionReceiptFingerprint: string;
+  writebackReceiptFingerprint: string;
+  writebackReceiptStorageKey: string;
+  media: { rawSha256: string; labeledSha256: string };
+  results: { rawResultId: string; labeledResultId: string; bundleFingerprint: string };
+  outcomeFingerprint: string;
+  reconciled: true;
 }
 
 interface NormalizedExecutionReceipt extends StudioAgentImagegenExecutionReceipt {
@@ -217,6 +245,69 @@ function normalizeSha256(value: string, field: string): string {
   const normalized = typeof value === "string" ? value.trim().toLowerCase() : "";
   if (!SHA256_PATTERN.test(normalized)) fail("invalid-input", `${field} 必须是 64 位 SHA-256。`);
   return normalized;
+}
+
+function assertExactKeys(value: Record<string, unknown>, expected: readonly string[], label: string): void {
+  const actual = Object.keys(value).sort((left, right) => left.localeCompare(right, "en"));
+  const wanted = [...expected].sort((left, right) => left.localeCompare(right, "en"));
+  if (JSON.stringify(actual) !== JSON.stringify(wanted)) {
+    fail("receipt-drift", `${label} 字段集合无效。`);
+  }
+}
+
+function parseAgentImagegenResultBundleLocator(value: unknown): StudioAgentImagegenResultBundleLocator {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    fail("receipt-drift", "Agent imagegen bundle locator 必须是对象。");
+  }
+  const source = value as Record<string, unknown>;
+  assertExactKeys(source, [
+    "schemaVersion", "kind", "outcomeSchemaVersion", "projectId", "manifestFingerprint",
+    "generationRunId", "packId", "packFingerprint", "provider", "executionReceiptFingerprint",
+    "writebackReceiptFingerprint", "writebackReceiptStorageKey", "media", "results",
+    "outcomeFingerprint", "reconciled",
+  ], "Agent imagegen bundle locator");
+  if (source.schemaVersion !== 1
+    || source.kind !== "studio-agent-imagegen-result-bundle-locator"
+    || (source.outcomeSchemaVersion !== 4 && source.outcomeSchemaVersion !== 5)
+    || (source.provider !== "codex" && source.provider !== "grok")
+    || source.reconciled !== true) {
+    fail("receipt-drift", "Agent imagegen bundle locator 版本、kind、provider 或终态标记无效。");
+  }
+  const media = source.media;
+  const results = source.results;
+  if (!media || typeof media !== "object" || Array.isArray(media)
+    || !results || typeof results !== "object" || Array.isArray(results)) {
+    fail("receipt-drift", "Agent imagegen bundle locator 缺少 media/results。");
+  }
+  const mediaSource = media as Record<string, unknown>;
+  const resultSource = results as Record<string, unknown>;
+  assertExactKeys(mediaSource, ["rawSha256", "labeledSha256"], "Agent imagegen bundle locator.media");
+  assertExactKeys(resultSource, ["rawResultId", "labeledResultId", "bundleFingerprint"], "Agent imagegen bundle locator.results");
+  return {
+    schemaVersion: 1,
+    kind: "studio-agent-imagegen-result-bundle-locator",
+    outcomeSchemaVersion: source.outcomeSchemaVersion,
+    projectId: normalizeId(String(source.projectId ?? ""), "locator.projectId"),
+    manifestFingerprint: normalizeSha256(String(source.manifestFingerprint ?? ""), "locator.manifestFingerprint"),
+    generationRunId: normalizeId(String(source.generationRunId ?? ""), "locator.generationRunId"),
+    packId: normalizeId(String(source.packId ?? ""), "locator.packId"),
+    packFingerprint: normalizeSha256(String(source.packFingerprint ?? ""), "locator.packFingerprint"),
+    provider: source.provider,
+    executionReceiptFingerprint: normalizeSha256(String(source.executionReceiptFingerprint ?? ""), "locator.executionReceiptFingerprint"),
+    writebackReceiptFingerprint: normalizeSha256(String(source.writebackReceiptFingerprint ?? ""), "locator.writebackReceiptFingerprint"),
+    writebackReceiptStorageKey: normalizeSha256(String(source.writebackReceiptStorageKey ?? ""), "locator.writebackReceiptStorageKey"),
+    media: {
+      rawSha256: normalizeSha256(String(mediaSource.rawSha256 ?? ""), "locator.media.rawSha256"),
+      labeledSha256: normalizeSha256(String(mediaSource.labeledSha256 ?? ""), "locator.media.labeledSha256"),
+    },
+    results: {
+      rawResultId: normalizeId(String(resultSource.rawResultId ?? ""), "locator.results.rawResultId"),
+      labeledResultId: normalizeId(String(resultSource.labeledResultId ?? ""), "locator.results.labeledResultId"),
+      bundleFingerprint: normalizeSha256(String(resultSource.bundleFingerprint ?? ""), "locator.results.bundleFingerprint"),
+    },
+    outcomeFingerprint: normalizeSha256(String(source.outcomeFingerprint ?? ""), "locator.outcomeFingerprint"),
+    reconciled: true,
+  };
 }
 
 function normalizeExecutionReceipt(
@@ -677,7 +768,7 @@ function buildWritebackReceipt(input: {
     kind: "studio-agent-imagegen-writeback-receipt" as const,
     projectId: input.context.projectId,
     manifestFingerprint: input.context.manifestFingerprint,
-    projectContextTokenSha256: digest(input.projectContextToken),
+    projectContextTokenSha256: studioImagegenContextTokenHash(input.projectContextToken),
     generationRunId: input.generationRunId,
     packId: input.packId,
     packFingerprint: input.packFingerprint,
@@ -751,7 +842,7 @@ function writebackReceiptStorageKey(receipt: Pick<WritebackReceipt,
 }
 
 function writebackReceiptLocator(input: {
-  context: ActiveManagedStudioContext;
+  context: Pick<ActiveManagedStudioContext, "projectId" | "manifestFingerprint">;
   projectContextToken: string;
   generationRunId: string;
   packId: string;
@@ -760,6 +851,7 @@ function writebackReceiptLocator(input: {
   executionReceipt: NormalizedExecutionReceipt;
   rawSha256: string;
   labeledSha256: string;
+  legacyProjectContextTokenHash?: boolean;
 }): Pick<WritebackReceipt,
   | "projectId"
   | "manifestFingerprint"
@@ -774,7 +866,9 @@ function writebackReceiptLocator(input: {
   return {
     projectId: input.context.projectId,
     manifestFingerprint: input.context.manifestFingerprint,
-    projectContextTokenSha256: digest(input.projectContextToken),
+    projectContextTokenSha256: input.legacyProjectContextTokenHash
+      ? digest(input.projectContextToken)
+      : studioImagegenContextTokenHash(input.projectContextToken),
     generationRunId: input.generationRunId,
     packId: input.packId,
     packFingerprint: input.packFingerprint,
@@ -785,43 +879,161 @@ function writebackReceiptLocator(input: {
   };
 }
 
+function isMissingFsError(error: unknown): boolean {
+  return error instanceof Error
+    && "code" in error
+    && (error as NodeJS.ErrnoException).code === "ENOENT";
+}
+
+function assertWritebackReceiptSchema(receipt: WritebackReceipt, storageKey: string, storedBytes: Buffer): void {
+  if (!receipt || (receipt.schemaVersion !== 4 && receipt.schemaVersion !== 5)
+    || receipt.kind !== "studio-agent-imagegen-writeback-receipt"
+    || typeof receipt.projectId !== "string" || !receipt.projectId
+    || typeof receipt.manifestFingerprint !== "string" || !SHA256_PATTERN.test(receipt.manifestFingerprint)
+    || typeof receipt.projectContextTokenSha256 !== "string" || !SHA256_PATTERN.test(receipt.projectContextTokenSha256)
+    || typeof receipt.generationRunId !== "string" || !receipt.generationRunId
+    || typeof receipt.packId !== "string" || !receipt.packId
+    || typeof receipt.packFingerprint !== "string" || !SHA256_PATTERN.test(receipt.packFingerprint)
+    || (receipt.provider !== "codex" && receipt.provider !== "grok")
+    || !receipt.executionReceipt || typeof receipt.executionReceipt.fingerprint !== "string"
+    || !SHA256_PATTERN.test(receipt.executionReceipt.fingerprint)
+    || !receipt.raw || !SHA256_PATTERN.test(receipt.raw.sha256)
+    || !Number.isInteger(receipt.raw.width) || receipt.raw.width < 1
+    || !Number.isInteger(receipt.raw.height) || receipt.raw.height < 1
+    || typeof receipt.raw.aspectRatio !== "number" || !Number.isFinite(receipt.raw.aspectRatio)
+    || !receipt.labeled || !SHA256_PATTERN.test(receipt.labeled.sha256)
+    || !Number.isInteger(receipt.labeled.width) || receipt.labeled.width < 1
+    || !Number.isInteger(receipt.labeled.height) || receipt.labeled.height < 1
+    || (receipt.labeled.recipe !== "chinese-panel-chrome-v1"
+      && receipt.labeled.recipe !== "chinese-unit-grid-chrome-v1")
+    || typeof receipt.fingerprint !== "string" || !SHA256_PATTERN.test(receipt.fingerprint)) {
+    fail("receipt-drift", "writeback receipt schema 无效。");
+  }
+  if (writebackReceiptStorageKey(receipt) !== storageKey
+    || receipt.fingerprint !== digest(Object.fromEntries(Object.entries(receipt).filter(([key]) => key !== "fingerprint")))
+    || !stableBytes(receipt).equals(storedBytes)) {
+    fail("receipt-drift", `writeback receipt 身份或 fingerprint 漂移：${receipt.fingerprint}`);
+  }
+}
+
+async function loadWritebackReceiptByStorageKey(
+  projectRoot: string,
+  storageKey: string,
+): Promise<WritebackReceipt | null> {
+  normalizeSha256(storageKey, "writebackReceiptStorageKey");
+  let directory;
+  try {
+    directory = await inspectExistingConfinedDirectory(
+      projectRoot,
+      path.join(projectRoot, RECEIPT_ROOT, storageKey.slice(0, 2)),
+    );
+  } catch (error) {
+    if (isMissingFsError(error)) return null;
+    fail("storage-unsafe", "writeback receipt 目录不是受管普通目录。", [
+      error instanceof Error ? error.message : String(error),
+    ]);
+  }
+  let stored;
+  try {
+    stored = await readConfinedRegularFileWithIdentity(directory, `${storageKey}.json`, MAX_RECEIPT_BYTES);
+  } catch (error) {
+    if (isMissingFsError(error)) return null;
+    fail("storage-unsafe", "writeback receipt 必须是单链接普通文件，拒绝跟随符号链接。", [
+      error instanceof Error ? error.message : String(error),
+    ]);
+  }
+  if (stored.nlink !== 1) {
+    fail("storage-unsafe", "writeback receipt 存在额外硬链接，拒绝读取。");
+  }
+  let receipt: WritebackReceipt;
+  try {
+    receipt = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(stored.bytes)) as WritebackReceipt;
+  } catch (error) {
+    fail("receipt-drift", "writeback receipt JSON 已损坏。", [
+      error instanceof Error ? error.message : String(error),
+    ]);
+  }
+  assertWritebackReceiptSchema(receipt, storageKey, stored.bytes);
+  return receipt;
+}
+
 async function loadWritebackReceipt(
   projectRoot: string,
   locator: ReturnType<typeof writebackReceiptLocator>,
 ): Promise<WritebackReceipt | null> {
+  const storageKey = writebackReceiptStorageKey(locator);
+  const receipt = await loadWritebackReceiptByStorageKey(projectRoot, storageKey);
+  if (!receipt) return null;
+  const expectedIdentity = stableValue(locator);
+  const actualIdentity = stableValue({
+    projectId: receipt.projectId,
+    manifestFingerprint: receipt.manifestFingerprint,
+    projectContextTokenSha256: receipt.projectContextTokenSha256,
+    generationRunId: receipt.generationRunId,
+    packId: receipt.packId,
+    packFingerprint: receipt.packFingerprint,
+    provider: receipt.provider,
+    executionReceipt: receipt.executionReceipt,
+    raw: { sha256: receipt.raw.sha256 },
+    labeled: { sha256: receipt.labeled.sha256 },
+  });
+  if (JSON.stringify(actualIdentity) !== JSON.stringify(expectedIdentity)) {
+    fail("receipt-drift", `writeback receipt 与 locator/payload 交叉身份不一致：${receipt.fingerprint}`);
+  }
+  return receipt;
+}
+
+async function loadWritebackReceiptForRequest(
+  projectRoot: string,
+  input: Parameters<typeof writebackReceiptLocator>[0],
+): Promise<WritebackReceipt | null> {
+  const current = await loadWritebackReceipt(projectRoot, writebackReceiptLocator(input));
+  if (current) return current;
+  // 兼容修复前已落盘的 JSON-string digest。仍然只尝试由原 request
+  // 确定出的单一 legacy key，不扫描 receipt 目录。
+  return loadWritebackReceipt(projectRoot, writebackReceiptLocator({
+    ...input,
+    legacyProjectContextTokenHash: true,
+  }));
+}
+
+async function proveMaterialCasObject(
+  projectRoot: string,
+  sha256: string,
+  label: "raw" | "labeled",
+): Promise<void> {
+  let directory;
   try {
-    const storageKey = writebackReceiptStorageKey(locator);
-    const directory = await inspectExistingConfinedDirectory(
+    directory = await inspectExistingConfinedDirectory(
       projectRoot,
-      path.join(projectRoot, RECEIPT_ROOT, storageKey.slice(0, 2)),
+      path.join(projectRoot, MATERIAL_CAS_RELATIVE_ROOT, sha256.slice(0, 2)),
     );
-    const stored = await readConfinedRegularFileWithIdentity(directory, `${storageKey}.json`, MAX_RECEIPT_BYTES);
-    if (stored.nlink !== 1) return null;
-    const receipt = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(stored.bytes)) as WritebackReceipt;
-    if (writebackReceiptStorageKey(receipt) !== storageKey
-      || receipt.fingerprint !== digest(Object.fromEntries(Object.entries(receipt).filter(([key]) => key !== "fingerprint")))
-      || !stableBytes(receipt).equals(stored.bytes)) return null;
-    const expectedIdentity = stableValue(locator);
-    const actualIdentity = stableValue({
-      projectId: receipt.projectId,
-      manifestFingerprint: receipt.manifestFingerprint,
-      projectContextTokenSha256: receipt.projectContextTokenSha256,
-      generationRunId: receipt.generationRunId,
-      packId: receipt.packId,
-      packFingerprint: receipt.packFingerprint,
-      provider: receipt.provider,
-      executionReceipt: receipt.executionReceipt,
-      raw: { sha256: receipt.raw.sha256 },
-      labeled: { sha256: receipt.labeled.sha256 },
-    });
-    return JSON.stringify(actualIdentity) === JSON.stringify(expectedIdentity) ? receipt : null;
-  } catch {
-    return null;
+  } catch (error) {
+    if (isMissingFsError(error)) {
+      fail("receipt-drift", `material CAS ${label} 对象不存在：${sha256}`);
+    }
+    fail("storage-unsafe", `material CAS ${label} 目录不是受管普通目录。`, [
+      error instanceof Error ? error.message : String(error),
+    ]);
+  }
+  let hashed;
+  try {
+    hashed = await hashConfinedRegularFileWithIdentity(directory, sha256, MAX_MATERIAL_CAS_BYTES);
+  } catch (error) {
+    fail("storage-unsafe", `material CAS ${label} 必须是单链接普通文件，拒绝跟随符号链接。`, [
+      error instanceof Error ? error.message : String(error),
+    ]);
+  }
+  if (hashed.nlink !== 1) {
+    fail("storage-unsafe", `material CAS ${label} 对象存在额外硬链接，拒绝读取。`);
+  }
+  if (hashed.sha256 !== sha256) {
+    fail(label === "raw" ? "raw-sha-mismatch" : "labeled-conflict", `material CAS ${label} 实测 SHA 与声明不一致。`);
   }
 }
 
 function outcomeFrom(input: {
-  context: ActiveManagedStudioContext;
+  context: Pick<ActiveManagedStudioContext, "projectId" | "manifestFingerprint">;
   packId: string;
   packFingerprint: string;
   generationRunId: string;
@@ -842,6 +1054,7 @@ function outcomeFrom(input: {
     ...(input.writebackReceipt.target ? { target: input.writebackReceipt.target } : {}),
     executionReceiptFingerprint: input.executionReceipt.fingerprint,
     writebackReceiptFingerprint: input.writebackReceipt.fingerprint,
+    writebackReceiptStorageKey: writebackReceiptStorageKey(input.writebackReceipt),
     media: {
       raw: input.writebackReceipt.raw,
       labeled: {
@@ -941,7 +1154,7 @@ export async function commitAgentImagegenResultBundle(
       || prior.raw.mediaSha256 !== raw.sha256) {
       fail("result-conflict", `generationRunId=${generationRunId} 已绑定其他 raw/labeled 结果。`);
     }
-    const existingReceipt = await loadWritebackReceipt(projectRoot, writebackReceiptLocator({
+    const existingReceipt = await loadWritebackReceiptForRequest(projectRoot, {
       context,
       projectContextToken: input.projectContextToken,
       generationRunId,
@@ -951,7 +1164,7 @@ export async function commitAgentImagegenResultBundle(
       executionReceipt,
       rawSha256: raw.sha256,
       labeledSha256: prior.labeled.mediaSha256,
-    }));
+    });
     // 旧的两次单项 register 即使恰好成对，也不是 v4 原子 bundle。
     // 只有同一命令先前落盘的不可变 writeback receipt 存在时才允许幂等恢复。
     if (!existingReceipt
@@ -1030,87 +1243,167 @@ export async function commitAgentImagegenResultBundle(
   });
 }
 
+async function proveAgentImagegenResultBundleOwnerClosure(input: {
+  projectRoot: string;
+  shell: Awaited<ReturnType<typeof inspectManagedProjectReadOnly>>;
+  receipt: WritebackReceipt;
+  results: StudioGenerationResultBundleRecord;
+  expectedContextTokenHash?: string;
+}): Promise<StudioAgentImagegenResultBundleOutcome> {
+  const { projectRoot, shell, receipt, results } = input;
+  const contextTokenHash = input.expectedContextTokenHash ?? receipt.projectContextTokenSha256;
+  if (receipt.projectId !== shell.project.id
+    || receipt.manifestFingerprint !== shell.manifestFingerprint
+    || results.generationRunId !== receipt.generationRunId
+    || results.packId !== receipt.packId
+    || results.packFingerprint !== receipt.packFingerprint
+    || results.provider !== receipt.provider
+    || results.raw.mediaSha256 !== receipt.raw.sha256
+    || results.labeled.mediaSha256 !== receipt.labeled.sha256
+    || results.raw.status !== "pending"
+    || results.labeled.status !== "pending") {
+    fail("receipt-drift", `writeback receipt / generation ledger 身份不一致：${receipt.fingerprint}`);
+  }
+  await proveMaterialCasObject(projectRoot, receipt.raw.sha256, "raw");
+  await proveMaterialCasObject(projectRoot, receipt.labeled.sha256, "labeled");
+  const callIntent = await readStudioImagegenCallIntentByRunReadOnly(projectRoot, receipt.generationRunId);
+  if (callIntent) {
+    const history = await readStudioImagegenCallContextRebindHistoryByRunReadOnly(projectRoot, receipt.generationRunId);
+    const contextRebind = history.length > 0 ? history[history.length - 1]! : null;
+    if (callIntent.callId !== receipt.executionReceipt.callId
+      || callIntent.packId !== receipt.packId
+      || callIntent.packFingerprint !== receipt.packFingerprint
+      || callIntent.provider !== receipt.provider
+      || callIntent.targetKind !== results.raw.targetKind
+      || callIntent.callAllowed !== false
+      || (!contextRebind && callIntent.contextTokenHash !== contextTokenHash)
+      || (contextRebind && (history[0]!.fromContextTokenHash !== callIntent.contextTokenHash
+        || contextRebind.toContextTokenHash !== contextTokenHash
+        || contextRebind.executionReceiptFingerprint !== receipt.executionReceipt.fingerprint
+        || contextRebind.candidateSha256 !== receipt.raw.sha256
+        || contextRebind.callAllowed !== false))
+      || callIntent.status !== "result-committed") {
+      fail("call-intent-conflict", `generationRunId=${receipt.generationRunId} 的只读 call intent 与 bundle 终态不一致。`);
+    }
+  } else if (receipt.executionReceipt.source !== "fixture-canary") {
+    fail("call-intent-required", "真实 Agent imagegen 结果缺少只读 pre-call intent，拒绝猜测成功。");
+  }
+  return outcomeFrom({
+    context: { projectId: shell.project.id, manifestFingerprint: shell.manifestFingerprint },
+    packId: receipt.packId,
+    packFingerprint: receipt.packFingerprint,
+    generationRunId: receipt.generationRunId,
+    provider: receipt.provider,
+    executionReceipt: receipt.executionReceipt,
+    writebackReceipt: receipt,
+    results,
+  });
+}
+
 /**
- * command-bus 崩溃恢复只读不可变收据 + ledger 结果，从不重做导入或 labeled 派生。
+ * command-bus 崩溃恢复只读不可变收据 + generation v7 快照 + material CAS。
+ * 完整性/schema/CAS/receipt 漂移 fail-closed；仅尚未提交才返回 null。
  */
 export async function proveAgentImagegenResultBundleOutcome(
   projectRoot: string,
   input: CommitAgentImagegenResultBundleInput,
 ): Promise<StudioAgentImagegenResultBundleOutcome | null> {
-  try {
-    const packId = normalizeId(input.packId, "packId");
-    const packFingerprint = normalizeSha256(input.packFingerprint, "packFingerprint");
-    const generationRunId = normalizeId(input.generationRunId, "generationRunId");
-    const rawSha256 = normalizeSha256(input.rawSha256, "rawSha256");
-    const context = await assertActiveManagedStudioContextToken(projectRoot, input.projectContextToken);
-    const executionReceipt = normalizeExecutionReceipt(input.executionReceipt, input.provider);
-    const results = await readStudioGenerationResultBundle(projectRoot, generationRunId);
-    if (!results
-      || results.packId !== packId
-      || results.packFingerprint !== packFingerprint
-      || results.provider !== input.provider
-      || results.raw.mediaSha256 !== rawSha256
-      || results.raw.status !== "pending"
-      || results.labeled.status !== "pending") return null;
-    const callIntent = await readStudioImagegenCallIntentByRun(projectRoot, generationRunId);
-    if (callIntent) {
-      const contextRebind = await readStudioImagegenCallContextRebindByRun(projectRoot, generationRunId);
-      const verifiedRebind = contextRebind
-        ? await verifyStudioImagegenCallContextRebindEvidence(projectRoot, generationRunId)
-        : null;
-      const requestedContextTokenHash = studioImagegenContextTokenHash(input.projectContextToken);
-      if (!callIntent
-        || callIntent.callId !== executionReceipt.callId
-        || callIntent.packId !== packId
-        || callIntent.packFingerprint !== packFingerprint
-        || callIntent.provider !== input.provider
-        || callIntent.targetKind !== results.raw.targetKind
-        || (!contextRebind && callIntent.contextTokenHash !== requestedContextTokenHash)
-        // verifyStudioImagegenCallContextRebindEvidence 已复核首环从原 call token
-        // 起步且整条 from/to 连续；恢复只应要求 latest.to 命中当前 token。
-        || (contextRebind && (contextRebind.toContextTokenHash !== requestedContextTokenHash
-          || contextRebind.executionReceiptFingerprint !== executionReceipt.fingerprint
-          || contextRebind.candidateSha256 !== rawSha256
-          || !verifiedRebind
-          || verifiedRebind.eventId !== contextRebind.eventId))
-        || callIntent.status !== "result-committed") return null;
-    } else if (executionReceipt.source !== "fixture-canary") {
-      return null;
-    }
-    const matching = await loadWritebackReceipt(projectRoot, writebackReceiptLocator({
-      context,
-      projectContextToken: input.projectContextToken,
-      generationRunId,
-      packId,
-      packFingerprint,
-      provider: input.provider,
-      executionReceipt,
-      rawSha256,
-      labeledSha256: results.labeled.mediaSha256,
-    }));
-    if (!matching
-      || matching.kind !== "studio-agent-imagegen-writeback-receipt"
-      || matching.projectId !== context.projectId
-      || matching.manifestFingerprint !== context.manifestFingerprint
-      || matching.projectContextTokenSha256 !== digest(input.projectContextToken)
-      || matching.generationRunId !== generationRunId
-      || matching.packId !== packId
-      || matching.packFingerprint !== packFingerprint
-      || matching.provider !== input.provider
-      || matching.executionReceipt.fingerprint !== executionReceipt.fingerprint
-      || matching.raw.sha256 !== rawSha256
-      || matching.labeled.sha256 !== results.labeled.mediaSha256) return null;
-    return outcomeFrom({
-      context,
-      packId,
-      packFingerprint,
-      generationRunId,
-      provider: input.provider,
-      executionReceipt,
-      writebackReceipt: matching,
-      results,
-    });
-  } catch {
-    return null;
+  const packId = normalizeId(input.packId, "packId");
+  const packFingerprint = normalizeSha256(input.packFingerprint, "packFingerprint");
+  const generationRunId = normalizeId(input.generationRunId, "generationRunId");
+  const rawSha256 = normalizeSha256(input.rawSha256, "rawSha256");
+  if (input.provider !== "codex" && input.provider !== "grok") fail("invalid-input", "provider 必须是 codex 或 grok。");
+  const shell = await inspectManagedProjectReadOnly(projectRoot);
+  const executionReceipt = normalizeExecutionReceipt(input.executionReceipt, input.provider);
+  const results = await readStudioGenerationResultBundleReadOnly(projectRoot, generationRunId);
+  if (!results) return null;
+  const matching = await loadWritebackReceiptForRequest(projectRoot, {
+    context: { projectId: shell.project.id, manifestFingerprint: shell.manifestFingerprint },
+    projectContextToken: input.projectContextToken,
+    generationRunId,
+    packId,
+    packFingerprint,
+    provider: input.provider,
+    executionReceipt,
+    rawSha256,
+    labeledSha256: results.labeled.mediaSha256,
+  });
+  if (!matching) {
+    fail("receipt-drift", `generationRunId=${generationRunId} 已有 ledger 结果，但缺少成对 writeback receipt；拒绝猜测成功。`);
   }
+  if (matching.kind !== "studio-agent-imagegen-writeback-receipt"
+    || matching.projectId !== shell.project.id
+    || matching.manifestFingerprint !== shell.manifestFingerprint
+    || (matching.projectContextTokenSha256 !== studioImagegenContextTokenHash(input.projectContextToken)
+      && matching.projectContextTokenSha256 !== digest(input.projectContextToken))
+    || matching.generationRunId !== generationRunId
+    || matching.packId !== packId
+    || matching.packFingerprint !== packFingerprint
+    || matching.provider !== input.provider
+    || matching.executionReceipt.fingerprint !== executionReceipt.fingerprint
+    || matching.raw.sha256 !== rawSha256
+    || matching.labeled.sha256 !== results.labeled.mediaSha256
+    || results.packId !== packId
+    || results.packFingerprint !== packFingerprint
+    || results.provider !== input.provider
+    || results.raw.mediaSha256 !== rawSha256) {
+    fail("receipt-drift", `writeback receipt / ledger / payload 交叉身份不一致：${matching.fingerprint}`);
+  }
+  return proveAgentImagegenResultBundleOwnerClosure({
+    projectRoot,
+    shell,
+    receipt: matching,
+    results,
+    expectedContextTokenHash: studioImagegenContextTokenHash(input.projectContextToken),
+  });
+}
+
+/**
+ * 仅凭 command ledger 的安全 locator 定点读取不可变 writeback receipt。
+ * 不扫描 receipt，不需要 projectContextToken/rawPath，也不调用任何写 owner。
+ */
+export async function proveAgentImagegenResultBundleOutcomeByLocator(
+  projectRoot: string,
+  value: unknown,
+): Promise<StudioAgentImagegenResultBundleOutcome> {
+  const locator = parseAgentImagegenResultBundleLocator(value);
+  const shell = await inspectManagedProjectReadOnly(projectRoot);
+  const receipt = await loadWritebackReceiptByStorageKey(projectRoot, locator.writebackReceiptStorageKey);
+  if (!receipt) {
+    fail("receipt-drift", `writeback receipt storageKey 不存在：${locator.writebackReceiptStorageKey}`);
+  }
+  const results = await readStudioGenerationResultBundleReadOnly(projectRoot, locator.generationRunId);
+  if (!results) {
+    fail("receipt-drift", `generationRunId=${locator.generationRunId} 缺少 generation result bundle。`);
+  }
+  if (receipt.schemaVersion !== locator.outcomeSchemaVersion
+    || receipt.projectId !== locator.projectId
+    || receipt.projectId !== shell.project.id
+    || receipt.manifestFingerprint !== locator.manifestFingerprint
+    || receipt.manifestFingerprint !== shell.manifestFingerprint
+    || receipt.generationRunId !== locator.generationRunId
+    || receipt.packId !== locator.packId
+    || receipt.packFingerprint !== locator.packFingerprint
+    || receipt.provider !== locator.provider
+    || receipt.executionReceipt.fingerprint !== locator.executionReceiptFingerprint
+    || receipt.fingerprint !== locator.writebackReceiptFingerprint
+    || writebackReceiptStorageKey(receipt) !== locator.writebackReceiptStorageKey
+    || receipt.raw.sha256 !== locator.media.rawSha256
+    || receipt.labeled.sha256 !== locator.media.labeledSha256
+    || results.raw.resultId !== locator.results.rawResultId
+    || results.labeled.resultId !== locator.results.labeledResultId
+    || results.fingerprint !== locator.results.bundleFingerprint) {
+    fail("receipt-drift", "Agent imagegen bundle locator 与 receipt/generation owner 身份不一致。");
+  }
+  const outcome = await proveAgentImagegenResultBundleOwnerClosure({
+    projectRoot,
+    shell,
+    receipt,
+    results,
+  });
+  if (outcome.fingerprint !== locator.outcomeFingerprint
+    || outcome.writebackReceiptStorageKey !== locator.writebackReceiptStorageKey) {
+    fail("receipt-drift", "Agent imagegen bundle locator 与重建 outcome fingerprint 不一致。");
+  }
+  return outcome;
 }

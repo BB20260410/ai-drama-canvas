@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   alignCanvasNodes,
+  CANVAS_GRID_SIZE,
   computeCanvasSnap,
   distributeCanvasNodes,
+  roundToCanvasGrid,
   type CanvasNodeGeometry,
 } from "../src/renderer/src/studio-canvas-align.js";
 
@@ -132,5 +134,14 @@ describe("P23 computeCanvasSnap", () => {
   it("非法 threshold 零偏移", () => {
     expect(computeCanvasSnap(dragged, [{ x: 290, y: 400, width: 188, height: 200 }], 0).lines).toEqual([]);
     expect(computeCanvasSnap(dragged, [{ x: 290, y: 400, width: 188, height: 200 }], Number.NaN).lines).toEqual([]);
+  });
+});
+
+describe("N14 roundToCanvasGrid", () => {
+  it("坐标圆整到 24 倍数；非法 size 原样返回", () => {
+    expect(CANVAS_GRID_SIZE).toBe(24);
+    expect(roundToCanvasGrid(13, 35)).toEqual({ x: 24, y: 24 });
+    expect(roundToCanvasGrid(0, 48)).toEqual({ x: 0, y: 48 });
+    expect(roundToCanvasGrid(11, 11, 0)).toEqual({ x: 11, y: 11 });
   });
 });

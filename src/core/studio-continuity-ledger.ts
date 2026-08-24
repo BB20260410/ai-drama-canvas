@@ -28,7 +28,10 @@ import {
   type StudioContinuityScopeInput,
   type StudioContinuityTimeline,
 } from "./studio-continuity.js";
-import { initializeStudioGenerationLedger } from "./studio-generation-ledger-storage.js";
+import {
+  initializeStudioGenerationLedger,
+  withStudioGenerationLedgerReadOnlySnapshot,
+} from "./studio-generation-ledger-storage.js";
 import {
   hasStudioRequestSchemaValidation,
   isStudioRequestSqliteValidationUnchanged,
@@ -45,13 +48,6 @@ const CONTINUITY_TABLES = [
   "studio_continuity_heads",
   "studio_continuity_conflicts",
   "studio_continuity_conflict_heads",
-  "studio_continuity_conflict_resolutions",
-  "studio_continuity_operation_receipts",
-] as const;
-
-const CONTINUITY_IMMUTABLE_TABLES = [
-  "studio_continuity_entries",
-  "studio_continuity_conflicts",
   "studio_continuity_conflict_resolutions",
   "studio_continuity_operation_receipts",
 ] as const;
@@ -542,11 +538,30 @@ const EXPECTED_COLUMNS: Record<(typeof CONTINUITY_TABLES)[number], string[]> = {
 };
 
 const REQUIRED_TRIGGERS = [
-  ...CONTINUITY_IMMUTABLE_TABLES.flatMap((table) => [`${table}_no_update`, `${table}_no_delete`]),
-  "studio_continuity_heads_guard_update",
-  "studio_continuity_heads_no_delete",
-  "studio_continuity_conflict_heads_guard_update",
-  "studio_continuity_conflict_heads_no_delete",
+  { name: "studio_continuity_entries_no_update", table: "studio_continuity_entries", event: "update", body: "continuity entries are append-only" },
+  { name: "studio_continuity_entries_no_delete", table: "studio_continuity_entries", event: "delete", body: "continuity entries are append-only" },
+  { name: "studio_continuity_conflicts_no_update", table: "studio_continuity_conflicts", event: "update", body: "continuity conflicts are append-only" },
+  { name: "studio_continuity_conflicts_no_delete", table: "studio_continuity_conflicts", event: "delete", body: "continuity conflicts are append-only" },
+  { name: "studio_continuity_conflict_resolutions_no_update", table: "studio_continuity_conflict_resolutions", event: "update", body: "continuity resolutions are append-only" },
+  { name: "studio_continuity_conflict_resolutions_no_delete", table: "studio_continuity_conflict_resolutions", event: "delete", body: "continuity resolutions are append-only" },
+  { name: "studio_continuity_operation_receipts_no_update", table: "studio_continuity_operation_receipts", event: "update", body: "continuity receipts are append-only" },
+  { name: "studio_continuity_operation_receipts_no_delete", table: "studio_continuity_operation_receipts", event: "delete", body: "continuity receipts are append-only" },
+  {
+    name: "studio_continuity_heads_guard_update",
+    table: "studio_continuity_heads",
+    event: "update",
+    when: "new.head_key <> old.head_key or new.revision <> old.revision + 1",
+    body: "continuity head requires monotonic cas",
+  },
+  { name: "studio_continuity_heads_no_delete", table: "studio_continuity_heads", event: "delete", body: "continuity heads cannot be deleted" },
+  {
+    name: "studio_continuity_conflict_heads_guard_update",
+    table: "studio_continuity_conflict_heads",
+    event: "update",
+    when: "new.conflict_id <> old.conflict_id or new.revision <> old.revision + 1 or old.status <> 'open' or new.status <> 'resolved' or new.resolution_id is null",
+    body: "continuity conflict head requires open-to-resolved cas",
+  },
+  { name: "studio_continuity_conflict_heads_no_delete", table: "studio_continuity_conflict_heads", event: "delete", body: "continuity conflict heads cannot be deleted" },
 ] as const;
 
 const REQUIRED_INDEXES = [
@@ -607,7 +622,14 @@ function assertContinuitySchema(db: DatabaseSync): void {
     }
   }
   for (const trigger of REQUIRED_TRIGGERS) {
-    if (!schemaObjectExists(db, trigger, "trigger")) fail("storage-invalid", `continuity trigger ${trigger} 缺失。`);
+    const sql = (db.prepare(
+      "SELECT sql FROM sqlite_master WHERE type='trigger' AND name=?",
+    ).get(trigger.name) as { sql?: string } | undefined)?.sql ?? "";
+    const normalized = sql.replace(/\s+/gu, " ").trim().toLowerCase()
+      .replace(/if not exists /gu, "");
+    const expected = `create trigger ${trigger.name} before ${trigger.event} on ${trigger.table}${"when" in trigger ? ` when ${trigger.when}` : ""} begin select raise(abort, '${trigger.body}'); end`;
+    const exact = new RegExp(`^${expected.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&")}$`, "u");
+    if (!exact.test(normalized)) fail("storage-invalid", `continuity trigger ${trigger.name} SQL 合同漂移。`);
   }
   for (const index of REQUIRED_INDEXES) {
     if (!schemaObjectExists(db, index, "index")) fail("storage-invalid", `continuity index ${index} 缺失。`);
@@ -2262,4 +2284,24 @@ export async function readStudioContinuityOperationReceipt(
   } finally {
     db.close();
   }
+}
+
+/**
+ * Command replay/recovery 专用：同一物理只读 generation 快照内联合验证
+ * continuity schema、operation receipt 与 immutable entry/conflict owner。
+ */
+export async function readStudioContinuityOperationReceiptReadOnly(
+  projectRoot: string,
+  operationIdInput: string,
+): Promise<StudioContinuityWriteResult | null> {
+  const operationId = normalizeOperationId(operationIdInput);
+  return withStudioGenerationLedgerReadOnlySnapshot(
+    projectRoot,
+    "studio continuity operation receipt",
+    (db) => {
+      assertContinuitySchema(db);
+      const row = operationReceiptRow(db, operationId);
+      return row ? resultFromReceipt(db, row, true) : null;
+    },
+  );
 }

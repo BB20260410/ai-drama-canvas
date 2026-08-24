@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "kind": "multi-model-frozen-readonly-review-pack",
+  "purpose": "final-frozen-review-of-already-landed-smoothness-and-button-work",
+  "createdAt": "2026-08-14T10:45:50+08:00",
+  "language": "zh-CN",
+  "safety": {
+    "relativePathsOnly": true,
+    "absolutePaths": 0,
+    "formalProjectBodies": 0,
+    "casBlobs": 0,
+    "credentials": 0,
+    "sqlDumps": 0,
+    "sourceDigestImpact": "docs/evidence is outside SOURCE_DIGEST_GLOBS (src/tests/scripts/package configs only)"
+  },
+  "identity": {
+    "gitHead": "3c56e1d2f518cefe57de728ad32222c409a1dabf",
+    "workingTree": "dirty-uncommitted-shared-tree",
+    "sourceDigest": "22bb68378a587777df1acab4b3bb36ed1cae74fa079b6caaa26c95275360ee3f",
+    "buildId": "6e0522f5d24b5d8663ac45dc063f205a",
+    "buildIdentityFingerprint": "d3109609380ca3dae5742e07dd867822274e83a029c71d9dae7308f0b43e7c47",
+    "manifestFingerprint": "4b2769fd2835f7704eba8cb33ebb72d499c923951421182ff2bd1b2947067009",
+    "packageVersion": "0.2.0",
+    "protocolVersion": "1.1",
+    "mcpToolCount": 220,
+    "sourceFiles": 1061,
+    "sourceBytes": 21276556,
+    "builtAt": "2026-08-14T02:40:29.118Z",
+    "distribution": "local-only",
+    "liveDigestRecheck": {
+      "command": "node --import tsx scripts/compute-source-digest.ts .",
+      "via": "ASCII symlink helper, not tsx/cli.mjs",
+      "matched": true,
+      "note": "live digest equals expected T23 10:40 CST identity; did not move after T23"
+    }
+  },
+  "reviewInstruction": {
+    "mode": "final-frozen-review",
+    "doNotImplement": true,
+    "doNotWriteWorktree": true,
+    "doNotTalkToOtherModels": true,
+    "focus": "this-morning-smoothness-and-button-work-on-22bb6837-not-old-d2e70bf9-pack",
+    "outputSchema": {
+      "verdict": "PASS|FAIL",
+      "findings": [
+        {
+          "id": "string",
+          "severity": "P0|P1|P2",
+          "summary": "string",
+          "evidencePaths": [
+            "pack-relative-path"
+          ]
+        }
+      ],
+      "notVerified": "bool"
+    },
+    "findingRules": [
+      "只报告有本包相对路径证据的 P0-P2",
+      "无复现依据必须把 notVerified 设为 true，且不要编造 FAIL",
+      "这是已落地脏树的终审，不是新实现轮",
+      "不得要求改源码、写 worktree、跑付费生成或写正式工程",
+      "只审今早落地的保存按钮、工作区切换按钮、whenReady 等 hash 三项，不要把旧 d2e70bf9 包的发现当成本身份新缺陷"
+    ]
+  },
+  "landedThisMorning": {
+    "note": "file list + short contract summaries only; huge diffs omitted",
+    "changes": [
+      {
+        "id": "video-editor-save-fail-closed",
+        "paths": [
+          "src/renderer/src/components/VideoEditorView.vue",
+          "tests/video-editor-dirty-guard.test.ts"
+        ],
+        "summary": "VideoEditor save：saving=true 必须在首个 await 之前置位；已在 saving 则直接 return false，避免连点发出两次 saveEditProject。按钮 :disabled=!active || saving。",
+        "contract": [
+          "async function save 入口：if (!active.value || saving.value) return false",
+          "saving.value = true 出现在 await suspendPreviewWork() 之前",
+          "finally 里 saving.value = false",
+          "保存失败且仍持有 preview lease 时 resumePreviewWork，避免编辑器永久暂停"
+        ]
+      },
+      {
+        "id": "hybrid-novel-workspace-switch-busy-gate",
+        "paths": [
+          "src/renderer/src/App.vue",
+          "src/renderer/src/components/NovelStudioView.vue",
+          "tests/novel-workspace-routing.test.ts"
+        ],
+        "summary": "混合/小说工作区切换：按钮在忙时禁用并展示原因，避免可点但被静默吞掉。",
+        "contract": [
+          "hybrid 按钮 data-testid=hybrid-switch-novel 使用 :disabled=projectOperationBusy，title 绑 workspaceSwitchBlockedReason",
+          "hybrid 原因条 data-testid=hybrid-workspace-switch-blocked，role=status",
+          "projectOperationBusy = creatingManagedProject || projectSwitching || managedWorkspaceSwitching || projectRemovingRoot || externalManagedProjectBusy",
+          "workspaceSwitchBlockedReason：正在切换工作区 / 正在切换工程 / 正在移除工程，不能切换工作区 / 正在创建工程 / 工程操作进行中，不能切换工作区",
+          "novel 按钮 data-testid=novel-switch-drama 使用 :disabled=Boolean(busy || loading)",
+          "novel 原因条 data-testid=novel-workspace-switch-blocked：loading 时正在切换工作区，否则正在处理，不能切换工作区",
+          "App 传给 NovelStudioView 的 loading = novelStudioRefreshing || managedWorkspaceSwitching || projectSwitching || Boolean(projectRemovingRoot)",
+          "switchManagedWorkspace 入口仍只拦 managedWorkspaceSwitching || projectSwitching || projectRemovingRoot，不读 creatingManagedProject / externalManagedProjectBusy",
+          "externalManagedProjectBusy 另有全屏 shield data-testid=managed-project-operation-shield"
+        ]
+      },
+      {
+        "id": "whenready-await-remaining-boot-hash",
+        "paths": [
+          "src/main/index.ts",
+          "tests/runtime-write-gate.test.ts",
+          "tests/app-close-coordinator.test.ts"
+        ],
+        "summary": "main whenReady：在 createWindow() 前 await 剩余 sourceRuntimeBootIdentity，让 first-card 只付廉价工件复核，而不是把剩余整树 walk 算进 1500ms。watcher 仍不等 hash。mutation 仍全量 inspect。hash 失败仍建窗；闸门失败关闭。",
+        "contract": [
+          "whenReady 序列：await sourceRuntimeBootIdentity.catch(() => undefined) 后才 await createWindow()",
+          "hash 失败不拦截建窗；业务访问由 getRuntimeWriteGate / 闸门失败关闭",
+          "startSourceRuntimeGateWatchers 内没有 await sourceRuntimeBootIdentity，chokidar.watch 先启动",
+          "boot promise then 只 noteBootHashCompleted；失败不开放复用",
+          "mutation 仍走完整 inspect，不得复用 boot digest"
+        ]
+      }
+    ]
+  },
+  "buttonTestFiles": [
+    {
+      "path": "tests/video-editor-dirty-guard.test.ts",
+      "covers": "VideoEditor 保存按钮 fail-closed",
+      "assertions": [
+        "组件含 :disabled=!active || saving",
+        "save() 源码中 saving.value = true 的下标小于 await suspendPreviewWork()",
+        "入口 if (!active.value || saving.value) return false"
+      ]
+    },
+    {
+      "path": "tests/novel-workspace-routing.test.ts",
+      "covers": "hybrid/novel 工作区切换按钮禁用与原因",
+      "assertions": [
+        "App 含 data-testid=hybrid-switch-novel、:disabled=projectOperationBusy、data-testid=hybrid-workspace-switch-blocked、workspaceSwitchBlockedReason",
+        "文案含 正在切换工作区 / 正在移除工程，不能切换工作区 / 工程操作进行中，不能切换工作区",
+        "App 不再使用 :disabled=managedWorkspaceSwitching || projectSwitching",
+        "Novel 含 data-testid=novel-switch-drama、:disabled=Boolean(busy || loading)、data-testid=novel-workspace-switch-blocked"
+      ]
+    },
+    {
+      "path": "tests/runtime-write-gate.test.ts",
+      "covers": "whenReady 等剩余 boot hash；watcher 不等 hash",
+      "assertions": [
+        "startSourceRuntimeGateWatchers 内 await sourceRuntimeBootIdentity 为 -1，且含 chokidar.watch",
+        "whenReady 切片中 await sourceRuntimeBootIdentity 在 await createWindow() 之前",
+        "含 sourceRuntimeBootIdentity.catch"
+      ]
+    }
+  ],
+  "t23Strict": {
+    "status": "PASS",
+    "evidenceStem": "docs/evidence/t23-strict-build-20260814-22bb6837.json",
+    "sourceDigest": "22bb68378a587777df1acab4b3bb36ed1cae74fa079b6caaa26c95275360ee3f",
+    "buildId": "6e0522f5d24b5d8663ac45dc063f205a",
+    "rendererFirstCardMs": 1229,
+    "rendererFirstRawMs": 3127,
+    "rendererAllPassReferencesMs": 4104,
+    "peakOutstandingProjectionIpc": 4,
+    "interactionStatus": "PASS",
+    "budgets": {
+      "maxRendererFirstCardMs": 1500,
+      "maxRendererFirstRawMs": 5000,
+      "maxRendererAllPassReferencesMs": 8000,
+      "maxOutstandingProjectionIpc": 4
+    },
+    "interactions": {
+      "warmUnitSwitchP95Ms": 41.79,
+      "zoomInputFeedbackP95Ms": 36.77,
+      "dragFeedbackP95Ms": 2.31,
+      "canvasPanAverageFps": 119.76,
+      "canvasPanFrameP95Ms": 10.3,
+      "unexplainedLongTaskMaxMs": 0
+    }
+  },
+  "evidenceStems": [
+    "docs/evidence/t23-strict-build-20260814-22bb6837.json"
+  ],
+  "outOfScope": [
+    "STATUS.md / TASKS.md / docs/当前开发交接.md 不在本切片",
+    "旧 d2e70bf9 多模型包与其 P2 不是本身份新实现轮",
+    "根目录 t23-strict-build-20260814-13d85a9f 是过期中间件"
+  ]
+}

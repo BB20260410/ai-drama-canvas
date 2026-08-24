@@ -83,6 +83,27 @@ describe("P1 小说工作区桌面路由", () => {
     expect(main).toContain("await inspectManagedProjectReadOnly(resolvedRoot);");
   });
 
+  it("混合工作区切换在工程门禁下禁用并说明原因，避免可点但被静默吞掉", async () => {
+    const [app, novel] = await Promise.all([
+      source("src/renderer/src/App.vue"),
+      source("src/renderer/src/components/NovelStudioView.vue"),
+    ]);
+    expect(parse(app, { filename: "App.vue" }).errors).toEqual([]);
+    expect(parse(novel, { filename: "NovelStudioView.vue" }).errors).toEqual([]);
+    expect(app).toContain('data-testid="hybrid-switch-novel"');
+    expect(app).toContain(':disabled="projectOperationBusy"');
+    expect(app).toContain('data-testid="hybrid-workspace-switch-blocked"');
+    expect(app).toContain("workspaceSwitchBlockedReason");
+    expect(app).toContain("正在切换工作区");
+    expect(app).toContain("正在移除工程，不能切换工作区");
+    expect(app).toContain("工程操作进行中，不能切换工作区");
+    expect(app).not.toContain(':disabled="managedWorkspaceSwitching || projectSwitching"');
+    expect(novel).toContain('data-testid="novel-switch-drama"');
+    expect(novel).toContain(':disabled="Boolean(busy || loading)"');
+    expect(novel).toContain('data-testid="novel-workspace-switch-blocked"');
+    expect(novel).toContain("正在切换工作区");
+  });
+
   it("保持 Material Studio owner，并延迟非素材库首屏分页读取", async () => {
     const material = await source("src/renderer/src/components/MaterialStudioView.vue");
     expect(parse(material, { filename: "MaterialStudioView.vue" }).errors).toEqual([]);

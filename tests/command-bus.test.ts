@@ -12,8 +12,9 @@ import { listProjectContext, upsertProjectContext } from "../src/core/memory.js"
 import { listAssetRelations, listVoiceIdentities, upsertAssetRelation, upsertVoiceIdentity } from "../src/core/asset-registry.js";
 import { getProductionWorkflow, listCreativeBibles, upsertCreativeBible } from "../src/core/production.js";
 import { createTaskPack, scanAndPersist } from "../src/core/service.js";
-import { ensureSidecar, getSidecarPaths, listEvents, listTaskPacks, loadIndex, writeJsonAtomic } from "../src/core/sidecar.js";
+import { appendEvent, ensureSidecar, getSidecarPaths, listEvents, listTaskPacks, loadIndex, writeJsonAtomic } from "../src/core/sidecar.js";
 import { listProjectLocks } from "../src/core/locks.js";
+import { upsertCommandLedgerEntry } from "../src/core/command-ledger-store.js";
 import { previewFusionStoryboardSheetMigration } from "../src/core/fusion-storyboard-sheet-migration.js";
 import {
   FUSION_STORYBOARD_SHEET_RENDER_POLICY_VERSION,
@@ -82,6 +83,17 @@ async function p4MigrationFixture() {
   }, null, 2)}\n`, "utf8");
   const preview = await previewFusionStoryboardSheetMigration(root, { itemIds: ["main-ep01-unit001"] });
   return { root, pngPath, preview };
+}
+
+async function removeTerminalReceipts(projectRoot: string, idempotencyKey: string): Promise<void> {
+  const eventsPath = getSidecarPaths(projectRoot).events;
+  const raw = await readFile(eventsPath, "utf8");
+  const kept = raw.split("\n").filter((line) => {
+    if (!line.trim()) return false;
+    const event = JSON.parse(line) as { type?: string; idempotencyKey?: string };
+    return event.type !== "command.side-effect-committed" || event.idempotencyKey !== idempotencyKey;
+  });
+  await writeFile(eventsPath, kept.length ? `${kept.join("\n")}\n` : "", "utf8");
 }
 
 async function p4RenderRegistrationFixture(root: string): Promise<{
@@ -280,9 +292,166 @@ describe("Codex 幂等命令总线", () => {
     expect((await listEvents(root, 100)).filter((event) => event.type === "command.outcome-unknown")).toHaveLength(1);
     const reconciled = await reconcileCommand(root, { idempotencyKey: input.idempotencyKey });
     expect(reconciled.status).toBe("succeeded");
-    expect(reconciled.result).toEqual(expect.objectContaining({ reconciled: true, evidenceEvents: expect.arrayContaining([expect.objectContaining({ type: "command.side-effect-committed" })]) }));
+    expect(reconciled.result).toEqual(expect.objectContaining({
+      reconciled: true,
+      evidenceEvents: expect.arrayContaining([
+        expect.objectContaining({ type: "command.side-effect-committed" }),
+      ]),
+    }));
     const replayed = await executeIdempotentCommand(root, { ...input, requestId: "request-crash-window-003" });
     expect(replayed.replayed).toBe(true);
+    expect(await listTaskPacks(root)).toHaveLength(1);
+  });
+
+  it("成功终态收据只保存摘要，不复制命令返回中的正文或绝对路径", async () => {
+    const root = await fixture();
+    const contentSentinel = "RECEIPT_CONTENT_MUST_NOT_LEAK_20260813";
+    const pathSentinel = "/ABSOLUTE_RECEIPT_LEAK_SENTINEL/private.md";
+    const input = {
+      requestId: "request-terminal-receipt-redaction-001",
+      idempotencyKey: "terminal-receipt-redaction-context-v1",
+      request: {
+        command: "upsert_context" as const,
+        payload: {
+          kind: "continuity" as const,
+          title: "回执脱敏",
+          content: `${contentSentinel}\n${pathSentinel}`,
+          itemIds: ["main-ep01-unit001"],
+        },
+      },
+    };
+    const result = await executeIdempotentCommand(root, input);
+    expect(JSON.stringify(result.result)).toContain(contentSentinel);
+    const terminal = (await listEvents(root, 200)).find((event) =>
+      event.type === "command.side-effect-committed"
+      && event.idempotencyKey === input.idempotencyKey);
+    expect(terminal?.data?.resultDigest).toMatch(/^[a-f0-9]{64}$/u);
+    expect(terminal?.data).not.toHaveProperty("result");
+    expect(JSON.stringify(terminal?.data)).not.toContain(contentSentinel);
+    expect(JSON.stringify(terminal?.data)).not.toContain(pathSentinel);
+  });
+
+  it("摘要型成功收据必须拒绝终态账本结果漂移，reconcile 与同键重放均不重进 domain", async () => {
+    const root = await fixture();
+    const input = {
+      requestId: "request-terminal-ledger-digest-drift-001",
+      idempotencyKey: "terminal-ledger-digest-drift-taskpack-v1",
+      request: {
+        command: "create_task_pack" as const,
+        payload: {
+          itemIds: ["main-ep01-unit001"],
+          mode: "autopilot" as const,
+          kind: "image" as const,
+        },
+      },
+    };
+    await expect(executeIdempotentCommand(root, input)).resolves.toMatchObject({ status: "succeeded" });
+    const terminal = (await listEvents(root, 200)).find((event) =>
+      event.type === "command.side-effect-committed" && event.idempotencyKey === input.idempotencyKey);
+    expect(terminal?.data).not.toHaveProperty("result");
+    const original = (await listCommandLedger(root)).find((entry) => entry.idempotencyKey === input.idempotencyKey)!;
+    await upsertCommandLedgerEntry(root, {
+      ...original,
+      result: { schemaVersion: 1, tampered: true },
+    }, original.executedAt);
+
+    await expect(reconcileCommand(root, { idempotencyKey: input.idempotencyKey }))
+      .rejects.toThrow("账本结果摘要与终态收据冲突");
+    await expect(executeIdempotentCommand(root, { ...input, requestId: "request-terminal-ledger-digest-drift-002" }))
+      .rejects.toThrow("账本结果摘要与终态收据冲突");
+    await upsertCommandLedgerEntry(root, {
+      ...original,
+      result: undefined,
+    }, original.executedAt);
+    await expect(reconcileCommand(root, { idempotencyKey: input.idempotencyKey }))
+      .rejects.toThrow("终态账本缺少结果且终态收据仅含摘要");
+    expect(await listTaskPacks(root)).toHaveLength(1);
+    expect((await listEvents(root, 200)).filter((event) =>
+      event.type === "task.created" && event.idempotencyKey === input.idempotencyKey)).toHaveLength(1);
+  });
+
+  it("同一命令出现不同摘要的终态收据时失败关闭且不改写账本", async () => {
+    const root = await fixture();
+    const input = {
+      requestId: "request-terminal-receipt-conflict-001",
+      idempotencyKey: "terminal-receipt-conflict-taskpack-v1",
+      request: {
+        command: "create_task_pack" as const,
+        payload: {
+          itemIds: ["main-ep01-unit001"],
+          mode: "autopilot" as const,
+          kind: "image" as const,
+        },
+      },
+    };
+    process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE = input.request.command;
+    try {
+      await expect(executeIdempotentCommand(root, input)).rejects.toThrow("结果未确认");
+    } finally {
+      delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE;
+    }
+    const original = (await listEvents(root, 200)).find((event) =>
+      event.type === "command.side-effect-committed"
+      && event.idempotencyKey === input.idempotencyKey);
+    expect(original?.data?.resultDigest).toMatch(/^[a-f0-9]{64}$/u);
+    await appendEvent(root, {
+      actor: "codex",
+      type: "command.side-effect-committed",
+      requestId: input.requestId,
+      idempotencyKey: input.idempotencyKey,
+      command: input.request.command,
+      data: {
+        ...(original?.data ?? {}),
+        resultDigest: "f".repeat(64),
+      },
+    });
+    await expect(reconcileCommand(root, {
+      idempotencyKey: input.idempotencyKey,
+    })).rejects.toThrow("互相冲突的终态收据");
+    expect((await listCommandLedger(root))[0]?.status).toBe("unknown");
+    expect(await listTaskPacks(root)).toHaveLength(1);
+  });
+
+  it("同摘要的成功与失败终态收据冲突时失败关闭", async () => {
+    const root = await fixture();
+    const input = {
+      requestId: "request-terminal-receipt-status-conflict-001",
+      idempotencyKey: "terminal-receipt-status-conflict-taskpack-v1",
+      request: {
+        command: "create_task_pack" as const,
+        payload: {
+          itemIds: ["main-ep01-unit001"],
+          mode: "autopilot" as const,
+          kind: "image" as const,
+        },
+      },
+    };
+    process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE = input.request.command;
+    try {
+      await expect(executeIdempotentCommand(root, input)).rejects.toThrow("结果未确认");
+    } finally {
+      delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE;
+    }
+    const original = (await listEvents(root, 200)).find((event) =>
+      event.type === "command.side-effect-committed"
+      && event.idempotencyKey === input.idempotencyKey);
+    await appendEvent(root, {
+      actor: "codex",
+      type: "command.side-effect-committed",
+      requestId: input.requestId,
+      idempotencyKey: input.idempotencyKey,
+      command: input.request.command,
+      data: {
+        ...(original?.data ?? {}),
+        outcomeStatus: "failed",
+        error: "测试终态失败",
+      },
+    });
+
+    await expect(reconcileCommand(root, {
+      idempotencyKey: input.idempotencyKey,
+    })).rejects.toThrow("互相冲突的终态收据");
+    expect((await listCommandLedger(root))[0]?.status).toBe("unknown");
     expect(await listTaskPacks(root)).toHaveLength(1);
   });
 
@@ -360,6 +529,168 @@ describe("Codex 幂等命令总线", () => {
     expect((await listCommandLedger(storageRoot))[0]).toMatchObject({ status: "succeeded", result: { reconciled: true } });
     expect((await loadFusionStoryboardSheetStore(sample.root)).revision).toBe(1);
     expect((await executeIdempotentCommand(sample.root, { ...input, requestId: "request-p4-reconcile-snapshot-002" }, { storageRoot })).replayed).toBe(true);
+  });
+
+  it("durable proof 不得越过损坏的终态收据把 unknown 提升为 succeeded", async () => {
+    const sample = await p4MigrationFixture();
+    const input = {
+      requestId: "request-p4-malformed-receipt-001",
+      idempotencyKey: "p4-malformed-receipt-after-store-v1",
+      request: {
+        command: "migrate_fusion_storyboard_sheets" as const,
+        payload: {
+          itemIds: ["main-ep01-unit001"],
+          expectedStoreRevision: sample.preview.storeRevision,
+          expectedCandidateFingerprint: sample.preview.candidateFingerprint,
+        },
+      },
+    };
+    process.env.AI_CANVAS_TEST_COMMAND_CRASH_BEFORE_COMMIT_EVENT = input.request.command;
+    try {
+      await expect(executeIdempotentCommand(sample.root, input)).rejects.toThrow("结果未确认");
+    } finally {
+      delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_BEFORE_COMMIT_EVENT;
+    }
+    const ledgerBefore = (await listCommandLedger(sample.root))[0];
+    expect(ledgerBefore).toMatchObject({ status: "unknown", durableReconciliation: { request: input.request } });
+    await appendEvent(sample.root, {
+      actor: "codex",
+      type: "command.side-effect-committed",
+      requestId: input.requestId,
+      idempotencyKey: input.idempotencyKey,
+      command: input.request.command,
+      data: {
+        requestHash: ledgerBefore?.requestHash,
+        command: input.request.command,
+        resultDigest: "not-a-sha256",
+        outcomeStatus: "succeeded",
+      },
+    });
+
+    await expect(reconcileCommand(sample.root, {
+      idempotencyKey: input.idempotencyKey,
+    })).rejects.toThrow("resultDigest");
+    expect((await listCommandLedger(sample.root))[0]?.status).toBe("unknown");
+    expect((await loadFusionStoryboardSheetStore(sample.root)).revision).toBe(1);
+  });
+
+  it("durable proof 必须服从合法失败收据且不得改判 succeeded", async () => {
+    const sample = await p4MigrationFixture();
+    const input = {
+      requestId: "request-p4-failed-receipt-001",
+      idempotencyKey: "p4-failed-receipt-after-store-v1",
+      request: {
+        command: "migrate_fusion_storyboard_sheets" as const,
+        payload: {
+          itemIds: ["main-ep01-unit001"],
+          expectedStoreRevision: sample.preview.storeRevision,
+          expectedCandidateFingerprint: sample.preview.candidateFingerprint,
+        },
+      },
+    };
+    process.env.AI_CANVAS_TEST_COMMAND_CRASH_BEFORE_COMMIT_EVENT = input.request.command;
+    try {
+      await expect(executeIdempotentCommand(sample.root, input)).rejects.toThrow("结果未确认");
+    } finally {
+      delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_BEFORE_COMMIT_EVENT;
+    }
+    const ledgerBefore = (await listCommandLedger(sample.root))[0];
+    const failedResult = { schemaVersion: 1, applied: false, reason: "confirmed_failure" };
+    await appendEvent(sample.root, {
+      actor: "codex",
+      type: "command.side-effect-committed",
+      requestId: input.requestId,
+      idempotencyKey: input.idempotencyKey,
+      command: input.request.command,
+      data: {
+        requestHash: ledgerBefore?.requestHash,
+        command: input.request.command,
+        result: failedResult,
+        resultDigest: sha('{"applied":false,"reason":"confirmed_failure","schemaVersion":1}'),
+        outcomeStatus: "failed",
+        error: "测试确认失败",
+      },
+    });
+
+    await expect(reconcileCommand(sample.root, {
+      idempotencyKey: input.idempotencyKey,
+    })).resolves.toMatchObject({
+      status: "failed",
+      result: { schemaVersion: 1, applied: false },
+    });
+    expect((await listCommandLedger(sample.root))[0]).toMatchObject({
+      status: "failed",
+      result: { schemaVersion: 1, applied: false },
+    });
+    expect((await loadFusionStoryboardSheetStore(sample.root)).revision).toBe(1);
+  });
+
+  it("durable proof 读取完成后若终态收据抢先落盘，锁内二次校验必须让失败收据胜出", async () => {
+    const sample = await p4MigrationFixture();
+    const input = {
+      requestId: "request-p4-receipt-race-001",
+      idempotencyKey: "p4-receipt-race-after-proof-v1",
+      request: {
+        command: "migrate_fusion_storyboard_sheets" as const,
+        payload: {
+          itemIds: ["main-ep01-unit001"],
+          expectedStoreRevision: sample.preview.storeRevision,
+          expectedCandidateFingerprint: sample.preview.candidateFingerprint,
+        },
+      },
+    };
+    process.env.AI_CANVAS_TEST_COMMAND_CRASH_BEFORE_COMMIT_EVENT = input.request.command;
+    try {
+      await expect(executeIdempotentCommand(sample.root, input)).rejects.toThrow("结果未确认");
+    } finally {
+      delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_BEFORE_COMMIT_EVENT;
+    }
+    const ledgerBefore = (await listCommandLedger(sample.root))[0]!;
+    let releaseProof!: () => void;
+    let proofEntered!: () => void;
+    const proofEnteredPromise = new Promise<void>((resolve) => { proofEntered = resolve; });
+    const releaseProofPromise = new Promise<void>((resolve) => { releaseProof = resolve; });
+    const actualMigration = await vi.importActual<typeof import("../src/core/fusion-storyboard-sheet-migration.js")>("../src/core/fusion-storyboard-sheet-migration.js");
+    vi.doMock("../src/core/fusion-storyboard-sheet-migration.js", () => ({
+      ...actualMigration,
+      previewFusionStoryboardSheetMigration: async (...args: Parameters<typeof actualMigration.previewFusionStoryboardSheetMigration>) => {
+        proofEntered();
+        await releaseProofPromise;
+        return actualMigration.previewFusionStoryboardSheetMigration(...args);
+      },
+    }));
+    vi.resetModules();
+    try {
+      const isolatedBus = await import("../src/core/command-bus.js");
+      const reconciling = isolatedBus.reconcileCommand(sample.root, { idempotencyKey: input.idempotencyKey });
+      await proofEnteredPromise;
+      const failedResult = { schemaVersion: 1, applied: false, reason: "confirmed_failure" };
+      await appendEvent(sample.root, {
+        actor: "codex",
+        type: "command.side-effect-committed",
+        requestId: input.requestId,
+        idempotencyKey: input.idempotencyKey,
+        command: input.request.command,
+        data: {
+          requestHash: ledgerBefore.requestHash,
+          command: input.request.command,
+          result: failedResult,
+          resultDigest: sha('{"applied":false,"reason":"confirmed_failure","schemaVersion":1}'),
+          outcomeStatus: "failed",
+          error: "safe confirmed failure",
+        },
+      });
+      releaseProof();
+      await expect(reconciling).resolves.toMatchObject({
+        status: "failed",
+        result: failedResult,
+      });
+      expect((await listCommandLedger(sample.root))[0]).toMatchObject({ status: "failed", result: failedResult });
+    } finally {
+      releaseProof();
+      vi.doUnmock("../src/core/fusion-storyboard-sheet-migration.js");
+      vi.resetModules();
+    }
   });
 
   it("P4 render 已登记 current receipt/store 后崩溃只做确定性对账与补扫，不再次渲染或登记", async () => {
@@ -519,8 +850,78 @@ describe("Codex 幂等命令总线", () => {
     delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE;
     expect((await listCommandLedger(root))[0]?.status).toBe("unknown");
     expect((await reconcileCommand(root, { idempotencyKey: input.idempotencyKey })).status).toBe("succeeded");
+    expect((await listCommandLedger(root))[0]).toMatchObject({ status: "succeeded", requestId: input.requestId });
+    expect((await listCommandLedger(storageRoot))[0]).toMatchObject({ status: "succeeded", requestId: input.requestId });
     const replayed = await executeIdempotentCommand(root, { ...input, requestId: "request-external-ledger-002" }, { storageRoot });
     expect(replayed.replayed).toBe(true);
+  });
+
+  it("独立事务根只存在 owner 收据时可对账并补齐镜像根收据", async () => {
+    const root = await fixture();
+    const storageRoot = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-command-owner-receipt-"));
+    roots.push(storageRoot);
+    const input = { requestId: "request-owner-receipt-001", idempotencyKey: "owner-only-receipt-taskpack-v1", request: { command: "create_task_pack" as const, payload: { itemIds: ["main-ep01-unit001"], mode: "autopilot" as const, kind: "image" as const } } };
+    process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE = input.request.command;
+    try { await expect(executeIdempotentCommand(root, input, { storageRoot })).rejects.toThrow("结果未确认"); }
+    finally { delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE; }
+    await removeTerminalReceipts(root, input.idempotencyKey);
+
+    await expect(reconcileCommand(root, { idempotencyKey: input.idempotencyKey }))
+      .resolves.toMatchObject({ status: "succeeded", replayed: true });
+    expect((await listEvents(root, 200)).filter((event) => event.type === "command.side-effect-committed" && event.idempotencyKey === input.idempotencyKey)).toHaveLength(1);
+  });
+
+  it("独立事务根只有镜像收据时失败关闭，不能把镜像当 owner", async () => {
+    const root = await fixture();
+    const storageRoot = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-command-mirror-receipt-"));
+    roots.push(storageRoot);
+    const input = { requestId: "request-mirror-receipt-001", idempotencyKey: "mirror-only-receipt-taskpack-v1", request: { command: "create_task_pack" as const, payload: { itemIds: ["main-ep01-unit001"], mode: "autopilot" as const, kind: "image" as const } } };
+    process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE = input.request.command;
+    try { await expect(executeIdempotentCommand(root, input, { storageRoot })).rejects.toThrow("结果未确认"); }
+    finally { delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE; }
+    await removeTerminalReceipts(storageRoot, input.idempotencyKey);
+
+    await expect(reconcileCommand(root, { idempotencyKey: input.idempotencyKey }))
+      .rejects.toThrow(/owner|事务根/u);
+    expect((await listCommandLedger(storageRoot))[0]?.status).toBe("unknown");
+  });
+
+  it("独立事务根 succeeded 账本同键重放遇到 mirror-only 收据也失败关闭", async () => {
+    const root = await fixture();
+    const storageRoot = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-command-terminal-mirror-only-"));
+    roots.push(storageRoot);
+    const input = { requestId: "request-terminal-mirror-only-001", idempotencyKey: "terminal-mirror-only-taskpack-v1", request: { command: "create_task_pack" as const, payload: { itemIds: ["main-ep01-unit001"], mode: "autopilot" as const, kind: "image" as const } } };
+    await expect(executeIdempotentCommand(root, input, { storageRoot }))
+      .resolves.toMatchObject({ status: "succeeded" });
+    await removeTerminalReceipts(storageRoot, input.idempotencyKey);
+
+    await expect(executeIdempotentCommand(root, { ...input, requestId: "request-terminal-mirror-only-002" }, { storageRoot }))
+      .rejects.toThrow(/owner|事务根/u);
+    expect(await listTaskPacks(root)).toHaveLength(1);
+  });
+
+  it("独立事务根与镜像根各自合法但终态不同仍失败关闭", async () => {
+    const root = await fixture();
+    const storageRoot = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-command-cross-root-conflict-"));
+    roots.push(storageRoot);
+    const input = { requestId: "request-cross-root-conflict-001", idempotencyKey: "cross-root-conflict-taskpack-v1", request: { command: "create_task_pack" as const, payload: { itemIds: ["main-ep01-unit001"], mode: "autopilot" as const, kind: "image" as const } } };
+    process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE = input.request.command;
+    try { await expect(executeIdempotentCommand(root, input, { storageRoot })).rejects.toThrow("结果未确认"); }
+    finally { delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE; }
+    const ownerReceipt = (await listEvents(storageRoot, 200)).find((event) => event.type === "command.side-effect-committed" && event.idempotencyKey === input.idempotencyKey)!;
+    await removeTerminalReceipts(root, input.idempotencyKey);
+    await appendEvent(root, {
+      actor: "codex",
+      type: "command.side-effect-committed",
+      requestId: input.requestId,
+      idempotencyKey: input.idempotencyKey,
+      command: input.request.command,
+      data: { ...ownerReceipt.data, outcomeStatus: "failed", error: "safe mirror conflict" },
+    });
+
+    await expect(reconcileCommand(root, { idempotencyKey: input.idempotencyKey }))
+      .rejects.toThrow(/互相冲突|跨根/u);
+    expect((await listCommandLedger(storageRoot))[0]?.status).toBe("unknown");
   });
 
   it("两个独立进程使用同一幂等键只执行一次", async () => {

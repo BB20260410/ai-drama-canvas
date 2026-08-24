@@ -1,13 +1,16 @@
-import { mkdir, mkdtemp, readFile, realpath, rename, rm, writeFile } from "node:fs/promises";
+import { lstat, mkdir, mkdtemp, readFile, realpath, rename, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createManagedProject } from "../src/core/managed-project.js";
 import {
+  __setAfterActiveManagedProjectStartupSecondPreflightHookForTests,
   activateProject,
   getActiveProjectReadOnly,
   getManagedProjectShell,
+  preflightActiveManagedProjectStartupReadOnly,
   reconcileActiveManagedProjectStartup,
+  reconcileActiveManagedProjectStartupWithLifecycle,
 } from "../src/core/service.js";
 import {
   ensureSidecar,
@@ -52,12 +55,119 @@ beforeEach(async () => {
 
 afterEach(async () => {
   __setAfterActiveProjectStateSnapshotHookForTests(null);
+  __setAfterActiveManagedProjectStartupSecondPreflightHookForTests(null);
   if (priorRegistryPath === undefined) delete process.env.AI_CANVAS_REGISTRY_PATH;
   else process.env.AI_CANVAS_REGISTRY_PATH = priorRegistryPath;
   await rm(temporaryRoot, { recursive: true, force: true });
 });
 
 describe("同根冷启动 startup reconcile", () => {
+  it("健康活动工程 preflight 为物理只读；旧 active schema 或 legacy-v2 泄漏明确要求 repair", async () => {
+    const shell = await createRegisteredManagedProject("preflight 健康工程", "novel");
+    await setActiveProjectRegistration(shell.paths.root);
+    const registryPath = process.env.AI_CANVAS_REGISTRY_PATH!;
+    const activePath = path.join(path.dirname(registryPath), "active-project.json");
+    const before = await Promise.all([
+      readOrMissing(registryPath),
+      readOrMissing(activePath),
+      readOrMissing(getProjectRegistryV2Path()),
+      readOrMissing(getWorkspacePreferencesV2Path()),
+    ]);
+    const active = await activeExpectation();
+    const locksRoot = path.join(path.dirname(registryPath), "locks");
+    await rm(locksRoot, { recursive: true, force: true });
+
+    await expect(preflightActiveManagedProjectStartupReadOnly(active)).resolves.toMatchObject({
+      kind: "healthy",
+      shell: { project: { id: shell.project.id }, paths: { root: shell.paths.root } },
+    });
+    await expect(Promise.all([
+      readOrMissing(registryPath),
+      readOrMissing(activePath),
+      readOrMissing(getProjectRegistryV2Path()),
+      readOrMissing(getWorkspacePreferencesV2Path()),
+    ])).resolves.toEqual(before);
+    await expect(lstat(locksRoot)).rejects.toMatchObject({ code: "ENOENT" });
+
+    await writeJsonAtomic(activePath, {
+      schemaVersion: 2,
+      primaryRoot: shell.paths.root,
+      activationId: active.activationId,
+      activatedAt: "2026-08-14T00:00:00.000Z",
+      updatedAt: "2026-08-14T00:00:00.000Z",
+    });
+    await expect(preflightActiveManagedProjectStartupReadOnly(active)).resolves.toMatchObject({
+      kind: "repair-required",
+      reason: "active-project-writer-fence",
+    });
+
+    await writeJsonAtomic(registryPath, [{
+      id: shell.project.id,
+      name: shell.project.name,
+      primaryRoot: shell.paths.root,
+      updatedAt: shell.project.updatedAt,
+    }]);
+    await expect(preflightActiveManagedProjectStartupReadOnly(active)).resolves.toMatchObject({
+      kind: "repair-required",
+      reason: "legacy-v2-registry-leak",
+    });
+  });
+
+  it("preflight 在 CAS 变化时失败关闭，不能猜测健康", async () => {
+    const first = await createRegisteredManagedProject("preflight CAS A");
+    const second = await createRegisteredManagedProject("preflight CAS B");
+    await setActiveProjectRegistration(first.paths.root);
+    const active = await activeExpectation();
+    __setAfterActiveProjectStateSnapshotHookForTests(async () => {
+      await setActiveProjectRegistration(second.paths.root);
+    });
+    await expect(preflightActiveManagedProjectStartupReadOnly(active))
+      .rejects.toThrow("active project startup preflight snapshot changed while reading");
+  });
+
+  it("第二次 sidecar preflight 后活动工程切换也必须失败关闭", async () => {
+    const first = await createRegisteredManagedProject("preflight 尾窗 A");
+    const second = await createRegisteredManagedProject("preflight 尾窗 B");
+    await setActiveProjectRegistration(first.paths.root);
+    const active = await activeExpectation();
+    __setAfterActiveManagedProjectStartupSecondPreflightHookForTests(async () => {
+      await setActiveProjectRegistration(second.paths.root);
+    });
+    await expect(preflightActiveManagedProjectStartupReadOnly(active))
+      .rejects.toThrow("活动工程启动快照已变化");
+  });
+
+  it("稳定 schema-1 drama/legacy 受管工程也走零写快路；v2 落入 legacy 仍必须 repair", async () => {
+    const shell = await createRegisteredManagedProject("preflight drama legacy", "drama");
+    await setActiveProjectRegistration(shell.paths.root);
+    const active = await activeExpectation();
+    const registryPath = process.env.AI_CANVAS_REGISTRY_PATH!;
+    const activePath = path.join(path.dirname(registryPath), "active-project.json");
+    expect(JSON.parse(await readFile(activePath, "utf8"))).toMatchObject({ schemaVersion: 2 });
+    const locksRoot = path.join(path.dirname(registryPath), "locks");
+    const before = await Promise.all([
+      readOrMissing(registryPath),
+      readOrMissing(activePath),
+      readOrMissing(getProjectRegistryV2Path()),
+    ]);
+    await rm(locksRoot, { recursive: true, force: true });
+
+    await expect(preflightActiveManagedProjectStartupReadOnly(active)).resolves.toMatchObject({
+      kind: "healthy",
+      shell: {
+        workspaceMode: "drama",
+        manifest: { schemaVersion: 1 },
+        project: { id: shell.project.id },
+      },
+    });
+    await expect(Promise.all([
+      readOrMissing(registryPath),
+      readOrMissing(activePath),
+      readOrMissing(getProjectRegistryV2Path()),
+    ])).resolves.toEqual(before);
+    await expect(lstat(locksRoot)).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
   it("健康同根只做锁内验证，不改写活动指针、偏好或注册表", async () => {
     const shell = await createRegisteredManagedProject("同根健康工程", "hybrid");
     await setActiveProjectRegistration(shell.paths.root);
@@ -178,6 +288,35 @@ describe("同根冷启动 startup reconcile", () => {
       registration: { id: first.project.id, primaryRoot: first.paths.root },
       value: first.project.id,
     });
+    await switchToSecond;
+    await expect(getActiveProjectReadOnly()).resolves.toMatchObject({ primaryRoot: second.paths.root });
+  });
+
+  it("watcher 生命周期在同一 CAS 锁内挂载，B 激活不能插入 A 的确认与挂载之间", async () => {
+    const first = await createRegisteredManagedProject("watcher CAS A");
+    const second = await createRegisteredManagedProject("watcher CAS B");
+    await setActiveProjectRegistration(first.paths.root);
+    const expected = await activeExpectation();
+    let resolveMounted!: () => void;
+    const mounted = new Promise<void>((resolve) => { resolveMounted = resolve; });
+    let releaseMount!: () => void;
+    const mountRelease = new Promise<void>((resolve) => { releaseMount = resolve; });
+    let mountedRoot = "";
+    const reconcile = reconcileActiveManagedProjectStartupWithLifecycle(expected, async (shell) => {
+      mountedRoot = shell.paths.root;
+      resolveMounted();
+      await mountRelease;
+    });
+    await mounted;
+    let switchSettled = false;
+    const switchToSecond = setActiveProjectRegistration(second.paths.root).finally(() => {
+      switchSettled = true;
+    });
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(switchSettled).toBe(false);
+    expect(mountedRoot).toBe(first.paths.root);
+    releaseMount();
+    await expect(reconcile).resolves.toMatchObject({ project: { id: first.project.id } });
     await switchToSecond;
     await expect(getActiveProjectReadOnly()).resolves.toMatchObject({ primaryRoot: second.paths.root });
   });

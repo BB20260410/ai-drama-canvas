@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "kind": "multi-model-hardening-closeout",
+  "status": "pass",
+  "completion": "code-gates-and-one-frozen-review-round",
+  "honesty": "One frozen review round on d2e70bf9, not three iterative rounds. All three model reports set notVerified=true. Codex verified GLM P2s without source change. Four-partition tests ran on the way to this tree (some earlier on 13d85a9f); after the last source change only targeted vitest was found, not a second full four-partition rerun.",
+  "createdAt": "2026-08-14T09:10:00+08:00",
+  "candidate": {
+    "gitHead": "3c56e1d2f518cefe57de728ad32222c409a1dabf",
+    "workingTree": "dirty-uncommitted-shared-tree",
+    "sourceDigest": "d2e70bf955440b1cc2435da1bc6c486f01af49e7cc6098def29249c0f01dff1f",
+    "buildId": "801b9352c8b82547b1380a0c13f12fda",
+    "buildIdentityFingerprint": "f2d293895ed36df935352065b546bac335b046e053d8f079250e2051d20908e0",
+    "manifestFingerprint": "ab14e0bd217d655561eb16f85c0b99fc05156163c1b2d7f4b3c9363e7a4dbe18",
+    "mcpToolCount": 220,
+    "sourceFiles": 1061,
+    "sourceBytes": 21271914,
+    "runtimeGateAllowed": true,
+    "committed": false,
+    "gitClean": false
+  },
+  "landedContracts": [
+    {
+      "id": "A2-CHECKPOINT-HEAD-REVISION",
+      "summary": "Checkpoint write schema 2 persists historical head_revision on operation receipts. Schema 1 remains read-compatible for control/diagnostics. Durable recovery and writes fail-closed on v1. Live-Head guessing is forbidden. A SIGKILL plus later Head-advance red test exists."
+    },
+    {
+      "id": "BUNDLE-STRICT-READONLY-25",
+      "summary": "commit_agent_imagegen_result_bundle is strict-readonly. Public-replay registry is 25/25."
+    },
+    {
+      "id": "RECONCILE-OPERATION-LOCATORS",
+      "summary": "Reconcile hydration is generalized for studio operation locators, including the fixed fast path and Dudu stage."
+    },
+    {
+      "id": "WRITE-GATE-BOOT-DIGEST-REUSE",
+      "summary": "Watchers start during boot hash. reuseBootSourceDigest is latched only if watchers covered the hash window and no invalidate occurred. Mutations still full-inspect."
+    },
+    {
+      "id": "UNITS-FIRST-CARD-HOLD",
+      "summary": "Units dashboard stays readonly preflight. App units prefetch overlaps reconcile. The coalescer holds a successful units result for 1500ms one-shot for the first card."
+    },
+    {
+      "id": "MCP-PUBLIC-REPLAY-ABI",
+      "summary": "execute_command description states public replay returns the persisted business result and does not re-authorize head/current/eligibleForPass. ABI fixture was rebaselined; tool count remains 220."
+    }
+  ],
+  "reviewRounds": [
+    {
+      "round": 1,
+      "purpose": "frozen candidate final review of already-landed dirty tree",
+      "candidateSourceDigest": "d2e70bf955440b1cc2435da1bc6c486f01af49e7cc6098def29249c0f01dff1f",
+      "packRelativePath": "docs/evidence/multi-model-review-pack-20260814-d2e70bf9.json",
+      "results": [
+        {
+          "reviewer": "kimi",
+          "requestedModel": "kimi-code/k3",
+          "actualModel": "unknown",
+          "identityNote": "probe body returned unknown; CLI invoked with -m kimi-code/k3; not treated as a silent model switch",
+          "verdict": "PASS",
+          "findings": [],
+          "notVerified": true,
+          "evidenceStem": "docs/evidence/multi-model-kimi-review-20260814-d2e70bf9.json"
+        },
+        {
+          "reviewer": "glm",
+          "requestedModel": "glm-5.2",
+          "actualModel": "glm-5-2-260617",
+          "identityNote": "adapter/API model field is glm-5-2-260617; probe body self-reported GLM-4 and was not used to switch models",
+          "verdict": "PASS",
+          "findings": [
+            {
+              "id": "F01",
+              "severity": "P2"
+            },
+            {
+              "id": "F02",
+              "severity": "P2"
+            },
+            {
+              "id": "F03",
+              "severity": "P2"
+            }
+          ],
+          "notVerified": true,
+          "evidenceStem": "docs/evidence/multi-model-glm-review-20260814-d2e70bf9.json"
+        },
+        {
+          "reviewer": "doubao",
+          "requestedModel": "doubao-seed-evolving",
+          "actualModel": "doubao-seed-evolving",
+          "verdict": "PASS",
+          "findings": [],
+          "notVerified": true,
+          "evidenceStem": "docs/evidence/multi-model-doubao-review-20260814-d2e70bf9.json"
+        }
+      ],
+      "codexDecision": {
+        "sourceChanged": false,
+        "committed": false,
+        "overall": "all-already-fail-closed-or-intended-contract",
+        "findings": [
+          {
+            "id": "F01",
+            "severity": "P2",
+            "verdict": "already-fail-closed"
+          },
+          {
+            "id": "F02",
+            "severity": "P2",
+            "verdict": "already-fail-closed"
+          },
+          {
+            "id": "F03",
+            "severity": "P2",
+            "verdict": "intended-contract"
+          }
+        ],
+        "evidenceStem": "docs/evidence/multi-model-glm-p2-codex-verify-20260814-d2e70bf9.json"
+      }
+    }
+  ],
+  "mechanicalVerification": {
+    "honesty": "typecheck, typecheck:app, partition audit 394=262/91/36/5, four partitions, audit:production 0, and build ran on the way to this tree. Some of that earlier work was bound to 13d85a9f. Rebuild happened for write-gate/units. After the last source change, only targeted vitest was found (runtime-write-gate, dashboard-ui, checkpoint, bundle, registry). This closeout does not claim a second full four-partition rerun on d2e70bf9.",
+    "typecheck": "PASS-on-the-way",
+    "typecheckApp": "PASS-on-the-way",
+    "partitionAudit": {
+      "files": 394,
+      "fast": 262,
+      "medium": 91,
+      "integration": 36,
+      "heavy": 5,
+      "fingerprint": "89ee7f22a49bda1b338d58642b94ce11e182d2176d70403ababf97f15985d657",
+      "boundToFinalDigest": false,
+      "note": "audit fingerprint recorded in the frozen review pack; not re-claimed as a post-final-source four-partition rerun"
+    },
+    "testPartitions": {
+      "status": "ran-on-the-way-some-on-13d85a9f",
+      "postFinalSourceRerun": "not-found",
+      "targetedVitestAfterLastSourceChange": [
+        "runtime-write-gate",
+        "dashboard-ui",
+        "checkpoint",
+        "bundle",
+        "registry"
+      ]
+    },
+    "productionAudit": "0 vulnerabilities on the way",
+    "build": {
+      "status": "PASS",
+      "sourceDigest": "d2e70bf955440b1cc2435da1bc6c486f01af49e7cc6098def29249c0f01dff1f",
+      "buildId": "801b9352c8b82547b1380a0c13f12fda",
+      "mcpToolCount": 220
+    }
+  },
+  "runtimeEvidence": {
+    "p5MultimediaFormal": {
+      "path": "docs/evidence/p5-multimedia-formal-20260814-d2e70bf9.json",
+      "status": "PASS",
+      "createdAtCst": "2026-08-14 08:44 CST",
+      "boundSourceDigest": "d2e70bf955440b1cc2435da1bc6c486f01af49e7cc6098def29249c0f01dff1f"
+    },
+    "p17Navigation": {
+      "path": "docs/evidence/p17-navigation-support-ui-smoke-20260814-d2e70bf9.json",
+      "status": "PASS",
+      "createdAtCst": "2026-08-14 08:46 CST",
+      "visitedFlows": 22,
+      "boundSourceDigest": "d2e70bf955440b1cc2435da1bc6c486f01af49e7cc6098def29249c0f01dff1f"
+    },
+    "t23Strict": {
+      "path": "docs/evidence/t23-strict-build-20260814-d2e70bf9.json",
+      "status": "PASS",
+      "createdAtCst": "2026-08-14 08:39 CST",
+      "rendererFirstCardMs": 1454,
+      "rendererFirstCardBudgetMs": 1500,
+      "rendererFirstRawMs": 3571,
+      "rendererFirstRawBudgetMs": 5000,
+      "rendererAllReferencesMs": 4678,
+      "rendererAllReferencesBudgetMs": 8000,
+      "peakOutstandingIpc": 4,
+      "interactionStatus": "PASS",
+      "boundSourceDigest": "d2e70bf955440b1cc2435da1bc6c486f01af49e7cc6098def29249c0f01dff1f"
+    }
+  },
+  "safety": {
+    "formalProjectWrites": 0,
+    "externalGenerationCalls": 0,
+    "uploads": 0,
+    "payments": 0,
+    "pushes": 0,
+    "commits": 0,
+    "appInstallations": 0,
+    "notarizations": 0,
+    "publications": 0,
+    "deletedUntrackedArchives": 0,
+    "analysisSrcTgzRetained": true,
+    "stale696b0970EvidenceRetained": true
+  },
+  "installedApp": {
+    "sourceDigest": "954ac71a461be527530a96709983741c5f0d1f9ae05a97f57605af5ded39d585",
+    "note": "historical installed baseline; this cycle did not install d2e70bf9",
+    "updatedByThisCycle": false
+  },
+  "remaining": {
+    "ownerAdjudication": "untracked .analysis-src.tgz owner is not adjudicated; do not git clean or delete it",
+    "git": "HEAD 3c56e1d dirty shared tree; no stage/commit/push; do not claim Git clean",
+    "install": "installed app remains historical 954ac71a; workspace-build evidence is not an install acceptance"
+  },
+  "evidenceStems": [
+    "docs/evidence/p5-multimedia-formal-20260814-d2e70bf9.json",
+    "docs/evidence/p17-navigation-support-ui-smoke-20260814-d2e70bf9.json",
+    "docs/evidence/t23-strict-build-20260814-d2e70bf9.json",
+    "docs/evidence/multi-model-review-pack-20260814-d2e70bf9.json",
+    "docs/evidence/multi-model-kimi-review-20260814-d2e70bf9.json",
+    "docs/evidence/multi-model-glm-review-20260814-d2e70bf9.json",
+    "docs/evidence/multi-model-doubao-review-20260814-d2e70bf9.json",
+    "docs/evidence/multi-model-glm-p2-codex-verify-20260814-d2e70bf9.json"
+  ],
+  "completionGate": {
+    "codeOnD2e70bf9": true,
+    "p5P17T23BoundToD2e70bf9": true,
+    "frozenReviewRoundCount": 1,
+    "reviewersBoundToSameDigest": 3,
+    "reviewPassVerdicts": 3,
+    "allModelReportsNotVerified": true,
+    "codexP2Verify": "already-fail-closed-or-intended-contract",
+    "sourceChangedAfterReviews": false,
+    "fourPartitionRerunAfterLastSourceChange": false,
+    "gitClean": false,
+    "installedUpdated": false
+  }
+}

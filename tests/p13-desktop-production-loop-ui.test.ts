@@ -92,6 +92,31 @@ describe("P13 零说明桌面生产闭环 UI", () => {
     expect(app).not.toContain('listStudioProductionUnits(root, { limit: 1 })');
   });
 
+  it("导入已有工程/选择受管父根 fail-closed：pickingProjectRoot 挡住连点双开系统目录框", () => {
+    const app = source("src/renderer/src/App.vue");
+    expect(app).toContain('data-testid="first-run-import"');
+    expect(app).toContain("正在处理，不能再选择工程目录");
+    expect(app).toContain(':disabled="projectOperationBusy || pickingProjectRoot"');
+    const choose = app.slice(
+      app.indexOf("async function chooseManagedParentRoot()"),
+      app.indexOf("async function importProject()"),
+    );
+    const imported = app.slice(
+      app.indexOf("async function importProject()"),
+      app.indexOf("async function switchManagedWorkspace("),
+    );
+    for (const handler of [choose, imported]) {
+      expect(handler).toContain("if (projectOperationBusy.value || pickingProjectRoot.value) return;");
+      expect(handler).toContain("pickingProjectRoot.value = true;");
+      expect(handler.indexOf("if (projectOperationBusy.value || pickingProjectRoot.value) return;")).toBeLessThan(
+        handler.indexOf("pickingProjectRoot.value = true;"),
+      );
+      expect(handler).toContain("pickingProjectRoot.value = false;");
+    }
+    expect(choose.indexOf("pickingProjectRoot.value = true;")).toBeLessThan(choose.indexOf("await window.canvasApi.pickManagedProjectsParent"));
+    expect(imported.indexOf("pickingProjectRoot.value = true;")).toBeLessThan(imported.indexOf("await window.canvasApi.pickProject"));
+  });
+
   it("项目中心忙碌期锁住关闭和破坏性入口，不可用登记仍可键盘确认移除", () => {
     const center = source("src/renderer/src/components/ProjectCenter.vue");
     const template = parse(center, { filename: "ProjectCenter.vue" }).descriptor.template?.content ?? "";
@@ -113,6 +138,27 @@ describe("P13 零说明桌面生产闭环 UI", () => {
     expect(template).toMatch(/<button[\s\S]{0,180}class="row-action"/u);
     expect(template).toContain(':disabled="busy || !project.available"');
     expect(template).toContain(':disabled="busy"');
+  });
+
+  it("项目中心导入/更改位置在 picking 时 fail-closed：busy 含 pickingProjectRoot", () => {
+    const app = source("src/renderer/src/App.vue");
+    const center = source("src/renderer/src/components/ProjectCenter.vue");
+    expect(app).toContain(':picking="pickingProjectRoot"');
+    expect(center).toContain("picking?: boolean");
+    expect(center).toContain("props.creating || props.switching || props.removingRoot || props.picking");
+    expect(center).toContain("正在选择工程目录");
+    expect(center).toContain('@click="requestImport"');
+    expect(center).toContain('@click="requestChooseParent"');
+    const choose = center.slice(
+      center.indexOf("function requestChooseParent()"),
+      center.indexOf("function requestImport()"),
+    );
+    const imported = center.slice(
+      center.indexOf("function requestImport()"),
+      center.indexOf("function duduStatusLabel("),
+    );
+    expect(choose).toContain("if (!busy.value) emit(\"chooseParent\")");
+    expect(imported).toContain("if (!busy.value) emit(\"import\")");
   });
 
   it("固定剧本到审片五步流程，并由 Core nextAction 驱动唯一继续按钮", () => {

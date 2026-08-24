@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "kind": "multi-model-glm-p2-codex-verify",
+  "verifier": "codex",
+  "createdAt": "2026-08-14T09:04:08+08:00",
+  "boundSourceDigest": "d2e70bf955440b1cc2435da1bc6c486f01af49e7cc6098def29249c0f01dff1f",
+  "liveDigest": "d2e70bf955440b1cc2435da1bc6c486f01af49e7cc6098def29249c0f01dff1f",
+  "liveDigestMatched": true,
+  "sourceReviewRelativePath": "docs/evidence/multi-model-glm-review-20260814-d2e70bf9.json",
+  "sourceChanged": false,
+  "committed": false,
+  "overall": "all-already-fail-closed-or-intended-contract",
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "P2",
+      "verdict": "already-fail-closed",
+      "evidence": "createRuntimeGateController.bootDigestReusable() is hashCompletedWhileWatchersRecording && !relevantEventSinceWatchers. noteBootHashCompleted() only latches reuse if noteWatchersRecording() already ran and invalidate() has not. invalidate() clears the latch and marks a relevant event; setWatcherHealthy(false) also clears recording/reuse and calls invalidate(). runInspection sets reuseBootSourceDigest only for checkRead/checkDiagnostic when that latch is set and no user inspect override; checkMutation/runMutationInspectionToStability always full-inspects and fail-closes on unstable epoch. startSourceRuntimeGateWatchers notes recording only after ready, wires add/change/unlink to invalidateIfRelevant, and treats watcher error as unhealthy. A silent chokidar miss is residual watcher risk, not a gate hole: writes still walk the tree.",
+      "lockedByTest": "watcher 覆盖 boot hash 且无事件时只读复用 boot digest，mutation 仍整树核验; hash 先于 watcher ready 或 setup 期间有事件时不复用 boot digest; watcher 未 ready 或失败时不保留 settled cache，每批均重新核验; main 在 boot hash 完成前启动 watcher，并把覆盖窗口交给 controller"
+    },
+    {
+      "id": "F02",
+      "severity": "P2",
+      "verdict": "already-fail-closed",
+      "evidence": "schema 1 receipts omit head_revision. operationReceipt() on schema 1 synthesizes head_revision=0 and never copies live Head. readStudioGenerationCheckpointOperationRecordReadOnly then fail-closes when historicalHeadRevision < 1 (缺少不可变历史 headRevision). assertWritableCheckpointSchema rejects schema 1 writes (只读可开 schema 1；写入需要正式 migration，禁止静默 ALTER / 从 live Head 回填). Durable recovery therefore cannot guess live Head from a v1 receipt.",
+      "lockedByTest": "schema 1 只读 control 可开；receipt 恢复 fail-closed，写入禁止静默 ALTER; refresh receipt 持久化历史 headRevision；terminal locator 缺失且 Head 被后续 refresh 推进后，durable recovery 不得用 live Head 猜"
+    },
+    {
+      "id": "F03",
+      "severity": "P2",
+      "verdict": "intended-contract",
+      "evidence": "STRICT_READ_ONLY_PUBLIC_REPLAY_HYDRATION_COMMANDS is 25/25 strict-readonly. hydrateSucceededPublicReplay/hydrateReceiptReconciledCommandResult rebuild the first public business shape from command-specific strict-readonly owners and do not re-run domain mutation or re-authorize head/current/eligibleForPass. execute_command description states same-key retry returns the persisted business result, and that head/current/eligibleForPass/approvedRawEligible/continuationEligible are not re-authorization; dynamic eligibility must be re-read from the matching control. Checkpoint recovery even forces eligibleForPass=false and current=false. Later-shrunk auth seeing the old immutable result is the documented idempotent replay contract, not a hole.",
+      "lockedByTest": "完整登记全部 25 个 locator 命令，并全部启用严格只读"
+    }
+  ]
+}

@@ -31,3 +31,13 @@ describe("受管 Studio style UI", () => {
     }
   });
 });
+
+describe("绑定工作台单元行视口剔除", () => {
+  it("unit-row 使用 content-visibility，离屏单元跳过同步布局", () => {
+    const binding = source("src/renderer/src/components/StudioBindingWorkbench.vue");
+    expect(binding).toContain('v-for="unit in units"');
+    expect(binding).toContain("content-visibility: auto;");
+    expect(binding).toContain("contain-intrinsic-size: auto 56px;");
+    expect(binding).not.toMatch(/\.unit-row \{[^}]*content-visibility:\s*hidden/);
+  });
+});

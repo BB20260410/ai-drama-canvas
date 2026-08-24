@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "kind": "multi-model-frozen-readonly-review-pack",
+  "purpose": "final-frozen-review-of-already-landed-shared-dirty-tree",
+  "createdAt": "2026-08-14T23:30:00+08:00",
+  "language": "zh-CN",
+  "safety": {
+    "relativePathsOnly": true,
+    "absolutePaths": 0,
+    "formalProjectBodies": 0,
+    "casBlobs": 0,
+    "credentials": 0,
+    "sqlDumps": 0,
+    "sourceDigestImpact": "docs/evidence is outside SOURCE_DIGEST_GLOBS"
+  },
+  "identity": {
+    "gitHead": "3c56e1d2f518cefe57de728ad32222c409a1dabf",
+    "workingTree": "dirty-uncommitted-shared-tree",
+    "sourceDigest": "bba45c715c035b7c24e09796ec01e9208a7a5ffb77541f001f4b8f8f032c50ef",
+    "buildId": "90941534f2a5d3eb617fadd5386f2c0b",
+    "buildIdentityFingerprint": "bd01c74504a090980ed1f94995776694a7372fec79c903288b6354abbdcf15af",
+    "manifestFingerprint": "eccf1594dc41bcc6a0ad4b339fd755b2aede2aa5e8806a4f3326c9075dfc596e",
+    "packageVersion": "0.2.0",
+    "protocolVersion": "1.1",
+    "mcpToolCount": 220,
+    "sourceFiles": 1062,
+    "sourceBytes": 21414566,
+    "builtAt": "2026-08-14T15:20:08.679Z",
+    "distribution": "local-only",
+    "liveDigestRecheck": {
+      "command": "npx tsx scripts/compute-source-digest.ts .",
+      "matchedManifest": true
+    }
+  },
+  "reviewInstruction": {
+    "mode": "final-frozen-readonly-review",
+    "doNotImplement": true,
+    "doNotWriteWorktree": true,
+    "doNotTalkToOtherModels": true,
+    "outputSchema": {
+      "verdict": "PASS|FAIL|NOT_VERIFIED|BLOCKED",
+      "findings": [
+        {
+          "id": "string",
+          "severity": "P0|P1|P2",
+          "summary": "string",
+          "evidencePaths": ["pack-relative-path"]
+        }
+      ],
+      "notVerified": "boolean"
+    },
+    "findingRules": [
+      "只报告有本包相对路径证据支撑的 P0-P2。",
+      "没有复现依据时设 notVerified=true；不得编造 FAIL。",
+      "这是已落地共享脏树的终审，不是实现轮。",
+      "禁止修改代码、写工作树、跑付费生成、上传或写正式工程。",
+      "返回模型身份不能由服务端字段或可信回执证明时必须标 IDENTITY_NOT_VERIFIED。"
+    ]
+  },
+  "changedSurface": {
+    "trackedModifiedCountAtFreeze": 79,
+    "untrackedCountAtFreeze": 43,
+    "inScopeSummary": [
+      "checkpoint schema 3：历史 headRevision 显式锚定；无 terminal 的死进程恢复不能从 live Head 猜历史。",
+      "commit_agent_imagegen_result_bundle：strict-readonly registry 已达 25/25，direct reconcile/same-key/wait/dead 恢复完整持久化结果而不泄露敏感字段。",
+      "P5：正式源工程只作 sentinel，Electron 使用隔离副本。",
+      "T23：启动预检、SQLite sidecar 409 竞态、首卡取证和 watcher 生命周期有定向回归。"
+    ],
+    "excluded": [
+      "STATUS.md、TASKS.md 与当前交接是交付状态文件，不是本包的产品源码证据。",
+      ".analysis-src.tgz、旧摘要的 evidence 和旧模型报告保留为历史，不能作为当前身份证据。",
+      "正式工程内容、CAS、SQLite 内容、令牌、绝对路径和完整日志均未放入本包。"
+    ]
+  },
+  "mechanicalAndRuntimeGates": {
+    "prebuild": {
+      "typecheck": "PASS",
+      "typecheckApp": "PASS",
+      "partitionAudit": {
+        "status": "PASS",
+        "files": 395,
+        "fast": 263,
+        "medium": 91,
+        "integration": 36,
+        "heavy": 5,
+        "fingerprint": "fa59c19b0291953e928ac4dba72172ff5cf94c08497faa2d07dd22d06ad5a4ce"
+      },
+      "fast": { "status": "PASS", "files": 263, "tests": 1524 },
+      "medium": { "status": "PASS", "files": 91, "tests": 788, "batches": 10 },
+      "integration": { "status": "PASS", "files": 36, "tests": 127, "batches": 5 },
+      "heavy": { "status": "PASS", "files": 5, "tests": 18, "batches": 5 },
+      "productionAudit": { "status": "PASS", "vulnerabilities": 0 }
+    },
+    "build": {
+      "status": "PASS",
+      "sourceDigest": "bba45c715c035b7c24e09796ec01e9208a7a5ffb77541f001f4b8f8f032c50ef",
+      "buildId": "90941534f2a5d3eb617fadd5386f2c0b",
+      "mcpToolCount": 220
+    },
+    "mcpSmoke": { "status": "PASS", "toolCount": 220, "resourceTemplateCount": 9, "promptCount": 8 },
+    "p5MultimediaFormal": {
+      "status": "PASS",
+      "evidence": "output/playwright/p5-multimedia-formal-20260814T152200Z-bba45c71.json",
+      "isolatedProjectCopy": true,
+      "readonlyProjectSentinelsUnchanged": true,
+      "videoPlaybackAdvanced": true,
+      "audioPlaybackAdvanced": true,
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalResources": 0
+    },
+    "p17Navigation": {
+      "status": "PASS",
+      "evidence": "docs/evidence/p17-navigation-support-ui-smoke-20260814T152300Z-bba45c71.json",
+      "visitedFlows": 22,
+      "pageErrors": 0,
+      "consoleErrors": 0
+    },
+    "t23Strict": {
+      "status": "PASS",
+      "evidence": "docs/evidence/t23-strict-build-20260814T152400Z-bba45c71.json",
+      "fixtureUnits": 36,
+      "rendererFirstCardMs": 422,
+      "rendererFirstRawMs": 3534,
+      "rendererAllPassReferencesMs": 4493,
+      "peakOutstandingProjectionIpc": 4,
+      "interactions": "PASS"
+    },
+    "isolatedElectron": {
+      "status": "PASS",
+      "electronVersion": "43.1.0",
+      "architecture": "arm64",
+      "appLaunched": false
+    },
+    "isolatedPackage": {
+      "status": "PASS",
+      "terminalEvidence": "docs/evidence/isolated-package-smoke-20260814T152655899Z-52685-ba286ef3.json",
+      "completion": "docs/evidence/isolated-package-smoke-20260814T152655899Z-52685-ba286ef3-completion.json",
+      "packagedMcpToolCount": 220,
+      "formalProjectUsed": false,
+      "externalWebsiteUsed": false,
+      "uploadUsed": false,
+      "paidActionUsed": false,
+      "installed": false,
+      "published": false
+    }
+  },
+  "reviewFocus": {
+    "kimi": ["跨层回放/恢复与 UI 证据身份是否存在可定位 P0-P2 漏洞"],
+    "glm": ["Core/Main/IPC/SQLite、事务、锁序、unknown/failed 恢复合同是否被证据覆盖"],
+    "doubao": ["22 条桌面路径中的按钮、加载、空态、错态、键盘、焦点、可访问性和中文文案是否有可定位 P0-P2"],
+    "outOfScope": ["付费生成、网页供应商、正式工程写入、安装、发布、公证、Git 操作"]
+  }
+}

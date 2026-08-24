@@ -1,0 +1,38 @@
+name: 缺陷报告
+description: 报告可复现的软件缺陷
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: 请不要在 Issue 里粘贴 API 密钥、令牌或本机工程路径里的私人媒体。
+  - type: textarea
+    id: what
+    attributes:
+      label: 发生了什么
+      description: 实际行为。
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: 环境
+      placeholder: macOS 版本 / Node 22.x / npm test 或 npm run dev
+    validations:
+      required: true

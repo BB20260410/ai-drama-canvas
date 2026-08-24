@@ -4,6 +4,7 @@ import type {
   StudioCanvasNodePosition,
   StudioCanvasViewport,
   StudioCanvasWorkflowGroup,
+  StudioCanvasSpatialGroup,
   StudioCanvasWorkspaceMode,
 } from "../../core/studio-canvas-layout-types.js";
 
@@ -14,6 +15,7 @@ export interface StudioCanvasLayoutSemanticSnapshot {
   pinnedNodeIds: string[];
   draftCanvasEdges: StudioCanvasDraftEdge[];
   workflowGroups: StudioCanvasWorkflowGroup[];
+  spatialGroups?: StudioCanvasSpatialGroup[];
 }
 
 export interface StudioCanvasLayoutCasApi {
@@ -152,6 +154,7 @@ export function emptyStudioCanvasLayoutSemanticSnapshot(): StudioCanvasLayoutSem
     pinnedNodeIds: [],
     draftCanvasEdges: [],
     workflowGroups: [],
+    spatialGroups: [],
   };
 }
 
@@ -169,6 +172,10 @@ export function snapshotStudioCanvasLayout(
       ...group,
       panelIds: [...group.panelIds],
       pipeline: [...group.pipeline],
+    })),
+    spatialGroups: (layout.spatialGroups ?? []).map((group) => ({
+      ...group,
+      memberIds: [...group.memberIds],
     })),
   };
 }
@@ -216,6 +223,14 @@ export function mergeStudioCanvasLayoutThreeWay(
     "workflowGroups",
     conflicts,
   );
+  const spatialGroups = mergeKeyedArray(
+    base.spatialGroups ?? [],
+    local.spatialGroups ?? [],
+    remote.spatialGroups ?? [],
+    (group) => group.id,
+    "spatialGroups",
+    conflicts,
+  );
   if (conflicts.length) throw new StudioCanvasLayoutMergeConflictError(conflicts);
   return {
     viewport: viewport as StudioCanvasViewport,
@@ -224,6 +239,7 @@ export function mergeStudioCanvasLayoutThreeWay(
     pinnedNodeIds,
     draftCanvasEdges,
     workflowGroups,
+    spatialGroups,
   };
 }
 

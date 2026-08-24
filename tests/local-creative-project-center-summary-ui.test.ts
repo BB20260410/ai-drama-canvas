@@ -60,3 +60,13 @@ describe("项目中心本机创作内容导入摘要", () => {
     expect(main).toContain("signal: controller.signal");
   });
 });
+
+describe("项目中心工程行视口剔除", () => {
+  it("project-row 使用 content-visibility，离屏工程跳过同步布局", () => {
+    const vue = readFileSync(path.join(root, "src/renderer/src/components/ProjectCenter.vue"), "utf8");
+    expect(vue).toContain('v-for="project in visibleProjects"');
+    expect(vue).toContain(".project-list { max-height: 280px; overflow-y: auto; padding: 10px 24px; }");
+    expect(vue).toContain(".project-row { width: 100%; display: flex; align-items: stretch; border-bottom: 1px solid var(--ui-line); background: transparent; content-visibility: auto; contain-intrinsic-size: auto 48px; }");
+    expect(vue).not.toMatch(/\.project-row \{[^}]*content-visibility:\s*hidden/);
+  });
+});

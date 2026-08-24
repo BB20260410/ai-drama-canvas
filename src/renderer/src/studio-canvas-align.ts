@@ -153,3 +153,19 @@ export function computeCanvasSnap(
     ],
   };
 }
+
+export const CANVAS_GRID_SIZE = 24;
+
+export function roundToCanvasGrid(
+  x: number,
+  y: number,
+  size = CANVAS_GRID_SIZE,
+): { x: number; y: number } {
+  if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(size) || size <= 0) {
+    return { x, y };
+  }
+  return {
+    x: Math.round(x / size) * size,
+    y: Math.round(y / size) * size,
+  };
+}

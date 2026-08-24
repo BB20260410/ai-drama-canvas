@@ -166,6 +166,7 @@ watch(() => props.projectRoot, () => {
 }, { immediate: true });
 
 async function importScript(): Promise<void> {
+  if (actionLoading.value) return;
   actionLoading.value = "import";
   error.value = "";
   notice.value = "";
@@ -197,6 +198,34 @@ async function focusOutline(start: number, end: number): Promise<void> {
   scriptBodyElement.value?.setSelectionRange(start, end);
 }
 
+function focusUnitHighlight(unit: { unitId: string; sourceSpans: Array<{ startOffsetUtf16: number; endOffsetUtf16: number }> }): void {
+  const spans = unit.sourceSpans;
+  if (spans.length) {
+    const start = Math.min(...spans.map((span) => span.startOffsetUtf16));
+    const end = Math.max(...spans.map((span) => span.endOffsetUtf16));
+    void focusOutline(start, end);
+  } else {
+    notice.value = "该单元尚未锚定本修订，不能猜选区。";
+  }
+  emit("openUnit", { unitId: unit.unitId, target: "canvas" });
+}
+
+function onReaderKeydown(event: KeyboardEvent): void {
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "e") {
+    event.preventDefault();
+    focusEarliestUnit();
+  }
+}
+
+function focusEarliestUnit(): void {
+  const unit = reader.value?.episode?.unitHighlights.find((entry) => entry.isEarliest);
+  if (!unit) {
+    notice.value = reader.value?.episode?.earliestStatusLine || "当前季/集暂无 earliest 单元。";
+    return;
+  }
+  focusUnitHighlight(unit);
+}
+
 const selectionExcerpt = computed(() => {
   if (!reader.value) return "";
   return reader.value.body.slice(selectionStart.value, selectionEnd.value);
@@ -226,6 +255,7 @@ function excerptForPanel(panel: WizardEditablePanel): string {
 }
 
 async function suggestWizard(): Promise<void> {
+  if (actionLoading.value) return;
   if (!reader.value) return;
   if (selectionEnd.value <= selectionStart.value) {
     report(new Error("请先在正文中选择一个非空片段。"));
@@ -295,7 +325,7 @@ const wizardValidationErrors = computed(() => {
 });
 
 async function materializeWizard(): Promise<void> {
-  if (!reader.value || !wizard.value || wizardValidationErrors.value.length) return;
+  if (!reader.value || !wizard.value || wizardValidationErrors.value.length || actionLoading.value) return;
   actionLoading.value = "materialize";
   error.value = "";
   notice.value = "";
@@ -374,7 +404,13 @@ function shortSha(value: string | null | undefined): string {
             <button type="button" data-testid="script-library-toggle-all" @click="showAllScripts = !showAllScripts">
               {{ showAllScripts ? "仅看在产" : `查看全部 ${library?.items.length ?? 0}` }}
             </button>
-            <button type="button" data-testid="script-library-import" :disabled="Boolean(actionLoading)" @click="importScript">
+            <button
+              type="button"
+              data-testid="script-library-import"
+              :disabled="Boolean(actionLoading)"
+              :title="actionLoading ? '正在处理，不能再导入剧本' : undefined"
+              @click="importScript"
+            >
               {{ actionLoading === "import" ? "导入中…" : "导入新剧本" }}
             </button>
           </div>
@@ -416,7 +452,7 @@ function shortSha(value: string | null | undefined): string {
       </section>
     </main>
 
-    <main v-else-if="activeTab === 'reader' && reader" class="reader-layout" data-testid="script-reader-pane">
+    <main v-else-if="activeTab === 'reader' && reader" class="reader-layout" data-testid="script-reader-pane" tabindex="0" @keydown="onReaderKeydown">
       <aside class="reader-nav">
         <h3>章节 / 场景</h3>
         <button
@@ -433,7 +469,7 @@ function shortSha(value: string | null | undefined): string {
           type="button"
           :class="{ earliest: unit.isEarliest }"
           :data-testid="`script-reader-unit-${unit.unitId}`"
-          @click="emit('openUnit', { unitId: unit.unitId, target: 'canvas' })"
+          @click="focusUnitHighlight(unit)"
         >
           {{ unit.sequence }} · {{ unit.title }}
           <small>{{ unit.formalCommitted ? "formal" : "未关账" }}</small>
@@ -443,7 +479,19 @@ function shortSha(value: string | null | undefined): string {
         <div class="selection-status">
           <span>r{{ reader.revisionOrdinal }} · {{ shortSha(reader.bodySha256) }}</span>
           <b>选区 {{ selectionStart }}–{{ selectionEnd }} · {{ readerDiagnostics.selectionChars }} 字符</b>
-          <button type="button" data-testid="script-reader-to-wizard" @click="suggestWizard">
+          <button
+            type="button"
+            data-testid="script-reader-focus-earliest"
+            :disabled="Boolean(actionLoading)"
+            @click="focusEarliestUnit"
+          >定位当前单元</button>
+          <button
+            type="button"
+            data-testid="script-reader-to-wizard"
+            :disabled="Boolean(actionLoading)"
+            :title="actionLoading ? '正在处理，不能再生成分镜建议' : undefined"
+            @click="suggestWizard"
+          >
             {{ actionLoading === "wizard" ? "拆格中…" : "按选区生成 15 秒分镜" }}
           </button>
         </div>
@@ -527,7 +575,13 @@ function shortSha(value: string | null | undefined): string {
         <blockquote>{{ selectionExcerpt || "请回阅读器选择原文。" }}</blockquote>
         <div class="wizard-controls">
           <label>宫格数 <input v-model.number="panelCount" type="number" min="2" max="6" data-testid="storyboard-wizard-panel-count" /></label>
-          <button type="button" data-testid="storyboard-wizard-suggest" :disabled="Boolean(actionLoading)" @click="suggestWizard">
+          <button
+            type="button"
+            data-testid="storyboard-wizard-suggest"
+            :disabled="Boolean(actionLoading)"
+            :title="actionLoading ? '正在处理，不能再生成分镜建议' : undefined"
+            @click="suggestWizard"
+          >
             {{ actionLoading === "wizard" ? "建议中…" : "重新生成建议" }}
           </button>
         </div>
@@ -569,6 +623,7 @@ function shortSha(value: string | null | undefined): string {
           class="primary"
           data-testid="storyboard-wizard-materialize"
           :disabled="!wizard || Boolean(wizardValidationErrors.length) || Boolean(actionLoading) || !wizardUnitTitle.trim()"
+          :title="actionLoading ? '正在处理，不能再物化分镜' : undefined"
           @click="materializeWizard"
         >{{ actionLoading === "materialize" ? "写入中…" : "经命令总线物化" }}</button>
         <div v-if="materialized" class="materialized-result" data-testid="storyboard-wizard-materialized">
@@ -593,9 +648,9 @@ button{border:1px solid var(--ui-line,#34362f);border-radius:4px;background:var(
 .product-tabs{display:flex;gap:3px;margin:0 0 12px;border-bottom:1px solid var(--ui-line,#34362f)}.product-tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:var(--ui-text-2,#8f9287)}.product-tabs button.active{border-bottom-color:var(--ui-accent,#d7af55);color:var(--ui-accent,#d7af55)}
 .banner{margin:0 0 10px;padding:8px 10px;border:1px solid;border-radius:4px}.banner.error{border-color:#8f4f45;background:#2a1815;color:#edb0a2}.banner.notice{border-color:#6e6036;background:#292412;color:#e7cf8a}.empty{padding:22px;color:var(--ui-text-2,#8f9287)}
 .library-layout{display:grid;grid-template-columns:minmax(320px,.9fr) minmax(360px,1.1fr);gap:14px}.document-list,.library-diagnostics,.reader-nav,.reader-body,.align-table-wrap,.media-preview,.wizard-source,.wizard-editor,.wizard-materialize{border:1px solid var(--ui-line,#34362f);background:var(--ui-surface,#171914);border-radius:5px;padding:12px;min-width:0}
-.pane-heading{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:9px}.pane-actions{display:flex;gap:5px}.pane-heading small,.document-card span,.document-card code{display:block;color:var(--ui-text-2,#8f9287);margin-top:4px;font-size:9px}.document-card{width:100%;display:block;margin-bottom:6px;text-align:left;padding:10px}.document-card.active{border-color:var(--ui-accent,#d7af55);background:color-mix(in srgb,var(--ui-accent,#d7af55) 8%,transparent)}
+.pane-heading{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:9px}.pane-actions{display:flex;gap:5px}.pane-heading small,.document-card span,.document-card code{display:block;color:var(--ui-text-2,#8f9287);margin-top:4px;font-size:9px}.document-card{width:100%;display:block;margin-bottom:6px;text-align:left;padding:10px;content-visibility:auto;contain-intrinsic-size:auto 56px}.document-card.active{border-color:var(--ui-accent,#d7af55);background:color-mix(in srgb,var(--ui-accent,#d7af55) 8%,transparent)}
 .library-diagnostics h3{font-size:18px;margin-top:4px}.library-diagnostics dl{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.library-diagnostics dl div,.media-preview dl div{padding:8px;background:var(--ui-surface-2,#1a1c17)}dt{color:var(--ui-text-2,#8f9287);font-size:9px}dd{margin:4px 0 0;word-break:break-all}.qc-card{margin:12px 0;padding:12px;border-left:2px solid var(--ui-accent,#d7af55);background:var(--ui-surface-2,#1a1c17)}.qc-card p{margin:6px 0;color:var(--ui-text-2,#a6a99e)}
-.reader-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:12px}.reader-nav{max-height:680px;overflow:auto}.reader-nav h3:not(:first-child){margin-top:16px}.reader-nav button{width:100%;display:flex;justify-content:space-between;text-align:left;border:0;border-radius:0;background:transparent;color:var(--ui-text-2,#a6a99e)}.reader-nav button.earliest{color:var(--ui-accent,#d7af55)}.reader-nav small{font-size:8px}.reader-body{padding:0;overflow:hidden}.selection-status{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:10px;border-bottom:1px solid var(--ui-line,#34362f)}.selection-status span{color:var(--ui-text-2,#8f9287)}.selection-status button{background:var(--ui-accent,#d7af55);color:var(--ui-accent-contrast,#1a160c)}.script-body{display:block;width:100%;height:620px;resize:none;border:0;border-radius:0;padding:18px;font:12px/1.75 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}
+.reader-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:12px}.reader-nav{max-height:680px;overflow:auto}.reader-nav h3:not(:first-child){margin-top:16px}.reader-nav button{width:100%;display:flex;justify-content:space-between;text-align:left;border:0;border-radius:0;background:transparent;color:var(--ui-text-2,#a6a99e);content-visibility:auto;contain-intrinsic-size:auto 28px}.reader-nav button.earliest{color:var(--ui-accent,#d7af55)}.reader-nav small{font-size:8px}.reader-body{padding:0;overflow:hidden}.selection-status{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:10px;border-bottom:1px solid var(--ui-line,#34362f)}.selection-status span{color:var(--ui-text-2,#8f9287)}.selection-status button{background:var(--ui-accent,#d7af55);color:var(--ui-accent-contrast,#1a160c)}.script-body{display:block;width:100%;height:620px;resize:none;border:0;border-radius:0;padding:18px;font:12px/1.75 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}
 .align-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px}.align-table-wrap{overflow:auto}.summary{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;color:var(--ui-text-2,#a6a99e)}.summary .ok b{color:#8fbf7a}.summary .warn b{color:#d7af55}.summary .danger b{color:#d08370}.summary .earliest{width:100%;font-size:9px}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border-bottom:1px solid var(--ui-line,#2a2c26);padding:7px 5px;text-align:left;vertical-align:top}th{color:var(--ui-text-2,#8f9287);font-weight:500}td b,td small{display:block}td small{color:var(--ui-text-2,#8f9287)}.mono{font:9px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}.status-missing-all{background:rgba(208,131,112,.06)}tr.earliest td:first-child b::after{content:" · earliest";color:var(--ui-accent,#d7af55);font-weight:400}tr.selected{outline:1px solid var(--ui-accent,#d7af55);outline-offset:-1px}td button{padding:3px 5px;margin:0 2px 2px 0}.media-preview img{display:block;width:100%;max-height:420px;object-fit:contain;background:#080908;border:1px solid var(--ui-line,#34362f)}.preview-placeholder{min-height:220px;display:grid;place-items:center;background:#0c0d0b;color:var(--ui-text-2,#8f9287)}.media-preview dl{display:grid;gap:5px}.media-preview code{font-size:8px;word-break:break-all}
 .wizard-layout{display:grid;grid-template-columns:250px minmax(420px,1fr) 280px;gap:12px;align-items:start}.wizard-source blockquote{max-height:360px;overflow:auto;margin:10px 0;padding:10px;border-left:2px solid var(--ui-accent,#d7af55);background:var(--ui-surface-2,#1a1c17);white-space:pre-wrap;line-height:1.6}.wizard-controls{flex-wrap:wrap}.wizard-controls input{width:70px}.panel-editor{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;border:1px solid var(--ui-line,#34362f);border-radius:4px;margin-bottom:8px}.panel-editor header,.panel-editor .wide{grid-column:1/-1}.panel-editor header{display:flex;justify-content:space-between}.panel-editor input,.panel-editor textarea,.wizard-materialize input{width:100%}.panel-editor small{color:var(--ui-text-2,#8f9287)}.wizard-materialize{display:grid;gap:8px;position:sticky;top:8px}.validation{padding:9px;border:1px solid #8f4f45;background:#2a1815;color:#edb0a2}.validation.ok{border-color:#55754a;background:#162415;color:#a9d39a}.validation p{margin:5px 0}.materialized-result{padding:9px;border:1px solid #55754a;background:#162415}.materialized-result p{margin:4px 0;color:#a9d39a}.materialized-result b{word-break:break-all}
 @media (max-width:1100px){.wizard-layout{grid-template-columns:1fr}.wizard-materialize{position:static}.align-layout{grid-template-columns:1fr}.library-layout{grid-template-columns:1fr}}

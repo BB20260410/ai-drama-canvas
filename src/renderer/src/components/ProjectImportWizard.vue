@@ -1,13 +1,13 @@
 <template>
-  <div class="import-overlay" @click.self="emit('cancel')">
+  <div class="import-overlay" @click.self="requestCancel">
     <section class="import-wizard">
       <header class="wizard-header">
         <div><span class="eyebrow">项目入库</span><h2>把真实制作目录接入画布</h2><p>预检只读取文件；最后确认后才建立或更新 .aicanvas。</p></div>
-        <button class="icon-button" type="button" aria-label="关闭导入向导" @click="emit('cancel')"><X :size="18" /></button>
+        <button class="icon-button" type="button" data-testid="project-import-close" aria-label="关闭导入向导" :disabled="working" :title="working ? '正在处理，不能再关闭导入向导' : undefined" @click="requestCancel"><X :size="18" /></button>
       </header>
 
       <nav class="step-rail" aria-label="导入步骤">
-        <button v-for="(label, index) in steps" :key="label" type="button" :class="{ active: stage === index, done: stage > index }" :disabled="index > maxStage" @click="stage = index">
+        <button v-for="(label, index) in steps" :key="label" type="button" :class="{ active: stage === index, done: stage > index }" :disabled="working || index > maxStage" :title="working ? '正在处理，不能再切换步骤' : undefined" @click="stage = index">
           <i>{{ stage > index ? '✓' : index + 1 }}</i><span>{{ label }}</span>
         </button>
       </nav>
@@ -18,14 +18,14 @@
             <div class="stage-heading"><span>01 / 04</span><h3>定义项目边界</h3><p>主根是事实来源和默认输出位置；附加来源只读取，不会自动写入。</p></div>
             <label class="field"><span>项目名称</span><input v-model="draft.name" placeholder="例如：黄金面具 · 古蜀卷" /></label>
             <div class="field"><span>起步方式</span><div class="mode-switch" role="radiogroup" aria-label="项目起步方式"><button type="button" role="radio" :aria-checked="projectMode === 'filesystem'" :class="{ active: projectMode === 'filesystem' }" @click="projectMode = 'filesystem'"><b>制作目录</b><small>目录中已经有 15 秒单元或镜头</small></button><button type="button" role="radio" :aria-checked="projectMode === 'story_first'" :class="{ active: projectMode === 'story_first' }" @click="projectMode = 'story_first'"><b>小说起步项目</b><small>允许空画布，先导入原文再建立分集</small></button></div></div>
-            <label class="field"><span>项目主根</span><div class="path-input"><input v-model="draft.primaryRoot" readonly /><button type="button" @click="replacePrimary"><FolderOpen :size="14" /> 更换</button></div></label>
+            <label class="field"><span>项目主根</span><div class="path-input"><input v-model="draft.primaryRoot" readonly /><button type="button" :disabled="working || pickingRoot" :title="(working || pickingRoot) ? '正在处理，不能再更换项目主根' : undefined" @click="replacePrimary"><FolderOpen :size="14" /> 更换</button></div></label>
             <div class="root-editor">
-              <div class="editor-heading"><div><b>附加来源根</b><small>剧本、参考图或其他生产目录</small></div><button type="button" @click="addRoot('source')"><Plus :size="14" /> 添加</button></div>
+              <div class="editor-heading"><div><b>附加来源根</b><small>剧本、参考图或其他生产目录</small></div><button type="button" :disabled="working || pickingRoot" :title="(working || pickingRoot) ? '正在处理，不能再添加扫描根' : undefined" @click="addRoot('source')"><Plus :size="14" /> 添加</button></div>
               <div v-if="!draft.sourceRoots.length" class="empty-line">当前只扫描项目主根</div>
               <div v-for="(root, index) in draft.sourceRoots" :key="`source-${index}`" class="path-row"><span>S{{ index + 1 }}</span><input v-model="draft.sourceRoots[index]" /><button type="button" :aria-label="`移除来源 ${index + 1}`" @click="draft.sourceRoots.splice(index, 1)"><X :size="14" /></button></div>
             </div>
             <div class="root-editor output-editor">
-              <div class="editor-heading"><div><b>额外输出根</b><small>Codex 允许写入的新版本位置</small></div><button type="button" @click="addRoot('output')"><Plus :size="14" /> 添加</button></div>
+              <div class="editor-heading"><div><b>额外输出根</b><small>Codex 允许写入的新版本位置</small></div><button type="button" :disabled="working || pickingRoot" :title="(working || pickingRoot) ? '正在处理，不能再添加扫描根' : undefined" @click="addRoot('output')"><Plus :size="14" /> 添加</button></div>
               <div v-for="(root, index) in extraOutputRoots" :key="`output-${index}`" class="path-row"><span>O{{ index + 1 }}</span><input :value="root" @input="updateOutput(index, ($event.target as HTMLInputElement).value)" /><button type="button" :aria-label="`移除输出 ${index + 1}`" @click="removeOutput(index)"><X :size="14" /></button></div>
             </div>
           </section>
@@ -62,7 +62,7 @@
 
       <footer class="wizard-footer">
         <div class="scan-state"><LoaderCircle v-if="working" class="spinning" :size="15" /><CircleCheck v-else-if="preview?.canImport" :size="15" /><CircleAlert v-else :size="15" /><span>{{ stateText }}</span></div>
-        <div><button type="button" class="secondary" :disabled="working" @click="stage ? stage-- : emit('cancel')">{{ stage ? '上一步' : '取消' }}</button><button type="button" class="primary" :disabled="working || (stage === 3 && !preview?.canImport)" @click="advance"><span>{{ primaryLabel }}</span><ArrowRight v-if="stage < 3" :size="15" /><Check v-else :size="15" /></button></div>
+        <div><button type="button" class="secondary" data-testid="project-import-back" :disabled="working" :title="working ? '正在处理，不能再返回' : undefined" @click="stage ? stage-- : requestCancel">{{ stage ? '上一步' : '取消' }}</button><button type="button" class="primary" data-testid="project-import-advance" :disabled="working || (stage === 3 && !preview?.canImport)" :title="working ? '正在处理，不能再导入项目' : undefined" @click="advance"><span>{{ working ? "处理中" : primaryLabel }}</span><ArrowRight v-if="stage < 3" :size="15" /><Check v-else :size="15" /></button></div>
       </footer>
     </section>
   </div>
@@ -79,6 +79,7 @@ const steps = ["目录", "识别", "规则", "确认"];
 const stage = ref(0);
 const maxStage = ref(0);
 const working = ref(true);
+const pickingRoot = ref(false);
 const errorText = ref("");
 const preview = ref<ProjectImportPreview | null>(null);
 const projectMode = ref<ProjectImportMode>("filesystem");
@@ -114,40 +115,67 @@ function applyPreview(value: ProjectImportPreview) {
   syncing = false;
 }
 
-async function prepare() {
-  working.value = true;
+function requestCancel() {
+  if (working.value) return;
+  emit("cancel");
+}
+
+async function runPrepare() {
   errorText.value = "";
+  const unitPatterns = unitPatternText.value.split("\n").map((item) => item.trim()).filter(Boolean);
+  const shotPatterns = shotPatternText.value.split("\n").map((item) => item.trim()).filter(Boolean);
+  const manualMappings = JSON.parse(manualMappingText.value || "[]") as ProjectConfig["namingRules"]["manualMappings"];
+  if (!Array.isArray(manualMappings)) throw new Error("手工路径映射必须是 JSON 数组。");
+  const namingRules = { patterns: [...unitPatterns.map((pattern, index) => ({ id: `custom-unit-${index + 1}`, type: "unit" as const, pattern })), ...shotPatterns.map((pattern, index) => ({ id: `custom-shot-${index + 1}`, type: "shot" as const, pattern }))], manualMappings };
+  const value = await window.canvasApi.prepareImport({ primaryRoot: draft.primaryRoot, projectMode: projectMode.value, name: draft.name || undefined, sourceRoots: [...draft.sourceRoots], outputRoots: [...draft.outputRoots], ignoreSegments: ignoreText.value ? ignoreText.value.split(/\n|,/).map((item) => item.trim()).filter(Boolean) : undefined, namingRules });
+  applyPreview(value);
+}
+
+async function prepare() {
+  if (working.value) return;
+  working.value = true;
   try {
-    const unitPatterns = unitPatternText.value.split("\n").map((item) => item.trim()).filter(Boolean);
-    const shotPatterns = shotPatternText.value.split("\n").map((item) => item.trim()).filter(Boolean);
-    const manualMappings = JSON.parse(manualMappingText.value || "[]") as ProjectConfig["namingRules"]["manualMappings"];
-    if (!Array.isArray(manualMappings)) throw new Error("手工路径映射必须是 JSON 数组。");
-    const namingRules = { patterns: [...unitPatterns.map((pattern, index) => ({ id: `custom-unit-${index + 1}`, type: "unit" as const, pattern })), ...shotPatterns.map((pattern, index) => ({ id: `custom-shot-${index + 1}`, type: "shot" as const, pattern }))], manualMappings };
-    const value = await window.canvasApi.prepareImport({ primaryRoot: draft.primaryRoot, projectMode: projectMode.value, name: draft.name || undefined, sourceRoots: [...draft.sourceRoots], outputRoots: [...draft.outputRoots], ignoreSegments: ignoreText.value ? ignoreText.value.split(/\n|,/).map((item) => item.trim()).filter(Boolean) : undefined, namingRules });
-    applyPreview(value);
+    await runPrepare();
   } catch (error) { errorText.value = message(error); }
   finally { working.value = false; }
 }
 
 async function advance() {
-  if (stage.value < 3) {
-    if (dirty.value || !preview.value) await prepare();
-    if (errorText.value) return;
-    stage.value += 1;
-    maxStage.value = Math.max(maxStage.value, stage.value);
-    return;
-  }
-  if (!preview.value || !preview.value.canImport) return;
-  if (dirty.value) { await prepare(); return; }
+  if (working.value) return;
   working.value = true;
-  errorText.value = "";
-  try { emit("imported", await window.canvasApi.commitImport({ previewId: preview.value.previewId, config: JSON.parse(JSON.stringify(preview.value.config)) as ProjectConfig, projectMode: preview.value.projectMode })); }
-  catch (error) { errorText.value = message(error); }
+  try {
+    if (stage.value < 3) {
+      if (dirty.value || !preview.value) await runPrepare();
+      if (errorText.value) return;
+      stage.value += 1;
+      maxStage.value = Math.max(maxStage.value, stage.value);
+      return;
+    }
+    if (!preview.value || !preview.value.canImport) return;
+    if (dirty.value) { await runPrepare(); return; }
+    emit("imported", await window.canvasApi.commitImport({ previewId: preview.value.previewId, config: JSON.parse(JSON.stringify(preview.value.config)) as ProjectConfig, projectMode: preview.value.projectMode }));
+  } catch (error) { errorText.value = message(error); }
   finally { working.value = false; }
 }
 
-async function replacePrimary() { const root = await window.canvasApi.pickProject("选择项目主根"); if (root) { draft.primaryRoot = root; draft.outputRoots = [root, ...extraOutputRoots.value]; } }
-async function addRoot(role: "source" | "output") { const root = await window.canvasApi.pickProject(role === "source" ? "选择附加来源根" : "选择允许输出根"); if (!root) return; if (role === "source" && !draft.sourceRoots.includes(root) && root !== draft.primaryRoot) draft.sourceRoots.push(root); if (role === "output" && !draft.outputRoots.includes(root)) draft.outputRoots.push(root); }
+async function replacePrimary() {
+  if (working.value || pickingRoot.value) return;
+  pickingRoot.value = true;
+  try {
+    const root = await window.canvasApi.pickProject("选择项目主根");
+    if (root) { draft.primaryRoot = root; draft.outputRoots = [root, ...extraOutputRoots.value]; }
+  } finally { pickingRoot.value = false; }
+}
+async function addRoot(role: "source" | "output") {
+  if (working.value || pickingRoot.value) return;
+  pickingRoot.value = true;
+  try {
+    const root = await window.canvasApi.pickProject(role === "source" ? "选择附加来源根" : "选择允许输出根");
+    if (!root) return;
+    if (role === "source" && !draft.sourceRoots.includes(root) && root !== draft.primaryRoot) draft.sourceRoots.push(root);
+    if (role === "output" && !draft.outputRoots.includes(root)) draft.outputRoots.push(root);
+  } finally { pickingRoot.value = false; }
+}
 function updateOutput(index: number, value: string) { const current = [...extraOutputRoots.value]; current[index] = value; draft.outputRoots = [draft.primaryRoot, ...current]; }
 function removeOutput(index: number) { const current = [...extraOutputRoots.value]; current.splice(index, 1); draft.outputRoots = [draft.primaryRoot, ...current]; }
 function roleLabel(role: "primary" | "source" | "output") { return ({ primary: "主", source: "源", output: "出" })[role]; }

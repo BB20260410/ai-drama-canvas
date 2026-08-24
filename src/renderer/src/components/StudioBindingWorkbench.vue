@@ -302,7 +302,7 @@
               <dt>说明</dt><dd>{{ selectedPanel.emptyConfirmation.note }}</dd>
               <dt>时间</dt><dd>{{ selectedPanel.emptyConfirmation.confirmedAt }}</dd>
             </dl>
-            <details v-if="selectedPanel.emptyConfirmation" class="binding-diagnostics"><summary>诊断详情</summary><code>{{ selectedPanel.emptyConfirmation.id }}</code></details>
+            <details v-if="selectedPanel.emptyConfirmation" class="binding-diagnostics"><summary data-testid="studio-binding-diagnostics">诊断详情</summary><code>{{ selectedPanel.emptyConfirmation.id }}</code></details>
             <p v-else class="empty-review-copy">零提案不等于已确认空。请阅读上方冻结剧本片段，并留下真实审阅说明。</p>
             <label class="empty-note-field">
               <span>审阅说明</span>
@@ -331,7 +331,7 @@
               <dt>状态</dt><dd>{{ selectedPanel.bindingSet.currentness === "current" ? "当前有效" : "需要更新" }}</dd>
               <dt>冻结时间</dt><dd>{{ selectedPanel.bindingSet.frozenAt }}</dd>
             </dl>
-            <details v-if="selectedPanel.bindingSet" class="binding-diagnostics"><summary>诊断详情</summary><code>{{ selectedPanel.bindingSet.id }}</code><code>{{ selectedPanel.bindingSet.fingerprint }}</code></details>
+            <details v-if="selectedPanel.bindingSet" class="binding-diagnostics"><summary data-testid="studio-binding-diagnostics">诊断详情</summary><code>{{ selectedPanel.bindingSet.id }}</code><code>{{ selectedPanel.bindingSet.fingerprint }}</code></details>
             <ul v-if="selectedPanel.blockers.length" class="blocker-list" aria-label="冻结阻塞项">
               <li v-for="blocker in selectedPanel.blockers" :key="blocker.code" :class="blocker.severity">
                 <CircleAlert :size="14" aria-hidden="true" />
@@ -1146,6 +1146,8 @@ textarea {
   background: transparent;
   color: var(--binding-ink);
   cursor: pointer;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 56px;
 }
 
 .unit-row.active {

@@ -56,8 +56,16 @@ shot_card:
     color_grade: "cold_blue_steel"
 
   video_plan:
+    shot_structure: "continuous_take_with_phases"
     subject_motion: "从手停在胸前推进到指尖接触后立即停住"
+    prop_motion: "面具由左手稳定托住，不发生自主位移"
+    environment_motion: "展厅环境静止，仅尘粒轻微漂浮"
     camera_movement: "slow_push_in"
+    motion_owners:
+      subject: "林若霜"
+      prop: "左手与面具绑定"
+      camera: "摄影机"
+      environment: "展厅空气"
     transition_in: "承接上一镜人物已站定"
     transition_out: "切至面具接触点大特写"
 
@@ -94,7 +102,9 @@ shot_card:
     forbidden: ["换脸", "换装", "面具变形", "额外人物", "文字或UI"]
 ```
 
-`static_frame.drawable_state` 只能描述一张图可冻结的瞬间；“走近、抬手、触碰、转身、离开”这类动作链必须拆分，或写入 `video_plan`。Shot Card 唯一拥有本镜 `duration_sec`、事件边界、`planned_start_state` 与 `planned_end_state`；它不保存观测 payload。原尺寸审片通过后，只把连续性卡或受管 Review 记录的唯一引用写入 `observed_end_state_ref`。
+`static_frame.drawable_state` 只能描述一张图可冻结的瞬间；“走近、抬手、触碰、转身、离开”这类动作链必须拆分，或写入 `video_plan`。`shot_structure` 由 Shot Card 唯一判断：`continuous_take_with_phases` 是一个连续镜头内分阶段运动，`editorial_multishot` 是有明确切点的多镜组接，`transition_matched_cut` 是由动作、视线、声音、遮挡或构图匹配完成的连续切换；阶段语法和硬切语法不得混写。多人、洪水或道具交互等复杂运动在既有 `motion_owners` 下分别指定 subject / prop / camera / environment，不建立第二份运动合同。
+
+Shot Card 唯一拥有本镜 `duration_sec`、单元故事板格数、事件边界、`planned_start_state` 与 `planned_end_state`；下游技能不得另设“20秒默认6/9格”等平行默认。它不保存观测 payload。原尺寸审片通过后，只把连续性卡或受管 Review 记录的唯一引用写入 `observed_end_state_ref`。
 
 `speech_budget` 永远测量当前 `audio_text.dialogue / narration` 中的锁版或已授权文本，不得拿候选短稿的测算冒充原稿测算。`timing_status: ready` 的镜头才可进入最终提交包，并统一满足：
 
@@ -244,7 +254,7 @@ sound_design:
 | 5 格 | 快节奏动作/追逐 | 3s |
 | 6 格 | 极快剪辑/蒙太奇/时间流逝 | 2.5s |
 
-上述平均值只用于初排。最终必须满足：
+上述平均值只用于初排，不授权其他技能另设格数默认。最终必须满足：
 
 - 各格时长之和严格等于单元真实时长
 - 每格只承担一个主要可见变化

@@ -13,6 +13,12 @@ export interface RuntimeWriteGateInspectionDependencies {
   computeSourceDigest?: ComputeSourceDigest;
   /** 安装态从 App Resources 的 release manifest 复核构建源码身份。 */
   readReleaseSourceDigest?: () => Promise<string>;
+  /**
+   * 调用方已证明 watcher 覆盖了 boot hash 窗口且无相关源码事件时，
+   * 把 boot.bootSourceDigest 当作 currentSourceDigest，只廉价复核已载入工件。
+   * 不得用于 mutation；也不得在 setup 期间发生过相关事件时启用。
+   */
+  reuseBootSourceDigest?: boolean;
 }
 
 export interface RuntimeBootIdentity {
@@ -123,6 +129,8 @@ export async function inspectRuntimeWriteGate(
         return manifest.sourceDigest;
       });
       currentSourceDigest = await readReleaseSourceDigest();
+    } else if (dependencies.reuseBootSourceDigest) {
+      currentSourceDigest = boot.bootSourceDigest;
     } else {
       currentSourceDigest = (await computeCurrentSourceDigest(boot.workspace)).sourceDigest;
     }
@@ -164,6 +172,10 @@ export interface RuntimeGateControllerMetrics {
   invalidations: number;
   watcherHealthy: boolean;
   invalidationEpoch: number;
+  /** watcher 覆盖 boot hash 且无相关事件时，只读核验可复用 boot digest。 */
+  bootDigestReusable: boolean;
+  /** 只读核验走 boot digest 复用、未再次 walk 源码树的次数。 */
+  bootDigestReuses: number;
   totalInspectionDurationMs: number;
   maxInspectionDurationMs: number;
 }
@@ -189,6 +201,13 @@ export interface RuntimeGateController {
   invalidate(): void;
   /** watcher 未 ready 或发生 error 时传 false，退化为每批真实重算。 */
   setWatcherHealthy(healthy: boolean): void;
+  /**
+   * watcher 已开始记录（ready 之后）。必须在 await boot hash 之前同步调用，
+   * 才能证明剩余 hash 窗口被覆盖。
+   */
+  noteWatchersRecording(): void;
+  /** boot hash 结算时调用；仅当此时 watcher 已在记录且无相关事件才允许复用。 */
+  noteBootHashCompleted(): void;
   getMetrics(): RuntimeGateControllerMetrics;
 }
 
@@ -241,6 +260,10 @@ export function createRuntimeGateController(
   const mutationInFlight = new WeakMap<RuntimeBootIdentity, Promise<RuntimeWriteGateStatus>>();
   let watcherHealthy = options.watcherHealthy === true;
   let invalidationEpoch = 0;
+  let watchersRecording = false;
+  let hashCompletedWhileWatchersRecording = false;
+  let relevantEventSinceWatchers = false;
+  const userInspect = options.inspect;
   const metrics = {
     digestCalls: 0,
     inspectionCalls: 0,
@@ -253,17 +276,33 @@ export function createRuntimeGateController(
     mutationEpochRetries: 0,
     mutationUnstableFailures: 0,
     invalidations: 0,
+    bootDigestReuses: 0,
     totalInspectionDurationMs: 0,
     maxInspectionDurationMs: 0,
   };
 
-  const runInspection = async (boot: RuntimeBootIdentity): Promise<RuntimeWriteGateStatus> => {
+  const bootDigestReusable = (): boolean => (
+    hashCompletedWhileWatchersRecording && !relevantEventSinceWatchers
+  );
+
+  const runInspection = async (
+    boot: RuntimeBootIdentity,
+    inspection: { allowBootDigestReuse?: boolean } = {},
+  ): Promise<RuntimeWriteGateStatus> => {
     const startedAt = now();
     metrics.inspectionCalls += 1;
-    // 正式 inspector 每次固定尝试一次 computeSourceDigest；这里统计的是门禁层尝试数。
-    metrics.digestCalls += 1;
+    const reuse = Boolean(inspection.allowBootDigestReuse)
+      && !userInspect
+      && bootDigestReusable();
+    if (reuse) metrics.bootDigestReuses += 1;
+    else {
+      // 正式 inspector 每次固定尝试一次 computeSourceDigest；这里统计的是门禁层尝试数。
+      metrics.digestCalls += 1;
+    }
     try {
-      return await inspect(boot);
+      return reuse
+        ? await inspectRuntimeWriteGate(boot, { reuseBootSourceDigest: true })
+        : await inspect(boot);
     } finally {
       const duration = Math.max(0, now() - startedAt);
       metrics.totalInspectionDurationMs += duration;
@@ -274,6 +313,8 @@ export function createRuntimeGateController(
   const invalidate = (): void => {
     invalidationEpoch += 1;
     metrics.invalidations += 1;
+    relevantEventSinceWatchers = true;
+    hashCompletedWhileWatchersRecording = false;
     // WeakMap 无 clear；整体替换也确保新读取不会加入失效 epoch 的在途核验。
     readCache = new WeakMap();
     readInFlight = new WeakMap();
@@ -292,18 +333,20 @@ export function createRuntimeGateController(
     metrics.readCacheMisses += 1;
 
     const epochAtStart = invalidationEpoch;
+    const healthyAtStart = watcherHealthy;
     const existing = readInFlight.get(boot);
     if (existing && existing.epoch === epochAtStart) {
       metrics.readSingleflightJoins += 1;
       return existing.promise;
     }
 
-    const pending = runInspection(boot);
+    const pending = runInspection(boot, { allowBootDigestReuse: true });
     readInFlight.set(boot, { epoch: epochAtStart, promise: pending });
     try {
       const status = await pending;
-      // watcher error/unready、TTL 期间的源码事件或显式 invalidate 都禁止落缓存。
-      if (watcherHealthy && invalidationEpoch === epochAtStart) {
+      // 不健康期间启动的核验、watcher error/unready、TTL 期间的源码事件
+      // 或显式 invalidate 都禁止落缓存。
+      if (healthyAtStart && watcherHealthy && invalidationEpoch === epochAtStart) {
         readCache.set(boot, {
           status,
           expiresAt: now() + readTtlMs,
@@ -379,14 +422,32 @@ export function createRuntimeGateController(
     invalidate,
     setWatcherHealthy(healthy) {
       if (watcherHealthy === healthy) return;
-      watcherHealthy = healthy;
-      // ready/error 状态切换也切断旧 epoch，避免健康前的结果在健康后被复用。
-      invalidate();
+      if (!healthy) {
+        // healthy→unhealthy：退化为每批重算，切断旧 epoch。
+        watcherHealthy = false;
+        watchersRecording = false;
+        hashCompletedWhileWatchersRecording = false;
+        invalidate();
+        return;
+      }
+      // unhealthy→healthy：丢弃不健康期间的在途核验，但不抬 epoch / 清缓存。
+      // read cache 只在 healthy 时写入，因此这里通常本就为空；
+      // 强制 invalidate 只会让首个诊断必走第二次整树 walk。
+      watcherHealthy = true;
+      readInFlight = new WeakMap();
+    },
+    noteWatchersRecording() {
+      watchersRecording = true;
+    },
+    noteBootHashCompleted() {
+      if (hashCompletedWhileWatchersRecording || relevantEventSinceWatchers) return;
+      hashCompletedWhileWatchersRecording = watchersRecording;
     },
     getMetrics: () => ({
       ...metrics,
       watcherHealthy,
       invalidationEpoch,
+      bootDigestReusable: bootDigestReusable(),
     }),
   };
 }

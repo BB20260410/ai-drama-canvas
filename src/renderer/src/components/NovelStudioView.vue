@@ -9,23 +9,24 @@
 
       <nav v-if="project.workspaceMode === 'hybrid'" class="workspace-switch" data-testid="novel-workspace-switch">
         <button type="button" class="active" aria-current="page" data-testid="novel-switch-novel">小说创作</button>
-        <button type="button" data-testid="novel-switch-drama" @click="emit('switch-workspace', 'drama')">短剧制作</button>
+        <button type="button" data-testid="novel-switch-drama" :disabled="Boolean(busy || loading)" :title="(busy || loading) ? (loading ? '正在切换工作区' : '正在处理，不能切换工作区') : undefined" @click="emit('switch-workspace', 'drama')">{{ loading ? "切换中" : "短剧制作" }}</button>
+        <small v-if="busy || loading" data-testid="novel-workspace-switch-blocked" role="status">{{ loading ? "正在切换工作区" : "正在处理，不能切换工作区" }}</small>
       </nav>
 
       <div class="header-actions">
-        <button type="button" :disabled="busy" data-testid="novel-import-file" @click="importNovel('file')">
+        <button type="button" :disabled="busy" :title="busy ? '正在处理，不能再导入文件' : undefined" data-testid="novel-import-file" @click="importNovel('file')">
           <FileInput :size="15" />导入文件
         </button>
-        <button type="button" :disabled="busy" data-testid="novel-import-directory" @click="importNovel('directory')">
+        <button type="button" :disabled="busy" :title="busy ? '正在处理，不能再导入目录' : undefined" data-testid="novel-import-directory" @click="importNovel('directory')">
           <FolderInput :size="15" />导入目录
         </button>
-        <button type="button" :disabled="busy" data-testid="novel-backup" @click="backupProject">
+        <button type="button" :disabled="busy" :title="busy ? '正在处理，不能再备份' : undefined" data-testid="novel-backup" @click="backupProject">
           <Archive :size="15" />备份
         </button>
-        <button type="button" :disabled="busy" data-testid="novel-restore" @click="restoreProject">
+        <button type="button" :disabled="busy" :title="busy ? '正在处理，不能再恢复' : undefined" data-testid="novel-restore" @click="restoreProject">
           <History :size="15" />恢复
         </button>
-        <button type="button" data-testid="novel-open-project-center" @click="emit('open-project-center')">
+        <button type="button" data-testid="novel-open-project-center" :disabled="Boolean(busy || loading)" :title="(busy || loading) ? (loading ? '正在切换工作区' : '正在处理，不能打开项目中心') : undefined" @click="requestOpenProjectCenter">
           <FolderKanban :size="15" />项目
         </button>
       </div>
@@ -68,7 +69,7 @@
 
         <div v-if="uninitialized" class="empty-rail">
           <p>正文库尚未初始化。</p>
-          <button type="button" class="primary" data-testid="novel-initialize" :disabled="busy" @click="initializeManuscript">初始化正文库</button>
+          <button type="button" class="primary" data-testid="novel-initialize" :disabled="busy" :title="busy ? '正在处理，不能再初始化正文库' : undefined" @click="initializeManuscript">初始化正文库</button>
         </div>
 
         <div v-else class="volume-list">
@@ -103,7 +104,7 @@
               </div>
               <form class="inline-create" @submit.prevent="createChapter(volume.volumeId)">
                 <input v-model="newChapterTitles[volume.volumeId]" :placeholder="`在${volume.title}新建章节`" maxlength="200" />
-                <button type="submit" :disabled="busy || !newChapterTitles[volume.volumeId]?.trim()" title="新建章节">+</button>
+                <button type="submit" :disabled="busy || !newChapterTitles[volume.volumeId]?.trim()" :title="busy ? '正在处理，不能再新建章节' : '新建章节'">+</button>
               </form>
             </template>
           </section>
@@ -116,7 +117,7 @@
 
         <form v-if="!uninitialized" class="new-volume" @submit.prevent="createVolume">
           <input v-model="newVolumeTitle" placeholder="新建卷" maxlength="200" />
-          <button type="submit" :disabled="busy || !newVolumeTitle.trim()">添加</button>
+          <button type="submit" :disabled="busy || !newVolumeTitle.trim()" :title="busy ? '正在处理，不能再新建卷' : undefined">添加</button>
         </form>
       </aside>
 
@@ -139,8 +140,8 @@
               <small>修订 r{{ activeChapter.revision }} · 每次保存自动保留历史快照</small>
             </div>
             <div class="editor-actions">
-              <button type="button" :disabled="busy" @click="renameActiveChapter"><PencilLine :size="14" />改名</button>
-              <button type="button" class="primary" data-testid="novel-save-chapter" :disabled="busy || !dirty" @click="saveActiveChapter">
+              <button type="button" :disabled="busy" :title="busy ? '正在处理，不能再改名' : undefined" @click="renameActiveChapter"><PencilLine :size="14" />改名</button>
+              <button type="button" class="primary" data-testid="novel-save-chapter" :disabled="busy || !dirty" :title="busy ? '正在处理，不能再保存' : undefined" @click="saveActiveChapter">
                 <Save :size="15" />{{ busy ? "处理中" : dirty ? "保存" : "已保存" }}
               </button>
             </div>
@@ -222,7 +223,7 @@
                 class="context-pack-receipt"
                 data-testid="novel-context-pack-receipt"
                 open>
-                <summary>Context Pack 选择回执</summary>
+                <summary data-testid="novel-context-pack-receipt-summary">Context Pack 选择回执</summary>
                 <p>
                   目标 {{ writingDashboard.writeReadiness.lease.contextPackReceipt.targetChapter.chapterId }} ·
                   截止 {{ writingDashboard.writeReadiness.lease.contextPackReceipt.cutoffChapterId ?? "首章前" }} ·
@@ -241,7 +242,7 @@
                   </li>
                 </ul>
                 <details class="receipt-trace">
-                  <summary>逐项轨迹（{{ writingDashboard.writeReadiness.lease.contextPackReceipt.selectionTrace.entries.length }}）</summary>
+                  <summary data-testid="novel-context-pack-receipt-trace">逐项轨迹（{{ writingDashboard.writeReadiness.lease.contextPackReceipt.selectionTrace.entries.length }}）</summary>
                   <ol>
                     <li
                       v-for="(entry, index) in writingDashboard.writeReadiness.lease.contextPackReceipt.selectionTrace.entries"
@@ -684,6 +685,11 @@ async function resolveLeaveDialog(action: "save" | "discard" | "cancel"): Promis
 
 defineExpose<NovelStudioExpose>({ requestLeave });
 
+function requestOpenProjectCenter(): void {
+  if (busy.value || props.loading) return;
+  emit("open-project-center");
+}
+
 function chapterTitle(chapterId: string | null | undefined): string {
   if (!chapterId) return "未建立";
   return chapters.value.find((entry) => entry.chapterId === chapterId)?.title ?? chapterId;
@@ -896,6 +902,7 @@ async function loadWorkspace(
 }
 
 async function initializeManuscript(): Promise<void> {
+  if (busy.value) return;
   busy.value = true;
   clearNotice();
   try {
@@ -937,6 +944,7 @@ async function openChapter(
 }
 
 async function saveActiveChapter(): Promise<void> {
+  if (busy.value) return;
   const chapter = activeChapter.value;
   if (!chapter || !dirty.value) return;
   const root = props.project.projectRoot;
@@ -992,6 +1000,7 @@ async function activateChapterPage(
 }
 
 async function selectVolume(volumeId: string): Promise<void> {
+  if (busy.value) return;
   if (volumeId === activeVolumeId.value) return;
   if (await requestLeave("chapter_switch") !== "proceed") return;
   const scope = beginLoadScope();
@@ -1007,6 +1016,7 @@ async function selectVolume(volumeId: string): Promise<void> {
 }
 
 async function changeChapterPage(direction: -1 | 1): Promise<void> {
+  if (busy.value) return;
   const volumeId = activeVolumeId.value;
   if (!volumeId || await requestLeave("chapter_switch") !== "proceed") return;
   const nextOffset = Math.max(0, chapterPageOffset.value + direction * chapterPageLimit.value);
@@ -1023,6 +1033,7 @@ async function changeChapterPage(direction: -1 | 1): Promise<void> {
 }
 
 async function changeVolumePage(direction: -1 | 1): Promise<void> {
+  if (busy.value) return;
   if (await requestLeave("chapter_switch") !== "proceed") return;
   const nextOffset = Math.max(0, volumePageOffset.value + direction * volumePageLimit.value);
   const scope = beginLoadScope();
@@ -1092,6 +1103,7 @@ async function reviewCandidate(decision: "accepted" | "rejected"): Promise<void>
 }
 
 async function createVolume(): Promise<void> {
+  if (busy.value) return;
   const title = newVolumeTitle.value.trim();
   const revision = workspace.value?.manifestRevision;
   if (!title || !revision) return;
@@ -1110,6 +1122,7 @@ async function createVolume(): Promise<void> {
 }
 
 async function createChapter(volumeId: string): Promise<void> {
+  if (busy.value) return;
   const title = newChapterTitles[volumeId]?.trim();
   const revision = workspace.value?.manifestRevision;
   if (!title || !revision) return;
@@ -1131,6 +1144,7 @@ async function createChapter(volumeId: string): Promise<void> {
 }
 
 async function renameActiveChapter(): Promise<void> {
+  if (busy.value) return;
   const chapter = activeChapter.value;
   const manifestRevision = workspace.value?.manifestRevision;
   if (!chapter || !manifestRevision) return;
@@ -1362,6 +1376,7 @@ button { color: inherit; }
 .project-identity p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
 .workspace-switch, .header-actions, .editor-actions { display: flex; align-items: center; gap: 6px; }
 .workspace-switch { padding: 3px; border-radius: 8px; background: #e8ece8; }
+.workspace-switch small { color: var(--muted); font-size: 11px; }
 .workspace-switch button, .header-actions button, .editor-actions button {
   display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 10px; border: 1px solid transparent; border-radius: 7px; background: transparent; cursor: pointer;
 }
@@ -1387,7 +1402,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .search-box button, .search-results header button { border: 0; color: var(--accent); background: transparent; cursor: pointer; font-size: 12px; font-weight: 700; }
 .search-results { border-bottom: 1px solid var(--line); background: white; }
 .search-results header { display: flex; justify-content: space-between; padding: 9px 10px; }
-.search-results > button { width: 100%; display: grid; gap: 3px; padding: 8px 10px; border: 0; border-top: 1px solid #edf0ed; text-align: left; background: white; cursor: pointer; }
+.search-results > button { width: 100%; display: grid; gap: 3px; padding: 8px 10px; border: 0; border-top: 1px solid #edf0ed; text-align: left; background: white; cursor: pointer; content-visibility: auto; contain-intrinsic-size: auto 48px; }
 .search-results > button:hover { background: #edf6f2; }
 .search-results strong { font-size: 12px; }
 .search-results span, .search-results p { color: var(--muted); font-size: 11px; }
@@ -1398,9 +1413,9 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .rail-heading small, .volume-section > header small { color: var(--muted); font-weight: 500; }
 .volume-section { padding: 0 8px 10px; }
 .volume-section > header { padding: 7px 6px; color: var(--muted); font-size: 11px; font-weight: 700; }
-.volume-toggle { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 7px 5px; border: 0; border-radius: 6px; color: inherit; text-align: left; background: transparent; cursor: pointer; }
+.volume-toggle { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 7px 5px; border: 0; border-radius: 6px; color: inherit; text-align: left; background: transparent; cursor: pointer; content-visibility: auto; contain-intrinsic-size: auto 40px; }
 .volume-toggle:hover, .volume-toggle.active { color: #0d5f55; background: #e3eee9; }
-.volume-section > button { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 8px; border: 0; border-radius: 6px; text-align: left; background: transparent; cursor: pointer; }
+.volume-section > button { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 8px; border: 0; border-radius: 6px; text-align: left; background: transparent; cursor: pointer; content-visibility: auto; contain-intrinsic-size: auto 40px; }
 .volume-section > button:hover { background: #e9eeea; }
 .volume-section > button.active { color: #0d5f55; background: #dcece6; }
 .volume-section > button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
@@ -1445,7 +1460,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .memory-compose blockquote { margin: 0; padding: 8px 10px; border-left: 2px solid var(--accent); color: var(--muted); background: #edf3ef; font: 12px/1.6 "Songti SC", STSong, serif; }
 .memory-compose button { min-height: 34px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 7px; cursor: pointer; }
 .memory-list { padding: 5px 8px 18px; }
-.memory-list > button { width: 100%; display: grid; gap: 4px; padding: 10px 7px; border: 0; border-bottom: 1px solid #e5e9e5; text-align: left; background: transparent; cursor: pointer; }
+.memory-list > button { width: 100%; display: grid; gap: 4px; padding: 10px 7px; border: 0; border-bottom: 1px solid #e5e9e5; text-align: left; background: transparent; cursor: pointer; content-visibility: auto; contain-intrinsic-size: auto 48px; }
 .memory-list > button:hover { background: #ebf1ed; }
 .memory-list span { color: var(--accent); font-size: 10px; font-weight: 700; }
 .memory-list strong { font: 600 13px/1.45 "Songti SC", STSong, serif; }
@@ -1519,7 +1534,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .candidate-board > header small, .candidate-board > header p { color: var(--muted); font-size: 10px; }
 .candidate-board > header p { margin: 0; line-height: 1.5; }
 .candidate-list { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 2px; }
-.candidate-list button { min-width: 120px; display: grid; gap: 3px; padding: 8px; border: 1px solid var(--line); border-radius: 7px; text-align: left; background: white; cursor: pointer; }
+.candidate-list button { min-width: 120px; display: grid; gap: 3px; padding: 8px; border: 1px solid var(--line); border-radius: 7px; text-align: left; background: white; cursor: pointer; content-visibility: auto; contain-intrinsic-size: auto 48px; }
 .candidate-list button.active { border-color: var(--accent); background: #e7f2ee; }
 .candidate-list span { font-size: 10px; font-weight: 700; }
 .candidate-list small { color: var(--muted); font-size: 9px; }

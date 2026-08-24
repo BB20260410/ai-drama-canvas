@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "kind": "ai-canvas-local-installed-app-cutover",
+  "status": "pass",
+  "completedAt": "2026-08-14T02:50:42.572Z",
+  "scope": "this-mac-local-only",
+  "source": {
+    "sourceDigest": "22bb68378a587777df1acab4b3bb36ed1cae74fa079b6caaa26c95275360ee3f",
+    "buildId": "6e0522f5d24b5d8663ac45dc063f205a",
+    "sourceFiles": 1061,
+    "sourceBytes": 21276556,
+    "releaseManifestFingerprint": "4b2769fd2835f7704eba8cb33ebb72d499c923951421182ff2bd1b2947067009",
+    "releaseManifestSha256": "de11a5021351ee1f9f2c388799de0f99ecc5ab0e60aed4d72436aff84a477cd2",
+    "mcpToolCount": 220,
+    "architecture": "arm64",
+    "version": "0.2.0",
+    "distribution": "local-only",
+    "liveDigestMatchedManifestBeforePackage": true,
+    "rebuildPerformed": false
+  },
+  "package": {
+    "mode": "electron-builder-mac-dir",
+    "script": "node node_modules/electron-builder/cli.js --mac --dir --publish never -c.mac.notarize=false -c.mac.identity=YIHANG LI (3JS43BTTJ3)",
+    "workingDirectory": "/Users/hxx/Documents/无限画布",
+    "asciiAlias": "/tmp/canvas-src",
+    "developerIdIdentity": "Developer ID Application: YIHANG LI (3JS43BTTJ3)",
+    "teamIdentifier": "3JS43BTTJ3",
+    "notarization": false,
+    "dmgGenerated": false,
+    "publish": "never"
+  },
+  "beforeInstalled": {
+    "path": "/Applications/AI 漫剧画布.app",
+    "sourceDigest": "954ac71a461be527530a96709983741c5f0d1f9ae05a97f57605af5ded39d585",
+    "buildId": "c7cb5ceec93ad2704422f4657f14f932",
+    "mcpToolCount": 220
+  },
+  "installedApp": {
+    "path": "/Applications/AI 漫剧画布.app",
+    "sourceDigest": "22bb68378a587777df1acab4b3bb36ed1cae74fa079b6caaa26c95275360ee3f",
+    "buildId": "6e0522f5d24b5d8663ac45dc063f205a",
+    "bundleIdentifier": "com.hxx.aidramacanvas",
+    "version": "0.2.0",
+    "architecture": "arm64",
+    "mcpToolCount": 220,
+    "codesignDeepStrict": true,
+    "teamIdentifier": "3JS43BTTJ3",
+    "executableSha256": "27ef44951ec866bd19820fe061790f36c4f20d53d6c7a6e8e228ee19b887decd",
+    "appAsarSha256": "4b508068a76f5caebee270821e35ff4b83c21ca71f797609e333adf1dbb19024",
+    "mcpServerSha256": "beee5b07ac5efde39325b61cd4212008bb654eefeb9fa48acafc1fe479983bf2",
+    "releaseManifestSha256": "de11a5021351ee1f9f2c388799de0f99ecc5ab0e60aed4d72436aff84a477cd2"
+  },
+  "workspaceDist": {
+    "path": "dist/mac-arm64/AI 漫剧画布.app",
+    "sameReleaseManifestAsInstalled": true,
+    "sameExecutableSha256AsInstalled": true,
+    "sameAppAsarSha256AsInstalled": true,
+    "sameMcpServerSha256AsInstalled": true,
+    "codesignDeepStrict": true
+  },
+  "installedVerification": {
+    "evidence": "docs/evidence/installed-local-verify-20260814T025023Z-22bb6837.json",
+    "evidenceSha256": "a19fd1bd060f3331101c21f2fee946b2b2833a5b9f7f1f1446288b23765573cd",
+    "status": "pass",
+    "packagedMcpTools": 220,
+    "launchWithoutSystemNode": true,
+    "showEvents": 0,
+    "focusEvents": 0,
+    "dockVisible": false,
+    "closeDurationMs": 570,
+    "graceful": true,
+    "exitCode": 0,
+    "forceTerminated": false,
+    "forceKilled": false,
+    "lingeringProcesses": 0
+  },
+  "rollback": {
+    "archiveRoot": "/Users/hxx/Documents/无限画布_交付归档/local-install-20260814T024645Z-22bb6837",
+    "previousInstalledSourceDigest": "954ac71a461be527530a96709983741c5f0d1f9ae05a97f57605af5ded39d585",
+    "previousInstalledBuildId": "c7cb5ceec93ad2704422f4657f14f932",
+    "previousInstalledPreserved": true,
+    "previousWorkspaceDistPreserved": true
+  },
+  "boundaries": {
+    "localOnly": true,
+    "notarizationPerformed": false,
+    "dmgGenerated": false,
+    "uploaded": false,
+    "published": false,
+    "paidActionUsed": false,
+    "formalProjectTouched": false,
+    "gitStaged": false,
+    "gitCommitted": false,
+    "gitPushed": false,
+    "isolatedWorktreeTouched": false,
+    "leftoverPackageTempElectron": false
+  }
+}

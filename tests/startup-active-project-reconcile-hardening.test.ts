@@ -62,6 +62,26 @@ describe("startup reconcile review hardening", () => {
     expect(runtimeIpcGateMode("canvas:release-restored-managed-project-shell-validation")).toBe("strong");
   });
 
+  it("persistStudioContext 在途合并最新焦点，不并行写 sidecar", () => {
+    const app = source("src/renderer/src/App.vue");
+    expect(app).toContain("const persistStudioContextBusy = ref(false);");
+    const start = app.indexOf("async function persistStudioContext(");
+    const end = app.indexOf("async function onProjectDrop(", start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const body = app.slice(start, end);
+    expect(body).toContain("pendingStudioContext = context;");
+    expect(body).toContain("if (persistStudioContextBusy.value || projectSwitching.value || projectRemovingRoot.value) return;");
+    expect(body).toContain("while (pendingStudioContext)");
+    expect(body.indexOf("persistStudioContextBusy.value = true")).toBeLessThan(
+      body.indexOf("await window.canvasApi.setActiveStudioContext"),
+    );
+    expect(body.indexOf("if (persistStudioContextBusy.value || projectSwitching.value || projectRemovingRoot.value) return;")).toBeLessThan(
+      body.indexOf("persistStudioContextBusy.value = true"),
+    );
+    expect(body).toContain("void persistStudioContext(pendingStudioContext);");
+  });
+
   it("启动把 reconcile 和 workspace 偏好先准备为局部变量，再一次性提交受管 UI", () => {
     const app = source("src/renderer/src/App.vue");
     const startupStart = app.indexOf("const startupReconcilePromise =");

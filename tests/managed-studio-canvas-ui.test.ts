@@ -59,8 +59,14 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(firstCardObserver).not.toContain("t23PerformanceProbeEnabled");
     expect(canvas).toContain("unitId: unit.id");
     expect(refreshAll).toContain('emit("initialUnitCardsCommitted"');
-    expect(refreshAll.indexOf("const overviewRead = loadOverview()")).toBeLessThan(
-      refreshAll.indexOf('emit("initialUnitCardsCommitted"'),
+    // 首卡 mutation 基线必须在任何 overview IPC 前冻结并逐层携带；否则 overview
+    // 自己的读取会污染“首卡前”的门禁计数。
+    expect(refreshAll).toContain("await captureT23FirstCardMutationChecks()");
+    expect(refreshAll.indexOf("await captureT23FirstCardMutationChecks()")).toBeLessThan(
+      refreshAll.indexOf("const overviewRead = loadOverview()"),
+    );
+    expect(refreshAll.indexOf('emit("initialUnitCardsCommitted"')).toBeLessThan(
+      refreshAll.indexOf("const overviewRead = loadOverview()"),
     );
     expect(refreshAll).toContain("if (canvasDisposed) return");
     expect(refreshAll).toContain("const isCurrent = () => !canvasDisposed");
@@ -310,7 +316,8 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain("collectStudioCanvasNodePositions");
     expect(canvas).toContain("@core/studio-canvas-layout-geometry");
     expect(canvas).toMatch(/import type \{[\s\S]*StudioCanvasLayout[\s\S]*\} from "@core\/studio-canvas-layout-types"/u);
-    expect(canvas).toContain(':pan-on-drag="[1, 2]"');
+    expect(canvas).toContain(':pan-on-drag="panOnDragButtons"');
+    expect(canvas).toContain("spacePanHeld.value ? [0, 1, 2] : [1, 2]");
     expect(canvas).toContain(':selection-key-code="true"');
     expect(canvas).toContain('data-testid="managed-canvas-layout-status"');
     expect(canvas).not.toMatch(/sqlite|localStorage|sessionStorage/);
@@ -365,6 +372,16 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain('code === "close-panel"');
     expect(canvas).toContain("appearanceListElement.value?.scrollIntoView");
     expect(canvas).toContain('if (kind === "asset" || kind === "unit" || kind === "panel") actionPanelOpen.value = true');
+  });
+
+  it("检查器禁用动作必须展示 action.reason，避免可点无反馈", () => {
+    const inspector = source("src/renderer/src/components/CanvasInspectorPanel.vue");
+    expect(inspector).toContain("action.reason");
+    expect(inspector).toContain("managed-canvas-action-reason-");
+    expect(inspector).toContain(":title=\"action.reason || action.label\"");
+    expect(inspector).toContain("reason?: string");
+    expect(inspector).toContain(":disabled=\"!action.enabled\"");
+    expect(inspector).toContain("button:disabled { opacity: .4; cursor: default; }");
   });
 
   it("LMD residual：执行最近工作流组按钮接线", () => {
@@ -898,7 +915,8 @@ describe("P26 接线与文案合同（审查升级补强）", () => {
     const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
     // 父组件必须真实渲染并绑定子组件（防整体删除检查器仍绿）。
     expect(view).toContain("<CanvasInspectorPanel");
-    expect(view).toContain('@close="selection = null"');
+    expect(view).toContain('@close="closeInspector"');
+    expect(view).toContain("selection.value = null");
     expect(view).toContain('@focus-appearance="focusAppearance"');
     expect(view).toContain('@run-node-action="runNodeAction"');
     // 错误翻译在画布 message() 实际接线。
@@ -953,5 +971,1131 @@ describe("P2c 当前单元聚合投影", () => {
     expect(main).toContain('ipcMain.handle("canvas:get-studio-production-projection-bundle"');
     expect(main).toContain("buildStudioProductionProjectionBundle(projectRoot, query)");
     expect(app).toContain("window.canvasApi.getStudioProductionProjectionBundle(root, query)");
+  });
+});
+
+describe("受管画布角色库图+音频入库", () => {
+  it("角色页提供上传图片/音频并入库放到画布的入口", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(view).toContain('data-testid="managed-canvas-character-ingest"');
+    expect(view).toContain('data-testid="managed-canvas-character-pick-image"');
+    expect(view).toContain('data-testid="managed-canvas-character-pick-audio"');
+    expect(view).toContain('data-testid="managed-canvas-character-save"');
+    expect(view).toContain("ingestCharacterCanvasPack");
+    expect(view).toContain('libraryTab === \'character\' || libraryTab === \'scene\' || libraryTab === \'prop\'');
+    expect(view).toContain('category === "character" && characterAudioPath.value');
+    expect(view).toContain("attachCharacterCompanionAudio");
+    expect(view).toContain('data-testid="managed-canvas-character-pick-side"');
+    expect(view).toContain('data-testid="managed-canvas-character-pick-back"');
+    expect(view).toContain("sideImagePath");
+    expect(view).toContain("backImagePath");
+    expect(view).toContain("audioSha256sForCharacterAsset");
+    expect(view).toContain(':character-audio-count="selectedCharacterAudioCount"');
+    expect(view).toContain('data-testid="managed-canvas-character-aliases-input"');
+    expect(view).toContain("splitCanvasAssetAliases(characterIngestAliases.value)");
+    expect(view).toContain("...(aliases.length ? { aliases } : {})");
+    expect(view).toContain('data-testid="managed-canvas-character-description-input"');
+    expect(view).toContain("...(description ? { description } : {})");
+  });
+
+  it("音频节点用原生播放器走 aicanvas-studio 媒体协议，不引入第二套波形库", () => {
+    const node = source("src/renderer/src/components/ManagedStudioCanvasNode.vue");
+    expect(node).toContain('data-testid="managed-canvas-audio-player"');
+    expect(node).toContain("canPlayAudio");
+    expect(node).toContain("aicanvas-studio://media/${props.data.mediaSha256}?projectRoot=");
+    expect(node).not.toContain("wavesurfer");
+    expect(node).not.toContain("peaks.js");
+  });
+
+  it("侧栏库条目可拖到画布落点钉选，不另建坐标表", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(view).toContain('const LIBRARY_NODE_MIME = "application/x-aicanvas-library-node"');
+    expect(view).toContain("function onLibraryDragStart");
+    expect(view).toContain("async function dropLibraryNodeAt");
+    expect(view).toContain("studioFlow.screenToFlowCoordinate");
+    expect(view).toContain('data-testid="managed-canvas-library-drag"');
+    expect(view).toContain("event.dataTransfer?.getData(LIBRARY_NODE_MIME)");
+  });
+
+  it("⌘G 创建空间命名组并写入 spatialGroups，不改 BindingSet", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(view).toContain("function groupSelectedCanvasNodes");
+    expect(view).toContain("function ungroupSelectedCanvasNodes");
+    expect(view).toContain("function applySpatialGrouping");
+    expect(view).toContain('type: "studioSpatialGroup"');
+    expect(view).toContain('event.key.toLowerCase() === "g"');
+    expect(view).not.toContain("createWorkflowFromSelection();");
+  });
+
+  it("节点 busy 时暂停音频，避免处理中仍播放", () => {
+    const node = source("src/renderer/src/components/ManagedStudioCanvasNode.vue");
+    expect(node).toContain("audioEl.value?.pause()");
+    expect(node).toContain("watch(\n  () => props.data.busy,\n  (busy) => {\n    if (busy) audioEl.value?.pause();\n  },\n);");
+    expect(node).toContain("onBeforeUnmount(() => {\n  nodeDisposed = true;\n  audioEl.value?.pause();");
+  });
+
+  it("播放地址身份变化时暂停音频，避免切工程仍播旧声", () => {
+    const node = source("src/renderer/src/components/ManagedStudioCanvasNode.vue");
+    expect(node).toContain("const playbackUrl = computed(() => {");
+    expect(node).toContain("watch(playbackUrl, () => {\n  audioEl.value?.pause();\n});");
+    expect(node).not.toContain("wavesurfer");
+  });
+
+  it("角色参考图/音频选择 fail-closed：pickingCharacterMedia 挡住连点双开系统文件框", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(view).toContain('data-testid="managed-canvas-character-pick-image"');
+    expect(view).toContain('data-testid="managed-canvas-character-pick-audio"');
+    expect(view).toContain(':disabled="characterIngestBusy || pickingCharacterMedia"');
+    expect(view).toContain("正在处理，不能再选择角色参考图");
+    expect(view).toContain("正在处理，不能再选择角色音频");
+    const image = view.slice(
+      view.indexOf("async function pickCharacterImage()"),
+      view.indexOf("async function pickCharacterAudio()"),
+    );
+    const audio = view.slice(
+      view.indexOf("async function pickCharacterAudio()"),
+      view.indexOf("async function submitCharacterIngest()"),
+    );
+    for (const handler of [image, audio]) {
+      expect(handler).toContain("if (characterIngestBusy.value || pickingCharacterMedia.value) return;");
+      expect(handler).toContain("pickingCharacterMedia.value = true;");
+      expect(handler.indexOf("if (characterIngestBusy.value || pickingCharacterMedia.value) return;")).toBeLessThan(
+        handler.indexOf("pickingCharacterMedia.value = true;"),
+      );
+      expect(handler.indexOf("pickingCharacterMedia.value = true;")).toBeLessThan(
+        handler.indexOf("await window.canvasApi.pickStudioMediaFiles()"),
+      );
+      expect(handler).toContain("pickingCharacterMedia.value = false;");
+    }
+  });
+});
+
+describe("受管画布侧栏列表视口剔除", () => {
+  it("library-list 行使用 content-visibility，避免离屏 36 项同步布局", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(view).toContain("class=\"library-list unit-list\"");
+    expect(view).toContain(".library-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px; content-visibility: auto; contain-intrinsic-size: auto 56px; }");
+  });
+
+  it("global-resource-card 使用 content-visibility，离屏 36 项跳过同步布局", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(view).toContain('v-for="(entry, index) in globalResourcePage.items"');
+    expect(view).toContain('class="global-resource-card"');
+    expect(view).toContain("const GLOBAL_RESOURCE_PAGE_LIMIT = 36");
+    expect(view).toMatch(/\.global-resource-list-viewport\s*\{[^}]*overflow:\s*auto/);
+    expect(view).toMatch(/\.global-resource-card\s*\{[^}]*content-visibility:\s*auto/);
+    expect(view).toMatch(/\.global-resource-card\s*\{[^}]*contain-intrinsic-size:\s*auto 128px/);
+    expect(view).not.toMatch(/\.global-resource-card\s*\{[^}]*content-visibility:\s*hidden/);
+    expect(view).not.toMatch(/\.global-resource-tabs button\s*\{[^}]*content-visibility/);
+  });
+
+  it("检查器 appearance-list 行使用 content-visibility，离屏出场条目跳过同步布局", () => {
+    const inspector = source("src/renderer/src/components/CanvasInspectorPanel.vue");
+    expect(inspector).toContain('data-testid="managed-canvas-appearances"');
+    expect(inspector).toContain(".appearance-list button { width: 100%; border: 1px solid var(--msc-line); border-radius: 7px; background: var(--msc-bg); padding: 8px; color: var(--msc-text); text-align: left; cursor: pointer; content-visibility: auto; contain-intrinsic-size: auto 40px; }");
+    expect(inspector).not.toMatch(/\.appearance-list button \{[^}]*content-visibility:\s*hidden/);
+  });
+
+  it("角色检查器展示已绑定音频，放到画布时会自动带出", () => {
+    const inspector = source("src/renderer/src/components/CanvasInspectorPanel.vue");
+    expect(inspector).toContain('data-testid="managed-canvas-character-audio"');
+    expect(inspector).toContain("放到画布时会自动带出");
+    expect(inspector).toContain('data-testid="managed-canvas-character-views"');
+    expect(inspector).toContain('data-testid="managed-canvas-character-aliases"');
+    expect(inspector).toContain("characterAliasLabel");
+    expect(inspector).toContain('data-testid="managed-canvas-character-description"');
+  });
+
+  it("角色检查器对已绑 CAS 音频用原生控件试听，busy 时禁用", () => {
+    const inspector = source("src/renderer/src/components/CanvasInspectorPanel.vue");
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(inspector).toContain('data-testid="managed-canvas-character-audio-player"');
+    expect(inspector).toContain("<audio");
+    expect(inspector).toContain('preload="metadata"');
+    expect(inspector).toContain('class="audio-player inspector-audio-player"');
+    expect(inspector).toContain("claimCanvasAudioPlayback(characterAudioEl.value)");
+    expect(inspector).toContain("releaseCanvasAudioPlayback(characterAudioEl.value)");
+    expect(inspector).toContain(".inspector-audio-player.audio-blocked { pointer-events: none; }");
+    expect(inspector).not.toContain("wavesurfer");
+    expect(view).toContain(':character-audio-playback-url="selectedCharacterAudioPlaybackUrl"');
+    expect(view).toContain(':character-audio-blocked="characterAudioBlocked"');
+    expect(view).toContain("aicanvas-studio://media/${sha}?projectRoot=");
+    expect(view).toContain("loading.value || pinActionBusy.value");
+  });
+
+  it("Shift+1/0/2 视口快捷键走 fitCanvas、zoomTo(1)、选区包围盒，Controls 不走默认 fitView", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"), view.indexOf("function onWindowBlur") > view.indexOf("function onCanvasKeydown") ? view.indexOf("if (event.key !== \"Escape\") return") : view.length);
+    expect(view).toContain('event.key === digit || event.code === `Digit${digit}`');
+    expect(keydown.indexOf('isShiftDigit(event, "1")')).toBeGreaterThanOrEqual(0);
+    expect(keydown.indexOf('isShiftDigit(event, "1")')).toBeLessThan(keydown.indexOf("void fitCanvas()"));
+    expect(keydown.indexOf('isShiftDigit(event, "0")')).toBeLessThan(keydown.indexOf("onZoomTo100()"));
+    expect(view).toContain("studioFlow.zoomTo(1, { duration: 180 })");
+    expect(keydown.indexOf('isShiftDigit(event, "2")')).toBeLessThan(keydown.indexOf("void fitSelectedCanvasNodes()"));
+    expect(view).toContain("const selected = nodes.value.filter((node) => node.selected);");
+    expect(view).toContain("if (!selected.length) return;");
+    expect(view.indexOf("if (!selected.length) return;")).toBeLessThan(view.indexOf("await fitCanvasToNodes(selected);"));
+    expect(view).toContain('#control-fit-view');
+    expect(view).toContain("onFitViewControl");
+    expect(view).not.toContain("@fit-view=");
+    expect(view).not.toContain("wavesurfer");
+  });
+
+  it("网格吸附默认关，对象吸附之后 round 24，成组拖不 round，不开 Vue Flow snapToGrid", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const snap = view.slice(view.indexOf("function applySnap"), view.indexOf("function snapGuideStyle"));
+    expect(view).toContain("const gridSnapEnabled = ref(false);");
+    expect(view).toContain('data-testid="managed-canvas-snap-to-grid"');
+    expect(view).not.toContain("snap-to-grid=");
+    expect(view).not.toContain(":snap-to-grid");
+    expect(snap).toContain("computeCanvasSnap");
+    expect(snap.indexOf("selectedIds.size > 1")).toBeLessThan(snap.indexOf("roundToCanvasGrid"));
+    expect(snap.indexOf("computeCanvasSnap")).toBeLessThan(snap.indexOf("roundToCanvasGrid"));
+    expect(snap).toContain("if (gridSnapEnabled.value)");
+    expect(snap).toContain("CANVAS_GRID_SIZE");
+  });
+
+  it("Arrow 微移 1px、Shift+Arrow 24px，无选区不 mutate", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(keydown).toContain('event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "ArrowLeft" || event.key === "ArrowRight"');
+    expect(keydown.indexOf("ArrowLeft")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(view).toContain("const step = event.shiftKey ? CANVAS_GRID_SIZE : 1;");
+    expect(view).toContain("if (!selected.length) return;");
+    expect(view).toContain("function nudgeSelectedCanvasNodes");
+    expect(view).toContain("applyPositionMap(changed);");
+  });
+
+  it("Delete/Backspace 优先删所选连线，否则卸钉；不启用 Vue Flow 默认删除", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(view).toContain(':delete-key-code="() => false"');
+    expect(keydown).toContain('event.key === "Delete" || event.key === "Backspace"');
+    expect(keydown.indexOf('event.key === "Delete" || event.key === "Backspace"')).toBeLessThan(keydown.indexOf("deleteSelectedDraftEdge()"));
+    expect(keydown.indexOf("deleteSelectedDraftEdge()")).toBeLessThan(keydown.indexOf("void togglePinnedNode(node.id)"));
+    expect(keydown).toContain("if (pinActionBusy.value || loading.value) return");
+    expect(keydown).toContain("isPinned(node.id)");
+  });
+
+  it("⌘A 全选当前 nodes，空图不 mutate，不抢 Shift+⌘A", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(keydown).toContain('!event.shiftKey && event.key.toLowerCase() === "a"');
+    expect(keydown.indexOf('event.key.toLowerCase() === "a"')).toBeLessThan(keydown.indexOf("selectAllCanvasNodes()"));
+    expect(view).toContain("function selectAllCanvasNodes");
+    expect(view).toContain("if (!nodes.value.length) return;");
+  });
+
+  it("Space 按下 pan-on-drag 含 0，松开回到中键/右键；输入框不切换", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(view).toContain(':pan-on-drag="panOnDragButtons"');
+    expect(view).toContain("const panOnDragButtons = computed(() => (spacePanHeld.value ? [0, 1, 2] : [1, 2]));");
+    expect(view).toContain("if (isSpaceKey(event))");
+    expect(view).toContain("spacePanHeld.value = true");
+    expect(view).toContain("function onCanvasKeyup");
+    expect(view).toContain('window.addEventListener("keyup", onCanvasKeyup)');
+    expect(view).not.toContain(':pan-on-drag="[1, 2]"');
+    expect(view).toContain("if (!editable)");
+  });
+
+  it("Escape 关弹层后再清节点选区，拖拽中不清选", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("if (event.key !== \"Escape\") return"));
+    expect(keydown).toContain("if (!isDragging.value) clearCanvasSelection()");
+    expect(view).toContain("function clearCanvasSelection");
+    expect(view).toContain("selected: false");
+    expect(view).toContain("if (!nodes.value.some((node) => node.selected)) return;");
+  });
+
+  it("Shift+⌘A 翻转 selected，空图不 mutate", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(keydown).toContain("event.shiftKey && event.key.toLowerCase() === \"a\"");
+    expect(keydown.indexOf("event.shiftKey && event.key.toLowerCase() === \"a\"")).toBeLessThan(keydown.indexOf("invertCanvasSelection()"));
+    expect(view).toContain("function invertCanvasSelection");
+    expect(view).toContain("selected: !node.selected");
+  });
+
+  it("Alt+Arrow 走 applyAlign，无 altKey 仍走微移", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(keydown).toContain("event.altKey");
+    expect(keydown.indexOf('applyAlign("left")')).toBeGreaterThan(keydown.indexOf("event.altKey"));
+    expect(keydown.indexOf('applyAlign("left")')).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes(-step, 0)"));
+    expect(keydown).toContain("&& !event.altKey");
+    expect(view).toContain("if (selected.length < 2) return;");
+  });
+
+  it("Alt+H/V 居中，Alt+Shift+H/V 均分", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(keydown).toContain('event.key.toLowerCase() === "h" || event.key.toLowerCase() === "v"');
+    expect(keydown.indexOf('event.key.toLowerCase() === "h" || event.key.toLowerCase() === "v"')).toBeLessThan(
+      keydown.indexOf('applyAlign(event.key.toLowerCase() === "h" ? "centerX" : "centerY")'),
+    );
+    expect(keydown).toContain('applyDistribute(event.key.toLowerCase() === "h" ? "x" : "y")');
+    expect(view).toContain("if (selected.length < 3) return;");
+  });
+
+  it("Shift+E/M/W 切连线/小地图/工作流，不抢 meta/ctrl 导演和弦", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(keydown).toContain('event.shiftKey');
+    expect(keydown).toContain('event.key.toLowerCase() === "e"');
+    expect(keydown.indexOf('event.key.toLowerCase() === "e"')).toBeLessThan(keydown.indexOf("toggleEdges()"));
+    expect(keydown.indexOf('event.key.toLowerCase() === "m"')).toBeLessThan(keydown.indexOf("toggleMiniMap()"));
+    expect(keydown.indexOf('event.key.toLowerCase() === "w"')).toBeLessThan(keydown.indexOf("toggleWorkspaceMode()"));
+    expect(view).toContain("function toggleMiniMap");
+    expect(view).toContain('data-testid="managed-canvas-toggle-minimap"');
+    expect(view).toContain('data-testid="managed-canvas-toggle-workspace-mode"');
+  });
+
+  it("Shift+T 时间线重排、Shift+Alt+T 强制；F5 走 refreshAll 且 preventDefault", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(keydown).toContain('event.key.toLowerCase() === "t"');
+    expect(keydown.indexOf("void applyTimelineLayout(false)")).toBeGreaterThan(keydown.indexOf('!event.altKey'));
+    expect(keydown).toContain("void applyTimelineLayout(true)");
+    expect(keydown).toContain('event.key === "F5"');
+    expect(keydown.indexOf('event.key === "F5"')).toBeLessThan(keydown.indexOf("void refreshAll()"));
+    expect(view).toContain('data-testid="managed-canvas-refresh"');
+  });
+
+  it("无修饰 C/A/L 开合连线、添加、素材库；F1 帮助；Shift+L 剧本资源", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(keydown).toContain('event.key.toLowerCase() === "c"');
+    expect(keydown.indexOf('event.key.toLowerCase() === "c"')).toBeLessThan(keydown.indexOf("toggleConnectMode()"));
+    expect(keydown).toContain('event.key === "F1"');
+    expect(keydown.indexOf('event.key === "F1"')).toBeLessThan(keydown.indexOf("toggleHelp()"));
+    expect(keydown).toContain('event.key.toLowerCase() === "a"');
+    expect(keydown.indexOf("toggleAddMenu()")).toBeGreaterThan(keydown.indexOf('event.key.toLowerCase() === "a"'));
+    expect(keydown.indexOf("void toggleGlobalResourceLibrary()")).toBeLessThan(keydown.lastIndexOf("void toggleLibrary()"));
+    expect(view).toContain("function toggleHelp");
+    expect(view).toContain("function toggleAddMenu");
+    expect(view).toContain('data-testid="managed-canvas-help"');
+  });
+
+  it("F6 核对来源、Shift+D 循环主题、⌘F 聚焦进度搜索、Enter 定位唯一命中", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(keydown).toContain('event.key === "F6"');
+    expect(keydown.indexOf('event.key === "F6"')).toBeLessThan(keydown.indexOf("void verifyLocalProductionSource()"));
+    expect(keydown).toContain('event.key.toLowerCase() === "d"');
+    expect(keydown.indexOf('event.key.toLowerCase() === "d"')).toBeLessThan(keydown.indexOf("cycleCanvasTheme()"));
+    expect(view).toContain("function cycleCanvasTheme");
+    expect(view).toContain("setCanvasTheme(nextId)");
+    expect(keydown).toContain('event.key.toLowerCase() === "f"');
+    expect(keydown.indexOf('event.key.toLowerCase() === "f"')).toBeLessThan(keydown.indexOf("focusTimelineProgressQuery()"));
+    expect(view).toContain('ref="timelineProgressQueryEl"');
+    expect(view).toContain('@keydown.enter.prevent="onTimelineSearchEnter"');
+    expect(view).toContain("void focusTimelineSearchResult()");
+    expect(view).toContain('event.key === "F5"');
+  });
+
+  it("F3/Shift+F3 循环命中，Enter 仍只定位唯一命中；查询框 Escape 先清查询再失焦", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(view).toContain("if (unitIds.length !== 1) return;");
+    expect(view).toContain("function cycleTimelineSearchHit");
+    expect(keydown).toContain('event.key === "F3"');
+    expect(keydown.indexOf('event.key === "F3"')).toBeLessThan(keydown.indexOf("cycleTimelineSearchHit(event.shiftKey ? -1 : 1)"));
+    expect(keydown).toContain("timelineProgressQuery.value = \"\"");
+    expect(keydown.indexOf("timelineProgressQuery.value = \"\"")).toBeLessThan(keydown.indexOf("timelineProgressQueryEl.value?.blur()"));
+    expect(keydown.indexOf("timelineProgressQueryEl.value?.blur()")).toBeLessThan(keydown.indexOf("closeViewMenu({ restore: false })"));
+    expect(keydown).toContain("rebuildGraph()");
+  });
+
+  it("查询框 Alt+Arrow 循环审片筛选；筛选 Escape 回查询框；[/] 循环宫格芯片", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(keydown).toContain('event.key === "ArrowDown" || event.key === "ArrowUp"');
+    expect(keydown.indexOf("inTimelineQuery")).toBeLessThan(keydown.indexOf("cycleTimelineProgressReview"));
+    expect(keydown.indexOf("cycleTimelineProgressReview")).toBeLessThan(keydown.indexOf('applyAlign("left")'));
+    expect(view).toContain("TIMELINE_PROGRESS_REVIEW_OPTIONS");
+    expect(keydown).toContain("[data-testid='managed-canvas-timeline-progress-review']");
+    expect(keydown.indexOf("timelineProgressQueryEl.value?.focus()")).toBeGreaterThan(keydown.indexOf("[data-testid='managed-canvas-timeline-progress-review']"));
+    expect(keydown).toContain('event.key === "[" || event.key === "]"');
+    expect(keydown.indexOf('event.key === "[" || event.key === "]"')).toBeLessThan(keydown.indexOf("cyclePanelTimelineChip"));
+    expect(view).toContain("void focusPanelOnCanvas");
+  });
+
+  it("Home/End 定位宫格首末芯片；条内 Arrow/Home/End/Page 只移焦", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const chipNavStart = view.indexOf("function movePanelTimelineChipFocus");
+    const chipNavEnd = view.indexOf("function focusPanelTimelineChipEnd");
+    const chipNav = view.slice(chipNavStart, chipNavEnd);
+    const n42Home = keydown.lastIndexOf('event.key === "Home" || event.key === "End"');
+    expect(view).toContain('role="toolbar"');
+    expect(view).toContain(':tabindex="panelTimelineActiveChipIndex === index ? 0 : -1"');
+    expect(keydown).toContain("[data-testid='managed-canvas-panel-timeline'] button");
+    expect(keydown.indexOf("movePanelTimelineChipFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("movePanelTimelineChipFocus")).toBeLessThan(keydown.indexOf("focusPanelTimelineChipEnd"));
+    expect(chipNav).toContain('key === "ArrowRight"');
+    expect(chipNav).toContain('key === "ArrowLeft"');
+    expect(chipNav).toContain('key === "Home"');
+    expect(chipNav).toContain('key === "End"');
+    expect(chipNav).toContain("Math.max(0, current - 10)");
+    expect(chipNav).toContain("Math.min(strip.length - 1, current + 10)");
+    expect(chipNav).not.toContain("focusPanelOnCanvas");
+    expect(keydown).toContain('event.key === "PageUp" || event.key === "PageDown"');
+    expect(keydown.indexOf('event.key === "PageUp" || event.key === "PageDown"')).toBeLessThan(keydown.indexOf("focusPanelTimelineChipEnd"));
+    expect(n42Home).toBeGreaterThan(keydown.indexOf("cyclePanelTimelineChip"));
+    expect(n42Home).toBeLessThan(keydown.indexOf("focusPanelTimelineChipEnd"));
+    expect(keydown.slice(n42Home - 280, n42Home)).toContain("!editable");
+    expect(keydown.slice(n42Home - 280, n42Home)).toContain("!event.shiftKey");
+    expect(view).toContain("void focusPanelOnCanvas(strip[index]!.panelId)");
+    const n45Page = keydown.lastIndexOf('event.key === "PageUp" || event.key === "PageDown"');
+    const jumper = view.slice(view.indexOf("function jumpPanelTimelineChipPage"), view.indexOf("function jumpUnitListPage"));
+    const unitJump = view.slice(view.indexOf("function jumpUnitListPage"), view.indexOf("async function pageUnitsByKeyboard"));
+    const pager = view.slice(view.indexOf("async function pageUnitsByKeyboard"), view.indexOf("const timelineProgressFilterResult"));
+    expect(n45Page).toBeGreaterThan(keydown.indexOf("focusPanelTimelineChipEnd"));
+    expect(keydown.slice(n45Page - 360, n45Page)).toContain("!editable");
+    expect(keydown.slice(n45Page - 360, n45Page)).toContain("!panelTimelineChip");
+    expect(keydown.slice(n45Page - 360, n45Page)).toContain("!unitListItem");
+    expect(n45Page).toBeLessThan(keydown.indexOf("jumpPanelTimelineChipPage"));
+    expect(jumper).toContain("Math.min(strip.length - 1, start + 10)");
+    expect(jumper).toContain("Math.max(0, start - 10)");
+    expect(jumper).toContain("void focusPanelOnCanvas(strip[next]!.panelId)");
+    expect(keydown).toContain(".unit-list .library-item");
+    expect(keydown.indexOf("pageUnitsByKeyboard")).toBeLessThan(keydown.indexOf("jumpUnitListPage"));
+    expect(keydown.indexOf("jumpUnitListPage")).toBeLessThan(keydown.indexOf("jumpPanelTimelineChipPage"));
+    expect(unitJump).toContain("void selectUnit(unit)");
+    expect(unitJump).toContain("Math.min(items.length - 1, current + 10)");
+    expect(unitJump).not.toContain("unitsNext");
+    expect(pager).toContain("await unitsNext()");
+    expect(pager).toContain("await unitsPrevious()");
+    expect(pager).toContain("if (loading.value) return");
+    const n47 = keydown.lastIndexOf("unitListOrPager");
+    expect(keydown.slice(n47, n47 + 280)).toContain("event.altKey");
+    expect(keydown.slice(n47, n47 + 420)).toContain("pageUnitsByKeyboard");
+  });
+
+  it("单元轨/素材窗/文稿列表 Arrow/Home/End 只移焦，不进 N15/N42", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const unitNav = view.slice(view.indexOf("function moveUnitListFocus"), view.indexOf("function moveAssetListFocus"));
+    const assetNav = view.slice(view.indexOf("function moveAssetListFocus"), view.indexOf("function moveTextListFocus"));
+    const textNav = view.slice(view.indexOf("function moveTextListFocus"), view.indexOf("function moveMediaListFocus"));
+    expect(view).toContain(':tabindex="unitListActiveIndex === index ? 0 : -1"');
+    expect(view).toContain(':tabindex="assetListActiveIndex === index ? 0 : -1"');
+    expect(view).toContain(':tabindex="textListActiveIndex === index ? 0 : -1"');
+    expect(keydown).toContain(".unit-list .library-item");
+    expect(keydown).toContain("[data-testid='managed-canvas-assets-virtual-viewport'] .library-item");
+    expect(keydown).toContain(".text-list .library-item");
+    expect(keydown).toContain('event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End"');
+    expect(keydown.indexOf("moveUnitListFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveAssetListFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveTextListFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveUnitListFocus")).toBeLessThan(keydown.indexOf("focusPanelTimelineChipEnd"));
+    expect(keydown.indexOf("movePanelTimelineChipFocus")).toBeLessThan(keydown.indexOf("moveUnitListFocus"));
+    expect(unitNav).not.toContain("selectUnit");
+    expect(assetNav).not.toContain("selectAsset");
+    expect(textNav).not.toContain("selection.value");
+    expect(view).toContain('key === "ArrowDown"');
+    expect(view).toContain('key === "ArrowUp"');
+    expect(view).toContain("[data-testid='managed-canvas-assets-virtual-viewport'] .library-item");
+  });
+
+  it("媒体库行 Arrow/Home/End 只移焦；媒体/素材 Alt+Page 翻页", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const mediaNav = view.slice(view.indexOf("function moveMediaListFocus"), view.indexOf("function moveAppearanceListFocus"));
+    const mediaPager = view.slice(view.indexOf("async function pageMediaByKeyboard"), view.indexOf("async function pageAssetsByKeyboard"));
+    const assetPager = view.slice(view.indexOf("async function pageAssetsByKeyboard"), view.indexOf("async function pageGlobalResourcesByKeyboard"));
+    expect(view).toContain(':tabindex="mediaListActiveIndex === index ? 0 : -1"');
+    expect(view).toContain('class="library-item media-library-item"');
+    expect(keydown).toContain(".media-library-item");
+    expect(keydown.indexOf("moveMediaListFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveTextListFocus")).toBeLessThan(keydown.indexOf("moveMediaListFocus"));
+    expect(mediaNav).not.toContain("togglePinnedNode");
+    expect(mediaNav).not.toContain("onLibraryDragStart");
+    expect(keydown).toContain("mediaListOrPager");
+    expect(keydown).toContain("assetListOrPager");
+    const n52 = keydown.lastIndexOf("mediaListOrPager");
+    expect(keydown.slice(n52, n52 + 280)).toContain("event.altKey");
+    expect(keydown.slice(n52, n52 + 420)).toContain("pageMediaByKeyboard");
+    const n53 = keydown.lastIndexOf("assetListOrPager");
+    expect(keydown.slice(n53, n53 + 280)).toContain("event.altKey");
+    expect(keydown.slice(n53, n53 + 420)).toContain("pageAssetsByKeyboard");
+    expect(keydown.indexOf("pageUnitsByKeyboard")).toBeLessThan(keydown.indexOf("pageMediaByKeyboard"));
+    expect(keydown.indexOf("pageMediaByKeyboard")).toBeLessThan(keydown.indexOf("pageAssetsByKeyboard"));
+    expect(mediaPager).toContain("await mediaNext()");
+    expect(mediaPager).toContain("await mediaPrevious()");
+    expect(mediaPager).toContain("if (loading.value) return");
+    expect(assetPager).toContain("await assetsNext()");
+    expect(assetPager).toContain("await assetsPrevious()");
+    expect(assetPager).not.toContain("unitsNext");
+  });
+
+  it("全局资源 Alt+Page 翻页，不抢 N47/N52/N53", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const globalPager = view.slice(
+      view.indexOf("async function pageGlobalResourcesByKeyboard"),
+      view.indexOf("async function pageAppearancesByKeyboard"),
+    );
+    expect(keydown).toContain("globalResourceListOrPager");
+    expect(keydown).toContain(".global-resource-card");
+    expect(keydown).toContain("[data-testid='managed-canvas-global-resources-prev']");
+    expect(keydown).toContain("[data-testid='managed-canvas-global-resources-next']");
+    const n54 = keydown.lastIndexOf("globalResourceListOrPager");
+    expect(keydown.slice(n54, n54 + 280)).toContain("event.altKey");
+    expect(keydown.slice(n54, n54 + 280)).toContain('event.key === "PageUp" || event.key === "PageDown"');
+    expect(keydown.slice(n54, n54 + 420)).toContain("pageGlobalResourcesByKeyboard");
+    expect(keydown.slice(n54, n54 + 280)).not.toContain("event.shiftKey &&");
+    expect(keydown.indexOf("pageAssetsByKeyboard")).toBeLessThan(keydown.indexOf("pageGlobalResourcesByKeyboard"));
+    expect(keydown.indexOf("pageGlobalResourcesByKeyboard")).toBeLessThan(keydown.indexOf("jumpUnitListPage"));
+    expect(globalPager).toContain("await globalResourcesNext()");
+    expect(globalPager).toContain("await globalResourcesPrevious()");
+    expect(globalPager).toContain("if (globalResourceLoading.value) return");
+    expect(globalPager).toContain(".global-resource-card");
+    expect(globalPager).not.toContain("unitsNext");
+    expect(globalPager).not.toContain("mediaNext");
+    expect(globalPager).not.toContain("assetsNext");
+    expect(globalPager).not.toContain("toggleGlobalResourceLibrary");
+    const n47 = keydown.lastIndexOf("unitListOrPager");
+    expect(keydown.slice(n47, n47 + 420)).toContain("pageUnitsByKeyboard");
+    expect(keydown.slice(n47, n47 + 420)).not.toContain("pageGlobalResourcesByKeyboard");
+  });
+
+  it("检查器出场 Alt+Page 翻页，不抢 N47/N52/N53/N54", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const appearancePager = view.slice(
+      view.indexOf("async function pageAppearancesByKeyboard"),
+      view.indexOf("const timelineProgressFilterResult"),
+    );
+    expect(keydown).toContain("appearanceListOrPager");
+    expect(keydown).toContain(".appearance-list button");
+    expect(keydown).toContain("[data-testid='managed-canvas-appearances-prev']");
+    expect(keydown).toContain("[data-testid='managed-canvas-appearances-next']");
+    const n55 = keydown.lastIndexOf("appearanceListOrPager");
+    expect(keydown.slice(n55, n55 + 280)).toContain("event.altKey");
+    expect(keydown.slice(n55, n55 + 280)).toContain('event.key === "PageUp" || event.key === "PageDown"');
+    expect(keydown.slice(n55, n55 + 420)).toContain("pageAppearancesByKeyboard");
+    expect(keydown.indexOf("pageGlobalResourcesByKeyboard")).toBeLessThan(keydown.indexOf("pageAppearancesByKeyboard"));
+    expect(keydown.indexOf("pageAppearancesByKeyboard")).toBeLessThan(keydown.indexOf("jumpUnitListPage"));
+    expect(appearancePager).toContain("await appearancesNext()");
+    expect(appearancePager).toContain("await appearancesPrevious()");
+    expect(appearancePager).toContain("if (loading.value) return");
+    expect(appearancePager).toContain('selection.value?.kind !== "asset"');
+    expect(appearancePager).not.toContain("focusAppearance");
+    expect(appearancePager).not.toContain("globalResourcesNext");
+    expect(appearancePager).not.toContain("unitsNext");
+    expect(appearancePager).not.toContain("mediaNext");
+    expect(appearancePager).not.toContain("assetsNext");
+    const n54 = keydown.lastIndexOf("globalResourceListOrPager");
+    expect(keydown.slice(n54, n54 + 420)).toContain("pageGlobalResourcesByKeyboard");
+    expect(keydown.slice(n54, n54 + 420)).not.toContain("pageAppearancesByKeyboard");
+  });
+
+  it("检查器出场行 Arrow/Home/End 只移焦，不进 N15/N55", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const inspector = source("src/renderer/src/components/CanvasInspectorPanel.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const appearanceNav = view.slice(
+      view.indexOf("function moveAppearanceListFocus"),
+      view.indexOf("function moveGlobalResourceListFocus"),
+    );
+    expect(inspector).toContain(':tabindex="appearanceListActiveIndex === index ? 0 : -1"');
+    expect(inspector).toContain(".appearance-list button");
+    expect(keydown).toContain("appearanceListItem");
+    expect(keydown).toContain(".appearance-list button");
+    expect(keydown.indexOf("moveAppearanceListFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveMediaListFocus")).toBeLessThan(keydown.indexOf("moveAppearanceListFocus"));
+    expect(keydown.indexOf("movePanelTimelineChipFocus")).toBeLessThan(keydown.indexOf("moveAppearanceListFocus"));
+    const n56 = keydown.lastIndexOf("appearanceListItem");
+    expect(keydown.slice(n56, n56 + 360)).toContain("!event.altKey");
+    expect(keydown.slice(n56, n56 + 360)).toContain('event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End"');
+    expect(keydown.slice(n56, n56 + 420)).toContain("moveAppearanceListFocus");
+    expect(appearanceNav).not.toContain("focusAppearance");
+    expect(appearanceNav).not.toContain("appearancesNext");
+    expect(appearanceNav).not.toContain("appearancesPrevious");
+    expect(appearanceNav).not.toContain("nudgeSelectedCanvasNodes");
+    const n55 = keydown.lastIndexOf("appearanceListOrPager");
+    expect(keydown.slice(n55, n55 + 420)).toContain("pageAppearancesByKeyboard");
+    expect(keydown.slice(n55, n55 + 420)).not.toContain("moveAppearanceListFocus");
+  });
+
+  it("全局资源卡 Arrow/Home/End 只移焦，不进 N15/N54", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const globalNav = view.slice(
+      view.indexOf("function moveGlobalResourceListFocus"),
+      view.indexOf("function moveNodeActionFocus"),
+    );
+    expect(view).toContain(':tabindex="globalResourceListActiveIndex === index ? 0 : -1"');
+    expect(view).toContain('class="global-resource-card"');
+    expect(keydown).toContain("globalResourceListItem");
+    expect(keydown.indexOf("moveGlobalResourceListFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveAppearanceListFocus")).toBeLessThan(keydown.indexOf("moveGlobalResourceListFocus"));
+    const n57 = keydown.lastIndexOf("globalResourceListItem");
+    expect(keydown.slice(n57, n57 + 360)).toContain("!event.altKey");
+    expect(keydown.slice(n57, n57 + 360)).toContain('event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End"');
+    expect(keydown.slice(n57, n57 + 420)).toContain("moveGlobalResourceListFocus");
+    expect(globalNav).not.toContain("openResourceCenter");
+    expect(globalNav).not.toContain("globalResourcesNext");
+    expect(globalNav).not.toContain("globalResourcesPrevious");
+    expect(globalNav).not.toContain("togglePinnedNode");
+    const n54 = keydown.lastIndexOf("globalResourceListOrPager");
+    expect(keydown.slice(n54, n54 + 420)).toContain("pageGlobalResourcesByKeyboard");
+    expect(keydown.slice(n54, n54 + 420)).not.toContain("moveGlobalResourceListFocus");
+  });
+
+  it("节点操作钮 Arrow/Home/End 只移焦可用项，不进 N15/N56/N57", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const inspector = source("src/renderer/src/components/CanvasInspectorPanel.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const actionNav = view.slice(
+      view.indexOf("function moveNodeActionFocus"),
+      view.indexOf("async function pageMediaByKeyboard"),
+    );
+    expect(inspector).toContain(':tabindex="action.enabled && nodeActionActiveIndex === index ? 0 : -1"');
+    expect(inspector).toContain(".node-action-buttons");
+    expect(keydown).toContain("nodeActionItem");
+    expect(keydown).toContain(".node-action-buttons button");
+    expect(keydown.indexOf("moveNodeActionFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveGlobalResourceListFocus")).toBeLessThan(keydown.indexOf("moveNodeActionFocus"));
+    const n58 = keydown.lastIndexOf("nodeActionItem");
+    expect(keydown.slice(n58, n58 + 360)).toContain("!event.altKey");
+    expect(keydown.slice(n58, n58 + 360)).toContain('event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End"');
+    expect(keydown.slice(n58, n58 + 420)).toContain("moveNodeActionFocus");
+    expect(actionNav).toContain("!el.disabled");
+    expect(actionNav).not.toContain("runNodeAction");
+    expect(actionNav).not.toContain("nudgeSelectedCanvasNodes");
+    expect(actionNav).not.toContain("focusAppearance");
+  });
+
+  it("素材库 tabs Arrow/Home/End 只移焦，不进 N15/N58", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const tabNav = view.slice(
+      view.indexOf("function moveLibraryTabFocus"),
+      view.indexOf("function moveGlobalResourceTabFocus"),
+    );
+    expect(view).toContain(':tabindex="libraryTabActiveIndex === index ? 0 : -1"');
+    expect(view).toContain("#managed-canvas-library .library-tabs button");
+    expect(keydown).toContain("libraryTabItem");
+    expect(keydown).toContain("#managed-canvas-library .library-tabs button");
+    expect(keydown.indexOf("moveLibraryTabFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveNodeActionFocus")).toBeLessThan(keydown.indexOf("moveLibraryTabFocus"));
+    const n59 = keydown.lastIndexOf("libraryTabItem");
+    expect(keydown.slice(n59, n59 + 360)).toContain("!event.altKey");
+    expect(keydown.slice(n59, n59 + 360)).toContain('event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End"');
+    expect(keydown.slice(n59, n59 + 420)).toContain("moveLibraryTabFocus");
+    expect(tabNav).not.toContain("openLibraryFor");
+    expect(tabNav).not.toContain("openGlobalResourcesFor");
+    expect(tabNav).not.toContain("nudgeSelectedCanvasNodes");
+    const n58Block = keydown.slice(keydown.lastIndexOf("nodeActionItem"), keydown.lastIndexOf("libraryTabItem"));
+    expect(n58Block).toContain("moveNodeActionFocus");
+    expect(n58Block).not.toContain("moveLibraryTabFocus");
+  });
+
+  it("全局资源 tabs Arrow/Home/End 只移焦可用项，不进 N15/N59", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const tabNav = view.slice(
+      view.indexOf("function moveGlobalResourceTabFocus"),
+      view.indexOf("function moveAddMenuFocus"),
+    );
+    expect(view).toContain(':tabindex="!globalResourceLoading && globalResourceTabActiveIndex === index ? 0 : -1"');
+    expect(view).toContain(".global-resource-tabs button");
+    expect(keydown).toContain("globalResourceTabItem");
+    expect(keydown.indexOf("moveGlobalResourceTabFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveLibraryTabFocus")).toBeLessThan(keydown.indexOf("moveGlobalResourceTabFocus"));
+    const n60 = keydown.lastIndexOf("globalResourceTabItem");
+    expect(keydown.slice(n60, n60 + 360)).toContain("!event.altKey");
+    expect(keydown.slice(n60, n60 + 360)).toContain('event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End"');
+    expect(keydown.slice(n60, n60 + 420)).toContain("moveGlobalResourceTabFocus");
+    expect(tabNav).toContain("!el.disabled");
+    expect(tabNav).not.toContain("openGlobalResourcesFor");
+    expect(tabNav).not.toContain("openLibraryFor");
+    expect(tabNav).not.toContain("nudgeSelectedCanvasNodes");
+    const n59Block = keydown.slice(keydown.lastIndexOf("libraryTabItem"), keydown.lastIndexOf("globalResourceTabItem"));
+    expect(n59Block).toContain("moveLibraryTabFocus");
+    expect(n59Block).not.toContain("moveGlobalResourceTabFocus");
+  });
+
+  it("添加菜单 Arrow/Home/End 只移焦，不进 N15/N29", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const menuNav = view.slice(
+      view.indexOf("function moveAddMenuFocus"),
+      view.indexOf("function moveFloatingToolbarFocus"),
+    );
+    const toggleAdd = view.slice(
+      view.indexOf("function toggleAddMenu"),
+      view.indexOf("function toggleConnectMode"),
+    );
+    expect(view).toContain(':tabindex="addMenuActiveIndex === index ? 0 : -1"');
+    expect(view).toContain("#managed-canvas-add-menu button");
+    expect(keydown).toContain("addMenuItem");
+    expect(keydown.indexOf("moveAddMenuFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveGlobalResourceTabFocus")).toBeLessThan(keydown.indexOf("moveAddMenuFocus"));
+    const n61 = keydown.lastIndexOf("addMenuItem");
+    expect(keydown.slice(n61, n61 + 420)).toContain("!event.altKey");
+    expect(keydown.slice(n61, n61 + 420)).toContain('event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End"');
+    expect(keydown.slice(n61, n61 + 480)).toContain("moveAddMenuFocus");
+    expect(menuNav).not.toContain("chooseAddKind");
+    expect(menuNav).not.toContain("nudgeSelectedCanvasNodes");
+    expect(toggleAdd).toContain("nextTick");
+    expect(toggleAdd).toContain("#managed-canvas-add-menu button");
+    expect(keydown.indexOf("toggleAddMenu()")).toBeGreaterThan(keydown.indexOf('event.key.toLowerCase() === "a"'));
+    const n60Block = keydown.slice(keydown.lastIndexOf("globalResourceTabItem"), keydown.lastIndexOf("addMenuItem"));
+    expect(n60Block).toContain("moveGlobalResourceTabFocus");
+    expect(n60Block).not.toContain("moveAddMenuFocus");
+  });
+
+  it("浮动工具栏 Arrow/Home/End 只移焦，不进 N15/N61", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const toolbarNav = view.slice(
+      view.indexOf("function moveFloatingToolbarFocus"),
+      view.indexOf("function moveBottomToolbarFocus"),
+    );
+    expect(view).toContain(':tabindex="floatingToolbarActiveIndex === 0 ? 0 : -1"');
+    expect(view).toContain(':tabindex="floatingToolbarActiveIndex === 4 ? 0 : -1"');
+    expect(keydown).toContain("floatingToolbarButton");
+    expect(keydown).toContain(".floating-tools > .add-menu-wrap > button");
+    expect(keydown).toContain(".floating-tools > button");
+    expect(keydown.indexOf("moveFloatingToolbarFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveAddMenuFocus")).toBeLessThan(keydown.indexOf("moveFloatingToolbarFocus"));
+    const n62 = keydown.lastIndexOf("floatingToolbarButton");
+    expect(keydown.slice(n62, n62 + 360)).toContain("!event.altKey");
+    expect(keydown.slice(n62, n62 + 360)).toContain('event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End"');
+    expect(keydown.slice(n62, n62 + 420)).toContain("moveFloatingToolbarFocus");
+    expect(toolbarNav).not.toContain("toggleAddMenu");
+    expect(toolbarNav).not.toContain("toggleLibrary");
+    expect(toolbarNav).not.toContain("toggleGlobalResourceLibrary");
+    expect(toolbarNav).not.toContain("toggleConnectMode");
+    expect(toolbarNav).not.toContain("toggleHelp");
+    expect(toolbarNav).not.toContain("nudgeSelectedCanvasNodes");
+    const n61Block = keydown.slice(keydown.lastIndexOf("addMenuItem"), keydown.lastIndexOf("floatingToolbarButton"));
+    expect(n61Block).toContain("moveAddMenuFocus");
+    expect(n61Block).not.toContain("moveFloatingToolbarFocus");
+  });
+
+  it("底部视图工具 Arrow/Home/End 只移焦可用项，不进 N15/N62", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const bottomNav = view.slice(
+      view.indexOf("function moveBottomToolbarFocus"),
+      view.indexOf("function viewMenuItemEnabledSlots"),
+    );
+    expect(view).toContain("bottomToolbarTabIndex(");
+    expect(view).toContain('data-testid="managed-canvas-undo" :disabled="!canUndoLayout || isDragging"');
+    expect(keydown).toContain("bottomToolbarButton");
+    expect(keydown).toContain(".bottom-tools > button");
+    expect(keydown).toContain(".bottom-tools .align-tools button");
+    expect(keydown.indexOf("moveBottomToolbarFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveFloatingToolbarFocus")).toBeLessThan(keydown.indexOf("moveBottomToolbarFocus"));
+    const n63 = keydown.lastIndexOf("bottomToolbarButton");
+    expect(keydown.slice(n63, n63 + 360)).toContain("!event.altKey");
+    expect(keydown.slice(n63, n63 + 360)).toContain('event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End"');
+    expect(keydown.slice(n63, n63 + 420)).toContain("moveBottomToolbarFocus");
+    expect(bottomNav).toContain("!el.disabled");
+    expect(bottomNav).not.toContain("fitCanvas");
+    expect(bottomNav).not.toContain("applyAlign");
+    expect(bottomNav).not.toContain("applyDistribute");
+    expect(bottomNav).not.toContain("undoLayout");
+    expect(bottomNav).not.toContain("toggleEdges");
+    expect(bottomNav).not.toContain("applyTimelineLayout");
+    const n62Block = keydown.slice(keydown.lastIndexOf("floatingToolbarButton"), keydown.lastIndexOf("bottomToolbarButton"));
+    expect(n62Block).toContain("moveFloatingToolbarFocus");
+    expect(n62Block).not.toContain("moveBottomToolbarFocus");
+  });
+
+  it("视图菜单项 Arrow/Home/End 只移焦可用项，不进 N15/N63", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const menuNav = view.slice(
+      view.indexOf("function moveViewMenuItemFocus"),
+      view.indexOf("function moveViewMenuThemeFocus"),
+    );
+    const toggleNav = view.slice(
+      view.indexOf("function onViewMenuToggle"),
+      view.indexOf("async function pageMediaByKeyboard"),
+    );
+    expect(view).toContain("viewMenuItemTabIndex(");
+    expect(view).toContain(".view-menu-pop > button");
+    expect(keydown).toContain("viewMenuPopItem");
+    expect(keydown.indexOf("moveViewMenuItemFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveBottomToolbarFocus")).toBeLessThan(keydown.indexOf("moveViewMenuItemFocus"));
+    const n64 = keydown.lastIndexOf("viewMenuPopItem");
+    expect(keydown.slice(n64, n64 + 360)).toContain("!event.altKey");
+    expect(keydown.slice(n64, n64 + 360)).toContain('event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End"');
+    expect(keydown.slice(n64, n64 + 420)).toContain("moveViewMenuItemFocus");
+    expect(menuNav).toContain("!el.disabled");
+    expect(menuNav).not.toContain("toggleMiniMap");
+    expect(menuNav).not.toContain("toggleWorkspaceMode");
+    expect(menuNav).not.toContain("refreshAll");
+    expect(menuNav).not.toContain("verifyLocalProductionSource");
+    expect(toggleNav).toContain("nextTick");
+    expect(toggleNav).toContain(".view-menu-pop > button");
+    const n63Block = keydown.slice(keydown.lastIndexOf("bottomToolbarButton"), keydown.lastIndexOf("viewMenuPopItem"));
+    expect(n63Block).toContain("moveBottomToolbarFocus");
+    expect(n63Block).not.toContain("moveViewMenuItemFocus");
+  });
+
+  it("视图主题 radio Arrow/Home/End 只移焦，不进 N15/N33/N64", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const themeNav = view.slice(
+      view.indexOf("function moveViewMenuThemeFocus"),
+      view.indexOf("function onViewMenuToggle"),
+    );
+    expect(view).toContain(':tabindex="viewMenuThemeActiveIndex === index ? 0 : -1"');
+    expect(view).toContain("setCanvasTheme(theme.id)");
+    expect(keydown).toContain("viewMenuThemeItem");
+    expect(keydown).toContain(".view-menu-theme > button[role='radio']");
+    expect(keydown.indexOf("moveViewMenuThemeFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveViewMenuItemFocus")).toBeLessThan(keydown.indexOf("moveViewMenuThemeFocus"));
+    const n65 = keydown.lastIndexOf("viewMenuThemeItem");
+    expect(keydown.slice(n65, n65 + 360)).toContain("!event.altKey");
+    expect(keydown.slice(n65, n65 + 360)).toContain('event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End"');
+    expect(keydown.slice(n65, n65 + 420)).toContain("moveViewMenuThemeFocus");
+    expect(themeNav).not.toContain("setCanvasTheme");
+    expect(themeNav).not.toContain("nudgeSelectedCanvasNodes");
+    const n64Block = keydown.slice(keydown.lastIndexOf("viewMenuPopItem"), keydown.lastIndexOf("viewMenuThemeItem"));
+    expect(n64Block).toContain("moveViewMenuItemFocus");
+    expect(n64Block).not.toContain("moveViewMenuThemeFocus");
+    expect(view).toContain("setCanvasTheme(nextId)");
+  });
+
+  it("受管画布 Vue Flow Controls Arrow/Home/End 只移焦，不进 N15/N9", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const controlsNav = view.slice(
+      view.indexOf("function moveManagedFlowControlsFocus"),
+      view.indexOf("function onManagedFlowControlsFocusIn"),
+    );
+    expect(view).toContain("#managed-studio-flow .vue-flow__controls-button");
+    expect(view).toContain("#control-fit-view");
+    expect(view).toContain("onFitViewControl");
+    expect(view).not.toContain("@fit-view=");
+    expect(keydown).toContain("managedFlowControlsButton");
+    expect(keydown.indexOf("moveManagedFlowControlsFocus")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveViewMenuThemeFocus")).toBeLessThan(keydown.indexOf("moveManagedFlowControlsFocus"));
+    const n66 = keydown.lastIndexOf("managedFlowControlsButton");
+    expect(keydown.slice(n66, n66 + 360)).toContain("!event.altKey");
+    expect(keydown.slice(n66, n66 + 360)).toContain('event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End"');
+    expect(keydown.slice(n66, n66 + 420)).toContain("moveManagedFlowControlsFocus");
+    expect(controlsNav).not.toContain("fitCanvas");
+    expect(controlsNav).not.toContain("onFitViewControl");
+    expect(controlsNav).not.toContain("onControlViewportChanged");
+    expect(controlsNav).not.toContain("nudgeSelectedCanvasNodes");
+    const n15 = keydown.lastIndexOf("nudgeSelectedCanvasNodes");
+    expect(keydown.slice(keydown.indexOf("managed-canvas-minimap"), n15)).toContain("#managed-studio-flow .vue-flow__controls-button");
+    const n65Block = keydown.slice(keydown.lastIndexOf("viewMenuThemeItem"), keydown.lastIndexOf("managedFlowControlsButton"));
+    expect(n65Block).toContain("moveViewMenuThemeFocus");
+    expect(n65Block).not.toContain("moveManagedFlowControlsFocus");
+  });
+
+  it("受管 MiniMap Arrow 平移视口，不进 N15/N23", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const pan = view.slice(
+      view.indexOf("function panCanvasFromMiniMap"),
+      view.indexOf("function miniMapNodeRects"),
+    );
+    expect(view).toContain('data-testid="managed-canvas-minimap"');
+    expect(view).toContain('tabindex="0"');
+    expect(keydown).toContain("miniMapSurface");
+    expect(keydown).toContain("[data-testid='managed-canvas-minimap']");
+    expect(keydown.indexOf("panCanvasFromMiniMap")).toBeLessThan(keydown.indexOf("nudgeSelectedCanvasNodes"));
+    expect(keydown.indexOf("moveManagedFlowControlsFocus")).toBeLessThan(keydown.indexOf("panCanvasFromMiniMap"));
+    const n69 = keydown.lastIndexOf("miniMapSurface");
+    expect(keydown.slice(n69, n69 + 360)).toContain("!event.altKey");
+    expect(keydown.slice(n69, n69 + 360)).toContain('event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "ArrowLeft" || event.key === "ArrowRight"');
+    expect(keydown.slice(n69, n69 + 420)).toContain("panCanvasFromMiniMap");
+    expect(pan).toContain("studioFlow.getViewport()");
+    expect(pan).toContain("studioFlow.setViewport");
+    expect(pan).not.toContain("toggleMiniMap");
+    expect(pan).not.toContain("zoomTo");
+    expect(pan).not.toContain("showMiniMap");
+    expect(pan).not.toContain("nudgeSelectedCanvasNodes");
+    expect(keydown.indexOf('event.key.toLowerCase() === "m"')).toBeLessThan(keydown.indexOf("toggleMiniMap()"));
+    const n66Block = keydown.slice(keydown.lastIndexOf("managedFlowControlsButton"), keydown.lastIndexOf("miniMapNode"));
+    expect(n66Block).toContain("moveManagedFlowControlsFocus");
+    expect(n66Block).not.toContain("panCanvasFromMiniMap");
+  });
+
+  it("帮助卡打开后焦关闭钮，Tab 不逃出，不抢 N28/N18", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const toggle = view.slice(
+      view.indexOf("function toggleHelp"),
+      view.indexOf("function toggleAddMenu"),
+    );
+    const close = view.slice(
+      view.indexOf("function closeHelp"),
+      view.indexOf("function toggleHelp"),
+    );
+    expect(view).toContain('#managed-canvas-help-card button[aria-label="关闭帮助"]');
+    expect(view).toContain("@click=\"closeHelp\"");
+    expect(toggle).toContain("nextTick");
+    expect(toggle).toContain("helpCloseButton()?.focus()");
+    expect(close).toContain("helpTriggerEl.value?.focus()");
+    expect(keydown).toContain('event.key === "Tab"');
+    expect(keydown).toContain("#managed-canvas-help-card");
+    const helpTab = keydown.indexOf("#managed-canvas-help-card");
+    expect(keydown.slice(helpTab - 160, helpTab + 220)).toContain("preventDefault");
+    expect(keydown.slice(helpTab - 160, helpTab + 220)).toContain("helpCloseButton");
+    expect(keydown.indexOf('event.key === "F1"')).toBeLessThan(keydown.indexOf("toggleHelp()"));
+    expect(keydown).toContain("if (helpWasOpen) helpTriggerEl.value?.focus()");
+  });
+
+  it("MiniMap 节点 data-node-id roving + Enter 选中，不进 N69/N15/连线", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const slot = view.slice(view.indexOf("#node-managedStudio"), view.indexOf("</MiniMap>"));
+    const move = view.slice(
+      view.indexOf("function moveMiniMapNodeFocus"),
+      view.indexOf("function selectCanvasNodeFromMiniMap"),
+    );
+    const select = view.slice(
+      view.indexOf("function selectCanvasNodeFromMiniMap"),
+      view.indexOf("function onControlViewportChanged"),
+    );
+    expect(slot).toContain(":data-node-id=");
+    expect(slot).toContain("{ id, position, dimensions, color, selected, dragging }");
+    expect(slot).not.toContain(' id="');
+    expect(slot).not.toContain(":id=");
+    expect(keydown).toContain("miniMapNode");
+    expect(keydown).toContain(".vue-flow__minimap-node");
+    expect(keydown.indexOf("moveMiniMapNodeFocus")).toBeLessThan(keydown.indexOf("panCanvasFromMiniMap"));
+    expect(keydown.indexOf("selectCanvasNodeFromMiniMap")).toBeLessThan(keydown.indexOf("spacePanHeld"));
+    const n71 = keydown.lastIndexOf("miniMapNode");
+    expect(keydown.slice(n71, n71 + 420)).toContain("!event.altKey");
+    expect(keydown.slice(n71, n71 + 420)).toContain("moveMiniMapNodeFocus");
+    expect(move).not.toContain("panCanvasFromMiniMap");
+    expect(move).not.toContain("nudgeSelectedCanvasNodes");
+    expect(select).toContain("studioFlow.setCenter");
+    expect(select).toContain("data-node-id");
+    expect(select).not.toContain("onNodeClick");
+    expect(select).not.toContain("onConnect");
+    const n71Block = keydown.slice(keydown.lastIndexOf("miniMapNode"), keydown.lastIndexOf("miniMapSurface"));
+    expect(n71Block).toContain("moveMiniMapNodeFocus");
+    expect(n71Block).not.toContain("panCanvasFromMiniMap");
+  });
+
+  it("连线横幅退出钮可 Tab，关闭后焦回连线钮，不改 status", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const toggleConnectMode = view.match(/function toggleConnectMode\(\): void \{([\s\S]*?)\n\}/u)?.[1] ?? "";
+    expect(view).toContain('v-if="connectMode" class="connect-banner" role="status"');
+    expect(view).toContain('data-testid="managed-canvas-connect-exit"');
+    expect(view).toContain("function restoreConnectTriggerFocus");
+    expect(view).toContain('[data-testid="managed-canvas-connect-mode"]');
+    expect(toggleConnectMode).toContain("stripPendingOutline(previousPendingId)");
+    expect(toggleConnectMode).toContain("restoreConnectTriggerFocus()");
+    expect(toggleConnectMode).not.toContain("rebuildGraph()");
+    expect(toggleConnectMode).not.toContain('workspaceMode.value = "workflow"');
+    expect(view).toContain("else if (connectWasOpen) restoreConnectTriggerFocus()");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(keydown.indexOf('event.key.toLowerCase() === "c"')).toBeLessThan(keydown.indexOf("toggleConnectMode()"));
+  });
+
+  it("检查器关闭钮可 Tab，关闭后焦回画布，不改成 dialog", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const inspector = source("src/renderer/src/components/CanvasInspectorPanel.vue");
+    const close = view.slice(
+      view.indexOf("function closeInspector"),
+      view.indexOf("function restoreInspectorFlowFocus"),
+    );
+    const restore = view.slice(
+      view.indexOf("function restoreInspectorFlowFocus"),
+      view.indexOf("function toggleConnectMode"),
+    );
+    expect(inspector).toContain('class="inspector-close"');
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-close"');
+    expect(inspector).toContain('<aside class="canvas-inspector" aria-label="画布节点详情">');
+    expect(inspector).not.toContain('role="dialog"');
+    expect(inspector).not.toContain("aria-modal");
+    expect(view).toContain('@close="closeInspector"');
+    expect(close).toContain("selection.value = null");
+    expect(restore).toContain("#managed-studio-flow");
+    expect(restore).toContain(".vue-flow__node[data-id=");
+    expect(inspector).toContain(':tabindex="appearanceListActiveIndex === index ? 0 : -1"');
+    expect(inspector).toContain(':tabindex="action.enabled && nodeActionActiveIndex === index ? 0 : -1"');
+  });
+
+  it("导演面板打开焦过滤框，Tab 不逃出，不覆盖 N18 帮助/添加归还", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const panel = source("src/renderer/src/components/DirectorActionPanel.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(panel).toContain('data-testid="director-action-panel"');
+    expect(panel).toContain('role="dialog"');
+    expect(panel).toContain('data-testid="director-panel-filter"');
+    expect(panel).toContain('data-testid="director-panel-close"');
+    expect(view).toContain("watch(directorPanelOpen");
+    expect(view).toContain('[data-testid="director-panel-filter"]');
+    expect(view).toContain("function toggleDirectorPanel");
+    expect(view).toContain("function closeDirectorPanel");
+    expect(view).toContain("restoreDirectorToggleFocus");
+    expect(keydown).toContain("[data-testid='director-action-panel']");
+    const directorTab = keydown.indexOf("[data-testid='director-action-panel']");
+    expect(keydown.slice(directorTab - 160, directorTab + 280)).toContain('event.key === "Tab"');
+    expect(keydown.slice(directorTab - 160, directorTab + 280)).toContain("moveDirectorPanelFocus");
+    expect(view).toContain("if (helpWasOpen) helpTriggerEl.value?.focus()");
+    expect(view).toContain("else if (addWasOpen) addTriggerEl.value?.focus()");
+    expect(view).toContain("else if (directorWasOpen) restoreDirectorToggleFocus()");
+  });
+
+  it("素材库/剧本资源关闭钮可 Tab，关闭后焦回开库钮，不改成 dialog", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const close = view.slice(
+      view.indexOf("function closeLibrary"),
+      view.indexOf("async function loadGlobalResources"),
+    );
+    expect(view).toContain('data-testid="managed-canvas-library-close"');
+    expect(view).toContain('data-testid="managed-canvas-global-library-close"');
+    expect(view).toContain('id="managed-canvas-library" class="canvas-library" aria-label="素材库"');
+    expect(view).toContain('id="managed-canvas-global-resource-library"');
+    expect(view).not.toContain('id="managed-canvas-library" class="canvas-library" aria-label="素材库" role="dialog"');
+    expect(close).toContain("managed-canvas-open-library");
+    expect(close).toContain("managed-canvas-open-global-resources");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(keydown.indexOf("void toggleLibrary()")).toBeGreaterThan(keydown.indexOf('event.key.toLowerCase() === "l"'));
+    expect(keydown.indexOf("void toggleGlobalResourceLibrary()")).toBeLessThan(keydown.lastIndexOf("void toggleLibrary()"));
+  });
+
+  it("错误横幅关闭钮可 Tab，关闭后焦回画布，Escape 不清错误", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const close = view.slice(
+      view.indexOf("function closeCanvasError"),
+      view.indexOf("function restoreInspectorFlowFocus"),
+    );
+    expect(view).toContain('class="canvas-error" role="alert"');
+    expect(view).toContain('data-testid="managed-canvas-error-close"');
+    expect(view).toContain('@click="closeCanvasError"');
+    expect(close).toContain('errorMessage.value = ""');
+    expect(close).toContain("restoreInspectorFlowFocus()");
+    expect(close).not.toContain("role=\"dialog\"");
+    const n18 = keydown.slice(
+      keydown.lastIndexOf('if (event.key !== "Escape") return'),
+      keydown.indexOf("function invalidateCanvasRequests"),
+    );
+    expect(n18).toContain("resetClearConfirmation()");
+    expect(n18).not.toContain("errorMessage");
+    expect(n18).toContain("if (helpWasOpen) helpTriggerEl.value?.focus()");
+  });
+
+  it("清空二次确认后焦回画布，无 window.confirm，不抢 N18", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const clear = view.slice(
+      view.indexOf("function clearWorkflowCanvas"),
+      view.indexOf("async function loadPanelPipeline"),
+    );
+    expect(view).toContain('data-testid="managed-canvas-clear-view"');
+    expect(view).toContain('aria-live="polite"');
+    expect(clear).toContain("if (!clearConfirmationArmed.value)");
+    expect(clear).toContain("workspaceMode.value = \"projection\"");
+    expect(clear).toContain("restoreInspectorFlowFocus()");
+    expect(clear).not.toContain("window.confirm");
+    expect(clear.indexOf("if (!clearConfirmationArmed.value)")).toBeLessThan(clear.indexOf("workflowGroups.value = []"));
+    expect(clear.indexOf("workflowGroups.value = []")).toBeLessThan(clear.indexOf("restoreInspectorFlowFocus()"));
+    expect(keydown).toContain("resetClearConfirmation()");
+    expect(keydown).not.toContain("clearWorkflowCanvas()");
+  });
+
+  it("帮助关闭钮含 testid，click 仍归还触发钮，不抢 N70/N18", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const close = view.slice(
+      view.indexOf("function closeHelp"),
+      view.indexOf("function toggleHelp"),
+    );
+    expect(view).toContain('data-testid="managed-canvas-help-close"');
+    expect(view).toContain('#managed-canvas-help-card button[aria-label="关闭帮助"]');
+    expect(close).toContain("helpOpen.value = false");
+    expect(close).toContain("helpTriggerEl.value?.focus()");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    expect(keydown.indexOf('event.key === "F1"')).toBeLessThan(keydown.indexOf("toggleHelp()"));
+    expect(keydown).toContain("if (helpWasOpen) helpTriggerEl.value?.focus()");
+  });
+
+  it("视图菜单关闭后焦回 summary，帮助/添加归还优先", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(view.indexOf("function onCanvasKeydown"));
+    const close = view.slice(
+      view.indexOf("function closeViewMenu"),
+      view.indexOf("function onGlobalPointerDown"),
+    );
+    expect(view).toContain('data-testid="managed-canvas-view-menu"');
+    expect(view).toContain('<summary data-testid="managed-canvas-view-menu" aria-label="视图选项">');
+    expect(close).toContain('viewMenuEl.value?.removeAttribute("open")');
+    expect(close).toContain("restoreViewMenuSummaryFocus()");
+    expect(view).toContain("closeViewMenu()");
+    expect(keydown).toContain("const viewMenuWasOpen");
+    expect(keydown).toContain("closeViewMenu({ restore: false })");
+    expect(keydown).toContain("else if (viewMenuWasOpen) restoreViewMenuSummaryFocus()");
+    expect(keydown.indexOf("if (helpWasOpen) helpTriggerEl.value?.focus()")).toBeLessThan(keydown.indexOf("else if (addWasOpen) addTriggerEl.value?.focus()"));
+    expect(keydown.indexOf("else if (addWasOpen) addTriggerEl.value?.focus()")).toBeLessThan(keydown.indexOf("else if (viewMenuWasOpen) restoreViewMenuSummaryFocus()"));
+    expect(view).toContain("function onViewMenuToggle");
+    expect(keydown).toContain(".view-menu-pop > button");
+  });
+
+  it("画布诊断 details 可键盘开合，不改成 dialog，不扩 N18", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const keydown = view.slice(
+      view.indexOf("function onCanvasKeydown"),
+      view.indexOf("function invalidateCanvasRequests"),
+    );
+    expect(view).toContain('class="flow-caption technical-diagnostics"');
+    expect(view).toContain('data-testid="managed-canvas-diagnostics"');
+    expect(view).toContain('data-testid="managed-canvas-dom-counts"');
+    expect(view).not.toContain('class="flow-caption technical-diagnostics" role="dialog"');
+    expect(keydown).not.toContain("managed-canvas-diagnostics");
+    expect(keydown).toContain("closeViewMenu({ restore: false })");
+  });
+
+  it("检查器诊断 details 可键盘开合，不关检查器，不改成 dialog", () => {
+    const inspector = source("src/renderer/src/components/CanvasInspectorPanel.vue");
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(inspector).toContain('class="technical-diagnostics inspector-diagnostics"');
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-diagnostics"');
+    expect(inspector).not.toContain('role="dialog"');
+    expect(inspector).toContain('<aside class="canvas-inspector" aria-label="画布节点详情">');
+    expect(view).toContain('@close="closeInspector"');
+    expect(view).toContain('data-testid="managed-canvas-diagnostics"');
+    expect(inspector).not.toContain("managed-canvas-diagnostics");
+  });
+
+  it("画布详细诊断 summary 含 testid，不抢 N80，不改 metrics open", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(view).toContain('data-testid="managed-canvas-diagnostics-detail"');
+    expect(view).toContain('data-testid="managed-canvas-detailed-diagnostics"');
+    expect(view).toContain('<summary data-testid="managed-canvas-detailed-diagnostics">详细诊断</summary>');
+    expect(view).toContain('<summary data-testid="managed-canvas-diagnostics">诊断详情</summary>');
+    expect(view).toContain('data-testid="managed-canvas-metrics" open');
+    expect(view).not.toContain("managed-canvas-detailed-diagnostics-");
+    expect(view).not.toContain('diagnostics-detail" role="dialog"');
+  });
+
+  it("画布项目概览 summary 含 testid，metrics 仍默认展开", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(view).toContain('class="canvas-metrics technical-diagnostics"');
+    expect(view).toContain('data-testid="managed-canvas-metrics"');
+    expect(view).toContain('data-testid="managed-canvas-metrics-summary"');
+    expect(view).toContain('<summary data-testid="managed-canvas-metrics-summary">项目概览</summary>');
+    expect(view).toContain('data-testid="managed-canvas-metrics" open');
+    expect(view).toContain('data-testid="managed-canvas-detailed-diagnostics"');
+    expect(view).not.toContain("managed-canvas-metrics-summary-");
+  });
+
+  it("画布高级操作 summary 含 testid，不改工作流 toolbar", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(view).toContain('class="advanced-workflow"');
+    expect(view).toContain('data-testid="managed-canvas-advanced-workflow"');
+    expect(view).toContain('<summary data-testid="managed-canvas-advanced-workflow">高级操作</summary>');
+    expect(view).toContain('data-testid="managed-canvas-workflow-toolbar"');
+    expect(view).toContain('data-testid="managed-canvas-create-workflow"');
+    expect(view).toContain('data-testid="managed-canvas-run-workflow"');
+    expect(view).not.toContain("managed-canvas-advanced-workflow-");
+    expect(view).not.toContain('advanced-workflow" role="dialog"');
+    expect(view).toContain('data-testid="managed-canvas-diagnostics"');
   });
 });

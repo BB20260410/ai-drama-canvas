@@ -11,6 +11,7 @@ import {
 } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   executeIdempotentCommand,
@@ -18,6 +19,7 @@ import {
   listCommandLedger,
   type IdempotentCommandInput,
 } from "../src/core/command-bus.js";
+import { __setBeforeCommandLedgerWritableOpenHookForTests } from "../src/core/command-ledger-store.js";
 import {
   createAuthorizedNovelImportPreflight,
   resetNovelImportPreflightAuthorizationsForTests,
@@ -25,7 +27,7 @@ import {
 import { NovelRepository } from "../src/core/novel-manuscript.js";
 import type { NovelCommandRequest } from "../src/core/novel-command-runtime.js";
 import { runWithOperationContext } from "../src/core/operation-context.js";
-import { listRegisteredProjects } from "../src/core/sidecar.js";
+import { listEvents, listRegisteredProjects } from "../src/core/sidecar.js";
 
 const temporaryRoots: string[] = [];
 const previousRegistryPath = process.env.AI_CANVAS_REGISTRY_PATH;
@@ -162,6 +164,7 @@ function envelope(label: string, request: NovelCommandRequest, idempotencyKey = 
 afterEach(async () => {
   delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE;
   delete process.env.AI_CANVAS_TEST_NOVEL_IMPORT_INTERRUPT;
+  __setBeforeCommandLedgerWritableOpenHookForTests(null);
   resetNovelImportPreflightAuthorizationsForTests();
   if (previousRegistryPath === undefined) delete process.env.AI_CANVAS_REGISTRY_PATH;
   else process.env.AI_CANVAS_REGISTRY_PATH = previousRegistryPath;
@@ -285,6 +288,88 @@ describe.sequential("novel import command owner", () => {
     expect(recovered.result).toMatchObject({ replayed: true });
     expect(recovered.result).not.toHaveProperty("projectRoot");
     expect(absoluteStrings(recovered.result)).toEqual([]);
+  });
+
+  it("registered 闭包完成但 anchor 账本被持续锁时，存活进程同键只凭完整 proof 收敛且不重做导入", async () => {
+    const data = await fixture("terminal-lock-live-proof");
+    const request = await importRequest(data.projectsRoot, data.sourcePath);
+    const idempotencyKey = "novel-import-idempotency-terminal-lock-live-proof";
+    let lockOwner: DatabaseSync | undefined;
+    __setBeforeCommandLedgerWritableOpenHookForTests(() => {
+      __setBeforeCommandLedgerWritableOpenHookForTests(({ databasePath }) => {
+        lockOwner = new DatabaseSync(databasePath);
+        lockOwner.exec("BEGIN IMMEDIATE");
+      });
+    });
+    let failure: unknown;
+    try {
+      failure = await executeIdempotentCommand(
+        data.ownerRoot,
+        envelope("terminal-lock-live-proof-a", request, idempotencyKey),
+        { deadlineAtMs: Date.now() + 450 },
+      ).catch((error: unknown) => error);
+    } finally {
+      lockOwner?.exec("ROLLBACK");
+      lockOwner?.close();
+    }
+    expect(failure).toMatchObject({
+      code: "OUTCOME_UNKNOWN",
+      reconciliationRequired: true,
+    });
+    const stranded = (await listCommandLedger(data.ownerRoot))[0];
+    expect(stranded).toMatchObject({
+      status: "running",
+      execution: { pid: process.pid, phase: "executing" },
+    });
+    expect(stranded?.novelImportResultAnchor).toBeUndefined();
+    expect((await listEvents(data.ownerRoot, 200)).filter((event) =>
+      event.type === "command.side-effect-committed"
+      && event.idempotencyKey === idempotencyKey)).toHaveLength(0);
+
+    resetNovelImportPreflightAuthorizationsForTests();
+    await rm(data.sourceRoot, { recursive: true, force: true });
+    const tokenless: NovelCommandRequest = {
+      ...request,
+      payload: { ...request.payload, preflightAuthorization: undefined },
+    };
+    const projectsBeforeRecovery = await treeIdentity(data.projectsRoot);
+    const recovered = await executeIdempotentCommand(
+      data.ownerRoot,
+      envelope("terminal-lock-live-proof-b", tokenless, idempotencyKey),
+      { waitForRunningMs: 2_000 },
+    );
+    expect(recovered).toMatchObject({
+      status: "succeeded",
+      replayed: true,
+      novelImportResultAnchor: { kind: "novel-import-result-anchor" },
+      result: { replayed: true },
+    });
+    expect(recovered.result).not.toHaveProperty("projectRoot");
+    expect(absoluteStrings(recovered.result)).toEqual([]);
+    expect(await treeIdentity(data.projectsRoot)).toBe(projectsBeforeRecovery);
+    const recoveredLedger = await listCommandLedger(data.ownerRoot);
+    expect(recoveredLedger).toHaveLength(1);
+    expect(recoveredLedger[0]).toMatchObject({
+      status: "succeeded",
+      novelImportResultAnchor: { kind: "novel-import-result-anchor" },
+      result: { schemaVersion: 1, kind: "novel-import-result-locator" },
+    });
+    const persistedResult = JSON.stringify(recoveredLedger[0]?.result);
+    expect(persistedResult).not.toContain("sourceRelativePath");
+    expect(persistedResult).not.toContain("objectRelativePath");
+    expect(persistedResult).not.toContain('"chapters"');
+    expect((await readdir(data.projectsRoot, { withFileTypes: true }))
+      .filter((entry) => entry.isDirectory() && entry.name !== ".aicanvas-novel-import-transactions"))
+      .toHaveLength(1);
+    const events = await listEvents(data.ownerRoot, 300);
+    expect(events.filter((event) => event.type === "command.started"
+      && event.idempotencyKey === idempotencyKey)).toHaveLength(1);
+    expect(events.filter((event) => event.type === "command.side-effect-committed"
+      && event.idempotencyKey === idempotencyKey)).toHaveLength(0);
+    const reconciled = events.filter((event) => event.type === "command.reconciled"
+      && event.idempotencyKey === idempotencyKey);
+    expect(reconciled).toHaveLength(1);
+    expect(reconciled[0]?.data?.evidenceSource).toBe("novel_import_receipts");
   });
 
   it("registered 中断前从未产生成功锚点时，可由完整闭包首次建立锚点并无源恢复", async () => {

@@ -8,6 +8,7 @@ import type { Readable } from "node:stream";
 import sharp from "sharp";
 import { afterEach, describe, expect, it } from "vitest";
 import {
+  __setAfterManagedPathFinalLstatHookForTests,
   getStudioMediaVerificationCacheDiagnostics,
   openStudioMediaStream,
   resolveStudioMediaRequest,
@@ -21,6 +22,7 @@ const roots: string[] = [];
 const VIDEO_PROXY_RECIPE = "studio-video-proxy:v1:max-1280x720:h264-crf28-aac128k-faststart";
 
 afterEach(async () => {
+  __setAfterManagedPathFinalLstatHookForTests(undefined);
   await Promise.all(roots.splice(0).map(async (root) => {
     await chmod(root, 0o700).catch(() => undefined);
     await rm(root, { recursive: true, force: true });
@@ -112,9 +114,10 @@ async function readyVideoProxy(root: string, sizeBytes: number): Promise<{
   return { recipeKey, mediaSha256: imported.sha256, derivativePath, outputSha256: output.sha256 };
 }
 
-function expectProtocolError(error: unknown, code: string): boolean {
+function expectProtocolError(error: unknown, code: string, message?: string): boolean {
   expect(error).toBeInstanceOf(StudioMediaProtocolError);
   expect((error as StudioMediaProtocolError).code).toBe(code);
+  if (message !== undefined) expect((error as StudioMediaProtocolError).message).toBe(message);
   return true;
 }
 
@@ -254,6 +257,74 @@ describe("素材库安全媒体读取协议", () => {
     await symlink(await mediaFile(root, "forbidden-shm", "not-a-sqlite-sidecar"), companion);
     await expect(resolveStudioMediaRequest(root, { thumbnailRecipeKey: imported.thumbnail!.recipeKey }))
       .rejects.toSatisfy((error: unknown) => expectProtocolError(error, "INTEGRITY_VIOLATION"));
+  });
+
+  it("WAL/SHM 可在 final lstat 后正常变动；消失允许，链接/目录/主库替换仍拒绝", async () => {
+    const root = await project();
+    const imported = await importStudioMedia(root, { sourcePath: await imageFile(root, "toctou-thumbnail.png") });
+    const canonicalRoot = await realpath(root);
+    const databasePath = path.join(canonicalRoot, ".aicanvas", "material-studio.sqlite");
+    const companion = path.join(canonicalRoot, ".aicanvas", "material-studio.sqlite-wal");
+    const walWriter = new DatabaseSync(databasePath);
+    walWriter.exec("PRAGMA journal_mode=WAL; PRAGMA user_version=41;");
+    let mutableWalHookHit = false;
+    __setAfterManagedPathFinalLstatHookForTests(async ({ candidate, label }) => {
+      if (candidate !== companion || label !== "素材库伴随文件") return false;
+      mutableWalHookHit = true;
+      // 真实 SQLite writer 在同一 lstat→realpath 窗口追加 WAL；这不是替换攻击。
+      walWriter.exec("PRAGMA user_version=42;");
+      return true;
+    });
+    try {
+      await expect(resolveStudioMediaRequest(root, { thumbnailRecipeKey: imported.thumbnail!.recipeKey }))
+        .resolves.toMatchObject({ status: 200, target: "thumbnail" });
+      expect(mutableWalHookHit).toBe(true);
+    } finally {
+      walWriter.close();
+    }
+
+    await writeFile(companion, "transient-wal");
+    __setAfterManagedPathFinalLstatHookForTests(async ({ candidate, label }) => {
+      if (candidate !== companion || label !== "素材库伴随文件") return false;
+      await rm(companion);
+      return true;
+    });
+    await expect(resolveStudioMediaRequest(root, { thumbnailRecipeKey: imported.thumbnail!.recipeKey }))
+      .resolves.toMatchObject({ status: 200, target: "thumbnail" });
+
+    const danglingTarget = path.join(canonicalRoot, ".aicanvas", "missing-database-target");
+    __setAfterManagedPathFinalLstatHookForTests(async ({ candidate, label }) => {
+      if (candidate !== databasePath || label !== "素材库数据库") return false;
+      await rm(databasePath);
+      await symlink(danglingTarget, databasePath);
+      return true;
+    });
+    await expect(resolveStudioMediaRequest(root, { thumbnailRecipeKey: imported.thumbnail!.recipeKey }))
+      .rejects.toSatisfy((error: unknown) => expectProtocolError(error, "INTEGRITY_VIOLATION", "素材库数据库 不能是符号链接。"));
+
+    const directoryRoot = await project();
+    const directoryImported = await importStudioMedia(directoryRoot, { sourcePath: await imageFile(directoryRoot, "toctou-directory-thumbnail.png") });
+    const directoryDatabase = path.join(await realpath(directoryRoot), ".aicanvas", "material-studio.sqlite");
+    __setAfterManagedPathFinalLstatHookForTests(async ({ candidate, label }) => {
+      if (candidate !== directoryDatabase || label !== "素材库数据库") return false;
+      await rm(directoryDatabase);
+      await mkdir(directoryDatabase);
+      return true;
+    });
+    await expect(resolveStudioMediaRequest(directoryRoot, { thumbnailRecipeKey: directoryImported.thumbnail!.recipeKey }))
+      .rejects.toSatisfy((error: unknown) => expectProtocolError(error, "INTEGRITY_VIOLATION", "素材库数据库 必须是普通文件。"));
+
+    const replacementRoot = await project();
+    const replacementImported = await importStudioMedia(replacementRoot, { sourcePath: await imageFile(replacementRoot, "toctou-replacement-thumbnail.png") });
+    const replacementDatabase = path.join(await realpath(replacementRoot), ".aicanvas", "material-studio.sqlite");
+    __setAfterManagedPathFinalLstatHookForTests(async ({ candidate, label }) => {
+      if (candidate !== replacementDatabase || label !== "素材库数据库") return false;
+      await rm(replacementDatabase);
+      await writeFile(replacementDatabase, "replacement-not-the-verified-sqlite");
+      return true;
+    });
+    await expect(resolveStudioMediaRequest(replacementRoot, { thumbnailRecipeKey: replacementImported.thumbnail!.recipeKey }))
+      .rejects.toSatisfy((error: unknown) => expectProtocolError(error, "INTEGRITY_VIOLATION", "素材库数据库 在安全解析期间发生变化。"));
   });
 
   it("未知 SHA 与伪造绝对路径描述都不能成为文件读取入口", async () => {

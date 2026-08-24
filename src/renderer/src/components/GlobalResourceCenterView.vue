@@ -1017,6 +1017,8 @@ function message(reason: unknown): string {
   overflow: hidden;
   border: 1px solid var(--grc-border);
   background: var(--grc-surface-2);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 152px;
 }
 .resource-card > figure {
   display: grid;

@@ -17,6 +17,7 @@ import {
   type SqliteSourceBindingIdentity,
 } from "./sqlite-readonly-snapshot.js";
 import { assertSqliteSchemaContract } from "./sqlite-schema-contract.js";
+import { withStudioGenerationLedgerReadOnlySnapshot } from "./studio-generation-ledger-storage.js";
 import {
   initializeStudioGenerationLedger,
   isStudioGenerationUnknownOwnerAbandonDetail,
@@ -32,10 +33,30 @@ import {
 } from "./studio-generation-review.js";
 
 const DATABASE_RELATIVE_PATH = ".aicanvas/studio-generation-ledger.sqlite";
-const CHECKPOINT_SCHEMA_VERSION = 1;
+const CHECKPOINT_SCHEMA_VERSION = 3;
+// schema 1 的 operation receipt 没有不可变历史 head_revision。
+// v1/v2→v3 迁移中，v1 旧行只记为 NULL、v2 既有锚原样保留；绝不从
+// live Head 猜历史锚。v3 新行由
+// BEFORE INSERT trigger 强制 head_revision 非空。
 const CHECKPOINT_MEMBER_COUNT = 6;
 const BUSY_TIMEOUT_MS = 5_000;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/u;
+let beforeCheckpointSchemaPromotionHookForTests: (() => void) | null = null;
+let beforeCheckpointSchemaWritableOpenHookForTests: (() => void) | null = null;
+
+export function __setBeforeCheckpointSchemaPromotionHookForTests(hook: (() => void) | null): void {
+  if (process.env.NODE_ENV !== "test") {
+    throw new Error("checkpoint schema promotion test hook is only available under NODE_ENV=test");
+  }
+  beforeCheckpointSchemaPromotionHookForTests = hook;
+}
+
+export function __setBeforeCheckpointSchemaWritableOpenHookForTests(hook: (() => void) | null): void {
+  if (process.env.NODE_ENV !== "test") {
+    throw new Error("checkpoint schema writable-open test hook is only available under NODE_ENV=test");
+  }
+  beforeCheckpointSchemaWritableOpenHookForTests = hook;
+}
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,254}$/u;
 
 export type StudioGenerationCheckpointErrorCode =
@@ -386,6 +407,7 @@ interface OperationReceiptRow {
   outcome_kind: "checkpoint" | "attestation";
   outcome_id: string;
   outcome_fingerprint: string;
+  head_revision: number | null;
   created_at: string;
 }
 
@@ -463,6 +485,11 @@ function parsedJson<T>(value: string, label: string): T {
   }
 }
 
+function isCanonicalIsoTimestamp(value: string): boolean {
+  const milliseconds = Date.parse(value);
+  return Number.isFinite(milliseconds) && new Date(milliseconds).toISOString() === value;
+}
+
 interface CheckpointDatabaseContext {
   databasePath: string;
   readonly sourceIdentity: SqliteSourceBindingIdentity;
@@ -503,7 +530,18 @@ function tableExists(db: DatabaseSync, name: string): boolean {
   return Boolean(db.prepare("SELECT 1 AS found FROM sqlite_master WHERE type='table' AND name=?").get(name));
 }
 
-function createSchema(db: DatabaseSync): void {
+function createSchema(db: DatabaseSync, schemaVersion: 1 | 2 | 3 = CHECKPOINT_SCHEMA_VERSION): void {
+  const receiptHeadRevisionColumn = schemaVersion === 1
+    ? ""
+    : schemaVersion === 2
+      ? "head_revision INTEGER NOT NULL CHECK(head_revision >= 1),"
+      : "head_revision INTEGER CHECK(head_revision IS NULL OR head_revision >= 1),";
+  const receiptHeadRevisionTrigger = schemaVersion !== 3 ? "" : `
+    CREATE TRIGGER studio_generation_checkpoint_receipts_require_head_revision
+      BEFORE INSERT ON studio_generation_checkpoint_operation_receipts
+      WHEN NEW.head_revision IS NULL
+      BEGIN SELECT RAISE(ABORT, 'generation checkpoint receipt head revision is required'); END;
+  `;
   db.exec(`
     CREATE TABLE studio_generation_checkpoint_snapshots (
       sequence INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -562,6 +600,7 @@ function createSchema(db: DatabaseSync): void {
       outcome_kind TEXT NOT NULL CHECK(outcome_kind IN ('checkpoint', 'attestation')),
       outcome_id TEXT NOT NULL,
       outcome_fingerprint TEXT NOT NULL CHECK(length(outcome_fingerprint) = 64),
+      ${receiptHeadRevisionColumn}
       created_at TEXT NOT NULL
     ) STRICT;
 
@@ -588,6 +627,7 @@ function createSchema(db: DatabaseSync): void {
     CREATE TRIGGER studio_generation_checkpoint_receipts_no_delete
       BEFORE DELETE ON studio_generation_checkpoint_operation_receipts
       BEGIN SELECT RAISE(ABORT, 'generation checkpoint receipts are append-only'); END;
+    ${receiptHeadRevisionTrigger}
     CREATE TRIGGER studio_generation_checkpoint_heads_no_delete
       BEFORE DELETE ON studio_generation_checkpoint_heads
       BEGIN SELECT RAISE(ABORT, 'generation checkpoint heads cannot be deleted'); END;
@@ -597,30 +637,45 @@ function createSchema(db: DatabaseSync): void {
   `);
 }
 
-const CHECKPOINT_TABLE_COLUMNS: Record<string, string[]> = {
-  studio_generation_checkpoint_snapshots: [
-    "sequence", "checkpoint_id", "batch_number", "members_json", "eligible_for_pass", "blockers_json",
-    "fingerprint", "created_at",
-  ],
-  studio_generation_checkpoint_heads: [
-    "batch_number", "revision", "checkpoint_id", "checkpoint_fingerprint", "updated_at",
-  ],
-  studio_generation_checkpoint_attestations: [
-    "sequence", "attestation_id", "batch_number", "checkpoint_id", "checkpoint_fingerprint", "decision",
-    "base_head_revision", "head_revision", "reviewer", "note", "fingerprint", "created_at",
-  ],
-  studio_generation_checkpoint_attestation_heads: [
-    "batch_number", "revision", "attestation_id", "attestation_fingerprint", "updated_at",
-  ],
-  studio_generation_checkpoint_operation_receipts: [
-    "operation_id", "operation_kind", "input_fingerprint", "outcome_kind", "outcome_id", "outcome_fingerprint", "created_at",
-  ],
-};
+const CHECKPOINT_OPERATION_RECEIPT_COLUMNS_V1 = [
+  "operation_id", "operation_kind", "input_fingerprint", "outcome_kind", "outcome_id", "outcome_fingerprint",
+  "created_at",
+] as const;
+const CHECKPOINT_OPERATION_RECEIPT_COLUMNS_V2 = [
+  "operation_id", "operation_kind", "input_fingerprint", "outcome_kind", "outcome_id", "outcome_fingerprint",
+  "head_revision", "created_at",
+] as const;
+
+function checkpointTableColumns(schemaVersion: 1 | 2 | 3): Record<string, string[]> {
+  return {
+    studio_generation_checkpoint_snapshots: [
+      "sequence", "checkpoint_id", "batch_number", "members_json", "eligible_for_pass", "blockers_json",
+      "fingerprint", "created_at",
+    ],
+    studio_generation_checkpoint_heads: [
+      "batch_number", "revision", "checkpoint_id", "checkpoint_fingerprint", "updated_at",
+    ],
+    studio_generation_checkpoint_attestations: [
+      "sequence", "attestation_id", "batch_number", "checkpoint_id", "checkpoint_fingerprint", "decision",
+      "base_head_revision", "head_revision", "reviewer", "note", "fingerprint", "created_at",
+    ],
+    studio_generation_checkpoint_attestation_heads: [
+      "batch_number", "revision", "attestation_id", "attestation_fingerprint", "updated_at",
+    ],
+    studio_generation_checkpoint_operation_receipts: [
+      ...(schemaVersion === 1
+        ? CHECKPOINT_OPERATION_RECEIPT_COLUMNS_V1
+        : CHECKPOINT_OPERATION_RECEIPT_COLUMNS_V2),
+    ],
+  };
+}
+
+const CHECKPOINT_TABLE_COLUMNS = checkpointTableColumns(CHECKPOINT_SCHEMA_VERSION);
 const CHECKPOINT_INDEXES = [
   "studio_generation_checkpoint_snapshot_batch_idx",
   "studio_generation_checkpoint_attestation_batch_idx",
 ] as const;
-const CHECKPOINT_TRIGGERS = [
+const CHECKPOINT_TRIGGERS_V1 = [
   "studio_generation_checkpoint_snapshots_no_update",
   "studio_generation_checkpoint_snapshots_no_delete",
   "studio_generation_checkpoint_attestations_no_update",
@@ -630,42 +685,78 @@ const CHECKPOINT_TRIGGERS = [
   "studio_generation_checkpoint_heads_no_delete",
   "studio_generation_checkpoint_attestation_heads_no_delete",
 ] as const;
+const CHECKPOINT_TRIGGERS_V3 = [
+  ...CHECKPOINT_TRIGGERS_V1,
+  "studio_generation_checkpoint_receipts_require_head_revision",
+] as const;
 
 function schemaObjectExists(db: DatabaseSync, name: string, type: "index" | "trigger"): boolean {
   return Boolean(db.prepare("SELECT 1 AS found FROM sqlite_master WHERE type=? AND name=?").get(type, name));
 }
 
-function assertSchema(db: DatabaseSync): void {
-  const marker = db.prepare(
+function readCheckpointSchemaMarker(db: DatabaseSync): string | undefined {
+  return (db.prepare(
     "SELECT value FROM studio_generation_ledger_meta WHERE key='p7_checkpoint_schema_version'",
-  ).get() as { value?: string } | undefined;
-  if (marker?.value !== String(CHECKPOINT_SCHEMA_VERSION)) {
-    fail("storage-invalid", "六图停检 schema marker 无效：" + (marker?.value ?? "缺失") + "。");
+  ).get() as { value?: string } | undefined)?.value;
+}
+
+function parsedCheckpointReadSchemaVersion(value: string | undefined): 1 | 2 | 3 {
+  if (value === "1") return 1;
+  if (value === "2") return 2;
+  if (value === "3") return 3;
+  fail("storage-invalid", value
+    ? "不支持六图停检 schema " + value + "。"
+    : "六图停检 schema marker 无效：缺失。");
+}
+
+function unsupportedCheckpointSchemaMessage(value: string | undefined): string {
+  if (value === "1" || value === "2") {
+    return `只读可开 schema ${value}；写入前必须完成显式 migration，禁止从 live Head 回填。`;
   }
+  return "不支持六图停检 schema " + value + "。";
+}
+
+function assertWritableCheckpointSchema(db: DatabaseSync): void {
+  const marker = readCheckpointSchemaMarker(db);
+  if (marker === String(CHECKPOINT_SCHEMA_VERSION)) return;
+  if (marker === "1") fail("storage-invalid", unsupportedCheckpointSchemaMessage("1"));
+  fail("storage-invalid", marker
+    ? "不支持六图停检 schema " + marker + "。"
+    : "六图停检 schema marker 无效：缺失。");
+}
+
+function assertSchema(db: DatabaseSync): void {
+  const schemaVersion = parsedCheckpointReadSchemaVersion(readCheckpointSchemaMarker(db));
+  const expectedColumns = checkpointTableColumns(schemaVersion);
   const actualTables = (db.prepare(`
     SELECT name FROM sqlite_master
     WHERE type='table' AND name GLOB 'studio_generation_checkpoint_*'
     ORDER BY name
   `).all() as Array<{ name: string }>).map((row) => row.name);
-  const expectedTables = Object.keys(CHECKPOINT_TABLE_COLUMNS).sort((left, right) => left.localeCompare(right, "en"));
+  const expectedTables = Object.keys(expectedColumns).sort((left, right) => left.localeCompare(right, "en"));
   if (JSON.stringify(actualTables) !== JSON.stringify(expectedTables)) {
     fail("storage-invalid", "六图停检 tables 与声明 schema 不一致。");
   }
-  for (const [table, expected] of Object.entries(CHECKPOINT_TABLE_COLUMNS)) {
+  for (const [table, expected] of Object.entries(expectedColumns)) {
     const actual = (db.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>).map((column) => column.name);
     if (JSON.stringify(actual) !== JSON.stringify(expected)) {
       fail("storage-invalid", `六图停检 table ${table} 列定义与声明 schema 不一致。`);
     }
   }
   for (const index of CHECKPOINT_INDEXES) if (!schemaObjectExists(db, index, "index")) fail("storage-invalid", `六图停检 index ${index} 缺失。`);
-  for (const trigger of CHECKPOINT_TRIGGERS) if (!schemaObjectExists(db, trigger, "trigger")) fail("storage-invalid", `六图停检 trigger ${trigger} 缺失。`);
+  const expectedTriggers = schemaVersion === 3 ? CHECKPOINT_TRIGGERS_V3 : CHECKPOINT_TRIGGERS_V1;
+  for (const trigger of expectedTriggers) if (!schemaObjectExists(db, trigger, "trigger")) fail("storage-invalid", `六图停检 trigger ${trigger} 缺失。`);
   const expected = new DatabaseSync(":memory:");
   try {
-    createSchema(expected);
+    createSchema(expected, schemaVersion);
     assertSqliteSchemaContract({
       actual: db,
       expected,
-      objectNames: [...Object.keys(CHECKPOINT_TABLE_COLUMNS), ...CHECKPOINT_INDEXES, ...CHECKPOINT_TRIGGERS],
+      objectNames: [
+        ...Object.keys(CHECKPOINT_TABLE_COLUMNS),
+        ...CHECKPOINT_INDEXES,
+        ...(schemaVersion === 3 ? CHECKPOINT_TRIGGERS_V3 : CHECKPOINT_TRIGGERS_V1),
+      ],
       tableNames: Object.keys(CHECKPOINT_TABLE_COLUMNS),
       ownedObjectPrefixes: ["studio_generation_checkpoint_"],
       rejectAllViews: true,
@@ -699,10 +790,122 @@ function assertBaseSchema(db: DatabaseSync): void {
   }
 }
 
+function migrateCheckpointSchemaToV3(db: DatabaseSync): void {
+  const marker = readCheckpointSchemaMarker(db);
+  if (marker === String(CHECKPOINT_SCHEMA_VERSION)) {
+    assertSchema(db);
+    return;
+  }
+  if (marker !== "1" && marker !== "2") fail("storage-invalid", unsupportedCheckpointSchemaMessage(marker));
+  const sourceSchemaVersion = Number(marker) as 1 | 2;
+
+  // 先完整验证已部署结构，避免把未知漂移 schema“修”成看似合法的 v3。
+  assertSchema(db);
+  const legacyCount = Number((db.prepare(
+    "SELECT COUNT(*) AS count FROM studio_generation_checkpoint_operation_receipts",
+  ).get() as { count: number }).count);
+  db.exec(`
+    DROP TRIGGER studio_generation_checkpoint_receipts_no_update;
+    DROP TRIGGER studio_generation_checkpoint_receipts_no_delete;
+    ALTER TABLE studio_generation_checkpoint_operation_receipts
+      RENAME TO studio_generation_checkpoint_operation_receipts_pre_v3_migration;
+
+    CREATE TABLE studio_generation_checkpoint_operation_receipts (
+      operation_id TEXT PRIMARY KEY,
+      operation_kind TEXT NOT NULL CHECK(operation_kind IN ('refresh', 'attest')),
+      input_fingerprint TEXT NOT NULL CHECK(length(input_fingerprint) = 64),
+      outcome_kind TEXT NOT NULL CHECK(outcome_kind IN ('checkpoint', 'attestation')),
+      outcome_id TEXT NOT NULL,
+      outcome_fingerprint TEXT NOT NULL CHECK(length(outcome_fingerprint) = 64),
+      head_revision INTEGER CHECK(head_revision IS NULL OR head_revision >= 1),
+      created_at TEXT NOT NULL
+    ) STRICT;
+
+    INSERT INTO studio_generation_checkpoint_operation_receipts(
+      operation_id,operation_kind,input_fingerprint,outcome_kind,
+      outcome_id,outcome_fingerprint,head_revision,created_at
+    )
+    SELECT operation_id,operation_kind,input_fingerprint,outcome_kind,
+           outcome_id,outcome_fingerprint,${sourceSchemaVersion === 1 ? "NULL" : "head_revision"},created_at
+    FROM studio_generation_checkpoint_operation_receipts_pre_v3_migration;
+  `);
+  const migratedCount = Number((db.prepare(
+    "SELECT COUNT(*) AS count FROM studio_generation_checkpoint_operation_receipts",
+  ).get() as { count: number }).count);
+  const legacyMinusMigrated = db.prepare(`
+    SELECT operation_id,operation_kind,input_fingerprint,outcome_kind,outcome_id,outcome_fingerprint,
+           ${sourceSchemaVersion === 1 ? "NULL" : "head_revision"} AS head_revision,created_at
+    FROM studio_generation_checkpoint_operation_receipts_pre_v3_migration
+    EXCEPT
+    SELECT operation_id,operation_kind,input_fingerprint,outcome_kind,outcome_id,outcome_fingerprint,
+           head_revision,created_at
+    FROM studio_generation_checkpoint_operation_receipts
+  `).all() as unknown[];
+  const migratedMinusLegacy = db.prepare(`
+    SELECT operation_id,operation_kind,input_fingerprint,outcome_kind,outcome_id,outcome_fingerprint,
+           head_revision,created_at
+    FROM studio_generation_checkpoint_operation_receipts
+    EXCEPT
+    SELECT operation_id,operation_kind,input_fingerprint,outcome_kind,outcome_id,outcome_fingerprint,
+           ${sourceSchemaVersion === 1 ? "NULL" : "head_revision"} AS head_revision,created_at
+    FROM studio_generation_checkpoint_operation_receipts_pre_v3_migration
+  `).all() as unknown[];
+  if (migratedCount !== legacyCount || legacyMinusMigrated.length > 0 || migratedMinusLegacy.length > 0) {
+    fail("storage-invalid", `checkpoint v${sourceSchemaVersion}→v3 operation receipt 复制核对失败。`);
+  }
+
+  db.exec(`
+    DROP TABLE studio_generation_checkpoint_operation_receipts_pre_v3_migration;
+    CREATE TRIGGER studio_generation_checkpoint_receipts_no_update
+      BEFORE UPDATE ON studio_generation_checkpoint_operation_receipts
+      BEGIN SELECT RAISE(ABORT, 'generation checkpoint receipts are append-only'); END;
+    CREATE TRIGGER studio_generation_checkpoint_receipts_no_delete
+      BEFORE DELETE ON studio_generation_checkpoint_operation_receipts
+      BEGIN SELECT RAISE(ABORT, 'generation checkpoint receipts are append-only'); END;
+    CREATE TRIGGER studio_generation_checkpoint_receipts_require_head_revision
+      BEFORE INSERT ON studio_generation_checkpoint_operation_receipts
+      WHEN NEW.head_revision IS NULL
+      BEGIN SELECT RAISE(ABORT, 'generation checkpoint receipt head revision is required'); END;
+  `);
+  beforeCheckpointSchemaPromotionHookForTests?.();
+  const promoted = db.prepare(`
+    UPDATE studio_generation_ledger_meta
+    SET value=?
+    WHERE key='p7_checkpoint_schema_version' AND value=?
+  `).run(String(CHECKPOINT_SCHEMA_VERSION), String(sourceSchemaVersion));
+  if (Number(promoted.changes) !== 1) {
+    fail("storage-invalid", `checkpoint v${sourceSchemaVersion}→v3 schema marker CAS 失败。`);
+  }
+  assertSchema(db);
+}
+
+async function checkpointSchemaIsCurrentReadOnly(
+  databasePath: string,
+  expectedSourceIdentity: SqliteSourceBindingIdentity,
+): Promise<boolean> {
+  let snapshot: Awaited<ReturnType<typeof openSqliteReadOnlySnapshot>> | null = null;
+  try {
+    snapshot = await openSqliteReadOnlySnapshot(databasePath, "generation checkpoint concurrent migration recheck");
+    if (snapshot.sourceIdentity.dev !== expectedSourceIdentity.dev
+      || snapshot.sourceIdentity.ino !== expectedSourceIdentity.ino
+      || snapshot.sourceIdentity.nlink !== 1n
+      || expectedSourceIdentity.nlink !== 1n) return false;
+    assertBaseSchema(snapshot.database);
+    if (readCheckpointSchemaMarker(snapshot.database) !== String(CHECKPOINT_SCHEMA_VERSION)) return false;
+    assertSchema(snapshot.database);
+    return true;
+  } catch {
+    return false;
+  } finally {
+    await snapshot?.close();
+  }
+}
+
 async function ensureCheckpointSchema(databasePath: string): Promise<void> {
   let snapshot: Awaited<ReturnType<typeof openSqliteReadOnlySnapshot>> | null = null;
   let sourceIdentity: SqliteSourceBindingIdentity | null = null;
   let needsInitialization = false;
+  let needsMigration = false;
   try {
     snapshot = await openSqliteReadOnlySnapshot(databasePath, "generation checkpoint ledger");
     sourceIdentity = snapshot.sourceIdentity;
@@ -711,58 +914,71 @@ async function ensureCheckpointSchema(databasePath: string): Promise<void> {
       "SELECT value FROM studio_generation_ledger_meta WHERE key='p7_checkpoint_schema_version'",
     ).get() as { value?: string } | undefined;
     if (marker) {
-      if (marker.value !== String(CHECKPOINT_SCHEMA_VERSION)) {
-        fail("storage-invalid", "不支持六图停检 schema " + marker.value + "。");
-      }
+      const schemaVersion = parsedCheckpointReadSchemaVersion(marker.value);
       assertSchema(snapshot.database);
-      return;
+      if (schemaVersion === CHECKPOINT_SCHEMA_VERSION) return;
+      needsMigration = true;
+    } else {
+      const residual = checkpointSchemaObjects(snapshot.database);
+      if (residual.length > 0) {
+        fail("storage-invalid", "六图停检 schema marker 缺失但已存在业务对象，禁止猜测或静默修复。", residual.map((item) => `${item.type}:${item.name}`));
+      }
+      needsInitialization = true;
     }
-    const residual = checkpointSchemaObjects(snapshot.database);
-    if (residual.length > 0) {
-      fail("storage-invalid", "六图停检 schema marker 缺失但已存在业务对象，禁止猜测或静默修复。", residual.map((item) => `${item.type}:${item.name}`));
-    }
-    needsInitialization = true;
   } finally {
     await snapshot?.close();
   }
-  if (!needsInitialization) return;
+  if (!needsInitialization && !needsMigration) return;
 
-  if (!sourceIdentity) fail("storage-invalid", "六图停检首次初始化缺少只读预检身份。");
-  assertSqliteSourceBindingIdentity(databasePath, sourceIdentity, "generation checkpoint ledger");
-  assertSafeSqliteSidecars(databasePath, "generation checkpoint ledger");
-
-  const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
-  const db = new DatabaseSync(databasePath, { timeout: busyTimeoutMs });
+  if (!sourceIdentity) fail("storage-invalid", "六图停检初始化或迁移缺少只读预检身份。");
+  beforeCheckpointSchemaWritableOpenHookForTests?.();
   try {
-    assertSafeSqliteSidecars(databasePath, "generation checkpoint ledger");
     assertSqliteSourceBindingIdentity(databasePath, sourceIdentity, "generation checkpoint ledger");
-    db.exec("PRAGMA busy_timeout=" + busyTimeoutMs + "; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;");
-    db.exec("BEGIN IMMEDIATE");
+    assertSafeSqliteSidecars(databasePath, "generation checkpoint ledger");
+
+    const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
+    const db = new DatabaseSync(databasePath, { timeout: busyTimeoutMs });
     try {
-      assertBaseSchema(db);
-      const marker = db.prepare(
-        "SELECT value FROM studio_generation_ledger_meta WHERE key='p7_checkpoint_schema_version'",
-      ).get() as { value?: string } | undefined;
-      if (marker) {
-        if (marker.value !== String(CHECKPOINT_SCHEMA_VERSION)) fail("storage-invalid", "不支持六图停检 schema " + marker.value + "。");
-        assertSchema(db);
-      } else {
-        const residual = checkpointSchemaObjects(db);
-        if (residual.length > 0) {
-          fail("storage-invalid", "六图停检 schema 首次初始化发现无 marker 残留对象。", residual.map((item) => `${item.type}:${item.name}`));
+      assertSafeSqliteSidecars(databasePath, "generation checkpoint ledger");
+      assertSqliteSourceBindingIdentity(databasePath, sourceIdentity, "generation checkpoint ledger");
+      db.exec("PRAGMA busy_timeout=" + busyTimeoutMs + "; PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL;");
+      db.exec("BEGIN IMMEDIATE");
+      try {
+        // BEGIN IMMEDIATE 取得 writer 锁后再次绑定同一物理源；任何 DDL 前关闭
+        // read-only preflight → writer lock 之间的替换窗口。
+        assertSafeSqliteSidecars(databasePath, "generation checkpoint ledger");
+        assertSqliteSourceBindingIdentity(databasePath, sourceIdentity, "generation checkpoint ledger");
+        assertBaseSchema(db);
+        const marker = db.prepare(
+          "SELECT value FROM studio_generation_ledger_meta WHERE key='p7_checkpoint_schema_version'",
+        ).get() as { value?: string } | undefined;
+        if (marker) {
+          const schemaVersion = parsedCheckpointReadSchemaVersion(marker.value);
+          if (schemaVersion === 1 || schemaVersion === 2) migrateCheckpointSchemaToV3(db);
+          else assertSchema(db);
+        } else {
+          const residual = checkpointSchemaObjects(db);
+          if (residual.length > 0) {
+            fail("storage-invalid", "六图停检 schema 首次初始化发现无 marker 残留对象。", residual.map((item) => `${item.type}:${item.name}`));
+          }
+          createSchema(db);
+          db.prepare("INSERT INTO studio_generation_ledger_meta(key,value) VALUES('p7_checkpoint_schema_version', ?)")
+            .run(String(CHECKPOINT_SCHEMA_VERSION));
+          assertSchema(db);
         }
-        createSchema(db);
-        db.prepare("INSERT INTO studio_generation_ledger_meta(key,value) VALUES('p7_checkpoint_schema_version', ?)")
-          .run(String(CHECKPOINT_SCHEMA_VERSION));
-        assertSchema(db);
+        db.exec("COMMIT");
+      } catch (error) {
+        db.exec("ROLLBACK");
+        throw error;
       }
-      db.exec("COMMIT");
-    } catch (error) {
-      db.exec("ROLLBACK");
-      throw error;
+    } finally {
+      db.close();
     }
-  } finally {
-    db.close();
+  } catch (error) {
+    // 并发迁移者可能在本次只读预检后先完成并改变文件身份。只允许一次
+    // 物理只读重验；marker=3 且完整合同/FK 均精确时视为幂等收敛。
+    if (needsMigration && await checkpointSchemaIsCurrentReadOnly(databasePath, sourceIdentity)) return;
+    throw error;
   }
 }
 
@@ -1542,8 +1758,17 @@ export async function getStudioGenerationCheckpointCanvasProjection(
 }
 
 function operationReceipt(db: DatabaseSync, operationId: string): OperationReceiptRow | undefined {
+  const schemaVersion = parsedCheckpointReadSchemaVersion(readCheckpointSchemaMarker(db));
+  if (schemaVersion === 1) {
+    const row = db.prepare(
+      "SELECT operation_id,operation_kind,input_fingerprint,outcome_kind,outcome_id,outcome_fingerprint,created_at "
+        + "FROM studio_generation_checkpoint_operation_receipts WHERE operation_id=?",
+    ).get(operationId) as Omit<OperationReceiptRow, "head_revision"> | undefined;
+    if (!row) return undefined;
+    return { ...row, head_revision: null };
+  }
   return db.prepare(
-    "SELECT operation_id,operation_kind,input_fingerprint,outcome_kind,outcome_id,outcome_fingerprint,created_at "
+    "SELECT operation_id,operation_kind,input_fingerprint,outcome_kind,outcome_id,outcome_fingerprint,head_revision,created_at "
       + "FROM studio_generation_checkpoint_operation_receipts WHERE operation_id=?",
   ).get(operationId) as unknown as OperationReceiptRow | undefined;
 }
@@ -1690,8 +1915,8 @@ async function projectAttestationById(
 }
 
 /**
- * Command recovery 的只读入口。回执身份来自与业务写入同事务提交的不可变行；
- * outcome 则按当前 Review/result/pack 状态重新投影，所以旧回执不会复活已 stale 的批准。
+ * @deprecated 仅供 legacy diagnostic。该 API 会初始化/打开 writable-risk owner 并投影
+ * live Review/result/pack currentness，不能作为 command replay/reconcile proof。
  */
 export async function readStudioGenerationCheckpointOperationReceipt(
   projectRoot: string,
@@ -1747,6 +1972,155 @@ export async function readStudioGenerationCheckpointOperationReceipt(
   fail("storage-invalid", "checkpoint operation receipt 操作与 outcome 类型不一致。");
 }
 
+/**
+ * Command replay/reconcile 专用严格只读 operation record。只在同一 schema-v7
+ * SQLite snapshot 内验证 checkpoint 私有 schema、receipt、immutable outcome 与 Head
+ * 提示；不读取 live batch、Review、媒体、冻结包，也不重新授予动态资格。
+ */
+export async function readStudioGenerationCheckpointOperationRecordReadOnly(
+  projectRoot: string,
+  rawInput: RefreshStudioGenerationCheckpointInput | AttestStudioGenerationCheckpointInput,
+  options: { historicalHeadRevision?: number } = {},
+): Promise<StudioGenerationCheckpointOperationReceipt | null> {
+  const input = "checkpointId" in rawInput
+    ? normalizeAttestInput(rawInput)
+    : normalizeRefreshInput(rawInput);
+  const operationId = input.operationId;
+  const inputFingerprint = studioGenerationCheckpointOperationInputFingerprint(input);
+  return withStudioGenerationLedgerReadOnlySnapshot(
+    projectRoot,
+    "generation checkpoint immutable operation record",
+    (db) => {
+      assertBaseSchema(db);
+      assertSchema(db);
+      const receipt = operationReceipt(db, operationId);
+      if (!receipt) return null;
+      if (receipt.operation_id !== operationId
+        || receipt.input_fingerprint !== inputFingerprint
+        || !SHA256_PATTERN.test(receipt.outcome_fingerprint)
+        || !isCanonicalIsoTimestamp(receipt.created_at)) {
+        fail("storage-invalid", "checkpoint operation receipt 身份、指纹或时间格式无效。");
+      }
+      const base = {
+        schemaVersion: 1 as const,
+        kind: "studio-generation-checkpoint-operation-receipt" as const,
+        operationId: receipt.operation_id,
+        inputFingerprint: receipt.input_fingerprint,
+        outcomeId: receipt.outcome_id,
+        outcomeFingerprint: receipt.outcome_fingerprint,
+        createdAt: receipt.created_at,
+      };
+      if (receipt.operation_kind === "refresh" && receipt.outcome_kind === "checkpoint") {
+        if ("checkpointId" in input) {
+          fail("storage-invalid", "checkpoint refresh receipt 与 attest 输入类型不一致。");
+        }
+        const refreshInput = input as RefreshStudioGenerationCheckpointInput;
+        const row = checkpointRow(db, receipt.outcome_id);
+        if (!row || Number(row.batch_number) !== refreshInput.batchNumber || row.fingerprint !== receipt.outcome_fingerprint) {
+          fail("storage-invalid", "checkpoint receipt 引用孤儿、跨批次或指纹漂移快照。");
+        }
+        const record = checkpointRecordFromRow(row);
+        if (!isCanonicalIsoTimestamp(record.createdAt)) {
+          fail("storage-invalid", "checkpoint immutable record 时间格式无效。");
+        }
+        const head = checkpointHeadRow(db, record.batchNumber);
+        const headCurrent = Boolean(head
+          && head.checkpoint_id === record.checkpointId
+          && head.checkpoint_fingerprint === record.fingerprint);
+        const historicalHeadRevision = Number(receipt.head_revision);
+        if (!Number.isSafeInteger(historicalHeadRevision) || historicalHeadRevision < 1) {
+          fail("storage-invalid", "checkpoint refresh operation receipt 缺少不可变历史 headRevision。");
+        }
+        if (options.historicalHeadRevision !== undefined
+          && options.historicalHeadRevision !== historicalHeadRevision) {
+          fail("storage-invalid", "checkpoint locator headRevision 与 receipt 历史锚不一致。");
+        }
+        if (historicalHeadRevision !== refreshInput.expectedHeadRevision
+          && historicalHeadRevision !== refreshInput.expectedHeadRevision + 1) {
+          fail("storage-invalid", "checkpoint refresh 历史 headRevision 与请求 CAS 不一致。");
+        }
+        return {
+          ...base,
+          operationKind: "refresh" as const,
+          outcomeKind: "checkpoint" as const,
+          outcome: {
+            ...record,
+            // eligibleForPass 是历史创建时投影；公开恢复不以它重新授予 pass 权限。
+            eligibleForPass: false,
+            head: headCurrent,
+            headRevision: historicalHeadRevision,
+            current: false,
+            currentStaleReasons: uniqueSorted([
+              ...(!headCurrent ? ["not-current-checkpoint-head"] : []),
+              "strict-recovery-currentness-not-proven",
+            ]),
+          },
+        };
+      }
+      if (receipt.operation_kind === "attest" && receipt.outcome_kind === "attestation") {
+        if (!("checkpointId" in input)) {
+          fail("storage-invalid", "checkpoint attest receipt 与 refresh 输入类型不一致。");
+        }
+        const attestInput = input as AttestStudioGenerationCheckpointInput;
+        const row = attestationRow(db, receipt.outcome_id);
+        if (!row || Number(row.batch_number) < 1 || row.fingerprint !== receipt.outcome_fingerprint) {
+          fail("storage-invalid", "checkpoint receipt 引用孤儿、跨批次或指纹漂移 attestation。");
+        }
+        const record = attestationRecordFromRow(row);
+        if (!isCanonicalIsoTimestamp(record.createdAt)) {
+          fail("storage-invalid", "checkpoint attestation immutable record 时间格式无效。");
+        }
+        const checkpoint = checkpointRow(db, record.checkpointId);
+        if (!checkpoint
+          || Number(checkpoint.batch_number) !== record.batchNumber
+          || checkpoint.fingerprint !== record.checkpointFingerprint) {
+          fail("storage-invalid", "checkpoint attestation 的不可变 checkpoint FK/批次/指纹不一致。");
+        }
+        checkpointRecordFromRow(checkpoint);
+        if (record.batchNumber !== attestInput.batchNumber
+          || record.checkpointId !== attestInput.checkpointId
+          || record.checkpointFingerprint !== attestInput.checkpointFingerprint
+          || record.baseHeadRevision !== attestInput.expectedHeadRevision
+          || record.decision !== attestInput.decision
+          || record.reviewer !== attestInput.reviewer
+          || record.note !== attestInput.note) {
+          fail("storage-invalid", "checkpoint attestation immutable event 与规范输入不一致。");
+        }
+        const historicalHeadRevision = Number(receipt.head_revision);
+        if (!Number.isSafeInteger(historicalHeadRevision) || historicalHeadRevision < 1) {
+          fail("storage-invalid", "checkpoint attest operation receipt 缺少不可变历史 headRevision。");
+        }
+        if (historicalHeadRevision !== record.headRevision) {
+          fail("storage-invalid", "checkpoint attest receipt 历史 headRevision 与 attestation 事件不一致。");
+        }
+        if (options.historicalHeadRevision !== undefined
+          && options.historicalHeadRevision !== historicalHeadRevision) {
+          fail("storage-invalid", "checkpoint locator headRevision 与 receipt 历史锚不一致。");
+        }
+        const head = attestationHeadRow(db, record.batchNumber);
+        const headCurrent = Boolean(head
+          && head.attestation_id === record.attestationId
+          && head.attestation_fingerprint === record.fingerprint);
+        return {
+          ...base,
+          operationKind: "attest" as const,
+          outcomeKind: "attestation" as const,
+          outcome: {
+            ...record,
+            head: headCurrent,
+            current: false,
+            currentStaleReasons: uniqueSorted([
+              ...(!headCurrent ? ["not-current-attestation-head"] : []),
+              "strict-recovery-currentness-not-proven",
+            ]),
+          },
+        };
+      }
+      fail("storage-invalid", "checkpoint operation receipt 操作与 outcome 类型不一致。");
+    },
+  );
+}
+
 function normalizeRefreshInput(
   rawInput: RefreshStudioGenerationCheckpointInput,
 ): RefreshStudioGenerationCheckpointInput {
@@ -1757,19 +2131,35 @@ function normalizeRefreshInput(
   };
 }
 
+export function studioGenerationCheckpointOperationInputFingerprint(
+  rawInput: RefreshStudioGenerationCheckpointInput | AttestStudioGenerationCheckpointInput,
+): string {
+  if ("checkpointId" in rawInput) {
+    const input = normalizeAttestInput(rawInput);
+    return digest({
+      schemaVersion: 1,
+      command: "attest-studio-generation-checkpoint",
+      ...input,
+    });
+  }
+  const input = normalizeRefreshInput(rawInput);
+  return digest({
+    schemaVersion: 1,
+    command: "refresh-studio-generation-checkpoint",
+    ...input,
+  });
+}
+
 export async function refreshStudioGenerationCheckpoint(
   projectRoot: string,
   rawInput: RefreshStudioGenerationCheckpointInput,
 ): Promise<StudioGenerationCheckpointProjection> {
   const input = normalizeRefreshInput(rawInput);
-  const inputFingerprint = digest({
-    schemaVersion: 1,
-    command: "refresh-studio-generation-checkpoint",
-    ...input,
-  });
+  const inputFingerprint = studioGenerationCheckpointOperationInputFingerprint(input);
   const databaseContext = await databaseContextFor(projectRoot);
   const preflightDb = openDatabase(databaseContext);
   try {
+    assertWritableCheckpointSchema(preflightDb);
     const receipt = operationReceipt(preflightDb, input.operationId);
     if (receipt) {
       assertReceipt(receipt, inputFingerprint, "refresh", "checkpoint");
@@ -1793,6 +2183,7 @@ export async function refreshStudioGenerationCheckpoint(
   let writtenId: string;
   try {
     writtenId = transaction(db, () => {
+      assertWritableCheckpointSchema(db);
       const receipt = operationReceipt(db, input.operationId);
       if (receipt) {
         assertReceipt(receipt, inputFingerprint, "refresh", "checkpoint");
@@ -1836,8 +2227,9 @@ export async function refreshStudioGenerationCheckpoint(
       const alreadyHead = Boolean(head
         && head.checkpoint_id === candidate.checkpointId
         && head.checkpoint_fingerprint === candidate.fingerprint);
+      const committedHeadRevision = alreadyHead ? actualRevision : actualRevision + 1;
       if (!alreadyHead) {
-        const nextRevision = actualRevision + 1;
+        const nextRevision = committedHeadRevision;
         if (!head) {
           db.prepare(`
             INSERT INTO studio_generation_checkpoint_heads(
@@ -1867,8 +2259,8 @@ export async function refreshStudioGenerationCheckpoint(
       db.prepare(`
         INSERT INTO studio_generation_checkpoint_operation_receipts(
           operation_id,operation_kind,input_fingerprint,outcome_kind,
-          outcome_id,outcome_fingerprint,created_at
-        ) VALUES(?,?,?,?,?,?,?)
+          outcome_id,outcome_fingerprint,head_revision,created_at
+        ) VALUES(?,?,?,?,?,?,?,?)
       `).run(
         input.operationId,
         "refresh",
@@ -1876,6 +2268,7 @@ export async function refreshStudioGenerationCheckpoint(
         "checkpoint",
         candidate.checkpointId,
         candidate.fingerprint,
+        committedHeadRevision,
         now,
       );
       return candidate.checkpointId;
@@ -1910,14 +2303,11 @@ export async function attestStudioGenerationCheckpoint(
   rawInput: AttestStudioGenerationCheckpointInput,
 ): Promise<StudioGenerationCheckpointAttestationProjection> {
   const input = normalizeAttestInput(rawInput);
-  const inputFingerprint = digest({
-    schemaVersion: 1,
-    command: "attest-studio-generation-checkpoint",
-    ...input,
-  });
+  const inputFingerprint = studioGenerationCheckpointOperationInputFingerprint(input);
   const databaseContext = await databaseContextFor(projectRoot);
   const preflightDb = openDatabase(databaseContext);
   try {
+    assertWritableCheckpointSchema(preflightDb);
     const receipt = operationReceipt(preflightDb, input.operationId);
     if (receipt) {
       assertReceipt(receipt, inputFingerprint, "attest", "attestation");
@@ -1953,6 +2343,7 @@ export async function attestStudioGenerationCheckpoint(
   let writtenId: string;
   try {
     writtenId = transaction(db, () => {
+      assertWritableCheckpointSchema(db);
       const receipt = operationReceipt(db, input.operationId);
       if (receipt) {
         assertReceipt(receipt, inputFingerprint, "attest", "attestation");
@@ -2049,8 +2440,8 @@ export async function attestStudioGenerationCheckpoint(
       db.prepare(`
         INSERT INTO studio_generation_checkpoint_operation_receipts(
           operation_id,operation_kind,input_fingerprint,outcome_kind,
-          outcome_id,outcome_fingerprint,created_at
-        ) VALUES(?,?,?,?,?,?,?)
+          outcome_id,outcome_fingerprint,head_revision,created_at
+        ) VALUES(?,?,?,?,?,?,?,?)
       `).run(
         input.operationId,
         "attest",
@@ -2058,6 +2449,7 @@ export async function attestStudioGenerationCheckpoint(
         "attestation",
         attestationId,
         fingerprint,
+        actualRevision + 1,
         now,
       );
       return attestationId;

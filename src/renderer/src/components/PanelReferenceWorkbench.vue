@@ -720,7 +720,7 @@ function detectionLabel(value: PanelVisualConstraint["warnings"][number]["detect
 .resolution-list { min-width: 0; display: flex; flex-direction: column; border-right: 1px solid #30332d; }
 .list-head, .resolution-row { display: grid; grid-template-columns: minmax(170px, 1.35fr) 82px minmax(150px, 1fr) 110px 135px; align-items: center; gap: 10px; }
 .list-head { min-height: 32px; padding: 0 14px; border-bottom: 1px solid #2b2e29; color: #656b63; font-size: 8px; letter-spacing: .06em; }
-.resolution-row { width: 100%; min-height: 61px; padding: 8px 14px; border: 0; border-bottom: 1px solid #272a26; background: transparent; color: #d8dbd4; text-align: left; cursor: pointer; transition: background .14s ease, box-shadow .14s ease; }
+.resolution-row { width: 100%; min-height: 61px; padding: 8px 14px; border: 0; border-bottom: 1px solid #272a26; background: transparent; color: #d8dbd4; text-align: left; cursor: pointer; transition: background .14s ease, box-shadow .14s ease; content-visibility: auto; contain-intrinsic-size: auto 61px; }
 .resolution-row:hover { background: #191c18; }
 .resolution-row.selected { background: #1a211d; box-shadow: inset 3px 0 #70b8b0; }
 .resolution-row span { min-width: 0; }
@@ -798,7 +798,7 @@ function detectionLabel(value: PanelVisualConstraint["warnings"][number]["detect
 .muted-copy { margin: 10px 0 0; color: #656b63; font-size: 9px; }
 .derived-section { background: #151714; }
 .derived-section > header h4 { margin-top: 5px; }
-.derived-card { width: 100%; display: block; padding: 10px 0; overflow: hidden; border: 0; border-bottom: 1px solid #252824; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.derived-card { width: 100%; display: block; padding: 10px 0; overflow: hidden; border: 0; border-bottom: 1px solid #252824; background: transparent; color: inherit; text-align: left; cursor: pointer; content-visibility: auto; contain-intrinsic-size: auto 56px; }
 .derived-card:hover, .derived-card.selected { background: #1a1f1b; box-shadow: inset 2px 0 #70b8b0; }
 .derived-card .artifact-path, .derived-card .artifact-sha { overflow-wrap: anywhere; white-space: normal; }
 .derived-pager { min-height: 38px; margin: 8px -18px -17px; }

@@ -1,5 +1,1124 @@
 # TASKS · 残留任务清账 2026-07-25
 
+## software_goal: oss-public-github-20260824
+
+- status: `in_progress`
+- [x] 本地全面检查（typecheck:app、fast tests、密钥扫描、gitignore）
+- [x] Apache-2.0 LICENSE / NOTICE / README / CONTRIBUTING / SECURITY / CoC / CI
+- [ ] 推送到 `BB20260410/ai-drama-canvas` 公开仓库
+- [ ] 读取 GitHub 仓库建议并落实
+
+## software_goal: character-canvas-pack-20260821
+
+- status: `completed_slice`
+- [x] 音色身份绑定规范角色资产 + CAS 音频 SHA
+- [x] 画布角色页上传图片/音频入库
+- [x] 钉到画布时自动带出参考图节点和音频节点
+- [x] 无窗口定向测试 + typecheck:app PASS
+
+## software_goal: oss-gap-n1-scene-prop-20260821
+
+- [x] 8 路开源调研合成 `docs/参考项目增量差距审计_20260821.md`
+- [x] 场景/道具对称入库（不绑 VoiceIdentity）
+- [x] N2 画布音频节点试听
+- [x] N3 库拖到落点钉选
+- [x] N4 角色多视图槽
+- [x] N5 阅读器联动 earliest span
+- [x] N6 ⌘G 命名空间组（spatialGroups + Vue Flow parentNode）
+- [x] N7 检查器角色 CAS 音频原生试听（mutex + busy 早退）
+- [x] N8 入库/检查器/库行别名接线
+- [x] N9 Shift+1 / Controls 走 fitCanvas（覆盖默认 fitView）
+- [x] N10 Shift+0 → zoomTo(1)
+- [x] N11 Shift+2 适配选区（无选区空操作）
+- [x] N12 入库可选 description（空则模板句）
+- [x] N13 Delete/Backspace 卸钉或删所选连线
+- [x] N14 可选 24px 网格吸附（默认关，不开 snapToGrid）
+- [x] N15 Arrow 1px / Shift+Arrow 24px 微移
+- [x] N16 ⌘A 全选当前 nodes
+- [x] N17 Space+左键拖平移（默认框选不变）
+- [x] N18 Escape 关弹层后再清选区
+- [x] N19 Shift+⌘A 反选
+- [x] N20 Alt+Arrow 走 applyAlign
+- [x] N21 Alt+H/V 居中，Alt+Shift+H/V 均分
+- [x] N22 Shift+E 切连线显隐
+- [x] N23 Shift+M 切小地图
+- [x] N24 Shift+W 切工作流过滤
+- [x] N25 Shift+T / Shift+Alt+T 时间线重排
+- [x] N26 F5 走 refreshAll（preventDefault）
+- [x] N27 无修饰 C 切连线模式
+- [x] N28 F1 开合帮助卡
+- [x] N29 无修饰 A 开合添加菜单
+- [x] N30 无修饰 L 开合素材库
+- [x] N31 Shift+L 开合剧本资源
+- [x] N32 F6 核对外部来源
+- [x] N33 Shift+D 循环画布主题
+- [x] N34 ⌘F 聚焦进度搜索
+- [x] N35 Enter 定位唯一搜索命中
+- [x] N36 F3/Shift+F3 循环搜索命中
+- [x] N37 查询非空 Escape 先清空
+- [x] N38 空查询 Escape 先失焦
+- [x] N39 查询框 Alt+Arrow 循环审片筛选
+- [x] N40 筛选 Escape 回查询框
+- [x] N41 `[`/`]` 循环宫格芯片
+- [x] N42 Home/End 定位宫格首末芯片（输入框保持原生）
+- [x] N43 宫格条 roving tabindex（Arrow/Home/End 只移焦）
+- [x] N44 芯片焦点 PageUp/PageDown 跳 10 格夹端点
+- [x] N45 无芯片焦点 PageUp/PageDown 跳 10 格夹端点
+- [x] N46 单元轨 Page 跳 10 条 selectUnit（不翻页）
+- [x] N47 单元轨/分页钮 Alt+Page 翻页
+- [x] N48 单元轨 Arrow/Home/End roving tabindex
+- [x] N49 素材可见窗 Arrow/Home/End roving tabindex
+- [x] N50 剧本/提示词列表 Arrow/Home/End roving tabindex
+- [x] N51 媒体库行 Arrow/Home/End roving tabindex（Enter 不钉选）
+- [x] N52 媒体库 Alt+Page 翻页
+- [x] N53 素材库 Alt+Page 翻页
+- [x] N54 全局资源 Alt+Page 翻页
+- [x] N55 检查器出场 Alt+Page 翻页（不 focusAppearance）
+- [x] N56 检查器出场行 Arrow/Home/End roving tabindex（Enter 仍 focusAppearance）
+- [x] N57 全局资源卡 Arrow/Home/End roving tabindex（Enter 不写入）
+- [x] N58 节点操作钮 Arrow/Home/End roving tabindex（跳过 disabled）
+- [x] N59 素材库 tabs Arrow/Home/End roving tabindex（Enter 仍 openLibraryFor）
+- [x] N60 全局资源 tabs Arrow/Home/End roving tabindex（跳过 loading disabled）
+- [x] N61 添加菜单 Arrow/Home/End roving tabindex（Enter 仍 chooseAddKind）
+- [x] N62 浮动工具栏 Arrow/Home/End roving tabindex（不调用 toggle*）
+- [x] N63 底部视图工具 Arrow/Home/End roving tabindex（跳过 disabled）
+- [x] N64 视图菜单项 Arrow/Home/End roving tabindex（打开后焦第一可用项）
+- [x] N65 视图主题 radio Arrow/Home/End roving tabindex（Enter 仍 setCanvasTheme）
+- [x] N66 受管画布 Vue Flow Controls Arrow/Home/End roving tabindex（不抢 N9）
+- [x] N67 故事图 Vue Flow Controls Arrow/Home/End roving tabindex（不改 connecting）
+- [x] N68 遗留生产画布 Vue Flow Controls Arrow/Home/End roving tabindex（不静态装入 VueFlow）
+- [x] N69 受管 MiniMap Arrow 平移视口（不抢 N15/N23）
+- [x] N70 帮助卡打开焦关闭钮，Tab 不逃出（不抢 N28/N18）
+- [x] N71 MiniMap 节点 data-node-id roving + Enter 选中（禁止 HTML id）
+- [x] N72 连线横幅退出钮 testid，关闭后焦回连线钮
+- [x] N73 检查器关闭钮 testid + 关闭后焦回画布（aside 非 dialog）
+- [x] N74 导演面板打开焦过滤框，Tab 不逃出
+- [x] N75 素材库/剧本资源关闭钮 testid，关闭后焦回开库钮
+- [x] N76 错误横幅关闭钮 testid + 关闭后焦回画布（Escape 不清错误）
+- [x] N77 清空二次确认后焦回画布（无 window.confirm）
+- [x] N78 帮助关闭钮 testid，click 归还触发钮
+- [x] N79 视图菜单关闭后焦回 summary（帮助/添加归还优先）
+- [x] N80 画布诊断 details summary testid
+- [x] N81 检查器诊断 details summary testid
+- [x] N82 素材库详情栏诊断 summary testid（不铺列表行）
+- [x] N83 审片下一动作诊断 summary testid
+- [x] N84 生成控制技术消息诊断 summary testid
+- [x] N85 审片头栏诊断 summary testid
+- [x] N86 审片资产卡诊断 summary testid
+- [x] N87 审片冲突卡诊断 summary testid
+
+## software_goal: 24h-perf-interaction-20260821
+
+- status: `in_progress`
+- deadline: `2026-08-22T11:30:00+08:00`
+- silent: 后台 scheduler 15m、无可见窗口；一轮做完立刻下一轮
+- journal: `.workqueue/continuous-iteration-20260821.md`
+
+### 迭代 P1（完成）
+- [x] 无窗口基线 40 tests PASS
+- [x] 受管画布侧栏 `.library-list li` content-visibility + 合同；managed-studio-canvas-ui 39 PASS
+- [x] 后台静默 scheduler `01a0225f7f21`
+
+### 迭代 P2（完成）
+- [x] MaterialStudio `.material-entry` 宫格/列表 content-visibility + 源码合同；4 files / 54 tests PASS；`typecheck:app` PASS
+
+### 迭代 P3（完成）
+- [x] StoryWorkbench `.chapter-list>button` content-visibility + 源码合同；7/7 PASS；`typecheck:app` PASS
+
+### 迭代 P4（完成）
+- [x] CanonicalAssetLibrary `.canonical-card` content-visibility + 源码合同；1/1 PASS；`typecheck:app` PASS
+
+### 迭代 P5（完成）
+- [x] GenerationQueue `.job-row` content-visibility + 源码合同；6/6 PASS；`typecheck:app` PASS
+
+### 迭代 P6（完成）
+- [x] Dashboard `.queue-entry` + 同型 `.unit-entry` content-visibility + 源码合同；12/12 PASS；`typecheck:app` PASS
+
+### 迭代 P7（完成）
+- [x] NovelStudio `.volume-section > button` content-visibility + 源码合同；12/12 PASS；`typecheck:app` PASS
+
+### 迭代 P8（完成）
+- [x] NarrativeAdaptation 事实/节拍/审核队列 content-visibility + 源码合同；3/3 PASS；`typecheck:app` PASS
+
+### 迭代 P9（完成）
+- [x] StoryWorkbench `.event-strip>button` content-visibility + 源码合同；8/8 PASS；`typecheck:app` PASS
+
+### 迭代 P10（完成）
+- [x] NarrativeAdaptation unit-list / provider-list / shot-list content-visibility + 源码合同；4/4 PASS；`typecheck:app` PASS
+
+### 迭代 P11（完成）
+- [x] Dashboard appearances 行 content-visibility + 源码合同；13/13 PASS；`typecheck:app` PASS
+
+### 迭代 P12（完成）
+- [x] ScriptWorkbench `.document-list button` content-visibility + 源码合同；3/3 PASS；`typecheck:app` PASS
+
+### 迭代 P13–P15（完成）
+- [x] NovelStudio search-results 48px；StoryWorkbench source-row 56px；Continuation article 56px + 共享 queue/memory/skill 索引 64px
+
+### 迭代 P16–P21（完成）
+- [x] NovelStudio memory-list 48px
+- [x] ProductionDesign bible-list 56px
+- [x] GenerationControl unit-rail 56px + panel-list 96px
+- [x] ContinuityTimeline track-list 72px
+- [x] MultimediaTimeline unit-list 56px
+- [x] GlobalResource resource-card 152px；Inspector appearance-list 40px；TaskCenter event-list 54px
+- [x] 11 files / 112 tests PASS；`typecheck:app` PASS
+
+### 迭代 P22（完成）
+- [x] PanelReference resolution-row/derived-card；Binding unit-row；ProjectCenter project-row；ScriptMediaAlign document-card；ProductionDesign voice/registry
+- [x] 5 files / 14 tests PASS
+
+### 迭代 P23（完成）
+- [x] ProductionDesign storyboard-table 行 62px content-visibility；production-design-view 6/6 PASS；`typecheck:app` PASS
+
+### 迭代 P24（完成）
+- [x] StudioContinuityReview history/timeline/conflict/batch 网格 content-visibility；12 tests PASS；`typecheck:app` PASS
+
+### 迭代 P25（完成）
+- [x] ContinuityTimeline span-row 72px；ReviewStudio history 56px；ScriptMediaAlign reader-nav 28px；GenerationControl plan-node 32px
+- [x] 6 files / 31 tests PASS；`typecheck:app` PASS；digest `fd5574a7…`
+
+### 迭代 P26（完成）
+- [x] ProductionDesign 分镜构建/迁移/核验 + sheets/enqueue/render handler fail-closed；7/7 PASS
+
+### 迭代 P27（完成）
+- [x] NovelStudio 新建卷/章/改名；VideoEditor 创建工程 handler fail-closed
+
+### 迭代 P28（完成）
+- [x] NovelStudio 选卷/翻页 busy 早退，不踩保存中 busy；36 tests PASS；`typecheck:app` PASS；digest `5d1b25e8…`
+
+### 迭代 P29（完成）
+- [x] VideoEditor `selectEditProject` 在 creating/editorWriteBusy 时 fail-closed；select 禁用并还原 currentId
+
+### 迭代 P30（完成）
+- [x] VideoEditor addMedia / addSubtitle / addOverlayTrack 写入中 fail-closed；dirty-guard 15/15 PASS；digest `6231cd7a…`
+
+### 迭代 P31（完成）
+- [x] VideoEditor openCreate / removeTrack 写入中 fail-closed
+
+### 迭代 P32（完成）
+- [x] VideoEditor addNestedTimeline / refreshNestedTimeline 写入中 fail-closed；dirty-guard 17/17 PASS；digest `efb4b990…`
+
+### 迭代 P33（完成）
+- [x] MaterialStudio continueFromCore / openCreateDialog pendingAction 早退；创建提交任意 pending 禁用；GlobalResource runReuse 合同；28 tests + typecheck:app PASS；digest `f1995faa…`
+
+### 迭代 P34（完成）
+- [x] DesktopSupport 修复/备份/恢复/刷新 busy title + handler 早退；Canonical 只读跳过；3 tests + typecheck:app PASS；digest `a931852c…`
+
+### 迭代 P35（完成）
+- [x] Higgsfield queueVideo busy 早退 + title；App.vue scanNow 拦截 projectOperationBusy；13 tests + typecheck:app PASS；digest `682c9ac5…`
+
+### 迭代 P36（完成）
+- [x] queueHiggsfieldImage 拦截 generationActionsBlocked；按钮 disabled + title；11 tests + typecheck:app PASS；digest `7036743e…`
+
+### 迭代 P37（完成）
+- [x] persistStudioContext in-flight + pending 合并最新焦点；切工程清 pending；13 tests + typecheck:app PASS；digest `f4ddb6e6…`
+
+### 迭代 P38（完成）
+- [x] createCanvasEntity / editCanvasEntity / toggleLinkMode busy fail-closed；12 tests + typecheck:app PASS；digest `aab33680…`
+
+### 迭代 P39（完成）
+- [x] Inspector `.artifact-row` content-visibility 40px；3+2 tests + typecheck:app PASS；digest `12f96712…`
+
+### 迭代 P40（完成）
+- [x] 扫描剩余无 CV Vue / busy：无自动项，未改产品
+
+### 迭代 P41（完成）
+- [x] ManagedStudioCanvas `.global-resource-card` 128px；TaskCenter `.task-pack li` 32px；先红后绿 47 tests + typecheck:app PASS；digest `c8a4d39d…`
+
+### 迭代 P42（完成）
+- [x] CanonicalAssetLibrary `.authority-entry,.version-entry` 40px；2/2 tests + typecheck:app PASS；digest `d117dda1…`
+
+### 迭代 P43（完成）
+- [x] 扫描 overflow:auto 未剔除行 / busy：无自动项，未改产品
+
+### 迭代 P44（完成）
+- [x] 扫描 inspector 第二列表 / 写入守卫：无自动项，未改产品
+
+### 迭代 P45（完成）
+- [x] 扫描 styles.css / Higgsfield + 52 条已有剔除合同 PASS；未改产品
+
+### 迭代 P46（完成）
+- [x] ContinuityReview `removeHeadAnnotation` fail-closed + busy title；13 tests + typecheck:app PASS；digest `ab18098e…`
+
+### 迭代 P47（完成）
+- [x] 扩大 busy 扫描同型写入：无自动项，未改产品
+
+### 迭代 P48（完成）
+- [x] 扫描箭头/方法 busy 赋值：无自动项，未改产品
+
+### 迭代 P49（完成）
+- [x] VideoEditor `cancelRender` fail-closed + busy title；18 tests + typecheck:app PASS；digest `90d93610…`
+
+### 迭代 P50（完成）
+- [x] 扫描 cancel/delete/remove/release 写 IPC：无自动项，未改产品
+
+### 迭代 P51（完成）
+- [x] VideoEditor `resolveRecovery` fail-closed + busy title；19 tests + typecheck:app PASS；digest `2eec8cbb…`
+
+### 迭代 P52（完成）
+- [x] NarrativeAdaptation `replaceFailedBatch` / `batchReview` prompt 前 fail-closed；5 tests + typecheck:app PASS；digest `43d9e35b…`
+
+### 迭代 P53（完成）
+- [x] StudioGenerationControl `runPlanAction` confirm 前 fail-closed；8 tests + typecheck:app PASS；digest `c8e7f5c1…`
+
+### 迭代 P54（完成）
+- [x] StoryWorkbench `pickSource` fail-closed + busy title；10 tests + typecheck:app PASS；digest `7a286ac2…`
+
+### 迭代 P55（完成）
+- [x] 扫描剩余 click→pick 写入口：无自动项，未改产品；digest 仍 `7a286ac2…`
+
+### 迭代 P56（完成）
+- [x] ManagedStudioCanvas `pickCharacterImage/Audio` fail-closed；44 tests + typecheck:app PASS；digest `d2b24727…`
+
+### 迭代 P57（完成）
+- [x] ImportWizard `pickingRoot` + MaterialStudio pick-package fail-closed；6 tests + typecheck:app PASS；digest `40995ad8…`
+
+### 迭代 P58（完成）
+- [x] App.vue `importProject`/`chooseManagedParentRoot` pickingProjectRoot fail-closed；p13 9/9 + typecheck:app PASS；digest `ce67d3d0…`
+
+### 迭代 P59（完成）
+- [x] 扫描 P54–P58 之外剩余 pick：无自动项，未改产品；digest 仍 `ce67d3d0…`
+
+### 迭代 P60（完成）
+- [x] ProjectCenter busy 含 picking；App 传入 pickingProjectRoot；p13 10/10 + typecheck:app PASS；digest `86c8cf90…`
+
+### 迭代 P61（完成）
+- [x] NovelStudio `.candidate-list button` content-visibility 48px；17 tests + typecheck:app PASS；digest `05c3757a…`
+
+### 迭代 P62（完成）
+- [x] NovelStudio `.volume-toggle` 40px + Continuation `.recovery-banner article` 48px；29 tests + typecheck:app PASS；digest `ce917cd3…`
+
+### 迭代 P63（完成）
+- [x] MultimediaTimeline `.track-entry` content-visibility 82px；10 tests + typecheck:app PASS；digest `6c6da1e7…`
+
+### 迭代 P64（完成）
+- [x] 扫描剩余无 CV 滚动行 / busy：无自动项，未改产品；digest 仍 `6c6da1e7…`
+
+### 迭代 P65（完成）
+- [x] 连续两轮无自动项：开源对标附录 N2 规格；未改产品；digest 仍 `6c6da1e7…`
+
+### 迭代 P66（完成）
+- [x] digest 漂 `ee8a9c5c…`（N2 画布音频落地中）；未改 24h-perf 产品；邻接 68 tests PASS
+
+### 迭代 P67（完成）
+- [x] digest 仍 `ee8a9c5c…`；非画布无新 CV/busy 红测；未改产品；113 tests PASS
+
+### 迭代 P68（完成）
+- [x] CanvasNode busy 暂停音频；46 tests + typecheck:app PASS；digest `5d716fa8…`
+
+### 迭代 P69（完成）
+- [x] digest 漂 `ccac908b…`（N3 库拖落地中）；未改 24h-perf 产品；邻接 68 tests PASS
+
+### 迭代 P70（完成）
+- [x] digest 仍 `ccac908b…`；N3 已关且拖放 fail-closed；未改产品；115 tests PASS
+
+### 迭代 P71（完成）
+- [x] CanvasNode playbackUrl 变化时 pause；48 tests + typecheck:app PASS；digest `e522506f…`
+
+### 迭代 P72（完成）
+- [x] 画布音频节点互斥 play（mutex 模块 + Node `@play`）；5+48 tests + typecheck:app PASS；digest `8ad68447…`
+
+### 迭代 P73（完成）
+- [x] MaterialStudio / MultimediaTimeline 原生音频接入画布互斥；21 tests + typecheck:app PASS；digest `7c953b7d…`
+
+### 迭代 P74（完成）
+- [x] busy/pendingAction/bindBusy 时原生 play 立即 pause；72 tests + typecheck:app PASS；digest `f13795bb…`
+
+### 迭代 P75（完成）
+- [x] busy 时禁用原生音频 pointer-events；75 tests + typecheck:app PASS；digest `870f970a…`
+
+### 迭代 P76（完成）
+- [x] 扫描剩余 CV/busy：无自动项，未改产品；digest 仍 `870f970a…`；75 tests + typecheck:app PASS
+
+### 迭代 P77（完成）
+- [x] 6b 附录：N5=`mod+e`→已有 `focusEarliestUnit`；未改产品；digest `d4197f88…`
+
+### 迭代 P78（完成）
+- [x] N5 已关；无新 CV/busy 红测，未改产品；digest `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P79（完成）
+- [x] 6b 附录：N6=⌘G + Vue Flow parentId + 遗留 group；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P80（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P81（完成）
+- [x] 6b 附录：N7=检查器/库行试听走 mutex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P82（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P83（完成）
+- [x] 6b 附录：N8=画布入库/检查器别名接线；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P84（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P85（完成）
+- [x] 6b 附录：N9=`Shift+1`/Controls → 已有 `fitCanvas()`；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P86（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P87（完成）
+- [x] 6b 附录：N10=`Shift+0` → `zoomTo(1)`；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P88（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P89（完成）
+- [x] 6b 附录：N11=`Shift+2` 适配所选节点；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P90（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P91（完成）
+- [x] 6b 附录：N12=入库可选 description；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P92（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P93（完成）
+- [x] 6b 附录：N13=Delete/Backspace 卸钉走 togglePinnedNode；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P94（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P95（完成）
+- [x] 6b 附录：N14=可选 24px 网格吸附（不启用 Vue Flow snapToGrid）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P96（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P97（完成）
+- [x] 6b 附录：N15=Arrow 微移 1px / Shift+Arrow 24px；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P98（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P99（完成）
+- [x] 6b 附录：N16=⌘A 全选当前 nodes；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P100（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P101（完成）
+- [x] 6b 附录：N17=Space+左键拖平移（不改默认框选）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P102（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P103（完成）
+- [x] 6b 附录：N18=Escape 关弹层后再清节点选区；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P104（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P105（完成）
+- [x] 6b 附录：N19=Shift+⌘A 反选；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P106（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P107（完成）
+- [x] 6b 附录：N20=Alt+Arrow 走 applyAlign；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P108（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P109（完成）
+- [x] 6b 附录：N21=Alt+H/V 居中、Alt+Shift+H/V 均分；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P110（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P111（完成）
+- [x] 6b 附录：N22=Shift+E 走 toggleEdges；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P112（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P113（完成）
+- [x] 6b 附录：N23=Shift+M 走 toggleMiniMap；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P114（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P115（完成）
+- [x] 6b 附录：N24=Shift+W 走 toggleWorkspaceMode；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P116（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P117（完成）
+- [x] 6b 附录：N25=Shift+T 走 applyTimelineLayout；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P118（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P119（完成）
+- [x] 6b 附录：N26=F5 走 refreshAll；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P120（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P121（完成）
+- [x] 6b 附录：N27=C 走 toggleConnectMode；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P122（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P123（完成）
+- [x] 6b 附录：N28=F1 走 toggleHelp；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P124（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P125（完成）
+- [x] 6b 附录：N29=A 走 toggleAddMenu；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P126（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P127（完成）
+- [x] 6b 附录：N30=L 走 toggleLibrary；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P128（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P129（完成）
+- [x] 6b 附录：N31=Shift+L 走 toggleGlobalResourceLibrary；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P130（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；81 tests + typecheck:app PASS
+
+### 迭代 P131（完成）
+- [x] 6b 附录：N32=F6 走 verifyLocalProductionSource；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P132（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P133（完成）
+- [x] 6b 附录：N33=Shift+D 走 setCanvasTheme 循环 light/dark/paper；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P134（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P135（完成）
+- [x] 6b 附录：N34=⌘F 聚焦 timeline-progress-query；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P136（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P137（完成）
+- [x] 6b 附录：N35=搜索框 Enter 走 focusTimelineSearchResult；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P138（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P139（完成）
+- [x] 6b 附录：N36=F3/Shift+F3 循环搜索多命中；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P140（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P141（完成）
+- [x] 6b 附录：N37=查询框非空 Escape 先清查询，不抢 N18；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P142（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P143（完成）
+- [x] 6b 附录：N38=空查询 Escape 先 blur 查询框，再按才 N18；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P144（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P145（完成）
+- [x] 6b 附录：N39=查询框 Alt+Arrow 循环 timelineProgressReview；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P146（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P147（完成）
+- [x] 6b 附录：N40=筛选框 Escape 聚焦 timeline-progress-query；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P148（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P149（完成）
+- [x] 6b 附录：N41=`[`/`]` 走 focusPanelOnCanvas 循环时间线条；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P150（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P151（完成）
+- [x] 6b 附录：N42=Home/End 走 focusPanelOnCanvas 首末格；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P152（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P153（完成）
+- [x] 6b 附录：N43=时间线条芯片 roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P154（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P155（完成）
+- [x] 6b 附录：N44=芯片焦点 PageUp/PageDown 跳 10 格；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P156（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P157（完成）
+- [x] 6b 附录：N45=无芯片焦点 PageUp/PageDown 走 focusPanelOnCanvas 跳 10 格；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P158（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P159（完成）
+- [x] 6b 附录：N46=单元轨 library-item PageUp/PageDown 走 selectUnit 跳 10 条；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P160（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P161（完成）
+- [x] 6b 附录：N47=单元轨 Alt+PageUp/PageDown 走 unitsPrevious/unitsNext；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P162（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P163（完成）
+- [x] 6b 附录：N48=单元轨 library-item Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P164（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P165（完成）
+- [x] 6b 附录：N49=素材库可见行 Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P166（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P167（完成）
+- [x] 6b 附录：N50=剧本/提示词 text-list Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P168（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P169（完成）
+- [x] 6b 附录：N51=媒体库 media-library-item Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P170（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P171（完成）
+- [x] 6b 附录：N52=媒体库 Alt+PageUp/PageDown 走 mediaPrevious/mediaNext；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P172（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P173（完成）
+- [x] 6b 附录：N53=素材库 Alt+PageUp/PageDown 走 assetsPrevious/assetsNext；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P174（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P175（完成）
+- [x] 6b 附录：N54=全局资源 Alt+PageUp/PageDown 走 globalResourcesPrevious/globalResourcesNext；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P176（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P177（完成）
+- [x] 6b 附录：N55=检查器出场时间线 Alt+PageUp/PageDown 走 appearancesPrevious/appearancesNext；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P178（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P179（完成）
+- [x] 6b 附录：N56=检查器出场行 appearance-list button Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P180（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P181（完成）
+- [x] 6b 附录：N57=全局资源卡 global-resource-card Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P182（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P183（完成）
+- [x] 6b 附录：N58=节点操作钮 node-action-buttons Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P184（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P185（完成）
+- [x] 6b 附录：N59=当前素材库 library-tabs Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P186（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P187（完成）
+- [x] 6b 附录：N60=全局资源 tabs global-resource-tabs Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P188（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P189（完成）
+- [x] 6b 附录：N61=添加菜单 add-menu button Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P190（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P191（完成）
+- [x] 6b 附录：N62=浮动工具栏 floating-tools 顶层钮 Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P192（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P193（完成）
+- [x] 6b 附录：N63=底部视图工具 bottom-tools 可用钮 Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P194（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P195（完成）
+- [x] 6b 附录：N64=视图菜单 view-menu-pop > button Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P196（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P197（完成）
+- [x] 6b 附录：N65=视图菜单主题 view-menu-theme radio Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P198（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P199（完成）
+- [x] 6b 附录：N66=受管画布 Vue Flow Controls-button Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P200（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P201（完成）
+- [x] 6b 附录：N67=故事事件图 story-graph-connect Controls-button Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P202（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P203（完成）
+- [x] 6b 附录：N68=遗留生产画布 production-flow Controls-button Arrow roving tabindex；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P204（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P205（完成）
+- [x] 6b 附录：N69=受管 MiniMap managed-canvas-minimap 焦点 Arrow 平移视口；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P206（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P207（完成）
+- [x] 6b 附录：N70=帮助卡 managed-canvas-help-card dialog 初焦关闭钮 + Tab 环；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P208（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P209（完成）
+- [x] 6b 附录：N71=MiniMap 节点 data-node-id roving + Enter 选中（禁止 HTML id）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P210（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P211（完成）
+- [x] 6b 附录：N72=连线横幅 connect-banner 退出钮 testid + 焦点归还连线钮；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P212（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P213（完成）
+- [x] 6b 附录：N73=检查器 inspector-close testid + 关闭后焦点归还画布（aside 不改 dialog）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P214（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P215（完成）
+- [x] 6b 附录：N74=导演动作面板 dialog 初焦过滤框 + Tab 环 + 关闭后归还导演钮；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P216（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P217（完成）
+- [x] 6b 附录：N75=素材库/剧本资源关闭钮 testid + 关闭后焦点归还对应开库钮（aside 不改 dialog）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P218（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P219（完成）
+- [x] 6b 附录：N76=错误横幅 canvas-error 关闭钮 testid + 关闭后焦点归还画布（alert 不改 dialog）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P220（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P221（完成）
+- [x] 6b 附录：N77=清空画布二次确认后焦点归还画布（不改 window.confirm；Escape 仍只解除武装）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P222（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P223（完成）
+- [x] 6b 附录：N78=帮助卡关闭钮 testid + 点击关闭后焦点归还帮助触发钮（不抢 N70 初焦/Tab；Escape 仍 N18）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P224（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P225（完成）
+- [x] 6b 附录：N79=视图菜单关闭后焦点归还 summary（打开初焦仍 N64；Escape 仍 N18；帮助/添加归还优先）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P226（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P227（完成）
+- [x] 6b 附录：N80=画布诊断 details summary testid（原生 disclosure；Escape 不关；不抢检查器诊断）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P228（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P229（完成）
+- [x] 6b 附录：N81=检查器诊断 details summary testid（原生 disclosure；Escape 不关；不抢 N73/N80）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P230（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；83 tests + typecheck:app PASS
+
+### 迭代 P231（完成）
+- [x] 6b 附录：N82=素材库详情栏诊断 details summary testid（原生 disclosure；不铺列表行；不抢 N80/N81）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P232（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；77 tests + typecheck:app PASS
+
+### 迭代 P233（完成）
+- [x] 6b 附录：N83=审片下一动作诊断 details summary testid（原生 disclosure；Escape 不关；不铺资产/冲突行；不抢 N80–N82）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P234（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；77 tests + typecheck:app PASS
+
+### 迭代 P235（完成）
+- [x] 6b 附录：N84=生成控制技术消息诊断 details summary testid（原生 disclosure；不改 pack-identity；不抢 N80–N83）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P236（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；77 tests + typecheck:app PASS
+
+### 迭代 P237（完成）
+- [x] 6b 附录：N85=审片 Review 头栏诊断 details summary testid（原生 disclosure；Escape 不关；不铺资产/冲突/批次行；不抢 N80–N84）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P238（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；77 tests + typecheck:app PASS
+
+### 迭代 P239（完成）
+- [x] 6b 附录：N86=审片资产卡诊断 details summary testid（原生 disclosure；共享 testid；不铺冲突/批次行；不抢 N80–N85）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P240（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；77 tests + typecheck:app PASS
+
+### 迭代 P241（完成）
+- [x] 6b 附录：N87=审片冲突卡诊断 details summary testid（原生 disclosure；共享 testid；不铺批次行；不抢 N80–N86）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P242（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；77 tests + typecheck:app PASS
+
+### 迭代 P243（完成）
+- [x] 6b 附录：N88=审片批次卡诊断 details summary testid（原生 disclosure；共享 testid；不给 blocking-batch 新加 details；不抢 N80–N87）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P244（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；77 tests + typecheck:app PASS
+
+### 迭代 P245（完成）
+- [x] 6b 附录：N89=素材库关联行诊断 details summary testid（原生 disclosure；共享 testid；不铺版本行；不抢 N82/N80–N88）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P246（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；77 tests + typecheck:app PASS
+
+### 迭代 P247（完成）
+- [x] 6b 附录：N90=素材库版本行诊断 details summary testid（原生 disclosure；共享 testid；不抢 N82/N89）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P248（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；77 tests + typecheck:app PASS
+
+### 迭代 P249（完成）
+- [x] 6b 附录：N91=审片空态诊断 details summary testid（原生 disclosure；不改查询表单；生成计划 ID 诊断另刀；不抢 N80–N90）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P250（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；77 tests + typecheck:app PASS
+
+### 迭代 P251（完成）
+- [x] 6b 附录：N92=生成控制计划 ID 诊断 details summary testid（原生 disclosure；共享 testid；不抢 N84/pack-identity；绑定工作台另刀）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P252（完成）
+- [x] 无新 CV/busy 红测，未改产品；digest 仍 `25c1df9c…`；77 tests + typecheck:app PASS
+
+### 迭代 P253（完成）
+- [x] 6b 附录：N93=绑定工作台 `.binding-diagnostics` summary testid（原生 disclosure；共享 testid；不改空镜说明/冻结钮；驾驶舱诊断另刀；不抢 N80–N92）；earliest 仍 N6；未改产品；digest 仍 `25c1df9c…`
+
+### 迭代 P254（完成）
+- [x] N7 检查器角色音频原生试听 + mutex/busy；5 files / 87 tests + typecheck:app PASS；digest `9cf8a12c…`→后续已漂
+
+### 迭代 P255（完成）
+- [x] N8 入库 aliases → create_studio_asset；检查器/库行展示；89 tests + typecheck:app PASS
+
+### 迭代 P256（完成）
+- [x] N9–N11 Shift+1/0/2 视口快捷键 + Controls 覆盖默认 fitView；90 tests + typecheck:app PASS；digest `3e49d01b…`
+
+### 迭代 P257（完成）
+- [x] N12 入库可选 description，空则保留模板句；92 tests + typecheck:app PASS
+
+### 迭代 P258（完成）
+- [x] N13 Delete/Backspace 优先删所选连线否则卸钉；`:delete-key-code="() => false"`；digest `132ba3f4…`
+
+### 迭代 P259（完成）
+- [x] N14 可选 24px 网格吸附默认关；对象吸附后 round；成组拖不 round
+
+### 迭代 P260（完成）
+- [x] N15 Arrow 1px / Shift+Arrow 24px，无选区不 mutate
+
+### 迭代 P261（完成）
+- [x] N16 ⌘A 全选当前 nodes；空图不 mutate；digest `16f62c06…`；91 tests + typecheck:app PASS
+
+### 迭代 P262（完成）
+- [x] N17 Space pan-on-drag 含 0，keyup 回 `[1,2]`；默认左键仍框选
+
+### 迭代 P263（完成）
+- [x] N18 Escape 关弹层后清选区；拖拽中不清选
+
+### 迭代 P264（完成）
+- [x] N19 Shift+⌘A 反选；digest `2b0608d7…`；94 tests + typecheck:app PASS
+
+### 迭代 P265（完成）
+- [x] N20 Alt+Arrow 走 applyAlign；N15 仍 `!altKey`
+
+### 迭代 P266（完成）
+- [x] N21 Alt+H/V 居中、Alt+Shift+H/V 均分；digest `66091716…`；96 tests + typecheck:app PASS
+
+### 迭代 P267（完成）
+- [x] N22–N26 Shift+E/M/W/T 与 F5 视图快捷键；不抢导演和弦；digest `842abfe0…`；98 tests + typecheck:app PASS
+
+### 迭代 P268（完成）
+- [x] N27–N31 C/F1/A/L/Shift+L 工具面板快捷键；digest `9b3b8b29…`；99 tests + typecheck:app PASS
+
+### 迭代 P269（完成）
+- [x] N32–N35 F6 核对、Shift+D 主题、⌘F 聚焦、Enter 唯一命中；digest `6dad03c6…`；100 tests + typecheck:app PASS
+
+### 迭代 P270（完成）
+- [x] N36–N38 F3 循环命中、Escape 先清查询再失焦；digest `ddeb1db7…`；101 tests + typecheck:app PASS
+
+### 迭代 P271（完成）
+- [x] N39–N41 审片筛选循环、Escape 回焦、宫格 `[`/`]`；digest `a29e41c7…`；102 tests + typecheck:app PASS
+
+### 迭代 P272（完成）
+- [x] N42–N44 Home/End 定位首末、条内 roving、芯片 Page 跳 10；digest `6bc21332…`；102 tests + typecheck:app PASS
+
+### 迭代 P273（完成）
+- [x] N45–N47 画布 Page 跳格、单元轨 Page、Alt+Page 翻页；digest `dce94757…`；102 tests + typecheck:app PASS
+
+### 迭代 P274（完成）
+- [x] N48–N50 单元轨/素材窗/文稿列表 roving tabindex；digest `a1463e4b…`；103 tests + typecheck:app PASS
+
+### 迭代 P275（完成）
+- [x] N51–N53 媒体行 roving、媒体/素材 Alt+Page 翻页；digest `18dbc1e7…`；104 tests + typecheck:app PASS
+
+### 迭代 P276–P277（完成）
+- [x] N54 全局资源 Alt+Page 翻页；N55 出场 Alt+Page 翻页；digest `9d36b0c7…`；99 tests + typecheck:app PASS
+
+### 迭代 P278–P280（完成）
+- [x] N56 出场行 roving、N57 全局卡 roving、N58 操作钮 roving（跳过 disabled）；digest `0ff21755…`；102 tests + typecheck:app PASS
+
+### 迭代 P281–P284（完成）
+- [x] N59 素材库 tabs roving、N60 全局资源 tabs roving、N61 添加菜单 roving、N62 浮动工具栏 roving；digest `c184b2a3…`；106 tests + typecheck:app PASS
+
+### 迭代 P285–P287（完成）
+- [x] N63 底栏 roving、N64 视图菜单项 roving、N65 主题 radio roving；digest `d56c6935…`；109 tests + typecheck:app PASS
+
+### 迭代 P288–P290（完成）
+- [x] N66 受管 Controls roving、N67 故事图 Controls roving、N68 遗留 Controls roving；digest `ee047112…`；129 tests + typecheck:app PASS
+
+### 迭代 P291–P292（完成）
+- [x] N69 MiniMap Arrow 平移、N70 帮助卡焦点陷阱；digest `75048002…`；112 tests + typecheck:app PASS
+
+### 迭代 P293–P294（完成）
+- [x] N71 MiniMap 节点键盘选中、N72 连线横幅退出焦点；digest `e7398624…`；114 tests + typecheck:app PASS
+
+### 迭代 P295–P297（完成）
+- [x] N73 检查器关闭、N74 导演面板焦点、N75 侧栏关闭；digest `bd8778d6…`；117 tests + typecheck:app PASS
+
+### 迭代 P298–P300（完成）
+- [x] N76 错误横幅关闭、N77 清空确认焦点、N78 帮助关闭 testid；digest `b4fff273…`；120 tests + typecheck:app PASS
+
+### 迭代 P301–P303（完成）
+- [x] N79 视图菜单归焦、N80 画布诊断、N81 检查器诊断；digest `35e3a828…`；123 tests + typecheck:app PASS
+
+### 迭代 P304–P306（完成）
+- [x] N82 素材库详情诊断、N83 审片下一动作诊断、N84 生成控制消息诊断；digest `fc19fd69…`；113 tests + typecheck:app PASS
+
+### 迭代 P307–P309（完成）
+- [x] N85 审片头栏诊断、N86 资产卡诊断、N87 冲突卡诊断；digest `bd3cf57c…`；116 tests + typecheck:app PASS
+
+### 迭代 P310–P312（完成）
+- [x] N88 审片批次卡诊断、N89 素材库关联行诊断、N90 版本行诊断；digest `2ad9c41b…`；121 tests + typecheck:app PASS
+
+### 迭代 P313–P315（完成）
+- [x] N91 审片空态诊断、N92 生成控制计划 ID 诊断、N93 绑定诊断；digest `2d8673b5…`；121 tests + typecheck:app PASS
+
+### 迭代 P316–P318（完成）
+- [x] N94 驾驶舱头栏下一动作诊断、N95 单元遗留诊断、N96 控制资产诊断；digest `7a610d0b…`；124 tests + typecheck:app PASS
+
+### 迭代 P319–P321（完成）
+- [x] N97 页脚状态指纹诊断、N98 准备清单诊断、N99 生成前预览诊断；digest `4611c913…`；127 tests + typecheck:app PASS
+
+### 迭代 P322–P324（完成）
+- [x] N100 驾驶舱绑定指纹诊断、N101 素材库权威图诊断、N102 桌面支持诊断；digest `3575b959…`；133 tests + typecheck:app PASS
+
+### 迭代 P325–P327（完成）
+- [x] N103 详细诊断、N104 项目概览、N105 高级操作 summary testid；digest `fb161a3f…`；118 tests + typecheck:app PASS
+
+### 迭代 P328–P330（完成）
+- [x] N106 冻结包身份、N107 结果行身份、N108 审片提交身份 summary testid；digest `0e38b378…`；35 tests + typecheck:app PASS
+
+### 迭代 P331–P333（完成）
+- [x] N109 剧本原文、N110 关系编辑器、N111 Context Pack 回执 summary testid；digest `2925d643…`；52 tests + typecheck:app PASS
+
+### 迭代 P334–P336（完成）
+- [x] N112 逐项轨迹、N113 只读证据、N114 导演设计 summary testid；digest `d3918c28…`；59 tests + typecheck:app PASS
+
+### 迭代 P337–P339（完成）
+- [x] N115 对白、N116 连续性、N117 生成提示词 summary testid；digest `5bc8472b…`；62 tests + typecheck:app PASS
+
+### 迭代 P340–P342（完成）
+- [x] N118 审片 `.asset-control` 160px CV、N119 交接格 `.handoff-grid>div` 40px CV、N120 生产设计 `.registry-list article` 56px CV；digest `d32ef777…`；5 files / 42 tests + typecheck:app PASS
+
+### 迭代 P343–P345（完成）
+- [x] N121 成板历史卡 117px CV、N122 宫格条 190px CV、N123 成板门禁行 18px CV；digest `4b5df160…`；5 files / 45 tests + typecheck:app PASS
+
+### 迭代 P346（下一步）
+- [ ] N124 生产设计一致性成员卡 `.consistency-members article` content-visibility（产品切片，禁止附录-only；不抢 N115–N123；不改 saving）
+
+### 后续候选
+- [ ] 无窗口交互合同扫按钮 disabled/busy（已覆盖的不再铺）
+- [ ] 仅当有测量证据才动 Core 读路径；禁止改 T23 `unitTimingQueries === returnedUnitCount` 合同
+- [ ] 禁止 Electron 可见窗口、安装版 App、medium/P5/三模型全链重跑
+
+### 边界
+禁止 Git 写、安装、正式工程、付费生成、弹窗。
+
+## software_goal: 24h-continuous-iteration-20260821
+
+- status: `in_progress`
+- deadline: `2026-08-22T09:40:00+08:00`
+- live_identity: `9b532fc6b4a95bf3b84a7d593d12bb2d517a0f373df59e462f619d7fd1afd6ae`
+- iteration_log: `.workqueue/continuous-iteration-20260821.md`
+
+### 迭代 1（完成）
+- [x] I1-A 定向 vitest：video-editor / multimedia-timeline / novel-studio 29 tests PASS
+- [x] I1-B `novel_chat.py --selftest` PASS；urlopen 元组仍 TypeError
+- [x] I1-C 同型扫描：撤销/快捷键、ShotTimeline、GenerationQueue.cancel、TaskCenter
+- [x] I1-D 反思已写入 journal
+
+### 迭代 2–4（完成）
+- [x] I2 VideoEditor `editorWriteBusy` 挡住撤销/分割/Ripple/快捷键；12/12 PASS
+- [x] I3 ShotTimeline `writeBusy` + load/selectUnit/move；2/2 PASS（未抢改 ScriptWorkbench）
+- [x] I4 GenerationQueue cancel/saveSettings/enqueue 互斥；3/3 PASS
+
+### 迭代 5（完成）
+- [x] TaskCenter `create`/`claim`/`refresh` fail-closed；`loadCenter` 避免写入中 refresh 空转；2/2 PASS
+
+### 迭代 6（完成）
+- [x] 只读：`reviewCandidate` 已被并行会话修好（`if (busy.value) return` 在 prompt 前），队列测试 5/5 PASS，未双修该文件
+- [x] 证实 `InspectorPanel.saveStatus`/`setAuthority` 缺 handler 重入 → 红测后修复；2/2 PASS
+- [x] busy 合同回归 9 files / 46 tests PASS；`typecheck:app` PASS
+
+### 迭代 7（完成）
+- [x] 身份漂移核对：`4ac08316…` / 1075 files；I6 的 `5a2e973d` 降为历史
+- [x] 回归 17 files / 64 tests PASS；两套 typecheck PASS；partition audit 408=276/91/36/5 PASS；适配器 selftest PASS
+- [x] 无新红测，未改产品代码（并行会话已覆盖连续/导入/设置/接续/故事工作台 busy）
+
+### 迭代 8（完成）
+- [x] 身份：`afdbfcc3` 后本轮落到 `f99fa921…` / 1076 files
+- [x] 并行会话已绿：legacy 撤销 busy、script-media-align、story-workbench；本轮不抢这些切片
+- [x] 新红测：`saveCanvasEntity` 缺重入 + 保存中可 ⌘Z；红绿修复；legacy-canvas-history-busy 3/3 PASS；`typecheck:app` PASS
+
+### 迭代 9（完成）
+- [x] `removeCanvasEntity` / `chooseLinkEndpoint` / `onEdgeClick` 在 confirm 与首个 await 前抢 `canvasHistoryBusy`；4/4 PASS；`typecheck:app` PASS
+- [x] 未碰并行会话正在改的 NovelStudio / NarrativeAdaptation
+
+### 迭代 10（完成）
+- [x] 身份：`e9f0aa9b…` / 1080 files；I9 `1c26e3e8` 降为历史
+- [x] 并行会话已绿拖拽三合同；本轮回归 10/10，未双修 App.vue
+- [x] `typecheck:app` PASS；partition 413=281/91/36/5 PASS；适配器 selftest PASS
+
+### 迭代 11（完成）
+- [x] 身份：`9b532fc6…` / 1081 files；I10 `e9f0aa9b` 降为历史
+- [x] 并行会话已绿 `cancelScanNow` 失败可见；本轮回归 12/12，未双修 App.vue
+- [x] `typecheck:app` PASS；partition 414=282/91/36/5 PASS；适配器 selftest PASS
+
+### 迭代 12（下一步）
+- [ ] 不要铺新页面。无新红测不改产品代码。等到 `2026-08-22T09:40+08:00` 或新复现 P0–P2
+
+### 后续候选（按反思进入，不预支）
+- [ ] 源码已漂：不得沿用 `bba45c71` 的 medium/P5/T23/三模型结论；只有本轮 digest 上的新门才算数
+- [ ] 适配器绿后：对**当时冻结包**补 GLM 5.2 / 豆包各一次；身份不可验则 `IDENTITY_NOT_VERIFIED`
+- [ ] 只在新红测时改产品代码；改完从两套 typecheck 起算
+
+### 边界
+禁止 Git 写、安装、正式工程、付费生成、destructive clean、覆盖旧 evidence。
+
+## software_goal: multi-agent-hardening-handoff-20260814（2026-08-14 23:35 当前状态）
+
+- status: `partially_completed_external_review_blocked`
+- current_identity: `bba45c715c035b7c24e09796ec01e9208a7a5ffb77541f001f4b8f8f032c50ef` / buildId `90941534f2a5d3eb617fadd5386f2c0b` / 220 tools
+- completed:
+  - [x] medium 91/788、integration 36/127、heavy 5/18 从头完整通过；audit 0、build 与 digest/manifest 等式 PASS
+  - [x] MCP smoke、P5 formal、P17、T23 build strict interactions、isolated Electron、isolated package 均按同一身份通过
+  - [x] 生成脱敏冻结审查包；Kimi K3 实调 `PASS/findings=[]`，但身份不可可信验证，已标 `IDENTITY_NOT_VERIFIED`
+  - [x] GLM 5.2 两次与豆包一次均实调并如实记录为本机适配器 `BLOCKED`；没有伪造模型正文或身份
+  - [x] 新证据、验证报告与交接已更新；未改产品源码、未清理共享脏树
+- blocked:
+  - [ ] GLM 5.2 与豆包有效审查正文：当前 `novel_chat.py` 在 Python 3.14 `urllib` timeout tuple 路径崩溃，尚未到达 provider。需要用户授权的外部适配器修复切片；源码不变时不得重跑已绿本地门。
+- evidence:
+  - `docs/evidence/multi-model-review-pack-20260814-bba45c71.json`
+  - `docs/evidence/multi-model-hardening-closeout-20260814-bba45c71.json`
+  - `docs/验证报告_20260814_多代理强健化本地门与外部审查状态_bba45c71.md`
+
+## software_goal: multi-agent-hardening-handoff-20260814
+
+- status: `in_progress_handed_off`（产品实现和定向终审完成；最终分区/build/UI/模型链未完成）
+- current_identity: `bba45c715c035b7c24e09796ec01e9208a7a5ffb77541f001f4b8f8f032c50ef` / 1062 files / 21,414,566 bytes；`release-manifest.json=624a0362…` 已过期，尚未 build
+- completed:
+  - [x] 多代理分方向实测、红绿修复与交叉只读审查
+  - [x] 25 类 locator 全部 strict-readonly；`commit_agent_imagegen_result_bundle` 已入册，registry 25/25
+  - [x] checkpoint schema 3：v1 NULL / v2 历史锚保留 / v3 新写非空；原子迁移、换 inode fail-close、真实 SIGKILL + Head-advance 恢复；定向 PASS + 独立 CLEAN
+  - [x] bundle canonical token hash、legacy request-only key、storageKey 定点 proof、safe pre-terminal checkpoint、direct reconcile full、真实 child SIGKILL；18/18 + v5/legacy + registry PASS，独立 CLEAN
+  - [x] P5 正式源只读 sentinel + 完整隔离副本 + Electron 有界关闭 + owned evidence 原子落盘；契约 7 tests PASS，独立 CLEAN
+  - [x] T23 独立 startup preflight、v1/v2 健康快路、最终三次 CAS、list strict effect 分类、首卡 mutation 取证、原子 watcher lifecycle、失败指标脱敏；定向 PASS + 独立 CLEAN
+  - [x] SQLite optional sidecar 消失/可变 WAL 波动不再假 409；悬空 symlink/目录/替换主库仍 fail-close；真实 DatabaseSync WAL 竞态测试 + 独立 CLEAN
+  - [x] ABI 新增两通道明确入冻结集：272 handles / 259 invokes，数量、名称、集合摘要全锁；2/2 PASS
+  - [x] `npm run typecheck` PASS
+  - [x] `npm run typecheck:app` PASS
+  - [x] partition audit PASS：395=263/91/36/5，fingerprint `fa59c19b0291953e928ac4dba72172ff5cf94c08497faa2d07dd22d06ad5a4ce`
+  - [x] fast PASS：263/263 files，1524/1524 tests，566.96s
+- pending_for_next_ai:
+  - [ ] 从头跑完 medium 91 files；当前只有前 6/10 批 60 files / 581 tests 绿，第 7 批因用户交接指令中断（exit 130），整分区不计 PASS
+  - [ ] 串行 `test:integration` 和 `test:heavy`
+  - [ ] 运行 `audit:production`；然后唯一 `build`，复算 manifest/live digest 等式
+  - [ ] 在新 build 上跑 MCP smoke、P5 formal、P17、T23 build strict interactions、isolated Electron、isolated package
+  - [ ] 生成同一最终 digest 的脱敏 review pack，实调 Kimi K3、GLM 5.2、豆包；无法验证 returned identity 时标 `IDENTITY_NOT_VERIFIED`
+  - [ ] 只在方案/真实门发现可复现 P0–P2 时做有界修复；任一源码变动后从两套 typecheck 重启全链
+  - [ ] 更新新 evidence/验证报告/STATUS/TASKS/交接；逐项保留未跟踪 owner，不清理 `.analysis-src.tgz`
+- git_state: HEAD `3c56e1d`；交接前 79 tracked modified / 37 untracked，tracked diff 约 `+11952/-802`；`git diff --check` PASS
+- stale_evidence: `*696b0970*`、`624a0362…`、`d2e70bf9…`、`13d85a9f…` 只属历史，不计当前结果
+- earliest_next: 接手 AI 按 `docs/当前开发交接.md` 21:59 CST 区块冷启动；无新红测不改代码，直接从头跑 medium
+- boundaries: 禁止 reset/clean/checkout/stage/commit/push；不安装、不发布/上传/付费生成、不写正式工程、不删除未跟踪/evidence
+
 ## software_goal: multi-model-quality-20260813
 
 - status: `completed`

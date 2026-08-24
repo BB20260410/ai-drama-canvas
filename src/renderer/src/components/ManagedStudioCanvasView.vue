@@ -12,7 +12,7 @@
     <header class="canvas-header">
       <p class="canvas-context" data-testid="managed-canvas-context">{{ unitContextText }}</p>
       <details class="canvas-metrics technical-diagnostics" data-testid="managed-canvas-metrics" open>
-        <summary>项目概览</summary>
+        <summary data-testid="managed-canvas-metrics-summary">项目概览</summary>
         <div>
           <span><b>{{ overview?.counts.canonicalAssets ?? 0 }}</b> 资产</span>
           <span><b>{{ overview?.counts.units ?? 0 }}</b> 单元</span>
@@ -37,7 +37,7 @@
           构建身份 v{{ runtimeBuildIdentity.packageVersion }} · buildId:{{ runtimeBuildIdentity.buildId.slice(0, 12) }} · sourceDigest:{{ runtimeBuildIdentity.sourceDigest.slice(0, 12) }}
         </div>
         <details v-if="productionDiagnostics" class="diagnostics-detail" data-testid="managed-canvas-diagnostics-detail">
-          <summary>详细诊断</summary>
+          <summary data-testid="managed-canvas-detailed-diagnostics">详细诊断</summary>
           <div class="diagnostics-grid">
             <span>派发 <b>{{ productionDiagnostics.counts.dispatches }}</b></span>
             <span>结果 <b>{{ productionDiagnostics.counts.results }}</b></span>
@@ -56,7 +56,7 @@
           data-testid="managed-canvas-director-toggle"
           :class="{ active: directorPanelOpen }"
           title="导演动作面板（⌘/）"
-          @click="directorPanelOpen = !directorPanelOpen">
+          @click="toggleDirectorPanel">
           导演
         </button>
         <button
@@ -131,12 +131,13 @@
         <label>
           <span class="sr-only">进度搜索</span>
           <input
+            ref="timelineProgressQueryEl"
             v-model.trim="timelineProgressQuery"
             type="search"
             data-testid="managed-canvas-timeline-progress-query"
             placeholder="搜集数/单元/角色/场景/SHA/审片状态"
             @input="scheduleFocusTimelineSearchResult"
-            @keydown.enter.prevent />
+            @keydown.enter.prevent="onTimelineSearchEnter" />
         </label>
         <select v-model="timelineProgressReview" data-testid="managed-canvas-timeline-progress-review" @change="focusTimelineSearchResult">
           <option value="">全部状态</option>
@@ -150,13 +151,13 @@
           命中 {{ timelineProgressFilterResult.unitCount }} 单元 / {{ timelineProgressFilterResult.panelCount }} 格
         </span>
       </div>
-      <ol v-if="panelTimelineStrip.length" class="panel-timeline-strip" data-testid="managed-canvas-panel-timeline" aria-label="当前单元宫格时间线">
+      <ol v-if="panelTimelineStrip.length" class="panel-timeline-strip" data-testid="managed-canvas-panel-timeline" role="toolbar" aria-label="当前单元宫格时间线">
         <li
-          v-for="row in panelTimelineStrip"
+          v-for="(row, index) in panelTimelineStrip"
           :key="row.panelId"
           :class="['timeline-chip', `review-${row.reviewDecision}`, { ready: row.hasRaw && row.hasLabeled, muted: timelineProgressDimmedPanelIds.has(row.panelId) }]"
           :title="`${row.startSeconds}s · 格${row.ordinal}`">
-          <button type="button" @click="focusPanelOnCanvas(row.panelId)">
+          <button type="button" :tabindex="panelTimelineActiveChipIndex === index ? 0 : -1" @click="focusPanelOnCanvas(row.panelId)" @focus="panelTimelineRovingIndex = index">
             <em>{{ row.startSeconds }}s</em>
             <span>P{{ row.ordinal }}</span>
             <small>{{ timelineChipLabel(row) }}</small>
@@ -164,7 +165,7 @@
         </li>
       </ol>
       <details class="advanced-workflow">
-        <summary>高级操作</summary>
+        <summary data-testid="managed-canvas-advanced-workflow">高级操作</summary>
         <div class="workflow-toolbar" data-testid="managed-canvas-workflow-toolbar" aria-label="工作流组">
           <span data-testid="managed-canvas-selection-count">已选宫格 {{ selectedPanelIds.length }}</span>
           <button type="button" data-testid="managed-canvas-create-workflow" :disabled="loading || selectedPanelIds.length === 0 || workflowBusy" @click="createWorkflowFromSelection">保存所选</button>
@@ -178,7 +179,7 @@
 
     <div v-if="errorMessage" class="canvas-error" role="alert">
       <span>{{ errorMessage }}</span>
-      <button type="button" aria-label="关闭错误" @click="errorMessage = ''">×</button>
+      <button type="button" data-testid="managed-canvas-error-close" aria-label="关闭错误" @click="closeCanvasError">×</button>
     </div>
 
     <div
@@ -207,7 +208,7 @@
               @click="emit('openResourceCenter')">
               打开总资源中心
             </button>
-            <button type="button" aria-label="关闭剧本资源" @click="closeLibrary">×</button>
+            <button type="button" data-testid="managed-canvas-global-library-close" aria-label="关闭剧本资源" @click="closeLibrary">×</button>
           </div>
         </header>
 
@@ -230,12 +231,14 @@
 
         <nav class="library-tabs global-resource-tabs" aria-label="剧本资源类型">
           <button
-            v-for="category in globalResourceCategories"
+            v-for="(category, index) in globalResourceCategories"
             :key="category.kind"
             type="button"
             :data-testid="`managed-canvas-global-resource-${category.kind}`"
             :class="{ active: globalResourceCategory === category.kind }"
             :disabled="globalResourceLoading"
+            :tabindex="!globalResourceLoading && globalResourceTabActiveIndex === index ? 0 : -1"
+            @focus="globalResourceTabRovingIndex = index"
             @click="openGlobalResourcesFor(category.kind)">
             {{ category.label }}
             <small v-if="globalResourceCounts[category.kind]">{{ globalResourceCounts[category.kind] }}</small>
@@ -265,11 +268,13 @@
             data-testid="managed-canvas-global-resource-viewport">
             <ul class="global-resource-list" aria-label="全部剧本版本图片列表">
               <li
-                v-for="entry in globalResourcePage.items"
+                v-for="(entry, index) in globalResourcePage.items"
                 :key="entry.id"
                 :data-resource-key="entry.id"
                 class="global-resource-card"
-                data-testid="managed-canvas-global-resource-item">
+                :tabindex="globalResourceListActiveIndex === index ? 0 : -1"
+                data-testid="managed-canvas-global-resource-item"
+                @focus="globalResourceListRovingIndex = index">
                 <figure>
                   <img
                     v-if="entry.thumbnailUrl"
@@ -334,13 +339,53 @@
       <aside v-else-if="libraryOpen" id="managed-canvas-library" class="canvas-library" aria-label="素材库">
         <header>
           <div><span class="eyebrow">素材库</span><h3>放到画布</h3></div>
-          <button type="button" aria-label="关闭素材库" @click="libraryOpen = false">×</button>
+          <button type="button" data-testid="managed-canvas-library-close" aria-label="关闭素材库" @click="closeLibrary">×</button>
         </header>
         <nav class="library-tabs" aria-label="素材类型">
-          <button v-for="tab in libraryTabs" :key="tab.kind" type="button" :class="{ active: libraryTab === tab.kind }" @click="openLibraryFor(tab.kind)">{{ tab.label }}</button>
+          <button
+            v-for="(tab, index) in libraryTabs"
+            :key="tab.kind"
+            type="button"
+            :class="{ active: libraryTab === tab.kind }"
+            :tabindex="libraryTabActiveIndex === index ? 0 : -1"
+            @focus="libraryTabRovingIndex = index"
+            @click="openLibraryFor(tab.kind)">{{ tab.label }}</button>
         </nav>
 
         <section v-if="libraryTab === 'character' || libraryTab === 'scene' || libraryTab === 'prop' || libraryTab === 'style'" class="library-section">
+          <form
+            v-if="libraryTab === 'character' || libraryTab === 'scene' || libraryTab === 'prop'"
+            class="character-ingest"
+            data-testid="managed-canvas-character-ingest"
+            @submit.prevent="submitCharacterIngest">
+            <label>
+              <span>{{ assetCategoryLabel(libraryTab) }}名称</span>
+              <input v-model.trim="characterIngestName" :disabled="characterIngestBusy" :placeholder="libraryTab === 'character' ? '例如：阿航' : libraryTab === 'scene' ? '例如：山洞内景' : '例如：黄金面具'" />
+            </label>
+            <label>
+              <span>别名（可选，逗号分隔）</span>
+              <input v-model.trim="characterIngestAliases" data-testid="managed-canvas-character-aliases-input" :disabled="characterIngestBusy" placeholder="例如：阿航，小航" />
+            </label>
+            <label>
+              <span>说明（可选）</span>
+              <textarea v-model.trim="characterIngestDescription" data-testid="managed-canvas-character-description-input" :disabled="characterIngestBusy" maxlength="20000" rows="2" placeholder="空则使用默认入库说明" />
+            </label>
+            <div class="character-ingest-files" :class="{ 'character-ingest-files-single': libraryTab !== 'character' }">
+              <button type="button" data-testid="managed-canvas-character-pick-image" :disabled="characterIngestBusy || pickingCharacterMedia" :title="(characterIngestBusy || pickingCharacterMedia) ? (libraryTab === 'character' ? '正在处理，不能再选择角色参考图' : '正在处理，不能再选择参考图') : undefined" @click="pickCharacterImage">{{ characterImagePath ? "已选参考图" : "上传图片" }}</button>
+              <button v-if="libraryTab === 'character'" type="button" data-testid="managed-canvas-character-pick-audio" :disabled="characterIngestBusy || pickingCharacterMedia" :title="(characterIngestBusy || pickingCharacterMedia) ? '正在处理，不能再选择角色音频' : undefined" @click="pickCharacterAudio">{{ characterAudioPath ? "已选音频" : "上传音频" }}</button>
+              <button v-if="libraryTab === 'character'" type="button" data-testid="managed-canvas-character-pick-side" :disabled="characterIngestBusy || pickingCharacterMedia" :title="(characterIngestBusy || pickingCharacterMedia) ? '正在处理，不能再选择侧视图' : undefined" @click="pickCharacterView('side')">{{ characterSideImagePath ? "已选侧视图" : "上传侧视图" }}</button>
+              <button v-if="libraryTab === 'character'" type="button" data-testid="managed-canvas-character-pick-back" :disabled="characterIngestBusy || pickingCharacterMedia" :title="(characterIngestBusy || pickingCharacterMedia) ? '正在处理，不能再选择背视图' : undefined" @click="pickCharacterView('back')">{{ characterBackImagePath ? "已选背视图" : "上传背视图" }}</button>
+            </div>
+            <p class="library-note">{{ characterIngestHint }}</p>
+            <button
+              class="character-ingest-save"
+              type="submit"
+              data-testid="managed-canvas-character-save"
+              :disabled="characterIngestBusy || !characterIngestName || !characterImagePath"
+              :title="characterIngestBusy ? '正在入库，不能再提交' : undefined">
+              {{ characterIngestBusy ? "入库中" : `存入${assetCategoryLabel(libraryTab)}库并放到画布` }}
+            </button>
+          </form>
           <label><span>搜索名称、别名或权威 SHA</span><input v-model.trim="assetSearch" placeholder="输入名称、别名或 SHA，按回车搜索" @keyup.enter="resetAssets" /></label>
           <p v-if="loading && !assetsPage" class="library-note" role="status">正在加载…</p>
           <p v-else-if="assetsPage && assetsPage.page.items.length === 0" class="library-empty">{{ assetSearch ? `没有找到与「${assetSearch}」匹配的${assetCategoryLabel(libraryTab)}` : `还没有可用的${assetCategoryLabel(libraryTab)}，先去素材中心添加` }}</p>
@@ -350,10 +395,10 @@
             @scroll="onAssetsLibraryScroll">
             <div class="library-list-spacer" :style="{ height: `${assetsVirtualWindow.totalHeight}px` }">
               <ul class="library-list" :style="{ transform: `translateY(${assetsVirtualWindow.offsetTop}px)` }">
-                <li v-for="asset in visibleLibraryAssets" :key="asset.id">
-                  <button type="button" class="library-item" @click="selectAsset(asset)">
+                <li v-for="(asset, index) in visibleLibraryAssets" :key="asset.id">
+                  <button type="button" class="library-item" draggable="true" data-testid="managed-canvas-library-drag" :tabindex="assetListActiveIndex === index ? 0 : -1" @focus="assetListRovingIndex = index" @click="selectAsset(asset)" @dragstart="onLibraryDragStart($event, `asset:${asset.id}`)">
                     <span class="item-thumb"><img v-if="authorityThumbUrl(asset.authorityThumbnailRecipeKey)" :src="authorityThumbUrl(asset.authorityThumbnailRecipeKey)" :alt="asset.name" loading="lazy" decoding="async" /><i v-else>{{ assetCategoryLabel(asset.category).slice(0, 1) }}</i></span>
-                    <span><b>{{ asset.name }}</b><small>{{ asset.hasPrimaryAuthority ? "参考图已锁定" : "待补参考图" }}</small></span>
+                    <span><b>{{ asset.name }}</b><small data-testid="managed-canvas-library-alias">{{ characterLibrarySubtitle(asset) }}</small></span>
                   </button>
                   <button type="button" class="pin-button" :disabled="loading || pinActionBusy" @click="togglePinnedNode(`asset:${asset.id}`)">{{ isPinned(`asset:${asset.id}`) ? "移出画布" : "添加" }}</button>
                 </li>
@@ -372,8 +417,8 @@
           <p v-if="loading && !textDocuments.length" class="library-note" role="status">正在加载…</p>
           <p v-else-if="!loading && filteredTextDocuments.length === 0" class="library-empty">还没有已保存的{{ libraryTab === "script" ? "剧本" : "提示词" }}</p>
           <ul class="library-list text-list">
-            <li v-for="doc in filteredTextDocuments" :key="`${doc.kind}:${doc.id}`">
-              <button type="button" class="library-item" @click="selection = { kind: doc.kind, doc }"><span class="item-type">{{ doc.kind === "script" ? "剧" : "词" }}</span><span><b>{{ doc.title }}</b><small>第 {{ doc.revision }} 版</small></span></button>
+            <li v-for="(doc, index) in filteredTextDocuments" :key="`${doc.kind}:${doc.id}`">
+              <button type="button" class="library-item" draggable="true" data-testid="managed-canvas-library-drag" :tabindex="textListActiveIndex === index ? 0 : -1" @focus="textListRovingIndex = index" @click="selection = { kind: doc.kind, doc }" @dragstart="onLibraryDragStart($event, `${doc.kind}:${doc.id}`)"><span class="item-type">{{ doc.kind === "script" ? "剧" : "词" }}</span><span><b>{{ doc.title }}</b><small>第 {{ doc.revision }} 版</small></span></button>
               <button type="button" class="pin-button" :disabled="loading || pinActionBusy" @click="togglePinnedNode(`${doc.kind}:${doc.id}`)">{{ isPinned(`${doc.kind}:${doc.id}`) ? "移出画布" : "添加" }}</button>
             </li>
           </ul>
@@ -402,8 +447,8 @@
             {{ mediaSearch ? `没有找到与「${mediaSearch}」匹配的媒体` : "当前工程还没有此类媒体" }}
           </p>
           <ul v-else class="library-list media-library-list">
-            <li v-for="media in mediaPage?.items ?? []" :key="media.sha256">
-              <div class="library-item media-library-item">
+            <li v-for="(media, index) in mediaPage?.items ?? []" :key="media.sha256">
+              <div class="library-item media-library-item" draggable="true" data-testid="managed-canvas-library-drag" :tabindex="mediaListActiveIndex === index ? 0 : -1" @focus="mediaListRovingIndex = index" @dragstart="onLibraryDragStart($event, mediaNodeId(media.sha256))">
                 <span class="item-thumb">
                   <img
                     v-if="media.kind === 'image' && media.thumbnail?.url"
@@ -455,8 +500,8 @@
           <p v-if="loading && !unitsPage" class="library-note" role="status">正在加载…</p>
           <p v-else-if="unitsPage && unitsPage.page.items.length === 0" class="library-empty">没有符合条件的 15 秒分镜</p>
           <ul class="library-list unit-list">
-            <li v-for="unit in unitsPage?.page.items ?? []" :key="unit.id">
-              <button type="button" class="library-item" @click="selectUnit(unit)"><span class="item-type">15s</span><span><b>{{ getUnitDualLabel(unit.id) || unit.label }}</b><small>{{ unit.panelCount }} 宫格 · {{ productionStatusLabel(unit.status) }}</small></span></button>
+            <li v-for="(unit, index) in unitsPage?.page.items ?? []" :key="unit.id">
+              <button type="button" class="library-item" :tabindex="unitListActiveIndex === index ? 0 : -1" @focus="unitListRovingIndex = index" @click="selectUnit(unit)"><span class="item-type">15s</span><span><b>{{ getUnitDualLabel(unit.id) || unit.label }}</b><small>{{ unit.panelCount }} 宫格 · {{ productionStatusLabel(unit.status) }}</small></span></button>
               <button type="button" class="pin-button" :disabled="isPinned(`unit:${unit.id}`) || loading || addUnitActionBusy" @click="addUnitToWorkspace(unit)">{{ isPinned(`unit:${unit.id}`) ? "已添加" : "添加" }}</button>
             </li>
           </ul>
@@ -470,7 +515,7 @@
 
       <main
         class="flow-shell"
-        :class="{ compact: zoom < 0.42, 'connect-assist': connectMode, 'external-drop-active': externalDropActive }"
+        :class="{ compact: zoom < 0.42, 'connect-assist': connectMode, 'external-drop-active': externalDropActive, 'space-pan': spacePanHeld }"
         data-testid="managed-canvas-flow-shell"
         @dragenter.prevent="onExternalDragEnter"
         @dragover.prevent="onExternalDragOver"
@@ -478,9 +523,15 @@
         @drop.prevent="onExternalDrop">
         <nav class="floating-tools" aria-label="画布工具">
           <div class="add-menu-wrap">
-            <button ref="addTriggerEl" type="button" data-testid="managed-canvas-add-node" :aria-expanded="addMenuOpen" aria-controls="managed-canvas-add-menu" @click="addMenuOpen = !addMenuOpen"><Plus :size="16" aria-hidden="true" /><span>添加</span></button>
+            <button ref="addTriggerEl" type="button" data-testid="managed-canvas-add-node" :aria-expanded="addMenuOpen" aria-controls="managed-canvas-add-menu" :tabindex="floatingToolbarActiveIndex === 0 ? 0 : -1" @focus="floatingToolbarRovingIndex = 0" @click="toggleAddMenu"><Plus :size="16" aria-hidden="true" /><span>添加</span></button>
             <div v-if="addMenuOpen" id="managed-canvas-add-menu" class="add-menu">
-              <button v-for="tab in libraryTabs" :key="tab.kind" type="button" @click="chooseAddKind(tab.kind)"><i>{{ tab.mark }}</i>{{ tab.label }}</button>
+              <button
+                v-for="(tab, index) in libraryTabs"
+                :key="tab.kind"
+                type="button"
+                :tabindex="addMenuActiveIndex === index ? 0 : -1"
+                @focus="addMenuRovingIndex = index"
+                @click="chooseAddKind(tab.kind)"><i>{{ tab.mark }}</i>{{ tab.label }}</button>
             </div>
           </div>
           <button
@@ -489,6 +540,8 @@
             :class="{ active: libraryOpen && libraryMode === 'current' }"
             :aria-expanded="libraryOpen && libraryMode === 'current'"
             aria-controls="managed-canvas-library"
+            :tabindex="floatingToolbarActiveIndex === 1 ? 0 : -1"
+            @focus="floatingToolbarRovingIndex = 1"
             @click="toggleLibrary">
             <LibraryBig :size="16" aria-hidden="true" /><span>素材库</span>
           </button>
@@ -499,13 +552,15 @@
             :aria-expanded="libraryOpen && libraryMode === 'global'"
             aria-controls="managed-canvas-global-resource-library"
             title="查看所有受管剧本中已归类的人物、场景、道具和风格版本图片"
+            :tabindex="floatingToolbarActiveIndex === 2 ? 0 : -1"
+            @focus="floatingToolbarRovingIndex = 2"
             @click="toggleGlobalResourceLibrary">
             <LibraryBig :size="16" aria-hidden="true" />
             <span>剧本资源</span>
             <small v-if="globalResourceCounts.total">{{ globalResourceCounts.total }}</small>
           </button>
-          <button type="button" data-testid="managed-canvas-connect-mode" :class="{ active: connectMode }" :aria-pressed="connectMode" @click="toggleConnectMode"><ArrowUpRight :size="16" aria-hidden="true" /><span>连线</span></button>
-          <button ref="helpTriggerEl" type="button" :aria-expanded="helpOpen" aria-controls="managed-canvas-help-card" @click="helpOpen = !helpOpen"><CircleHelp :size="16" aria-hidden="true" /><span>帮助</span></button>
+          <button type="button" data-testid="managed-canvas-connect-mode" :class="{ active: connectMode }" :aria-pressed="connectMode" :tabindex="floatingToolbarActiveIndex === 3 ? 0 : -1" @focus="floatingToolbarRovingIndex = 3" @click="toggleConnectMode"><ArrowUpRight :size="16" aria-hidden="true" /><span>连线</span></button>
+          <button ref="helpTriggerEl" type="button" data-testid="managed-canvas-help" :aria-expanded="helpOpen" aria-controls="managed-canvas-help-card" :tabindex="floatingToolbarActiveIndex === 4 ? 0 : -1" @focus="floatingToolbarRovingIndex = 4" @click="toggleHelp"><CircleHelp :size="16" aria-hidden="true" /><span>帮助</span></button>
         </nav>
 
         <div v-if="loading && !nodes.length" class="flow-loading" role="status">正在打开画布…</div>
@@ -526,7 +581,7 @@
           :nodes-draggable="true"
           :fit-view-on-init="!hasPersistedLayout"
           :selection-key-code="true"
-          :pan-on-drag="[1, 2]"
+          :pan-on-drag="panOnDragButtons"
           :delete-key-code="() => false"
           @connect="onConnect"
           @edge-click="onDraftEdgeClick"
@@ -539,16 +594,27 @@
           @move="onMove"
           @move-end="onMoveEnd">
           <Background :pattern-color="canvasThemeAssets.patternColor" :gap="24" :size="1" />
-          <Controls position="bottom-left" @zoom-in="onControlViewportChanged" @zoom-out="onControlViewportChanged" @fit-view="onControlViewportChanged">
+          <Controls position="bottom-left" @zoom-in="onControlViewportChanged" @zoom-out="onControlViewportChanged">
             <template #icon-zoom-in><Plus :size="14" aria-hidden="true" /><span class="sr-only">放大画布</span></template>
             <template #icon-zoom-out><Minus :size="14" aria-hidden="true" /><span class="sr-only">缩小画布</span></template>
-            <template #icon-fit-view><Scan :size="14" aria-hidden="true" /><span class="sr-only">适配全部节点</span></template>
+            <template #control-fit-view>
+              <ControlButton
+                class="vue-flow__controls-fitview"
+                title="适配全部节点"
+                aria-label="适配全部节点"
+                data-testid="managed-canvas-fit-view"
+                @click="onFitViewControl">
+                <Scan :size="14" aria-hidden="true" />
+                <span class="sr-only">适配全部节点</span>
+              </ControlButton>
+            </template>
             <template #icon-unlock><LockOpen :size="14" aria-hidden="true" /><span class="sr-only">锁定画布交互</span></template>
             <template #icon-lock><Lock :size="14" aria-hidden="true" /><span class="sr-only">启用画布交互</span></template>
           </Controls>
           <MiniMap
             v-if="showMiniMap"
             data-testid="managed-canvas-minimap"
+            tabindex="0"
             position="bottom-right"
             aria-label="画布节点小地图"
             :pannable="true"
@@ -556,10 +622,13 @@
             :mask-color="canvasThemeAssets.minimapMaskColor"
             :node-color="canvasThemeAssets.minimapNodeColor">
             <!-- Vue Flow 默认 MiniMapNode 会把业务节点 id 复制到 SVG rect，和主画布节点形成重复 DOM id。 -->
-            <template #node-managedStudio="{ position, dimensions, color, selected, dragging }">
+            <template #node-managedStudio="{ id, position, dimensions, color, selected, dragging }">
               <rect
                 class="vue-flow__minimap-node"
                 :class="{ selected, dragging }"
+                :data-node-id="id"
+                tabindex="-1"
+                focusable="true"
                 :x="position.x"
                 :y="position.y"
                 :rx="5"
@@ -576,7 +645,7 @@
 
         <div v-if="connectMode" class="connect-banner" role="status">
           <span>连线模式：点击一个节点的＋，再点击目标节点的＋完成连线</span>
-          <button type="button" @click="toggleConnectMode">退出（Esc）</button>
+          <button type="button" data-testid="managed-canvas-connect-exit" @click="toggleConnectMode">退出（Esc）</button>
         </div>
 
         <div v-if="snapLines.length" class="snap-guides" aria-hidden="true">
@@ -584,48 +653,53 @@
         </div>
 
         <div class="bottom-tools" aria-label="视图工具">
-          <button type="button" title="适配全部节点" @click="fitCanvas">适配</button>
-          <button type="button" data-testid="managed-canvas-undo" :disabled="!canUndoLayout || isDragging" title="撤销布局（⌘Z）" @click="undoLayout"><Undo2 :size="13" aria-hidden="true" /><span>撤销</span></button>
-          <button type="button" data-testid="managed-canvas-redo" :disabled="!canRedoLayout || isDragging" title="重做布局（⌘⇧Z / Ctrl+Y）" @click="redoLayout"><Redo2 :size="13" aria-hidden="true" /><span>重做</span></button>
+          <button type="button" title="适配全部节点" :tabindex="bottomToolbarTabIndex('fit')" @focus="bottomToolbarFocusKey = 'fit'" @click="fitCanvas">适配</button>
+          <button type="button" data-testid="managed-canvas-undo" :disabled="!canUndoLayout || isDragging" :tabindex="bottomToolbarTabIndex('undo', !canUndoLayout || isDragging)" title="撤销布局（⌘Z）" @focus="bottomToolbarFocusKey = 'undo'" @click="undoLayout"><Undo2 :size="13" aria-hidden="true" /><span>撤销</span></button>
+          <button type="button" data-testid="managed-canvas-redo" :disabled="!canRedoLayout || isDragging" :tabindex="bottomToolbarTabIndex('redo', !canRedoLayout || isDragging)" title="重做布局（⌘⇧Z / Ctrl+Y）" @focus="bottomToolbarFocusKey = 'redo'" @click="redoLayout"><Redo2 :size="13" aria-hidden="true" /><span>重做</span></button>
           <span v-if="selectionCount >= 2" class="align-tools" data-testid="managed-canvas-align-tools">
-            <button type="button" title="左对齐" aria-label="左对齐" :disabled="isDragging" @click="applyAlign('left')"><AlignStartVertical :size="13" aria-hidden="true" /></button>
-            <button type="button" title="水平居中对齐" aria-label="水平居中对齐" :disabled="isDragging" @click="applyAlign('centerX')"><AlignCenterVertical :size="13" aria-hidden="true" /></button>
-            <button type="button" title="右对齐" aria-label="右对齐" :disabled="isDragging" @click="applyAlign('right')"><AlignEndVertical :size="13" aria-hidden="true" /></button>
-            <button type="button" title="顶对齐" aria-label="顶对齐" :disabled="isDragging" @click="applyAlign('top')"><AlignStartHorizontal :size="13" aria-hidden="true" /></button>
-            <button type="button" title="垂直居中对齐" aria-label="垂直居中对齐" :disabled="isDragging" @click="applyAlign('centerY')"><AlignCenterHorizontal :size="13" aria-hidden="true" /></button>
-            <button type="button" title="底对齐" aria-label="底对齐" :disabled="isDragging" @click="applyAlign('bottom')"><AlignEndHorizontal :size="13" aria-hidden="true" /></button>
-            <button v-if="selectionCount >= 3" type="button" title="水平等距分布" :disabled="isDragging" @click="applyDistribute('x')">水平均分</button>
-            <button v-if="selectionCount >= 3" type="button" title="垂直等距分布" :disabled="isDragging" @click="applyDistribute('y')">垂直均分</button>
+            <button type="button" title="左对齐" aria-label="左对齐" :disabled="isDragging" :tabindex="bottomToolbarTabIndex('align-left', isDragging)" @focus="bottomToolbarFocusKey = 'align-left'" @click="applyAlign('left')"><AlignStartVertical :size="13" aria-hidden="true" /></button>
+            <button type="button" title="水平居中对齐" aria-label="水平居中对齐" :disabled="isDragging" :tabindex="bottomToolbarTabIndex('align-centerX', isDragging)" @focus="bottomToolbarFocusKey = 'align-centerX'" @click="applyAlign('centerX')"><AlignCenterVertical :size="13" aria-hidden="true" /></button>
+            <button type="button" title="右对齐" aria-label="右对齐" :disabled="isDragging" :tabindex="bottomToolbarTabIndex('align-right', isDragging)" @focus="bottomToolbarFocusKey = 'align-right'" @click="applyAlign('right')"><AlignEndVertical :size="13" aria-hidden="true" /></button>
+            <button type="button" title="顶对齐" aria-label="顶对齐" :disabled="isDragging" :tabindex="bottomToolbarTabIndex('align-top', isDragging)" @focus="bottomToolbarFocusKey = 'align-top'" @click="applyAlign('top')"><AlignStartHorizontal :size="13" aria-hidden="true" /></button>
+            <button type="button" title="垂直居中对齐" aria-label="垂直居中对齐" :disabled="isDragging" :tabindex="bottomToolbarTabIndex('align-centerY', isDragging)" @focus="bottomToolbarFocusKey = 'align-centerY'" @click="applyAlign('centerY')"><AlignCenterHorizontal :size="13" aria-hidden="true" /></button>
+            <button type="button" title="底对齐" aria-label="底对齐" :disabled="isDragging" :tabindex="bottomToolbarTabIndex('align-bottom', isDragging)" @focus="bottomToolbarFocusKey = 'align-bottom'" @click="applyAlign('bottom')"><AlignEndHorizontal :size="13" aria-hidden="true" /></button>
+            <button v-if="selectionCount >= 3" type="button" title="水平等距分布" :disabled="isDragging" :tabindex="bottomToolbarTabIndex('dist-x', isDragging)" @focus="bottomToolbarFocusKey = 'dist-x'" @click="applyDistribute('x')">水平均分</button>
+            <button v-if="selectionCount >= 3" type="button" title="垂直等距分布" :disabled="isDragging" :tabindex="bottomToolbarTabIndex('dist-y', isDragging)" @focus="bottomToolbarFocusKey = 'dist-y'" @click="applyDistribute('y')">垂直均分</button>
           </span>
           <span v-if="selectionCount > 0" class="selection-count">已选 {{ selectionCount }} 节点</span>
-          <button type="button" data-testid="managed-canvas-toggle-edges" :aria-pressed="showEdges" @click="toggleEdges">{{ showEdges ? "隐藏连线" : "显示连线" }}</button>
-          <button type="button" data-testid="managed-canvas-timeline-layout" :disabled="loading || isDragging || !nodes.length" title="按剧情时间线重新排布（钉住的节点可选择是否强制）" @click="applyTimelineLayout(false)">按时间线排布</button>
-          <button type="button" data-testid="managed-canvas-timeline-layout-force" :disabled="loading || isDragging || !nodes.length" title="强制按时间线重排全部节点" @click="applyTimelineLayout(true)">强制时间线</button>
-          <button v-if="selectedDraftEdgeId" type="button" data-testid="managed-canvas-delete-edge" @click="deleteSelectedDraftEdge">删除所选连线</button>
-          <button v-if="workspaceMode === 'workflow'" type="button" class="danger-subtle" data-testid="managed-canvas-clear-view" :aria-pressed="clearConfirmationArmed" @click="clearWorkflowCanvas">{{ clearConfirmationArmed ? "再点一次确认清空" : "清空画布视图" }}</button>
-          <details ref="viewMenuEl" class="view-menu">
-            <summary aria-label="视图选项">视图</summary>
+          <button type="button" data-testid="managed-canvas-snap-to-grid" :aria-pressed="gridSnapEnabled" :disabled="isDragging" :tabindex="bottomToolbarTabIndex('snap', isDragging)" title="单节点拖拽后圆整到 24px 网格；成组拖不动" @focus="bottomToolbarFocusKey = 'snap'" @click="gridSnapEnabled = !gridSnapEnabled">{{ gridSnapEnabled ? "网格吸附开" : "网格吸附关" }}</button>
+          <button type="button" data-testid="managed-canvas-toggle-edges" :aria-pressed="showEdges" :tabindex="bottomToolbarTabIndex('edges')" @focus="bottomToolbarFocusKey = 'edges'" @click="toggleEdges">{{ showEdges ? "隐藏连线" : "显示连线" }}</button>
+          <button type="button" data-testid="managed-canvas-timeline-layout" :disabled="loading || isDragging || !nodes.length" :tabindex="bottomToolbarTabIndex('timeline', loading || isDragging || !nodes.length)" title="按剧情时间线重新排布（钉住的节点可选择是否强制）" @focus="bottomToolbarFocusKey = 'timeline'" @click="applyTimelineLayout(false)">按时间线排布</button>
+          <button type="button" data-testid="managed-canvas-timeline-layout-force" :disabled="loading || isDragging || !nodes.length" :tabindex="bottomToolbarTabIndex('timelineForce', loading || isDragging || !nodes.length)" title="强制按时间线重排全部节点" @focus="bottomToolbarFocusKey = 'timelineForce'" @click="applyTimelineLayout(true)">强制时间线</button>
+          <button v-if="selectedDraftEdgeId" type="button" data-testid="managed-canvas-delete-edge" :tabindex="bottomToolbarTabIndex('deleteEdge')" @focus="bottomToolbarFocusKey = 'deleteEdge'" @click="deleteSelectedDraftEdge">删除所选连线</button>
+          <button v-if="workspaceMode === 'workflow'" type="button" class="danger-subtle" data-testid="managed-canvas-clear-view" :aria-pressed="clearConfirmationArmed" aria-live="polite" :tabindex="bottomToolbarTabIndex('clear')" @focus="bottomToolbarFocusKey = 'clear'" @click="clearWorkflowCanvas">{{ clearConfirmationArmed ? "再点一次确认清空" : "清空画布视图" }}</button>
+          <details ref="viewMenuEl" class="view-menu" @toggle="onViewMenuToggle">
+            <summary data-testid="managed-canvas-view-menu" aria-label="视图选项">视图</summary>
             <div class="view-menu-pop" role="menu">
-              <button type="button" :aria-pressed="showMiniMap" @click="showMiniMap = !showMiniMap">{{ showMiniMap ? "隐藏小地图" : "显示小地图" }}</button>
-              <button type="button" @click="toggleWorkspaceMode">{{ workspaceMode === "workflow" ? "查看全部" : "只看工作流" }}</button>
-              <button type="button" :disabled="loading" @click="refreshAll">刷新</button>
+              <button type="button" data-testid="managed-canvas-toggle-minimap" :aria-pressed="showMiniMap" :tabindex="viewMenuItemTabIndex(0)" @focus="viewMenuItemFocusSlot = 0" @click="toggleMiniMap">{{ showMiniMap ? "隐藏小地图" : "显示小地图" }}</button>
+              <button type="button" data-testid="managed-canvas-toggle-workspace-mode" :tabindex="viewMenuItemTabIndex(1)" @focus="viewMenuItemFocusSlot = 1" @click="toggleWorkspaceMode">{{ workspaceMode === "workflow" ? "查看全部" : "只看工作流" }}</button>
+              <button type="button" data-testid="managed-canvas-refresh" :disabled="loading" :tabindex="viewMenuItemTabIndex(2, loading)" @focus="viewMenuItemFocusSlot = 2" @click="refreshAll">刷新</button>
               <button
                 type="button"
                 data-testid="managed-canvas-verify-source"
                 :disabled="loading || localProductionPreviewLoading"
+                :tabindex="viewMenuItemTabIndex(3, loading || localProductionPreviewLoading)"
                 title="显式读取并核对外部来源内容；大型项目可能需要较长时间"
+                @focus="viewMenuItemFocusSlot = 3"
                 @click="verifyLocalProductionSource">
                 {{ localProductionPreviewLoading ? "正在核对来源…" : "核对外部来源" }}
               </button>
               <div class="view-menu-theme" role="radiogroup" aria-label="画布主题">
                 <span>主题</span>
                 <button
-                  v-for="theme in MANAGED_CANVAS_THEMES"
+                  v-for="(theme, index) in MANAGED_CANVAS_THEMES"
                   :key="theme.id"
                   type="button"
                   role="radio"
                   :aria-checked="canvasTheme === theme.id"
                   :class="{ active: canvasTheme === theme.id }"
+                  :tabindex="viewMenuThemeActiveIndex === index ? 0 : -1"
+                  @focus="viewMenuThemeRovingIndex = index"
                   @click="setCanvasTheme(theme.id)">
                   {{ theme.label }}
                 </button>
@@ -635,7 +709,7 @@
         </div>
 
         <details class="flow-caption technical-diagnostics">
-          <summary>诊断详情</summary>
+          <summary data-testid="managed-canvas-diagnostics">诊断详情</summary>
           <div data-testid="managed-canvas-dom-counts">
             <span>当前 DOM：{{ assetNodeCount }} 资产 · {{ unitNodeCount }} 单元 · {{ panelNodeCount }} 宫格 · {{ pipelineNodeCount }} 结果/审片 · {{ textDocumentCount }} 文稿</span>
             <span data-testid="managed-canvas-thumb-count">有图节点 {{ thumbnailNodeCount }}</span>
@@ -646,7 +720,7 @@
         </details>
 
         <div v-if="helpOpen" id="managed-canvas-help-card" class="help-card" role="dialog" aria-label="画布帮助">
-          <button type="button" aria-label="关闭帮助" @click="helpOpen = false">×</button>
+          <button type="button" data-testid="managed-canvas-help-close" aria-label="关闭帮助" @click="closeHelp">×</button>
           <h3>三步准备一格</h3>
           <ol><li>从“添加”或“素材库”放入剧本、提示词、角色、场景、道具、风格、图片/视频/音频和 15 秒分镜。</li><li>媒体节点右上角“拖出”手柄会复制原文件到桌面或其他软件，画布与 CAS 原件始终保留。</li><li>点击任一节点左侧或右侧的“＋”，再点击另一节点的“＋”完成连线；如果使用连线，每个宫格必须连齐正式绑定中的全部人物、场景、道具、风格、当前剧本和提示词。</li><li>点击顶部“准备并记录派发”；后台重新核对锁定资产和正式绑定，写入冻结包、生成计划和派发记录。此步骤不会直接生成图片，需等待所选 Codex/Grok Agent 领取。</li></ol>
           <p>“剧本资源”按人物、场景、道具和风格分页展示全部受管剧本的版本图片；它是只读目录，不会把跨剧本图片静默写入当前工程，也不会一次把全部图片挂成画布节点。</p>
@@ -668,7 +742,11 @@
         :asset-category-label="assetCategoryLabel"
         :production-status-label="productionStatusLabel"
         :currentness-label="currentnessLabel"
-        @close="selection = null"
+        :character-audio-count="selectedCharacterAudioCount"
+        :character-audio-playback-url="selectedCharacterAudioPlaybackUrl"
+        :character-audio-blocked="characterAudioBlocked"
+        :character-view-slots="selectedCharacterViewSlots"
+        @close="closeInspector"
         @focus-appearance="focusAppearance"
         @appearances-previous="appearancesPrevious"
         @appearances-next="appearancesNext"
@@ -679,7 +757,7 @@
         :open="directorPanelOpen"
         :season="seasonFilter || undefined"
         :episode="episodeFilter || undefined"
-        @close="directorPanelOpen = false"
+        @close="closeDirectorPanel"
         @action="onDirectorAction"
       />
     </div>
@@ -688,7 +766,7 @@
 
 <script setup lang="ts">
 import { Background } from "@vue-flow/background";
-import { Controls } from "@vue-flow/controls";
+import { ControlButton, Controls } from "@vue-flow/controls";
 import { ConnectionMode, useVueFlow, VueFlow, type Connection, type Edge, type Node, type NodeChange, type NodeMouseEvent, type NodeTypesObject } from "@vue-flow/core";
 import { MiniMap } from "@vue-flow/minimap";
 import { computed, markRaw, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
@@ -718,6 +796,7 @@ import {
   Undo2,
 } from "lucide-vue-next";
 import ManagedStudioCanvasNode from "./ManagedStudioCanvasNode.vue";
+import StudioSpatialGroupNode from "./StudioSpatialGroupNode.vue";
 import CanvasInspectorPanel from "./CanvasInspectorPanel.vue";
 import DirectorActionPanel from "./DirectorActionPanel.vue";
 import type { DirectorAction } from "../director-action-panel.js";
@@ -753,12 +832,15 @@ import type {
   StudioCanvasNodePosition,
   StudioCanvasViewport,
   StudioCanvasWorkflowGroup,
+  StudioCanvasSpatialGroup,
   StudioCanvasWorkspaceMode,
 } from "@core/studio-canvas-layout-types";
 import {
   alignCanvasNodes,
+  CANVAS_GRID_SIZE,
   computeCanvasSnap,
   distributeCanvasNodes,
+  roundToCanvasGrid,
   type CanvasAlignMode,
   type CanvasNodeGeometry,
 } from "../studio-canvas-align";
@@ -821,6 +903,14 @@ import {
 import { toUserFacingErrorText } from "../user-facing-error";
 import { createStudioCommandEnvelope } from "../studio-command-envelope";
 import {
+  audioSha256sForCharacterAsset,
+  ingestCharacterCanvasPack,
+  isCharacterAudioPath,
+  isCharacterImagePath,
+  splitCanvasAssetAliases,
+} from "../character-canvas-pack";
+import type { VoiceIdentity } from "@core/types";
+import {
   createProjectScopedActionGate,
   type ProjectScopedActionToken,
 } from "../project-scoped-action-gate";
@@ -851,6 +941,7 @@ export interface ManagedStudioCanvasLayoutApi {
         pinnedNodeIds?: string[];
         draftCanvasEdges?: StudioCanvasDraftEdge[];
         workflowGroups?: StudioCanvasWorkflowGroup[];
+        spatialGroups?: StudioCanvasSpatialGroup[];
         updatedAt?: string;
       };
       expectedFingerprint?: string;
@@ -892,6 +983,7 @@ const emit = defineEmits<{
     projectRoot: string;
     refreshSequence: number;
     unitCount: number;
+    startupMutationChecks?: number;
   }];
   openDashboard: [focus: import("@core/studio-canvas-locator").StudioCanvasFocusLocator];
   /** 打开剧本绑定工作台（非驾驶舱） */
@@ -995,6 +1087,9 @@ const nodes = shallowRef<Node[]>([]);
 const undoStack = createCanvasUndoStack({ maxEntries: 80 });
 const undoTick = ref(0);
 const isDragging = ref(false);
+const gridSnapEnabled = ref(false);
+const spacePanHeld = ref(false);
+const panOnDragButtons = computed(() => (spacePanHeld.value ? [0, 1, 2] : [1, 2]));
 const snapLines = ref<Array<{ axis: "x" | "y"; position: number }>>([]);
 const selectionCount = ref(0);
 let dragStartSnapshot: CanvasPositionMap | null = null;
@@ -1020,6 +1115,7 @@ const initialTimelineLayoutAppliedRoot = ref("");
 const layoutViewport = ref<StudioCanvasViewport>({ x: 30, y: 36, zoom: 0.72 });
 const layoutSaveState = ref<"idle" | "pending" | "saving" | "saved" | "error">("idle");
 const workflowGroups = ref<StudioCanvasWorkflowGroup[]>([]);
+const spatialGroups = ref<StudioCanvasSpatialGroup[]>([]);
 const workspaceMode = ref<StudioCanvasWorkspaceMode>("projection");
 const pinnedNodeIds = ref<string[]>([]);
 const draftCanvasEdges = ref<StudioCanvasDraftEdge[]>([]);
@@ -1047,6 +1143,18 @@ type CanvasLibraryMode = "current" | "global";
 const libraryMode = ref<CanvasLibraryMode>("current");
 const libraryOpen = ref(false);
 const addMenuOpen = ref(false);
+const characterIngestName = ref("");
+const characterIngestAliases = ref("");
+const characterIngestDescription = ref("");
+const characterImagePath = ref("");
+const characterAudioPath = ref("");
+const characterSideImagePath = ref("");
+const characterBackImagePath = ref("");
+const characterViewSlots = ref(new Map<string, string[]>());
+const characterIngestBusy = ref(false);
+const pickingCharacterMedia = ref(false);
+const characterVoices = ref<VoiceIdentity[]>([]);
+const characterCompanionMedia = ref(new Map<string, string[]>());
 const GLOBAL_RESOURCE_PAGE_LIMIT = 36;
 const globalResourceCategories: ReadonlyArray<{ kind: MaterialStudioAssetCategory; label: string }> = [
   { kind: "character", label: "人物" },
@@ -1121,12 +1229,25 @@ function setCanvasTheme(themeId: ManagedCanvasThemeId): void {
   writeManagedCanvasTheme(themeId);
   notifyManagedCanvasThemeChanged(themeId);
 }
+
+function cycleCanvasTheme(): void {
+  const ids = MANAGED_CANVAS_THEMES.map((theme) => theme.id);
+  const index = Math.max(0, ids.indexOf(canvasTheme.value));
+  const nextId = ids[(index + 1) % ids.length]!;
+  setCanvasTheme(nextId);
+}
 // P26：弹层统一交互（点击外部关闭 + Escape 统一 + 焦点归还）。
 const addTriggerEl = ref<HTMLElement | null>(null);
 const helpTriggerEl = ref<HTMLElement | null>(null);
 const viewMenuEl = ref<HTMLDetailsElement | null>(null);
-function closeViewMenu(): void {
+function restoreViewMenuSummaryFocus(): void {
+  viewMenuEl.value?.querySelector<HTMLElement>("summary")?.focus();
+}
+
+function closeViewMenu(options?: { restore?: boolean }): void {
+  const wasOpen = Boolean(viewMenuEl.value?.hasAttribute("open"));
   viewMenuEl.value?.removeAttribute("open");
+  if (wasOpen && options?.restore !== false) restoreViewMenuSummaryFocus();
 }
 function onGlobalPointerDown(event: PointerEvent): void {
   const target = event.target as HTMLElement | null;
@@ -1285,6 +1406,7 @@ function ipcUnderSignal<T>(signal: AbortSignal, start: () => Promise<T>): Promis
 const selectedUnitRevision = ref(1);
 const nodeTypes = {
   managedStudio: markRaw(ManagedStudioCanvasNode),
+  studioSpatialGroup: markRaw(StudioSpatialGroupNode),
 } as NodeTypesObject;
 const studioFlow = useVueFlow("managed-studio-flow");
 
@@ -1300,7 +1422,7 @@ function authorityThumbUrl(recipeKey?: string): string | undefined {
 
 function onDirectorAction(action: DirectorAction): void {
   if (action.kind === "toggle-panel") {
-    directorPanelOpen.value = !directorPanelOpen.value;
+    toggleDirectorPanel();
     return;
   }
   if (action.kind === "refresh") {
@@ -1721,6 +1843,21 @@ const selection = ref<
   | null
 >(null);
 const inspectorPanelEl = ref<InstanceType<typeof CanvasInspectorPanel> | null>(null);
+const selectedCharacterAudioCount = computed(() => {
+  if (selection.value?.kind !== "asset") return 0;
+  return audioSha256sForCharacterAsset(characterVoices.value, selection.value.asset.id).length;
+});
+const selectedCharacterAudioPlaybackUrl = computed(() => {
+  if (selection.value?.kind !== "asset" || !props.projectRoot) return "";
+  const sha = audioSha256sForCharacterAsset(characterVoices.value, selection.value.asset.id)[0];
+  if (!sha) return "";
+  return `aicanvas-studio://media/${sha}?projectRoot=${encodeURIComponent(props.projectRoot)}`;
+});
+const characterAudioBlocked = computed(() => loading.value || pinActionBusy.value);
+const selectedCharacterViewSlots = computed(() => {
+  if (selection.value?.kind !== "asset") return [];
+  return characterViewSlots.value.get(selection.value.asset.id) ?? [];
+});
 const appearanceListElement = computed<HTMLElement | null>(() => inspectorPanelEl.value?.appearanceListElement ?? null);
 
 const filteredEpisodes = computed(() => {
@@ -1751,6 +1888,206 @@ const filteredTextDocuments = computed(() => textDocuments.value.filter((doc) =>
 
 function mediaNodeId(mediaSha256: string): string {
   return `library-media:${mediaSha256}`;
+}
+
+const LIBRARY_NODE_MIME = "application/x-aicanvas-library-node";
+
+function onLibraryDragStart(event: DragEvent, nodeId: string): void {
+  if (!event.dataTransfer || pinActionBusy.value || loading.value) {
+    event.preventDefault();
+    return;
+  }
+  event.dataTransfer.setData(LIBRARY_NODE_MIME, nodeId);
+  event.dataTransfer.effectAllowed = "copy";
+}
+
+async function dropLibraryNodeAt(event: DragEvent, nodeId: string): Promise<void> {
+  if (pinActionBusy.value || loading.value) return;
+  const point = studioFlow.screenToFlowCoordinate({ x: event.clientX, y: event.clientY });
+  if (!isPinned(nodeId)) await togglePinnedNode(nodeId);
+  if (!isPinned(nodeId)) return;
+  persistedLayoutNodes.value = {
+    ...persistedLayoutNodes.value,
+    [nodeId]: { x: Math.round(point.x), y: Math.round(point.y) },
+  };
+  rebuildGraph();
+  scheduleLayoutPersist();
+}
+
+function characterLibrarySubtitle(asset: StudioDashboardAssetSummary): string {
+  const audioCount = audioSha256sForCharacterAsset(characterVoices.value, asset.id).length;
+  const image = asset.hasPrimaryAuthority ? "参考图已锁定" : "待补参考图";
+  const alias = (asset.aliases ?? []).find((item) => item !== asset.name);
+  const base = audioCount > 0 ? `${image} · 音频 ${audioCount}` : image;
+  return alias ? `${base} · ${alias}` : base;
+}
+
+const characterIngestHint = computed(() => {
+  const image = characterImagePath.value ? characterImagePath.value.replaceAll("\\", "/").split("/").at(-1) : "未选图片";
+  if (libraryTab.value !== "character") return image;
+  const audio = characterAudioPath.value ? characterAudioPath.value.replaceAll("\\", "/").split("/").at(-1) : "未选音频（可选）";
+  return `${image} · ${audio}`;
+});
+
+async function refreshCharacterVoices(projectRoot = props.projectRoot): Promise<void> {
+  try {
+    characterVoices.value = await window.canvasApi.listVoiceIdentities(projectRoot);
+  } catch {
+    if (projectRoot === props.projectRoot) characterVoices.value = [];
+  }
+}
+
+function detachCharacterCompanionAudio(assetId: string, current: Set<string>): void {
+  const shas = characterCompanionMedia.value.get(assetId) ?? [];
+  const nextMedia = new Map(pinnedMediaItems.value);
+  for (const sha of shas) {
+    current.delete(mediaNodeId(sha));
+    nextMedia.delete(sha);
+  }
+  pinnedMediaItems.value = nextMedia;
+  const nextCompanions = new Map(characterCompanionMedia.value);
+  nextCompanions.delete(assetId);
+  characterCompanionMedia.value = nextCompanions;
+}
+
+async function attachCharacterCompanionAudio(
+  assetId: string,
+  current: Set<string>,
+  projectRoot: string,
+): Promise<void> {
+  await refreshCharacterVoices(projectRoot);
+  const shas = audioSha256sForCharacterAsset(characterVoices.value, assetId);
+  if (!shas.length) return;
+  const nextMedia = new Map(pinnedMediaItems.value);
+  const attached: string[] = [];
+  for (const sha of shas) {
+    const nodeId = mediaNodeId(sha);
+    if (current.has(nodeId)) {
+      attached.push(sha);
+      continue;
+    }
+    if ([...current].filter((id) => id.startsWith("library-media:")).length >= STUDIO_CANVAS_PINNED_MEDIA_LIMIT) {
+      break;
+    }
+    const media = mediaPage.value?.items.find((item) => item.sha256 === sha)
+      ?? await window.canvasApi.getStudioMedia(projectRoot, sha);
+    if (!media || media.kind !== "audio") continue;
+    current.add(nodeId);
+    nextMedia.set(sha, media);
+    attached.push(sha);
+  }
+  pinnedMediaItems.value = nextMedia;
+  if (attached.length) {
+    const nextCompanions = new Map(characterCompanionMedia.value);
+    nextCompanions.set(assetId, attached);
+    characterCompanionMedia.value = nextCompanions;
+  }
+}
+
+async function pickCharacterImage(): Promise<void> {
+  if (characterIngestBusy.value || pickingCharacterMedia.value) return;
+  pickingCharacterMedia.value = true;
+  try {
+    const paths = await window.canvasApi.pickStudioMediaFiles();
+    const image = paths.find((candidate) => isCharacterImagePath(candidate));
+    if (!image) {
+      if (paths.length) errorMessage.value = "请选择 png/jpg/webp 等角色参考图。";
+      return;
+    }
+    characterImagePath.value = image;
+    errorMessage.value = "";
+  } finally {
+    pickingCharacterMedia.value = false;
+  }
+}
+
+async function pickCharacterView(slot: "side" | "back"): Promise<void> {
+  if (characterIngestBusy.value || pickingCharacterMedia.value) return;
+  pickingCharacterMedia.value = true;
+  try {
+    const paths = await window.canvasApi.pickStudioMediaFiles();
+    const image = paths.find((candidate) => isCharacterImagePath(candidate));
+    if (!image) {
+      if (paths.length) errorMessage.value = slot === "side" ? "请选择侧视图图片。" : "请选择背视图图片。";
+      return;
+    }
+    if (slot === "side") characterSideImagePath.value = image;
+    else characterBackImagePath.value = image;
+    errorMessage.value = "";
+  } finally {
+    pickingCharacterMedia.value = false;
+  }
+}
+
+async function pickCharacterAudio(): Promise<void> {
+  if (characterIngestBusy.value || pickingCharacterMedia.value) return;
+  pickingCharacterMedia.value = true;
+  try {
+    const paths = await window.canvasApi.pickStudioMediaFiles();
+    const audio = paths.find((candidate) => isCharacterAudioPath(candidate));
+    if (!audio) {
+      if (paths.length) errorMessage.value = "请选择 mp3/wav/m4a 等角色音频。";
+      return;
+    }
+    characterAudioPath.value = audio;
+    errorMessage.value = "";
+  } finally {
+    pickingCharacterMedia.value = false;
+  }
+}
+
+async function submitCharacterIngest(): Promise<void> {
+  if (characterIngestBusy.value || !characterIngestName.value || !characterImagePath.value) return;
+  const projectRoot = props.projectRoot;
+  characterIngestBusy.value = true;
+  errorMessage.value = "";
+  try {
+    const category = libraryTab.value === "scene" || libraryTab.value === "prop" ? libraryTab.value : "character";
+    const aliases = splitCanvasAssetAliases(characterIngestAliases.value);
+    const description = characterIngestDescription.value.trim();
+    const pack = await ingestCharacterCanvasPack({
+      executeStudioCommand: (root, envelope) => window.canvasApi.executeStudioCommand(root, envelope),
+      upsertVoiceIdentity: (root, input) => window.canvasApi.upsertVoiceIdentity(root, input),
+    }, projectRoot, {
+      name: characterIngestName.value,
+      imagePath: characterImagePath.value,
+      category,
+      ...(aliases.length ? { aliases } : {}),
+      ...(description ? { description } : {}),
+      ...(category === "character" && characterAudioPath.value ? { audioPath: characterAudioPath.value } : {}),
+      ...(category === "character" && characterSideImagePath.value ? { sideImagePath: characterSideImagePath.value } : {}),
+      ...(category === "character" && characterBackImagePath.value ? { backImagePath: characterBackImagePath.value } : {}),
+    });
+    if (projectRoot !== props.projectRoot) return;
+    characterIngestName.value = "";
+    characterIngestAliases.value = "";
+    characterIngestDescription.value = "";
+    characterImagePath.value = "";
+    characterAudioPath.value = "";
+    characterSideImagePath.value = "";
+    characterBackImagePath.value = "";
+    if (pack.viewSha256s) {
+      const nextViews = new Map(characterViewSlots.value);
+      nextViews.set(pack.assetId, Object.keys(pack.viewSha256s));
+      characterViewSlots.value = nextViews;
+    }
+    await refreshCharacterVoices(projectRoot);
+    await resetAssets();
+    const nodeId = `asset:${pack.assetId}`;
+    if (!pinnedNodeIds.value.includes(nodeId)) {
+      await togglePinnedNode(nodeId);
+    }
+    for (const sha of Object.values(pack.viewSha256s ?? {})) {
+      const mediaId = mediaNodeId(sha);
+      if (!pinnedNodeIds.value.includes(mediaId)) await togglePinnedNode(mediaId);
+    }
+  } catch (error) {
+    if (projectRoot !== props.projectRoot) return;
+    errorMessage.value = message(error);
+    emit("failed", errorMessage.value);
+  } finally {
+    if (projectRoot === props.projectRoot) characterIngestBusy.value = false;
+  }
 }
 
 function mediaKindMark(kind: StudioMediaIpcItem["kind"]): string {
@@ -2089,7 +2426,500 @@ const panelTimelineStrip = computed(() => {
 });
 
 const timelineProgressQuery = ref("");
-const timelineProgressReview = ref<"" | "any-pending" | "pass" | "rework" | "reject" | "none">("");
+const TIMELINE_PROGRESS_REVIEW_OPTIONS = ["", "any-pending", "pass", "rework", "reject", "none"] as const;
+const timelineProgressReview = ref<(typeof TIMELINE_PROGRESS_REVIEW_OPTIONS)[number]>("");
+
+function cycleTimelineProgressReview(direction: 1 | -1): void {
+  const options = TIMELINE_PROGRESS_REVIEW_OPTIONS;
+  const index = Math.max(0, options.indexOf(timelineProgressReview.value));
+  timelineProgressReview.value = options[(index + direction + options.length) % options.length]!;
+  void focusTimelineSearchResult();
+}
+
+function cyclePanelTimelineChip(direction: 1 | -1): void {
+  const strip = panelTimelineStrip.value;
+  if (!strip.length) return;
+  const currentId = selection.value?.kind === "panel" ? selection.value.panel.id : "";
+  const index = strip.findIndex((row) => row.panelId === currentId);
+  const next = index < 0
+    ? (direction > 0 ? 0 : strip.length - 1)
+    : (index + direction + strip.length) % strip.length;
+  panelTimelineRovingIndex.value = next;
+  void focusPanelOnCanvas(strip[next]!.panelId);
+}
+
+const panelTimelineRovingIndex = ref(-1);
+
+const panelTimelineActiveChipIndex = computed(() => {
+  const strip = panelTimelineStrip.value;
+  if (!strip.length) return 0;
+  const roving = panelTimelineRovingIndex.value;
+  if (roving >= 0 && roving < strip.length) return roving;
+  const currentId = selection.value?.kind === "panel" ? selection.value.panel.id : "";
+  const selected = strip.findIndex((row) => row.panelId === currentId);
+  return selected >= 0 ? selected : 0;
+});
+
+function panelTimelineChipButtons(): HTMLButtonElement[] {
+  return Array.from(document.querySelectorAll<HTMLButtonElement>("[data-testid='managed-canvas-panel-timeline'] button"));
+}
+
+function movePanelTimelineChipFocus(key: string): void {
+  const strip = panelTimelineStrip.value;
+  if (!strip.length) return;
+  const buttons = panelTimelineChipButtons();
+  const active = document.activeElement;
+  const index = buttons.findIndex((button) => button === active || button.contains(active));
+  const current = index >= 0 ? index : panelTimelineActiveChipIndex.value;
+  let next = current;
+  if (key === "ArrowRight") next = (current + 1) % strip.length;
+  else if (key === "ArrowLeft") next = (current - 1 + strip.length) % strip.length;
+  else if (key === "Home") next = 0;
+  else if (key === "End") next = strip.length - 1;
+  else if (key === "PageUp") next = Math.max(0, current - 10);
+  else if (key === "PageDown") next = Math.min(strip.length - 1, current + 10);
+  else return;
+  panelTimelineRovingIndex.value = next;
+  buttons[next]?.focus();
+}
+
+function focusPanelTimelineChipEnd(which: "first" | "last"): void {
+  const strip = panelTimelineStrip.value;
+  if (!strip.length) return;
+  const index = which === "first" ? 0 : strip.length - 1;
+  panelTimelineRovingIndex.value = index;
+  void focusPanelOnCanvas(strip[index]!.panelId);
+}
+
+function jumpPanelTimelineChipPage(direction: 1 | -1): void {
+  const strip = panelTimelineStrip.value;
+  if (!strip.length) return;
+  const currentId = selection.value?.kind === "panel" ? selection.value.panel.id : "";
+  const index = strip.findIndex((row) => row.panelId === currentId);
+  const start = index < 0 ? (direction > 0 ? 0 : strip.length - 1) : index;
+  const next = direction > 0
+    ? Math.min(strip.length - 1, start + 10)
+    : Math.max(0, start - 10);
+  panelTimelineRovingIndex.value = next;
+  void focusPanelOnCanvas(strip[next]!.panelId);
+}
+
+function jumpUnitListPage(direction: 1 | -1): void {
+  const items = unitsPage.value?.page.items ?? [];
+  if (!items.length) return;
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>(".unit-list .library-item"));
+  const active = document.activeElement;
+  const index = buttons.findIndex((button) => button === active || button.contains(active));
+  const current = index >= 0 ? index : 0;
+  const next = direction > 0
+    ? Math.min(items.length - 1, current + 10)
+    : Math.max(0, current - 10);
+  const unit = items[next];
+  if (!unit) return;
+  unitListRovingIndex.value = next;
+  buttons[next]?.focus();
+  void selectUnit(unit);
+}
+
+async function pageUnitsByKeyboard(direction: 1 | -1): Promise<void> {
+  if (loading.value) return;
+  if (direction > 0) {
+    if (!unitsPage.value?.page.nextCursor) return;
+    await unitsNext();
+  } else {
+    if (!unitCursorStack.value.length) return;
+    await unitsPrevious();
+  }
+  const first = document.querySelector<HTMLButtonElement>(".unit-list .library-item");
+  if (first) {
+    unitListRovingIndex.value = 0;
+    first.focus();
+    return;
+  }
+  const pager = document.querySelector<HTMLButtonElement>(
+    direction > 0
+      ? "[data-testid='managed-canvas-units-next']"
+      : "[data-testid='managed-canvas-units-prev']",
+  );
+  pager?.focus();
+}
+
+const unitListRovingIndex = ref(-1);
+const assetListRovingIndex = ref(-1);
+const textListRovingIndex = ref(-1);
+const mediaListRovingIndex = ref(-1);
+const globalResourceListRovingIndex = ref(-1);
+
+function listRovingActiveIndex(
+  count: number,
+  roving: number,
+  selected: number,
+): number {
+  if (count <= 0) return 0;
+  if (roving >= 0 && roving < count) return roving;
+  return selected >= 0 ? selected : 0;
+}
+
+const unitListActiveIndex = computed(() => {
+  const items = unitsPage.value?.page.items ?? [];
+  const currentId = selection.value?.kind === "unit" ? selection.value.unit.id : unitDetail.value?.unit.id ?? "";
+  const selected = items.findIndex((unit) => unit.id === currentId);
+  return listRovingActiveIndex(items.length, unitListRovingIndex.value, selected);
+});
+
+const assetListActiveIndex = computed(() => {
+  const items = visibleLibraryAssets.value;
+  const currentId = selection.value?.kind === "asset" ? selection.value.asset.id : "";
+  const selected = items.findIndex((asset) => asset.id === currentId);
+  return listRovingActiveIndex(items.length, assetListRovingIndex.value, selected);
+});
+
+const textListActiveIndex = computed(() => {
+  const items = filteredTextDocuments.value;
+  const currentId = selection.value?.kind === "script" || selection.value?.kind === "prompt"
+    ? selection.value.doc.id
+    : "";
+  const selected = items.findIndex((doc) => doc.id === currentId);
+  return listRovingActiveIndex(items.length, textListRovingIndex.value, selected);
+});
+
+const mediaListActiveIndex = computed(() => {
+  const items = mediaPage.value?.items ?? [];
+  return listRovingActiveIndex(items.length, mediaListRovingIndex.value, -1);
+});
+
+const globalResourceListActiveIndex = computed(() => {
+  const items = globalResourcePage.value?.items ?? [];
+  return listRovingActiveIndex(items.length, globalResourceListRovingIndex.value, -1);
+});
+
+function nextRovingIndex(current: number, count: number, key: string): number | null {
+  if (count <= 0) return null;
+  if (key === "ArrowDown" || key === "ArrowRight") return (current + 1) % count;
+  if (key === "ArrowUp" || key === "ArrowLeft") return (current - 1 + count) % count;
+  if (key === "Home") return 0;
+  if (key === "End") return count - 1;
+  return null;
+}
+
+function moveListedItemFocus(selector: string, key: string, fallback: number): void {
+  const items = Array.from(document.querySelectorAll<HTMLElement>(selector));
+  if (!items.length) return;
+  const active = document.activeElement;
+  const index = items.findIndex((el) => el === active || el.contains(active));
+  const current = index >= 0 ? index : Math.max(0, Math.min(fallback, items.length - 1));
+  const next = nextRovingIndex(current, items.length, key);
+  if (next == null) return;
+  items[next]?.focus();
+}
+
+function moveUnitListFocus(key: string): void {
+  moveListedItemFocus(".unit-list .library-item", key, unitListActiveIndex.value);
+}
+
+function moveAssetListFocus(key: string): void {
+  moveListedItemFocus("[data-testid='managed-canvas-assets-virtual-viewport'] .library-item", key, assetListActiveIndex.value);
+}
+
+function moveTextListFocus(key: string): void {
+  moveListedItemFocus(".text-list .library-item", key, textListActiveIndex.value);
+}
+
+function moveMediaListFocus(key: string): void {
+  moveListedItemFocus(".media-library-item", key, mediaListActiveIndex.value);
+}
+
+function moveAppearanceListFocus(key: string): void {
+  moveListedItemFocus(".appearance-list button", key, 0);
+}
+
+function moveGlobalResourceListFocus(key: string): void {
+  moveListedItemFocus(".global-resource-card", key, globalResourceListActiveIndex.value);
+}
+
+function moveNodeActionFocus(key: string): void {
+  const items = Array.from(document.querySelectorAll<HTMLButtonElement>(".node-action-buttons button"))
+    .filter((el) => !el.disabled);
+  if (!items.length) return;
+  const active = document.activeElement;
+  const index = items.findIndex((el) => el === active || el.contains(active));
+  const current = index >= 0 ? index : 0;
+  const next = nextRovingIndex(current, items.length, key);
+  if (next == null) return;
+  items[next]?.focus();
+}
+
+const libraryTabRovingIndex = ref(-1);
+const globalResourceTabRovingIndex = ref(-1);
+const addMenuRovingIndex = ref(-1);
+
+const libraryTabActiveIndex = computed(() => {
+  const selected = libraryTabs.findIndex((tab) => tab.kind === libraryTab.value);
+  return listRovingActiveIndex(libraryTabs.length, libraryTabRovingIndex.value, selected);
+});
+
+const globalResourceTabActiveIndex = computed(() => {
+  const selected = globalResourceCategories.findIndex((category) => category.kind === globalResourceCategory.value);
+  return listRovingActiveIndex(globalResourceCategories.length, globalResourceTabRovingIndex.value, selected);
+});
+
+const addMenuActiveIndex = computed(() => {
+  return listRovingActiveIndex(libraryTabs.length, addMenuRovingIndex.value, 0);
+});
+
+function moveLibraryTabFocus(key: string): void {
+  moveListedItemFocus("#managed-canvas-library .library-tabs button", key, libraryTabActiveIndex.value);
+}
+
+function moveGlobalResourceTabFocus(key: string): void {
+  const items = Array.from(document.querySelectorAll<HTMLButtonElement>(".global-resource-tabs button"))
+    .filter((el) => !el.disabled);
+  if (!items.length) return;
+  const active = document.activeElement;
+  const index = items.findIndex((el) => el === active || el.contains(active));
+  const current = index >= 0 ? index : 0;
+  const next = nextRovingIndex(current, items.length, key);
+  if (next == null) return;
+  items[next]?.focus();
+}
+
+function moveAddMenuFocus(key: string): void {
+  moveListedItemFocus("#managed-canvas-add-menu button", key, addMenuActiveIndex.value);
+}
+
+const floatingToolbarRovingIndex = ref(-1);
+const floatingToolbarActiveIndex = computed(() => listRovingActiveIndex(5, floatingToolbarRovingIndex.value, 0));
+
+function moveFloatingToolbarFocus(key: string): void {
+  const items = Array.from(document.querySelectorAll<HTMLButtonElement>(
+    ".floating-tools > .add-menu-wrap > button, .floating-tools > button",
+  ));
+  if (!items.length) return;
+  const active = document.activeElement;
+  const index = items.findIndex((el) => el === active || el.contains(active));
+  const current = index >= 0 ? index : floatingToolbarActiveIndex.value;
+  const next = nextRovingIndex(current, items.length, key);
+  if (next == null) return;
+  items[next]?.focus();
+}
+
+const bottomToolbarFocusKey = ref("fit");
+const viewMenuItemFocusSlot = ref(0);
+const viewMenuThemeRovingIndex = ref(-1);
+
+function bottomToolbarEnabledKeys(): string[] {
+  const keys: string[] = ["fit"];
+  if (canUndoLayout.value && !isDragging.value) keys.push("undo");
+  if (canRedoLayout.value && !isDragging.value) keys.push("redo");
+  if (selectionCount.value >= 2 && !isDragging.value) {
+    keys.push("align-left", "align-centerX", "align-right", "align-top", "align-centerY", "align-bottom");
+    if (selectionCount.value >= 3) keys.push("dist-x", "dist-y");
+  }
+  if (!isDragging.value) keys.push("snap");
+  keys.push("edges");
+  if (!loading.value && !isDragging.value && nodes.value.length) keys.push("timeline", "timelineForce");
+  if (selectedDraftEdgeId.value) keys.push("deleteEdge");
+  if (workspaceMode.value === "workflow") keys.push("clear");
+  return keys;
+}
+
+function bottomToolbarTabIndex(key: string, disabled = false): number {
+  if (disabled) return -1;
+  const enabled = bottomToolbarEnabledKeys();
+  if (!enabled.length) return -1;
+  const current = enabled.includes(bottomToolbarFocusKey.value) ? bottomToolbarFocusKey.value : enabled[0];
+  return current === key ? 0 : -1;
+}
+
+function moveBottomToolbarFocus(key: string): void {
+  const items = Array.from(document.querySelectorAll<HTMLButtonElement>(
+    ".bottom-tools > button, .bottom-tools .align-tools button",
+  )).filter((el) => !el.disabled);
+  if (!items.length) return;
+  const active = document.activeElement;
+  const index = items.findIndex((el) => el === active || el.contains(active));
+  const current = index >= 0 ? index : 0;
+  const next = nextRovingIndex(current, items.length, key);
+  if (next == null) return;
+  items[next]?.focus();
+}
+
+function viewMenuItemEnabledSlots(): number[] {
+  const slots = [0, 1];
+  if (!loading.value) slots.push(2);
+  if (!loading.value && !localProductionPreviewLoading.value) slots.push(3);
+  return slots;
+}
+
+function viewMenuItemTabIndex(slot: number, disabled = false): number {
+  if (disabled) return -1;
+  const enabled = viewMenuItemEnabledSlots();
+  if (!enabled.length) return -1;
+  const current = enabled.includes(viewMenuItemFocusSlot.value) ? viewMenuItemFocusSlot.value : enabled[0]!;
+  return current === slot ? 0 : -1;
+}
+
+function moveViewMenuItemFocus(key: string): void {
+  const items = Array.from(document.querySelectorAll<HTMLButtonElement>(".view-menu-pop > button"))
+    .filter((el) => !el.disabled);
+  if (!items.length) return;
+  const active = document.activeElement;
+  const index = items.findIndex((el) => el === active || el.contains(active));
+  const current = index >= 0 ? index : 0;
+  const next = nextRovingIndex(current, items.length, key);
+  if (next == null) return;
+  items[next]?.focus();
+}
+
+const viewMenuThemeActiveIndex = computed(() => {
+  const selected = MANAGED_CANVAS_THEMES.findIndex((theme) => theme.id === canvasTheme.value);
+  return listRovingActiveIndex(MANAGED_CANVAS_THEMES.length, viewMenuThemeRovingIndex.value, selected);
+});
+
+function moveViewMenuThemeFocus(key: string): void {
+  moveListedItemFocus(".view-menu-theme > button[role='radio']", key, viewMenuThemeActiveIndex.value);
+}
+
+function onViewMenuToggle(event: Event): void {
+  const details = event.currentTarget as HTMLDetailsElement;
+  if (!details.open) return;
+  viewMenuItemFocusSlot.value = 0;
+  void nextTick(() => {
+    const first = Array.from(document.querySelectorAll<HTMLButtonElement>(".view-menu-pop > button"))
+      .find((el) => !el.disabled);
+    first?.focus();
+  });
+}
+
+function managedFlowControlsButtons(): HTMLButtonElement[] {
+  return Array.from(document.querySelectorAll<HTMLButtonElement>("#managed-studio-flow .vue-flow__controls-button"));
+}
+
+function syncManagedFlowControlsTabIndex(active?: Element | null): void {
+  const items = managedFlowControlsButtons();
+  if (!items.length) return;
+  const index = items.findIndex((el) => el === active || el.contains(active ?? null));
+  const current = index >= 0 ? index : 0;
+  items.forEach((el, i) => {
+    el.tabIndex = i === current ? 0 : -1;
+  });
+}
+
+function moveManagedFlowControlsFocus(key: string): void {
+  const items = managedFlowControlsButtons();
+  if (!items.length) return;
+  const active = document.activeElement;
+  const index = items.findIndex((el) => el === active || el.contains(active));
+  const current = index >= 0 ? index : 0;
+  const next = nextRovingIndex(current, items.length, key);
+  if (next == null) return;
+  syncManagedFlowControlsTabIndex(items[next]);
+  items[next]?.focus();
+}
+
+function onManagedFlowControlsFocusIn(event: FocusEvent): void {
+  const target = event.target as HTMLElement | null;
+  if (!target?.closest("#managed-studio-flow .vue-flow__controls-button")) return;
+  syncManagedFlowControlsTabIndex(target);
+}
+
+function onMiniMapNodeFocusIn(event: FocusEvent): void {
+  const target = event.target as HTMLElement | null;
+  if (!target?.closest(".vue-flow__minimap-node")) return;
+  syncMiniMapNodeTabIndex(target);
+}
+
+async function pageMediaByKeyboard(direction: 1 | -1): Promise<void> {
+  if (loading.value) return;
+  if (direction > 0) {
+    if (!mediaPage.value?.nextCursor) return;
+    await mediaNext();
+  } else {
+    if (!mediaCursorStack.value.length) return;
+    await mediaPrevious();
+  }
+  const first = document.querySelector<HTMLElement>(".media-library-item");
+  if (first) {
+    mediaListRovingIndex.value = 0;
+    first.focus();
+    return;
+  }
+  const pager = document.querySelector<HTMLButtonElement>(
+    direction > 0
+      ? "[data-testid='managed-canvas-media-next']"
+      : "[data-testid='managed-canvas-media-prev']",
+  );
+  pager?.focus();
+}
+
+async function pageAssetsByKeyboard(direction: 1 | -1): Promise<void> {
+  if (loading.value) return;
+  if (direction > 0) {
+    if (!assetsPage.value?.page.nextCursor) return;
+    await assetsNext();
+  } else {
+    if (!assetCursorStack.value.length) return;
+    await assetsPrevious();
+  }
+  const first = document.querySelector<HTMLElement>("[data-testid='managed-canvas-assets-virtual-viewport'] .library-item");
+  if (first) {
+    assetListRovingIndex.value = 0;
+    first.focus();
+    return;
+  }
+  const pager = document.querySelector<HTMLButtonElement>(
+    direction > 0
+      ? "[data-testid='managed-canvas-assets-next']"
+      : "[data-testid='managed-canvas-assets-prev']",
+  );
+  pager?.focus();
+}
+
+async function pageGlobalResourcesByKeyboard(direction: 1 | -1): Promise<void> {
+  if (globalResourceLoading.value) return;
+  if (direction > 0) {
+    if (!globalResourcePage.value?.nextCursor) return;
+    await globalResourcesNext();
+  } else {
+    if (!globalResourceCursorStack.value.length) return;
+    await globalResourcesPrevious();
+  }
+  const first = document.querySelector<HTMLElement>(".global-resource-card");
+  if (first) {
+    globalResourceListRovingIndex.value = 0;
+    first.focus();
+    return;
+  }
+  const pager = document.querySelector<HTMLButtonElement>(
+    direction > 0
+      ? "[data-testid='managed-canvas-global-resources-next']"
+      : "[data-testid='managed-canvas-global-resources-prev']",
+  );
+  pager?.focus();
+}
+
+async function pageAppearancesByKeyboard(direction: 1 | -1): Promise<void> {
+  if (loading.value) return;
+  if (selection.value?.kind !== "asset") return;
+  if (direction > 0) {
+    if (!appearancesPage.value?.page.nextCursor) return;
+    await appearancesNext();
+  } else {
+    if (!appearanceCursorStack.value.length) return;
+    await appearancesPrevious();
+  }
+  const first = document.querySelector<HTMLButtonElement>(".appearance-list button");
+  if (first) {
+    first.focus();
+    return;
+  }
+  const pager = document.querySelector<HTMLButtonElement>(
+    direction > 0
+      ? "[data-testid='managed-canvas-appearances-next']"
+      : "[data-testid='managed-canvas-appearances-prev']",
+  );
+  pager?.focus();
+}
 
 const timelineProgressFilterResult = computed(() => {
   const unitItems = unitsPage.value?.page.items ?? [];
@@ -2349,6 +3179,20 @@ async function focusTimelineAnchor(timeline: StudioCanvasTimelineLayout): Promis
 
 /** 进度搜索逐键触发会全量过滤数百单元；150ms 防抖合并连续输入，卸载时清理定时器。 */
 let timelineSearchFocusTimer = 0;
+const timelineProgressQueryEl = ref<HTMLInputElement | null>(null);
+
+function focusTimelineProgressQuery(): void {
+  const el = timelineProgressQueryEl.value;
+  if (!el) return;
+  el.focus();
+  el.select();
+}
+
+function onTimelineSearchEnter(event: KeyboardEvent): void {
+  if (event.shiftKey || event.metaKey || event.ctrlKey || event.altKey) return;
+  void focusTimelineSearchResult();
+}
+
 function scheduleFocusTimelineSearchResult(): void {
   if (timelineSearchFocusTimer) window.clearTimeout(timelineSearchFocusTimer);
   timelineSearchFocusTimer = window.setTimeout(() => {
@@ -2358,23 +3202,16 @@ function scheduleFocusTimelineSearchResult(): void {
 }
 
 /** 搜索只有一个单元命中时直接定位，避免“找到了但还要在大画布里找”。 */
-async function focusTimelineSearchResult(): Promise<void> {
-  await nextTick();
-  // T12: 先用批量投影搜索（支持双编号），再回落到旧过滤器
+function collectTimelineSearchUnitIds(): string[] {
   const q = timelineProgressQuery.value.trim();
-  let unitIds: string[] = [];
   if (q) {
     const projectionMatches = searchUnitsFromProjection(q);
-    if (projectionMatches.length > 0) {
-      unitIds = projectionMatches;
-    } else {
-      unitIds = timelineProgressFilterResult.value?.matchedUnitIds ?? [];
-    }
-  } else {
-    unitIds = timelineProgressFilterResult.value?.matchedUnitIds ?? [];
+    if (projectionMatches.length > 0) return projectionMatches;
   }
-  if (unitIds.length !== 1) return;
-  const unitId = unitIds[0]!;
+  return timelineProgressFilterResult.value?.matchedUnitIds ?? [];
+}
+
+async function centerOnTimelineSearchUnit(unitId: string): Promise<void> {
   const anchor = nodes.value.find((node) => node.id === `media:unit-grid-raw:${unitId}`)
     ?? nodes.value.find((node) => node.id === `generation-state:${unitId}`)
     ?? nodes.value.find((node) => node.id === `unit:${unitId}`);
@@ -2388,6 +3225,30 @@ async function focusTimelineSearchResult(): Promise<void> {
     // 搜索不应破坏当前视图；Vue Flow 未就绪时保持原位置。
   }
 }
+
+async function focusTimelineSearchResult(): Promise<void> {
+  await nextTick();
+  const unitIds = collectTimelineSearchUnitIds();
+  if (unitIds.length !== 1) return;
+  await centerOnTimelineSearchUnit(unitIds[0]!);
+}
+
+let timelineSearchCursor = -1;
+
+async function cycleTimelineSearchHit(direction: 1 | -1): Promise<void> {
+  await nextTick();
+  const unitIds = collectTimelineSearchUnitIds();
+  if (!unitIds.length) return;
+  const next = timelineSearchCursor < 0
+    ? (direction > 0 ? 0 : unitIds.length - 1)
+    : (timelineSearchCursor + direction + unitIds.length) % unitIds.length;
+  timelineSearchCursor = next;
+  await centerOnTimelineSearchUnit(unitIds[next]!);
+}
+
+watch([timelineProgressQuery, timelineProgressReview], () => {
+  timelineSearchCursor = -1;
+});
 
 /** IPC 只接收纯对象；Vue ref 内的深层 Proxy 不能直接穿过 structured clone。 */
 function plainNodePositions(input: Record<string, StudioCanvasNodePosition>): Record<string, StudioCanvasNodePosition> {
@@ -2425,8 +3286,123 @@ function plainWorkflowGroups(groups: readonly StudioCanvasWorkflowGroup[]): Stud
   }));
 }
 
+function plainSpatialGroups(groups: readonly StudioCanvasSpatialGroup[]): StudioCanvasSpatialGroup[] {
+  return groups.map((group) => {
+    const node = nodes.value.find((candidate) => candidate.id === group.id);
+    return {
+      id: group.id,
+      title: group.title,
+      memberIds: [...group.memberIds],
+      x: node?.position.x ?? group.x,
+      y: node?.position.y ?? group.y,
+      width: group.width,
+      height: group.height,
+    };
+  });
+}
+
+function collectAbsoluteNodePositions(): Record<string, StudioCanvasNodePosition> {
+  const byId = new Map(nodes.value.map((node) => [node.id, node]));
+  const collected: Record<string, StudioCanvasNodePosition> = {};
+  for (const node of nodes.value) {
+    if (node.type === "studioSpatialGroup") continue;
+    let x = node.position.x;
+    let y = node.position.y;
+    const parentId = (node as Node & { parentNode?: string }).parentNode;
+    if (parentId) {
+      const parent = byId.get(parentId);
+      if (parent) {
+        x += parent.position.x;
+        y += parent.position.y;
+      }
+    }
+    collected[node.id] = { x, y };
+  }
+  return collectStudioCanvasNodePositions(
+    Object.entries(collected).map(([id, position]) => ({ id, position })),
+  );
+}
+
 function isPinned(nodeId: string): boolean {
   return pinnedNodeIds.value.includes(nodeId);
+}
+
+function applySpatialGrouping(source: Node[]): Node[] {
+  const groups = spatialGroups.value;
+  if (!groups.length) return source;
+  const byId = new Map(source.map((node) => [node.id, node]));
+  const groupNodes: Node[] = groups.map((group) => ({
+    id: group.id,
+    type: "studioSpatialGroup",
+    position: { x: group.x, y: group.y },
+    style: { width: `${group.width}px`, height: `${group.height}px` },
+    data: {
+      title: group.title,
+      memberIds: [...group.memberIds],
+      width: group.width,
+      height: group.height,
+    },
+    selectable: true,
+    draggable: true,
+    zIndex: -1,
+  }));
+  for (const group of groups) {
+    for (const memberId of group.memberIds) {
+      const node = byId.get(memberId);
+      if (!node) continue;
+      const abs = node.position;
+      (node as Node & { parentNode?: string; extent?: string }).parentNode = group.id;
+      (node as Node & { parentNode?: string; extent?: string }).extent = "parent";
+      node.position = { x: abs.x - group.x, y: abs.y - group.y };
+    }
+  }
+  return [...groupNodes, ...source];
+}
+
+function groupSelectedCanvasNodes(): void {
+  if (loading.value || pinActionBusy.value || isDragging.value) return;
+  const selected = nodes.value.filter((node) => (
+    (node as CanvasFlowNodeLike).selected
+    && node.type !== "studioSpatialGroup"
+    && !(node as Node & { parentNode?: string }).parentNode
+  ));
+  if (selected.length < 2) {
+    errorMessage.value = "至少选中两个未分组节点才能创建命名组。";
+    return;
+  }
+  const abs = selected.map((node) => ({
+    id: node.id,
+    ...node.position,
+    width: Number((node as Node & { dimensions?: { width?: number } }).dimensions?.width ?? 220),
+    height: Number((node as Node & { dimensions?: { height?: number } }).dimensions?.height ?? 140),
+  }));
+  const minX = Math.min(...abs.map((item) => item.x)) - 24;
+  const minY = Math.min(...abs.map((item) => item.y)) - 36;
+  const maxX = Math.max(...abs.map((item) => item.x + item.width)) + 24;
+  const maxY = Math.max(...abs.map((item) => item.y + item.height)) + 24;
+  const group: StudioCanvasSpatialGroup = {
+    id: `group:${crypto.randomUUID()}`,
+    title: `组 ${spatialGroups.value.length + 1}`,
+    memberIds: abs.map((item) => item.id),
+    x: Math.round(minX),
+    y: Math.round(minY),
+    width: Math.max(80, Math.round(maxX - minX)),
+    height: Math.max(60, Math.round(maxY - minY)),
+  };
+  spatialGroups.value = [...spatialGroups.value, group];
+  rebuildGraph();
+  scheduleLayoutPersist();
+}
+
+function ungroupSelectedCanvasNodes(): void {
+  if (loading.value || pinActionBusy.value || isDragging.value) return;
+  const selectedIds = new Set(nodes.value.filter((node) => (node as CanvasFlowNodeLike).selected).map((node) => node.id));
+  if (!selectedIds.size) return;
+  const next = spatialGroups.value.filter((group) => !selectedIds.has(group.id) && !group.memberIds.some((id) => selectedIds.has(id)));
+  if (next.length === spatialGroups.value.length) return;
+  spatialGroups.value = next;
+  rebuildGraph();
+  scheduleLayoutPersist();
 }
 
 function pruneDraftEdgesForRemovedNodes(removed: ReadonlySet<string>): void {
@@ -2485,6 +3461,13 @@ async function togglePinnedNode(nodeId: string): Promise<void> {
       // 首次从“查看全部”进入工作流时，先保留旧投影并完成精确资产读取；若先切
       // workflow，任何并发状态刷新都会短暂重建空图，Vue Flow 的延迟 remove
       // 事件随后可能反向删除已加载节点。
+        if (wasPinned) {
+          detachCharacterCompanionAudio(normalized.slice("asset:".length), current);
+        } else {
+          await attachCharacterCompanionAudio(normalized.slice("asset:".length), current, projectRoot);
+          if (!canvasUiActionIsCurrent(pinActionGate, scope)) return;
+        }
+        pinnedNodeIds.value = [...current];
         await loadPinnedAssets({ rebuild: !enteringWorkflow });
         if (!canvasUiActionIsCurrent(pinActionGate, scope)) return;
       } catch (error) {
@@ -2626,8 +3609,12 @@ function releaseGlobalResourceState(): void {
 }
 
 function closeLibrary(): void {
+  const restoreTestId = libraryMode.value === "global"
+    ? "managed-canvas-open-global-resources"
+    : "managed-canvas-open-library";
   if (libraryMode.value === "global") releaseGlobalResourceState();
   libraryOpen.value = false;
+  document.querySelector<HTMLButtonElement>(`[data-testid="${restoreTestId}"]`)?.focus();
 }
 
 async function loadGlobalResources(cursor?: string): Promise<boolean> {
@@ -2729,6 +3716,7 @@ async function openLibraryFor(kind: StudioCanvasLibraryTab): Promise<void> {
   addMenuOpen.value = false;
   if (kind === "character" || kind === "scene" || kind === "prop" || kind === "style") {
     assetCategory.value = kind;
+    if (kind === "character") await refreshCharacterVoices();
     await resetAssets();
   } else if (kind === "media") {
     await resetMedia();
@@ -2773,6 +3761,111 @@ function stripPendingOutline(nodeId: string): void {
   });
 }
 
+function helpCloseButton(): HTMLButtonElement | null {
+  return document.querySelector<HTMLButtonElement>('#managed-canvas-help-card button[aria-label="关闭帮助"]');
+}
+
+function closeHelp(): void {
+  if (!helpOpen.value) return;
+  helpOpen.value = false;
+  helpTriggerEl.value?.focus();
+}
+
+function toggleHelp(): void {
+  helpOpen.value = !helpOpen.value;
+  if (helpOpen.value) {
+    void nextTick(() => {
+      helpCloseButton()?.focus();
+    });
+    return;
+  }
+  helpTriggerEl.value?.focus();
+}
+
+function toggleAddMenu(): void {
+  addMenuOpen.value = !addMenuOpen.value;
+  if (addMenuOpen.value) {
+    addMenuRovingIndex.value = 0;
+    void nextTick(() => {
+      document.querySelector<HTMLButtonElement>("#managed-canvas-add-menu button")?.focus();
+    });
+  }
+}
+
+function restoreConnectTriggerFocus(): void {
+  document.querySelector<HTMLButtonElement>('[data-testid="managed-canvas-connect-mode"]')?.focus();
+}
+
+function restoreDirectorToggleFocus(): void {
+  document.querySelector<HTMLButtonElement>('[data-testid="managed-canvas-director-toggle"]')?.focus();
+}
+
+watch(directorPanelOpen, (open) => {
+  if (!open) return;
+  void nextTick(() => {
+    document.querySelector<HTMLInputElement>('[data-testid="director-panel-filter"]')?.focus();
+  });
+});
+
+function toggleDirectorPanel(): void {
+  directorPanelOpen.value = !directorPanelOpen.value;
+  if (directorPanelOpen.value) return;
+  restoreDirectorToggleFocus();
+}
+
+function closeDirectorPanel(): void {
+  if (!directorPanelOpen.value) return;
+  directorPanelOpen.value = false;
+  restoreDirectorToggleFocus();
+}
+
+function directorPanelFocusables(): HTMLElement[] {
+  const root = document.querySelector("[data-testid='director-action-panel']");
+  if (!root) return [];
+  return Array.from(root.querySelectorAll<HTMLElement>(
+    "[data-testid='director-panel-close'], [data-testid='director-panel-filter'], .director-action:not(:disabled)",
+  ));
+}
+
+function moveDirectorPanelFocus(shiftKey: boolean): void {
+  const items = directorPanelFocusables();
+  if (!items.length) return;
+  const active = document.activeElement;
+  const index = items.findIndex((el) => el === active || el.contains(active));
+  const current = index >= 0 ? index : 0;
+  const next = shiftKey
+    ? (current - 1 + items.length) % items.length
+    : (current + 1) % items.length;
+  items[next]?.focus();
+}
+
+function closeInspector(): void {
+  const selectedNode = nodes.value.find((node) => node.selected);
+  const nodeId = selectedNode?.id;
+  selection.value = null;
+  void nextTick(() => restoreInspectorFlowFocus(nodeId));
+}
+
+function closeCanvasError(): void {
+  errorMessage.value = "";
+  restoreInspectorFlowFocus();
+}
+
+function restoreInspectorFlowFocus(nodeId?: string): void {
+  if (nodeId) {
+    const nodeEl = document.querySelector<HTMLElement>(`#managed-studio-flow .vue-flow__node[data-id="${CSS.escape(nodeId)}"]`);
+    if (nodeEl) {
+      if (nodeEl.tabIndex < 0) nodeEl.tabIndex = -1;
+      nodeEl.focus();
+      return;
+    }
+  }
+  const flow = document.querySelector<HTMLElement>("#managed-studio-flow");
+  if (!flow) return;
+  if (flow.tabIndex < 0) flow.tabIndex = -1;
+  flow.focus();
+}
+
 function toggleConnectMode(): void {
   const previousPendingId = pendingConnectionSourceId.value;
   connectMode.value = !connectMode.value;
@@ -2780,6 +3873,7 @@ function toggleConnectMode(): void {
   addMenuOpen.value = false;
   // 取消连线后清除烘进节点 class 的 connection-pending 描边（F-02；外科清除，不触发全量重建）。
   stripPendingOutline(previousPendingId);
+  if (!connectMode.value) restoreConnectTriggerFocus();
 }
 
 /**
@@ -2893,15 +3987,15 @@ function onConnect(connection: Connection): void {
   scheduleLayoutPersist();
 }
 
-async function fitCanvas(): Promise<void> {
-  if (!nodes.value.length) return;
+async function fitCanvasToNodes(source: Node[]): Promise<void> {
+  if (!source.length) return;
   // only-render-visible-elements 会让离屏节点暂时没有 dimensions；fitView 会因此遗漏它们。
   // 画布本身已有严格 DOM 上限，直接按所有有界节点的坐标计算包围盒，确保素材与整条
   // 宫格生产链都能被“一键适配”看到。
-  const minX = Math.min(...nodes.value.map((node) => node.position.x));
-  const minY = Math.min(...nodes.value.map((node) => node.position.y));
-  const maxX = Math.max(...nodes.value.map((node) => node.position.x + 188));
-  const maxY = Math.max(...nodes.value.map((node) => node.position.y + 200));
+  const minX = Math.min(...source.map((node) => node.position.x));
+  const minY = Math.min(...source.map((node) => node.position.y));
+  const maxX = Math.max(...source.map((node) => node.position.x + 188));
+  const maxY = Math.max(...source.map((node) => node.position.y + 200));
   await studioFlow.fitBounds({
     x: minX,
     y: minY,
@@ -2914,9 +4008,41 @@ async function fitCanvas(): Promise<void> {
   });
 }
 
+async function fitCanvas(): Promise<void> {
+  await fitCanvasToNodes(nodes.value);
+}
+
+async function fitSelectedCanvasNodes(): Promise<void> {
+  const selected = nodes.value.filter((node) => node.selected);
+  if (!selected.length) return;
+  await fitCanvasToNodes(selected);
+}
+
+function onFitViewControl(): void {
+  void fitCanvas().then(() => onControlViewportChanged());
+}
+
+function onZoomTo100(): void {
+  void studioFlow.zoomTo(1, { duration: 180 }).then(() => onControlViewportChanged());
+}
+
+function isShiftDigit(event: KeyboardEvent, digit: "0" | "1" | "2"): boolean {
+  return Boolean(
+    event.shiftKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && (event.key === digit || event.code === `Digit${digit}`),
+  );
+}
+
 function toggleEdges(): void {
   showEdges.value = !showEdges.value;
   rebuildGraph();
+}
+
+function toggleMiniMap(): void {
+  showMiniMap.value = !showMiniMap.value;
 }
 
 function toggleWorkspaceMode(): void {
@@ -2951,6 +4077,7 @@ function clearWorkflowCanvas(): void {
   pinnedMediaItems.value = new Map();
   draftCanvasEdges.value = [];
   workflowGroups.value = [];
+  spatialGroups.value = [];
   selectedPanelIds.value = [];
   connectMode.value = false;
   pendingConnectionSourceId.value = "";
@@ -2959,6 +4086,7 @@ function clearWorkflowCanvas(): void {
   workspaceMode.value = "projection";
   rebuildGraph();
   scheduleLayoutPersist();
+  void nextTick(() => restoreInspectorFlowFocus());
 }
 
 async function loadPanelPipeline(
@@ -3976,7 +5104,7 @@ function rebuildGraph(): void {
         kind: "asset",
         kindLabel: assetCategoryLabel(asset.category),
         title: asset.name,
-        subtitle: asset.hasPrimaryAuthority ? "参考图已锁定" : "待补参考图",
+        subtitle: characterLibrarySubtitle(asset),
         excerpt: (asset.description || "").slice(0, 100),
         thumbnailUrl: thumb,
         locked: asset.hasPrimaryAuthority,
@@ -4521,7 +5649,7 @@ function rebuildGraph(): void {
   for (const node of nextNodes) {
     if (selectedNodeIds.has(node.id)) (node as CanvasFlowNodeLike).selected = true;
   }
-  nodes.value = nextNodes;
+  nodes.value = applySpatialGrouping(nextNodes);
   edges.value = nextEdges;
   syncSelectionSnapshot(nextNodes);
 }
@@ -4545,6 +5673,7 @@ async function hydrateLayoutFromDisk(projectRoot = props.projectRoot): Promise<b
       pinnedMediaItems.value = new Map();
       draftCanvasEdges.value = [];
       workflowGroups.value = [];
+      spatialGroups.value = [];
       return true;
     }
     layoutSaveCoordinator.setBaseline(projectRoot, layout);
@@ -4560,6 +5689,7 @@ async function hydrateLayoutFromDisk(projectRoot = props.projectRoot): Promise<b
       : (layout.workspaceMode ?? "projection");
     draftCanvasEdges.value = [...(layout.draftCanvasEdges ?? [])];
     workflowGroups.value = [...(layout.workflowGroups ?? [])];
+    spatialGroups.value = [...(layout.spatialGroups ?? [])];
     return true;
   } catch (error) {
     // 布局是视图层：失败不阻断生产投影
@@ -4586,6 +5716,10 @@ function acceptPersistedLayout(
     ...group,
     panelIds: [...group.panelIds],
     pipeline: [...group.pipeline],
+  }));
+  spatialGroups.value = (layout.spatialGroups ?? []).map((group) => ({
+    ...group,
+    memberIds: [...group.memberIds],
   }));
   nodes.value = nodes.value.map((node) => {
     const position = layout.nodes[node.id];
@@ -4658,9 +5792,7 @@ async function persistWorkflow(
     pipeline: ["image"],
   });
   const created = nextGroups[nextGroups.length - 1]!;
-  const collected = collectStudioCanvasNodePositions(
-    nodes.value.map((node) => ({ id: node.id, position: { x: node.position.x, y: node.position.y } })),
-  );
+  const collected = collectAbsoluteNodePositions();
   const local: StudioCanvasLayoutSemanticSnapshot = {
     viewport: { ...layoutViewport.value, zoom: zoom.value },
     nodes: plainNodePositions(boundedLayoutNodes({ ...persistedLayoutNodes.value, ...collected })),
@@ -4668,6 +5800,7 @@ async function persistWorkflow(
     pinnedNodeIds: [...pinnedNodeIds.value],
     draftCanvasEdges: plainDraftEdges(),
     workflowGroups: plainWorkflowGroups(nextGroups),
+    spatialGroups: plainSpatialGroups(spatialGroups.value),
   };
   const workflowLayoutGeneration = layoutSaveGeneration;
   const result = await layoutSaveCoordinator.saveExclusive({
@@ -4684,12 +5817,7 @@ async function persistWorkflow(
       && workflowLayoutGeneration === layoutSaveGeneration,
   });
   workflowGroups.value = [...result.layout.workflowGroups];
-  const reflectedNodes = collectStudioCanvasNodePositions(
-    nodes.value.map((node) => ({
-      id: node.id,
-      position: { x: node.position.x, y: node.position.y },
-    })),
-  );
+  const reflectedNodes = collectAbsoluteNodePositions();
   layoutSaveCoordinator.setReflectedSemantic(scope.projectRoot, {
     viewport: { ...layoutViewport.value, zoom: zoom.value },
     nodes: plainNodePositions(boundedLayoutNodes({
@@ -4700,6 +5828,7 @@ async function persistWorkflow(
     pinnedNodeIds: [...pinnedNodeIds.value],
     draftCanvasEdges: plainDraftEdges(),
     workflowGroups: plainWorkflowGroups(workflowGroups.value),
+    spatialGroups: plainSpatialGroups(spatialGroups.value),
   });
   lastWorkflowTitle.value = created.title;
   layoutSaveState.value = "saved";
@@ -5085,9 +6214,7 @@ async function persistLayoutNow(
   if (generation !== layoutSaveGeneration) return;
   const isCurrentProject = () => projectRoot === props.projectRoot && generation === layoutSaveGeneration;
   if (isCurrentProject()) layoutSaveState.value = "saving";
-  const collected = collectStudioCanvasNodePositions(
-    nodes.value.map((node) => ({ id: node.id, position: { x: node.position.x, y: node.position.y } })),
-  );
+  const collected = collectAbsoluteNodePositions();
   // 在首次 CAS 前冻结本窗口语义；冲突重试不得被远端 hydrate 反向覆盖。
   const local: StudioCanvasLayoutSemanticSnapshot = {
     viewport: { ...layoutViewport.value, zoom: zoom.value },
@@ -5096,6 +6223,7 @@ async function persistLayoutNow(
     pinnedNodeIds: [...pinnedNodeIds.value],
     draftCanvasEdges: plainDraftEdges(),
     workflowGroups: plainWorkflowGroups(workflowGroups.value),
+    spatialGroups: plainSpatialGroups(spatialGroups.value),
   };
   layoutSaveCoordinator.saveLatest({
     projectRoot,
@@ -5124,6 +6252,17 @@ async function loadOverview(): Promise<void> {
   const token = controller.begin(props.projectRoot, query);
   const result = await props.api.getDashboard(props.projectRoot, query);
   if (controller.isCurrent(token, query) && result.operation === "overview") overview.value = result;
+}
+
+async function captureT23FirstCardMutationChecks(): Promise<number | undefined> {
+  if (window.canvasApi.t23PerformanceProbeEnabled !== true) return undefined;
+  const gate = await window.canvasApi.getRuntimeWriteGate();
+  const value = "runtimeGateMetrics" in gate
+    ? gate.runtimeGateMetrics?.mutationChecks
+    : undefined;
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0
+    ? value
+    : undefined;
 }
 
 async function activateUnitTimelineProjections(units: StudioDashboardUnitSummary[]): Promise<void> {
@@ -5271,9 +6410,12 @@ function onExternalDragEnter(event: DragEvent): void {
 }
 
 function onExternalDragOver(event: DragEvent): void {
-  if (!event.dataTransfer?.types?.includes("Files")) return;
+  const types = event.dataTransfer?.types ?? [];
+  const fromLibrary = Array.from(types).includes(LIBRARY_NODE_MIME);
+  const fromFiles = Array.from(types).includes("Files");
+  if (!fromLibrary && !fromFiles) return;
   externalDropActive.value = true;
-  event.dataTransfer.dropEffect = "copy";
+  if (event.dataTransfer) event.dataTransfer.dropEffect = "copy";
 }
 
 function onExternalDragLeave(event: DragEvent): void {
@@ -5286,6 +6428,11 @@ function onExternalDragLeave(event: DragEvent): void {
 async function onExternalDrop(event: DragEvent): Promise<void> {
   externalDropDepth.value = 0;
   externalDropActive.value = false;
+  const libraryNodeId = event.dataTransfer?.getData(LIBRARY_NODE_MIME)?.trim();
+  if (libraryNodeId) {
+    await dropLibraryNodeAt(event, libraryNodeId);
+    return;
+  }
   if (externalImportBusy.value) return;
   const files = Array.from(event.dataTransfer?.files ?? []);
   if (!files.length) return;
@@ -5557,15 +6704,22 @@ async function refreshAll(): Promise<void> {
       : false;
     if (!isCurrent()) return;
 
-    markT23RendererStartup("canvas-dashboard-overview-start");
-    const overviewRead = loadOverview();
+    // first-card 已进 DOM 后、任何 overview IPC 之前冻结 mutation 指标；该值逐层
+    // 传到 App，T23 不再在事后读取被 overview 污染的摘要。
+    const startupMutationChecks = initialUnitCardObserved
+      ? await captureT23FirstCardMutationChecks()
+      : undefined;
+    if (!isCurrent()) return;
     if (initialUnitCardObserved) {
       emit("initialUnitCardsCommitted", {
         projectRoot,
         refreshSequence: requestSequence,
         unitCount: initialUnits.length,
+        ...(startupMutationChecks === undefined ? {} : { startupMutationChecks }),
       });
     }
+    markT23RendererStartup("canvas-dashboard-overview-start");
+    const overviewRead = loadOverview();
     await overviewRead;
     if (!isCurrent()) return;
     markT23RendererStartup("canvas-dashboard-overview-ready");
@@ -6113,6 +7267,62 @@ function onMoveEnd(event: { flowTransform?: { x?: number; y?: number; zoom?: num
   scheduleLayoutPersist();
 }
 
+const MINIMAP_PAN_STEP = 48;
+
+function panCanvasFromMiniMap(key: string): void {
+  const viewport = studioFlow.getViewport();
+  let { x, y } = viewport;
+  if (key === "ArrowLeft") x += MINIMAP_PAN_STEP;
+  else if (key === "ArrowRight") x -= MINIMAP_PAN_STEP;
+  else if (key === "ArrowUp") y += MINIMAP_PAN_STEP;
+  else if (key === "ArrowDown") y -= MINIMAP_PAN_STEP;
+  else return;
+  void studioFlow.setViewport({ x, y, zoom: viewport.zoom });
+}
+
+function miniMapNodeRects(): SVGRectElement[] {
+  return Array.from(document.querySelectorAll<SVGRectElement>("[data-testid='managed-canvas-minimap'] .vue-flow__minimap-node"));
+}
+
+function syncMiniMapNodeTabIndex(active?: Element | null): void {
+  const items = miniMapNodeRects();
+  if (!items.length) return;
+  const index = items.findIndex((el) => el === active || el.contains(active ?? null));
+  const current = index >= 0 ? index : 0;
+  items.forEach((el, i) => {
+    el.tabIndex = i === current ? 0 : -1;
+  });
+}
+
+function moveMiniMapNodeFocus(key: string): void {
+  const items = miniMapNodeRects();
+  if (!items.length) return;
+  const active = document.activeElement;
+  const index = items.findIndex((el) => el === active || el.contains(active));
+  const current = index >= 0 ? index : 0;
+  const next = nextRovingIndex(current, items.length, key);
+  if (next == null) return;
+  syncMiniMapNodeTabIndex(items[next]);
+  items[next]?.focus();
+}
+
+function selectCanvasNodeFromMiniMap(target: EventTarget | null): void {
+  const el = (target as Element | null)?.closest?.(".vue-flow__minimap-node");
+  const nodeId = el?.getAttribute("data-node-id") ?? "";
+  if (!nodeId) return;
+  const node = nodes.value.find((entry) => entry.id === nodeId);
+  if (!node) return;
+  nodes.value = nodes.value.map((entry) => {
+    const selected = entry.id === nodeId;
+    return entry.selected === selected ? entry : { ...entry, selected };
+  });
+  selectionCount.value = 1;
+  void studioFlow.setCenter(node.position.x + 86, node.position.y + 58, {
+    zoom: Math.max(zoom.value, 0.7),
+    duration: 180,
+  });
+}
+
 function onControlViewportChanged(): void {
   // Controls 直接调用 store.zoomIn/zoomOut，部分版本不会向 VueFlow 转发 moveEnd。
   // 等内置过渡结束后从 store 读取真实视口并持久化，避免重启后缩放跳回旧值。
@@ -6181,6 +7391,38 @@ function applyAlign(mode: CanvasAlignMode): void {
     return !origin || Math.abs(origin.x - position.x) > 1e-6 || Math.abs(origin.y - position.y) > 1e-6;
   });
   if (!anyAligned) return;
+  undoStack.push(before);
+  bumpUndoTick();
+  applyPositionMap(changed);
+}
+
+function selectAllCanvasNodes(): void {
+  if (!nodes.value.length) return;
+  if (nodes.value.every((node) => node.selected)) return;
+  nodes.value = nodes.value.map((node) => (node.selected ? node : { ...node, selected: true }));
+  selectionCount.value = nodes.value.length;
+}
+
+function invertCanvasSelection(): void {
+  if (!nodes.value.length) return;
+  nodes.value = nodes.value.map((node) => ({ ...node, selected: !node.selected }));
+  selectionCount.value = nodes.value.filter((node) => node.selected).length;
+}
+
+function clearCanvasSelection(): void {
+  if (!nodes.value.some((node) => node.selected)) return;
+  nodes.value = nodes.value.map((node) => (node.selected ? { ...node, selected: false } : node));
+  selectionCount.value = 0;
+}
+
+function nudgeSelectedCanvasNodes(dx: number, dy: number): void {
+  if (isDragging.value || pinActionBusy.value) return;
+  const selected = selectedGeometries();
+  if (!selected.length) return;
+  const before = Object.fromEntries(selected.map((item) => [item.id, { x: item.x, y: item.y }]));
+  const changed: CanvasPositionMap = Object.fromEntries(
+    selected.map((item) => [item.id, { x: item.x + dx, y: item.y + dy }]),
+  );
   undoStack.push(before);
   bumpUndoTick();
   applyPositionMap(changed);
@@ -6280,6 +7522,9 @@ function applySnap(event: CanvasNodeDragPayload): void {
   if (result.dx !== 0 || result.dy !== 0) {
     draggedNode.position = { x: draggedNode.position.x + result.dx, y: draggedNode.position.y + result.dy };
   }
+  if (gridSnapEnabled.value) {
+    draggedNode.position = roundToCanvasGrid(draggedNode.position.x, draggedNode.position.y, CANVAS_GRID_SIZE);
+  }
   snapLines.value = result.lines;
 }
 
@@ -6309,9 +7554,7 @@ function finalizeDragSession(): void {
     dragStartSnapshot = null;
   }
   // 会话坐标已在 v-model:nodes 中；合并进持久化 map 并 debounce 写盘
-  const collected = collectStudioCanvasNodePositions(
-    nodes.value.map((node) => ({ id: node.id, position: { x: node.position.x, y: node.position.y } })),
-  );
+  const collected = collectAbsoluteNodePositions();
   persistedLayoutNodes.value = { ...persistedLayoutNodes.value, ...collected };
   scheduleLayoutPersist();
   // 拖拽窗口内被顺延的投影重建（F-04：拖拽中置脏，收尾时补齐）。
@@ -6332,14 +7575,71 @@ function onNodeDragStop(): void {
 }
 
 function onWindowBlur(): void {
+  spacePanHeld.value = false;
   if (!isDragging.value) return;
   finalizeDragSession();
+}
+
+function isSpaceKey(event: KeyboardEvent): boolean {
+  return event.code === "Space" || event.key === " ";
+}
+
+function onCanvasKeyup(event: KeyboardEvent): void {
+  if (!isSpaceKey(event)) return;
+  spacePanHeld.value = false;
 }
 
 function onCanvasKeydown(event: KeyboardEvent): void {
   const target = event.target as HTMLElement | null;
   const editable = target?.matches("input,textarea,select,[contenteditable='true']");
+  if (
+    target?.closest(".vue-flow__minimap-node")
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "Enter" || isSpaceKey(event))
+  ) {
+    event.preventDefault();
+    selectCanvasNodeFromMiniMap(target);
+    return;
+  }
+  if (isSpaceKey(event)) {
+    if (!editable) {
+      event.preventDefault();
+      spacePanHeld.value = true;
+    }
+    return;
+  }
   // P23：⌘Z/⌘⇧Z/Ctrl+Y 布局 undo/redo；拖拽中（isDragging）忽略防快照时序缠绕。
+  if ((event.metaKey || event.ctrlKey) && !editable && event.shiftKey && event.key.toLowerCase() === "a") {
+    event.preventDefault();
+    if (!isDragging.value) invertCanvasSelection();
+    return;
+  }
+  if ((event.metaKey || event.ctrlKey) && !editable && !event.shiftKey && event.key.toLowerCase() === "a") {
+    event.preventDefault();
+    if (!isDragging.value) selectAllCanvasNodes();
+    return;
+  }
+  if (
+    (event.metaKey || event.ctrlKey)
+    && !event.altKey
+    && !event.shiftKey
+    && event.key.toLowerCase() === "f"
+  ) {
+    const inQuery = Boolean(target?.closest?.("[data-testid='managed-canvas-timeline-progress-query']"));
+    if (editable && !inQuery) return;
+    event.preventDefault();
+    if (!isDragging.value) focusTimelineProgressQuery();
+    return;
+  }
+  if ((event.metaKey || event.ctrlKey) && !editable && event.key.toLowerCase() === "g") {
+    event.preventDefault();
+    if (event.shiftKey) ungroupSelectedCanvasNodes();
+    else groupSelectedCanvasNodes();
+    return;
+  }
   if ((event.metaKey || event.ctrlKey) && !editable && event.key.toLowerCase() === "z") {
     event.preventDefault();
     if (!isDragging.value) {
@@ -6353,13 +7653,695 @@ function onCanvasKeydown(event: KeyboardEvent): void {
     if (!isDragging.value) redoLayout();
     return;
   }
+  if (!editable && !isDragging.value && isShiftDigit(event, "1")) {
+    event.preventDefault();
+    void fitCanvas();
+    return;
+  }
+  if (!editable && !isDragging.value && isShiftDigit(event, "0")) {
+    event.preventDefault();
+    onZoomTo100();
+    return;
+  }
+  if (!editable && !isDragging.value && isShiftDigit(event, "2")) {
+    event.preventDefault();
+    void fitSelectedCanvasNodes();
+    return;
+  }
+  const inTimelineQuery = Boolean(target?.closest("[data-testid='managed-canvas-timeline-progress-query']"));
+  if (
+    inTimelineQuery
+    && event.altKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && (event.key === "ArrowDown" || event.key === "ArrowUp")
+  ) {
+    event.preventDefault();
+    if (!isDragging.value) cycleTimelineProgressReview(event.key === "ArrowDown" ? 1 : -1);
+    return;
+  }
+  if (!editable && !isDragging.value && (event.key === "Delete" || event.key === "Backspace")) {
+    event.preventDefault();
+    if (pinActionBusy.value || loading.value) return;
+    if (selectedDraftEdgeId.value) {
+      deleteSelectedDraftEdge();
+      return;
+    }
+    const selected = nodes.value.filter((node) => node.selected && node.type !== "studioSpatialGroup" && isPinned(node.id));
+    for (const node of selected) void togglePinnedNode(node.id);
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && event.altKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.shiftKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "ArrowLeft" || event.key === "ArrowRight")
+  ) {
+    event.preventDefault();
+    if (event.key === "ArrowLeft") applyAlign("left");
+    else if (event.key === "ArrowRight") applyAlign("right");
+    else if (event.key === "ArrowUp") applyAlign("top");
+    else applyAlign("bottom");
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && event.altKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && (event.key.toLowerCase() === "h" || event.key.toLowerCase() === "v")
+  ) {
+    event.preventDefault();
+    if (event.shiftKey) applyDistribute(event.key.toLowerCase() === "h" ? "x" : "y");
+    else applyAlign(event.key.toLowerCase() === "h" ? "centerX" : "centerY");
+    return;
+  }
+  const panelTimelineChip = Boolean(target?.closest("[data-testid='managed-canvas-panel-timeline'] button"));
+  const unitListItem = Boolean(target?.closest(".unit-list .library-item"));
+  const unitListOrPager = Boolean(
+    unitListItem
+    || target?.closest("[data-testid='managed-canvas-units-prev']")
+    || target?.closest("[data-testid='managed-canvas-units-next']"),
+  );
+  if (
+    panelTimelineChip
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    movePanelTimelineChipFocus(event.key);
+    return;
+  }
+  const assetListItem = Boolean(target?.closest("[data-testid='managed-canvas-assets-virtual-viewport'] .library-item"));
+  const textListItem = Boolean(target?.closest(".text-list .library-item"));
+  const mediaListItem = Boolean(target?.closest(".media-library-item"));
+  const mediaListOrPager = Boolean(
+    mediaListItem
+    || target?.closest("[data-testid='managed-canvas-media-prev']")
+    || target?.closest("[data-testid='managed-canvas-media-next']"),
+  );
+  const assetListOrPager = Boolean(
+    assetListItem
+    || target?.closest("[data-testid='managed-canvas-assets-prev']")
+    || target?.closest("[data-testid='managed-canvas-assets-next']"),
+  );
+  const globalResourceListItem = Boolean(target?.closest(".global-resource-card"));
+  const globalResourceListOrPager = Boolean(
+    globalResourceListItem
+    || target?.closest("[data-testid='managed-canvas-global-resources-prev']")
+    || target?.closest("[data-testid='managed-canvas-global-resources-next']"),
+  );
+  const appearanceListItem = Boolean(target?.closest(".appearance-list button"));
+  const appearanceListOrPager = Boolean(
+    appearanceListItem
+    || target?.closest("[data-testid='managed-canvas-appearances-prev']")
+    || target?.closest("[data-testid='managed-canvas-appearances-next']"),
+  );
+  const nodeActionItem = Boolean(target?.closest(".node-action-buttons button"));
+  const libraryTabItem = Boolean(target?.closest("#managed-canvas-library .library-tabs button"));
+  const globalResourceTabItem = Boolean(target?.closest(".global-resource-tabs button"));
+  const addMenuItem = Boolean(target?.closest("#managed-canvas-add-menu button"));
+  const floatingToolbarButton = Boolean(
+    target?.closest(".floating-tools > .add-menu-wrap > button")
+    || target?.closest(".floating-tools > button"),
+  );
+  const bottomToolbarButton = Boolean(
+    target?.closest(".bottom-tools > button")
+    || target?.closest(".bottom-tools .align-tools button"),
+  );
+  const viewMenuPopItem = Boolean(target?.closest(".view-menu-pop > button"));
+  const viewMenuThemeItem = Boolean(target?.closest(".view-menu-theme > button[role='radio']"));
+  const managedFlowControlsButton = Boolean(target?.closest("#managed-studio-flow .vue-flow__controls-button"));
+  const miniMapNode = Boolean(target?.closest(".vue-flow__minimap-node"));
+  const miniMapSurface = Boolean(target?.closest("[data-testid='managed-canvas-minimap']"));
+  if (
+    unitListItem
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveUnitListFocus(event.key);
+    return;
+  }
+  if (
+    assetListItem
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveAssetListFocus(event.key);
+    return;
+  }
+  if (
+    textListItem
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveTextListFocus(event.key);
+    return;
+  }
+  if (
+    mediaListItem
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveMediaListFocus(event.key);
+    return;
+  }
+  if (
+    appearanceListItem
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveAppearanceListFocus(event.key);
+    return;
+  }
+  if (
+    globalResourceListItem
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveGlobalResourceListFocus(event.key);
+    return;
+  }
+  if (
+    nodeActionItem
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveNodeActionFocus(event.key);
+    return;
+  }
+  if (
+    libraryTabItem
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveLibraryTabFocus(event.key);
+    return;
+  }
+  if (
+    globalResourceTabItem
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveGlobalResourceTabFocus(event.key);
+    return;
+  }
+  if (
+    addMenuItem
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveAddMenuFocus(event.key);
+    return;
+  }
+  if (
+    floatingToolbarButton
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveFloatingToolbarFocus(event.key);
+    return;
+  }
+  if (
+    bottomToolbarButton
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveBottomToolbarFocus(event.key);
+    return;
+  }
+  if (
+    viewMenuPopItem
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveViewMenuItemFocus(event.key);
+    return;
+  }
+  if (
+    viewMenuThemeItem
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveViewMenuThemeFocus(event.key);
+    return;
+  }
+  if (
+    managedFlowControlsButton
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveManagedFlowControlsFocus(event.key);
+    return;
+  }
+  if (
+    miniMapNode
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    moveMiniMapNodeFocus(event.key);
+    return;
+  }
+  if (
+    miniMapSurface
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "ArrowLeft" || event.key === "ArrowRight")
+  ) {
+    event.preventDefault();
+    panCanvasFromMiniMap(event.key);
+    return;
+  }
+  if (
+    helpOpen.value
+    && event.key === "Tab"
+    && target?.closest("#managed-canvas-help-card")
+  ) {
+    event.preventDefault();
+    helpCloseButton()?.focus();
+    return;
+  }
+  if (
+    directorPanelOpen.value
+    && event.key === "Tab"
+    && target?.closest("[data-testid='director-action-panel']")
+  ) {
+    event.preventDefault();
+    moveDirectorPanelFocus(event.shiftKey);
+    return;
+  }
+  if (
+    panelTimelineChip
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "PageUp" || event.key === "PageDown")
+  ) {
+    event.preventDefault();
+    movePanelTimelineChipFocus(event.key);
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "ArrowLeft" || event.key === "ArrowRight")
+  ) {
+    if (target?.closest?.("[data-testid='managed-canvas-minimap']")) return;
+    if (target?.closest?.("#managed-studio-flow .vue-flow__controls-button")) {
+      event.preventDefault();
+      return;
+    }
+    event.preventDefault();
+    const step = event.shiftKey ? CANVAS_GRID_SIZE : 1;
+    if (event.key === "ArrowLeft") nudgeSelectedCanvasNodes(-step, 0);
+    else if (event.key === "ArrowRight") nudgeSelectedCanvasNodes(step, 0);
+    else if (event.key === "ArrowUp") nudgeSelectedCanvasNodes(0, -step);
+    else nudgeSelectedCanvasNodes(0, step);
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "[" || event.key === "]")
+  ) {
+    event.preventDefault();
+    cyclePanelTimelineChip(event.key === "]" ? 1 : -1);
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "Home" || event.key === "End")
+  ) {
+    event.preventDefault();
+    focusPanelTimelineChipEnd(event.key === "Home" ? "first" : "last");
+    return;
+  }
+  if (
+    unitListOrPager
+    && event.altKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.shiftKey
+    && (event.key === "PageUp" || event.key === "PageDown")
+  ) {
+    event.preventDefault();
+    if (!isDragging.value) void pageUnitsByKeyboard(event.key === "PageDown" ? 1 : -1);
+    return;
+  }
+  if (
+    mediaListOrPager
+    && event.altKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.shiftKey
+    && (event.key === "PageUp" || event.key === "PageDown")
+  ) {
+    event.preventDefault();
+    if (!isDragging.value) void pageMediaByKeyboard(event.key === "PageDown" ? 1 : -1);
+    return;
+  }
+  if (
+    assetListOrPager
+    && event.altKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.shiftKey
+    && (event.key === "PageUp" || event.key === "PageDown")
+  ) {
+    event.preventDefault();
+    if (!isDragging.value) void pageAssetsByKeyboard(event.key === "PageDown" ? 1 : -1);
+    return;
+  }
+  if (
+    globalResourceListOrPager
+    && event.altKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.shiftKey
+    && (event.key === "PageUp" || event.key === "PageDown")
+  ) {
+    event.preventDefault();
+    if (!isDragging.value) void pageGlobalResourcesByKeyboard(event.key === "PageDown" ? 1 : -1);
+    return;
+  }
+  if (
+    appearanceListOrPager
+    && event.altKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.shiftKey
+    && (event.key === "PageUp" || event.key === "PageDown")
+  ) {
+    event.preventDefault();
+    if (!isDragging.value) void pageAppearancesByKeyboard(event.key === "PageDown" ? 1 : -1);
+    return;
+  }
+  if (
+    unitListItem
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "PageUp" || event.key === "PageDown")
+  ) {
+    event.preventDefault();
+    jumpUnitListPage(event.key === "PageDown" ? 1 : -1);
+    return;
+  }
+  if (
+    !editable
+    && !panelTimelineChip
+    && !unitListItem
+    && !isDragging.value
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+    && (event.key === "PageUp" || event.key === "PageDown")
+  ) {
+    event.preventDefault();
+    jumpPanelTimelineChipPage(event.key === "PageDown" ? 1 : -1);
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && event.shiftKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && event.key.toLowerCase() === "e"
+  ) {
+    event.preventDefault();
+    toggleEdges();
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && event.shiftKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && event.key.toLowerCase() === "d"
+  ) {
+    event.preventDefault();
+    cycleCanvasTheme();
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && event.shiftKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && event.key.toLowerCase() === "m"
+  ) {
+    event.preventDefault();
+    toggleMiniMap();
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && event.shiftKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && event.key.toLowerCase() === "w"
+  ) {
+    event.preventDefault();
+    toggleWorkspaceMode();
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && !loading.value
+    && event.shiftKey
+    && !event.altKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && event.key.toLowerCase() === "t"
+  ) {
+    event.preventDefault();
+    void applyTimelineLayout(false);
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && !loading.value
+    && event.shiftKey
+    && event.altKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && event.key.toLowerCase() === "t"
+  ) {
+    event.preventDefault();
+    void applyTimelineLayout(true);
+    return;
+  }
+  if (!editable && !isDragging.value && !loading.value && event.key === "F5") {
+    event.preventDefault();
+    void refreshAll();
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && !loading.value
+    && !localProductionPreviewLoading.value
+    && event.key === "F6"
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && !event.shiftKey
+  ) {
+    event.preventDefault();
+    void verifyLocalProductionSource();
+    return;
+  }
+  if (event.key === "F3" && !event.metaKey && !event.ctrlKey && !event.altKey) {
+    const inQuery = Boolean(target?.closest("[data-testid='managed-canvas-timeline-progress-query']"));
+    if (editable && !inQuery) return;
+    event.preventDefault();
+    if (!isDragging.value && timelineProgressQuery.value.trim()) {
+      void cycleTimelineSearchHit(event.shiftKey ? -1 : 1);
+    }
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && !event.shiftKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && event.key.toLowerCase() === "c"
+  ) {
+    event.preventDefault();
+    toggleConnectMode();
+    return;
+  }
+  if (!editable && !isDragging.value && !event.metaKey && !event.ctrlKey && !event.altKey && event.key === "F1") {
+    event.preventDefault();
+    toggleHelp();
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && !event.shiftKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && event.key.toLowerCase() === "a"
+  ) {
+    event.preventDefault();
+    toggleAddMenu();
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && event.shiftKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && event.key.toLowerCase() === "l"
+  ) {
+    event.preventDefault();
+    void toggleGlobalResourceLibrary();
+    return;
+  }
+  if (
+    !editable
+    && !isDragging.value
+    && !event.shiftKey
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.altKey
+    && event.key.toLowerCase() === "l"
+  ) {
+    event.preventDefault();
+    void toggleLibrary();
+    return;
+  }
   // Qwen D4：受闸导演快捷键（白名单；禁任意写命令）
   if (!editable && !isDragging.value) {
     const gated = directorHotkeys.match(event);
     if (gated) {
       event.preventDefault();
       if (gated === "toggle-director-panel") {
-        directorPanelOpen.value = !directorPanelOpen.value;
+        toggleDirectorPanel();
         return;
       }
       const action = directorActionByHotkey(gated);
@@ -6367,25 +8349,52 @@ function onCanvasKeydown(event: KeyboardEvent): void {
       return;
     }
   }
+  if (event.key === "Escape") {
+    const inQuery = Boolean(target?.closest("[data-testid='managed-canvas-timeline-progress-query']"));
+    if (inQuery) {
+      if (timelineProgressQuery.value.trim() || timelineProgressReview.value) {
+        event.preventDefault();
+        timelineProgressQuery.value = "";
+        timelineProgressReview.value = "";
+        timelineSearchCursor = -1;
+        return;
+      }
+      event.preventDefault();
+      timelineProgressQueryEl.value?.blur();
+      return;
+    }
+    if (target?.closest("[data-testid='managed-canvas-timeline-progress-review']")) {
+      event.preventDefault();
+      timelineProgressQueryEl.value?.focus();
+      return;
+    }
+  }
   if (event.key !== "Escape") return;
   const escapePendingId = pendingConnectionSourceId.value;
   const helpWasOpen = helpOpen.value;
   const addWasOpen = addMenuOpen.value;
+  const viewMenuWasOpen = Boolean(viewMenuEl.value?.hasAttribute("open"));
+  const directorWasOpen = directorPanelOpen.value;
+  const connectWasOpen = connectMode.value;
   connectMode.value = false;
   pendingConnectionSourceId.value = "";
   selectedDraftEdgeId.value = "";
   addMenuOpen.value = false;
   helpOpen.value = false;
   directorPanelOpen.value = false;
-  closeViewMenu();
+  closeViewMenu({ restore: false });
   resetClearConfirmation();
   stripPendingOutline(escapePendingId);
   // 焦点归还触发按钮（a11y）。
   if (helpWasOpen) helpTriggerEl.value?.focus();
   else if (addWasOpen) addTriggerEl.value?.focus();
+  else if (viewMenuWasOpen) restoreViewMenuSummaryFocus();
+  else if (directorWasOpen) restoreDirectorToggleFocus();
+  else if (connectWasOpen) restoreConnectTriggerFocus();
   // R5-F2：Escape 重建前取消挂起吸附 rAF 并清线（不改 isDragging——d3-drag 会话仍存活，stop 时复位）。
   cancelPendingSnap();
   snapLines.value = [];
+  if (!isDragging.value) clearCanvasSelection();
   rebuildGraph();
 }
 
@@ -6461,6 +8470,7 @@ watch(() => props.projectRoot, async (_projectRoot, previousProjectRoot) => {
   undoStack.clear();
   bumpUndoTick();
   isDragging.value = false;
+  spacePanHeld.value = false;
   cancelPendingSnap();
   snapLines.value = [];
   dragStartSnapshot = null;
@@ -6502,6 +8512,7 @@ watch(() => props.projectRoot, async (_projectRoot, previousProjectRoot) => {
   pinnedNodeIds.value = [];
   draftCanvasEdges.value = [];
   workflowGroups.value = [];
+  spatialGroups.value = [];
   selectedPanelIds.value = [];
   lastWorkflowTitle.value = "";
   lastWorkflowRunSummary.value = "";
@@ -6546,7 +8557,10 @@ watch(() => props.projectRoot, async (_projectRoot, previousProjectRoot) => {
 onMounted(async () => {
   markT23RendererStartup("canvas-mounted");
   window.addEventListener("keydown", onCanvasKeydown);
+  window.addEventListener("keyup", onCanvasKeyup);
   window.addEventListener("blur", onWindowBlur);
+  window.addEventListener("focusin", onManagedFlowControlsFocusIn);
+  window.addEventListener("focusin", onMiniMapNodeFocusIn);
   document.addEventListener("pointerdown", onGlobalPointerDown, true);
   // 只读 UI 核对钩子：暴露 unit-grid raw 管道快照（含 only-render-visible 剔除的 off-screen 节点），
   // 不写盘、不平移视口；verify:project-ui / t23-s1e1-raw-sha 用其核对 selectedRawSha256。
@@ -6663,7 +8677,10 @@ onBeforeUnmount(() => {
   generationProjectionRefreshQueued = false;
   resetClearConfirmation();
   window.removeEventListener("keydown", onCanvasKeydown);
+  window.removeEventListener("keyup", onCanvasKeyup);
   window.removeEventListener("blur", onWindowBlur);
+  window.removeEventListener("focusin", onManagedFlowControlsFocusIn);
+  window.removeEventListener("focusin", onMiniMapNodeFocusIn);
   document.removeEventListener("pointerdown", onGlobalPointerDown, true);
   studioGenerationProgressUnsubscribe?.();
   void finalLayoutFlush.finally(() => { layoutSaveGeneration += 1; });
@@ -6935,10 +8952,19 @@ button { color: inherit; }
 .library-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin: 5px 0 13px; }
 .library-tabs button { border: 0; border-radius: 7px; background: var(--msc-surface-2); padding: 7px 4px; color: var(--msc-text-2); cursor: pointer; font-size: 11px; }
 .library-tabs button.active { background: var(--msc-accent-soft); color: var(--msc-accent-strong); font-weight: 650; }
+.character-ingest { display: grid; gap: 8px; margin: 0 0 12px; padding: 10px; border: 1px solid var(--msc-line); border-radius: 8px; background: var(--msc-bg); }
+.character-ingest-files { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.character-ingest-files-single { grid-template-columns: 1fr; }
+.character-ingest-files button, .character-ingest-save {
+  min-height: 32px; border: 1px solid var(--msc-line); border-radius: 7px; background: var(--msc-surface-2); color: var(--msc-text); cursor: pointer; font-size: 11px;
+}
+.character-ingest-save { border-color: var(--msc-accent); background: var(--msc-accent-soft); color: var(--msc-accent-strong); font-weight: 650; }
+.character-ingest-save:disabled, .character-ingest-files button:disabled { opacity: .55; cursor: not-allowed; }
 .library-section label span, .library-note { display: block; margin: 0 0 6px; color: var(--msc-text-3); font-size: 11px; }
-.library-section input, .library-section select { width: 100%; box-sizing: border-box; border: 1px solid var(--msc-line); border-radius: 7px; background: var(--msc-bg); color: var(--msc-text); padding: 8px; }
+.library-section input, .library-section select, .library-section textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--msc-line); border-radius: 7px; background: var(--msc-bg); color: var(--msc-text); padding: 8px; }
+.library-section textarea { resize: vertical; min-height: 48px; font: inherit; }
 .library-list { list-style: none; margin: 10px 0; padding: 0; display: grid; gap: 6px; }
-.library-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px; }
+.library-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px; content-visibility: auto; contain-intrinsic-size: auto 56px; }
 .library-list-viewport {
   height: 360px;
   overflow: auto;
@@ -7027,6 +9053,8 @@ button { color: inherit; }
   border: 1px solid var(--msc-line);
   border-radius: 9px;
   background: var(--msc-surface);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 128px;
 }
 .global-resource-card > figure {
   width: 84px;
@@ -7073,6 +9101,9 @@ button { color: inherit; }
 .global-resource-associations span { color: var(--msc-text-3); font-size: 8px; line-height: 1.4; }
 .global-resource-pager { margin-top: 8px; }
 .flow-shell { position: relative; min-width: 0; overflow: hidden; isolation: isolate; background: var(--msc-bg); }
+.flow-shell.space-pan,
+.flow-shell.space-pan :deep(.vue-flow__pane) { cursor: grab; }
+.flow-shell.space-pan :deep(.vue-flow__pane):active { cursor: grabbing; }
 .flow-shell.external-drop-active {
   outline: 2px dashed var(--msc-accent);
   outline-offset: -6px;

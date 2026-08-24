@@ -266,3 +266,43 @@ describe("P22 REMEDIATING 新增守卫 UI 合同锚点", () => {
     expect(view).toContain("reworkGuidance.value = \"\"");
   });
 });
+
+describe("连续性审查网格视口剔除", () => {
+  it("history/timeline/conflict/batch 卡片使用 content-visibility，离屏条目跳过同步布局", async () => {
+    const view = await readFile(path.join(process.cwd(), "src/renderer/src/components/StudioContinuityReviewView.vue"), "utf8");
+    expect(view).toContain(".continuity-review{min-height:0;height:100%;overflow:auto;background:var(--ui-surface);color:var(--ui-text)}");
+    expect(view).toContain(".history-list article{padding:11px;background:var(--ui-surface);content-visibility:auto;contain-intrinsic-size:auto 56px}");
+    expect(view).toContain(".timeline-list>div{position:relative;padding:9px 10px;background:var(--ui-surface);content-visibility:auto;contain-intrinsic-size:auto 40px}");
+    expect(view).toContain(".conflict-section article{display:grid;grid-template-columns:minmax(180px,1fr) 1fr minmax(180px,1fr);gap:12px;padding:10px 13px;border-top:1px solid var(--ui-line);content-visibility:auto;contain-intrinsic-size:auto 56px}");
+    expect(view).toContain(".batch-grid article{padding:11px;background:var(--ui-surface);content-visibility:auto;contain-intrinsic-size:auto 56px}");
+    expect(view).not.toMatch(/\.history-list article\{[^}]*content-visibility:hidden/);
+    expect(view).not.toMatch(/\.opaque-correction-list article\{[^}]*content-visibility/);
+  });
+
+  it("asset-control 使用 content-visibility，离屏资产卡跳过同步布局", async () => {
+    const view = await readFile(path.join(process.cwd(), "src/renderer/src/components/StudioContinuityReviewView.vue"), "utf8");
+    expect(view).toContain(".asset-control{margin:12px;border-left:3px solid var(--ui-danger);background:var(--ui-surface);content-visibility:auto;contain-intrinsic-size:auto 160px}");
+    expect(view).toContain(".asset-control.ready{border-left-color:var(--ui-ok)}");
+    expect(view).toContain(".field-grid{display:grid;grid-template-columns:repeat(9,minmax(72px,1fr));border-bottom:1px solid var(--ui-line)}");
+    expect(view).toContain(".conflict-section article{display:grid;grid-template-columns:minmax(180px,1fr) 1fr minmax(180px,1fr);gap:12px;padding:10px 13px;border-top:1px solid var(--ui-line);content-visibility:auto;contain-intrinsic-size:auto 56px}");
+    expect(view).toContain(".batch-grid article{padding:11px;background:var(--ui-surface);content-visibility:auto;contain-intrinsic-size:auto 56px}");
+    expect(view).not.toMatch(/\.asset-control\{[^}]*content-visibility:\s*hidden/);
+    expect(view).not.toMatch(/\.asset-control\.ready\{[^}]*content-visibility/);
+    expect(view).not.toMatch(/\.field-grid>div\{[^}]*content-visibility/);
+    expect(view).not.toMatch(/\.opaque-correction-list article\{[^}]*content-visibility/);
+  });
+
+  it("handoff-grid 格使用 content-visibility，离屏交接项跳过同步布局", async () => {
+    const view = await readFile(path.join(process.cwd(), "src/renderer/src/components/StudioContinuityReviewView.vue"), "utf8");
+    expect(view).toContain(".handoff-grid>div{min-width:0;padding:9px 10px;background:var(--ui-surface);content-visibility:auto;contain-intrinsic-size:auto 40px}");
+    expect(view).toContain(".asset-control{margin:12px;border-left:3px solid var(--ui-danger);background:var(--ui-surface);content-visibility:auto;contain-intrinsic-size:auto 160px}");
+    expect(view).toContain(".conflict-section article{display:grid;grid-template-columns:minmax(180px,1fr) 1fr minmax(180px,1fr);gap:12px;padding:10px 13px;border-top:1px solid var(--ui-line);content-visibility:auto;contain-intrinsic-size:auto 56px}");
+    expect(view).toContain(".batch-grid article{padding:11px;background:var(--ui-surface);content-visibility:auto;contain-intrinsic-size:auto 56px}");
+    expect(view).toContain(".handoff-note{margin:0;padding:10px 14px;border-bottom:1px solid var(--ui-line);color:var(--ui-text-3);font-size:9px;line-height:1.6}");
+    expect(view).not.toMatch(/\.handoff-grid>div\{[^}]*content-visibility:\s*hidden/);
+    expect(view).not.toMatch(/\.handoff-note\{[^}]*content-visibility/);
+    expect(view).not.toMatch(/\.handoff-grid \.usable b\{[^}]*content-visibility/);
+    expect(view).not.toMatch(/\.field-grid>div\{[^}]*content-visibility/);
+    expect(view).not.toMatch(/\.opaque-correction-list article\{[^}]*content-visibility/);
+  });
+});

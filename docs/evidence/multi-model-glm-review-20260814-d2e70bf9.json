@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "kind": "multi-model-frozen-review-summary",
+  "reviewer": "glm",
+  "createdAt": "2026-08-14T09:05:00+08:00",
+  "boundSourceDigest": "d2e70bf955440b1cc2435da1bc6c486f01af49e7cc6098def29249c0f01dff1f",
+  "packRelativePath": "docs/evidence/multi-model-review-pack-20260814-d2e70bf9.json",
+  "inputSha256": "3ab29bff8a79bcdbceb318686d01da313cbabe4d1565caf3f959a190ee190811",
+  "requestedModel": "glm-5.2",
+  "returnedModel": "glm-5-2-260617",
+  "probeSelfReportedModel": "GLM-4",
+  "identityNote": "adapter/API model field is glm-5-2-260617 (historical valid identity); probe body self-reported GLM-4 and was not used to switch models",
+  "timeoutDegrade": "Python 3.14 urllib rejects (connect,read) tuple; used adapter default timeout-sec=0. Same model, not a model switch.",
+  "exitCode": 0,
+  "finishReason": "stop",
+  "notVerified": true,
+  "verdict": "PASS",
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "P2",
+      "summary": "写闸门 reuseBootSourceDigest 依赖 watcher 覆盖 boot hash 窗口且无相关源码事件；若 watcher 漏报（文件系统节流/竞态），只读核验基于过期 digest，且 mutation invalidation epoch 若共享同一事件源则失败关闭兜底可能同时失效。",
+      "evidencePaths": [
+        "src/core/runtime-write-gate.ts",
+        "src/main/index.ts",
+        "tests/runtime-write-gate.test.ts"
+      ]
+    },
+    {
+      "id": "F02",
+      "severity": "P2",
+      "summary": "v1 checkpoint operation receipt 无不可变历史 head_revision，只读可开 v1；恢复路径消费 v1 receipt 时若下游未全面处理 unknown head_revision，历史投影可能基于不完整锚点而非保持 unknown。",
+      "evidencePaths": [
+        "src/core/studio-generation-checkpoint.ts",
+        "tests/studio-generation-checkpoint.test.ts"
+      ]
+    },
+    {
+      "id": "F03",
+      "severity": "P2",
+      "summary": "公开同键重放返回已持久化完整业务结果且动态 head/current/eligible 不重新授权；若授权上下文在初次执行与重放之间被撤销或收缩，重放可能返回超出当前权限的结果。",
+      "evidencePaths": [
+        "src/core/command-bus.ts",
+        "tests/command-public-replay-hydration-registry.test.ts"
+      ]
+    }
+  ],
+  "blocked": false
+}

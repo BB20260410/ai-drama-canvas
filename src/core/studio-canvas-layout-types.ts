@@ -22,6 +22,17 @@ export interface StudioCanvasWorkflowGroup {
   createdAt: string;
 }
 
+/** 视图层空间编组；不进入 BindingSet / 生成事实源。 */
+export interface StudioCanvasSpatialGroup {
+  id: string;
+  title: string;
+  memberIds: string[];
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 /**
  * projection 只展示业务真源的有界投影；workflow 允许用户整理视图节点与草稿连线。
  * 两种模式都只是画布视图状态，不承载业务状态。
@@ -46,6 +57,8 @@ export interface StudioCanvasLayout {
   /** visual-only / draft；绝不作为 BindingSet 或生成事实源。 */
   draftCanvasEdges: StudioCanvasDraftEdge[];
   workflowGroups: StudioCanvasWorkflowGroup[];
+  /** 空则省略，保持旧 fingerprint。 */
+  spatialGroups?: StudioCanvasSpatialGroup[];
   updatedAt: string;
 }
 
@@ -57,5 +70,6 @@ export interface StudioCanvasLayoutDraft {
   /** visual-only / draft；Start 仅可预检，不能据此冻结或派发。 */
   draftCanvasEdges?: StudioCanvasDraftEdge[];
   workflowGroups?: StudioCanvasWorkflowGroup[];
+  spatialGroups?: StudioCanvasSpatialGroup[];
   updatedAt?: string;
 }

@@ -23,15 +23,14 @@ import {
   getStudioAssetBindingSet,
   getStudioAssetMentionAnalysis,
   getStudioBindingOperationReceipt,
-  getStudioMentionDecision,
   getStudioMentionIdentityKeyFingerprint,
-  getStudioPanelEntityClosureConfirmation,
   getStudioPanelEntityClosureConfirmationCurrentness,
   getStudioPanelBindingScopeFingerprint,
   getStudioProductionPanelTimeContext,
   getStudioCanonicalSuccessorUnitIds,
   getStudioProductionScopeFacets,
   getStudioProductionUnitSnapshot,
+  readStudioBindingOperationProofReadOnly,
   getStudioScriptSectionRevision,
   getStudioUnitBindingHeadSummaries,
   listStudioProductionUnits,
@@ -1586,29 +1585,7 @@ export async function proveStudioBindingOperationOutcome(
   requestHash: string,
   command: StudioBindingOperationCommand,
 ): Promise<{ receipt: StudioBindingOperationReceipt; outcome: Record<string, unknown> } | undefined> {
-  const receipt = await getStudioBindingOperationReceipt(projectRoot, requestHash);
-  if (!receipt || receipt.command !== command) return undefined;
-  const outcome = receipt.outcomeIdentity;
-  if (command === "analyze_studio_script_entities") {
-    const analysisId = typeof outcome.analysisId === "string" ? outcome.analysisId : "";
-    const analysis = analysisId ? await getStudioAssetMentionAnalysis(projectRoot, analysisId) : null;
-    if (!analysis || analysis.fingerprint !== outcome.analysisFingerprint || analysis.revision !== outcome.analysisRevision) return undefined;
-  } else if (command === "resolve_studio_entity_proposal") {
-    const decisionId = typeof outcome.decisionId === "string" ? outcome.decisionId : "";
-    const decision = decisionId ? await getStudioMentionDecision(projectRoot, decisionId) : null;
-    if (!decision || decision.fingerprint !== outcome.decisionFingerprint) return undefined;
-  } else if (command === "confirm_studio_panel_empty") {
-    const confirmationId = typeof outcome.confirmationId === "string" ? outcome.confirmationId : "";
-    const confirmation = confirmationId ? await getStudioPanelEntityClosureConfirmation(projectRoot, confirmationId) : null;
-    if (!confirmation
-      || confirmation.fingerprint !== outcome.confirmationFingerprint
-      || confirmation.revision !== outcome.confirmationRevision) return undefined;
-  } else {
-    const bindingSetId = typeof outcome.bindingSetId === "string" ? outcome.bindingSetId : "";
-    const bindingSet = bindingSetId ? await getStudioAssetBindingSet(projectRoot, bindingSetId) : null;
-    if (!bindingSet || bindingSet.fingerprint !== outcome.bindingSetFingerprint || bindingSet.revision !== outcome.bindingSetRevision) return undefined;
-  }
-  return { receipt, outcome };
+  return readStudioBindingOperationProofReadOnly(projectRoot, requestHash, command);
 }
 
 /**

@@ -8,6 +8,7 @@ import {
   registerStudioGenerationResult,
 } from "../src/core/studio-generation-ledger.js";
 import {
+  getStudioGenerationReviewControl,
   listStudioGenerationReviewHistory,
   submitStudioGenerationReview,
   type StudioGenerationReviewAnnotationInput,
@@ -166,6 +167,26 @@ describe("P22 §4-1 批注 v2 校验", () => {
 });
 
 describe("P22 §4-2/3 提交链与删除修正", () => {
+  it("Review 必须绑定该 run 真实 raw/labeled resultId，伪造 ID 不得推进 Head", async () => {
+    const pair = await registeredPair();
+    await expect(submitStudioGenerationReview(fixture!.root, reviewInput(pair, {
+      operationId: "p22-ann-fake-raw-result-id",
+      rawResultId: "studio-generation-result-fake-raw",
+    }))).rejects.toMatchObject({ code: "result-pair-invalid" });
+    await expect(submitStudioGenerationReview(fixture!.root, reviewInput(pair, {
+      operationId: "p22-ann-fake-labeled-result-id",
+      labeledResultId: "studio-generation-result-fake-labeled",
+    }))).rejects.toMatchObject({ code: "result-pair-invalid" });
+    expect(await listStudioGenerationReviewHistory(fixture!.root, {
+      generationRunId: pair.generationRunId,
+      limit: 10,
+    })).toEqual({ items: [] });
+    expect((await getStudioGenerationReviewControl(
+      fixture!.root,
+      pair.generationRunId,
+    )).headRevision).toBe(0);
+  });
+
   it("批注原样写回（Core 不改写）；correction 移除批注后 Head 推进且集合正确；过期 expectedHeadRevision 拒绝", async () => {
     const pair = await registeredPair();
     const base = await submitStudioGenerationReview(fixture!.root, reviewInput(pair, {

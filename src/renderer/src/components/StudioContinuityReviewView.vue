@@ -11,7 +11,7 @@
         <strong>{{ loadState.control.nextAction.label }}</strong>
         <p>{{ nextActionReasonText(loadState.control.nextAction.reason) }}</p>
         <details class="technical-diagnostics next-action-diagnostics">
-          <summary>诊断详情</summary>
+          <summary data-testid="studio-continuity-next-action-diagnostics">诊断详情</summary>
           <code v-if="loadState.control.nextAction.command">{{ loadState.control.nextAction.command }}</code>
           <code v-if="nextActionHasTechnicalReason(loadState.control.nextAction.reason)">{{ loadState.control.nextAction.reason }}</code>
         </details>
@@ -32,7 +32,7 @@
       <p>画布会自动带入当前单元、宫格、锁定资产与原始图/标注图结果，无需填写技术编号。</p>
       <button type="button" class="empty-goto-canvas" @click="$emit('requestCanvas')">去画布选择宫格</button>
       <details class="diagnostic-details">
-        <summary>诊断详情</summary>
+        <summary data-testid="studio-continuity-empty-diagnostics">诊断详情</summary>
         <form class="scope-form diagnostic-query" data-testid="continuity-query-form" @submit.prevent="loadControl(true)">
           <label><span>15 秒单元 ID</span><input v-model.trim="draft.unitId" required autocomplete="off" placeholder="unit-ep01-001" /></label>
           <label><span>单元 revision</span><input v-model="draft.unitRevision" required inputmode="numeric" /></label>
@@ -153,7 +153,7 @@
             <div><b>{{ categoryLabel(asset.category) }} {{ assetIndex + 1 }} · {{ asset.assetName }}</b><strong>{{ assetDisplayReady(asset) ? "就绪" : assetHasOpaqueState(asset) ? "需补全" : "阻断" }}</strong></div>
             <span>{{ assetResolvedVisualFieldCount(asset) }}/9</span>
           </header>
-          <details class="technical-diagnostics"><summary>诊断详情</summary><code>{{ asset.assetId }}</code></details>
+          <details class="technical-diagnostics"><summary data-testid="studio-continuity-asset-diagnostics">诊断详情</summary><code>{{ asset.assetId }}</code></details>
           <div class="field-grid">
             <div v-for="field in asset.fields" :key="field.field" :class="[`field-${field.status}`, { 'field-opaque': assetFieldHasOpaqueState(asset, field.field) }]">
               <span>{{ fieldLabel(field.field) }}</span>
@@ -189,7 +189,7 @@
         <article v-for="(conflict, conflictIndex) in loadState.control.conflicts.items" :key="conflict.conflictId">
           <div><b>冲突 {{ conflictIndex + 1 }}</b><span>{{ fieldLabel(conflict.field) }}</span></div>
           <p>{{ conflict.overlapStartMilliseconds / 1000 }}–{{ conflict.overlapEndMilliseconds / 1000 }}s</p>
-          <details class="technical-diagnostics"><summary>诊断详情</summary><code>{{ conflict.subjectId }} · {{ conflict.conflictId }} · r{{ conflict.revision }}</code></details>
+          <details class="technical-diagnostics"><summary data-testid="studio-continuity-conflict-diagnostics">诊断详情</summary><code>{{ conflict.subjectId }} · {{ conflict.conflictId }} · r{{ conflict.revision }}</code></details>
         </article>
       </section>
 
@@ -371,9 +371,9 @@
             <label class="review-note"><span>画面批注（与圈选一起写回；分类摘要将自动前缀）</span><textarea v-model="reviewNote" rows="3" placeholder="例：阿航脸型与权威图不一致，左侧挑染丢失。"></textarea></label>
             <p v-if="incompleteDraftCount > 0" class="draft-incomplete-hint" role="alert">还有 {{ incompleteDraftCount }} 条圈选未选择分类或未填写批注；补全后才能提交（不会静默丢弃）。</p>
             <div class="review-actions">
-              <button type="button" class="rework" :disabled="reviewSubmitting || !reviewPairReady || !reviewNote.trim() || incompleteDraftCount > 0" @click="submitVisualReview('rework')">返工</button>
-              <button type="button" class="reject" :disabled="reviewSubmitting || !reviewPairReady || !reviewNote.trim() || incompleteDraftCount > 0" @click="submitVisualReview('reject')">拒绝</button>
-              <button type="button" class="pass" :disabled="reviewSubmitting || !reviewPairReady || !reviewNote.trim() || incompleteDraftCount > 0" @click="submitVisualReview('pass')">通过</button>
+              <button type="button" class="rework" data-testid="continuity-review-rework" :disabled="reviewSubmitting || !reviewPairReady || !reviewNote.trim() || incompleteDraftCount > 0" :title="reviewSubmitting ? '正在处理，不能再返工' : undefined" @click="submitVisualReview('rework')">{{ reviewSubmitting ? "提交中" : "返工" }}</button>
+              <button type="button" class="reject" data-testid="continuity-review-reject" :disabled="reviewSubmitting || !reviewPairReady || !reviewNote.trim() || incompleteDraftCount > 0" :title="reviewSubmitting ? '正在处理，不能再拒绝' : undefined" @click="submitVisualReview('reject')">{{ reviewSubmitting ? "提交中" : "拒绝" }}</button>
+              <button type="button" class="pass" data-testid="continuity-review-pass" :disabled="reviewSubmitting || !reviewPairReady || !reviewNote.trim() || incompleteDraftCount > 0" :title="reviewSubmitting ? '正在处理，不能再通过' : undefined" @click="submitVisualReview('pass')">{{ reviewSubmitting ? "提交中" : "通过" }}</button>
             </div>
             <p v-if="reworkGuidance" class="rework-guidance" role="status" data-testid="review-rework-guidance">{{ reworkGuidance }}</p>
           </div>
@@ -382,7 +382,7 @@
             <strong>{{ reviewStatusLabel(loadState.control.review.control.status) }}</strong>
             <p v-if="loadState.control.review.control.blockers.length">{{ loadState.control.review.control.blockers.join("；") }}</p>
             <p v-else>当前 Review 与 raw/labeled、冻结包及连续性指纹一致。</p>
-            <details class="technical-diagnostics"><summary>诊断详情</summary><code>Head revision {{ loadState.control.review.control.headRevision }}</code></details>
+            <details class="technical-diagnostics"><summary data-testid="studio-continuity-review-head-diagnostics">诊断详情</summary><code>Head revision {{ loadState.control.review.control.headRevision }}</code></details>
           </div>
           <div class="history-list">
             <article v-for="review in loadState.control.review.history.items" :key="review.reviewId">
@@ -397,13 +397,14 @@
                     v-if="review.current && ann.id && review.reviewId === loadState.control?.review?.control?.head?.reviewId"
                     type="button"
                     :disabled="reviewSubmitting"
+                    :title="reviewSubmitting ? '正在处理，不能再移除批注' : undefined"
                     :aria-label="`移除批注 ${ann.id}`"
                     @click="removeHeadAnnotation(review, ann.id!)">移除</button>
                 </span>
               </div>
               <small v-if="review.currentStaleReasons.length">已漂移：{{ review.currentStaleReasons.join("；") }}</small>
               <details class="technical-diagnostics review-identity" :data-testid="`studio-review-identity-${review.reviewId}`">
-                <summary>提交时身份（生成时版本）</summary>
+                <summary data-testid="studio-review-identity-summary">提交时身份（生成时版本）</summary>
                 <p>pack <code>{{ review.packId }}</code> · 包指纹 {{ review.packFingerprint.slice(0, 12) }}…</p>
                 <p>raw {{ review.rawSha256.slice(0, 12) }}… · labeled {{ review.labeledSha256.slice(0, 12) }}…</p>
               </details>
@@ -435,7 +436,7 @@
             <header><b>批次 {{ batch.batchNumber }}</b><span>{{ checkpointStatusLabel(batch.status) }}</span></header>
             <p>{{ batch.slotCount }}/6 个生产槽</p>
             <small v-if="batch.blockers.length">{{ batch.blockers.join("；") }}</small>
-            <details class="technical-diagnostics"><summary>诊断详情</summary><code>checkpoint r{{ batch.checkpointHeadRevision }} · attestation r{{ batch.attestationHeadRevision }}</code></details>
+            <details class="technical-diagnostics"><summary data-testid="studio-continuity-batch-diagnostics">诊断详情</summary><code>checkpoint r{{ batch.checkpointHeadRevision }} · attestation r{{ batch.attestationHeadRevision }}</code></details>
           </article>
         </div>
         <footer v-if="loadState.control.checkpoint.batches.total > 0" class="page-actions">
@@ -835,6 +836,7 @@ export default defineComponent({
     }
 
     async function submitVisualReview(decision: "pass" | "rework" | "reject"): Promise<void> {
+      if (reviewSubmitting.value) return;
       const focus = props.focus;
       const control = loadState.control?.review?.control;
       if (focus?.reviewWriteAllowed === false || !focus?.generationRunId || !focus.packId || !focus.rawResultId || !focus.rawSha256
@@ -896,6 +898,7 @@ export default defineComponent({
 
     /** 删除已提交批注 = 追加 correction（同 decision，annotations 集合移除该项），复用既有 CAS。 */
     async function removeHeadAnnotation(review: StudioGenerationReviewProjection, annotationId: string): Promise<void> {
+      if (reviewSubmitting.value) return;
       const focus = props.focus;
       const control = loadState.control?.review?.control;
       if (!focus?.generationRunId || !focus.packId || !control?.head || !props.api.submitReview || !props.api.getReviewIdentity) return;
@@ -1585,7 +1588,7 @@ export default defineComponent({
 .handoff-note.ready{color:var(--ui-ok)}
 .handoff-note.blocked{color:var(--ui-danger)}
 .handoff-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--ui-line)}
-.handoff-grid>div{min-width:0;padding:9px 10px;background:var(--ui-surface)}
+.handoff-grid>div{min-width:0;padding:9px 10px;background:var(--ui-surface);content-visibility:auto;contain-intrinsic-size:auto 40px}
 .handoff-grid span,.handoff-grid b{display:block}
 .handoff-grid span{color:var(--ui-text-3);font-size:8px}
 .handoff-grid b{margin-top:4px;overflow:hidden;color:var(--ui-danger);font:8px ui-monospace,SFMono-Regular,Menlo,monospace;text-overflow:ellipsis;white-space:nowrap}
@@ -1601,7 +1604,7 @@ export default defineComponent({
 .opaque-correction-list textarea{width:100%;min-height:46px;resize:vertical;border:1px solid var(--ui-line);background:var(--ui-surface-alt);color:var(--ui-text);font:9px ui-monospace,SFMono-Regular,Menlo,monospace;line-height:1.45}
 .opaque-correction-list button{align-self:end;min-height:30px}
 .inline-empty{padding:18px;color:var(--ui-text-3);font-size:9px}
-.asset-control{margin:12px;border-left:3px solid var(--ui-danger);background:var(--ui-surface)}
+.asset-control{margin:12px;border-left:3px solid var(--ui-danger);background:var(--ui-surface);content-visibility:auto;contain-intrinsic-size:auto 160px}
 .asset-control.ready{border-left-color:var(--ui-ok)}
 .asset-control>header{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;border-bottom:1px solid var(--ui-line)}
 .asset-control>header>div{display:flex;align-items:center;gap:9px}
@@ -1622,7 +1625,7 @@ export default defineComponent({
 .blocker-list{margin:0;padding:9px 14px 9px 29px;border-bottom:1px solid var(--ui-line);color:var(--ui-danger);font-size:8px;line-height:1.6}
 .blocker-list b{margin-right:6px;color:var(--ui-danger)}
 .timeline-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;background:var(--ui-line)}
-.timeline-list>div{position:relative;padding:9px 10px;background:var(--ui-surface)}
+.timeline-list>div{position:relative;padding:9px 10px;background:var(--ui-surface);content-visibility:auto;contain-intrinsic-size:auto 40px}
 .timeline-list span,.timeline-list b{display:inline-block}
 .timeline-list span{color:var(--ui-text-3);font:7px ui-monospace,SFMono-Regular,Menlo,monospace}
 .timeline-list b{margin-left:7px;color:var(--ui-text-2);font-size:8px}
@@ -1633,7 +1636,7 @@ export default defineComponent({
 .page-actions button,.page-more{height:25px;padding:0 9px;border:1px solid var(--ui-line);background:transparent;color:var(--ui-accent-strong);font-size:8px;cursor:pointer}
 .page-actions button:disabled{color:var(--ui-line)}
 .page-actions span{color:var(--ui-text-3);font-size:8px}
-.conflict-section article{display:grid;grid-template-columns:minmax(180px,1fr) 1fr minmax(180px,1fr);gap:12px;padding:10px 13px;border-top:1px solid var(--ui-line)}
+.conflict-section article{display:grid;grid-template-columns:minmax(180px,1fr) 1fr minmax(180px,1fr);gap:12px;padding:10px 13px;border-top:1px solid var(--ui-line);content-visibility:auto;contain-intrinsic-size:auto 56px}
 .conflict-section article>div{display:flex;gap:8px}
 .conflict-section article b{font-size:9px}
 .conflict-section article span{color:var(--ui-accent-strong);font-size:8px}
@@ -1646,7 +1649,7 @@ export default defineComponent({
 .review-head span{margin-left:10px;color:var(--ui-text-3);font-size:8px}
 .review-head p{margin:7px 0 0;color:var(--ui-text-3);font-size:8px}
 .history-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:var(--ui-line);border-top:1px solid var(--ui-line)}
-.history-list article{padding:11px;background:var(--ui-surface)}
+.history-list article{padding:11px;background:var(--ui-surface);content-visibility:auto;contain-intrinsic-size:auto 56px}
 .history-list span,.history-list b,.history-list em{display:inline-block}
 .history-list span{color:var(--ui-text-3);font-size:7px}
 .history-list b{margin-left:8px;color:var(--ui-accent-strong);font-size:8px}
@@ -1665,7 +1668,7 @@ export default defineComponent({
 .blocking-batch span{margin-left:9px;color:var(--ui-accent-strong);font-size:8px}
 .blocking-batch p{margin:6px 0 0;color:var(--ui-danger);font-size:8px}
 .batch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--ui-line)}
-.batch-grid article{padding:11px;background:var(--ui-surface)}
+.batch-grid article{padding:11px;background:var(--ui-surface);content-visibility:auto;contain-intrinsic-size:auto 56px}
 .batch-grid header{display:flex;justify-content:space-between}
 .batch-grid b{font-size:9px}
 .batch-grid header span{color:var(--ui-accent-strong);font-size:8px}

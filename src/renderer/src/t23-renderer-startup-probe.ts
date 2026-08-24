@@ -7,3 +7,15 @@ export function markT23RendererStartup(milestone: string): void {
   if (api.t23PerformanceProbeEnabled !== true) return;
   api.recordT23RendererMilestone(milestone);
 }
+
+/** T23 专用结构化启动门禁摘要；生产环境 probe disabled 时为零成本返回。 */
+export function recordT23StartupRuntimeGate(
+  phase: "baseline" | "first-card" | "final",
+  mutationChecks: number | undefined,
+): void {
+  if (window.canvasApi.t23PerformanceProbeEnabled !== true
+    || typeof mutationChecks !== "number"
+    || !Number.isSafeInteger(mutationChecks)
+    || mutationChecks < 0) return;
+  window.canvasApi.recordT23StartupRuntimeGate(phase, mutationChecks);
+}

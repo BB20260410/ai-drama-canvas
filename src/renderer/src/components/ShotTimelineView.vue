@@ -10,13 +10,13 @@
         <span v-if="active" :class="['timeline-verdict', { invalid: !localValid }]">
           {{ active.shots.length }} 镜 · {{ totalDuration.toFixed(2) }} 秒
         </span>
-        <button class="ghost-button" type="button" :disabled="!active || saving" @click="saveTimeline">
+        <button class="ghost-button" type="button" data-testid="shot-timeline-save" :disabled="!active || writeBusy" :title="writeBusy ? '正在处理，不能再保存编排' : undefined" @click="saveTimeline">
           <Save :size="15" /> {{ saving ? "保存中" : "保存编排" }}
         </button>
-        <button class="ghost-button" type="button" :disabled="!active?.shots.length || !localValid || queuing" @click="enqueueShots">
+        <button class="ghost-button" type="button" data-testid="shot-timeline-enqueue" :disabled="!active?.shots.length || !localValid || writeBusy" :title="writeBusy ? '正在处理，不能再加入图片队列' : undefined" @click="enqueueShots">
           <ListPlus :size="15" /> {{ queuing ? "加入中" : "加入图片队列" }}
         </button>
-        <button class="primary-button" type="button" :disabled="!active?.shots.length || !localValid || creating" @click="createPack">
+        <button class="primary-button" type="button" data-testid="shot-timeline-create-pack" :disabled="!active?.shots.length || !localValid || writeBusy" :title="writeBusy ? '正在处理，不能再创建任务包' : undefined" @click="createPack">
           <PackagePlus :size="15" /> {{ creating ? "创建中" : "创建原镜头任务包" }}
         </button>
       </div>
@@ -145,6 +145,7 @@ const localIssues = computed(() => {
 });
 const localValid = computed(() => localIssues.value.length === 0);
 const filmstripColumns = computed(() => ({ gridTemplateColumns: `repeat(${Math.max(1, active.value?.shots.length ?? 1)}, minmax(176px, 1fr))` }));
+const writeBusy = computed(() => saving.value || creating.value || queuing.value);
 
 watch(filteredTimelines, (values) => {
   if (!values.some((timeline) => timeline.unitId === activeUnitId.value)) selectUnit(values[0]?.unitId ?? "");
@@ -153,6 +154,7 @@ watch(() => props.index.scannedAt, () => void load());
 onMounted(() => void load());
 
 async function load() {
+  if (writeBusy.value) return;
   loading.value = true;
   try {
     timelines.value = await window.canvasApi.getUnitTimelines(props.projectRoot);
@@ -164,42 +166,47 @@ async function load() {
   finally { loading.value = false; }
 }
 function selectUnit(unitId: string) {
+  if (writeBusy.value) return;
   activeUnitId.value = unitId;
   selectedShotId.value = timelines.value.find((timeline) => timeline.unitId === unitId)?.shots[0]?.item.id ?? "";
 }
 function move(index: number, offset: number) {
-  if (!active.value) return;
+  if (!active.value || writeBusy.value) return;
   const target = index + offset;
   if (target < 0 || target >= active.value.shots.length) return;
   const [entry] = active.value.shots.splice(index, 1);
   if (entry) active.value.shots.splice(target, 0, entry);
 }
-async function saveTimeline() {
+async function persistTimeline() {
   if (!active.value || !localValid.value) return false;
-  saving.value = true;
   try {
     const saved = await window.canvasApi.saveUnitTimeline(props.projectRoot, active.value.unitId, active.value.shots.map((entry, order) => ({ ...entry.timing, shotId: entry.item.id, order })));
     timelines.value.splice(timelines.value.findIndex((timeline) => timeline.unitId === saved.unitId), 1, saved);
     emit("changed", "镜头顺序与时长已写入项目侧车");
     return true;
   } catch (error) { emit("failed", message(error)); return false; }
+}
+async function saveTimeline() {
+  if (!active.value || !localValid.value || writeBusy.value) return false;
+  saving.value = true;
+  try { return await persistTimeline(); }
   finally { saving.value = false; }
 }
 async function createPack() {
-  if (!active.value || !localValid.value) return;
+  if (!active.value || !localValid.value || writeBusy.value) return;
   creating.value = true;
   try {
-    if (!await saveTimeline()) return;
+    if (!await persistTimeline()) return;
     const pack = await window.canvasApi.createShotTaskPack(props.projectRoot, active.value.unitId, "autopilot");
     emit("taskCreated", pack.task.id);
   } catch (error) { emit("failed", message(error)); }
   finally { creating.value = false; }
 }
 async function enqueueShots() {
-  if (!active.value || !localValid.value) return;
+  if (!active.value || !localValid.value || writeBusy.value) return;
   queuing.value = true;
   try {
-    if (!await saveTimeline()) return;
+    if (!await persistTimeline()) return;
     const jobs = await window.canvasApi.enqueueGeneration(props.projectRoot, { itemIds: active.value.shots.map((entry) => entry.item.id), kind: "image" });
     emit("queued", jobs.length);
   } catch (error) { emit("failed", message(error)); }

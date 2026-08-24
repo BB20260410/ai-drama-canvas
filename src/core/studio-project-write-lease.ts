@@ -489,7 +489,10 @@ export async function assertStudioProjectWriteLeaseForCommand(
 
   const root = path.resolve(projectRoot);
   const mode = getStudioWriteLeaseMode();
-  const projection = await getStudioProjectWriteLease(root);
+  // 入口授权只读取原子 rename 的租约文件；不能为了判断“谁可写”而初始化或
+  // 修复 generation owner。首次业务执行会在 command executor 内单独完成
+  // writable managed-project 复检，终态 same-key replay 则保持物理只读。
+  const projection = await getStudioProjectWriteLeaseReadOnly(root);
   const holderId = input.holderId?.trim();
   const leaseToken = input.leaseToken?.trim();
 

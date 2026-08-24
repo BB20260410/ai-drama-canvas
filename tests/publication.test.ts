@@ -25,7 +25,10 @@ import { listProjectLocks } from "../src/core/locks.js";
 
 const roots: string[] = [];
 const execFileAsync = promisify(execFile);
-afterEach(async () => Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true }))));
+afterEach(async () => {
+  delete process.env.AI_CANVAS_TEST_COMMAND_FAIL_TERMINAL_LEDGER_ONCE;
+  await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
+});
 
 async function waitForPath(filePath: string, attempts = 300): Promise<void> {
   for (let attempt = 0; attempt < attempts; attempt += 1) {
@@ -414,6 +417,44 @@ describe("轻量发布预检与注册", () => {
     expect((await listCommandLedger(root))[0]).toEqual(expect.objectContaining({ status: "failed", result: expect.objectContaining({ intentId: intent.id, status: "failed" }) }));
     expect((await reconcileCommand(root, { idempotencyKey: input.idempotencyKey })).status).toBe("failed");
     await expect(executeIdempotentCommand(root, { ...input, requestId: "request-publication-failed-002" })).rejects.toThrow("已明确失败");
+  });
+
+  it("真实 confirmed failure 在终态账本写失败后只用安全结构化投影恢复", async () => {
+    const { root, output } = await fixture();
+    const intent = await preflightPublication(root, { idempotencyKey: "publish-command-safe-failure-intent-001", requestedPath: path.join(output, "empty-safe.bin"), kind: "other", context: { purpose: "other" } });
+    await writeFile(intent.targetPath, "", "utf8");
+    const input = {
+      requestId: "request-publication-safe-failure-001",
+      idempotencyKey: "command-publication-safe-failure-001",
+      request: { command: "register_publication" as const, payload: { intentId: intent.id, reservationToken: intent.reservationToken, expectedRevision: intent.revision } },
+    };
+    process.env.AI_CANVAS_TEST_COMMAND_FAIL_TERMINAL_LEDGER_ONCE = input.request.command;
+    await expect(executeIdempotentCommand(root, input)).rejects.toMatchObject({
+      code: "OUTCOME_UNKNOWN",
+      reconciliationRequired: true,
+    });
+    delete process.env.AI_CANVAS_TEST_COMMAND_FAIL_TERMINAL_LEDGER_ONCE;
+
+    const terminal = (await listEvents(root, 200)).find((event) =>
+      event.type === "command.side-effect-committed" && event.idempotencyKey === input.idempotencyKey);
+    expect(terminal?.data?.result).toEqual(expect.objectContaining({
+      schemaVersion: 1,
+      kind: "confirmed-command-failure",
+      code: "confirmed_failure",
+      intentId: intent.id,
+      status: "failed",
+    }));
+    expect(JSON.stringify(terminal?.data)).not.toContain(intent.targetPath);
+    const reconciled = await reconcileCommand(root, { idempotencyKey: input.idempotencyKey });
+    expect(reconciled).toMatchObject({
+      status: "failed",
+      result: { schemaVersion: 1, kind: "confirmed-command-failure", intentId: intent.id, status: "failed" },
+    });
+    await expect(executeIdempotentCommand(root, { ...input, requestId: "request-publication-safe-failure-002" }))
+      .rejects.toMatchObject({
+        name: "ConfirmedCommandFailure",
+        result: { schemaVersion: 1, kind: "confirmed-command-failure", intentId: intent.id, status: "failed" },
+      });
   });
 
   it("发布写操作通过命令账本继承外层幂等键并可安全重放", async () => {

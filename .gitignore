@@ -53,6 +53,12 @@
 /.workqueue/*.lock
 /.workqueue/*.tmp
 /.workqueue/*-probe.mts
+/.workqueue/continuous-iteration-*
+/.workqueue/iteration-lock.json
+
+# 源码快照与根目录构建残渣
+*.tgz
+/t23-strict-build-*.json
 
 # 根目录散落的视觉工作文件不属于软件源码
 /*.png

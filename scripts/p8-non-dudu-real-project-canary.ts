@@ -487,14 +487,26 @@ try {
   for (const expected of ["剧本 可用", "图片 可用", "视频 可用", "音频 可用"]) {
     if (!availabilityText.includes(expected)) throw new Error(`桌面 UI 缺少四轨状态：${expected}`);
   }
-  const videoPlayback = await playForProbe(page, "multimedia-video-player");
   const playbackSelect = page.locator('[data-testid="multimedia-playback-select"]');
-  const audioOption = (await playbackSelect.locator("option").evaluateAll((options) =>
+  const playbackOptions = await playbackSelect.locator("option").evaluateAll((options) =>
     options.map((option) => ({
       value: (option as HTMLOptionElement).value,
       label: option.textContent?.trim() ?? "",
-    })))).find((option) => option.label.includes("对白"));
+    })));
+  const selectedValue = await playbackSelect.inputValue();
+  const playerCount = await page.locator(
+    '[data-testid="multimedia-video-player"], [data-testid="multimedia-audio-player"]',
+  ).count();
+  const emptyText = (await page.locator('[data-testid="multimedia-playback-empty"]').innerText()).trim();
+  if (selectedValue || playerCount !== 0 || !emptyText.includes("未选择时不会加载原媒体")) {
+    throw new Error("桌面 UI 在用户选择前自动加载了正式媒体。");
+  }
+  const videoOption = playbackOptions.find((option) => option.label.includes("视频"));
+  const audioOption = playbackOptions.find((option) => option.label.includes("对白"));
+  if (!videoOption) throw new Error("桌面 UI 没有非嘟嘟视频轨播放选项。");
   if (!audioOption) throw new Error("桌面 UI 没有非嘟嘟对白轨播放选项。");
+  await playbackSelect.selectOption(videoOption.value);
+  const videoPlayback = await playForProbe(page, "multimedia-video-player");
   await playbackSelect.selectOption(audioOption.value);
   const audioPlayback = await playForProbe(page, "multimedia-audio-player");
   if (!videoPlayback.advanced || videoPlayback.errorCode !== null

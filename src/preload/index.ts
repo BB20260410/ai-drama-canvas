@@ -177,6 +177,10 @@ const api = {
   recordT23RendererMilestone: (milestone: string): void => {
     t23IpcPerformanceProbe.recordRendererMilestone(milestone, performance.now());
   },
+  recordT23StartupRuntimeGate: (
+    phase: "baseline" | "first-card" | "final",
+    mutationChecks: number,
+  ): void => t23IpcPerformanceProbe.recordStartupRuntimeGateSnapshot(phase, mutationChecks),
   getT23IpcPerformanceProbeSnapshot: () => t23IpcPerformanceProbe.snapshot(),
   listProjects: (
     options?: import("../core/service.js").ListProjectsRequestOptions,
@@ -184,6 +188,10 @@ const api = {
   cancelProjectListRequest: (requestId: string): Promise<boolean> =>
     ipcRenderer.invoke("canvas:cancel-project-list-request", requestId),
   getActiveProject: (): ReturnType<typeof import("../core/service.js").getActiveProjectReadOnly> => ipcRenderer.invoke("canvas:get-active-project"),
+  preflightActiveManagedProjectStartup: (input: Parameters<typeof import("../core/service.js").preflightActiveManagedProjectStartupReadOnly>[0]): ReturnType<typeof import("../core/service.js").preflightActiveManagedProjectStartupReadOnly> =>
+    ipcRenderer.invoke("canvas:preflight-active-managed-project-startup", input),
+  ensureActiveManagedProjectGenerationWatcher: (input: Parameters<typeof import("../core/service.js").reconcileActiveManagedProjectStartup>[0]): Promise<{ projectId: string }> =>
+    ipcRenderer.invoke("canvas:ensure-active-managed-project-generation-watcher", input),
   reconcileActiveManagedProjectStartup: (input: Parameters<typeof import("../core/service.js").reconcileActiveManagedProjectStartup>[0]): ReturnType<typeof import("../core/service.js").reconcileActiveManagedProjectStartup> =>
     ipcRenderer.invoke("canvas:reconcile-active-managed-project-startup", input),
   getManagedProjectOperationState: (): Promise<ManagedProjectOperationIpcState> => ipcRenderer.invoke("canvas:get-managed-project-operation-state"),

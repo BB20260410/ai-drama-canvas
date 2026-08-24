@@ -43,6 +43,7 @@ describe("studio-canvas-layout", () => {
       targetKind: "raw",
     }]);
     expect(first.workflowGroups[0]!.pipeline).toEqual(["image", "review"]);
+    expect(first.spatialGroups).toBeUndefined();
 
     const again = normalizeStudioCanvasLayout({
       viewport: first.viewport,
@@ -101,6 +102,38 @@ describe("studio-canvas-layout", () => {
       updatedAt: legacy.updatedAt,
     });
     expect(workflow.fingerprint).not.toBe(legacy.fingerprint);
+  });
+
+  it("空 spatialGroups 不改旧 fingerprint；有组才进入内容", () => {
+    const empty = normalizeStudioCanvasLayout({
+      viewport: { x: 1, y: 2, zoom: 1 },
+      nodes: { "panel:legacy": { x: 3, y: 4 } },
+      updatedAt: "2026-07-18T00:00:00.000Z",
+    });
+    const alsoEmpty = normalizeStudioCanvasLayout({
+      viewport: empty.viewport,
+      nodes: empty.nodes,
+      spatialGroups: [],
+      updatedAt: empty.updatedAt,
+    });
+    expect(alsoEmpty.fingerprint).toBe(empty.fingerprint);
+    expect(alsoEmpty.spatialGroups).toBeUndefined();
+    const grouped = normalizeStudioCanvasLayout({
+      viewport: empty.viewport,
+      nodes: empty.nodes,
+      spatialGroups: [{
+        id: "group:a",
+        title: "角色墙",
+        memberIds: ["asset:1", "asset:2"],
+        x: 10,
+        y: 20,
+        width: 400,
+        height: 240,
+      }],
+      updatedAt: empty.updatedAt,
+    });
+    expect(grouped.spatialGroups?.[0]?.memberIds).toEqual(["asset:1", "asset:2"]);
+    expect(grouped.fingerprint).not.toBe(empty.fingerprint);
   });
 
   it("竖排自动布局与非法输入失败关闭", () => {

@@ -107,13 +107,14 @@ describe("P8 Dashboard UI 源码合同", () => {
     expect(overviewCalls).toBe(2);
   });
 
-  it("冷启动默认 units 只共享同根同参数的进行中请求，完成后不缓存", async () => {
+  it("冷启动默认 units 共享进行中请求，并把刚完成的 prefetch 一次性交给首卡 waiter", async () => {
     type DashboardResponse = Awaited<ReturnType<StudioProductionDashboardUiApi["getDashboard"]>>;
     let unitsCalls = 0;
     let resolveUnits!: (value: DashboardResponse) => void;
     const firstUnits = new Promise<DashboardResponse>((resolve) => {
       resolveUnits = resolve;
     });
+    let clock = 1_000;
     const api = createStudioDashboardRequestCoalescer({
       getDashboard: async (_projectRoot, query) => {
         if (query.operation === "units") {
@@ -122,7 +123,7 @@ describe("P8 Dashboard UI 源码合同", () => {
         }
         return { operation: query.operation } as DashboardResponse;
       },
-    });
+    }, { now: () => clock, firstCardUnitsHoldMs: 200 });
 
     const prefetched = api.getDashboard("/tmp/project-a", { operation: "units", limit: 36 });
     const canvasRead = api.getDashboard("/tmp/project-a", { operation: "units", limit: 36 });
@@ -137,7 +138,33 @@ describe("P8 Dashboard UI 源码合同", () => {
     resolveUnits({ operation: "units" } as DashboardResponse);
     await expect(Promise.all([prefetched, canvasRead, differentCursor, differentProject])).resolves.toHaveLength(4);
     await api.getDashboard("/tmp/project-a", { operation: "units", limit: 36 });
+    expect(unitsCalls).toBe(3);
+
+    await api.getDashboard("/tmp/project-a", { operation: "units", limit: 36 });
     expect(unitsCalls).toBe(4);
+
+    clock += 201;
+    await api.getDashboard("/tmp/project-a", { operation: "units", limit: 36 });
+    expect(unitsCalls).toBe(5);
+  });
+
+  it("失败的 units prefetch 不进入首卡 hold", async () => {
+    type DashboardResponse = Awaited<ReturnType<StudioProductionDashboardUiApi["getDashboard"]>>;
+    let unitsCalls = 0;
+    const api = createStudioDashboardRequestCoalescer({
+      getDashboard: async (_projectRoot, query) => {
+        if (query.operation === "units") {
+          unitsCalls += 1;
+          if (unitsCalls === 1) throw new Error("prefetch failed");
+        }
+        return { operation: query.operation } as DashboardResponse;
+      },
+    });
+    await expect(api.getDashboard("/tmp/project-a", { operation: "units", limit: 36 }))
+      .rejects.toThrow(/prefetch failed/u);
+    await expect(api.getDashboard("/tmp/project-a", { operation: "units", limit: 36 }))
+      .resolves.toMatchObject({ operation: "units" });
+    expect(unitsCalls).toBe(2);
   });
 
   it("宫格选择与打开画布是同级按钮，异常队列和资产出场均可双向翻页", () => {
@@ -217,5 +244,109 @@ describe("P8 Dashboard UI 源码合同", () => {
     expect(core).toContain("unit: StudioDashboardUnitSummary & { revision: number }");
     expect(core).toContain("readStudioContinuityEntry");
     expect(core).toContain("P0 必须聚焦到 freeze gate 真正指出的宫格");
+  });
+
+  it("驾驶舱头栏下一动作诊断 summary 含 testid，不铺单元/资产/页脚", () => {
+    const view = dashboardSource();
+    expect(view).toContain('data-testid="dashboard-next-action"');
+    expect(view).toContain('data-testid="studio-dashboard-next-action-diagnostics"');
+    expect(view).toContain('<summary data-testid="studio-dashboard-next-action-diagnostics">诊断详情</summary>');
+    expect(view).toContain("{{ currentNextAction.command }}");
+    expect(view).not.toContain("studio-dashboard-next-action-diagnostics-");
+    expect(view).not.toContain('dashboard-next-action" role="dialog"');
+    expect(view).toContain("{{ shortHash(overview.fingerprint) }}");
+  });
+
+  it("驾驶舱单元遗留诊断 summary 含 testid，不铺头栏/资产/页脚", () => {
+    const view = dashboardSource();
+    expect(view).toContain('class="detail-block diagnostic-details legacy-diagnostics"');
+    expect(view).toContain('data-testid="studio-dashboard-unit-diagnostics"');
+    expect(view).toContain('<summary data-testid="studio-dashboard-unit-diagnostics">诊断详情</summary>');
+    expect(view).toContain("unitDetail.selectedPanel.legacy.sourceShot");
+    expect(view).not.toContain("studio-dashboard-unit-diagnostics-");
+    expect(view).toContain('data-testid="studio-dashboard-next-action-diagnostics"');
+  });
+
+  it("驾驶舱控制资产诊断 summary 含共享 testid，不铺准备清单/页脚", () => {
+    const view = dashboardSource();
+    expect(view).toContain('data-testid="dashboard-control-assets"');
+    expect(view).toContain('data-testid="studio-dashboard-asset-diagnostics"');
+    expect(view).toContain('<summary data-testid="studio-dashboard-asset-diagnostics">诊断详情</summary>');
+    expect(view).toContain("{{ asset.assetId }}");
+    expect(view).not.toContain("studio-dashboard-asset-diagnostics-");
+    expect(view).toContain('data-testid="studio-dashboard-next-action-diagnostics"');
+    expect(view).toContain('data-testid="studio-dashboard-unit-diagnostics"');
+  });
+
+  it("驾驶舱页脚状态指纹诊断 summary 含 testid，不铺准备清单/预览/绑定指纹", () => {
+    const view = dashboardSource();
+    expect(view).toContain('data-testid="dashboard-counts"');
+    expect(view).toContain('class="dashboard-footer"');
+    expect(view).toContain('data-testid="studio-dashboard-overview-diagnostics"');
+    expect(view).toContain('<summary data-testid="studio-dashboard-overview-diagnostics">诊断详情</summary>');
+    expect(view).toContain("状态指纹：{{ shortHash(overview.fingerprint) }}");
+    expect(view).not.toContain("studio-dashboard-overview-diagnostics-");
+    expect(view).toContain('data-testid="studio-dashboard-next-action-diagnostics"');
+    expect(view).toContain('data-testid="studio-dashboard-asset-diagnostics"');
+    expect(view).toContain('data-testid="studio-dashboard-unit-diagnostics"');
+  });
+
+  it("驾驶舱准备清单诊断 summary 含共享 testid，不铺预览/绑定指纹", () => {
+    const view = dashboardSource();
+    expect(view).toContain('data-testid="dashboard-preparation-checklist"');
+    expect(view).toContain('data-testid="studio-dashboard-prep-diagnostics"');
+    expect(view).toContain('<summary data-testid="studio-dashboard-prep-diagnostics">诊断详情</summary>');
+    expect(view).toContain("{{ item.reason }}");
+    expect(view).not.toContain("studio-dashboard-prep-diagnostics-");
+    expect(view).toContain('data-testid="studio-dashboard-overview-diagnostics"');
+  });
+
+  it("驾驶舱生成前预览诊断 summary 含共享 testid，不铺绑定指纹", () => {
+    const view = dashboardSource();
+    expect(view).toContain('data-testid="dashboard-generation-preflight"');
+    expect(view).toContain('data-testid="studio-dashboard-preflight-diagnostics"');
+    expect(view).toContain('<summary data-testid="studio-dashboard-preflight-diagnostics">诊断详情</summary>');
+    expect(view).toContain("{{ reason }}");
+    expect(view).not.toContain("studio-dashboard-preflight-diagnostics-");
+    expect(view).toContain('data-testid="studio-dashboard-prep-diagnostics"');
+    expect(view).toContain('data-testid="studio-dashboard-overview-diagnostics"');
+    expect(view).toContain("Binding 指纹：{{ shortHash(unitDetail.selectedPanel.panel.bindingFingerprint) }}");
+  });
+
+  it("驾驶舱绑定指纹诊断 summary 含 testid，不抢头栏/页脚/资产", () => {
+    const view = dashboardSource();
+    expect(view).toContain("unitDetail.selectedPanel.panel.bindingFingerprint");
+    expect(view).toContain('data-testid="studio-dashboard-binding-diagnostics"');
+    expect(view).toContain('<summary data-testid="studio-dashboard-binding-diagnostics">诊断详情</summary>');
+    expect(view).toContain("Binding 指纹：{{ shortHash(unitDetail.selectedPanel.panel.bindingFingerprint) }}");
+    expect(view).not.toContain("studio-dashboard-binding-diagnostics-");
+    expect(view).not.toContain('bindingFingerprint" role="dialog"');
+    expect(view).toContain('data-testid="studio-dashboard-next-action-diagnostics"');
+    expect(view).toContain('data-testid="studio-dashboard-overview-diagnostics"');
+    expect(view).toContain('data-testid="studio-dashboard-asset-diagnostics"');
+    expect(view).toContain('data-testid="studio-dashboard-prep-diagnostics"');
+    expect(view).toContain('data-testid="studio-dashboard-preflight-diagnostics"');
+    expect(view).not.toContain("<summary>诊断详情</summary>");
+  });
+});
+
+describe("P8 Dashboard 队列/单元行视口剔除", () => {
+  it("queue-entry 与 unit-entry 使用 content-visibility，离屏条目跳过同步布局", () => {
+    const view = dashboardSource();
+    expect(view).toContain('class="queue-entry"');
+    expect(view).toContain('class="unit-entry"');
+    expect(view).toContain("limit: 36");
+    expect(view).toContain(".left-rail,\n.right-rail,\n.center-stage {\n  min-height: 0;\n  overflow: auto;");
+    expect(view).toContain(".unit-entry,\n.queue-entry {\n  content-visibility: auto;\n  contain-intrinsic-size: auto 52px;\n}");
+    expect(view).not.toMatch(/\.queue-entry \{[^}]*content-visibility:\s*hidden/);
+    expect(view).not.toMatch(/\.unit-entry \{[^}]*content-visibility:\s*hidden/);
+  });
+
+  it("appearances 行使用 content-visibility，离屏出场条目跳过同步布局", () => {
+    const view = dashboardSource();
+    expect(view).toContain('data-testid="dashboard-appearances"');
+    expect(view).toContain('data-testid="dashboard-appearances-pager"');
+    expect(view).toContain("[data-testid=\"dashboard-appearances\"] button {\n  content-visibility: auto;\n  contain-intrinsic-size: auto 40px;\n}");
+    expect(view).not.toMatch(/\[data-testid="dashboard-appearances"\] button \{[^}]*content-visibility:\s*hidden/);
   });
 });

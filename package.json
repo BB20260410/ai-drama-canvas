@@ -2,8 +2,20 @@
   "name": "ai-drama-canvas",
   "version": "0.2.0",
   "private": true,
+  "license": "Apache-2.0",
   "description": "本地优先的 AI 漫剧无限画布与 Codex 接续系统",
   "author": "hxx",
+  "homepage": "https://github.com/BB20260410/ai-drama-canvas#readme",
+  "bugs": {
+    "url": "https://github.com/BB20260410/ai-drama-canvas/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BB20260410/ai-drama-canvas.git"
+  },
+  "engines": {
+    "node": ">=22"
+  },
   "type": "module",
   "main": "out/main/index.js",
   "bin": {
@@ -183,6 +195,7 @@
   "build": {
     "appId": "com.hxx.aidramacanvas",
     "productName": "AI 漫剧画布",
+    "copyright": "Copyright 2026 hxx",
     "asar": true,
     "asarUnpack": [
       "dist-mcp/**/*",
@@ -197,6 +210,18 @@
       {
         "from": "release-manifest.json",
         "to": "release-manifest.json"
+      },
+      {
+        "from": "LICENSE",
+        "to": "LICENSE"
+      },
+      {
+        "from": "NOTICE",
+        "to": "NOTICE"
+      },
+      {
+        "from": "THIRD_PARTY_NOTICES.md",
+        "to": "THIRD_PARTY_NOTICES.md"
       }
     ],
     "mac": {

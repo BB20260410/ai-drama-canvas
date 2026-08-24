@@ -14,7 +14,7 @@
         <strong>{{ currentNextAction?.label || "加载中…" }}</strong>
         <p>{{ friendlyDashboardText(currentNextAction?.reason || "") }}</p>
         <details v-if="currentNextAction?.command || currentNextAction?.locator" class="diagnostic-details">
-          <summary>诊断详情</summary>
+          <summary data-testid="studio-dashboard-next-action-diagnostics">诊断详情</summary>
           <code v-if="currentNextAction?.command">命令：{{ currentNextAction.command }}</code>
           <code v-if="currentNextAction?.locator?.unitId">单元：{{ currentNextAction.locator.unitId }}</code>
           <code v-if="currentNextAction?.locator?.panelId">宫格：{{ currentNextAction.locator.panelId }}</code>
@@ -186,7 +186,7 @@
                 :class="{ ready: item.ready, blocked: !item.ready }">
                 <strong>{{ item.ready ? "✓" : "·" }} {{ item.label }}</strong>
                 <span>{{ displayReasonText(item.reason) }}</span>
-                <details v-if="isTechnicalReasonText(item.reason)" class="diagnostic-details"><summary>诊断详情</summary><code>{{ item.reason }}</code></details>
+                <details v-if="isTechnicalReasonText(item.reason)" class="diagnostic-details"><summary data-testid="studio-dashboard-prep-diagnostics">诊断详情</summary><code>{{ item.reason }}</code></details>
               </li>
             </ul>
           </section>
@@ -198,7 +198,7 @@
             <ul class="prep-list">
               <li v-for="(reason, idx) in generationPreflight.reasons" :key="idx" class="blocked">
                 <span>{{ displayReasonText(reason) }}</span>
-                <details v-if="isTechnicalReasonText(reason)" class="diagnostic-details"><summary>诊断详情</summary><code>{{ reason }}</code></details>
+                <details v-if="isTechnicalReasonText(reason)" class="diagnostic-details"><summary data-testid="studio-dashboard-preflight-diagnostics">诊断详情</summary><code>{{ reason }}</code></details>
               </li>
               <li v-if="!generationPreflight.reasons.length" class="ready">
                 <span>准备项与冻结包已通过。</span>
@@ -216,7 +216,7 @@
                   {{ categoryLabel(asset.category) }} {{ assetIndex + 1 }} · {{ asset.assetName }}
                   <small>{{ asset.role || "查看规范资产及全部出场" }}</small>
                 </button>
-                <details class="diagnostic-details"><summary>诊断详情</summary><code>{{ asset.assetId }}</code></details>
+                <details class="diagnostic-details"><summary data-testid="studio-dashboard-asset-diagnostics">诊断详情</summary><code>{{ asset.assetId }}</code></details>
               </li>
               <li v-if="!unitDetail.selectedPanel.controlAssets.length" class="empty">无控制资产</li>
             </ul>
@@ -225,7 +225,7 @@
             <h4>资产绑定</h4>
             <p>{{ currentnessLabel(unitDetail.selectedPanel.panel.bindingCurrentness) }}</p>
             <details v-if="unitDetail.selectedPanel.panel.bindingFingerprint" class="diagnostic-details">
-              <summary>诊断详情</summary>
+              <summary data-testid="studio-dashboard-binding-diagnostics">诊断详情</summary>
               <code>Binding 指纹：{{ shortHash(unitDetail.selectedPanel.panel.bindingFingerprint) }}</code>
             </details>
           </section>
@@ -250,7 +250,7 @@
             <p v-else>未加载连续性投影</p>
           </section>
           <details class="detail-block diagnostic-details legacy-diagnostics">
-            <summary>诊断详情</summary>
+            <summary data-testid="studio-dashboard-unit-diagnostics">诊断详情</summary>
             <ul>
               <li>原镜：{{ unitDetail.selectedPanel.legacy.sourceShot }}</li>
               <li>中文板：{{ unitDetail.selectedPanel.legacy.fusionStoryboardSheet }}</li>
@@ -278,7 +278,7 @@
 
     <footer class="dashboard-footer" data-testid="dashboard-counts">
       <span v-if="overview">单元 {{ overview.counts.units }} · 资产 {{ overview.counts.canonicalAssets }} · 媒体 {{ overview.counts.media }}</span>
-      <details v-if="overview" class="diagnostic-details"><summary>诊断详情</summary><code>状态指纹：{{ shortHash(overview.fingerprint) }}</code></details>
+      <details v-if="overview" class="diagnostic-details"><summary data-testid="studio-dashboard-overview-diagnostics">诊断详情</summary><code>状态指纹：{{ shortHash(overview.fingerprint) }}</code></details>
     </footer>
   </section>
 </template>
@@ -944,6 +944,15 @@ onMounted(() => {
   border-radius: 10px;
   padding: 8px 10px;
   cursor: pointer;
+}
+.unit-entry,
+.queue-entry {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 52px;
+}
+[data-testid="dashboard-appearances"] button {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 40px;
 }
 .panel-card {
   padding: 0;

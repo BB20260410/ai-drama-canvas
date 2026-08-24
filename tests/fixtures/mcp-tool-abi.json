@@ -1,5 +1,5 @@
 {
   "toolCount": 220,
-  "toolAbiSha256": "9d8b96cc721a92e2943e9c607571b05eafdb4a206e4fb8e40deeeb878d0c74ca",
-  "rebaselineNote": "2026-08-12 wq-0006 有界重基线：fixture（2026-08-10 23:11）早于 tool-registrar 重构与 server.ts 描述演进（08-11 08:41）；工具数 220/唯一 220 不变，无增删名；实测投影哈希与失败现场一致。"
+  "toolAbiSha256": "3b79a58a45bf1180af09fe264cb64db23052aa41a9eb97f717897991c944fcc2",
+  "rebaselineNote": "2026-08-14 有界重基线：execute_command 描述改为说明公开重放返回已持久化完整业务结果，动态 head/current/eligible 不重新授权；工具数 220/唯一 220 不变，无增删名。"
 }

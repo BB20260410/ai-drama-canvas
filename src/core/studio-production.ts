@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
-import { existsSync, lstatSync } from "node:fs";
-import { readFile } from "node:fs/promises";
+import { constants as fsConstants, existsSync, lstatSync } from "node:fs";
+import { lstat, open, realpath } from "node:fs/promises";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import {
@@ -20,7 +20,9 @@ import {
   markStudioRequestSqliteValidationIfUnchanged,
   studioRequestSqliteValidationKey,
 } from "./studio-request-schema-cache.js";
+import { inspectManagedProjectReadOnly } from "./managed-project.js";
 import { recordStudioUnitsReadCounter } from "./studio-units-read-phase-timeline.js";
+import { openSqliteReadOnlySnapshot } from "./sqlite-readonly-snapshot.js";
 
 const SCHEMA_VERSION = 6;
 const DATABASE_RELATIVE_PATH = ".aicanvas/studio-production.sqlite";
@@ -2242,13 +2244,17 @@ function documentFromRow(row: DocumentRow): StudioTextDocument {
 }
 
 function textRevisionMetadataFromRow(projectRoot: string, row: TextRevisionRow): StudioTextRevisionMetadata {
+  const bodySha256 = row.body_sha256;
+  if (!/^[a-f0-9]{64}$/u.test(bodySha256)) throw new Error(`冻结文本 CAS SHA 无效：${row.id}`);
+  const expectedRelativePath = `${TEXT_CAS_RELATIVE_ROOT}/${bodySha256.slice(0, 2)}/${bodySha256}.txt`;
+  if (row.body_relpath !== expectedRelativePath) throw new Error(`冻结文本 CAS 路径无效：${row.id}`);
   return {
     id: row.id,
     documentId: row.document_id,
     documentKind: row.document_kind,
     documentTitle: row.document_title,
     ordinal: Number(row.ordinal),
-    bodySha256: row.body_sha256,
+    bodySha256,
     bodySizeBytes: Number(row.body_size_bytes),
     bodyPath: fromProjectRelative(projectRoot, row.body_relpath),
     source: row.source,
@@ -2297,12 +2303,40 @@ async function materializeTextCas(paths: StudioPaths, body: string): Promise<{
 }
 
 async function readFrozenBody(metadata: StudioTextRevisionMetadata): Promise<string> {
-  const bytes = await readFile(metadata.bodyPath);
-  const sha256 = createHash("sha256").update(bytes).digest("hex");
-  if (bytes.byteLength !== metadata.bodySizeBytes || sha256 !== metadata.bodySha256) {
-    throw new Error(`冻结文本 CAS 验证失败：${metadata.id}`);
+  const pathBefore = await lstat(metadata.bodyPath, { bigint: true });
+  const canonicalPath = await realpath(metadata.bodyPath);
+  const canonicalBefore = await lstat(canonicalPath, { bigint: true });
+  if (!pathBefore.isFile() || pathBefore.isSymbolicLink() || pathBefore.nlink !== 1n
+    || !canonicalBefore.isFile() || canonicalBefore.isSymbolicLink() || canonicalBefore.nlink !== 1n
+    || pathBefore.dev !== canonicalBefore.dev || pathBefore.ino !== canonicalBefore.ino) {
+    throw new Error(`冻结文本 CAS 必须是单链接普通文件：${metadata.id}`);
   }
-  return bytes.toString("utf8");
+  const handle = await open(metadata.bodyPath, fsConstants.O_RDONLY | fsConstants.O_NOFOLLOW);
+  try {
+    const before = await handle.stat({ bigint: true });
+    if (!before.isFile() || before.nlink !== 1n
+      || before.dev !== pathBefore.dev || before.ino !== pathBefore.ino
+      || before.size !== BigInt(metadata.bodySizeBytes)) {
+      throw new Error(`冻结文本 CAS 身份无效：${metadata.id}`);
+    }
+    const bytes = await handle.readFile();
+    const after = await handle.stat({ bigint: true });
+    const pathAfter = await lstat(metadata.bodyPath, { bigint: true });
+    if (!after.isFile() || after.nlink !== 1n
+      || after.dev !== before.dev || after.ino !== before.ino || after.size !== before.size
+      || after.mtimeNs !== before.mtimeNs || after.ctimeNs !== before.ctimeNs
+      || !pathAfter.isFile() || pathAfter.isSymbolicLink() || pathAfter.nlink !== 1n
+      || pathAfter.dev !== before.dev || pathAfter.ino !== before.ino) {
+      throw new Error(`冻结文本 CAS 在读取期间发生变化：${metadata.id}`);
+    }
+    const sha256 = createHash("sha256").update(bytes).digest("hex");
+    if (bytes.byteLength !== metadata.bodySizeBytes || sha256 !== metadata.bodySha256) {
+      throw new Error(`冻结文本 CAS 验证失败：${metadata.id}`);
+    }
+    return bytes.toString("utf8");
+  } finally {
+    await handle.close();
+  }
 }
 
 export async function createStudioTextDocument(
@@ -3578,71 +3612,66 @@ function portableRevisionIdentity(revision: StudioTextRevision): object {
   };
 }
 
-export async function readStudioProductionUnitSnapshot(
-  projectRoot: string,
+async function readStudioProductionUnitSnapshotFromDatabase(
+  paths: Omit<StudioPaths, "storageIdentities">,
+  db: DatabaseSync,
   unitId: string,
   unitRevision?: number,
 ): Promise<StudioProductionUnitSnapshot | null> {
-  const paths = await ensureProductionDirectories(projectRoot);
   const normalizedUnitId = normalizeExistingId(unitId, "unitId");
   if (unitRevision !== undefined && (!Number.isSafeInteger(unitRevision) || unitRevision < 1)) {
     throw new Error("unitRevision 必须是正整数。");
   }
-  const db = openDatabase(paths.database);
   let unit: StudioProductionUnitSummary | undefined;
   let scriptMetadata: StudioTextRevisionMetadata | undefined;
   let panelRows: PanelRow[] = [];
   const assetsByPanel = new Map<number, StudioPanelAssetMention[]>();
   const sourceSpanRowsByPanel = new Map<number, PanelSourceSpanRow[]>();
   const promptMetadataById = new Map<string, StudioTextRevisionMetadata>();
-  try {
-    const currentUnitRow = unitRowById(db, normalizedUnitId);
-    if (!currentUnitRow) return null;
-    if (unitRevision === undefined) {
-      unit = unitSummaryFromRow(db, currentUnitRow);
-    } else {
-      const revisionRow = db.prepare(`SELECT * FROM studio_production_unit_revisions
+  const currentUnitRow = unitRowById(db, normalizedUnitId);
+  if (!currentUnitRow) return null;
+  if (unitRevision === undefined) {
+    unit = unitSummaryFromRow(db, currentUnitRow);
+  } else {
+    const revisionRow = db.prepare(`SELECT * FROM studio_production_unit_revisions
         WHERE unit_id = ? AND revision = ?`).get(normalizedUnitId, unitRevision) as unknown as UnitRevisionRow | undefined;
-      if (!revisionRow) return null;
-      unit = unitSummaryFromRevisionRow(db, currentUnitRow, revisionRow);
-    }
-    const scriptRow = revisionRowById(db, unit.scriptRevisionId);
-    if (!scriptRow || scriptRow.document_kind !== "script") throw new Error(`单元 ${unit.id} 的剧本修订无效。`);
-    scriptMetadata = textRevisionMetadataFromRow(paths.root, scriptRow);
-    panelRows = db.prepare(`
+    if (!revisionRow) return null;
+    unit = unitSummaryFromRevisionRow(db, currentUnitRow, revisionRow);
+  }
+  const scriptRow = revisionRowById(db, unit.scriptRevisionId);
+  if (!scriptRow || scriptRow.document_kind !== "script") throw new Error(`单元 ${unit.id} 的剧本修订无效。`);
+  scriptMetadata = textRevisionMetadataFromRow(paths.root, scriptRow);
+  panelRows = db.prepare(`
       SELECT * FROM studio_production_panels
       WHERE unit_id = ? AND unit_revision = ? ORDER BY panel_index
     `).all(unit.id, unit.revision) as unknown as PanelRow[];
-    if (panelRows.length !== unit.panelCount) throw new Error(`单元 ${unit.id} 的宫格数据不完整。`);
-    const sourceSpanRows = db.prepare(`
+  if (panelRows.length !== unit.panelCount) throw new Error(`单元 ${unit.id} 的宫格数据不完整。`);
+  const sourceSpanRows = db.prepare(`
       SELECT * FROM studio_production_panel_source_spans
       WHERE unit_id = ? AND unit_revision = ? ORDER BY panel_index, span_index
     `).all(unit.id, unit.revision) as unknown as PanelSourceSpanRow[];
-    const panelIndexes = new Set(panelRows.map((row) => Number(row.panel_index)));
-    for (const row of sourceSpanRows) {
-      const panelIndex = Number(row.panel_index);
-      if (!panelIndexes.has(panelIndex)) throw new Error(`单元 ${unit.id} 的剧本 source span 指向不存在的 panel。`);
-      sourceSpanRowsByPanel.set(panelIndex, [...(sourceSpanRowsByPanel.get(panelIndex) ?? []), row]);
-    }
-    for (const panelRow of panelRows) {
-      const promptRow = revisionRowById(db, panelRow.prompt_revision_id);
-      if (!promptRow || promptRow.document_kind !== "prompt") throw new Error(`宫格 ${panelRow.panel_id} 的提示词修订无效。`);
-      promptMetadataById.set(promptRow.id, textRevisionMetadataFromRow(paths.root, promptRow));
-      const assetRows = db.prepare(`
+  const panelIndexes = new Set(panelRows.map((row) => Number(row.panel_index)));
+  for (const row of sourceSpanRows) {
+    const panelIndex = Number(row.panel_index);
+    if (!panelIndexes.has(panelIndex)) throw new Error(`单元 ${unit.id} 的剧本 source span 指向不存在的 panel。`);
+    sourceSpanRowsByPanel.set(panelIndex, [...(sourceSpanRowsByPanel.get(panelIndex) ?? []), row]);
+  }
+  for (const panelRow of panelRows) {
+    const promptRow = revisionRowById(db, panelRow.prompt_revision_id);
+    if (!promptRow || promptRow.document_kind !== "prompt") throw new Error(`宫格 ${panelRow.panel_id} 的提示词修订无效。`);
+    promptMetadataById.set(promptRow.id, textRevisionMetadataFromRow(paths.root, promptRow));
+    const assetRows = db.prepare(`
         SELECT * FROM studio_production_panel_assets
         WHERE unit_id = ? AND unit_revision = ? AND panel_index = ? ORDER BY asset_id
       `).all(unit.id, unit.revision, Number(panelRow.panel_index)) as unknown as AssetRow[];
-      assetsByPanel.set(Number(panelRow.panel_index), assetRows.map((asset) => ({
-        assetId: asset.asset_id,
-        category: asset.category,
-        presence: asset.presence,
-        role: asset.role,
-        continuityState: asset.continuity_state,
-        evidence: evidenceForAsset(db, unit!.id, unit!.revision, Number(panelRow.panel_index), asset.asset_id),
-      })));
-    }
-  } finally {
-    db.close();
+    assetsByPanel.set(Number(panelRow.panel_index), assetRows.map((asset) => ({
+      assetId: asset.asset_id,
+      category: asset.category,
+      presence: asset.presence,
+      role: asset.role,
+      continuityState: asset.continuity_state,
+      evidence: evidenceForAsset(db, unit!.id, unit!.revision, Number(panelRow.panel_index), asset.asset_id),
+    })));
   }
   const scriptRevision: StudioTextRevision = {
     ...scriptMetadata!,
@@ -3702,6 +3731,72 @@ export async function readStudioProductionUnitSnapshot(
     fingerprint: "",
   };
   return { ...snapshot, fingerprint: createStudioProductionUnitFingerprint(snapshot) };
+}
+
+export async function readStudioProductionUnitSnapshot(
+  projectRoot: string,
+  unitId: string,
+  unitRevision?: number,
+): Promise<StudioProductionUnitSnapshot | null> {
+  const paths = await ensureProductionDirectories(projectRoot);
+  const db = openDatabase(paths.database);
+  try {
+    return await readStudioProductionUnitSnapshotFromDatabase(paths, db, unitId, unitRevision);
+  } finally {
+    db.close();
+  }
+}
+
+function assertStudioProductionUnitSnapshotReadOnlySchema(db: DatabaseSync): void {
+  const version = db.prepare(
+    "SELECT value FROM studio_production_meta WHERE key = 'schema_version'",
+  ).get() as { value?: string } | undefined;
+  if (version?.value !== String(SCHEMA_VERSION)) {
+    throw new Error(`Studio production unit 只读快照要求 schema v${SCHEMA_VERSION}。`);
+  }
+  const requiredTables = [
+    "studio_production_meta",
+    "studio_text_documents",
+    "studio_text_revisions",
+    "studio_production_units",
+    "studio_production_unit_revisions",
+    "studio_production_unit_timings",
+    "studio_production_panels",
+    "studio_production_panel_source_spans",
+    "studio_production_panel_assets",
+    "studio_production_continuity_evidence",
+  ];
+  const rows = db.prepare(
+    `SELECT name, sql FROM sqlite_master
+      WHERE type = 'table' AND name IN (${requiredTables.map(() => "?").join(",")})`,
+  ).all(...requiredTables) as Array<{ name: string; sql: string }>;
+  const strict = new Set(rows
+    .filter((row) => /\bSTRICT\s*;?\s*$/iu.test(row.sql ?? ""))
+    .map((row) => row.name));
+  const missing = requiredTables.filter((table) => !strict.has(table));
+  if (missing.length > 0) {
+    throw new Error(`Studio production unit 只读快照缺少严格表：${missing.join(", ")}。`);
+  }
+}
+
+/**
+ * Crash/replay proof 专用：不 ensure 目录、不打开 live SQLite，只读取物理快照与不可变 CAS。
+ */
+export async function readStudioProductionUnitSnapshotReadOnly(
+  projectRoot: string,
+  unitId: string,
+  unitRevision?: number,
+): Promise<StudioProductionUnitSnapshot | null> {
+  const shell = await inspectManagedProjectReadOnly(projectRoot);
+  const paths = productionPaths(shell.paths.root);
+  let snapshot: Awaited<ReturnType<typeof openSqliteReadOnlySnapshot>> | null = null;
+  try {
+    snapshot = await openSqliteReadOnlySnapshot(paths.database, "studio production unit snapshot");
+    assertStudioProductionUnitSnapshotReadOnlySchema(snapshot.database);
+    return await readStudioProductionUnitSnapshotFromDatabase(paths, snapshot.database, unitId, unitRevision);
+  } finally {
+    await snapshot?.close();
+  }
 }
 
 /**
@@ -6015,6 +6110,119 @@ function bindingOperationReceiptFromRow(row: Record<string, unknown>): StudioBin
     outcomeFingerprint: expectedFingerprint,
     createdAt: String(row.created_at),
   };
+}
+
+function isMissingStudioProductionDatabase(error: unknown): boolean {
+  return error instanceof Error
+    && "code" in error
+    && (error as NodeJS.ErrnoException).code === "ENOENT";
+}
+
+function assertStudioBindingProofSnapshotSchema(db: DatabaseSync): void {
+  const version = db.prepare(
+    "SELECT value FROM studio_production_meta WHERE key = 'schema_version'",
+  ).get() as { value?: string } | undefined;
+  if (version?.value !== String(SCHEMA_VERSION)) {
+    throw new Error(`Studio binding 只读 proof 要求 production schema v${SCHEMA_VERSION}。`);
+  }
+  const requiredTables = [
+    "studio_binding_operation_receipts",
+    "studio_asset_mention_analyses",
+    "studio_asset_mention_proposals",
+    "studio_asset_mention_candidates",
+    "studio_asset_mention_decisions",
+    "studio_panel_entity_closure_confirmations",
+    "studio_asset_binding_sets",
+    "studio_asset_bindings",
+    "studio_asset_binding_mentions",
+    "studio_asset_binding_dependencies",
+  ];
+  const rows = db.prepare(
+    `SELECT name, sql FROM sqlite_master
+      WHERE type = 'table' AND name IN (${requiredTables.map(() => "?").join(",")})`,
+  ).all(...requiredTables) as Array<{ name: string; sql: string }>;
+  const strictTables = new Set(rows
+    .filter((row) => /\bSTRICT\s*;?\s*$/iu.test(row.sql ?? ""))
+    .map((row) => row.name));
+  const missing = requiredTables.filter((table) => !strictTables.has(table));
+  if (missing.length > 0) {
+    throw new Error(`Studio binding 只读 proof schema 缺少严格表：${missing.join(", ")}。`);
+  }
+}
+
+/**
+ * 从同一份物理只读 SQLite 快照联合校验 operation receipt 与 immutable owner。
+ * 不调用 ensureProductionDirectories/openDatabase，也不打开 live DB 的 SQLite handle。
+ */
+export async function readStudioBindingOperationProofReadOnly(
+  projectRoot: string,
+  requestHash: string,
+  command: StudioBindingOperationCommand,
+): Promise<{ receipt: StudioBindingOperationReceipt; outcome: Record<string, unknown> } | undefined> {
+  const root = resolveProjectRoot(projectRoot);
+  const normalizedHash = assertSha256(requestHash, "requestHash");
+  const normalizedCommand = normalizeStudioBindingOperationCommand(command);
+  let snapshot: Awaited<ReturnType<typeof openSqliteReadOnlySnapshot>> | null = null;
+  try {
+    snapshot = await openSqliteReadOnlySnapshot(
+      productionPaths(root).database,
+      "studio production binding operation proof",
+    );
+  } catch (error) {
+    if (isMissingStudioProductionDatabase(error)) return undefined;
+    throw error;
+  }
+  try {
+    const db = snapshot.database;
+    assertStudioBindingProofSnapshotSchema(db);
+    const receiptRow = db.prepare(
+      "SELECT * FROM studio_binding_operation_receipts WHERE request_hash = ?",
+    ).get(normalizedHash) as Record<string, unknown> | undefined;
+    if (!receiptRow) return undefined;
+    const receipt = bindingOperationReceiptFromRow(receiptRow);
+    if (receipt.requestHash !== normalizedHash || receipt.command !== normalizedCommand) return undefined;
+    const outcome = receipt.outcomeIdentity;
+
+    if (normalizedCommand === "analyze_studio_script_entities") {
+      const analysisId = typeof outcome.analysisId === "string" ? outcome.analysisId : "";
+      const row = analysisId
+        ? db.prepare("SELECT * FROM studio_asset_mention_analyses WHERE id = ?").get(analysisId) as Record<string, unknown> | undefined
+        : undefined;
+      const analysis = row ? analysisFromRow(db, row) : null;
+      if (!analysis
+        || analysis.fingerprint !== outcome.analysisFingerprint
+        || analysis.revision !== outcome.analysisRevision) return undefined;
+    } else if (normalizedCommand === "resolve_studio_entity_proposal") {
+      const decisionId = typeof outcome.decisionId === "string" ? outcome.decisionId : "";
+      const row = decisionId ? db.prepare(`SELECT d.*, p.presence AS proposal_presence, p.role AS proposal_role
+        FROM studio_asset_mention_decisions d
+        JOIN studio_asset_mention_proposals p ON p.id = d.proposal_id
+        WHERE d.id = ?`).get(decisionId) as Record<string, unknown> | undefined : undefined;
+      const decision = row ? decisionFromRow(row) : null;
+      if (!decision || decision.fingerprint !== outcome.decisionFingerprint) return undefined;
+    } else if (normalizedCommand === "confirm_studio_panel_empty") {
+      const confirmationId = typeof outcome.confirmationId === "string" ? outcome.confirmationId : "";
+      const row = confirmationId
+        ? db.prepare("SELECT * FROM studio_panel_entity_closure_confirmations WHERE id = ?").get(confirmationId) as Record<string, unknown> | undefined
+        : undefined;
+      const confirmation = row ? panelEntityClosureConfirmationFromRow(row) : null;
+      if (!confirmation
+        || confirmation.fingerprint !== outcome.confirmationFingerprint
+        || confirmation.revision !== outcome.confirmationRevision) return undefined;
+    } else {
+      const bindingSetId = typeof outcome.bindingSetId === "string" ? outcome.bindingSetId : "";
+      const row = bindingSetId
+        ? db.prepare("SELECT * FROM studio_asset_binding_sets WHERE id = ?").get(bindingSetId) as Record<string, unknown> | undefined
+        : undefined;
+      const bindingSet = row ? bindingSetFromRow(db, row) : null;
+      if (!bindingSet
+        || bindingSet.fingerprint !== outcome.bindingSetFingerprint
+        || bindingSet.revision !== outcome.bindingSetRevision) return undefined;
+    }
+    return { receipt, outcome };
+  } finally {
+    await snapshot.close();
+  }
 }
 
 function recordStudioBindingOperationReceiptInTransaction(

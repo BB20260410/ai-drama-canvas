@@ -17,6 +17,7 @@ import type {
   StudioCanvasNodePosition,
   StudioCanvasViewport,
   StudioCanvasWorkflowGroup,
+  StudioCanvasSpatialGroup,
   StudioCanvasDraftEdge,
   StudioCanvasWorkflowStep,
   StudioCanvasWorkspaceMode,
@@ -27,6 +28,7 @@ export type {
   StudioCanvasNodePosition,
   StudioCanvasViewport,
   StudioCanvasWorkflowGroup,
+  StudioCanvasSpatialGroup,
   StudioCanvasDraftEdge,
   StudioCanvasWorkflowStep,
   StudioCanvasWorkspaceMode,
@@ -203,6 +205,35 @@ function normalizeWorkflowGroups(groups: StudioCanvasWorkflowGroup[] | undefined
   });
 }
 
+function normalizeSpatialGroups(groups: StudioCanvasSpatialGroup[] | undefined): StudioCanvasSpatialGroup[] {
+  const list = groups ?? [];
+  if (list.length > MAX_GROUPS) fail("invalid-input", `spatialGroups 超过上限 ${MAX_GROUPS}。`);
+  const ids = new Set<string>();
+  return list.map((group, index) => {
+    const id = requiredId(group.id, `spatialGroups[${index}].id`);
+    if (ids.has(id)) fail("invalid-input", `spatialGroups id 重复：${id}`);
+    ids.add(id);
+    const title = group.title.trim();
+    if (!title || title.length > 120) fail("invalid-input", `spatialGroups[${index}].title 无效。`);
+    if (!Array.isArray(group.memberIds) || group.memberIds.length < 2) {
+      fail("invalid-input", `spatialGroups[${index}].memberIds 至少 2 个。`);
+    }
+    if (group.memberIds.length > MAX_PANELS_PER_GROUP) {
+      fail("invalid-input", `spatialGroups[${index}].memberIds 超过 ${MAX_PANELS_PER_GROUP}。`);
+    }
+    const memberIds = group.memberIds.map((memberId, memberIndex) => requiredId(memberId, `spatialGroups[${index}].memberIds[${memberIndex}]`));
+    if (new Set(memberIds).size !== memberIds.length) {
+      fail("invalid-input", `spatialGroups[${index}].memberIds 含重复。`);
+    }
+    const x = finiteNumber(group.x, `spatialGroups[${index}].x`);
+    const y = finiteNumber(group.y, `spatialGroups[${index}].y`);
+    const width = finiteNumber(group.width, `spatialGroups[${index}].width`);
+    const height = finiteNumber(group.height, `spatialGroups[${index}].height`);
+    if (width < 80 || height < 60) fail("invalid-input", `spatialGroups[${index}] 尺寸过小。`);
+    return { id, title, memberIds, x, y, width, height };
+  });
+}
+
 /** 规范化并计算内容指纹。 */
 export function normalizeStudioCanvasLayout(draft: StudioCanvasLayoutDraft): StudioCanvasLayout {
   const viewport = normalizeViewport(draft.viewport);
@@ -211,6 +242,7 @@ export function normalizeStudioCanvasLayout(draft: StudioCanvasLayoutDraft): Stu
   const pinnedNodeIds = normalizePinnedNodeIds(draft.pinnedNodeIds);
   const draftCanvasEdges = normalizeDraftCanvasEdges(draft.draftCanvasEdges);
   const workflowGroups = normalizeWorkflowGroups(draft.workflowGroups);
+  const spatialGroups = normalizeSpatialGroups(draft.spatialGroups);
   const updatedAt = (draft.updatedAt ?? new Date().toISOString()).trim();
   if (!updatedAt) fail("invalid-input", "updatedAt 不能为空。");
   const semantic = {
@@ -222,6 +254,7 @@ export function normalizeStudioCanvasLayout(draft: StudioCanvasLayoutDraft): Stu
     pinnedNodeIds,
     draftCanvasEdges,
     workflowGroups,
+    ...(spatialGroups.length > 0 ? { spatialGroups } : {}),
     updatedAt,
   };
   return {
@@ -246,6 +279,7 @@ export function mergeStudioCanvasLayout(
     pinnedNodeIds: patch.pinnedNodeIds ?? base?.pinnedNodeIds ?? [],
     draftCanvasEdges: patch.draftCanvasEdges ?? base?.draftCanvasEdges ?? [],
     workflowGroups: patch.workflowGroups ?? base?.workflowGroups ?? [],
+    spatialGroups: patch.spatialGroups ?? base?.spatialGroups ?? [],
     updatedAt: patch.updatedAt,
   });
 }

@@ -67,6 +67,7 @@ import {
   StudioHiggsfieldConnectorSqlGuardError,
 } from "./studio-higgsfield-connector-sql-guard.js";
 import {
+  assertGenerationRetryOperationReceiptSchema,
   detachedUnknownDispositionRecord,
   detachedUnknownDispositionSemantic,
   detachedUnknownRecord,
@@ -76,6 +77,7 @@ import {
   openDatabase,
   runTransaction,
   tableExists,
+  withStudioGenerationLedgerReadOnlySnapshot,
   type DetachedUnknownDispositionRow,
   type DetachedUnknownObservationRow,
   type LedgerPaths,
@@ -88,6 +90,7 @@ export {
 import { withStudioRequestSchemaCache } from "./studio-request-schema-cache.js";
 
 const IMAGEGEN_QUARANTINE_RELATIVE_ROOT = ".aicanvas/studio-generation/quarantine";
+const PACK_CAS_RELATIVE_ROOT = ".aicanvas/studio-generation/objects/sha256";
 const DEFAULT_PAGE_LIMIT = 50;
 const MAX_PAGE_LIMIT = 100;
 const MAX_PACK_BYTES = 4 * 1024 * 1024;
@@ -1038,6 +1041,53 @@ function collectResultProjectionContexts(
   return contexts;
 }
 
+function projectResultRecordFromStoredCurrentness(
+  row: ResultRow,
+  context: ResultProjectionContext,
+): StudioGenerationResultRecord {
+  const siblingCurrentness = context.siblings.map(parseStoredResultCurrentness);
+  const inputCurrent = siblingCurrentness.every((item) => item.inputCurrent);
+  const staleReasons = mergeReasons(...siblingCurrentness.map((item) => item.staleReasons));
+  const promotionEligible = context.siblings.every((sibling, index) => sibling.status === "pending"
+      && siblingCurrentness[index]!.promotionEligible)
+    && inputCurrent
+    && context.pairComplete;
+  const target = targetIdentityFromRows(context.pack, context.target);
+  const targetProjection = target.targetKind === "panel"
+    ? {
+        targetKind: "panel" as const,
+        targetKey: target.targetKey,
+        panelId: row.panel_id,
+        panelIndex: Number(row.panel_index),
+      }
+    : {
+        targetKind: "unit-grid" as const,
+        targetKey: target.targetKey,
+      };
+  return {
+    sequence: Number(row.sequence),
+    resultId: row.result_id,
+    generationRunId: row.generation_run_id,
+    variant: row.variant,
+    status: row.status,
+    mediaSha256: row.media_sha256,
+    dispatchId: context.dispatch.dispatch_id,
+    provider: context.dispatch.executor_provider as StudioFormalImagegenProvider,
+    dispatchProvenance: context.dispatch.provenance,
+    dispatchedAt: context.dispatch.dispatched_at,
+    packId: row.pack_id,
+    packFingerprint: row.pack_fingerprint,
+    unitId: row.unit_id,
+    unitRevision: Number(row.unit_revision),
+    ...targetProjection,
+    pairComplete: context.pairComplete,
+    inputCurrent,
+    promotionEligible,
+    staleReasons,
+    createdAt: row.created_at,
+  };
+}
+
 async function projectResultRecords(
   paths: LedgerPaths,
   rows: ResultRow[],
@@ -1255,12 +1305,7 @@ function targetFingerprintForPack(pack: AnyStudioGenerationFreezePack): string {
   return stableDigest(pack.target);
 }
 
-async function readAnyPackFromRow(paths: LedgerPaths, row: PackRow): Promise<AnyStudioGenerationFreezePack> {
-  const bytes = await verifyFile(
-    fromProjectRelative(paths.root, row.content_relpath),
-    row.content_sha256,
-    Number(row.content_size_bytes),
-  );
+function packFromVerifiedBytes(bytes: Buffer): AnyStudioGenerationFreezePack {
   let parsed: unknown;
   try {
     parsed = JSON.parse(bytes.toString("utf8"));
@@ -1269,13 +1314,11 @@ async function readAnyPackFromRow(paths: LedgerPaths, row: PackRow): Promise<Any
   }
   const pack = parsed as AnyStudioGenerationFreezePack;
   assertAnyPackSelfIntegrity(pack);
-  const db = openDatabase(paths);
-  let targetRow: PackTargetRow | undefined;
-  try {
-    targetRow = packTargetRowById(db, row.pack_id);
-  } finally {
-    db.close();
-  }
+  return pack;
+}
+
+function assertAnyPackMatchesIndex(db: DatabaseSync, row: PackRow, pack: AnyStudioGenerationFreezePack): void {
+  const targetRow = packTargetRowById(db, row.pack_id);
   if (pack.id !== row.pack_id
     || pack.fingerprint !== row.fingerprint
     || pack.projectId !== row.project_id) {
@@ -1312,6 +1355,43 @@ async function readAnyPackFromRow(paths: LedgerPaths, row: PackRow): Promise<Any
       || pack.target.panelIndex !== Number(row.panel_index)) {
       fail("pack-cas-drift", `generation pack CAS 与 SQLite panel 索引不一致：${row.pack_id}`);
     }
+  }
+}
+
+async function readAnyPackFromRowReadOnly(
+  projectRoot: string,
+  db: DatabaseSync,
+  row: PackRow,
+): Promise<AnyStudioGenerationFreezePack> {
+  const expectedRelativePath = `${PACK_CAS_RELATIVE_ROOT}/${row.content_sha256.slice(0, 2)}/${row.content_sha256}.json`;
+  if (row.content_relpath !== expectedRelativePath) {
+    fail("pack-cas-drift", `generation pack ${row.pack_id} 的 CAS 相对路径不是内容寻址 canonical 路径。`);
+  }
+  const absolutePath = fromProjectRelative(projectRoot, row.content_relpath);
+  const directory = await inspectExistingConfinedDirectory(projectRoot, path.dirname(absolutePath));
+  const read = await readConfinedRegularFileWithIdentity(directory, path.basename(absolutePath), MAX_PACK_BYTES);
+  if (read.nlink !== 1
+    || read.bytes.byteLength !== Number(row.content_size_bytes)
+    || sha256(read.bytes) !== row.content_sha256) {
+    fail("pack-cas-drift", `generation pack CAS 字节或文件身份与索引不一致：${row.pack_id}`);
+  }
+  const pack = packFromVerifiedBytes(read.bytes);
+  assertAnyPackMatchesIndex(db, row, pack);
+  return pack;
+}
+
+async function readAnyPackFromRow(paths: LedgerPaths, row: PackRow): Promise<AnyStudioGenerationFreezePack> {
+  const bytes = await verifyFile(
+    fromProjectRelative(paths.root, row.content_relpath),
+    row.content_sha256,
+    Number(row.content_size_bytes),
+  );
+  const pack = packFromVerifiedBytes(bytes);
+  const db = openDatabase(paths);
+  try {
+    assertAnyPackMatchesIndex(db, row, pack);
+  } finally {
+    db.close();
   }
   return pack;
 }
@@ -2897,6 +2977,7 @@ function contextRebindEvents(db: DatabaseSync, call: CallIntentRow): Array<{
 }> {
   const matches: Array<{ row: CallEventRow; detail: StudioImagegenCallContextRebindDetail }> = [];
   for (const row of callEventsById(db, call.call_id)) {
+    strictCallEventRecord(db, row);
     const detail = parseStudioImagegenCallContextRebindDetail(row.note);
     if (!detail) continue;
     if (row.kind !== "unknown-observation"
@@ -2997,6 +3078,9 @@ function callIntentRecord(
     || !SHA256_PATTERN.test(row.context_token_hash)) {
     fail("storage-invalid", `imagegen call intent ${row.call_id} 的不可变字段无效。`);
   }
+  if (row.call_id !== `studio-imagegen-call-${row.input_fingerprint.slice(0, 40)}`) {
+    fail("storage-invalid", `imagegen call intent ${row.call_id} 的 callId 内容寻址漂移。`);
+  }
   const quarantine = imagegenCallQuarantineGrant(projectRoot, row.input_fingerprint);
   return {
     schemaVersion: 1,
@@ -3019,6 +3103,37 @@ function callIntentRecord(
     idempotentReplay: options.idempotentReplay,
     createdAt: row.created_at,
   };
+}
+
+async function assertCallIntentContentClosureReadOnly(
+  projectRoot: string,
+  db: DatabaseSync,
+  row: CallIntentRow,
+): Promise<void> {
+  const dispatch = dispatchRowByRun(db, row.generation_run_id);
+  const packRow = packRowById(db, row.pack_id);
+  const target = packTargetRowById(db, row.pack_id);
+  const protocol = dispatchProtocolRowByRun(db, row.generation_run_id);
+  if (!dispatch || !packRow || !protocol
+    || dispatch.dispatch_id !== row.dispatch_id
+    || protocol.dispatch_id !== row.dispatch_id
+    || Number(protocol.protocol_version) !== 2
+    || Number(protocol.requires_call_intent) !== 1) {
+    fail("storage-invalid", `imagegen call intent ${row.call_id} 缺少可重算的 immutable closure。`);
+  }
+  const pack = await readAnyPackFromRowReadOnly(projectRoot, db, packRow);
+  const targetIdentity = targetIdentityFromRows(packRow, target);
+  const recomputed = imagegenCallInputFingerprint({
+    pack,
+    dispatch,
+    targetKind: targetIdentity.targetKind,
+    targetKey: targetIdentity.targetKey,
+    targetFingerprint: targetIdentity.targetFingerprint,
+  });
+  if (row.input_fingerprint !== recomputed
+    || row.call_id !== `studio-imagegen-call-${recomputed.slice(0, 40)}`) {
+    fail("storage-invalid", `imagegen call intent ${row.call_id} 的完整 inputFingerprint 内容闭包漂移。`);
+  }
 }
 
 function normalizeEvidenceReference(value: string, field: string): string {
@@ -4384,6 +4499,70 @@ export async function readStudioImagegenCallContextRebindByRun(
   }
 }
 
+export async function readStudioImagegenCallContextRebindByEventId(
+  projectRoot: string,
+  generationRunIdValue: string,
+  eventIdValue: string,
+): Promise<StudioImagegenCallContextRebindRecord | null> {
+  const { paths } = await managedLedgerPaths(projectRoot);
+  const generationRunId = normalizeId(generationRunIdValue, "generationRunId");
+  const eventId = normalizeId(eventIdValue, "eventId");
+  const db = openDatabase(paths);
+  try {
+    const call = callIntentRowByRun(db, generationRunId);
+    if (!call) return null;
+    const match = contextRebindEvents(db, call).find((candidate) => candidate.row.event_id === eventId);
+    return match ? contextRebindRecord(match, true) : null;
+  } finally {
+    db.close();
+  }
+}
+
+/** command replay/recovery 的严格只读历史 rebind：只认精确 eventId，不读取 quarantine/current token。 */
+export async function readStudioImagegenCallContextRebindByEventIdReadOnly(
+  projectRoot: string,
+  generationRunIdValue: string,
+  eventIdValue: string,
+): Promise<StudioImagegenCallContextRebindRecord | null> {
+  const generationRunId = normalizeId(generationRunIdValue, "generationRunId");
+  const eventId = normalizeId(eventIdValue, "eventId");
+  return withStudioGenerationLedgerReadOnlySnapshot(projectRoot, "imagegen rebind immutable event", async (db, context) => {
+    const call = callIntentRowByRun(db, generationRunId);
+    if (!call) return null;
+    await assertCallIntentContentClosureReadOnly(context.projectRoot, db, call);
+    const matches = contextRebindEvents(db, call).filter((candidate) => candidate.row.event_id === eventId);
+    if (matches.length > 1) fail("storage-invalid", `imagegen rebind eventId=${eventId} 不唯一。`);
+    return matches[0] ? contextRebindRecord(matches[0], true) : null;
+  });
+}
+
+export async function readStudioImagegenCallContextRebindHistoryByRunReadOnly(
+  projectRoot: string,
+  generationRunIdValue: string,
+): Promise<StudioImagegenCallContextRebindRecord[]> {
+  const generationRunId = normalizeId(generationRunIdValue, "generationRunId");
+  return withStudioGenerationLedgerReadOnlySnapshot(projectRoot, "imagegen rebind immutable history", async (db, context) => {
+    const call = callIntentRowByRun(db, generationRunId);
+    if (call) await assertCallIntentContentClosureReadOnly(context.projectRoot, db, call);
+    return call ? contextRebindEvents(db, call).map((candidate) => contextRebindRecord(candidate, true)) : [];
+  });
+}
+
+export async function readStudioImagegenCallContextRebindHistoryByRun(
+  projectRoot: string,
+  generationRunIdValue: string,
+): Promise<StudioImagegenCallContextRebindRecord[]> {
+  const { paths } = await managedLedgerPaths(projectRoot);
+  const generationRunId = normalizeId(generationRunIdValue, "generationRunId");
+  const db = openDatabase(paths);
+  try {
+    const call = callIntentRowByRun(db, generationRunId);
+    return call ? contextRebindEvents(db, call).map((candidate) => contextRebindRecord(candidate, true)) : [];
+  } finally {
+    db.close();
+  }
+}
+
 /**
  * 提交/崩溃恢复前重新读取同一 quarantine 的 candidate 与完整审计回执；事件本身不是文件仍存在的替代证据。
  */
@@ -4487,6 +4666,29 @@ export async function readStudioImagegenCallIntentByRun(
   }
 }
 
+/**
+ * command replay 的严格只读 intent。historicalStatus 来自已验证的 command locator；
+ * 不用后来追加的 call/run event 猜首次公开状态。
+ */
+export async function readStudioImagegenCallIntentByRunReadOnly(
+  projectRoot: string,
+  generationRunIdValue: string,
+  historicalStatus?: StudioGenerationCallIntentRecord["status"],
+): Promise<StudioGenerationCallIntentRecord | null> {
+  const generationRunId = normalizeId(generationRunIdValue, "generationRunId");
+  if (historicalStatus !== undefined
+    && !["generation_unknown", "not-invoked", "result-committed", "owner-abandoned"].includes(historicalStatus)) {
+    fail("invalid-input", "historicalStatus 无效。");
+  }
+  return withStudioGenerationLedgerReadOnlySnapshot(projectRoot, "imagegen call immutable intent", async (db, context) => {
+    const row = callIntentRowByRun(db, generationRunId);
+    if (!row) return null;
+    await assertCallIntentContentClosureReadOnly(context.projectRoot, db, row);
+    const record = callIntentRecord(context.projectRoot, db, row, { callAllowed: false, idempotentReplay: true });
+    return historicalStatus === undefined ? record : { ...record, status: historicalStatus };
+  });
+}
+
 /** 只读返回一个 call 的不可变事件链；不暴露 SQLite 行或兼容锚点。 */
 export async function readStudioImagegenCallEventHistory(
   projectRoot: string,
@@ -4502,6 +4704,117 @@ export async function readStudioImagegenCallEventHistory(
   } finally {
     db.close();
   }
+}
+
+function strictCallEventRecord(db: DatabaseSync, row: CallEventRow): StudioGenerationCallEventRecord {
+  const intent = callIntentRowById(db, row.call_id);
+  if (!intent
+    || intent.generation_run_id !== row.generation_run_id
+    || intent.call_id !== `studio-imagegen-call-${intent.input_fingerprint.slice(0, 40)}`) {
+    fail("storage-invalid", `imagegen call event ${row.event_id} 缺少一致的 call/run content identity。`);
+  }
+  const expectedEventId = `studio-generation-call-event-${stableDigest({
+    schemaVersion: 1,
+    callId: row.call_id,
+    generationRunId: row.generation_run_id,
+    kind: row.kind,
+    evidenceReference: row.evidence_reference,
+    evidenceFingerprint: row.evidence_fingerprint,
+    note: row.note,
+  }).slice(0, 40)}`;
+  if (row.event_id !== expectedEventId) {
+    fail("storage-invalid", `imagegen call event content identity 漂移：${row.event_id}`);
+  }
+  return callEventRecord(row);
+}
+
+/** 崩溃 proof：同一严格只读 v7 快照内按请求内容定位 event。 */
+export async function readStudioImagegenCallReconciliationOutcomeReadOnly(
+  projectRoot: string,
+  input: {
+    callId: string;
+    kind: "not-invoked" | "unknown-observation";
+    evidenceReference: string;
+    evidenceFingerprint: string;
+    note?: string;
+  },
+): Promise<StudioGenerationCallEventRecord | null> {
+  const callId = normalizeId(input.callId, "callId");
+  const evidenceReference = normalizeEvidenceReference(input.evidenceReference, "evidenceReference");
+  const evidenceFingerprint = normalizeSha256(input.evidenceFingerprint, "evidenceFingerprint");
+  const note = typeof input.note === "string" ? input.note.trim().slice(0, 500) : "";
+  return withStudioGenerationLedgerReadOnlySnapshot(
+    projectRoot,
+    "generation call reconciliation proof",
+    async (db, context) => {
+      const intent = callIntentRowById(db, callId);
+      if (!intent || intent.call_id !== `studio-imagegen-call-${intent.input_fingerprint.slice(0, 40)}`) return null;
+      await assertCallIntentContentClosureReadOnly(context.projectRoot, db, intent);
+      const eventId = `studio-generation-call-event-${stableDigest({
+        schemaVersion: 1,
+        callId,
+        generationRunId: intent.generation_run_id,
+        kind: input.kind,
+        evidenceReference,
+        evidenceFingerprint,
+        note,
+      }).slice(0, 40)}`;
+      const row = db.prepare("SELECT * FROM studio_generation_call_events WHERE event_id = ?")
+        .get(eventId) as unknown as CallEventRow | undefined;
+      return row ? strictCallEventRecord(db, row) : null;
+    },
+  );
+}
+
+/** Locator hydration：同一严格只读 v7 快照按 event/call/run 三锚读取。 */
+export async function readStudioImagegenCallEventByIdentityReadOnly(
+  projectRoot: string,
+  identity: { eventId: string; callId: string; generationRunId: string },
+): Promise<StudioGenerationCallEventRecord | null> {
+  const eventId = normalizeId(identity.eventId, "eventId");
+  const callId = normalizeId(identity.callId, "callId");
+  const generationRunId = normalizeId(identity.generationRunId, "generationRunId");
+  return withStudioGenerationLedgerReadOnlySnapshot(
+    projectRoot,
+    "generation call event identity proof",
+    async (db, context) => {
+      const row = db.prepare("SELECT * FROM studio_generation_call_events WHERE event_id = ?")
+        .get(eventId) as unknown as CallEventRow | undefined;
+      if (!row || row.call_id !== callId || row.generation_run_id !== generationRunId) return null;
+      const intent = callIntentRowById(db, row.call_id);
+      if (!intent) return null;
+      await assertCallIntentContentClosureReadOnly(context.projectRoot, db, intent);
+      return strictCallEventRecord(db, row);
+    },
+  );
+}
+
+/** Detached disposition recovery：observation 与 disposition 必须来自同一严格只读快照。 */
+export async function readStudioDetachedGenerationUnknownDispositionByIdentityReadOnly(
+  projectRoot: string,
+  identity: { observationId: string; dispositionId?: string },
+): Promise<StudioDetachedGenerationUnknownDisposition | null> {
+  const observationId = normalizeId(identity.observationId, "observationId");
+  const dispositionId = identity.dispositionId === undefined
+    ? undefined
+    : normalizeId(identity.dispositionId, "dispositionId");
+  return withStudioGenerationLedgerReadOnlySnapshot(
+    projectRoot,
+    "detached generation disposition identity proof",
+    (db) => {
+      const observationRow = db.prepare(
+        "SELECT * FROM studio_generation_detached_unknown_observations WHERE observation_id = ?",
+      ).get(observationId) as unknown as DetachedUnknownObservationRow | undefined;
+      if (!observationRow) return null;
+      const dispositionRow = (dispositionId
+        ? db.prepare("SELECT * FROM studio_generation_detached_unknown_dispositions WHERE disposition_id = ?")
+          .get(dispositionId)
+        : db.prepare("SELECT * FROM studio_generation_detached_unknown_dispositions WHERE observation_id = ?")
+          .get(observationId)) as unknown as DetachedUnknownDispositionRow | undefined;
+      if (!dispositionRow || dispositionRow.observation_id !== observationId) return null;
+      return detachedUnknownDispositionRecord(dispositionRow, detachedUnknownRecord(observationRow), true);
+    },
+  );
 }
 
 function assertRunNotGenerationUnknown(db: DatabaseSync, generationRunId: string): void {
@@ -5106,6 +5419,39 @@ export async function readStudioGenerationResultBundle(
   );
 }
 
+/**
+ * command replay/recovery 的严格只读 bundle：generation v7 快照 + 落盘 currentness。
+ * 不观察 live pack currentness，不打开 writable generation/material DB，不重新授权 eligible。
+ */
+export async function readStudioGenerationResultBundleReadOnly(
+  projectRoot: string,
+  generationRunId: string,
+): Promise<StudioGenerationResultBundleRecord | null> {
+  const normalizedRunId = normalizeId(generationRunId, "generationRunId");
+  return withStudioGenerationLedgerReadOnlySnapshot(
+    projectRoot,
+    "generation result bundle immutable record",
+    (db) => {
+      const rows = db.prepare("SELECT * FROM studio_generation_results WHERE generation_run_id = ? ORDER BY sequence")
+        .all(normalizedRunId) as unknown as ResultRow[];
+      if (rows.length === 0) return null;
+      if (rows.length !== 2 || !rows.some((row) => row.variant === "raw") || !rows.some((row) => row.variant === "labeled")) {
+        fail("storage-invalid", `generationRunId=${normalizedRunId} 的 raw/labeled 配对证据无效。`);
+      }
+      const contexts = collectResultProjectionContexts(db, rows);
+      const projected = rows.map((row) => {
+        const context = contexts.get(row.result_id);
+        if (!context) fail("storage-invalid", `generation result ${row.result_id} 缺少投影上下文。`);
+        return projectResultRecordFromStoredCurrentness(row, context);
+      });
+      return bundleRecord(
+        projected.find((item) => item.variant === "raw")!,
+        projected.find((item) => item.variant === "labeled")!,
+      );
+    },
+  );
+}
+
 export async function readStudioGenerationResult(
   projectRoot: string,
   resultId: string,
@@ -5397,7 +5743,7 @@ export interface StudioGenerationPlanProjection {
 }
 
 function planRecord(db: DatabaseSync, row: PlanRow, idempotentReplay: boolean): StudioGenerationPlanRecord {
-  return {
+  const record: StudioGenerationPlanRecord = {
     planId: row.plan_id,
     projectId: row.project_id,
     sourceCommandRequestId: row.source_command_request_id,
@@ -5427,6 +5773,51 @@ function planRecord(db: DatabaseSync, row: PlanRow, idempotentReplay: boolean): 
           };
     }),
   };
+  if (record.nodes.length !== record.nodeCount
+    || record.nodes.some((node, index) => node.nodeIndex !== index + 1)) {
+    fail("storage-invalid", `generation plan ${row.plan_id} 的节点闭包不连续。`);
+  }
+  const allPanel = record.nodes.every((node) => node.targetKind === "panel");
+  const identityNodes = allPanel
+    ? record.nodes.map((node) => {
+        if (node.targetKind !== "panel") fail("storage-invalid", `generation plan ${row.plan_id} panel schema 漂移。`);
+        return {
+          nodeIndex: node.nodeIndex,
+          unitId: node.unitId,
+          panelId: node.panelId,
+          packId: node.packId,
+          packFingerprint: node.packFingerprint,
+        };
+      })
+    : record.nodes.map((node) => {
+        const pack = packRowById(db, node.packId);
+        const target = pack ? packTargetRowById(db, node.packId) : undefined;
+        if (!pack || pack.fingerprint !== node.packFingerprint) {
+          fail("storage-invalid", `generation plan ${row.plan_id} 的 pack 闭包缺失。`);
+        }
+        const identity = targetIdentityFromRows(pack, target);
+        if (identity.targetKind !== node.targetKind || identity.targetKey !== node.targetKey) {
+          fail("storage-invalid", `generation plan ${row.plan_id} 的 target 闭包漂移。`);
+        }
+        return {
+          nodeIndex: node.nodeIndex,
+          targetKind: node.targetKind,
+          targetKey: node.targetKey,
+          targetFingerprint: identity.targetFingerprint,
+          unitId: node.unitId,
+          unitRevision: Number(pack.unit_revision),
+          ...(node.targetKind === "panel" ? { panelId: node.panelId } : {}),
+          packId: node.packId,
+          packFingerprint: node.packFingerprint,
+        };
+      });
+  const expectedPlanId = stableDigest({
+    schemaVersion: allPanel ? 1 : 2,
+    projectId: row.project_id,
+    nodes: identityNodes,
+  });
+  if (row.plan_id !== expectedPlanId) fail("storage-invalid", `generation plan ${row.plan_id} 的 planId 内容寻址漂移。`);
+  return record;
 }
 
 function runEventRecord(row: RunEventRow): StudioGenerationRunEventRecord {
@@ -5435,6 +5826,24 @@ function runEventRecord(row: RunEventRow): StudioGenerationRunEventRecord {
     detail = JSON.parse(row.detail_json);
   } catch {
     fail("storage-invalid", `run event ${row.event_id} 的 detail_json 损坏。`);
+  }
+  const expectedEventId = `studio-generation-run-event-${stableDigest({
+    schemaVersion: 1,
+    generationRunId: row.generation_run_id,
+    kind: row.kind,
+    attempt: Number(row.attempt),
+    supersedesRunId: row.supersedes_run_id ?? null,
+    detail,
+  }).slice(0, 40)}`;
+  if (row.event_id !== expectedEventId) fail("storage-invalid", `run event ${row.event_id} 的 eventId 内容寻址漂移。`);
+  const parsed = parsePlanRunId(row.generation_run_id);
+  if (row.plan_id === null) {
+    if (row.node_index !== null || (parsed && row.kind !== "dispatched")) {
+      fail("storage-invalid", `run event ${row.event_id} 的 plan/node linkage 漂移。`);
+    }
+  } else if (!parsed || parsed.planId !== row.plan_id
+    || parsed.nodeIndex !== Number(row.node_index) || parsed.attempt !== Number(row.attempt)) {
+    fail("storage-invalid", `run event ${row.event_id} 的 plan/node linkage 漂移。`);
   }
   return {
     eventId: row.event_id,
@@ -5881,6 +6290,250 @@ export interface StudioGenerationPlanRetryOutcome {
     idempotentReplay: boolean;
   }>;
   skipped: Array<{ nodeIndex: number; reason: string }>;
+  /** command-bus 调用才携带；绑定同事务 append-only operation receipt。 */
+  receiptFingerprint?: string;
+}
+
+type StudioGenerationRetrySkippedReasonCode =
+  | "planned-no-dispatch"
+  | "state-not-retryable"
+  | "concurrent-current-run-changed"
+  | "concurrent-status-changed";
+type StudioGenerationRetrySkippedStatus = "dispatched" | "succeeded" | "retry-superseded";
+
+interface StudioGenerationRetryReceiptOutcome {
+  planId: string;
+  retried: StudioGenerationPlanRetryOutcome["retried"];
+  skipped: Array<{
+    nodeIndex: number;
+    reasonCode: StudioGenerationRetrySkippedReasonCode;
+    reasonTextVersion: 1;
+    status?: StudioGenerationRetrySkippedStatus;
+  }>;
+}
+
+export interface StudioGenerationRetryOperationProof {
+  operationId: string;
+  requestFingerprint: string;
+  outcomeFingerprint: string;
+  receiptFingerprint: string;
+  outcome: StudioGenerationPlanRetryOutcome;
+}
+
+function normalizeRetrySkippedReason(
+  item: { nodeIndex: number; reason: string },
+): StudioGenerationRetryReceiptOutcome["skipped"][number] {
+  if (item.reason === "planned（尚无 dispatch，直接派发即可，无需重试）") {
+    return { nodeIndex: item.nodeIndex, reasonCode: "planned-no-dispatch", reasonTextVersion: 1 };
+  }
+  if (item.reason === "并发期间当前 run 已变化，未重试") {
+    return { nodeIndex: item.nodeIndex, reasonCode: "concurrent-current-run-changed", reasonTextVersion: 1 };
+  }
+  const state = /^当前状态 (dispatched|succeeded|retry-superseded) 不可重试（仅 failed\/cancelled 或当前结果对的 Review Head=REWORK）$/u.exec(item.reason);
+  if (state) {
+    return {
+      nodeIndex: item.nodeIndex,
+      reasonCode: "state-not-retryable",
+      reasonTextVersion: 1,
+      status: state[1] as StudioGenerationRetrySkippedStatus,
+    };
+  }
+  const concurrent = /^并发期间状态变为 (dispatched|succeeded|retry-superseded)，未重试$/u.exec(item.reason);
+  if (concurrent) {
+    return {
+      nodeIndex: item.nodeIndex,
+      reasonCode: "concurrent-status-changed",
+      reasonTextVersion: 1,
+      status: concurrent[1] as StudioGenerationRetrySkippedStatus,
+    };
+  }
+  fail("storage-invalid", `generation retry skipped reason 不在安全版本化白名单：nodeIndex=${item.nodeIndex}`);
+}
+
+function retrySkippedReasonFromReceipt(
+  item: StudioGenerationRetryReceiptOutcome["skipped"][number],
+): string {
+  if (item.reasonTextVersion !== 1) fail("storage-invalid", "generation retry receipt reasonTextVersion 不受支持。");
+  if (item.reasonCode === "planned-no-dispatch") {
+    if (item.status !== undefined) fail("storage-invalid", "planned-no-dispatch 不得携带 status。");
+    return "planned（尚无 dispatch，直接派发即可，无需重试）";
+  }
+  if (item.reasonCode === "concurrent-current-run-changed") {
+    if (item.status !== undefined) fail("storage-invalid", "concurrent-current-run-changed 不得携带 status。");
+    return "并发期间当前 run 已变化，未重试";
+  }
+  if (!item.status || !["dispatched", "succeeded", "retry-superseded"].includes(item.status)) {
+    fail("storage-invalid", "generation retry receipt status 不在白名单。");
+  }
+  return item.reasonCode === "state-not-retryable"
+    ? `当前状态 ${item.status} 不可重试（仅 failed/cancelled 或当前结果对的 Review Head=REWORK）`
+    : `并发期间状态变为 ${item.status}，未重试`;
+}
+
+function retryRequestFingerprint(input: { planId: string; nodeIndexes?: number[] }): string {
+  return stableDigest({
+    planId: input.planId,
+    scope: input.nodeIndexes === undefined
+      ? { kind: "all" }
+      : { kind: "node-indexes", nodeIndexes: [...new Set(input.nodeIndexes)].sort((a, b) => a - b) },
+  });
+}
+
+function retryReceiptOutcome(outcome: StudioGenerationPlanRetryOutcome): StudioGenerationRetryReceiptOutcome {
+  return {
+    planId: outcome.planId,
+    retried: outcome.retried.map((item) => ({ ...item })),
+    skipped: outcome.skipped.map(normalizeRetrySkippedReason),
+  };
+}
+
+function retryPublicOutcome(
+  outcome: StudioGenerationRetryReceiptOutcome,
+  receiptFingerprint: string,
+): StudioGenerationPlanRetryOutcome {
+  return {
+    planId: outcome.planId,
+    retried: outcome.retried.map((item) => ({ ...item })),
+    skipped: outcome.skipped.map((item) => ({
+      nodeIndex: item.nodeIndex,
+      reason: retrySkippedReasonFromReceipt(item),
+    })),
+    receiptFingerprint,
+  };
+}
+
+interface StudioGenerationRetryOperationReceiptRow {
+  operation_id: string;
+  request_fingerprint: string;
+  plan_id: string;
+  outcome_json: string;
+  outcome_fingerprint: string;
+  receipt_fingerprint: string;
+  created_at: string;
+}
+
+function exactObjectKeys(value: Record<string, unknown>, expected: readonly string[], label: string): void {
+  const actual = Object.keys(value).sort();
+  const wanted = [...expected].sort();
+  if (JSON.stringify(actual) !== JSON.stringify(wanted)) fail("storage-invalid", `${label} 字段集合无效。`);
+}
+
+function generationRetryReceiptProofFromRow(
+  row: StudioGenerationRetryOperationReceiptRow,
+  expected?: { operationId: string; requestFingerprint: string },
+): StudioGenerationRetryOperationProof {
+  if (!SHA256_PATTERN.test(row.operation_id)
+    || !SHA256_PATTERN.test(row.request_fingerprint)
+    || !SHA256_PATTERN.test(row.outcome_fingerprint)
+    || !SHA256_PATTERN.test(row.receipt_fingerprint)) {
+    fail("storage-invalid", "generation retry operation receipt SHA 身份无效。");
+  }
+  if (expected && (row.operation_id !== expected.operationId
+    || row.request_fingerprint !== expected.requestFingerprint)) {
+    fail("storage-invalid", "generation retry operation receipt 请求身份不一致。");
+  }
+  let parsed: unknown;
+  try { parsed = JSON.parse(row.outcome_json); } catch { fail("storage-invalid", "generation retry operation receipt outcome JSON 损坏。"); }
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) fail("storage-invalid", "generation retry operation receipt outcome 无效。");
+  const source = parsed as Record<string, unknown>;
+  exactObjectKeys(source, ["planId", "retried", "skipped"], "generation retry receipt outcome");
+  if (source.planId !== row.plan_id || typeof source.planId !== "string" || !source.planId) {
+    fail("storage-invalid", "generation retry operation receipt planId 漂移。");
+  }
+  if (!Array.isArray(source.retried) || !Array.isArray(source.skipped)
+    || source.retried.length + source.skipped.length > 36) {
+    fail("storage-invalid", "generation retry operation receipt 节点集合无效。");
+  }
+  const retried = source.retried.map((raw, index) => {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) fail("storage-invalid", `generation retry receipt retried[${index}] 无效。`);
+    const item = raw as Record<string, unknown>;
+    exactObjectKeys(item, ["nodeIndex", "generationRunId", "attempt", "supersedesRunId", "idempotentReplay"], `generation retry receipt retried[${index}]`);
+    if (!Number.isSafeInteger(item.nodeIndex) || Number(item.nodeIndex) < 1
+      || !Number.isSafeInteger(item.attempt) || Number(item.attempt) < 1
+      || typeof item.generationRunId !== "string" || !item.generationRunId
+      || typeof item.supersedesRunId !== "string" || !item.supersedesRunId
+      || typeof item.idempotentReplay !== "boolean") {
+      fail("storage-invalid", `generation retry receipt retried[${index}] 身份无效。`);
+    }
+    return {
+      nodeIndex: Number(item.nodeIndex),
+      generationRunId: item.generationRunId,
+      attempt: Number(item.attempt),
+      supersedesRunId: item.supersedesRunId,
+      idempotentReplay: item.idempotentReplay,
+    };
+  });
+  const skipped = source.skipped.map((raw, index) => {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) fail("storage-invalid", `generation retry receipt skipped[${index}] 无效。`);
+    const item = raw as Record<string, unknown>;
+    const hasStatus = Object.prototype.hasOwnProperty.call(item, "status");
+    exactObjectKeys(item, hasStatus
+      ? ["nodeIndex", "reasonCode", "reasonTextVersion", "status"]
+      : ["nodeIndex", "reasonCode", "reasonTextVersion"], `generation retry receipt skipped[${index}]`);
+    if (!Number.isSafeInteger(item.nodeIndex) || Number(item.nodeIndex) < 1
+      || item.reasonTextVersion !== 1
+      || !["planned-no-dispatch", "state-not-retryable", "concurrent-current-run-changed", "concurrent-status-changed"].includes(String(item.reasonCode))) {
+      fail("storage-invalid", `generation retry receipt skipped[${index}] 身份无效。`);
+    }
+    const normalized = {
+      nodeIndex: Number(item.nodeIndex),
+      reasonCode: item.reasonCode as StudioGenerationRetrySkippedReasonCode,
+      reasonTextVersion: 1 as const,
+      ...(hasStatus ? { status: item.status as StudioGenerationRetrySkippedStatus } : {}),
+    };
+    retrySkippedReasonFromReceipt(normalized);
+    return normalized;
+  });
+  const outcome: StudioGenerationRetryReceiptOutcome = { planId: source.planId, retried, skipped };
+  const outcomeFingerprint = stableDigest(outcome);
+  if (outcomeFingerprint !== row.outcome_fingerprint) fail("storage-invalid", "generation retry receipt outcome fingerprint 漂移。");
+  const receiptFingerprint = stableDigest({
+    schemaVersion: 1,
+    kind: "studio-generation-retry-operation-receipt",
+    operationId: row.operation_id,
+    requestFingerprint: row.request_fingerprint,
+    planId: row.plan_id,
+    outcomeFingerprint,
+  });
+  if (receiptFingerprint !== row.receipt_fingerprint) fail("storage-invalid", "generation retry receipt fingerprint 漂移。");
+  return {
+    operationId: row.operation_id,
+    requestFingerprint: row.request_fingerprint,
+    outcomeFingerprint,
+    receiptFingerprint,
+    outcome: retryPublicOutcome(outcome, receiptFingerprint),
+  };
+}
+
+export async function readStudioGenerationRetryOperationOutcomeReadOnly(
+  projectRoot: string,
+  operationId: string,
+  input?: { planId: string; nodeIndexes?: number[] },
+): Promise<StudioGenerationRetryOperationProof | null> {
+  if (!SHA256_PATTERN.test(operationId)) fail("invalid-input", "generation retry operationId 必须是 SHA-256。");
+  const planId = input ? normalizeId(input.planId, "planId") : undefined;
+  if (input?.nodeIndexes !== undefined
+    && (!Array.isArray(input.nodeIndexes)
+      || input.nodeIndexes.some((value) => !Number.isSafeInteger(value) || value < 1))) {
+    fail("invalid-input", "nodeIndexes 必须是正整数数组。");
+  }
+  const requestFingerprint = planId
+    ? retryRequestFingerprint({ planId, ...(input?.nodeIndexes ? { nodeIndexes: input.nodeIndexes } : {}) })
+    : undefined;
+  return withStudioGenerationLedgerReadOnlySnapshot(
+    projectRoot,
+    "generation retry operation receipt",
+    (db) => {
+      if (!tableExists(db, "studio_generation_retry_operation_receipts")) return null;
+      assertGenerationRetryOperationReceiptSchema(db);
+      const row = db.prepare(
+        "SELECT * FROM studio_generation_retry_operation_receipts WHERE operation_id = ?",
+      ).get(operationId) as unknown as StudioGenerationRetryOperationReceiptRow | undefined;
+      return row ? generationRetryReceiptProofFromRow(row, requestFingerprint
+        ? { operationId, requestFingerprint }
+        : undefined) : null;
+    },
+  );
 }
 
 interface CurrentReworkReviewRetryAuthority {
@@ -5994,14 +6647,33 @@ function planNodeNextRetryAttempt(db: DatabaseSync, planId: string, nodeIndex: n
  */
 export async function retryStudioGenerationPlanNodes(
   projectRoot: string,
-  input: { planId: string; nodeIndexes?: number[] },
+  input: { planId: string; nodeIndexes?: number[]; operationId?: string },
 ): Promise<StudioGenerationPlanRetryOutcome> {
   const { paths } = await managedLedgerPaths(projectRoot);
   const planId = normalizeId(input.planId, "planId");
+  const operationId = input.operationId;
+  if (operationId !== undefined && !SHA256_PATTERN.test(operationId)) {
+    fail("invalid-input", "generation retry operationId 必须是 SHA-256。");
+  }
+  if (input.nodeIndexes !== undefined
+    && (!Array.isArray(input.nodeIndexes)
+      || input.nodeIndexes.some((value) => !Number.isSafeInteger(value) || value < 1))) {
+    fail("invalid-input", "nodeIndexes 必须是正整数数组。");
+  }
+  const requestFingerprint = retryRequestFingerprint({
+    planId,
+    ...(input.nodeIndexes !== undefined ? { nodeIndexes: input.nodeIndexes } : {}),
+  });
   const readDb = openDatabase(paths);
   let plan: PlanRow | undefined;
   let nodes: PlanNodeRow[] = [];
   try {
+    if (operationId) {
+      const existing = readDb.prepare(
+        "SELECT * FROM studio_generation_retry_operation_receipts WHERE operation_id = ?",
+      ).get(operationId) as unknown as StudioGenerationRetryOperationReceiptRow | undefined;
+      if (existing) return generationRetryReceiptProofFromRow(existing, { operationId, requestFingerprint }).outcome;
+    }
     plan = planRowById(readDb, planId);
     if (plan) nodes = planNodesByPlan(readDb, planId);
   } finally {
@@ -6010,9 +6682,6 @@ export async function retryStudioGenerationPlanNodes(
   if (!plan) fail("plan-not-found", `generation plan 不存在：${planId}`);
   let targets = nodes;
   if (input.nodeIndexes !== undefined) {
-    if (!Array.isArray(input.nodeIndexes) || input.nodeIndexes.some((value) => !Number.isSafeInteger(value) || value < 1)) {
-      fail("invalid-input", "nodeIndexes 必须是正整数数组。");
-    }
     const byIndex = new Map(nodes.map((node) => [Number(node.node_index), node]));
     targets = input.nodeIndexes.map((index) => {
       const node = byIndex.get(index);
@@ -6075,6 +6744,14 @@ export async function retryStudioGenerationPlanNodes(
   const writeDb = openDatabase(paths);
   try {
     return runTransaction(writeDb, () => {
+      if (operationId) {
+        const existing = writeDb.prepare(
+          "SELECT * FROM studio_generation_retry_operation_receipts WHERE operation_id = ?",
+        ).get(operationId) as unknown as StudioGenerationRetryOperationReceiptRow | undefined;
+        if (existing) {
+          return generationRetryReceiptProofFromRow(existing, { operationId, requestFingerprint }).outcome;
+        }
+      }
       const outcome: StudioGenerationPlanRetryOutcome = { planId, retried: [], skipped: [...skipped] };
       for (const item of prepared) {
         const nodeIndex = Number(item.node.node_index);
@@ -6165,7 +6842,35 @@ export async function retryStudioGenerationPlanNodes(
           idempotentReplay: false,
         });
       }
-      return outcome;
+      if (!operationId) return outcome;
+      const receiptOutcome = retryReceiptOutcome(outcome);
+      const outcomeJson = JSON.stringify(stableValue(receiptOutcome));
+      if (Buffer.byteLength(outcomeJson, "utf8") > 32_768) {
+        fail("storage-invalid", "generation retry operation receipt 超过 32KiB。 ");
+      }
+      const outcomeFingerprint = stableDigest(receiptOutcome);
+      const receiptFingerprint = stableDigest({
+        schemaVersion: 1,
+        kind: "studio-generation-retry-operation-receipt",
+        operationId,
+        requestFingerprint,
+        planId,
+        outcomeFingerprint,
+      });
+      const createdAt = new Date().toISOString();
+      writeDb.prepare(`INSERT INTO studio_generation_retry_operation_receipts(
+        operation_id, request_fingerprint, plan_id, outcome_json,
+        outcome_fingerprint, receipt_fingerprint, created_at
+      ) VALUES(?, ?, ?, ?, ?, ?, ?)`).run(
+        operationId,
+        requestFingerprint,
+        planId,
+        outcomeJson,
+        outcomeFingerprint,
+        receiptFingerprint,
+        createdAt,
+      );
+      return retryPublicOutcome(receiptOutcome, receiptFingerprint);
     });
   } finally {
     writeDb.close();
@@ -6268,6 +6973,73 @@ export async function getStudioGenerationPlanProjection(
   }
 }
 
+/** create-plan 公开重放只返回建计划时的不可变 PlanRecord，不投影后来变化的节点状态。 */
+export async function readStudioGenerationPlanRecordReadOnly(
+  projectRoot: string,
+  planIdValue: string,
+): Promise<StudioGenerationPlanRecord | null> {
+  const planId = normalizeId(planIdValue, "planId");
+  return withStudioGenerationLedgerReadOnlySnapshot(projectRoot, "generation plan immutable record", (db) => {
+    const row = planRowById(db, planId);
+    return row ? planRecord(db, row, true) : null;
+  });
+}
+
+export async function readStudioGenerationPlanRecordBySourceCommandRequestIdReadOnly(
+  projectRoot: string,
+  sourceCommandRequestIdValue: string,
+): Promise<StudioGenerationPlanRecord | null> {
+  const sourceCommandRequestId = normalizeId(sourceCommandRequestIdValue, "sourceCommandRequestId");
+  return withStudioGenerationLedgerReadOnlySnapshot(projectRoot, "generation plan operation owner", (db) => {
+    const rows = db.prepare("SELECT * FROM studio_generation_plans WHERE source_command_request_id = ?")
+      .all(sourceCommandRequestId) as unknown as PlanRow[];
+    if (rows.length > 1) fail("storage-invalid", `sourceCommandRequestId=${sourceCommandRequestId} 绑定多个 plan。`);
+    return rows[0] ? planRecord(db, rows[0], true) : null;
+  });
+}
+
+export async function readStudioGenerationPlanProjectionBySourceCommandRequestId(
+  projectRoot: string,
+  sourceCommandRequestId: string,
+): Promise<StudioGenerationPlanProjection | null> {
+  const { paths } = await managedLedgerPaths(projectRoot);
+  const normalizedSourceCommandRequestId = normalizeId(sourceCommandRequestId, "sourceCommandRequestId");
+  const db = openDatabase(paths);
+  try {
+    const row = db.prepare("SELECT * FROM studio_generation_plans WHERE source_command_request_id = ? LIMIT 1")
+      .get(normalizedSourceCommandRequestId) as unknown as PlanRow | undefined;
+    return row ? projectPlan(db, row) : null;
+  } finally {
+    db.close();
+  }
+}
+
+export async function findStudioGenerationPlanProjectionByTargets(
+  projectRoot: string,
+  nodesValue: StudioGenerationPlanNodeInput[],
+): Promise<StudioGenerationPlanProjection | null> {
+  const { paths } = await managedLedgerPaths(projectRoot);
+  const nodes = normalizePlanNodeList(nodesValue);
+  const wanted = new Set(nodes.map((node) => node.targetKey));
+  const db = openDatabase(paths);
+  try {
+    const rows = db.prepare("SELECT * FROM studio_generation_plans WHERE node_count = ? ORDER BY sequence DESC")
+      .all(nodes.length) as unknown as PlanRow[];
+    const matches: StudioGenerationPlanProjection[] = [];
+    for (const row of rows) {
+      const projection = projectPlan(db, row);
+      if (projection.nodes.length === wanted.size
+        && projection.nodes.every((node) => wanted.has(node.targetKey))) matches.push(projection);
+    }
+    if (matches.length > 1) {
+      fail("storage-invalid", "同一 generation plan target 集存在多个历史候选；缺少 operation receipt 时拒绝任选恢复。 ");
+    }
+    return matches[0] ?? null;
+  } finally {
+    db.close();
+  }
+}
+
 /** 最新包含目标宫格的 plan（按 plans.sequence 倒序）。 */
 export async function getStudioGenerationLatestPlanForPanel(
   projectRoot: string,
@@ -6350,6 +7122,141 @@ export async function readStudioGenerationRunEventHistory(
   } finally {
     db.close();
   }
+}
+
+export async function readStudioGenerationRunEventByIdReadOnly(
+  projectRoot: string,
+  identity: { generationRunId: string; eventId: string },
+): Promise<StudioGenerationRunEventRecord | null> {
+  const generationRunId = normalizeId(identity.generationRunId, "generationRunId");
+  const eventId = normalizeId(identity.eventId, "eventId");
+  return withStudioGenerationLedgerReadOnlySnapshot(projectRoot, "generation run immutable event", (db) => {
+    const row = db.prepare("SELECT * FROM studio_generation_run_events WHERE event_id = ?")
+      .get(eventId) as unknown as RunEventRow | undefined;
+    if (!row) return null;
+    if (row.generation_run_id !== generationRunId) fail("storage-invalid", `run event ${eventId} 与 generationRunId 不一致。`);
+    return runEventRecord(row);
+  });
+}
+
+function pairedGenerationRunTerminalEvent(
+  rows: RunEventRow[],
+  terminalKind: "cancelled",
+  matchesDetail: (detail: unknown) => boolean,
+  label: string,
+): StudioGenerationRunEventRecord | null {
+  const requests = rows.filter((row) => row.kind === "cancel-requested" && matchesDetail(runEventRecord(row).detail));
+  const terminals = rows.filter((row) => row.kind === terminalKind && matchesDetail(runEventRecord(row).detail));
+  if (requests.length === 0 && terminals.length === 0) return null;
+  if (requests.length !== 1 || terminals.length !== 1) {
+    fail("storage-invalid", `${label} 的 request/terminal 事件不唯一或不成对。`);
+  }
+  const request = requests[0]!;
+  const terminal = terminals[0]!;
+  if (terminal.sequence !== request.sequence + 1
+    || terminal.generation_run_id !== request.generation_run_id
+    || terminal.plan_id !== request.plan_id
+    || terminal.node_index !== request.node_index
+    || terminal.attempt !== request.attempt
+    || terminal.supersedes_run_id !== request.supersedes_run_id
+    || terminal.created_at !== request.created_at
+    || stableDigest(JSON.parse(terminal.detail_json)) !== stableDigest(JSON.parse(request.detail_json))) {
+    fail("storage-invalid", `${label} 的 request/terminal 身份、顺序或 detail 不对称。`);
+  }
+  return runEventRecord(terminal);
+}
+
+export async function readStudioGenerationRunCommandOutcomeReadOnly(
+  projectRoot: string,
+  input:
+    | { command: "fail"; generationRunId: string; errorClass: string; detail?: string }
+    | { command: "cancel"; generationRunId: string; reason?: string }
+    | { command: "abandon"; generationRunId: string; callId: string; evidenceReference: string; evidenceFingerprint: string; reason: string },
+): Promise<{ event: StudioGenerationRunEventRecord; intent?: StudioGenerationCallIntentRecord } | null> {
+  const generationRunId = normalizeId(input.generationRunId, "generationRunId");
+  return withStudioGenerationLedgerReadOnlySnapshot(projectRoot, "generation run command immutable outcome", async (db, context) => {
+    const rows = db.prepare("SELECT * FROM studio_generation_run_events WHERE generation_run_id = ? ORDER BY sequence")
+      .all(generationRunId) as unknown as RunEventRow[];
+    if (input.command === "fail") {
+      const errorClass = normalizeId(input.errorClass, "errorClass");
+      const detail = typeof input.detail === "string" ? input.detail.slice(0, 500) : "";
+      const matches = rows.map(runEventRecord).filter((event) => {
+        const value = event.detail as { errorClass?: unknown; detail?: unknown };
+        return event.kind === "failed" && value.errorClass === errorClass && (value.detail ?? "") === detail;
+      });
+      if (matches.length > 1) fail("storage-invalid", "generation fail command 对应多个事件。 ");
+      return matches[0] ? { event: matches[0] } : null;
+    }
+    if (input.command === "cancel") {
+      const reason = typeof input.reason === "string" ? input.reason.slice(0, 200) : "";
+      const event = pairedGenerationRunTerminalEvent(
+        rows,
+        "cancelled",
+        (detail) => Boolean(detail && typeof detail === "object" && !Array.isArray(detail)
+          && (detail as { reason?: unknown }).reason === reason),
+        "generation cancel command",
+      );
+      return event ? { event } : null;
+    }
+    const callId = normalizeId(input.callId, "callId");
+    const row = callIntentRowById(db, callId);
+    if (!row || row.generation_run_id !== generationRunId) return null;
+    await assertCallIntentContentClosureReadOnly(context.projectRoot, db, row);
+    const event = pairedGenerationRunTerminalEvent(
+      rows,
+      "cancelled",
+      (detail) => sameStudioGenerationUnknownOwnerAbandonDetail(detail, {
+        evidenceReference: input.evidenceReference,
+        evidenceFingerprint: input.evidenceFingerprint,
+        reason: input.reason,
+      }),
+      "generation abandon command",
+    );
+    return event
+      ? { event, intent: { ...callIntentRecord(context.projectRoot, db, row, { callAllowed: false, idempotentReplay: true }), status: "owner-abandoned" } }
+      : null;
+  });
+}
+
+/** Public locator hydration：按 terminal event 精确重建并验证同事务 request/terminal 对。 */
+export async function readStudioGenerationRunPairedTerminalOutcomeReadOnly(
+  projectRoot: string,
+  identity: {
+    command: "cancel" | "abandon";
+    generationRunId: string;
+    eventId: string;
+    callId?: string;
+  },
+): Promise<{ event: StudioGenerationRunEventRecord; intent?: StudioGenerationCallIntentRecord } | null> {
+  const generationRunId = normalizeId(identity.generationRunId, "generationRunId");
+  const eventId = normalizeId(identity.eventId, "eventId");
+  return withStudioGenerationLedgerReadOnlySnapshot(projectRoot, "generation run paired terminal outcome", async (db, context) => {
+    const rows = db.prepare("SELECT * FROM studio_generation_run_events WHERE generation_run_id = ? ORDER BY sequence")
+      .all(generationRunId) as unknown as RunEventRow[];
+    const terminal = rows.find((row) => row.event_id === eventId);
+    if (!terminal || terminal.kind !== "cancelled") return null;
+    const terminalDetailFingerprint = stableDigest(JSON.parse(terminal.detail_json));
+    const event = pairedGenerationRunTerminalEvent(
+      rows,
+      "cancelled",
+      (detail) => stableDigest(detail) === terminalDetailFingerprint,
+      `generation ${identity.command} locator`,
+    );
+    if (!event || event.eventId !== eventId) return null;
+    if (identity.command === "cancel") {
+      if (isStudioGenerationUnknownOwnerAbandonDetail(event.detail)) return null;
+      return { event };
+    }
+    if (!isStudioGenerationUnknownOwnerAbandonDetail(event.detail) || !identity.callId) return null;
+    const callId = normalizeId(identity.callId, "callId");
+    const row = callIntentRowById(db, callId);
+    if (!row || row.generation_run_id !== generationRunId) return null;
+    await assertCallIntentContentClosureReadOnly(context.projectRoot, db, row);
+    return {
+      event,
+      intent: { ...callIntentRecord(context.projectRoot, db, row, { callAllowed: false, idempotentReplay: true }), status: "owner-abandoned" },
+    };
+  });
 }
 
 /** (plan,node) 事件历史只读导出（durable 对账证明用，按 sequence 升序）。 */

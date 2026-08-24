@@ -29,6 +29,7 @@ import {
   seedStudioP7ResolvedContinuity,
   type StudioP7Fixture,
 } from "../tests/helpers/studio-p7-fixture.js";
+import { assertWorkspaceRuntimeBuildIdentity } from "./lib/workspace-runtime-build-identity.js";
 
 const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const evidenceRoot = path.join(workspace, "docs", "evidence");
@@ -263,6 +264,7 @@ try {
   const page = await application.firstWindow();
   page.setDefaultTimeout(60_000);
   await page.setViewportSize({ width: 1728, height: 1029 });
+  const runtimeBuildIdentity = await assertWorkspaceRuntimeBuildIdentity(workspace, page);
   page.on("pageerror", (error) => pageErrors.push(error.message));
   page.on("console", (entry) => { if (entry.type() === "error") consoleErrors.push(entry.text()); });
   page.on("request", (request) => { if (/^https?:/iu.test(request.url())) externalRequests.push(request.url()); });
@@ -547,6 +549,7 @@ try {
     status: "pass",
     createdAt: new Date().toISOString(),
     buildIdentity: releaseManifest,
+    runtimeBuildIdentity,
     projectId,
     runtime: "workspace-build",
     performance: {

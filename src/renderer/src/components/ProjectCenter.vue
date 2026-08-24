@@ -205,6 +205,7 @@ const props = defineProps<{
   switching?: boolean;
   removingRoot?: string;
   refreshing?: boolean;
+  picking?: boolean;
   defaultParentRoot?: string;
 }>();
 
@@ -255,13 +256,15 @@ const duduDiscoveryError = ref("");
 let duduDiscoveryToken = 0;
 let sourceRefreshTimer: ReturnType<typeof setInterval> | undefined;
 const SOURCE_REFRESH_INTERVAL_MS = 60_000;
-const busy = computed(() => Boolean(props.creating || props.switching || props.removingRoot));
+const busy = computed(() => Boolean(props.creating || props.switching || props.removingRoot || props.picking));
 const refreshing = computed(() => Boolean(props.refreshing));
 const busyLabel = computed(() => props.removingRoot
   ? "正在移除项目登记"
   : props.creating
     ? "正在建立隔离工程"
-    : "正在安全切换工程");
+    : props.picking
+      ? "正在选择工程目录"
+      : "正在安全切换工程");
 const createValidation = computed(() => validateManagedStudioCreateDraft(createDraft));
 const createModeCopy = computed(() => createModeCopyByMode[createDraft.workspaceMode]);
 const createMessage = computed(() => submitted.value ? createValidation.value.message : "");
@@ -456,7 +459,7 @@ p { margin: 0; color: var(--ui-text-2); font-size: 12px; }
 .project-busy,.project-warning{display:flex;align-items:center;gap:8px;margin:0;padding:10px 24px;border-bottom:1px solid var(--ui-line);background:var(--ui-accent-soft);color:var(--ui-accent-strong);font-size:12px}.project-warning{background:var(--ui-surface-2);color:var(--ui-danger)}
 .project-list-toolbar{display:flex;align-items:center;gap:10px;padding:10px 24px;border-bottom:1px solid var(--ui-line);background:var(--ui-bg)}.project-list-toolbar>span{flex:0 0 auto;color:var(--ui-text-3);font-size:10px}.project-list-toolbar>button{flex:0 0 auto;min-height:30px;padding:0 9px;border:1px solid var(--ui-line);border-radius:var(--ui-radius-ctl);background:var(--ui-surface);color:var(--ui-text-2);font-size:10px;cursor:pointer}.project-list-toolbar>button:hover{border-color:var(--ui-accent);color:var(--ui-accent)}.project-search{min-width:0;flex:1;display:flex;align-items:center;gap:7px;height:32px;padding:0 10px;border:1px solid var(--ui-line);border-radius:var(--ui-radius-ctl);background:var(--ui-surface);color:var(--ui-text-3)}.project-search:focus-within{border-color:var(--ui-accent);box-shadow:var(--ui-focus-ring)}.project-search input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:var(--ui-text);font-size:11px}
 .project-list { max-height: 280px; overflow-y: auto; padding: 10px 24px; }
-.project-row { width: 100%; display: flex; align-items: stretch; border-bottom: 1px solid var(--ui-line); background: transparent; }
+.project-row { width: 100%; display: flex; align-items: stretch; border-bottom: 1px solid var(--ui-line); background: transparent; content-visibility: auto; contain-intrinsic-size: auto 48px; }
 .project-row:hover { background: var(--ui-surface-2); }
 .project-row.current { color: var(--ui-accent); }
 .project-row.unavailable .project-open{cursor:not-allowed;opacity:.58}.project-row.unavailable:hover{background:var(--ui-surface-2)}

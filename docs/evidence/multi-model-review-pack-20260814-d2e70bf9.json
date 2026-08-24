@@ -1,0 +1,289 @@
+{
+  "schemaVersion": 1,
+  "kind": "multi-model-frozen-readonly-review-pack",
+  "purpose": "final-frozen-review-of-already-landed-dirty-tree",
+  "createdAt": "2026-08-14T08:52:00+08:00",
+  "language": "zh-CN",
+  "safety": {
+    "relativePathsOnly": true,
+    "absolutePaths": 0,
+    "formalProjectBodies": 0,
+    "casBlobs": 0,
+    "credentials": 0,
+    "sqlDumps": 0,
+    "sourceDigestImpact": "docs/evidence is outside SOURCE_DIGEST_GLOBS (src/tests/scripts/package configs only)"
+  },
+  "identity": {
+    "gitHead": "3c56e1d2f518cefe57de728ad32222c409a1dabf",
+    "workingTree": "dirty-uncommitted-shared-tree",
+    "sourceDigest": "d2e70bf955440b1cc2435da1bc6c486f01af49e7cc6098def29249c0f01dff1f",
+    "buildId": "801b9352c8b82547b1380a0c13f12fda",
+    "buildIdentityFingerprint": "f2d293895ed36df935352065b546bac335b046e053d8f079250e2051d20908e0",
+    "manifestFingerprint": "ab14e0bd217d655561eb16f85c0b99fc05156163c1b2d7f4b3c9363e7a4dbe18",
+    "packageVersion": "0.2.0",
+    "protocolVersion": "1.1",
+    "mcpToolCount": 220,
+    "sourceFiles": 1061,
+    "sourceBytes": 21271914,
+    "builtAt": "2026-08-14T00:39:15.308Z",
+    "distribution": "local-only",
+    "liveDigestRecheck": {
+      "command": "node --import tsx scripts/compute-source-digest.ts .",
+      "via": "ASCII symlink helper, not tsx/cli.mjs",
+      "matched": true
+    }
+  },
+  "reviewInstruction": {
+    "mode": "final-frozen-review",
+    "doNotImplement": true,
+    "doNotWriteWorktree": true,
+    "doNotTalkToOtherModels": true,
+    "outputSchema": {
+      "verdict": "PASS|FAIL",
+      "findings": [
+        {
+          "id": "string",
+          "severity": "P0|P1|P2",
+          "summary": "string",
+          "evidencePaths": [
+            "pack-relative-path"
+          ]
+        }
+      ],
+      "notVerified": "bool"
+    },
+    "findingRules": [
+      "只报告有本包相对路径证据的 P0-P2",
+      "无复现依据必须把 notVerified 设为 true，且不要编造 FAIL",
+      "这是已落地脏树的终审，不是新实现轮",
+      "不得要求改源码、写 worktree、跑付费生成或写正式工程"
+    ]
+  },
+  "dirtyTreeVsHead": {
+    "note": "file list + short summaries only; huge diffs omitted",
+    "trackedModified": 59,
+    "untrackedSourceOrTest": [
+      "scripts/lib/workspace-runtime-build-identity.ts",
+      "src/core/command-terminal-receipt.ts",
+      "src/renderer/src/studio-multimedia-playback-selection.ts",
+      "tests/command-public-replay-hydration-registry.test.ts",
+      "tests/command-terminal-receipt.test.ts",
+      "tests/studio-generation-reconcile-recovery.test.ts",
+      "tests/studio-multimedia-playback-selection.test.ts",
+      "tests/workspace-runtime-build-identity.test.ts"
+    ],
+    "untrackedEvidenceStems": [
+      "docs/evidence/p5-multimedia-formal-20260814-d2e70bf9.json",
+      "docs/evidence/p17-navigation-support-ui-smoke-20260814-d2e70bf9.json",
+      "docs/evidence/t23-strict-build-20260814-d2e70bf9.json"
+    ],
+    "excludedFromThisPack": [
+      "STATUS.md / TASKS.md / docs/当前开发交接.md are dirty but out of this slice",
+      "Kimi plan markdown is a plan, not product source",
+      ".analysis-src.tgz and stale 696b0970 evidence are retained and not reviewed as current identity",
+      "root t23-strict-build-20260814-13d85a9f files are stale intermediate artifacts"
+    ],
+    "changes": [
+      {
+        "paths": [
+          "src/core/command-bus.ts",
+          "src/core/command-terminal-receipt.ts",
+          "tests/command-bus.test.ts",
+          "tests/command-terminal-receipt.test.ts",
+          "tests/command-public-replay-hydration-registry.test.ts"
+        ],
+        "summary": "命令终态 receipt 严格解析；25 个 locator 命令全部登记为 succeeded public replay 的 strict-readonly 水合。公开同键重放返回已持久化完整业务结果，动态 head/current/eligible 不重新授权。"
+      },
+      {
+        "paths": [
+          "src/core/studio-generation-checkpoint.ts",
+          "tests/studio-generation-checkpoint.test.ts"
+        ],
+        "summary": "checkpoint schema 现为 v2；只读可开 v1 与 v2。v1 operation receipt 没有不可变历史 head_revision。写入禁止静默 ALTER，也禁止从 live Head 猜历史列，需正式 migration。"
+      },
+      {
+        "paths": [
+          "src/core/studio-agent-imagegen-result-bundle.ts",
+          "tests/studio-agent-imagegen-result-bundle.test.ts",
+          "tests/studio-generation-reconcile-recovery.test.ts"
+        ],
+        "summary": "commit_agent_imagegen_result_bundle 进入 25/25 严格只读重放；bundle 提交与 reconcile 恢复补齐 generation/material/writeback 证明，不再是 registry 中唯一 blocked-writable-risk。"
+      },
+      {
+        "paths": [
+          "src/core/runtime-write-gate.ts",
+          "src/main/index.ts",
+          "tests/runtime-write-gate.test.ts"
+        ],
+        "summary": "写闸门只读核验在 watcher 已覆盖 boot hash 窗口且无相关源码事件时可复用 boot.bootSourceDigest，避免重复 walk。该复用不得用于 mutation；mutation 绑定 invalidation epoch，不稳定则失败关闭。"
+      },
+      {
+        "paths": [
+          "src/renderer/src/studio-production-dashboard-store.ts",
+          "src/renderer/src/App.vue",
+          "src/core/studio-production.ts"
+        ],
+        "summary": "units 首卡路径：App 冷启动预发默认 units，与 Dashboard 同参请求合并；刚完成的同参 units 结果短暂 hold 1500ms 只为接住首卡 waiter。overview 与失败结果不进入 hold，也不是写权限缓存。"
+      },
+      {
+        "paths": [
+          "src/core/studio-generation-ledger.ts",
+          "src/core/studio-generation-ledger-storage.ts",
+          "src/core/studio-generation-review.ts",
+          "src/core/studio-post-result-observation.ts"
+        ],
+        "summary": "generation ledger / review / post-observation 恢复与 currentness 合同加强：失败投影、stale review、只读 snapshot 与 operation receipt 对齐。"
+      },
+      {
+        "paths": [
+          "src/core/studio-binding-control.ts",
+          "src/core/studio-continuity-ledger.ts",
+          "src/core/studio-video-package.ts",
+          "src/core/dudu-readonly-import.ts",
+          "src/core/local-creative-production-unit-materializer.ts"
+        ],
+        "summary": "binding / continuity / video package / Dudu 只读导入 / local-creative materialize 的 command 恢复与 locator 重放对齐，不改正式工程写入面。"
+      },
+      {
+        "paths": [
+          "src/renderer/src/studio-multimedia-playback-selection.ts",
+          "src/renderer/src/components/StudioMultimediaTimelineView.vue",
+          "src/renderer/src/components/VideoEditorView.vue",
+          "tests/studio-multimedia-playback-selection.test.ts",
+          "tests/video-editor-preview-sync.test.ts"
+        ],
+        "summary": "多媒体时间线播放选择抽成纯函数；VideoEditor 预览同步保持同批去重/卸载失效合同。"
+      },
+      {
+        "paths": [
+          "scripts/lib/workspace-runtime-build-identity.ts",
+          "scripts/ui-p5-multimedia-formal-smoke.ts",
+          "scripts/ui-p17-navigation-support-smoke.ts",
+          "scripts/t23-scale-performance-dev-smoke.ts",
+          "tests/workspace-runtime-build-identity.test.ts"
+        ],
+        "summary": "P5/P17/T23 harness 增加 workspace/runtime/build 身份等式门；旧构建不能冒充新源码通过。"
+      },
+      {
+        "paths": [
+          "release-manifest.json",
+          "tests/fixtures/mcp-tool-abi.json",
+          "src/mcp/server.ts"
+        ],
+        "summary": "manifest 冻结为本身份 d2e70bf9 / 801b9352 / 1061 files / 21271914 bytes / MCP 220。execute_command ABI 描述改为公开重放返回已持久化完整业务结果；工具数仍 220，无增删名。"
+      }
+    ]
+  },
+  "mechanicalAndElectronGates": {
+    "typecheck": {
+      "status": "PASS"
+    },
+    "partitionAudit": {
+      "files": 394,
+      "fast": 262,
+      "medium": 91,
+      "integration": 36,
+      "heavy": 5,
+      "fingerprint": "89ee7f22a49bda1b338d58642b94ce11e182d2176d70403ababf97f15985d657"
+    },
+    "productionAudit": {
+      "status": "PASS",
+      "vulnerabilities": 0
+    },
+    "build": {
+      "status": "PASS",
+      "sourceDigest": "d2e70bf955440b1cc2435da1bc6c486f01af49e7cc6098def29249c0f01dff1f",
+      "buildId": "801b9352c8b82547b1380a0c13f12fda",
+      "mcpToolCount": 220,
+      "sourceFiles": 1061,
+      "sourceBytes": 21271914
+    },
+    "p5MultimediaFormal": {
+      "status": "PASS",
+      "evidenceStem": "docs/evidence/p5-multimedia-formal-20260814-d2e70bf9.json",
+      "videoEntries": 1,
+      "audioEntries": 1,
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalResources": 0,
+      "readonlyProjectSentinelsUnchanged": true,
+      "externalUploadCount": 0,
+      "imageGenerationCount": 0,
+      "paidActionCount": 0
+    },
+    "p17Navigation": {
+      "status": "PASS",
+      "evidenceStem": "docs/evidence/p17-navigation-support-ui-smoke-20260814-d2e70bf9.json",
+      "visitedFlows": 22,
+      "uiAudits": 7,
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalRequests": 0,
+      "showEvents": 0,
+      "focusEvents": 0,
+      "gracefulExitCode": 0
+    },
+    "t23Strict": {
+      "status": "PASS",
+      "evidenceStem": "docs/evidence/t23-strict-build-20260814-d2e70bf9.json",
+      "rendererFirstCardMs": 1454,
+      "rendererFirstRawMs": 3571,
+      "rendererAllPassReferencesMs": 4678,
+      "peakOutstandingProjectionIpc": 4,
+      "interactionStatus": "PASS"
+    }
+  },
+  "evidenceStems": [
+    "docs/evidence/p5-multimedia-formal-20260814-d2e70bf9.json",
+    "docs/evidence/p17-navigation-support-ui-smoke-20260814-d2e70bf9.json",
+    "docs/evidence/t23-strict-build-20260814-d2e70bf9.json"
+  ],
+  "contracts": {
+    "checkpointSchema": {
+      "paths": [
+        "src/core/studio-generation-checkpoint.ts",
+        "tests/studio-generation-checkpoint.test.ts"
+      ],
+      "currentWriteSchema": 2,
+      "readCompat": [
+        "1",
+        "2"
+      ],
+      "rules": [
+        "v1 operation receipt 没有不可变历史 head_revision",
+        "只读可开 schema 1 与 2",
+        "写入禁止静默 ALTER",
+        "禁止从 live Head 猜历史列；缺锚时保持 unknown，需正式 migration"
+      ]
+    },
+    "publicReplay": {
+      "paths": [
+        "src/core/command-bus.ts",
+        "tests/command-public-replay-hydration-registry.test.ts"
+      ],
+      "locatorCommands": 25,
+      "strictReadonlyEnabled": 25,
+      "ratio": "25/25"
+    },
+    "writeGateBootDigestReuse": {
+      "paths": [
+        "src/core/runtime-write-gate.ts",
+        "src/main/index.ts",
+        "tests/runtime-write-gate.test.ts"
+      ],
+      "rules": [
+        "reuseBootSourceDigest 仅当 watcher 已覆盖 boot hash 窗口且无相关源码事件",
+        "只读核验可复用 boot digest，不得用于 mutation",
+        "mutation 绑定 invalidation epoch，不稳定则失败关闭"
+      ]
+    },
+    "unitsFirstCardPath": {
+      "paths": [
+        "src/renderer/src/studio-production-dashboard-store.ts",
+        "src/renderer/src/App.vue",
+        "src/core/studio-production.ts"
+      ],
+      "firstCardUnitsHoldMs": 1500
+    }
+  }
+}

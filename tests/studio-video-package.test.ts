@@ -7,8 +7,13 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { describe, expect, it } from "vitest";
 import { getActiveManagedStudioContext } from "../src/core/active-managed-studio-context.js";
-import { executeIdempotentCommand } from "../src/core/command-bus.js";
-import { listRegisteredProjects, registerProject } from "../src/core/sidecar.js";
+import {
+  __projectStudioOperationResultForPersistenceForTests,
+  __studioOperationLocatorMatchesOwnerForTests,
+  executeIdempotentCommand,
+  listCommandLedger,
+} from "../src/core/command-bus.js";
+import { findEventsByIdempotencyKey, listRegisteredProjects, registerProject } from "../src/core/sidecar.js";
 import {
   duduReadonlySourceRequestMatchesReceipt,
   discoverDuduReadonlyImportProjects,
@@ -126,6 +131,177 @@ async function readOnlySurfaceSnapshot(input: {
 }
 
 describe.sequential("P30 Studio 视频包 owner", () => {
+  it("Dudu stage 与视频包 locator 严格清洗伪造字段并绑定 operationId", () => {
+    const operationId = "a".repeat(64);
+    const creatorOperationId = "b".repeat(64);
+    const prepareOutcome = {
+      intent: {
+        schemaVersion: 5,
+        kind: "studio-video-package-export-intent",
+        intentId: "intent-prepare-1",
+        // 内容寻址 alias 会指向旧 creator intent；locator 必须仍绑定本次
+        // command requestHash，而不是复用 intent.operationId。
+        operationId: creatorOperationId,
+        inputFingerprint: "0".repeat(64),
+        fingerprint: "1".repeat(64),
+        authorityKind: "studio-review",
+        authorityId: "review-prepare-1",
+        authorityFingerprint: "2".repeat(64),
+        targetKind: "unit-grid",
+        targetKey: "unit-grid:unit-prepare-1",
+        unitId: "unit-prepare-1",
+        unitRevision: 3,
+        sourceClosureFingerprint: "3".repeat(64),
+        productionRoot: "/private/production-root",
+        builderRelativePath: "builder/run.py",
+        sourceSpecRelativePath: "spec/video.json",
+        outputRootRelativePath: "output",
+        packageRelativePath: "output/unit-prepare-1",
+      },
+      replayed: false,
+    };
+    const prepareLocator = __projectStudioOperationResultForPersistenceForTests(
+      "prepare_studio_video_package_export",
+      prepareOutcome,
+      operationId,
+    ) as Record<string, unknown>;
+    expect(prepareLocator).toMatchObject({
+      schemaVersion: 1,
+      kind: "studio-operation-result-locator",
+      operation: "video-package-prepare",
+      operationId,
+      intentId: "intent-prepare-1",
+      inputFingerprint: "0".repeat(64),
+      intentFingerprint: "1".repeat(64),
+      providerAnchor: "2".repeat(64),
+      storageAnchor: "3".repeat(64),
+    });
+    expect(JSON.stringify(prepareLocator)).not.toMatch(/productionRoot|Path|output\/unit-prepare/u);
+    expect(() => __projectStudioOperationResultForPersistenceForTests(
+      "prepare_studio_video_package_export",
+      { ...prepareLocator, operationId: "f".repeat(64) },
+      operationId,
+    )).toThrow(/operationId/u);
+    expect(() => __projectStudioOperationResultForPersistenceForTests(
+      "prepare_studio_video_package_export",
+      { ...prepareLocator, productionRoot: "/tmp/forged" },
+      operationId,
+    )).toThrow(/额外字段|locator/u);
+    expect(__studioOperationLocatorMatchesOwnerForTests(
+      "prepare_studio_video_package_export",
+      { ...prepareLocator, storageAnchor: "9".repeat(64) },
+      prepareOutcome,
+      operationId,
+    )).toBe(false);
+
+    const stageOutcome = {
+      schemaVersion: 1,
+      kind: "dudu-readonly-stage-command-outcome",
+      directoryName: "dudu-readonly-studio",
+      projectId: "project-dudu",
+      managedManifestFingerprint: "b".repeat(64),
+      importFingerprint: "c".repeat(64),
+      sourceManifestFingerprint: "d".repeat(64),
+      productionScopeFingerprint: "e".repeat(64),
+      contractSha256: "f".repeat(64),
+      counts: {
+        units: 33,
+        panels: 112,
+        durationSeconds: 492,
+        bindingSets: 112,
+        unitGridPacks: 30,
+        historicalImports: 28,
+        videoManifests: 28,
+        generationDispatches: 0,
+        generationResults: 0,
+        generationCallIntents: 0,
+        generationCallEvents: 0,
+        generationPlans: 0,
+        generationRunEvents: 0,
+      },
+      replayed: true,
+    };
+    const stageLocator = __projectStudioOperationResultForPersistenceForTests(
+      "stage_dudu_readonly_managed_project",
+      stageOutcome,
+      operationId,
+    ) as Record<string, unknown>;
+    expect(Object.keys(stageLocator).sort()).toEqual([
+      "countsFingerprint",
+      "directoryName",
+      "importFingerprint",
+      "kind",
+      "managedManifestFingerprint",
+      "operation",
+      "operationId",
+      "ownerFingerprint",
+      "projectId",
+      "reconciled",
+      "schemaVersion",
+    ].sort());
+    expect(stageLocator).not.toHaveProperty("counts");
+    expect(() => __projectStudioOperationResultForPersistenceForTests(
+      "stage_dudu_readonly_managed_project",
+      { ...stageLocator, operationId: "0".repeat(64) },
+      operationId,
+    )).toThrow(/operationId/u);
+    expect(() => __projectStudioOperationResultForPersistenceForTests(
+      "stage_dudu_readonly_managed_project",
+      { ...stageLocator, counts: { units: 999 }, projectRoot: "/tmp/forged" },
+      operationId,
+    )).toThrow(/额外字段|locator/u);
+    const canonicalStage = __projectStudioOperationResultForPersistenceForTests(
+      "stage_dudu_readonly_managed_project",
+      { ...stageLocator, ownerFingerprint: "0".repeat(64) },
+      operationId,
+    ) as Record<string, unknown>;
+    expect(canonicalStage.ownerFingerprint).toBe(stageLocator.ownerFingerprint);
+    expect(__studioOperationLocatorMatchesOwnerForTests(
+      "stage_dudu_readonly_managed_project",
+      { ...stageLocator, countsFingerprint: "9".repeat(64) },
+      stageOutcome,
+      operationId,
+    )).toBe(false);
+
+    const buildOutcome = {
+      intent: { intentId: "intent-1", fingerprint: "1".repeat(64) },
+      receipt: {
+        receiptId: "receipt-1",
+        manifestSha256: "2".repeat(64),
+        manifestFingerprint: "3".repeat(64),
+        fingerprint: "4".repeat(64),
+        storageKind: "managed-evidence",
+      },
+    };
+    const buildLocator = __projectStudioOperationResultForPersistenceForTests(
+      "build_studio_video_package",
+      buildOutcome,
+      operationId,
+    ) as Record<string, unknown>;
+    expect(() => __projectStudioOperationResultForPersistenceForTests(
+      "build_studio_video_package",
+      { ...buildLocator, operationId: "0".repeat(64) },
+      operationId,
+    )).toThrow(/operationId/u);
+    expect(() => __projectStudioOperationResultForPersistenceForTests(
+      "build_studio_video_package",
+      { ...buildLocator, packageRelativePath: "../../forged", projectRoot: "/tmp/forged" },
+      operationId,
+    )).toThrow(/额外字段|locator/u);
+    const canonicalBuild = __projectStudioOperationResultForPersistenceForTests(
+      "build_studio_video_package",
+      { ...buildLocator, ownerFingerprint: "0".repeat(64) },
+      operationId,
+    ) as Record<string, unknown>;
+    expect(canonicalBuild.ownerFingerprint).toBe(buildLocator.ownerFingerprint);
+    expect(__studioOperationLocatorMatchesOwnerForTests(
+      "build_studio_video_package",
+      { ...buildLocator, intentFingerprint: "9".repeat(64) },
+      buildOutcome,
+      operationId,
+    )).toBe(false);
+  });
+
   it("以活动 Dudu 身份完成历史采用、只读门、receipt 重放和 Review 派生包", async () => {
     const fixture = await createDuduReadonlySourceFixture();
     const priorRegistry = process.env.AI_CANVAS_REGISTRY_PATH;
@@ -184,6 +360,13 @@ describe.sequential("P30 Studio 视频包 owner", () => {
           reconciled: true,
         },
       });
+      const persistedStage = (await listCommandLedger(bootstrapCommandRoot))
+        .find((entry) => entry.idempotencyKey === "p30-dudu-bootstrap-key-0001");
+      expect(persistedStage?.result).toMatchObject({
+        kind: "studio-operation-result-locator",
+        operation: "dudu-stage",
+      });
+      expect(JSON.stringify(persistedStage)).not.toContain(fixture.projectsRoot);
       const bootstrapLedger = parseMcpText(await mcpClient.callTool({
         name: "list_command_ledger",
         arguments: { projectRoot: fixture.projectsRoot, scope: "dudu-bootstrap", limit: 20 },
@@ -353,6 +536,13 @@ describe.sequential("P30 Studio 视频包 owner", () => {
           replayedActivation: true,
         },
       });
+      const persistedFinalize = (await listCommandLedger(staged.shell.paths.root))
+        .find((entry) => entry.idempotencyKey === "p30-dudu-finalize-key-0001");
+      expect(persistedFinalize?.result).toMatchObject({
+        kind: "studio-operation-result-locator",
+        operation: "dudu-finalize",
+      });
+      expect(JSON.stringify(persistedFinalize)).not.toContain(staged.shell.paths.root);
       await expect(proveDuduReadonlyFinalizationOutcome(
         staged.shell.paths.root,
         fixture.source,
@@ -559,6 +749,150 @@ describe.sequential("P30 Studio 视频包 owner", () => {
       });
       const u12PreparedByCommand = u12PrepareRecord.result as Awaited<ReturnType<typeof prepareStudioVideoPackageExport>>;
       expect(u12PreparedByCommand).toMatchObject({ replayed: false, intent: { unitId: "S1E01-U12" } });
+      const u12PrepareControlAfterCreate = await getStudioVideoPackageControl(staged.shell.paths.root, {
+        by: "authority-latest",
+        authority: u12Authority,
+      });
+      expect(u12PrepareControlAfterCreate).toMatchObject({
+        status: "resolved",
+        selectedIntentId: u12PreparedByCommand.intent.intentId,
+      });
+      const u12AliasPrepareRequest = {
+        ...u12PrepareRequest,
+        payload: {
+          ...u12PrepareRequest.payload,
+          expectedControlFingerprint: u12PrepareControlAfterCreate.fingerprint,
+        },
+      };
+      const u12AliasPrepareHash = stableDigest({
+        projectRoot: path.resolve(staged.shell.paths.root),
+        request: u12AliasPrepareRequest,
+      });
+      expect(u12AliasPrepareHash).not.toBe(u12PreparedByCommand.intent.operationId);
+
+      const crashBeforePrepareKey = "p30-video-u12-prepare-crash-before-key-0001";
+      const previousCrashBefore = process.env.AI_CANVAS_TEST_COMMAND_CRASH_BEFORE_COMMIT_EVENT;
+      process.env.AI_CANVAS_TEST_COMMAND_CRASH_BEFORE_COMMIT_EVENT = "prepare_studio_video_package_export";
+      try {
+        await expect(executeIdempotentCommand(staged.shell.paths.root, {
+          requestId: "p30-video-u12-prepare-crash-before-request-0001",
+          idempotencyKey: crashBeforePrepareKey,
+          request: u12AliasPrepareRequest,
+        })).rejects.toThrow(/执行结果未确认/u);
+      } finally {
+        if (previousCrashBefore === undefined) delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_BEFORE_COMMIT_EVENT;
+        else process.env.AI_CANVAS_TEST_COMMAND_CRASH_BEFORE_COMMIT_EVENT = previousCrashBefore;
+      }
+      const crashBeforeRecovered = await executeIdempotentCommand(staged.shell.paths.root, {
+        requestId: "p30-video-u12-prepare-crash-before-recover-request-0002",
+        idempotencyKey: crashBeforePrepareKey,
+        request: u12AliasPrepareRequest,
+      });
+      expect(crashBeforeRecovered).toMatchObject({ status: "succeeded", replayed: true });
+      expect(crashBeforeRecovered.result).toMatchObject({ replayed: true, reconciled: true });
+      expect((crashBeforeRecovered.result as typeof u12PreparedByCommand).intent).toEqual(u12PreparedByCommand.intent);
+
+      const crashAfterPrepareKey = "p30-video-u12-prepare-crash-after-key-0001";
+      const previousPrepareCrashAfter = process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE;
+      process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE = "prepare_studio_video_package_export";
+      try {
+        await expect(executeIdempotentCommand(staged.shell.paths.root, {
+          requestId: "p30-video-u12-prepare-crash-after-request-0001",
+          idempotencyKey: crashAfterPrepareKey,
+          request: u12AliasPrepareRequest,
+        })).rejects.toThrow(/执行结果未确认/u);
+      } finally {
+        if (previousPrepareCrashAfter === undefined) delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE;
+        else process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE = previousPrepareCrashAfter;
+      }
+      const crashAfterRecovered = await executeIdempotentCommand(staged.shell.paths.root, {
+        requestId: "p30-video-u12-prepare-crash-after-recover-request-0002",
+        idempotencyKey: crashAfterPrepareKey,
+        request: u12AliasPrepareRequest,
+      });
+      expect(crashAfterRecovered).toMatchObject({ status: "succeeded", replayed: true });
+      expect(crashAfterRecovered.result).toMatchObject({ replayed: true, reconciled: true });
+      expect((crashAfterRecovered.result as typeof u12PreparedByCommand).intent).toEqual(u12PreparedByCommand.intent);
+
+      const prepareIntentDb = new DatabaseSync(staged.shell.paths.generationDatabase, { readOnly: true });
+      try {
+        expect(Number((prepareIntentDb.prepare(
+          "SELECT COUNT(*) AS count FROM studio_video_package_export_intents WHERE intent_id = ?",
+        ).get(u12PreparedByCommand.intent.intentId) as { count: number }).count)).toBe(1);
+      } finally {
+        prepareIntentDb.close();
+      }
+      const prepareRecoveryLedger = (await listCommandLedger(staged.shell.paths.root))
+        .filter((entry) => entry.idempotencyKey === crashBeforePrepareKey
+          || entry.idempotencyKey === crashAfterPrepareKey);
+      expect(prepareRecoveryLedger).toHaveLength(2);
+      for (const entry of prepareRecoveryLedger) {
+        expect(entry).toMatchObject({
+          status: "succeeded",
+          result: {
+            kind: "studio-operation-result-locator",
+            operation: "video-package-prepare",
+            operationId: u12AliasPrepareHash,
+          },
+        });
+        expect(JSON.stringify(entry)).not.toMatch(/productionRoot|builderRelativePath|sourceSpecRelativePath|outputRootRelativePath|packageRelativePath/u);
+      }
+      const prepareRecoveryEvents = (await Promise.all([
+        findEventsByIdempotencyKey(staged.shell.paths.root, crashBeforePrepareKey),
+        findEventsByIdempotencyKey(staged.shell.paths.root, crashAfterPrepareKey),
+      ])).flat();
+      expect(prepareRecoveryEvents.length).toBeGreaterThan(0);
+      expect(JSON.stringify(prepareRecoveryEvents)).not.toContain(u12PreparedByCommand.intent.productionRoot);
+      expect(JSON.stringify(prepareRecoveryEvents)).not.toMatch(/builderRelativePath|sourceSpecRelativePath|outputRootRelativePath|packageRelativePath/u);
+
+      // 兼容 locator 上线前的 succeeded full ledger：其 nested intent.operationId
+      // 是旧 creator，读取与 same-key replay 必须用本条账本 requestHash 重新投影。
+      const legacyFullLedgerDb = new DatabaseSync(path.join(staged.shell.paths.sidecar, "command-ledger.sqlite"));
+      try {
+        const row = legacyFullLedgerDb.prepare(
+          "SELECT payload_json FROM command_ledger_entries WHERE idempotency_key = ?",
+        ).get(crashBeforePrepareKey) as { payload_json: string };
+        const legacyFull = JSON.parse(row.payload_json) as { result: unknown };
+        legacyFull.result = u12PreparedByCommand;
+        legacyFullLedgerDb.prepare(
+          "UPDATE command_ledger_entries SET payload_json = ? WHERE idempotency_key = ?",
+        ).run(JSON.stringify(legacyFull), crashBeforePrepareKey);
+      } finally {
+        legacyFullLedgerDb.close();
+      }
+      const legacyFullReplay = await executeIdempotentCommand(staged.shell.paths.root, {
+        requestId: "p30-video-u12-prepare-legacy-full-replay-request-0003",
+        idempotencyKey: crashBeforePrepareKey,
+        request: u12AliasPrepareRequest,
+      });
+      expect(legacyFullReplay).toMatchObject({
+        status: "succeeded",
+        replayed: true,
+        result: {
+          replayed: true,
+          reconciled: true,
+          intent: { intentId: u12PreparedByCommand.intent.intentId },
+        },
+      });
+
+      const commandLedgerDb = new DatabaseSync(path.join(staged.shell.paths.sidecar, "command-ledger.sqlite"));
+      try {
+        const row = commandLedgerDb.prepare(
+          "SELECT payload_json FROM command_ledger_entries WHERE idempotency_key = ?",
+        ).get(crashAfterPrepareKey) as { payload_json: string };
+        const tampered = JSON.parse(row.payload_json) as { result: Record<string, unknown> };
+        tampered.result.storageAnchor = "9".repeat(64);
+        commandLedgerDb.prepare(
+          "UPDATE command_ledger_entries SET payload_json = ? WHERE idempotency_key = ?",
+        ).run(JSON.stringify(tampered), crashAfterPrepareKey);
+      } finally {
+        commandLedgerDb.close();
+      }
+      await expect(executeIdempotentCommand(staged.shell.paths.root, {
+        requestId: "p30-video-u12-prepare-tamper-replay-request-0003",
+        idempotencyKey: crashAfterPrepareKey,
+        request: u12AliasPrepareRequest,
+      })).rejects.toThrow(/摘要|冲突|locator|回执/u);
       await expect(executeIdempotentCommand(staged.shell.paths.root, {
         requestId: "p30-video-u12-prepare-stale-request-0002",
         idempotencyKey: "p30-video-u12-prepare-stale-key-0002",
@@ -647,10 +981,113 @@ describe.sequential("P30 Studio 视频包 owner", () => {
         result: { replayed: true, reconciled: true, receipt: { storageKind: "managed-evidence" } },
       });
       expect(u12Recovered.result).not.toHaveProperty("adoptedExisting");
+      const persistedBuild = (await listCommandLedger(staged.shell.paths.root))
+        .find((entry) => entry.idempotencyKey === "p30-video-u12-build-key-0001");
+      expect(persistedBuild?.result).toMatchObject({
+        kind: "studio-operation-result-locator",
+        operation: "video-package-build",
+        storageKind: "managed-evidence",
+      });
+      expect(JSON.stringify(persistedBuild)).not.toMatch(/storageRelativePath|manifestRelativePath|packageRelativePath/u);
       await expect(readStudioVideoPackageExportIntentByOperationId(
         staged.shell.paths.root,
         stableDigest({ projectRoot: path.resolve(staged.shell.paths.root), request: u12BuildRequest }),
       )).resolves.toMatchObject({ intentId: u12PreparedByCommand.intent.intentId });
+
+      // 正常 succeeded 同键重放与并发 waiter 都只从 canonical locator 走严格
+      // 纯读 Owner hydration；不得再次 build/adopt，也不得把完整 receipt 落回账本。
+      const builderCountAfterU12Build = await builderInvocationCount(counterPath);
+      const u12TerminalReplay = await executeIdempotentCommand(staged.shell.paths.root, {
+        requestId: "p30-video-u12-build-terminal-replay-request-0003",
+        idempotencyKey: "p30-video-u12-build-key-0001",
+        request: u12BuildRequest,
+      });
+      expect(u12TerminalReplay).toMatchObject({
+        status: "succeeded",
+        replayed: true,
+        result: {
+          replayed: true,
+          reconciled: true,
+          receipt: { receiptId: (u12Recovered.result as { receipt: { receiptId: string } }).receipt.receiptId },
+        },
+      });
+      expect(await builderInvocationCount(counterPath)).toBe(builderCountAfterU12Build);
+
+      const u12PostBuildIntentControl = await getStudioVideoPackageControl(staged.shell.paths.root, {
+        by: "intent",
+        intentId: u12PreparedByCommand.intent.intentId,
+      });
+      const u12PostBuildAuthorityControl = await getStudioVideoPackageControl(staged.shell.paths.root, {
+        by: "authority-latest",
+        authority: u12Authority,
+      });
+      const concurrentBuildRequest = {
+        ...u12BuildRequest,
+        payload: {
+          ...u12BuildRequest.payload,
+          expectedIntentControlFingerprint: u12PostBuildIntentControl.fingerprint,
+          expectedAuthorityControlFingerprint: u12PostBuildAuthorityControl.fingerprint,
+        },
+      };
+      const concurrentBuildKey = "p30-video-u12-build-concurrent-key-0002";
+      const [concurrentBuildA, concurrentBuildB] = await Promise.all([
+        executeIdempotentCommand(staged.shell.paths.root, {
+          requestId: "p30-video-u12-build-concurrent-request-0004-a",
+          idempotencyKey: concurrentBuildKey,
+          request: concurrentBuildRequest,
+        }),
+        executeIdempotentCommand(staged.shell.paths.root, {
+          requestId: "p30-video-u12-build-concurrent-request-0004-b",
+          idempotencyKey: concurrentBuildKey,
+          request: concurrentBuildRequest,
+        }),
+      ]);
+      expect([concurrentBuildA.replayed, concurrentBuildB.replayed].sort()).toEqual([false, true]);
+      for (const outcome of [concurrentBuildA, concurrentBuildB]) {
+        expect(outcome).toMatchObject({
+          status: "succeeded",
+          result: {
+            receipt: { receiptId: (u12Recovered.result as { receipt: { receiptId: string } }).receipt.receiptId },
+          },
+        });
+      }
+      expect(await builderInvocationCount(counterPath)).toBe(builderCountAfterU12Build);
+      const concurrentPersistedBuild = (await listCommandLedger(staged.shell.paths.root))
+        .find((entry) => entry.idempotencyKey === concurrentBuildKey);
+      expect(concurrentPersistedBuild?.result).toMatchObject({
+        kind: "studio-operation-result-locator",
+        operation: "video-package-build",
+        receiptId: (u12Recovered.result as { receipt: { receiptId: string } }).receipt.receiptId,
+      });
+      expect(JSON.stringify(concurrentPersistedBuild))
+        .not.toMatch(/storageRelativePath|manifestRelativePath|packageRelativePath|productionRoot/u);
+      const u12ReceiptDb = new DatabaseSync(staged.shell.paths.generationDatabase, { readOnly: true });
+      try {
+        expect(Number((u12ReceiptDb.prepare(
+          "SELECT COUNT(*) AS count FROM studio_video_package_verify_receipts WHERE intent_id = ?",
+        ).get(u12PreparedByCommand.intent.intentId) as { count: number }).count)).toBe(1);
+      } finally {
+        u12ReceiptDb.close();
+      }
+
+      const tamperedBuildDb = new DatabaseSync(path.join(staged.shell.paths.sidecar, "command-ledger.sqlite"));
+      try {
+        const row = tamperedBuildDb.prepare(
+          "SELECT payload_json FROM command_ledger_entries WHERE idempotency_key = ?",
+        ).get(concurrentBuildKey) as { payload_json: string };
+        const tampered = JSON.parse(row.payload_json) as { result: Record<string, unknown> };
+        tampered.result.receiptFingerprint = "8".repeat(64);
+        tamperedBuildDb.prepare(
+          "UPDATE command_ledger_entries SET payload_json = ? WHERE idempotency_key = ?",
+        ).run(JSON.stringify(tampered), concurrentBuildKey);
+      } finally {
+        tamperedBuildDb.close();
+      }
+      await expect(executeIdempotentCommand(staged.shell.paths.root, {
+        requestId: "p30-video-u12-build-concurrent-tamper-request-0005",
+        idempotencyKey: concurrentBuildKey,
+        request: concurrentBuildRequest,
+      })).rejects.toThrow(/摘要|冲突|locator|回执/u);
 
       // authority-latest 明确 conflict 时，即使调用方提交了匹配的 control fingerprint，
       // command-bus 也必须在追加 alias/intent 前失败关闭，不能猜一个候选继续。

@@ -386,19 +386,31 @@ async function exercisePlayback(page: Page): Promise<CycleEvidence["playback"]> 
     .replace(/\s+/gu, " ")
     .trim();
   assert(availability.includes("视频 可用") && availability.includes("音频 可用"), availability);
-  const video = await playForProbe(page, "multimedia-video-player");
-  assert(video.advanced && video.errorCode === null && video.sourceProtocol === "aicanvas-studio:");
   const select = page.locator('[data-testid="multimedia-playback-select"]');
-  const audioOption = await select.locator("option").evaluateAll((options) => {
-    const values = options.map((candidate) => ({
+  const options = await select.locator("option").evaluateAll((candidates) =>
+    candidates.map((candidate) => ({
       value: (candidate as HTMLOptionElement).value,
       label: candidate.textContent?.trim() ?? "",
-    }));
-    return values.find((candidate) => candidate.label.includes("对白"))
-      ?? values.find((candidate) => /audio|音频/iu.test(candidate.label))
+    })));
+  assert.equal(await select.inputValue(), "", "媒体播放器不得默认选择首条正式媒体");
+  assert.equal(await page.locator(
+    '[data-testid="multimedia-video-player"], [data-testid="multimedia-audio-player"]',
+  ).count(), 0, "媒体播放器不得在用户选择前挂载原媒体");
+  assert.match(
+    (await page.locator('[data-testid="multimedia-playback-empty"]').innerText()).trim(),
+    /未选择时不会加载原媒体/u,
+  );
+  const videoOption = options.find((candidate) => /视频/iu.test(candidate.label)) ?? null;
+  const audioOption = (() => {
+    return options.find((candidate) => candidate.label.includes("对白"))
+      ?? options.find((candidate) => /audio|音频/iu.test(candidate.label))
       ?? null;
-  });
+  })();
+  assert(videoOption, "媒体播放器缺少视频选项");
   assert(audioOption, "媒体播放器缺少音频选项");
+  await select.selectOption(videoOption.value);
+  const video = await playForProbe(page, "multimedia-video-player");
+  assert(video.advanced && video.errorCode === null && video.sourceProtocol === "aicanvas-studio:");
   await select.selectOption(audioOption.value);
   const audio = await playForProbe(page, "multimedia-audio-player");
   assert(audio.advanced && audio.errorCode === null && audio.sourceProtocol === "aicanvas-studio:");

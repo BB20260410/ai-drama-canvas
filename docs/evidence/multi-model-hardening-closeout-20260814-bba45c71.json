@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "kind": "multi-agent-hardening-local-closeout-and-external-review-status",
+  "createdAt": "2026-08-14T23:35:00+08:00",
+  "identity": {
+    "sourceDigest": "bba45c715c035b7c24e09796ec01e9208a7a5ffb77541f001f4b8f8f032c50ef",
+    "buildId": "90941534f2a5d3eb617fadd5386f2c0b",
+    "mcpToolCount": 220,
+    "sourceFiles": 1062,
+    "sourceBytes": 21414566
+  },
+  "localDelivery": {
+    "status": "PASS",
+    "typecheck": "PASS",
+    "typecheckApp": "PASS",
+    "partitionAudit": "PASS",
+    "fast": "PASS",
+    "medium": "PASS",
+    "integration": "PASS",
+    "heavy": "PASS",
+    "productionAuditVulnerabilities": 0,
+    "build": "PASS",
+    "mcpSmoke": "PASS",
+    "p5Formal": "PASS",
+    "p17": "PASS",
+    "t23StrictInteractions": "PASS",
+    "isolatedElectron": "PASS",
+    "isolatedPackage": "PASS"
+  },
+  "reviewPack": {
+    "path": "docs/evidence/multi-model-review-pack-20260814-bba45c71.json",
+    "relativePathsOnly": true,
+    "credentials": 0,
+    "formalProjectBodies": 0,
+    "casBlobs": 0
+  },
+  "externalReview": {
+    "status": "BLOCKED",
+    "kimi": {
+      "requestedModel": "kimi-code/k3",
+      "cliVersion": "0.35.0",
+      "verdict": "PASS",
+      "findings": [],
+      "notVerified": true,
+      "identity": "IDENTITY_NOT_VERIFIED",
+      "reason": "Kimi only cross-checked evidence and could not independently rerun gates; CLI output supplied no trusted provider identity receipt."
+    },
+    "glm": {
+      "requestedModel": "glm-5.2",
+      "verdict": "BLOCKED",
+      "attempts": 2,
+      "identity": "IDENTITY_NOT_VERIFIED",
+      "failureClass": "LOCAL_ADAPTER_RUNTIME_ERROR",
+      "failure": "Python 3.14 urllib rejects the adapter timeout tuple before any provider response: TypeError tuple object cannot be interpreted as an integer or float.",
+      "modelBodyReceived": false
+    },
+    "doubao": {
+      "requestedModel": "doubao-seed-evolving",
+      "verdict": "BLOCKED",
+      "attempts": 1,
+      "identity": "IDENTITY_NOT_VERIFIED",
+      "failureClass": "LOCAL_ADAPTER_RUNTIME_ERROR",
+      "failure": "Same Python 3.14 urllib timeout-tuple failure before any provider response.",
+      "modelBodyReceived": false
+    }
+  },
+  "authorizationBoundary": {
+    "formalProjectWritten": false,
+    "installed": false,
+    "published": false,
+    "uploaded": false,
+    "paidGeneration": false,
+    "gitStageCommitPush": false,
+    "deletedEvidence": false
+  },
+  "finalStatus": "PARTIALLY_COMPLETED_EXTERNAL_REVIEW_BLOCKED",
+  "nextAction": "Repair or replace the local GLM/Doubao review adapter under an explicitly authorized external-tool slice, then submit the unchanged review pack once per blocked seat. Do not rerun green product gates unless source changes."
+}

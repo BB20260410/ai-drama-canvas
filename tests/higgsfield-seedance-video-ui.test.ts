@@ -22,6 +22,21 @@ describe("Higgsfield Seedance 视频 UI", () => {
     expect(source).toContain("control?.availability === 'ready'");
   });
 
+  it("加入队列在 busy 时 fail-closed：handler 在 emit 前拦截，同 tick 连点不会重复排队", async () => {
+    const source = await readFile(path.join(root, "src/renderer/src/components/HiggsfieldSeedanceVideoStep.vue"), "utf8");
+    expect(source).toContain(':disabled="!canQueue || busy"');
+    expect(source).toContain("正在处理，不能再加入 Higgsfield 视频队列");
+    const start = source.indexOf("function queueVideo()");
+    const end = source.indexOf("</script>", start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const handler = source.slice(start, end);
+    expect(handler).toContain("if (props.busy || !props.control || !canQueue.value) return;");
+    expect(handler.indexOf("if (props.busy || !props.control || !canQueue.value) return;")).toBeLessThan(
+      handler.indexOf('emit("queueVideo"'),
+    );
+  });
+
   it("MCP 只暴露控制面；写入口仍是 execute_command，且不包含 credits fallback", async () => {
     const source = await readFile(path.join(root, "src/mcp/server.ts"), "utf8");
     expect(source).toContain('"get_studio_video_generation_control"');

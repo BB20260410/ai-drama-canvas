@@ -19,6 +19,7 @@ import {
 import {
   __setStudioPostResultObservationFinalReviewHookForTests,
   getStudioPostResultObservationControl,
+  readStudioPostResultObservationOperationRecordReadOnly,
   readStudioPostResultObservation,
   readStudioPostResultObservationOutcomeByOperationId,
   submitStudioPostResultObservation,
@@ -806,7 +807,21 @@ describe("PASS 审片结果实际末态观察收据", () => {
       SET revision=2,observation_id=?,observation_fingerprint=?,updated_at=?
       WHERE generation_run_id=? AND revision=1
     `).run(observationId, fingerprint, now, prepared.generationRunId);
+    const legacyOperationId = "a".repeat(64);
+    db.prepare(`
+      INSERT INTO studio_post_result_observation_operation_receipts(
+        operation_id,input_fingerprint,observation_id,outcome_fingerprint,created_at
+      ) VALUES(?,?,?,?,?)
+    `).run(legacyOperationId, "b".repeat(64), observationId, fingerprint, now);
     db.close();
+
+    await expect(readStudioPostResultObservationOperationRecordReadOnly(
+      fixture!.root,
+      legacyOperationId,
+    )).rejects.toMatchObject({
+      code: "storage-invalid",
+      details: [expect.stringMatching(/legacy v1 输入无法/u)],
+    });
 
     const legacy = await readStudioPostResultObservation(fixture!.root, observationId);
     expect(legacy).toMatchObject({
@@ -896,7 +911,21 @@ describe("PASS 审片结果实际末态观察收据", () => {
       SET revision=2,observation_id=?,observation_fingerprint=?,updated_at=?
       WHERE generation_run_id=? AND revision=1
     `).run(observationId, fingerprint, now, prepared.generationRunId);
+    const legacyOperationId = "c".repeat(64);
+    db.prepare(`
+      INSERT INTO studio_post_result_observation_operation_receipts(
+        operation_id,input_fingerprint,observation_id,outcome_fingerprint,created_at
+      ) VALUES(?,?,?,?,?)
+    `).run(legacyOperationId, "d".repeat(64), observationId, fingerprint, now);
     db.close();
+
+    await expect(readStudioPostResultObservationOperationRecordReadOnly(
+      fixture!.root,
+      legacyOperationId,
+    )).rejects.toMatchObject({
+      code: "storage-invalid",
+      details: [expect.stringMatching(/legacy v2 输入无法/u)],
+    });
 
     const legacy = await readStudioPostResultObservation(fixture!.root, observationId);
     expect(legacy).toMatchObject({

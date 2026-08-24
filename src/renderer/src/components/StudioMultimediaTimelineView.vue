@@ -2,7 +2,7 @@
   <section
     class="multimedia-timeline"
     data-testid="studio-multimedia-timeline-view"
-    :aria-busy="unitsLoading || timelineLoading">
+    :aria-busy="unitsLoading || timelineLoading || bindBusy">
     <header class="timeline-header">
       <div>
         <span class="eyebrow">四媒体时间线</span>
@@ -13,9 +13,10 @@
         type="button"
         class="refresh-button"
         data-testid="multimedia-refresh"
-        :disabled="unitsLoading || timelineLoading || !projectRoot"
+        :disabled="unitsLoading || timelineLoading || bindBusy || !projectRoot"
+        :title="bindBusy ? bindBusyTitle : undefined"
         @click="refresh">
-        {{ unitsLoading || timelineLoading ? "读取中" : "刷新" }}
+        {{ bindBusy ? (bindStage === "import" ? "导入中" : bindStage === "attach" ? "绑定中" : "处理中") : unitsLoading || timelineLoading ? "读取中" : "刷新" }}
       </button>
     </header>
 
@@ -47,11 +48,12 @@
           autocomplete="off"
           placeholder="单元 ID 或标题" />
       </label>
-      <button type="submit" :disabled="unitsLoading || !projectRoot">应用范围</button>
+      <button type="submit" :disabled="unitsLoading || bindBusy || !projectRoot" :title="bindBusy ? bindBusyTitle : undefined">应用范围</button>
       <button
         type="button"
         class="quiet-button"
-        :disabled="unitsLoading || (!draftSeason && !draftEpisode && !unitFilter)"
+        :disabled="unitsLoading || bindBusy || (!draftSeason && !draftEpisode && !unitFilter)"
+        :title="bindBusy ? bindBusyTitle : undefined"
         @click="clearScope">
         清除
       </button>
@@ -90,6 +92,8 @@
               type="button"
               :class="{ active: unit.id === selectedUnitId }"
               :data-unit-id="unit.id"
+              :disabled="bindBusy"
+              :title="bindBusy ? bindBusyTitle : undefined"
               @click="selectUnit(unit.id)">
               <span>{{ unit.season }} / {{ unit.episode }} · U{{ pad(unit.sequence, 3) }}</span>
               <strong>{{ unit.title }}</strong>
@@ -105,10 +109,10 @@
         </ul>
 
         <footer class="pager" data-testid="multimedia-unit-pager">
-          <button type="button" :disabled="!cursorHistory.length || unitsLoading" @click="previousPage">
+          <button type="button" :disabled="!cursorHistory.length || unitsLoading || bindBusy" :title="bindBusy ? bindBusyTitle : undefined" @click="previousPage">
             上一页
           </button>
-          <button type="button" :disabled="!unitPage?.nextCursor || unitsLoading" @click="nextPage">
+          <button type="button" :disabled="!unitPage?.nextCursor || unitsLoading || bindBusy" :title="bindBusy ? bindBusyTitle : undefined" @click="nextPage">
             下一页
           </button>
         </footer>
@@ -182,6 +186,7 @@
               <label v-if="playableEntries.length">
                 <span>播放素材</span>
                 <select v-model="selectedPlaybackId" data-testid="multimedia-playback-select">
+                  <option value="" disabled>请选择正式媒体</option>
                   <option v-for="entry in playableEntries" :key="entry.id" :value="entry.id">
                     {{ entry.label }} · {{ formatRange(entry.startSeconds, entry.endSeconds) }}
                   </option>
@@ -199,15 +204,20 @@
             </video>
             <audio
               v-else-if="selectedPlaybackEntry?.media.mimeType.startsWith('audio/')"
+              ref="timelineAudioEl"
               :key="selectedPlaybackEntry.id"
+              :class="{ 'audio-blocked': bindBusy }"
               :src="studioMediaUrl(selectedPlaybackEntry.media.sha256)"
               controls
               preload="metadata"
-              data-testid="multimedia-audio-player">
+              data-testid="multimedia-audio-player"
+              @play="onTimelineAudioPlay">
               当前桌面运行时不支持该音频格式。
             </audio>
             <p v-else class="playback-empty" data-testid="multimedia-playback-empty">
-              当前单元没有正式绑定的视频或音频；不会用候选媒体代替。
+              {{ playableEntries.length
+                ? "请选择一条正式视频或音频后播放；未选择时不会加载原媒体。"
+                : "当前单元没有正式绑定的视频或音频；不会用候选媒体代替。" }}
             </p>
           </section>
 
@@ -356,7 +366,7 @@
                   当前投影没有 panel；未伪造剧本片段。
                 </div>
                 <details class="script-source" data-testid="multimedia-script-source">
-                  <summary>查看本单元剧本原文与来源</summary>
+                  <summary data-testid="multimedia-script-source-summary">查看本单元剧本原文与来源</summary>
                   <p>{{ timeline.script.body }}</p>
                   <small>
                     {{ timeline.script.source }} · {{ timeline.script.sourceVersion }}
@@ -463,7 +473,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineComponent, h, onMounted, ref, watch, type PropType } from "vue";
+import { computed, defineComponent, h, onBeforeUnmount, onMounted, ref, watch, type PropType } from "vue";
+import { claimCanvasAudioPlayback, releaseCanvasAudioPlayback } from "../canvas-audio-mutex";
 import type {
   StudioMultimediaMediaProjection,
   StudioMultimediaTimelineProjection,
@@ -473,6 +484,10 @@ import type {
   StudioProductionUnitListQuery,
   StudioProductionUnitPage,
 } from "@core/studio-production";
+import {
+  findSelectedStudioMultimediaPlaybackEntry,
+  retainStudioMultimediaPlaybackSelection,
+} from "../studio-multimedia-playback-selection";
 
 const PAGE_LIMIT = 36;
 
@@ -575,6 +590,13 @@ const apiCanBind = computed(() =>
   typeof props.api.pickAndImportMedia === "function"
   && typeof props.api.attachMedia === "function");
 
+const bindBusyTitle = computed(() => {
+  if (!bindBusy.value) return "";
+  if (bindStage.value === "import") return "正在导入媒体，不能换单元、刷新或改范围";
+  if (bindStage.value === "attach") return "正在绑定媒体，不能换单元、刷新或改范围";
+  return "正在处理媒体，不能换单元、刷新或改范围";
+});
+
 const bindFormValid = computed(() => Boolean(
   timeline.value
   && importedMedia.value
@@ -659,14 +681,29 @@ const playableEntries = computed<MediaEntry[]>(() => [
 ]);
 
 const selectedPlaybackEntry = computed(() =>
-  playableEntries.value.find((entry) => entry.id === selectedPlaybackId.value)
-  ?? playableEntries.value[0]
-  ?? null);
+  findSelectedStudioMultimediaPlaybackEntry(
+    playableEntries.value,
+    selectedPlaybackId.value,
+  ));
+
+const timelineAudioEl = ref<HTMLAudioElement | null>(null);
+function onTimelineAudioPlay(): void {
+  if (bindBusy.value) {
+    timelineAudioEl.value?.pause();
+    return;
+  }
+  claimCanvasAudioPlayback(timelineAudioEl.value);
+}
+onBeforeUnmount(() => {
+  timelineAudioEl.value?.pause();
+  releaseCanvasAudioPlayback(timelineAudioEl.value);
+});
 
 watch(playableEntries, (entries) => {
-  if (!entries.some((entry) => entry.id === selectedPlaybackId.value)) {
-    selectedPlaybackId.value = entries[0]?.id ?? "";
-  }
+  selectedPlaybackId.value = retainStudioMultimediaPlaybackSelection(
+    entries,
+    selectedPlaybackId.value,
+  );
 }, { immediate: true });
 
 const timelineTicks = computed(() => {
@@ -757,10 +794,12 @@ watch(() => props.api, () => {
 onMounted(() => void loadUnits(props.initialUnitId));
 
 async function refresh() {
+  if (bindBusy.value) return;
   await loadUnits(selectedUnitId.value);
 }
 
 async function applyScope() {
+  if (bindBusy.value) return;
   appliedSeason.value = draftSeason.value;
   appliedEpisode.value = draftEpisode.value;
   selectedUnitId.value = "";
@@ -770,6 +809,7 @@ async function applyScope() {
 }
 
 async function clearScope() {
+  if (bindBusy.value) return;
   draftSeason.value = "";
   draftEpisode.value = "";
   unitFilter.value = "";
@@ -898,6 +938,7 @@ function resetBindDraft() {
 }
 
 async function selectUnit(unitId: string, force = false) {
+  if (bindBusy.value && !force) return;
   if (!force && selectedUnitId.value === unitId && timeline.value) return;
   if (selectedUnitId.value !== unitId) resetBindDraft();
   selectedUnitId.value = unitId;
@@ -923,7 +964,7 @@ async function selectUnit(unitId: string, force = false) {
 
 async function nextPage() {
   const nextCursor = unitPage.value?.nextCursor;
-  if (!nextCursor || unitsLoading.value) return;
+  if (!nextCursor || unitsLoading.value || bindBusy.value) return;
   cursorHistory.value.push(currentCursor.value);
   currentCursor.value = nextCursor;
   selectedUnitId.value = "";
@@ -932,7 +973,7 @@ async function nextPage() {
 }
 
 async function previousPage() {
-  if (!cursorHistory.value.length || unitsLoading.value) return;
+  if (!cursorHistory.value.length || unitsLoading.value || bindBusy.value) return;
   currentCursor.value = cursorHistory.value.pop();
   selectedUnitId.value = "";
   timeline.value = null;
@@ -1168,6 +1209,8 @@ button:disabled { opacity: .42; cursor: not-allowed; }
   text-align: left;
   cursor: pointer;
   transition: background-color 120ms ease, border-color 120ms ease;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 56px;
 }
 .unit-list li > button:hover { background: var(--ui-surface-2); }
 .unit-list li > button.active { border-left-color: var(--ui-accent); background: var(--ui-accent-soft); color: var(--ui-text); }
@@ -1248,6 +1291,7 @@ button:disabled { opacity: .42; cursor: not-allowed; }
 }
 .playback-deck video { width: min(100%, 720px); max-height: 360px; background: #000; }
 .playback-deck audio { width: min(100%, 720px); }
+.playback-deck audio.audio-blocked { pointer-events: none; }
 .playback-empty { margin: 0; color: var(--ui-text-3); font-size: 9px; }
 .media-bind-deck {
   min-width: 740px;
@@ -1354,6 +1398,8 @@ button:disabled { opacity: .42; cursor: not-allowed; }
   min-height: 82px;
   border-bottom: 1px solid color-mix(in srgb, var(--ui-line) 72%, transparent);
   animation: entry-in 150ms ease both;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 82px;
 }
 .track-entry:last-of-type { border-bottom: 0; }
 .segment-field {

@@ -22,5 +22,26 @@ describe("Binding 工作台候选确认（Jellyfish）", () => {
     expect(vue).toContain("'select'");
     expect(vue).toContain("'accept'");
   });
+
+  it("绑定诊断 summary 含共享 testid，不改空镜说明/确认/冻结钮", () => {
+    const vue = source("src/renderer/src/components/StudioBindingWorkbench.vue");
+    expect(vue).toContain('class="inspector-section empty-review-section"');
+    expect(vue).toContain('class="inspector-section freeze-section"');
+    expect(vue.match(/data-testid="studio-binding-diagnostics"/g)?.length).toBe(2);
+    expect(vue).toContain('<details v-if="selectedPanel.emptyConfirmation" class="binding-diagnostics"><summary data-testid="studio-binding-diagnostics">诊断详情</summary>');
+    expect(vue).toContain('<details v-if="selectedPanel.bindingSet" class="binding-diagnostics"><summary data-testid="studio-binding-diagnostics">诊断详情</summary>');
+    expect(vue).toContain("{{ selectedPanel.emptyConfirmation.id }}");
+    expect(vue).toContain("{{ selectedPanel.bindingSet.id }}");
+    expect(vue).toContain("{{ selectedPanel.bindingSet.fingerprint }}");
+    expect(vue).toContain('data-testid="binding-empty-note"');
+    expect(vue).toContain('data-testid="binding-confirm-empty"');
+    expect(vue).toContain('data-testid="binding-freeze"');
+    expect(vue).toContain('data-testid="binding-empty-confirmation-status"');
+    expect(vue).toContain('data-testid="binding-set-status"');
+    expect(vue).not.toContain("studio-binding-diagnostics-");
+    expect(vue).not.toContain('binding-diagnostics" role="dialog"');
+    expect(vue).not.toContain("studio-generation-plan-id-diagnostics");
+    expect(vue).not.toContain("studio-continuity-empty-diagnostics");
+  });
 });
 

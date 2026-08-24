@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "kind": "multi-model-frozen-review-summary",
+  "reviewer": "glm",
+  "createdAt": "2026-08-14T10:56:57+08:00",
+  "boundSourceDigest": "22bb68378a587777df1acab4b3bb36ed1cae74fa079b6caaa26c95275360ee3f",
+  "packRelativePath": "docs/evidence/multi-model-review-pack-20260814-22bb6837.json",
+  "inputSha256": "91deab7f41073e15334e05ebc21c9599888e52500d92553d736d2ae4dc906d6f",
+  "requestedModel": "glm-5.2",
+  "returnedModel": "glm-5-2-260617",
+  "probeSelfReportedModel": "glm-4",
+  "identityNote": "adapter/API model field is glm-5-2-260617 (historical valid identity); probe body self-reported glm-4 and was not used to switch models",
+  "timeoutDegrade": "Python 3.14 urllib rejects (connect,read) tuple; used adapter default timeout-sec=0. Same model, not a model switch.",
+  "exitCode": 0,
+  "finishReason": "stop",
+  "notVerified": true,
+  "verdict": "PASS",
+  "findings": [
+    {
+      "id": "switchManagedWorkspace-guard-set-narrower-than-button-disabled",
+      "severity": "P2",
+      "summary": "switchManagedWorkspace 入口守卫仅拦 managedWorkspaceSwitching || projectSwitching || projectRemovingRoot，而按钮 :disabled=projectOperationBusy 还含 creatingManagedProject 与 externalManagedProjectBusy；若存在非按钮路径（快捷键/菜单/IPC）在 creatingManagedProject 期间触发切换，会绕过按钮 busy gate。externalManagedProjectBusy 另有全屏 shield 可兜底，但 creatingManagedProject 是否有同等屏蔽无证据。",
+      "evidencePaths": [
+        "src/renderer/src/App.vue",
+        "tests/novel-workspace-routing.test.ts"
+      ]
+    },
+    {
+      "id": "videoeditor-save-success-path-not-resume-preview",
+      "severity": "P2",
+      "summary": "VideoEditor save 合同仅规定保存失败且仍持有 preview lease 时 resumePreviewWork，未覆盖保存成功后 preview lease 的释放/resume 路径；若成功路径不 resume，编辑器可能在保存后永久处于预览暂停态。无成功路径源码证据。",
+      "evidencePaths": [
+        "src/renderer/src/components/VideoEditorView.vue",
+        "tests/video-editor-dirty-guard.test.ts"
+      ]
+    },
+    {
+      "id": "boot-hash-catch-undefined-semantic-collapse",
+      "severity": "P2",
+      "summary": "whenReady 中 await sourceRuntimeBootIdentity.catch(() => undefined) 将 hash 失败折叠为 undefined，调用方无法区分仍在 pending 与已失败；合同依赖 then 链不 noteBootHashCompleted 来保持 gate 关闭，但若上游 promise 既不 resolve 也不 reject（chokidar 启动后无变更事件），whenReady 将永久阻塞 createWindow。无 sourceRuntimeBootIdentity 完成条件源码证据。",
+      "evidencePaths": [
+        "src/main/index.ts",
+        "tests/runtime-write-gate.test.ts"
+      ]
+    }
+  ],
+  "blocked": false
+}

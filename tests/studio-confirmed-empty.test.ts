@@ -6,6 +6,7 @@ import { DatabaseSync } from "node:sqlite";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   executeIdempotentCommand,
+  listCommandLedger,
   type StudioCommandRequest,
 } from "../src/core/command-bus.js";
 import { getCapabilities } from "../src/core/codex.js";
@@ -210,6 +211,10 @@ describe("P6 confirmed-empty vertical slice", () => {
     await expect(executeIdempotentCommand(target.root, envelope(101, confirmRequest)))
       .rejects.toThrow(/执行结果未确认/u);
     delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE;
+    const crashed = (await listCommandLedger(target.root))
+      .find((entry) => entry.idempotencyKey === envelope(101, confirmRequest).idempotencyKey);
+    expect(crashed?.durableReconciliation).toBeUndefined();
+    expect(JSON.stringify(crashed)).not.toContain(confirmRequest.payload.note);
     const reconciled = await executeIdempotentCommand(target.root, {
       ...envelope(101, confirmRequest),
       requestId: "confirmed-empty-request-0101-recovery",
@@ -219,6 +224,15 @@ describe("P6 confirmed-empty vertical slice", () => {
       replayed: true,
       result: { reconciled: true, confirmationRevision: 1 },
     });
+    const persistedReconciled = (await listCommandLedger(target.root))
+      .find((entry) => entry.idempotencyKey === envelope(101, confirmRequest).idempotencyKey);
+    expect(persistedReconciled?.result).toMatchObject({
+      schemaVersion: 1,
+      kind: "studio-operation-result-locator",
+      operation: "confirm-panel-empty",
+      confirmationRevision: 1,
+    });
+    expect(JSON.stringify(persistedReconciled)).not.toContain(confirmRequest.payload.note);
     const replayed = await executeIdempotentCommand(target.root, {
       ...envelope(101, confirmRequest),
       requestId: "confirmed-empty-request-0101-replay",

@@ -29,9 +29,14 @@ import {
   upsertCommandLedgerEntry,
   type CommandLedgerEntry,
 } from "./command-ledger-store.js";
+import {
+  commandTerminalJsonDigest,
+  parseCommandTerminalReceiptData,
+  projectConfirmedCommandFailureForReceipt,
+} from "./command-terminal-receipt.js";
 import { saveAgentSkill } from "./skills.js";
 import { connectStoryEvents, importStoryFile, importStoryText, upsertStoryEvent } from "./story.js";
-import { analyzeNovelChapters, exportAdaptation, generateAdaptationPlans, materializeSelectedAdaptationPlan, regenerateAdaptationScope, selectAdaptationPlan, upsertNarrativeBeat, upsertNovelFact } from "./adaptation.js";
+import { analyzeNovelChapters, exportAdaptation, generateAdaptationPlans, loadAdaptationStore, materializeSelectedAdaptationPlan, regenerateAdaptationScope, selectAdaptationPlan, upsertNarrativeBeat, upsertNovelFact } from "./adaptation.js";
 import { createShotTaskPack, saveUnitTimeline } from "./timeline.js";
 import type { AssetRelationKind, BrowserGenerationUpdateStatus, BrowserPreflightInput, BrowserSubmissionReconciliationInput, BrowserUploadInput, CreativeBibleKind, ProductionWorkflowStageId, ProductionWorkflowStageStatus, ReconcileHttpGenerationSubmissionInput, ShotTiming, SubagentImageGenerationUpdateStatus, SubmitReviewInput, WorkItemStatus } from "./types.js";
 import { withProjectLock } from "./locks.js";
@@ -93,7 +98,7 @@ import {
 import { enrichPublicationIntentWithDiagnostics } from "./studio-publication-preflight-diagnostics.js";
 import { createNovelAnalysisTask, reviewNovelAnalysisBatch, reviewNovelAnalysisItem, submitNovelAnalysisProposal } from "./novel-analysis.js";
 import { executeNextNovelAnalysisRunTask, executeNovelAnalysisTask, isNovelAnalysisExecutionSafetyError, markNovelAnalysisExecutionReconciliationRequired, novelAnalysisExecutionSafeMessage, planNovelAnalysisRun, reconcileNovelAnalysisExecution, replaceNovelAnalysisRunTask, upsertNovelAnalysisProvider } from "./novel-analysis-provider.js";
-import { isConfirmedCommandFailure, isRejectedCommandFailure, RejectedCommandFailure } from "./command-outcome.js";
+import { ConfirmedCommandFailure, isConfirmedCommandFailure, isRejectedCommandFailure, RejectedCommandFailure } from "./command-outcome.js";
 import {
   RetrySafeSqliteBusyError,
   isRetrySafeSqliteBusyError,
@@ -140,15 +145,19 @@ import {
   proveStudioBindingOperationOutcome,
 } from "./studio-binding-control.js";
 import {
-  getStudioGenerationPlanProjection,
   listStudioGenerationPlanProjections,
-  readStudioImagegenCallContextRebindByRun,
-  readStudioImagegenCallEventHistory,
-  readStudioImagegenCallIntentByRun,
-  readStudioDetachedGenerationUnknownDisposition,
-  readStudioGenerationPlanNodeEventHistory,
-  readStudioGenerationRunEventHistory,
-  sameStudioGenerationUnknownOwnerAbandonDetail,
+  readStudioImagegenCallContextRebindByEventIdReadOnly,
+  readStudioImagegenCallContextRebindHistoryByRunReadOnly,
+  readStudioImagegenCallEventByIdentityReadOnly,
+  readStudioImagegenCallIntentByRunReadOnly,
+  readStudioImagegenCallReconciliationOutcomeReadOnly,
+  readStudioDetachedGenerationUnknownDispositionByIdentityReadOnly,
+  readStudioGenerationRetryOperationOutcomeReadOnly,
+  readStudioGenerationPlanRecordBySourceCommandRequestIdReadOnly,
+  readStudioGenerationPlanRecordReadOnly,
+  readStudioGenerationRunCommandOutcomeReadOnly,
+  readStudioGenerationRunEventByIdReadOnly,
+  readStudioGenerationRunPairedTerminalOutcomeReadOnly,
   studioImagegenContextTokenHash,
   type AbandonStudioGenerationUnknownInput,
   type AbandonStudioDetachedGenerationUnknownInput,
@@ -158,25 +167,26 @@ import {
   type ReconcileStudioImagegenCallInput,
 } from "./studio-generation-ledger.js";
 import {
-  readStudioContinuityOperationReceipt,
+  readStudioContinuityOperationReceiptReadOnly,
   type AppendStudioContinuityCorrectionInput,
   type AppendStudioContinuityObservationInput,
 } from "./studio-continuity-ledger.js";
 import {
-  readStudioGenerationReviewOperationOutcome,
+  readStudioGenerationReviewOperationRecordReadOnly,
   type SubmitStudioGenerationReviewInput,
 } from "./studio-generation-review.js";
 import {
-  proveStudioPostResultObservationOutcome,
+  readStudioPostResultObservationOperationRecordReadOnly,
   type SubmitStudioPostResultObservationInput,
 } from "./studio-post-result-observation.js";
 import {
-  readStudioGenerationCheckpointOperationReceipt,
+  readStudioGenerationCheckpointOperationRecordReadOnly,
   type AttestStudioGenerationCheckpointInput,
   type RefreshStudioGenerationCheckpointInput,
 } from "./studio-generation-checkpoint.js";
 import {
   proveAgentImagegenResultBundleOutcome,
+  proveAgentImagegenResultBundleOutcomeByLocator,
 } from "./studio-agent-imagegen-result-bundle.js";
 import {
   ActiveManagedStudioContextError,
@@ -185,7 +195,10 @@ import {
 import {
   DuduReadonlyControlConflictError,
   discoverDuduReadonlyImportProjects,
+  getDuduReadonlyImportControl,
   proveDuduReadonlyFinalizationOutcome,
+  readDuduReadonlyFinalizationOutcomeByOperationId,
+  readDuduReadonlyStageOutcomeByOperationId,
   proveDuduReadonlyStageCommandOutcome,
   resolveDuduReadonlyImportCommandRoot,
   stageDuduReadonlyManagedProject,
@@ -195,6 +208,7 @@ import {
 import type { DuduReadonlySourceInput } from "./dudu-readonly-source.js";
 import {
   getStudioVideoPackageControl,
+  readStudioVideoPackageBuildReceiptByOperationIdReadOnly,
   readStudioVideoPackageExportIntentByOperationId,
   type StudioVideoPackageAuthorityInput,
   type StudioVideoPackageExpectedManagedSource,
@@ -213,7 +227,7 @@ import {
 } from "./studio-multimedia-timeline.js";
 import {
   materializeLocalCreativeProductionUnits,
-  readLocalCreativeProductionUnitMaterializationOutcome,
+  readLocalCreativeProductionUnitMaterializationOutcomeReadOnly,
   type LocalCreativeProductionUnitMaterializationReceipt,
   type MaterializeLocalCreativeProductionUnitsInput,
 } from "./local-creative-production-unit-materializer.js";
@@ -517,6 +531,17 @@ interface NovelImportResultAnchor {
   canonicalReceiptSha256: string;
 }
 
+interface NovelImportResultLocator {
+  schemaVersion: 1;
+  kind: "novel-import-result-locator";
+  receiptId: string;
+  projectId: string;
+  receiptFingerprint: string;
+  stateChainFingerprint: string;
+  chapterManifestSha256: string;
+  canonicalReceiptSha256: string;
+}
+
 type DurableReconciliationCommandRequest = Extract<CommandRequest,
   { command:
       | "novel_import_external_snapshot"
@@ -563,7 +588,7 @@ interface DurableCommandReconciliationSnapshot {
 }
 
 interface DurableCommandProof {
-  source: "novel_import_receipts" | "novel_writing_source_snapshot_receipts" | "novel_writing_state_operation_receipts" | "dudu_readonly_import_receipts" | "local_creative_production_unit_receipts" | "studio_video_package_ledger" | "studio_multimedia_timeline_bindings" | "fusion-storyboard-sheet-store" | "fusion-storyboard-sheet-migration-candidate-fingerprint" | "canonical-asset-store" | "studio_script_section_revisions" | "studio_binding_operation_receipts" | "studio_continuity_operation_receipts" | "studio_generation_review_operation_receipts" | "studio_post_result_observation_operation_receipts" | "studio_generation_checkpoint_operation_receipts" | "studio_agent_imagegen_writeback_receipts" | "studio_generation_plan_run_ledger" | "studio_generation_call_ledger" | "studio_generation_detached_disposition_ledger";
+  source: "novel_import_receipts" | "novel_writing_source_snapshot_receipts" | "novel_writing_state_operation_receipts" | "dudu_readonly_import_receipts" | "local_creative_production_unit_receipts" | "studio_video_package_ledger" | "studio_multimedia_timeline_bindings" | "fusion-storyboard-sheet-store" | "fusion-storyboard-sheet-migration-candidate-fingerprint" | "canonical-asset-store" | "studio_script_section_revisions" | "studio_binding_operation_receipts" | "studio_continuity_operation_receipts" | "studio_generation_review_operation_receipts" | "studio_post_result_observation_operation_receipts" | "studio_generation_checkpoint_operation_receipts" | "studio_agent_imagegen_writeback_receipts" | "studio_generation_plan_run_ledger" | "studio_generation_retry_operation_receipts" | "studio_generation_call_ledger" | "studio_generation_detached_disposition_ledger";
   identity: Record<string, unknown>;
   result: unknown;
 }
@@ -631,9 +656,39 @@ async function readCommandLedger(projectRoot: string): Promise<CommandLedger> {
  * 可重放命令账本。旧账本若曾写入 true，所有读取面也在投影时强制降权。
  */
 function revokePersistedImagegenCallCapability(record: IdempotentCommandResult): IdempotentCommandResult {
+  const withoutSensitiveStudioSnapshot = isStudioOperationLocatorCommand(record.command)
+    && (record.execution?.phase === "side_effect_committed" || record.status === "succeeded")
+    ? { ...record, durableReconciliation: undefined }
+    : record;
+  if (isStudioOperationLocatorCommand(record.command)
+    && record.status === "succeeded"
+    && record.result !== undefined) {
+    return {
+      ...withoutSensitiveStudioSnapshot,
+      // 兼容 locator 引入前已落盘的 full Studio 结果。alias intent 的
+      // nested operationId 可能属于旧 creator，唯一正确绑定是账本 requestHash。
+      result: projectStudioOperationResultForPersistence(record.command, record.result, record.requestHash),
+    };
+  }
+  if (record.command === "commit_agent_imagegen_result_bundle"
+    && record.result && typeof record.result === "object" && !Array.isArray(record.result)
+    && ((record.result as Record<string, unknown>).kind === "studio-agent-imagegen-result-bundle-outcome"
+      || isCommandReceiptProjection(record.result, "studio-agent-imagegen-result-bundle-locator"))) {
+    const { durableReconciliation: _sensitiveSnapshot, ...safeRecord } = record;
+    return {
+      ...safeRecord,
+      result: agentImagegenResultBundleLocatorFromResult(record.result),
+    };
+  }
+  if (record.command === "materialize_local_creative_production_units" && record.result !== undefined) {
+    return {
+      ...record,
+      result: localCreativeMaterializationResultLocatorFromResult(record.result),
+    };
+  }
   if (!(["prepare_studio_imagegen_call", "prepare_studio_higgsfield_video_generation", "claim_studio_higgsfield_connector_request", "authorize_studio_higgsfield_connector_request"] as const).includes(record.command as never)
     || !record.result || typeof record.result !== "object" || Array.isArray(record.result)) {
-    return { ...record };
+    return { ...withoutSensitiveStudioSnapshot };
   }
   if (record.command === "prepare_studio_higgsfield_video_generation") {
     return {
@@ -645,7 +700,7 @@ function revokePersistedImagegenCallCapability(record: IdempotentCommandResult):
     return { ...record, result: projectHiggsfieldConnectorQueueResultForPersistence(record.command, record.result) };
   }
   return {
-    ...record,
+    ...withoutSensitiveStudioSnapshot,
     result: {
       ...(record.result as Record<string, unknown>),
       callAllowed: false,
@@ -736,6 +791,572 @@ function stable(value: unknown): string {
   return JSON.stringify(value);
 }
 
+const COMMAND_TERMINAL_RECEIPT_RESULT_MAX_BYTES = 8 * 1024;
+
+type CommandReceiptProjectionKind =
+  | "novel-analysis-task-result-locator"
+  | "novel-import-result-locator"
+  | "local-creative-production-unit-materialization-result-locator"
+  | "studio-agent-imagegen-result-bundle-locator"
+  | "studio-operation-result-locator"
+  | "studio-multimedia-timeline-binding-result-locator"
+  | "studio-script-section-result-locator"
+  | "http-generation-reconciliation-result-locator"
+  | "command-terminal-result-unavailable-locator";
+
+function isCommandReceiptProjection(
+  value: unknown,
+  kind: CommandReceiptProjectionKind,
+): value is Record<string, unknown> {
+  return Boolean(value
+    && typeof value === "object"
+    && !Array.isArray(value)
+    && (value as Record<string, unknown>).schemaVersion === 1
+    && (value as Record<string, unknown>).kind === kind);
+}
+
+function terminalReceiptResult(value: unknown, includeProjectedResult = false): {
+  resultDigest: string;
+  result?: unknown;
+} {
+  const serialized = JSON.stringify(value);
+  if (serialized === undefined) {
+    return { resultDigest: commandTerminalJsonDigest(value) };
+  }
+  const persisted = JSON.parse(serialized) as unknown;
+  // Command ledger/receipt 都是 JSON owner。摘要必须基于真正能落盘的
+  // JSON 投影，否则业务结果里的 undefined 字段会在 ledger 持久化时
+  // 消失，导致同一结果在 same-key replay 被误判为摘要冲突。
+  const resultDigest = commandTerminalJsonDigest(persisted);
+  if (!includeProjectedResult) return { resultDigest };
+  return {
+    resultDigest,
+    ...(Buffer.byteLength(serialized, "utf8") <= COMMAND_TERMINAL_RECEIPT_RESULT_MAX_BYTES
+      ? { result: persisted }
+      : {}),
+  };
+}
+
+function commandTerminalReceiptResult(
+  command: CommandRequest["command"],
+  value: unknown,
+  operationId?: string,
+): ReturnType<typeof terminalReceiptResult> {
+  if (isCommandReceiptProjection(value, "command-terminal-result-unavailable-locator")) {
+    const source = value as Record<string, unknown>;
+    if (source.command !== command
+      || typeof source.resultDigest !== "string"
+      || !/^[a-f0-9]{64}$/u.test(source.resultDigest)) {
+      // 跨 command 或损坏的 unavailable locator 不得作为摘要通行证。
+      return terminalReceiptResult(value);
+    }
+    return { resultDigest: source.resultDigest, result: value };
+  }
+  const isOwnPersistedProjection =
+    (command === "create_novel_analysis_task"
+      && isCommandReceiptProjection(value, "novel-analysis-task-result-locator"))
+    || (command === "novel_import_external_snapshot"
+      && isCommandReceiptProjection(value, "novel-import-result-locator"))
+    || (command === "attach_studio_multimedia_timeline_media"
+      && isCommandReceiptProjection(value, "studio-multimedia-timeline-binding-result-locator"))
+    || (command === "append_studio_script_section_revision"
+      && isCommandReceiptProjection(value, "studio-script-section-result-locator"))
+    || (command === "reconcile_http_generation_submission"
+      && isCommandReceiptProjection(value, "http-generation-reconciliation-result-locator"));
+  if (isOwnPersistedProjection) {
+    return terminalReceiptResult(value, true);
+  }
+  if (command === "create_novel_analysis_task"
+    && value && typeof value === "object" && !Array.isArray(value)) {
+    const source = value as Record<string, unknown>;
+    const workspace = source.workspace;
+    const task = source.task;
+    if (workspace && typeof workspace === "object" && !Array.isArray(workspace)
+      && task && typeof task === "object" && !Array.isArray(task)
+      && Number.isInteger((workspace as Record<string, unknown>).revision)
+      && typeof (task as Record<string, unknown>).id === "string") {
+      return terminalReceiptResult({
+        schemaVersion: 1,
+        kind: "novel-analysis-task-result-locator",
+        taskId: (task as Record<string, unknown>).id,
+        workspaceRevision: (workspace as Record<string, unknown>).revision,
+      }, true);
+    }
+  }
+  if (command === "novel_import_external_snapshot") {
+    return terminalReceiptResult(novelImportResultLocatorFromResult(value), true);
+  }
+  if (command === "materialize_local_creative_production_units") {
+    return terminalReceiptResult(localCreativeMaterializationResultLocatorFromResult(value), true);
+  }
+  if (command === "commit_agent_imagegen_result_bundle") {
+    return terminalReceiptResult(agentImagegenResultBundleLocatorFromResult(value), true);
+  }
+  if (isStudioOperationLocatorCommand(command)) {
+    return terminalReceiptResult(projectStudioOperationResultForPersistence(command, value, operationId), true);
+  }
+  if (command === "confirm_studio_panel_empty") {
+    return terminalReceiptResult(studioConfirmEmptyLocatorFromResult(value), true);
+  }
+  if (command === "append_studio_continuity_observation"
+    || command === "append_studio_continuity_correction") {
+    return terminalReceiptResult(studioContinuityLocatorFromResult(command, value), true);
+  }
+  if (command === "submit_studio_generation_review") {
+    return terminalReceiptResult(studioGenerationReviewLocatorFromResult(value), true);
+  }
+  if (command === "attach_studio_multimedia_timeline_media"
+    && value && typeof value === "object" && !Array.isArray(value)) {
+    const binding = (value as Record<string, unknown>).binding;
+    if (binding && typeof binding === "object" && !Array.isArray(binding)) {
+      const source = binding as Record<string, unknown>;
+      if (typeof source.recordId === "string"
+        && typeof source.operationId === "string"
+        && typeof source.unitId === "string"
+        && typeof source.unitFingerprint === "string"
+        && typeof source.slotId === "string"
+        && typeof source.mediaSha256 === "string"
+        && typeof source.fingerprint === "string"
+        && Number.isInteger(source.unitRevision)
+        && Number.isInteger(source.revision)) {
+        return terminalReceiptResult({
+          schemaVersion: 1,
+          kind: "studio-multimedia-timeline-binding-result-locator",
+          recordId: source.recordId,
+          operationId: source.operationId,
+          unitId: source.unitId,
+          unitRevision: source.unitRevision,
+          unitFingerprint: source.unitFingerprint,
+          slotId: source.slotId,
+          revision: source.revision,
+          ...(Number.isInteger(source.panelIndex) ? { panelIndex: source.panelIndex } : {}),
+          ...(typeof source.panelId === "string" && source.panelId ? { panelId: source.panelId } : {}),
+          role: source.role,
+          mediaSha256: source.mediaSha256,
+          bindingFingerprint: source.fingerprint,
+        }, true);
+      }
+    }
+  }
+  if (command === "append_studio_script_section_revision"
+    && value && typeof value === "object" && !Array.isArray(value)) {
+    const source = value as Record<string, unknown>;
+    if (typeof source.id === "string"
+      && typeof source.sectionId === "string"
+      && typeof source.scriptRevisionId === "string"
+      && typeof source.scriptSha256 === "string"
+      && typeof source.surfaceSha256 === "string"
+      && typeof source.fingerprint === "string"
+      && Number.isInteger(source.revision)
+      && Number.isInteger(source.startOffsetUtf16)
+      && Number.isInteger(source.endOffsetUtf16)) {
+      return terminalReceiptResult({
+        schemaVersion: 1,
+        kind: "studio-script-section-result-locator",
+        revisionId: source.id,
+        sectionId: source.sectionId,
+        revision: source.revision,
+        sectionKind: source.kind,
+        scriptRevisionId: source.scriptRevisionId,
+        scriptSha256: source.scriptSha256,
+        startOffsetUtf16: source.startOffsetUtf16,
+        endOffsetUtf16: source.endOffsetUtf16,
+        surfaceSha256: source.surfaceSha256,
+        fingerprint: source.fingerprint,
+      }, true);
+    }
+  }
+  if (command !== "reconcile_http_generation_submission"
+    || !value || typeof value !== "object" || Array.isArray(value)) {
+    return terminalReceiptResult(value);
+  }
+  const source = value as Record<string, unknown>;
+  const projected: Record<string, unknown> = {
+    schemaVersion: 1,
+    kind: "http-generation-reconciliation-result-locator",
+    applied: source.applied === true,
+  };
+  if (typeof source.jobId === "string" && source.jobId) projected.jobId = source.jobId;
+  if (typeof source.status === "string" && source.status) projected.status = source.status;
+  return terminalReceiptResult(projected, true);
+}
+
+async function hydrateReceiptReconciledCommandResult(
+  projectRoot: string,
+  request: CommandRequest,
+  record: IdempotentCommandResult,
+): Promise<IdempotentCommandResult> {
+  if (record.status !== "succeeded") return record;
+  if (request.command === "materialize_local_creative_production_units") {
+    const outcome = await readLocalCreativeProductionUnitMaterializationOutcomeReadOnly(projectRoot, {
+      ...request.payload,
+      idempotencyKey: record.requestHash,
+    });
+    const replayedOutcome = outcome
+      ? { ...outcome, replayed: true, reconciled: true }
+      : null;
+    if (!replayedOutcome
+      || stable(localCreativeMaterializationResultLocatorFromResult(replayedOutcome))
+        !== stable(localCreativeMaterializationResultLocatorFromResult(record.result))) {
+      throw new Error("本机剧情生产单元物化 locator 与只读 Owner 回执不一致；拒绝返回错误结果。");
+    }
+    return { ...record, result: replayedOutcome };
+  }
+  if (request.command === "commit_agent_imagegen_result_bundle") {
+    const locator = agentImagegenResultBundleLocatorFromResult(record.result);
+    const outcome = await proveAgentImagegenResultBundleOutcome(projectRoot, request.payload);
+    if (!outcome
+      || !agentImagegenResultBundleLocatorMatchesOutcome(locator, outcome, true)) {
+      throw new Error("Agent 生图结果包终态 locator 与只读 Owner 回执不一致；拒绝返回错误结果。");
+    }
+    return { ...record, result: { ...outcome, reconciled: true } };
+  }
+  if (request.command === "analyze_studio_script_entities"
+    || request.command === "resolve_studio_entity_proposal"
+    || request.command === "freeze_studio_asset_binding_set") {
+    const proof = await proveStudioBindingOperationOutcome(projectRoot, record.requestHash, request.command);
+    if (!proof) throw new Error(`Studio ${request.command} 终态 locator 缺少严格只读 Owner proof。`);
+    const owner = proof.outcome;
+    const base = {
+      receiptId: proof.receipt.id,
+      receiptFingerprint: proof.receipt.outcomeFingerprint,
+      unitId: owner.unitId,
+      panelId: owner.panelId,
+      reconciled: true,
+    };
+    const outcome = request.command === "analyze_studio_script_entities"
+      ? {
+        ...base,
+        analysisId: owner.analysisId,
+        analysisRevision: owner.analysisRevision,
+        analysisFingerprint: owner.analysisFingerprint,
+        message: "已从追加式 Studio binding 操作收据对账解析结果。",
+      }
+      : request.command === "resolve_studio_entity_proposal"
+        ? {
+          ...base,
+          proposalId: owner.proposalId,
+          decisionId: owner.decisionId,
+          decisionRevision: owner.decisionRevision,
+          decisionFingerprint: owner.decisionFingerprint,
+          message: "已从追加式 Studio binding 操作收据对账人工决策。",
+        }
+        : {
+          ...base,
+          bindingSetId: owner.bindingSetId,
+          bindingSetRevision: owner.bindingSetRevision,
+          bindingSetFingerprint: owner.bindingSetFingerprint,
+          message: "已从追加式 Studio binding 操作收据对账冻结结果。",
+        };
+    const persisted = studioBindingOperationLocatorFromResult(request.command, record.result, record.requestHash);
+    if (stable(studioBindingOperationLocatorFromResult(request.command, outcome, record.requestHash))
+      !== stable(persisted)) {
+      throw new Error(`Studio ${request.command} locator 与严格只读 Owner proof 不一致。`);
+    }
+    return { ...record, result: outcome };
+  }
+  if (request.command === "confirm_studio_panel_empty") {
+    const proof = await proveStudioBindingOperationOutcome(
+      projectRoot,
+      record.requestHash,
+      request.command,
+    );
+    if (!proof) throw new Error("confirmed-empty 终态 locator 缺少只读 Owner 回执；拒绝返回不完整结果。");
+    const outcome = {
+      receiptId: proof.receipt.id,
+      receiptFingerprint: proof.receipt.outcomeFingerprint,
+      ...proof.outcome,
+      reconciled: true,
+      message: "已从追加式 Studio binding 操作收据对账 confirmed-empty 裁决。",
+    };
+    if (stable(studioConfirmEmptyLocatorFromResult(outcome, record.requestHash))
+      !== stable(studioConfirmEmptyLocatorFromResult(record.result))) {
+      throw new Error("confirmed-empty 终态 locator 与只读 Owner 回执不一致；拒绝返回错误结果。");
+    }
+    return { ...record, result: outcome };
+  }
+  if (request.command === "append_studio_continuity_observation"
+    || request.command === "append_studio_continuity_correction") {
+    const outcome = await readStudioContinuityOperationReceiptReadOnly(
+      projectRoot,
+      record.requestHash,
+    );
+    if (!outcome
+      || stable(studioContinuityLocatorFromResult(request.command, outcome))
+        !== stable(studioContinuityLocatorFromResult(request.command, record.result))) {
+      throw new Error("Studio continuity 终态 locator 与只读 Owner 回执不一致；拒绝返回错误结果。");
+    }
+    return { ...record, result: { ...outcome, reconciled: true } };
+  }
+  if (request.command === "submit_studio_generation_review") {
+    const outcome = await readStudioGenerationReviewOperationRecordReadOnly(
+      projectRoot,
+      record.requestHash,
+    );
+    if (!outcome
+      || stable(studioGenerationReviewLocatorFromResult(outcome, record.requestHash))
+        !== stable(studioGenerationReviewLocatorFromResult(record.result))) {
+      throw new Error("Studio generation review 终态 locator 与只读 Owner 回执不一致；拒绝返回错误结果。");
+    }
+    return { ...record, result: { ...outcome, reconciled: true } };
+  }
+  if (request.command === "submit_studio_post_result_observation") {
+    const outcome = await readStudioPostResultObservationOperationRecordReadOnly(projectRoot, record.requestHash);
+    if (!outcome
+      || stable(studioExtendedOperationLocatorFromResult(request.command, outcome, record.requestHash))
+        !== stable(studioExtendedOperationLocatorFromResult(request.command, record.result))) {
+      throw new Error("Studio post-result observation locator 与只读 Owner 回执不一致；拒绝返回错误结果。");
+    }
+    return { ...record, result: { ...outcome, reconciled: true } };
+  }
+  if (request.command === "create_studio_generation_plan") {
+    const locator = studioExtendedOperationLocatorFromResult(request.command, record.result);
+    const planId = requiredLocatorString(locator, "planId", "generation plan locator");
+    const outcome = await readStudioGenerationPlanRecordReadOnly(projectRoot, planId);
+    if (!outcome
+      || stable(studioExtendedOperationLocatorFromResult(request.command, outcome, record.requestHash)) !== stable(locator)) {
+      throw new Error("Studio generation plan locator 与只读 Owner 投影不一致；拒绝返回错误结果。");
+    }
+    return { ...record, result: { ...outcome, reconciled: true } };
+  }
+  if (request.command === "fail_studio_generation_run"
+    || request.command === "cancel_studio_generation_run") {
+    const locator = studioExtendedOperationLocatorFromResult(request.command, record.result);
+    const proof = request.command === "fail_studio_generation_run"
+      ? { event: await readStudioGenerationRunEventByIdReadOnly(projectRoot, {
+        generationRunId: requiredLocatorString(locator, "generationRunId", "generation run locator"),
+        eventId: requiredLocatorString(locator, "eventId", "generation run locator"),
+      }) }
+      : await readStudioGenerationRunPairedTerminalOutcomeReadOnly(projectRoot, {
+        command: "cancel",
+        generationRunId: requiredLocatorString(locator, "generationRunId", "generation run locator"),
+        eventId: requiredLocatorString(locator, "eventId", "generation run locator"),
+      });
+    const outcome = proof?.event ?? null;
+    if (!outcome
+      || stable(studioExtendedOperationLocatorFromResult(request.command, outcome, record.requestHash)) !== stable(locator)) {
+      throw new Error("Studio generation run locator 与只读 Owner 事件不一致；拒绝返回错误结果。");
+    }
+    return { ...record, result: { ...outcome, reconciled: true } };
+  }
+  if (request.command === "retry_studio_generation_plan_nodes") {
+    const locator = studioExtendedOperationLocatorFromResult(request.command, record.result);
+    const proof = await readStudioGenerationRetryOperationOutcomeReadOnly(
+      projectRoot,
+      record.requestHash,
+      "payload" in request ? request.payload : undefined,
+    );
+    const outcome = proof ? { ...proof.outcome, reconciled: true } : null;
+    if (!outcome) throw new Error("Studio generation retry locator 缺少原子只读 Owner 回执。");
+    if (stable(studioExtendedOperationLocatorFromResult(request.command, outcome, record.requestHash)) !== stable(locator)) {
+      throw new Error("Studio generation retry locator 与原子只读 Owner 回执不一致；拒绝返回错误结果。");
+    }
+    return { ...record, result: outcome };
+  }
+  if (request.command === "prepare_studio_imagegen_call") {
+    const locator = studioExtendedOperationLocatorFromResult(request.command, record.result);
+    const generationRunId = requiredLocatorString(locator, "generationRunId", "imagegen prepare locator");
+    const historicalStatus = requiredLocatorString(locator, "status", "imagegen prepare locator") as
+      "generation_unknown" | "not-invoked" | "result-committed" | "owner-abandoned";
+    const intent = await readStudioImagegenCallIntentByRunReadOnly(projectRoot, generationRunId, historicalStatus);
+    const outcome = intent ? { ...intent, callAllowed: false, idempotentReplay: true, reconciled: true } : null;
+    if (!outcome
+      || stable(studioExtendedOperationLocatorFromResult(request.command, outcome, record.requestHash)) !== stable(locator)) {
+      throw new Error("Studio imagegen prepare locator 与只读 Owner intent 不一致；拒绝返回错误结果。");
+    }
+    return { ...record, result: outcome };
+  }
+  if (request.command === "abandon_studio_generation_unknown") {
+    const locator = studioExtendedOperationLocatorFromResult(request.command, record.result);
+    const proof = await readStudioGenerationRunPairedTerminalOutcomeReadOnly(projectRoot, {
+      command: "abandon",
+      generationRunId: requiredLocatorString(locator, "generationRunId", "imagegen abandon locator"),
+      eventId: requiredLocatorString(locator, "eventId", "imagegen abandon locator"),
+      callId: requiredLocatorString(locator, "callId", "imagegen abandon locator"),
+    });
+    const outcome = proof?.intent
+      ? { ...proof.event, callId: proof.intent.callId, status: proof.intent.status, reconciled: true }
+      : null;
+    if (!outcome
+      || stable(studioExtendedOperationLocatorFromResult(request.command, outcome, record.requestHash)) !== stable(locator)) {
+      throw new Error("Studio imagegen abandon locator 与只读 Owner 事件不一致；拒绝返回错误结果。");
+    }
+    return { ...record, result: outcome };
+  }
+  if (request.command === "rebind_studio_imagegen_call_context") {
+    const locator = studioExtendedOperationLocatorFromResult(request.command, record.result);
+    const generationRunId = requiredLocatorString(locator, "generationRunId", "imagegen rebind locator");
+    const eventId = requiredLocatorString(locator, "eventId", "imagegen rebind locator");
+    const rebind = await readStudioImagegenCallContextRebindByEventIdReadOnly(projectRoot, generationRunId, eventId);
+    const outcome = rebind ? { ...rebind, idempotentReplay: true, reconciled: true } : null;
+    if (!outcome
+      || stable(studioExtendedOperationLocatorFromResult(request.command, outcome, record.requestHash)) !== stable(locator)) {
+      throw new Error("Studio imagegen rebind locator 与只读 Owner 事件不一致；拒绝返回错误结果。");
+    }
+    return { ...record, result: outcome };
+  }
+  if (request.command === "refresh_studio_generation_checkpoint"
+    || request.command === "attest_studio_generation_checkpoint") {
+    const locator = studioExtendedOperationLocatorFromResult(request.command, record.result, record.requestHash);
+    const receipt = await readStudioGenerationCheckpointOperationRecordReadOnly(projectRoot, {
+      operationId: record.requestHash,
+      ...request.payload,
+    } as RefreshStudioGenerationCheckpointInput | AttestStudioGenerationCheckpointInput, {
+      // locator.headRevision 只与 receipt 历史锚交叉校验；无 terminal 时由 receipt 提供锚。
+      historicalHeadRevision: requiredLocatorInteger(locator, "headRevision", "generation checkpoint locator"),
+    });
+    if (!receipt
+      || stable(studioExtendedOperationLocatorFromResult(request.command, receipt, record.requestHash)) !== stable(locator)) {
+      throw new Error("Studio generation checkpoint locator 与只读 Owner 回执不一致；拒绝返回错误结果。");
+    }
+    return { ...record, result: { ...receipt.outcome, reconciled: true } };
+  }
+  if (request.command === "reconcile_studio_imagegen_call") {
+    const locator = studioExtendedOperationLocatorFromResult(request.command, record.result, record.requestHash);
+    const event = await readStudioImagegenCallEventByIdentityReadOnly(projectRoot, {
+      eventId: requiredLocatorString(locator, "eventId", "imagegen reconcile locator"),
+      callId: requiredLocatorString(locator, "callId", "imagegen reconcile locator"),
+      generationRunId: requiredLocatorString(locator, "generationRunId", "imagegen reconcile locator"),
+    });
+    const outcome = event ? { ...event, reconciled: true } : null;
+    if (!outcome
+      || !studioOperationLocatorMatchesOwner(request.command, locator, outcome, record.requestHash)) {
+      throw new Error("imagegen reconcile locator 与严格只读 Owner event 不一致。");
+    }
+    return { ...record, result: outcome };
+  }
+  if (request.command === "abandon_studio_detached_generation_unknown") {
+    const locator = studioExtendedOperationLocatorFromResult(request.command, record.result, record.requestHash);
+    const disposition = await readStudioDetachedGenerationUnknownDispositionByIdentityReadOnly(projectRoot, {
+      observationId: requiredLocatorString(locator, "observationId", "detached generation abandon locator"),
+      dispositionId: requiredLocatorString(locator, "dispositionId", "detached generation abandon locator"),
+    });
+    const outcome = disposition ? { ...disposition, idempotentReplay: true, reconciled: true } : null;
+    if (!outcome
+      || !studioOperationLocatorMatchesOwner(request.command, locator, outcome, record.requestHash)) {
+      throw new Error("detached generation abandon locator 与严格只读 Owner disposition 不一致。");
+    }
+    return { ...record, result: outcome };
+  }
+  if (request.command === "prepare_studio_video_package_export") {
+    const locator = studioExtendedOperationLocatorFromResult(request.command, record.result, record.requestHash);
+    if (locator.operationId !== record.requestHash) {
+      throw new Error("video package prepare locator operationId 与命令 requestHash 不一致。");
+    }
+    const intent = await readStudioVideoPackageExportIntentByOperationId(projectRoot, record.requestHash);
+    const outcome = intent ? { intent, replayed: true, reconciled: true } : null;
+    if (!outcome
+      || !studioOperationLocatorMatchesOwner(request.command, locator, outcome, record.requestHash)) {
+      throw new Error("video package prepare locator 与只读 Owner intent 重投影不一致。");
+    }
+    return { ...record, result: outcome };
+  }
+  if (request.command === "stage_dudu_readonly_managed_project") {
+    const locator = studioExtendedOperationLocatorFromResult(request.command, record.result, record.requestHash);
+    if (locator.operationId !== record.requestHash) {
+      throw new Error("Dudu stage locator operationId 与命令 requestHash 不一致。");
+    }
+    const transactionRoot = path.resolve(projectRoot);
+    if (path.basename(transactionRoot) !== ".aicanvas-dudu-import-transactions") {
+      throw new Error("Dudu stage locator 仅允许从固定 bootstrap transaction root 恢复。");
+    }
+    const projectsRoot = path.dirname(transactionRoot);
+    const outcome = await readDuduReadonlyStageOutcomeByOperationId(projectsRoot, record.requestHash);
+    if (!outcome
+      || !studioOperationLocatorMatchesOwner(request.command, locator, outcome, record.requestHash)) {
+      throw new Error("Dudu stage locator 与只读 Owner receipt 重投影不一致；拒绝返回错误结果。");
+    }
+    return {
+      ...record,
+      result: {
+        ...outcome,
+        reconciled: true,
+      },
+    };
+  }
+  if (request.command === "finalize_dudu_readonly_managed_project") {
+    const locator = studioExtendedOperationLocatorFromResult(request.command, record.result);
+    const outcome = await readDuduReadonlyFinalizationOutcomeByOperationId(projectRoot, record.requestHash);
+    if (!outcome
+      || stable(studioExtendedOperationLocatorFromResult(request.command, outcome, record.requestHash)) !== stable(locator)) {
+      throw new Error("Dudu finalize locator 与只读 Owner control 不一致；拒绝返回错误结果。");
+    }
+    return {
+      ...record,
+      result: {
+        ...outcome,
+        reconciled: true,
+      },
+    };
+  }
+  if (request.command === "build_studio_video_package") {
+    const locator = studioExtendedOperationLocatorFromResult(request.command, record.result, record.requestHash);
+    if (locator.operationId !== record.requestHash) {
+      throw new Error("video package build locator operationId 与命令 requestHash 不一致。");
+    }
+    const proof = await readStudioVideoPackageBuildReceiptByOperationIdReadOnly(
+      projectRoot,
+      record.requestHash,
+    );
+    if (!proof || proof.intent.intentId !== requiredLocatorString(locator, "intentId", "video package build locator")) {
+      throw new Error("video package build locator 与 immutable Owner proof 不一致；拒绝返回错误结果。");
+    }
+    if (locator.storageKind !== "managed-evidence" || proof.receipt.storageKind !== "managed-evidence") {
+      throw new Error("video package build 恢复仅允许 managed-evidence owner。");
+    }
+    const outcome = {
+      intent: proof.intent,
+      receipt: proof.receipt,
+      replayed: true,
+      reconciled: true,
+    };
+    if (!studioOperationLocatorMatchesOwner(request.command, locator, outcome, record.requestHash)) {
+      throw new Error("video package build locator 与只读 Owner intent/receipt 重投影不一致。");
+    }
+    return {
+      ...record,
+      result: outcome,
+    };
+  }
+  if (request.command !== "create_novel_analysis_task") {
+    return record;
+  }
+  const locator = record.result;
+  if (!locator || typeof locator !== "object" || Array.isArray(locator)) {
+    throw new Error("小说分析任务终态回执缺少安全定位符；保持已对账账本并停止返回不完整结果。");
+  }
+  const source = locator as Record<string, unknown>;
+  if (source.schemaVersion !== 1
+    || source.kind !== "novel-analysis-task-result-locator"
+    || typeof source.taskId !== "string"
+    || !Number.isInteger(source.workspaceRevision)) {
+    throw new Error("小说分析任务终态回执定位符无效；保持已对账账本并停止返回不完整结果。");
+  }
+  const workspace = await loadAdaptationStore(projectRoot);
+  if (workspace.revision < Number(source.workspaceRevision)) {
+    throw new Error("小说分析工作区修订早于终态回执；拒绝从不完整状态重建结果。");
+  }
+  const task = workspace.analysisTasks.find((candidate) => candidate.id === source.taskId);
+  if (!task
+    || task.providerId !== (request.payload.providerId?.trim().slice(0, 120) || "codex")
+    || task.providerKind !== (request.payload.providerKind ?? "codex")) {
+    throw new Error("小说分析任务终态回执与当前 Owner 状态不一致；拒绝返回错误任务。");
+  }
+  const requestedChapterIds = [...new Set((request.payload.chapterIds ?? []).map((value) => value.trim()).filter(Boolean))].sort();
+  if (requestedChapterIds.length
+    && JSON.stringify(requestedChapterIds) !== JSON.stringify(task.chapterRefs.map((entry) => entry.chapterId).sort())) {
+    throw new Error("小说分析任务终态回执的章节绑定与当前 Owner 状态不一致；拒绝返回错误任务。");
+  }
+  return { ...record, result: { workspace, task } };
+}
+
+function shouldHydrateReceiptRecoveryResult(request: CommandRequest): boolean {
+  return request.command === "create_novel_analysis_task"
+    || request.command === "materialize_local_creative_production_units"
+    || request.command === "commit_agent_imagegen_result_bundle"
+    || isStudioOperationLocatorCommand(request.command);
+}
+
 function canonicalAssetSemanticSourceIdentity(snapshot: CanonicalAssetSourceSnapshot): unknown {
   return {
     algorithm: snapshot.algorithm,
@@ -759,6 +1380,12 @@ function commandRequestHash(projectRoot: string, request: CommandRequest): strin
     projectRoot: path.resolve(projectRoot),
     request: commandRequestForPersistence(request),
   })).digest("hex");
+}
+
+/** 仅供 Vitest 构造“业务 owner 已提交、命令 receipt 尚未写入”的精确崩溃窗。 */
+export function __commandRequestHashForTests(projectRoot: string, request: CommandRequest): string {
+  if (process.env.NODE_ENV !== "test") throw new Error("command request hash helper 仅允许测试环境。");
+  return commandRequestHash(projectRoot, request);
 }
 
 function isStudioBindingOperationCommand(command: CommandRequest["command"]): command is StudioBindingOperationCommand {
@@ -1234,6 +1861,70 @@ function durableReconciliationSnapshot(request: CommandRequest): DurableCommandR
     : undefined;
 }
 
+function localCreativeMaterializationResultLocatorFromResult(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("本机剧情生产单元物化结果缺少安全定位信息。");
+  }
+  const source = value as Record<string, unknown>;
+  const alreadyProjected = isCommandReceiptProjection(
+    value,
+    "local-creative-production-unit-materialization-result-locator",
+  );
+  const receiptFingerprint = alreadyProjected ? source.receiptFingerprint : source.fingerprint;
+  if (typeof receiptFingerprint !== "string" || !/^[a-f0-9]{64}$/u.test(receiptFingerprint)
+    || typeof source.previewFingerprint !== "string" || !source.previewFingerprint
+    || typeof source.sourceFingerprint !== "string" || !source.sourceFingerprint
+    || source.adapterId !== "dudu-world-prologue-v1"
+    || typeof source.scopeId !== "string" || !source.scopeId
+    || !Array.isArray(source.units) || source.units.length === 0) {
+    throw new Error("本机剧情生产单元物化结果的内容寻址锚点无效。");
+  }
+  const units = source.units.map((entry, index) => {
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+      throw new Error(`本机剧情生产单元物化结果 units[${index}] 无效。`);
+    }
+    const unit = entry as Record<string, unknown>;
+    if (typeof unit.candidateId !== "string" || !unit.candidateId
+      || typeof unit.candidateFingerprint !== "string" || !/^[a-f0-9]{64}$/u.test(unit.candidateFingerprint)
+      || typeof unit.unitId !== "string" || !unit.unitId
+      || typeof unit.unitFingerprint !== "string" || !/^[a-f0-9]{64}$/u.test(unit.unitFingerprint)
+      || !["created", "reused", "revised", "recovered"].includes(String(unit.disposition))
+      || (unit.unitRevision !== undefined && (!Number.isSafeInteger(unit.unitRevision) || Number(unit.unitRevision) < 1))) {
+      throw new Error(`本机剧情生产单元物化结果 units[${index}] 内容寻址锚点无效。`);
+    }
+    return {
+      candidateId: unit.candidateId,
+      candidateFingerprint: unit.candidateFingerprint,
+      unitId: unit.unitId,
+      ...(unit.unitRevision === undefined ? {} : { unitRevision: unit.unitRevision }),
+      unitFingerprint: unit.unitFingerprint,
+      disposition: unit.disposition,
+    };
+  });
+  const locator = {
+    schemaVersion: 1,
+    kind: "local-creative-production-unit-materialization-result-locator",
+    receiptFingerprint,
+    previewFingerprint: source.previewFingerprint,
+    sourceFingerprint: source.sourceFingerprint,
+    adapterId: source.adapterId,
+    scopeId: source.scopeId,
+    ...(source.sourceSnapshotAtCommit === "current" || source.sourceSnapshotAtCommit === "stale-after-verified-snapshot"
+      ? { sourceSnapshotAtCommit: source.sourceSnapshotAtCommit }
+      : {}),
+    assetBindingReadiness: source.assetBindingReadiness === "blocked-unresolved"
+      ? source.assetBindingReadiness
+      : "blocked-unresolved",
+    replayed: true,
+    reconciled: true,
+    units,
+  };
+  if (Buffer.byteLength(JSON.stringify(locator), "utf8") > COMMAND_TERMINAL_RECEIPT_RESULT_MAX_BYTES) {
+    throw new Error("本机剧情生产单元物化安全定位符超过终态回执上限。");
+  }
+  return locator;
+}
+
 function localCreativeMaterializationProof(
   operationId: string,
   outcome: LocalCreativeProductionUnitMaterializationReceipt,
@@ -1247,8 +1938,1210 @@ function localCreativeMaterializationProof(
       sourceFingerprint: outcome.sourceFingerprint,
       unitIds: outcome.units.map((unit) => unit.unitId),
     },
-    result: { ...outcome, replayed: true, reconciled: true },
+    result: localCreativeMaterializationResultLocatorFromResult(outcome),
   };
+}
+
+function agentImagegenResultBundleLocatorFromResult(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("Agent 生图结果包终态结果缺少安全定位信息。");
+  }
+  const source = value as Record<string, unknown>;
+  const alreadyProjected = isCommandReceiptProjection(value, "studio-agent-imagegen-result-bundle-locator");
+  const results = source.results;
+  const media = source.media;
+  if (!results || typeof results !== "object" || Array.isArray(results)
+    || !media || typeof media !== "object" || Array.isArray(media)) {
+    throw new Error("Agent 生图结果包终态结果缺少 results/media 定位锚点。");
+  }
+  const resultSource = results as Record<string, unknown>;
+  const mediaSource = media as Record<string, unknown>;
+  const rawResult = alreadyProjected ? undefined : resultSource.raw;
+  const labeledResult = alreadyProjected ? undefined : resultSource.labeled;
+  const rawMedia = alreadyProjected ? undefined : mediaSource.raw;
+  const labeledMedia = alreadyProjected ? undefined : mediaSource.labeled;
+  const rawResultId = alreadyProjected
+    ? resultSource.rawResultId
+    : rawResult && typeof rawResult === "object" && !Array.isArray(rawResult)
+      ? (rawResult as Record<string, unknown>).resultId
+      : undefined;
+  const labeledResultId = alreadyProjected
+    ? resultSource.labeledResultId
+    : labeledResult && typeof labeledResult === "object" && !Array.isArray(labeledResult)
+      ? (labeledResult as Record<string, unknown>).resultId
+      : undefined;
+  const resultBundleFingerprint = alreadyProjected
+    ? resultSource.bundleFingerprint
+    : resultSource.fingerprint;
+  const rawSha256 = alreadyProjected
+    ? mediaSource.rawSha256
+    : rawMedia && typeof rawMedia === "object" && !Array.isArray(rawMedia)
+      ? (rawMedia as Record<string, unknown>).sha256
+      : undefined;
+  const labeledSha256 = alreadyProjected
+    ? mediaSource.labeledSha256
+    : labeledMedia && typeof labeledMedia === "object" && !Array.isArray(labeledMedia)
+      ? (labeledMedia as Record<string, unknown>).sha256
+      : undefined;
+  const outcomeFingerprint = alreadyProjected ? source.outcomeFingerprint : source.fingerprint;
+  const writebackReceiptStorageKey = source.writebackReceiptStorageKey;
+  for (const [label, candidate] of Object.entries({
+    packFingerprint: source.packFingerprint,
+    executionReceiptFingerprint: source.executionReceiptFingerprint,
+    writebackReceiptFingerprint: source.writebackReceiptFingerprint,
+    rawSha256,
+    labeledSha256,
+    resultBundleFingerprint,
+    outcomeFingerprint,
+  })) {
+    if (typeof candidate !== "string" || !/^[a-f0-9]{64}$/u.test(candidate)) {
+      throw new Error(`Agent 生图结果包终态 locator 缺少 ${label} SHA-256。`);
+    }
+  }
+  for (const [label, candidate] of Object.entries({
+    projectId: source.projectId,
+    manifestFingerprint: source.manifestFingerprint,
+    generationRunId: source.generationRunId,
+    packId: source.packId,
+    rawResultId,
+    labeledResultId,
+  })) {
+    if (typeof candidate !== "string" || !candidate) {
+      throw new Error(`Agent 生图结果包终态 locator 缺少 ${label}。`);
+    }
+  }
+  if (source.provider !== "codex" && source.provider !== "grok") {
+    throw new Error("Agent 生图结果包终态 locator provider 无效。");
+  }
+  if (writebackReceiptStorageKey !== undefined
+    && (typeof writebackReceiptStorageKey !== "string" || !/^[a-f0-9]{64}$/u.test(writebackReceiptStorageKey))) {
+    throw new Error("Agent 生图结果包终态 locator writebackReceiptStorageKey 无效。");
+  }
+  const locator = {
+    schemaVersion: 1,
+    kind: "studio-agent-imagegen-result-bundle-locator",
+    outcomeSchemaVersion: alreadyProjected ? source.outcomeSchemaVersion : source.schemaVersion,
+    projectId: source.projectId,
+    manifestFingerprint: source.manifestFingerprint,
+    generationRunId: source.generationRunId,
+    packId: source.packId,
+    packFingerprint: source.packFingerprint,
+    provider: source.provider,
+    executionReceiptFingerprint: source.executionReceiptFingerprint,
+    writebackReceiptFingerprint: source.writebackReceiptFingerprint,
+    ...(writebackReceiptStorageKey === undefined ? {} : { writebackReceiptStorageKey }),
+    media: { rawSha256, labeledSha256 },
+    results: { rawResultId, labeledResultId, bundleFingerprint: resultBundleFingerprint },
+    outcomeFingerprint,
+    reconciled: true,
+  };
+  if ((locator.outcomeSchemaVersion !== 4 && locator.outcomeSchemaVersion !== 5)
+    || Buffer.byteLength(JSON.stringify(locator), "utf8") > COMMAND_TERMINAL_RECEIPT_RESULT_MAX_BYTES) {
+    throw new Error("Agent 生图结果包终态 locator 版本无效或超过大小上限。");
+  }
+  return locator;
+}
+
+function agentImagegenResultBundleLocatorMatchesOutcome(
+  locatorValue: unknown,
+  outcome: unknown,
+  allowLegacyWithoutStorageKey: boolean,
+): boolean {
+  const persisted = agentImagegenResultBundleLocatorFromResult(locatorValue);
+  const expected = agentImagegenResultBundleLocatorFromResult(outcome);
+  if (persisted.writebackReceiptStorageKey !== undefined) {
+    return stable(persisted) === stable(expected);
+  }
+  if (!allowLegacyWithoutStorageKey) return false;
+  if (!outcome || typeof outcome !== "object" || Array.isArray(outcome)) return false;
+  const legacyBody = Object.fromEntries(Object.entries(outcome as Record<string, unknown>)
+    .filter(([key]) => key !== "fingerprint" && key !== "writebackReceiptStorageKey" && key !== "reconciled"));
+  const expectedLegacy = { ...expected };
+  delete expectedLegacy.writebackReceiptStorageKey;
+  expectedLegacy.outcomeFingerprint = createHash("sha256").update(stable(legacyBody)).digest("hex");
+  return stable(persisted) === stable(expectedLegacy);
+}
+
+async function hydrateAgentImagegenResultBundleFromLocator(
+  projectRoot: string,
+  record: IdempotentCommandResult,
+): Promise<IdempotentCommandResult> {
+  if (record.status !== "succeeded") return record;
+  const locator = agentImagegenResultBundleLocatorFromResult(record.result);
+  if (locator.writebackReceiptStorageKey === undefined) {
+    throw new Error("旧 Agent 生图结果包 locator 缺少 writebackReceiptStorageKey；direct reconcile 禁止扫描，保持账本终态但拒绝返回不完整结果。");
+  }
+  const outcome = await proveAgentImagegenResultBundleOutcomeByLocator(projectRoot, locator);
+  if (!agentImagegenResultBundleLocatorMatchesOutcome(locator, outcome, false)) {
+    throw new Error("Agent 生图结果包 locator 与定点只读 Owner proof 不一致；拒绝返回错误结果。");
+  }
+  return { ...record, result: { ...outcome, reconciled: true } };
+}
+
+async function reconcileAgentImagegenResultBundleSafeCheckpoint(input: {
+  projectRoot: string;
+  storageRoot: string;
+  record: IdempotentCommandResult;
+}): Promise<IdempotentCommandResult> {
+  const root = path.resolve(input.projectRoot);
+  const storageRoot = path.resolve(input.storageRoot);
+  const locator = agentImagegenResultBundleLocatorFromResult(input.record.result);
+  const outcome = await proveAgentImagegenResultBundleOutcomeByLocator(root, locator);
+  if (!agentImagegenResultBundleLocatorMatchesOutcome(locator, outcome, false)) {
+    throw new Error("Agent 生图结果包 safe checkpoint 与定点只读 Owner proof 不一致。");
+  }
+  let transitioned = false;
+  const stored = await withProjectLock(storageRoot, "command-bus", async () => {
+    const current = await getCommandByIdempotencyKey(storageRoot, input.record.idempotencyKey);
+    if (!current || current.requestHash !== input.record.requestHash
+      || current.command !== "commit_agent_imagegen_result_bundle") {
+      throw new Error("Agent 生图结果包 safe checkpoint 对账期间账本身份变化。");
+    }
+    if (current.status === "failed" || current.status === "cancelled") {
+      throw new Error("Agent 生图结果包 safe checkpoint 与账本失败/取消终态冲突。");
+    }
+    if (current.status === "running"
+      && current.execution?.phase === "executing"
+      && processAlive(current.execution.pid)) {
+      throw new Error(`命令仍由进程 ${current.execution.pid} 执行，不能提前对账。`);
+    }
+    const currentLocator = agentImagegenResultBundleLocatorFromResult(current.result);
+    if (!agentImagegenResultBundleLocatorMatchesOutcome(currentLocator, outcome, false)) {
+      throw new Error("Agent 生图结果包当前 safe checkpoint 与 Owner proof 不一致。");
+    }
+    const terminalSnapshot = await readCommandTerminalReceiptSnapshot({
+      projectRoot: root,
+      storageRoot,
+      record: current,
+    });
+    if (terminalSnapshot.outcome) {
+      if (terminalSnapshot.outcome.status !== "succeeded"
+        || !terminalSnapshot.outcome.result
+        || stable(agentImagegenResultBundleLocatorFromResult(terminalSnapshot.outcome.result))
+          !== stable(currentLocator)) {
+        throw new Error("Agent 生图结果包 safe checkpoint 与随后 terminal receipt 冲突。");
+      }
+    }
+    if (current.status !== "succeeded") transitioned = true;
+    const reconciledAt = new Date().toISOString();
+    current.status = "succeeded";
+    current.result = currentLocator;
+    current.error = undefined;
+    current.execution = { pid: process.pid, phase: "side_effect_committed", heartbeatAt: reconciledAt };
+    current.durableReconciliation = undefined;
+    current.executedAt = reconciledAt;
+    await persistCommandLedgerEntry(storageRoot, current, reconciledAt);
+    return current;
+  });
+  if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, stored);
+  if (transitioned) {
+    const event = {
+      actor: "codex" as const,
+      type: "command.reconciled",
+      requestId: stored.requestId,
+      idempotencyKey: stored.idempotencyKey,
+      command: stored.command,
+      data: {
+        evidenceEventIds: [],
+        evidenceSource: "studio_agent_imagegen_writeback_receipt_locator",
+        reconciledAt: stored.executedAt,
+      },
+    };
+    await appendEvent(storageRoot, event);
+    if (storageRoot !== root) await appendEvent(root, event);
+  }
+  return hydrateAgentImagegenResultBundleFromLocator(root, { ...stored, replayed: true });
+}
+
+type StudioOperationResultLocatorOperation =
+  | "binding-analyze"
+  | "binding-resolve"
+  | "binding-freeze"
+  | "confirm-panel-empty"
+  | "continuity-observation"
+  | "continuity-correction"
+  | "generation-review"
+  | "post-result-observation"
+  | "generation-plan-create"
+  | "generation-run-fail"
+  | "generation-run-cancel"
+  | "generation-plan-retry"
+  | "imagegen-call-prepare"
+  | "imagegen-call-abandon"
+  | "imagegen-call-rebind"
+  | "generation-checkpoint-refresh"
+  | "generation-checkpoint-attest"
+  | "imagegen-call-reconcile"
+  | "detached-generation-abandon"
+  | "video-package-prepare"
+  | "dudu-stage"
+  | "dudu-finalize"
+  | "video-package-build";
+
+function studioOperationLocatorBase(
+  value: unknown,
+  operation: StudioOperationResultLocatorOperation,
+): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(`Studio ${operation} 结果缺少安全定位信息。`);
+  }
+  const source = value as Record<string, unknown>;
+  if (isCommandReceiptProjection(value, "studio-operation-result-locator")
+    && source.operation !== operation) {
+    throw new Error(`Studio ${operation} locator 与命令类型不一致。`);
+  }
+  return source;
+}
+
+function requiredLocatorString(source: Record<string, unknown>, key: string, label: string): string {
+  const value = source[key];
+  if (typeof value !== "string" || !value) throw new Error(`${label} 缺少 ${key}。`);
+  return value;
+}
+
+function requiredLocatorInteger(source: Record<string, unknown>, key: string, label: string): number {
+  const value = source[key];
+  if (!Number.isSafeInteger(value) || Number(value) < 0) throw new Error(`${label} 的 ${key} 无效。`);
+  return Number(value);
+}
+
+function assertExactLocatorKeys(
+  source: Record<string, unknown>,
+  expectedKeys: readonly string[],
+  label: string,
+): void {
+  const actual = Object.keys(source).sort();
+  const expected = [...expectedKeys].sort();
+  if (stable(actual) !== stable(expected)) {
+    throw new Error(`${label} 存在缺失或额外字段。`);
+  }
+}
+
+const DUDU_STAGE_COUNT_KEYS = [
+  "units",
+  "panels",
+  "durationSeconds",
+  "bindingSets",
+  "unitGridPacks",
+  "historicalImports",
+  "videoManifests",
+  "generationDispatches",
+  "generationResults",
+  "generationCallIntents",
+  "generationCallEvents",
+  "generationPlans",
+  "generationRunEvents",
+] as const;
+
+function normalizedDuduStageCounts(source: Record<string, unknown>): Record<string, number> {
+  const counts = source.counts;
+  if (!counts || typeof counts !== "object" || Array.isArray(counts)) {
+    throw new Error("Dudu stage outcome 缺少 immutable counts。");
+  }
+  const countSource = counts as Record<string, unknown>;
+  assertExactLocatorKeys(countSource, DUDU_STAGE_COUNT_KEYS, "Dudu stage counts");
+  return Object.fromEntries(DUDU_STAGE_COUNT_KEYS.map((key) => [
+    key,
+    requiredLocatorInteger(countSource, key, "Dudu stage counts"),
+  ]));
+}
+
+function studioConfirmEmptyLocatorFromResult(value: unknown, operationId?: string): Record<string, unknown> {
+  const operation = "confirm-panel-empty" as const;
+  const source = studioOperationLocatorBase(value, operation);
+  const locator = {
+    schemaVersion: 1,
+    kind: "studio-operation-result-locator",
+    operation,
+    operationId: typeof source.operationId === "string" && source.operationId ? source.operationId : operationId,
+    receiptId: requiredLocatorString(source, "receiptId", "confirmed-empty locator"),
+    receiptFingerprint: requiredLocatorString(source, "receiptFingerprint", "confirmed-empty locator"),
+    ownerFingerprint: requiredLocatorString(source, "receiptFingerprint", "confirmed-empty locator"),
+    confirmationId: requiredLocatorString(source, "confirmationId", "confirmed-empty locator"),
+    confirmationRevision: requiredLocatorInteger(source, "confirmationRevision", "confirmed-empty locator"),
+    confirmationFingerprint: requiredLocatorString(source, "confirmationFingerprint", "confirmed-empty locator"),
+    unitId: requiredLocatorString(source, "unitId", "confirmed-empty locator"),
+    panelId: requiredLocatorString(source, "panelId", "confirmed-empty locator"),
+    reconciled: true,
+  };
+  if (typeof locator.operationId !== "string" || !locator.operationId) {
+    throw new Error("confirmed-empty locator 缺少 operationId。");
+  }
+  if (locator.confirmationRevision < 1) throw new Error("confirmed-empty locator confirmationRevision 必须为正整数。");
+  return locator;
+}
+
+type StudioBindingLocatorCommand = Extract<CommandRequest["command"],
+  | "analyze_studio_script_entities"
+  | "resolve_studio_entity_proposal"
+  | "freeze_studio_asset_binding_set">;
+
+function studioBindingLocatorOperation(command: StudioBindingLocatorCommand): StudioOperationResultLocatorOperation {
+  return command === "analyze_studio_script_entities"
+    ? "binding-analyze"
+    : command === "resolve_studio_entity_proposal"
+      ? "binding-resolve"
+      : "binding-freeze";
+}
+
+function studioBindingOperationLocatorFromResult(
+  command: StudioBindingLocatorCommand,
+  value: unknown,
+  operationId?: string,
+): Record<string, unknown> {
+  const operation = studioBindingLocatorOperation(command);
+  const source = studioOperationLocatorBase(value, operation);
+  const projected = isCommandReceiptProjection(value, "studio-operation-result-locator");
+  const resolvedOperationId = projected
+    ? requiredLocatorString(source, "operationId", `Studio ${operation} locator`)
+    : operationId;
+  if (!resolvedOperationId || (operationId && resolvedOperationId !== operationId)) {
+    throw new Error(`Studio ${operation} locator operationId 与命令 requestHash 不一致。`);
+  }
+  const commonKeys = [
+    "schemaVersion", "kind", "operation", "operationId", "receiptId", "receiptFingerprint",
+    "unitId", "panelId", "ownerFingerprint", "reconciled",
+  ];
+  const operationKeys = command === "analyze_studio_script_entities"
+    ? ["analysisId", "analysisRevision", "analysisFingerprint"]
+    : command === "resolve_studio_entity_proposal"
+      ? ["proposalId", "decisionId", "decisionRevision", "decisionFingerprint"]
+      : ["bindingSetId", "bindingSetRevision", "bindingSetFingerprint"];
+  if (projected) {
+    assertExactLocatorKeys(source, [...commonKeys, ...operationKeys], `Studio ${operation} locator`);
+  }
+  const identity: Record<string, unknown> = {
+    operationId: resolvedOperationId,
+    receiptId: requiredLocatorString(source, "receiptId", `Studio ${operation} locator`),
+    receiptFingerprint: requiredLocatorString(source, "receiptFingerprint", `Studio ${operation} locator`),
+    unitId: requiredLocatorString(source, "unitId", `Studio ${operation} locator`),
+    panelId: requiredLocatorString(source, "panelId", `Studio ${operation} locator`),
+  };
+  if (command === "analyze_studio_script_entities") {
+    identity.analysisId = requiredLocatorString(source, "analysisId", "Studio binding analyze locator");
+    identity.analysisRevision = requiredLocatorInteger(source, "analysisRevision", "Studio binding analyze locator");
+    identity.analysisFingerprint = requiredLocatorString(source, "analysisFingerprint", "Studio binding analyze locator");
+    if (Number(identity.analysisRevision) < 1) throw new Error("Studio binding analyze locator revision 无效。");
+  } else if (command === "resolve_studio_entity_proposal") {
+    identity.proposalId = requiredLocatorString(source, "proposalId", "Studio binding resolve locator");
+    identity.decisionId = requiredLocatorString(source, "decisionId", "Studio binding resolve locator");
+    identity.decisionRevision = requiredLocatorInteger(source, "decisionRevision", "Studio binding resolve locator");
+    identity.decisionFingerprint = requiredLocatorString(source, "decisionFingerprint", "Studio binding resolve locator");
+    if (Number(identity.decisionRevision) < 1) throw new Error("Studio binding resolve locator revision 无效。");
+  } else {
+    identity.bindingSetId = requiredLocatorString(source, "bindingSetId", "Studio binding freeze locator");
+    identity.bindingSetRevision = requiredLocatorInteger(source, "bindingSetRevision", "Studio binding freeze locator");
+    identity.bindingSetFingerprint = requiredLocatorString(source, "bindingSetFingerprint", "Studio binding freeze locator");
+    if (Number(identity.bindingSetRevision) < 1) throw new Error("Studio binding freeze locator revision 无效。");
+  }
+  const locator = {
+    schemaVersion: 1,
+    kind: "studio-operation-result-locator",
+    operation,
+    ...identity,
+    ownerFingerprint: studioLocatorFingerprint(identity),
+    reconciled: true,
+  };
+  if (Buffer.byteLength(JSON.stringify(locator), "utf8") > COMMAND_TERMINAL_RECEIPT_RESULT_MAX_BYTES) {
+    throw new Error(`Studio ${operation} locator 超过终态回执上限。`);
+  }
+  return locator;
+}
+
+function studioContinuityLocatorFromResult(
+  command: "append_studio_continuity_observation" | "append_studio_continuity_correction",
+  value: unknown,
+): Record<string, unknown> {
+  const operation = command === "append_studio_continuity_observation"
+    ? "continuity-observation" as const
+    : "continuity-correction" as const;
+  const source = studioOperationLocatorBase(value, operation);
+  const projected = isCommandReceiptProjection(value, "studio-operation-result-locator");
+  const entry = source.entry;
+  const head = source.head;
+  if (!entry || typeof entry !== "object" || Array.isArray(entry)
+    || !head || typeof head !== "object" || Array.isArray(head)) {
+    throw new Error(`Studio ${operation} locator 缺少 entry/head 锚点。`);
+  }
+  const entrySource = entry as Record<string, unknown>;
+  const headSource = head as Record<string, unknown>;
+  const expectedWriteCommand = operation === "continuity-observation" ? "append-observation" : "append-correction";
+  const writeCommand = projected ? source.writeCommand : source.command;
+  if (writeCommand !== expectedWriteCommand) throw new Error(`Studio ${operation} locator 写命令不一致。`);
+  const headEntry = projected ? undefined : headSource.entry;
+  const headEntrySource = headEntry && typeof headEntry === "object" && !Array.isArray(headEntry)
+    ? headEntry as Record<string, unknown>
+    : undefined;
+  const locator = {
+    schemaVersion: 1,
+    kind: "studio-operation-result-locator",
+    operation,
+    writeCommand,
+    operationId: requiredLocatorString(source, "operationId", `Studio ${operation} locator`),
+    receiptId: requiredLocatorString(source, "receiptId", `Studio ${operation} locator`),
+    requestFingerprint: requiredLocatorString(source, "requestFingerprint", `Studio ${operation} locator`),
+    receiptFingerprint: requiredLocatorString(source, projected ? "receiptFingerprint" : "fingerprint", `Studio ${operation} locator`),
+    ownerFingerprint: requiredLocatorString(source, projected ? "ownerFingerprint" : "fingerprint", `Studio ${operation} locator`),
+    entry: {
+      id: requiredLocatorString(entrySource, "id", `Studio ${operation} locator entry`),
+      fingerprint: requiredLocatorString(entrySource, "fingerprint", `Studio ${operation} locator entry`),
+    },
+    head: {
+      headKey: requiredLocatorString(headSource, "headKey", `Studio ${operation} locator head`),
+      revision: requiredLocatorInteger(headSource, "revision", `Studio ${operation} locator head`),
+      entryId: projected
+        ? requiredLocatorString(headSource, "entryId", `Studio ${operation} locator head`)
+        : requiredLocatorString(headEntrySource ?? {}, "id", `Studio ${operation} locator head entry`),
+      entryFingerprint: projected
+        ? requiredLocatorString(headSource, "entryFingerprint", `Studio ${operation} locator head`)
+        : requiredLocatorString(headEntrySource ?? {}, "fingerprint", `Studio ${operation} locator head entry`),
+    },
+    reconciled: true,
+  };
+  if (locator.head.revision < 1) throw new Error(`Studio ${operation} locator head revision 必须为正整数。`);
+  return locator;
+}
+
+function studioGenerationReviewLocatorFromResult(value: unknown, operationId?: string): Record<string, unknown> {
+  const operation = "generation-review" as const;
+  const source = studioOperationLocatorBase(value, operation);
+  const locator = {
+    schemaVersion: 1,
+    kind: "studio-operation-result-locator",
+    operation,
+    operationId: typeof source.operationId === "string" && source.operationId ? source.operationId : operationId,
+    reviewId: requiredLocatorString(source, "reviewId", "Studio generation-review locator"),
+    generationRunId: requiredLocatorString(source, "generationRunId", "Studio generation-review locator"),
+    reviewKind: requiredLocatorString(source, "reviewKind" in source ? "reviewKind" : "kind", "Studio generation-review locator"),
+    baseHeadRevision: requiredLocatorInteger(source, "baseHeadRevision", "Studio generation-review locator"),
+    ...(source.headRevision === undefined ? {} : { headRevision: requiredLocatorInteger(source, "headRevision", "Studio generation-review locator") }),
+    ...(typeof source.supersedesReviewId === "string" && source.supersedesReviewId ? { supersedesReviewId: source.supersedesReviewId } : {}),
+    rawResultId: requiredLocatorString(source, "rawResultId", "Studio generation-review locator"),
+    rawSha256: requiredLocatorString(source, "rawSha256", "Studio generation-review locator"),
+    labeledResultId: requiredLocatorString(source, "labeledResultId", "Studio generation-review locator"),
+    labeledSha256: requiredLocatorString(source, "labeledSha256", "Studio generation-review locator"),
+    packId: requiredLocatorString(source, "packId", "Studio generation-review locator"),
+    packFingerprint: requiredLocatorString(source, "packFingerprint", "Studio generation-review locator"),
+    continuityFingerprint: requiredLocatorString(source, "continuityFingerprint", "Studio generation-review locator"),
+    decision: requiredLocatorString(source, "decision", "Studio generation-review locator"),
+    fingerprint: requiredLocatorString(source, "fingerprint", "Studio generation-review locator"),
+    ownerFingerprint: requiredLocatorString(source, "fingerprint", "Studio generation-review locator"),
+    reconciled: true,
+  };
+  if (locator.reviewKind !== "observation" && locator.reviewKind !== "correction") {
+    throw new Error("Studio generation-review locator reviewKind 无效。");
+  }
+  if (typeof locator.operationId !== "string" || !locator.operationId) {
+    throw new Error("Studio generation-review locator 缺少 operationId。");
+  }
+  if (Buffer.byteLength(JSON.stringify(locator), "utf8") > COMMAND_TERMINAL_RECEIPT_RESULT_MAX_BYTES) {
+    throw new Error("Studio generation-review locator 超过终态回执上限。");
+  }
+  return locator;
+}
+
+type ExtendedStudioOperationCommand = Extract<CommandRequest["command"],
+  | "submit_studio_post_result_observation"
+  | "create_studio_generation_plan"
+  | "fail_studio_generation_run"
+  | "cancel_studio_generation_run"
+  | "retry_studio_generation_plan_nodes"
+  | "prepare_studio_imagegen_call"
+  | "abandon_studio_generation_unknown"
+  | "rebind_studio_imagegen_call_context"
+  | "refresh_studio_generation_checkpoint"
+  | "attest_studio_generation_checkpoint"
+  | "reconcile_studio_imagegen_call"
+  | "abandon_studio_detached_generation_unknown"
+  | "prepare_studio_video_package_export"
+  | "stage_dudu_readonly_managed_project"
+  | "finalize_dudu_readonly_managed_project"
+  | "build_studio_video_package">;
+
+function extendedStudioOperation(command: ExtendedStudioOperationCommand): StudioOperationResultLocatorOperation {
+  const operations: Record<ExtendedStudioOperationCommand, StudioOperationResultLocatorOperation> = {
+    submit_studio_post_result_observation: "post-result-observation",
+    create_studio_generation_plan: "generation-plan-create",
+    fail_studio_generation_run: "generation-run-fail",
+    cancel_studio_generation_run: "generation-run-cancel",
+    retry_studio_generation_plan_nodes: "generation-plan-retry",
+    prepare_studio_imagegen_call: "imagegen-call-prepare",
+    abandon_studio_generation_unknown: "imagegen-call-abandon",
+    rebind_studio_imagegen_call_context: "imagegen-call-rebind",
+    refresh_studio_generation_checkpoint: "generation-checkpoint-refresh",
+    attest_studio_generation_checkpoint: "generation-checkpoint-attest",
+    reconcile_studio_imagegen_call: "imagegen-call-reconcile",
+    abandon_studio_detached_generation_unknown: "detached-generation-abandon",
+    prepare_studio_video_package_export: "video-package-prepare",
+    stage_dudu_readonly_managed_project: "dudu-stage",
+    finalize_dudu_readonly_managed_project: "dudu-finalize",
+    build_studio_video_package: "video-package-build",
+  };
+  return operations[command];
+}
+
+function safeGenerationPlanNodes(source: Record<string, unknown>, label: string): Array<Record<string, unknown>> {
+  if (!Array.isArray(source.nodes)) throw new Error(`${label} 缺少 nodes。`);
+  return source.nodes.map((item, index) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) throw new Error(`${label}.nodes[${index}] 无效。`);
+    const node = item as Record<string, unknown>;
+    return {
+      nodeIndex: requiredLocatorInteger(node, "nodeIndex", `${label}.nodes[${index}]`),
+      targetKind: requiredLocatorString(node, "targetKind", `${label}.nodes[${index}]`),
+      targetKey: requiredLocatorString(node, "targetKey", `${label}.nodes[${index}]`),
+      unitId: requiredLocatorString(node, "unitId", `${label}.nodes[${index}]`),
+      ...(typeof node.panelId === "string" && node.panelId ? { panelId: node.panelId } : {}),
+      packId: requiredLocatorString(node, "packId", `${label}.nodes[${index}]`),
+      packFingerprint: requiredLocatorString(node, "packFingerprint", `${label}.nodes[${index}]`),
+    };
+  });
+}
+
+function studioLocatorFingerprint(value: unknown): string {
+  return createHash("sha256").update(stable(value)).digest("hex");
+}
+
+function studioExtendedOperationLocatorFromResult(
+  command: ExtendedStudioOperationCommand,
+  value: unknown,
+  operationId?: string,
+): Record<string, unknown> {
+  const operation = extendedStudioOperation(command);
+  const source = studioOperationLocatorBase(value, operation);
+  const resolvedOperationId = typeof source.operationId === "string" && source.operationId
+    ? source.operationId
+    : operationId;
+  if (!resolvedOperationId) throw new Error(`Studio ${operation} locator 缺少 operationId。`);
+  const common = {
+    schemaVersion: 1,
+    kind: "studio-operation-result-locator",
+    operation,
+    operationId: resolvedOperationId,
+    reconciled: true,
+  };
+  let locator: Record<string, unknown>;
+  if (command === "submit_studio_post_result_observation") {
+    locator = {
+      ...common,
+      observationId: requiredLocatorString(source, "observationId", "post-result observation locator"),
+      generationRunId: requiredLocatorString(source, "generationRunId", "post-result observation locator"),
+      baseHeadRevision: requiredLocatorInteger(source, "baseHeadRevision", "post-result observation locator"),
+      headRevision: requiredLocatorInteger(source, "headRevision", "post-result observation locator"),
+      reviewId: requiredLocatorString(source, "reviewId", "post-result observation locator"),
+      reviewFingerprint: requiredLocatorString(source, "reviewFingerprint", "post-result observation locator"),
+      rawResultId: requiredLocatorString(source, "rawResultId", "post-result observation locator"),
+      rawSha256: requiredLocatorString(source, "rawSha256", "post-result observation locator"),
+      labeledResultId: requiredLocatorString(source, "labeledResultId", "post-result observation locator"),
+      labeledSha256: requiredLocatorString(source, "labeledSha256", "post-result observation locator"),
+      packId: requiredLocatorString(source, "packId", "post-result observation locator"),
+      packFingerprint: requiredLocatorString(source, "packFingerprint", "post-result observation locator"),
+      plannedContinuityFingerprint: requiredLocatorString(source, "plannedContinuityFingerprint", "post-result observation locator"),
+      fingerprint: requiredLocatorString(source, "fingerprint", "post-result observation locator"),
+      ownerFingerprint: requiredLocatorString(source, "fingerprint", "post-result observation locator"),
+    };
+  } else if (command === "create_studio_generation_plan") {
+    const projected = isCommandReceiptProjection(value, "studio-operation-result-locator");
+    const nodes = projected ? undefined : safeGenerationPlanNodes(source, "generation plan locator");
+    const nodeCount = requiredLocatorInteger(source, "nodeCount", "generation plan locator");
+    if (nodes && nodeCount !== nodes.length) throw new Error("generation plan locator nodeCount 与 nodes 不一致。");
+    const nodesFingerprint = projected
+      ? requiredLocatorString(source, "nodesFingerprint", "generation plan locator")
+      : studioLocatorFingerprint(nodes);
+    const identity = {
+      planId: requiredLocatorString(source, "planId", "generation plan locator"),
+      projectId: requiredLocatorString(source, "projectId", "generation plan locator"),
+      sourceCommandRequestId: requiredLocatorString(source, "sourceCommandRequestId", "generation plan locator"),
+      nodeCount,
+      nodesFingerprint,
+    };
+    locator = {
+      ...common,
+      ...identity,
+      ownerFingerprint: studioLocatorFingerprint(identity),
+    };
+  } else if (command === "fail_studio_generation_run" || command === "cancel_studio_generation_run") {
+    const expectedKind = command === "fail_studio_generation_run" ? "failed" : "cancelled";
+    const actualKind = isCommandReceiptProjection(value, "studio-operation-result-locator")
+      ? source.eventKind
+      : source.kind;
+    if (actualKind !== expectedKind) throw new Error(`generation run locator kind 必须为 ${expectedKind}。`);
+    const identity = {
+      eventId: requiredLocatorString(source, "eventId", "generation run locator"),
+      generationRunId: requiredLocatorString(source, "generationRunId", "generation run locator"),
+      ...(typeof source.planId === "string" && source.planId ? { planId: source.planId } : {}),
+      ...(source.nodeIndex === null || source.nodeIndex === undefined ? {} : { nodeIndex: requiredLocatorInteger(source, "nodeIndex", "generation run locator") }),
+      eventKind: expectedKind,
+      attempt: requiredLocatorInteger(source, "attempt", "generation run locator"),
+      ...(typeof source.supersedesRunId === "string" && source.supersedesRunId ? { supersedesRunId: source.supersedesRunId } : {}),
+    };
+    locator = {
+      ...common,
+      ...identity,
+      ownerFingerprint: studioLocatorFingerprint(identity),
+    };
+  } else if (command === "retry_studio_generation_plan_nodes") {
+    if (!Array.isArray(source.retried) || !Array.isArray(source.skipped)) throw new Error("generation retry locator 缺少 retried/skipped。");
+    const retried = source.retried.map((item, index) => {
+      if (!item || typeof item !== "object" || Array.isArray(item)) throw new Error(`generation retry retried[${index}] 无效。`);
+      const entry = item as Record<string, unknown>;
+      return {
+        nodeIndex: requiredLocatorInteger(entry, "nodeIndex", `generation retry retried[${index}]`),
+        attempt: requiredLocatorInteger(entry, "attempt", `generation retry retried[${index}]`),
+      };
+    });
+    const skipped = source.skipped.map((item, index) => {
+      if (!item || typeof item !== "object" || Array.isArray(item)) throw new Error(`generation retry skipped[${index}] 无效。`);
+      return { nodeIndex: requiredLocatorInteger(item as Record<string, unknown>, "nodeIndex", `generation retry skipped[${index}]`) };
+    });
+    const identity = {
+      planId: requiredLocatorString(source, "planId", "generation retry locator"),
+      retried,
+      skipped,
+      receiptFingerprint: requiredLocatorString(source, "receiptFingerprint", "generation retry locator"),
+    };
+    locator = {
+      ...common,
+      ...identity,
+      ownerFingerprint: studioLocatorFingerprint(identity),
+    };
+  } else if (command === "prepare_studio_imagegen_call") {
+    locator = {
+      ...common,
+      callId: requiredLocatorString(source, "callId", "imagegen prepare locator"),
+      generationRunId: requiredLocatorString(source, "generationRunId", "imagegen prepare locator"),
+      dispatchId: requiredLocatorString(source, "dispatchId", "imagegen prepare locator"),
+      packId: requiredLocatorString(source, "packId", "imagegen prepare locator"),
+      packFingerprint: requiredLocatorString(source, "packFingerprint", "imagegen prepare locator"),
+      provider: requiredLocatorString(source, "provider", "imagegen prepare locator"),
+      targetKind: requiredLocatorString(source, "targetKind", "imagegen prepare locator"),
+      targetKey: requiredLocatorString(source, "targetKey", "imagegen prepare locator"),
+      inputFingerprint: requiredLocatorString(source, "inputFingerprint", "imagegen prepare locator"),
+      ownerFingerprint: requiredLocatorString(source, "inputFingerprint", "imagegen prepare locator"),
+      commandRequestId: requiredLocatorString(source, "commandRequestId", "imagegen prepare locator"),
+      status: requiredLocatorString(source, "status", "imagegen prepare locator"),
+      callAllowed: false,
+      idempotentReplay: true,
+    };
+  } else if (command === "abandon_studio_generation_unknown") {
+    const actualKind = isCommandReceiptProjection(value, "studio-operation-result-locator")
+      ? source.eventKind
+      : source.kind;
+    if (actualKind !== "cancelled") throw new Error("imagegen abandon locator event kind 无效。");
+    const identity = {
+      eventId: requiredLocatorString(source, "eventId", "imagegen abandon locator"),
+      callId: requiredLocatorString(source, "callId", "imagegen abandon locator"),
+      generationRunId: requiredLocatorString(source, "generationRunId", "imagegen abandon locator"),
+      ...(typeof source.planId === "string" && source.planId ? { planId: source.planId } : {}),
+      ...(source.nodeIndex === null || source.nodeIndex === undefined ? {} : { nodeIndex: requiredLocatorInteger(source, "nodeIndex", "imagegen abandon locator") }),
+      eventKind: "cancelled",
+      attempt: requiredLocatorInteger(source, "attempt", "imagegen abandon locator"),
+      status: requiredLocatorString(source, "status", "imagegen abandon locator"),
+    };
+    locator = {
+      ...common,
+      ...identity,
+      ownerFingerprint: studioLocatorFingerprint(identity),
+    };
+  } else if (command === "rebind_studio_imagegen_call_context") {
+    locator = {
+      ...common,
+      eventId: requiredLocatorString(source, "eventId", "imagegen rebind locator"),
+      callId: requiredLocatorString(source, "callId", "imagegen rebind locator"),
+      generationRunId: requiredLocatorString(source, "generationRunId", "imagegen rebind locator"),
+      dispatchId: requiredLocatorString(source, "dispatchId", "imagegen rebind locator"),
+      packId: requiredLocatorString(source, "packId", "imagegen rebind locator"),
+      packFingerprint: requiredLocatorString(source, "packFingerprint", "imagegen rebind locator"),
+      provider: requiredLocatorString(source, "provider", "imagegen rebind locator"),
+      inputFingerprint: requiredLocatorString(source, "inputFingerprint", "imagegen rebind locator"),
+      candidateSha256: requiredLocatorString(source, "candidateSha256", "imagegen rebind locator"),
+      receiptSha256: requiredLocatorString(source, "receiptSha256", "imagegen rebind locator"),
+      executionReceiptFingerprint: requiredLocatorString(source, "executionReceiptFingerprint", "imagegen rebind locator"),
+      ownerFingerprint: requiredLocatorString(source, "executionReceiptFingerprint", "imagegen rebind locator"),
+      callAllowed: false,
+      idempotentReplay: true,
+    };
+  } else if (command === "reconcile_studio_imagegen_call") {
+    const projected = isCommandReceiptProjection(value, "studio-operation-result-locator");
+    if (projected) {
+      assertExactLocatorKeys(source, [
+        "schemaVersion", "kind", "operation", "operationId", "eventId", "callId",
+        "generationRunId", "eventKind", "ownerFingerprint", "reconciled",
+      ], "imagegen reconcile locator");
+    }
+    if (operationId && resolvedOperationId !== operationId) {
+      throw new Error("imagegen reconcile locator operationId 与命令 requestHash 不一致。");
+    }
+    const eventKind = projected ? source.eventKind : source.kind;
+    if (eventKind !== "not-invoked" && eventKind !== "unknown-observation") {
+      throw new Error("imagegen reconcile locator eventKind 无效。");
+    }
+    const identity = {
+      operationId: resolvedOperationId,
+      eventId: requiredLocatorString(source, "eventId", "imagegen reconcile locator"),
+      callId: requiredLocatorString(source, "callId", "imagegen reconcile locator"),
+      generationRunId: requiredLocatorString(source, "generationRunId", "imagegen reconcile locator"),
+      eventKind,
+    };
+    locator = {
+      ...common,
+      ...identity,
+      ownerFingerprint: studioLocatorFingerprint(identity),
+    };
+  } else if (command === "abandon_studio_detached_generation_unknown") {
+    const projected = isCommandReceiptProjection(value, "studio-operation-result-locator");
+    if (projected) {
+      assertExactLocatorKeys(source, [
+        "schemaVersion", "kind", "operation", "operationId", "dispositionId",
+        "observationId", "observationFingerprint", "dispositionFingerprint",
+        "status", "detachedCandidatePolicy", "nextRunPolicy", "ownerFingerprint", "reconciled",
+      ], "detached generation abandon locator");
+    }
+    if (operationId && resolvedOperationId !== operationId) {
+      throw new Error("detached generation abandon locator operationId 与命令 requestHash 不一致。");
+    }
+    const status = requiredLocatorString(source, "status", "detached generation abandon locator");
+    const detachedCandidatePolicy = requiredLocatorString(source, "detachedCandidatePolicy", "detached generation abandon locator");
+    const nextRunPolicy = requiredLocatorString(source, "nextRunPolicy", "detached generation abandon locator");
+    if (status !== "owner-abandoned"
+      || detachedCandidatePolicy !== "never-import-or-reuse"
+      || nextRunPolicy !== "fresh-formal-run-only") {
+      throw new Error("detached generation abandon locator policy 无效。");
+    }
+    const identity = {
+      operationId: resolvedOperationId,
+      dispositionId: requiredLocatorString(source, "dispositionId", "detached generation abandon locator"),
+      observationId: requiredLocatorString(source, "observationId", "detached generation abandon locator"),
+      observationFingerprint: requiredLocatorString(source, "observationFingerprint", "detached generation abandon locator"),
+      dispositionFingerprint: requiredLocatorString(source, projected ? "dispositionFingerprint" : "fingerprint", "detached generation abandon locator"),
+      status,
+      detachedCandidatePolicy,
+      nextRunPolicy,
+    };
+    locator = {
+      ...common,
+      ...identity,
+      ownerFingerprint: studioLocatorFingerprint(identity),
+    };
+  } else if (command === "prepare_studio_video_package_export") {
+    const projected = isCommandReceiptProjection(value, "studio-operation-result-locator");
+    if (projected) {
+      assertExactLocatorKeys(source, [
+        "schemaVersion", "kind", "operation", "operationId", "intentId",
+        "inputFingerprint", "intentFingerprint", "intentSchemaVersion",
+        "authorityKind", "authorityId", "authorityFingerprint",
+        "targetKind", "targetKey", "unitId", "unitRevision",
+        "providerAnchor", "storageAnchor", "ownerFingerprint", "reconciled",
+      ], "video package prepare locator");
+    }
+    if (operationId && resolvedOperationId !== operationId) {
+      throw new Error("video package prepare locator operationId 与命令 requestHash 不一致。");
+    }
+    const intent = source.intent && typeof source.intent === "object" && !Array.isArray(source.intent)
+      ? source.intent as Record<string, unknown>
+      : source;
+    const intentSchemaVersion = requiredLocatorInteger(intent, "intentSchemaVersion" in intent ? "intentSchemaVersion" : "schemaVersion", "video package prepare locator");
+    if (intentSchemaVersion !== 4 && intentSchemaVersion !== 5) {
+      throw new Error("video package prepare locator 只接受 intent schema v4/v5。");
+    }
+    const authorityKind = requiredLocatorString(intent, "authorityKind", "video package prepare locator");
+    if (authorityKind !== "studio-review" && authorityKind !== "historical-import") {
+      throw new Error("video package prepare locator authorityKind 无效。");
+    }
+    const targetKind = requiredLocatorString(intent, "targetKind", "video package prepare locator");
+    if (targetKind !== "unit-grid") throw new Error("video package prepare locator targetKind 无效。");
+    const authorityFingerprint = requiredLocatorString(intent, "authorityFingerprint", "video package prepare locator");
+    const inputFingerprint = requiredLocatorString(intent, "inputFingerprint", "video package prepare locator");
+    const providerAnchor = projected
+      ? requiredLocatorString(source, "providerAnchor", "video package prepare locator")
+      : authorityFingerprint;
+    const storageAnchor = projected
+      ? requiredLocatorString(source, "storageAnchor", "video package prepare locator")
+      : typeof intent.sourceClosureFingerprint === "string" && intent.sourceClosureFingerprint
+        ? intent.sourceClosureFingerprint
+        : typeof intent.managedSourceFingerprint === "string" && intent.managedSourceFingerprint
+          ? intent.managedSourceFingerprint
+          : inputFingerprint;
+    const identity = {
+      operationId: resolvedOperationId,
+      intentId: requiredLocatorString(intent, "intentId", "video package prepare locator"),
+      inputFingerprint,
+      intentFingerprint: requiredLocatorString(intent, projected ? "intentFingerprint" : "fingerprint", "video package prepare locator"),
+      intentSchemaVersion,
+      authorityKind,
+      authorityId: requiredLocatorString(intent, "authorityId", "video package prepare locator"),
+      authorityFingerprint,
+      targetKind,
+      targetKey: requiredLocatorString(intent, "targetKey", "video package prepare locator"),
+      unitId: requiredLocatorString(intent, "unitId", "video package prepare locator"),
+      unitRevision: requiredLocatorInteger(intent, "unitRevision", "video package prepare locator"),
+      providerAnchor,
+      storageAnchor,
+    };
+    locator = {
+      ...common,
+      ...identity,
+      ownerFingerprint: studioLocatorFingerprint(identity),
+    };
+  } else if (command === "stage_dudu_readonly_managed_project") {
+    const projected = isCommandReceiptProjection(value, "studio-operation-result-locator");
+    if (projected) {
+      assertExactLocatorKeys(source, [
+        "schemaVersion", "kind", "operation", "operationId", "directoryName",
+        "projectId", "managedManifestFingerprint", "importFingerprint",
+        "countsFingerprint", "ownerFingerprint", "reconciled",
+      ], "Dudu stage locator");
+    }
+    if (operationId && resolvedOperationId !== operationId) {
+      throw new Error("Dudu stage locator operationId 与命令 requestHash 不一致。");
+    }
+    const directoryName = requiredLocatorString(source, "directoryName", "Dudu stage locator");
+    if (directoryName === "." || directoryName === ".." || path.basename(directoryName) !== directoryName) {
+      throw new Error("Dudu stage locator directoryName 不是安全直接子目录。");
+    }
+    const countsFingerprint = projected
+      ? requiredLocatorString(source, "countsFingerprint", "Dudu stage locator")
+      : studioLocatorFingerprint(normalizedDuduStageCounts(source));
+    const identity = {
+      operationId: resolvedOperationId,
+      directoryName,
+      projectId: requiredLocatorString(source, "projectId", "Dudu stage locator"),
+      managedManifestFingerprint: requiredLocatorString(source, "managedManifestFingerprint", "Dudu stage locator"),
+      importFingerprint: requiredLocatorString(source, "importFingerprint", "Dudu stage locator"),
+      countsFingerprint,
+    };
+    locator = {
+      ...common,
+      ...identity,
+      ownerFingerprint: studioLocatorFingerprint(identity),
+    };
+  } else if (command === "finalize_dudu_readonly_managed_project") {
+    const registration = source.registration && typeof source.registration === "object" && !Array.isArray(source.registration)
+      ? source.registration as Record<string, unknown> : source;
+    const activation = source.activation && typeof source.activation === "object" && !Array.isArray(source.activation)
+      ? source.activation as Record<string, unknown> : source;
+    locator = {
+      ...common,
+      projectId: requiredLocatorString(source, "projectId", "Dudu finalize locator"),
+      importFingerprint: requiredLocatorString(source, "importFingerprint", "Dudu finalize locator"),
+      activationId: requiredLocatorString(source, "activationId", "Dudu finalize locator"),
+      registrationFingerprint: typeof source.registrationFingerprint === "string" && source.registrationFingerprint
+        ? source.registrationFingerprint
+        : requiredLocatorString(registration, "fingerprint", "Dudu finalize locator"),
+      activationFingerprint: typeof source.activationFingerprint === "string" && source.activationFingerprint
+        ? source.activationFingerprint
+        : requiredLocatorString(activation, "fingerprint", "Dudu finalize locator"),
+      ownerFingerprint: typeof source.ownerFingerprint === "string" && source.ownerFingerprint
+        ? source.ownerFingerprint
+        : requiredLocatorString(activation, "fingerprint", "Dudu finalize locator"),
+    };
+  } else if (command === "build_studio_video_package") {
+    const projected = isCommandReceiptProjection(value, "studio-operation-result-locator");
+    if (projected) {
+      assertExactLocatorKeys(source, [
+        "schemaVersion", "kind", "operation", "operationId", "intentId",
+        "intentFingerprint", "receiptId", "manifestSha256", "manifestFingerprint",
+        "receiptFingerprint", "storageKind", "ownerFingerprint", "reconciled",
+      ], "video package build locator");
+    }
+    if (operationId && resolvedOperationId !== operationId) {
+      throw new Error("video package build locator operationId 与命令 requestHash 不一致。");
+    }
+    const intent = source.intent && typeof source.intent === "object" && !Array.isArray(source.intent)
+      ? source.intent as Record<string, unknown> : source;
+    const receipt = source.receipt && typeof source.receipt === "object" && !Array.isArray(source.receipt)
+      ? source.receipt as Record<string, unknown> : source;
+    const identity = {
+      operationId: resolvedOperationId,
+      intentId: requiredLocatorString(intent, "intentId", "video package build locator"),
+      intentFingerprint: typeof source.intentFingerprint === "string" && source.intentFingerprint
+        ? source.intentFingerprint
+        : requiredLocatorString(intent, "fingerprint", "video package build locator"),
+      receiptId: requiredLocatorString(receipt, "receiptId", "video package build locator"),
+      manifestSha256: requiredLocatorString(receipt, "manifestSha256", "video package build locator"),
+      manifestFingerprint: requiredLocatorString(receipt, "manifestFingerprint", "video package build locator"),
+      receiptFingerprint: typeof source.receiptFingerprint === "string" && source.receiptFingerprint
+        ? source.receiptFingerprint
+        : requiredLocatorString(receipt, "fingerprint", "video package build locator"),
+      storageKind: (receipt.storageKind ?? source.storageKind) === "managed-evidence" ? "managed-evidence" : (() => { throw new Error("video package build locator 仅允许 managed-evidence。"); })(),
+    };
+    locator = {
+      ...common,
+      ...identity,
+      ownerFingerprint: studioLocatorFingerprint(identity),
+    };
+  } else {
+    const projected = isCommandReceiptProjection(value, "studio-operation-result-locator");
+    if (projected) {
+      assertExactLocatorKeys(source, command === "refresh_studio_generation_checkpoint"
+        ? [
+          "schemaVersion", "kind", "operation", "operationId", "operationKind",
+          "outcomeId", "outcomeFingerprint", "batchNumber", "headRevision", "checkpointId",
+          "checkpointFingerprint", "ownerFingerprint", "reconciled",
+        ]
+        : [
+          "schemaVersion", "kind", "operation", "operationId", "operationKind",
+          "outcomeId", "outcomeFingerprint", "batchNumber", "headRevision", "attestationId",
+          "checkpointId", "checkpointFingerprint", "attestationFingerprint", "decision",
+          "ownerFingerprint", "reconciled",
+        ], `Studio ${operation} locator`);
+    }
+    if (operationId && resolvedOperationId !== operationId) {
+      throw new Error(`Studio ${operation} locator operationId 与命令 requestHash 不一致。`);
+    }
+    const outcome = source.outcome ?? source;
+    if (!outcome || typeof outcome !== "object" || Array.isArray(outcome)) {
+      throw new Error(`Studio ${operation} locator 缺少 checkpoint outcome。`);
+    }
+    const outcomeSource = outcome as Record<string, unknown>;
+    const operationReceipt = source.operationReceipt && typeof source.operationReceipt === "object" && !Array.isArray(source.operationReceipt)
+      ? source.operationReceipt as Record<string, unknown>
+      : source;
+    const expectedKind = command === "refresh_studio_generation_checkpoint" ? "refresh" : "attest";
+    const operationKind = source.operationKind ?? (command === "refresh_studio_generation_checkpoint" ? "refresh" : "attest");
+    if (operationKind !== expectedKind) throw new Error(`Studio ${operation} locator operationKind 不一致。`);
+    locator = {
+      ...common,
+      operationKind,
+      outcomeId: typeof operationReceipt.outcomeId === "string" && operationReceipt.outcomeId
+        ? operationReceipt.outcomeId
+        : requiredLocatorString(outcomeSource, command === "refresh_studio_generation_checkpoint" ? "checkpointId" : "attestationId", `Studio ${operation} locator`),
+      outcomeFingerprint: typeof operationReceipt.outcomeFingerprint === "string" && operationReceipt.outcomeFingerprint
+        ? operationReceipt.outcomeFingerprint
+        : requiredLocatorString(outcomeSource, "fingerprint", `Studio ${operation} locator`),
+      batchNumber: requiredLocatorInteger(outcomeSource, "batchNumber", `Studio ${operation} locator`),
+      headRevision: requiredLocatorInteger(outcomeSource, "headRevision", `Studio ${operation} locator`),
+      ...(command === "refresh_studio_generation_checkpoint"
+        ? {
+          checkpointId: requiredLocatorString(outcomeSource, "checkpointId", `Studio ${operation} locator`),
+          checkpointFingerprint: typeof outcomeSource.checkpointFingerprint === "string" && outcomeSource.checkpointFingerprint
+            ? outcomeSource.checkpointFingerprint
+            : requiredLocatorString(outcomeSource, "fingerprint", `Studio ${operation} locator`),
+        }
+        : {
+          attestationId: requiredLocatorString(outcomeSource, "attestationId", `Studio ${operation} locator`),
+          checkpointId: requiredLocatorString(outcomeSource, "checkpointId", `Studio ${operation} locator`),
+          checkpointFingerprint: requiredLocatorString(outcomeSource, "checkpointFingerprint", `Studio ${operation} locator`),
+          attestationFingerprint: typeof outcomeSource.attestationFingerprint === "string" && outcomeSource.attestationFingerprint
+            ? outcomeSource.attestationFingerprint
+            : requiredLocatorString(outcomeSource, "fingerprint", `Studio ${operation} locator`),
+          decision: requiredLocatorString(outcomeSource, "decision", `Studio ${operation} locator`),
+        }),
+      ownerFingerprint: studioLocatorFingerprint({
+        operationId: resolvedOperationId,
+        operationKind,
+        outcomeId: typeof operationReceipt.outcomeId === "string" && operationReceipt.outcomeId
+          ? operationReceipt.outcomeId
+          : requiredLocatorString(outcomeSource, command === "refresh_studio_generation_checkpoint" ? "checkpointId" : "attestationId", `Studio ${operation} locator`),
+        outcomeFingerprint: typeof operationReceipt.outcomeFingerprint === "string" && operationReceipt.outcomeFingerprint
+          ? operationReceipt.outcomeFingerprint
+          : requiredLocatorString(outcomeSource, "fingerprint", `Studio ${operation} locator`),
+      }),
+    };
+    if (projected && stable(source) !== stable(locator)) {
+      throw new Error(`Studio ${operation} locator 内容与 canonical 身份不一致。`);
+    }
+  }
+  if (Buffer.byteLength(JSON.stringify(locator), "utf8") > COMMAND_TERMINAL_RECEIPT_RESULT_MAX_BYTES) {
+    throw new Error(`Studio ${operation} locator 超过终态回执上限。`);
+  }
+  return locator;
+}
+
+function projectStudioOperationResultForPersistence(
+  command: CommandRequest["command"],
+  value: unknown,
+  operationId?: string,
+): unknown {
+  if (command === "analyze_studio_script_entities"
+    || command === "resolve_studio_entity_proposal"
+    || command === "freeze_studio_asset_binding_set") {
+    return studioBindingOperationLocatorFromResult(command, value, operationId);
+  }
+  if (command === "confirm_studio_panel_empty") return studioConfirmEmptyLocatorFromResult(value, operationId);
+  if (command === "append_studio_continuity_observation"
+    || command === "append_studio_continuity_correction") {
+    return studioContinuityLocatorFromResult(command, value);
+  }
+  if (command === "submit_studio_generation_review") return studioGenerationReviewLocatorFromResult(value, operationId);
+  if (command === "submit_studio_post_result_observation"
+    || command === "create_studio_generation_plan"
+    || command === "fail_studio_generation_run"
+    || command === "cancel_studio_generation_run"
+    || command === "retry_studio_generation_plan_nodes"
+    || command === "prepare_studio_imagegen_call"
+    || command === "abandon_studio_generation_unknown"
+    || command === "rebind_studio_imagegen_call_context"
+    || command === "refresh_studio_generation_checkpoint"
+    || command === "attest_studio_generation_checkpoint"
+    || command === "reconcile_studio_imagegen_call"
+    || command === "abandon_studio_detached_generation_unknown"
+    || command === "prepare_studio_video_package_export"
+    || command === "stage_dudu_readonly_managed_project"
+    || command === "finalize_dudu_readonly_managed_project"
+    || command === "build_studio_video_package") {
+    const locator = studioExtendedOperationLocatorFromResult(command, value, operationId);
+    if (Buffer.byteLength(JSON.stringify(locator), "utf8") > COMMAND_TERMINAL_RECEIPT_RESULT_MAX_BYTES) {
+      throw new Error(`Studio ${locator.operation} locator 超过终态回执上限。`);
+    }
+    return locator;
+  }
+  return value;
+}
+
+/** 仅供 Vitest 定向验证命令结果 locator 的严格投影边界。 */
+export function __projectStudioOperationResultForPersistenceForTests(
+  command: CommandRequest["command"],
+  value: unknown,
+  operationId?: string,
+): unknown {
+  if (process.env.NODE_ENV !== "test") throw new Error("Studio locator projector 仅允许测试环境调用。");
+  return projectStudioOperationResultForPersistence(command, value, operationId);
+}
+
+function studioOperationLocatorMatchesOwner(
+  command: ExtendedStudioOperationCommand,
+  persisted: unknown,
+  owner: unknown,
+  operationId: string,
+): boolean {
+  const locator = studioExtendedOperationLocatorFromResult(command, persisted, operationId);
+  if (locator.operationId !== operationId) return false;
+  return stable(studioExtendedOperationLocatorFromResult(command, owner, operationId)) === stable(locator);
+}
+
+/** 仅供 Vitest 定向证明 locator 必须与纯读 owner 重投影稳定等值。 */
+export function __studioOperationLocatorMatchesOwnerForTests(
+  command: ExtendedStudioOperationCommand,
+  persisted: unknown,
+  owner: unknown,
+  operationId: string,
+): boolean {
+  if (process.env.NODE_ENV !== "test") throw new Error("Studio locator owner matcher 仅允许测试环境调用。");
+  return studioOperationLocatorMatchesOwner(command, persisted, owner, operationId);
+}
+
+const STUDIO_OPERATION_LOCATOR_COMMANDS = [
+  "analyze_studio_script_entities",
+  "resolve_studio_entity_proposal",
+  "freeze_studio_asset_binding_set",
+  "confirm_studio_panel_empty",
+  "append_studio_continuity_observation",
+  "append_studio_continuity_correction",
+  "submit_studio_generation_review",
+  "submit_studio_post_result_observation",
+  "refresh_studio_generation_checkpoint",
+  "attest_studio_generation_checkpoint",
+  "create_studio_generation_plan",
+  "fail_studio_generation_run",
+  "cancel_studio_generation_run",
+  "retry_studio_generation_plan_nodes",
+  "prepare_studio_imagegen_call",
+  "abandon_studio_generation_unknown",
+  "rebind_studio_imagegen_call_context",
+  "reconcile_studio_imagegen_call",
+  "abandon_studio_detached_generation_unknown",
+  "prepare_studio_video_package_export",
+  "stage_dudu_readonly_managed_project",
+  "finalize_dudu_readonly_managed_project",
+  "build_studio_video_package",
+] as const satisfies readonly CommandRequest["command"][];
+
+const studioOperationLocatorCommandSet: ReadonlySet<CommandRequest["command"]> =
+  new Set(STUDIO_OPERATION_LOCATOR_COMMANDS);
+
+const STRICT_READ_ONLY_PUBLIC_REPLAY_HYDRATION_COMMANDS = [
+  "analyze_studio_script_entities",
+  "resolve_studio_entity_proposal",
+  "freeze_studio_asset_binding_set",
+  "confirm_studio_panel_empty",
+  "append_studio_continuity_observation",
+  "append_studio_continuity_correction",
+  "submit_studio_generation_review",
+  "submit_studio_post_result_observation",
+  "refresh_studio_generation_checkpoint",
+  "attest_studio_generation_checkpoint",
+  "create_studio_generation_plan",
+  "fail_studio_generation_run",
+  "cancel_studio_generation_run",
+  "retry_studio_generation_plan_nodes",
+  "prepare_studio_imagegen_call",
+  "abandon_studio_generation_unknown",
+  "rebind_studio_imagegen_call_context",
+  "reconcile_studio_imagegen_call",
+  "abandon_studio_detached_generation_unknown",
+  "prepare_studio_video_package_export",
+  "stage_dudu_readonly_managed_project",
+  "finalize_dudu_readonly_managed_project",
+  "build_studio_video_package",
+  "materialize_local_creative_production_units",
+  "commit_agent_imagegen_result_bundle",
+] as const satisfies readonly CommandRequest["command"][];
+
+const succeededPublicReplayHydrationCommandSet: ReadonlySet<CommandRequest["command"]> =
+  new Set(STRICT_READ_ONLY_PUBLIC_REPLAY_HYDRATION_COMMANDS);
+
+const PUBLIC_REPLAY_HYDRATION_COMMANDS = [
+  ...STUDIO_OPERATION_LOCATOR_COMMANDS,
+  "materialize_local_creative_production_units",
+  "commit_agent_imagegen_result_bundle",
+] as const satisfies readonly CommandRequest["command"][];
+
+const PUBLIC_REPLAY_HYDRATION_REGISTRY = PUBLIC_REPLAY_HYDRATION_COMMANDS.map((command) => ({
+  command,
+  mode: succeededPublicReplayHydrationCommandSet.has(command)
+    ? "strict-readonly"
+    : "blocked-writable-risk",
+} as const));
+
+function isStudioOperationLocatorCommand(command: CommandRequest["command"]): boolean {
+  return studioOperationLocatorCommandSet.has(command);
+}
+
+function shouldHydrateSucceededPublicReplay(request: CommandRequest): boolean {
+  return succeededPublicReplayHydrationCommandSet.has(request.command);
+}
+
+/**
+ * execute_command 的公开 succeeded replay 统一出口。
+ * 账本仍只携 canonical locator；这里只从 command-specific 严格纯读 Owner
+ * 瞬态重建首次公开业务 shape，绝不调用 domain mutation。
+ */
+async function hydrateSucceededPublicReplay(
+  projectRoot: string,
+  request: CommandRequest,
+  record: IdempotentCommandResult,
+): Promise<IdempotentCommandResult> {
+  if (record.status !== "succeeded" || !shouldHydrateSucceededPublicReplay(request)) return record;
+  return hydrateReceiptReconciledCommandResult(
+    projectRoot,
+    request,
+    revokePersistedImagegenCallCapability(record),
+  );
+}
+
+async function hydrateRecoveredPublicResult(
+  projectRoot: string,
+  request: CommandRequest,
+  recovered: IdempotentCommandResult,
+): Promise<IdempotentCommandResult> {
+  const persisted = revokePersistedImagegenCallCapability(recovered);
+  return shouldHydrateReceiptRecoveryResult(request) || shouldHydrateSucceededPublicReplay(request)
+    ? hydrateReceiptReconciledCommandResult(projectRoot, request, persisted)
+    : persisted;
+}
+
+/** 仅供 Vitest 锁定所有持久化 locator 命令都有公开 replay hydration 注册。 */
+export function __succeededPublicReplayHydrationCommandsForTests(): readonly CommandRequest["command"][] {
+  if (process.env.NODE_ENV !== "test") throw new Error("公开 replay hydration 注册表仅允许测试环境读取。");
+  return [...STRICT_READ_ONLY_PUBLIC_REPLAY_HYDRATION_COMMANDS];
+}
+
+export function __succeededPublicReplayHydrationRegistryForTests(): ReadonlyArray<{
+  command: CommandRequest["command"];
+  mode: "strict-readonly" | "blocked-writable-risk";
+}> {
+  if (process.env.NODE_ENV !== "test") throw new Error("公开 replay hydration 注册表仅允许测试环境读取。");
+  return PUBLIC_REPLAY_HYDRATION_REGISTRY.map((entry) => ({ ...entry }));
 }
 
 function reconciliationRequestFromRecord(projectRoot: string, record: IdempotentCommandResult): DurableReconciliationCommandRequest | undefined {
@@ -1286,11 +3179,40 @@ function novelImportResultAnchorFromResult(result: unknown): NovelImportResultAn
   };
 }
 
+function novelImportResultLocatorFromResult(result: unknown): NovelImportResultLocator {
+  if (isCommandReceiptProjection(result, "novel-import-result-locator")) {
+    const source = result as unknown as NovelImportResultLocator;
+    for (const key of [
+      "receiptId", "projectId", "receiptFingerprint", "stateChainFingerprint",
+      "chapterManifestSha256", "canonicalReceiptSha256",
+    ] as const) {
+      if (typeof source[key] !== "string" || !source[key]) {
+        throw new Error(`小说导入终态回执定位符缺少 ${key} 锚点。`);
+      }
+    }
+    return source;
+  }
+  const anchor = novelImportResultAnchorFromResult(result);
+  return {
+    ...anchor,
+    kind: "novel-import-result-locator",
+  };
+}
+
+function novelImportAnchorFromLocator(locator: NovelImportResultLocator): NovelImportResultAnchor {
+  return {
+    ...locator,
+    kind: "novel-import-result-anchor",
+  };
+}
+
 function assertNovelImportResultMatchesAnchor(
   result: unknown,
   expected: NovelImportResultAnchor,
 ): void {
-  const actual = novelImportResultAnchorFromResult(result);
+  const actual = isCommandReceiptProjection(result, "novel-import-result-locator")
+    ? novelImportAnchorFromLocator(novelImportResultLocatorFromResult(result))
+    : novelImportResultAnchorFromResult(result);
   if (stable(actual) !== stable(expected)) {
     throw new Error("小说导入当前 registered 闭包与首次成功账本锚点不一致。");
   }
@@ -1305,7 +3227,10 @@ function existingNovelImportResultAnchor(record: IdempotentCommandResult): Novel
     if (record.result !== undefined) assertNovelImportResultMatchesAnchor(record.result, persisted);
     return persisted;
   }
-  return record.result === undefined ? null : novelImportResultAnchorFromResult(record.result);
+  if (record.result === undefined) return null;
+  return isCommandReceiptProjection(record.result, "novel-import-result-locator")
+    ? novelImportAnchorFromLocator(novelImportResultLocatorFromResult(record.result))
+    : novelImportResultAnchorFromResult(record.result);
 }
 
 function expectedNovelImportResultAnchor(record: IdempotentCommandResult): NovelImportResultAnchor {
@@ -1490,7 +3415,7 @@ async function proveDurableOutcome(projectRoot: string, request: DurableReconcil
     }
     if (request.command === "materialize_local_creative_production_units") {
       const operationId = commandRequestHash(projectRoot, request);
-      const outcome = await readLocalCreativeProductionUnitMaterializationOutcome(projectRoot, {
+      const outcome = await readLocalCreativeProductionUnitMaterializationOutcomeReadOnly(projectRoot, {
         ...request.payload,
         idempotencyKey: operationId,
       });
@@ -1501,14 +3426,16 @@ async function proveDurableOutcome(projectRoot: string, request: DurableReconcil
       const operationId = commandRequestHash(projectRoot, request);
       const intent = await readStudioVideoPackageExportIntentByOperationId(projectRoot, operationId);
       const expectedSource = request.payload.expectedManagedSource;
-      if (!intent || intent.schemaVersion !== 4
+      if (!intent || (intent.schemaVersion !== 4 && intent.schemaVersion !== 5)
+        || (intent.schemaVersion === 5
+          && (typeof intent.sourceClosureFingerprint !== "string"
+            || !/^[a-f0-9]{64}$/u.test(intent.sourceClosureFingerprint)))
         || intent.unitRevision !== request.payload.expectedRevision
         || (request.payload.authority.kind === "historical-import"
           ? intent.authorityKind !== "historical-import" || intent.packId !== request.payload.authority.packId
           : intent.authorityKind !== "studio-review"
             || intent.authorityId !== request.payload.authority.reviewId
             || !expectedSource
-            || intent.schemaVersion !== 4
             || intent.managedSourceFingerprint !== expectedSource.expectedSourceFingerprint
             || intent.managedSourceUnitSnapshotFingerprint !== expectedSource.expectedUnitSnapshotFingerprint
             || intent.observationControlFingerprint !== expectedSource.expectedObservationControlFingerprint
@@ -1598,8 +3525,12 @@ async function proveDurableOutcome(projectRoot: string, request: DurableReconcil
       };
     }
     if (request.command === "prepare_studio_imagegen_call") {
-      const intent = await readStudioImagegenCallIntentByRun(projectRoot, request.payload.generationRunId);
       const expectedCommandRequestId = commandRequestHash(projectRoot, request);
+      const intent = await readStudioImagegenCallIntentByRunReadOnly(
+        projectRoot,
+        request.payload.generationRunId,
+        "generation_unknown",
+      );
       if (!intent
         || intent.commandRequestId !== expectedCommandRequestId
         || intent.packId !== request.payload.packId
@@ -1619,14 +3550,14 @@ async function proveDurableOutcome(projectRoot: string, request: DurableReconcil
       };
     }
     if (request.command === "reconcile_studio_imagegen_call") {
-      await assertActiveManagedStudioContextToken(projectRoot, request.payload.projectContextToken);
-      const expectedEvidenceReference = request.payload.evidenceReference.trim().slice(0, 500);
-      const expectedNote = (request.payload.note ?? "").trim().slice(0, 500);
-      const events = await readStudioImagegenCallEventHistory(projectRoot, request.payload.callId);
-      const event = events.find((candidate) => candidate.kind === request.payload.result
-        && candidate.evidenceReference === expectedEvidenceReference
-        && candidate.evidenceFingerprint === request.payload.evidenceFingerprint.trim().toLowerCase()
-        && candidate.note === expectedNote);
+      // 恢复只证明 immutable event；不得重新验证可能已经轮换的 current active token。
+      const event = await readStudioImagegenCallReconciliationOutcomeReadOnly(projectRoot, {
+        callId: request.payload.callId,
+        kind: request.payload.result,
+        evidenceReference: request.payload.evidenceReference,
+        evidenceFingerprint: request.payload.evidenceFingerprint,
+        note: request.payload.note,
+      });
       if (!event) return undefined;
       return {
         source: "studio_generation_call_ledger",
@@ -1635,33 +3566,30 @@ async function proveDurableOutcome(projectRoot: string, request: DurableReconcil
       };
     }
     if (request.command === "abandon_studio_generation_unknown") {
-      await assertActiveManagedStudioContextToken(projectRoot, request.payload.projectContextToken);
-      const intent = await readStudioImagegenCallIntentByRun(projectRoot, request.payload.generationRunId);
-      if (!intent || intent.callId !== request.payload.callId || intent.status !== "owner-abandoned") return undefined;
-      const history = await readStudioGenerationRunEventHistory(projectRoot, request.payload.generationRunId);
-      const match = history.find((event) => event.kind === "cancelled"
-        && sameStudioGenerationUnknownOwnerAbandonDetail(event.detail, {
-          evidenceReference: request.payload.evidenceReference,
-          evidenceFingerprint: request.payload.evidenceFingerprint,
-          reason: request.payload.reason,
-        }));
-      if (!match) return undefined;
+      const proof = await readStudioGenerationRunCommandOutcomeReadOnly(projectRoot, {
+        command: "abandon",
+        generationRunId: request.payload.generationRunId,
+        callId: request.payload.callId,
+        evidenceReference: request.payload.evidenceReference,
+        evidenceFingerprint: request.payload.evidenceFingerprint,
+        reason: request.payload.reason,
+      });
+      if (!proof?.intent || proof.intent.callId !== request.payload.callId) return undefined;
       return {
         source: "studio_generation_plan_run_ledger",
         identity: {
-          callId: intent.callId,
-          generationRunId: match.generationRunId,
-          eventId: match.eventId,
+          callId: proof.intent.callId,
+          generationRunId: proof.event.generationRunId,
+          eventId: proof.event.eventId,
           disposition: "owner-abandoned-generation-unknown",
         },
-        result: { ...match, callId: intent.callId, status: intent.status, reconciled: true },
+        result: { ...proof.event, callId: proof.intent.callId, status: proof.intent.status, reconciled: true },
       };
     }
     if (request.command === "abandon_studio_detached_generation_unknown") {
-      const disposition = await readStudioDetachedGenerationUnknownDisposition(
-        projectRoot,
-        request.payload.observationId,
-      );
+      const disposition = await readStudioDetachedGenerationUnknownDispositionByIdentityReadOnly(projectRoot, {
+        observationId: request.payload.observationId,
+      });
       const authorizationTextSha256 = createHash("sha256")
         .update(request.payload.authorizationText, "utf8")
         .digest("hex");
@@ -1687,11 +3615,21 @@ async function proveDurableOutcome(projectRoot: string, request: DurableReconcil
       };
     }
     if (request.command === "rebind_studio_imagegen_call_context") {
-      await assertActiveManagedStudioContextToken(projectRoot, request.payload.projectContextToken);
-      const rebind = await readStudioImagegenCallContextRebindByRun(
+      // eventId 内容寻址于完整 rebind detail；先从严格快照中有界寻找完全匹配事件，
+      // 不重新核 active token/quarantine。后续合法新环不会覆盖旧事件。
+      const history = await readStudioImagegenCallContextRebindHistoryByRunReadOnly(
         projectRoot,
         request.payload.generationRunId,
       );
+      const rebind = history.find((candidate) => candidate.callId === request.payload.callId
+        && candidate.packId === request.payload.packId
+        && candidate.packFingerprint === request.payload.packFingerprint
+        && candidate.inputFingerprint === request.payload.inputFingerprint
+        && candidate.candidateSha256 === request.payload.candidateSha256
+        && candidate.receiptSha256 === request.payload.receiptSha256
+        && candidate.evidenceReference === request.payload.evidenceReference.trim().slice(0, 500)
+        && candidate.evidenceFingerprint === request.payload.evidenceFingerprint.trim().toLowerCase()
+        && candidate.reason === request.payload.reason.normalize("NFC").trim());
       if (!rebind
         || rebind.callId !== request.payload.callId
         || rebind.packId !== request.payload.packId
@@ -1736,16 +3674,18 @@ async function proveDurableOutcome(projectRoot: string, request: DurableReconcil
       };
     }
     if (request.command === "create_studio_generation_plan") {
-      // 以 source_command_request_id=commandRequestHash 为锚：证明精确节点集的 plan 已落账。
+      // planId 对节点闭包内容寻址；新 operation 复用旧 plan 时 source request id
+      // 合法属于首次创建者，因此恢复必须按完整 target 集合寻找同一只读投影。
       const expectedAnchor = commandRequestHash(projectRoot, request);
       const wanted = new Set(request.payload.nodes.map((node) => JSON.stringify([
         node.targetKind ?? "panel",
         node.targetKind === "unit-grid" ? `unit-grid:${node.unitId}` : `panel:${node.unitId}:${node.panelId}`,
       ])));
-      const candidates = await listStudioGenerationPlanProjections(projectRoot, { limit: 36 });
-      const plan = candidates.find((candidate) => candidate.sourceCommandRequestId === expectedAnchor
-        && candidate.nodes.length === wanted.size
-        && candidate.nodes.every((node) => wanted.has(JSON.stringify([node.targetKind, node.targetKey]))));
+      // 无 terminal locator 时只认本 operation 的 source anchor。内容寻址复用旧 plan
+      // 不会产生新 anchor；crash-before-terminal 必须保持 unknown，禁止按 targets 猜。
+      const plan = await readStudioGenerationPlanRecordBySourceCommandRequestIdReadOnly(projectRoot, expectedAnchor);
+      if (plan && (plan.nodes.length !== wanted.size
+        || !plan.nodes.every((node) => wanted.has(JSON.stringify([node.targetKind, node.targetKey]))))) return undefined;
       if (!plan) return undefined;
       return {
         source: "studio_generation_plan_run_ledger",
@@ -1754,55 +3694,48 @@ async function proveDurableOutcome(projectRoot: string, request: DurableReconcil
       };
     }
     if (request.command === "fail_studio_generation_run") {
-      // 内容匹配任意位置：目标 failed 事件被 retry-superseded 覆盖也不影响证明。
-      const history = await readStudioGenerationRunEventHistory(projectRoot, request.payload.generationRunId);
-      const match = history.find((event) => {
-        if (event.kind !== "failed") return false;
-        const detail = event.detail as { errorClass?: unknown; detail?: unknown };
-        return detail.errorClass === request.payload.errorClass && (detail.detail ?? "") === (request.payload.detail ?? "");
+      const proof = await readStudioGenerationRunCommandOutcomeReadOnly(projectRoot, {
+        command: "fail",
+        generationRunId: request.payload.generationRunId,
+        errorClass: request.payload.errorClass,
+        detail: request.payload.detail,
       });
-      if (!match) return undefined;
+      if (!proof) return undefined;
       return {
         source: "studio_generation_plan_run_ledger",
-        identity: { generationRunId: match.generationRunId, eventId: match.eventId, kind: match.kind },
-        result: { ...match, reconciled: true },
+        identity: { generationRunId: proof.event.generationRunId, eventId: proof.event.eventId, kind: proof.event.kind },
+        result: { ...proof.event, reconciled: true },
       };
     }
     if (request.command === "cancel_studio_generation_run") {
-      const history = await readStudioGenerationRunEventHistory(projectRoot, request.payload.generationRunId);
-      const match = history.find((event) => event.kind === "cancelled");
-      if (!match) return undefined;
+      const proof = await readStudioGenerationRunCommandOutcomeReadOnly(projectRoot, {
+        command: "cancel",
+        generationRunId: request.payload.generationRunId,
+        reason: request.payload.reason,
+      });
+      if (!proof) return undefined;
       return {
         source: "studio_generation_plan_run_ledger",
-        identity: { generationRunId: match.generationRunId, eventId: match.eventId, kind: match.kind },
-        result: { ...match, reconciled: true },
+        identity: { generationRunId: proof.event.generationRunId, eventId: proof.event.eventId, kind: proof.event.kind },
+        result: { ...proof.event, reconciled: true },
       };
     }
     if (request.command === "retry_studio_generation_plan_nodes") {
-      // 事件链证明：范围内每节点找"带 supersedes_run_id 的 dispatched 事件"（retry 产物，
-      // adopted legacy 的 attempt:1 形态也覆盖）；否则该节点须本就不在 failed/cancelled（合法 skipped）。
-      const plan = await getStudioGenerationPlanProjection(projectRoot, request.payload.planId);
-      if (!plan) return undefined;
-      const inScope = request.payload.nodeIndexes ?? plan.nodes.map((node) => node.nodeIndex);
-      const retried: Array<{ nodeIndex: number; generationRunId: string; attempt: number }> = [];
-      const skipped: Array<{ nodeIndex: number; reason: string }> = [];
-      for (const nodeIndex of inScope) {
-        const node = plan.nodes.find((entry) => entry.nodeIndex === nodeIndex);
-        if (!node) return undefined;
-        const nodeEvents = await readStudioGenerationPlanNodeEventHistory(projectRoot, plan.planId, nodeIndex);
-        const retryDispatch = [...nodeEvents].reverse().find((event) => event.kind === "dispatched" && event.supersedesRunId);
-        if (retryDispatch) {
-          retried.push({ nodeIndex, generationRunId: retryDispatch.generationRunId, attempt: retryDispatch.attempt });
-        } else if (node.status !== "failed" && node.status !== "cancelled") {
-          skipped.push({ nodeIndex, reason: `当前状态 ${node.status} 无需/不可重试` });
-        } else {
-          return undefined;
-        }
-      }
+      const operationId = commandRequestHash(projectRoot, request);
+      const proof = await readStudioGenerationRetryOperationOutcomeReadOnly(
+        projectRoot,
+        operationId,
+        request.payload,
+      );
+      if (!proof) return undefined;
       return {
-        source: "studio_generation_plan_run_ledger",
-        identity: { planId: plan.planId, retriedRunIds: retried.map((entry) => entry.generationRunId) },
-        result: { planId: plan.planId, retried, skipped, reconciled: true },
+        source: "studio_generation_retry_operation_receipts",
+        identity: {
+          operationId,
+          requestFingerprint: proof.requestFingerprint,
+          receiptFingerprint: proof.receiptFingerprint,
+        },
+        result: { ...proof.outcome, reconciled: true },
       };
     }
     if (request.command === "append_studio_script_section_revision") {
@@ -1830,7 +3763,7 @@ async function proveDurableOutcome(projectRoot: string, request: DurableReconcil
       // P7 连续性恢复只认业务事务内的 immutable operation receipt。operationId
       // 是完整公开命令的 request hash，因此既不重放 append，也不从当前 Head 猜测。
       const operationId = commandRequestHash(projectRoot, request);
-      const receipt = await readStudioContinuityOperationReceipt(projectRoot, operationId);
+      const receipt = await readStudioContinuityOperationReceiptReadOnly(projectRoot, operationId);
       const expectedCommand = request.command === "append_studio_continuity_observation"
         ? "append-observation"
         : "append-correction";
@@ -1869,7 +3802,7 @@ async function proveDurableOutcome(projectRoot: string, request: DurableReconcil
       // Review receipt API 先按 command request hash 定位 immutable operation row，
       // 再投影同一 review event；只校验不可变输入语义，不要求它仍是当前 Head。
       const operationId = commandRequestHash(projectRoot, request);
-      const outcome = await readStudioGenerationReviewOperationOutcome(projectRoot, operationId);
+      const outcome = await readStudioGenerationReviewOperationRecordReadOnly(projectRoot, operationId);
       const expectedSupersedesReviewId = request.payload.supersedesReviewId?.trim();
       const expectedCriteria = request.payload.criteria
         .map((criterion) => ({
@@ -1918,10 +3851,7 @@ async function proveDurableOutcome(projectRoot: string, request: DurableReconcil
       // 实际末态只能凭 observation owner 的 immutable operation receipt 对账。
       // 不调用 submit 回放，以免“无回执”的未知执行在恢复路径里产生新写。
       const operationId = commandRequestHash(projectRoot, request);
-      const outcome = await proveStudioPostResultObservationOutcome(projectRoot, {
-        ...request.payload,
-        operationId,
-      });
+      const outcome = await readStudioPostResultObservationOperationRecordReadOnly(projectRoot, operationId);
       if (!outcome) return undefined;
       return {
         source: "studio_post_result_observation_operation_receipts",
@@ -1941,7 +3871,10 @@ async function proveDurableOutcome(projectRoot: string, request: DurableReconcil
     if (request.command === "refresh_studio_generation_checkpoint"
       || request.command === "attest_studio_generation_checkpoint") {
       const operationId = commandRequestHash(projectRoot, request);
-      const receipt = await readStudioGenerationCheckpointOperationReceipt(projectRoot, operationId);
+      const receipt = await readStudioGenerationCheckpointOperationRecordReadOnly(projectRoot, {
+        operationId,
+        ...request.payload,
+      } as RefreshStudioGenerationCheckpointInput | AttestStudioGenerationCheckpointInput);
       const expectedKind = request.command === "refresh_studio_generation_checkpoint" ? "refresh" : "attest";
       const expectedOutcomeKind = expectedKind === "refresh" ? "checkpoint" : "attestation";
       if (!receipt
@@ -2349,6 +4282,29 @@ async function proveDurableOutcomeWithMutationFence(
   return proveDurableOutcome(projectRoot, request);
 }
 
+async function proveCompletedNovelImportOutcomeWithMutationFence(
+  projectRoot: string,
+  request: Extract<DurableReconciliationCommandRequest, { command: "novel_import_external_snapshot" }>,
+): Promise<DurableCommandProof | undefined> {
+  return withProjectLock(projectRoot, "novel-import-mutation", async () => {
+    const operationId = commandRequestHash(projectRoot, request);
+    const completed = await proveCompletedNovelExternalImport(request.payload, operationId);
+    if (!completed) return undefined;
+    const { projectRoot: _absoluteProjectRoot, ...safeOutcome } = completed;
+    return {
+      source: "novel_import_receipts",
+      identity: {
+        operationId,
+        receiptId: completed.receipt.receiptId,
+        projectId: completed.receipt.projectId,
+        receiptFingerprint: completed.receipt.fingerprint,
+        stateChainFingerprint: completed.receipt.stateChainFingerprint,
+      },
+      result: { ...safeOutcome, replayed: true, reconciled: true },
+    };
+  });
+}
+
 function abortError(signal?: AbortSignal): Error {
   const message = typeof signal?.reason === "string" ? signal.reason : signal?.reason instanceof Error ? signal.reason.message : "命令已取消。";
   const error = new Error(message);
@@ -2386,6 +4342,295 @@ function processAlive(pid: number | undefined): boolean {
   catch (error) { return Boolean(error instanceof Error && "code" in error && (error as NodeJS.ErrnoException).code === "EPERM"); }
 }
 
+function matchingSideEffectCommittedEvents(
+  events: Awaited<ReturnType<typeof findEventsByIdempotencyKey>>,
+  record: IdempotentCommandResult,
+) {
+  return events.filter((event) => event.type === "command.side-effect-committed"
+    && event.requestId === record.requestId
+    && event.command === record.command
+    && event.data?.requestHash === record.requestHash);
+}
+
+async function hasValidatedSideEffectCommittedReceipt(
+  projectRoot: string,
+  storageRoot: string,
+  record: IdempotentCommandResult,
+): Promise<boolean> {
+  return (await readCommandTerminalReceiptSnapshot({
+    projectRoot,
+    storageRoot,
+    record,
+  })).outcome !== undefined;
+}
+
+function committedEventOutcome(
+  events: ReturnType<typeof matchingSideEffectCommittedEvents>,
+): {
+  status: "succeeded" | "failed";
+  errorMessage?: string;
+  result: unknown;
+} {
+  if (events.length === 0) throw new Error("命令终态收据为空，不能对账。");
+  const validated = events.map((event) => ({
+    event,
+    ...parseCommandTerminalReceiptData(event.data),
+  }));
+  const terminalIdentities = new Set(validated.map((receipt) =>
+    `${receipt.outcomeStatus}:${receipt.resultDigest}`));
+  if (terminalIdentities.size !== 1) {
+    throw new Error("同一命令存在互相冲突的终态收据；保持原账本状态并停止对账。");
+  }
+  for (const { event, resultDigest } of validated) {
+    const data = event.data ?? {};
+    if (!Object.prototype.hasOwnProperty.call(data, "result")) continue;
+    const actualDigest = createHash("sha256").update(stable(data.result)).digest("hex");
+    if (actualDigest !== resultDigest) {
+      throw new Error("命令终态收据的结果与 resultDigest 不一致；保持原账本状态并停止对账。");
+    }
+  }
+  const failed = validated.find((receipt) => receipt.outcomeStatus === "failed");
+  const selected = failed ?? validated[0];
+  if (!selected) throw new Error("命令终态收据为空，不能对账。");
+  const data = selected.event.data ?? {};
+  const hasResult = Object.prototype.hasOwnProperty.call(data, "result");
+  return {
+    status: failed ? "failed" : "succeeded",
+    ...(failed ? { errorMessage: String(data.error ?? "命令已确认失败。") } : {}),
+    result: hasResult
+      ? data.result
+      : {
+        schemaVersion: 1,
+        kind: "command-terminal-result-unavailable-locator",
+        command: selected.event.command,
+        resultDigest: selected.resultDigest,
+        reconciled: true,
+        evidenceEvents: events.map((event) => ({
+          id: event.id,
+          type: event.type,
+          at: event.at,
+          itemId: event.itemId,
+          taskId: event.taskId,
+        })),
+      },
+  };
+}
+
+type CommandTerminalReceiptEvents = ReturnType<typeof matchingSideEffectCommittedEvents>;
+
+interface CommandTerminalReceiptSnapshot {
+  ownerRoot: string;
+  mirrorRoot?: string;
+  ownerEvents: CommandTerminalReceiptEvents;
+  mirrorEvents: CommandTerminalReceiptEvents;
+  outcome?: ReturnType<typeof committedEventOutcome>;
+}
+
+async function readCommandTerminalReceiptSnapshot(input: {
+  projectRoot: string;
+  storageRoot: string;
+  record: IdempotentCommandResult;
+}): Promise<CommandTerminalReceiptSnapshot> {
+  const root = path.resolve(input.projectRoot);
+  const ownerRoot = path.resolve(input.storageRoot);
+  const ownerEvents = matchingSideEffectCommittedEvents(
+    await findEventsByIdempotencyKey(ownerRoot, input.record.idempotencyKey, 200),
+    input.record,
+  );
+  const mirrorEvents = ownerRoot === root
+    ? []
+    : matchingSideEffectCommittedEvents(
+      await findEventsByIdempotencyKey(root, input.record.idempotencyKey, 200),
+      input.record,
+    );
+  if (ownerRoot !== root) {
+    const ownerMatchingIdentityEvents = ownerEvents;
+    const mirrorMatchingIdentityEvents = mirrorEvents;
+    // 两个根各自出现同 idempotencyKey 的 terminal receipt，但 identity 不同，
+    // 不能把“不匹配”误当作“缺失”；这属于跨根 request identity 冲突。
+    const ownerAllTerminalEvents = (await findEventsByIdempotencyKey(ownerRoot, input.record.idempotencyKey, 200))
+      .filter((event) => event.type === "command.side-effect-committed");
+    const mirrorAllTerminalEvents = (await findEventsByIdempotencyKey(root, input.record.idempotencyKey, 200))
+      .filter((event) => event.type === "command.side-effect-committed");
+    if (ownerAllTerminalEvents.length !== ownerMatchingIdentityEvents.length
+      || mirrorAllTerminalEvents.length !== mirrorMatchingIdentityEvents.length) {
+      throw new Error("命令终态收据在事务根 owner 或镜像根存在 request identity 冲突；保持原账本状态并停止对账。");
+    }
+  }
+  const ownerOutcome = ownerEvents.length ? committedEventOutcome(ownerEvents) : undefined;
+  const mirrorOutcome = mirrorEvents.length ? committedEventOutcome(mirrorEvents) : undefined;
+  if (!ownerOutcome && mirrorOutcome) {
+    throw new Error("命令终态收据只存在于镜像根、事务根 owner 缺失；失败关闭并禁止 durable proof 覆盖。");
+  }
+  if (ownerOutcome && mirrorOutcome) {
+    const ownerIdentity = `${ownerOutcome.status}:${parseCommandTerminalReceiptData(ownerEvents[0]!.data).resultDigest}`;
+    const mirrorIdentity = `${mirrorOutcome.status}:${parseCommandTerminalReceiptData(mirrorEvents[0]!.data).resultDigest}`;
+    if (ownerIdentity !== mirrorIdentity) {
+      throw new Error("命令终态收据在事务根 owner 与镜像根之间互相冲突；保持原账本状态并停止对账。");
+    }
+  }
+  return {
+    ownerRoot,
+    ...(ownerRoot === root ? {} : { mirrorRoot: root }),
+    ownerEvents,
+    mirrorEvents,
+    outcome: ownerOutcome,
+  };
+}
+
+function assertTerminalLedgerMatchesReceipt(
+  record: IdempotentCommandResult,
+  outcome: ReturnType<typeof committedEventOutcome>,
+  ownerEvents: CommandTerminalReceiptEvents,
+): void {
+  if ((record.status === "succeeded" || record.status === "failed") && record.status !== outcome.status) {
+    throw new Error("命令账本终态与终态收据冲突；保持原账本状态并停止对账。");
+  }
+  if (record.status === "succeeded" || record.status === "failed") {
+    const receiptCarriesResult = ownerEvents.some((event) =>
+      Object.prototype.hasOwnProperty.call(event.data ?? {}, "result"));
+    if (record.result === undefined) {
+      if (!receiptCarriesResult) {
+        throw new Error("命令终态账本缺少结果且终态收据仅含摘要；无法验证结果身份，保持原账本状态并停止对账。");
+      }
+      return;
+    }
+    const receiptDigest = parseCommandTerminalReceiptData(ownerEvents[0]!.data).resultDigest;
+    const ledgerDigest = outcome.status === "failed"
+      ? terminalReceiptResult(record.result).resultDigest
+      : commandTerminalReceiptResult(record.command, record.result, record.requestHash).resultDigest;
+    if (ledgerDigest !== receiptDigest) {
+      throw new Error("命令账本结果摘要与终态收据冲突；保持原账本状态并停止对账。");
+    }
+  }
+}
+
+async function appendMissingTerminalReceiptMirror(
+  snapshot: CommandTerminalReceiptSnapshot,
+): Promise<void> {
+  if (!snapshot.mirrorRoot || snapshot.mirrorEvents.length || !snapshot.ownerEvents.length) return;
+  const owner = snapshot.ownerEvents[snapshot.ownerEvents.length - 1]!;
+  await appendEvent(snapshot.mirrorRoot, {
+    actor: owner.actor,
+    type: owner.type,
+    requestId: owner.requestId,
+    idempotencyKey: owner.idempotencyKey,
+    command: owner.command,
+    itemId: owner.itemId,
+    taskId: owner.taskId,
+    data: owner.data,
+  });
+}
+
+async function reconcileRunningCommandFromCommittedEvent(input: {
+  projectRoot: string;
+  storageRoot: string;
+  record: IdempotentCommandResult;
+  replayRequestId: string;
+}): Promise<IdempotentCommandResult | undefined> {
+  const root = path.resolve(input.projectRoot);
+  const storageRoot = path.resolve(input.storageRoot);
+  let evidenceEventIds: string[] = [];
+  let transitioned = false;
+  const stored = await withProjectLock(storageRoot, "command-bus", async () => {
+    const current = await getCommandByIdempotencyKey(storageRoot, input.record.idempotencyKey);
+    if (!current
+      || current.requestHash !== input.record.requestHash
+      || current.command !== input.record.command) return undefined;
+    if (!["running", "unknown", "succeeded", "failed"].includes(current.status)) return undefined;
+    const snapshot = await readCommandTerminalReceiptSnapshot({
+      projectRoot: root,
+      storageRoot,
+      record: current,
+    });
+    const evidence = snapshot.ownerEvents;
+    if (!snapshot.outcome) return undefined;
+    const reconciledAt = new Date().toISOString();
+    const outcome = snapshot.outcome;
+    evidenceEventIds = evidence.map((event) => event.id);
+    if (current.status === "succeeded" || current.status === "failed") {
+      assertTerminalLedgerMatchesReceipt(current, outcome, evidence);
+    } else {
+      transitioned = true;
+      current.status = outcome.status;
+      current.error = outcome.status === "failed"
+        ? { message: outcome.errorMessage ?? "命令已确认失败。", observedAt: reconciledAt }
+        : undefined;
+      current.result = outcome.result;
+      current.execution = {
+        pid: process.pid,
+        phase: "side_effect_committed",
+        heartbeatAt: reconciledAt,
+      };
+      current.executedAt = reconciledAt;
+      if (current.command === "commit_agent_imagegen_result_bundle"
+        || isStudioOperationLocatorCommand(current.command)) {
+        current.durableReconciliation = undefined;
+      }
+      await persistCommandLedgerEntry(storageRoot, current, reconciledAt);
+    }
+    return current;
+  });
+  if (!stored) return undefined;
+  if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, stored);
+  await appendMissingTerminalReceiptMirror(await readCommandTerminalReceiptSnapshot({
+    projectRoot: root,
+    storageRoot,
+    record: stored,
+  }));
+  if (transitioned && evidenceEventIds.length) {
+    const event = {
+      actor: "codex" as const,
+      type: "command.reconciled",
+      requestId: stored.requestId,
+      idempotencyKey: stored.idempotencyKey,
+      command: stored.command,
+      data: {
+        evidenceEventIds,
+        evidenceSource: "command.side-effect-committed",
+        reconciledAt: stored.executedAt,
+      },
+    };
+    await appendEvent(storageRoot, event);
+    if (storageRoot !== root) await appendEvent(root, event);
+  }
+  return {
+    ...stored,
+    requestId: input.replayRequestId,
+    replayed: true,
+  };
+}
+
+function terminalPersistenceOutcomeUnknown(error: unknown): Error & {
+  code: "OUTCOME_UNKNOWN";
+  reconciliationRequired: true;
+} {
+  return Object.assign(
+    new Error("命令执行结果未确认：事务根已保留命令状态或终态证据，但命令账本终态/镜像暂时无法完整写入；必须按原 idempotencyKey 对账，禁止重跑业务副作用。", { cause: error }),
+    { code: "OUTCOME_UNKNOWN" as const, reconciliationRequired: true as const },
+  );
+}
+
+function isTerminalPersistenceOutcomeUnknown(error: unknown): error is Error & {
+  code: "OUTCOME_UNKNOWN";
+  reconciliationRequired: true;
+} {
+  return error instanceof Error
+    && (error as { code?: unknown }).code === "OUTCOME_UNKNOWN"
+    && (error as { reconciliationRequired?: unknown }).reconciliationRequired === true;
+}
+
+async function mirrorTerminalLedgerRecord(
+  projectRoot: string,
+  record: IdempotentCommandResult,
+): Promise<void> {
+  try {
+    await mirrorLedgerRecord(projectRoot, record);
+  } catch (error) {
+    throw terminalPersistenceOutcomeUnknown(error);
+  }
+}
+
 async function markDurableRecoveryRejected(input: {
   projectRoot: string;
   storageRoot: string;
@@ -2410,7 +4655,7 @@ async function markDurableRecoveryRejected(input: {
     await persistCommandLedgerEntry(storageRoot, current, observedAt);
     return current;
   });
-  if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
+  if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, stored);
   if (stored.status === "failed") {
     const event = {
       actor: "codex" as const,
@@ -2438,11 +4683,15 @@ async function recoverCommandFromDurableState(input: {
   record: IdempotentCommandResult;
   request: DurableReconciliationCommandRequest;
   replayRequestId?: string;
+  allowLiveCompletedNovelImportProof?: boolean;
 }): Promise<IdempotentCommandResult | undefined> {
   const root = path.resolve(input.projectRoot);
   const storageRoot = path.resolve(input.storageRoot);
   if (input.record.command !== input.request.command || input.record.requestHash !== commandRequestHash(root, input.request)) return undefined;
-  let proof = await proveDurableOutcomeWithMutationFence(root, input.request);
+  let proof = input.allowLiveCompletedNovelImportProof === true
+    && input.request.command === "novel_import_external_snapshot"
+    ? await proveCompletedNovelImportOutcomeWithMutationFence(root, input.request)
+    : await proveDurableOutcomeWithMutationFence(root, input.request);
   if (proof && input.request.command === "novel_import_external_snapshot") {
     const recordAnchor = existingNovelImportResultAnchor(input.record);
     const requestAnchor = await uniqueNovelImportRequestAnchor(storageRoot, input.record.requestHash);
@@ -2508,11 +4757,42 @@ async function recoverCommandFromDurableState(input: {
   const stored = await withProjectLock(storageRoot, "command-bus", async (): Promise<IdempotentCommandResult | undefined> => {
     const current = await getCommandByIdempotencyKey(storageRoot, input.record.idempotencyKey);
     if (!current || current.requestHash !== input.record.requestHash || current.command !== input.record.command) return undefined;
-    if (current.status === "succeeded") return current;
-    const recoverableFailed = current.status === "failed" && current.execution?.phase === "side_effect_committed";
-    if (current.status === "failed" && !recoverableFailed) return undefined;
+    // proof 的读取发生在锁外，producer 可能在此期间先写入 terminal receipt。
+    // 落 proof 前必须在 command owner 锁内二次读取，并让 receipt 的终态优先。
+    const terminalSnapshot = await readCommandTerminalReceiptSnapshot({
+      projectRoot: root,
+      storageRoot,
+      record: current,
+    });
+    if (terminalSnapshot.outcome) {
+      assertTerminalLedgerMatchesReceipt(current, terminalSnapshot.outcome, terminalSnapshot.ownerEvents);
+      const receiptAt = new Date().toISOString();
+      current.status = terminalSnapshot.outcome.status;
+      current.result = terminalSnapshot.outcome.result;
+      current.error = terminalSnapshot.outcome.status === "failed"
+        ? { message: terminalSnapshot.outcome.errorMessage ?? "命令已确认失败。", observedAt: receiptAt }
+        : undefined;
+      current.execution = { pid: process.pid, phase: "side_effect_committed", heartbeatAt: receiptAt };
+      current.executedAt = receiptAt;
+      if (current.command === "commit_agent_imagegen_result_bundle"
+        || isStudioOperationLocatorCommand(current.command)) {
+        current.durableReconciliation = undefined;
+      }
+      await persistCommandLedgerEntry(storageRoot, current, receiptAt);
+      return current;
+    }
+    if (current.status === "succeeded" || current.status === "failed") {
+      // 本次 proof 读取期间另一执行者可能已经持久化完整终态但 receipt 尚不可见。
+      // 绝不能用较早 proof 覆盖它；保留当前终态原值。
+      return current;
+    }
     if (current.status === "cancelled") return undefined;
-    if (current.status === "running" && processAlive(current.execution?.pid)) return undefined;
+    const liveCompletedNovelImportProof = input.allowLiveCompletedNovelImportProof === true
+      && input.request.command === "novel_import_external_snapshot"
+      && proof !== undefined;
+    if (current.status === "running"
+      && processAlive(current.execution?.pid)
+      && !liveCompletedNovelImportProof) return undefined;
     if (input.request.command === "novel_import_external_snapshot") {
       const recordAnchor = existingNovelImportResultAnchor(current);
       const requestAnchor = await uniqueNovelImportRequestAnchor(storageRoot, current.requestHash);
@@ -2525,16 +4805,23 @@ async function recoverCommandFromDurableState(input: {
       current.novelImportResultAnchor = expected;
     }
     current.status = "succeeded";
-    current.result = proof.result;
+    current.result = input.request.command === "novel_import_external_snapshot"
+      ? novelImportResultLocatorFromResult(proof.result)
+      : input.request.command === "commit_agent_imagegen_result_bundle"
+        ? agentImagegenResultBundleLocatorFromResult(proof.result)
+        : projectStudioOperationResultForPersistence(input.request.command, proof.result, current.requestHash);
     current.error = undefined;
     current.execution = { pid: process.pid, phase: "side_effect_committed", heartbeatAt: reconciledAt };
     current.executedAt = reconciledAt;
-    current.durableReconciliation ??= durableReconciliationSnapshot(input.request);
+    if (current.command === "commit_agent_imagegen_result_bundle"
+      || isStudioOperationLocatorCommand(current.command)) {
+      current.durableReconciliation = undefined;
+    }
     await persistCommandLedgerEntry(storageRoot, current, reconciledAt);
     return current;
   });
   if (!stored) return undefined;
-  if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
+  if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, stored);
   const event = {
     actor: "codex" as const,
     type: "command.reconciled",
@@ -2571,7 +4858,7 @@ async function markLostDurableExecutorUnknown(input: {
     await persistCommandLedgerEntry(storageRoot, current, observedAt);
     return current;
   });
-  if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
+  if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, stored);
   if (stored.status === "unknown") {
     await appendEvent(storageRoot, { actor: "codex", type: "command.executor-lost", requestId: stored.requestId, idempotencyKey: stored.idempotencyKey, command: stored.command, data: { pid: input.record.execution?.pid, phase: input.record.execution?.phase, heartbeatAt: input.record.execution?.heartbeatAt, observedAt } });
   }
@@ -3466,9 +5753,12 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
   }
   // Studio 命令在写统一命令账本前先验证受管壳，避免把普通/legacy 目录静默接管。
   // 正式写根强制为当前受管工程；禁止隐式跨根 storageRoot。
-  let managedShell: Awaited<ReturnType<typeof inspectManagedProject>> | undefined;
+  let managedShell: Awaited<ReturnType<typeof inspectManagedProjectReadOnly>> | undefined;
   if (studioCommand) {
-    managedShell = await inspectManagedProject(root);
+    // 登记/重放前只验证受管壳身份，不能初始化或修复 generation owner。
+    // 真正首次执行仍会在 execute() 进入业务 executor 前走 inspectManagedProject；
+    // succeeded same-key / receipt reconcile 则保持物理只读，避免悄悄补表或 trigger。
+    managedShell = await inspectManagedProjectReadOnly(root);
     // 跨代理写租约：require 模式无租约不准写；compat 仅在有租约时挡异主。
     const { assertStudioProjectWriteLeaseForCommand } = await import("./studio-project-write-lease.js");
     await assertStudioProjectWriteLeaseForCommand(root, {
@@ -3524,17 +5814,20 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
       throw new Error("小说导入 registered 业务闭包漂移；本次拒绝重放并将账本降为 unknown。", { cause: error });
     }
   };
-  const registration = await withSqliteBusyRetry(() => withProjectLock(storageRoot, "command-bus", async (): Promise<{ action: "execute"; record: IdempotentCommandResult } | { action: "replay"; record: IdempotentCommandResult } | { action: "recover"; record: IdempotentCommandResult } | { action: "wait" }> => {
+  const registration = await withSqliteBusyRetry(() => withProjectLock(storageRoot, "command-bus", async (): Promise<{ action: "execute"; record: IdempotentCommandResult } | { action: "replay"; record: IdempotentCommandResult } | { action: "recover"; record: IdempotentCommandResult } | { action: "receipt-reconcile"; record: IdempotentCommandResult } | { action: "wait" }> => {
     const keyed = await getCommandByIdempotencyKey(storageRoot, input.idempotencyKey);
     if (keyed) {
       if (keyed.requestHash !== requestHash) throw new Error("幂等键已用于不同参数；拒绝执行以避免重复或错写。 ");
+      if (["running", "succeeded", "failed"].includes(keyed.status)
+        && await hasValidatedSideEffectCommittedReceipt(root, storageRoot, keyed)) {
+        return { action: "receipt-reconcile", record: { ...keyed } };
+      }
       if (keyed.status === "succeeded") return { action: "replay", record: { ...keyed, requestId: input.requestId, replayed: true } };
       if (keyed.status === "running") {
         if (isDurableReconciliationCommand(input.request) && !processAlive(keyed.execution?.pid)) return { action: "recover", record: { ...keyed } };
         return { action: "wait" };
       }
       if (keyed.status === "failed") {
-        if (isDurableReconciliationCommand(input.request) && keyed.execution?.phase === "side_effect_committed") return { action: "recover", record: { ...keyed } };
         if (keyed.error?.busyUncommitted === true) {
           // SQLite 瞬时锁失败且事务确认未提交：允许同一 idempotencyKey（参数哈希已在
           // 上方校验一致）受控重试。重新登记 running，不新建账本键、不重放旧结果。
@@ -3575,13 +5868,16 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
     const requested = await getCommandByRequestId(storageRoot, input.requestId);
     if (requested && requested.requestHash !== requestHash) throw new Error("requestId 已用于不同命令；请生成新的 requestId。 ");
     if (requested) {
+      if (["running", "succeeded", "failed"].includes(requested.status)
+        && await hasValidatedSideEffectCommittedReceipt(root, storageRoot, requested)) {
+        return { action: "receipt-reconcile", record: { ...requested } };
+      }
       if (requested.status === "succeeded") return { action: "replay", record: { ...requested, replayed: true } };
       if (requested.status === "running") {
         if (isDurableReconciliationCommand(input.request) && !processAlive(requested.execution?.pid)) return { action: "recover", record: { ...requested } };
         return { action: "wait" };
       }
       if (requested.status === "failed") {
-        if (isDurableReconciliationCommand(input.request) && requested.execution?.phase === "side_effect_committed") return { action: "recover", record: { ...requested } };
         throw new Error(`requestId 对应命令已明确失败：${requested.error?.message ?? "已记录失败终态"}；请修正输入并使用新的 requestId 与 idempotencyKey。`);
       }
       if (requested.status === "cancelled") throw new Error(`requestId 对应命令已明确取消且未提交；如需重新执行，请使用新的 requestId 与 idempotencyKey。`);
@@ -3608,12 +5904,46 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
     }
     throw error;
   }));
-  if (registration.action === "replay") return verifyNovelImportReplay(registration.record);
+  if (registration.action === "replay") {
+    if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, registration.record);
+    const replayed = await hydrateSucceededPublicReplay(root, input.request, registration.record);
+    return verifyNovelImportReplay(replayed);
+  }
+  if (registration.action === "receipt-reconcile") {
+    // 必须在对账将账本转为 terminal 之前冻结入口状态；只有本次
+    // running/unknown -> succeeded 才允许读取纯只读 Owner 补全响应。
+    const enteredReceiptRecovery = registration.record.status === "running"
+      || registration.record.status === "unknown";
+    const reconciled = await reconcileRunningCommandFromCommittedEvent({
+      projectRoot: root,
+      storageRoot,
+      record: registration.record,
+      replayRequestId: input.requestId,
+    });
+    if (!reconciled) {
+      throw new Error("命令终态证据在对账期间发生变化；保持原账本状态并禁止重跑业务副作用。");
+    }
+    const persistedProjection = revokePersistedImagegenCallCapability(reconciled);
+    const replayed = enteredReceiptRecovery
+      && shouldHydrateReceiptRecoveryResult(input.request)
+      ? await hydrateReceiptReconciledCommandResult(root, input.request, persistedProjection)
+      : await hydrateSucceededPublicReplay(root, input.request, persistedProjection);
+    if (replayed.status === "failed") {
+      throw new ConfirmedCommandFailure(
+        `命令 ${replayed.command} 已明确失败：${replayed.error?.message ?? "已记录失败终态"}；原幂等键不会重放。`,
+        replayed.result,
+      );
+    }
+    return verifyNovelImportReplay(replayed);
+  }
   if (registration.action === "recover") {
     const recovered = isDurableReconciliationCommand(input.request)
       ? await recoverCommandFromDurableState({ projectRoot: root, storageRoot, record: registration.record, request: input.request, replayRequestId: input.requestId })
       : undefined;
-    if (recovered) return verifyNovelImportReplay(revokePersistedImagegenCallCapability(recovered));
+    if (recovered) {
+      const replayed = await hydrateRecoveredPublicResult(root, input.request, recovered);
+      return verifyNovelImportReplay(replayed);
+    }
     const unresolved = registration.record.status === "running"
       ? await markLostDurableExecutorUnknown({ projectRoot: root, storageRoot, record: registration.record })
       : registration.record;
@@ -3622,6 +5952,7 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
   }
   if (registration.action === "wait") {
     const deadline = Date.now() + Math.max(250, options.waitForRunningMs ?? 30_000);
+    let nextLiveNovelImportProofAt = 0;
     while (Date.now() < deadline) {
       await wait(40, signal);
       const current = (await getCommandByIdempotencyKey(storageRoot, input.idempotencyKey))
@@ -3629,13 +5960,11 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
       if (!current) throw new Error("命令等待期间账本记录消失；已停止执行以避免重复副作用。 ");
       if (current.requestHash !== requestHash) throw new Error("命令等待期间请求哈希发生冲突；拒绝继续。 ");
       if (current.status === "succeeded") {
-        return verifyNovelImportReplay({ ...current, requestId: input.requestId, replayed: true });
+        const waited = { ...current, requestId: input.requestId, replayed: true };
+        const replayed = await hydrateSucceededPublicReplay(root, input.request, waited);
+        return verifyNovelImportReplay(replayed);
       }
       if (current.status === "failed") {
-        if (isDurableReconciliationCommand(input.request) && current.execution?.phase === "side_effect_committed") {
-          const recovered = await recoverCommandFromDurableState({ projectRoot: root, storageRoot, record: current, request: input.request, replayRequestId: input.requestId });
-          if (recovered) return verifyNovelImportReplay(recovered);
-        }
         if (current.error?.busyUncommitted === true) {
           // 等待中目击到 busyUncommitted 失败终态：事务确认未提交，可安全重试。
           // 消息携带 canonical SQLITE_BUSY 文案，错误对象带结构化 busyUncommitted/retryable
@@ -3652,13 +5981,30 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
       if (current.status === "unknown") {
         if (isDurableReconciliationCommand(input.request)) {
           const recovered = await recoverCommandFromDurableState({ projectRoot: root, storageRoot, record: current, request: input.request, replayRequestId: input.requestId });
-          if (recovered) return verifyNovelImportReplay(recovered);
+          if (recovered) return verifyNovelImportReplay(
+            await hydrateRecoveredPublicResult(root, input.request, recovered));
         }
         throw new Error(`命令 ${current.command} 的执行结果为 unknown；禁止自动重放。请先读取命令账本和真实文件进行结果对账。`);
       }
+      if (current.status === "running"
+        && input.request.command === "novel_import_external_snapshot"
+        && Date.now() >= nextLiveNovelImportProofAt) {
+        nextLiveNovelImportProofAt = Date.now() + 250;
+        const recovered = await recoverCommandFromDurableState({
+          projectRoot: root,
+          storageRoot,
+          record: current,
+          request: input.request,
+          replayRequestId: input.requestId,
+          allowLiveCompletedNovelImportProof: true,
+        });
+        if (recovered) return verifyNovelImportReplay(
+          await hydrateRecoveredPublicResult(root, input.request, recovered));
+      }
       if (isDurableReconciliationCommand(input.request) && current.status === "running" && !processAlive(current.execution?.pid)) {
         const recovered = await recoverCommandFromDurableState({ projectRoot: root, storageRoot, record: current, request: input.request, replayRequestId: input.requestId });
-        if (recovered) return verifyNovelImportReplay(recovered);
+        if (recovered) return verifyNovelImportReplay(
+          await hydrateRecoveredPublicResult(root, input.request, recovered));
         await markLostDurableExecutorUnknown({ projectRoot: root, storageRoot, record: current });
         throw new Error(`命令 ${current.command} 的执行进程已退出，且不可变证据不足；保持 unknown，禁止自动重放。`);
       }
@@ -3676,6 +6022,44 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
     await persistCommandLedgerEntry(storageRoot, next, next.executedAt ?? next.startedAt);
     return next;
   });
+  let terminalLedgerFailureInjected = false;
+  const persistAfterTerminalReceipt = async (): Promise<IdempotentCommandResult> => {
+    let stored: IdempotentCommandResult;
+    try {
+      if (!terminalLedgerFailureInjected
+        && process.env.AI_CANVAS_TEST_COMMAND_FAIL_TERMINAL_LEDGER_ONCE === input.request.command) {
+        terminalLedgerFailureInjected = true;
+        throw new Error("TEST_ONLY_TERMINAL_LEDGER_FAILURE");
+      }
+      stored = await persistRecord();
+    } catch (error) {
+      const observedAt = new Date().toISOString();
+      record.status = "unknown";
+      record.error = {
+        message: "业务终态收据已保存，但命令账本终态尚未确认；必须按原 idempotencyKey 对账，禁止重跑业务副作用。",
+        observedAt,
+      };
+      record.executedAt = observedAt;
+      try {
+        const fallback = await persistRecord();
+        await appendEvent(storageRoot, {
+          actor: "codex",
+          type: "command.outcome-unknown",
+          requestId: input.requestId,
+          idempotencyKey: input.idempotencyKey,
+          command: input.request.command,
+          data: { requestHash, error: record.error.message, projectRoot: root, terminalReceiptPresent: true },
+        });
+        if (storageRoot !== root) await mirrorLedgerRecord(root, fallback);
+      } catch {
+        // 第一次终态写和保守 unknown 写都失败时，已有 terminal receipt 仍是
+        // 唯一耐久业务证据；保留原 running 行，由同键自动对账消费 receipt。
+      }
+      throw terminalPersistenceOutcomeUnknown(error);
+    }
+    if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, stored);
+    return stored;
+  };
 
   let heartbeatChain = Promise.resolve();
   const heartbeat = setInterval(() => {
@@ -3760,13 +6144,37 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
     });
     await stopHeartbeat();
     if (process.env.AI_CANVAS_TEST_COMMAND_CRASH_BEFORE_COMMIT_EVENT === input.request.command) throw new Error("TEST_ONLY_CRASH_BEFORE_COMMIT_EVENT");
-    const persistedResult = input.request.command === "prepare_studio_higgsfield_video_generation"
+    const capabilitySafeResult = input.request.command === "prepare_studio_higgsfield_video_generation"
       ? projectHiggsfieldPrepareResultForPersistence(result)
       : (["claim_studio_higgsfield_connector_request", "authorize_studio_higgsfield_connector_request"] as const).includes(input.request.command as never)
         ? projectHiggsfieldConnectorQueueResultForPersistence(input.request.command, result)
       : input.request.command === "prepare_studio_imagegen_call"
         ? revokeImagegenCallCapabilityFromResult(result)
-        : result;
+        : input.request.command === "materialize_local_creative_production_units"
+          ? localCreativeMaterializationResultLocatorFromResult(result)
+          : input.request.command === "commit_agent_imagegen_result_bundle"
+            ? agentImagegenResultBundleLocatorFromResult(result)
+            : result;
+    const persistenceInput = input.request.command === "abandon_studio_generation_unknown"
+      && capabilitySafeResult && typeof capabilitySafeResult === "object" && !Array.isArray(capabilitySafeResult)
+      ? {
+        ...capabilitySafeResult,
+        callId: input.request.payload.callId,
+        status: "owner-abandoned",
+      }
+      : capabilitySafeResult;
+    const persistedResult = projectStudioOperationResultForPersistence(
+      input.request.command,
+      persistenceInput,
+      requestHash,
+    );
+    // 敏感 durable snapshot 只服务“无 terminal receipt”的崩溃窗。一旦业务返回
+    // 可内容寻址的安全 locator，就先从内存记录撤销；即使随后 terminal event 写入
+    // 或投影校验抛错，unknown 账本也不得重新持久化 token/note/reason。
+    if (input.request.command === "commit_agent_imagegen_result_bundle"
+      || isStudioOperationLocatorCommand(input.request.command)) {
+      record.durableReconciliation = undefined;
+    }
     if (novelImportCommand) {
       await withProjectLock(root, "novel-import-mutation", async () => {
         const actual = novelImportResultAnchorFromResult(persistedResult);
@@ -3777,16 +6185,51 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
         await persistRecord();
       });
     }
-    const resultDigest = createHash("sha256").update(stable(persistedResult)).digest("hex");
-    record.execution = { pid: process.pid, phase: "side_effect_committed", heartbeatAt: new Date().toISOString() };
-    // 导入业务副作用已经闭合，先把首次 receipt 锚点与 side_effect_committed
-    // 阶段持久化；即使随后响应丢失，unknown 恢复也不能采用另一套自洽闭包。
-    // novel import 已在 mutation fence 内连同跨 key anchor 一起持久化。
-    const terminalData = { requestHash, command: input.request.command, resultDigest, projectRoot: root };
-    await appendEvent(storageRoot, { actor: "codex", type: "command.side-effect-committed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: terminalData });
+    const terminalData = await withProjectLock(storageRoot, "command-bus", async () => {
+      const current = await getCommandByIdempotencyKey(storageRoot, record.idempotencyKey);
+      if (!current || current.requestHash !== record.requestHash || current.command !== record.command) {
+        throw new Error("业务完成后命令账本身份发生变化；停止写终态收据。");
+      }
+      record.execution = { pid: process.pid, phase: "side_effect_committed", heartbeatAt: new Date().toISOString() };
+      if (input.request.command === "commit_agent_imagegen_result_bundle") {
+        // bundle owner 已完成后，先把唯一可恢复的安全 locator 落入 command owner，
+        // 再追加 terminal receipt。即使进程在两者之间硬退出，磁盘也不再保留
+        // projectContextToken/rawPath/executionReceipt 等 durable request 原文。
+        record.result = persistedResult;
+        record.durableReconciliation = undefined;
+        await persistCommandLedgerEntry(storageRoot, record, record.execution.heartbeatAt);
+        if (process.env.NODE_ENV === "test"
+          && process.env.AI_CANVAS_TEST_COMMAND_PAUSE_AFTER_SAFE_CHECKPOINT === input.request.command) {
+          const configured = Number(process.env.AI_CANVAS_TEST_COMMAND_PAUSE_AFTER_SAFE_CHECKPOINT_MS ?? "30000");
+          const pauseMs = Number.isFinite(configured)
+            ? Math.max(1, Math.min(Math.trunc(configured), 60_000))
+            : 30_000;
+          await new Promise<void>((resolve) => setTimeout(resolve, pauseMs));
+        }
+        if (process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_SAFE_CHECKPOINT === input.request.command) {
+          throw new Error("TEST_ONLY_CRASH_AFTER_SAFE_CHECKPOINT");
+        }
+      }
+      const terminalReceipt = commandTerminalReceiptResult(input.request.command, persistedResult, requestHash);
+      // owner terminal receipt 与 command owner 锁同序，durable recovery 在同锁内
+      // 二次读取，不再允许 proof 与 producer receipt 交叉覆盖。
+      const data = {
+        requestHash,
+        command: input.request.command,
+        ...terminalReceipt,
+        projectRoot: root,
+        outcomeStatus: "succeeded" as const,
+      };
+      if (input.request.command === "commit_agent_imagegen_result_bundle"
+        || isStudioOperationLocatorCommand(input.request.command)) {
+        record.durableReconciliation = undefined;
+      }
+      await appendEvent(storageRoot, { actor: "codex", type: "command.side-effect-committed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data });
+      return data;
+    });
     if (storageRoot !== root) {
       await appendEvent(root, { actor: "codex", type: "command.side-effect-committed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: terminalData });
-      await mirrorLedgerRecord(root, record);
+      await mirrorTerminalLedgerRecord(root, record);
     }
     if (process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE === input.request.command) throw new Error("TEST_ONLY_CRASH_AFTER_EXECUTE");
     // 测试注入：副作用已提交后的响应丢失窗口抛 busy——必须走 outcome_unknown 对账，禁止重试。
@@ -3794,20 +6237,24 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
     record.status = "succeeded";
     record.result = persistedResult;
     record.executedAt = new Date().toISOString();
-    const stored = await persistRecord();
-    if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
+    const stored = await persistAfterTerminalReceipt();
     await appendEvent(storageRoot, { actor: "codex", type: "command.executed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { requestHash, projectRoot: root } });
     // 首次成功调用栈可以消费唯一一次 true；任何账本、事件、等待者与后续重放都只见 false。
-    if ((["prepare_studio_imagegen_call", "prepare_studio_higgsfield_video_generation", "claim_studio_higgsfield_connector_request", "authorize_studio_higgsfield_connector_request"] as const).includes(input.request.command as never)
+    if (((["prepare_studio_imagegen_call", "prepare_studio_higgsfield_video_generation", "claim_studio_higgsfield_connector_request", "authorize_studio_higgsfield_connector_request", "materialize_local_creative_production_units", "commit_agent_imagegen_result_bundle"] as const).includes(input.request.command as never)
+        || isStudioOperationLocatorCommand(input.request.command))
       && result && typeof result === "object" && !Array.isArray(result)
       && (input.request.command === "claim_studio_higgsfield_connector_request"
         || input.request.command === "authorize_studio_higgsfield_connector_request"
+        || input.request.command === "materialize_local_creative_production_units"
+        || input.request.command === "commit_agent_imagegen_result_bundle"
+        || isStudioOperationLocatorCommand(input.request.command)
         || (result as { callAllowed?: unknown }).callAllowed === true)) {
       return { ...stored, result };
     }
     return stored;
   } catch (error) {
     await stopHeartbeat();
+    if (isTerminalPersistenceOutcomeUnknown(error)) throw error;
     const observedAt = new Date().toISOString();
     if (isAbortError(error) && input.request.command === "scan_project") {
       const cancellation = abortError(signal);
@@ -3817,7 +6264,7 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
       record.executedAt = observedAt;
       const stored = await persistRecord();
       if (stored.status === "succeeded") return verifyNovelImportReplay({ ...stored, replayed: true });
-      if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
+      if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, stored);
       await appendEvent(storageRoot, { actor: "codex", type: "command.cancelled", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { requestHash, error: record.error.message, projectRoot: root, committed: false } });
       throw cancellation;
     }
@@ -3832,7 +6279,7 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
       record.error = { message: safeMessage, observedAt };
       record.executedAt = observedAt;
       const stored = await persistRecord();
-      if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
+      if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, stored);
       const eventType = preDispatch ? "command.failed" : "command.outcome-unknown";
       const eventData = { requestHash, error: safeMessage, novelAnalysisSafetyCode: error.code, phase: error.phase };
       await appendEvent(storageRoot, { actor: "codex", type: eventType, requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: eventData });
@@ -3845,7 +6292,7 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
       record.error = { message: error.message, observedAt };
       record.executedAt = observedAt;
       const stored = await persistRecord();
-      if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
+      if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, stored);
       await appendEvent(storageRoot, { actor: "codex", type: "command.failed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { requestHash, error: error.message, projectRoot: root, committed: false, result: error.result } });
       throw error;
     }
@@ -3854,42 +6301,59 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
         ? await proveDurableOutcomeWithMutationFence(root, input.request)
         : undefined;
       if (durableProof) {
-        const resultDigest = createHash("sha256").update(stable(durableProof.result)).digest("hex");
-        record.execution = { pid: process.pid, phase: "side_effect_committed", heartbeatAt: observedAt };
-        const terminalData = {
-          requestHash,
-          command: input.request.command,
-          resultDigest,
-          projectRoot: root,
-          reconciledFromConfirmedFailure: true,
-          evidenceSource: durableProof.source,
-          durableIdentity: durableProof.identity,
-        };
-        await appendEvent(storageRoot, { actor: "codex", type: "command.side-effect-committed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: terminalData });
+        const terminalData = await withProjectLock(storageRoot, "command-bus", async () => {
+          const current = await getCommandByIdempotencyKey(storageRoot, record.idempotencyKey);
+          if (!current || current.requestHash !== record.requestHash || current.command !== record.command) {
+            throw new Error("确认失败后的业务 proof 与命令账本身份冲突；停止写终态收据。");
+          }
+          const terminalReceipt = commandTerminalReceiptResult(input.request.command, durableProof.result, requestHash);
+          record.execution = { pid: process.pid, phase: "side_effect_committed", heartbeatAt: observedAt };
+          const data = {
+            requestHash,
+            command: input.request.command,
+            ...terminalReceipt,
+            projectRoot: root,
+            outcomeStatus: "succeeded" as const,
+            reconciledFromConfirmedFailure: true,
+            evidenceSource: durableProof.source,
+            durableIdentity: durableProof.identity,
+          };
+          await appendEvent(storageRoot, { actor: "codex", type: "command.side-effect-committed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data });
+          return data;
+        });
         if (storageRoot !== root) await appendEvent(root, { actor: "codex", type: "command.side-effect-committed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: terminalData });
         record.status = "succeeded";
-        record.result = durableProof.result;
+        record.result = projectStudioOperationResultForPersistence(input.request.command, durableProof.result, requestHash);
+        if (isStudioOperationLocatorCommand(input.request.command)) {
+          record.durableReconciliation = undefined;
+        }
         record.error = undefined;
         record.executedAt = observedAt;
-        const stored = await persistRecord();
-        if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
+        const stored = await persistAfterTerminalReceipt();
         await appendEvent(storageRoot, { actor: "codex", type: "command.reconciled", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { evidenceEventIds: [], evidenceSource: durableProof.source, durableIdentity: durableProof.identity, reconciledAt: observedAt } });
         return verifyNovelImportReplay(stored);
       }
-      const failureMessage = error.message;
-      const resultDigest = createHash("sha256").update(stable(error.result)).digest("hex");
-      record.execution = { pid: process.pid, phase: "side_effect_committed", heartbeatAt: observedAt };
-      const terminalData = { requestHash, command: input.request.command, resultDigest, projectRoot: root, outcomeStatus: "failed", error: failureMessage, result: error.result };
-      await appendEvent(storageRoot, { actor: "codex", type: "command.side-effect-committed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: terminalData });
+      const failureProjection = projectConfirmedCommandFailureForReceipt(error.result, error.message);
+      const failureMessage = failureProjection.summary;
+      const terminalData = await withProjectLock(storageRoot, "command-bus", async () => {
+        const current = await getCommandByIdempotencyKey(storageRoot, record.idempotencyKey);
+        if (!current || current.requestHash !== record.requestHash || current.command !== record.command) {
+          throw new Error("业务确认失败后命令账本身份发生变化；停止写终态收据。");
+        }
+        const terminalReceipt = terminalReceiptResult(failureProjection, true);
+        record.execution = { pid: process.pid, phase: "side_effect_committed", heartbeatAt: observedAt };
+        const data = { requestHash, command: input.request.command, ...terminalReceipt, outcomeStatus: "failed" as const, error: failureMessage };
+        await appendEvent(storageRoot, { actor: "codex", type: "command.side-effect-committed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data });
+        return data;
+      });
       if (storageRoot !== root) await appendEvent(root, { actor: "codex", type: "command.side-effect-committed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: terminalData });
       record.status = "failed";
-      record.result = error.result;
+      record.result = failureProjection;
       record.error = { message: failureMessage, observedAt };
       record.executedAt = observedAt;
-      const stored = await persistRecord();
-      if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
+      const stored = await persistAfterTerminalReceipt();
       await appendEvent(storageRoot, { actor: "codex", type: "command.failed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { requestHash, error: failureMessage, projectRoot: root, committed: true } });
-      throw error;
+      throw new ConfirmedCommandFailure(error.message, failureProjection);
     }
     if (isRetrySafeSqliteBusyError(error)) {
       // 只有 typed proof 才能标记 failed(busyUncommitted) 并允许同键重试。
@@ -3900,16 +6364,21 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
       record.executedAt = observedAt;
       const stored = await persistRecord();
       if (stored.status === "succeeded") return verifyNovelImportReplay({ ...stored, replayed: true });
-      if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
+      if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, stored);
       await appendEvent(storageRoot, { actor: "codex", type: "command.failed", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { requestHash, error: busyMessage, projectRoot: root, committed: false, busyUncommitted: true, attempts: Math.max(1, busyAttempts) } });
       throw new Error(`数据库瞬时锁在 ${Math.max(1, busyAttempts)} 次受控重试（预算 ${STUDIO_SQLITE_BUSY_RETRY_BUDGET_MS}ms）后仍未释放（command=${input.request.command}，事务未提交）：${busyMessage}`);
     }
     record.status = "unknown";
     record.error = { message: error instanceof Error ? error.message : String(error), observedAt };
     record.executedAt = observedAt;
-    const stored = await persistRecord();
+    let stored: IdempotentCommandResult;
+    try {
+      stored = await persistRecord();
+    } catch (persistenceError) {
+      throw terminalPersistenceOutcomeUnknown(persistenceError);
+    }
     if (stored.status === "succeeded") return verifyNovelImportReplay({ ...stored, replayed: true });
-    if (storageRoot !== root) await mirrorLedgerRecord(root, stored);
+    if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, stored);
     await appendEvent(storageRoot, { actor: "codex", type: "command.outcome-unknown", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { requestHash, error: record.error.message, projectRoot: root } });
     throw new Error(`命令执行结果未确认，已锁定幂等键防止重复副作用：${record.error.message}`);
   }
@@ -3943,7 +6412,85 @@ export async function reconcileCommand(projectRoot: string, input: { idempotency
     if (!record) throw new Error(`命令账本中找不到幂等键：${input.idempotencyKey}`);
     return { ...record };
   });
+  // Durable proof 是恢复无终态事件的崩溃窗口，不能覆盖已经存在但损坏或
+  // 与账本冲突的终态收据。任何 matching receipt 必须先经过统一 parser；
+  // 只有不存在 receipt 时才允许继续读取业务 owner 的 durable state。
+  const durableStorageRoot = durableCandidate.storageRoot
+    ? path.resolve(durableCandidate.storageRoot)
+    : root;
   const durableRequest = reconciliationRequestFromRecord(root, durableCandidate);
+  const receiptSnapshot = await readCommandTerminalReceiptSnapshot({
+    projectRoot: root,
+    storageRoot: durableStorageRoot,
+    record: durableCandidate,
+  });
+  if (receiptSnapshot.outcome) {
+    // 先联合校验 owner/mirror receipt，确保损坏或跨根冲突在进入 durable proof
+    // 前失败关闭。storageRoot 是唯一 owner，projectRoot 只作镜像。
+    assertTerminalLedgerMatchesReceipt(
+      durableCandidate,
+      receiptSnapshot.outcome,
+      receiptSnapshot.ownerEvents,
+    );
+    if (durableCandidate.status === "cancelled") {
+      throw new Error("命令账本终态与终态收据冲突；保持原账本状态并停止对账。");
+    }
+    const receiptReconciled = await reconcileRunningCommandFromCommittedEvent({
+      projectRoot: root,
+      storageRoot: durableStorageRoot,
+      record: durableCandidate,
+      replayRequestId: durableCandidate.requestId,
+    });
+    if (!receiptReconciled) {
+      throw new Error("命令终态收据在对账期间失去当前性；保持原账本状态并停止对账。");
+    }
+    if (durableRequest?.command === "novel_import_external_snapshot"
+      && receiptReconciled.status === "succeeded") {
+      try {
+        return {
+          ...receiptReconciled,
+          replayed: true,
+          result: await proveSafeCompletedNovelImportResult(
+            durableRequest,
+            durableCandidate.requestHash,
+            receiptReconciled,
+          ),
+        };
+      } catch (error) {
+        await downgradeSucceededNovelImportClosureDrift(durableStorageRoot, receiptReconciled, error);
+        throw new Error("小说导入 registered 业务闭包漂移；reconcile 拒绝返回 succeeded 并将账本降为 unknown。", { cause: error });
+      }
+    }
+    if (durableRequest
+      && (shouldHydrateSucceededPublicReplay(durableRequest)
+        || ((durableCandidate.status === "running" || durableCandidate.status === "unknown")
+          && (isStudioOperationLocatorCommand(durableRequest.command)
+            || durableRequest.command === "commit_agent_imagegen_result_bundle")))
+      && receiptReconciled.status === "succeeded") {
+      return hydrateReceiptReconciledCommandResult(
+        root,
+        durableRequest,
+        revokePersistedImagegenCallCapability(receiptReconciled),
+      );
+    }
+    if (!durableRequest
+      && isStudioOperationLocatorCommand(durableCandidate.command)
+      && durableCandidate.command !== "refresh_studio_generation_checkpoint"
+      && durableCandidate.command !== "attest_studio_generation_checkpoint"
+      && receiptReconciled.status === "succeeded") {
+      return hydrateReceiptReconciledCommandResult(
+        root,
+        { command: durableCandidate.command } as CommandRequest,
+        receiptReconciled,
+      );
+    }
+    if (!durableRequest
+      && durableCandidate.command === "commit_agent_imagegen_result_bundle"
+      && receiptReconciled.status === "succeeded") {
+      return hydrateAgentImagegenResultBundleFromLocator(root, receiptReconciled);
+    }
+    return receiptReconciled;
+  }
   if (durableRequest?.command === "novel_import_external_snapshot"
     && durableCandidate.status === "succeeded") {
     try {
@@ -3963,11 +6510,7 @@ export async function reconcileCommand(projectRoot: string, input: { idempotency
   }
   if (durableRequest
     && (durableCandidate.status === "unknown"
-      || durableCandidate.status === "running"
-      || (durableCandidate.status === "failed" && durableCandidate.execution?.phase === "side_effect_committed"))) {
-    const durableStorageRoot = durableCandidate.storageRoot && path.resolve(durableCandidate.storageRoot) !== root
-      ? path.resolve(durableCandidate.storageRoot)
-      : root;
+      || durableCandidate.status === "running")) {
     const recovered = await recoverCommandFromDurableState({ projectRoot: root, storageRoot: durableStorageRoot, record: durableCandidate, request: durableRequest });
     if (recovered) {
       if (durableRequest.command === "novel_import_external_snapshot") {
@@ -3986,14 +6529,48 @@ export async function reconcileCommand(projectRoot: string, input: { idempotency
           throw new Error("小说导入恢复后 registered 业务闭包仍不完整；reconcile 拒绝返回 succeeded。", { cause: error });
         }
       }
-      return recovered;
+      return (isStudioOperationLocatorCommand(durableRequest.command)
+        || durableRequest.command === "commit_agent_imagegen_result_bundle")
+        ? hydrateReceiptReconciledCommandResult(
+          root,
+          durableRequest,
+          revokePersistedImagegenCallCapability(recovered),
+        )
+        : recovered;
     }
+  }
+  if (!durableRequest
+    && durableCandidate.command === "commit_agent_imagegen_result_bundle"
+    && (durableCandidate.status === "running" || durableCandidate.status === "unknown")
+    && durableCandidate.result !== undefined) {
+    return reconcileAgentImagegenResultBundleSafeCheckpoint({
+      projectRoot: root,
+      storageRoot: durableStorageRoot,
+      record: durableCandidate,
+    });
   }
   const reconciled = await withProjectLock(root, "command-bus", async () => {
     const ledger = await readCommandLedger(root);
     const record = ledger.entries.find((entry) => entry.idempotencyKey === input.idempotencyKey);
     if (!record) throw new Error(`命令账本中找不到幂等键：${input.idempotencyKey}`);
-    if (record.status === "succeeded" || record.status === "failed" || record.status === "cancelled") return { record: { ...record, replayed: true }, mirrorRoot: undefined as string | undefined };
+    if (record.status === "succeeded" || record.status === "failed" || record.status === "cancelled") {
+      const evidence = matchingSideEffectCommittedEvents(
+        await findEventsByIdempotencyKey(root, input.idempotencyKey, 200),
+        record,
+      );
+      if (evidence.length) {
+        const outcome = committedEventOutcome(evidence);
+        if (record.status === "cancelled" || record.status !== outcome.status) {
+          throw new Error("命令账本终态与终态收据冲突；保持原账本状态并停止对账。");
+        }
+      }
+      return {
+        record: { ...record, replayed: true },
+        mirrorRoot: record.storageRoot && path.resolve(record.storageRoot) !== root
+          ? record.storageRoot
+          : undefined,
+      };
+    }
     if (record.status === "unknown"
       && record.command === "revise_studio_production_unit"
       && record.execution?.phase === "executing"
@@ -4075,11 +6652,7 @@ export async function reconcileCommand(projectRoot: string, input: { idempotency
       };
     }
     const events = await findEventsByIdempotencyKey(root, input.idempotencyKey, 200);
-    const evidence = events.filter((event) => event.type === "command.side-effect-committed"
-      && event.requestId === record.requestId
-      && event.command === record.command
-      && event.data?.requestHash === record.requestHash
-      && typeof event.data?.resultDigest === "string");
+    const evidence = matchingSideEffectCommittedEvents(events, record);
     if (!evidence.length) {
       if (record.status === "running" && record.execution?.pid && !processAlive(record.execution.pid)) {
         const observedAt = new Date().toISOString();
@@ -4095,10 +6668,12 @@ export async function reconcileCommand(projectRoot: string, input: { idempotency
       throw new Error("未找到与 requestHash/command 完全匹配的终态提交证据，不能把未确认命令推断为成功；中间业务事件不足以证明整条命令完成。 ");
     }
     const reconciledAt = new Date().toISOString();
-    const failedEvidence = evidence.find((event) => event.data?.outcomeStatus === "failed");
-    record.status = failedEvidence ? "failed" : "succeeded";
-    record.error = failedEvidence ? { message: String(failedEvidence.data?.error ?? "命令已确认失败。"), observedAt: reconciledAt } : undefined;
-    record.result = failedEvidence?.data?.result ?? { reconciled: true, evidenceEvents: evidence.map((event) => ({ id: event.id, type: event.type, at: event.at, itemId: event.itemId, taskId: event.taskId })) };
+    const outcome = committedEventOutcome(evidence);
+    record.status = outcome.status;
+    record.error = outcome.status === "failed"
+      ? { message: outcome.errorMessage ?? "命令已确认失败。", observedAt: reconciledAt }
+      : undefined;
+    record.result = outcome.result;
     record.executedAt = reconciledAt;
     ledger.updatedAt = reconciledAt;
     await persistCommandLedgerSnapshot(root, ledger);
@@ -4107,8 +6682,11 @@ export async function reconcileCommand(projectRoot: string, input: { idempotency
   });
   // 镜像账本必须在释放当前项目锁后更新，避免两个互为 storageRoot 的
   // 对账操作形成反向锁序。
-  if (reconciled.mirrorRoot) await mirrorLedgerRecord(reconciled.mirrorRoot, reconciled.record);
-  return revokePersistedImagegenCallCapability(reconciled.record);
+  if (reconciled.mirrorRoot) await mirrorTerminalLedgerRecord(reconciled.mirrorRoot, reconciled.record);
+  const publicRecord = revokePersistedImagegenCallCapability(reconciled.record);
+  return publicRecord.command === "commit_agent_imagegen_result_bundle" && publicRecord.status === "succeeded"
+    ? hydrateAgentImagegenResultBundleFromLocator(root, publicRecord)
+    : publicRecord;
 }
 
 export async function listCommandLedger(projectRoot: string, limit = 100): Promise<IdempotentCommandResult[]> {

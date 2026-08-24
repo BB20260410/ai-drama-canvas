@@ -22,6 +22,7 @@ import {
   readJson,
   readTaskPack,
   repairProjectRegistryCompatibility,
+  preflightActiveProjectStartupReadOnly as preflightActiveProjectStartupSidecarReadOnly,
   reconcileActiveProjectStartup,
   saveIndex,
   saveOverrides,
@@ -652,6 +653,121 @@ export async function reconcileActiveManagedProjectStartup(input: {
     return shell;
   });
   return reconciled.value;
+}
+
+/**
+ * 仅供 main 进程把纯进程内 watcher 挂载绑定到同一 registry CAS 临界区。回调不得
+ * 写工程 owner 或再取 project-registry 锁；它的失败会让本次 lifecycle 失败关闭。
+ */
+export async function reconcileActiveManagedProjectStartupWithLifecycle(
+  input: { projectRoot: string; activationId: string },
+  onConfirmedUnderRegistryLock: (shell: ProjectShell) => Promise<void> | void,
+): Promise<ProjectShell> {
+  const absoluteRoot = path.resolve(input.projectRoot);
+  const reconciled = await reconcileActiveProjectStartup({
+    primaryRoot: absoluteRoot,
+    activationId: input.activationId,
+  }, async (registration) => {
+    const shell = await inspectManagedProjectReadOnly(absoluteRoot);
+    if (shell.project.id !== registration.id || path.resolve(shell.paths.root) !== absoluteRoot) {
+      throw new Error("活动工程登记与受管 manifest 身份不一致，拒绝冷启动。 ");
+    }
+    return shell;
+  }, async ({ value }) => onConfirmedUnderRegistryLock(value));
+  return reconciled.value;
+}
+
+export type ActiveManagedProjectStartupPreflight = {
+  kind: "healthy";
+  shell: ProjectShell;
+} | {
+  kind: "repair-required";
+  reason: "legacy-v2-registry-leak" | "active-project-writer-fence" | "legacy-registration";
+};
+
+function sameStartupManifestIdentity(left: ProjectShell, right: ProjectShell): boolean {
+  return left.project.id === right.project.id
+    && path.resolve(left.paths.root) === path.resolve(right.paths.root)
+    && left.manifestFingerprint === right.manifestFingerprint
+    && left.manifest.schemaVersion === right.manifest.schemaVersion;
+}
+
+function assertStartupPreflightLaneMatchesManifest(
+  registrationLane: "legacy" | "v2",
+  shell: ProjectShell,
+): void {
+  if (shell.manifest.schemaVersion === 1
+    && registrationLane === "legacy"
+    && shell.workspaceMode === "drama") return;
+  if (shell.manifest.schemaVersion === 2 && registrationLane === "v2") return;
+  throw new Error("活动工程注册 lane 与受管 manifest schema 不一致，拒绝冷启动。 ");
+}
+
+let afterActiveManagedProjectStartupSecondPreflightHookForTests:
+  | (() => void | Promise<void>)
+  | null = null;
+
+/** 仅供 Vitest 覆盖第二次 sidecar 预检与最终确认之间的 CAS 尾窗。 */
+export function __setAfterActiveManagedProjectStartupSecondPreflightHookForTests(
+  hook: typeof afterActiveManagedProjectStartupSecondPreflightHookForTests,
+): void {
+  if (process.env.NODE_ENV !== "test") {
+    throw new Error("活动工程启动预检尾窗 hook 仅允许测试环境。 ");
+  }
+  afterActiveManagedProjectStartupSecondPreflightHookForTests = hook;
+}
+
+/**
+ * 健康 v1 drama / v2 活动工程的首卡快路：sidecar → manifest → sidecar → manifest →
+ * 最终 sidecar 的只读稳定确认。任何 compatibility repair、旧 active 格式、CAS 变化或
+ * manifest 漂移都不允许“猜健康”；前者显式交给 strong reconcile，后者直接失败关闭。
+ */
+export async function preflightActiveManagedProjectStartupReadOnly(input: {
+  projectRoot: string;
+  activationId: string;
+}): Promise<ActiveManagedProjectStartupPreflight> {
+  const first = await preflightActiveProjectStartupSidecarReadOnly({
+    primaryRoot: input.projectRoot,
+    activationId: input.activationId,
+  });
+  if (first.kind === "repair-required") return first;
+  const firstShell = await inspectManagedProjectReadOnly(input.projectRoot);
+  if (firstShell.project.id !== first.registration.id || path.resolve(firstShell.paths.root) !== path.resolve(input.projectRoot)) {
+    throw new Error("活动工程登记与受管 manifest 身份不一致，拒绝冷启动。 ");
+  }
+  assertStartupPreflightLaneMatchesManifest(first.registrationLane, firstShell);
+  const second = await preflightActiveProjectStartupSidecarReadOnly({
+    primaryRoot: input.projectRoot,
+    activationId: input.activationId,
+  });
+  if (second.kind === "repair-required") return second;
+  const hook = afterActiveManagedProjectStartupSecondPreflightHookForTests;
+  afterActiveManagedProjectStartupSecondPreflightHookForTests = null;
+  await hook?.();
+  if (second.registration.id !== first.registration.id
+    || second.registrationLane !== first.registrationLane
+    || path.resolve(second.registration.primaryRoot) !== path.resolve(first.registration.primaryRoot)) {
+    throw new Error("活动工程启动预检身份在 manifest 校验期间发生变化。 ");
+  }
+  const secondShell = await inspectManagedProjectReadOnly(input.projectRoot);
+  if (!sameStartupManifestIdentity(firstShell, secondShell)) {
+    throw new Error("活动工程 manifest 在启动预检期间发生变化。 ");
+  }
+  assertStartupPreflightLaneMatchesManifest(second.registrationLane, secondShell);
+  // inspect2 之后再做一次只读 sidecar CAS：否则 A→B 恰好落在第二次
+  // sidecar 预检之后时，旧 A manifest 仍可能被误判健康。
+  const final = await preflightActiveProjectStartupSidecarReadOnly({
+    primaryRoot: input.projectRoot,
+    activationId: input.activationId,
+  });
+  if (final.kind === "repair-required") return final;
+  if (final.registration.id !== second.registration.id
+    || final.registrationLane !== second.registrationLane
+    || path.resolve(final.registration.primaryRoot) !== path.resolve(second.registration.primaryRoot)
+    || path.resolve(final.registration.primaryRoot) !== path.resolve(input.projectRoot)) {
+    throw new Error("活动工程启动预检身份在最终确认期间发生变化，拒绝冷启动。 ");
+  }
+  return { kind: "healthy", shell: secondShell };
 }
 
 export async function getManagedProjectShell(projectRoot: string): Promise<ProjectShell | null> {

@@ -3,15 +3,16 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import { access, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { loadAdaptationStore, saveAdaptationStore } from "../src/core/adaptation.js";
 import { commitProjectImport, prepareProjectImport } from "../src/core/importer.js";
 import { createNovelAnalysisTask, submitNovelAnalysisProposal } from "../src/core/novel-analysis.js";
 import { __setNovelAnalysisExecutionIntentHookForTests, __setNovelAnalysisMarkExecutionHookForTests, __setNovelAnalysisRunProgressHookForTests, executeNextNovelAnalysisRunTask, executeNovelAnalysisTask, getNovelAnalysisExecutionRecoveryStatus, getNovelAnalysisProviderSettings, getNovelAnalysisRunProgress, markNovelAnalysisExecutionReconciliationRequired, planNovelAnalysisRun, probeNovelAnalysisProvider, reconcileNovelAnalysisExecution, replaceNovelAnalysisRunTask, upsertNovelAnalysisProvider } from "../src/core/novel-analysis-provider.js";
 import { __setNovelAnalysisAddressResolverForTests } from "../src/core/novel-analysis-transport.js";
-import { executeIdempotentCommand } from "../src/core/command-bus.js";
-import { listCommandLedgerEntries } from "../src/core/command-ledger-store.js";
-import { getSidecarPaths } from "../src/core/sidecar.js";
+import { executeIdempotentCommand, listCommandLedger } from "../src/core/command-bus.js";
+import { __setBeforeCommandLedgerWritableOpenHookForTests, listCommandLedgerEntries } from "../src/core/command-ledger-store.js";
+import { getSidecarPaths, listEvents } from "../src/core/sidecar.js";
 import { importStoryFile } from "../src/core/story.js";
 
 const roots: string[] = [];
@@ -21,6 +22,7 @@ afterEach(async () => {
   __setNovelAnalysisExecutionIntentHookForTests(undefined);
   __setNovelAnalysisMarkExecutionHookForTests(undefined);
   __setNovelAnalysisRunProgressHookForTests(undefined);
+  __setBeforeCommandLedgerWritableOpenHookForTests(null);
   delete process.env.AI_CANVAS_TEST_NOVEL_KEY;
   delete process.env.AI_CANVAS_TEST_NOVEL_ANALYSIS_INTERRUPT;
   vi.useRealTimers();
@@ -107,6 +109,81 @@ describe("小说分析 OpenAI 兼容 Provider", () => {
     })).rejects.toThrow(/符号链接|受管目录|输出目录/u);
     expect(await readdir(outsideRoot)).toEqual([]);
     expect((await loadAdaptationStore(root)).analysisTasks).toEqual([]);
+  });
+
+  it("创建分析任务的终态账本持续锁恢复时从安全定位符重读完整 Owner 结果", async () => {
+    const root = await fixture();
+    let owner: DatabaseSync | undefined;
+    __setBeforeCommandLedgerWritableOpenHookForTests(() => {
+      __setBeforeCommandLedgerWritableOpenHookForTests(({ databasePath }) => {
+        owner = new DatabaseSync(databasePath);
+        owner.exec("BEGIN IMMEDIATE");
+      });
+    });
+    const input = {
+      requestId: "request-analysis-create-terminal-lock-001",
+      idempotencyKey: "analysis-create-terminal-lock-codex-v1",
+      request: {
+        command: "create_novel_analysis_task" as const,
+        payload: {
+          expectedRevision: 0,
+          providerId: "codex",
+          providerKind: "codex" as const,
+        },
+      },
+    };
+    let failure: unknown;
+    try {
+      failure = await executeIdempotentCommand(root, input, {
+        deadlineAtMs: Date.now() + 450,
+      }).catch((error: unknown) => error);
+    } finally {
+      owner?.exec("ROLLBACK");
+      owner?.close();
+    }
+    expect(failure).toMatchObject({
+      code: "OUTCOME_UNKNOWN",
+      reconciliationRequired: true,
+    });
+    expect((await listCommandLedger(root))[0]).toMatchObject({
+      status: "running",
+      execution: { phase: "executing" },
+    });
+    const receipt = (await listEvents(root, 200)).find((event) =>
+      event.type === "command.side-effect-committed"
+      && event.idempotencyKey === input.idempotencyKey);
+    expect(receipt?.data?.result).toEqual({
+      schemaVersion: 1,
+      kind: "novel-analysis-task-result-locator",
+      taskId: expect.stringMatching(/^analysis-/u),
+      workspaceRevision: 1,
+    });
+    expect(JSON.stringify(receipt?.data?.result)).not.toContain(root);
+
+    const recovered = await executeIdempotentCommand(root, {
+      ...input,
+      requestId: "request-analysis-create-terminal-lock-002",
+    }, { waitForRunningMs: 300 });
+    expect(recovered).toMatchObject({
+      status: "succeeded",
+      replayed: true,
+      result: {
+        workspace: { revision: 1 },
+        task: {
+          id: receipt?.data?.result && typeof receipt.data.result === "object"
+            ? (receipt.data.result as { taskId: string }).taskId
+            : "missing-task-id",
+          providerId: "codex",
+          providerKind: "codex",
+          status: "prepared",
+        },
+      },
+    });
+    expect((recovered.result as { task: { taskMarkdownPath: string } }).task.taskMarkdownPath).toContain(root);
+    expect((await listCommandLedger(root))[0]).toMatchObject({
+      status: "succeeded",
+      result: { kind: "novel-analysis-task-result-locator" },
+    });
   });
 
   it("预检后到 execution intent 前任务绑定漂移时仍保持 prepared 且零 POST", async () => {

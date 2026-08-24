@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "kind": "p5-multimedia-formal-electron-smoke",
+  "createdAt": "2026-08-14T00:44:20.165Z",
+  "runtimeBuildIdentity": {
+    "schemaVersion": 1,
+    "kind": "workspace-runtime-build-identity-evidence",
+    "sourceDigest": "d2e70bf955440b1cc2435da1bc6c486f01af49e7cc6098def29249c0f01dff1f",
+    "buildId": "801b9352c8b82547b1380a0c13f12fda",
+    "buildIdentityFingerprint": "f2d293895ed36df935352065b546bac335b046e053d8f079250e2051d20908e0",
+    "mcpToolCount": 220,
+    "sourceFiles": 1061,
+    "sourceBytes": 21271914,
+    "artifactSourceDigest": "d2e70bf955440b1cc2435da1bc6c486f01af49e7cc6098def29249c0f01dff1f",
+    "runtimeGateAllowed": true
+  },
+  "projectId": "project-b3e5fa60bbcd",
+  "unitId": "unit-local-e61b4628ca1abe8d8752c50d304fdb6e77847b16",
+  "availabilityText": "剧本 可用\n图片 可用\n视频 可用\n音频 可用",
+  "videoEntries": 1,
+  "audioEntries": 1,
+  "gapText": "缺失项与派生物状态\n无已知缺失\n\nCore 未报告正式故事板、视频、音频或派生物缺口。",
+  "importButtonEnabled": true,
+  "playbackOptions": [
+    {
+      "value": "",
+      "label": "请选择正式媒体"
+    },
+    {
+      "value": "timeline-binding-6850a5ae52deb1e74b23302ca230c4682ba566a4",
+      "label": "视频 · w00-video-main · 0.000s–12.000s"
+    },
+    {
+      "value": "timeline-binding-eec3bc974b4790122f972f8db756ac36fbfb8f40",
+      "label": "对白 · w00-dialogue-main · 0.000s–12.000s"
+    }
+  ],
+  "unselectedPlaybackState": {
+    "selectedValue": "",
+    "videoPlayers": 0,
+    "audioPlayers": 0,
+    "emptyText": "请选择一条正式视频或音频后播放；未选择时不会加载原媒体。"
+  },
+  "videoPlayback": {
+    "readyState": 4,
+    "networkState": 1,
+    "durationSeconds": 12,
+    "startSeconds": 0,
+    "endSeconds": 0.657089,
+    "advanced": true,
+    "paused": true,
+    "errorCode": null,
+    "sourceProtocol": "aicanvas-studio:"
+  },
+  "audioPlayback": {
+    "readyState": 4,
+    "networkState": 1,
+    "durationSeconds": 12,
+    "startSeconds": 0,
+    "endSeconds": 0.794959,
+    "advanced": true,
+    "paused": true,
+    "errorCode": null,
+    "sourceProtocol": "aicanvas-studio:"
+  },
+  "derivativeLabels": [
+    "缩略图 ready",
+    "缩略图 ready",
+    "视频海报 ready",
+    "视频代理 ready",
+    "音频波形 ready"
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalResources": [],
+  "readonlyProjectSentinels": {
+    "unchanged": true,
+    "before": [
+      {
+        "relativePath": ".aicanvas/managed-project.json",
+        "exists": true,
+        "bytes": 1414,
+        "mtimeMs": 1784988532217,
+        "sha256": "68b4747ca2c83db5a77eeb574c2e8fcb0364e4b3457e987a314cd9eaeea9b5ac"
+      },
+      {
+        "relativePath": ".aicanvas/project.json",
+        "exists": true,
+        "bytes": 831,
+        "mtimeMs": 1784988532077,
+        "sha256": "0294f210f97ad4a76c90f293c089f0ea8eac9c442f621e4c94b2c2dbbe1cddfa"
+      },
+      {
+        "relativePath": ".aicanvas/studio-production.sqlite",
+        "exists": true,
+        "bytes": 749568,
+        "mtimeMs": 1785095221206,
+        "sha256": "5ff80761bc916f7ced658f9c40281d6356209ba1134cda3d586bd43635a382c1"
+      },
+      {
+        "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+        "exists": true,
+        "bytes": 1355776,
+        "mtimeMs": 1786663372990,
+        "sha256": "9d1869559cd1d942942dfd1d14a192153a7990f0afd98d8adcd650e9b64ac1d0"
+      },
+      {
+        "relativePath": ".aicanvas/material-studio.sqlite",
+        "exists": true,
+        "bytes": 700416,
+        "mtimeMs": 1785095174803,
+        "sha256": "f5414aaa8bd1ed27996af47110d82ce7593d033fb6423aba563b2b085debde99"
+      },
+      {
+        "relativePath": ".aicanvas/studio-canvas-layout.json",
+        "exists": true,
+        "bytes": 4094,
+        "mtimeMs": 1785049077624,
+        "sha256": "b4688c42790c435e43690b125e48695e3d9693b3291568e44646a5e8196cbe40"
+      }
+    ],
+    "after": [
+      {
+        "relativePath": ".aicanvas/managed-project.json",
+        "exists": true,
+        "bytes": 1414,
+        "mtimeMs": 1784988532217,
+        "sha256": "68b4747ca2c83db5a77eeb574c2e8fcb0364e4b3457e987a314cd9eaeea9b5ac"
+      },
+      {
+        "relativePath": ".aicanvas/project.json",
+        "exists": true,
+        "bytes": 831,
+        "mtimeMs": 1784988532077,
+        "sha256": "0294f210f97ad4a76c90f293c089f0ea8eac9c442f621e4c94b2c2dbbe1cddfa"
+      },
+      {
+        "relativePath": ".aicanvas/studio-production.sqlite",
+        "exists": true,
+        "bytes": 749568,
+        "mtimeMs": 1785095221206,
+        "sha256": "5ff80761bc916f7ced658f9c40281d6356209ba1134cda3d586bd43635a382c1"
+      },
+      {
+        "relativePath": ".aicanvas/studio-generation-ledger.sqlite",
+        "exists": true,
+        "bytes": 1355776,
+        "mtimeMs": 1786663372990,
+        "sha256": "9d1869559cd1d942942dfd1d14a192153a7990f0afd98d8adcd650e9b64ac1d0"
+      },
+      {
+        "relativePath": ".aicanvas/material-studio.sqlite",
+        "exists": true,
+        "bytes": 700416,
+        "mtimeMs": 1785095174803,
+        "sha256": "f5414aaa8bd1ed27996af47110d82ce7593d033fb6423aba563b2b085debde99"
+      },
+      {
+        "relativePath": ".aicanvas/studio-canvas-layout.json",
+        "exists": true,
+        "bytes": 4094,
+        "mtimeMs": 1785049077624,
+        "sha256": "b4688c42790c435e43690b125e48695e3d9693b3291568e44646a5e8196cbe40"
+      }
+    ]
+  },
+  "screenshots": {
+    "overview": {
+      "path": "output/playwright/p5-multimedia-formal-overview-2026-08-14T00-44-14-637Z.png",
+      "sha256": "3b9df98c37cee06f0e190a1fe17aa062de3ea12cc92dd56876af68dde65b68f5",
+      "sizeBytes": 163896,
+      "width": 1728,
+      "height": 1029,
+      "maxChannelStandardDeviation": 22.433976041186504
+    },
+    "tracks": {
+      "path": "output/playwright/p5-multimedia-formal-tracks-2026-08-14T00-44-14-637Z.png",
+      "sha256": "810ede1a5817763105c80d5fa0d56efbb677d471223180f97bb8a98a119b5467",
+      "sizeBytes": 179846,
+      "width": 1728,
+      "height": 1029,
+      "maxChannelStandardDeviation": 26.200094244402003
+    }
+  },
+  "externalUploadCount": 0,
+  "imageGenerationCount": 0,
+  "paidActionCount": 0
+}

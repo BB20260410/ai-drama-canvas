@@ -20,8 +20,52 @@ async function loadRelationStore(projectRoot: string): Promise<RelationStore> {
   return readJson(getSidecarPaths(projectRoot).assetRelations, { schemaVersion: 1, revision: 0, relations: [], updatedAt: new Date(0).toISOString() });
 }
 
+function normalizeVoiceIdentity(voice: VoiceIdentity): VoiceIdentity {
+  return {
+    ...voice,
+    samplePaths: Array.isArray(voice.samplePaths) ? voice.samplePaths : [],
+    characterAssetIds: Array.isArray(voice.characterAssetIds) ? voice.characterAssetIds : [],
+    characterItemIds: Array.isArray(voice.characterItemIds) ? voice.characterItemIds : [],
+    sampleMediaSha256s: Array.isArray(voice.sampleMediaSha256s) ? voice.sampleMediaSha256s : [],
+  };
+}
+
+function normalizeAssetIdList(values: string[] | undefined, field: string): string[] {
+  return [...new Set((values ?? []).map((value) => value.trim()).filter(Boolean))].map((id) => {
+    if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u.test(id)) {
+      throw new Error(`${field} 含无效 ID：${id}`);
+    }
+    return id;
+  });
+}
+
+function normalizeSha256List(values: string[] | undefined, field: string): string[] {
+  return [...new Set((values ?? []).map((value) => value.trim().toLowerCase()).filter(Boolean))].map((sha) => {
+    if (!/^[a-f0-9]{64}$/u.test(sha)) {
+      throw new Error(`${field} 含无效 SHA-256：${sha}`);
+    }
+    return sha;
+  });
+}
+
 async function loadVoiceStore(projectRoot: string): Promise<VoiceStore> {
-  return readJson(getSidecarPaths(projectRoot).voiceIdentities, { schemaVersion: 1, revision: 0, voices: [], updatedAt: new Date(0).toISOString() });
+  const store = await readJson(getSidecarPaths(projectRoot).voiceIdentities, {
+    schemaVersion: 1,
+    revision: 0,
+    voices: [],
+    updatedAt: new Date(0).toISOString(),
+  });
+  return { ...store, schemaVersion: 1, voices: store.voices.map(normalizeVoiceIdentity) };
+}
+
+export function audioSha256sForCharacterAsset(voices: VoiceIdentity[], assetId: string): string[] {
+  const id = assetId.trim();
+  if (!id) return [];
+  return [...new Set(
+    voices
+      .filter((voice) => voice.characterAssetIds.includes(id))
+      .flatMap((voice) => voice.sampleMediaSha256s),
+  )];
 }
 
 export async function listAssetRelations(projectRoot: string, options: { itemId?: string; artifactId?: string; kind?: AssetRelationKind } = {}): Promise<AssetRelation[]> {
@@ -158,6 +202,14 @@ export async function upsertVoiceIdentity(
     if (!/\.(wav|mp3|m4a|aac|flac|ogg)$/i.test(samplePath)) throw new Error(`音色样本扩展名不受支持：${samplePath}`);
     await access(samplePath).catch(() => { throw new Error(`音色样本不存在：${samplePath}`); });
   }
+  const characterAssetIds = normalizeAssetIdList(
+    input.characterAssetIds ?? existing?.characterAssetIds,
+    "characterAssetIds",
+  );
+  const sampleMediaSha256s = normalizeSha256List(
+    input.sampleMediaSha256s ?? existing?.sampleMediaSha256s,
+    "sampleMediaSha256s",
+  );
   const index = await getProjectIndex(projectRoot);
   const itemIds = new Set(index.items.map((item) => item.id));
   const characterItemIds = [...new Set(input.characterItemIds ?? existing?.characterItemIds ?? [])];
@@ -166,7 +218,23 @@ export async function upsertVoiceIdentity(
   const hardLockId = input.hardLockId === undefined ? existing?.hardLockId : input.hardLockId || undefined;
   if (hardLockId && !index.project.hardLocks.some((lock) => lock.id === hardLockId)) throw new Error(`音色绑定了不存在的硬锁：${hardLockId}`);
   const now = new Date().toISOString();
-  const voice: VoiceIdentity = { id: existing?.id ?? `voice-${randomUUID()}`, name: input.name.trim().slice(0, 160), provider: input.provider === undefined ? existing?.provider : input.provider.trim().slice(0, 120) || undefined, providerVoiceId: input.providerVoiceId === undefined ? existing?.providerVoiceId : input.providerVoiceId.trim().slice(0, 500) || undefined, language: input.language === undefined ? existing?.language ?? "zh-CN" : input.language.trim().slice(0, 80) || "zh-CN", description: input.description === undefined ? existing?.description ?? "" : input.description.trim().slice(0, 20_000), samplePaths, characterItemIds, hardLockId, tags: [...new Set((input.tags ?? existing?.tags ?? []).map((tag) => tag.trim()).filter(Boolean))].slice(0, 100), revision: (existing?.revision ?? 0) + 1, createdAt: existing?.createdAt ?? now, updatedAt: now };
+  const voice: VoiceIdentity = {
+    id: existing?.id ?? `voice-${randomUUID()}`,
+    name: input.name.trim().slice(0, 160),
+    provider: input.provider === undefined ? existing?.provider : input.provider.trim().slice(0, 120) || undefined,
+    providerVoiceId: input.providerVoiceId === undefined ? existing?.providerVoiceId : input.providerVoiceId.trim().slice(0, 500) || undefined,
+    language: input.language === undefined ? existing?.language ?? "zh-CN" : input.language.trim().slice(0, 80) || "zh-CN",
+    description: input.description === undefined ? existing?.description ?? "" : input.description.trim().slice(0, 20_000),
+    samplePaths,
+    characterAssetIds,
+    characterItemIds,
+    sampleMediaSha256s,
+    hardLockId,
+    tags: [...new Set((input.tags ?? existing?.tags ?? []).map((tag) => tag.trim()).filter(Boolean))].slice(0, 100),
+    revision: (existing?.revision ?? 0) + 1,
+    createdAt: existing?.createdAt ?? now,
+    updatedAt: now,
+  };
   store.voices = [voice, ...store.voices.filter((candidate) => candidate.id !== voice.id)];
   store.revision += 1; store.updatedAt = now;
   await writeJsonAtomic(getSidecarPaths(projectRoot).voiceIdentities, store);

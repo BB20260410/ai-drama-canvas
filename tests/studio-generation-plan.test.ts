@@ -1,4 +1,5 @@
-import { mkdtemp, rm } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { lstat, mkdtemp, readFile, readdir, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -13,11 +14,13 @@ import {
   getStudioGenerationLedgerState,
   getStudioGenerationPlanProjection,
   listStudioGenerationPlanProjections,
+  readStudioGenerationRetryOperationOutcomeReadOnly,
   registerStudioGenerationResult,
   retryStudioGenerationPlanNodes,
   type StudioGenerationPlanProjection,
 } from "../src/core/studio-generation-ledger.js";
-import { executeIdempotentCommand, reconcileCommand } from "../src/core/command-bus.js";
+import { executeIdempotentCommand, listCommandLedger, reconcileCommand } from "../src/core/command-bus.js";
+import { __setBeforeGenerationWritableOpenHookForTests } from "../src/core/studio-generation-ledger-storage.js";
 import { buildStudioGenerationPlanProgress } from "../src/core/studio-generation-plan-progress.js";
 import { getStudioGenerationControlEnvelope } from "../src/core/codex.js";
 import { createStudioP7Fixture, seedStudioP7ResolvedPanelContinuity, type StudioP7Fixture } from "./helpers/studio-p7-fixture.js";
@@ -37,6 +40,52 @@ async function p7(): Promise<StudioP7Fixture> {
   const fixture = await createStudioP7Fixture();
   fixtures.push(fixture);
   return fixture;
+}
+
+async function generationOwnerFilesystemSnapshot(projectRoot: string): Promise<Record<string, unknown>> {
+  const aicanvas = path.join(projectRoot, ".aicanvas");
+  const roots = [
+    "studio-generation-ledger.sqlite",
+    "studio-generation-ledger.sqlite-wal",
+    "studio-generation-ledger.sqlite-shm",
+    "studio-generation",
+  ];
+  const snapshot: Record<string, unknown> = {};
+  async function visit(relative: string): Promise<void> {
+    const absolute = path.join(aicanvas, relative);
+    let metadata;
+    try {
+      metadata = await lstat(absolute);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        snapshot[relative] = null;
+        return;
+      }
+      throw error;
+    }
+    const identity = {
+      dev: String(metadata.dev),
+      ino: String(metadata.ino),
+      size: metadata.size,
+      mtimeMs: metadata.mtimeMs,
+      ctimeMs: metadata.ctimeMs,
+    };
+    if (metadata.isDirectory()) {
+      snapshot[relative] = { kind: "directory", ...identity };
+      for (const name of (await readdir(absolute)).sort((left, right) => left.localeCompare(right, "en"))) {
+        await visit(`${relative}/${name}`);
+      }
+      return;
+    }
+    if (!metadata.isFile()) throw new Error(`generation owner 出现非普通文件：${relative}`);
+    snapshot[relative] = {
+      kind: "file",
+      ...identity,
+      sha256: createHash("sha256").update(await readFile(absolute)).digest("hex"),
+    };
+  }
+  for (const relative of roots) await visit(relative);
+  return snapshot;
 }
 
 async function freezeTwoPanel(fixture: StudioP7Fixture) {
@@ -782,6 +831,131 @@ describe("P21 §4-6/7 投影与 control plan operation", () => {
 });
 
 describe("P21 §4-9 durable reconciliation", () => {
+  it("retry skipped 由同事务 operation receipt 恢复原始公开结果，账本仅保留安全 locator", async () => {
+    const fixture = await p7();
+    const { unit, packs } = await freezeTwoPanel(fixture);
+    const plan = await createStudioGenerationPlan(fixture.root, {
+      nodes: [{ unitId: unit.unit.id, panelId: packs[0]!.panelId }],
+      sourceCommandRequestId: "retry-skipped-plan-source",
+    });
+    const command = {
+      requestId: "p21-retry-skipped-public-0001",
+      idempotencyKey: "p21-retry-skipped-public-key-0001",
+      request: {
+        command: "retry_studio_generation_plan_nodes" as const,
+        payload: { planId: plan.planId, nodeIndexes: [1] },
+      },
+    };
+    const first = await executeIdempotentCommand(fixture.root, command);
+    expect(first).toMatchObject({
+      status: "succeeded",
+      result: {
+        planId: plan.planId,
+        skipped: [{ nodeIndex: 1, reason: "planned（尚无 dispatch，直接派发即可，无需重试）" }],
+      },
+    });
+    const replay = await executeIdempotentCommand(fixture.root, {
+      ...command,
+      requestId: "p21-retry-skipped-public-0002",
+    });
+    expect(replay).toMatchObject({
+      status: "succeeded",
+      result: {
+        planId: plan.planId,
+        skipped: [{ nodeIndex: 1, reason: "planned（尚无 dispatch，直接派发即可，无需重试）" }],
+        reconciled: true,
+      },
+    });
+    const crashCommand = {
+      ...command,
+      requestId: "p21-retry-skipped-crash-0001",
+      idempotencyKey: "p21-retry-skipped-crash-key-0001",
+    };
+    process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE = "retry_studio_generation_plan_nodes";
+    await expect(executeIdempotentCommand(fixture.root, crashCommand)).rejects.toThrow(/执行结果未确认/u);
+    delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE;
+    await expect(reconcileCommand(fixture.root, { idempotencyKey: crashCommand.idempotencyKey }))
+      .resolves.toMatchObject({
+        status: "succeeded",
+        result: {
+          planId: plan.planId,
+          skipped: [{ nodeIndex: 1, reason: "planned（尚无 dispatch，直接派发即可，无需重试）" }],
+          reconciled: true,
+        },
+      });
+
+    const generationDb = new DatabaseSync(path.join(fixture.root, ".aicanvas", "studio-generation-ledger.sqlite"));
+    try {
+      const receipts = generationDb.prepare(
+        "SELECT outcome_json AS outcomeJson FROM studio_generation_retry_operation_receipts",
+      ).all() as Array<{ outcomeJson: string }>;
+      expect(receipts).toHaveLength(1);
+      for (const receipt of receipts) {
+        expect(receipt.outcomeJson).toContain('"reasonCode":"planned-no-dispatch"');
+        expect(receipt.outcomeJson).not.toContain("尚无 dispatch");
+      }
+    } finally {
+      generationDb.close();
+    }
+    const commandDb = new DatabaseSync(path.join(fixture.root, ".aicanvas", "command-ledger.sqlite"), { readOnly: true });
+    try {
+      const row = commandDb.prepare(
+        "SELECT payload_json AS payloadJson FROM command_ledger_entries WHERE idempotency_key = ?",
+      ).get(command.idempotencyKey) as { payloadJson: string };
+      const record = JSON.parse(row.payloadJson) as { result: { kind: string; receiptFingerprint: string; skipped: unknown[] } };
+      const persisted = record.result;
+      expect(persisted).toMatchObject({
+        kind: "studio-operation-result-locator",
+        operation: "generation-plan-retry",
+        skipped: [{ nodeIndex: 1 }],
+      });
+      expect(persisted.receiptFingerprint).toMatch(/^[a-f0-9]{64}$/u);
+      expect(row.payloadJson).not.toContain("尚无 dispatch");
+    } finally {
+      commandDb.close();
+    }
+    const tamperDb = new DatabaseSync(path.join(fixture.root, ".aicanvas", "studio-generation-ledger.sqlite"));
+    try {
+      tamperDb.exec("DROP TRIGGER studio_generation_retry_operation_receipts_no_update");
+      tamperDb.exec(`
+        CREATE TRIGGER studio_generation_retry_operation_receipts_no_update
+        BEFORE UPDATE ON studio_generation_retry_operation_receipts WHEN 0
+        BEGIN SELECT RAISE(ABORT, 'generation retry operation receipts are append-only'); END
+      `);
+    } finally {
+      tamperDb.close();
+    }
+    await expect(readStudioGenerationRetryOperationOutcomeReadOnly(
+      fixture.root,
+      first.requestHash,
+      command.request.payload,
+    )).rejects.toThrow(/no_update trigger 漂移/u);
+    const generationOwnerBeforeReplay = await generationOwnerFilesystemSnapshot(fixture.root);
+    let generationWritableOpens = 0;
+    __setBeforeGenerationWritableOpenHookForTests(() => {
+      generationWritableOpens += 1;
+    });
+    try {
+      await expect(executeIdempotentCommand(fixture.root, {
+        ...command,
+        requestId: "p21-retry-skipped-tamper-0001",
+      })).rejects.toThrow(/no_update trigger 漂移/u);
+    } finally {
+      __setBeforeGenerationWritableOpenHookForTests(null);
+    }
+    expect(generationWritableOpens).toBe(0);
+    expect(await generationOwnerFilesystemSnapshot(fixture.root)).toEqual(generationOwnerBeforeReplay);
+    const verifyTamperDb = new DatabaseSync(path.join(fixture.root, ".aicanvas", "studio-generation-ledger.sqlite"), { readOnly: true });
+    try {
+      const trigger = verifyTamperDb.prepare(
+        "SELECT sql FROM sqlite_master WHERE type='trigger' AND name='studio_generation_retry_operation_receipts_no_update'",
+      ).get() as { sql: string };
+      expect(trigger.sql.replace(/\s+/gu, " ").toLowerCase()).toContain("when 0");
+    } finally {
+      verifyTamperDb.close();
+    }
+  });
+
   it("plan/fail/cancel/retry 命令崩溃后按各自 proof 锚点对账", async () => {
     const fixture = await p7();
     const { unit, packs } = await freezeTwoPanel(fixture);
@@ -797,6 +971,34 @@ describe("P21 §4-9 durable reconciliation", () => {
     const planReconciled = await reconcileCommand(fixture.root, { idempotencyKey: planCommand.idempotencyKey });
     expect(planReconciled).toMatchObject({ status: "succeeded", result: { reconciled: true } });
     const planId = (planReconciled.result as { planId: string }).planId;
+    const reusedPlanCommand = {
+      ...planCommand,
+      requestId: "p21-durable-plan-reuse-0002",
+      idempotencyKey: "p21-durable-plan-reuse-key-0002",
+      request: {
+        command: "create_studio_generation_plan" as const,
+        payload: { nodes: [{ targetKind: "panel" as const, unitId: unit.unit.id, panelId: packs[0]!.panelId }] },
+      },
+    };
+    process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE = "create_studio_generation_plan";
+    await expect(executeIdempotentCommand(fixture.root, reusedPlanCommand)).rejects.toThrow();
+    delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE;
+    await expect(reconcileCommand(fixture.root, { idempotencyKey: reusedPlanCommand.idempotencyKey }))
+      .resolves.toMatchObject({ status: "succeeded", result: { planId, reconciled: true } });
+    const reusedBeforeTerminalCommand = {
+      ...reusedPlanCommand,
+      requestId: "p21-durable-plan-reuse-0003",
+      idempotencyKey: "p21-durable-plan-reuse-key-0003",
+    };
+    process.env.AI_CANVAS_TEST_COMMAND_CRASH_BEFORE_COMMIT_EVENT = "create_studio_generation_plan";
+    await expect(executeIdempotentCommand(fixture.root, reusedBeforeTerminalCommand)).rejects.toThrow();
+    delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_BEFORE_COMMIT_EVENT;
+    await expect(reconcileCommand(fixture.root, { idempotencyKey: reusedBeforeTerminalCommand.idempotencyKey }))
+      .rejects.toThrow(/未找到与 requestHash\/command 完全匹配的终态提交证据/u);
+    expect((await listCommandLedger(fixture.root)).find((entry) =>
+      entry.idempotencyKey === reusedBeforeTerminalCommand.idempotencyKey)).toMatchObject({ status: "unknown" });
+    expect((await listStudioGenerationPlanProjections(fixture.root, { limit: 36 }))
+      .filter((entry) => entry.planId === planId)).toHaveLength(1);
 
     // dispatch（直调 core 铺底）→ fail 命令崩溃 → 事件锚证明。
     await dispatchStudioGenerationPack(fixture.root, {
@@ -840,5 +1042,76 @@ describe("P21 §4-9 durable reconciliation", () => {
     delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE;
     const cancelReconciled = await reconcileCommand(fixture.root, { idempotencyKey: cancelCommand.idempotencyKey });
     expect(cancelReconciled).toMatchObject({ status: "succeeded", result: { reconciled: true, kind: "cancelled" } });
+
+    const ownerBeforePublicReplay = await generationOwnerFilesystemSnapshot(fixture.root);
+    let generationWritableOpens = 0;
+    __setBeforeGenerationWritableOpenHookForTests(() => { generationWritableOpens += 1; });
+    try {
+      await expect(executeIdempotentCommand(fixture.root, {
+        ...planCommand,
+        requestId: "p21-durable-plan-public-replay-0004",
+      })).resolves.toMatchObject({ status: "succeeded", result: { planId, nodes: [{ nodeIndex: 1 }] } });
+      await expect(executeIdempotentCommand(fixture.root, {
+        ...failCommand,
+        requestId: "p21-durable-fail-public-replay-0002",
+      })).resolves.toMatchObject({ status: "succeeded", result: { kind: "failed", eventId: expect.any(String) } });
+      await expect(executeIdempotentCommand(fixture.root, {
+        ...cancelCommand,
+        requestId: "p21-durable-cancel-public-replay-0002",
+      })).resolves.toMatchObject({ status: "succeeded", result: { kind: "cancelled", eventId: expect.any(String) } });
+    } finally {
+      __setBeforeGenerationWritableOpenHookForTests(null);
+    }
+    expect(generationWritableOpens).toBe(0);
+    expect(await generationOwnerFilesystemSnapshot(fixture.root)).toEqual(ownerBeforePublicReplay);
+
+    const generationDbPath = path.join(fixture.root, ".aicanvas", "studio-generation-ledger.sqlite");
+    const cancelEventId = (cancelReconciled.result as { eventId: string }).eventId;
+    const tamperCancelPairDb = new DatabaseSync(generationDbPath);
+    try {
+      tamperCancelPairDb.exec("DROP TRIGGER studio_generation_run_events_no_delete");
+      tamperCancelPairDb.prepare(`DELETE FROM studio_generation_run_events
+        WHERE generation_run_id = ? AND kind = 'cancel-requested'`)
+        .run(cancelCommand.request.payload.generationRunId);
+      tamperCancelPairDb.exec(`CREATE TRIGGER studio_generation_run_events_no_delete
+        BEFORE DELETE ON studio_generation_run_events BEGIN SELECT RAISE(ABORT, 'generation run events are append-only'); END`);
+    } finally {
+      tamperCancelPairDb.close();
+    }
+    await expect(executeIdempotentCommand(fixture.root, {
+      ...cancelCommand,
+      requestId: "p21-durable-cancel-pair-tamper-0003",
+    })).rejects.toThrow(/request\/terminal 事件不唯一或不成对/u);
+    expect((await listCommandLedger(fixture.root)).find((entry) => entry.idempotencyKey === cancelCommand.idempotencyKey))
+      .toMatchObject({ status: "succeeded", result: { eventId: cancelEventId } });
+
+    const tamperPlanDb = new DatabaseSync(generationDbPath);
+    try {
+      tamperPlanDb.exec("DROP TRIGGER studio_generation_plans_no_update");
+      tamperPlanDb.prepare("UPDATE studio_generation_plans SET project_id = project_id || '-tampered' WHERE plan_id = ?").run(planId);
+      tamperPlanDb.exec(`CREATE TRIGGER studio_generation_plans_no_update
+        BEFORE UPDATE ON studio_generation_plans BEGIN SELECT RAISE(ABORT, 'generation plans are append-only'); END`);
+    } finally {
+      tamperPlanDb.close();
+    }
+    await expect(executeIdempotentCommand(fixture.root, {
+      ...planCommand,
+      requestId: "p21-durable-plan-content-id-tamper-0005",
+    })).rejects.toThrow(/planId 内容寻址漂移/u);
+
+    const failEventId = (failReconciled.result as { eventId: string }).eventId;
+    const tamperRunDb = new DatabaseSync(generationDbPath);
+    try {
+      tamperRunDb.exec("DROP TRIGGER studio_generation_run_events_no_update");
+      tamperRunDb.prepare("UPDATE studio_generation_run_events SET detail_json = '{}' WHERE event_id = ?").run(failEventId);
+      tamperRunDb.exec(`CREATE TRIGGER studio_generation_run_events_no_update
+        BEFORE UPDATE ON studio_generation_run_events BEGIN SELECT RAISE(ABORT, 'generation run events are append-only'); END`);
+    } finally {
+      tamperRunDb.close();
+    }
+    await expect(executeIdempotentCommand(fixture.root, {
+      ...failCommand,
+      requestId: "p21-durable-fail-content-id-tamper-0003",
+    })).rejects.toThrow(/eventId 内容寻址漂移/u);
   });
 });

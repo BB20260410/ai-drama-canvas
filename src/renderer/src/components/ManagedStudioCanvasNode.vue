@@ -71,6 +71,19 @@
       <span class="kind-label">{{ data.kindLabel }}</span>
       <strong class="title">{{ data.title }}</strong>
       <p v-if="data.subtitle" class="subtitle">{{ data.subtitle }}</p>
+      <audio
+        v-if="canPlayAudio"
+        ref="audioEl"
+        class="canvas-audio-player nodrag nopan nowheel"
+        controls
+        preload="metadata"
+        :src="playbackUrl"
+        data-testid="managed-canvas-audio-player"
+        @play="onCanvasAudioPlay"
+        @pointerdown.stop
+        @click.stop>
+        当前桌面运行时不支持该音频格式。
+      </audio>
       <p v-if="data.excerpt" class="excerpt">{{ data.excerpt }}</p>
       <p
         v-if="data.mediaSha256"
@@ -114,6 +127,7 @@
 import { Handle, Position } from "@vue-flow/core";
 import { Lock } from "lucide-vue-next";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { claimCanvasAudioPlayback, releaseCanvasAudioPlayback } from "../canvas-audio-mutex";
 
 export interface ManagedStudioCanvasNodeData {
   kind: "asset" | "reference" | "unit" | "panel" | "script" | "prompt" | "image" | "raw" | "labeled" | "review" | "video" | "audio" | "continuity";
@@ -143,6 +157,7 @@ export interface ManagedStudioCanvasNodeData {
 
 const props = defineProps<{ data: ManagedStudioCanvasNodeData }>();
 
+const audioEl = ref<HTMLAudioElement | null>(null);
 const exportArmed = ref(false);
 const exportPreparing = ref(false);
 const exportError = ref("");
@@ -161,6 +176,18 @@ const canExportMedia = computed(() => Boolean(
   && props.data.projectRoot
   && !props.data.missing,
 ));
+
+const canPlayAudio = computed(() => Boolean(
+  props.data.kind === "audio"
+  && props.data.mediaSha256
+  && props.data.projectRoot
+  && !props.data.missing,
+));
+
+const playbackUrl = computed(() => {
+  if (!canPlayAudio.value) return "";
+  return `aicanvas-studio://media/${props.data.mediaSha256}?projectRoot=${encodeURIComponent(props.data.projectRoot ?? "")}`;
+});
 
 const displayThumbnailUrl = computed(() => {
   const url = props.data.thumbnailUrl;
@@ -324,8 +351,29 @@ watch(
   () => disarmExport(),
 );
 
+function onCanvasAudioPlay(): void {
+  if (props.data.busy) {
+    audioEl.value?.pause();
+    return;
+  }
+  claimCanvasAudioPlayback(audioEl.value);
+}
+
+watch(
+  () => props.data.busy,
+  (busy) => {
+    if (busy) audioEl.value?.pause();
+  },
+);
+
+watch(playbackUrl, () => {
+  audioEl.value?.pause();
+});
+
 onBeforeUnmount(() => {
   nodeDisposed = true;
+  audioEl.value?.pause();
+  releaseCanvasAudioPlayback(audioEl.value);
   thumbnailIdentityGeneration += 1;
   exportIdentityGeneration += 1;
   clearArmExpireTimer();
@@ -379,6 +427,7 @@ onBeforeUnmount(() => {
 .msc-node.kind-audio { border-color: var(--msc-accent); background: color-mix(in srgb, var(--msc-accent) 9%, var(--msc-surface)); }
 .msc-node.kind-continuity { border-color: var(--msc-kind-unit); background: color-mix(in srgb, var(--msc-kind-unit) 9%, var(--msc-surface)); }
 .msc-node.busy { outline: 1px solid var(--msc-accent); }
+.msc-node.busy .canvas-audio-player { pointer-events: none; }
 .connection-handle {
   width: 26px;
   height: 26px;
@@ -472,6 +521,12 @@ onBeforeUnmount(() => {
   color: var(--msc-danger);
   font-size: 9px;
   pointer-events: none;
+}
+.canvas-audio-player {
+  display: block;
+  width: 100%;
+  height: 28px;
+  margin: 4px 0 2px;
 }
 .thumb-placeholder {
   height: 108px;

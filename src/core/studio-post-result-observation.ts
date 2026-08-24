@@ -39,6 +39,7 @@ import {
 } from "./studio-generation-review.js";
 import { probeStudioReviewedVideoEvidence } from "./studio-media-evidence-probe.js";
 import type { StudioSeedanceObservedState } from "./studio-seedance-prompt-compiler.js";
+import { withStudioGenerationLedgerReadOnlySnapshot } from "./studio-generation-ledger-storage.js";
 
 const DATABASE_RELATIVE_PATH = ".aicanvas/studio-generation-ledger.sqlite";
 const SCHEMA_VERSION = 1;
@@ -290,6 +291,7 @@ interface OperationRow {
   input_fingerprint: string;
   observation_id: string;
   outcome_fingerprint: string;
+  created_at: string;
 }
 
 interface DatabaseContext {
@@ -312,6 +314,11 @@ function requiredText(value: unknown, label: string, maximum = 8_000): string {
     fail("invalid-input", `${label} 必须是 1-${maximum} 个字符。`);
   }
   return normalized;
+}
+
+function isCanonicalIsoTimestamp(value: string): boolean {
+  const milliseconds = Date.parse(value);
+  return Number.isFinite(milliseconds) && new Date(milliseconds).toISOString() === value;
 }
 
 function normalizedId(value: unknown, label: string): string {
@@ -1253,7 +1260,7 @@ function headRow(db: DatabaseSync, generationRunId: string): HeadRow | undefined
 
 function operationRow(db: DatabaseSync, operationId: string): OperationRow | undefined {
   return db.prepare(`
-    SELECT operation_id,input_fingerprint,observation_id,outcome_fingerprint
+    SELECT operation_id,input_fingerprint,observation_id,outcome_fingerprint,created_at
     FROM studio_post_result_observation_operation_receipts WHERE operation_id=?
   `).get(operationId) as unknown as OperationRow | undefined;
 }
@@ -1950,6 +1957,37 @@ function addReason(reasons: string[], reason: string): void {
   if (!reasons.includes(reason)) reasons.push(reason);
 }
 
+function immutableContinuationIneligibleReasons(record: StudioPostResultObservationRecord): string[] {
+  const reasons: string[] = [];
+  if (record.evidenceContractVersion === 1 || !record.evidenceKind || !record.evidenceSha256) {
+    addReason(reasons, "legacy-observation-without-explicit-evidence");
+  }
+  if (record.evidenceContractVersion === 2) {
+    addReason(reasons, "legacy-v2-observation-without-full-availability-or-lineage");
+  }
+  if (record.evidenceContractVersion >= 2 && record.observedState.referenceSha256 !== record.evidenceSha256) {
+    addReason(reasons, "observed-reference-does-not-match-evidence");
+  }
+  if ((record.evidenceKind === "terminal-panel-crop" || record.evidenceKind === "accepted-last-frame")
+    && LEGACY_V2_OBSERVATION_AVAILABILITY_FIELDS.some((field) => record.observedAvailability[field] === "observed")) {
+    addReason(reasons, "static-evidence-claims-dynamic-observation");
+  }
+  if (record.evidenceKind === "terminal-panel-crop") {
+    if (record.evidenceContractVersion < 3 || !record.evidenceLineage) {
+      addReason(reasons, "terminal-panel-crop-without-trusted-raw-derivation-receipt");
+    }
+  } else if (record.evidenceContractVersion === 3
+    && (record.evidenceKind === "accepted-last-frame" || record.evidenceKind === "reviewed-video")) {
+    addReason(reasons, `${record.evidenceKind}-without-specialized-lineage-receipt`);
+  }
+  if (record.evidenceContractVersion >= 4 && record.continuitySnapshot) {
+    for (const gap of nextShotContinuityContinuationGaps(record.continuitySnapshot)) {
+      addReason(reasons, `structured-continuity-unknown:${gap}`);
+    }
+  }
+  return reasons.sort((left, right) => left.localeCompare(right, "en"));
+}
+
 async function projectObservation(
   projectRoot: string,
   record: StudioPostResultObservationRecord,
@@ -2095,53 +2133,7 @@ async function projectObservation(
   }
   const currentStaleReasons = reasons.sort((left, right) => left.localeCompare(right, "en"));
   const current = headCurrent && currentStaleReasons.length === 0;
-  const continuationIneligibleReasons: string[] = [];
-  if (record.evidenceContractVersion === 1
-    || !record.evidenceKind
-    || !record.evidenceSha256) {
-    addReason(continuationIneligibleReasons, "legacy-observation-without-explicit-evidence");
-  }
-  if (record.evidenceContractVersion === 2) {
-    addReason(
-      continuationIneligibleReasons,
-      "legacy-v2-observation-without-full-availability-or-lineage",
-    );
-  }
-  if (record.evidenceContractVersion >= 2
-    && record.observedState.referenceSha256 !== record.evidenceSha256) {
-    addReason(continuationIneligibleReasons, "observed-reference-does-not-match-evidence");
-  }
-  if ((record.evidenceKind === "terminal-panel-crop"
-      || record.evidenceKind === "accepted-last-frame")
-    && LEGACY_V2_OBSERVATION_AVAILABILITY_FIELDS.some(
-      (field) => record.observedAvailability[field] === "observed",
-    )) {
-    addReason(
-      continuationIneligibleReasons,
-      "static-evidence-claims-dynamic-observation",
-    );
-  }
-  if (record.evidenceKind === "terminal-panel-crop") {
-    if (record.evidenceContractVersion < 3 || !record.evidenceLineage) {
-      addReason(
-        continuationIneligibleReasons,
-        "terminal-panel-crop-without-trusted-raw-derivation-receipt",
-      );
-    }
-  } else if (record.evidenceContractVersion === 3
-    && (record.evidenceKind === "accepted-last-frame"
-      || record.evidenceKind === "reviewed-video")) {
-    addReason(
-      continuationIneligibleReasons,
-      `${record.evidenceKind}-without-specialized-lineage-receipt`,
-    );
-  }
-  if (record.evidenceContractVersion >= 4 && record.continuitySnapshot) {
-    for (const gap of nextShotContinuityContinuationGaps(record.continuitySnapshot)) {
-      addReason(continuationIneligibleReasons, `structured-continuity-unknown:${gap}`);
-    }
-  }
-  continuationIneligibleReasons.sort((left, right) => left.localeCompare(right, "en"));
+  const continuationIneligibleReasons = immutableContinuationIneligibleReasons(record);
   const observedState: StudioPostResultObservedActualState = {
     referenceSha256: record.observedState.referenceSha256,
   };
@@ -2338,8 +2330,9 @@ export async function readStudioPostResultObservation(
 }
 
 /**
- * 只读证明某次 operation 已经完成，供命令总线在“领域写入成功、命令账本尚未
- * 提交”崩溃窗口中对账。调用方不得直接读取本模块私有表。
+ * @deprecated 仅供 legacy diagnostic。该 API 会投影动态 Review/result/media
+ * currentness，不能作为 command replay/reconcile proof；命令总线必须使用严格
+ * 只读 operation record reader。
  */
 export async function readStudioPostResultObservationOutcomeByOperationId(
   projectRoot: string,
@@ -2363,6 +2356,89 @@ export async function readStudioPostResultObservationOutcomeByOperationId(
     fail("storage-invalid", `operationId ${operationId} 引用孤儿或漂移的实际末态事件。`);
   }
   return projectObservation(projectRoot, recordFromRow(row));
+}
+
+/**
+ * 命令公开重放专用严格只读记录。immutable observation/receipt/head 保持完整；
+ * current/continuation 授权稳定 fail-closed，不调用 Review control、result、media、
+ * production 或任何可能初始化 owner 的路径。
+ */
+export async function readStudioPostResultObservationOperationRecordReadOnly(
+  projectRoot: string,
+  operationIdValue: string,
+): Promise<StudioPostResultObservationProjection | null> {
+  const operationId = normalizedId(operationIdValue, "operationId");
+  return withStudioGenerationLedgerReadOnlySnapshot(projectRoot, "post-result observation immutable operation record", (db) => {
+    assertBaseSchema(db);
+    assertSchema(db);
+    const receipt = operationRow(db, operationId);
+    if (!receipt) return null;
+    const row = observationRow(db, receipt.observation_id);
+    if (!row) fail("storage-invalid", `operationId ${operationId} 引用孤儿实际末态事件。`);
+    const record = recordFromRow(row);
+    if (receipt.operation_id !== operationId
+      || !SHA256_PATTERN.test(receipt.input_fingerprint)
+      || receipt.outcome_fingerprint !== record.fingerprint
+      || receipt.observation_id !== record.observationId
+      || !isCanonicalIsoTimestamp(receipt.created_at)) {
+      fail("storage-invalid", `operationId ${operationId} 的 input/outcome 内容身份漂移。`);
+    }
+    if (record.evidenceContractVersion < 3) {
+      fail("storage-invalid", `operationId ${operationId} 的 legacy v${record.evidenceContractVersion} 输入无法由当前 operation receipt 完整重建。`);
+    } else {
+      const reconstructedInput = {
+        operationId,
+        generationRunId: record.generationRunId,
+        expectedHeadRevision: record.baseHeadRevision,
+        expectedReviewId: record.reviewId,
+        expectedReviewFingerprint: record.reviewFingerprint,
+        rawResultId: record.rawResultId,
+        rawSha256: record.rawSha256,
+        labeledResultId: record.labeledResultId,
+        labeledSha256: record.labeledSha256,
+        packId: record.packId,
+        packFingerprint: record.packFingerprint,
+        plannedContinuityFingerprint: record.plannedContinuityFingerprint,
+        evidenceKind: record.evidenceKind!,
+        evidenceSha256: record.evidenceSha256!,
+        ...(record.terminalPanelId ? { terminalPanelId: record.terminalPanelId } : {}),
+        observedState: record.observedState,
+        observedAvailability: record.observedAvailability,
+        ...(record.continuitySnapshot ? { continuitySnapshot: record.continuitySnapshot } : {}),
+        observer: record.observer,
+        note: record.note,
+      };
+      const expectedInputFingerprint = digest({
+        schemaVersion: record.continuitySnapshot ? 4 : 3,
+        command: "submit-studio-post-result-observation",
+        ...reconstructedInput,
+      });
+      if (receipt.input_fingerprint !== expectedInputFingerprint) {
+        fail("storage-invalid", `operationId ${operationId} 的 inputFingerprint 无法由 immutable event 重建。`);
+      }
+    }
+    const head = headRow(db, record.generationRunId);
+    const headCurrent = Boolean(head
+      && head.observation_id === record.observationId
+      && head.observation_fingerprint === record.fingerprint
+      && Number(head.revision) === record.headRevision);
+    const observedState: StudioPostResultObservedActualState = { referenceSha256: record.observedState.referenceSha256 };
+    for (const field of OBSERVATION_AVAILABILITY_FIELDS) {
+      if (record.observedAvailability[field] === "observed") observedState[field] = record.observedState[field];
+    }
+    return {
+      ...record,
+      observedState,
+      head: headCurrent,
+      current: false,
+      continuationEligible: false,
+      currentStaleReasons: [
+        ...(!headCurrent ? ["not-current-observation-head"] : []),
+        "strict-recovery-currentness-not-proven",
+      ],
+      continuationIneligibleReasons: immutableContinuationIneligibleReasons(record),
+    };
+  });
 }
 
 /**

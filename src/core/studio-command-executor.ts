@@ -896,7 +896,10 @@ export async function executeStudioCommand(
     }
     case "retry_studio_generation_plan_nodes": {
       try {
-        return await retryStudioGenerationPlanNodes(projectRoot, request.payload);
+        return await retryStudioGenerationPlanNodes(projectRoot, {
+          ...request.payload,
+          operationId,
+        });
       } catch (error) {
         rejectStudioGenerationPrecondition(error, "studio_generation_plan", {});
       }

@@ -62,7 +62,7 @@
             <option value="grok">Grok</option>
           </select>
         </label>
-        <button type="button" class="primary-action continue-action" data-testid="studio-continue-action" :disabled="loading || Boolean(pendingAction) || !overview?.nextActionControl || (isGlobalAssetScope && overview?.nextActionControl?.requiresWrite)" :title="isGlobalAssetScope && overview?.nextActionControl?.requiresWrite ? globalWriteBlockedText : undefined" @click="continueFromCore">
+        <button type="button" class="primary-action continue-action" data-testid="studio-continue-action" :disabled="loading || Boolean(pendingAction) || !overview?.nextActionControl || (isGlobalAssetScope && overview?.nextActionControl?.requiresWrite)" :title="Boolean(pendingAction) ? '正在处理，不能再继续' : (isGlobalAssetScope && overview?.nextActionControl?.requiresWrite ? globalWriteBlockedText : undefined)" @click="continueFromCore">
           <ChevronRight :size="16" aria-hidden="true" /><span>继续</span>
         </button>
         <button v-if="api.openProjectCenter" type="button" class="quiet-action" data-testid="studio-open-project-center" :disabled="Boolean(pendingAction)" @click="api.openProjectCenter()">
@@ -509,7 +509,7 @@
               <p v-if="association.sourceNote">{{ association.sourceNote }}</p>
             </article>
             <details class="technical-diagnostics">
-              <summary>诊断详情</summary>
+              <summary data-testid="material-studio-diagnostics">诊断详情</summary>
               <dl>
                 <dt>图片 SHA</dt><dd>{{ detail.resourceImage.mediaSha256 }}</dd>
                 <dt>原始文件名</dt><dd>{{ detail.resourceImage.sourceBasename }}</dd>
@@ -526,7 +526,7 @@
             </div>
             <pre>{{ compactTextPreview(detail.textDocument.bodyPreview, detail.textDocument.kind) }}</pre>
             <p v-if="detail.textDocument.truncated || compactTextPreview(detail.textDocument.bodyPreview, detail.textDocument.kind).length < detail.textDocument.bodyPreview.length">正文较长，普通界面仅显示摘要；完整内容可在诊断详情查看。</p>
-            <details class="technical-diagnostics"><summary>诊断详情</summary><pre>{{ detail.textDocument.bodyPreview }}</pre><dl><dt>文档 ID</dt><dd>{{ detail.id }}</dd><dt>修订</dt><dd>r{{ detail.revision }}</dd><dt>SHA</dt><dd>{{ shortSha(detail.textDocument.bodySha256) }}</dd><dt>来源</dt><dd>{{ detail.textDocument.source }}</dd><dt>版本</dt><dd>{{ detail.textDocument.sourceVersion }}</dd></dl>
+            <details class="technical-diagnostics"><summary data-testid="material-studio-diagnostics">诊断详情</summary><pre>{{ detail.textDocument.bodyPreview }}</pre><dl><dt>文档 ID</dt><dd>{{ detail.id }}</dd><dt>修订</dt><dd>r{{ detail.revision }}</dd><dt>SHA</dt><dd>{{ shortSha(detail.textDocument.bodySha256) }}</dd><dt>来源</dt><dd>{{ detail.textDocument.source }}</dd><dt>版本</dt><dd>{{ detail.textDocument.sourceVersion }}</dd></dl>
               <div class="text-revision-history" data-testid="studio-text-revision-history">
                 <b>修订历史（最新在前，仅前 20 条）</b>
                 <p v-if="textRevisionsLoading" role="status">正在读取修订历史…</p>
@@ -566,10 +566,13 @@
               preload="metadata" />
             <audio
               v-else-if="detail.kind === 'audio' && detail.mediaPreview?.playbackUrl"
+              ref="studioAudioEl"
               class="media-player audio-player"
+              :class="{ 'audio-blocked': Boolean(pendingAction) }"
               :src="detail.mediaPreview.playbackUrl"
               controls
-              preload="metadata" />
+              preload="metadata"
+              @play="onStudioAudioPlay" />
             <p class="media-preview-note">{{ detail.mediaPreview?.message }}</p>
           </section>
 
@@ -584,7 +587,7 @@
                 decoding="async" />
               <span v-else><ImageIcon :size="30" aria-hidden="true" />尚无已审定权威图</span>
             </figure>
-            <details v-if="detail.primaryAuthority" class="technical-diagnostics"><summary>诊断详情</summary><dl><dt>版本 ID</dt><dd>{{ detail.primaryAuthority.versionId }}</dd><dt>SHA</dt><dd>{{ shortSha(detail.primaryAuthority.mediaSha256) }}</dd></dl></details>
+            <details v-if="detail.primaryAuthority" class="technical-diagnostics"><summary data-testid="material-studio-authority-diagnostics">诊断详情</summary><dl><dt>版本 ID</dt><dd>{{ detail.primaryAuthority.versionId }}</dd><dt>SHA</dt><dd>{{ shortSha(detail.primaryAuthority.mediaSha256) }}</dd></dl></details>
           </section>
 
           <section v-if="isAssetKind(detail.kind) && !isGlobalAssetScope" class="detail-section cross-project-reuse" data-testid="cross-project-asset-reuse">
@@ -601,6 +604,7 @@
                 type="button"
                 data-testid="cross-project-asset-pick-package"
                 :disabled="Boolean(pendingAction) || !api.pickCrossProjectAssetPackage"
+                :title="Boolean(pendingAction) ? '正在处理，不能再选择复用包' : undefined"
                 @click="pickCrossProjectAssetPackage"
               >选择复用包</button>
             </div>
@@ -679,7 +683,7 @@
 
           <section v-if="detail.prompt" class="detail-section prompt-section">
             <h3>冻结提示词</h3><p>一致性提示词已锁定；普通界面不展开长提示词。</p>
-            <details class="technical-diagnostics"><summary>诊断详情</summary><div v-if="detail.prompt.positive"><span>正向</span><p>{{ detail.prompt.positive }}</p></div><div v-if="detail.prompt.negative"><span>禁止</span><p>{{ detail.prompt.negative }}</p></div><footer v-if="detail.prompt.frozenPackId"><LockKeyhole :size="12" aria-hidden="true" />{{ detail.prompt.frozenPackId }}</footer></details>
+            <details class="technical-diagnostics"><summary data-testid="material-studio-diagnostics">诊断详情</summary><div v-if="detail.prompt.positive"><span>正向</span><p>{{ detail.prompt.positive }}</p></div><div v-if="detail.prompt.negative"><span>禁止</span><p>{{ detail.prompt.negative }}</p></div><footer v-if="detail.prompt.frozenPackId"><LockKeyhole :size="12" aria-hidden="true" />{{ detail.prompt.frozenPackId }}</footer></details>
           </section>
 
           <section v-if="isAssetKind(detail.kind)" class="detail-section relations-section">
@@ -692,7 +696,7 @@
                 </header>
                 <small>{{ relationDirection(relation, detail.id) }}</small>
                 <small v-if="relation.role || relation.note">{{ relation.role }}{{ relation.role && relation.note ? " · " : "" }}{{ relation.note }}</small>
-                <details class="technical-diagnostics"><summary>诊断详情</summary><code>{{ relation.id }} · {{ relationOtherAsset(relation, detail.id) }} · r{{ relation.revision }}</code><small v-if="relation.supersedesRelationId">替代 {{ relation.supersedesRelationId }}</small><small v-if="relation.supersededByRelationId">已由 {{ relation.supersededByRelationId }} 替代</small></details>
+                <details class="technical-diagnostics"><summary data-testid="material-studio-relation-diagnostics">诊断详情</summary><code>{{ relation.id }} · {{ relationOtherAsset(relation, detail.id) }} · r{{ relation.revision }}</code><small v-if="relation.supersedesRelationId">替代 {{ relation.supersedesRelationId }}</small><small v-if="relation.supersededByRelationId">已由 {{ relation.supersededByRelationId }} 替代</small></details>
                 <button
                   v-if="!isGlobalAssetScope && relation.head && relation.status === 'stale' && api.rebaseAssetRelation"
                   type="button"
@@ -706,7 +710,7 @@
               </article>
             </div>
             <p v-else class="relation-empty">尚无派生或组合来源；普通独立资产可以保持为空。</p>
-            <details v-if="!isGlobalAssetScope" class="asset-relation-editor" @toggle="onRelationEditorToggle"><summary>关联另一个资产</summary><div class="relation-intake">
+            <details v-if="!isGlobalAssetScope" class="asset-relation-editor" @toggle="onRelationEditorToggle"><summary data-testid="material-studio-relation-editor">关联另一个资产</summary><div class="relation-intake">
               <label><span>关系类型</span><select v-model="relationDraft.kind" :disabled="Boolean(pendingAction)">
                 <option value="derived_from">派生自</option>
                 <option value="variant_of">变体自</option>
@@ -740,7 +744,7 @@
                   <span :class="`review-${version.reviewStatus}`">{{ reviewLabel(version.reviewStatus) }}</span>
                   <em v-if="version.isPrimary">当前权威</em>
                 </div>
-                <div class="version-meta"><time v-if="version.createdAt">{{ formatDate(version.createdAt) }}</time><details class="technical-diagnostics"><summary>诊断详情</summary><code>{{ version.id }} · {{ shortSha(version.mediaSha256) }}</code></details></div>
+                <div class="version-meta"><time v-if="version.createdAt">{{ formatDate(version.createdAt) }}</time><details class="technical-diagnostics"><summary data-testid="material-studio-version-diagnostics">诊断详情</summary><code>{{ version.id }} · {{ shortSha(version.mediaSha256) }}</code></details></div>
               </header>
               <button
                 v-if="version.mediaUrl"
@@ -952,7 +956,7 @@
         <p>创建后只得到资产身份；尚未经 approved 的图片不会成为生图权威。</p>
         <footer>
           <button type="button" class="quiet-action" @click="closeCreateDialog">取消</button>
-          <button type="submit" class="primary-action" :disabled="!createDraft.name || pendingAction === 'create-asset'">
+          <button type="submit" class="primary-action" :disabled="!createDraft.name || Boolean(pendingAction)" :title="pendingAction ? '正在处理，不能再创建资产' : undefined">
             <LoaderCircle v-if="pendingAction === 'create-asset'" :size="14" class="spinning" aria-hidden="true" />
             <Plus v-else :size="14" aria-hidden="true" />
             创建资产
@@ -1057,6 +1061,7 @@ import {
 } from "../material-studio-create-draft";
 import { markT23RendererStartup } from "../t23-renderer-startup-probe";
 import { createStudioInitialOverviewReleaseGate } from "../studio-initial-overview-release-gate";
+import { claimCanvasAudioPlayback, releaseCanvasAudioPlayback } from "../canvas-audio-mutex";
 
 const AsyncStudioBindingWorkbench = defineAsyncComponent(() => import("./StudioBindingWorkbench.vue"));
 const AsyncStudioContinuityReviewView = defineAsyncComponent(() => import("./StudioContinuityReviewView.vue"));
@@ -1254,6 +1259,7 @@ export default defineComponent({
     failed: (_message: string) => true,
     selectionChanged: (_entryId: string) => true,
     bindingChanged: (_message: string) => true,
+    initialUnitCardsCommitted: (_payload: { projectRoot: string; startupMutationChecks?: number }) => true,
     projectRestored: (_projectRoot: string) => true,
     studioContextChanged: (_context: { mode: string; unitId?: string; panelId?: string; generationRunId?: string }) => true,
   },
@@ -1261,6 +1267,14 @@ export default defineComponent({
     markT23RendererStartup("material-setup");
     // P25/P26：壳头跟随受管画布主题（同一主题键 + 变更事件；仅壳头换肤，子视图不动）。
     const shellTheme = ref<ManagedCanvasThemeId>(readManagedCanvasTheme());
+    const studioAudioEl = ref<HTMLAudioElement | null>(null);
+    function onStudioAudioPlay(): void {
+      if (pendingAction.value) {
+        studioAudioEl.value?.pause();
+        return;
+      }
+      claimCanvasAudioPlayback(studioAudioEl.value);
+    }
     const onCanvasThemeChanged = (event: Event): void => {
       shellTheme.value = normalizeManagedCanvasTheme((event as CustomEvent).detail);
     };
@@ -1662,6 +1676,8 @@ export default defineComponent({
     });
 
     onBeforeUnmount(() => {
+      studioAudioEl.value?.pause();
+      releaseCanvasAudioPlayback(studioAudioEl.value);
       disposed = true;
       overviewRequest += 1;
       globalReuseOverviewRequest += 1;
@@ -1743,8 +1759,16 @@ export default defineComponent({
       projectRoot: string;
       refreshSequence: number;
       unitCount: number;
+      startupMutationChecks?: number;
     }): void {
       startInitialOverview(payload.projectRoot);
+      // App 持有活动工程 activationId；这里仅上报真实首卡已落地，不能自行猜 CAS。
+      emit("initialUnitCardsCommitted", {
+        projectRoot: payload.projectRoot,
+        ...(payload.startupMutationChecks === undefined
+          ? {}
+          : { startupMutationChecks: payload.startupMutationChecks }),
+      });
     }
 
     async function refresh(): Promise<void> {
@@ -2141,6 +2165,7 @@ export default defineComponent({
     }
 
     function openCreateDialog(category: MaterialStudioAssetCategory): void {
+      if (pendingAction.value) return;
       if (blockGlobalAssetWrite()) return;
       resetCreateDraft(category);
       createDialogOpen.value = true;
@@ -2208,16 +2233,14 @@ export default defineComponent({
 
     async function pickCrossProjectAssetPackage(): Promise<void> {
       if (blockGlobalAssetWrite()) return;
-      if (!props.api.pickCrossProjectAssetPackage || pendingAction.value) return;
-      clearFeedback();
-      try {
-        const picked = await props.api.pickCrossProjectAssetPackage();
-        if (!picked) return;
+      if (!props.api.pickCrossProjectAssetPackage) return;
+      await runAction("pick-package", "", async (scope) => {
+        const picked = await props.api.pickCrossProjectAssetPackage!();
+        if (!picked || !materialActionIsCurrent(scope)) return false;
         crossProjectPackage.value = picked;
         notice.value = `复用包已通过 manifest 与逐对象 SHA 核验：${picked.manifest.items.length} 项。`;
-      } catch (reason) {
-        fail(reason);
-      }
+        return false;
+      });
     }
 
     async function importCrossProjectAssetItem(
@@ -2509,6 +2532,7 @@ export default defineComponent({
     }
 
     async function continueFromCore(): Promise<void> {
+      if (pendingAction.value) return;
       const action = overview.value?.nextActionControl;
       if (!action) {
         fail(new Error("Core 尚未返回可执行的下一步；请刷新当前工程后重试。"));
@@ -2819,6 +2843,8 @@ export default defineComponent({
     }
 
     return {
+      studioAudioEl,
+      onStudioAudioPlay,
       shellTheme,
       activeSection,
       assetScope,
@@ -3053,7 +3079,7 @@ button:disabled{cursor:not-allowed;opacity:.46}
 .empty-state h2{margin:3px 0 0;color:var(--ui-text);font-size:17px}
 .empty-state p{max-width:390px;margin:0 0 8px;color:var(--dim);font-size:10px;line-height:1.6}
 .entry-collection.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(174px,1fr));align-content:start}
-.material-entry{position:relative;min-width:0;padding:0;border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--ui-surface);color:inherit;text-align:left;cursor:pointer}
+.material-entry{position:relative;min-width:0;padding:0;border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--ui-surface);color:inherit;text-align:left;cursor:pointer;content-visibility:auto;contain-intrinsic-size:auto 260px}
 .material-entry:hover,.material-entry.selected{background:var(--ui-surface-2);box-shadow:inset 0 0 0 1px var(--gold-soft)}
 .material-entry:focus-visible{z-index:2;outline:2px solid var(--gold);outline-offset:-2px}
 .material-entry figure{position:relative;height:148px;margin:0;display:grid;place-items:center;overflow:hidden;background:var(--ui-surface-2)}
@@ -3074,7 +3100,7 @@ button:disabled{cursor:not-allowed;opacity:.46}
 .entry-copy footer{margin-top:9px;display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--ui-text-3)}
 .entry-copy small,.entry-copy time{overflow:hidden;font-size:8px;text-overflow:ellipsis;white-space:nowrap}
 .entry-collection.list{display:block}
-.entry-collection.list .material-entry{width:100%;min-height:82px;display:grid;grid-template-columns:104px minmax(0,1fr) 24px;align-items:stretch;border-right:0}
+.entry-collection.list .material-entry{width:100%;min-height:82px;display:grid;grid-template-columns:104px minmax(0,1fr) 24px;align-items:stretch;border-right:0;contain-intrinsic-size:auto 82px}
 .entry-collection.list .material-entry figure{height:auto;min-height:81px}
 .entry-collection.list .entry-copy{min-height:0;padding:10px 14px}
 .entry-collection.list .resource-image-associations{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
@@ -3262,6 +3288,7 @@ button:disabled{cursor:not-allowed;opacity:.46}
 .version-preview-dialog>footer p{grid-column:1/-1;margin:0;color:var(--ui-text-3);font-size:8px;line-height:1.5}
 .media-preview-section .media-player{display:block;width:100%;max-height:210px;margin-top:9px;background:var(--ui-surface-2)}
 .media-preview-section .audio-player{height:38px;background:transparent}
+.audio-player.audio-blocked{pointer-events:none}
 .media-preview-note{margin:9px 0 0;color:var(--ui-text-3);font-size:8px;line-height:1.55;white-space:pre-wrap}
 .applicability-section>p{margin:9px 0 0;color:var(--ui-text-3);font-size:8px;line-height:1.55}
 .relations-section{background:var(--ui-surface)}

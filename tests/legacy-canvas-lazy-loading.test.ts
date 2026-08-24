@@ -39,4 +39,20 @@ describe("旧版生产画布按需加载", () => {
     expect(projection).not.toContain("eventFacts.some((fact) => fact.id === factId)");
     expect(projection).not.toContain("items.some((item) => item.id === itemId)");
   });
+
+  it("遗留生产画布 Vue Flow Controls Arrow/Home/End 只移焦，不静态装入 VueFlow", async () => {
+    const app = await readFile(path.join(process.cwd(), "src/renderer/src/App.vue"), "utf8");
+    expect(app).toContain("#production-flow .vue-flow__controls-button");
+    expect(app).toContain("function moveProductionFlowControlsFocus");
+    expect(app).toContain("function onCanvasShortcut(");
+    const shortcutStart = app.indexOf("function onCanvasShortcut(");
+    const shortcutEnd = app.indexOf("function showMessage(");
+    const shortcut = app.slice(shortcutStart, shortcutEnd);
+    expect(shortcut).toContain('event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Home" || event.key === "End"');
+    expect(shortcut).toContain("moveProductionFlowControlsFocus");
+    expect(shortcut.indexOf("moveProductionFlowControlsFocus")).toBeLessThan(shortcut.indexOf('event.key.toLowerCase() !== "z"'));
+    expect(shortcut).not.toContain("createCanvasEntity");
+    expect(app).not.toMatch(/import\s+\{[^}]*\b(?:VueFlow|useVueFlow)\b[^}]*\}\s+from\s+"@vue-flow\/core"/su);
+    expect(app).toContain('const LegacyVueFlowControls = defineAsyncComponent(async () => (await import("@vue-flow/controls")).Controls)');
+  });
 });

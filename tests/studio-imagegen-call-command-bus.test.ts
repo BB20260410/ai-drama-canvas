@@ -1,9 +1,11 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { spawn } from "node:child_process";
+import { copyFile, lstat, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import { afterEach, describe, expect, it } from "vitest";
 import {
+  __commandRequestHashForTests,
   executeIdempotentCommand,
   listCommandLedger,
   reconcileCommand,
@@ -12,14 +14,22 @@ import {
 import { getActiveManagedStudioContext } from "../src/core/active-managed-studio-context.js";
 import {
   dispatchStudioGenerationPack,
+  __setBeforeImagegenIntentTransactionHookForTests,
   createStudioGenerationPlan,
   freezeAndPersistStudioUnitGridGenerationPack,
   getStudioGenerationPlanProjection,
+  prepareStudioImagegenCall,
   readStudioGenerationRunEventHistory,
+  readStudioImagegenCallContextRebindByEventId,
   readStudioImagegenCallIntentByRun,
+  readStudioImagegenCallIntentByRunReadOnly,
 } from "../src/core/studio-generation-ledger.js";
+import { __setBeforeGenerationWritableOpenHookForTests } from "../src/core/studio-generation-ledger-storage.js";
+import { upsertCommandLedgerEntry } from "../src/core/command-ledger-store.js";
 import { submitStudioGenerationReview } from "../src/core/studio-generation-review.js";
-import { registerProject, setActiveProjectRegistration } from "../src/core/sidecar.js";
+import { appendEvent, registerProject, setActiveProjectRegistration } from "../src/core/sidecar.js";
+import { commandTerminalJsonDigest } from "../src/core/command-terminal-receipt.js";
+import { proveAgentImagegenResultBundleOutcome } from "../src/core/studio-agent-imagegen-result-bundle.js";
 import {
   createStudioP7Fixture,
   seedStudioP7ResolvedPanelContinuity,
@@ -58,6 +68,51 @@ function envelope(index: string, request: IdempotentCommandInput["request"]): Id
     idempotencyKey: `call-idempotency-${index}`,
     request,
   };
+}
+
+function stableTestValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stableTestValue);
+  if (!value || typeof value !== "object") return value;
+  return Object.fromEntries(Object.entries(value as Record<string, unknown>)
+    .filter(([, entry]) => entry !== undefined)
+    .sort(([left], [right]) => left.localeCompare(right, "en"))
+    .map(([key, entry]) => [key, stableTestValue(entry)]));
+}
+
+function stableTestDigest(value: unknown): string {
+  return createHash("sha256").update(JSON.stringify(stableTestValue(value)), "utf8").digest("hex");
+}
+
+async function generationOwnerFilesystemSnapshot(projectRoot: string): Promise<Record<string, unknown>> {
+  const aicanvas = path.join(projectRoot, ".aicanvas");
+  const snapshot: Record<string, unknown> = {};
+  async function visit(relative: string): Promise<void> {
+    const absolute = path.join(aicanvas, relative);
+    let metadata;
+    try {
+      metadata = await lstat(absolute);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        snapshot[relative] = null;
+        return;
+      }
+      throw error;
+    }
+    const identity = { dev: String(metadata.dev), ino: String(metadata.ino), size: metadata.size, mtimeMs: metadata.mtimeMs, ctimeMs: metadata.ctimeMs };
+    if (metadata.isDirectory()) {
+      snapshot[relative] = { kind: "directory", ...identity };
+      for (const name of (await readdir(absolute)).sort((left, right) => left.localeCompare(right, "en"))) {
+        await visit(`${relative}/${name}`);
+      }
+      return;
+    }
+    if (!metadata.isFile()) throw new Error(`generation owner 出现非普通文件：${relative}`);
+    snapshot[relative] = { kind: "file", ...identity, sha256: createHash("sha256").update(await readFile(absolute)).digest("hex") };
+  }
+  for (const relative of ["studio-generation-ledger.sqlite", "studio-generation-ledger.sqlite-wal", "studio-generation-ledger.sqlite-shm", "studio-generation"]) {
+    await visit(relative);
+  }
+  return snapshot;
 }
 
 describe.sequential("Studio imagegen call 命令总线 capability", () => {
@@ -185,7 +240,7 @@ describe.sequential("Studio imagegen call 命令总线 capability", () => {
       generatedAt: "2026-07-22T00:00:01.000Z",
     };
     await writeFile(prepared.quarantine.receiptPath, `${JSON.stringify(executionReceipt, null, 2)}\n`);
-    const committed = await executeIdempotentCommand(fixture.root, envelope("commit-unit-grid", {
+    const commitRequest = {
       command: "commit_agent_imagegen_result_bundle",
       payload: {
         projectContextToken: context.projectContextToken,
@@ -199,7 +254,9 @@ describe.sequential("Studio imagegen call 命令总线 capability", () => {
         expectedRevision: frozen.pack.target.unitRevision,
         executionReceipt,
       },
-    }));
+    } as const;
+    const commitEnvelope = envelope("commit-unit-grid", commitRequest);
+    const committed = await executeIdempotentCommand(fixture.root, commitEnvelope);
     expect(committed).toMatchObject({
       status: "succeeded",
       result: {
@@ -209,6 +266,141 @@ describe.sequential("Studio imagegen call 命令总线 capability", () => {
         review: { status: "pending", autoApproved: false },
       },
     });
+    const sameKeyBundle = await executeIdempotentCommand(fixture.root, {
+      ...commitEnvelope,
+      requestId: "call-request-commit-unit-grid-replay",
+    });
+    expect(sameKeyBundle).toMatchObject({
+      status: "succeeded",
+      replayed: true,
+      result: {
+        kind: "studio-agent-imagegen-result-bundle-outcome",
+        results: { schemaVersion: 5, pairComplete: true },
+        writebackReceiptStorageKey: expect.stringMatching(/^[a-f0-9]{64}$/u),
+        reconciled: true,
+      },
+    });
+    const directBundleReconcile = await reconcileCommand(fixture.root, {
+      idempotencyKey: commitEnvelope.idempotencyKey,
+    });
+    expect(directBundleReconcile).toMatchObject({
+      status: "succeeded",
+      replayed: true,
+      result: {
+        kind: "studio-agent-imagegen-result-bundle-outcome",
+        results: { schemaVersion: 5, pairComplete: true },
+        writebackReceiptStorageKey: (sameKeyBundle.result as { writebackReceiptStorageKey: string }).writebackReceiptStorageKey,
+        reconciled: true,
+      },
+    });
+    const bundleLedger = (await listCommandLedger(fixture.root))
+      .find((entry) => entry.idempotencyKey === commitEnvelope.idempotencyKey)!;
+    expect(bundleLedger).toMatchObject({ result: { kind: "studio-agent-imagegen-result-bundle-locator" } });
+
+    // 历史 v5 receipt 在修复前使用 SHA(JSON token string)。原请求路径只允许
+    // 尝试该请求唯一可推导的 legacy key，且仍以原 token 的 canonical hash
+    // 验证 call intent；无请求 direct reconcile 不得扫描旧 receipt。
+    const canonicalLocator = bundleLedger.result as Record<string, unknown>;
+    const canonicalStorageKey = canonicalLocator.writebackReceiptStorageKey as string;
+    const receiptRoot = path.join(fixture.root, ".aicanvas", "studio-generation", "writeback-receipts", "sha256");
+    const canonicalReceiptPath = path.join(receiptRoot, canonicalStorageKey.slice(0, 2), `${canonicalStorageKey}.json`);
+    const canonicalReceipt = JSON.parse(await readFile(canonicalReceiptPath, "utf8")) as Record<string, unknown>;
+    const legacyReceiptBody: Record<string, unknown> = {
+      ...canonicalReceipt,
+      projectContextTokenSha256: stableTestDigest(context.projectContextToken),
+    };
+    delete legacyReceiptBody.fingerprint;
+    const legacyReceipt: Record<string, unknown> = {
+      ...legacyReceiptBody,
+      fingerprint: stableTestDigest(legacyReceiptBody),
+    };
+    const legacyExecutionReceipt = legacyReceipt.executionReceipt as Record<string, unknown>;
+    const legacyRaw = legacyReceipt.raw as Record<string, unknown>;
+    const legacyLabeled = legacyReceipt.labeled as Record<string, unknown>;
+    const legacyStorageKey = stableTestDigest({
+      schemaVersion: 1,
+      kind: "studio-agent-imagegen-writeback-receipt-storage-key",
+      projectId: legacyReceipt.projectId,
+      manifestFingerprint: legacyReceipt.manifestFingerprint,
+      projectContextTokenSha256: legacyReceipt.projectContextTokenSha256,
+      generationRunId: legacyReceipt.generationRunId,
+      packId: legacyReceipt.packId,
+      packFingerprint: legacyReceipt.packFingerprint,
+      provider: legacyReceipt.provider,
+      executionReceiptFingerprint: legacyExecutionReceipt.fingerprint,
+      rawSha256: legacyRaw.sha256,
+      labeledSha256: legacyLabeled.sha256,
+    });
+    const legacyReceiptDirectory = path.join(receiptRoot, legacyStorageKey.slice(0, 2));
+    await mkdir(legacyReceiptDirectory, { recursive: true });
+    await writeFile(
+      path.join(legacyReceiptDirectory, `${legacyStorageKey}.json`),
+      `${JSON.stringify(stableTestValue(legacyReceipt), null, 2)}\n`,
+    );
+    await rm(canonicalReceiptPath);
+
+    const canonicalOutcome = sameKeyBundle.result as Record<string, unknown>;
+    const reconstructedLegacyOutcomeBody: Record<string, unknown> = {
+      ...canonicalOutcome,
+      writebackReceiptFingerprint: legacyReceipt.fingerprint,
+      writebackReceiptStorageKey: legacyStorageKey,
+    };
+    delete reconstructedLegacyOutcomeBody.fingerprint;
+    delete reconstructedLegacyOutcomeBody.reconciled;
+    const legacyProof = await proveAgentImagegenResultBundleOutcome(fixture.root, commitRequest.payload);
+    expect(legacyProof).not.toBeNull();
+    expect(legacyProof).toMatchObject({
+      writebackReceiptFingerprint: legacyReceipt.fingerprint,
+      writebackReceiptStorageKey: legacyStorageKey,
+      fingerprint: stableTestDigest(reconstructedLegacyOutcomeBody),
+    });
+    const historicalOutcomeBody: Record<string, unknown> = { ...reconstructedLegacyOutcomeBody };
+    delete historicalOutcomeBody.writebackReceiptStorageKey;
+    const legacyLocator: Record<string, unknown> = {
+      ...canonicalLocator,
+      writebackReceiptFingerprint: legacyReceipt.fingerprint,
+      outcomeFingerprint: stableTestDigest(historicalOutcomeBody),
+    };
+    delete legacyLocator.writebackReceiptStorageKey;
+    const legacyKey = "call-idempotency-commit-unit-grid-legacy-v5";
+    const legacyRequestId = "call-request-commit-unit-grid-legacy-v5";
+    await upsertCommandLedgerEntry(fixture.root, {
+      ...bundleLedger,
+      idempotencyKey: legacyKey,
+      requestId: legacyRequestId,
+      result: legacyLocator,
+    });
+    await appendEvent(fixture.root, {
+      actor: "codex",
+      type: "command.side-effect-committed",
+      requestId: legacyRequestId,
+      idempotencyKey: legacyKey,
+      command: commitRequest.command,
+      data: {
+        requestHash: bundleLedger.requestHash,
+        command: commitRequest.command,
+        resultDigest: commandTerminalJsonDigest(legacyLocator),
+        result: legacyLocator,
+        projectRoot: fixture.root,
+        outcomeStatus: "succeeded",
+      },
+    });
+    await expect(executeIdempotentCommand(fixture.root, {
+      idempotencyKey: legacyKey,
+      requestId: "call-request-commit-unit-grid-legacy-v5-replay",
+      request: commitRequest,
+    })).resolves.toMatchObject({
+      status: "succeeded",
+      replayed: true,
+      result: {
+        kind: "studio-agent-imagegen-result-bundle-outcome",
+        schemaVersion: 5,
+        writebackReceiptStorageKey: legacyStorageKey,
+        reconciled: true,
+      },
+    });
+    await expect(reconcileCommand(fixture.root, { idempotencyKey: legacyKey }))
+      .rejects.toThrow(/缺少 writebackReceiptStorageKey|禁止扫描/u);
     await expect(executeIdempotentCommand(fixture.root, envelope("reconcile-after-result", {
       command: "reconcile_studio_imagegen_call",
       payload: {
@@ -267,14 +459,50 @@ describe.sequential("Studio imagegen call 命令总线 capability", () => {
       },
     };
     const crashEnvelope = envelope("prepare-crash-0002", crashRequest);
+    let releaseIntent!: () => void;
+    let markIntentEntered!: () => void;
+    const intentEntered = new Promise<void>((resolve) => { markIntentEntered = resolve; });
+    const releaseIntentBarrier = new Promise<void>((resolve) => { releaseIntent = resolve; });
+    __setBeforeImagegenIntentTransactionHookForTests(async () => {
+      markIntentEntered();
+      await releaseIntentBarrier;
+    });
     process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE = crashRequest.command;
+    const producer = executeIdempotentCommand(fixture.root, crashEnvelope);
     try {
-      await expect(executeIdempotentCommand(fixture.root, crashEnvelope)).rejects.toThrow("执行结果未确认");
+      await intentEntered;
+      const waiter = executeIdempotentCommand(fixture.root, {
+        ...crashEnvelope,
+        requestId: "call-request-prepare-crash-waiter-0002",
+      }, { waitForRunningMs: 10_000 });
+      releaseIntent();
+      await expect(producer).rejects.toThrow("执行结果未确认");
+      await expect(waiter).resolves.toMatchObject({
+        status: "succeeded",
+        replayed: true,
+        result: {
+          generationRunId: crashRunId,
+          kind: "studio-generation-call-intent",
+          status: "generation_unknown",
+          callAllowed: false,
+          idempotentReplay: true,
+        },
+      });
     } finally {
+      releaseIntent();
+      __setBeforeImagegenIntentTransactionHookForTests(null);
       delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE;
     }
-    expect((await listCommandLedger(fixture.root)).find((entry) => entry.idempotencyKey === crashEnvelope.idempotencyKey))
-      .toMatchObject({ status: "unknown", durableReconciliation: { schemaVersion: 1, request: crashRequest } });
+    const crashedPrepare = (await listCommandLedger(fixture.root))
+      .find((entry) => entry.idempotencyKey === crashEnvelope.idempotencyKey);
+    expect(crashedPrepare).toMatchObject({
+      status: "succeeded",
+      result: { kind: "studio-operation-result-locator", operation: "imagegen-call-prepare" },
+    });
+    expect(crashedPrepare?.durableReconciliation).toBeUndefined();
+    expect(JSON.stringify(crashedPrepare)).not.toContain(context.projectContextToken);
+    await expect(readStudioImagegenCallIntentByRun(fixture.root, crashRunId))
+      .resolves.toMatchObject({ callId: expect.any(String), generationRunId: crashRunId });
     const recoveredCrash = await reconcileCommand(fixture.root, { idempotencyKey: crashEnvelope.idempotencyKey });
     expect(recoveredCrash).toMatchObject({
       status: "succeeded",
@@ -292,6 +520,13 @@ describe.sequential("Studio imagegen call 命令总线 capability", () => {
         idempotentReplay: true,
       },
     });
+    expect((await listCommandLedger(fixture.root)).filter((entry) =>
+      entry.requestHash === recoveredCrash.requestHash)).toHaveLength(2);
+    expect(new Set((await listCommandLedger(fixture.root)).filter((entry) =>
+      entry.requestHash === recoveredCrash.requestHash)
+      .map((entry) => (entry.result as { callId?: string }).callId))).toEqual(new Set([
+      (recoveredCrash.result as { callId: string }).callId,
+    ]));
 
     const abandonedCallId = (recoveredCrash.result as { callId: string }).callId;
     const abandonRequest = {
@@ -315,8 +550,12 @@ describe.sequential("Studio imagegen call 命令总线 capability", () => {
     } finally {
       delete process.env.AI_CANVAS_TEST_COMMAND_CRASH_AFTER_EXECUTE;
     }
-    expect((await listCommandLedger(fixture.root)).find((entry) => entry.idempotencyKey === abandonEnvelope.idempotencyKey))
-      .toMatchObject({ status: "unknown", durableReconciliation: { schemaVersion: 1, request: abandonRequest } });
+    const crashedAbandon = (await listCommandLedger(fixture.root))
+      .find((entry) => entry.idempotencyKey === abandonEnvelope.idempotencyKey);
+    expect(crashedAbandon).toMatchObject({ status: "unknown" });
+    expect(crashedAbandon?.durableReconciliation).toBeUndefined();
+    expect(JSON.stringify(crashedAbandon)).not.toContain(abandonRequest.payload.reason);
+    expect(JSON.stringify(crashedAbandon)).not.toContain(abandonRequest.payload.evidenceReference);
     const recoveredAbandon = await reconcileCommand(fixture.root, { idempotencyKey: abandonEnvelope.idempotencyKey });
     expect(recoveredAbandon).toMatchObject({
       status: "succeeded",
@@ -660,6 +899,46 @@ describe.sequential("Studio imagegen call 命令总线 capability", () => {
     });
     expect((secondRebind.result as { fromContextTokenHash: string }).fromContextTokenHash)
       .toBe((recoveredRebind.result as { toContextTokenHash: string }).toContextTokenHash);
+    await expect(readStudioImagegenCallContextRebindByEventId(
+      fixture.root,
+      rebindRunId,
+      (recoveredRebind.result as { eventId: string }).eventId,
+    )).resolves.toMatchObject({
+      eventId: (recoveredRebind.result as { eventId: string }).eventId,
+      evidenceFingerprint: rebindRequest.payload.evidenceFingerprint,
+      candidateSha256: rebindCandidateSha256,
+    });
+
+    const ownerBeforePublicReplay = await generationOwnerFilesystemSnapshot(fixture.root);
+    let generationWritableOpens = 0;
+    __setBeforeGenerationWritableOpenHookForTests(() => { generationWritableOpens += 1; });
+    try {
+      await expect(executeIdempotentCommand(fixture.root, {
+        ...crashEnvelope,
+        requestId: "call-request-prepare-crash-public-replay-0002",
+      })).resolves.toMatchObject({
+        status: "succeeded",
+        result: { callId: abandonedCallId, status: "generation_unknown", callAllowed: false },
+      });
+      await expect(executeIdempotentCommand(fixture.root, {
+        ...abandonEnvelope,
+        requestId: "call-request-owner-abandon-public-replay-0002",
+      })).resolves.toMatchObject({
+        status: "succeeded",
+        result: { eventId: (recoveredAbandon.result as { eventId: string }).eventId, status: "owner-abandoned" },
+      });
+      await expect(executeIdempotentCommand(fixture.root, {
+        ...rebindEnvelope,
+        requestId: "call-request-context-rebind-historical-public-replay-0003",
+      })).resolves.toMatchObject({
+        status: "succeeded",
+        result: { eventId: (recoveredRebind.result as { eventId: string }).eventId, candidateSha256: rebindCandidateSha256 },
+      });
+    } finally {
+      __setBeforeGenerationWritableOpenHookForTests(null);
+    }
+    expect(generationWritableOpens).toBe(0);
+    expect(await generationOwnerFilesystemSnapshot(fixture.root)).toEqual(ownerBeforePublicReplay);
 
     const commitTwiceReboundRequest = {
       ...commitReboundRequest,
@@ -713,5 +992,181 @@ describe.sequential("Studio imagegen call 命令总线 capability", () => {
       name: "RejectedCommandFailure",
       result: { entityType: "studio_generation_call", code: "call-intent-conflict" },
     });
+
+    const generationDbPath = path.join(fixture.root, ".aicanvas", "studio-generation-ledger.sqlite");
+    const tamperAbandonPairDb = new (await import("node:sqlite")).DatabaseSync(generationDbPath);
+    try {
+      tamperAbandonPairDb.exec("DROP TRIGGER studio_generation_run_events_no_delete");
+      tamperAbandonPairDb.prepare(`DELETE FROM studio_generation_run_events
+        WHERE generation_run_id = ? AND kind = 'cancel-requested'`)
+        .run(crashRunId);
+      tamperAbandonPairDb.exec(`CREATE TRIGGER studio_generation_run_events_no_delete
+        BEFORE DELETE ON studio_generation_run_events BEGIN SELECT RAISE(ABORT, 'generation run events are append-only'); END`);
+    } finally {
+      tamperAbandonPairDb.close();
+    }
+    await expect(executeIdempotentCommand(fixture.root, {
+      ...abandonEnvelope,
+      requestId: "call-request-owner-abandon-pair-tamper-0004",
+    })).rejects.toThrow(/request\/terminal 身份、顺序或 detail 不对称|request\/terminal 事件不唯一或不成对/u);
+
+    const tamperIntentDb = new (await import("node:sqlite")).DatabaseSync(generationDbPath);
+    try {
+      tamperIntentDb.exec("DROP TRIGGER studio_generation_call_intents_no_update");
+      const tamperedInputFingerprint = "f".repeat(64);
+      tamperIntentDb.prepare("UPDATE studio_generation_call_intents SET input_fingerprint = ?, call_id = ? WHERE generation_run_id = ?")
+        .run(tamperedInputFingerprint, `studio-imagegen-call-${tamperedInputFingerprint.slice(0, 40)}`, crashRunId);
+      tamperIntentDb.exec(`CREATE TRIGGER studio_generation_call_intents_no_update
+        BEFORE UPDATE ON studio_generation_call_intents BEGIN SELECT RAISE(ABORT, 'generation call intents are append-only'); END`);
+    } finally {
+      tamperIntentDb.close();
+    }
+    await expect(executeIdempotentCommand(fixture.root, {
+      ...crashEnvelope,
+      requestId: "call-request-prepare-content-id-tamper-0002",
+    })).rejects.toThrow(/严格只读 proof 失败|完整 inputFingerprint 内容闭包漂移/u);
+
+    const tamperRebindDb = new (await import("node:sqlite")).DatabaseSync(generationDbPath);
+    try {
+      tamperRebindDb.exec("DROP TRIGGER studio_generation_call_events_no_update");
+      tamperRebindDb.prepare("UPDATE studio_generation_call_events SET evidence_reference = evidence_reference || '-tampered' WHERE event_id = ?")
+        .run((recoveredRebind.result as { eventId: string }).eventId);
+      tamperRebindDb.exec(`CREATE TRIGGER studio_generation_call_events_no_update
+        BEFORE UPDATE ON studio_generation_call_events BEGIN SELECT RAISE(ABORT, 'generation call events are append-only'); END`);
+    } finally {
+      tamperRebindDb.close();
+    }
+    await expect(executeIdempotentCommand(fixture.root, {
+      ...rebindEnvelope,
+      requestId: "call-request-rebind-content-id-tamper-0003",
+    })).rejects.toThrow(/严格只读 proof 失败|eventId 内容寻址漂移|事件身份不闭合|call event content identity 漂移/u);
   }, 120_000);
+
+  it("无 terminal receipt 的活 owner 转 dead 后，waiter 走 durable proof 并瞬态 hydrate full", async () => {
+    delete process.env.AI_CANVAS_RECORDED_SOURCE_DIGEST;
+    registryParent = path.join("/tmp", `ai-canvas-call-dead-owner-${process.pid}-${Date.now()}`);
+    process.env.AI_CANVAS_REGISTRY_PATH = path.join(registryParent, "projects.json");
+    fixture = await createStudioP7Fixture();
+    const identityWorkspace = path.join(fixture.parentRoot, "stable-build-identity-dead-owner");
+    await mkdir(path.join(identityWorkspace, "src", "mcp"), { recursive: true });
+    await Promise.all([
+      writeFile(path.join(identityWorkspace, "package.json"), `${JSON.stringify({ name: "ai-drama-canvas", version: "0.2.0" })}\n`),
+      writeFile(path.join(identityWorkspace, "src", "mcp", "server.ts"), "server.registerTool(\"fixture\", {}, () => ({}));\n"),
+    ]);
+    process.env.AI_CANVAS_WORKSPACE = identityWorkspace;
+    await registerProject(fixture.shell.project);
+    await setActiveProjectRegistration(fixture.root);
+    const unit = fixture.units.twoPanel;
+    for (const panel of unit.panels) {
+      await seedStudioP7ResolvedPanelContinuity(fixture.root, {
+        unitId: unit.unit.id,
+        panelId: panel.id,
+        assetIds: panel.assets.filter((asset) => asset.presence !== "forbidden").map((asset) => asset.assetId),
+      });
+    }
+    const frozen = await freezeAndPersistStudioUnitGridGenerationPack(fixture.root, {
+      targetKind: "unit-grid",
+      unitId: unit.unit.id,
+      continuationWaiver: await studioP7UserContinuationWaiver(fixture.root, unit, "fixture:dead-owner-wait"),
+    });
+    const generationRunId = "unit-grid-dead-owner-run-0001";
+    await dispatchStudioGenerationPack(fixture.root, {
+      packId: frozen.packId,
+      packFingerprint: frozen.fingerprint,
+      generationRunId,
+      provider: "grok",
+    });
+    const context = await getActiveManagedStudioContext();
+    const request = {
+      command: "prepare_studio_imagegen_call" as const,
+      payload: {
+        packId: frozen.packId,
+        packFingerprint: frozen.fingerprint,
+        generationRunId,
+        provider: "grok" as const,
+        projectContextToken: context.projectContextToken,
+        callerAgentId: "codex-dead-owner-fixture",
+        expectedRevision: 0 as const,
+      },
+    };
+    const requestHash = __commandRequestHashForTests(fixture.root, request);
+    const owner = await prepareStudioImagegenCall(fixture.root, { ...request.payload, commandRequestId: requestHash });
+    expect(owner).toMatchObject({ generationRunId, commandRequestId: requestHash, callAllowed: true });
+    const idempotencyKey = "prepare-dead-owner-no-terminal-key-0001";
+    const originalRequestId = "prepare-dead-owner-no-terminal-request-0001";
+    const startedAt = new Date().toISOString();
+    const processOwner = spawn(process.execPath, ["-e", "setInterval(() => {}, 1000)"], { stdio: "ignore" });
+    await new Promise<void>((resolve, reject) => {
+      processOwner.once("spawn", resolve);
+      processOwner.once("error", reject);
+    });
+    await upsertCommandLedgerEntry(fixture.root, {
+      schemaVersion: 1,
+      requestId: originalRequestId,
+      idempotencyKey,
+      command: request.command,
+      status: "running",
+      replayed: false,
+      requestHash,
+      execution: { pid: processOwner.pid!, phase: "executing", heartbeatAt: startedAt },
+      durableReconciliation: { schemaVersion: 1, request },
+      startedAt,
+    });
+    let generationWritableOpens = 0;
+    __setBeforeGenerationWritableOpenHookForTests(() => { generationWritableOpens += 1; });
+    let settled = false;
+    const waiter = executeIdempotentCommand(fixture.root, {
+      requestId: "prepare-dead-owner-waiter-request-0001",
+      idempotencyKey,
+      request,
+    }, { waitForRunningMs: 10_000 }).finally(() => { settled = true; });
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    expect(settled).toBe(false);
+    processOwner.kill("SIGKILL");
+    await new Promise<void>((resolve) => processOwner.once("exit", () => resolve()));
+    try {
+      await expect(waiter).resolves.toMatchObject({
+        status: "succeeded",
+        result: { kind: "studio-generation-call-intent", generationRunId, callId: owner.callId, callAllowed: false, idempotentReplay: true },
+      });
+    } finally {
+      __setBeforeGenerationWritableOpenHookForTests(null);
+    }
+    expect(generationWritableOpens).toBe(0);
+    const ledger = (await listCommandLedger(fixture.root)).find((entry) => entry.idempotencyKey === idempotencyKey);
+    expect(ledger).toMatchObject({
+      status: "succeeded",
+      result: { kind: "studio-operation-result-locator", operation: "imagegen-call-prepare", callId: owner.callId },
+    });
+    const db = new (await import("node:sqlite")).DatabaseSync(path.join(fixture.root, ".aicanvas", "studio-generation-ledger.sqlite"), { readOnly: true });
+    try {
+      expect((db.prepare("SELECT COUNT(*) AS count FROM studio_generation_call_intents WHERE generation_run_id = ?")
+        .get(generationRunId) as { count: number }).count).toBe(1);
+    } finally {
+      db.close();
+    }
+
+    const generationDbPath = path.join(fixture.root, ".aicanvas", "studio-generation-ledger.sqlite");
+    const tamperPackDb = new (await import("node:sqlite")).DatabaseSync(generationDbPath);
+    try {
+      const packRow = tamperPackDb.prepare("SELECT content_relpath FROM studio_generation_packs WHERE pack_id = ?")
+        .get(frozen.packId) as { content_relpath: string };
+      const nonCanonicalRelative = ".aicanvas/studio-generation/noncanonical-pack-copy.json";
+      await copyFile(path.join(fixture.root, packRow.content_relpath), path.join(fixture.root, nonCanonicalRelative));
+      tamperPackDb.exec("DROP TRIGGER studio_generation_packs_no_update");
+      tamperPackDb.prepare("UPDATE studio_generation_packs SET content_relpath = ? WHERE pack_id = ?")
+        .run(nonCanonicalRelative, frozen.packId);
+      tamperPackDb.exec(`CREATE TRIGGER studio_generation_packs_no_update
+        BEFORE UPDATE ON studio_generation_packs BEGIN SELECT RAISE(ABORT, 'generation packs are append-only'); END`);
+    } finally {
+      tamperPackDb.close();
+    }
+    await expect(readStudioImagegenCallIntentByRunReadOnly(fixture.root, generationRunId, "generation_unknown"))
+      .rejects.toThrow(/CAS 相对路径不是内容寻址 canonical 路径/u);
+    await expect(executeIdempotentCommand(fixture.root, {
+      requestId: "prepare-dead-owner-pack-relpath-tamper-0002",
+      idempotencyKey,
+      request,
+    })).rejects.toThrow(/CAS 相对路径不是内容寻址 canonical 路径/u);
+  }, 60_000);
 });

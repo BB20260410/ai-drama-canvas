@@ -45,13 +45,33 @@
             <button v-if="job.subagentCheckpoint?.output?.isolatedPath" type="button" @click="reveal(job.subagentCheckpoint.output.isolatedPath)">候选</button>
             <button v-if="job.resultPath" type="button" @click="reveal(job.resultPath)">raw</button>
             <button v-if="job.companionPath" type="button" @click="reveal(job.companionPath)">labeled</button>
-            <button v-if="canProcess(job)" type="button" @click="processJob(job.id)">定向处理</button>
-            <button v-if="canReviewCandidate(job)" type="button" @click="reviewCandidate(job, 'visual_accept')">视觉通过</button>
-            <button v-if="canReviewCandidate(job)" type="button" @click="reviewCandidate(job, 'visual_rejected')">视觉返工</button>
+            <button
+              v-if="canProcess(job)"
+              type="button"
+              data-testid="generation-queue-process"
+              :disabled="busy"
+              :title="busy ? '正在处理，不能再定向处理' : undefined"
+              @click="processJob(job.id)">定向处理</button>
+            <button
+              v-if="canReviewCandidate(job)"
+              type="button"
+              data-testid="generation-queue-visual-accept"
+              :disabled="busy"
+              :title="busy ? '正在处理，不能再提交视觉验收' : undefined"
+              @click="reviewCandidate(job, 'visual_accept')">视觉通过</button>
+            <button
+              v-if="canReviewCandidate(job)"
+              type="button"
+              data-testid="generation-queue-visual-reject"
+              :disabled="busy"
+              :title="busy ? '正在处理，不能再提交视觉验收' : undefined"
+              @click="reviewCandidate(job, 'visual_rejected')">视觉返工</button>
             <button
               v-if="canCancel(job)"
               type="button"
               data-testid="generation-queue-cancel"
+              :disabled="busy"
+              :title="busy ? '正在处理，不能再取消' : undefined"
               @click="cancel(job.id)">取消</button>
           </div>
           <div
@@ -132,7 +152,7 @@
           </section>
           <section class="defaults" v-if="settings"><label><span>图片默认</span><select v-model="settings.defaultImageProviderId"><option v-for="provider in imageProviders" :key="provider.id" :value="provider.id">{{ provider.name }}</option></select></label><label><span>视频默认</span><select v-model="settings.defaultVideoProviderId"><option v-for="provider in videoProviders" :key="provider.id" :value="provider.id">{{ provider.name }}</option></select></label><label><span>并发</span><input v-if="!strictSequential" v-model.number="settings.concurrency" type="number" min="1" max="8" /><input v-else :value="1" type="number" disabled /></label><p v-if="strictSequential" class="subagent-boundary">一图一代理项目固定项目并发 1；UI 不允许放宽，避免未知调用与新任务重叠。</p></section>
         </div>
-        <footer><button class="primary-button" type="button" @click="saveSettings"><Save :size="14" /> 保存配置</button></footer>
+        <footer><button class="primary-button" type="button" data-testid="generation-queue-save-settings" :disabled="busy" :title="busy ? '正在处理，不能再保存配置' : undefined" @click="saveSettings"><Save :size="14" /> {{ busy ? "处理中" : "保存配置" }}</button></footer>
       </aside>
     </div>
   </section>
@@ -243,8 +263,9 @@ watch(kind, () => providerId.value = kind.value === "image" ? settings.value?.de
 watch(() => props.projectRoot, load);
 onMounted(load);
 async function load() { settings.value = clone(await window.canvasApi.getGenerationSettings(props.projectRoot)); resetWorkflowDrafts(); jobs.value = await window.canvasApi.listGenerationJobs(props.projectRoot); providerId.value = settings.value.defaultImageProviderId ?? availableProviders.value[0]?.id ?? ""; }
-async function refresh(){ busy.value=true; try{ await load(); emit("changed","生成队列已只读刷新；未提交、未轮询、未取消任何任务"); }catch(error){ emit("failed",message(error)); }finally{ busy.value=false; } }
+async function refresh(){ if (busy.value) return; busy.value=true; try{ await load(); emit("changed","生成队列已只读刷新；未提交、未轮询、未取消任何任务"); }catch(error){ emit("failed",message(error)); }finally{ busy.value=false; } }
 async function enqueueNext() {
+  if (busy.value) return;
   if (!props.index?.items?.length) {
     emit("failed", "受管工程请从画布工作流 / MCP freeze-dispatch 派发；本队列仅观察与取消/跳转/预览。");
     return;
@@ -260,10 +281,25 @@ async function enqueueNext() {
     emit("changed", `已加入 ${created.length} 个${kind.value === 'image' ? '图片' : '视频'}生成任务`);
   } catch(error){ emit("failed", message(error)); } finally { busy.value=false; }
 }
-async function processJob(id:string){ busy.value=true; try { jobs.value=await window.canvasApi.processGenerationQueue(props.projectRoot,id); emit("changed",`仅处理指定生成任务 ${id}`); } catch(error){ emit("failed",message(error)); } finally { busy.value=false; } }
-async function cancel(id:string){ try { await window.canvasApi.cancelGenerationJob(props.projectRoot,id); jobs.value=await window.canvasApi.listGenerationJobs(props.projectRoot); emit("changed","生成任务已取消"); } catch(error){ emit("failed",message(error)); } }
-async function reviewCandidate(job:GenerationJob,status:"visual_accept"|"visual_rejected"){ const checkpoint=job.subagentCheckpoint; const lease=checkpoint?.lease; const call=checkpoint?.callIntent; if(!checkpoint||!lease?.owner||!lease.fence||!call)return; const promptText=status==="visual_accept"?"请填写人物、场景、道具、风格一致性通过说明：":"请填写具体视觉返工原因："; const note=window.prompt(promptText,"")?.trim(); if(!note)return; busy.value=true; try{ await window.canvasApi.updateSubagentImageGenerationJob(props.projectRoot,job.id,{expectedRevision:checkpoint.revision,status,agentTaskName:lease.agentTaskName,owner:lease.owner,leaseId:lease.leaseId,fence:lease.fence,runId:call.runId,callId:call.callId,reviewer:"/root/ui_visual_reviewer",note}); jobs.value=await window.canvasApi.listGenerationJobs(props.projectRoot); emit("changed",status==="visual_accept"?"候选已通过视觉验收并完成 raw/labeled 事务发布":"候选已登记视觉返工，隔离证据已保留"); }catch(error){emit("failed",message(error));}finally{busy.value=false;} }
-async function saveSettings(){ if(!settings.value)return; try { if(strictSequential.value)settings.value.concurrency=1; for(const provider of settings.value.providers){ if(provider.adapter==="codex-subagent-imagegen"&&provider.capabilities)provider.capabilities.maxConcurrency=1; if(!provider.workflow)continue; let parsed:unknown; try{ parsed=JSON.parse(workflowDraft(provider)); }catch{ throw new Error(`${provider.name} 的工作流不是有效 JSON`); } if(!parsed||typeof parsed!=="object"||Array.isArray(parsed))throw new Error(`${provider.name} 的工作流必须是 JSON 对象`); provider.workflow.definition=parsed as Record<string,GenerationWorkflowJsonValue>; } settings.value=clone(await window.canvasApi.saveGenerationSettings(props.projectRoot,clone(settings.value))); resetWorkflowDrafts(); emit("changed","生成供应商配置与工作流快照已保存"); } catch(error){ emit("failed",message(error)); } }
+async function processJob(id:string){ if (busy.value) return; busy.value=true; try { jobs.value=await window.canvasApi.processGenerationQueue(props.projectRoot,id); emit("changed",`仅处理指定生成任务 ${id}`); } catch(error){ emit("failed",message(error)); } finally { busy.value=false; } }
+async function cancel(id:string){ if (busy.value) return; busy.value=true; try { await window.canvasApi.cancelGenerationJob(props.projectRoot,id); jobs.value=await window.canvasApi.listGenerationJobs(props.projectRoot); emit("changed","生成任务已取消"); } catch(error){ emit("failed",message(error)); } finally { busy.value=false; } }
+async function reviewCandidate(job:GenerationJob,status:"visual_accept"|"visual_rejected"){
+  if (busy.value) return;
+  const checkpoint=job.subagentCheckpoint;
+  const lease=checkpoint?.lease;
+  const call=checkpoint?.callIntent;
+  if(!checkpoint||!lease?.owner||!lease.fence||!call)return;
+  const promptText=status==="visual_accept"?"请填写人物、场景、道具、风格一致性通过说明：":"请填写具体视觉返工原因：";
+  busy.value=true;
+  try {
+    const note=window.prompt(promptText,"")?.trim();
+    if(!note)return;
+    await window.canvasApi.updateSubagentImageGenerationJob(props.projectRoot,job.id,{expectedRevision:checkpoint.revision,status,agentTaskName:lease.agentTaskName,owner:lease.owner,leaseId:lease.leaseId,fence:lease.fence,runId:call.runId,callId:call.callId,reviewer:"/root/ui_visual_reviewer",note});
+    jobs.value=await window.canvasApi.listGenerationJobs(props.projectRoot);
+    emit("changed",status==="visual_accept"?"候选已通过视觉验收并完成 raw/labeled 事务发布":"候选已登记视觉返工，隔离证据已保留");
+  } catch(error){ emit("failed",message(error)); } finally { busy.value=false; }
+}
+async function saveSettings(){ if (!settings.value || busy.value) return; busy.value = true; try { if(strictSequential.value)settings.value.concurrency=1; for(const provider of settings.value.providers){ if(provider.adapter==="codex-subagent-imagegen"&&provider.capabilities)provider.capabilities.maxConcurrency=1; if(!provider.workflow)continue; let parsed:unknown; try{ parsed=JSON.parse(workflowDraft(provider)); }catch{ throw new Error(`${provider.name} 的工作流不是有效 JSON`); } if(!parsed||typeof parsed!=="object"||Array.isArray(parsed))throw new Error(`${provider.name} 的工作流必须是 JSON 对象`); provider.workflow.definition=parsed as Record<string,GenerationWorkflowJsonValue>; } settings.value=clone(await window.canvasApi.saveGenerationSettings(props.projectRoot,clone(settings.value))); resetWorkflowDrafts(); emit("changed","生成供应商配置与工作流快照已保存"); } catch(error){ emit("failed",message(error)); } finally { busy.value = false; } }
 function addProvider(){ if(!settings.value)return; const now=new Date().toISOString(); settings.value.providers.push({id:`provider-${crypto.randomUUID().slice(0,8)}`,name:"新落盘桥接",adapter:"folder-bridge",kinds:[kind.value],enabled:true,capabilities:{referenceModes:["text","first_frame","last_frame","first_last_frame","multi_image","video_reference"],maxReferenceImages:12,maxReferenceVideos:1,supportedDurations:[5,10,15],supportedAspectRatios:["9:16","16:9","1:1"],supportedResolutions:["720p","1080p"],models:[],maxConcurrency:2,supportsCancel:false},outputRoot:props.projectRoot,createdAt:now,updatedAt:now}); }
 function configureAdapter(provider:GenerationProvider){
   if(provider.adapter==="codex-subagent-imagegen"){
@@ -297,7 +333,7 @@ function clone<T>(value:T):T { return JSON.parse(JSON.stringify(value)) as T; }
 </script>
 
 <style scoped>
-.generation-view { height:100%; display:flex; flex-direction:column; overflow:hidden; background:#121310; }.module-header { flex:0 0 92px; display:flex; align-items:center; justify-content:space-between; padding:0 26px; border-bottom:1px solid #30322c; }.module-header h2{margin:6px 0 3px;font-size:19px}.module-header p{margin:0;color:#83867b;font-size:10px}.module-actions{display:flex;gap:8px}.queue-toolbar{flex:0 0 52px;display:flex;align-items:center;gap:8px;padding:0 26px;border-bottom:1px solid #30322c;background:#151613;flex-wrap:wrap}.queue-toolbar select,.queue-toolbar button{height:31px;border:1px solid #35372f;background:#1b1c18;color:#bbb;padding:0 9px}.queue-toolbar button{display:flex;align-items:center;gap:6px;color:#d7af55;cursor:pointer}.queue-toolbar span{margin-left:auto;color:#686b62;font-size:8px}.queue-tabs{display:flex;gap:4px}.queue-tabs button{color:#9a9d93}.queue-tabs button.active{border-color:#d7af55;color:#e8c56a;background:#221f16}.queue-body{min-height:0;flex:1;display:grid;grid-template-columns:1fr;overflow:hidden}.queue-body.with-settings{grid-template-columns:minmax(0,1fr) 380px}.job-list{min-height:0;overflow:auto;padding:0 26px 70px}.job-row{min-width:760px;display:grid;grid-template-columns:110px minmax(260px,1.4fr) minmax(260px,1fr) 150px;gap:14px;align-items:center;min-height:92px;border-bottom:1px solid #2b2d27}.job-state{color:#aaa;font-size:9px}.job-state i{display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:#d7af55}.job-succeeded .job-state i{background:#83aa72}.job-failed .job-state i{background:#d36b59}.job-waiting_external .job-state i{background:#70a7c5}.job-cancelled{opacity:.5}.job-main{min-width:0}.job-main b,.job-main small{display:block}.job-main b{font-size:10px}.job-main small{margin-top:4px;color:#60635a;font:7px Menlo,monospace}.job-main p{margin:8px 0 0;color:#85887e;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.job-route{min-width:0}.job-route span,.job-route small{display:block}.job-route span{color:#d7af55;font-size:8px}.job-route small{margin-top:6px;color:#64675e;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.job-actions{display:flex;justify-content:flex-end;gap:5px}.job-actions button{height:25px;border:1px solid #383a33;background:transparent;color:#999c92;font-size:8px;cursor:pointer}.queue-empty{height:100%;display:grid;place-content:center;justify-items:center;gap:10px;color:#61645b;font-size:9px}.provider-settings{min-width:0;min-height:0;height:100%;display:flex;flex-direction:column;overflow:hidden;border-left:1px solid #30322c;background:#171815}.provider-settings>header{flex:0 0 64px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid #30322c}.provider-settings h3{margin:6px 0 0;font-size:13px}.provider-settings header button{width:29px;height:29px;border:1px solid #3a3c34;background:transparent;color:#d7af55}.settings-scroll{min-height:0;flex:1;overflow:auto}.provider-editor{padding:16px 18px;border-bottom:1px solid #30322c}.provider-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}.provider-head>input{flex:1;color:#eee;font-weight:600}.provider-head label{display:flex;align-items:center;gap:4px;color:#888b80;font-size:8px}.provider-editor>label,.defaults label{display:grid;grid-template-columns:64px 1fr;align-items:center;gap:8px;margin-top:7px;color:#777a70;font-size:8px}.provider-editor input,.provider-editor select,.defaults input,.defaults select{min-width:0;width:100%;height:29px;border:1px solid #34362f;background:#121310;color:#bbb;padding:0 7px}.defaults{padding:16px 18px}.provider-settings>footer{flex:0 0 auto;padding:12px 18px;border-top:1px solid #30322c}.provider-settings>footer button{width:100%}
+.generation-view { height:100%; display:flex; flex-direction:column; overflow:hidden; background:#121310; }.module-header { flex:0 0 92px; display:flex; align-items:center; justify-content:space-between; padding:0 26px; border-bottom:1px solid #30322c; }.module-header h2{margin:6px 0 3px;font-size:19px}.module-header p{margin:0;color:#83867b;font-size:10px}.module-actions{display:flex;gap:8px}.queue-toolbar{flex:0 0 52px;display:flex;align-items:center;gap:8px;padding:0 26px;border-bottom:1px solid #30322c;background:#151613;flex-wrap:wrap}.queue-toolbar select,.queue-toolbar button{height:31px;border:1px solid #35372f;background:#1b1c18;color:#bbb;padding:0 9px}.queue-toolbar button{display:flex;align-items:center;gap:6px;color:#d7af55;cursor:pointer}.queue-toolbar span{margin-left:auto;color:#686b62;font-size:8px}.queue-tabs{display:flex;gap:4px}.queue-tabs button{color:#9a9d93}.queue-tabs button.active{border-color:#d7af55;color:#e8c56a;background:#221f16}.queue-body{min-height:0;flex:1;display:grid;grid-template-columns:1fr;overflow:hidden}.queue-body.with-settings{grid-template-columns:minmax(0,1fr) 380px}.job-list{min-height:0;overflow:auto;padding:0 26px 70px}.job-row{min-width:760px;display:grid;grid-template-columns:110px minmax(260px,1.4fr) minmax(260px,1fr) 150px;gap:14px;align-items:center;min-height:92px;border-bottom:1px solid #2b2d27;content-visibility:auto;contain-intrinsic-size:auto 92px}.job-state{color:#aaa;font-size:9px}.job-state i{display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:#d7af55}.job-succeeded .job-state i{background:#83aa72}.job-failed .job-state i{background:#d36b59}.job-waiting_external .job-state i{background:#70a7c5}.job-cancelled{opacity:.5}.job-main{min-width:0}.job-main b,.job-main small{display:block}.job-main b{font-size:10px}.job-main small{margin-top:4px;color:#60635a;font:7px Menlo,monospace}.job-main p{margin:8px 0 0;color:#85887e;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.job-route{min-width:0}.job-route span,.job-route small{display:block}.job-route span{color:#d7af55;font-size:8px}.job-route small{margin-top:6px;color:#64675e;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.job-actions{display:flex;justify-content:flex-end;gap:5px}.job-actions button{height:25px;border:1px solid #383a33;background:transparent;color:#999c92;font-size:8px;cursor:pointer}.queue-empty{height:100%;display:grid;place-content:center;justify-items:center;gap:10px;color:#61645b;font-size:9px}.provider-settings{min-width:0;min-height:0;height:100%;display:flex;flex-direction:column;overflow:hidden;border-left:1px solid #30322c;background:#171815}.provider-settings>header{flex:0 0 64px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid #30322c}.provider-settings h3{margin:6px 0 0;font-size:13px}.provider-settings header button{width:29px;height:29px;border:1px solid #3a3c34;background:transparent;color:#d7af55}.settings-scroll{min-height:0;flex:1;overflow:auto}.provider-editor{padding:16px 18px;border-bottom:1px solid #30322c}.provider-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}.provider-head>input{flex:1;color:#eee;font-weight:600}.provider-head label{display:flex;align-items:center;gap:4px;color:#888b80;font-size:8px}.provider-editor>label,.defaults label{display:grid;grid-template-columns:64px 1fr;align-items:center;gap:8px;margin-top:7px;color:#777a70;font-size:8px}.provider-editor input,.provider-editor select,.defaults input,.defaults select{min-width:0;width:100%;height:29px;border:1px solid #34362f;background:#121310;color:#bbb;padding:0 7px}.defaults{padding:16px 18px}.provider-settings>footer{flex:0 0 auto;padding:12px 18px;border-top:1px solid #30322c}.provider-settings>footer button{width:100%}
 .job-waiting_remote .job-state i { background: #70a7c5; }
 .job-submission_unknown .job-state i { background: #d58a49; }
 .job-generation_unknown .job-state i { background: #e07845; }

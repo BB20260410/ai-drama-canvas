@@ -8,16 +8,16 @@
       </div>
       <div class="editor-actions">
         <span :class="['engine-state', { offline: !engine?.available }]">{{ engine?.available ? 'FFmpeg 就绪' : 'FFmpeg 未就绪' }}</span>
-        <select v-model="activeProjectId" @change="selectEditProject(activeProjectId)">
+        <select v-model="activeProjectId" :disabled="creating || editorWriteBusy" :title="(creating || editorWriteBusy) ? '正在处理，不能再切换剪辑工程' : undefined" @change="selectEditProject(activeProjectId)">
           <option value="">选择剪辑工程</option>
           <option v-for="entry in projects" :key="entry.id" :value="entry.id">{{ entry.name }} · v{{ entry.revision }}</option>
         </select>
-        <button class="ghost-button icon-history" type="button" title="撤销剪辑" :disabled="!active || !historyInfo.canUndo" @click="undoEditor"><Undo2 :size="14" /></button>
-        <button class="ghost-button icon-history" type="button" title="重做剪辑" :disabled="!active || !historyInfo.canRedo" @click="redoEditor"><Redo2 :size="14" /></button>
-        <button class="ghost-button" type="button" @click="showCreate = true"><Plus :size="14" /> 新建</button>
+        <button class="ghost-button icon-history" type="button" :title="editorWriteBusy ? '正在处理剪辑，不能撤销' : '撤销剪辑'" :disabled="!active || !historyInfo.canUndo || editorWriteBusy" @click="undoEditor"><Undo2 :size="14" /></button>
+        <button class="ghost-button icon-history" type="button" :title="editorWriteBusy ? '正在处理剪辑，不能重做' : '重做剪辑'" :disabled="!active || !historyInfo.canRedo || editorWriteBusy" @click="redoEditor"><Redo2 :size="14" /></button>
+        <button class="ghost-button" type="button" :disabled="creating || editorWriteBusy" :title="(creating || editorWriteBusy) ? '正在处理，不能再新建剪辑工程' : undefined" @click="openCreate"><Plus :size="14" /> 新建</button>
         <button class="ghost-button" type="button" :disabled="!active || saving" @click="save()"><Save :size="14" /> {{ saving ? '保存中' : '保存' }}</button>
-        <button v-if="rendering" class="ghost-button render-cancel" type="button" @click="cancelRender"><Square :size="13" /> 取消导出</button>
-        <button class="primary-button" type="button" :disabled="!active || !visualClips.length || rendering || !engine?.available" @click="render">
+        <button v-if="rendering" class="ghost-button render-cancel" type="button" :disabled="cancellingRender" :title="cancellingRender ? '正在处理，不能再取消导出' : undefined" @click="cancelRender"><Square :size="13" /> 取消导出</button>
+        <button class="primary-button" type="button" :disabled="!active || !visualClips.length || rendering || saving || exportingOtio || importingOtio || !engine?.available" @click="render">
           <Download :size="14" /> {{ rendering ? '正在导出' : '导出 MP4' }}
         </button>
       </div>
@@ -26,7 +26,7 @@
     <div v-if="loading" class="editor-empty"><LoaderCircle class="spinning" :size="26" /><span>正在载入剪辑工程与真实素材…</span></div>
     <div v-else-if="!active" class="editor-empty">
       <Clapperboard :size="34" /><h3>还没有剪辑工程</h3><p>新建工程后，可自动装入本集权威视频；也可以从左侧素材库逐个加入。</p>
-      <button class="primary-button" type="button" @click="showCreate = true"><Plus :size="15" /> 新建第一个工程</button>
+      <button class="primary-button" type="button" :disabled="creating || editorWriteBusy" :title="(creating || editorWriteBusy) ? '正在处理，不能再新建剪辑工程' : undefined" @click="openCreate"><Plus :size="15" /> 新建第一个工程</button>
     </div>
     <div v-else class="editor-body">
       <aside class="media-bin">
@@ -36,7 +36,7 @@
           <article v-for="item in filteredMedia" :key="item.id" @mouseenter="ensureMediaPreview(item)" @mouseleave="clearMediaPreviewDemand">
             <figure><img v-if="item.waveformPath || item.thumbnailPath" :src="assetUrl(item.waveformPath || item.thumbnailPath!)" :alt="`${item.name} ${item.kind === 'audio' ? '波形' : '缩略图'}`" loading="lazy" decoding="async" /><span v-else><LoaderCircle v-if="previewLoading.has(item.artifactId)" class="spinning" :size="16" /><Music2 v-else-if="item.kind === 'audio'" :size="18" /><Film v-else :size="18" /></span><em>{{ item.kind.toUpperCase() }}</em></figure>
             <div><b>{{ item.name }}</b><small>{{ mediaMeta(item) }}</small><code>{{ item.path }}</code></div>
-            <div class="media-actions"><button v-if="item.kind==='video'" type="button" :class="{ready:item.proxyPath}" :title="item.proxyPath?'剪辑代理已就绪':'生成最长边 1280 的本地剪辑代理'" :disabled="proxyLoading.has(item.artifactId)" @click="prepareProxy(item)"><LoaderCircle v-if="proxyLoading.has(item.artifactId)" class="spinning" :size="12" /><span v-else>P</span></button><button type="button" title="追加到主画面" @click="addMedia(item)"><Plus :size="15" /></button></div>
+            <div class="media-actions"><button v-if="item.kind==='video'" type="button" :class="{ready:item.proxyPath}" :title="item.proxyPath?'剪辑代理已就绪':'生成最长边 1280 的本地剪辑代理'" :disabled="proxyLoading.has(item.artifactId)" @click="prepareProxy(item)"><LoaderCircle v-if="proxyLoading.has(item.artifactId)" class="spinning" :size="12" /><span v-else>P</span></button><button type="button" :disabled="creating || editorWriteBusy" :title="(creating || editorWriteBusy) ? '正在处理，不能再追加素材' : '追加到主画面'" @click="addMedia(item)"><Plus :size="15" /></button></div>
           </article>
           <p v-if="!filteredMedia.length" class="bin-empty">没有匹配的可解码素材</p>
           <button v-if="mediaNextCursor" class="media-load-more" type="button" :disabled="mediaPageLoading" @click="loadMedia(false)">{{ mediaPageLoading ? "读取中…" : "加载更多" }}</button>
@@ -73,7 +73,7 @@
 
         <section class="timeline-deck">
           <header class="timeline-tools">
-            <div><button type="button" @click="addOverlayTrack"><Layers3 :size="14" /> 画中画轨</button><button type="button" @click="addSubtitle"><Captions :size="14" /> 字幕</button><select v-model="selectedNestedProjectId" data-testid="nested-project-select" title="选择要冻结插入的子剪辑工程"><option value="">子时间线</option><option v-for="entry in availableNestedProjects" :key="entry.id" :value="entry.id">{{ entry.name }} · v{{ entry.revision }}</option></select><button type="button" data-testid="add-nested-timeline" :disabled="nestedAdding || !selectedNestedProjectId" @click="addNestedTimeline"><Layers3 :size="14" /> {{ nestedAdding ? '冻结中' : '插入子时间线' }}</button><button class="tool-emphasis" type="button" title="在播放头分割当前片段（⌘B）" :disabled="!canSplitSelected" @click="splitSelectedAtPlayhead"><Scissors :size="14" /> 分割</button><button class="danger" type="button" title="删除当前片段并收拢后续未锁定轨道（⇧⌫）" :disabled="!selectedClip" @click="rippleDeleteSelected"><Trash2 :size="14" /> Ripple 删除</button><button type="button" :disabled="extractingFrame" @click="extractCurrentFrame"><ImageDown :size="14" /> {{ extractingFrame ? '合成中' : '导出当前帧' }}</button><select v-model="continuationTargetId" title="选择要登记新首帧的下一个 15 秒单元"><option value="">续接目标</option><option v-for="item in continuationUnits" :key="item.id" :value="item.id">EP{{String(item.episode).padStart(2,'0')}}-{{String(item.unit).padStart(3,'0')}} {{item.title}}</option></select><button type="button" :disabled="preparingContinuation||!continuationTargetId" @click="prepareTimelineContinuation"><Link2 :size="14" /> {{preparingContinuation?'准备中':'末帧续视频'}}</button><button type="button" @click="importOtio"><FileUp :size="14" /> OTIO</button><button type="button" :disabled="!active" @click="exportOtio"><FileDown :size="14" /> OTIO</button><button type="button" :disabled="!selectedClip || selectedTrack?.kind !== 'visual' || selectedTrack?.order !== 0" @click="moveClip(-1)"><ChevronLeft :size="14" /> 前移</button><button type="button" :disabled="!selectedClip || selectedTrack?.kind !== 'visual' || selectedTrack?.order !== 0" @click="moveClip(1)">后移 <ChevronRight :size="14" /></button><button type="button" :disabled="!selectedClip" @click="removeClip"><X :size="14" /> 普通移除</button></div>
+            <div><button type="button" :disabled="creating || editorWriteBusy" :title="(creating || editorWriteBusy) ? '正在处理，不能再添加画中画轨' : undefined" @click="addOverlayTrack"><Layers3 :size="14" /> 画中画轨</button><button type="button" :disabled="creating || editorWriteBusy" :title="(creating || editorWriteBusy) ? '正在处理，不能再添加字幕' : undefined" @click="addSubtitle"><Captions :size="14" /> 字幕</button><select v-model="selectedNestedProjectId" data-testid="nested-project-select" title="选择要冻结插入的子剪辑工程"><option value="">子时间线</option><option v-for="entry in availableNestedProjects" :key="entry.id" :value="entry.id">{{ entry.name }} · v{{ entry.revision }}</option></select><button type="button" data-testid="add-nested-timeline" :disabled="nestedAdding || !selectedNestedProjectId || creating || editorWriteBusy" :title="(creating || editorWriteBusy) ? '正在处理，不能再插入子时间线' : undefined" @click="addNestedTimeline"><Layers3 :size="14" /> {{ nestedAdding ? '冻结中' : '插入子时间线' }}</button><button class="tool-emphasis" type="button" title="在播放头分割当前片段（⌘B）" :disabled="!canSplitSelected || editorWriteBusy" @click="splitSelectedAtPlayhead"><Scissors :size="14" /> 分割</button><button class="danger" type="button" title="删除当前片段并收拢后续未锁定轨道（⇧⌫）" :disabled="!selectedClip || editorWriteBusy" @click="rippleDeleteSelected"><Trash2 :size="14" /> Ripple 删除</button><button type="button" :disabled="extractingFrame || saving || exportingOtio || importingOtio" @click="extractCurrentFrame"><ImageDown :size="14" /> {{ extractingFrame ? '合成中' : '导出当前帧' }}</button><select v-model="continuationTargetId" title="选择要登记新首帧的下一个 15 秒单元"><option value="">续接目标</option><option v-for="item in continuationUnits" :key="item.id" :value="item.id">EP{{String(item.episode).padStart(2,'0')}}-{{String(item.unit).padStart(3,'0')}} {{item.title}}</option></select><button type="button" :disabled="preparingContinuation || saving || exportingOtio || importingOtio || !continuationTargetId" @click="prepareTimelineContinuation"><Link2 :size="14" /> {{preparingContinuation?'准备中':'末帧续视频'}}</button><button type="button" data-testid="import-otio" :disabled="importingOtio || exportingOtio || saving" :title="importingOtio ? '正在导入 OTIO' : exportingOtio ? '请等待导出完成' : saving ? '请等待保存完成' : '导入 OTIO 时间线'" @click="importOtio"><FileUp :size="14" /> {{ importingOtio ? '导入中' : 'OTIO' }}</button><button type="button" data-testid="export-otio" :disabled="!active || exportingOtio || saving" :title="exportingOtio ? '正在导出 OTIO' : saving ? '请等待保存完成' : '导出 OTIO 时间线'" @click="exportOtio"><FileDown :size="14" /> {{ exportingOtio ? '导出中' : 'OTIO' }}</button><button type="button" :disabled="!selectedClip || selectedTrack?.kind !== 'visual' || selectedTrack?.order !== 0" @click="moveClip(-1)"><ChevronLeft :size="14" /> 前移</button><button type="button" :disabled="!selectedClip || selectedTrack?.kind !== 'visual' || selectedTrack?.order !== 0" @click="moveClip(1)">后移 <ChevronRight :size="14" /></button><button type="button" :disabled="!selectedClip" @click="removeClip"><X :size="14" /> 普通移除</button></div>
             <div class="timeline-scale"><span>拖动片段 · 边缘裁切 · 自动吸附</span><label>缩放 <input v-model.number="pixelsPerSecond" type="range" min="24" max="120" step="4" /></label></div>
           </header>
           <div ref="timelineScrollElement" class="timeline-scroll" @scroll.passive="onTimelineScroll">
@@ -84,7 +84,7 @@
               <div class="playhead" :style="{ left: `${playhead * pixelsPerSecond}px` }"><i></i></div>
               <div v-if="snapGuideTime !== null" class="snap-guide" :style="{ left: `${108 + snapGuideTime * pixelsPerSecond}px` }"><span>{{ timecode(snapGuideTime) }}</span></div>
               <div v-for="track in active.tracks" :key="track.id" class="track-row">
-                <header :class="{ selected: track.id === selectedTrackId }" @click.stop="selectedTrackId = track.id"><span>{{ track.kind === 'visual' ? (track.order === 0 ? 'V' : 'P') : track.kind === 'audio' ? 'A' : 'T' }}</span><div><b>{{ track.name }}</b><small>{{ track.clips.length }} clips</small></div><button v-if="track.kind === 'visual' && track.order > 0 && !track.clips.length" type="button" title="删除空叠加轨" @click.stop="removeTrack(track.id)"><X :size="11" /></button></header>
+                <header :class="{ selected: track.id === selectedTrackId }" @click.stop="selectedTrackId = track.id"><span>{{ track.kind === 'visual' ? (track.order === 0 ? 'V' : 'P') : track.kind === 'audio' ? 'A' : 'T' }}</span><div><b>{{ track.name }}</b><small>{{ track.clips.length }} clips</small></div><button v-if="track.kind === 'visual' && track.order > 0 && !track.clips.length" type="button" :disabled="creating || editorWriteBusy" :title="(creating || editorWriteBusy) ? '正在处理，不能再删除空叠加轨' : '删除空叠加轨'" @click.stop="removeTrack(track.id)"><X :size="11" /></button></header>
                 <div class="track-lane">
                   <button
                     v-for="clip in visibleTrackClips(track)"
@@ -117,7 +117,7 @@
         </section>
         <section v-if="selectedClip" class="selected-fields">
           <div class="inspector-label">当前片段</div><h3>{{ selectedClip.name }}</h3><code>{{ selectedClip.kind === 'timeline' ? `${selectedClip.nestedTimeline?.childEditProjectId} · 冻结 v${selectedClip.nestedTimeline?.childEditProjectRevision}` : selectedClip.sourcePath }}</code>
-          <div v-if="selectedClip.kind === 'timeline'" class="nested-inspector" data-testid="nested-timeline-inspector"><small>快照 {{ selectedClip.nestedTimeline?.childSnapshotSha256.slice(0,12) }} · {{ selectedClip.nestedTimeline?.childTimebase.rateNumerator }}/{{ selectedClip.nestedTimeline?.childTimebase.rateDenominator }}</small><small v-if="nestedPreviewErrors.get(selectedClip.id)" role="alert">{{ nestedPreviewErrors.get(selectedClip.id) }}</small><button type="button" data-testid="refresh-nested-timeline" :disabled="nestedAdding" @click="refreshNestedTimeline">显式刷新到子工程当前修订</button></div>
+          <div v-if="selectedClip.kind === 'timeline'" class="nested-inspector" data-testid="nested-timeline-inspector"><small>快照 {{ selectedClip.nestedTimeline?.childSnapshotSha256.slice(0,12) }} · {{ selectedClip.nestedTimeline?.childTimebase.rateNumerator }}/{{ selectedClip.nestedTimeline?.childTimebase.rateDenominator }}</small><small v-if="nestedPreviewErrors.get(selectedClip.id)" role="alert">{{ nestedPreviewErrors.get(selectedClip.id) }}</small><button type="button" data-testid="refresh-nested-timeline" :disabled="nestedAdding || creating || editorWriteBusy" :title="(creating || editorWriteBusy) ? '正在处理，不能再刷新嵌套时间线' : undefined" @click="refreshNestedTimeline">显式刷新到子工程当前修订</button></div>
           <label><span>成片时长 · {{ clipDurationFrames(selectedClip) }} 帧</span><input v-model.number="selectedClip.durationSeconds" type="number" :min="frameDuration" :max="MAX_EDIT_TIMELINE_SECONDS" :step="frameDuration" @change="normalizeSelectedClipTiming" /></label>
           <label v-if="['video','audio'].includes(selectedClip.kind)"><span>源片裁切起点 · F{{ clipTrimStartFrame(selectedClip) }}</span><input v-model.number="selectedClip.trimStartSeconds" type="number" min="0" :step="frameDuration" @change="normalizeSelectedClipTiming" /></label>
           <label v-if="['video','audio'].includes(selectedClip.kind)"><span>播放速率</span><input v-model.number="selectedClip.playbackRate" data-testid="edit-playback-rate" type="number" min="0.1" max="8" step="0.1" :disabled="clipParticipatesInDissolve(selectedClip)" /></label>
@@ -196,7 +196,7 @@
           <div v-if="editorRecovery.incompleteRenderIds.length" class="recovery-renders"><span>上次未完成导出</span><code v-for="renderId in editorRecovery.incompleteRenderIds" :key="renderId">{{ renderId }}</code></div>
           <small>恢复稳定修订会从现有 editor history 创建一个新的更高修订，不覆盖最新文件。</small>
         </div>
-        <footer><button class="ghost-button" type="button" :disabled="resolvingRecovery || !editorRecovery.stableAvailable" @click="resolveRecovery('stable')"><ShieldCheck :size="14" /> {{ editorRecovery.stableAvailable ? `恢复稳定修订 v${editorRecovery.stableRevision}` : '没有可用的更早稳定修订' }}</button><button class="primary-button" type="button" :disabled="resolvingRecovery" @click="resolveRecovery('latest')"><Clock3 :size="14" /> {{ resolvingRecovery ? '正在打开' : `打开最新修订 v${editorRecovery.latestRevision}` }}</button></footer>
+        <footer><button class="ghost-button" type="button" :disabled="resolvingRecovery || !editorRecovery.stableAvailable" :title="resolvingRecovery ? '正在处理，不能再选择恢复修订' : undefined" @click="resolveRecovery('stable')"><ShieldCheck :size="14" /> {{ editorRecovery.stableAvailable ? `恢复稳定修订 v${editorRecovery.stableRevision}` : '没有可用的更早稳定修订' }}</button><button class="primary-button" type="button" :disabled="resolvingRecovery" :title="resolvingRecovery ? '正在处理，不能再选择恢复修订' : undefined" @click="resolveRecovery('latest')"><Clock3 :size="14" /> {{ resolvingRecovery ? '正在打开' : `打开最新修订 v${editorRecovery.latestRevision}` }}</button></footer>
       </section>
     </div>
 
@@ -207,7 +207,7 @@
         <label><span>分集范围</span><select v-model="draft.episode"><option value="">全项目</option><option v-for="episode in episodes" :key="episode" :value="String(episode)">EP{{ String(episode).padStart(2, '0') }}</option></select></label>
         <div class="modal-grid"><label><span>宽</span><input v-model.number="draft.width" type="number" min="256" max="7680" /></label><label><span>高</span><input v-model.number="draft.height" type="number" min="256" max="7680" /></label><label><span>帧率</span><input v-model.number="draft.fps" type="number" min="12" max="120" step="0.001" /></label></div>
         <label class="check"><input v-model="draft.autoPopulate" type="checkbox" /><span>自动装入本范围内的权威视频；若没有视频则装入权威图片</span></label>
-        <footer><button class="ghost-button" type="button" @click="showCreate = false">取消</button><button class="primary-button" type="button" :disabled="creating" @click="createProject"><Plus :size="14" /> {{ creating ? '创建中' : '创建工程' }}</button></footer>
+        <footer><button class="ghost-button" type="button" @click="showCreate = false">取消</button><button class="primary-button" type="button" :disabled="creating" :title="creating ? '正在处理，不能再创建剪辑工程' : undefined" @click="createProject"><Plus :size="14" /> {{ creating ? '创建中' : '创建工程' }}</button></footer>
       </section>
     </div>
   </section>
@@ -315,7 +315,10 @@ const mediaSearch = ref("");
 const mediaKind = ref<"all" | "video" | "image" | "audio">("all");
 const loading = ref(true);
 const saving = ref(false);
+const exportingOtio = ref(false);
+const importingOtio = ref(false);
 const rendering = ref(false);
+const cancellingRender = ref(false);
 const activeRenderId = ref("");
 const extractingFrame = ref(false);
 const preparingContinuation = ref(false);
@@ -414,6 +417,7 @@ let timelineResizeObserver: ResizeObserver | null = null;
 let mediaSearchTimer: ReturnType<typeof setTimeout> | null = null;
 let mediaLoadingSequence = 0;
 
+const editorWriteBusy = computed(() => saving.value || exportingOtio.value || importingOtio.value || rendering.value || extractingFrame.value || preparingContinuation.value);
 const episodes = computed(() => [...new Set(props.index.items.map((item) => item.episode).filter((value): value is number => Boolean(value)))].sort((a, b) => a - b));
 const continuationUnits = computed(() => props.index.items.filter((item) => item.type === "unit" && item.status !== "弃用").sort((a, b) => (a.episode ?? 0) - (b.episode ?? 0) || (a.unit ?? 0) - (b.unit ?? 0)));
 const availableNestedProjects = computed(() => projects.value.filter((entry) => entry.id !== active.value?.id));
@@ -781,6 +785,10 @@ async function openProject(id: string): Promise<boolean> {
 async function selectEditProject(id: string): Promise<void> {
   const currentId = active.value?.id ?? "";
   if (id === currentId) return;
+  if (creating.value || editorWriteBusy.value) {
+    activeProjectId.value = currentId;
+    return;
+  }
   if (await requestLeave("edit_project_switch") !== "proceed") {
     activeProjectId.value = currentId;
     return;
@@ -789,7 +797,7 @@ async function selectEditProject(id: string): Promise<void> {
   if (!opened && activeProjectId.value === id) activeProjectId.value = active.value?.id ?? currentId;
 }
 async function resolveRecovery(choice: "stable" | "latest") {
-  if (!editorRecovery.value || !editorSessionId.value) return;
+  if (resolvingRecovery.value || !editorRecovery.value || !editorSessionId.value) return;
   resolvingRecovery.value = true;
   try {
     const result = await window.canvasApi.resolveEditorSessionRecovery(props.projectRoot, editorSessionId.value, choice);
@@ -801,6 +809,7 @@ async function resolveRecovery(choice: "stable" | "latest") {
   finally { resolvingRecovery.value = false; }
 }
 async function createProject() {
+  if (creating.value) return;
   if (await requestLeave("edit_project_switch") !== "proceed") return;
   creating.value = true;
   try {
@@ -820,6 +829,7 @@ async function createProject() {
   finally { creating.value = false; }
 }
 function addMedia(item: EditMediaItem) {
+  if (creating.value || editorWriteBusy.value) return;
   if (!active.value) return;
   const selected = active.value.tracks.find((entry) => entry.id === selectedTrackId.value);
   const track = item.kind === "audio"
@@ -868,6 +878,7 @@ function addMedia(item: EditMediaItem) {
   seek(clip.startSeconds);
 }
 function addSubtitle() {
+  if (creating.value || editorWriteBusy.value) return;
   if (!active.value) return;
   const track = active.value.tracks.find((entry) => entry.kind === "subtitle");
   if (!track) return;
@@ -895,6 +906,7 @@ function addSubtitle() {
   seek(clip.startSeconds);
 }
 async function addNestedTimeline() {
+  if (creating.value || editorWriteBusy.value) return;
   if (!active.value || !selectedNestedProjectId.value || nestedAdding.value) return;
   const selectedChildId = selectedNestedProjectId.value;
   const selected = active.value.tracks.find((entry) => entry.id === selectedTrackId.value);
@@ -909,9 +921,11 @@ async function addNestedTimeline() {
     const result = await runAtomicEditOperation({ type: "add_nested_timeline", trackId: track.id, childEditProjectId: child.id, childExpectedRevision: child.revision, startFrame }, `已冻结插入子时间线 ${child.name}`);
     const createdId = result?.affectedClipIds[0];
     if (createdId) { selectedClipId.value = createdId; selectClip(createdId); }
-  } finally { nestedAdding.value = false; }
+  } catch (error) { emit("failed", message(error)); }
+  finally { nestedAdding.value = false; }
 }
 async function refreshNestedTimeline() {
+  if (creating.value || editorWriteBusy.value) return;
   const clip = selectedClip.value;
   if (!active.value || clip?.kind !== "timeline" || !clip.nestedTimeline || nestedAdding.value) return;
   const childId = clip.nestedTimeline.childEditProjectId;
@@ -939,6 +953,7 @@ async function refreshNestedTimeline() {
   finally { nestedAdding.value = false; }
 }
 function addOverlayTrack() {
+  if (creating.value || editorWriteBusy.value) return;
   if (!active.value) return;
   const count = active.value.tracks.filter((track) => track.kind === "visual").length;
   const track = { id: `track-${crypto.randomUUID()}`, kind: "visual" as const, name: `画中画 ${count}`, order: count, locked: false, muted: false, hidden: false, clips: [] };
@@ -948,7 +963,12 @@ function addOverlayTrack() {
   selectedTrackId.value = track.id;
   selectedClipId.value = "";
 }
+function openCreate() {
+  if (creating.value || editorWriteBusy.value) return;
+  showCreate.value = true;
+}
 function removeTrack(trackId: string) {
+  if (creating.value || editorWriteBusy.value) return;
   if (!active.value) return;
   const track = active.value.tracks.find((entry) => entry.id === trackId);
   if (!track || track.kind !== "visual" || track.order === 0 || track.clips.length) return;
@@ -957,11 +977,11 @@ function removeTrack(trackId: string) {
   selectedTrackId.value = active.value.tracks[0]?.id ?? "";
 }
 async function save(options: { scheduleNestedPreviews?: boolean } = {}) {
-  if (!active.value) return false;
+  if (!active.value || saving.value) return false;
+  saving.value = true;
   await suspendPreviewWork();
   let previewLeaseHeld = true;
   let persisted = false;
-  saving.value = true;
   try {
     reflowVisual();
     const revision = active.value.revision;
@@ -986,43 +1006,66 @@ async function save(options: { scheduleNestedPreviews?: boolean } = {}) {
   }
 }
 async function undoEditor() {
-  if (!active.value || !historyInfo.canUndo) return;
+  if (!active.value || !historyInfo.canUndo || editorWriteBusy.value) return;
   if (await requestLeave("history_navigation") !== "proceed") return;
   try { acceptPersistedProject(await window.canvasApi.undoEditProject(props.projectRoot, active.value.id, active.value.revision)); Object.assign(historyInfo, await window.canvasApi.getEditHistoryInfo(props.projectRoot, active.value.id)); if (editorSessionId.value) await window.canvasApi.setEditorSessionProject(props.projectRoot, editorSessionId.value, active.value.id); projects.value = await window.canvasApi.listEditProjects(props.projectRoot); activateNestedPreviews(); emit("changed", `已撤销到新修订 v${active.value.revision}`); }
   catch (error) { emit("failed", message(error)); }
 }
 async function redoEditor() {
-  if (!active.value || !historyInfo.canRedo) return;
+  if (!active.value || !historyInfo.canRedo || editorWriteBusy.value) return;
   if (await requestLeave("history_navigation") !== "proceed") return;
   try { acceptPersistedProject(await window.canvasApi.redoEditProject(props.projectRoot, active.value.id, active.value.revision)); Object.assign(historyInfo, await window.canvasApi.getEditHistoryInfo(props.projectRoot, active.value.id)); if (editorSessionId.value) await window.canvasApi.setEditorSessionProject(props.projectRoot, editorSessionId.value, active.value.id); projects.value = await window.canvasApi.listEditProjects(props.projectRoot); activateNestedPreviews(); emit("changed", `已重做到新修订 v${active.value.revision}`); }
   catch (error) { emit("failed", message(error)); }
 }
 async function exportOtio() {
-  if (!active.value || !await save({ scheduleNestedPreviews: false })) return;
-  try { const result = await window.canvasApi.exportEditOtio(props.projectRoot, active.value.id, active.value.revision); emit("changed", `OTIO 已导出：${result.path}`); await window.canvasApi.showInFolder(result.path); }
-  catch (error) { emit("failed", message(error)); }
-  finally { resumePreviewWork(); }
+  if (!active.value || exportingOtio.value || saving.value) return;
+  exportingOtio.value = true;
+  let shouldResumePreview = false;
+  try {
+    if (!await save({ scheduleNestedPreviews: false })) return;
+    shouldResumePreview = true;
+    const result = await window.canvasApi.exportEditOtio(props.projectRoot, active.value.id, active.value.revision);
+    emit("changed", `OTIO 已导出：${result.path}`);
+    await window.canvasApi.showInFolder(result.path);
+  } catch (error) { emit("failed", message(error)); }
+  finally {
+    exportingOtio.value = false;
+    if (shouldResumePreview) resumePreviewWork();
+  }
 }
 async function importOtio() {
-  if (await requestLeave("edit_project_switch") !== "proceed") return;
-  const filePath = await window.canvasApi.pickOtio();
-  if (!filePath) return;
-  try { const project = await window.canvasApi.importEditOtio(props.projectRoot, filePath); projects.value = await window.canvasApi.listEditProjects(props.projectRoot); await openProject(project.id); emit("changed", `OTIO 已导入为新工程：${project.name}`); }
-  catch (error) { emit("failed", message(error)); }
+  if (importingOtio.value || exportingOtio.value || saving.value) return;
+  importingOtio.value = true;
+  try {
+    if (await requestLeave("edit_project_switch") !== "proceed") return;
+    const filePath = await window.canvasApi.pickOtio();
+    if (!filePath) return;
+    const project = await window.canvasApi.importEditOtio(props.projectRoot, filePath);
+    projects.value = await window.canvasApi.listEditProjects(props.projectRoot);
+    await openProject(project.id);
+    emit("changed", `OTIO 已导入为新工程：${project.name}`);
+  } catch (error) { emit("failed", message(error)); }
+  finally {
+    importingOtio.value = false;
+  }
 }
 function onEditorShortcut(event: KeyboardEvent) {
   if (["INPUT", "TEXTAREA", "SELECT"].includes((event.target as HTMLElement | null)?.tagName ?? "")) return;
+  if (editorWriteBusy.value) return;
   if (event.metaKey && event.key.toLowerCase() === "b") { event.preventDefault(); void splitSelectedAtPlayhead(); return; }
   if (event.shiftKey && event.key === "Backspace") { event.preventDefault(); void rippleDeleteSelected(); return; }
   if (event.metaKey && event.key.toLowerCase() === "z") { event.preventDefault(); if (event.shiftKey) void redoEditor(); else void undoEditor(); }
 }
 async function render() {
-  if (!active.value || !await save({ scheduleNestedPreviews: false })) return;
+  if (!active.value || rendering.value || saving.value || exportingOtio.value || importingOtio.value) return;
   rendering.value = true;
-  renderPollActive = true;
-  stopPlayback();
-  const pollDeadline = Date.now() + 2 * 60 * 60 * 1_000;
+  let shouldResumePreview = false;
   try {
+    if (!await save({ scheduleNestedPreviews: false })) return;
+    shouldResumePreview = true;
+    renderPollActive = true;
+    stopPlayback();
+    const pollDeadline = Date.now() + 2 * 60 * 60 * 1_000;
     let result = await window.canvasApi.startEditRender(props.projectRoot, active.value.id, { expectedRevision: active.value.revision });
     activeRenderId.value = result.id;
     // FE-01：卸载/超时守卫——视图卸载即停轮询；job 异常滞留 running 时 2h 上限兜底，不形成死循环。
@@ -1039,33 +1082,41 @@ async function render() {
     if (result.status === "cancelled") emit("changed", "成片导出已取消");
     else emit("changed", `成片已导出：${result.outputPath}`);
   } catch (error) { emit("failed", message(error)); }
-  finally { rendering.value = false; activeRenderId.value = ""; resumePreviewWork(); }
+  finally { rendering.value = false; activeRenderId.value = ""; if (shouldResumePreview) resumePreviewWork(); }
 }
 let renderPollActive = false;
 async function cancelRender() {
-  if (!activeRenderId.value) return;
+  if (!activeRenderId.value || cancellingRender.value) return;
+  cancellingRender.value = true;
   try { await window.canvasApi.cancelEditRender(props.projectRoot, activeRenderId.value); }
   catch (error) { emit("failed", message(error)); }
+  finally { cancellingRender.value = false; }
 }
 async function extractCurrentFrame() {
-  if (!active.value || !totalDuration.value || !await save({ scheduleNestedPreviews: false })) return;
+  if (!active.value || !totalDuration.value || extractingFrame.value || saving.value || exportingOtio.value || importingOtio.value) return;
   extractingFrame.value = true;
+  let shouldResumePreview = false;
   try {
+    if (!await save({ scheduleNestedPreviews: false })) return;
+    shouldResumePreview = true;
     const timeSeconds = Math.min(playhead.value, Math.max(0, totalDuration.value - frameDuration.value));
     const frame = await window.canvasApi.extractTimelineFrame(props.projectRoot, { editProjectId: active.value.id, expectedRevision: active.value.revision, timeSeconds });
     emit("changed", `已导出时间线合成帧：${frame.framePath}`);
     await window.canvasApi.showInFolder(frame.framePath);
   } catch (error) { emit("failed", message(error)); }
-  finally { extractingFrame.value = false; resumePreviewWork(); }
+  finally { extractingFrame.value = false; if (shouldResumePreview) resumePreviewWork(); }
 }
 async function prepareTimelineContinuation() {
-  if (!active.value || !continuationTargetId.value || !await save({ scheduleNestedPreviews: false })) return;
+  if (!active.value || !continuationTargetId.value || preparingContinuation.value || saving.value || exportingOtio.value || importingOtio.value) return;
   preparingContinuation.value = true;
+  let shouldResumePreview = false;
   try {
+    if (!await save({ scheduleNestedPreviews: false })) return;
+    shouldResumePreview = true;
     const result = await window.canvasApi.prepareTimelineContinuation(props.projectRoot, { editProjectId: active.value.id, targetItemId: continuationTargetId.value, expectedRevision: active.value.revision, enqueue: true });
     emit("changed", `时间线末帧已登记为续接首帧，视频任务已入队：${result.pack.id}`);
   } catch (error) { emit("failed", message(error)); }
-  finally { preparingContinuation.value = false; resumePreviewWork(); }
+  finally { preparingContinuation.value = false; if (shouldResumePreview) resumePreviewWork(); }
 }
 function beginTimelineGesture(event: PointerEvent, trackId: string, clipId: string, mode: TimelineGestureMode) {
   if (event.button !== 0 || !active.value) return;
@@ -1299,7 +1350,7 @@ async function runAtomicEditOperation(operation: EditOperation, successMessage: 
 }
 async function splitSelectedAtPlayhead() {
   const clip = selectedClip.value;
-  if (!clip || !canSplitSelected.value) return;
+  if (!clip || !canSplitSelected.value || editorWriteBusy.value) return;
   const splitTime = playhead.value;
   const result = await runAtomicEditOperation({ type: "split_clip", clipId: clip.id, timeSeconds: splitTime }, `已在 ${timecode(splitTime)} 分割片段`);
   const createdId = result?.affectedClipIds.find((id) => id !== clip.id);
@@ -1308,7 +1359,8 @@ async function splitSelectedAtPlayhead() {
 }
 async function rippleDeleteSelected() {
   const clip = selectedClip.value;
-  if (!clip || !window.confirm(`Ripple 删除“${clip.name}”？\n\n该片段会被移除，结束点之后的所有未锁定轨道将向前收拢 ${clip.durationSeconds.toFixed(2)} 秒。`)) return;
+  if (!clip || editorWriteBusy.value) return;
+  if (!window.confirm(`Ripple 删除“${clip.name}”？\n\n该片段会被移除，结束点之后的所有未锁定轨道将向前收拢 ${clip.durationSeconds.toFixed(2)} 秒。`)) return;
   const start = clip.startSeconds;
   const result = await runAtomicEditOperation({ type: "ripple_delete", clipId: clip.id, allUnlockedTracks: true }, `已 Ripple 删除 ${clip.name}`);
   if (!result) return;
@@ -1401,8 +1453,7 @@ function togglePlayback() {
   if (!totalDuration.value) return;
   if (playhead.value >= totalDuration.value - .01) seek(0);
   playing.value = true;
-  syncPreview();
-  void nextTick(syncPreview);
+  void previewSyncScheduler.request();
   let previous = performance.now();
   playbackTimer = setInterval(() => {
     const now = performance.now();

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "kind": "multi-model-frozen-review-summary",
+  "reviewer": "doubao",
+  "createdAt": "2026-08-14T09:05:00+08:00",
+  "boundSourceDigest": "d2e70bf955440b1cc2435da1bc6c486f01af49e7cc6098def29249c0f01dff1f",
+  "packRelativePath": "docs/evidence/multi-model-review-pack-20260814-d2e70bf9.json",
+  "inputSha256": "3ab29bff8a79bcdbceb318686d01da313cbabe4d1565caf3f959a190ee190811",
+  "requestedModel": "doubao-seed-evolving",
+  "returnedModel": "doubao-seed-evolving",
+  "timeoutDegrade": "same as GLM: timeout-sec=0 because Python 3.14 rejects tuple timeout",
+  "exitCode": 0,
+  "finishReason": "stop",
+  "notVerified": true,
+  "verdict": "PASS",
+  "findings": [],
+  "blocked": false
+}

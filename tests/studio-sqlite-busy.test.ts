@@ -22,7 +22,7 @@ import {
 import { classifyToolError } from "../src/core/tool-error-classification.js";
 import { executeIdempotentCommand, listCommandLedger, reconcileCommand } from "../src/core/command-bus.js";
 import { __setAfterScanIndexCommitHookForTests, getProjectIndex, scanAndPersist } from "../src/core/service.js";
-import { ensureSidecar, getSidecarPaths, listTaskPacks, writeJsonAtomic } from "../src/core/sidecar.js";
+import { ensureSidecar, getSidecarPaths, listEvents, listTaskPacks, writeJsonAtomic } from "../src/core/sidecar.js";
 import { seedProductionReady } from "./workflow-helpers.js";
 
 const roots: string[] = [];
@@ -59,6 +59,50 @@ function taskPackInput(requestId: string, idempotencyKey: string) {
     requestId,
     idempotencyKey,
     request: { command: "create_task_pack" as const, payload: { itemIds: ["main-ep01-unit001"], mode: "autopilot" as const, kind: "image" as const } },
+  };
+}
+
+async function seedMirrorCommandLedger(projectRoot: string, label: string): Promise<void> {
+  const observedAt = new Date(Date.now() - 1_000).toISOString();
+  await upsertCommandLedgerEntry(projectRoot, {
+    schemaVersion: 1,
+    requestId: `request-mirror-seed-${label}`,
+    idempotencyKey: `mirror-seed-${label}-v1`,
+    command: "create_task_pack",
+    status: "failed",
+    replayed: false,
+    requestHash: "0".repeat(64),
+    startedAt: observedAt,
+    executedAt: observedAt,
+    error: { message: "mirror seed", observedAt },
+  }, observedAt);
+}
+
+function holdNextCommandLedgerWriteFor(projectRoot: string): {
+  release: () => void;
+  acquired: () => boolean;
+} {
+  const target = path.resolve(commandLedgerSqlitePathFor(projectRoot));
+  let owner: DatabaseSync | undefined;
+  const arm = () => {
+    __setBeforeCommandLedgerWritableOpenHookForTests(({ databasePath }) => {
+      if (path.resolve(databasePath) !== target) {
+        arm();
+        return;
+      }
+      owner = new DatabaseSync(databasePath);
+      owner.exec("BEGIN IMMEDIATE");
+    });
+  };
+  arm();
+  return {
+    acquired: () => owner !== undefined,
+    release: () => {
+      owner?.exec("ROLLBACK");
+      owner?.close();
+      owner = undefined;
+      __setBeforeCommandLedgerWritableOpenHookForTests(null);
+    },
   };
 }
 
@@ -267,6 +311,249 @@ describe("studio-sqlite-busy", () => {
     expect(ledger).toHaveLength(1);
     expect(ledger[0]?.status).toBe("unknown");
     expect(ledger[0]?.execution?.phase).toBe("side_effect_committed");
+  });
+
+  it("业务已提交时持续 ledger 锁不会让存活进程永久占用 running，同键按 receipt 自动对账", async () => {
+    const root = await fixture();
+    let writableOpenCount = 0;
+    let lockOwner: DatabaseSync | undefined;
+    __setBeforeCommandLedgerWritableOpenHookForTests(() => {
+      writableOpenCount += 1;
+      __setBeforeCommandLedgerWritableOpenHookForTests(({ databasePath }) => {
+        writableOpenCount += 1;
+        lockOwner = new DatabaseSync(databasePath);
+        lockOwner.exec("BEGIN IMMEDIATE");
+      });
+    });
+    const input = taskPackInput(
+      "request-ledger-terminal-lock-001",
+      "ledger-terminal-lock-taskpack-unit001-v1",
+    );
+    let failure: unknown;
+    try {
+      failure = await executeIdempotentCommand(root, input, {
+        deadlineAtMs: Date.now() + 450,
+      }).catch((error: unknown) => error);
+    } finally {
+      lockOwner?.exec("ROLLBACK");
+      lockOwner?.close();
+    }
+    expect(failure).toBeInstanceOf(Error);
+    expect((failure as Error).message).toContain("结果未确认");
+    expect((failure as Error & { reconciliationRequired?: boolean }).reconciliationRequired).toBe(true);
+    expect(writableOpenCount).toBe(2);
+    expect(await listTaskPacks(root)).toHaveLength(1);
+    expect((await listCommandLedger(root))[0]).toMatchObject({
+      status: "running",
+      execution: { phase: "executing" },
+    });
+
+    const reconciled = await executeIdempotentCommand(root, {
+      ...input,
+      requestId: "request-ledger-terminal-lock-002",
+    }, { waitForRunningMs: 300 });
+    expect(reconciled.status).toBe("succeeded");
+    expect(reconciled.replayed).toBe(true);
+    expect(reconciled.result).toEqual(expect.objectContaining({
+      reconciled: true,
+      evidenceEvents: expect.arrayContaining([
+        expect.objectContaining({ type: "command.side-effect-committed" }),
+      ]),
+    }));
+    expect((await listCommandLedger(root))[0]?.status).toBe("succeeded");
+    expect(await listTaskPacks(root)).toHaveLength(1);
+  });
+
+  it("已确认失败的终态持续锁必须保持 OUTCOME_UNKNOWN，并在同键对账后继续从失败通道抛出", async () => {
+    const root = await fixture();
+    let lockOwner: DatabaseSync | undefined;
+    __setBeforeCommandLedgerWritableOpenHookForTests(() => {
+      __setBeforeCommandLedgerWritableOpenHookForTests(({ databasePath }) => {
+        lockOwner = new DatabaseSync(databasePath);
+        lockOwner.exec("BEGIN IMMEDIATE");
+      });
+    });
+    const input = {
+      requestId: "request-confirmed-terminal-lock-001",
+      idempotencyKey: "confirmed-terminal-lock-missing-job-v1",
+      request: {
+        command: "reconcile_http_generation_submission" as const,
+        payload: {
+          jobId: "missing-job",
+          expectedRevision: 1,
+          reconciliation: {
+            result: "found" as const,
+            method: "provider_idempotency_lookup" as const,
+            externalTaskId: "remote-missing-job",
+            evidenceReference: "confirmed-terminal-lock-evidence",
+            note: "唯一远端任务已确认，但本地任务不存在",
+          },
+        },
+      },
+    };
+    let failure: unknown;
+    try {
+      failure = await executeIdempotentCommand(root, input, {
+        deadlineAtMs: Date.now() + 450,
+      }).catch((error: unknown) => error);
+    } finally {
+      lockOwner?.exec("ROLLBACK");
+      lockOwner?.close();
+    }
+    expect(failure).toMatchObject({
+      code: "OUTCOME_UNKNOWN",
+      reconciliationRequired: true,
+    });
+    expect(classifyToolError({
+      message: (failure as Error).message,
+      cancelled: false,
+    })).toMatchObject({ code: "OUTCOME_UNKNOWN", retryable: false });
+    expect((await listCommandLedger(root))[0]).toMatchObject({
+      status: "running",
+      execution: { phase: "executing" },
+    });
+    const committed = (await listEvents(root, 200)).filter((event) =>
+      event.type === "command.side-effect-committed"
+      && event.idempotencyKey === input.idempotencyKey);
+    expect(committed).toHaveLength(1);
+    expect(committed[0]).toMatchObject({
+      requestId: input.requestId,
+      command: input.request.command,
+      data: {
+        outcomeStatus: "failed",
+        result: { schemaVersion: 1, applied: false, jobId: "missing-job" },
+      },
+    });
+
+    await expect(executeIdempotentCommand(root, {
+      ...input,
+      requestId: "request-confirmed-terminal-lock-002",
+    }, { waitForRunningMs: 300 })).rejects.toMatchObject({
+      name: "ConfirmedCommandFailure",
+      result: { schemaVersion: 1, applied: false, jobId: "missing-job" },
+    });
+    expect((await listCommandLedger(root))[0]).toMatchObject({
+      status: "failed",
+      replayed: false,
+      execution: { phase: "side_effect_committed" },
+    });
+    const events = await listEvents(root, 200);
+    expect(events.filter((event) => event.type === "command.started"
+      && event.idempotencyKey === input.idempotencyKey)).toHaveLength(1);
+    expect(events.filter((event) => event.type === "command.side-effect-committed"
+      && event.idempotencyKey === input.idempotencyKey)).toHaveLength(1);
+    expect(events.filter((event) => event.type === "command.reconciled"
+      && event.idempotencyKey === input.idempotencyKey)).toHaveLength(1);
+  });
+
+  it("独立事务根成功终态的项目镜像被锁时保持 OUTCOME_UNKNOWN，解锁后同键只修复镜像", async () => {
+    const root = await fixture();
+    const storageRoot = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-mirror-success-storage-"));
+    roots.push(storageRoot);
+    await seedMirrorCommandLedger(root, "success");
+    const held = holdNextCommandLedgerWriteFor(root);
+    const input = taskPackInput(
+      "request-mirror-terminal-success-001",
+      "mirror-terminal-success-taskpack-v1",
+    );
+    let failure: unknown;
+    try {
+      failure = await executeIdempotentCommand(root, input, {
+        storageRoot,
+        deadlineAtMs: Date.now() + 450,
+      }).catch((error: unknown) => error);
+      expect(held.acquired()).toBe(true);
+    } finally {
+      held.release();
+    }
+    expect(failure).toMatchObject({
+      code: "OUTCOME_UNKNOWN",
+      reconciliationRequired: true,
+    });
+    expect((failure as Error).message).not.toContain("database is locked");
+    expect(await listTaskPacks(root)).toHaveLength(1);
+    expect((await listCommandLedger(storageRoot)).find((entry) =>
+      entry.idempotencyKey === input.idempotencyKey)).toMatchObject({
+      status: "running",
+      execution: { phase: "executing" },
+    });
+    expect((await listCommandLedger(root)).find((entry) =>
+      entry.idempotencyKey === input.idempotencyKey)).toBeUndefined();
+
+    const replayed = await executeIdempotentCommand(root, {
+      ...input,
+      requestId: "request-mirror-terminal-success-002",
+    }, { storageRoot, waitForRunningMs: 300 });
+    expect(replayed).toMatchObject({ status: "succeeded", replayed: true });
+    expect(await listTaskPacks(root)).toHaveLength(1);
+    expect((await listCommandLedger(storageRoot)).find((entry) =>
+      entry.idempotencyKey === input.idempotencyKey)?.status).toBe("succeeded");
+    expect((await listCommandLedger(root)).find((entry) =>
+      entry.idempotencyKey === input.idempotencyKey)?.status).toBe("succeeded");
+  });
+
+  it("独立事务根失败终态的项目镜像被锁时保留失败，解锁后同键仍从 Confirmed 通道抛出", async () => {
+    const root = await fixture();
+    const storageRoot = await mkdtemp(path.join(os.tmpdir(), "ai-canvas-mirror-failure-storage-"));
+    roots.push(storageRoot);
+    await seedMirrorCommandLedger(root, "failure");
+    const held = holdNextCommandLedgerWriteFor(root);
+    const input = {
+      requestId: "request-mirror-terminal-failure-001",
+      idempotencyKey: "mirror-terminal-failure-missing-job-v1",
+      request: {
+        command: "reconcile_http_generation_submission" as const,
+        payload: {
+          jobId: "missing-mirror-job",
+          expectedRevision: 1,
+          reconciliation: {
+            result: "found" as const,
+            method: "provider_idempotency_lookup" as const,
+            externalTaskId: "remote-missing-mirror-job",
+            evidenceReference: "mirror-terminal-failure-evidence",
+            note: "远端唯一任务存在，但本地任务不存在",
+          },
+        },
+      },
+    };
+    let failure: unknown;
+    try {
+      failure = await executeIdempotentCommand(root, input, {
+        storageRoot,
+        deadlineAtMs: Date.now() + 450,
+      }).catch((error: unknown) => error);
+      expect(held.acquired()).toBe(true);
+    } finally {
+      held.release();
+    }
+    expect(failure).toMatchObject({
+      code: "OUTCOME_UNKNOWN",
+      reconciliationRequired: true,
+    });
+    expect((failure as Error).message).not.toContain("database is locked");
+    expect((await listCommandLedger(storageRoot)).find((entry) =>
+      entry.idempotencyKey === input.idempotencyKey)).toMatchObject({
+      status: "failed",
+      result: { schemaVersion: 1, applied: false, jobId: "missing-mirror-job" },
+      execution: { phase: "side_effect_committed" },
+    });
+
+    await expect(executeIdempotentCommand(root, {
+      ...input,
+      requestId: "request-mirror-terminal-failure-002",
+    }, { storageRoot, waitForRunningMs: 300 })).rejects.toMatchObject({
+      name: "ConfirmedCommandFailure",
+      result: { schemaVersion: 1, applied: false, jobId: "missing-mirror-job" },
+    });
+    expect((await listCommandLedger(storageRoot)).find((entry) =>
+      entry.idempotencyKey === input.idempotencyKey)?.status).toBe("failed");
+    expect((await listCommandLedger(root)).find((entry) =>
+      entry.idempotencyKey === input.idempotencyKey)?.status).toBe("failed");
+    const storageEvents = await listEvents(storageRoot, 200);
+    expect(storageEvents.filter((event) => event.type === "command.started"
+      && event.idempotencyKey === input.idempotencyKey)).toHaveLength(1);
+    expect(storageEvents.filter((event) => event.type === "command.side-effect-committed"
+      && event.idempotencyKey === input.idempotencyKey)).toHaveLength(1);
   });
 
   it("scan JSON 提交后 cache busy：只执行一次并锁定 unknown，禁止同键自动重跑", async () => {

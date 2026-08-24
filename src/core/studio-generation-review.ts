@@ -19,10 +19,13 @@ import {
   type SqliteSourceBindingIdentity,
 } from "./sqlite-readonly-snapshot.js";
 import { assertSqliteSchemaContract } from "./sqlite-schema-contract.js";
+import { withStudioRequestSchemaCache } from "./studio-request-schema-cache.js";
+import { withStudioGenerationLedgerReadOnlySnapshot } from "./studio-generation-ledger-storage.js";
 import {
   initializeStudioGenerationLedger,
   readStudioGenerationFrozenPack,
   readStudioGenerationResult,
+  readStudioGenerationResultBundle,
   readStudioUnitGridGenerationFrozenPack,
   type StudioGenerationResultRecord,
 } from "./studio-generation-ledger.js";
@@ -229,6 +232,8 @@ interface OperationRow {
   operation_id: string;
   input_fingerprint: string;
   review_id: string;
+  outcome_fingerprint: string;
+  created_at: string;
 }
 
 function fail(code: StudioGenerationReviewErrorCode, message: string, details: string[] = []): never {
@@ -240,6 +245,11 @@ function requiredText(value: unknown, label: string, maximum = 8_000): string {
   const normalized = value.trim();
   if (!normalized || normalized.length > maximum) fail("invalid-input", `${label} 必须是 1-${maximum} 个字符。`);
   return normalized;
+}
+
+function isCanonicalIsoTimestamp(value: string): boolean {
+  const milliseconds = Date.parse(value);
+  return Number.isFinite(milliseconds) && new Date(milliseconds).toISOString() === value;
 }
 
 function normalizedId(value: unknown, label: string): string {
@@ -678,7 +688,7 @@ function headRow(db: DatabaseSync, generationRunId: string): ReviewHeadRow | und
 }
 
 function operationRow(db: DatabaseSync, operationId: string): OperationRow | undefined {
-  return db.prepare("SELECT operation_id,input_fingerprint,review_id FROM studio_generation_review_operation_receipts WHERE operation_id=?")
+  return db.prepare("SELECT operation_id,input_fingerprint,review_id,outcome_fingerprint,created_at FROM studio_generation_review_operation_receipts WHERE operation_id=?")
     .get(operationId) as unknown as OperationRow | undefined;
 }
 
@@ -754,12 +764,14 @@ async function readPair(projectRoot: string, input: SubmitStudioGenerationReview
   currentAtSubmission: boolean;
   staleReasons: string[];
 }> {
-  const [raw, labeled] = await Promise.all([
-    readStudioGenerationResult(projectRoot, input.rawResultId),
-    readStudioGenerationResult(projectRoot, input.labeledResultId),
-  ]);
-  if (!raw || !labeled) fail("result-not-found", "Review 引用的 raw/labeled 结果不存在。");
-  if (raw.variant !== "raw" || labeled.variant !== "labeled"
+  // Review 从业务上只接受同一 run 的完整 raw/labeled 对。直接读取 bundle 可在
+  // 一次账本快照和一次 currentness/media 闭包校验里投影两项，避免分别读取时
+  // 重复执行完整 managed/schema/CAS 验证；结果身份仍由下方逐字段门禁锁定。
+  const bundle = await readStudioGenerationResultBundle(projectRoot, input.generationRunId);
+  if (!bundle) fail("result-not-found", "Review 引用的 raw/labeled 结果不存在或不完整。");
+  const { raw, labeled } = bundle;
+  if (raw.resultId !== input.rawResultId || labeled.resultId !== input.labeledResultId
+    || raw.variant !== "raw" || labeled.variant !== "labeled"
     || raw.generationRunId !== input.generationRunId || labeled.generationRunId !== input.generationRunId
     || raw.packId !== labeled.packId || raw.packFingerprint !== labeled.packFingerprint
     || raw.targetKind !== labeled.targetKind || raw.targetKey !== labeled.targetKey
@@ -835,7 +847,7 @@ function ensureHeadCas(head: ReviewHeadRow | undefined, expected: number, kind: 
   }
 }
 
-export async function submitStudioGenerationReview(
+async function submitStudioGenerationReviewInternal(
   projectRoot: string,
   rawInput: SubmitStudioGenerationReviewInput,
 ): Promise<StudioGenerationReviewProjection> {
@@ -955,6 +967,15 @@ export async function submitStudioGenerationReview(
   return projectReview(projectRoot, recordFromRow(written));
 }
 
+export async function submitStudioGenerationReview(
+  projectRoot: string,
+  rawInput: SubmitStudioGenerationReviewInput,
+): Promise<StudioGenerationReviewProjection> {
+  return withStudioRequestSchemaCache(
+    () => submitStudioGenerationReviewInternal(projectRoot, rawInput),
+  );
+}
+
 async function projectReview(projectRoot: string, record: StudioGenerationReviewRecord): Promise<StudioGenerationReviewProjection> {
   const snapshot = await openReviewReadSnapshot(projectRoot, "generation review projection");
   if (!snapshot) fail("storage-invalid", "Review 事件存在但 Review schema 不可读。");
@@ -1055,7 +1076,8 @@ export async function readStudioGenerationReview(
 }
 
 /**
- * 命令总线崩溃恢复只读业务事务内的不可变 receipt，绝不重放 Review。
+ * @deprecated 仅供 legacy diagnostic。该 API 会投影动态 currentness，不能作为
+ * command replay/reconcile proof；命令总线必须使用严格只读 operation record reader。
  */
 export async function readStudioGenerationReviewOperationOutcome(
   projectRoot: string,
@@ -1075,6 +1097,75 @@ export async function readStudioGenerationReviewOperationOutcome(
   if (!receipt) return null;
   if (!row) fail("storage-invalid", `Review operation ${operationId} 引用孤儿事件。`);
   return projectReview(projectRoot, recordFromRow(row));
+}
+
+/**
+ * 命令公开重放专用严格只读记录。只从同一 generation SQLite 快照恢复 immutable
+ * event/receipt/head；不调用 result/media/production currentness 路径。历史事件完整
+ * 返回，但所有可授权字段 fail-closed，避免 correction 后旧 PASS 被重新放行。
+ */
+export async function readStudioGenerationReviewOperationRecordReadOnly(
+  projectRoot: string,
+  operationIdValue: string,
+): Promise<StudioGenerationReviewProjection | null> {
+  const operationId = normalizedId(operationIdValue, "operationId");
+  return withStudioGenerationLedgerReadOnlySnapshot(projectRoot, "generation review immutable operation record", (db) => {
+    assertBaseSchema(db);
+    assertSchema(db);
+    const receipt = operationRow(db, operationId);
+    if (!receipt) return null;
+    const row = reviewRow(db, receipt.review_id);
+    if (!row) fail("storage-invalid", `Review operation ${operationId} 引用孤儿事件。`);
+    const record = recordFromRow(row);
+    if (receipt.operation_id !== operationId
+      || !SHA256_PATTERN.test(receipt.input_fingerprint)
+      || receipt.outcome_fingerprint !== record.fingerprint
+      || receipt.review_id !== record.reviewId
+      || !isCanonicalIsoTimestamp(receipt.created_at)) {
+      fail("storage-invalid", `Review operation ${operationId} 的 input/outcome 内容身份漂移。`);
+    }
+    const reconstructedInput = {
+      operationId,
+      generationRunId: record.generationRunId,
+      kind: record.kind,
+      expectedHeadRevision: record.baseHeadRevision,
+      ...(record.supersedesReviewId ? { supersedesReviewId: record.supersedesReviewId } : {}),
+      rawResultId: record.rawResultId,
+      rawSha256: record.rawSha256,
+      labeledResultId: record.labeledResultId,
+      labeledSha256: record.labeledSha256,
+      expectedPackFingerprint: record.packFingerprint,
+      continuityFingerprint: record.continuityFingerprint,
+      decision: record.decision,
+      criteria: record.criteria,
+      annotations: record.annotations,
+      reviewer: record.reviewer,
+      note: record.note,
+    };
+    const expectedInputFingerprint = digest({
+      schemaVersion: 1,
+      command: "submit-studio-generation-review",
+      ...reconstructedInput,
+    });
+    if (receipt.input_fingerprint !== expectedInputFingerprint) {
+      fail("storage-invalid", `Review operation ${operationId} 的 inputFingerprint 无法由 immutable event 重建。`);
+    }
+    const head = headRow(db, record.generationRunId);
+    const headCurrent = Boolean(head
+      && head.review_id === record.reviewId
+      && head.review_fingerprint === record.fingerprint
+      && Number(head.revision) === record.headRevision);
+    return {
+      ...record,
+      head: headCurrent,
+      current: false,
+      approvedRawEligible: false,
+      currentStaleReasons: [
+        ...(!headCurrent ? ["not-current-review-head"] : []),
+        "strict-recovery-currentness-not-proven",
+      ],
+    };
+  });
 }
 
 function normalizedLimit(value: number | undefined): number {
@@ -1102,7 +1193,7 @@ function encodeCursor(scope: string, sequence: number): string {
   return Buffer.from(JSON.stringify({ v: 1, scope, sequence }), "utf8").toString("base64url");
 }
 
-export async function listStudioGenerationReviewHistory(
+async function listStudioGenerationReviewHistoryInternal(
   projectRoot: string,
   query: StudioGenerationReviewHistoryQuery,
 ): Promise<StudioGenerationReviewHistoryPage> {
@@ -1127,4 +1218,13 @@ export async function listStudioGenerationReviewHistory(
     items: await Promise.all(pageRows.map((row) => projectReview(projectRoot, recordFromRow(row)))),
     ...(rows.length > limit ? { nextCursor: encodeCursor(scope, Number(pageRows.at(-1)!.sequence)) } : {}),
   };
+}
+
+export async function listStudioGenerationReviewHistory(
+  projectRoot: string,
+  query: StudioGenerationReviewHistoryQuery,
+): Promise<StudioGenerationReviewHistoryPage> {
+  return withStudioRequestSchemaCache(
+    () => listStudioGenerationReviewHistoryInternal(projectRoot, query),
+  );
 }

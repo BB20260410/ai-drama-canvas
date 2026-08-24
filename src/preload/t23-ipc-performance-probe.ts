@@ -67,11 +67,21 @@ export interface T23IpcPerformanceProbeSnapshot {
       atMs: number;
     }>;
   };
+  startupRuntimeGate?: {
+    schemaVersion: 1;
+    baselineMutationChecks?: number;
+    firstCardMutationChecks?: number;
+    finalMutationChecks?: number;
+  };
 }
 
 export interface T23IpcPerformanceProbe {
   invoke<T>(channel: string, ...args: unknown[]): Promise<T>;
   recordRendererMilestone(milestone: string, atMs: number): void;
+  recordStartupRuntimeGateSnapshot(
+    phase: "baseline" | "first-card" | "final",
+    mutationChecks: number,
+  ): void;
   snapshot(): T23IpcPerformanceProbeSnapshot;
 }
 
@@ -100,6 +110,9 @@ export function createT23IpcPerformanceProbe(
   const rendererStartupMilestones: NonNullable<
     T23IpcPerformanceProbeSnapshot["rendererStartupTimeline"]
   >["milestones"] = [];
+  const startupRuntimeGate: NonNullable<T23IpcPerformanceProbeSnapshot["startupRuntimeGate"]> = {
+    schemaVersion: 1,
+  };
   const channels = new Map<string, {
     totalCalls: number;
     completedCalls: number;
@@ -138,6 +151,9 @@ export function createT23IpcPerformanceProbe(
           milestones: rendererStartupMilestones.map((milestone) => ({ ...milestone })),
         },
       }
+      : {}),
+    ...(Object.keys(startupRuntimeGate).length > 1
+      ? { startupRuntimeGate: { ...startupRuntimeGate } }
       : {}),
   });
 
@@ -230,6 +246,12 @@ export function createT23IpcPerformanceProbe(
         || !Number.isFinite(atMs)
         || atMs < 0) return;
       rendererStartupMilestones.push({ milestone, atMs });
+    },
+    recordStartupRuntimeGateSnapshot(phase, mutationChecks): void {
+      if (!enabled || !Number.isSafeInteger(mutationChecks) || mutationChecks < 0) return;
+      if (phase === "baseline") startupRuntimeGate.baselineMutationChecks = mutationChecks;
+      else if (phase === "first-card") startupRuntimeGate.firstCardMutationChecks = mutationChecks;
+      else startupRuntimeGate.finalMutationChecks = mutationChecks;
     },
     async invoke<T>(channel: string, ...args: unknown[]): Promise<T> {
       if (!enabled) return invoke<T>(channel, ...args);

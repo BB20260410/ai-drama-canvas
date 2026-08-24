@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 安全漏洞
+    url: https://github.com/BB20260410/ai-drama-canvas/security/advisories/new
+    about: 请不要在公开 Issue 里报告可利用的安全问题。

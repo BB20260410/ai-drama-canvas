@@ -50,6 +50,19 @@ describe("视频编辑预览同步调度", () => {
     expect(syncs).toHaveLength(3);
   });
 
+  it("播放开始与同批 post-flush watcher 共用一次同步，不在首个 tick 前重复 seek/play", async () => {
+    const syncs: string[] = [];
+    const playing = ref(false);
+    const scheduler = createVideoEditorPreviewSyncScheduler(() => syncs.push("sync"));
+    watch(playing, () => { void scheduler.request(); }, { flush: "post" });
+
+    playing.value = true;
+    void scheduler.request();
+    await flush();
+
+    expect(syncs).toEqual(["sync"]);
+  });
+
   it("同批任意多个请求只执行一次，且同步读取最新状态", async () => {
     const executions: number[] = [];
     const playhead = ref(0);
@@ -109,7 +122,13 @@ describe("视频编辑预览同步调度", () => {
     expect(component).toContain("watch([previewClip, activeDissolve, activeOverlayClips], () => { void previewSyncScheduler.request(); }, { flush: \"post\" });");
     expect(component).toMatch(/watch\(\(\) => active\.value\?\.tracks[\s\S]*?\(\) => \{ void previewSyncScheduler\.request\(\); \}, \{ flush: \"post\" \}\);/);
     expect(component).toMatch(/function seek\([\s\S]*?playhead\.value = quantizeTimelineTime[\s\S]*?void previewSyncScheduler\.request\(\);\n\}/);
-    expect(component.match(/previewSyncScheduler\.request\(\)/g)).toHaveLength(3);
+    const toggleStart = component.indexOf("function togglePlayback()");
+    const toggleEnd = component.indexOf("\nfunction stopPlayback()", toggleStart);
+    const togglePlaybackSource = component.slice(toggleStart, toggleEnd);
+    expect(togglePlaybackSource).toContain("playing.value = true;\n  void previewSyncScheduler.request();");
+    expect(togglePlaybackSource).not.toContain("syncPreview()");
+    expect(togglePlaybackSource).not.toContain("nextTick(");
+    expect(component.match(/previewSyncScheduler\.request\(\)/g)).toHaveLength(4);
     expect(component).toContain("previewSyncScheduler.invalidate()");
   });
 });

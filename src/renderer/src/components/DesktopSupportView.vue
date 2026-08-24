@@ -2,7 +2,7 @@
   <section class="desktop-support" data-testid="desktop-support-view" :aria-busy="busy">
     <header>
       <div><span>桌面生产支持</span><h2>{{ section === "agent" ? "Agent 连接" : "帮助与安全" }}</h2></div>
-      <button type="button" data-testid="desktop-support-refresh" :disabled="busy" @click="refreshStatus"><RefreshCw :size="14" :class="{ spinning: busy }" />{{ busyOperation === "refresh" ? "检查中" : "刷新状态" }}</button>
+      <button type="button" data-testid="desktop-support-refresh" :disabled="busy" :title="busy ? '正在处理，不能再刷新状态' : undefined" @click="refreshStatus"><RefreshCw :size="14" :class="{ spinning: busy }" />{{ busyOperation === "refresh" ? "检查中" : "刷新状态" }}</button>
     </header>
 
     <div v-if="notice" class="notice" :class="{ error }" role="status">{{ notice }}</div>
@@ -41,7 +41,7 @@
       <div class="explicit-action">
         <ShieldCheck :size="18" />
         <p><b>只在你明确点击后才修复配置</b><span>原配置只在本机以 0600 权限备份用于失败回滚；软件不解析、不显示、不上传其中的 API 密钥。切换项目后无需重新配置。</span></p>
-        <button type="button" data-testid="desktop-support-repair" :disabled="busy || !status?.repairAvailable || !status?.repairNeeded" @click="repairConnections">{{ busyOperation === "repair" ? "修复中" : status?.repairAvailable && !status?.repairNeeded ? "无需修复" : "备份并修复 Codex 连接" }}</button>
+        <button type="button" data-testid="desktop-support-repair" :disabled="busy || !status?.repairAvailable || !status?.repairNeeded" :title="busy ? '正在处理，不能再修复连接' : undefined" @click="repairConnections">{{ busyOperation === "repair" ? "修复中" : status?.repairAvailable && !status?.repairNeeded ? "无需修复" : "备份并修复 Codex 连接" }}</button>
       </div>
     </main>
 
@@ -58,11 +58,11 @@
         <h3>工程安全</h3>
         <p>备份会在写入屏障内建立一致快照。恢复始终落到新目录，不会覆盖原工程。</p>
         <div class="backup-actions">
-          <button type="button" data-testid="desktop-support-backup" :disabled="busy" @click="backupProject"><Archive :size="15" />{{ busyOperation === "backup" ? "备份中" : "备份当前工程" }}</button>
-          <button type="button" data-testid="desktop-support-restore" :disabled="busy" @click="restoreProject"><FolderInput :size="15" />{{ busyOperation === "restore" ? "恢复中" : "恢复到新目录" }}</button>
+          <button type="button" data-testid="desktop-support-backup" :disabled="busy" :title="busy ? '正在处理，不能再备份当前工程' : undefined" @click="backupProject"><Archive :size="15" />{{ busyOperation === "backup" ? "备份中" : "备份当前工程" }}</button>
+          <button type="button" data-testid="desktop-support-restore" :disabled="busy" :title="busy ? '正在处理，不能再恢复到新目录' : undefined" @click="restoreProject"><FolderInput :size="15" />{{ busyOperation === "restore" ? "恢复中" : "恢复到新目录" }}</button>
         </div>
         <details>
-          <summary>诊断详情（高级）</summary>
+          <summary data-testid="desktop-support-diagnostics">诊断详情（高级）</summary>
           <dl>
             <dt>当前工程</dt><dd>{{ projectRoot }}</dd>
             <dt>运行形态</dt><dd>{{ status?.packaged ? "安装版" : "开发版" }}</dd>
@@ -162,6 +162,7 @@ async function refreshStatus(): Promise<void> {
 }
 
 async function repairConnections(): Promise<void> {
+  if (busy.value) return;
   await withBusy("repair", async ({ sequence, projectRoot }) => {
     await window.canvasApi.repairAgentConnections(projectRoot);
     const next = await window.canvasApi.getAgentConnectionStatus(projectRoot);
@@ -172,6 +173,7 @@ async function repairConnections(): Promise<void> {
 }
 
 async function backupProject(): Promise<void> {
+  if (busy.value) return;
   const operationId = `backup-${Date.now()}-${actionSequence + 1}`;
   const sourceRoot = props.projectRoot;
   await withBusy("backup", async ({ sequence, projectRoot }) => {
@@ -189,6 +191,7 @@ async function backupProject(): Promise<void> {
 }
 
 async function restoreProject(): Promise<void> {
+  if (busy.value) return;
   const operationId = `restore-${Date.now()}-${actionSequence + 1}`;
   const sourceRoot = props.projectRoot;
   await withBusy("restore", async ({ sequence, projectRoot }) => {

@@ -32,7 +32,9 @@ import {
   getStudioVideoPackageControl,
   prepareStudioVideoPackageExport,
   prepareStudioVideoPackageSource,
+  readStudioVideoPackageBuildReceiptByOperationIdReadOnly,
 } from "../src/core/studio-video-package.js";
+import { withStudioUnitsReadProbe } from "../src/core/studio-units-read-phase-timeline.js";
 import { createDuduReadonlySourceFixture } from "./helpers/dudu-readonly-source-fixture.js";
 
 function sha256(bytes: Buffer): string {
@@ -228,6 +230,33 @@ describe.sequential("Studio 视频包真实 provider 血缘", () => {
         mechanicalStatus: "verified",
         dynamicModelStatus: "not-run",
       });
+      const intentControlBeforeCommand = await getStudioVideoPackageControl(staged.shell.paths.root, {
+        by: "intent",
+        intentId: prepared.intent.intentId,
+      });
+      const authorityControlBeforeCommand = await getStudioVideoPackageControl(staged.shell.paths.root, {
+        by: "authority-latest",
+        authority,
+      });
+      const buildCommandRequest = {
+        command: "build_studio_video_package" as const,
+        payload: {
+          intentId: prepared.intent.intentId,
+          expectedRevision: pack!.target.unitRevision,
+          expectedIntentControlFingerprint: intentControlBeforeCommand.fingerprint,
+          expectedAuthorityControlFingerprint: authorityControlBeforeCommand.fingerprint,
+          destinationPolicy: "managed-evidence-only" as const,
+        },
+      };
+      const buildCommand = await executeIdempotentCommand(staged.shell.paths.root, {
+        requestId: "studio-video-provider-build-command-request-0001",
+        idempotencyKey: "studio-video-provider-build-command-key-0001",
+        request: buildCommandRequest,
+      });
+      expect(buildCommand).toMatchObject({
+        status: "succeeded",
+        result: { receipt: { receiptId: built.receipt.receiptId } },
+      });
       const videoSpecPath = path.join(
         staged.shell.paths.root,
         built.receipt.storageRelativePath,
@@ -389,6 +418,83 @@ describe.sequential("Studio 视频包真实 provider 血缘", () => {
       expect(actual.endState).not.toHaveProperty("motionVector");
       expect(JSON.stringify(observedSource)).not.toContain("末格伤势无法确认");
       expect(JSON.stringify(observedSource)).not.toContain("静态裁图无法证明动作余势");
+
+      const revisedUnit = await reviseStudioProductionUnit(staged.shell.paths.root, {
+        unitId: snapshot!.unit.id,
+        expectedRevision: snapshot!.unit.revision,
+        season: snapshot!.unit.season,
+        episode: snapshot!.unit.episode,
+        sequence: snapshot!.unit.sequence,
+        title: `${snapshot!.unit.title}（历史成功重放修订）`,
+        durationSeconds: snapshot!.unit.durationSeconds,
+        scriptRevisionId: snapshot!.unit.scriptRevisionId,
+        panels: snapshot!.panels.map((panel) => ({
+          id: panel.id,
+          title: panel.title,
+          visualAction: panel.visualAction,
+          shotComposition: panel.shotComposition,
+          filmingMethod: panel.filmingMethod,
+          dialogue: panel.dialogue,
+          subtitle: panel.subtitle,
+          startSeconds: panel.startSeconds,
+          endSeconds: panel.endSeconds,
+          durationSeconds: panel.durationSeconds,
+          promptRevisionId: panel.promptRevisionId,
+          sourceSpans: panel.sourceSpans.map((span) => ({
+            startOffsetUtf16: span.startOffsetUtf16,
+            endOffsetUtf16: span.endOffsetUtf16,
+          })),
+          assets: panel.assets.map((asset) => ({
+            assetId: asset.assetId,
+            category: asset.category,
+            presence: asset.presence,
+            role: asset.role,
+            continuityState: asset.continuityState,
+            evidence: asset.evidence.map((evidence) => ({
+              kind: evidence.kind,
+              reference: evidence.reference,
+              note: evidence.note,
+            })),
+          })),
+        })),
+      });
+      expect(revisedUnit.unit.revision).toBe(snapshot!.unit.revision + 1);
+      expect(revisedUnit.fingerprint).not.toBe(snapshot!.fingerprint);
+      expect(prepared.intent.managedSourceUnitSnapshotFingerprint).toBe(snapshot!.fingerprint);
+      const historicalReplay = await executeIdempotentCommand(staged.shell.paths.root, {
+        requestId: "studio-video-provider-build-command-replay-0002",
+        idempotencyKey: "studio-video-provider-build-command-key-0001",
+        request: buildCommandRequest,
+      });
+      expect(historicalReplay).toMatchObject({
+        status: "succeeded",
+        replayed: true,
+        result: {
+          replayed: true,
+          reconciled: true,
+          receipt: { receiptId: built.receipt.receiptId },
+        },
+      });
+      const strictProof = await withStudioUnitsReadProbe(true, () =>
+        readStudioVideoPackageBuildReceiptByOperationIdReadOnly(
+          staged.shell.paths.root,
+          buildCommand.requestHash,
+        ));
+      expect(strictProof.value).toMatchObject({
+        intent: { intentId: prepared.intent.intentId },
+        receipt: { receiptId: built.receipt.receiptId },
+      });
+      expect(strictProof.snapshot?.counters).toMatchObject({
+        generationLedgerEnsureCalls: 0,
+        generationLedgerInitializationStarts: 0,
+        productionDirectoryEnsureCalls: 0,
+        productionOpenDatabaseCalls: 0,
+        productionOwnerConnections: 0,
+      });
+      await expect(getStudioVideoPackageControl(staged.shell.paths.root, {
+        by: "intent",
+        intentId: prepared.intent.intentId,
+      })).resolves.toMatchObject({ control: { status: "stale", blockers: ["input-drift"] } });
     } finally {
       if (priorRegistry === undefined) delete process.env.AI_CANVAS_REGISTRY_PATH;
       else process.env.AI_CANVAS_REGISTRY_PATH = priorRegistry;
