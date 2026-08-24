@@ -5,8 +5,9 @@
 - status: `in_progress`
 - [x] 本地全面检查（typecheck:app、fast tests、密钥扫描、gitignore）
 - [x] Apache-2.0 LICENSE / NOTICE / README / CONTRIBUTING / SECURITY / CoC / CI
-- [ ] 推送到 `BB20260410/ai-drama-canvas` 公开仓库
-- [ ] 读取 GitHub 仓库建议并落实
+- [x] 推送到 `BB20260410/ai-drama-canvas` 公开仓库
+- [x] 读取 GitHub 建议：CI 改 macOS、Dependabot 升级、CodeQL
+- [ ] 等待 macOS CI 通过并确认 Dependabot 告警收敛
 
 ## software_goal: character-canvas-pack-20260821
 

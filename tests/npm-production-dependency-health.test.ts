@@ -75,6 +75,25 @@ describe("npm production dependency health", () => {
       .toThrow(/surprise|生产依赖/u);
   });
 
+  it("lockfile v3 的 devOptional 与 optional 一样可作为 optional 链证明", () => {
+    const lockfile: PackageLockJson = {
+      packages: {
+        "": { dependencies: { sharp: "1.0.0" } },
+        "node_modules/sharp": { version: "1.0.0", optionalDependencies: { tslib: "2.8.1" } },
+        "node_modules/tslib": { version: "2.8.1", devOptional: true },
+      },
+    };
+    const npmLs: NpmLsJson = {
+      problems: ["extraneous: tslib@2.8.1 /workspace/node_modules/tslib"],
+      dependencies: {
+        tslib: { version: "2.8.1", extraneous: true },
+      },
+    };
+    const summary = assertNpmProductionDependencyHealth(npmLs, lockfile);
+    expect(summary.status).toBe("passed");
+    expect(summary.acceptedOptionalProblems.map((entry) => entry.name)).toEqual(["tslib"]);
+  });
+
   it("按真实 lockfile 节点路径解析 optional 链，拒绝同名 nested 版本错配", () => {
     const lockfile: PackageLockJson = {
       packages: {

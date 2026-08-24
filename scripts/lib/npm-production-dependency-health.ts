@@ -15,6 +15,8 @@ export interface PackageLockPackageEntry {
   version?: string;
   dev?: boolean;
   optional?: boolean;
+  /** npm lockfile v3：同时出现在 optional 与 dev 树上时写 devOptional，而不是 optional。 */
+  devOptional?: boolean;
   dependencies?: Record<string, string>;
   optionalDependencies?: Record<string, string>;
 }
@@ -55,6 +57,10 @@ interface ReachableOptionalPackage {
 
 function packageKey(name: string): string {
   return `node_modules/${name}`;
+}
+
+function isLockfileOptional(entry: PackageLockPackageEntry | undefined): boolean {
+  return entry?.optional === true || entry?.devOptional === true;
 }
 
 function parsedVersion(value: string): [number, number, number] | undefined {
@@ -126,7 +132,7 @@ function reachableOptionalPackages(lockfile: PackageLockJson): Map<string, Reach
       name: rootDependency,
       packagePath: rootPackagePath,
       path: [rootDependency],
-      optionalPath: rootEntry.optionalDependencies?.[rootDependency] !== undefined || rootPackage.optional === true,
+      optionalPath: rootEntry.optionalDependencies?.[rootDependency] !== undefined || isLockfileOptional(rootPackage),
     }];
     const visited = new Set<string>();
     while (queue.length > 0) {
@@ -136,7 +142,7 @@ function reachableOptionalPackages(lockfile: PackageLockJson): Map<string, Reach
       visited.add(visitKey);
       const entry = packages[current.packagePath];
       if (!entry?.version || entry.dev === true) continue;
-      const optionalPath = current.optionalPath || entry.optional === true;
+      const optionalPath = current.optionalPath || isLockfileOptional(entry);
       if (optionalPath && !reachable.has(current.packagePath)) {
         reachable.set(current.packagePath, {
           rootDependency,
@@ -260,7 +266,7 @@ export function assertNpmProductionDependencyHealth(
       || installed?.extraneous !== true
       || installed.version !== parsed.version
       || lockEntry?.version !== parsed.version
-      || lockEntry.optional !== true) {
+      || !isLockfileOptional(lockEntry)) {
       rejectedProblems.push(parsed);
       continue;
     }

@@ -1,16 +1,17 @@
 # STATUS · 当前源码生产中枢（P0—P9 CLOSED / MCP_CLIENT_RESTART_PASS）
 
-## 2026-08-24 · 开源发布准备
+## 2026-08-24 · 开源发布
 
 | 字段 | 当前值 |
 |---|---|
-| status | `in_progress`：本地门禁已过，准备推送到 GitHub 公开仓库 |
-| remote | `https://github.com/BB20260410/ai-drama-canvas`（Apache-2.0 完全免费开源） |
-| license | Apache-2.0；无 CLA、无商业双授权 |
-| local_gate | `typecheck:app` PASS；`npm test` 288 files / 1784 tests PASS（约 401s） |
-| secret_scan | 无硬编码 API key；`projects/` `productions/` `output/` 已 ignore；TLS 夹具仅为测试自签 |
-| earliest_next | 推送后读取 GitHub Community standards / Security 建议并落实 |
-| note | 停止 N124 content-visibility 空转；本任务覆盖上传 |
+| status | `in_progress`：已推送公开仓库，正在落实 GitHub 建议 |
+| remote | https://github.com/BB20260410/ai-drama-canvas |
+| license | Apache-2.0（GitHub 已识别）；无 CLA、无商业双授权 |
+| community | health 100%；secret scanning / push protection / Dependabot 已开 |
+| github_suggestions | Ubuntu CI 失败（需要 macOS dirfd）；Dependabot 开发依赖告警；建议 CodeQL |
+| follow_up | CI 改 macos-latest；electron-builder 26.15.3 / tsx 4.23.12；补 CodeQL |
+| local_gate | `typecheck:app` PASS；fast 1784 tests PASS；生产 audit 0 |
+| earliest_next | 等 macOS CI；确认 Dependabot 告警收敛 |
 
 ## 2026-08-22 19:03 CST · N121–N123 产品切片落地（禁止附录-only）
 
