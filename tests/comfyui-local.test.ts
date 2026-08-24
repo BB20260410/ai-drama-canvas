@@ -14,6 +14,7 @@ import { getPublicationIntent, registerPublication } from "../src/core/publicati
 import { scanAndPersist } from "../src/core/service.js";
 import { ensureSidecar, getSidecarPaths, writeJsonAtomic } from "../src/core/sidecar.js";
 import { seedProductionReady } from "./workflow-helpers.js";
+import { toJsLiteral } from "../src/core/js-code-literal.js";
 
 const roots: string[] = [];
 const servers: ReturnType<typeof createServer>[] = [];
@@ -301,7 +302,7 @@ describe("comfyui-local 专用可恢复适配", () => {
     loopback.reveal();
     loopback.states.set(job.comfyUiCheckpoint!.promptId, "success");
     const moduleUrl = new URL("../src/core/generation.ts", import.meta.url).href;
-    await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue } from ${JSON.stringify(moduleUrl)}; await processGenerationQueue(${JSON.stringify(root)}, { jobId: ${JSON.stringify(job.id)} });`]);
+    await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue } from ${toJsLiteral(moduleUrl)}; await processGenerationQueue(${toJsLiteral(root)}, { jobId: ${toJsLiteral(job.id)} });`]);
     job = (await listGenerationJobs(root)).find((candidate) => candidate.id === job.id)!;
     expect(job.status).toBe("succeeded");
     expect(loopback.counts().postCount).toBe(1);
@@ -328,7 +329,7 @@ describe("comfyui-local 专用可恢复适配", () => {
 
     loopback.setPreflightMode("ok");
     const moduleUrl = new URL("../src/core/generation.ts", import.meta.url).href;
-    await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue } from ${JSON.stringify(moduleUrl)}; await processGenerationQueue(${JSON.stringify(root)}, { jobId: ${JSON.stringify(job.id)} });`]);
+    await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue } from ${toJsLiteral(moduleUrl)}; await processGenerationQueue(${toJsLiteral(root)}, { jobId: ${toJsLiteral(job.id)} });`]);
     job = (await listGenerationJobs(root)).find((candidate) => candidate.id === job.id)!;
     expect(job).toMatchObject({ status: "waiting_remote", attempts: 1, submissionIntent: { attempt: 1 }, comfyUiCheckpoint: { stage: "queued", ...preparedIdentity } });
     expect(loopback.counts().postCount).toBe(1);

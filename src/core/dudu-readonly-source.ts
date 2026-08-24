@@ -825,7 +825,7 @@ const DUDU_PROMPT_PATH_PATTERNS: ReadonlyArray<{ label: string; pattern: RegExp 
   { label: "Windows 绝对路径", pattern: /(?:^|[\s（(：:'"`])[A-Za-z]:[\\/]\S+/u },
   {
     label: "相对媒体路径",
-    pattern: /(?:^|[\s（(：:'"`])(?:\.{0,2}[\\/])?(?:[^\s'"`()：]+[\\/])+[^\s'"`()：]+\.(?:png|jpe?g|webp|gif|bmp|tiff?|svg|mp4|mov|webm)(?=$|[\s'"`),，。；;])/iu,
+    pattern: /(?:^|[\s（(：:'"`])(?:\.{0,2}[\\/])?(?:[^\s'"`()：\\/]+[\\/])+[^\s'"`()：\\/]+\.(?:png|jpe?g|webp|gif|bmp|tiff?|svg|mp4|mov|webm)(?=$|[\s'"`),，。；;])/iu,
   },
 ];
 

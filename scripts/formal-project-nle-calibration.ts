@@ -22,6 +22,7 @@ import { inspectFormalDramaSource, materializeFormalDramaProject, type FormalDra
 import { commitProjectImport, prepareProjectImport } from "../src/core/importer.js";
 import { getPublicationReceipt } from "../src/core/publication.js";
 import { getProjectIndex, scanAndPersist } from "../src/core/service.js";
+import { toJsLiteral } from "../src/core/js-code-literal.js";
 import type { EditClip } from "../src/core/types.js";
 
 const execFileAsync = promisify(execFile);
@@ -430,7 +431,7 @@ for (const [index, timeSeconds] of frameTimes.entries()) {
 
 const targetItem = ep22IndexedUnits.at(-1)!;
 const editorModule = pathToFileURL(path.join(workspace, "src", "core", "editor.ts")).href;
-const continuationScript = `import { prepareTimelineVideoContinuation } from ${JSON.stringify(editorModule)}; const result = await prepareTimelineVideoContinuation(${JSON.stringify(calibrationRoot)}, ${JSON.stringify({ editProjectId: master.id, targetItemId: targetItem.id, expectedRevision: master.revision, timeSeconds: secondsForFrame(totalFrames - 1), enqueue: false, prompt: "承接 EP22 镜53 正式剧本结尾；保持封神台、涟漪、定格与淡出方向连续。" })}); process.stdout.write(JSON.stringify({ extractionId: result.extraction.id, framePath: result.extraction.framePath, packId: result.pack.id, sourceType: result.pack.sourceType, targetFirstFrameArtifactId: result.pack.targetFirstFrameArtifactId, generationJob: result.generationJob ?? null }));`;
+const continuationScript = `import { prepareTimelineVideoContinuation } from ${toJsLiteral(editorModule)}; const result = await prepareTimelineVideoContinuation(${toJsLiteral(calibrationRoot)}, ${toJsLiteral({ editProjectId: master.id, targetItemId: targetItem.id, expectedRevision: master.revision, timeSeconds: secondsForFrame(totalFrames - 1), enqueue: false, prompt: "承接 EP22 镜53 正式剧本结尾；保持封神台、涟漪、定格与淡出方向连续。" })}); process.stdout.write(JSON.stringify({ extractionId: result.extraction.id, framePath: result.extraction.framePath, packId: result.pack.id, sourceType: result.pack.sourceType, targetFirstFrameArtifactId: result.pack.targetFirstFrameArtifactId, generationJob: result.generationJob ?? null }));`;
 const continuationRaw = await execFileAsync(process.execPath, ["--import", "tsx", "--eval", continuationScript], { cwd: workspace, env: { ...process.env, AI_CANVAS_PROJECT_ROOT: calibrationRoot, AI_CANVAS_REGISTRY_PATH: registryPath }, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
 const continuation = JSON.parse(continuationRaw.stdout.trim());
 if (continuation.sourceType !== "timeline" || !continuation.targetFirstFrameArtifactId || continuation.generationJob !== null) throw new Error(`fresh-process Continuation 无效：${JSON.stringify(continuation)}`);

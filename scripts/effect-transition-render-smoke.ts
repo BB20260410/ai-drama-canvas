@@ -17,6 +17,7 @@ import {
 } from "../src/core/editor.js";
 import { commitProjectImport, prepareProjectImport } from "../src/core/importer.js";
 import { scanAndPersist, getProjectIndex } from "../src/core/service.js";
+import { toJsLiteral } from "../src/core/js-code-literal.js";
 
 const execFileAsync = promisify(execFile);
 const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -228,7 +229,7 @@ try {
   if (midpointColor.red < 55 || midpointColor.blue < 55) throw new Error(`合成帧没有保留两路转场贡献：${JSON.stringify(midpointColor)}`);
 
   const editorModule = pathToFileURL(path.join(workspace, "src", "core", "editor.ts")).href;
-  const childScript = `import { prepareTimelineVideoContinuation } from ${JSON.stringify(editorModule)}; const result = await prepareTimelineVideoContinuation(${JSON.stringify(root)}, ${JSON.stringify({ editProjectId: imported.id, targetItemId: target.id, expectedRevision: imported.revision, enqueue: false })}); process.stdout.write(JSON.stringify({ extractionId: result.extraction.id, framePath: result.extraction.framePath, packId: result.pack.id, sourceType: result.pack.sourceType, targetFirstFrameArtifactId: result.pack.targetFirstFrameArtifactId, generationJob: result.generationJob ?? null }));`;
+  const childScript = `import { prepareTimelineVideoContinuation } from ${toJsLiteral(editorModule)}; const result = await prepareTimelineVideoContinuation(${toJsLiteral(root)}, ${toJsLiteral({ editProjectId: imported.id, targetItemId: target.id, expectedRevision: imported.revision, enqueue: false })}); process.stdout.write(JSON.stringify({ extractionId: result.extraction.id, framePath: result.extraction.framePath, packId: result.pack.id, sourceType: result.pack.sourceType, targetFirstFrameArtifactId: result.pack.targetFirstFrameArtifactId, generationJob: result.generationJob ?? null }));`;
   const childResult = await execFileAsync(process.execPath, ["--import", "tsx", "--eval", childScript], { cwd: workspace, env: { ...process.env, AI_CANVAS_REGISTRY_PATH: registryPath }, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
   const restartContinuation = JSON.parse(childResult.stdout.trim());
   if (restartContinuation.sourceType !== "timeline" || !restartContinuation.targetFirstFrameArtifactId || restartContinuation.generationJob !== null) throw new Error(`全新 Node 续接结果无效：${JSON.stringify(restartContinuation)}`);

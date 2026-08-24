@@ -7,7 +7,7 @@ function errorCode(error) {
 }
 
 export function createUniqueEvidenceStem(prefix = "isolated-package-smoke") {
-  const timestamp = new Date().toISOString().replace(/[-:.]/gu, "").replace("Z", "Z");
+  const timestamp = new Date().toISOString().replace(/[-:.]/gu, "");
   return `${prefix}-${timestamp}-${process.pid}-${randomUUID().slice(0, 8)}`;
 }
 

@@ -78,8 +78,8 @@ const server = createServer(async (request, response) => {
       return;
     }
     response.writeHead(404).end();
-  } catch (error) {
-    json(500, { error: error instanceof Error ? error.message : String(error) });
+  } catch {
+    json(500, { error: "loopback failed" });
   }
 });
 

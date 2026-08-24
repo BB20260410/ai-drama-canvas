@@ -16,6 +16,7 @@ import { scanAndPersist } from "../src/core/service.js";
 import { ensureSidecar, getSidecarPaths, writeJsonAtomic } from "../src/core/sidecar.js";
 import type { GenerationJob } from "../src/core/types.js";
 import { seedProductionReady } from "../tests/workflow-helpers.js";
+import { toJsLiteral } from "../src/core/js-code-literal.js";
 
 const execFileAsync = promisify(execFile);
 const stamp = new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14);
@@ -52,7 +53,7 @@ async function waitFor(check: () => Promise<boolean>, timeoutMs = 15_000): Promi
 
 async function processInFreshNode(jobId: string): Promise<void> {
   const moduleUrl = new URL("../src/core/generation.ts", import.meta.url).href;
-  await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue } from ${JSON.stringify(moduleUrl)}; await processGenerationQueue(${JSON.stringify(root)}, { jobId: ${JSON.stringify(jobId)} });`], { cwd: process.cwd(), env: process.env });
+  await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue } from ${toJsLiteral(moduleUrl)}; await processGenerationQueue(${toJsLiteral(root)}, { jobId: ${toJsLiteral(jobId)} });`], { cwd: process.cwd(), env: process.env });
 }
 
 const sourceImage = await sharp({ create: { width: 720, height: 1280, channels: 3, background: "#93622f" } }).png().toBuffer();
@@ -224,7 +225,7 @@ try {
   assert(!JSON.stringify(snapshotDuringRetry).includes("local-secret-query"), "统一快照泄露签名结果 URL。 ");
 
   const moduleUrl = new URL("../src/core/generation.ts", import.meta.url).href;
-  const crashWorker = spawn(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue } from ${JSON.stringify(moduleUrl)}; await processGenerationQueue(${JSON.stringify(root)}, { jobId: ${JSON.stringify(resilientJob.id)} });`], { cwd: process.cwd(), env: process.env, stdio: ["ignore", "ignore", "pipe"] });
+  const crashWorker = spawn(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue } from ${toJsLiteral(moduleUrl)}; await processGenerationQueue(${toJsLiteral(root)}, { jobId: ${toJsLiteral(resilientJob.id)} });`], { cwd: process.cwd(), env: process.env, stdio: ["ignore", "ignore", "pipe"] });
   const crashStderr: Buffer[] = [];
   crashWorker.stderr?.on("data", (chunk) => crashStderr.push(Buffer.from(chunk)));
   const crashClosed = new Promise<{ code: number | null; signal: NodeJS.Signals | null }>((resolve) => crashWorker.once("close", (code, signal) => resolve({ code, signal })));

@@ -18,6 +18,7 @@ import { getProjectIndex, scanAndPersist } from "../src/core/service.js";
 import { ensureSidecar, getSidecarPaths, writeJsonAtomic } from "../src/core/sidecar.js";
 import type { EditClip, EditProject } from "../src/core/types.js";
 import { seedProductionReady } from "./workflow-helpers.js";
+import { toJsLiteral } from "../src/core/js-code-literal.js";
 
 const execFileAsync = promisify(execFile);
 const roots: string[] = [];
@@ -202,7 +203,7 @@ describe("嵌套时间线生产续接", () => {
     expect({ extractionId: directRetry.extraction.id, packId: directRetry.pack.id, artifactId: directRetry.extraction.registeredArtifactId }).toEqual({ extractionId: first.extraction.id, packId: first.pack.id, artifactId: first.extraction.registeredArtifactId });
 
     const editorModule = pathToFileURL(path.join(process.cwd(), "src", "core", "editor.ts")).href;
-    const childScript = `import { prepareTimelineVideoContinuation } from ${JSON.stringify(editorModule)}; const value = await prepareTimelineVideoContinuation(${JSON.stringify(root)}, ${JSON.stringify({ editProjectId: rootProject.id, targetItemId: "main-ep01-unit002", expectedRevision: rootProject.revision, enqueue: false })}); process.stdout.write(JSON.stringify({ extractionId: value.extraction.id, packId: value.pack.id, artifactId: value.extraction.registeredArtifactId, dependencyManifestSha256: value.extraction.dependencyManifestSha256, renderPlanSha256: value.extraction.renderPlanSha256 }));`;
+    const childScript = `import { prepareTimelineVideoContinuation } from ${toJsLiteral(editorModule)}; const value = await prepareTimelineVideoContinuation(${toJsLiteral(root)}, ${toJsLiteral({ editProjectId: rootProject.id, targetItemId: "main-ep01-unit002", expectedRevision: rootProject.revision, enqueue: false })}); process.stdout.write(JSON.stringify({ extractionId: value.extraction.id, packId: value.pack.id, artifactId: value.extraction.registeredArtifactId, dependencyManifestSha256: value.extraction.dependencyManifestSha256, renderPlanSha256: value.extraction.renderPlanSha256 }));`;
     const { stdout: restartStdout } = await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", childScript], { cwd: process.cwd(), maxBuffer: 1_000_000 });
     expect(JSON.parse(restartStdout)).toEqual({ extractionId: first.extraction.id, packId: first.pack.id, artifactId: first.extraction.registeredArtifactId, dependencyManifestSha256: first.extraction.dependencyManifestSha256, renderPlanSha256: first.extraction.renderPlanSha256 });
     expect(await listTimelineFrameExtractions(root, rootProject.id)).toHaveLength(1);

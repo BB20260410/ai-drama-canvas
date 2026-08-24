@@ -16,6 +16,7 @@ import { scanAndPersist } from "../src/core/service.js";
 import { ensureSidecar, getSidecarPaths, writeJsonAtomic } from "../src/core/sidecar.js";
 import type { GenerationJob } from "../src/core/types.js";
 import { seedProductionReady } from "../tests/workflow-helpers.js";
+import { toJsLiteral } from "../src/core/js-code-literal.js";
 
 const execFileAsync = promisify(execFile);
 const stamp = new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14);
@@ -51,7 +52,7 @@ async function jobById(jobId: string): Promise<GenerationJob> {
 
 async function processFresh(jobId: string): Promise<void> {
   const moduleUrl = new URL("../src/core/generation.ts", import.meta.url).href;
-  await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue } from ${JSON.stringify(moduleUrl)}; await processGenerationQueue(${JSON.stringify(root)}, { jobId: ${JSON.stringify(jobId)} });`], { cwd: process.cwd(), env: process.env, maxBuffer: 2_000_000 });
+  await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue } from ${toJsLiteral(moduleUrl)}; await processGenerationQueue(${toJsLiteral(root)}, { jobId: ${toJsLiteral(jobId)} });`], { cwd: process.cwd(), env: process.env, maxBuffer: 2_000_000 });
 }
 
 type PromptState = "pending" | "running" | "success" | "failed" | "cancelled";
@@ -144,8 +145,8 @@ const server = createServer(async (request: IncomingMessage, response: ServerRes
       return json(410, { error: "legacy interrupt forbidden" });
     }
     response.writeHead(404).end();
-  } catch (error) {
-    json(500, { error: error instanceof Error ? error.message : String(error) });
+  } catch {
+    json(500, { error: "loopback failed" });
   }
 });
 

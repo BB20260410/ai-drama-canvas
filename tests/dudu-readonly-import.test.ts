@@ -6,6 +6,7 @@ import type {
   DuduReferenceAsset,
 } from "../src/core/dudu-readonly-source.js";
 import {
+  assertDuduPromptTextPathFree,
   auditDuduV2BindingSafetyClosure,
   duduFindSemanticTokenRange,
   duduReferencePresenceForPanel,
@@ -446,6 +447,16 @@ describe("Dudu readonly import projection", () => {
       const unsafe = { ...fixture, binding: { ...fixture.binding!, rawGridPrompt: unsafeRaw } };
       expect(() => auditDuduReadonlyUnitProjection(unsafe), unsafeRaw).toThrow(/路径|URL/u);
     }
+  });
+
+  it("相对媒体路径检测不因 !/ 重复回退，且仍拦截 refs/file.png", () => {
+    expect(() => assertDuduPromptTextPathFree("refs/identity.png", "probe")).toThrow(/相对媒体路径/u);
+    expect(() => assertDuduPromptTextPathFree("./foo/bar.jpg", "probe")).toThrow(/相对媒体路径/u);
+    expect(() => assertDuduPromptTextPathFree("无路径的正常提示词", "probe")).not.toThrow();
+    const noisy = `${"!/".repeat(4_000)} end`;
+    const started = Date.now();
+    expect(() => assertDuduPromptTextPathFree(noisy, "probe")).not.toThrow();
+    expect(Date.now() - started).toBeLessThan(200);
   });
 
   it("does not use a generic empty nest as a mother/cub forbidden anchor", () => {

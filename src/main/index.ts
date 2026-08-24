@@ -23,6 +23,7 @@ import {
   retryWatcherCloseOnce,
 } from "./watcher-owner-coordinator.js";
 import { DEFAULT_PROJECT_ROOT } from "../core/constants.js";
+import { toJsLiteral } from "../core/js-code-literal.js";
 import {
   activateProject,
   claimTask,
@@ -1300,22 +1301,29 @@ export function classifyNovelDesktopPublicError(
   if (/\b(?:ENOSPC|NO SPACE LEFT)\b|磁盘(?:已满|空间不足)|存储空间不足/iu.test(messages)) {
     return "NOVEL_STORAGE_FULL";
   }
-  if (/\b(?:EACCES|EPERM|PERMISSION DENIED|OPERATION NOT PERMITTED)\b|无权限|权限不足|没有.*权限/iu.test(messages)) {
+  if (/\b(?:EACCES|EPERM|PERMISSION DENIED|OPERATION NOT PERMITTED)\b|无权限|权限不足/iu.test(messages)
+    || (messages.includes("没有") && messages.includes("权限"))) {
     return "NOVEL_PERMISSION_DENIED";
   }
-  if (/\b(?:SQLITE_BUSY|SQLITE_LOCKED|RESOURCE_BUSY)\b|DATABASE IS LOCKED|数据库瞬时锁|资源.*占用/iu.test(messages)) {
+  if (/\b(?:SQLITE_BUSY|SQLITE_LOCKED|RESOURCE_BUSY)\b|DATABASE IS LOCKED|数据库瞬时锁/iu.test(messages)
+    || (messages.includes("资源") && messages.includes("占用"))) {
     return "NOVEL_RESOURCE_BUSY";
   }
-  if (/RECOVERY[ _-]?REQUIRED|OUTCOME[ _-]?UNKNOWN|保持\s*unknown|结果(?:尚)?未确认|禁止自动重放|先.*对账|恢复与对账/iu.test(messages)) {
+  if (/RECOVERY[ _-]?REQUIRED|OUTCOME[ _-]?UNKNOWN|保持\s*unknown|结果(?:尚)?未确认|禁止自动重放|恢复与对账/iu.test(messages)
+    || (messages.includes("先") && messages.includes("对账"))) {
     return "NOVEL_RECOVERY_REQUIRED";
   }
-  if (/CLOSURE[ _-]?DRIFT|闭包|STATE CHAIN|RECEIPT|回执|FINGERPRINT.*(?:无效|不一致)|MANIFEST.*(?:DRIFT|不一致)/iu.test(messages)) {
+  if (/CLOSURE[ _-]?DRIFT|闭包|STATE CHAIN|RECEIPT|回执/iu.test(messages)
+    || (/FINGERPRINT/iu.test(messages) && (messages.includes("无效") || messages.includes("不一致")))
+    || (/MANIFEST/iu.test(messages) && (/DRIFT/iu.test(messages) || messages.includes("不一致")))) {
     return "NOVEL_CLOSURE_DRIFT";
   }
-  if (/DESTINATION[ _-]?CHANGED|目标.*(?:变化|改变)|目标.*身份已变化/iu.test(messages)) {
+  if (/DESTINATION[ _-]?CHANGED/iu.test(messages)
+    || (messages.includes("目标") && (messages.includes("变化") || messages.includes("改变") || messages.includes("身份已变化")))) {
     return "NOVEL_DESTINATION_CHANGED";
   }
-  if (/SOURCE[ _-]?CHANGED|TOCTOU|来源.*(?:变化|改变)|身份已变化|预检后已变化|SELECTIONID 已作废|NO SUCH FILE/iu.test(messages)) {
+  if (/SOURCE[ _-]?CHANGED|TOCTOU|身份已变化|预检后已变化|SELECTIONID 已作废|NO SUCH FILE/iu.test(messages)
+    || (messages.includes("来源") && (messages.includes("变化") || messages.includes("改变")))) {
     return "NOVEL_SOURCE_CHANGED";
   }
   if (/VALIDATION|INVALID|无效|不允许|必须|拒绝|UNSUPPORTED|格式|参数|SCHEMA|越根|符号链接|硬链接/iu.test(messages)) {
@@ -2081,7 +2089,7 @@ async function createWindow(): Promise<void> {
     const screenshotView = process.env.AI_CANVAS_SCREENSHOT_VIEW;
     if (screenshotView) {
       setTimeout(() => {
-        const label = JSON.stringify(screenshotView);
+        const label = toJsLiteral(screenshotView);
         void mainWindow?.webContents.executeJavaScript(
           `Array.from(document.querySelectorAll('.module-nav button')).find((button) => button.textContent?.includes(${label}))?.click()`,
         );
@@ -2093,14 +2101,14 @@ async function createWindow(): Promise<void> {
     const continuationTab = process.env.AI_CANVAS_CONTINUATION_TAB;
     if (continuationTab) {
       setTimeout(() => {
-        const label = JSON.stringify(continuationTab);
+        const label = toJsLiteral(continuationTab);
         void mainWindow?.webContents.executeJavaScript(`Array.from(document.querySelectorAll('.continuation-header nav button')).find((button) => button.textContent?.includes(${label}))?.click()`);
       }, Math.min(2_500, Math.round(screenshotDelay * 0.45)));
     }
     const storyMode = process.env.AI_CANVAS_STORY_MODE;
     if (storyMode) {
       setTimeout(() => {
-        const label = JSON.stringify(storyMode);
+        const label = toJsLiteral(storyMode);
         void mainWindow?.webContents.executeJavaScript(`Array.from(document.querySelectorAll('.story-header nav button')).find((button) => button.textContent?.includes(${label}))?.click()`);
       }, Math.min(2_500, Math.round(screenshotDelay * 0.45)));
     }
@@ -2108,7 +2116,7 @@ async function createWindow(): Promise<void> {
     const canvasThemeProbe = process.env.AI_CANVAS_CANVAS_THEME_PROBE;
     if (canvasThemeProbe) {
       setTimeout(() => {
-        const theme = JSON.stringify(canvasThemeProbe);
+        const theme = toJsLiteral(canvasThemeProbe);
         void mainWindow?.webContents.executeJavaScript(
           `(() => { try { window.localStorage.setItem("managed-canvas-theme", ${theme}); window.location.reload(); } catch { /* 探针路径忽略 */ } })()`,
         );
@@ -2118,7 +2126,7 @@ async function createWindow(): Promise<void> {
       setTimeout(async () => {
         if (!mainWindow) return;
         const click = async (selector: string, index = 0) => {
-          const point = await mainWindow!.webContents.executeJavaScript(`(() => { const element = document.querySelectorAll(${JSON.stringify(selector)})[${index}]; if (!element) return null; const rect = element.getBoundingClientRect(); return { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top + rect.height / 2) }; })()`);
+          const point = await mainWindow!.webContents.executeJavaScript(`(() => { const element = document.querySelectorAll(${toJsLiteral(selector)})[${index}]; if (!element) return null; const rect = element.getBoundingClientRect(); return { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top + rect.height / 2) }; })()`);
           if (!point) throw new Error(`找不到自动改编控件：${selector}[${index}]`);
           for (const event of [{ type: "mouseMove" as const, x: point.x, y: point.y }, { type: "mouseDown" as const, x: point.x, y: point.y, button: "left" as const, clickCount: 1 }, { type: "mouseUp" as const, x: point.x, y: point.y, button: "left" as const, clickCount: 1 }]) mainWindow!.webContents.sendInputEvent(event);
           await new Promise((resolve) => setTimeout(resolve, 260));
@@ -2185,21 +2193,21 @@ async function createWindow(): Promise<void> {
     const designTab = process.env.AI_CANVAS_DESIGN_TAB;
     if (designTab) {
       setTimeout(() => {
-        const label = JSON.stringify(designTab);
+        const label = toJsLiteral(designTab);
         void mainWindow?.webContents.executeJavaScript(`Array.from(document.querySelectorAll('.design-header nav button')).find((button) => button.textContent?.includes(${label}))?.click()`);
       }, Math.min(2_500, Math.round(screenshotDelay * 0.45)));
     }
     const storyContextItem = process.env.AI_CANVAS_STORY_CONTEXT_ITEM;
     if (storyContextItem) {
       setTimeout(() => {
-        const value = JSON.stringify(storyContextItem);
+        const value = toJsLiteral(storyContextItem);
         void mainWindow?.webContents.executeJavaScript(`void (async () => { const select = document.querySelector('.story-actions select'); if (!select) return; select.value = ${value}; select.dispatchEvent(new Event('change', { bubbles: true })); await new Promise((resolve) => setTimeout(resolve, 180)); Array.from(document.querySelectorAll('.story-actions button')).find((button) => button.textContent?.includes('生产上下文'))?.click(); })()`);
       }, Math.min(4_000, Math.round(screenshotDelay * 0.62)));
     }
     const editorSeekSeconds = Number(process.env.AI_CANVAS_EDITOR_SEEK_SECONDS);
     if (Number.isFinite(editorSeekSeconds) && editorSeekSeconds > 0) {
       setTimeout(() => {
-        void mainWindow?.webContents.executeJavaScript(`void (() => { const input = document.querySelector('.transport input[type="range"]'); if (!input) return; input.value = ${editorSeekSeconds}; input.dispatchEvent(new Event('input', { bubbles: true })); document.querySelector('.timeline-clip.subtitle')?.click(); })()`);
+        void mainWindow?.webContents.executeJavaScript(`void (() => { const input = document.querySelector('.transport input[type="range"]'); if (!input) return; input.value = ${toJsLiteral(editorSeekSeconds)}; input.dispatchEvent(new Event('input', { bubbles: true })); document.querySelector('.timeline-clip.subtitle')?.click(); })()`);
       }, Math.min(4_500, Math.round(screenshotDelay * 0.68)));
     }
     if (process.env.AI_CANVAS_PREPARE_CONTINUATION === "1") {
@@ -2548,7 +2556,7 @@ async function createWindow(): Promise<void> {
     const undoCount = Math.max(0, Math.min(20, Number(process.env.AI_CANVAS_UNDO_COUNT) || 0));
     if (undoCount) {
       setTimeout(() => {
-        void mainWindow?.webContents.executeJavaScript(`void (async () => { for (let index = 0; index < ${undoCount}; index += 1) { document.querySelector('button[title^="撤销"]')?.click(); await new Promise((resolve) => setTimeout(resolve, 350)); } })()`);
+        void mainWindow?.webContents.executeJavaScript(`void (async () => { for (let index = 0; index < ${toJsLiteral(undoCount)}; index += 1) { document.querySelector('button[title^="撤销"]')?.click(); await new Promise((resolve) => setTimeout(resolve, 350)); } })()`);
       }, Math.min(3_000, Math.round(screenshotDelay / 2)));
     }
     if (process.env.AI_CANVAS_REVIEW_PASS === "1") {
@@ -2568,7 +2576,7 @@ async function createWindow(): Promise<void> {
     if (importStep) {
       setTimeout(() => {
         void mainWindow?.webContents.executeJavaScript(`void (async () => {
-          for (let index = 0; index < ${importStep}; index += 1) {
+          for (let index = 0; index < ${toJsLiteral(importStep)}; index += 1) {
             for (let attempt = 0; attempt < 50; attempt += 1) {
               const button = document.querySelector('.wizard-footer .primary');
               if (button && !button.disabled) { button.click(); break; }

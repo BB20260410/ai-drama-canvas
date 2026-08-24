@@ -17,6 +17,7 @@ import { getReviewQueue, submitReview } from "../src/core/reviews.js";
 import { ensureSidecar, getSidecarPaths, loadProjectConfig, writeJsonAtomic } from "../src/core/sidecar.js";
 import { cancelPublication, getPublicationIntent, getPublicationReceipt, listPublicationIntents } from "../src/core/publication.js";
 import { executeIdempotentCommand } from "../src/core/command-bus.js";
+import { toJsLiteral } from "../src/core/js-code-literal.js";
 
 const roots: string[] = [];
 const execFileAsync = promisify(execFile);
@@ -296,13 +297,13 @@ describe("第二阶段生产闭环", () => {
     expect(submitIntent.browserState).toBe("submission_unknown");
     expect(submitIntent.browserCheckpoint).toMatchObject({ revision: 4, stage: "submission_unknown", submissionIntent: { clientJobId: job!.id, attempt: 1 } });
     const generationModule = new URL("../src/core/generation.ts", import.meta.url).href;
-    const unknownProcess = await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue, listGenerationJobs, getBrowserGenerationPlan } from ${JSON.stringify(generationModule)}; const root=${JSON.stringify(root)}; await processGenerationQueue(root); const job=(await listGenerationJobs(root)).find((entry)=>entry.id===${JSON.stringify(job!.id)}); const plan=await getBrowserGenerationPlan(root,${JSON.stringify(job!.id)}); process.stdout.write(JSON.stringify({status:job?.status,externalTaskId:job?.externalTaskId,stage:plan.currentCheckpoint?.stage,revision:plan.currentCheckpoint?.revision}));`], { cwd: process.cwd() });
+    const unknownProcess = await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue, listGenerationJobs, getBrowserGenerationPlan } from ${toJsLiteral(generationModule)}; const root=${toJsLiteral(root)}; await processGenerationQueue(root); const job=(await listGenerationJobs(root)).find((entry)=>entry.id===${toJsLiteral(job!.id)}); const plan=await getBrowserGenerationPlan(root,${toJsLiteral(job!.id)}); process.stdout.write(JSON.stringify({status:job?.status,externalTaskId:job?.externalTaskId,stage:plan.currentCheckpoint?.stage,revision:plan.currentCheckpoint?.revision}));`], { cwd: process.cwd() });
     expect(JSON.parse(unknownProcess.stdout)).toEqual({ status: "submission_unknown", stage: "submission_unknown", revision: 4 });
     await expect(updateBrowserGenerationJob(root, job!.id, { expectedRevision: 4, status: "failed", error: "没有收到回执" })).rejects.toThrow("必须先提交 result=not_found 的结构化对账证据");
     await expect(updateBrowserGenerationJob(root, job!.id, { expectedRevision: 4, status: "submitted", externalTaskId: "web-123", submissionReconciliation: { method: "browser_history", result: "not_found", note: "历史中没有找到" } })).rejects.toThrow("对账结果必须为 found");
     const submitted = await updateBrowserGenerationJob(root, job!.id, { expectedRevision: 4, status: "submitted", externalTaskId: "web-123", submissionReconciliation: { method: "browser_history", result: "found", note: "单次点击后页面显示任务编号", externalTaskId: "web-123" } });
     expect(submitted.browserState).toBe("submitted");
-    const resumedProcess = await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { listGenerationJobs, getBrowserGenerationPlan } from ${JSON.stringify(generationModule)}; const root=${JSON.stringify(root)}; const job=(await listGenerationJobs(root)).find((entry)=>entry.id===${JSON.stringify(job!.id)}); const plan=await getBrowserGenerationPlan(root,${JSON.stringify(job!.id)}); process.stdout.write(JSON.stringify({status:job?.status,externalTaskId:job?.externalTaskId,stage:plan.currentCheckpoint?.stage}));`], { cwd: process.cwd() });
+    const resumedProcess = await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { listGenerationJobs, getBrowserGenerationPlan } from ${toJsLiteral(generationModule)}; const root=${toJsLiteral(root)}; const job=(await listGenerationJobs(root)).find((entry)=>entry.id===${toJsLiteral(job!.id)}); const plan=await getBrowserGenerationPlan(root,${toJsLiteral(job!.id)}); process.stdout.write(JSON.stringify({status:job?.status,externalTaskId:job?.externalTaskId,stage:plan.currentCheckpoint?.stage}));`], { cwd: process.cwd() });
     expect(JSON.parse(resumedProcess.stdout)).toEqual({ status: "waiting_external", externalTaskId: "web-123", stage: "submitted" });
     const unrelatedDirectory = path.join(root, "EP01_15s_002_队列隔离");
     await mkdir(unrelatedDirectory, { recursive: true });
@@ -680,7 +681,7 @@ describe("第二阶段生产闭环", () => {
     expect(doctor.checks).toEqual(expect.arrayContaining([expect.objectContaining({ id: "video-continuations", level: "warning", detail: expect.stringContaining("1 个提交结果待对账") })]));
     const generationModule = new URL("../src/core/generation.ts", import.meta.url).href;
     const editorModule = new URL("../src/core/editor.ts", import.meta.url).href;
-    const recovered = await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { listGenerationJobs } from ${JSON.stringify(generationModule)}; import { listVideoContinuationPacks } from ${JSON.stringify(editorModule)}; const root=${JSON.stringify(root)}; const job=(await listGenerationJobs(root)).find((entry)=>entry.id===${JSON.stringify(job!.id)}); const pack=(await listVideoContinuationPacks(root)).find((entry)=>entry.id===${JSON.stringify(pack.id)}); process.stdout.write(JSON.stringify({jobStatus:job?.status,packStatus:pack?.status,clientJobId:pack?.browserCheckpoint?.submissionIntent?.clientJobId,packRevision:pack?.revision}));`], { cwd: process.cwd() });
+    const recovered = await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { listGenerationJobs } from ${toJsLiteral(generationModule)}; import { listVideoContinuationPacks } from ${toJsLiteral(editorModule)}; const root=${toJsLiteral(root)}; const job=(await listGenerationJobs(root)).find((entry)=>entry.id===${toJsLiteral(job!.id)}); const pack=(await listVideoContinuationPacks(root)).find((entry)=>entry.id===${toJsLiteral(pack.id)}); process.stdout.write(JSON.stringify({jobStatus:job?.status,packStatus:pack?.status,clientJobId:pack?.browserCheckpoint?.submissionIntent?.clientJobId,packRevision:pack?.revision}));`], { cwd: process.cwd() });
     expect(JSON.parse(recovered.stdout)).toEqual({ jobStatus: "submission_unknown", packStatus: "submission_unknown", clientJobId: job!.id, packRevision: projected.revision });
     const submitted = await updateBrowserGenerationJob(root, job!.id, { expectedRevision: unknown.browserCheckpoint!.revision, status: "submitted", externalTaskId: "video-web-001", submissionReconciliation: { method: "client_job_id_search", result: "found", note: "按 clientJobId 找到唯一任务。", externalTaskId: "video-web-001" } });
     expect((await listVideoContinuationPacks(root)).find((entry) => entry.id === pack.id)).toMatchObject({ status: "submitted", externalTaskId: "video-web-001" });
@@ -1160,7 +1161,7 @@ describe("第二阶段生产闭环", () => {
       expect((await getPublicationIntent(root, job!.publicationIntentId!))?.status).toBe("reserved");
 
       const generationModule = new URL("../src/core/generation.ts", import.meta.url).href;
-      await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue } from ${JSON.stringify(generationModule)}; await processGenerationQueue(${JSON.stringify(root)});`], { cwd: process.cwd() });
+      await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue } from ${toJsLiteral(generationModule)}; await processGenerationQueue(${toJsLiteral(root)});`], { cwd: process.cwd() });
       const recovered = (await listGenerationJobs(root)).find((candidate) => candidate.id === job!.id)!;
       expect(recovered.status).toBe("succeeded");
       expect(recovered.remoteObservation).toMatchObject({ state: "succeeded", stage: "publish", nextAction: "none" });
@@ -1225,7 +1226,7 @@ describe("第二阶段生产闭环", () => {
       expect(unknown.remoteObservation).toMatchObject({ state: "retryable_or_unknown", stage: "submit", nextAction: "inspect_remote_task" });
       expect((await getPublicationIntent(root, unknownJob!.publicationIntentId!))?.status).toBe("reserved");
       const submitCountBeforeRestart = submitCount;
-      await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue } from ${JSON.stringify(generationModule)}; await processGenerationQueue(${JSON.stringify(root)}, { jobId: ${JSON.stringify(unknownJob!.id)} });`], { cwd: process.cwd() });
+      await execFileAsync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", `import { processGenerationQueue } from ${toJsLiteral(generationModule)}; await processGenerationQueue(${toJsLiteral(root)}, { jobId: ${toJsLiteral(unknownJob!.id)} });`], { cwd: process.cwd() });
       expect(submitCount).toBe(submitCountBeforeRestart);
       const intentCountBeforeDuplicate = (await listPublicationIntents(root)).length;
       await expect(enqueueGeneration(root, { itemIds: ["main-ep01-unit001"], kind: "image", providerId: "http-resilience-test" })).rejects.toThrow("拒绝创建可能重复付费的新任务");

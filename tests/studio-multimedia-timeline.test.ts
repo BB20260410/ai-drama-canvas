@@ -20,6 +20,7 @@ import {
   StudioMultimediaTimelineConflictError,
 } from "../src/core/studio-multimedia-timeline.js";
 import { getStudioProductionUnitSnapshot } from "../src/core/studio-production.js";
+import { toJsLiteral } from "../src/core/js-code-literal.js";
 import {
   commitUnitGridBundle,
   createUnitGridFixtureProject,
@@ -387,10 +388,10 @@ describe("受管四媒体时间线关系 owner", () => {
 
       const moduleUrl = new URL("../src/core/studio-multimedia-timeline.ts", import.meta.url).href;
       const childScript = `
-        import { getStudioMultimediaTimelineProjection } from ${JSON.stringify(moduleUrl)};
+        import { getStudioMultimediaTimelineProjection } from ${toJsLiteral(moduleUrl)};
         const projection = await getStudioMultimediaTimelineProjection(
-          ${JSON.stringify(fixture.root)},
-          { unitId: ${JSON.stringify(fixture.unitId)} }
+          ${toJsLiteral(fixture.root)},
+          { unitId: ${toJsLiteral(fixture.unitId)} }
         );
         process.stdout.write(JSON.stringify({
           fingerprint: projection?.fingerprint,

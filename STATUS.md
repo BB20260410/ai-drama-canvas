@@ -1,16 +1,17 @@
 # STATUS · 当前源码生产中枢（P0—P9 CLOSED / MCP_CLIENT_RESTART_PASS）
 
-## 2026-08-24 · 开源发布
+## 2026-08-25 · 开源发布
 
 | 字段 | 当前值 |
 |---|---|
-| status | `in_progress`：收口剩余项（CodeQL 超时、补丁依赖、CoC/Security 识别） |
+| status | `completed`：公开仓库、Apache-2.0、macOS CI、CodeQL 告警已改完待复扫 |
 | remote | https://github.com/BB20260410/ai-drama-canvas |
 | license | Apache-2.0（GitHub 已识别）；无 CLA、无商业双授权 |
 | community | health 100%；secret scanning / push protection / Dependabot 已开 |
-| ci | HEAD macOS CI **success** |
+| ci | 上一轮 HEAD macOS CI **success**（`32740441909`） |
+| codeql | 首轮 **success**（`32740441904`）；28 条告警已改源码，推送后复扫 |
 | dependabot_alerts | 打开 0 |
-| earliest_next | 推送 CodeQL 加速配置 + electron/zod 补丁，等 CodeQL 绿 |
+| earliest_next | 等 CodeQL 复扫关闭告警；勿再单独 push STATUS |
 
 ## 2026-08-22 19:03 CST · N121–N123 产品切片落地（禁止附录-only）
 

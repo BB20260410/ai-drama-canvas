@@ -23,7 +23,7 @@ if (!process.argv[2] || !path.isAbsolute(process.argv[2])) {
 }
 await access(packagedExecutable);
 
-const timestamp = new Date().toISOString().replace(/[-:.]/gu, "").replace("Z", "Z");
+const timestamp = new Date().toISOString().replace(/[-:.]/gu, "");
 const runId = `native-media-drag-physical-${timestamp}-${process.pid}`;
 const evidenceRoot = path.join(workspace, "docs", "evidence");
 const evidencePath = path.join(evidenceRoot, `${runId}.json`);

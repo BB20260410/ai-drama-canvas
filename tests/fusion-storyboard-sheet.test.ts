@@ -13,6 +13,7 @@ import {
 } from "../src/core/fusion-storyboard-sheet.js";
 import type { FusionScheduleRow } from "../src/core/fusion-package.js";
 import type { StoryboardProductionContract } from "../src/core/types.js";
+import { xmlVisibleText } from "../src/core/xml-visible-text.js";
 
 const UNIT_ID = "season-3-ep01-unit001";
 const roots: string[] = [];
@@ -146,7 +147,7 @@ describe("融合分镜故事板本地渲染", () => {
     const metadata = await sharp(sample.outputPath, { failOn: "error" }).metadata();
     expect(metadata).toMatchObject({ width: 2160, height: first.height, format: "png" });
     const svg = await readFile(sample.svgOutputPath, "utf8");
-    const visibleTextWithoutWhitespace = svg.replace(/<[^>]*>/gu, "").replace(/\s/gu, "");
+    const visibleTextWithoutWhitespace = xmlVisibleText(svg).replace(/\s/gu, "");
     expect(svg).toContain("中文本地排版 · AI 画面无字");
     expect(svg).toContain("画面内容 / 动作");
     expect(svg).toContain("连续性 / 声音");
@@ -241,7 +242,7 @@ describe("融合分镜故事板本地渲染", () => {
     expect(fieldAudit.requiredHeight).toBeLessThanOrEqual(fieldAudit.allocatedHeight);
     expect(fieldAudit.contentSha256).toBe(digest(Buffer.from(longAction)));
     const svg = await readFile(sample.svgOutputPath, "utf8");
-    const visibleText = svg.replace(/<[^>]*>/gu, "");
+    const visibleText = xmlVisibleText(svg);
     expect(visibleText).toContain(completeEnding);
     expect(svg).not.toContain("…");
     expect(svg).toContain("&quot;allRequiredTextVisible&quot;:true");

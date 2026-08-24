@@ -38,6 +38,7 @@ import {
   type FusionStoryboardSheetState,
 } from "../src/core/fusion-storyboard-sheet-evidence.js";
 import { previewFusionStoryboardSheetMigration } from "../src/core/fusion-storyboard-sheet-migration.js";
+import { xmlVisibleText } from "../src/core/xml-visible-text.js";
 import { listFusionStoryboardSheetArtifactSnapshot, loadFusionStoryboardSheetStore } from "../src/core/fusion-storyboard-sheet-store.js";
 import { buildFusionStoryboardGrid, type FusionStoryboardGridContract } from "../src/core/fusion-storyboard-grid.js";
 import {
@@ -1414,7 +1415,7 @@ async function validateRendererFixtures(root: string): Promise<Record<string, un
   assertRenderedTextComplete(longRendered, long.contract);
   const longField = longRendered.overflowReport.rows[0]!.textFields.find((field) => field.field === "imageContentAction");
   const longSvg = await readFile(long.svgOutputPath, "utf8");
-  const longVisibleText = longSvg.replace(/<[^>]*>/gu, "");
+  const longVisibleText = xmlVisibleText(longSvg);
   assert(longRendered.panelCount === 2
     && longRendered.height > 3_840
     && longRendered.overflowReport.expanded
@@ -1441,7 +1442,7 @@ async function validateRendererFixtures(root: string): Promise<Record<string, un
     && firstSix.cropAudit.every((entry) => entry.fit === "contain" && entry.geometry === "none" && !entry.cropApplied),
   "6 格 fixture 未完整成板或发生了未授权裁切。");
   const sixSvg = await readFile(six.svgOutputPath, "utf8");
-  const visibleWithoutWhitespace = sixSvg.replace(/<[^>]*>/gu, "").replace(/\s/gu, "");
+  const visibleWithoutWhitespace = xmlVisibleText(sixSvg).replace(/\s/gu, "");
   for (const panel of six.contract.panels) {
     for (const field of panel.tableFields.filter((entry) => entry.key !== "duration")) {
       assert(visibleWithoutWhitespace.includes(field.value.replace(/\s/gu, "")), `6 格 SVG 丢失中文字段：${panel.id}.${field.key}`);

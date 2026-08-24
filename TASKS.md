@@ -2,13 +2,15 @@
 
 ## software_goal: oss-public-github-20260824
 
-- status: `in_progress`
+- status: `completed`
 - [x] 本地全面检查（typecheck:app、fast tests、密钥扫描、gitignore）
 - [x] Apache-2.0 LICENSE / NOTICE / README / CONTRIBUTING / SECURITY / CoC / CI
 - [x] 推送到 `BB20260410/ai-drama-canvas` 公开仓库
 - [x] 读取 GitHub 建议：CI 改 macOS、Dependabot 升级、CodeQL
-- [x] macOS CI 通过（32714879168）；打开 Dependabot 告警 0
+- [x] macOS CI 通过（32714879168 / 32740441909）；打开 Dependabot 告警 0
 - [x] 关闭会破坏构建的 Dependabot PR（TS 7 / Vite 8 / 顶层 esbuild）
+- [x] CodeQL 首轮跑完 success（32740441904，3h20m）
+- [x] 修 CodeQL 28 条告警（ReDoS / executeJavaScript / 多项式正则 / 标签剥离 / 恒等替换 / 栈泄露）
 
 ## software_goal: character-canvas-pack-20260821
 
