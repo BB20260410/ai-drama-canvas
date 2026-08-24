@@ -1,0 +1,5 @@
+name: ai-drama-canvas
+paths-ignore:
+  - docs/evidence/**
+  - dist-mcp/**
+  - coverage/**
