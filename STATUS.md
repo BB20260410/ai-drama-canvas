@@ -4,7 +4,7 @@
 
 | 字段 | 当前值 |
 |---|---|
-| status | `in_progress`：W1 + W2-A/B/D/E/F + W3-A 已落地；W2-C 需 Darwin；整计划未关账 |
+| status | `in_progress`：W1 + W2-A/B/D/E/F + W3-A/B 已落地；W2-C 需 Darwin；整计划未关账 |
 | plan | `docs/PLAN_运行速度与内存占用长期执行_20260825.md` |
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
@@ -17,8 +17,9 @@
 | wave2d | 账本/计划风暴并入 scheduleUnitGridGraphRebuild 单 rAF |
 | wave2e | 节点 >80 默认关 MiniMap；invalidate 清用户覆盖 |
 | wave2f | 切工程 thumbnailLru.clear()；DOM counts 含参考/连续性/边 |
-| wave3a | earliest / timeline 入口改 `inspectManagedProjectReadOnly`；earliest 租约改只读。checkpoint / 时间线开库仍可能建 schema（W3-B） |
-| earliest_next | **Wave 3-B**：schema 未初始化失败关闭，不静默建库 |
+| wave3a | earliest / timeline 入口改 `inspectManagedProjectReadOnly`；earliest 租约改只读 |
+| wave3b | `assertGenerationLedgerSchemaFileReady`：缺库/无 schema 失败关闭且不建库；时间线与 earliest 在批读/checkpoint 前调用 |
+| earliest_next | **Wave 3-C**：`getStudioEpisodeEarliest` 用 list 行 revision，去掉 per-unit snapshot |
 
 ## 2026-08-25 · 本机人物库同步
 

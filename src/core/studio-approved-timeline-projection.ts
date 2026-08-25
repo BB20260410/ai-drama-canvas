@@ -13,6 +13,7 @@
  * - 历史候选未通过闭合核验时不提升，仅在 candidateWarning 如实说明失败项。
  */
 import { inspectManagedProjectReadOnly } from "./managed-project.js";
+import { assertGenerationLedgerSchemaFileReady } from "./studio-generation-ledger-readiness.js";
 import { listStudioProductionUnits } from "./studio-production.js";
 import {
   listStudioGenerationLatestUnitGridRuns,
@@ -197,8 +198,9 @@ export async function getApprovedTimelineProjection(
   query: ApprovedTimelineProjectionQuery,
 ): Promise<ApprovedTimelineProjection> {
   const startedAt = Date.now();
-  // 入口身份校验走 ReadOnly inspect（写版会 ensure ledger）。后续账本批读仍可能开库（W3-B）。
+  // 入口身份校验走 ReadOnly inspect。schema 未就绪则失败关闭，不进入会建库的账本批读。
   const shell = await inspectManagedProjectReadOnly(projectRoot);
+  assertGenerationLedgerSchemaFileReady(shell.paths.generationDatabase);
   const season = query.season ?? "S1";
   const episode = query.episode ?? "S1E1";
   const bound = resolveApprovedTimelineBound(query);

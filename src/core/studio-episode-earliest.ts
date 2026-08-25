@@ -5,6 +5,7 @@
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { inspectManagedProjectReadOnly } from "./managed-project.js";
+import { assertGenerationLedgerSchemaFileReady } from "./studio-generation-ledger-readiness.js";
 import { listStudioProductionUnits, getStudioProductionUnitSnapshot } from "./studio-production.js";
 import { getStudioGenerationCheckpointControl } from "./studio-generation-checkpoint.js";
 import { getStudioProjectWriteLeaseReadOnly } from "./studio-project-write-lease.js";
@@ -99,8 +100,9 @@ export async function getStudioEpisodeEarliest(
   } = {},
 ): Promise<StudioEpisodeEarliestProjection> {
   const root = path.resolve(projectRoot);
-  // 入口身份校验走 ReadOnly inspect。checkpoint 控制面仍可能初始化账本（W3-B）。
+  // 入口身份校验走 ReadOnly inspect。schema 未就绪则失败关闭，不进入 checkpoint 初始化。
   const shell = await inspectManagedProjectReadOnly(root);
+  assertGenerationLedgerSchemaFileReady(shell.paths.generationDatabase);
   const season = input.season ?? "S1";
   const episode = input.episode ?? "S1E2";
   const formalExternal = await loadExternalFormalSet(input.evidenceDir, episode);
