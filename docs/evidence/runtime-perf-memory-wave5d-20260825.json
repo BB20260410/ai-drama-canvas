@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "5-D",
+  "recordedAt": "2026-08-25T16:57:00Z",
+  "change": {
+    "file": "src/core/studio-media-protocol.ts",
+    "derivativeServing": "DB binding + inspectManagedFileCached(derivative only)",
+    "removedOnDerivativeServe": "inspectCasObjectCached(source CAS)",
+    "mediaTargetStillHashesSource": true,
+    "thumbnailRecipeUnchanged": "material-studio-thumb:v1:autorotate:inside-512:no-enlarge:webp-q82",
+    "derivativeRecipesUnchanged": true
+  },
+  "tests": [
+    "tests/runtime-perf-wave5d-derivative-serving-binding.test.ts",
+    "tests/studio-media-protocol.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "sourceContract": { "passed": 1, "platform": "linux", "files": 1 },
+    "ownerProtocolTests": "未跑：importStudioMedia 需 Darwin dirfd；断言已改为 media 全 SHA = 0"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W5-D：aicanvas-studio://derivative serving 不再对源 CAS 做 inspectCasObjectCached 全 SHA。仍校验派生行 recipeKey↔mediaSha256↔kind，并对派生文件做身份/SHA/魔数。target===media 仍全 SHA 源对象。未改 recipe。未关身份绑定。",
+  "residual": [
+    "ensureStudioImageThumbnail 恢复前仍 sha256File 源对象（写入/修复路径，不是 serving）",
+    "verifiedFileCache 仍 2048 跨工程常驻（W5-E）",
+    "视频/音频派生生成仍不进 W5-C 闸",
+    "Linux 未实跑 studio-media-protocol owner 测（dirfd）；CI macos 会跑更新后的 media=0 断言",
+    "W4/W5-A–C 残差仍在；禁止写成「已优化缩略指纹」或「serving 不再校验身份」"
+  ]
+}

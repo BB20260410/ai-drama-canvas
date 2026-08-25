@@ -1019,8 +1019,8 @@ export async function resolveStudioMediaRequest(
     const expectedMediaKind = derivative.kind === "audio_waveform" ? "audio" : "video";
     if (source.kind !== expectedMediaKind) throw integrityViolation("派生类型与源媒体 kind 不匹配。");
     await assertDatabaseFiles(canonicalRoot);
-    const sourcePath = path.join(canonicalRoot, ...source.objectRelpath.split("/"));
-    await inspectCasObjectCached(canonicalRoot, sourcePath, source.sha256, source.sizeBytes);
+    // W5-D：serving 只校派生文件 + DB 绑定（recipeKey ↔ mediaSha256 ↔ kind）。
+    // 不在每次派生服务前对源 CAS 做全 SHA。源对象全 SHA 仍由 target===media 与写入/恢复路径负责。
     const derivativePath = path.join(canonicalRoot, ...derivative.relativePath.split("/"));
     const inspected = await inspectManagedFileCached({
       target: "derivative",
