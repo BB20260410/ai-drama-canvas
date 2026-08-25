@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "5-E-stale-writeback-guard",
+  "recordedAt": "2026-08-25T18:27:00Z",
+  "change": {
+    "kind": "source",
+    "files": [
+      "src/core/studio-verified-file-cache.ts",
+      "src/core/studio-media-protocol.ts",
+      "tests/runtime-perf-wave5e-verified-file-cache-buckets.test.ts"
+    ],
+    "summary": "离开工程抬高 leaveGeneration；在途 inspect 带旧 generation 不得 remember 写回。evict 时丢掉该工程 in-flight 登记。媒体请求换 canonicalRoot 时淘汰上一工程，不在 activate-project 加读盘。"
+  },
+  "verification": {
+    "typecheckApp": "PASS",
+    "directedLinux": {
+      "files": 5,
+      "passed": 46,
+      "platform": "linux"
+    },
+    "reviews": {
+      "redline": "PASS; 无 must-fix",
+      "completion": "PASS; 无 must-fix"
+    }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "overwrote20260811Final": false,
+    "t23SqlUnchanged": true,
+    "thumbnailRecipeUnchanged": true,
+    "verifiedFileCacheLimit": 2048,
+    "activateProjectNoExtraIo": true
+  },
+  "claim": "W5-E：切工程后在途 inspect 不得把旧工程桶写回。禁止写「列表原图次数已测为 0」或「运行速度已关账」。",
+  "residual": [
+    "在途 SHA 仍会跑完，只是不写缓存",
+    "安装版 T23 / P7 owner / 列表翻页探针仍 NOT_RUN"
+  ]
+}

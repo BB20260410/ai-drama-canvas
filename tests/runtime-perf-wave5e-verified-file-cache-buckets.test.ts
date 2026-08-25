@@ -12,6 +12,7 @@ import {
   resetVerifiedFileCacheForTests,
   verifiedFileCacheBucketCount,
   verifiedFileCacheSize,
+  verifiedFileLeaveGeneration,
 } from "../src/core/studio-verified-file-cache.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -90,5 +91,31 @@ describe("Wave 5-E verifiedFileCache 按工程分桶", () => {
     expect(main).toContain("await evictVerifiedFileCacheForClosedProject(closingRoot)");
     expect(canvas).toContain("thumbnailLru.clear()");
     expect(canvas).not.toContain("evictVerifiedFileCache");
+  });
+
+  it("离开后过期的 remember 不得写回；未带 generation 的测试写入仍可重建", () => {
+    seed("/tmp/stale-root", 0);
+    const started = verifiedFileLeaveGeneration();
+    expect(evictVerifiedFileCacheForProject("/tmp/stale-root")).toBe(1);
+    expect(rememberVerifiedFile({
+      bindingKey: "/tmp/stale-root:stale",
+      lookupKey: "/tmp/stale-root:lookup:stale",
+      canonicalRoot: "/tmp/stale-root",
+      inspected: { stale: true },
+      expectedSha256: "b".repeat(64),
+      expectedSize: 1,
+    }, started)).toBe(0);
+    expect(verifiedFileCacheSize()).toBe(0);
+    seed("/tmp/stale-root", 1);
+    expect(verifiedFileCacheSize()).toBe(1);
+  });
+
+  it("媒体请求换工程时淘汰上一工程；inspect 写回带 leave generation", () => {
+    const protocol = readFileSync(path.join(root, "src/core/studio-media-protocol.ts"), "utf8");
+    expect(protocol).toContain("lastServedCanonicalRoot");
+    expect(protocol).toContain("await evictVerifiedFileCacheAfterLeavingProject(lastServedCanonicalRoot)");
+    expect(protocol).toContain("dropInFlightFileInspectionsForRoots");
+    expect(protocol).toContain("const startedAtLeaveGeneration = verifiedFileLeaveGeneration()");
+    expect(protocol).toContain("}, startedAtLeaveGeneration)");
   });
 });

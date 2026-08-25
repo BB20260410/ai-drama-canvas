@@ -24,6 +24,18 @@ interface VerificationBucket {
 }
 
 const buckets = new Map<string, VerificationBucket>();
+let leaveGeneration = 0;
+const leaveGenerationByRoot = new Map<string, number>();
+
+/** 切走工程时递增；在途 inspect 用它判断写回是否过期。 */
+export function verifiedFileLeaveGeneration(): number {
+  return leaveGeneration;
+}
+
+function markProjectLeft(canonicalRoot: string): void {
+  leaveGeneration += 1;
+  leaveGenerationByRoot.set(canonicalRoot, leaveGeneration);
+}
 
 function bucketOf(canonicalRoot: string): VerificationBucket {
   let bucket = buckets.get(canonicalRoot);
@@ -87,7 +99,14 @@ export function touchVerifiedFile(entry: VerifiedFileCacheEntry): void {
   bucket.cache.set(entry.bindingKey, entry);
 }
 
-export function rememberVerifiedFile(entry: VerifiedFileCacheEntry): number {
+export function rememberVerifiedFile(
+  entry: VerifiedFileCacheEntry,
+  startedAtLeaveGeneration?: number,
+): number {
+  const leftAt = leaveGenerationByRoot.get(entry.canonicalRoot);
+  if (leftAt !== undefined && startedAtLeaveGeneration !== undefined && startedAtLeaveGeneration < leftAt) {
+    return 0;
+  }
   const bucket = bucketOf(entry.canonicalRoot);
   const previousBinding = bucket.lookup.get(entry.lookupKey);
   if (previousBinding && previousBinding !== entry.bindingKey) bucket.cache.delete(previousBinding);
@@ -104,6 +123,7 @@ export function rememberVerifiedFile(entry: VerifiedFileCacheEntry): number {
 }
 
 export function evictVerifiedFileCacheForProject(canonicalRoot: string): number {
+  markProjectLeft(canonicalRoot);
   const bucket = buckets.get(canonicalRoot);
   if (!bucket) return 0;
   const removed = bucket.cache.size;
@@ -113,4 +133,6 @@ export function evictVerifiedFileCacheForProject(canonicalRoot: string): number 
 
 export function resetVerifiedFileCacheForTests(): void {
   buckets.clear();
+  leaveGeneration = 0;
+  leaveGenerationByRoot.clear();
 }

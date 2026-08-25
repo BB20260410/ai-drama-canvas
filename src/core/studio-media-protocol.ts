@@ -14,6 +14,7 @@ import {
   getVerifiedFileLookup,
   rememberVerifiedFile,
   touchVerifiedFile,
+  verifiedFileLeaveGeneration,
   verifiedFileCacheBucketCount,
   verifiedFileCacheSize,
 } from "./studio-verified-file-cache.js";
@@ -202,6 +203,20 @@ interface NormalizedRequest {
 
 const trustedResolutions = new WeakMap<object, InternalResolution>();
 const inFlightFileInspections = new Map<string, Promise<InspectedFile>>();
+let lastServedCanonicalRoot: string | null = null;
+
+function dropInFlightFileInspectionsForRoots(roots: readonly string[]): number {
+  const needles = [...new Set(roots.filter((root) => typeof root === "string" && root.length > 0).map((root) => JSON.stringify(root)))];
+  if (needles.length === 0) return 0;
+  let removed = 0;
+  for (const key of inFlightFileInspections.keys()) {
+    if (needles.some((needle) => key.includes(needle))) {
+      inFlightFileInspections.delete(key);
+      removed += 1;
+    }
+  }
+  return removed;
+}
 const verificationCacheMetrics = {
   cacheHits: { media: 0, thumbnail: 0, derivative: 0 },
   cacheMisses: { media: 0, thumbnail: 0, derivative: 0 },
@@ -788,13 +803,17 @@ export { evictVerifiedFileCacheForProject, VERIFIED_FILE_CACHE_LIMIT };
 export async function evictVerifiedFileCacheAfterLeavingProject(projectRoot: string | null | undefined): Promise<number> {
   if (typeof projectRoot !== "string" || !projectRoot.trim()) return 0;
   const resolved = path.resolve(projectRoot.trim());
-  let removed = evictVerifiedFileCacheForProject(resolved);
+  const roots = [resolved];
   try {
     const canonical = await realpath(resolved);
-    if (canonical !== resolved) removed += evictVerifiedFileCacheForProject(canonical);
+    if (canonical !== resolved) roots.push(canonical);
   } catch {
-    // 切走后工程根可能已不存在；resolve 键已淘汰即可。
+    // 切走后工程根可能已不存在；resolve 键仍要淘汰。
   }
+  dropInFlightFileInspectionsForRoots(roots);
+  let removed = 0;
+  for (const root of roots) removed += evictVerifiedFileCacheForProject(root);
+  if (lastServedCanonicalRoot && roots.includes(lastServedCanonicalRoot)) lastServedCanonicalRoot = null;
   return removed;
 }
 
@@ -803,6 +822,7 @@ export async function evictVerifiedFileCacheAfterLeavingProject(projectRoot: str
  * dev/ino/size/mtime/ctime。缓存键同时绑定工程、冻结记录、期望内容与规范路径。
  */
 async function inspectManagedFileCached(input: InspectCachedInput): Promise<InspectedFile> {
+  const startedAtLeaveGeneration = verifiedFileLeaveGeneration();
   const canonicalPath = path.resolve(input.filePath);
   const pathStats = await assertManagedPath(input.canonicalRoot, canonicalPath, input.label);
   const currentIdentity = identity(pathStats);
@@ -869,7 +889,7 @@ async function inspectManagedFileCached(input: InspectCachedInput): Promise<Insp
     expectedSha256,
     expectedSize,
     inspected,
-  });
+  }, startedAtLeaveGeneration);
   return inspected;
 }
 
@@ -1021,6 +1041,10 @@ export async function resolveStudioMediaRequest(
 ): Promise<StudioMediaResolution> {
   const request = normalizeRequestArguments(projectRootOrRequest, maybeRequest);
   const canonicalRoot = await canonicalProjectRoot(request.projectRoot);
+  if (lastServedCanonicalRoot && lastServedCanonicalRoot !== canonicalRoot) {
+    await evictVerifiedFileCacheAfterLeavingProject(lastServedCanonicalRoot);
+  }
+  lastServedCanonicalRoot = canonicalRoot;
   const databasePath = await assertDatabaseFiles(canonicalRoot);
   if (request.target === "derivative") {
     const derivative = validateDerivativeRow(readDerivativeRow(databasePath, request.key));
