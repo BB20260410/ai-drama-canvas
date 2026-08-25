@@ -177,6 +177,33 @@ export function resolveApprovedTimelineBound(
 }
 
 /**
+ * 驾驶舱 bundle 只需要当前单元 + 前后邻的正式选择。
+ * 去空、去重、非空失败关闭；不得超过有界上限。禁止省略字段回退整集。
+ */
+export function resolveProjectionBundleApprovedTimelineUnitIds(input: {
+  unitId: string;
+  previousUnitId?: string | null;
+  nextUnitId?: string | null;
+}): string[] {
+  const seen = new Set<string>();
+  const unitIds: string[] = [];
+  for (const raw of [input.unitId, input.previousUnitId, input.nextUnitId]) {
+    if (typeof raw !== "string") continue;
+    const id = raw.trim();
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    unitIds.push(id);
+  }
+  if (unitIds.length === 0) {
+    throw new Error("unitIds 必须是非空数组；省略该字段才表示整集。");
+  }
+  if (unitIds.length > APPROVED_TIMELINE_BOUNDED_UNIT_LIMIT) {
+    throw new Error(`unitIds 最多 ${APPROVED_TIMELINE_BOUNDED_UNIT_LIMIT} 项。`);
+  }
+  return unitIds;
+}
+
+/**
  * 解析时间线投影快慢开关。
  * 省略或 undefined → true；仅显式 `false` 走 full（绑定就绪 / deriveGenerationTargetState）。
  */

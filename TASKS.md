@@ -14,6 +14,7 @@
 - [x] Wave 2-E：MiniMap 节点 >80 默认关
 - [x] Wave 2-F：切工程清 LRU；DOM counts 含参考/连续性
 - [x] Wave 2-C：Linux 有界对照（返回集 ⊆ 请求 id；省略=全量）。P7 owner 对照仍需 Darwin
+- [x] Wave 2 bundle：驾驶舱正式时间线只物化当前+前后邻；多媒体 storyboard 只请求当前单元。阶段名不变
 - [x] Wave 3-A：earliest / approved-timeline / align-board 改 `inspectManagedProjectReadOnly`
 - [x] Wave 3-B：`assertGenerationLedgerSchemaFileReady` 失败关闭，不静默建库
 - [x] Wave 3-C：earliest 用 list 行 revision，去掉 per-unit snapshot
