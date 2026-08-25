@@ -204,7 +204,7 @@
           <p class="continuity-reference-note">{{ readOnlyEvidenceNote }}</p>
           <div class="review-comparison">
             <figure v-for="source in (['raw', 'labeled'] as const)" :key="`continuity-reference-${source}`">
-              <figcaption><span>{{ source === 'raw' ? '原始宫格图（只读）' : '中文标注图（只读）' }}</span><button type="button" :disabled="!decodedOf(source)" @click="openOriginalPreview(source)">原尺寸查看</button></figcaption>
+              <figcaption><span>{{ source === 'raw' ? '原始宫格图（只读）' : '中文标注图（只读）' }}</span><button type="button" :disabled="!originalUrlOf(source)" @click="openOriginalPreview(source)">原尺寸查看</button></figcaption>
               <div class="annotation-stage">
                 <img
                   v-if="imageUrlOf(source)"
@@ -219,9 +219,10 @@
               </div>
             </figure>
           </div>
-          <p v-if="reviewMedia.status === 'loading'" class="media-state" role="status">正在加载并解码历史 raw/labeled；两张图都成功后才能按原图填写状态。</p>
+          <p v-if="reviewMedia.status === 'loading'" class="media-state" role="status">正在加载审片缩略图；两张图都成功后才能填写状态。需要看原图请点原尺寸查看。</p>
           <p v-else-if="reviewMedia.error" class="media-state error" role="alert">{{ reviewMedia.error }}</p>
-          <p v-else-if="reviewMedia.rawDecoded && reviewMedia.labeledDecoded" class="media-state ready" role="status">历史 raw/labeled 已按原尺寸解码；请只填写画面中真实可见的语义状态。</p>
+          <p v-else-if="reviewMedia.rawDecoded && reviewMedia.labeledDecoded" class="media-state ready" role="status">审片缩略图已加载；请只填写画面中真实可见的语义状态。原图仅在点原尺寸查看后打开。</p>
+          <p v-else-if="reviewMediaAvailable" class="media-state" role="status">当前没有完整审片缩略图。并排不加载原图；请点原尺寸查看后再填写状态。</p>
         </div>
         <div v-if="!loadState.control.review && !reviewMediaAvailable" class="inline-empty">当前宫格尚无可读取的审片结果或历史。</div>
         <template v-if="loadState.control.review">
@@ -253,7 +254,7 @@
 
             <div v-if="compareMode === 'off'" class="review-comparison">
               <figure v-for="source in (['raw', 'labeled'] as const)" :key="source">
-                <figcaption><span>{{ source === 'raw' ? '原始图' : '标注图' }}</span><button type="button" :disabled="!decodedOf(source)" @click="openOriginalPreview(source)">原尺寸查看</button></figcaption>
+                <figcaption><span>{{ source === 'raw' ? '原始图' : '标注图' }}</span><button type="button" :disabled="!originalUrlOf(source)" @click="openOriginalPreview(source)">原尺寸查看</button></figcaption>
                 <div
                   class="annotation-stage"
                   :data-stage="source"
@@ -346,9 +347,10 @@
               <canvas v-show="differenceState.status === 'ready'" ref="differenceCanvas" class="difference-canvas" aria-label="原始图与标注图的差分"></canvas>
             </div>
 
-            <p v-if="reviewMedia.status === 'loading'" class="media-state" role="status">正在加载并解码 raw/labeled；两张图片都成功前不能提交审片。</p>
+            <p v-if="reviewMedia.status === 'loading'" class="media-state" role="status">正在加载审片缩略图；两张图片都成功前不能提交审片。需要看原图请点原尺寸查看。</p>
             <p v-else-if="reviewMedia.error" class="media-state error" role="alert">{{ reviewMedia.error }}</p>
-            <p v-else-if="reviewPairReady" class="media-state ready" role="status">raw/labeled 已加载并通过浏览器解码，可圈选问题区域后提交审片。</p>
+            <p v-else-if="reviewPairReady" class="media-state ready" role="status">审片缩略图已加载并可圈选提交。原图仅在点原尺寸查看后打开。</p>
+            <p v-else-if="reviewPairAvailable" class="media-state" role="status">当前没有完整审片缩略图。并排不加载原图；请点原尺寸查看后再圈选提交。</p>
 
             <div class="annotation-tools" data-testid="review-annotation-tools">
               <div class="tool-row">
@@ -454,7 +456,16 @@
 
     <div v-if="originalPreview" class="original-preview" role="dialog" aria-modal="true" aria-label="原尺寸图片查看">
       <header><strong>{{ originalPreview === 'raw' ? '原始图' : '标注图' }} · 原尺寸</strong><button type="button" @click="originalPreview = null">关闭</button></header>
-      <div><img :src="originalPreview === 'raw' ? rawImageUrl : labeledImageUrl" :alt="originalPreview === 'raw' ? '原始图原尺寸' : '标注图原尺寸'" decoding="async" /></div>
+      <div>
+        <img
+          v-if="originalUrlOf(originalPreview)"
+          :src="originalUrlOf(originalPreview)"
+          :data-review-request="reviewMedia.requestSequence"
+          :alt="originalPreview === 'raw' ? '原始图原尺寸' : '标注图原尺寸'"
+          decoding="async"
+          @load="onOriginalPreviewLoad(originalPreview, $event)"
+          @error="onOriginalPreviewError(originalPreview, $event)" />
+      </div>
     </div>
   </section>
 </template>
@@ -475,6 +486,7 @@ import {
   type AnnotationDraftGeometry,
   type StudioReviewAnnotationCategory,
 } from "../studio-review-compare";
+import { reviewMediaDisplayUrls } from "../studio-list-preview-url";
 import {
   STUDIO_CONTINUITY_REVIEW_UI_CHECKPOINT_LIMIT,
   STUDIO_CONTINUITY_REVIEW_UI_TIMELINE_LIMIT,
@@ -523,6 +535,8 @@ export default defineComponent({
     const loadState = reactive(createStudioContinuityReviewLoadState());
     const rawImageUrl = ref("");
     const labeledImageUrl = ref("");
+    const rawOriginalUrl = ref("");
+    const labeledOriginalUrl = ref("");
     const originalPreview = ref<"raw" | "labeled" | null>(null);
     const reviewMedia = reactive({
       requestSequence: 0,
@@ -775,11 +789,17 @@ export default defineComponent({
           props.api.getMedia(projectRoot, focus.labeledSha256!),
         ]);
         if (!isCurrentMediaRequest(requestSequence, projectRoot, generationRunId, focusToken)) return;
-        const rawUrl = raw?.mediaUrl ?? raw?.thumbnail?.url ?? "";
-        const labeledUrl = labeled?.mediaUrl ?? labeled?.thumbnail?.url ?? "";
-        if (!rawUrl || !labeledUrl) throw new Error("raw/labeled 媒体记录不存在或没有可读取地址。");
-        rawImageUrl.value = rawUrl;
-        labeledImageUrl.value = labeledUrl;
+        const rawUrls = reviewMediaDisplayUrls(raw);
+        const labeledUrls = reviewMediaDisplayUrls(labeled);
+        if (!rawUrls.thumbnailUrl && !rawUrls.originalUrl) throw new Error("raw 媒体记录不存在或没有可读取地址。");
+        if (!labeledUrls.thumbnailUrl && !labeledUrls.originalUrl) throw new Error("labeled 媒体记录不存在或没有可读取地址。");
+        rawImageUrl.value = rawUrls.thumbnailUrl;
+        labeledImageUrl.value = labeledUrls.thumbnailUrl;
+        rawOriginalUrl.value = rawUrls.originalUrl;
+        labeledOriginalUrl.value = labeledUrls.originalUrl;
+        if (!rawUrls.thumbnailUrl && !labeledUrls.thumbnailUrl) {
+          reviewMedia.status = "idle";
+        }
       } catch (reason) {
         if (isCurrentMediaRequest(requestSequence, projectRoot, generationRunId, focusToken)) failReviewMedia(reason);
       } finally {
@@ -963,6 +983,10 @@ export default defineComponent({
 
     function imageUrlOf(source: "raw" | "labeled"): string {
       return source === "raw" ? rawImageUrl.value : labeledImageUrl.value;
+    }
+
+    function originalUrlOf(source: "raw" | "labeled"): string {
+      return source === "raw" ? rawOriginalUrl.value : labeledOriginalUrl.value;
     }
 
     interface OverlayAnnotation {
@@ -1204,6 +1228,8 @@ export default defineComponent({
       const requestSequence = ++mediaRequestSequence;
       rawImageUrl.value = "";
       labeledImageUrl.value = "";
+      rawOriginalUrl.value = "";
+      labeledOriginalUrl.value = "";
       Object.assign(reviewMedia, {
         requestSequence,
         projectRoot,
@@ -1222,6 +1248,8 @@ export default defineComponent({
       const requestSequence = ++mediaRequestSequence;
       rawImageUrl.value = "";
       labeledImageUrl.value = "";
+      rawOriginalUrl.value = "";
+      labeledOriginalUrl.value = "";
       Object.assign(reviewMedia, {
         requestSequence,
         projectRoot: "",
@@ -1266,6 +1294,8 @@ export default defineComponent({
         if (reviewMedia.rawDecoded && reviewMedia.labeledDecoded) {
           reviewMedia.status = "ready";
           reviewMedia.error = "";
+        } else if ((kind === "raw" && !labeledImageUrl.value) || (kind === "labeled" && !rawImageUrl.value)) {
+          reviewMedia.status = "idle";
         }
       } catch (reason) {
         if (isCurrentMediaRequest(requestSequence, reviewMedia.projectRoot, reviewMedia.generationRunId, reviewMedia.focusToken)) failReviewMedia(reason);
@@ -1281,8 +1311,18 @@ export default defineComponent({
     }
 
     function openOriginalPreview(kind: "raw" | "labeled"): void {
-      if ((kind === "raw" && !reviewMedia.rawDecoded) || (kind === "labeled" && !reviewMedia.labeledDecoded)) return;
+      if (!originalUrlOf(kind)) return;
       originalPreview.value = kind;
+    }
+
+    async function onOriginalPreviewLoad(kind: "raw" | "labeled", event: Event): Promise<void> {
+      if (imageUrlOf(kind)) return;
+      await onReviewImageLoad(kind, event);
+    }
+
+    function onOriginalPreviewError(kind: "raw" | "labeled", event: Event): void {
+      if (imageUrlOf(kind) && decodedOf(kind)) return;
+      onReviewImageError(kind, event);
     }
 
     function isCurrentReviewSubmission(sequence: number, projectRoot: string, generationRunId: string, focusToken: number): boolean {
@@ -1517,6 +1557,8 @@ export default defineComponent({
       reviewMedia,
       rawImageUrl,
       labeledImageUrl,
+      rawOriginalUrl,
+      labeledOriginalUrl,
       originalPreview,
       reviewNote,
       reviewSubmitting,
@@ -1534,6 +1576,7 @@ export default defineComponent({
       incompleteDraftCount,
       decodedOf,
       imageUrlOf,
+      originalUrlOf,
       overlayAnnotations,
       onStagePointerDown,
       onWipePointerDown,
@@ -1541,6 +1584,8 @@ export default defineComponent({
       removeHeadAnnotation,
       onReviewImageError,
       onReviewImageLoad,
+      onOriginalPreviewLoad,
+      onOriginalPreviewError,
       openOriginalPreview,
       submitVisualReview,
       stateText,

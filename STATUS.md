@@ -4,12 +4,12 @@
 
 | 字段 | 当前值 |
 |---|---|
-| status | `in_progress`：W1–W3 + W4-A–F 已落地；W2-C 需 Darwin；整计划未关账 |
+| status | `in_progress`：W1–W3 + W4-A–F + W5-A 已落地；W2-C 需 Darwin；整计划未关账 |
 | plan | `docs/PLAN_运行速度与内存占用长期执行_20260825.md` |
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
-| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`、`wave3*`、`wave4a`–`wave4f` |
+| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`、`wave3*`、`wave4a`–`wave4f`、`wave5a` |
 | wave4b | story/adaptation/novel-agent 经 withX 动态 import；story.ts 顶栏已卸 mammoth（docx 分支动态加载）。doctor 仍会 `import("mammoth")` 探测；snapshot 会 withStory，doctor 会 withStory+withAdaptation |
 | wave4c | video-package / Higgsfield queue+video / dudu / local-creative 经 withX。mcp-projection 仍静态（同步消毒、无重依赖）。调用对应控制面/写命令仍会加载 |
 | wave4d | MCP 只读诊断面 earliest / bundle / dashboard / multimedia / write-lease / reader / align 经 withX；session-snapshot 不再静态拉 bundle。command-bus 仍静态拉 ledger。codex 仍静态拉 session-snapshot.js 本身。Main dashboard 顶栏未卸（T23）。get_active_managed_studio_context 仍会加载 write-lease |
@@ -27,7 +27,8 @@
 | wave4a | editor.js 经 `withEditor` 动态 import；MCP Zod 仍静态拉小模块 keyframe-curve |
 | wave4e | 常驻 runtime gate watcher 默认只递归订 src/；tests/scripts 需 AI_CANVAS_RUNTIME_GATE_WATCH_TESTS_SCRIPTS。SOURCE_DIGEST_GLOBS 未改；generation-ledger watcher 与 packaged 身份 gate 未关 |
 | wave4f | src 媒体 owner 经 `sharp-lazy` 首次 touch 再 import(\"sharp\")。THUMBNAIL_RECIPE / 派生 recipe 未改。doctor 仍会 loadSharp 探测 |
-| earliest_next | **Wave 5-A**：对照/审片网格未选中行只绑 thumbnailUrl；审片并排默认 thumb，原图显式打开 |
+| wave5a | 对照未选中行不绑图；选中预览与审片并排默认 thumbnailUrl，禁止回退 mediaUrl。原图仅显式打开；差分仍读原图字节。未改 recipe |
+| earliest_next | **Wave 5-B**：legacy `thumb=1` 不要先整文件读入；失败占位，不回退 4K bytes |
 
 ## 2026-08-25 · 本机人物库同步
 

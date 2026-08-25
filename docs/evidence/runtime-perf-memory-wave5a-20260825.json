@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "5-A",
+  "recordedAt": "2026-08-25T16:36:00Z",
+  "change": {
+    "helper": "src/renderer/src/studio-list-preview-url.ts",
+    "callSites": [
+      "src/renderer/src/components/ScriptMediaAlignView.vue",
+      "src/renderer/src/components/StudioContinuityReviewView.vue"
+    ],
+    "defaultBinding": "thumbnailUrl only",
+    "originalOpenExplicit": true,
+    "differenceStillReadsOriginalBytes": true,
+    "thumbnailRecipeUnchanged": "material-studio-thumb:v1:autorotate:inside-512:no-enlarge:webp-q82"
+  },
+  "tests": [
+    "tests/runtime-perf-wave5a-list-thumbnail-binding.test.ts",
+    "tests/script-media-align-view.test.ts",
+    "tests/studio-continuity-review-ui.test.ts",
+    "tests/studio-continuity-review-desktop-integration.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "sourceContractAndOwnerTests": { "passed": 25, "platform": "linux", "files": 4 }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W5-A：对照表格未选中行不绑图；选中预览与审片并排/解码器默认只绑 thumbnailUrl，禁止回退 mediaUrl。原图仅「打开原图 / 原尺寸查看」绑定；差分仍走 readStudioMediaBytes（最长边 2048）。未改 THUMBNAIL_RECIPE / 派生 recipe。",
+  "residual": [
+    "显式打开原图仍会加载 aicanvas-studio://media/*；差分仍读原图字节（已缩 2048）",
+    "未跑安装版「列表停留+翻 2 页」媒体请求探针；本切片是源码合同，不是 Electron GUI 实证",
+    "legacy aicanvas-asset?thumb=1 仍可能先整文件读入（W5-B）",
+    "W4-A/D/F 残差仍在：get_capabilities 仍 withEditor；command-bus 仍静态拉 ledger；doctor 仍会 loadSharp",
+    "禁止写成「已优化缩略指纹」或「审片永不加载原图」"
+  ]
+}

@@ -13,6 +13,7 @@ import type {
   WizardEditablePanel,
 } from "@core/studio-storyboard-wizard";
 import type { StudioScriptProductUiApi } from "../material-studio-ui-contract";
+import { listOrWorkbenchPreviewUrl } from "../studio-list-preview-url";
 
 const props = defineProps<{
   projectRoot: string;
@@ -52,6 +53,18 @@ const wizardUnitTitle = ref("新建 15 秒分镜单元");
 const materialized = ref<Awaited<ReturnType<StudioScriptProductUiApi["materializeStoryboardWizard"]>> | null>(null);
 const selectedAlignRow = ref<ScriptMediaAlignRow | null>(null);
 const selectedMediaPreview = ref<{ mediaUrl: string; thumbnailUrl?: string; kind: string } | null>(null);
+const alignShowOriginal = ref(false);
+const alignPreviewSrc = computed(() => listOrWorkbenchPreviewUrl({
+  thumbnailUrl: selectedMediaPreview.value?.thumbnailUrl,
+  mediaUrl: selectedMediaPreview.value?.mediaUrl,
+  showOriginal: alignShowOriginal.value,
+}));
+const alignPreviewPlaceholder = computed(() => {
+  if (!selectedAlignRow.value?.rawSha256) return "当前单元没有 raw 图";
+  if (!selectedMediaPreview.value) return "正在读取本地媒体…";
+  if (selectedMediaPreview.value.mediaUrl) return "当前单元没有缩略图；可点打开原图。";
+  return "当前单元没有可显示的预览。";
+});
 
 function messageOf(reason: unknown): string {
   return reason instanceof Error ? reason.message : String(reason);
@@ -351,6 +364,7 @@ async function materializeWizard(): Promise<void> {
 async function selectAlignRow(row: ScriptMediaAlignRow): Promise<void> {
   selectedAlignRow.value = row;
   selectedMediaPreview.value = null;
+  alignShowOriginal.value = false;
   if (!row.rawSha256) return;
   try {
     selectedMediaPreview.value = await props.api.getMediaPreview(props.projectRoot, row.rawSha256);
@@ -552,12 +566,18 @@ function shortSha(value: string | null | undefined): string {
           <span class="eyebrow">DIRECT MEDIA</span>
           <h3>{{ selectedAlignRow.unitId }}</h3>
           <img
-            v-if="selectedMediaPreview && selectedAlignRow.rawSha256"
-            :src="selectedMediaPreview.thumbnailUrl || selectedMediaPreview.mediaUrl"
+            v-if="alignPreviewSrc"
+            :src="alignPreviewSrc"
             :alt="`${selectedAlignRow.unitId} raw 结果`"
             decoding="async"
           />
-          <div v-else class="preview-placeholder">{{ selectedAlignRow.rawSha256 ? "正在读取本地媒体…" : "当前单元没有 raw 图" }}</div>
+          <div v-else class="preview-placeholder">{{ alignPreviewPlaceholder }}</div>
+          <button
+            v-if="selectedMediaPreview?.mediaUrl && !alignShowOriginal"
+            type="button"
+            data-testid="align-open-original"
+            @click="alignShowOriginal = true"
+          >打开原图</button>
           <dl>
             <div><dt>raw</dt><dd><code>{{ selectedAlignRow.rawSha256 || "—" }}</code></dd></div>
             <div><dt>labeled</dt><dd><code>{{ selectedAlignRow.labeledSha256 || "—" }}</code></dd></div>
