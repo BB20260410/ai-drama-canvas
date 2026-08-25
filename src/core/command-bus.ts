@@ -38,6 +38,8 @@ import {
 import { saveAgentSkill } from "./skills.js";
 import { withAdaptation, type AdaptationModule } from "./adaptation-lazy.js";
 import { withStory, type StoryModule } from "./story-lazy.js";
+import { withNovelAnalysis, type NovelAnalysisModule } from "./novel-analysis-lazy.js";
+import { loadNovelAnalysisProvider, withNovelAnalysisProvider, type NovelAnalysisProviderModule } from "./novel-analysis-provider-lazy.js";
 import { createShotTaskPack, saveUnitTimeline } from "./timeline.js";
 import type { AssetRelationKind, BrowserGenerationUpdateStatus, BrowserPreflightInput, BrowserSubmissionReconciliationInput, BrowserUploadInput, CreativeBibleKind, ProductionWorkflowStageId, ProductionWorkflowStageStatus, ReconcileHttpGenerationSubmissionInput, ShotTiming, SubagentImageGenerationUpdateStatus, SubmitReviewInput, WorkItemStatus } from "./types.js";
 import { withProjectLock } from "./locks.js";
@@ -97,8 +99,6 @@ import {
   type PreflightPublicationInput,
 } from "./publication.js";
 import { enrichPublicationIntentWithDiagnostics } from "./studio-publication-preflight-diagnostics.js";
-import { createNovelAnalysisTask, reviewNovelAnalysisBatch, reviewNovelAnalysisItem, submitNovelAnalysisProposal } from "./novel-analysis.js";
-import { executeNextNovelAnalysisRunTask, executeNovelAnalysisTask, isNovelAnalysisExecutionSafetyError, markNovelAnalysisExecutionReconciliationRequired, novelAnalysisExecutionSafeMessage, planNovelAnalysisRun, reconcileNovelAnalysisExecution, replaceNovelAnalysisRunTask, upsertNovelAnalysisProvider } from "./novel-analysis-provider.js";
 import { ConfirmedCommandFailure, isConfirmedCommandFailure, isRejectedCommandFailure, RejectedCommandFailure } from "./command-outcome.js";
 import {
   RetrySafeSqliteBusyError,
@@ -438,17 +438,17 @@ export type CommandRequest =
   | { command: "upsert_novel_fact"; payload: Parameters<AdaptationModule["upsertNovelFact"]>[1] }
   | { command: "upsert_narrative_beat"; payload: Parameters<AdaptationModule["upsertNarrativeBeat"]>[1] }
   | { command: "export_adaptation"; payload: Parameters<AdaptationModule["exportAdaptation"]>[1] }
-  | { command: "create_novel_analysis_task"; payload: Parameters<typeof createNovelAnalysisTask>[1] }
-  | { command: "submit_novel_analysis_proposal"; payload: Parameters<typeof submitNovelAnalysisProposal>[1] }
-  | { command: "review_novel_analysis_item"; payload: Parameters<typeof reviewNovelAnalysisItem>[1] }
-  | { command: "review_novel_analysis_batch"; payload: Parameters<typeof reviewNovelAnalysisBatch>[1] }
-  | { command: "upsert_novel_analysis_provider"; payload: Parameters<typeof upsertNovelAnalysisProvider>[1] }
-  | { command: "plan_novel_analysis_run"; payload: Parameters<typeof planNovelAnalysisRun>[1] }
-  | { command: "execute_novel_analysis_task"; payload: Parameters<typeof executeNovelAnalysisTask>[1] }
-  | { command: "execute_next_novel_analysis_run_task"; payload: Parameters<typeof executeNextNovelAnalysisRunTask>[1] }
-  | { command: "replace_novel_analysis_run_task"; payload: Parameters<typeof replaceNovelAnalysisRunTask>[1] }
-  | { command: "mark_novel_analysis_execution_reconciliation_required"; payload: Parameters<typeof markNovelAnalysisExecutionReconciliationRequired>[1] }
-  | { command: "reconcile_novel_analysis_execution"; payload: Parameters<typeof reconcileNovelAnalysisExecution>[1] }
+  | { command: "create_novel_analysis_task"; payload: Parameters<NovelAnalysisModule["createNovelAnalysisTask"]>[1] }
+  | { command: "submit_novel_analysis_proposal"; payload: Parameters<NovelAnalysisModule["submitNovelAnalysisProposal"]>[1] }
+  | { command: "review_novel_analysis_item"; payload: Parameters<NovelAnalysisModule["reviewNovelAnalysisItem"]>[1] }
+  | { command: "review_novel_analysis_batch"; payload: Parameters<NovelAnalysisModule["reviewNovelAnalysisBatch"]>[1] }
+  | { command: "upsert_novel_analysis_provider"; payload: Parameters<NovelAnalysisProviderModule["upsertNovelAnalysisProvider"]>[1] }
+  | { command: "plan_novel_analysis_run"; payload: Parameters<NovelAnalysisProviderModule["planNovelAnalysisRun"]>[1] }
+  | { command: "execute_novel_analysis_task"; payload: Parameters<NovelAnalysisProviderModule["executeNovelAnalysisTask"]>[1] }
+  | { command: "execute_next_novel_analysis_run_task"; payload: Parameters<NovelAnalysisProviderModule["executeNextNovelAnalysisRunTask"]>[1] }
+  | { command: "replace_novel_analysis_run_task"; payload: Parameters<NovelAnalysisProviderModule["replaceNovelAnalysisRunTask"]>[1] }
+  | { command: "mark_novel_analysis_execution_reconciliation_required"; payload: Parameters<NovelAnalysisProviderModule["markNovelAnalysisExecutionReconciliationRequired"]>[1] }
+  | { command: "reconcile_novel_analysis_execution"; payload: Parameters<NovelAnalysisProviderModule["reconcileNovelAnalysisExecution"]>[1] }
   | { command: "save_skill"; payload: Parameters<typeof saveAgentSkill>[1] }
   | { command: "create_handoff"; payload: { itemId?: string } }
   | { command: "save_unit_timeline"; payload: { unitId: string; timings: ShotTiming[] } }
@@ -5367,17 +5367,17 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
     case "select_adaptation_plan": return withAdaptation((adaptation) => adaptation.selectAdaptationPlan(projectRoot, request.payload.planId, request.payload.expectedRevision));
     case "materialize_adaptation_plan": return withAdaptation((adaptation) => adaptation.materializeSelectedAdaptationPlan(projectRoot, request.payload));
     case "regenerate_adaptation_scope": return withAdaptation((adaptation) => adaptation.regenerateAdaptationScope(projectRoot, request.payload));
-    case "create_novel_analysis_task": return createNovelAnalysisTask(projectRoot, request.payload);
-    case "submit_novel_analysis_proposal": return submitNovelAnalysisProposal(projectRoot, request.payload);
-    case "review_novel_analysis_item": return reviewNovelAnalysisItem(projectRoot, request.payload);
-    case "review_novel_analysis_batch": return reviewNovelAnalysisBatch(projectRoot, request.payload);
-    case "upsert_novel_analysis_provider": return upsertNovelAnalysisProvider(projectRoot, request.payload);
-    case "plan_novel_analysis_run": return planNovelAnalysisRun(projectRoot, request.payload);
-    case "execute_novel_analysis_task": return executeNovelAnalysisTask(projectRoot, request.payload);
-    case "execute_next_novel_analysis_run_task": return executeNextNovelAnalysisRunTask(projectRoot, request.payload);
-    case "replace_novel_analysis_run_task": return replaceNovelAnalysisRunTask(projectRoot, request.payload);
-    case "mark_novel_analysis_execution_reconciliation_required": return markNovelAnalysisExecutionReconciliationRequired(projectRoot, request.payload);
-    case "reconcile_novel_analysis_execution": return reconcileNovelAnalysisExecution(projectRoot, request.payload);
+    case "create_novel_analysis_task": return withNovelAnalysis((novelAnalysis) => novelAnalysis.createNovelAnalysisTask(projectRoot, request.payload));
+    case "submit_novel_analysis_proposal": return withNovelAnalysis((novelAnalysis) => novelAnalysis.submitNovelAnalysisProposal(projectRoot, request.payload));
+    case "review_novel_analysis_item": return withNovelAnalysis((novelAnalysis) => novelAnalysis.reviewNovelAnalysisItem(projectRoot, request.payload));
+    case "review_novel_analysis_batch": return withNovelAnalysis((novelAnalysis) => novelAnalysis.reviewNovelAnalysisBatch(projectRoot, request.payload));
+    case "upsert_novel_analysis_provider": return withNovelAnalysisProvider((provider) => provider.upsertNovelAnalysisProvider(projectRoot, request.payload));
+    case "plan_novel_analysis_run": return withNovelAnalysisProvider((provider) => provider.planNovelAnalysisRun(projectRoot, request.payload));
+    case "execute_novel_analysis_task": return withNovelAnalysisProvider((provider) => provider.executeNovelAnalysisTask(projectRoot, request.payload));
+    case "execute_next_novel_analysis_run_task": return withNovelAnalysisProvider((provider) => provider.executeNextNovelAnalysisRunTask(projectRoot, request.payload));
+    case "replace_novel_analysis_run_task": return withNovelAnalysisProvider((provider) => provider.replaceNovelAnalysisRunTask(projectRoot, request.payload));
+    case "mark_novel_analysis_execution_reconciliation_required": return withNovelAnalysisProvider((provider) => provider.markNovelAnalysisExecutionReconciliationRequired(projectRoot, request.payload));
+    case "reconcile_novel_analysis_execution": return withNovelAnalysisProvider((provider) => provider.reconcileNovelAnalysisExecution(projectRoot, request.payload));
     case "upsert_novel_fact": return withAdaptation((adaptation) => adaptation.upsertNovelFact(projectRoot, request.payload));
     case "upsert_narrative_beat": return withAdaptation((adaptation) => adaptation.upsertNarrativeBeat(projectRoot, request.payload));
     case "export_adaptation": return withAdaptation((adaptation) => adaptation.exportAdaptation(projectRoot, request.payload));
@@ -6276,23 +6276,26 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
       await appendEvent(storageRoot, { actor: "codex", type: "command.cancelled", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { requestHash, error: record.error.message, projectRoot: root, committed: false } });
       throw cancellation;
     }
-    if (isNovelAnalysisExecutionCommand(input.request) && isNovelAnalysisExecutionSafetyError(error)) {
-      // 小说正文外发通道的 pre-dispatch 与 post-dispatch 错误只能进入稳定投影。
-      // 特别是不能复用通用 command 事件的 projectRoot 字段：它会把本机绝对路径
-      // 和底层错误一起暴露给账本读取面或 Renderer。
-      const safeMessage = novelAnalysisExecutionSafeMessage(error);
-      const preDispatch = error.phase === "pre_dispatch";
-      record.status = preDispatch ? "failed" : "unknown";
-      record.result = undefined;
-      record.error = { message: safeMessage, observedAt };
-      record.executedAt = observedAt;
-      const stored = await persistRecord();
-      if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, stored);
-      const eventType = preDispatch ? "command.failed" : "command.outcome-unknown";
-      const eventData = { requestHash, error: safeMessage, novelAnalysisSafetyCode: error.code, phase: error.phase };
-      await appendEvent(storageRoot, { actor: "codex", type: eventType, requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: eventData });
-      if (storageRoot !== root) await appendEvent(root, { actor: "codex", type: eventType, requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: eventData });
-      throw error;
+    if (isNovelAnalysisExecutionCommand(input.request)) {
+      const provider = await loadNovelAnalysisProvider();
+      if (provider.isNovelAnalysisExecutionSafetyError(error)) {
+        // 小说正文外发通道的 pre-dispatch 与 post-dispatch 错误只能进入稳定投影。
+        // 特别是不能复用通用 command 事件的 projectRoot 字段：它会把本机绝对路径
+        // 和底层错误一起暴露给账本读取面或 Renderer。
+        const safeMessage = provider.novelAnalysisExecutionSafeMessage(error);
+        const preDispatch = error.phase === "pre_dispatch";
+        record.status = preDispatch ? "failed" : "unknown";
+        record.result = undefined;
+        record.error = { message: safeMessage, observedAt };
+        record.executedAt = observedAt;
+        const stored = await persistRecord();
+        if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, stored);
+        const eventType = preDispatch ? "command.failed" : "command.outcome-unknown";
+        const eventData = { requestHash, error: safeMessage, novelAnalysisSafetyCode: error.code, phase: error.phase };
+        await appendEvent(storageRoot, { actor: "codex", type: eventType, requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: eventData });
+        if (storageRoot !== root) await appendEvent(root, { actor: "codex", type: eventType, requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: eventData });
+        throw error;
+      }
     }
     if (isRejectedCommandFailure(error)) {
       record.status = "failed";

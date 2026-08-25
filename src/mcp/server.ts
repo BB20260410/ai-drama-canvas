@@ -44,6 +44,8 @@ import { withAdaptation, type AdaptationModule } from "../core/adaptation-lazy.j
 import { withEditor } from "../core/editor-lazy.js";
 import { withNovelAgent, type NovelAgentModule } from "../core/novel-agent-lazy.js";
 import { withStory, type StoryModule } from "../core/story-lazy.js";
+import { withNovelAnalysis, type NovelAnalysisModule } from "../core/novel-analysis-lazy.js";
+import { withNovelAnalysisProvider, type NovelAnalysisProviderModule } from "../core/novel-analysis-provider-lazy.js";
 import { editKeyframeCurveIssue, editKeyframeSourceTransformIssue } from "../core/keyframe-curve.js";
 import { doctorProject, getCapabilities, getProjectChanges, getProjectSnapshot, getStudioGenerationControlEnvelope } from "../core/codex.js";
 import { analyzeChangeImpact, commitExistingProductionRecovery, getProductionWorkflow, getStoryboard, listCreativeBibles, previewExistingProductionRecovery, updateProductionWorkflowStage, upsertCreativeBible, upsertStoryboardRow } from "../core/production.js";
@@ -71,10 +73,8 @@ import type { StudioProductionDashboardQuery } from "../core/studio-production-d
 import { listAssetRelations, listVoiceIdentities, upsertAssetRelation, upsertVoiceIdentity } from "../core/asset-registry.js";
 import type { EditProject, GenerationJob, GenerationProvider, GenerationSettings } from "../core/types.js";
 import { PUBLICATION_KINDS, PUBLICATION_PURPOSES, PUBLICATION_VARIANTS, listPublicationIntents, listPublicationReceipts } from "../core/publication.js";
-import { createNovelAnalysisTask, listNovelAnalysisReviews, reviewNovelAnalysisBatch, reviewNovelAnalysisItem, submitNovelAnalysisProposal } from "../core/novel-analysis.js";
 import { isNovelWritingStateRejectedError } from "../core/novel-writing-state.js";
 import { NOVEL_MANUSCRIPT_COMMAND_SCHEMA_OPTIONS } from "../core/novel-command-runtime.js";
-import { getNovelAnalysisExecutionRecoveryStatus, getNovelAnalysisProviderSettings, getNovelAnalysisRunProgress, listNovelAnalysisRunProgress, probeNovelAnalysisProvider } from "../core/novel-analysis-provider.js";
 import type { ScanProgress } from "../core/scanner.js";
 import { inspectFusionPackage } from "../core/fusion-package.js";
 import { loadFusionProductionAssets } from "../core/fusion-production.js";
@@ -217,6 +217,18 @@ const upsertNovelFact = (...args: Parameters<AdaptationModule["upsertNovelFact"]
   withAdaptation((adaptation) => adaptation.upsertNovelFact(...args));
 const validateAdaptationPlan = (...args: Parameters<AdaptationModule["validateAdaptationPlan"]>) =>
   withAdaptation((adaptation) => adaptation.validateAdaptationPlan(...args));
+const listNovelAnalysisReviews = (...args: Parameters<NovelAnalysisModule["listNovelAnalysisReviews"]>) =>
+  withNovelAnalysis((novelAnalysis) => novelAnalysis.listNovelAnalysisReviews(...args));
+const getNovelAnalysisProviderSettings = (...args: Parameters<NovelAnalysisProviderModule["getNovelAnalysisProviderSettings"]>) =>
+  withNovelAnalysisProvider((provider) => provider.getNovelAnalysisProviderSettings(...args));
+const probeNovelAnalysisProvider = (...args: Parameters<NovelAnalysisProviderModule["probeNovelAnalysisProvider"]>) =>
+  withNovelAnalysisProvider((provider) => provider.probeNovelAnalysisProvider(...args));
+const getNovelAnalysisRunProgress = (...args: Parameters<NovelAnalysisProviderModule["getNovelAnalysisRunProgress"]>) =>
+  withNovelAnalysisProvider((provider) => provider.getNovelAnalysisRunProgress(...args));
+const listNovelAnalysisRunProgress = (...args: Parameters<NovelAnalysisProviderModule["listNovelAnalysisRunProgress"]>) =>
+  withNovelAnalysisProvider((provider) => provider.listNovelAnalysisRunProgress(...args));
+const getNovelAnalysisExecutionRecoveryStatus = (...args: Parameters<NovelAnalysisProviderModule["getNovelAnalysisExecutionRecoveryStatus"]>) =>
+  withNovelAnalysisProvider((provider) => provider.getNovelAnalysisExecutionRecoveryStatus(...args));
 const buildNovelContextPack = (...args: Parameters<NovelAgentModule["buildNovelContextPack"]>) =>
   withNovelAgent((novelAgent) => novelAgent.buildNovelContextPack(...args));
 const compareNovelWritingSourceReceipts = (...args: Parameters<NovelAgentModule["compareNovelWritingSourceReceipts"]>) =>

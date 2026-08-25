@@ -13,6 +13,7 @@ import { readAgentSkills } from "./skills.js";
 import { NOVEL_AGENT_CAPABILITIES } from "./novel-agent-capabilities.js";
 import { withAdaptation } from "./adaptation-lazy.js";
 import { withStory } from "./story-lazy.js";
+import { withNovelAnalysisProvider } from "./novel-analysis-provider-lazy.js";
 import { auditExistingProductionBaselines, getProductionWorkflow, getStoryboard, listCreativeBibles } from "./production.js";
 import { listAssetRelations, listVoiceIdentities } from "./asset-registry.js";
 import { listProjectLocks } from "./locks.js";
@@ -20,7 +21,6 @@ import { listPublicationIntents, publicationTargetExists } from "./publication.j
 import { listCommandLedger } from "./command-bus.js";
 import { resolveRuntimeBuildIdentity, type BuildIdentity } from "./build-identity.js";
 import { assertRuntimeBuildCurrentness } from "./project-backup.js";
-import { getNovelAnalysisExecutionRecoveryStatus, getNovelAnalysisProviderSettings, listNovelAnalysisRunProgress } from "./novel-analysis-provider.js";
 import { getCanvasHistoryInfo, getCanvasSemanticState } from "./canvas-state.js";
 import { getFusionAssetConsistencyState, type FusionAssetConsistencyState } from "./fusion-asset-consistency.js";
 import { getUnitTimelines } from "./timeline.js";
@@ -1089,7 +1089,7 @@ export async function getCapabilities(
     const absoluteRoot = path.resolve(projectRoot);
     const index = await loadIndex(absoluteRoot);
     const settings = await readJson<GenerationSettings | null>(getSidecarPaths(absoluteRoot).generationSettings, null);
-    const analysisSettings = await getNovelAnalysisProviderSettings(absoluteRoot);
+    const analysisSettings = await withNovelAnalysisProvider((provider) => provider.getNovelAnalysisProviderSettings(absoluteRoot));
     project = {
       root: absoluteRoot,
       imported: Boolean(index),
@@ -2035,7 +2035,7 @@ export async function doctorProject(projectRoot: string) {
   if (settings?.defaultVideoProviderId && !providers.some((provider) => provider.id === settings.defaultVideoProviderId && provider.enabled)) providerIssues.push("默认视频供应商不存在或未启用");
   if (!sidecarFailed("generation-settings-corrupt")) checks.push({ id: "generation-providers", level: providerIssues.length ? "warning" : "ok", title: "生成供应商", detail: providerIssues.length ? providerIssues.join("；") : `${providers.filter((provider) => provider.enabled).length} 个已启用供应商，基础配置完整。`, suggestedAction: providerIssues.length ? "在项目设置/生成队列中修正供应商能力与凭据环境变量。" : undefined });
 
-  const analysisSettings = await diagnoseSidecar<NovelAnalysisProviderSettings>("analysis-provider-settings-corrupt", "小说分析模型配置", paths.storyAnalysisProviders, () => getNovelAnalysisProviderSettings(root), { schemaVersion: 1, revision: 0, providers: [], updatedAt: new Date(0).toISOString() });
+  const analysisSettings = await diagnoseSidecar<NovelAnalysisProviderSettings>("analysis-provider-settings-corrupt", "小说分析模型配置", paths.storyAnalysisProviders, () => withNovelAnalysisProvider((provider) => provider.getNovelAnalysisProviderSettings(root)), { schemaVersion: 1, revision: 0, providers: [], updatedAt: new Date(0).toISOString() });
   const analysisProviderIssues = analysisSettings.providers.filter((provider) => provider.enabled).flatMap((provider) => {
     const issues: string[] = [];
     if (provider.adapter === "openai-compatible" && !provider.baseUrl) issues.push(`${provider.name} 缺少 Base URL`);
@@ -2071,9 +2071,9 @@ export async function doctorProject(projectRoot: string) {
     const pendingAnalysisReviews = adaptationWorkspace.analysisReviews.filter((review) => review.status === "pending");
     const evidenceIssueReviews = pendingAnalysisReviews.filter((review) => review.evidenceIssues.length);
     const uncertainAnalysisTasks = adaptationWorkspace.analysisTasks.filter((task) => ["executing", "reconciliation_required", "submission_unknown"].includes(task.status));
-    const analysisExecutionRecovery = await getNovelAnalysisExecutionRecoveryStatus(root).catch(() => null);
+    const analysisExecutionRecovery = await withNovelAnalysisProvider((provider) => provider.getNovelAnalysisExecutionRecoveryStatus(root)).catch(() => null);
     const reconciliationCandidates = analysisExecutionRecovery?.candidates.length ?? 0;
-    const analysisRuns = await listNovelAnalysisRunProgress(root).catch(() => []);
+    const analysisRuns = await withNovelAnalysisProvider((provider) => provider.listNovelAnalysisRunProgress(root)).catch(() => []);
     const blockedAnalysisRuns = analysisRuns.filter((run) => run.status === "blocked" || run.status === "stale");
     const missingAnalysisTaskFiles = (await Promise.all(adaptationWorkspace.analysisTasks.flatMap((task) => [task.taskJsonPath, task.taskMarkdownPath]).map(async (filePath) => await canAccess(filePath, fsConstants.R_OK) ? "" : filePath))).filter(Boolean);
     const adaptationWarning = Boolean(planErrors || evidenceIssueReviews.length || missingAnalysisTaskFiles.length || uncertainAnalysisTasks.length || blockedAnalysisRuns.length || reconciliationCandidates);

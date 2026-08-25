@@ -121,8 +121,8 @@ import type { EditOperation } from "../core/editor.js";
 import { analyzeChangeImpact, getProductionWorkflow, getStoryboard, listCreativeBibles, updateProductionWorkflowStage, upsertCreativeBible, upsertStoryboardRow } from "../core/production.js";
 import { withAdaptation, type AdaptationModule } from "../core/adaptation-lazy.js";
 import { listAssetRelations, listVoiceIdentities, upsertAssetRelation, upsertVoiceIdentity } from "../core/asset-registry.js";
-import { createNovelAnalysisTask, listNovelAnalysisReviews, reviewNovelAnalysisBatch, reviewNovelAnalysisItem } from "../core/novel-analysis.js";
-import { getNovelAnalysisProviderSettings, getNovelAnalysisRunProgress, listNovelAnalysisRunProgress, probeNovelAnalysisProvider } from "../core/novel-analysis-provider.js";
+import { withNovelAnalysis, type NovelAnalysisModule } from "../core/novel-analysis-lazy.js";
+import { withNovelAnalysisProvider, type NovelAnalysisProviderModule } from "../core/novel-analysis-provider-lazy.js";
 import {
   executeIdempotentCommand,
   getNovelImportCommandOwnerRoot,
@@ -327,6 +327,16 @@ const upsertNovelFact = (...args: Parameters<AdaptationModule["upsertNovelFact"]
   withAdaptation((adaptation) => adaptation.upsertNovelFact(...args));
 const validateAdaptationPlan = (...args: Parameters<AdaptationModule["validateAdaptationPlan"]>) =>
   withAdaptation((adaptation) => adaptation.validateAdaptationPlan(...args));
+const listNovelAnalysisReviews = (...args: Parameters<NovelAnalysisModule["listNovelAnalysisReviews"]>) =>
+  withNovelAnalysis((novelAnalysis) => novelAnalysis.listNovelAnalysisReviews(...args));
+const getNovelAnalysisProviderSettings = (...args: Parameters<NovelAnalysisProviderModule["getNovelAnalysisProviderSettings"]>) =>
+  withNovelAnalysisProvider((provider) => provider.getNovelAnalysisProviderSettings(...args));
+const probeNovelAnalysisProvider = (...args: Parameters<NovelAnalysisProviderModule["probeNovelAnalysisProvider"]>) =>
+  withNovelAnalysisProvider((provider) => provider.probeNovelAnalysisProvider(...args));
+const getNovelAnalysisRunProgress = (...args: Parameters<NovelAnalysisProviderModule["getNovelAnalysisRunProgress"]>) =>
+  withNovelAnalysisProvider((provider) => provider.getNovelAnalysisRunProgress(...args));
+const listNovelAnalysisRunProgress = (...args: Parameters<NovelAnalysisProviderModule["listNovelAnalysisRunProgress"]>) =>
+  withNovelAnalysisProvider((provider) => provider.listNovelAnalysisRunProgress(...args));
 const discoverDuduReadonlyImportProjects = (...args: Parameters<DuduReadonlyImportModule["discoverDuduReadonlyImportProjects"]>) =>
   withDuduReadonlyImport((dudu) => dudu.discoverDuduReadonlyImportProjects(...args));
 const getDuduReadonlyImportControl = (...args: Parameters<DuduReadonlyImportModule["getDuduReadonlyImportControl"]>) =>
@@ -3803,47 +3813,47 @@ function registerIpc(): void {
   ipcMain.handle("canvas:materialize-adaptation-plan", async (_event, projectRoot: string, input: Parameters<typeof materializeSelectedAdaptationPlan>[1]) => materializeSelectedAdaptationPlan(await requireLegacyStoryMutationProjectRoot(projectRoot), input));
   ipcMain.handle("canvas:analyze-adaptation-impact", (_event, projectRoot: string, input: Parameters<typeof analyzeAdaptationChangeImpact>[1]) => analyzeAdaptationChangeImpact(projectRoot, input));
   ipcMain.handle("canvas:regenerate-adaptation-scope", async (_event, projectRoot: string, input: Parameters<typeof regenerateAdaptationScope>[1]) => regenerateAdaptationScope(await requireLegacyStoryMutationProjectRoot(projectRoot), input));
-  ipcMain.handle("canvas:create-novel-analysis-task", async (_event, projectRoot: string, input: Parameters<typeof createNovelAnalysisTask>[1]) => {
+  ipcMain.handle("canvas:create-novel-analysis-task", async (_event, projectRoot: string, input: Parameters<NovelAnalysisModule["createNovelAnalysisTask"]>[1]) => {
     const idempotencyKey = `ui-analysis-task-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "create_novel_analysis_task", payload: input } });
     return result.result;
   });
-  ipcMain.handle("canvas:list-novel-analysis-reviews", (_event, projectRoot: string, options?: Parameters<typeof listNovelAnalysisReviews>[1]) => listNovelAnalysisReviews(projectRoot, options));
-  ipcMain.handle("canvas:review-novel-analysis-item", async (_event, projectRoot: string, input: Parameters<typeof reviewNovelAnalysisItem>[1]) => {
+  ipcMain.handle("canvas:list-novel-analysis-reviews", (_event, projectRoot: string, options?: Parameters<NovelAnalysisModule["listNovelAnalysisReviews"]>[1]) => listNovelAnalysisReviews(projectRoot, options));
+  ipcMain.handle("canvas:review-novel-analysis-item", async (_event, projectRoot: string, input: Parameters<NovelAnalysisModule["reviewNovelAnalysisItem"]>[1]) => {
     const idempotencyKey = `ui-analysis-review-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "review_novel_analysis_item", payload: input } });
     return result.result;
   });
-  ipcMain.handle("canvas:review-novel-analysis-batch", async (_event, projectRoot: string, input: Parameters<typeof reviewNovelAnalysisBatch>[1]) => {
+  ipcMain.handle("canvas:review-novel-analysis-batch", async (_event, projectRoot: string, input: Parameters<NovelAnalysisModule["reviewNovelAnalysisBatch"]>[1]) => {
     const idempotencyKey = `ui-analysis-review-batch-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "review_novel_analysis_batch", payload: input } });
     return result.result;
   });
   ipcMain.handle("canvas:get-novel-analysis-providers", (_event, projectRoot: string) => getNovelAnalysisProviderSettings(projectRoot));
   ipcMain.handle("canvas:probe-novel-analysis-provider", (_event, projectRoot: string, providerId: string) => probeNovelAnalysisProvider(projectRoot, providerId));
-  ipcMain.handle("canvas:upsert-novel-analysis-provider", async (_event, projectRoot: string, input: Parameters<typeof import("../core/novel-analysis-provider.js").upsertNovelAnalysisProvider>[1]) => {
+  ipcMain.handle("canvas:upsert-novel-analysis-provider", async (_event, projectRoot: string, input: Parameters<NovelAnalysisProviderModule["upsertNovelAnalysisProvider"]>[1]) => {
     const idempotencyKey = `ui-analysis-provider-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "upsert_novel_analysis_provider", payload: input } });
     return result.result;
   });
-  ipcMain.handle("canvas:plan-novel-analysis-run", async (_event, projectRoot: string, input: Parameters<typeof import("../core/novel-analysis-provider.js").planNovelAnalysisRun>[1]) => {
+  ipcMain.handle("canvas:plan-novel-analysis-run", async (_event, projectRoot: string, input: Parameters<NovelAnalysisProviderModule["planNovelAnalysisRun"]>[1]) => {
     const idempotencyKey = `ui-analysis-run-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "plan_novel_analysis_run", payload: input } });
     return result.result;
   });
   ipcMain.handle("canvas:list-novel-analysis-runs", (_event, projectRoot: string) => listNovelAnalysisRunProgress(projectRoot));
   ipcMain.handle("canvas:get-novel-analysis-run", (_event, projectRoot: string, runId: string) => getNovelAnalysisRunProgress(projectRoot, runId));
-  ipcMain.handle("canvas:execute-next-novel-analysis-run-task", async (_event, projectRoot: string, input: Parameters<typeof import("../core/novel-analysis-provider.js").executeNextNovelAnalysisRunTask>[1]) => {
+  ipcMain.handle("canvas:execute-next-novel-analysis-run-task", async (_event, projectRoot: string, input: Parameters<NovelAnalysisProviderModule["executeNextNovelAnalysisRunTask"]>[1]) => {
     const idempotencyKey = `ui-analysis-run-next-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "execute_next_novel_analysis_run_task", payload: input } });
     return result.result;
   });
-  ipcMain.handle("canvas:replace-novel-analysis-run-task", async (_event, projectRoot: string, input: Parameters<typeof import("../core/novel-analysis-provider.js").replaceNovelAnalysisRunTask>[1]) => {
+  ipcMain.handle("canvas:replace-novel-analysis-run-task", async (_event, projectRoot: string, input: Parameters<NovelAnalysisProviderModule["replaceNovelAnalysisRunTask"]>[1]) => {
     const idempotencyKey = `ui-analysis-run-replace-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "replace_novel_analysis_run_task", payload: input } });
     return result.result;
   });
-  ipcMain.handle("canvas:execute-novel-analysis-task", async (_event, projectRoot: string, input: Parameters<typeof import("../core/novel-analysis-provider.js").executeNovelAnalysisTask>[1]) => {
+  ipcMain.handle("canvas:execute-novel-analysis-task", async (_event, projectRoot: string, input: Parameters<NovelAnalysisProviderModule["executeNovelAnalysisTask"]>[1]) => {
     const idempotencyKey = `ui-analysis-execute-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "execute_novel_analysis_task", payload: input } });
     return result.result;
