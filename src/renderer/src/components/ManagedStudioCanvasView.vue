@@ -36,9 +36,9 @@
         >
           构建身份 v{{ runtimeBuildIdentity.packageVersion }} · buildId:{{ runtimeBuildIdentity.buildId.slice(0, 12) }} · sourceDigest:{{ runtimeBuildIdentity.sourceDigest.slice(0, 12) }}
         </div>
-        <details v-if="productionDiagnostics" class="diagnostics-detail" data-testid="managed-canvas-diagnostics-detail">
+        <details class="diagnostics-detail" data-testid="managed-canvas-diagnostics-detail" @toggle="onProductionDiagnosticsToggle">
           <summary data-testid="managed-canvas-detailed-diagnostics">详细诊断</summary>
-          <div class="diagnostics-grid">
+          <div v-if="productionDiagnostics" class="diagnostics-grid">
             <span>派发 <b>{{ productionDiagnostics.counts.dispatches }}</b></span>
             <span>结果 <b>{{ productionDiagnostics.counts.results }}</b></span>
             <span>raw <b>{{ productionDiagnostics.counts.rawResults }}</b></span>
@@ -48,6 +48,7 @@
             <span>Run: 成功<b>{{ productionDiagnostics.runStateDistribution.succeeded }}</b> 失败<b>{{ productionDiagnostics.runStateDistribution.failed }}</b> 取消<b>{{ productionDiagnostics.runStateDistribution.cancelled }}</b> 飞行<b>{{ productionDiagnostics.runStateDistribution.inFlight }}</b></span>
             <small>诊断耗时 {{ productionDiagnostics.durationMs }}ms</small>
           </div>
+          <p v-else class="diagnostics-grid">{{ productionDiagnosticsLoading ? "正在读取诊断…" : "展开后读取整集诊断。" }}</p>
         </details>
       </details>
       <div class="header-actions">
@@ -1002,8 +1003,10 @@ const pinnedAssetController = createDashboardLoadController();
 const timelineProjection = useStudioTimelineProjection(computed(() => props.projectRoot));
 // T15: 单元级写租约显示（谁正在写哪个单元）
 const unitLeaseDisplayHint = ref<string | null>(null);
-// T14: 生产诊断（真实状态，禁止推算）
+// T14: 生产诊断（真实状态，禁止推算）。默认不拉；展开「详细诊断」才物化整集。
 const productionDiagnostics = ref<any>(null);
+const productionDiagnosticsOpen = ref(false);
+const productionDiagnosticsLoading = ref(false);
 /** 运行时构建身份（release-manifest / 源码 digest），供 UI 验收与排障。 */
 const runtimeBuildIdentity = ref<{
   packageVersion: string;
@@ -6541,11 +6544,19 @@ async function refreshUnitLeaseDisplay(): Promise<void> {
   }
 }
 
-/** T14: 加载生产诊断（真实状态，禁止“宫格数×3”推算）。 */
+function onProductionDiagnosticsToggle(event: Event): void {
+  const el = event.currentTarget;
+  if (!(el instanceof HTMLDetailsElement)) return;
+  productionDiagnosticsOpen.value = el.open;
+  if (el.open) void refreshProductionDiagnostics();
+}
+
+/** T14: 加载生产诊断（真实状态，禁止“宫格数×3”推算）。仅展开详细诊断时调用。 */
 async function refreshProductionDiagnostics(): Promise<void> {
   const projectRoot = props.projectRoot;
   const requestSequence = refreshSequence;
   const isCurrent = () => projectRoot === props.projectRoot && requestSequence === refreshSequence;
+  if (isCurrent()) productionDiagnosticsLoading.value = true;
   try {
     const api = (window as any).canvasApi;
     if (!api?.getStudioProductionDiagnostics) {
@@ -6557,6 +6568,8 @@ async function refreshProductionDiagnostics(): Promise<void> {
     productionDiagnostics.value = diagnostics;
   } catch {
     if (isCurrent()) productionDiagnostics.value = null;
+  } finally {
+    if (isCurrent()) productionDiagnosticsLoading.value = false;
   }
 }
 
@@ -6791,8 +6804,8 @@ async function refreshAll(): Promise<void> {
     // T12: loadUnits 已按当前页面唯一季集刷新批量投影；多季集混排不猜测。
     // T15: 刷新单元级写租约显示
     void refreshUnitLeaseDisplay();
-    // T14: 加载生产诊断（真实计数）
-    void refreshProductionDiagnostics();
+    // T14: 详细诊断含整集 canonical + 写版 inspect，不得在 36 单元首屏默认物化。
+    if (productionDiagnosticsOpen.value) void refreshProductionDiagnostics();
     // 来源预览只读但可能遍历较大目录，首屏完成后后台核对，不阻塞画布可用性。
     void refreshLocalProductionPreview(projectRoot, requestSequence);
     rebuildGraph();
@@ -8487,6 +8500,7 @@ watch(() => props.projectRoot, async (_projectRoot, previousProjectRoot) => {
   overview.value = null;
   unitLeaseDisplayHint.value = null;
   productionDiagnostics.value = null;
+  productionDiagnosticsLoading.value = false;
   localProductionPreview.value = null;
   localCreativeIngestStatus.value = null;
   localProductionPreviewLoading.value = false;

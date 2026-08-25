@@ -16,6 +16,7 @@
 - [x] Wave 2-F M7 残差：`frozenReferenceThumbnailCache` 同工程 `createBoundedKeyedCache(96)`，只持 Promise/URL
 - [x] Wave 2-C：Linux 有界对照（返回集 ⊆ 请求 id；省略=全量）。P7 owner 对照仍需 Darwin
 - [x] Wave 2 §1.3 残差：有界 `unitIds` 走 `listStudioProductionUnitIdentitiesByIds`，不再翻页扫集；2500 末页 36 Linux mock 只走 by-id。P7 仍需 Darwin
+- [x] Wave 2 §1.3 残差：画布详细诊断展开才读整集 diagnostics；refreshAll 默认不拉
 - [x] Wave 2 bundle：驾驶舱正式时间线只物化当前+前后邻；多媒体 storyboard 只请求当前单元。阶段名不变
 - [x] Wave 3-A：earliest / approved-timeline / align-board 改 `inspectManagedProjectReadOnly`
 - [x] Wave 3-B：`assertGenerationLedgerSchemaFileReady` 失败关闭，不静默建库

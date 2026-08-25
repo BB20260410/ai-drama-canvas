@@ -70,6 +70,11 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     );
     expect(refreshAll).toContain("if (canvasDisposed) return");
     expect(refreshAll).toContain("const isCurrent = () => !canvasDisposed");
+    expect(refreshAll).toContain("if (productionDiagnosticsOpen.value) void refreshProductionDiagnostics()");
+    expect(refreshAll).not.toMatch(/^\s*void refreshProductionDiagnostics\(\);/mu);
+    expect(refreshAll.indexOf('emit("initialUnitCardsCommitted"')).toBeLessThan(
+      refreshAll.indexOf("if (productionDiagnosticsOpen.value) void refreshProductionDiagnostics()"),
+    );
 
     const projectRootWatch = canvas.slice(
       canvas.indexOf("watch(() => props.projectRoot"),
@@ -589,6 +594,9 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(diagnosticsBlock).not.toContain("getStudioProductionDiagnostics(props.projectRoot)");
     expect(canvasSwitchBlock).toContain("unitLeaseDisplayHint.value = null");
     expect(canvasSwitchBlock).toContain("productionDiagnostics.value = null");
+    expect(canvas).toContain("if (productionDiagnosticsOpen.value) void refreshProductionDiagnostics()");
+    expect(canvas).toContain("@toggle=\"onProductionDiagnosticsToggle\"");
+    expect(canvas).not.toContain("<details v-if=\"productionDiagnostics\" class=\"diagnostics-detail\"");
 
     const materialResetBlock = material.match(/function resetWorkspace\(\): void \{[\s\S]*?\n    \}/u)?.[0] ?? "";
     expect(materialResetBlock).toContain("actionGate.invalidate()");
@@ -2079,6 +2087,8 @@ describe("受管画布侧栏列表视口剔除", () => {
     expect(view).toContain('data-testid="managed-canvas-diagnostics-detail"');
     expect(view).toContain('data-testid="managed-canvas-detailed-diagnostics"');
     expect(view).toContain('<summary data-testid="managed-canvas-detailed-diagnostics">详细诊断</summary>');
+    expect(view).toContain("@toggle=\"onProductionDiagnosticsToggle\"");
+    expect(view).not.toContain("<details v-if=\"productionDiagnostics\" class=\"diagnostics-detail\"");
     expect(view).toContain('<summary data-testid="managed-canvas-diagnostics">诊断详情</summary>');
     expect(view).toContain('data-testid="managed-canvas-metrics" open');
     expect(view).not.toContain("managed-canvas-detailed-diagnostics-");
