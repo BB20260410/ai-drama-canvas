@@ -632,6 +632,7 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     const casMerge = source("src/renderer/src/studio-canvas-layout-cas-merge.ts");
     expect(canvas).toContain("toggleLibrary");
     expect(canvas).toContain("(assetsPage.value?.page.items ?? []).slice(0, 6)");
+    expect(canvas).toContain('left.name.localeCompare(right.name, "zh-CN", { numeric: true })');
     expect(canvas).toMatch(/async function loadAssets[\s\S]{0,500}limit:\s*36/u);
     expect(canvas).toContain("const local: StudioCanvasLayoutSemanticSnapshot = {");
     expect(canvas).toContain("workflowGroups: plainWorkflowGroups(workflowGroups.value)");

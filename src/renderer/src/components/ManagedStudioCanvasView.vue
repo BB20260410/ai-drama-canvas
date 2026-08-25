@@ -1198,7 +1198,11 @@ const assetsLibraryScrollTop = ref(0);
 const ASSET_ROW_HEIGHT = 56;
 const ASSET_VIEWPORT_HEIGHT = 360;
 const thumbnailLru = createThumbnailLru(96);
-const libraryAssetItems = computed(() => assetsPage.value?.page.items ?? []);
+const libraryAssetItems = computed(() =>
+  [...(assetsPage.value?.page.items ?? [])].sort((left, right) =>
+    left.name.localeCompare(right.name, "zh-CN", { numeric: true }),
+  ),
+);
 const assetsVirtualWindow = computed(() =>
   computeVirtualListWindow({
     itemCount: libraryAssetItems.value.length,
