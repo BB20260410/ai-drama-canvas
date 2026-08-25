@@ -20,6 +20,7 @@
 - [x] Wave 3-C：earliest 用 list 行 revision，去掉 per-unit snapshot
 - [x] Wave 3-D：ssl5 复用 align-board earliest，不二次调用
 - [x] Wave 4-A：editor / OTIO 经 `withEditor` 动态 import（不拆 command-bus 写路径）
+- [x] Wave 4 get_capabilities：握手不再 withEditor 探测 FFmpeg；deferred engine；probe_video_engine 仍实时探测
 - [x] Wave 4-B：story / adaptation / novel-agent-service 动态 import；mammoth 卸出 story 顶栏
 - [x] Wave 4-C：video-package / Higgsfield / dudu / local-creative 动态 import（mcp-projection 仍静态）
 - [x] Wave 4-D：MCP 只读诊断面抄 Main IPC `await import`（不拆 command-bus / ledger 写路径）

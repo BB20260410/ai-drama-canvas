@@ -2,7 +2,7 @@ import { constants as fsConstants } from "node:fs";
 import { access, lstat, realpath } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { withEditor } from "./editor-lazy.js";
+import { DEFERRED_VIDEO_ENGINE_CAPABILITY, withEditor } from "./editor-lazy.js";
 import { loadSharp } from "./sharp-lazy.js";
 import { generationPublicationTerminalMatchesJob, getGenerationSettings, getHttpGenerationSubmissionCheckpoint, listGenerationJobs } from "./generation.js";
 import { getContinuationSnapshot, listProjectContext } from "./memory.js";
@@ -1082,7 +1082,7 @@ export async function getCapabilities(
   projectRoot?: string,
   runtime: GetCapabilitiesRuntimeProjection = {},
 ) {
-  const engine = await withEditor((editor) => editor.probeVideoEngine());
+  const engine = DEFERRED_VIDEO_ENGINE_CAPABILITY;
   const machineMedia = await readMachineMediaRuntimeSnapshot();
   let project: Record<string, unknown> | undefined;
   if (projectRoot) {

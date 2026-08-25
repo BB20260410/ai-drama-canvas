@@ -21,3 +21,14 @@ export function loadKeyframeCurve(): Promise<KeyframeCurveModule> {
 export async function withEditor<T>(read: (editor: EditorModule) => T | Promise<T>): Promise<T> {
   return read(await loadEditor());
 }
+
+/**
+ * get_capabilities 握手不得 import editor / 探测 FFmpeg。
+ * 实时 available/path/version 只经 probe_video_engine（仍走 withEditor）。
+ */
+export const DEFERRED_VIDEO_ENGINE_CAPABILITY = {
+  status: "deferred",
+  probed: false,
+  probeTool: "probe_video_engine",
+  issues: ["get_capabilities 不探测剪辑引擎；请调用 probe_video_engine。"],
+} as const;
