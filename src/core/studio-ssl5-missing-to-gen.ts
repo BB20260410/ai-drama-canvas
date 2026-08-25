@@ -4,7 +4,6 @@
  * 从 script-media-align / missing-media 投影出「应对哪一 unit 走 freeze 链」；
  * 不自动 dispatch、不抢写租约。
  */
-import { getStudioEpisodeEarliest } from "./studio-episode-earliest.js";
 import { getStudioScriptMediaAlignBoard, type ScriptMediaAlignRow } from "./studio-script-media-align.js";
 
 export const SSL5_PLAN_SCHEMA_VERSION = 1 as const;
@@ -44,17 +43,13 @@ export async function planSsl5MissingToGen(
     ...(query.documentId ? { documentId: query.documentId } : {}),
     ...(query.evidenceDir ? { evidenceDir: query.evidenceDir } : {}),
   });
-  const earliest = await getStudioEpisodeEarliest(projectRoot, {
-    season: query.season,
-    episode: query.episode,
-    ...(query.evidenceDir ? { evidenceDir: query.evidenceDir } : {}),
-  });
+  // earliest 已由 align-board 算过；禁止二次 getStudioEpisodeEarliest。
 
   const items: Ssl5MissingToGenPlanItem[] = board.rows
-    .filter((r) => r.status !== "covered" || r.unitId === earliest.earliestUnitId)
+    .filter((r) => r.status !== "covered" || r.unitId === board.earliestUnitId)
     .map((r) => {
       let priority: Ssl5MissingToGenPlanItem["priority"] = "covered";
-      if (r.unitId === earliest.earliestUnitId) priority = "earliest";
+      if (r.unitId === board.earliestUnitId) priority = "earliest";
       else if (r.status === "missing-all") priority = "missing-all";
       else if (r.status === "partial") priority = "partial";
       return {
@@ -94,7 +89,7 @@ export async function planSsl5MissingToGen(
     projectRoot,
     season: query.season,
     episode: query.episode,
-    earliestUnitId: earliest.earliestUnitId,
+    earliestUnitId: board.earliestUnitId,
     focusUnitId: focus?.unitId ?? null,
     missingAllCount: board.missingAllCount,
     partialCount: board.partialCount,
