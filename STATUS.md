@@ -9,7 +9,7 @@
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
-| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`（含 `wave2c`、`wave2-bundle-approved-bound`）、`wave3*`、`wave4a`–`wave4f`、`wave4-capabilities-deferred-engine`、`wave4-novel-analysis-lazy`、`wave4-capabilities-settings-thin`、`wave5a`–`wave5e`、`wave5e-project-switch-evict`、`wave5e-stale-writeback-guard`、`wave6a`–`wave6c`、`wave6-reverify`、`wave6-darwin-ci-0b46327` |
+| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`（含 `wave2c`、`wave2-bundle-approved-bound`）、`wave3*`、`wave4a`–`wave4f`、`wave4-capabilities-deferred-engine`、`wave4-novel-analysis-lazy`、`wave4-capabilities-settings-thin`、`wave5a`–`wave5e`、`wave5e-project-switch-evict`、`wave5e-stale-writeback-guard`、`wave5e-darwin-ci`、`wave6a`–`wave6c`、`wave6-reverify`、`wave6-darwin-ci-0b46327` |
 | wave4b | story/adaptation/novel-agent 经 withX 动态 import；story.ts 顶栏已卸 mammoth（docx 分支动态加载）。doctor 仍会 `import("mammoth")` 探测；snapshot 会 withStory，doctor 会 withStory+withAdaptation |
 | wave4c | video-package / Higgsfield queue+video / dudu / local-creative 经 withX。mcp-projection 仍静态（同步消毒、无重依赖）。调用对应控制面/写命令仍会加载 |
 | wave4d | MCP 只读诊断面 earliest / bundle / dashboard / multimedia / write-lease / reader / align 经 withX；session-snapshot 不再静态拉 bundle。command-bus 仍静态拉 ledger。codex 仍静态拉 session-snapshot.js 本身。Main dashboard 顶栏未卸（T23）。get_active_managed_studio_context 仍会加载 write-lease |
@@ -41,8 +41,9 @@
 | wave6b | 未跑安装版 T23（owner 未点名；本 Cloud 无 macOS App / 无正式工程 GUI）。不得称整包完成 |
 | wave6c | 对照 §1 八条；纠正 composable 空 unitIds 与 executor 边界注释。Linux npm test 64 文件失败（dirfd）；边界合同已修。整计划部分完成 |
 | wave6-reverify | 两路审查 PASS（无 must-fix）。`typecheck:app` PASS。Linux 定向 35 files / 305 tests PASS。§1.4 源码合同改为已完成（editor/adaptation/novel 已懒加载）。安装版 T23 / P7 / 列表探针仍 NOT_RUN。未改源码 |
-| wave6-darwin-ci | macos-latest CI check **success** on `0b46327`（run `32881922045`）。HEAD `ba0e4ab`（W5-E evict/写回）CI 仍 queued。不是安装版 T23 |
-| earliest_next | **本 Cloud 可落地切片已尽**。真阻塞仅 owner/Darwin：安装版 T23、列表翻页探针；HEAD CI 仍 queued。禁拆 command-bus ledger。禁止 N124 / 禁止写「运行速度已关账」 |
+| wave6-darwin-ci | macos-latest CI check **success** on `0b46327`（run `32881922045`）。不是安装版 T23 |
+| wave5e-darwin-ci | macos-latest CI check **success** on `3f04d05`（evict，run `32883471735`）与 `84b594c`（写回拦截，run `32883952438`）。不是安装版 T23 |
+| earliest_next | **本 Cloud 可落地切片已尽**。真阻塞仅 owner/Darwin：安装版 T23、列表翻页探针。禁拆 command-bus ledger。禁止 N124 / 禁止写「运行速度已关账」 |
 
 ## 2026-08-25 · 本机人物库同步
 

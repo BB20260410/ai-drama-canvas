@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "5-E-darwin-ci",
+  "recordedAt": "2026-08-25T18:51:00Z",
+  "change": {
+    "kind": "verification-only",
+    "sourceCodeChanged": false,
+    "note": "macos-latest CI check 覆盖 W5-E Main evict 与在途写回拦截两个源码提交。"
+  },
+  "verification": {
+    "platform": "macos-latest",
+    "runs": [
+      {
+        "headSha": "3f04d05b830ada79696736e3858bc0fc59e7ac42",
+        "subject": "性能：切工程时淘汰旧工程 verifiedFileCache",
+        "runId": 32883471735,
+        "url": "https://github.com/BB20260410/ai-drama-canvas/actions/runs/32883471735",
+        "conclusion": "success"
+      },
+      {
+        "headSha": "84b594c0cd9d703eb2bae2ab7e68a2c8c05e0285",
+        "subject": "修复：离开工程后在途 inspect 不得写回 verifiedFileCache",
+        "runId": 32883952438,
+        "url": "https://github.com/BB20260410/ai-drama-canvas/actions/runs/32883952438",
+        "conclusion": "success"
+      }
+    ],
+    "installedT23": "NOT_RUN",
+    "listFlipProbe": "NOT_RUN"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "overwrote20260811Final": false
+  },
+  "claim": "W5-E 源码提交 macos-latest CI check SUCCESS。不是安装版 T23。禁止写「运行速度已关账」。",
+  "residual": [
+    "HEAD 文档提交 CI 可能仍 queued/in_progress",
+    "安装版 T23 / 列表翻页探针仍 NOT_RUN"
+  ]
+}
