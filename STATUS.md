@@ -9,14 +9,14 @@
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
-| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`（含 `wave2c`、`wave2-bundle-approved-bound`、`wave2-unitids-by-id`、`wave2-diagnostics-lazy-open`、`wave2-episode-lean-identities`、`wave2f-reference-cache-lru`）、`wave3*`、`wave4a`–`wave4f`、`wave4-capabilities-deferred-engine`、`wave4-novel-analysis-lazy`、`wave4-capabilities-settings-thin`、`wave5a`–`wave5e`、`wave5e-project-switch-evict`、`wave5e-stale-writeback-guard`、`wave5e-darwin-ci`、`wave5-list-flip-source-contract`、`wave5-list-flip-protocol-classify`、`wave5-list-flip-darwin-ci-379df38`、`wave6a`–`wave6c`、`wave6-reverify`、`wave6-reverify-expanded`、`wave6-darwin-ci-0b46327`、`wave6-darwin-ci-e1ea3f1`、`wave6-darwin-ci-36abafb`、`sqlite-busy-wall-flake`、`sqlite-shm-binding-race` |
+| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`（含 `wave2c`、`wave2-bundle-approved-bound`、`wave2-unitids-by-id`、`wave2-diagnostics-lazy-open`、`wave2-episode-lean-identities`、`wave2f-reference-cache-lru`）、`wave3*`、`wave4a`–`wave4f`、`wave4-capabilities-deferred-engine`、`wave4-novel-analysis-lazy`、`wave4-capabilities-settings-thin`、`wave5a`–`wave5e`、`wave5e-project-switch-evict`、`wave5e-stale-writeback-guard`、`wave5e-darwin-ci`、`wave5-list-flip-source-contract`、`wave5-list-flip-protocol-classify`、`wave5-list-flip-darwin-ci-379df38`、`wave6a`–`wave6c`、`wave6-reverify`、`wave6-reverify-expanded`、`wave6-reverify-after-lean`、`wave6-darwin-ci-0b46327`、`wave6-darwin-ci-e1ea3f1`、`wave6-darwin-ci-36abafb`、`sqlite-busy-wall-flake`、`sqlite-shm-binding-race` |
 | wave4b | story/adaptation/novel-agent 经 withX 动态 import；story.ts 顶栏已卸 mammoth（docx 分支动态加载）。doctor 仍会 `import("mammoth")` 探测；snapshot 会 withStory，doctor 会 withStory+withAdaptation |
 | wave4c | video-package / Higgsfield queue+video / dudu / local-creative 经 withX。mcp-projection 仍静态（同步消毒、无重依赖）。调用对应控制面/写命令仍会加载 |
 | wave4d | MCP 只读诊断面 earliest / bundle / dashboard / multimedia / write-lease / reader / align 经 withX；session-snapshot 不再静态拉 bundle。command-bus 仍静态拉 ledger。codex 仍静态拉 session-snapshot.js 本身。Main dashboard 顶栏未卸（T23）。get_active_managed_studio_context 仍会加载 write-lease |
 | wave1b | CLI `scripts/report-approved-timeline-full.ts` 显式 `fastMode: false` + `durationMs`；日常诊断/canonical 仍显式 true |
 | wave1c | resolver + CLI 合同测 Linux 6 PASS；P7 fixture 需 Darwin |
 | wave2a | `resolveApprovedTimelineBound`：unitIds/limit 上限 36；省略=整集；空数组失败关闭 |
-| wave2c | Linux mock 有界对照 5 PASS（⊆ 请求 id；省略=全量；2500 末页 36 只走 by-id）。P7 owner 对照仍需 Darwin |
+| wave2c | Linux mock 有界对照 6 PASS（⊆ 请求 id；省略=全量；limit→lean；2500 末页 36 只走 by-id）。P7 owner 对照仍需 Darwin |
 | wave2b | 画布 / composable 可见页传 unitIds；空可见集不回退整集 |
 | wave2-bundle | 驾驶舱 bundle 正式时间线只物化当前+前后邻（最多 3）；多媒体 storyboard 只请求当前 unitId。阶段名仍是 `timeline-approved-neighbors`。earliest/diagnostics 仍整集 |
 | wave2-unitids-by-id | 有界 `unitIds` 走 `listStudioProductionUnitIdentitiesByIds`（IN ≤36，不翻页、不记 `unitTimingQueries`）。未改 `listStudioProductionUnits` SQL。两路审查 PASS |
@@ -46,12 +46,13 @@
 | wave6c | 对照 §1 八条；纠正 composable 空 unitIds 与 executor 边界注释。Linux npm test 64 文件失败（dirfd）；边界合同已修。整计划部分完成 |
 | wave6-reverify | 两路审查 PASS（无 must-fix）。`typecheck:app` PASS。Linux 定向 35 files / 305 tests PASS。§1.4 源码合同改为已完成（editor/adaptation/novel 已懒加载）。安装版 T23 / P7 / 列表探针仍 NOT_RUN。未改源码 |
 | wave6-reverify-expanded | list-flip / M7 / busy 墙钟之后重跑：`typecheck:app` PASS；Linux 37 files / 320 tests PASS；busy ledger 1 条仍需 Darwin dirfd（既有）。两路审查 PASS。未改源码。安装版 T23 / P7 / 列表探针仍 NOT_RUN |
+| wave6-reverify-after-lean | §1.3 三刀之后重跑：`typecheck:app` PASS；Linux 38 files / 327 tests PASS；busy ledger 1 条仍需 Darwin dirfd（既有）。两路审查 PASS。未改源码。安装版 T23 / P7 / 列表探针仍 NOT_RUN |
 | wave6-darwin-ci | macos-latest CI check **success** on `0b46327`（run `32881922045`）、源码 `e1ea3f1`（run `32889586061`）与扩大复验 `36abafb`（run `32891408457`）。不是安装版 T23 |
 | wave5e-darwin-ci | macos-latest CI check **success** on `3f04d05`（evict，run `32883471735`）与 `84b594c`（写回拦截，run `32883952438`）。不是安装版 T23 |
 | wave5-list-flip-darwin-ci | macos-latest CI check **success** on `379df38`（list-flip 源码合同，run `32886953416`）。不是安装版 T23，不是 GUI 探针 |
 | sqlite-busy-wall | Darwin CI `b002adf`/`d0c4175` 因 547/507 < 500 红；墙钟改 5s 后 HEAD `e1ea3f1` check **success**（run `32889586061`）。未改 120s timeout。不是 T23 |
 | sqlite-shm-race | Darwin CI `5a075cf` run `32893004763` Fast tests 因 -shm 竞态 `canonNlink=0` 误判红。绑定把 inode 换号 / nlink=0 当瞬态重试；symlink / nlink>1 仍失败关闭。修复提交 `3a3462e` check **success**（run `32894599796`）。不是 T23 |
-| earliest_next | **等待 owner**（本刀 lean 身份落地后）。§1.3 仍部分完成。仅用户能解：①安装版 T23 ②列表翻页 GUI 探针 `aicanvas-studio://media/* = 0` ③P7 owner 有界对照。禁拆 command-bus ledger。禁止 N124 / 禁止写「运行速度已关账」 |
+| earliest_next | **等待 owner**。§1.3 三刀 + 其后扩大复验已落地。仅用户能解：①安装版 T23 ②列表翻页 GUI 探针 `aicanvas-studio://media/* = 0` ③P7 owner 有界对照。禁拆 command-bus ledger。禁止 N124 / 禁止写「运行速度已关账」 |
 
 ## 2026-08-25 · 本机人物库同步
 

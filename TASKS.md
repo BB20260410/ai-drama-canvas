@@ -44,6 +44,7 @@
 - [x] Wave 6-C：对照 §1 八条；全量审查 + Linux npm test（dirfd 失败已分类）；结论部分完成
 - [x] Wave 6 复验：两路审查 PASS；typecheck:app PASS；Linux 定向 35 files / 305 tests PASS；安装版 T23 仍 NOT_RUN
 - [x] Wave 6 扩大复验：typecheck:app PASS；Linux 37 files / 320 tests PASS（含 list-flip / M7 LRU / busy 墙钟）；busy ledger 1 条仍需 Darwin dirfd；安装版 T23 仍 NOT_RUN
+- [x] Wave 6 三刀后复验：typecheck:app PASS；Linux 38 files / 327 tests PASS（含 lean identities / units-read-phase）；busy ledger 1 条仍需 Darwin dirfd；安装版 T23 仍 NOT_RUN
 - [x] Wave 6 Darwin CI：macos-latest check success on `0b46327`（run 32881922045）；不是安装版 T23
 - [x] Wave 5-E Darwin CI：macos-latest check success on `3f04d05`（evict）与 `84b594c`（写回拦截）；不是安装版 T23
 - [x] Wave 5 列表翻页源码合同 Darwin CI：macos-latest check success on `379df38`（run 32886953416）；不是安装版 T23 / 不是 GUI 探针
