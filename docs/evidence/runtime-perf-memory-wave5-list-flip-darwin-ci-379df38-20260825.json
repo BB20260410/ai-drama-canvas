@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "5-list-flip-darwin-ci",
+  "recordedAt": "2026-08-25T19:17:08Z",
+  "change": {
+    "kind": "verification-only",
+    "sourceCodeChanged": false,
+    "commit": "379df3807d65845057569d780b38fae306bf843b",
+    "summary": "macos-latest CI check success on 列表翻页源码合同提交。含 Typecheck + Fast tests。不是安装版 T23，不是列表 GUI 探针。"
+  },
+  "verification": {
+    "darwinCi": {
+      "conclusion": "success",
+      "runId": 32886953416,
+      "url": "https://github.com/BB20260410/ai-drama-canvas/actions/runs/32886953416",
+      "headSha": "379df3807d65845057569d780b38fae306bf843b",
+      "jobs": ["Build MCP", "Typecheck", "Fast tests"]
+    },
+    "listFlipProbe": "NOT_RUN",
+    "installedT23": "NOT_RUN"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "overwrote20260811Final": false,
+    "wave5ParentChecked": false
+  },
+  "claim": "Darwin CI 在 379df38 已绿。禁止写「T23 已复测」或「列表原图次数已测为 0」或「运行速度已关账」。",
+  "residual": [
+    "HEAD 此后还有 a89e275 / b002adf / d0c4175，当时 CI 仍 in_progress",
+    "安装版 T23 / P7 owner / 列表 GUI 探针仍 NOT_RUN"
+  ]
+}
