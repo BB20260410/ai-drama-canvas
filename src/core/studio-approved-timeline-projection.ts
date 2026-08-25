@@ -14,7 +14,10 @@
  */
 import { inspectManagedProjectReadOnly } from "./managed-project.js";
 import { assertGenerationLedgerSchemaFileReady } from "./studio-generation-ledger-readiness.js";
-import { listStudioProductionUnits } from "./studio-production.js";
+import {
+  listStudioProductionUnitIdentitiesByIds,
+  listStudioProductionUnits,
+} from "./studio-production.js";
 import {
   listStudioGenerationLatestUnitGridRuns,
   type StudioGenerationActiveRunProjection,
@@ -214,6 +217,46 @@ export function resolveApprovedTimelineFastMode(
   return query?.fastMode ?? true;
 }
 
+type ApprovedTimelineUnitIdentity = {
+  id: string;
+  sequence: number;
+  title: string;
+  revision: number;
+  panelCount: number;
+};
+
+/** 整集或仅 limit：仍走 cursor 翻页。有 unitIds 时不得走这条。 */
+async function listApprovedTimelineEpisodeUnitIdentities(
+  projectRoot: string,
+  season: string,
+  episode: string,
+  limit: number | undefined,
+): Promise<ApprovedTimelineUnitIdentity[]> {
+  const unitSummaries: ApprovedTimelineUnitIdentity[] = [];
+  let cursor: string | undefined;
+  for (let page = 0; page < 50; page++) {
+    const batch = await listStudioProductionUnits(projectRoot, {
+      season,
+      episode,
+      limit: 50,
+      cursor,
+    });
+    for (const item of batch.items) {
+      unitSummaries.push({
+        id: item.id,
+        sequence: item.sequence,
+        title: item.title,
+        revision: item.revision,
+        panelCount: item.panelCount,
+      });
+    }
+    if (limit !== undefined && unitSummaries.length >= limit) break;
+    if (!batch.nextCursor) break;
+    cursor = batch.nextCursor;
+  }
+  return unitSummaries;
+}
+
 /**
  * 批量获取一集所有单元的正式时间线投影。
  * 使用 deriveGenerationTargetState 归约器确保状态一致性。
@@ -234,25 +277,16 @@ export async function getApprovedTimelineProjection(
   const bound = resolveApprovedTimelineBound(query);
   const wantedIds = bound.unitIds ? new Set(bound.unitIds) : undefined;
 
-  // 1. 批量获取单元（单页最多 50）。省略 bound 则翻页至全量；
-  //    有 unitIds/limit 时凑齐即停，不把未请求的单元送进后续账本批读。
-  const unitSummaries: Array<{ id: string; sequence: number; title: string; revision: number; panelCount: number }> = [];
-  let cursor: string | undefined;
-  for (let page = 0; page < 50; page++) {
-    const batch = await listStudioProductionUnits(projectRoot, {
+  // 1. 单元身份：有 unitIds 时按 id 直读（≤36），禁止翻页扫整集再 filter。
+  //    省略 / 仅 limit 仍走既有 cursor 翻页；limit 上限 36，单页 50，最多一页。
+  //    账本批读只吃 boundedSummaries。
+  const unitSummaries = wantedIds
+    ? await listStudioProductionUnitIdentitiesByIds(projectRoot, {
       season,
       episode,
-      limit: 50,
-      cursor,
-    });
-    for (const item of batch.items) {
-      unitSummaries.push({ id: item.id, sequence: item.sequence, title: item.title, revision: item.revision, panelCount: item.panelCount });
-    }
-    if (wantedIds && unitSummaries.filter((unit) => wantedIds.has(unit.id)).length >= wantedIds.size) break;
-    if (bound.limit !== undefined && unitSummaries.length >= bound.limit) break;
-    if (!batch.nextCursor) break;
-    cursor = batch.nextCursor;
-  }
+      unitIds: bound.unitIds!,
+    })
+    : await listApprovedTimelineEpisodeUnitIdentities(projectRoot, season, episode, bound.limit);
   unitSummaries.sort((a, b) => a.sequence - b.sequence || a.id.localeCompare(b.id));
   const boundedSummaries = wantedIds
     ? unitSummaries.filter((unit) => wantedIds.has(unit.id))

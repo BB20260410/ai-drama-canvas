@@ -673,6 +673,21 @@ export interface StudioProductionUnitListQuery {
   limit?: number;
 }
 
+/** 时间线有界投影用的轻量身份：不含 timing / 集内时码，避免为 36 个 id 扫整集。 */
+export interface StudioProductionUnitTimelineIdentity {
+  id: string;
+  sequence: number;
+  title: string;
+  revision: number;
+  panelCount: number;
+}
+
+export interface StudioProductionUnitIdentityByIdsQuery {
+  season: string;
+  episode: string;
+  unitIds: readonly string[];
+}
+
 export interface StudioProductionUnitPage {
   items: StudioProductionUnitSummary[];
   nextCursor?: string;
@@ -3302,6 +3317,59 @@ export async function listStudioProductionUnits(
         })
         : undefined,
     };
+  } finally {
+    db.close();
+  }
+}
+
+/**
+ * 按 id 读取同季同集单元身份（最多 36）。
+ * 给正式时间线有界投影用：禁止再翻页扫整集再 filter。
+ * 不走 unitSummaryFromRow，因此不记 unitTimingQueries / episodeStartQueries，
+ * 也不改 listStudioProductionUnits 的 T23 热路径 SQL。
+ * 缺行或跨季集 id 直接省略，与有界投影「返回集 ⊆ 请求 id」一致。
+ */
+export async function listStudioProductionUnitIdentitiesByIds(
+  projectRoot: string,
+  query: StudioProductionUnitIdentityByIdsQuery,
+): Promise<StudioProductionUnitTimelineIdentity[]> {
+  const season = requiredText(query.season, "season", 500);
+  const episode = requiredText(query.episode, "episode", 500);
+  if (!Array.isArray(query.unitIds) || query.unitIds.length === 0) {
+    throw new Error("unitIds 必须是非空数组；省略该字段才表示整集。");
+  }
+  const ids = [...new Set(query.unitIds.map((id) => {
+    if (typeof id !== "string" || id.trim() === "") throw new Error("unitIds 含空标识。");
+    return id.trim();
+  }))];
+  if (ids.length === 0) {
+    throw new Error("unitIds 必须是非空数组；省略该字段才表示整集。");
+  }
+  if (ids.length > 36) throw new Error("unitIds 最多 36 项。");
+  const paths = await ensureProductionDirectories(projectRoot);
+  const db = openDatabase(paths.database);
+  try {
+    recordStudioUnitsReadCounter("productionBusinessSqlExecutions");
+    const placeholders = ids.map(() => "?").join(", ");
+    const rows = db.prepare(`
+      SELECT id, sequence, title, revision, panel_count
+      FROM studio_production_units
+      WHERE season = ? AND episode = ? AND id IN (${placeholders})
+      ORDER BY sequence, id
+    `).all(season, episode, ...ids) as Array<{
+      id: string;
+      sequence: number;
+      title: string;
+      revision: number;
+      panel_count: number;
+    }>;
+    return rows.map((row) => ({
+      id: row.id,
+      sequence: Number(row.sequence),
+      title: row.title,
+      revision: Number(row.revision),
+      panelCount: Number(row.panel_count),
+    }));
   } finally {
     db.close();
   }
