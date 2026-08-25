@@ -134,7 +134,7 @@ export function useStudioTimelineProjection(projectRoot: Ref<string> | string) {
   // 组件卸载时自动使在途请求失效（仅在 setup 作用域内使用时注册）。
   if (getCurrentScope()) onScopeDispose(invalidate);
 
-  /** 刷新批量时间线投影（fastMode <1s）。可见页传入 unitIds（≤36），省略则整集。 */
+  /** 刷新批量时间线投影（fastMode <1s）。可见页传入 unitIds（≤36），省略则整集。空数组/空标识/超 36 失败关闭，禁止静默整集。 */
   async function refresh(season: string, episode: string, unitIds?: readonly string[]) {
     const requestRoot = root.value;
     refreshSeq += 1;
@@ -148,14 +148,25 @@ export function useStudioTimelineProjection(projectRoot: Ref<string> | string) {
         if (isCurrent()) error.value = "canvasApi.getApprovedTimelineProjection 不可用";
         return;
       }
-      const uniqueIds = unitIds
-        ? [...new Set(unitIds.filter((id) => typeof id === "string" && id.trim() !== ""))]
-        : [];
+      let boundUnitIds: string[] | undefined;
+      if (unitIds !== undefined) {
+        if (unitIds.length === 0) {
+          throw new Error("unitIds 必须是非空数组；省略该字段才表示整集。");
+        }
+        const unique = [...new Set(unitIds.map((id) => {
+          if (typeof id !== "string" || id.trim() === "") throw new Error("unitIds 含空标识。");
+          return id;
+        }))];
+        if (unique.length > 36) {
+          throw new Error("unitIds 最多 36 项。");
+        }
+        boundUnitIds = unique;
+      }
       const result = await api.getApprovedTimelineProjection(requestRoot, {
         season,
         episode,
         fastMode: true,
-        ...(uniqueIds.length > 0 ? { unitIds: uniqueIds.slice(0, 36) } : {}),
+        ...(boundUnitIds ? { unitIds: boundUnitIds } : {}),
       });
       // 旧响应（发起后 root 已切换、已有更新的 refresh、或已 invalidate）直接丢弃。
       if (!isCurrent()) return;

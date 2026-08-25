@@ -75,8 +75,51 @@ describe("useStudioTimelineProjection 异步 token 绑定", () => {
       },
     });
     const tp = useStudioTimelineProjection("/proj-a");
-    await tp.refresh("S1", "S1E2", ["u1", "u1", ""]);
+    await tp.refresh("S1", "S1E2", ["u1", "u1"]);
     expect(received?.unitIds).toEqual(["u1"]);
+  });
+
+  it("显式空 unitIds 失败关闭，不回退整集", async () => {
+    let called = 0;
+    installCanvasApi({
+      getApprovedTimelineProjection: async () => {
+        called += 1;
+        return makeProjection("whole-episode");
+      },
+    });
+    const tp = useStudioTimelineProjection("/proj-a");
+    await tp.refresh("S1", "S1E2", []);
+    expect(called).toBe(0);
+    expect(tp.projection.value).toBeNull();
+    expect(tp.error.value).toMatch(/非空数组/);
+  });
+
+  it("全空白 unitIds 失败关闭，不回退整集", async () => {
+    let called = 0;
+    installCanvasApi({
+      getApprovedTimelineProjection: async () => {
+        called += 1;
+        return makeProjection("whole-episode");
+      },
+    });
+    const tp = useStudioTimelineProjection("/proj-a");
+    await tp.refresh("S1", "S1E2", ["", "  "]);
+    expect(called).toBe(0);
+    expect(tp.error.value).toMatch(/空标识/);
+  });
+
+  it("超过 36 个 unitIds 失败关闭，不静默截断", async () => {
+    let called = 0;
+    installCanvasApi({
+      getApprovedTimelineProjection: async () => {
+        called += 1;
+        return makeProjection("truncated");
+      },
+    });
+    const tp = useStudioTimelineProjection("/proj-a");
+    await tp.refresh("S1", "S1E2", Array.from({ length: 37 }, (_, i) => `u${i}`));
+    expect(called).toBe(0);
+    expect(tp.error.value).toMatch(/最多 36/);
   });
 
   it("旧 seq 响应（乱序到达）被丢弃，不覆盖更新的投影", async () => {
