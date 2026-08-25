@@ -8,10 +8,10 @@
 - [ ] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
 - [ ] Wave 1-B：full 仅诊断/CLI + 耗时
 - [ ] Wave 1-C：定向测试 + typecheck:app
-- [ ] Wave 2：有界时间线（可见 36 / 可选 unitIds）
-- [ ] Wave 3：只读投影改 `inspectManagedProjectReadOnly`
+- [ ] Wave 2：有界时间线（可见 36 / 可选 unitIds）；附属：rebuildGraph 合并、MiniMap 降级、切工程清 LRU
+- [ ] Wave 3：只读投影改 `inspectManagedProjectReadOnly`；earliest 去 per-unit snapshot；ssl5 不二次 earliest
 - [ ] Wave 4：MCP/Main 冷域动态 import（editor / story+mammoth / novel / video-package；抄 Main IPC `await import`；禁拆 command-bus 写路径）
-- [ ] Wave 5：列表只绑缩略图；legacy 失败不回退 4K
+- [ ] Wave 5：列表只绑缩略图；legacy thumb 不先整文件读入；审片默认 thumb；derivative 不校源全 SHA
 - [ ] Wave 6：度量关账；安装版 T23 仅 owner 点名
 - [ ] 禁止：重建 P0–P14、无证据 SQL 批量化、N124 CV、全盘扫正式工程
 

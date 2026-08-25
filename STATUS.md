@@ -10,7 +10,7 @@
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
 | evidence | `docs/evidence/runtime-perf-memory-plan-sources-20260825.json` |
-| mcp_import_graph | 已交叉并入计划 Wave 4（MCP ~137 core / 无启动快路 / `story` static mammoth）。画布、媒体 CAS、红线怀疑者仍在跑，不挡 Wave 1 |
+| subagent_fold | 七路只读审计均 IDLE，已交叉进计划 §3 / §5 / Wave 2–5。假热点（units SQL / T23 计数 / N124 / 首屏再拆包）维持禁止 |
 | earliest_next | **Wave 1-A**：时间线投影默认 `fastMode ?? true`（计划 §6 Wave 1） |
 
 ## 2026-08-25 · 本机人物库同步
