@@ -264,7 +264,7 @@ async function verifyHistoricalPassCandidates(
 
 /**
  * 时间线投影专用：只读打开已有 generation ledger，再跑同一份历史事实 SQL。
- * 不走 openSqliteReadOnlySnapshot（不复制整库）。缺库/缺表返回空事实，不建库。
+ * 不复制整库隔离快照。缺库/缺表返回空事实，不建库。
  */
 export async function readStudioGenerationProjectionSelectionFactsReadOnly(
   context: StudioGenerationProjectionSelectionFactsReadContext,
