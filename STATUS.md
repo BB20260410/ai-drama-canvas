@@ -42,10 +42,10 @@
 | wave6b | 未跑安装版 T23（owner 未点名；本 Cloud 无 macOS App / 无正式工程 GUI）。不得称整包完成 |
 | wave6c | 对照 §1 八条；纠正 composable 空 unitIds 与 executor 边界注释。Linux npm test 64 文件失败（dirfd）；边界合同已修。整计划部分完成 |
 | wave6-reverify | 两路审查 PASS（无 must-fix）。`typecheck:app` PASS。Linux 定向 35 files / 305 tests PASS。§1.4 源码合同改为已完成（editor/adaptation/novel 已懒加载）。安装版 T23 / P7 / 列表探针仍 NOT_RUN。未改源码 |
-| wave6-darwin-ci | macos-latest CI check **success** on `0b46327`（run `32881922045`）。不是安装版 T23 |
+| wave6-darwin-ci | macos-latest CI check **success** on `0b46327`（run `32881922045`）与 HEAD `e1ea3f1`（run `32889586061`）。不是安装版 T23 |
 | wave5e-darwin-ci | macos-latest CI check **success** on `3f04d05`（evict，run `32883471735`）与 `84b594c`（写回拦截，run `32883952438`）。不是安装版 T23 |
 | wave5-list-flip-darwin-ci | macos-latest CI check **success** on `379df38`（list-flip 源码合同，run `32886953416`）。不是安装版 T23，不是 GUI 探针 |
-| sqlite-busy-wall | Darwin CI `b002adf` Fast tests 因 `547 < 500` 红；已放宽合同测墙钟至 5s，未改 120s 写库 timeout。不是 T23 / 不是 M7 回归 |
+| sqlite-busy-wall | Darwin CI `b002adf`/`d0c4175` 因 547/507 < 500 红；墙钟改 5s 后 HEAD `e1ea3f1` check **success**（run `32889586061`）。未改 120s timeout。不是 T23 |
 | earliest_next | **本 Cloud 可落地切片已尽**。真阻塞仅 owner/Darwin：安装版 T23、列表翻页 GUI 探针。禁拆 command-bus ledger。禁止 N124 / 禁止写「运行速度已关账」 |
 
 ## 2026-08-25 · 本机人物库同步
