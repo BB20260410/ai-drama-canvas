@@ -8,7 +8,8 @@ import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { lstat, readFile, realpath } from "node:fs/promises";
 import path from "node:path";
-import sharp, { type Metadata } from "sharp";
+import type { Metadata } from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import {
   assertActiveManagedStudioContextToken,
   type ActiveManagedStudioContext,
@@ -469,7 +470,7 @@ async function inspectRaw(
   }
   let metadata: Metadata;
   try {
-    metadata = await sharp(canonicalPath, { failOn: "error", limitInputPixels: 100_000_000 }).rotate().metadata();
+    metadata = await (await loadSharpDefault())(canonicalPath, { failOn: "error", limitInputPixels: 100_000_000 }).rotate().metadata();
   } catch (error) {
     fail("raw-decode-failed", "raw 图像无法完整解码。", [error instanceof Error ? error.message : String(error)]);
   }

@@ -5,7 +5,8 @@ import { createHash } from "node:crypto";
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import sharp, { type OutputInfo } from "sharp";
+import type { OutputInfo } from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import {
   canonicalizeStudioJsonValue as stableValue,
   digestStudioCanonicalJson as stableDigest,
@@ -3687,7 +3688,7 @@ async function inspectStudioImagegenQuarantineEvidence(input: {
   const receiptSha256 = sha256(receipt.bytes);
   let candidateInfo: OutputInfo;
   try {
-    const decoded = await sharp(candidate.bytes, { failOn: "warning", limitInputPixels: 25_000_000 })
+    const decoded = await (await loadSharpDefault())(candidate.bytes, { failOn: "warning", limitInputPixels: 25_000_000 })
       .rotate()
       .raw()
       .toBuffer({ resolveWithObject: true });

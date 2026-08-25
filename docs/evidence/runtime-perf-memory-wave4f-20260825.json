@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "4-F",
+  "recordedAt": "2026-08-25T16:24:00Z",
+  "change": {
+    "gateway": "src/core/sharp-lazy.ts",
+    "callSites": [
+      "src/core/generation.ts",
+      "src/core/material-studio.ts",
+      "src/core/studio-generation-ledger.ts",
+      "src/core/publication.ts",
+      "src/core/scanner.ts",
+      "src/core/editor.ts",
+      "src/core/studio-video-package.ts",
+      "src/core/studio-agent-imagegen-result-bundle.ts",
+      "src/core/studio-labeled-layout.ts",
+      "src/core/studio-media-derivatives.ts",
+      "src/core/studio-consistency-evaluator.ts",
+      "src/core/legacy-thumbnails.ts",
+      "src/core/fusion-panel-references.ts",
+      "src/core/fusion-storyboard-sheet.ts",
+      "src/core/fusion-references.ts",
+      "src/core/fusion-asset-consistency.ts",
+      "src/core/studio-scale-fixture.ts",
+      "src/core/codex.ts"
+    ],
+    "thumbnailRecipeUnchanged": "material-studio-thumb:v1:autorotate:inside-512:no-enlarge:webp-q82",
+    "derivativeRecipesUnchanged": true
+  },
+  "tests": [
+    "tests/runtime-perf-wave4f-sharp-lazy-import.test.ts",
+    "tests/legacy-thumbnails.test.ts",
+    "tests/studio-labeled-layout.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "sourceContractAndOwnerTests": { "passed": 9, "platform": "linux", "files": 3 }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W4-F：src 媒体 owner 不再静态值导入 sharp；经 sharp-lazy 首次 touch 再 import(\"sharp\")。未改 THUMBNAIL_RECIPE / 派生 recipe / legacy 512 WebP 参数。doctor 探测改为 loadSharp() 共享缓存。",
+  "residual": [
+    "首次真正解码/派生日仍会加载原生 sharp；Main 与 MCP 各进程仍可能各载一份",
+    "doctor_project 仍会 loadSharp 探测；get_capabilities 不加载 sharp",
+    "tests/ 仍可静态 import sharp（夹具出图，不在生产启动图）",
+    "command-bus 仍静态拉 ledger；get_capabilities 仍 withEditor（W4-A/D）",
+    "禁止写成「连上 Agent 永不加载 sharp」或「已改缩略指纹」"
+  ]
+}

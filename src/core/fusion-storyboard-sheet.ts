@@ -2,7 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { constants } from "node:fs";
 import { link, lstat, mkdir, open, readFile, rm } from "node:fs/promises";
 import path from "node:path";
-import sharp from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import { FUSION_STORYBOARD_BEAT_ALGORITHM_VERSION, FUSION_STORYBOARD_VISIBLE_TIME_POLICY_VERSION, fusionStoryboardPanelDisplayTiming } from "./fusion-storyboard-grid.js";
 import type { FusionStoryboardGridContract, FusionStoryboardGridPanel, FusionStoryboardGridTableField } from "./fusion-storyboard-grid.js";
 
@@ -457,7 +457,7 @@ async function loadPanelImage(input: FusionStoryboardSheetPanelImageInput): Prom
   }
   const digest = sha256(content);
   if (digest !== expectedSha256) throw new Error(`panel ${input.panelId} 图片 SHA-256 不一致。`);
-  const metadata = await sharp(content, { failOn: "error" }).metadata().catch((error) => {
+  const metadata = await (await loadSharpDefault())(content, { failOn: "error" }).metadata().catch((error) => {
     throw new Error(`panel ${input.panelId} 图片无法解码：${error instanceof Error ? error.message : String(error)}`);
   });
   if (!metadata.width || !metadata.height || !metadata.format) throw new Error(`panel ${input.panelId} 图片缺少有效尺寸或格式。`);
@@ -649,14 +649,14 @@ function explicitCropRect(sourceWidth: number, sourceHeight: number, rect: Fusio
 }
 
 async function normalizedPanelData(image: LoadedPanelImage, bounds: RowBounds): Promise<NormalizedPanelImage> {
-  const oriented = await sharp(image.bytesBuffer, { failOn: "error" }).rotate().toBuffer({ resolveWithObject: true });
+  const oriented = await (await loadSharpDefault())(image.bytesBuffer, { failOn: "error" }).rotate().toBuffer({ resolveWithObject: true });
   const orientedWidth = oriented.info.width;
   const orientedHeight = oriented.info.height;
   const background = { r: 16, g: 23, b: 17 };
   let buffer: Buffer;
   let audit: FusionStoryboardSheetPanelCropAudit;
   if (image.transform.fit === "contain") {
-    buffer = await sharp(oriented.data, { failOn: "error" })
+    buffer = await (await loadSharpDefault())(oriented.data, { failOn: "error" })
       .resize({ width: IMAGE_COLUMN_WIDTH, height: bounds.height, fit: "contain", background })
       .flatten({ background })
       .jpeg({ quality: 90, chromaSubsampling: "4:4:4", mozjpeg: true })
@@ -687,7 +687,7 @@ async function normalizedPanelData(image: LoadedPanelImage, bounds: RowBounds): 
       requestedRect = image.transform.rect;
       pixels = explicitCropRect(orientedWidth, orientedHeight, requestedRect);
     }
-    let pipeline = sharp(oriented.data, { failOn: "error" }).extract(pixels);
+    let pipeline = (await loadSharpDefault())(oriented.data, { failOn: "error" }).extract(pixels);
     if (focalPoint) pipeline = pipeline.resize({ width: IMAGE_COLUMN_WIDTH, height: bounds.height, fit: "fill" });
     else pipeline = pipeline.resize({ width: IMAGE_COLUMN_WIDTH, height: bounds.height, fit: "contain", background });
     buffer = await pipeline
@@ -932,10 +932,10 @@ async function renderFusionStoryboardSheetInternal(input: RenderFusionStoryboard
     },
   }));
   const renderedSvg = await renderSvg(input.contract, panels, loaded, renderPurpose, policy, layout, renderFingerprint);
-  const png = await sharp(renderedSvg.svg, { failOn: "error", limitInputPixels: 100_000_000 })
+  const png = await (await loadSharpDefault())(renderedSvg.svg, { failOn: "error", limitInputPixels: 100_000_000 })
     .png({ compressionLevel: 9, adaptiveFiltering: true, palette: false })
     .toBuffer();
-  const pngMetadata = await sharp(png, { failOn: "error" }).metadata();
+  const pngMetadata = await (await loadSharpDefault())(png, { failOn: "error" }).metadata();
   if (pngMetadata.width !== PAGE_WIDTH || pngMetadata.height !== layout.pageHeight || pngMetadata.format !== "png") {
     throw new Error(`Sharp 生成的故事板尺寸或格式不符合 ${PAGE_WIDTH}×${layout.pageHeight} PNG 合同。`);
   }

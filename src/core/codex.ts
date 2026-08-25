@@ -3,6 +3,7 @@ import { access, lstat, realpath } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { withEditor } from "./editor-lazy.js";
+import { loadSharp } from "./sharp-lazy.js";
 import { generationPublicationTerminalMatchesJob, getGenerationSettings, getHttpGenerationSubmissionCheckpoint, listGenerationJobs } from "./generation.js";
 import { getContinuationSnapshot, listProjectContext } from "./memory.js";
 import { getReviewQueue, listReviewRecords } from "./reviews.js";
@@ -1687,7 +1688,7 @@ export async function doctorProject(projectRoot: string) {
     diagnoseSidecar("task-store-corrupt", "任务包侧车", paths.tasks, () => listTaskPacks(root), []),
     diagnoseSidecar("asset-relation-store-corrupt", "资产关系侧车", paths.assetRelations, () => listAssetRelations(root), []),
     diagnoseSidecar("voice-store-corrupt", "音色身份侧车", paths.voiceIdentities, () => listVoiceIdentities(root), []),
-    Promise.allSettled([import("sharp"), import("mammoth")]),
+    Promise.allSettled([loadSharp(), import("mammoth")]),
     listProjectLocks(root),
     diagnoseSidecar("command-ledger-corrupt", "幂等命令账本", paths.commandLedger, async () => ({ entries: await listCommandLedger(root, 500) }), { entries: [] }),
     diagnoseSidecar("adaptation-store-corrupt", "小说自动改编侧车", paths.storyAdaptation, () => withAdaptation((adaptation) => adaptation.getAdaptationWorkspace(root)), null),

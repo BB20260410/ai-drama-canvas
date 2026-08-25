@@ -3,7 +3,7 @@ import { constants as fsConstants } from "node:fs";
 import { access, appendFile, mkdir, readdir, readFile, rename, stat, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import sharp from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import { upsertAssetRelation } from "./asset-registry.js";
 import { RejectedCommandFailure } from "./command-outcome.js";
 import { enqueueGeneration, listGenerationJobs } from "./generation.js";
@@ -670,7 +670,7 @@ async function prepareEditMediaPreviewUnlocked(projectRoot: string, artifactId: 
   const preview: EditMediaPreview = { artifactId: artifact.id, kind, sourceModifiedAt: artifact.modifiedAt, generatedAt: now, proxyPath: cached?.proxyPath };
   if (kind === "image") {
     const thumbnailPath = path.join(paths.editorPreviews, `${safeId}-thumb.jpg`);
-    await sharp(artifact.path, { failOn: "error" }).resize(320, 180, { fit: "contain", background: "#080907" }).jpeg({ quality: 82 }).toFile(thumbnailPath);
+    await (await loadSharpDefault())(artifact.path, { failOn: "error" }).resize(320, 180, { fit: "contain", background: "#080907" }).jpeg({ quality: 82 }).toFile(thumbnailPath);
     preview.thumbnailPath = thumbnailPath;
   } else if (kind === "audio") {
     const engine = await probeVideoEngine();
@@ -692,9 +692,9 @@ async function prepareEditMediaPreviewUnlocked(projectRoot: string, artifactId: 
       temporaryFrames.push(framePath);
     }
     const filmstripPath = path.join(paths.editorPreviews, `${safeId}-filmstrip.jpg`);
-    await sharp({ create: { width: 800, height: 100, channels: 3, background: "#080907" } }).composite(temporaryFrames.map((input, index) => ({ input, left: index * 160, top: 0 }))).jpeg({ quality: 82 }).toFile(filmstripPath);
+    await (await loadSharpDefault())({ create: { width: 800, height: 100, channels: 3, background: "#080907" } }).composite(temporaryFrames.map((input, index) => ({ input, left: index * 160, top: 0 }))).jpeg({ quality: 82 }).toFile(filmstripPath);
     const thumbnailPath = path.join(paths.editorPreviews, `${safeId}-thumb.jpg`);
-    await sharp(temporaryFrames[2]!, { failOn: "error" }).jpeg({ quality: 84 }).toFile(thumbnailPath);
+    await (await loadSharpDefault())(temporaryFrames[2]!, { failOn: "error" }).jpeg({ quality: 84 }).toFile(thumbnailPath);
     await Promise.all(temporaryFrames.map((filePath) => unlink(filePath).catch(() => undefined)));
     preview.thumbnailPath = thumbnailPath;
     preview.filmstripPath = filmstripPath;
@@ -2662,7 +2662,7 @@ async function createSubtitleOverlays(project: EditProject, directory: string): 
     const tspans = lines.map((line, lineIndex) => `<tspan x="${project.width / 2}" y="${boxY + Math.round(fontSize * 1.15) + lineIndex * lineHeight}">${xmlEscape(line)}</tspan>`).join("");
     const svg = `<svg width="${project.width}" height="${project.height}" xmlns="http://www.w3.org/2000/svg"><rect x="${Math.round(project.width * 0.07)}" y="${boxY}" width="${Math.round(project.width * 0.86)}" height="${boxHeight}" rx="${Math.round(fontSize * 0.35)}" fill="${background}" fill-opacity="0.72"/><text text-anchor="middle" font-family="PingFang SC,Heiti SC,Arial,sans-serif" font-size="${fontSize}" font-weight="600" fill="${fontColor}" stroke="#000000" stroke-width="${Math.max(1, Math.round(fontSize * 0.04))}" paint-order="stroke" letter-spacing="1">${tspans}</text></svg>`;
     const overlayPath = path.join(directory, `subtitle-${String(index + 1).padStart(3, "0")}.png`);
-    await sharp(Buffer.from(svg)).png().toFile(overlayPath);
+    await (await loadSharpDefault())(Buffer.from(svg)).png().toFile(overlayPath);
     overlays.push({ clip, path: overlayPath });
   }
   return overlays;
@@ -3435,7 +3435,7 @@ async function extractTimelineFrameUnlocked(
     const result = await runProcess(projectRoot, engine.ffmpegPath, args, { tool: "ffmpeg", stage: "timeline-frame", weight: MEDIA_WEIGHTS.foreground, timeoutMs: mediaStageTimeout("ffmpeg", 5 * 60_000) });
     if (result.status !== "succeeded") throw new Error(result.status === "timed_out" ? "时间线合成帧提取超时，进程树已终止。" : result.output.trim().split("\n").slice(-12).join("\n") || "时间线合成帧提取失败。 ");
     try {
-      const metadata = await sharp(framePath, { failOn: "error" }).metadata();
+      const metadata = await (await loadSharpDefault())(framePath, { failOn: "error" }).metadata();
       width = metadata.width ?? 0;
       height = metadata.height ?? 0;
       if (width && height) break;
@@ -3523,7 +3523,7 @@ async function extractLastFrameUnlocked(
   const framePath = path.join(outputDirectory, `${prefix}_尾帧_视频续接_${stamp}_raw.png`);
   const result = await runProcess(projectRoot, engine.ffmpegPath, ["-hide_banner", "-loglevel", "error", "-sseof", "-0.08", "-i", sourceVideoPath, "-frames:v", "1", "-update", "1", "-n", framePath], { tool: "ffmpeg", stage: "source-last-frame", weight: MEDIA_WEIGHTS.foreground, timeoutMs: mediaStageTimeout("ffmpeg", 120_000) });
   if (result.status !== "succeeded") throw new Error(result.status === "timed_out" ? "视频末帧提取超时，进程树已终止。" : result.output.trim().split("\n").slice(-10).join("\n") || "视频末帧提取失败。");
-  const metadata = await sharp(framePath, { failOn: "error" }).metadata();
+  const metadata = await (await loadSharpDefault())(framePath, { failOn: "error" }).metadata();
   if (!metadata.width || !metadata.height) throw new Error("已输出末帧文件，但图片无法解码。");
   const registered = await registerArtifact(projectRoot, { itemId: item.id, artifactPath: framePath, kind: "raw-image", variant: "end", note: `从视频末帧提取：${sourceVideoPath}` });
   const extractedAt = new Date().toISOString();
@@ -3549,7 +3549,7 @@ export async function createVideoContinuationPack(
   const sourceVideoPath = input.sourceVideoPath ? path.resolve(input.sourceVideoPath) : undefined;
   const lastFramePath = path.resolve(input.lastFramePath);
   await Promise.all([...(sourceVideoPath ? [access(sourceVideoPath, fsConstants.R_OK)] : []), access(lastFramePath, fsConstants.R_OK)]).catch(() => { throw new Error("续接视频或末帧图片不存在。 "); });
-  const lastFrameMetadata = await sharp(lastFramePath, { failOn: "error" }).metadata();
+  const lastFrameMetadata = await (await loadSharpDefault())(lastFramePath, { failOn: "error" }).metadata();
   if (!lastFrameMetadata.width || !lastFrameMetadata.height) throw new Error("末帧参考图无法解码。");
   const hardLocks = index.project.hardLocks.filter((lock) => item.hardLockIds.includes(lock.id));
   const id = `continuation-${randomUUID()}`;

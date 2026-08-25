@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFile, realpath, stat } from "node:fs/promises";
 import path from "node:path";
-import sharp from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import { loadFusionProductionAssets, loadFusionProjectManifest, parseFusionUnitStoryboardReferenceAssetIds, type FusionProductionAssetCatalog } from "./fusion-production.js";
 import { loadFusionStoryboardGridSelections, materializeAllFusionStoryboardGrids } from "./fusion-storyboard-production.js";
 import { normalizeFusionStoryboardGridContract, type FusionStoryboardGridContract, type FusionStoryboardGridPanel } from "./fusion-storyboard-grid.js";
@@ -678,7 +678,7 @@ async function validateDerivedVisualArtifact(
     || visual.review.memberHardLockDigest !== visual.memberHardLockDigest) return { ...asset, status: "stale" };
   const actualSha = await digestFile(visual.path).catch(() => undefined);
   if (!actualSha || actualSha !== visual.sha256) return { ...asset, status: "stale" };
-  const metadata = await sharp(visual.path, { failOn: "error" }).metadata().catch(() => undefined);
+  const metadata = await (await loadSharpDefault())(visual.path, { failOn: "error" }).metadata().catch(() => undefined);
   const file = await stat(visual.path).catch(() => undefined);
   if (!metadata?.width || !metadata.height || !file?.isFile()
     || metadata.width !== visual.width || metadata.height !== visual.height || file.size !== visual.fileSize) {
@@ -1755,7 +1755,7 @@ export async function registerDerivedPanelReferenceArtifact(projectRoot: string,
     if (!isInsideProject(canonicalRoot, canonicalFile)) throw new Error("组合派生参考图必须位于当前隔离工程内，禁止登记外部或只读源文件。");
     const [file, metadata, sha256] = await Promise.all([
       stat(canonicalFile),
-      sharp(canonicalFile, { failOn: "error" }).metadata().catch(() => { throw new Error("组合派生参考图无法解码。"); }),
+      (await loadSharpDefault())(canonicalFile, { failOn: "error" }).metadata().catch(() => { throw new Error("组合派生参考图无法解码。"); }),
       digestFile(canonicalFile),
     ]);
     if (!file.isFile() || !metadata.width || !metadata.height || metadata.width < 256 || metadata.height < 256 || file.size < 1_024) {

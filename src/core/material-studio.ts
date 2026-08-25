@@ -6,7 +6,7 @@ import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
-import sharp from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import {
   ensureConfinedDirectory as ensureSharedConfinedDirectory,
   importConfinedFileToSha256Cas,
@@ -2027,13 +2027,13 @@ async function materializeThumbnail(
   try {
     const existingStats = await lstat(target);
     if (existingStats.isSymbolicLink() || !existingStats.isFile()) throw new Error(`缩略图目标不是普通文件：${target}`);
-    const metadata = await sharp(target, { failOn: "error" }).metadata();
+    const metadata = await (await loadSharpDefault())(target, { failOn: "error" }).metadata();
     if (!metadata.width || !metadata.height || metadata.format !== "webp") throw new Error(`缩略图不可解码：${target}`);
     return { recipeKey, path: target, width: metadata.width, height: metadata.height };
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
   }
-  const rendered = await sharp(objectPath, { failOn: "error" })
+  const rendered = await (await loadSharpDefault())(objectPath, { failOn: "error" })
     .rotate()
     .resize({ width: 512, height: 512, fit: "inside", withoutEnlargement: true })
     .webp({ quality: 82 })
@@ -2616,7 +2616,7 @@ async function ensureStudioImageThumbnailInternal(
     if (metadata.isSymbolicLink() || !metadata.isFile()) {
       throw new Error("缩略图目标不是受管普通文件，已拒绝自动修复。");
     }
-    const decoded = await sharp(target, { failOn: "error" }).metadata();
+    const decoded = await (await loadSharpDefault())(target, { failOn: "error" }).metadata();
     if (!decoded.width || !decoded.height || decoded.format !== "webp") {
       throw new Error("缩略图不可解码。");
     }

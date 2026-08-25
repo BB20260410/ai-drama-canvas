@@ -2,7 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { constants as fsConstants, type BigIntStats } from "node:fs";
 import { lstat, mkdir, open, realpath, type FileHandle } from "node:fs/promises";
 import path from "node:path";
-import sharp from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import { z } from "zod";
 import { ConfirmedCommandFailure, RejectedCommandFailure } from "./command-outcome.js";
 import { withProjectLock } from "./locks.js";
@@ -659,7 +659,7 @@ async function inspectPublicationFile(
     const openedIdentity = presentFileIdentity(await handle.stat({ bigint: true }));
     if (!sameIdentity(expectedIdentity.file, openedIdentity)) throw new PublicationValidationConflict("最终发布文件在打开固定句柄前发生变化，CAS 未提交；发布意图仍保留为 reserved。");
     if (["raw-image", "labeled-image"].includes(kind)) {
-      const image = await sharp(filePath).metadata().catch(() => undefined);
+      const image = await (await loadSharpDefault())(filePath).metadata().catch(() => undefined);
       width = image?.width;
       height = image?.height;
       decodable = Boolean(image?.format && width && height);

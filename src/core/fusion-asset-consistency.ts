@@ -1,7 +1,8 @@
 import { createHash, randomUUID } from "node:crypto";
 import { access, mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
-import sharp, { type OverlayOptions } from "sharp";
+import type { OverlayOptions } from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import { loadFusionProductionAssets, loadFusionProjectManifest, type FusionMaterializationReceipt, type FusionProductionAssetCatalog, type FusionProductionAssetEntry } from "./fusion-production.js";
 import { reviewCoversArtifacts } from "./review-evidence.js";
 import { getSidecarPaths, loadIndex, loadOverrides, loadProjectConfig, readJson, writeJsonAtomic } from "./sidecar.js";
@@ -704,7 +705,7 @@ async function buildReviewBoard(projectRoot: string, batch: FusionAssetConsisten
   const tileWidth = 608;
   const tileHeight = 1044;
   const imageHeight = 992;
-  const images = await Promise.all(batch.members.map(async (member) => sharp(member.evidence!.raw.path, { failOn: "error" }).rotate().resize({ width: tileWidth, height: imageHeight, fit: "cover" }).png().toBuffer()));
+  const images = await Promise.all(batch.members.map(async (member) => (await loadSharpDefault())(member.evidence!.raw.path, { failOn: "error" }).rotate().resize({ width: tileWidth, height: imageHeight, fit: "cover" }).png().toBuffer()));
   const composites: OverlayOptions[] = images.map((input, index) => ({ input, left: gap + (index % 3) * (tileWidth + gap), top: gap + Math.floor(index / 3) * (tileHeight + gap) }));
   const labels = batch.members.map((member, index) => {
     const left = gap + (index % 3) * (tileWidth + gap);
@@ -713,7 +714,7 @@ async function buildReviewBoard(projectRoot: string, batch: FusionAssetConsisten
   }).join("");
   const svg = Buffer.from(`<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">${labels}<text x="24" y="2140" fill="#ffffff" font-size="22" font-family="PingFang SC, Heiti SC, sans-serif">复核专用｜不得作为正式资产或生图参考｜${xml(batch.id)}｜${batch.currentSnapshotHash.slice(0, 20)}</text></svg>`);
   composites.push({ input: svg, left: 0, top: 0 });
-  const output = await sharp({ create: { width, height, channels: 3, background: "#06152f" } }).composite(composites).png({ compressionLevel: 9, adaptiveFiltering: true }).toBuffer();
+  const output = await (await loadSharpDefault())({ create: { width, height, channels: 3, background: "#06152f" } }).composite(composites).png({ compressionLevel: 9, adaptiveFiltering: true }).toBuffer();
   const outputSha = sha256(output);
   const directory = getSidecarPaths(projectRoot).assetConsistencyBoards;
   const basename = `${batch.id}-${FUSION_ASSET_CONSISTENCY_BOARD_RENDER_VERSION}-${batch.currentSnapshotHash.slice(0, 20)}`;

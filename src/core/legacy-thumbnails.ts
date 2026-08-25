@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { lstat, mkdir, readdir, rename, rm, stat } from "node:fs/promises";
 import path from "node:path";
-import sharp from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 
 /**
  * 旧生产画布节点缩略图（P18）。
@@ -61,7 +61,7 @@ async function existingThumbnail(target: string): Promise<LegacyThumbnailResult 
   try {
     const existing = await lstat(target);
     if (existing.isFile() && !existing.isSymbolicLink()) {
-      const metadata = await sharp(target, { failOn: "error" }).metadata();
+      const metadata = await (await loadSharpDefault())(target, { failOn: "error" }).metadata();
       if (metadata.width && metadata.height && metadata.format === "webp") {
         return { path: target, width: metadata.width, height: metadata.height };
       }
@@ -86,7 +86,7 @@ export async function resolveLegacyThumbnailFromBytes(
     await mkdir(cacheRoot, { recursive: true });
     const temporary = path.join(cacheRoot, `.${key}.${randomUUID()}.tmp.webp`);
     try {
-      const result = await sharp(bytes, { failOn: "error" })
+      const result = await (await loadSharpDefault())(bytes, { failOn: "error" })
         .rotate()
         .resize({ width: LEGACY_THUMBNAIL_MAX_EDGE, height: LEGACY_THUMBNAIL_MAX_EDGE, fit: "inside", withoutEnlargement: true })
         .webp({ quality: LEGACY_THUMBNAIL_WEBP_QUALITY })
@@ -123,7 +123,7 @@ export async function resolveLegacyThumbnail(cacheRoot: string, absolutePath: st
     await mkdir(cacheRoot, { recursive: true });
     const temporary = path.join(cacheRoot, `.${key}.${randomUUID()}.tmp.webp`);
     try {
-      const result = await sharp(absolutePath, { failOn: "error" })
+      const result = await (await loadSharpDefault())(absolutePath, { failOn: "error" })
         .rotate()
         .resize({ width: LEGACY_THUMBNAIL_MAX_EDGE, height: LEGACY_THUMBNAIL_MAX_EDGE, fit: "inside", withoutEnlargement: true })
         .webp({ quality: LEGACY_THUMBNAIL_WEBP_QUALITY })

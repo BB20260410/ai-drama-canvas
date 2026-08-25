@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { constants as fsConstants } from "node:fs";
 import { lstat, open, realpath } from "node:fs/promises";
 import path from "node:path";
-import sharp from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 
 /**
  * P19 一致性辅助门禁 · 机器四态判定器（studio-consistency-evaluator）。
@@ -132,7 +132,7 @@ interface NormalizedImage {
 }
 
 async function normalizePixels(input: string | Buffer, config: P19EvaluatorConfig): Promise<NormalizedImage> {
-  const pipeline = sharp(input, { limitInputPixels: config.maxInputPixels, failOn: "error" });
+  const pipeline = (await loadSharpDefault())(input, { limitInputPixels: config.maxInputPixels, failOn: "error" });
   const metadata = await pipeline.metadata();
   const width = metadata.width ?? 0;
   const height = metadata.height ?? 0;
@@ -142,7 +142,7 @@ async function normalizePixels(input: string | Buffer, config: P19EvaluatorConfi
   let frameNote: string | undefined;
   if ((metadata.pages ?? 1) > 1) frameNote = `animated-input-first-of-${metadata.pages}-pages`;
 
-  const base = sharp(input, { limitInputPixels: config.maxInputPixels, failOn: "error" })
+  const base = (await loadSharpDefault())(input, { limitInputPixels: config.maxInputPixels, failOn: "error" })
     .rotate()
     .toColourspace("srgb")
     .flatten({ background: "#808080" });

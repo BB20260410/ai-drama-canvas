@@ -3,7 +3,7 @@ import { constants as fsConstants, type BigIntStats, type Stats } from "node:fs"
 import { lstat, open, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import fg from "fast-glob";
-import sharp from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import { completionIssues } from "./acceptance.js";
 import { DEFAULT_PROJECT_ROOT, STATUS_PRIORITY } from "./constants.js";
 import {
@@ -1153,7 +1153,7 @@ async function inspectArtifact(
     let decodable: boolean | undefined;
     if (imageKind) {
       try {
-        const metadata = await sharp(filePath, { failOn: "error" }).metadata();
+        const metadata = await (await loadSharpDefault())(filePath, { failOn: "error" }).metadata();
         throwIfScanAborted(signal);
         width = metadata.width;
         height = metadata.height;
