@@ -2,7 +2,7 @@
 
 ## software_goal: runtime-perf-memory-20260825
 
-- status: `部分完成`（W6 已停；W2-C Linux 对照已绿；P7 owner / 安装版 T23 / 列表探针未跑）
+- status: `部分完成`（W6 复验已跑；§1.4 源码已完成；P7 owner / 安装版 T23 / 列表探针未跑）
 - plan: `docs/PLAN_运行速度与内存占用长期执行_20260825.md`
 - [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席本环境未跑）
 - [x] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
@@ -37,6 +37,7 @@
 - [x] Wave 6-A：typecheck:app + 本计划定向测（Linux 27/241 PASS；P7 fixture 仍需 Darwin）
 - [x] Wave 6-B：安装版 T23（owner 未点名 → 已写未跑；未弹窗）
 - [x] Wave 6-C：对照 §1 八条；全量审查 + Linux npm test（dirfd 失败已分类）；结论部分完成
+- [x] Wave 6 复验：两路审查 PASS；typecheck:app PASS；Linux 定向 35 files / 305 tests PASS；安装版 T23 仍 NOT_RUN
 - [x] Wave 6：度量关账（结论部分完成，非整包完成；安装版 T23 未跑）
 - [ ] 禁止：重建 P0–P14、无证据 SQL 批量化、N124 CV、全盘扫正式工程
 
