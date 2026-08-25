@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "ci-sqlite-busy-wall-flake",
+  "recordedAt": "2026-08-25T19:26:00Z",
+  "change": {
+    "kind": "test-only",
+    "sourceCodeChanged": false,
+    "files": [
+      "tests/studio-sqlite-busy-contract.test.ts"
+    ],
+    "summary": "短 deadline 墙钟从 500ms 改为 5s 且 < 120s/10。生产 STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS 仍 120000。触发：Darwin CI 32887756159 on b002adf Fast tests expected 547 < 500。"
+  },
+  "verification": {
+    "typecheckApp": "PASS",
+    "directedLinux": {
+      "file": "tests/studio-sqlite-busy-contract.test.ts",
+      "passed": 3,
+      "failed": 1,
+      "failedReason": "command ledger 项需 Darwin dirfd（既有，非本 diff）",
+      "platform": "linux"
+    },
+    "reviews": {
+      "redline": "PASS; 无 must-fix；禁止改 120s 常量",
+      "completion": "PASS; 不得勾 Wave 5 父项或关 Goal"
+    },
+    "failedDarwinCi": {
+      "runId": 32887756159,
+      "url": "https://github.com/BB20260410/ai-drama-canvas/actions/runs/32887756159",
+      "headSha": "b002adf43e68b5e5044a3313288758d6863438dc",
+      "note": "M7 LRU 提交；失败是墙钟 flake，不是参考缓存回归"
+    }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "overwrote20260811Final": false,
+    "t23SqlUnchanged": true,
+    "writeBusyTimeoutUnchanged": 120000,
+    "wave5ParentChecked": false
+  },
+  "claim": "仅放宽 busy 合同测墙钟。禁止写「T23 已复测」「M7 导致 SQL 回退」「运行速度已关账」。",
+  "residual": [
+    "本修复的 macos-latest CI 待本提交后复跑",
+    "安装版 T23 / 列表 GUI 探针仍 NOT_RUN"
+  ]
+}

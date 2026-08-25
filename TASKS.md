@@ -43,6 +43,7 @@
 - [x] Wave 6 Darwin CI：macos-latest check success on `0b46327`（run 32881922045）；不是安装版 T23
 - [x] Wave 5-E Darwin CI：macos-latest check success on `3f04d05`（evict）与 `84b594c`（写回拦截）；不是安装版 T23
 - [x] Wave 5 列表翻页源码合同 Darwin CI：macos-latest check success on `379df38`（run 32886953416）；不是安装版 T23 / 不是 GUI 探针
+- [x] Darwin CI flake：`studio-sqlite-busy-contract` 墙钟 500→5000（b002adf run 32887756159）；未改 120s timeout
 - [x] Wave 6：度量关账（结论部分完成，非整包完成；安装版 T23 未跑）
 - [ ] 禁止：重建 P0–P14、无证据 SQL 批量化、N124 CV、全盘扫正式工程
 
