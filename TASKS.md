@@ -10,7 +10,8 @@
 - [x] Wave 1-C：定向测试 + typecheck:app
 - [x] Wave 2-A：`unitIds`/`limit` 有界投影（上限 36；省略=整集）
 - [x] Wave 2-B：画布可见页只请求 unitIds
-- [ ] Wave 2-C–F：有界合同测收口；rebuildGraph 合并、MiniMap 降级、切工程清 LRU
+- [x] Wave 2-D：账本/计划风暴并入单 rAF
+- [ ] Wave 2-C/E/F：P7 有界对照（Darwin）；MiniMap 降级；切工程清 LRU
 - [ ] Wave 3：只读投影改 `inspectManagedProjectReadOnly`；earliest 去 per-unit snapshot；ssl5 不二次 earliest
 - [ ] Wave 4：MCP/Main 冷域动态 import（editor / story+mammoth / novel / video-package；抄 Main IPC `await import`；禁拆 command-bus 写路径）
 - [ ] Wave 5：列表只绑缩略图；legacy thumb 不先整文件读入；审片默认 thumb；derivative 不校源全 SHA

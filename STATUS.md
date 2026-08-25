@@ -14,7 +14,8 @@
 | wave1c | resolver + CLI 合同测 Linux 6 PASS；P7 fixture 需 Darwin |
 | wave2a | `resolveApprovedTimelineBound`：unitIds/limit 上限 36；省略=整集；空数组失败关闭 |
 | wave2b | 画布 / composable 可见页传 unitIds；空可见集不回退整集 |
-| earliest_next | **Wave 2-C/D**：有界合同测收口后 rebuildGraph 合并（不插队 MCP） |
+| wave2d | 账本/计划风暴并入 scheduleUnitGridGraphRebuild 单 rAF |
+| earliest_next | **Wave 2-E**：MiniMap 过阈降级 |
 
 ## 2026-08-25 · 本机人物库同步
 

@@ -6075,7 +6075,7 @@ function schedulePlanStatusRebuild(): void {
       planStatusRebuildDirty = true;
       return;
     }
-    rebuildGraph();
+    scheduleUnitGridGraphRebuild();
   }, 200);
 }
 
@@ -6093,7 +6093,8 @@ async function refreshGenerationProjectionFromLedger(): Promise<void> {
   if (canvasDisposed || projectRoot !== props.projectRoot) return;
   scheduleApprovedUnitGridRawProjection(projectRoot, units, coreByUnit);
   if (canvasDisposed || projectRoot !== props.projectRoot) return;
-  rebuildGraph();
+  // raw 投影收尾已 scheduleUnitGridGraphRebuild；此处再并入同一 rAF，避免同帧双整图。
+  scheduleUnitGridGraphRebuild();
 }
 
 /**

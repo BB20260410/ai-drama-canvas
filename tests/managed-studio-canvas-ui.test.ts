@@ -867,6 +867,8 @@ describe("P25 主题与事件接线 UI 合同", () => {
     // 账本投影驱动节点徽标（syncPlanNodeStatuses 经 200ms 去抖重建；拖拽中置脏收尾补齐）。
     expect(view).toContain("schedulePlanStatusRebuild()");
     expect(view).toContain("planStatusRebuildDirty");
+    expect(view).toMatch(/function schedulePlanStatusRebuild[\s\S]*scheduleUnitGridGraphRebuild\(\);/u);
+    expect(view).toContain("raw 投影收尾已 scheduleUnitGridGraphRebuild");
     // 取消连线外科式清除描边（不触发全量重建，P15 合同）。
     expect(view).toContain("stripPendingOutline");
     expect(view).toMatch(/function toggleConnectMode[\s\S]{0,400}stripPendingOutline\(previousPendingId\);/u);

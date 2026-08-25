@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "2-D",
+  "recordedAt": "2026-08-25T14:35:00Z",
+  "change": {
+    "schedulePlanStatusRebuildUsesRaf": true,
+    "ledgerRefreshCoalescesWithRawProjectionRaf": true,
+    "userLoadPathsRemainSyncRebuild": true
+  },
+  "verification": {
+    "managedStudioCanvasUi": "pending-this-commit"
+  },
+  "claim": "W2-D：账本/计划风暴并入已有 rAF，不改 envelope。用户操作/首屏仍同步 rebuild。"
+}
