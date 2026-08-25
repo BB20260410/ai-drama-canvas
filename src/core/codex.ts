@@ -14,6 +14,7 @@ import { NOVEL_AGENT_CAPABILITIES } from "./novel-agent-capabilities.js";
 import { withAdaptation } from "./adaptation-lazy.js";
 import { withStory } from "./story-lazy.js";
 import { withNovelAnalysisProvider } from "./novel-analysis-provider-lazy.js";
+import { getNovelAnalysisProviderSettings } from "./novel-analysis-provider-settings.js";
 import { auditExistingProductionBaselines, getProductionWorkflow, getStoryboard, listCreativeBibles } from "./production.js";
 import { listAssetRelations, listVoiceIdentities } from "./asset-registry.js";
 import { listProjectLocks } from "./locks.js";
@@ -1089,7 +1090,7 @@ export async function getCapabilities(
     const absoluteRoot = path.resolve(projectRoot);
     const index = await loadIndex(absoluteRoot);
     const settings = await readJson<GenerationSettings | null>(getSidecarPaths(absoluteRoot).generationSettings, null);
-    const analysisSettings = await withNovelAnalysisProvider((provider) => provider.getNovelAnalysisProviderSettings(absoluteRoot));
+    const analysisSettings = await getNovelAnalysisProviderSettings(absoluteRoot);
     project = {
       root: absoluteRoot,
       imported: Boolean(index),

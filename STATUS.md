@@ -29,6 +29,7 @@
 | wave4a | editor.js 经 `withEditor` 动态 import；MCP Zod 仍静态拉小模块 keyframe-curve |
 | wave4-cap | `getCapabilities` 握手用 `DEFERRED_VIDEO_ENGINE_CAPABILITY`，不 withEditor。`probe_video_engine` / doctor 仍会加载 editor |
 | wave4-novel | MCP / Main / command-bus / codex 经 `withNovelAnalysis*` 动态 import；写 case 未搬家。调用对应工具仍会加载整图。两路审查 PASS |
+| wave4-settings | `getCapabilities(projectRoot)` 经 `novel-analysis-provider-settings` 读配置，不 withNovelAnalysisProvider。doctor / 分析工具仍会加载整图 |
 | wave4e | 常驻 runtime gate watcher 默认只递归订 src/；tests/scripts 需 AI_CANVAS_RUNTIME_GATE_WATCH_TESTS_SCRIPTS。SOURCE_DIGEST_GLOBS 未改；generation-ledger watcher 与 packaged 身份 gate 未关 |
 | wave4f | src 媒体 owner 经 `sharp-lazy` 首次 touch 再 import(\"sharp\")。THUMBNAIL_RECIPE / 派生 recipe 未改。doctor 仍会 loadSharp 探测 |
 | wave5a | 对照未选中行不绑图；选中预览与审片并排默认 thumbnailUrl，禁止回退 mediaUrl。原图仅显式打开；差分仍读原图字节。未改 recipe |
@@ -39,7 +40,7 @@
 | wave6a | typecheck:app PASS；Linux 定向测 27 files / 241 tests PASS。P7 fixture / media-protocol 仍需 Darwin。未改源码 |
 | wave6b | 未跑安装版 T23（owner 未点名；本 Cloud 无 macOS App / 无正式工程 GUI）。不得称整包完成 |
 | wave6c | 对照 §1 八条；纠正 composable 空 unitIds 与 executor 边界注释。Linux npm test 64 文件失败（dirfd）；边界合同已修。整计划部分完成 |
-| earliest_next | **本 Cloud 可落地切片已尽**。真阻塞仅 owner/Darwin：P7 owner 对照、安装版 T23、列表翻页 `aicanvas-studio://media/* = 0`。禁拆 command-bus ledger 写路径。禁止 N124 / 禁止写「运行速度已关账」 |
+| earliest_next | 握手读分析配置已走薄模块。开放残差：command-bus 仍静态 ledger；P7 owner / 安装版 T23 / 列表探针需 Darwin 或 owner。禁止 N124 / 禁止写「运行速度已关账」 |
 
 ## 2026-08-25 · 本机人物库同步
 

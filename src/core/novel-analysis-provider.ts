@@ -6,7 +6,10 @@ import { assertNovelAnalysisChapterBinding, assertNovelAnalysisTaskBindingUnchan
 import { NovelAnalysisTransportError, assertNovelAnalysisStaticUrlPolicy, prepareNovelAnalysisPinnedTarget, requestPinnedNovelAnalysisText, type PinnedTarget } from "./novel-analysis-transport.js";
 import { appendEvent, getSidecarPaths, readJson, writeJsonAtomic } from "./sidecar.js";
 import { withStory, type StoryModule } from "./story-lazy.js";
+import { getNovelAnalysisProviderSettings } from "./novel-analysis-provider-settings.js";
 import type { AdaptationStore, NovelAnalysisProvider, NovelAnalysisProviderSettings, NovelAnalysisRunProgress, NovelAnalysisTask, StoryLibrary } from "./types.js";
+
+export { getNovelAnalysisProviderSettings } from "./novel-analysis-provider-settings.js";
 
 const loadAdaptationStore = (...args: Parameters<AdaptationModule["loadAdaptationStore"]>) =>
   withAdaptation((adaptation) => adaptation.loadAdaptationStore(...args));
@@ -199,7 +202,6 @@ const LEGACY_ANALYSIS_EXECUTION_LEASE_MS = 10 * 60_000;
 
 function now(): string { return new Date().toISOString(); }
 function record(value: unknown): value is Record<string, unknown> { return Boolean(value) && typeof value === "object" && !Array.isArray(value); }
-function emptySettings(): NovelAnalysisProviderSettings { return { schemaVersion: 1, revision: 0, providers: [], updatedAt: new Date(0).toISOString() }; }
 function hash(value: string): string { return createHash("sha256").update(value).digest("hex"); }
 
 function persistedExecutionError(error: unknown, status: "failed" | "submission_unknown"): string {
@@ -247,22 +249,6 @@ function childUrl(base: URL, suffix: "models" | "chat/completions"): URL {
   const url = new URL(base.toString());
   url.pathname = `${base.pathname.replace(/\/+$/, "")}/${suffix}`;
   return url;
-}
-
-function validateSettings(value: unknown): NovelAnalysisProviderSettings {
-  if (!record(value) || value.schemaVersion !== 1 || !Number.isInteger(value.revision) || !Array.isArray(value.providers) || typeof value.updatedAt !== "string") throw new Error("analysis-providers.json 结构损坏，已停止读取和写入。 ");
-  const ids = new Set<string>();
-  for (const entry of value.providers) {
-    if (!record(entry) || entry.schemaVersion !== 1 || typeof entry.id !== "string" || ids.has(entry.id) || typeof entry.name !== "string" || !["openai-compatible", "mock"].includes(String(entry.adapter)) || typeof entry.enabled !== "boolean" || typeof entry.model !== "string" || !Number.isInteger(entry.revision)) throw new Error("analysis-providers.json 包含无效或重复的 Provider。 ");
-    ids.add(entry.id);
-  }
-  if (value.defaultProviderId !== undefined && (typeof value.defaultProviderId !== "string" || !ids.has(value.defaultProviderId))) throw new Error("analysis-providers.json 的默认 Provider 不存在。 ");
-  return value as unknown as NovelAnalysisProviderSettings;
-}
-
-export async function getNovelAnalysisProviderSettings(projectRoot: string): Promise<NovelAnalysisProviderSettings> {
-  const value = await readJson<unknown | null>(getSidecarPaths(projectRoot).storyAnalysisProviders, null);
-  return value === null ? emptySettings() : validateSettings(value);
 }
 
 function normalizedProvider(input: UpsertNovelAnalysisProviderInput["provider"], existing?: NovelAnalysisProvider): NovelAnalysisProvider {
