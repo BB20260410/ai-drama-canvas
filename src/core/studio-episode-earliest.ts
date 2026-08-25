@@ -6,7 +6,7 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import { inspectManagedProjectReadOnly } from "./managed-project.js";
 import { assertGenerationLedgerSchemaFileReady } from "./studio-generation-ledger-readiness.js";
-import { listStudioProductionUnits, getStudioProductionUnitSnapshot } from "./studio-production.js";
+import { listStudioProductionUnits } from "./studio-production.js";
 import { getStudioGenerationCheckpointControl } from "./studio-generation-checkpoint.js";
 import { getStudioProjectWriteLeaseReadOnly } from "./studio-project-write-lease.js";
 import { projectStudioUnitGridNextAction } from "./studio-unit-grid-next-action.js";
@@ -140,7 +140,6 @@ export async function getStudioEpisodeEarliest(
 
   const slots: StudioEpisodeUnitSlotProjection[] = [];
   for (const unit of units) {
-    const snap = await getStudioProductionUnitSnapshot(root, unit.id);
     const approved = timelineByUnit.get(unit.id);
     const approvedPass = approved?.productionStatus === "pass";
     let generationRunId: string | null = approved?.selectedGenerationRunId
@@ -174,7 +173,7 @@ export async function getStudioEpisodeEarliest(
       unitId: unit.id,
       sequence: unit.sequence,
       title: unit.title,
-      revision: snap?.unit.revision ?? unit.revision,
+      revision: unit.revision,
       formalCommitted,
       reviewDecision,
       generationRunId,
