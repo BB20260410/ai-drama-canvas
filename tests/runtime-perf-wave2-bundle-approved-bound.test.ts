@@ -53,6 +53,12 @@ describe("Wave 2 bundle approved timeline 有界", () => {
       nextUnitId: "",
     })).toThrow(/非空数组/);
 
+    expect(() => resolveProjectionBundleApprovedTimelineUnitIds({
+      unitId: "",
+      previousUnitId: "S1E1-U01",
+      nextUnitId: "S1E1-U02",
+    })).toThrow(/非空数组/);
+
     const bound = resolveApprovedTimelineBound({
       unitIds: resolveProjectionBundleApprovedTimelineUnitIds({
         unitId: "S1E1-U02",

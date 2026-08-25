@@ -28,7 +28,7 @@
     "bundleOwnerFixture": "NOT_RUN Darwin dirfd"
   },
   "reviews": {
-    "implementation": "PASS: T23 phase set unchanged; helper fail-closed; approved after neighbor maps; no T23 SQL / recipe / dashboard owner edit",
+    "implementation": "PASS: T23 phase set unchanged; helper fail-closed including blank current unitId even if neighbors exist; approved after neighbor maps; no T23 SQL / recipe / dashboard owner edit",
     "redline": "PASS: no official scan; no ledger write; no GUI; no command-bus split; no N124; no P0-P14 rebuild"
   },
   "isolation": {
