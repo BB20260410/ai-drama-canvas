@@ -18,6 +18,8 @@ const mcpStartupFiles = [
   "src/core/command-bus.ts",
   "src/core/studio-command-executor.ts",
   "src/core/active-managed-studio-context.ts",
+  "src/core/codex.ts",
+  "src/core/studio-generation-session-snapshot.ts",
 ];
 
 const diagnosticSpecifiers = [
@@ -65,6 +67,8 @@ describe("Wave 4-D MCP 只读诊断面动态 import", () => {
     expect(executor).toContain('case "submit_studio_post_result_observation"');
     expect(executor).toContain("withStudioMultimediaTimeline");
     expect(executor).toContain("withStudioPostResultObservation");
+    expect(source("src/core/studio-generation-session-snapshot.ts")).toContain("withStudioProductionProjectionBundle");
+    expect(source("src/core/codex.ts")).toContain("studio-generation-session-snapshot");
   });
 
   it("MCP 诊断工具经 withX；ledger 只读处置面用 handler 内动态 import", () => {

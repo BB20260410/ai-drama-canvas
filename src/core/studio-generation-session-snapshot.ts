@@ -1,18 +1,13 @@
 import { createHash } from "node:crypto";
-import {
-  buildStudioProductionProjectionBundle,
-  type StudioProjectionFrozenReference,
-} from "./studio-production-projection-bundle.js";
+import type { StudioProjectionFrozenReference } from "./studio-production-projection-bundle.js";
+import { withStudioProductionProjectionBundle } from "./studio-readonly-diagnostics-lazy.js";
 import {
   listStudioGenerationLatestUnitGridRuns,
   readAnyStudioGenerationFrozenPack,
   type AnyStudioGenerationFreezePack,
 } from "./studio-generation-ledger.js";
 import { queryStudioGenerationFreeze } from "./studio-generation.js";
-import type {
-  StudioDashboardCurrentness,
-  StudioDashboardNextAction,
-} from "./studio-production-dashboard.js";
+import type { StudioDashboardCurrentness, StudioDashboardNextAction } from "./studio-production-dashboard.js";
 import type { NextShotContinuitySnapshot } from "./studio-next-shot-continuity.js";
 import type { StudioPostResultObservedActualState } from "./studio-post-result-observation.js";
 
@@ -175,7 +170,9 @@ export async function buildStudioGenerationSessionSnapshot(
   projectRoot: string,
   query: { unitId: string; panelId?: string },
 ): Promise<StudioGenerationSessionSnapshot> {
-  const bundle = await buildStudioProductionProjectionBundle(projectRoot, query);
+  const bundle = await withStudioProductionProjectionBundle((projection) =>
+    projection.buildStudioProductionProjectionBundle(projectRoot, query),
+  );
   const selectedPanelId = query.panelId
     ?? bundle.currentUnit.selectedPanelId
     ?? bundle.currentUnit.panels[0]?.panelId;

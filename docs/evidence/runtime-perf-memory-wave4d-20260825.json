@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "kind": "runtime-perf-memory-wave",
   "wave": "4-D",
-  "recordedAt": "2026-08-25T16:03:00Z",
+  "recordedAt": "2026-08-25T16:12:00Z",
   "change": {
     "loaders": [
       "src/core/studio-readonly-diagnostics-lazy.ts"
@@ -11,7 +11,9 @@
       "src/mcp/server.ts",
       "src/core/command-bus.ts",
       "src/core/studio-command-executor.ts",
-      "src/core/active-managed-studio-context.ts"
+      "src/core/active-managed-studio-context.ts",
+      "src/core/codex.ts",
+      "src/core/studio-generation-session-snapshot.ts"
     ],
     "commandBusWritePathUnmoved": true,
     "executorCasesUnmoved": true,
@@ -29,14 +31,16 @@
     "ledgerWrite": false,
     "gui": false
   },
-  "claim": "W4-D：MCP 只读诊断面 earliest / projection-bundle / dashboard / multimedia-timeline / write-lease / script-reader / script-media-align 改为 withX；post-result-observation 与 multimedia 写 case 未搬家；generation_unknown 处置面在 handler 内动态 import ledger。未调用对应工具时，MCP 启动解析不含这些诊断模块。",
+  "claim": "W4-D：MCP 只读诊断面 earliest / projection-bundle / dashboard / multimedia-timeline / write-lease / script-reader / align 改为 withX；session-snapshot 不再静态拉 bundle。写 case 未搬家。未调用对应诊断工具 / session-snapshot 操作时，MCP 启动解析不含 bundle / dashboard / multimedia / observation / earliest / reader / align。",
   "residual": [
+    "codex.ts 仍静态拉 session-snapshot.js 本身；调用 get_studio_generation_control(session-snapshot) 仍会 withStudioProductionProjectionBundle",
     "command-bus 仍静态拉 studio-generation-ledger；MCP 启动解析仍含 ledger",
     "get_active_managed_studio_context / write-lease 工具 / earliest 仍会加载 write-lease",
     "Main 顶栏仍静态拉 dashboard / projection-bundle / multimedia-timeline / script-reader / align（dashboard 留给 T23 units 热路径，本波未卸）",
     "script-library-projection / material-studio / studio-production / codex 仍在 MCP 顶栏",
-    "list_projects 在有 ingest manifest 时仍可能 withLocalCreativeContentImport（W4-C 残差）",
+    "list_projects 在有 ingest manifest 时仍可能 withLocalCreativeContentImport（W4-C）",
     "get_capabilities 仍 withEditor；doctor 仍动态探测 mammoth",
+    "formal 回写 / bundle 组装视频包子投影仍会 withStudioVideoPackage；commit_agent_imagegen_result_bundle 仍会碰 Higgsfield queue（W4-C）",
     "禁止写成「连上 Agent 永不加载诊断模块 / write-lease / ledger」"
   ]
 }
