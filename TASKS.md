@@ -51,6 +51,7 @@
 - [x] Wave 6 扩大复验：typecheck:app PASS；Linux 37 files / 320 tests PASS（含 list-flip / M7 LRU / busy 墙钟）；busy ledger 1 条仍需 Darwin dirfd；安装版 T23 仍 NOT_RUN
 - [x] Wave 6 三刀后复验：typecheck:app PASS；Linux 38 files / 327 tests PASS（含 lean identities / units-read-phase）；busy ledger 1 条仍需 Darwin dirfd；安装版 T23 仍 NOT_RUN
 - [x] Wave 6 只读三刀后复验：typecheck:app PASS；Linux 41 files / 336 tests PASS（含 identity/ledger/historical readonly）；busy ledger 1 条仍需 Darwin dirfd；安装版 T23 仍 NOT_RUN
+- [x] Wave 6 零 mock inspect 后复验：typecheck:app PASS；Linux 41 files / 322 tests PASS（含 unmocked inspect / projection sqlite）；busy ledger 1 条仍需 Darwin dirfd；安装版 T23 仍 NOT_RUN
 - [x] Wave 6 Darwin CI：macos-latest check success on `0b46327`（run 32881922045）；不是安装版 T23
 - [x] Wave 5-E Darwin CI：macos-latest check success on `3f04d05`（evict）与 `84b594c`（写回拦截）；不是安装版 T23
 - [x] Wave 5 列表翻页源码合同 Darwin CI：macos-latest check success on `379df38`（run 32886953416）；不是安装版 T23 / 不是 GUI 探针
