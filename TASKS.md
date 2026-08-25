@@ -2,7 +2,7 @@
 
 ## software_goal: runtime-perf-memory-20260825
 
-- status: `阻塞`（本 Cloud；整计划 `部分完成`）。§1.3 by-id + 诊断懒展开 + lean 季集身份 + 身份只读 + 账本批读只读 + 历史 PASS 活库只读已落地。等待 owner：P7 owner / 安装版 T23 / 列表 GUI 探针
+- status: `阻塞`（本 Cloud；整计划 `部分完成`）。§1.3 by-id + 诊断懒展开 + lean 季集身份 + 身份只读 + 账本批读只读 + 历史 PASS 活库只读 + Linux 真投影 sqlite 接线已落地。等待 owner：P7 owner / 安装版 T23 / 列表 GUI 探针
 - plan: `docs/PLAN_运行速度与内存占用长期执行_20260825.md`
 - [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席本环境未跑）
 - [x] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
@@ -21,6 +21,7 @@
 - [x] Wave 2 §1.3 残差：身份旁路只读打开已有生产库，缺库失败关闭；不 ensure / 不建库。Linux 真 sqlite 2500 末页 36 PASS。P7 仍需 Darwin
 - [x] Wave 2/3 §1.3 残差：时间线账本批读只读打开已有 generation ledger，不走 managedLedgerPaths / 可写 openDatabase。驾驶舱 / T23 / unit-grid 可写入口未改。Linux 真 sqlite 36 单元 PASS。P7 仍需 Darwin
 - [x] Wave 2/3 §1.3 残差：时间线历史 PASS 活库只读，不再 snapshot 复制整库。缺库/缺表仍空事实。P7 仍需 Darwin
+- [x] Wave 2/3 §1.3 残差：Linux 真 `getApprovedTimelineProjection` 手工 sqlite 接线（只 mock inspect；2500 末页 36；`unitTimingQueries=0`）。不是 P7 owner
 - [x] Wave 2 bundle：驾驶舱正式时间线只物化当前+前后邻；多媒体 storyboard 只请求当前单元。阶段名不变
 - [x] Wave 3-A：earliest / approved-timeline / align-board 改 `inspectManagedProjectReadOnly`
 - [x] Wave 3-B：`assertGenerationLedgerSchemaFileReady` 失败关闭，不静默建库
