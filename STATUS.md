@@ -6,8 +6,8 @@
 |---|---|
 | status | `completed_slice`：硬锁人物 + 桌面声线已入 `codex-ai-drama-studio` 人物库 |
 | project | `projects/codex-ai-drama-studio` |
-| characters | 33 → **41**（补：朔、素、穷奇、父亲30/50、白衣僧、黑衣僧、豆姐） |
-| voices | 0 → **4**（阿航 3 条、阿依 2、嘟嘟 2、豆姐 2） |
+| characters | 33 → **42**（含图腾腾；另有朔、素、穷奇、父亲30/50、白衣僧、黑衣僧、豆姐） |
+| voices | 0 → **5**（阿航、阿依、嘟嘟、豆姐、图腾腾） |
 | sort | 画布素材库按 `zh-CN` 姓名排序 |
 | earliest_next | 打开桌面端人物库核对试听；未改正式生图硬锁主权威 |
 

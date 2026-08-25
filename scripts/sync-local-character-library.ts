@@ -3,7 +3,8 @@
  * 已有资产不改主权威；同 SHA 不去重失败。写入走 executeIdempotentCommand。
  */
 import { createHash } from "node:crypto";
-import { access } from "node:fs/promises";
+import { access, copyFile, lstat } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { executeIdempotentCommand } from "../src/core/command-bus.js";
 import { getStudioCanonicalAsset, listStudioCanonicalAssets } from "../src/core/material-studio.js";
@@ -97,6 +98,14 @@ const NEW_CHARACTERS: NewCharacter[] = [
     negativeLocks: ["禁止普通人脸", "禁止嘴与眼睑", "禁止半面具或裂面具"],
     description: "完整黄金面具人格。台词后期画外配音。",
   },
+  {
+    id: "character-tutengteng",
+    name: "图腾腾",
+    aliases: ["图腾腾"],
+    image: desk("图腾腾参考图.png"),
+    audio: [desk("图腾腾声音.mp3"), desk("图腾腾声音参考.mp3")],
+    description: "本机人物库：图腾腾参考图与声线。",
+  },
 ];
 
 const AUDIO_BINDINGS: Array<{ assetId: string; name: string; files: string[] }> = [
@@ -143,8 +152,22 @@ async function exec(step: string, command: string, payload: Record<string, unkno
   return (result.result ?? {}) as Record<string, unknown>;
 }
 
+async function regularFileForImport(sourcePath: string): Promise<{ path: string; copied: boolean }> {
+  const metadata = await lstat(sourcePath);
+  if (metadata.isFile() && !metadata.isSymbolicLink() && metadata.nlink === 1) {
+    return { path: sourcePath, copied: false };
+  }
+  const dest = path.join(
+    os.tmpdir(),
+    `aic-char-import-${createHash("sha256").update(sourcePath).digest("hex").slice(0, 16)}${path.extname(sourcePath)}`,
+  );
+  await copyFile(sourcePath, dest);
+  return { path: dest, copied: true };
+}
+
 async function importMedia(step: string, sourcePath: string): Promise<{ sha256: string; kind: string }> {
-  const imported = await exec(step, "import_studio_media", { sourcePath });
+  const source = await regularFileForImport(sourcePath);
+  const imported = await exec(source.copied ? `${step}:copy` : step, "import_studio_media", { sourcePath: source.path });
   const sha256 = String(imported.sha256 ?? "").toLowerCase();
   const kind = String(imported.kind ?? "");
   if (!/^[a-f0-9]{64}$/u.test(sha256)) throw new Error(`导入失败：${sourcePath}`);
