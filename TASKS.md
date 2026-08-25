@@ -1,5 +1,20 @@
 # TASKS · 残留任务清账 2026-07-25
 
+## software_goal: runtime-perf-memory-20260825
+
+- status: `in_progress`（Wave 0 立项完成；Wave 1 未开始）
+- plan: `docs/PLAN_运行速度与内存占用长期执行_20260825.md`
+- [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席本环境未跑）
+- [ ] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
+- [ ] Wave 1-B：full 仅诊断/CLI + 耗时
+- [ ] Wave 1-C：定向测试 + typecheck:app
+- [ ] Wave 2：有界时间线（可见 36 / 可选 unitIds）
+- [ ] Wave 3：只读投影改 `inspectManagedProjectReadOnly`
+- [ ] Wave 4：MCP/Main 冷域动态 import（editor/adaptation/higgsfield）
+- [ ] Wave 5：列表只绑缩略图；legacy 失败不回退 4K
+- [ ] Wave 6：度量关账；安装版 T23 仅 owner 点名
+- [ ] 禁止：重建 P0–P14、无证据 SQL 批量化、N124 CV、全盘扫正式工程
+
 ## software_goal: unit-grid-brief-contract-w1-20260825
 
 - status: `completed_slice`

@@ -1,5 +1,17 @@
 # STATUS · 当前源码生产中枢（P0—P9 CLOSED / MCP_CLIENT_RESTART_PASS）
 
+## 2026-08-25 · 运行速度与内存占用长期计划立项
+
+| 字段 | 当前值 |
+|---|---|
+| status | `completed_slice`：计划已落盘，**未改运行时代码** |
+| plan | `docs/PLAN_运行速度与内存占用长期执行_20260825.md` |
+| wave0 | 调用点表已写入计划 §4；`getApprovedTimelineProjection` 默认仍是 `fastMode ?? false` |
+| models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
+| isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
+| evidence | `docs/evidence/runtime-perf-memory-plan-sources-20260825.json` |
+| earliest_next | **Wave 1-A**：时间线投影默认 `fastMode ?? true`（计划 §6 Wave 1） |
+
 ## 2026-08-25 · 本机人物库同步
 
 | 字段 | 当前值 |
@@ -9,7 +21,7 @@
 | characters | 33 → **42**（含图腾腾；另有朔、素、穷奇、父亲30/50、白衣僧、黑衣僧、豆姐） |
 | voices | 0 → **5**（阿航、阿依、嘟嘟、豆姐、图腾腾） |
 | sort | 画布素材库按 `zh-CN` 姓名排序 |
-| earliest_next | Cursor 接手 W2 锁参考覆盖率只读报告；交接 `docs/交接_给Cursor_20260825.md` |
+| earliest_next | 速度/内存计划 Wave 1-A（默认 fastMode）；W2 CLI 若本 checkout 无代码则不在本计划主链 |
 
 ## 2026-08-25 · W1 Unit-Grid Brief 合同
 
