@@ -318,6 +318,21 @@ describe("T9 getApprovedTimelineProjection 批量投影", () => {
     expect(omitted.fastMode).toBe(true);
     expect(explicitFast.fastMode).toBe(true);
     expect(omitted.durationMs).toBeGreaterThanOrEqual(0);
+    expect(omitted.bounded).toBe(false);
+    expect(explicitFast.bounded).toBe(false);
+  }, 120_000);
+
+  it("unitIds 有界：返回集 ⊆ 请求 id，且 bounded=true", async () => {
+    const fixture = await p7();
+    const { passUnit } = await seedUnitGridRuns(fixture);
+    const projection = await getApprovedTimelineProjection(fixture.root, {
+      season: "S03",
+      episode: "EP01",
+      unitIds: [passUnit.unit.id],
+    });
+    expect(projection.bounded).toBe(true);
+    expect(projection.unitCount).toBe(1);
+    expect(projection.units.map((unit) => unit.unitId)).toEqual([passUnit.unit.id]);
   }, 120_000);
 });
 

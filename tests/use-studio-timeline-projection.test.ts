@@ -66,6 +66,19 @@ describe("useStudioTimelineProjection 异步 token 绑定", () => {
     expect(tp.error.value).toBeNull();
   });
 
+  it("传入可见 unitIds 时不拉整集", async () => {
+    let received: { unitIds?: string[] } | undefined;
+    installCanvasApi({
+      getApprovedTimelineProjection: async (_root: string, query: { unitIds?: string[] }) => {
+        received = query;
+        return makeProjection("u1");
+      },
+    });
+    const tp = useStudioTimelineProjection("/proj-a");
+    await tp.refresh("S1", "S1E2", ["u1", "u1", ""]);
+    expect(received?.unitIds).toEqual(["u1"]);
+  });
+
   it("旧 seq 响应（乱序到达）被丢弃，不覆盖更新的投影", async () => {
     const first = deferred<ReturnType<typeof makeProjection>>();
     const second = deferred<ReturnType<typeof makeProjection>>();

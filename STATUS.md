@@ -12,7 +12,9 @@
 | evidence | `docs/evidence/runtime-perf-memory-wave1a-20260825.json`、`docs/evidence/runtime-perf-memory-wave1b-20260825.json` |
 | wave1b | CLI `scripts/report-approved-timeline-full.ts` 显式 `fastMode: false` + `durationMs`；日常诊断/canonical 仍显式 true |
 | wave1c | resolver + CLI 合同测 Linux 6 PASS；P7 fixture 需 Darwin |
-| earliest_next | **Wave 2-A**：有界时间线 `unitIds`/`limit`（上限 36） |
+| wave2a | `resolveApprovedTimelineBound`：unitIds/limit 上限 36；省略=整集；空数组失败关闭 |
+| wave2b | 画布 / composable 可见页传 unitIds；空可见集不回退整集 |
+| earliest_next | **Wave 2-C/D**：有界合同测收口后 rebuildGraph 合并（不插队 MCP） |
 
 ## 2026-08-25 · 本机人物库同步
 

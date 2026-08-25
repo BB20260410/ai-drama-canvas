@@ -290,7 +290,7 @@ const api = {
   ): ReturnType<typeof import("../core/studio-generation-ledger.js").getStudioDetachedGenerationUnknownUnitStates> =>
     ipcRenderer.invoke("canvas:get-studio-detached-unknown-unit-states", projectRoot, unitIds),
     // T9 批量时间线投影
-    getApprovedTimelineProjection: (projectRoot: string, query: { season?: string; episode?: string; fastMode?: boolean }): Promise<import("../core/studio-approved-timeline-projection.js").ApprovedTimelineProjection> =>
+    getApprovedTimelineProjection: (projectRoot: string, query: { season?: string; episode?: string; fastMode?: boolean; unitIds?: string[]; limit?: number }): Promise<import("../core/studio-approved-timeline-projection.js").ApprovedTimelineProjection> =>
       t23IpcPerformanceProbe.invoke("canvas:get-approved-timeline-projection", projectRoot, query),
     // T19 持续生图状态机
     getContinuousGenerationState: (projectRoot: string, input: { season?: string; episode?: string }): Promise<import("../core/studio-continuous-generation-state.js").ContinuousGenerationStateProjection> => ipcRenderer.invoke("canvas:get-continuous-generation-state", projectRoot, input),

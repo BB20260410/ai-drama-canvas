@@ -2986,7 +2986,7 @@ function registerIpc(): void {
   ipcMain.handle("canvas:get-approved-timeline-projection", async (
     _event,
     projectRoot: string,
-    query: { season?: string; episode?: string; fastMode?: boolean } = {},
+    query: { season?: string; episode?: string; fastMode?: boolean; unitIds?: string[]; limit?: number } = {},
   ) => {
     await requireManagedStudioProject(projectRoot);
     const { getApprovedTimelineProjection } = await import("../core/studio-approved-timeline-projection.js");

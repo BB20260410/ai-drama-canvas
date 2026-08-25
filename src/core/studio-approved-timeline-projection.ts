@@ -100,6 +100,8 @@ export interface ApprovedTimelineProjection {
   fastMode: boolean;
   /** 本次投影墙钟耗时（毫秒），供诊断/CLI 提示。 */
   durationMs: number;
+  /** 是否应用了 unitIds/limit 有界查询（省略则为整集）。 */
+  bounded: boolean;
 }
 
 /**
@@ -123,12 +125,55 @@ interface DerivedUnitState {
   error: string | null;
 }
 
+/** 画布一页上限；有界查询不得超过此数。 */
+export const APPROVED_TIMELINE_BOUNDED_UNIT_LIMIT = 36;
+
 /** 时间线投影查询。省略 `fastMode` 视为 true（产品默认快路径）。 */
 export type ApprovedTimelineProjectionQuery = {
   season?: string;
   episode?: string;
   fastMode?: boolean;
+  /** 只投影这些单元（须同季同集已存在）。上限 36。省略则整集。 */
+  unitIds?: string[];
+  /** 无 unitIds 时按集内顺序截断。上限 36。 */
+  limit?: number;
 };
+
+export type ApprovedTimelineBound = {
+  unitIds?: string[];
+  limit?: number;
+};
+
+/**
+ * 解析有界投影。省略 unitIds/limit → 整集。
+ * 空数组 / 超 36 / 非正 limit 失败关闭，禁止静默整集。
+ */
+export function resolveApprovedTimelineBound(
+  query: Pick<ApprovedTimelineProjectionQuery, "unitIds" | "limit"> | undefined,
+): ApprovedTimelineBound {
+  const unitIds = query?.unitIds;
+  const limit = query?.limit;
+  if (unitIds !== undefined) {
+    if (!Array.isArray(unitIds) || unitIds.length === 0) {
+      throw new Error("unitIds 必须是非空数组；省略该字段才表示整集。");
+    }
+    const unique = [...new Set(unitIds.map((id) => {
+      if (typeof id !== "string" || id.trim() === "") throw new Error("unitIds 含空标识。");
+      return id;
+    }))];
+    if (unique.length > APPROVED_TIMELINE_BOUNDED_UNIT_LIMIT) {
+      throw new Error(`unitIds 最多 ${APPROVED_TIMELINE_BOUNDED_UNIT_LIMIT} 项。`);
+    }
+    return { unitIds: unique };
+  }
+  if (limit !== undefined) {
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > APPROVED_TIMELINE_BOUNDED_UNIT_LIMIT) {
+      throw new Error(`limit 必须是 1–${APPROVED_TIMELINE_BOUNDED_UNIT_LIMIT} 的整数。`);
+    }
+    return { limit };
+  }
+  return {};
+}
 
 /**
  * 解析时间线投影快慢开关。
@@ -155,9 +200,11 @@ export async function getApprovedTimelineProjection(
   const shell = await inspectManagedProject(projectRoot);
   const season = query.season ?? "S1";
   const episode = query.episode ?? "S1E1";
+  const bound = resolveApprovedTimelineBound(query);
+  const wantedIds = bound.unitIds ? new Set(bound.unitIds) : undefined;
 
-  // 1. 批量获取所有单元（单页最多 50，翻页至全量）
-  // panelCount 直接取列表行 panel_count 列，不再逐单元开库取 snapshot。
+  // 1. 批量获取单元（单页最多 50）。省略 bound 则翻页至全量；
+  //    有 unitIds/limit 时凑齐即停，不把未请求的单元送进后续账本批读。
   const unitSummaries: Array<{ id: string; sequence: number; title: string; revision: number; panelCount: number }> = [];
   let cursor: string | undefined;
   for (let page = 0; page < 50; page++) {
@@ -170,30 +217,37 @@ export async function getApprovedTimelineProjection(
     for (const item of batch.items) {
       unitSummaries.push({ id: item.id, sequence: item.sequence, title: item.title, revision: item.revision, panelCount: item.panelCount });
     }
+    if (wantedIds && unitSummaries.filter((unit) => wantedIds.has(unit.id)).length >= wantedIds.size) break;
+    if (bound.limit !== undefined && unitSummaries.length >= bound.limit) break;
     if (!batch.nextCursor) break;
     cursor = batch.nextCursor;
   }
   unitSummaries.sort((a, b) => a.sequence - b.sequence || a.id.localeCompare(b.id));
+  const boundedSummaries = wantedIds
+    ? unitSummaries.filter((unit) => wantedIds.has(unit.id))
+    : bound.limit !== undefined
+      ? unitSummaries.slice(0, bound.limit)
+      : unitSummaries;
 
   // 2. 循环外一次取齐全部单元的最新 unit-grid run（单次只读连接，消除 N+1 串行开库）；
   //    同批带回最新 run 成对结果的 raw/labeled 媒体 SHA，供正式 SHA 填充。
   const latestUnitGridRuns = await listStudioGenerationLatestUnitGridRuns(
     projectRoot,
-    unitSummaries.map((unit) => unit.id),
+    boundedSummaries.map((unit) => unit.id),
   );
   const latestRunByUnit = new Map(latestUnitGridRuns.map((entry) => [entry.unitId, entry]));
 
   // 3. 先批量读取历史 PASS。fullMode 遇到“无正式 run + 已核验历史 PASS”时可直接
   // 跳过昂贵 freeze/readiness；最终仍由第二遍的历史选择规则提升为 PASS。
   const historicalSelectionFacts = await readStudioGenerationProjectionSelectionFacts(projectRoot, {
-    units: unitSummaries.map((unit) => ({ unitId: unit.id, revision: unit.revision })),
+    units: boundedSummaries.map((unit) => ({ unitId: unit.id, revision: unit.revision })),
     generationRunIds: [],
   });
 
   // 4. 第一遍：逐单元推导状态（单单元失败不影响其他）
   const fastMode = resolveApprovedTimelineFastMode(query);
   const derivedByUnit = new Map<string, DerivedUnitState>();
-  for (const unit of unitSummaries) {
+  for (const unit of boundedSummaries) {
     try {
       if (fastMode) {
         // 快速模式：仅从账本推导状态（跳过绑定就绪查询，性能从 45s 降到 <3s）
@@ -244,7 +298,7 @@ export async function getApprovedTimelineProjection(
   const snapshotApprovedRunIds = new Set(latestUnitGridRuns.flatMap((entry) => (
     entry.approvedResultIdentity ? [entry.approvedResultIdentity.generationRunId] : []
   )));
-  const formalPassRunIds = unitSummaries
+  const formalPassRunIds = boundedSummaries
     .map((unit) => derivedByUnit.get(unit.id))
     .filter((derived): derived is DerivedUnitState => Boolean(
       derived && !derived.error && derived.state === "pass" && derived.latestRun?.hasResultPair,
@@ -264,7 +318,7 @@ export async function getApprovedTimelineProjection(
   const units: ApprovedTimelineUnitProjection[] = [];
   const summary = { pass: 0, pendingReview: 0, inProgress: 0, failed: 0, blocked: 0 };
 
-  for (const unit of unitSummaries) {
+  for (const unit of boundedSummaries) {
     const derived = derivedByUnit.get(unit.id)!;
     const displayLabel = resolveUnitDisplayLabel(unit.id, unit.sequence, episode);
     if (derived.error !== null) {
@@ -396,5 +450,6 @@ export async function getApprovedTimelineProjection(
     builtAt: new Date().toISOString(),
     fastMode,
     durationMs: Date.now() - startedAt,
+    bounded: wantedIds !== undefined || bound.limit !== undefined,
   };
 }

@@ -200,6 +200,8 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     // snapshot 内闭合的 PASS execution identity；renderer 只做精确 SHA/pack
     // 匹配、读媒体和闭包核验，不再逐单元重读 Review。
     expect(canvas).toContain("getApprovedTimelineProjection");
+    expect(canvas).toContain("unitIds");
+    expect(canvas).toContain("禁止回退整集");
     expect(canvas).toContain("resolveUnitGridSelectedResultIdentity");
     expect(canvas).toContain("rawMediaSha256: selectedRawSha256");
     expect(canvas).toContain("停检账本只可作为首屏 placeholder");

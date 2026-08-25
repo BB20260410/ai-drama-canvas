@@ -1884,7 +1884,12 @@ async function refreshTimelineProjectionForUnits(
     timelineProjection.reset();
     return null;
   }
-  await timelineProjection.refresh(scope.season, scope.episode);
+  const visibleUnitIds = [...new Set(units.map((unit) => unit.id).filter(Boolean))].slice(0, 36);
+  if (visibleUnitIds.length === 0) {
+    timelineProjection.reset();
+    return null;
+  }
+  await timelineProjection.refresh(scope.season, scope.episode, visibleUnitIds);
   return timelineProjection.projection.value
     ? new Map(timelineProjection.projection.value.map((unit) => [unit.unitId, unit]))
     : null;
@@ -4633,11 +4638,21 @@ async function loadApprovedUnitGridRawProjection(
         const adjudication = await readUnitGridProjectionWithin(
           "核心正式时间线投影",
           "时间线",
-          (signal) => ipcUnderSignal(signal, () => window.canvasApi.getApprovedTimelineProjection(projectRoot, {
-            season: group.season,
-            episode: group.episode,
-            fastMode: true,
-          })),
+          (signal) => ipcUnderSignal(signal, () => {
+            const unitIds = units.slice(0, 36)
+              .filter((unit) => unit.seasonId === group.season && unit.episodeId === group.episode)
+              .map((unit) => unit.id)
+              .filter(Boolean);
+            if (unitIds.length === 0) {
+              throw new Error("可见页没有可投影的 unitIds，禁止回退整集。");
+            }
+            return window.canvasApi.getApprovedTimelineProjection(projectRoot, {
+              season: group.season,
+              episode: group.episode,
+              fastMode: true,
+              unitIds,
+            });
+          }),
         );
         for (const coreUnit of adjudication.units) {
           coreByUnitId.set(coreUnit.unitId, coreUnit);

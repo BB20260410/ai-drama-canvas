@@ -134,8 +134,8 @@ export function useStudioTimelineProjection(projectRoot: Ref<string> | string) {
   // 组件卸载时自动使在途请求失效（仅在 setup 作用域内使用时注册）。
   if (getCurrentScope()) onScopeDispose(invalidate);
 
-  /** 刷新批量时间线投影（fastMode <1s）。 */
-  async function refresh(season: string, episode: string) {
+  /** 刷新批量时间线投影（fastMode <1s）。可见页传入 unitIds（≤36），省略则整集。 */
+  async function refresh(season: string, episode: string, unitIds?: readonly string[]) {
     const requestRoot = root.value;
     refreshSeq += 1;
     const seq = refreshSeq;
@@ -148,10 +148,14 @@ export function useStudioTimelineProjection(projectRoot: Ref<string> | string) {
         if (isCurrent()) error.value = "canvasApi.getApprovedTimelineProjection 不可用";
         return;
       }
+      const uniqueIds = unitIds
+        ? [...new Set(unitIds.filter((id) => typeof id === "string" && id.trim() !== ""))]
+        : [];
       const result = await api.getApprovedTimelineProjection(requestRoot, {
         season,
         episode,
         fastMode: true,
+        ...(uniqueIds.length > 0 ? { unitIds: uniqueIds.slice(0, 36) } : {}),
       });
       // 旧响应（发起后 root 已切换、已有更新的 refresh、或已 invalidate）直接丢弃。
       if (!isCurrent()) return;
