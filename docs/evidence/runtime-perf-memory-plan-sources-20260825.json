@@ -31,7 +31,20 @@
     "dashboardUnitPageLimit": 36,
     "thumbnailLruDefault": 64,
     "legacyThumbMaxEntries": 2000,
-    "formalProjectFullScan": false
+    "formalProjectFullScan": false,
+    "mcpStaticCoreClosureApproxFiles": 137,
+    "mcpStaticCoreClosureApproxSourceBytes": 6100000,
+    "mainStaticCoreClosureApproxFiles": 106,
+    "mainStaticCoreClosureApproxSourceBytes": 4600000,
+    "mainIpcDynamicImports": 9,
+    "mcpStartupFastPath": false,
+    "storyStaticMammoth": true,
+    "runtimeGateWatchesTestsAndScripts": true
+  },
+  "mcpImportGraphAudit": {
+    "subagent": "bc-5f5879a5-6646-5507-a45a-7ad698c3ebb2",
+    "method": "static import closure walk; source bytes not RSS; tsc not run",
+    "foldedInto": "docs/PLAN_运行速度与内存占用长期执行_20260825.md §3.2 M2 / §6 Wave 4"
   },
   "claim": "速度/内存长期计划已按源码与已关账报告立项；外部模型席本环境未能实调；未改运行时代码；未扫正式工程。"
 }

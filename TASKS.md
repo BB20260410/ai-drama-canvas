@@ -10,7 +10,7 @@
 - [ ] Wave 1-C：定向测试 + typecheck:app
 - [ ] Wave 2：有界时间线（可见 36 / 可选 unitIds）
 - [ ] Wave 3：只读投影改 `inspectManagedProjectReadOnly`
-- [ ] Wave 4：MCP/Main 冷域动态 import（editor/adaptation/higgsfield）
+- [ ] Wave 4：MCP/Main 冷域动态 import（editor / story+mammoth / novel / video-package；抄 Main IPC `await import`；禁拆 command-bus 写路径）
 - [ ] Wave 5：列表只绑缩略图；legacy 失败不回退 4K
 - [ ] Wave 6：度量关账；安装版 T23 仅 owner 点名
 - [ ] 禁止：重建 P0–P14、无证据 SQL 批量化、N124 CV、全盘扫正式工程
