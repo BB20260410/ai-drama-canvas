@@ -2,7 +2,7 @@
 
 ## software_goal: runtime-perf-memory-20260825
 
-- status: `阻塞`（本 Cloud；整计划 `部分完成`）。§1.3 by-id + 诊断懒展开 + lean 季集身份 + 时间线账本批读只读旁路已落地。等待 owner：P7 owner / 安装版 T23 / 列表 GUI 探针
+- status: `阻塞`（本 Cloud；整计划 `部分完成`）。§1.3 by-id + 诊断懒展开 + lean 季集身份 + 身份只读 + 账本批读只读 + 历史 PASS 活库只读已落地。等待 owner：P7 owner / 安装版 T23 / 列表 GUI 探针
 - plan: `docs/PLAN_运行速度与内存占用长期执行_20260825.md`
 - [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席本环境未跑）
 - [x] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
@@ -48,6 +48,7 @@
 - [x] Wave 6 复验：两路审查 PASS；typecheck:app PASS；Linux 定向 35 files / 305 tests PASS；安装版 T23 仍 NOT_RUN
 - [x] Wave 6 扩大复验：typecheck:app PASS；Linux 37 files / 320 tests PASS（含 list-flip / M7 LRU / busy 墙钟）；busy ledger 1 条仍需 Darwin dirfd；安装版 T23 仍 NOT_RUN
 - [x] Wave 6 三刀后复验：typecheck:app PASS；Linux 38 files / 327 tests PASS（含 lean identities / units-read-phase）；busy ledger 1 条仍需 Darwin dirfd；安装版 T23 仍 NOT_RUN
+- [x] Wave 6 只读三刀后复验：typecheck:app PASS；Linux 41 files / 336 tests PASS（含 identity/ledger/historical readonly）；busy ledger 1 条仍需 Darwin dirfd；安装版 T23 仍 NOT_RUN
 - [x] Wave 6 Darwin CI：macos-latest check success on `0b46327`（run 32881922045）；不是安装版 T23
 - [x] Wave 5-E Darwin CI：macos-latest check success on `3f04d05`（evict）与 `84b594c`（写回拦截）；不是安装版 T23
 - [x] Wave 5 列表翻页源码合同 Darwin CI：macos-latest check success on `379df38`（run 32886953416）；不是安装版 T23 / 不是 GUI 探针
