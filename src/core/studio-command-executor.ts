@@ -63,7 +63,12 @@ import {
   appendStudioContinuityObservation,
 } from "./studio-continuity-ledger.js";
 import { submitStudioGenerationReview } from "./studio-generation-review.js";
-import { submitStudioPostResultObservation } from "./studio-post-result-observation.js";
+import {
+  withStudioMultimediaTimeline,
+  withStudioPostResultObservation,
+  type StudioMultimediaTimelineModule,
+  type StudioPostResultObservationModule,
+} from "./studio-readonly-diagnostics-lazy.js";
 import {
   attestStudioGenerationCheckpoint,
   refreshStudioGenerationCheckpoint,
@@ -86,7 +91,6 @@ import {
   type HiggsfieldQueueModule,
   type HiggsfieldVideoModule,
 } from "./studio-higgsfield-lazy.js";
-import { attachStudioMultimediaTimelineMedia } from "./studio-multimedia-timeline.js";
 import { withLocalCreativeMaterializer, type LocalCreativeMaterializerModule } from "./local-creative-lazy.js";
 import {
   deterministicStudioTimelineRejection,
@@ -118,6 +122,10 @@ const recordStudioHiggsfieldSubmission = (...args: Parameters<HiggsfieldVideoMod
   withHiggsfieldVideo((higgsfield) => higgsfield.recordStudioHiggsfieldSubmission(...args));
 const assertNoActiveStudioHiggsfieldConnectorReservation = (...args: Parameters<HiggsfieldQueueModule["assertNoActiveStudioHiggsfieldConnectorReservation"]>) =>
   withHiggsfieldQueue((queue) => queue.assertNoActiveStudioHiggsfieldConnectorReservation(...args));
+const submitStudioPostResultObservation = (...args: Parameters<StudioPostResultObservationModule["submitStudioPostResultObservation"]>) =>
+  withStudioPostResultObservation((observation) => observation.submitStudioPostResultObservation(...args));
+const attachStudioMultimediaTimelineMedia = (...args: Parameters<StudioMultimediaTimelineModule["attachStudioMultimediaTimelineMedia"]>) =>
+  withStudioMultimediaTimeline((timeline) => timeline.attachStudioMultimediaTimelineMedia(...args));
 const assertStudioHiggsfieldConnectorOwnerCurrent = (...args: Parameters<HiggsfieldQueueModule["assertStudioHiggsfieldConnectorOwnerCurrent"]>) =>
   withHiggsfieldQueue((queue) => queue.assertStudioHiggsfieldConnectorOwnerCurrent(...args));
 const authorizeStudioHiggsfieldConnectorRequest = (...args: Parameters<HiggsfieldQueueModule["authorizeStudioHiggsfieldConnectorRequest"]>) =>

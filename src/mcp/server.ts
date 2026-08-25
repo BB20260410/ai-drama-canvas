@@ -52,18 +52,22 @@ import { executeIdempotentCommand, isStudioCommandRequest, listCommandLedger, re
 import { isRejectedCommandFailure } from "../core/command-outcome.js";
 import { classifyToolError } from "../core/tool-error-classification.js";
 import {
-  acquireStudioProjectWriteLease,
-  getStudioProjectWriteLeasePublic,
-  heartbeatStudioProjectWriteLease,
-  recommendGenerationUnknownDisposition,
-  releaseStudioProjectWriteLease,
-} from "../core/studio-project-write-lease.js";
-import {
-  readStudioGenerationDispatch,
-  readStudioImagegenCallIntentByRun,
-  readStudioGenerationResultBundle,
-} from "../core/studio-generation-ledger.js";
-import { getStudioEpisodeEarliest } from "../core/studio-episode-earliest.js";
+  withStudioEpisodeEarliest,
+  withStudioMultimediaTimeline,
+  withStudioProductionDashboard,
+  withStudioProductionProjectionBundle,
+  withStudioProjectWriteLease,
+  withStudioScriptLibraryReader,
+  withStudioScriptMediaAlign,
+  type StudioEpisodeEarliestModule,
+  type StudioMultimediaTimelineModule,
+  type StudioProductionDashboardModule,
+  type StudioProductionProjectionBundleModule,
+  type StudioProjectWriteLeaseModule,
+  type StudioScriptLibraryReaderModule,
+  type StudioScriptMediaAlignModule,
+} from "../core/studio-readonly-diagnostics-lazy.js";
+import type { StudioProductionDashboardQuery } from "../core/studio-production-dashboard.js";
 import { listAssetRelations, listVoiceIdentities, upsertAssetRelation, upsertVoiceIdentity } from "../core/asset-registry.js";
 import type { EditProject, GenerationJob, GenerationProvider, GenerationSettings } from "../core/types.js";
 import { PUBLICATION_KINDS, PUBLICATION_PURPOSES, PUBLICATION_VARIANTS, listPublicationIntents, listPublicationReceipts } from "../core/publication.js";
@@ -131,7 +135,6 @@ import {
   listStudioBindingSections,
   listStudioBindingUnits,
 } from "../core/studio-binding-control.js";
-import { buildStudioProductionProjectionBundle } from "../core/studio-production-projection-bundle.js";
 import { evaluateStudioReviewTargetConsistency, getStudioContinuityReviewControl, resolveLatestStudioGenerationRunForPanel } from "../core/studio-continuity-review-control.js";
 import { getStudioGenerationTrace, getStudioScriptRevisionImpact } from "../core/studio-trace.js";
 import {
@@ -139,8 +142,6 @@ import {
   getStudioEpisodeUnitMediaMap,
   getStudioScriptLibraryIndex,
 } from "../core/studio-script-library-projection.js";
-import { getStudioScriptReaderView } from "../core/studio-script-library-reader.js";
-import { getStudioScriptMediaAlignBoard } from "../core/studio-script-media-align.js";
 import { openStudioStoryboardWizard } from "../core/studio-storyboard-wizard.js";
 import { suggestStudioStoryboardDraft } from "../core/studio-storyboard-draft.js";
 import { runStudioFusionHelper } from "../core/studio-fusion-product-helpers.js";
@@ -160,11 +161,6 @@ import {
   runtimeMcpGateMode,
 } from "../core/runtime-mcp-effect.js";
 import { createRuntimeMcpPerformanceProbe } from "../core/runtime-mcp-observability.js";
-import {
-  getStudioProductionDashboard,
-  type StudioProductionDashboardQuery,
-} from "../core/studio-production-dashboard.js";
-import { getStudioMultimediaTimelineProjection } from "../core/studio-multimedia-timeline.js";
 import { getActiveManagedStudioContext } from "../core/active-managed-studio-context.js";
 import { withDuduReadonlyImport, type DuduReadonlyImportModule } from "../core/dudu-readonly-import-lazy.js";
 import { withStudioVideoPackage, type StudioVideoPackageModule } from "../core/studio-video-package-lazy.js";
@@ -267,6 +263,28 @@ const getStudioHiggsfieldVideoGenerationControl = (...args: Parameters<Higgsfiel
   withHiggsfieldVideo((higgsfield) => higgsfield.getStudioHiggsfieldVideoGenerationControl(...args));
 const getStudioHiggsfieldConnectorWorkQueue = (...args: Parameters<HiggsfieldQueueModule["getStudioHiggsfieldConnectorWorkQueue"]>) =>
   withHiggsfieldQueue((queue) => queue.getStudioHiggsfieldConnectorWorkQueue(...args));
+const getStudioEpisodeEarliest = (...args: Parameters<StudioEpisodeEarliestModule["getStudioEpisodeEarliest"]>) =>
+  withStudioEpisodeEarliest((earliest) => earliest.getStudioEpisodeEarliest(...args));
+const buildStudioProductionProjectionBundle = (...args: Parameters<StudioProductionProjectionBundleModule["buildStudioProductionProjectionBundle"]>) =>
+  withStudioProductionProjectionBundle((bundle) => bundle.buildStudioProductionProjectionBundle(...args));
+const getStudioProductionDashboard = (...args: Parameters<StudioProductionDashboardModule["getStudioProductionDashboard"]>) =>
+  withStudioProductionDashboard((dashboard) => dashboard.getStudioProductionDashboard(...args));
+const getStudioMultimediaTimelineProjection = (...args: Parameters<StudioMultimediaTimelineModule["getStudioMultimediaTimelineProjection"]>) =>
+  withStudioMultimediaTimeline((timeline) => timeline.getStudioMultimediaTimelineProjection(...args));
+const getStudioProjectWriteLeasePublic = (...args: Parameters<StudioProjectWriteLeaseModule["getStudioProjectWriteLeasePublic"]>) =>
+  withStudioProjectWriteLease((writeLease) => writeLease.getStudioProjectWriteLeasePublic(...args));
+const acquireStudioProjectWriteLease = (...args: Parameters<StudioProjectWriteLeaseModule["acquireStudioProjectWriteLease"]>) =>
+  withStudioProjectWriteLease((writeLease) => writeLease.acquireStudioProjectWriteLease(...args));
+const heartbeatStudioProjectWriteLease = (...args: Parameters<StudioProjectWriteLeaseModule["heartbeatStudioProjectWriteLease"]>) =>
+  withStudioProjectWriteLease((writeLease) => writeLease.heartbeatStudioProjectWriteLease(...args));
+const releaseStudioProjectWriteLease = (...args: Parameters<StudioProjectWriteLeaseModule["releaseStudioProjectWriteLease"]>) =>
+  withStudioProjectWriteLease((writeLease) => writeLease.releaseStudioProjectWriteLease(...args));
+const recommendGenerationUnknownDisposition = (...args: Parameters<StudioProjectWriteLeaseModule["recommendGenerationUnknownDisposition"]>) =>
+  withStudioProjectWriteLease((writeLease) => writeLease.recommendGenerationUnknownDisposition(...args));
+const getStudioScriptReaderView = (...args: Parameters<StudioScriptLibraryReaderModule["getStudioScriptReaderView"]>) =>
+  withStudioScriptLibraryReader((reader) => reader.getStudioScriptReaderView(...args));
+const getStudioScriptMediaAlignBoard = (...args: Parameters<StudioScriptMediaAlignModule["getStudioScriptMediaAlignBoard"]>) =>
+  withStudioScriptMediaAlign((align) => align.getStudioScriptMediaAlignBoard(...args));
 
 const server = new McpServer({
   name: "ai-drama-canvas",
@@ -1923,6 +1941,11 @@ registrar.registerTool(
   async ({ projectRoot, generationRunId, remoteMayExist }) => {
     try {
       await inspectManagedProject(projectRoot);
+      const {
+        readStudioGenerationDispatch,
+        readStudioImagegenCallIntentByRun,
+        readStudioGenerationResultBundle,
+      } = await import("../core/studio-generation-ledger.js");
       const [dispatch, callIntent, bundle] = await Promise.all([
         readStudioGenerationDispatch(projectRoot, generationRunId).catch(() => null),
         readStudioImagegenCallIntentByRun(projectRoot, generationRunId).catch(() => null),
@@ -1934,7 +1957,7 @@ registrar.registerTool(
       );
       // run terminal from events is not always on dispatch; keep null if unknown
       const runTerminal = null as "failed" | "cancelled" | "succeeded" | null;
-      const advice = recommendGenerationUnknownDisposition({
+      const advice = await recommendGenerationUnknownDisposition({
         hasCallIntent,
         hasCommittedResult,
         runTerminal,

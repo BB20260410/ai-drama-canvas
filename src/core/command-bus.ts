@@ -176,10 +176,13 @@ import {
   readStudioGenerationReviewOperationRecordReadOnly,
   type SubmitStudioGenerationReviewInput,
 } from "./studio-generation-review.js";
+import type { SubmitStudioPostResultObservationInput } from "./studio-post-result-observation.js";
 import {
-  readStudioPostResultObservationOperationRecordReadOnly,
-  type SubmitStudioPostResultObservationInput,
-} from "./studio-post-result-observation.js";
+  withStudioMultimediaTimeline,
+  withStudioPostResultObservation,
+  type StudioMultimediaTimelineModule,
+  type StudioPostResultObservationModule,
+} from "./studio-readonly-diagnostics-lazy.js";
 import {
   readStudioGenerationCheckpointOperationRecordReadOnly,
   type AttestStudioGenerationCheckpointInput,
@@ -200,10 +203,7 @@ import { withStudioVideoPackage, type StudioVideoPackageModule } from "./studio-
 import type { StudioVideoPackageAuthorityInput, StudioVideoPackageExpectedManagedSource } from "./studio-video-package.js";
 import type { AttestStudioHiggsfieldConnectorCapabilityInput, RecordStudioHiggsfieldSubmissionInput } from "./studio-higgsfield-video-generation.js";
 import type { reconcileStudioHiggsfieldConnectorRequest, HiggsfieldDirectUnlimitedObservation } from "./studio-higgsfield-connector-queue.js";
-import {
-  readStudioMultimediaTimelineBindingByOperationId,
-  type AttachStudioMultimediaTimelineMediaInput,
-} from "./studio-multimedia-timeline.js";
+import type { AttachStudioMultimediaTimelineMediaInput } from "./studio-multimedia-timeline.js";
 import { withLocalCreativeMaterializer, type LocalCreativeMaterializerModule } from "./local-creative-lazy.js";
 import type { LocalCreativeProductionUnitMaterializationReceipt, MaterializeLocalCreativeProductionUnitsInput } from "./local-creative-production-unit-materializer.js";
 
@@ -233,6 +233,10 @@ const materializeLocalCreativeProductionUnits = (...args: Parameters<LocalCreati
   withLocalCreativeMaterializer((materializer) => materializer.materializeLocalCreativeProductionUnits(...args));
 const readLocalCreativeProductionUnitMaterializationOutcomeReadOnly = (...args: Parameters<LocalCreativeMaterializerModule["readLocalCreativeProductionUnitMaterializationOutcomeReadOnly"]>) =>
   withLocalCreativeMaterializer((materializer) => materializer.readLocalCreativeProductionUnitMaterializationOutcomeReadOnly(...args));
+const readStudioPostResultObservationOperationRecordReadOnly = (...args: Parameters<StudioPostResultObservationModule["readStudioPostResultObservationOperationRecordReadOnly"]>) =>
+  withStudioPostResultObservation((observation) => observation.readStudioPostResultObservationOperationRecordReadOnly(...args));
+const readStudioMultimediaTimelineBindingByOperationId = (...args: Parameters<StudioMultimediaTimelineModule["readStudioMultimediaTimelineBindingByOperationId"]>) =>
+  withStudioMultimediaTimeline((timeline) => timeline.readStudioMultimediaTimelineBindingByOperationId(...args));
 
 export type AppendStudioContinuityObservationCommandPayload = Omit<AppendStudioContinuityObservationInput, "operationId">;
 export type AppendStudioContinuityCorrectionCommandPayload = Omit<AppendStudioContinuityCorrectionInput, "operationId">;

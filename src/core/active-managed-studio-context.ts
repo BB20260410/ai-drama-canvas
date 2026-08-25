@@ -11,8 +11,8 @@ import {
   type ActiveStudioFocus,
   type ActiveStudioMode,
 } from "./sidecar.js";
-import { type StudioDashboardNextAction } from "./studio-production-dashboard.js";
-import { getStudioProjectWriteLeaseReadOnly } from "./studio-project-write-lease.js";
+import type { StudioDashboardNextAction } from "./studio-production-dashboard.js";
+import { withStudioProjectWriteLease } from "./studio-readonly-diagnostics-lazy.js";
 
 export const ACTIVE_MANAGED_STUDIO_CONTEXT_SCHEMA_VERSION = 1 as const;
 
@@ -382,7 +382,9 @@ async function getActiveManagedStudioContextOnce(
     },
   };
   try {
-    const leaseProjection = await getStudioProjectWriteLeaseReadOnly(activeRoot);
+    const leaseProjection = await withStudioProjectWriteLease((writeLease) =>
+      writeLease.getStudioProjectWriteLeaseReadOnly(activeRoot),
+    );
     body.writeLease = {
       held: leaseProjection.held,
       expired: leaseProjection.expired,

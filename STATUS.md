@@ -4,14 +4,15 @@
 
 | 字段 | 当前值 |
 |---|---|
-| status | `in_progress`：W1–W3 + W4-A/B/C 已落地；W2-C 需 Darwin；整计划未关账 |
+| status | `in_progress`：W1–W3 + W4-A/B/C/D 已落地；W2-C 需 Darwin；整计划未关账 |
 | plan | `docs/PLAN_运行速度与内存占用长期执行_20260825.md` |
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
-| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`、`wave3*`、`wave4a`、`wave4b`、`wave4c` |
+| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`、`wave3*`、`wave4a`、`wave4b`、`wave4c`、`wave4d` |
 | wave4b | story/adaptation/novel-agent 经 withX 动态 import；story.ts 顶栏已卸 mammoth（docx 分支动态加载）。doctor 仍会 `import("mammoth")` 探测；snapshot 会 withStory，doctor 会 withStory+withAdaptation |
 | wave4c | video-package / Higgsfield queue+video / dudu / local-creative 经 withX。mcp-projection 仍静态（同步消毒、无重依赖）。调用对应控制面/写命令仍会加载 |
+| wave4d | MCP 只读诊断面 earliest / bundle / dashboard / multimedia / write-lease / reader / align 经 withX；observation 隐藏边已切断。command-bus 仍静态拉 ledger。Main dashboard 顶栏未卸（T23）。get_active_managed_studio_context 仍会加载 write-lease |
 | wave1b | CLI `scripts/report-approved-timeline-full.ts` 显式 `fastMode: false` + `durationMs`；日常诊断/canonical 仍显式 true |
 | wave1c | resolver + CLI 合同测 Linux 6 PASS；P7 fixture 需 Darwin |
 | wave2a | `resolveApprovedTimelineBound`：unitIds/limit 上限 36；省略=整集；空数组失败关闭 |
@@ -24,7 +25,7 @@
 | wave3c | earliest 槽位 revision 只用 list 行；不再 `getStudioProductionUnitSnapshot` |
 | wave3d | `planSsl5MissingToGen` 只用 `board.earliestUnitId`，不再二次 earliest |
 | wave4a | editor.js 经 `withEditor` 动态 import；MCP Zod 仍静态拉小模块 keyframe-curve |
-| earliest_next | **Wave 4-D**：把 Main 已有 IPC `await import` 模式抄到 MCP 只读诊断面 |
+| earliest_next | **Wave 4-E**：runtime gate watcher 收窄（常驻只订 `src/`；`tests/`/`scripts/` 改开关）。禁关 generation-ledger watcher 或 packaged 身份 gate |
 
 ## 2026-08-25 · 本机人物库同步
 
