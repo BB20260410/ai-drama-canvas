@@ -38,6 +38,7 @@
 - [x] Wave 6-B：安装版 T23（owner 未点名 → 已写未跑；未弹窗）
 - [x] Wave 6-C：对照 §1 八条；全量审查 + Linux npm test（dirfd 失败已分类）；结论部分完成
 - [x] Wave 6 复验：两路审查 PASS；typecheck:app PASS；Linux 定向 35 files / 305 tests PASS；安装版 T23 仍 NOT_RUN
+- [x] Wave 6 Darwin CI：macos-latest check success on `0b46327`（run 32881922045）；HEAD W5-E 后续提交 CI 仍 queued；不是安装版 T23
 - [x] Wave 6：度量关账（结论部分完成，非整包完成；安装版 T23 未跑）
 - [ ] 禁止：重建 P0–P14、无证据 SQL 批量化、N124 CV、全盘扫正式工程
 
