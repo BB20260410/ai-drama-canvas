@@ -4,7 +4,7 @@
 
 | 字段 | 当前值 |
 |---|---|
-| status | `部分完成`：W6 已停。§1 八条 1/2/7/8 已完成，3/4/5/6 部分完成。未跑安装版 T23 / W2-C / 列表探针。禁止写「运行速度已关账」 |
+| status | `部分完成`：W6 已停。§1 八条 1/2/7/8 已完成，3/4/5/6 部分完成。W2-C Linux 对照已绿。未跑安装版 T23 / P7 owner / 列表探针。禁止写「运行速度已关账」 |
 | plan | `docs/PLAN_运行速度与内存占用长期执行_20260825.md` |
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
