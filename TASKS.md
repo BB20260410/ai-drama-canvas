@@ -33,7 +33,7 @@
 - [x] Wave 5-C：缩略派生并发上限（与画布 15s 向导并发 4 同级）
 - [x] Wave 5-D：derivative serving 只校派生文件 + DB 绑定
 - [x] Wave 5-E：`verifiedFileCache` 按 projectRoot 分桶或切工程淘汰（分桶 + Main watcher 关闭/切换淘汰旧桶）
-- [x] Wave 5 列表翻页源码合同：`tests/runtime-perf-wave5-list-flip-media-count.test.ts`（helper 合成 2 页×36 media=0 + LRU URL-only；非 GUI）
+- [x] Wave 5 列表翻页源码合同：`tests/runtime-perf-wave5-list-flip-media-count.test.ts`（helper 合成 2 页×36 + hostname→thumbnailRecipeKey 分类 + thumbnail serving 不读源 CAS；非 GUI）
 - [ ] Wave 5 父项（列表翻页探针）：源码合同 W5-A–E + list-flip 已勾；安装版 `aicanvas-studio://media/* = 0` 未跑，故父项不勾
 - [x] Wave 6-A：typecheck:app + 本计划定向测（Linux 27/241 PASS；P7 fixture 仍需 Darwin）
 - [x] Wave 6-B：安装版 T23（owner 未点名 → 已写未跑；未弹窗）

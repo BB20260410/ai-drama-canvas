@@ -8,15 +8,41 @@ import { listOrWorkbenchPreviewUrl } from "../src/renderer/src/studio-list-previ
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const source = (relative: string) => readFileSync(path.join(root, relative), "utf8");
 
+function hexKey(lane: number, page: number, index: number): string {
+  return `${lane.toString(16).padStart(2, "0")}${page.toString(16).padStart(2, "0")}${index.toString(16).padStart(2, "0")}${"ab".repeat(29)}`;
+}
+
 function pageItems(page: number, count: number) {
   return Array.from({ length: count }, (_, index) => ({
-    thumbnailUrl: `aicanvas-studio://thumbnail/p${page}-${index}?projectRoot=%2Ftmp`,
-    mediaUrl: `aicanvas-studio://media/p${page}-${index}?projectRoot=%2Ftmp`,
+    thumbnailUrl: `aicanvas-studio://thumbnail/${hexKey(1, page, index)}?projectRoot=%2Ftmp`,
+    mediaUrl: `aicanvas-studio://media/${hexKey(2, page, index)}?projectRoot=%2Ftmp`,
   }));
 }
 
 function countStudioMediaProtocol(urls: readonly string[]): number {
   return urls.filter((url) => url.includes("aicanvas-studio://media/")).length;
+}
+
+/** 与 Main `protocol.handle("aicanvas-studio")` 同一套 hostname → 请求字段映射（测试内镜像，不改 handler）。 */
+function classifyAicanvasStudioRequest(url: string):
+  | { ok: true; target: "media" | "thumbnail" | "derivative"; field: "mediaSha256" | "thumbnailRecipeKey" | "derivativeRecipeKey" }
+  | { ok: false } {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return { ok: false };
+  }
+  const target = parsed.hostname;
+  const key = decodeURIComponent(parsed.pathname.replace(/^\//u, ""));
+  if ((target !== "media" && target !== "thumbnail" && target !== "derivative") || !/^[a-f0-9]{64}$/u.test(key)) {
+    return { ok: false };
+  }
+  return {
+    ok: true,
+    target,
+    field: target === "media" ? "mediaSha256" : target === "thumbnail" ? "thumbnailRecipeKey" : "derivativeRecipeKey",
+  };
 }
 
 function sliceBetween(haystack: string, startMarker: string, endMarker: string): string {
@@ -47,6 +73,32 @@ describe("Wave 5 列表翻页原图次数源码合同（非 GUI 探针）", () =
       page.map((item) => listOrWorkbenchPreviewUrl({ ...item, showOriginal: true })),
     );
     expect(countStudioMediaProtocol(explicit)).toBe(72);
+
+    const classified = defaultSrcs.map((src) => classifyAicanvasStudioRequest(src));
+    expect(classified.every((item) => item.ok && item.target === "thumbnail" && item.field === "thumbnailRecipeKey")).toBe(true);
+    expect(classified.filter((item) => item.ok && item.field === "mediaSha256")).toHaveLength(0);
+    const explicitClassified = explicit.map((src) => classifyAicanvasStudioRequest(src));
+    expect(explicitClassified.filter((item) => item.ok && item.field === "mediaSha256")).toHaveLength(72);
+  });
+
+  it("协议 handler 把 thumbnail 主机名映射成 thumbnailRecipeKey；thumbnail serving 不 inspect 源 CAS", () => {
+    const main = source("src/main/index.ts");
+    const handler = sliceBetween(main, 'protocol.handle("aicanvas-studio"', 'protocol.handle("aicanvas-asset"');
+    expect(handler).toContain("{ mediaSha256: key, rangeHeader }");
+    expect(handler).toContain("{ thumbnailRecipeKey: key, rangeHeader }");
+    expect(handler).toContain("{ derivativeRecipeKey: key, rangeHeader }");
+    expect(handler).toContain("streamStudioMediaRequest");
+
+    const protocol = source("src/core/studio-media-protocol.ts");
+    const mediaStart = protocol.indexOf('if (request.target === "media")');
+    const thumbStart = protocol.indexOf("if (!row.thumbnailRelpath", mediaStart);
+    expect(mediaStart).toBeGreaterThan(-1);
+    expect(thumbStart).toBeGreaterThan(mediaStart);
+    const thumbnailBranch = protocol.slice(thumbStart, protocol.indexOf("export async function openStudioMediaStream", thumbStart));
+    expect(thumbnailBranch).toContain('target: "thumbnail"');
+    expect(thumbnailBranch).toContain("inspectManagedFileCached");
+    expect(thumbnailBranch).not.toContain("inspectCasObjectCached");
+    expect(thumbnailBranch).not.toContain("objectRelpath");
   });
 
   it("缩略图 LRU 只缓存 URL 字符串，不持媒体二进制", () => {
