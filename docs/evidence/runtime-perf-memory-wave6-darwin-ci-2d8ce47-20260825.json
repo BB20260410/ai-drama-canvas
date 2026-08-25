@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "6-darwin-ci-2d8ce47",
+  "recordedAt": "2026-08-25T22:58:52Z",
+  "change": {
+    "kind": "verification-only",
+    "sourceCodeChanged": false,
+    "summary": "macos-latest CI check success on HEAD 4b1824a、零 mock inspect 源码 2d8ce47、真 sqlite 接线 43945a2。不是安装版 T23，不是 P7 owner，不是列表 GUI 探针。"
+  },
+  "verification": {
+    "darwinCi": {
+      "conclusion": "success",
+      "runId": 32907435248,
+      "url": "https://github.com/BB20260410/ai-drama-canvas/actions/runs/32907435248",
+      "headSha": "4b1824a8b77e75d1f0bc40c71bdc5af9a2a1d557",
+      "createdAt": "2026-08-25T22:42:39Z",
+      "updatedAt": "2026-08-25T22:58:26Z",
+      "steps": ["Typecheck=success", "Fast tests=success"],
+      "fastTests": {
+        "testFiles": 320,
+        "projectionUnmockedInspect": { "file": "tests/runtime-perf-wave2-projection-unmocked-inspect.test.ts", "tests": 6, "durationMs": 10654 },
+        "projectionReadonlySqlite": { "file": "tests/runtime-perf-wave2-projection-readonly-sqlite.test.ts", "tests": 5, "durationMs": 11770 }
+      },
+      "note": "4b1824a 为复验证据提交；测试面与 2d8ce47 相同"
+    },
+    "related": {
+      "2d8ce47": {
+        "conclusion": "success",
+        "runId": 32906906873,
+        "url": "https://github.com/BB20260410/ai-drama-canvas/actions/runs/32906906873",
+        "headSha": "2d8ce4714ca9bdf9127ede7958fe4283d021fd63",
+        "createdAt": "2026-08-25T22:35:58Z",
+        "updatedAt": "2026-08-25T22:49:17Z",
+        "note": "零 mock inspect 源码；Fast tests 320 files；unmocked 6 / 4393ms；sqlite 5 / 4926ms"
+      },
+      "43945a2": {
+        "conclusion": "success",
+        "runId": 32906441251,
+        "url": "https://github.com/BB20260410/ai-drama-canvas/actions/runs/32906441251",
+        "headSha": "43945a23e129c3c4868efb0bdbe75e6ebad71cd3",
+        "createdAt": "2026-08-25T22:30:08Z",
+        "updatedAt": "2026-08-25T22:47:15Z",
+        "note": "真 sqlite 接线（只 mock inspect）；Fast tests 319 files；projection-readonly-sqlite 5 tests 5455ms"
+      },
+      "6df4eb4": {
+        "conclusion": "failure",
+        "runId": 32905324987,
+        "note": "wave3b 源码合同撞注释中的 snapshot 标识；adf2f0c 已修"
+      }
+    },
+    "listFlipProbe": "NOT_RUN",
+    "installedT23": "NOT_RUN",
+    "p7OwnerBounded": "NOT_RUN",
+    "installedApp": "NO_APP"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "overwrote20260811Final": false,
+    "writeBusyTimeoutUnchanged": 120000,
+    "wave5ParentChecked": false,
+    "listStudioProductionUnitsBodyUnchanged": true,
+    "checkpointWriteInitUnchanged": true
+  },
+  "claim": "4b1824a / 2d8ce47 / 43945a2 Darwin CI 已绿（含零 mock inspect 6 与真 sqlite 接线 5）。禁止写「T23 已复测」「列表原图次数已测为 0」「P7 已在本 Cloud 跑过」「运行速度已关账」。",
+  "residual": [
+    "安装版 T23 / P7 owner / 列表 GUI 探针仍 NOT_RUN",
+    "macos CI ≠ 安装版 T23"
+  ]
+}
