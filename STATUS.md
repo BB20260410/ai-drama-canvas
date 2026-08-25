@@ -9,7 +9,7 @@
 | characters | 33 → **42**（含图腾腾；另有朔、素、穷奇、父亲30/50、白衣僧、黑衣僧、豆姐） |
 | voices | 0 → **5**（阿航、阿依、嘟嘟、豆姐、图腾腾） |
 | sort | 画布素材库按 `zh-CN` 姓名排序 |
-| earliest_next | 打开桌面端人物库核对试听；未改正式生图硬锁主权威 |
+| earliest_next | Cursor 接手 W2 锁参考覆盖率只读报告；交接 `docs/交接_给Cursor_20260825.md` |
 
 ## 2026-08-25 · W1 Unit-Grid Brief 合同
 
