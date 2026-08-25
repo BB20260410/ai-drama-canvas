@@ -32,7 +32,7 @@
 - [x] Wave 5-C：缩略派生并发上限（与画布 15s 向导并发 4 同级）
 - [x] Wave 5-D：derivative serving 只校派生文件 + DB 绑定
 - [x] Wave 5-E：`verifiedFileCache` 按 projectRoot 分桶或切工程淘汰
-- [ ] Wave 5：列表只绑缩略图；legacy thumb 不先整文件读入；审片默认 thumb；derivative 不校源全 SHA
+- [ ] Wave 5 父项（列表翻页探针）：源码合同 W5-A–E 已勾；`aicanvas-studio://media/* = 0` 未跑，故父项不勾
 - [x] Wave 6-A：typecheck:app + 本计划定向测（Linux 27/241 PASS；P7 fixture 仍需 Darwin）
 - [x] Wave 6-B：安装版 T23（owner 未点名 → 已写未跑；未弹窗）
 - [x] Wave 6-C：对照 §1 八条；全量审查 + Linux npm test（dirfd 失败已分类）；结论部分完成
