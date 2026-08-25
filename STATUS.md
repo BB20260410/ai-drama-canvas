@@ -9,7 +9,7 @@
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
-| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`（含 `wave2c`、`wave2-bundle-approved-bound`）、`wave3*`、`wave4a`–`wave4f`、`wave4-capabilities-deferred-engine`、`wave4-novel-analysis-lazy`、`wave5a`–`wave5e`、`wave6a`–`wave6c` |
+| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`（含 `wave2c`、`wave2-bundle-approved-bound`）、`wave3*`、`wave4a`–`wave4f`、`wave4-capabilities-deferred-engine`、`wave4-novel-analysis-lazy`、`wave4-capabilities-settings-thin`、`wave5a`–`wave5e`、`wave6a`–`wave6c` |
 | wave4b | story/adaptation/novel-agent 经 withX 动态 import；story.ts 顶栏已卸 mammoth（docx 分支动态加载）。doctor 仍会 `import("mammoth")` 探测；snapshot 会 withStory，doctor 会 withStory+withAdaptation |
 | wave4c | video-package / Higgsfield queue+video / dudu / local-creative 经 withX。mcp-projection 仍静态（同步消毒、无重依赖）。调用对应控制面/写命令仍会加载 |
 | wave4d | MCP 只读诊断面 earliest / bundle / dashboard / multimedia / write-lease / reader / align 经 withX；session-snapshot 不再静态拉 bundle。command-bus 仍静态拉 ledger。codex 仍静态拉 session-snapshot.js 本身。Main dashboard 顶栏未卸（T23）。get_active_managed_studio_context 仍会加载 write-lease |
