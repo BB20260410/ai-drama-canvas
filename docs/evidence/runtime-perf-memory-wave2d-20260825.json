@@ -9,7 +9,7 @@
     "userLoadPathsRemainSyncRebuild": true
   },
   "verification": {
-    "managedStudioCanvasUi": "pending-this-commit"
+    "managedStudioCanvasUi": "PASS"
   },
   "claim": "W2-D：账本/计划风暴并入已有 rAF，不改 envelope。用户操作/首屏仍同步 rebuild。"
 }

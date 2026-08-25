@@ -1226,7 +1226,13 @@ const pendingConnectionSourceId = ref("");
 const selectedDraftEdgeId = ref("");
 const clearConfirmationArmed = ref(false);
 const showEdges = ref(true);
-const showMiniMap = ref(true);
+/** smoke 典型页 ≤78；超过此数默认关 MiniMap，避免全 store SVG。用户仍可手动开。 */
+const MINIMAP_AUTO_HIDE_AFTER_NODES = 80;
+const miniMapUserOverride = ref<boolean | null>(null);
+const showMiniMap = computed(() => {
+  if (miniMapUserOverride.value !== null) return miniMapUserOverride.value;
+  return nodes.value.length <= MINIMAP_AUTO_HIDE_AFTER_NODES;
+});
 // P25 主题皮肤：浅色（默认）/深色/米色，经主题模块持久化（组件内不出现存储字面量，合同红线）。
 const canvasTheme = ref<ManagedCanvasThemeId>(readManagedCanvasTheme());
 const canvasThemeAssets = computed(() => getManagedCanvasThemeAssets(canvasTheme.value));
@@ -4053,7 +4059,7 @@ function toggleEdges(): void {
 }
 
 function toggleMiniMap(): void {
-  showMiniMap.value = !showMiniMap.value;
+  miniMapUserOverride.value = !showMiniMap.value;
 }
 
 function toggleWorkspaceMode(): void {
@@ -8455,6 +8461,7 @@ function invalidateCanvasRequests(): void {
   pinnedAssetController.invalidate();
   guardedActionGate.invalidate();
   invalidateGlobalResourceRequest();
+  miniMapUserOverride.value = null;
 }
 
 watch(() => unitDetail.value?.unit.id, (unitId, previousUnitId) => {

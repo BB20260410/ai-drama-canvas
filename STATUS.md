@@ -15,7 +15,8 @@
 | wave2a | `resolveApprovedTimelineBound`：unitIds/limit 上限 36；省略=整集；空数组失败关闭 |
 | wave2b | 画布 / composable 可见页传 unitIds；空可见集不回退整集 |
 | wave2d | 账本/计划风暴并入 scheduleUnitGridGraphRebuild 单 rAF |
-| earliest_next | **Wave 2-E**：MiniMap 过阈降级 |
+| wave2e | 节点 >80 默认关 MiniMap；invalidate 清用户覆盖 |
+| earliest_next | **Wave 2-F**：切工程 `thumbnailLru.clear()` |
 
 ## 2026-08-25 · 本机人物库同步
 
