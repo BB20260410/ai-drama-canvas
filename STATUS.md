@@ -4,7 +4,7 @@
 
 | 字段 | 当前值 |
 |---|---|
-| status | `部分完成`：W6 复验已跑。§1 八条 1/2/4/7/8 已完成，3/5/6 部分完成。§1.5 源码合同测已补（非 GUI 探针）。未跑安装版 T23 / P7 owner / 列表探针。禁止写「运行速度已关账」 |
+| status | `阻塞`（本 Cloud 可执行项已尽；整计划仍 `部分完成`）。§1 八条 1/2/4/7/8 已完成，3/5/6 部分完成。等待 owner / Darwin。禁止写「运行速度已关账」 |
 | plan | `docs/PLAN_运行速度与内存占用长期执行_20260825.md` |
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
@@ -48,7 +48,7 @@
 | wave5-list-flip-darwin-ci | macos-latest CI check **success** on `379df38`（list-flip 源码合同，run `32886953416`）。不是安装版 T23，不是 GUI 探针 |
 | sqlite-busy-wall | Darwin CI `b002adf`/`d0c4175` 因 547/507 < 500 红；墙钟改 5s 后 HEAD `e1ea3f1` check **success**（run `32889586061`）。未改 120s timeout。不是 T23 |
 | sqlite-shm-race | Darwin CI `5a075cf` run `32893004763` Fast tests 因 -shm 竞态 `canonNlink=0` 误判红。绑定把 inode 换号 / nlink=0 当瞬态重试；symlink / nlink>1 仍失败关闭。修复提交 `3a3462e` check **success**（run `32894599796`）。不是 T23 |
-| earliest_next | **本 Cloud 可落地切片已尽**。真阻塞仅 owner/Darwin：安装版 T23、列表翻页 GUI 探针。禁拆 command-bus ledger。禁止 N124 / 禁止写「运行速度已关账」 |
+| earliest_next | **等待 owner**。本 Cloud 无下一步可执行项。仅用户能解：①安装版 T23 ②列表翻页 GUI 探针 `aicanvas-studio://media/* = 0` ③P7 owner 有界对照。禁拆 command-bus ledger。禁止 N124 / 禁止写「运行速度已关账」 |
 
 ## 2026-08-25 · 本机人物库同步
 

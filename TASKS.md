@@ -2,7 +2,7 @@
 
 ## software_goal: runtime-perf-memory-20260825
 
-- status: `部分完成`（W6 复验已跑；§1.4 源码已完成；§1.5 源码合同测已补；P7 owner / 安装版 T23 / 列表 GUI 探针未跑）
+- status: `阻塞`（本 Cloud；整计划 `部分完成`）。等待 owner：P7 owner / 安装版 T23 / 列表 GUI 探针
 - plan: `docs/PLAN_运行速度与内存占用长期执行_20260825.md`
 - [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席本环境未跑）
 - [x] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
