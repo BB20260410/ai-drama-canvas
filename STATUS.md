@@ -11,7 +11,8 @@
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
 | evidence | `docs/evidence/runtime-perf-memory-wave1a-20260825.json`、`docs/evidence/runtime-perf-memory-wave1b-20260825.json` |
 | wave1b | CLI `scripts/report-approved-timeline-full.ts` 显式 `fastMode: false` + `durationMs`；日常诊断/canonical 仍显式 true |
-| earliest_next | **Wave 1-C**：锁测试覆盖后进 Wave 2（不插队 MCP / N124） |
+| wave1c | resolver + CLI 合同测 Linux 6 PASS；P7 fixture 需 Darwin |
+| earliest_next | **Wave 2-A**：有界时间线 `unitIds`/`limit`（上限 36） |
 
 ## 2026-08-25 · 本机人物库同步
 

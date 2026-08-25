@@ -145,7 +145,7 @@ export function resolveApprovedTimelineFastMode(
  * 使用 deriveGenerationTargetState 归约器确保状态一致性。
  * 性能优化：fastMode（默认 true）跳过绑定就绪查询（仅从账本推导状态）；
  * 最新 run、历史 PASS 候选与宫格数均循环外一次取齐（单次只读连接 + 列表行 panel_count），无 N+1 开库。
- * 诊断/CLI 必须显式 `fastMode: false` 才走 full。
+ * full 仅显式 `fastMode: false`（CLI `report-approved-timeline-full`）。日常诊断/canonical 保持 `true`。
  */
 export async function getApprovedTimelineProjection(
   projectRoot: string,

@@ -7,7 +7,7 @@
 - [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席本环境未跑）
 - [x] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
 - [x] Wave 1-B：full 仅 CLI `report-approved-timeline-full` + 投影 `durationMs`；日常诊断保持 fast
-- [ ] Wave 1-C：定向测试 + typecheck:app
+- [x] Wave 1-C：定向测试 + typecheck:app
 - [ ] Wave 2：有界时间线（可见 36 / 可选 unitIds）；附属：rebuildGraph 合并、MiniMap 降级、切工程清 LRU
 - [ ] Wave 3：只读投影改 `inspectManagedProjectReadOnly`；earliest 去 per-unit snapshot；ssl5 不二次 earliest
 - [ ] Wave 4：MCP/Main 冷域动态 import（editor / story+mammoth / novel / video-package；抄 Main IPC `await import`；禁拆 command-bus 写路径）
