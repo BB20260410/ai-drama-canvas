@@ -2,7 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { access, readFile, stat } from "node:fs/promises";
 import path from "node:path";
-import { listEditProjects, readEditRenderJobs } from "./editor.js";
+import { withEditor } from "./editor-lazy.js";
 import { listGenerationJobs } from "./generation.js";
 import { getProjectIndex } from "./service.js";
 import { appendEvent, getSidecarPaths, listTaskPacks, loadProjectConfig, readJson, writeJsonAtomic } from "./sidecar.js";
@@ -480,8 +480,8 @@ async function loadProductionEvidenceContext(projectRoot: string) {
     getStoryboard(projectRoot),
     listCreativeBibles(projectRoot),
     listReviewRecords(projectRoot, { limit: 1_000 }),
-    listEditProjects(projectRoot),
-    readEditRenderJobs(projectRoot),
+    withEditor((editor) => editor.listEditProjects(projectRoot)),
+    withEditor((editor) => editor.readEditRenderJobs(projectRoot)),
     listPublicationReceipts(projectRoot),
     readJson<AdaptationStore | null>(sidecar.storyAdaptation, null),
     readJson<StoryLibrary | null>(sidecar.storyIndex, null),
@@ -1092,7 +1092,7 @@ export async function getConfirmedStoryboardContracts(
 }
 
 export async function analyzeChangeImpact(projectRoot: string, input: { targetType: "item" | "story_event" | "hard_lock" | "bible"; targetId: string }) {
-  const [index, storyEvents, tasks, generationJobs, editProjects, bibles, storyboard] = await Promise.all([getProjectIndex(projectRoot), listStoryEvents(projectRoot, { includeOrphans: true }), listTaskPacks(projectRoot), listGenerationJobs(projectRoot), listEditProjects(projectRoot), listCreativeBibles(projectRoot), getStoryboard(projectRoot)]);
+  const [index, storyEvents, tasks, generationJobs, editProjects, bibles, storyboard] = await Promise.all([getProjectIndex(projectRoot), listStoryEvents(projectRoot, { includeOrphans: true }), listTaskPacks(projectRoot), listGenerationJobs(projectRoot), withEditor((editor) => editor.listEditProjects(projectRoot)), listCreativeBibles(projectRoot), getStoryboard(projectRoot)]);
   const itemIds = new Set<string>();
   const artifactIds = new Set<string>();
   const eventIds = new Set<string>();

@@ -115,7 +115,8 @@ import {
 } from "../core/runtime-ipc-effect.js";
 import { createRuntimeIpcPerformanceProbe } from "../core/runtime-ipc-observability.js";
 import { getRuntimeStorageReadMetrics } from "../core/runtime-storage-observability.js";
-import { applyEditOperation, beginEditorSession, cancelEditRender, closeEditorSession, createEditProject, createVideoContinuationPack, exportEditProjectOtio, extractLastFrame, extractTimelineFrame, getEditHistoryInfo, getEditProject, getEditorSessionState, getEditRenderJob, importEditProjectOtio, listEditMedia, listEditMediaPage, listEditProjects, listEditRenderJobs, listTimelineFrameExtractions, listVideoContinuationPacks, prepareEditMediaPreview, prepareEditMediaProxy, prepareNestedTimelinePreview, prepareTimelineVideoContinuation, probeVideoEngine, redoEditProject, renderEditProject, resolveEditorSessionRecovery, saveEditProject, setEditorSessionProject, startEditRender, undoEditProject, updateVideoContinuationPack, type EditOperation } from "../core/editor.js";
+import { withEditor, type EditorModule } from "../core/editor-lazy.js";
+import type { EditOperation } from "../core/editor.js";
 import { analyzeChangeImpact, getProductionWorkflow, getStoryboard, listCreativeBibles, updateProductionWorkflowStage, upsertCreativeBible, upsertStoryboardRow } from "../core/production.js";
 import { analyzeAdaptationChangeImpact, analyzeNovelChapters, exportAdaptation, generateAdaptationPlans, getAdaptationWorkspace, materializeSelectedAdaptationPlan, regenerateAdaptationScope, selectAdaptationPlan, upsertNarrativeBeat, upsertNovelFact, validateAdaptationPlan } from "../core/adaptation.js";
 import { listAssetRelations, listVoiceIdentities, upsertAssetRelation, upsertVoiceIdentity } from "../core/asset-registry.js";
@@ -1922,7 +1923,7 @@ function requireCanonicalAssetListInput(input: unknown): CanonicalAssetIpcListIn
 async function cleanupActiveEditorSessions(): Promise<void> {
   const entries = [...activeEditorSessions.entries()];
   activeEditorSessions.clear();
-  await Promise.all(entries.map(([projectRoot, sessionId]) => closeEditorSession(projectRoot, sessionId)));
+  await Promise.all(entries.map(([projectRoot, sessionId]) => withEditor((editor) => editor.closeEditorSession(projectRoot, sessionId))));
 }
 
 async function trackActiveScan<T>(operation: () => Promise<T>): Promise<T> {
@@ -3874,42 +3875,42 @@ function registerIpc(): void {
   });
   ipcMain.handle("canvas:list-voice-identities", (_event, projectRoot: string) => listVoiceIdentities(projectRoot));
   ipcMain.handle("canvas:upsert-voice-identity", (_event, projectRoot: string, input: Parameters<typeof upsertVoiceIdentity>[1]) => upsertVoiceIdentity(projectRoot, input, "user"));
-  ipcMain.handle("canvas:list-edit-projects", (_event, projectRoot: string) => listEditProjects(projectRoot));
-  ipcMain.handle("canvas:get-editor-session", (_event, projectRoot: string) => getEditorSessionState(projectRoot));
+  ipcMain.handle("canvas:list-edit-projects", (_event, projectRoot: string) => withEditor((editor) => editor.listEditProjects(projectRoot)));
+  ipcMain.handle("canvas:get-editor-session", (_event, projectRoot: string) => withEditor((editor) => editor.getEditorSessionState(projectRoot)));
   ipcMain.handle("canvas:begin-editor-session", async (_event, projectRoot: string) => {
-    const result = await beginEditorSession(projectRoot);
+    const result = await withEditor((editor) => editor.beginEditorSession(projectRoot));
     activeEditorSessions.set(projectRoot, result.state.sessionId);
     return result;
   });
-  ipcMain.handle("canvas:set-editor-session-project", (_event, projectRoot: string, sessionId: string, editProjectId: string) => setEditorSessionProject(projectRoot, sessionId, editProjectId));
-  ipcMain.handle("canvas:resolve-editor-session-recovery", (_event, projectRoot: string, sessionId: string, choice: "stable" | "latest") => resolveEditorSessionRecovery(projectRoot, sessionId, choice));
+  ipcMain.handle("canvas:set-editor-session-project", (_event, projectRoot: string, sessionId: string, editProjectId: string) => withEditor((editor) => editor.setEditorSessionProject(projectRoot, sessionId, editProjectId)));
+  ipcMain.handle("canvas:resolve-editor-session-recovery", (_event, projectRoot: string, sessionId: string, choice: "stable" | "latest") => withEditor((editor) => editor.resolveEditorSessionRecovery(projectRoot, sessionId, choice)));
   ipcMain.handle("canvas:close-editor-session", async (_event, projectRoot: string, sessionId: string) => {
-    const result = await closeEditorSession(projectRoot, sessionId);
+    const result = await withEditor((editor) => editor.closeEditorSession(projectRoot, sessionId));
     if (activeEditorSessions.get(projectRoot) === sessionId) activeEditorSessions.delete(projectRoot);
     return result;
   });
-  ipcMain.handle("canvas:get-edit-project", (_event, projectRoot: string, editProjectId: string) => getEditProject(projectRoot, editProjectId));
-  ipcMain.handle("canvas:create-edit-project", (_event, projectRoot: string, input?: Parameters<typeof createEditProject>[1]) => createEditProject(projectRoot, input));
-  ipcMain.handle("canvas:save-edit-project", (_event, projectRoot: string, project: EditProject, expectedRevision: number) => saveEditProject(projectRoot, project, expectedRevision));
-  ipcMain.handle("canvas:apply-edit-operation", (_event, projectRoot: string, editProjectId: string, expectedRevision: number, operation: EditOperation) => applyEditOperation(projectRoot, editProjectId, expectedRevision, operation, "user"));
-  ipcMain.handle("canvas:get-edit-history-info", (_event, projectRoot: string, editProjectId: string) => getEditHistoryInfo(projectRoot, editProjectId));
-  ipcMain.handle("canvas:undo-edit-project", (_event, projectRoot: string, editProjectId: string, expectedRevision: number) => undoEditProject(projectRoot, editProjectId, expectedRevision, "user"));
-  ipcMain.handle("canvas:redo-edit-project", (_event, projectRoot: string, editProjectId: string, expectedRevision: number) => redoEditProject(projectRoot, editProjectId, expectedRevision, "user"));
-  ipcMain.handle("canvas:export-edit-otio", (_event, projectRoot: string, editProjectId: string, expectedRevision: number, outputPath?: string) => exportEditProjectOtio(projectRoot, editProjectId, expectedRevision, outputPath));
-  ipcMain.handle("canvas:import-edit-otio", async (_event, projectRoot: string, filePath: string, name?: string) => importEditProjectOtio(await requireLegacyProjectRoot(projectRoot), filePath, name));
-  ipcMain.handle("canvas:list-edit-media", (_event, projectRoot: string, episode?: number) => listEditMedia(projectRoot, episode));
-  ipcMain.handle("canvas:list-edit-media-page", (_event, projectRoot: string, query?: Parameters<typeof listEditMediaPage>[1]) => listEditMediaPage(projectRoot, query));
-  ipcMain.handle("canvas:prepare-edit-media-preview", (_event, projectRoot: string, artifactId: string) => prepareEditMediaPreview(projectRoot, artifactId));
-  ipcMain.handle("canvas:prepare-edit-media-proxy", (_event, projectRoot: string, artifactId: string) => prepareEditMediaProxy(projectRoot, artifactId));
-  ipcMain.handle("canvas:prepare-nested-timeline-preview", (_event, projectRoot: string, parentEditProjectId: string, expectedRevision: number, clipId: string) => prepareNestedTimelinePreview(projectRoot, parentEditProjectId, expectedRevision, clipId));
-  ipcMain.handle("canvas:probe-video-engine", () => probeVideoEngine());
-  ipcMain.handle("canvas:list-edit-render-jobs", (_event, projectRoot: string) => listEditRenderJobs(projectRoot));
-  ipcMain.handle("canvas:render-edit-project", (_event, projectRoot: string, editProjectId: string, options: { expectedRevision: number; outputDirectory?: string }) => renderEditProject(projectRoot, editProjectId, options));
-  ipcMain.handle("canvas:start-edit-render", (_event, projectRoot: string, editProjectId: string, options: { expectedRevision: number; outputDirectory?: string }) => startEditRender(projectRoot, editProjectId, options));
-  ipcMain.handle("canvas:get-edit-render-job", (_event, projectRoot: string, renderId: string) => getEditRenderJob(projectRoot, renderId));
-  ipcMain.handle("canvas:cancel-edit-render", (_event, projectRoot: string, renderId: string) => cancelEditRender(projectRoot, renderId));
-  ipcMain.handle("canvas:extract-timeline-frame", (_event, projectRoot: string, input: Parameters<typeof extractTimelineFrame>[1]) => extractTimelineFrame(projectRoot, input));
-  ipcMain.handle("canvas:prepare-timeline-continuation", async (_event, projectRoot: string, input: Parameters<typeof prepareTimelineVideoContinuation>[1]) => {
+  ipcMain.handle("canvas:get-edit-project", (_event, projectRoot: string, editProjectId: string) => withEditor((editor) => editor.getEditProject(projectRoot, editProjectId)));
+  ipcMain.handle("canvas:create-edit-project", (_event, projectRoot: string, input?: Parameters<EditorModule["createEditProject"]>[1]) => withEditor((editor) => editor.createEditProject(projectRoot, input)));
+  ipcMain.handle("canvas:save-edit-project", (_event, projectRoot: string, project: EditProject, expectedRevision: number) => withEditor((editor) => editor.saveEditProject(projectRoot, project, expectedRevision)));
+  ipcMain.handle("canvas:apply-edit-operation", (_event, projectRoot: string, editProjectId: string, expectedRevision: number, operation: EditOperation) => withEditor((editor) => editor.applyEditOperation(projectRoot, editProjectId, expectedRevision, operation, "user")));
+  ipcMain.handle("canvas:get-edit-history-info", (_event, projectRoot: string, editProjectId: string) => withEditor((editor) => editor.getEditHistoryInfo(projectRoot, editProjectId)));
+  ipcMain.handle("canvas:undo-edit-project", (_event, projectRoot: string, editProjectId: string, expectedRevision: number) => withEditor((editor) => editor.undoEditProject(projectRoot, editProjectId, expectedRevision, "user")));
+  ipcMain.handle("canvas:redo-edit-project", (_event, projectRoot: string, editProjectId: string, expectedRevision: number) => withEditor((editor) => editor.redoEditProject(projectRoot, editProjectId, expectedRevision, "user")));
+  ipcMain.handle("canvas:export-edit-otio", (_event, projectRoot: string, editProjectId: string, expectedRevision: number, outputPath?: string) => withEditor((editor) => editor.exportEditProjectOtio(projectRoot, editProjectId, expectedRevision, outputPath)));
+  ipcMain.handle("canvas:import-edit-otio", async (_event, projectRoot: string, filePath: string, name?: string) => withEditor(async (editor) => editor.importEditProjectOtio(await requireLegacyProjectRoot(projectRoot), filePath, name)));
+  ipcMain.handle("canvas:list-edit-media", (_event, projectRoot: string, episode?: number) => withEditor((editor) => editor.listEditMedia(projectRoot, episode)));
+  ipcMain.handle("canvas:list-edit-media-page", (_event, projectRoot: string, query?: Parameters<EditorModule["listEditMediaPage"]>[1]) => withEditor((editor) => editor.listEditMediaPage(projectRoot, query)));
+  ipcMain.handle("canvas:prepare-edit-media-preview", (_event, projectRoot: string, artifactId: string) => withEditor((editor) => editor.prepareEditMediaPreview(projectRoot, artifactId)));
+  ipcMain.handle("canvas:prepare-edit-media-proxy", (_event, projectRoot: string, artifactId: string) => withEditor((editor) => editor.prepareEditMediaProxy(projectRoot, artifactId)));
+  ipcMain.handle("canvas:prepare-nested-timeline-preview", (_event, projectRoot: string, parentEditProjectId: string, expectedRevision: number, clipId: string) => withEditor((editor) => editor.prepareNestedTimelinePreview(projectRoot, parentEditProjectId, expectedRevision, clipId)));
+  ipcMain.handle("canvas:probe-video-engine", () => withEditor((editor) => editor.probeVideoEngine()));
+  ipcMain.handle("canvas:list-edit-render-jobs", (_event, projectRoot: string) => withEditor((editor) => editor.listEditRenderJobs(projectRoot)));
+  ipcMain.handle("canvas:render-edit-project", (_event, projectRoot: string, editProjectId: string, options: { expectedRevision: number; outputDirectory?: string }) => withEditor((editor) => editor.renderEditProject(projectRoot, editProjectId, options)));
+  ipcMain.handle("canvas:start-edit-render", (_event, projectRoot: string, editProjectId: string, options: { expectedRevision: number; outputDirectory?: string }) => withEditor((editor) => editor.startEditRender(projectRoot, editProjectId, options)));
+  ipcMain.handle("canvas:get-edit-render-job", (_event, projectRoot: string, renderId: string) => withEditor((editor) => editor.getEditRenderJob(projectRoot, renderId)));
+  ipcMain.handle("canvas:cancel-edit-render", (_event, projectRoot: string, renderId: string) => withEditor((editor) => editor.cancelEditRender(projectRoot, renderId)));
+  ipcMain.handle("canvas:extract-timeline-frame", (_event, projectRoot: string, input: Parameters<EditorModule["extractTimelineFrame"]>[1]) => withEditor((editor) => editor.extractTimelineFrame(projectRoot, input)));
+  ipcMain.handle("canvas:prepare-timeline-continuation", async (_event, projectRoot: string, input: Parameters<EditorModule["prepareTimelineVideoContinuation"]>[1]) => {
     if (input.expectedRevision === undefined) throw new Error("桌面端末帧续作必须锁定剪辑工程修订号。");
     const idempotencyKey = `ui-timeline-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, {
@@ -3919,11 +3920,11 @@ function registerIpc(): void {
     });
     return result.result;
   });
-  ipcMain.handle("canvas:list-timeline-frames", (_event, projectRoot: string, editProjectId?: string, limit?: number) => listTimelineFrameExtractions(projectRoot, editProjectId, limit));
-  ipcMain.handle("canvas:extract-last-frame", async (_event, projectRoot: string, input: { itemId: string; artifactId?: string; videoPath?: string }) => extractLastFrame(await requireLegacyProjectRoot(projectRoot), input));
-  ipcMain.handle("canvas:create-video-continuation", async (_event, projectRoot: string, input: { itemId: string; sourceVideoPath?: string; lastFramePath: string; prompt?: string }) => createVideoContinuationPack(await requireLegacyProjectRoot(projectRoot), input));
-  ipcMain.handle("canvas:list-video-continuations", (_event, projectRoot: string, itemId?: string) => listVideoContinuationPacks(projectRoot, itemId));
-  ipcMain.handle("canvas:update-video-continuation", (_event, projectRoot: string, continuationId: string, input: { expectedRevision: number; status: "failed" | "cancelled"; error: string }) => updateVideoContinuationPack(projectRoot, continuationId, input));
+  ipcMain.handle("canvas:list-timeline-frames", (_event, projectRoot: string, editProjectId?: string, limit?: number) => withEditor((editor) => editor.listTimelineFrameExtractions(projectRoot, editProjectId, limit)));
+  ipcMain.handle("canvas:extract-last-frame", async (_event, projectRoot: string, input: { itemId: string; artifactId?: string; videoPath?: string }) => withEditor(async (editor) => editor.extractLastFrame(await requireLegacyProjectRoot(projectRoot), input)));
+  ipcMain.handle("canvas:create-video-continuation", async (_event, projectRoot: string, input: { itemId: string; sourceVideoPath?: string; lastFramePath: string; prompt?: string }) => withEditor(async (editor) => editor.createVideoContinuationPack(await requireLegacyProjectRoot(projectRoot), input)));
+  ipcMain.handle("canvas:list-video-continuations", (_event, projectRoot: string, itemId?: string) => withEditor((editor) => editor.listVideoContinuationPacks(projectRoot, itemId)));
+  ipcMain.handle("canvas:update-video-continuation", (_event, projectRoot: string, continuationId: string, input: { expectedRevision: number; status: "failed" | "cancelled"; error: string }) => withEditor((editor) => editor.updateVideoContinuationPack(projectRoot, continuationId, input)));
   ipcMain.handle("canvas:get-item", (_event, projectRoot: string, itemId: string) => getItem(projectRoot, itemId));
   ipcMain.handle(
     "canvas:update-status",

@@ -42,7 +42,7 @@ import { createContinuationHandoff, deleteProjectContext, getContinuationSnapsho
 import { PROJECT_CONTEXT_KINDS } from "../core/types.js";
 import { buildStoryContext, connectStoryEvents, importStoryFile, importStoryText, listStoryChapters, listStoryEvents, listStorySources, readStoryChapter, upsertStoryEvent } from "../core/story.js";
 import { analyzeAdaptationChangeImpact, analyzeNovelChapters, exportAdaptation, generateAdaptationPlans, getAdaptationWorkspace, materializeSelectedAdaptationPlan, regenerateAdaptationScope, selectAdaptationPlan, upsertNarrativeBeat, upsertNovelFact, validateAdaptationPlan } from "../core/adaptation.js";
-import { applyEditOperation, cancelEditRender, createEditProject, createVideoContinuationPack, exportEditProjectOtio, extractLastFrame, extractTimelineFrame, getEditHistoryInfo, getEditProject, getEditRenderJob, importEditProjectOtio, listEditMedia, listEditProjects, listEditRenderJobs, listTimelineFrameExtractions, listVideoContinuationPacks, prepareEditMediaPreview, prepareEditMediaProxy, probeVideoEngine, redoEditProject, saveEditProject, startEditRender, undoEditProject, updateVideoContinuationPack } from "../core/editor.js";
+import { withEditor } from "../core/editor-lazy.js";
 import { editKeyframeCurveIssue, editKeyframeSourceTransformIssue } from "../core/keyframe-curve.js";
 import { doctorProject, getCapabilities, getProjectChanges, getProjectSnapshot, getStudioGenerationControlEnvelope } from "../core/codex.js";
 import { analyzeChangeImpact, commitExistingProductionRecovery, getProductionWorkflow, getStoryboard, listCreativeBibles, previewExistingProductionRecovery, updateProductionWorkflowStage, upsertCreativeBible, upsertStoryboardRow } from "../core/production.js";
@@ -4628,7 +4628,7 @@ registrar.registerTool(
     inputSchema: {},
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
-  async () => textResult(await probeVideoEngine()),
+  async () => textResult(await withEditor((editor) => editor.probeVideoEngine())),
 );
 
 registrar.registerTool(
@@ -4641,7 +4641,7 @@ registrar.registerTool(
   },
   async ({ projectRoot }) => {
     try {
-      return textResult((await listEditProjects(projectRoot)).map((project) => ({
+      return textResult((await withEditor((editor) => editor.listEditProjects(projectRoot))).map((project) => ({
         id: project.id,
         name: project.name,
         episode: project.episode,
@@ -4666,7 +4666,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
   async ({ projectRoot, editProjectId }) => {
-    try { return textResult(await getEditProject(projectRoot, editProjectId)); }
+    try { return textResult(await withEditor((editor) => editor.getEditProject(projectRoot, editProjectId))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -4688,7 +4688,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, openWorldHint: false },
   },
   async ({ projectRoot, name, episode, width, height, fps, autoPopulate }) => {
-    try { return textResult(await createEditProject(projectRoot, { name, episode, width, height, fps, autoPopulate })); }
+    try { return textResult(await withEditor((editor) => editor.createEditProject(projectRoot, { name, episode, width, height, fps, autoPopulate }))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -4702,7 +4702,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, openWorldHint: false },
   },
   async ({ projectRoot, project, expectedRevision }) => {
-    try { return textResult(await saveEditProject(projectRoot, project as EditProject, expectedRevision, "codex")); }
+    try { return textResult(await withEditor((editor) => editor.saveEditProject(projectRoot, project as EditProject, expectedRevision, "codex"))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -4778,7 +4778,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
   async ({ projectRoot, editProjectId, expectedRevision, operation }) => {
-    try { return textResult(await applyEditOperation(projectRoot, editProjectId, expectedRevision, operation)); }
+    try { return textResult(await withEditor((editor) => editor.applyEditOperation(projectRoot, editProjectId, expectedRevision, operation))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -4791,7 +4791,7 @@ registrar.registerTool(
     inputSchema: { projectRoot: projectRootSchema, editProjectId: z.string().min(3) },
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
-  async ({ projectRoot, editProjectId }) => { try { return textResult(await getEditHistoryInfo(projectRoot, editProjectId)); } catch (error) { return toolError(error); } },
+  async ({ projectRoot, editProjectId }) => { try { return textResult(await withEditor((editor) => editor.getEditHistoryInfo(projectRoot, editProjectId))); } catch (error) { return toolError(error); } },
 );
 
 registrar.registerTool(
@@ -4802,7 +4802,7 @@ registrar.registerTool(
     inputSchema: { projectRoot: projectRootSchema, editProjectId: z.string().min(3), expectedRevision: z.number().int().positive() },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
-  async ({ projectRoot, editProjectId, expectedRevision }) => { try { return textResult(await undoEditProject(projectRoot, editProjectId, expectedRevision, "codex")); } catch (error) { return toolError(error); } },
+  async ({ projectRoot, editProjectId, expectedRevision }) => { try { return textResult(await withEditor((editor) => editor.undoEditProject(projectRoot, editProjectId, expectedRevision, "codex"))); } catch (error) { return toolError(error); } },
 );
 
 registrar.registerTool(
@@ -4813,7 +4813,7 @@ registrar.registerTool(
     inputSchema: { projectRoot: projectRootSchema, editProjectId: z.string().min(3), expectedRevision: z.number().int().positive() },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
-  async ({ projectRoot, editProjectId, expectedRevision }) => { try { return textResult(await redoEditProject(projectRoot, editProjectId, expectedRevision, "codex")); } catch (error) { return toolError(error); } },
+  async ({ projectRoot, editProjectId, expectedRevision }) => { try { return textResult(await withEditor((editor) => editor.redoEditProject(projectRoot, editProjectId, expectedRevision, "codex"))); } catch (error) { return toolError(error); } },
 );
 
 registrar.registerTool(
@@ -4824,7 +4824,7 @@ registrar.registerTool(
     inputSchema: { projectRoot: projectRootSchema, editProjectId: z.string().min(3), expectedRevision: z.number().int().positive(), outputPath: z.string().optional() },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
-  async ({ projectRoot, editProjectId, expectedRevision, outputPath }) => { try { return textResult(await exportEditProjectOtio(projectRoot, editProjectId, expectedRevision, outputPath)); } catch (error) { return toolError(error); } },
+  async ({ projectRoot, editProjectId, expectedRevision, outputPath }) => { try { return textResult(await withEditor((editor) => editor.exportEditProjectOtio(projectRoot, editProjectId, expectedRevision, outputPath))); } catch (error) { return toolError(error); } },
 );
 
 registrar.registerTool(
@@ -4835,7 +4835,7 @@ registrar.registerTool(
     inputSchema: { projectRoot: projectRootSchema, filePath: z.string().min(1), name: z.string().max(120).optional() },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
-  async ({ projectRoot, filePath, name }) => { try { return textResult(await importEditProjectOtio(projectRoot, filePath, name)); } catch (error) { return toolError(error); } },
+  async ({ projectRoot, filePath, name }) => { try { return textResult(await withEditor((editor) => editor.importEditProjectOtio(projectRoot, filePath, name))); } catch (error) { return toolError(error); } },
 );
 
 registrar.registerTool(
@@ -6094,7 +6094,7 @@ registrar.registerTool(
   },
   async ({ projectRoot, episode, limit }) => {
     try {
-      const media = await listEditMedia(projectRoot, episode);
+      const media = await withEditor((editor) => editor.listEditMedia(projectRoot, episode));
       return textResult({ total: media.length, media: media.slice(0, limit) });
     } catch (error) { return toolError(error); }
   },
@@ -6109,7 +6109,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   },
   async ({ projectRoot, artifactId }) => {
-    try { return textResult(await prepareEditMediaPreview(projectRoot, artifactId)); }
+    try { return textResult(await withEditor((editor) => editor.prepareEditMediaPreview(projectRoot, artifactId))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6123,7 +6123,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   },
   async ({ projectRoot, artifactId }) => {
-    try { return textResult(await prepareEditMediaProxy(projectRoot, artifactId)); }
+    try { return textResult(await withEditor((editor) => editor.prepareEditMediaProxy(projectRoot, artifactId))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6137,7 +6137,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
   async ({ projectRoot, editProjectId, expectedRevision, outputDirectory }) => {
-    try { return textResult(await startEditRender(projectRoot, editProjectId, { expectedRevision, outputDirectory })); }
+    try { return textResult(await withEditor((editor) => editor.startEditRender(projectRoot, editProjectId, { expectedRevision, outputDirectory }))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6151,7 +6151,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
   async ({ projectRoot, renderId }) => {
-    try { return textResult(await getEditRenderJob(projectRoot, renderId)); }
+    try { return textResult(await withEditor((editor) => editor.getEditRenderJob(projectRoot, renderId))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6165,7 +6165,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   },
   async ({ projectRoot, renderId }) => {
-    try { return textResult(await cancelEditRender(projectRoot, renderId)); }
+    try { return textResult(await withEditor((editor) => editor.cancelEditRender(projectRoot, renderId))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6179,7 +6179,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
   async ({ projectRoot, limit }) => {
-    try { return textResult((await listEditRenderJobs(projectRoot)).slice(0, limit)); }
+    try { return textResult((await withEditor((editor) => editor.listEditRenderJobs(projectRoot))).slice(0, limit)); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6193,7 +6193,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
   async ({ projectRoot, editProjectId, expectedRevision, timeSeconds, itemId, registerAsEndFrame, registerVariant }) => {
-    try { return textResult(await extractTimelineFrame(projectRoot, { editProjectId, expectedRevision, timeSeconds, itemId, registerAsEndFrame, registerVariant })); }
+    try { return textResult(await withEditor((editor) => editor.extractTimelineFrame(projectRoot, { editProjectId, expectedRevision, timeSeconds, itemId, registerAsEndFrame, registerVariant }))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6221,7 +6221,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
   async ({ projectRoot, editProjectId, limit }) => {
-    try { return textResult(await listTimelineFrameExtractions(projectRoot, editProjectId, limit)); }
+    try { return textResult(await withEditor((editor) => editor.listTimelineFrameExtractions(projectRoot, editProjectId, limit))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6235,7 +6235,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
   async ({ projectRoot, itemId, artifactId, videoPath }) => {
-    try { return textResult(await extractLastFrame(projectRoot, { itemId, artifactId, videoPath })); }
+    try { return textResult(await withEditor((editor) => editor.extractLastFrame(projectRoot, { itemId, artifactId, videoPath }))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6249,7 +6249,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
   async ({ projectRoot, itemId, sourceVideoPath, lastFramePath, prompt }) => {
-    try { return textResult(await createVideoContinuationPack(projectRoot, { itemId, sourceVideoPath, lastFramePath, prompt })); }
+    try { return textResult(await withEditor((editor) => editor.createVideoContinuationPack(projectRoot, { itemId, sourceVideoPath, lastFramePath, prompt }))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6263,7 +6263,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
   async ({ projectRoot, itemId, limit }) => {
-    try { return textResult((await listVideoContinuationPacks(projectRoot, itemId)).slice(0, limit)); }
+    try { return textResult((await withEditor((editor) => editor.listVideoContinuationPacks(projectRoot, itemId))).slice(0, limit)); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6283,7 +6283,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   },
   async ({ projectRoot, continuationId, expectedRevision, status, error }) => {
-    try { return textResult(await updateVideoContinuationPack(projectRoot, continuationId, { expectedRevision, status, error })); }
+    try { return textResult(await withEditor((editor) => editor.updateVideoContinuationPack(projectRoot, continuationId, { expectedRevision, status, error }))); }
     catch (cause) { return toolError(cause); }
   },
 );
@@ -6407,7 +6407,7 @@ server.registerResource(
   { title: "剪辑工程", description: "读取剪辑工程修订、轨道和片段；片段数量受资源预算限制。", mimeType: "application/json" },
   async (uri, variables) => {
     const project = await resolveProjectById(String(variables.projectId ?? ""));
-    const edit = await getEditProject(project.primaryRoot, String(variables.editProjectId ?? ""));
+    const edit = await withEditor((editor) => editor.getEditProject(project.primaryRoot, String(variables.editProjectId ?? "")));
     let remaining = 500;
     return jsonResource(uri, { ...edit, tracks: edit.tracks.map((track) => { const clips = track.clips.slice(0, Math.max(0, remaining)); remaining -= clips.length; return { ...track, clips, clipsTruncated: clips.length < track.clips.length }; }), totalClips: edit.tracks.reduce((sum, track) => sum + track.clips.length, 0) });
   },

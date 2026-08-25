@@ -2,7 +2,7 @@
 
 ## software_goal: runtime-perf-memory-20260825
 
-- status: `in_progress`（W1 + W2 + W3-A–D 已落地；W4-A 下一步）
+- status: `in_progress`（W1–W3 + W4-A 已落地；W4-B 下一步）
 - plan: `docs/PLAN_运行速度与内存占用长期执行_20260825.md`
 - [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席本环境未跑）
 - [x] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
@@ -18,7 +18,8 @@
 - [x] Wave 3-B：`assertGenerationLedgerSchemaFileReady` 失败关闭，不静默建库
 - [x] Wave 3-C：earliest 用 list 行 revision，去掉 per-unit snapshot
 - [x] Wave 3-D：ssl5 复用 align-board earliest，不二次调用
-- [ ] Wave 4：MCP/Main 冷域动态 import（editor / story+mammoth / novel / video-package；抄 Main IPC `await import`；禁拆 command-bus 写路径）
+- [x] Wave 4-A：editor / OTIO 经 `withEditor` 动态 import（不拆 command-bus 写路径）
+- [ ] Wave 4-B/C/D/E/F：story/mammoth、video-package、MCP 诊断 import、watcher、sharp
 - [ ] Wave 5：列表只绑缩略图；legacy thumb 不先整文件读入；审片默认 thumb；derivative 不校源全 SHA
 - [ ] Wave 6：度量关账；安装版 T23 仅 owner 点名
 - [ ] 禁止：重建 P0–P14、无证据 SQL 批量化、N124 CV、全盘扫正式工程

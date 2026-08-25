@@ -2,7 +2,7 @@ import { constants as fsConstants } from "node:fs";
 import { access, lstat, realpath } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { getEditorSessionState, listEditProjects, listVideoContinuationPacks, probeVideoEngine, readEditRenderJobs } from "./editor.js";
+import { withEditor } from "./editor-lazy.js";
 import { generationPublicationTerminalMatchesJob, getGenerationSettings, getHttpGenerationSubmissionCheckpoint, listGenerationJobs } from "./generation.js";
 import { getContinuationSnapshot, listProjectContext } from "./memory.js";
 import { getReviewQueue, listReviewRecords } from "./reviews.js";
@@ -1081,7 +1081,7 @@ export async function getCapabilities(
   projectRoot?: string,
   runtime: GetCapabilitiesRuntimeProjection = {},
 ) {
-  const engine = await probeVideoEngine();
+  const engine = await withEditor((editor) => editor.probeVideoEngine());
   const machineMedia = await readMachineMediaRuntimeSnapshot();
   let project: Record<string, unknown> | undefined;
   if (projectRoot) {
@@ -1679,11 +1679,11 @@ export async function doctorProject(projectRoot: string) {
   const fusionPanelReferenceStorePresent = fusionProjectPresent && await canAccess(paths.panelReferenceResolutions, fsConstants.R_OK);
   const [generationJobs, renderJobs, continuations, publicationIntents, _eventProbe, engine, tasks, relations, voices, runtimeModules, projectLocks, commandLedger, adaptationWorkspace] = await Promise.all([
     diagnoseSidecar("generation-store-corrupt", "生成队列侧车", paths.generationJobs, () => listGenerationJobs(root), []),
-    diagnoseSidecar("render-store-corrupt", "剪辑导出侧车", paths.editorRenders, () => readEditRenderJobs(root), []),
-    diagnoseSidecar("continuation-store-corrupt", "视频续接侧车", paths.editorContinuations, () => listVideoContinuationPacks(root), []),
+    diagnoseSidecar("render-store-corrupt", "剪辑导出侧车", paths.editorRenders, () => withEditor((editor) => editor.readEditRenderJobs(root)), []),
+    diagnoseSidecar("continuation-store-corrupt", "视频续接侧车", paths.editorContinuations, () => withEditor((editor) => editor.listVideoContinuationPacks(root)), []),
     diagnoseSidecar("publication-store-corrupt", "素材发布侧车", paths.publications, () => listPublicationIntents(root), []),
     diagnoseSidecar("event-log-corrupt", "追加式事件日志", paths.events, () => listEvents(root, 2_000), []),
-    probeVideoEngine(),
+    withEditor((editor) => editor.probeVideoEngine()),
     diagnoseSidecar("task-store-corrupt", "任务包侧车", paths.tasks, () => listTaskPacks(root), []),
     diagnoseSidecar("asset-relation-store-corrupt", "资产关系侧车", paths.assetRelations, () => listAssetRelations(root), []),
     diagnoseSidecar("voice-store-corrupt", "音色身份侧车", paths.voiceIdentities, () => listVoiceIdentities(root), []),
@@ -1747,9 +1747,9 @@ export async function doctorProject(projectRoot: string) {
     diagnoseSidecar("story-index-corrupt", "小说来源与章节索引", paths.storyIndex, async () => Promise.all([listStorySources(root), listStoryChapters(root)]), [[], []]),
     diagnoseSidecar("story-event-store-corrupt", "故事事件侧车", paths.storyEvents, () => listStoryEvents(root, { includeOrphans: true }), []),
     diagnoseSidecar("timeline-store-corrupt", "原镜头时间线侧车", paths.timeline, () => getUnitTimelines(root), []),
-    diagnoseSidecar("editor-project-store-corrupt", "剪辑工程侧车", paths.editorProjects, () => listEditProjects(root), []),
+    diagnoseSidecar("editor-project-store-corrupt", "剪辑工程侧车", paths.editorProjects, () => withEditor((editor) => editor.listEditProjects(root)), []),
     diagnoseSidecar("editor-session-corrupt", "剪辑会话侧车", paths.editorSession, async () => {
-      const session = await getEditorSessionState(root);
+      const session = await withEditor((editor) => editor.getEditorSessionState(root));
       if (session && (session.schemaVersion !== 1 || typeof session.sessionId !== "string" || typeof session.cleanShutdown !== "boolean")) throw new Error("剪辑会话结构无效。 ");
       return session;
     }, null),
@@ -2109,8 +2109,8 @@ export async function getProjectSnapshot(projectRoot: string, focusItemId?: stri
     getReviewQueue(root).then((entries) => entries.slice(0, 20)),
     listTaskPacks(root),
     listGenerationJobs(root),
-    readEditRenderJobs(root),
-    listVideoContinuationPacks(root, focusItemId),
+    withEditor((editor) => editor.readEditRenderJobs(root)),
+    withEditor((editor) => editor.listVideoContinuationPacks(root, focusItemId)),
     listEvents(root, 30),
     readAgentSkills(root, { enabledOnly: true }),
     getContinuationSnapshot(root, { itemId: focusItemId, initializeDefaultSkills: false }),

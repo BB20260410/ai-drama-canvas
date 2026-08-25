@@ -4,7 +4,8 @@ import path from "node:path";
 import { upsertAssetRelation, upsertVoiceIdentity } from "./asset-registry.js";
 import { deleteCanvasEntity, deleteCanvasLink, redoCanvasSemanticState, undoCanvasSemanticState, upsertCanvasEntity, upsertCanvasLink } from "./canvas-state.js";
 import { saveScriptDocument } from "./documents.js";
-import { applyEditOperation, cancelEditRender, createEditProject, createVideoContinuationPack, exportEditProjectOtio, extractLastFrame, extractTimelineFrame, importEditProjectOtio, prepareEditMediaPreview, prepareEditMediaProxy, prepareTimelineVideoContinuation, redoEditProject, saveEditProject, startEditRender, undoEditProject, updateVideoContinuationPack, type EditOperation } from "./editor.js";
+import { withEditor, type EditorModule } from "./editor-lazy.js";
+import type { EditOperation } from "./editor.js";
 import { cancelGenerationJob, enqueueGeneration, migrateGenerationExecutionState, processGenerationQueue, reconcileHttpGenerationSubmission, updateBrowserGenerationJob, updateSubagentImageGenerationJob, upsertGenerationProvider } from "./generation.js";
 import { createContinuationHandoff, deleteProjectContext, upsertProjectContext } from "./memory.js";
 import { commitExistingProductionRecovery, updateProductionWorkflowStage, upsertCreativeBible, upsertStoryboardRow } from "./production.js";
@@ -420,8 +421,8 @@ export type CommandRequest =
   | { command: "enqueue_generation"; payload: Parameters<typeof enqueueGeneration>[1] }
   | { command: "upsert_generation_provider"; payload: Parameters<typeof upsertGenerationProvider>[1] }
   | { command: "save_script_document"; payload: { filePath: string; content: string; expectedModifiedAt?: string } }
-  | { command: "extract_last_frame"; payload: Parameters<typeof extractLastFrame>[1] }
-  | { command: "create_video_continuation"; payload: Parameters<typeof createVideoContinuationPack>[1] }
+  | { command: "extract_last_frame"; payload: Parameters<EditorModule["extractLastFrame"]>[1] }
+  | { command: "create_video_continuation"; payload: Parameters<EditorModule["createVideoContinuationPack"]>[1] }
   | { command: "import_story_file"; payload: { filePath: string; title?: string } }
   | { command: "import_story_text"; payload: Parameters<typeof importStoryText>[1] }
   | { command: "analyze_novel_chapters"; payload: Parameters<typeof analyzeNovelChapters>[1] }
@@ -457,7 +458,7 @@ export type CommandRequest =
   | { command: "register_publication_bundle"; payload: Parameters<typeof registerPublicationBundle>[1] }
   | { command: "cancel_publication_bundle"; payload: Parameters<typeof cancelPublicationBundle>[1] }
   | { command: "fail_publication_bundle"; payload: Parameters<typeof failPublicationBundle>[1] }
-  | { command: "create_edit_project"; payload: Parameters<typeof createEditProject>[1] }
+  | { command: "create_edit_project"; payload: Parameters<EditorModule["createEditProject"]>[1] }
   | { command: "save_edit_project"; payload: { project: EditProject; expectedRevision: number } }
   | { command: "undo_edit_project"; payload: { editProjectId: string; expectedRevision: number } }
   | { command: "redo_edit_project"; payload: { editProjectId: string; expectedRevision: number } }
@@ -465,7 +466,7 @@ export type CommandRequest =
   | { command: "import_edit_otio"; payload: { filePath: string; name?: string } }
   | { command: "start_edit_render"; payload: { editProjectId: string; expectedRevision: number; outputDirectory?: string } }
   | { command: "cancel_edit_render"; payload: { renderId: string } }
-  | { command: "extract_timeline_frame"; payload: Parameters<typeof extractTimelineFrame>[1] }
+  | { command: "extract_timeline_frame"; payload: Parameters<EditorModule["extractTimelineFrame"]>[1] }
   | { command: "prepare_edit_media_preview"; payload: { artifactId: string } }
   | { command: "prepare_edit_media_proxy"; payload: { artifactId: string } };
 
@@ -5301,7 +5302,7 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
       return finishBatch(projectRoot, taskId, input);
     }
     case "apply_edit_operation": {
-      const result = await applyEditOperation(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, request.payload.operation, "codex");
+      const result = await withEditor((editor) => editor.applyEditOperation(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, request.payload.operation, "codex"));
       return { editProjectId: result.project.id, revision: result.project.revision, updatedAt: result.project.updatedAt, affectedTrackIds: result.affectedTrackIds, affectedClipIds: result.affectedClipIds };
     }
     case "update_workflow_stage": return updateProductionWorkflowStage(projectRoot, request.payload, "codex");
@@ -5326,9 +5327,9 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
     }
     case "update_video_continuation": {
       const { continuationId, ...input } = request.payload;
-      return updateVideoContinuationPack(projectRoot, continuationId, input);
+      return withEditor((editor) => editor.updateVideoContinuationPack(projectRoot, continuationId, input));
     }
-    case "prepare_timeline_continuation": return prepareTimelineVideoContinuation(projectRoot, request.payload);
+    case "prepare_timeline_continuation": return withEditor((editor) => editor.prepareTimelineVideoContinuation(projectRoot, request.payload));
     case "upsert_context": return upsertProjectContext(projectRoot, request.payload, "codex");
     case "delete_context": {
       await deleteProjectContext(projectRoot, request.payload, "codex");
@@ -5350,8 +5351,8 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
     case "enqueue_generation": return enqueueGeneration(projectRoot, request.payload);
     case "upsert_generation_provider": return upsertGenerationProvider(projectRoot, request.payload, "codex");
     case "save_script_document": return saveScriptDocument(projectRoot, request.payload.filePath, request.payload.content, request.payload.expectedModifiedAt);
-    case "extract_last_frame": return extractLastFrame(projectRoot, request.payload);
-    case "create_video_continuation": return createVideoContinuationPack(projectRoot, request.payload);
+    case "extract_last_frame": return withEditor((editor) => editor.extractLastFrame(projectRoot, request.payload));
+    case "create_video_continuation": return withEditor((editor) => editor.createVideoContinuationPack(projectRoot, request.payload));
     case "import_story_file": return importStoryFile(projectRoot, request.payload.filePath, request.payload.title);
     case "import_story_text": return importStoryText(projectRoot, request.payload);
     case "analyze_novel_chapters": return analyzeNovelChapters(projectRoot, request.payload);
@@ -5391,17 +5392,17 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
     case "register_publication_bundle": return registerPublicationBundle(projectRoot, request.payload, "codex");
     case "cancel_publication_bundle": return cancelPublicationBundle(projectRoot, request.payload, "codex");
     case "fail_publication_bundle": return failPublicationBundle(projectRoot, request.payload, "codex");
-    case "create_edit_project": return createEditProject(projectRoot, request.payload);
-    case "save_edit_project": return saveEditProject(projectRoot, request.payload.project, request.payload.expectedRevision, "codex");
-    case "undo_edit_project": return undoEditProject(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, "codex");
-    case "redo_edit_project": return redoEditProject(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, "codex");
-    case "export_edit_otio": return exportEditProjectOtio(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, request.payload.outputPath);
-    case "import_edit_otio": return importEditProjectOtio(projectRoot, request.payload.filePath, request.payload.name);
-    case "start_edit_render": return startEditRender(projectRoot, request.payload.editProjectId, { expectedRevision: request.payload.expectedRevision, outputDirectory: request.payload.outputDirectory });
-    case "cancel_edit_render": return cancelEditRender(projectRoot, request.payload.renderId);
-    case "extract_timeline_frame": return extractTimelineFrame(projectRoot, request.payload);
-    case "prepare_edit_media_preview": return prepareEditMediaPreview(projectRoot, request.payload.artifactId);
-    case "prepare_edit_media_proxy": return prepareEditMediaProxy(projectRoot, request.payload.artifactId);
+    case "create_edit_project": return withEditor((editor) => editor.createEditProject(projectRoot, request.payload));
+    case "save_edit_project": return withEditor((editor) => editor.saveEditProject(projectRoot, request.payload.project, request.payload.expectedRevision, "codex"));
+    case "undo_edit_project": return withEditor((editor) => editor.undoEditProject(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, "codex"));
+    case "redo_edit_project": return withEditor((editor) => editor.redoEditProject(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, "codex"));
+    case "export_edit_otio": return withEditor((editor) => editor.exportEditProjectOtio(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, request.payload.outputPath));
+    case "import_edit_otio": return withEditor((editor) => editor.importEditProjectOtio(projectRoot, request.payload.filePath, request.payload.name));
+    case "start_edit_render": return withEditor((editor) => editor.startEditRender(projectRoot, request.payload.editProjectId, { expectedRevision: request.payload.expectedRevision, outputDirectory: request.payload.outputDirectory }));
+    case "cancel_edit_render": return withEditor((editor) => editor.cancelEditRender(projectRoot, request.payload.renderId));
+    case "extract_timeline_frame": return withEditor((editor) => editor.extractTimelineFrame(projectRoot, request.payload));
+    case "prepare_edit_media_preview": return withEditor((editor) => editor.prepareEditMediaPreview(projectRoot, request.payload.artifactId));
+    case "prepare_edit_media_proxy": return withEditor((editor) => editor.prepareEditMediaProxy(projectRoot, request.payload.artifactId));
   }
 }
 
