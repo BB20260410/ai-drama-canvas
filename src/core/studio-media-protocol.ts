@@ -6,6 +6,17 @@ import { createHash } from "node:crypto";
 import { Readable } from "node:stream";
 import { DatabaseSync } from "node:sqlite";
 import { studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
+import {
+  VERIFIED_FILE_CACHE_LIMIT,
+  deleteDanglingVerifiedFileLookup,
+  evictVerifiedFileCacheForProject,
+  getVerifiedFile,
+  getVerifiedFileLookup,
+  rememberVerifiedFile,
+  touchVerifiedFile,
+  verifiedFileCacheBucketCount,
+  verifiedFileCacheSize,
+} from "./studio-verified-file-cache.js";
 
 const DATABASE_RELATIVE_PATH = ".aicanvas/material-studio.sqlite";
 const OBJECTS_RELATIVE_ROOT = ".aicanvas/objects/sha256";
@@ -190,10 +201,7 @@ interface NormalizedRequest {
 }
 
 const trustedResolutions = new WeakMap<object, InternalResolution>();
-const verifiedFileCache = new Map<string, VerificationCacheEntry>();
-const verifiedFileLookup = new Map<string, string>();
 const inFlightFileInspections = new Map<string, Promise<InspectedFile>>();
-const VERIFIED_FILE_CACHE_LIMIT = 2_048;
 const verificationCacheMetrics = {
   cacheHits: { media: 0, thumbnail: 0, derivative: 0 },
   cacheMisses: { media: 0, thumbnail: 0, derivative: 0 },
@@ -204,6 +212,7 @@ const verificationCacheMetrics = {
 export interface StudioMediaVerificationCacheDiagnostics {
   limit: number;
   size: number;
+  buckets: number;
   inFlight: number;
   cacheHits: Readonly<Record<StudioMediaProtocolTarget, number>>;
   cacheMisses: Readonly<Record<StudioMediaProtocolTarget, number>>;
@@ -217,7 +226,8 @@ export interface StudioMediaVerificationCacheDiagnostics {
 export function getStudioMediaVerificationCacheDiagnostics(): StudioMediaVerificationCacheDiagnostics {
   return Object.freeze({
     limit: VERIFIED_FILE_CACHE_LIMIT,
-    size: verifiedFileCache.size,
+    size: verifiedFileCacheSize(),
+    buckets: verifiedFileCacheBucketCount(),
     inFlight: inFlightFileInspections.size,
     cacheHits: Object.freeze({ ...verificationCacheMetrics.cacheHits }),
     cacheMisses: Object.freeze({ ...verificationCacheMetrics.cacheMisses }),
@@ -768,26 +778,7 @@ function fileIdentityKey(value: FileIdentity): string {
   return `${value.dev}:${value.ino}:${value.size}:${value.mtimeNs}:${value.ctimeNs}`;
 }
 
-function touchVerifiedFile(entry: VerificationCacheEntry): void {
-  verifiedFileCache.delete(entry.bindingKey);
-  verifiedFileCache.set(entry.bindingKey, entry);
-}
-
-function rememberVerifiedFile(entry: VerificationCacheEntry): void {
-  const previousBinding = verifiedFileLookup.get(entry.lookupKey);
-  if (previousBinding && previousBinding !== entry.bindingKey) verifiedFileCache.delete(previousBinding);
-  verifiedFileCache.delete(entry.bindingKey);
-  verifiedFileCache.set(entry.bindingKey, entry);
-  verifiedFileLookup.set(entry.lookupKey, entry.bindingKey);
-  while (verifiedFileCache.size > VERIFIED_FILE_CACHE_LIMIT) {
-    const oldestBinding = verifiedFileCache.keys().next().value as string | undefined;
-    if (!oldestBinding) break;
-    const oldest = verifiedFileCache.get(oldestBinding);
-    verifiedFileCache.delete(oldestBinding);
-    if (oldest && verifiedFileLookup.get(oldest.lookupKey) === oldestBinding) verifiedFileLookup.delete(oldest.lookupKey);
-    verificationCacheMetrics.evictions += 1;
-  }
-}
+export { evictVerifiedFileCacheForProject, VERIFIED_FILE_CACHE_LIMIT };
 
 /**
  * 缓存只跳过整文件 SHA；每次请求仍重新走完整路径链 lstat/realpath，并比较
@@ -803,9 +794,9 @@ async function inspectManagedFileCached(input: InspectCachedInput): Promise<Insp
   if (currentIdentity.size > BigInt(Number.MAX_SAFE_INTEGER)) throw integrityViolation(`${input.label}过大，无法安全提供。`);
 
   const lookupKey = verificationLookupKey(input, canonicalPath);
-  const indexedBinding = verifiedFileLookup.get(lookupKey);
-  const previous = indexedBinding ? verifiedFileCache.get(indexedBinding) : undefined;
-  if (indexedBinding && !previous) verifiedFileLookup.delete(lookupKey);
+  const indexedBinding = getVerifiedFileLookup(input.canonicalRoot, lookupKey);
+  const previous = indexedBinding ? getVerifiedFile<InspectedFile>(input.canonicalRoot, indexedBinding) : undefined;
+  if (indexedBinding && !previous) deleteDanglingVerifiedFileLookup(input.canonicalRoot, lookupKey);
 
   if (previous && input.expectedSha256 !== undefined && input.expectedSize !== undefined
     && (previous.expectedSha256 !== input.expectedSha256 || previous.expectedSize !== input.expectedSize)) {
@@ -815,7 +806,7 @@ async function inspectManagedFileCached(input: InspectCachedInput): Promise<Insp
   const requestedBinding = input.expectedSha256 !== undefined && input.expectedSize !== undefined
     ? verificationBindingKey(lookupKey, input.expectedSha256, input.expectedSize)
     : indexedBinding;
-  const cached = requestedBinding ? verifiedFileCache.get(requestedBinding) : undefined;
+  const cached = requestedBinding ? getVerifiedFile<InspectedFile>(input.canonicalRoot, requestedBinding) : undefined;
   if (cached && identitiesEqual(cached.inspected.identity, currentIdentity)) {
     verificationCacheMetrics.cacheHits[input.target] += 1;
     touchVerifiedFile(cached);
@@ -850,7 +841,7 @@ async function inspectManagedFileCached(input: InspectCachedInput): Promise<Insp
     throw integrityViolation(`${input.label} SHA-256 或字节数与冻结记录不匹配。`);
   }
   const bindingKey = verificationBindingKey(lookupKey, expectedSha256, expectedSize);
-  rememberVerifiedFile({
+  verificationCacheMetrics.evictions += rememberVerifiedFile({
     bindingKey,
     lookupKey,
     target: input.target,

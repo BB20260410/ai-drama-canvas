@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "5-E",
+  "recordedAt": "2026-08-25T17:03:00Z",
+  "change": {
+    "module": "src/core/studio-verified-file-cache.ts",
+    "protocol": "src/core/studio-media-protocol.ts",
+    "limitUnchanged": 2048,
+    "bucketKey": "canonicalRoot",
+    "evictApi": "evictVerifiedFileCacheForProject",
+    "evictionPolicy": "prefer other project LRU, then current"
+  },
+  "tests": [
+    "tests/runtime-perf-wave5e-verified-file-cache-buckets.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "sourceContractAndOwnerTests": { "passed": 3, "platform": "linux", "files": 1 }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W5-E：verifiedFileCache 按 canonicalRoot 分桶。全局上限仍 2048，未加大。超限优先淘汰其他工程最旧条目。提供 evictVerifiedFileCacheForProject。未关身份绑定，未改 recipe。",
+  "residual": [
+    "未在切工程 UI 自动调用 evict（本切片只提供分桶 + 导出淘汰 API）",
+    "未跑安装版「列表停留+翻 2 页 aicanvas-studio://media/* = 0」探针",
+    "ensure 恢复前仍 sha256File 源对象；media 目标仍全 SHA",
+    "W4/W5-A–D 残差仍在；禁止写成「已优化缩略指纹」或「serving 不再校验身份」或「扩大了缓存上限」"
+  ]
+}
