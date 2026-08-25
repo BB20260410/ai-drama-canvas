@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "6-darwin-ci-36abafb",
+  "recordedAt": "2026-08-25T20:01:47Z",
+  "change": {
+    "kind": "verification-only",
+    "sourceCodeChanged": false,
+    "summary": "macos-latest CI check success on 36abafb（扩大复验文档提交；含 list-flip / M7 LRU / busy 墙钟 5s）。不是安装版 T23，不是列表 GUI 探针。"
+  },
+  "verification": {
+    "darwinCi": {
+      "conclusion": "success",
+      "runId": 32891408457,
+      "url": "https://github.com/BB20260410/ai-drama-canvas/actions/runs/32891408457",
+      "headSha": "36abafb1cd4ae2ef9820d31dd32181493d512929",
+      "createdAt": "2026-08-25T19:45:45Z",
+      "updatedAt": "2026-08-25T20:01:16Z",
+      "steps": ["Typecheck=success", "Fast tests=success"]
+    },
+    "priorSourceGreen": {
+      "e1ea3f1": { "conclusion": "success", "runId": 32889586061, "note": "源码 HEAD（M7 + busy 墙钟）；36abafb 仅文档/证据" }
+    },
+    "listFlipProbe": "NOT_RUN",
+    "installedT23": "NOT_RUN",
+    "installedApp": "NO_APP"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "overwrote20260811Final": false,
+    "writeBusyTimeoutUnchanged": 120000,
+    "wave5ParentChecked": false
+  },
+  "claim": "36abafb Darwin CI 已绿。禁止写「T23 已复测」「列表原图次数已测为 0」「运行速度已关账」。",
+  "residual": [
+    "安装版 T23 / P7 owner / 列表 GUI 探针仍 NOT_RUN",
+    "macos CI ≠ 安装版 T23"
+  ]
+}
