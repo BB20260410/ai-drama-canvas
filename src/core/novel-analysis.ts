@@ -1,11 +1,11 @@
 import { createHash, randomUUID } from "node:crypto";
 import path from "node:path";
 import { z } from "zod";
-import { loadAdaptationStore, saveAdaptationStore } from "./adaptation.js";
+import { withAdaptation, type AdaptationModule } from "./adaptation-lazy.js";
 import { withProjectLock } from "./locks.js";
 import { assertNovelAnalysisChapterBinding, createNovelAnalysisTaskBindingFiles, freezeNovelAnalysisTaskBinding, novelAnalysisTaskPaths } from "./novel-analysis-task-binding.js";
 import { appendEvent } from "./sidecar.js";
-import { loadStoryAnalysisChapterSnapshot, loadStoryLibrarySnapshot } from "./story.js";
+import { withStory, type StoryModule } from "./story-lazy.js";
 import type {
   AdaptationStore,
   NarrativeBeat,
@@ -18,6 +18,15 @@ import type {
   StoryLibrary,
   StoryChapter,
 } from "./types.js";
+
+const loadAdaptationStore = (...args: Parameters<AdaptationModule["loadAdaptationStore"]>) =>
+  withAdaptation((adaptation) => adaptation.loadAdaptationStore(...args));
+const saveAdaptationStore = (...args: Parameters<AdaptationModule["saveAdaptationStore"]>) =>
+  withAdaptation((adaptation) => adaptation.saveAdaptationStore(...args));
+const loadStoryLibrarySnapshot = (...args: Parameters<StoryModule["loadStoryLibrarySnapshot"]>) =>
+  withStory((story) => story.loadStoryLibrarySnapshot(...args));
+const loadStoryAnalysisChapterSnapshot = (...args: Parameters<StoryModule["loadStoryAnalysisChapterSnapshot"]>) =>
+  withStory((story) => story.loadStoryAnalysisChapterSnapshot(...args));
 
 export type FactProposal = Omit<NovelFact, "schemaVersion" | "id" | "revision" | "createdAt" | "updatedAt"> & { id?: string };
 export type BeatProposal = Omit<NarrativeBeat, "schemaVersion" | "id" | "revision" | "createdAt" | "updatedAt"> & { id?: string };

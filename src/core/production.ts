@@ -6,7 +6,7 @@ import { withEditor } from "./editor-lazy.js";
 import { listGenerationJobs } from "./generation.js";
 import { getProjectIndex } from "./service.js";
 import { appendEvent, getSidecarPaths, listTaskPacks, loadProjectConfig, readJson, writeJsonAtomic } from "./sidecar.js";
-import { listStoryChapters, listStoryEvents, listStorySources } from "./story.js";
+import { withStory, type StoryModule } from "./story-lazy.js";
 import { listReviewRecords } from "./reviews.js";
 import { reviewCoversAnyArtifact, reviewCoversArtifacts } from "./review-evidence.js";
 import {
@@ -454,19 +454,19 @@ function storyEvidenceAuditIssue(error: unknown): string {
 
 async function loadProductionStoryEvidence(projectRoot: string) {
   try {
-    const [storySources, storyChapters, storyEvents] = await Promise.all([
-      listStorySources(projectRoot),
-      listStoryChapters(projectRoot),
-      listStoryEvents(projectRoot, { includeOrphans: true }),
-    ]);
+    const [storySources, storyChapters, storyEvents] = await withStory((story) => Promise.all([
+      story.listStorySources(projectRoot),
+      story.listStoryChapters(projectRoot),
+      story.listStoryEvents(projectRoot, { includeOrphans: true }),
+    ]));
     return { storySources, storyChapters, storyEvents, storyEvidenceReadIssue: undefined };
   } catch (error) {
     // Story Core 的普通读取必须继续 fail-closed；生产审计只把同一失败翻译成
     // 可呈现的失效证据，绝不回退 raw cast 或继续信任受损索引中的路径。
     return {
-      storySources: [] as Awaited<ReturnType<typeof listStorySources>>,
-      storyChapters: [] as Awaited<ReturnType<typeof listStoryChapters>>,
-      storyEvents: [] as Awaited<ReturnType<typeof listStoryEvents>>,
+      storySources: [] as Awaited<ReturnType<StoryModule["listStorySources"]>>,
+      storyChapters: [] as Awaited<ReturnType<StoryModule["listStoryChapters"]>>,
+      storyEvents: [] as Awaited<ReturnType<StoryModule["listStoryEvents"]>>,
       storyEvidenceReadIssue: storyEvidenceAuditIssue(error),
     };
   }
@@ -1092,7 +1092,7 @@ export async function getConfirmedStoryboardContracts(
 }
 
 export async function analyzeChangeImpact(projectRoot: string, input: { targetType: "item" | "story_event" | "hard_lock" | "bible"; targetId: string }) {
-  const [index, storyEvents, tasks, generationJobs, editProjects, bibles, storyboard] = await Promise.all([getProjectIndex(projectRoot), listStoryEvents(projectRoot, { includeOrphans: true }), listTaskPacks(projectRoot), listGenerationJobs(projectRoot), withEditor((editor) => editor.listEditProjects(projectRoot)), listCreativeBibles(projectRoot), getStoryboard(projectRoot)]);
+  const [index, storyEvents, tasks, generationJobs, editProjects, bibles, storyboard] = await Promise.all([getProjectIndex(projectRoot), withStory((story) => story.listStoryEvents(projectRoot, { includeOrphans: true })), listTaskPacks(projectRoot), listGenerationJobs(projectRoot), withEditor((editor) => editor.listEditProjects(projectRoot)), listCreativeBibles(projectRoot), getStoryboard(projectRoot)]);
   const itemIds = new Set<string>();
   const artifactIds = new Set<string>();
   const eventIds = new Set<string>();

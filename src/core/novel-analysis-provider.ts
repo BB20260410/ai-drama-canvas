@@ -1,12 +1,23 @@
 import { createHash, randomUUID } from "node:crypto";
-import { loadAdaptationStore, saveAdaptationStore } from "./adaptation.js";
+import { withAdaptation, type AdaptationModule } from "./adaptation-lazy.js";
 import { withProjectLock } from "./locks.js";
 import { createNovelAnalysisRun, parseNovelAnalysisProposal, replaceNovelAnalysisRunTaskAttempt, submitNovelAnalysisProposal } from "./novel-analysis.js";
 import { assertNovelAnalysisChapterBinding, assertNovelAnalysisTaskBindingUnchanged, freezeNovelAnalysisTaskBinding, NovelAnalysisTaskBindingError, persistNovelAnalysisProposal } from "./novel-analysis-task-binding.js";
 import { NovelAnalysisTransportError, assertNovelAnalysisStaticUrlPolicy, prepareNovelAnalysisPinnedTarget, requestPinnedNovelAnalysisText, type PinnedTarget } from "./novel-analysis-transport.js";
 import { appendEvent, getSidecarPaths, readJson, writeJsonAtomic } from "./sidecar.js";
-import { assertStoryLibraryIndexEnvelopeReadable, loadStoryAnalysisChapterSnapshot, loadStoryLibrarySnapshot, StoryAnalysisSnapshotError } from "./story.js";
+import { withStory, type StoryModule } from "./story-lazy.js";
 import type { AdaptationStore, NovelAnalysisProvider, NovelAnalysisProviderSettings, NovelAnalysisRunProgress, NovelAnalysisTask, StoryLibrary } from "./types.js";
+
+const loadAdaptationStore = (...args: Parameters<AdaptationModule["loadAdaptationStore"]>) =>
+  withAdaptation((adaptation) => adaptation.loadAdaptationStore(...args));
+const saveAdaptationStore = (...args: Parameters<AdaptationModule["saveAdaptationStore"]>) =>
+  withAdaptation((adaptation) => adaptation.saveAdaptationStore(...args));
+const loadStoryLibrarySnapshot = (...args: Parameters<StoryModule["loadStoryLibrarySnapshot"]>) =>
+  withStory((story) => story.loadStoryLibrarySnapshot(...args));
+const loadStoryAnalysisChapterSnapshot = (...args: Parameters<StoryModule["loadStoryAnalysisChapterSnapshot"]>) =>
+  withStory((story) => story.loadStoryAnalysisChapterSnapshot(...args));
+const assertStoryLibraryIndexEnvelopeReadable = (...args: Parameters<StoryModule["assertStoryLibraryIndexEnvelopeReadable"]>) =>
+  withStory((story) => story.assertStoryLibraryIndexEnvelopeReadable(...args));
 
 export interface UpsertNovelAnalysisProviderInput {
   expectedRevision: number;
@@ -505,7 +516,10 @@ async function chapterPayload(projectRoot: string, task: NovelAnalysisTask, maxC
   try {
     snapshot = await loadStoryAnalysisChapterSnapshot(projectRoot, task.chapterRefs.map((chapter) => chapter.chapterId));
   } catch (error) {
-    if (error instanceof StoryAnalysisSnapshotError && error.kind === "library") {
+    const libraryUnavailable = await withStory(
+      (story) => error instanceof story.StoryAnalysisSnapshotError && error.kind === "library",
+    );
+    if (libraryUnavailable) {
       throw preDispatchFailure("NOVEL_ANALYSIS_PRE_DISPATCH_LIBRARY_UNAVAILABLE", "章节索引或迁移闭包当前不可读取；请恢复后重新执行。", error);
     }
     throw preDispatchFailure("NOVEL_ANALYSIS_PRE_DISPATCH_CHAPTER_UNAVAILABLE", "章节正文当前不可读取；请恢复章节后重新执行。", error);

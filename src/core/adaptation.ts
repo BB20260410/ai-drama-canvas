@@ -5,7 +5,7 @@ import { getStoryboard, upsertStoryboardRow } from "./production.js";
 import { getProjectIndex, scanAndPersist } from "./service.js";
 import { appendEvent, getSidecarPaths, loadProjectConfig, readJson, writeJsonAtomic, writeTextAtomic } from "./sidecar.js";
 import { withProjectLock } from "./locks.js";
-import { loadStoryAnalysisSnapshot, loadStoryLibrarySnapshot } from "./story.js";
+import { withStory, type StoryModule } from "./story-lazy.js";
 import type {
   AdaptationChangeImpact,
   AdaptationPlan,
@@ -22,6 +22,11 @@ import type {
   StoryboardRowUpsertInput,
   StoryLibrary,
 } from "./types.js";
+
+const loadStoryLibrarySnapshot = (...args: Parameters<StoryModule["loadStoryLibrarySnapshot"]>) =>
+  withStory((story) => story.loadStoryLibrarySnapshot(...args));
+const loadStoryAnalysisSnapshot = (...args: Parameters<StoryModule["loadStoryAnalysisSnapshot"]>) =>
+  withStory((story) => story.loadStoryAnalysisSnapshot(...args));
 
 const DIALOGUE_WARNING_RATE = 4;
 const DIALOGUE_HARD_RATE = 6;

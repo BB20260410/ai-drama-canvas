@@ -9,7 +9,9 @@ import { getReviewQueue, listReviewRecords } from "./reviews.js";
 import { getNextTask } from "./service.js";
 import { getSidecarPaths, listEvents, listTaskPacks, loadIndex, loadProjectConfig, readJson } from "./sidecar.js";
 import { readAgentSkills } from "./skills.js";
-import { listStoryChapters, listStoryEvents, listStorySources } from "./story.js";
+import { NOVEL_AGENT_CAPABILITIES } from "./novel-agent-capabilities.js";
+import { withAdaptation } from "./adaptation-lazy.js";
+import { withStory } from "./story-lazy.js";
 import { auditExistingProductionBaselines, getProductionWorkflow, getStoryboard, listCreativeBibles } from "./production.js";
 import { listAssetRelations, listVoiceIdentities } from "./asset-registry.js";
 import { listProjectLocks } from "./locks.js";
@@ -17,7 +19,6 @@ import { listPublicationIntents, publicationTargetExists } from "./publication.j
 import { listCommandLedger } from "./command-bus.js";
 import { resolveRuntimeBuildIdentity, type BuildIdentity } from "./build-identity.js";
 import { assertRuntimeBuildCurrentness } from "./project-backup.js";
-import { getAdaptationWorkspace } from "./adaptation.js";
 import { getNovelAnalysisExecutionRecoveryStatus, getNovelAnalysisProviderSettings, listNovelAnalysisRunProgress } from "./novel-analysis-provider.js";
 import { getCanvasHistoryInfo, getCanvasSemanticState } from "./canvas-state.js";
 import { getFusionAssetConsistencyState, type FusionAssetConsistencyState } from "./fusion-asset-consistency.js";
@@ -72,7 +73,6 @@ import {
   AI_CANVAS_PROTOCOL_VERSION,
 } from "./release-manifest.js";
 import { withStudioRequestSchemaCache } from "./studio-request-schema-cache.js";
-import { NOVEL_AGENT_CAPABILITIES } from "./novel-agent-service.js";
 
 export { AI_CANVAS_PROTOCOL_VERSION } from "./release-manifest.js";
 
@@ -1690,7 +1690,7 @@ export async function doctorProject(projectRoot: string) {
     Promise.allSettled([import("sharp"), import("mammoth")]),
     listProjectLocks(root),
     diagnoseSidecar("command-ledger-corrupt", "幂等命令账本", paths.commandLedger, async () => ({ entries: await listCommandLedger(root, 500) }), { entries: [] }),
-    diagnoseSidecar("adaptation-store-corrupt", "小说自动改编侧车", paths.storyAdaptation, () => getAdaptationWorkspace(root), null),
+    diagnoseSidecar("adaptation-store-corrupt", "小说自动改编侧车", paths.storyAdaptation, () => withAdaptation((adaptation) => adaptation.getAdaptationWorkspace(root)), null),
   ]);
   const machineMediaConfig = getMachineMediaRuntimeConfig();
   let machineMediaRuntime: Awaited<ReturnType<typeof readMachineMediaRuntimeSnapshot>> | undefined;
@@ -1744,8 +1744,8 @@ export async function doctorProject(projectRoot: string) {
       return canvas;
     }, null),
     diagnoseSidecar("canvas-history-corrupt", "无限画布历史侧车", paths.canvasHistory, () => getCanvasHistoryInfo(root), null),
-    diagnoseSidecar("story-index-corrupt", "小说来源与章节索引", paths.storyIndex, async () => Promise.all([listStorySources(root), listStoryChapters(root)]), [[], []]),
-    diagnoseSidecar("story-event-store-corrupt", "故事事件侧车", paths.storyEvents, () => listStoryEvents(root, { includeOrphans: true }), []),
+    diagnoseSidecar("story-index-corrupt", "小说来源与章节索引", paths.storyIndex, async () => withStory((story) => Promise.all([story.listStorySources(root), story.listStoryChapters(root)])), [[], []]),
+    diagnoseSidecar("story-event-store-corrupt", "故事事件侧车", paths.storyEvents, () => withStory((story) => story.listStoryEvents(root, { includeOrphans: true })), []),
     diagnoseSidecar("timeline-store-corrupt", "原镜头时间线侧车", paths.timeline, () => getUnitTimelines(root), []),
     diagnoseSidecar("editor-project-store-corrupt", "剪辑工程侧车", paths.editorProjects, () => withEditor((editor) => editor.listEditProjects(root)), []),
     diagnoseSidecar("editor-session-corrupt", "剪辑会话侧车", paths.editorSession, async () => {
@@ -2114,9 +2114,9 @@ export async function getProjectSnapshot(projectRoot: string, focusItemId?: stri
     listEvents(root, 30),
     readAgentSkills(root, { enabledOnly: true }),
     getContinuationSnapshot(root, { itemId: focusItemId, initializeDefaultSkills: false }),
-    listStorySources(root),
-    listStoryChapters(root),
-    listStoryEvents(root, { includeOrphans: true }),
+    withStory((story) => story.listStorySources(root)),
+    withStory((story) => story.listStoryChapters(root)),
+    withStory((story) => story.listStoryEvents(root, { includeOrphans: true })),
     getProductionWorkflow(root, { includeEvidenceAudit: true }),
     listCreativeBibles(root),
     getStoryboard(root),

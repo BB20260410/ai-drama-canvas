@@ -36,8 +36,8 @@ import {
   projectConfirmedCommandFailureForReceipt,
 } from "./command-terminal-receipt.js";
 import { saveAgentSkill } from "./skills.js";
-import { connectStoryEvents, importStoryFile, importStoryText, upsertStoryEvent } from "./story.js";
-import { analyzeNovelChapters, exportAdaptation, generateAdaptationPlans, loadAdaptationStore, materializeSelectedAdaptationPlan, regenerateAdaptationScope, selectAdaptationPlan, upsertNarrativeBeat, upsertNovelFact } from "./adaptation.js";
+import { withAdaptation, type AdaptationModule } from "./adaptation-lazy.js";
+import { withStory, type StoryModule } from "./story-lazy.js";
 import { createShotTaskPack, saveUnitTimeline } from "./timeline.js";
 import type { AssetRelationKind, BrowserGenerationUpdateStatus, BrowserPreflightInput, BrowserSubmissionReconciliationInput, BrowserUploadInput, CreativeBibleKind, ProductionWorkflowStageId, ProductionWorkflowStageStatus, ReconcileHttpGenerationSubmissionInput, ShotTiming, SubagentImageGenerationUpdateStatus, SubmitReviewInput, WorkItemStatus } from "./types.js";
 import { withProjectLock } from "./locks.js";
@@ -405,7 +405,7 @@ export type CommandRequest =
   | { command: "prepare_timeline_continuation"; payload: { editProjectId: string; targetItemId: string; expectedRevision: number; timeSeconds?: number; prompt?: string; providerId?: string; enqueue?: boolean } }
   | { command: "upsert_context"; payload: Parameters<typeof upsertProjectContext>[1] }
   | { command: "delete_context"; payload: Parameters<typeof deleteProjectContext>[1] }
-  | { command: "upsert_story_event"; payload: Parameters<typeof upsertStoryEvent>[1] }
+  | { command: "upsert_story_event"; payload: Parameters<StoryModule["upsertStoryEvent"]>[1] }
   | { command: "connect_story_events"; payload: { sourceEventId: string; targetEventId: string } }
   | { command: "upsert_canvas_entity"; payload: Parameters<typeof upsertCanvasEntity>[1] }
   | { command: "delete_canvas_entity"; payload: { entityId: string } }
@@ -424,15 +424,15 @@ export type CommandRequest =
   | { command: "extract_last_frame"; payload: Parameters<EditorModule["extractLastFrame"]>[1] }
   | { command: "create_video_continuation"; payload: Parameters<EditorModule["createVideoContinuationPack"]>[1] }
   | { command: "import_story_file"; payload: { filePath: string; title?: string } }
-  | { command: "import_story_text"; payload: Parameters<typeof importStoryText>[1] }
-  | { command: "analyze_novel_chapters"; payload: Parameters<typeof analyzeNovelChapters>[1] }
-  | { command: "generate_adaptation_plans"; payload: Parameters<typeof generateAdaptationPlans>[1] }
+  | { command: "import_story_text"; payload: Parameters<StoryModule["importStoryText"]>[1] }
+  | { command: "analyze_novel_chapters"; payload: Parameters<AdaptationModule["analyzeNovelChapters"]>[1] }
+  | { command: "generate_adaptation_plans"; payload: Parameters<AdaptationModule["generateAdaptationPlans"]>[1] }
   | { command: "select_adaptation_plan"; payload: { planId: string; expectedRevision: number } }
-  | { command: "materialize_adaptation_plan"; payload: Parameters<typeof materializeSelectedAdaptationPlan>[1] }
-  | { command: "regenerate_adaptation_scope"; payload: Parameters<typeof regenerateAdaptationScope>[1] }
-  | { command: "upsert_novel_fact"; payload: Parameters<typeof upsertNovelFact>[1] }
-  | { command: "upsert_narrative_beat"; payload: Parameters<typeof upsertNarrativeBeat>[1] }
-  | { command: "export_adaptation"; payload: Parameters<typeof exportAdaptation>[1] }
+  | { command: "materialize_adaptation_plan"; payload: Parameters<AdaptationModule["materializeSelectedAdaptationPlan"]>[1] }
+  | { command: "regenerate_adaptation_scope"; payload: Parameters<AdaptationModule["regenerateAdaptationScope"]>[1] }
+  | { command: "upsert_novel_fact"; payload: Parameters<AdaptationModule["upsertNovelFact"]>[1] }
+  | { command: "upsert_narrative_beat"; payload: Parameters<AdaptationModule["upsertNarrativeBeat"]>[1] }
+  | { command: "export_adaptation"; payload: Parameters<AdaptationModule["exportAdaptation"]>[1] }
   | { command: "create_novel_analysis_task"; payload: Parameters<typeof createNovelAnalysisTask>[1] }
   | { command: "submit_novel_analysis_proposal"; payload: Parameters<typeof submitNovelAnalysisProposal>[1] }
   | { command: "review_novel_analysis_item"; payload: Parameters<typeof reviewNovelAnalysisItem>[1] }
@@ -1333,7 +1333,7 @@ async function hydrateReceiptReconciledCommandResult(
     || !Number.isInteger(source.workspaceRevision)) {
     throw new Error("小说分析任务终态回执定位符无效；保持已对账账本并停止返回不完整结果。");
   }
-  const workspace = await loadAdaptationStore(projectRoot);
+  const workspace = await withAdaptation((adaptation) => adaptation.loadAdaptationStore(projectRoot));
   if (workspace.revision < Number(source.workspaceRevision)) {
     throw new Error("小说分析工作区修订早于终态回执；拒绝从不完整状态重建结果。");
   }
@@ -5335,8 +5335,8 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
       await deleteProjectContext(projectRoot, request.payload, "codex");
       return { deleted: request.payload.contextId };
     }
-    case "upsert_story_event": return upsertStoryEvent(projectRoot, request.payload, "codex");
-    case "connect_story_events": return connectStoryEvents(projectRoot, request.payload.sourceEventId, request.payload.targetEventId, "codex");
+    case "upsert_story_event": return withStory((story) => story.upsertStoryEvent(projectRoot, request.payload, "codex"));
+    case "connect_story_events": return withStory((story) => story.connectStoryEvents(projectRoot, request.payload.sourceEventId, request.payload.targetEventId, "codex"));
     case "upsert_canvas_entity": return upsertCanvasEntity(projectRoot, request.payload, "codex");
     case "delete_canvas_entity": return deleteCanvasEntity(projectRoot, request.payload.entityId, "codex");
     case "upsert_canvas_link": return upsertCanvasLink(projectRoot, request.payload, "codex");
@@ -5353,13 +5353,13 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
     case "save_script_document": return saveScriptDocument(projectRoot, request.payload.filePath, request.payload.content, request.payload.expectedModifiedAt);
     case "extract_last_frame": return withEditor((editor) => editor.extractLastFrame(projectRoot, request.payload));
     case "create_video_continuation": return withEditor((editor) => editor.createVideoContinuationPack(projectRoot, request.payload));
-    case "import_story_file": return importStoryFile(projectRoot, request.payload.filePath, request.payload.title);
-    case "import_story_text": return importStoryText(projectRoot, request.payload);
-    case "analyze_novel_chapters": return analyzeNovelChapters(projectRoot, request.payload);
-    case "generate_adaptation_plans": return generateAdaptationPlans(projectRoot, request.payload);
-    case "select_adaptation_plan": return selectAdaptationPlan(projectRoot, request.payload.planId, request.payload.expectedRevision);
-    case "materialize_adaptation_plan": return materializeSelectedAdaptationPlan(projectRoot, request.payload);
-    case "regenerate_adaptation_scope": return regenerateAdaptationScope(projectRoot, request.payload);
+    case "import_story_file": return withStory((story) => story.importStoryFile(projectRoot, request.payload.filePath, request.payload.title));
+    case "import_story_text": return withStory((story) => story.importStoryText(projectRoot, request.payload));
+    case "analyze_novel_chapters": return withAdaptation((adaptation) => adaptation.analyzeNovelChapters(projectRoot, request.payload));
+    case "generate_adaptation_plans": return withAdaptation((adaptation) => adaptation.generateAdaptationPlans(projectRoot, request.payload));
+    case "select_adaptation_plan": return withAdaptation((adaptation) => adaptation.selectAdaptationPlan(projectRoot, request.payload.planId, request.payload.expectedRevision));
+    case "materialize_adaptation_plan": return withAdaptation((adaptation) => adaptation.materializeSelectedAdaptationPlan(projectRoot, request.payload));
+    case "regenerate_adaptation_scope": return withAdaptation((adaptation) => adaptation.regenerateAdaptationScope(projectRoot, request.payload));
     case "create_novel_analysis_task": return createNovelAnalysisTask(projectRoot, request.payload);
     case "submit_novel_analysis_proposal": return submitNovelAnalysisProposal(projectRoot, request.payload);
     case "review_novel_analysis_item": return reviewNovelAnalysisItem(projectRoot, request.payload);
@@ -5371,9 +5371,9 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
     case "replace_novel_analysis_run_task": return replaceNovelAnalysisRunTask(projectRoot, request.payload);
     case "mark_novel_analysis_execution_reconciliation_required": return markNovelAnalysisExecutionReconciliationRequired(projectRoot, request.payload);
     case "reconcile_novel_analysis_execution": return reconcileNovelAnalysisExecution(projectRoot, request.payload);
-    case "upsert_novel_fact": return upsertNovelFact(projectRoot, request.payload);
-    case "upsert_narrative_beat": return upsertNarrativeBeat(projectRoot, request.payload);
-    case "export_adaptation": return exportAdaptation(projectRoot, request.payload);
+    case "upsert_novel_fact": return withAdaptation((adaptation) => adaptation.upsertNovelFact(projectRoot, request.payload));
+    case "upsert_narrative_beat": return withAdaptation((adaptation) => adaptation.upsertNarrativeBeat(projectRoot, request.payload));
+    case "export_adaptation": return withAdaptation((adaptation) => adaptation.exportAdaptation(projectRoot, request.payload));
     case "save_skill": return saveAgentSkill(projectRoot, request.payload);
     case "create_handoff": return createContinuationHandoff(projectRoot, request.payload);
     case "save_unit_timeline": return saveUnitTimeline(projectRoot, request.payload.unitId, request.payload.timings);

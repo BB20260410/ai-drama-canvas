@@ -40,9 +40,10 @@ import { commitProjectImport, prepareProjectImport } from "../core/importer.js";
 import { listAgentSkills, readAgentSkill, saveAgentSkill } from "../core/skills.js";
 import { createContinuationHandoff, deleteProjectContext, getContinuationSnapshot, listProjectContext, searchProjectContext, upsertProjectContext } from "../core/memory.js";
 import { PROJECT_CONTEXT_KINDS } from "../core/types.js";
-import { buildStoryContext, connectStoryEvents, importStoryFile, importStoryText, listStoryChapters, listStoryEvents, listStorySources, readStoryChapter, upsertStoryEvent } from "../core/story.js";
-import { analyzeAdaptationChangeImpact, analyzeNovelChapters, exportAdaptation, generateAdaptationPlans, getAdaptationWorkspace, materializeSelectedAdaptationPlan, regenerateAdaptationScope, selectAdaptationPlan, upsertNarrativeBeat, upsertNovelFact, validateAdaptationPlan } from "../core/adaptation.js";
+import { withAdaptation, type AdaptationModule } from "../core/adaptation-lazy.js";
 import { withEditor } from "../core/editor-lazy.js";
+import { withNovelAgent, type NovelAgentModule } from "../core/novel-agent-lazy.js";
+import { withStory, type StoryModule } from "../core/story-lazy.js";
 import { editKeyframeCurveIssue, editKeyframeSourceTransformIssue } from "../core/keyframe-curve.js";
 import { doctorProject, getCapabilities, getProjectChanges, getProjectSnapshot, getStudioGenerationControlEnvelope } from "../core/codex.js";
 import { analyzeChangeImpact, commitExistingProductionRecovery, getProductionWorkflow, getStoryboard, listCreativeBibles, previewExistingProductionRecovery, updateProductionWorkflowStage, upsertCreativeBible, upsertStoryboardRow } from "../core/production.js";
@@ -67,23 +68,6 @@ import { listAssetRelations, listVoiceIdentities, upsertAssetRelation, upsertVoi
 import type { EditProject, GenerationJob, GenerationProvider, GenerationSettings } from "../core/types.js";
 import { PUBLICATION_KINDS, PUBLICATION_PURPOSES, PUBLICATION_VARIANTS, listPublicationIntents, listPublicationReceipts } from "../core/publication.js";
 import { createNovelAnalysisTask, listNovelAnalysisReviews, reviewNovelAnalysisBatch, reviewNovelAnalysisItem, submitNovelAnalysisProposal } from "../core/novel-analysis.js";
-import {
-  buildNovelContextPack,
-  compareNovelWritingSourceReceipts,
-  doctorNovelAgent,
-  getNovelManuscriptWorkspace,
-  getNovelSearchIndexStatus,
-  getNovelStateRebuildStatus,
-  getNovelWritingState,
-  listNovelManuscriptChapters,
-  listNovelWritingSourceReceipts,
-  planNovelStateRebuild,
-  probeNovelChapterConsistency,
-  preflightNovelChapterWrite,
-  prepareNovelChapterWrite,
-  readNovelManuscriptRange,
-  searchNovelManuscript,
-} from "../core/novel-agent-service.js";
 import { isNovelWritingStateRejectedError } from "../core/novel-writing-state.js";
 import { NOVEL_MANUSCRIPT_COMMAND_SCHEMA_OPTIONS } from "../core/novel-command-runtime.js";
 import { getNovelAnalysisExecutionRecoveryStatus, getNovelAnalysisProviderSettings, getNovelAnalysisRunProgress, listNovelAnalysisRunProgress, probeNovelAnalysisProvider } from "../core/novel-analysis-provider.js";
@@ -194,6 +178,77 @@ import { AI_CANVAS_APPLICATION_VERSION, readRuntimeReleaseManifest } from "../co
 import { STUDIO_CODEX_PUBLIC_COMMAND_SCHEMA_OPTIONS, studioSha256Schema } from "../core/studio-command-runtime.js";
 import { ensureConfinedDirectory } from "../core/confined-project-storage.js";
 import { createMcpToolRegistrar } from "./tool-registrar.js";
+
+const buildStoryContext = (...args: Parameters<StoryModule["buildStoryContext"]>) =>
+  withStory((story) => story.buildStoryContext(...args));
+const connectStoryEvents = (...args: Parameters<StoryModule["connectStoryEvents"]>) =>
+  withStory((story) => story.connectStoryEvents(...args));
+const importStoryFile = (...args: Parameters<StoryModule["importStoryFile"]>) =>
+  withStory((story) => story.importStoryFile(...args));
+const importStoryText = (...args: Parameters<StoryModule["importStoryText"]>) =>
+  withStory((story) => story.importStoryText(...args));
+const listStoryChapters = (...args: Parameters<StoryModule["listStoryChapters"]>) =>
+  withStory((story) => story.listStoryChapters(...args));
+const listStoryEvents = (...args: Parameters<StoryModule["listStoryEvents"]>) =>
+  withStory((story) => story.listStoryEvents(...args));
+const listStorySources = (...args: Parameters<StoryModule["listStorySources"]>) =>
+  withStory((story) => story.listStorySources(...args));
+const readStoryChapter = (...args: Parameters<StoryModule["readStoryChapter"]>) =>
+  withStory((story) => story.readStoryChapter(...args));
+const upsertStoryEvent = (...args: Parameters<StoryModule["upsertStoryEvent"]>) =>
+  withStory((story) => story.upsertStoryEvent(...args));
+const analyzeAdaptationChangeImpact = (...args: Parameters<AdaptationModule["analyzeAdaptationChangeImpact"]>) =>
+  withAdaptation((adaptation) => adaptation.analyzeAdaptationChangeImpact(...args));
+const analyzeNovelChapters = (...args: Parameters<AdaptationModule["analyzeNovelChapters"]>) =>
+  withAdaptation((adaptation) => adaptation.analyzeNovelChapters(...args));
+const exportAdaptation = (...args: Parameters<AdaptationModule["exportAdaptation"]>) =>
+  withAdaptation((adaptation) => adaptation.exportAdaptation(...args));
+const generateAdaptationPlans = (...args: Parameters<AdaptationModule["generateAdaptationPlans"]>) =>
+  withAdaptation((adaptation) => adaptation.generateAdaptationPlans(...args));
+const getAdaptationWorkspace = (...args: Parameters<AdaptationModule["getAdaptationWorkspace"]>) =>
+  withAdaptation((adaptation) => adaptation.getAdaptationWorkspace(...args));
+const materializeSelectedAdaptationPlan = (...args: Parameters<AdaptationModule["materializeSelectedAdaptationPlan"]>) =>
+  withAdaptation((adaptation) => adaptation.materializeSelectedAdaptationPlan(...args));
+const regenerateAdaptationScope = (...args: Parameters<AdaptationModule["regenerateAdaptationScope"]>) =>
+  withAdaptation((adaptation) => adaptation.regenerateAdaptationScope(...args));
+const selectAdaptationPlan = (...args: Parameters<AdaptationModule["selectAdaptationPlan"]>) =>
+  withAdaptation((adaptation) => adaptation.selectAdaptationPlan(...args));
+const upsertNarrativeBeat = (...args: Parameters<AdaptationModule["upsertNarrativeBeat"]>) =>
+  withAdaptation((adaptation) => adaptation.upsertNarrativeBeat(...args));
+const upsertNovelFact = (...args: Parameters<AdaptationModule["upsertNovelFact"]>) =>
+  withAdaptation((adaptation) => adaptation.upsertNovelFact(...args));
+const validateAdaptationPlan = (...args: Parameters<AdaptationModule["validateAdaptationPlan"]>) =>
+  withAdaptation((adaptation) => adaptation.validateAdaptationPlan(...args));
+const buildNovelContextPack = (...args: Parameters<NovelAgentModule["buildNovelContextPack"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.buildNovelContextPack(...args));
+const compareNovelWritingSourceReceipts = (...args: Parameters<NovelAgentModule["compareNovelWritingSourceReceipts"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.compareNovelWritingSourceReceipts(...args));
+const doctorNovelAgent = (...args: Parameters<NovelAgentModule["doctorNovelAgent"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.doctorNovelAgent(...args));
+const getNovelManuscriptWorkspace = (...args: Parameters<NovelAgentModule["getNovelManuscriptWorkspace"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.getNovelManuscriptWorkspace(...args));
+const getNovelSearchIndexStatus = (...args: Parameters<NovelAgentModule["getNovelSearchIndexStatus"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.getNovelSearchIndexStatus(...args));
+const getNovelStateRebuildStatus = (...args: Parameters<NovelAgentModule["getNovelStateRebuildStatus"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.getNovelStateRebuildStatus(...args));
+const getNovelWritingState = (...args: Parameters<NovelAgentModule["getNovelWritingState"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.getNovelWritingState(...args));
+const listNovelManuscriptChapters = (...args: Parameters<NovelAgentModule["listNovelManuscriptChapters"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.listNovelManuscriptChapters(...args));
+const listNovelWritingSourceReceipts = (...args: Parameters<NovelAgentModule["listNovelWritingSourceReceipts"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.listNovelWritingSourceReceipts(...args));
+const planNovelStateRebuild = (...args: Parameters<NovelAgentModule["planNovelStateRebuild"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.planNovelStateRebuild(...args));
+const probeNovelChapterConsistency = (...args: Parameters<NovelAgentModule["probeNovelChapterConsistency"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.probeNovelChapterConsistency(...args));
+const preflightNovelChapterWrite = (...args: Parameters<NovelAgentModule["preflightNovelChapterWrite"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.preflightNovelChapterWrite(...args));
+const prepareNovelChapterWrite = (...args: Parameters<NovelAgentModule["prepareNovelChapterWrite"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.prepareNovelChapterWrite(...args));
+const readNovelManuscriptRange = (...args: Parameters<NovelAgentModule["readNovelManuscriptRange"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.readNovelManuscriptRange(...args));
+const searchNovelManuscript = (...args: Parameters<NovelAgentModule["searchNovelManuscript"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.searchNovelManuscript(...args));
 
 const server = new McpServer({
   name: "ai-drama-canvas",

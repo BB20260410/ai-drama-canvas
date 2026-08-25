@@ -97,7 +97,7 @@ import { getReviewQueue, listReviewRecords, submitReview } from "../core/reviews
 import { commitProjectImport, prepareProjectImport } from "../core/importer.js";
 import { deleteAgentSkill, listAgentSkills, readAgentSkill, saveAgentSkill } from "../core/skills.js";
 import { createContinuationHandoff, deleteProjectContext, getContinuationSnapshot, listProjectContext, searchProjectContext, upsertProjectContext } from "../core/memory.js";
-import { buildStoryContext, connectStoryEvents, importStoryFile, importStoryText, listStoryChapters, listStoryEvents, listStorySources, readStoryChapter, upsertStoryEvent } from "../core/story.js";
+import { withStory, type StoryModule } from "../core/story-lazy.js";
 import {
   resolveRuntimeBuildIdentity,
   sourceDigestPathIsRelevant,
@@ -118,7 +118,7 @@ import { getRuntimeStorageReadMetrics } from "../core/runtime-storage-observabil
 import { withEditor, type EditorModule } from "../core/editor-lazy.js";
 import type { EditOperation } from "../core/editor.js";
 import { analyzeChangeImpact, getProductionWorkflow, getStoryboard, listCreativeBibles, updateProductionWorkflowStage, upsertCreativeBible, upsertStoryboardRow } from "../core/production.js";
-import { analyzeAdaptationChangeImpact, analyzeNovelChapters, exportAdaptation, generateAdaptationPlans, getAdaptationWorkspace, materializeSelectedAdaptationPlan, regenerateAdaptationScope, selectAdaptationPlan, upsertNarrativeBeat, upsertNovelFact, validateAdaptationPlan } from "../core/adaptation.js";
+import { withAdaptation, type AdaptationModule } from "../core/adaptation-lazy.js";
 import { listAssetRelations, listVoiceIdentities, upsertAssetRelation, upsertVoiceIdentity } from "../core/asset-registry.js";
 import { createNovelAnalysisTask, listNovelAnalysisReviews, reviewNovelAnalysisBatch, reviewNovelAnalysisItem } from "../core/novel-analysis.js";
 import { getNovelAnalysisProviderSettings, getNovelAnalysisRunProgress, listNovelAnalysisRunProgress, probeNovelAnalysisProvider } from "../core/novel-analysis-provider.js";
@@ -291,6 +291,47 @@ import {
   type StudioCanvasWorkflowRunOptions,
 } from "../core/studio-canvas-workflow-runner.js";
 import type { StudioCanvasWorkflowGroup } from "../core/studio-canvas-layout-types.js";
+
+const buildStoryContext = (...args: Parameters<StoryModule["buildStoryContext"]>) =>
+  withStory((story) => story.buildStoryContext(...args));
+const connectStoryEvents = (...args: Parameters<StoryModule["connectStoryEvents"]>) =>
+  withStory((story) => story.connectStoryEvents(...args));
+const importStoryFile = (...args: Parameters<StoryModule["importStoryFile"]>) =>
+  withStory((story) => story.importStoryFile(...args));
+const importStoryText = (...args: Parameters<StoryModule["importStoryText"]>) =>
+  withStory((story) => story.importStoryText(...args));
+const listStoryChapters = (...args: Parameters<StoryModule["listStoryChapters"]>) =>
+  withStory((story) => story.listStoryChapters(...args));
+const listStoryEvents = (...args: Parameters<StoryModule["listStoryEvents"]>) =>
+  withStory((story) => story.listStoryEvents(...args));
+const listStorySources = (...args: Parameters<StoryModule["listStorySources"]>) =>
+  withStory((story) => story.listStorySources(...args));
+const readStoryChapter = (...args: Parameters<StoryModule["readStoryChapter"]>) =>
+  withStory((story) => story.readStoryChapter(...args));
+const upsertStoryEvent = (...args: Parameters<StoryModule["upsertStoryEvent"]>) =>
+  withStory((story) => story.upsertStoryEvent(...args));
+const analyzeAdaptationChangeImpact = (...args: Parameters<AdaptationModule["analyzeAdaptationChangeImpact"]>) =>
+  withAdaptation((adaptation) => adaptation.analyzeAdaptationChangeImpact(...args));
+const analyzeNovelChapters = (...args: Parameters<AdaptationModule["analyzeNovelChapters"]>) =>
+  withAdaptation((adaptation) => adaptation.analyzeNovelChapters(...args));
+const exportAdaptation = (...args: Parameters<AdaptationModule["exportAdaptation"]>) =>
+  withAdaptation((adaptation) => adaptation.exportAdaptation(...args));
+const generateAdaptationPlans = (...args: Parameters<AdaptationModule["generateAdaptationPlans"]>) =>
+  withAdaptation((adaptation) => adaptation.generateAdaptationPlans(...args));
+const getAdaptationWorkspace = (...args: Parameters<AdaptationModule["getAdaptationWorkspace"]>) =>
+  withAdaptation((adaptation) => adaptation.getAdaptationWorkspace(...args));
+const materializeSelectedAdaptationPlan = (...args: Parameters<AdaptationModule["materializeSelectedAdaptationPlan"]>) =>
+  withAdaptation((adaptation) => adaptation.materializeSelectedAdaptationPlan(...args));
+const regenerateAdaptationScope = (...args: Parameters<AdaptationModule["regenerateAdaptationScope"]>) =>
+  withAdaptation((adaptation) => adaptation.regenerateAdaptationScope(...args));
+const selectAdaptationPlan = (...args: Parameters<AdaptationModule["selectAdaptationPlan"]>) =>
+  withAdaptation((adaptation) => adaptation.selectAdaptationPlan(...args));
+const upsertNarrativeBeat = (...args: Parameters<AdaptationModule["upsertNarrativeBeat"]>) =>
+  withAdaptation((adaptation) => adaptation.upsertNarrativeBeat(...args));
+const upsertNovelFact = (...args: Parameters<AdaptationModule["upsertNovelFact"]>) =>
+  withAdaptation((adaptation) => adaptation.upsertNovelFact(...args));
+const validateAdaptationPlan = (...args: Parameters<AdaptationModule["validateAdaptationPlan"]>) =>
+  withAdaptation((adaptation) => adaptation.validateAdaptationPlan(...args));
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url));
 const sourceRuntimeWorkspace = path.resolve(currentDir, "../..");

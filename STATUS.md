@@ -4,12 +4,13 @@
 
 | 字段 | 当前值 |
 |---|---|
-| status | `in_progress`：W1–W3 + W4-A 已落地；W2-C 需 Darwin；整计划未关账 |
+| status | `in_progress`：W1–W3 + W4-A/B 已落地；W2-C 需 Darwin；整计划未关账 |
 | plan | `docs/PLAN_运行速度与内存占用长期执行_20260825.md` |
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
-| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`、`wave3*`、`wave4a` |
+| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`、`wave3*`、`wave4a`、`wave4b` |
+| wave4b | story/adaptation/novel-agent 经 withX 动态 import；mammoth 仅 docx 时 `import("mammoth")`；capabilities 已拆出。doctor / snapshot 仍会加载 story+adaptation |
 | wave1b | CLI `scripts/report-approved-timeline-full.ts` 显式 `fastMode: false` + `durationMs`；日常诊断/canonical 仍显式 true |
 | wave1c | resolver + CLI 合同测 Linux 6 PASS；P7 fixture 需 Darwin |
 | wave2a | `resolveApprovedTimelineBound`：unitIds/limit 上限 36；省略=整集；空数组失败关闭 |
@@ -22,7 +23,7 @@
 | wave3c | earliest 槽位 revision 只用 list 行；不再 `getStudioProductionUnitSnapshot` |
 | wave3d | `planSsl5MissingToGen` 只用 `board.earliestUnitId`，不再二次 earliest |
 | wave4a | editor.js 经 `withEditor` 动态 import；MCP Zod 仍静态拉小模块 keyframe-curve |
-| earliest_next | **Wave 4-B**：adaptation / story.js（卸 mammoth）/ novel-agent-service 动态 import |
+| earliest_next | **Wave 4-C**：studio-video-package / Higgsfield / dudu / local-creative 动态 import |
 
 ## 2026-08-25 · 本机人物库同步
 

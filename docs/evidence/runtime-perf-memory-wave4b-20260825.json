@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "4-B",
+  "recordedAt": "2026-08-25T16:30:00Z",
+  "change": {
+    "loaders": [
+      "src/core/story-lazy.ts",
+      "src/core/adaptation-lazy.ts",
+      "src/core/novel-agent-lazy.ts"
+    ],
+    "capabilitiesExtractedTo": "src/core/novel-agent-capabilities.ts",
+    "mammoth": "dynamic import inside story.extractFile docx branch only",
+    "commandBusWritePathUnmoved": true,
+    "hiddenEdgesAlsoCut": [
+      "src/core/adaptation.ts",
+      "src/core/novel-analysis.ts",
+      "src/core/novel-analysis-provider.ts",
+      "src/core/novel-memory-authority.ts",
+      "src/core/novel-desktop-writing-os.ts"
+    ]
+  },
+  "tests": [
+    "tests/runtime-perf-wave4b-story-adaptation-lazy-import.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "sourceContractTests": { "passed": 4, "platform": "linux" },
+    "relatedDarwinTests": "story/adaptation/novel-agent/command-bus 在本 Linux 因 dirfd helper 失败关闭；与本切片无关，需 Darwin"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W4-B：story.js / adaptation.js / novel-agent-service.js 改为 withX 动态 import；mammoth 不再静态进 story 顶栏。未搬家 command-bus 写命令。get_capabilities 不再静态拉 novel-agent-service（常量已拆出）。doctor_project / get_project_snapshot 仍会加载 story+adaptation。禁止写成「连上 Agent 永不加载 story」。",
+  "residual": [
+    "get_capabilities 仍 withEditor（W4-A 残差）",
+    "get_capabilities 带 projectRoot 仍走 novel-analysis-provider 设置读取（只读 JSON，不加载 story.js）",
+    "doctor_project / get_project_snapshot 会 withStory / withAdaptation",
+    "novel-agent-json CLI 仍静态拉 novel-agent-service"
+  ]
+}
