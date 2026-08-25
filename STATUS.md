@@ -1,5 +1,16 @@
 # STATUS · 当前源码生产中枢（P0—P9 CLOSED / MCP_CLIENT_RESTART_PASS）
 
+## 2026-08-25 · W1 Unit-Grid Brief 合同
+
+| 字段 | 当前值 |
+|---|---|
+| status | `completed_slice`：7 槽 `promptContract` 已挂到 unit-grid Agent brief |
+| plan | `docs/PLAN_非强健优化全景_20260725.md` §W1 |
+| injection | `buildStudioUnitGridAgentImagegenBrief.promptContract`；不改 `renderedPrompt` / freeze 指纹 |
+| verify | `typecheck:app`；brief-contract 4 PASS；continuation-source 4 PASS |
+| isolation | 未写正式工程；未 live 生图；未宣称永不漂 |
+| earliest_next | W2 锁参考覆盖率只读报告；或 owner 指定隔离单元做 live canary |
+
 ## 2026-08-25 · 开源发布
 
 | 字段 | 当前值 |
@@ -8,7 +19,7 @@
 | remote | https://github.com/BB20260410/ai-drama-canvas |
 | license | Apache-2.0（GitHub 已识别）；无 CLA、无商业双授权 |
 | community | health 100%；secret scanning / push protection / Dependabot / 私密漏洞报告已开 |
-| ci | 上一轮 HEAD macOS CI **success**（`32764041578`）；本轮补齐测试运行时后待复跑 |
+| ci | HEAD macOS CI **success**（`32806629542`，13m7s） |
 | codeql | 上一轮 **success**（`32764041576`）；打开告警 **0** / 已关闭 28 |
 | dependabot_alerts | 打开 0 |
 | earliest_next | 推送测试运行时补齐后等 CI；勿再单独 push STATUS |

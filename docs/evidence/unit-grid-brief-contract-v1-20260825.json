@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "kind": "unit-grid-brief-contract-canary",
+  "recordedAt": "2026-08-25T12:30:00+08:00",
+  "templateId": "unit-grid-brief-template-v1",
+  "injection": {
+    "compose": "src/core/unit-grid-brief-contract.ts",
+    "brief": "buildStudioUnitGridAgentImagegenBrief.promptContract",
+    "freezeFingerprintUnchanged": true,
+    "liveImagegen": false,
+    "formalProjectTouched": false
+  },
+  "verification": {
+    "typecheck:app": "PASS",
+    "tests": [
+      "tests/studio-unit-grid-brief-contract.test.ts",
+      "tests/studio-unit-grid-continuation-source.test.ts"
+    ]
+  },
+  "docs": [
+    "docs/prompts/unit-grid-brief-template_v1.md",
+    "docs/prompts/style-lock-and-negatives_v1.md",
+    "docs/prompts/continuation-delta-contract_v1.md",
+    "docs/prompts/review-criteria-map_v1.md",
+    "docs/prompts/INJECTION.md"
+  ],
+  "claim": "Agent brief 现带 7 槽 promptContract；未宣称永不漂；未对正式工程生图。"
+}

@@ -1,5 +1,15 @@
 # TASKS · 残留任务清账 2026-07-25
 
+## software_goal: unit-grid-brief-contract-w1-20260825
+
+- status: `completed_slice`
+- [x] `src/core/unit-grid-brief-contract.ts` 从 freeze pack 组装 7 槽
+- [x] `buildStudioUnitGridAgentImagegenBrief` 挂 `promptContract`（不改 renderedPrompt）
+- [x] `docs/prompts/*` 模板 + 注入说明
+- [x] 定向测试 + typecheck:app
+- [x] 证据 JSON 新文件名 `docs/evidence/unit-grid-brief-contract-v1-20260825.json`
+- [ ] live canary（隔离工程 freeze→生图）— 需 owner 指定单元与额度，本切片不做
+
 ## software_goal: oss-public-github-20260824
 
 - status: `completed`

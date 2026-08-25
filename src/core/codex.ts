@@ -64,6 +64,10 @@ import {
   type StudioUnitGridGenerationFreezePack,
 } from "./studio-unit-grid-generation.js";
 import {
+  composeUnitGridBriefContract,
+  renderUnitGridBriefContractText,
+} from "./unit-grid-brief-contract.js";
+import {
   AI_CANVAS_APPLICATION_VERSION,
   AI_CANVAS_PROTOCOL_VERSION,
 } from "./release-manifest.js";
@@ -221,6 +225,7 @@ export function buildStudioUnitGridAgentImagegenBrief(
   if (controlReferences.length === 0) {
     throw new Error("unit-grid Agent brief 缺少 controlReferences，禁止降级 text-only。");
   }
+  const promptContract = composeUnitGridBriefContract(pack);
   return {
     schemaVersion: 1 as const,
     kind: "studio-agent-imagegen-brief" as const,
@@ -231,6 +236,8 @@ export function buildStudioUnitGridAgentImagegenBrief(
     target: pack.target,
     layout: pack.request.modelPayload.layout,
     prompt: pack.request.modelPayload.renderedPrompt,
+    promptContract,
+    promptContractText: renderUnitGridBriefContractText(promptContract),
     forbidden: pack.request.forbidden,
     referenceCount: pack.request.controlReferences.length,
     controlReferences,

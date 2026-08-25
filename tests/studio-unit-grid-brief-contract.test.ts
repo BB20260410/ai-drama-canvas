@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { buildStudioUnitGridAgentImagegenBrief } from "../src/core/codex.js";
 import type { StudioUnitGridGenerationFreezePack } from "../src/core/studio-unit-grid-generation.js";
+import {
+  IDENTITY_SENTENCE_MAX_CHARS,
+  UNIT_GRID_BRIEF_TEMPLATE_ID,
+  composeUnitGridBriefContract,
+} from "../src/core/unit-grid-brief-contract.js";
 
 const SHA_A = "a".repeat(64);
 const SHA_B = "b".repeat(64);
@@ -39,6 +44,7 @@ function nineHeads(assetId: string, panelId: string) {
 /** 最小可驱动 shipped brief builder 的 unit-grid pack 形状（不走 I/O）。 */
 function minimalUnitGridPack(options?: {
   emptyControlReferences?: boolean;
+  continuation?: boolean;
 }): StudioUnitGridGenerationFreezePack {
   // 测试夹具：仅满足 brief builder 读取面，经 unknown 断言为 shipped 类型。
   const panelId = "panel-01";
@@ -193,6 +199,9 @@ function minimalUnitGridPack(options?: {
       fingerprint: SHA_C,
     }],
     controlReferences,
+    ...(options?.continuation
+      ? { continuationSource: { schemaVersion: 2, kind: "studio-unit-grid-continuation-source", referenceId: "cont-1" } }
+      : {}),
     request: {
       schemaVersion: 5,
       kind: "studio-codex-generation-request",
@@ -319,6 +328,49 @@ describe("buildStudioUnitGridAgentImagegenBrief (shipped runtime)", () => {
     expect(grok.continuityNineFieldSummary).toEqual(codex.continuityNineFieldSummary);
     expect(grok.tool.primaryTool).toMatch(/image_gen/);
     expect(codex.tool.primaryTool).toMatch(/image_gen|Codex/i);
+
+    expect(codex.promptContract.templateId).toBe(UNIT_GRID_BRIEF_TEMPLATE_ID);
+    expect(codex.promptContract.slots.STYLE_LOCK.aspect).toBe("9:16");
+    expect(codex.promptContract.slots.IDENTITY_LOCK).toEqual([
+      expect.objectContaining({
+        assetId: "character-qingdeng-ke",
+        mediaSha256: SHA_A,
+        purpose: "identity",
+      }),
+    ]);
+    expect(codex.promptContract.slots.IDENTITY_LOCK[0]!.identitySentence.length)
+      .toBeLessThanOrEqual(IDENTITY_SENTENCE_MAX_CHARS);
+    expect(codex.promptContract.slots.SCENE_LOCK[0]).toMatchObject({
+      assetId: "scene-rainy-inn",
+      mediaSha256: SHA_B,
+    });
+    expect(codex.promptContract.slots.BEATS[0]).toMatchObject({
+      order: 1,
+      panelId: "panel-01",
+      shotComposition: "中景",
+      filmingMethod: "固定",
+      visualAction: "停步",
+    });
+    expect(codex.promptContract.slots.HARD_NEGS).toEqual(expect.arrayContaining(["字幕", "水印/标志"]));
+    expect(codex.promptContract.slots.DELTA_ONLY).toBeNull();
+    expect(codex.promptContract.slots.OUTPUT_RULES.some((rule) => rule.includes("只输出一张图"))).toBe(true);
+    expect(codex.promptContractText).toContain("STYLE_LOCK");
+    expect(codex.promptContractText).toContain("IDENTITY_LOCK");
+    expect(grok.promptContract).toEqual(codex.promptContract);
+  });
+
+  it("续镜 pack 投影 DELTA_ONLY，且不改 renderedPrompt", () => {
+    const pack = minimalUnitGridPack({ continuation: true });
+    const brief = buildStudioUnitGridAgentImagegenBrief(pack, "codex");
+    expect(brief.prompt).toBe("只生成一张 9:16 竖屏 2 宫格故事板");
+    expect(brief.promptContract.continuation).toBe(true);
+    expect(brief.promptContract.slots.DELTA_ONLY).toMatch(/只写变化/);
+    expect(brief.promptContractText).toContain("DELTA_ONLY");
+  });
+
+  it("compose 与 brief 共用同一 fail-closed：零 controlRefs 禁止 text-only", () => {
+    const pack = minimalUnitGridPack({ emptyControlReferences: true });
+    expect(() => composeUnitGridBriefContract(pack)).toThrow(/controlReferences|text-only/);
   });
 
   it("controlReferences 为空时 fail-closed，禁止 text-only", () => {
