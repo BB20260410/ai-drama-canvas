@@ -9,7 +9,7 @@
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
-| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`（含 `wave2c`、`wave2-bundle-approved-bound`、`wave2f-reference-cache-lru`）、`wave3*`、`wave4a`–`wave4f`、`wave4-capabilities-deferred-engine`、`wave4-novel-analysis-lazy`、`wave4-capabilities-settings-thin`、`wave5a`–`wave5e`、`wave5e-project-switch-evict`、`wave5e-stale-writeback-guard`、`wave5e-darwin-ci`、`wave5-list-flip-source-contract`、`wave5-list-flip-protocol-classify`、`wave5-list-flip-darwin-ci-379df38`、`wave6a`–`wave6c`、`wave6-reverify`、`wave6-reverify-expanded`、`wave6-darwin-ci-0b46327`、`wave6-darwin-ci-e1ea3f1`、`wave6-darwin-ci-36abafb`、`sqlite-busy-wall-flake` |
+| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`（含 `wave2c`、`wave2-bundle-approved-bound`、`wave2f-reference-cache-lru`）、`wave3*`、`wave4a`–`wave4f`、`wave4-capabilities-deferred-engine`、`wave4-novel-analysis-lazy`、`wave4-capabilities-settings-thin`、`wave5a`–`wave5e`、`wave5e-project-switch-evict`、`wave5e-stale-writeback-guard`、`wave5e-darwin-ci`、`wave5-list-flip-source-contract`、`wave5-list-flip-protocol-classify`、`wave5-list-flip-darwin-ci-379df38`、`wave6a`–`wave6c`、`wave6-reverify`、`wave6-reverify-expanded`、`wave6-darwin-ci-0b46327`、`wave6-darwin-ci-e1ea3f1`、`wave6-darwin-ci-36abafb`、`sqlite-busy-wall-flake`、`sqlite-shm-binding-race` |
 | wave4b | story/adaptation/novel-agent 经 withX 动态 import；story.ts 顶栏已卸 mammoth（docx 分支动态加载）。doctor 仍会 `import("mammoth")` 探测；snapshot 会 withStory，doctor 会 withStory+withAdaptation |
 | wave4c | video-package / Higgsfield queue+video / dudu / local-creative 经 withX。mcp-projection 仍静态（同步消毒、无重依赖）。调用对应控制面/写命令仍会加载 |
 | wave4d | MCP 只读诊断面 earliest / bundle / dashboard / multimedia / write-lease / reader / align 经 withX；session-snapshot 不再静态拉 bundle。command-bus 仍静态拉 ledger。codex 仍静态拉 session-snapshot.js 本身。Main dashboard 顶栏未卸（T23）。get_active_managed_studio_context 仍会加载 write-lease |
@@ -47,6 +47,7 @@
 | wave5e-darwin-ci | macos-latest CI check **success** on `3f04d05`（evict，run `32883471735`）与 `84b594c`（写回拦截，run `32883952438`）。不是安装版 T23 |
 | wave5-list-flip-darwin-ci | macos-latest CI check **success** on `379df38`（list-flip 源码合同，run `32886953416`）。不是安装版 T23，不是 GUI 探针 |
 | sqlite-busy-wall | Darwin CI `b002adf`/`d0c4175` 因 547/507 < 500 红；墙钟改 5s 后 HEAD `e1ea3f1` check **success**（run `32889586061`）。未改 120s timeout。不是 T23 |
+| sqlite-shm-race | Darwin CI `5a075cf` run `32893004763` Fast tests 因 -shm 竞态 `canonNlink=0` 误判红。绑定把 inode 换号 / nlink=0 当瞬态重试；symlink / nlink>1 仍失败关闭。不是 T23 |
 | earliest_next | **本 Cloud 可落地切片已尽**。真阻塞仅 owner/Darwin：安装版 T23、列表翻页 GUI 探针。禁拆 command-bus ledger。禁止 N124 / 禁止写「运行速度已关账」 |
 
 ## 2026-08-25 · 本机人物库同步

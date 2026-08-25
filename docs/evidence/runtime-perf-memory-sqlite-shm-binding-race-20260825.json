@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "ci-sqlite-shm-binding-race",
+  "recordedAt": "2026-08-25T20:17:30Z",
+  "change": {
+    "kind": "source-and-test",
+    "files": [
+      "src/core/sqlite-readonly-snapshot.ts",
+      "tests/sqlite-readonly-snapshot.test.ts"
+    ],
+    "summary": "sidecar 绑定把 lstat↔realpath inode 换号与 unlink 短窗 nlink=0 归为瞬态竞态并退避。symlink / nlink>1 仍立即失败关闭。触发：Darwin CI 32893004763 on 5a075cf Fast tests。"
+  },
+  "verification": {
+    "typecheckApp": "PASS",
+    "directedLinux": {
+      "file": "tests/sqlite-readonly-snapshot.test.ts",
+      "repeats": 30,
+      "passed": 30,
+      "platform": "linux"
+    },
+    "reviews": {
+      "redline": "PASS; 无 must-fix。未改 T23 SQL / recipe / 120s timeout / command-bus 写路径。硬链与 symlink 仍失败关闭。",
+      "completion": "PASS; 不得勾 Wave 5 父项或关 Goal。macos CI ≠ 安装版 T23。"
+    },
+    "failedDarwinCi": {
+      "runId": 32893004763,
+      "url": "https://github.com/BB20260410/ai-drama-canvas/actions/runs/32893004763",
+      "headSha": "5a075cf6fd377f1f17f48b8b47872524a87c8375",
+      "note": "文档提交；失败是 -shm 竞态误判，不是扩大复验回归。源码 36abafb CI 已绿。"
+    }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "overwrote20260811Final": false,
+    "t23SqlUnchanged": true,
+    "writeBusyTimeoutUnchanged": 120000,
+    "wave5ParentChecked": false
+  },
+  "claim": "仅收窄 sidecar 瞬态竞态重试。禁止写「T23 已复测」「运行速度已关账」。",
+  "residual": [
+    "本修复的 macos-latest CI 待本提交后复跑",
+    "安装版 T23 / 列表 GUI 探针仍 NOT_RUN"
+  ]
+}
