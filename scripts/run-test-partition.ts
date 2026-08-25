@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import process from "node:process";
 import fg from "fast-glob";
+import { ensureTestRuntime } from "./lib/ensure-test-runtime.js";
 
 type TestPartition = "fast" | "medium" | "integration" | "heavy";
 
@@ -258,6 +259,7 @@ async function run(): Promise<void> {
   }
   const files = selectors.length > 0 ? selectedByCaller : partitions[action];
   if (files.length === 0) throw new Error(`${action} 测试层为空。`);
+  await ensureTestRuntime(root);
   const vitestEntry = path.join(root, "node_modules/vitest/vitest.mjs");
   const childPassthrough = passthrough.filter((argument) => !selectors.includes(argument));
   // 长分区不能把数十个重型 SQLite/媒体夹具压进同一个 Vitest 主进程：

@@ -11,6 +11,7 @@
 - [x] 关闭会破坏构建的 Dependabot PR（TS 7 / Vite 8 / 顶层 esbuild）
 - [x] CodeQL 首轮跑完 success（32740441904，3h20m）
 - [x] 修 CodeQL 28 条告警（ReDoS / executeJavaScript / 多项式正则 / 标签剥离 / 恒等替换 / 栈泄露）
+- [x] 本地 `npm test` 0 失败：测试前补齐 Electron 二进制与 dist-mcp
 
 ## software_goal: character-canvas-pack-20260821
 

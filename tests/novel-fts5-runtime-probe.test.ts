@@ -5,21 +5,12 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
+import { electronExecutablePath } from "../scripts/lib/ensure-test-runtime.js";
 
 const execFileAsync = promisify(execFile);
 const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const probePath = path.join(workspace, "scripts", "probe-novel-fts5-runtime.mjs");
-const electronExecutable = path.join(
-  workspace,
-  "node_modules",
-  "electron",
-  "dist",
-  ...(process.platform === "darwin"
-    ? ["Electron.app", "Contents", "MacOS", "Electron"]
-    : process.platform === "win32"
-      ? ["electron.exe"]
-      : ["electron"]),
-);
+const electronExecutable = electronExecutablePath(workspace);
 const temporaryRoots: string[] = [];
 
 interface ProbeResult {

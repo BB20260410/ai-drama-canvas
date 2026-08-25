@@ -13,6 +13,7 @@ import {
   type ReleaseManifest,
 } from "../src/core/release-manifest.js";
 import { EXPECTED_MCP_TOOL_COUNT } from "./helpers/mcp-tool-count.js";
+import { electronExecutablePath } from "../scripts/lib/ensure-test-runtime.js";
 
 const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const temporaryRoots: string[] = [];
@@ -25,8 +26,8 @@ function parsed(result: unknown): Record<string, any> {
 }
 
 describe("P14 Electron 自带 runtime 启动编译 MCP", () => {
-  it("无需系统 Node 即可读取隔离 runtime manifest 与真实工具清单", async () => {
-    const electronExecutable = path.join(workspace, "node_modules", "electron", "dist", "Electron.app", "Contents", "MacOS", "Electron");
+  it.runIf(process.platform === "darwin")("无需系统 Node 即可读取隔离 runtime manifest 与真实工具清单", async () => {
+    const electronExecutable = electronExecutablePath(workspace);
     const serverPath = path.join(workspace, "dist-mcp", "mcp", "server.js");
     const releaseManifestPath = path.join(workspace, "release-manifest.json");
     await Promise.all([access(electronExecutable), access(serverPath), access(releaseManifestPath)]);

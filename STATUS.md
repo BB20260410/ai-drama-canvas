@@ -4,14 +4,14 @@
 
 | 字段 | 当前值 |
 |---|---|
-| status | `completed`：公开仓库、Apache-2.0、macOS CI、CodeQL 告警已改完待复扫 |
+| status | `completed`：公开仓库、CI/CodeQL 绿、本地 `npm test` 0 失败 |
 | remote | https://github.com/BB20260410/ai-drama-canvas |
 | license | Apache-2.0（GitHub 已识别）；无 CLA、无商业双授权 |
-| community | health 100%；secret scanning / push protection / Dependabot 已开 |
-| ci | 上一轮 HEAD macOS CI **success**（`32740441909`） |
-| codeql | 首轮 **success**（`32740441904`）；28 条告警已改源码，推送后复扫 |
+| community | health 100%；secret scanning / push protection / Dependabot / 私密漏洞报告已开 |
+| ci | 上一轮 HEAD macOS CI **success**（`32764041578`）；本轮补齐测试运行时后待复跑 |
+| codeql | 上一轮 **success**（`32764041576`）；打开告警 **0** / 已关闭 28 |
 | dependabot_alerts | 打开 0 |
-| earliest_next | 等 CodeQL 复扫关闭告警；勿再单独 push STATUS |
+| earliest_next | 推送测试运行时补齐后等 CI；勿再单独 push STATUS |
 
 ## 2026-08-22 19:03 CST · N121–N123 产品切片落地（禁止附录-only）
 
