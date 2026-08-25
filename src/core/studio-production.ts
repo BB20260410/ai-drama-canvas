@@ -673,7 +673,7 @@ export interface StudioProductionUnitListQuery {
   limit?: number;
 }
 
-/** 时间线有界投影用的轻量身份：不含 timing / 集内时码，避免为 36 个 id 扫整集。 */
+/** 时间线轻量身份：不含 timing / 集内时码。有界 by-id 与整集/earliest lean 共用。 */
 export interface StudioProductionUnitTimelineIdentity {
   id: string;
   sequence: number;
@@ -686,6 +686,13 @@ export interface StudioProductionUnitIdentityByIdsQuery {
   season: string;
   episode: string;
   unitIds: readonly string[];
+}
+
+export interface StudioProductionUnitIdentityListQuery {
+  season: string;
+  episode: string;
+  /** 按集内顺序截断。省略则最多 2500（与旧 cursor 50×50 同顶）。 */
+  limit?: number;
 }
 
 export interface StudioProductionUnitPage {
@@ -3357,6 +3364,55 @@ export async function listStudioProductionUnitIdentitiesByIds(
       WHERE season = ? AND episode = ? AND id IN (${placeholders})
       ORDER BY sequence, id
     `).all(season, episode, ...ids) as Array<{
+      id: string;
+      sequence: number;
+      title: string;
+      revision: number;
+      panel_count: number;
+    }>;
+    return rows.map((row) => ({
+      id: row.id,
+      sequence: Number(row.sequence),
+      title: row.title,
+      revision: Number(row.revision),
+      panelCount: Number(row.panel_count),
+    }));
+  } finally {
+    db.close();
+  }
+}
+
+/**
+ * 按季集读取单元身份（最多 2500）。
+ * 给整集时间线 / earliest 用：只要 id/sequence/title/revision/panel_count，
+ * 禁止再走 dashboard units 热路径的 per-unit timing 摘要。
+ * 不改 T23 热路径 SQL。
+ */
+export async function listStudioProductionUnitIdentities(
+  projectRoot: string,
+  query: StudioProductionUnitIdentityListQuery,
+): Promise<StudioProductionUnitTimelineIdentity[]> {
+  const season = requiredText(query.season, "season", 500);
+  const episode = requiredText(query.episode, "episode", 500);
+  const maxRows = 2500;
+  let limit = maxRows;
+  if (query.limit !== undefined) {
+    if (!Number.isSafeInteger(query.limit) || query.limit < 1 || query.limit > maxRows) {
+      throw new Error(`limit 必须是 1–${maxRows} 的整数。`);
+    }
+    limit = query.limit;
+  }
+  const paths = await ensureProductionDirectories(projectRoot);
+  const db = openDatabase(paths.database);
+  try {
+    recordStudioUnitsReadCounter("productionBusinessSqlExecutions");
+    const rows = db.prepare(`
+      SELECT id, sequence, title, revision, panel_count
+      FROM studio_production_units
+      WHERE season = ? AND episode = ?
+      ORDER BY sequence, id
+      LIMIT ?
+    `).all(season, episode, limit) as Array<{
       id: string;
       sequence: number;
       title: string;

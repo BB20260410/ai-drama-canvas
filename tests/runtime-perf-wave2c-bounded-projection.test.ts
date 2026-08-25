@@ -56,6 +56,12 @@ function installIdleEpisode(units: StudioProductionUnitSummary[]): void {
     items: units,
     nextCursor: undefined,
   });
+  vi.spyOn(production, "listStudioProductionUnitIdentities").mockImplementation(
+    async (_projectRoot, query) => {
+      const items = units.map(leanIdentity);
+      return query.limit === undefined ? items : items.slice(0, query.limit);
+    },
+  );
   vi.spyOn(production, "listStudioProductionUnitIdentitiesByIds").mockImplementation(
     async (_projectRoot, query) => {
       const wanted = new Set(query.unitIds);
@@ -84,7 +90,30 @@ describe("Wave 2-C 有界投影对照（无 P7 fixture）", () => {
     expect(projection.bounded).toBe(false);
     expect(projection.unitCount).toBe(5);
     expect(projection.units.map((unit) => unit.unitId)).toEqual(units.map((unit) => unit.id));
-    expect(production.listStudioProductionUnits).toHaveBeenCalled();
+    expect(production.listStudioProductionUnitIdentities).toHaveBeenCalledWith("/tmp/w2c-mock", {
+      season: SEASON,
+      episode: EPISODE,
+    });
+    expect(production.listStudioProductionUnits).not.toHaveBeenCalled();
+    expect(production.listStudioProductionUnitIdentitiesByIds).not.toHaveBeenCalled();
+  });
+
+  it("仅 limit 走 lean 季集身份，不走 listStudioProductionUnits", async () => {
+    const units = fakeUnits(8);
+    installIdleEpisode(units);
+    const projection = await getApprovedTimelineProjection("/tmp/w2c-mock", {
+      season: SEASON,
+      episode: EPISODE,
+      limit: 3,
+    });
+    expect(projection.bounded).toBe(true);
+    expect(projection.units.map((unit) => unit.unitId)).toEqual(units.slice(0, 3).map((unit) => unit.id));
+    expect(production.listStudioProductionUnitIdentities).toHaveBeenCalledWith("/tmp/w2c-mock", {
+      season: SEASON,
+      episode: EPISODE,
+      limit: 3,
+    });
+    expect(production.listStudioProductionUnits).not.toHaveBeenCalled();
     expect(production.listStudioProductionUnitIdentitiesByIds).not.toHaveBeenCalled();
   });
 
@@ -103,6 +132,7 @@ describe("Wave 2-C 有界投影对照（无 P7 fixture）", () => {
     expect(returned.every((id) => requested.includes(id))).toBe(true);
     expect(returned).toEqual([units[1]!.id, units[3]!.id]);
     expect(production.listStudioProductionUnits).not.toHaveBeenCalled();
+    expect(production.listStudioProductionUnitIdentities).not.toHaveBeenCalled();
     expect(production.listStudioProductionUnitIdentitiesByIds).toHaveBeenCalledTimes(1);
   });
 
@@ -119,6 +149,7 @@ describe("Wave 2-C 有界投影对照（无 P7 fixture）", () => {
     expect(projection.units).toHaveLength(36);
     expect(projection.units.map((unit) => unit.unitId)).toEqual(requested);
     expect(production.listStudioProductionUnits).not.toHaveBeenCalled();
+    expect(production.listStudioProductionUnitIdentities).not.toHaveBeenCalled();
     expect(production.listStudioProductionUnitIdentitiesByIds).toHaveBeenCalledTimes(1);
     expect(production.listStudioProductionUnitIdentitiesByIds).toHaveBeenCalledWith("/tmp/w2c-mock", {
       season: SEASON,
@@ -142,14 +173,18 @@ describe("Wave 2-C 有界投影对照（无 P7 fixture）", () => {
     expect(omitted.units.map((unit) => unit.unitId)).toEqual(allIds.units.map((unit) => unit.unitId));
     expect(omitted.bounded).toBe(false);
     expect(allIds.bounded).toBe(true);
-    expect(production.listStudioProductionUnits).toHaveBeenCalledTimes(1);
+    expect(production.listStudioProductionUnitIdentities).toHaveBeenCalledTimes(1);
+    expect(production.listStudioProductionUnits).not.toHaveBeenCalled();
     expect(production.listStudioProductionUnitIdentitiesByIds).toHaveBeenCalledTimes(1);
   });
 
-  it("源码合同：有界 unitIds 走 by-id；by-id 不记 T23 timing / 不扫页", () => {
+  it("源码合同：有界 unitIds 走 by-id；省略/limit 走 lean；两路都不记 T23 timing", () => {
     const projection = source("src/core/studio-approved-timeline-projection.ts");
     expect(projection).toContain("listStudioProductionUnitIdentitiesByIds");
+    expect(projection).toContain("listStudioProductionUnitIdentities");
     expect(projection).toContain("有 unitIds 时按 id 直读");
+    expect(projection).toContain("省略 / 仅 limit 走 lean 季集身份");
+    expect(projection).not.toContain("listStudioProductionUnits");
     const byIdStart = projection.indexOf("const unitSummaries = wantedIds");
     const byIdEnd = projection.indexOf("listApprovedTimelineEpisodeUnitIdentities(projectRoot", byIdStart);
     expect(byIdStart).toBeGreaterThan(-1);
@@ -158,17 +193,30 @@ describe("Wave 2-C 有界投影对照（无 P7 fixture）", () => {
     expect(projection.slice(byIdStart, byIdEnd)).not.toContain("listStudioProductionUnits");
 
     const productionSource = source("src/core/studio-production.ts");
-    const start = productionSource.indexOf("export async function listStudioProductionUnitIdentitiesByIds");
-    const end = productionSource.indexOf("export async function getStudioProductionScopeFacets", start);
-    expect(start).toBeGreaterThan(-1);
-    expect(end).toBeGreaterThan(start);
-    const fn = productionSource.slice(start, end);
-    expect(fn).toContain("id IN (");
-    expect(fn).toContain("SELECT id, sequence, title, revision, panel_count");
-    expect(fn).not.toContain("unitSummaryFromRow");
-    expect(fn).not.toContain("unitTimingQueries");
-    expect(fn).not.toContain("episodeStartQueries");
-    expect(fn).not.toContain("unitPageQueries");
-    expect(fn).not.toContain("SELECT * FROM studio_production_units");
+    const byIdFnStart = productionSource.indexOf("export async function listStudioProductionUnitIdentitiesByIds");
+    const leanFnStart = productionSource.indexOf("export async function listStudioProductionUnitIdentities(");
+    const facetsStart = productionSource.indexOf("export async function getStudioProductionScopeFacets");
+    expect(byIdFnStart).toBeGreaterThan(-1);
+    expect(leanFnStart).toBeGreaterThan(byIdFnStart);
+    expect(facetsStart).toBeGreaterThan(leanFnStart);
+    const byIdFn = productionSource.slice(byIdFnStart, leanFnStart);
+    expect(byIdFn).toContain("id IN (");
+    expect(byIdFn).toContain("SELECT id, sequence, title, revision, panel_count");
+    expect(byIdFn).not.toContain("unitSummaryFromRow");
+    expect(byIdFn).not.toContain("unitTimingQueries");
+    expect(byIdFn).not.toContain("episodeStartQueries");
+    expect(byIdFn).not.toContain("unitPageQueries");
+    expect(byIdFn).not.toContain("SELECT * FROM studio_production_units");
+
+    const leanFn = productionSource.slice(leanFnStart, facetsStart);
+    expect(leanFn).toContain("SELECT id, sequence, title, revision, panel_count");
+    expect(leanFn).toContain("ORDER BY sequence, id");
+    expect(leanFn).toContain("LIMIT ?");
+    expect(leanFn).not.toContain("unitSummaryFromRow");
+    expect(leanFn).not.toContain("unitTimingQueries");
+    expect(leanFn).not.toContain("episodeStartQueries");
+    expect(leanFn).not.toContain("unitPageQueries");
+    expect(leanFn).not.toContain("SELECT * FROM studio_production_units");
+    expect(leanFn).not.toContain("id IN (");
   });
 });

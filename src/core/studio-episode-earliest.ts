@@ -6,7 +6,7 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import { inspectManagedProjectReadOnly } from "./managed-project.js";
 import { assertGenerationLedgerSchemaFileReady } from "./studio-generation-ledger-readiness.js";
-import { listStudioProductionUnits } from "./studio-production.js";
+import { listStudioProductionUnitIdentities } from "./studio-production.js";
 import { getStudioGenerationCheckpointControl } from "./studio-generation-checkpoint.js";
 import { getStudioProjectWriteLeaseReadOnly } from "./studio-project-write-lease.js";
 import { projectStudioUnitGridNextAction } from "./studio-unit-grid-next-action.js";
@@ -107,27 +107,14 @@ export async function getStudioEpisodeEarliest(
   const episode = input.episode ?? "S1E2";
   const formalExternal = await loadExternalFormalSet(input.evidenceDir, episode);
 
-  const units: Array<{ id: string; sequence: number; title: string; revision: number }> = [];
-  let cursor: string | undefined;
-  for (let page = 0; page < 50; page++) {
-    const batch = await listStudioProductionUnits(root, {
-      season,
-      episode,
-      limit: 50,
-      cursor,
-    });
-    for (const item of batch.items) {
-      units.push({
-        id: item.id,
-        sequence: item.sequence,
-        title: item.title,
-        revision: item.revision,
-      });
-    }
-    if (!batch.nextCursor) break;
-    cursor = batch.nextCursor;
-  }
-  units.sort((a, b) => a.sequence - b.sequence || a.id.localeCompare(b.id));
+  const units = (await listStudioProductionUnitIdentities(root, { season, episode }))
+    .map((item) => ({
+      id: item.id,
+      sequence: item.sequence,
+      title: item.title,
+      revision: item.revision,
+    }))
+    .sort((a, b) => a.sequence - b.sequence || a.id.localeCompare(b.id));
 
   // 与诊断/画布同源：正式时间线投影（当前修订 PASS > 已核验历史 PASS）决定 formalCommitted。
   // 禁止只靠外部 evidence 或忽略历史 PASS 导致 earliest 卡在已 PASS 单元上。

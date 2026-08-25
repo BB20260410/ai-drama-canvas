@@ -15,8 +15,8 @@
 import { inspectManagedProjectReadOnly } from "./managed-project.js";
 import { assertGenerationLedgerSchemaFileReady } from "./studio-generation-ledger-readiness.js";
 import {
+  listStudioProductionUnitIdentities,
   listStudioProductionUnitIdentitiesByIds,
-  listStudioProductionUnits,
 } from "./studio-production.js";
 import {
   listStudioGenerationLatestUnitGridRuns,
@@ -225,36 +225,18 @@ type ApprovedTimelineUnitIdentity = {
   panelCount: number;
 };
 
-/** 整集或仅 limit：仍走 cursor 翻页。有 unitIds 时不得走这条。 */
+/** 整集或仅 limit：lean 身份一次读完。有 unitIds 时不得走这条。 */
 async function listApprovedTimelineEpisodeUnitIdentities(
   projectRoot: string,
   season: string,
   episode: string,
   limit: number | undefined,
 ): Promise<ApprovedTimelineUnitIdentity[]> {
-  const unitSummaries: ApprovedTimelineUnitIdentity[] = [];
-  let cursor: string | undefined;
-  for (let page = 0; page < 50; page++) {
-    const batch = await listStudioProductionUnits(projectRoot, {
-      season,
-      episode,
-      limit: 50,
-      cursor,
-    });
-    for (const item of batch.items) {
-      unitSummaries.push({
-        id: item.id,
-        sequence: item.sequence,
-        title: item.title,
-        revision: item.revision,
-        panelCount: item.panelCount,
-      });
-    }
-    if (limit !== undefined && unitSummaries.length >= limit) break;
-    if (!batch.nextCursor) break;
-    cursor = batch.nextCursor;
-  }
-  return unitSummaries;
+  return listStudioProductionUnitIdentities(projectRoot, {
+    season,
+    episode,
+    ...(limit === undefined ? {} : { limit }),
+  });
 }
 
 /**
@@ -278,7 +260,7 @@ export async function getApprovedTimelineProjection(
   const wantedIds = bound.unitIds ? new Set(bound.unitIds) : undefined;
 
   // 1. 单元身份：有 unitIds 时按 id 直读（≤36），禁止翻页扫整集再 filter。
-  //    省略 / 仅 limit 仍走既有 cursor 翻页；limit 上限 36，单页 50，最多一页。
+  //    省略 / 仅 limit 走 lean 季集身份，不经 unitSummaryFromRow / unitTimingQueries。
   //    账本批读只吃 boundedSummaries。
   const unitSummaries = wantedIds
     ? await listStudioProductionUnitIdentitiesByIds(projectRoot, {
