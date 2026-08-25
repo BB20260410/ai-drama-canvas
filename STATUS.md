@@ -9,13 +9,14 @@
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
-| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`、`wave3*`、`wave4a`–`wave4f`、`wave5a`–`wave5e`、`wave6a`–`wave6c` |
+| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`（含 `wave2c`）、`wave3*`、`wave4a`–`wave4f`、`wave5a`–`wave5e`、`wave6a`–`wave6c` |
 | wave4b | story/adaptation/novel-agent 经 withX 动态 import；story.ts 顶栏已卸 mammoth（docx 分支动态加载）。doctor 仍会 `import("mammoth")` 探测；snapshot 会 withStory，doctor 会 withStory+withAdaptation |
 | wave4c | video-package / Higgsfield queue+video / dudu / local-creative 经 withX。mcp-projection 仍静态（同步消毒、无重依赖）。调用对应控制面/写命令仍会加载 |
 | wave4d | MCP 只读诊断面 earliest / bundle / dashboard / multimedia / write-lease / reader / align 经 withX；session-snapshot 不再静态拉 bundle。command-bus 仍静态拉 ledger。codex 仍静态拉 session-snapshot.js 本身。Main dashboard 顶栏未卸（T23）。get_active_managed_studio_context 仍会加载 write-lease |
 | wave1b | CLI `scripts/report-approved-timeline-full.ts` 显式 `fastMode: false` + `durationMs`；日常诊断/canonical 仍显式 true |
 | wave1c | resolver + CLI 合同测 Linux 6 PASS；P7 fixture 需 Darwin |
 | wave2a | `resolveApprovedTimelineBound`：unitIds/limit 上限 36；省略=整集；空数组失败关闭 |
+| wave2c | Linux mock 有界对照 3 PASS（⊆ 请求 id；省略=全量）。P7 owner 对照仍需 Darwin |
 | wave2b | 画布 / composable 可见页传 unitIds；空可见集不回退整集 |
 | wave2d | 账本/计划风暴并入 scheduleUnitGridGraphRebuild 单 rAF |
 | wave2e | 节点 >80 默认关 MiniMap；invalidate 清用户覆盖 |
@@ -35,7 +36,7 @@
 | wave6a | typecheck:app PASS；Linux 定向测 27 files / 241 tests PASS。P7 fixture / media-protocol 仍需 Darwin。未改源码 |
 | wave6b | 未跑安装版 T23（owner 未点名；本 Cloud 无 macOS App / 无正式工程 GUI）。不得称整包完成 |
 | wave6c | 对照 §1 八条；纠正 composable 空 unitIds 与 executor 边界注释。Linux npm test 64 文件失败（dirfd）；边界合同已修。整计划部分完成 |
-| earliest_next | **本计划停**。开放残差仅 Darwin/owner：W2-C、安装版 T23、列表翻页探针。禁止 N124 / 禁止写「运行速度已关账」 |
+| earliest_next | **本计划停**。开放残差仅 Darwin/owner：P7 owner 对照、安装版 T23、列表翻页探针。禁止 N124 / 禁止写「运行速度已关账」 |
 
 ## 2026-08-25 · 本机人物库同步
 

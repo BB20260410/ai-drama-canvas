@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "2-C",
+  "recordedAt": "2026-08-25T17:42:00Z",
+  "change": {
+    "kind": "verification",
+    "linuxContract": "tests/runtime-perf-wave2c-bounded-projection.test.ts",
+    "p7OwnerFixture": "tests/studio-approved-timeline-projection.test.ts still Darwin dirfd"
+  },
+  "tests": [
+    "tests/runtime-perf-wave2c-bounded-projection.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "linuxBoundedContrast": { "passed": 3, "platform": "linux", "files": 1 },
+    "p7OwnerContrast": "NOT_RUN Darwin dirfd"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "mocks": [
+      "inspectManagedProjectReadOnly",
+      "assertGenerationLedgerSchemaFileReady",
+      "listStudioProductionUnits",
+      "listStudioGenerationLatestUnitGridRuns",
+      "readStudioGenerationProjectionSelectionFacts"
+    ]
+  },
+  "claim": "W2-C：Linux 有界对照 3 PASS。有界返回集 ⊆ 请求 id 且 bounded=true；省略 unitIds 等于今日全量且 bounded=false。未扫正式工程。P7 owner 对照仍需 Darwin。",
+  "residual": [
+    "P7 fixture 上的有界/省略对照仍需 macOS dirfd",
+    "dashboard / projection-bundle 省略 unitIds 仍整集（earliest 需要全序）",
+    "禁止写成「运行速度已关账」或「P7 有界对照已在本 Cloud 跑过」"
+  ]
+}

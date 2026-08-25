@@ -2,7 +2,7 @@
 
 ## software_goal: runtime-perf-memory-20260825
 
-- status: `部分完成`（W6 已停；安装版 T23 / W2-C / 列表探针未跑）
+- status: `部分完成`（W6 已停；W2-C Linux 对照已绿；P7 owner / 安装版 T23 / 列表探针未跑）
 - plan: `docs/PLAN_运行速度与内存占用长期执行_20260825.md`
 - [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席本环境未跑）
 - [x] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
@@ -13,7 +13,7 @@
 - [x] Wave 2-D：账本/计划风暴并入单 rAF
 - [x] Wave 2-E：MiniMap 节点 >80 默认关
 - [x] Wave 2-F：切工程清 LRU；DOM counts 含参考/连续性
-- [ ] Wave 2-C：P7 有界对照（需 Darwin）
+- [x] Wave 2-C：Linux 有界对照（返回集 ⊆ 请求 id；省略=全量）。P7 owner 对照仍需 Darwin
 - [x] Wave 3-A：earliest / approved-timeline / align-board 改 `inspectManagedProjectReadOnly`
 - [x] Wave 3-B：`assertGenerationLedgerSchemaFileReady` 失败关闭，不静默建库
 - [x] Wave 3-C：earliest 用 list 行 revision，去掉 per-unit snapshot
