@@ -4,13 +4,14 @@
 
 | 字段 | 当前值 |
 |---|---|
-| status | `in_progress`：W1-A 已改默认 `fastMode ?? true`；整计划未关账 |
+| status | `in_progress`：W1-A/B 已落地；整计划未关账 |
 | plan | `docs/PLAN_运行速度与内存占用长期执行_20260825.md` |
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
-| evidence | `docs/evidence/runtime-perf-memory-wave1a-20260825.json` |
-| earliest_next | **Wave 1-B**：诊断/CLI 显式 full + 耗时（W1-A 验收通过后） |
+| evidence | `docs/evidence/runtime-perf-memory-wave1a-20260825.json`、`docs/evidence/runtime-perf-memory-wave1b-20260825.json` |
+| wave1b | CLI `scripts/report-approved-timeline-full.ts` 显式 `fastMode: false` + `durationMs`；日常诊断/canonical 仍显式 true |
+| earliest_next | **Wave 1-C**：锁测试覆盖后进 Wave 2（不插队 MCP / N124） |
 
 ## 2026-08-25 · 本机人物库同步
 

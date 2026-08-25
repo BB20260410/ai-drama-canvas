@@ -264,6 +264,8 @@ describe("T9 getApprovedTimelineProjection 批量投影", () => {
     expect(inflightProjection.selectedPackFingerprint).toBeNull();
     expect(inflightProjection.selectedRunExecutionIdentity).toBeNull();
     expect(inflightProjection.referenceClosureStatus).toBe("not-applicable");
+    expect(projection.fastMode).toBe(true);
+    expect(projection.durationMs).toBeGreaterThanOrEqual(0);
   }, 120_000);
 
   it("显式 fastMode:false：PASS 单元同样给出真实 SHA", async () => {
@@ -278,6 +280,8 @@ describe("T9 getApprovedTimelineProjection 批量投影", () => {
     expect(passProjection.productionStatus).toBe("pass");
     expect(passProjection.selectedRawSha256).toBe(passMedia.raw.imported.sha256);
     expect(passProjection.selectedLabeledSha256).toBe(passMedia.labeled.imported.sha256);
+    expect(projection.fastMode).toBe(false);
+    expect(projection.durationMs).toBeGreaterThanOrEqual(0);
   }, 120_000);
 
   it("省略 fastMode 视为 true，与显式 true 投影一致", async () => {
@@ -311,6 +315,9 @@ describe("T9 getApprovedTimelineProjection 批量投影", () => {
       selectedRawSha256: unit.selectedRawSha256,
       selectedLabeledSha256: unit.selectedLabeledSha256,
     })));
+    expect(omitted.fastMode).toBe(true);
+    expect(explicitFast.fastMode).toBe(true);
+    expect(omitted.durationMs).toBeGreaterThanOrEqual(0);
   }, 120_000);
 });
 

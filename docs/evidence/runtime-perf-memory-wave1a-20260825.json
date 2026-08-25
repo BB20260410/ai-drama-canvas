@@ -11,8 +11,18 @@
     "deriveRulesUnchanged": true
   },
   "tests": [
+    "tests/resolve-approved-timeline-fast-mode.test.ts",
     "tests/studio-approved-timeline-projection.test.ts"
   ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "resolverUnitTests": { "passed": 2, "platform": "linux" },
+    "p7FixtureTests": "Darwin dirfd only; Linux 未跑 fixture",
+    "reviews": [
+      { "id": "bc-670d46ab-39ad-5cf4-b555-374b7397b2e3", "verdict": "PASS" },
+      { "id": "bc-b38e514a-45e9-595f-8c7a-7f34d610754e", "verdict": "已完成" }
+    ]
+  },
   "isolation": {
     "officialProjectScan": false,
     "ledgerWrite": false,

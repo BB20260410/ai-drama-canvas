@@ -96,6 +96,10 @@ export interface ApprovedTimelineProjection {
     blocked: number;
   };
   builtAt: string;
+  /** 解析后的快慢开关（省略 query.fastMode 时为 true）。 */
+  fastMode: boolean;
+  /** 本次投影墙钟耗时（毫秒），供诊断/CLI 提示。 */
+  durationMs: number;
 }
 
 /**
@@ -147,6 +151,7 @@ export async function getApprovedTimelineProjection(
   projectRoot: string,
   query: ApprovedTimelineProjectionQuery,
 ): Promise<ApprovedTimelineProjection> {
+  const startedAt = Date.now();
   const shell = await inspectManagedProject(projectRoot);
   const season = query.season ?? "S1";
   const episode = query.episode ?? "S1E1";
@@ -389,5 +394,7 @@ export async function getApprovedTimelineProjection(
     units,
     summary,
     builtAt: new Date().toISOString(),
+    fastMode,
+    durationMs: Date.now() - startedAt,
   };
 }
