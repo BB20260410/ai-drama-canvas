@@ -47,7 +47,7 @@
 - [x] Darwin CI flake：`studio-sqlite-busy-contract` 墙钟 500→5000（b002adf run 32887756159）；未改 120s timeout
 - [x] HEAD `e1ea3f1` macos-latest check success（run 32889586061）；含 M7 LRU；不是安装版 T23
 - [x] `36abafb` macos-latest check success（run 32891408457）；扩大复验文档；不是安装版 T23 / 不是 GUI 探针
-- [x] Darwin CI flake：`sqlite-readonly-snapshot` -shm 竞态 nlink=0 / inode 换号改瞬态重试（5a075cf run 32893004763）；symlink / 硬链仍失败关闭
+- [x] Darwin CI flake：`sqlite-readonly-snapshot` -shm 竞态 nlink=0 / inode 换号改瞬态重试（5a075cf run 32893004763）；修复 `3a3462e` macos-latest success（run 32894599796）；symlink / 硬链仍失败关闭
 - [x] Wave 6：度量关账（结论部分完成，非整包完成；安装版 T23 未跑）
 - [ ] 禁止：重建 P0–P14、无证据 SQL 批量化、N124 CV、全盘扫正式工程
 
