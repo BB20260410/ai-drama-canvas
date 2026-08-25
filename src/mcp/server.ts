@@ -420,6 +420,7 @@ async function assertMcpToolRuntimeCurrent(name: string): Promise<void> {
 async function startMcpRuntimeGateWatchers(): Promise<void> {
   if (mcpRuntimeGateWatchers.length > 0) return;
   const boot = await MCP_RUNTIME_BOOT_IDENTITY;
+  // W4-E：默认只递归订 src/；tests/scripts 见 AI_CANVAS_RUNTIME_GATE_WATCH_TESTS_SCRIPTS
   const watchPaths = sourceDigestWatchPaths(boot.workspace);
   const workspaceRoot = watchPaths[0];
   if (!workspaceRoot) throw new Error("MCP 运行时源码 watcher 缺少 workspace 根。");

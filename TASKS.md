@@ -2,7 +2,7 @@
 
 ## software_goal: runtime-perf-memory-20260825
 
-- status: `in_progress`（W1–W3 + W4-A/B/C/D 已落地；W4-E 下一步）
+- status: `in_progress`（W1–W3 + W4-A–E 已落地；W4-F 下一步）
 - plan: `docs/PLAN_运行速度与内存占用长期执行_20260825.md`
 - [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席本环境未跑）
 - [x] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
@@ -22,7 +22,8 @@
 - [x] Wave 4-B：story / adaptation / novel-agent-service 动态 import；mammoth 卸出 story 顶栏
 - [x] Wave 4-C：video-package / Higgsfield / dudu / local-creative 动态 import（mcp-projection 仍静态）
 - [x] Wave 4-D：MCP 只读诊断面抄 Main IPC `await import`（不拆 command-bus / ledger 写路径）
-- [ ] Wave 4-E/F：runtime gate watcher 收窄；sharp 经媒体网关首次 touch
+- [x] Wave 4-E：runtime gate watcher 默认只订 `src/`；`tests/`/`scripts/` 改开关
+- [ ] Wave 4-F：sharp 经媒体网关首次 touch
 - [ ] Wave 5：列表只绑缩略图；legacy thumb 不先整文件读入；审片默认 thumb；derivative 不校源全 SHA
 - [ ] Wave 6：度量关账；安装版 T23 仅 owner 点名
 - [ ] 禁止：重建 P0–P14、无证据 SQL 批量化、N124 CV、全盘扫正式工程

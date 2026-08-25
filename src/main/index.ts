@@ -683,6 +683,7 @@ async function startSourceRuntimeGateWatchers(): Promise<void> {
     || !sourceRuntimeBootIdentity
     || sourceRuntimeGateWatchers.length > 0) return;
   // 不要等 boot hash：watcher 必须覆盖剩余 hash 窗口，否则首个诊断会被迫二次整树 walk。
+  // W4-E：默认只递归订 src/；tests/scripts 见 AI_CANVAS_RUNTIME_GATE_WATCH_TESTS_SCRIPTS
   const watchPaths = sourceDigestWatchPaths(sourceRuntimeWorkspace);
   const workspaceRoot = watchPaths[0];
   if (!workspaceRoot) throw new Error("运行时源码 watcher 缺少 workspace 根。");

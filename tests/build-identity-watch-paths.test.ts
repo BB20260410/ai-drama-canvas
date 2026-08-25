@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   listSourceDigestFiles,
+  resolveSourceDigestWatchScope,
   sourceDigestPathIsRelevant,
   sourceDigestWatchPaths,
 } from "../src/core/build-identity.js";
@@ -10,8 +11,29 @@ import {
 const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 describe("sourceDigest watcher 合同", () => {
-  it("只暴露 workspace 浅层与三个递归源码根", () => {
-    expect(sourceDigestWatchPaths(workspace)).toEqual([
+  it("默认常驻只暴露 workspace 浅层与 src", () => {
+    expect(sourceDigestWatchPaths(workspace, { scope: "resident" })).toEqual([
+      workspace,
+      path.join(workspace, "src"),
+    ]);
+    expect(resolveSourceDigestWatchScope({})).toBe("resident");
+    expect(sourceDigestWatchPaths(workspace, { env: {} })).toEqual([
+      workspace,
+      path.join(workspace, "src"),
+    ]);
+  });
+
+  it("开关打开才递归订 tests/scripts", () => {
+    expect(sourceDigestWatchPaths(workspace, { scope: "full" })).toEqual([
+      workspace,
+      path.join(workspace, "src"),
+      path.join(workspace, "tests"),
+      path.join(workspace, "scripts"),
+    ]);
+    expect(resolveSourceDigestWatchScope({ AI_CANVAS_RUNTIME_GATE_WATCH_TESTS_SCRIPTS: "1" })).toBe("full");
+    expect(sourceDigestWatchPaths(workspace, {
+      env: { AI_CANVAS_RUNTIME_GATE_WATCH_TESTS_SCRIPTS: "true" },
+    })).toEqual([
       workspace,
       path.join(workspace, "src"),
       path.join(workspace, "tests"),

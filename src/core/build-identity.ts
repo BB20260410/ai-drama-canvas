@@ -133,6 +133,7 @@ const SOURCE_DIGEST_ROOT_FILES = new Set([
 ]);
 const SOURCE_DIGEST_ROOT_TSCONFIG_PATTERN = /^tsconfig.*\.json$/u;
 const SOURCE_DIGEST_RECURSIVE_ROOTS = ["src", "tests", "scripts"] as const;
+const SOURCE_DIGEST_WATCH_RESIDENT_ROOTS = ["src"] as const;
 const SOURCE_DIGEST_IGNORED_DIRECTORY_NAMES = new Set([
   "node_modules",
   "dist",
@@ -145,17 +146,38 @@ const SOURCE_DIGEST_EXTENSIONS = {
   scripts: new Set([".ts", ".mjs", ".js"]),
 } as const;
 
+export type SourceDigestWatchScope = "resident" | "full";
+
+/**
+ * 常驻 runtime gate watcher 默认只递归订 src/。
+ * 显式 AI_CANVAS_RUNTIME_GATE_WATCH_TESTS_SCRIPTS=1|true|yes|full 才把 tests/scripts 纳入递归监听。
+ * 不改变 SOURCE_DIGEST_GLOBS / computeSourceDigest 身份枚举。
+ */
+export function resolveSourceDigestWatchScope(
+  env: NodeJS.ProcessEnv = process.env,
+): SourceDigestWatchScope {
+  const raw = (env.AI_CANVAS_RUNTIME_GATE_WATCH_TESTS_SCRIPTS ?? "").trim().toLowerCase();
+  return raw === "1" || raw === "true" || raw === "yes" || raw === "full" ? "full" : "resident";
+}
+
 /**
  * chokidar v4 不再展开 glob。调用方应：
  * - 对第一个 workspace 根建立 depth=0 的浅监听，捕获新增/改名的 tsconfig；
- * - 对其余 src/tests/scripts 根建立递归监听；
+ * - 对递归根建立递归监听（默认仅 src/；tests/scripts 见 resolveSourceDigestWatchScope）；
  * - 所有文件事件再交给 sourceDigestPathIsRelevant 精确过滤。
  */
-export function sourceDigestWatchPaths(workspace: string): string[] {
+export function sourceDigestWatchPaths(
+  workspace: string,
+  options?: { scope?: SourceDigestWatchScope; env?: NodeJS.ProcessEnv },
+): string[] {
   const root = path.resolve(workspace);
+  const scope = options?.scope ?? resolveSourceDigestWatchScope(options?.env);
+  const recursiveRoots = scope === "full"
+    ? SOURCE_DIGEST_RECURSIVE_ROOTS
+    : SOURCE_DIGEST_WATCH_RESIDENT_ROOTS;
   return [
     root,
-    ...SOURCE_DIGEST_RECURSIVE_ROOTS.map((relativePath) => path.join(root, relativePath)),
+    ...recursiveRoots.map((relativePath) => path.join(root, relativePath)),
   ];
 }
 
