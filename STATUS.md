@@ -4,14 +4,13 @@
 
 | 字段 | 当前值 |
 |---|---|
-| status | `completed_slice`：计划已落盘，**未改运行时代码** |
+| status | `in_progress`：W1-A 已改默认 `fastMode ?? true`；整计划未关账 |
 | plan | `docs/PLAN_运行速度与内存占用长期执行_20260825.md` |
-| wave0 | 调用点表已写入计划 §4；`getApprovedTimelineProjection` 默认仍是 `fastMode ?? false` |
+| wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
-| evidence | `docs/evidence/runtime-perf-memory-plan-sources-20260825.json` |
-| subagent_fold | 七路只读审计均 IDLE，已交叉进计划 §3 / §5 / Wave 2–5。假热点（units SQL / T23 计数 / N124 / 首屏再拆包）维持禁止 |
-| earliest_next | **Wave 1-A**：时间线投影默认 `fastMode ?? true`（计划 §6 Wave 1） |
+| evidence | `docs/evidence/runtime-perf-memory-wave1a-20260825.json` |
+| earliest_next | **Wave 1-B**：诊断/CLI 显式 full + 耗时（W1-A 验收通过后） |
 
 ## 2026-08-25 · 本机人物库同步
 

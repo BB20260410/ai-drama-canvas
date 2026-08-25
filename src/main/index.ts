@@ -2986,10 +2986,11 @@ function registerIpc(): void {
   ipcMain.handle("canvas:get-approved-timeline-projection", async (
     _event,
     projectRoot: string,
-    query: { season?: string; episode?: string },
+    query: { season?: string; episode?: string; fastMode?: boolean } = {},
   ) => {
     await requireManagedStudioProject(projectRoot);
     const { getApprovedTimelineProjection } = await import("../core/studio-approved-timeline-projection.js");
+    // 省略 fastMode 由 core 视为 true；仅显式 false 走 full。
     return getApprovedTimelineProjection(projectRoot, query);
   });
   // T19 持续生图状态机（Agent 恢复生产位置）

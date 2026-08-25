@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "1-A",
+  "recordedAt": "2026-08-25T14:10:00Z",
+  "change": {
+    "file": "src/core/studio-approved-timeline-projection.ts",
+    "resolver": "resolveApprovedTimelineFastMode",
+    "defaultFastMode": true,
+    "ipcOmitsTreatedAsTrue": true,
+    "deriveRulesUnchanged": true
+  },
+  "tests": [
+    "tests/studio-approved-timeline-projection.test.ts"
+  ],
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W1-A：省略 fastMode 视为 true；仅显式 false 走 full。未改 PASS 归约。"
+}

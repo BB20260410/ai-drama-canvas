@@ -119,15 +119,33 @@ interface DerivedUnitState {
   error: string | null;
 }
 
+/** 时间线投影查询。省略 `fastMode` 视为 true（产品默认快路径）。 */
+export type ApprovedTimelineProjectionQuery = {
+  season?: string;
+  episode?: string;
+  fastMode?: boolean;
+};
+
+/**
+ * 解析时间线投影快慢开关。
+ * 省略或 undefined → true；仅显式 `false` 走 full（绑定就绪 / deriveGenerationTargetState）。
+ */
+export function resolveApprovedTimelineFastMode(
+  query: Pick<ApprovedTimelineProjectionQuery, "fastMode"> | undefined,
+): boolean {
+  return query?.fastMode ?? true;
+}
+
 /**
  * 批量获取一集所有单元的正式时间线投影。
  * 使用 deriveGenerationTargetState 归约器确保状态一致性。
- * 性能优化：使用 fastMode 跳过绑定就绪查询（仅从账本推导状态）；
+ * 性能优化：fastMode（默认 true）跳过绑定就绪查询（仅从账本推导状态）；
  * 最新 run、历史 PASS 候选与宫格数均循环外一次取齐（单次只读连接 + 列表行 panel_count），无 N+1 开库。
+ * 诊断/CLI 必须显式 `fastMode: false` 才走 full。
  */
 export async function getApprovedTimelineProjection(
   projectRoot: string,
-  query: { season?: string; episode?: string; fastMode?: boolean },
+  query: ApprovedTimelineProjectionQuery,
 ): Promise<ApprovedTimelineProjection> {
   const shell = await inspectManagedProject(projectRoot);
   const season = query.season ?? "S1";
@@ -168,7 +186,7 @@ export async function getApprovedTimelineProjection(
   });
 
   // 4. 第一遍：逐单元推导状态（单单元失败不影响其他）
-  const fastMode = query.fastMode ?? false;
+  const fastMode = resolveApprovedTimelineFastMode(query);
   const derivedByUnit = new Map<string, DerivedUnitState>();
   for (const unit of unitSummaries) {
     try {

@@ -5,7 +5,7 @@
 - status: `in_progress`（Wave 0 立项完成；Wave 1 未开始）
 - plan: `docs/PLAN_运行速度与内存占用长期执行_20260825.md`
 - [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席本环境未跑）
-- [ ] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
+- [x] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
 - [ ] Wave 1-B：full 仅诊断/CLI + 耗时
 - [ ] Wave 1-C：定向测试 + typecheck:app
 - [ ] Wave 2：有界时间线（可见 36 / 可选 unitIds）；附属：rebuildGraph 合并、MiniMap 降级、切工程清 LRU
