@@ -7,6 +7,7 @@ import { DatabaseSync } from "node:sqlite";
 import { Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { loadSharpDefault } from "./sharp-lazy.js";
+import { studioThumbnailDerivationGate } from "./studio-thumbnail-derivation-limit.js";
 import {
   ensureConfinedDirectory as ensureSharedConfinedDirectory,
   importConfinedFileToSha256Cas,
@@ -2033,11 +2034,12 @@ async function materializeThumbnail(
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
   }
-  const rendered = await (await loadSharpDefault())(objectPath, { failOn: "error" })
-    .rotate()
-    .resize({ width: 512, height: 512, fit: "inside", withoutEnlargement: true })
-    .webp({ quality: 82 })
-    .toBuffer({ resolveWithObject: true });
+  const rendered = await studioThumbnailDerivationGate.run(async () =>
+    (await loadSharpDefault())(objectPath, { failOn: "error" })
+      .rotate()
+      .resize({ width: 512, height: 512, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 82 })
+      .toBuffer({ resolveWithObject: true }));
   if (!rendered.info.width || !rendered.info.height || Math.max(rendered.info.width, rendered.info.height) > 512) {
     throw new Error("缩略图派生尺寸无效。");
   }
