@@ -4,10 +4,10 @@
  */
 import { createHash } from "node:crypto";
 import path from "node:path";
-import { inspectManagedProject } from "./managed-project.js";
+import { inspectManagedProjectReadOnly } from "./managed-project.js";
 import { listStudioProductionUnits, getStudioProductionUnitSnapshot } from "./studio-production.js";
 import { getStudioGenerationCheckpointControl } from "./studio-generation-checkpoint.js";
-import { getStudioProjectWriteLease } from "./studio-project-write-lease.js";
+import { getStudioProjectWriteLeaseReadOnly } from "./studio-project-write-lease.js";
 import { projectStudioUnitGridNextAction } from "./studio-unit-grid-next-action.js";
 import { getApprovedTimelineProjection } from "./studio-approved-timeline-projection.js";
 
@@ -99,7 +99,8 @@ export async function getStudioEpisodeEarliest(
   } = {},
 ): Promise<StudioEpisodeEarliestProjection> {
   const root = path.resolve(projectRoot);
-  const shell = await inspectManagedProject(root);
+  // 只读投影：校验受管身份，不 ensure generation ledger，也不在只读路径 activateProject。
+  const shell = await inspectManagedProjectReadOnly(root);
   const season = input.season ?? "S1";
   const episode = input.episode ?? "S1E2";
   const formalExternal = await loadExternalFormalSet(input.evidenceDir, episode);
@@ -187,7 +188,7 @@ export async function getStudioEpisodeEarliest(
 
   const [checkpoint, writeLease] = await Promise.all([
     getStudioGenerationCheckpointControl(root).catch(() => null),
-    getStudioProjectWriteLease(root).catch(() => null),
+    getStudioProjectWriteLeaseReadOnly(root).catch(() => null),
   ]);
 
   const earliestReason = earliest

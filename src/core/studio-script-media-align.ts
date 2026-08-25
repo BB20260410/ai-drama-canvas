@@ -99,6 +99,7 @@ export async function getStudioScriptMediaAlignBoard(
 ): Promise<ScriptMediaAlignBoard> {
   const season = query.season;
   const episode = query.episode;
+  // 身份校验走 earliest 的 inspectManagedProjectReadOnly；本函数不 activateProject、不 ensure ledger。
 
   const [map, earliest] = await Promise.all([
     getStudioEpisodeUnitMediaMap(projectRoot, { season, episode, limit: 200 }),

@@ -12,7 +12,7 @@
  * - 正式 run PASS 优先；无正式 PASS 时，已核验历史 PASS 提升为正式结果（来源可追溯）；
  * - 历史候选未通过闭合核验时不提升，仅在 candidateWarning 如实说明失败项。
  */
-import { inspectManagedProject } from "./managed-project.js";
+import { inspectManagedProjectReadOnly } from "./managed-project.js";
 import { listStudioProductionUnits } from "./studio-production.js";
 import {
   listStudioGenerationLatestUnitGridRuns,
@@ -197,7 +197,8 @@ export async function getApprovedTimelineProjection(
   query: ApprovedTimelineProjectionQuery,
 ): Promise<ApprovedTimelineProjection> {
   const startedAt = Date.now();
-  const shell = await inspectManagedProject(projectRoot);
+  // 只读投影：校验受管身份，不 ensure generation ledger。
+  const shell = await inspectManagedProjectReadOnly(projectRoot);
   const season = query.season ?? "S1";
   const episode = query.episode ?? "S1E1";
   const bound = resolveApprovedTimelineBound(query);

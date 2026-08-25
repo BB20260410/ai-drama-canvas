@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "3-A",
+  "recordedAt": "2026-08-25T14:20:00Z",
+  "change": {
+    "approvedTimelineInspect": "inspectManagedProjectReadOnly",
+    "earliestInspect": "inspectManagedProjectReadOnly",
+    "earliestWriteLease": "getStudioProjectWriteLeaseReadOnly",
+    "alignBoardDirectWriteInspect": false,
+    "activateProjectOnReadPath": false
+  },
+  "residual": {
+    "checkpointControlMayEnsureLedger": true,
+    "reason": "getStudioGenerationCheckpointControl 仍走 initialize + inspectManagedProject；W3-B 处理未初始化失败关闭"
+  },
+  "tests": [
+    "tests/runtime-perf-wave3a-readonly-inspect.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "pending",
+    "sourceContractTests": "pending",
+    "p7FixtureTests": "Darwin dirfd only; Linux 未跑 fixture"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W3-A：只读时间线/earliest/align-board 入口不再 inspectManagedProject（不 ensure ledger）。未改 PASS 归约，未改 checkpoint owner。"
+}
