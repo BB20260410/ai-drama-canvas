@@ -2,7 +2,7 @@
 
 ## software_goal: runtime-perf-memory-20260825
 
-- status: `in_progress`（W1–W5 切片已落地；W6 下一步；W2-C 需 Darwin；列表翻页探针未跑）
+- status: `in_progress`（W1–W6-A 已落地；W6-B/C 下一步；W2-C 需 Darwin；列表翻页探针未跑）
 - plan: `docs/PLAN_运行速度与内存占用长期执行_20260825.md`
 - [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席本环境未跑）
 - [x] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
@@ -30,6 +30,9 @@
 - [x] Wave 5-D：derivative serving 只校派生文件 + DB 绑定
 - [x] Wave 5-E：`verifiedFileCache` 按 projectRoot 分桶或切工程淘汰
 - [ ] Wave 5：列表只绑缩略图；legacy thumb 不先整文件读入；审片默认 thumb；derivative 不校源全 SHA
+- [x] Wave 6-A：typecheck:app + 本计划定向测（Linux 27/241 PASS；P7 fixture 仍需 Darwin）
+- [ ] Wave 6-B：安装版 T23（owner 未点名 → 写未跑）
+- [ ] Wave 6-C：对照 §1 八条；全量审查 + 真实测试
 - [ ] Wave 6：度量关账；安装版 T23 仅 owner 点名
 - [ ] 禁止：重建 P0–P14、无证据 SQL 批量化、N124 CV、全盘扫正式工程
 

@@ -4,7 +4,7 @@
 
 | 字段 | 当前值 |
 |---|---|
-| status | `in_progress`：W1–W5 切片已落地（W5 列表翻页探针未跑）；W2-C 需 Darwin；整计划未关账 |
+| status | `in_progress`：W1–W6-A 已落地；W6-B 未跑安装版；W2-C 需 Darwin；列表翻页探针未跑；整计划未关账 |
 | plan | `docs/PLAN_运行速度与内存占用长期执行_20260825.md` |
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
@@ -32,7 +32,8 @@
 | wave5c | 源图缩略派生经 studioThumbnailDerivationGate 并发 4。未改 recipe / recipeKey。画布 UI 队列仍是 2 |
 | wave5d | 派生 serving 只校派生文件 + DB 绑定，不再 inspectCasObjectCached 源 CAS。media 目标仍全 SHA。未关身份绑定 |
 | wave5e | verifiedFileCache 按 canonicalRoot 分桶；上限仍 2048。超限优先淘汰其他工程。未在切工程 UI 自动 evict |
-| earliest_next | **Wave 6-A**：无窗口 typecheck:app + 本计划定向测 |
+| wave6a | typecheck:app PASS；Linux 定向测 27 files / 241 tests PASS。P7 fixture / media-protocol 仍需 Darwin。未改源码 |
+| earliest_next | **Wave 6-B**：owner 未点名安装版 T23 → 写「未跑安装版」，不得称整包完成 |
 
 ## 2026-08-25 · 本机人物库同步
 
