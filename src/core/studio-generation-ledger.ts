@@ -83,6 +83,7 @@ import {
   type DetachedUnknownObservationRow,
   type LedgerPaths,
 } from "./studio-generation-ledger-storage.js";
+import { openGenerationLedgerReadOnly } from "./studio-generation-ledger-readiness.js";
 export {
   __setBeforeGenerationWritableOpenHookForTests,
   getStudioGenerationLedgerState,
@@ -7764,18 +7765,13 @@ function sqlPlaceholders(count: number): string {
 }
 
 /**
- * 批量获取一组单元的 unit-grid 目标最新 run（含成对结果 SHA）。
- * 单次 openDatabase；逐表一条批量 SQL（窗口函数取每组最新），替代逐单元多次点查。
- * 未派发的单元同样出现在结果中（latestRun=null），便于调用方对齐输入顺序。
+ * 在已打开连接上执行最新 unit-grid run 批量投影。调用方负责打开；本函数负责事务与 close。
+ * SQL 与装配口径对可写入口 / 时间线只读入口保持同一份。
  */
-export async function listStudioGenerationLatestUnitGridRuns(
-  projectRoot: string,
-  unitIds: string[],
-): Promise<StudioGenerationLatestUnitGridRun[]> {
-  const { paths } = await managedLedgerPaths(projectRoot);
-  const normalizedUnitIds = unitIds.map((unitId) => normalizeId(unitId, "unitId"));
-  if (normalizedUnitIds.length === 0) return [];
-  const db = openDatabase(paths);
+function queryLatestUnitGridRunsFromOpenDatabase(
+  db: DatabaseSync,
+  normalizedUnitIds: string[],
+): StudioGenerationLatestUnitGridRun[] {
   let readTransactionOpen = false;
   try {
     // 所有批量事实必须来自同一个 WAL 快照，否则 Review Head 在逐表查询之间变化时
@@ -8078,6 +8074,39 @@ export async function listStudioGenerationLatestUnitGridRuns(
     }
     db.close();
   }
+}
+
+/**
+ * 批量获取一组单元的 unit-grid 目标最新 run（含成对结果 SHA）。
+ * 单次 openDatabase；逐表一条批量 SQL（窗口函数取每组最新），替代逐单元多次点查。
+ * 未派发的单元同样出现在结果中（latestRun=null），便于调用方对齐输入顺序。
+ * 可写入口：驾驶舱 / T23 / unit-grid / session-snapshot。时间线投影走 ReadOnly 旁路。
+ */
+export async function listStudioGenerationLatestUnitGridRuns(
+  projectRoot: string,
+  unitIds: string[],
+): Promise<StudioGenerationLatestUnitGridRun[]> {
+  const { paths } = await managedLedgerPaths(projectRoot);
+  const normalizedUnitIds = unitIds.map((unitId) => normalizeId(unitId, "unitId"));
+  if (normalizedUnitIds.length === 0) return [];
+  return queryLatestUnitGridRunsFromOpenDatabase(openDatabase(paths), normalizedUnitIds);
+}
+
+/**
+ * 时间线投影专用：只读打开已有 generation ledger，再跑同一份批量 SQL。
+ * 不走 managedLedgerPaths / 可写 openDatabase（不 ensure CAS、不 preflight 整库复制、不迁移、不切 WAL）。
+ * 缺库/schema 未就绪失败关闭。不得用于驾驶舱 nextAction / T23 / unit-grid 写邻接路径。
+ */
+export async function listStudioGenerationLatestUnitGridRunsReadOnly(
+  databasePath: string,
+  unitIds: string[],
+): Promise<StudioGenerationLatestUnitGridRun[]> {
+  const normalizedUnitIds = unitIds.map((unitId) => normalizeId(unitId, "unitId"));
+  if (normalizedUnitIds.length === 0) return [];
+  return queryLatestUnitGridRunsFromOpenDatabase(
+    openGenerationLedgerReadOnly(databasePath),
+    normalizedUnitIds,
+  );
 }
 
 

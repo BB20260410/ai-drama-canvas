@@ -91,15 +91,37 @@ describe("Wave 3-B generation ledger 失败关闭", () => {
     expect(timeline).toContain("assertGenerationLedgerSchemaFileReady(shell.paths.generationDatabase)");
     expect(earliest).toContain("assertGenerationLedgerSchemaFileReady(shell.paths.generationDatabase)");
     expect(timeline.indexOf("assertGenerationLedgerSchemaFileReady")).toBeLessThan(
-      timeline.indexOf("listStudioGenerationLatestUnitGridRuns"),
+      timeline.indexOf("listStudioGenerationLatestUnitGridRunsReadOnly"),
     );
+    expect(timeline).toContain("listStudioGenerationLatestUnitGridRunsReadOnly");
+    expect(timeline).not.toMatch(/listStudioGenerationLatestUnitGridRuns\(/u);
     expect(earliest.indexOf("assertGenerationLedgerSchemaFileReady")).toBeLessThan(
       earliest.indexOf("getStudioGenerationCheckpointControl"),
     );
+    expect(readiness).toContain("openGenerationLedgerReadOnly");
+    expect(readiness).toContain("readOnly: true");
+    expect(readiness).toContain("query_only");
     expect(readiness).not.toMatch(/inspectManagedProject\(/u);
     expect(readiness).not.toMatch(/openDatabase\s*\(/u);
     expect(readiness).not.toMatch(/initializeStudioGenerationLedger\s*\(/u);
     expect(readiness).not.toMatch(/createCurrentSchema\s*\(/u);
+    expect(readiness).not.toContain("journal_mode");
+    expect(readiness).not.toContain("CREATE TABLE");
+    const ledger = source("src/core/studio-generation-ledger.ts");
+    const writableStart = ledger.indexOf("export async function listStudioGenerationLatestUnitGridRuns(");
+    const readonlyStart = ledger.indexOf("export async function listStudioGenerationLatestUnitGridRunsReadOnly(");
+    expect(writableStart).toBeGreaterThan(-1);
+    expect(readonlyStart).toBeGreaterThan(writableStart);
+    const writableFn = ledger.slice(writableStart, readonlyStart);
+    expect(writableFn).toContain("await managedLedgerPaths(projectRoot)");
+    expect(writableFn).toContain("openDatabase(paths)");
+    expect(writableFn).not.toContain("openGenerationLedgerReadOnly");
+    const readonlyFn = ledger.slice(readonlyStart, ledger.indexOf("export type StudioUnitGridRollupBucket"));
+    expect(readonlyFn).toContain("openGenerationLedgerReadOnly(databasePath)");
+    expect(readonlyFn).not.toContain("await managedLedgerPaths");
+    expect(readonlyFn).not.toContain("openDatabase(paths)");
+    expect(readonlyFn).not.toContain("journal_mode");
+    expect(readonlyFn).not.toContain("CREATE TABLE");
     expect(storage).toContain(`const SCHEMA_VERSION = ${GENERATION_LEDGER_REQUIRED_SCHEMA_VERSION}`);
   });
 });

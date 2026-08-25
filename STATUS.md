@@ -4,12 +4,12 @@
 
 | 字段 | 当前值 |
 |---|---|
-| status | `阻塞`（§1.3 by-id / 诊断懒展开 / lean 身份 + 身份只读打开已落地；整计划仍 `部分完成`）。§1 八条 1/2/4/7/8 已完成，3/5/6 部分完成。等待 owner / Darwin。禁止写「运行速度已关账」 |
+| status | `阻塞`（§1.3 by-id / 诊断懒展开 / lean 身份 + 身份只读打开 + 时间线账本批读只读旁路已落地；整计划仍 `部分完成`）。§1 八条 1/2/4/7/8 已完成，3/5/6 部分完成。等待 owner / Darwin。禁止写「运行速度已关账」 |
 | plan | `docs/PLAN_运行速度与内存占用长期执行_20260825.md` |
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
-| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`（含 `wave2c`、`wave2-bundle-approved-bound`、`wave2-unitids-by-id`、`wave2-diagnostics-lazy-open`、`wave2-episode-lean-identities`、`wave2-identity-readonly-sql`、`wave2f-reference-cache-lru`）、`wave3*`、`wave4a`–`wave4f`、`wave4-capabilities-deferred-engine`、`wave4-novel-analysis-lazy`、`wave4-capabilities-settings-thin`、`wave5a`–`wave5e`、`wave5e-project-switch-evict`、`wave5e-stale-writeback-guard`、`wave5e-darwin-ci`、`wave5-list-flip-source-contract`、`wave5-list-flip-protocol-classify`、`wave5-list-flip-darwin-ci-379df38`、`wave6a`–`wave6c`、`wave6-reverify`、`wave6-reverify-expanded`、`wave6-reverify-after-lean`、`wave6-darwin-ci-0b46327`、`wave6-darwin-ci-e1ea3f1`、`wave6-darwin-ci-36abafb`、`sqlite-busy-wall-flake`、`sqlite-shm-binding-race` |
+| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`（含 `wave2c`、`wave2-bundle-approved-bound`、`wave2-unitids-by-id`、`wave2-diagnostics-lazy-open`、`wave2-episode-lean-identities`、`wave2-identity-readonly-sql`、`wave2-ledger-readonly-sql`、`wave2f-reference-cache-lru`）、`wave3*`、`wave4a`–`wave4f`、`wave4-capabilities-deferred-engine`、`wave4-novel-analysis-lazy`、`wave4-capabilities-settings-thin`、`wave5a`–`wave5e`、`wave5e-project-switch-evict`、`wave5e-stale-writeback-guard`、`wave5e-darwin-ci`、`wave5-list-flip-source-contract`、`wave5-list-flip-protocol-classify`、`wave5-list-flip-darwin-ci-379df38`、`wave6a`–`wave6c`、`wave6-reverify`、`wave6-reverify-expanded`、`wave6-reverify-after-lean`、`wave6-darwin-ci-0b46327`、`wave6-darwin-ci-e1ea3f1`、`wave6-darwin-ci-36abafb`、`sqlite-busy-wall-flake`、`sqlite-shm-binding-race` |
 | wave4b | story/adaptation/novel-agent 经 withX 动态 import；story.ts 顶栏已卸 mammoth（docx 分支动态加载）。doctor 仍会 `import("mammoth")` 探测；snapshot 会 withStory，doctor 会 withStory+withAdaptation |
 | wave4c | video-package / Higgsfield queue+video / dudu / local-creative 经 withX。mcp-projection 仍静态（同步消毒、无重依赖）。调用对应控制面/写命令仍会加载 |
 | wave4d | MCP 只读诊断面 earliest / bundle / dashboard / multimedia / write-lease / reader / align 经 withX；session-snapshot 不再静态拉 bundle。command-bus 仍静态拉 ledger。codex 仍静态拉 session-snapshot.js 本身。Main dashboard 顶栏未卸（T23）。get_active_managed_studio_context 仍会加载 write-lease |
@@ -22,6 +22,7 @@
 | wave2-unitids-by-id | 有界 `unitIds` 走 `listStudioProductionUnitIdentitiesByIds`（IN ≤36，不翻页、不记 `unitTimingQueries`）。未改 `listStudioProductionUnits` SQL。两路审查 PASS |
 | wave2-episode-lean-identities | 省略 / 仅 limit / earliest 走 `listStudioProductionUnitIdentities`（`SELECT id, sequence, title, revision, panel_count` + LIMIT，顶 2500）。不经 `unitSummaryFromRow`，不记 `unitTimingQueries`。未改 `listStudioProductionUnits` SQL。红线 PASS；完成门在证据落盘后 PASS。证据 `docs/evidence/runtime-perf-memory-wave2-episode-lean-identities-20260825.json` |
 | wave2-identity-readonly-sql | 身份旁路改为 `productionPaths` + 只读打开（`readOnly` + `query_only`）；缺库失败关闭，不 ensure / 不建库。`listStudioProductionUnits` 函数体未改。Linux 真 sqlite 2500 末页 36 PASS。不是 P7 owner。证据 `docs/evidence/runtime-perf-memory-wave2-identity-readonly-sql-20260825.json` |
+| wave2-ledger-readonly-sql | 时间线 `getApprovedTimelineProjection` 账本批读改 `listStudioGenerationLatestUnitGridRunsReadOnly`（`readOnly` + `query_only`，不走 `managedLedgerPaths` / 可写 `openDatabase`）。SQL 与可写入口同一份。驾驶舱 / T23 / unit-grid / session-snapshot 仍走可写入口。Linux 真 sqlite 36 单元只读批读 PASS。不是 P7 owner，不是安装版 T23。证据 `docs/evidence/runtime-perf-memory-wave2-ledger-readonly-sql-20260825.json` |
 | wave2-diag-lazy | 画布「详细诊断」展开才 `getStudioProductionDiagnostics`；`refreshAll` 默认不拉整集 canonical。切工程仍清空。首卡 emit 仍在诊断之前 |
 | wave2d | 账本/计划风暴并入 scheduleUnitGridGraphRebuild 单 rAF |
 | wave2e | 节点 >80 默认关 MiniMap；invalidate 清用户覆盖 |
@@ -53,7 +54,7 @@
 | wave5-list-flip-darwin-ci | macos-latest CI check **success** on `379df38`（list-flip 源码合同，run `32886953416`）。不是安装版 T23，不是 GUI 探针 |
 | sqlite-busy-wall | Darwin CI `b002adf`/`d0c4175` 因 547/507 < 500 红；墙钟改 5s 后 HEAD `e1ea3f1` check **success**（run `32889586061`）。未改 120s timeout。不是 T23 |
 | sqlite-shm-race | Darwin CI `5a075cf` run `32893004763` Fast tests 因 -shm 竞态 `canonNlink=0` 误判红。绑定把 inode 换号 / nlink=0 当瞬态重试；symlink / nlink>1 仍失败关闭。修复提交 `3a3462e` check **success**（run `32894599796`）。不是 T23 |
-| earliest_next | **等待 owner**。§1.3 三刀 + 身份只读打开已落地。仅用户能解：①安装版 T23 ②列表翻页 GUI 探针 `aicanvas-studio://media/* = 0` ③P7 owner 有界对照。禁拆 command-bus ledger。禁止 N124 / 禁止写「运行速度已关账」 |
+| earliest_next | **等待 owner**。§1.3 三刀 + 身份只读打开 + 时间线账本批读只读旁路已落地。仅用户能解：①安装版 T23 ②列表翻页 GUI 探针 `aicanvas-studio://media/* = 0` ③P7 owner 有界对照。禁拆 command-bus ledger。禁止 N124 / 禁止写「运行速度已关账」 |
 
 ## 2026-08-25 · 本机人物库同步
 

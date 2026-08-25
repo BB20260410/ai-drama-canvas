@@ -19,7 +19,7 @@ import {
   listStudioProductionUnitIdentitiesByIds,
 } from "./studio-production.js";
 import {
-  listStudioGenerationLatestUnitGridRuns,
+  listStudioGenerationLatestUnitGridRunsReadOnly,
   type StudioGenerationActiveRunProjection,
   type StudioGenerationApprovedResultIdentity,
 } from "./studio-generation-ledger.js";
@@ -278,8 +278,10 @@ export async function getApprovedTimelineProjection(
 
   // 2. 循环外一次取齐全部单元的最新 unit-grid run（单次只读连接，消除 N+1 串行开库）；
   //    同批带回最新 run 成对结果的 raw/labeled 媒体 SHA，供正式 SHA 填充。
-  const latestUnitGridRuns = await listStudioGenerationLatestUnitGridRuns(
-    projectRoot,
+  //    只读打开已有账本，不走 managedLedgerPaths / 可写 openDatabase（不建库、不迁移、不切 WAL）。
+  //    驾驶舱 / T23 / unit-grid 仍用 listStudioGenerationLatestUnitGridRuns 可写入口。
+  const latestUnitGridRuns = await listStudioGenerationLatestUnitGridRunsReadOnly(
+    shell.paths.generationDatabase,
     boundedSummaries.map((unit) => unit.id),
   );
   const latestRunByUnit = new Map(latestUnitGridRuns.map((entry) => [entry.unitId, entry]));
