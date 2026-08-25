@@ -17,6 +17,11 @@ import { loadSharpDefault } from "./sharp-lazy.js";
 
 const LEGACY_THUMBNAIL_MAX_EDGE = 512;
 const LEGACY_THUMBNAIL_WEBP_QUALITY = 82;
+/** 1×1 透明 WebP。thumb=1 失败时占位，禁止把 4K 原图 bytes 回退给 <img>。 */
+export const LEGACY_THUMBNAIL_PLACEHOLDER_WEBP = Buffer.from(
+  "UklGRkAAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAIAAAAQAFZQOCAYAAAAMAEAnQEqAQABAAzAziWkAANwAP7sZwAA",
+  "base64",
+);
 /** F-10（main 审查）：缓存总量上限——超出时按 mtime 最旧先淘汰（保守方向：多淘汰不漏可用项，漏网项会懒重生成）。 */
 const LEGACY_THUMBNAIL_CACHE_MAX_ENTRIES = 2_000;
 
@@ -105,7 +110,7 @@ export async function resolveLegacyThumbnailFromBytes(
   }
 }
 
-/** 返回可用缩略图；源不可读、非普通文件、不可解码或缓存目录不可写时返回 null（调用方回退原图）。 */
+/** 返回可用缩略图；源不可读、非普通文件、不可解码或缓存目录不可写时返回 null（调用方占位，不回退原图 bytes）。 */
 export async function resolveLegacyThumbnail(cacheRoot: string, absolutePath: string): Promise<LegacyThumbnailResult | null> {
   let sourceStats: Awaited<ReturnType<typeof stat>>;
   try {
@@ -119,7 +124,7 @@ export async function resolveLegacyThumbnail(cacheRoot: string, absolutePath: st
   const existing = await existingThumbnail(target);
   if (existing) return existing;
   try {
-    // mkdir 必须在 try 内：缓存目录不可写时返回 null 回退原图，绝不让 thumb 请求变成 404 破图。
+    // mkdir 必须在 try 内：缓存目录不可写时返回 null，由协议回占位 WebP，绝不回退 4K 原图 bytes。
     await mkdir(cacheRoot, { recursive: true });
     const temporary = path.join(cacheRoot, `.${key}.${randomUUID()}.tmp.webp`);
     try {

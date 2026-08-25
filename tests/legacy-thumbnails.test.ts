@@ -51,7 +51,7 @@ describe("P18 旧画布缩略图管线", () => {
     expect(second!.path).not.toBe(first!.path);
   });
 
-  it("缺失或不可解码源返回 null，由调用方回退原图", async () => {
+  it("缺失或不可解码源返回 null，由调用方占位不回退原图", async () => {
     const root = await makeTempRoot();
     const cacheRoot = path.join(root, "cache");
     expect(await resolveLegacyThumbnail(cacheRoot, path.join(root, "missing.png"))).toBeNull();
@@ -76,12 +76,15 @@ describe("P18 旧画布缩略图管线", () => {
 
   it("合同：协议入口与节点组件均接入缩略图链路", () => {
     const main = readFileSync(path.join(process.cwd(), "src/main/index.ts"), "utf8");
-    expect(main).toContain("resolveLegacyThumbnail");
+    expect(main).toContain("resolveLegacyThumbnail(");
+    expect(main).toContain("LEGACY_THUMBNAIL_PLACEHOLDER_WEBP");
+    expect(main).not.toContain("resolveLegacyThumbnailFromBytes");
     expect(main).toContain('url.searchParams.get("thumb") === "1"');
     const node = readFileSync(path.join(process.cwd(), "src/renderer/src/components/ProductionNode.vue"), "utf8");
     expect(node).toContain("assetThumbnailUrl");
     expect(node).not.toContain("assetUrl(");
     const utils = readFileSync(path.join(process.cwd(), "src/renderer/src/utils.ts"), "utf8");
     expect(utils).toContain("&thumb=1");
+    expect(utils).toContain("不回退原图");
   });
 });

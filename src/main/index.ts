@@ -89,6 +89,7 @@ import {
   setActiveStudioContext,
 } from "../core/sidecar.js";
 import {
+  hashResolvedLegacyAssetFile,
   isLegacyUnhashedMediaPathAllowed,
   readLegacyAssetBytes,
   resolveLegacyAssetPath,
@@ -180,7 +181,7 @@ import { FUSION_STORYBOARD_BEAT_ALGORITHM_VERSION, FUSION_STORYBOARD_VISIBLE_TIM
 import { getFusionStoryboardSheetState, listFusionStoryboardSheets } from "../core/fusion-storyboard-sheet-evidence.js";
 import type { AgentSkillCategory, CanvasEntity, CanvasSemanticLink, EditProject, GenerationKind, GenerationSettings, ProjectConfig, ProjectContextKind, ProjectImportMode, ProjectImportOptions, ReviewDecision, ShotTiming, StoryEventStatus, SubmitReviewInput, TaskPack, WorkItemStatus } from "../core/types.js";
 import { streamStudioMediaRequest, StudioMediaProtocolError } from "../core/studio-media-protocol.js";
-import { resolveLegacyThumbnailFromBytes } from "../core/legacy-thumbnails.js";
+import { LEGACY_THUMBNAIL_PLACEHOLDER_WEBP, resolveLegacyThumbnail } from "../core/legacy-thumbnails.js";
 import {
   getStudioMediaDerivatives,
   materializeStudioMediaDerivatives,
@@ -4774,28 +4775,21 @@ if (!app.requestSingleInstanceLock()) {
       if (!expectedSha256 && !isLegacyUnhashedMediaPathAllowed(canonicalPath)) {
         return new Response("Unhashed legacy requests are limited to media files", { status: 403 });
       }
+      if (url.searchParams.get("thumb") === "1") {
+        if (expectedSha256) {
+          const digest = await hashResolvedLegacyAssetFile(canonicalPath);
+          if (!digest) return new Response("Path outside registered project roots or unsafe file identity", { status: 403 });
+          if (digest !== expectedSha256) return new Response("Content SHA-256 mismatch", { status: 409 });
+        }
+        const thumbnail = await resolveLegacyThumbnail(legacyThumbnailCacheRoot, canonicalPath);
+        const thumbBytes = thumbnail
+          ? await readFile(thumbnail.path)
+          : LEGACY_THUMBNAIL_PLACEHOLDER_WEBP;
+        return new Response(new Uint8Array(thumbBytes), { status: 200, headers: { "content-type": "image/webp", "cache-control": "no-store", "x-content-type-options": "nosniff" } });
+      }
       const asset = await readLegacyAssetBytes(canonicalPath);
       if (!asset) return new Response("Path outside registered project roots or unsafe file identity", { status: 403 });
-      if (expectedSha256) {
-        if (asset.sha256 !== expectedSha256) return new Response("Content SHA-256 mismatch", { status: 409 });
-        // sha 已验证：thumb=1 时可安全改供由该内容派生的缩略图（F-01 修复：校验先于缩略分支）。
-        if (url.searchParams.get("thumb") === "1") {
-          const thumbnail = await resolveLegacyThumbnailFromBytes(legacyThumbnailCacheRoot, `${asset.canonicalPath}:${asset.sha256}`, asset.bytes);
-          if (thumbnail) {
-            const thumbBytes = await readFile(thumbnail.path);
-            return new Response(new Uint8Array(thumbBytes), { status: 200, headers: { "content-type": "image/webp", "cache-control": "no-store", "x-content-type-options": "nosniff" } });
-          }
-        }
-        return new Response(new Uint8Array(asset.bytes), { status: 200, headers: { "content-type": legacyAssetContentType(asset.canonicalPath), "cache-control": "no-store", "x-content-type-options": "nosniff" } });
-      }
-      // P18：thumb=1 时优先返回懒生成的 512px WebP 缩略图；不可用时回退原图，不阻断渲染。
-      if (url.searchParams.get("thumb") === "1") {
-        const thumbnail = await resolveLegacyThumbnailFromBytes(legacyThumbnailCacheRoot, `${asset.canonicalPath}:${asset.sha256}`, asset.bytes);
-        if (thumbnail) {
-          const thumbBytes = await readFile(thumbnail.path);
-          return new Response(new Uint8Array(thumbBytes), { status: 200, headers: { "content-type": "image/webp", "cache-control": "no-store", "x-content-type-options": "nosniff" } });
-        }
-      }
+      if (expectedSha256 && asset.sha256 !== expectedSha256) return new Response("Content SHA-256 mismatch", { status: 409 });
       return new Response(new Uint8Array(asset.bytes), { status: 200, headers: { "content-type": legacyAssetContentType(asset.canonicalPath), "cache-control": "no-store", "x-content-type-options": "nosniff" } });
     } catch {
       return new Response("Not found", { status: 404 });

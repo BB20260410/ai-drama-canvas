@@ -121,6 +121,53 @@ export async function readLegacyAssetBytes(absolutePath: string): Promise<{
   }
 }
 
+/**
+ * Wave 5-B：校验内容 SHA 时只流式哈希，不把整文件留在内存。
+ * 调用方必须先 `resolveLegacyAssetPath`；本函数不再重复根判定。
+ */
+export async function hashResolvedLegacyAssetFile(canonicalPath: string): Promise<string | null> {
+  if (!path.isAbsolute(canonicalPath)) return null;
+  try {
+    const pathBefore = await lstat(canonicalPath, { bigint: true });
+    if (pathBefore.isSymbolicLink() || !pathBefore.isFile()) return null;
+    const handle = await open(canonicalPath, fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0));
+    try {
+      const descriptorBefore = await handle.stat({ bigint: true });
+      if (!descriptorBefore.isFile()
+        || descriptorBefore.dev !== pathBefore.dev
+        || descriptorBefore.ino !== pathBefore.ino) return null;
+      const hash = createHash("sha256");
+      const chunk = Buffer.alloc(64 * 1024);
+      let remaining = Number(descriptorBefore.size);
+      while (remaining > 0) {
+        const { bytesRead } = await handle.read(chunk, 0, Math.min(chunk.length, remaining), null);
+        if (bytesRead < 1) return null;
+        hash.update(chunk.subarray(0, bytesRead));
+        remaining -= bytesRead;
+      }
+      const [descriptorAfter, pathAfter] = await Promise.all([
+        handle.stat({ bigint: true }),
+        lstat(canonicalPath, { bigint: true }),
+      ]);
+      if (pathAfter.isSymbolicLink()
+        || !pathAfter.isFile()
+        || descriptorAfter.dev !== descriptorBefore.dev
+        || descriptorAfter.ino !== descriptorBefore.ino
+        || descriptorAfter.size !== descriptorBefore.size
+        || descriptorAfter.mtimeNs !== descriptorBefore.mtimeNs
+        || descriptorAfter.ctimeNs !== descriptorBefore.ctimeNs
+        || pathAfter.dev !== descriptorBefore.dev
+        || pathAfter.ino !== descriptorBefore.ino
+        || pathAfter.size !== descriptorBefore.size) return null;
+      return hash.digest("hex");
+    } finally {
+      await handle.close();
+    }
+  } catch {
+    return null;
+  }
+}
+
 /** 带 5s 缓存的判定（协议按图片逐请求调用，避免每次重读注册表）。 */
 export async function isLegacyAssetPathAllowed(absolutePath: string): Promise<boolean> {
   return (await resolveLegacyAssetPath(absolutePath)) !== null;

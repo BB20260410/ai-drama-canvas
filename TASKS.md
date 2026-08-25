@@ -2,7 +2,7 @@
 
 ## software_goal: runtime-perf-memory-20260825
 
-- status: `in_progress`（W1–W4 + W5-A 已落地；W5-B 下一步；W2-C 需 Darwin）
+- status: `in_progress`（W1–W4 + W5-A/B 已落地；W5-C 下一步；W2-C 需 Darwin）
 - plan: `docs/PLAN_运行速度与内存占用长期执行_20260825.md`
 - [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席本环境未跑）
 - [x] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
@@ -25,7 +25,7 @@
 - [x] Wave 4-E：runtime gate watcher 默认只订 `src/`；`tests/`/`scripts/` 改开关
 - [x] Wave 4-F：sharp 经媒体网关首次 touch（未改 CAS recipe / 缩略指纹）
 - [x] Wave 5-A：对照/审片未选中行只绑 thumbnailUrl；审片并排默认 thumb，原图显式打开
-- [ ] Wave 5-B：legacy `thumb=1` 不先整文件读入；失败占位，不回退 4K bytes
+- [x] Wave 5-B：legacy `thumb=1` 不先整文件读入；失败占位，不回退 4K bytes
 - [ ] Wave 5-C：缩略派生并发上限（与画布 15s 向导并发 4 同级）
 - [ ] Wave 5-D：derivative serving 只校派生文件 + DB 绑定
 - [ ] Wave 5-E：`verifiedFileCache` 按 projectRoot 分桶或切工程淘汰

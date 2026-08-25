@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "5-B",
+  "recordedAt": "2026-08-25T16:45:00Z",
+  "change": {
+    "protocol": "src/main/index.ts aicanvas-asset thumb=1",
+    "hashWithoutRetain": "src/core/legacy-asset-confinement.ts#hashResolvedLegacyAssetFile",
+    "thumbnailPath": "resolveLegacyThumbnail(cacheRoot, canonicalPath)",
+    "failure": "LEGACY_THUMBNAIL_PLACEHOLDER_WEBP",
+    "noOriginalFallbackOnThumb": true,
+    "legacyMaxEdgeUnchanged": 512,
+    "legacyWebpQualityUnchanged": 82
+  },
+  "tests": [
+    "tests/runtime-perf-wave5b-legacy-thumb-path.test.ts",
+    "tests/legacy-thumbnails.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "sourceContractAndOwnerTests": { "passed": 8, "platform": "linux", "files": 2 },
+    "hashStreamTest": "PASS (legacy-asset-confinement hashResolvedLegacyAssetFile)",
+    "preexistingDarwinConfinement": "isLegacyAssetPathAllowed 登记工程用例仍需 macOS dirfd；非本切片引入"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W5-B：legacy aicanvas-asset thumb=1 不再先 readLegacyAssetBytes 整文件入内存再 sharp(bytes)。有 sha 时流式哈希校验；缩略走 sharp(path)+磁盘键。失败回 1×1 占位 WebP，不回退 4K 原图 bytes。未改 512/q82。未预扫 CAS。",
+  "residual": [
+    "非 thumb 请求仍会 readLegacyAssetBytes（原图服务，本切片范围外）",
+    "带 sha 的 thumb 仍会流式读一遍源文件做哈希，但不把整文件 Buffer 留给 sharp",
+    "resolveLegacyThumbnailFromBytes 仍留在 core，协议入口不再调用",
+    "未跑 Electron aicanvas-asset 协议实请求",
+    "W4-A/D/F 与 W5-A 残差仍在；禁止写成「已优化缩略指纹」或「thumb 永不读源文件」"
+  ]
+}
