@@ -4,12 +4,12 @@
 
 | 字段 | 当前值 |
 |---|---|
-| status | `in_progress`：W1–W6-A 已落地；W6-B 未跑安装版；W2-C 需 Darwin；列表翻页探针未跑；整计划未关账 |
+| status | `in_progress`：W1–W6-B 已落地（W6-B=未跑安装版）；W2-C 需 Darwin；列表翻页探针未跑；整计划最高部分完成 |
 | plan | `docs/PLAN_运行速度与内存占用长期执行_20260825.md` |
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
-| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`、`wave3*`、`wave4a`–`wave4f`、`wave5a`–`wave5e` |
+| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`、`wave3*`、`wave4a`–`wave4f`、`wave5a`–`wave5e`、`wave6a`、`wave6b` |
 | wave4b | story/adaptation/novel-agent 经 withX 动态 import；story.ts 顶栏已卸 mammoth（docx 分支动态加载）。doctor 仍会 `import("mammoth")` 探测；snapshot 会 withStory，doctor 会 withStory+withAdaptation |
 | wave4c | video-package / Higgsfield queue+video / dudu / local-creative 经 withX。mcp-projection 仍静态（同步消毒、无重依赖）。调用对应控制面/写命令仍会加载 |
 | wave4d | MCP 只读诊断面 earliest / bundle / dashboard / multimedia / write-lease / reader / align 经 withX；session-snapshot 不再静态拉 bundle。command-bus 仍静态拉 ledger。codex 仍静态拉 session-snapshot.js 本身。Main dashboard 顶栏未卸（T23）。get_active_managed_studio_context 仍会加载 write-lease |
@@ -33,7 +33,8 @@
 | wave5d | 派生 serving 只校派生文件 + DB 绑定，不再 inspectCasObjectCached 源 CAS。media 目标仍全 SHA。未关身份绑定 |
 | wave5e | verifiedFileCache 按 canonicalRoot 分桶；上限仍 2048。超限优先淘汰其他工程。未在切工程 UI 自动 evict |
 | wave6a | typecheck:app PASS；Linux 定向测 27 files / 241 tests PASS。P7 fixture / media-protocol 仍需 Darwin。未改源码 |
-| earliest_next | **Wave 6-B**：owner 未点名安装版 T23 → 写「未跑安装版」，不得称整包完成 |
+| wave6b | 未跑安装版 T23（owner 未点名；本 Cloud 无 macOS App / 无正式工程 GUI）。不得称整包完成 |
+| earliest_next | **Wave 6-C**：对照计划 §1 八条；全量代码审查后再真实测试 |
 
 ## 2026-08-25 · 本机人物库同步
 
