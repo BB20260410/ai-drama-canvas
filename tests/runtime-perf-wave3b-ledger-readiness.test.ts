@@ -122,6 +122,11 @@ describe("Wave 3-B generation ledger 失败关闭", () => {
     expect(readonlyFn).not.toContain("openDatabase(paths)");
     expect(readonlyFn).not.toContain("journal_mode");
     expect(readonlyFn).not.toContain("CREATE TABLE");
+    const historical = source("src/core/studio-generation-historical-imports-read.ts");
+    expect(historical).toContain("readStudioGenerationProjectionSelectionFactsReadOnly");
+    expect(historical).not.toContain("openSqliteReadOnlySnapshot");
+    expect(timeline).toContain("readStudioGenerationProjectionSelectionFactsReadOnly");
+    expect(timeline).not.toMatch(/readStudioGenerationProjectionSelectionFacts\(/u);
     expect(storage).toContain(`const SCHEMA_VERSION = ${GENERATION_LEDGER_REQUIRED_SCHEMA_VERSION}`);
   });
 });

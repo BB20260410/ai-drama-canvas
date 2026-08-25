@@ -69,7 +69,7 @@ function installIdleEpisode(units: StudioProductionUnitSummary[]): void {
     },
   );
   vi.spyOn(generationLedger, "listStudioGenerationLatestUnitGridRunsReadOnly").mockResolvedValue([]);
-  vi.spyOn(historicalRead, "readStudioGenerationProjectionSelectionFacts").mockResolvedValue({
+  vi.spyOn(historicalRead, "readStudioGenerationProjectionSelectionFactsReadOnly").mockResolvedValue({
     historicalPassByUnit: new Map(),
     packFingerprintByRunId: new Map(),
   });
@@ -245,5 +245,7 @@ describe("Wave 2-C 有界投影对照（无 P7 fixture）", () => {
     expect(projection).not.toMatch(/listStudioGenerationLatestUnitGridRuns\(/u);
     expect(projection).toContain("shell.paths.generationDatabase");
     expect(projection).toContain("不走 managedLedgerPaths / 可写 openDatabase");
+    expect(projection).toContain("readStudioGenerationProjectionSelectionFactsReadOnly");
+    expect(projection).not.toMatch(/readStudioGenerationProjectionSelectionFacts\(/u);
   });
 });

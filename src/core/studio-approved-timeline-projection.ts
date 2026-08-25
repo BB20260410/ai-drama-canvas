@@ -25,7 +25,7 @@ import {
 } from "./studio-generation-ledger.js";
 import { deriveGenerationTargetState, type GenerationTargetState } from "./studio-generation-target-state.js";
 import { buildUnitDisplayIdentity } from "./studio-unit-display-identity.js";
-import { readStudioGenerationProjectionSelectionFacts } from "./studio-generation-historical-imports-read.js";
+import { readStudioGenerationProjectionSelectionFactsReadOnly } from "./studio-generation-historical-imports-read.js";
 
 export const APPROVED_TIMELINE_SCHEMA_VERSION = 1 as const;
 
@@ -288,7 +288,12 @@ export async function getApprovedTimelineProjection(
 
   // 3. 先批量读取历史 PASS。fullMode 遇到“无正式 run + 已核验历史 PASS”时可直接
   // 跳过昂贵 freeze/readiness；最终仍由第二遍的历史选择规则提升为 PASS。
-  const historicalSelectionFacts = await readStudioGenerationProjectionSelectionFacts(projectRoot, {
+  const historicalFactsContext = {
+    databasePath: shell.paths.generationDatabase,
+    projectRoot: shell.paths.root,
+    mediaCasRoot: shell.paths.mediaCas,
+  };
+  const historicalSelectionFacts = await readStudioGenerationProjectionSelectionFactsReadOnly(historicalFactsContext, {
     units: boundedSummaries.map((unit) => ({ unitId: unit.id, revision: unit.revision })),
     generationRunIds: [],
   });
@@ -354,7 +359,7 @@ export async function getApprovedTimelineProjection(
     ))
     .map((derived) => derived.latestRun!.generationRunId)
     .filter((runId) => !snapshotApprovedRunIds.has(runId));
-  const formalSelectionFacts = await readStudioGenerationProjectionSelectionFacts(projectRoot, {
+  const formalSelectionFacts = await readStudioGenerationProjectionSelectionFactsReadOnly(historicalFactsContext, {
     units: [],
     generationRunIds: formalPassRunIds,
   });

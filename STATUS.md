@@ -23,6 +23,7 @@
 | wave2-episode-lean-identities | 省略 / 仅 limit / earliest 走 `listStudioProductionUnitIdentities`（`SELECT id, sequence, title, revision, panel_count` + LIMIT，顶 2500）。不经 `unitSummaryFromRow`，不记 `unitTimingQueries`。未改 `listStudioProductionUnits` SQL。红线 PASS；完成门在证据落盘后 PASS。证据 `docs/evidence/runtime-perf-memory-wave2-episode-lean-identities-20260825.json` |
 | wave2-identity-readonly-sql | 身份旁路改为 `productionPaths` + 只读打开（`readOnly` + `query_only`）；缺库失败关闭，不 ensure / 不建库。`listStudioProductionUnits` 函数体未改。Linux 真 sqlite 2500 末页 36 PASS。不是 P7 owner。证据 `docs/evidence/runtime-perf-memory-wave2-identity-readonly-sql-20260825.json` |
 | wave2-ledger-readonly-sql | 时间线 `getApprovedTimelineProjection` 账本批读改 `listStudioGenerationLatestUnitGridRunsReadOnly`（`readOnly` + `query_only`，不走 `managedLedgerPaths` / 可写 `openDatabase`）。SQL 与可写入口同一份。驾驶舱 / T23 / unit-grid / session-snapshot 仍走可写入口。Linux 真 sqlite 36 单元只读批读 PASS。不是 P7 owner，不是安装版 T23。证据 `docs/evidence/runtime-perf-memory-wave2-ledger-readonly-sql-20260825.json` |
+| wave2-historical-facts-readonly | 时间线历史 PASS 改 `readStudioGenerationProjectionSelectionFactsReadOnly`（活库 `readOnly` + `query_only`），不再 `openSqliteReadOnlySnapshot` 整库复制。缺库/缺表仍空事实。s1e1 入口仍 inspect 后转 ReadOnly。不是 P7 owner。证据 `docs/evidence/runtime-perf-memory-wave2-historical-facts-readonly-20260825.json` |
 | wave2-diag-lazy | 画布「详细诊断」展开才 `getStudioProductionDiagnostics`；`refreshAll` 默认不拉整集 canonical。切工程仍清空。首卡 emit 仍在诊断之前 |
 | wave2d | 账本/计划风暴并入 scheduleUnitGridGraphRebuild 单 rAF |
 | wave2e | 节点 >80 默认关 MiniMap；invalidate 清用户覆盖 |

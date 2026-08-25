@@ -20,6 +20,7 @@
 - [x] Wave 2 §1.3 残差：省略/limit/earliest 走 `listStudioProductionUnitIdentities`，不再翻页 `listStudioProductionUnits` 付 per-unit timing。P7 仍需 Darwin
 - [x] Wave 2 §1.3 残差：身份旁路只读打开已有生产库，缺库失败关闭；不 ensure / 不建库。Linux 真 sqlite 2500 末页 36 PASS。P7 仍需 Darwin
 - [x] Wave 2/3 §1.3 残差：时间线账本批读只读打开已有 generation ledger，不走 managedLedgerPaths / 可写 openDatabase。驾驶舱 / T23 / unit-grid 可写入口未改。Linux 真 sqlite 36 单元 PASS。P7 仍需 Darwin
+- [x] Wave 2/3 §1.3 残差：时间线历史 PASS 活库只读，不再 snapshot 复制整库。缺库/缺表仍空事实。P7 仍需 Darwin
 - [x] Wave 2 bundle：驾驶舱正式时间线只物化当前+前后邻；多媒体 storyboard 只请求当前单元。阶段名不变
 - [x] Wave 3-A：earliest / approved-timeline / align-board 改 `inspectManagedProjectReadOnly`
 - [x] Wave 3-B：`assertGenerationLedgerSchemaFileReady` 失败关闭，不静默建库
