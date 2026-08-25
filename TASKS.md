@@ -18,6 +18,7 @@
 - [x] Wave 2 §1.3 残差：有界 `unitIds` 走 `listStudioProductionUnitIdentitiesByIds`，不再翻页扫集；2500 末页 36 Linux mock 只走 by-id。P7 仍需 Darwin
 - [x] Wave 2 §1.3 残差：画布详细诊断展开才读整集 diagnostics；refreshAll 默认不拉
 - [x] Wave 2 §1.3 残差：省略/limit/earliest 走 `listStudioProductionUnitIdentities`，不再翻页 `listStudioProductionUnits` 付 per-unit timing。P7 仍需 Darwin
+- [x] Wave 2 §1.3 残差：身份旁路只读打开已有生产库，缺库失败关闭；不 ensure / 不建库。Linux 真 sqlite 2500 末页 36 PASS。P7 仍需 Darwin
 - [x] Wave 2 bundle：驾驶舱正式时间线只物化当前+前后邻；多媒体 storyboard 只请求当前单元。阶段名不变
 - [x] Wave 3-A：earliest / approved-timeline / align-board 改 `inspectManagedProjectReadOnly`
 - [x] Wave 3-B：`assertGenerationLedgerSchemaFileReady` 失败关闭，不静默建库

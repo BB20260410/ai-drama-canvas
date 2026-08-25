@@ -3329,12 +3329,43 @@ export async function listStudioProductionUnits(
   }
 }
 
+/** 只读身份投影缺库/缺表时失败关闭，不建生产库。 */
+export const STUDIO_PRODUCTION_UNITS_UNINITIALIZED_MESSAGE = "生产知识库未初始化，只读身份投影失败关闭。";
+
+/**
+ * 时间线身份旁路专用：只读打开已有生产库。
+ * 不 ensure 目录、不建库、不迁移、不改 WAL。不得用于 listStudioProductionUnits。
+ */
+function openStudioProductionUnitsIdentityDatabase(databasePath: string): DatabaseSync {
+  if (!existsSync(databasePath)) {
+    throw new Error(STUDIO_PRODUCTION_UNITS_UNINITIALIZED_MESSAGE);
+  }
+  const metadata = lstatSync(databasePath);
+  if (metadata.isSymbolicLink() || !metadata.isFile()) {
+    throw new Error("生产知识库数据库必须是无符号链接的普通文件。");
+  }
+  const db = new DatabaseSync(databasePath, { readOnly: true });
+  try {
+    db.exec("PRAGMA query_only = ON");
+    const found = db.prepare(
+      "SELECT 1 AS found FROM sqlite_master WHERE type = 'table' AND name = 'studio_production_units' LIMIT 1",
+    ).get();
+    if (!found) {
+      throw new Error(STUDIO_PRODUCTION_UNITS_UNINITIALIZED_MESSAGE);
+    }
+    return db;
+  } catch (error) {
+    db.close();
+    throw error;
+  }
+}
+
 /**
  * 按 id 读取同季同集单元身份（最多 36）。
  * 给正式时间线有界投影用：禁止再翻页扫整集再 filter。
  * 不走 unitSummaryFromRow，因此不记 unitTimingQueries / episodeStartQueries，
  * 也不改 listStudioProductionUnits 的 T23 热路径 SQL。
- * 缺行或跨季集 id 直接省略，与有界投影「返回集 ⊆ 请求 id」一致。
+ * 只读打开已有生产库；缺库失败关闭。缺行或跨季集 id 直接省略。
  */
 export async function listStudioProductionUnitIdentitiesByIds(
   projectRoot: string,
@@ -3353,8 +3384,8 @@ export async function listStudioProductionUnitIdentitiesByIds(
     throw new Error("unitIds 必须是非空数组；省略该字段才表示整集。");
   }
   if (ids.length > 36) throw new Error("unitIds 最多 36 项。");
-  const paths = await ensureProductionDirectories(projectRoot);
-  const db = openDatabase(paths.database);
+  const paths = productionPaths(projectRoot);
+  const db = openStudioProductionUnitsIdentityDatabase(paths.database);
   try {
     recordStudioUnitsReadCounter("productionBusinessSqlExecutions");
     const placeholders = ids.map(() => "?").join(", ");
@@ -3386,7 +3417,7 @@ export async function listStudioProductionUnitIdentitiesByIds(
  * 按季集读取单元身份（最多 2500）。
  * 给整集时间线 / earliest 用：只要 id/sequence/title/revision/panel_count，
  * 禁止再走 dashboard units 热路径的 per-unit timing 摘要。
- * 不改 T23 热路径 SQL。
+ * 只读打开已有生产库；缺库失败关闭。不改 T23 热路径 SQL。
  */
 export async function listStudioProductionUnitIdentities(
   projectRoot: string,
@@ -3402,8 +3433,8 @@ export async function listStudioProductionUnitIdentities(
     }
     limit = query.limit;
   }
-  const paths = await ensureProductionDirectories(projectRoot);
-  const db = openDatabase(paths.database);
+  const paths = productionPaths(projectRoot);
+  const db = openStudioProductionUnitsIdentityDatabase(paths.database);
   try {
     recordStudioUnitsReadCounter("productionBusinessSqlExecutions");
     const rows = db.prepare(`

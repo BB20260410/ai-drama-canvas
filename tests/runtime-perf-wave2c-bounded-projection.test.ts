@@ -207,6 +207,9 @@ describe("Wave 2-C 有界投影对照（无 P7 fixture）", () => {
     expect(byIdFn).not.toContain("episodeStartQueries");
     expect(byIdFn).not.toContain("unitPageQueries");
     expect(byIdFn).not.toContain("SELECT * FROM studio_production_units");
+    expect(byIdFn).toContain("openStudioProductionUnitsIdentityDatabase");
+    expect(byIdFn).not.toContain("ensureProductionDirectories");
+    expect(byIdFn).not.toContain("openDatabase(");
 
     const leanFn = productionSource.slice(leanFnStart, facetsStart);
     expect(leanFn).toContain("SELECT id, sequence, title, revision, panel_count");
@@ -218,5 +221,24 @@ describe("Wave 2-C 有界投影对照（无 P7 fixture）", () => {
     expect(leanFn).not.toContain("unitPageQueries");
     expect(leanFn).not.toContain("SELECT * FROM studio_production_units");
     expect(leanFn).not.toContain("id IN (");
+    expect(leanFn).toContain("openStudioProductionUnitsIdentityDatabase");
+    expect(leanFn).not.toContain("ensureProductionDirectories");
+    expect(leanFn).not.toContain("openDatabase(");
+
+    const helperStart = productionSource.indexOf("function openStudioProductionUnitsIdentityDatabase");
+    expect(helperStart).toBeGreaterThan(-1);
+    expect(helperStart).toBeLessThan(byIdFnStart);
+    const helper = productionSource.slice(helperStart, byIdFnStart);
+    expect(helper).toContain("readOnly: true");
+    expect(helper).toContain("query_only");
+    expect(helper).not.toContain("CREATE TABLE");
+    expect(helper).not.toContain("journal_mode");
+    expect(helper).not.toContain("ensureProductionDirectories");
+
+    const listStart = productionSource.indexOf("export async function listStudioProductionUnits(");
+    const listFn = productionSource.slice(listStart, helperStart);
+    expect(listFn).toContain("SELECT * FROM studio_production_units");
+    expect(listFn).toContain("unitSummaryFromRow");
+    expect(listFn).toContain("ensureProductionDirectories");
   });
 });
