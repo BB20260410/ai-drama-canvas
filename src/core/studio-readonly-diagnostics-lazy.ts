@@ -2,7 +2,7 @@
  * Wave 4-D：MCP 只读诊断面冷域。启动路径不得静态拉 earliest / dashboard /
  * projection-bundle / multimedia-timeline / post-result-observation / write-lease /
  * script-reader / script-media-align。
- * 写路径仍走 command-bus / studio-command-executor 原命令；此处只延迟加载同一模块。
+ * 写路径仍走 command-bus 原命令与 executor 调度；此处只延迟加载同一模块。
  */
 export type StudioEpisodeEarliestModule = typeof import("./studio-episode-earliest.js");
 export type StudioProductionProjectionBundleModule = typeof import("./studio-production-projection-bundle.js");
