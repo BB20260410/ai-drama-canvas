@@ -1,7 +1,10 @@
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync } from "node:fs";
+import { realpath } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
+import { evictVerifiedFileCacheAfterLeavingProject } from "../src/core/studio-media-protocol.js";
 import {
   VERIFIED_FILE_CACHE_LIMIT,
   evictVerifiedFileCacheForProject,
@@ -57,7 +60,35 @@ describe("Wave 5-E verifiedFileCache 按工程分桶", () => {
     expect(protocol).toContain("rememberVerifiedFile");
     expect(protocol).toContain("getVerifiedFileLookup");
     expect(protocol).toContain("evictVerifiedFileCacheForProject");
+    expect(protocol).toContain("export async function evictVerifiedFileCacheAfterLeavingProject");
     expect(protocol).not.toMatch(/VERIFIED_FILE_CACHE_LIMIT\s*=\s*4_?096/u);
     expect(protocol).toContain("material-studio-thumb:v1:autorotate:inside-512:no-enlarge:webp-q82");
+  });
+
+  it("离开工程淘汰该工程桶，保留其他工程，空根不做事", async () => {
+    expect(await evictVerifiedFileCacheAfterLeavingProject(null)).toBe(0);
+    expect(await evictVerifiedFileCacheAfterLeavingProject("")).toBe(0);
+    const dir = mkdtempSync(path.join(os.tmpdir(), "w5e-leave-"));
+    const resolved = path.resolve(dir);
+    const canonical = await realpath(resolved);
+    seed("/tmp/keep-other", 0);
+    seed(resolved, 0);
+    if (canonical !== resolved) seed(canonical, 1);
+    const removed = await evictVerifiedFileCacheAfterLeavingProject(dir);
+    expect(removed).toBeGreaterThan(0);
+    expect(verifiedFileCacheSize()).toBe(1);
+    expect(verifiedFileCacheBucketCount()).toBe(1);
+  });
+
+  it("Main 切工程关闭账本 watcher 时淘汰旧工程缓存；画布不假接线", () => {
+    const main = readFileSync(path.join(root, "src/main/index.ts"), "utf8");
+    const canvas = readFileSync(path.join(root, "src/renderer/src/components/ManagedStudioCanvasView.vue"), "utf8");
+    expect(main).toContain("evictVerifiedFileCacheAfterLeavingProject");
+    expect(main).toContain("async function evictVerifiedFileCacheForClosedProject");
+    expect(main).toContain("previousRoot !== targetRoot");
+    expect(main).toContain("await evictVerifiedFileCacheForClosedProject(previousRoot)");
+    expect(main).toContain("await evictVerifiedFileCacheForClosedProject(closingRoot)");
+    expect(canvas).toContain("thumbnailLru.clear()");
+    expect(canvas).not.toContain("evictVerifiedFileCache");
   });
 });

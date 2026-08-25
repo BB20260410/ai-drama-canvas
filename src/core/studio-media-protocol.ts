@@ -781,6 +781,24 @@ function fileIdentityKey(value: FileIdentity): string {
 export { evictVerifiedFileCacheForProject, VERIFIED_FILE_CACHE_LIMIT };
 
 /**
+ * 离开工程时淘汰该工程 verifiedFileCache 桶。
+ * 同时打 resolve 与 realpath 两键：媒体协议按 realpath 分桶，Main watcher 记 path.resolve。
+ * 目录已不可读时仍淘汰 resolve 键。不得扩大 2048 上限。
+ */
+export async function evictVerifiedFileCacheAfterLeavingProject(projectRoot: string | null | undefined): Promise<number> {
+  if (typeof projectRoot !== "string" || !projectRoot.trim()) return 0;
+  const resolved = path.resolve(projectRoot.trim());
+  let removed = evictVerifiedFileCacheForProject(resolved);
+  try {
+    const canonical = await realpath(resolved);
+    if (canonical !== resolved) removed += evictVerifiedFileCacheForProject(canonical);
+  } catch {
+    // 切走后工程根可能已不存在；resolve 键已淘汰即可。
+  }
+  return removed;
+}
+
+/**
  * 缓存只跳过整文件 SHA；每次请求仍重新走完整路径链 lstat/realpath，并比较
  * dev/ino/size/mtime/ctime。缓存键同时绑定工程、冻结记录、期望内容与规范路径。
  */

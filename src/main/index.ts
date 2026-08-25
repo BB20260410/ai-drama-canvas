@@ -180,7 +180,7 @@ import { getCanonicalAsset, getCanonicalAssetCatalogState, listCanonicalAssets, 
 import { FUSION_STORYBOARD_BEAT_ALGORITHM_VERSION, FUSION_STORYBOARD_VISIBLE_TIME_POLICY_VERSION } from "../core/fusion-storyboard-grid.js";
 import { getFusionStoryboardSheetState, listFusionStoryboardSheets } from "../core/fusion-storyboard-sheet-evidence.js";
 import type { AgentSkillCategory, CanvasEntity, CanvasSemanticLink, EditProject, GenerationKind, GenerationSettings, ProjectConfig, ProjectContextKind, ProjectImportMode, ProjectImportOptions, ReviewDecision, ShotTiming, StoryEventStatus, SubmitReviewInput, TaskPack, WorkItemStatus } from "../core/types.js";
-import { streamStudioMediaRequest, StudioMediaProtocolError } from "../core/studio-media-protocol.js";
+import { evictVerifiedFileCacheAfterLeavingProject, streamStudioMediaRequest, StudioMediaProtocolError } from "../core/studio-media-protocol.js";
 import { LEGACY_THUMBNAIL_PLACEHOLDER_WEBP, resolveLegacyThumbnail } from "../core/legacy-thumbnails.js";
 import {
   getStudioMediaDerivatives,
@@ -1016,14 +1016,30 @@ async function ensureStudioGenerationLedgerWatcher(projectRoot: string): Promise
   return next;
 }
 
+async function evictVerifiedFileCacheForClosedProject(projectRoot: string | null): Promise<void> {
+  if (!projectRoot) return;
+  try {
+    await evictVerifiedFileCacheAfterLeavingProject(projectRoot);
+  } catch {
+    // 切工程淘汰失败不得挡住 watcher 关闭或挂载。
+  }
+}
+
 async function ensureStudioGenerationLedgerWatcherExclusive(projectRoot: string): Promise<void> {
   if (appQuitOperationAdmission.isClosed()) throw new Error("应用正在退出，禁止新建生成账本 watcher。");
   const targetRoot = path.resolve(projectRoot);
   if (generationLedgerWatchedRoot === targetRoot && generationLedgerWatcher) return;
   const previous = generationLedgerWatcher;
+  const previousRoot = generationLedgerWatchedRoot;
   generationLedgerWatcher = null;
   generationLedgerWatchedRoot = null;
-  await previous?.close();
+  try {
+    await previous?.close();
+  } finally {
+    if (previousRoot && previousRoot !== targetRoot) {
+      await evictVerifiedFileCacheForClosedProject(previousRoot);
+    }
+  }
   if (appQuitOperationAdmission.isClosed()) throw new Error("应用正在退出，禁止新建生成账本 watcher。");
   generationLedgerWatcher = createStudioGenerationLedgerWatcher({
     projectRoot: targetRoot,
@@ -1041,9 +1057,14 @@ async function ensureStudioGenerationLedgerWatcherExclusive(projectRoot: string)
 async function closeStudioGenerationLedgerWatcher(): Promise<void> {
   const next = generationLedgerWatcherChain.then(async () => {
     const closing = generationLedgerWatcher;
+    const closingRoot = generationLedgerWatchedRoot;
     generationLedgerWatcher = null;
     generationLedgerWatchedRoot = null;
-    await closing?.close();
+    try {
+      await closing?.close();
+    } finally {
+      await evictVerifiedFileCacheForClosedProject(closingRoot);
+    }
   });
   generationLedgerWatcherChain = next.catch(() => undefined);
   return next;
