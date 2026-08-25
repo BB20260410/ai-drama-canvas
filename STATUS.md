@@ -4,19 +4,20 @@
 
 | 字段 | 当前值 |
 |---|---|
-| status | `in_progress`：W1 + W2-A/B 已落地；整计划未关账 |
+| status | `in_progress`：W1 + W2-A/B/D/E/F 已落地；W2-C 需 Darwin；整计划未关账 |
 | plan | `docs/PLAN_运行速度与内存占用长期执行_20260825.md` |
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
-| evidence | `docs/evidence/runtime-perf-memory-wave1a-20260825.json`、wave1b、wave1c、wave2a、wave2b |
+| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2a/b/d/e/f` |
 | wave1b | CLI `scripts/report-approved-timeline-full.ts` 显式 `fastMode: false` + `durationMs`；日常诊断/canonical 仍显式 true |
 | wave1c | resolver + CLI 合同测 Linux 6 PASS；P7 fixture 需 Darwin |
 | wave2a | `resolveApprovedTimelineBound`：unitIds/limit 上限 36；省略=整集；空数组失败关闭 |
 | wave2b | 画布 / composable 可见页传 unitIds；空可见集不回退整集 |
 | wave2d | 账本/计划风暴并入 scheduleUnitGridGraphRebuild 单 rAF |
 | wave2e | 节点 >80 默认关 MiniMap；invalidate 清用户覆盖 |
-| earliest_next | **Wave 2-F**：切工程 `thumbnailLru.clear()` |
+| wave2f | 切工程 thumbnailLru.clear()；DOM counts 含参考/连续性/边 |
+| earliest_next | **Wave 3-A**：只读 `inspectManagedProjectReadOnly` |
 
 ## 2026-08-25 · 本机人物库同步
 

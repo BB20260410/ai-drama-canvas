@@ -711,7 +711,7 @@
         <details class="flow-caption technical-diagnostics">
           <summary data-testid="managed-canvas-diagnostics">诊断详情</summary>
           <div data-testid="managed-canvas-dom-counts">
-            <span>当前 DOM：{{ assetNodeCount }} 资产 · {{ unitNodeCount }} 单元 · {{ panelNodeCount }} 宫格 · {{ pipelineNodeCount }} 结果/审片 · {{ textDocumentCount }} 文稿</span>
+            <span>当前 DOM：{{ assetNodeCount }} 资产 · {{ unitNodeCount }} 单元 · {{ panelNodeCount }} 宫格 · {{ pipelineNodeCount }} 结果/审片 · {{ referenceNodeCount }} 参考 · {{ continuityNodeCount }} 连续性 · {{ edgeObjectCount }} 边 · {{ textDocumentCount }} 文稿</span>
             <span data-testid="managed-canvas-thumb-count">有图节点 {{ thumbnailNodeCount }}</span>
             <span>缩放 {{ Math.round(zoom * 100) }}%</span>
             <span data-testid="managed-canvas-layout-status">{{ layoutStatusLabel }}</span>
@@ -2154,6 +2154,13 @@ const pipelineNodeCount = computed(() => nodes.value.filter((node) => {
   const kind = (node.data as { kind?: string } | undefined)?.kind;
   return kind === "raw" || kind === "labeled" || kind === "review";
 }).length);
+const referenceNodeCount = computed(() => nodes.value.filter((node) => (
+  (node.data as { kind?: string } | undefined)?.kind === "reference"
+)).length);
+const continuityNodeCount = computed(() => nodes.value.filter((node) => (
+  (node.data as { kind?: string } | undefined)?.kind === "continuity"
+)).length);
+const edgeObjectCount = computed(() => edges.value.length);
 const textDocumentCount = computed(() => textDocuments.value.length);
 const thumbnailNodeCount = computed(() => {
   const projectedAssets = workspaceMode.value === "workflow"
@@ -8518,6 +8525,7 @@ watch(() => props.projectRoot, async (_projectRoot, previousProjectRoot) => {
   unitGridNonPassPipeline.value = new Map();
   unitGridCorePassUnits.value = new Set();
   frozenReferenceThumbnailCache.clear();
+  thumbnailLru.clear();
   studioThumbnailDerivationFailed.clear();
   // T12/T13：切工程时失效在途投影请求并清空旧工程的投影/summary，不跨工程残留。
   timelineProjection.reset();

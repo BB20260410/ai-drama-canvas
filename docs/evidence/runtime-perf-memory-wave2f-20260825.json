@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "2-F",
+  "recordedAt": "2026-08-25T14:46:00Z",
+  "change": {
+    "thumbnailLruClearedOnProjectSwitch": true,
+    "domCountsIncludeReferenceContinuityEdges": true,
+    "urlOnlyLru": true
+  },
+  "claim": "W2-F：切工程清 thumbnailLru；诊断计数含参考/连续性/边。不缓存媒体二进制。"
+}

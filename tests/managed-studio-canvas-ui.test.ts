@@ -345,6 +345,9 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain('data-testid="managed-canvas-minimap"');
     expect(canvas).toContain("MINIMAP_AUTO_HIDE_AFTER_NODES");
     expect(canvas).toContain("miniMapUserOverride");
+    expect(canvas).toContain("thumbnailLru.clear()");
+    expect(canvas).toContain("referenceNodeCount");
+    expect(canvas).toContain("continuityNodeCount");
     expect(canvas).toContain("@nodes-change=\"onNodesChange\"");
     expect(canvas).toContain("extractStudioCanvasPanelIdsFromSelection");
     expect(canvas).toContain("createStudioCanvasWorkflowGroup");

@@ -12,7 +12,8 @@
 - [x] Wave 2-B：画布可见页只请求 unitIds
 - [x] Wave 2-D：账本/计划风暴并入单 rAF
 - [x] Wave 2-E：MiniMap 节点 >80 默认关
-- [ ] Wave 2-C/F：P7 有界对照（Darwin）；切工程清 LRU
+- [x] Wave 2-F：切工程清 LRU；DOM counts 含参考/连续性
+- [ ] Wave 2-C：P7 有界对照（需 Darwin）
 - [ ] Wave 3：只读投影改 `inspectManagedProjectReadOnly`；earliest 去 per-unit snapshot；ssl5 不二次 earliest
 - [ ] Wave 4：MCP/Main 冷域动态 import（editor / story+mammoth / novel / video-package；抄 Main IPC `await import`；禁拆 command-bus 写路径）
 - [ ] Wave 5：列表只绑缩略图；legacy thumb 不先整文件读入；审片默认 thumb；derivative 不校源全 SHA
