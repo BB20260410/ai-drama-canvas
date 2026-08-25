@@ -808,6 +808,7 @@ import type {
   MaterialStudioUiEntry,
   MaterialStudioUiPage,
 } from "../material-studio-ui-contract";
+import { createBoundedKeyedCache } from "../use-bounded-keyed-cache.js";
 import { createThumbnailLru } from "../use-thumbnail-lru.js";
 import { computeVirtualListWindow, sliceVirtualWindow } from "../use-virtual-list.js";
 import { LatestBoundedTaskQueue } from "../bounded-task-queue.js";
@@ -1374,7 +1375,7 @@ const unitGridVideoPackagePipeline = ref(new Map<string, UnitGridVideoPackagePro
 const unitGridNonPassPipeline = ref(new Map<string, UnitGridNonPassProjection>());
 /** 核心投影判 PASS 的可见单元集合（唯一裁决的落地缓存）：区分“已通过·投影恢复中”与“等待检查”。 */
 const unitGridCorePassUnits = ref(new Set<string>());
-const frozenReferenceThumbnailCache = new Map<string, Promise<FrozenReferenceThumbnailResult>>();
+const frozenReferenceThumbnailCache = createBoundedKeyedCache<Promise<FrozenReferenceThumbnailResult>>(96);
 // 冻结参考闭包会同时复验多个本地 CAS 缩略图；generation-run 路径含 history+media+pack。
 // 超时必须 AbortController.abort，并丢弃迟到 IPC 结果（见 unit-grid-projection-read-gate）。
 const UNIT_GRID_RAW_PROJECTION_READ_TIMEOUT_MS = UNIT_GRID_RAW_PROJECTION_READ_TIMEOUT_MS_DEFAULT;

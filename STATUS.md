@@ -9,7 +9,7 @@
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
 | models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
-| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`（含 `wave2c`、`wave2-bundle-approved-bound`）、`wave3*`、`wave4a`–`wave4f`、`wave4-capabilities-deferred-engine`、`wave4-novel-analysis-lazy`、`wave4-capabilities-settings-thin`、`wave5a`–`wave5e`、`wave5e-project-switch-evict`、`wave5e-stale-writeback-guard`、`wave5e-darwin-ci`、`wave5-list-flip-source-contract`、`wave5-list-flip-protocol-classify`、`wave6a`–`wave6c`、`wave6-reverify`、`wave6-darwin-ci-0b46327` |
+| evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`（含 `wave2c`、`wave2-bundle-approved-bound`、`wave2f-reference-cache-lru`）、`wave3*`、`wave4a`–`wave4f`、`wave4-capabilities-deferred-engine`、`wave4-novel-analysis-lazy`、`wave4-capabilities-settings-thin`、`wave5a`–`wave5e`、`wave5e-project-switch-evict`、`wave5e-stale-writeback-guard`、`wave5e-darwin-ci`、`wave5-list-flip-source-contract`、`wave5-list-flip-protocol-classify`、`wave6a`–`wave6c`、`wave6-reverify`、`wave6-darwin-ci-0b46327` |
 | wave4b | story/adaptation/novel-agent 经 withX 动态 import；story.ts 顶栏已卸 mammoth（docx 分支动态加载）。doctor 仍会 `import("mammoth")` 探测；snapshot 会 withStory，doctor 会 withStory+withAdaptation |
 | wave4c | video-package / Higgsfield queue+video / dudu / local-creative 经 withX。mcp-projection 仍静态（同步消毒、无重依赖）。调用对应控制面/写命令仍会加载 |
 | wave4d | MCP 只读诊断面 earliest / bundle / dashboard / multimedia / write-lease / reader / align 经 withX；session-snapshot 不再静态拉 bundle。command-bus 仍静态拉 ledger。codex 仍静态拉 session-snapshot.js 本身。Main dashboard 顶栏未卸（T23）。get_active_managed_studio_context 仍会加载 write-lease |
@@ -21,7 +21,7 @@
 | wave2-bundle | 驾驶舱 bundle 正式时间线只物化当前+前后邻（最多 3）；多媒体 storyboard 只请求当前 unitId。阶段名仍是 `timeline-approved-neighbors`。earliest/diagnostics 仍整集 |
 | wave2d | 账本/计划风暴并入 scheduleUnitGridGraphRebuild 单 rAF |
 | wave2e | 节点 >80 默认关 MiniMap；invalidate 清用户覆盖 |
-| wave2f | 切工程 thumbnailLru.clear()；DOM counts 含参考/连续性/边 |
+| wave2f | 切工程 thumbnailLru.clear()；DOM counts 含参考/连续性/边；frozenReferenceThumbnailCache 同工程 LRU 硬顶 96（只持 Promise/URL） |
 | wave3a | earliest / timeline 入口改 `inspectManagedProjectReadOnly`；earliest 租约改只读 |
 | wave3b | `assertGenerationLedgerSchemaFileReady`：缺库/无 schema 失败关闭且不建库；时间线与 earliest 在批读/checkpoint 前调用 |
 | wave3c | earliest 槽位 revision 只用 list 行；不再 `getStudioProductionUnitSnapshot` |
