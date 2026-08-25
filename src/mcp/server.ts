@@ -103,8 +103,12 @@ import {
   type PanelVisualConstraint,
 } from "../core/fusion-visual-constraints.js";
 import { inspectManagedProject } from "../core/managed-project.js";
-import { getLocalCreativeProjectIngestStatus } from "../core/local-creative-project-ingest-status.js";
-import { previewLocalCreativeProductionUnits } from "../core/local-creative-production-unit-preview.js";
+import {
+  withLocalCreativeIngestStatus,
+  withLocalCreativePreview,
+  type LocalCreativeIngestStatusModule,
+  type LocalCreativePreviewModule,
+} from "../core/local-creative-lazy.js";
 import {
   getMaterialStudioState,
   getStudioCanonicalAsset,
@@ -162,17 +166,15 @@ import {
 } from "../core/studio-production-dashboard.js";
 import { getStudioMultimediaTimelineProjection } from "../core/studio-multimedia-timeline.js";
 import { getActiveManagedStudioContext } from "../core/active-managed-studio-context.js";
+import { withDuduReadonlyImport, type DuduReadonlyImportModule } from "../core/dudu-readonly-import-lazy.js";
+import { withStudioVideoPackage, type StudioVideoPackageModule } from "../core/studio-video-package-lazy.js";
+import type { StudioVideoPackageAuthorityInput } from "../core/studio-video-package.js";
 import {
-  discoverDuduReadonlyImportProjects,
-  getDuduReadonlyImportControl,
-  resolveDuduReadonlyImportCommandRoot,
-} from "../core/dudu-readonly-import.js";
-import {
-  getStudioVideoPackageControl,
-  type StudioVideoPackageAuthorityInput,
-} from "../core/studio-video-package.js";
-import { getStudioHiggsfieldVideoGenerationControl } from "../core/studio-higgsfield-video-generation.js";
-import { getStudioHiggsfieldConnectorWorkQueue } from "../core/studio-higgsfield-connector-queue.js";
+  withHiggsfieldQueue,
+  withHiggsfieldVideo,
+  type HiggsfieldQueueModule,
+  type HiggsfieldVideoModule,
+} from "../core/studio-higgsfield-lazy.js";
 import { projectHiggsfieldPrepareConnectorRequestForMcp } from "../core/studio-higgsfield-mcp-projection.js";
 import { AI_CANVAS_APPLICATION_VERSION, readRuntimeReleaseManifest } from "../core/release-manifest.js";
 import { STUDIO_CODEX_PUBLIC_COMMAND_SCHEMA_OPTIONS, studioSha256Schema } from "../core/studio-command-runtime.js";
@@ -249,6 +251,22 @@ const readNovelManuscriptRange = (...args: Parameters<NovelAgentModule["readNove
   withNovelAgent((novelAgent) => novelAgent.readNovelManuscriptRange(...args));
 const searchNovelManuscript = (...args: Parameters<NovelAgentModule["searchNovelManuscript"]>) =>
   withNovelAgent((novelAgent) => novelAgent.searchNovelManuscript(...args));
+const getLocalCreativeProjectIngestStatus = (...args: Parameters<LocalCreativeIngestStatusModule["getLocalCreativeProjectIngestStatus"]>) =>
+  withLocalCreativeIngestStatus((ingest) => ingest.getLocalCreativeProjectIngestStatus(...args));
+const previewLocalCreativeProductionUnits = (...args: Parameters<LocalCreativePreviewModule["previewLocalCreativeProductionUnits"]>) =>
+  withLocalCreativePreview((preview) => preview.previewLocalCreativeProductionUnits(...args));
+const discoverDuduReadonlyImportProjects = (...args: Parameters<DuduReadonlyImportModule["discoverDuduReadonlyImportProjects"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.discoverDuduReadonlyImportProjects(...args));
+const getDuduReadonlyImportControl = (...args: Parameters<DuduReadonlyImportModule["getDuduReadonlyImportControl"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.getDuduReadonlyImportControl(...args));
+const resolveDuduReadonlyImportCommandRoot = (...args: Parameters<DuduReadonlyImportModule["resolveDuduReadonlyImportCommandRoot"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.resolveDuduReadonlyImportCommandRoot(...args));
+const getStudioVideoPackageControl = (...args: Parameters<StudioVideoPackageModule["getStudioVideoPackageControl"]>) =>
+  withStudioVideoPackage((videoPackage) => videoPackage.getStudioVideoPackageControl(...args));
+const getStudioHiggsfieldVideoGenerationControl = (...args: Parameters<HiggsfieldVideoModule["getStudioHiggsfieldVideoGenerationControl"]>) =>
+  withHiggsfieldVideo((higgsfield) => higgsfield.getStudioHiggsfieldVideoGenerationControl(...args));
+const getStudioHiggsfieldConnectorWorkQueue = (...args: Parameters<HiggsfieldQueueModule["getStudioHiggsfieldConnectorWorkQueue"]>) =>
+  withHiggsfieldQueue((queue) => queue.getStudioHiggsfieldConnectorWorkQueue(...args));
 
 const server = new McpServer({
   name: "ai-drama-canvas",

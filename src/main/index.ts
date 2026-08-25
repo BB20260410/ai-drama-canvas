@@ -233,16 +233,10 @@ import {
   reconcileCanvasProjectionOutbox,
   replayUnconsumedCanvasProjectionEvents,
 } from "../core/studio-canvas-projection-outbox.js";
-import {
-  discoverDuduReadonlyImportProjects,
-  getDuduReadonlyImportControl,
-} from "../core/dudu-readonly-import.js";
-import {
-  getStudioVideoPackageControl,
-  toStudioVideoPackagePublicControlLookup,
-  type StudioVideoPackageControlQuery,
-} from "../core/studio-video-package.js";
-import { getStudioHiggsfieldVideoGenerationControl } from "../core/studio-higgsfield-video-generation.js";
+import { withDuduReadonlyImport, type DuduReadonlyImportModule } from "../core/dudu-readonly-import-lazy.js";
+import { withStudioVideoPackage, type StudioVideoPackageModule } from "../core/studio-video-package-lazy.js";
+import type { StudioVideoPackageControlQuery } from "../core/studio-video-package.js";
+import { withHiggsfieldVideo, type HiggsfieldVideoModule } from "../core/studio-higgsfield-lazy.js";
 import { buildStudioGenerationPlanProgress } from "../core/studio-generation-plan-progress.js";
 import { createStudioGenerationLedgerWatcher, type StudioGenerationLedgerWatcherHandle } from "./studio-generation-ledger-watcher.js";
 import { registerStudioGlobalResourceReadIpc } from "./studio-global-resource-read-ipc.js";
@@ -332,6 +326,16 @@ const upsertNovelFact = (...args: Parameters<AdaptationModule["upsertNovelFact"]
   withAdaptation((adaptation) => adaptation.upsertNovelFact(...args));
 const validateAdaptationPlan = (...args: Parameters<AdaptationModule["validateAdaptationPlan"]>) =>
   withAdaptation((adaptation) => adaptation.validateAdaptationPlan(...args));
+const discoverDuduReadonlyImportProjects = (...args: Parameters<DuduReadonlyImportModule["discoverDuduReadonlyImportProjects"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.discoverDuduReadonlyImportProjects(...args));
+const getDuduReadonlyImportControl = (...args: Parameters<DuduReadonlyImportModule["getDuduReadonlyImportControl"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.getDuduReadonlyImportControl(...args));
+const getStudioVideoPackageControl = (...args: Parameters<StudioVideoPackageModule["getStudioVideoPackageControl"]>) =>
+  withStudioVideoPackage((videoPackage) => videoPackage.getStudioVideoPackageControl(...args));
+const toStudioVideoPackagePublicControlLookup = (...args: Parameters<StudioVideoPackageModule["toStudioVideoPackagePublicControlLookup"]>) =>
+  withStudioVideoPackage((videoPackage) => videoPackage.toStudioVideoPackagePublicControlLookup(...args));
+const getStudioHiggsfieldVideoGenerationControl = (...args: Parameters<HiggsfieldVideoModule["getStudioHiggsfieldVideoGenerationControl"]>) =>
+  withHiggsfieldVideo((higgsfield) => higgsfield.getStudioHiggsfieldVideoGenerationControl(...args));
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url));
 const sourceRuntimeWorkspace = path.resolve(currentDir, "../..");

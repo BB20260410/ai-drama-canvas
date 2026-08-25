@@ -346,12 +346,8 @@ import {
   type StudioMultimediaTimelineRole,
 } from "./studio-multimedia-timeline.js";
 
-import {
-  getStudioVideoPackageControl, // 修正点 4（3/4）：本轮真正调用，见主入口 videoPackage
-  type StudioVideoPackageControlLookup,
-  type StudioVideoPackageControlQuery,
-  type StudioVideoPackageAuthorityInput,
-} from "./studio-video-package.js";
+import { withStudioVideoPackage } from "./studio-video-package-lazy.js";
+import type { StudioVideoPackageControlLookup, StudioVideoPackageControlQuery, StudioVideoPackageAuthorityInput } from "./studio-video-package.js";
 
 import {
   getStudioMedia,
@@ -1288,7 +1284,7 @@ export async function buildStudioProductionProjectionBundle(
     ? { by: "authority-latest", authority: { kind: "studio-review", reviewId: ownReviewId } satisfies StudioVideoPackageAuthorityInput }
     : undefined;
   const videoPackageControlPromise = videoPackageQuery
-    ? getStudioVideoPackageControl(projectRoot, videoPackageQuery)
+    ? withStudioVideoPackage((videoPackage) => videoPackage.getStudioVideoPackageControl(projectRoot, videoPackageQuery))
     : Promise.resolve(undefined);
 
   // 步骤 6：相邻摘要、冻结包和视频包并行读取。

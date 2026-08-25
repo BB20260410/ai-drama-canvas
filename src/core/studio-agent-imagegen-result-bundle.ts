@@ -46,7 +46,7 @@ import {
   renderStudioUnitGridLabeledLayoutToBuffer,
 } from "./studio-labeled-layout.js";
 import { assertStudioImagegenCandidatePathAllowed } from "./studio-imagegen-candidate-gate.js";
-import { assertNoActiveStudioHiggsfieldConnectorReservation } from "./studio-higgsfield-connector-queue.js";
+import { withHiggsfieldQueue } from "./studio-higgsfield-lazy.js";
 import { inspectManagedProjectReadOnly } from "./managed-project.js";
 import {
   ensureConfinedDirectory,
@@ -1086,7 +1086,7 @@ export async function commitAgentImagegenResultBundle(
     fail("invalid-input", "expectedRevision 必须是正整数。");
   }
   // Direct callers must fail before raw inspection, labeled render, material CAS or writeback receipt work.
-  await assertNoActiveStudioHiggsfieldConnectorReservation(projectRoot, generationRunId);
+  await withHiggsfieldQueue((queue) => queue.assertNoActiveStudioHiggsfieldConnectorReservation(projectRoot, generationRunId));
   const context = await assertActiveManagedStudioContextToken(projectRoot, input.projectContextToken);
   const executionReceipt = normalizeExecutionReceipt(input.executionReceipt, input.provider);
   const verified = await verifyPackAndDispatch({

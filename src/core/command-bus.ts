@@ -193,45 +193,46 @@ import {
   ActiveManagedStudioContextError,
   assertActiveManagedStudioContextToken,
 } from "./active-managed-studio-context.js";
-import {
-  DuduReadonlyControlConflictError,
-  discoverDuduReadonlyImportProjects,
-  getDuduReadonlyImportControl,
-  proveDuduReadonlyFinalizationOutcome,
-  readDuduReadonlyFinalizationOutcomeByOperationId,
-  readDuduReadonlyStageOutcomeByOperationId,
-  proveDuduReadonlyStageCommandOutcome,
-  resolveDuduReadonlyImportCommandRoot,
-  stageDuduReadonlyManagedProject,
-  summarizeDuduReadonlyStageResult,
-  type StageDuduReadonlyManagedProjectInput,
-} from "./dudu-readonly-import.js";
+import { withDuduReadonlyImport, type DuduReadonlyImportModule } from "./dudu-readonly-import-lazy.js";
+import type { StageDuduReadonlyManagedProjectInput } from "./dudu-readonly-import.js";
 import type { DuduReadonlySourceInput } from "./dudu-readonly-source.js";
-import {
-  getStudioVideoPackageControl,
-  readStudioVideoPackageBuildReceiptByOperationIdReadOnly,
-  readStudioVideoPackageExportIntentByOperationId,
-  type StudioVideoPackageAuthorityInput,
-  type StudioVideoPackageExpectedManagedSource,
-} from "./studio-video-package.js";
-import type {
-  AttestStudioHiggsfieldConnectorCapabilityInput,
-  RecordStudioHiggsfieldSubmissionInput,
-} from "./studio-higgsfield-video-generation.js";
-import type {
-  reconcileStudioHiggsfieldConnectorRequest,
-  HiggsfieldDirectUnlimitedObservation,
-} from "./studio-higgsfield-connector-queue.js";
+import { withStudioVideoPackage, type StudioVideoPackageModule } from "./studio-video-package-lazy.js";
+import type { StudioVideoPackageAuthorityInput, StudioVideoPackageExpectedManagedSource } from "./studio-video-package.js";
+import type { AttestStudioHiggsfieldConnectorCapabilityInput, RecordStudioHiggsfieldSubmissionInput } from "./studio-higgsfield-video-generation.js";
+import type { reconcileStudioHiggsfieldConnectorRequest, HiggsfieldDirectUnlimitedObservation } from "./studio-higgsfield-connector-queue.js";
 import {
   readStudioMultimediaTimelineBindingByOperationId,
   type AttachStudioMultimediaTimelineMediaInput,
 } from "./studio-multimedia-timeline.js";
-import {
-  materializeLocalCreativeProductionUnits,
-  readLocalCreativeProductionUnitMaterializationOutcomeReadOnly,
-  type LocalCreativeProductionUnitMaterializationReceipt,
-  type MaterializeLocalCreativeProductionUnitsInput,
-} from "./local-creative-production-unit-materializer.js";
+import { withLocalCreativeMaterializer, type LocalCreativeMaterializerModule } from "./local-creative-lazy.js";
+import type { LocalCreativeProductionUnitMaterializationReceipt, MaterializeLocalCreativeProductionUnitsInput } from "./local-creative-production-unit-materializer.js";
+
+const discoverDuduReadonlyImportProjects = (...args: Parameters<DuduReadonlyImportModule["discoverDuduReadonlyImportProjects"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.discoverDuduReadonlyImportProjects(...args));
+const proveDuduReadonlyFinalizationOutcome = (...args: Parameters<DuduReadonlyImportModule["proveDuduReadonlyFinalizationOutcome"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.proveDuduReadonlyFinalizationOutcome(...args));
+const readDuduReadonlyFinalizationOutcomeByOperationId = (...args: Parameters<DuduReadonlyImportModule["readDuduReadonlyFinalizationOutcomeByOperationId"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.readDuduReadonlyFinalizationOutcomeByOperationId(...args));
+const readDuduReadonlyStageOutcomeByOperationId = (...args: Parameters<DuduReadonlyImportModule["readDuduReadonlyStageOutcomeByOperationId"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.readDuduReadonlyStageOutcomeByOperationId(...args));
+const proveDuduReadonlyStageCommandOutcome = (...args: Parameters<DuduReadonlyImportModule["proveDuduReadonlyStageCommandOutcome"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.proveDuduReadonlyStageCommandOutcome(...args));
+const resolveDuduReadonlyImportCommandRoot = (...args: Parameters<DuduReadonlyImportModule["resolveDuduReadonlyImportCommandRoot"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.resolveDuduReadonlyImportCommandRoot(...args));
+const stageDuduReadonlyManagedProject = (...args: Parameters<DuduReadonlyImportModule["stageDuduReadonlyManagedProject"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.stageDuduReadonlyManagedProject(...args));
+const summarizeDuduReadonlyStageResult = (...args: Parameters<DuduReadonlyImportModule["summarizeDuduReadonlyStageResult"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.summarizeDuduReadonlyStageResult(...args));
+const getStudioVideoPackageControl = (...args: Parameters<StudioVideoPackageModule["getStudioVideoPackageControl"]>) =>
+  withStudioVideoPackage((videoPackage) => videoPackage.getStudioVideoPackageControl(...args));
+const readStudioVideoPackageBuildReceiptByOperationIdReadOnly = (...args: Parameters<StudioVideoPackageModule["readStudioVideoPackageBuildReceiptByOperationIdReadOnly"]>) =>
+  withStudioVideoPackage((videoPackage) => videoPackage.readStudioVideoPackageBuildReceiptByOperationIdReadOnly(...args));
+const readStudioVideoPackageExportIntentByOperationId = (...args: Parameters<StudioVideoPackageModule["readStudioVideoPackageExportIntentByOperationId"]>) =>
+  withStudioVideoPackage((videoPackage) => videoPackage.readStudioVideoPackageExportIntentByOperationId(...args));
+const materializeLocalCreativeProductionUnits = (...args: Parameters<LocalCreativeMaterializerModule["materializeLocalCreativeProductionUnits"]>) =>
+  withLocalCreativeMaterializer((materializer) => materializer.materializeLocalCreativeProductionUnits(...args));
+const readLocalCreativeProductionUnitMaterializationOutcomeReadOnly = (...args: Parameters<LocalCreativeMaterializerModule["readLocalCreativeProductionUnitMaterializationOutcomeReadOnly"]>) =>
+  withLocalCreativeMaterializer((materializer) => materializer.readLocalCreativeProductionUnitMaterializationOutcomeReadOnly(...args));
 
 export type AppendStudioContinuityObservationCommandPayload = Omit<AppendStudioContinuityObservationInput, "operationId">;
 export type AppendStudioContinuityCorrectionCommandPayload = Omit<AppendStudioContinuityCorrectionInput, "operationId">;
@@ -5078,13 +5079,15 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
           expectedDiscoveryFingerprint: request.payload.expectedDiscoveryFingerprint,
         }));
       } catch (error) {
-        if (error instanceof DuduReadonlyControlConflictError) {
+        const conflict = await withDuduReadonlyImport((dudu) =>
+          error instanceof dudu.DuduReadonlyControlConflictError ? error : null);
+        if (conflict) {
           rejectP30OrchestrationCommand({
             entityType: "dudu_readonly_import",
             reason: "control_conflict",
-            message: error.message,
-            expectedFingerprint: error.expectedFingerprint ?? request.payload.expectedDiscoveryFingerprint,
-            currentFingerprint: error.currentFingerprint,
+            message: conflict.message,
+            expectedFingerprint: conflict.expectedFingerprint ?? request.payload.expectedDiscoveryFingerprint,
+            currentFingerprint: conflict.currentFingerprint,
           });
         }
         throw error;

@@ -68,14 +68,11 @@ import {
   type ProjectShell,
 } from "./managed-project.js";
 import {
-  inspectLocalCreativeSourceInventory,
-  type LocalCreativeSourceInventoryLayer,
-  type LocalCreativeSourceInventorySnapshot,
-} from "./local-creative-source-inventory.js";
-import {
-  verifyLocalCreativeContentImportSummaryCompletionBaseline,
-  type LocalCreativeProjectContentImportSummary,
-} from "./local-creative-project-content-import.js";
+  withLocalCreativeContentImport,
+  withLocalCreativeInventory,
+} from "./local-creative-lazy.js";
+import type { LocalCreativeSourceInventoryLayer, LocalCreativeSourceInventorySnapshot } from "./local-creative-source-inventory.js";
+import type { LocalCreativeProjectContentImportSummary } from "./local-creative-project-content-import.js";
 import { readMaterialStudioProjectCenterCounts } from "./material-studio.js";
 
 export interface PersistedScanOptions {
@@ -335,9 +332,9 @@ async function readLocalCreativeContentImportSummary(
   let sourceVerificationError: string | undefined;
   if (options.refreshSource) {
     try {
-      currentInventory = await inspectLocalCreativeSourceInventory(sourceContext.sourceLayers, {
+      currentInventory = await withLocalCreativeInventory((inventory) => inventory.inspectLocalCreativeSourceInventory(sourceContext.sourceLayers, {
         ...(options.signal ? { signal: options.signal } : {}),
-      });
+      }));
     } catch (error) {
       if (options.signal?.aborted || (error instanceof Error && error.name === "AbortError")) throw error;
       currentInventory = null;
@@ -391,7 +388,7 @@ async function readLocalCreativeContentImportSummary(
     )
   ));
   const completionBaselineValid = compactSummary
-    ? await verifyLocalCreativeContentImportSummaryCompletionBaseline(projectRoot, compactSummary)
+    ? await withLocalCreativeContentImport((contentImport) => contentImport.verifyLocalCreativeContentImportSummaryCompletionBaseline(projectRoot, compactSummary))
     : false;
   const baseStatus = !record
     ? "not-imported" as const

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "4-C",
+  "recordedAt": "2026-08-25T15:50:00Z",
+  "change": {
+    "loaders": [
+      "src/core/studio-video-package-lazy.ts",
+      "src/core/dudu-readonly-import-lazy.ts",
+      "src/core/studio-higgsfield-lazy.ts",
+      "src/core/local-creative-lazy.ts"
+    ],
+    "startupAndHiddenEdges": [
+      "src/mcp/server.ts",
+      "src/main/index.ts",
+      "src/core/command-bus.ts",
+      "src/core/studio-command-executor.ts",
+      "src/core/service.ts",
+      "src/core/studio-production-projection-bundle.ts",
+      "src/core/studio-agent-imagegen-result-bundle.ts"
+    ],
+    "commandBusWritePathUnmoved": true,
+    "executorCasesUnmoved": true
+  },
+  "tests": [
+    "tests/runtime-perf-wave4c-video-dudu-higgsfield-lazy-import.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "sourceContractTests": { "passed": 4, "platform": "linux" }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W4-C：studio-video-package / Higgsfield video+queue / dudu-readonly-import / local-creative 改为 withX 动态 import。未搬家 command-bus / executor 写命令。",
+  "residual": [
+    "studio-higgsfield-mcp-projection 仍静态：同步消毒器，不依赖 video-package/queue",
+    "调用 get_studio_video_package_control / Higgsfield 控制面 / Dudu 发现 / local-creative ingest 仍会加载对应模块",
+    "projection-bundle 在组装视频包子投影时 withStudioVideoPackage",
+    "commit_agent_imagegen_result_bundle 会 withHiggsfieldQueue 做 reservation 断言",
+    "禁止写成「连上 Agent 永不加载视频包 / Higgsfield / Dudu」"
+  ]
+}
