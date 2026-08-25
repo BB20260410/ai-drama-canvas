@@ -99,7 +99,7 @@ export async function getStudioEpisodeEarliest(
   } = {},
 ): Promise<StudioEpisodeEarliestProjection> {
   const root = path.resolve(projectRoot);
-  // 只读投影：校验受管身份，不 ensure generation ledger，也不在只读路径 activateProject。
+  // 入口身份校验走 ReadOnly inspect。checkpoint 控制面仍可能初始化账本（W3-B）。
   const shell = await inspectManagedProjectReadOnly(root);
   const season = input.season ?? "S1";
   const episode = input.episode ?? "S1E2";

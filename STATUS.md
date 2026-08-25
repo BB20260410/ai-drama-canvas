@@ -17,7 +17,7 @@
 | wave2d | 账本/计划风暴并入 scheduleUnitGridGraphRebuild 单 rAF |
 | wave2e | 节点 >80 默认关 MiniMap；invalidate 清用户覆盖 |
 | wave2f | 切工程 thumbnailLru.clear()；DOM counts 含参考/连续性/边 |
-| wave3a | earliest / timeline 改 `inspectManagedProjectReadOnly`；earliest 租约改只读；align-board 无写 inspect。checkpoint 仍可能 ensure（W3-B） |
+| wave3a | earliest / timeline 入口改 `inspectManagedProjectReadOnly`；earliest 租约改只读。checkpoint / 时间线开库仍可能建 schema（W3-B） |
 | earliest_next | **Wave 3-B**：schema 未初始化失败关闭，不静默建库 |
 
 ## 2026-08-25 · 本机人物库同步

@@ -197,7 +197,7 @@ export async function getApprovedTimelineProjection(
   query: ApprovedTimelineProjectionQuery,
 ): Promise<ApprovedTimelineProjection> {
   const startedAt = Date.now();
-  // 只读投影：校验受管身份，不 ensure generation ledger。
+  // 入口身份校验走 ReadOnly inspect（写版会 ensure ledger）。后续账本批读仍可能开库（W3-B）。
   const shell = await inspectManagedProjectReadOnly(projectRoot);
   const season = query.season ?? "S1";
   const episode = query.episode ?? "S1E1";
