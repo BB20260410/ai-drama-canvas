@@ -267,6 +267,7 @@
           </section>
           <section>
             <b>正式结果</b>
+            <p data-testid="studio-generation-history-next">{{ historyEnvelopeNextLabel(history) }}</p>
             <p v-if="!history.length">尚无原始图或标注图写回；派发只表示本地已登记意图，图片尚未生成。</p>
             <article v-for="item in history" :key="item.resultId" class="result-row">
               <div><strong>{{ item.variant === 'raw' ? '原始图' : '标注图' }}</strong><small>{{ providerLabel(item.provider) }} · {{ reviewStatusLabel(item.status) }}</small></div>
@@ -365,6 +366,7 @@ import {
 import { formatCharacterBackReferences, formatPropBackReferences, formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
 import {
   composeStudioGenerationPlanDraft,
+  historyEnvelopeNextLabel,
   planEnvelopeNextLabel,
   refineStudioGenerationPlanDraftIfUnitGridBlocking,
   type PersistedPlanNodeStatus,

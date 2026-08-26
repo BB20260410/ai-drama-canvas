@@ -225,6 +225,34 @@ export function planOperationEnvelopeNext(input: {
   return planEnvelopeNextFromNodeStatuses(input.statuses ?? []);
 }
 
+export type HistoryEnvelopeItem = {
+  pairComplete?: boolean;
+  status?: string | null;
+};
+
+/**
+ * operation=history 信封下一步。只看本页 items，不翻页、不加 inspect。
+ * 未成对→wait；成对 pending→Review；成对 rejected→retry；空页/全 approved→follow-core-readiness。
+ * 要看最新请 newest-first。不执行、不派发、不重试、不自动 Review PASS。
+ */
+export function historyEnvelopeNext(items: readonly HistoryEnvelopeItem[]): string {
+  if (items.length === 0) return PLAN_ENVELOPE_NEXT_FOLLOW;
+  const complete = items.filter((item) => item.pairComplete);
+  if (complete.length === 0) return PLAN_ENVELOPE_NEXT_WAIT;
+  if (complete.some((item) => item.status === "pending")) return PLAN_ENVELOPE_NEXT_REVIEW;
+  if (complete.some((item) => item.status === "rejected")) return PLAN_ENVELOPE_NEXT_RETRY;
+  return PLAN_ENVELOPE_NEXT_FOLLOW;
+}
+
+/** 生成控制结果列表中文下一步；与 history 信封英文 next 同一套本页优先级。 */
+export function historyEnvelopeNextLabel(items: readonly HistoryEnvelopeItem[]): string {
+  const next = historyEnvelopeNext(items);
+  if (next === PLAN_ENVELOPE_NEXT_WAIT) return "下一步：等待成对写回或对账（不派发）";
+  if (next === PLAN_ENVELOPE_NEXT_REVIEW) return "下一步：Review（不派发）";
+  if (next === PLAN_ENVELOPE_NEXT_RETRY) return "下一步：返工后 retry（不重试、不派发）";
+  return "下一步：跟随 readiness（不派发）";
+}
+
 /**
  * active-runs 信封下一步。本槽 unknown / 未审 / 在途优先；单镜再看同单元 unit-grid。
  * generationBlocked 仍由调用方按本槽 blockingRuns 决定。不执行、不派发、不重试。

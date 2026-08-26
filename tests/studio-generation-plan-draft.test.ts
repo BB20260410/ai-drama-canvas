@@ -15,6 +15,8 @@ import {
   PLAN_ENVELOPE_NEXT_RETRY,
   PLAN_ENVELOPE_NEXT_REVIEW,
   PLAN_ENVELOPE_NEXT_WAIT,
+  historyEnvelopeNext,
+  historyEnvelopeNextLabel,
   planEnvelopeNextFromNodeStatuses,
   planEnvelopeNextLabel,
   planOperationEnvelopeNext,
@@ -262,6 +264,17 @@ describe("create-plan 只读草稿纯函数", () => {
     expect(planEnvelopeNextLabel(["succeeded"])).toContain("Review");
     expect(planEnvelopeNextLabel(["planned"])).toContain("dispatch");
     expect(planEnvelopeNextLabel([])).toContain("create-plan");
+    expect(historyEnvelopeNext([])).toBe(PLAN_ENVELOPE_NEXT_FOLLOW);
+    expect(historyEnvelopeNext([{ pairComplete: false, status: "pending" }])).toBe(PLAN_ENVELOPE_NEXT_WAIT);
+    expect(historyEnvelopeNext([{ pairComplete: true, status: "pending" }])).toBe(PLAN_ENVELOPE_NEXT_REVIEW);
+    expect(historyEnvelopeNext([{ pairComplete: true, status: "rejected" }])).toBe(PLAN_ENVELOPE_NEXT_RETRY);
+    expect(historyEnvelopeNext([{ pairComplete: true, status: "approved" }])).toBe(PLAN_ENVELOPE_NEXT_FOLLOW);
+    expect(historyEnvelopeNext([
+      { pairComplete: true, status: "approved" },
+      { pairComplete: true, status: "pending" },
+    ])).toBe(PLAN_ENVELOPE_NEXT_REVIEW);
+    expect(historyEnvelopeNextLabel([{ pairComplete: true, status: "pending" }])).toContain("Review");
+    expect(historyEnvelopeNextLabel([])).toContain("readiness");
   });
 });
 
@@ -275,6 +288,8 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(draft).toContain("planOperationEnvelopeNext");
     expect(draft).toContain("planEnvelopeNextFromNodeStatuses");
     expect(draft).toContain("planEnvelopeNextLabel");
+    expect(draft).toContain("historyEnvelopeNext");
+    expect(draft).toContain("historyEnvelopeNextLabel");
     expect(draft).toContain("unitGridNextActionBlockingKind");
     expect(draft).not.toContain("studio-script-media-align");
     expect(draft).not.toContain("studio-ssl5-missing-to-gen");
@@ -488,5 +503,36 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(mcp).toContain("未限定列表或 not_found→follow-core-readiness");
     expect(mcp).toContain("get_studio_generation_control(operation=plan) 看 envelope nextAction");
     expect(mcp).toContain("wait/retry/Review 时禁止 dispatch");
+  });
+
+  it("operation=history 信封 next 只看本页 items，生成控制零额外 IPC，不改 T4/T5", () => {
+    const draft = source("src/core/studio-generation-plan-draft.ts");
+    expect(draft).toContain("historyEnvelopeNext");
+    expect(draft).toContain("historyEnvelopeNextLabel");
+    expect(draft).toContain("只看本页 items");
+    expect(draft).toContain("newest-first");
+    expect(draft).not.toContain("listStudioGenerationPanelHistory");
+    expect(draft).not.toContain("listStudioGenerationActiveRuns");
+    const codex = source("src/core/codex.ts");
+    expect(codex).toContain("historyEnvelopeNext");
+    expect(codex).toContain("nextAction: historyEnvelopeNext(page.items)");
+    const helperStart = codex.indexOf("if (query.operation === \"history\")");
+    const helperEnd = codex.indexOf("return withStudioRequestSchemaCache", helperStart);
+    const helper = codex.slice(helperStart, helperEnd);
+    expect(helper).toContain("historyEnvelopeNext(page.items)");
+    expect(helper).not.toContain("listStudioGenerationActiveRuns");
+    expect(helper).not.toContain("dispatch_studio_generation_pack");
+    expect(helper).not.toContain("evaluateStudioConsistency");
+    expect(helper).not.toContain("studio-ssl5-missing-to-gen");
+    const control = source("src/renderer/src/components/StudioGenerationControlView.vue");
+    expect(control).toContain("historyEnvelopeNextLabel");
+    expect(control).toContain('data-testid="studio-generation-history-next"');
+    expect(control).toContain("historyEnvelopeNextLabel(history)");
+    expect(control).not.toContain("getStudioGenerationControlEnvelope");
+    const mcp = source("src/mcp/server.ts");
+    expect(mcp).toContain("history 信封 nextAction");
+    expect(mcp).toContain("要看最新请 newest-first");
+    expect(mcp).toContain("history order=newest-first");
+    expect(mcp).toContain("Review 时禁止再 dispatch");
   });
 });

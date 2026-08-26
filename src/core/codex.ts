@@ -91,6 +91,7 @@ import { withStudioRequestSchemaCache } from "./studio-request-schema-cache.js";
 import {
   activeRunsEnvelopeNext,
   composeStudioGenerationPlanDraft,
+  historyEnvelopeNext,
   packEnvelopeNextOverrideForUnitGridBlocking,
   planOperationEnvelopeNext,
   refineStudioGenerationPlanDraftIfUnitGridBlocking,
@@ -1034,6 +1035,7 @@ export async function getStudioGenerationControlEnvelope(
       ...(query.targetKind === "unit-grid" ? { targetKey: `unit-grid:${query.unitId}` } : { panelId: query.panelId }),
       items: page.items,
       ...(page.nextCursor ? { nextCursor: page.nextCursor } : {}),
+      nextAction: historyEnvelopeNext(page.items),
       controlReferencesExposed: false as const,
     };
   }
