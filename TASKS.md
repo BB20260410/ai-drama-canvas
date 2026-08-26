@@ -38,6 +38,7 @@
 - [x] 对照侧栏跨单元场景回指（只扫已加载快照提及；更早同场景可点穿；≠ BindingSet）
 - [x] session-snapshot 跨单元场景回指（只读 SQL 快照提及；缺库失败关闭为空；brief 只加 tool note，不改同步 brief）
 - [x] SSL-5 横幅 / 阅读器选区命中复用对照同款场景回指（只扫已加载 board；≠ BindingSet）
+- [x] 画布检查器无冻结包时退本格锁版光线/服化（只读 SQL；不改 dashboard 投影；有冻结包仍只认覆盖行）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825

@@ -1,0 +1,39 @@
+{
+  "id": "goal-inspector-lock-lighting-costume-20260826",
+  "kind": "inspector-unit-lock-lighting-costume-readonly",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T19:53:00.000Z",
+  "scope": "Canvas inspector falls back to current-unit lock sceneLighting/costumeState when no frozen pack is loaded. Thin readonly SQL (readOnly + query_only) reads current unit revision only; missing db/table/columns fail closed empty. Frozen pack still wins and does not read head. StudioDashboardPanelSummary is unchanged. Not BindingSet; does not dispatch.",
+  "invariants": {
+    "frozenPackStillWins": true,
+    "doesNotChangeDashboardProjection": true,
+    "doesNotCallGetStudioProductionUnitSnapshotOnInspectorPath": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotCallBindingInspect": true,
+    "missingDbOrColumnsFailClosedEmpty": true,
+    "panelLimit": 6,
+    "doesNotDispatch": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-unit-lock-overlays-readonly-sql.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts"
+      ],
+      "result": "3 files / 109 tests PASS"
+    },
+    "commit": "97c176d"
+  },
+  "notClaimed": [
+    "real-generation constraint evidence",
+    "lighting or costume fully solved",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
