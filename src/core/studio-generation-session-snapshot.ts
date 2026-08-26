@@ -8,6 +8,8 @@ import {
 } from "./studio-generation-ledger.js";
 import { queryStudioGenerationFreeze } from "./studio-generation.js";
 import {
+  parseFrozenPanelCostumeFromRenderedPrompt,
+  parseFrozenPanelLightingFromRenderedPrompt,
   previousStandingFromFrozenRenderedPrompt,
   type StudioPanelStandingHandoff,
 } from "./studio-panel-standing.js";
@@ -81,6 +83,12 @@ export interface StudioGenerationSessionSnapshot {
   previousStanding: (StudioPanelStandingHandoff & {
     source: "frozen-rendered-prompt";
   }) | null;
+  /**
+   * 冻结宫格光线/服装覆盖：只从该包 renderedPrompt 还原，不读 unit head。
+   * 历史包无「光线/服装（宫格覆盖）」行则为 null。不是 BindingSet。
+   */
+  frozenPanelLighting: string | null;
+  frozenPanelCostume: string | null;
   camera: {
     current?: {
       shotComposition: string;
@@ -317,6 +325,14 @@ export async function buildStudioGenerationSessionSnapshot(
       const parsed = previousStandingFromFrozenRenderedPrompt(frozenPanel);
       return parsed ? { ...parsed, source: "frozen-rendered-prompt" as const } : null;
     })(),
+    frozenPanelLighting: (() => {
+      const prompt = frozenPanel?.request?.modelPayload?.renderedPrompt;
+      return typeof prompt === "string" ? parseFrozenPanelLightingFromRenderedPrompt(prompt) : null;
+    })(),
+    frozenPanelCostume: (() => {
+      const prompt = frozenPanel?.request?.modelPayload?.renderedPrompt;
+      return typeof prompt === "string" ? parseFrozenPanelCostumeFromRenderedPrompt(prompt) : null;
+    })(),
     camera: {
       current: frozenPanel
         ? {
@@ -353,6 +369,8 @@ export async function buildStudioGenerationSessionSnapshot(
       referenceRoles: body.referenceRoles,
       previousActualTail: body.previousActualTail,
       ...(body.previousStanding ? { previousStanding: body.previousStanding } : {}),
+      ...(body.frozenPanelLighting ? { frozenPanelLighting: body.frozenPanelLighting } : {}),
+      ...(body.frozenPanelCostume ? { frozenPanelCostume: body.frozenPanelCostume } : {}),
       camera: body.camera,
       topRiskCode: body.topRisk?.code ?? null,
     }),

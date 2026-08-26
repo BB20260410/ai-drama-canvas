@@ -208,6 +208,10 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
   it("session-snapshot / 生成控制 / 审片从冻结提示词露前镜，不读 head", () => {
     const snapshot = readFileSync(path.join(repoRoot, "src/core/studio-generation-session-snapshot.ts"), "utf8");
     expect(snapshot).toContain("previousStandingFromFrozenRenderedPrompt(frozenPanel)");
+    expect(snapshot).toContain("parseFrozenPanelLightingFromRenderedPrompt");
+    expect(snapshot).toContain("parseFrozenPanelCostumeFromRenderedPrompt");
+    expect(snapshot).toContain("frozenPanelLighting");
+    expect(snapshot).toContain("frozenPanelCostume");
     expect(snapshot).toContain('source: "frozen-rendered-prompt"');
     expect(snapshot).toContain("不读 unit head");
     expect(snapshot).not.toContain("getCurrentStudioPanelAssetBindingSet");
