@@ -384,6 +384,9 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain('code === "focus-unit"');
     expect(canvas).toContain('code === "freeze-dispatch"');
     expect(canvas).toContain('code === "close-panel"');
+    expect(canvas).toContain("unitGridNextActionCode: unitDetail.value?.nextAction.code");
+    expect(canvas).toContain("unitGridNextActionLabel: unitDetail.value?.nextAction.label");
+    expect(source("src/renderer/src/components/CanvasInspectorPanel.vue")).toContain('data-testid="managed-canvas-inspector-next"');
     expect(canvas).toContain("appearanceListElement.value?.scrollIntoView");
     expect(canvas).toContain('if (kind === "asset" || kind === "unit" || kind === "panel") actionPanelOpen.value = true');
   });

@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   composeStudioGenerationPlanDraft,
+  canvasFreezeDispatchOverrideForUnitGridBlocking,
   packEnvelopeNextOverrideForUnitGridBlocking,
   refineStudioGenerationPlanDraftIfUnitGridBlocking,
   STUDIO_GENERATION_PLAN_COMMAND,
@@ -207,6 +208,17 @@ describe("create-plan 只读草稿纯函数", () => {
     expect(packEnvelopeNextOverrideForUnitGridBlocking("succeeded")).toBe("Review (no dispatch)");
     expect(packEnvelopeNextOverrideForUnitGridBlocking("planned")).toBeNull();
     expect(packEnvelopeNextOverrideForUnitGridBlocking(undefined)).toBeNull();
+    expect(canvasFreezeDispatchOverrideForUnitGridBlocking("wait-or-reconcile-unit-grid-run", "等待整板结果")).toEqual({
+      enabled: false,
+      label: "等待整板结果",
+      reason: "等待整板结果",
+    });
+    expect(canvasFreezeDispatchOverrideForUnitGridBlocking("retry-unit-grid-plan-nodes")?.enabled).toBe(false);
+    expect(canvasFreezeDispatchOverrideForUnitGridBlocking("submit-unit-grid-review")?.label).toContain("Review");
+    expect(canvasFreezeDispatchOverrideForUnitGridBlocking("reconcile-unit-grid-call")?.reason).toContain("对账");
+    expect(canvasFreezeDispatchOverrideForUnitGridBlocking("dispatch-unit-grid")).toBeNull();
+    expect(canvasFreezeDispatchOverrideForUnitGridBlocking("create-unit-grid-plan")).toBeNull();
+    expect(canvasFreezeDispatchOverrideForUnitGridBlocking("create-unit-grid-freeze")).toBeNull();
   });
 });
 
@@ -215,6 +227,7 @@ describe("create-plan 草稿接线源码合同", () => {
     const draft = source("src/core/studio-generation-plan-draft.ts");
     expect(draft).toContain("refineStudioGenerationPlanDraftIfUnitGridBlocking");
     expect(draft).toContain("packEnvelopeNextOverrideForUnitGridBlocking");
+    expect(draft).toContain("canvasFreezeDispatchOverrideForUnitGridBlocking");
     expect(draft).toContain("unitGridNextActionBlockingKind");
     expect(draft).not.toContain("studio-script-media-align");
     expect(draft).not.toContain("studio-ssl5-missing-to-gen");
@@ -333,5 +346,29 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(helper).toContain("Review (no dispatch)");
     expect(helper).not.toContain("unitGridReadinessPackId");
     expect(helper).not.toContain("candidate.packId");
+  });
+
+  it("画布节点下一步跟 unit-grid 在途对齐，零额外 IPC，不拉对照板", () => {
+    const panel = source("src/core/studio-canvas-node-action-panel.ts");
+    expect(panel).toContain("canvasFreezeDispatchOverrideForUnitGridBlocking");
+    expect(panel).toContain("unitGridNextActionCode");
+    expect(panel).toContain("unitGridNextActionLabel");
+    expect(panel).toContain('key: "next"');
+    expect(panel).toContain('code: "freeze-dispatch"');
+    expect(panel).not.toContain("studio-ssl5-missing-to-gen");
+    expect(panel).not.toContain("studio-script-media-align");
+    expect(panel).not.toContain("studio-episode-earliest");
+    expect(panel).not.toContain("dispatch_studio_generation_pack");
+    const canvas = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(canvas).toContain("unitGridNextActionCode: unitDetail.value?.nextAction.code");
+    expect(canvas).toContain("unitGridNextActionLabel: unitDetail.value?.nextAction.label");
+    expect(canvas).toContain("sameUnit ? unitDetail.value?.nextAction.code");
+    expect(canvas).not.toContain("from \"@core/studio-generation-plan-draft");
+    expect(canvas).not.toContain("studio-ssl5-missing-to-gen");
+    const inspector = source("src/renderer/src/components/CanvasInspectorPanel.vue");
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-next"');
+    expect(inspector).toContain('field.key === "next"');
+    expect(inspector).not.toContain("from \"@core/studio-generation-plan-draft");
+    expect(inspector).not.toContain("studio-ssl5-missing-to-gen");
   });
 });

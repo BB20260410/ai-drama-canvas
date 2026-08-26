@@ -2537,9 +2537,12 @@ const nodeActionPanel = computed(() => {
       assetCount: panel.assetIds.length,
       canFreezeDispatch: panel.status === "generation-ready" || panel.bindingCurrentness === "current",
       isBusy: Boolean(selectedNodeBusy.value),
+      unitGridNextActionCode: unitDetail.value?.nextAction.code,
+      unitGridNextActionLabel: unitDetail.value?.nextAction.label,
     });
   }
   if (selection.value.kind === "unit") {
+    const sameUnit = unitDetail.value?.unit.id === selection.value.unit.id;
     return buildStudioCanvasNodeActionPanel({
       kind: "unit",
       id: selection.value.unit.id,
@@ -2547,6 +2550,8 @@ const nodeActionPanel = computed(() => {
       title: selection.value.unit.label,
       status: selection.value.unit.status,
       subtitle: selection.value.unit.episodeId,
+      unitGridNextActionCode: sameUnit ? unitDetail.value?.nextAction.code : undefined,
+      unitGridNextActionLabel: sameUnit ? unitDetail.value?.nextAction.label : undefined,
     });
   }
   if (selection.value.kind === "asset") {

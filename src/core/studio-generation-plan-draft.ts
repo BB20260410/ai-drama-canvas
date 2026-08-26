@@ -135,6 +135,20 @@ export function packEnvelopeNextOverrideForUnitGridBlocking(
   return null;
 }
 
+/**
+ * 画布节点 freeze-dispatch：unit-grid 已在途/待重试/待审/对账时不得再建议派发。
+ * 只改 enabled/文案；不执行、不派发、不重试。planned / create-plan / dispatch 不挡。
+ */
+export function canvasFreezeDispatchOverrideForUnitGridBlocking(
+  code?: string | null,
+  label?: string | null,
+): { enabled: false; label: string; reason: string } | null {
+  const kind = unitGridNextActionBlockingKind(code);
+  if (!kind) return null;
+  const text = blockedReasonForUnitGridBlocking(kind, label);
+  return { enabled: false, label: text, reason: text };
+}
+
 function blocked(reason: string): StudioGenerationPlanDraft {
   return {
     command: STUDIO_GENERATION_PLAN_COMMAND,
