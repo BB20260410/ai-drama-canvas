@@ -57,6 +57,72 @@ export const STUDIO_GENERATION_PLAN_REVIEW_PANEL =
   "该宫格计划节点已有结果，下一步是 Review（不派发）";
 export const STUDIO_GENERATION_PLAN_REVIEW_UNIT_GRID =
   "该整板计划节点已有结果，下一步是 Review（不派发）";
+export const STUDIO_GENERATION_PLAN_UNIT_GRID_WAIT =
+  "earliest / unit-grid 正在执行，等待结果或对账（不派发）";
+export const STUDIO_GENERATION_PLAN_UNIT_GRID_RETRY =
+  "earliest / unit-grid 计划节点已失败/已取消，下一步是 retry（不重试、不派发）";
+export const STUDIO_GENERATION_PLAN_UNIT_GRID_REVIEW =
+  "earliest / unit-grid 计划节点已有结果，下一步是 Review（不派发）";
+export const STUDIO_GENERATION_PLAN_UNIT_GRID_RECONCILE =
+  "earliest / unit-grid 未知生图 call，先对账（禁止重派）";
+
+export type UnitGridBlockingKind = "wait" | "retry" | "review" | "reconcile";
+
+/** 驾驶舱 / earliest nextAction code → 禁止再建议 create-plan/dispatch。 */
+export function unitGridNextActionBlockingKind(
+  code: string | null | undefined,
+): UnitGridBlockingKind | null {
+  if (code === "wait-or-reconcile-unit-grid-run") return "wait";
+  if (code === "retry-unit-grid-plan-nodes") return "retry";
+  if (code === "submit-unit-grid-review") return "review";
+  if (code === "reconcile-unit-grid-call") return "reconcile";
+  return null;
+}
+
+/** 已加载 unit-grid 节点状态 → 同上。planned 不挡（下一步仍是 dispatch）。 */
+export function unitGridStatusBlockingKind(
+  status: PersistedPlanNodeStatus | null | undefined,
+): Exclude<UnitGridBlockingKind, "reconcile"> | null {
+  if (status === "dispatched") return "wait";
+  if (status === "failed" || status === "cancelled") return "retry";
+  if (status === "succeeded") return "review";
+  return null;
+}
+
+function blockedReasonForUnitGridBlocking(
+  kind: UnitGridBlockingKind,
+  label?: string | null,
+): string {
+  if (label) return label;
+  if (kind === "wait") return STUDIO_GENERATION_PLAN_UNIT_GRID_WAIT;
+  if (kind === "retry") return STUDIO_GENERATION_PLAN_UNIT_GRID_RETRY;
+  if (kind === "review") return STUDIO_GENERATION_PLAN_UNIT_GRID_REVIEW;
+  return STUDIO_GENERATION_PLAN_UNIT_GRID_RECONCILE;
+}
+
+/**
+ * unit-grid 已在途/待重试/待审/对账时，单镜或整板草稿都不得再 ready 建计划。
+ * 只精炼文案；不执行、不派发、不重试。
+ */
+export function refineStudioGenerationPlanDraftIfUnitGridBlocking(
+  draft: StudioGenerationPlanDraft,
+  input: {
+    code?: string | null;
+    status?: PersistedPlanNodeStatus | null;
+    label?: string | null;
+  },
+): StudioGenerationPlanDraft {
+  const kind = unitGridNextActionBlockingKind(input.code)
+    ?? unitGridStatusBlockingKind(input.status);
+  if (!kind) return draft;
+  return {
+    ...draft,
+    ready: false,
+    dispatch: false,
+    blockedReason: blockedReasonForUnitGridBlocking(kind, input.label),
+    note: "unit-grid 已占用下一步。不执行、不派发、不重试。",
+  };
+}
 
 function blocked(reason: string): StudioGenerationPlanDraft {
   return {

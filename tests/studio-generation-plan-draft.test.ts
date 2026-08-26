@@ -4,7 +4,10 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   composeStudioGenerationPlanDraft,
+  refineStudioGenerationPlanDraftIfUnitGridBlocking,
   STUDIO_GENERATION_PLAN_COMMAND,
+  unitGridNextActionBlockingKind,
+  unitGridStatusBlockingKind,
 } from "../src/core/studio-generation-plan-draft.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -149,11 +152,62 @@ describe("create-plan 只读草稿纯函数", () => {
       targetKind: "unit-grid",
     }).blockedReason).toContain("禁止用单镜或同行 preview pack 冒充整板节点");
   });
+
+  it("unit-grid 在途/待重试/待审时单镜草稿不得再 ready", () => {
+    expect(unitGridNextActionBlockingKind("wait-or-reconcile-unit-grid-run")).toBe("wait");
+    expect(unitGridNextActionBlockingKind("retry-unit-grid-plan-nodes")).toBe("retry");
+    expect(unitGridNextActionBlockingKind("submit-unit-grid-review")).toBe("review");
+    expect(unitGridNextActionBlockingKind("reconcile-unit-grid-call")).toBe("reconcile");
+    expect(unitGridNextActionBlockingKind("dispatch-unit-grid")).toBeNull();
+    expect(unitGridNextActionBlockingKind("create-unit-grid-plan")).toBeNull();
+    expect(unitGridStatusBlockingKind("dispatched")).toBe("wait");
+    expect(unitGridStatusBlockingKind("failed")).toBe("retry");
+    expect(unitGridStatusBlockingKind("cancelled")).toBe("retry");
+    expect(unitGridStatusBlockingKind("succeeded")).toBe("review");
+    expect(unitGridStatusBlockingKind("planned")).toBeNull();
+
+    const ready = composeStudioGenerationPlanDraft({
+      focusUnitId: "u1",
+      focusPanelId: "p1",
+      focusPackId: "pack-own",
+    });
+    expect(ready.ready).toBe(true);
+    const waiting = refineStudioGenerationPlanDraftIfUnitGridBlocking(ready, {
+      code: "wait-or-reconcile-unit-grid-run",
+      label: "unit-grid 正在执行，等待结果或对账现有 run",
+    });
+    expect(waiting.ready).toBe(false);
+    expect(waiting.dispatch).toBe(false);
+    expect(waiting.blockedReason).toBe("unit-grid 正在执行，等待结果或对账现有 run");
+    expect(waiting.nodes).toEqual([{ unitId: "u1", panelId: "p1" }]);
+    expect(refineStudioGenerationPlanDraftIfUnitGridBlocking(ready, {
+      code: "dispatch-unit-grid",
+    }).ready).toBe(true);
+    expect(refineStudioGenerationPlanDraftIfUnitGridBlocking(ready, {
+      status: "planned",
+    }).ready).toBe(true);
+    const persisted = composeStudioGenerationPlanDraft({
+      focusUnitId: "u1",
+      focusPanelId: "p1",
+      focusPackId: "pack-own",
+      hasPersistedPlan: true,
+      persistedPlanStatus: "planned",
+    });
+    expect(persisted.blockedReason).toContain("下一步是 dispatch");
+    const again = refineStudioGenerationPlanDraftIfUnitGridBlocking(persisted, {
+      status: "dispatched",
+    });
+    expect(again.ready).toBe(false);
+    expect(again.blockedReason).toContain("等待结果或对账");
+    expect(again.nodes).toEqual([{ unitId: "u1", panelId: "p1" }]);
+  });
 });
 
 describe("create-plan 草稿接线源码合同", () => {
   it("薄模块不拉对照板 / 不执行 / 不派发", () => {
     const draft = source("src/core/studio-generation-plan-draft.ts");
+    expect(draft).toContain("refineStudioGenerationPlanDraftIfUnitGridBlocking");
+    expect(draft).toContain("unitGridNextActionBlockingKind");
     expect(draft).not.toContain("studio-script-media-align");
     expect(draft).not.toContain("studio-ssl5-missing-to-gen");
     expect(draft).not.toContain("node:sqlite");
@@ -170,6 +224,8 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(snapshot).toContain("readPersistedUnitGridPlanState");
     expect(snapshot).toContain("hasPersistedPlan");
     expect(snapshot).toContain("persistedPlanStatus");
+    expect(snapshot).toContain("refineStudioGenerationPlanDraftIfUnitGridBlocking");
+    expect(snapshot).toContain("bundle.nextAction.code");
     expect(snapshot).toContain("listStudioGenerationPacksByUnit");
     expect(snapshot).toContain('targetKind: "unit-grid"');
     expect(snapshot).toContain('pack.provenance !== "asset-binding-set"');
@@ -220,6 +276,8 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(computed).toContain("persistedUnitGridPackIdForDraft()");
     expect(computed).toContain("hasPersistedPlan: hasPersistedPlanForDraft()");
     expect(computed).toContain("persistedPlanStatus: persistedPlanStatusForDraft()");
+    expect(computed).toContain("refineStudioGenerationPlanDraftIfUnitGridBlocking");
+    expect(computed).toContain("unitGridPersistedStatusForBlocking()");
     expect(computed).not.toContain("unitGridReadinessPackId");
     expect(computed).not.toContain("selectedPackId");
     expect(control).toContain("`unit-grid ${node.unitId}`");

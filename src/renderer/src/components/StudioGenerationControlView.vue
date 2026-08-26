@@ -364,6 +364,7 @@ import {
 import { formatCharacterBackReferences, formatPropBackReferences, formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
 import {
   composeStudioGenerationPlanDraft,
+  refineStudioGenerationPlanDraftIfUnitGridBlocking,
   type PersistedPlanNodeStatus,
   type StudioGenerationPlanDraftNode,
 } from "@core/studio-generation-plan-draft";
@@ -656,7 +657,27 @@ function persistedPlanStatusForDraft(): PersistedPlanNodeStatus | undefined {
   return undefined;
 }
 
-/** 单镜只认当前宫格 ready pack；整板只认已落盘 unit-grid pack。已有计划则按节点状态写下一步。不执行、不派发。 */
+/** 已加载 unit-grid 节点；零额外 IPC。planned 不挡单镜草稿。 */
+function unitGridPersistedStatusForBlocking(): PersistedPlanNodeStatus | undefined {
+  const nodes = progress.value?.nodes ?? [];
+  const match = nodes.find((node) => (
+    node.targetKind === "unit-grid" && node.unitId === selectedUnitId.value
+  ));
+  const status = match?.status;
+  if (
+    status === "planned"
+    || status === "dispatched"
+    || status === "failed"
+    || status === "cancelled"
+    || status === "succeeded"
+  ) {
+    return status;
+  }
+  if (status === "retry-superseded") return "planned";
+  return undefined;
+}
+
+/** 单镜只认当前宫格 ready pack；整板只认已落盘 unit-grid pack。已有计划则按节点状态写下一步。unit-grid 在途时单镜草稿不得再 ready。不执行、不派发。 */
 const generationPlanDraft = computed(() => {
   if (historyTargetKind.value === "unit-grid") {
     return composeStudioGenerationPlanDraft({
@@ -669,13 +690,16 @@ const generationPlanDraft = computed(() => {
     });
   }
   const generation = detail.value?.selectedPanel?.generation;
-  return composeStudioGenerationPlanDraft({
-    focusUnitId: selectedUnitId.value || null,
-    focusPanelId: selectedPanelId.value || null,
-    focusPackId: generation?.status === "ready" && generation.packId ? generation.packId : null,
-    hasPersistedPlan: hasPersistedPlanForDraft(),
-    persistedPlanStatus: persistedPlanStatusForDraft(),
-  });
+  return refineStudioGenerationPlanDraftIfUnitGridBlocking(
+    composeStudioGenerationPlanDraft({
+      focusUnitId: selectedUnitId.value || null,
+      focusPanelId: selectedPanelId.value || null,
+      focusPackId: generation?.status === "ready" && generation.packId ? generation.packId : null,
+      hasPersistedPlan: hasPersistedPlanForDraft(),
+      persistedPlanStatus: persistedPlanStatusForDraft(),
+    }),
+    { status: unitGridPersistedStatusForBlocking() },
+  );
 });
 
 // P24 R5-F2：watch 源含 projectRoot——复制工程同 packId 切换时也重新加载身份。

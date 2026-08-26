@@ -24,6 +24,7 @@ import { readStudioSceneBackReferences } from "./studio-scene-backrefs-read.js";
 import type { CharacterBackReference, PropBackReference, SceneBackReference } from "./studio-scene-backrefs.js";
 import {
   composeStudioGenerationPlanDraft,
+  refineStudioGenerationPlanDraftIfUnitGridBlocking,
   type StudioGenerationPlanDraft,
 } from "./studio-generation-plan-draft.js";
 import {
@@ -474,39 +475,45 @@ export async function buildStudioGenerationSessionSnapshot(
     })(),
     styleLockLine: formatFrozenStyleLockReadonlyLine(styleLockRefsFromAnyFrozenPack(frozenPanel)),
     beatLine: formatFrozenPanelBeatReadonlyLine(frozenPanelBeatFromAnyFrozenPack(frozenPanel)),
-    generationPlanDraft: query.panelId
-      ? composeStudioGenerationPlanDraft({
-          focusUnitId: query.unitId,
-          focusPanelId: query.panelId,
-          focusPackId: await persistedPanelPackIdForDraft(projectRoot, query.panelId, readiness),
-          ...(() => {
-            const persisted = readPersistedPanelPlanState(
-              generationLedgerSidecarPath(projectRoot),
-              query.unitId,
-              query.panelId,
-            );
-            return {
-              hasPersistedPlan: persisted.hasPlan,
-              persistedPlanStatus: persisted.status ?? undefined,
-            };
-          })(),
-        })
-      : composeStudioGenerationPlanDraft({
-          focusUnitId: query.unitId,
-          focusPanelId: null,
-          focusPackId: await persistedUnitGridPackIdForDraft(projectRoot, query.unitId),
-          targetKind: "unit-grid",
-          ...(() => {
-            const persisted = readPersistedUnitGridPlanState(
-              generationLedgerSidecarPath(projectRoot),
-              query.unitId,
-            );
-            return {
-              hasPersistedPlan: persisted.hasPlan,
-              persistedPlanStatus: persisted.status ?? undefined,
-            };
-          })(),
-        }),
+    generationPlanDraft: refineStudioGenerationPlanDraftIfUnitGridBlocking(
+      query.panelId
+        ? composeStudioGenerationPlanDraft({
+            focusUnitId: query.unitId,
+            focusPanelId: query.panelId,
+            focusPackId: await persistedPanelPackIdForDraft(projectRoot, query.panelId, readiness),
+            ...(() => {
+              const persisted = readPersistedPanelPlanState(
+                generationLedgerSidecarPath(projectRoot),
+                query.unitId,
+                query.panelId,
+              );
+              return {
+                hasPersistedPlan: persisted.hasPlan,
+                persistedPlanStatus: persisted.status ?? undefined,
+              };
+            })(),
+          })
+        : composeStudioGenerationPlanDraft({
+            focusUnitId: query.unitId,
+            focusPanelId: null,
+            focusPackId: await persistedUnitGridPackIdForDraft(projectRoot, query.unitId),
+            targetKind: "unit-grid",
+            ...(() => {
+              const persisted = readPersistedUnitGridPlanState(
+                generationLedgerSidecarPath(projectRoot),
+                query.unitId,
+              );
+              return {
+                hasPersistedPlan: persisted.hasPlan,
+                persistedPlanStatus: persisted.status ?? undefined,
+              };
+            })(),
+          }),
+      {
+        code: bundle.nextAction.code,
+        label: bundle.nextAction.label,
+      },
+    ),
     camera: {
       current: frozenPanel
         ? {

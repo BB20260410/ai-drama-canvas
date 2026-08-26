@@ -36,6 +36,7 @@ import {
 import type { CharacterBackReference, PropBackReference, SceneBackReference } from "./studio-scene-backrefs.js";
 import {
   composeSsl5GenerationPlanDraft,
+  unitGridNextActionBlockingKind,
   type PersistedPlanNodeStatus,
   type Ssl5GenerationPlanDraft,
 } from "./studio-generation-plan-draft.js";
@@ -331,11 +332,7 @@ export function buildSsl5PlanFromBoard(
 export function earliestBlockingPath(
   earliestCode: string | null | undefined,
 ): "wait" | "retry" | "review" | "reconcile" | null {
-  if (earliestCode === "wait-or-reconcile-unit-grid-run") return "wait";
-  if (earliestCode === "retry-unit-grid-plan-nodes") return "retry";
-  if (earliestCode === "submit-unit-grid-review") return "review";
-  if (earliestCode === "reconcile-unit-grid-call") return "reconcile";
-  return null;
+  return unitGridNextActionBlockingKind(earliestCode);
 }
 
 /**
