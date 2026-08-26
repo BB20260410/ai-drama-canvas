@@ -755,6 +755,7 @@
         :panel-shot-type-line="inspectorShotTypeLine"
         :panel-style-lock-line="inspectorStyleLockLine"
         :panel-beat-line="inspectorBeatLine"
+        :panel-consistency-peek-line="inspectorConsistencyPeekLine"
         :panel-scene-back-reference-note="inspectorSceneBackReferenceNote"
         :panel-scene-back-references="inspectorSceneBackReferences"
         :panel-prop-back-reference-note="inspectorPropBackReferenceNote"
@@ -1991,6 +1992,7 @@ const inspectorLightingCostumeSource = ref<"frozen-rendered-prompt" | "unit-lock
 const inspectorShotTypeLine = ref<string | null>(null);
 const inspectorStyleLockLine = ref<string | null>(null);
 const inspectorBeatLine = ref<string | null>(null);
+const inspectorConsistencyPeekLine = ref<string | null>(null);
 const inspectorSceneBackReferenceNote = ref<string | null>(null);
 const inspectorSceneBackReferences = ref<SceneBackReference[]>([]);
 const inspectorPropBackReferenceNote = ref<string | null>(null);
@@ -2040,6 +2042,43 @@ async function readInspectorLockOverlays(
   } catch {
     clearInspectorLockOverlayCache();
     return inspectorLockOverlayByPanelId.value;
+  }
+}
+
+function inspectorConsistencyPeekLabel(peek?: {
+  status: "cached" | "unevaluated";
+  verdict?: "consistent" | "needs-review" | "drifted" | "not-checkable";
+  generationRunId?: string | null;
+}): string {
+  if (!peek || peek.status === "unevaluated" || !peek.verdict) return "一致性：未评估";
+  if (peek.verdict === "consistent") return "一致性：一致";
+  if (peek.verdict === "needs-review") return "一致性：需复核";
+  if (peek.verdict === "drifted") return "一致性：明显漂移";
+  return "一致性：无法检查";
+}
+
+async function applyInspectorConsistencyPeek(token: number, panelId: string): Promise<void> {
+  const unitId = unitDetail.value?.unit.id;
+  if (!props.projectRoot || !unitId || !panelId.trim()) {
+    if (token === inspectorStandingToken) inspectorConsistencyPeekLine.value = "一致性：未评估";
+    return;
+  }
+  try {
+    const historyResult = await window.canvasApi.getStudioGenerationControl(props.projectRoot, {
+      operation: "history",
+      unitId,
+      panelId,
+      limit: 1,
+      order: "newest-first",
+    });
+    if (token !== inspectorStandingToken) return;
+    if (historyResult.operation !== "history" || historyResult.status !== "ready") {
+      inspectorConsistencyPeekLine.value = "一致性：未评估";
+      return;
+    }
+    inspectorConsistencyPeekLine.value = inspectorConsistencyPeekLabel(historyResult.consistencyPeek);
+  } catch {
+    if (token === inspectorStandingToken) inspectorConsistencyPeekLine.value = "一致性：未评估";
   }
 }
 
@@ -2105,6 +2144,7 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
   inspectorShotTypeLine.value = null;
   inspectorStyleLockLine.value = null;
   inspectorBeatLine.value = null;
+  inspectorConsistencyPeekLine.value = null;
   inspectorSceneBackReferenceNote.value = null;
   inspectorSceneBackReferences.value = [];
   inspectorPropBackReferenceNote.value = null;
@@ -2113,6 +2153,7 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
   inspectorCharacterBackReferences.value = [];
   if (selection.value?.kind !== "panel") return;
   const panel = selection.value.panel;
+  void applyInspectorConsistencyPeek(token, panel.id);
   const packId = unitDetail.value?.selectedPanel?.panel.id === panel.id
     ? unitDetail.value.selectedPanel.generation.packId
     : undefined;
@@ -4206,6 +4247,7 @@ function closeInspector(): void {
   inspectorShotTypeLine.value = null;
   inspectorStyleLockLine.value = null;
   inspectorBeatLine.value = null;
+  inspectorConsistencyPeekLine.value = null;
   inspectorSceneBackReferenceNote.value = null;
   inspectorSceneBackReferences.value = [];
   inspectorPropBackReferenceNote.value = null;

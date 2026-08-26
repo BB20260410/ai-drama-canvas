@@ -30,6 +30,7 @@ import {
   historyEnvelopeConsistencyPeek,
   sessionConsistencyPeekFromVerdict,
 } from "../src/core/studio-generation-session-snapshot.js";
+import { traceEnvelopePeekRunId } from "../src/core/studio-trace.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const source = (relative: string) => readFileSync(path.join(root, relative), "utf8");
@@ -576,6 +577,14 @@ describe("create-plan 草稿接线源码合同", () => {
 
   it("session-snapshot 一致性四态 peek 不 evaluate、不进 fingerprint", async () => {
     expect(await historyEnvelopeConsistencyPeek([])).toBeUndefined();
+    expect(traceEnvelopePeekRunId({ runs: [] })).toBeNull();
+    expect(traceEnvelopePeekRunId({
+      runs: [{ runId: "run-old" }, { runId: "run-new" }],
+    })).toBe("run-new");
+    expect(traceEnvelopePeekRunId({
+      selector: { runId: "run-selected" },
+      runs: [{ runId: "run-old" }, { runId: "run-new" }],
+    })).toBe("run-selected");
     expect(sessionConsistencyPeekFromVerdict(undefined)).toEqual({
       status: "unevaluated",
       generationRunId: null,

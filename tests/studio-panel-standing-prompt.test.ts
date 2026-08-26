@@ -560,6 +560,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(canvas).toContain("getStudioTrace");
     expect(canvas).toContain("resolveStudioTraceSelector");
     expect(canvas).toContain("禁止猜第一格");
+    expect(canvas).toContain("applyInspectorConsistencyPeek");
+    expect(canvas).toContain("getStudioGenerationControl");
     expect(canvas).not.toContain('action.kind === "open-trace" || action.kind === "open-consistency"');
     expect(canvas).not.toContain("evaluateStudioConsistency(");
     expect(canvas).not.toContain("getStudioBindingControl");
@@ -568,11 +570,16 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(trace).toContain("previousStandings.length > 0 ? { previousStandings }");
     expect(trace).toContain("frozenPanelOverlaysFromFrozenPanelPacks(panelPacks)");
     expect(trace).toContain("frozenPanelOverlays.length > 0 ? { frozenPanelOverlays }");
+    expect(trace).toContain("consistencyPeek");
+    expect(trace).toContain("traceEnvelopePeekRunId");
     expect(trace).toContain("不读 unit head");
+    expect(trace).not.toContain("evaluateStudioConsistency");
     expect(trace).not.toContain("getCurrentStudioPanelAssetBindingSet");
     const mcpTrace = readFileSync(path.join(repoRoot, "src/mcp/server.ts"), "utf8");
     expect(mcpTrace).toContain("previousStandings");
     expect(mcpTrace).toContain("frozenPanelOverlays");
+    expect(mcpTrace).toContain("consistencyPeek");
+    expect(mcpTrace).toContain("无 run 则省略以免改 P24 形状");
     expect(mcpTrace).toContain("无该行则省略");
   });
 });

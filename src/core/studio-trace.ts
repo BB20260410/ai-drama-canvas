@@ -163,6 +163,39 @@ export interface StudioGenerationTrace {
    * 仅当至少一格含「光线/服装（宫格覆盖）」行时返回，以免改历史 P24 投影形状。
    */
   frozenPanelOverlays?: FrozenPanelOverlayRow[];
+  /**
+   * 一致性四态只读 peek：by-run 用该 run，否则本包 runs 最新一条（sequence 升序末项）。
+   * 无 run 则省略，以免改历史 P24 投影形状。只读进程内 LRU；未评估 ≠ 无法检查。
+   * 不 evaluate 像素。机器不自动 Review PASS。不是 BindingSet。
+   */
+  consistencyPeek?: {
+    status: "cached" | "unevaluated";
+    verdict?: "consistent" | "needs-review" | "drifted" | "not-checkable";
+    generationRunId: string | null;
+  };
+}
+
+/** 追溯 peek 用 run：by-run 认选择器；否则本包 runs 最新一条。不用 previousActualTail。 */
+export function traceEnvelopePeekRunId(input: {
+  selector?: { runId?: string };
+  runs: ReadonlyArray<{ runId?: string | null }>;
+}): string | null {
+  if (input.selector?.runId) return input.selector.runId;
+  for (let index = input.runs.length - 1; index >= 0; index -= 1) {
+    const runId = input.runs[index]?.runId;
+    if (runId) return runId;
+  }
+  return null;
+}
+
+async function traceEnvelopeConsistencyPeek(
+  runId: string | null,
+): Promise<StudioGenerationTrace["consistencyPeek"]> {
+  if (!runId) return undefined;
+  const { peekStudioConsistencyVerdictByRunId } = await import("./studio-consistency-evaluator.js");
+  const verdict = peekStudioConsistencyVerdictByRunId(runId);
+  if (verdict) return { status: "cached", verdict, generationRunId: runId };
+  return { status: "unevaluated", generationRunId: runId };
 }
 
 function selectorKeys(selector: Record<string, unknown>): string[] {
@@ -420,6 +453,10 @@ export async function getStudioGenerationTrace(
   const reviewsBox = await collectTraceReviews(projectRoot, runsBox.runs.map((run) => run.runId), TRACE_REVIEWS_CAP);
   const previousStandings = previousStandingsFromFrozenPanelPacks(panelPacks);
   const frozenPanelOverlays = frozenPanelOverlaysFromFrozenPanelPacks(panelPacks);
+  const consistencyPeek = await traceEnvelopeConsistencyPeek(traceEnvelopePeekRunId({
+    selector: "runId" in selector ? { runId: selector.runId } : {},
+    runs: runsBox.runs,
+  }));
   const panels: StudioGenerationTracePanelIdentity[] = panelPacks.map((panelPack) => ({
     panelId: panelPack.target.panelId,
     panelIndex: panelPack.target.panelIndex,
@@ -480,6 +517,7 @@ export async function getStudioGenerationTrace(
     ...(detachedUnknownObservations.length > 0 ? { detachedUnknownObservations } : {}),
     ...(previousStandings.length > 0 ? { previousStandings } : {}),
     ...(frozenPanelOverlays.length > 0 ? { frozenPanelOverlays } : {}),
+    ...(consistencyPeek ? { consistencyPeek } : {}),
   };
 }
 

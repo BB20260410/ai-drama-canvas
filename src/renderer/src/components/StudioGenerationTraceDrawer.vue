@@ -28,6 +28,11 @@ export type StudioTraceDrawerModel = {
   results: Array<{ resultId: string; variant: string; inputCurrent: boolean }>;
   runsTruncated: boolean;
   resultsTruncated: boolean;
+  consistencyPeek?: {
+    status: "cached" | "unevaluated";
+    verdict?: "consistent" | "needs-review" | "drifted" | "not-checkable";
+    generationRunId: string | null;
+  };
 };
 
 defineProps<{
@@ -43,6 +48,14 @@ const emit = defineEmits<{
 
 function standingLine(row: NonNullable<StudioTraceDrawerModel["previousStandings"]>[number]): string {
   return formatPreviousStandingReadonlyLine(row.previousStanding) ?? "前镜行无法格式化";
+}
+
+function consistencyPeekLabel(peek?: StudioTraceDrawerModel["consistencyPeek"]): string {
+  if (!peek || peek.status === "unevaluated" || !peek.verdict) return "一致性：未评估";
+  if (peek.verdict === "consistent") return "一致性：一致";
+  if (peek.verdict === "needs-review") return "一致性：需复核";
+  if (peek.verdict === "drifted") return "一致性：明显漂移";
+  return "一致性：无法检查";
 }
 
 function classificationLabel(value: string): string {
@@ -78,6 +91,8 @@ function classificationLabel(value: string): string {
         <dd>{{ trace.pack.packId }} · {{ trace.pack.fingerprint.slice(0, 12) }}</dd>
         <dt>变化分类</dt>
         <dd data-testid="studio-generation-trace-classification">{{ classificationLabel(trace.changeClassification.classification) }}</dd>
+        <dt>一致性</dt>
+        <dd data-testid="studio-generation-trace-peek">{{ consistencyPeekLabel(trace.consistencyPeek) }}</dd>
       </dl>
       <section data-testid="studio-generation-trace-previous-standings">
         <h4>前镜交接</h4>

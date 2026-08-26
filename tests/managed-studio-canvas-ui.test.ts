@@ -1979,10 +1979,18 @@ describe("受管画布侧栏列表视口剔除", () => {
     expect(drawer).toContain('data-testid="studio-generation-trace-drawer"');
     expect(drawer).toContain('data-testid="studio-generation-trace-previous-standings"');
     expect(drawer).toContain('data-testid="studio-generation-trace-overlays"');
+    expect(drawer).toContain('data-testid="studio-generation-trace-peek"');
+    expect(drawer).toContain("consistencyPeekLabel");
     expect(drawer).toContain("frozenPanelOverlays");
     expect(drawer).toContain("formatPreviousStandingReadonlyLine");
     expect(drawer).not.toContain("evaluateStudioConsistency");
     expect(drawer).not.toContain("getStudioBindingControl");
+    expect(view).toContain("applyInspectorConsistencyPeek");
+    expect(view).toContain("getStudioGenerationControl");
+    expect(view).toContain('operation: "history"');
+    expect(view).toContain('order: "newest-first"');
+    expect(view).not.toContain("studio-consistency-evaluator");
+    expect(view).not.toContain("studio-generation-session-snapshot");
   });
 
   it("素材库/剧本资源关闭钮可 Tab，关闭后焦回开库钮，不改成 dialog", () => {
@@ -2122,6 +2130,8 @@ describe("受管画布侧栏列表视口剔除", () => {
     expect(inspector).toContain("panelStyleLockLine");
     expect(inspector).toContain('data-testid="managed-canvas-inspector-beat"');
     expect(inspector).toContain("panelBeatLine");
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-peek"');
+    expect(inspector).toContain("panelConsistencyPeekLine");
     expect(inspector).toContain("panelCharacterBackReferenceNote");
     expect(view).toContain("getStudioSceneBackReferences");
     expect(view).toContain("revealInspectorSceneBackRef");
