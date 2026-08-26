@@ -152,6 +152,79 @@ export function canvasFreezeDispatchOverrideForUnitGridBlocking(
 export const ACTIVE_RUNS_NEXT_RECONCILE = "reconcile-or-commit-existing-call-only" as const;
 export const ACTIVE_RUNS_NEXT_FOLLOW_READINESS = "follow-core-readiness" as const;
 
+export const PLAN_ENVELOPE_NEXT_WAIT = "wait → result or reconcile (no dispatch)" as const;
+export const PLAN_ENVELOPE_NEXT_RETRY = "retry_studio_generation_plan_nodes (no retry here, no dispatch)" as const;
+export const PLAN_ENVELOPE_NEXT_REVIEW = "Review (no dispatch)" as const;
+export const PLAN_ENVELOPE_NEXT_DISPATCH = "dispatch (no dispatch here)" as const;
+export const PLAN_ENVELOPE_NEXT_CREATE = "create-plan (no execute)" as const;
+export const PLAN_ENVELOPE_NEXT_FOLLOW = ACTIVE_RUNS_NEXT_FOLLOW_READINESS;
+
+export function normalizePlanNodeStatusForEnvelope(
+  status: string | null | undefined,
+): PersistedPlanNodeStatus | null {
+  if (status === "retry-superseded") return "planned";
+  if (
+    status === "planned"
+    || status === "dispatched"
+    || status === "failed"
+    || status === "cancelled"
+    || status === "succeeded"
+  ) {
+    return status;
+  }
+  return null;
+}
+
+/**
+ * 单计划节点聚合下一步。dispatched > failed/cancelled > planned > 全 succeeded。
+ * 空节点当 create-plan。retry-superseded 映射为 planned。不执行、不派发、不重试。
+ */
+export function planEnvelopeNextFromNodeStatuses(
+  statuses: readonly (string | null | undefined)[],
+): string {
+  const normalized = statuses
+    .map(normalizePlanNodeStatusForEnvelope)
+    .filter((status): status is PersistedPlanNodeStatus => status !== null);
+  if (normalized.some((status) => status === "dispatched")) return PLAN_ENVELOPE_NEXT_WAIT;
+  if (normalized.some((status) => status === "failed" || status === "cancelled")) {
+    return PLAN_ENVELOPE_NEXT_RETRY;
+  }
+  if (normalized.some((status) => status === "planned")) return PLAN_ENVELOPE_NEXT_DISPATCH;
+  if (normalized.length > 0 && normalized.every((status) => status === "succeeded")) {
+    return PLAN_ENVELOPE_NEXT_REVIEW;
+  }
+  return PLAN_ENVELOPE_NEXT_CREATE;
+}
+
+/** 生成控制计划列表中文下一步；与信封英文 next 同一套状态优先级。 */
+export function planEnvelopeNextLabel(
+  statuses: readonly (string | null | undefined)[],
+): string {
+  const next = planEnvelopeNextFromNodeStatuses(statuses);
+  if (next === PLAN_ENVELOPE_NEXT_WAIT) return "下一步：等待结果或对账（不派发）";
+  if (next === PLAN_ENVELOPE_NEXT_RETRY) return "下一步：retry（不重试、不派发）";
+  if (next === PLAN_ENVELOPE_NEXT_REVIEW) return "下一步：Review（不派发）";
+  if (next === PLAN_ENVELOPE_NEXT_DISPATCH) return "下一步：dispatch（不派发）";
+  return "下一步：create-plan（不执行、不派发）";
+}
+
+/**
+ * operation=plan 信封下一步。
+ * 未限定列表 / not_found → follow-core-readiness（不猜单元）。
+ * 按 planId 或单元查到计划 → 节点状态聚合。
+ * 按单元查无计划 → create-plan。
+ * 不执行、不派发、不重试。
+ */
+export function planOperationEnvelopeNext(input: {
+  kind: "not-found" | "unscoped-list" | "scoped";
+  statuses?: readonly (string | null | undefined)[];
+}): string {
+  if (input.kind === "not-found" || input.kind === "unscoped-list") {
+    return PLAN_ENVELOPE_NEXT_FOLLOW;
+  }
+  return planEnvelopeNextFromNodeStatuses(input.statuses ?? []);
+}
+
 /**
  * active-runs 信封下一步。本槽 unknown / 未审 / 在途优先；单镜再看同单元 unit-grid。
  * generationBlocked 仍由调用方按本槽 blockingRuns 决定。不执行、不派发、不重试。

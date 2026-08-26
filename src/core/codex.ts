@@ -92,6 +92,7 @@ import {
   activeRunsEnvelopeNext,
   composeStudioGenerationPlanDraft,
   packEnvelopeNextOverrideForUnitGridBlocking,
+  planOperationEnvelopeNext,
   refineStudioGenerationPlanDraftIfUnitGridBlocking,
   type PersistedPlanNodeStatus,
 } from "./studio-generation-plan-draft.js";
@@ -951,6 +952,7 @@ export async function getStudioGenerationControlEnvelope(
           operation: "plan" as const,
           status: "not_found" as const,
           planId: query.planId,
+          nextAction: planOperationEnvelopeNext({ kind: "not-found" }),
           controlReferencesExposed: false as const,
         };
       }
@@ -961,6 +963,7 @@ export async function getStudioGenerationControlEnvelope(
           operation: "plan" as const,
           status: "not_found" as const,
           planId: query.planId,
+          nextAction: planOperationEnvelopeNext({ kind: "not-found" }),
           controlReferencesExposed: false as const,
         };
       }
@@ -970,9 +973,17 @@ export async function getStudioGenerationControlEnvelope(
         operation: "plan" as const,
         status: "ready" as const,
         plan,
+        nextAction: planOperationEnvelopeNext({
+          kind: "scoped",
+          statuses: plan.nodes.map((node) => node.status),
+        }),
         controlReferencesExposed: false as const,
       };
     }
+    const scoped = Boolean(
+      (query.targetKind === "unit-grid" && query.unitId)
+      || (query.unitId && query.panelId),
+    );
     const plans = query.targetKind === "unit-grid" && query.unitId
       ? [await getStudioGenerationLatestPlanForUnitGrid(shell.paths.root, query.unitId)].filter(Boolean)
       : query.unitId && query.panelId
@@ -985,6 +996,12 @@ export async function getStudioGenerationControlEnvelope(
       status: "ready" as const,
       projectId: shell.project.id,
       plans,
+      nextAction: scoped
+        ? planOperationEnvelopeNext({
+          kind: "scoped",
+          statuses: plans.flatMap((plan) => plan?.nodes.map((node) => node.status) ?? []),
+        })
+        : planOperationEnvelopeNext({ kind: "unscoped-list" }),
       controlReferencesExposed: false as const,
     };
   }

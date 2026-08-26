@@ -9,6 +9,15 @@ import {
   activeRunsEnvelopeNext,
   canvasFreezeDispatchOverrideForUnitGridBlocking,
   packEnvelopeNextOverrideForUnitGridBlocking,
+  PLAN_ENVELOPE_NEXT_CREATE,
+  PLAN_ENVELOPE_NEXT_DISPATCH,
+  PLAN_ENVELOPE_NEXT_FOLLOW,
+  PLAN_ENVELOPE_NEXT_RETRY,
+  PLAN_ENVELOPE_NEXT_REVIEW,
+  PLAN_ENVELOPE_NEXT_WAIT,
+  planEnvelopeNextFromNodeStatuses,
+  planEnvelopeNextLabel,
+  planOperationEnvelopeNext,
   refineStudioGenerationPlanDraftIfUnitGridBlocking,
   STUDIO_GENERATION_PLAN_COMMAND,
   unitGridNextActionBlockingKind,
@@ -236,6 +245,23 @@ describe("create-plan 只读草稿纯函数", () => {
     );
     expect(activeRunsEnvelopeNext({ unitGridBlockingStatus: "succeeded" })).toBe("Review (no dispatch)");
     expect(activeRunsEnvelopeNext({ unitGridBlockingStatus: "planned" })).toBe(ACTIVE_RUNS_NEXT_FOLLOW_READINESS);
+    expect(planEnvelopeNextFromNodeStatuses(["dispatched", "planned"])).toBe(PLAN_ENVELOPE_NEXT_WAIT);
+    expect(planEnvelopeNextFromNodeStatuses(["failed", "planned"])).toBe(PLAN_ENVELOPE_NEXT_RETRY);
+    expect(planEnvelopeNextFromNodeStatuses(["cancelled"])).toBe(PLAN_ENVELOPE_NEXT_RETRY);
+    expect(planEnvelopeNextFromNodeStatuses(["planned"])).toBe(PLAN_ENVELOPE_NEXT_DISPATCH);
+    expect(planEnvelopeNextFromNodeStatuses(["retry-superseded"])).toBe(PLAN_ENVELOPE_NEXT_DISPATCH);
+    expect(planEnvelopeNextFromNodeStatuses(["succeeded", "planned"])).toBe(PLAN_ENVELOPE_NEXT_DISPATCH);
+    expect(planEnvelopeNextFromNodeStatuses(["succeeded"])).toBe(PLAN_ENVELOPE_NEXT_REVIEW);
+    expect(planEnvelopeNextFromNodeStatuses([])).toBe(PLAN_ENVELOPE_NEXT_CREATE);
+    expect(planOperationEnvelopeNext({ kind: "not-found" })).toBe(PLAN_ENVELOPE_NEXT_FOLLOW);
+    expect(planOperationEnvelopeNext({ kind: "unscoped-list" })).toBe(PLAN_ENVELOPE_NEXT_FOLLOW);
+    expect(planOperationEnvelopeNext({ kind: "scoped", statuses: [] })).toBe(PLAN_ENVELOPE_NEXT_CREATE);
+    expect(planOperationEnvelopeNext({ kind: "scoped", statuses: ["dispatched"] })).toBe(PLAN_ENVELOPE_NEXT_WAIT);
+    expect(planEnvelopeNextLabel(["dispatched"])).toContain("等待结果或对账");
+    expect(planEnvelopeNextLabel(["failed"])).toContain("retry");
+    expect(planEnvelopeNextLabel(["succeeded"])).toContain("Review");
+    expect(planEnvelopeNextLabel(["planned"])).toContain("dispatch");
+    expect(planEnvelopeNextLabel([])).toContain("create-plan");
   });
 });
 
@@ -246,6 +272,9 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(draft).toContain("packEnvelopeNextOverrideForUnitGridBlocking");
     expect(draft).toContain("canvasFreezeDispatchOverrideForUnitGridBlocking");
     expect(draft).toContain("activeRunsEnvelopeNext");
+    expect(draft).toContain("planOperationEnvelopeNext");
+    expect(draft).toContain("planEnvelopeNextFromNodeStatuses");
+    expect(draft).toContain("planEnvelopeNextLabel");
     expect(draft).toContain("unitGridNextActionBlockingKind");
     expect(draft).not.toContain("studio-script-media-align");
     expect(draft).not.toContain("studio-ssl5-missing-to-gen");
@@ -295,6 +324,8 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(control).toContain('data-testid="studio-generation-plan-draft"');
     expect(control).toContain('data-testid="studio-generation-plan-nodes"');
     expect(control).toContain('data-testid="studio-generation-plan-command"');
+    expect(control).toContain('data-testid="studio-generation-plan-next"');
+    expect(control).toContain("planEnvelopeNextLabel");
     expect(control).toContain("persistedUnitGridPackIdForDraft");
     expect(control).toContain("hasPersistedPlanForDraft");
     expect(control).toContain("persistedPlanStatusForDraft");
@@ -420,5 +451,42 @@ describe("create-plan 草稿接线源码合同", () => {
     const mcp = source("src/mcp/server.ts");
     expect(mcp).toContain("active-runs 返回指定单元/宫格所有 run 的完整状态投影、恢复动作与 envelope nextAction");
     expect(mcp).toContain("generationBlocked 仍只认本槽 blockingRuns");
+  });
+
+  it("operation=plan 信封 next 跟节点状态对齐，生成控制零额外 IPC，不改 T4/T5", () => {
+    const draft = source("src/core/studio-generation-plan-draft.ts");
+    expect(draft).toContain("planOperationEnvelopeNext");
+    expect(draft).toContain("PLAN_ENVELOPE_NEXT_DISPATCH");
+    expect(draft).toContain("PLAN_ENVELOPE_NEXT_CREATE");
+    expect(draft).toContain('kind: "not-found" | "unscoped-list" | "scoped"');
+    expect(draft).not.toContain("listStudioGenerationActiveRuns");
+    const codex = source("src/core/codex.ts");
+    expect(codex).toContain("planOperationEnvelopeNext");
+    expect(codex).toContain("operation === \"plan\"");
+    expect(codex).toContain("nextAction: planOperationEnvelopeNext");
+    expect(codex).toContain('kind: "not-found"');
+    expect(codex).toContain('kind: "scoped"');
+    expect(codex).toContain('kind: "unscoped-list"');
+    expect(codex).toContain("plan.nodes.map((node) => node.status)");
+    const helperStart = codex.indexOf("if (query.operation === \"plan\")");
+    const helperEnd = codex.indexOf("if (query.operation === \"history\")", helperStart);
+    const helper = codex.slice(helperStart, helperEnd);
+    expect(helper).toContain("planOperationEnvelopeNext");
+    expect(helper).not.toContain("dispatch_studio_generation_pack");
+    expect(helper).not.toContain("create_studio_generation_plan");
+    expect(helper).not.toContain("studio-ssl5-missing-to-gen");
+    expect(helper).not.toContain("listStudioGenerationActiveRuns");
+    const control = source("src/renderer/src/components/StudioGenerationControlView.vue");
+    expect(control).toContain("planEnvelopeNextLabel");
+    expect(control).toContain('data-testid="studio-generation-plan-next"');
+    expect(control).toContain("planEnvelopeNextLabel([])");
+    expect(control).toContain("group.nodes.map((node) => node.status)");
+    expect(control).not.toContain("getStudioGenerationControlEnvelope");
+    expect(control).not.toContain("operation: \"plan\"");
+    const mcp = source("src/mcp/server.ts");
+    expect(mcp).toContain("plan 信封 nextAction");
+    expect(mcp).toContain("未限定列表或 not_found→follow-core-readiness");
+    expect(mcp).toContain("get_studio_generation_control(operation=plan) 看 envelope nextAction");
+    expect(mcp).toContain("wait/retry/Review 时禁止 dispatch");
   });
 });

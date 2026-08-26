@@ -26,10 +26,11 @@
       <div v-if="!progress || progress.nodes.length === 0" class="plans-empty" data-testid="generation-plan-empty-guide">
         <strong>尚无生成计划</strong>
         <p>步骤：① 绑定就绪 → ② 冻结/建计划 → ③ 派发生图 → ④ 回写 → ⑤ 审片。在画布选中宫格点「开始」，或由 Agent 经 MCP 建立计划；进度只来自本地账本。</p>
+        <p data-testid="studio-generation-plan-next">{{ planEnvelopeNextLabel([]) }}</p>
       </div>
       <article v-for="(group, groupIndex) in planGroups" :key="group.planId" class="plan-group" :data-plan-id="group.planId">
         <header>
-          <small>第 {{ groupIndex + 1 }} 批 · {{ group.nodes.length }} 个任务<template v-if="group.lastActivityAt"> · 最近活动 {{ group.lastActivityAt }}</template></small>
+          <small>第 {{ groupIndex + 1 }} 批 · {{ group.nodes.length }} 个任务<template v-if="group.lastActivityAt"> · 最近活动 {{ group.lastActivityAt }}</template> · <span data-testid="studio-generation-plan-next">{{ planEnvelopeNextLabel(group.nodes.map((node) => node.status)) }}</span></small>
           <button
             v-if="group.retriable"
             type="button"
@@ -364,6 +365,7 @@ import {
 import { formatCharacterBackReferences, formatPropBackReferences, formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
 import {
   composeStudioGenerationPlanDraft,
+  planEnvelopeNextLabel,
   refineStudioGenerationPlanDraftIfUnitGridBlocking,
   type PersistedPlanNodeStatus,
   type StudioGenerationPlanDraftNode,

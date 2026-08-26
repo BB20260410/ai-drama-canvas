@@ -127,6 +127,8 @@ describe("正式生图页锁版光线服化与场景回指", () => {
     expect(view).toContain("styleLockRefsFromAnyFrozenPack");
     expect(view).toContain('data-testid="studio-control-beat"');
     expect(view).toContain('data-testid="studio-generation-plan-draft"');
+    expect(view).toContain('data-testid="studio-generation-plan-next"');
+    expect(view).toContain("planEnvelopeNextLabel");
     expect(view).toContain("composeStudioGenerationPlanDraft");
     expect(view).toContain("formatUnitLockPanelShotTypeLine");
     expect(view).toContain("formatUnitLockPanelBeatLine");
