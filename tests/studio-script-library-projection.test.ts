@@ -10,9 +10,12 @@ import {
   formatPanelStandingGaps,
   formatPanelStandingHandoff,
   formatSceneBackReferences,
+  formatWizardSceneBackReferenceLine,
   listPanelStandingGaps,
   listSceneAssetMentions,
   listSceneBackReferences,
+  wizardSceneMentionsFromSuggestedIds,
+  WIZARD_SCENE_BACKREF_UNLOADED_NOTE,
   normalizeSourceSpans,
   summarizePanelAssetMentions,
   pickFirstCoveredPanel,
@@ -587,6 +590,43 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(pickFirstMissingPanel(panels)?.panelId).toBe("p1");
     expect(pickFirstMissingPanel(panels.filter((panel) => panel.hasMedia))).toBeUndefined();
   });
+
+  it("向导场景回指只认对照板里出现过的 scene，不写冻结提示词", () => {
+    const units = [{
+      unitId: "u1",
+      sequence: 1,
+      panels: [{
+        panelId: "u1p1",
+        panelIndex: 1,
+        assetMentions: [
+          { assetId: "scene-stone", category: "scene", role: "石室" },
+          { assetId: "char-a", category: "character", role: "豆姐" },
+        ],
+      }],
+    }];
+    expect(wizardSceneMentionsFromSuggestedIds(["scene-stone", "char-a"], units)).toEqual([
+      { assetId: "scene-stone", category: "scene", role: "石室" },
+    ]);
+    expect(wizardSceneMentionsFromSuggestedIds(["char-a"], units)).toEqual([]);
+    expect(formatWizardSceneBackReferenceLine({
+      boardLoaded: false,
+      currentSequence: 2,
+      currentPanelIndex: 1,
+      suggestedAssetIds: ["scene-stone"],
+      units,
+    })).toBe(WIZARD_SCENE_BACKREF_UNLOADED_NOTE);
+    expect(formatWizardSceneBackReferenceLine({
+      boardLoaded: true,
+      currentSequence: 2,
+      currentPanelIndex: 1,
+      suggestedAssetIds: ["scene-stone"],
+      units,
+    })).toContain("U1 G1 石室");
+    const wizard = readFileSync(path.join(repoRoot, "src/core/studio-storyboard-wizard.ts"), "utf8");
+    expect(wizard).toContain("formatWizardPromptBody(input.panels)");
+    expect(wizard).not.toContain("formatWizardSceneBackReferenceLine");
+    expect(wizard).not.toContain("场景回指");
+  });
 });
 
 describe("SSL-0 ScriptSpanMediaMap 入口", () => {
@@ -607,6 +647,8 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     expect(source).toContain("summarizePanelAssetMentions");
     expect(source).toContain("listSceneBackReferences");
     expect(source).toContain("formatSceneBackReferenceLineFromBoard");
+    expect(source).toContain("formatWizardSceneBackReferenceLine");
+    expect(source).toContain("wizardSceneMentionsFromSuggestedIds");
     expect(source).toContain("sceneBackReferenceLine");
     expect(source).toContain('from "./studio-scene-backrefs.js"');
     expect(source).toContain("不是 BindingSet，不能当 generation-ready");

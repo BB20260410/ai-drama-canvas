@@ -63,6 +63,12 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("wizardStandingLine");
     expect(vue).toContain("wizardLightingLine");
     expect(vue).toContain("wizardCostumeLine");
+    expect(vue).toContain("wizardSceneBackRefLine");
+    expect(vue).toContain("formatWizardSceneBackReferenceLine");
+    expect(vue).toContain('data-testid="storyboard-wizard-scene-backrefs"');
+    expect(vue).toContain("revealWizardSceneBackRef");
+    expect(vue).toContain('activeTab.value = "align"');
+    expect(vue).not.toContain("studio-scene-backrefs-read");
     expect(vue).toContain("wizardPreviousStandingForPanel");
     expect(vue).toContain("formatUnitLockPreviousStandingLine");
     expect(vue).toContain("formatWizardLockPreviousLightingLine");

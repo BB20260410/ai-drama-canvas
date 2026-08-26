@@ -10,8 +10,10 @@ import {
   formatPanelStandingGaps,
   formatPanelStandingHandoff,
   formatSceneBackReferences,
+  formatWizardSceneBackReferenceLine,
   listSceneAssetMentions,
   listSceneBackReferences,
+  wizardSceneMentionsFromSuggestedIds,
   pickFirstCoveredPanel,
   pickFirstMissingPanel,
   type SceneBackReference,
@@ -400,6 +402,39 @@ function wizardLightingLine(panelIndex: number): string | null {
 
 function wizardCostumeLine(panelIndex: number): string | null {
   return formatWizardLockPreviousCostumeLine(wizardPreviousCostumeForPanel(wizardPanels.value, panelIndex));
+}
+
+function wizardSceneBackRefLine(panelIndex: number): string {
+  const panel = wizardPanels.value.find((entry) => entry.panelIndex === panelIndex);
+  return formatWizardSceneBackReferenceLine({
+    boardLoaded: Boolean(board.value),
+    currentSequence: wizardSequence.value,
+    currentPanelIndex: panelIndex,
+    suggestedAssetIds: panel?.suggestedAssetIds,
+    units: board.value?.rows ?? [],
+  });
+}
+
+function wizardSceneBackRefs(panelIndex: number): SceneBackReference[] {
+  if (!board.value) return [];
+  const panel = wizardPanels.value.find((entry) => entry.panelIndex === panelIndex);
+  return listSceneBackReferences({
+    currentUnitId: "wizard-draft",
+    currentSequence: wizardSequence.value,
+    currentPanelIndex: panelIndex,
+    currentPanelId: `wizard-g${panelIndex}`,
+    sceneMentions: wizardSceneMentionsFromSuggestedIds(panel?.suggestedAssetIds, board.value.rows),
+    units: board.value.rows,
+  });
+}
+
+async function revealWizardSceneBackRef(ref: SceneBackReference): Promise<void> {
+  if (!board.value) {
+    notice.value = "对照板未加载，无法查场景回指。不是 BindingSet，不能当 generation-ready。";
+    return;
+  }
+  activeTab.value = "align";
+  await revealSceneBackRef(ref);
 }
 
 function reflowWizardTimings(): void {
@@ -1061,6 +1096,15 @@ function shortSha(value: string | null | undefined): string {
             class="wide wizard-lock-hint wizard-previous-costume"
             data-testid="storyboard-wizard-previous-costume"
           >{{ wizardCostumeLine(panel.panelIndex) }}</p>
+          <p class="wide wizard-lock-hint" data-testid="storyboard-wizard-scene-backrefs">{{ wizardSceneBackRefLine(panel.panelIndex) }}</p>
+          <button
+            v-for="ref in wizardSceneBackRefs(panel.panelIndex)"
+            :key="`${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+            type="button"
+            class="wide"
+            :data-testid="`storyboard-wizard-scene-backref-${ref.unitId}-${ref.panelId}`"
+            @click="revealWizardSceneBackRef(ref)"
+          >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
           <small class="wide">原文锚 {{ panel.sourceSpans.length }} · 资产建议 {{ panel.suggestedAssetIds.length }} · 歧义 {{ panel.unresolvedProposals.length }}</small>
         </article>
       </section>

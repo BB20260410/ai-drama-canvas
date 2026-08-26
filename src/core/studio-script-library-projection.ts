@@ -301,6 +301,67 @@ export function listSceneBackReferences(input: {
     .slice(0, limit);
 }
 
+export const WIZARD_SCENE_BACKREF_UNLOADED_NOTE =
+  "对照板未加载，无法查场景回指。不是 BindingSet，不能当 generation-ready。";
+
+const WIZARD_DRAFT_UNIT_ID = "wizard-draft";
+
+/** 建议资产只在已加载对照板里出现过 category=scene 才算场景提及。 */
+export function wizardSceneMentionsFromSuggestedIds(
+  suggestedAssetIds: ReadonlyArray<string> | null | undefined,
+  units: ReadonlyArray<{
+    panels: ReadonlyArray<{
+      assetMentions: ReadonlyArray<{ assetId: string; category: string; role?: string }>;
+    }>;
+  }>,
+): PanelAssetMentionLite[] {
+  const suggested = new Set(
+    (suggestedAssetIds ?? []).map((assetId) => assetId.trim()).filter(Boolean),
+  );
+  if (!suggested.size) return [];
+  const sceneById = new Map<string, string>();
+  for (const unit of units) {
+    for (const panel of unit.panels) {
+      for (const mention of listSceneAssetMentions(panel.assetMentions)) {
+        if (!suggested.has(mention.assetId) || sceneById.has(mention.assetId)) continue;
+        sceneById.set(mention.assetId, mention.role);
+      }
+    }
+  }
+  return [...sceneById.entries()].map(([assetId, role]) => ({ assetId, category: "scene", role }));
+}
+
+/** 15s 向导：只扫已加载对照板。不写冻结提示词，不是 BindingSet。 */
+export function formatWizardSceneBackReferenceLine(input: {
+  boardLoaded: boolean;
+  currentSequence: number;
+  currentPanelIndex: number;
+  suggestedAssetIds?: ReadonlyArray<string> | null;
+  units: ReadonlyArray<{
+    unitId: string;
+    sequence: number;
+    panels: ReadonlyArray<{
+      panelId: string;
+      panelIndex: number;
+      assetMentions: ReadonlyArray<{ assetId: string; category: string; role?: string }>;
+    }>;
+  }>;
+}): string {
+  if (!input.boardLoaded) return WIZARD_SCENE_BACKREF_UNLOADED_NOTE;
+  const mentions = wizardSceneMentionsFromSuggestedIds(input.suggestedAssetIds, input.units);
+  return formatSceneBackReferences(
+    mentions.length,
+    listSceneBackReferences({
+      currentUnitId: WIZARD_DRAFT_UNIT_ID,
+      currentSequence: input.currentSequence,
+      currentPanelIndex: input.currentPanelIndex,
+      currentPanelId: `wizard-g${input.currentPanelIndex}`,
+      sceneMentions: mentions,
+      units: input.units,
+    }),
+  );
+}
+
 export function formatSceneBackReferenceLineFromBoard(input: {
   currentUnitId: string;
   currentSequence: number;
