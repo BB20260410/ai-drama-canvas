@@ -1,0 +1,52 @@
+{
+  "kind": "runtime-perf-memory-external-review",
+  "date": "2026-08-26",
+  "scope": "branch cursor/runtime-perf-memory-plan-4c1c vs main; Wave 1–7 hot path only",
+  "not": ["installed-T23", "list-gui-probe", "P7-owner", "formal-project-scan"],
+  "seats": {
+    "glm-5.3": {
+      "channel": "ark-agent-plan /api/plan/v3",
+      "http": 200,
+      "usableIssueTable": false,
+      "note": "思考占满，未给出合格中文问题表"
+    },
+    "deepseek-v4-pro": {
+      "channel": "qwen-token-plan cn-beijing",
+      "http": 200,
+      "usableIssueTable": true,
+      "rejected": [
+        "invented canvas-rebuild.ts and command-bus/index.ts",
+        "marked intentional sync rebuildGraph as must-fix",
+        "marked static ledger import as should-fix (red-line write path)"
+      ]
+    },
+    "doubao-seed-evolving": {
+      "channel": "ark-agent-plan /api/plan/v3",
+      "http": null,
+      "usableIssueTable": false,
+      "note": "两次 TimeoutError；短探测此前已 200，不当成调不了"
+    },
+    "qwen3.8-max-preview": {
+      "channel": "qwen-token-plan cn-beijing",
+      "http": 200,
+      "role": "chief",
+      "mustFix": false
+    },
+    "kimi-k3": "NOT_RUN_this_review",
+    "tokenrouter-tr": "NOT_RUN_401_history"
+  },
+  "redLinesUnchanged": {
+    "THUMBNAIL_RECIPE": "material-studio-thumb:v1:autorotate:inside-512:no-enlarge:webp-q82",
+    "VERIFIED_FILE_CACHE_LIMIT": 2048,
+    "STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS": 120000,
+    "listStudioProductionUnitsBody": "unchanged",
+    "assertDatabaseFilesCount": 3,
+    "commandBusStaticLedgerImport": true
+  },
+  "sessionVerdict": {
+    "mustFix": false,
+    "didNotImplementDeepSeekMustFix": true,
+    "conclusion": "部分完成",
+    "reason": "外部席已实调；主审无 must-fix；豆包超时、GLM 表不合格；安装版 T23 / GUI 探针 / P7 仍 NOT_RUN"
+  }
+}
