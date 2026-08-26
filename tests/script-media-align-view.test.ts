@@ -35,6 +35,9 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(parse(vue, { filename: "ScriptMediaAlignView.vue" }).errors).toEqual([]);
     expect(vue).toContain('data-testid="script-library-import"');
     expect(vue).toContain('data-testid="script-reader-to-wizard"');
+    expect(vue).toContain('data-testid="script-reader-span-media"');
+    expect(vue).toContain('data-testid="script-reader-span-media-board"');
+    expect(vue).toContain("getStudioScriptSpanMediaMap");
     expect(vue).toContain('data-testid="storyboard-wizard-suggest"');
     expect(vue).toContain('data-testid="storyboard-wizard-materialize"');
     expect(vue).toContain('data-testid="ssl5-missing-to-gen-plan"');
@@ -84,6 +87,10 @@ describe("剧本库与 15 秒分镜源码合同", () => {
   it("分镜建议进行中 fail-closed：busy 在首个 await 之前置位，阅读器与向导入口都禁用并给出大白话原因，连点不会重复写入", () => {
     const vue = source();
 
+    const spanButton = buttonAttrs(vue, "script-reader-span-media");
+    expect(spanButton).toContain(':disabled="Boolean(actionLoading)"');
+    expect(spanButton).toContain("正在处理，不能再查这段配图");
+
     const readerSuggest = buttonAttrs(vue, "script-reader-to-wizard");
     expect(readerSuggest).toContain(':disabled="Boolean(actionLoading)"');
     expect(readerSuggest).toContain("正在处理，不能再生成分镜建议");
@@ -93,6 +100,16 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(wizardSuggest).toContain(':disabled="Boolean(actionLoading)"');
     expect(wizardSuggest).toContain("正在处理，不能再生成分镜建议");
     expect(vue).toContain('{{ actionLoading === "wizard" ? "建议中…" : "重新生成建议" }}');
+
+    const spanLookup = handlerBody(vue, "async function lookupSpanMedia()", "async function suggestWizard(");
+    expect(spanLookup).toContain("if (actionLoading.value) return;");
+    expect(spanLookup).toContain('actionLoading.value = "span-media"');
+    expect(spanLookup.indexOf("if (actionLoading.value) return;")).toBeLessThan(
+      spanLookup.indexOf('actionLoading.value = "span-media"'),
+    );
+    expect(spanLookup.indexOf('actionLoading.value = "span-media"')).toBeLessThan(
+      spanLookup.indexOf("await props.api.getStudioScriptSpanMediaMap"),
+    );
 
     const suggest = handlerBody(vue, "async function suggestWizard()", "function reflowWizardTimings(");
     expect(suggest).toContain("if (actionLoading.value) return;");

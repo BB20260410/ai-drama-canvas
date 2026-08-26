@@ -454,6 +454,21 @@ export function buildMissingMediaReport(map: EpisodeUnitMediaMap): MissingMediaR
   };
 }
 
+export async function getStudioScriptSpanMediaMap(
+  projectRoot: string,
+  query: { season: string; episode: string; startOffsetUtf16: number; endOffsetUtf16: number; limit?: number },
+): Promise<ScriptSpanMediaMap> {
+  const map = await getStudioEpisodeUnitMediaMap(projectRoot, {
+    season: query.season,
+    episode: query.episode,
+    ...(query.limit !== undefined ? { limit: query.limit } : {}),
+  });
+  return resolveScriptSpanMediaMap(map, {
+    startOffsetUtf16: query.startOffsetUtf16,
+    endOffsetUtf16: query.endOffsetUtf16,
+  });
+}
+
 export async function getStudioEpisodeMissingMediaReport(
   projectRoot: string,
   query: { season: string; episode: string; limit?: number },

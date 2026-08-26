@@ -3347,6 +3347,18 @@ function registerIpc(): void {
     },
   );
   ipcMain.handle(
+    "canvas:get-studio-script-span-media-map",
+    async (
+      _event,
+      projectRoot: string,
+      query: { season: string; episode: string; startOffsetUtf16: number; endOffsetUtf16: number; limit?: number },
+    ) => {
+      await requireManagedStudioProjectReadOnly(projectRoot);
+      const { getStudioScriptSpanMediaMap } = await import("../core/studio-script-library-projection.js");
+      return getStudioScriptSpanMediaMap(projectRoot, query);
+    },
+  );
+  ipcMain.handle(
     "canvas:plan-ssl5-missing-to-gen",
     async (
       _event,

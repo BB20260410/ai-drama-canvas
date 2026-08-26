@@ -193,5 +193,6 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     expect(server).toContain("script-span-media-map");
     expect(server).toContain("resolveScriptSpanMediaMap");
     expect(server).toContain("startOffsetUtf16");
+    expect(readFileSync(path.join(repoRoot, "src/core/studio-script-library-projection.ts"), "utf8")).toContain("export async function getStudioScriptSpanMediaMap");
   });
 });

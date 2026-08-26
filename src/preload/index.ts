@@ -371,6 +371,11 @@ const api = {
     query: { season: string; episode: string; documentId?: string; revisionId?: string; evidenceDir?: string },
   ): ReturnType<typeof import("../core/studio-script-media-align.js").getStudioScriptMediaAlignBoard> =>
     ipcRenderer.invoke("canvas:get-studio-script-media-align-board", projectRoot, query),
+  getStudioScriptSpanMediaMap: (
+    projectRoot: string,
+    query: { season: string; episode: string; startOffsetUtf16: number; endOffsetUtf16: number; limit?: number },
+  ): ReturnType<typeof import("../core/studio-script-library-projection.js").getStudioScriptSpanMediaMap> =>
+    ipcRenderer.invoke("canvas:get-studio-script-span-media-map", projectRoot, query),
   planSsl5MissingToGen: (
     projectRoot: string,
     query: { season: string; episode: string; documentId?: string; evidenceDir?: string },

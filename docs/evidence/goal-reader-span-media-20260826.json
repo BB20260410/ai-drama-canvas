@@ -1,0 +1,25 @@
+{
+  "id": "goal-reader-span-media-20260826",
+  "createdAt": "2026-08-26T18:35:00.000Z",
+  "kind": "reader-span-media-readonly",
+  "conclusion": "PASS",
+  "scope": "Script reader selected-span media lookup; does not dispatch, evaluate, or Review PASS",
+  "invariants": {
+    "ipcReadOnly": true,
+    "usesGetStudioScriptSpanMediaMap": true,
+    "emptySelectionFailsClosed": true,
+    "doesNotDispatch": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotReviewPass": true
+  },
+  "proof": {
+    "tests": [
+      "tests/script-media-align-view.test.ts",
+      "tests/studio-script-library-projection.test.ts",
+      "tests/material-studio-ui-contract.test.ts"
+    ],
+    "files": 3,
+    "testsPassed": 21,
+    "typecheckApp": "PASS"
+  }
+}
