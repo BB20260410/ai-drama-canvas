@@ -24,6 +24,7 @@ import type {
 import type { StudioScriptProductUiApi } from "../material-studio-ui-contract";
 import type { Ssl5MissingToGenPlan } from "@core/studio-ssl5-missing-to-gen";
 import { listOrWorkbenchPreviewUrl } from "../studio-list-preview-url";
+import StudioGenerationTraceDrawer, { type StudioTraceDrawerModel } from "./StudioGenerationTraceDrawer.vue";
 
 const props = defineProps<{
   projectRoot: string;
@@ -65,6 +66,11 @@ const wizardUnitTitle = ref("新建 15 秒分镜单元");
 const materialized = ref<Awaited<ReturnType<StudioScriptProductUiApi["materializeStoryboardWizard"]>> | null>(null);
 const selectedAlignRow = ref<ScriptMediaAlignRow | null>(null);
 const selectedAlignPanel = ref<AlignPanelRow | null>(null);
+const alignTraceOpen = ref(false);
+const alignTraceLoading = ref(false);
+const alignTraceError = ref("");
+const alignTrace = ref<StudioTraceDrawerModel | null>(null);
+let alignTraceLoadSequence = 0;
 const selectedMediaPreview = ref<{ mediaUrl: string; thumbnailUrl?: string; kind: string } | null>(null);
 const alignShowOriginal = ref(false);
 const alignPreviewSrc = computed(() => listOrWorkbenchPreviewUrl({
@@ -519,6 +525,54 @@ async function selectAlignPanel(panel: AlignPanelRow): Promise<void> {
   await loadAlignPreview(panel.rawSha256);
 }
 
+function resolveAlignTraceSelector(): { packId: string } | { runId: string } | null {
+  if (selectedAlignPanel.value) {
+    if (selectedAlignPanel.value.packId) return { packId: selectedAlignPanel.value.packId };
+    if (selectedAlignPanel.value.generationRunId) return { runId: selectedAlignPanel.value.generationRunId };
+    return null;
+  }
+  if (selectedAlignRow.value?.packId) return { packId: selectedAlignRow.value.packId };
+  if (selectedAlignRow.value?.generationRunId) return { runId: selectedAlignRow.value.generationRunId };
+  return null;
+}
+
+async function openAlignGenerationTrace(): Promise<void> {
+  if (!props.api.getStudioTrace) {
+    alignTraceOpen.value = true;
+    alignTraceError.value = "当前桌面适配层未接入 getStudioTrace。";
+    alignTrace.value = null;
+    return;
+  }
+  const selector = resolveAlignTraceSelector();
+  alignTraceOpen.value = true;
+  alignTraceError.value = "";
+  alignTrace.value = null;
+  if (!selector) {
+    alignTraceError.value = "需要 pack 或 run。未冻结的宫格不能打开生成追溯，禁止猜第一格。";
+    return;
+  }
+  const sequence = ++alignTraceLoadSequence;
+  alignTraceLoading.value = true;
+  try {
+    const trace = await props.api.getStudioTrace(props.projectRoot, selector);
+    if (sequence !== alignTraceLoadSequence) return;
+    alignTrace.value = trace;
+  } catch (reason) {
+    if (sequence !== alignTraceLoadSequence) return;
+    alignTraceError.value = messageOf(reason);
+  } finally {
+    if (sequence === alignTraceLoadSequence) alignTraceLoading.value = false;
+  }
+}
+
+function closeAlignGenerationTrace(): void {
+  alignTraceLoadSequence += 1;
+  alignTraceOpen.value = false;
+  alignTraceLoading.value = false;
+  alignTrace.value = null;
+  alignTraceError.value = "";
+}
+
 async function selectAlignTablePanel(row: ScriptMediaAlignRow, panel: AlignPanelRow): Promise<void> {
   selectedAlignRow.value = row;
   selectedAlignPanel.value = panel;
@@ -828,6 +882,17 @@ function shortSha(value: string | null | undefined): string {
             <div><dt>原文锚</dt><dd>{{ selectedAlignPanel?.sourceSpans.length ?? selectedAlignRow.sourceSpans.length }}</dd></div>
             <div><dt>pack</dt><dd><code data-testid="align-panel-pack">{{ selectedAlignPanel?.packId || selectedAlignRow.packId || "—" }}</code></dd></div>
             <div><dt>run</dt><dd><code data-testid="align-panel-run">{{ selectedAlignPanel?.generationRunId || selectedAlignRow.generationRunId || "—" }}</code></dd></div>
+            <div>
+              <dt>追溯</dt>
+              <dd>
+                <button
+                  type="button"
+                  data-testid="align-open-trace"
+                  :disabled="!resolveAlignTraceSelector() || !api.getStudioTrace"
+                  @click="openAlignGenerationTrace"
+                >打开生成追溯</button>
+              </dd>
+            </div>
             <div><dt>构图</dt><dd data-testid="align-panel-composition">{{ selectedAlignPanel?.shotComposition || "—" }}</dd></div>
             <div><dt>动作</dt><dd data-testid="align-panel-action">{{ selectedAlignPanel?.visualAction || "—" }}</dd></div>
             <div><dt>运镜</dt><dd data-testid="align-panel-filming">{{ selectedAlignPanel?.filmingMethod || "—" }}</dd></div>
@@ -848,6 +913,13 @@ function shortSha(value: string | null | undefined): string {
         </template>
         <div v-else class="empty">点击一行查看本地 raw/labeled 身份与缩略图。</div>
       </aside>
+      <StudioGenerationTraceDrawer
+        :open="alignTraceOpen"
+        :loading="alignTraceLoading"
+        :error="alignTraceError"
+        :trace="alignTrace"
+        @close="closeAlignGenerationTrace"
+      />
     </main>
 
     <main v-else-if="activeTab === 'wizard' && reader" class="wizard-layout" data-testid="storyboard-wizard-pane">
@@ -920,7 +992,7 @@ function shortSha(value: string | null | undefined): string {
 </template>
 
 <style scoped>
-.script-product{height:100%;min-height:620px;overflow:auto;padding:18px 22px 48px;box-sizing:border-box;background:var(--ui-bg,#121310);color:var(--ui-text,#e8e6dc);font-size:11px}
+.script-product{position:relative;height:100%;min-height:620px;overflow:auto;padding:18px 22px 48px;box-sizing:border-box;background:var(--ui-bg,#121310);color:var(--ui-text,#e8e6dc);font-size:11px}
 .product-header{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:flex-end;margin-bottom:12px}
 .eyebrow{color:var(--ui-accent,#d7af55);font:700 9px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em}
 h2{margin:4px 0;font-size:19px}h3{margin:0 0 10px;font-size:13px}.product-header p{margin:0;color:var(--ui-text-2,#8f9287)}

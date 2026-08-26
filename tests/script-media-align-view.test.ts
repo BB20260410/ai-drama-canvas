@@ -65,6 +65,13 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("align-panel-peek");
     expect(vue).toContain("align-panel-pack");
     expect(vue).toContain("align-panel-run");
+    expect(vue).toContain('data-testid="align-open-trace"');
+    expect(vue).toContain("openAlignGenerationTrace");
+    expect(vue).toContain("resolveAlignTraceSelector");
+    expect(vue).toContain("getStudioTrace");
+    expect(vue).toContain("禁止猜第一格");
+    expect(vue).not.toContain("evaluateStudioConsistency");
+    expect(vue).not.toContain("getStudioBindingControl");
     expect(vue).toContain("align-panel-composition");
     expect(vue).toContain("align-panel-action");
     expect(vue).toContain("align-panel-handoff");

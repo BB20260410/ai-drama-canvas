@@ -960,6 +960,12 @@ const studioScriptAlignApi = {
   ) {
     return window.canvasApi.getStudioScriptMediaAlignBoard(root, query);
   },
+  getStudioTrace(
+    root: string,
+    selector: { packId?: string; runId?: string; resultId?: string },
+  ) {
+    return window.canvasApi.getStudioTrace(root, selector);
+  },
   planSsl5MissingToGen(
     root: string,
     query: { season: string; episode: string; documentId?: string },

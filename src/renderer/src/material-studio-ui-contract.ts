@@ -17,6 +17,7 @@ import type { ScriptReaderView } from "../../core/studio-script-library-reader.j
 import type { StudioProductionUnitListQuery, StudioProductionUnitPage } from "../../core/studio-production.js";
 import type { StudioStoryboardWizardSession, WizardEditablePanel } from "../../core/studio-storyboard-wizard.js";
 import type { Ssl5MissingToGenPlan } from "../../core/studio-ssl5-missing-to-gen.js";
+import type { StudioGenerationTrace } from "../../core/studio-trace.js";
 
 export type MaterialStudioSection = "script" | "prompt" | "character" | "scene" | "prop" | "style" | "media";
 export type MaterialStudioAssetCategory = "character" | "scene" | "prop" | "style";
@@ -327,6 +328,10 @@ export interface StudioScriptProductUiApi {
     evidenceDir?: string;
   }): Promise<ScriptReaderView>;
   getStudioScriptMediaAlignBoard(projectRoot: string, query: { season: string; episode: string }): Promise<import("../../core/studio-script-media-align.js").ScriptMediaAlignBoard>;
+  getStudioTrace?(
+    projectRoot: string,
+    selector: { packId?: string; runId?: string; resultId?: string },
+  ): Promise<StudioGenerationTrace>;
   planSsl5MissingToGen(projectRoot: string, query: { season: string; episode: string; documentId?: string }): Promise<Ssl5MissingToGenPlan>;
   getStudioScriptSpanMediaMap(projectRoot: string, query: {
     season: string;
