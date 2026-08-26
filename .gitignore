@@ -77,6 +77,8 @@
 .env
 .env.*
 !.env.example
+**/.grok/env.local
+env.local
 .npmrc
 *.pem
 *.key
