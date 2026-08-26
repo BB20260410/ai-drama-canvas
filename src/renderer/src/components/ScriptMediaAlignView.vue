@@ -464,6 +464,7 @@ async function revealSpanMediaHit(hit: ScriptSpanMediaHit): Promise<void> {
     await loadAlignPreview(focusPanel.rawSha256);
     activeTab.value = "align";
     notice.value = `已对照 ${hit.unitId} G${hit.panelIndex}。`;
+    await scrollAlignRowIntoView(hit.unitId);
   } catch (reason) {
     report(reason);
   } finally {
@@ -483,6 +484,13 @@ async function revealSsl5Focus(nextBoard: ScriptMediaAlignBoard, nextPlan: Ssl5M
       : undefined
   ) ?? pickFirstMissingPanel(focusRow.panels) ?? pickFirstCoveredPanel(focusRow.panels) ?? null;
   await loadAlignPreview(selectedAlignPanel.value?.rawSha256 ?? focusRow.rawSha256);
+  await scrollAlignRowIntoView(focusRow.unitId);
+}
+
+async function scrollAlignRowIntoView(unitId: string): Promise<void> {
+  await nextTick();
+  const row = document.querySelector(`[data-testid="align-row-${unitId}"]`);
+  if (row instanceof HTMLElement) row.scrollIntoView({ block: "nearest" });
 }
 
 async function loadAlignPreview(rawSha256: string | null | undefined): Promise<void> {

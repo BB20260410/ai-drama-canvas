@@ -169,6 +169,8 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(reveal).toContain('activeTab.value = "align"');
     expect(reveal).toContain("不能猜宫格");
     expect(reveal).toContain("loadAlignPreview(focusPanel.rawSha256)");
+    expect(reveal).toContain("scrollAlignRowIntoView(hit.unitId)");
+    expect(vue).toContain('scrollIntoView({ block: "nearest" })');
     expect(reveal).not.toContain("revealSsl5Focus");
     expect(reveal).not.toContain("pickFirstCoveredPanel");
     expect(reveal).not.toContain("getStudioBindingControl");
