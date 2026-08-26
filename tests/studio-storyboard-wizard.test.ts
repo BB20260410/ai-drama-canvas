@@ -104,6 +104,8 @@ describe("studio-storyboard-wizard", () => {
     expect(body).toContain("前镜交接：G1 中景 · 站定 · 固定。本格必须从该站位连续起拍");
     expect(body).not.toContain("光线：");
     expect(body).not.toContain("服化：");
+    expect(body).not.toContain("场景回指");
+    expect(body).not.toContain("道具回指");
     const lit = applyWizardPanelEdits(panels, [
       { panelIndex: 1, sceneLighting: "室内火光", costumeState: "深灰祭服" },
     ]);

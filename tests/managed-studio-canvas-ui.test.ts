@@ -2110,6 +2110,8 @@ describe("受管画布侧栏列表视口剔除", () => {
     expect(view).not.toContain("studio-unit-lock-overlays-read");
     expect(inspector).toContain('data-testid="managed-canvas-inspector-scene-backrefs"');
     expect(inspector).toContain("panelSceneBackReferenceNote");
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-prop-backrefs"');
+    expect(inspector).toContain("panelPropBackReferenceNote");
     expect(view).toContain("getStudioSceneBackReferences");
     expect(view).toContain("revealInspectorSceneBackRef");
     expect(view).toContain("focusAppearance(ref.unitId, ref.panelId)");

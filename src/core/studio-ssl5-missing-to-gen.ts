@@ -12,7 +12,10 @@ import {
 import {
   formatPanelLightingCostumeLine,
   formatPanelStandingGaps,
+  formatPropBackReferenceLineFromBoard,
   formatSceneBackReferenceLineFromBoard,
+  listPropAssetMentions,
+  listPropBackReferences,
   listSceneAssetMentions,
   listSceneBackReferences,
   pickFirstMissingPanel,
@@ -23,7 +26,7 @@ import {
   wizardPreviousCostumeForPanel,
   wizardPreviousLightingForPanel,
 } from "./studio-panel-standing.js";
-import type { SceneBackReference } from "./studio-scene-backrefs.js";
+import type { PropBackReference, SceneBackReference } from "./studio-scene-backrefs.js";
 
 export const SSL5_PLAN_SCHEMA_VERSION = 1 as const;
 
@@ -48,6 +51,8 @@ export interface Ssl5MissingToGenPlanItem {
   previousCostumeLine: string | null;
   sceneBackReferenceLine: string;
   sceneBackReferences: SceneBackReference[];
+  propBackReferenceLine: string;
+  propBackReferences: PropBackReference[];
 }
 
 export interface Ssl5MissingToGenPlan {
@@ -70,6 +75,8 @@ export interface Ssl5MissingToGenPlan {
   previousCostumeLine: string | null;
   sceneBackReferenceLine: string;
   sceneBackReferences: SceneBackReference[];
+  propBackReferenceLine: string;
+  propBackReferences: PropBackReference[];
   missingAllCount: number;
   partialCount: number;
   items: Ssl5MissingToGenPlanItem[];
@@ -113,6 +120,17 @@ export function buildSsl5PlanFromBoard(
             units: board.rows,
           })
         : [];
+      const propMentions = listPropAssetMentions(missingPanel?.assetMentions);
+      const propBackReferences = missingPanel
+        ? listPropBackReferences({
+            currentUnitId: row.unitId,
+            currentSequence: row.sequence,
+            currentPanelIndex: missingPanel.panelIndex,
+            currentPanelId: missingPanel.panelId,
+            propMentions,
+            units: board.rows,
+          })
+        : [];
       const previousLighting = missingPanel
         ? wizardPreviousLightingForPanel(row.panels ?? [], missingPanel.panelIndex)
         : null;
@@ -149,6 +167,17 @@ export function buildSsl5PlanFromBoard(
             })
           : "没有宫格可查场景回指",
         sceneBackReferences,
+        propBackReferenceLine: missingPanel
+          ? formatPropBackReferenceLineFromBoard({
+              currentUnitId: row.unitId,
+              currentSequence: row.sequence,
+              currentPanelIndex: missingPanel.panelIndex,
+              currentPanelId: missingPanel.panelId,
+              currentMentions: missingPanel.assetMentions,
+              units: board.rows,
+            })
+          : "没有宫格可查道具回指",
+        propBackReferences,
       };
     })
     .sort((left, right) => {
@@ -182,6 +211,8 @@ export function buildSsl5PlanFromBoard(
     previousCostumeLine: focus?.previousCostumeLine ?? null,
     sceneBackReferenceLine: focus?.sceneBackReferenceLine ?? "没有宫格可查场景回指",
     sceneBackReferences: focus?.sceneBackReferences ?? [],
+    propBackReferenceLine: focus?.propBackReferenceLine ?? "没有宫格可查道具回指",
+    propBackReferences: focus?.propBackReferences ?? [],
     missingAllCount: board.missingAllCount,
     partialCount: board.partialCount,
     items,

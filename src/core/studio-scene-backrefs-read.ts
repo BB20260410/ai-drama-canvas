@@ -7,8 +7,11 @@ import { existsSync, lstatSync } from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import {
+  PROP_BACK_REFERENCE_LIMIT,
   SCENE_BACK_REFERENCE_LIMIT,
+  formatPropBackReferences,
   formatSceneBackReferences,
+  type PropBackReference,
   type SceneBackReference,
 } from "./studio-scene-backrefs.js";
 
@@ -35,6 +38,9 @@ export type StudioSceneBackrefReadResult = {
   sceneMentions: Array<{ assetId: string; role: string }>;
   sceneBackReferences: SceneBackReference[];
   sceneBackReferenceNote: string;
+  propMentions: Array<{ assetId: string; role: string }>;
+  propBackReferences: PropBackReference[];
+  propBackReferenceNote: string;
 };
 
 function emptySceneBackrefResult(): StudioSceneBackrefReadResult {
@@ -42,6 +48,9 @@ function emptySceneBackrefResult(): StudioSceneBackrefReadResult {
     sceneMentions: [],
     sceneBackReferences: [],
     sceneBackReferenceNote: formatSceneBackReferences(0, []),
+    propMentions: [],
+    propBackReferences: [],
+    propBackReferenceNote: formatPropBackReferences(0, []),
   };
 }
 
@@ -77,9 +86,10 @@ function openStudioSceneBackrefsDatabase(databasePath: string): DatabaseSync | n
   }
 }
 
-function readCurrentSceneMentions(
+function readCurrentCategoryMentions(
   db: DatabaseSync,
   query: StudioSceneBackrefReadQuery,
+  category: "scene" | "prop",
 ): Array<{ assetId: string; role: string }> {
   const rows = db.prepare(`
     SELECT asset_id, role
@@ -87,13 +97,14 @@ function readCurrentSceneMentions(
     WHERE unit_id = ?
       AND unit_revision = ?
       AND panel_index = ?
-      AND category = 'scene'
+      AND category = ?
     ORDER BY asset_id
     LIMIT ?
   `).all(
     query.unitId,
     query.unitRevision,
     query.panelIndex,
+    category,
     CURRENT_SCENE_MENTION_CAP,
   ) as Array<{ asset_id: string; role: string }>;
   const seen = new Set<string>();
@@ -107,14 +118,16 @@ function readCurrentSceneMentions(
   return mentions;
 }
 
-function readEarlierSceneMentions(
+function readEarlierCategoryMentions(
   db: DatabaseSync,
   query: StudioSceneBackrefReadQuery,
-  sceneIds: readonly string[],
+  assetIds: readonly string[],
+  category: "scene" | "prop",
 ): SceneBackReference[] {
-  if (sceneIds.length === 0) return [];
-  const limit = Math.max(1, Math.min(query.limit ?? SCENE_BACK_REFERENCE_LIMIT, SCENE_BACK_REFERENCE_LIMIT));
-  const placeholders = sceneIds.map(() => "?").join(", ");
+  if (assetIds.length === 0) return [];
+  const cap = category === "prop" ? PROP_BACK_REFERENCE_LIMIT : SCENE_BACK_REFERENCE_LIMIT;
+  const limit = Math.max(1, Math.min(query.limit ?? cap, cap));
+  const placeholders = assetIds.map(() => "?").join(", ");
   const rows = db.prepare(`
     SELECT pa.asset_id, pa.role, pa.unit_id, pa.unit_sequence, pa.panel_index, p.panel_id
     FROM studio_production_panel_assets pa
@@ -124,7 +137,7 @@ function readEarlierSceneMentions(
       ON p.unit_id = pa.unit_id
      AND p.unit_revision = pa.unit_revision
      AND p.panel_index = pa.panel_index
-    WHERE pa.category = 'scene'
+    WHERE pa.category = ?
       AND pa.asset_id IN (${placeholders})
       AND u.season = ?
       AND u.episode = ?
@@ -136,7 +149,8 @@ function readEarlierSceneMentions(
     ORDER BY pa.unit_sequence DESC, pa.panel_index DESC
     LIMIT ?
   `).all(
-    ...sceneIds,
+    category,
+    ...assetIds,
     query.season,
     query.episode,
     query.sequence,
@@ -176,7 +190,7 @@ function readEarlierSceneMentions(
 }
 
 /**
- * 当前宫格快照场景提及 + 同季同集更早同场景宫格。
+ * 当前宫格快照场景/道具提及 + 同季同集更早同资产宫格。
  * 缺库/缺表返回空结果，不建库。不是 BindingSet。
  */
 export function readStudioSceneBackReferences(
@@ -186,16 +200,27 @@ export function readStudioSceneBackReferences(
   const db = openStudioSceneBackrefsDatabase(productionDatabasePath(projectRoot));
   if (!db) return emptySceneBackrefResult();
   try {
-    const sceneMentions = readCurrentSceneMentions(db, query);
-    const sceneBackReferences = readEarlierSceneMentions(
+    const sceneMentions = readCurrentCategoryMentions(db, query, "scene");
+    const sceneBackReferences = readEarlierCategoryMentions(
       db,
       query,
       sceneMentions.map((mention) => mention.assetId),
+      "scene",
+    );
+    const propMentions = readCurrentCategoryMentions(db, query, "prop");
+    const propBackReferences = readEarlierCategoryMentions(
+      db,
+      query,
+      propMentions.map((mention) => mention.assetId),
+      "prop",
     );
     return {
       sceneMentions,
       sceneBackReferences,
       sceneBackReferenceNote: formatSceneBackReferences(sceneMentions.length, sceneBackReferences),
+      propMentions,
+      propBackReferences,
+      propBackReferenceNote: formatPropBackReferences(propMentions.length, propBackReferences),
     };
   } finally {
     db.close();

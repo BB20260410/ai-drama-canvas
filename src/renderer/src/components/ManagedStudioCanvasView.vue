@@ -754,6 +754,8 @@
         :panel-lighting-costume-source="inspectorLightingCostumeSource"
         :panel-scene-back-reference-note="inspectorSceneBackReferenceNote"
         :panel-scene-back-references="inspectorSceneBackReferences"
+        :panel-prop-back-reference-note="inspectorPropBackReferenceNote"
+        :panel-prop-back-references="inspectorPropBackReferences"
         @close="closeInspector"
         @focus-appearance="focusAppearance"
         @appearances-previous="appearancesPrevious"
@@ -829,7 +831,7 @@ import {
   frozenPanelLightingFromAnyFrozenPack,
   previousStandingFromAnyFrozenPack,
 } from "@core/studio-panel-standing";
-import { formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
+import { formatPropBackReferences, formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
 import type { DirectorAction } from "../director-action-panel.js";
 import type {
   MaterialStudioAssetCategory,
@@ -1974,6 +1976,8 @@ const inspectorFrozenCostumeLine = ref<string | null>(null);
 const inspectorLightingCostumeSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>(null);
 const inspectorSceneBackReferenceNote = ref<string | null>(null);
 const inspectorSceneBackReferences = ref<SceneBackReference[]>([]);
+const inspectorPropBackReferenceNote = ref<string | null>(null);
+const inspectorPropBackReferences = ref<SceneBackReference[]>([]);
 type InspectorLockOverlay = {
   panelId: string;
   panelIndex: number;
@@ -2027,6 +2031,8 @@ async function applyInspectorSceneBackrefs(
   if (!props.projectRoot || !unit?.id || !Number.isInteger(unit.revision) || unit.revision < 1) {
     inspectorSceneBackReferenceNote.value = formatSceneBackReferences(0, []);
     inspectorSceneBackReferences.value = [];
+    inspectorPropBackReferenceNote.value = formatPropBackReferences(0, []);
+    inspectorPropBackReferences.value = [];
     return;
   }
   try {
@@ -2042,10 +2048,14 @@ async function applyInspectorSceneBackrefs(
     if (token !== inspectorStandingToken) return;
     inspectorSceneBackReferenceNote.value = result.sceneBackReferenceNote;
     inspectorSceneBackReferences.value = result.sceneBackReferences ?? [];
+    inspectorPropBackReferenceNote.value = result.propBackReferenceNote;
+    inspectorPropBackReferences.value = result.propBackReferences ?? [];
   } catch {
     if (token !== inspectorStandingToken) return;
     inspectorSceneBackReferenceNote.value = formatSceneBackReferences(0, []);
     inspectorSceneBackReferences.value = [];
+    inspectorPropBackReferenceNote.value = formatPropBackReferences(0, []);
+    inspectorPropBackReferences.value = [];
   }
 }
 
@@ -2067,6 +2077,8 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
   inspectorLightingCostumeSource.value = null;
   inspectorSceneBackReferenceNote.value = null;
   inspectorSceneBackReferences.value = [];
+  inspectorPropBackReferenceNote.value = null;
+  inspectorPropBackReferences.value = [];
   if (selection.value?.kind !== "panel") return;
   const panel = selection.value.panel;
   const packId = unitDetail.value?.selectedPanel?.panel.id === panel.id
@@ -4130,6 +4142,8 @@ function closeInspector(): void {
   inspectorLightingCostumeSource.value = null;
   inspectorSceneBackReferenceNote.value = null;
   inspectorSceneBackReferences.value = [];
+  inspectorPropBackReferenceNote.value = null;
+  inspectorPropBackReferences.value = [];
   void nextTick(() => restoreInspectorFlowFocus(nodeId));
 }
 

@@ -14,7 +14,7 @@ import {
   type StudioPanelStandingHandoff,
 } from "./studio-panel-standing.js";
 import { readStudioSceneBackReferences } from "./studio-scene-backrefs-read.js";
-import type { SceneBackReference } from "./studio-scene-backrefs.js";
+import type { PropBackReference, SceneBackReference } from "./studio-scene-backrefs.js";
 import type { StudioDashboardCurrentness, StudioDashboardNextAction } from "./studio-production-dashboard.js";
 import type { NextShotContinuitySnapshot } from "./studio-next-shot-continuity.js";
 import type { StudioPostResultObservedActualState } from "./studio-post-result-observation.js";
@@ -98,6 +98,13 @@ export interface StudioGenerationSessionSnapshot {
   sceneMentions: Array<{ assetId: string; role: string }>;
   sceneBackReferences: SceneBackReference[];
   sceneBackReferenceNote: string;
+  /**
+   * 跨单元道具回指：只读生产库快照提及（category=prop），不读 unit head、不拆冻结包。
+   * 无道具提及则为空数组；缺库失败关闭为空，不建库。不是 BindingSet。
+   */
+  propMentions: Array<{ assetId: string; role: string }>;
+  propBackReferences: PropBackReference[];
+  propBackReferenceNote: string;
   camera: {
     current?: {
       shotComposition: string;
@@ -354,6 +361,9 @@ export async function buildStudioGenerationSessionSnapshot(
     sceneMentions: sceneBackref.sceneMentions,
     sceneBackReferences: sceneBackref.sceneBackReferences,
     sceneBackReferenceNote: sceneBackref.sceneBackReferenceNote,
+    propMentions: sceneBackref.propMentions,
+    propBackReferences: sceneBackref.propBackReferences,
+    propBackReferenceNote: sceneBackref.propBackReferenceNote,
     camera: {
       current: frozenPanel
         ? {
@@ -396,6 +406,12 @@ export async function buildStudioGenerationSessionSnapshot(
         ? {
             sceneMentions: body.sceneMentions,
             sceneBackReferences: body.sceneBackReferences,
+          }
+        : {}),
+      ...(body.propMentions.length > 0 || body.propBackReferences.length > 0
+        ? {
+            propMentions: body.propMentions,
+            propBackReferences: body.propBackReferences,
           }
         : {}),
       camera: body.camera,

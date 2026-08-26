@@ -56,7 +56,9 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("ssl5-focus-previous-costume");
     expect(vue).toContain("ssl5-focus-scene-backrefs");
     expect(vue).toContain("ssl5-focus-scene-backref-");
+    expect(vue).toContain("ssl5-focus-prop-backrefs");
     expect(vue).toContain("span-media-hit-scene-backrefs");
+    expect(vue).toContain("span-media-hit-prop-backrefs");
     expect(vue).toContain("revealReaderSceneBackRef");
     expect(vue).toContain("formatPanelLightingCostumeLine");
     expect(vue).toContain("revealSpanMediaHit");
@@ -109,8 +111,13 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("align-panel-handoff");
     expect(vue).toContain("align-panel-assets");
     expect(vue).toContain("align-panel-scene-backrefs");
+    expect(vue).toContain("align-panel-prop-backrefs");
     expect(vue).toContain("listSceneBackReferences");
+    expect(vue).toContain("listPropBackReferences");
     expect(vue).toContain("formatSceneBackReferences");
+    expect(vue).toContain("formatPropBackReferences");
+    expect(vue).toContain("formatWizardPropBackReferenceLine");
+    expect(vue).toContain('data-testid="storyboard-wizard-prop-backrefs"');
     expect(vue).toContain("revealSceneBackRef");
     expect(vue).toContain("不能猜宫格");
     expect(vue).toContain("不是 BindingSet");
@@ -200,6 +207,7 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     );
     expect(suggest).toContain('actionLoading.value = ""');
     expect(suggest).toContain("report(reason)");
+    expect(suggest).not.toContain("loadAlign(");
   });
 
   it("选区命中对照这格 fail-closed：busy 在首个 await 之前置位，未命中不猜宫格，缺图不绑其他格的图", () => {

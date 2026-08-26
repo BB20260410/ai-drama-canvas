@@ -10,10 +10,15 @@ import {
   formatPanelLightingCostumeLine,
   formatPanelStandingGaps,
   formatPanelStandingHandoff,
+  formatPropBackReferences,
   formatSceneBackReferences,
+  formatWizardPropBackReferenceLine,
   formatWizardSceneBackReferenceLine,
+  listPropAssetMentions,
+  listPropBackReferences,
   listSceneAssetMentions,
   listSceneBackReferences,
+  wizardPropMentionsFromSuggestedIds,
   wizardSceneMentionsFromSuggestedIds,
   pickFirstCoveredPanel,
   pickFirstMissingPanel,
@@ -429,6 +434,30 @@ function wizardSceneBackRefs(panelIndex: number): SceneBackReference[] {
   });
 }
 
+function wizardPropBackRefLine(panelIndex: number): string {
+  const panel = wizardPanels.value.find((entry) => entry.panelIndex === panelIndex);
+  return formatWizardPropBackReferenceLine({
+    boardLoaded: Boolean(board.value),
+    currentSequence: wizardSequence.value,
+    currentPanelIndex: panelIndex,
+    suggestedAssetIds: panel?.suggestedAssetIds,
+    units: board.value?.rows ?? [],
+  });
+}
+
+function wizardPropBackRefs(panelIndex: number): SceneBackReference[] {
+  if (!board.value) return [];
+  const panel = wizardPanels.value.find((entry) => entry.panelIndex === panelIndex);
+  return listPropBackReferences({
+    currentUnitId: "wizard-draft",
+    currentSequence: wizardSequence.value,
+    currentPanelIndex: panelIndex,
+    currentPanelId: `wizard-g${panelIndex}`,
+    propMentions: wizardPropMentionsFromSuggestedIds(panel?.suggestedAssetIds, board.value.rows),
+    units: board.value.rows,
+  });
+}
+
 async function revealWizardSceneBackRef(ref: SceneBackReference): Promise<void> {
   if (!board.value) {
     notice.value = "对照板未加载，无法查场景回指。不是 BindingSet，不能当 generation-ready。";
@@ -707,6 +736,27 @@ const alignSceneBackRefLine = computed(() => {
   return formatSceneBackReferences(alignSceneMentions.value.length, alignSceneBackRefs.value);
 });
 
+const alignPropMentions = computed(() => listPropAssetMentions(selectedAlignPanel.value?.assetMentions));
+
+const alignPropBackRefs = computed(() => {
+  const row = selectedAlignRow.value;
+  const panel = selectedAlignPanel.value;
+  if (!board.value || !row || !panel) return [];
+  return listPropBackReferences({
+    currentUnitId: row.unitId,
+    currentSequence: row.sequence,
+    currentPanelIndex: panel.panelIndex,
+    currentPanelId: panel.panelId,
+    propMentions: alignPropMentions.value,
+    units: board.value.rows,
+  });
+});
+
+const alignPropBackRefLine = computed(() => {
+  if (!selectedAlignPanel.value) return null;
+  return formatPropBackReferences(alignPropMentions.value.length, alignPropBackRefs.value);
+});
+
 async function revealSceneBackRef(ref: SceneBackReference): Promise<void> {
   const focusRow = board.value?.rows.find((row) => row.unitId === ref.unitId);
   if (!focusRow) {
@@ -890,11 +940,20 @@ function shortSha(value: string | null | undefined): string {
                 <small data-testid="span-media-hit-gaps">{{ formatPanelStandingGaps(hit) }}</small>
                 <small data-testid="span-media-hit-lighting">{{ formatPanelLightingCostumeLine(hit) }}</small>
                 <small data-testid="span-media-hit-scene-backrefs">{{ hit.sceneBackReferenceLine }}</small>
+                <small data-testid="span-media-hit-prop-backrefs">{{ hit.propBackReferenceLine }}</small>
                 <button
                   v-for="ref in hit.sceneBackReferences"
                   :key="`${ref.unitId}:${ref.panelId}:${ref.assetId}`"
                   type="button"
                   :data-testid="`span-media-hit-scene-backref-${ref.unitId}-${ref.panelId}`"
+                  :disabled="Boolean(actionLoading)"
+                  @click="revealReaderSceneBackRef(ref)"
+                >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
+                <button
+                  v-for="ref in hit.propBackReferences"
+                  :key="`prop:${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+                  type="button"
+                  :data-testid="`span-media-hit-prop-backref-${ref.unitId}-${ref.panelId}`"
                   :disabled="Boolean(actionLoading)"
                   @click="revealReaderSceneBackRef(ref)"
                 >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
@@ -954,11 +1013,20 @@ function shortSha(value: string | null | undefined): string {
           <span v-if="ssl5Plan.previousLightingLine" data-testid="ssl5-focus-previous-lighting">{{ ssl5Plan.previousLightingLine }}</span>
           <span v-if="ssl5Plan.previousCostumeLine" data-testid="ssl5-focus-previous-costume">{{ ssl5Plan.previousCostumeLine }}</span>
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-scene-backrefs">{{ ssl5Plan.sceneBackReferenceLine }}</span>
+          <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-prop-backrefs">{{ ssl5Plan.propBackReferenceLine }}</span>
           <button
             v-for="ref in ssl5Plan.sceneBackReferences"
             :key="`${ref.unitId}:${ref.panelId}:${ref.assetId}`"
             type="button"
             :data-testid="`ssl5-focus-scene-backref-${ref.unitId}-${ref.panelId}`"
+            :disabled="Boolean(actionLoading)"
+            @click="revealSceneBackRef(ref)"
+          >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
+          <button
+            v-for="ref in ssl5Plan.propBackReferences"
+            :key="`prop:${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+            type="button"
+            :data-testid="`ssl5-focus-prop-backref-${ref.unitId}-${ref.panelId}`"
             :disabled="Boolean(actionLoading)"
             @click="revealSceneBackRef(ref)"
           >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
@@ -1095,6 +1163,19 @@ function shortSha(value: string | null | undefined): string {
                 >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
               </dd>
             </div>
+            <div v-if="alignPropBackRefLine">
+              <dt>道具回指</dt>
+              <dd data-testid="align-panel-prop-backrefs">
+                <p>{{ alignPropBackRefLine }}</p>
+                <button
+                  v-for="ref in alignPropBackRefs"
+                  :key="`prop:${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+                  type="button"
+                  :data-testid="`align-prop-backref-${ref.unitId}-${ref.panelId}`"
+                  @click="revealSceneBackRef(ref)"
+                >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
+              </dd>
+            </div>
           </dl>
         </template>
         <div v-else class="empty">点击一行查看本地 raw/labeled 身份与缩略图。</div>
@@ -1160,6 +1241,15 @@ function shortSha(value: string | null | undefined): string {
             type="button"
             class="wide"
             :data-testid="`storyboard-wizard-scene-backref-${ref.unitId}-${ref.panelId}`"
+            @click="revealWizardSceneBackRef(ref)"
+          >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
+          <p class="wide wizard-lock-hint" data-testid="storyboard-wizard-prop-backrefs">{{ wizardPropBackRefLine(panel.panelIndex) }}</p>
+          <button
+            v-for="ref in wizardPropBackRefs(panel.panelIndex)"
+            :key="`prop:${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+            type="button"
+            class="wide"
+            :data-testid="`storyboard-wizard-prop-backref-${ref.unitId}-${ref.panelId}`"
             @click="revealWizardSceneBackRef(ref)"
           >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
           <small class="wide">原文锚 {{ panel.sourceSpans.length }} · 资产建议 {{ panel.suggestedAssetIds.length }} · 歧义 {{ panel.unresolvedProposals.length }}</small>

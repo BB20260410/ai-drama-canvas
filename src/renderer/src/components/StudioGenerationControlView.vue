@@ -170,6 +170,20 @@
               :disabled="loading"
               @click="revealControlSceneBackRef(ref)"
             >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
+            <p
+              v-if="controlPropBackReferenceNote"
+              class="previous-standing"
+              data-testid="studio-control-prop-backrefs">
+              {{ controlPropBackReferenceNote }}
+            </p>
+            <button
+              v-for="ref in controlPropBackReferences"
+              :key="`prop:${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+              type="button"
+              :data-testid="`studio-control-prop-backref-${ref.unitId}-${ref.panelId}`"
+              :disabled="loading"
+              @click="revealControlSceneBackRef(ref)"
+            >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
             <details v-if="historyTargetKind === 'panel' && isTechnicalGenerationMessage(detail.selectedPanel.generation.message)" class="technical-diagnostics">
               <summary data-testid="studio-generation-message-diagnostics">诊断详情</summary>
               <p><code>{{ detail.selectedPanel.generation.message }}</code></p>
@@ -283,7 +297,7 @@ import {
   previousStandingFromAnyFrozenPack,
   type StudioPanelStandingHandoff,
 } from "@core/studio-panel-standing";
-import { formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
+import { formatPropBackReferences, formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
 
 const props = defineProps<{
   projectRoot: string;
@@ -360,6 +374,8 @@ const lockCostumeLine = ref<string | null>(null);
 const lightingCostumeSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>(null);
 const controlSceneBackReferenceNote = ref<string | null>(null);
 const controlSceneBackReferences = ref<SceneBackReference[]>([]);
+const controlPropBackReferenceNote = ref<string | null>(null);
+const controlPropBackReferences = ref<SceneBackReference[]>([]);
 type ControlLockOverlay = {
   panelId: string;
   panelIndex: number;
@@ -412,6 +428,8 @@ async function applyControlSceneBackrefs(
   if (!props.projectRoot || !unit?.id || !Number.isInteger(unit.revision) || unit.revision < 1) {
     controlSceneBackReferenceNote.value = formatSceneBackReferences(0, []);
     controlSceneBackReferences.value = [];
+    controlPropBackReferenceNote.value = formatPropBackReferences(0, []);
+    controlPropBackReferences.value = [];
     return;
   }
   try {
@@ -427,10 +445,14 @@ async function applyControlSceneBackrefs(
     if (token !== frozenPackToken) return;
     controlSceneBackReferenceNote.value = result.sceneBackReferenceNote;
     controlSceneBackReferences.value = result.sceneBackReferences ?? [];
+    controlPropBackReferenceNote.value = result.propBackReferenceNote;
+    controlPropBackReferences.value = result.propBackReferences ?? [];
   } catch {
     if (token !== frozenPackToken) return;
     controlSceneBackReferenceNote.value = formatSceneBackReferences(0, []);
     controlSceneBackReferences.value = [];
+    controlPropBackReferenceNote.value = formatPropBackReferences(0, []);
+    controlPropBackReferences.value = [];
   }
 }
 
@@ -506,6 +528,8 @@ watch([selectedPackId, selectedPanelId, () => props.projectRoot, () => detail.va
   lightingCostumeSource.value = null;
   controlSceneBackReferenceNote.value = null;
   controlSceneBackReferences.value = [];
+  controlPropBackReferenceNote.value = null;
+  controlPropBackReferences.value = [];
   frozenPackError.value = "";
   const panel = detail.value?.panels.find((entry) => entry.id === selectedPanelId.value);
   if (packId) {
@@ -1296,6 +1320,8 @@ watch(() => props.projectRoot, () => {
   lightingCostumeSource.value = null;
   controlSceneBackReferenceNote.value = null;
   controlSceneBackReferences.value = [];
+  controlPropBackReferenceNote.value = null;
+  controlPropBackReferences.value = [];
   history.value = [];
   selectedUnitId.value = "";
   selectedPanelId.value = "";
