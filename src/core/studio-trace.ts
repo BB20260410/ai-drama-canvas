@@ -175,7 +175,7 @@ export interface StudioGenerationTrace {
   };
 }
 
-/** 追溯 peek 用 run：by-run 认选择器；否则本包 runs 最新一条。不用 previousActualTail。 */
+/** 追溯 peek 用 run：by-run 认选择器；否则本包 runs 最新一条。不用上一镜尾态 run。 */
 export function traceEnvelopePeekRunId(input: {
   selector?: { runId?: string };
   runs: ReadonlyArray<{ runId?: string | null }>;

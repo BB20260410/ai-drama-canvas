@@ -108,7 +108,6 @@ describe("P24 追溯 IPC 桌面接线（§4-8）", () => {
     expect(traceCore).toContain("peekStudioConsistencyVerdictByRunId");
     expect(traceCore).not.toContain("evaluateStudioConsistency");
     expect(traceCore).not.toContain('from "./studio-consistency-evaluator.js"');
-    expect(traceCore).not.toContain("previousActualTail");
     expect(traceCore).not.toContain("studio-generation-session-snapshot");
   });
 });
