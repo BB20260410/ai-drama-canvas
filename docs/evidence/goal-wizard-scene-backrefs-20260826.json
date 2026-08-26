@@ -1,0 +1,37 @@
+{
+  "id": "goal-wizard-scene-backrefs-20260826",
+  "kind": "wizard-scene-backrefs-readonly",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T19:58:00.000Z",
+  "scope": "15s wizard shows cross-unit scene backrefs by classifying suggestedAssetIds against already-loaded align-board scene mentions. Unloaded board fails closed with an explicit note. Does not write into formatWizardPromptBody / freeze fingerprint. Click-through switches to align and reuses revealSceneBackRef (no first-panel guess). Not BindingSet; does not dispatch.",
+  "invariants": {
+    "usesLoadedBoardOnly": true,
+    "doesNotAutoLoadAlignBoard": true,
+    "doesNotWriteFrozenPrompt": true,
+    "doesNotGuessFirstPanel": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotDispatch": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts"
+      ],
+      "result": "3 files PASS; studio-storyboard-wizard 5/6 PASS, 1 Linux dirfd failure is pre-existing createManagedProject fixture"
+    }
+  },
+  "notClaimed": [
+    "real-generation constraint evidence",
+    "scene consistency fully solved",
+    "wizard auto-loads align board",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
