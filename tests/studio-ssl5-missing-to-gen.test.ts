@@ -6,6 +6,7 @@ import type { ScriptMediaAlignRow } from "../src/core/studio-script-media-align.
 import {
   buildSsl5PlanFromBoard,
   composeSsl5GenerationPlanDraft,
+  refineSsl5FocusPlanDraftIfPersisted,
   SSL5_GENERATION_PLAN_COMMAND,
   SSL5_PLAN_SCHEMA_VERSION,
 } from "../src/core/studio-ssl5-missing-to-gen.js";
@@ -194,6 +195,14 @@ describe("SSL-5 缺图下一步纯函数", () => {
       note: "只起草建计划节点；不执行、不派发。派发须用计划推导 runId。",
     });
     expect(plan.items[0]?.generationPlanDraft.ready).toBe(true);
+    const refined = refineSsl5FocusPlanDraftIfPersisted(plan, true);
+    expect(refined.schemaVersion).toBe(SSL5_PLAN_SCHEMA_VERSION);
+    expect(refined.generationPlanDraft.ready).toBe(false);
+    expect(refined.generationPlanDraft.dispatch).toBe(false);
+    expect(refined.generationPlanDraft.blockedReason).toContain("下一步是 dispatch");
+    expect(refined.generationPlanDraft.nodes).toEqual([{ unitId: "u-frozen", panelId: "p-focus" }]);
+    expect(refined.items[0]?.generationPlanDraft.ready).toBe(false);
+    expect(refineSsl5FocusPlanDraftIfPersisted(plan, false).generationPlanDraft.ready).toBe(true);
   });
 
   it("composeSsl5GenerationPlanDraft 无焦点 / 无宫格失败关闭", () => {
@@ -439,9 +448,13 @@ describe("SSL-5 入口源码合同", () => {
     expect(ssl5).not.toContain("dispatch_studio_generation_pack");
     expect(ssl5).toContain("create-plan");
     expect(ssl5).toContain("composeSsl5GenerationPlanDraft");
+    expect(ssl5).toContain("refineSsl5FocusPlanDraftIfPersisted");
+    expect(ssl5).toContain("readPersistedPanelHasPlan");
     expect(ssl5).toContain("studio-generation-plan-draft");
     expect(ssl5).toContain("focusPackId");
     expect(ssl5).toContain("SSL5_PLAN_SCHEMA_VERSION = 1");
+    expect(ssl5).not.toContain("studio-generation-ledger.js");
+    expect(ssl5).not.toContain("managedLedgerPaths");
   });
 
   it("桌面对照面展示只读下一步，导演动作不写命令", () => {

@@ -26,6 +26,11 @@ import {
   composeStudioGenerationPlanDraft,
   type StudioGenerationPlanDraft,
 } from "./studio-generation-plan-draft.js";
+import {
+  generationLedgerSidecarPath,
+  readPersistedPanelHasPlan,
+  readPersistedUnitGridPackAndPlan,
+} from "./studio-unit-grid-persisted-plan-read.js";
 import type { StudioDashboardCurrentness, StudioDashboardNextAction } from "./studio-production-dashboard.js";
 import type { NextShotContinuitySnapshot } from "./studio-next-shot-continuity.js";
 import type { StudioPostResultObservedActualState } from "./studio-post-result-observation.js";
@@ -141,7 +146,8 @@ export interface StudioGenerationSessionSnapshot {
   /**
    * P21 create-plan 只读草稿：有 query.panelId 只认该格已落盘单镜包；
    * 无 panelId 只认该单元已落盘 unit-grid pack，禁止猜第一格，禁止用 readiness 候选。
-   * 未冻结 / 未落盘则为 blocked。不进 fingerprint。不执行、不派发。
+   * 账本已有对应 plan 时 ready=false，下一步是 dispatch。未冻结 / 未落盘则为 blocked。
+   * 不进 fingerprint。不执行、不派发。
    */
   generationPlanDraft: StudioGenerationPlanDraft;
   camera: {
@@ -473,12 +479,21 @@ export async function buildStudioGenerationSessionSnapshot(
           focusUnitId: query.unitId,
           focusPanelId: query.panelId,
           focusPackId: await persistedPanelPackIdForDraft(projectRoot, query.panelId, readiness),
+          hasPersistedPlan: readPersistedPanelHasPlan(
+            generationLedgerSidecarPath(projectRoot),
+            query.unitId,
+            query.panelId,
+          ),
         })
       : composeStudioGenerationPlanDraft({
           focusUnitId: query.unitId,
           focusPanelId: null,
           focusPackId: await persistedUnitGridPackIdForDraft(projectRoot, query.unitId),
           targetKind: "unit-grid",
+          hasPersistedPlan: readPersistedUnitGridPackAndPlan(
+            generationLedgerSidecarPath(projectRoot),
+            query.unitId,
+          ).hasPlan,
         }),
     camera: {
       current: frozenPanel

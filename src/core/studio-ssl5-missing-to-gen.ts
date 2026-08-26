@@ -38,6 +38,10 @@ import {
   composeSsl5GenerationPlanDraft,
   type Ssl5GenerationPlanDraft,
 } from "./studio-generation-plan-draft.js";
+import {
+  generationLedgerSidecarPath,
+  readPersistedPanelHasPlan,
+} from "./studio-unit-grid-persisted-plan-read.js";
 
 export const SSL5_PLAN_SCHEMA_VERSION = 1 as const;
 export {
@@ -312,6 +316,34 @@ export function buildSsl5PlanFromBoard(
   };
 }
 
+/**
+ * 焦点缺图格已有单镜计划时，草稿不再 ready 建计划。
+ * 只精炼焦点（及同格 item）；不扫其它行、不执行、不派发。
+ */
+export function refineSsl5FocusPlanDraftIfPersisted(
+  plan: Ssl5MissingToGenPlan,
+  hasPersistedPlan: boolean,
+): Ssl5MissingToGenPlan {
+  if (!hasPersistedPlan || !plan.focusUnitId || !plan.focusPanelId || !plan.focusPackId) {
+    return plan;
+  }
+  const draft = composeSsl5GenerationPlanDraft({
+    focusUnitId: plan.focusUnitId,
+    focusPanelId: plan.focusPanelId,
+    focusPackId: plan.focusPackId,
+    hasPersistedPlan: true,
+  });
+  return {
+    ...plan,
+    generationPlanDraft: draft,
+    items: plan.items.map((item) => (
+      item.unitId === plan.focusUnitId && item.focusPanelId === plan.focusPanelId
+        ? { ...item, generationPlanDraft: draft }
+        : item
+    )),
+  };
+}
+
 export async function planSsl5MissingToGen(
   projectRoot: string,
   query: { season: string; episode: string; evidenceDir?: string; documentId?: string },
@@ -323,5 +355,14 @@ export async function planSsl5MissingToGen(
     ...(query.evidenceDir ? { evidenceDir: query.evidenceDir } : {}),
   });
   // earliest 已由 align-board 算过；禁止二次 getStudioEpisodeEarliest。
-  return buildSsl5PlanFromBoard(projectRoot, query, board);
+  const plan = buildSsl5PlanFromBoard(projectRoot, query, board);
+  if (!plan.focusUnitId || !plan.focusPanelId || !plan.focusPackId) return plan;
+  return refineSsl5FocusPlanDraftIfPersisted(
+    plan,
+    readPersistedPanelHasPlan(
+      generationLedgerSidecarPath(projectRoot),
+      plan.focusUnitId,
+      plan.focusPanelId,
+    ),
+  );
 }

@@ -28,6 +28,12 @@ export type Ssl5GenerationPlanDraft = StudioGenerationPlanDraft;
 
 const NOTE_BLOCKED = "只读草稿。不执行、不派发。";
 const NOTE_READY = "只起草建计划节点；不执行、不派发。派发须用计划推导 runId。";
+const NOTE_HAS_PLAN = "计划已落盘。下一步 dispatch；不执行、不派发。派发须用计划推导 runId。";
+
+export const STUDIO_GENERATION_PLAN_ALREADY_EXISTS_PANEL =
+  "该宫格已有生成计划，下一步是 dispatch（不派发）";
+export const STUDIO_GENERATION_PLAN_ALREADY_EXISTS_UNIT_GRID =
+  "该整板已有生成计划，下一步是 dispatch（不派发）";
 
 function blocked(reason: string): StudioGenerationPlanDraft {
   return {
@@ -40,11 +46,27 @@ function blocked(reason: string): StudioGenerationPlanDraft {
   };
 }
 
+function alreadyPlanned(
+  reason: string,
+  nodes: StudioGenerationPlanDraftNode[],
+): StudioGenerationPlanDraft {
+  return {
+    command: STUDIO_GENERATION_PLAN_COMMAND,
+    ready: false,
+    blockedReason: reason,
+    nodes,
+    dispatch: false,
+    note: NOTE_HAS_PLAN,
+  };
+}
+
 export function composeStudioGenerationPlanDraft(input: {
   focusUnitId: string | null;
   focusPanelId: string | null;
   focusPackId: string | null;
   targetKind?: "panel" | "unit-grid";
+  /** 账本已有对应 plan 时不再 ready 建计划；下一步是 dispatch，本面仍不派发。 */
+  hasPersistedPlan?: boolean;
 }): StudioGenerationPlanDraft {
   if (!input.focusUnitId) {
     return blocked("没有目标单元，不能建立计划");
@@ -53,11 +75,15 @@ export function composeStudioGenerationPlanDraft(input: {
     if (!input.focusPackId) {
       return blocked("该整板尚无冻结 pack，先 Binding→readiness→freeze。禁止用单镜或同行 preview pack 冒充整板节点");
     }
+    const nodes: StudioGenerationPlanDraftNode[] = [{ targetKind: "unit-grid", unitId: input.focusUnitId }];
+    if (input.hasPersistedPlan) {
+      return alreadyPlanned(STUDIO_GENERATION_PLAN_ALREADY_EXISTS_UNIT_GRID, nodes);
+    }
     return {
       command: STUDIO_GENERATION_PLAN_COMMAND,
       ready: true,
       blockedReason: null,
-      nodes: [{ targetKind: "unit-grid", unitId: input.focusUnitId }],
+      nodes,
       dispatch: false,
       note: NOTE_READY,
     };
@@ -68,11 +94,15 @@ export function composeStudioGenerationPlanDraft(input: {
   if (!input.focusPackId) {
     return blocked("该宫格尚无冻结 pack，先 Binding→readiness→freeze。禁止用同行已出图宫格的 packId");
   }
+  const nodes: StudioGenerationPlanDraftNode[] = [{ unitId: input.focusUnitId, panelId: input.focusPanelId }];
+  if (input.hasPersistedPlan) {
+    return alreadyPlanned(STUDIO_GENERATION_PLAN_ALREADY_EXISTS_PANEL, nodes);
+  }
   return {
     command: STUDIO_GENERATION_PLAN_COMMAND,
     ready: true,
     blockedReason: null,
-    nodes: [{ unitId: input.focusUnitId, panelId: input.focusPanelId }],
+    nodes,
     dispatch: false,
     note: NOTE_READY,
   };

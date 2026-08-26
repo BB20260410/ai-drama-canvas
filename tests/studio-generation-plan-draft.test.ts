@@ -50,6 +50,34 @@ describe("create-plan 只读草稿纯函数", () => {
     });
   });
 
+  it("本格已有计划时不再 ready 建计划，下一步是 dispatch，仍不派发", () => {
+    expect(composeStudioGenerationPlanDraft({
+      focusUnitId: "u1",
+      focusPanelId: "p1",
+      focusPackId: "pack-own",
+      hasPersistedPlan: true,
+    })).toEqual({
+      command: STUDIO_GENERATION_PLAN_COMMAND,
+      ready: false,
+      blockedReason: "该宫格已有生成计划，下一步是 dispatch（不派发）",
+      nodes: [{ unitId: "u1", panelId: "p1" }],
+      dispatch: false,
+      note: "计划已落盘。下一步 dispatch；不执行、不派发。派发须用计划推导 runId。",
+    });
+    expect(composeStudioGenerationPlanDraft({
+      focusUnitId: "u1",
+      focusPanelId: null,
+      focusPackId: "pack-grid",
+      targetKind: "unit-grid",
+      hasPersistedPlan: true,
+    })).toMatchObject({
+      ready: false,
+      blockedReason: "该整板已有生成计划，下一步是 dispatch（不派发）",
+      nodes: [{ targetKind: "unit-grid", unitId: "u1" }],
+      dispatch: false,
+    });
+  });
+
   it("整板已有冻结 pack 时 ready 出 unit-grid 节点，无 pack 失败关闭", () => {
     expect(composeStudioGenerationPlanDraft({
       focusUnitId: "u1",
@@ -88,6 +116,9 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(snapshot).toContain("composeStudioGenerationPlanDraft");
     expect(snapshot).toContain("persistedPanelPackIdForDraft");
     expect(snapshot).toContain("persistedUnitGridPackIdForDraft");
+    expect(snapshot).toContain("readPersistedPanelHasPlan");
+    expect(snapshot).toContain("readPersistedUnitGridPackAndPlan");
+    expect(snapshot).toContain("hasPersistedPlan");
     expect(snapshot).toContain("listStudioGenerationPacksByUnit");
     expect(snapshot).toContain('targetKind: "unit-grid"');
     expect(snapshot).toContain('pack.provenance !== "asset-binding-set"');
@@ -119,6 +150,7 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(control).toContain('data-testid="studio-generation-plan-nodes"');
     expect(control).toContain('data-testid="studio-generation-plan-command"');
     expect(control).toContain("persistedUnitGridPackIdForDraft");
+    expect(control).toContain("hasPersistedPlanForDraft");
     expect(control).toContain("formatGenerationPlanDraftNode");
     expect(control).toContain("generation?.status === \"ready\" && generation.packId");
     expect(control).not.toContain("dispatch_studio_generation_pack");
@@ -134,6 +166,7 @@ describe("create-plan 草稿接线源码合同", () => {
     const computed = control.slice(computedStart, computedEnd);
     expect(computed).toContain('targetKind: "unit-grid"');
     expect(computed).toContain("persistedUnitGridPackIdForDraft()");
+    expect(computed).toContain("hasPersistedPlan: hasPersistedPlanForDraft()");
     expect(computed).not.toContain("unitGridReadinessPackId");
     expect(computed).not.toContain("selectedPackId");
     expect(control).toContain("`unit-grid ${node.unitId}`");
@@ -143,10 +176,16 @@ describe("create-plan 草稿接线源码合同", () => {
     const codex = source("src/core/codex.ts");
     expect(codex).toContain("composeStudioGenerationPlanDraft");
     expect(codex).toContain("composePersistedPackGenerationPlanDraft");
+    expect(codex).toContain("persistedPlanExistsForPack");
+    expect(codex).toContain("packEnvelopeNext");
     expect(codex).toContain('targetKind: "unit-grid"');
-    expect(codex).toContain("generationPlanDraft: composePersistedPackGenerationPlanDraft(pack)");
-    expect(codex).toContain('next: "create-plan → dispatch(provider=codex)');
-    expect(codex).toContain('next: "create-plan → dispatch(provider=codex|grok)');
+    expect(codex).toContain("composePersistedPackGenerationPlanDraft(pack, hasPersistedPlan)");
+    expect(codex).toContain("packEnvelopeNext(hasPersistedPlan, false)");
+    expect(codex).toContain("packEnvelopeNext(hasPersistedPlan, true)");
+    expect(codex).toContain('"create-plan → dispatch(provider=codex)');
+    expect(codex).toContain('"create-plan → dispatch(provider=codex|grok)');
+    expect(codex).toContain('"dispatch(provider=codex) → prepare pre-call intent');
+    expect(codex).toContain('"dispatch(provider=codex|grok) → agent imagegen');
     expect(codex).toContain('next: "freeze → create-plan → dispatch(provider=codex)');
     expect(codex).toContain('next: "freeze → create-plan → dispatch(provider=codex|grok)');
     expect(codex).not.toContain('next: "freeze → dispatch(provider=codex|grok)');
@@ -157,6 +196,9 @@ describe("create-plan 草稿接线源码合同", () => {
     const helper = codex.slice(helperStart, helperEnd);
     expect(helper).toContain("pack.id");
     expect(helper).toContain("pack.target.panelId");
+    expect(helper).toContain("hasPersistedPlan");
+    expect(helper).toContain("readPersistedPanelHasPlan");
+    expect(helper).toContain("readPersistedUnitGridPackAndPlan");
     expect(helper).not.toContain("unitGridReadinessPackId");
     expect(helper).not.toContain("candidate.packId");
   });

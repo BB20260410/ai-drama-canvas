@@ -613,7 +613,21 @@ function formatGenerationPlanDraftNode(node: StudioGenerationPlanDraftNode): str
     : `${node.unitId} ${node.panelId}`;
 }
 
-/** 单镜只认当前宫格 ready pack；整板只认已落盘 unit-grid pack。不执行、不派发。 */
+function hasPersistedPlanForDraft(): boolean {
+  const nodes = progress.value?.nodes ?? [];
+  if (historyTargetKind.value === "unit-grid") {
+    return nodes.some((node) => (
+      node.targetKind === "unit-grid" && node.unitId === selectedUnitId.value
+    ));
+  }
+  return nodes.some((node) => (
+    node.targetKind === "panel"
+    && node.unitId === selectedUnitId.value
+    && node.panelId === selectedPanelId.value
+  ));
+}
+
+/** 单镜只认当前宫格 ready pack；整板只认已落盘 unit-grid pack。已有计划则下一步 dispatch。不执行、不派发。 */
 const generationPlanDraft = computed(() => {
   if (historyTargetKind.value === "unit-grid") {
     return composeStudioGenerationPlanDraft({
@@ -621,6 +635,7 @@ const generationPlanDraft = computed(() => {
       focusPanelId: null,
       focusPackId: persistedUnitGridPackIdForDraft(),
       targetKind: "unit-grid",
+      hasPersistedPlan: hasPersistedPlanForDraft(),
     });
   }
   const generation = detail.value?.selectedPanel?.generation;
@@ -628,6 +643,7 @@ const generationPlanDraft = computed(() => {
     focusUnitId: selectedUnitId.value || null,
     focusPanelId: selectedPanelId.value || null,
     focusPackId: generation?.status === "ready" && generation.packId ? generation.packId : null,
+    hasPersistedPlan: hasPersistedPlanForDraft(),
   });
 });
 
