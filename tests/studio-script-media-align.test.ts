@@ -166,5 +166,9 @@ describe("对照行四态 peek 源码合同", () => {
     expect(vue).toContain("align-panel-list");
     expect(vue).toContain("align-panel-peek");
     expect(align).toContain("row.panels.map((panel) => panel.generationRunId)");
+    expect(align).toContain("earliestCode");
+    expect(align).toContain("earliestLabel");
+    expect(align).toContain("SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION = 1");
+    expect(align).toContain("slots.find((slot) => slot.unitId === earliest.earliestUnitId)");
   });
 });

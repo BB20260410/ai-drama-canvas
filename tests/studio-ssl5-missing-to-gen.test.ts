@@ -6,6 +6,8 @@ import type { ScriptMediaAlignRow } from "../src/core/studio-script-media-align.
 import {
   buildSsl5PlanFromBoard,
   composeSsl5GenerationPlanDraft,
+  earliestBlockingPath,
+  refineSsl5FocusIfEarliestBlocking,
   refineSsl5FocusPlanDraftIfPersisted,
   SSL5_GENERATION_PLAN_COMMAND,
   SSL5_PLAN_SCHEMA_VERSION,
@@ -214,6 +216,190 @@ describe("SSL-5 缺图下一步纯函数", () => {
     const reviewed = refineSsl5FocusPlanDraftIfPersisted(plan, { hasPlan: true, status: "succeeded" });
     expect(reviewed.generationPlanDraft.blockedReason).toContain("下一步是 Review");
     expect(reviewed.items[0]?.recommendedPath).toEqual(["review"]);
+  });
+
+  it("earliest 在途/待重试/待审时焦点禁止再建议 create-plan/dispatch", () => {
+    expect(earliestBlockingPath("wait-or-reconcile-unit-grid-run")).toBe("wait");
+    expect(earliestBlockingPath("retry-unit-grid-plan-nodes")).toBe("retry");
+    expect(earliestBlockingPath("submit-unit-grid-review")).toBe("review");
+    expect(earliestBlockingPath("reconcile-unit-grid-call")).toBe("reconcile");
+    expect(earliestBlockingPath("dispatch-unit-grid")).toBeNull();
+    expect(earliestBlockingPath("create-unit-grid-plan")).toBeNull();
+    expect(earliestBlockingPath("freeze-unit-grid")).toBeNull();
+
+    const waiting = buildSsl5PlanFromBoard(
+      "/tmp/iso",
+      { season: "S1", episode: "E2" },
+      {
+        earliestUnitId: "u-frozen",
+        earliestCode: "wait-or-reconcile-unit-grid-run",
+        earliestLabel: "unit-grid 正在执行，等待结果或对账现有 run",
+        missingAllCount: 1,
+        partialCount: 0,
+        rows: [
+          row({
+            unitId: "u-frozen",
+            sequence: 1,
+            status: "missing-all",
+            isEarliest: true,
+            panels: [
+              panel({ panelId: "p-focus", panelIndex: 1, hasMedia: false, packId: "focus-own-pack" }),
+            ],
+          }),
+        ],
+      },
+    );
+    expect(waiting.schemaVersion).toBe(SSL5_PLAN_SCHEMA_VERSION);
+    expect(waiting.earliestCode).toBe("wait-or-reconcile-unit-grid-run");
+    expect(waiting.focusUnitId).toBe("u-frozen");
+    expect(waiting.generationPlanDraft.ready).toBe(false);
+    expect(waiting.generationPlanDraft.dispatch).toBe(false);
+    expect(waiting.generationPlanDraft.blockedReason).toBe("unit-grid 正在执行，等待结果或对账现有 run");
+    expect(waiting.generationPlanDraft.nodes).toEqual([{ unitId: "u-frozen", panelId: "p-focus" }]);
+    expect(waiting.items[0]?.recommendedPath).toEqual(["wait"]);
+
+    const retried = buildSsl5PlanFromBoard(
+      "/tmp/iso",
+      { season: "S1", episode: "E2" },
+      {
+        earliestUnitId: "u-frozen",
+        earliestCode: "retry-unit-grid-plan-nodes",
+        earliestLabel: "unit-grid 计划节点已失败/已取消，下一步 retry（不重试、不派发）",
+        missingAllCount: 1,
+        partialCount: 0,
+        rows: [
+          row({
+            unitId: "u-frozen",
+            sequence: 1,
+            status: "missing-all",
+            isEarliest: true,
+            panels: [
+              panel({ panelId: "p-focus", panelIndex: 1, hasMedia: false, packId: "focus-own-pack" }),
+            ],
+          }),
+        ],
+      },
+    );
+    expect(retried.generationPlanDraft.ready).toBe(false);
+    expect(retried.items[0]?.recommendedPath).toEqual(["retry"]);
+    expect(retried.generationPlanDraft.blockedReason).toContain("下一步 retry");
+
+    const reviewedGrid = buildSsl5PlanFromBoard(
+      "/tmp/iso",
+      { season: "S1", episode: "E2" },
+      {
+        earliestUnitId: "u-frozen",
+        earliestCode: "submit-unit-grid-review",
+        earliestLabel: null,
+        missingAllCount: 1,
+        partialCount: 0,
+        rows: [
+          row({
+            unitId: "u-frozen",
+            sequence: 1,
+            status: "missing-all",
+            isEarliest: true,
+            panels: [
+              panel({ panelId: "p-focus", panelIndex: 1, hasMedia: false, packId: "focus-own-pack" }),
+            ],
+          }),
+        ],
+      },
+    );
+    expect(reviewedGrid.generationPlanDraft.ready).toBe(false);
+    expect(reviewedGrid.items[0]?.recommendedPath).toEqual(["review"]);
+    expect(reviewedGrid.generationPlanDraft.blockedReason).toContain("下一步是 Review");
+
+    const dispatching = buildSsl5PlanFromBoard(
+      "/tmp/iso",
+      { season: "S1", episode: "E2" },
+      {
+        earliestUnitId: "u-frozen",
+        earliestCode: "dispatch-unit-grid",
+        earliestLabel: "派发 unit-grid 生图包",
+        missingAllCount: 1,
+        partialCount: 0,
+        rows: [
+          row({
+            unitId: "u-frozen",
+            sequence: 1,
+            status: "missing-all",
+            isEarliest: true,
+            panels: [
+              panel({ panelId: "p-focus", panelIndex: 1, hasMedia: false, packId: "focus-own-pack" }),
+            ],
+          }),
+        ],
+      },
+    );
+    expect(dispatching.generationPlanDraft.ready).toBe(true);
+    expect(dispatching.items[0]?.recommendedPath).toContain("create-plan");
+  });
+
+  it("焦点不是 earliest 时不改 create-plan 草稿", () => {
+    const plan = buildSsl5PlanFromBoard(
+      "/tmp/iso",
+      { season: "S1", episode: "E2" },
+      {
+        earliestUnitId: "u-early",
+        earliestCode: "wait-or-reconcile-unit-grid-run",
+        earliestLabel: "unit-grid 正在执行，等待结果或对账现有 run",
+        missingAllCount: 1,
+        partialCount: 0,
+        rows: [
+          row({
+            unitId: "u-other",
+            sequence: 2,
+            status: "missing-all",
+            panels: [
+              panel({ panelId: "p-other", panelIndex: 1, hasMedia: false, packId: "other-pack" }),
+            ],
+          }),
+        ],
+      },
+    );
+    expect(plan.focusUnitId).toBe("u-other");
+    expect(plan.earliestUnitId).toBe("u-early");
+    expect(plan.generationPlanDraft.ready).toBe(true);
+    expect(plan.generationPlanDraft.blockedReason).toBeNull();
+    expect(plan.items[0]?.recommendedPath).toContain("create-plan");
+    expect(refineSsl5FocusIfEarliestBlocking(plan).generationPlanDraft.ready).toBe(true);
+  });
+
+  it("单镜已有计划改标 dispatch 之后 earliest wait 仍赢", () => {
+    const plan = buildSsl5PlanFromBoard(
+      "/tmp/iso",
+      { season: "S1", episode: "E2" },
+      {
+        earliestUnitId: "u-frozen",
+        earliestCode: "wait-or-reconcile-unit-grid-run",
+        earliestLabel: "unit-grid 正在执行，等待结果或对账现有 run",
+        missingAllCount: 1,
+        partialCount: 0,
+        rows: [
+          row({
+            unitId: "u-frozen",
+            sequence: 1,
+            status: "missing-all",
+            isEarliest: true,
+            panels: [
+              panel({ panelId: "p-focus", panelIndex: 1, hasMedia: false, packId: "focus-own-pack" }),
+            ],
+          }),
+        ],
+      },
+    );
+    expect(plan.generationPlanDraft.ready).toBe(false);
+    expect(plan.items[0]?.recommendedPath).toEqual(["wait"]);
+    const persisted = refineSsl5FocusPlanDraftIfPersisted(plan, { hasPlan: true, status: "planned" });
+    expect(persisted.generationPlanDraft.blockedReason).toContain("下一步是 dispatch");
+    expect(persisted.items[0]?.recommendedPath).toEqual(["dispatch", "prepare", "gen", "commit", "review"]);
+    const again = refineSsl5FocusIfEarliestBlocking(persisted);
+    expect(again.generationPlanDraft.ready).toBe(false);
+    expect(again.generationPlanDraft.dispatch).toBe(false);
+    expect(again.generationPlanDraft.blockedReason).toBe("unit-grid 正在执行，等待结果或对账现有 run");
+    expect(again.generationPlanDraft.nodes).toEqual([{ unitId: "u-frozen", panelId: "p-focus" }]);
+    expect(again.items[0]?.recommendedPath).toEqual(["wait"]);
   });
 
   it("composeSsl5GenerationPlanDraft 无焦点 / 无宫格失败关闭", () => {
@@ -460,6 +646,8 @@ describe("SSL-5 入口源码合同", () => {
     expect(ssl5).toContain("create-plan");
     expect(ssl5).toContain("composeSsl5GenerationPlanDraft");
     expect(ssl5).toContain("refineSsl5FocusPlanDraftIfPersisted");
+    expect(ssl5).toContain("refineSsl5FocusIfEarliestBlocking");
+    expect(ssl5).toContain("earliestBlockingPath");
     expect(ssl5).toContain("readPersistedPanelPlanState");
     expect(ssl5).toContain("studio-generation-plan-draft");
     expect(ssl5).toContain("focusPackId");
@@ -491,6 +679,8 @@ describe("SSL-5 入口源码合同", () => {
     expect(vue).toContain('data-testid="ssl5-generation-plan-nodes"');
     expect(vue).toContain("formatSsl5PlanDraftNode");
     expect(vue).toContain("不执行 create-plan");
+    expect(vue).toContain('data-testid="ssl5-earliest-next"');
+    expect(vue).toContain("ssl5EarliestNextLine");
     expect(vue).not.toContain("dispatch_studio_generation_pack");
     expect(ssl5).toContain("formatSceneBackReferenceLineFromBoard");
     expect(ssl5).toContain("formatPanelLightingCostumeLine");
@@ -520,6 +710,7 @@ describe("SSL-5 入口源码合同", () => {
     expect(director).toContain("ssl5-missing-to-gen-plan");
     expect(director).toContain("不自动 dispatch");
     expect(director).toContain("不执行建计划");
+    expect(director).toContain("下一步以 earliest 为准");
     expect(director).not.toContain("dispatch_studio_generation_pack");
   });
 });

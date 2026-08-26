@@ -98,6 +98,9 @@ export interface Ssl5MissingToGenPlan {
   season: string;
   episode: string;
   earliestUnitId: string | null;
+  earliestCode: string | null;
+  earliestLabel: string | null;
+  earliestStatusLine: string | null;
   focusUnitId: string | null;
   focusPanelId: string | null;
   focusPanelIndex: number | null;
@@ -144,7 +147,11 @@ const SSL5_RECOMMENDED_PATH = [
 export function buildSsl5PlanFromBoard(
   projectRoot: string,
   query: { season: string; episode: string },
-  board: Pick<ScriptMediaAlignBoard, "rows" | "earliestUnitId" | "missingAllCount" | "partialCount">,
+  board: Pick<ScriptMediaAlignBoard, "rows" | "earliestUnitId" | "missingAllCount" | "partialCount"> & {
+    earliestCode?: string | null;
+    earliestLabel?: string | null;
+    earliestStatusLine?: string | null;
+  },
   builtAt = new Date().toISOString(),
 ): Ssl5MissingToGenPlan {
   const items: Ssl5MissingToGenPlanItem[] = board.rows
@@ -275,13 +282,16 @@ export function buildSsl5PlanFromBoard(
     ?? items.find((item) => item.priority === "partial")
     ?? null;
 
-  return {
+  const plan: Ssl5MissingToGenPlan = {
     schemaVersion: SSL5_PLAN_SCHEMA_VERSION,
     kind: "studio-ssl5-missing-to-gen-plan",
     projectRoot,
     season: query.season,
     episode: query.episode,
     earliestUnitId: board.earliestUnitId,
+    earliestCode: board.earliestCode ?? null,
+    earliestLabel: board.earliestLabel ?? null,
+    earliestStatusLine: board.earliestStatusLine ?? null,
     focusUnitId: focus?.unitId ?? null,
     focusPanelId: focus?.focusPanelId ?? null,
     focusPanelIndex: focus?.focusPanelIndex ?? null,
@@ -314,6 +324,51 @@ export function buildSsl5PlanFromBoard(
     partialCount: board.partialCount,
     items,
     builtAt,
+  };
+  return refineSsl5FocusIfEarliestBlocking(plan);
+}
+
+export function earliestBlockingPath(
+  earliestCode: string | null | undefined,
+): "wait" | "retry" | "review" | "reconcile" | null {
+  if (earliestCode === "wait-or-reconcile-unit-grid-run") return "wait";
+  if (earliestCode === "retry-unit-grid-plan-nodes") return "retry";
+  if (earliestCode === "submit-unit-grid-review") return "review";
+  if (earliestCode === "reconcile-unit-grid-call") return "reconcile";
+  return null;
+}
+
+/**
+ * 焦点就是 earliest 且整板下一步是 wait/retry/Review/对账时，
+ * 禁止再建议 create-plan / dispatch。只精炼焦点；不执行、不派发。
+ */
+export function refineSsl5FocusIfEarliestBlocking(plan: Ssl5MissingToGenPlan): Ssl5MissingToGenPlan {
+  const kind = earliestBlockingPath(plan.earliestCode);
+  if (!kind || !plan.focusUnitId || plan.focusUnitId !== plan.earliestUnitId) return plan;
+  const recommendedPath = [kind === "reconcile" ? "wait" : kind];
+  const blockedReason = plan.earliestLabel
+    || (kind === "wait"
+      ? "earliest 计划节点进行中，等待结果或对账（不派发）"
+      : kind === "retry"
+        ? "earliest 计划节点已失败/已取消，下一步是 retry（不重试、不派发）"
+        : kind === "review"
+          ? "earliest 计划节点已有结果，下一步是 Review（不派发）"
+          : "earliest 未知生图 call，先对账（禁止重派）");
+  const draft = {
+    ...plan.generationPlanDraft,
+    ready: false,
+    dispatch: false as const,
+    blockedReason,
+    note: "earliest 已占用下一步。不执行、不派发、不重试。",
+  };
+  return {
+    ...plan,
+    generationPlanDraft: draft,
+    items: plan.items.map((item) => (
+      item.unitId === plan.focusUnitId && item.focusPanelId === plan.focusPanelId
+        ? { ...item, generationPlanDraft: draft, recommendedPath }
+        : item
+    )),
   };
 }
 
@@ -386,8 +441,8 @@ export async function planSsl5MissingToGen(
     plan.focusUnitId,
     plan.focusPanelId,
   );
-  return refineSsl5FocusPlanDraftIfPersisted(plan, {
+  return refineSsl5FocusIfEarliestBlocking(refineSsl5FocusPlanDraftIfPersisted(plan, {
     hasPlan: persisted.hasPlan,
     status: persisted.status ?? undefined,
-  });
+  }));
 }

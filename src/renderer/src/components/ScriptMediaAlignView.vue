@@ -187,6 +187,18 @@ const ssl5FocusPath = computed(() => {
   return ssl5Plan.value.items.find((item) => item.unitId === ssl5Plan.value?.focusUnitId)?.recommendedPath ?? [];
 });
 
+const ssl5EarliestNextLine = computed(() => {
+  const plan = ssl5Plan.value;
+  if (!plan) return "先 Binding 确认再走 freeze → create-plan 链。";
+  const step = ssl5FocusPath.value[0];
+  if (ssl5FocusPath.value.length === 1 && (step === "wait" || step === "retry" || step === "review")) {
+    return plan.generationPlanDraft.blockedReason
+      || plan.earliestLabel
+      || "下一步以 earliest 为准。";
+  }
+  return "先 Binding 确认再走 freeze → create-plan 链。";
+});
+
 function formatSsl5PlanDraftNode(node: StudioGenerationPlanDraftNode): string {
   return "targetKind" in node && node.targetKind === "unit-grid"
     ? `unit-grid ${node.unitId}`
@@ -1133,7 +1145,7 @@ function shortSha(value: string | null | undefined): string {
           <ol v-if="ssl5FocusPath.length">
             <li v-for="step in ssl5FocusPath" :key="step">{{ step }}</li>
           </ol>
-          <p>只读计划，不自动 dispatch，不执行 create-plan。先 Binding 确认再走 freeze → create-plan 链。</p>
+          <p>只读计划，不自动 dispatch，不执行 create-plan。<span data-testid="ssl5-earliest-next">{{ ssl5EarliestNextLine }}</span></p>
           <button
             v-if="ssl5Plan.focusUnitId"
             type="button"

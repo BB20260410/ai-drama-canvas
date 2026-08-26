@@ -11,7 +11,10 @@ describe("Wave 3-D ssl5 复用 align-board earliest", () => {
     const text = source("src/core/studio-ssl5-missing-to-gen.ts");
     expect(text).toContain("getStudioScriptMediaAlignBoard");
     expect(text).toContain("board.earliestUnitId");
+    expect(text).toContain("board.earliestCode");
+    expect(text).toContain("refineSsl5FocusIfEarliestBlocking");
     expect(text).not.toMatch(/getStudioEpisodeEarliest\s*\(/u);
+    expect(text).not.toContain("studio-episode-earliest");
     expect(text).toContain('"binding-ready?"');
     expect(text).toContain('"dispatch"');
     expect(text).toContain('"review"');

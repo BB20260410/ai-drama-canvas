@@ -64,6 +64,8 @@ export interface ScriptMediaAlignBoard {
   documentTitle: string | null;
   revisionId: string | null;
   earliestUnitId: string | null;
+  earliestCode: string | null;
+  earliestLabel: string | null;
   earliestStatusLine: string | null;
   unitCount: number;
   coveredCount: number;
@@ -237,6 +239,12 @@ export async function getStudioScriptMediaAlignBoard(
     documentTitle,
     revisionId,
     earliestUnitId: earliest.earliestUnitId,
+    earliestCode: earliest.earliestUnitId
+      ? earliest.slots.find((slot) => slot.unitId === earliest.earliestUnitId)?.code ?? null
+      : null,
+    earliestLabel: earliest.earliestUnitId
+      ? earliest.slots.find((slot) => slot.unitId === earliest.earliestUnitId)?.label ?? null
+      : null,
     earliestStatusLine: earliest.statusLine,
     unitCount: rowsWithPeek.length,
     coveredCount: rowsWithPeek.filter((r) => r.status === "covered").length,

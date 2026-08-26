@@ -102,6 +102,8 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain('data-testid="ssl5-missing-to-gen-plan"');
     expect(vue).toContain("planSsl5MissingToGen");
     expect(vue).toContain("不自动 dispatch");
+    expect(vue).toContain('data-testid="ssl5-earliest-next"');
+    expect(vue).toContain("ssl5EarliestNextLine");
     expect(vue).toContain("align-peek-");
     expect(vue).toContain("未评估");
     expect(vue).toContain("<th>四态</th>");
