@@ -4,7 +4,7 @@
  * - suggest：封装 P20 suggestStudioStoryboardDraft（只读）
  * - applyPanelEdits：纯函数合并 Agent/人工字段（不自动变正式）
  * - materialize：create prompt + create_studio_production_unit（显式调用才写）
- * extension 规则保持 P20；不跳过 Binding/freeze 链（物化后仍走 readiness）
+ * extension 规则保持 P20；不跳过 Binding/freeze/create-plan 链（物化后仍走 readiness，不自动派发）
  */
 import {
   suggestStudioStoryboardDraft,
@@ -21,6 +21,9 @@ import {
 import { formatWizardPromptBody } from "./studio-panel-standing.js";
 
 export const STORYBOARD_WIZARD_SCHEMA_VERSION = 1 as const;
+/** 物化后只读下一步。不跳过 Binding，不自动派发，中间必须 create-plan。 */
+export const WIZARD_POST_MATERIALIZE_NEXT =
+  "物化后走 Binding→readiness→freeze→create-plan→dispatch（不跳过 Binding，不自动派发）";
 
 export interface WizardPanelEdit {
   panelIndex: number;
@@ -164,7 +167,7 @@ export async function openStudioStoryboardWizard(
       "Agent/人工填写每格 visualAction/景别/运镜/光线/服化（applyWizardPanelEdits）",
       "G2+ 必须从上一格站位连续起拍；上一格光线/服化只作锁版提示，不自动写入本格（不是 BindingSet，不能当 generation-ready）",
       "validateWizardForMaterialize 无错误后 materializeStudioStoryboardWizardUnit",
-      "物化后走 readiness→freeze→dispatch（不跳过 Binding）",
+      WIZARD_POST_MATERIALIZE_NEXT,
     ],
     builtAt: new Date().toISOString(),
   };

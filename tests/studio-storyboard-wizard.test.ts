@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { mkdtemp, realpath, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -82,6 +83,15 @@ describe("studio-storyboard-wizard", () => {
 
   it("schema frozen", () => {
     expect(STORYBOARD_WIZARD_SCHEMA_VERSION).toBe(1);
+  });
+
+  it("物化后下一步含 create-plan，不跳过 Binding，不自动派发", () => {
+    const wizard = readFileSync(new URL("../src/core/studio-storyboard-wizard.ts", import.meta.url), "utf8");
+    expect(wizard).toContain("WIZARD_POST_MATERIALIZE_NEXT");
+    expect(wizard).toContain("Binding→readiness→freeze→create-plan→dispatch");
+    expect(wizard).toContain("不跳过 Binding，不自动派发");
+    expect(wizard).not.toContain("物化后走 readiness→freeze→dispatch（不跳过 Binding）");
+    expect(wizard).toContain("WIZARD_POST_MATERIALIZE_NEXT,");
   });
 
   it("G2+ 向导前镜取上一格；物化 prompt 首格不写前镜行", () => {

@@ -81,6 +81,11 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("getStudioScriptSpanMediaMap");
     expect(vue).toContain('data-testid="storyboard-wizard-suggest"');
     expect(vue).toContain('data-testid="storyboard-wizard-materialize"');
+    expect(vue).toContain('data-testid="storyboard-wizard-next"');
+    expect(vue).toContain("Binding → freeze → create-plan → dispatch");
+    expect(vue).toContain("仍需后续 Binding / freeze / create-plan");
+    expect(vue).toContain("进入 Binding");
+    expect(vue).not.toContain("仍需后续 Binding / freeze。</p>");
     expect(vue).toContain('data-testid="storyboard-wizard-previous-standing"');
     expect(vue).toContain('data-testid="storyboard-wizard-lighting"');
     expect(vue).toContain('data-testid="storyboard-wizard-costume"');

@@ -1404,7 +1404,7 @@ function shortSha(value: string | null | undefined): string {
         <div class="validation" :class="{ ok: !wizardValidationErrors.length }">
           <b>{{ wizardValidationErrors.length ? "尚不能物化" : "机械校验通过" }}</b>
           <p v-for="validationError in wizardValidationErrors" :key="validationError">{{ validationError }}</p>
-          <p v-if="!wizardValidationErrors.length">2–6 格、15 秒、动作和时间线已闭合；仍需后续 Binding / freeze。</p>
+          <p v-if="!wizardValidationErrors.length">2–6 格、15 秒、动作和时间线已闭合；仍需后续 Binding / freeze / create-plan。</p>
         </div>
         <button
           type="button"
@@ -1418,6 +1418,7 @@ function shortSha(value: string | null | undefined): string {
           <b>{{ materialized.unitId }}</b>
           <p>unit r{{ materialized.unitRevision }} · prompt {{ materialized.promptRevisionId }}</p>
           <p v-for="panel in materialized.panelStatuses" :key="panel.panelId">G{{ panel.panelIndex }}：{{ panel.status }}</p>
+          <p data-testid="storyboard-wizard-next">下一步：Binding → freeze → create-plan → dispatch（不跳过 Binding，不自动派发）</p>
           <button type="button" @click="emit('openUnit', { unitId: materialized.unitId, target: 'binding' })">进入 Binding</button>
         </div>
       </aside>
