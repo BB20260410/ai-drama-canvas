@@ -78,6 +78,7 @@ import {
   parseFrozenPanelCostumeFromRenderedPrompt,
   parseFrozenPanelLightingFromRenderedPrompt,
   parsePreviousStandingFromRenderedPrompt,
+  studioAgentImagegenBriefConstraintLines,
   pickPreviousPanelStanding,
   type StudioPanelStandingHandoff,
 } from "./studio-panel-standing.js";
@@ -2692,6 +2693,10 @@ export interface StudioAgentImagegenBrief {
   /** 从 renderedPrompt 还原；历史包无宫格覆盖行则为 null。 */
   frozenPanelLighting: string | null;
   frozenPanelCostume: string | null;
+  /** 从该包 renderedPrompt / panel.shotType 还原；无扩写/原镜则为 null。 */
+  shotTypeLine: string | null;
+  /** 从该包 target 起止秒还原；无时长则为 null。不写新冻结行。 */
+  beatLine: string | null;
   controlReferences: Array<{
     assetId: string;
     category: string;
@@ -2789,6 +2794,7 @@ export function buildStudioAgentImagegenBrief(
     previousStanding: parsePreviousStandingFromRenderedPrompt(pack.request.modelPayload.renderedPrompt),
     frozenPanelLighting: parseFrozenPanelLightingFromRenderedPrompt(pack.request.modelPayload.renderedPrompt),
     frozenPanelCostume: parseFrozenPanelCostumeFromRenderedPrompt(pack.request.modelPayload.renderedPrompt),
+    ...studioAgentImagegenBriefConstraintLines(pack),
     controlReferences: pack.request.controlReferences.map((ref) => ({
       assetId: ref.assetId,
       category: ref.category,

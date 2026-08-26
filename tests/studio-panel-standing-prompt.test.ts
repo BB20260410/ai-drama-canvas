@@ -35,6 +35,7 @@ import {
   frozenPanelBeatFromAnyFrozenPack,
   frozenPanelShotTypeFromAnyFrozenPack,
   UNIT_BEAT_TOOL_NOTE,
+  studioAgentImagegenBriefConstraintLines,
   frozenPanelOverlaysFromFrozenPanelPacks,
   FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
   EXTENSION_SHOT_TYPE_TOOL_NOTE,
@@ -102,6 +103,11 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(generation).toContain("SCENE_BACK_REFERENCE_TOOL_NOTE");
     expect(generation).toContain("PROP_BACK_REFERENCE_TOOL_NOTE");
     expect(generation).toContain("CHARACTER_BACK_REFERENCE_TOOL_NOTE");
+    expect(generation).toContain("EXTENSION_SHOT_TYPE_TOOL_NOTE");
+    expect(generation).toContain("UNIT_BEAT_TOOL_NOTE");
+    expect(generation).toContain("studioAgentImagegenBriefConstraintLines(pack)");
+    expect(generation).toContain("shotTypeLine: string | null");
+    expect(generation).toContain("beatLine: string | null");
     const unitGrid = readFileSync(path.join(repoRoot, "src/core/studio-unit-grid-generation.ts"), "utf8");
     expect(unitGrid).toContain("formatPreviousStandingPromptLine");
     expect(unitGrid).toContain("第${offset + 1}格${previousLine}");
@@ -314,6 +320,26 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(formatUnitLockPanelBeatLine({ panelIndex: 2 })).toBeNull();
     expect(UNIT_BEAT_TOOL_NOTE).toContain("15s 节拍");
     expect(UNIT_BEAT_TOOL_NOTE).toContain("2–6 格合计 15.0s");
+    expect(studioAgentImagegenBriefConstraintLines({
+      panel: { shotType: "extension" },
+      request: { modelPayload: { renderedPrompt: "镜头类型：扩写延续（保持与前一格连续，不重新起镜）" } },
+      target: { panelIndex: 2, unitLocalStartSeconds: 7.5, unitLocalEndSeconds: 15, durationSeconds: 7.5 },
+    })).toEqual({
+      shotTypeLine: "冻结扩写格：必须与前一格连续，禁止重新起镜，禁止锚定原文。不是 BindingSet。",
+      beatLine: "冻结 15s 节拍：G2 7.5–15s（7.5s）。本单元须 2–6 格合计 15.0s。不是 BindingSet。",
+    });
+    expect(studioAgentImagegenBriefConstraintLines({
+      request: { modelPayload: { renderedPrompt: "只生成一张 9:16 竖屏分镜" } },
+    })).toEqual({ shotTypeLine: null, beatLine: null });
+    expect(studioAgentImagegenBriefConstraintLines({
+      schemaVersion: 5,
+      panels: [{
+        panelId: "p2",
+        panelPack: {
+          target: { panelIndex: 2, unitLocalStartSeconds: 7.5, unitLocalEndSeconds: 15, durationSeconds: 7.5 },
+        },
+      }],
+    })).toEqual({ shotTypeLine: null, beatLine: null });
   });
 
   it("session-snapshot / 生成控制 / 审片从冻结提示词露前镜，不读 head", () => {

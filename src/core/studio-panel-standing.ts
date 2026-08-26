@@ -323,6 +323,24 @@ export function formatFrozenPanelShotTypeReadonlyLine(
   return null;
 }
 
+/**
+ * 单镜 Agent brief 结构化约束：只从该包 renderedPrompt / target 还原。
+ * 无扩写/原镜或无时长则为 null。不是 BindingSet，不读 unit head。
+ */
+export function studioAgentImagegenBriefConstraintLines(
+  pack: AnyFrozenPackStandingSource & { panel?: { shotType?: string } },
+): { shotTypeLine: string | null; beatLine: string | null } {
+  const prompt = pack.request?.modelPayload?.renderedPrompt;
+  const fromPrompt = typeof prompt === "string" ? parseFrozenPanelShotTypeFromRenderedPrompt(prompt) : null;
+  const fromPanel = pack.panel?.shotType === "extension" || pack.panel?.shotType === "original"
+    ? pack.panel.shotType
+    : null;
+  return {
+    shotTypeLine: formatFrozenPanelShotTypeReadonlyLine(fromPrompt ?? fromPanel),
+    beatLine: formatFrozenPanelBeatReadonlyLine(frozenPanelBeatFromAnyFrozenPack(pack)),
+  };
+}
+
 /** 当前宫格锁版镜头类型（无冻结包时）；不是 BindingSet。 */
 export function formatUnitLockPanelShotTypeLine(
   overlay: { panelIndex: number; shotType?: string } | null | undefined,
