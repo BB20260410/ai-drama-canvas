@@ -27,8 +27,10 @@ import {
   unitGridStatusBlockingKind,
 } from "../src/core/studio-generation-plan-draft.js";
 import {
+  formatSessionCheckpointLine,
   formatSessionWriteLeaseLine,
   historyEnvelopeConsistencyPeek,
+  sessionCheckpointPeekFailClosed,
   sessionConsistencyPeekFromVerdict,
   sessionWriteLeasePeekFailClosed,
 } from "../src/core/studio-generation-session-snapshot.js";
@@ -355,6 +357,7 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(digest).not.toContain("generationPlanDraft");
     expect(digest).not.toContain("consistencyPeek");
     expect(digest).not.toContain("writeLease");
+    expect(digest).not.toContain("checkpoint");
     const helperStart = snapshot.indexOf("async function persistedUnitGridPackIdForDraft");
     const helperEnd = snapshot.indexOf("function panelPack(", helperStart);
     const helper = snapshot.slice(helperStart, helperEnd);
@@ -660,5 +663,39 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(mcp).toContain("writeLease，held/holderId/denialHint/line");
     expect(mcp).toContain("不暴露 token");
     expect(mcp).toContain("不改 nextAction");
+  });
+
+  it("session-snapshot 六图闸只读 peek 不进 fingerprint、不静态拉停检模块", () => {
+    expect(formatSessionCheckpointLine(null)).toBe("会话快照未投影六图闸");
+    expect(formatSessionCheckpointLine({
+      newSlotDispatchAllowed: false,
+      blockingBatchNumber: 3,
+    })).toBe("六图闸未放行（batch 3），先完成停检/Review（不派发）");
+    expect(formatSessionCheckpointLine({ newSlotDispatchAllowed: false })).toBe(
+      "六图闸未放行，先完成停检/Review（不派发）",
+    );
+    expect(formatSessionCheckpointLine({ newSlotDispatchAllowed: true })).toBe("六图闸已放行新槽");
+    expect(sessionCheckpointPeekFailClosed()).toEqual({
+      newSlotDispatchAllowed: false,
+      blockingBatchNumber: null,
+      line: "六图闸未放行，先完成停检/Review（不派发）",
+    });
+    const snapshot = source("src/core/studio-generation-session-snapshot.ts");
+    expect(snapshot).toContain("getStudioGenerationCheckpointDashboardGate");
+    expect(snapshot).toContain("formatSessionCheckpointLine");
+    expect(snapshot).toContain("sessionCheckpointPeekFailClosed");
+    expect(snapshot).toContain('import("./studio-generation-checkpoint.js")');
+    expect(snapshot).toContain("不改 nextAction");
+    expect(snapshot).toContain("不改草稿 ready");
+    expect(snapshot).not.toContain('from "./studio-generation-checkpoint.js"');
+    expect(snapshot).not.toContain("getStudioGenerationCheckpointControl");
+    expect(snapshot).not.toContain("attestStudioGenerationCheckpoint");
+    const digest = snapshot.slice(snapshot.indexOf("fingerprint: digest({"), snapshot.indexOf("topRiskCode: body.topRisk?.code ?? null,"));
+    expect(digest).not.toContain("checkpoint");
+    expect(digest).not.toContain("writeLease");
+    expect(digest).not.toContain("generationPlanDraft");
+    const mcp = source("src/mcp/server.ts");
+    expect(mcp).toContain("checkpoint，newSlotDispatchAllowed/blockingBatchNumber/line");
+    expect(mcp).toContain("不执行停检、不派发");
   });
 });

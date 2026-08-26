@@ -107,6 +107,51 @@ async function sessionWriteLeasePeek(projectRoot: string): Promise<SessionWriteL
   }
 }
 
+/** 六图闸只读 peek。只拷 newSlotDispatchAllowed / blockingBatchNumber / line。 */
+export type SessionCheckpointPeek = {
+  newSlotDispatchAllowed: boolean;
+  blockingBatchNumber: number | null;
+  line: string;
+};
+
+const SESSION_CHECKPOINT_BLOCKED_LINE = "六图闸未放行，先完成停检/Review（不派发）";
+
+/** 与对照板同文案。本地排版，不拉对照模块。未投影 ≠ 已放行。 */
+export function formatSessionCheckpointLine(
+  checkpoint?: { newSlotDispatchAllowed: boolean; blockingBatchNumber?: number | null } | null,
+): string {
+  if (!checkpoint) return "会话快照未投影六图闸";
+  if (checkpoint.newSlotDispatchAllowed === false) {
+    return checkpoint.blockingBatchNumber != null
+      ? `六图闸未放行（batch ${checkpoint.blockingBatchNumber}），先完成停检/Review（不派发）`
+      : SESSION_CHECKPOINT_BLOCKED_LINE;
+  }
+  return "六图闸已放行新槽";
+}
+
+export function sessionCheckpointPeekFailClosed(): SessionCheckpointPeek {
+  return {
+    newSlotDispatchAllowed: false,
+    blockingBatchNumber: null,
+    line: SESSION_CHECKPOINT_BLOCKED_LINE,
+  };
+}
+
+/** 动态 import 首屏闸。失败关闭为未放行。不改 nextAction / 草稿 ready。 */
+async function sessionCheckpointPeek(projectRoot: string): Promise<SessionCheckpointPeek> {
+  try {
+    const { getStudioGenerationCheckpointDashboardGate } = await import("./studio-generation-checkpoint.js");
+    const gate = await getStudioGenerationCheckpointDashboardGate(projectRoot);
+    const peek = {
+      newSlotDispatchAllowed: gate.newSlotDispatchAllowed !== false,
+      blockingBatchNumber: gate.blockingBatchNumber ?? null,
+    };
+    return { ...peek, line: formatSessionCheckpointLine(peek) };
+  } catch {
+    return sessionCheckpointPeekFailClosed();
+  }
+}
+
 /**
  * history 信封 consistencyPeek。只看本页 items；无 run 则省略字段。
  * 动态 import peek，不 evaluate 像素。机器不自动 Review PASS。
@@ -245,6 +290,13 @@ export interface StudioGenerationSessionSnapshot {
    * 不进 fingerprint。不改 nextAction。不改草稿 ready。不抢租约、不派发。
    */
   writeLease: SessionWriteLeasePeek;
+  /**
+   * 六图闸只读 peek：动态 import 首屏 DashboardGate。
+   * 只拷 newSlotDispatchAllowed / blockingBatchNumber / 本地 line。
+   * 失败关闭为未放行+默认句，不让 snapshot 整体失败。
+   * 不进 fingerprint。不改 nextAction。不改草稿 ready。不执行停检、不派发。
+   */
+  checkpoint: SessionCheckpointPeek;
   camera: {
     current?: {
       shotComposition: string;
@@ -406,6 +458,7 @@ export async function buildStudioGenerationSessionSnapshot(
     throw new Error(`单元 ${query.unitId} 没有可用于生成会话的当前宫格。`);
   }
   const writeLeasePromise = sessionWriteLeasePeek(projectRoot);
+  const checkpointPromise = sessionCheckpointPeek(projectRoot);
 
   // readiness 返回的是当前态候选包，尚未执行 freeze 时不会出现在账本里。
   // 会话快照必须直接使用这份内存候选，不能把“未持久化”误判成缺少剧本/
@@ -586,6 +639,7 @@ export async function buildStudioGenerationSessionSnapshot(
     beatLine: formatFrozenPanelBeatReadonlyLine(frozenPanelBeatFromAnyFrozenPack(frozenPanel)),
     consistencyPeek,
     writeLease: await writeLeasePromise,
+    checkpoint: await checkpointPromise,
     generationPlanDraft: refineStudioGenerationPlanDraftIfUnitGridBlocking(
       query.panelId
         ? composeStudioGenerationPlanDraft({

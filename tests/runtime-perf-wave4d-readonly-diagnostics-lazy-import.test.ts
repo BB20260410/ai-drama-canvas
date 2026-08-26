@@ -71,6 +71,8 @@ describe("Wave 4-D MCP 只读诊断面动态 import", () => {
     expect(executor).toContain("withStudioPostResultObservation");
     expect(source("src/core/studio-generation-session-snapshot.ts")).toContain("withStudioProductionProjectionBundle");
     expect(source("src/core/studio-generation-session-snapshot.ts")).toContain("withStudioProjectWriteLease");
+    expect(source("src/core/studio-generation-session-snapshot.ts")).toContain("getStudioGenerationCheckpointDashboardGate");
+    expect(valueImportLines(source("src/core/studio-generation-session-snapshot.ts"), "studio-generation-checkpoint\\.js")).toEqual([]);
     expect(source("src/core/codex.ts")).toContain("studio-generation-session-snapshot");
   });
 
