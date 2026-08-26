@@ -1,0 +1,58 @@
+{
+  "id": "goal-shot-type-extension-20260826",
+  "kind": "shot-type-extension-readonly",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T20:38:00.000Z",
+  "scope": "Expose existing frozen renderedPrompt line 镜头类型：原镜/扩写延续 and optional lock-overlay shot_type to Align / SSL-5 / reader / 15s wizard / canvas inspector / generation control / review / session-snapshot / Agent brief. Parses the existing freeze line only; does not write a new freeze line or change G2+ fingerprints. shot_type is optional (PRAGMA table_info); missing column returns shotType=\"\" and does not fail-close lighting/costume. Review reads frozen pack only and never unit head / lock overlay. Not BindingSet; does not change StudioDashboardPanelSummary or get_studio_trace; unit-grid brief last tool note remains previous-standing; formatWizardPromptBody is unchanged.",
+  "invariants": {
+    "parsesExistingShotTypeLineOnly": true,
+    "doesNotWriteNewFrozenPromptLine": true,
+    "shotTypeColumnOptional": true,
+    "missingShotTypeColumnDoesNotFailLightingCostume": true,
+    "reviewFrozenPackOnly": true,
+    "doesNotReadUnitHeadForHistoricalPacks": true,
+    "doesNotGuessFirstPanel": true,
+    "doesNotChangeDashboardProjection": true,
+    "doesNotWriteTraceHeadShotType": true,
+    "doesNotCallBindingInspect": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotDispatch": true,
+    "doesNotWriteWizardPromptConstraint": true,
+    "unitGridBriefLastNoteRemainsPreviousStanding": true,
+    "sessionSnapshotSchemaVersionUnchanged": 1,
+    "ssl5PlanSchemaVersionUnchanged": 1
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-unit-lock-overlays-readonly-sql.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-unit-grid-brief-contract.test.ts",
+        "tests/studio-scene-backrefs-readonly-sql.test.ts",
+        "tests/studio-continuity-review-ui.test.ts"
+      ],
+      "result": "10 files / 175 tests PASS"
+    },
+    "knownExistingFailure": "tests/studio-storyboard-wizard.test.ts createManagedProject Linux dirfd; not a new regression",
+    "commit": "c4f759e"
+  },
+  "notClaimed": [
+    "shot-type / extension consistency fully solved",
+    "15s beat fully solved",
+    "style lock surface",
+    "real-generation constraint evidence",
+    "wizard auto-loads align board",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

@@ -45,6 +45,7 @@
 - [x] 生成控制无冻结包退锁版光线/服化 + 当前 head 场景回指（有包仍只认覆盖行；点穿不猜第一格；不改 dashboard / get_studio_trace）
 - [x] 对照/SSL-5/阅读器/向导/检查器/生成控制/session-snapshot 跨单元道具回指（只认 category=prop；一次 IPC 同开库；点穿复用场景回指；不写冻结提示词；整板 brief 最后一条仍是前镜句；≠ BindingSet）
 - [x] 对照/SSL-5/阅读器/向导/检查器/生成控制/session-snapshot 跨单元角色回指（只认 category=character；一次 IPC 同开库返回 scene+prop+character；点穿复用场景回指；不写冻结提示词；整板 brief 最后一条仍是前镜句；≠ BindingSet）
+- [x] 对照/SSL-5/阅读器/向导/检查器/生成控制/审片/session-snapshot 扩写格镜头类型（只解析已有「镜头类型：」行；锁版 shot_type 为可选列；审片只认冻结包；不写新冻结行；整板 brief 最后一条仍是前镜句；≠ BindingSet）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
