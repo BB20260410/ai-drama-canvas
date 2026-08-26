@@ -1,0 +1,35 @@
+{
+  "id": "goal-reader-checkpoint-lease-20260826",
+  "kind": "reader-reuse-earliest-checkpoint-lease",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T23:41:00.000Z",
+  "scope": "Script reader episode projection copies checkpointLine / writeLeaseLine from the earliest payload it already loads. Local formatters avoid importing the align module (cycle). schemaVersion remains 1. Vue shows both on the library QC card and reader nav. Does not acquire, dispatch, or change T4/T5/dashboard.",
+  "invariants": {
+    "schemaVersionStill1": true,
+    "readerDoesNotImportAlign": true,
+    "readerDoesNotImportWriteLeaseModule": true,
+    "doesNotDispatch": true,
+    "doesNotAcquireLease": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-reader.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts"
+      ],
+      "result": "4 files / 39 tests PASS"
+    },
+    "commit": "43830e9"
+  },
+  "notClaimed": [
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
