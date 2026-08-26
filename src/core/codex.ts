@@ -633,7 +633,7 @@ export async function getStudioGenerationControlEnvelope(
             },
             agentExecution: {
               formalProviders: STUDIO_FORMAL_IMAGEGEN_ALLOWED_PROVIDERS,
-              next: "freeze → plan → dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback",
+              next: "freeze → create-plan → dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback",
               briefs: {
                 codex: buildStudioUnitGridAgentImagegenBrief(readiness.pack, "codex"),
                 grok: buildStudioUnitGridAgentImagegenBrief(readiness.pack, "grok"),
@@ -716,7 +716,7 @@ export async function getStudioGenerationControlEnvelope(
         },
         agentExecution: {
           formalProviders: STUDIO_FORMAL_IMAGEGEN_ALLOWED_PROVIDERS,
-          next: "freeze → dispatch(provider=codex|grok) → agent imagegen → atomic raw/labeled writeback",
+          next: "freeze → create-plan → dispatch(provider=codex|grok) → agent imagegen → atomic raw/labeled writeback",
           briefs: {
             codex: buildStudioAgentImagegenBrief(readiness.pack, "codex"),
             grok: buildStudioAgentImagegenBrief(readiness.pack, "grok"),

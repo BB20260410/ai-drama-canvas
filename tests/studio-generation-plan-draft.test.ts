@@ -83,20 +83,30 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(draft).not.toContain("dispatch_studio_generation_pack");
   });
 
-  it("session-snapshot 只认 query.panelId 已落盘单镜包，草稿不进 fingerprint", () => {
+  it("session-snapshot 有 panelId 走单镜、无 panelId 走已落盘整板，草稿不进 fingerprint", () => {
     const snapshot = source("src/core/studio-generation-session-snapshot.ts");
     expect(snapshot).toContain("composeStudioGenerationPlanDraft");
     expect(snapshot).toContain("persistedPanelPackIdForDraft");
-    expect(snapshot).toContain("query.panelId ?? null");
+    expect(snapshot).toContain("persistedUnitGridPackIdForDraft");
+    expect(snapshot).toContain("listStudioGenerationPacksByUnit");
+    expect(snapshot).toContain('targetKind: "unit-grid"');
     expect(snapshot).toContain('pack.provenance !== "asset-binding-set"');
+    expect(snapshot).toContain('persisted.provenance !== "unit-grid-binding-sets"');
     expect(snapshot).toContain("generationPlanDraft");
     expect(snapshot).toContain("不进 fingerprint");
     expect(snapshot).not.toContain("studio-ssl5-missing-to-gen");
     expect(snapshot).not.toContain("studio-script-media-align");
+    expect(snapshot).not.toContain("studio-unit-grid-generation");
     expect(snapshot).not.toContain("execute_command");
     expect(snapshot).not.toContain("dispatch_studio_generation_pack");
     const digest = snapshot.slice(snapshot.indexOf("fingerprint: digest({"), snapshot.indexOf("topRiskCode: body.topRisk?.code ?? null,"));
     expect(digest).not.toContain("generationPlanDraft");
+    const helperStart = snapshot.indexOf("async function persistedUnitGridPackIdForDraft");
+    const helperEnd = snapshot.indexOf("function panelPack(", helperStart);
+    const helper = snapshot.slice(helperStart, helperEnd);
+    expect(helper).toContain('item.targetKind === "unit-grid"');
+    expect(helper).not.toContain("queryStudioUnitGridGenerationFreeze");
+    expect(helper).not.toContain("candidate.packId");
   });
 
   it("生成控制整板出 unit-grid 节点，不用 readiness 候选", () => {
@@ -104,6 +114,7 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(control).toContain("composeStudioGenerationPlanDraft");
     expect(control).toContain('data-testid="studio-generation-plan-draft"');
     expect(control).toContain('data-testid="studio-generation-plan-nodes"');
+    expect(control).toContain('data-testid="studio-generation-plan-command"');
     expect(control).toContain("persistedUnitGridPackIdForDraft");
     expect(control).toContain("formatGenerationPlanDraftNode");
     expect(control).toContain("generation?.status === \"ready\" && generation.packId");
@@ -133,6 +144,9 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(codex).toContain("generationPlanDraft: composePersistedPackGenerationPlanDraft(pack)");
     expect(codex).toContain('next: "create-plan → dispatch(provider=codex)');
     expect(codex).toContain('next: "create-plan → dispatch(provider=codex|grok)');
+    expect(codex).toContain('next: "freeze → create-plan → dispatch(provider=codex)');
+    expect(codex).toContain('next: "freeze → create-plan → dispatch(provider=codex|grok)');
+    expect(codex).not.toContain('next: "freeze → dispatch(provider=codex|grok)');
     expect(codex).not.toContain("studio-ssl5-missing-to-gen");
     expect(codex).not.toContain("studio-script-media-align");
     const helperStart = codex.indexOf("function composePersistedPackGenerationPlanDraft");

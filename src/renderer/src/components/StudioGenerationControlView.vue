@@ -174,6 +174,12 @@
               {{ generationPlanDraft.ready ? "可建立计划（不派发）" : generationPlanDraft.blockedReason }}
             </p>
             <p
+              v-if="generationPlanDraft.ready"
+              class="previous-standing"
+              data-testid="studio-generation-plan-command">
+              {{ generationPlanDraft.command }}
+            </p>
+            <p
               v-if="generationPlanDraft.ready && generationPlanDraft.nodes?.[0]"
               class="previous-standing"
               data-testid="studio-generation-plan-nodes">

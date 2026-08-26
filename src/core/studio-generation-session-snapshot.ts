@@ -3,6 +3,7 @@ import type { StudioProjectionFrozenReference } from "./studio-production-projec
 import { withStudioProductionProjectionBundle } from "./studio-readonly-diagnostics-lazy.js";
 import {
   listStudioGenerationLatestUnitGridRuns,
+  listStudioGenerationPacksByUnit,
   readAnyStudioGenerationFrozenPack,
   type AnyStudioGenerationFreezePack,
 } from "./studio-generation-ledger.js";
@@ -131,9 +132,9 @@ export interface StudioGenerationSessionSnapshot {
    */
   beatLine: string | null;
   /**
-   * P21 create-plan 只读草稿：只认 query.panelId 自己的已落盘单镜冻结包。
-   * 无 panelId 禁止猜第一格；未冻结 / 整板包 / 未落盘则为 blocked。不进 fingerprint。
-   * 不执行、不派发。
+   * P21 create-plan 只读草稿：有 query.panelId 只认该格已落盘单镜包；
+   * 无 panelId 只认该单元已落盘 unit-grid pack，禁止猜第一格，禁止用 readiness 候选。
+   * 未冻结 / 未落盘则为 blocked。不进 fingerprint。不执行、不派发。
    */
   generationPlanDraft: StudioGenerationPlanDraft;
   camera: {
@@ -185,6 +186,39 @@ async function persistedPanelPackIdForDraft(
   try {
     const persisted = await readAnyStudioGenerationFrozenPack(projectRoot, pack.id);
     return persisted?.id === pack.id ? pack.id : null;
+  } catch {
+    return null;
+  }
+}
+
+/** 只认账本已落盘 unit-grid pack；不用 readiness 候选，不猜第一格。 */
+async function persistedUnitGridPackIdForDraft(
+  projectRoot: string,
+  unitId: string,
+): Promise<string | null> {
+  let cursor: string | undefined;
+  let latest: { sequence: number; packId: string } | null = null;
+  for (let page = 0; page < 8; page += 1) {
+    const result = await listStudioGenerationPacksByUnit(projectRoot, {
+      unitId,
+      limit: 36,
+      ...(cursor ? { cursor } : {}),
+    });
+    for (const item of result.items) {
+      if (item.targetKind === "unit-grid" && (!latest || item.sequence > latest.sequence)) {
+        latest = { sequence: item.sequence, packId: item.packId };
+      }
+    }
+    if (!result.nextCursor) break;
+    cursor = result.nextCursor;
+  }
+  if (!latest) return null;
+  try {
+    const persisted = await readAnyStudioGenerationFrozenPack(projectRoot, latest.packId);
+    if (!persisted || persisted.id !== latest.packId) return null;
+    if (persisted.provenance !== "unit-grid-binding-sets") return null;
+    if (persisted.target.targetKind !== "unit-grid" || persisted.target.unitId !== unitId) return null;
+    return persisted.id;
   } catch {
     return null;
   }
@@ -426,11 +460,18 @@ export async function buildStudioGenerationSessionSnapshot(
       return formatFrozenPanelShotTypeReadonlyLine(fromPrompt ?? fromPanel);
     })(),
     beatLine: formatFrozenPanelBeatReadonlyLine(frozenPanelBeatFromAnyFrozenPack(frozenPanel)),
-    generationPlanDraft: composeStudioGenerationPlanDraft({
-      focusUnitId: query.unitId,
-      focusPanelId: query.panelId ?? null,
-      focusPackId: await persistedPanelPackIdForDraft(projectRoot, query.panelId, readiness),
-    }),
+    generationPlanDraft: query.panelId
+      ? composeStudioGenerationPlanDraft({
+          focusUnitId: query.unitId,
+          focusPanelId: query.panelId,
+          focusPackId: await persistedPanelPackIdForDraft(projectRoot, query.panelId, readiness),
+        })
+      : composeStudioGenerationPlanDraft({
+          focusUnitId: query.unitId,
+          focusPanelId: null,
+          focusPackId: await persistedUnitGridPackIdForDraft(projectRoot, query.unitId),
+          targetKind: "unit-grid",
+        }),
     camera: {
       current: frozenPanel
         ? {
