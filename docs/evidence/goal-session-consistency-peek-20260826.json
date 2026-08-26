@@ -1,0 +1,50 @@
+{
+  "id": "goal-session-consistency-peek-20260826",
+  "kind": "session-snapshot-consistency-peek",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T23:00:30.000Z",
+  "scope": "session-snapshot now exposes consistencyPeek for Review assist. Peek uses current panel newest-first history run, else unit-grid latest run. Process-local LRU only; unevaluated ≠ not-checkable. Dynamic import peekStudioConsistencyVerdictByRunId; does not call evaluateStudioConsistency; does not import align; does not enter fingerprint; schemaVersion remains 1. Machine does not auto Review PASS.",
+  "invariants": {
+    "schemaVersionStill1": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotAutoReviewPass": true,
+    "unevaluatedIsNotNotCheckable": true,
+    "doesNotEnterFingerprint": true,
+    "doesNotStaticImportEvaluator": true,
+    "doesNotImportAlign": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/studio-generation-control-ui.test.ts"
+      ],
+      "result": "11 files / 175 tests PASS"
+    },
+    "commit": "dce2ceb"
+  },
+  "notClaimed": [
+    "evaluateStudioConsistency called from session-snapshot",
+    "MCP new process always has cached verdict",
+    "auto Review PASS",
+    "align surface evaluate",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
