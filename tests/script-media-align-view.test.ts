@@ -59,6 +59,8 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("<th>四态</th>");
     expect(vue).toContain("<th>宫格</th>");
     expect(vue).toContain("align-panels-");
+    expect(vue).toContain("align-table-panel-");
+    expect(vue).toContain("selectAlignTablePanel");
     expect(vue).toContain("align-panel-list");
     expect(vue).toContain("align-panel-peek");
     expect(vue).toContain("align-panel-pack");
@@ -179,6 +181,18 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(reveal).not.toContain("pickFirstCoveredPanel");
     expect(reveal).not.toContain("getStudioBindingControl");
     expect(reveal).not.toContain("evaluateStudioConsistency");
+  });
+
+  it("对照表宫格钮点精确格：stop 冒泡，缺图不绑其他格的图，不猜第一张有图", () => {
+    const vue = source();
+    const selectTable = handlerBody(vue, "async function selectAlignTablePanel(", "function peekLabel(");
+    expect(selectTable).toContain("selectedAlignRow.value = row");
+    expect(selectTable).toContain("selectedAlignPanel.value = panel");
+    expect(selectTable).toContain("loadAlignPreview(panel.rawSha256)");
+    expect(selectTable).not.toContain("pickFirstCoveredPanel");
+    expect(selectTable).not.toContain("row.rawSha256");
+    expect(vue).toContain('@click.stop="selectAlignTablePanel(row, panel)"');
+    expect(vue).toContain("formatPanelCoverageMarks(row.panels)");
   });
 });
 
