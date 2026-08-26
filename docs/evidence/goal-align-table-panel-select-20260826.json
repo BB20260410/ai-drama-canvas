@@ -1,0 +1,36 @@
+{
+  "id": "goal-align-table-panel-select-20260826",
+  "createdAt": "2026-08-26T18:28:20.000Z",
+  "kind": "align-table-panel-select-readonly",
+  "conclusion": "PASS",
+  "scope": "Align table G有/G缺 buttons select the exact panel with click.stop. Missing panel does not bind another panel image. Does not guess first covered panel. No dispatch.",
+  "invariants": {
+    "selectsExactPanelId": true,
+    "clickStopDoesNotSelectRowFirstCovered": true,
+    "doesNotBindOtherPanelImage": true,
+    "doesNotCallBindingControl": true,
+    "doesNotDispatch": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotReviewPass": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/use-virtual-list-lru-hotkeys.test.ts"
+      ],
+      "result": "5 files / 36 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "desktop GUI click verified",
+    "standing fully solved",
+    "real-generation constraint evidence",
+    "installed T23",
+    "100% fit"
+  ]
+}
