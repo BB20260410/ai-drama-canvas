@@ -35,6 +35,12 @@ export {
 
 export const SCRIPT_LIBRARY_PROJECTION_SCHEMA_VERSION = 1 as const;
 
+/** 只读 LRU peek。未评估 ≠ 无法检查。不跑像素、不自动 Review PASS。 */
+export type SpanMediaConsistencyPeek = {
+  status: "cached" | "unevaluated";
+  verdict?: "consistent" | "needs-review" | "drifted" | "not-checkable";
+};
+
 export type ScriptLibraryDocumentKind = "script" | "prompt" | string;
 
 export interface ScriptLibraryIndexItem {
@@ -1045,6 +1051,8 @@ export interface ScriptSpanMediaHit {
   propBackReferences: PropBackReference[];
   characterBackReferenceLine: string;
   characterBackReferences: CharacterBackReference[];
+  /** 只读 LRU peek。未评估 ≠ 无法检查。机器不自动 Review PASS。 */
+  consistencyPeek: SpanMediaConsistencyPeek;
 }
 
 export interface ScriptSpanMediaMap {
@@ -1148,6 +1156,7 @@ export function resolveScriptSpanMediaMap(
           characterMentions: listCharacterAssetMentions(panel.assetMentions),
           units: map.units,
         }),
+        consistencyPeek: { status: "unevaluated" },
       });
     }
   }
@@ -1163,6 +1172,47 @@ export function resolveScriptSpanMediaMap(
     missingCount: hits.filter((hit) => !hit.hasMedia).length,
     hits,
   };
+}
+
+export function attachSpanMediaConsistencyPeeks(
+  map: ScriptSpanMediaMap,
+  verdictByRunId: ReadonlyMap<string, SpanMediaConsistencyPeek["verdict"]>,
+): ScriptSpanMediaMap {
+  return {
+    ...map,
+    hits: map.hits.map((hit) => {
+      const verdict = hit.generationRunId ? verdictByRunId.get(hit.generationRunId) : undefined;
+      return {
+        ...hit,
+        consistencyPeek: verdict
+          ? { status: "cached", verdict }
+          : { status: "unevaluated" },
+      };
+    }),
+  };
+}
+
+async function loadSpanMediaConsistencyPeeks(
+  map: ScriptSpanMediaMap,
+): Promise<Map<string, NonNullable<SpanMediaConsistencyPeek["verdict"]>>> {
+  const runIds = [...new Set(
+    map.hits.map((hit) => hit.generationRunId).filter((id): id is string => Boolean(id)),
+  )];
+  if (runIds.length === 0) return new Map();
+  const { peekStudioConsistencyVerdictByRunId } = await import("./studio-consistency-evaluator.js");
+  const out = new Map<string, NonNullable<SpanMediaConsistencyPeek["verdict"]>>();
+  for (const runId of runIds) {
+    const verdict = peekStudioConsistencyVerdictByRunId(runId);
+    if (verdict) out.set(runId, verdict);
+  }
+  return out;
+}
+
+/** 只读 LRU 挂 peek。无 run / 未入缓存 → unevaluated。不跑像素。 */
+export async function withSpanMediaConsistencyPeeks(
+  map: ScriptSpanMediaMap,
+): Promise<ScriptSpanMediaMap> {
+  return attachSpanMediaConsistencyPeeks(map, await loadSpanMediaConsistencyPeeks(map));
 }
 
 /** 纯函数：span 归一。 */
@@ -1438,10 +1488,10 @@ export async function getStudioScriptSpanMediaMap(
     episode: query.episode,
     ...(query.limit !== undefined ? { limit: query.limit } : {}),
   });
-  return resolveScriptSpanMediaMap(map, {
+  return withSpanMediaConsistencyPeeks(resolveScriptSpanMediaMap(map, {
     startOffsetUtf16: query.startOffsetUtf16,
     endOffsetUtf16: query.endOffsetUtf16,
-  });
+  }));
 }
 
 export async function getStudioEpisodeMissingMediaReport(

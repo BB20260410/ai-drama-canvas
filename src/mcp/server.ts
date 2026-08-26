@@ -144,6 +144,7 @@ import {
   getStudioEpisodeUnitMediaMap,
   getStudioScriptLibraryIndex,
   resolveScriptSpanMediaMap,
+  withSpanMediaConsistencyPeeks,
 } from "../core/studio-script-library-projection.js";
 import { openStudioStoryboardWizard } from "../core/studio-storyboard-wizard.js";
 import { suggestStudioStoryboardDraft } from "../core/studio-storyboard-draft.js";
@@ -5391,7 +5392,7 @@ registrar.registerTool(
   {
     title: "剧本库只读投影（SSL-0/1/2/3/5 计划）",
     description:
-      "剧本库投影只读入口。library-index；episode-unit-media-map；missing-media-report；reader-view（正文+大纲+earliest）；script-media-align（SSL-3 一键图文对照：unit→图 SHA/缺图/trace 钥匙/大纲锚，需 season+episode，可选 documentId）；ssl5-missing-to-gen-plan（SSL-5 缺图→earliest 只读下一步，含焦点宫格场景/道具/角色回指 sceneBackReferenceLine/sceneBackReferences/propBackReferenceLine/propBackReferences/characterBackReferenceLine/characterBackReferences、锁版光线/服化 lightingCostumeLine、镜头类型/扩写格 shotTypeLine、风格锁 styleLockLine 与 15s 节拍 beatLine/unitBeatLine、焦点宫格自己的 focusPackId 与 create-plan 只读草稿 generationPlanDraft（只认缺图格 pack，禁止用同行已出图 packId；账本已有对应 plan 则 ready=false、按节点状态写 dispatch/wait/retry/Review；焦点即 earliest 且 earliest 已是 wait/retry/Review/对账时禁止再建议 create-plan/dispatch，下一步以 earliest 为准；不执行、不 dispatch）；只扫已加载对照板）；script-span-media-map（点选 span→相交宫格/图/构图/前镜交接/锁版光线服化/镜头类型/风格锁/15s 节拍/场景回指/道具回指/角色回指，需 season+episode+startOffsetUtf16+endOffsetUtf16）。不写账本；不返回 CAS 路径/媒体二进制。",
+      "剧本库投影只读入口。library-index；episode-unit-media-map；missing-media-report；reader-view（正文+大纲+earliest）；script-media-align（SSL-3 一键图文对照：unit→图 SHA/缺图/trace 钥匙/大纲锚，需 season+episode，可选 documentId）；ssl5-missing-to-gen-plan（SSL-5 缺图→earliest 只读下一步，含焦点宫格场景/道具/角色回指 sceneBackReferenceLine/sceneBackReferences/propBackReferenceLine/propBackReferences/characterBackReferenceLine/characterBackReferences、锁版光线/服化 lightingCostumeLine、镜头类型/扩写格 shotTypeLine、风格锁 styleLockLine 与 15s 节拍 beatLine/unitBeatLine、一致性四态 peek consistencyPeek（复用已加载对照板焦点格/行，零额外评估；未评估 ≠ 无法检查；机器不自动 Review PASS）、焦点宫格自己的 focusPackId 与 create-plan 只读草稿 generationPlanDraft（只认缺图格 pack，禁止用同行已出图 packId；账本已有对应 plan 则 ready=false、按节点状态写 dispatch/wait/retry/Review；焦点即 earliest 且 earliest 已是 wait/retry/Review/对账时禁止再建议 create-plan/dispatch，下一步以 earliest 为准；不执行、不 dispatch）；只扫已加载对照板）；script-span-media-map（点选 span→相交宫格/图/构图/前镜交接/锁版光线服化/镜头类型/风格锁/15s 节拍/场景回指/道具回指/角色回指/一致性四态 peek consistencyPeek（只读 LRU；未评估 ≠ 无法检查；不跑像素；机器不自动 Review PASS），需 season+episode+startOffsetUtf16+endOffsetUtf16）。不写账本；不返回 CAS 路径/媒体二进制。",
     inputSchema: {
       projectRoot: managedStudioProjectRootSchema,
       operation: z.enum([
@@ -5495,7 +5496,11 @@ registrar.registerTool(
           episode,
           ...(limit !== undefined ? { limit } : {}),
         });
-        return managedStudioResult(resolveScriptSpanMediaMap(map, { startOffsetUtf16, endOffsetUtf16 }));
+        return managedStudioResult(
+          await withSpanMediaConsistencyPeeks(
+            resolveScriptSpanMediaMap(map, { startOffsetUtf16, endOffsetUtf16 }),
+          ),
+        );
       }
       if (operation === "episode-unit-media-map") {
         return managedStudioResult(

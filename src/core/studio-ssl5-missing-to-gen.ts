@@ -6,6 +6,7 @@
  */
 import {
   getStudioScriptMediaAlignBoard,
+  type AlignConsistencyPeek,
   type ScriptMediaAlignBoard,
   type ScriptMediaAlignRow,
 } from "./studio-script-media-align.js";
@@ -90,6 +91,8 @@ export interface Ssl5MissingToGenPlanItem {
   propBackReferences: PropBackReference[];
   characterBackReferenceLine: string;
   characterBackReferences: CharacterBackReference[];
+  /** 复用对照板焦点格/行已有 peek。零额外评估。未评估 ≠ 无法检查。 */
+  consistencyPeek: AlignConsistencyPeek;
 }
 
 export interface Ssl5MissingToGenPlan {
@@ -127,6 +130,8 @@ export interface Ssl5MissingToGenPlan {
   propBackReferences: PropBackReference[];
   characterBackReferenceLine: string;
   characterBackReferences: CharacterBackReference[];
+  /** 复用对照板焦点格/行已有 peek。零额外评估。未评估 ≠ 无法检查。 */
+  consistencyPeek: AlignConsistencyPeek;
   missingAllCount: number;
   partialCount: number;
   items: Ssl5MissingToGenPlanItem[];
@@ -144,6 +149,14 @@ const SSL5_RECOMMENDED_PATH = [
   "commit",
   "review",
 ] as const;
+
+function reuseBoardConsistencyPeek(
+  missingPanel: ScriptMediaAlignRow["panels"][number] | undefined,
+  row: ScriptMediaAlignRow,
+): AlignConsistencyPeek {
+  if (missingPanel) return missingPanel.consistencyPeek ?? { status: "unevaluated" };
+  return row.consistencyPeek ?? { status: "unevaluated" };
+}
 
 export function buildSsl5PlanFromBoard(
   projectRoot: string,
@@ -270,6 +283,7 @@ export function buildSsl5PlanFromBoard(
             })
           : "没有宫格可查角色回指",
         characterBackReferences,
+        consistencyPeek: reuseBoardConsistencyPeek(missingPanel, row),
       };
     })
     .sort((left, right) => {
@@ -321,6 +335,7 @@ export function buildSsl5PlanFromBoard(
     propBackReferences: focus?.propBackReferences ?? [],
     characterBackReferenceLine: focus?.characterBackReferenceLine ?? "没有宫格可查角色回指",
     characterBackReferences: focus?.characterBackReferences ?? [],
+    consistencyPeek: focus?.consistencyPeek ?? { status: "unevaluated" },
     missingAllCount: board.missingAllCount,
     partialCount: board.partialCount,
     items,

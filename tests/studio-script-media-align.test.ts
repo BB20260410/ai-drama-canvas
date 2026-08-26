@@ -165,6 +165,8 @@ describe("对照行四态 peek 源码合同", () => {
     expect(align).toContain("panels: u.panels");
     expect(vue).toContain("align-panel-list");
     expect(vue).toContain("align-panel-peek");
+    expect(vue).toContain("span-media-hit-peek");
+    expect(vue).toContain("ssl5-focus-peek");
     expect(align).toContain("row.panels.map((panel) => panel.generationRunId)");
     expect(align).toContain("earliestCode");
     expect(align).toContain("earliestLabel");

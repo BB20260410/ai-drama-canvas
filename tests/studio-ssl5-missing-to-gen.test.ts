@@ -628,6 +628,98 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.styleLockLine).toBe("没有宫格可查风格锁");
     expect(plan.beatLine).toBe("没有宫格可查 15s 节拍");
     expect(plan.unitBeatLine).toBe("没有宫格可查 15s 节拍");
+    expect(plan.consistencyPeek).toEqual({ status: "unevaluated" });
+  });
+
+  it("consistencyPeek 复用焦点缺图格，不偷同行已出图格", () => {
+    const plan = buildSsl5PlanFromBoard("/tmp/iso", { season: "S1", episode: "E2" }, {
+      earliestUnitId: "u-partial",
+      missingAllCount: 0,
+      partialCount: 1,
+      rows: [
+        row({
+          unitId: "u-partial",
+          sequence: 1,
+          status: "partial",
+          isEarliest: true,
+          generationRunId: "run-covered",
+          consistencyPeek: { status: "cached", verdict: "consistent" },
+          panels: [
+            panel({
+              panelId: "p-covered",
+              panelIndex: 1,
+              hasMedia: true,
+              generationRunId: "run-covered",
+              consistencyPeek: { status: "cached", verdict: "consistent" },
+            }),
+            panel({
+              panelId: "p-missing",
+              panelIndex: 2,
+              hasMedia: false,
+              generationRunId: null,
+              consistencyPeek: { status: "unevaluated" },
+            }),
+          ],
+        }),
+      ],
+    });
+    expect(plan.focusPanelId).toBe("p-missing");
+    expect(plan.consistencyPeek).toEqual({ status: "unevaluated" });
+    expect(plan.items[0]?.consistencyPeek).toEqual({ status: "unevaluated" });
+  });
+
+  it("焦点缺图格已有 peek 则原样复用；无缺图格才用行 peek", () => {
+    const focused = buildSsl5PlanFromBoard("/tmp/iso", { season: "S1", episode: "E2" }, {
+      earliestUnitId: "u-partial",
+      missingAllCount: 0,
+      partialCount: 1,
+      rows: [
+        row({
+          unitId: "u-partial",
+          sequence: 1,
+          status: "partial",
+          isEarliest: true,
+          consistencyPeek: { status: "cached", verdict: "consistent" },
+          panels: [
+            panel({ panelId: "p-covered", panelIndex: 1, hasMedia: true }),
+            panel({
+              panelId: "p-missing",
+              panelIndex: 2,
+              hasMedia: false,
+              generationRunId: "run-focus",
+              consistencyPeek: { status: "cached", verdict: "needs-review" },
+            }),
+          ],
+        }),
+      ],
+    });
+    expect(focused.focusPanelId).toBe("p-missing");
+    expect(focused.consistencyPeek).toEqual({ status: "cached", verdict: "needs-review" });
+
+    const covered = buildSsl5PlanFromBoard("/tmp/iso", { season: "S1", episode: "E2" }, {
+      earliestUnitId: "u-early",
+      missingAllCount: 0,
+      partialCount: 0,
+      rows: [
+        row({
+          unitId: "u-early",
+          sequence: 1,
+          status: "covered",
+          isEarliest: true,
+          consistencyPeek: { status: "cached", verdict: "drifted" },
+          panels: [
+            panel({
+              panelId: "p1",
+              panelIndex: 1,
+              hasMedia: true,
+              consistencyPeek: { status: "cached", verdict: "consistent" },
+            }),
+          ],
+        }),
+      ],
+    });
+    expect(covered.focusPanelId).toBeNull();
+    expect(covered.consistencyPeek).toEqual({ status: "cached", verdict: "drifted" });
   });
 });
 
@@ -667,6 +759,8 @@ describe("SSL-5 入口源码合同", () => {
     expect(vue).toContain('data-testid="ssl5-focus-scene-backrefs"');
     expect(vue).toContain('data-testid="ssl5-focus-prop-backrefs"');
     expect(vue).toContain('data-testid="ssl5-focus-character-backrefs"');
+    expect(vue).toContain('data-testid="ssl5-focus-peek"');
+    expect(vue).toContain("peekLabel(ssl5Plan.consistencyPeek)");
     expect(vue).toContain('data-testid="ssl5-focus-shot-type"');
     expect(vue).toContain('data-testid="ssl5-focus-style-lock"');
     expect(vue).toContain('data-testid="ssl5-focus-beat"');
@@ -704,6 +798,9 @@ describe("SSL-5 入口源码合同", () => {
     expect(ssl5).toContain("formatCharacterBackReferenceLineFromBoard");
     expect(ssl5).not.toContain("studio-scene-backrefs-read");
     expect(ssl5).not.toContain("evaluateStudioConsistency");
+    expect(ssl5).not.toContain("studio-consistency-evaluator");
+    expect(ssl5).toContain("reuseBoardConsistencyPeek");
+    expect(ssl5).toContain("consistencyPeek");
     expect(ssl5).not.toContain("getStudioBindingControl");
     expect(vue).toContain("planSsl5MissingToGen");
     expect(vue).toContain("不自动 dispatch");

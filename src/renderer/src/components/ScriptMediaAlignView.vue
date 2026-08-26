@@ -1027,6 +1027,7 @@ function shortSha(value: string | null | undefined): string {
                 <small data-testid="span-media-hit-scene-backrefs">{{ hit.sceneBackReferenceLine }}</small>
                 <small data-testid="span-media-hit-prop-backrefs">{{ hit.propBackReferenceLine }}</small>
                 <small data-testid="span-media-hit-character-backrefs">{{ hit.characterBackReferenceLine }}</small>
+                <small data-testid="span-media-hit-peek">{{ peekLabel(hit.consistencyPeek) }}</small>
                 <button
                   v-for="ref in hit.sceneBackReferences"
                   :key="`${ref.unitId}:${ref.panelId}:${ref.assetId}`"
@@ -1113,6 +1114,7 @@ function shortSha(value: string | null | undefined): string {
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-scene-backrefs">{{ ssl5Plan.sceneBackReferenceLine }}</span>
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-prop-backrefs">{{ ssl5Plan.propBackReferenceLine }}</span>
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-character-backrefs">{{ ssl5Plan.characterBackReferenceLine }}</span>
+          <span data-testid="ssl5-focus-peek">{{ peekLabel(ssl5Plan.consistencyPeek) }}</span>
           <button
             v-for="ref in ssl5Plan.sceneBackReferences"
             :key="`${ref.unitId}:${ref.panelId}:${ref.assetId}`"

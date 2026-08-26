@@ -37,6 +37,8 @@ import {
   pickFirstMissingPanel,
   pickRawLabeledFromResults,
   resolveScriptSpanMediaMap,
+  attachSpanMediaConsistencyPeeks,
+  withSpanMediaConsistencyPeeks,
   selectLatestPanelPack,
   spansOverlap,
   SCRIPT_LIBRARY_PROJECTION_SCHEMA_VERSION,
@@ -277,6 +279,7 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(hit.hits[0]?.propBackReferenceLine).toContain("本格快照未提及道具");
     expect(hit.hits[0]?.characterBackReferences).toEqual([]);
     expect(hit.hits[0]?.characterBackReferenceLine).toContain("本格快照未提及角色");
+    expect(hit.hits[0]?.consistencyPeek).toEqual({ status: "unevaluated" });
     expect(formatPanelLightingCostumeLine(hit.hits[0])).toContain("锁版光线：G1 窗侧冷光");
     expect(formatPanelLightingCostumeLine(hit.hits[0])).toContain("锁版服装：G1 素袍");
     expect(formatPanelLightingCostumeLine(hit.hits[0])).toContain("不是 BindingSet");
@@ -817,8 +820,107 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     const server = readFileSync(path.join(repoRoot, "src/mcp/server.ts"), "utf8");
     expect(server).toContain("script-span-media-map");
     expect(server).toContain("resolveScriptSpanMediaMap");
+    expect(server).toContain("withSpanMediaConsistencyPeeks");
     expect(server).toContain("startOffsetUtf16");
     expect(readFileSync(path.join(repoRoot, "src/core/studio-script-library-projection.ts"), "utf8")).toContain("export async function getStudioScriptSpanMediaMap");
+  });
+
+  it("span 命中 consistencyPeek 只挂缓存四态，未命中为未评估", async () => {
+    const { indexStudioConsistencyPeek } = await import("../src/core/studio-consistency-evaluator.js");
+    const unit = (partial: Partial<UnitSpanMediaMapEntry> & Pick<UnitSpanMediaMapEntry, "unitId" | "sequence" | "panels">): UnitSpanMediaMapEntry => ({
+      unitRevision: 1,
+      season: "S1",
+      episode: "E2",
+      title: partial.unitId,
+      scriptRevisionId: "rev-1",
+      scriptDocumentId: "doc-1",
+      durationSeconds: 15,
+      panelCount: partial.panels.length,
+      coveredPanelCount: partial.panels.filter((panel) => panel.hasMedia).length,
+      missingPanelCount: partial.panels.filter((panel) => !panel.hasMedia).length,
+      ...partial,
+    });
+    const map = resolveScriptSpanMediaMap({
+      projectRoot: "/tmp/iso",
+      season: "S1",
+      episode: "E2",
+      units: [
+        unit({
+          unitId: "U1",
+          sequence: 1,
+          panels: [{
+            panelIndex: 1,
+            panelId: "p1",
+            title: "g1",
+            sourceSpans: [{ startOffsetUtf16: 0, endOffsetUtf16: 20 }],
+            packId: "pack-1",
+            packFingerprint: "fp",
+            rawSha256: "aa",
+            labeledSha256: null,
+            generationRunId: "run-span-hit",
+            hasMedia: true,
+            shotComposition: "",
+            visualAction: "",
+            filmingMethod: "",
+            sceneLighting: "",
+            costumeState: "",
+            shotType: "",
+            assetMentions: [],
+            previousHandoff: null,
+          }],
+        }),
+        unit({
+          unitId: "U2",
+          sequence: 2,
+          panels: [{
+            panelIndex: 1,
+            panelId: "p2",
+            title: "g1",
+            sourceSpans: [{ startOffsetUtf16: 0, endOffsetUtf16: 20 }],
+            packId: null,
+            packFingerprint: null,
+            rawSha256: null,
+            labeledSha256: null,
+            generationRunId: "run-span-miss",
+            hasMedia: false,
+            shotComposition: "",
+            visualAction: "",
+            filmingMethod: "",
+            sceneLighting: "",
+            costumeState: "",
+            shotType: "",
+            assetMentions: [],
+            previousHandoff: null,
+          }],
+        }),
+      ],
+    }, { startOffsetUtf16: 4, endOffsetUtf16: 8 });
+    expect(map.hits.every((hit) => hit.consistencyPeek.status === "unevaluated")).toBe(true);
+    const attached = attachSpanMediaConsistencyPeeks(map, new Map([["run-span-hit", "needs-review"]]));
+    expect(attached.hits[0]?.consistencyPeek).toEqual({ status: "cached", verdict: "needs-review" });
+    expect(attached.hits[1]?.consistencyPeek).toEqual({ status: "unevaluated" });
+    indexStudioConsistencyPeek({
+      schemaVersion: 1,
+      kind: "studio-consistency-evaluation",
+      verdict: "drifted",
+      assets: [],
+      evidence: {
+        projectId: "p",
+        generationRunId: "run-span-hit",
+        resultSha256: "aa",
+        referenceSha256: [],
+        assetVersionIds: [],
+        packFingerprint: "fp",
+        evaluatorVersion: "test",
+        configSha: "cfg",
+      },
+      computedAt: "2026-08-26T23:40:00.000Z",
+      durationMs: 1,
+      frameNotes: [],
+    });
+    const peeked = await withSpanMediaConsistencyPeeks(map);
+    expect(peeked.hits[0]?.consistencyPeek).toEqual({ status: "cached", verdict: "drifted" });
+    expect(peeked.hits[1]?.consistencyPeek).toEqual({ status: "unevaluated" });
   });
 
   it("episode-unit-media-map 按 panel 读 pack，不把 unit-grid 摊到所有宫格", () => {
@@ -855,6 +957,11 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     expect(source).toContain("不是 BindingSet，不能当 generation-ready");
     expect(source).not.toContain("getStudioBindingControl");
     expect(source).not.toContain("evaluateStudioConsistency");
+    expect(source).toContain("attachSpanMediaConsistencyPeeks");
+    expect(source).toContain("withSpanMediaConsistencyPeeks");
+    expect(source).toContain('import("./studio-consistency-evaluator.js")');
+    expect(source).not.toMatch(/^import \{[^}]*peekStudioConsistencyVerdictByRunId/mu);
+    expect(source).not.toMatch(/^import type \{[^}]*ConsistencyVerdict/mu);
     expect(source).not.toContain("panel 级 media 目前与 unit-grid 共享同一结果图");
     expect(source).toContain("summarizeScriptRevisionUnits");
     expect(source).toContain("coveredMediaCount = summary.coveredMediaCount");
