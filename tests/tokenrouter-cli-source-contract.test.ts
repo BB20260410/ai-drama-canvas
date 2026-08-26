@@ -24,7 +24,10 @@ describe("TokenRouter Cloud CLI 源码合同", () => {
       expect(text, file).not.toMatch(/Bearer [A-Za-z0-9._-]{16,}/u);
     }
     expect(source("scripts/tokenrouter/tr_chat")).toContain("qwen/qwen3.8-max-free");
+    expect(source("scripts/tokenrouter/tr_chat")).toContain("没有 ~/.grok/env.local");
     expect(source("scripts/tokenrouter/novel_chat.py")).toContain('--role tr');
+    expect(source("scripts/tokenrouter/novel_chat.py")).toContain("TOKENROUTER_BASE_URL");
+    expect(source("scripts/tokenrouter/novel_chat.py")).toContain("--timeout-sec");
     expect(source("scripts/install-tokenrouter-cli.sh")).toContain('"$dest/tr_chat"');
   });
 

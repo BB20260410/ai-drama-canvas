@@ -24,8 +24,12 @@ if [[ -n "${TOKENROUTER_API_KEY:-}" ]]; then
 import os
 from pathlib import Path
 key = os.environ["TOKENROUTER_API_KEY"]
+base = os.environ.get("TOKENROUTER_BASE_URL", "https://api.tokenrouter.com/v1")
 path = Path.home() / ".grok" / "env.local"
-path.write_text(f"TOKENROUTER_API_KEY={key}\n", encoding="utf-8")
+path.write_text(
+    f"TOKENROUTER_API_KEY={key}\nTOKENROUTER_BASE_URL={base}\n",
+    encoding="utf-8",
+)
 path.chmod(0o600)
 PY
 fi

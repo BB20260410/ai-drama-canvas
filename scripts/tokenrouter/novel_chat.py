@@ -13,19 +13,29 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 ENV_LOCAL = Path.home() / ".grok" / "env.local"
-ENDPOINT = "https://api.tokenrouter.com/v1/chat/completions"
+ALLOWED_BASE = "https://api.tokenrouter.com/v1"
 MODEL = "qwen/qwen3.8-max-free"
 
 
 def load_env_local() -> None:
     if not ENV_LOCAL.is_file():
         return
-    raw = subprocess.check_output(
-        ["bash", "-lc", f"set -a && source {ENV_LOCAL.as_posix()} && set +a && printf '%s' \"${{TOKENROUTER_API_KEY:-}}\""],
+    exported = subprocess.check_output(
+        ["bash", "-lc", f"set -a && source {ENV_LOCAL.as_posix()} && set +a && /usr/bin/env"],
         text=True,
     )
-    if raw and "TOKENROUTER_API_KEY" not in os.environ:
-        os.environ["TOKENROUTER_API_KEY"] = raw
+    for line in exported.splitlines():
+        if line.startswith("TOKENROUTER_API_KEY=") or line.startswith("TOKENROUTER_BASE_URL="):
+            name, _, value = line.partition("=")
+            os.environ.setdefault(name, value)
+
+
+def completions_url() -> str:
+    base = os.environ.get("TOKENROUTER_BASE_URL", ALLOWED_BASE).strip().rstrip("/")
+    if base != ALLOWED_BASE:
+        print("TOKENROUTER_BASE_URL 只允许 https://api.tokenrouter.com/v1", file=sys.stderr)
+        raise SystemExit(2)
+    return f"{base}/chat/completions"
 
 
 def main() -> int:
@@ -56,7 +66,7 @@ def main() -> int:
     load_env_local()
     key = os.environ.get("TOKENROUTER_API_KEY", "").strip()
     if not key:
-        print("TOKENROUTER_API_KEY 未注入。从本机 ~/.grok/env.local 填到 Cloud Secret，不要贴进对话。", file=sys.stderr)
+        print("TOKENROUTER_API_KEY 未注入。Cloud Secret 注入成环境变量后，novel_chat.py --role tr 能读到。", file=sys.stderr)
         return 2
 
     payload = {
@@ -72,9 +82,11 @@ def main() -> int:
     body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     last_error = ""
     started = time.time()
+    timeout = None if args.timeout_sec == 0 else args.timeout_sec
+    endpoint = completions_url()
     for attempt in range(1, 4):
         req = Request(
-            ENDPOINT,
+            endpoint,
             data=body,
             headers={
                 "Authorization": f"Bearer {key}",
@@ -83,7 +95,7 @@ def main() -> int:
             method="POST",
         )
         try:
-            with urlopen(req, timeout=180) as resp:
+            with urlopen(req, timeout=timeout) as resp:
                 raw = resp.read().decode("utf-8")
                 data = json.loads(raw)
                 text = data["choices"][0]["message"]["content"]

@@ -3,15 +3,23 @@
 set -euo pipefail
 
 ENV_LOCAL="${HOME}/.grok/env.local"
-if [[ -f "$ENV_LOCAL" ]]; then
-  set -a
-  # shellcheck disable=SC1090
-  source "$ENV_LOCAL"
-  set +a
+if [[ ! -f "$ENV_LOCAL" ]]; then
+  echo "没有 ~/.grok/env.local。Cloud 请用 python3 ~/.grok/bin/novel_chat.py --role tr（读环境变量）。不要跑 tr_chat。" >&2
+  exit 2
 fi
+set -a
+# shellcheck disable=SC1090
+source "$ENV_LOCAL"
+set +a
 
 if [[ -z "${TOKENROUTER_API_KEY:-}" ]]; then
-  echo "TOKENROUTER_API_KEY 未注入。从本机 ~/.grok/env.local 填到 Cloud Secret，不要贴进对话。" >&2
+  echo "TOKENROUTER_API_KEY 未注入。" >&2
+  exit 2
+fi
+
+BASE="${TOKENROUTER_BASE_URL:-https://api.tokenrouter.com/v1}"
+if [[ "$BASE" != "https://api.tokenrouter.com/v1" ]]; then
+  echo "TOKENROUTER_BASE_URL 只允许 https://api.tokenrouter.com/v1" >&2
   exit 2
 fi
 
@@ -71,7 +79,7 @@ max_attempts=3
 http_code=""
 while [[ "$attempt" -le "$max_attempts" ]]; do
   http_code="$(
-    curl -sS "https://api.tokenrouter.com/v1/chat/completions" \
+    curl -sS "${BASE}/chat/completions" \
       -H "Authorization: Bearer ${TOKENROUTER_API_KEY}" \
       -H "Content-Type: application/json" \
       --connect-timeout 20 \
