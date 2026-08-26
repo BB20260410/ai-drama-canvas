@@ -25,6 +25,8 @@ import {
   frozenPanelCostumeFromAnyFrozenPack,
   formatFrozenPanelLightingReadonlyLine,
   formatFrozenPanelCostumeReadonlyLine,
+  formatUnitLockPanelLightingLine,
+  formatUnitLockPanelCostumeLine,
   frozenPanelOverlaysFromFrozenPanelPacks,
   FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
 } from "../src/core/studio-panel-standing.js";
@@ -208,6 +210,9 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     }, "p2")).toBe("深灰祭服");
     expect(formatFrozenPanelLightingReadonlyLine("室内火光")).toContain("不是 BindingSet");
     expect(formatFrozenPanelCostumeReadonlyLine("")).toBeNull();
+    expect(formatUnitLockPanelLightingLine({ panelIndex: 2, sceneLighting: "室内火光" })).toContain("不能当 generation-ready");
+    expect(formatUnitLockPanelCostumeLine({ panelIndex: 2, costumeState: "深灰祭服" })).toContain("锁版服装：G2");
+    expect(formatUnitLockPanelLightingLine({ panelIndex: 2, sceneLighting: "" })).toBeNull();
     expect(frozenPanelOverlaysFromFrozenPanelPacks([
       { target: { panelId: "p1" }, request: { modelPayload: { renderedPrompt: "只生成一张" } } },
       { target: { panelId: "p2" }, request: { modelPayload: { renderedPrompt: "光线（宫格覆盖）：室内火光\n服装（宫格覆盖）：深灰祭服" } } },
@@ -287,6 +292,9 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(canvas).toContain("frozenPanelLightingFromAnyFrozenPack(pack, panel.id)");
     expect(canvas).toContain("formatFrozenPanelLightingReadonlyLine");
     expect(canvas).toContain("formatUnitLockPreviousStandingLine");
+    expect(canvas).toContain("formatUnitLockPanelLightingLine");
+    expect(canvas).toContain("getStudioUnitLockOverlays");
+    expect(canvas).not.toContain("getStudioProductionUnitSnapshot");
     expect(canvas).toContain("frozen-rendered-prompt");
     expect(canvas).toContain("getStudioTrace");
     expect(canvas).toContain("resolveStudioTraceSelector");

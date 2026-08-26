@@ -2103,6 +2103,11 @@ describe("受管画布侧栏列表视口剔除", () => {
     expect(inspector).toContain("panelPreviousStandingLine");
     expect(inspector).toContain("panelFrozenLightingLine");
     expect(inspector).toContain("panelFrozenCostumeLine");
+    expect(inspector).toContain("panelLightingCostumeSource");
+    expect(inspector).toContain("锁版未记光线");
+    expect(view).toContain("formatUnitLockPanelLightingLine");
+    expect(view).toContain("getStudioUnitLockOverlays");
+    expect(view).not.toContain("studio-unit-lock-overlays-read");
     expect(inspector).not.toContain("evaluateStudioConsistency");
     expect(inspector).not.toContain("getStudioBindingControl");
     expect(inspector).not.toContain('role="dialog"');

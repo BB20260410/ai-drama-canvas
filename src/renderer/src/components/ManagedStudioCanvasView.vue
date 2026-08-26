@@ -751,6 +751,7 @@
         :panel-previous-standing-source="inspectorPreviousStandingSource"
         :panel-frozen-lighting-line="inspectorFrozenLightingLine"
         :panel-frozen-costume-line="inspectorFrozenCostumeLine"
+        :panel-lighting-costume-source="inspectorLightingCostumeSource"
         @close="closeInspector"
         @focus-appearance="focusAppearance"
         @appearances-previous="appearancesPrevious"
@@ -818,6 +819,8 @@ import {
   formatFrozenPanelCostumeReadonlyLine,
   formatFrozenPanelLightingReadonlyLine,
   formatPreviousStandingReadonlyLine,
+  formatUnitLockPanelCostumeLine,
+  formatUnitLockPanelLightingLine,
   formatUnitLockPreviousStandingLine,
   frozenPanelCostumeFromAnyFrozenPack,
   frozenPanelLightingFromAnyFrozenPack,
@@ -1964,13 +1967,58 @@ const inspectorPreviousStandingLine = ref<string | null>(null);
 const inspectorPreviousStandingSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>(null);
 const inspectorFrozenLightingLine = ref<string | null>(null);
 const inspectorFrozenCostumeLine = ref<string | null>(null);
+const inspectorLightingCostumeSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>(null);
+type InspectorLockOverlay = {
+  panelId: string;
+  panelIndex: number;
+  sceneLighting: string;
+  costumeState: string;
+};
+const inspectorLockOverlayCacheKey = ref<string | null>(null);
+const inspectorLockOverlayByPanelId = ref(new Map<string, InspectorLockOverlay>());
 let inspectorStandingToken = 0;
+
+function clearInspectorLockOverlayCache(): void {
+  inspectorLockOverlayCacheKey.value = null;
+  inspectorLockOverlayByPanelId.value = new Map();
+}
+
+async function readInspectorLockOverlays(
+  projectRoot: string,
+  unitId: string,
+  unitRevision: number,
+): Promise<Map<string, InspectorLockOverlay>> {
+  const key = `${projectRoot}\0${unitId}:${unitRevision}`;
+  if (inspectorLockOverlayCacheKey.value === key) return inspectorLockOverlayByPanelId.value;
+  try {
+    const result = await window.canvasApi.getStudioUnitLockOverlays(projectRoot, { unitId, unitRevision });
+    const next = new Map<string, InspectorLockOverlay>();
+    for (const row of result.overlays ?? []) {
+      const panelId = row.panelId?.trim() ?? "";
+      if (!panelId) continue;
+      next.set(panelId, {
+        panelId,
+        panelIndex: row.panelIndex,
+        sceneLighting: row.sceneLighting ?? "",
+        costumeState: row.costumeState ?? "",
+      });
+    }
+    inspectorLockOverlayCacheKey.value = key;
+    inspectorLockOverlayByPanelId.value = next;
+    return next;
+  } catch {
+    clearInspectorLockOverlayCache();
+    return inspectorLockOverlayByPanelId.value;
+  }
+}
+
 watch([selection, unitDetail, () => props.projectRoot], async () => {
   const token = ++inspectorStandingToken;
   inspectorPreviousStandingLine.value = null;
   inspectorPreviousStandingSource.value = null;
   inspectorFrozenLightingLine.value = null;
   inspectorFrozenCostumeLine.value = null;
+  inspectorLightingCostumeSource.value = null;
   if (selection.value?.kind !== "panel") return;
   const panel = selection.value.panel;
   const packId = unitDetail.value?.selectedPanel?.panel.id === panel.id
@@ -1992,6 +2040,7 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
         inspectorFrozenCostumeLine.value = formatFrozenPanelCostumeReadonlyLine(
           frozenPanelCostumeFromAnyFrozenPack(pack, panel.id),
         );
+        inspectorLightingCostumeSource.value = "frozen-rendered-prompt";
         return;
       }
     } catch {
@@ -2002,15 +2051,28 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
   const previous = (unitDetail.value?.panels ?? [])
     .filter((entry) => entry.ordinal < panel.ordinal)
     .sort((left, right) => right.ordinal - left.ordinal)[0];
-  if (!previous) return;
-  inspectorPreviousStandingLine.value = formatUnitLockPreviousStandingLine({
-    panelIndex: previous.ordinal,
-    panelId: previous.id,
-    shotComposition: previous.shotComposition ?? "",
-    visualAction: previous.visualAction ?? "",
-    filmingMethod: "",
-  });
-  inspectorPreviousStandingSource.value = "unit-lock";
+  if (previous) {
+    inspectorPreviousStandingLine.value = formatUnitLockPreviousStandingLine({
+      panelIndex: previous.ordinal,
+      panelId: previous.id,
+      shotComposition: previous.shotComposition ?? "",
+      visualAction: previous.visualAction ?? "",
+      filmingMethod: "",
+    });
+    inspectorPreviousStandingSource.value = "unit-lock";
+  }
+  const unitId = unitDetail.value?.unit.id;
+  const unitRevision = unitDetail.value?.unit.revision;
+  if (!props.projectRoot || !unitId || !Number.isInteger(unitRevision) || unitRevision < 1) {
+    inspectorLightingCostumeSource.value = "unit-lock";
+    return;
+  }
+  const overlays = await readInspectorLockOverlays(props.projectRoot, unitId, unitRevision);
+  if (token !== inspectorStandingToken) return;
+  const overlay = overlays.get(panel.id);
+  inspectorFrozenLightingLine.value = formatUnitLockPanelLightingLine(overlay);
+  inspectorFrozenCostumeLine.value = formatUnitLockPanelCostumeLine(overlay);
+  inspectorLightingCostumeSource.value = "unit-lock";
 }, { immediate: true });
 const appearanceListElement = computed<HTMLElement | null>(() => inspectorPanelEl.value?.appearanceListElement ?? null);
 
@@ -4014,6 +4076,7 @@ function closeInspector(): void {
   inspectorPreviousStandingSource.value = null;
   inspectorFrozenLightingLine.value = null;
   inspectorFrozenCostumeLine.value = null;
+  inspectorLightingCostumeSource.value = null;
   void nextTick(() => restoreInspectorFlowFocus(nodeId));
 }
 
@@ -8678,6 +8741,7 @@ watch(() => props.projectRoot, async (_projectRoot, previousProjectRoot) => {
   pinnedTextDocuments.value = [];
   pinnedMediaItems.value = new Map();
   unitDetail.value = null;
+  clearInspectorLockOverlayCache();
   unitGridRawPipeline.value = new Map();
   unitGridReferencePipeline.value = new Map();
   unitGridContinuityPipeline.value = new Map();

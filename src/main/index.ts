@@ -3249,6 +3249,18 @@ function registerIpc(): void {
     await requireManagedStudioProject(projectRoot);
     return readAnyStudioGenerationFrozenPack(projectRoot, packId);
   });
+  ipcMain.handle(
+    "canvas:get-studio-unit-lock-overlays",
+    async (
+      _event,
+      projectRoot: string,
+      query: { unitId: string; unitRevision: number },
+    ) => {
+      await requireManagedStudioProjectReadOnly(projectRoot);
+      const { readStudioUnitLockOverlays } = await import("../core/studio-unit-lock-overlays-read.js");
+      return readStudioUnitLockOverlays(projectRoot, query);
+    },
+  );
   ipcMain.handle("canvas:get-studio-pack-currentness", async (
     _event,
     projectRoot: string,

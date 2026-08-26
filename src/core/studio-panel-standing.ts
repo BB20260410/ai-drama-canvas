@@ -169,6 +169,24 @@ export function formatUnitLockPreviousStandingLine(
   return `锁版前镜：G${handoff.panelIndex} ${handoff.shotComposition.trim() || "构图未记"} · ${handoff.visualAction.trim() || "动作未记"} · ${handoff.filmingMethod.trim() || "运镜未记"}。不是 BindingSet，不能当 generation-ready。`;
 }
 
+/** 当前宫格锁版光线（无冻结包时）；不是前镜行，不是 BindingSet。 */
+export function formatUnitLockPanelLightingLine(
+  overlay: { panelIndex: number; sceneLighting?: string } | null | undefined,
+): string | null {
+  const text = overlay?.sceneLighting?.trim() ?? "";
+  if (!overlay || !text) return null;
+  return `锁版光线：G${overlay.panelIndex} ${text}。不是 BindingSet，不能当 generation-ready。`;
+}
+
+/** 当前宫格锁版服装（无冻结包时）；不是前镜行，不是 BindingSet。 */
+export function formatUnitLockPanelCostumeLine(
+  overlay: { panelIndex: number; costumeState?: string } | null | undefined,
+): string | null {
+  const text = overlay?.costumeState?.trim() ?? "";
+  if (!overlay || !text) return null;
+  return `锁版服装：G${overlay.panelIndex} ${text}。不是 BindingSet，不能当 generation-ready。`;
+}
+
 export const UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE =
   "若 previousStandings、promptContract.BEATS[].previousStanding 或 renderedPrompt 含「前镜交接」，必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。";
 

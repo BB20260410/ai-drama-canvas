@@ -341,6 +341,11 @@ const api = {
   // P24：追溯只读通道（规范 §2.3）。
   getStudioFrozenPack: (projectRoot: string, packId: string): ReturnType<typeof import("../core/studio-generation-ledger.js").readAnyStudioGenerationFrozenPack> =>
     t23IpcPerformanceProbe.invoke("canvas:get-studio-frozen-pack", projectRoot, packId),
+  getStudioUnitLockOverlays: (
+    projectRoot: string,
+    query: { unitId: string; unitRevision: number },
+  ): Promise<import("../core/studio-unit-lock-overlays-read.js").StudioUnitLockOverlayReadResult> =>
+    ipcRenderer.invoke("canvas:get-studio-unit-lock-overlays", projectRoot, query),
   getStudioPackCurrentness: (projectRoot: string, packId: string): Promise<import("../core/studio-trace.js").StudioGenerationPackCurrentness> =>
     t23IpcPerformanceProbe.invoke("canvas:get-studio-pack-currentness", projectRoot, packId),
   getStudioTrace: (
