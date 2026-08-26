@@ -1,0 +1,39 @@
+{
+  "id": "goal-ssl5-reader-scene-backrefs-20260826",
+  "kind": "ssl5-reader-scene-backref-from-loaded-board",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T19:44:40.000Z",
+  "scope": "SSL-5 missing-to-gen plan and script-span-media-map project sceneBackReferenceLine from already-loaded align/episode board snapshot mentions (category=scene). Same earlier-sequence / same-unit earlier-panel rule as the align sidebar. Cap 4. No extra pack IO, no unit head, no Binding inspect, no dashboard projection change, no dispatch.",
+  "invariants": {
+    "usesLoadedBoardOnly": true,
+    "matchesSceneCategoryOnly": true,
+    "ignoresLaterUnits": true,
+    "notBindingSet": true,
+    "doesNotReadUnitHead": true,
+    "doesNotCallBindingInspect": true,
+    "doesNotDispatch": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-script-library-projection.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-scene-backrefs-readonly-sql.test.ts"
+      ],
+      "result": "5 files / 41 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "scene consistency fully solved",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
