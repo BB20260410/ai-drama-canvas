@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   composeStudioGenerationPlanDraft,
+  packEnvelopeNextOverrideForUnitGridBlocking,
   refineStudioGenerationPlanDraftIfUnitGridBlocking,
   STUDIO_GENERATION_PLAN_COMMAND,
   unitGridNextActionBlockingKind,
@@ -200,6 +201,12 @@ describe("create-plan 只读草稿纯函数", () => {
     expect(again.ready).toBe(false);
     expect(again.blockedReason).toContain("等待结果或对账");
     expect(again.nodes).toEqual([{ unitId: "u1", panelId: "p1" }]);
+    expect(packEnvelopeNextOverrideForUnitGridBlocking("dispatched")).toBe("wait → result or reconcile (no dispatch)");
+    expect(packEnvelopeNextOverrideForUnitGridBlocking("failed")).toBe("retry_studio_generation_plan_nodes (no retry here, no dispatch)");
+    expect(packEnvelopeNextOverrideForUnitGridBlocking("cancelled")).toBe("retry_studio_generation_plan_nodes (no retry here, no dispatch)");
+    expect(packEnvelopeNextOverrideForUnitGridBlocking("succeeded")).toBe("Review (no dispatch)");
+    expect(packEnvelopeNextOverrideForUnitGridBlocking("planned")).toBeNull();
+    expect(packEnvelopeNextOverrideForUnitGridBlocking(undefined)).toBeNull();
   });
 });
 
@@ -207,6 +214,7 @@ describe("create-plan 草稿接线源码合同", () => {
   it("薄模块不拉对照板 / 不执行 / 不派发", () => {
     const draft = source("src/core/studio-generation-plan-draft.ts");
     expect(draft).toContain("refineStudioGenerationPlanDraftIfUnitGridBlocking");
+    expect(draft).toContain("packEnvelopeNextOverrideForUnitGridBlocking");
     expect(draft).toContain("unitGridNextActionBlockingKind");
     expect(draft).not.toContain("studio-script-media-align");
     expect(draft).not.toContain("studio-ssl5-missing-to-gen");
@@ -291,8 +299,11 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(codex).toContain("packEnvelopeNext");
     expect(codex).toContain('targetKind: "unit-grid"');
     expect(codex).toContain("composePersistedPackGenerationPlanDraft(pack, hasPersistedPlan, persistedPlanStatus)");
-    expect(codex).toContain("packEnvelopeNext(hasPersistedPlan, false, persistedPlanStatus)");
-    expect(codex).toContain("packEnvelopeNext(hasPersistedPlan, true, persistedPlanStatus)");
+    expect(codex).toContain("refineStudioGenerationPlanDraftIfUnitGridBlocking");
+    expect(codex).toContain("siblingUnitGridPlanStatusForPanelPack");
+    expect(codex).toContain("packEnvelopeNextOverrideForUnitGridBlocking");
+    expect(codex).toContain("packEnvelopeNext(hasPersistedPlan, false, persistedPlanStatus, unitGridBlockingStatus)");
+    expect(codex).toContain("packEnvelopeNext(hasPersistedPlan, true, persistedPlanStatus, unitGridBlockingStatus)");
     expect(codex).toContain('"create-plan → dispatch(provider=codex)');
     expect(codex).toContain('"create-plan → dispatch(provider=codex|grok)');
     expect(codex).toContain('"dispatch(provider=codex) → prepare pre-call intent');
@@ -311,6 +322,8 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(helper).toContain("persistedPlanStatus");
     expect(helper).toContain("readPersistedPanelPlanState");
     expect(helper).toContain("readPersistedUnitGridPlanState");
+    expect(helper).toContain("siblingUnitGridPlanStatusForPanelPack");
+    expect(helper).toContain("isStudioUnitGridGenerationPack(pack)");
     expect(helper).toContain("wait → result or reconcile (no dispatch)");
     expect(helper).toContain("retry_studio_generation_plan_nodes (no retry here, no dispatch)");
     expect(helper).toContain("Review (no dispatch)");

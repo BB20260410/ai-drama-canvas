@@ -124,6 +124,17 @@ export function refineStudioGenerationPlanDraftIfUnitGridBlocking(
   };
 }
 
+/** pack envelope `next` 与草稿同一套 unit-grid 阻塞。planned 不挡。 */
+export function packEnvelopeNextOverrideForUnitGridBlocking(
+  status?: PersistedPlanNodeStatus | null,
+): string | null {
+  const kind = unitGridStatusBlockingKind(status);
+  if (kind === "wait") return "wait → result or reconcile (no dispatch)";
+  if (kind === "retry") return "retry_studio_generation_plan_nodes (no retry here, no dispatch)";
+  if (kind === "review") return "Review (no dispatch)";
+  return null;
+}
+
 function blocked(reason: string): StudioGenerationPlanDraft {
   return {
     command: STUDIO_GENERATION_PLAN_COMMAND,
