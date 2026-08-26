@@ -201,8 +201,26 @@ const ssl5EarliestNextLine = computed(() => {
       || plan.earliestLabel
       || "下一步以 earliest 为准。";
   }
+  if (ssl5FocusPath.value.includes("acquire-lease")) {
+    return plan.writeLeaseLine || "写租约未持有；写命令前须 acquire-lease（不派发）";
+  }
   return "先 Binding 确认再走 freeze → create-plan 链。";
 });
+
+const missingReportOpenItems = computed(() =>
+  (board.value?.missingReport.items ?? []).filter((item) => item.status !== "covered"),
+);
+
+async function copyMissingReport() {
+  const report = board.value?.missingReport;
+  if (!report) return;
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(report, null, 2));
+    notice.value = "已复制缺图报告 JSON。";
+  } catch {
+    notice.value = "无法复制缺图报告，请改用 MCP missing-media-report。";
+  }
+}
 
 function reviewDecisionLabel(decision?: string | null): string {
   if (decision === "pass") return "Review 通过";
@@ -1112,6 +1130,7 @@ function shortSha(value: string | null | undefined): string {
           <span class="danger">缺图 <b>{{ board.missingAllCount }}</b></span>
           <span v-if="board.earliestStatusLine" class="earliest">{{ board.earliestStatusLine }}</span>
           <span data-testid="align-checkpoint-gate">{{ board.checkpointLine }}</span>
+          <span data-testid="align-write-lease">{{ board.writeLeaseLine }}</span>
         </div>
         <div v-if="ssl5Plan" class="ssl5-plan" data-testid="ssl5-missing-to-gen-plan">
           <b>SSL-5 下一步</b>
@@ -1164,12 +1183,30 @@ function shortSha(value: string | null | undefined): string {
           </ol>
           <p>只读计划，不自动 dispatch，不执行 create-plan。<span data-testid="ssl5-earliest-next">{{ ssl5EarliestNextLine }}</span></p>
           <span data-testid="ssl5-checkpoint-next">{{ ssl5Plan.checkpointLine }}</span>
+          <span data-testid="ssl5-write-lease">{{ ssl5Plan.writeLeaseLine }}</span>
           <button
             v-if="ssl5Plan.focusUnitId"
             type="button"
             data-testid="ssl5-open-binding"
             @click="emit('openUnit', { unitId: ssl5Plan.focusUnitId, target: 'binding' })"
           >去 Binding 确认</button>
+        </div>
+        <div v-if="board?.missingReport" class="missing-report" data-testid="align-missing-report">
+          <b>缺图报告</b>
+          <span>全缺 {{ board.missingReport.missingAllCount }} · 部分 {{ board.missingReport.partialCount }}</span>
+          <button
+            type="button"
+            data-testid="align-missing-report-copy"
+            @click="copyMissingReport"
+          >复制 JSON</button>
+          <ul v-if="missingReportOpenItems.length">
+            <li
+              v-for="item in missingReportOpenItems"
+              :key="item.unitId"
+              :data-testid="`align-missing-report-${item.unitId}`"
+            >{{ item.unitId }} {{ item.status === "missing-all" ? "全缺" : "部分" }} 缺 {{ item.missingPanelCount }}/{{ item.panelCount }}</li>
+          </ul>
+          <p v-else>没有缺图或部分覆盖单元。</p>
         </div>
         <table v-if="board" data-testid="align-table">
           <thead><tr><th>单元</th><th>状态</th><th>宫格</th><th>四态</th><th>formal</th><th>Review</th><th>raw</th><th>pack / run</th><th>点穿</th></tr></thead>
@@ -1467,7 +1504,7 @@ button{border:1px solid var(--ui-line,#34362f);border-radius:4px;background:var(
 .library-diagnostics h3{font-size:18px;margin-top:4px}.library-diagnostics dl{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.library-diagnostics dl div,.media-preview dl div{padding:8px;background:var(--ui-surface-2,#1a1c17)}dt{color:var(--ui-text-2,#8f9287);font-size:9px}dd{margin:4px 0 0;word-break:break-all}.qc-card{margin:12px 0;padding:12px;border-left:2px solid var(--ui-accent,#d7af55);background:var(--ui-surface-2,#1a1c17)}.qc-card p{margin:6px 0;color:var(--ui-text-2,#a6a99e)}
 .reader-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:12px}.reader-nav{max-height:680px;overflow:auto}.reader-nav h3:not(:first-child){margin-top:16px}.reader-nav button{width:100%;display:flex;justify-content:space-between;text-align:left;border:0;border-radius:0;background:transparent;color:var(--ui-text-2,#a6a99e);content-visibility:auto;contain-intrinsic-size:auto 28px}.reader-nav button.earliest{color:var(--ui-accent,#d7af55)}.reader-nav small{font-size:8px}.reader-body{padding:0;overflow:hidden}.span-media{padding:10px;border-bottom:1px solid var(--ui-line,#34362f);background:var(--ui-surface-2,#1a1c17)}.span-media b,.span-media span,.span-media p{display:block;margin:4px 0}.span-media li{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin:6px 0}.span-media-hit-copy{min-width:0;flex:1}.span-media-hit-copy small{display:block;color:var(--ui-text-2,#8f9287);margin-top:2px}.span-media-hit-actions{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
 .selection-status{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:10px;border-bottom:1px solid var(--ui-line,#34362f)}.selection-status span{color:var(--ui-text-2,#8f9287)}.selection-status button{background:var(--ui-accent,#d7af55);color:var(--ui-accent-contrast,#1a160c)}.script-body{display:block;width:100%;height:620px;resize:none;border:0;border-radius:0;padding:18px;font:12px/1.75 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}
-.align-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px}.align-table-wrap{overflow:auto}.summary{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;color:var(--ui-text-2,#a6a99e)}.summary .ok b{color:#8fbf7a}.summary .warn b{color:#d7af55}.summary .danger b{color:#d08370}.summary .earliest{width:100%;font-size:9px}.ssl5-plan{margin:0 0 10px;padding:10px;border:1px solid var(--ui-line,#34362f);background:var(--ui-surface-2,#1a1c17)}.ssl5-plan b,.ssl5-plan span,.ssl5-plan p{display:block;margin:4px 0}.ssl5-plan ol{margin:6px 0;padding-left:18px;color:var(--ui-text-2,#a6a99e)}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border-bottom:1px solid var(--ui-line,#2a2c26);padding:7px 5px;text-align:left;vertical-align:top}th{color:var(--ui-text-2,#8f9287);font-weight:500}td b,td small{display:block}td small{color:var(--ui-text-2,#8f9287)}.mono{font:9px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}.status-missing-all{background:rgba(208,131,112,.06)}tr.earliest td:first-child b::after{content:" · earliest";color:var(--ui-accent,#d7af55);font-weight:400}tr.selected{outline:1px solid var(--ui-accent,#d7af55);outline-offset:-1px}td button{padding:3px 5px;margin:0 2px 2px 0}.align-panels{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0;padding:0;list-style:none}.align-panels button.active{border-color:var(--ui-accent,#d7af55);color:var(--ui-accent,#d7af55)}.align-table-panels{display:flex;flex-wrap:wrap;gap:3px}.align-table-panels button{padding:2px 5px;font-size:9px}.align-table-panels button.active{border-color:var(--ui-accent,#d7af55);color:var(--ui-accent,#d7af55)}.media-preview img{display:block;width:100%;max-height:420px;object-fit:contain;background:#080908;border:1px solid var(--ui-line,#34362f)}.preview-placeholder{min-height:220px;display:grid;place-items:center;background:#0c0d0b;color:var(--ui-text-2,#8f9287)}.media-preview dl{display:grid;gap:5px}.media-preview code{font-size:8px;word-break:break-all}
+.align-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px}.align-table-wrap{overflow:auto}.summary{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;color:var(--ui-text-2,#a6a99e)}.summary .ok b{color:#8fbf7a}.summary .warn b{color:#d7af55}.summary .danger b{color:#d08370}.summary .earliest{width:100%;font-size:9px}.ssl5-plan,.missing-report{margin:0 0 10px;padding:10px;border:1px solid var(--ui-line,#34362f);background:var(--ui-surface-2,#1a1c17)}.ssl5-plan b,.ssl5-plan span,.ssl5-plan p,.missing-report b,.missing-report span,.missing-report p{display:block;margin:4px 0}.ssl5-plan ol,.missing-report ul{margin:6px 0;padding-left:18px;color:var(--ui-text-2,#a6a99e)}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border-bottom:1px solid var(--ui-line,#2a2c26);padding:7px 5px;text-align:left;vertical-align:top}th{color:var(--ui-text-2,#8f9287);font-weight:500}td b,td small{display:block}td small{color:var(--ui-text-2,#8f9287)}.mono{font:9px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}.status-missing-all{background:rgba(208,131,112,.06)}tr.earliest td:first-child b::after{content:" · earliest";color:var(--ui-accent,#d7af55);font-weight:400}tr.selected{outline:1px solid var(--ui-accent,#d7af55);outline-offset:-1px}td button{padding:3px 5px;margin:0 2px 2px 0}.align-panels{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0;padding:0;list-style:none}.align-panels button.active{border-color:var(--ui-accent,#d7af55);color:var(--ui-accent,#d7af55)}.align-table-panels{display:flex;flex-wrap:wrap;gap:3px}.align-table-panels button{padding:2px 5px;font-size:9px}.align-table-panels button.active{border-color:var(--ui-accent,#d7af55);color:var(--ui-accent,#d7af55)}.media-preview img{display:block;width:100%;max-height:420px;object-fit:contain;background:#080908;border:1px solid var(--ui-line,#34362f)}.preview-placeholder{min-height:220px;display:grid;place-items:center;background:#0c0d0b;color:var(--ui-text-2,#8f9287)}.media-preview dl{display:grid;gap:5px}.media-preview code{font-size:8px;word-break:break-all}
 .wizard-layout{display:grid;grid-template-columns:250px minmax(420px,1fr) 280px;gap:12px;align-items:start}.wizard-source blockquote{max-height:360px;overflow:auto;margin:10px 0;padding:10px;border-left:2px solid var(--ui-accent,#d7af55);background:var(--ui-surface-2,#1a1c17);white-space:pre-wrap;line-height:1.6}.wizard-controls{flex-wrap:wrap}.wizard-controls input{width:70px}.panel-editor{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;border:1px solid var(--ui-line,#34362f);border-radius:4px;margin-bottom:8px}.panel-editor header,.panel-editor .wide{grid-column:1/-1}.panel-editor header{display:flex;justify-content:space-between}.panel-editor input,.panel-editor textarea,.wizard-materialize input{width:100%}.panel-editor small,.wizard-lock-hint{color:var(--ui-text-2,#8f9287)}.wizard-lock-hint{margin:2px 0 0;font-size:10px}.wizard-materialize{display:grid;gap:8px;position:sticky;top:8px}.validation{padding:9px;border:1px solid #8f4f45;background:#2a1815;color:#edb0a2}.validation.ok{border-color:#55754a;background:#162415;color:#a9d39a}.validation p{margin:5px 0}.materialized-result{padding:9px;border:1px solid #55754a;background:#162415}.materialized-result p{margin:4px 0;color:#a9d39a}.materialized-result b{word-break:break-all}
 @media (max-width:1100px){.wizard-layout{grid-template-columns:1fr}.wizard-materialize{position:static}.align-layout{grid-template-columns:1fr}.library-layout{grid-template-columns:1fr}}
 </style>

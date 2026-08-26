@@ -70,6 +70,24 @@ export function formatAlignCheckpointLine(checkpoint?: AlignCheckpointGate | nul
   return "六图闸已放行新槽";
 }
 
+export type AlignWriteLeaseGate = {
+  held: boolean;
+  holderId: string | null;
+  denialHint: string | null;
+};
+
+/** 复用 earliest 已算的写租约。未投影 ≠ 已持有。不暴露 token。 */
+export function formatAlignWriteLeaseLine(lease?: AlignWriteLeaseGate | null): string {
+  if (!lease) return "对照板未投影写租约";
+  if (lease.held) {
+    return lease.holderId
+      ? `写租约由 ${lease.holderId} 持有；无该租约禁止写命令（不派发）`
+      : "写租约已被持有；无该租约禁止写命令（不派发）";
+  }
+  return lease.denialHint
+    || "写租约未持有；写命令前须 acquire-lease（不派发）";
+}
+
 export interface ScriptMediaAlignBoard {
   schemaVersion: typeof SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION;
   kind: "studio-script-media-align-board";
@@ -86,6 +104,8 @@ export interface ScriptMediaAlignBoard {
   earliestReason: string | null;
   checkpoint: AlignCheckpointGate;
   checkpointLine: string;
+  writeLease: AlignWriteLeaseGate;
+  writeLeaseLine: string;
   unitCount: number;
   coveredCount: number;
   partialCount: number;
@@ -253,6 +273,11 @@ export async function getStudioScriptMediaAlignBoard(
       ? { blockingBatchNumber: earliest.checkpoint.blockingBatchNumber }
       : {}),
   };
+  const writeLease: AlignWriteLeaseGate = {
+    held: earliest.writeLease.held === true,
+    holderId: earliest.writeLease.holderId ?? null,
+    denialHint: earliest.writeLease.denialHint ?? null,
+  };
 
   return {
     schemaVersion: SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION,
@@ -274,6 +299,8 @@ export async function getStudioScriptMediaAlignBoard(
     earliestReason: earliest.earliestReason ?? null,
     checkpoint,
     checkpointLine: formatAlignCheckpointLine(checkpoint),
+    writeLease,
+    writeLeaseLine: formatAlignWriteLeaseLine(writeLease),
     unitCount: rowsWithPeek.length,
     coveredCount: rowsWithPeek.filter((r) => r.status === "covered").length,
     partialCount: rowsWithPeek.filter((r) => r.status === "partial").length,

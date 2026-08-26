@@ -6,9 +6,11 @@
  */
 import {
   formatAlignCheckpointLine,
+  formatAlignWriteLeaseLine,
   getStudioScriptMediaAlignBoard,
   type AlignCheckpointGate,
   type AlignConsistencyPeek,
+  type AlignWriteLeaseGate,
   type ScriptMediaAlignBoard,
   type ScriptMediaAlignRow,
 } from "./studio-script-media-align.js";
@@ -110,6 +112,8 @@ export interface Ssl5MissingToGenPlan {
   earliestReason: string | null;
   checkpoint: AlignCheckpointGate | null;
   checkpointLine: string;
+  writeLease: AlignWriteLeaseGate | null;
+  writeLeaseLine: string;
   focusUnitId: string | null;
   focusPanelId: string | null;
   focusPanelIndex: number | null;
@@ -173,6 +177,8 @@ export function buildSsl5PlanFromBoard(
     earliestReason?: string | null;
     checkpoint?: AlignCheckpointGate | null;
     checkpointLine?: string | null;
+    writeLease?: AlignWriteLeaseGate | null;
+    writeLeaseLine?: string | null;
   },
   builtAt = new Date().toISOString(),
 ): Ssl5MissingToGenPlan {
@@ -318,6 +324,8 @@ export function buildSsl5PlanFromBoard(
     earliestReason: board.earliestReason ?? null,
     checkpoint: board.checkpoint ?? null,
     checkpointLine: board.checkpointLine ?? formatAlignCheckpointLine(board.checkpoint ?? null),
+    writeLease: board.writeLease ?? null,
+    writeLeaseLine: board.writeLeaseLine ?? formatAlignWriteLeaseLine(board.writeLease ?? null),
     focusUnitId: focus?.unitId ?? null,
     focusPanelId: focus?.focusPanelId ?? null,
     focusPanelIndex: focus?.focusPanelIndex ?? null,
@@ -352,7 +360,9 @@ export function buildSsl5PlanFromBoard(
     items,
     builtAt,
   };
-  return refineSsl5FocusIfCheckpointBlocking(refineSsl5FocusIfEarliestBlocking(plan));
+  return refineSsl5RecommendedPathIfWriteLeaseOpen(
+    refineSsl5FocusIfCheckpointBlocking(refineSsl5FocusIfEarliestBlocking(plan)),
+  );
 }
 
 export function earliestBlockingPath(
@@ -419,6 +429,39 @@ export function refineSsl5FocusIfCheckpointBlocking(plan: Ssl5MissingToGenPlan):
       ...item,
       generationPlanDraft: draft,
       recommendedPath: ["wait"],
+    })),
+  };
+}
+
+export function recommendedPathWithWriteLease(
+  path: readonly string[],
+  lease?: AlignWriteLeaseGate | null,
+): string[] {
+  const next = [...path];
+  if (!lease || lease.held || next.includes("acquire-lease")) return next;
+  if (next.length === 1 && (next[0] === "wait" || next[0] === "retry" || next[0] === "review")) {
+    return next;
+  }
+  const freezeAt = next.indexOf("freeze");
+  if (freezeAt < 0) return ["acquire-lease", ...next];
+  next.splice(freezeAt, 0, "acquire-lease");
+  return next;
+}
+
+/**
+ * 对照板已投影写租约且未持有时，路径在 freeze 前插入 acquire-lease。
+ * 不改草稿 ready（未持有 ≠ 不能建计划草稿）。闸/earliest 已挡时不插。
+ * 不暴露 token，不抢租约，不派发。
+ */
+export function refineSsl5RecommendedPathIfWriteLeaseOpen(plan: Ssl5MissingToGenPlan): Ssl5MissingToGenPlan {
+  if (plan.writeLease?.held !== false) return plan;
+  if (earliestBlockingPath(plan.earliestCode)) return plan;
+  if (plan.checkpoint?.newSlotDispatchAllowed === false) return plan;
+  return {
+    ...plan,
+    items: plan.items.map((item) => ({
+      ...item,
+      recommendedPath: recommendedPathWithWriteLease(item.recommendedPath, plan.writeLease),
     })),
   };
 }
@@ -492,8 +535,8 @@ export async function planSsl5MissingToGen(
     plan.focusUnitId,
     plan.focusPanelId,
   );
-  return refineSsl5FocusIfCheckpointBlocking(refineSsl5FocusIfEarliestBlocking(refineSsl5FocusPlanDraftIfPersisted(plan, {
+  return refineSsl5RecommendedPathIfWriteLeaseOpen(refineSsl5FocusIfCheckpointBlocking(refineSsl5FocusIfEarliestBlocking(refineSsl5FocusPlanDraftIfPersisted(plan, {
     hasPlan: persisted.hasPlan,
     status: persisted.status ?? undefined,
-  })));
+  }))));
 }

@@ -52,7 +52,7 @@ export const DIRECTOR_ACTIONS: DirectorAction[] = [
     id: "ssl5-plan",
     kind: "open-align-board",
     title: "缺图下一步",
-    description: "只读计划：缺图 unit/宫格 + 前镜交接 + create-plan 草稿；下一步以 earliest 为准（wait/retry/Review 或六图闸未放行时不建议 create-plan；不自动 dispatch，不执行建计划）",
+    description: "只读计划：缺图 unit/宫格 + 前镜交接 + create-plan 草稿；下一步以 earliest 为准（wait/retry/Review 或六图闸未放行时不建议 create-plan；写租约未持有时须先 acquire-lease；对照可复制缺图报告 JSON；不自动 dispatch，不执行建计划）",
     readonlyHint: "get_studio_script_library_projection ssl5-missing-to-gen-plan",
     requiresSeasonEpisode: true,
   },

@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import {
   attachAlignRowConsistencyPeeks,
   formatAlignCheckpointLine,
+  formatAlignWriteLeaseLine,
   matchOutlineAnchorsForUnit,
   SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION,
   type ScriptMediaAlignRow,
@@ -179,6 +180,15 @@ describe("对照行四态 peek 源码合同", () => {
     expect(vue).toContain("align-checkpoint-gate");
     expect(vue).toContain("align-review-");
     expect(vue).toContain("ssl5-checkpoint-next");
+    expect(align).toContain("formatAlignWriteLeaseLine");
+    expect(align).toContain("earliest.writeLease");
+    expect(align).toContain("missingReport");
+    expect(vue).toContain("align-write-lease");
+    expect(vue).toContain("ssl5-write-lease");
+    expect(vue).toContain("align-missing-report");
+    expect(vue).toContain("align-missing-report-copy");
+    expect(vue).toContain("copyMissingReport");
+    expect(align).not.toContain("studio-project-write-lease");
   });
 
   it("formatAlignCheckpointLine 只读投影六图闸，未投影 ≠ 已放行", () => {
@@ -189,6 +199,24 @@ describe("对照行四态 peek 源码合同", () => {
     );
     expect(formatAlignCheckpointLine({ newSlotDispatchAllowed: false, blockingBatchNumber: 3 })).toBe(
       "六图闸未放行（batch 3），先完成停检/Review（不派发）",
+    );
+  });
+
+  it("formatAlignWriteLeaseLine 只读投影写租约，未投影 ≠ 已持有，不暴露 token", () => {
+    expect(formatAlignWriteLeaseLine(null)).toBe("对照板未投影写租约");
+    expect(formatAlignWriteLeaseLine({ held: true, holderId: "agent-a", denialHint: null })).toBe(
+      "写租约由 agent-a 持有；无该租约禁止写命令（不派发）",
+    );
+    expect(formatAlignWriteLeaseLine({ held: true, holderId: null, denialHint: null })).toBe(
+      "写租约已被持有；无该租约禁止写命令（不派发）",
+    );
+    expect(formatAlignWriteLeaseLine({
+      held: false,
+      holderId: null,
+      denialHint: "须先 acquire_studio_project_write_lease",
+    })).toBe("须先 acquire_studio_project_write_lease");
+    expect(formatAlignWriteLeaseLine({ held: false, holderId: null, denialHint: null })).toBe(
+      "写租约未持有；写命令前须 acquire-lease（不派发）",
     );
   });
 });

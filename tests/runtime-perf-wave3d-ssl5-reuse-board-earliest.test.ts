@@ -13,10 +13,13 @@ describe("Wave 3-D ssl5 复用 align-board earliest", () => {
     expect(text).toContain("board.earliestUnitId");
     expect(text).toContain("board.earliestCode");
     expect(text).toContain("board.checkpoint");
+    expect(text).toContain("board.writeLease");
     expect(text).toContain("refineSsl5FocusIfEarliestBlocking");
     expect(text).toContain("refineSsl5FocusIfCheckpointBlocking");
+    expect(text).toContain("refineSsl5RecommendedPathIfWriteLeaseOpen");
     expect(text).not.toMatch(/getStudioEpisodeEarliest\s*\(/u);
     expect(text).not.toContain("studio-episode-earliest");
+    expect(text).not.toContain("studio-project-write-lease");
     expect(text).toContain('"binding-ready?"');
     expect(text).toContain('"dispatch"');
     expect(text).toContain('"review"');

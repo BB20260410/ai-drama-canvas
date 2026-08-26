@@ -71,6 +71,12 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("ssl5-focus-peek");
     expect(vue).toContain("ssl5-checkpoint-next");
     expect(vue).toContain("align-checkpoint-gate");
+    expect(vue).toContain("align-write-lease");
+    expect(vue).toContain("ssl5-write-lease");
+    expect(vue).toContain("align-missing-report");
+    expect(vue).toContain("align-missing-report-copy");
+    expect(vue).toContain("copyMissingReport");
+    expect(vue).toContain("missingReportOpenItems");
     expect(vue).toContain("align-review-");
     expect(vue).toContain("script-reader-earliest-reason");
     expect(vue).toContain("peekLabel(hit.consistencyPeek)");

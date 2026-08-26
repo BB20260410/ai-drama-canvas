@@ -632,6 +632,8 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.consistencyPeek).toEqual({ status: "unevaluated" });
     expect(plan.checkpoint).toBeNull();
     expect(plan.checkpointLine).toBe("对照板未投影六图闸");
+    expect(plan.writeLease).toBeNull();
+    expect(plan.writeLeaseLine).toBe("对照板未投影写租约");
   });
 
   it("六图闸未放行时禁止再建议 create-plan/dispatch，earliest wait 文案更具体时保留", () => {
@@ -704,6 +706,122 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(refineSsl5FocusIfCheckpointBlocking(waiting).generationPlanDraft.blockedReason).toBe(
       "unit-grid 正在执行，等待结果或对账现有 run",
     );
+  });
+
+  it("写租约未持有时路径插入 acquire-lease，未投影/闸/earliest 不插", () => {
+    const open = buildSsl5PlanFromBoard("/tmp/iso", { season: "S1", episode: "E2" }, {
+      earliestUnitId: "u-focus",
+      missingAllCount: 1,
+      partialCount: 0,
+      writeLease: { held: false, holderId: null, denialHint: null },
+      rows: [
+        row({
+          unitId: "u-focus",
+          sequence: 1,
+          status: "missing-all",
+          isEarliest: true,
+          panels: [panel({ panelId: "p1", panelIndex: 1, hasMedia: false, packId: "pack-1" })],
+        }),
+      ],
+    });
+    expect(open.generationPlanDraft.ready).toBe(true);
+    expect(open.writeLeaseLine).toBe("写租约未持有；写命令前须 acquire-lease（不派发）");
+    expect(open.items[0]?.recommendedPath).toEqual([
+      "binding-ready?",
+      "readiness",
+      "acquire-lease",
+      "freeze",
+      "create-plan",
+      "dispatch",
+      "prepare",
+      "gen",
+      "commit",
+      "review",
+    ]);
+
+    const unprojected = buildSsl5PlanFromBoard("/tmp/iso", { season: "S1", episode: "E2" }, {
+      earliestUnitId: "u-focus",
+      missingAllCount: 1,
+      partialCount: 0,
+      rows: [
+        row({
+          unitId: "u-focus",
+          sequence: 1,
+          status: "missing-all",
+          isEarliest: true,
+          panels: [panel({ panelId: "p1", panelIndex: 1, hasMedia: false, packId: "pack-1" })],
+        }),
+      ],
+    });
+    expect(unprojected.writeLeaseLine).toBe("对照板未投影写租约");
+    expect(unprojected.items[0]?.recommendedPath).toEqual([
+      "binding-ready?",
+      "readiness",
+      "freeze",
+      "create-plan",
+      "dispatch",
+      "prepare",
+      "gen",
+      "commit",
+      "review",
+    ]);
+
+    const held = buildSsl5PlanFromBoard("/tmp/iso", { season: "S1", episode: "E2" }, {
+      earliestUnitId: "u-focus",
+      missingAllCount: 1,
+      partialCount: 0,
+      writeLease: { held: true, holderId: "agent-a", denialHint: null },
+      rows: [
+        row({
+          unitId: "u-focus",
+          sequence: 1,
+          status: "missing-all",
+          isEarliest: true,
+          panels: [panel({ panelId: "p1", panelIndex: 1, hasMedia: false, packId: "pack-1" })],
+        }),
+      ],
+    });
+    expect(held.writeLeaseLine).toContain("agent-a");
+    expect(held.items[0]?.recommendedPath.includes("acquire-lease")).toBe(false);
+    expect(held.generationPlanDraft.ready).toBe(true);
+
+    const waiting = buildSsl5PlanFromBoard("/tmp/iso", { season: "S1", episode: "E2" }, {
+      earliestUnitId: "u-focus",
+      earliestCode: "wait-or-reconcile-unit-grid-run",
+      missingAllCount: 1,
+      partialCount: 0,
+      writeLease: { held: false, holderId: null, denialHint: null },
+      rows: [
+        row({
+          unitId: "u-focus",
+          sequence: 1,
+          status: "missing-all",
+          isEarliest: true,
+          panels: [panel({ panelId: "p1", panelIndex: 1, hasMedia: false, packId: "pack-1" })],
+        }),
+      ],
+    });
+    expect(waiting.items[0]?.recommendedPath).toEqual(["wait"]);
+
+    const gated = buildSsl5PlanFromBoard("/tmp/iso", { season: "S1", episode: "E2" }, {
+      earliestUnitId: "u-focus",
+      earliestCode: "dispatch-unit-grid",
+      missingAllCount: 1,
+      partialCount: 0,
+      checkpoint: { newSlotDispatchAllowed: false, blockingBatchNumber: 2 },
+      writeLease: { held: false, holderId: null, denialHint: null },
+      rows: [
+        row({
+          unitId: "u-focus",
+          sequence: 1,
+          status: "missing-all",
+          isEarliest: true,
+          panels: [panel({ panelId: "p1", panelIndex: 1, hasMedia: false, packId: "pack-1" })],
+        }),
+      ],
+    });
+    expect(gated.items[0]?.recommendedPath).toEqual(["wait"]);
+    expect(gated.generationPlanDraft.blockedReason).toContain("六图闸");
   });
 
   it("consistencyPeek 复用焦点缺图格，不偷同行已出图格", () => {
@@ -804,6 +922,9 @@ describe("SSL-5 入口源码合同", () => {
     const ssl5 = source("src/core/studio-ssl5-missing-to-gen.ts");
     const lazy = source("src/core/studio-readonly-diagnostics-lazy.ts");
     expect(server).toContain("ssl5-missing-to-gen-plan");
+    expect(server).toContain("writeLease/writeLeaseLine");
+    expect(server).toContain("missingReport");
+    expect(server).toContain("acquire-lease");
     expect(server).toContain("withStudioSsl5MissingToGen");
     expect(server).not.toMatch(/from ["'].*studio-ssl5-missing-to-gen\.js["']/u);
     expect(lazy).toContain('import("./studio-ssl5-missing-to-gen.js")');
@@ -816,8 +937,11 @@ describe("SSL-5 入口源码合同", () => {
     expect(ssl5).toContain("refineSsl5FocusIfEarliestBlocking");
     expect(ssl5).toContain("refineSsl5FocusIfCheckpointBlocking");
     expect(ssl5).toContain("formatAlignCheckpointLine");
+    expect(ssl5).toContain("refineSsl5RecommendedPathIfWriteLeaseOpen");
+    expect(ssl5).toContain("formatAlignWriteLeaseLine");
     expect(ssl5).not.toContain("studio-generation-checkpoint");
     expect(ssl5).not.toContain("getStudioGenerationCheckpointControl");
+    expect(ssl5).not.toContain("studio-project-write-lease");
     expect(ssl5).toContain("earliestBlockingPath");
     expect(ssl5).toContain("readPersistedPanelPlanState");
     expect(ssl5).toContain("studio-generation-plan-draft");
@@ -855,6 +979,10 @@ describe("SSL-5 入口源码合同", () => {
     expect(vue).toContain('data-testid="ssl5-earliest-next"');
     expect(vue).toContain('data-testid="ssl5-checkpoint-next"');
     expect(vue).toContain('data-testid="align-checkpoint-gate"');
+    expect(vue).toContain('data-testid="ssl5-write-lease"');
+    expect(vue).toContain('data-testid="align-write-lease"');
+    expect(vue).toContain('data-testid="align-missing-report"');
+    expect(vue).toContain('data-testid="align-missing-report-copy"');
     expect(vue).toContain("align-review-");
     expect(vue).toContain("reviewDecisionLabel");
     expect(vue).toContain("ssl5EarliestNextLine");
@@ -892,6 +1020,8 @@ describe("SSL-5 入口源码合同", () => {
     expect(director).toContain("不执行建计划");
     expect(director).toContain("下一步以 earliest 为准");
     expect(director).toContain("六图闸");
+    expect(director).toContain("acquire-lease");
+    expect(director).toContain("缺图报告");
     expect(director).not.toContain("dispatch_studio_generation_pack");
   });
 });
