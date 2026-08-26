@@ -1,0 +1,34 @@
+{
+  "id": "goal-align-panel-rows-20260826",
+  "createdAt": "2026-08-26T18:06:00.000Z",
+  "kind": "align-board-panel-coverage",
+  "conclusion": "PASS",
+  "scope": "Align board exposes per-panel coverage marks and selected-panel preview; unselected panels do not bind images",
+  "invariants": {
+    "rowCarriesPanels": true,
+    "coverageMarksTextOnly": true,
+    "selectedPanelPreviewOnly": true,
+    "doesNotDispatch": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotReviewPass": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts"
+      ],
+      "result": "4 files / 27 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "runtime speed closed",
+    "100% fit"
+  ]
+}

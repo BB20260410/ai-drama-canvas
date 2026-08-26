@@ -11,7 +11,8 @@
 - [x] 对照行四态 peek（只读缓存；未评估 ≠ 无法检查；不自动 Review PASS）
 - [x] 阅读器「这段配了哪些图」桌面按钮（`getStudioScriptSpanMediaMap`）
 - [x] episode-unit-media-map 按 panel 读 pack（unit-grid 不得复制到所有宫格）
-- [ ] 对照表展开宫格行（把 per-panel 真相露到导演面）
+- [x] 对照表展开宫格行（把 per-panel 真相露到导演面）
+- [ ] SSL-5 焦点落到第一张缺图宫格（不 dispatch）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825

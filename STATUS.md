@@ -8,11 +8,11 @@
 | analysis | `docs/GOAL_无限画布全面分析与下一刀_20260826.md` |
 | workqueue | reap 0；next EMPTY；closed=7 |
 | A_earliest | **等待 owner**（真生图 / 安装版 T23 / P7 / 列表 GUI 探针） |
-| B_earliest | 对照表展开宫格行；episode-unit-media-map 已按 panel 读 pack |
+| B_earliest | SSL-5 焦点落到第一张缺图宫格；对照表已展开宫格覆盖 |
 | dual_track_gate | A_done=no；B_demo=部分；SSL≥ssl3 源码有、ssl5 计划已暴露；fit_band≠L5 |
 | ssl5 | `get_studio_script_library_projection` op `ssl5-missing-to-gen-plan`；对照横幅 `ssl5-missing-to-gen-plan`；不 dispatch |
-| evidence | `docs/evidence/goal-ssl5-missing-to-gen-mcp-20260826.json`、`goal-script-span-media-map-20260826.json`、`goal-align-consistency-peek-20260826.json`、`goal-reader-span-media-20260826.json`、`goal-episode-unit-media-map-per-panel-20260826.json` |
-| earliest_next | B：对照表展开宫格行（把 per-panel 真相露到导演面）。A 仍等 owner。禁止写「运行速度已关账」/「100% 契合」 |
+| evidence | `docs/evidence/goal-ssl5-missing-to-gen-mcp-20260826.json`、`goal-script-span-media-map-20260826.json`、`goal-align-consistency-peek-20260826.json`、`goal-reader-span-media-20260826.json`、`goal-episode-unit-media-map-per-panel-20260826.json`、`goal-align-panel-rows-20260826.json` |
+| earliest_next | B：SSL-5 焦点落到第一张缺图宫格。A 仍等 owner。禁止写「运行速度已关账」/「100% 契合」 |
 
 ## 2026-08-25 · 运行速度与内存占用长期计划立项
 
