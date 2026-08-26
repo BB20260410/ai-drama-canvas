@@ -73,6 +73,7 @@
 - [x] get_studio_trace / 画布检查器一致性四态 peek 辅助 Review（追溯 by-run 用该 run、否则本包最新 run；无 run 省略以免改 P24 形状；检查器复用 history 信封 newest-first limit 1；动态 import peek，不 evaluate 像素；Vue 不 import evaluator；不改 dashboard / T4/T5 / P24 golden；机器不自动 Review PASS）
 - [x] 阅读器 span 命中 / SSL-5 横幅一致性四态 peek（命中按 generationRunId 只读 LRU；SSL-5 复用对照板焦点格/行已有 peek，不偷同行已出图格、不二次评估；未评估 ≠ 无法检查；Vue 复用 peekLabel，不 import evaluator；schemaVersion 仍为 1；机器不自动 Review PASS）
 - [x] 对照/SSL-5 复用六图闸（对照板拷贝 earliest 已算 checkpoint；未放行新槽时禁止再建议 create-plan/dispatch；earliest wait/retry/Review 文案更具体时保留；不二次读闸；对照表 Review 角标用已有 reviewDecision；阅读器露出 earliestReason；不执行停检、不派发；schemaVersion 仍为 1）
+- [x] 对照/SSL-5 写租约 + 对照缺图报告 JSON（对照板拷贝 earliest 已算 writeLease，不暴露 token；未持有时 SSL-5 在 freeze 前插入 acquire-lease；未投影不插；闸/earliest 已挡不插；不改草稿 ready；对照面复制 missingReport；不抢租约、不派发；schemaVersion 仍为 1）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
