@@ -12,8 +12,11 @@ import {
 import {
   formatPanelLightingCostumeLine,
   formatPanelStandingGaps,
+  formatCharacterBackReferenceLineFromBoard,
   formatPropBackReferenceLineFromBoard,
   formatSceneBackReferenceLineFromBoard,
+  listCharacterAssetMentions,
+  listCharacterBackReferences,
   listPropAssetMentions,
   listPropBackReferences,
   listSceneAssetMentions,
@@ -26,7 +29,7 @@ import {
   wizardPreviousCostumeForPanel,
   wizardPreviousLightingForPanel,
 } from "./studio-panel-standing.js";
-import type { PropBackReference, SceneBackReference } from "./studio-scene-backrefs.js";
+import type { CharacterBackReference, PropBackReference, SceneBackReference } from "./studio-scene-backrefs.js";
 
 export const SSL5_PLAN_SCHEMA_VERSION = 1 as const;
 
@@ -53,6 +56,8 @@ export interface Ssl5MissingToGenPlanItem {
   sceneBackReferences: SceneBackReference[];
   propBackReferenceLine: string;
   propBackReferences: PropBackReference[];
+  characterBackReferenceLine: string;
+  characterBackReferences: CharacterBackReference[];
 }
 
 export interface Ssl5MissingToGenPlan {
@@ -77,6 +82,8 @@ export interface Ssl5MissingToGenPlan {
   sceneBackReferences: SceneBackReference[];
   propBackReferenceLine: string;
   propBackReferences: PropBackReference[];
+  characterBackReferenceLine: string;
+  characterBackReferences: CharacterBackReference[];
   missingAllCount: number;
   partialCount: number;
   items: Ssl5MissingToGenPlanItem[];
@@ -131,6 +138,17 @@ export function buildSsl5PlanFromBoard(
             units: board.rows,
           })
         : [];
+      const characterMentions = listCharacterAssetMentions(missingPanel?.assetMentions);
+      const characterBackReferences = missingPanel
+        ? listCharacterBackReferences({
+            currentUnitId: row.unitId,
+            currentSequence: row.sequence,
+            currentPanelIndex: missingPanel.panelIndex,
+            currentPanelId: missingPanel.panelId,
+            characterMentions,
+            units: board.rows,
+          })
+        : [];
       const previousLighting = missingPanel
         ? wizardPreviousLightingForPanel(row.panels ?? [], missingPanel.panelIndex)
         : null;
@@ -178,6 +196,17 @@ export function buildSsl5PlanFromBoard(
             })
           : "没有宫格可查道具回指",
         propBackReferences,
+        characterBackReferenceLine: missingPanel
+          ? formatCharacterBackReferenceLineFromBoard({
+              currentUnitId: row.unitId,
+              currentSequence: row.sequence,
+              currentPanelIndex: missingPanel.panelIndex,
+              currentPanelId: missingPanel.panelId,
+              currentMentions: missingPanel.assetMentions,
+              units: board.rows,
+            })
+          : "没有宫格可查角色回指",
+        characterBackReferences,
       };
     })
     .sort((left, right) => {
@@ -213,6 +242,8 @@ export function buildSsl5PlanFromBoard(
     sceneBackReferences: focus?.sceneBackReferences ?? [],
     propBackReferenceLine: focus?.propBackReferenceLine ?? "没有宫格可查道具回指",
     propBackReferences: focus?.propBackReferences ?? [],
+    characterBackReferenceLine: focus?.characterBackReferenceLine ?? "没有宫格可查角色回指",
+    characterBackReferences: focus?.characterBackReferences ?? [],
     missingAllCount: board.missingAllCount,
     partialCount: board.partialCount,
     items,

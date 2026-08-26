@@ -14,7 +14,7 @@ import {
   type StudioPanelStandingHandoff,
 } from "./studio-panel-standing.js";
 import { readStudioSceneBackReferences } from "./studio-scene-backrefs-read.js";
-import type { PropBackReference, SceneBackReference } from "./studio-scene-backrefs.js";
+import type { CharacterBackReference, PropBackReference, SceneBackReference } from "./studio-scene-backrefs.js";
 import type { StudioDashboardCurrentness, StudioDashboardNextAction } from "./studio-production-dashboard.js";
 import type { NextShotContinuitySnapshot } from "./studio-next-shot-continuity.js";
 import type { StudioPostResultObservedActualState } from "./studio-post-result-observation.js";
@@ -105,6 +105,13 @@ export interface StudioGenerationSessionSnapshot {
   propMentions: Array<{ assetId: string; role: string }>;
   propBackReferences: PropBackReference[];
   propBackReferenceNote: string;
+  /**
+   * 跨单元角色回指：只读生产库快照提及（category=character），不读 unit head、不拆冻结包。
+   * 无角色提及则为空数组；缺库失败关闭为空，不建库。不是 BindingSet。
+   */
+  characterMentions: Array<{ assetId: string; role: string }>;
+  characterBackReferences: CharacterBackReference[];
+  characterBackReferenceNote: string;
   camera: {
     current?: {
       shotComposition: string;
@@ -364,6 +371,9 @@ export async function buildStudioGenerationSessionSnapshot(
     propMentions: sceneBackref.propMentions,
     propBackReferences: sceneBackref.propBackReferences,
     propBackReferenceNote: sceneBackref.propBackReferenceNote,
+    characterMentions: sceneBackref.characterMentions,
+    characterBackReferences: sceneBackref.characterBackReferences,
+    characterBackReferenceNote: sceneBackref.characterBackReferenceNote,
     camera: {
       current: frozenPanel
         ? {
@@ -412,6 +422,12 @@ export async function buildStudioGenerationSessionSnapshot(
         ? {
             propMentions: body.propMentions,
             propBackReferences: body.propBackReferences,
+          }
+        : {}),
+      ...(body.characterMentions.length > 0 || body.characterBackReferences.length > 0
+        ? {
+            characterMentions: body.characterMentions,
+            characterBackReferences: body.characterBackReferences,
           }
         : {}),
       camera: body.camera,

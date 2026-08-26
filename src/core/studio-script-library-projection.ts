@@ -10,19 +10,25 @@ import {
   listStudioGenerationResultsByPack,
 } from "./studio-generation-ledger.js";
 import {
+  CHARACTER_BACK_REFERENCE_LIMIT,
   PROP_BACK_REFERENCE_LIMIT,
   SCENE_BACK_REFERENCE_LIMIT,
+  formatCharacterBackReferences,
   formatPropBackReferences,
   formatSceneBackReferences,
+  type CharacterBackReference,
   type PropBackReference,
   type SceneBackReference,
 } from "./studio-scene-backrefs.js";
 
 export {
+  CHARACTER_BACK_REFERENCE_LIMIT,
   PROP_BACK_REFERENCE_LIMIT,
   SCENE_BACK_REFERENCE_LIMIT,
+  formatCharacterBackReferences,
   formatPropBackReferences,
   formatSceneBackReferences,
+  type CharacterBackReference,
   type PropBackReference,
   type SceneBackReference,
 } from "./studio-scene-backrefs.js";
@@ -276,6 +282,18 @@ export function listPropAssetMentions(
   });
 }
 
+export function listCharacterAssetMentions(
+  mentions: ReadonlyArray<{ assetId?: string; category?: string; role?: string }> | null | undefined,
+): PanelAssetMentionLite[] {
+  if (!mentions) return [];
+  return mentions.flatMap((mention) => {
+    const assetId = String(mention.assetId ?? "").trim();
+    const category = String(mention.category ?? "").trim();
+    if (!assetId || category !== "character") return [];
+    return [{ assetId, category, role: String(mention.role ?? "").trim() }];
+  });
+}
+
 function isEarlierPanel(
   sequence: number,
   panelIndex: number,
@@ -396,11 +414,69 @@ export function listPropBackReferences(input: {
     .slice(0, limit);
 }
 
+/**
+ * 跨单元角色回指：只扫已加载对照/episode 快照提及。
+ * 不是 BindingSet，不能当 generation-ready。不读 head、不拆冻结包。
+ */
+export function listCharacterBackReferences(input: {
+  currentUnitId: string;
+  currentSequence: number;
+  currentPanelIndex: number;
+  currentPanelId: string;
+  characterMentions: ReadonlyArray<{ assetId: string; role?: string }>;
+  units: ReadonlyArray<{
+    unitId: string;
+    sequence: number;
+    panels: ReadonlyArray<{
+      panelId: string;
+      panelIndex: number;
+      assetMentions: ReadonlyArray<{ assetId: string; category: string; role?: string }>;
+    }>;
+  }>;
+  limit?: number;
+}): CharacterBackReference[] {
+  const characterIds = new Set(
+    input.characterMentions.map((mention) => mention.assetId.trim()).filter(Boolean),
+  );
+  if (!characterIds.size) return [];
+  const limit = Math.max(1, Math.min(input.limit ?? CHARACTER_BACK_REFERENCE_LIMIT, CHARACTER_BACK_REFERENCE_LIMIT));
+  const rows: CharacterBackReference[] = [];
+  const seen = new Set<string>();
+  for (const unit of input.units) {
+    for (const panel of unit.panels) {
+      if (panel.panelId === input.currentPanelId && unit.unitId === input.currentUnitId) continue;
+      if (!isEarlierPanel(unit.sequence, panel.panelIndex, input.currentSequence, input.currentPanelIndex)) {
+        continue;
+      }
+      for (const mention of listCharacterAssetMentions(panel.assetMentions)) {
+        if (!characterIds.has(mention.assetId)) continue;
+        const key = `${unit.unitId}:${panel.panelId}:${mention.assetId}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        rows.push({
+          assetId: mention.assetId,
+          role: mention.role,
+          unitId: unit.unitId,
+          sequence: unit.sequence,
+          panelIndex: panel.panelIndex,
+          panelId: panel.panelId,
+        });
+      }
+    }
+  }
+  return rows
+    .sort((left, right) => right.sequence - left.sequence || right.panelIndex - left.panelIndex)
+    .slice(0, limit);
+}
+
 export const WIZARD_SCENE_BACKREF_UNLOADED_NOTE =
   "对照板未加载，无法查场景回指。不是 BindingSet，不能当 generation-ready。";
 
 export const WIZARD_PROP_BACKREF_UNLOADED_NOTE =
   "对照板未加载，无法查道具回指。不是 BindingSet，不能当 generation-ready。";
+
+export const WIZARD_CHARACTER_BACKREF_UNLOADED_NOTE =
+  "对照板未加载，无法查角色回指。不是 BindingSet，不能当 generation-ready。";
 
 const WIZARD_DRAFT_UNIT_ID = "wizard-draft";
 
@@ -570,6 +646,89 @@ export function formatPropBackReferenceLineFromBoard(input: {
   }));
 }
 
+/** 建议资产只在已加载对照板里出现过 category=character 才算角色提及。 */
+export function wizardCharacterMentionsFromSuggestedIds(
+  suggestedAssetIds: ReadonlyArray<string> | null | undefined,
+  units: ReadonlyArray<{
+    panels: ReadonlyArray<{
+      assetMentions: ReadonlyArray<{ assetId: string; category: string; role?: string }>;
+    }>;
+  }>,
+): PanelAssetMentionLite[] {
+  const suggested = new Set(
+    (suggestedAssetIds ?? []).map((assetId) => assetId.trim()).filter(Boolean),
+  );
+  if (!suggested.size) return [];
+  const characterById = new Map<string, string>();
+  for (const unit of units) {
+    for (const panel of unit.panels) {
+      for (const mention of listCharacterAssetMentions(panel.assetMentions)) {
+        if (!suggested.has(mention.assetId) || characterById.has(mention.assetId)) continue;
+        characterById.set(mention.assetId, mention.role);
+      }
+    }
+  }
+  return [...characterById.entries()].map(([assetId, role]) => ({ assetId, category: "character", role }));
+}
+
+/** 15s 向导：只扫已加载对照板。不写冻结提示词，不是 BindingSet。 */
+export function formatWizardCharacterBackReferenceLine(input: {
+  boardLoaded: boolean;
+  currentSequence: number;
+  currentPanelIndex: number;
+  suggestedAssetIds?: ReadonlyArray<string> | null;
+  units: ReadonlyArray<{
+    unitId: string;
+    sequence: number;
+    panels: ReadonlyArray<{
+      panelId: string;
+      panelIndex: number;
+      assetMentions: ReadonlyArray<{ assetId: string; category: string; role?: string }>;
+    }>;
+  }>;
+}): string {
+  if (!input.boardLoaded) return WIZARD_CHARACTER_BACKREF_UNLOADED_NOTE;
+  const mentions = wizardCharacterMentionsFromSuggestedIds(input.suggestedAssetIds, input.units);
+  return formatCharacterBackReferences(
+    mentions.length,
+    listCharacterBackReferences({
+      currentUnitId: WIZARD_DRAFT_UNIT_ID,
+      currentSequence: input.currentSequence,
+      currentPanelIndex: input.currentPanelIndex,
+      currentPanelId: `wizard-g${input.currentPanelIndex}`,
+      characterMentions: mentions,
+      units: input.units,
+    }),
+  );
+}
+
+export function formatCharacterBackReferenceLineFromBoard(input: {
+  currentUnitId: string;
+  currentSequence: number;
+  currentPanelIndex: number;
+  currentPanelId: string;
+  currentMentions: ReadonlyArray<{ assetId?: string; category?: string; role?: string }> | null | undefined;
+  units: ReadonlyArray<{
+    unitId: string;
+    sequence: number;
+    panels: ReadonlyArray<{
+      panelId: string;
+      panelIndex: number;
+      assetMentions: ReadonlyArray<{ assetId: string; category: string; role?: string }>;
+    }>;
+  }>;
+}): string {
+  const mentions = listCharacterAssetMentions(input.currentMentions);
+  return formatCharacterBackReferences(mentions.length, listCharacterBackReferences({
+    currentUnitId: input.currentUnitId,
+    currentSequence: input.currentSequence,
+    currentPanelIndex: input.currentPanelIndex,
+    currentPanelId: input.currentPanelId,
+    characterMentions: mentions,
+    units: input.units,
+  }));
+}
+
 export function applyPackMediaToPanels(
   panels: Array<{
     index: number;
@@ -696,6 +855,8 @@ export interface ScriptSpanMediaHit {
   sceneBackReferences: SceneBackReference[];
   propBackReferenceLine: string;
   propBackReferences: PropBackReference[];
+  characterBackReferenceLine: string;
+  characterBackReferences: CharacterBackReference[];
 }
 
 export interface ScriptSpanMediaMap {
@@ -774,6 +935,22 @@ export function resolveScriptSpanMediaMap(
           currentPanelIndex: panel.panelIndex,
           currentPanelId: panel.panelId,
           propMentions: listPropAssetMentions(panel.assetMentions),
+          units: map.units,
+        }),
+        characterBackReferenceLine: formatCharacterBackReferenceLineFromBoard({
+          currentUnitId: unit.unitId,
+          currentSequence: unit.sequence,
+          currentPanelIndex: panel.panelIndex,
+          currentPanelId: panel.panelId,
+          currentMentions: panel.assetMentions,
+          units: map.units,
+        }),
+        characterBackReferences: listCharacterBackReferences({
+          currentUnitId: unit.unitId,
+          currentSequence: unit.sequence,
+          currentPanelIndex: panel.panelIndex,
+          currentPanelId: panel.panelId,
+          characterMentions: listCharacterAssetMentions(panel.assetMentions),
           units: map.units,
         }),
       });

@@ -1,5 +1,5 @@
 /**
- * 跨单元场景回指：只读打开已有生产库，按 scene asset_id 查更早宫格。
+ * 跨单元场景/道具/角色回指：只读打开已有生产库，按 category + asset_id 查更早宫格。
  * 走 studio_production_asset_timeline_idx，不扫整集 snapshot，不 ensure / 不建库。
  * 快照提及，不是 BindingSet，不能当 generation-ready。
  */
@@ -7,10 +7,13 @@ import { existsSync, lstatSync } from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import {
+  CHARACTER_BACK_REFERENCE_LIMIT,
   PROP_BACK_REFERENCE_LIMIT,
   SCENE_BACK_REFERENCE_LIMIT,
+  formatCharacterBackReferences,
   formatPropBackReferences,
   formatSceneBackReferences,
+  type CharacterBackReference,
   type PropBackReference,
   type SceneBackReference,
 } from "./studio-scene-backrefs.js";
@@ -41,6 +44,9 @@ export type StudioSceneBackrefReadResult = {
   propMentions: Array<{ assetId: string; role: string }>;
   propBackReferences: PropBackReference[];
   propBackReferenceNote: string;
+  characterMentions: Array<{ assetId: string; role: string }>;
+  characterBackReferences: CharacterBackReference[];
+  characterBackReferenceNote: string;
 };
 
 function emptySceneBackrefResult(): StudioSceneBackrefReadResult {
@@ -51,6 +57,9 @@ function emptySceneBackrefResult(): StudioSceneBackrefReadResult {
     propMentions: [],
     propBackReferences: [],
     propBackReferenceNote: formatPropBackReferences(0, []),
+    characterMentions: [],
+    characterBackReferences: [],
+    characterBackReferenceNote: formatCharacterBackReferences(0, []),
   };
 }
 
@@ -89,7 +98,7 @@ function openStudioSceneBackrefsDatabase(databasePath: string): DatabaseSync | n
 function readCurrentCategoryMentions(
   db: DatabaseSync,
   query: StudioSceneBackrefReadQuery,
-  category: "scene" | "prop",
+  category: "scene" | "prop" | "character",
 ): Array<{ assetId: string; role: string }> {
   const rows = db.prepare(`
     SELECT asset_id, role
@@ -122,10 +131,14 @@ function readEarlierCategoryMentions(
   db: DatabaseSync,
   query: StudioSceneBackrefReadQuery,
   assetIds: readonly string[],
-  category: "scene" | "prop",
+  category: "scene" | "prop" | "character",
 ): SceneBackReference[] {
   if (assetIds.length === 0) return [];
-  const cap = category === "prop" ? PROP_BACK_REFERENCE_LIMIT : SCENE_BACK_REFERENCE_LIMIT;
+  const cap = category === "prop"
+    ? PROP_BACK_REFERENCE_LIMIT
+    : category === "character"
+      ? CHARACTER_BACK_REFERENCE_LIMIT
+      : SCENE_BACK_REFERENCE_LIMIT;
   const limit = Math.max(1, Math.min(query.limit ?? cap, cap));
   const placeholders = assetIds.map(() => "?").join(", ");
   const rows = db.prepare(`
@@ -214,6 +227,13 @@ export function readStudioSceneBackReferences(
       propMentions.map((mention) => mention.assetId),
       "prop",
     );
+    const characterMentions = readCurrentCategoryMentions(db, query, "character");
+    const characterBackReferences = readEarlierCategoryMentions(
+      db,
+      query,
+      characterMentions.map((mention) => mention.assetId),
+      "character",
+    );
     return {
       sceneMentions,
       sceneBackReferences,
@@ -221,6 +241,9 @@ export function readStudioSceneBackReferences(
       propMentions,
       propBackReferences,
       propBackReferenceNote: formatPropBackReferences(propMentions.length, propBackReferences),
+      characterMentions,
+      characterBackReferences,
+      characterBackReferenceNote: formatCharacterBackReferences(characterMentions.length, characterBackReferences),
     };
   } finally {
     db.close();

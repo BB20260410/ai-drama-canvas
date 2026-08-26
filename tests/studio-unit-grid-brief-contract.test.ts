@@ -363,11 +363,13 @@ describe("buildStudioUnitGridAgentImagegenBrief (shipped runtime)", () => {
     expect(codex.tool.notes.at(-1)).toContain("前镜交接");
     expect(codex.tool.notes.some((note) => note.includes("光线（宫格覆盖）"))).toBe(true);
     expect(codex.tool.notes.some((note) => note.includes("propBackReferences"))).toBe(true);
-    expect(codex.tool.notes.indexOf(codex.tool.notes.find((note) => note.includes("propBackReferences")) ?? "")).toBeLessThan(
+    expect(codex.tool.notes.some((note) => note.includes("characterBackReferences"))).toBe(true);
+    expect(codex.tool.notes.indexOf(codex.tool.notes.find((note) => note.includes("characterBackReferences")) ?? "")).toBeLessThan(
       codex.tool.notes.length - 1,
     );
     expect(grok.tool.notes.at(-1)).toContain("前镜交接");
     expect(grok.tool.notes.some((note) => note.includes("propBackReferences"))).toBe(true);
+    expect(grok.tool.notes.some((note) => note.includes("characterBackReferences"))).toBe(true);
   });
 
   it("续镜 pack 投影 DELTA_ONLY，且不改 renderedPrompt", () => {

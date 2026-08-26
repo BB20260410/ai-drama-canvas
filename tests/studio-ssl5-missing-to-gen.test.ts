@@ -93,6 +93,8 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.sceneBackReferences).toEqual([]);
     expect(plan.propBackReferenceLine).toBe("没有宫格可查道具回指");
     expect(plan.propBackReferences).toEqual([]);
+    expect(plan.characterBackReferenceLine).toBe("没有宫格可查角色回指");
+    expect(plan.characterBackReferences).toEqual([]);
     expect(plan.items[0]?.lightingCostumeLine).toBe("没有宫格可查光线/服化");
     expect(plan.items[0]?.recommendedPath).toEqual([
       "binding-ready?",
@@ -185,6 +187,7 @@ describe("SSL-5 缺图下一步纯函数", () => {
             assetMentions: [
               { assetId: "scene-stone", category: "scene", role: "石室" },
               { assetId: "prop-mask", category: "prop", role: "黄金面具" },
+              { assetId: "char-dou", category: "character", role: "豆姐" },
             ],
           })],
         }),
@@ -201,6 +204,7 @@ describe("SSL-5 缺图下一步纯函数", () => {
             assetMentions: [
               { assetId: "scene-stone", category: "scene", role: "石室" },
               { assetId: "prop-mask", category: "prop", role: "黄金面具" },
+              { assetId: "char-dou", category: "character", role: "豆姐" },
             ],
           })],
         }),
@@ -215,6 +219,7 @@ describe("SSL-5 缺图下一步纯函数", () => {
             assetMentions: [
               { assetId: "scene-stone", category: "scene", role: "石室" },
               { assetId: "prop-mask", category: "prop", role: "黄金面具" },
+              { assetId: "char-dou", category: "character", role: "豆姐" },
             ],
           })],
         }),
@@ -250,6 +255,18 @@ describe("SSL-5 缺图下一步纯函数", () => {
       panelId: "e1",
     }]);
     expect(plan.items.find((item) => item.unitId === "u-focus")?.propBackReferences).toEqual(plan.propBackReferences);
+    expect(plan.characterBackReferenceLine).toContain("U1 G1 豆姐");
+    expect(plan.characterBackReferenceLine).toContain("不是 BindingSet");
+    expect(plan.characterBackReferenceLine).not.toContain("U3");
+    expect(plan.characterBackReferences).toEqual([{
+      assetId: "char-dou",
+      role: "豆姐",
+      unitId: "u-early",
+      sequence: 1,
+      panelIndex: 1,
+      panelId: "e1",
+    }]);
+    expect(plan.items.find((item) => item.unitId === "u-focus")?.characterBackReferences).toEqual(plan.characterBackReferences);
   });
 
   it("全 covered 且无 earliest 则无焦点", () => {
@@ -267,6 +284,8 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.sceneBackReferences).toEqual([]);
     expect(plan.propBackReferenceLine).toBe("没有宫格可查道具回指");
     expect(plan.propBackReferences).toEqual([]);
+    expect(plan.characterBackReferenceLine).toBe("没有宫格可查角色回指");
+    expect(plan.characterBackReferences).toEqual([]);
   });
 });
 
@@ -294,6 +313,7 @@ describe("SSL-5 入口源码合同", () => {
     expect(vue).toContain('data-testid="ssl5-focus-standing-gaps"');
     expect(vue).toContain('data-testid="ssl5-focus-scene-backrefs"');
     expect(vue).toContain('data-testid="ssl5-focus-prop-backrefs"');
+    expect(vue).toContain('data-testid="ssl5-focus-character-backrefs"');
     expect(vue).toContain('data-testid="ssl5-focus-lighting"');
     expect(vue).toContain('data-testid="ssl5-focus-previous-lighting"');
     expect(vue).toContain('data-testid="ssl5-focus-previous-costume"');
@@ -305,6 +325,8 @@ describe("SSL-5 入口源码合同", () => {
     expect(ssl5).toContain("sceneBackReferences");
     expect(ssl5).toContain("propBackReferences");
     expect(ssl5).toContain("formatPropBackReferenceLineFromBoard");
+    expect(ssl5).toContain("characterBackReferences");
+    expect(ssl5).toContain("formatCharacterBackReferenceLineFromBoard");
     expect(ssl5).not.toContain("studio-scene-backrefs-read");
     expect(ssl5).not.toContain("evaluateStudioConsistency");
     expect(ssl5).not.toContain("getStudioBindingControl");

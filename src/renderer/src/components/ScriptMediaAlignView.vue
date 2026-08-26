@@ -10,14 +10,19 @@ import {
   formatPanelLightingCostumeLine,
   formatPanelStandingGaps,
   formatPanelStandingHandoff,
+  formatCharacterBackReferences,
   formatPropBackReferences,
   formatSceneBackReferences,
+  formatWizardCharacterBackReferenceLine,
   formatWizardPropBackReferenceLine,
   formatWizardSceneBackReferenceLine,
+  listCharacterAssetMentions,
+  listCharacterBackReferences,
   listPropAssetMentions,
   listPropBackReferences,
   listSceneAssetMentions,
   listSceneBackReferences,
+  wizardCharacterMentionsFromSuggestedIds,
   wizardPropMentionsFromSuggestedIds,
   wizardSceneMentionsFromSuggestedIds,
   pickFirstCoveredPanel,
@@ -458,6 +463,30 @@ function wizardPropBackRefs(panelIndex: number): SceneBackReference[] {
   });
 }
 
+function wizardCharacterBackRefLine(panelIndex: number): string {
+  const panel = wizardPanels.value.find((entry) => entry.panelIndex === panelIndex);
+  return formatWizardCharacterBackReferenceLine({
+    boardLoaded: Boolean(board.value),
+    currentSequence: wizardSequence.value,
+    currentPanelIndex: panelIndex,
+    suggestedAssetIds: panel?.suggestedAssetIds,
+    units: board.value?.rows ?? [],
+  });
+}
+
+function wizardCharacterBackRefs(panelIndex: number): SceneBackReference[] {
+  if (!board.value) return [];
+  const panel = wizardPanels.value.find((entry) => entry.panelIndex === panelIndex);
+  return listCharacterBackReferences({
+    currentUnitId: "wizard-draft",
+    currentSequence: wizardSequence.value,
+    currentPanelIndex: panelIndex,
+    currentPanelId: `wizard-g${panelIndex}`,
+    characterMentions: wizardCharacterMentionsFromSuggestedIds(panel?.suggestedAssetIds, board.value.rows),
+    units: board.value.rows,
+  });
+}
+
 async function revealWizardSceneBackRef(ref: SceneBackReference): Promise<void> {
   if (!board.value) {
     notice.value = "对照板未加载，无法查场景回指。不是 BindingSet，不能当 generation-ready。";
@@ -757,6 +786,27 @@ const alignPropBackRefLine = computed(() => {
   return formatPropBackReferences(alignPropMentions.value.length, alignPropBackRefs.value);
 });
 
+const alignCharacterMentions = computed(() => listCharacterAssetMentions(selectedAlignPanel.value?.assetMentions));
+
+const alignCharacterBackRefs = computed(() => {
+  const row = selectedAlignRow.value;
+  const panel = selectedAlignPanel.value;
+  if (!board.value || !row || !panel) return [];
+  return listCharacterBackReferences({
+    currentUnitId: row.unitId,
+    currentSequence: row.sequence,
+    currentPanelIndex: panel.panelIndex,
+    currentPanelId: panel.panelId,
+    characterMentions: alignCharacterMentions.value,
+    units: board.value.rows,
+  });
+});
+
+const alignCharacterBackRefLine = computed(() => {
+  if (!selectedAlignPanel.value) return null;
+  return formatCharacterBackReferences(alignCharacterMentions.value.length, alignCharacterBackRefs.value);
+});
+
 async function revealSceneBackRef(ref: SceneBackReference): Promise<void> {
   const focusRow = board.value?.rows.find((row) => row.unitId === ref.unitId);
   if (!focusRow) {
@@ -941,6 +991,7 @@ function shortSha(value: string | null | undefined): string {
                 <small data-testid="span-media-hit-lighting">{{ formatPanelLightingCostumeLine(hit) }}</small>
                 <small data-testid="span-media-hit-scene-backrefs">{{ hit.sceneBackReferenceLine }}</small>
                 <small data-testid="span-media-hit-prop-backrefs">{{ hit.propBackReferenceLine }}</small>
+                <small data-testid="span-media-hit-character-backrefs">{{ hit.characterBackReferenceLine }}</small>
                 <button
                   v-for="ref in hit.sceneBackReferences"
                   :key="`${ref.unitId}:${ref.panelId}:${ref.assetId}`"
@@ -954,6 +1005,14 @@ function shortSha(value: string | null | undefined): string {
                   :key="`prop:${ref.unitId}:${ref.panelId}:${ref.assetId}`"
                   type="button"
                   :data-testid="`span-media-hit-prop-backref-${ref.unitId}-${ref.panelId}`"
+                  :disabled="Boolean(actionLoading)"
+                  @click="revealReaderSceneBackRef(ref)"
+                >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
+                <button
+                  v-for="ref in hit.characterBackReferences"
+                  :key="`char:${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+                  type="button"
+                  :data-testid="`span-media-hit-character-backref-${ref.unitId}-${ref.panelId}`"
                   :disabled="Boolean(actionLoading)"
                   @click="revealReaderSceneBackRef(ref)"
                 >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
@@ -1014,6 +1073,7 @@ function shortSha(value: string | null | undefined): string {
           <span v-if="ssl5Plan.previousCostumeLine" data-testid="ssl5-focus-previous-costume">{{ ssl5Plan.previousCostumeLine }}</span>
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-scene-backrefs">{{ ssl5Plan.sceneBackReferenceLine }}</span>
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-prop-backrefs">{{ ssl5Plan.propBackReferenceLine }}</span>
+          <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-character-backrefs">{{ ssl5Plan.characterBackReferenceLine }}</span>
           <button
             v-for="ref in ssl5Plan.sceneBackReferences"
             :key="`${ref.unitId}:${ref.panelId}:${ref.assetId}`"
@@ -1027,6 +1087,14 @@ function shortSha(value: string | null | undefined): string {
             :key="`prop:${ref.unitId}:${ref.panelId}:${ref.assetId}`"
             type="button"
             :data-testid="`ssl5-focus-prop-backref-${ref.unitId}-${ref.panelId}`"
+            :disabled="Boolean(actionLoading)"
+            @click="revealSceneBackRef(ref)"
+          >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
+          <button
+            v-for="ref in ssl5Plan.characterBackReferences"
+            :key="`char:${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+            type="button"
+            :data-testid="`ssl5-focus-character-backref-${ref.unitId}-${ref.panelId}`"
             :disabled="Boolean(actionLoading)"
             @click="revealSceneBackRef(ref)"
           >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
@@ -1176,6 +1244,19 @@ function shortSha(value: string | null | undefined): string {
                 >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
               </dd>
             </div>
+            <div v-if="alignCharacterBackRefLine">
+              <dt>角色回指</dt>
+              <dd data-testid="align-panel-character-backrefs">
+                <p>{{ alignCharacterBackRefLine }}</p>
+                <button
+                  v-for="ref in alignCharacterBackRefs"
+                  :key="`char:${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+                  type="button"
+                  :data-testid="`align-character-backref-${ref.unitId}-${ref.panelId}`"
+                  @click="revealSceneBackRef(ref)"
+                >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
+              </dd>
+            </div>
           </dl>
         </template>
         <div v-else class="empty">点击一行查看本地 raw/labeled 身份与缩略图。</div>
@@ -1250,6 +1331,15 @@ function shortSha(value: string | null | undefined): string {
             type="button"
             class="wide"
             :data-testid="`storyboard-wizard-prop-backref-${ref.unitId}-${ref.panelId}`"
+            @click="revealWizardSceneBackRef(ref)"
+          >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
+          <p class="wide wizard-lock-hint" data-testid="storyboard-wizard-character-backrefs">{{ wizardCharacterBackRefLine(panel.panelIndex) }}</p>
+          <button
+            v-for="ref in wizardCharacterBackRefs(panel.panelIndex)"
+            :key="`char:${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+            type="button"
+            class="wide"
+            :data-testid="`storyboard-wizard-character-backref-${ref.unitId}-${ref.panelId}`"
             @click="revealWizardSceneBackRef(ref)"
           >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
           <small class="wide">原文锚 {{ panel.sourceSpans.length }} · 资产建议 {{ panel.suggestedAssetIds.length }} · 歧义 {{ panel.unresolvedProposals.length }}</small>

@@ -184,6 +184,20 @@
               :disabled="loading"
               @click="revealControlSceneBackRef(ref)"
             >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
+            <p
+              v-if="controlCharacterBackReferenceNote"
+              class="previous-standing"
+              data-testid="studio-control-character-backrefs">
+              {{ controlCharacterBackReferenceNote }}
+            </p>
+            <button
+              v-for="ref in controlCharacterBackReferences"
+              :key="`char:${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+              type="button"
+              :data-testid="`studio-control-character-backref-${ref.unitId}-${ref.panelId}`"
+              :disabled="loading"
+              @click="revealControlSceneBackRef(ref)"
+            >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
             <details v-if="historyTargetKind === 'panel' && isTechnicalGenerationMessage(detail.selectedPanel.generation.message)" class="technical-diagnostics">
               <summary data-testid="studio-generation-message-diagnostics">诊断详情</summary>
               <p><code>{{ detail.selectedPanel.generation.message }}</code></p>
@@ -297,7 +311,7 @@ import {
   previousStandingFromAnyFrozenPack,
   type StudioPanelStandingHandoff,
 } from "@core/studio-panel-standing";
-import { formatPropBackReferences, formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
+import { formatCharacterBackReferences, formatPropBackReferences, formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
 
 const props = defineProps<{
   projectRoot: string;
@@ -376,6 +390,8 @@ const controlSceneBackReferenceNote = ref<string | null>(null);
 const controlSceneBackReferences = ref<SceneBackReference[]>([]);
 const controlPropBackReferenceNote = ref<string | null>(null);
 const controlPropBackReferences = ref<SceneBackReference[]>([]);
+const controlCharacterBackReferenceNote = ref<string | null>(null);
+const controlCharacterBackReferences = ref<SceneBackReference[]>([]);
 type ControlLockOverlay = {
   panelId: string;
   panelIndex: number;
@@ -430,6 +446,8 @@ async function applyControlSceneBackrefs(
     controlSceneBackReferences.value = [];
     controlPropBackReferenceNote.value = formatPropBackReferences(0, []);
     controlPropBackReferences.value = [];
+    controlCharacterBackReferenceNote.value = formatCharacterBackReferences(0, []);
+    controlCharacterBackReferences.value = [];
     return;
   }
   try {
@@ -447,12 +465,16 @@ async function applyControlSceneBackrefs(
     controlSceneBackReferences.value = result.sceneBackReferences ?? [];
     controlPropBackReferenceNote.value = result.propBackReferenceNote;
     controlPropBackReferences.value = result.propBackReferences ?? [];
+    controlCharacterBackReferenceNote.value = result.characterBackReferenceNote;
+    controlCharacterBackReferences.value = result.characterBackReferences ?? [];
   } catch {
     if (token !== frozenPackToken) return;
     controlSceneBackReferenceNote.value = formatSceneBackReferences(0, []);
     controlSceneBackReferences.value = [];
     controlPropBackReferenceNote.value = formatPropBackReferences(0, []);
     controlPropBackReferences.value = [];
+    controlCharacterBackReferenceNote.value = formatCharacterBackReferences(0, []);
+    controlCharacterBackReferences.value = [];
   }
 }
 
@@ -530,6 +552,8 @@ watch([selectedPackId, selectedPanelId, () => props.projectRoot, () => detail.va
   controlSceneBackReferences.value = [];
   controlPropBackReferenceNote.value = null;
   controlPropBackReferences.value = [];
+  controlCharacterBackReferenceNote.value = null;
+  controlCharacterBackReferences.value = [];
   frozenPackError.value = "";
   const panel = detail.value?.panels.find((entry) => entry.id === selectedPanelId.value);
   if (packId) {
@@ -1322,6 +1346,8 @@ watch(() => props.projectRoot, () => {
   controlSceneBackReferences.value = [];
   controlPropBackReferenceNote.value = null;
   controlPropBackReferences.value = [];
+  controlCharacterBackReferenceNote.value = null;
+  controlCharacterBackReferences.value = [];
   history.value = [];
   selectedUnitId.value = "";
   selectedPanelId.value = "";

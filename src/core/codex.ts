@@ -60,6 +60,7 @@ import {
   type StudioFormalImagegenProvider,
 } from "./studio-imagegen-providers.js";
 import {
+  CHARACTER_BACK_REFERENCE_TOOL_NOTE,
   FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
   PROP_BACK_REFERENCE_TOOL_NOTE,
   SCENE_BACK_REFERENCE_TOOL_NOTE,
@@ -283,6 +284,7 @@ export function buildStudioUnitGridAgentImagegenBrief(
         FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
         SCENE_BACK_REFERENCE_TOOL_NOTE,
         PROP_BACK_REFERENCE_TOOL_NOTE,
+        CHARACTER_BACK_REFERENCE_TOOL_NOTE,
         UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE,
       ],
     },

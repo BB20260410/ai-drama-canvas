@@ -49,3 +49,23 @@ export function formatPropBackReferences(
     .join("；");
   return `道具回指：${text}。快照提及，不是 BindingSet，不能当 generation-ready。`;
 }
+
+export const CHARACTER_BACK_REFERENCE_LIMIT = SCENE_BACK_REFERENCE_LIMIT;
+
+export type CharacterBackReference = SceneBackReference;
+
+export function formatCharacterBackReferences(
+  characterMentionCount: number,
+  rows: ReadonlyArray<CharacterBackReference>,
+): string {
+  if (characterMentionCount <= 0) {
+    return "本格快照未提及角色。不是 BindingSet，不能当 generation-ready。";
+  }
+  if (!rows.length) {
+    return "角色回指：本集更早单元没有同角色快照提及。不是 BindingSet，不能当 generation-ready。";
+  }
+  const text = rows
+    .map((row) => `U${row.sequence} G${row.panelIndex} ${row.role || row.assetId}`)
+    .join("；");
+  return `角色回指：${text}。快照提及，不是 BindingSet，不能当 generation-ready。`;
+}

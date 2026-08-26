@@ -119,6 +119,7 @@ describe("正式生图页锁版光线服化与场景回指", () => {
     expect(view).toContain('data-testid="studio-lock-costume"');
     expect(view).toContain('data-testid="studio-control-scene-backrefs"');
     expect(view).toContain('data-testid="studio-control-prop-backrefs"');
+    expect(view).toContain('data-testid="studio-control-character-backrefs"');
     expect(view).toContain("getStudioUnitLockOverlays");
     expect(view).toContain("getStudioSceneBackReferences");
     expect(view).toContain("formatUnitLockPanelLightingLine");

@@ -92,6 +92,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(generation).toContain("FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE");
     expect(generation).toContain("SCENE_BACK_REFERENCE_TOOL_NOTE");
     expect(generation).toContain("PROP_BACK_REFERENCE_TOOL_NOTE");
+    expect(generation).toContain("CHARACTER_BACK_REFERENCE_TOOL_NOTE");
     const unitGrid = readFileSync(path.join(repoRoot, "src/core/studio-unit-grid-generation.ts"), "utf8");
     expect(unitGrid).toContain("formatPreviousStandingPromptLine");
     expect(unitGrid).toContain("第${offset + 1}格${previousLine}");
@@ -165,6 +166,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(emptyContinuity).not.toContain("服化：");
     expect(emptyContinuity).not.toContain("场景回指");
     expect(emptyContinuity).not.toContain("道具回指");
+    expect(emptyContinuity).not.toContain("角色回指");
     expect(formatWizardLightingPromptLine("")).toBeNull();
     expect(formatWizardCostumePromptLine("  ")).toBeNull();
     expect(formatWizardLightingPromptLine("室内火光")).toBe("光线：室内火光");
@@ -255,6 +257,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(control).toContain("getStudioUnitLockOverlays");
     expect(control).toContain("getStudioSceneBackReferences");
     expect(control).toContain('data-testid="studio-control-prop-backrefs"');
+    expect(control).toContain('data-testid="studio-control-character-backrefs"');
     expect(control).toContain("formatUnitLockPanelLightingLine");
     expect(control).not.toContain("studio-scene-backrefs-read");
     expect(control).not.toContain("evaluateStudioConsistency");
@@ -274,6 +277,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(wizard).toContain("上一格光线/服化只作锁版提示");
     expect(wizard).not.toContain("场景回指");
     expect(wizard).not.toContain("道具回指");
+    expect(wizard).not.toContain("角色回指");
     const app = readFileSync(path.join(repoRoot, "src/renderer/src/App.vue"), "utf8");
     expect(app).toContain("formatWizardPromptBody(input.panels)");
     expect(app).not.toContain("evaluateStudioConsistency(");
@@ -290,6 +294,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(wizardView).toContain("wizardStandingLine");
     expect(wizardView).toContain("formatUnitLockPreviousStandingLine");
     expect(wizardView).toContain('data-testid="storyboard-wizard-prop-backrefs"');
+    expect(wizardView).toContain('data-testid="storyboard-wizard-character-backrefs"');
     const brief = readFileSync(path.join(repoRoot, "src/core/codex.ts"), "utf8");
     expect(brief).toContain("previousStandings");
     expect(brief).toContain("previousStandingFromFrozenRenderedPrompt(panel.panelPack)");
@@ -298,6 +303,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(brief).toContain("FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE");
     expect(brief).toContain("SCENE_BACK_REFERENCE_TOOL_NOTE");
     expect(brief).toContain("PROP_BACK_REFERENCE_TOOL_NOTE");
+    expect(brief).toContain("CHARACTER_BACK_REFERENCE_TOOL_NOTE");
     expect(brief).toContain("frozenPanelLightingFromAnyFrozenPack(panel.panelPack)");
     const canvas = readFileSync(path.join(repoRoot, "src/renderer/src/components/ManagedStudioCanvasView.vue"), "utf8");
     expect(canvas).toContain("previousStandingFromAnyFrozenPack(pack, panel.id)");

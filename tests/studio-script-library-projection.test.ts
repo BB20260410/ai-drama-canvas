@@ -11,13 +11,16 @@ import {
   formatPanelStandingGaps,
   formatPanelStandingHandoff,
   formatSceneBackReferences,
+  formatWizardCharacterBackReferenceLine,
   formatWizardPropBackReferenceLine,
   formatWizardSceneBackReferenceLine,
   listPanelStandingGaps,
   listSceneAssetMentions,
   listSceneBackReferences,
+  wizardCharacterMentionsFromSuggestedIds,
   wizardPropMentionsFromSuggestedIds,
   wizardSceneMentionsFromSuggestedIds,
+  WIZARD_CHARACTER_BACKREF_UNLOADED_NOTE,
   WIZARD_PROP_BACKREF_UNLOADED_NOTE,
   WIZARD_SCENE_BACKREF_UNLOADED_NOTE,
   normalizeSourceSpans,
@@ -233,6 +236,8 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(hit.hits[0]?.sceneBackReferenceLine).toContain("本格快照未提及场景");
     expect(hit.hits[0]?.propBackReferences).toEqual([]);
     expect(hit.hits[0]?.propBackReferenceLine).toContain("本格快照未提及道具");
+    expect(hit.hits[0]?.characterBackReferences).toEqual([]);
+    expect(hit.hits[0]?.characterBackReferenceLine).toContain("本格快照未提及角色");
     expect(formatPanelLightingCostumeLine(hit.hits[0])).toContain("锁版光线：G1 窗侧冷光");
     expect(formatPanelLightingCostumeLine(hit.hits[0])).toContain("锁版服装：G1 素袍");
     expect(formatPanelLightingCostumeLine(hit.hits[0])).toContain("不是 BindingSet");
@@ -307,6 +312,8 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(hit.hits[1]?.sceneBackReferenceLine).toContain("本格快照未提及场景");
     expect(hit.hits[1]?.propBackReferences).toEqual([]);
     expect(hit.hits[1]?.propBackReferenceLine).toContain("本格快照未提及道具");
+    expect(hit.hits[1]?.characterBackReferences).toEqual([]);
+    expect(hit.hits[1]?.characterBackReferenceLine).toContain("本格快照未提及角色");
     expect(formatPanelStandingHandoff(hit.hits[1]?.previousHandoff ?? null)).toContain("G1 中景");
     expect(formatPanelLightingCostumeLine(hit.hits[1])).toContain("锁版未记光线");
     expect(formatPanelLightingCostumeLine(null)).toBe("没有宫格可查光线/服化");
@@ -351,6 +358,7 @@ describe("studio-script-library-projection pure helpers", () => {
             assetMentions: [
               { assetId: "scene-stone", category: "scene", role: "石室" },
               { assetId: "prop-mask", category: "prop", role: "黄金面具" },
+              { assetId: "char-dou", category: "character", role: "豆姐" },
             ],
             previousHandoff: null,
           }],
@@ -388,6 +396,7 @@ describe("studio-script-library-projection pure helpers", () => {
             assetMentions: [
               { assetId: "scene-stone", category: "scene", role: "石室" },
               { assetId: "prop-mask", category: "prop", role: "黄金面具" },
+              { assetId: "char-dou", category: "character", role: "豆姐" },
             ],
             previousHandoff: null,
           }],
@@ -425,6 +434,7 @@ describe("studio-script-library-projection pure helpers", () => {
             assetMentions: [
               { assetId: "scene-stone", category: "scene", role: "石室" },
               { assetId: "prop-mask", category: "prop", role: "黄金面具" },
+              { assetId: "char-dou", category: "character", role: "豆姐" },
             ],
             previousHandoff: null,
           }],
@@ -450,6 +460,17 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(hit.hits[0]?.propBackReferences).toEqual([{
       assetId: "prop-mask",
       role: "黄金面具",
+      unitId: "U1",
+      sequence: 1,
+      panelIndex: 1,
+      panelId: "u1p1",
+    }]);
+    expect(hit.hits[0]?.characterBackReferenceLine).toContain("U1 G1 豆姐");
+    expect(hit.hits[0]?.characterBackReferenceLine).toContain("不是 BindingSet");
+    expect(hit.hits[0]?.characterBackReferenceLine).not.toContain("U3");
+    expect(hit.hits[0]?.characterBackReferences).toEqual([{
+      assetId: "char-dou",
+      role: "豆姐",
       unitId: "U1",
       sequence: 1,
       panelIndex: 1,
@@ -662,6 +683,10 @@ describe("studio-script-library-projection pure helpers", () => {
       { assetId: "prop-mask", category: "prop", role: "黄金面具" },
     ]);
     expect(wizardPropMentionsFromSuggestedIds(["char-a"], units)).toEqual([]);
+    expect(wizardCharacterMentionsFromSuggestedIds(["char-a", "scene-stone"], units)).toEqual([
+      { assetId: "char-a", category: "character", role: "豆姐" },
+    ]);
+    expect(wizardCharacterMentionsFromSuggestedIds(["scene-stone"], units)).toEqual([]);
     expect(formatWizardSceneBackReferenceLine({
       boardLoaded: false,
       currentSequence: 2,
@@ -690,12 +715,28 @@ describe("studio-script-library-projection pure helpers", () => {
       suggestedAssetIds: ["prop-mask"],
       units,
     })).toContain("U1 G1 黄金面具");
+    expect(formatWizardCharacterBackReferenceLine({
+      boardLoaded: false,
+      currentSequence: 2,
+      currentPanelIndex: 1,
+      suggestedAssetIds: ["char-a"],
+      units,
+    })).toBe(WIZARD_CHARACTER_BACKREF_UNLOADED_NOTE);
+    expect(formatWizardCharacterBackReferenceLine({
+      boardLoaded: true,
+      currentSequence: 2,
+      currentPanelIndex: 1,
+      suggestedAssetIds: ["char-a"],
+      units,
+    })).toContain("U1 G1 豆姐");
     const wizard = readFileSync(path.join(repoRoot, "src/core/studio-storyboard-wizard.ts"), "utf8");
     expect(wizard).toContain("formatWizardPromptBody(input.panels)");
     expect(wizard).not.toContain("formatWizardSceneBackReferenceLine");
     expect(wizard).not.toContain("formatWizardPropBackReferenceLine");
+    expect(wizard).not.toContain("formatWizardCharacterBackReferenceLine");
     expect(wizard).not.toContain("场景回指");
     expect(wizard).not.toContain("道具回指");
+    expect(wizard).not.toContain("角色回指");
   });
 });
 
@@ -723,6 +764,9 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     expect(source).toContain("sceneBackReferences");
     expect(source).toContain("propBackReferenceLine");
     expect(source).toContain("propBackReferences");
+    expect(source).toContain("characterBackReferenceLine");
+    expect(source).toContain("characterBackReferences");
+    expect(source).toContain("formatCharacterBackReferences");
     expect(source).toContain("formatPropBackReferences");
     expect(source).toContain("formatPanelLightingCostumeLine");
     expect(source).toContain('from "./studio-scene-backrefs.js"');

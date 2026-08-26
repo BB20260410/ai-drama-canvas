@@ -11,8 +11,8 @@ import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 import { afterEach, describe, expect, it } from "vitest";
 import { readStudioSceneBackReferences } from "../src/core/studio-scene-backrefs-read.js";
-import { formatPropBackReferences, formatSceneBackReferences } from "../src/core/studio-scene-backrefs.js";
-import { PROP_BACK_REFERENCE_TOOL_NOTE, SCENE_BACK_REFERENCE_TOOL_NOTE } from "../src/core/studio-panel-standing.js";
+import { formatCharacterBackReferences, formatPropBackReferences, formatSceneBackReferences } from "../src/core/studio-scene-backrefs.js";
+import { CHARACTER_BACK_REFERENCE_TOOL_NOTE, PROP_BACK_REFERENCE_TOOL_NOTE, SCENE_BACK_REFERENCE_TOOL_NOTE } from "../src/core/studio-panel-standing.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const source = (relative: string) => readFileSync(path.join(repoRoot, relative), "utf8");
@@ -94,12 +94,16 @@ async function seedSceneBackrefDatabase(): Promise<string> {
     insertAsset.run("u1", 1, 2, "scene-stone", "scene", "石室夜");
     insertAsset.run("u2", 2, 1, "scene-stone", "scene", "石室");
     insertAsset.run("u2", 2, 1, "prop-mask", "prop", "黄金面具");
+    insertAsset.run("u2", 2, 1, "char-dou", "character", "豆姐");
     insertAsset.run("u2", 2, 2, "scene-stone", "scene", "石室续");
     insertAsset.run("u2", 2, 2, "prop-mask", "prop", "面具续");
+    insertAsset.run("u2", 2, 2, "char-dou", "character", "豆姐续");
     insertAsset.run("u3", 3, 1, "scene-stone", "scene", "石室后");
     insertAsset.run("u3", 3, 1, "prop-mask", "prop", "面具后");
+    insertAsset.run("u3", 3, 1, "char-dou", "character", "豆姐后");
     insertAsset.run("u-other", 1, 1, "scene-stone", "scene", "他集石室");
     insertAsset.run("u-other", 1, 1, "prop-mask", "prop", "他集面具");
+    insertAsset.run("u-other", 1, 1, "char-dou", "character", "他集豆姐");
   } finally {
     db.close();
   }
@@ -124,6 +128,9 @@ describe("studio scene backrefs readonly sql", () => {
     expect(result.propMentions).toEqual([]);
     expect(result.propBackReferences).toEqual([]);
     expect(result.propBackReferenceNote).toBe(formatPropBackReferences(0, []));
+    expect(result.characterMentions).toEqual([]);
+    expect(result.characterBackReferences).toEqual([]);
+    expect(result.characterBackReferenceNote).toBe(formatCharacterBackReferences(0, []));
     expect(existsSync(path.join(tempRoot, ".aicanvas", "studio-production.sqlite"))).toBe(false);
   });
 
@@ -147,6 +154,9 @@ describe("studio scene backrefs readonly sql", () => {
     expect(result.propMentions).toEqual([]);
     expect(result.propBackReferences).toEqual([]);
     expect(result.propBackReferenceNote).toBe(formatPropBackReferences(0, []));
+    expect(result.characterMentions).toEqual([]);
+    expect(result.characterBackReferences).toEqual([]);
+    expect(result.characterBackReferenceNote).toBe(formatCharacterBackReferences(0, []));
   });
 
   it("只收更早同场景快照提及；忽略角色、更晚单元与他集", async () => {
@@ -213,6 +223,28 @@ describe("studio scene backrefs readonly sql", () => {
     expect(current.propBackReferenceNote).toContain("U2 G1 黄金面具");
     expect(current.propBackReferences.map((row) => row.unitId)).not.toContain("u3");
     expect(current.propBackReferences.map((row) => row.unitId)).not.toContain("u-other");
+    expect(current.characterMentions).toEqual([{ assetId: "char-dou", role: "豆姐续" }]);
+    expect(current.characterBackReferences).toEqual([
+      {
+        assetId: "char-dou",
+        role: "豆姐",
+        unitId: "u2",
+        sequence: 2,
+        panelIndex: 1,
+        panelId: "u2p1",
+      },
+      {
+        assetId: "char-dou",
+        role: "豆姐",
+        unitId: "u1",
+        sequence: 1,
+        panelIndex: 1,
+        panelId: "u1p1",
+      },
+    ]);
+    expect(current.characterBackReferenceNote).toContain("U2 G1 豆姐");
+    expect(current.characterBackReferences.map((row) => row.unitId)).not.toContain("u3");
+    expect(current.characterBackReferences.map((row) => row.unitId)).not.toContain("u-other");
 
     const firstPanel = readStudioSceneBackReferences(root, {
       unitId: "u1",
@@ -229,6 +261,9 @@ describe("studio scene backrefs readonly sql", () => {
     expect(firstPanel.propMentions).toEqual([{ assetId: "prop-mask", role: "黄金面具" }]);
     expect(firstPanel.propBackReferences).toEqual([]);
     expect(firstPanel.propBackReferenceNote).toContain("没有同道具快照提及");
+    expect(firstPanel.characterMentions).toEqual([{ assetId: "char-dou", role: "豆姐" }]);
+    expect(firstPanel.characterBackReferences).toEqual([]);
+    expect(firstPanel.characterBackReferenceNote).toContain("没有同角色快照提及");
   });
 
   it("上限 4；本格角色提及不算场景", async () => {
@@ -278,6 +313,8 @@ describe("studio scene backrefs readonly sql", () => {
     expect(snapshot).toContain("sceneBackReferenceNote");
     expect(snapshot).toContain("propBackReferences");
     expect(snapshot).toContain("propBackReferenceNote");
+    expect(snapshot).toContain("characterBackReferences");
+    expect(snapshot).toContain("characterBackReferenceNote");
     expect(snapshot).toContain("不读 unit head");
     expect(snapshot).not.toContain("getStudioProductionUnitSnapshot");
     expect(snapshot).not.toContain("getCurrentStudioPanelAssetBindingSet");
@@ -289,6 +326,7 @@ describe("studio scene backrefs readonly sql", () => {
     expect(reader).toContain("category = ?");
     expect(reader).toContain('"scene"');
     expect(reader).toContain('"prop"');
+    expect(reader).toContain('"character"');
     expect(reader).not.toContain("ensureProductionDirectories");
     expect(reader).not.toContain("evaluateStudioConsistency");
     const mcp = source("src/mcp/server.ts");
@@ -296,17 +334,23 @@ describe("studio scene backrefs readonly sql", () => {
     expect(mcp).toContain("sceneBackReferenceNote");
     expect(mcp).toContain("propBackReferences");
     expect(mcp).toContain("propBackReferenceNote");
+    expect(mcp).toContain("characterBackReferences");
+    expect(mcp).toContain("characterBackReferenceNote");
     expect(mcp).toContain("不是 BindingSet");
     const generation = source("src/core/studio-generation.ts");
     expect(generation).toContain("SCENE_BACK_REFERENCE_TOOL_NOTE");
     expect(generation).toContain("PROP_BACK_REFERENCE_TOOL_NOTE");
+    expect(generation).toContain("CHARACTER_BACK_REFERENCE_TOOL_NOTE");
     const brief = source("src/core/codex.ts");
     expect(brief).toContain("SCENE_BACK_REFERENCE_TOOL_NOTE");
     expect(brief).toContain("PROP_BACK_REFERENCE_TOOL_NOTE");
+    expect(brief).toContain("CHARACTER_BACK_REFERENCE_TOOL_NOTE");
     expect(SCENE_BACK_REFERENCE_TOOL_NOTE).toContain("session-snapshot");
     expect(SCENE_BACK_REFERENCE_TOOL_NOTE).toContain("不是 BindingSet");
     expect(PROP_BACK_REFERENCE_TOOL_NOTE).toContain("propBackReferences");
     expect(PROP_BACK_REFERENCE_TOOL_NOTE).toContain("不是 BindingSet");
+    expect(CHARACTER_BACK_REFERENCE_TOOL_NOTE).toContain("characterBackReferences");
+    expect(CHARACTER_BACK_REFERENCE_TOOL_NOTE).toContain("不是 BindingSet");
     const canvas = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
     expect(canvas).toContain("getStudioSceneBackReferences");
     expect(canvas).toContain("applyInspectorSceneBackrefs");

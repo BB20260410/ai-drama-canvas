@@ -199,6 +199,9 @@ export const SCENE_BACK_REFERENCE_TOOL_NOTE =
 export const PROP_BACK_REFERENCE_TOOL_NOTE =
   "若 session-snapshot 含 propBackReferences / propBackReferenceNote，必须与更早同道具快照提及连续，禁止换成未回指的道具。快照提及不是 BindingSet，不能当 generation-ready。";
 
+export const CHARACTER_BACK_REFERENCE_TOOL_NOTE =
+  "若 session-snapshot 含 characterBackReferences / characterBackReferenceNote，必须与更早同角色快照提及连续，禁止换成未回指的角色。快照提及不是 BindingSet，不能当 generation-ready。";
+
 export type FrozenPanelStandingRow = {
   panelId: string;
   previousStanding: StudioPanelStandingHandoff & { source: "frozen-rendered-prompt" };
