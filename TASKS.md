@@ -63,6 +63,7 @@
 - [x] session-snapshot / 生成控制单镜草稿跟 unit-grid 在途对齐（驾驶舱 nextAction 或已加载 unit-grid 节点为 wait/retry/Review/对账时草稿不得再 ready；零额外 IPC；不进 fingerprint；不执行、不 dispatch、不 retry；schemaVersion 仍为 1）
 - [x] pack envelope 单镜草稿/next 跟 unit-grid 在途对齐（同单元 unit-grid 节点 dispatched/failed/cancelled/succeeded 时草稿不得再 ready，next 改 wait/retry/Review；不加 inspect；planned 不挡；不执行、不 dispatch、不 retry）
 - [x] readiness next 跟 unit-grid 在途对齐（单镜/整板 ready 路径的 agentExecution.next 在同单元 unit-grid 已在途/待重试/待审时改 wait/retry/Review；freeze writeCommand 不变；不加 inspect；不执行、不 dispatch、不 retry）
+- [x] 画布节点下一步跟 unit-grid 在途对齐（检查器「下一步」用已加载 unitDetail.nextAction；wait/retry/Review/对账时禁用 freeze-dispatch 并露出同一下一步；planned 不挡；零额外 IPC；不执行、不 dispatch、不 retry；schemaVersion 仍为 1）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
