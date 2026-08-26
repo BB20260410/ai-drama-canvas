@@ -41,6 +41,7 @@
 - [x] 画布检查器无冻结包时退本格锁版光线/服化（只读 SQL；不改 dashboard 投影；有冻结包仍只认覆盖行）
 - [x] 画布检查器跨单元场景回指（复用只读 SQL；点穿走 focusAppearance，不猜第一格；不改 get_studio_trace）
 - [x] 15s 向导跨单元场景回指（只扫已加载对照板；建议资产须在板里出现过 scene；不写冻结提示词）
+- [x] SSL-5 / 阅读器露出锁版光线服化；场景回指可点穿精确宫格（阅读器仅用户点穿才加载对照板；≠ BindingSet）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
