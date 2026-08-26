@@ -43,6 +43,7 @@
 - [x] 15s 向导跨单元场景回指（只扫已加载对照板；建议资产须在板里出现过 scene；不写冻结提示词）
 - [x] SSL-5 / 阅读器露出锁版光线服化；场景回指可点穿精确宫格（阅读器仅用户点穿才加载对照板；≠ BindingSet）
 - [x] 生成控制无冻结包退锁版光线/服化 + 当前 head 场景回指（有包仍只认覆盖行；点穿不猜第一格；不改 dashboard / get_studio_trace）
+- [x] 对照/SSL-5/阅读器/向导/检查器/生成控制/session-snapshot 跨单元道具回指（只认 category=prop；一次 IPC 同开库；点穿复用场景回指；不写冻结提示词；整板 brief 最后一条仍是前镜句；≠ BindingSet）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
