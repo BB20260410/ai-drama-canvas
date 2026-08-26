@@ -1,0 +1,35 @@
+{
+  "id": "goal-episode-unit-media-map-per-panel-20260826",
+  "createdAt": "2026-08-26T18:02:00.000Z",
+  "kind": "episode-unit-media-map-per-panel-pack",
+  "conclusion": "PASS",
+  "scope": "SSL-0 episode-unit-media-map reads panel packs only; unit-grid is not copied onto every panel",
+  "invariants": {
+    "listPacksByPanelId": true,
+    "ignoresUnitGridTargetKind": true,
+    "doesNotCopyOnePackToAllPanels": true,
+    "alignPreviewUsesFirstCoveredPanel": true,
+    "doesNotDispatch": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotReviewPass": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts"
+      ],
+      "result": "4 files / 27 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "runtime speed closed",
+    "100% fit"
+  ]
+}
