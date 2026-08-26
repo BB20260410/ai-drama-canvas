@@ -121,8 +121,11 @@ describe("正式生图页锁版光线服化与场景回指", () => {
     expect(view).toContain('data-testid="studio-control-prop-backrefs"');
     expect(view).toContain('data-testid="studio-control-character-backrefs"');
     expect(view).toContain('data-testid="studio-control-shot-type"');
+    expect(view).toContain('data-testid="studio-control-beat"');
     expect(view).toContain("formatUnitLockPanelShotTypeLine");
+    expect(view).toContain("formatUnitLockPanelBeatLine");
     expect(view).toContain("frozenPanelShotTypeFromAnyFrozenPack");
+    expect(view).toContain("frozenPanelBeatFromAnyFrozenPack");
     expect(view).toContain("getStudioUnitLockOverlays");
     expect(view).toContain("getStudioSceneBackReferences");
     expect(view).toContain("formatUnitLockPanelLightingLine");

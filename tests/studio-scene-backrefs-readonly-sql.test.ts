@@ -316,6 +316,7 @@ describe("studio scene backrefs readonly sql", () => {
     expect(snapshot).toContain("characterBackReferences");
     expect(snapshot).toContain("characterBackReferenceNote");
     expect(snapshot).toContain("shotTypeLine");
+    expect(snapshot).toContain("beatLine");
     expect(snapshot).toContain("parseFrozenPanelShotTypeFromRenderedPrompt");
     expect(snapshot).toContain("不读 unit head");
     expect(snapshot).not.toContain("getStudioProductionUnitSnapshot");
@@ -339,17 +340,20 @@ describe("studio scene backrefs readonly sql", () => {
     expect(mcp).toContain("characterBackReferences");
     expect(mcp).toContain("characterBackReferenceNote");
     expect(mcp).toContain("shotTypeLine");
+    expect(mcp).toContain("beatLine");
     expect(mcp).toContain("不是 BindingSet");
     const generation = source("src/core/studio-generation.ts");
     expect(generation).toContain("SCENE_BACK_REFERENCE_TOOL_NOTE");
     expect(generation).toContain("PROP_BACK_REFERENCE_TOOL_NOTE");
     expect(generation).toContain("CHARACTER_BACK_REFERENCE_TOOL_NOTE");
     expect(generation).toContain("EXTENSION_SHOT_TYPE_TOOL_NOTE");
+    expect(generation).toContain("UNIT_BEAT_TOOL_NOTE");
     const brief = source("src/core/codex.ts");
     expect(brief).toContain("SCENE_BACK_REFERENCE_TOOL_NOTE");
     expect(brief).toContain("PROP_BACK_REFERENCE_TOOL_NOTE");
     expect(brief).toContain("CHARACTER_BACK_REFERENCE_TOOL_NOTE");
     expect(brief).toContain("EXTENSION_SHOT_TYPE_TOOL_NOTE");
+    expect(brief).toContain("UNIT_BEAT_TOOL_NOTE");
     expect(SCENE_BACK_REFERENCE_TOOL_NOTE).toContain("session-snapshot");
     expect(SCENE_BACK_REFERENCE_TOOL_NOTE).toContain("不是 BindingSet");
     expect(PROP_BACK_REFERENCE_TOOL_NOTE).toContain("propBackReferences");

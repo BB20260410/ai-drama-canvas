@@ -753,6 +753,7 @@
         :panel-frozen-costume-line="inspectorFrozenCostumeLine"
         :panel-lighting-costume-source="inspectorLightingCostumeSource"
         :panel-shot-type-line="inspectorShotTypeLine"
+        :panel-beat-line="inspectorBeatLine"
         :panel-scene-back-reference-note="inspectorSceneBackReferenceNote"
         :panel-scene-back-references="inspectorSceneBackReferences"
         :panel-prop-back-reference-note="inspectorPropBackReferenceNote"
@@ -826,12 +827,15 @@ import StudioGenerationTraceDrawer, { type StudioTraceDrawerModel } from "./Stud
 import {
   formatFrozenPanelCostumeReadonlyLine,
   formatFrozenPanelLightingReadonlyLine,
+  formatFrozenPanelBeatReadonlyLine,
   formatFrozenPanelShotTypeReadonlyLine,
   formatPreviousStandingReadonlyLine,
+  formatUnitLockPanelBeatLine,
   formatUnitLockPanelCostumeLine,
   formatUnitLockPanelLightingLine,
   formatUnitLockPanelShotTypeLine,
   formatUnitLockPreviousStandingLine,
+  frozenPanelBeatFromAnyFrozenPack,
   frozenPanelCostumeFromAnyFrozenPack,
   frozenPanelLightingFromAnyFrozenPack,
   frozenPanelShotTypeFromAnyFrozenPack,
@@ -1981,6 +1985,7 @@ const inspectorFrozenLightingLine = ref<string | null>(null);
 const inspectorFrozenCostumeLine = ref<string | null>(null);
 const inspectorLightingCostumeSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>(null);
 const inspectorShotTypeLine = ref<string | null>(null);
+const inspectorBeatLine = ref<string | null>(null);
 const inspectorSceneBackReferenceNote = ref<string | null>(null);
 const inspectorSceneBackReferences = ref<SceneBackReference[]>([]);
 const inspectorPropBackReferenceNote = ref<string | null>(null);
@@ -2093,6 +2098,7 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
   inspectorFrozenCostumeLine.value = null;
   inspectorLightingCostumeSource.value = null;
   inspectorShotTypeLine.value = null;
+  inspectorBeatLine.value = null;
   inspectorSceneBackReferenceNote.value = null;
   inspectorSceneBackReferences.value = [];
   inspectorPropBackReferenceNote.value = null;
@@ -2123,6 +2129,9 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
         inspectorShotTypeLine.value = formatFrozenPanelShotTypeReadonlyLine(
           frozenPanelShotTypeFromAnyFrozenPack(pack, panel.id),
         );
+        inspectorBeatLine.value = formatFrozenPanelBeatReadonlyLine(
+          frozenPanelBeatFromAnyFrozenPack(pack, panel.id),
+        );
         inspectorLightingCostumeSource.value = "frozen-rendered-prompt";
         await applyInspectorSceneBackrefs(token, panel.id, panel.ordinal);
         return;
@@ -2147,6 +2156,12 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
   }
   const unitId = unitDetail.value?.unit.id;
   const unitRevision = unitDetail.value?.unit.revision;
+  inspectorBeatLine.value = formatUnitLockPanelBeatLine({
+    panelIndex: panel.ordinal,
+    startSeconds: panel.startSeconds,
+    endSeconds: panel.endSeconds,
+    durationSeconds: panel.durationSeconds,
+  });
   if (!props.projectRoot || !unitId || !Number.isInteger(unitRevision) || unitRevision < 1) {
     inspectorLightingCostumeSource.value = "unit-lock";
     await applyInspectorSceneBackrefs(token, panel.id, panel.ordinal);
@@ -4165,6 +4180,7 @@ function closeInspector(): void {
   inspectorFrozenCostumeLine.value = null;
   inspectorLightingCostumeSource.value = null;
   inspectorShotTypeLine.value = null;
+  inspectorBeatLine.value = null;
   inspectorSceneBackReferenceNote.value = null;
   inspectorSceneBackReferences.value = [];
   inspectorPropBackReferenceNote.value = null;

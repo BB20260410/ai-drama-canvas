@@ -163,6 +163,12 @@
               {{ controlShotTypeLine }}
             </p>
             <p
+              v-if="controlBeatLine"
+              class="previous-standing"
+              data-testid="studio-control-beat">
+              {{ controlBeatLine }}
+            </p>
+            <p
               v-if="controlSceneBackReferenceNote"
               class="previous-standing"
               data-testid="studio-control-scene-backrefs">
@@ -307,13 +313,16 @@ import {
   loadDetachedUnknownNodeStates,
 } from "../studio-generation-refresh-controller";
 import {
+  formatFrozenPanelBeatReadonlyLine,
   formatFrozenPanelCostumeReadonlyLine,
   formatFrozenPanelLightingReadonlyLine,
   formatFrozenPanelShotTypeReadonlyLine,
   formatPreviousStandingReadonlyLine,
+  formatUnitLockPanelBeatLine,
   formatUnitLockPanelCostumeLine,
   formatUnitLockPanelLightingLine,
   formatUnitLockPanelShotTypeLine,
+  frozenPanelBeatFromAnyFrozenPack,
   frozenPanelCostumeFromAnyFrozenPack,
   frozenPanelLightingFromAnyFrozenPack,
   frozenPanelShotTypeFromAnyFrozenPack,
@@ -398,6 +407,9 @@ const lightingCostumeSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>
 const frozenPackShotTypeLine = ref<string | null>(null);
 const lockShotTypeLine = ref<string | null>(null);
 const controlShotTypeLine = computed(() => frozenPackShotTypeLine.value || lockShotTypeLine.value);
+const frozenPackBeatLine = ref<string | null>(null);
+const lockBeatLine = ref<string | null>(null);
+const controlBeatLine = computed(() => frozenPackBeatLine.value || lockBeatLine.value);
 const controlSceneBackReferenceNote = ref<string | null>(null);
 const controlSceneBackReferences = ref<SceneBackReference[]>([]);
 const controlPropBackReferenceNote = ref<string | null>(null);
@@ -560,9 +572,11 @@ watch([selectedPackId, selectedPanelId, () => props.projectRoot, () => detail.va
   frozenPackLightingLine.value = null;
   frozenPackCostumeLine.value = null;
   frozenPackShotTypeLine.value = null;
+  frozenPackBeatLine.value = null;
   lockLightingLine.value = null;
   lockCostumeLine.value = null;
   lockShotTypeLine.value = null;
+  lockBeatLine.value = null;
   lightingCostumeSource.value = null;
   controlSceneBackReferenceNote.value = null;
   controlSceneBackReferences.value = [];
@@ -612,6 +626,9 @@ watch([selectedPackId, selectedPanelId, () => props.projectRoot, () => detail.va
         frozenPackShotTypeLine.value = formatFrozenPanelShotTypeReadonlyLine(
           frozenPanelShotTypeFromAnyFrozenPack(pack, selectedPanelId.value),
         );
+        frozenPackBeatLine.value = formatFrozenPanelBeatReadonlyLine(
+          frozenPanelBeatFromAnyFrozenPack(pack, selectedPanelId.value),
+        );
         lightingCostumeSource.value = "frozen-rendered-prompt";
         if (panel) await applyControlSceneBackrefs(token, panel.id, panel.ordinal);
         return;
@@ -634,6 +651,19 @@ watch([selectedPackId, selectedPanelId, () => props.projectRoot, () => detail.va
     lockLightingLine.value = formatUnitLockPanelLightingLine(overlay);
     lockCostumeLine.value = formatUnitLockPanelCostumeLine(overlay);
     lockShotTypeLine.value = formatUnitLockPanelShotTypeLine(overlay);
+    lockBeatLine.value = formatUnitLockPanelBeatLine({
+      panelIndex: panel.ordinal,
+      startSeconds: panel.startSeconds,
+      endSeconds: panel.endSeconds,
+      durationSeconds: panel.durationSeconds,
+    });
+  } else if (panel) {
+    lockBeatLine.value = formatUnitLockPanelBeatLine({
+      panelIndex: panel.ordinal,
+      startSeconds: panel.startSeconds,
+      endSeconds: panel.endSeconds,
+      durationSeconds: panel.durationSeconds,
+    });
   }
   if (panel) await applyControlSceneBackrefs(token, panel.id, panel.ordinal);
 });
@@ -1362,6 +1392,7 @@ watch(() => props.projectRoot, () => {
   lockLightingLine.value = null;
   lockCostumeLine.value = null;
   lockShotTypeLine.value = null;
+  lockBeatLine.value = null;
   lightingCostumeSource.value = null;
   controlSceneBackReferenceNote.value = null;
   controlSceneBackReferences.value = [];
@@ -1381,6 +1412,7 @@ watch(() => props.projectRoot, () => {
   frozenPackLightingLine.value = null;
   frozenPackCostumeLine.value = null;
   frozenPackShotTypeLine.value = null;
+  frozenPackBeatLine.value = null;
   frozenPackError.value = "";
   duduDetectionRoot = "";
   duduProject.value = null;

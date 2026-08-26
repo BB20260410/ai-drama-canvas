@@ -8,7 +8,9 @@ import {
 } from "./studio-generation-ledger.js";
 import { queryStudioGenerationFreeze } from "./studio-generation.js";
 import {
+  formatFrozenPanelBeatReadonlyLine,
   formatFrozenPanelShotTypeReadonlyLine,
+  frozenPanelBeatFromAnyFrozenPack,
   parseFrozenPanelCostumeFromRenderedPrompt,
   parseFrozenPanelLightingFromRenderedPrompt,
   parseFrozenPanelShotTypeFromRenderedPrompt,
@@ -119,6 +121,11 @@ export interface StudioGenerationSessionSnapshot {
    * 无扩写/原镜则为 null，不进 fingerprint。不是 BindingSet。
    */
   shotTypeLine: string | null;
+  /**
+   * 冻结 15s 节拍只读句：只从该包 target 起止秒还原，不读 unit head，不写新冻结行。
+   * 无时长则为 null，不进 fingerprint。不是 BindingSet。
+   */
+  beatLine: string | null;
   camera: {
     current?: {
       shotComposition: string;
@@ -391,6 +398,7 @@ export async function buildStudioGenerationSessionSnapshot(
         : null;
       return formatFrozenPanelShotTypeReadonlyLine(fromPrompt ?? fromPanel);
     })(),
+    beatLine: formatFrozenPanelBeatReadonlyLine(frozenPanelBeatFromAnyFrozenPack(frozenPanel)),
     camera: {
       current: frozenPanel
         ? {
@@ -448,6 +456,7 @@ export async function buildStudioGenerationSessionSnapshot(
           }
         : {}),
       ...(body.shotTypeLine ? { shotTypeLine: body.shotTypeLine } : {}),
+      ...(body.beatLine ? { beatLine: body.beatLine } : {}),
       camera: body.camera,
       topRiskCode: body.topRisk?.code ?? null,
     }),

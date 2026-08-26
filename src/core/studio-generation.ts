@@ -73,6 +73,7 @@ import {
   EXTENSION_SHOT_TYPE_TOOL_NOTE,
   PROP_BACK_REFERENCE_TOOL_NOTE,
   SCENE_BACK_REFERENCE_TOOL_NOTE,
+  UNIT_BEAT_TOOL_NOTE,
   formatPreviousStandingPromptLine,
   parseFrozenPanelCostumeFromRenderedPrompt,
   parseFrozenPanelLightingFromRenderedPrompt,
@@ -2750,6 +2751,7 @@ export function buildStudioAgentImagegenBrief(
         PROP_BACK_REFERENCE_TOOL_NOTE,
         CHARACTER_BACK_REFERENCE_TOOL_NOTE,
         EXTENSION_SHOT_TYPE_TOOL_NOTE,
+        UNIT_BEAT_TOOL_NOTE,
         "禁止浏览器、Artlist、ComfyUI、网页自动化旁路。",
       ],
     }
@@ -2767,6 +2769,7 @@ export function buildStudioAgentImagegenBrief(
         PROP_BACK_REFERENCE_TOOL_NOTE,
         CHARACTER_BACK_REFERENCE_TOOL_NOTE,
         EXTENSION_SHOT_TYPE_TOOL_NOTE,
+        UNIT_BEAT_TOOL_NOTE,
         "禁止浏览器、Artlist、网页自动化旁路。",
       ],
     };

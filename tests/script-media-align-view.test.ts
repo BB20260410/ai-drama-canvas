@@ -59,13 +59,17 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("ssl5-focus-prop-backrefs");
     expect(vue).toContain("ssl5-focus-character-backrefs");
     expect(vue).toContain("ssl5-focus-shot-type");
+    expect(vue).toContain("ssl5-focus-beat");
+    expect(vue).toContain("ssl5-focus-unit-beat");
     expect(vue).toContain("span-media-hit-shot-type");
+    expect(vue).toContain("span-media-hit-beat");
     expect(vue).toContain("span-media-hit-scene-backrefs");
     expect(vue).toContain("span-media-hit-prop-backrefs");
     expect(vue).toContain("span-media-hit-character-backrefs");
     expect(vue).toContain("revealReaderSceneBackRef");
     expect(vue).toContain("formatPanelLightingCostumeLine");
     expect(vue).toContain("formatPanelShotTypeLine");
+    expect(vue).toContain("formatPanelBeatLine");
     expect(vue).toContain("revealSpanMediaHit");
     expect(vue).toContain("getStudioScriptSpanMediaMap");
     expect(vue).toContain('data-testid="storyboard-wizard-suggest"');
@@ -119,6 +123,7 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("align-panel-prop-backrefs");
     expect(vue).toContain("align-panel-character-backrefs");
     expect(vue).toContain("align-panel-shot-type");
+    expect(vue).toContain("align-panel-beat");
     expect(vue).toContain("listSceneBackReferences");
     expect(vue).toContain("listPropBackReferences");
     expect(vue).toContain("listCharacterBackReferences");
@@ -130,6 +135,7 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain('data-testid="storyboard-wizard-prop-backrefs"');
     expect(vue).toContain('data-testid="storyboard-wizard-character-backrefs"');
     expect(vue).toContain('data-testid="storyboard-wizard-shot-type"');
+    expect(vue).toContain('data-testid="storyboard-wizard-beat"');
     expect(vue).toContain("revealSceneBackRef");
     expect(vue).toContain("不能猜宫格");
     expect(vue).toContain("不是 BindingSet");

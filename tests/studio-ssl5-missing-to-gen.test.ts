@@ -97,8 +97,12 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.characterBackReferences).toEqual([]);
     expect(plan.shotTypeLine).toBe("没有宫格可查镜头类型");
     expect(plan.shotType).toBeUndefined();
+    expect(plan.beatLine).toBe("没有宫格可查 15s 节拍");
+    expect(plan.unitBeatLine).toBe("没有宫格可查 15s 节拍");
     expect(plan.items[0]?.lightingCostumeLine).toBe("没有宫格可查光线/服化");
     expect(plan.items[0]?.shotTypeLine).toBe("没有宫格可查镜头类型");
+    expect(plan.items[0]?.beatLine).toBe("没有宫格可查 15s 节拍");
+    expect(plan.items[0]?.unitBeatLine).toBe("没有宫格可查 15s 节拍");
     expect(plan.items[0]?.recommendedPath).toEqual([
       "binding-ready?",
       "readiness",
@@ -144,6 +148,9 @@ describe("SSL-5 缺图下一步纯函数", () => {
             filmingMethod: "固定",
             sceneLighting: "窗侧冷光",
             costumeState: "素袍",
+            startSeconds: 0,
+            endSeconds: 7.5,
+            durationSeconds: 7.5,
           }),
           panel({
             panelId: "p2",
@@ -152,6 +159,9 @@ describe("SSL-5 缺图下一步纯函数", () => {
             sceneLighting: "近灯",
             costumeState: "加披风",
             shotType: "extension",
+            startSeconds: 7.5,
+            endSeconds: 15,
+            durationSeconds: 7.5,
             previousHandoff: { panelIndex: 1, panelId: "p1", shotComposition: "中景", visualAction: "站定", filmingMethod: "固定" },
           }),
         ],
@@ -177,6 +187,11 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.shotTypeLine).toContain("禁止重新起镜");
     expect(plan.shotTypeLine).toContain("不是 BindingSet");
     expect(plan.items[0]?.shotTypeLine).toContain("扩写格：G2");
+    expect(plan.beatLine).toContain("15s 节拍：G2 7.5–15s（7.5s）");
+    expect(plan.beatLine).toContain("本单元须 2–6 格合计 15.0s");
+    expect(plan.unitBeatLine).toContain("2 格合计 15.0s");
+    expect(plan.items[0]?.beatLine).toBe(plan.beatLine);
+    expect(plan.items[0]?.unitBeatLine).toBe(plan.unitBeatLine);
   });
 
   it("焦点宫格场景回指只扫已加载对照板，忽略更晚单元", () => {
@@ -301,6 +316,8 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.characterBackReferenceLine).toBe("没有宫格可查角色回指");
     expect(plan.characterBackReferences).toEqual([]);
     expect(plan.shotTypeLine).toBe("没有宫格可查镜头类型");
+    expect(plan.beatLine).toBe("没有宫格可查 15s 节拍");
+    expect(plan.unitBeatLine).toBe("没有宫格可查 15s 节拍");
   });
 });
 
@@ -330,6 +347,8 @@ describe("SSL-5 入口源码合同", () => {
     expect(vue).toContain('data-testid="ssl5-focus-prop-backrefs"');
     expect(vue).toContain('data-testid="ssl5-focus-character-backrefs"');
     expect(vue).toContain('data-testid="ssl5-focus-shot-type"');
+    expect(vue).toContain('data-testid="ssl5-focus-beat"');
+    expect(vue).toContain('data-testid="ssl5-focus-unit-beat"');
     expect(vue).toContain('data-testid="ssl5-focus-lighting"');
     expect(vue).toContain('data-testid="ssl5-focus-previous-lighting"');
     expect(vue).toContain('data-testid="ssl5-focus-previous-costume"');
@@ -337,6 +356,11 @@ describe("SSL-5 入口源码合同", () => {
     expect(ssl5).toContain("formatPanelLightingCostumeLine");
     expect(ssl5).toContain("formatPanelShotTypeLine");
     expect(ssl5).toContain("shotTypeLine");
+    expect(ssl5).toContain("formatPanelBeatLine");
+    expect(ssl5).toContain("formatUnitBeatLine");
+    expect(ssl5).toContain("beatLine");
+    expect(ssl5).toContain("unitBeatLine");
+    expect(ssl5).toContain("没有宫格可查 15s 节拍");
     expect(ssl5).toContain("wizardPreviousLightingForPanel");
     expect(ssl5).toContain("wizardPreviousCostumeForPanel");
     expect(ssl5).toContain("lightingCostumeLine");

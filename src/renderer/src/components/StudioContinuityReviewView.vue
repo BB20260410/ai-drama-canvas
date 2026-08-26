@@ -135,6 +135,16 @@
         </header>
         <p class="handoff-note ready">{{ frozenShotTypeLine }} 历史身份经冻结包还原，不读 head。</p>
       </section>
+      <section
+        v-if="frozenBeatLine"
+        class="control-section previous-standing-section"
+        data-testid="studio-review-beat">
+        <header>
+          <div><span>15s 节拍</span><h3>冻结宫格起止秒</h3></div>
+          <small>不是 BindingSet</small>
+        </header>
+        <p class="handoff-note ready">{{ frozenBeatLine }} 历史身份经冻结包还原，不读 head。</p>
+      </section>
 
       <section
         v-if="continuityCorrectionRows.length && canAppendContinuityCorrection"
@@ -509,10 +519,12 @@ import type { StudioContinuityField, StudioContinuityFieldState } from "@core/st
 import type { StudioContinuityReviewAssetControl, StudioContinuityReviewFieldStatus } from "@core/studio-continuity-review-control";
 import type { StudioGenerationReviewProjection } from "@core/studio-generation-review";
 import {
+  formatFrozenPanelBeatReadonlyLine,
   formatFrozenPanelCostumeReadonlyLine,
   formatFrozenPanelLightingReadonlyLine,
   formatFrozenPanelShotTypeReadonlyLine,
   formatPreviousStandingReadonlyLine,
+  frozenPanelBeatFromAnyFrozenPack,
   frozenPanelCostumeFromAnyFrozenPack,
   frozenPanelLightingFromAnyFrozenPack,
   frozenPanelShotTypeFromAnyFrozenPack,
@@ -753,6 +765,7 @@ export default defineComponent({
     const frozenLightingLine = ref<string | null>(null);
     const frozenCostumeLine = ref<string | null>(null);
     const frozenShotTypeLine = ref<string | null>(null);
+    const frozenBeatLine = ref<string | null>(null);
     const reviewStandingPackId = computed(() =>
       props.focus?.packId
       ?? loadState.control?.review?.control.head?.packId
@@ -778,6 +791,7 @@ export default defineComponent({
       frozenLightingLine.value = null;
       frozenCostumeLine.value = null;
       frozenShotTypeLine.value = null;
+      frozenBeatLine.value = null;
       reviewStandingToken += 1;
       timelineOffset = 0;
       conflictOffset = 0;
@@ -792,6 +806,7 @@ export default defineComponent({
       frozenLightingLine.value = null;
       frozenCostumeLine.value = null;
       frozenShotTypeLine.value = null;
+      frozenBeatLine.value = null;
       if (!packId) return;
       try {
         const pack = await window.canvasApi.getStudioFrozenPack(props.projectRoot, packId);
@@ -806,12 +821,16 @@ export default defineComponent({
         frozenShotTypeLine.value = formatFrozenPanelShotTypeReadonlyLine(
           frozenPanelShotTypeFromAnyFrozenPack(pack, reviewStandingPanelId.value),
         );
+        frozenBeatLine.value = formatFrozenPanelBeatReadonlyLine(
+          frozenPanelBeatFromAnyFrozenPack(pack, reviewStandingPanelId.value),
+        );
       } catch {
         if (token !== reviewStandingToken) return;
         frozenPreviousStanding.value = null;
         frozenLightingLine.value = null;
         frozenCostumeLine.value = null;
         frozenShotTypeLine.value = null;
+        frozenBeatLine.value = null;
       }
     }, { immediate: true });
 
@@ -824,6 +843,7 @@ export default defineComponent({
       frozenLightingLine.value = null;
       frozenCostumeLine.value = null;
       frozenShotTypeLine.value = null;
+      frozenBeatLine.value = null;
       releasePointerCleanups();
     });
     if (typeof window !== "undefined") {
@@ -1626,6 +1646,7 @@ export default defineComponent({
       frozenLightingLine,
       frozenCostumeLine,
       frozenShotTypeLine,
+      frozenBeatLine,
       continuityCorrectionRows,
       canAppendContinuityCorrection,
       reviewMediaAvailable,

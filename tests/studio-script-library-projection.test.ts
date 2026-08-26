@@ -7,8 +7,10 @@ import {
   buildMissingMediaReport,
   countCoveredUnits,
   formatPanelCoverageMarks,
+  formatPanelBeatLine,
   formatPanelLightingCostumeLine,
   formatPanelShotTypeLine,
+  formatUnitBeatLine,
   formatPanelStandingGaps,
   formatPanelStandingHandoff,
   formatSceneBackReferences,
@@ -241,6 +243,19 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(formatPanelShotTypeLine({ panelIndex: 2, shotType: "extension" })).toContain("扩写格：G2");
     expect(formatPanelShotTypeLine({ panelIndex: 3, shotType: "" })).toContain("锁版未记镜头类型");
     expect(formatPanelShotTypeLine(null)).toBe("没有宫格可查镜头类型");
+    expect(hit.hits[0]?.beatLine).toBe("锁版未记 15s 节拍。不是 BindingSet，不能当 generation-ready。");
+    expect(formatPanelBeatLine(null)).toBe("没有宫格可查 15s 节拍");
+    expect(formatPanelBeatLine({ panelIndex: 1, startSeconds: 0, endSeconds: 5, durationSeconds: 5 })).toContain("15s 节拍：G1 0–5s（5s）");
+    expect(formatPanelBeatLine({ panelIndex: 1, startSeconds: 0, endSeconds: 5, durationSeconds: 5 })).toContain("本单元须 2–6 格合计 15.0s");
+    expect(formatPanelBeatLine({ panelIndex: 2, startSeconds: 0, endSeconds: 16, durationSeconds: 16 })).toContain("单格超过 15.0s");
+    expect(formatUnitBeatLine([])).toBe("没有宫格可查 15s 节拍");
+    expect(formatUnitBeatLine([
+      { panelIndex: 1, startSeconds: 0, endSeconds: 7.5, durationSeconds: 7.5 },
+      { panelIndex: 2, startSeconds: 7.5, endSeconds: 15, durationSeconds: 7.5 },
+    ])).toContain("2 格合计 15.0s");
+    expect(formatUnitBeatLine([
+      { panelIndex: 1, startSeconds: 0, endSeconds: 5, durationSeconds: 5 },
+    ])).toContain("格数 1（须 2–6）");
     expect(hit.hits[0]?.sceneBackReferences).toEqual([]);
     expect(hit.hits[0]?.sceneBackReferenceLine).toContain("本格快照未提及场景");
     expect(hit.hits[0]?.propBackReferences).toEqual([]);
@@ -519,6 +534,17 @@ describe("studio-script-library-projection pure helpers", () => {
     );
     expect(panels[0]).toMatchObject({ panelId: "p1", hasMedia: false, rawSha256: null, packId: null, shotComposition: "", visualAction: "" });
     expect(panels[1]).toMatchObject({ panelId: "p2", hasMedia: true, rawSha256: "raw-p2", packId: "pack-p2" });
+    const timed = applyPackMediaToPanels(
+      [
+        { index: 1, id: "p1", startSeconds: 0, endSeconds: 7.5, durationSeconds: 7.5 },
+        { index: 2, id: "p2", startSeconds: 7.5, endSeconds: 15 },
+      ],
+      new Map(),
+    );
+    expect(timed[0]).toMatchObject({ startSeconds: 0, endSeconds: 7.5, durationSeconds: 7.5 });
+    expect(timed[1]).toMatchObject({ startSeconds: 7.5, endSeconds: 15, durationSeconds: 7.5 });
+    expect(formatPanelBeatLine(timed[1])).toContain("7.5–15s（7.5s）");
+    expect(formatUnitBeatLine(timed)).toContain("2 格合计 15.0s");
     const withComp = applyPackMediaToPanels(
       [{ index: 1, id: "p1", title: "g1", shotComposition: "近景三分", visualAction: "抬手" }],
       new Map(),
@@ -780,6 +806,9 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     expect(source).toContain("formatPanelLightingCostumeLine");
     expect(source).toContain("formatPanelShotTypeLine");
     expect(source).toContain("shotTypeLine");
+    expect(source).toContain("formatPanelBeatLine");
+    expect(source).toContain("formatUnitBeatLine");
+    expect(source).toContain("beatLine");
     expect(source).toContain('from "./studio-scene-backrefs.js"');
     expect(source).toContain("不是 BindingSet，不能当 generation-ready");
     expect(source).not.toContain("getStudioBindingControl");

@@ -10,9 +10,11 @@ import {
   type ScriptMediaAlignRow,
 } from "./studio-script-media-align.js";
 import {
+  formatPanelBeatLine,
   formatPanelLightingCostumeLine,
   formatPanelShotTypeLine,
   formatPanelStandingGaps,
+  formatUnitBeatLine,
   formatCharacterBackReferenceLineFromBoard,
   formatPropBackReferenceLineFromBoard,
   formatSceneBackReferenceLineFromBoard,
@@ -55,6 +57,8 @@ export interface Ssl5MissingToGenPlanItem {
   previousCostumeLine: string | null;
   shotType?: "original" | "extension";
   shotTypeLine: string;
+  beatLine: string;
+  unitBeatLine: string;
   sceneBackReferenceLine: string;
   sceneBackReferences: SceneBackReference[];
   propBackReferenceLine: string;
@@ -83,6 +87,8 @@ export interface Ssl5MissingToGenPlan {
   previousCostumeLine: string | null;
   shotType?: "original" | "extension";
   shotTypeLine: string;
+  beatLine: string;
+  unitBeatLine: string;
   sceneBackReferenceLine: string;
   sceneBackReferences: SceneBackReference[];
   propBackReferenceLine: string;
@@ -183,6 +189,8 @@ export function buildSsl5PlanFromBoard(
           ? missingPanel.shotType
           : undefined,
         shotTypeLine: formatPanelShotTypeLine(missingPanel ?? null),
+        beatLine: formatPanelBeatLine(missingPanel ?? null),
+        unitBeatLine: formatUnitBeatLine(row.panels ?? []),
         sceneBackReferenceLine: missingPanel
           ? formatSceneBackReferenceLineFromBoard({
               currentUnitId: row.unitId,
@@ -249,6 +257,8 @@ export function buildSsl5PlanFromBoard(
     previousCostumeLine: focus?.previousCostumeLine ?? null,
     shotType: focus?.shotType,
     shotTypeLine: focus?.shotTypeLine ?? "没有宫格可查镜头类型",
+    beatLine: focus?.beatLine ?? "没有宫格可查 15s 节拍",
+    unitBeatLine: focus?.unitBeatLine ?? "没有宫格可查 15s 节拍",
     sceneBackReferenceLine: focus?.sceneBackReferenceLine ?? "没有宫格可查场景回指",
     sceneBackReferences: focus?.sceneBackReferences ?? [],
     propBackReferenceLine: focus?.propBackReferenceLine ?? "没有宫格可查道具回指",

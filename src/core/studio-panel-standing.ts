@@ -20,11 +20,20 @@ export type FrozenRenderedPromptPack = {
   };
 };
 
+export type FrozenPackBeatTarget = {
+  panelIndex?: number;
+  panelCount?: number;
+  unitLocalStartSeconds?: number;
+  unitLocalEndSeconds?: number;
+  durationSeconds?: number;
+};
+
 export type AnyFrozenPackStandingSource = FrozenRenderedPromptPack & {
   schemaVersion?: number;
+  target?: FrozenPackBeatTarget;
   panels?: ReadonlyArray<{
     panelId: string;
-    panelPack?: FrozenRenderedPromptPack;
+    panelPack?: FrozenRenderedPromptPack & { target?: FrozenPackBeatTarget };
   }>;
 };
 
@@ -204,6 +213,81 @@ export const CHARACTER_BACK_REFERENCE_TOOL_NOTE =
 
 export const EXTENSION_SHOT_TYPE_TOOL_NOTE =
   "若 session-snapshot / frozen pack / shotTypeLine 标明扩写格，必须与前一格连续，禁止重新起镜，禁止锚定原文 sourceSpans。原镜必须锚定原文。";
+
+export const UNIT_BEAT_TOOL_NOTE =
+  "若 session-snapshot / frozen pack / beatLine 标明 15s 节拍，必须保持 2–6 格合计 15.0s、本格时长与起止秒，禁止改格数或把后一事件提前进本格。";
+
+export type FrozenPanelBeat = {
+  panelIndex: number;
+  startSeconds: number;
+  endSeconds: number;
+  durationSeconds: number;
+  panelCount?: number;
+};
+
+function beatSourceFromAnyFrozenPack(
+  pack: AnyFrozenPackStandingSource | null | undefined,
+  panelId?: string,
+): (FrozenRenderedPromptPack & { target?: FrozenPackBeatTarget }) | null {
+  if (!pack) return null;
+  if (Array.isArray(pack.panels)) {
+    return panelId ? pack.panels.find((entry) => entry.panelId === panelId)?.panelPack ?? null : null;
+  }
+  return pack;
+}
+
+/** 单镜包直接取 target；unit-grid 必须 panelId，禁止猜第一格。不读 unit head。 */
+export function frozenPanelBeatFromAnyFrozenPack(
+  pack: AnyFrozenPackStandingSource | null | undefined,
+  panelId?: string,
+): FrozenPanelBeat | null {
+  const source = beatSourceFromAnyFrozenPack(pack, panelId);
+  const target = source?.target;
+  if (!target) return null;
+  const start = Number(target.unitLocalStartSeconds);
+  const end = Number(target.unitLocalEndSeconds);
+  let duration = Number(target.durationSeconds);
+  if ((!Number.isFinite(duration) || duration <= 0) && Number.isFinite(start) && Number.isFinite(end) && end > start) {
+    duration = end - start;
+  }
+  if (!Number.isFinite(start) || !Number.isFinite(end) || !Number.isFinite(duration) || duration <= 0) return null;
+  const panelIndex = Number(target.panelIndex);
+  const panelCount = Number(target.panelCount);
+  return {
+    panelIndex: Number.isFinite(panelIndex) ? panelIndex : 0,
+    startSeconds: Math.round(start * 10) / 10,
+    endSeconds: Math.round(end * 10) / 10,
+    durationSeconds: Math.round(duration * 10) / 10,
+    ...(Number.isFinite(panelCount) && panelCount > 0 ? { panelCount } : {}),
+  };
+}
+
+export function formatFrozenPanelBeatReadonlyLine(
+  beat: FrozenPanelBeat | null | undefined,
+): string | null {
+  if (!beat) return null;
+  return `冻结 15s 节拍：G${beat.panelIndex} ${beat.startSeconds}–${beat.endSeconds}s（${beat.durationSeconds}s）。本单元须 2–6 格合计 15.0s。不是 BindingSet。`;
+}
+
+/** 当前宫格锁版 15s 节拍（无冻结包时）；不是 BindingSet。 */
+export function formatUnitLockPanelBeatLine(
+  overlay: {
+    panelIndex: number;
+    startSeconds?: number;
+    endSeconds?: number;
+    durationSeconds?: number;
+  } | null | undefined,
+): string | null {
+  if (!overlay) return null;
+  const start = Number(overlay.startSeconds);
+  const end = Number(overlay.endSeconds);
+  let duration = Number(overlay.durationSeconds);
+  if ((!Number.isFinite(duration) || duration <= 0) && Number.isFinite(start) && Number.isFinite(end) && end > start) {
+    duration = end - start;
+  }
+  if (!Number.isFinite(start) || !Number.isFinite(end) || !Number.isFinite(duration) || duration <= 0) return null;
+  return `锁版 15s 节拍：G${overlay.panelIndex} ${Math.round(start * 10) / 10}–${Math.round(end * 10) / 10}s（${Math.round(duration * 10) / 10}s）。本单元须 2–6 格合计 15.0s。不是 BindingSet，不能当 generation-ready。`;
+}
 
 export type FrozenPanelShotType = "original" | "extension";
 

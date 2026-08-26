@@ -81,6 +81,9 @@ export interface UnitPanelMediaEntry {
   sceneLighting: string;
   costumeState: string;
   shotType: "original" | "extension" | "";
+  startSeconds?: number;
+  endSeconds?: number;
+  durationSeconds?: number;
   assetMentions: PanelAssetMentionLite[];
   previousHandoff: PanelStandingHandoff | null;
 }
@@ -282,6 +285,76 @@ export function formatPanelShotTypeLine(
     return `原镜：${prefix}必须锚定原文。不是 BindingSet，不能当 generation-ready。`;
   }
   return "锁版未记镜头类型。不是 BindingSet，不能当 generation-ready。";
+}
+
+export const UNIT_BEAT_SECONDS = 15;
+export const UNIT_BEAT_PANEL_MIN = 2;
+export const UNIT_BEAT_PANEL_MAX = 6;
+export const UNIT_BEAT_PANEL_MIN_SECONDS = 1;
+
+export type PanelBeatFields = {
+  panelIndex?: number;
+  startSeconds?: number;
+  endSeconds?: number;
+  durationSeconds?: number;
+};
+
+function normalizeBeatSeconds(value: unknown): number {
+  const seconds = Number(value);
+  return Number.isFinite(seconds) ? Math.round(seconds * 10) / 10 : 0;
+}
+
+/** 锁版本格 15s 节拍；不是 BindingSet，不能当 generation-ready。 */
+export function formatPanelBeatLine(
+  panel: PanelBeatFields | null | undefined,
+): string {
+  if (!panel) return "没有宫格可查 15s 节拍";
+  const index = Number(panel.panelIndex);
+  const prefix = Number.isFinite(index) ? `G${index} ` : "";
+  const start = normalizeBeatSeconds(panel.startSeconds);
+  const end = normalizeBeatSeconds(panel.endSeconds);
+  let duration = normalizeBeatSeconds(panel.durationSeconds);
+  if (duration <= 0 && end > start) duration = normalizeBeatSeconds(end - start);
+  if (duration <= 0) {
+    return "锁版未记 15s 节拍。不是 BindingSet，不能当 generation-ready。";
+  }
+  const gaps: string[] = [];
+  if (duration < UNIT_BEAT_PANEL_MIN_SECONDS) gaps.push("单格不足 1.0s");
+  if (duration > UNIT_BEAT_SECONDS) gaps.push("单格超过 15.0s");
+  const gapText = gaps.length ? `缺口：${gaps.join("、")}。` : "";
+  return `15s 节拍：${prefix}${start}–${end}s（${duration}s）。${gapText}本单元须 ${UNIT_BEAT_PANEL_MIN}–${UNIT_BEAT_PANEL_MAX} 格合计 ${UNIT_BEAT_SECONDS.toFixed(1)}s。不是 BindingSet，不能当 generation-ready。`;
+}
+
+/** 整单元 15s 节拍合计；不是 BindingSet，不能当 generation-ready。 */
+export function formatUnitBeatLine(
+  panels: ReadonlyArray<PanelBeatFields> | null | undefined,
+): string {
+  if (!panels?.length) return "没有宫格可查 15s 节拍";
+  const count = panels.length;
+  const durations = panels.map((panel) => {
+    let duration = normalizeBeatSeconds(panel.durationSeconds);
+    const start = normalizeBeatSeconds(panel.startSeconds);
+    const end = normalizeBeatSeconds(panel.endSeconds);
+    if (duration <= 0 && end > start) duration = normalizeBeatSeconds(end - start);
+    return duration;
+  });
+  const marks = panels.map((panel, offset) => {
+    const index = Number(panel.panelIndex);
+    const prefix = Number.isFinite(index) ? `G${index}` : "G?";
+    return `${prefix} ${durations[offset]}s`;
+  });
+  const rounded = normalizeBeatSeconds(durations.reduce((total, seconds) => total + seconds, 0));
+  const gaps: string[] = [];
+  if (count < UNIT_BEAT_PANEL_MIN || count > UNIT_BEAT_PANEL_MAX) {
+    gaps.push(`格数 ${count}（须 ${UNIT_BEAT_PANEL_MIN}–${UNIT_BEAT_PANEL_MAX}）`);
+  }
+  if (Math.abs(rounded - UNIT_BEAT_SECONDS) > 0.05) {
+    gaps.push(`合计 ${rounded}s（须 ${UNIT_BEAT_SECONDS.toFixed(1)}s）`);
+  }
+  if (gaps.length) {
+    return `15s 节拍缺口：${gaps.join("、")} · ${marks.join(" · ")}。不是 BindingSet，不能当 generation-ready。`;
+  }
+  return `15s 节拍：${count} 格合计 ${rounded.toFixed(1)}s · ${marks.join(" · ")}。不是 BindingSet，不能当 generation-ready。`;
 }
 
 export function listSceneAssetMentions(
@@ -767,6 +840,9 @@ export function applyPackMediaToPanels(
     sceneLighting?: string;
     costumeState?: string;
     shotType?: string;
+    startSeconds?: number;
+    endSeconds?: number;
+    durationSeconds?: number;
     assets?: unknown;
   }>,
   mediaByPanelId: ReadonlyMap<string, PackMediaPick>,
@@ -791,6 +867,15 @@ export function applyPackMediaToPanels(
       sceneLighting: String(panel.sceneLighting || ""),
       costumeState: String(panel.costumeState || ""),
       shotType,
+      startSeconds: normalizeBeatSeconds(panel.startSeconds),
+      endSeconds: normalizeBeatSeconds(panel.endSeconds),
+      durationSeconds: (() => {
+        const duration = normalizeBeatSeconds(panel.durationSeconds);
+        if (duration > 0) return duration;
+        const start = normalizeBeatSeconds(panel.startSeconds);
+        const end = normalizeBeatSeconds(panel.endSeconds);
+        return end > start ? normalizeBeatSeconds(end - start) : 0;
+      })(),
       assetMentions: summarizePanelAssetMentions(panel.assets),
       previousHandoff: null,
     };
@@ -879,6 +964,10 @@ export interface ScriptSpanMediaHit {
   costumeState: string;
   shotType?: "original" | "extension";
   shotTypeLine: string;
+  startSeconds?: number;
+  endSeconds?: number;
+  durationSeconds?: number;
+  beatLine: string;
   sceneBackReferenceLine: string;
   sceneBackReferences: SceneBackReference[];
   propBackReferenceLine: string;
@@ -935,6 +1024,10 @@ export function resolveScriptSpanMediaMap(
         costumeState: panel.costumeState,
         shotType: panel.shotType === "extension" || panel.shotType === "original" ? panel.shotType : undefined,
         shotTypeLine: formatPanelShotTypeLine(panel),
+        startSeconds: panel.startSeconds,
+        endSeconds: panel.endSeconds,
+        durationSeconds: panel.durationSeconds,
+        beatLine: formatPanelBeatLine(panel),
         sceneBackReferenceLine: formatSceneBackReferenceLineFromBoard({
           currentUnitId: unit.unitId,
           currentSequence: unit.sequence,

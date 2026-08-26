@@ -5391,7 +5391,7 @@ registrar.registerTool(
   {
     title: "剧本库只读投影（SSL-0/1/2/3/5 计划）",
     description:
-      "剧本库投影只读入口。library-index；episode-unit-media-map；missing-media-report；reader-view（正文+大纲+earliest）；script-media-align（SSL-3 一键图文对照：unit→图 SHA/缺图/trace 钥匙/大纲锚，需 season+episode，可选 documentId）；ssl5-missing-to-gen-plan（SSL-5 缺图→earliest 只读下一步，含焦点宫格场景/道具/角色回指 sceneBackReferenceLine/sceneBackReferences/propBackReferenceLine/propBackReferences/characterBackReferenceLine/characterBackReferences、锁版光线/服化 lightingCostumeLine 与镜头类型/扩写格 shotTypeLine，只扫已加载对照板，不 dispatch）；script-span-media-map（点选 span→相交宫格/图/构图/前镜交接/锁版光线服化/镜头类型/场景回指/道具回指/角色回指，需 season+episode+startOffsetUtf16+endOffsetUtf16）。不写账本；不返回 CAS 路径/媒体二进制。",
+      "剧本库投影只读入口。library-index；episode-unit-media-map；missing-media-report；reader-view（正文+大纲+earliest）；script-media-align（SSL-3 一键图文对照：unit→图 SHA/缺图/trace 钥匙/大纲锚，需 season+episode，可选 documentId）；ssl5-missing-to-gen-plan（SSL-5 缺图→earliest 只读下一步，含焦点宫格场景/道具/角色回指 sceneBackReferenceLine/sceneBackReferences/propBackReferenceLine/propBackReferences/characterBackReferenceLine/characterBackReferences、锁版光线/服化 lightingCostumeLine、镜头类型/扩写格 shotTypeLine 与 15s 节拍 beatLine/unitBeatLine，只扫已加载对照板，不 dispatch）；script-span-media-map（点选 span→相交宫格/图/构图/前镜交接/锁版光线服化/镜头类型/15s 节拍/场景回指/道具回指/角色回指，需 season+episode+startOffsetUtf16+endOffsetUtf16）。不写账本；不返回 CAS 路径/媒体二进制。",
     inputSchema: {
       projectRoot: managedStudioProjectRootSchema,
       operation: z.enum([
@@ -5660,7 +5660,7 @@ registrar.registerTool(
   "get_studio_generation_control",
   {
     title: "读取 Codex 生成一致性控制封装",
-    description: "单一只读入口提供 session-snapshot、panel/unit-grid 的 readiness、pack、history、plan、call、active-runs、detached-unknown。session-snapshot 汇总当前宫格的剧本片段、BindingSet、参考角色、上一镜实际尾态、冻结提示词前镜交接（previousStanding，只从该包 renderedPrompt 还原、不读 head）、冻结宫格光线/服装覆盖（frozenPanelLighting / frozenPanelCostume，无该行则为 null）、冻结镜头类型只读句（shotTypeLine，只从该包 renderedPrompt 或 pack.panel.shotType 还原、不读 head，无扩写/原镜则为 null）、跨单元场景/道具/角色回指（sceneMentions / sceneBackReferences / sceneBackReferenceNote / propMentions / propBackReferences / propBackReferenceNote / characterMentions / characterBackReferences / characterBackReferenceNote，只读生产库快照提及、不读 head、不是 BindingSet；无提及或无更早则空数组，缺库失败关闭为空且不建库）、机位与最高风险，不返回本地路径；就绪、历史与未知态同样不返回本地路径，仅 pack 返回已重验逐格闭包、受管 media CAS 边界和文件 SHA-256 的 controlReferences.localPath。call 读取不会重新授权模型调用；active-runs 返回指定单元/宫格所有 run 的完整状态投影与恢复动作；detached-unknown 只投影防重证据，不导入候选。",
+    description: "单一只读入口提供 session-snapshot、panel/unit-grid 的 readiness、pack、history、plan、call、active-runs、detached-unknown。session-snapshot 汇总当前宫格的剧本片段、BindingSet、参考角色、上一镜实际尾态、冻结提示词前镜交接（previousStanding，只从该包 renderedPrompt 还原、不读 head）、冻结宫格光线/服装覆盖（frozenPanelLighting / frozenPanelCostume，无该行则为 null）、冻结镜头类型只读句（shotTypeLine，只从该包 renderedPrompt 或 pack.panel.shotType 还原、不读 head，无扩写/原镜则为 null）、冻结 15s 节拍只读句（beatLine，只从该包 target.unitLocalStartSeconds/unitLocalEndSeconds/durationSeconds 还原、不读 head，无时长则为 null）、跨单元场景/道具/角色回指（sceneMentions / sceneBackReferences / sceneBackReferenceNote / propMentions / propBackReferences / propBackReferenceNote / characterMentions / characterBackReferences / characterBackReferenceNote，只读生产库快照提及、不读 head、不是 BindingSet；无提及或无更早则空数组，缺库失败关闭为空且不建库）、机位与最高风险，不返回本地路径；就绪、历史与未知态同样不返回本地路径，仅 pack 返回已重验逐格闭包、受管 media CAS 边界和文件 SHA-256 的 controlReferences.localPath。call 读取不会重新授权模型调用；active-runs 返回指定单元/宫格所有 run 的完整状态投影与恢复动作；detached-unknown 只投影防重证据，不导入候选。",
     inputSchema: {
       projectRoot: managedStudioProjectRootSchema,
       query: studioGenerationControlQuerySchema,

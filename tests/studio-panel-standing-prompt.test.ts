@@ -27,10 +27,14 @@ import {
   formatFrozenPanelCostumeReadonlyLine,
   formatUnitLockPanelLightingLine,
   formatUnitLockPanelCostumeLine,
+  formatUnitLockPanelBeatLine,
   formatUnitLockPanelShotTypeLine,
+  formatFrozenPanelBeatReadonlyLine,
   formatFrozenPanelShotTypeReadonlyLine,
   parseFrozenPanelShotTypeFromRenderedPrompt,
+  frozenPanelBeatFromAnyFrozenPack,
   frozenPanelShotTypeFromAnyFrozenPack,
+  UNIT_BEAT_TOOL_NOTE,
   frozenPanelOverlaysFromFrozenPanelPacks,
   FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
   EXTENSION_SHOT_TYPE_TOOL_NOTE,
@@ -174,6 +178,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(emptyContinuity).not.toContain("角色回指");
     expect(emptyContinuity).not.toContain("扩写格：必须与前一格连续");
     expect(emptyContinuity).not.toContain("禁止锚定原文");
+    expect(emptyContinuity).not.toContain("本单元须 2–6 格合计 15.0s");
+    expect(emptyContinuity).toContain("0-5s");
     expect(formatWizardLightingPromptLine("")).toBeNull();
     expect(formatWizardCostumePromptLine("  ")).toBeNull();
     expect(formatWizardLightingPromptLine("室内火光")).toBe("光线：室内火光");
@@ -261,6 +267,53 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(formatUnitLockPanelShotTypeLine({ panelIndex: 2, shotType: "" })).toBeNull();
     expect(EXTENSION_SHOT_TYPE_TOOL_NOTE).toContain("扩写格");
     expect(EXTENSION_SHOT_TYPE_TOOL_NOTE).toContain("禁止锚定原文");
+    expect(frozenPanelBeatFromAnyFrozenPack({
+      target: { panelIndex: 2, unitLocalStartSeconds: 7.5, unitLocalEndSeconds: 15, durationSeconds: 7.5 },
+    })).toEqual({
+      panelIndex: 2,
+      startSeconds: 7.5,
+      endSeconds: 15,
+      durationSeconds: 7.5,
+    });
+    expect(frozenPanelBeatFromAnyFrozenPack({
+      schemaVersion: 5,
+      panels: [{
+        panelId: "p2",
+        panelPack: {
+          target: { panelIndex: 2, unitLocalStartSeconds: 7.5, unitLocalEndSeconds: 15, durationSeconds: 7.5 },
+        },
+      }],
+    })).toBeNull();
+    expect(frozenPanelBeatFromAnyFrozenPack({
+      schemaVersion: 5,
+      panels: [{
+        panelId: "p2",
+        panelPack: {
+          target: { panelIndex: 2, unitLocalStartSeconds: 7.5, unitLocalEndSeconds: 15, durationSeconds: 7.5 },
+        },
+      }],
+    }, "p2")).toEqual({
+      panelIndex: 2,
+      startSeconds: 7.5,
+      endSeconds: 15,
+      durationSeconds: 7.5,
+    });
+    expect(formatFrozenPanelBeatReadonlyLine({
+      panelIndex: 2,
+      startSeconds: 7.5,
+      endSeconds: 15,
+      durationSeconds: 7.5,
+    })).toContain("冻结 15s 节拍：G2 7.5–15s（7.5s）");
+    expect(formatFrozenPanelBeatReadonlyLine(null)).toBeNull();
+    expect(formatUnitLockPanelBeatLine({
+      panelIndex: 2,
+      startSeconds: 7.5,
+      endSeconds: 15,
+      durationSeconds: 7.5,
+    })).toContain("锁版 15s 节拍：G2 7.5–15s（7.5s）");
+    expect(formatUnitLockPanelBeatLine({ panelIndex: 2 })).toBeNull();
+    expect(UNIT_BEAT_TOOL_NOTE).toContain("15s 节拍");
+    expect(UNIT_BEAT_TOOL_NOTE).toContain("2–6 格合计 15.0s");
   });
 
   it("session-snapshot / 生成控制 / 审片从冻结提示词露前镜，不读 head", () => {
@@ -272,6 +325,9 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(snapshot).toContain("frozenPanelCostume");
     expect(snapshot).toContain("shotTypeLine");
     expect(snapshot).toContain("parseFrozenPanelShotTypeFromRenderedPrompt");
+    expect(snapshot).toContain("beatLine");
+    expect(snapshot).toContain("frozenPanelBeatFromAnyFrozenPack(frozenPanel)");
+    expect(snapshot).toContain("formatFrozenPanelBeatReadonlyLine");
     expect(snapshot).toContain("readStudioSceneBackReferences");
     expect(snapshot).toContain("sceneBackReferences");
     expect(snapshot).toContain('source: "frozen-rendered-prompt"');
@@ -283,6 +339,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(mcp).toContain("frozenPanelLighting");
     expect(mcp).toContain("frozenPanelCostume");
     expect(mcp).toContain("shotTypeLine");
+    expect(mcp).toContain("beatLine");
+    expect(mcp).toContain("15s 节拍");
     expect(mcp).toContain("sceneBackReferences");
     expect(mcp).toContain("只从该包 renderedPrompt 还原");
     const control = readFileSync(path.join(repoRoot, "src/renderer/src/components/StudioGenerationControlView.vue"), "utf8");
@@ -297,8 +355,12 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(control).toContain('data-testid="studio-control-prop-backrefs"');
     expect(control).toContain('data-testid="studio-control-character-backrefs"');
     expect(control).toContain('data-testid="studio-control-shot-type"');
+    expect(control).toContain('data-testid="studio-control-beat"');
     expect(control).toContain("frozenPanelShotTypeFromAnyFrozenPack(pack, selectedPanelId.value)");
+    expect(control).toContain("frozenPanelBeatFromAnyFrozenPack(pack, selectedPanelId.value)");
     expect(control).toContain("formatUnitLockPanelShotTypeLine");
+    expect(control).toContain("formatUnitLockPanelBeatLine");
+    expect(control).toContain("panel.startSeconds");
     expect(control).toContain("formatUnitLockPanelLightingLine");
     expect(control).not.toContain("studio-scene-backrefs-read");
     expect(control).not.toContain("evaluateStudioConsistency");
@@ -307,7 +369,9 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(review).toContain('data-testid="studio-review-previous-standing"');
     expect(review).toContain('data-testid="studio-review-lighting-costume"');
     expect(review).toContain('data-testid="studio-review-shot-type"');
+    expect(review).toContain('data-testid="studio-review-beat"');
     expect(review).toContain("frozenPanelShotTypeFromAnyFrozenPack(pack, reviewStandingPanelId.value)");
+    expect(review).toContain("frozenPanelBeatFromAnyFrozenPack(pack, reviewStandingPanelId.value)");
     expect(review).not.toContain("getStudioUnitLockOverlays");
     expect(review).toContain("previousStandingFromAnyFrozenPack(pack, reviewStandingPanelId.value)");
     expect(review).toContain("frozenPanelLightingFromAnyFrozenPack(pack, reviewStandingPanelId.value)");
@@ -323,6 +387,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(wizard).not.toContain("道具回指");
     expect(wizard).not.toContain("角色回指");
     expect(wizard).not.toContain("扩写格：必须与前一格连续");
+    expect(wizard).not.toContain("本单元须 2–6 格合计 15.0s");
     const app = readFileSync(path.join(repoRoot, "src/renderer/src/App.vue"), "utf8");
     expect(app).toContain("formatWizardPromptBody(input.panels)");
     expect(app).not.toContain("evaluateStudioConsistency(");
@@ -341,7 +406,9 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(wizardView).toContain('data-testid="storyboard-wizard-prop-backrefs"');
     expect(wizardView).toContain('data-testid="storyboard-wizard-character-backrefs"');
     expect(wizardView).toContain('data-testid="storyboard-wizard-shot-type"');
+    expect(wizardView).toContain('data-testid="storyboard-wizard-beat"');
     expect(wizardView).toContain("formatPanelShotTypeLine");
+    expect(wizardView).toContain("formatPanelBeatLine");
     const brief = readFileSync(path.join(repoRoot, "src/core/codex.ts"), "utf8");
     expect(brief).toContain("previousStandings");
     expect(brief).toContain("previousStandingFromFrozenRenderedPrompt(panel.panelPack)");
@@ -352,6 +419,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(brief).toContain("PROP_BACK_REFERENCE_TOOL_NOTE");
     expect(brief).toContain("CHARACTER_BACK_REFERENCE_TOOL_NOTE");
     expect(brief).toContain("EXTENSION_SHOT_TYPE_TOOL_NOTE");
+    expect(brief).toContain("UNIT_BEAT_TOOL_NOTE");
     expect(brief).toContain("frozenPanelLightingFromAnyFrozenPack(panel.panelPack)");
     const canvas = readFileSync(path.join(repoRoot, "src/renderer/src/components/ManagedStudioCanvasView.vue"), "utf8");
     expect(canvas).toContain("previousStandingFromAnyFrozenPack(pack, panel.id)");
@@ -360,7 +428,10 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(canvas).toContain("formatUnitLockPreviousStandingLine");
     expect(canvas).toContain("formatUnitLockPanelLightingLine");
     expect(canvas).toContain("formatUnitLockPanelShotTypeLine");
+    expect(canvas).toContain("formatUnitLockPanelBeatLine");
     expect(canvas).toContain("frozenPanelShotTypeFromAnyFrozenPack(pack, panel.id)");
+    expect(canvas).toContain("frozenPanelBeatFromAnyFrozenPack(pack, panel.id)");
+    expect(canvas).toContain("panel.startSeconds");
     expect(canvas).toContain("getStudioUnitLockOverlays");
     expect(canvas).toContain("getStudioSceneBackReferences");
     expect(canvas).not.toContain("getStudioProductionUnitSnapshot");
