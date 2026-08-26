@@ -1,0 +1,41 @@
+{
+  "id": "goal-unit-grid-plan-draft-20260826",
+  "kind": "unit-grid-generation-control-pack-plan-readonly-draft",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T21:16:00.000Z",
+  "scope": "composeStudioGenerationPlanDraft accepts targetKind=unit-grid and emits { targetKind: unit-grid, unitId } when a persisted pack id is present. StudioGenerationControlView uses history[0].packId or a matching unit-grid plan node packId; it never uses unitGridReadinessPackId or selectedPackId (which falls back to the readiness candidate). get_studio_generation_control pack attaches agentExecution.generationPlanDraft from the already-persisted pack.id. Session-snapshot and SSL-5 stay panel-only. Does not execute create_studio_generation_plan or dispatch. SSL5_PLAN_SCHEMA_VERSION and session-snapshot schemaVersion stay 1.",
+  "invariants": {
+    "sessionSnapshotSchemaVersionUnchanged": 1,
+    "ssl5PlanSchemaVersionUnchanged": 1,
+    "doesNotExecuteCreatePlan": true,
+    "doesNotDispatch": true,
+    "doesNotUseReadinessCandidatePack": true,
+    "doesNotPromoteSsl5PreviewPackToUnitGrid": true,
+    "unitGridNodeOmitsPanelId": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts"
+      ],
+      "result": "6 files / 47 tests PASS"
+    },
+    "commit": "4a6167b"
+  },
+  "notClaimed": [
+    "SSL-5 one-click generation closed",
+    "create_studio_generation_plan executed",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
