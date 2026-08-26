@@ -354,6 +354,9 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(snapshot).toContain("beatLine");
     expect(snapshot).toContain("frozenPanelBeatFromAnyFrozenPack(frozenPanel)");
     expect(snapshot).toContain("formatFrozenPanelBeatReadonlyLine");
+    expect(snapshot).toContain("generationPlanDraft");
+    expect(snapshot).toContain("composeStudioGenerationPlanDraft");
+    expect(snapshot).not.toContain("studio-ssl5-missing-to-gen");
     expect(snapshot).toContain("readStudioSceneBackReferences");
     expect(snapshot).toContain("sceneBackReferences");
     expect(snapshot).toContain('source: "frozen-rendered-prompt"');
@@ -366,6 +369,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(mcp).toContain("frozenPanelCostume");
     expect(mcp).toContain("shotTypeLine");
     expect(mcp).toContain("beatLine");
+    expect(mcp).toContain("generationPlanDraft");
     expect(mcp).toContain("15s 节拍");
     expect(mcp).toContain("sceneBackReferences");
     expect(mcp).toContain("只从该包 renderedPrompt 还原");
@@ -386,6 +390,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(control).toContain("frozenPanelBeatFromAnyFrozenPack(pack, selectedPanelId.value)");
     expect(control).toContain("formatUnitLockPanelShotTypeLine");
     expect(control).toContain("formatUnitLockPanelBeatLine");
+    expect(control).toContain('data-testid="studio-generation-plan-draft"');
+    expect(control).toContain("composeStudioGenerationPlanDraft");
     expect(control).toContain("panel.startSeconds");
     expect(control).toContain("formatUnitLockPanelLightingLine");
     expect(control).not.toContain("studio-scene-backrefs-read");

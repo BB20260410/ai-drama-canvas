@@ -120,7 +120,7 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.generationPlanDraft.ready).toBe(false);
     expect(plan.generationPlanDraft.dispatch).toBe(false);
     expect(plan.generationPlanDraft.command).toBe(SSL5_GENERATION_PLAN_COMMAND);
-    expect(plan.generationPlanDraft.blockedReason).toBe("焦点单元没有缺图宫格，禁止猜第一格");
+    expect(plan.generationPlanDraft.blockedReason).toBe("没有目标宫格，禁止猜第一格");
     expect(plan.generationPlanDraft.nodes).toBeNull();
   });
 
@@ -199,12 +199,12 @@ describe("SSL-5 缺图下一步纯函数", () => {
       focusUnitId: null,
       focusPanelId: "p1",
       focusPackId: "pack-1",
-    }).blockedReason).toBe("没有缺图焦点，不能建立计划");
+    }).blockedReason).toBe("没有目标单元，不能建立计划");
     expect(composeSsl5GenerationPlanDraft({
       focusUnitId: "u1",
       focusPanelId: null,
       focusPackId: "pack-1",
-    }).blockedReason).toBe("焦点单元没有缺图宫格，禁止猜第一格");
+    }).blockedReason).toBe("没有目标宫格，禁止猜第一格");
   });
 
   it("无 earliest 时焦点落在第一条 missing-all", () => {
@@ -400,7 +400,7 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.focusUnitId).toBeNull();
     expect(plan.focusPackId).toBeNull();
     expect(plan.generationPlanDraft.ready).toBe(false);
-    expect(plan.generationPlanDraft.blockedReason).toBe("没有缺图焦点，不能建立计划");
+    expect(plan.generationPlanDraft.blockedReason).toBe("没有目标单元，不能建立计划");
     expect(plan.items).toEqual([]);
     expect(plan.lightingCostumeLine).toBe("没有宫格可查光线/服化");
     expect(plan.previousLightingLine).toBeNull();
@@ -430,6 +430,7 @@ describe("SSL-5 入口源码合同", () => {
     expect(ssl5).not.toContain("dispatch_studio_generation_pack");
     expect(ssl5).toContain("create-plan");
     expect(ssl5).toContain("composeSsl5GenerationPlanDraft");
+    expect(ssl5).toContain("studio-generation-plan-draft");
     expect(ssl5).toContain("focusPackId");
     expect(ssl5).toContain("SSL5_PLAN_SCHEMA_VERSION = 1");
   });

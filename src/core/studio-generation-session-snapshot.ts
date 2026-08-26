@@ -19,6 +19,10 @@ import {
 } from "./studio-panel-standing.js";
 import { readStudioSceneBackReferences } from "./studio-scene-backrefs-read.js";
 import type { CharacterBackReference, PropBackReference, SceneBackReference } from "./studio-scene-backrefs.js";
+import {
+  composeStudioGenerationPlanDraft,
+  type StudioGenerationPlanDraft,
+} from "./studio-generation-plan-draft.js";
 import type { StudioDashboardCurrentness, StudioDashboardNextAction } from "./studio-production-dashboard.js";
 import type { NextShotContinuitySnapshot } from "./studio-next-shot-continuity.js";
 import type { StudioPostResultObservedActualState } from "./studio-post-result-observation.js";
@@ -126,6 +130,12 @@ export interface StudioGenerationSessionSnapshot {
    * 无时长则为 null，不进 fingerprint。不是 BindingSet。
    */
   beatLine: string | null;
+  /**
+   * P21 create-plan 只读草稿：只认 query.panelId 自己的已落盘单镜冻结包。
+   * 无 panelId 禁止猜第一格；未冻结 / 整板包 / 未落盘则为 blocked。不进 fingerprint。
+   * 不执行、不派发。
+   */
+  generationPlanDraft: StudioGenerationPlanDraft;
   camera: {
     current?: {
       shotComposition: string;
@@ -161,6 +171,23 @@ function stable(value: unknown): unknown {
 
 function digest(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(stable(value)), "utf8").digest("hex");
+}
+
+/** 只认 query.panelId 自己的已落盘单镜包；整板包 / 未落盘 / 无 panelId 失败关闭。 */
+async function persistedPanelPackIdForDraft(
+  projectRoot: string,
+  panelId: string | undefined,
+  readiness: { status: string; pack?: AnyStudioGenerationFreezePack | null },
+): Promise<string | null> {
+  if (!panelId || readiness.status !== "ready" || !readiness.pack) return null;
+  const pack = readiness.pack;
+  if (pack.provenance !== "asset-binding-set" || pack.target.panelId !== panelId) return null;
+  try {
+    const persisted = await readAnyStudioGenerationFrozenPack(projectRoot, pack.id);
+    return persisted?.id === pack.id ? pack.id : null;
+  } catch {
+    return null;
+  }
 }
 
 function panelPack(
@@ -399,6 +426,11 @@ export async function buildStudioGenerationSessionSnapshot(
       return formatFrozenPanelShotTypeReadonlyLine(fromPrompt ?? fromPanel);
     })(),
     beatLine: formatFrozenPanelBeatReadonlyLine(frozenPanelBeatFromAnyFrozenPack(frozenPanel)),
+    generationPlanDraft: composeStudioGenerationPlanDraft({
+      focusUnitId: query.unitId,
+      focusPanelId: query.panelId ?? null,
+      focusPackId: await persistedPanelPackIdForDraft(projectRoot, query.panelId, readiness),
+    }),
     camera: {
       current: frozenPanel
         ? {

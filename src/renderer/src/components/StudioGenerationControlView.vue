@@ -169,6 +169,17 @@
               {{ controlBeatLine }}
             </p>
             <p
+              class="previous-standing"
+              data-testid="studio-generation-plan-draft">
+              {{ generationPlanDraft.ready ? "可建立计划（不派发）" : generationPlanDraft.blockedReason }}
+            </p>
+            <p
+              v-if="generationPlanDraft.ready && generationPlanDraft.nodes?.[0]"
+              class="previous-standing"
+              data-testid="studio-generation-plan-nodes">
+              {{ generationPlanDraft.nodes[0].unitId }} {{ generationPlanDraft.nodes[0].panelId }}
+            </p>
+            <p
               v-if="controlSceneBackReferenceNote"
               class="previous-standing"
               data-testid="studio-control-scene-backrefs">
@@ -330,6 +341,7 @@ import {
   type StudioPanelStandingHandoff,
 } from "@core/studio-panel-standing";
 import { formatCharacterBackReferences, formatPropBackReferences, formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
+import { composeStudioGenerationPlanDraft } from "@core/studio-generation-plan-draft";
 
 const props = defineProps<{
   projectRoot: string;
@@ -561,6 +573,21 @@ const selectedPackId = computed(() => {
   }
   const generation = detail.value?.selectedPanel?.generation;
   return generation?.status === "ready" ? generation.packId : "";
+});
+
+/** 只认当前宫格自己的单镜冻结包；整板 history pack 不当单镜节点。不执行、不派发。 */
+const generationPlanDraft = computed(() => {
+  const generation = detail.value?.selectedPanel?.generation;
+  const panelPackId = historyTargetKind.value === "unit-grid"
+    ? null
+    : generation?.status === "ready" && generation.packId
+      ? generation.packId
+      : null;
+  return composeStudioGenerationPlanDraft({
+    focusUnitId: selectedUnitId.value || null,
+    focusPanelId: selectedPanelId.value || null,
+    focusPackId: panelPackId,
+  });
 });
 
 // P24 R5-F2：watch 源含 projectRoot——复制工程同 packId 切换时也重新加载身份。
