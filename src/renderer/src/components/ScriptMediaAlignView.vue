@@ -11,10 +11,9 @@ import {
   pickFirstMissingPanel,
   type ScriptLibraryIndex,
   type ScriptSpanMediaMap,
-  type UnitPanelMediaEntry,
 } from "@core/studio-script-library-projection";
 import type { ScriptReaderView } from "@core/studio-script-library-reader";
-import type { AlignConsistencyPeek, ScriptMediaAlignBoard, ScriptMediaAlignRow } from "@core/studio-script-media-align";
+import type { AlignConsistencyPeek, AlignPanelRow, ScriptMediaAlignBoard, ScriptMediaAlignRow } from "@core/studio-script-media-align";
 import type {
   StudioStoryboardWizardSession,
   WizardEditablePanel,
@@ -62,7 +61,7 @@ const wizardSequence = ref(1);
 const wizardUnitTitle = ref("新建 15 秒分镜单元");
 const materialized = ref<Awaited<ReturnType<StudioScriptProductUiApi["materializeStoryboardWizard"]>> | null>(null);
 const selectedAlignRow = ref<ScriptMediaAlignRow | null>(null);
-const selectedAlignPanel = ref<UnitPanelMediaEntry | null>(null);
+const selectedAlignPanel = ref<AlignPanelRow | null>(null);
 const selectedMediaPreview = ref<{ mediaUrl: string; thumbnailUrl?: string; kind: string } | null>(null);
 const alignShowOriginal = ref(false);
 const alignPreviewSrc = computed(() => listOrWorkbenchPreviewUrl({
@@ -270,11 +269,17 @@ const selectionExcerpt = computed(() => {
   return reader.value.body.slice(selectionStart.value, selectionEnd.value);
 });
 
+const selectedLibraryItem = computed(() =>
+  library.value?.items.find((item) => item.documentId === (reader.value?.documentId || selectedDocumentId.value)) ?? null,
+);
+
 const readerDiagnostics = computed(() => ({
   chars: reader.value?.bodyCharCount ?? 0,
   outline: reader.value?.outline.length ?? 0,
   episodeUnits: reader.value?.episode?.unitHighlights.length ?? 0,
   selectionChars: selectionExcerpt.value.length,
+  linkedUnits: selectedLibraryItem.value?.linkedUnitCount ?? 0,
+  coveredUnits: selectedLibraryItem.value?.coveredMediaCount ?? 0,
 }));
 
 const visibleLibraryItems = computed(() => {
@@ -449,7 +454,7 @@ async function selectAlignRow(row: ScriptMediaAlignRow): Promise<void> {
   await loadAlignPreview(selectedAlignPanel.value?.rawSha256 ?? row.rawSha256);
 }
 
-async function selectAlignPanel(panel: UnitPanelMediaEntry): Promise<void> {
+async function selectAlignPanel(panel: AlignPanelRow): Promise<void> {
   selectedAlignPanel.value = panel;
   await loadAlignPreview(panel.rawSha256);
 }
@@ -543,6 +548,8 @@ function shortSha(value: string | null | undefined): string {
           <div><dt>正文字符</dt><dd>{{ readerDiagnostics.chars }}</dd></div>
           <div><dt>大纲节点</dt><dd>{{ readerDiagnostics.outline }}</dd></div>
           <div><dt>本集单元</dt><dd>{{ readerDiagnostics.episodeUnits }}</dd></div>
+          <div><dt>关联单元</dt><dd>{{ readerDiagnostics.linkedUnits }}</dd></div>
+          <div><dt>有图单元</dt><dd data-testid="script-library-covered-media">{{ readerDiagnostics.coveredUnits }}</dd></div>
         </dl>
         <div class="qc-card">
           <b>提示词 / QC 诊断</b>
@@ -695,6 +702,7 @@ function shortSha(value: string | null | undefined): string {
           <span class="eyebrow">DIRECT MEDIA</span>
           <h3>{{ selectedAlignRow.unitId }}</h3>
           <p v-if="selectedAlignPanel">G{{ selectedAlignPanel.panelIndex }} {{ selectedAlignPanel.title || selectedAlignPanel.panelId }}</p>
+          <p data-testid="align-panel-peek">{{ peekLabel(selectedAlignPanel?.consistencyPeek ?? selectedAlignRow.consistencyPeek) }}</p>
           <ul v-if="selectedAlignRow.panels.length" class="align-panels" data-testid="align-panel-list">
             <li v-for="panel in selectedAlignRow.panels" :key="panel.panelId">
               <button

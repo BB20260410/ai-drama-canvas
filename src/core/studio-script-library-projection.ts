@@ -146,7 +146,7 @@ export function applyPackMediaToPanels(
 }
 
 /** 单元行预览：优先第一张已出图的宫格，不把缺图格当成整单元有图。 */
-export function pickFirstCoveredPanel(panels: UnitPanelMediaEntry[]): UnitPanelMediaEntry | undefined {
+export function pickFirstCoveredPanel<T extends UnitPanelMediaEntry>(panels: T[]): T | undefined {
   return panels.find((panel) => panel.hasMedia) ?? panels[0];
 }
 

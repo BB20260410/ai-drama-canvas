@@ -1,0 +1,13 @@
+{
+  "id": "goal-library-covered-media-count-20260826",
+  "createdAt": "2026-08-26T18:10:00.000Z",
+  "kind": "script-library-covered-media-count",
+  "conclusion": "PENDING_TESTS",
+  "scope": "Script library coveredMediaCount counts linked units that have any panel raw/labeled; no longer hardcoded 0",
+  "invariants": {
+    "usesPerPanelPackLookup": true,
+    "doesNotHardcodeZero": true,
+    "libraryCardShowsCount": true
+  },
+  "notClaimed": ["installed T23", "100% fit", "runtime speed closed"]
+}

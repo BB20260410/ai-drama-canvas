@@ -14,7 +14,8 @@
 - [x] 对照表展开宫格行（把 per-panel 真相露到导演面）
 - [x] SSL-5 焦点落到第一张缺图宫格（不 dispatch）
 - [x] 打开对照自动露出 SSL-5 焦点宫格
-- [ ] 剧本库 coveredMediaCount 不再恒为 0
+- [x] 剧本库 coveredMediaCount 不再恒为 0
+- [ ] 对照所选宫格挂只读四态 peek
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825

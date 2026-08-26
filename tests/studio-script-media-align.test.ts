@@ -89,6 +89,29 @@ describe("studio-script-media-align", () => {
     expect(rows[0]?.consistencyPeek).toEqual({ status: "cached", verdict: "needs-review" });
     expect(rows[1]?.consistencyPeek).toEqual({ status: "unevaluated" });
     expect(rows[2]?.consistencyPeek).toEqual({ status: "unevaluated" });
+    const withPanels = attachAlignRowConsistencyPeeks(
+      [alignRow({
+        unitId: "U4",
+        sequence: 4,
+        generationRunId: "run-unit",
+        panels: [{
+          panelIndex: 2,
+          panelId: "p2",
+          title: "g2",
+          sourceSpans: [],
+          packId: null,
+          packFingerprint: null,
+          rawSha256: "raw2",
+          labeledSha256: null,
+          generationRunId: "run-panel",
+          hasMedia: true,
+          consistencyPeek: { status: "unevaluated" },
+        }],
+      })],
+      new Map([["run-panel", "drifted"], ["run-unit", "consistent"]]),
+    );
+    expect(withPanels[0]?.consistencyPeek).toEqual({ status: "cached", verdict: "consistent" });
+    expect(withPanels[0]?.panels[0]?.consistencyPeek).toEqual({ status: "cached", verdict: "drifted" });
   });
 
   it("runId peek 不跑像素，瞬态结果不编入", () => {
@@ -133,5 +156,7 @@ describe("对照行四态 peek 源码合同", () => {
     expect(vue).toContain("peekLabel");
     expect(align).toContain("panels: u.panels");
     expect(vue).toContain("align-panel-list");
+    expect(vue).toContain("align-panel-peek");
+    expect(align).toContain("row.panels.map((panel) => panel.generationRunId)");
   });
 });

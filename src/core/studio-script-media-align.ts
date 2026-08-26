@@ -44,13 +44,15 @@ export interface ScriptMediaAlignRow {
   /** 只读缓存 peek。未评估 ≠ 无法检查。机器不自动 Review PASS。 */
   consistencyPeek: AlignConsistencyPeek;
   /** 宫格级媒体真相；unit-grid 不摊派。 */
-  panels: UnitPanelMediaEntry[];
+  panels: AlignPanelRow[];
 }
 
 export interface AlignConsistencyPeek {
   status: "cached" | "unevaluated";
   verdict?: ConsistencyVerdict;
 }
+
+export type AlignPanelRow = UnitPanelMediaEntry & { consistencyPeek: AlignConsistencyPeek };
 
 export interface ScriptMediaAlignBoard {
   schemaVersion: typeof SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION;
@@ -103,12 +105,24 @@ export function attachAlignRowConsistencyPeeks(
       consistencyPeek: verdict
         ? { status: "cached", verdict }
         : { status: "unevaluated" },
+      panels: row.panels.map((panel) => {
+        const panelVerdict = panel.generationRunId ? verdictByRunId.get(panel.generationRunId) : undefined;
+        return {
+          ...panel,
+          consistencyPeek: panelVerdict
+            ? { status: "cached" as const, verdict: panelVerdict }
+            : { status: "unevaluated" as const },
+        };
+      }),
     };
   });
 }
 
 async function loadAlignConsistencyPeeks(rows: ScriptMediaAlignRow[]): Promise<Map<string, ConsistencyVerdict>> {
-  const runIds = [...new Set(rows.map((row) => row.generationRunId).filter((id): id is string => Boolean(id)))];
+  const runIds = [...new Set(
+    rows.flatMap((row) => [row.generationRunId, ...row.panels.map((panel) => panel.generationRunId)])
+      .filter((id): id is string => Boolean(id)),
+  )];
   if (runIds.length === 0) return new Map();
   const { peekStudioConsistencyVerdictByRunId } = await import("./studio-consistency-evaluator.js");
   const out = new Map<string, ConsistencyVerdict>();
@@ -205,7 +219,7 @@ export async function getStudioScriptMediaAlignBoard(
       sourceSpans: spans,
       outlineAnchors: matchOutlineAnchorsForUnit(u.unitId, outline),
       consistencyPeek: { status: "unevaluated" },
-      panels: u.panels,
+      panels: u.panels.map((panel) => ({ ...panel, consistencyPeek: { status: "unevaluated" as const } })),
     };
   });
 

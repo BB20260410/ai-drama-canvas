@@ -20,6 +20,7 @@ function panel(partial: Partial<ScriptMediaAlignRow["panels"][number]> & Pick<Sc
     rawSha256: partial.hasMedia ? "raw" : null,
     labeledSha256: null,
     generationRunId: null,
+    consistencyPeek: { status: "unevaluated" },
     ...partial,
   };
 }
