@@ -1,0 +1,48 @@
+{
+  "id": "goal-wizard-post-materialize-create-plan-next-20260826",
+  "kind": "wizard-post-materialize-create-plan-next",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T22:47:00.000Z",
+  "scope": "SSL-4 storyboard wizard post-materialize next now includes create-plan. Session nextSteps uses WIZARD_POST_MATERIALIZE_NEXT: Binding→readiness→freeze→create-plan→dispatch. Align wizard UI validation and materialized result show the same chain. Does not skip Binding, does not auto dispatch, does not change formatWizardPromptBody / freeze fingerprint. schemaVersion remains 1. Wizard does not value-import plan-draft or ssl5.",
+  "invariants": {
+    "schemaVersionStill1": true,
+    "doesNotSkipBinding": true,
+    "doesNotAutoDispatch": true,
+    "formatWizardPromptBodyUnchanged": true,
+    "doesNotExecuteCreatePlan": true,
+    "doesNotChangeT5": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts"
+      ],
+      "result": "10 files / 163 tests PASS"
+    },
+    "wizardSourceContract": "tests/studio-storyboard-wizard.test.ts 物化后下一步含 create-plan PASS; createManagedProject span test still Darwin dirfd on Linux",
+    "commit": "c501cc3"
+  },
+  "notClaimed": [
+    "wizard auto Binding",
+    "wizard auto freeze",
+    "create_studio_generation_plan executed",
+    "dispatch executed",
+    "formatWizardPromptBody rewritten",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
