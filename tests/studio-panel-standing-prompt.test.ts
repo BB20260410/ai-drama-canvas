@@ -158,6 +158,10 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(canvas).toContain("previousStandingFromAnyFrozenPack(pack, panel.id)");
     expect(canvas).toContain("formatUnitLockPreviousStandingLine");
     expect(canvas).toContain("frozen-rendered-prompt");
+    expect(canvas).toContain("getStudioTrace");
+    expect(canvas).toContain("resolveStudioTraceSelector");
+    expect(canvas).toContain("禁止猜第一格");
+    expect(canvas).not.toContain('action.kind === "open-trace" || action.kind === "open-consistency"');
     expect(canvas).not.toContain("evaluateStudioConsistency(");
     expect(canvas).not.toContain("getStudioBindingControl");
     const trace = readFileSync(path.join(repoRoot, "src/core/studio-trace.ts"), "utf8");

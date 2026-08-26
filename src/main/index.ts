@@ -249,7 +249,7 @@ import {
   inspectAgentConnections,
 } from "../core/agent-connection-config.js";
 import { getStudioBindingControl, listStudioBindingUnits } from "../core/studio-binding-control.js";
-import { evaluateStudioGenerationPackCurrentness } from "../core/studio-trace.js";
+import { evaluateStudioGenerationPackCurrentness, getStudioGenerationTrace } from "../core/studio-trace.js";
 import { getStudioContinuityReviewControl } from "../core/studio-continuity-review-control.js";
 import { getStudioScriptMediaAlignBoard } from "../core/studio-script-media-align.js";
 import { inspectStudioCrossProjectAssetPackage } from "../core/studio-cross-project-asset-reuse.js";
@@ -3259,6 +3259,18 @@ function registerIpc(): void {
     if (!pack) throw new Error(`冻结包不存在：${packId}`);
     // 与 trace 同一 target-aware fail-safe 口径；unit-grid 聚合全部 BindingSet，绝不拿首格冒充整板。
     return evaluateStudioGenerationPackCurrentness(projectRoot, pack);
+  });
+  ipcMain.handle("canvas:get-studio-trace", async (
+    _event,
+    projectRoot: string,
+    selector: { packId?: string; runId?: string; resultId?: string },
+  ) => {
+    await requireManagedStudioProject(projectRoot);
+    const keys = ["packId", "runId", "resultId"].filter((key) => typeof selector?.[key] === "string" && String(selector[key]).trim());
+    if (keys.length !== 1) throw new Error("selector 必须恰好包含 packId/runId/resultId 之一。");
+    if (selector.packId) return getStudioGenerationTrace(projectRoot, { packId: selector.packId });
+    if (selector.runId) return getStudioGenerationTrace(projectRoot, { runId: selector.runId });
+    return getStudioGenerationTrace(projectRoot, { resultId: selector.resultId! });
   });
   ipcMain.handle("canvas:list-studio-text-revisions", async (
     _event,

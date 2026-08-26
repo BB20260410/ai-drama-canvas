@@ -1963,6 +1963,23 @@ describe("受管画布侧栏列表视口剔除", () => {
     expect(view).toContain("else if (directorWasOpen) restoreDirectorToggleFocus()");
   });
 
+  it("导演生成追溯走 getStudioTrace，不猜第一格，不打开审片冒充", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const drawer = source("src/renderer/src/components/StudioGenerationTraceDrawer.vue");
+    expect(view).toContain("function resolveStudioTraceSelector");
+    expect(view).toContain("window.canvasApi.getStudioTrace");
+    expect(view).toContain("禁止猜第一格");
+    expect(view).toContain('action.kind === "open-trace"');
+    expect(view).not.toContain('action.kind === "open-trace" || action.kind === "open-consistency"');
+    expect(view).not.toContain("evaluateStudioConsistency(");
+    expect(view).not.toContain("getStudioBindingControl");
+    expect(drawer).toContain('data-testid="studio-generation-trace-drawer"');
+    expect(drawer).toContain('data-testid="studio-generation-trace-previous-standings"');
+    expect(drawer).toContain("formatPreviousStandingReadonlyLine");
+    expect(drawer).not.toContain("evaluateStudioConsistency");
+    expect(drawer).not.toContain("getStudioBindingControl");
+  });
+
   it("素材库/剧本资源关闭钮可 Tab，关闭后焦回开库钮，不改成 dialog", () => {
     const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
     const close = view.slice(

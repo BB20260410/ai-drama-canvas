@@ -343,6 +343,11 @@ const api = {
     t23IpcPerformanceProbe.invoke("canvas:get-studio-frozen-pack", projectRoot, packId),
   getStudioPackCurrentness: (projectRoot: string, packId: string): Promise<import("../core/studio-trace.js").StudioGenerationPackCurrentness> =>
     t23IpcPerformanceProbe.invoke("canvas:get-studio-pack-currentness", projectRoot, packId),
+  getStudioTrace: (
+    projectRoot: string,
+    selector: { packId?: string; runId?: string; resultId?: string },
+  ): Promise<import("../core/studio-trace.js").StudioGenerationTrace> =>
+    t23IpcPerformanceProbe.invoke("canvas:get-studio-trace", projectRoot, selector),
   listStudioTextRevisions: (projectRoot: string, query: { documentId: string; limit?: number; cursor?: string }): ReturnType<typeof import("../core/studio-production.js").listStudioTextRevisions> => ipcRenderer.invoke("canvas:list-studio-text-revisions", projectRoot, query),
   getStudioProductionDashboard: (projectRoot: string, query: import("../core/studio-production-dashboard.js").StudioProductionDashboardQuery): ReturnType<typeof import("../core/studio-production-dashboard.js").getStudioProductionDashboard> =>
     t23IpcPerformanceProbe.invoke("canvas:get-studio-production-dashboard", projectRoot, query),

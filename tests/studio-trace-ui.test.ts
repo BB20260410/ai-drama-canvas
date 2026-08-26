@@ -62,7 +62,7 @@ describe("P24 追溯 IPC 桌面接线（§4-8）", () => {
       source("src/main/index.ts"),
       source("src/preload/index.ts"),
     ]);
-    for (const channel of ["canvas:get-studio-generation-control", "canvas:get-studio-frozen-pack", "canvas:get-studio-pack-currentness", "canvas:list-studio-text-revisions"]) {
+    for (const channel of ["canvas:get-studio-generation-control", "canvas:get-studio-frozen-pack", "canvas:get-studio-pack-currentness", "canvas:get-studio-trace", "canvas:list-studio-text-revisions"]) {
       expect(main).toContain(`ipcMain.handle("${channel}"`);
       const handlerStart = main.indexOf(`ipcMain.handle("${channel}"`);
       const handler = main.slice(handlerStart, handlerStart + 600);
@@ -72,10 +72,12 @@ describe("P24 追溯 IPC 桌面接线（§4-8）", () => {
     // 只读通道接入 t23IpcPerformanceProbe 计时包装（内部仍是 ipcRenderer.invoke）。
     expect(preload).toContain('invoke("canvas:get-studio-frozen-pack", projectRoot, packId)');
     expect(preload).toContain('invoke("canvas:get-studio-pack-currentness", projectRoot, packId)');
+    expect(preload).toContain('invoke("canvas:get-studio-trace", projectRoot, selector)');
     expect(preload).toContain('invoke("canvas:list-studio-text-revisions", projectRoot, query)');
     expect(preload).toContain('invoke("canvas:get-studio-generation-control", projectRoot, query)');
     expect(main).toContain("getStudioGenerationControlEnvelope(projectRoot, query)");
     expect(main).toContain("readAnyStudioGenerationFrozenPack(projectRoot, packId)");
+    expect(main).toContain("getStudioGenerationTrace(projectRoot, { packId: selector.packId })");
     // pack-currentness 在 main 侧走 target-aware 聚合（内部逐 BindingSet 仍经
     // buildStudioAssetBindingCurrentContext→currentness→classify 纯模块，与 trace 同一映射点；退化资产归 unexpected）。
     expect(main).toContain("evaluateStudioGenerationPackCurrentness(projectRoot, pack)");
@@ -86,5 +88,11 @@ describe("P24 追溯 IPC 桌面接线（§4-8）", () => {
     expect(traceCore).toContain("buildStudioAssetBindingCurrentContext(projectRoot, bindingSetId)");
     expect(traceCore).toContain("getStudioAssetBindingSetCurrentness(projectRoot, bindingSetId, context)");
     expect(traceCore).toContain("classifyStudioStaleReasons(bindingSetStaleReasons)");
+    const drawer = await source("src/renderer/src/components/StudioGenerationTraceDrawer.vue");
+    expect(drawer).toContain('data-testid="studio-generation-trace-drawer"');
+    expect(drawer).toContain("get_studio_trace");
+    expect(drawer).not.toContain("evaluateStudioConsistency");
+    expect(drawer).not.toContain("studio-trace.js");
+    expect(drawer).not.toContain("@core/studio-trace");
   });
 });

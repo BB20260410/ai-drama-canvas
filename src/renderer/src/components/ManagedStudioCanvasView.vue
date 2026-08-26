@@ -763,6 +763,13 @@
         @close="closeDirectorPanel"
         @action="onDirectorAction"
       />
+      <StudioGenerationTraceDrawer
+        :open="generationTraceOpen"
+        :loading="generationTraceLoading"
+        :error="generationTraceError"
+        :trace="generationTrace"
+        @close="closeStudioGenerationTrace"
+      />
     </div>
   </section>
 </template>
@@ -804,6 +811,7 @@ import ManagedStudioCanvasNode from "./ManagedStudioCanvasNode.vue";
 import StudioSpatialGroupNode from "./StudioSpatialGroupNode.vue";
 import CanvasInspectorPanel from "./CanvasInspectorPanel.vue";
 import DirectorActionPanel from "./DirectorActionPanel.vue";
+import StudioGenerationTraceDrawer, { type StudioTraceDrawerModel } from "./StudioGenerationTraceDrawer.vue";
 import {
   formatPreviousStandingReadonlyLine,
   formatUnitLockPreviousStandingLine,
@@ -1204,6 +1212,11 @@ let globalResourceLoadSequence = 0;
 /** Qwen D5：导演动作面板（只读导航） */
 const directorPanelOpen = ref(false);
 const directorHotkeys = createGatedHotkeyRegistry(DEFAULT_DIRECTOR_HOTKEYS);
+const generationTraceOpen = ref(false);
+const generationTraceLoading = ref(false);
+const generationTraceError = ref("");
+const generationTrace = shallowRef<StudioTraceDrawerModel | null>(null);
+let generationTraceLoadSequence = 0;
 /** Qwen D3：侧栏素材虚拟窗口 + 缩略图 LRU */
 const assetsLibraryScrollTop = ref(0);
 const ASSET_ROW_HEIGHT = 56;
@@ -1443,6 +1456,62 @@ function authorityThumbUrl(recipeKey?: string): string | undefined {
   return url;
 }
 
+function resolveStudioTraceSelector(): { packId: string } | { runId: string } | { resultId: string } | null {
+  const canvasPanelId = selectedPanelIds.value[0];
+  if (canvasPanelId) {
+    const pipeline = panelPipeline.value.get(canvasPanelId);
+    if (pipeline?.packId) return { packId: pipeline.packId };
+    if (pipeline?.generationRunId) return { runId: pipeline.generationRunId };
+    if (pipeline?.raw?.resultId) return { resultId: pipeline.raw.resultId };
+    const focused = unitDetail.value?.selectedPanel;
+    if (focused?.panel.id === canvasPanelId && focused.generation.packId) {
+      return { packId: focused.generation.packId };
+    }
+    return null;
+  }
+  const unitId = unitDetail.value?.unit.id;
+  if (unitId) {
+    const grid = unitGridRawPipeline.value.get(unitId);
+    if (grid?.packId) return { packId: grid.packId };
+    if (grid?.generationRunId) return { runId: grid.generationRunId };
+  }
+  const focused = unitDetail.value?.selectedPanel;
+  if (focused?.generation.packId) return { packId: focused.generation.packId };
+  return null;
+}
+
+async function openStudioGenerationTrace(): Promise<void> {
+  directorPanelOpen.value = false;
+  generationTraceOpen.value = true;
+  generationTraceError.value = "";
+  generationTrace.value = null;
+  const selector = resolveStudioTraceSelector();
+  if (!selector) {
+    generationTraceError.value = "需要 pack 或 run。未冻结的宫格不能打开生成追溯，禁止猜第一格。";
+    return;
+  }
+  const sequence = ++generationTraceLoadSequence;
+  generationTraceLoading.value = true;
+  try {
+    const trace = await window.canvasApi.getStudioTrace(props.projectRoot, selector);
+    if (sequence !== generationTraceLoadSequence) return;
+    generationTrace.value = trace;
+  } catch (error) {
+    if (sequence !== generationTraceLoadSequence) return;
+    generationTraceError.value = error instanceof Error ? error.message : String(error);
+  } finally {
+    if (sequence === generationTraceLoadSequence) generationTraceLoading.value = false;
+  }
+}
+
+function closeStudioGenerationTrace(): void {
+  generationTraceLoadSequence += 1;
+  generationTraceOpen.value = false;
+  generationTraceLoading.value = false;
+  generationTrace.value = null;
+  generationTraceError.value = "";
+}
+
 function onDirectorAction(action: DirectorAction): void {
   if (action.kind === "toggle-panel") {
     toggleDirectorPanel();
@@ -1465,8 +1534,12 @@ function onDirectorAction(action: DirectorAction): void {
     directorPanelOpen.value = false;
     return;
   }
-  if (action.kind === "open-trace" || action.kind === "open-consistency") {
-    const panelId = unitDetail.value?.panels[0]?.id;
+  if (action.kind === "open-trace") {
+    void openStudioGenerationTrace();
+    return;
+  }
+  if (action.kind === "open-consistency") {
+    const panelId = selectedPanelIds.value[0] ?? unitDetail.value?.selectedPanelId ?? unitDetail.value?.panels[0]?.id;
     if (panelId) openPanelReview(panelId);
     directorPanelOpen.value = false;
   }
@@ -8477,6 +8550,7 @@ function onCanvasKeydown(event: KeyboardEvent): void {
   const addWasOpen = addMenuOpen.value;
   const viewMenuWasOpen = Boolean(viewMenuEl.value?.hasAttribute("open"));
   const directorWasOpen = directorPanelOpen.value;
+  const traceWasOpen = generationTraceOpen.value;
   const connectWasOpen = connectMode.value;
   connectMode.value = false;
   pendingConnectionSourceId.value = "";
@@ -8484,6 +8558,7 @@ function onCanvasKeydown(event: KeyboardEvent): void {
   addMenuOpen.value = false;
   helpOpen.value = false;
   directorPanelOpen.value = false;
+  if (traceWasOpen) closeStudioGenerationTrace();
   closeViewMenu({ restore: false });
   resetClearConfirmation();
   stripPendingOutline(escapePendingId);
