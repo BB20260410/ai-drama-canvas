@@ -18,6 +18,7 @@ import {
   getStudioTextRevision,
   type StudioProductionPanelInput,
 } from "./studio-production.js";
+import { formatWizardPromptBody } from "./studio-panel-standing.js";
 
 export const STORYBOARD_WIZARD_SCHEMA_VERSION = 1 as const;
 
@@ -161,6 +162,7 @@ export async function openStudioStoryboardWizard(
     panels: toWizardEditablePanels(suggestion.panels),
     nextSteps: [
       "Agent/人工填写每格 visualAction/景别/运镜（applyWizardPanelEdits）",
+      "G2+ 必须从上一格站位连续起拍（向导前镜，不是 BindingSet，不能当 generation-ready）",
       "validateWizardForMaterialize 无错误后 materializeStudioStoryboardWizardUnit",
       "物化后走 readiness→freeze→dispatch（不跳过 Binding）",
     ],
@@ -182,12 +184,7 @@ export async function materializeStudioStoryboardWizardUnit(
     title: input.promptTitle ?? `${input.unitTitle} wizard prompt`,
     expectedRevision: 0,
   });
-  const promptBody = input.panels
-    .map(
-      (p) =>
-        `G${p.panelIndex} ${p.shotType} ${p.startSeconds}-${p.endSeconds}s ${p.title}: ${p.visualAction}`,
-    )
-    .join("\n");
+  const promptBody = formatWizardPromptBody(input.panels);
   const promptWrap = await appendStudioPromptRevision(projectRoot, {
     documentId: promptDoc.id,
     expectedRevision: 0,

@@ -10,6 +10,10 @@ import {
   STORYBOARD_WIZARD_SCHEMA_VERSION,
   type WizardEditablePanel,
 } from "../src/core/studio-storyboard-wizard.js";
+import {
+  formatWizardPromptBody,
+  wizardPreviousStandingForPanel,
+} from "../src/core/studio-panel-standing.js";
 import type { StudioStoryboardDraftPanelSuggestion } from "../src/core/studio-storyboard-draft.js";
 import {
   appendStudioScriptRevision,
@@ -67,6 +71,26 @@ describe("studio-storyboard-wizard", () => {
 
   it("schema frozen", () => {
     expect(STORYBOARD_WIZARD_SCHEMA_VERSION).toBe(1);
+  });
+
+  it("G2+ 向导前镜取上一格；物化 prompt 首格不写前镜行", () => {
+    const panels = applyWizardPanelEdits(toWizardEditablePanels([basePanel(1), basePanel(2)]), [
+      { panelIndex: 1, visualAction: "站定", shotComposition: "中景", filmingMethod: "固定" },
+      { panelIndex: 2, visualAction: "抬手", shotComposition: "近景", filmingMethod: "推" },
+    ]);
+    expect(wizardPreviousStandingForPanel(panels, 1)).toBeNull();
+    expect(wizardPreviousStandingForPanel(panels, 2)).toEqual({
+      panelIndex: 1,
+      panelId: "G1",
+      shotComposition: "中景",
+      visualAction: "站定",
+      filmingMethod: "固定",
+    });
+    const body = formatWizardPromptBody(panels);
+    expect(body).toContain("G1 original 0-5s G1: 站定");
+    expect(body).not.toMatch(/^G1 .*\n前镜交接/u);
+    expect(body).toContain("G2 original 5-10s G2: 抬手");
+    expect(body).toContain("前镜交接：G1 中景 · 站定 · 固定。本格必须从该站位连续起拍");
   });
 
   it("keeps a selected span anchored to the original revision offsets", async () => {

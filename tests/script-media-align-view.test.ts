@@ -53,6 +53,10 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("getStudioScriptSpanMediaMap");
     expect(vue).toContain('data-testid="storyboard-wizard-suggest"');
     expect(vue).toContain('data-testid="storyboard-wizard-materialize"');
+    expect(vue).toContain('data-testid="storyboard-wizard-previous-standing"');
+    expect(vue).toContain("wizardStandingLine");
+    expect(vue).toContain("wizardPreviousStandingForPanel");
+    expect(vue).toContain("formatUnitLockPreviousStandingLine");
     expect(vue).toContain('data-testid="ssl5-missing-to-gen-plan"');
     expect(vue).toContain("planSsl5MissingToGen");
     expect(vue).toContain("不自动 dispatch");

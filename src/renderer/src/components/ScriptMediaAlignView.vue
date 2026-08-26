@@ -25,6 +25,10 @@ import type { StudioScriptProductUiApi } from "../material-studio-ui-contract";
 import type { Ssl5MissingToGenPlan } from "@core/studio-ssl5-missing-to-gen";
 import { listOrWorkbenchPreviewUrl } from "../studio-list-preview-url";
 import StudioGenerationTraceDrawer, { type StudioTraceDrawerModel } from "./StudioGenerationTraceDrawer.vue";
+import {
+  formatUnitLockPreviousStandingLine,
+  wizardPreviousStandingForPanel,
+} from "@core/studio-panel-standing";
 
 const props = defineProps<{
   projectRoot: string;
@@ -376,6 +380,10 @@ async function suggestWizard(): Promise<void> {
   } finally {
     actionLoading.value = "";
   }
+}
+
+function wizardStandingLine(panelIndex: number): string | null {
+  return formatUnitLockPreviousStandingLine(wizardPreviousStandingForPanel(wizardPanels.value, panelIndex));
 }
 
 function reflowWizardTimings(): void {
@@ -968,6 +976,11 @@ function shortSha(value: string | null | undefined): string {
           <label>运镜 <input v-model.trim="panel.filmingMethod" /></label>
           <label>对白 <input v-model.trim="panel.dialogue" /></label>
           <label>时长 <input v-model.number="panel.durationSeconds" type="number" min="0.1" max="15" step="0.1" @change="reflowWizardTimings" /></label>
+          <p
+            v-if="wizardStandingLine(panel.panelIndex)"
+            class="wide wizard-previous-standing"
+            data-testid="storyboard-wizard-previous-standing"
+          >{{ wizardStandingLine(panel.panelIndex) }}</p>
           <small class="wide">原文锚 {{ panel.sourceSpans.length }} · 资产建议 {{ panel.suggestedAssetIds.length }} · 歧义 {{ panel.unresolvedProposals.length }}</small>
         </article>
       </section>

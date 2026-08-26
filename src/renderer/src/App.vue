@@ -387,6 +387,7 @@ import {
 import { createProjectScopedActionGate, type ProjectScopedActionToken } from "./project-scoped-action-gate";
 import { statusClass } from "./utils";
 import { resolveStoryboardWizardAssets } from "./storyboard-wizard-assets";
+import { formatWizardPromptBody } from "@core/studio-panel-standing";
 import { markT23RendererStartup, recordT23StartupRuntimeGate } from "./t23-renderer-startup-probe";
 import { createManagedStudioModulePreloader } from "./managed-studio-module-preload";
 import type { CreateManagedProjectOptions, ProjectShell } from "@core/managed-project";
@@ -1015,9 +1016,7 @@ const studioScriptAlignApi = {
     const unitId = `unit-wizard-${semanticDigest.slice(0, 40)}`;
     const promptDocumentId = `prompt-wizard-${semanticDigest.slice(0, 40)}`;
     const promptTitle = `${input.unitTitle} · 15 秒分镜提示词`;
-    const promptBody = input.panels.map((panel) =>
-      `G${panel.panelIndex} ${panel.shotType} ${panel.startSeconds}-${panel.endSeconds}s ${panel.title}: ${panel.visualAction}`,
-    ).join("\n");
+    const promptBody = formatWizardPromptBody(input.panels);
 
     const requireResult = <T,>(
       result: Awaited<ReturnType<typeof window.canvasApi.executeStudioCommand>>,

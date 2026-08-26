@@ -11,6 +11,8 @@ import {
   previousStandingFromFrozenRenderedPrompt,
   previousStandingsFromFrozenPanelPacks,
   formatUnitLockPreviousStandingLine,
+  wizardPreviousStandingForPanel,
+  formatWizardPromptBody,
 } from "../src/core/studio-panel-standing.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -125,6 +127,14 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(previousStandingsFromFrozenPanelPacks([
       { target: { panelId: "p1" }, request: { modelPayload: { renderedPrompt: "只生成一张" } } },
     ])).toEqual([]);
+    expect(wizardPreviousStandingForPanel([
+      { panelIndex: 1, shotComposition: "中景", visualAction: "站定", filmingMethod: "固定" },
+      { panelIndex: 2, shotComposition: "近景", visualAction: "抬手", filmingMethod: "推" },
+    ], 1)).toBeNull();
+    expect(formatWizardPromptBody([
+      { panelIndex: 1, shotType: "original", startSeconds: 0, endSeconds: 5, title: "G1", visualAction: "站定", shotComposition: "中景", filmingMethod: "固定" },
+      { panelIndex: 2, shotType: "original", startSeconds: 5, endSeconds: 10, title: "G2", visualAction: "抬手", shotComposition: "近景", filmingMethod: "推" },
+    ])).toContain("前镜交接：G1 中景 · 站定 · 固定");
   });
 
   it("session-snapshot / 生成控制 / 审片从冻结提示词露前镜，不读 head", () => {
@@ -150,6 +160,16 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(review).not.toContain("evaluateStudioConsistency(");
     expect(review).not.toContain("getStudioBindingControl");
     expect(review).not.toContain("generation.packId");
+    const wizard = readFileSync(path.join(repoRoot, "src/core/studio-storyboard-wizard.ts"), "utf8");
+    expect(wizard).toContain("formatWizardPromptBody(input.panels)");
+    expect(wizard).toContain("G2+ 必须从上一格站位连续起拍");
+    const app = readFileSync(path.join(repoRoot, "src/renderer/src/App.vue"), "utf8");
+    expect(app).toContain("formatWizardPromptBody(input.panels)");
+    expect(app).not.toContain("evaluateStudioConsistency(");
+    const wizardView = readFileSync(path.join(repoRoot, "src/renderer/src/components/ScriptMediaAlignView.vue"), "utf8");
+    expect(wizardView).toContain('data-testid="storyboard-wizard-previous-standing"');
+    expect(wizardView).toContain("wizardStandingLine");
+    expect(wizardView).toContain("formatUnitLockPreviousStandingLine");
     const brief = readFileSync(path.join(repoRoot, "src/core/codex.ts"), "utf8");
     expect(brief).toContain("previousStandings");
     expect(brief).toContain("previousStandingFromFrozenRenderedPrompt(panel.panelPack)");

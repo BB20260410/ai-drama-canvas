@@ -127,6 +127,50 @@ export type FrozenPanelStandingRow = {
 };
 
 /**
+ * 15s 向导：上一格锁版前镜。不是冻结包，不能当 generation-ready。
+ */
+export function wizardPreviousStandingForPanel(
+  panels: ReadonlyArray<{
+    panelIndex: number;
+    shotComposition: string;
+    visualAction: string;
+    filmingMethod: string;
+  }>,
+  currentPanelIndex: number,
+): StudioPanelStandingHandoff | null {
+  return pickPreviousPanelStanding(
+    panels.map((panel) => ({
+      index: panel.panelIndex,
+      id: `G${panel.panelIndex}`,
+      shotComposition: panel.shotComposition,
+      visualAction: panel.visualAction,
+      filmingMethod: panel.filmingMethod,
+    })),
+    currentPanelIndex,
+  );
+}
+
+/** 向导物化 prompt 正文：G2+ 写入与冻结相同的「前镜交接」行；首格不写。 */
+export function formatWizardPromptBody(
+  panels: ReadonlyArray<{
+    panelIndex: number;
+    shotType: string;
+    startSeconds: number;
+    endSeconds: number;
+    title: string;
+    visualAction: string;
+    shotComposition: string;
+    filmingMethod: string;
+  }>,
+): string {
+  return panels.map((panel) => {
+    const standing = formatPreviousStandingPromptLine(wizardPreviousStandingForPanel(panels, panel.panelIndex));
+    const head = `G${panel.panelIndex} ${panel.shotType} ${panel.startSeconds}-${panel.endSeconds}s ${panel.title}: ${panel.visualAction}`;
+    return standing ? `${head}\n${standing}` : head;
+  }).join("\n");
+}
+
+/**
  * 追溯/brief 共用：只从各格冻结 renderedPrompt 还原。
  * 无「前镜交接」行的格不进数组；全空则调用方应省略字段，保持历史投影兼容。
  */
