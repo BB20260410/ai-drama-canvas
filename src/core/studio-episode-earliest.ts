@@ -11,6 +11,10 @@ import { getStudioGenerationCheckpointControl } from "./studio-generation-checkp
 import { getStudioProjectWriteLeaseReadOnly } from "./studio-project-write-lease.js";
 import { projectStudioUnitGridNextAction } from "./studio-unit-grid-next-action.js";
 import { getApprovedTimelineProjection } from "./studio-approved-timeline-projection.js";
+import {
+  readPersistedUnitGridPackAndPlan,
+  type PersistedUnitGridPackAndPlan,
+} from "./studio-unit-grid-persisted-plan-read.js";
 
 export const STUDIO_EPISODE_EARLIEST_SCHEMA_VERSION = 1 as const;
 
@@ -57,6 +61,39 @@ export interface StudioEpisodeEarliestProjection {
 
 function digest(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
+}
+
+/**
+ * 只把 earliest pending 且仍是 freeze 的槽按该 unit 已落盘 pack/计划精炼。
+ * 其它槽位保持 hasCurrentPack=false，禁止全槽扫描。
+ */
+export function refineEarliestReadyToFreezeSlot(
+  slot: StudioEpisodeUnitSlotProjection,
+  persisted: PersistedUnitGridPackAndPlan,
+): StudioEpisodeUnitSlotProjection {
+  if (slot.formalCommitted || slot.phase !== "ready-to-freeze") return slot;
+  if (!persisted.packId) return slot;
+  const next = projectStudioUnitGridNextAction({
+    hasCurrentPack: true,
+    hasCurrentPlan: persisted.hasPlan,
+  });
+  return {
+    ...slot,
+    phase: next.phase,
+    code: next.code,
+    label: next.label,
+  };
+}
+
+export function formatStudioEpisodeEarliestStatusLine(input: {
+  earliest: Pick<StudioEpisodeUnitSlotProjection, "unitId" | "code" | "label"> | null;
+  completedCount: number;
+  slotCount: number;
+}): string {
+  if (!input.earliest) {
+    return `earliest：无待 formal 单元（列表内 ${input.completedCount} 齐）`;
+  }
+  return `earliest 下一步：${input.earliest.unitId} ${input.earliest.code}（${input.earliest.label}）；已 formal ${input.completedCount}/${input.slotCount}`;
 }
 
 /**
@@ -149,6 +186,7 @@ export async function getStudioEpisodeEarliest(
         ? "generation_unknown"
         : null;
 
+    // 全槽位仍不读落盘 pack（§1.3 有界）。freeze/plan/dispatch 只对下面 earliest 一格精炼。
     const next = projectStudioUnitGridNextAction({
       hasCurrentPack: false,
       callStatus,
@@ -172,7 +210,15 @@ export async function getStudioEpisodeEarliest(
 
   const completedUnitIds = slots.filter((s) => s.formalCommitted).map((s) => s.unitId);
   const pendingUnitIds = slots.filter((s) => !s.formalCommitted).map((s) => s.unitId);
-  const earliest = slots.find((s) => !s.formalCommitted) ?? null;
+  const earliestIndex = slots.findIndex((s) => !s.formalCommitted);
+  if (earliestIndex >= 0 && slots[earliestIndex]!.phase === "ready-to-freeze") {
+    const candidate = slots[earliestIndex]!;
+    slots[earliestIndex] = refineEarliestReadyToFreezeSlot(
+      candidate,
+      readPersistedUnitGridPackAndPlan(shell.paths.generationDatabase, candidate.unitId),
+    );
+  }
+  const earliest = earliestIndex >= 0 ? slots[earliestIndex]! : null;
 
   const [checkpoint, writeLease] = await Promise.all([
     getStudioGenerationCheckpointControl(root).catch(() => null),
@@ -187,9 +233,11 @@ export async function getStudioEpisodeEarliest(
       ? `工程内尚无 ${season}/${episode} 单元`
       : `${season}/${episode} 列表内 formal 证据已齐（未必整集关账）`;
 
-  const statusLine = earliest
-    ? `earliest 下一步：${earliest.unitId}；已 formal ${completedUnitIds.length}/${slots.length}`
-    : `earliest：无待 formal 单元（列表内 ${completedUnitIds.length} 齐）`;
+  const statusLine = formatStudioEpisodeEarliestStatusLine({
+    earliest,
+    completedCount: completedUnitIds.length,
+    slotCount: slots.length,
+  });
 
   const body = {
     schemaVersion: 1 as const,
