@@ -1,0 +1,49 @@
+{
+  "id": "goal-session-snapshot-scene-backrefs-20260826",
+  "kind": "session-snapshot-cross-unit-scene-backref-readonly",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T19:41:30.000Z",
+  "scope": "get_studio_generation_control session-snapshot projects sceneMentions / sceneBackReferences / sceneBackReferenceNote from a lean read-only SQL lookup of studio_production_panel_assets (category=scene). Uses the existing asset timeline index. Same episode only. Earlier sequence / same-unit earlier panel. Cap 4. Missing DB or missing tables fail closed to empty and do not create a production database. Empty mentions do not enter fingerprint. schemaVersion remains 1. Single-panel and unit-grid Agent briefs add SCENE_BACK_REFERENCE_TOOL_NOTE pointing at session-snapshot; briefs stay sync and pack-only. Not BindingSet; not generation-ready; does not dispatch.",
+  "invariants": {
+    "readOnlyQueryOnly": true,
+    "doesNotEnsureOrCreateDatabase": true,
+    "matchesSceneCategoryOnly": true,
+    "sameEpisodeOnly": true,
+    "ignoresLaterUnits": true,
+    "limitFour": true,
+    "emptyOmitsFingerprint": true,
+    "schemaVersionUnchanged": true,
+    "doesNotReadUnitHead": true,
+    "doesNotCallBindingInspect": true,
+    "doesNotEvaluateConsistency": true,
+    "doesNotChangeDashboardProjection": true,
+    "doesNotChangeP24TraceShape": true,
+    "briefStaysSyncPackOnly": true,
+    "notBindingSet": true,
+    "doesNotDispatch": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-scene-backrefs-readonly-sql.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/studio-script-library-projection.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-unit-grid-brief-contract.test.ts"
+      ],
+      "result": "6 files / 50 tests PASS. P7 session-snapshot fixture not run on Linux (dirfd)."
+    }
+  },
+  "notClaimed": [
+    "P7 owner session-snapshot live fixture",
+    "scene consistency fully solved",
+    "BindingSet scene currentness",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

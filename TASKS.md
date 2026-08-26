@@ -36,6 +36,7 @@
 - [x] session-snapshot 投影 frozenPanelLighting / frozenPanelCostume（无该行则 null，不进 fingerprint；不读 head）
 - [x] 单镜/整板 Agent brief + get_studio_trace 投影冻结宫格光线/服装（全空省略；不改 P24；不改 renderedPrompt）
 - [x] 对照侧栏跨单元场景回指（只扫已加载快照提及；更早同场景可点穿；≠ BindingSet）
+- [x] session-snapshot 跨单元场景回指（只读 SQL 快照提及；缺库失败关闭为空；brief 只加 tool note，不改同步 brief）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
