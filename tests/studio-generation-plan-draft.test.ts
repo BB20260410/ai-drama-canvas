@@ -93,9 +93,12 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(snapshot).toContain('pack.provenance !== "asset-binding-set"');
     expect(snapshot).toContain('persisted.provenance !== "unit-grid-binding-sets"');
     expect(snapshot).toContain("generationPlanDraft");
+    expect(snapshot).toContain("styleLockLine");
+    expect(snapshot).toContain("styleLockRefsFromAnyFrozenPack(frozenPanel)");
     expect(snapshot).toContain("不进 fingerprint");
     expect(snapshot).not.toContain("studio-ssl5-missing-to-gen");
     expect(snapshot).not.toContain("studio-script-media-align");
+    expect(snapshot).not.toContain("studio-script-library-projection");
     expect(snapshot).not.toContain("studio-unit-grid-generation");
     expect(snapshot).not.toContain("execute_command");
     expect(snapshot).not.toContain("dispatch_studio_generation_pack");

@@ -51,6 +51,7 @@ describe("StudioGenerationSessionSnapshot", () => {
     expect(first.previousStanding).toBeNull();
     expect(first.frozenPanelLighting).toBeNull();
     expect(first.frozenPanelCostume).toBeNull();
+    expect(first.styleLockLine).toBeNull();
     expect(first.topRisk).toBeNull();
     expect(first.fingerprint).toBe(second.fingerprint);
 

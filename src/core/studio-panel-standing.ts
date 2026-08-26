@@ -12,13 +12,39 @@ export type StudioPanelStandingHandoff = {
   filmingMethod: string;
 };
 
-export type FrozenRenderedPromptPack = {
+export type FrozenStyleLockRef = {
+  assetId: string;
+  role: string;
+};
+
+export type FrozenPackStyleLockSource = {
   request?: {
     modelPayload?: {
       renderedPrompt?: string;
     };
+    controlReferences?: ReadonlyArray<{
+      assetId?: string;
+      category?: string;
+      role?: string;
+    }>;
   };
+  assets?: ReadonlyArray<{
+    assetId?: string;
+    category?: string;
+    role?: string;
+  }>;
+  controlReferences?: ReadonlyArray<{
+    assetId?: string;
+    category?: string;
+    categories?: readonly string[];
+    role?: string;
+    roles?: readonly string[];
+    coveredAssetIds?: readonly string[];
+    referenceId?: string;
+  }>;
 };
+
+export type FrozenRenderedPromptPack = FrozenPackStyleLockSource;
 
 export type FrozenPackBeatTarget = {
   panelId?: string;
@@ -37,6 +63,83 @@ export type AnyFrozenPackStandingSource = FrozenRenderedPromptPack & {
     panelPack?: FrozenRenderedPromptPack & { target?: FrozenPackBeatTarget };
   }>;
 };
+
+function collectStyleLockRefs(source: FrozenPackStyleLockSource | null | undefined): FrozenStyleLockRef[] {
+  if (!source) return [];
+  const seen = new Set<string>();
+  const refs: FrozenStyleLockRef[] = [];
+  const add = (assetId: string, role: string) => {
+    const id = assetId.trim();
+    if (!id || seen.has(id)) return;
+    seen.add(id);
+    refs.push({ assetId: id, role: role.trim() });
+  };
+  for (const ref of source.request?.controlReferences ?? []) {
+    if (String(ref.category ?? "").trim() !== "style") continue;
+    add(String(ref.assetId ?? ""), String(ref.role ?? ""));
+  }
+  for (const asset of source.assets ?? []) {
+    if (String(asset.category ?? "").trim() !== "style") continue;
+    add(String(asset.assetId ?? ""), String(asset.role ?? ""));
+  }
+  for (const ref of source.controlReferences ?? []) {
+    const categories = Array.isArray(ref.categories)
+      ? ref.categories
+      : (ref.category ? [ref.category] : []);
+    if (!categories.some((category) => String(category).trim() === "style")) continue;
+    add(
+      String(ref.coveredAssetIds?.[0] ?? ref.assetId ?? ref.referenceId ?? ""),
+      String(ref.roles?.[0] ?? ref.role ?? ""),
+    );
+  }
+  return refs;
+}
+
+/**
+ * 单镜包直接收 category=style；unit-grid 必须 panelId，禁止猜第一格。
+ * 不读 unit head，不写新冻结行。
+ */
+export function styleLockRefsFromAnyFrozenPack(
+  pack: AnyFrozenPackStandingSource | null | undefined,
+  panelId?: string,
+): FrozenStyleLockRef[] {
+  if (!pack) return [];
+  if (Array.isArray(pack.panels)) {
+    if (!panelId) return [];
+    return collectStyleLockRefs(pack.panels.find((entry) => entry.panelId === panelId)?.panelPack);
+  }
+  return collectStyleLockRefs(pack);
+}
+
+export function formatFrozenStyleLockReadonlyLine(
+  refs: ReadonlyArray<FrozenStyleLockRef> | null | undefined,
+): string | null {
+  if (!refs?.length) return null;
+  const parts = refs.map((ref) => {
+    const role = ref.role.trim();
+    return role ? `${ref.assetId} ${role}` : ref.assetId;
+  });
+  return `风格锁（冻结包）：${parts.join(" · ")}。跟随风格控制参考，禁止另起画风。不是 BindingSet。`;
+}
+
+/** 当前宫格已加载控制资产里的风格锁（无冻结包时）；不是 BindingSet。 */
+export function formatUnitLockStyleLockLine(
+  assets: ReadonlyArray<{ assetId?: string; category?: string; role?: string }> | null | undefined,
+): string | null {
+  if (!assets) return null;
+  const refs = assets.flatMap((asset) => {
+    const assetId = String(asset.assetId ?? "").trim();
+    const category = String(asset.category ?? "").trim();
+    if (!assetId || category !== "style") return [];
+    return [{ assetId, role: String(asset.role ?? "").trim() }];
+  });
+  if (!refs.length) return null;
+  const parts = refs.map((ref) => {
+    const role = ref.role.trim();
+    return role ? `${ref.assetId} ${role}` : ref.assetId;
+  });
+  return `锁版风格：${parts.join(" · ")}。跟随风格控制参考，禁止另起画风。不是 BindingSet，不能当 generation-ready。`;
+}
 
 export function pickPreviousPanelStanding(
   panels: ReadonlyArray<{
@@ -217,6 +320,9 @@ export const EXTENSION_SHOT_TYPE_TOOL_NOTE =
 
 export const UNIT_BEAT_TOOL_NOTE =
   "若 session-snapshot / frozen pack / beatLine 标明 15s 节拍，必须保持 2–6 格合计 15.0s、本格时长与起止秒，禁止改格数或把后一事件提前进本格。";
+
+export const STYLE_LOCK_TOOL_NOTE =
+  "若 session-snapshot / frozen pack / styleLockLine / promptContract.STYLE_LOCK 标明风格控制参考，必须跟随该画风与风格资产，禁止另起画风。不是 BindingSet。";
 
 export type FrozenPanelBeat = {
   panelIndex: number;

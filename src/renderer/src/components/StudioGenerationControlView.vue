@@ -163,6 +163,18 @@
               {{ controlShotTypeLine }}
             </p>
             <p
+              v-if="frozenPackStyleLockLine"
+              class="previous-standing"
+              data-testid="studio-pack-style-lock">
+              {{ frozenPackStyleLockLine }}
+            </p>
+            <p
+              v-if="lockStyleLockLine"
+              class="previous-standing"
+              data-testid="studio-lock-style-lock">
+              {{ lockStyleLockLine }}
+            </p>
+            <p
               v-if="controlBeatLine"
               class="previous-standing"
               data-testid="studio-control-beat">
@@ -334,6 +346,8 @@ import {
   formatFrozenPanelCostumeReadonlyLine,
   formatFrozenPanelLightingReadonlyLine,
   formatFrozenPanelShotTypeReadonlyLine,
+  formatFrozenStyleLockReadonlyLine,
+  formatUnitLockStyleLockLine,
   formatPreviousStandingReadonlyLine,
   formatUnitLockPanelBeatLine,
   formatUnitLockPanelCostumeLine,
@@ -344,6 +358,7 @@ import {
   frozenPanelLightingFromAnyFrozenPack,
   frozenPanelShotTypeFromAnyFrozenPack,
   previousStandingFromAnyFrozenPack,
+  styleLockRefsFromAnyFrozenPack,
   type StudioPanelStandingHandoff,
 } from "@core/studio-panel-standing";
 import { formatCharacterBackReferences, formatPropBackReferences, formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
@@ -425,6 +440,8 @@ const lightingCostumeSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>
 const frozenPackShotTypeLine = ref<string | null>(null);
 const lockShotTypeLine = ref<string | null>(null);
 const controlShotTypeLine = computed(() => frozenPackShotTypeLine.value || lockShotTypeLine.value);
+const frozenPackStyleLockLine = ref<string | null>(null);
+const lockStyleLockLine = ref<string | null>(null);
 const frozenPackBeatLine = ref<string | null>(null);
 const lockBeatLine = ref<string | null>(null);
 const controlBeatLine = computed(() => frozenPackBeatLine.value || lockBeatLine.value);
@@ -623,10 +640,12 @@ watch([selectedPackId, selectedPanelId, () => props.projectRoot, () => detail.va
   frozenPackLightingLine.value = null;
   frozenPackCostumeLine.value = null;
   frozenPackShotTypeLine.value = null;
+  frozenPackStyleLockLine.value = null;
   frozenPackBeatLine.value = null;
   lockLightingLine.value = null;
   lockCostumeLine.value = null;
   lockShotTypeLine.value = null;
+  lockStyleLockLine.value = null;
   lockBeatLine.value = null;
   lightingCostumeSource.value = null;
   controlSceneBackReferenceNote.value = null;
@@ -677,6 +696,9 @@ watch([selectedPackId, selectedPanelId, () => props.projectRoot, () => detail.va
         frozenPackShotTypeLine.value = formatFrozenPanelShotTypeReadonlyLine(
           frozenPanelShotTypeFromAnyFrozenPack(pack, selectedPanelId.value),
         );
+        frozenPackStyleLockLine.value = formatFrozenStyleLockReadonlyLine(
+          styleLockRefsFromAnyFrozenPack(pack, selectedPanelId.value),
+        );
         frozenPackBeatLine.value = formatFrozenPanelBeatReadonlyLine(
           frozenPanelBeatFromAnyFrozenPack(pack, selectedPanelId.value),
         );
@@ -702,6 +724,7 @@ watch([selectedPackId, selectedPanelId, () => props.projectRoot, () => detail.va
     lockLightingLine.value = formatUnitLockPanelLightingLine(overlay);
     lockCostumeLine.value = formatUnitLockPanelCostumeLine(overlay);
     lockShotTypeLine.value = formatUnitLockPanelShotTypeLine(overlay);
+    lockStyleLockLine.value = formatUnitLockStyleLockLine(detail.value?.selectedPanel?.controlAssets);
     lockBeatLine.value = formatUnitLockPanelBeatLine({
       panelIndex: panel.ordinal,
       startSeconds: panel.startSeconds,
@@ -709,6 +732,7 @@ watch([selectedPackId, selectedPanelId, () => props.projectRoot, () => detail.va
       durationSeconds: panel.durationSeconds,
     });
   } else if (panel) {
+    lockStyleLockLine.value = formatUnitLockStyleLockLine(detail.value?.selectedPanel?.controlAssets);
     lockBeatLine.value = formatUnitLockPanelBeatLine({
       panelIndex: panel.ordinal,
       startSeconds: panel.startSeconds,
@@ -1443,6 +1467,7 @@ watch(() => props.projectRoot, () => {
   lockLightingLine.value = null;
   lockCostumeLine.value = null;
   lockShotTypeLine.value = null;
+  lockStyleLockLine.value = null;
   lockBeatLine.value = null;
   lightingCostumeSource.value = null;
   controlSceneBackReferenceNote.value = null;
@@ -1463,6 +1488,7 @@ watch(() => props.projectRoot, () => {
   frozenPackLightingLine.value = null;
   frozenPackCostumeLine.value = null;
   frozenPackShotTypeLine.value = null;
+  frozenPackStyleLockLine.value = null;
   frozenPackBeatLine.value = null;
   frozenPackError.value = "";
   duduDetectionRoot = "";

@@ -11,11 +11,13 @@ import { queryStudioGenerationFreeze } from "./studio-generation.js";
 import {
   formatFrozenPanelBeatReadonlyLine,
   formatFrozenPanelShotTypeReadonlyLine,
+  formatFrozenStyleLockReadonlyLine,
   frozenPanelBeatFromAnyFrozenPack,
   parseFrozenPanelCostumeFromRenderedPrompt,
   parseFrozenPanelLightingFromRenderedPrompt,
   parseFrozenPanelShotTypeFromRenderedPrompt,
   previousStandingFromFrozenRenderedPrompt,
+  styleLockRefsFromAnyFrozenPack,
   type StudioPanelStandingHandoff,
 } from "./studio-panel-standing.js";
 import { readStudioSceneBackReferences } from "./studio-scene-backrefs-read.js";
@@ -126,6 +128,11 @@ export interface StudioGenerationSessionSnapshot {
    * 无扩写/原镜则为 null，不进 fingerprint。不是 BindingSet。
    */
   shotTypeLine: string | null;
+  /**
+   * 冻结风格锁只读句：只从该包 controlReferences / assets 的 category=style 还原，不读 unit head。
+   * 无风格控制参考则为 null，不进 fingerprint。不是 BindingSet。
+   */
+  styleLockLine: string | null;
   /**
    * 冻结 15s 节拍只读句：只从该包 target 起止秒还原，不读 unit head，不写新冻结行。
    * 无时长则为 null，不进 fingerprint。不是 BindingSet。
@@ -459,6 +466,7 @@ export async function buildStudioGenerationSessionSnapshot(
         : null;
       return formatFrozenPanelShotTypeReadonlyLine(fromPrompt ?? fromPanel);
     })(),
+    styleLockLine: formatFrozenStyleLockReadonlyLine(styleLockRefsFromAnyFrozenPack(frozenPanel)),
     beatLine: formatFrozenPanelBeatReadonlyLine(frozenPanelBeatFromAnyFrozenPack(frozenPanel)),
     generationPlanDraft: query.panelId
       ? composeStudioGenerationPlanDraft({
@@ -529,6 +537,7 @@ export async function buildStudioGenerationSessionSnapshot(
           }
         : {}),
       ...(body.shotTypeLine ? { shotTypeLine: body.shotTypeLine } : {}),
+      ...(body.styleLockLine ? { styleLockLine: body.styleLockLine } : {}),
       ...(body.beatLine ? { beatLine: body.beatLine } : {}),
       camera: body.camera,
       topRiskCode: body.topRisk?.code ?? null,

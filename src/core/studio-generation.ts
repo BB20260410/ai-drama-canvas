@@ -74,11 +74,14 @@ import {
   PROP_BACK_REFERENCE_TOOL_NOTE,
   SCENE_BACK_REFERENCE_TOOL_NOTE,
   UNIT_BEAT_TOOL_NOTE,
+  STYLE_LOCK_TOOL_NOTE,
+  formatFrozenStyleLockReadonlyLine,
   formatPreviousStandingPromptLine,
   parseFrozenPanelCostumeFromRenderedPrompt,
   parseFrozenPanelLightingFromRenderedPrompt,
   parsePreviousStandingFromRenderedPrompt,
   studioAgentImagegenBriefConstraintLines,
+  styleLockRefsFromAnyFrozenPack,
   pickPreviousPanelStanding,
   type StudioPanelStandingHandoff,
 } from "./studio-panel-standing.js";
@@ -2695,6 +2698,8 @@ export interface StudioAgentImagegenBrief {
   frozenPanelCostume: string | null;
   /** 从该包 renderedPrompt / panel.shotType 还原；无扩写/原镜则为 null。 */
   shotTypeLine: string | null;
+  /** 从该包 controlReferences / assets 的 category=style 还原；无风格控制参考则为 null。 */
+  styleLockLine: string | null;
   /** 从该包 target 起止秒还原；无时长则为 null。不写新冻结行。 */
   beatLine: string | null;
   controlReferences: Array<{
@@ -2757,6 +2762,7 @@ export function buildStudioAgentImagegenBrief(
         CHARACTER_BACK_REFERENCE_TOOL_NOTE,
         EXTENSION_SHOT_TYPE_TOOL_NOTE,
         UNIT_BEAT_TOOL_NOTE,
+        STYLE_LOCK_TOOL_NOTE,
         "禁止浏览器、Artlist、ComfyUI、网页自动化旁路。",
       ],
     }
@@ -2775,6 +2781,7 @@ export function buildStudioAgentImagegenBrief(
         CHARACTER_BACK_REFERENCE_TOOL_NOTE,
         EXTENSION_SHOT_TYPE_TOOL_NOTE,
         UNIT_BEAT_TOOL_NOTE,
+        STYLE_LOCK_TOOL_NOTE,
         "禁止浏览器、Artlist、网页自动化旁路。",
       ],
     };
@@ -2795,6 +2802,7 @@ export function buildStudioAgentImagegenBrief(
     frozenPanelLighting: parseFrozenPanelLightingFromRenderedPrompt(pack.request.modelPayload.renderedPrompt),
     frozenPanelCostume: parseFrozenPanelCostumeFromRenderedPrompt(pack.request.modelPayload.renderedPrompt),
     ...studioAgentImagegenBriefConstraintLines(pack),
+    styleLockLine: formatFrozenStyleLockReadonlyLine(styleLockRefsFromAnyFrozenPack(pack)),
     controlReferences: pack.request.controlReferences.map((ref) => ({
       assetId: ref.assetId,
       category: ref.category,

@@ -31,10 +31,14 @@ import {
   formatUnitLockPanelShotTypeLine,
   formatFrozenPanelBeatReadonlyLine,
   formatFrozenPanelShotTypeReadonlyLine,
+  formatFrozenStyleLockReadonlyLine,
+  formatUnitLockStyleLockLine,
   parseFrozenPanelShotTypeFromRenderedPrompt,
   frozenPanelBeatFromAnyFrozenPack,
   frozenPanelShotTypeFromAnyFrozenPack,
+  styleLockRefsFromAnyFrozenPack,
   UNIT_BEAT_TOOL_NOTE,
+  STYLE_LOCK_TOOL_NOTE,
   studioAgentImagegenBriefConstraintLines,
   frozenPanelOverlaysFromFrozenPanelPacks,
   FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
@@ -107,6 +111,9 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(generation).toContain("UNIT_BEAT_TOOL_NOTE");
     expect(generation).toContain("studioAgentImagegenBriefConstraintLines(pack)");
     expect(generation).toContain("shotTypeLine: string | null");
+    expect(generation).toContain("styleLockLine: string | null");
+    expect(generation).toContain("STYLE_LOCK_TOOL_NOTE");
+    expect(generation).toContain("styleLockRefsFromAnyFrozenPack(pack)");
     expect(generation).toContain("beatLine: string | null");
     const unitGrid = readFileSync(path.join(repoRoot, "src/core/studio-unit-grid-generation.ts"), "utf8");
     expect(unitGrid).toContain("formatPreviousStandingPromptLine");
@@ -340,6 +347,63 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
         },
       }],
     })).toEqual({ shotTypeLine: null, beatLine: null });
+    expect(styleLockRefsFromAnyFrozenPack({
+      request: {
+        controlReferences: [
+          { assetId: "style-cine", category: "style", role: "夜戏油彩" },
+          { assetId: "char-a", category: "character", role: "豆姐" },
+        ],
+      },
+      assets: [{ assetId: "style-cine", category: "style", role: "夜戏油彩" }],
+    })).toEqual([{ assetId: "style-cine", role: "夜戏油彩" }]);
+    expect(styleLockRefsFromAnyFrozenPack({
+      schemaVersion: 5,
+      panels: [{
+        panelId: "p2",
+        panelPack: {
+          request: { controlReferences: [{ assetId: "style-cine", category: "style", role: "夜戏油彩" }] },
+        },
+      }],
+    })).toEqual([]);
+    expect(styleLockRefsFromAnyFrozenPack({
+      schemaVersion: 5,
+      panels: [{
+        panelId: "p2",
+        panelPack: {
+          request: { controlReferences: [{ assetId: "style-cine", category: "style", role: "夜戏油彩" }] },
+        },
+      }],
+    }, "p2")).toEqual([{ assetId: "style-cine", role: "夜戏油彩" }]);
+    expect(formatFrozenStyleLockReadonlyLine([{ assetId: "style-cine", role: "夜戏油彩" }])).toContain("风格锁（冻结包）：style-cine 夜戏油彩");
+    expect(formatFrozenStyleLockReadonlyLine([])).toBeNull();
+    expect(formatUnitLockStyleLockLine([{ assetId: "style-cine", category: "style", role: "夜戏油彩" }])).toContain("锁版风格：style-cine 夜戏油彩");
+    expect(formatUnitLockStyleLockLine([{ assetId: "char-a", category: "character", role: "豆姐" }])).toBeNull();
+    expect(STYLE_LOCK_TOOL_NOTE).toContain("styleLockLine");
+    expect(STYLE_LOCK_TOOL_NOTE).toContain("禁止另起画风");
+    expect(formatWizardPromptBody([
+      {
+        panelIndex: 1,
+        shotType: "original",
+        startSeconds: 0,
+        endSeconds: 7.5,
+        title: "起",
+        visualAction: "站定",
+        shotComposition: "中景",
+        filmingMethod: "固定",
+      },
+    ])).not.toContain("风格：");
+    expect(formatWizardPromptBody([
+      {
+        panelIndex: 1,
+        shotType: "original",
+        startSeconds: 0,
+        endSeconds: 7.5,
+        title: "起",
+        visualAction: "站定",
+        shotComposition: "中景",
+        filmingMethod: "固定",
+      },
+    ])).not.toContain("风格锁");
   });
 
   it("session-snapshot / 生成控制 / 审片从冻结提示词露前镜，不读 head", () => {
@@ -351,6 +415,10 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(snapshot).toContain("frozenPanelCostume");
     expect(snapshot).toContain("shotTypeLine");
     expect(snapshot).toContain("parseFrozenPanelShotTypeFromRenderedPrompt");
+    expect(snapshot).toContain("styleLockLine");
+    expect(snapshot).toContain("styleLockRefsFromAnyFrozenPack(frozenPanel)");
+    expect(snapshot).toContain("formatFrozenStyleLockReadonlyLine");
+    expect(snapshot).not.toContain("studio-script-library-projection");
     expect(snapshot).toContain("beatLine");
     expect(snapshot).toContain("frozenPanelBeatFromAnyFrozenPack(frozenPanel)");
     expect(snapshot).toContain("formatFrozenPanelBeatReadonlyLine");
@@ -368,6 +436,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(mcp).toContain("frozenPanelLighting");
     expect(mcp).toContain("frozenPanelCostume");
     expect(mcp).toContain("shotTypeLine");
+    expect(mcp).toContain("styleLockLine");
     expect(mcp).toContain("beatLine");
     expect(mcp).toContain("generationPlanDraft");
     expect(mcp).toContain("15s 节拍");
@@ -385,6 +454,10 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(control).toContain('data-testid="studio-control-prop-backrefs"');
     expect(control).toContain('data-testid="studio-control-character-backrefs"');
     expect(control).toContain('data-testid="studio-control-shot-type"');
+    expect(control).toContain('data-testid="studio-pack-style-lock"');
+    expect(control).toContain('data-testid="studio-lock-style-lock"');
+    expect(control).toContain("styleLockRefsFromAnyFrozenPack(pack, selectedPanelId.value)");
+    expect(control).toContain("formatUnitLockStyleLockLine");
     expect(control).toContain('data-testid="studio-control-beat"');
     expect(control).toContain("frozenPanelShotTypeFromAnyFrozenPack(pack, selectedPanelId.value)");
     expect(control).toContain("frozenPanelBeatFromAnyFrozenPack(pack, selectedPanelId.value)");
@@ -401,6 +474,9 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(review).toContain('data-testid="studio-review-previous-standing"');
     expect(review).toContain('data-testid="studio-review-lighting-costume"');
     expect(review).toContain('data-testid="studio-review-shot-type"');
+    expect(review).toContain('data-testid="studio-review-style-lock"');
+    expect(review).toContain("styleLockRefsFromAnyFrozenPack(pack, reviewStandingPanelId.value)");
+    expect(review).not.toContain("formatUnitLockStyleLockLine");
     expect(review).toContain('data-testid="studio-review-beat"');
     expect(review).toContain("frozenPanelShotTypeFromAnyFrozenPack(pack, reviewStandingPanelId.value)");
     expect(review).toContain("frozenPanelBeatFromAnyFrozenPack(pack, reviewStandingPanelId.value)");
@@ -438,6 +514,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(wizardView).toContain('data-testid="storyboard-wizard-prop-backrefs"');
     expect(wizardView).toContain('data-testid="storyboard-wizard-character-backrefs"');
     expect(wizardView).toContain('data-testid="storyboard-wizard-shot-type"');
+    expect(wizardView).toContain('data-testid="storyboard-wizard-style-lock"');
+    expect(wizardView).toContain("formatWizardStyleLockLine");
     expect(wizardView).toContain('data-testid="storyboard-wizard-beat"');
     expect(wizardView).toContain("formatPanelShotTypeLine");
     expect(wizardView).toContain("formatPanelBeatLine");
@@ -452,6 +530,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(brief).toContain("CHARACTER_BACK_REFERENCE_TOOL_NOTE");
     expect(brief).toContain("EXTENSION_SHOT_TYPE_TOOL_NOTE");
     expect(brief).toContain("UNIT_BEAT_TOOL_NOTE");
+    expect(brief).toContain("STYLE_LOCK_TOOL_NOTE");
     expect(brief).toContain("frozenPanelLightingFromAnyFrozenPack(panel.panelPack)");
     const canvas = readFileSync(path.join(repoRoot, "src/renderer/src/components/ManagedStudioCanvasView.vue"), "utf8");
     expect(canvas).toContain("previousStandingFromAnyFrozenPack(pack, panel.id)");
@@ -462,6 +541,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(canvas).toContain("formatUnitLockPanelShotTypeLine");
     expect(canvas).toContain("formatUnitLockPanelBeatLine");
     expect(canvas).toContain("frozenPanelShotTypeFromAnyFrozenPack(pack, panel.id)");
+    expect(canvas).toContain("styleLockRefsFromAnyFrozenPack(pack, panel.id)");
+    expect(canvas).toContain("formatUnitLockStyleLockLine");
     expect(canvas).toContain("frozenPanelBeatFromAnyFrozenPack(pack, panel.id)");
     expect(canvas).toContain("panel.startSeconds");
     expect(canvas).toContain("getStudioUnitLockOverlays");

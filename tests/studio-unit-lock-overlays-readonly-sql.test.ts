@@ -197,6 +197,7 @@ describe("当前单元锁版光线/服化只读 SQL", () => {
     const inspector = source("src/renderer/src/components/CanvasInspectorPanel.vue");
     expect(inspector).toContain("panelLightingCostumeSource");
     expect(inspector).toContain("managed-canvas-inspector-shot-type");
+    expect(inspector).toContain("managed-canvas-inspector-style-lock");
     expect(inspector).toContain("managed-canvas-inspector-beat");
     expect(inspector).toContain("锁版未记光线");
     expect(inspector).toContain("当前单元锁版。不是 BindingSet，不能当 generation-ready。");

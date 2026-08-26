@@ -393,6 +393,34 @@ export function listCharacterAssetMentions(
   });
 }
 
+export function listStyleAssetMentions(
+  mentions: ReadonlyArray<{ assetId?: string; category?: string; role?: string }> | null | undefined,
+): PanelAssetMentionLite[] {
+  if (!mentions) return [];
+  return mentions.flatMap((mention) => {
+    const assetId = String(mention.assetId ?? "").trim();
+    const category = String(mention.category ?? "").trim();
+    if (!assetId || category !== "style") return [];
+    return [{ assetId, category, role: String(mention.role ?? "").trim() }];
+  });
+}
+
+/** 锁版本格风格控制参考；不是 BindingSet，不能当 generation-ready。不开 category=style 回指。 */
+export function formatStyleLockLine(
+  mentions: ReadonlyArray<{ assetId?: string; category?: string; role?: string }> | null | undefined,
+): string {
+  if (mentions == null) return "没有宫格可查风格锁";
+  const style = listStyleAssetMentions(mentions);
+  if (!style.length) {
+    return "锁版未记风格控制参考。不是 BindingSet，不能当 generation-ready。";
+  }
+  const parts = style.map((mention) => {
+    const role = mention.role.trim();
+    return role ? `${mention.assetId} ${role}` : mention.assetId;
+  });
+  return `风格锁：${parts.join(" · ")}。跟随风格控制参考，禁止另起画风。不是 BindingSet，不能当 generation-ready。`;
+}
+
 function isEarlierPanel(
   sequence: number,
   panelIndex: number,
@@ -576,6 +604,9 @@ export const WIZARD_PROP_BACKREF_UNLOADED_NOTE =
 
 export const WIZARD_CHARACTER_BACKREF_UNLOADED_NOTE =
   "对照板未加载，无法查角色回指。不是 BindingSet，不能当 generation-ready。";
+
+export const WIZARD_STYLE_LOCK_UNLOADED_NOTE =
+  "对照板未加载，不能查风格锁。不是 BindingSet，不能当 generation-ready。";
 
 const WIZARD_DRAFT_UNIT_ID = "wizard-draft";
 
@@ -801,6 +832,45 @@ export function formatWizardCharacterBackReferenceLine(input: {
   );
 }
 
+/** 建议资产只在已加载对照板里出现过 category=style 才算风格提及。不开 style 回指。 */
+export function wizardStyleMentionsFromSuggestedIds(
+  suggestedAssetIds: ReadonlyArray<string> | null | undefined,
+  units: ReadonlyArray<{
+    panels: ReadonlyArray<{
+      assetMentions: ReadonlyArray<{ assetId: string; category: string; role?: string }>;
+    }>;
+  }>,
+): PanelAssetMentionLite[] {
+  const suggested = new Set(
+    (suggestedAssetIds ?? []).map((assetId) => assetId.trim()).filter(Boolean),
+  );
+  if (!suggested.size) return [];
+  const styleById = new Map<string, string>();
+  for (const unit of units) {
+    for (const panel of unit.panels) {
+      for (const mention of listStyleAssetMentions(panel.assetMentions)) {
+        if (!suggested.has(mention.assetId) || styleById.has(mention.assetId)) continue;
+        styleById.set(mention.assetId, mention.role);
+      }
+    }
+  }
+  return [...styleById.entries()].map(([assetId, role]) => ({ assetId, category: "style", role }));
+}
+
+/** 15s 向导：只扫已加载对照板。不写冻结提示词，不是 BindingSet。 */
+export function formatWizardStyleLockLine(input: {
+  boardLoaded: boolean;
+  suggestedAssetIds?: ReadonlyArray<string> | null;
+  units: ReadonlyArray<{
+    panels: ReadonlyArray<{
+      assetMentions: ReadonlyArray<{ assetId: string; category: string; role?: string }>;
+    }>;
+  }>;
+}): string {
+  if (!input.boardLoaded) return WIZARD_STYLE_LOCK_UNLOADED_NOTE;
+  return formatStyleLockLine(wizardStyleMentionsFromSuggestedIds(input.suggestedAssetIds, input.units));
+}
+
 export function formatCharacterBackReferenceLineFromBoard(input: {
   currentUnitId: string;
   currentSequence: number;
@@ -964,6 +1034,7 @@ export interface ScriptSpanMediaHit {
   costumeState: string;
   shotType?: "original" | "extension";
   shotTypeLine: string;
+  styleLockLine: string;
   startSeconds?: number;
   endSeconds?: number;
   durationSeconds?: number;
@@ -1024,6 +1095,7 @@ export function resolveScriptSpanMediaMap(
         costumeState: panel.costumeState,
         shotType: panel.shotType === "extension" || panel.shotType === "original" ? panel.shotType : undefined,
         shotTypeLine: formatPanelShotTypeLine(panel),
+        styleLockLine: formatStyleLockLine(panel.assetMentions),
         startSeconds: panel.startSeconds,
         endSeconds: panel.endSeconds,
         durationSeconds: panel.durationSeconds,

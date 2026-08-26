@@ -370,6 +370,7 @@ describe("buildStudioUnitGridAgentImagegenBrief (shipped runtime)", () => {
     expect(codex.tool.notes.some((note) => note.includes("characterBackReferences"))).toBe(true);
     expect(codex.tool.notes.some((note) => note.includes("shotTypeLine") && note.includes("扩写格"))).toBe(true);
     expect(codex.tool.notes.some((note) => note.includes("beatLine") && note.includes("15s 节拍"))).toBe(true);
+    expect(codex.tool.notes.some((note) => note.includes("styleLockLine") && note.includes("禁止另起画风"))).toBe(true);
     expect(codex.tool.notes.indexOf(codex.tool.notes.find((note) => note.includes("characterBackReferences")) ?? "")).toBeLessThan(
       codex.tool.notes.indexOf(codex.tool.notes.find((note) => note.includes("shotTypeLine")) ?? ""),
     );
@@ -377,6 +378,9 @@ describe("buildStudioUnitGridAgentImagegenBrief (shipped runtime)", () => {
       codex.tool.notes.indexOf(codex.tool.notes.find((note) => note.includes("beatLine")) ?? ""),
     );
     expect(codex.tool.notes.indexOf(codex.tool.notes.find((note) => note.includes("beatLine")) ?? "")).toBeLessThan(
+      codex.tool.notes.indexOf(codex.tool.notes.find((note) => note.includes("styleLockLine")) ?? ""),
+    );
+    expect(codex.tool.notes.indexOf(codex.tool.notes.find((note) => note.includes("styleLockLine")) ?? "")).toBeLessThan(
       codex.tool.notes.length - 1,
     );
     expect(grok.tool.notes.at(-1)).toContain("前镜交接");
@@ -384,6 +388,7 @@ describe("buildStudioUnitGridAgentImagegenBrief (shipped runtime)", () => {
     expect(grok.tool.notes.some((note) => note.includes("characterBackReferences"))).toBe(true);
     expect(grok.tool.notes.some((note) => note.includes("shotTypeLine") && note.includes("扩写格"))).toBe(true);
     expect(grok.tool.notes.some((note) => note.includes("beatLine") && note.includes("15s 节拍"))).toBe(true);
+    expect(grok.tool.notes.some((note) => note.includes("styleLockLine") && note.includes("禁止另起画风"))).toBe(true);
   });
 
   it("续镜 pack 投影 DELTA_ONLY，且不改 renderedPrompt", () => {

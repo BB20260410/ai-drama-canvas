@@ -98,11 +98,13 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.characterBackReferenceLine).toBe("没有宫格可查角色回指");
     expect(plan.characterBackReferences).toEqual([]);
     expect(plan.shotTypeLine).toBe("没有宫格可查镜头类型");
+    expect(plan.styleLockLine).toBe("没有宫格可查风格锁");
     expect(plan.shotType).toBeUndefined();
     expect(plan.beatLine).toBe("没有宫格可查 15s 节拍");
     expect(plan.unitBeatLine).toBe("没有宫格可查 15s 节拍");
     expect(plan.items[0]?.lightingCostumeLine).toBe("没有宫格可查光线/服化");
     expect(plan.items[0]?.shotTypeLine).toBe("没有宫格可查镜头类型");
+    expect(plan.items[0]?.styleLockLine).toBe("没有宫格可查风格锁");
     expect(plan.items[0]?.beatLine).toBe("没有宫格可查 15s 节拍");
     expect(plan.items[0]?.unitBeatLine).toBe("没有宫格可查 15s 节拍");
     expect(plan.items[0]?.recommendedPath).toEqual([
@@ -279,6 +281,8 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.shotTypeLine).toContain("禁止重新起镜");
     expect(plan.shotTypeLine).toContain("不是 BindingSet");
     expect(plan.items[0]?.shotTypeLine).toContain("扩写格：G2");
+    expect(plan.styleLockLine).toBe("锁版未记风格控制参考。不是 BindingSet，不能当 generation-ready。");
+    expect(plan.items[0]?.styleLockLine).toBe(plan.styleLockLine);
     expect(plan.beatLine).toContain("15s 节拍：G2 7.5–15s（7.5s）");
     expect(plan.beatLine).toContain("本单元须 2–6 格合计 15.0s");
     expect(plan.unitBeatLine).toContain("2 格合计 15.0s");
@@ -322,6 +326,7 @@ describe("SSL-5 缺图下一步纯函数", () => {
               { assetId: "scene-stone", category: "scene", role: "石室" },
               { assetId: "prop-mask", category: "prop", role: "黄金面具" },
               { assetId: "char-dou", category: "character", role: "豆姐" },
+              { assetId: "style-cine", category: "style", role: "夜戏油彩" },
             ],
           })],
         }),
@@ -388,6 +393,9 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.shotTypeLine).toContain("原镜：G1");
     expect(plan.shotTypeLine).toContain("必须锚定原文");
     expect(plan.items.find((item) => item.unitId === "u-focus")?.shotTypeLine).toBe(plan.shotTypeLine);
+    expect(plan.styleLockLine).toContain("风格锁：style-cine 夜戏油彩");
+    expect(plan.styleLockLine).toContain("禁止另起画风");
+    expect(plan.items.find((item) => item.unitId === "u-focus")?.styleLockLine).toBe(plan.styleLockLine);
   });
 
   it("全 covered 且无 earliest 则无焦点", () => {
@@ -411,6 +419,7 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.characterBackReferenceLine).toBe("没有宫格可查角色回指");
     expect(plan.characterBackReferences).toEqual([]);
     expect(plan.shotTypeLine).toBe("没有宫格可查镜头类型");
+    expect(plan.styleLockLine).toBe("没有宫格可查风格锁");
     expect(plan.beatLine).toBe("没有宫格可查 15s 节拍");
     expect(plan.unitBeatLine).toBe("没有宫格可查 15s 节拍");
   });
@@ -447,6 +456,7 @@ describe("SSL-5 入口源码合同", () => {
     expect(vue).toContain('data-testid="ssl5-focus-prop-backrefs"');
     expect(vue).toContain('data-testid="ssl5-focus-character-backrefs"');
     expect(vue).toContain('data-testid="ssl5-focus-shot-type"');
+    expect(vue).toContain('data-testid="ssl5-focus-style-lock"');
     expect(vue).toContain('data-testid="ssl5-focus-beat"');
     expect(vue).toContain('data-testid="ssl5-focus-unit-beat"');
     expect(vue).toContain('data-testid="ssl5-focus-lighting"');
@@ -462,6 +472,9 @@ describe("SSL-5 入口源码合同", () => {
     expect(ssl5).toContain("formatPanelLightingCostumeLine");
     expect(ssl5).toContain("formatPanelShotTypeLine");
     expect(ssl5).toContain("shotTypeLine");
+    expect(ssl5).toContain("formatStyleLockLine");
+    expect(ssl5).toContain("styleLockLine");
+    expect(ssl5).not.toContain("listStyleBackReferences");
     expect(ssl5).toContain("formatPanelBeatLine");
     expect(ssl5).toContain("formatUnitBeatLine");
     expect(ssl5).toContain("beatLine");

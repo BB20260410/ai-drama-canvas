@@ -14,6 +14,7 @@ import {
   formatPanelLightingCostumeLine,
   formatPanelShotTypeLine,
   formatPanelStandingGaps,
+  formatStyleLockLine,
   formatUnitBeatLine,
   formatCharacterBackReferenceLineFromBoard,
   formatPropBackReferenceLineFromBoard,
@@ -74,6 +75,7 @@ export interface Ssl5MissingToGenPlanItem {
   previousCostumeLine: string | null;
   shotType?: "original" | "extension";
   shotTypeLine: string;
+  styleLockLine: string;
   beatLine: string;
   unitBeatLine: string;
   sceneBackReferenceLine: string;
@@ -107,6 +109,7 @@ export interface Ssl5MissingToGenPlan {
   previousCostumeLine: string | null;
   shotType?: "original" | "extension";
   shotTypeLine: string;
+  styleLockLine: string;
   beatLine: string;
   unitBeatLine: string;
   sceneBackReferenceLine: string;
@@ -218,6 +221,7 @@ export function buildSsl5PlanFromBoard(
           ? missingPanel.shotType
           : undefined,
         shotTypeLine: formatPanelShotTypeLine(missingPanel ?? null),
+        styleLockLine: formatStyleLockLine(missingPanel?.assetMentions ?? null),
         beatLine: formatPanelBeatLine(missingPanel ?? null),
         unitBeatLine: formatUnitBeatLine(row.panels ?? []),
         sceneBackReferenceLine: missingPanel
@@ -292,6 +296,7 @@ export function buildSsl5PlanFromBoard(
     previousCostumeLine: focus?.previousCostumeLine ?? null,
     shotType: focus?.shotType,
     shotTypeLine: focus?.shotTypeLine ?? "没有宫格可查镜头类型",
+    styleLockLine: focus?.styleLockLine ?? "没有宫格可查风格锁",
     beatLine: focus?.beatLine ?? "没有宫格可查 15s 节拍",
     unitBeatLine: focus?.unitBeatLine ?? "没有宫格可查 15s 节拍",
     sceneBackReferenceLine: focus?.sceneBackReferenceLine ?? "没有宫格可查场景回指",

@@ -10,6 +10,8 @@ import {
   formatPanelLightingCostumeLine,
   formatPanelBeatLine,
   formatPanelShotTypeLine,
+  formatStyleLockLine,
+  formatWizardStyleLockLine,
   formatPanelStandingGaps,
   formatPanelStandingHandoff,
   formatCharacterBackReferences,
@@ -422,6 +424,15 @@ function wizardLightingLine(panelIndex: number): string | null {
 
 function wizardCostumeLine(panelIndex: number): string | null {
   return formatWizardLockPreviousCostumeLine(wizardPreviousCostumeForPanel(wizardPanels.value, panelIndex));
+}
+
+function wizardStyleLockLine(panelIndex: number): string {
+  const panel = wizardPanels.value.find((entry) => entry.panelIndex === panelIndex);
+  return formatWizardStyleLockLine({
+    boardLoaded: Boolean(board.value),
+    suggestedAssetIds: panel?.suggestedAssetIds,
+    units: board.value?.rows ?? [],
+  });
 }
 
 function wizardSceneBackRefLine(panelIndex: number): string {
@@ -999,6 +1010,7 @@ function shortSha(value: string | null | undefined): string {
                 <small data-testid="span-media-hit-gaps">{{ formatPanelStandingGaps(hit) }}</small>
                 <small data-testid="span-media-hit-lighting">{{ formatPanelLightingCostumeLine(hit) }}</small>
                 <small data-testid="span-media-hit-shot-type">{{ hit.shotTypeLine }}</small>
+                <small data-testid="span-media-hit-style-lock">{{ hit.styleLockLine }}</small>
                 <small data-testid="span-media-hit-beat">{{ hit.beatLine }}</small>
                 <small data-testid="span-media-hit-scene-backrefs">{{ hit.sceneBackReferenceLine }}</small>
                 <small data-testid="span-media-hit-prop-backrefs">{{ hit.propBackReferenceLine }}</small>
@@ -1081,6 +1093,7 @@ function shortSha(value: string | null | undefined): string {
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-standing-gaps">{{ ssl5Plan.standingGapLine }}</span>
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-lighting">{{ ssl5Plan.lightingCostumeLine }}</span>
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-shot-type">{{ ssl5Plan.shotTypeLine }}</span>
+          <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-style-lock">{{ ssl5Plan.styleLockLine }}</span>
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-beat">{{ ssl5Plan.beatLine }}</span>
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-unit-beat">{{ ssl5Plan.unitBeatLine }}</span>
           <span v-if="ssl5Plan.previousLightingLine" data-testid="ssl5-focus-previous-lighting">{{ ssl5Plan.previousLightingLine }}</span>
@@ -1225,6 +1238,7 @@ function shortSha(value: string | null | undefined): string {
             <div><dt>光线</dt><dd data-testid="align-panel-lighting">{{ selectedAlignPanel?.sceneLighting || "—" }}</dd></div>
             <div><dt>服化</dt><dd data-testid="align-panel-costume">{{ selectedAlignPanel?.costumeState || "—" }}</dd></div>
             <div><dt>镜头类型</dt><dd data-testid="align-panel-shot-type">{{ formatPanelShotTypeLine(selectedAlignPanel) }}</dd></div>
+            <div><dt>风格锁</dt><dd data-testid="align-panel-style-lock">{{ formatStyleLockLine(selectedAlignPanel?.assetMentions ?? null) }}</dd></div>
             <div><dt>15s 节拍</dt><dd data-testid="align-panel-beat">{{ formatPanelBeatLine(selectedAlignPanel) }}</dd></div>
             <div><dt>前镜</dt><dd data-testid="align-panel-handoff">{{ formatPanelStandingHandoff(selectedAlignPanel?.previousHandoff) }}</dd></div>
             <div><dt>站位缺口</dt><dd data-testid="align-panel-standing-gaps">{{ formatPanelStandingGaps(selectedAlignPanel) }}</dd></div>
@@ -1319,6 +1333,7 @@ function shortSha(value: string | null | undefined): string {
           <label>光线 <input v-model.trim="panel.sceneLighting" data-testid="storyboard-wizard-lighting" /></label>
           <label>服化 <input v-model.trim="panel.costumeState" data-testid="storyboard-wizard-costume" /></label>
           <p class="wide wizard-lock-hint" data-testid="storyboard-wizard-shot-type">{{ formatPanelShotTypeLine(panel) }}</p>
+          <p class="wide wizard-lock-hint" data-testid="storyboard-wizard-style-lock">{{ wizardStyleLockLine(panel.panelIndex) }}</p>
           <p class="wide wizard-lock-hint" data-testid="storyboard-wizard-beat">{{ formatPanelBeatLine(panel) }}</p>
           <label>对白 <input v-model.trim="panel.dialogue" /></label>
           <label>时长 <input v-model.number="panel.durationSeconds" type="number" min="0.1" max="15" step="0.1" @change="reflowWizardTimings" /></label>

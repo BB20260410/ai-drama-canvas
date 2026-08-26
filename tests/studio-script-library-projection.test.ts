@@ -10,6 +10,8 @@ import {
   formatPanelBeatLine,
   formatPanelLightingCostumeLine,
   formatPanelShotTypeLine,
+  formatStyleLockLine,
+  formatWizardStyleLockLine,
   formatUnitBeatLine,
   formatPanelStandingGaps,
   formatPanelStandingHandoff,
@@ -20,10 +22,13 @@ import {
   listPanelStandingGaps,
   listSceneAssetMentions,
   listSceneBackReferences,
+  listStyleAssetMentions,
   wizardCharacterMentionsFromSuggestedIds,
   wizardPropMentionsFromSuggestedIds,
   wizardSceneMentionsFromSuggestedIds,
+  wizardStyleMentionsFromSuggestedIds,
   WIZARD_CHARACTER_BACKREF_UNLOADED_NOTE,
+  WIZARD_STYLE_LOCK_UNLOADED_NOTE,
   WIZARD_PROP_BACKREF_UNLOADED_NOTE,
   WIZARD_SCENE_BACKREF_UNLOADED_NOTE,
   normalizeSourceSpans,
@@ -243,6 +248,16 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(formatPanelShotTypeLine({ panelIndex: 2, shotType: "extension" })).toContain("扩写格：G2");
     expect(formatPanelShotTypeLine({ panelIndex: 3, shotType: "" })).toContain("锁版未记镜头类型");
     expect(formatPanelShotTypeLine(null)).toBe("没有宫格可查镜头类型");
+    expect(hit.hits[0]?.styleLockLine).toBe("锁版未记风格控制参考。不是 BindingSet，不能当 generation-ready。");
+    expect(formatStyleLockLine(null)).toBe("没有宫格可查风格锁");
+    expect(formatStyleLockLine([])).toBe("锁版未记风格控制参考。不是 BindingSet，不能当 generation-ready。");
+    expect(formatStyleLockLine([{ assetId: "style-cine", category: "style", role: "夜戏油彩" }])).toBe(
+      "风格锁：style-cine 夜戏油彩。跟随风格控制参考，禁止另起画风。不是 BindingSet，不能当 generation-ready。",
+    );
+    expect(formatStyleLockLine([{ assetId: "char-a", category: "character", role: "豆姐" }])).toContain("锁版未记风格控制参考");
+    expect(listStyleAssetMentions([{ assetId: "style-cine", category: "style", role: "夜戏油彩" }])).toEqual([
+      { assetId: "style-cine", category: "style", role: "夜戏油彩" },
+    ]);
     expect(hit.hits[0]?.beatLine).toBe("锁版未记 15s 节拍。不是 BindingSet，不能当 generation-ready。");
     expect(formatPanelBeatLine(null)).toBe("没有宫格可查 15s 节拍");
     expect(formatPanelBeatLine({ panelIndex: 1, startSeconds: 0, endSeconds: 5, durationSeconds: 5 })).toContain("15s 节拍：G1 0–5s（5s）");
@@ -707,6 +722,7 @@ describe("studio-script-library-projection pure helpers", () => {
           { assetId: "scene-stone", category: "scene", role: "石室" },
           { assetId: "char-a", category: "character", role: "豆姐" },
           { assetId: "prop-mask", category: "prop", role: "黄金面具" },
+          { assetId: "style-cine", category: "style", role: "夜戏油彩" },
         ],
       }],
     }];
@@ -722,6 +738,25 @@ describe("studio-script-library-projection pure helpers", () => {
       { assetId: "char-a", category: "character", role: "豆姐" },
     ]);
     expect(wizardCharacterMentionsFromSuggestedIds(["scene-stone"], units)).toEqual([]);
+    expect(wizardStyleMentionsFromSuggestedIds(["style-cine", "char-a"], units)).toEqual([
+      { assetId: "style-cine", category: "style", role: "夜戏油彩" },
+    ]);
+    expect(wizardStyleMentionsFromSuggestedIds(["char-a"], units)).toEqual([]);
+    expect(formatWizardStyleLockLine({
+      boardLoaded: false,
+      suggestedAssetIds: ["style-cine"],
+      units,
+    })).toBe(WIZARD_STYLE_LOCK_UNLOADED_NOTE);
+    expect(formatWizardStyleLockLine({
+      boardLoaded: true,
+      suggestedAssetIds: ["style-cine"],
+      units,
+    })).toContain("风格锁：style-cine 夜戏油彩");
+    expect(formatWizardStyleLockLine({
+      boardLoaded: true,
+      suggestedAssetIds: ["char-a"],
+      units,
+    })).toContain("锁版未记风格控制参考");
     expect(formatWizardSceneBackReferenceLine({
       boardLoaded: false,
       currentSequence: 2,
@@ -769,9 +804,11 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(wizard).not.toContain("formatWizardSceneBackReferenceLine");
     expect(wizard).not.toContain("formatWizardPropBackReferenceLine");
     expect(wizard).not.toContain("formatWizardCharacterBackReferenceLine");
+    expect(wizard).not.toContain("formatWizardStyleLockLine");
     expect(wizard).not.toContain("场景回指");
     expect(wizard).not.toContain("道具回指");
     expect(wizard).not.toContain("角色回指");
+    expect(wizard).not.toContain("风格锁");
   });
 });
 
@@ -806,6 +843,11 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     expect(source).toContain("formatPanelLightingCostumeLine");
     expect(source).toContain("formatPanelShotTypeLine");
     expect(source).toContain("shotTypeLine");
+    expect(source).toContain("listStyleAssetMentions");
+    expect(source).toContain("formatStyleLockLine");
+    expect(source).toContain("styleLockLine");
+    expect(source).toContain("formatWizardStyleLockLine");
+    expect(source).not.toContain("listStyleBackReferences");
     expect(source).toContain("formatPanelBeatLine");
     expect(source).toContain("formatUnitBeatLine");
     expect(source).toContain("beatLine");

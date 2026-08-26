@@ -316,6 +316,7 @@ describe("studio scene backrefs readonly sql", () => {
     expect(snapshot).toContain("characterBackReferences");
     expect(snapshot).toContain("characterBackReferenceNote");
     expect(snapshot).toContain("shotTypeLine");
+    expect(snapshot).toContain("styleLockLine");
     expect(snapshot).toContain("beatLine");
     expect(snapshot).toContain("parseFrozenPanelShotTypeFromRenderedPrompt");
     expect(snapshot).toContain("不读 unit head");
@@ -340,6 +341,7 @@ describe("studio scene backrefs readonly sql", () => {
     expect(mcp).toContain("characterBackReferences");
     expect(mcp).toContain("characterBackReferenceNote");
     expect(mcp).toContain("shotTypeLine");
+    expect(mcp).toContain("styleLockLine");
     expect(mcp).toContain("beatLine");
     expect(mcp).toContain("不是 BindingSet");
     const generation = source("src/core/studio-generation.ts");

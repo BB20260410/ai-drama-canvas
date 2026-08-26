@@ -129,6 +129,7 @@ describe("P7 连续性 / Review UI 有界 store", () => {
     expect(template).toContain('data-testid="studio-review-previous-standing"');
     expect(template).toContain('data-testid="studio-review-lighting-costume"');
     expect(template).toContain('data-testid="studio-review-shot-type"');
+    expect(template).toContain('data-testid="studio-review-style-lock"');
     expect(template).toContain('data-testid="studio-review-beat"');
     expect(template).toContain("冻结提示词约束");
     expect(template).toContain("末格可复用状态");

@@ -136,6 +136,16 @@
         <p class="handoff-note ready">{{ frozenShotTypeLine }} 历史身份经冻结包还原，不读 head。</p>
       </section>
       <section
+        v-if="frozenStyleLockLine"
+        class="control-section previous-standing-section"
+        data-testid="studio-review-style-lock">
+        <header>
+          <div><span>风格锁</span><h3>冻结控制参考</h3></div>
+          <small>不是 BindingSet</small>
+        </header>
+        <p class="handoff-note ready">{{ frozenStyleLockLine }} 历史身份经冻结包还原，不读 head。</p>
+      </section>
+      <section
         v-if="frozenBeatLine"
         class="control-section previous-standing-section"
         data-testid="studio-review-beat">
@@ -523,12 +533,14 @@ import {
   formatFrozenPanelCostumeReadonlyLine,
   formatFrozenPanelLightingReadonlyLine,
   formatFrozenPanelShotTypeReadonlyLine,
+  formatFrozenStyleLockReadonlyLine,
   formatPreviousStandingReadonlyLine,
   frozenPanelBeatFromAnyFrozenPack,
   frozenPanelCostumeFromAnyFrozenPack,
   frozenPanelLightingFromAnyFrozenPack,
   frozenPanelShotTypeFromAnyFrozenPack,
   previousStandingFromAnyFrozenPack,
+  styleLockRefsFromAnyFrozenPack,
   type StudioPanelStandingHandoff,
 } from "@core/studio-panel-standing";
 import {
@@ -765,6 +777,7 @@ export default defineComponent({
     const frozenLightingLine = ref<string | null>(null);
     const frozenCostumeLine = ref<string | null>(null);
     const frozenShotTypeLine = ref<string | null>(null);
+    const frozenStyleLockLine = ref<string | null>(null);
     const frozenBeatLine = ref<string | null>(null);
     const reviewStandingPackId = computed(() =>
       props.focus?.packId
@@ -791,6 +804,7 @@ export default defineComponent({
       frozenLightingLine.value = null;
       frozenCostumeLine.value = null;
       frozenShotTypeLine.value = null;
+      frozenStyleLockLine.value = null;
       frozenBeatLine.value = null;
       reviewStandingToken += 1;
       timelineOffset = 0;
@@ -806,6 +820,7 @@ export default defineComponent({
       frozenLightingLine.value = null;
       frozenCostumeLine.value = null;
       frozenShotTypeLine.value = null;
+      frozenStyleLockLine.value = null;
       frozenBeatLine.value = null;
       if (!packId) return;
       try {
@@ -821,6 +836,9 @@ export default defineComponent({
         frozenShotTypeLine.value = formatFrozenPanelShotTypeReadonlyLine(
           frozenPanelShotTypeFromAnyFrozenPack(pack, reviewStandingPanelId.value),
         );
+        frozenStyleLockLine.value = formatFrozenStyleLockReadonlyLine(
+          styleLockRefsFromAnyFrozenPack(pack, reviewStandingPanelId.value),
+        );
         frozenBeatLine.value = formatFrozenPanelBeatReadonlyLine(
           frozenPanelBeatFromAnyFrozenPack(pack, reviewStandingPanelId.value),
         );
@@ -830,6 +848,7 @@ export default defineComponent({
         frozenLightingLine.value = null;
         frozenCostumeLine.value = null;
         frozenShotTypeLine.value = null;
+        frozenStyleLockLine.value = null;
         frozenBeatLine.value = null;
       }
     }, { immediate: true });
@@ -843,6 +862,7 @@ export default defineComponent({
       frozenLightingLine.value = null;
       frozenCostumeLine.value = null;
       frozenShotTypeLine.value = null;
+      frozenStyleLockLine.value = null;
       frozenBeatLine.value = null;
       releasePointerCleanups();
     });
@@ -1646,6 +1666,7 @@ export default defineComponent({
       frozenLightingLine,
       frozenCostumeLine,
       frozenShotTypeLine,
+      frozenStyleLockLine,
       frozenBeatLine,
       continuityCorrectionRows,
       canAppendContinuityCorrection,

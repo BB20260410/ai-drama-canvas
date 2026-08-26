@@ -753,6 +753,7 @@
         :panel-frozen-costume-line="inspectorFrozenCostumeLine"
         :panel-lighting-costume-source="inspectorLightingCostumeSource"
         :panel-shot-type-line="inspectorShotTypeLine"
+        :panel-style-lock-line="inspectorStyleLockLine"
         :panel-beat-line="inspectorBeatLine"
         :panel-scene-back-reference-note="inspectorSceneBackReferenceNote"
         :panel-scene-back-references="inspectorSceneBackReferences"
@@ -829,6 +830,8 @@ import {
   formatFrozenPanelLightingReadonlyLine,
   formatFrozenPanelBeatReadonlyLine,
   formatFrozenPanelShotTypeReadonlyLine,
+  formatFrozenStyleLockReadonlyLine,
+  formatUnitLockStyleLockLine,
   formatPreviousStandingReadonlyLine,
   formatUnitLockPanelBeatLine,
   formatUnitLockPanelCostumeLine,
@@ -840,6 +843,7 @@ import {
   frozenPanelLightingFromAnyFrozenPack,
   frozenPanelShotTypeFromAnyFrozenPack,
   previousStandingFromAnyFrozenPack,
+  styleLockRefsFromAnyFrozenPack,
 } from "@core/studio-panel-standing";
 import { formatCharacterBackReferences, formatPropBackReferences, formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
 import type { DirectorAction } from "../director-action-panel.js";
@@ -1985,6 +1989,7 @@ const inspectorFrozenLightingLine = ref<string | null>(null);
 const inspectorFrozenCostumeLine = ref<string | null>(null);
 const inspectorLightingCostumeSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>(null);
 const inspectorShotTypeLine = ref<string | null>(null);
+const inspectorStyleLockLine = ref<string | null>(null);
 const inspectorBeatLine = ref<string | null>(null);
 const inspectorSceneBackReferenceNote = ref<string | null>(null);
 const inspectorSceneBackReferences = ref<SceneBackReference[]>([]);
@@ -2098,6 +2103,7 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
   inspectorFrozenCostumeLine.value = null;
   inspectorLightingCostumeSource.value = null;
   inspectorShotTypeLine.value = null;
+  inspectorStyleLockLine.value = null;
   inspectorBeatLine.value = null;
   inspectorSceneBackReferenceNote.value = null;
   inspectorSceneBackReferences.value = [];
@@ -2128,6 +2134,9 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
         );
         inspectorShotTypeLine.value = formatFrozenPanelShotTypeReadonlyLine(
           frozenPanelShotTypeFromAnyFrozenPack(pack, panel.id),
+        );
+        inspectorStyleLockLine.value = formatFrozenStyleLockReadonlyLine(
+          styleLockRefsFromAnyFrozenPack(pack, panel.id),
         );
         inspectorBeatLine.value = formatFrozenPanelBeatReadonlyLine(
           frozenPanelBeatFromAnyFrozenPack(pack, panel.id),
@@ -2163,6 +2172,11 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
     durationSeconds: panel.durationSeconds,
   });
   if (!props.projectRoot || !unitId || !Number.isInteger(unitRevision) || unitRevision < 1) {
+    inspectorStyleLockLine.value = formatUnitLockStyleLockLine(
+      unitDetail.value?.selectedPanel?.panel.id === panel.id
+        ? unitDetail.value.selectedPanel.controlAssets
+        : undefined,
+    );
     inspectorLightingCostumeSource.value = "unit-lock";
     await applyInspectorSceneBackrefs(token, panel.id, panel.ordinal);
     return;
@@ -2173,6 +2187,11 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
   inspectorFrozenLightingLine.value = formatUnitLockPanelLightingLine(overlay);
   inspectorFrozenCostumeLine.value = formatUnitLockPanelCostumeLine(overlay);
   inspectorShotTypeLine.value = formatUnitLockPanelShotTypeLine(overlay);
+  inspectorStyleLockLine.value = formatUnitLockStyleLockLine(
+    unitDetail.value?.selectedPanel?.panel.id === panel.id
+      ? unitDetail.value.selectedPanel.controlAssets
+      : undefined,
+  );
   inspectorLightingCostumeSource.value = "unit-lock";
   await applyInspectorSceneBackrefs(token, panel.id, panel.ordinal);
 }, { immediate: true });
@@ -4180,6 +4199,7 @@ function closeInspector(): void {
   inspectorFrozenCostumeLine.value = null;
   inspectorLightingCostumeSource.value = null;
   inspectorShotTypeLine.value = null;
+  inspectorStyleLockLine.value = null;
   inspectorBeatLine.value = null;
   inspectorSceneBackReferenceNote.value = null;
   inspectorSceneBackReferences.value = [];

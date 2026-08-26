@@ -62,6 +62,7 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("ssl5-focus-beat");
     expect(vue).toContain("ssl5-focus-unit-beat");
     expect(vue).toContain("span-media-hit-shot-type");
+    expect(vue).toContain("span-media-hit-style-lock");
     expect(vue).toContain("span-media-hit-beat");
     expect(vue).toContain("span-media-hit-scene-backrefs");
     expect(vue).toContain("span-media-hit-prop-backrefs");
@@ -69,6 +70,12 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("revealReaderSceneBackRef");
     expect(vue).toContain("formatPanelLightingCostumeLine");
     expect(vue).toContain("formatPanelShotTypeLine");
+    expect(vue).toContain("formatStyleLockLine");
+    expect(vue).toContain("formatWizardStyleLockLine");
+    expect(vue).toContain("align-panel-style-lock");
+    expect(vue).toContain("storyboard-wizard-style-lock");
+    expect(vue).toContain("wizardStyleLockLine");
+    expect(vue).not.toContain("listStyleBackReferences");
     expect(vue).toContain("formatPanelBeatLine");
     expect(vue).toContain("revealSpanMediaHit");
     expect(vue).toContain("getStudioScriptSpanMediaMap");
@@ -123,6 +130,7 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("align-panel-prop-backrefs");
     expect(vue).toContain("align-panel-character-backrefs");
     expect(vue).toContain("align-panel-shot-type");
+    expect(vue).toContain("align-panel-style-lock");
     expect(vue).toContain("align-panel-beat");
     expect(vue).toContain("listSceneBackReferences");
     expect(vue).toContain("listPropBackReferences");
@@ -135,6 +143,7 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain('data-testid="storyboard-wizard-prop-backrefs"');
     expect(vue).toContain('data-testid="storyboard-wizard-character-backrefs"');
     expect(vue).toContain('data-testid="storyboard-wizard-shot-type"');
+    expect(vue).toContain('data-testid="storyboard-wizard-style-lock"');
     expect(vue).toContain('data-testid="storyboard-wizard-beat"');
     expect(vue).toContain("revealSceneBackRef");
     expect(vue).toContain("不能猜宫格");
