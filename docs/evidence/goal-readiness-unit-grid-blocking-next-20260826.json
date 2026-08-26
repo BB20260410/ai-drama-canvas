@@ -1,0 +1,50 @@
+{
+  "id": "goal-readiness-unit-grid-blocking-next-20260826",
+  "kind": "readiness-unit-grid-blocking-next",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T22:33:00.000Z",
+  "scope": "queryStudioGenerationControl readiness agentExecution.next uses readinessAgentNext. Panel and unit-grid ready paths keep freeze→create-plan→dispatch fallbacks. Same-unit unit-grid plan status dispatched/failed/cancelled/succeeded rewrites next to wait/retry/Review via packEnvelopeNextOverrideForUnitGridBlocking. Uses generationLedgerSidecarPath + readPersistedUnitGridPlanState (no extra inspect). Does not change writeCommand freeze payload. Does not execute freeze, create-plan, dispatch, retry, or Review. Does not change T5.",
+  "invariants": {
+    "noInspectAdded": true,
+    "freezeWriteCommandUnchanged": true,
+    "fallbackStringsKept": true,
+    "plannedDoesNotBlock": true,
+    "doesNotExecuteFreeze": true,
+    "doesNotExecuteCreatePlan": true,
+    "doesNotDispatch": true,
+    "doesNotRetry": true,
+    "doesNotChangeT5": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts"
+      ],
+      "result": "8 files / 59 tests PASS"
+    },
+    "commit": "267fe42"
+  },
+  "notClaimed": [
+    "freeze executed",
+    "create_studio_generation_plan executed",
+    "dispatch executed",
+    "retry executed",
+    "Review executed",
+    "T5 continuous generation remapped",
+    "readiness blocked when unit-grid in-flight",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
