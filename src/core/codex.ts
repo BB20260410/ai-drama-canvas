@@ -95,6 +95,7 @@ import {
   type PersistedPlanNodeStatus,
 } from "./studio-generation-plan-draft.js";
 import {
+  generationLedgerSidecarPath,
   readPersistedPanelPlanState,
   readPersistedUnitGridPlanState,
 } from "./studio-unit-grid-persisted-plan-read.js";
@@ -486,6 +487,13 @@ function packEnvelopeNext(
     : "dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback";
 }
 
+/** readiness 只读 next：同单元 unit-grid 在途时禁止再写 freeze→create-plan→dispatch。不加 inspect。 */
+function readinessAgentNext(projectRoot: string, unitId: string, fallback: string): string {
+  const status = readPersistedUnitGridPlanState(generationLedgerSidecarPath(projectRoot), unitId).status
+    ?? undefined;
+  return packEnvelopeNextOverrideForUnitGridBlocking(status) ?? fallback;
+}
+
 function sameSortedStrings(left: string[], right: string[]): boolean {
   const sortedLeft = [...left].sort((a, b) => a.localeCompare(b, "en"));
   const sortedRight = [...right].sort((a, b) => a.localeCompare(b, "en"));
@@ -695,7 +703,11 @@ export async function getStudioGenerationControlEnvelope(
             },
             agentExecution: {
               formalProviders: STUDIO_FORMAL_IMAGEGEN_ALLOWED_PROVIDERS,
-              next: "freeze → create-plan → dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback",
+              next: readinessAgentNext(
+                projectRoot,
+                readiness.pack.target.unitId,
+                "freeze → create-plan → dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback",
+              ),
               briefs: {
                 codex: buildStudioUnitGridAgentImagegenBrief(readiness.pack, "codex"),
                 grok: buildStudioUnitGridAgentImagegenBrief(readiness.pack, "grok"),
@@ -778,7 +790,11 @@ export async function getStudioGenerationControlEnvelope(
         },
         agentExecution: {
           formalProviders: STUDIO_FORMAL_IMAGEGEN_ALLOWED_PROVIDERS,
-          next: "freeze → create-plan → dispatch(provider=codex|grok) → agent imagegen → atomic raw/labeled writeback",
+          next: readinessAgentNext(
+            projectRoot,
+            readiness.pack.target.unitId,
+            "freeze → create-plan → dispatch(provider=codex|grok) → agent imagegen → atomic raw/labeled writeback",
+          ),
           briefs: {
             codex: buildStudioAgentImagegenBrief(readiness.pack, "codex"),
             grok: buildStudioAgentImagegenBrief(readiness.pack, "grok"),

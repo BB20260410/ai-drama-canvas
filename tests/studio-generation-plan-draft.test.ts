@@ -308,8 +308,10 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(codex).toContain('"create-plan → dispatch(provider=codex|grok)');
     expect(codex).toContain('"dispatch(provider=codex) → prepare pre-call intent');
     expect(codex).toContain('"dispatch(provider=codex|grok) → agent imagegen');
-    expect(codex).toContain('next: "freeze → create-plan → dispatch(provider=codex)');
-    expect(codex).toContain('next: "freeze → create-plan → dispatch(provider=codex|grok)');
+    expect(codex).toContain("readinessAgentNext");
+    expect(codex).toContain("generationLedgerSidecarPath");
+    expect(codex).toContain('"freeze → create-plan → dispatch(provider=codex)');
+    expect(codex).toContain('"freeze → create-plan → dispatch(provider=codex|grok)');
     expect(codex).not.toContain('next: "freeze → dispatch(provider=codex|grok)');
     expect(codex).not.toContain("studio-ssl5-missing-to-gen");
     expect(codex).not.toContain("studio-script-media-align");
@@ -324,6 +326,8 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(helper).toContain("readPersistedUnitGridPlanState");
     expect(helper).toContain("siblingUnitGridPlanStatusForPanelPack");
     expect(helper).toContain("isStudioUnitGridGenerationPack(pack)");
+    expect(helper).toContain("readinessAgentNext");
+    expect(helper).toContain("generationLedgerSidecarPath");
     expect(helper).toContain("wait → result or reconcile (no dispatch)");
     expect(helper).toContain("retry_studio_generation_plan_nodes (no retry here, no dispatch)");
     expect(helper).toContain("Review (no dispatch)");
