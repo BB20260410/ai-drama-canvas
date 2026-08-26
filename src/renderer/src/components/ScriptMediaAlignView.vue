@@ -7,7 +7,7 @@ import { computed, nextTick, ref, watch } from "vue";
 import type { StudioProductionUnitSummary } from "@core/studio-production";
 import type { ScriptLibraryIndex } from "@core/studio-script-library-projection";
 import type { ScriptReaderView } from "@core/studio-script-library-reader";
-import type { ScriptMediaAlignBoard, ScriptMediaAlignRow } from "@core/studio-script-media-align";
+import type { AlignConsistencyPeek, ScriptMediaAlignBoard, ScriptMediaAlignRow } from "@core/studio-script-media-align";
 import type {
   StudioStoryboardWizardSession,
   WizardEditablePanel,
@@ -388,6 +388,14 @@ async function selectAlignRow(row: ScriptMediaAlignRow): Promise<void> {
   }
 }
 
+function peekLabel(peek?: AlignConsistencyPeek): string {
+  if (!peek || peek.status === "unevaluated" || !peek.verdict) return "未评估";
+  if (peek.verdict === "consistent") return "一致";
+  if (peek.verdict === "needs-review") return "需复核";
+  if (peek.verdict === "drifted") return "明显漂移";
+  return "无法检查";
+}
+
 function statusLabel(status: string): string {
   return ({ covered: "有图", partial: "部分", "missing-all": "缺图" } as Record<string, string>)[status] ?? status;
 }
@@ -563,7 +571,7 @@ function shortSha(value: string | null | undefined): string {
           >去 Binding 确认</button>
         </div>
         <table v-if="board" data-testid="align-table">
-          <thead><tr><th>单元</th><th>状态</th><th>formal</th><th>raw</th><th>pack / run</th><th>点穿</th></tr></thead>
+          <thead><tr><th>单元</th><th>状态</th><th>四态</th><th>formal</th><th>raw</th><th>pack / run</th><th>点穿</th></tr></thead>
           <tbody>
             <tr
               v-for="row in board.rows"
@@ -574,6 +582,7 @@ function shortSha(value: string | null | undefined): string {
             >
               <td><b>{{ row.unitId }}</b><small>{{ row.title }}</small></td>
               <td>{{ statusLabel(row.status) }}</td>
+              <td :data-testid="`align-peek-${row.unitId}`">{{ peekLabel(row.consistencyPeek) }}</td>
               <td>{{ row.formalCommitted ? "是" : "否" }}</td>
               <td class="mono">{{ shortSha(row.rawSha256) }}</td>
               <td class="mono">

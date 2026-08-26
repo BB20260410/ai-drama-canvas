@@ -8,7 +8,8 @@
 - [x] 全面分析对照北星 / SSL / Phase D / 速度计划
 - [x] SSL-5：`ssl5-missing-to-gen-plan` MCP + 对照横幅 + 导演动作（不 dispatch）
 - [x] ScriptSpanMediaMap（`script-span-media-map` 只读；点段落→相交宫格/图）
-- [ ] 对照行四态 peek
+- [x] 对照行四态 peek（只读缓存；未评估 ≠ 无法检查；不自动 Review PASS）
+- [ ] 阅读器「这段配了哪些图」桌面按钮（MCP `script-span-media-map` 已有）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825

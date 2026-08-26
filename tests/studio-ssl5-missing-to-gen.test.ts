@@ -29,6 +29,7 @@ function row(partial: Partial<ScriptMediaAlignRow> & Pick<ScriptMediaAlignRow, "
     trace: { byPack: null, byRun: null },
     sourceSpans: [],
     outlineAnchors: [],
+    consistencyPeek: { status: "unevaluated" },
     ...partial,
   };
 }

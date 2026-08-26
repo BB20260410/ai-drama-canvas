@@ -1,8 +1,44 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
+  attachAlignRowConsistencyPeeks,
   matchOutlineAnchorsForUnit,
   SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION,
+  type ScriptMediaAlignRow,
 } from "../src/core/studio-script-media-align.js";
+import {
+  indexStudioConsistencyPeek,
+  peekStudioConsistencyVerdictByRunId,
+  type ConsistencyEvaluationResult,
+} from "../src/core/studio-consistency-evaluator.js";
+
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+function alignRow(partial: Partial<ScriptMediaAlignRow> & Pick<ScriptMediaAlignRow, "unitId" | "sequence">): ScriptMediaAlignRow {
+  return {
+    title: partial.unitId,
+    formalCommitted: false,
+    isEarliest: false,
+    reviewDecision: null,
+    scriptRevisionId: null,
+    panelCount: 2,
+    coveredPanelCount: 2,
+    missingPanelCount: 0,
+    status: "covered",
+    rawSha256: null,
+    labeledSha256: null,
+    packId: null,
+    packFingerprint: null,
+    generationRunId: null,
+    trace: { byPack: null, byRun: null },
+    sourceSpans: [],
+    outlineAnchors: [],
+    consistencyPeek: { status: "unevaluated" },
+    ...partial,
+  };
+}
 
 describe("studio-script-media-align", () => {
   it("matches outline headings containing unit id", () => {
@@ -38,5 +74,61 @@ describe("studio-script-media-align", () => {
 
   it("schema frozen", () => {
     expect(SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION).toBe(1);
+  });
+
+  it("attachAlignRowConsistencyPeeks 只挂缓存四态，未命中为未评估", () => {
+    const rows = attachAlignRowConsistencyPeeks(
+      [
+        alignRow({ unitId: "U1", sequence: 1, generationRunId: "run-hit" }),
+        alignRow({ unitId: "U2", sequence: 2, generationRunId: "run-miss" }),
+        alignRow({ unitId: "U3", sequence: 3 }),
+      ],
+      new Map([["run-hit", "needs-review"]]),
+    );
+    expect(rows[0]?.consistencyPeek).toEqual({ status: "cached", verdict: "needs-review" });
+    expect(rows[1]?.consistencyPeek).toEqual({ status: "unevaluated" });
+    expect(rows[2]?.consistencyPeek).toEqual({ status: "unevaluated" });
+  });
+
+  it("runId peek 不跑像素，瞬态结果不编入", () => {
+    const cached: ConsistencyEvaluationResult = {
+      schemaVersion: 1,
+      kind: "studio-consistency-evaluation",
+      verdict: "drifted",
+      assets: [],
+      evidence: {
+        projectId: "p",
+        generationRunId: "run-align-peek",
+        resultSha256: "aa",
+        referenceSha256: [],
+        assetVersionIds: [],
+        packFingerprint: "fp",
+        evaluatorVersion: "test",
+        configSha: "cfg",
+      },
+      computedAt: "2026-08-26T17:51:00.000Z",
+      durationMs: 1,
+      frameNotes: [],
+    };
+    indexStudioConsistencyPeek(cached);
+    expect(peekStudioConsistencyVerdictByRunId("run-align-peek")).toBe("drifted");
+    indexStudioConsistencyPeek({ ...cached, evidence: { ...cached.evidence, generationRunId: "run-transient" }, transient: true, verdict: "not-checkable" });
+    expect(peekStudioConsistencyVerdictByRunId("run-transient")).toBeUndefined();
+    expect(peekStudioConsistencyVerdictByRunId("run-never")).toBeUndefined();
+  });
+});
+
+describe("对照行四态 peek 源码合同", () => {
+  it("align 动态 import peek，不调用 evaluate，不自动 Review PASS", () => {
+    const align = readFileSync(path.join(repoRoot, "src/core/studio-script-media-align.ts"), "utf8");
+    const vue = readFileSync(path.join(repoRoot, "src/renderer/src/components/ScriptMediaAlignView.vue"), "utf8");
+    expect(align).toContain('import("./studio-consistency-evaluator.js")');
+    expect(align).toContain("peekStudioConsistencyVerdictByRunId");
+    expect(align).not.toContain("evaluateStudioConsistency");
+    expect(align).not.toContain("evaluateStudioReviewTargetConsistency");
+    expect(align).not.toMatch(/^import \{[^}]*peekStudioConsistencyVerdictByRunId/mu);
+    expect(vue).toContain("align-peek-");
+    expect(vue).toContain("未评估");
+    expect(vue).toContain("peekLabel");
   });
 });

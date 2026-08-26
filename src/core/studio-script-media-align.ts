@@ -11,6 +11,7 @@ import {
   type UnitSpanMediaMapEntry,
 } from "./studio-script-library-projection.js";
 import { getStudioScriptReaderView, type ScriptOutlineHeading } from "./studio-script-library-reader.js";
+import type { ConsistencyVerdict } from "./studio-consistency-evaluator.js";
 
 export const SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION = 1 as const;
 
@@ -38,6 +39,13 @@ export interface ScriptMediaAlignRow {
   };
   sourceSpans: Array<{ startOffsetUtf16: number; endOffsetUtf16: number }>;
   outlineAnchors: Array<{ title: string; level: number; startOffsetUtf16: number }>;
+  /** 只读缓存 peek。未评估 ≠ 无法检查。机器不自动 Review PASS。 */
+  consistencyPeek: AlignConsistencyPeek;
+}
+
+export interface AlignConsistencyPeek {
+  status: "cached" | "unevaluated";
+  verdict?: ConsistencyVerdict;
 }
 
 export interface ScriptMediaAlignBoard {
@@ -78,6 +86,33 @@ export function matchOutlineAnchorsForUnit(
       startOffsetUtf16: h.startOffsetUtf16,
     }))
     .slice(0, 12);
+}
+
+export function attachAlignRowConsistencyPeeks(
+  rows: ScriptMediaAlignRow[],
+  verdictByRunId: ReadonlyMap<string, ConsistencyVerdict>,
+): ScriptMediaAlignRow[] {
+  return rows.map((row) => {
+    const verdict = row.generationRunId ? verdictByRunId.get(row.generationRunId) : undefined;
+    return {
+      ...row,
+      consistencyPeek: verdict
+        ? { status: "cached", verdict }
+        : { status: "unevaluated" },
+    };
+  });
+}
+
+async function loadAlignConsistencyPeeks(rows: ScriptMediaAlignRow[]): Promise<Map<string, ConsistencyVerdict>> {
+  const runIds = [...new Set(rows.map((row) => row.generationRunId).filter((id): id is string => Boolean(id)))];
+  if (runIds.length === 0) return new Map();
+  const { peekStudioConsistencyVerdictByRunId } = await import("./studio-consistency-evaluator.js");
+  const out = new Map<string, ConsistencyVerdict>();
+  for (const runId of runIds) {
+    const verdict = peekStudioConsistencyVerdictByRunId(runId);
+    if (verdict) out.set(runId, verdict);
+  }
+  return out;
 }
 
 function rowStatus(u: UnitSpanMediaMapEntry): ScriptMediaAlignRow["status"] {
@@ -165,10 +200,12 @@ export async function getStudioScriptMediaAlignBoard(
       },
       sourceSpans: spans,
       outlineAnchors: matchOutlineAnchorsForUnit(u.unitId, outline),
+      consistencyPeek: { status: "unevaluated" },
     };
   });
 
   rows.sort((a, b) => a.sequence - b.sequence);
+  const rowsWithPeek = attachAlignRowConsistencyPeeks(rows, await loadAlignConsistencyPeeks(rows));
   const missingReport = buildMissingMediaReport(map);
 
   return {
@@ -182,11 +219,11 @@ export async function getStudioScriptMediaAlignBoard(
     revisionId,
     earliestUnitId: earliest.earliestUnitId,
     earliestStatusLine: earliest.statusLine,
-    unitCount: rows.length,
-    coveredCount: rows.filter((r) => r.status === "covered").length,
-    partialCount: rows.filter((r) => r.status === "partial").length,
-    missingAllCount: rows.filter((r) => r.status === "missing-all").length,
-    rows,
+    unitCount: rowsWithPeek.length,
+    coveredCount: rowsWithPeek.filter((r) => r.status === "covered").length,
+    partialCount: rowsWithPeek.filter((r) => r.status === "partial").length,
+    missingAllCount: rowsWithPeek.filter((r) => r.status === "missing-all").length,
+    rows: rowsWithPeek,
     missingReport,
     builtAt: new Date().toISOString(),
   };

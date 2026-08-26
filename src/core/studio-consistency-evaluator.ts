@@ -480,6 +480,8 @@ interface CacheEntry {
 }
 
 const evaluationCache = new Map<string, CacheEntry>();
+/** runId → 最近一次非瞬态评估，供对照面 peek；不触发像素。 */
+const peekByRunId = new Map<string, ConsistencyEvaluationResult>();
 const inflight = new Map<string, Promise<ConsistencyEvaluationResult>>();
 let running = 0;
 const pendingQueue: Array<{ scope: string; run: () => Promise<void>; cancel: () => void }> = [];
@@ -517,8 +519,14 @@ function cacheGet(key: string): ConsistencyEvaluationResult | undefined {
   return entry.result;
 }
 
+function rememberRunPeek(result: ConsistencyEvaluationResult): void {
+  if (result.transient) return;
+  peekByRunId.set(result.evidence.generationRunId, result);
+}
+
 function cacheSet(key: string, result: ConsistencyEvaluationResult): void {
   evaluationCache.set(key, { result, touchedAt: Date.now() });
+  rememberRunPeek(result);
   while (evaluationCache.size > P19_EVALUATOR_CONFIG.lruSize) {
     let oldestKey: string | undefined;
     let oldestAt = Number.POSITIVE_INFINITY;
@@ -529,8 +537,23 @@ function cacheSet(key: string, result: ConsistencyEvaluationResult): void {
       }
     }
     if (oldestKey === undefined) return;
+    const evicted = evaluationCache.get(oldestKey);
     evaluationCache.delete(oldestKey);
+    const runId = evicted?.result.evidence.generationRunId;
+    if (runId && peekByRunId.get(runId) === evicted?.result) {
+      peekByRunId.delete(runId);
+    }
   }
+}
+
+/** 只读：按 generationRunId 取已缓存四态。未评估返回 undefined。不验文件、不跑像素。 */
+export function peekStudioConsistencyVerdictByRunId(generationRunId: string): ConsistencyVerdict | undefined {
+  return peekByRunId.get(generationRunId)?.verdict;
+}
+
+/** 把已完成评估编入 runId peek（Review 评估走 cacheSet；测试可直接编入）。不触发像素。 */
+export function indexStudioConsistencyPeek(result: ConsistencyEvaluationResult): void {
+  rememberRunPeek(result);
 }
 
 async function acquireSlot(scope: string, signal?: AbortSignal): Promise<(() => void) | "evicted" | "aborted" | null> {
