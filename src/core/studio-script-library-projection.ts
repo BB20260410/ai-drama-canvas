@@ -213,6 +213,110 @@ export function formatPanelStandingGaps(panel: PanelStandingFields | null | unde
   return `锁版站位缺口：${gaps.join("、")} · ${handoff}。不是 BindingSet，不能当 generation-ready。`;
 }
 
+export const SCENE_BACK_REFERENCE_LIMIT = 4;
+
+export type SceneBackReference = {
+  assetId: string;
+  role: string;
+  unitId: string;
+  sequence: number;
+  panelIndex: number;
+  panelId: string;
+};
+
+export function listSceneAssetMentions(
+  mentions: ReadonlyArray<{ assetId?: string; category?: string; role?: string }> | null | undefined,
+): PanelAssetMentionLite[] {
+  if (!mentions) return [];
+  return mentions.flatMap((mention) => {
+    const assetId = String(mention.assetId ?? "").trim();
+    const category = String(mention.category ?? "").trim();
+    if (!assetId || category !== "scene") return [];
+    return [{ assetId, category, role: String(mention.role ?? "").trim() }];
+  });
+}
+
+function isEarlierPanel(
+  sequence: number,
+  panelIndex: number,
+  currentSequence: number,
+  currentPanelIndex: number,
+): boolean {
+  if (sequence < currentSequence) return true;
+  return sequence === currentSequence && panelIndex < currentPanelIndex;
+}
+
+/**
+ * 跨单元场景回指：只扫已加载对照/episode 快照提及。
+ * 不是 BindingSet，不能当 generation-ready。不读 head、不拆冻结包。
+ */
+export function listSceneBackReferences(input: {
+  currentUnitId: string;
+  currentSequence: number;
+  currentPanelIndex: number;
+  currentPanelId: string;
+  sceneMentions: ReadonlyArray<{ assetId: string; role?: string }>;
+  units: ReadonlyArray<{
+    unitId: string;
+    sequence: number;
+    panels: ReadonlyArray<{
+      panelId: string;
+      panelIndex: number;
+      assetMentions: ReadonlyArray<{ assetId: string; category: string; role?: string }>;
+    }>;
+  }>;
+  limit?: number;
+}): SceneBackReference[] {
+  const sceneIds = new Set(
+    input.sceneMentions.map((mention) => mention.assetId.trim()).filter(Boolean),
+  );
+  if (!sceneIds.size) return [];
+  const limit = Math.max(1, Math.min(input.limit ?? SCENE_BACK_REFERENCE_LIMIT, SCENE_BACK_REFERENCE_LIMIT));
+  const rows: SceneBackReference[] = [];
+  const seen = new Set<string>();
+  for (const unit of input.units) {
+    for (const panel of unit.panels) {
+      if (panel.panelId === input.currentPanelId && unit.unitId === input.currentUnitId) continue;
+      if (!isEarlierPanel(unit.sequence, panel.panelIndex, input.currentSequence, input.currentPanelIndex)) {
+        continue;
+      }
+      for (const mention of listSceneAssetMentions(panel.assetMentions)) {
+        if (!sceneIds.has(mention.assetId)) continue;
+        const key = `${unit.unitId}:${panel.panelId}:${mention.assetId}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        rows.push({
+          assetId: mention.assetId,
+          role: mention.role,
+          unitId: unit.unitId,
+          sequence: unit.sequence,
+          panelIndex: panel.panelIndex,
+          panelId: panel.panelId,
+        });
+      }
+    }
+  }
+  return rows
+    .sort((left, right) => right.sequence - left.sequence || right.panelIndex - left.panelIndex)
+    .slice(0, limit);
+}
+
+export function formatSceneBackReferences(
+  sceneMentionCount: number,
+  rows: ReadonlyArray<SceneBackReference>,
+): string {
+  if (sceneMentionCount <= 0) {
+    return "本格快照未提及场景。不是 BindingSet，不能当 generation-ready。";
+  }
+  if (!rows.length) {
+    return "场景回指：本集更早单元没有同场景快照提及。不是 BindingSet，不能当 generation-ready。";
+  }
+  const text = rows
+    .map((row) => `U${row.sequence} G${row.panelIndex} ${row.role || row.assetId}`)
+    .join("；");
+  return `场景回指：${text}。快照提及，不是 BindingSet，不能当 generation-ready。`;
+}
+
 export function applyPackMediaToPanels(
   panels: Array<{
     index: number;

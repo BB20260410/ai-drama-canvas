@@ -9,8 +9,12 @@ import {
   formatPanelCoverageMarks,
   formatPanelStandingGaps,
   formatPanelStandingHandoff,
+  formatSceneBackReferences,
+  listSceneAssetMentions,
+  listSceneBackReferences,
   pickFirstCoveredPanel,
   pickFirstMissingPanel,
+  type SceneBackReference,
   type ScriptLibraryIndex,
   type ScriptSpanMediaHit,
   type ScriptSpanMediaMap,
@@ -611,6 +615,43 @@ async function selectAlignTablePanel(row: ScriptMediaAlignRow, panel: AlignPanel
   await loadAlignPreview(panel.rawSha256);
 }
 
+const alignSceneMentions = computed(() => listSceneAssetMentions(selectedAlignPanel.value?.assetMentions));
+
+const alignSceneBackRefs = computed(() => {
+  const row = selectedAlignRow.value;
+  const panel = selectedAlignPanel.value;
+  if (!board.value || !row || !panel) return [];
+  return listSceneBackReferences({
+    currentUnitId: row.unitId,
+    currentSequence: row.sequence,
+    currentPanelIndex: panel.panelIndex,
+    currentPanelId: panel.panelId,
+    sceneMentions: alignSceneMentions.value,
+    units: board.value.rows,
+  });
+});
+
+const alignSceneBackRefLine = computed(() => {
+  if (!selectedAlignPanel.value) return null;
+  return formatSceneBackReferences(alignSceneMentions.value.length, alignSceneBackRefs.value);
+});
+
+async function revealSceneBackRef(ref: SceneBackReference): Promise<void> {
+  const focusRow = board.value?.rows.find((row) => row.unitId === ref.unitId);
+  if (!focusRow) {
+    notice.value = `对照表没有 ${ref.unitId}，不能猜宫格。`;
+    return;
+  }
+  const focusPanel = focusRow.panels.find((panel) => panel.panelId === ref.panelId);
+  if (!focusPanel) {
+    notice.value = `对照表没有 ${ref.unitId} G${ref.panelIndex}，不能猜宫格。`;
+    return;
+  }
+  await selectAlignTablePanel(focusRow, focusPanel);
+  notice.value = `已回指 ${ref.unitId} G${ref.panelIndex}。快照提及，不是 BindingSet。`;
+  await scrollAlignRowIntoView(ref.unitId);
+}
+
 function peekLabel(peek?: AlignConsistencyPeek): string {
   if (!peek || peek.status === "unevaluated" || !peek.verdict) return "未评估";
   if (peek.verdict === "consistent") return "一致";
@@ -945,6 +986,19 @@ function shortSha(value: string | null | undefined): string {
                 </template>
                 <template v-else>—</template>
                 <small>快照提及，不是 BindingSet，不能当 generation-ready。</small>
+              </dd>
+            </div>
+            <div v-if="alignSceneBackRefLine">
+              <dt>场景回指</dt>
+              <dd data-testid="align-panel-scene-backrefs">
+                <p>{{ alignSceneBackRefLine }}</p>
+                <button
+                  v-for="ref in alignSceneBackRefs"
+                  :key="`${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+                  type="button"
+                  :data-testid="`align-scene-backref-${ref.unitId}-${ref.panelId}`"
+                  @click="revealSceneBackRef(ref)"
+                >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
               </dd>
             </div>
           </dl>

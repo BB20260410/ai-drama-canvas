@@ -9,7 +9,10 @@ import {
   formatPanelCoverageMarks,
   formatPanelStandingGaps,
   formatPanelStandingHandoff,
+  formatSceneBackReferences,
   listPanelStandingGaps,
+  listSceneAssetMentions,
+  listSceneBackReferences,
   normalizeSourceSpans,
   summarizePanelAssetMentions,
   pickFirstCoveredPanel,
@@ -349,6 +352,117 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(summarizePanelAssetMentions([{ assetId: "  ", role: "x" }, { assetId: "prop-1", category: "prop", role: "面具" }])).toEqual([
       { assetId: "prop-1", category: "prop", role: "面具" },
     ]);
+    expect(listSceneAssetMentions([
+      { assetId: "char-a", category: "character", role: "豆姐" },
+      { assetId: "scene-stone", category: "scene", role: "石室" },
+    ])).toEqual([{ assetId: "scene-stone", category: "scene", role: "石室" }]);
+    expect(listSceneBackReferences({
+      currentUnitId: "u2",
+      currentSequence: 2,
+      currentPanelIndex: 1,
+      currentPanelId: "u2p1",
+      sceneMentions: [{ assetId: "scene-stone", role: "石室" }],
+      units: [
+        {
+          unitId: "u1",
+          sequence: 1,
+          panels: [{
+            panelId: "u1p1",
+            panelIndex: 1,
+            assetMentions: [{ assetId: "scene-stone", category: "scene", role: "石室" }],
+          }],
+        },
+        {
+          unitId: "u2",
+          sequence: 2,
+          panels: [{
+            panelId: "u2p1",
+            panelIndex: 1,
+            assetMentions: [{ assetId: "scene-stone", category: "scene", role: "石室" }],
+          }],
+        },
+        {
+          unitId: "u3",
+          sequence: 3,
+          panels: [{
+            panelId: "u3p1",
+            panelIndex: 1,
+            assetMentions: [{ assetId: "scene-stone", category: "scene", role: "石室" }],
+          }],
+        },
+      ],
+    })).toEqual([{
+      assetId: "scene-stone",
+      role: "石室",
+      unitId: "u1",
+      sequence: 1,
+      panelIndex: 1,
+      panelId: "u1p1",
+    }]);
+    expect(listSceneBackReferences({
+      currentUnitId: "u1",
+      currentSequence: 1,
+      currentPanelIndex: 2,
+      currentPanelId: "u1p2",
+      sceneMentions: [{ assetId: "scene-stone", role: "石室" }],
+      units: [{
+        unitId: "u1",
+        sequence: 1,
+        panels: [
+          {
+            panelId: "u1p1",
+            panelIndex: 1,
+            assetMentions: [{ assetId: "scene-stone", category: "scene", role: "石室" }],
+          },
+          {
+            panelId: "u1p2",
+            panelIndex: 2,
+            assetMentions: [{ assetId: "scene-stone", category: "scene", role: "石室" }],
+          },
+        ],
+      }],
+    })).toEqual([{
+      assetId: "scene-stone",
+      role: "石室",
+      unitId: "u1",
+      sequence: 1,
+      panelIndex: 1,
+      panelId: "u1p1",
+    }]);
+    expect(listSceneBackReferences({
+      currentUnitId: "u1",
+      currentSequence: 1,
+      currentPanelIndex: 1,
+      currentPanelId: "u1p1",
+      sceneMentions: [{ assetId: "scene-stone" }],
+      units: [{
+        unitId: "u1",
+        sequence: 1,
+        panels: [{
+          panelId: "u1p1",
+          panelIndex: 1,
+          assetMentions: [{ assetId: "scene-stone", category: "scene", role: "石室" }],
+        }],
+      }],
+    })).toEqual([]);
+    expect(formatSceneBackReferences(0, [])).toContain("本格快照未提及场景");
+    expect(formatSceneBackReferences(1, [])).toContain("没有同场景快照提及");
+    expect(formatSceneBackReferences(1, [{
+      assetId: "scene-stone",
+      role: "石室",
+      unitId: "u1",
+      sequence: 1,
+      panelIndex: 2,
+      panelId: "u1p2",
+    }])).toContain("U1 G2 石室");
+    expect(formatSceneBackReferences(1, [{
+      assetId: "scene-stone",
+      role: "石室",
+      unitId: "u1",
+      sequence: 1,
+      panelIndex: 2,
+      panelId: "u1p2",
+    }])).toContain("不是 BindingSet");
     expect(pickFirstCoveredPanel(panels)?.panelId).toBe("p2");
     expect(formatPanelCoverageMarks(panels)).toBe("G1缺 G2有");
     expect(pickFirstMissingPanel(panels)?.panelId).toBe("p1");
@@ -372,6 +486,10 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     expect(source).toContain("applyPackMediaToPanels");
     expect(source).toContain("attachPanelStandingHandoffs");
     expect(source).toContain("summarizePanelAssetMentions");
+    expect(source).toContain("listSceneBackReferences");
+    expect(source).toContain("不是 BindingSet，不能当 generation-ready");
+    expect(source).not.toContain("getStudioBindingControl");
+    expect(source).not.toContain("evaluateStudioConsistency");
     expect(source).not.toContain("panel 级 media 目前与 unit-grid 共享同一结果图");
     expect(source).toContain("summarizeScriptRevisionUnits");
     expect(source).toContain("coveredMediaCount = summary.coveredMediaCount");
