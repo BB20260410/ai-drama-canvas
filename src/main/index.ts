@@ -3266,11 +3266,14 @@ function registerIpc(): void {
     selector: { packId?: string; runId?: string; resultId?: string },
   ) => {
     await requireManagedStudioProject(projectRoot);
-    const keys = ["packId", "runId", "resultId"].filter((key) => typeof selector?.[key] === "string" && String(selector[key]).trim());
+    const packId = typeof selector?.packId === "string" ? selector.packId.trim() : "";
+    const runId = typeof selector?.runId === "string" ? selector.runId.trim() : "";
+    const resultId = typeof selector?.resultId === "string" ? selector.resultId.trim() : "";
+    const keys = [packId && "packId", runId && "runId", resultId && "resultId"].filter(Boolean);
     if (keys.length !== 1) throw new Error("selector 必须恰好包含 packId/runId/resultId 之一。");
-    if (selector.packId) return getStudioGenerationTrace(projectRoot, { packId: selector.packId });
-    if (selector.runId) return getStudioGenerationTrace(projectRoot, { runId: selector.runId });
-    return getStudioGenerationTrace(projectRoot, { resultId: selector.resultId! });
+    if (packId) return getStudioGenerationTrace(projectRoot, { packId });
+    if (runId) return getStudioGenerationTrace(projectRoot, { runId });
+    return getStudioGenerationTrace(projectRoot, { resultId });
   });
   ipcMain.handle("canvas:list-studio-text-revisions", async (
     _event,

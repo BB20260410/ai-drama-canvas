@@ -77,7 +77,7 @@ describe("P24 追溯 IPC 桌面接线（§4-8）", () => {
     expect(preload).toContain('invoke("canvas:get-studio-generation-control", projectRoot, query)');
     expect(main).toContain("getStudioGenerationControlEnvelope(projectRoot, query)");
     expect(main).toContain("readAnyStudioGenerationFrozenPack(projectRoot, packId)");
-    expect(main).toContain("getStudioGenerationTrace(projectRoot, { packId: selector.packId })");
+    expect(main).toContain("getStudioGenerationTrace(projectRoot, { packId })");
     // pack-currentness 在 main 侧走 target-aware 聚合（内部逐 BindingSet 仍经
     // buildStudioAssetBindingCurrentContext→currentness→classify 纯模块，与 trace 同一映射点；退化资产归 unexpected）。
     expect(main).toContain("evaluateStudioGenerationPackCurrentness(projectRoot, pack)");
