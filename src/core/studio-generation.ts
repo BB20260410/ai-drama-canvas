@@ -1173,6 +1173,46 @@ async function freezeAllowedAsset(
   return { ...result, sourceFingerprint };
 }
 
+export type StudioPanelStandingHandoff = {
+  panelIndex: number;
+  panelId: string;
+  shotComposition: string;
+  visualAction: string;
+  filmingMethod: string;
+};
+
+export function pickPreviousPanelStanding(
+  panels: ReadonlyArray<{
+    index: number;
+    id: string;
+    shotComposition: string;
+    visualAction: string;
+    filmingMethod: string;
+  }>,
+  currentIndex: number,
+): StudioPanelStandingHandoff | null {
+  if (!Number.isFinite(currentIndex)) return null;
+  const previous = panels
+    .filter((panel) => panel.index < currentIndex)
+    .sort((left, right) => right.index - left.index)[0];
+  if (!previous) return null;
+  return {
+    panelIndex: previous.index,
+    panelId: previous.id,
+    shotComposition: previous.shotComposition,
+    visualAction: previous.visualAction,
+    filmingMethod: previous.filmingMethod,
+  };
+}
+
+/** 写入冻结 renderedPrompt；首格返回 null，不改指纹。 */
+export function formatPreviousStandingPromptLine(
+  handoff: StudioPanelStandingHandoff | null | undefined,
+): string | null {
+  if (!handoff) return null;
+  return `前镜交接：G${handoff.panelIndex} ${handoff.shotComposition.trim() || "构图未记"} · ${handoff.visualAction.trim() || "动作未记"} · ${handoff.filmingMethod.trim() || "运镜未记"}。本格必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。`;
+}
+
 function panelInstruction(panel: StudioProductionPanel): StudioGenerationPanelInstruction {
   return {
     title: panel.title,
@@ -1641,7 +1681,9 @@ function renderStudioPrompt(input: {
   assets: StudioFrozenAssetReference[];
   forbiddenAssets: StudioFrozenForbiddenAsset[];
   layout: StudioCodexModelPayload["layout"];
+  previousStanding?: StudioPanelStandingHandoff | null;
 }): string {
+  const previousLine = formatPreviousStandingPromptLine(input.previousStanding);
   const lines = [
     input.layout === "cinematic-wide"
       ? "只生成一张电影宽银幕横幅、电影写实的 AI 短剧分镜图；保持横屏，不要竖屏、拼图、分屏、字幕、水印、界面文字或现代物。"
@@ -1649,6 +1691,7 @@ function renderStudioPrompt(input: {
     `宫格画面：${input.panel.title}。${input.panel.visualAction}`,
     `景别与构图：${input.panel.shotComposition}`,
     `拍摄方式：${input.panel.filmingMethod}`,
+    ...(previousLine ? [previousLine] : []),
     `本格冻结提示词：${input.promptRevision.body}`,
     `镜头类型：${input.panel.shotType === "extension" ? "扩写延续（保持与前一格连续，不重新起镜）" : "原镜"}`,
   ];
@@ -1723,6 +1766,7 @@ function buildRequest(input: {
   previousApprovedRaw?: StudioPreviousApprovedRawSnapshot;
   assets: StudioFrozenAssetReference[];
   forbiddenAssets: StudioFrozenForbiddenAsset[];
+  previousStanding?: StudioPanelStandingHandoff | null;
 }): StudioCodexGenerationRequest {
   const layout = inferStudioPanelImageLayout({
     visualAction: input.panel.visualAction,
@@ -1732,7 +1776,11 @@ function buildRequest(input: {
   const modelPayload: StudioCodexModelPayload = {
     exactlyOneImage: true,
     layout,
-    renderedPrompt: renderStudioPrompt({ ...input, layout }),
+    renderedPrompt: renderStudioPrompt({
+      ...input,
+      layout,
+      ...(input.previousStanding ? { previousStanding: input.previousStanding } : {}),
+    }),
     target: input.target,
     panel: input.panel,
     prompt: {
@@ -2360,6 +2408,7 @@ async function buildFreezePackInternal(
   const scriptRevision = freezeTextRevision(snapshot.scriptRevision);
   const promptRevision = freezePromptRevision(panel.promptRevision);
   const instruction = panelInstruction(panel);
+  const previousStanding = pickPreviousPanelStanding(snapshot.panels, panel.index);
   const request = buildRequest({
     projectId: shell.project.id,
     target,
@@ -2372,6 +2421,7 @@ async function buildFreezePackInternal(
     ...(previousApprovedRaw ? { previousApprovedRaw } : {}),
     assets,
     forbiddenAssets,
+    ...(previousStanding ? { previousStanding } : {}),
   });
   const semantic: Omit<StudioGenerationFreezePack, "id" | "fingerprint"> = {
     schemaVersion: 4,

@@ -33,6 +33,12 @@ export interface UnitGridBriefBeat {
   filmingMethod: string;
   visualAction: string;
   dialogue?: string;
+  previousStanding?: {
+    order: number;
+    shotComposition: string;
+    filmingMethod: string;
+    visualAction: string;
+  };
 }
 
 export interface UnitGridBriefContract {
@@ -119,15 +125,28 @@ export function composeUnitGridBriefContract(
   if (references.length === 0) {
     throw new Error("unit-grid Brief 合同缺少 controlReferences，禁止降级 text-only。");
   }
-  const beats: UnitGridBriefBeat[] = pack.panels.slice(0, MAX_BEATS).map((panel) => ({
-    order: panel.order,
-    panelId: panel.panelId,
-    durationSeconds: panel.durationSeconds,
-    shotComposition: panel.instruction.shotComposition,
-    filmingMethod: panel.instruction.filmingMethod,
-    visualAction: panel.instruction.visualAction,
-    ...(panel.instruction.dialogue ? { dialogue: clip(panel.instruction.dialogue, 80) } : {}),
-  }));
+  const beats: UnitGridBriefBeat[] = pack.panels.slice(0, MAX_BEATS).map((panel, index, all) => {
+    const previous = index > 0 ? all[index - 1] : undefined;
+    return {
+      order: panel.order,
+      panelId: panel.panelId,
+      durationSeconds: panel.durationSeconds,
+      shotComposition: panel.instruction.shotComposition,
+      filmingMethod: panel.instruction.filmingMethod,
+      visualAction: panel.instruction.visualAction,
+      ...(panel.instruction.dialogue ? { dialogue: clip(panel.instruction.dialogue, 80) } : {}),
+      ...(previous
+        ? {
+          previousStanding: {
+            order: previous.order,
+            shotComposition: previous.instruction.shotComposition,
+            filmingMethod: previous.instruction.filmingMethod,
+            visualAction: previous.instruction.visualAction,
+          },
+        }
+        : {}),
+    };
+  });
   if (beats.length === 0) {
     throw new Error("unit-grid Brief 合同缺少 BEATS。");
   }
@@ -183,7 +202,11 @@ export function renderUnitGridBriefContractText(contract: UnitGridBriefContract)
     .map((entry) => `${entry.assetId} sha256:${entry.mediaSha256.slice(0, 12)}`)
     .join("；") || "无场景控制参考";
   const beats = slots.BEATS
-    .map((beat) => `G${beat.order} ${beat.durationSeconds}s ${beat.shotComposition}/${beat.filmingMethod} ${clip(beat.visualAction, 48)}`)
+    .map((beat) => {
+      const self = `G${beat.order} ${beat.durationSeconds}s ${beat.shotComposition}/${beat.filmingMethod} ${clip(beat.visualAction, 48)}`;
+      if (!beat.previousStanding) return self;
+      return `${self} ← G${beat.previousStanding.order} ${beat.previousStanding.shotComposition}/${beat.previousStanding.filmingMethod}`;
+    })
     .join(" | ");
   const delta = slots.DELTA_ONLY ?? "非续镜：按 BEATS 完整执行";
   return [

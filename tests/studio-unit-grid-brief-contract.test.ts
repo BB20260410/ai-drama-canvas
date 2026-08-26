@@ -5,6 +5,7 @@ import {
   IDENTITY_SENTENCE_MAX_CHARS,
   UNIT_GRID_BRIEF_TEMPLATE_ID,
   composeUnitGridBriefContract,
+  renderUnitGridBriefContractText,
 } from "../src/core/unit-grid-brief-contract.js";
 
 const SHA_A = "a".repeat(64);
@@ -371,6 +372,36 @@ describe("buildStudioUnitGridAgentImagegenBrief (shipped runtime)", () => {
   it("compose 与 brief 共用同一 fail-closed：零 controlRefs 禁止 text-only", () => {
     const pack = minimalUnitGridPack({ emptyControlReferences: true });
     expect(() => composeUnitGridBriefContract(pack)).toThrow(/controlReferences|text-only/);
+  });
+
+  it("多格 brief 把前镜站位写进 BEATS 文本，不改 pack.renderedPrompt", () => {
+    const pack = minimalUnitGridPack();
+    const first = pack.panels[0]!;
+    pack.panels.push({
+      ...first,
+      order: 2,
+      panelId: "panel-02",
+      panelIndex: 2,
+      startSeconds: 7.5,
+      endSeconds: 15,
+      instruction: {
+        visualAction: "抬手",
+        shotComposition: "近景",
+        filmingMethod: "推",
+      },
+    });
+    const originalPrompt = pack.request.modelPayload.renderedPrompt;
+    const contract = composeUnitGridBriefContract(pack);
+    expect(contract.slots.BEATS[0]?.previousStanding).toBeUndefined();
+    expect(contract.slots.BEATS[1]?.previousStanding).toEqual({
+      order: 1,
+      shotComposition: "中景",
+      filmingMethod: "固定",
+      visualAction: "停步",
+    });
+    expect(pack.request.modelPayload.renderedPrompt).toBe(originalPrompt);
+    const text = renderUnitGridBriefContractText(contract);
+    expect(text).toContain("G2 7.5s 近景/推 抬手 ← G1 中景/固定");
   });
 
   it("controlReferences 为空时 fail-closed，禁止 text-only", () => {
