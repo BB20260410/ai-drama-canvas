@@ -348,10 +348,14 @@ describe("buildStudioUnitGridAgentImagegenBrief (shipped runtime)", () => {
     expect(codex.promptContract.slots.BEATS[0]).toMatchObject({
       order: 1,
       panelId: "panel-01",
+      startSeconds: 0,
+      endSeconds: 7.5,
+      durationSeconds: 7.5,
       shotComposition: "中景",
       filmingMethod: "固定",
       visualAction: "停步",
     });
+    expect(codex.promptContractText).toContain("G1 0–7.5s 7.5s 中景/固定 停步");
     expect(codex.promptContract.slots.HARD_NEGS).toEqual(expect.arrayContaining(["字幕", "水印/标志"]));
     expect(codex.promptContract.slots.DELTA_ONLY).toBeNull();
     expect(codex.promptContract.slots.OUTPUT_RULES.some((rule) => rule.includes("只输出一张图"))).toBe(true);
@@ -423,7 +427,7 @@ describe("buildStudioUnitGridAgentImagegenBrief (shipped runtime)", () => {
     });
     expect(pack.request.modelPayload.renderedPrompt).toBe(originalPrompt);
     const text = renderUnitGridBriefContractText(contract);
-    expect(text).toContain("G2 7.5s 近景/推 抬手 ← G1 中景/固定");
+    expect(text).toContain("G2 7.5–15s 7.5s 近景/推 抬手 ← G1 中景/固定");
     const standingLine = "前镜交接：G1 中景 · 停步 · 固定。本格必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。";
     pack.panels[1] = {
       ...pack.panels[1]!,
@@ -499,6 +503,58 @@ describe("buildStudioUnitGridAgentImagegenBrief (shipped runtime)", () => {
       { panelId: "panel-02", lighting: "走廊冷光", costume: "湿祭服" },
     ]);
     expect(brief.prompt).toBe(originalPrompt);
+  });
+
+  it("多格 brief 把 15s 起止秒与扩写格写进 BEATS，不改 renderedPrompt", () => {
+    const pack = minimalUnitGridPack();
+    const first = pack.panels[0]!;
+    pack.panels[0] = {
+      ...first,
+      instruction: {
+        ...first.instruction,
+        shotType: "original",
+      },
+    };
+    pack.panels.push({
+      ...first,
+      order: 2,
+      panelId: "panel-02",
+      panelIndex: 2,
+      startSeconds: 7.5,
+      endSeconds: 15,
+      durationSeconds: 7.5,
+      instruction: {
+        visualAction: "抬手",
+        shotComposition: "近景",
+        filmingMethod: "推",
+        shotType: "extension",
+      },
+    });
+    const originalPrompt = pack.request.modelPayload.renderedPrompt;
+    const contract = composeUnitGridBriefContract(pack);
+    expect(contract.schemaVersion).toBe(1);
+    expect(contract.templateId).toBe(UNIT_GRID_BRIEF_TEMPLATE_ID);
+    expect(contract.slots.BEATS[0]).toMatchObject({
+      startSeconds: 0,
+      endSeconds: 7.5,
+      durationSeconds: 7.5,
+      shotType: "original",
+    });
+    expect(contract.slots.BEATS[1]).toMatchObject({
+      startSeconds: 7.5,
+      endSeconds: 15,
+      durationSeconds: 7.5,
+      shotType: "extension",
+    });
+    expect(pack.request.modelPayload.renderedPrompt).toBe(originalPrompt);
+    const text = renderUnitGridBriefContractText(contract);
+    expect(text).toContain("G1 0–7.5s 7.5s 原镜 中景/固定 停步");
+    expect(text).toContain("G2 7.5–15s 7.5s 扩写 近景/推 抬手 ← G1 中景/固定");
+    const brief = buildStudioUnitGridAgentImagegenBrief(pack, "codex");
+    expect(brief.prompt).toBe(originalPrompt);
+    expect(brief.promptContractText).toContain("原镜");
+    expect(brief.promptContractText).toContain("扩写");
+    expect(brief.tool.notes.at(-1)).toContain("前镜交接");
   });
 
   it("controlReferences 为空时 fail-closed，禁止 text-only", () => {

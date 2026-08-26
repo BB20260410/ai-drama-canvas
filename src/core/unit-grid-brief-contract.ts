@@ -28,7 +28,10 @@ export interface UnitGridBriefIdentityLock {
 export interface UnitGridBriefBeat {
   order: number;
   panelId: string;
+  startSeconds?: number;
+  endSeconds?: number;
   durationSeconds: number;
+  shotType?: "original" | "extension";
   shotComposition: string;
   filmingMethod: string;
   visualAction: string;
@@ -129,10 +132,16 @@ export function composeUnitGridBriefContract(
   }
   const beats: UnitGridBriefBeat[] = pack.panels.slice(0, MAX_BEATS).map((panel, index, all) => {
     const previous = index > 0 ? all[index - 1] : undefined;
+    const shotType = panel.instruction.shotType === "extension" || panel.instruction.shotType === "original"
+      ? panel.instruction.shotType
+      : undefined;
     return {
       order: panel.order,
       panelId: panel.panelId,
+      startSeconds: panel.startSeconds,
+      endSeconds: panel.endSeconds,
       durationSeconds: panel.durationSeconds,
+      ...(shotType ? { shotType } : {}),
       shotComposition: panel.instruction.shotComposition,
       filmingMethod: panel.instruction.filmingMethod,
       visualAction: panel.instruction.visualAction,
@@ -215,7 +224,11 @@ export function renderUnitGridBriefContractText(contract: UnitGridBriefContract)
         beat.sceneLighting ? `光:${clip(beat.sceneLighting, 24)}` : "",
         beat.costumeState ? `服:${clip(beat.costumeState, 24)}` : "",
       ].filter(Boolean).join(" ");
-      const self = `G${beat.order} ${beat.durationSeconds}s ${beat.shotComposition}/${beat.filmingMethod} ${clip(beat.visualAction, 48)}${overlay ? ` ${overlay}` : ""}`;
+      const timing = Number.isFinite(beat.startSeconds) && Number.isFinite(beat.endSeconds)
+        ? `${beat.startSeconds}–${beat.endSeconds}s ${beat.durationSeconds}s`
+        : `${beat.durationSeconds}s`;
+      const shot = beat.shotType === "extension" ? "扩写" : beat.shotType === "original" ? "原镜" : "";
+      const self = `G${beat.order} ${timing}${shot ? ` ${shot}` : ""} ${beat.shotComposition}/${beat.filmingMethod} ${clip(beat.visualAction, 48)}${overlay ? ` ${overlay}` : ""}`;
       if (!beat.previousStanding) return self;
       return `${self} ← G${beat.previousStanding.order} ${beat.previousStanding.shotComposition}/${beat.previousStanding.filmingMethod}`;
     })
