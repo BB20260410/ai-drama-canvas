@@ -2,7 +2,7 @@
 
 ## software_goal: runtime-perf-memory-20260825
 
-- status: `阻塞`（本 Cloud；整计划 `部分完成`）。§1.3 by-id + 诊断懒展开 + lean 季集身份 + 身份只读 + 账本批读只读 + 历史 PASS 活库只读 + Linux 真投影 sqlite 接线 + 零 mock inspect 已落地；Darwin CI `43945a2`/`2d8ce47`/`4b1824a` 已绿。等待 owner：P7 owner / 安装版 T23 / 列表 GUI 探针
+- status: `阻塞`（本 Cloud；整计划 `部分完成`）。§1.3 by-id + 诊断懒展开 + lean 季集身份 + 身份只读 + 账本批读只读 + 历史 PASS 活库只读 + Linux 真投影 sqlite 接线 + 零 mock inspect + Wave 7 画布媒体热路径已落地；Darwin CI `43945a2`/`2d8ce47`/`4b1824a` 已绿。等待 owner：P7 owner / 安装版 T23 / 列表 GUI 探针
 - plan: `docs/PLAN_运行速度与内存占用长期执行_20260825.md`
 - [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席本环境未跑）
 - [x] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
@@ -54,6 +54,7 @@
 - [x] Wave 6 零 mock inspect 后复验：typecheck:app PASS；Linux 41 files / 322 tests PASS（含 unmocked inspect / projection sqlite）；busy ledger 1 条仍需 Darwin dirfd；安装版 T23 仍 NOT_RUN
 - [x] Wave 6 Darwin CI：macos-latest check success on `0b46327`（run 32881922045）；不是安装版 T23
 - [x] Wave 6 Darwin CI 投影接线：`43945a2` run `32906441251` success（真 sqlite 5）；`2d8ce47` run `32906906873` success（零 mock inspect 6 + sqlite 5）；HEAD `4b1824a` run `32907435248` success（320 files）；不是安装版 T23 / 不是 P7 owner
+- [x] Wave 7 运行热路径：`getStudioMedia` 只读旁路 + 同 SHA 单飞；derivative 单次只读会话（保留二次 assert TOCTOU）；核心裁剪 rebuild 并入 rAF。未去掉 worker 增量 schedule。Linux 7/139 PASS。不是 P7 / T23 / GUI
 - [x] Wave 5-E Darwin CI：macos-latest check success on `3f04d05`（evict）与 `84b594c`（写回拦截）；不是安装版 T23
 - [x] Wave 5 列表翻页源码合同 Darwin CI：macos-latest check success on `379df38`（run 32886953416）；不是安装版 T23 / 不是 GUI 探针
 - [x] Darwin CI flake：`studio-sqlite-busy-contract` 墙钟 500→5000（b002adf run 32887756159）；未改 120s timeout

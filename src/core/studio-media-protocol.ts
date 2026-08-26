@@ -550,26 +550,25 @@ async function assertDatabaseFiles(canonicalRoot: string): Promise<string> {
   return databasePath;
 }
 
-function readMediaRow(databasePath: string, target: "media" | "thumbnail", key: string): MediaRow {
-  let database: DatabaseSync | undefined;
+function openProtocolDatabase(databasePath: string): DatabaseSync {
+  const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
+  const database = new DatabaseSync(databasePath, { readOnly: true, timeout: busyTimeoutMs });
   try {
-    const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
-    database = new DatabaseSync(databasePath, { readOnly: true, timeout: busyTimeoutMs });
     database.exec(`PRAGMA query_only=ON; PRAGMA busy_timeout=${busyTimeoutMs};`);
     const version = database.prepare("SELECT value FROM studio_meta WHERE key = 'schema_version'").get() as { value?: unknown } | undefined;
     if (version?.value !== SCHEMA_VERSION) throw integrityViolation("素材库 schema_version 缺失或不受支持。");
-    const columns = database.prepare("PRAGMA table_info(studio_media)").all() as Array<{ name?: unknown }>;
-    if (columns.length !== EXPECTED_MEDIA_COLUMNS.length
-      || columns.some((column, index) => column.name !== EXPECTED_MEDIA_COLUMNS[index])) {
-      throw integrityViolation("素材库 studio_media schema 已漂移。");
-    }
-    const sql = target === "media"
-      ? "SELECT sha256, kind, size_bytes, mime_type, source_basename, object_relpath, derivative_status, thumbnail_recipe_key, thumbnail_relpath, thumbnail_width, thumbnail_height FROM studio_media WHERE sha256 = ? LIMIT 2"
-      : "SELECT sha256, kind, size_bytes, mime_type, source_basename, object_relpath, derivative_status, thumbnail_recipe_key, thumbnail_relpath, thumbnail_width, thumbnail_height FROM studio_media WHERE thumbnail_recipe_key = ? LIMIT 2";
-    const rows = database.prepare(sql).all(key) as unknown as MediaRow[];
-    if (rows.length === 0) throw new StudioMediaProtocolError("MEDIA_NOT_FOUND", "素材标识不存在。", 404);
-    if (rows.length !== 1) throw integrityViolation("素材标识对应多条数据库记录。");
-    return rows[0]!;
+    return database;
+  } catch (error) {
+    database.close();
+    throw error;
+  }
+}
+
+function withProtocolDatabase<T>(databasePath: string, read: (database: DatabaseSync) => T): T {
+  let database: DatabaseSync | undefined;
+  try {
+    database = openProtocolDatabase(databasePath);
+    return read(database);
   } catch (error) {
     if (error instanceof StudioMediaProtocolError) throw error;
     throw integrityViolation("素材库不可读或查询失败。");
@@ -578,29 +577,54 @@ function readMediaRow(databasePath: string, target: "media" | "thumbnail", key: 
   }
 }
 
-function readDerivativeRow(databasePath: string, recipeKey: string): DerivativeRow {
-  let database: DatabaseSync | undefined;
-  try {
-    const busyTimeoutMs = studioSqliteBusyTimeoutMs(BUSY_TIMEOUT_MS);
-    database = new DatabaseSync(databasePath, { readOnly: true, timeout: busyTimeoutMs });
-    database.exec(`PRAGMA query_only=ON; PRAGMA busy_timeout=${busyTimeoutMs};`);
-    const version = database.prepare("SELECT value FROM studio_meta WHERE key = 'schema_version'").get() as { value?: unknown } | undefined;
-    if (version?.value !== SCHEMA_VERSION) throw integrityViolation("素材库 schema_version 缺失或不受支持。");
-    const columns = database.prepare("PRAGMA table_info(studio_media_derivatives)").all() as Array<{ name?: unknown }>;
-    if (columns.length !== EXPECTED_DERIVATIVE_COLUMNS.length
-      || columns.some((column, index) => column.name !== EXPECTED_DERIVATIVE_COLUMNS[index])) {
-      throw integrityViolation("素材派生索引 schema 已漂移。");
-    }
-    const rows = database.prepare("SELECT * FROM studio_media_derivatives WHERE recipe_key = ? LIMIT 2").all(recipeKey) as unknown as DerivativeRow[];
-    if (rows.length === 0) throw new StudioMediaProtocolError("MEDIA_NOT_FOUND", "派生 recipe key 不存在。", 404);
-    if (rows.length !== 1) throw integrityViolation("派生 recipe key 对应多条记录。");
-    return rows[0]!;
-  } catch (error) {
-    if (error instanceof StudioMediaProtocolError) throw error;
-    throw integrityViolation("素材派生索引不可读或查询失败。");
-  } finally {
-    database?.close();
+function assertMediaTableSchema(database: DatabaseSync): void {
+  const columns = database.prepare("PRAGMA table_info(studio_media)").all() as Array<{ name?: unknown }>;
+  if (columns.length !== EXPECTED_MEDIA_COLUMNS.length
+    || columns.some((column, index) => column.name !== EXPECTED_MEDIA_COLUMNS[index])) {
+    throw integrityViolation("素材库 studio_media schema 已漂移。");
   }
+}
+
+function assertDerivativeTableSchema(database: DatabaseSync): void {
+  const columns = database.prepare("PRAGMA table_info(studio_media_derivatives)").all() as Array<{ name?: unknown }>;
+  if (columns.length !== EXPECTED_DERIVATIVE_COLUMNS.length
+    || columns.some((column, index) => column.name !== EXPECTED_DERIVATIVE_COLUMNS[index])) {
+    throw integrityViolation("素材派生索引 schema 已漂移。");
+  }
+}
+
+function queryMediaRow(database: DatabaseSync, target: "media" | "thumbnail", key: string): MediaRow {
+  assertMediaTableSchema(database);
+  const sql = target === "media"
+    ? "SELECT sha256, kind, size_bytes, mime_type, source_basename, object_relpath, derivative_status, thumbnail_recipe_key, thumbnail_relpath, thumbnail_width, thumbnail_height FROM studio_media WHERE sha256 = ? LIMIT 2"
+    : "SELECT sha256, kind, size_bytes, mime_type, source_basename, object_relpath, derivative_status, thumbnail_recipe_key, thumbnail_relpath, thumbnail_width, thumbnail_height FROM studio_media WHERE thumbnail_recipe_key = ? LIMIT 2";
+  const rows = database.prepare(sql).all(key) as unknown as MediaRow[];
+  if (rows.length === 0) throw new StudioMediaProtocolError("MEDIA_NOT_FOUND", "素材标识不存在。", 404);
+  if (rows.length !== 1) throw integrityViolation("素材标识对应多条数据库记录。");
+  return rows[0]!;
+}
+
+function queryDerivativeRow(database: DatabaseSync, recipeKey: string): DerivativeRow {
+  assertDerivativeTableSchema(database);
+  const rows = database.prepare("SELECT * FROM studio_media_derivatives WHERE recipe_key = ? LIMIT 2").all(recipeKey) as unknown as DerivativeRow[];
+  if (rows.length === 0) throw new StudioMediaProtocolError("MEDIA_NOT_FOUND", "派生 recipe key 不存在。", 404);
+  if (rows.length !== 1) throw integrityViolation("派生 recipe key 对应多条记录。");
+  return rows[0]!;
+}
+
+function readMediaRow(databasePath: string, target: "media" | "thumbnail", key: string): MediaRow {
+  return withProtocolDatabase(databasePath, (database) => queryMediaRow(database, target, key));
+}
+
+function readDerivativeAndSourceRows(databasePath: string, recipeKey: string): {
+  derivative: ReturnType<typeof validateDerivativeRow>;
+  source: ReturnType<typeof validateMediaRow>;
+} {
+  return withProtocolDatabase(databasePath, (database) => {
+    const derivative = validateDerivativeRow(queryDerivativeRow(database, recipeKey));
+    const source = validateMediaRow(queryMediaRow(database, "media", derivative.mediaSha256));
+    return { derivative, source };
+  });
 }
 
 function expectedMimeType(kind: "image" | "video" | "audio", sourceBasename: string): string {
@@ -1047,8 +1071,7 @@ export async function resolveStudioMediaRequest(
   lastServedCanonicalRoot = canonicalRoot;
   const databasePath = await assertDatabaseFiles(canonicalRoot);
   if (request.target === "derivative") {
-    const derivative = validateDerivativeRow(readDerivativeRow(databasePath, request.key));
-    const source = validateMediaRow(readMediaRow(databasePath, "media", derivative.mediaSha256));
+    const { derivative, source } = readDerivativeAndSourceRows(databasePath, request.key);
     const expectedMediaKind = derivative.kind === "audio_waveform" ? "audio" : "video";
     if (source.kind !== expectedMediaKind) throw integrityViolation("派生类型与源媒体 kind 不匹配。");
     await assertDatabaseFiles(canonicalRoot);

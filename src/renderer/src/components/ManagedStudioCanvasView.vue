@@ -4716,7 +4716,8 @@ async function loadApprovedUnitGridRawProjection(
         .map((unit) => [unit.id, projectCoreNonPassProjection(coreByUnitId.get(unit.id))] as const)
         .filter((entry): entry is readonly [string, UnitGridNonPassProjection] => Boolean(entry[1])),
     );
-    rebuildGraph();
+    // 与随后停检账本 placeholder 的 schedule 同帧合并，避免核心裁剪后再同步整图一次。
+    scheduleUnitGridGraphRebuild();
     // 停检账本存证只作执行层身份来源与“深核验中”占位：仅核心判 PASS 且选中 SHA
     // 与存证一致的单元落占位；核心未判 PASS 的单元绝不因存证单独出现 raw 节点。
     const checkpointNeeded = units.slice(0, 36).some((unit) => {

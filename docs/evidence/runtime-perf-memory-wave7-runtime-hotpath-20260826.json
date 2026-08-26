@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "7-runtime-hotpath",
+  "recordedAt": "2026-08-26T01:35:00Z",
+  "change": {
+    "kind": "source-fix",
+    "sourceCodeChanged": true,
+    "note": "多子代理交叉后落地三条安全刀，否决两条假安全刀。① getStudioMedia 改为 studioPaths + 只读打开已有 material-studio.sqlite（readOnly + query_only），缺库/缺表返回 null，不 ensure 目录、不走可写 openDatabase（P28 probe + WAL + 建表）；同 (root, sha) 并发单飞。② 媒体协议 derivative 把派生行+源媒体行合成 withProtocolDatabase 单次只读会话；二次 assertDatabaseFiles TOCTOU 保留（仍 3 次）。③ 画布核心快照裁剪后的同步 rebuildGraph 改为 scheduleUnitGridGraphRebuild，与停检 placeholder 同帧合并。未去掉 worker 内逐单元增量 schedule（T23 first-raw / 增量显示合同）。未改 listStudioProductionUnits / T23 SQL / 阶段名 / recipe / 2048 / 120s / command-bus / checkpoint 写初始化。外部六席本 Cloud NOT_RUN，未伪造互评。不是 P7 owner，不是安装版 T23，不是 GUI 探针。"
+  },
+  "rejectedKnives": [
+    {
+      "knife": "delete second assertDatabaseFiles",
+      "verdict": "否决",
+      "reason": "DB→CAS 之间的 TOCTOU 完整性闸；studio-media-protocol 测试用 final-lstat hook 覆盖第二次窗口。"
+    },
+    {
+      "knife": "only schedule rebuild on first deep-verified raw",
+      "verdict": "否决",
+      "reason": "破「深核验随后增量补回」与 worker 内逐单元 schedule 合同；探针可能绿但产品合同破。"
+    }
+  ],
+  "section1": [
+    { "id": 1, "gate": "default fastMode true", "verdict": "已完成" },
+    { "id": 2, "gate": "full only explicit CLI + durationMs", "verdict": "已完成" },
+    {
+      "id": 3,
+      "gate": "36-unit screen does not materialize 2500",
+      "verdict": "部分完成",
+      "note": "展示路径仍有界。本波未改时间线投影 SQL。P7 owner NOT_RUN。"
+    },
+    { "id": 4, "gate": "MCP cold start lazy editor/adaptation/novel", "verdict": "已完成" },
+    {
+      "id": 5,
+      "gate": "thumbnail LRU URL-only; list original count 0",
+      "verdict": "部分完成",
+      "note": "getStudioMedia 只读不改变列表预览合同。GUI 探针 NOT_RUN；Wave 5 父项不勾。"
+    },
+    {
+      "id": 6,
+      "gate": "T23 gates do not regress",
+      "verdict": "部分完成",
+      "note": "listStudioProductionUnits 未改；worker 增量 schedule + markFirstRaw 保留。安装版 T23 NOT_RUN。"
+    },
+    { "id": 7, "gate": "per-wave evidence; no 2026-08-11 final overwrite", "verdict": "已完成" },
+    { "id": 8, "gate": "no official bypass / no owner rebuild / no GUI", "verdict": "已完成" }
+  ],
+  "reviews": {
+    "redlineSkeptic": "PASS; 无 must-fix。listStudioProductionUnits 未改。二次 assertDatabaseFiles 仍 3 次。worker 内 scheduleUnitGridGraphRebuild + markFirstRaw 仍在。THUMBNAIL_RECIPE / 2048 / 120s / T23 阶段名 / command-bus 写路径 / checkpoint databaseContextFor / N124 未改。getStudioMedia 是既有 owner 上的只读旁路，不是重建 material-studio。手工 sqlite 不是 P7 owner。",
+    "completionGate": "PASS for this slice only。typecheck:app + Linux 定向 7 files / 139 tests PASS。§1.3/5/6 仍部分完成。不得勾 Wave 5 父项或关 Goal。禁止写「运行速度已关账」。"
+  },
+  "verification": {
+    "typecheckApp": "PASS",
+    "directedLinux": {
+      "files": [
+        "tests/runtime-perf-wave7-runtime-hotpath.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/t23-scale-performance-contract.test.ts",
+        "tests/t23-raw-reference-span.test.ts",
+        "tests/runtime-perf-wave5-list-flip-media-count.test.ts",
+        "tests/resolve-approved-timeline-bound.test.ts",
+        "tests/runtime-perf-wave2-identity-readonly-sql.test.ts"
+      ],
+      "filesPassed": 7,
+      "testsPassed": 139
+    },
+    "externalModels": "NOT_RUN",
+    "listStudioProductionUnitsUnchanged": true,
+    "installedT23": "NOT_RUN",
+    "listFlipProbe": "NOT_RUN",
+    "w2cP7": "NOT_RUN Darwin dirfd",
+    "handmadeSqliteIsNotP7Owner": true,
+    "assertDatabaseFilesCalls": 3
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "overwrote20260811Final": false,
+    "t23SqlContractUnchanged": true,
+    "listStudioProductionUnitsSqlUnchanged": true,
+    "writeBusyTimeoutUnchanged": 120000,
+    "verifiedFileCacheLimitUnchanged": 2048,
+    "thumbnailRecipeUnchanged": "material-studio-thumb:v1:autorotate:inside-512:no-enlarge:webp-q82",
+    "wave5ParentChecked": false
+  },
+  "claim": "画布 getStudioMedia 改为只读打开已有素材库并同 SHA 单飞；derivative 单次只读会话；核心裁剪 rebuild 并入 rAF。二次 assert 与逐单元增量 schedule 保留。Linux 7/139 PASS。安装版 T23 / P7 owner / 列表 GUI 探针仍 NOT_RUN。整计划部分完成。禁止写「运行速度已关账」。",
+  "forbiddenClaims": [
+    "运行速度已关账",
+    "P7 有界对照已在本 Cloud 跑过",
+    "列表原图次数已测为 0",
+    "T23 已复测不回退"
+  ]
+}

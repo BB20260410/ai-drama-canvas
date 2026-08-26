@@ -219,6 +219,8 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain("核心裁决不可读时旧 PASS raw/参考/连续性不能继续冒充 current");
     expect(canvas).toContain("core.selectedRawSha256 === projection.rawMediaSha256");
     expect(canvas).toContain("深核验随后增量补回");
+    expect(canvas).toMatch(/unitGridNonPassPipeline\.value = new Map\([\s\S]{0,500}scheduleUnitGridGraphRebuild\(\);/u);
+    expect(canvas).toContain("与随后停检账本 placeholder 的 schedule 同帧合并");
     expect(canvas).toContain("scheduleUnitGridGraphRebuild");
     expect(canvas).toContain("flushUnitGridGraphRebuild");
     expect(canvas).toContain("createT23RawReferenceSpanTracker");
