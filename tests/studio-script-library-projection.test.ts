@@ -211,11 +211,76 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(hit.missingCount).toBe(0);
     expect(hit.hits[0]?.unitId).toBe("U1");
     expect(hit.hits[0]?.rawSha256).toBe("aa");
+    expect(hit.hits[0]?.shotComposition).toBe("近景");
+    expect(hit.hits[0]?.visualAction).toBe("抬手");
+    expect(hit.hits[0]?.filmingMethod).toBe("固定");
+    expect(hit.hits[0]?.previousHandoff).toBeNull();
     const miss = resolveScriptSpanMediaMap(map, { startOffsetUtf16: 40, endOffsetUtf16: 45 });
     expect(miss.matchCount).toBe(1);
     expect(miss.missingCount).toBe(1);
     expect(resolveScriptSpanMediaMap(map, { startOffsetUtf16: 80, endOffsetUtf16: 90 }).matchCount).toBe(0);
     expect(() => resolveScriptSpanMediaMap(map, { startOffsetUtf16: 9, endOffsetUtf16: 3 })).toThrow(/有效/);
+  });
+
+  it("resolveScriptSpanMediaMap copies previous-panel standing handoff", () => {
+    const panels = applyPackMediaToPanels(
+      [
+        {
+          index: 1,
+          id: "p1",
+          title: "g1",
+          sourceSpans: [{ startOffsetUtf16: 0, endOffsetUtf16: 20 }],
+          shotComposition: "中景",
+          visualAction: "站定",
+          filmingMethod: "固定",
+        },
+        {
+          index: 2,
+          id: "p2",
+          title: "g2",
+          sourceSpans: [{ startOffsetUtf16: 10, endOffsetUtf16: 30 }],
+          shotComposition: "近景",
+          visualAction: "抬手",
+          filmingMethod: "推",
+        },
+      ],
+      new Map(),
+    );
+    const map = {
+      projectRoot: "/tmp/iso",
+      season: "S1",
+      episode: "E2",
+      units: [{
+        unitId: "U1",
+        unitRevision: 1,
+        season: "S1",
+        episode: "E2",
+        sequence: 1,
+        title: "U1",
+        scriptRevisionId: "rev-1",
+        scriptDocumentId: "doc-1",
+        durationSeconds: 15,
+        panelCount: 2,
+        coveredPanelCount: 0,
+        missingPanelCount: 2,
+        panels,
+      }],
+    };
+    const hit = resolveScriptSpanMediaMap(map, { startOffsetUtf16: 12, endOffsetUtf16: 18 });
+    expect(hit.matchCount).toBe(2);
+    expect(hit.hits[0]?.panelId).toBe("p1");
+    expect(hit.hits[0]?.previousHandoff).toBeNull();
+    expect(hit.hits[1]?.panelId).toBe("p2");
+    expect(hit.hits[1]?.shotComposition).toBe("近景");
+    expect(hit.hits[1]?.filmingMethod).toBe("推");
+    expect(hit.hits[1]?.previousHandoff).toEqual({
+      panelIndex: 1,
+      panelId: "p1",
+      shotComposition: "中景",
+      visualAction: "站定",
+      filmingMethod: "固定",
+    });
+    expect(formatPanelStandingHandoff(hit.hits[1]?.previousHandoff ?? null)).toContain("G1 中景");
   });
 
   it("selectLatestPanelPack ignores unit-grid and other panels", () => {

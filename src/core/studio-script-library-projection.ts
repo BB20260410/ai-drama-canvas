@@ -303,6 +303,11 @@ export interface ScriptSpanMediaHit {
   rawSha256: string | null;
   labeledSha256: string | null;
   hasMedia: boolean;
+  /** 锁版构图/动作/运镜只读投影；不推导 nextAction。 */
+  shotComposition: string;
+  visualAction: string;
+  filmingMethod: string;
+  previousHandoff: PanelStandingHandoff | null;
 }
 
 export interface ScriptSpanMediaMap {
@@ -345,6 +350,10 @@ export function resolveScriptSpanMediaMap(
         rawSha256: panel.rawSha256,
         labeledSha256: panel.labeledSha256,
         hasMedia: panel.hasMedia,
+        shotComposition: panel.shotComposition,
+        visualAction: panel.visualAction,
+        filmingMethod: panel.filmingMethod,
+        previousHandoff: panel.previousHandoff,
       });
     }
   }
