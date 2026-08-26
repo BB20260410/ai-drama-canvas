@@ -1,0 +1,55 @@
+{
+  "id": "goal-active-runs-unit-grid-blocking-next-20260826",
+  "kind": "active-runs-unit-grid-blocking-next",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T22:44:00.000Z",
+  "scope": "get_studio_generation_control operation=active-runs adds envelope nextAction via activeRunsEnvelopeNext. Slot unknown→reconcile, unreviewed→Review, in-flight/blocked→wait. Panel also reads sibling unit-grid plan status (generationLedgerSidecarPath + readPersistedUnitGridPlanState, no extra inspect). planned does not block. generationBlocked still equals this-slot blockingRuns.length>0. listStudioGenerationActiveRuns / T4 / T5 unchanged. Does not execute freeze, create-plan, dispatch, retry, or Review. schemaVersion remains 1.",
+  "invariants": {
+    "noInspectAdded": true,
+    "ledgerListUnchanged": true,
+    "generationBlockedStillSlotLocal": true,
+    "plannedDoesNotBlock": true,
+    "doesNotExecuteFreeze": true,
+    "doesNotExecuteCreatePlan": true,
+    "doesNotDispatch": true,
+    "doesNotRetry": true,
+    "doesNotChangeT5": true,
+    "schemaVersionStill1": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts"
+      ],
+      "result": "10 files / 163 tests PASS"
+    },
+    "commit": "b2cedf6"
+  },
+  "notClaimed": [
+    "T4 listStudioGenerationActiveRuns shape changed",
+    "generationBlocked now includes sibling unit-grid",
+    "freeze executed",
+    "create_studio_generation_plan executed",
+    "dispatch executed",
+    "retry executed",
+    "Review executed",
+    "T5 continuous generation remapped",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "mcp-managed-studio Darwin dirfd",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
