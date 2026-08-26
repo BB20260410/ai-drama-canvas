@@ -21,6 +21,7 @@ export type FrozenRenderedPromptPack = {
 };
 
 export type FrozenPackBeatTarget = {
+  panelId?: string;
   panelIndex?: number;
   panelCount?: number;
   unitLocalStartSeconds?: number;
