@@ -1,0 +1,34 @@
+{
+  "id": "goal-align-row-no-unit-fallback-20260826",
+  "createdAt": "2026-08-26T18:30:00.000Z",
+  "kind": "align-row-preview-per-panel-only",
+  "conclusion": "PASS",
+  "scope": "selectAlignRow and revealSsl5Focus bind only the selected panel rawSha256. No fallback to row/unit-grid image. Missing panel binds nothing.",
+  "invariants": {
+    "noRowRawFallback": true,
+    "noFocusRowRawFallback": true,
+    "missingPanelBindsNothing": true,
+    "doesNotCallBindingControl": true,
+    "doesNotDispatch": true,
+    "doesNotReviewPass": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/use-virtual-list-lru-hotkeys.test.ts"
+      ],
+      "result": "5 files / 37 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "desktop GUI click verified",
+    "Wave 5 parent complete",
+    "installed T23",
+    "100% fit"
+  ]
+}

@@ -22,6 +22,7 @@
 - [x] 选区命中「对照这格」跳到精确宫格并滚进视口（未命中不猜；缺图不绑其他格）
 - [x] 对照侧栏 / 选区命中 / SSL-5 焦点列出锁版站位缺口（≠ BindingSet / ≠ generation-ready）
 - [x] 对照表宫格列可点精确格（stop 冒泡；缺图不绑其他格）
+- [x] 对照行/SSL-5 预览只绑所选宫格 raw（不再回退整行/unit-grid 图）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
