@@ -962,6 +962,7 @@ export async function getStudioGenerationControlEnvelope(
             grok: buildStudioUnitGridAgentImagegenBrief(pack, "grok"),
           },
           generationPlanDraft: composePersistedPackGenerationPlanDraft(pack),
+          next: "create-plan → dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback",
           dispatchPayloadTemplate: {
             command: "dispatch_studio_generation_pack" as const,
             required: ["packId", "packFingerprint", "generationRunId", "provider", "expectedRevision"],
@@ -1004,6 +1005,7 @@ export async function getStudioGenerationControlEnvelope(
           grok: buildStudioAgentImagegenBrief(pack, "grok"),
         },
         generationPlanDraft: composePersistedPackGenerationPlanDraft(pack),
+        next: "create-plan → dispatch(provider=codex|grok) → agent imagegen → atomic raw/labeled writeback",
         dispatchPayloadTemplate: {
           command: "dispatch_studio_generation_pack" as const,
           required: ["packId", "packFingerprint", "generationRunId", "provider", "expectedRevision"],

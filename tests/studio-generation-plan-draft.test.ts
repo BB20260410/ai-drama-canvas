@@ -131,6 +131,8 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(codex).toContain("composePersistedPackGenerationPlanDraft");
     expect(codex).toContain('targetKind: "unit-grid"');
     expect(codex).toContain("generationPlanDraft: composePersistedPackGenerationPlanDraft(pack)");
+    expect(codex).toContain('next: "create-plan → dispatch(provider=codex)');
+    expect(codex).toContain('next: "create-plan → dispatch(provider=codex|grok)');
     expect(codex).not.toContain("studio-ssl5-missing-to-gen");
     expect(codex).not.toContain("studio-script-media-align");
     const helperStart = codex.indexOf("function composePersistedPackGenerationPlanDraft");
