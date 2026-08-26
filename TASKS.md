@@ -66,6 +66,7 @@
 - [x] 画布节点下一步跟 unit-grid 在途对齐（检查器「下一步」用已加载 unitDetail.nextAction；wait/retry/Review/对账时禁用 freeze-dispatch 并露出同一下一步；planned 不挡；零额外 IPC；不执行、不 dispatch、不 retry；schemaVersion 仍为 1）
 - [x] active-runs envelope next 跟本槽/unit-grid 对齐（unknown→对账、未审→Review、在途→wait；单镜另看同单元 unit-grid；generationBlocked 仍只认本槽 blockingRuns；不改 T4 ledger；不加 inspect；不执行、不 dispatch、不 retry；schemaVersion 仍为 1）
 - [x] 15s 向导物化后下一步含 create-plan（nextSteps / 物化结果写 Binding→freeze→create-plan→dispatch；不跳过 Binding，不自动派发，不改 formatWizardPromptBody；schemaVersion 仍为 1）
+- [x] generation-control operation=plan 信封 next 跟节点状态对齐（按 planId/单元查：dispatched→wait、failed/cancelled→retry、planned→dispatch、全 succeeded→Review；无计划→create-plan；未限定列表/not_found→follow-core-readiness；生成控制用已加载 progress.nodes，零额外 IPC；MCP 标准环先读 plan next 再决定是否 dispatch；不执行、不派发、不重试；不改 T4/T5；schemaVersion 仍为 1）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825

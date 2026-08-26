@@ -1,0 +1,50 @@
+{
+  "id": "goal-plan-envelope-next-20260826",
+  "kind": "plan-operation-envelope-next",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T22:54:00.000Z",
+  "scope": "get_studio_generation_control operation=plan now exposes envelope nextAction from node statuses. dispatched→wait, failed/cancelled→retry, planned→dispatch, all succeeded→Review, scoped empty→create-plan, unscoped list or not_found→follow-core-readiness. Generation control Vue shows the same next from already-loaded progress.nodes (zero extra IPC). MCP prompt step 6 reads plan nextAction before dispatch. Does not execute create-plan, does not dispatch, does not retry. schemaVersion remains 1. Does not change T4/T5/listStudioGenerationActiveRuns.",
+  "invariants": {
+    "schemaVersionStill1": true,
+    "doesNotExecuteCreatePlan": true,
+    "doesNotDispatch": true,
+    "doesNotRetry": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true,
+    "unscopedListDoesNotGuessUnit": true,
+    "generationControlZeroExtraIpc": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/studio-generation-control-ui.test.ts"
+      ],
+      "result": "11 files / 173 tests PASS"
+    },
+    "commit": "cf84a3d"
+  },
+  "notClaimed": [
+    "create_studio_generation_plan executed",
+    "dispatch executed",
+    "retry executed",
+    "T5 mapping changed",
+    "T4 listStudioGenerationActiveRuns changed",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
