@@ -1,0 +1,41 @@
+{
+  "id": "goal-wizard-lighting-costume-20260826",
+  "kind": "ssl4-wizard-lighting-costume-readonly",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T19:15:40.000Z",
+  "scope": "15s storyboard wizard editor exposes per-panel sceneLighting and costumeState. formatWizardPromptBody appends 光线：/服化： only when those fields are non-empty; empty fields keep the previous prompt body shape. G2+ shows lock-version previous lighting/costume as readonly hints and does not auto-fill the current panel. Freeze renderedPrompt still writes 光线（宫格覆盖） from the current panel only; no 前镜光线 line. App and Core still share formatWizardPromptBody. Not BindingSet; not generation-ready; does not dispatch or skip Binding/freeze.",
+  "invariants": {
+    "emptyFieldsOmitLightingCostumeLines": true,
+    "nonEmptyFieldsAppendPromptLines": true,
+    "previousLightingIsReadonlyHintOnly": true,
+    "doesNotWritePreviousLightingIntoFrozenPrompt": true,
+    "appAndCoreShareFormatWizardPromptBody": true,
+    "doesNotDispatch": true,
+    "doesNotSkipBinding": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/material-studio-ui-contract.test.ts",
+        "tests/studio-storyboard-wizard.test.ts"
+      ],
+      "result": "3 files PASS (standing/align/ui-contract); wizard 5/6 PASS; 1 Linux dirfd failure is pre-existing createManagedProject fixture, not this slice"
+    },
+    "commit": "8c15fa8"
+  },
+  "notClaimed": [
+    "real-generation constraint evidence",
+    "lighting or costume fully solved",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click of wizard lighting inputs",
+    "wizard fixture on Linux",
+    "canvas inspector sceneLighting field",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
