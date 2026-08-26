@@ -70,6 +70,7 @@
 - [x] generation-control operation=history 信封 next 跟本页结果对齐（未成对→wait、成对 pending→Review、成对 rejected→retry、空页/全 approved→follow-core-readiness；要看最新请 newest-first；生成控制用已加载 history，零额外 IPC；不改 history list SQL；不 evaluate 像素；不自动 Review PASS；不改 T4/T5；schemaVersion 仍为 1）
 - [x] session-snapshot 一致性四态 peek 辅助 Review（当前宫格 newest-first 结果 run，否则整板 latest run；只读进程内 LRU；未评估 ≠ 无法检查；动态 import peek，不 evaluate 像素；不进 fingerprint；不拉对照板；机器不自动 Review PASS；schemaVersion 仍为 1）
 - [x] generation-control operation=history 信封 consistencyPeek 辅助 Review（本页优先成对 run；只读进程内 LRU；未评估 ≠ 无法检查；动态 import peek，不 evaluate 像素；生成控制用已加载信封、零额外 IPC；Vue 不 import evaluator；不改 history list SQL；不改 T4/T5；机器不自动 Review PASS；schemaVersion 仍为 1）
+- [x] get_studio_trace / 画布检查器一致性四态 peek 辅助 Review（追溯 by-run 用该 run、否则本包最新 run；无 run 省略以免改 P24 形状；检查器复用 history 信封 newest-first limit 1；动态 import peek，不 evaluate 像素；Vue 不 import evaluator；不改 dashboard / T4/T5 / P24 golden；机器不自动 Review PASS）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
