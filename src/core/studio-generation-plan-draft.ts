@@ -149,6 +149,30 @@ export function canvasFreezeDispatchOverrideForUnitGridBlocking(
   return { enabled: false, label: text, reason: text };
 }
 
+export const ACTIVE_RUNS_NEXT_RECONCILE = "reconcile-or-commit-existing-call-only" as const;
+export const ACTIVE_RUNS_NEXT_FOLLOW_READINESS = "follow-core-readiness" as const;
+
+/**
+ * active-runs 信封下一步。本槽 unknown / 未审 / 在途优先；单镜再看同单元 unit-grid。
+ * generationBlocked 仍由调用方按本槽 blockingRuns 决定。不执行、不派发、不重试。
+ */
+export function activeRunsEnvelopeNext(input: {
+  hasUnknownCall?: boolean;
+  hasUnreviewedPair?: boolean;
+  hasInFlightRun?: boolean;
+  generationBlocked?: boolean;
+  unitGridBlockingStatus?: PersistedPlanNodeStatus | null;
+}): string {
+  if (input.hasUnknownCall) return ACTIVE_RUNS_NEXT_RECONCILE;
+  const unitGridNext = packEnvelopeNextOverrideForUnitGridBlocking(input.unitGridBlockingStatus);
+  if (unitGridNext) return unitGridNext;
+  if (input.hasUnreviewedPair) return "Review (no dispatch)";
+  if (input.hasInFlightRun || input.generationBlocked) {
+    return "wait → result or reconcile (no dispatch)";
+  }
+  return ACTIVE_RUNS_NEXT_FOLLOW_READINESS;
+}
+
 function blocked(reason: string): StudioGenerationPlanDraft {
   return {
     command: STUDIO_GENERATION_PLAN_COMMAND,

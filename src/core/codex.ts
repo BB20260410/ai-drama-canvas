@@ -89,6 +89,7 @@ import {
 } from "./release-manifest.js";
 import { withStudioRequestSchemaCache } from "./studio-request-schema-cache.js";
 import {
+  activeRunsEnvelopeNext,
   composeStudioGenerationPlanDraft,
   packEnvelopeNextOverrideForUnitGridBlocking,
   refineStudioGenerationPlanDraftIfUnitGridBlocking,
@@ -871,6 +872,10 @@ export async function getStudioGenerationControlEnvelope(
       targetKind: query.targetKind ?? "panel",
       ...(query.targetKind === "unit-grid" ? {} : { panelId: (query as { panelId: string }).panelId }),
     });
+    const generationBlocked = result.blockingRuns.length > 0;
+    const unitGridBlockingStatus = result.targetKind === "panel"
+      ? readPersistedUnitGridPlanState(generationLedgerSidecarPath(projectRoot), result.unitId).status ?? undefined
+      : undefined;
     return {
       schemaVersion: 1 as const,
       kind: STUDIO_GENERATION_CONTROL_KIND,
@@ -881,7 +886,17 @@ export async function getStudioGenerationControlEnvelope(
       ...(result.panelId ? { panelId: result.panelId } : {}),
       runs: result.runs,
       blockingRuns: result.blockingRuns,
-      generationBlocked: result.blockingRuns.length > 0,
+      generationBlocked,
+      nextAction: activeRunsEnvelopeNext({
+        hasUnknownCall: result.runs.some((run) => run.callStatus === "generation_unknown")
+          || result.blockingRuns.some((row) => row.reason.includes("generation_unknown")),
+        hasUnreviewedPair: result.runs.some((run) => run.hasResultPair && run.reviewStatus === "unreviewed")
+          || result.blockingRuns.some((row) => row.reason.includes("未审片")),
+        hasInFlightRun: result.runs.some((run) => !run.terminal)
+          || result.blockingRuns.some((row) => row.reason.includes("非终态")),
+        generationBlocked,
+        unitGridBlockingStatus,
+      }),
       controlReferencesExposed: false as const,
     };
   }

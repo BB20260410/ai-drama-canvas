@@ -4,6 +4,9 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   composeStudioGenerationPlanDraft,
+  ACTIVE_RUNS_NEXT_FOLLOW_READINESS,
+  ACTIVE_RUNS_NEXT_RECONCILE,
+  activeRunsEnvelopeNext,
   canvasFreezeDispatchOverrideForUnitGridBlocking,
   packEnvelopeNextOverrideForUnitGridBlocking,
   refineStudioGenerationPlanDraftIfUnitGridBlocking,
@@ -219,6 +222,20 @@ describe("create-plan 只读草稿纯函数", () => {
     expect(canvasFreezeDispatchOverrideForUnitGridBlocking("dispatch-unit-grid")).toBeNull();
     expect(canvasFreezeDispatchOverrideForUnitGridBlocking("create-unit-grid-plan")).toBeNull();
     expect(canvasFreezeDispatchOverrideForUnitGridBlocking("create-unit-grid-freeze")).toBeNull();
+    expect(activeRunsEnvelopeNext({})).toBe(ACTIVE_RUNS_NEXT_FOLLOW_READINESS);
+    expect(activeRunsEnvelopeNext({ hasUnknownCall: true, hasInFlightRun: true })).toBe(ACTIVE_RUNS_NEXT_RECONCILE);
+    expect(activeRunsEnvelopeNext({
+      hasUnreviewedPair: true,
+      unitGridBlockingStatus: "dispatched",
+    })).toBe("wait → result or reconcile (no dispatch)");
+    expect(activeRunsEnvelopeNext({ hasUnreviewedPair: true })).toBe("Review (no dispatch)");
+    expect(activeRunsEnvelopeNext({ hasInFlightRun: true })).toBe("wait → result or reconcile (no dispatch)");
+    expect(activeRunsEnvelopeNext({ generationBlocked: true })).toBe("wait → result or reconcile (no dispatch)");
+    expect(activeRunsEnvelopeNext({ unitGridBlockingStatus: "failed" })).toBe(
+      "retry_studio_generation_plan_nodes (no retry here, no dispatch)",
+    );
+    expect(activeRunsEnvelopeNext({ unitGridBlockingStatus: "succeeded" })).toBe("Review (no dispatch)");
+    expect(activeRunsEnvelopeNext({ unitGridBlockingStatus: "planned" })).toBe(ACTIVE_RUNS_NEXT_FOLLOW_READINESS);
   });
 });
 
@@ -228,6 +245,7 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(draft).toContain("refineStudioGenerationPlanDraftIfUnitGridBlocking");
     expect(draft).toContain("packEnvelopeNextOverrideForUnitGridBlocking");
     expect(draft).toContain("canvasFreezeDispatchOverrideForUnitGridBlocking");
+    expect(draft).toContain("activeRunsEnvelopeNext");
     expect(draft).toContain("unitGridNextActionBlockingKind");
     expect(draft).not.toContain("studio-script-media-align");
     expect(draft).not.toContain("studio-ssl5-missing-to-gen");
@@ -370,5 +388,37 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(inspector).toContain('field.key === "next"');
     expect(inspector).not.toContain("from \"@core/studio-generation-plan-draft");
     expect(inspector).not.toContain("studio-ssl5-missing-to-gen");
+  });
+
+  it("active-runs 信封 next 跟本槽/unit-grid 对齐，不改 T4 ledger，不加 inspect", () => {
+    const draft = source("src/core/studio-generation-plan-draft.ts");
+    expect(draft).toContain("activeRunsEnvelopeNext");
+    expect(draft).toContain("ACTIVE_RUNS_NEXT_RECONCILE");
+    expect(draft).toContain("ACTIVE_RUNS_NEXT_FOLLOW_READINESS");
+    expect(draft).toContain("hasUnknownCall");
+    expect(draft).toContain("hasUnreviewedPair");
+    expect(draft).toContain("hasInFlightRun");
+    expect(draft).not.toContain("listStudioGenerationActiveRuns");
+    const codex = source("src/core/codex.ts");
+    expect(codex).toContain("activeRunsEnvelopeNext");
+    expect(codex).toContain("operation === \"active-runs\"");
+    expect(codex).toContain("generationBlocked = result.blockingRuns.length > 0");
+    expect(codex).toContain("result.targetKind === \"panel\"");
+    expect(codex).toContain("readPersistedUnitGridPlanState(generationLedgerSidecarPath(projectRoot), result.unitId)");
+    expect(codex).toContain("run.callStatus === \"generation_unknown\"");
+    expect(codex).toContain("run.hasResultPair && run.reviewStatus === \"unreviewed\"");
+    expect(codex).toContain("!run.terminal");
+    expect(codex).toContain("nextAction: activeRunsEnvelopeNext");
+    const helperStart = codex.indexOf("if (query.operation === \"active-runs\")");
+    const helperEnd = codex.indexOf("if (query.operation === \"detached-unknown\")", helperStart);
+    const helper = codex.slice(helperStart, helperEnd);
+    expect(helper).toContain("activeRunsEnvelopeNext");
+    expect(helper).toContain("listStudioGenerationActiveRuns");
+    expect(helper).not.toContain("inspectManagedProject(");
+    expect(helper).not.toContain("dispatch_studio_generation_pack");
+    expect(helper).not.toContain("studio-ssl5-missing-to-gen");
+    const mcp = source("src/mcp/server.ts");
+    expect(mcp).toContain("active-runs 返回指定单元/宫格所有 run 的完整状态投影、恢复动作与 envelope nextAction");
+    expect(mcp).toContain("generationBlocked 仍只认本槽 blockingRuns");
   });
 });
