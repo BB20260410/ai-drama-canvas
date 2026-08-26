@@ -9,13 +9,22 @@ const source = (relative: string) => readFileSync(path.join(root, relative), "ut
 describe("Wave 5-D 派生 serving 不校源 CAS 全 SHA", () => {
   it("derivative 分支只读 DB 绑定再 inspect 派生文件，不再 inspectCasObjectCached 源对象", () => {
     const protocol = source("src/core/studio-media-protocol.ts");
+    const helperStart = protocol.indexOf("function readDerivativeAndSourceRows");
+    const helperEnd = protocol.indexOf("function expectedMimeType", helperStart);
+    expect(helperStart).toBeGreaterThan(-1);
+    expect(helperEnd).toBeGreaterThan(helperStart);
+    const helper = protocol.slice(helperStart, helperEnd);
+    expect(helper).toContain("validateDerivativeRow");
+    expect(helper).toContain("validateMediaRow");
+    expect(helper).toContain("withProtocolDatabase");
+    expect(helper).not.toContain("inspectCasObjectCached");
+
     const start = protocol.indexOf('if (request.target === "derivative")');
     const mediaStart = protocol.indexOf('if (request.target === "media")', start);
     expect(start).toBeGreaterThan(-1);
     expect(mediaStart).toBeGreaterThan(start);
     const derivativeBranch = protocol.slice(start, mediaStart);
-    expect(derivativeBranch).toContain("validateDerivativeRow");
-    expect(derivativeBranch).toContain("validateMediaRow");
+    expect(derivativeBranch).toContain("readDerivativeAndSourceRows");
     expect(derivativeBranch).toContain("派生类型与源媒体 kind 不匹配");
     expect(derivativeBranch).toContain("inspectManagedFileCached");
     expect(derivativeBranch).toContain('target: "derivative"');
