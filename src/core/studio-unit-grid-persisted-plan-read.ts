@@ -18,9 +18,19 @@ export type PersistedPlanState = {
   status: PersistedPlanNodeStatus | null;
 };
 
-const EMPTY_PLAN_STATE: PersistedPlanState = { hasPlan: false, status: null };
+export type PersistedUnitGridPackPlanState = {
+  packId: string | null;
+  hasPlan: boolean;
+  status: PersistedPlanNodeStatus | null;
+};
 
-const EMPTY: PersistedUnitGridPackAndPlan = { packId: null, hasPlan: false };
+const EMPTY_PLAN_STATE: PersistedPlanState = { hasPlan: false, status: null };
+const EMPTY_PACK_PLAN_STATE: PersistedUnitGridPackPlanState = {
+  packId: null,
+  hasPlan: false,
+  status: null,
+};
+
 const LEDGER_RELATIVE = path.join(".aicanvas", "studio-generation-ledger.sqlite");
 
 /** 只拼已知 sidecar 相对路径；不 ensure、不建库。 */
@@ -182,6 +192,46 @@ export function readPersistedPanelHasPlan(
 }
 
 /**
+ * 一次只读开库：整板 pack + hasPlan + 节点状态。
+ * hasPlan 仍只认 plan_node_targets；节点状态另读 plan_nodes.pack_id。
+ * 缺节点行 / 缺 dispatch 表失败关闭为 planned。不改 PersistedUnitGridPackAndPlan 形状。
+ */
+export function readPersistedUnitGridPackPlanState(
+  databasePath: string,
+  unitId: string,
+): PersistedUnitGridPackPlanState {
+  const normalized = unitId.trim();
+  if (!normalized || !databasePath.trim()) return EMPTY_PACK_PLAN_STATE;
+  let db: ReturnType<typeof openGenerationLedgerReadOnly> | undefined;
+  try {
+    db = openGenerationLedgerReadOnly(databasePath);
+    const pack = db.prepare(LATEST_UNIT_GRID_PACK_SQL).get(normalized, normalized) as
+      | { packId?: string }
+      | undefined;
+    const plan = db.prepare(LATEST_UNIT_GRID_PLAN_SQL).get(unitGridPlanTargetKey(normalized)) as
+      | { planId?: string }
+      | undefined;
+    const packId = typeof pack?.packId === "string" && pack.packId ? pack.packId : null;
+    const hasPlan = typeof plan?.planId === "string" && Boolean(plan.planId);
+    if (!hasPlan) return { packId, hasPlan: false, status: null };
+    let nodePackId: string | null = null;
+    try {
+      const node = db.prepare(LATEST_UNIT_GRID_PLAN_NODE_PACK_SQL).get(unitGridPlanTargetKey(normalized)) as
+        | { packId?: string }
+        | undefined;
+      nodePackId = typeof node?.packId === "string" && node.packId ? node.packId : null;
+    } catch {
+      nodePackId = null;
+    }
+    return { packId, hasPlan: true, status: derivePlanNodeStatus(db, nodePackId) };
+  } catch {
+    return EMPTY_PACK_PLAN_STATE;
+  } finally {
+    db?.close();
+  }
+}
+
+/**
  * 整板 hasPlan 仍只认 plan_node_targets；节点状态另读 plan_nodes.pack_id。
  * 缺节点行 / 缺 dispatch 表失败关闭为 planned。不改 PersistedUnitGridPackAndPlan。
  */
@@ -189,30 +239,8 @@ export function readPersistedUnitGridPlanState(
   databasePath: string,
   unitId: string,
 ): PersistedPlanState {
-  const normalized = unitId.trim();
-  if (!normalized || !databasePath.trim()) return EMPTY_PLAN_STATE;
-  let db: ReturnType<typeof openGenerationLedgerReadOnly> | undefined;
-  try {
-    db = openGenerationLedgerReadOnly(databasePath);
-    const plan = db.prepare(LATEST_UNIT_GRID_PLAN_SQL).get(unitGridPlanTargetKey(normalized)) as
-      | { planId?: string }
-      | undefined;
-    if (typeof plan?.planId !== "string" || !plan.planId) return EMPTY_PLAN_STATE;
-    let packId: string | null = null;
-    try {
-      const node = db.prepare(LATEST_UNIT_GRID_PLAN_NODE_PACK_SQL).get(unitGridPlanTargetKey(normalized)) as
-        | { packId?: string }
-        | undefined;
-      packId = typeof node?.packId === "string" && node.packId ? node.packId : null;
-    } catch {
-      packId = null;
-    }
-    return { hasPlan: true, status: derivePlanNodeStatus(db, packId) };
-  } catch {
-    return EMPTY_PLAN_STATE;
-  } finally {
-    db?.close();
-  }
+  const state = readPersistedUnitGridPackPlanState(databasePath, unitId);
+  return { hasPlan: state.hasPlan, status: state.status };
 }
 
 /**
@@ -223,24 +251,6 @@ export function readPersistedUnitGridPackAndPlan(
   databasePath: string,
   unitId: string,
 ): PersistedUnitGridPackAndPlan {
-  const normalized = unitId.trim();
-  if (!normalized || !databasePath.trim()) return EMPTY;
-  let db: ReturnType<typeof openGenerationLedgerReadOnly> | undefined;
-  try {
-    db = openGenerationLedgerReadOnly(databasePath);
-    const pack = db.prepare(LATEST_UNIT_GRID_PACK_SQL).get(normalized, normalized) as
-      | { packId?: string }
-      | undefined;
-    const plan = db.prepare(LATEST_UNIT_GRID_PLAN_SQL).get(unitGridPlanTargetKey(normalized)) as
-      | { planId?: string }
-      | undefined;
-    return {
-      packId: typeof pack?.packId === "string" && pack.packId ? pack.packId : null,
-      hasPlan: typeof plan?.planId === "string" && Boolean(plan.planId),
-    };
-  } catch {
-    return EMPTY;
-  } finally {
-    db?.close();
-  }
+  const state = readPersistedUnitGridPackPlanState(databasePath, unitId);
+  return { packId: state.packId, hasPlan: state.hasPlan };
 }

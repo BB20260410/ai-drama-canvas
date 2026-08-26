@@ -11,6 +11,7 @@ import {
   readPersistedPanelHasPlan,
   readPersistedPanelPlanState,
   readPersistedUnitGridPackAndPlan,
+  readPersistedUnitGridPackPlanState,
   readPersistedUnitGridPlanState,
 } from "../src/core/studio-unit-grid-persisted-plan-read.js";
 import {
@@ -282,6 +283,11 @@ describe("单镜落盘计划只读", () => {
       packId: "pack-grid",
       hasPlan: true,
     });
+    expect(readPersistedUnitGridPackPlanState(targetsOnly, "u-grid")).toEqual({
+      packId: "pack-grid",
+      hasPlan: true,
+      status: "planned",
+    });
     expect(readPersistedUnitGridPlanState(targetsOnly, "u-grid")).toEqual({
       hasPlan: true,
       status: "planned",
@@ -333,6 +339,7 @@ describe("已有计划时人机同下一步源码合同", () => {
     expect(text).toContain("readPersistedPanelHasPlan");
     expect(text).toContain("readPersistedPanelPlanState");
     expect(text).toContain("readPersistedUnitGridPlanState");
+    expect(text).toContain("readPersistedUnitGridPackPlanState");
     expect(text).toContain("generationLedgerSidecarPath");
     expect(text).toContain("t.pack_id IS NULL");
     expect(text).toContain("LIMIT 1");

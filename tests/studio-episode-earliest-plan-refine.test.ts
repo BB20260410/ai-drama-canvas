@@ -118,6 +118,28 @@ describe("earliest 人机同下一步：只精炼一个 pending 槽", () => {
     expect(dispatch.code).toBe("dispatch-unit-grid");
   });
 
+  it("有计划时按节点状态精炼 wait / retry / Review", () => {
+    const freeze = freezeSlot("S1E2-U03");
+    expect(refineEarliestReadyToFreezeSlot(freeze, {
+      packId: "pack-grid",
+      hasPlan: true,
+      status: "dispatched",
+    }).code).toBe("wait-or-reconcile-unit-grid-run");
+    expect(refineEarliestReadyToFreezeSlot(freeze, {
+      packId: "pack-grid",
+      hasPlan: true,
+      status: "failed",
+    })).toMatchObject({
+      phase: "ready-to-retry",
+      code: "retry-unit-grid-plan-nodes",
+    });
+    expect(refineEarliestReadyToFreezeSlot(freeze, {
+      packId: "pack-grid",
+      hasPlan: true,
+      status: "succeeded",
+    }).code).toBe("submit-unit-grid-review");
+  });
+
   it("已 formal / 非 freeze 槽不改", () => {
     const approved = {
       ...freezeSlot("S1E2-U01"),
@@ -209,11 +231,13 @@ describe("earliest 源码合同：有界只读", () => {
   it("全槽位仍 hasCurrentPack=false；只对 earliest 一格只读查 pack/计划", () => {
     const text = source("src/core/studio-episode-earliest.ts");
     expect(text).toContain("hasCurrentPack: false");
-    expect(text).toContain("readPersistedUnitGridPackAndPlan");
+    expect(text).toContain("readPersistedUnitGridPackPlanState");
     expect(text).toContain("refineEarliestReadyToFreezeSlot");
     expect(text).toContain("formatStudioEpisodeEarliestStatusLine");
     expect(text).toContain("STUDIO_EPISODE_EARLIEST_SCHEMA_VERSION = 1");
-    expect(text.match(/readPersistedUnitGridPackAndPlan\(/g)?.length).toBe(1);
+    expect(text).toContain("persistedPlanStatus");
+    expect(text.match(/readPersistedUnitGridPackPlanState\(/g)?.length).toBe(1);
+    expect(text).not.toContain("readPersistedUnitGridPackAndPlan(");
     expect(text).not.toContain("listStudioGenerationPacksByUnit");
     expect(text).not.toContain("getStudioGenerationLatestPlanForUnitGrid");
     expect(text).not.toContain("managedLedgerPaths");

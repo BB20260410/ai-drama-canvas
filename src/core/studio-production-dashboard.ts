@@ -774,7 +774,8 @@ export function unitGridProjectionToDashboardNextAction(
       || projection.phase === "rework"
       || projection.phase === "not-invoked-needs-new-run"
       || projection.phase === "abandoned-needs-new-run"
-      || projection.phase === "pending-review",
+      || projection.phase === "pending-review"
+      || projection.phase === "ready-to-retry",
     locator: unitLocator(projectId, unitId),
   };
 }
@@ -821,6 +822,13 @@ async function resolveUnitGridDashboardNextAction(
       callStatus,
       pairComplete: latestRun.hasResultPair,
       reviewDecision,
+      persistedPlanStatus: latestRun.latestEventKind === "failed"
+        ? "failed"
+        : latestRun.latestEventKind === "cancelled"
+          ? "cancelled"
+          : latestRun.latestEventKind === "retry-superseded"
+            ? "planned"
+            : undefined,
     });
     return unitGridProjectionToDashboardNextAction(projectId, unitId, projection);
   }

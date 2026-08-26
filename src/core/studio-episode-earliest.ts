@@ -11,8 +11,9 @@ import { getStudioGenerationCheckpointControl } from "./studio-generation-checkp
 import { getStudioProjectWriteLeaseReadOnly } from "./studio-project-write-lease.js";
 import { projectStudioUnitGridNextAction } from "./studio-unit-grid-next-action.js";
 import { getApprovedTimelineProjection } from "./studio-approved-timeline-projection.js";
+import type { PersistedPlanNodeStatus } from "./studio-generation-plan-draft.js";
 import {
-  readPersistedUnitGridPackAndPlan,
+  readPersistedUnitGridPackPlanState,
   type PersistedUnitGridPackAndPlan,
 } from "./studio-unit-grid-persisted-plan-read.js";
 
@@ -69,13 +70,14 @@ function digest(value: unknown): string {
  */
 export function refineEarliestReadyToFreezeSlot(
   slot: StudioEpisodeUnitSlotProjection,
-  persisted: PersistedUnitGridPackAndPlan,
+  persisted: PersistedUnitGridPackAndPlan & { status?: PersistedPlanNodeStatus | null },
 ): StudioEpisodeUnitSlotProjection {
   if (slot.formalCommitted || slot.phase !== "ready-to-freeze") return slot;
   if (!persisted.packId) return slot;
   const next = projectStudioUnitGridNextAction({
     hasCurrentPack: true,
     hasCurrentPlan: persisted.hasPlan,
+    persistedPlanStatus: persisted.status ?? undefined,
   });
   return {
     ...slot,
@@ -186,7 +188,7 @@ export async function getStudioEpisodeEarliest(
         ? "generation_unknown"
         : null;
 
-    // 全槽位仍不读落盘 pack（§1.3 有界）。freeze/plan/dispatch 只对下面 earliest 一格精炼。
+    // 全槽位仍不读落盘 pack（§1.3 有界）。freeze/plan/dispatch/wait/retry/Review 只对下面 earliest 一格精炼。
     const next = projectStudioUnitGridNextAction({
       hasCurrentPack: false,
       callStatus,
@@ -215,7 +217,7 @@ export async function getStudioEpisodeEarliest(
     const candidate = slots[earliestIndex]!;
     slots[earliestIndex] = refineEarliestReadyToFreezeSlot(
       candidate,
-      readPersistedUnitGridPackAndPlan(shell.paths.generationDatabase, candidate.unitId),
+      readPersistedUnitGridPackPlanState(shell.paths.generationDatabase, candidate.unitId),
     );
   }
   const earliest = earliestIndex >= 0 ? slots[earliestIndex]! : null;

@@ -4,6 +4,7 @@
  * 防止 unit-grid 已 Review pass / in-flight / pending-review 时误投 panel 级
  * `execute-agent-imagegen`。
  */
+import type { PersistedPlanNodeStatus } from "./studio-generation-plan-draft.js";
 
 export type StudioUnitGridLedgerPhase =
   | "ready-to-freeze"
@@ -16,7 +17,8 @@ export type StudioUnitGridLedgerPhase =
   | "rework"
   | "rejected"
   | "not-invoked-needs-new-run"
-  | "abandoned-needs-new-run";
+  | "abandoned-needs-new-run"
+  | "ready-to-retry";
 
 export interface StudioUnitGridNextActionProjection {
   phase: StudioUnitGridLedgerPhase;
@@ -38,6 +40,8 @@ export function projectStudioUnitGridNextAction(input: {
   callStatus?: "generation_unknown" | "not-invoked" | "result-committed" | "owner-abandoned" | null;
   pairComplete?: boolean;
   reviewDecision?: "pass" | "rework" | "reject" | "pending" | null;
+  /** 只读计划节点状态。inspect 已给出 active run / pair / review 时那些优先。未传则保持旧文案。 */
+  persistedPlanStatus?: PersistedPlanNodeStatus;
 }): StudioUnitGridNextActionProjection {
   const callStatus = input.callStatus ?? null;
   const review = input.reviewDecision ?? null;
@@ -121,6 +125,37 @@ export function projectStudioUnitGridNextAction(input: {
       phase: "pending-review",
       code: "submit-unit-grid-review",
       label: "raw/labeled 已齐，提交 unit-grid Review",
+      forbidPanelGenerate: true,
+      allowNewUnitGridRun: false,
+      targetKind: "unit-grid",
+    };
+  }
+
+  if (input.persistedPlanStatus === "dispatched") {
+    return {
+      phase: "in-flight",
+      code: "wait-or-reconcile-unit-grid-run",
+      label: "unit-grid 正在执行，等待结果或对账现有 run",
+      forbidPanelGenerate: true,
+      allowNewUnitGridRun: false,
+      targetKind: "unit-grid",
+    };
+  }
+  if (input.persistedPlanStatus === "succeeded") {
+    return {
+      phase: "pending-review",
+      code: "submit-unit-grid-review",
+      label: "raw/labeled 已齐，提交 unit-grid Review",
+      forbidPanelGenerate: true,
+      allowNewUnitGridRun: false,
+      targetKind: "unit-grid",
+    };
+  }
+  if (input.persistedPlanStatus === "failed" || input.persistedPlanStatus === "cancelled") {
+    return {
+      phase: "ready-to-retry",
+      code: "retry-unit-grid-plan-nodes",
+      label: "unit-grid 计划节点已失败/已取消，下一步 retry（不重试、不派发）",
       forbidPanelGenerate: true,
       allowNewUnitGridRun: false,
       targetKind: "unit-grid",
