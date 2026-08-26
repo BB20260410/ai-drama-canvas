@@ -1,0 +1,39 @@
+{
+  "id": "goal-inspector-scene-backrefs-20260826",
+  "kind": "inspector-scene-backrefs-readonly",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T19:56:30.000Z",
+  "scope": "Canvas inspector exposes current-head cross-unit scene backrefs via the existing readonly SQL reader (readOnly + query_only, timeline index). Buttons call focusAppearance(unitId, panelId) and do not guess the first panel. get_studio_trace is unchanged and still does not read production head for scene backrefs. Not BindingSet; does not dispatch.",
+  "invariants": {
+    "reusesExistingReadonlySql": true,
+    "doesNotImportSqliteInRenderer": true,
+    "doesNotChangeGetStudioTrace": true,
+    "doesNotGuessFirstPanel": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotCallBindingInspect": true,
+    "doesNotDispatch": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-scene-backrefs-readonly-sql.test.ts",
+        "tests/studio-unit-lock-overlays-readonly-sql.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts"
+      ],
+      "result": "4 files / 114 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "real-generation constraint evidence",
+    "scene consistency fully solved",
+    "wizard structured scene backrefs",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
