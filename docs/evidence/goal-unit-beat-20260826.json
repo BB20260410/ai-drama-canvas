@@ -1,0 +1,57 @@
+{
+  "id": "goal-unit-beat-20260826",
+  "kind": "unit-beat-readonly",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T20:49:00.000Z",
+  "scope": "Expose lock-version / frozen-pack 15s×2–6 panel start/end/duration to Align / SSL-5 / reader / 15s wizard / canvas inspector / generation control / review / session-snapshot / Agent brief. Reads existing freeze pack target (unitLocalStartSeconds / unitLocalEndSeconds / durationSeconds) only; does not write a new freeze renderedPrompt line or change G2+ fingerprints. Inspector / generation control without a pack use StudioDashboardPanelSummary startSeconds/endSeconds/durationSeconds already present; no extra lock-overlay timing SQL. Review reads frozen pack target only and never unit head / lock overlay. Not BindingSet; does not change StudioDashboardPanelSummary or get_studio_trace; unit-grid brief last tool note remains previous-standing; formatWizardPromptBody is unchanged.",
+  "invariants": {
+    "readsExistingFrozenTargetOnly": true,
+    "doesNotWriteNewFrozenPromptLine": true,
+    "doesNotAddShotTypeToRequiredPanelColumns": true,
+    "noExtraLockOverlayTimingSql": true,
+    "reviewFrozenPackOnly": true,
+    "doesNotReadUnitHeadForHistoricalPacks": true,
+    "doesNotGuessFirstPanel": true,
+    "doesNotChangeDashboardProjection": true,
+    "doesNotWriteTraceHeadBeat": true,
+    "doesNotCallBindingInspect": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotDispatch": true,
+    "doesNotWriteWizardPromptConstraint": true,
+    "unitGridBriefLastNoteRemainsPreviousStanding": true,
+    "sessionSnapshotSchemaVersionUnchanged": 1,
+    "ssl5PlanSchemaVersionUnchanged": 1
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-unit-lock-overlays-readonly-sql.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-unit-grid-brief-contract.test.ts",
+        "tests/studio-scene-backrefs-readonly-sql.test.ts",
+        "tests/studio-continuity-review-ui.test.ts"
+      ],
+      "result": "10 files / 175 tests PASS"
+    },
+    "knownExistingFailure": "tests/studio-storyboard-wizard.test.ts createManagedProject Linux dirfd; not a new regression",
+    "commit": "7175261"
+  },
+  "notClaimed": [
+    "15s beat fully solved",
+    "style lock surface",
+    "real-generation constraint evidence",
+    "wizard auto-loads align board",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
