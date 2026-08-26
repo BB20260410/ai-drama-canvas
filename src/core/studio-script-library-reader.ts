@@ -17,6 +17,33 @@ import { getStudioEpisodeEarliest } from "./studio-episode-earliest.js";
 
 export const SCRIPT_READER_SCHEMA_VERSION = 1 as const;
 
+/** 与对照板同文案。本地排版，避免与对照模块循环依赖。 */
+function readerCheckpointLine(checkpoint: {
+  newSlotDispatchAllowed: boolean;
+  blockingBatchNumber?: number;
+}): string {
+  if (checkpoint.newSlotDispatchAllowed === false) {
+    return checkpoint.blockingBatchNumber != null
+      ? `六图闸未放行（batch ${checkpoint.blockingBatchNumber}），先完成停检/Review（不派发）`
+      : "六图闸未放行，先完成停检/Review（不派发）";
+  }
+  return "六图闸已放行新槽";
+}
+
+function readerWriteLeaseLine(lease: {
+  held: boolean;
+  holderId: string | null;
+  denialHint: string | null;
+}): string {
+  if (lease.held) {
+    return lease.holderId
+      ? `写租约由 ${lease.holderId} 持有；无该租约禁止写命令（不派发）`
+      : "写租约已被持有；无该租约禁止写命令（不派发）";
+  }
+  return lease.denialHint
+    || "写租约未持有；写命令前须 acquire-lease（不派发）";
+}
+
 export interface ScriptOutlineHeading {
   level: number;
   title: string;
@@ -52,6 +79,8 @@ export interface ScriptReaderView {
     earliestUnitId: string | null;
     earliestStatusLine: string | null;
     earliestReason: string | null;
+    checkpointLine: string;
+    writeLeaseLine: string;
     unitHighlights: ScriptReaderUnitHighlight[];
   };
   builtAt: string;
@@ -188,6 +217,8 @@ export async function getStudioScriptReaderView(
       earliestUnitId: earliest.earliestUnitId,
       earliestStatusLine: earliest.statusLine,
       earliestReason: earliest.earliestReason ?? null,
+      checkpointLine: readerCheckpointLine(earliest.checkpoint),
+      writeLeaseLine: readerWriteLeaseLine(earliest.writeLease),
       unitHighlights,
     };
   }

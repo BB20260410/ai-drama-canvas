@@ -27,7 +27,13 @@ describe("studio-script-library-reader", () => {
     const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
     const reader = readFileSync(path.join(root, "src/core/studio-script-library-reader.ts"), "utf8");
     expect(reader).toContain("earliestReason: earliest.earliestReason");
+    expect(reader).toContain("earliest.checkpoint");
+    expect(reader).toContain("earliest.writeLease");
+    expect(reader).toContain("checkpointLine");
+    expect(reader).toContain("writeLeaseLine");
     expect(reader).toContain("SCRIPT_READER_SCHEMA_VERSION = 1");
     expect(reader).not.toContain("evaluateStudioConsistency");
+    expect(reader).not.toContain("studio-script-media-align");
+    expect(reader).not.toContain("studio-project-write-lease");
   });
 });

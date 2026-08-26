@@ -1002,6 +1002,8 @@ function shortSha(value: string | null | undefined): string {
           <p>{{ reader.outline.length ? "已识别 Markdown 场景/章节导航。" : "未识别 Markdown 标题；仍可按文本选区拆格。" }}</p>
           <p>{{ reader.episode?.earliestStatusLine || "当前季/集暂无 earliest 诊断。" }}</p>
           <p v-if="reader.episode?.earliestReason" data-testid="script-reader-earliest-reason">{{ reader.episode.earliestReason }}</p>
+          <p v-if="reader.episode?.checkpointLine" data-testid="script-reader-checkpoint">{{ reader.episode.checkpointLine }}</p>
+          <p v-if="reader.episode?.writeLeaseLine" data-testid="script-reader-write-lease">{{ reader.episode.writeLeaseLine }}</p>
           <p>向导提示词只有显式物化后才写入 prompt owner；只读建议不会建立正式单元。</p>
         </div>
         <button type="button" class="primary" @click="activeTab = 'reader'">打开阅读器</button>
@@ -1030,6 +1032,8 @@ function shortSha(value: string | null | undefined): string {
           {{ unit.sequence }} · {{ unit.title }}
           <small>{{ unit.formalCommitted ? "formal" : "未关账" }}</small>
         </button>
+        <p v-if="reader.episode?.checkpointLine" class="wizard-lock-hint">{{ reader.episode.checkpointLine }}</p>
+        <p v-if="reader.episode?.writeLeaseLine" class="wizard-lock-hint">{{ reader.episode.writeLeaseLine }}</p>
       </aside>
       <section class="reader-body">
         <div class="selection-status">

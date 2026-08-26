@@ -79,6 +79,8 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("missingReportOpenItems");
     expect(vue).toContain("align-review-");
     expect(vue).toContain("script-reader-earliest-reason");
+    expect(vue).toContain("script-reader-checkpoint");
+    expect(vue).toContain("script-reader-write-lease");
     expect(vue).toContain("peekLabel(hit.consistencyPeek)");
     expect(vue).toContain("peekLabel(ssl5Plan.consistencyPeek)");
     expect(vue).not.toContain("studio-consistency-evaluator");
@@ -266,6 +268,8 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(suggest).toContain('actionLoading.value = ""');
     expect(suggest).toContain("report(reason)");
     expect(suggest).not.toContain("loadAlign(");
+    expect(vue).toContain("wizardAlignCheckpointLine");
+    expect(vue).toContain("对照板未加载，不自动查六图闸");
   });
 
   it("选区命中对照这格 fail-closed：busy 在首个 await 之前置位，未命中不猜宫格，缺图不绑其他格的图", () => {
