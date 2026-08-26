@@ -7,7 +7,9 @@ import {
   buildMissingMediaReport,
   countCoveredUnits,
   formatPanelCoverageMarks,
+  formatPanelStandingGaps,
   formatPanelStandingHandoff,
+  listPanelStandingGaps,
   normalizeSourceSpans,
   summarizePanelAssetMentions,
   pickFirstCoveredPanel,
@@ -335,6 +337,15 @@ describe("studio-script-library-projection pure helpers", () => {
     });
     expect(handed[0]?.assetMentions).toEqual([{ assetId: "char-a", category: "character", role: "豆姐" }]);
     expect(formatPanelStandingHandoff(handed[1]?.previousHandoff ?? null)).toContain("G1 中景");
+    expect(listPanelStandingGaps(handed[1])).toEqual([]);
+    expect(formatPanelStandingGaps(handed[1])).toContain("锁版站位已记");
+    expect(listPanelStandingGaps({ shotComposition: "", visualAction: "抬手", filmingMethod: "" })).toEqual(["缺构图", "缺运镜"]);
+    expect(formatPanelStandingGaps({
+      shotComposition: "",
+      visualAction: "",
+      filmingMethod: "",
+      previousHandoff: handed[1]?.previousHandoff ?? null,
+    })).toContain("不是 BindingSet");
     expect(summarizePanelAssetMentions([{ assetId: "  ", role: "x" }, { assetId: "prop-1", category: "prop", role: "面具" }])).toEqual([
       { assetId: "prop-1", category: "prop", role: "面具" },
     ]);

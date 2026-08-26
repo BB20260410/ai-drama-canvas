@@ -140,6 +140,8 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.previousShotComposition).toBe("中景");
     expect(plan.previousVisualAction).toBe("站定");
     expect(plan.previousFilmingMethod).toBe("固定");
+    expect(plan.standingGapLine).toContain("锁版站位缺口");
+    expect(plan.standingGapLine).toContain("不是 BindingSet");
   });
 
   it("全 covered 且无 earliest 则无焦点", () => {
@@ -174,6 +176,7 @@ describe("SSL-5 入口源码合同", () => {
     expect(vue).toContain('data-testid="ssl5-missing-to-gen-plan"');
     expect(vue).toContain('data-testid="ssl5-focus-panel"');
     expect(vue).toContain('data-testid="ssl5-focus-handoff"');
+    expect(vue).toContain('data-testid="ssl5-focus-standing-gaps"');
     expect(vue).toContain("planSsl5MissingToGen");
     expect(vue).toContain("不自动 dispatch");
     expect(director).toContain("ssl5-missing-to-gen-plan");

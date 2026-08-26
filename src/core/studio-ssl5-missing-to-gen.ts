@@ -9,7 +9,7 @@ import {
   type ScriptMediaAlignBoard,
   type ScriptMediaAlignRow,
 } from "./studio-script-media-align.js";
-import { pickFirstMissingPanel } from "./studio-script-library-projection.js";
+import { formatPanelStandingGaps, pickFirstMissingPanel } from "./studio-script-library-projection.js";
 
 export const SSL5_PLAN_SCHEMA_VERSION = 1 as const;
 
@@ -28,6 +28,7 @@ export interface Ssl5MissingToGenPlanItem {
   previousShotComposition: string | null;
   previousVisualAction: string | null;
   previousFilmingMethod: string | null;
+  standingGapLine: string;
 }
 
 export interface Ssl5MissingToGenPlan {
@@ -44,6 +45,7 @@ export interface Ssl5MissingToGenPlan {
   previousShotComposition: string | null;
   previousVisualAction: string | null;
   previousFilmingMethod: string | null;
+  standingGapLine: string;
   missingAllCount: number;
   partialCount: number;
   items: Ssl5MissingToGenPlanItem[];
@@ -91,6 +93,7 @@ export function buildSsl5PlanFromBoard(
         previousShotComposition: handoff?.shotComposition ?? null,
         previousVisualAction: handoff?.visualAction ?? null,
         previousFilmingMethod: handoff?.filmingMethod ?? null,
+        standingGapLine: formatPanelStandingGaps(missingPanel ?? null),
       };
     })
     .sort((left, right) => {
@@ -118,6 +121,7 @@ export function buildSsl5PlanFromBoard(
     previousShotComposition: focus?.previousShotComposition ?? null,
     previousVisualAction: focus?.previousVisualAction ?? null,
     previousFilmingMethod: focus?.previousFilmingMethod ?? null,
+    standingGapLine: focus?.standingGapLine ?? "没有宫格可查站位缺口",
     missingAllCount: board.missingAllCount,
     partialCount: board.partialCount,
     items,

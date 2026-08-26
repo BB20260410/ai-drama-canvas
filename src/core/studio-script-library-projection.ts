@@ -188,6 +188,31 @@ export function formatPanelStandingHandoff(handoff: PanelStandingHandoff | null 
   return `G${handoff.panelIndex} ${handoff.shotComposition || "构图未记"} · ${handoff.visualAction || "动作未记"} · ${handoff.filmingMethod || "运镜未记"}`;
 }
 
+export type PanelStandingFields = {
+  shotComposition?: string;
+  visualAction?: string;
+  filmingMethod?: string;
+  previousHandoff?: PanelStandingHandoff | null;
+};
+
+/** 锁版站位缺口；不是 BindingSet，不能当 generation-ready。 */
+export function listPanelStandingGaps(panel: PanelStandingFields | null | undefined): string[] {
+  if (!panel) return [];
+  const gaps: string[] = [];
+  if (!String(panel.shotComposition || "").trim()) gaps.push("缺构图");
+  if (!String(panel.visualAction || "").trim()) gaps.push("缺动作");
+  if (!String(panel.filmingMethod || "").trim()) gaps.push("缺运镜");
+  return gaps;
+}
+
+export function formatPanelStandingGaps(panel: PanelStandingFields | null | undefined): string {
+  if (!panel) return "没有宫格可查站位缺口";
+  const gaps = listPanelStandingGaps(panel);
+  const handoff = formatPanelStandingHandoff(panel.previousHandoff);
+  if (!gaps.length) return `锁版站位已记 · ${handoff}`;
+  return `锁版站位缺口：${gaps.join("、")} · ${handoff}。不是 BindingSet，不能当 generation-ready。`;
+}
+
 export function applyPackMediaToPanels(
   panels: Array<{
     index: number;
