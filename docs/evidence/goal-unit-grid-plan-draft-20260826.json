@@ -3,7 +3,7 @@
   "kind": "unit-grid-generation-control-pack-plan-readonly-draft",
   "conclusion": "PASS",
   "createdAt": "2026-08-26T21:16:00.000Z",
-  "scope": "composeStudioGenerationPlanDraft accepts targetKind=unit-grid and emits { targetKind: unit-grid, unitId } when a persisted pack id is present. StudioGenerationControlView uses history[0].packId or a matching unit-grid plan node packId; it never uses unitGridReadinessPackId or selectedPackId (which falls back to the readiness candidate). get_studio_generation_control pack attaches agentExecution.generationPlanDraft from the already-persisted pack.id. Session-snapshot and SSL-5 stay panel-only. Does not execute create_studio_generation_plan or dispatch. SSL5_PLAN_SCHEMA_VERSION and session-snapshot schemaVersion stay 1.",
+  "scope": "composeStudioGenerationPlanDraft accepts targetKind=unit-grid and emits { targetKind: unit-grid, unitId } when a persisted pack id is present. StudioGenerationControlView uses history[0].packId or a matching unit-grid plan node packId; it never uses unitGridReadinessPackId or selectedPackId (which falls back to the readiness candidate). get_studio_generation_control pack attaches agentExecution.generationPlanDraft from the already-persisted pack.id and sets next to start at create-plan. Session-snapshot and SSL-5 stay panel-only. Does not execute create_studio_generation_plan or dispatch. SSL5_PLAN_SCHEMA_VERSION and session-snapshot schemaVersion stay 1.",
   "invariants": {
     "sessionSnapshotSchemaVersionUnchanged": 1,
     "ssl5PlanSchemaVersionUnchanged": 1,
@@ -26,7 +26,8 @@
       ],
       "result": "6 files / 47 tests PASS"
     },
-    "commit": "4a6167b"
+    "commit": "4a6167b",
+    "followUpCommit": "9ebbfa9"
   },
   "notClaimed": [
     "SSL-5 one-click generation closed",
