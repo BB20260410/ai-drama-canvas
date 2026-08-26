@@ -39,7 +39,10 @@ import {
   type StudioCodexGenerationRequest,
   type StudioGenerationFreezePack,
 } from "./studio-generation.js";
-import { buildStudioGenerationSessionSnapshot } from "./studio-generation-session-snapshot.js";
+import {
+  buildStudioGenerationSessionSnapshot,
+  historyEnvelopeConsistencyPeek,
+} from "./studio-generation-session-snapshot.js";
 import {
   getStudioGenerationLatestPlanForPanel,
   getStudioGenerationLatestPlanForUnitGrid,
@@ -1023,6 +1026,7 @@ export async function getStudioGenerationControlEnvelope(
           ...(query.limit === undefined ? {} : { limit: query.limit }),
           ...(query.order === undefined ? {} : { order: query.order }),
         });
+    const consistencyPeek = await historyEnvelopeConsistencyPeek(page.items);
     return {
       schemaVersion: 1 as const,
       kind: STUDIO_GENERATION_CONTROL_KIND,
@@ -1036,6 +1040,7 @@ export async function getStudioGenerationControlEnvelope(
       items: page.items,
       ...(page.nextCursor ? { nextCursor: page.nextCursor } : {}),
       nextAction: historyEnvelopeNext(page.items),
+      ...(consistencyPeek ? { consistencyPeek } : {}),
       controlReferencesExposed: false as const,
     };
   }

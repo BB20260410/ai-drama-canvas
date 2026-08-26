@@ -17,6 +17,7 @@ import {
   PLAN_ENVELOPE_NEXT_WAIT,
   historyEnvelopeNext,
   historyEnvelopeNextLabel,
+  historyEnvelopePeekRunId,
   planEnvelopeNextFromNodeStatuses,
   planEnvelopeNextLabel,
   planOperationEnvelopeNext,
@@ -25,7 +26,10 @@ import {
   unitGridNextActionBlockingKind,
   unitGridStatusBlockingKind,
 } from "../src/core/studio-generation-plan-draft.js";
-import { sessionConsistencyPeekFromVerdict } from "../src/core/studio-generation-session-snapshot.js";
+import {
+  historyEnvelopeConsistencyPeek,
+  sessionConsistencyPeekFromVerdict,
+} from "../src/core/studio-generation-session-snapshot.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const source = (relative: string) => readFileSync(path.join(root, relative), "utf8");
@@ -276,6 +280,13 @@ describe("create-plan 只读草稿纯函数", () => {
     ])).toBe(PLAN_ENVELOPE_NEXT_REVIEW);
     expect(historyEnvelopeNextLabel([{ pairComplete: true, status: "pending" }])).toContain("Review");
     expect(historyEnvelopeNextLabel([])).toContain("readiness");
+    expect(historyEnvelopePeekRunId([])).toBeNull();
+    expect(historyEnvelopePeekRunId([{ pairComplete: false, generationRunId: "run-incomplete" }])).toBe("run-incomplete");
+    expect(historyEnvelopePeekRunId([
+      { pairComplete: false, generationRunId: "run-incomplete" },
+      { pairComplete: true, generationRunId: "run-paired" },
+    ])).toBe("run-paired");
+    expect(historyEnvelopePeekRunId([{ pairComplete: true, status: "pending" }])).toBeNull();
   });
 });
 
@@ -291,6 +302,7 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(draft).toContain("planEnvelopeNextLabel");
     expect(draft).toContain("historyEnvelopeNext");
     expect(draft).toContain("historyEnvelopeNextLabel");
+    expect(draft).toContain("historyEnvelopePeekRunId");
     expect(draft).toContain("unitGridNextActionBlockingKind");
     expect(draft).not.toContain("studio-script-media-align");
     expect(draft).not.toContain("studio-ssl5-missing-to-gen");
@@ -317,6 +329,8 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(snapshot).toContain("generationPlanDraft");
     expect(snapshot).toContain("consistencyPeek");
     expect(snapshot).toContain("sessionConsistencyPeekFromVerdict");
+    expect(snapshot).toContain("historyEnvelopeConsistencyPeek");
+    expect(snapshot).toContain("historyEnvelopePeekRunId");
     expect(snapshot).toContain("listStudioGenerationPanelHistory");
     expect(snapshot).toContain('order: "newest-first"');
     expect(snapshot).toContain('import("./studio-consistency-evaluator.js")');
@@ -519,6 +533,7 @@ describe("create-plan 草稿接线源码合同", () => {
     const draft = source("src/core/studio-generation-plan-draft.ts");
     expect(draft).toContain("historyEnvelopeNext");
     expect(draft).toContain("historyEnvelopeNextLabel");
+    expect(draft).toContain("historyEnvelopePeekRunId");
     expect(draft).toContain("只看本页 items");
     expect(draft).toContain("newest-first");
     expect(draft).not.toContain("listStudioGenerationPanelHistory");
@@ -526,27 +541,41 @@ describe("create-plan 草稿接线源码合同", () => {
     const codex = source("src/core/codex.ts");
     expect(codex).toContain("historyEnvelopeNext");
     expect(codex).toContain("nextAction: historyEnvelopeNext(page.items)");
+    expect(codex).toContain("historyEnvelopeConsistencyPeek");
     const helperStart = codex.indexOf("if (query.operation === \"history\")");
     const helperEnd = codex.indexOf("return withStudioRequestSchemaCache", helperStart);
     const helper = codex.slice(helperStart, helperEnd);
     expect(helper).toContain("historyEnvelopeNext(page.items)");
+    expect(helper).toContain("historyEnvelopeConsistencyPeek(page.items)");
     expect(helper).not.toContain("listStudioGenerationActiveRuns");
     expect(helper).not.toContain("dispatch_studio_generation_pack");
     expect(helper).not.toContain("evaluateStudioConsistency");
     expect(helper).not.toContain("studio-ssl5-missing-to-gen");
+    expect(helper).not.toContain("previousActualTail");
     const control = source("src/renderer/src/components/StudioGenerationControlView.vue");
     expect(control).toContain("historyEnvelopeNextLabel");
     expect(control).toContain('data-testid="studio-generation-history-next"');
     expect(control).toContain("historyEnvelopeNextLabel(history)");
+    expect(control).toContain('data-testid="studio-generation-history-peek"');
+    expect(control).toContain("historyConsistencyPeekLabel");
+    expect(control).toContain("historyResult.consistencyPeek");
+    expect(control).toContain('operation: "history"');
     expect(control).not.toContain("getStudioGenerationControlEnvelope");
+    expect(control).not.toContain("listStudioGenerationPanelHistory");
+    expect(control).not.toContain("studio-consistency-evaluator");
+    expect(control).not.toContain("studio-generation-session-snapshot");
+    expect(control).not.toContain("evaluateStudioConsistency");
     const mcp = source("src/mcp/server.ts");
     expect(mcp).toContain("history 信封 nextAction");
+    expect(mcp).toContain("history 信封 consistencyPeek");
     expect(mcp).toContain("要看最新请 newest-first");
     expect(mcp).toContain("history order=newest-first");
     expect(mcp).toContain("Review 时禁止再 dispatch");
+    expect(mcp).toContain("envelope nextAction 与 consistencyPeek");
   });
 
-  it("session-snapshot 一致性四态 peek 不 evaluate、不进 fingerprint", () => {
+  it("session-snapshot 一致性四态 peek 不 evaluate、不进 fingerprint", async () => {
+    expect(await historyEnvelopeConsistencyPeek([])).toBeUndefined();
     expect(sessionConsistencyPeekFromVerdict(undefined)).toEqual({
       status: "unevaluated",
       generationRunId: null,
@@ -563,6 +592,7 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(sessionConsistencyPeekFromVerdict("run-1", "drifted").status).toBe("cached");
     const snapshot = source("src/core/studio-generation-session-snapshot.ts");
     expect(snapshot).toContain("consistencyPeek");
+    expect(snapshot).toContain("historyEnvelopeConsistencyPeek");
     expect(snapshot).toContain("未评估 ≠ 无法检查");
     expect(snapshot).toContain("peekStudioConsistencyVerdictByRunId");
     expect(snapshot).not.toContain("evaluateStudioConsistency");

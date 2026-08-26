@@ -228,7 +228,18 @@ export function planOperationEnvelopeNext(input: {
 export type HistoryEnvelopeItem = {
   pairComplete?: boolean;
   status?: string | null;
+  generationRunId?: string | null;
 };
+
+/**
+ * 本页 consistencyPeek 用 run：优先成对项，否则本页第一项有 run 的。
+ * 不翻页、不加 inspect、不用 previousActualTail。
+ */
+export function historyEnvelopePeekRunId(items: readonly HistoryEnvelopeItem[]): string | null {
+  const paired = items.find((item) => item.pairComplete && item.generationRunId);
+  if (paired?.generationRunId) return paired.generationRunId;
+  return items.find((item) => item.generationRunId)?.generationRunId ?? null;
+}
 
 /**
  * operation=history 信封下一步。只看本页 items，不翻页、不加 inspect。

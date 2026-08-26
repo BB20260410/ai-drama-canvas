@@ -268,6 +268,7 @@
           <section>
             <b>正式结果</b>
             <p data-testid="studio-generation-history-next">{{ historyEnvelopeNextLabel(history) }}</p>
+            <p data-testid="studio-generation-history-peek">{{ historyConsistencyPeekLabel(historyConsistencyPeek) }}</p>
             <p v-if="!history.length">尚无原始图或标注图写回；派发只表示本地已登记意图，图片尚未生成。</p>
             <article v-for="item in history" :key="item.resultId" class="result-row">
               <div><strong>{{ item.variant === 'raw' ? '原始图' : '标注图' }}</strong><small>{{ providerLabel(item.provider) }} · {{ reviewStatusLabel(item.status) }}</small></div>
@@ -404,6 +405,12 @@ const selectedPanelId = ref("");
 const unitCursor = ref<string>();
 const unitCursorStack = ref<string[]>([]);
 const history = ref<StudioGenerationResultRecord[]>([]);
+type HistoryConsistencyPeek = {
+  status: "cached" | "unevaluated";
+  verdict?: "consistent" | "needs-review" | "drifted" | "not-checkable";
+  generationRunId: string | null;
+};
+const historyConsistencyPeek = ref<HistoryConsistencyPeek | undefined>();
 const historyCursor = ref<string>();
 const historyNextCursor = ref<string>();
 const historyCursorStack = ref<string[]>([]);
@@ -956,6 +963,14 @@ function reviewStatusLabel(status: string): string {
   return status === "approved" ? "已通过" : status === "rejected" ? "需返工" : status === "pending" ? "待审片" : status;
 }
 
+function historyConsistencyPeekLabel(peek?: HistoryConsistencyPeek): string {
+  if (!peek || peek.status === "unevaluated" || !peek.verdict) return "一致性：未评估";
+  if (peek.verdict === "consistent") return "一致性：一致";
+  if (peek.verdict === "needs-review") return "一致性：需复核";
+  if (peek.verdict === "drifted") return "一致性：明显漂移";
+  return "一致性：无法检查";
+}
+
 function videoControlStatusLabel(control: StudioVideoPackagePublicControlLookup): string {
   if (control.status === "not-prepared") return "尚未建立视频包意图";
   if (control.status === "conflict") return "视频包换代链冲突";
@@ -1248,6 +1263,7 @@ async function loadHistory(parentToken?: number): Promise<void> {
   const loadSequence = historyLoadGate.begin();
   if (!selectedUnitId.value) {
     history.value = [];
+    historyConsistencyPeek.value = undefined;
     detachedUnknownControl.value = null;
     videoControl.value = null;
     videoControlError.value = "";
@@ -1313,21 +1329,35 @@ async function loadHistory(parentToken?: number): Promise<void> {
           return {
             items: historyResult.items,
             nextCursor: historyResult.nextCursor,
+            consistencyPeek: historyResult.consistencyPeek,
             readinessPackId,
             detachedUnknownControl: detachedUnknownResult as DetachedUnknownControlView,
           };
         })
       : selectedPanelId.value
-        ? await window.canvasApi.listStudioGenerationPanelHistory(root, {
+        ? await window.canvasApi.getStudioGenerationControl(root, {
+            operation: "history",
             unitId,
             panelId: selectedPanelId.value,
             ...(historyCursor.value ? { cursor: historyCursor.value } : {}),
             limit: 24,
             order: "newest-first",
-          }).then((result) => ({ ...result, readinessPackId: "", detachedUnknownControl: null }))
+          }).then((historyResult) => {
+            if (historyResult.operation !== "history" || historyResult.status !== "ready") {
+              throw new Error("宫格生成历史投影不可用。");
+            }
+            return {
+              items: historyResult.items,
+              nextCursor: historyResult.nextCursor,
+              consistencyPeek: historyResult.consistencyPeek,
+              readinessPackId: "",
+              detachedUnknownControl: null,
+            };
+          })
         : {
             items: [] as StudioGenerationResultRecord[],
             nextCursor: undefined,
+            consistencyPeek: undefined,
             readinessPackId: "",
             detachedUnknownControl: null,
           };
@@ -1341,6 +1371,7 @@ async function loadHistory(parentToken?: number): Promise<void> {
       };
     }
     history.value = page.items;
+    historyConsistencyPeek.value = page.consistencyPeek;
     historyNextCursor.value = page.nextCursor;
     await loadVideoPackageControl(root, token, page.items);
   } catch (reason) {
@@ -1552,6 +1583,7 @@ watch(() => props.projectRoot, () => {
   controlCharacterBackReferenceNote.value = null;
   controlCharacterBackReferences.value = [];
   history.value = [];
+  historyConsistencyPeek.value = undefined;
   selectedUnitId.value = "";
   selectedPanelId.value = "";
   loading.value = true;

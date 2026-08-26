@@ -25,6 +25,7 @@ import { readStudioSceneBackReferences } from "./studio-scene-backrefs-read.js";
 import type { CharacterBackReference, PropBackReference, SceneBackReference } from "./studio-scene-backrefs.js";
 import {
   composeStudioGenerationPlanDraft,
+  historyEnvelopePeekRunId,
   refineStudioGenerationPlanDraftIfUnitGridBlocking,
   type StudioGenerationPlanDraft,
 } from "./studio-generation-plan-draft.js";
@@ -53,6 +54,19 @@ export function sessionConsistencyPeekFromVerdict(
   if (!generationRunId) return { status: "unevaluated", generationRunId: null };
   if (verdict) return { status: "cached", verdict, generationRunId };
   return { status: "unevaluated", generationRunId };
+}
+
+/**
+ * history 信封 consistencyPeek。只看本页 items；无 run 则省略字段。
+ * 动态 import peek，不 evaluate 像素。机器不自动 Review PASS。
+ */
+export async function historyEnvelopeConsistencyPeek(
+  items: ReadonlyArray<{ generationRunId?: string | null; pairComplete?: boolean }>,
+): Promise<SessionConsistencyPeek | undefined> {
+  const runId = historyEnvelopePeekRunId(items);
+  if (!runId) return undefined;
+  const { peekStudioConsistencyVerdictByRunId } = await import("./studio-consistency-evaluator.js");
+  return sessionConsistencyPeekFromVerdict(runId, peekStudioConsistencyVerdictByRunId(runId));
 }
 
 export interface StudioGenerationSessionReference {

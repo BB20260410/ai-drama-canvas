@@ -426,6 +426,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(snapshot).toContain("composeStudioGenerationPlanDraft");
     expect(snapshot).toContain("consistencyPeek");
     expect(snapshot).toContain("sessionConsistencyPeekFromVerdict");
+    expect(snapshot).toContain("historyEnvelopeConsistencyPeek");
     expect(snapshot).toContain('import("./studio-consistency-evaluator.js")');
     expect(snapshot).not.toContain("studio-ssl5-missing-to-gen");
     expect(snapshot).toContain("readStudioSceneBackReferences");
@@ -463,6 +464,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(control).toContain('data-testid="studio-lock-style-lock"');
     expect(control).toContain("styleLockRefsFromAnyFrozenPack(pack, selectedPanelId.value)");
     expect(control).toContain("formatUnitLockStyleLockLine");
+    expect(control).toContain('data-testid="studio-generation-history-peek"');
     expect(control).toContain('data-testid="studio-control-beat"');
     expect(control).toContain("frozenPanelShotTypeFromAnyFrozenPack(pack, selectedPanelId.value)");
     expect(control).toContain("frozenPanelBeatFromAnyFrozenPack(pack, selectedPanelId.value)");

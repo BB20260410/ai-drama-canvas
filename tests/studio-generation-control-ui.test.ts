@@ -18,7 +18,7 @@ describe("受管 Studio 正式生图页", () => {
   it("正式页只读取受管账本和 Dashboard，不暴露网页/HTTP/Mock 供应商编辑", () => {
     const view = read("src/renderer/src/components/StudioGenerationControlView.vue");
     expect(view).toContain("getStudioGenerationLedgerState");
-    expect(view).toContain("listStudioGenerationPanelHistory");
+    expect(view).toContain("getStudioGenerationControl");
     expect(view).toContain("getDashboard");
     expect(view).toContain("派发只表示本地已登记意图，图片尚未生成");
     expect(view).not.toMatch(/codex-browser|http-json|ComfyUI|Mock 验证|加入下一批/u);
@@ -131,6 +131,8 @@ describe("正式生图页锁版光线服化与场景回指", () => {
     expect(view).toContain("planEnvelopeNextLabel");
     expect(view).toContain('data-testid="studio-generation-history-next"');
     expect(view).toContain("historyEnvelopeNextLabel");
+    expect(view).toContain('data-testid="studio-generation-history-peek"');
+    expect(view).toContain("historyConsistencyPeekLabel");
     expect(view).toContain("composeStudioGenerationPlanDraft");
     expect(view).toContain("formatUnitLockPanelShotTypeLine");
     expect(view).toContain("formatUnitLockPanelBeatLine");
