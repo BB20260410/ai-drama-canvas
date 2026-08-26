@@ -1,0 +1,41 @@
+{
+  "id": "goal-generation-control-lock-lighting-backrefs-20260826",
+  "kind": "generation-control-lock-lighting-costume-and-scene-backrefs",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T20:08:20.000Z",
+  "scope": "Studio generation control is a current-production surface. When a frozen pack exists it still reads lighting/costume only from renderedPrompt overlay lines (unit-grid requires panelId). When the pack is missing it falls back to lock-version sceneLighting/costumeState via getStudioUnitLockOverlays (readOnly SQL, cap 6). Scene backrefs always use current-head getStudioSceneBackReferences; click-through selects the exact unit/panel and fail-closes instead of guessing panels[0]. Does not change StudioDashboardPanelSummary, get_studio_trace, Binding inspect, or dispatch.",
+  "invariants": {
+    "frozenPackStillOverlayOnly": true,
+    "lockFallbackOnlyWithoutPack": true,
+    "doesNotImportSqlReadersInRenderer": true,
+    "doesNotGuessFirstPanel": true,
+    "doesNotChangeDashboardProjection": true,
+    "doesNotWriteTraceHeadBackrefs": true,
+    "doesNotCallBindingInspect": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotDispatch": true,
+    "clearsLockCacheAfterDetailNull": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/studio-trace-ui.test.ts"
+      ],
+      "result": "3 files / 19 tests PASS"
+    },
+    "commit": "4a52971"
+  },
+  "notClaimed": [
+    "scene consistency fully solved",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
