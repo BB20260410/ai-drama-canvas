@@ -183,6 +183,16 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(reveal).not.toContain("evaluateStudioConsistency");
   });
 
+  it("对照行选中只绑所选宫格 raw，不再回退整行/unit-grid 图", () => {
+    const vue = source();
+    const selectRow = handlerBody(vue, "async function selectAlignRow(", "async function selectAlignPanel(");
+    expect(selectRow).toContain("loadAlignPreview(selectedAlignPanel.value?.rawSha256)");
+    expect(selectRow).not.toContain("row.rawSha256");
+    const ssl5 = handlerBody(vue, "async function revealSsl5Focus(", "async function scrollAlignRowIntoView(");
+    expect(ssl5).toContain("loadAlignPreview(selectedAlignPanel.value?.rawSha256)");
+    expect(ssl5).not.toContain("focusRow.rawSha256");
+  });
+
   it("对照表宫格钮点精确格：stop 冒泡，缺图不绑其他格的图，不猜第一张有图", () => {
     const vue = source();
     const selectTable = handlerBody(vue, "async function selectAlignTablePanel(", "function peekLabel(");

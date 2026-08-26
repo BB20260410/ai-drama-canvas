@@ -484,7 +484,7 @@ async function revealSsl5Focus(nextBoard: ScriptMediaAlignBoard, nextPlan: Ssl5M
       ? focusRow.panels.find((panel) => panel.panelId === nextPlan.focusPanelId)
       : undefined
   ) ?? pickFirstMissingPanel(focusRow.panels) ?? pickFirstCoveredPanel(focusRow.panels) ?? null;
-  await loadAlignPreview(selectedAlignPanel.value?.rawSha256 ?? focusRow.rawSha256);
+  await loadAlignPreview(selectedAlignPanel.value?.rawSha256);
   await scrollAlignRowIntoView(focusRow.unitId);
 }
 
@@ -507,8 +507,11 @@ async function loadAlignPreview(rawSha256: string | null | undefined): Promise<v
 
 async function selectAlignRow(row: ScriptMediaAlignRow): Promise<void> {
   selectedAlignRow.value = row;
-  selectedAlignPanel.value = pickFirstCoveredPanel(row.panels) ?? null;
-  await loadAlignPreview(selectedAlignPanel.value?.rawSha256 ?? row.rawSha256);
+  selectedAlignPanel.value = row.panels.find((panel) => panel.hasMedia)
+    ?? pickFirstMissingPanel(row.panels)
+    ?? row.panels[0]
+    ?? null;
+  await loadAlignPreview(selectedAlignPanel.value?.rawSha256);
 }
 
 async function selectAlignPanel(panel: AlignPanelRow): Promise<void> {
