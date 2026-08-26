@@ -3,10 +3,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
+  applyPackMediaToPanels,
   buildMissingMediaReport,
   normalizeSourceSpans,
+  pickFirstCoveredPanel,
   pickRawLabeledFromResults,
   resolveScriptSpanMediaMap,
+  selectLatestPanelPack,
   spansOverlap,
   SCRIPT_LIBRARY_PROJECTION_SCHEMA_VERSION,
   type EpisodeUnitMediaMap,
@@ -185,6 +188,39 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(resolveScriptSpanMediaMap(map, { startOffsetUtf16: 80, endOffsetUtf16: 90 }).matchCount).toBe(0);
     expect(() => resolveScriptSpanMediaMap(map, { startOffsetUtf16: 9, endOffsetUtf16: 3 })).toThrow(/有效/);
   });
+
+  it("selectLatestPanelPack ignores unit-grid and other panels", () => {
+    const packs = [
+      { targetKind: "unit-grid", panelId: "unit-grid:U1", sequence: 9, packId: "grid-new" },
+      { targetKind: "panel", panelId: "p2", sequence: 8, packId: "p2-new" },
+      { targetKind: "panel", panelId: "p1", sequence: 3, packId: "p1-old" },
+      { targetKind: "panel", panelId: "p1", sequence: 5, packId: "p1-new" },
+    ];
+    expect(selectLatestPanelPack(packs, "p1")?.packId).toBe("p1-new");
+    expect(selectLatestPanelPack(packs, "p2")?.packId).toBe("p2-new");
+    expect(selectLatestPanelPack(packs, "p3")).toBeUndefined();
+  });
+
+  it("applyPackMediaToPanels does not copy one pack onto every panel", () => {
+    const panels = applyPackMediaToPanels(
+      [
+        { index: 1, id: "p1", title: "g1", sourceSpans: [{ startOffsetUtf16: 0, endOffsetUtf16: 10 }] },
+        { index: 2, id: "p2", title: "g2", sourceSpans: [{ startOffsetUtf16: 10, endOffsetUtf16: 20 }] },
+      ],
+      new Map([
+        ["p2", {
+          packId: "pack-p2",
+          packFingerprint: "fp2",
+          rawSha256: "raw-p2",
+          labeledSha256: null,
+          generationRunId: "run-p2",
+        }],
+      ]),
+    );
+    expect(panels[0]).toMatchObject({ panelId: "p1", hasMedia: false, rawSha256: null, packId: null });
+    expect(panels[1]).toMatchObject({ panelId: "p2", hasMedia: true, rawSha256: "raw-p2", packId: "pack-p2" });
+    expect(pickFirstCoveredPanel(panels)?.panelId).toBe("p2");
+  });
 });
 
 describe("SSL-0 ScriptSpanMediaMap 入口", () => {
@@ -194,5 +230,16 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     expect(server).toContain("resolveScriptSpanMediaMap");
     expect(server).toContain("startOffsetUtf16");
     expect(readFileSync(path.join(repoRoot, "src/core/studio-script-library-projection.ts"), "utf8")).toContain("export async function getStudioScriptSpanMediaMap");
+  });
+
+  it("episode-unit-media-map 按 panel 读 pack，不把 unit-grid 摊到所有宫格", () => {
+    const source = readFileSync(path.join(repoRoot, "src/core/studio-script-library-projection.ts"), "utf8");
+    expect(source).toContain("listStudioGenerationPacksByUnit(projectRoot, { unitId, panelId, limit: 20 })");
+    expect(source).toContain("listPanelPacksNewestFirst");
+    expect(source).toContain("applyPackMediaToPanels");
+    expect(source).not.toContain("panel 级 media 目前与 unit-grid 共享同一结果图");
+    const align = readFileSync(path.join(repoRoot, "src/core/studio-script-media-align.ts"), "utf8");
+    expect(align).toContain("pickFirstCoveredPanel");
+    expect(align).not.toContain("const firstPanel = u.panels[0]");
   });
 });

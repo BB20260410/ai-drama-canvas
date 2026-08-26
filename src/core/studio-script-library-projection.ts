@@ -83,6 +83,73 @@ export interface EpisodeUnitMediaMap {
   builtAt: string;
 }
 
+export interface PackMediaPick {
+  packId: string | null;
+  packFingerprint: string | null;
+  rawSha256: string | null;
+  labeledSha256: string | null;
+  generationRunId: string | null;
+}
+
+export const EMPTY_PACK_MEDIA: PackMediaPick = {
+  packId: null,
+  packFingerprint: null,
+  rawSha256: null,
+  labeledSha256: null,
+  generationRunId: null,
+};
+
+export type PackIndexLite = {
+  targetKind: string;
+  panelId: string;
+  sequence: number;
+  packId: string;
+  fingerprint?: string;
+};
+
+/** 只认 targetKind=panel 且 panelId 对齐的冻结包；unit-grid 不得摊到宫格。 */
+export function listPanelPacksNewestFirst<T extends PackIndexLite>(
+  packs: T[],
+  panelId: string,
+): T[] {
+  return [...packs]
+    .filter((pack) => pack.targetKind === "panel" && pack.panelId === panelId)
+    .sort((a, b) => b.sequence - a.sequence);
+}
+
+export function selectLatestPanelPack<T extends PackIndexLite>(
+  packs: T[],
+  panelId: string,
+): T | undefined {
+  return listPanelPacksNewestFirst(packs, panelId)[0];
+}
+
+export function applyPackMediaToPanels(
+  panels: Array<{ index: number; id: string; title?: string; sourceSpans?: unknown }>,
+  mediaByPanelId: ReadonlyMap<string, PackMediaPick>,
+): UnitPanelMediaEntry[] {
+  return panels.map((panel) => {
+    const media = mediaByPanelId.get(String(panel.id)) ?? EMPTY_PACK_MEDIA;
+    return {
+      panelIndex: Number(panel.index),
+      panelId: String(panel.id),
+      title: String(panel.title || ""),
+      sourceSpans: normalizeSourceSpans(panel.sourceSpans),
+      packId: media.packId,
+      packFingerprint: media.packFingerprint,
+      rawSha256: media.rawSha256,
+      labeledSha256: media.labeledSha256,
+      generationRunId: media.generationRunId,
+      hasMedia: Boolean(media.rawSha256 || media.labeledSha256),
+    };
+  });
+}
+
+/** 单元行预览：优先第一张已出图的宫格，不把缺图格当成整单元有图。 */
+export function pickFirstCoveredPanel(panels: UnitPanelMediaEntry[]): UnitPanelMediaEntry | undefined {
+  return panels.find((panel) => panel.hasMedia) ?? panels[0];
+}
+
 /** 纯函数：从结果列表抽取 raw/labeled SHA（单测用）。 */
 export function pickRawLabeledFromResults(
   results: Array<{ variant?: string; mediaSha256?: string; generationRunId?: string }>,
@@ -277,16 +344,10 @@ export async function getStudioScriptLibraryIndex(
 async function latestPackMedia(
   projectRoot: string,
   unitId: string,
-): Promise<{
-  packId: string | null;
-  packFingerprint: string | null;
-  rawSha256: string | null;
-  labeledSha256: string | null;
-  generationRunId: string | null;
-}> {
-  const packs = await listStudioGenerationPacksByUnit(projectRoot, { unitId, limit: 20 });
-  // 取最新 sequence 的 pack 中有结果的
-  const ordered = [...packs.items].sort((a, b) => b.sequence - a.sequence);
+  panelId: string,
+): Promise<PackMediaPick> {
+  const packs = await listStudioGenerationPacksByUnit(projectRoot, { unitId, panelId, limit: 20 });
+  const ordered = listPanelPacksNewestFirst(packs.items, panelId);
   for (const p of ordered) {
     const results = await listStudioGenerationResultsByPack(projectRoot, { packId: p.packId, limit: 20 });
     const picked = pickRawLabeledFromResults(
@@ -314,7 +375,7 @@ async function latestPackMedia(
 }
 
 /**
- * 集级 unit→span→media 投影（只读）。panel 级 media 目前与 unit-grid 共享同一结果图。
+ * 集级 unit→span→media 投影（只读）。每个宫格只读自己的 panel pack；unit-grid 不摊派。
  */
 export async function getStudioEpisodeUnitMediaMap(
   projectRoot: string,
@@ -339,23 +400,12 @@ export async function getStudioEpisodeUnitMediaMap(
       }
       const snap = await getStudioProductionUnitSnapshot(projectRoot, u.id);
       if (!snap) continue;
-      const media = await latestPackMedia(projectRoot, u.id);
-      const panels: UnitPanelMediaEntry[] = (snap.panels || []).map((panel) => {
-        const spans = normalizeSourceSpans((panel as { sourceSpans?: unknown }).sourceSpans);
-        const hasMedia = Boolean(media.rawSha256 || media.labeledSha256);
-        return {
-          panelIndex: Number(panel.index),
-          panelId: String(panel.id),
-          title: String(panel.title || ""),
-          sourceSpans: spans,
-          packId: media.packId,
-          packFingerprint: media.packFingerprint,
-          rawSha256: media.rawSha256,
-          labeledSha256: media.labeledSha256,
-          generationRunId: media.generationRunId,
-          hasMedia,
-        };
-      });
+      const mediaByPanelId = new Map<string, PackMediaPick>();
+      for (const panel of snap.panels || []) {
+        const panelId = String(panel.id);
+        mediaByPanelId.set(panelId, await latestPackMedia(projectRoot, u.id, panelId));
+      }
+      const panels = applyPackMediaToPanels(snap.panels || [], mediaByPanelId);
       const coveredPanelCount = panels.filter((p) => p.hasMedia).length;
       units.push({
         unitId: snap.unit.id,

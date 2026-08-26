@@ -8,6 +8,7 @@ import { getStudioEpisodeEarliest } from "./studio-episode-earliest.js";
 import {
   getStudioEpisodeUnitMediaMap,
   buildMissingMediaReport,
+  pickFirstCoveredPanel,
   type UnitSpanMediaMapEntry,
 } from "./studio-script-library-projection.js";
 import { getStudioScriptReaderView, type ScriptOutlineHeading } from "./studio-script-library-reader.js";
@@ -169,12 +170,12 @@ export async function getStudioScriptMediaAlignBoard(
   const slotById = new Map(earliest.slots.map((s) => [s.unitId, s]));
   const rows: ScriptMediaAlignRow[] = map.units.map((u) => {
     const slot = slotById.get(u.unitId);
-    const firstPanel = u.panels[0];
-    const rawSha256 = firstPanel?.rawSha256 ?? null;
-    const labeledSha256 = firstPanel?.labeledSha256 ?? null;
-    const packId = firstPanel?.packId ?? null;
-    const packFingerprint = firstPanel?.packFingerprint ?? null;
-    const generationRunId = firstPanel?.generationRunId ?? null;
+    const preview = pickFirstCoveredPanel(u.panels);
+    const rawSha256 = preview?.rawSha256 ?? null;
+    const labeledSha256 = preview?.labeledSha256 ?? null;
+    const packId = preview?.packId ?? null;
+    const packFingerprint = preview?.packFingerprint ?? null;
+    const generationRunId = preview?.generationRunId ?? null;
     const status = rowStatus(u);
     const spans = u.panels.flatMap((p) => p.sourceSpans);
     return {
