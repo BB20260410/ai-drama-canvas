@@ -59,6 +59,7 @@
 - [x] SSL-5 / session-snapshot / 生成控制 / pack envelope 已有计划则 create-plan 草稿改标 dispatch（SSL-5 只精炼焦点缺图格；单镜计划排除整板兼容 panel_id；不执行、不 dispatch；schemaVersion 仍为 1）
 - [x] SSL-5 / session-snapshot / 生成控制 / pack envelope 已有计划时按节点状态区分 dispatch/wait/retry/Review（未传 status 保持 dispatch 文案；retry-superseded→planned；SSL-5 只精炼焦点；生成控制零额外 IPC；不改 earliest / 驾驶舱 nextAction；不执行、不 dispatch、不 retry；schemaVersion 仍为 1）
 - [x] earliest / 驾驶舱 nextAction 按计划节点状态区分 dispatch/wait/retry/Review（earliest 一次只读开库；驾驶舱用 latestRun.latestEventKind；inspect 优先；不改 T5；不执行、不 dispatch、不 retry；schemaVersion 仍为 1）
+- [x] SSL-5 / 对照与 earliest wait/retry/Review 对齐（对照板带 earliestCode/label；焦点即 earliest 时禁止再建议 create-plan/dispatch；persist refine 之后 earliest wait 仍赢；不二次 getStudioEpisodeEarliest；不执行、不 dispatch、不 retry；schemaVersion 仍为 1）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
