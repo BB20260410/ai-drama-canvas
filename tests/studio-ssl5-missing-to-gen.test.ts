@@ -144,6 +144,54 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.standingGapLine).toContain("不是 BindingSet");
   });
 
+  it("焦点宫格场景回指只扫已加载对照板，忽略更晚单元", () => {
+    const plan = buildSsl5PlanFromBoard("/tmp/iso", { season: "S1", episode: "E2" }, {
+      earliestUnitId: null,
+      missingAllCount: 1,
+      partialCount: 0,
+      rows: [
+        row({
+          unitId: "u-early",
+          sequence: 1,
+          status: "covered",
+          panels: [panel({
+            panelId: "e1",
+            panelIndex: 1,
+            hasMedia: true,
+            assetMentions: [{ assetId: "scene-stone", category: "scene", role: "石室" }],
+          })],
+        }),
+        row({
+          unitId: "u-focus",
+          sequence: 2,
+          status: "missing-all",
+          panels: [panel({
+            panelId: "f1",
+            panelIndex: 1,
+            hasMedia: false,
+            assetMentions: [{ assetId: "scene-stone", category: "scene", role: "石室" }],
+          })],
+        }),
+        row({
+          unitId: "u-later",
+          sequence: 3,
+          status: "missing-all",
+          panels: [panel({
+            panelId: "l1",
+            panelIndex: 1,
+            hasMedia: false,
+            assetMentions: [{ assetId: "scene-stone", category: "scene", role: "石室" }],
+          })],
+        }),
+      ],
+    });
+    expect(plan.focusUnitId).toBe("u-focus");
+    expect(plan.sceneBackReferenceLine).toContain("U1 G1 石室");
+    expect(plan.sceneBackReferenceLine).toContain("不是 BindingSet");
+    expect(plan.sceneBackReferenceLine).not.toContain("U3");
+    expect(plan.items.find((item) => item.unitId === "u-focus")?.sceneBackReferenceLine).toContain("U1 G1 石室");
+  });
+
   it("全 covered 且无 earliest 则无焦点", () => {
     const plan = buildSsl5PlanFromBoard("/tmp/iso", { season: "S1", episode: "E2" }, {
       earliestUnitId: null,
@@ -173,10 +221,15 @@ describe("SSL-5 入口源码合同", () => {
   it("桌面对照面展示只读下一步，导演动作不写命令", () => {
     const vue = source("src/renderer/src/components/ScriptMediaAlignView.vue");
     const director = source("src/renderer/src/director-action-panel.ts");
+    const ssl5 = source("src/core/studio-ssl5-missing-to-gen.ts");
     expect(vue).toContain('data-testid="ssl5-missing-to-gen-plan"');
     expect(vue).toContain('data-testid="ssl5-focus-panel"');
     expect(vue).toContain('data-testid="ssl5-focus-handoff"');
     expect(vue).toContain('data-testid="ssl5-focus-standing-gaps"');
+    expect(vue).toContain('data-testid="ssl5-focus-scene-backrefs"');
+    expect(ssl5).toContain("formatSceneBackReferenceLineFromBoard");
+    expect(ssl5).not.toContain("evaluateStudioConsistency");
+    expect(ssl5).not.toContain("getStudioBindingControl");
     expect(vue).toContain("planSsl5MissingToGen");
     expect(vue).toContain("不自动 dispatch");
     expect(director).toContain("ssl5-missing-to-gen-plan");

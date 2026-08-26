@@ -11,6 +11,7 @@ import {
 } from "./studio-generation-ledger.js";
 import {
   SCENE_BACK_REFERENCE_LIMIT,
+  formatSceneBackReferences,
   type SceneBackReference,
 } from "./studio-scene-backrefs.js";
 
@@ -300,6 +301,33 @@ export function listSceneBackReferences(input: {
     .slice(0, limit);
 }
 
+export function formatSceneBackReferenceLineFromBoard(input: {
+  currentUnitId: string;
+  currentSequence: number;
+  currentPanelIndex: number;
+  currentPanelId: string;
+  currentMentions: ReadonlyArray<{ assetId?: string; category?: string; role?: string }> | null | undefined;
+  units: ReadonlyArray<{
+    unitId: string;
+    sequence: number;
+    panels: ReadonlyArray<{
+      panelId: string;
+      panelIndex: number;
+      assetMentions: ReadonlyArray<{ assetId: string; category: string; role?: string }>;
+    }>;
+  }>;
+}): string {
+  const mentions = listSceneAssetMentions(input.currentMentions);
+  return formatSceneBackReferences(mentions.length, listSceneBackReferences({
+    currentUnitId: input.currentUnitId,
+    currentSequence: input.currentSequence,
+    currentPanelIndex: input.currentPanelIndex,
+    currentPanelId: input.currentPanelId,
+    sceneMentions: mentions,
+    units: input.units,
+  }));
+}
+
 export function applyPackMediaToPanels(
   panels: Array<{
     index: number;
@@ -420,6 +448,7 @@ export interface ScriptSpanMediaHit {
   visualAction: string;
   filmingMethod: string;
   previousHandoff: PanelStandingHandoff | null;
+  sceneBackReferenceLine: string;
 }
 
 export interface ScriptSpanMediaMap {
@@ -466,6 +495,14 @@ export function resolveScriptSpanMediaMap(
         visualAction: panel.visualAction,
         filmingMethod: panel.filmingMethod,
         previousHandoff: panel.previousHandoff,
+        sceneBackReferenceLine: formatSceneBackReferenceLineFromBoard({
+          currentUnitId: unit.unitId,
+          currentSequence: unit.sequence,
+          currentPanelIndex: panel.panelIndex,
+          currentPanelId: panel.panelId,
+          currentMentions: panel.assetMentions,
+          units: map.units,
+        }),
       });
     }
   }

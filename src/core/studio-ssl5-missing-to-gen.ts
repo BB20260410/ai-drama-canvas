@@ -9,7 +9,11 @@ import {
   type ScriptMediaAlignBoard,
   type ScriptMediaAlignRow,
 } from "./studio-script-media-align.js";
-import { formatPanelStandingGaps, pickFirstMissingPanel } from "./studio-script-library-projection.js";
+import {
+  formatPanelStandingGaps,
+  formatSceneBackReferenceLineFromBoard,
+  pickFirstMissingPanel,
+} from "./studio-script-library-projection.js";
 
 export const SSL5_PLAN_SCHEMA_VERSION = 1 as const;
 
@@ -29,6 +33,7 @@ export interface Ssl5MissingToGenPlanItem {
   previousVisualAction: string | null;
   previousFilmingMethod: string | null;
   standingGapLine: string;
+  sceneBackReferenceLine: string;
 }
 
 export interface Ssl5MissingToGenPlan {
@@ -46,6 +51,7 @@ export interface Ssl5MissingToGenPlan {
   previousVisualAction: string | null;
   previousFilmingMethod: string | null;
   standingGapLine: string;
+  sceneBackReferenceLine: string;
   missingAllCount: number;
   partialCount: number;
   items: Ssl5MissingToGenPlanItem[];
@@ -94,6 +100,16 @@ export function buildSsl5PlanFromBoard(
         previousVisualAction: handoff?.visualAction ?? null,
         previousFilmingMethod: handoff?.filmingMethod ?? null,
         standingGapLine: formatPanelStandingGaps(missingPanel ?? null),
+        sceneBackReferenceLine: missingPanel
+          ? formatSceneBackReferenceLineFromBoard({
+              currentUnitId: row.unitId,
+              currentSequence: row.sequence,
+              currentPanelIndex: missingPanel.panelIndex,
+              currentPanelId: missingPanel.panelId,
+              currentMentions: missingPanel.assetMentions,
+              units: board.rows,
+            })
+          : "没有宫格可查场景回指",
       };
     })
     .sort((left, right) => {
@@ -122,6 +138,7 @@ export function buildSsl5PlanFromBoard(
     previousVisualAction: focus?.previousVisualAction ?? null,
     previousFilmingMethod: focus?.previousFilmingMethod ?? null,
     standingGapLine: focus?.standingGapLine ?? "没有宫格可查站位缺口",
+    sceneBackReferenceLine: focus?.sceneBackReferenceLine ?? "没有宫格可查场景回指",
     missingAllCount: board.missingAllCount,
     partialCount: board.partialCount,
     items,

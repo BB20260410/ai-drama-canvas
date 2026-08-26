@@ -220,6 +220,7 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(hit.hits[0]?.visualAction).toBe("抬手");
     expect(hit.hits[0]?.filmingMethod).toBe("固定");
     expect(hit.hits[0]?.previousHandoff).toBeNull();
+    expect(hit.hits[0]?.sceneBackReferenceLine).toContain("本格快照未提及场景");
     const miss = resolveScriptSpanMediaMap(map, { startOffsetUtf16: 40, endOffsetUtf16: 45 });
     expect(miss.matchCount).toBe(1);
     expect(miss.missingCount).toBe(1);
@@ -285,7 +286,125 @@ describe("studio-script-library-projection pure helpers", () => {
       visualAction: "站定",
       filmingMethod: "固定",
     });
+    expect(hit.hits[1]?.sceneBackReferenceLine).toContain("本格快照未提及场景");
     expect(formatPanelStandingHandoff(hit.hits[1]?.previousHandoff ?? null)).toContain("G1 中景");
+  });
+
+  it("resolveScriptSpanMediaMap 投影跨单元场景回指，忽略更晚单元", () => {
+    const map = {
+      projectRoot: "/tmp/iso",
+      season: "S1",
+      episode: "E2",
+      units: [
+        {
+          unitId: "U1",
+          unitRevision: 1,
+          season: "S1",
+          episode: "E2",
+          sequence: 1,
+          title: "早",
+          scriptRevisionId: null,
+          scriptDocumentId: null,
+          durationSeconds: 15,
+          panelCount: 1,
+          coveredPanelCount: 0,
+          missingPanelCount: 1,
+          panels: [{
+            panelIndex: 1,
+            panelId: "u1p1",
+            title: "g1",
+            sourceSpans: [{ startOffsetUtf16: 0, endOffsetUtf16: 10 }],
+            packId: null,
+            packFingerprint: null,
+            rawSha256: null,
+            labeledSha256: null,
+            generationRunId: null,
+            hasMedia: false,
+            shotComposition: "",
+            visualAction: "",
+            filmingMethod: "",
+            sceneLighting: "",
+            costumeState: "",
+            shotType: "" as const,
+            assetMentions: [{ assetId: "scene-stone", category: "scene", role: "石室" }],
+            previousHandoff: null,
+          }],
+        },
+        {
+          unitId: "U2",
+          unitRevision: 1,
+          season: "S1",
+          episode: "E2",
+          sequence: 2,
+          title: "后",
+          scriptRevisionId: null,
+          scriptDocumentId: null,
+          durationSeconds: 15,
+          panelCount: 1,
+          coveredPanelCount: 0,
+          missingPanelCount: 1,
+          panels: [{
+            panelIndex: 1,
+            panelId: "u2p1",
+            title: "g1",
+            sourceSpans: [{ startOffsetUtf16: 10, endOffsetUtf16: 20 }],
+            packId: null,
+            packFingerprint: null,
+            rawSha256: null,
+            labeledSha256: null,
+            generationRunId: null,
+            hasMedia: false,
+            shotComposition: "",
+            visualAction: "",
+            filmingMethod: "",
+            sceneLighting: "",
+            costumeState: "",
+            shotType: "" as const,
+            assetMentions: [{ assetId: "scene-stone", category: "scene", role: "石室" }],
+            previousHandoff: null,
+          }],
+        },
+        {
+          unitId: "U3",
+          unitRevision: 1,
+          season: "S1",
+          episode: "E2",
+          sequence: 3,
+          title: "更晚",
+          scriptRevisionId: null,
+          scriptDocumentId: null,
+          durationSeconds: 15,
+          panelCount: 1,
+          coveredPanelCount: 0,
+          missingPanelCount: 1,
+          panels: [{
+            panelIndex: 1,
+            panelId: "u3p1",
+            title: "g1",
+            sourceSpans: [{ startOffsetUtf16: 20, endOffsetUtf16: 30 }],
+            packId: null,
+            packFingerprint: null,
+            rawSha256: null,
+            labeledSha256: null,
+            generationRunId: null,
+            hasMedia: false,
+            shotComposition: "",
+            visualAction: "",
+            filmingMethod: "",
+            sceneLighting: "",
+            costumeState: "",
+            shotType: "" as const,
+            assetMentions: [{ assetId: "scene-stone", category: "scene", role: "石室" }],
+            previousHandoff: null,
+          }],
+        },
+      ],
+    };
+    const hit = resolveScriptSpanMediaMap(map, { startOffsetUtf16: 10, endOffsetUtf16: 20 });
+    expect(hit.hits).toHaveLength(1);
+    expect(hit.hits[0]?.sceneBackReferenceLine).toContain("U1 G1 石室");
+    expect(hit.hits[0]?.sceneBackReferenceLine).toContain("不是 BindingSet");
+    expect(hit.hits[0]?.sceneBackReferenceLine).not.toContain("U3");
   });
 
   it("selectLatestPanelPack ignores unit-grid and other panels", () => {
@@ -487,6 +606,8 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     expect(source).toContain("attachPanelStandingHandoffs");
     expect(source).toContain("summarizePanelAssetMentions");
     expect(source).toContain("listSceneBackReferences");
+    expect(source).toContain("formatSceneBackReferenceLineFromBoard");
+    expect(source).toContain("sceneBackReferenceLine");
     expect(source).toContain('from "./studio-scene-backrefs.js"');
     expect(source).toContain("不是 BindingSet，不能当 generation-ready");
     expect(source).not.toContain("getStudioBindingControl");
