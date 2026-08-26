@@ -42,6 +42,8 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("span-media-hit-standing");
     expect(vue).toContain("span-media-hit-handoff");
     expect(vue).toContain("span-media-hit-gaps");
+    expect(vue).toContain("span-media-hit-lighting");
+    expect(vue).toContain("span-media-hit-scene-backref-");
     expect(vue).toContain("span-media-hit-align");
     expect(vue).toContain("span-media-hit-trace");
     expect(vue).toContain("openHitGenerationTrace");
@@ -49,8 +51,14 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("formatPanelStandingGaps");
     expect(vue).toContain("align-panel-standing-gaps");
     expect(vue).toContain("ssl5-focus-standing-gaps");
+    expect(vue).toContain("ssl5-focus-lighting");
+    expect(vue).toContain("ssl5-focus-previous-lighting");
+    expect(vue).toContain("ssl5-focus-previous-costume");
     expect(vue).toContain("ssl5-focus-scene-backrefs");
+    expect(vue).toContain("ssl5-focus-scene-backref-");
     expect(vue).toContain("span-media-hit-scene-backrefs");
+    expect(vue).toContain("revealReaderSceneBackRef");
+    expect(vue).toContain("formatPanelLightingCostumeLine");
     expect(vue).toContain("revealSpanMediaHit");
     expect(vue).toContain("getStudioScriptSpanMediaMap");
     expect(vue).toContain('data-testid="storyboard-wizard-suggest"');
@@ -96,6 +104,8 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).not.toContain("getStudioBindingControl");
     expect(vue).toContain("align-panel-composition");
     expect(vue).toContain("align-panel-action");
+    expect(vue).toContain("align-panel-lighting");
+    expect(vue).toContain("align-panel-costume");
     expect(vue).toContain("align-panel-handoff");
     expect(vue).toContain("align-panel-assets");
     expect(vue).toContain("align-panel-scene-backrefs");
@@ -197,7 +207,7 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     const alignButton = buttonAttrs(vue, "span-media-hit-align");
     expect(alignButton).toContain(':disabled="Boolean(actionLoading)"');
     expect(alignButton).toContain("正在处理，不能再对照这格");
-    const reveal = handlerBody(vue, "async function revealSpanMediaHit(", "async function revealSsl5Focus(");
+    const reveal = handlerBody(vue, "async function revealSpanMediaHit(", "async function revealReaderSceneBackRef(");
     expect(reveal).toContain("if (actionLoading.value) return;");
     expect(reveal).toContain('actionLoading.value = "span-align"');
     expect(reveal.indexOf("if (actionLoading.value) return;")).toBeLessThan(
@@ -215,6 +225,22 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(reveal).not.toContain("pickFirstCoveredPanel");
     expect(reveal).not.toContain("getStudioBindingControl");
     expect(reveal).not.toContain("evaluateStudioConsistency");
+  });
+
+  it("阅读器场景回指点穿：对照板未加载时由用户点穿再加载，不猜宫格", () => {
+    const vue = source();
+    const reveal = handlerBody(vue, "async function revealReaderSceneBackRef(", "async function revealSsl5Focus(");
+    expect(reveal).toContain("if (actionLoading.value) return;");
+    expect(reveal).toContain("getStudioScriptMediaAlignBoard");
+    expect(reveal).toContain("planSsl5MissingToGen");
+    expect(reveal).toContain("revealSceneBackRef");
+    expect(reveal).toContain("不能当 generation-ready");
+    expect(reveal).toContain('activeTab.value = "align"');
+    expect(reveal).not.toContain("pickFirstCoveredPanel");
+    expect(reveal).not.toContain("revealSsl5Focus");
+    expect(reveal).not.toContain("getStudioBindingControl");
+    expect(reveal).not.toContain("evaluateStudioConsistency");
+    expect(vue).not.toContain("studio-scene-backrefs-read");
   });
 
   it("对照行选中只绑所选宫格 raw，不再回退整行/unit-grid 图", () => {

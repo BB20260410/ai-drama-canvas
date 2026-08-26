@@ -5391,7 +5391,7 @@ registrar.registerTool(
   {
     title: "剧本库只读投影（SSL-0/1/2/3/5 计划）",
     description:
-      "剧本库投影只读入口。library-index；episode-unit-media-map；missing-media-report；reader-view（正文+大纲+earliest）；script-media-align（SSL-3 一键图文对照：unit→图 SHA/缺图/trace 钥匙/大纲锚，需 season+episode，可选 documentId）；ssl5-missing-to-gen-plan（SSL-5 缺图→earliest 只读下一步，含焦点宫格场景回指 sceneBackReferenceLine，只扫已加载对照板，不 dispatch）；script-span-media-map（点选 span→相交宫格/图/构图/前镜交接/场景回指，需 season+episode+startOffsetUtf16+endOffsetUtf16）。不写账本；不返回 CAS 路径/媒体二进制。",
+      "剧本库投影只读入口。library-index；episode-unit-media-map；missing-media-report；reader-view（正文+大纲+earliest）；script-media-align（SSL-3 一键图文对照：unit→图 SHA/缺图/trace 钥匙/大纲锚，需 season+episode，可选 documentId）；ssl5-missing-to-gen-plan（SSL-5 缺图→earliest 只读下一步，含焦点宫格场景回指 sceneBackReferenceLine/sceneBackReferences 与锁版光线/服化 lightingCostumeLine，只扫已加载对照板，不 dispatch）；script-span-media-map（点选 span→相交宫格/图/构图/前镜交接/锁版光线服化/场景回指，需 season+episode+startOffsetUtf16+endOffsetUtf16）。不写账本；不返回 CAS 路径/媒体二进制。",
     inputSchema: {
       projectRoot: managedStudioProjectRootSchema,
       operation: z.enum([

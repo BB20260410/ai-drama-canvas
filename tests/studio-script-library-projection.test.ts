@@ -7,6 +7,7 @@ import {
   buildMissingMediaReport,
   countCoveredUnits,
   formatPanelCoverageMarks,
+  formatPanelLightingCostumeLine,
   formatPanelStandingGaps,
   formatPanelStandingHandoff,
   formatSceneBackReferences,
@@ -180,8 +181,8 @@ describe("studio-script-library-projection pure helpers", () => {
             shotComposition: "近景",
             visualAction: "抬手",
             filmingMethod: "固定",
-            sceneLighting: "",
-            costumeState: "",
+            sceneLighting: "窗侧冷光",
+            costumeState: "素袍",
             shotType: "original",
             assetMentions: [],
             previousHandoff: null,
@@ -223,7 +224,13 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(hit.hits[0]?.visualAction).toBe("抬手");
     expect(hit.hits[0]?.filmingMethod).toBe("固定");
     expect(hit.hits[0]?.previousHandoff).toBeNull();
+    expect(hit.hits[0]?.sceneLighting).toBe("窗侧冷光");
+    expect(hit.hits[0]?.costumeState).toBe("素袍");
+    expect(hit.hits[0]?.sceneBackReferences).toEqual([]);
     expect(hit.hits[0]?.sceneBackReferenceLine).toContain("本格快照未提及场景");
+    expect(formatPanelLightingCostumeLine(hit.hits[0])).toContain("锁版光线：G1 窗侧冷光");
+    expect(formatPanelLightingCostumeLine(hit.hits[0])).toContain("锁版服装：G1 素袍");
+    expect(formatPanelLightingCostumeLine(hit.hits[0])).toContain("不是 BindingSet");
     const miss = resolveScriptSpanMediaMap(map, { startOffsetUtf16: 40, endOffsetUtf16: 45 });
     expect(miss.matchCount).toBe(1);
     expect(miss.missingCount).toBe(1);
@@ -289,8 +296,13 @@ describe("studio-script-library-projection pure helpers", () => {
       visualAction: "站定",
       filmingMethod: "固定",
     });
+    expect(hit.hits[1]?.sceneLighting).toBe("");
+    expect(hit.hits[1]?.costumeState).toBe("");
+    expect(hit.hits[1]?.sceneBackReferences).toEqual([]);
     expect(hit.hits[1]?.sceneBackReferenceLine).toContain("本格快照未提及场景");
     expect(formatPanelStandingHandoff(hit.hits[1]?.previousHandoff ?? null)).toContain("G1 中景");
+    expect(formatPanelLightingCostumeLine(hit.hits[1])).toContain("锁版未记光线");
+    expect(formatPanelLightingCostumeLine(null)).toBe("没有宫格可查光线/服化");
   });
 
   it("resolveScriptSpanMediaMap 投影跨单元场景回指，忽略更晚单元", () => {
@@ -408,6 +420,16 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(hit.hits[0]?.sceneBackReferenceLine).toContain("U1 G1 石室");
     expect(hit.hits[0]?.sceneBackReferenceLine).toContain("不是 BindingSet");
     expect(hit.hits[0]?.sceneBackReferenceLine).not.toContain("U3");
+    expect(hit.hits[0]?.sceneBackReferences).toEqual([{
+      assetId: "scene-stone",
+      role: "石室",
+      unitId: "U1",
+      sequence: 1,
+      panelIndex: 1,
+      panelId: "u1p1",
+    }]);
+    expect(hit.hits[0]?.sceneLighting).toBe("");
+    expect(hit.hits[0]?.costumeState).toBe("");
   });
 
   it("selectLatestPanelPack ignores unit-grid and other panels", () => {
@@ -650,6 +672,8 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     expect(source).toContain("formatWizardSceneBackReferenceLine");
     expect(source).toContain("wizardSceneMentionsFromSuggestedIds");
     expect(source).toContain("sceneBackReferenceLine");
+    expect(source).toContain("sceneBackReferences");
+    expect(source).toContain("formatPanelLightingCostumeLine");
     expect(source).toContain('from "./studio-scene-backrefs.js"');
     expect(source).toContain("不是 BindingSet，不能当 generation-ready");
     expect(source).not.toContain("getStudioBindingControl");

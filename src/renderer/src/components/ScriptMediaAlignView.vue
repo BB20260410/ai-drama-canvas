@@ -7,6 +7,7 @@ import { computed, nextTick, ref, watch } from "vue";
 import type { StudioProductionUnitSummary } from "@core/studio-production";
 import {
   formatPanelCoverageMarks,
+  formatPanelLightingCostumeLine,
   formatPanelStandingGaps,
   formatPanelStandingHandoff,
   formatSceneBackReferences,
@@ -538,6 +539,41 @@ async function revealSpanMediaHit(hit: ScriptSpanMediaHit): Promise<void> {
   }
 }
 
+async function revealReaderSceneBackRef(ref: SceneBackReference): Promise<void> {
+  if (actionLoading.value) return;
+  if (!board.value) {
+    if (!season.value.trim() || !episode.value.trim()) {
+      notice.value = "请先填写季与集，才能查场景回指。不是 BindingSet，不能当 generation-ready。";
+      return;
+    }
+    actionLoading.value = "span-align";
+    error.value = "";
+    try {
+      const query = {
+        season: season.value.trim(),
+        episode: episode.value.trim(),
+      };
+      const [loadedBoard, nextPlan] = await Promise.all([
+        props.api.getStudioScriptMediaAlignBoard(props.projectRoot, query),
+        props.api.planSsl5MissingToGen(props.projectRoot, query),
+      ]);
+      board.value = loadedBoard;
+      ssl5Plan.value = nextPlan;
+    } catch (reason) {
+      report(reason);
+      return;
+    } finally {
+      actionLoading.value = "";
+    }
+  }
+  if (!board.value) {
+    notice.value = "对照板未加载，无法查场景回指。不是 BindingSet，不能当 generation-ready。";
+    return;
+  }
+  activeTab.value = "align";
+  await revealSceneBackRef(ref);
+}
+
 async function revealSsl5Focus(nextBoard: ScriptMediaAlignBoard, nextPlan: Ssl5MissingToGenPlan): Promise<void> {
   const focusRow = nextPlan.focusUnitId
     ? nextBoard.rows.find((row) => row.unitId === nextPlan.focusUnitId)
@@ -852,7 +888,16 @@ function shortSha(value: string | null | undefined): string {
                 <small data-testid="span-media-hit-standing">{{ hit.shotComposition || "构图未记" }} · {{ hit.visualAction || "动作未记" }} · {{ hit.filmingMethod || "运镜未记" }}</small>
                 <small data-testid="span-media-hit-handoff">{{ formatPanelStandingHandoff(hit.previousHandoff) }}</small>
                 <small data-testid="span-media-hit-gaps">{{ formatPanelStandingGaps(hit) }}</small>
+                <small data-testid="span-media-hit-lighting">{{ formatPanelLightingCostumeLine(hit) }}</small>
                 <small data-testid="span-media-hit-scene-backrefs">{{ hit.sceneBackReferenceLine }}</small>
+                <button
+                  v-for="ref in hit.sceneBackReferences"
+                  :key="`${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+                  type="button"
+                  :data-testid="`span-media-hit-scene-backref-${ref.unitId}-${ref.panelId}`"
+                  :disabled="Boolean(actionLoading)"
+                  @click="revealReaderSceneBackRef(ref)"
+                >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
               </div>
               <div class="span-media-hit-actions">
                 <button
@@ -905,7 +950,18 @@ function shortSha(value: string | null | undefined): string {
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-panel">G{{ ssl5Plan.focusPanelIndex }} {{ ssl5Plan.focusPanelId }}</span>
           <span v-if="ssl5Plan.previousPanelIndex != null" data-testid="ssl5-focus-handoff">前镜 G{{ ssl5Plan.previousPanelIndex }} {{ ssl5Plan.previousShotComposition || "构图未记" }} · {{ ssl5Plan.previousVisualAction || "动作未记" }} · {{ ssl5Plan.previousFilmingMethod || "运镜未记" }}</span>
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-standing-gaps">{{ ssl5Plan.standingGapLine }}</span>
+          <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-lighting">{{ ssl5Plan.lightingCostumeLine }}</span>
+          <span v-if="ssl5Plan.previousLightingLine" data-testid="ssl5-focus-previous-lighting">{{ ssl5Plan.previousLightingLine }}</span>
+          <span v-if="ssl5Plan.previousCostumeLine" data-testid="ssl5-focus-previous-costume">{{ ssl5Plan.previousCostumeLine }}</span>
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-scene-backrefs">{{ ssl5Plan.sceneBackReferenceLine }}</span>
+          <button
+            v-for="ref in ssl5Plan.sceneBackReferences"
+            :key="`${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+            type="button"
+            :data-testid="`ssl5-focus-scene-backref-${ref.unitId}-${ref.panelId}`"
+            :disabled="Boolean(actionLoading)"
+            @click="revealSceneBackRef(ref)"
+          >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
           <span>缺图 {{ ssl5Plan.missingAllCount }} · 部分 {{ ssl5Plan.partialCount }}</span>
           <ol v-if="ssl5FocusPath.length">
             <li v-for="step in ssl5FocusPath" :key="step">{{ step }}</li>
@@ -1013,6 +1069,7 @@ function shortSha(value: string | null | undefined): string {
             <div><dt>动作</dt><dd data-testid="align-panel-action">{{ selectedAlignPanel?.visualAction || "—" }}</dd></div>
             <div><dt>运镜</dt><dd data-testid="align-panel-filming">{{ selectedAlignPanel?.filmingMethod || "—" }}</dd></div>
             <div><dt>光线</dt><dd data-testid="align-panel-lighting">{{ selectedAlignPanel?.sceneLighting || "—" }}</dd></div>
+            <div><dt>服化</dt><dd data-testid="align-panel-costume">{{ selectedAlignPanel?.costumeState || "—" }}</dd></div>
             <div><dt>前镜</dt><dd data-testid="align-panel-handoff">{{ formatPanelStandingHandoff(selectedAlignPanel?.previousHandoff) }}</dd></div>
             <div><dt>站位缺口</dt><dd data-testid="align-panel-standing-gaps">{{ formatPanelStandingGaps(selectedAlignPanel) }}</dd></div>
             <div>

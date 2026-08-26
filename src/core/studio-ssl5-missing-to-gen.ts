@@ -10,10 +10,20 @@ import {
   type ScriptMediaAlignRow,
 } from "./studio-script-media-align.js";
 import {
+  formatPanelLightingCostumeLine,
   formatPanelStandingGaps,
   formatSceneBackReferenceLineFromBoard,
+  listSceneAssetMentions,
+  listSceneBackReferences,
   pickFirstMissingPanel,
 } from "./studio-script-library-projection.js";
+import {
+  formatWizardLockPreviousCostumeLine,
+  formatWizardLockPreviousLightingLine,
+  wizardPreviousCostumeForPanel,
+  wizardPreviousLightingForPanel,
+} from "./studio-panel-standing.js";
+import type { SceneBackReference } from "./studio-scene-backrefs.js";
 
 export const SSL5_PLAN_SCHEMA_VERSION = 1 as const;
 
@@ -33,7 +43,11 @@ export interface Ssl5MissingToGenPlanItem {
   previousVisualAction: string | null;
   previousFilmingMethod: string | null;
   standingGapLine: string;
+  lightingCostumeLine: string;
+  previousLightingLine: string | null;
+  previousCostumeLine: string | null;
   sceneBackReferenceLine: string;
+  sceneBackReferences: SceneBackReference[];
 }
 
 export interface Ssl5MissingToGenPlan {
@@ -51,7 +65,11 @@ export interface Ssl5MissingToGenPlan {
   previousVisualAction: string | null;
   previousFilmingMethod: string | null;
   standingGapLine: string;
+  lightingCostumeLine: string;
+  previousLightingLine: string | null;
+  previousCostumeLine: string | null;
   sceneBackReferenceLine: string;
+  sceneBackReferences: SceneBackReference[];
   missingAllCount: number;
   partialCount: number;
   items: Ssl5MissingToGenPlanItem[];
@@ -84,6 +102,23 @@ export function buildSsl5PlanFromBoard(
       else if (row.status === "partial") priority = "partial";
       const missingPanel = pickFirstMissingPanel(row.panels ?? []);
       const handoff = missingPanel?.previousHandoff ?? null;
+      const sceneMentions = listSceneAssetMentions(missingPanel?.assetMentions);
+      const sceneBackReferences = missingPanel
+        ? listSceneBackReferences({
+            currentUnitId: row.unitId,
+            currentSequence: row.sequence,
+            currentPanelIndex: missingPanel.panelIndex,
+            currentPanelId: missingPanel.panelId,
+            sceneMentions,
+            units: board.rows,
+          })
+        : [];
+      const previousLighting = missingPanel
+        ? wizardPreviousLightingForPanel(row.panels ?? [], missingPanel.panelIndex)
+        : null;
+      const previousCostume = missingPanel
+        ? wizardPreviousCostumeForPanel(row.panels ?? [], missingPanel.panelIndex)
+        : null;
       return {
         unitId: row.unitId,
         sequence: row.sequence,
@@ -100,6 +135,9 @@ export function buildSsl5PlanFromBoard(
         previousVisualAction: handoff?.visualAction ?? null,
         previousFilmingMethod: handoff?.filmingMethod ?? null,
         standingGapLine: formatPanelStandingGaps(missingPanel ?? null),
+        lightingCostumeLine: formatPanelLightingCostumeLine(missingPanel ?? null),
+        previousLightingLine: formatWizardLockPreviousLightingLine(previousLighting),
+        previousCostumeLine: formatWizardLockPreviousCostumeLine(previousCostume),
         sceneBackReferenceLine: missingPanel
           ? formatSceneBackReferenceLineFromBoard({
               currentUnitId: row.unitId,
@@ -110,6 +148,7 @@ export function buildSsl5PlanFromBoard(
               units: board.rows,
             })
           : "没有宫格可查场景回指",
+        sceneBackReferences,
       };
     })
     .sort((left, right) => {
@@ -138,7 +177,11 @@ export function buildSsl5PlanFromBoard(
     previousVisualAction: focus?.previousVisualAction ?? null,
     previousFilmingMethod: focus?.previousFilmingMethod ?? null,
     standingGapLine: focus?.standingGapLine ?? "没有宫格可查站位缺口",
+    lightingCostumeLine: focus?.lightingCostumeLine ?? "没有宫格可查光线/服化",
+    previousLightingLine: focus?.previousLightingLine ?? null,
+    previousCostumeLine: focus?.previousCostumeLine ?? null,
     sceneBackReferenceLine: focus?.sceneBackReferenceLine ?? "没有宫格可查场景回指",
+    sceneBackReferences: focus?.sceneBackReferences ?? [],
     missingAllCount: board.missingAllCount,
     partialCount: board.partialCount,
     items,

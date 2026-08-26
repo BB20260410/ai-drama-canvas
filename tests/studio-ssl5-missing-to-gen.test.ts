@@ -87,6 +87,11 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.items.find((item) => item.unitId === "u-missing")?.focusPanelId).toBe("p1");
     expect(plan.items.find((item) => item.unitId === "u-missing")?.focusPanelIndex).toBe(1);
     expect(plan.items.map((item) => item.unitId)).toEqual(["u-early", "u-missing", "u-partial"]);
+    expect(plan.lightingCostumeLine).toBe("没有宫格可查光线/服化");
+    expect(plan.previousLightingLine).toBeNull();
+    expect(plan.previousCostumeLine).toBeNull();
+    expect(plan.sceneBackReferences).toEqual([]);
+    expect(plan.items[0]?.lightingCostumeLine).toBe("没有宫格可查光线/服化");
     expect(plan.items[0]?.recommendedPath).toEqual([
       "binding-ready?",
       "readiness",
@@ -123,11 +128,22 @@ describe("SSL-5 缺图下一步纯函数", () => {
         sequence: 1,
         status: "partial",
         panels: [
-          panel({ panelId: "p1", panelIndex: 1, hasMedia: true, shotComposition: "中景", visualAction: "站定", filmingMethod: "固定" }),
+          panel({
+            panelId: "p1",
+            panelIndex: 1,
+            hasMedia: true,
+            shotComposition: "中景",
+            visualAction: "站定",
+            filmingMethod: "固定",
+            sceneLighting: "窗侧冷光",
+            costumeState: "素袍",
+          }),
           panel({
             panelId: "p2",
             panelIndex: 2,
             hasMedia: false,
+            sceneLighting: "近灯",
+            costumeState: "加披风",
             previousHandoff: { panelIndex: 1, panelId: "p1", shotComposition: "中景", visualAction: "站定", filmingMethod: "固定" },
           }),
         ],
@@ -142,6 +158,12 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.previousFilmingMethod).toBe("固定");
     expect(plan.standingGapLine).toContain("锁版站位缺口");
     expect(plan.standingGapLine).toContain("不是 BindingSet");
+    expect(plan.lightingCostumeLine).toContain("锁版光线：G2 近灯");
+    expect(plan.lightingCostumeLine).toContain("锁版服装：G2 加披风");
+    expect(plan.lightingCostumeLine).toContain("不是 BindingSet");
+    expect(plan.previousLightingLine).toContain("锁版前镜光线：G1 窗侧冷光");
+    expect(plan.previousCostumeLine).toContain("锁版前镜服化：G1 素袍");
+    expect(plan.items[0]?.lightingCostumeLine).toContain("锁版光线：G2 近灯");
   });
 
   it("焦点宫格场景回指只扫已加载对照板，忽略更晚单元", () => {
@@ -169,6 +191,8 @@ describe("SSL-5 缺图下一步纯函数", () => {
             panelId: "f1",
             panelIndex: 1,
             hasMedia: false,
+            sceneLighting: "石室火塘",
+            costumeState: "青布短打",
             assetMentions: [{ assetId: "scene-stone", category: "scene", role: "石室" }],
           })],
         }),
@@ -189,7 +213,20 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.sceneBackReferenceLine).toContain("U1 G1 石室");
     expect(plan.sceneBackReferenceLine).toContain("不是 BindingSet");
     expect(plan.sceneBackReferenceLine).not.toContain("U3");
+    expect(plan.sceneBackReferences).toEqual([{
+      assetId: "scene-stone",
+      role: "石室",
+      unitId: "u-early",
+      sequence: 1,
+      panelIndex: 1,
+      panelId: "e1",
+    }]);
+    expect(plan.lightingCostumeLine).toContain("锁版光线：G1 石室火塘");
+    expect(plan.lightingCostumeLine).toContain("锁版服装：G1 青布短打");
+    expect(plan.previousLightingLine).toBeNull();
+    expect(plan.previousCostumeLine).toBeNull();
     expect(plan.items.find((item) => item.unitId === "u-focus")?.sceneBackReferenceLine).toContain("U1 G1 石室");
+    expect(plan.items.find((item) => item.unitId === "u-focus")?.sceneBackReferences).toEqual(plan.sceneBackReferences);
   });
 
   it("全 covered 且无 earliest 则无焦点", () => {
@@ -201,6 +238,10 @@ describe("SSL-5 缺图下一步纯函数", () => {
     });
     expect(plan.focusUnitId).toBeNull();
     expect(plan.items).toEqual([]);
+    expect(plan.lightingCostumeLine).toBe("没有宫格可查光线/服化");
+    expect(plan.previousLightingLine).toBeNull();
+    expect(plan.previousCostumeLine).toBeNull();
+    expect(plan.sceneBackReferences).toEqual([]);
   });
 });
 
@@ -227,7 +268,16 @@ describe("SSL-5 入口源码合同", () => {
     expect(vue).toContain('data-testid="ssl5-focus-handoff"');
     expect(vue).toContain('data-testid="ssl5-focus-standing-gaps"');
     expect(vue).toContain('data-testid="ssl5-focus-scene-backrefs"');
+    expect(vue).toContain('data-testid="ssl5-focus-lighting"');
+    expect(vue).toContain('data-testid="ssl5-focus-previous-lighting"');
+    expect(vue).toContain('data-testid="ssl5-focus-previous-costume"');
     expect(ssl5).toContain("formatSceneBackReferenceLineFromBoard");
+    expect(ssl5).toContain("formatPanelLightingCostumeLine");
+    expect(ssl5).toContain("wizardPreviousLightingForPanel");
+    expect(ssl5).toContain("wizardPreviousCostumeForPanel");
+    expect(ssl5).toContain("lightingCostumeLine");
+    expect(ssl5).toContain("sceneBackReferences");
+    expect(ssl5).not.toContain("studio-scene-backrefs-read");
     expect(ssl5).not.toContain("evaluateStudioConsistency");
     expect(ssl5).not.toContain("getStudioBindingControl");
     expect(vue).toContain("planSsl5MissingToGen");

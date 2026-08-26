@@ -224,6 +224,28 @@ export function formatPanelStandingGaps(panel: PanelStandingFields | null | unde
   return `锁版站位缺口：${gaps.join("、")} · ${handoff}。不是 BindingSet，不能当 generation-ready。`;
 }
 
+export type PanelLightingCostumeFields = {
+  panelIndex?: number;
+  sceneLighting?: string;
+  costumeState?: string;
+};
+
+/** 锁版本格光线/服化；不是 BindingSet，不能当 generation-ready。 */
+export function formatPanelLightingCostumeLine(
+  panel: PanelLightingCostumeFields | null | undefined,
+): string {
+  if (!panel) return "没有宫格可查光线/服化";
+  const lighting = String(panel.sceneLighting || "").trim();
+  const costume = String(panel.costumeState || "").trim();
+  const index = Number(panel.panelIndex);
+  const prefix = Number.isFinite(index) ? `G${index} ` : "";
+  const parts = [
+    lighting ? `锁版光线：${prefix}${lighting}` : "锁版未记光线",
+    costume ? `锁版服装：${prefix}${costume}` : "锁版未记服装",
+  ];
+  return `${parts.join(" · ")}。不是 BindingSet，不能当 generation-ready。`;
+}
+
 export function listSceneAssetMentions(
   mentions: ReadonlyArray<{ assetId?: string; category?: string; role?: string }> | null | undefined,
 ): PanelAssetMentionLite[] {
@@ -509,7 +531,10 @@ export interface ScriptSpanMediaHit {
   visualAction: string;
   filmingMethod: string;
   previousHandoff: PanelStandingHandoff | null;
+  sceneLighting: string;
+  costumeState: string;
   sceneBackReferenceLine: string;
+  sceneBackReferences: SceneBackReference[];
 }
 
 export interface ScriptSpanMediaMap {
@@ -556,12 +581,22 @@ export function resolveScriptSpanMediaMap(
         visualAction: panel.visualAction,
         filmingMethod: panel.filmingMethod,
         previousHandoff: panel.previousHandoff,
+        sceneLighting: panel.sceneLighting,
+        costumeState: panel.costumeState,
         sceneBackReferenceLine: formatSceneBackReferenceLineFromBoard({
           currentUnitId: unit.unitId,
           currentSequence: unit.sequence,
           currentPanelIndex: panel.panelIndex,
           currentPanelId: panel.panelId,
           currentMentions: panel.assetMentions,
+          units: map.units,
+        }),
+        sceneBackReferences: listSceneBackReferences({
+          currentUnitId: unit.unitId,
+          currentSequence: unit.sequence,
+          currentPanelIndex: panel.panelIndex,
+          currentPanelId: panel.panelId,
+          sceneMentions: listSceneAssetMentions(panel.assetMentions),
           units: map.units,
         }),
       });
