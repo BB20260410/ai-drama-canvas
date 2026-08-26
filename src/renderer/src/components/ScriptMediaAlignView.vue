@@ -190,6 +190,11 @@ const ssl5FocusPath = computed(() => {
 const ssl5EarliestNextLine = computed(() => {
   const plan = ssl5Plan.value;
   if (!plan) return "先 Binding 确认再走 freeze → create-plan 链。";
+  if (plan.checkpoint?.newSlotDispatchAllowed === false) {
+    return plan.generationPlanDraft.blockedReason
+      || plan.checkpointLine
+      || "六图闸未放行，先完成停检/Review。";
+  }
   const step = ssl5FocusPath.value[0];
   if (ssl5FocusPath.value.length === 1 && (step === "wait" || step === "retry" || step === "review")) {
     return plan.generationPlanDraft.blockedReason
@@ -198,6 +203,14 @@ const ssl5EarliestNextLine = computed(() => {
   }
   return "先 Binding 确认再走 freeze → create-plan 链。";
 });
+
+function reviewDecisionLabel(decision?: string | null): string {
+  if (decision === "pass") return "Review 通过";
+  if (decision === "rework") return "Review 返工";
+  if (decision === "reject") return "Review 驳回";
+  if (decision === "pending") return "待 Review";
+  return "未审";
+}
 
 function formatSsl5PlanDraftNode(node: StudioGenerationPlanDraftNode): string {
   return "targetKind" in node && node.targetKind === "unit-grid"
@@ -952,6 +965,7 @@ function shortSha(value: string | null | undefined): string {
           <p>正文 CAS：<code>{{ shortSha(reader.bodySha256) }}</code></p>
           <p>{{ reader.outline.length ? "已识别 Markdown 场景/章节导航。" : "未识别 Markdown 标题；仍可按文本选区拆格。" }}</p>
           <p>{{ reader.episode?.earliestStatusLine || "当前季/集暂无 earliest 诊断。" }}</p>
+          <p v-if="reader.episode?.earliestReason" data-testid="script-reader-earliest-reason">{{ reader.episode.earliestReason }}</p>
           <p>向导提示词只有显式物化后才写入 prompt owner；只读建议不会建立正式单元。</p>
         </div>
         <button type="button" class="primary" @click="activeTab = 'reader'">打开阅读器</button>
@@ -1097,6 +1111,7 @@ function shortSha(value: string | null | undefined): string {
           <span class="warn">部分 <b>{{ board.partialCount }}</b></span>
           <span class="danger">缺图 <b>{{ board.missingAllCount }}</b></span>
           <span v-if="board.earliestStatusLine" class="earliest">{{ board.earliestStatusLine }}</span>
+          <span data-testid="align-checkpoint-gate">{{ board.checkpointLine }}</span>
         </div>
         <div v-if="ssl5Plan" class="ssl5-plan" data-testid="ssl5-missing-to-gen-plan">
           <b>SSL-5 下一步</b>
@@ -1148,6 +1163,7 @@ function shortSha(value: string | null | undefined): string {
             <li v-for="step in ssl5FocusPath" :key="step">{{ step }}</li>
           </ol>
           <p>只读计划，不自动 dispatch，不执行 create-plan。<span data-testid="ssl5-earliest-next">{{ ssl5EarliestNextLine }}</span></p>
+          <span data-testid="ssl5-checkpoint-next">{{ ssl5Plan.checkpointLine }}</span>
           <button
             v-if="ssl5Plan.focusUnitId"
             type="button"
@@ -1156,7 +1172,7 @@ function shortSha(value: string | null | undefined): string {
           >去 Binding 确认</button>
         </div>
         <table v-if="board" data-testid="align-table">
-          <thead><tr><th>单元</th><th>状态</th><th>宫格</th><th>四态</th><th>formal</th><th>raw</th><th>pack / run</th><th>点穿</th></tr></thead>
+          <thead><tr><th>单元</th><th>状态</th><th>宫格</th><th>四态</th><th>formal</th><th>Review</th><th>raw</th><th>pack / run</th><th>点穿</th></tr></thead>
           <tbody>
             <tr
               v-for="row in board.rows"
@@ -1182,6 +1198,7 @@ function shortSha(value: string | null | undefined): string {
               </td>
               <td :data-testid="`align-peek-${row.unitId}`">{{ peekLabel(row.consistencyPeek) }}</td>
               <td>{{ row.formalCommitted ? "是" : "否" }}</td>
+              <td :data-testid="`align-review-${row.unitId}`">{{ reviewDecisionLabel(row.reviewDecision) }}</td>
               <td class="mono">{{ shortSha(row.rawSha256) }}</td>
               <td class="mono">
                 <div v-if="row.packId">pack: {{ row.packId.slice(0, 28) }}…</div>

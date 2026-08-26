@@ -8,6 +8,7 @@ import {
   composeSsl5GenerationPlanDraft,
   earliestBlockingPath,
   refineSsl5FocusIfEarliestBlocking,
+  refineSsl5FocusIfCheckpointBlocking,
   refineSsl5FocusPlanDraftIfPersisted,
   SSL5_GENERATION_PLAN_COMMAND,
   SSL5_PLAN_SCHEMA_VERSION,
@@ -629,6 +630,80 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.beatLine).toBe("没有宫格可查 15s 节拍");
     expect(plan.unitBeatLine).toBe("没有宫格可查 15s 节拍");
     expect(plan.consistencyPeek).toEqual({ status: "unevaluated" });
+    expect(plan.checkpoint).toBeNull();
+    expect(plan.checkpointLine).toBe("对照板未投影六图闸");
+  });
+
+  it("六图闸未放行时禁止再建议 create-plan/dispatch，earliest wait 文案更具体时保留", () => {
+    const blocked = buildSsl5PlanFromBoard("/tmp/iso", { season: "S1", episode: "E2" }, {
+      earliestUnitId: "u-frozen",
+      earliestCode: "dispatch-unit-grid",
+      missingAllCount: 1,
+      partialCount: 0,
+      checkpoint: { newSlotDispatchAllowed: false, blockingBatchNumber: 2 },
+      rows: [
+        row({
+          unitId: "u-frozen",
+          sequence: 1,
+          status: "missing-all",
+          isEarliest: true,
+          panels: [
+            panel({ panelId: "p-focus", panelIndex: 1, hasMedia: false, packId: "focus-own-pack" }),
+          ],
+        }),
+      ],
+    });
+    expect(blocked.generationPlanDraft.ready).toBe(false);
+    expect(blocked.generationPlanDraft.dispatch).toBe(false);
+    expect(blocked.generationPlanDraft.blockedReason).toContain("六图闸未放行（batch 2）");
+    expect(blocked.items[0]?.recommendedPath).toEqual(["wait"]);
+    expect(blocked.checkpointLine).toContain("batch 2");
+
+    const other = buildSsl5PlanFromBoard("/tmp/iso", { season: "S1", episode: "E2" }, {
+      earliestUnitId: "u-early",
+      earliestCode: "dispatch-unit-grid",
+      missingAllCount: 1,
+      partialCount: 0,
+      checkpoint: { newSlotDispatchAllowed: false, blockingBatchNumber: 4 },
+      rows: [
+        row({
+          unitId: "u-other",
+          sequence: 2,
+          status: "missing-all",
+          panels: [
+            panel({ panelId: "p-other", panelIndex: 1, hasMedia: false, packId: "other-pack" }),
+          ],
+        }),
+      ],
+    });
+    expect(other.focusUnitId).toBe("u-other");
+    expect(other.generationPlanDraft.ready).toBe(false);
+    expect(other.items[0]?.recommendedPath).toEqual(["wait"]);
+
+    const waiting = buildSsl5PlanFromBoard("/tmp/iso", { season: "S1", episode: "E2" }, {
+      earliestUnitId: "u-frozen",
+      earliestCode: "wait-or-reconcile-unit-grid-run",
+      earliestLabel: "unit-grid 正在执行，等待结果或对账现有 run",
+      missingAllCount: 1,
+      partialCount: 0,
+      checkpoint: { newSlotDispatchAllowed: false, blockingBatchNumber: 2 },
+      rows: [
+        row({
+          unitId: "u-frozen",
+          sequence: 1,
+          status: "missing-all",
+          isEarliest: true,
+          panels: [
+            panel({ panelId: "p-focus", panelIndex: 1, hasMedia: false, packId: "focus-own-pack" }),
+          ],
+        }),
+      ],
+    });
+    expect(waiting.generationPlanDraft.blockedReason).toBe("unit-grid 正在执行，等待结果或对账现有 run");
+    expect(waiting.items[0]?.recommendedPath).toEqual(["wait"]);
+    expect(refineSsl5FocusIfCheckpointBlocking(waiting).generationPlanDraft.blockedReason).toBe(
+      "unit-grid 正在执行，等待结果或对账现有 run",
+    );
   });
 
   it("consistencyPeek 复用焦点缺图格，不偷同行已出图格", () => {
@@ -739,6 +814,10 @@ describe("SSL-5 入口源码合同", () => {
     expect(ssl5).toContain("composeSsl5GenerationPlanDraft");
     expect(ssl5).toContain("refineSsl5FocusPlanDraftIfPersisted");
     expect(ssl5).toContain("refineSsl5FocusIfEarliestBlocking");
+    expect(ssl5).toContain("refineSsl5FocusIfCheckpointBlocking");
+    expect(ssl5).toContain("formatAlignCheckpointLine");
+    expect(ssl5).not.toContain("studio-generation-checkpoint");
+    expect(ssl5).not.toContain("getStudioGenerationCheckpointControl");
     expect(ssl5).toContain("earliestBlockingPath");
     expect(ssl5).toContain("readPersistedPanelPlanState");
     expect(ssl5).toContain("studio-generation-plan-draft");
@@ -774,6 +853,10 @@ describe("SSL-5 入口源码合同", () => {
     expect(vue).toContain("formatSsl5PlanDraftNode");
     expect(vue).toContain("不执行 create-plan");
     expect(vue).toContain('data-testid="ssl5-earliest-next"');
+    expect(vue).toContain('data-testid="ssl5-checkpoint-next"');
+    expect(vue).toContain('data-testid="align-checkpoint-gate"');
+    expect(vue).toContain("align-review-");
+    expect(vue).toContain("reviewDecisionLabel");
     expect(vue).toContain("ssl5EarliestNextLine");
     expect(vue).not.toContain("dispatch_studio_generation_pack");
     expect(ssl5).toContain("formatSceneBackReferenceLineFromBoard");
@@ -808,6 +891,7 @@ describe("SSL-5 入口源码合同", () => {
     expect(director).toContain("不自动 dispatch");
     expect(director).toContain("不执行建计划");
     expect(director).toContain("下一步以 earliest 为准");
+    expect(director).toContain("六图闸");
     expect(director).not.toContain("dispatch_studio_generation_pack");
   });
 });

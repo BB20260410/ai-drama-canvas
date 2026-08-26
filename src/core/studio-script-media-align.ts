@@ -54,6 +54,22 @@ export interface AlignConsistencyPeek {
 
 export type AlignPanelRow = UnitPanelMediaEntry & { consistencyPeek: AlignConsistencyPeek };
 
+export type AlignCheckpointGate = {
+  newSlotDispatchAllowed: boolean;
+  blockingBatchNumber?: number;
+};
+
+/** 复用 earliest 已算的六图闸。未投影 ≠ 已放行。 */
+export function formatAlignCheckpointLine(checkpoint?: AlignCheckpointGate | null): string {
+  if (!checkpoint) return "对照板未投影六图闸";
+  if (checkpoint.newSlotDispatchAllowed === false) {
+    return checkpoint.blockingBatchNumber != null
+      ? `六图闸未放行（batch ${checkpoint.blockingBatchNumber}），先完成停检/Review（不派发）`
+      : "六图闸未放行，先完成停检/Review（不派发）";
+  }
+  return "六图闸已放行新槽";
+}
+
 export interface ScriptMediaAlignBoard {
   schemaVersion: typeof SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION;
   kind: "studio-script-media-align-board";
@@ -67,6 +83,9 @@ export interface ScriptMediaAlignBoard {
   earliestCode: string | null;
   earliestLabel: string | null;
   earliestStatusLine: string | null;
+  earliestReason: string | null;
+  checkpoint: AlignCheckpointGate;
+  checkpointLine: string;
   unitCount: number;
   coveredCount: number;
   partialCount: number;
@@ -228,6 +247,12 @@ export async function getStudioScriptMediaAlignBoard(
   rows.sort((a, b) => a.sequence - b.sequence);
   const rowsWithPeek = attachAlignRowConsistencyPeeks(rows, await loadAlignConsistencyPeeks(rows));
   const missingReport = buildMissingMediaReport(map);
+  const checkpoint: AlignCheckpointGate = {
+    newSlotDispatchAllowed: earliest.checkpoint.newSlotDispatchAllowed !== false,
+    ...(earliest.checkpoint.blockingBatchNumber !== undefined
+      ? { blockingBatchNumber: earliest.checkpoint.blockingBatchNumber }
+      : {}),
+  };
 
   return {
     schemaVersion: SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION,
@@ -246,6 +271,9 @@ export async function getStudioScriptMediaAlignBoard(
       ? earliest.slots.find((slot) => slot.unitId === earliest.earliestUnitId)?.label ?? null
       : null,
     earliestStatusLine: earliest.statusLine,
+    earliestReason: earliest.earliestReason ?? null,
+    checkpoint,
+    checkpointLine: formatAlignCheckpointLine(checkpoint),
     unitCount: rowsWithPeek.length,
     coveredCount: rowsWithPeek.filter((r) => r.status === "covered").length,
     partialCount: rowsWithPeek.filter((r) => r.status === "partial").length,

@@ -51,6 +51,7 @@ export interface ScriptReaderView {
     episode: string;
     earliestUnitId: string | null;
     earliestStatusLine: string | null;
+    earliestReason: string | null;
     unitHighlights: ScriptReaderUnitHighlight[];
   };
   builtAt: string;
@@ -186,6 +187,7 @@ export async function getStudioScriptReaderView(
       episode: query.episode,
       earliestUnitId: earliest.earliestUnitId,
       earliestStatusLine: earliest.statusLine,
+      earliestReason: earliest.earliestReason ?? null,
       unitHighlights,
     };
   }

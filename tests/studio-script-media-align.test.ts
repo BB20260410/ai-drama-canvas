@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   attachAlignRowConsistencyPeeks,
+  formatAlignCheckpointLine,
   matchOutlineAnchorsForUnit,
   SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION,
   type ScriptMediaAlignRow,
@@ -170,7 +171,24 @@ describe("对照行四态 peek 源码合同", () => {
     expect(align).toContain("row.panels.map((panel) => panel.generationRunId)");
     expect(align).toContain("earliestCode");
     expect(align).toContain("earliestLabel");
+    expect(align).toContain("earliestReason");
+    expect(align).toContain("formatAlignCheckpointLine");
+    expect(align).toContain("earliest.checkpoint");
     expect(align).toContain("SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION = 1");
     expect(align).toContain("slots.find((slot) => slot.unitId === earliest.earliestUnitId)");
+    expect(vue).toContain("align-checkpoint-gate");
+    expect(vue).toContain("align-review-");
+    expect(vue).toContain("ssl5-checkpoint-next");
+  });
+
+  it("formatAlignCheckpointLine 只读投影六图闸，未投影 ≠ 已放行", () => {
+    expect(formatAlignCheckpointLine(null)).toBe("对照板未投影六图闸");
+    expect(formatAlignCheckpointLine({ newSlotDispatchAllowed: true })).toBe("六图闸已放行新槽");
+    expect(formatAlignCheckpointLine({ newSlotDispatchAllowed: false })).toBe(
+      "六图闸未放行，先完成停检/Review（不派发）",
+    );
+    expect(formatAlignCheckpointLine({ newSlotDispatchAllowed: false, blockingBatchNumber: 3 })).toBe(
+      "六图闸未放行（batch 3），先完成停检/Review（不派发）",
+    );
   });
 });

@@ -5,7 +5,9 @@
  * 不自动 dispatch、不抢写租约。
  */
 import {
+  formatAlignCheckpointLine,
   getStudioScriptMediaAlignBoard,
+  type AlignCheckpointGate,
   type AlignConsistencyPeek,
   type ScriptMediaAlignBoard,
   type ScriptMediaAlignRow,
@@ -105,6 +107,9 @@ export interface Ssl5MissingToGenPlan {
   earliestCode: string | null;
   earliestLabel: string | null;
   earliestStatusLine: string | null;
+  earliestReason: string | null;
+  checkpoint: AlignCheckpointGate | null;
+  checkpointLine: string;
   focusUnitId: string | null;
   focusPanelId: string | null;
   focusPanelIndex: number | null;
@@ -165,6 +170,9 @@ export function buildSsl5PlanFromBoard(
     earliestCode?: string | null;
     earliestLabel?: string | null;
     earliestStatusLine?: string | null;
+    earliestReason?: string | null;
+    checkpoint?: AlignCheckpointGate | null;
+    checkpointLine?: string | null;
   },
   builtAt = new Date().toISOString(),
 ): Ssl5MissingToGenPlan {
@@ -307,6 +315,9 @@ export function buildSsl5PlanFromBoard(
     earliestCode: board.earliestCode ?? null,
     earliestLabel: board.earliestLabel ?? null,
     earliestStatusLine: board.earliestStatusLine ?? null,
+    earliestReason: board.earliestReason ?? null,
+    checkpoint: board.checkpoint ?? null,
+    checkpointLine: board.checkpointLine ?? formatAlignCheckpointLine(board.checkpoint ?? null),
     focusUnitId: focus?.unitId ?? null,
     focusPanelId: focus?.focusPanelId ?? null,
     focusPanelIndex: focus?.focusPanelIndex ?? null,
@@ -341,7 +352,7 @@ export function buildSsl5PlanFromBoard(
     items,
     builtAt,
   };
-  return refineSsl5FocusIfEarliestBlocking(plan);
+  return refineSsl5FocusIfCheckpointBlocking(refineSsl5FocusIfEarliestBlocking(plan));
 }
 
 export function earliestBlockingPath(
@@ -381,6 +392,34 @@ export function refineSsl5FocusIfEarliestBlocking(plan: Ssl5MissingToGenPlan): S
         ? { ...item, generationPlanDraft: draft, recommendedPath }
         : item
     )),
+  };
+}
+
+/**
+ * 对照板已投影六图闸且未放行新槽时，禁止再建议 create-plan / dispatch。
+ * 复用已加载 board.checkpoint，不二次读闸。earliest wait/retry/Review 文案更具体时保留。
+ * 不执行停检、不派发。
+ */
+export function refineSsl5FocusIfCheckpointBlocking(plan: Ssl5MissingToGenPlan): Ssl5MissingToGenPlan {
+  if (plan.checkpoint?.newSlotDispatchAllowed !== false) return plan;
+  if (earliestBlockingPath(plan.earliestCode)) return plan;
+  const blockedReason = plan.checkpointLine
+    || formatAlignCheckpointLine(plan.checkpoint);
+  const draft = {
+    ...plan.generationPlanDraft,
+    ready: false,
+    dispatch: false as const,
+    blockedReason,
+    note: "六图闸已占用下一步。不执行、不派发。",
+  };
+  return {
+    ...plan,
+    generationPlanDraft: draft,
+    items: plan.items.map((item) => ({
+      ...item,
+      generationPlanDraft: draft,
+      recommendedPath: ["wait"],
+    })),
   };
 }
 
@@ -453,8 +492,8 @@ export async function planSsl5MissingToGen(
     plan.focusUnitId,
     plan.focusPanelId,
   );
-  return refineSsl5FocusIfEarliestBlocking(refineSsl5FocusPlanDraftIfPersisted(plan, {
+  return refineSsl5FocusIfCheckpointBlocking(refineSsl5FocusIfEarliestBlocking(refineSsl5FocusPlanDraftIfPersisted(plan, {
     hasPlan: persisted.hasPlan,
     status: persisted.status ?? undefined,
-  }));
+  })));
 }
