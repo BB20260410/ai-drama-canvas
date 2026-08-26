@@ -487,6 +487,7 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     expect(source).toContain("attachPanelStandingHandoffs");
     expect(source).toContain("summarizePanelAssetMentions");
     expect(source).toContain("listSceneBackReferences");
+    expect(source).toContain('from "./studio-scene-backrefs.js"');
     expect(source).toContain("不是 BindingSet，不能当 generation-ready");
     expect(source).not.toContain("getStudioBindingControl");
     expect(source).not.toContain("evaluateStudioConsistency");

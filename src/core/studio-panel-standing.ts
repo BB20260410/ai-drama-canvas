@@ -175,6 +175,9 @@ export const UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE =
 export const FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE =
   "若 frozenPanelLighting、frozenPanelCostume、frozenPanelOverlays 或 renderedPrompt 含「光线（宫格覆盖）」/「服装（宫格覆盖）」，必须保持该宫格覆盖，禁止改光色或换装。";
 
+export const SCENE_BACK_REFERENCE_TOOL_NOTE =
+  "若 session-snapshot 含 sceneBackReferences / sceneBackReferenceNote，必须与更早同场景快照提及连续，禁止换成未回指的场景。快照提及不是 BindingSet，不能当 generation-ready。";
+
 export type FrozenPanelStandingRow = {
   panelId: string;
   previousStanding: StudioPanelStandingHandoff & { source: "frozen-rendered-prompt" };

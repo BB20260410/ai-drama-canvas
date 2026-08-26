@@ -61,6 +61,7 @@ import {
 } from "./studio-imagegen-providers.js";
 import {
   FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
+  SCENE_BACK_REFERENCE_TOOL_NOTE,
   UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE,
   frozenPanelCostumeFromAnyFrozenPack,
   frozenPanelLightingFromAnyFrozenPack,
@@ -276,7 +277,12 @@ export function buildStudioUnitGridAgentImagegenBrief(
     referencePathSource: "pack-operation-controlReferences-only" as const,
     tool: {
       ...tool,
-      notes: [...tool.notes, FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE, UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE],
+      notes: [
+        ...tool.notes,
+        FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
+        SCENE_BACK_REFERENCE_TOOL_NOTE,
+        UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE,
+      ],
     },
   };
 }

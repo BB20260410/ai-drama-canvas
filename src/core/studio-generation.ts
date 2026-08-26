@@ -69,6 +69,7 @@ import {
 } from "./studio-unit-grid-read-epoch.js";
 import {
   FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
+  SCENE_BACK_REFERENCE_TOOL_NOTE,
   formatPreviousStandingPromptLine,
   parseFrozenPanelCostumeFromRenderedPrompt,
   parseFrozenPanelLightingFromRenderedPrompt,
@@ -2742,6 +2743,7 @@ export function buildStudioAgentImagegenBrief(
         "参考图本地路径只读 pack 操作返回的 request.controlReferences.localPath（已 CAS/SHA 校验）。",
         "若 previousStanding 或 renderedPrompt 含「前镜交接」，必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。",
         FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
+        SCENE_BACK_REFERENCE_TOOL_NOTE,
         "禁止浏览器、Artlist、ComfyUI、网页自动化旁路。",
       ],
     }
@@ -2755,6 +2757,7 @@ export function buildStudioAgentImagegenBrief(
         "不得替换冻结包外的身份；不得把字幕/分屏画进 raw。",
         "若 previousStanding 或 renderedPrompt 含「前镜交接」，必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。",
         FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
+        SCENE_BACK_REFERENCE_TOOL_NOTE,
         "禁止浏览器、Artlist、网页自动化旁路。",
       ],
     };

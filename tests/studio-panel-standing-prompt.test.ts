@@ -88,6 +88,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(generation).not.toContain("前镜光线");
     expect(generation).toContain("frozenPanelLighting: parseFrozenPanelLightingFromRenderedPrompt");
     expect(generation).toContain("FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE");
+    expect(generation).toContain("SCENE_BACK_REFERENCE_TOOL_NOTE");
     const unitGrid = readFileSync(path.join(repoRoot, "src/core/studio-unit-grid-generation.ts"), "utf8");
     expect(unitGrid).toContain("formatPreviousStandingPromptLine");
     expect(unitGrid).toContain("第${offset + 1}格${previousLine}");
@@ -224,6 +225,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(snapshot).toContain("parseFrozenPanelCostumeFromRenderedPrompt");
     expect(snapshot).toContain("frozenPanelLighting");
     expect(snapshot).toContain("frozenPanelCostume");
+    expect(snapshot).toContain("readStudioSceneBackReferences");
+    expect(snapshot).toContain("sceneBackReferences");
     expect(snapshot).toContain('source: "frozen-rendered-prompt"');
     expect(snapshot).toContain("不读 unit head");
     expect(snapshot).not.toContain("getCurrentStudioPanelAssetBindingSet");
@@ -232,6 +235,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(mcp).toContain("previousStanding");
     expect(mcp).toContain("frozenPanelLighting");
     expect(mcp).toContain("frozenPanelCostume");
+    expect(mcp).toContain("sceneBackReferences");
     expect(mcp).toContain("只从该包 renderedPrompt 还原");
     const control = readFileSync(path.join(repoRoot, "src/renderer/src/components/StudioGenerationControlView.vue"), "utf8");
     expect(control).toContain('data-testid="studio-pack-previous-standing"');
@@ -276,6 +280,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(brief).toContain("UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE");
     expect(brief).toContain("frozenPanelOverlays");
     expect(brief).toContain("FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE");
+    expect(brief).toContain("SCENE_BACK_REFERENCE_TOOL_NOTE");
     expect(brief).toContain("frozenPanelLightingFromAnyFrozenPack(panel.panelPack)");
     const canvas = readFileSync(path.join(repoRoot, "src/renderer/src/components/ManagedStudioCanvasView.vue"), "utf8");
     expect(canvas).toContain("previousStandingFromAnyFrozenPack(pack, panel.id)");

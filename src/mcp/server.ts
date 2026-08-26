@@ -5660,7 +5660,7 @@ registrar.registerTool(
   "get_studio_generation_control",
   {
     title: "读取 Codex 生成一致性控制封装",
-    description: "单一只读入口提供 session-snapshot、panel/unit-grid 的 readiness、pack、history、plan、call、active-runs、detached-unknown。session-snapshot 汇总当前宫格的剧本片段、BindingSet、参考角色、上一镜实际尾态、冻结提示词前镜交接（previousStanding，只从该包 renderedPrompt 还原、不读 head）、冻结宫格光线/服装覆盖（frozenPanelLighting / frozenPanelCostume，无该行则为 null）、机位与最高风险，不返回本地路径；就绪、历史与未知态同样不返回本地路径，仅 pack 返回已重验逐格闭包、受管 media CAS 边界和文件 SHA-256 的 controlReferences.localPath。call 读取不会重新授权模型调用；active-runs 返回指定单元/宫格所有 run 的完整状态投影与恢复动作；detached-unknown 只投影防重证据，不导入候选。",
+    description: "单一只读入口提供 session-snapshot、panel/unit-grid 的 readiness、pack、history、plan、call、active-runs、detached-unknown。session-snapshot 汇总当前宫格的剧本片段、BindingSet、参考角色、上一镜实际尾态、冻结提示词前镜交接（previousStanding，只从该包 renderedPrompt 还原、不读 head）、冻结宫格光线/服装覆盖（frozenPanelLighting / frozenPanelCostume，无该行则为 null）、跨单元场景回指（sceneMentions / sceneBackReferences / sceneBackReferenceNote，只读生产库快照提及、不读 head、不是 BindingSet；无提及或无更早则空数组，缺库失败关闭为空且不建库）、机位与最高风险，不返回本地路径；就绪、历史与未知态同样不返回本地路径，仅 pack 返回已重验逐格闭包、受管 media CAS 边界和文件 SHA-256 的 controlReferences.localPath。call 读取不会重新授权模型调用；active-runs 返回指定单元/宫格所有 run 的完整状态投影与恢复动作；detached-unknown 只投影防重证据，不导入候选。",
     inputSchema: {
       projectRoot: managedStudioProjectRootSchema,
       query: studioGenerationControlQuerySchema,

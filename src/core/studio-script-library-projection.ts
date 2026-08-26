@@ -9,6 +9,16 @@ import {
   listStudioGenerationPacksByUnit,
   listStudioGenerationResultsByPack,
 } from "./studio-generation-ledger.js";
+import {
+  SCENE_BACK_REFERENCE_LIMIT,
+  type SceneBackReference,
+} from "./studio-scene-backrefs.js";
+
+export {
+  SCENE_BACK_REFERENCE_LIMIT,
+  formatSceneBackReferences,
+  type SceneBackReference,
+} from "./studio-scene-backrefs.js";
 
 export const SCRIPT_LIBRARY_PROJECTION_SCHEMA_VERSION = 1 as const;
 
@@ -213,17 +223,6 @@ export function formatPanelStandingGaps(panel: PanelStandingFields | null | unde
   return `锁版站位缺口：${gaps.join("、")} · ${handoff}。不是 BindingSet，不能当 generation-ready。`;
 }
 
-export const SCENE_BACK_REFERENCE_LIMIT = 4;
-
-export type SceneBackReference = {
-  assetId: string;
-  role: string;
-  unitId: string;
-  sequence: number;
-  panelIndex: number;
-  panelId: string;
-};
-
 export function listSceneAssetMentions(
   mentions: ReadonlyArray<{ assetId?: string; category?: string; role?: string }> | null | undefined,
 ): PanelAssetMentionLite[] {
@@ -299,22 +298,6 @@ export function listSceneBackReferences(input: {
   return rows
     .sort((left, right) => right.sequence - left.sequence || right.panelIndex - left.panelIndex)
     .slice(0, limit);
-}
-
-export function formatSceneBackReferences(
-  sceneMentionCount: number,
-  rows: ReadonlyArray<SceneBackReference>,
-): string {
-  if (sceneMentionCount <= 0) {
-    return "本格快照未提及场景。不是 BindingSet，不能当 generation-ready。";
-  }
-  if (!rows.length) {
-    return "场景回指：本集更早单元没有同场景快照提及。不是 BindingSet，不能当 generation-ready。";
-  }
-  const text = rows
-    .map((row) => `U${row.sequence} G${row.panelIndex} ${row.role || row.assetId}`)
-    .join("；");
-  return `场景回指：${text}。快照提及，不是 BindingSet，不能当 generation-ready。`;
 }
 
 export function applyPackMediaToPanels(

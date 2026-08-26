@@ -13,6 +13,8 @@ import {
   previousStandingFromFrozenRenderedPrompt,
   type StudioPanelStandingHandoff,
 } from "./studio-panel-standing.js";
+import { readStudioSceneBackReferences } from "./studio-scene-backrefs-read.js";
+import type { SceneBackReference } from "./studio-scene-backrefs.js";
 import type { StudioDashboardCurrentness, StudioDashboardNextAction } from "./studio-production-dashboard.js";
 import type { NextShotContinuitySnapshot } from "./studio-next-shot-continuity.js";
 import type { StudioPostResultObservedActualState } from "./studio-post-result-observation.js";
@@ -89,6 +91,13 @@ export interface StudioGenerationSessionSnapshot {
    */
   frozenPanelLighting: string | null;
   frozenPanelCostume: string | null;
+  /**
+   * 跨单元场景回指：只读生产库快照提及（category=scene），不读 unit head、不拆冻结包。
+   * 无场景提及则为空数组；缺库失败关闭为空，不建库。不是 BindingSet。
+   */
+  sceneMentions: Array<{ assetId: string; role: string }>;
+  sceneBackReferences: SceneBackReference[];
+  sceneBackReferenceNote: string;
   camera: {
     current?: {
       shotComposition: string;
@@ -284,6 +293,15 @@ export async function buildStudioGenerationSessionSnapshot(
 
   const target = frozenPanel?.target;
   const previousSnapshot = incoming?.continuitySnapshot;
+  const sceneBackref = readStudioSceneBackReferences(projectRoot, {
+    unitId: bundle.currentUnit.unitId,
+    unitRevision: bundle.currentUnit.revision,
+    sequence: bundle.currentUnit.sequence,
+    panelId: selectedPanelId,
+    panelIndex: panel.panelIndex,
+    season: bundle.currentUnit.season,
+    episode: bundle.currentUnit.episode,
+  });
   const body = {
     schemaVersion: STUDIO_GENERATION_SESSION_SNAPSHOT_SCHEMA_VERSION,
     kind: "studio-generation-session-snapshot" as const,
@@ -333,6 +351,9 @@ export async function buildStudioGenerationSessionSnapshot(
       const prompt = frozenPanel?.request?.modelPayload?.renderedPrompt;
       return typeof prompt === "string" ? parseFrozenPanelCostumeFromRenderedPrompt(prompt) : null;
     })(),
+    sceneMentions: sceneBackref.sceneMentions,
+    sceneBackReferences: sceneBackref.sceneBackReferences,
+    sceneBackReferenceNote: sceneBackref.sceneBackReferenceNote,
     camera: {
       current: frozenPanel
         ? {
@@ -371,6 +392,12 @@ export async function buildStudioGenerationSessionSnapshot(
       ...(body.previousStanding ? { previousStanding: body.previousStanding } : {}),
       ...(body.frozenPanelLighting ? { frozenPanelLighting: body.frozenPanelLighting } : {}),
       ...(body.frozenPanelCostume ? { frozenPanelCostume: body.frozenPanelCostume } : {}),
+      ...(body.sceneMentions.length > 0 || body.sceneBackReferences.length > 0
+        ? {
+            sceneMentions: body.sceneMentions,
+            sceneBackReferences: body.sceneBackReferences,
+          }
+        : {}),
       camera: body.camera,
       topRiskCode: body.topRisk?.code ?? null,
     }),
