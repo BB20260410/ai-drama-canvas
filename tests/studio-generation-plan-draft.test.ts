@@ -27,8 +27,10 @@ import {
   unitGridStatusBlockingKind,
 } from "../src/core/studio-generation-plan-draft.js";
 import {
+  formatSessionWriteLeaseLine,
   historyEnvelopeConsistencyPeek,
   sessionConsistencyPeekFromVerdict,
+  sessionWriteLeasePeekFailClosed,
 } from "../src/core/studio-generation-session-snapshot.js";
 import { traceEnvelopePeekRunId } from "../src/core/studio-trace.js";
 
@@ -329,6 +331,8 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(snapshot).toContain('persisted.provenance !== "unit-grid-binding-sets"');
     expect(snapshot).toContain("generationPlanDraft");
     expect(snapshot).toContain("consistencyPeek");
+    expect(snapshot).toContain("writeLease");
+    expect(snapshot).toContain("withStudioProjectWriteLease");
     expect(snapshot).toContain("sessionConsistencyPeekFromVerdict");
     expect(snapshot).toContain("historyEnvelopeConsistencyPeek");
     expect(snapshot).toContain("historyEnvelopePeekRunId");
@@ -350,6 +354,7 @@ describe("create-plan 草稿接线源码合同", () => {
     const digest = snapshot.slice(snapshot.indexOf("fingerprint: digest({"), snapshot.indexOf("topRiskCode: body.topRisk?.code ?? null,"));
     expect(digest).not.toContain("generationPlanDraft");
     expect(digest).not.toContain("consistencyPeek");
+    expect(digest).not.toContain("writeLease");
     const helperStart = snapshot.indexOf("async function persistedUnitGridPackIdForDraft");
     const helperEnd = snapshot.indexOf("function panelPack(", helperStart);
     const helper = snapshot.slice(helperStart, helperEnd);
@@ -611,5 +616,49 @@ describe("create-plan 草稿接线源码合同", () => {
     const mcp = source("src/mcp/server.ts");
     expect(mcp).toContain("consistencyPeek，按当前宫格 newest-first 结果 run");
     expect(mcp).toContain("机器不自动 Review PASS");
+  });
+
+  it("session-snapshot 写租约只读 peek 不进 fingerprint、不静态拉租约模块", () => {
+    expect(formatSessionWriteLeaseLine(null)).toBe("会话快照未投影写租约");
+    expect(formatSessionWriteLeaseLine({ held: true, holderId: "agent-a", denialHint: null })).toBe(
+      "写租约由 agent-a 持有；无该租约禁止写命令（不派发）",
+    );
+    expect(formatSessionWriteLeaseLine({ held: true, holderId: null, denialHint: null })).toBe(
+      "写租约已被持有；无该租约禁止写命令（不派发）",
+    );
+    expect(formatSessionWriteLeaseLine({
+      held: false,
+      holderId: null,
+      denialHint: "当前项目写租约未持有",
+    })).toBe("当前项目写租约未持有");
+    expect(formatSessionWriteLeaseLine({ held: false, holderId: null, denialHint: null })).toBe(
+      "写租约未持有；写命令前须 acquire-lease（不派发）",
+    );
+    expect(sessionWriteLeasePeekFailClosed()).toEqual({
+      held: false,
+      holderId: null,
+      denialHint: null,
+      line: "写租约未持有；写命令前须 acquire-lease（不派发）",
+    });
+    const snapshot = source("src/core/studio-generation-session-snapshot.ts");
+    expect(snapshot).toContain("withStudioProjectWriteLease");
+    expect(snapshot).toContain("getStudioProjectWriteLeaseReadOnly");
+    expect(snapshot).toContain("formatSessionWriteLeaseLine");
+    expect(snapshot).toContain("writeLease");
+    expect(snapshot).toContain("sessionWriteLeasePeekFailClosed");
+    expect(snapshot).toContain("不暴露 token");
+    expect(snapshot).toContain("不改 nextAction");
+    expect(snapshot).toContain("不改草稿 ready");
+    expect(snapshot).not.toContain('from "./studio-project-write-lease.js"');
+    expect(snapshot).not.toContain("leaseToken");
+    expect(snapshot).not.toContain("acquireStudioProjectWriteLease");
+    const digest = snapshot.slice(snapshot.indexOf("fingerprint: digest({"), snapshot.indexOf("topRiskCode: body.topRisk?.code ?? null,"));
+    expect(digest).not.toContain("writeLease");
+    expect(digest).not.toContain("generationPlanDraft");
+    expect(digest).not.toContain("consistencyPeek");
+    const mcp = source("src/mcp/server.ts");
+    expect(mcp).toContain("writeLease，held/holderId/denialHint/line");
+    expect(mcp).toContain("不暴露 token");
+    expect(mcp).toContain("不改 nextAction");
   });
 });

@@ -1,6 +1,9 @@
 import { createHash } from "node:crypto";
 import type { StudioProjectionFrozenReference } from "./studio-production-projection-bundle.js";
-import { withStudioProductionProjectionBundle } from "./studio-readonly-diagnostics-lazy.js";
+import {
+  withStudioProductionProjectionBundle,
+  withStudioProjectWriteLease,
+} from "./studio-readonly-diagnostics-lazy.js";
 import {
   listStudioGenerationLatestUnitGridRuns,
   listStudioGenerationPacksByUnit,
@@ -54,6 +57,54 @@ export function sessionConsistencyPeekFromVerdict(
   if (!generationRunId) return { status: "unevaluated", generationRunId: null };
   if (verdict) return { status: "cached", verdict, generationRunId };
   return { status: "unevaluated", generationRunId };
+}
+
+/** 写租约只读 peek。只拷 held / holderId / denialHint / line，不暴露 token。 */
+export type SessionWriteLeasePeek = {
+  held: boolean;
+  holderId: string | null;
+  denialHint: string | null;
+  line: string;
+};
+
+const SESSION_WRITE_LEASE_UNHELD_LINE = "写租约未持有；写命令前须 acquire-lease（不派发）";
+
+/** 与对照板同文案。本地排版，不拉对照模块。未投影 ≠ 已持有。 */
+export function formatSessionWriteLeaseLine(
+  lease?: { held: boolean; holderId: string | null; denialHint: string | null } | null,
+): string {
+  if (!lease) return "会话快照未投影写租约";
+  if (lease.held) {
+    return lease.holderId
+      ? `写租约由 ${lease.holderId} 持有；无该租约禁止写命令（不派发）`
+      : "写租约已被持有；无该租约禁止写命令（不派发）";
+  }
+  return lease.denialHint || SESSION_WRITE_LEASE_UNHELD_LINE;
+}
+
+export function sessionWriteLeasePeekFailClosed(): SessionWriteLeasePeek {
+  return {
+    held: false,
+    holderId: null,
+    denialHint: null,
+    line: SESSION_WRITE_LEASE_UNHELD_LINE,
+  };
+}
+
+async function sessionWriteLeasePeek(projectRoot: string): Promise<SessionWriteLeasePeek> {
+  try {
+    const projection = await withStudioProjectWriteLease((mod) =>
+      mod.getStudioProjectWriteLeaseReadOnly(projectRoot),
+    );
+    const peek = {
+      held: projection.held === true,
+      holderId: projection.lease?.holderId ?? null,
+      denialHint: projection.denialHint ?? null,
+    };
+    return { ...peek, line: formatSessionWriteLeaseLine(peek) };
+  } catch {
+    return sessionWriteLeasePeekFailClosed();
+  }
 }
 
 /**
@@ -187,6 +238,13 @@ export interface StudioGenerationSessionSnapshot {
    * 只读进程内 LRU；未评估 ≠ 无法检查。不进 fingerprint。不 evaluate 像素。机器不自动 Review PASS。
    */
   consistencyPeek: SessionConsistencyPeek;
+  /**
+   * 写租约只读 peek：经 withStudioProjectWriteLease 读 getStudioProjectWriteLeaseReadOnly。
+   * 只拷 held / holderId / denialHint / 本地 line，不暴露 token。
+   * 失败关闭为未持有+默认句，不让 snapshot 整体失败。
+   * 不进 fingerprint。不改 nextAction。不改草稿 ready。不抢租约、不派发。
+   */
+  writeLease: SessionWriteLeasePeek;
   camera: {
     current?: {
       shotComposition: string;
@@ -347,6 +405,7 @@ export async function buildStudioGenerationSessionSnapshot(
   if (!selectedPanelId || !panel) {
     throw new Error(`单元 ${query.unitId} 没有可用于生成会话的当前宫格。`);
   }
+  const writeLeasePromise = sessionWriteLeasePeek(projectRoot);
 
   // readiness 返回的是当前态候选包，尚未执行 freeze 时不会出现在账本里。
   // 会话快照必须直接使用这份内存候选，不能把“未持久化”误判成缺少剧本/
@@ -526,6 +585,7 @@ export async function buildStudioGenerationSessionSnapshot(
     styleLockLine: formatFrozenStyleLockReadonlyLine(styleLockRefsFromAnyFrozenPack(frozenPanel)),
     beatLine: formatFrozenPanelBeatReadonlyLine(frozenPanelBeatFromAnyFrozenPack(frozenPanel)),
     consistencyPeek,
+    writeLease: await writeLeasePromise,
     generationPlanDraft: refineStudioGenerationPlanDraftIfUnitGridBlocking(
       query.panelId
         ? composeStudioGenerationPlanDraft({
