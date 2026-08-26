@@ -149,6 +149,21 @@ export function canvasFreezeDispatchOverrideForUnitGridBlocking(
   return { enabled: false, label: text, reason: text };
 }
 
+/**
+ * 画布节点 freeze-dispatch：已加载 overview 六图闸未放行时不得再建议派发。
+ * 未投影（undefined）不挡。只改 enabled/文案；不执行停检、不派发。
+ */
+export function canvasFreezeDispatchOverrideForCheckpointGate(
+  newSlotDispatchAllowed?: boolean | null,
+  blockingBatchNumber?: number | null,
+): { enabled: false; label: string; reason: string } | null {
+  if (newSlotDispatchAllowed !== false) return null;
+  const text = blockingBatchNumber != null
+    ? `六图闸未放行（batch ${blockingBatchNumber}），先完成停检/Review（不派发）`
+    : "六图闸未放行，先完成停检/Review（不派发）";
+  return { enabled: false, label: text, reason: text };
+}
+
 export const ACTIVE_RUNS_NEXT_RECONCILE = "reconcile-or-commit-existing-call-only" as const;
 export const ACTIVE_RUNS_NEXT_FOLLOW_READINESS = "follow-core-readiness" as const;
 

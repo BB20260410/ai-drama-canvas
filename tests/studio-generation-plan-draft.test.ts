@@ -7,6 +7,7 @@ import {
   ACTIVE_RUNS_NEXT_FOLLOW_READINESS,
   ACTIVE_RUNS_NEXT_RECONCILE,
   activeRunsEnvelopeNext,
+  canvasFreezeDispatchOverrideForCheckpointGate,
   canvasFreezeDispatchOverrideForUnitGridBlocking,
   packEnvelopeNextOverrideForUnitGridBlocking,
   PLAN_ENVELOPE_NEXT_CREATE,
@@ -243,6 +244,15 @@ describe("create-plan 只读草稿纯函数", () => {
     expect(canvasFreezeDispatchOverrideForUnitGridBlocking("dispatch-unit-grid")).toBeNull();
     expect(canvasFreezeDispatchOverrideForUnitGridBlocking("create-unit-grid-plan")).toBeNull();
     expect(canvasFreezeDispatchOverrideForUnitGridBlocking("create-unit-grid-freeze")).toBeNull();
+    expect(canvasFreezeDispatchOverrideForCheckpointGate(false, 3)).toEqual({
+      enabled: false,
+      label: "六图闸未放行（batch 3），先完成停检/Review（不派发）",
+      reason: "六图闸未放行（batch 3），先完成停检/Review（不派发）",
+    });
+    expect(canvasFreezeDispatchOverrideForCheckpointGate(false)?.reason).toContain("六图闸未放行");
+    expect(canvasFreezeDispatchOverrideForCheckpointGate(true)).toBeNull();
+    expect(canvasFreezeDispatchOverrideForCheckpointGate(undefined)).toBeNull();
+    expect(canvasFreezeDispatchOverrideForCheckpointGate(null)).toBeNull();
     expect(activeRunsEnvelopeNext({})).toBe(ACTIVE_RUNS_NEXT_FOLLOW_READINESS);
     expect(activeRunsEnvelopeNext({ hasUnknownCall: true, hasInFlightRun: true })).toBe(ACTIVE_RUNS_NEXT_RECONCILE);
     expect(activeRunsEnvelopeNext({
@@ -301,6 +311,7 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(draft).toContain("refineStudioGenerationPlanDraftIfUnitGridBlocking");
     expect(draft).toContain("packEnvelopeNextOverrideForUnitGridBlocking");
     expect(draft).toContain("canvasFreezeDispatchOverrideForUnitGridBlocking");
+    expect(draft).toContain("canvasFreezeDispatchOverrideForCheckpointGate");
     expect(draft).toContain("activeRunsEnvelopeNext");
     expect(draft).toContain("planOperationEnvelopeNext");
     expect(draft).toContain("planEnvelopeNextFromNodeStatuses");
@@ -448,8 +459,10 @@ describe("create-plan 草稿接线源码合同", () => {
   it("画布节点下一步跟 unit-grid 在途对齐，零额外 IPC，不拉对照板", () => {
     const panel = source("src/core/studio-canvas-node-action-panel.ts");
     expect(panel).toContain("canvasFreezeDispatchOverrideForUnitGridBlocking");
+    expect(panel).toContain("canvasFreezeDispatchOverrideForCheckpointGate");
     expect(panel).toContain("unitGridNextActionCode");
     expect(panel).toContain("unitGridNextActionLabel");
+    expect(panel).toContain("checkpointNewSlotDispatchAllowed");
     expect(panel).toContain('key: "next"');
     expect(panel).toContain('code: "freeze-dispatch"');
     expect(panel).not.toContain("studio-ssl5-missing-to-gen");
@@ -459,6 +472,8 @@ describe("create-plan 草稿接线源码合同", () => {
     const canvas = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
     expect(canvas).toContain("unitGridNextActionCode: unitDetail.value?.nextAction.code");
     expect(canvas).toContain("unitGridNextActionLabel: unitDetail.value?.nextAction.label");
+    expect(canvas).toContain("overview.value?.checkpoint.newSlotDispatchAllowed");
+    expect(canvas).toContain("checkpointNewSlotBlocked");
     expect(canvas).toContain("sameUnit ? unitDetail.value?.nextAction.code");
     expect(canvas).not.toContain("from \"@core/studio-generation-plan-draft");
     expect(canvas).not.toContain("studio-ssl5-missing-to-gen");

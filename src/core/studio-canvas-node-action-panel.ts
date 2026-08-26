@@ -4,7 +4,10 @@
  * - 动作通过 execute_command / openDashboard 由上层执行
  * - unit-grid 在途时 freeze-dispatch 不得再建议派发（只精炼文案，不执行）
  */
-import { canvasFreezeDispatchOverrideForUnitGridBlocking } from "./studio-generation-plan-draft.js";
+import {
+  canvasFreezeDispatchOverrideForCheckpointGate,
+  canvasFreezeDispatchOverrideForUnitGridBlocking,
+} from "./studio-generation-plan-draft.js";
 
 export type StudioCanvasNodeActionCode =
   | "open-dashboard"
@@ -38,6 +41,9 @@ export interface StudioCanvasNodeActionPanelInput {
   /** 驾驶舱 / earliest nextAction。wait/retry/Review/对账时禁止再建议 freeze-dispatch。 */
   unitGridNextActionCode?: string | null;
   unitGridNextActionLabel?: string | null;
+  /** 已加载 overview 六图闸。未投影不挡；false 才禁止 freeze-dispatch。 */
+  checkpointNewSlotDispatchAllowed?: boolean | null;
+  checkpointBlockingBatchNumber?: number | null;
 }
 
 export interface StudioCanvasNodeActionPanel {
@@ -73,13 +79,20 @@ export function buildStudioCanvasNodeActionPanel(
   const actions: StudioCanvasNodeAction[] = [];
   const busy = Boolean(input.isBusy);
   const nextLabel = input.unitGridNextActionLabel?.trim() || "";
-  if (nextLabel) {
-    fields.push({ key: "next", label: "下一步", value: nextLabel });
-  }
-  const freezeDispatchOverride = canvasFreezeDispatchOverrideForUnitGridBlocking(
+  const unitGridOverride = canvasFreezeDispatchOverrideForUnitGridBlocking(
     input.unitGridNextActionCode,
     input.unitGridNextActionLabel,
   );
+  const checkpointOverride = canvasFreezeDispatchOverrideForCheckpointGate(
+    input.checkpointNewSlotDispatchAllowed,
+    input.checkpointBlockingBatchNumber,
+  );
+  const freezeDispatchOverride = unitGridOverride ?? checkpointOverride;
+  if (nextLabel) {
+    fields.push({ key: "next", label: "下一步", value: nextLabel });
+  } else if (checkpointOverride) {
+    fields.push({ key: "next", label: "下一步", value: checkpointOverride.reason });
+  }
 
   if (nodeKind === "panel") {
     const panelId = (input.panelId ?? id).trim();

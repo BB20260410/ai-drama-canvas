@@ -64,14 +64,16 @@
           type="button"
           class="primary-start"
           data-testid="managed-canvas-primary-start"
-          :disabled="loading || workflowBusy || !unitDetail || generationProjectionDegraded || runtimeWriteBlocked"
+          :disabled="loading || workflowBusy || !unitDetail || generationProjectionDegraded || runtimeWriteBlocked || checkpointNewSlotBlocked"
           :title="generationProjectionDegraded
             ? generationProjectionHint
             : runtimeWriteBlocked
               ? runtimeWriteGateHint
+            : checkpointNewSlotBlocked
+              ? checkpointGateHint
             : (!unitDetail ? '请先从素材库添加 15 秒分镜' : undefined)"
           @click="primaryStart">
-          {{ generationProjectionDegraded ? "账本待恢复" : (workflowBusy ? "正在预检并记录派发…" : (unitDetail ? `准备并记录 ${unitDetail.panels.length} 格派发` : "准备派发")) }}
+          {{ generationProjectionDegraded ? "账本待恢复" : (checkpointNewSlotBlocked ? "六图闸未放行" : (workflowBusy ? "正在预检并记录派发…" : (unitDetail ? `准备并记录 ${unitDetail.panels.length} 格派发` : "准备派发"))) }}
         </button>
       </div>
     </header>
@@ -1115,6 +1117,15 @@ const localSourceTruthLabel = computed(() => {
  * 但必须关闭派发，不能把尚未验真的历史结果显示为正式素材。
  */
 const generationProjectionDegraded = computed(() => overview.value?.generationProjection?.status === "degraded");
+/** 已加载 overview 六图闸未放行时挡主按钮；overview 未投影不挡。 */
+const checkpointNewSlotBlocked = computed(() =>
+  overview.value?.checkpoint.newSlotDispatchAllowed === false);
+const checkpointGateHint = computed(() => {
+  const batch = overview.value?.checkpoint.blockingBatchNumber;
+  return batch != null
+    ? `六图闸未放行（batch ${batch}），先完成停检/Review（不派发）`
+    : "六图闸未放行，先完成停检/Review（不派发）";
+});
 const rawReferenceProjectionLoading = ref(false);
 const rawReferenceProjectionIssue = ref<string | undefined>();
 const generationProjectionHint = computed(() => {
@@ -2580,6 +2591,8 @@ const nodeActionPanel = computed(() => {
       isBusy: Boolean(selectedNodeBusy.value),
       unitGridNextActionCode: unitDetail.value?.nextAction.code,
       unitGridNextActionLabel: unitDetail.value?.nextAction.label,
+      checkpointNewSlotDispatchAllowed: overview.value?.checkpoint.newSlotDispatchAllowed,
+      checkpointBlockingBatchNumber: overview.value?.checkpoint.blockingBatchNumber,
     });
   }
   if (selection.value.kind === "unit") {
@@ -2593,6 +2606,8 @@ const nodeActionPanel = computed(() => {
       subtitle: selection.value.unit.episodeId,
       unitGridNextActionCode: sameUnit ? unitDetail.value?.nextAction.code : undefined,
       unitGridNextActionLabel: sameUnit ? unitDetail.value?.nextAction.label : undefined,
+      checkpointNewSlotDispatchAllowed: overview.value?.checkpoint.newSlotDispatchAllowed,
+      checkpointBlockingBatchNumber: overview.value?.checkpoint.blockingBatchNumber,
     });
   }
   if (selection.value.kind === "asset") {
@@ -2643,6 +2658,10 @@ function runNodeAction(code: StudioCanvasNodeActionCode): void {
     return;
   }
   if (code === "freeze-dispatch" && selection.value?.kind === "panel") {
+    if (checkpointNewSlotBlocked.value) {
+      errorMessage.value = checkpointGateHint.value;
+      return;
+    }
     emit("requestGeneration", {
       ...(unitDetail.value?.unit.id ? { unitId: unitDetail.value.unit.id } : {}),
       panelId: selection.value.panel.id,
@@ -6584,6 +6603,12 @@ async function primaryStart(): Promise<void> {
     if (generationProjectionDegraded.value) {
       errorMessage.value = generationProjectionHint.value;
       lastWorkflowRunSummary.value = "生成账本待恢复，未派发";
+      lastWorkflowFailed.value = true;
+      return;
+    }
+    if (checkpointNewSlotBlocked.value) {
+      errorMessage.value = checkpointGateHint.value;
+      lastWorkflowRunSummary.value = "六图闸未放行，未派发";
       lastWorkflowFailed.value = true;
       return;
     }

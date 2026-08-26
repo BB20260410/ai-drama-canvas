@@ -78,6 +78,46 @@ describe("studio-canvas-node-action-panel + status（Local #1 backlog）", () =>
     expect(planned.actions.some((a) => a.code === "freeze-dispatch" && a.enabled)).toBe(true);
   });
 
+  it("overview 六图闸未放行时 freeze-dispatch 禁用，未投影不挡，unit-grid wait 文案优先", () => {
+    const blocked = buildStudioCanvasNodeActionPanel({
+      kind: "panel",
+      id: "p1",
+      unitId: "u1",
+      panelId: "p1",
+      canFreezeDispatch: true,
+      checkpointNewSlotDispatchAllowed: false,
+      checkpointBlockingBatchNumber: 4,
+    });
+    expect(blocked.actions.find((a) => a.code === "freeze-dispatch")?.enabled).toBe(false);
+    expect(blocked.actions.find((a) => a.code === "freeze-dispatch")?.reason).toContain("batch 4");
+    expect(blocked.fields.some((f) => f.key === "next" && String(f.value).includes("六图闸未放行"))).toBe(true);
+
+    const unprojected = buildStudioCanvasNodeActionPanel({
+      kind: "panel",
+      id: "p1",
+      unitId: "u1",
+      panelId: "p1",
+      canFreezeDispatch: true,
+    });
+    expect(unprojected.actions.some((a) => a.code === "freeze-dispatch" && a.enabled)).toBe(true);
+    expect(unprojected.fields.some((f) => f.key === "next")).toBe(false);
+
+    const waitWins = buildStudioCanvasNodeActionPanel({
+      kind: "panel",
+      id: "p1",
+      unitId: "u1",
+      panelId: "p1",
+      canFreezeDispatch: true,
+      unitGridNextActionCode: "wait-or-reconcile-unit-grid-run",
+      unitGridNextActionLabel: "unit-grid 正在执行，等待结果或对账现有 run",
+      checkpointNewSlotDispatchAllowed: false,
+      checkpointBlockingBatchNumber: 4,
+    });
+    expect(waitWins.actions.find((a) => a.code === "freeze-dispatch")?.reason).toContain("等待结果");
+    expect(waitWins.actions.find((a) => a.code === "freeze-dispatch")?.reason).not.toContain("六图闸");
+    expect(waitWins.fields.some((f) => f.key === "next" && String(f.value).includes("等待结果"))).toBe(true);
+  });
+
   it("status store set/clear/isBusy", () => {
     const store = createStudioCanvasNodeStatusStore();
     store.set("panel:p1", { step: "image", message: "生图中" });

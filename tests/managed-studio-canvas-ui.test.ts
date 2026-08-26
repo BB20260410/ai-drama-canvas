@@ -386,6 +386,10 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain('code === "close-panel"');
     expect(canvas).toContain("unitGridNextActionCode: unitDetail.value?.nextAction.code");
     expect(canvas).toContain("unitGridNextActionLabel: unitDetail.value?.nextAction.label");
+    expect(canvas).toContain("overview.value?.checkpoint.newSlotDispatchAllowed");
+    expect(canvas).toContain("checkpointNewSlotBlocked");
+    expect(canvas).toContain("checkpointGateHint");
+    expect(canvas).toContain("六图闸未放行，未派发");
     expect(source("src/renderer/src/components/CanvasInspectorPanel.vue")).toContain('data-testid="managed-canvas-inspector-next"');
     expect(canvas).toContain("appearanceListElement.value?.scrollIntoView");
     expect(canvas).toContain('if (kind === "asset" || kind === "unit" || kind === "panel") actionPanelOpen.value = true');
@@ -466,6 +470,21 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).not.toContain("开始全部");
     expect(canvas).not.toContain("开始失败：");
     expect(canvas).toContain("派发准备失败：");
+  });
+
+  it("主按钮与节点 freeze-dispatch 复用已加载 overview 六图闸，零额外 IPC", () => {
+    const canvas = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(canvas).toContain("checkpointNewSlotBlocked");
+    expect(canvas).toContain("checkpointGateHint");
+    expect(canvas).toContain("overview.value?.checkpoint.newSlotDispatchAllowed");
+    expect(canvas).toContain("overview.value?.checkpoint.blockingBatchNumber");
+    expect(canvas).toContain("if (checkpointNewSlotBlocked.value)");
+    expect(canvas).toContain("六图闸未放行，未派发");
+    expect(canvas).toContain("六图闸未放行");
+    expect(canvas).toContain('code === "freeze-dispatch"');
+    expect(canvas).not.toContain("getStudioGenerationCheckpointControl");
+    expect(canvas).not.toContain("from \"@core/studio-generation-checkpoint");
+    expect(canvas).not.toContain("from \"@core/studio-generation-plan-draft");
   });
 
   it("P15：桌面端优先使用受管 Studio layout owner，添加单元后自动收起抽屉并适配画布", () => {
