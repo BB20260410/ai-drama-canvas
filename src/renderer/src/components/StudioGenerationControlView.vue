@@ -126,6 +126,18 @@
               data-testid="studio-pack-previous-standing">
               {{ frozenPackPreviousStandingLine }}
             </p>
+            <p
+              v-if="frozenPackLightingLine"
+              class="previous-standing"
+              data-testid="studio-pack-lighting">
+              {{ frozenPackLightingLine }}
+            </p>
+            <p
+              v-if="frozenPackCostumeLine"
+              class="previous-standing"
+              data-testid="studio-pack-costume">
+              {{ frozenPackCostumeLine }}
+            </p>
             <details v-if="historyTargetKind === 'panel' && isTechnicalGenerationMessage(detail.selectedPanel.generation.message)" class="technical-diagnostics">
               <summary data-testid="studio-generation-message-diagnostics">诊断详情</summary>
               <p><code>{{ detail.selectedPanel.generation.message }}</code></p>
@@ -146,6 +158,8 @@
                 <div><dt>连续性指纹</dt><dd><code>{{ shortHash(frozenPackIdentity.continuityFingerprint) }}</code></dd></div>
                 <div><dt>单元快照指纹</dt><dd><code>{{ shortHash(frozenPackIdentity.unitSnapshotFingerprint) }}</code></dd></div>
                 <div v-if="frozenPackPreviousStandingLine"><dt>前镜交接</dt><dd>{{ frozenPackPreviousStandingLine }}</dd></div>
+                <div v-if="frozenPackLightingLine"><dt>光线</dt><dd>{{ frozenPackLightingLine }}</dd></div>
+                <div v-if="frozenPackCostumeLine"><dt>服装</dt><dd>{{ frozenPackCostumeLine }}</dd></div>
               </dl>
             </details>
           </section>
@@ -227,7 +241,11 @@ import {
   loadDetachedUnknownNodeStates,
 } from "../studio-generation-refresh-controller";
 import {
+  formatFrozenPanelCostumeReadonlyLine,
+  formatFrozenPanelLightingReadonlyLine,
   formatPreviousStandingReadonlyLine,
+  frozenPanelCostumeFromAnyFrozenPack,
+  frozenPanelLightingFromAnyFrozenPack,
   previousStandingFromAnyFrozenPack,
   type StudioPanelStandingHandoff,
 } from "@core/studio-panel-standing";
@@ -297,6 +315,8 @@ type FrozenPackIdentityView = {
 const frozenPackIdentity = ref<FrozenPackIdentityView | null>(null);
 const frozenPackPreviousStanding = ref<StudioPanelStandingHandoff | null>(null);
 const frozenPackPreviousStandingLine = computed(() => formatPreviousStandingReadonlyLine(frozenPackPreviousStanding.value));
+const frozenPackLightingLine = ref<string | null>(null);
+const frozenPackCostumeLine = ref<string | null>(null);
 const frozenPackLoading = ref(false);
 const frozenPackError = ref("");
 let frozenPackToken = 0;
@@ -366,6 +386,8 @@ watch([selectedPackId, selectedPanelId, () => props.projectRoot], async () => {
   const token = ++frozenPackToken;
   frozenPackIdentity.value = null;
   frozenPackPreviousStanding.value = null;
+  frozenPackLightingLine.value = null;
+  frozenPackCostumeLine.value = null;
   frozenPackError.value = "";
   if (!packId) return;
   frozenPackLoading.value = true;
@@ -397,6 +419,12 @@ watch([selectedPackId, selectedPanelId, () => props.projectRoot], async () => {
       }
       : null;
     frozenPackPreviousStanding.value = previousStandingFromAnyFrozenPack(pack, selectedPanelId.value);
+    frozenPackLightingLine.value = formatFrozenPanelLightingReadonlyLine(
+      frozenPanelLightingFromAnyFrozenPack(pack, selectedPanelId.value),
+    );
+    frozenPackCostumeLine.value = formatFrozenPanelCostumeReadonlyLine(
+      frozenPanelCostumeFromAnyFrozenPack(pack, selectedPanelId.value),
+    );
     if (!pack) frozenPackError.value = "冻结包不存在或已损坏。";
   } catch (reason) {
     if (token !== frozenPackToken) return;
@@ -1106,6 +1134,8 @@ watch(() => props.projectRoot, () => {
   packCurrentness.value = {};
   frozenPackIdentity.value = null;
   frozenPackPreviousStanding.value = null;
+  frozenPackLightingLine.value = null;
+  frozenPackCostumeLine.value = null;
   frozenPackError.value = "";
   duduDetectionRoot = "";
   duduProject.value = null;

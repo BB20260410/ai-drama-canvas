@@ -114,6 +114,17 @@
         </header>
         <p class="handoff-note ready">{{ frozenPreviousStandingLine }} 历史身份经冻结包还原，不读 head。</p>
       </section>
+      <section
+        v-if="frozenLightingLine || frozenCostumeLine"
+        class="control-section previous-standing-section"
+        data-testid="studio-review-lighting-costume">
+        <header>
+          <div><span>光线 / 服装</span><h3>冻结宫格覆盖</h3></div>
+          <small>不是 BindingSet</small>
+        </header>
+        <p v-if="frozenLightingLine" class="handoff-note ready" data-testid="studio-review-lighting">{{ frozenLightingLine }} 历史身份经冻结包还原，不读 head。</p>
+        <p v-if="frozenCostumeLine" class="handoff-note ready" data-testid="studio-review-costume">{{ frozenCostumeLine }} 历史身份经冻结包还原，不读 head。</p>
+      </section>
 
       <section
         v-if="continuityCorrectionRows.length && canAppendContinuityCorrection"
@@ -488,7 +499,11 @@ import type { StudioContinuityField, StudioContinuityFieldState } from "@core/st
 import type { StudioContinuityReviewAssetControl, StudioContinuityReviewFieldStatus } from "@core/studio-continuity-review-control";
 import type { StudioGenerationReviewProjection } from "@core/studio-generation-review";
 import {
+  formatFrozenPanelCostumeReadonlyLine,
+  formatFrozenPanelLightingReadonlyLine,
   formatPreviousStandingReadonlyLine,
+  frozenPanelCostumeFromAnyFrozenPack,
+  frozenPanelLightingFromAnyFrozenPack,
   previousStandingFromAnyFrozenPack,
   type StudioPanelStandingHandoff,
 } from "@core/studio-panel-standing";
@@ -723,6 +738,8 @@ export default defineComponent({
     const focus = computed(() => props.focus);
     const frozenPreviousStanding = ref<StudioPanelStandingHandoff | null>(null);
     const frozenPreviousStandingLine = computed(() => formatPreviousStandingReadonlyLine(frozenPreviousStanding.value));
+    const frozenLightingLine = ref<string | null>(null);
+    const frozenCostumeLine = ref<string | null>(null);
     const reviewStandingPackId = computed(() =>
       props.focus?.packId
       ?? loadState.control?.review?.control.head?.packId
@@ -745,6 +762,8 @@ export default defineComponent({
       continuityCorrectionError.value = "";
       originalPreview.value = null;
       frozenPreviousStanding.value = null;
+      frozenLightingLine.value = null;
+      frozenCostumeLine.value = null;
       reviewStandingToken += 1;
       timelineOffset = 0;
       conflictOffset = 0;
@@ -756,14 +775,24 @@ export default defineComponent({
       const packId = reviewStandingPackId.value;
       const token = ++reviewStandingToken;
       frozenPreviousStanding.value = null;
+      frozenLightingLine.value = null;
+      frozenCostumeLine.value = null;
       if (!packId) return;
       try {
         const pack = await window.canvasApi.getStudioFrozenPack(props.projectRoot, packId);
         if (token !== reviewStandingToken) return;
         frozenPreviousStanding.value = previousStandingFromAnyFrozenPack(pack, reviewStandingPanelId.value);
+        frozenLightingLine.value = formatFrozenPanelLightingReadonlyLine(
+          frozenPanelLightingFromAnyFrozenPack(pack, reviewStandingPanelId.value),
+        );
+        frozenCostumeLine.value = formatFrozenPanelCostumeReadonlyLine(
+          frozenPanelCostumeFromAnyFrozenPack(pack, reviewStandingPanelId.value),
+        );
       } catch {
         if (token !== reviewStandingToken) return;
         frozenPreviousStanding.value = null;
+        frozenLightingLine.value = null;
+        frozenCostumeLine.value = null;
       }
     }, { immediate: true });
 
@@ -773,6 +802,8 @@ export default defineComponent({
       reviewSubmissionSequence += 1;
       reviewStandingToken += 1;
       frozenPreviousStanding.value = null;
+      frozenLightingLine.value = null;
+      frozenCostumeLine.value = null;
       releasePointerCleanups();
     });
     if (typeof window !== "undefined") {
@@ -1572,6 +1603,8 @@ export default defineComponent({
       timelinePageTotal,
       continuityHandoff,
       frozenPreviousStandingLine,
+      frozenLightingLine,
+      frozenCostumeLine,
       continuityCorrectionRows,
       canAppendContinuityCorrection,
       reviewMediaAvailable,

@@ -2096,7 +2096,11 @@ describe("受管画布侧栏列表视口剔除", () => {
     expect(inspector).toContain('data-testid="managed-canvas-inspector-diagnostics"');
     expect(inspector).toContain('data-testid="managed-canvas-inspector-composition"');
     expect(inspector).toContain('data-testid="managed-canvas-inspector-previous-standing"');
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-lighting"');
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-costume"');
     expect(inspector).toContain("panelPreviousStandingLine");
+    expect(inspector).toContain("panelFrozenLightingLine");
+    expect(inspector).toContain("panelFrozenCostumeLine");
     expect(inspector).not.toContain("evaluateStudioConsistency");
     expect(inspector).not.toContain("getStudioBindingControl");
     expect(inspector).not.toContain('role="dialog"');

@@ -77,6 +77,20 @@ export function parsePreviousStandingFromRenderedPrompt(
   };
 }
 
+/** 单镜包直接取 request；unit-grid 必须带 panelId，禁止猜第一格。不读 unit head。 */
+export function renderedPromptFromAnyFrozenPack(
+  pack: AnyFrozenPackStandingSource | null | undefined,
+  panelId?: string,
+): string | null {
+  if (!pack) return null;
+  const source = Array.isArray(pack.panels)
+    ? (panelId ? pack.panels.find((entry) => entry.panelId === panelId)?.panelPack : undefined)
+    : pack;
+  if (!source) return null;
+  const prompt = source.request?.modelPayload?.renderedPrompt;
+  return typeof prompt === "string" && prompt ? prompt : null;
+}
+
 export function previousStandingFromFrozenRenderedPrompt(
   pack: FrozenRenderedPromptPack | null | undefined,
 ): StudioPanelStandingHandoff | null {
@@ -93,13 +107,50 @@ export function previousStandingFromAnyFrozenPack(
   pack: AnyFrozenPackStandingSource | null | undefined,
   panelId?: string,
 ): StudioPanelStandingHandoff | null {
-  if (!pack) return null;
-  if (Array.isArray(pack.panels)) {
-    if (!panelId) return null;
-    const panel = pack.panels.find((entry) => entry.panelId === panelId);
-    return previousStandingFromFrozenRenderedPrompt(panel?.panelPack);
-  }
-  return previousStandingFromFrozenRenderedPrompt(pack);
+  const prompt = renderedPromptFromAnyFrozenPack(pack, panelId);
+  return prompt ? parsePreviousStandingFromRenderedPrompt(prompt) : null;
+}
+
+export function parseFrozenPanelLightingFromRenderedPrompt(renderedPrompt: string): string | null {
+  const match = /光线（宫格覆盖）：(.+)/u.exec(renderedPrompt);
+  const value = match?.[1]?.trim() ?? "";
+  return value || null;
+}
+
+export function parseFrozenPanelCostumeFromRenderedPrompt(renderedPrompt: string): string | null {
+  const match = /服装（宫格覆盖）：(.+)/u.exec(renderedPrompt);
+  const value = match?.[1]?.trim() ?? "";
+  return value || null;
+}
+
+export function frozenPanelLightingFromAnyFrozenPack(
+  pack: AnyFrozenPackStandingSource | null | undefined,
+  panelId?: string,
+): string | null {
+  const prompt = renderedPromptFromAnyFrozenPack(pack, panelId);
+  return prompt ? parseFrozenPanelLightingFromRenderedPrompt(prompt) : null;
+}
+
+export function frozenPanelCostumeFromAnyFrozenPack(
+  pack: AnyFrozenPackStandingSource | null | undefined,
+  panelId?: string,
+): string | null {
+  const prompt = renderedPromptFromAnyFrozenPack(pack, panelId);
+  return prompt ? parseFrozenPanelCostumeFromRenderedPrompt(prompt) : null;
+}
+
+export function formatFrozenPanelLightingReadonlyLine(
+  lighting: string | null | undefined,
+): string | null {
+  if (!lighting) return null;
+  return `冻结光线（宫格覆盖）：${lighting}。不是 BindingSet。`;
+}
+
+export function formatFrozenPanelCostumeReadonlyLine(
+  costume: string | null | undefined,
+): string | null {
+  if (!costume) return null;
+  return `冻结服装（宫格覆盖）：${costume}。不是 BindingSet。`;
 }
 
 /** 导演/审片只读行；无前镜行返回 null，不写「首格无前镜」以免冒充历史包。 */

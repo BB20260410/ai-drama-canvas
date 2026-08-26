@@ -749,6 +749,8 @@
         :character-view-slots="selectedCharacterViewSlots"
         :panel-previous-standing-line="inspectorPreviousStandingLine"
         :panel-previous-standing-source="inspectorPreviousStandingSource"
+        :panel-frozen-lighting-line="inspectorFrozenLightingLine"
+        :panel-frozen-costume-line="inspectorFrozenCostumeLine"
         @close="closeInspector"
         @focus-appearance="focusAppearance"
         @appearances-previous="appearancesPrevious"
@@ -813,8 +815,12 @@ import CanvasInspectorPanel from "./CanvasInspectorPanel.vue";
 import DirectorActionPanel from "./DirectorActionPanel.vue";
 import StudioGenerationTraceDrawer, { type StudioTraceDrawerModel } from "./StudioGenerationTraceDrawer.vue";
 import {
+  formatFrozenPanelCostumeReadonlyLine,
+  formatFrozenPanelLightingReadonlyLine,
   formatPreviousStandingReadonlyLine,
   formatUnitLockPreviousStandingLine,
+  frozenPanelCostumeFromAnyFrozenPack,
+  frozenPanelLightingFromAnyFrozenPack,
   previousStandingFromAnyFrozenPack,
 } from "@core/studio-panel-standing";
 import type { DirectorAction } from "../director-action-panel.js";
@@ -1956,11 +1962,15 @@ const selectedCharacterViewSlots = computed(() => {
 });
 const inspectorPreviousStandingLine = ref<string | null>(null);
 const inspectorPreviousStandingSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>(null);
+const inspectorFrozenLightingLine = ref<string | null>(null);
+const inspectorFrozenCostumeLine = ref<string | null>(null);
 let inspectorStandingToken = 0;
 watch([selection, unitDetail, () => props.projectRoot], async () => {
   const token = ++inspectorStandingToken;
   inspectorPreviousStandingLine.value = null;
   inspectorPreviousStandingSource.value = null;
+  inspectorFrozenLightingLine.value = null;
+  inspectorFrozenCostumeLine.value = null;
   if (selection.value?.kind !== "panel") return;
   const panel = selection.value.panel;
   const packId = unitDetail.value?.selectedPanel?.panel.id === panel.id
@@ -1976,6 +1986,12 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
           inspectorPreviousStandingLine.value = line;
           inspectorPreviousStandingSource.value = "frozen-rendered-prompt";
         }
+        inspectorFrozenLightingLine.value = formatFrozenPanelLightingReadonlyLine(
+          frozenPanelLightingFromAnyFrozenPack(pack, panel.id),
+        );
+        inspectorFrozenCostumeLine.value = formatFrozenPanelCostumeReadonlyLine(
+          frozenPanelCostumeFromAnyFrozenPack(pack, panel.id),
+        );
         return;
       }
     } catch {
@@ -3996,6 +4012,8 @@ function closeInspector(): void {
   inspectorStandingToken += 1;
   inspectorPreviousStandingLine.value = null;
   inspectorPreviousStandingSource.value = null;
+  inspectorFrozenLightingLine.value = null;
+  inspectorFrozenCostumeLine.value = null;
   void nextTick(() => restoreInspectorFlowFocus(nodeId));
 }
 

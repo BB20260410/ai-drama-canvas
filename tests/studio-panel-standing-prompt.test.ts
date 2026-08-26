@@ -19,6 +19,12 @@ import {
   formatWizardLockPreviousCostumeLine,
   wizardPreviousLightingForPanel,
   wizardPreviousCostumeForPanel,
+  parseFrozenPanelLightingFromRenderedPrompt,
+  parseFrozenPanelCostumeFromRenderedPrompt,
+  frozenPanelLightingFromAnyFrozenPack,
+  frozenPanelCostumeFromAnyFrozenPack,
+  formatFrozenPanelLightingReadonlyLine,
+  formatFrozenPanelCostumeReadonlyLine,
 } from "../src/core/studio-panel-standing.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -175,6 +181,28 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(formatWizardLockPreviousLightingLine({ panelIndex: 1, sceneLighting: "室内火光" })).toContain("不能当 generation-ready");
     expect(formatWizardLockPreviousCostumeLine({ panelIndex: 1, costumeState: "深灰祭服" })).toContain("不是 BindingSet");
     expect(formatWizardLockPreviousLightingLine(null)).toBeNull();
+    expect(parseFrozenPanelLightingFromRenderedPrompt("只生成一张 9:16 竖屏")).toBeNull();
+    expect(parseFrozenPanelLightingFromRenderedPrompt("光线（宫格覆盖）：室内火光\n尾")).toBe("室内火光");
+    expect(parseFrozenPanelCostumeFromRenderedPrompt("服装（宫格覆盖）：深灰祭服")).toBe("深灰祭服");
+    expect(frozenPanelLightingFromAnyFrozenPack({
+      request: { modelPayload: { renderedPrompt: "光线（宫格覆盖）：室内火光" } },
+    })).toBe("室内火光");
+    expect(frozenPanelLightingFromAnyFrozenPack({
+      schemaVersion: 5,
+      panels: [{
+        panelId: "p2",
+        panelPack: { request: { modelPayload: { renderedPrompt: "光线（宫格覆盖）：室内火光" } } },
+      }],
+    })).toBeNull();
+    expect(frozenPanelCostumeFromAnyFrozenPack({
+      schemaVersion: 5,
+      panels: [{
+        panelId: "p2",
+        panelPack: { request: { modelPayload: { renderedPrompt: "服装（宫格覆盖）：深灰祭服" } } },
+      }],
+    }, "p2")).toBe("深灰祭服");
+    expect(formatFrozenPanelLightingReadonlyLine("室内火光")).toContain("不是 BindingSet");
+    expect(formatFrozenPanelCostumeReadonlyLine("")).toBeNull();
   });
 
   it("session-snapshot / 生成控制 / 审片从冻结提示词露前镜，不读 head", () => {
@@ -189,13 +217,18 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(mcp).toContain("只从该包 renderedPrompt 还原");
     const control = readFileSync(path.join(repoRoot, "src/renderer/src/components/StudioGenerationControlView.vue"), "utf8");
     expect(control).toContain('data-testid="studio-pack-previous-standing"');
+    expect(control).toContain('data-testid="studio-pack-lighting"');
+    expect(control).toContain('data-testid="studio-pack-costume"');
     expect(control).toContain("previousStandingFromAnyFrozenPack(pack, selectedPanelId.value)");
+    expect(control).toContain("frozenPanelLightingFromAnyFrozenPack(pack, selectedPanelId.value)");
     expect(control).toContain("formatPreviousStandingReadonlyLine");
     expect(control).not.toContain("evaluateStudioConsistency");
     expect(control).not.toContain("getStudioBindingControl");
     const review = readFileSync(path.join(repoRoot, "src/renderer/src/components/StudioContinuityReviewView.vue"), "utf8");
     expect(review).toContain('data-testid="studio-review-previous-standing"');
+    expect(review).toContain('data-testid="studio-review-lighting-costume"');
     expect(review).toContain("previousStandingFromAnyFrozenPack(pack, reviewStandingPanelId.value)");
+    expect(review).toContain("frozenPanelLightingFromAnyFrozenPack(pack, reviewStandingPanelId.value)");
     expect(review).toContain("focus?.packId");
     expect(review).not.toContain("evaluateStudioConsistency(");
     expect(review).not.toContain("getStudioBindingControl");
@@ -225,6 +258,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(brief).toContain("UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE");
     const canvas = readFileSync(path.join(repoRoot, "src/renderer/src/components/ManagedStudioCanvasView.vue"), "utf8");
     expect(canvas).toContain("previousStandingFromAnyFrozenPack(pack, panel.id)");
+    expect(canvas).toContain("frozenPanelLightingFromAnyFrozenPack(pack, panel.id)");
+    expect(canvas).toContain("formatFrozenPanelLightingReadonlyLine");
     expect(canvas).toContain("formatUnitLockPreviousStandingLine");
     expect(canvas).toContain("frozen-rendered-prompt");
     expect(canvas).toContain("getStudioTrace");
