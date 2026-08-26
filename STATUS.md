@@ -7,8 +7,9 @@
 | status | `阻塞`（§1.3 by-id / 诊断懒展开 / lean 身份 + 身份只读打开 + 时间线账本批读只读旁路 + 历史 PASS 活库只读 + Linux 真投影 sqlite 接线 + 零 mock inspect + Wave 7 画布媒体热路径已落地；Darwin CI `43945a2`/`2d8ce47`/`4b1824a` 已绿；整计划仍 `部分完成`）。§1 八条 1/2/4/7/8 已完成，3/5/6 部分完成。等待 owner。禁止写「运行速度已关账」 |
 | plan | `docs/PLAN_运行速度与内存占用长期执行_20260825.md` |
 | wave1a | `resolveApprovedTimelineFastMode`：省略 / undefined → true；仅显式 false 走 full |
-| models | 本 Cloud 无 `novel_chat.py` / `env.local` / grok / Key → 外部席 **未能实调**，未伪造 |
+| models | TokenRouter CLI 已装到 `~/.grok/bin`（仅 `--role tr`）；用户已跳过 Cloud Secret → 外部席真请求 **未开始**，未伪造。禁止再索要同一 Key |
 | isolation | 未扫正式工程；未写账本；未弹窗；未重做 T23 SQL / N124 CV |
+| cloud_env | 本 run 无 linked environment。`scripts/cloud-agent-install.sh` 幂等两遍 PASS（`npm ci` + 可选 CLI；不要求 Key）。Secret / 本机填入已跳过，不再挡环境关账 |
 | evidence | `docs/evidence/runtime-perf-memory-wave1*.json`、`wave2*`（含 `wave2c`、`wave2-bundle-approved-bound`、`wave2-unitids-by-id`、`wave2-diagnostics-lazy-open`、`wave2-episode-lean-identities`、`wave2-identity-readonly-sql`、`wave2-ledger-readonly-sql`、`wave2-historical-facts-readonly`、`wave2-projection-readonly-sql`、`wave2-projection-unmocked-inspect`、`wave2f-reference-cache-lru`）、`wave3*`、`wave4a`–`wave4f`、`wave4-capabilities-deferred-engine`、`wave4-novel-analysis-lazy`、`wave4-capabilities-settings-thin`、`wave5a`–`wave5e`、`wave5e-project-switch-evict`、`wave5e-stale-writeback-guard`、`wave5e-darwin-ci`、`wave5-list-flip-source-contract`、`wave5-list-flip-protocol-classify`、`wave5-list-flip-darwin-ci-379df38`、`wave6a`–`wave6c`、`wave6-reverify`、`wave6-reverify-expanded`、`wave6-reverify-after-lean`、`wave6-reverify-after-readonly`、`wave6-reverify-after-unmocked-inspect`、`wave6-darwin-ci-0b46327`、`wave6-darwin-ci-e1ea3f1`、`wave6-darwin-ci-36abafb`、`wave6-darwin-ci-2d8ce47`、`wave7-runtime-hotpath`、`sqlite-busy-wall-flake`、`sqlite-shm-binding-race` |
 | wave4b | story/adaptation/novel-agent 经 withX 动态 import；story.ts 顶栏已卸 mammoth（docx 分支动态加载）。doctor 仍会 `import("mammoth")` 探测；snapshot 会 withStory，doctor 会 withStory+withAdaptation |
 | wave4c | video-package / Higgsfield queue+video / dudu / local-creative 经 withX。mcp-projection 仍静态（同步消毒、无重依赖）。调用对应控制面/写命令仍会加载 |

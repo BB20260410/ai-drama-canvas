@@ -27,4 +27,12 @@ describe("TokenRouter Cloud CLI 源码合同", () => {
     expect(source("scripts/tokenrouter/novel_chat.py")).toContain('--role tr');
     expect(source("scripts/install-tokenrouter-cli.sh")).toContain('"$dest/tr_chat"');
   });
+
+  it("Cloud 引导不要求 TokenRouter Key，且缺脚本时仍可 npm ci", () => {
+    const text = source("scripts/cloud-agent-install.sh");
+    expect(text).toContain("npm ci");
+    expect(text).toContain("install-tokenrouter-cli.sh");
+    expect(text).toContain("不要求 TOKENROUTER_API_KEY");
+    expect(text).toMatch(/if \[\[ -f scripts\/install-tokenrouter-cli\.sh \]\]/u);
+  });
 });

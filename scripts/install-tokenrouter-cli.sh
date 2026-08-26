@@ -35,5 +35,5 @@ echo "installed $dest/novel_chat.py"
 if [[ -f "${HOME}/.grok/env.local" ]]; then
   echo "env.local present (chmod 600)"
 else
-  echo "env.local absent; export TOKENROUTER_API_KEY or fill Cloud Secret"
+  echo "env.local absent; TokenRouter live calls stay NOT_RUN until TOKENROUTER_API_KEY is present"
 fi
