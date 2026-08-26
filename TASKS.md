@@ -4,7 +4,7 @@
 
 - status: `阻塞`（本 Cloud；整计划 `部分完成`）。§1.3 by-id + 诊断懒展开 + lean 季集身份 + 身份只读 + 账本批读只读 + 历史 PASS 活库只读 + Linux 真投影 sqlite 接线 + 零 mock inspect + Wave 7 画布媒体热路径已落地；Darwin CI `43945a2`/`2d8ce47`/`4b1824a` 已绿。等待 owner：P7 owner / 安装版 T23 / 列表 GUI 探针
 - plan: `docs/PLAN_运行速度与内存占用长期执行_20260825.md`
-- [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席本环境未跑）
+- [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席 2026-08-26 已实调，主审无 must-fix；`python3 scripts/external-seat-review.py --brief <简报> -o /tmp/seat-review`）
 - [x] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
 - [x] Wave 1-B：full 仅 CLI `report-approved-timeline-full` + 投影 `durationMs`；日常诊断保持 fast
 - [x] Wave 1-C：定向测试 + typecheck:app

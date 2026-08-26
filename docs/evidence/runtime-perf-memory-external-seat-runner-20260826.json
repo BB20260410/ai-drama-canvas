@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "0-external-seat-runner",
+  "recordedAt": "2026-08-26T17:35:00Z",
+  "change": {
+    "kind": "tooling-and-docs",
+    "sourceCodeChanged": false,
+    "productRuntimeUnchanged": true,
+    "note": "按千问主审执行：不拆 command-bus ledger，不全量异步化 rebuildGraph。勾选 Wave 0 外部模型席。落地仓库入口 scripts/external-seat-review.py（默认 glm/deepseek/qwen；--seats 子集；--with-doubao 可选；429/500 重试；只读 ARK_API_KEY / QWEN_TOKEN_PLAN_API_KEY）。未改 src/、recipe、2048、120s、T23 SQL、checkpoint。"
+  },
+  "rejectedKnives": [
+    {
+      "knife": "dynamic-import studio-generation-ledger from command-bus",
+      "verdict": "否决",
+      "reason": "红线写路径。主审无 must-fix。"
+    },
+    {
+      "knife": "convert remaining synchronous rebuildGraph to rAF",
+      "verdict": "否决",
+      "reason": "大量同步 rebuildGraph 有意保留。主审无 must-fix。"
+    }
+  ],
+  "verification": {
+    "typecheckApp": "NOT_RUN_docs_and_script_only",
+    "sourceContract": {
+      "files": [
+        "tests/external-seat-review-source-contract.test.ts",
+        "tests/tokenrouter-cli-source-contract.test.ts"
+      ],
+      "result": "2 files / 4 tests PASS"
+    },
+    "liveSmoke": {
+      "command": "python3 scripts/external-seat-review.py --brief <one-line> --seats qwen --timeout-sec 90",
+      "chief": "qwen3.8-max-preview",
+      "ok": true,
+      "reply": "千问已通",
+      "keysInOutput": false
+    }
+  },
+  "section1": [
+    { "id": 1, "gate": "default fastMode true", "verdict": "已完成" },
+    { "id": 2, "gate": "full only explicit CLI + durationMs", "verdict": "已完成" },
+    { "id": 3, "gate": "36-unit screen does not materialize 2500", "verdict": "部分完成" },
+    { "id": 4, "gate": "MCP cold start lazy editor/adaptation/novel", "verdict": "已完成" },
+    { "id": 5, "gate": "thumbnail LRU URL-only; list original count 0", "verdict": "部分完成" },
+    { "id": 6, "gate": "T23 gates do not regress", "verdict": "部分完成" },
+    { "id": 7, "gate": "per-wave evidence; no 2026-08-11 final overwrite", "verdict": "已完成" },
+    { "id": 8, "gate": "no official bypass / no owner rebuild / no GUI", "verdict": "已完成" }
+  ],
+  "not": [
+    "installed-T23",
+    "list-gui-probe",
+    "P7-owner",
+    "formal-project-scan",
+    "wave5-parent-check",
+    "plan-complete"
+  ],
+  "sessionVerdict": {
+    "mustFix": false,
+    "didNotImplementDeepSeekMustFix": true,
+    "wave0ExternalSeat": "已完成",
+    "plan": "部分完成",
+    "earliest": "等待 owner：安装版 T23 / 列表 GUI 探针 / P7 owner"
+  }
+}
