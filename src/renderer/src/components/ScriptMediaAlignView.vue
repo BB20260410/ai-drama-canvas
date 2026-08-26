@@ -8,6 +8,7 @@ import type { StudioProductionUnitSummary } from "@core/studio-production";
 import {
   formatPanelCoverageMarks,
   pickFirstCoveredPanel,
+  pickFirstMissingPanel,
   type ScriptLibraryIndex,
   type ScriptSpanMediaMap,
   type UnitPanelMediaEntry,
@@ -167,6 +168,7 @@ async function loadAlign(): Promise<void> {
     ]);
     board.value = nextBoard;
     ssl5Plan.value = nextPlan;
+    await revealSsl5Focus(nextBoard, nextPlan);
   } catch (reason) {
     report(reason);
   } finally {
@@ -414,6 +416,20 @@ async function materializeWizard(): Promise<void> {
   } finally {
     actionLoading.value = "";
   }
+}
+
+async function revealSsl5Focus(nextBoard: ScriptMediaAlignBoard, nextPlan: Ssl5MissingToGenPlan): Promise<void> {
+  const focusRow = nextPlan.focusUnitId
+    ? nextBoard.rows.find((row) => row.unitId === nextPlan.focusUnitId)
+    : undefined;
+  if (!focusRow) return;
+  selectedAlignRow.value = focusRow;
+  selectedAlignPanel.value = (
+    nextPlan.focusPanelId
+      ? focusRow.panels.find((panel) => panel.panelId === nextPlan.focusPanelId)
+      : undefined
+  ) ?? pickFirstMissingPanel(focusRow.panels) ?? pickFirstCoveredPanel(focusRow.panels) ?? null;
+  await loadAlignPreview(selectedAlignPanel.value?.rawSha256 ?? focusRow.rawSha256);
 }
 
 async function loadAlignPreview(rawSha256: string | null | undefined): Promise<void> {

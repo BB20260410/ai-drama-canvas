@@ -51,6 +51,13 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("align-panel-list");
     expect(vue).toContain("selectAlignPanel");
     expect(vue).toContain("formatPanelCoverageMarks");
+    expect(vue).toContain("revealSsl5Focus");
+    expect(vue).toContain("pickFirstMissingPanel");
+    const loadAlign = handlerBody(vue, "async function loadAlign()", "async function bootstrap(");
+    expect(loadAlign).toContain("await revealSsl5Focus(nextBoard, nextPlan)");
+    expect(loadAlign.indexOf("ssl5Plan.value = nextPlan")).toBeLessThan(
+      loadAlign.indexOf("await revealSsl5Focus(nextBoard, nextPlan)"),
+    );
   });
 
   it("导入/物化在进行中 fail-closed：actionLoading 在首个 await 之前置位，按钮禁用并给出大白话原因，连点不会重复写入", () => {
