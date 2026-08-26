@@ -150,6 +150,15 @@ export function pickFirstCoveredPanel(panels: UnitPanelMediaEntry[]): UnitPanelM
   return panels.find((panel) => panel.hasMedia) ?? panels[0];
 }
 
+/** 生图下一步：第一张缺图宫格。全覆盖则无。 */
+export function pickFirstMissingPanel<T extends { panelId: string; panelIndex: number; hasMedia: boolean }>(
+  panels: T[],
+): T | undefined {
+  return [...panels]
+    .filter((panel) => !panel.hasMedia)
+    .sort((a, b) => a.panelIndex - b.panelIndex)[0];
+}
+
 /** 导演面宫格覆盖标记。不推导 nextAction。 */
 export function formatPanelCoverageMarks(
   panels: Array<{ panelIndex: number; hasMedia: boolean }>,

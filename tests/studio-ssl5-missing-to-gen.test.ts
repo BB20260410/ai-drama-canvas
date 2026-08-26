@@ -11,6 +11,19 @@ import {
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const source = (relative: string) => readFileSync(path.join(root, relative), "utf8");
 
+function panel(partial: Partial<ScriptMediaAlignRow["panels"][number]> & Pick<ScriptMediaAlignRow["panels"][number], "panelId" | "panelIndex" | "hasMedia">): ScriptMediaAlignRow["panels"][number] {
+  return {
+    title: partial.title ?? partial.panelId,
+    sourceSpans: [],
+    packId: null,
+    packFingerprint: null,
+    rawSha256: partial.hasMedia ? "raw" : null,
+    labeledSha256: null,
+    generationRunId: null,
+    ...partial,
+  };
+}
+
 function row(partial: Partial<ScriptMediaAlignRow> & Pick<ScriptMediaAlignRow, "unitId" | "sequence" | "status">): ScriptMediaAlignRow {
   return {
     title: partial.title ?? partial.unitId,
@@ -47,7 +60,12 @@ describe("SSL-5 缺图下一步纯函数", () => {
         rows: [
           row({ unitId: "u-covered", sequence: 1, status: "covered" }),
           row({ unitId: "u-early", sequence: 2, status: "covered", isEarliest: true }),
-          row({ unitId: "u-missing", sequence: 3, status: "missing-all" }),
+          row({
+            unitId: "u-missing",
+            sequence: 3,
+            status: "missing-all",
+            panels: [panel({ panelId: "p2", panelIndex: 2, hasMedia: false }), panel({ panelId: "p1", panelIndex: 1, hasMedia: false })],
+          }),
           row({ unitId: "u-partial", sequence: 4, status: "partial" }),
         ],
       },
@@ -56,6 +74,9 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.schemaVersion).toBe(SSL5_PLAN_SCHEMA_VERSION);
     expect(plan.kind).toBe("studio-ssl5-missing-to-gen-plan");
     expect(plan.focusUnitId).toBe("u-early");
+    expect(plan.focusPanelId).toBeNull();
+    expect(plan.items.find((item) => item.unitId === "u-missing")?.focusPanelId).toBe("p1");
+    expect(plan.items.find((item) => item.unitId === "u-missing")?.focusPanelIndex).toBe(1);
     expect(plan.items.map((item) => item.unitId)).toEqual(["u-early", "u-missing", "u-partial"]);
     expect(plan.items[0]?.recommendedPath).toEqual([
       "binding-ready?",
@@ -81,6 +102,26 @@ describe("SSL-5 缺图下一步纯函数", () => {
     });
     expect(plan.focusUnitId).toBe("u-a");
     expect(plan.items[0]?.priority).toBe("missing-all");
+  });
+
+  it("无 earliest 的部分覆盖焦点落到第一张缺图宫格", () => {
+    const plan = buildSsl5PlanFromBoard("/tmp/iso", { season: "S1", episode: "E2" }, {
+      earliestUnitId: null,
+      missingAllCount: 0,
+      partialCount: 1,
+      rows: [row({
+        unitId: "u-partial",
+        sequence: 1,
+        status: "partial",
+        panels: [
+          panel({ panelId: "p1", panelIndex: 1, hasMedia: true }),
+          panel({ panelId: "p2", panelIndex: 2, hasMedia: false }),
+        ],
+      })],
+    });
+    expect(plan.focusUnitId).toBe("u-partial");
+    expect(plan.focusPanelId).toBe("p2");
+    expect(plan.focusPanelIndex).toBe(2);
   });
 
   it("全 covered 且无 earliest 则无焦点", () => {
@@ -113,6 +154,7 @@ describe("SSL-5 入口源码合同", () => {
     const vue = source("src/renderer/src/components/ScriptMediaAlignView.vue");
     const director = source("src/renderer/src/director-action-panel.ts");
     expect(vue).toContain('data-testid="ssl5-missing-to-gen-plan"');
+    expect(vue).toContain('data-testid="ssl5-focus-panel"');
     expect(vue).toContain("planSsl5MissingToGen");
     expect(vue).toContain("不自动 dispatch");
     expect(director).toContain("ssl5-missing-to-gen-plan");

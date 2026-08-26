@@ -630,6 +630,7 @@ function shortSha(value: string | null | undefined): string {
         <div v-if="ssl5Plan" class="ssl5-plan" data-testid="ssl5-missing-to-gen-plan">
           <b>SSL-5 下一步</b>
           <span data-testid="ssl5-focus-unit">{{ ssl5Plan.focusUnitId || "无缺图焦点" }}</span>
+          <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-panel">G{{ ssl5Plan.focusPanelIndex }} {{ ssl5Plan.focusPanelId }}</span>
           <span>缺图 {{ ssl5Plan.missingAllCount }} · 部分 {{ ssl5Plan.partialCount }}</span>
           <ol v-if="ssl5FocusPath.length">
             <li v-for="step in ssl5FocusPath" :key="step">{{ step }}</li>

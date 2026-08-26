@@ -9,6 +9,7 @@ import {
   type ScriptMediaAlignBoard,
   type ScriptMediaAlignRow,
 } from "./studio-script-media-align.js";
+import { pickFirstMissingPanel } from "./studio-script-library-projection.js";
 
 export const SSL5_PLAN_SCHEMA_VERSION = 1 as const;
 
@@ -21,6 +22,8 @@ export interface Ssl5MissingToGenPlanItem {
   recommendedPath: string[];
   packId: string | null;
   generationRunId: string | null;
+  focusPanelId: string | null;
+  focusPanelIndex: number | null;
 }
 
 export interface Ssl5MissingToGenPlan {
@@ -31,6 +34,8 @@ export interface Ssl5MissingToGenPlan {
   episode: string;
   earliestUnitId: string | null;
   focusUnitId: string | null;
+  focusPanelId: string | null;
+  focusPanelIndex: number | null;
   missingAllCount: number;
   partialCount: number;
   items: Ssl5MissingToGenPlanItem[];
@@ -61,6 +66,7 @@ export function buildSsl5PlanFromBoard(
       if (row.unitId === board.earliestUnitId) priority = "earliest";
       else if (row.status === "missing-all") priority = "missing-all";
       else if (row.status === "partial") priority = "partial";
+      const missingPanel = pickFirstMissingPanel(row.panels ?? []);
       return {
         unitId: row.unitId,
         sequence: row.sequence,
@@ -70,6 +76,8 @@ export function buildSsl5PlanFromBoard(
         recommendedPath: [...SSL5_RECOMMENDED_PATH],
         packId: row.packId,
         generationRunId: row.generationRunId,
+        focusPanelId: missingPanel?.panelId ?? null,
+        focusPanelIndex: missingPanel?.panelIndex ?? null,
       };
     })
     .sort((left, right) => {
@@ -91,6 +99,8 @@ export function buildSsl5PlanFromBoard(
     episode: query.episode,
     earliestUnitId: board.earliestUnitId,
     focusUnitId: focus?.unitId ?? null,
+    focusPanelId: focus?.focusPanelId ?? null,
+    focusPanelIndex: focus?.focusPanelIndex ?? null,
     missingAllCount: board.missingAllCount,
     partialCount: board.partialCount,
     items,

@@ -8,6 +8,7 @@ import {
   formatPanelCoverageMarks,
   normalizeSourceSpans,
   pickFirstCoveredPanel,
+  pickFirstMissingPanel,
   pickRawLabeledFromResults,
   resolveScriptSpanMediaMap,
   selectLatestPanelPack,
@@ -222,6 +223,8 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(panels[1]).toMatchObject({ panelId: "p2", hasMedia: true, rawSha256: "raw-p2", packId: "pack-p2" });
     expect(pickFirstCoveredPanel(panels)?.panelId).toBe("p2");
     expect(formatPanelCoverageMarks(panels)).toBe("G1缺 G2有");
+    expect(pickFirstMissingPanel(panels)?.panelId).toBe("p1");
+    expect(pickFirstMissingPanel(panels.filter((panel) => panel.hasMedia))).toBeUndefined();
   });
 });
 
