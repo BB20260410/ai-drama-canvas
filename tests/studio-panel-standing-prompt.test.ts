@@ -424,6 +424,9 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(snapshot).toContain("formatFrozenPanelBeatReadonlyLine");
     expect(snapshot).toContain("generationPlanDraft");
     expect(snapshot).toContain("composeStudioGenerationPlanDraft");
+    expect(snapshot).toContain("consistencyPeek");
+    expect(snapshot).toContain("sessionConsistencyPeekFromVerdict");
+    expect(snapshot).toContain('import("./studio-consistency-evaluator.js")');
     expect(snapshot).not.toContain("studio-ssl5-missing-to-gen");
     expect(snapshot).toContain("readStudioSceneBackReferences");
     expect(snapshot).toContain("sceneBackReferences");
@@ -439,6 +442,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(mcp).toContain("styleLockLine");
     expect(mcp).toContain("beatLine");
     expect(mcp).toContain("generationPlanDraft");
+    expect(mcp).toContain("consistencyPeek");
+    expect(mcp).toContain("未评估 ≠ 无法检查");
     expect(mcp).toContain("15s 节拍");
     expect(mcp).toContain("sceneBackReferences");
     expect(mcp).toContain("只从该包 renderedPrompt 还原");

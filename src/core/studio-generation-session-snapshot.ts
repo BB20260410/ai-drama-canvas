@@ -4,6 +4,7 @@ import { withStudioProductionProjectionBundle } from "./studio-readonly-diagnost
 import {
   listStudioGenerationLatestUnitGridRuns,
   listStudioGenerationPacksByUnit,
+  listStudioGenerationPanelHistory,
   readAnyStudioGenerationFrozenPack,
   type AnyStudioGenerationFreezePack,
 } from "./studio-generation-ledger.js";
@@ -37,6 +38,22 @@ import type { NextShotContinuitySnapshot } from "./studio-next-shot-continuity.j
 import type { StudioPostResultObservedActualState } from "./studio-post-result-observation.js";
 
 export const STUDIO_GENERATION_SESSION_SNAPSHOT_SCHEMA_VERSION = 1 as const;
+
+export type SessionConsistencyPeek = {
+  status: "cached" | "unevaluated";
+  verdict?: "consistent" | "needs-review" | "drifted" | "not-checkable";
+  generationRunId: string | null;
+};
+
+/** 只读 peek 投影。无 run / 未入 LRU → unevaluated（≠ 无法检查）。不 evaluate 像素。 */
+export function sessionConsistencyPeekFromVerdict(
+  generationRunId: string | null | undefined,
+  verdict?: SessionConsistencyPeek["verdict"],
+): SessionConsistencyPeek {
+  if (!generationRunId) return { status: "unevaluated", generationRunId: null };
+  if (verdict) return { status: "cached", verdict, generationRunId };
+  return { status: "unevaluated", generationRunId };
+}
 
 export interface StudioGenerationSessionReference {
   assetId: string;
@@ -151,6 +168,11 @@ export interface StudioGenerationSessionSnapshot {
    * 不进 fingerprint。不执行、不派发。
    */
   generationPlanDraft: StudioGenerationPlanDraft;
+  /**
+   * 一致性四态只读 peek：按当前宫格 newest-first 结果 run，否则整板 latest run。
+   * 只读进程内 LRU；未评估 ≠ 无法检查。不进 fingerprint。不 evaluate 像素。机器不自动 Review PASS。
+   */
+  consistencyPeek: SessionConsistencyPeek;
   camera: {
     current?: {
       shotComposition: string;
@@ -329,6 +351,20 @@ export async function buildStudioGenerationSessionSnapshot(
     : persistedPack;
   const frozenPanel = panelPack(pack, selectedPanelId);
   const latestRun = (await listStudioGenerationLatestUnitGridRuns(projectRoot, [query.unitId]))[0]?.latestRun;
+  const panelHistoryRunId = (
+    await listStudioGenerationPanelHistory(projectRoot, {
+      unitId: query.unitId,
+      panelId: selectedPanelId,
+      order: "newest-first",
+      limit: 1,
+    })
+  ).items[0]?.generationRunId;
+  const consistencyPeekRunId = panelHistoryRunId ?? latestRun?.generationRunId;
+  const { peekStudioConsistencyVerdictByRunId } = await import("./studio-consistency-evaluator.js");
+  const consistencyPeek = sessionConsistencyPeekFromVerdict(
+    consistencyPeekRunId,
+    consistencyPeekRunId ? peekStudioConsistencyVerdictByRunId(consistencyPeekRunId) : undefined,
+  );
 
   const frozenReferences = frozenPanel
     ? [
@@ -475,6 +511,7 @@ export async function buildStudioGenerationSessionSnapshot(
     })(),
     styleLockLine: formatFrozenStyleLockReadonlyLine(styleLockRefsFromAnyFrozenPack(frozenPanel)),
     beatLine: formatFrozenPanelBeatReadonlyLine(frozenPanelBeatFromAnyFrozenPack(frozenPanel)),
+    consistencyPeek,
     generationPlanDraft: refineStudioGenerationPlanDraftIfUnitGridBlocking(
       query.panelId
         ? composeStudioGenerationPlanDraft({

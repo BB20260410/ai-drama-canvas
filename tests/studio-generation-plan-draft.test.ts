@@ -25,6 +25,7 @@ import {
   unitGridNextActionBlockingKind,
   unitGridStatusBlockingKind,
 } from "../src/core/studio-generation-plan-draft.js";
+import { sessionConsistencyPeekFromVerdict } from "../src/core/studio-generation-session-snapshot.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const source = (relative: string) => readFileSync(path.join(root, relative), "utf8");
@@ -314,6 +315,12 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(snapshot).toContain('pack.provenance !== "asset-binding-set"');
     expect(snapshot).toContain('persisted.provenance !== "unit-grid-binding-sets"');
     expect(snapshot).toContain("generationPlanDraft");
+    expect(snapshot).toContain("consistencyPeek");
+    expect(snapshot).toContain("sessionConsistencyPeekFromVerdict");
+    expect(snapshot).toContain("listStudioGenerationPanelHistory");
+    expect(snapshot).toContain('order: "newest-first"');
+    expect(snapshot).toContain('import("./studio-consistency-evaluator.js")');
+    expect(snapshot).toContain("peekStudioConsistencyVerdictByRunId");
     expect(snapshot).toContain("styleLockLine");
     expect(snapshot).toContain("styleLockRefsFromAnyFrozenPack(frozenPanel)");
     expect(snapshot).toContain("不进 fingerprint");
@@ -323,8 +330,11 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(snapshot).not.toContain("studio-unit-grid-generation");
     expect(snapshot).not.toContain("execute_command");
     expect(snapshot).not.toContain("dispatch_studio_generation_pack");
+    expect(snapshot).not.toContain("evaluateStudioConsistency");
+    expect(snapshot).not.toContain('from "./studio-consistency-evaluator.js"');
     const digest = snapshot.slice(snapshot.indexOf("fingerprint: digest({"), snapshot.indexOf("topRiskCode: body.topRisk?.code ?? null,"));
     expect(digest).not.toContain("generationPlanDraft");
+    expect(digest).not.toContain("consistencyPeek");
     const helperStart = snapshot.indexOf("async function persistedUnitGridPackIdForDraft");
     const helperEnd = snapshot.indexOf("function panelPack(", helperStart);
     const helper = snapshot.slice(helperStart, helperEnd);
@@ -534,5 +544,33 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(mcp).toContain("要看最新请 newest-first");
     expect(mcp).toContain("history order=newest-first");
     expect(mcp).toContain("Review 时禁止再 dispatch");
+  });
+
+  it("session-snapshot 一致性四态 peek 不 evaluate、不进 fingerprint", () => {
+    expect(sessionConsistencyPeekFromVerdict(undefined)).toEqual({
+      status: "unevaluated",
+      generationRunId: null,
+    });
+    expect(sessionConsistencyPeekFromVerdict("run-1")).toEqual({
+      status: "unevaluated",
+      generationRunId: "run-1",
+    });
+    expect(sessionConsistencyPeekFromVerdict("run-1", "needs-review")).toEqual({
+      status: "cached",
+      verdict: "needs-review",
+      generationRunId: "run-1",
+    });
+    expect(sessionConsistencyPeekFromVerdict("run-1", "drifted").status).toBe("cached");
+    const snapshot = source("src/core/studio-generation-session-snapshot.ts");
+    expect(snapshot).toContain("consistencyPeek");
+    expect(snapshot).toContain("未评估 ≠ 无法检查");
+    expect(snapshot).toContain("peekStudioConsistencyVerdictByRunId");
+    expect(snapshot).not.toContain("evaluateStudioConsistency");
+    expect(snapshot).not.toContain("getStudioBindingControl");
+    const digest = snapshot.slice(snapshot.indexOf("fingerprint: digest({"), snapshot.indexOf("topRiskCode: body.topRisk?.code ?? null,"));
+    expect(digest).not.toContain("consistencyPeek");
+    const mcp = source("src/mcp/server.ts");
+    expect(mcp).toContain("consistencyPeek，按当前宫格 newest-first 结果 run");
+    expect(mcp).toContain("机器不自动 Review PASS");
   });
 });
