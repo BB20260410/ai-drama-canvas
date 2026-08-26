@@ -177,7 +177,7 @@
               v-if="generationPlanDraft.ready && generationPlanDraft.nodes?.[0]"
               class="previous-standing"
               data-testid="studio-generation-plan-nodes">
-              {{ generationPlanDraft.nodes[0].unitId }} {{ generationPlanDraft.nodes[0].panelId }}
+              {{ formatGenerationPlanDraftNode(generationPlanDraft.nodes[0]) }}
             </p>
             <p
               v-if="controlSceneBackReferenceNote"
@@ -341,7 +341,7 @@ import {
   type StudioPanelStandingHandoff,
 } from "@core/studio-panel-standing";
 import { formatCharacterBackReferences, formatPropBackReferences, formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
-import { composeStudioGenerationPlanDraft } from "@core/studio-generation-plan-draft";
+import { composeStudioGenerationPlanDraft, type StudioGenerationPlanDraftNode } from "@core/studio-generation-plan-draft";
 
 const props = defineProps<{
   projectRoot: string;
@@ -575,18 +575,36 @@ const selectedPackId = computed(() => {
   return generation?.status === "ready" ? generation.packId : "";
 });
 
-/** 只认当前宫格自己的单镜冻结包；整板 history pack 不当单镜节点。不执行、不派发。 */
+/** 已落盘整板 pack：只认 history / 计划节点，不用 readiness 候选。 */
+function persistedUnitGridPackIdForDraft(): string | null {
+  return history.value[0]?.packId
+    ?? (progress.value?.nodes ?? []).find((node) => (
+      node.targetKind === "unit-grid" && node.unitId === selectedUnitId.value && node.packId
+    ))?.packId
+    ?? null;
+}
+
+function formatGenerationPlanDraftNode(node: StudioGenerationPlanDraftNode): string {
+  return "targetKind" in node && node.targetKind === "unit-grid"
+    ? `unit-grid ${node.unitId}`
+    : `${node.unitId} ${node.panelId}`;
+}
+
+/** 单镜只认当前宫格 ready pack；整板只认已落盘 unit-grid pack。不执行、不派发。 */
 const generationPlanDraft = computed(() => {
+  if (historyTargetKind.value === "unit-grid") {
+    return composeStudioGenerationPlanDraft({
+      focusUnitId: selectedUnitId.value || null,
+      focusPanelId: null,
+      focusPackId: persistedUnitGridPackIdForDraft(),
+      targetKind: "unit-grid",
+    });
+  }
   const generation = detail.value?.selectedPanel?.generation;
-  const panelPackId = historyTargetKind.value === "unit-grid"
-    ? null
-    : generation?.status === "ready" && generation.packId
-      ? generation.packId
-      : null;
   return composeStudioGenerationPlanDraft({
     focusUnitId: selectedUnitId.value || null,
     focusPanelId: selectedPanelId.value || null,
-    focusPackId: panelPackId,
+    focusPackId: generation?.status === "ready" && generation.packId ? generation.packId : null,
   });
 });
 

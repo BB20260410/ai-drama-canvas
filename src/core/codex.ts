@@ -87,6 +87,7 @@ import {
   AI_CANVAS_PROTOCOL_VERSION,
 } from "./release-manifest.js";
 import { withStudioRequestSchemaCache } from "./studio-request-schema-cache.js";
+import { composeStudioGenerationPlanDraft } from "./studio-generation-plan-draft.js";
 
 export { AI_CANVAS_PROTOCOL_VERSION } from "./release-manifest.js";
 
@@ -402,6 +403,25 @@ function isStudioUnitGridGenerationPack(
   return pack.schemaVersion === 5
     && pack.provenance === "unit-grid-binding-sets"
     && pack.target.targetKind === "unit-grid";
+}
+
+/** 已落盘 pack 起草 create-plan 节点；不执行、不派发。 */
+function composePersistedPackGenerationPlanDraft(
+  pack: StudioGenerationFreezePack | StudioUnitGridGenerationFreezePack,
+) {
+  if (isStudioUnitGridGenerationPack(pack)) {
+    return composeStudioGenerationPlanDraft({
+      focusUnitId: pack.target.unitId,
+      focusPanelId: null,
+      focusPackId: pack.id,
+      targetKind: "unit-grid",
+    });
+  }
+  return composeStudioGenerationPlanDraft({
+    focusUnitId: pack.target.unitId,
+    focusPanelId: pack.target.panelId,
+    focusPackId: pack.id,
+  });
 }
 
 function sameSortedStrings(left: string[], right: string[]): boolean {
@@ -941,6 +961,7 @@ export async function getStudioGenerationControlEnvelope(
             codex: buildStudioUnitGridAgentImagegenBrief(pack, "codex"),
             grok: buildStudioUnitGridAgentImagegenBrief(pack, "grok"),
           },
+          generationPlanDraft: composePersistedPackGenerationPlanDraft(pack),
           dispatchPayloadTemplate: {
             command: "dispatch_studio_generation_pack" as const,
             required: ["packId", "packFingerprint", "generationRunId", "provider", "expectedRevision"],
@@ -982,6 +1003,7 @@ export async function getStudioGenerationControlEnvelope(
           codex: buildStudioAgentImagegenBrief(pack, "codex"),
           grok: buildStudioAgentImagegenBrief(pack, "grok"),
         },
+        generationPlanDraft: composePersistedPackGenerationPlanDraft(pack),
         dispatchPayloadTemplate: {
           command: "dispatch_studio_generation_pack" as const,
           required: ["packId", "packFingerprint", "generationRunId", "provider", "expectedRevision"],

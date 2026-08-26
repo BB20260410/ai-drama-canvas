@@ -49,6 +49,28 @@ describe("create-plan 只读草稿纯函数", () => {
       note: "只起草建计划节点；不执行、不派发。派发须用计划推导 runId。",
     });
   });
+
+  it("整板已有冻结 pack 时 ready 出 unit-grid 节点，无 pack 失败关闭", () => {
+    expect(composeStudioGenerationPlanDraft({
+      focusUnitId: "u1",
+      focusPanelId: null,
+      focusPackId: "pack-grid",
+      targetKind: "unit-grid",
+    })).toEqual({
+      command: STUDIO_GENERATION_PLAN_COMMAND,
+      ready: true,
+      blockedReason: null,
+      nodes: [{ targetKind: "unit-grid", unitId: "u1" }],
+      dispatch: false,
+      note: "只起草建计划节点；不执行、不派发。派发须用计划推导 runId。",
+    });
+    expect(composeStudioGenerationPlanDraft({
+      focusUnitId: "u1",
+      focusPanelId: "p1",
+      focusPackId: null,
+      targetKind: "unit-grid",
+    }).blockedReason).toContain("禁止用单镜或同行 preview pack 冒充整板节点");
+  });
 });
 
 describe("create-plan 草稿接线源码合同", () => {
@@ -77,18 +99,46 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(digest).not.toContain("generationPlanDraft");
   });
 
-  it("生成控制只认当前宫格单镜 ready pack，整板 pack 不当节点", () => {
+  it("生成控制整板出 unit-grid 节点，不用 readiness 候选", () => {
     const control = source("src/renderer/src/components/StudioGenerationControlView.vue");
     expect(control).toContain("composeStudioGenerationPlanDraft");
     expect(control).toContain('data-testid="studio-generation-plan-draft"');
     expect(control).toContain('data-testid="studio-generation-plan-nodes"');
-    expect(control).toContain('historyTargetKind.value === "unit-grid"');
+    expect(control).toContain("persistedUnitGridPackIdForDraft");
+    expect(control).toContain("formatGenerationPlanDraftNode");
     expect(control).toContain("generation?.status === \"ready\" && generation.packId");
     expect(control).not.toContain("dispatch_studio_generation_pack");
+    const persistStart = control.indexOf("function persistedUnitGridPackIdForDraft");
+    const persistEnd = control.indexOf("function formatGenerationPlanDraftNode", persistStart);
+    const persist = control.slice(persistStart, persistEnd);
+    expect(persist).toContain("history.value[0]?.packId");
+    expect(persist).toContain('node.targetKind === "unit-grid"');
+    expect(persist).not.toContain("unitGridReadinessPackId");
+    expect(persist).not.toContain("selectedPackId");
     const computedStart = control.indexOf("const generationPlanDraft = computed");
-    const computedEnd = control.indexOf("});", computedStart);
+    const computedEnd = control.indexOf("// P24 R5-F2", computedStart);
     const computed = control.slice(computedStart, computedEnd);
-    expect(computed).toContain("? null");
+    expect(computed).toContain('targetKind: "unit-grid"');
+    expect(computed).toContain("persistedUnitGridPackIdForDraft()");
+    expect(computed).not.toContain("unitGridReadinessPackId");
     expect(computed).not.toContain("selectedPackId");
+    expect(control).toContain("`unit-grid ${node.unitId}`");
+  });
+
+  it("pack envelope 已落盘包起草 create-plan，不拉对照板", () => {
+    const codex = source("src/core/codex.ts");
+    expect(codex).toContain("composeStudioGenerationPlanDraft");
+    expect(codex).toContain("composePersistedPackGenerationPlanDraft");
+    expect(codex).toContain('targetKind: "unit-grid"');
+    expect(codex).toContain("generationPlanDraft: composePersistedPackGenerationPlanDraft(pack)");
+    expect(codex).not.toContain("studio-ssl5-missing-to-gen");
+    expect(codex).not.toContain("studio-script-media-align");
+    const helperStart = codex.indexOf("function composePersistedPackGenerationPlanDraft");
+    const helperEnd = codex.indexOf("function sameSortedStrings", helperStart);
+    const helper = codex.slice(helperStart, helperEnd);
+    expect(helper).toContain("pack.id");
+    expect(helper).toContain("pack.target.panelId");
+    expect(helper).not.toContain("unitGridReadinessPackId");
+    expect(helper).not.toContain("candidate.packId");
   });
 });
