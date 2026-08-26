@@ -17,6 +17,7 @@
 - [x] 剧本库 coveredMediaCount 不再恒为 0
 - [x] 对照所选宫格挂只读四态 peek
 - [x] 站位/构图只读演示（对照侧栏露出 shotComposition / visualAction；无正式工程真实验证）
+- [x] 对照宫格前镜交接 + 运镜/光线/快照资产提及（不是 BindingSet；不 dispatch）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
