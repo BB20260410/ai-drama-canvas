@@ -48,6 +48,7 @@
 - [x] 对照/SSL-5/阅读器/向导/检查器/生成控制/审片/session-snapshot 扩写格镜头类型（只解析已有「镜头类型：」行；锁版 shot_type 为可选列；审片只认冻结包；不写新冻结行；整板 brief 最后一条仍是前镜句；≠ BindingSet）
 - [x] 对照/SSL-5/阅读器/向导/检查器/生成控制/审片/session-snapshot 15s 节拍（只读冻结包 target 起止秒，不写新冻结行；无包检查器/生成控制用驾驶舱已有 start/end/duration，不再开 lock-overlay timing SQL；审片只认冻结包；整板 brief 最后一条仍是前镜句；≠ BindingSet）
 - [x] unit-grid Agent brief.BEATS 带 startSeconds/endSeconds/shotType（promptContractText 含起止秒与原镜/扩写；不改冻结 renderedPrompt；templateId / schemaVersion 不变；整板 brief 最后一条仍是前镜句）
+- [x] 单镜 Agent brief 带 shotTypeLine / beatLine（只从冻结包 renderedPrompt / target 还原；无扩写/原镜或无时长则为 null；unit-grid 无 panelId 不猜第一格；不改 renderedPrompt）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825

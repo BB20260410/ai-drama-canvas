@@ -1,0 +1,38 @@
+{
+  "id": "goal-panel-brief-shot-type-beat-20260826",
+  "kind": "panel-agent-brief-shot-type-beat",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T20:55:00.000Z",
+  "scope": "Single-panel StudioAgentImagegenBrief now exposes shotTypeLine and beatLine from the frozen pack only (renderedPrompt 镜头类型 line / panel.shotType, and target unitLocalStartSeconds/unitLocalEndSeconds/durationSeconds). Unit-grid shaped packs without panelId do not guess the first panel. Does not rewrite freeze renderedPrompt or change brief schemaVersion.",
+  "invariants": {
+    "readsFrozenPackOnly": true,
+    "doesNotChangeRenderedPrompt": true,
+    "doesNotReadUnitHead": true,
+    "doesNotGuessFirstPanel": true,
+    "doesNotChangeDashboardProjection": true,
+    "doesNotDispatch": true,
+    "briefSchemaVersionUnchanged": 1
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/studio-unit-grid-brief-contract.test.ts",
+        "tests/studio-scene-backrefs-readonly-sql.test.ts"
+      ],
+      "result": "3 files / 18 tests PASS"
+    },
+    "commit": "85254b0"
+  },
+  "notClaimed": [
+    "15s beat fully solved",
+    "shot-type / extension fully solved",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
