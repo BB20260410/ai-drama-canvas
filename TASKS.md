@@ -13,7 +13,7 @@
 - [x] episode-unit-media-map 按 panel 读 pack（unit-grid 不得复制到所有宫格）
 - [x] 对照表展开宫格行（把 per-panel 真相露到导演面）
 - [x] SSL-5 焦点落到第一张缺图宫格（不 dispatch）
-- [ ] 打开对照自动露出 SSL-5 焦点宫格
+- [x] 打开对照自动露出 SSL-5 焦点宫格
 - [ ] 剧本库 coveredMediaCount 不再恒为 0
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 

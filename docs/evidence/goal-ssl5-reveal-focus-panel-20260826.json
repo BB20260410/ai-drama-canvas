@@ -1,0 +1,26 @@
+{
+  "id": "goal-ssl5-reveal-focus-panel-20260826",
+  "createdAt": "2026-08-26T18:08:30.000Z",
+  "kind": "ssl5-reveal-focus-panel-on-align",
+  "conclusion": "PASS",
+  "scope": "loadAlign reveals SSL-5 focus unit/panel preview; unselected panels do not bind images; no dispatch",
+  "invariants": {
+    "revealAfterPlanAssigned": true,
+    "selectedPreviewOnly": true,
+    "doesNotDispatch": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/use-virtual-list-lru-hotkeys.test.ts"
+      ],
+      "result": "5 files / 32 tests PASS"
+    }
+  },
+  "notClaimed": ["installed T23", "100% fit", "runtime speed closed"]
+}
