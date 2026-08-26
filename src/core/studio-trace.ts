@@ -27,6 +27,10 @@ import {
   type StudioDetachedGenerationUnknownObservation,
 } from "./studio-generation-ledger.js";
 import type { StudioGenerationFreezePack } from "./studio-generation.js";
+import {
+  previousStandingsFromFrozenPanelPacks,
+  type FrozenPanelStandingRow,
+} from "./studio-panel-standing.js";
 import type { StudioUnitGridGenerationFreezePack } from "./studio-unit-grid-generation.js";
 import {
   getStudioAssetBindingSetCurrentness,
@@ -147,6 +151,11 @@ export interface StudioGenerationTrace {
   historicalEvidence?: StudioHistoricalGenerationEvidenceRecord;
   /** 仅在存在时返回；空项目保持既有 P24 投影逐字节兼容。 */
   detachedUnknownObservations?: StudioDetachedGenerationUnknownObservation[];
+  /**
+   * 锁版前镜：只从该包 renderedPrompt 还原，不读 unit head。
+   * 仅当至少一格含「前镜交接」行时返回，以免改历史 P24 投影形状。
+   */
+  previousStandings?: FrozenPanelStandingRow[];
 }
 
 function selectorKeys(selector: Record<string, unknown>): string[] {
@@ -402,6 +411,7 @@ export async function getStudioGenerationTrace(
     listStudioDetachedGenerationUnknownObservations(projectRoot, { unitId: pack.target.unitId }),
   ]);
   const reviewsBox = await collectTraceReviews(projectRoot, runsBox.runs.map((run) => run.runId), TRACE_REVIEWS_CAP);
+  const previousStandings = previousStandingsFromFrozenPanelPacks(panelPacks);
   const panels: StudioGenerationTracePanelIdentity[] = panelPacks.map((panelPack) => ({
     panelId: panelPack.target.panelId,
     panelIndex: panelPack.target.panelIndex,
@@ -460,6 +470,7 @@ export async function getStudioGenerationTrace(
     reviewsTruncated: reviewsBox.truncated,
     ...(historicalEvidence ? { historicalEvidence } : {}),
     ...(detachedUnknownObservations.length > 0 ? { detachedUnknownObservations } : {}),
+    ...(previousStandings.length > 0 ? { previousStandings } : {}),
   };
 }
 

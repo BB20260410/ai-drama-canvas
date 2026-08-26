@@ -9,6 +9,7 @@ import {
   pickPreviousPanelStanding,
   previousStandingFromAnyFrozenPack,
   previousStandingFromFrozenRenderedPrompt,
+  previousStandingsFromFrozenPanelPacks,
   formatUnitLockPreviousStandingLine,
 } from "../src/core/studio-panel-standing.js";
 
@@ -114,6 +115,16 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(formatPreviousStandingReadonlyLine(null)).toBeNull();
     expect(formatUnitLockPreviousStandingLine(parsed)).toContain("不能当 generation-ready");
     expect(formatUnitLockPreviousStandingLine(null)).toBeNull();
+    expect(previousStandingsFromFrozenPanelPacks([
+      { target: { panelId: "p1" }, request: { modelPayload: { renderedPrompt: "只生成一张" } } },
+      { target: { panelId: "p2" }, request: { modelPayload: { renderedPrompt: `头\n${line}\n尾` } } },
+    ])).toEqual([{
+      panelId: "p2",
+      previousStanding: { ...parsed, source: "frozen-rendered-prompt" },
+    }]);
+    expect(previousStandingsFromFrozenPanelPacks([
+      { target: { panelId: "p1" }, request: { modelPayload: { renderedPrompt: "只生成一张" } } },
+    ])).toEqual([]);
   });
 
   it("session-snapshot / 生成控制 / 审片从冻结提示词露前镜，不读 head", () => {
@@ -149,5 +160,13 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(canvas).toContain("frozen-rendered-prompt");
     expect(canvas).not.toContain("evaluateStudioConsistency(");
     expect(canvas).not.toContain("getStudioBindingControl");
+    const trace = readFileSync(path.join(repoRoot, "src/core/studio-trace.ts"), "utf8");
+    expect(trace).toContain("previousStandingsFromFrozenPanelPacks(panelPacks)");
+    expect(trace).toContain("previousStandings.length > 0 ? { previousStandings }");
+    expect(trace).toContain("不读 unit head");
+    expect(trace).not.toContain("getCurrentStudioPanelAssetBindingSet");
+    const mcpTrace = readFileSync(path.join(repoRoot, "src/mcp/server.ts"), "utf8");
+    expect(mcpTrace).toContain("previousStandings");
+    expect(mcpTrace).toContain("无该行则省略");
   });
 });

@@ -120,3 +120,30 @@ export function formatUnitLockPreviousStandingLine(
 
 export const UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE =
   "若 previousStandings、promptContract.BEATS[].previousStanding 或 renderedPrompt 含「前镜交接」，必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。";
+
+export type FrozenPanelStandingRow = {
+  panelId: string;
+  previousStanding: StudioPanelStandingHandoff & { source: "frozen-rendered-prompt" };
+};
+
+/**
+ * 追溯/brief 共用：只从各格冻结 renderedPrompt 还原。
+ * 无「前镜交接」行的格不进数组；全空则调用方应省略字段，保持历史投影兼容。
+ */
+export function previousStandingsFromFrozenPanelPacks(
+  packs: ReadonlyArray<{
+    target?: { panelId?: string };
+    request?: { modelPayload?: { renderedPrompt?: string } };
+  }>,
+): FrozenPanelStandingRow[] {
+  const rows: FrozenPanelStandingRow[] = [];
+  for (const pack of packs) {
+    const parsed = previousStandingFromFrozenRenderedPrompt(pack);
+    if (!parsed) continue;
+    rows.push({
+      panelId: typeof pack.target?.panelId === "string" ? pack.target.panelId : "",
+      previousStanding: { ...parsed, source: "frozen-rendered-prompt" },
+    });
+  }
+  return rows;
+}
