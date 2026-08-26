@@ -55,6 +55,7 @@
 - [x] session-snapshot 无 panelId 露出 unit-grid create-plan 草稿；单镜/整板 readiness next 含 create-plan；生成控制露出命令名（只认账本已落盘 pack，不猜第一格，不执行、不 dispatch；schemaVersion 仍为 1）
 - [x] 驾驶舱 unit-grid nextAction：已落盘 pack 无计划 → create-plan；readiness 候选不当冻结包（不执行、不 dispatch）
 - [x] earliest 只对一个 pending 单元按落盘 pack/计划区分 freeze/plan/dispatch（全槽位仍不读 pack；只读开库；statusLine 带 code；不执行、不 dispatch；schemaVersion 仍为 1）
+- [x] 对照/SSL-5/阅读器/向导/检查器/生成控制/审片/session-snapshot/brief 风格锁只读露出（只认已有 category=style 控制参考；不开 category=style 回指；不写新冻结「风格：」行；不加第 8 槽；审片只认冻结包；向导不自动 loadAlign；整板 brief 最后一条仍是前镜句；≠ BindingSet）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
