@@ -1,0 +1,31 @@
+{
+  "id": "goal-align-panel-composition-20260826",
+  "createdAt": "2026-08-26T18:13:30.000Z",
+  "kind": "align-panel-composition-readonly",
+  "conclusion": "PASS",
+  "scope": "Align selected-panel sidebar shows shotComposition and visualAction from unit snapshot; source-contract only, no live standing verification",
+  "invariants": {
+    "fieldsFromSnapshotPanel": true,
+    "doesNotInventStanding": true,
+    "doesNotDispatch": true,
+    "doesNotEvaluatePixels": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts"
+      ],
+      "result": "4 files / 29 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "standing fully solved",
+    "real-generation constraint evidence",
+    "installed T23",
+    "100% fit"
+  ]
+}
