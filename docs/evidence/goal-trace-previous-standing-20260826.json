@@ -1,0 +1,41 @@
+{
+  "id": "goal-trace-previous-standing-20260826",
+  "createdAt": "2026-08-26T18:57:00.000Z",
+  "kind": "get-studio-trace-previous-standings-readonly",
+  "conclusion": "PASS",
+  "scope": "get_studio_trace / getStudioGenerationTrace projects previousStandings only from this pack's renderedPrompt. Rows without a 前镜交接 line are omitted; an all-empty list omits the field so historical P24 projection shape stays compatible. Does not read unit head, evaluate pixels, call Binding inspect, or dispatch.",
+  "invariants": {
+    "parsesFrozenPromptOnly": true,
+    "omitsFieldWhenEmpty": true,
+    "doesNotReadUnitHead": true,
+    "doesNotRewriteP24Golden": true,
+    "doesNotDispatch": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotCallBindingInspect": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/studio-unit-grid-brief-contract.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-continuity-review-ui.test.ts",
+        "tests/studio-generation-plan-ui.test.ts"
+      ],
+      "result": "5 files / 34 tests PASS"
+    },
+    "commit": "8d58367"
+  },
+  "notClaimed": [
+    "real-generation constraint evidence",
+    "standing fully solved",
+    "director open-trace UI calls get_studio_trace",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed",
+    "P24 golden updated"
+  ]
+}
