@@ -453,7 +453,9 @@ describe("SSL-5 入口源码合同", () => {
     expect(vue).toContain('data-testid="ssl5-focus-previous-lighting"');
     expect(vue).toContain('data-testid="ssl5-focus-previous-costume"');
     expect(vue).toContain('data-testid="ssl5-generation-plan-draft"');
+    expect(vue).toContain('data-testid="ssl5-generation-plan-command"');
     expect(vue).toContain('data-testid="ssl5-generation-plan-nodes"');
+    expect(vue).toContain("formatSsl5PlanDraftNode");
     expect(vue).toContain("不执行 create-plan");
     expect(vue).not.toContain("dispatch_studio_generation_pack");
     expect(ssl5).toContain("formatSceneBackReferenceLineFromBoard");

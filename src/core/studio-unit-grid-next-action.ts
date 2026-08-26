@@ -7,6 +7,7 @@
 
 export type StudioUnitGridLedgerPhase =
   | "ready-to-freeze"
+  | "ready-to-plan"
   | "ready-to-dispatch"
   | "in-flight"
   | "generation-unknown"
@@ -30,6 +31,8 @@ export interface StudioUnitGridNextActionProjection {
 
 export function projectStudioUnitGridNextAction(input: {
   hasCurrentPack: boolean;
+  /** 已落盘 pack 上是否已有 generate plan。未传时保持旧行为（有包即派发）。 */
+  hasCurrentPlan?: boolean;
   /** 已派发且尚未终态的 run；必须等待/恢复，不能把它误投影成可再次派发。 */
   hasActiveRun?: boolean;
   callStatus?: "generation_unknown" | "not-invoked" | "result-committed" | "owner-abandoned" | null;
@@ -125,6 +128,16 @@ export function projectStudioUnitGridNextAction(input: {
   }
 
   if (input.hasCurrentPack) {
+    if (input.hasCurrentPlan === false) {
+      return {
+        phase: "ready-to-plan",
+        code: "create-unit-grid-plan",
+        label: "建立 unit-grid 生成计划（不派发）",
+        forbidPanelGenerate: true,
+        allowNewUnitGridRun: true,
+        targetKind: "unit-grid",
+      };
+    }
     return {
       phase: "ready-to-dispatch",
       code: "dispatch-unit-grid",

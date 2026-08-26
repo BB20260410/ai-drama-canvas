@@ -42,6 +42,7 @@ import type {
 } from "@core/studio-storyboard-wizard";
 import type { StudioScriptProductUiApi } from "../material-studio-ui-contract";
 import type { Ssl5MissingToGenPlan } from "@core/studio-ssl5-missing-to-gen";
+import type { StudioGenerationPlanDraftNode } from "@core/studio-generation-plan-draft";
 import { listOrWorkbenchPreviewUrl } from "../studio-list-preview-url";
 import StudioGenerationTraceDrawer, { type StudioTraceDrawerModel } from "./StudioGenerationTraceDrawer.vue";
 import {
@@ -183,6 +184,12 @@ const ssl5FocusPath = computed(() => {
   if (!ssl5Plan.value?.focusUnitId) return [];
   return ssl5Plan.value.items.find((item) => item.unitId === ssl5Plan.value?.focusUnitId)?.recommendedPath ?? [];
 });
+
+function formatSsl5PlanDraftNode(node: StudioGenerationPlanDraftNode): string {
+  return "targetKind" in node && node.targetKind === "unit-grid"
+    ? `unit-grid ${node.unitId}`
+    : `${node.unitId} ${node.panelId}`;
+}
 
 async function loadAlign(): Promise<void> {
   if (!season.value.trim() || !episode.value.trim()) {
@@ -1108,7 +1115,8 @@ function shortSha(value: string | null | undefined): string {
           <span>缺图 {{ ssl5Plan.missingAllCount }} · 部分 {{ ssl5Plan.partialCount }}</span>
           <span v-if="ssl5Plan.focusPackId" data-testid="ssl5-focus-pack">{{ ssl5Plan.focusPackId }}</span>
           <span data-testid="ssl5-generation-plan-draft">{{ ssl5Plan.generationPlanDraft.ready ? "可建立计划（不派发）" : ssl5Plan.generationPlanDraft.blockedReason }}</span>
-          <span v-if="ssl5Plan.generationPlanDraft.ready && ssl5Plan.generationPlanDraft.nodes?.[0]" data-testid="ssl5-generation-plan-nodes">{{ ssl5Plan.generationPlanDraft.nodes[0].unitId }} {{ ssl5Plan.generationPlanDraft.nodes[0].panelId }}</span>
+          <span v-if="ssl5Plan.generationPlanDraft.ready" data-testid="ssl5-generation-plan-command">{{ ssl5Plan.generationPlanDraft.command }}</span>
+          <span v-if="ssl5Plan.generationPlanDraft.ready && ssl5Plan.generationPlanDraft.nodes?.[0]" data-testid="ssl5-generation-plan-nodes">{{ formatSsl5PlanDraftNode(ssl5Plan.generationPlanDraft.nodes[0]) }}</span>
           <ol v-if="ssl5FocusPath.length">
             <li v-for="step in ssl5FocusPath" :key="step">{{ step }}</li>
           </ol>
