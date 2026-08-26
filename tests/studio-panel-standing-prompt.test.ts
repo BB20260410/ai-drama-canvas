@@ -218,6 +218,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(snapshot).not.toContain("evaluateStudioConsistency");
     const mcp = readFileSync(path.join(repoRoot, "src/mcp/server.ts"), "utf8");
     expect(mcp).toContain("previousStanding");
+    expect(mcp).toContain("frozenPanelLighting");
+    expect(mcp).toContain("frozenPanelCostume");
     expect(mcp).toContain("只从该包 renderedPrompt 还原");
     const control = readFileSync(path.join(repoRoot, "src/renderer/src/components/StudioGenerationControlView.vue"), "utf8");
     expect(control).toContain('data-testid="studio-pack-previous-standing"');

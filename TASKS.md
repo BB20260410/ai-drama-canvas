@@ -33,6 +33,7 @@
 - [x] 15s 向导 G2+ 露出前镜；物化 prompt 写入「前镜交接」行（首格不写）
 - [x] 15s 向导可填本格光线/服化；物化 prompt 非空才写；G2+ 只读上一格光线/服化（不自动写入、不加冻结前镜光线行）
 - [x] 画布检查器 / 生成控制 / 审片只从已加载冻结包露「光线/服装（宫格覆盖）」（unit-grid 必须 panelId；不改 dashboard 投影）
+- [x] session-snapshot 投影 frozenPanelLighting / frozenPanelCostume（无该行则 null，不进 fingerprint；不读 head）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
