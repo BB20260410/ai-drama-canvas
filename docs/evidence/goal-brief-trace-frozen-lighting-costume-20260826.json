@@ -1,0 +1,41 @@
+{
+  "id": "goal-brief-trace-frozen-lighting-costume-20260826",
+  "kind": "agent-brief-trace-frozen-lighting-costume-readonly",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T19:24:55.000Z",
+  "scope": "Single-panel Agent brief adds frozenPanelLighting/frozenPanelCostume parsed from renderedPrompt. Unit-grid brief adds frozenPanelOverlays only when at least one panel has 光线/服装（宫格覆盖）; BEATS optionally include instruction sceneLighting/costumeState in promptContractText. get_studio_trace adds frozenPanelOverlays only when non-empty so historical P24 projection shape stays unchanged. Tool notes tell the agent to keep those overlays. Does not rewrite renderedPrompt. Does not read unit head. Not BindingSet; does not dispatch.",
+  "invariants": {
+    "parsesFrozenOverlayLinesOnly": true,
+    "emptyOverlaysOmitTraceField": true,
+    "emptyOverlaysOmitUnitGridBriefField": true,
+    "doesNotRewriteRenderedPrompt": true,
+    "doesNotReadUnitHead": true,
+    "doesNotChangeP24Golden": true,
+    "doesNotDispatch": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/studio-unit-grid-brief-contract.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/material-studio-ui-contract.test.ts"
+      ],
+      "result": "6 files / 132 tests PASS"
+    },
+    "commit": "f48a84b"
+  },
+  "notClaimed": [
+    "P24 golden update",
+    "real-generation constraint evidence",
+    "lighting or costume fully solved",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
