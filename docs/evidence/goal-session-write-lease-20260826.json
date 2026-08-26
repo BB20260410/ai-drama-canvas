@@ -1,0 +1,56 @@
+{
+  "id": "goal-session-write-lease-20260826",
+  "kind": "session-snapshot-write-lease-peek",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T23:50:00.000Z",
+  "scope": "buildStudioGenerationSessionSnapshot projects writeLease via withStudioProjectWriteLease → getStudioProjectWriteLeaseReadOnly. Copies held / holderId / denialHint / local line only. Does not expose token, does not enter fingerprint, does not change nextAction or generationPlanDraft.ready. Read failure fail-closes as unheld + default acquire-lease line. schemaVersion remains 1. Vue / generation-control do not value-import session-snapshot. Does not acquire, dispatch, or change T4/T5/dashboard.",
+  "invariants": {
+    "schemaVersionStill1": true,
+    "usesWithStudioProjectWriteLease": true,
+    "usesGetStudioProjectWriteLeaseReadOnly": true,
+    "noStaticWriteLeaseImport": true,
+    "doesNotExposeToken": true,
+    "doesNotEnterFingerprint": true,
+    "doesNotChangeNextAction": true,
+    "doesNotChangeDraftReady": true,
+    "doesNotAcquireLease": true,
+    "doesNotDispatch": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true,
+    "doesNotChangeDashboardProjection": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-script-library-reader.test.ts"
+      ],
+      "result": "14 files / 206 tests PASS"
+    },
+    "commit": "67d3d51",
+    "linuxDirfdNote": "tests/studio-generation-session-snapshot.test.ts P7 fixture still needs Darwin dirfd; not claimed as this Cloud gate"
+  },
+  "notClaimed": [
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed",
+    "session-snapshot acquires write lease",
+    "readiness reads checkpoint control"
+  ]
+}
