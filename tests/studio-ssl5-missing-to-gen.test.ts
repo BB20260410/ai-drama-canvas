@@ -22,6 +22,12 @@ function panel(partial: Partial<ScriptMediaAlignRow["panels"][number]> & Pick<Sc
     generationRunId: null,
     shotComposition: "",
     visualAction: "",
+    filmingMethod: "",
+    sceneLighting: "",
+    costumeState: "",
+    shotType: "",
+    assetMentions: [],
+    previousHandoff: null,
     consistencyPeek: { status: "unevaluated" },
     ...partial,
   };
@@ -117,14 +123,23 @@ describe("SSL-5 缺图下一步纯函数", () => {
         sequence: 1,
         status: "partial",
         panels: [
-          panel({ panelId: "p1", panelIndex: 1, hasMedia: true }),
-          panel({ panelId: "p2", panelIndex: 2, hasMedia: false }),
+          panel({ panelId: "p1", panelIndex: 1, hasMedia: true, shotComposition: "中景", visualAction: "站定", filmingMethod: "固定" }),
+          panel({
+            panelId: "p2",
+            panelIndex: 2,
+            hasMedia: false,
+            previousHandoff: { panelIndex: 1, panelId: "p1", shotComposition: "中景", visualAction: "站定", filmingMethod: "固定" },
+          }),
         ],
       })],
     });
     expect(plan.focusUnitId).toBe("u-partial");
     expect(plan.focusPanelId).toBe("p2");
     expect(plan.focusPanelIndex).toBe(2);
+    expect(plan.previousPanelIndex).toBe(1);
+    expect(plan.previousShotComposition).toBe("中景");
+    expect(plan.previousVisualAction).toBe("站定");
+    expect(plan.previousFilmingMethod).toBe("固定");
   });
 
   it("全 covered 且无 earliest 则无焦点", () => {
@@ -158,6 +173,7 @@ describe("SSL-5 入口源码合同", () => {
     const director = source("src/renderer/src/director-action-panel.ts");
     expect(vue).toContain('data-testid="ssl5-missing-to-gen-plan"');
     expect(vue).toContain('data-testid="ssl5-focus-panel"');
+    expect(vue).toContain('data-testid="ssl5-focus-handoff"');
     expect(vue).toContain("planSsl5MissingToGen");
     expect(vue).toContain("不自动 dispatch");
     expect(director).toContain("ssl5-missing-to-gen-plan");

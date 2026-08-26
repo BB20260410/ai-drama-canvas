@@ -24,6 +24,10 @@ export interface Ssl5MissingToGenPlanItem {
   generationRunId: string | null;
   focusPanelId: string | null;
   focusPanelIndex: number | null;
+  previousPanelIndex: number | null;
+  previousShotComposition: string | null;
+  previousVisualAction: string | null;
+  previousFilmingMethod: string | null;
 }
 
 export interface Ssl5MissingToGenPlan {
@@ -36,6 +40,10 @@ export interface Ssl5MissingToGenPlan {
   focusUnitId: string | null;
   focusPanelId: string | null;
   focusPanelIndex: number | null;
+  previousPanelIndex: number | null;
+  previousShotComposition: string | null;
+  previousVisualAction: string | null;
+  previousFilmingMethod: string | null;
   missingAllCount: number;
   partialCount: number;
   items: Ssl5MissingToGenPlanItem[];
@@ -67,6 +75,7 @@ export function buildSsl5PlanFromBoard(
       else if (row.status === "missing-all") priority = "missing-all";
       else if (row.status === "partial") priority = "partial";
       const missingPanel = pickFirstMissingPanel(row.panels ?? []);
+      const handoff = missingPanel?.previousHandoff ?? null;
       return {
         unitId: row.unitId,
         sequence: row.sequence,
@@ -78,6 +87,10 @@ export function buildSsl5PlanFromBoard(
         generationRunId: row.generationRunId,
         focusPanelId: missingPanel?.panelId ?? null,
         focusPanelIndex: missingPanel?.panelIndex ?? null,
+        previousPanelIndex: handoff?.panelIndex ?? null,
+        previousShotComposition: handoff?.shotComposition ?? null,
+        previousVisualAction: handoff?.visualAction ?? null,
+        previousFilmingMethod: handoff?.filmingMethod ?? null,
       };
     })
     .sort((left, right) => {
@@ -101,6 +114,10 @@ export function buildSsl5PlanFromBoard(
     focusUnitId: focus?.unitId ?? null,
     focusPanelId: focus?.focusPanelId ?? null,
     focusPanelIndex: focus?.focusPanelIndex ?? null,
+    previousPanelIndex: focus?.previousPanelIndex ?? null,
+    previousShotComposition: focus?.previousShotComposition ?? null,
+    previousVisualAction: focus?.previousVisualAction ?? null,
+    previousFilmingMethod: focus?.previousFilmingMethod ?? null,
     missingAllCount: board.missingAllCount,
     partialCount: board.partialCount,
     items,

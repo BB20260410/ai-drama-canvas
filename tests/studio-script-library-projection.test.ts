@@ -7,7 +7,9 @@ import {
   buildMissingMediaReport,
   countCoveredUnits,
   formatPanelCoverageMarks,
+  formatPanelStandingHandoff,
   normalizeSourceSpans,
+  summarizePanelAssetMentions,
   pickFirstCoveredPanel,
   pickFirstMissingPanel,
   pickRawLabeledFromResults,
@@ -169,6 +171,12 @@ describe("studio-script-library-projection pure helpers", () => {
             hasMedia: true,
             shotComposition: "近景",
             visualAction: "抬手",
+            filmingMethod: "固定",
+            sceneLighting: "",
+            costumeState: "",
+            shotType: "original",
+            assetMentions: [],
+            previousHandoff: null,
           }],
         }),
         unit({
@@ -187,6 +195,12 @@ describe("studio-script-library-projection pure helpers", () => {
             hasMedia: false,
             shotComposition: "",
             visualAction: "",
+            filmingMethod: "",
+            sceneLighting: "",
+            costumeState: "",
+            shotType: "",
+            assetMentions: [],
+            previousHandoff: null,
           }],
         }),
       ],
@@ -238,7 +252,27 @@ describe("studio-script-library-projection pure helpers", () => {
       [{ index: 1, id: "p1", title: "g1", shotComposition: "近景三分", visualAction: "抬手" }],
       new Map(),
     );
-    expect(withComp[0]).toMatchObject({ shotComposition: "近景三分", visualAction: "抬手", hasMedia: false });
+    expect(withComp[0]).toMatchObject({ shotComposition: "近景三分", visualAction: "抬手", hasMedia: false, previousHandoff: null });
+    const handed = applyPackMediaToPanels(
+      [
+        { index: 1, id: "p1", title: "g1", shotComposition: "中景", visualAction: "站定", filmingMethod: "固定", assets: [{ assetId: "char-a", category: "character", role: "豆姐" }] },
+        { index: 2, id: "p2", title: "g2", shotComposition: "近景", visualAction: "抬手", filmingMethod: "推" },
+      ],
+      new Map(),
+    );
+    expect(handed[0]?.previousHandoff).toBeNull();
+    expect(handed[1]?.previousHandoff).toEqual({
+      panelIndex: 1,
+      panelId: "p1",
+      shotComposition: "中景",
+      visualAction: "站定",
+      filmingMethod: "固定",
+    });
+    expect(handed[0]?.assetMentions).toEqual([{ assetId: "char-a", category: "character", role: "豆姐" }]);
+    expect(formatPanelStandingHandoff(handed[1]?.previousHandoff ?? null)).toContain("G1 中景");
+    expect(summarizePanelAssetMentions([{ assetId: "  ", role: "x" }, { assetId: "prop-1", category: "prop", role: "面具" }])).toEqual([
+      { assetId: "prop-1", category: "prop", role: "面具" },
+    ]);
     expect(pickFirstCoveredPanel(panels)?.panelId).toBe("p2");
     expect(formatPanelCoverageMarks(panels)).toBe("G1缺 G2有");
     expect(pickFirstMissingPanel(panels)?.panelId).toBe("p1");
@@ -260,6 +294,8 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     expect(source).toContain("listStudioGenerationPacksByUnit(projectRoot, { unitId, panelId, limit: 20 })");
     expect(source).toContain("listPanelPacksNewestFirst");
     expect(source).toContain("applyPackMediaToPanels");
+    expect(source).toContain("attachPanelStandingHandoffs");
+    expect(source).toContain("summarizePanelAssetMentions");
     expect(source).not.toContain("panel 级 media 目前与 unit-grid 共享同一结果图");
     expect(source).toContain("summarizeScriptRevisionUnits");
     expect(source).toContain("coveredMediaCount = summary.coveredMediaCount");

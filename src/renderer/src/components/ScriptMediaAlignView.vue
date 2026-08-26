@@ -7,6 +7,7 @@ import { computed, nextTick, ref, watch } from "vue";
 import type { StudioProductionUnitSummary } from "@core/studio-production";
 import {
   formatPanelCoverageMarks,
+  formatPanelStandingHandoff,
   pickFirstCoveredPanel,
   pickFirstMissingPanel,
   type ScriptLibraryIndex,
@@ -654,6 +655,7 @@ function shortSha(value: string | null | undefined): string {
           <b>SSL-5 下一步</b>
           <span data-testid="ssl5-focus-unit">{{ ssl5Plan.focusUnitId || "无缺图焦点" }}</span>
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-panel">G{{ ssl5Plan.focusPanelIndex }} {{ ssl5Plan.focusPanelId }}</span>
+          <span v-if="ssl5Plan.previousPanelIndex != null" data-testid="ssl5-focus-handoff">前镜 G{{ ssl5Plan.previousPanelIndex }} {{ ssl5Plan.previousShotComposition || "构图未记" }} · {{ ssl5Plan.previousVisualAction || "动作未记" }} · {{ ssl5Plan.previousFilmingMethod || "运镜未记" }}</span>
           <span>缺图 {{ ssl5Plan.missingAllCount }} · 部分 {{ ssl5Plan.partialCount }}</span>
           <ol v-if="ssl5FocusPath.length">
             <li v-for="step in ssl5FocusPath" :key="step">{{ step }}</li>
@@ -736,6 +738,19 @@ function shortSha(value: string | null | undefined): string {
             <div><dt>run</dt><dd><code data-testid="align-panel-run">{{ selectedAlignPanel?.generationRunId || selectedAlignRow.generationRunId || "—" }}</code></dd></div>
             <div><dt>构图</dt><dd data-testid="align-panel-composition">{{ selectedAlignPanel?.shotComposition || "—" }}</dd></div>
             <div><dt>动作</dt><dd data-testid="align-panel-action">{{ selectedAlignPanel?.visualAction || "—" }}</dd></div>
+            <div><dt>运镜</dt><dd data-testid="align-panel-filming">{{ selectedAlignPanel?.filmingMethod || "—" }}</dd></div>
+            <div><dt>光线</dt><dd data-testid="align-panel-lighting">{{ selectedAlignPanel?.sceneLighting || "—" }}</dd></div>
+            <div><dt>前镜</dt><dd data-testid="align-panel-handoff">{{ formatPanelStandingHandoff(selectedAlignPanel?.previousHandoff) }}</dd></div>
+            <div>
+              <dt>快照提及</dt>
+              <dd data-testid="align-panel-assets">
+                <template v-if="selectedAlignPanel?.assetMentions.length">
+                  <p v-for="asset in selectedAlignPanel.assetMentions" :key="asset.assetId">{{ asset.category || "资产" }} {{ asset.role || asset.assetId }}</p>
+                </template>
+                <template v-else>—</template>
+                <small>快照提及，不是 BindingSet，不能当 generation-ready。</small>
+              </dd>
+            </div>
           </dl>
         </template>
         <div v-else class="empty">点击一行查看本地 raw/labeled 身份与缩略图。</div>

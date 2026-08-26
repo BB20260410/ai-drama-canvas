@@ -54,6 +54,26 @@ export interface UnitPanelMediaEntry {
   /** 锁版构图/动作只读投影；不推导 nextAction。 */
   shotComposition: string;
   visualAction: string;
+  filmingMethod: string;
+  sceneLighting: string;
+  costumeState: string;
+  shotType: "original" | "extension" | "";
+  assetMentions: PanelAssetMentionLite[];
+  previousHandoff: PanelStandingHandoff | null;
+}
+
+export interface PanelAssetMentionLite {
+  assetId: string;
+  category: string;
+  role: string;
+}
+
+export interface PanelStandingHandoff {
+  panelIndex: number;
+  panelId: string;
+  shotComposition: string;
+  visualAction: string;
+  filmingMethod: string;
 }
 
 export interface UnitSpanMediaMapEntry {
@@ -127,12 +147,66 @@ export function selectLatestPanelPack<T extends PackIndexLite>(
   return listPanelPacksNewestFirst(packs, panelId)[0];
 }
 
+export function summarizePanelAssetMentions(assets: unknown): PanelAssetMentionLite[] {
+  if (!Array.isArray(assets)) return [];
+  const out: PanelAssetMentionLite[] = [];
+  for (const asset of assets) {
+    if (!asset || typeof asset !== "object") continue;
+    const assetId = String((asset as { assetId?: unknown }).assetId ?? "").trim();
+    if (!assetId) continue;
+    out.push({
+      assetId,
+      category: String((asset as { category?: unknown }).category ?? ""),
+      role: String((asset as { role?: unknown }).role ?? ""),
+    });
+    if (out.length >= 6) break;
+  }
+  return out;
+}
+
+export function attachPanelStandingHandoffs<T extends UnitPanelMediaEntry>(panels: T[]): T[] {
+  const ordered = [...panels].sort((left, right) => left.panelIndex - right.panelIndex);
+  return ordered.map((panel, index) => {
+    const previous = index > 0 ? ordered[index - 1] : undefined;
+    return {
+      ...panel,
+      previousHandoff: previous
+        ? {
+          panelIndex: previous.panelIndex,
+          panelId: previous.panelId,
+          shotComposition: previous.shotComposition,
+          visualAction: previous.visualAction,
+          filmingMethod: previous.filmingMethod,
+        }
+        : null,
+    };
+  });
+}
+
+export function formatPanelStandingHandoff(handoff: PanelStandingHandoff | null | undefined): string {
+  if (!handoff) return "首格无前镜";
+  return `G${handoff.panelIndex} ${handoff.shotComposition || "构图未记"} · ${handoff.visualAction || "动作未记"} · ${handoff.filmingMethod || "运镜未记"}`;
+}
+
 export function applyPackMediaToPanels(
-  panels: Array<{ index: number; id: string; title?: string; sourceSpans?: unknown; shotComposition?: string; visualAction?: string }>,
+  panels: Array<{
+    index: number;
+    id: string;
+    title?: string;
+    sourceSpans?: unknown;
+    shotComposition?: string;
+    visualAction?: string;
+    filmingMethod?: string;
+    sceneLighting?: string;
+    costumeState?: string;
+    shotType?: string;
+    assets?: unknown;
+  }>,
   mediaByPanelId: ReadonlyMap<string, PackMediaPick>,
 ): UnitPanelMediaEntry[] {
-  return panels.map((panel) => {
+  const entries = panels.map((panel) => {
     const media = mediaByPanelId.get(String(panel.id)) ?? EMPTY_PACK_MEDIA;
+    const shotType = panel.shotType === "extension" ? "extension" as const : panel.shotType === "original" ? "original" as const : "" as const;
     return {
       panelIndex: Number(panel.index),
       panelId: String(panel.id),
@@ -146,8 +220,15 @@ export function applyPackMediaToPanels(
       hasMedia: Boolean(media.rawSha256 || media.labeledSha256),
       shotComposition: String(panel.shotComposition || ""),
       visualAction: String(panel.visualAction || ""),
+      filmingMethod: String(panel.filmingMethod || ""),
+      sceneLighting: String(panel.sceneLighting || ""),
+      costumeState: String(panel.costumeState || ""),
+      shotType,
+      assetMentions: summarizePanelAssetMentions(panel.assets),
+      previousHandoff: null,
     };
   });
+  return attachPanelStandingHandoffs(entries);
 }
 
 /** 单元行预览：优先第一张已出图的宫格，不把缺图格当成整单元有图。 */
