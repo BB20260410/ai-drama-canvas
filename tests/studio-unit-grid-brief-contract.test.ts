@@ -358,6 +358,9 @@ describe("buildStudioUnitGridAgentImagegenBrief (shipped runtime)", () => {
     expect(codex.promptContractText).toContain("STYLE_LOCK");
     expect(codex.promptContractText).toContain("IDENTITY_LOCK");
     expect(grok.promptContract).toEqual(codex.promptContract);
+    expect(codex.previousStandings).toEqual([{ panelId: "panel-01", previousStanding: null }]);
+    expect(codex.tool.notes.at(-1)).toContain("前镜交接");
+    expect(grok.tool.notes.at(-1)).toContain("前镜交接");
   });
 
   it("续镜 pack 投影 DELTA_ONLY，且不改 renderedPrompt", () => {
@@ -402,6 +405,32 @@ describe("buildStudioUnitGridAgentImagegenBrief (shipped runtime)", () => {
     expect(pack.request.modelPayload.renderedPrompt).toBe(originalPrompt);
     const text = renderUnitGridBriefContractText(contract);
     expect(text).toContain("G2 7.5s 近景/推 抬手 ← G1 中景/固定");
+    const standingLine = "前镜交接：G1 中景 · 停步 · 固定。本格必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。";
+    pack.panels[1] = {
+      ...pack.panels[1]!,
+      panelPack: {
+        ...pack.panels[1]!.panelPack,
+        request: {
+          modelPayload: { renderedPrompt: `头\n${standingLine}\n尾` },
+        },
+      } as typeof pack.panels[1]["panelPack"],
+    };
+    const brief = buildStudioUnitGridAgentImagegenBrief(pack, "codex");
+    expect(brief.previousStandings).toEqual([
+      { panelId: "panel-01", previousStanding: null },
+      {
+        panelId: "panel-02",
+        previousStanding: {
+          panelIndex: 1,
+          panelId: "",
+          shotComposition: "中景",
+          visualAction: "停步",
+          filmingMethod: "固定",
+        },
+      },
+    ]);
+    expect(brief.tool.notes.some((note) => note.includes("前镜交接"))).toBe(true);
+    expect(brief.prompt).toBe(originalPrompt);
   });
 
   it("controlReferences 为空时 fail-closed，禁止 text-only", () => {

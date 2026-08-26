@@ -747,6 +747,8 @@
         :character-audio-playback-url="selectedCharacterAudioPlaybackUrl"
         :character-audio-blocked="characterAudioBlocked"
         :character-view-slots="selectedCharacterViewSlots"
+        :panel-previous-standing-line="inspectorPreviousStandingLine"
+        :panel-previous-standing-source="inspectorPreviousStandingSource"
         @close="closeInspector"
         @focus-appearance="focusAppearance"
         @appearances-previous="appearancesPrevious"
@@ -802,6 +804,11 @@ import ManagedStudioCanvasNode from "./ManagedStudioCanvasNode.vue";
 import StudioSpatialGroupNode from "./StudioSpatialGroupNode.vue";
 import CanvasInspectorPanel from "./CanvasInspectorPanel.vue";
 import DirectorActionPanel from "./DirectorActionPanel.vue";
+import {
+  formatPreviousStandingReadonlyLine,
+  formatUnitLockPreviousStandingLine,
+  previousStandingFromAnyFrozenPack,
+} from "@core/studio-panel-standing";
 import type { DirectorAction } from "../director-action-panel.js";
 import type {
   MaterialStudioAssetCategory,
@@ -1874,6 +1881,48 @@ const selectedCharacterViewSlots = computed(() => {
   if (selection.value?.kind !== "asset") return [];
   return characterViewSlots.value.get(selection.value.asset.id) ?? [];
 });
+const inspectorPreviousStandingLine = ref<string | null>(null);
+const inspectorPreviousStandingSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>(null);
+let inspectorStandingToken = 0;
+watch([selection, unitDetail, () => props.projectRoot], async () => {
+  const token = ++inspectorStandingToken;
+  inspectorPreviousStandingLine.value = null;
+  inspectorPreviousStandingSource.value = null;
+  if (selection.value?.kind !== "panel") return;
+  const panel = selection.value.panel;
+  const packId = unitDetail.value?.selectedPanel?.panel.id === panel.id
+    ? unitDetail.value.selectedPanel.generation.packId
+    : undefined;
+  if (packId && props.projectRoot) {
+    try {
+      const pack = await window.canvasApi.getStudioFrozenPack(props.projectRoot, packId);
+      if (token !== inspectorStandingToken) return;
+      if (pack) {
+        const line = formatPreviousStandingReadonlyLine(previousStandingFromAnyFrozenPack(pack, panel.id));
+        if (line) {
+          inspectorPreviousStandingLine.value = line;
+          inspectorPreviousStandingSource.value = "frozen-rendered-prompt";
+        }
+        return;
+      }
+    } catch {
+      if (token !== inspectorStandingToken) return;
+    }
+  }
+  if (token !== inspectorStandingToken) return;
+  const previous = (unitDetail.value?.panels ?? [])
+    .filter((entry) => entry.ordinal < panel.ordinal)
+    .sort((left, right) => right.ordinal - left.ordinal)[0];
+  if (!previous) return;
+  inspectorPreviousStandingLine.value = formatUnitLockPreviousStandingLine({
+    panelIndex: previous.ordinal,
+    panelId: previous.id,
+    shotComposition: previous.shotComposition ?? "",
+    visualAction: previous.visualAction ?? "",
+    filmingMethod: "",
+  });
+  inspectorPreviousStandingSource.value = "unit-lock";
+}, { immediate: true });
 const appearanceListElement = computed<HTMLElement | null>(() => inspectorPanelEl.value?.appearanceListElement ?? null);
 
 const filteredEpisodes = computed(() => {
@@ -3871,6 +3920,9 @@ function closeInspector(): void {
   const selectedNode = nodes.value.find((node) => node.selected);
   const nodeId = selectedNode?.id;
   selection.value = null;
+  inspectorStandingToken += 1;
+  inspectorPreviousStandingLine.value = null;
+  inspectorPreviousStandingSource.value = null;
   void nextTick(() => restoreInspectorFlowFocus(nodeId));
 }
 

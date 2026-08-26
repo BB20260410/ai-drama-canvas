@@ -43,7 +43,7 @@
       <span class="inspector-kind">{{ selection.kind === "script" ? "剧本" : "提示词" }}</span><h3>{{ selection.doc.title || "未命名文稿" }}</h3><p class="inspector-body" data-testid="managed-canvas-text-body">{{ selection.doc.bodyPreview || "（正文预览待加载）" }}</p><details class="technical-diagnostics inspector-diagnostics"><summary data-testid="managed-canvas-inspector-diagnostics">诊断详情</summary><dl><dt>文档 ID</dt><dd>{{ selection.doc.id }}</dd><dt>修订</dt><dd>r{{ selection.doc.revision }}</dd></dl></details>
     </template>
     <template v-else-if="selection.kind === 'panel'">
-      <span class="inspector-kind">宫格 {{ selection.panel.ordinal }}</span><h3>{{ selection.panel.label }}</h3><p>{{ selection.panel.visualAction || selection.panel.statusReason || "尚无动作说明" }}</p><dl><dt>时间</dt><dd>{{ selection.panel.startSeconds }}–{{ selection.panel.endSeconds }} 秒</dd><dt>绑定状态</dt><dd>{{ currentnessLabel(selection.panel.bindingCurrentness) }}</dd><dt>控制资产</dt><dd>{{ selection.panel.assetIds.length }}</dd></dl><blockquote v-if="selection.panel.dialogue">{{ selection.panel.dialogue }}</blockquote>
+      <span class="inspector-kind">宫格 {{ selection.panel.ordinal }}</span><h3>{{ selection.panel.label }}</h3><p>{{ selection.panel.visualAction || selection.panel.statusReason || "尚无动作说明" }}</p><dl><dt>时间</dt><dd>{{ selection.panel.startSeconds }}–{{ selection.panel.endSeconds }} 秒</dd><dt>构图</dt><dd data-testid="managed-canvas-inspector-composition">{{ selection.panel.shotComposition || "构图未记" }}</dd><dt>前镜</dt><dd data-testid="managed-canvas-inspector-previous-standing">{{ panelPreviousStandingLine || "首格或尚未冻结前镜" }}</dd><dt>绑定状态</dt><dd>{{ currentnessLabel(selection.panel.bindingCurrentness) }}</dd><dt>控制资产</dt><dd>{{ selection.panel.assetIds.length }}</dd></dl><p v-if="panelPreviousStandingLine" class="inspector-standing-note" data-testid="managed-canvas-inspector-standing-source">{{ panelPreviousStandingSource === "frozen-rendered-prompt" ? "冻结提示词约束。不是 BindingSet。" : "当前单元锁版。不是 BindingSet，不能当 generation-ready。" }}</p><blockquote v-if="selection.panel.dialogue">{{ selection.panel.dialogue }}</blockquote>
     </template>
     <section v-if="nodeActionPanel" class="node-action-panel" data-testid="managed-canvas-node-action-panel" aria-label="节点操作"><header><b>下一步</b><span v-if="selectedNodeBusy" class="busy-tag" data-testid="managed-canvas-node-busy">{{ selectedNodeBusy.message }}</span></header><div class="node-action-buttons"><button v-for="(action, index) in nodeActionPanel.actions" :key="action.code" type="button" :data-testid="`managed-canvas-action-${action.code}`" :disabled="!action.enabled" :tabindex="action.enabled && nodeActionActiveIndex === index ? 0 : -1" :title="action.reason || action.label" @focus="nodeActionRovingIndex = index" @click="emit('runNodeAction', action.code)">{{ action.label }}<small v-if="action.reason" :data-testid="`managed-canvas-action-reason-${action.code}`">{{ action.reason }}</small></button></div></section>
   </aside>
@@ -82,6 +82,8 @@ const props = defineProps<{
   characterAudioPlaybackUrl?: string;
   characterAudioBlocked?: boolean;
   characterViewSlots?: string[];
+  panelPreviousStandingLine?: string | null;
+  panelPreviousStandingSource?: "frozen-rendered-prompt" | "unit-lock" | null;
 }>();
 const characterAudioEl = ref<HTMLAudioElement | null>(null);
 const appearanceListRovingIndex = ref(-1);
@@ -179,6 +181,7 @@ defineExpose({ appearanceListElement });
 .canvas-inspector h3 { margin: 5px 30px 10px 0; font-size: 15px; }
 .canvas-inspector h4 { margin: 18px 0 8px; color: var(--msc-accent-strong); font-size: 12px; }
 .canvas-inspector p { color: var(--msc-text-2); font-size: 12px; line-height: 1.6; }
+.inspector-standing-note { margin: 8px 0 0; color: var(--msc-text-3); font-size: 10px; line-height: 1.5; }
 .inspector-kind { color: var(--msc-accent); font-size: 10px; font-weight: 700; letter-spacing: .12em; }
 .inspector-thumb { margin: 8px 0 10px; overflow: hidden; border: 1px solid var(--msc-line); border-radius: 9px; aspect-ratio: 16/10; background: var(--msc-bg); }
 .inspector-thumb img { width: 100%; height: 100%; display: block; object-fit: cover; }

@@ -60,6 +60,10 @@ import {
   type StudioFormalImagegenProvider,
 } from "./studio-imagegen-providers.js";
 import {
+  UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE,
+  previousStandingFromFrozenRenderedPrompt,
+} from "./studio-panel-standing.js";
+import {
   assertStudioUnitGridGenerationFreezePackCurrent,
   queryStudioUnitGridGenerationFreeze,
   type StudioUnitGridCodexGenerationRequest,
@@ -228,6 +232,11 @@ export function buildStudioUnitGridAgentImagegenBrief(
     throw new Error("unit-grid Agent brief 缺少 controlReferences，禁止降级 text-only。");
   }
   const promptContract = composeUnitGridBriefContract(pack);
+  const previousStandings = pack.panels.map((panel) => ({
+    panelId: panel.panelId,
+    previousStanding: previousStandingFromFrozenRenderedPrompt(panel.panelPack),
+  }));
+  const tool = providerToolHints(provider);
   return {
     schemaVersion: 1 as const,
     kind: "studio-agent-imagegen-brief" as const,
@@ -240,6 +249,7 @@ export function buildStudioUnitGridAgentImagegenBrief(
     prompt: pack.request.modelPayload.renderedPrompt,
     promptContract,
     promptContractText: renderUnitGridBriefContractText(promptContract),
+    previousStandings,
     forbidden: pack.request.forbidden,
     referenceCount: pack.request.controlReferences.length,
     controlReferences,
@@ -254,7 +264,10 @@ export function buildStudioUnitGridAgentImagegenBrief(
     continuityFingerprint: pack.continuityFingerprint,
     continuityNineFieldSummary,
     referencePathSource: "pack-operation-controlReferences-only" as const,
-    tool: providerToolHints(provider),
+    tool: {
+      ...tool,
+      notes: [...tool.notes, UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE],
+    },
   };
 }
 

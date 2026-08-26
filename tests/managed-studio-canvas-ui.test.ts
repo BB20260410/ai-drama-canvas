@@ -2077,6 +2077,11 @@ describe("受管画布侧栏列表视口剔除", () => {
     const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
     expect(inspector).toContain('class="technical-diagnostics inspector-diagnostics"');
     expect(inspector).toContain('data-testid="managed-canvas-inspector-diagnostics"');
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-composition"');
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-previous-standing"');
+    expect(inspector).toContain("panelPreviousStandingLine");
+    expect(inspector).not.toContain("evaluateStudioConsistency");
+    expect(inspector).not.toContain("getStudioBindingControl");
     expect(inspector).not.toContain('role="dialog"');
     expect(inspector).toContain('<aside class="canvas-inspector" aria-label="画布节点详情">');
     expect(view).toContain('@close="closeInspector"');

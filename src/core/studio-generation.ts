@@ -81,6 +81,8 @@ export {
   previousStandingFromAnyFrozenPack,
   previousStandingFromFrozenRenderedPrompt,
   formatPreviousStandingReadonlyLine,
+  formatUnitLockPreviousStandingLine,
+  UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE,
   type StudioPanelStandingHandoff,
 } from "./studio-panel-standing.js";
 

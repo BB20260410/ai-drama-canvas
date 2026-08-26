@@ -9,6 +9,7 @@ import {
   pickPreviousPanelStanding,
   previousStandingFromAnyFrozenPack,
   previousStandingFromFrozenRenderedPrompt,
+  formatUnitLockPreviousStandingLine,
 } from "../src/core/studio-panel-standing.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -111,6 +112,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     }, "p2")).toEqual(parsed);
     expect(formatPreviousStandingReadonlyLine(parsed)).toContain("不是 BindingSet");
     expect(formatPreviousStandingReadonlyLine(null)).toBeNull();
+    expect(formatUnitLockPreviousStandingLine(parsed)).toContain("不能当 generation-ready");
+    expect(formatUnitLockPreviousStandingLine(null)).toBeNull();
   });
 
   it("session-snapshot / 生成控制 / 审片从冻结提示词露前镜，不读 head", () => {
@@ -136,5 +139,15 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(review).not.toContain("evaluateStudioConsistency(");
     expect(review).not.toContain("getStudioBindingControl");
     expect(review).not.toContain("generation.packId");
+    const brief = readFileSync(path.join(repoRoot, "src/core/codex.ts"), "utf8");
+    expect(brief).toContain("previousStandings");
+    expect(brief).toContain("previousStandingFromFrozenRenderedPrompt(panel.panelPack)");
+    expect(brief).toContain("UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE");
+    const canvas = readFileSync(path.join(repoRoot, "src/renderer/src/components/ManagedStudioCanvasView.vue"), "utf8");
+    expect(canvas).toContain("previousStandingFromAnyFrozenPack(pack, panel.id)");
+    expect(canvas).toContain("formatUnitLockPreviousStandingLine");
+    expect(canvas).toContain("frozen-rendered-prompt");
+    expect(canvas).not.toContain("evaluateStudioConsistency(");
+    expect(canvas).not.toContain("getStudioBindingControl");
   });
 });

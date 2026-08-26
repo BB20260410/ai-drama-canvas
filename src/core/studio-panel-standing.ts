@@ -109,3 +109,14 @@ export function formatPreviousStandingReadonlyLine(
   if (!handoff) return null;
   return `前镜交接（冻结提示词）：G${handoff.panelIndex} ${handoff.shotComposition.trim() || "构图未记"} · ${handoff.visualAction.trim() || "动作未记"} · ${handoff.filmingMethod.trim() || "运镜未记"}。本格必须从该站位连续起拍。不是 BindingSet。`;
 }
+
+/** 当前单元锁版前镜（未冻结或历史包无该行时）；不是冻结提示词，不能当 generation-ready。 */
+export function formatUnitLockPreviousStandingLine(
+  handoff: StudioPanelStandingHandoff | null | undefined,
+): string | null {
+  if (!handoff) return null;
+  return `锁版前镜：G${handoff.panelIndex} ${handoff.shotComposition.trim() || "构图未记"} · ${handoff.visualAction.trim() || "动作未记"} · ${handoff.filmingMethod.trim() || "运镜未记"}。不是 BindingSet，不能当 generation-ready。`;
+}
+
+export const UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE =
+  "若 previousStandings、promptContract.BEATS[].previousStanding 或 renderedPrompt 含「前镜交接」，必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。";
