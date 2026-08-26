@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   formatPreviousStandingPromptLine,
+  parsePreviousStandingFromRenderedPrompt,
   pickPreviousPanelStanding,
 } from "../src/core/studio-generation.js";
 
@@ -37,10 +38,30 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     })).toBe("前镜交接：G1 中景 · 站定 · 固定。本格必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。");
   });
 
+  it("parsePreviousStandingFromRenderedPrompt 只认冻结行，不读 head", () => {
+    const line = formatPreviousStandingPromptLine({
+      panelIndex: 1,
+      panelId: "p1",
+      shotComposition: "中景",
+      visualAction: "站定",
+      filmingMethod: "固定",
+    });
+    expect(parsePreviousStandingFromRenderedPrompt("只生成一张 9:16 竖屏")).toBeNull();
+    expect(parsePreviousStandingFromRenderedPrompt(`头\n${line}\n尾`)).toEqual({
+      panelIndex: 1,
+      panelId: "",
+      shotComposition: "中景",
+      visualAction: "站定",
+      filmingMethod: "固定",
+    });
+  });
+
   it("单镜冻结与 unit-grid 提示词接入前镜行；brief 不改已冻结 renderedPrompt", () => {
     const generation = readFileSync(path.join(repoRoot, "src/core/studio-generation.ts"), "utf8");
     expect(generation).toContain("pickPreviousPanelStanding(snapshot.panels, panel.index)");
     expect(generation).toContain("formatPreviousStandingPromptLine(input.previousStanding)");
+    expect(generation).toContain("previousStanding: parsePreviousStandingFromRenderedPrompt");
+    expect(generation).toContain("若 previousStanding 或 renderedPrompt 含「前镜交接」");
     expect(generation).not.toContain("前镜交接：首格无前镜");
     const unitGrid = readFileSync(path.join(repoRoot, "src/core/studio-unit-grid-generation.ts"), "utf8");
     expect(unitGrid).toContain("formatPreviousStandingPromptLine");

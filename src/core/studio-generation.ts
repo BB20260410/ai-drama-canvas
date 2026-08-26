@@ -1213,6 +1213,23 @@ export function formatPreviousStandingPromptLine(
   return `前镜交接：G${handoff.panelIndex} ${handoff.shotComposition.trim() || "构图未记"} · ${handoff.visualAction.trim() || "动作未记"} · ${handoff.filmingMethod.trim() || "运镜未记"}。本格必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。`;
 }
 
+/** 从已冻结 renderedPrompt 还原前镜；历史包无此行则 null。panelId 不在提示词里。 */
+export function parsePreviousStandingFromRenderedPrompt(
+  renderedPrompt: string,
+): StudioPanelStandingHandoff | null {
+  const match = /前镜交接：G(\d+) (.+?) · (.+?) · (.+?)。本格必须从该站位连续起拍/u.exec(renderedPrompt);
+  if (!match) return null;
+  const panelIndex = Number(match[1]);
+  if (!Number.isFinite(panelIndex)) return null;
+  return {
+    panelIndex,
+    panelId: "",
+    shotComposition: match[2] ?? "",
+    visualAction: match[3] ?? "",
+    filmingMethod: match[4] ?? "",
+  };
+}
+
 function panelInstruction(panel: StudioProductionPanel): StudioGenerationPanelInstruction {
   return {
     title: panel.title,
@@ -2701,6 +2718,8 @@ export interface StudioAgentImagegenBrief {
   exactlyOneImage: true;
   maxCalls: 1;
   renderedPrompt: string;
+  /** 从 renderedPrompt 还原；历史包无前镜行则为 null。 */
+  previousStanding: StudioPanelStandingHandoff | null;
   controlReferences: Array<{
     assetId: string;
     category: string;
@@ -2754,6 +2773,7 @@ export function buildStudioAgentImagegenBrief(
         "严格只调用一次生图工具，只产出一张图。",
         "人物/场景/道具/风格只能来自冻结 pack 的 controlReferences 与 modelPayload。",
         "参考图本地路径只读 pack 操作返回的 request.controlReferences.localPath（已 CAS/SHA 校验）。",
+        "若 previousStanding 或 renderedPrompt 含「前镜交接」，必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。",
         "禁止浏览器、Artlist、ComfyUI、网页自动化旁路。",
       ],
     }
@@ -2765,6 +2785,7 @@ export function buildStudioAgentImagegenBrief(
         `严格只生成一张${effectiveStudioPanelImageLayout(pack.request.modelPayload) === "cinematic-wide" ? "电影宽银幕横幅" : "9:16 竖屏"}分镜；有权威参考时用 image_edit 绑定角色/场景/道具/风格。`,
         "参考图 localPath 只来自 pack 操作的 verified controlReferences，不使用 brief 内路径。",
         "不得替换冻结包外的身份；不得把字幕/分屏画进 raw。",
+        "若 previousStanding 或 renderedPrompt 含「前镜交接」，必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。",
         "禁止浏览器、Artlist、网页自动化旁路。",
       ],
     };
@@ -2781,6 +2802,7 @@ export function buildStudioAgentImagegenBrief(
     exactlyOneImage: true,
     maxCalls: 1,
     renderedPrompt: pack.request.modelPayload.renderedPrompt,
+    previousStanding: parsePreviousStandingFromRenderedPrompt(pack.request.modelPayload.renderedPrompt),
     controlReferences: pack.request.controlReferences.map((ref) => ({
       assetId: ref.assetId,
       category: ref.category,
