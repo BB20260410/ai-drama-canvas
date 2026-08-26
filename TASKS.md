@@ -35,6 +35,7 @@
 - [x] 画布检查器 / 生成控制 / 审片只从已加载冻结包露「光线/服装（宫格覆盖）」（unit-grid 必须 panelId；不改 dashboard 投影）
 - [x] session-snapshot 投影 frozenPanelLighting / frozenPanelCostume（无该行则 null，不进 fingerprint；不读 head）
 - [x] 单镜/整板 Agent brief + get_studio_trace 投影冻结宫格光线/服装（全空省略；不改 P24；不改 renderedPrompt）
+- [x] 对照侧栏跨单元场景回指（只扫已加载快照提及；更早同场景可点穿；≠ BindingSet）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
