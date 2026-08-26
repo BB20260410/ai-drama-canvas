@@ -30,6 +30,7 @@ function row(partial: Partial<ScriptMediaAlignRow> & Pick<ScriptMediaAlignRow, "
     sourceSpans: [],
     outlineAnchors: [],
     consistencyPeek: { status: "unevaluated" },
+    panels: [],
     ...partial,
   };
 }

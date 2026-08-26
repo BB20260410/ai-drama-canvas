@@ -150,6 +150,16 @@ export function pickFirstCoveredPanel(panels: UnitPanelMediaEntry[]): UnitPanelM
   return panels.find((panel) => panel.hasMedia) ?? panels[0];
 }
 
+/** 导演面宫格覆盖标记。不推导 nextAction。 */
+export function formatPanelCoverageMarks(
+  panels: Array<{ panelIndex: number; hasMedia: boolean }>,
+): string {
+  return [...panels]
+    .sort((a, b) => a.panelIndex - b.panelIndex)
+    .map((panel) => `G${panel.panelIndex}${panel.hasMedia ? "有" : "缺"}`)
+    .join(" ");
+}
+
 /** 纯函数：从结果列表抽取 raw/labeled SHA（单测用）。 */
 export function pickRawLabeledFromResults(
   results: Array<{ variant?: string; mediaSha256?: string; generationRunId?: string }>,

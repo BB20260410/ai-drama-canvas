@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
   applyPackMediaToPanels,
   buildMissingMediaReport,
+  formatPanelCoverageMarks,
   normalizeSourceSpans,
   pickFirstCoveredPanel,
   pickRawLabeledFromResults,
@@ -220,6 +221,7 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(panels[0]).toMatchObject({ panelId: "p1", hasMedia: false, rawSha256: null, packId: null });
     expect(panels[1]).toMatchObject({ panelId: "p2", hasMedia: true, rawSha256: "raw-p2", packId: "pack-p2" });
     expect(pickFirstCoveredPanel(panels)?.panelId).toBe("p2");
+    expect(formatPanelCoverageMarks(panels)).toBe("G1缺 G2有");
   });
 });
 
@@ -240,6 +242,7 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     expect(source).not.toContain("panel 级 media 目前与 unit-grid 共享同一结果图");
     const align = readFileSync(path.join(repoRoot, "src/core/studio-script-media-align.ts"), "utf8");
     expect(align).toContain("pickFirstCoveredPanel");
+    expect(align).toContain("panels: u.panels");
     expect(align).not.toContain("const firstPanel = u.panels[0]");
   });
 });

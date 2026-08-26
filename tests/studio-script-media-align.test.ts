@@ -36,6 +36,7 @@ function alignRow(partial: Partial<ScriptMediaAlignRow> & Pick<ScriptMediaAlignR
     sourceSpans: [],
     outlineAnchors: [],
     consistencyPeek: { status: "unevaluated" },
+    panels: [],
     ...partial,
   };
 }
@@ -130,5 +131,7 @@ describe("对照行四态 peek 源码合同", () => {
     expect(vue).toContain("align-peek-");
     expect(vue).toContain("未评估");
     expect(vue).toContain("peekLabel");
+    expect(align).toContain("panels: u.panels");
+    expect(vue).toContain("align-panel-list");
   });
 });

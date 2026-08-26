@@ -9,6 +9,7 @@ import {
   getStudioEpisodeUnitMediaMap,
   buildMissingMediaReport,
   pickFirstCoveredPanel,
+  type UnitPanelMediaEntry,
   type UnitSpanMediaMapEntry,
 } from "./studio-script-library-projection.js";
 import { getStudioScriptReaderView, type ScriptOutlineHeading } from "./studio-script-library-reader.js";
@@ -42,6 +43,8 @@ export interface ScriptMediaAlignRow {
   outlineAnchors: Array<{ title: string; level: number; startOffsetUtf16: number }>;
   /** 只读缓存 peek。未评估 ≠ 无法检查。机器不自动 Review PASS。 */
   consistencyPeek: AlignConsistencyPeek;
+  /** 宫格级媒体真相；unit-grid 不摊派。 */
+  panels: UnitPanelMediaEntry[];
 }
 
 export interface AlignConsistencyPeek {
@@ -202,6 +205,7 @@ export async function getStudioScriptMediaAlignBoard(
       sourceSpans: spans,
       outlineAnchors: matchOutlineAnchorsForUnit(u.unitId, outline),
       consistencyPeek: { status: "unevaluated" },
+      panels: u.panels,
     };
   });
 
