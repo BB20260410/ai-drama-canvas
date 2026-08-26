@@ -294,7 +294,9 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(canvas).toContain("formatUnitLockPreviousStandingLine");
     expect(canvas).toContain("formatUnitLockPanelLightingLine");
     expect(canvas).toContain("getStudioUnitLockOverlays");
+    expect(canvas).toContain("getStudioSceneBackReferences");
     expect(canvas).not.toContain("getStudioProductionUnitSnapshot");
+    expect(canvas).not.toContain("studio-scene-backrefs-read");
     expect(canvas).toContain("frozen-rendered-prompt");
     expect(canvas).toContain("getStudioTrace");
     expect(canvas).toContain("resolveStudioTraceSelector");

@@ -3261,6 +3261,18 @@ function registerIpc(): void {
       return readStudioUnitLockOverlays(projectRoot, query);
     },
   );
+  ipcMain.handle(
+    "canvas:get-studio-scene-backrefs",
+    async (
+      _event,
+      projectRoot: string,
+      query: import("../core/studio-scene-backrefs-read.js").StudioSceneBackrefReadQuery,
+    ) => {
+      await requireManagedStudioProjectReadOnly(projectRoot);
+      const { readStudioSceneBackReferences } = await import("../core/studio-scene-backrefs-read.js");
+      return readStudioSceneBackReferences(projectRoot, query);
+    },
+  );
   ipcMain.handle("canvas:get-studio-pack-currentness", async (
     _event,
     projectRoot: string,

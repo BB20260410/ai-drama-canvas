@@ -43,7 +43,7 @@
       <span class="inspector-kind">{{ selection.kind === "script" ? "剧本" : "提示词" }}</span><h3>{{ selection.doc.title || "未命名文稿" }}</h3><p class="inspector-body" data-testid="managed-canvas-text-body">{{ selection.doc.bodyPreview || "（正文预览待加载）" }}</p><details class="technical-diagnostics inspector-diagnostics"><summary data-testid="managed-canvas-inspector-diagnostics">诊断详情</summary><dl><dt>文档 ID</dt><dd>{{ selection.doc.id }}</dd><dt>修订</dt><dd>r{{ selection.doc.revision }}</dd></dl></details>
     </template>
     <template v-else-if="selection.kind === 'panel'">
-      <span class="inspector-kind">宫格 {{ selection.panel.ordinal }}</span><h3>{{ selection.panel.label }}</h3><p>{{ selection.panel.visualAction || selection.panel.statusReason || "尚无动作说明" }}</p><dl><dt>时间</dt><dd>{{ selection.panel.startSeconds }}–{{ selection.panel.endSeconds }} 秒</dd><dt>构图</dt><dd data-testid="managed-canvas-inspector-composition">{{ selection.panel.shotComposition || "构图未记" }}</dd><dt>前镜</dt><dd data-testid="managed-canvas-inspector-previous-standing">{{ panelPreviousStandingLine || "首格或尚未冻结前镜" }}</dd><dt>光线</dt><dd data-testid="managed-canvas-inspector-lighting">{{ panelFrozenLightingLine || (panelLightingCostumeSource === "unit-lock" ? "锁版未记光线" : "尚未冻结宫格光线") }}</dd><dt>服装</dt><dd data-testid="managed-canvas-inspector-costume">{{ panelFrozenCostumeLine || (panelLightingCostumeSource === "unit-lock" ? "锁版未记服装" : "尚未冻结宫格服装") }}</dd><dt>绑定状态</dt><dd>{{ currentnessLabel(selection.panel.bindingCurrentness) }}</dd><dt>控制资产</dt><dd>{{ selection.panel.assetIds.length }}</dd></dl><p v-if="panelPreviousStandingLine" class="inspector-standing-note" data-testid="managed-canvas-inspector-standing-source">{{ panelPreviousStandingSource === "frozen-rendered-prompt" ? "冻结提示词约束。不是 BindingSet。" : "当前单元锁版。不是 BindingSet，不能当 generation-ready。" }}</p><p v-if="panelFrozenLightingLine || panelFrozenCostumeLine" class="inspector-standing-note" data-testid="managed-canvas-inspector-lighting-source">{{ panelLightingCostumeSource === "frozen-rendered-prompt" ? "冻结提示词约束。不是 BindingSet。" : "当前单元锁版。不是 BindingSet，不能当 generation-ready。" }}</p><blockquote v-if="selection.panel.dialogue">{{ selection.panel.dialogue }}</blockquote>
+      <span class="inspector-kind">宫格 {{ selection.panel.ordinal }}</span><h3>{{ selection.panel.label }}</h3><p>{{ selection.panel.visualAction || selection.panel.statusReason || "尚无动作说明" }}</p><dl><dt>时间</dt><dd>{{ selection.panel.startSeconds }}–{{ selection.panel.endSeconds }} 秒</dd><dt>构图</dt><dd data-testid="managed-canvas-inspector-composition">{{ selection.panel.shotComposition || "构图未记" }}</dd><dt>前镜</dt><dd data-testid="managed-canvas-inspector-previous-standing">{{ panelPreviousStandingLine || "首格或尚未冻结前镜" }}</dd><dt>光线</dt><dd data-testid="managed-canvas-inspector-lighting">{{ panelFrozenLightingLine || (panelLightingCostumeSource === "unit-lock" ? "锁版未记光线" : "尚未冻结宫格光线") }}</dd><dt>服装</dt><dd data-testid="managed-canvas-inspector-costume">{{ panelFrozenCostumeLine || (panelLightingCostumeSource === "unit-lock" ? "锁版未记服装" : "尚未冻结宫格服装") }}</dd><dt>场景回指</dt><dd data-testid="managed-canvas-inspector-scene-backrefs"><p>{{ panelSceneBackReferenceNote || "尚未查询场景回指" }}</p><button v-for="ref in panelSceneBackReferences" :key="`${ref.unitId}:${ref.panelId}:${ref.assetId}`" type="button" :data-testid="`managed-canvas-inspector-scene-backref-${ref.unitId}-${ref.panelId}`" @click="emit('revealSceneBackRef', ref)">U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button></dd><dt>绑定状态</dt><dd>{{ currentnessLabel(selection.panel.bindingCurrentness) }}</dd><dt>控制资产</dt><dd>{{ selection.panel.assetIds.length }}</dd></dl><p v-if="panelPreviousStandingLine" class="inspector-standing-note" data-testid="managed-canvas-inspector-standing-source">{{ panelPreviousStandingSource === "frozen-rendered-prompt" ? "冻结提示词约束。不是 BindingSet。" : "当前单元锁版。不是 BindingSet，不能当 generation-ready。" }}</p><p v-if="panelFrozenLightingLine || panelFrozenCostumeLine" class="inspector-standing-note" data-testid="managed-canvas-inspector-lighting-source">{{ panelLightingCostumeSource === "frozen-rendered-prompt" ? "冻结提示词约束。不是 BindingSet。" : "当前单元锁版。不是 BindingSet，不能当 generation-ready。" }}</p><blockquote v-if="selection.panel.dialogue">{{ selection.panel.dialogue }}</blockquote>
     </template>
     <section v-if="nodeActionPanel" class="node-action-panel" data-testid="managed-canvas-node-action-panel" aria-label="节点操作"><header><b>下一步</b><span v-if="selectedNodeBusy" class="busy-tag" data-testid="managed-canvas-node-busy">{{ selectedNodeBusy.message }}</span></header><div class="node-action-buttons"><button v-for="(action, index) in nodeActionPanel.actions" :key="action.code" type="button" :data-testid="`managed-canvas-action-${action.code}`" :disabled="!action.enabled" :tabindex="action.enabled && nodeActionActiveIndex === index ? 0 : -1" :title="action.reason || action.label" @focus="nodeActionRovingIndex = index" @click="emit('runNodeAction', action.code)">{{ action.label }}<small v-if="action.reason" :data-testid="`managed-canvas-action-reason-${action.code}`">{{ action.reason }}</small></button></div></section>
   </aside>
@@ -59,6 +59,7 @@ import type {
   StudioDashboardUnitSummary,
 } from "@core/studio-production-dashboard";
 import type { StudioCanvasNodeActionCode } from "@core/studio-canvas-node-action-panel";
+import type { SceneBackReference } from "@core/studio-scene-backrefs";
 
 /** P26 拆分子组件：画布右侧检查器（纯展示+事件上行；全部 testid 原样保留）。 */
 export type CanvasInspectorSelection =
@@ -87,6 +88,8 @@ const props = defineProps<{
   panelFrozenLightingLine?: string | null;
   panelFrozenCostumeLine?: string | null;
   panelLightingCostumeSource?: "frozen-rendered-prompt" | "unit-lock" | null;
+  panelSceneBackReferenceNote?: string | null;
+  panelSceneBackReferences?: SceneBackReference[];
 }>();
 const characterAudioEl = ref<HTMLAudioElement | null>(null);
 const appearanceListRovingIndex = ref(-1);
@@ -171,6 +174,7 @@ const emit = defineEmits<{
   appearancesPrevious: [];
   appearancesNext: [];
   runNodeAction: [code: StudioCanvasNodeActionCode];
+  revealSceneBackRef: [ref: SceneBackReference];
 }>();
 
 // 父组件需要滚动出场时间线（节点动作 focus-appearances 时）。
@@ -192,6 +196,7 @@ defineExpose({ appearanceListElement });
 .canvas-inspector dl { display: grid; grid-template-columns: 70px 1fr; gap: 6px; font-size: 11px; }
 .canvas-inspector dt { color: var(--msc-text-3); }
 .canvas-inspector dd { margin: 0; word-break: break-word; }
+.canvas-inspector dd button { display: block; margin: 4px 0 0; border: 1px solid var(--msc-line); border-radius: 6px; background: var(--msc-bg); padding: 4px 6px; color: var(--msc-text); font-size: 10px; cursor: pointer; }
 .appearance-list { list-style: none; margin: 0; padding: 0; }
 .appearance-list li { margin-bottom: 5px; }
 .appearance-list button { width: 100%; border: 1px solid var(--msc-line); border-radius: 7px; background: var(--msc-bg); padding: 8px; color: var(--msc-text); text-align: left; cursor: pointer; content-visibility: auto; contain-intrinsic-size: auto 40px; }

@@ -346,6 +346,11 @@ const api = {
     query: { unitId: string; unitRevision: number },
   ): Promise<import("../core/studio-unit-lock-overlays-read.js").StudioUnitLockOverlayReadResult> =>
     ipcRenderer.invoke("canvas:get-studio-unit-lock-overlays", projectRoot, query),
+  getStudioSceneBackReferences: (
+    projectRoot: string,
+    query: import("../core/studio-scene-backrefs-read.js").StudioSceneBackrefReadQuery,
+  ): Promise<import("../core/studio-scene-backrefs-read.js").StudioSceneBackrefReadResult> =>
+    ipcRenderer.invoke("canvas:get-studio-scene-backrefs", projectRoot, query),
   getStudioPackCurrentness: (projectRoot: string, packId: string): Promise<import("../core/studio-trace.js").StudioGenerationPackCurrentness> =>
     t23IpcPerformanceProbe.invoke("canvas:get-studio-pack-currentness", projectRoot, packId),
   getStudioTrace: (

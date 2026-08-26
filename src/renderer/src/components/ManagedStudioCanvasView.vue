@@ -752,11 +752,14 @@
         :panel-frozen-lighting-line="inspectorFrozenLightingLine"
         :panel-frozen-costume-line="inspectorFrozenCostumeLine"
         :panel-lighting-costume-source="inspectorLightingCostumeSource"
+        :panel-scene-back-reference-note="inspectorSceneBackReferenceNote"
+        :panel-scene-back-references="inspectorSceneBackReferences"
         @close="closeInspector"
         @focus-appearance="focusAppearance"
         @appearances-previous="appearancesPrevious"
         @appearances-next="appearancesNext"
         @run-node-action="runNodeAction"
+        @reveal-scene-back-ref="revealInspectorSceneBackRef"
       />
 
       <DirectorActionPanel
@@ -826,6 +829,7 @@ import {
   frozenPanelLightingFromAnyFrozenPack,
   previousStandingFromAnyFrozenPack,
 } from "@core/studio-panel-standing";
+import { formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
 import type { DirectorAction } from "../director-action-panel.js";
 import type {
   MaterialStudioAssetCategory,
@@ -1968,6 +1972,8 @@ const inspectorPreviousStandingSource = ref<"frozen-rendered-prompt" | "unit-loc
 const inspectorFrozenLightingLine = ref<string | null>(null);
 const inspectorFrozenCostumeLine = ref<string | null>(null);
 const inspectorLightingCostumeSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>(null);
+const inspectorSceneBackReferenceNote = ref<string | null>(null);
+const inspectorSceneBackReferences = ref<SceneBackReference[]>([]);
 type InspectorLockOverlay = {
   panelId: string;
   panelIndex: number;
@@ -2012,6 +2018,46 @@ async function readInspectorLockOverlays(
   }
 }
 
+async function applyInspectorSceneBackrefs(
+  token: number,
+  panelId: string,
+  panelIndex: number,
+): Promise<void> {
+  const unit = unitDetail.value?.unit;
+  if (!props.projectRoot || !unit?.id || !Number.isInteger(unit.revision) || unit.revision < 1) {
+    inspectorSceneBackReferenceNote.value = formatSceneBackReferences(0, []);
+    inspectorSceneBackReferences.value = [];
+    return;
+  }
+  try {
+    const result = await window.canvasApi.getStudioSceneBackReferences(props.projectRoot, {
+      unitId: unit.id,
+      unitRevision: unit.revision,
+      sequence: unit.sequence,
+      panelId,
+      panelIndex,
+      season: unit.seasonId,
+      episode: unit.episodeId,
+    });
+    if (token !== inspectorStandingToken) return;
+    inspectorSceneBackReferenceNote.value = result.sceneBackReferenceNote;
+    inspectorSceneBackReferences.value = result.sceneBackReferences ?? [];
+  } catch {
+    if (token !== inspectorStandingToken) return;
+    inspectorSceneBackReferenceNote.value = formatSceneBackReferences(0, []);
+    inspectorSceneBackReferences.value = [];
+  }
+}
+
+async function revealInspectorSceneBackRef(ref: SceneBackReference): Promise<void> {
+  if (!ref.unitId.trim() || !ref.panelId.trim()) return;
+  try {
+    await focusAppearance(ref.unitId, ref.panelId);
+  } catch {
+    // 单元/宫格不在当前工程则失败关闭，禁止猜第一格。
+  }
+}
+
 watch([selection, unitDetail, () => props.projectRoot], async () => {
   const token = ++inspectorStandingToken;
   inspectorPreviousStandingLine.value = null;
@@ -2019,6 +2065,8 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
   inspectorFrozenLightingLine.value = null;
   inspectorFrozenCostumeLine.value = null;
   inspectorLightingCostumeSource.value = null;
+  inspectorSceneBackReferenceNote.value = null;
+  inspectorSceneBackReferences.value = [];
   if (selection.value?.kind !== "panel") return;
   const panel = selection.value.panel;
   const packId = unitDetail.value?.selectedPanel?.panel.id === panel.id
@@ -2041,6 +2089,7 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
           frozenPanelCostumeFromAnyFrozenPack(pack, panel.id),
         );
         inspectorLightingCostumeSource.value = "frozen-rendered-prompt";
+        await applyInspectorSceneBackrefs(token, panel.id, panel.ordinal);
         return;
       }
     } catch {
@@ -2065,6 +2114,7 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
   const unitRevision = unitDetail.value?.unit.revision;
   if (!props.projectRoot || !unitId || !Number.isInteger(unitRevision) || unitRevision < 1) {
     inspectorLightingCostumeSource.value = "unit-lock";
+    await applyInspectorSceneBackrefs(token, panel.id, panel.ordinal);
     return;
   }
   const overlays = await readInspectorLockOverlays(props.projectRoot, unitId, unitRevision);
@@ -2073,6 +2123,7 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
   inspectorFrozenLightingLine.value = formatUnitLockPanelLightingLine(overlay);
   inspectorFrozenCostumeLine.value = formatUnitLockPanelCostumeLine(overlay);
   inspectorLightingCostumeSource.value = "unit-lock";
+  await applyInspectorSceneBackrefs(token, panel.id, panel.ordinal);
 }, { immediate: true });
 const appearanceListElement = computed<HTMLElement | null>(() => inspectorPanelEl.value?.appearanceListElement ?? null);
 
@@ -4077,6 +4128,8 @@ function closeInspector(): void {
   inspectorFrozenLightingLine.value = null;
   inspectorFrozenCostumeLine.value = null;
   inspectorLightingCostumeSource.value = null;
+  inspectorSceneBackReferenceNote.value = null;
+  inspectorSceneBackReferences.value = [];
   void nextTick(() => restoreInspectorFlowFocus(nodeId));
 }
 
