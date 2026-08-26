@@ -7,6 +7,10 @@ import {
   type AnyStudioGenerationFreezePack,
 } from "./studio-generation-ledger.js";
 import { queryStudioGenerationFreeze } from "./studio-generation.js";
+import {
+  previousStandingFromFrozenRenderedPrompt,
+  type StudioPanelStandingHandoff,
+} from "./studio-panel-standing.js";
 import type { StudioDashboardCurrentness, StudioDashboardNextAction } from "./studio-production-dashboard.js";
 import type { NextShotContinuitySnapshot } from "./studio-next-shot-continuity.js";
 import type { StudioPostResultObservedActualState } from "./studio-post-result-observation.js";
@@ -70,6 +74,13 @@ export interface StudioGenerationSessionSnapshot {
     continuitySnapshot?: NextShotContinuitySnapshot;
     fingerprint: string;
   };
+  /**
+   * 锁版前镜：只从该包 renderedPrompt 还原，不读 unit head。
+   * 历史包无「前镜交接」行则为 null。不是 BindingSet，也不是 previousActualTail。
+   */
+  previousStanding: (StudioPanelStandingHandoff & {
+    source: "frozen-rendered-prompt";
+  }) | null;
   camera: {
     current?: {
       shotComposition: string;
@@ -302,6 +313,10 @@ export async function buildStudioGenerationSessionSnapshot(
           fingerprint: incoming.stamp.fingerprint,
         }
       : undefined,
+    previousStanding: (() => {
+      const parsed = previousStandingFromFrozenRenderedPrompt(frozenPanel);
+      return parsed ? { ...parsed, source: "frozen-rendered-prompt" as const } : null;
+    })(),
     camera: {
       current: frozenPanel
         ? {
@@ -337,6 +352,7 @@ export async function buildStudioGenerationSessionSnapshot(
         : null,
       referenceRoles: body.referenceRoles,
       previousActualTail: body.previousActualTail,
+      ...(body.previousStanding ? { previousStanding: body.previousStanding } : {}),
       camera: body.camera,
       topRiskCode: body.topRisk?.code ?? null,
     }),

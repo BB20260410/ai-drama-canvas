@@ -15,6 +15,8 @@ describe("P24 追溯 UI 合同（U1–U4 诊断面）", () => {
     expect(view).toContain('data-testid="studio-pack-identity"');
     expect(view).toContain("冻结包身份（生成时版本）");
     expect(view).toContain("getStudioFrozenPack");
+    expect(view).toContain('data-testid="studio-pack-previous-standing"');
+    expect(view).toContain("previousStandingFromAnyFrozenPack");
     expect(view).toContain("scriptRevisionId");
     expect(view).toContain("unitSnapshotFingerprint");
     // U2：结果行生成时身份+变化分类（经 pack-currentness IPC 懒加载——首次展开才取，错误可重试；切工程清缓存）。

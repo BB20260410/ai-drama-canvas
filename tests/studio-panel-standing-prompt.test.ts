@@ -4,9 +4,12 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   formatPreviousStandingPromptLine,
+  formatPreviousStandingReadonlyLine,
   parsePreviousStandingFromRenderedPrompt,
   pickPreviousPanelStanding,
-} from "../src/core/studio-generation.js";
+  previousStandingFromAnyFrozenPack,
+  previousStandingFromFrozenRenderedPrompt,
+} from "../src/core/studio-panel-standing.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -69,5 +72,69 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     const brief = readFileSync(path.join(repoRoot, "src/core/unit-grid-brief-contract.ts"), "utf8");
     expect(brief).toContain("previousStanding");
     expect(brief).toContain("不改 renderedPrompt");
+  });
+
+  it("previousStandingFromAnyFrozenPack 只认该包提示词，unit-grid 不猜第一格", () => {
+    const line = formatPreviousStandingPromptLine({
+      panelIndex: 1,
+      panelId: "p1",
+      shotComposition: "中景",
+      visualAction: "站定",
+      filmingMethod: "固定",
+    });
+    const parsed = {
+      panelIndex: 1,
+      panelId: "",
+      shotComposition: "中景",
+      visualAction: "站定",
+      filmingMethod: "固定",
+    };
+    expect(previousStandingFromFrozenRenderedPrompt({
+      request: { modelPayload: { renderedPrompt: `头\n${line}\n尾` } },
+    })).toEqual(parsed);
+    expect(previousStandingFromFrozenRenderedPrompt({
+      request: { modelPayload: { renderedPrompt: "只生成一张 9:16 竖屏" } },
+    })).toBeNull();
+    expect(previousStandingFromAnyFrozenPack({
+      schemaVersion: 5,
+      panels: [{
+        panelId: "p2",
+        panelPack: { request: { modelPayload: { renderedPrompt: `头\n${line}\n尾` } } },
+      }],
+    })).toBeNull();
+    expect(previousStandingFromAnyFrozenPack({
+      schemaVersion: 5,
+      panels: [{
+        panelId: "p2",
+        panelPack: { request: { modelPayload: { renderedPrompt: `头\n${line}\n尾` } } },
+      }],
+    }, "p2")).toEqual(parsed);
+    expect(formatPreviousStandingReadonlyLine(parsed)).toContain("不是 BindingSet");
+    expect(formatPreviousStandingReadonlyLine(null)).toBeNull();
+  });
+
+  it("session-snapshot / 生成控制 / 审片从冻结提示词露前镜，不读 head", () => {
+    const snapshot = readFileSync(path.join(repoRoot, "src/core/studio-generation-session-snapshot.ts"), "utf8");
+    expect(snapshot).toContain("previousStandingFromFrozenRenderedPrompt(frozenPanel)");
+    expect(snapshot).toContain('source: "frozen-rendered-prompt"');
+    expect(snapshot).toContain("不读 unit head");
+    expect(snapshot).not.toContain("getCurrentStudioPanelAssetBindingSet");
+    expect(snapshot).not.toContain("evaluateStudioConsistency");
+    const mcp = readFileSync(path.join(repoRoot, "src/mcp/server.ts"), "utf8");
+    expect(mcp).toContain("previousStanding");
+    expect(mcp).toContain("只从该包 renderedPrompt 还原");
+    const control = readFileSync(path.join(repoRoot, "src/renderer/src/components/StudioGenerationControlView.vue"), "utf8");
+    expect(control).toContain('data-testid="studio-pack-previous-standing"');
+    expect(control).toContain("previousStandingFromAnyFrozenPack(pack, selectedPanelId.value)");
+    expect(control).toContain("formatPreviousStandingReadonlyLine");
+    expect(control).not.toContain("evaluateStudioConsistency");
+    expect(control).not.toContain("getStudioBindingControl");
+    const review = readFileSync(path.join(repoRoot, "src/renderer/src/components/StudioContinuityReviewView.vue"), "utf8");
+    expect(review).toContain('data-testid="studio-review-previous-standing"');
+    expect(review).toContain("previousStandingFromAnyFrozenPack(pack, reviewStandingPanelId.value)");
+    expect(review).toContain("focus?.packId");
+    expect(review).not.toContain("evaluateStudioConsistency(");
+    expect(review).not.toContain("getStudioBindingControl");
+    expect(review).not.toContain("generation.packId");
   });
 });

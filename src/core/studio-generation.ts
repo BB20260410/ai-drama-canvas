@@ -67,6 +67,22 @@ import {
   memoStudioUnitGridRead,
   verifyStudioUnitGridMediaOnce,
 } from "./studio-unit-grid-read-epoch.js";
+import {
+  formatPreviousStandingPromptLine,
+  parsePreviousStandingFromRenderedPrompt,
+  pickPreviousPanelStanding,
+  type StudioPanelStandingHandoff,
+} from "./studio-panel-standing.js";
+
+export {
+  formatPreviousStandingPromptLine,
+  parsePreviousStandingFromRenderedPrompt,
+  pickPreviousPanelStanding,
+  previousStandingFromAnyFrozenPack,
+  previousStandingFromFrozenRenderedPrompt,
+  formatPreviousStandingReadonlyLine,
+  type StudioPanelStandingHandoff,
+} from "./studio-panel-standing.js";
 
 const SHA256_PATTERN = /^[a-f0-9]{64}$/u;
 /** 内部账本定位串不是可供模型执行的视觉状态，禁止被当作已解析连续性。 */
@@ -1171,63 +1187,6 @@ async function freezeAllowedAsset(
     media: frozenMedia,
   };
   return { ...result, sourceFingerprint };
-}
-
-export type StudioPanelStandingHandoff = {
-  panelIndex: number;
-  panelId: string;
-  shotComposition: string;
-  visualAction: string;
-  filmingMethod: string;
-};
-
-export function pickPreviousPanelStanding(
-  panels: ReadonlyArray<{
-    index: number;
-    id: string;
-    shotComposition: string;
-    visualAction: string;
-    filmingMethod: string;
-  }>,
-  currentIndex: number,
-): StudioPanelStandingHandoff | null {
-  if (!Number.isFinite(currentIndex)) return null;
-  const previous = panels
-    .filter((panel) => panel.index < currentIndex)
-    .sort((left, right) => right.index - left.index)[0];
-  if (!previous) return null;
-  return {
-    panelIndex: previous.index,
-    panelId: previous.id,
-    shotComposition: previous.shotComposition,
-    visualAction: previous.visualAction,
-    filmingMethod: previous.filmingMethod,
-  };
-}
-
-/** 写入冻结 renderedPrompt；首格返回 null，不改指纹。 */
-export function formatPreviousStandingPromptLine(
-  handoff: StudioPanelStandingHandoff | null | undefined,
-): string | null {
-  if (!handoff) return null;
-  return `前镜交接：G${handoff.panelIndex} ${handoff.shotComposition.trim() || "构图未记"} · ${handoff.visualAction.trim() || "动作未记"} · ${handoff.filmingMethod.trim() || "运镜未记"}。本格必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。`;
-}
-
-/** 从已冻结 renderedPrompt 还原前镜；历史包无此行则 null。panelId 不在提示词里。 */
-export function parsePreviousStandingFromRenderedPrompt(
-  renderedPrompt: string,
-): StudioPanelStandingHandoff | null {
-  const match = /前镜交接：G(\d+) (.+?) · (.+?) · (.+?)。本格必须从该站位连续起拍/u.exec(renderedPrompt);
-  if (!match) return null;
-  const panelIndex = Number(match[1]);
-  if (!Number.isFinite(panelIndex)) return null;
-  return {
-    panelIndex,
-    panelId: "",
-    shotComposition: match[2] ?? "",
-    visualAction: match[3] ?? "",
-    filmingMethod: match[4] ?? "",
-  };
 }
 
 function panelInstruction(panel: StudioProductionPanel): StudioGenerationPanelInstruction {

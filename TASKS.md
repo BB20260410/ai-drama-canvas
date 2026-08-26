@@ -25,6 +25,7 @@
 - [x] 对照行/SSL-5 预览只绑所选宫格 raw（不再回退整行/unit-grid 图）
 - [x] 新冻结 renderedPrompt / unit-grid brief 写入前镜站位（首格不写以免改指纹；不 dispatch）
 - [x] 单镜 Agent brief 从冻结 renderedPrompt 还原 previousStanding + toolHints（不读 head）
+- [x] session-snapshot / 生成控制 / 审片只读露出冻结前镜（不读 head；不 evaluate 像素；不调 Binding）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825

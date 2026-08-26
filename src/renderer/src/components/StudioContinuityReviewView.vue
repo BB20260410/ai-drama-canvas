@@ -105,6 +105,17 @@
       </section>
 
       <section
+        v-if="frozenPreviousStandingLine"
+        class="control-section previous-standing-section"
+        data-testid="studio-review-previous-standing">
+        <header>
+          <div><span>前镜交接</span><h3>冻结提示词约束</h3></div>
+          <small>不是 BindingSet</small>
+        </header>
+        <p class="handoff-note ready">{{ frozenPreviousStandingLine }} 历史身份经冻结包还原，不读 head。</p>
+      </section>
+
+      <section
         v-if="continuityCorrectionRows.length && canAppendContinuityCorrection"
         class="control-section opaque-correction-section"
         data-testid="continuity-opaque-correction">
@@ -477,6 +488,11 @@ import type { StudioContinuityField, StudioContinuityFieldState } from "@core/st
 import type { StudioContinuityReviewAssetControl, StudioContinuityReviewFieldStatus } from "@core/studio-continuity-review-control";
 import type { StudioGenerationReviewProjection } from "@core/studio-generation-review";
 import {
+  formatPreviousStandingReadonlyLine,
+  previousStandingFromAnyFrozenPack,
+  type StudioPanelStandingHandoff,
+} from "@core/studio-panel-standing";
+import {
   assignUniqueAnnotationIds,
   annotationCategorySummary,
   buildReviewCriteria,
@@ -705,6 +721,20 @@ export default defineComponent({
       && reviewMedia.labeledDecoded,
     ));
     const focus = computed(() => props.focus);
+    const frozenPreviousStanding = ref<StudioPanelStandingHandoff | null>(null);
+    const frozenPreviousStandingLine = computed(() => formatPreviousStandingReadonlyLine(frozenPreviousStanding.value));
+    const reviewStandingPackId = computed(() =>
+      props.focus?.packId
+      ?? loadState.control?.review?.control.head?.packId
+      ?? loadState.control?.review?.history.items[0]?.packId
+      ?? "",
+    );
+    const reviewStandingPanelId = computed(() => {
+      const target = props.focus?.generationTarget;
+      if (target?.targetKind === "panel") return target.panelId;
+      return props.focus?.panelId || draft.panelId;
+    });
+    let reviewStandingToken = 0;
 
     watch(() => props.projectRoot, (root) => {
       invalidateStudioContinuityReviewLoad(loadState, root);
@@ -714,16 +744,35 @@ export default defineComponent({
       continuityCorrectionSavingKey.value = "";
       continuityCorrectionError.value = "";
       originalPreview.value = null;
+      frozenPreviousStanding.value = null;
+      reviewStandingToken += 1;
       timelineOffset = 0;
       conflictOffset = 0;
       reviewCursor = undefined;
       checkpointOffset = 0;
     });
 
+    watch([reviewStandingPackId, reviewStandingPanelId, () => props.projectRoot], async () => {
+      const packId = reviewStandingPackId.value;
+      const token = ++reviewStandingToken;
+      frozenPreviousStanding.value = null;
+      if (!packId) return;
+      try {
+        const pack = await window.canvasApi.getStudioFrozenPack(props.projectRoot, packId);
+        if (token !== reviewStandingToken) return;
+        frozenPreviousStanding.value = previousStandingFromAnyFrozenPack(pack, reviewStandingPanelId.value);
+      } catch {
+        if (token !== reviewStandingToken) return;
+        frozenPreviousStanding.value = null;
+      }
+    }, { immediate: true });
+
     onBeforeUnmount(() => {
       invalidateStudioContinuityReviewLoad(loadState);
       invalidateReviewMedia();
       reviewSubmissionSequence += 1;
+      reviewStandingToken += 1;
+      frozenPreviousStanding.value = null;
       releasePointerCleanups();
     });
     if (typeof window !== "undefined") {
@@ -1522,6 +1571,7 @@ export default defineComponent({
       timelineNextOffset,
       timelinePageTotal,
       continuityHandoff,
+      frozenPreviousStandingLine,
       continuityCorrectionRows,
       canAppendContinuityCorrection,
       reviewMediaAvailable,
