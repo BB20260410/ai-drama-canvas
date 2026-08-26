@@ -1,0 +1,39 @@
+{
+  "id": "goal-dashboard-create-plan-next-20260826",
+  "kind": "unit-grid-dashboard-create-plan-next-action",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T21:26:00.000Z",
+  "scope": "projectStudioUnitGridNextAction gains ready-to-plan when hasCurrentPack && hasCurrentPlan===false. Dashboard no-run path treats readiness candidate as not persisted: no ledger unit-grid pack → freeze; persisted pack without plan → create-unit-grid-plan; persisted pack with plan → dispatch. Align banner formats unit-grid draft nodes and shows the command name. Does not execute create_studio_generation_plan or dispatch. Does not change T23 SQL, listStudioProductionUnits, or checkpoint write init. session-snapshot nextAction still comes from Core dashboard.",
+  "invariants": {
+    "doesNotExecuteCreatePlan": true,
+    "doesNotDispatch": true,
+    "readinessCandidateIsNotPersistedPack": true,
+    "omittedHasCurrentPlanKeepsDispatch": true,
+    "forbidPanelGenerate": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-unit-grid-next-action.test.ts",
+        "tests/studio-production-dashboard-ui.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts"
+      ],
+      "result": "5 files / 50 tests PASS"
+    },
+    "commit": "f40b1b3"
+  },
+  "notClaimed": [
+    "earliest slots now read persisted packs for every unit",
+    "SSL-5 one-click generation closed",
+    "create_studio_generation_plan executed",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
