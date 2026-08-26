@@ -1,0 +1,33 @@
+{
+  "id": "goal-agent-brief-previous-standing-20260826",
+  "createdAt": "2026-08-26T18:37:40.000Z",
+  "kind": "agent-brief-previous-standing-readonly",
+  "conclusion": "PASS",
+  "scope": "Single-panel StudioAgentImagegenBrief exposes previousStanding parsed from frozen renderedPrompt and adds a toolHints note. Does not read unit head. Historical packs without the line stay null. No dispatch.",
+  "invariants": {
+    "parsesFrozenPromptOnly": true,
+    "doesNotReadUnitHead": true,
+    "historicalPacksStayNull": true,
+    "doesNotDispatch": true,
+    "doesNotRewriteHistoricalPacks": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/studio-unit-grid-brief-contract.test.ts",
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts"
+      ],
+      "result": "5 files / 37 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "real-generation constraint evidence",
+    "standing fully solved",
+    "installed T23",
+    "100% fit"
+  ]
+}

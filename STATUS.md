@@ -8,11 +8,11 @@
 | analysis | `docs/GOAL_无限画布全面分析与下一刀_20260826.md` |
 | workqueue | reap 0；next EMPTY；closed=7 |
 | A_earliest | **等待 owner**（真生图 / 安装版 T23 / P7 / 列表 GUI 探针） |
-| B_earliest | 冻结提示词已写前镜站位；真生图约束验证仍等 owner |
-| dual_track_gate | A_done=no；B_demo=部分（对照前镜 + 冻结 renderedPrompt 前镜行）；SSL≥ssl3 源码有、ssl5 计划已暴露；fit_band≠L5 |
+| B_earliest | 单镜 Agent brief 已暴露前镜站位；真生图约束验证仍等 owner |
+| dual_track_gate | A_done=no；B_demo=部分（对照前镜 + 冻结提示词 + brief.previousStanding）；SSL≥ssl3 源码有、ssl5 计划已暴露；fit_band≠L5 |
 | ssl5 | `get_studio_script_library_projection` op `ssl5-missing-to-gen-plan`；对照横幅含 focusPanelId；打开对照自动露出焦点宫格；不 dispatch |
-| evidence | `docs/evidence/goal-ssl5-missing-to-gen-mcp-20260826.json`、`goal-script-span-media-map-20260826.json`、`goal-align-consistency-peek-20260826.json`、`goal-reader-span-media-20260826.json`、`goal-episode-unit-media-map-per-panel-20260826.json`、`goal-align-panel-rows-20260826.json`、`goal-ssl5-focus-missing-panel-20260826.json`、`goal-ssl5-reveal-focus-panel-20260826.json`、`goal-library-covered-and-panel-peek-20260826.json`、`goal-align-panel-composition-20260826.json`、`goal-align-panel-standing-handoff-20260826.json`、`goal-reader-span-standing-handoff-20260826.json`、`goal-reader-span-reveal-align-20260826.json`、`goal-align-standing-gaps-20260826.json`、`goal-align-table-panel-select-20260826.json`、`goal-align-row-no-unit-fallback-20260826.json`、`goal-freeze-prompt-previous-standing-20260826.json` |
-| earliest_next | A 仍等 owner。B 源码已把前镜写入新冻结提示词；真实验证需正式工程。禁止写「运行速度已关账」/「100% 契合」 |
+| evidence | `docs/evidence/goal-ssl5-missing-to-gen-mcp-20260826.json`、`goal-script-span-media-map-20260826.json`、`goal-align-consistency-peek-20260826.json`、`goal-reader-span-media-20260826.json`、`goal-episode-unit-media-map-per-panel-20260826.json`、`goal-align-panel-rows-20260826.json`、`goal-ssl5-focus-missing-panel-20260826.json`、`goal-ssl5-reveal-focus-panel-20260826.json`、`goal-library-covered-and-panel-peek-20260826.json`、`goal-align-panel-composition-20260826.json`、`goal-align-panel-standing-handoff-20260826.json`、`goal-reader-span-standing-handoff-20260826.json`、`goal-reader-span-reveal-align-20260826.json`、`goal-align-standing-gaps-20260826.json`、`goal-align-table-panel-select-20260826.json`、`goal-align-row-no-unit-fallback-20260826.json`、`goal-freeze-prompt-previous-standing-20260826.json`、`goal-agent-brief-previous-standing-20260826.json` |
+| earliest_next | A 仍等 owner。B 源码已把前镜写入冻结提示词与 Agent brief；真实验证需正式工程。禁止写「运行速度已关账」/「100% 契合」 |
 
 ## 2026-08-25 · 运行速度与内存占用长期计划立项
 
