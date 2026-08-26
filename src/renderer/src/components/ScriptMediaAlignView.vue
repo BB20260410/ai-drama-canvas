@@ -529,7 +529,7 @@ function shortSha(value: string | null | undefined): string {
         >
           <b>{{ item.title }}</b>
           <span>Head r{{ item.headRevision }} · {{ item.revisionCount }} 个不可变修订</span>
-          <span>关联 {{ item.linkedUnitCount }} 个生产单元</span>
+          <span>关联 {{ item.linkedUnitCount }} 个生产单元 · 有图 {{ item.coveredMediaCount }}</span>
           <code>{{ item.documentId }}</code>
         </button>
         <div v-if="!(library?.items.length)" class="empty">当前工程还没有剧本文档。</div>

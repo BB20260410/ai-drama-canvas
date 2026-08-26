@@ -290,16 +290,37 @@ export function normalizeSourceSpans(spans: unknown): ScriptSpanRef[] {
   return out;
 }
 
-async function countUnitsForScriptRevision(projectRoot: string, scriptRevisionId: string): Promise<number> {
+/** 纯：有任一宫格出图的单元数。 */
+export function countCoveredUnits(
+  units: Array<{ panels: Array<{ hasMedia: boolean }> }>,
+): number {
+  return units.filter((unit) => unit.panels.some((panel) => panel.hasMedia)).length;
+}
+
+async function summarizeScriptRevisionUnits(
+  projectRoot: string,
+  scriptRevisionId: string,
+): Promise<{ linkedUnitCount: number; coveredMediaCount: number }> {
   // 经 list units 扫描头修订（有界页）；SSL-0 可接受 O(n) 投影
   let cursor: string | undefined;
-  let n = 0;
+  let linkedUnitCount = 0;
+  let coveredMediaCount = 0;
   for (let page = 0; page < 50; page++) {
     const batch = await listStudioProductionUnits(projectRoot, { limit: 100, cursor });
     for (const u of batch.items) {
       try {
         const snap = await getStudioProductionUnitSnapshot(projectRoot, u.id);
-        if (snap?.scriptRevision?.id === scriptRevisionId) n += 1;
+        if (snap?.scriptRevision?.id !== scriptRevisionId) continue;
+        linkedUnitCount += 1;
+        let covered = false;
+        for (const panel of snap.panels || []) {
+          const media = await latestPackMedia(projectRoot, u.id, String(panel.id));
+          if (media.rawSha256 || media.labeledSha256) {
+            covered = true;
+            break;
+          }
+        }
+        if (covered) coveredMediaCount += 1;
       } catch {
         /* skip */
       }
@@ -307,7 +328,7 @@ async function countUnitsForScriptRevision(projectRoot: string, scriptRevisionId
     if (!batch.nextCursor) break;
     cursor = batch.nextCursor;
   }
-  return n;
+  return { linkedUnitCount, coveredMediaCount };
 }
 
 /**
@@ -330,13 +351,9 @@ export async function getStudioScriptLibraryIndex(
     let linkedUnitCount = 0;
     let coveredMediaCount = 0;
     if (headRevId) {
-      linkedUnitCount = await countUnitsForScriptRevision(projectRoot, headRevId);
-      // coveredMedia：粗估 — 有任一 unit pack 结果则 +1（按 unit，非 panel）
-      // 完整 panel 覆盖见 getStudioEpisodeUnitMediaMap
-      if (linkedUnitCount > 0) {
-        // 轻量：不二次扫 pack；coveredMediaCount 在 episode map 更准
-        coveredMediaCount = 0;
-      }
+      const summary = await summarizeScriptRevisionUnits(projectRoot, headRevId);
+      linkedUnitCount = summary.linkedUnitCount;
+      coveredMediaCount = summary.coveredMediaCount;
     }
     items.push({
       documentId: doc.id,

@@ -34,6 +34,7 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     const vue = source();
     expect(parse(vue, { filename: "ScriptMediaAlignView.vue" }).errors).toEqual([]);
     expect(vue).toContain('data-testid="script-library-import"');
+    expect(vue).toContain("有图 {{ item.coveredMediaCount }}");
     expect(vue).toContain('data-testid="script-reader-to-wizard"');
     expect(vue).toContain('data-testid="script-reader-span-media"');
     expect(vue).toContain('data-testid="script-reader-span-media-board"');

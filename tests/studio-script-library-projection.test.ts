@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
   applyPackMediaToPanels,
   buildMissingMediaReport,
+  countCoveredUnits,
   formatPanelCoverageMarks,
   normalizeSourceSpans,
   pickFirstCoveredPanel,
@@ -50,6 +51,14 @@ describe("studio-script-library-projection pure helpers", () => {
 
   it("schema version is frozen for SSL-0", () => {
     expect(SCRIPT_LIBRARY_PROJECTION_SCHEMA_VERSION).toBe(1);
+  });
+
+  it("countCoveredUnits counts units with any panel media", () => {
+    expect(countCoveredUnits([
+      { panels: [{ hasMedia: false }, { hasMedia: true }] },
+      { panels: [{ hasMedia: false }] },
+      { panels: [] },
+    ])).toBe(1);
   });
 
   it("buildMissingMediaReport classifies covered/partial/missing", () => {
@@ -243,6 +252,9 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     expect(source).toContain("listPanelPacksNewestFirst");
     expect(source).toContain("applyPackMediaToPanels");
     expect(source).not.toContain("panel 级 media 目前与 unit-grid 共享同一结果图");
+    expect(source).toContain("summarizeScriptRevisionUnits");
+    expect(source).toContain("coveredMediaCount = summary.coveredMediaCount");
+    expect(source).not.toContain("轻量：不二次扫 pack；coveredMediaCount 在 episode map 更准");
     const align = readFileSync(path.join(repoRoot, "src/core/studio-script-media-align.ts"), "utf8");
     expect(align).toContain("pickFirstCoveredPanel");
     expect(align).toContain("panels: u.panels");
