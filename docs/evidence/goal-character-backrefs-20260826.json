@@ -1,0 +1,53 @@
+{
+  "id": "goal-character-backrefs-20260826",
+  "kind": "character-backrefs-readonly",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T20:25:00.000Z",
+  "scope": "Cross-unit character backrefs reuse the scene/prop-backref contract: snapshot mentions with category=character only. Align / SSL-5 / reader / 15s wizard scan the already-loaded board; session-snapshot / canvas inspector / generation control use one readOnly SQL open (same IPC canvas:get-studio-scene-backrefs) that returns scene, prop, and character sets. Click-through reuses existing reveal handlers and fail-closes instead of guessing panels[0]. Not BindingSet; does not write formatWizardPromptBody / freeze fingerprint; does not change StudioDashboardPanelSummary or get_studio_trace; unit-grid brief last tool note remains previous-standing. Review stays frozen-pack identity only.",
+  "invariants": {
+    "categoryCharacterOnly": true,
+    "sameIpcReturnsThreeSets": true,
+    "usesLoadedBoardOnlyOnAlignSsl5ReaderWizard": true,
+    "doesNotAutoLoadAlignBoard": true,
+    "doesNotWriteFrozenPrompt": true,
+    "doesNotGuessFirstPanel": true,
+    "doesNotChangeDashboardProjection": true,
+    "doesNotWriteTraceHeadBackrefs": true,
+    "doesNotCallBindingInspect": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotDispatch": true,
+    "unitGridBriefLastNoteRemainsPreviousStanding": true,
+    "sessionSnapshotSchemaVersionUnchanged": 1,
+    "ssl5PlanSchemaVersionUnchanged": 1
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-scene-backrefs-readonly-sql.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-unit-grid-brief-contract.test.ts"
+      ],
+      "result": "8 files / 158 tests PASS"
+    },
+    "commit": "0b63b41"
+  },
+  "notClaimed": [
+    "character consistency fully solved",
+    "prop consistency fully solved",
+    "scene consistency fully solved",
+    "real-generation constraint evidence",
+    "wizard auto-loads align board",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
