@@ -1,0 +1,42 @@
+{
+  "id": "goal-session-control-plan-draft-20260826",
+  "kind": "session-snapshot-generation-control-plan-readonly-draft",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T21:07:00.000Z",
+  "scope": "composeStudioGenerationPlanDraft extracted to a thin module with no align-board or sqlite imports. session-snapshot and StudioGenerationControlView expose the same read-only create_studio_generation_plan draft. Snapshot uses query.panelId only (does not guess the first panel) and only a persisted asset-binding-set pack whose target.panelId matches; unit-grid packs and unpersisted readiness candidates stay blocked. Control uses the selected panel's own ready pack and never the unit-grid history pack. Draft is omitted from session-snapshot fingerprint. Does not execute or dispatch. SSL5_PLAN_SCHEMA_VERSION and session-snapshot schemaVersion stay 1.",
+  "invariants": {
+    "sessionSnapshotSchemaVersionUnchanged": 1,
+    "ssl5PlanSchemaVersionUnchanged": 1,
+    "doesNotExecuteCreatePlan": true,
+    "doesNotDispatch": true,
+    "doesNotGuessFirstPanel": true,
+    "doesNotUseSiblingOrUnitGridPackAsPanelNode": true,
+    "doesNotImportAlignBoardFromSnapshot": true,
+    "draftOmittedFromFingerprint": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts"
+      ],
+      "result": "6 files / 45 tests PASS"
+    },
+    "commit": "b455e21"
+  },
+  "notClaimed": [
+    "SSL-5 one-click generation closed",
+    "create_studio_generation_plan executed",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

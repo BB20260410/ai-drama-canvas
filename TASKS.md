@@ -50,6 +50,7 @@
 - [x] unit-grid Agent brief.BEATS 带 startSeconds/endSeconds/shotType（promptContractText 含起止秒与原镜/扩写；不改冻结 renderedPrompt；templateId / schemaVersion 不变；整板 brief 最后一条仍是前镜句）
 - [x] 单镜 Agent brief 带 shotTypeLine / beatLine（只从冻结包 renderedPrompt / target 还原；无扩写/原镜或无时长则为 null；unit-grid 无 panelId 不猜第一格；不改 renderedPrompt）
 - [x] SSL-5 create-plan 只读草稿（recommendedPath 含 create-plan；generationPlanDraft 只认焦点缺图格 focusPackId，禁止用同行已出图 preview pack；不执行、不 dispatch；schemaVersion 仍为 1）
+- [x] session-snapshot / 生成控制露出同一 create-plan 只读草稿（薄模块不拉对照板；只认 query.panelId / 当前宫格已落盘单镜包；整板 pack 不当单镜节点；草稿不进 fingerprint；不执行、不 dispatch；schemaVersion 仍为 1）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
