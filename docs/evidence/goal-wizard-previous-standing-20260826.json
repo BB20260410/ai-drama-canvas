@@ -1,0 +1,39 @@
+{
+  "id": "goal-wizard-previous-standing-20260826",
+  "kind": "ssl4-wizard-previous-standing-readonly",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T19:10:30.000Z",
+  "scope": "15s storyboard wizard G2+ shows lock previous standing from the previous editable panel and writes the same 前镜交接 line into the materialized prompt body via formatWizardPromptBody. First panel omits the line. Desktop App materialize path uses the same helper. Not BindingSet; not generation-ready; does not dispatch or skip Binding/freeze.",
+  "invariants": {
+    "firstPanelOmitsPromptLine": true,
+    "laterPanelsWriteFrozenStandingLine": true,
+    "appAndCoreShareFormatWizardPromptBody": true,
+    "doesNotDispatch": true,
+    "doesNotSkipBinding": true,
+    "doesNotCallBindingInspectFromWizardUi": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/material-studio-ui-contract.test.ts",
+        "tests/studio-storyboard-wizard.test.ts"
+      ],
+      "result": "3 files PASS; wizard 5/6 PASS; 1 Linux dirfd failure is pre-existing createManagedProject fixture, not this slice"
+    },
+    "commit": "44db496"
+  },
+  "notClaimed": [
+    "real-generation constraint evidence",
+    "standing fully solved",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click of wizard standing",
+    "wizard fixture on Linux",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}
