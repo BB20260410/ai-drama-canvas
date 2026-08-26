@@ -5232,7 +5232,7 @@ registrar.registerTool(
   "get_studio_trace",
   {
     title: "Studio 生成全链双向追溯（只读）",
-    description: "P24 双向追溯：by-pack/by-run/by-result 返回当时链投影（剧本 revision、原文 spans、单元修订、提示词 revision、BindingSet、连续性指纹、runs/results/reviews 有界列表、冻结提示词前镜 previousStandings（只从该包 renderedPrompt 还原，无该行则省略）、预期/非预期变化分类，历史身份一律经冻结包还原不读 head）；script-revision-impact 按剧本 revision 反查受影响单元修订→宫格→冻结包→runs→结果（两层分页，limit≤100）。只读，不写任何账本。",
+    description: "P24 双向追溯：by-pack/by-run/by-result 返回当时链投影（剧本 revision、原文 spans、单元修订、提示词 revision、BindingSet、连续性指纹、runs/results/reviews 有界列表、冻结提示词前镜 previousStandings（只从该包 renderedPrompt 还原，无该行则省略）、冻结宫格光线/服装覆盖 frozenPanelOverlays（无该行则省略）、预期/非预期变化分类，历史身份一律经冻结包还原不读 head）；script-revision-impact 按剧本 revision 反查受影响单元修订→宫格→冻结包→runs→结果（两层分页，limit≤100）。只读，不写任何账本。",
     inputSchema: {
       projectRoot: managedStudioProjectRootSchema,
       operation: z.enum(["by-pack", "by-run", "by-result", "script-revision-impact"]),

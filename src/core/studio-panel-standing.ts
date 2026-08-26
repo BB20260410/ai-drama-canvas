@@ -172,6 +172,9 @@ export function formatUnitLockPreviousStandingLine(
 export const UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE =
   "若 previousStandings、promptContract.BEATS[].previousStanding 或 renderedPrompt 含「前镜交接」，必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。";
 
+export const FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE =
+  "若 frozenPanelLighting、frozenPanelCostume、frozenPanelOverlays 或 renderedPrompt 含「光线（宫格覆盖）」/「服装（宫格覆盖）」，必须保持该宫格覆盖，禁止改光色或换装。";
+
 export type FrozenPanelStandingRow = {
   panelId: string;
   previousStanding: StudioPanelStandingHandoff & { source: "frozen-rendered-prompt" };
@@ -308,6 +311,36 @@ export function previousStandingsFromFrozenPanelPacks(
     rows.push({
       panelId: typeof pack.target?.panelId === "string" ? pack.target.panelId : "",
       previousStanding: { ...parsed, source: "frozen-rendered-prompt" },
+    });
+  }
+  return rows;
+}
+
+export type FrozenPanelOverlayRow = {
+  panelId: string;
+  lighting: string | null;
+  costume: string | null;
+};
+
+/**
+ * 追溯/brief 共用：只从各格冻结 renderedPrompt 还原宫格光线/服装覆盖。
+ * 两行都没有的格不进数组；全空则调用方应省略字段，保持历史 P24 投影兼容。
+ */
+export function frozenPanelOverlaysFromFrozenPanelPacks(
+  packs: ReadonlyArray<{
+    target?: { panelId?: string };
+    request?: { modelPayload?: { renderedPrompt?: string } };
+  }>,
+): FrozenPanelOverlayRow[] {
+  const rows: FrozenPanelOverlayRow[] = [];
+  for (const pack of packs) {
+    const lighting = frozenPanelLightingFromAnyFrozenPack(pack);
+    const costume = frozenPanelCostumeFromAnyFrozenPack(pack);
+    if (!lighting && !costume) continue;
+    rows.push({
+      panelId: typeof pack.target?.panelId === "string" ? pack.target.panelId : "",
+      lighting,
+      costume,
     });
   }
   return rows;

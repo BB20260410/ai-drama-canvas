@@ -68,7 +68,10 @@ import {
   verifyStudioUnitGridMediaOnce,
 } from "./studio-unit-grid-read-epoch.js";
 import {
+  FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
   formatPreviousStandingPromptLine,
+  parseFrozenPanelCostumeFromRenderedPrompt,
+  parseFrozenPanelLightingFromRenderedPrompt,
   parsePreviousStandingFromRenderedPrompt,
   pickPreviousPanelStanding,
   type StudioPanelStandingHandoff,
@@ -2681,6 +2684,9 @@ export interface StudioAgentImagegenBrief {
   renderedPrompt: string;
   /** 从 renderedPrompt 还原；历史包无前镜行则为 null。 */
   previousStanding: StudioPanelStandingHandoff | null;
+  /** 从 renderedPrompt 还原；历史包无宫格覆盖行则为 null。 */
+  frozenPanelLighting: string | null;
+  frozenPanelCostume: string | null;
   controlReferences: Array<{
     assetId: string;
     category: string;
@@ -2735,6 +2741,7 @@ export function buildStudioAgentImagegenBrief(
         "人物/场景/道具/风格只能来自冻结 pack 的 controlReferences 与 modelPayload。",
         "参考图本地路径只读 pack 操作返回的 request.controlReferences.localPath（已 CAS/SHA 校验）。",
         "若 previousStanding 或 renderedPrompt 含「前镜交接」，必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。",
+        FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
         "禁止浏览器、Artlist、ComfyUI、网页自动化旁路。",
       ],
     }
@@ -2747,6 +2754,7 @@ export function buildStudioAgentImagegenBrief(
         "参考图 localPath 只来自 pack 操作的 verified controlReferences，不使用 brief 内路径。",
         "不得替换冻结包外的身份；不得把字幕/分屏画进 raw。",
         "若 previousStanding 或 renderedPrompt 含「前镜交接」，必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。",
+        FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
         "禁止浏览器、Artlist、网页自动化旁路。",
       ],
     };
@@ -2764,6 +2772,8 @@ export function buildStudioAgentImagegenBrief(
     maxCalls: 1,
     renderedPrompt: pack.request.modelPayload.renderedPrompt,
     previousStanding: parsePreviousStandingFromRenderedPrompt(pack.request.modelPayload.renderedPrompt),
+    frozenPanelLighting: parseFrozenPanelLightingFromRenderedPrompt(pack.request.modelPayload.renderedPrompt),
+    frozenPanelCostume: parseFrozenPanelCostumeFromRenderedPrompt(pack.request.modelPayload.renderedPrompt),
     controlReferences: pack.request.controlReferences.map((ref) => ({
       assetId: ref.assetId,
       category: ref.category,

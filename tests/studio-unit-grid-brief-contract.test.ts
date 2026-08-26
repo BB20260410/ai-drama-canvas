@@ -359,7 +359,9 @@ describe("buildStudioUnitGridAgentImagegenBrief (shipped runtime)", () => {
     expect(codex.promptContractText).toContain("IDENTITY_LOCK");
     expect(grok.promptContract).toEqual(codex.promptContract);
     expect(codex.previousStandings).toEqual([{ panelId: "panel-01", previousStanding: null }]);
+    expect(codex.frozenPanelOverlays).toBeUndefined();
     expect(codex.tool.notes.at(-1)).toContain("前镜交接");
+    expect(codex.tool.notes.some((note) => note.includes("光线（宫格覆盖）"))).toBe(true);
     expect(grok.tool.notes.at(-1)).toContain("前镜交接");
   });
 
@@ -430,6 +432,55 @@ describe("buildStudioUnitGridAgentImagegenBrief (shipped runtime)", () => {
       },
     ]);
     expect(brief.tool.notes.some((note) => note.includes("前镜交接"))).toBe(true);
+    expect(brief.tool.notes.some((note) => note.includes("光线（宫格覆盖）"))).toBe(true);
+    expect(brief.prompt).toBe(originalPrompt);
+    expect(brief.frozenPanelOverlays).toBeUndefined();
+  });
+
+  it("多格 brief 把本格光线/服化写进 BEATS，并从 panelPack 投影 overlays", () => {
+    const pack = minimalUnitGridPack();
+    const first = pack.panels[0]!;
+    pack.panels[0] = {
+      ...first,
+      instruction: {
+        ...first.instruction,
+        sceneLighting: "室内火光",
+        costumeState: "深灰祭服",
+      },
+    };
+    pack.panels.push({
+      ...first,
+      order: 2,
+      panelId: "panel-02",
+      panelIndex: 2,
+      startSeconds: 7.5,
+      endSeconds: 15,
+      instruction: {
+        visualAction: "抬手",
+        shotComposition: "近景",
+        filmingMethod: "推",
+        sceneLighting: "走廊冷光",
+      },
+      panelPack: {
+        ...first.panelPack,
+        request: {
+          modelPayload: { renderedPrompt: "头\n光线（宫格覆盖）：走廊冷光\n服装（宫格覆盖）：湿祭服\n尾" },
+        },
+      } as typeof first.panelPack,
+    });
+    const originalPrompt = pack.request.modelPayload.renderedPrompt;
+    const contract = composeUnitGridBriefContract(pack);
+    expect(contract.slots.BEATS[0]?.sceneLighting).toBe("室内火光");
+    expect(contract.slots.BEATS[0]?.costumeState).toBe("深灰祭服");
+    expect(contract.slots.BEATS[1]?.sceneLighting).toBe("走廊冷光");
+    const text = renderUnitGridBriefContractText(contract);
+    expect(text).toContain("光:室内火光");
+    expect(text).toContain("服:深灰祭服");
+    expect(text).toContain("光:走廊冷光");
+    const brief = buildStudioUnitGridAgentImagegenBrief(pack, "codex");
+    expect(brief.frozenPanelOverlays).toEqual([
+      { panelId: "panel-02", lighting: "走廊冷光", costume: "湿祭服" },
+    ]);
     expect(brief.prompt).toBe(originalPrompt);
   });
 

@@ -39,6 +39,8 @@ export interface UnitGridBriefBeat {
     filmingMethod: string;
     visualAction: string;
   };
+  sceneLighting?: string;
+  costumeState?: string;
 }
 
 export interface UnitGridBriefContract {
@@ -135,6 +137,12 @@ export function composeUnitGridBriefContract(
       filmingMethod: panel.instruction.filmingMethod,
       visualAction: panel.instruction.visualAction,
       ...(panel.instruction.dialogue ? { dialogue: clip(panel.instruction.dialogue, 80) } : {}),
+      ...(panel.instruction.sceneLighting?.trim()
+        ? { sceneLighting: clip(panel.instruction.sceneLighting, 80) }
+        : {}),
+      ...(panel.instruction.costumeState?.trim()
+        ? { costumeState: clip(panel.instruction.costumeState, 80) }
+        : {}),
       ...(previous
         ? {
           previousStanding: {
@@ -203,7 +211,11 @@ export function renderUnitGridBriefContractText(contract: UnitGridBriefContract)
     .join("；") || "无场景控制参考";
   const beats = slots.BEATS
     .map((beat) => {
-      const self = `G${beat.order} ${beat.durationSeconds}s ${beat.shotComposition}/${beat.filmingMethod} ${clip(beat.visualAction, 48)}`;
+      const overlay = [
+        beat.sceneLighting ? `光:${clip(beat.sceneLighting, 24)}` : "",
+        beat.costumeState ? `服:${clip(beat.costumeState, 24)}` : "",
+      ].filter(Boolean).join(" ");
+      const self = `G${beat.order} ${beat.durationSeconds}s ${beat.shotComposition}/${beat.filmingMethod} ${clip(beat.visualAction, 48)}${overlay ? ` ${overlay}` : ""}`;
       if (!beat.previousStanding) return self;
       return `${self} ← G${beat.previousStanding.order} ${beat.previousStanding.shotComposition}/${beat.previousStanding.filmingMethod}`;
     })

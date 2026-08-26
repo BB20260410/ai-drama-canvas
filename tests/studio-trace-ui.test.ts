@@ -93,6 +93,8 @@ describe("P24 追溯 IPC 桌面接线（§4-8）", () => {
     expect(traceCore).toContain("classifyStudioStaleReasons(bindingSetStaleReasons)");
     const drawer = await source("src/renderer/src/components/StudioGenerationTraceDrawer.vue");
     expect(drawer).toContain('data-testid="studio-generation-trace-drawer"');
+    expect(drawer).toContain('data-testid="studio-generation-trace-overlays"');
+    expect(drawer).toContain("frozenPanelOverlays");
     expect(drawer).toContain("get_studio_trace");
     expect(drawer).not.toContain("evaluateStudioConsistency");
     expect(drawer).not.toContain("studio-trace.js");

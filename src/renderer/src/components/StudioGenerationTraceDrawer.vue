@@ -19,6 +19,11 @@ export type StudioTraceDrawerModel = {
       source?: string;
     };
   }>;
+  frozenPanelOverlays?: Array<{
+    panelId: string;
+    lighting: string | null;
+    costume: string | null;
+  }>;
   runs: Array<{ runId: string; provider: string; terminal: boolean }>;
   results: Array<{ resultId: string; variant: string; inputCurrent: boolean }>;
   runsTruncated: boolean;
@@ -83,6 +88,16 @@ function classificationLabel(value: string): string {
           </li>
         </ul>
         <p v-else class="empty">历史包无「前镜交接」行，已省略 previousStandings。</p>
+      </section>
+      <section data-testid="studio-generation-trace-overlays">
+        <h4>光线 / 服装覆盖</h4>
+        <ul v-if="trace.frozenPanelOverlays?.length">
+          <li v-for="row in trace.frozenPanelOverlays" :key="`overlay:${row.panelId}:${row.lighting ?? ''}:${row.costume ?? ''}`">
+            <code>{{ row.panelId || "panelId 未记" }}</code>
+            <span>{{ [row.lighting ? `光线：${row.lighting}` : "", row.costume ? `服装：${row.costume}` : ""].filter(Boolean).join(" · ") }}。不是 BindingSet。</span>
+          </li>
+        </ul>
+        <p v-else class="empty">历史包无「光线/服装（宫格覆盖）」行，已省略 frozenPanelOverlays。</p>
       </section>
       <p class="counts" data-testid="studio-generation-trace-counts">
         runs {{ trace.runs.length }}{{ trace.runsTruncated ? "+" : "" }}

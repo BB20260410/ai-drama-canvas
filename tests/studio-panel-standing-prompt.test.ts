@@ -25,6 +25,8 @@ import {
   frozenPanelCostumeFromAnyFrozenPack,
   formatFrozenPanelLightingReadonlyLine,
   formatFrozenPanelCostumeReadonlyLine,
+  frozenPanelOverlaysFromFrozenPanelPacks,
+  FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
 } from "../src/core/studio-panel-standing.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -84,6 +86,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(generation).not.toContain("前镜交接：首格无前镜");
     expect(generation).toContain("光线（宫格覆盖）：${input.panel.sceneLighting}");
     expect(generation).not.toContain("前镜光线");
+    expect(generation).toContain("frozenPanelLighting: parseFrozenPanelLightingFromRenderedPrompt");
+    expect(generation).toContain("FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE");
     const unitGrid = readFileSync(path.join(repoRoot, "src/core/studio-unit-grid-generation.ts"), "utf8");
     expect(unitGrid).toContain("formatPreviousStandingPromptLine");
     expect(unitGrid).toContain("第${offset + 1}格${previousLine}");
@@ -203,6 +207,14 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     }, "p2")).toBe("深灰祭服");
     expect(formatFrozenPanelLightingReadonlyLine("室内火光")).toContain("不是 BindingSet");
     expect(formatFrozenPanelCostumeReadonlyLine("")).toBeNull();
+    expect(frozenPanelOverlaysFromFrozenPanelPacks([
+      { target: { panelId: "p1" }, request: { modelPayload: { renderedPrompt: "只生成一张" } } },
+      { target: { panelId: "p2" }, request: { modelPayload: { renderedPrompt: "光线（宫格覆盖）：室内火光\n服装（宫格覆盖）：深灰祭服" } } },
+    ])).toEqual([{ panelId: "p2", lighting: "室内火光", costume: "深灰祭服" }]);
+    expect(frozenPanelOverlaysFromFrozenPanelPacks([
+      { target: { panelId: "p1" }, request: { modelPayload: { renderedPrompt: "只生成一张" } } },
+    ])).toEqual([]);
+    expect(FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE).toContain("光线（宫格覆盖）");
   });
 
   it("session-snapshot / 生成控制 / 审片从冻结提示词露前镜，不读 head", () => {
@@ -262,6 +274,9 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(brief).toContain("previousStandings");
     expect(brief).toContain("previousStandingFromFrozenRenderedPrompt(panel.panelPack)");
     expect(brief).toContain("UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE");
+    expect(brief).toContain("frozenPanelOverlays");
+    expect(brief).toContain("FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE");
+    expect(brief).toContain("frozenPanelLightingFromAnyFrozenPack(panel.panelPack)");
     const canvas = readFileSync(path.join(repoRoot, "src/renderer/src/components/ManagedStudioCanvasView.vue"), "utf8");
     expect(canvas).toContain("previousStandingFromAnyFrozenPack(pack, panel.id)");
     expect(canvas).toContain("frozenPanelLightingFromAnyFrozenPack(pack, panel.id)");
@@ -277,10 +292,13 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     const trace = readFileSync(path.join(repoRoot, "src/core/studio-trace.ts"), "utf8");
     expect(trace).toContain("previousStandingsFromFrozenPanelPacks(panelPacks)");
     expect(trace).toContain("previousStandings.length > 0 ? { previousStandings }");
+    expect(trace).toContain("frozenPanelOverlaysFromFrozenPanelPacks(panelPacks)");
+    expect(trace).toContain("frozenPanelOverlays.length > 0 ? { frozenPanelOverlays }");
     expect(trace).toContain("不读 unit head");
     expect(trace).not.toContain("getCurrentStudioPanelAssetBindingSet");
     const mcpTrace = readFileSync(path.join(repoRoot, "src/mcp/server.ts"), "utf8");
     expect(mcpTrace).toContain("previousStandings");
+    expect(mcpTrace).toContain("frozenPanelOverlays");
     expect(mcpTrace).toContain("无该行则省略");
   });
 });

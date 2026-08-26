@@ -1975,6 +1975,8 @@ describe("受管画布侧栏列表视口剔除", () => {
     expect(view).not.toContain("getStudioBindingControl");
     expect(drawer).toContain('data-testid="studio-generation-trace-drawer"');
     expect(drawer).toContain('data-testid="studio-generation-trace-previous-standings"');
+    expect(drawer).toContain('data-testid="studio-generation-trace-overlays"');
+    expect(drawer).toContain("frozenPanelOverlays");
     expect(drawer).toContain("formatPreviousStandingReadonlyLine");
     expect(drawer).not.toContain("evaluateStudioConsistency");
     expect(drawer).not.toContain("getStudioBindingControl");

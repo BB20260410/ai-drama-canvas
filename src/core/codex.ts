@@ -60,7 +60,10 @@ import {
   type StudioFormalImagegenProvider,
 } from "./studio-imagegen-providers.js";
 import {
+  FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
   UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE,
+  frozenPanelCostumeFromAnyFrozenPack,
+  frozenPanelLightingFromAnyFrozenPack,
   previousStandingFromFrozenRenderedPrompt,
 } from "./studio-panel-standing.js";
 import {
@@ -236,6 +239,12 @@ export function buildStudioUnitGridAgentImagegenBrief(
     panelId: panel.panelId,
     previousStanding: previousStandingFromFrozenRenderedPrompt(panel.panelPack),
   }));
+  const frozenPanelOverlays = pack.panels.flatMap((panel) => {
+    const lighting = frozenPanelLightingFromAnyFrozenPack(panel.panelPack);
+    const costume = frozenPanelCostumeFromAnyFrozenPack(panel.panelPack);
+    if (!lighting && !costume) return [];
+    return [{ panelId: panel.panelId, lighting, costume }];
+  });
   const tool = providerToolHints(provider);
   return {
     schemaVersion: 1 as const,
@@ -250,6 +259,7 @@ export function buildStudioUnitGridAgentImagegenBrief(
     promptContract,
     promptContractText: renderUnitGridBriefContractText(promptContract),
     previousStandings,
+    ...(frozenPanelOverlays.length > 0 ? { frozenPanelOverlays } : {}),
     forbidden: pack.request.forbidden,
     referenceCount: pack.request.controlReferences.length,
     controlReferences,
@@ -266,7 +276,7 @@ export function buildStudioUnitGridAgentImagegenBrief(
     referencePathSource: "pack-operation-controlReferences-only" as const,
     tool: {
       ...tool,
-      notes: [...tool.notes, UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE],
+      notes: [...tool.notes, FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE, UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE],
     },
   };
 }

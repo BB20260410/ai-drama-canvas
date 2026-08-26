@@ -28,7 +28,9 @@ import {
 } from "./studio-generation-ledger.js";
 import type { StudioGenerationFreezePack } from "./studio-generation.js";
 import {
+  frozenPanelOverlaysFromFrozenPanelPacks,
   previousStandingsFromFrozenPanelPacks,
+  type FrozenPanelOverlayRow,
   type FrozenPanelStandingRow,
 } from "./studio-panel-standing.js";
 import type { StudioUnitGridGenerationFreezePack } from "./studio-unit-grid-generation.js";
@@ -156,6 +158,11 @@ export interface StudioGenerationTrace {
    * 仅当至少一格含「前镜交接」行时返回，以免改历史 P24 投影形状。
    */
   previousStandings?: FrozenPanelStandingRow[];
+  /**
+   * 冻结宫格光线/服装覆盖：只从该包 renderedPrompt 还原，不读 unit head。
+   * 仅当至少一格含「光线/服装（宫格覆盖）」行时返回，以免改历史 P24 投影形状。
+   */
+  frozenPanelOverlays?: FrozenPanelOverlayRow[];
 }
 
 function selectorKeys(selector: Record<string, unknown>): string[] {
@@ -412,6 +419,7 @@ export async function getStudioGenerationTrace(
   ]);
   const reviewsBox = await collectTraceReviews(projectRoot, runsBox.runs.map((run) => run.runId), TRACE_REVIEWS_CAP);
   const previousStandings = previousStandingsFromFrozenPanelPacks(panelPacks);
+  const frozenPanelOverlays = frozenPanelOverlaysFromFrozenPanelPacks(panelPacks);
   const panels: StudioGenerationTracePanelIdentity[] = panelPacks.map((panelPack) => ({
     panelId: panelPack.target.panelId,
     panelIndex: panelPack.target.panelIndex,
@@ -471,6 +479,7 @@ export async function getStudioGenerationTrace(
     ...(historicalEvidence ? { historicalEvidence } : {}),
     ...(detachedUnknownObservations.length > 0 ? { detachedUnknownObservations } : {}),
     ...(previousStandings.length > 0 ? { previousStandings } : {}),
+    ...(frozenPanelOverlays.length > 0 ? { frozenPanelOverlays } : {}),
   };
 }
 
