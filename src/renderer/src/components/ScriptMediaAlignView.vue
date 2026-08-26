@@ -732,6 +732,10 @@ function shortSha(value: string | null | undefined): string {
             <div><dt>raw</dt><dd><code>{{ selectedAlignPanel?.rawSha256 || selectedAlignRow.rawSha256 || "—" }}</code></dd></div>
             <div><dt>labeled</dt><dd><code>{{ selectedAlignPanel?.labeledSha256 || selectedAlignRow.labeledSha256 || "—" }}</code></dd></div>
             <div><dt>原文锚</dt><dd>{{ selectedAlignPanel?.sourceSpans.length ?? selectedAlignRow.sourceSpans.length }}</dd></div>
+            <div><dt>pack</dt><dd><code data-testid="align-panel-pack">{{ selectedAlignPanel?.packId || selectedAlignRow.packId || "—" }}</code></dd></div>
+            <div><dt>run</dt><dd><code data-testid="align-panel-run">{{ selectedAlignPanel?.generationRunId || selectedAlignRow.generationRunId || "—" }}</code></dd></div>
+            <div><dt>构图</dt><dd data-testid="align-panel-composition">{{ selectedAlignPanel?.shotComposition || "—" }}</dd></div>
+            <div><dt>动作</dt><dd data-testid="align-panel-action">{{ selectedAlignPanel?.visualAction || "—" }}</dd></div>
           </dl>
         </template>
         <div v-else class="empty">点击一行查看本地 raw/labeled 身份与缩略图。</div>

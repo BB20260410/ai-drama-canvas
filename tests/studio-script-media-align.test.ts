@@ -105,6 +105,8 @@ describe("studio-script-media-align", () => {
           labeledSha256: null,
           generationRunId: "run-panel",
           hasMedia: true,
+          shotComposition: "中景",
+          visualAction: "停住",
           consistencyPeek: { status: "unevaluated" },
         }],
       })],

@@ -51,6 +51,9 @@ export interface UnitPanelMediaEntry {
   labeledSha256: string | null;
   generationRunId: string | null;
   hasMedia: boolean;
+  /** 锁版构图/动作只读投影；不推导 nextAction。 */
+  shotComposition: string;
+  visualAction: string;
 }
 
 export interface UnitSpanMediaMapEntry {
@@ -125,7 +128,7 @@ export function selectLatestPanelPack<T extends PackIndexLite>(
 }
 
 export function applyPackMediaToPanels(
-  panels: Array<{ index: number; id: string; title?: string; sourceSpans?: unknown }>,
+  panels: Array<{ index: number; id: string; title?: string; sourceSpans?: unknown; shotComposition?: string; visualAction?: string }>,
   mediaByPanelId: ReadonlyMap<string, PackMediaPick>,
 ): UnitPanelMediaEntry[] {
   return panels.map((panel) => {
@@ -141,6 +144,8 @@ export function applyPackMediaToPanels(
       labeledSha256: media.labeledSha256,
       generationRunId: media.generationRunId,
       hasMedia: Boolean(media.rawSha256 || media.labeledSha256),
+      shotComposition: String(panel.shotComposition || ""),
+      visualAction: String(panel.visualAction || ""),
     };
   });
 }

@@ -1,0 +1,33 @@
+{
+  "id": "goal-library-covered-and-panel-peek-20260826",
+  "createdAt": "2026-08-26T18:12:00.000Z",
+  "kind": "library-covered-media-and-align-panel-peek",
+  "conclusion": "PASS",
+  "scope": "Library coveredMediaCount uses per-panel pack media; align selected-panel peek is cache-only",
+  "invariants": {
+    "coveredMediaFromPanelPacks": true,
+    "panelPeekCacheOnly": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotReviewPass": true,
+    "doesNotDispatch": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts"
+      ],
+      "result": "4 files / 29 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "runtime speed closed",
+    "100% fit"
+  ]
+}

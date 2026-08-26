@@ -167,6 +167,8 @@ describe("studio-script-library-projection pure helpers", () => {
             labeledSha256: null,
             generationRunId: "run-1",
             hasMedia: true,
+            shotComposition: "近景",
+            visualAction: "抬手",
           }],
         }),
         unit({
@@ -183,6 +185,8 @@ describe("studio-script-library-projection pure helpers", () => {
             labeledSha256: null,
             generationRunId: null,
             hasMedia: false,
+            shotComposition: "",
+            visualAction: "",
           }],
         }),
       ],
@@ -228,8 +232,13 @@ describe("studio-script-library-projection pure helpers", () => {
         }],
       ]),
     );
-    expect(panels[0]).toMatchObject({ panelId: "p1", hasMedia: false, rawSha256: null, packId: null });
+    expect(panels[0]).toMatchObject({ panelId: "p1", hasMedia: false, rawSha256: null, packId: null, shotComposition: "", visualAction: "" });
     expect(panels[1]).toMatchObject({ panelId: "p2", hasMedia: true, rawSha256: "raw-p2", packId: "pack-p2" });
+    const withComp = applyPackMediaToPanels(
+      [{ index: 1, id: "p1", title: "g1", shotComposition: "近景三分", visualAction: "抬手" }],
+      new Map(),
+    );
+    expect(withComp[0]).toMatchObject({ shotComposition: "近景三分", visualAction: "抬手", hasMedia: false });
     expect(pickFirstCoveredPanel(panels)?.panelId).toBe("p2");
     expect(formatPanelCoverageMarks(panels)).toBe("G1缺 G2有");
     expect(pickFirstMissingPanel(panels)?.panelId).toBe("p1");
