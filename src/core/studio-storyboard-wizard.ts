@@ -161,8 +161,8 @@ export async function openStudioStoryboardWizard(
     suggestion,
     panels: toWizardEditablePanels(suggestion.panels),
     nextSteps: [
-      "Agent/人工填写每格 visualAction/景别/运镜（applyWizardPanelEdits）",
-      "G2+ 必须从上一格站位连续起拍（向导前镜，不是 BindingSet，不能当 generation-ready）",
+      "Agent/人工填写每格 visualAction/景别/运镜/光线/服化（applyWizardPanelEdits）",
+      "G2+ 必须从上一格站位连续起拍；上一格光线/服化只作锁版提示，不自动写入本格（不是 BindingSet，不能当 generation-ready）",
       "validateWizardForMaterialize 无错误后 materializeStudioStoryboardWizardUnit",
       "物化后走 readiness→freeze→dispatch（不跳过 Binding）",
     ],

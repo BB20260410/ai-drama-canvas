@@ -12,6 +12,8 @@ import {
 } from "../src/core/studio-storyboard-wizard.js";
 import {
   formatWizardPromptBody,
+  wizardPreviousCostumeForPanel,
+  wizardPreviousLightingForPanel,
   wizardPreviousStandingForPanel,
 } from "../src/core/studio-panel-standing.js";
 import type { StudioStoryboardDraftPanelSuggestion } from "../src/core/studio-storyboard-draft.js";
@@ -52,10 +54,19 @@ describe("studio-storyboard-wizard", () => {
 
   it("applyWizardPanelEdits merges by panelIndex", () => {
     const panels = toWizardEditablePanels([basePanel(1), basePanel(2)]);
-    const next = applyWizardPanelEdits(panels, [{ panelIndex: 2, visualAction: "推近", title: "近景格" }]);
+    const next = applyWizardPanelEdits(panels, [{
+      panelIndex: 2,
+      visualAction: "推近",
+      title: "近景格",
+      sceneLighting: "走廊冷光",
+      costumeState: "湿祭服",
+    }]);
     expect(next[0]?.visualAction).toBe("");
     expect(next[1]?.visualAction).toBe("推近");
     expect(next[1]?.title).toBe("近景格");
+    expect(next[1]?.sceneLighting).toBe("走廊冷光");
+    expect(next[1]?.costumeState).toBe("湿祭服");
+    expect(next[0]?.sceneLighting).toBe("");
   });
 
   it("validateWizardForMaterialize enforces 15s and visualAction", () => {
@@ -91,6 +102,18 @@ describe("studio-storyboard-wizard", () => {
     expect(body).not.toMatch(/^G1 .*\n前镜交接/u);
     expect(body).toContain("G2 original 5-10s G2: 抬手");
     expect(body).toContain("前镜交接：G1 中景 · 站定 · 固定。本格必须从该站位连续起拍");
+    expect(body).not.toContain("光线：");
+    expect(body).not.toContain("服化：");
+    const lit = applyWizardPanelEdits(panels, [
+      { panelIndex: 1, sceneLighting: "室内火光", costumeState: "深灰祭服" },
+    ]);
+    expect(wizardPreviousLightingForPanel(lit, 1)).toBeNull();
+    expect(wizardPreviousLightingForPanel(lit, 2)).toEqual({ panelIndex: 1, sceneLighting: "室内火光" });
+    expect(wizardPreviousCostumeForPanel(lit, 2)).toEqual({ panelIndex: 1, costumeState: "深灰祭服" });
+    const litBody = formatWizardPromptBody(lit);
+    expect(litBody).toContain("光线：室内火光");
+    expect(litBody).toContain("服化：深灰祭服");
+    expect(litBody).not.toMatch(/G2[\s\S]*光线：/u);
   });
 
   it("keeps a selected span anchored to the original revision offsets", async () => {

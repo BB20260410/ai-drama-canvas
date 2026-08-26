@@ -150,7 +150,73 @@ export function wizardPreviousStandingForPanel(
   );
 }
 
-/** 向导物化 prompt 正文：G2+ 写入与冻结相同的「前镜交接」行；首格不写。 */
+export type StudioPanelLightingHandoff = {
+  panelIndex: number;
+  sceneLighting: string;
+};
+
+export type StudioPanelCostumeHandoff = {
+  panelIndex: number;
+  costumeState: string;
+};
+
+function pickPreviousWizardPanel<T extends { panelIndex: number }>(
+  panels: ReadonlyArray<T>,
+  currentPanelIndex: number,
+): T | undefined {
+  if (!Number.isFinite(currentPanelIndex)) return undefined;
+  return panels
+    .filter((panel) => panel.panelIndex < currentPanelIndex)
+    .sort((left, right) => right.panelIndex - left.panelIndex)[0];
+}
+
+/** 向导 G2+ 上一格光线。空则 null；不自动写入本格，不是 BindingSet。 */
+export function wizardPreviousLightingForPanel(
+  panels: ReadonlyArray<{ panelIndex: number; sceneLighting?: string }>,
+  currentPanelIndex: number,
+): StudioPanelLightingHandoff | null {
+  const previous = pickPreviousWizardPanel(panels, currentPanelIndex);
+  const sceneLighting = previous?.sceneLighting?.trim() ?? "";
+  if (!previous || !sceneLighting) return null;
+  return { panelIndex: previous.panelIndex, sceneLighting };
+}
+
+/** 向导 G2+ 上一格服化。空则 null；不自动写入本格，不是 BindingSet。 */
+export function wizardPreviousCostumeForPanel(
+  panels: ReadonlyArray<{ panelIndex: number; costumeState?: string }>,
+  currentPanelIndex: number,
+): StudioPanelCostumeHandoff | null {
+  const previous = pickPreviousWizardPanel(panels, currentPanelIndex);
+  const costumeState = previous?.costumeState?.trim() ?? "";
+  if (!previous || !costumeState) return null;
+  return { panelIndex: previous.panelIndex, costumeState };
+}
+
+export function formatWizardLockPreviousLightingLine(
+  handoff: StudioPanelLightingHandoff | null | undefined,
+): string | null {
+  if (!handoff) return null;
+  return `锁版前镜光线：G${handoff.panelIndex} ${handoff.sceneLighting}。不是 BindingSet，不能当 generation-ready。`;
+}
+
+export function formatWizardLockPreviousCostumeLine(
+  handoff: StudioPanelCostumeHandoff | null | undefined,
+): string | null {
+  if (!handoff) return null;
+  return `锁版前镜服化：G${handoff.panelIndex} ${handoff.costumeState}。不是 BindingSet，不能当 generation-ready。`;
+}
+
+export function formatWizardLightingPromptLine(sceneLighting?: string): string | null {
+  const text = sceneLighting?.trim() ?? "";
+  return text ? `光线：${text}` : null;
+}
+
+export function formatWizardCostumePromptLine(costumeState?: string): string | null {
+  const text = costumeState?.trim() ?? "";
+  return text ? `服化：${text}` : null;
+}
+
+/** 向导物化 prompt 正文：G2+ 写入与冻结相同的「前镜交接」行；首格不写。光线/服化仅本格非空才追加，不写前镜光线行。 */
 export function formatWizardPromptBody(
   panels: ReadonlyArray<{
     panelIndex: number;
@@ -161,12 +227,16 @@ export function formatWizardPromptBody(
     visualAction: string;
     shotComposition: string;
     filmingMethod: string;
+    sceneLighting?: string;
+    costumeState?: string;
   }>,
 ): string {
   return panels.map((panel) => {
     const standing = formatPreviousStandingPromptLine(wizardPreviousStandingForPanel(panels, panel.panelIndex));
+    const lighting = formatWizardLightingPromptLine(panel.sceneLighting);
+    const costume = formatWizardCostumePromptLine(panel.costumeState);
     const head = `G${panel.panelIndex} ${panel.shotType} ${panel.startSeconds}-${panel.endSeconds}s ${panel.title}: ${panel.visualAction}`;
-    return standing ? `${head}\n${standing}` : head;
+    return [head, standing, lighting, costume].filter(Boolean).join("\n");
   }).join("\n");
 }
 

@@ -13,6 +13,12 @@ import {
   formatUnitLockPreviousStandingLine,
   wizardPreviousStandingForPanel,
   formatWizardPromptBody,
+  formatWizardLightingPromptLine,
+  formatWizardCostumePromptLine,
+  formatWizardLockPreviousLightingLine,
+  formatWizardLockPreviousCostumeLine,
+  wizardPreviousLightingForPanel,
+  wizardPreviousCostumeForPanel,
 } from "../src/core/studio-panel-standing.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -70,6 +76,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(generation).toContain("previousStanding: parsePreviousStandingFromRenderedPrompt");
     expect(generation).toContain("若 previousStanding 或 renderedPrompt 含「前镜交接」");
     expect(generation).not.toContain("前镜交接：首格无前镜");
+    expect(generation).toContain("光线（宫格覆盖）：${input.panel.sceneLighting}");
+    expect(generation).not.toContain("前镜光线");
     const unitGrid = readFileSync(path.join(repoRoot, "src/core/studio-unit-grid-generation.ts"), "utf8");
     expect(unitGrid).toContain("formatPreviousStandingPromptLine");
     expect(unitGrid).toContain("第${offset + 1}格${previousLine}");
@@ -135,6 +143,38 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
       { panelIndex: 1, shotType: "original", startSeconds: 0, endSeconds: 5, title: "G1", visualAction: "站定", shotComposition: "中景", filmingMethod: "固定" },
       { panelIndex: 2, shotType: "original", startSeconds: 5, endSeconds: 10, title: "G2", visualAction: "抬手", shotComposition: "近景", filmingMethod: "推" },
     ])).toContain("前镜交接：G1 中景 · 站定 · 固定");
+    const emptyContinuity = formatWizardPromptBody([
+      { panelIndex: 1, shotType: "original", startSeconds: 0, endSeconds: 5, title: "G1", visualAction: "站定", shotComposition: "中景", filmingMethod: "固定" },
+      { panelIndex: 2, shotType: "original", startSeconds: 5, endSeconds: 10, title: "G2", visualAction: "抬手", shotComposition: "近景", filmingMethod: "推" },
+    ]);
+    expect(emptyContinuity).not.toContain("光线：");
+    expect(emptyContinuity).not.toContain("服化：");
+    expect(formatWizardLightingPromptLine("")).toBeNull();
+    expect(formatWizardCostumePromptLine("  ")).toBeNull();
+    expect(formatWizardLightingPromptLine("室内火光")).toBe("光线：室内火光");
+    expect(formatWizardCostumePromptLine("深灰祭服")).toBe("服化：深灰祭服");
+    const withContinuity = formatWizardPromptBody([
+      { panelIndex: 1, shotType: "original", startSeconds: 0, endSeconds: 5, title: "G1", visualAction: "站定", shotComposition: "中景", filmingMethod: "固定", sceneLighting: "室内火光", costumeState: "深灰祭服" },
+      { panelIndex: 2, shotType: "original", startSeconds: 5, endSeconds: 10, title: "G2", visualAction: "抬手", shotComposition: "近景", filmingMethod: "推" },
+    ]);
+    expect(withContinuity).toContain("G1 original 0-5s G1: 站定\n光线：室内火光\n服化：深灰祭服");
+    expect(withContinuity).toContain("前镜交接：G1 中景 · 站定 · 固定");
+    expect(withContinuity).not.toMatch(/G2[\s\S]*光线：室内火光/u);
+    expect(wizardPreviousLightingForPanel([
+      { panelIndex: 1, sceneLighting: "室内火光" },
+      { panelIndex: 2, sceneLighting: "" },
+    ], 1)).toBeNull();
+    expect(wizardPreviousLightingForPanel([
+      { panelIndex: 1, sceneLighting: "室内火光" },
+      { panelIndex: 2, sceneLighting: "" },
+    ], 2)).toEqual({ panelIndex: 1, sceneLighting: "室内火光" });
+    expect(wizardPreviousCostumeForPanel([
+      { panelIndex: 1, costumeState: "深灰祭服" },
+      { panelIndex: 2, costumeState: "" },
+    ], 2)).toEqual({ panelIndex: 1, costumeState: "深灰祭服" });
+    expect(formatWizardLockPreviousLightingLine({ panelIndex: 1, sceneLighting: "室内火光" })).toContain("不能当 generation-ready");
+    expect(formatWizardLockPreviousCostumeLine({ panelIndex: 1, costumeState: "深灰祭服" })).toContain("不是 BindingSet");
+    expect(formatWizardLockPreviousLightingLine(null)).toBeNull();
   });
 
   it("session-snapshot / 生成控制 / 审片从冻结提示词露前镜，不读 head", () => {
@@ -163,11 +203,20 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     const wizard = readFileSync(path.join(repoRoot, "src/core/studio-storyboard-wizard.ts"), "utf8");
     expect(wizard).toContain("formatWizardPromptBody(input.panels)");
     expect(wizard).toContain("G2+ 必须从上一格站位连续起拍");
+    expect(wizard).toContain("上一格光线/服化只作锁版提示");
     const app = readFileSync(path.join(repoRoot, "src/renderer/src/App.vue"), "utf8");
     expect(app).toContain("formatWizardPromptBody(input.panels)");
     expect(app).not.toContain("evaluateStudioConsistency(");
     const wizardView = readFileSync(path.join(repoRoot, "src/renderer/src/components/ScriptMediaAlignView.vue"), "utf8");
     expect(wizardView).toContain('data-testid="storyboard-wizard-previous-standing"');
+    expect(wizardView).toContain('data-testid="storyboard-wizard-lighting"');
+    expect(wizardView).toContain('data-testid="storyboard-wizard-costume"');
+    expect(wizardView).toContain('data-testid="storyboard-wizard-previous-lighting"');
+    expect(wizardView).toContain('data-testid="storyboard-wizard-previous-costume"');
+    expect(wizardView).toContain("wizardLightingLine");
+    expect(wizardView).toContain("wizardCostumeLine");
+    expect(wizardView).toContain("formatWizardLockPreviousLightingLine");
+    expect(wizardView).not.toContain("evaluateStudioConsistency(");
     expect(wizardView).toContain("wizardStandingLine");
     expect(wizardView).toContain("formatUnitLockPreviousStandingLine");
     const brief = readFileSync(path.join(repoRoot, "src/core/codex.ts"), "utf8");

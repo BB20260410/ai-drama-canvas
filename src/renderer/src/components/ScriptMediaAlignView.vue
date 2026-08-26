@@ -27,6 +27,10 @@ import { listOrWorkbenchPreviewUrl } from "../studio-list-preview-url";
 import StudioGenerationTraceDrawer, { type StudioTraceDrawerModel } from "./StudioGenerationTraceDrawer.vue";
 import {
   formatUnitLockPreviousStandingLine,
+  formatWizardLockPreviousCostumeLine,
+  formatWizardLockPreviousLightingLine,
+  wizardPreviousCostumeForPanel,
+  wizardPreviousLightingForPanel,
   wizardPreviousStandingForPanel,
 } from "@core/studio-panel-standing";
 
@@ -384,6 +388,14 @@ async function suggestWizard(): Promise<void> {
 
 function wizardStandingLine(panelIndex: number): string | null {
   return formatUnitLockPreviousStandingLine(wizardPreviousStandingForPanel(wizardPanels.value, panelIndex));
+}
+
+function wizardLightingLine(panelIndex: number): string | null {
+  return formatWizardLockPreviousLightingLine(wizardPreviousLightingForPanel(wizardPanels.value, panelIndex));
+}
+
+function wizardCostumeLine(panelIndex: number): string | null {
+  return formatWizardLockPreviousCostumeLine(wizardPreviousCostumeForPanel(wizardPanels.value, panelIndex));
 }
 
 function reflowWizardTimings(): void {
@@ -962,7 +974,7 @@ function shortSha(value: string | null | undefined): string {
 
       <section class="wizard-editor">
         <h3>2 · 编辑 2–6 格</h3>
-        <div v-if="!wizard" class="empty">点击“重新生成建议”，再逐格补齐动作、构图和运镜。</div>
+        <div v-if="!wizard" class="empty">点击“重新生成建议”，再逐格补齐动作、构图、运镜、光线和服化。</div>
         <article
           v-for="panel in wizardPanels"
           :key="panel.panelIndex"
@@ -974,13 +986,25 @@ function shortSha(value: string | null | undefined): string {
           <label class="wide">画面动作 <textarea v-model.trim="panel.visualAction" rows="3" /></label>
           <label>景别 / 构图 <input v-model.trim="panel.shotComposition" /></label>
           <label>运镜 <input v-model.trim="panel.filmingMethod" /></label>
+          <label>光线 <input v-model.trim="panel.sceneLighting" data-testid="storyboard-wizard-lighting" /></label>
+          <label>服化 <input v-model.trim="panel.costumeState" data-testid="storyboard-wizard-costume" /></label>
           <label>对白 <input v-model.trim="panel.dialogue" /></label>
           <label>时长 <input v-model.number="panel.durationSeconds" type="number" min="0.1" max="15" step="0.1" @change="reflowWizardTimings" /></label>
           <p
             v-if="wizardStandingLine(panel.panelIndex)"
-            class="wide wizard-previous-standing"
+            class="wide wizard-lock-hint wizard-previous-standing"
             data-testid="storyboard-wizard-previous-standing"
           >{{ wizardStandingLine(panel.panelIndex) }}</p>
+          <p
+            v-if="wizardLightingLine(panel.panelIndex)"
+            class="wide wizard-lock-hint wizard-previous-lighting"
+            data-testid="storyboard-wizard-previous-lighting"
+          >{{ wizardLightingLine(panel.panelIndex) }}</p>
+          <p
+            v-if="wizardCostumeLine(panel.panelIndex)"
+            class="wide wizard-lock-hint wizard-previous-costume"
+            data-testid="storyboard-wizard-previous-costume"
+          >{{ wizardCostumeLine(panel.panelIndex) }}</p>
           <small class="wide">原文锚 {{ panel.sourceSpans.length }} · 资产建议 {{ panel.suggestedAssetIds.length }} · 歧义 {{ panel.unresolvedProposals.length }}</small>
         </article>
       </section>
@@ -1038,6 +1062,6 @@ button{border:1px solid var(--ui-line,#34362f);border-radius:4px;background:var(
 .reader-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:12px}.reader-nav{max-height:680px;overflow:auto}.reader-nav h3:not(:first-child){margin-top:16px}.reader-nav button{width:100%;display:flex;justify-content:space-between;text-align:left;border:0;border-radius:0;background:transparent;color:var(--ui-text-2,#a6a99e);content-visibility:auto;contain-intrinsic-size:auto 28px}.reader-nav button.earliest{color:var(--ui-accent,#d7af55)}.reader-nav small{font-size:8px}.reader-body{padding:0;overflow:hidden}.span-media{padding:10px;border-bottom:1px solid var(--ui-line,#34362f);background:var(--ui-surface-2,#1a1c17)}.span-media b,.span-media span,.span-media p{display:block;margin:4px 0}.span-media li{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin:6px 0}.span-media-hit-copy{min-width:0;flex:1}.span-media-hit-copy small{display:block;color:var(--ui-text-2,#8f9287);margin-top:2px}.span-media-hit-actions{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
 .selection-status{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:10px;border-bottom:1px solid var(--ui-line,#34362f)}.selection-status span{color:var(--ui-text-2,#8f9287)}.selection-status button{background:var(--ui-accent,#d7af55);color:var(--ui-accent-contrast,#1a160c)}.script-body{display:block;width:100%;height:620px;resize:none;border:0;border-radius:0;padding:18px;font:12px/1.75 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}
 .align-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px}.align-table-wrap{overflow:auto}.summary{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;color:var(--ui-text-2,#a6a99e)}.summary .ok b{color:#8fbf7a}.summary .warn b{color:#d7af55}.summary .danger b{color:#d08370}.summary .earliest{width:100%;font-size:9px}.ssl5-plan{margin:0 0 10px;padding:10px;border:1px solid var(--ui-line,#34362f);background:var(--ui-surface-2,#1a1c17)}.ssl5-plan b,.ssl5-plan span,.ssl5-plan p{display:block;margin:4px 0}.ssl5-plan ol{margin:6px 0;padding-left:18px;color:var(--ui-text-2,#a6a99e)}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border-bottom:1px solid var(--ui-line,#2a2c26);padding:7px 5px;text-align:left;vertical-align:top}th{color:var(--ui-text-2,#8f9287);font-weight:500}td b,td small{display:block}td small{color:var(--ui-text-2,#8f9287)}.mono{font:9px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}.status-missing-all{background:rgba(208,131,112,.06)}tr.earliest td:first-child b::after{content:" · earliest";color:var(--ui-accent,#d7af55);font-weight:400}tr.selected{outline:1px solid var(--ui-accent,#d7af55);outline-offset:-1px}td button{padding:3px 5px;margin:0 2px 2px 0}.align-panels{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0;padding:0;list-style:none}.align-panels button.active{border-color:var(--ui-accent,#d7af55);color:var(--ui-accent,#d7af55)}.align-table-panels{display:flex;flex-wrap:wrap;gap:3px}.align-table-panels button{padding:2px 5px;font-size:9px}.align-table-panels button.active{border-color:var(--ui-accent,#d7af55);color:var(--ui-accent,#d7af55)}.media-preview img{display:block;width:100%;max-height:420px;object-fit:contain;background:#080908;border:1px solid var(--ui-line,#34362f)}.preview-placeholder{min-height:220px;display:grid;place-items:center;background:#0c0d0b;color:var(--ui-text-2,#8f9287)}.media-preview dl{display:grid;gap:5px}.media-preview code{font-size:8px;word-break:break-all}
-.wizard-layout{display:grid;grid-template-columns:250px minmax(420px,1fr) 280px;gap:12px;align-items:start}.wizard-source blockquote{max-height:360px;overflow:auto;margin:10px 0;padding:10px;border-left:2px solid var(--ui-accent,#d7af55);background:var(--ui-surface-2,#1a1c17);white-space:pre-wrap;line-height:1.6}.wizard-controls{flex-wrap:wrap}.wizard-controls input{width:70px}.panel-editor{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;border:1px solid var(--ui-line,#34362f);border-radius:4px;margin-bottom:8px}.panel-editor header,.panel-editor .wide{grid-column:1/-1}.panel-editor header{display:flex;justify-content:space-between}.panel-editor input,.panel-editor textarea,.wizard-materialize input{width:100%}.panel-editor small{color:var(--ui-text-2,#8f9287)}.wizard-materialize{display:grid;gap:8px;position:sticky;top:8px}.validation{padding:9px;border:1px solid #8f4f45;background:#2a1815;color:#edb0a2}.validation.ok{border-color:#55754a;background:#162415;color:#a9d39a}.validation p{margin:5px 0}.materialized-result{padding:9px;border:1px solid #55754a;background:#162415}.materialized-result p{margin:4px 0;color:#a9d39a}.materialized-result b{word-break:break-all}
+.wizard-layout{display:grid;grid-template-columns:250px minmax(420px,1fr) 280px;gap:12px;align-items:start}.wizard-source blockquote{max-height:360px;overflow:auto;margin:10px 0;padding:10px;border-left:2px solid var(--ui-accent,#d7af55);background:var(--ui-surface-2,#1a1c17);white-space:pre-wrap;line-height:1.6}.wizard-controls{flex-wrap:wrap}.wizard-controls input{width:70px}.panel-editor{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;border:1px solid var(--ui-line,#34362f);border-radius:4px;margin-bottom:8px}.panel-editor header,.panel-editor .wide{grid-column:1/-1}.panel-editor header{display:flex;justify-content:space-between}.panel-editor input,.panel-editor textarea,.wizard-materialize input{width:100%}.panel-editor small,.wizard-lock-hint{color:var(--ui-text-2,#8f9287)}.wizard-lock-hint{margin:2px 0 0;font-size:10px}.wizard-materialize{display:grid;gap:8px;position:sticky;top:8px}.validation{padding:9px;border:1px solid #8f4f45;background:#2a1815;color:#edb0a2}.validation.ok{border-color:#55754a;background:#162415;color:#a9d39a}.validation p{margin:5px 0}.materialized-result{padding:9px;border:1px solid #55754a;background:#162415}.materialized-result p{margin:4px 0;color:#a9d39a}.materialized-result b{word-break:break-all}
 @media (max-width:1100px){.wizard-layout{grid-template-columns:1fr}.wizard-materialize{position:static}.align-layout{grid-template-columns:1fr}.library-layout{grid-template-columns:1fr}}
 </style>
