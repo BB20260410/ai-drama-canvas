@@ -1106,10 +1106,13 @@ function shortSha(value: string | null | undefined): string {
             @click="revealSceneBackRef(ref)"
           >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
           <span>缺图 {{ ssl5Plan.missingAllCount }} · 部分 {{ ssl5Plan.partialCount }}</span>
+          <span v-if="ssl5Plan.focusPackId" data-testid="ssl5-focus-pack">{{ ssl5Plan.focusPackId }}</span>
+          <span data-testid="ssl5-generation-plan-draft">{{ ssl5Plan.generationPlanDraft.ready ? "可建立计划（不派发）" : ssl5Plan.generationPlanDraft.blockedReason }}</span>
+          <span v-if="ssl5Plan.generationPlanDraft.ready && ssl5Plan.generationPlanDraft.nodes?.[0]" data-testid="ssl5-generation-plan-nodes">{{ ssl5Plan.generationPlanDraft.nodes[0].unitId }} {{ ssl5Plan.generationPlanDraft.nodes[0].panelId }}</span>
           <ol v-if="ssl5FocusPath.length">
             <li v-for="step in ssl5FocusPath" :key="step">{{ step }}</li>
           </ol>
-          <p>只读计划，不自动 dispatch。先 Binding 确认再走 freeze 链。</p>
+          <p>只读计划，不自动 dispatch，不执行 create-plan。先 Binding 确认再走 freeze → create-plan 链。</p>
           <button
             v-if="ssl5Plan.focusUnitId"
             type="button"

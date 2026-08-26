@@ -35,6 +35,71 @@ import {
 import type { CharacterBackReference, PropBackReference, SceneBackReference } from "./studio-scene-backrefs.js";
 
 export const SSL5_PLAN_SCHEMA_VERSION = 1 as const;
+export const SSL5_GENERATION_PLAN_COMMAND = "create_studio_generation_plan" as const;
+
+export type Ssl5GenerationPlanDraftNode = {
+  unitId: string;
+  panelId: string;
+};
+
+/**
+ * SSL-5 → P21 建计划只读草稿。不执行命令、不派发。
+ * 只认焦点缺图宫格自己的 packId；禁止用同行已出图宫格的 preview pack。
+ */
+export type Ssl5GenerationPlanDraft = {
+  command: typeof SSL5_GENERATION_PLAN_COMMAND;
+  ready: boolean;
+  blockedReason: string | null;
+  nodes: Ssl5GenerationPlanDraftNode[] | null;
+  dispatch: false;
+  note: string;
+};
+
+export function composeSsl5GenerationPlanDraft(input: {
+  focusUnitId: string | null;
+  focusPanelId: string | null;
+  focusPackId: string | null;
+}): Ssl5GenerationPlanDraft {
+  const noteReady = "只起草建计划节点；不执行、不派发。派发须用计划推导 runId。";
+  if (!input.focusUnitId) {
+    return {
+      command: SSL5_GENERATION_PLAN_COMMAND,
+      ready: false,
+      blockedReason: "没有缺图焦点，不能建立计划",
+      nodes: null,
+      dispatch: false,
+      note: "只读草稿。不执行、不派发。",
+    };
+  }
+  if (!input.focusPanelId) {
+    return {
+      command: SSL5_GENERATION_PLAN_COMMAND,
+      ready: false,
+      blockedReason: "焦点单元没有缺图宫格，禁止猜第一格",
+      nodes: null,
+      dispatch: false,
+      note: "只读草稿。不执行、不派发。",
+    };
+  }
+  if (!input.focusPackId) {
+    return {
+      command: SSL5_GENERATION_PLAN_COMMAND,
+      ready: false,
+      blockedReason: "焦点宫格尚无冻结 pack，先 Binding→readiness→freeze。禁止用同行已出图宫格的 packId",
+      nodes: null,
+      dispatch: false,
+      note: "只读草稿。不执行、不派发。",
+    };
+  }
+  return {
+    command: SSL5_GENERATION_PLAN_COMMAND,
+    ready: true,
+    blockedReason: null,
+    nodes: [{ unitId: input.focusUnitId, panelId: input.focusPanelId }],
+    dispatch: false,
+    note: noteReady,
+  };
+}
 
 export interface Ssl5MissingToGenPlanItem {
   unitId: string;
@@ -44,6 +109,9 @@ export interface Ssl5MissingToGenPlanItem {
   priority: "earliest" | "missing-all" | "partial" | "covered";
   recommendedPath: string[];
   packId: string | null;
+  /** 焦点缺图宫格自己的冻结包；不是同行已出图 preview pack。 */
+  focusPackId: string | null;
+  generationPlanDraft: Ssl5GenerationPlanDraft;
   generationRunId: string | null;
   focusPanelId: string | null;
   focusPanelIndex: number | null;
@@ -77,6 +145,9 @@ export interface Ssl5MissingToGenPlan {
   focusUnitId: string | null;
   focusPanelId: string | null;
   focusPanelIndex: number | null;
+  /** 焦点缺图宫格自己的冻结包；不是同行已出图 preview pack。 */
+  focusPackId: string | null;
+  generationPlanDraft: Ssl5GenerationPlanDraft;
   previousPanelIndex: number | null;
   previousShotComposition: string | null;
   previousVisualAction: string | null;
@@ -105,6 +176,7 @@ const SSL5_RECOMMENDED_PATH = [
   "binding-ready?",
   "readiness",
   "freeze",
+  "create-plan",
   "dispatch",
   "prepare",
   "gen",
@@ -166,6 +238,8 @@ export function buildSsl5PlanFromBoard(
       const previousCostume = missingPanel
         ? wizardPreviousCostumeForPanel(row.panels ?? [], missingPanel.panelIndex)
         : null;
+      const focusPanelId = missingPanel?.panelId ?? null;
+      const focusPackId = missingPanel?.packId ?? null;
       return {
         unitId: row.unitId,
         sequence: row.sequence,
@@ -174,8 +248,14 @@ export function buildSsl5PlanFromBoard(
         priority,
         recommendedPath: [...SSL5_RECOMMENDED_PATH],
         packId: row.packId,
+        focusPackId,
+        generationPlanDraft: composeSsl5GenerationPlanDraft({
+          focusUnitId: row.unitId,
+          focusPanelId,
+          focusPackId,
+        }),
         generationRunId: row.generationRunId,
-        focusPanelId: missingPanel?.panelId ?? null,
+        focusPanelId,
         focusPanelIndex: missingPanel?.panelIndex ?? null,
         previousPanelIndex: handoff?.panelIndex ?? null,
         previousShotComposition: handoff?.shotComposition ?? null,
@@ -247,6 +327,12 @@ export function buildSsl5PlanFromBoard(
     focusUnitId: focus?.unitId ?? null,
     focusPanelId: focus?.focusPanelId ?? null,
     focusPanelIndex: focus?.focusPanelIndex ?? null,
+    focusPackId: focus?.focusPackId ?? null,
+    generationPlanDraft: composeSsl5GenerationPlanDraft({
+      focusUnitId: focus?.unitId ?? null,
+      focusPanelId: focus?.focusPanelId ?? null,
+      focusPackId: focus?.focusPackId ?? null,
+    }),
     previousPanelIndex: focus?.previousPanelIndex ?? null,
     previousShotComposition: focus?.previousShotComposition ?? null,
     previousVisualAction: focus?.previousVisualAction ?? null,

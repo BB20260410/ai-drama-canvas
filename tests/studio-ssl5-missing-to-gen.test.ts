@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 import type { ScriptMediaAlignRow } from "../src/core/studio-script-media-align.js";
 import {
   buildSsl5PlanFromBoard,
+  composeSsl5GenerationPlanDraft,
+  SSL5_GENERATION_PLAN_COMMAND,
   SSL5_PLAN_SCHEMA_VERSION,
 } from "../src/core/studio-ssl5-missing-to-gen.js";
 
@@ -107,12 +109,102 @@ describe("SSL-5 缺图下一步纯函数", () => {
       "binding-ready?",
       "readiness",
       "freeze",
+      "create-plan",
       "dispatch",
       "prepare",
       "gen",
       "commit",
       "review",
     ]);
+    expect(plan.focusPackId).toBeNull();
+    expect(plan.generationPlanDraft.ready).toBe(false);
+    expect(plan.generationPlanDraft.dispatch).toBe(false);
+    expect(plan.generationPlanDraft.command).toBe(SSL5_GENERATION_PLAN_COMMAND);
+    expect(plan.generationPlanDraft.blockedReason).toBe("焦点单元没有缺图宫格，禁止猜第一格");
+    expect(plan.generationPlanDraft.nodes).toBeNull();
+  });
+
+  it("create-plan 草稿只认缺图格自己的 pack，不用同行已出图 packId", () => {
+    const plan = buildSsl5PlanFromBoard(
+      "/tmp/iso",
+      { season: "S1", episode: "E2" },
+      {
+        earliestUnitId: "u-partial",
+        missingAllCount: 0,
+        partialCount: 1,
+        rows: [
+          row({
+            unitId: "u-partial",
+            sequence: 1,
+            status: "partial",
+            isEarliest: true,
+            packId: "preview-covered-pack",
+            panels: [
+              panel({ panelId: "p-covered", panelIndex: 1, hasMedia: true, packId: "preview-covered-pack" }),
+              panel({ panelId: "p-missing", panelIndex: 2, hasMedia: false, packId: null }),
+            ],
+          }),
+        ],
+      },
+    );
+    expect(plan.schemaVersion).toBe(SSL5_PLAN_SCHEMA_VERSION);
+    expect(plan.focusUnitId).toBe("u-partial");
+    expect(plan.focusPanelId).toBe("p-missing");
+    expect(plan.items[0]?.packId).toBe("preview-covered-pack");
+    expect(plan.focusPackId).toBeNull();
+    expect(plan.items[0]?.focusPackId).toBeNull();
+    expect(plan.generationPlanDraft.ready).toBe(false);
+    expect(plan.generationPlanDraft.nodes).toBeNull();
+    expect(plan.generationPlanDraft.blockedReason).toContain("禁止用同行已出图宫格的 packId");
+  });
+
+  it("缺图格已有自己的冻结 pack 时草稿 ready，仍不派发", () => {
+    const plan = buildSsl5PlanFromBoard(
+      "/tmp/iso",
+      { season: "S1", episode: "E2" },
+      {
+        earliestUnitId: "u-frozen",
+        missingAllCount: 1,
+        partialCount: 0,
+        rows: [
+          row({
+            unitId: "u-frozen",
+            sequence: 1,
+            status: "missing-all",
+            isEarliest: true,
+            packId: null,
+            panels: [
+              panel({ panelId: "p-focus", panelIndex: 1, hasMedia: false, packId: "focus-own-pack" }),
+            ],
+          }),
+        ],
+      },
+    );
+    expect(plan.focusUnitId).toBe("u-frozen");
+    expect(plan.focusPanelId).toBe("p-focus");
+    expect(plan.focusPackId).toBe("focus-own-pack");
+    expect(plan.generationPlanDraft).toEqual({
+      command: SSL5_GENERATION_PLAN_COMMAND,
+      ready: true,
+      blockedReason: null,
+      nodes: [{ unitId: "u-frozen", panelId: "p-focus" }],
+      dispatch: false,
+      note: "只起草建计划节点；不执行、不派发。派发须用计划推导 runId。",
+    });
+    expect(plan.items[0]?.generationPlanDraft.ready).toBe(true);
+  });
+
+  it("composeSsl5GenerationPlanDraft 无焦点 / 无宫格失败关闭", () => {
+    expect(composeSsl5GenerationPlanDraft({
+      focusUnitId: null,
+      focusPanelId: "p1",
+      focusPackId: "pack-1",
+    }).blockedReason).toBe("没有缺图焦点，不能建立计划");
+    expect(composeSsl5GenerationPlanDraft({
+      focusUnitId: "u1",
+      focusPanelId: null,
+      focusPackId: "pack-1",
+    }).blockedReason).toBe("焦点单元没有缺图宫格，禁止猜第一格");
   });
 
   it("无 earliest 时焦点落在第一条 missing-all", () => {
@@ -306,6 +398,9 @@ describe("SSL-5 缺图下一步纯函数", () => {
       rows: [row({ unitId: "u-ok", sequence: 1, status: "covered" })],
     });
     expect(plan.focusUnitId).toBeNull();
+    expect(plan.focusPackId).toBeNull();
+    expect(plan.generationPlanDraft.ready).toBe(false);
+    expect(plan.generationPlanDraft.blockedReason).toBe("没有缺图焦点，不能建立计划");
     expect(plan.items).toEqual([]);
     expect(plan.lightingCostumeLine).toBe("没有宫格可查光线/服化");
     expect(plan.previousLightingLine).toBeNull();
@@ -333,6 +428,10 @@ describe("SSL-5 入口源码合同", () => {
     expect(ssl5).not.toMatch(/getStudioEpisodeEarliest\s*\(/u);
     expect(ssl5).not.toContain("execute_command");
     expect(ssl5).not.toContain("dispatch_studio_generation_pack");
+    expect(ssl5).toContain("create-plan");
+    expect(ssl5).toContain("composeSsl5GenerationPlanDraft");
+    expect(ssl5).toContain("focusPackId");
+    expect(ssl5).toContain("SSL5_PLAN_SCHEMA_VERSION = 1");
   });
 
   it("桌面对照面展示只读下一步，导演动作不写命令", () => {
@@ -352,6 +451,10 @@ describe("SSL-5 入口源码合同", () => {
     expect(vue).toContain('data-testid="ssl5-focus-lighting"');
     expect(vue).toContain('data-testid="ssl5-focus-previous-lighting"');
     expect(vue).toContain('data-testid="ssl5-focus-previous-costume"');
+    expect(vue).toContain('data-testid="ssl5-generation-plan-draft"');
+    expect(vue).toContain('data-testid="ssl5-generation-plan-nodes"');
+    expect(vue).toContain("不执行 create-plan");
+    expect(vue).not.toContain("dispatch_studio_generation_pack");
     expect(ssl5).toContain("formatSceneBackReferenceLineFromBoard");
     expect(ssl5).toContain("formatPanelLightingCostumeLine");
     expect(ssl5).toContain("formatPanelShotTypeLine");
@@ -376,6 +479,7 @@ describe("SSL-5 入口源码合同", () => {
     expect(vue).toContain("不自动 dispatch");
     expect(director).toContain("ssl5-missing-to-gen-plan");
     expect(director).toContain("不自动 dispatch");
+    expect(director).toContain("不执行建计划");
     expect(director).not.toContain("dispatch_studio_generation_pack");
   });
 });
