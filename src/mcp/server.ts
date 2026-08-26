@@ -61,6 +61,7 @@ import {
   withStudioProjectWriteLease,
   withStudioScriptLibraryReader,
   withStudioScriptMediaAlign,
+  withStudioSsl5MissingToGen,
   type StudioEpisodeEarliestModule,
   type StudioMultimediaTimelineModule,
   type StudioProductionDashboardModule,
@@ -68,6 +69,7 @@ import {
   type StudioProjectWriteLeaseModule,
   type StudioScriptLibraryReaderModule,
   type StudioScriptMediaAlignModule,
+  type StudioSsl5MissingToGenModule,
 } from "../core/studio-readonly-diagnostics-lazy.js";
 import type { StudioProductionDashboardQuery } from "../core/studio-production-dashboard.js";
 import { listAssetRelations, listVoiceIdentities, upsertAssetRelation, upsertVoiceIdentity } from "../core/asset-registry.js";
@@ -297,6 +299,8 @@ const getStudioScriptReaderView = (...args: Parameters<StudioScriptLibraryReader
   withStudioScriptLibraryReader((reader) => reader.getStudioScriptReaderView(...args));
 const getStudioScriptMediaAlignBoard = (...args: Parameters<StudioScriptMediaAlignModule["getStudioScriptMediaAlignBoard"]>) =>
   withStudioScriptMediaAlign((align) => align.getStudioScriptMediaAlignBoard(...args));
+const planSsl5MissingToGen = (...args: Parameters<StudioSsl5MissingToGenModule["planSsl5MissingToGen"]>) =>
+  withStudioSsl5MissingToGen((ssl5) => ssl5.planSsl5MissingToGen(...args));
 
 const server = new McpServer({
   name: "ai-drama-canvas",
@@ -5384,9 +5388,9 @@ registrar.registerTool(
 registrar.registerTool(
   "get_studio_script_library_projection",
   {
-    title: "剧本库只读投影（SSL-0/1/2/3）",
+    title: "剧本库只读投影（SSL-0/1/2/3/5 计划）",
     description:
-      "剧本库投影只读入口。library-index；episode-unit-media-map；missing-media-report；reader-view（正文+大纲+earliest）；script-media-align（SSL-3 一键图文对照：unit→图 SHA/缺图/trace 钥匙/大纲锚，需 season+episode，可选 documentId）。不写账本；不返回 CAS 路径/媒体二进制。",
+      "剧本库投影只读入口。library-index；episode-unit-media-map；missing-media-report；reader-view（正文+大纲+earliest）；script-media-align（SSL-3 一键图文对照：unit→图 SHA/缺图/trace 钥匙/大纲锚，需 season+episode，可选 documentId）；ssl5-missing-to-gen-plan（SSL-5 缺图→earliest 只读下一步，不 dispatch）。不写账本；不返回 CAS 路径/媒体二进制。",
     inputSchema: {
       projectRoot: managedStudioProjectRootSchema,
       operation: z.enum([
@@ -5396,6 +5400,7 @@ registrar.registerTool(
         "reader-view",
         "script-media-align",
         "storyboard-wizard-suggest",
+        "ssl5-missing-to-gen-plan",
       ]),
       kind: z.enum(["script", "prompt"]).optional(),
       season: z.string().min(1).max(64).optional(),
@@ -5463,6 +5468,15 @@ registrar.registerTool(
             episode,
             ...(documentId ? { documentId } : {}),
             ...(revisionId ? { revisionId } : {}),
+          }),
+        );
+      }
+      if (operation === "ssl5-missing-to-gen-plan") {
+        return managedStudioResult(
+          await planSsl5MissingToGen(projectRoot, {
+            season,
+            episode,
+            ...(documentId ? { documentId } : {}),
           }),
         );
       }

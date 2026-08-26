@@ -49,6 +49,14 @@ export const DIRECTOR_ACTIONS: DirectorAction[] = [
     requiresSeasonEpisode: true,
   },
   {
+    id: "ssl5-plan",
+    kind: "open-align-board",
+    title: "缺图下一步",
+    description: "只读计划：缺图 unit → earliest → freeze 链（不自动 dispatch）",
+    readonlyHint: "get_studio_script_library_projection ssl5-missing-to-gen-plan",
+    requiresSeasonEpisode: true,
+  },
+  {
     id: "reader",
     kind: "open-reader",
     title: "阅读剧本",

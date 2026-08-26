@@ -3347,6 +3347,18 @@ function registerIpc(): void {
     },
   );
   ipcMain.handle(
+    "canvas:plan-ssl5-missing-to-gen",
+    async (
+      _event,
+      projectRoot: string,
+      query: { season: string; episode: string; documentId?: string; evidenceDir?: string },
+    ) => {
+      await requireManagedStudioProjectReadOnly(projectRoot);
+      const { planSsl5MissingToGen } = await import("../core/studio-ssl5-missing-to-gen.js");
+      return planSsl5MissingToGen(projectRoot, query);
+    },
+  );
+  ipcMain.handle(
     "canvas:get-studio-script-library-index",
     async (
       _event,

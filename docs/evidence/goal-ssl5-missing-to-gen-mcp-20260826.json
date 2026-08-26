@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "kind": "goal-dual-track-slice",
+  "slice": "ssl5-missing-to-gen-plan",
+  "recordedAt": "2026-08-26T17:47:00Z",
+  "analysis": "docs/GOAL_无限画布全面分析与下一刀_20260826.md",
+  "change": {
+    "kind": "source-fix",
+    "sourceCodeChanged": true,
+    "note": "SSL-5 只读计划暴露为 get_studio_script_library_projection operation ssl5-missing-to-gen-plan；MCP 经 withStudioSsl5MissingToGen 动态 import。对照面横幅 + 导演动作「缺图下一步」。抽出 buildSsl5PlanFromBoard 纯函数。不 dispatch、不抢租约、不改 T23 SQL / recipe / 2048 / 120s / command-bus ledger。"
+  },
+  "verification": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/use-virtual-list-lru-hotkeys.test.ts",
+        "tests/material-studio-ui-contract.test.ts"
+      ],
+      "result": "6 files / 27 tests PASS"
+    },
+    "workqueue": "EMPTY",
+    "installedT23": "NOT_RUN",
+    "listGuiProbe": "NOT_RUN",
+    "p7Owner": "NOT_RUN",
+    "liveGeneration": "NOT_RUN"
+  },
+  "goalVerdict": {
+    "slice": "已完成",
+    "wholeGoal": "部分完成",
+    "mustFix": false,
+    "nextB": "ScriptSpanMediaMap",
+    "nextA": "等待 owner"
+  }
+}

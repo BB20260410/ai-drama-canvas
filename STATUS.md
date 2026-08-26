@@ -1,5 +1,19 @@
 # STATUS · 当前源码生产中枢（P0—P9 CLOSED / MCP_CLIENT_RESTART_PASS）
 
+## 2026-08-26 · Goal 全面分析与持续优化
+
+| 字段 | 当前值 |
+|---|---|
+| status | `部分完成`。分析 + SSL-5 只读计划入口已落地。整目标未关账 |
+| analysis | `docs/GOAL_无限画布全面分析与下一刀_20260826.md` |
+| workqueue | reap 0；next EMPTY；closed=7 |
+| A_earliest | **等待 owner**（真生图 / 安装版 T23 / P7 / 列表 GUI 探针） |
+| B_earliest | ScriptSpanMediaMap（点段落知配哪格图）；本切片已完成 SSL-5 只读 MCP |
+| dual_track_gate | A_done=no；B_demo=部分；SSL≥ssl3 源码有、ssl5 计划已暴露；fit_band≠L5 |
+| ssl5 | `get_studio_script_library_projection` op `ssl5-missing-to-gen-plan`；对照横幅 `ssl5-missing-to-gen-plan`；不 dispatch |
+| evidence | `docs/evidence/goal-ssl5-missing-to-gen-mcp-20260826.json` |
+| earliest_next | B：ScriptSpanMediaMap。A 仍等 owner。禁止写「运行速度已关账」/「100% 契合」 |
+
 ## 2026-08-25 · 运行速度与内存占用长期计划立项
 
 | 字段 | 当前值 |

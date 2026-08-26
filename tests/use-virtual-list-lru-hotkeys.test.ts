@@ -61,6 +61,8 @@ describe("D5 director panel model", () => {
   it("filters and maps hotkeys; no write commands in hints", () => {
     expect(DIRECTOR_ACTIONS.length).toBeGreaterThanOrEqual(6);
     expect(filterDirectorActions("对照")[0]?.id).toBe("align");
+    expect(filterDirectorActions("缺图下一步")[0]?.id).toBe("ssl5-plan");
+    expect(filterDirectorActions("缺图下一步")[0]?.readonlyHint).toContain("ssl5-missing-to-gen-plan");
     expect(directorActionByHotkey("focus-earliest")?.kind).toBe("navigate-earliest");
     for (const a of DIRECTOR_ACTIONS) {
       expect(JSON.stringify(a).toLowerCase()).not.toMatch(/execute_command/);

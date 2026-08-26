@@ -1,5 +1,16 @@
 # TASKS · 残留任务清账 2026-07-25
 
+## software_goal: canvas-dual-track-optimize-20260826
+
+- status: `部分完成`。全面分析已落盘；SSL-5 只读计划入口已挂。整 Goal 未关账（无真生图闭环 / 无 T23）。
+- analysis: `docs/GOAL_无限画布全面分析与下一刀_20260826.md`
+- [x] Q0 workqueue 空（reap 0；next EMPTY）
+- [x] 全面分析对照北星 / SSL / Phase D / 速度计划
+- [x] SSL-5：`ssl5-missing-to-gen-plan` MCP + 对照横幅 + 导演动作（不 dispatch）
+- [ ] ScriptSpanMediaMap（点段落→格/图）
+- [ ] 对照行四态 peek
+- [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
+
 ## software_goal: runtime-perf-memory-20260825
 
 - status: `阻塞`（本 Cloud；整计划 `部分完成`）。§1.3 by-id + 诊断懒展开 + lean 季集身份 + 身份只读 + 账本批读只读 + 历史 PASS 活库只读 + Linux 真投影 sqlite 接线 + 零 mock inspect + Wave 7 画布媒体热路径已落地；Darwin CI `43945a2`/`2d8ce47`/`4b1824a` 已绿。等待 owner：P7 owner / 安装版 T23 / 列表 GUI 探针

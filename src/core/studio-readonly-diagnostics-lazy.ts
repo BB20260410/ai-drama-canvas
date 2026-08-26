@@ -12,6 +12,7 @@ export type StudioPostResultObservationModule = typeof import("./studio-post-res
 export type StudioProjectWriteLeaseModule = typeof import("./studio-project-write-lease.js");
 export type StudioScriptLibraryReaderModule = typeof import("./studio-script-library-reader.js");
 export type StudioScriptMediaAlignModule = typeof import("./studio-script-media-align.js");
+export type StudioSsl5MissingToGenModule = typeof import("./studio-ssl5-missing-to-gen.js");
 
 let episodeEarliestModule: Promise<StudioEpisodeEarliestModule> | undefined;
 let projectionBundleModule: Promise<StudioProductionProjectionBundleModule> | undefined;
@@ -21,6 +22,7 @@ let postResultObservationModule: Promise<StudioPostResultObservationModule> | un
 let projectWriteLeaseModule: Promise<StudioProjectWriteLeaseModule> | undefined;
 let scriptLibraryReaderModule: Promise<StudioScriptLibraryReaderModule> | undefined;
 let scriptMediaAlignModule: Promise<StudioScriptMediaAlignModule> | undefined;
+let ssl5MissingToGenModule: Promise<StudioSsl5MissingToGenModule> | undefined;
 
 export function loadStudioEpisodeEarliest(): Promise<StudioEpisodeEarliestModule> {
   episodeEarliestModule ??= import("./studio-episode-earliest.js");
@@ -60,6 +62,11 @@ export function loadStudioScriptLibraryReader(): Promise<StudioScriptLibraryRead
 export function loadStudioScriptMediaAlign(): Promise<StudioScriptMediaAlignModule> {
   scriptMediaAlignModule ??= import("./studio-script-media-align.js");
   return scriptMediaAlignModule;
+}
+
+export function loadStudioSsl5MissingToGen(): Promise<StudioSsl5MissingToGenModule> {
+  ssl5MissingToGenModule ??= import("./studio-ssl5-missing-to-gen.js");
+  return ssl5MissingToGenModule;
 }
 
 export async function withStudioEpisodeEarliest<T>(
@@ -108,4 +115,10 @@ export async function withStudioScriptMediaAlign<T>(
   read: (align: StudioScriptMediaAlignModule) => T | Promise<T>,
 ): Promise<T> {
   return read(await loadStudioScriptMediaAlign());
+}
+
+export async function withStudioSsl5MissingToGen<T>(
+  read: (ssl5: StudioSsl5MissingToGenModule) => T | Promise<T>,
+): Promise<T> {
+  return read(await loadStudioSsl5MissingToGen());
 }

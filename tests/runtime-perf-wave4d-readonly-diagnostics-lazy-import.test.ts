@@ -30,6 +30,7 @@ const diagnosticSpecifiers = [
   "studio-post-result-observation\\.js",
   "studio-script-library-reader\\.js",
   "studio-script-media-align\\.js",
+  "studio-ssl5-missing-to-gen\\.js",
 ];
 
 describe("Wave 4-D MCP 只读诊断面动态 import", () => {
@@ -57,6 +58,7 @@ describe("Wave 4-D MCP 只读诊断面动态 import", () => {
     expect(lazy).toContain('import("./studio-project-write-lease.js")');
     expect(lazy).toContain('import("./studio-script-library-reader.js")');
     expect(lazy).toContain('import("./studio-script-media-align.js")');
+    expect(lazy).toContain('import("./studio-ssl5-missing-to-gen.js")');
     const commandBus = source("src/core/command-bus.ts");
     expect(commandBus).toContain('"attach_studio_multimedia_timeline_media"');
     expect(commandBus).toContain('"submit_studio_post_result_observation"');
@@ -80,6 +82,7 @@ describe("Wave 4-D MCP 只读诊断面动态 import", () => {
     expect(server).toContain("withStudioProjectWriteLease");
     expect(server).toContain("withStudioScriptLibraryReader");
     expect(server).toContain("withStudioScriptMediaAlign");
+    expect(server).toContain("withStudioSsl5MissingToGen");
     expect(server).toContain('import("../core/studio-generation-ledger.js")');
     expect(source("src/core/active-managed-studio-context.ts")).toContain("withStudioProjectWriteLease");
     expect(source("src/mcp/server.ts")).toContain("function sanitizeCommandRecord");

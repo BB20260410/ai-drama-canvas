@@ -960,6 +960,12 @@ const studioScriptAlignApi = {
   ) {
     return window.canvasApi.getStudioScriptMediaAlignBoard(root, query);
   },
+  planSsl5MissingToGen(
+    root: string,
+    query: { season: string; episode: string; documentId?: string },
+  ) {
+    return window.canvasApi.planSsl5MissingToGen(root, query);
+  },
   openStoryboardWizard(
     root: string,
     input: Parameters<typeof window.canvasApi.openStudioStoryboardWizard>[1],
