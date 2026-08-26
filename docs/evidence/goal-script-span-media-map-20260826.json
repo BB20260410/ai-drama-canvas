@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "kind": "goal-dual-track-slice",
+  "slice": "script-span-media-map",
+  "recordedAt": "2026-08-26T17:50:00Z",
+  "change": {
+    "kind": "source-fix",
+    "sourceCodeChanged": true,
+    "note": "SSL-0 ScriptSpanMediaMap：resolveScriptSpanMediaMap 纯函数 + MCP operation script-span-media-map。半开区间相交；无效 range 失败关闭。复用 getStudioEpisodeUnitMediaMap，不新建库，不 dispatch。"
+  },
+  "verification": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts"
+      ],
+      "result": "3 files / 17 tests PASS"
+    }
+  },
+  "goalVerdict": {
+    "slice": "已完成",
+    "wholeGoal": "部分完成",
+    "nextB": "对照行四态 peek",
+    "nextA": "等待 owner"
+  }
+}

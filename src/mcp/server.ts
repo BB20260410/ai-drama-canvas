@@ -143,6 +143,7 @@ import {
   getStudioEpisodeMissingMediaReport,
   getStudioEpisodeUnitMediaMap,
   getStudioScriptLibraryIndex,
+  resolveScriptSpanMediaMap,
 } from "../core/studio-script-library-projection.js";
 import { openStudioStoryboardWizard } from "../core/studio-storyboard-wizard.js";
 import { suggestStudioStoryboardDraft } from "../core/studio-storyboard-draft.js";
@@ -5390,7 +5391,7 @@ registrar.registerTool(
   {
     title: "剧本库只读投影（SSL-0/1/2/3/5 计划）",
     description:
-      "剧本库投影只读入口。library-index；episode-unit-media-map；missing-media-report；reader-view（正文+大纲+earliest）；script-media-align（SSL-3 一键图文对照：unit→图 SHA/缺图/trace 钥匙/大纲锚，需 season+episode，可选 documentId）；ssl5-missing-to-gen-plan（SSL-5 缺图→earliest 只读下一步，不 dispatch）。不写账本；不返回 CAS 路径/媒体二进制。",
+      "剧本库投影只读入口。library-index；episode-unit-media-map；missing-media-report；reader-view（正文+大纲+earliest）；script-media-align（SSL-3 一键图文对照：unit→图 SHA/缺图/trace 钥匙/大纲锚，需 season+episode，可选 documentId）；ssl5-missing-to-gen-plan（SSL-5 缺图→earliest 只读下一步，不 dispatch）；script-span-media-map（点选 span→相交宫格/图，需 season+episode+startOffsetUtf16+endOffsetUtf16）。不写账本；不返回 CAS 路径/媒体二进制。",
     inputSchema: {
       projectRoot: managedStudioProjectRootSchema,
       operation: z.enum([
@@ -5401,6 +5402,7 @@ registrar.registerTool(
         "script-media-align",
         "storyboard-wizard-suggest",
         "ssl5-missing-to-gen-plan",
+        "script-span-media-map",
       ]),
       kind: z.enum(["script", "prompt"]).optional(),
       season: z.string().min(1).max(64).optional(),
@@ -5411,6 +5413,8 @@ registrar.registerTool(
       scriptRevisionId: studioStableIdSchema.optional(),
       panelCount: z.number().int().min(2).max(6).optional(),
       includeBody: z.boolean().optional(),
+      startOffsetUtf16: z.number().int().min(0).optional(),
+      endOffsetUtf16: z.number().int().min(0).optional(),
     },
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
@@ -5426,6 +5430,8 @@ registrar.registerTool(
     scriptRevisionId,
     panelCount,
     includeBody,
+    startOffsetUtf16,
+    endOffsetUtf16,
   }) => {
     try {
       await inspectManagedProject(projectRoot);
@@ -5479,6 +5485,17 @@ registrar.registerTool(
             ...(documentId ? { documentId } : {}),
           }),
         );
+      }
+      if (operation === "script-span-media-map") {
+        if (startOffsetUtf16 === undefined || endOffsetUtf16 === undefined) {
+          throw new Error("script-span-media-map 需要 startOffsetUtf16 与 endOffsetUtf16。");
+        }
+        const map = await getStudioEpisodeUnitMediaMap(projectRoot, {
+          season,
+          episode,
+          ...(limit !== undefined ? { limit } : {}),
+        });
+        return managedStudioResult(resolveScriptSpanMediaMap(map, { startOffsetUtf16, endOffsetUtf16 }));
       }
       if (operation === "episode-unit-media-map") {
         return managedStudioResult(

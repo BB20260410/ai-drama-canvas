@@ -111,6 +111,85 @@ export function pickRawLabeledFromResults(
   return { rawSha256, labeledSha256, generationRunId };
 }
 
+/** 半开区间 [start, end) 是否相交。空区间不相交。 */
+export function spansOverlap(left: ScriptSpanRef, right: ScriptSpanRef): boolean {
+  return left.startOffsetUtf16 < left.endOffsetUtf16
+    && right.startOffsetUtf16 < right.endOffsetUtf16
+    && left.startOffsetUtf16 < right.endOffsetUtf16
+    && right.startOffsetUtf16 < left.endOffsetUtf16;
+}
+
+export interface ScriptSpanMediaHit {
+  unitId: string;
+  sequence: number;
+  title: string;
+  panelId: string;
+  panelIndex: number;
+  sourceSpans: ScriptSpanRef[];
+  packId: string | null;
+  generationRunId: string | null;
+  rawSha256: string | null;
+  labeledSha256: string | null;
+  hasMedia: boolean;
+}
+
+export interface ScriptSpanMediaMap {
+  schemaVersion: typeof SCRIPT_LIBRARY_PROJECTION_SCHEMA_VERSION;
+  kind: "studio-script-span-media-map";
+  projectRoot: string;
+  season: string;
+  episode: string;
+  query: ScriptSpanRef;
+  matchCount: number;
+  missingCount: number;
+  hits: ScriptSpanMediaHit[];
+}
+
+/** 纯函数：点选剧本 span → 相交宫格/图。不扫盘、不写账本。 */
+export function resolveScriptSpanMediaMap(
+  map: Pick<EpisodeUnitMediaMap, "projectRoot" | "season" | "episode" | "units">,
+  query: ScriptSpanRef,
+): ScriptSpanMediaMap {
+  if (
+    !Number.isFinite(query.startOffsetUtf16)
+    || !Number.isFinite(query.endOffsetUtf16)
+    || query.endOffsetUtf16 < query.startOffsetUtf16
+  ) {
+    throw new Error("script-span-media-map 需要有效的 startOffsetUtf16 ≤ endOffsetUtf16。");
+  }
+  const hits: ScriptSpanMediaHit[] = [];
+  for (const unit of map.units) {
+    for (const panel of unit.panels) {
+      if (!panel.sourceSpans.some((span) => spansOverlap(span, query))) continue;
+      hits.push({
+        unitId: unit.unitId,
+        sequence: unit.sequence,
+        title: unit.title,
+        panelId: panel.panelId,
+        panelIndex: panel.panelIndex,
+        sourceSpans: panel.sourceSpans,
+        packId: panel.packId,
+        generationRunId: panel.generationRunId,
+        rawSha256: panel.rawSha256,
+        labeledSha256: panel.labeledSha256,
+        hasMedia: panel.hasMedia,
+      });
+    }
+  }
+  hits.sort((left, right) => left.sequence - right.sequence || left.panelIndex - right.panelIndex);
+  return {
+    schemaVersion: SCRIPT_LIBRARY_PROJECTION_SCHEMA_VERSION,
+    kind: "studio-script-span-media-map",
+    projectRoot: map.projectRoot,
+    season: map.season,
+    episode: map.episode,
+    query,
+    matchCount: hits.length,
+    missingCount: hits.filter((hit) => !hit.hasMedia).length,
+    hits,
+  };
+}
+
 /** 纯函数：span 归一。 */
 export function normalizeSourceSpans(spans: unknown): ScriptSpanRef[] {
   if (!Array.isArray(spans)) return [];

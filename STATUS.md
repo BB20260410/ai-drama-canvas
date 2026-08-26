@@ -8,11 +8,11 @@
 | analysis | `docs/GOAL_无限画布全面分析与下一刀_20260826.md` |
 | workqueue | reap 0；next EMPTY；closed=7 |
 | A_earliest | **等待 owner**（真生图 / 安装版 T23 / P7 / 列表 GUI 探针） |
-| B_earliest | ScriptSpanMediaMap（点段落知配哪格图）；本切片已完成 SSL-5 只读 MCP |
+| B_earliest | 对照行四态 peek；SSL-5 与 ScriptSpanMediaMap 只读入口已挂 |
 | dual_track_gate | A_done=no；B_demo=部分；SSL≥ssl3 源码有、ssl5 计划已暴露；fit_band≠L5 |
 | ssl5 | `get_studio_script_library_projection` op `ssl5-missing-to-gen-plan`；对照横幅 `ssl5-missing-to-gen-plan`；不 dispatch |
 | evidence | `docs/evidence/goal-ssl5-missing-to-gen-mcp-20260826.json` |
-| earliest_next | B：ScriptSpanMediaMap。A 仍等 owner。禁止写「运行速度已关账」/「100% 契合」 |
+| earliest_next | B：对照行四态 peek。A 仍等 owner。禁止写「运行速度已关账」/「100% 契合」 |
 
 ## 2026-08-25 · 运行速度与内存占用长期计划立项
 

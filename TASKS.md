@@ -7,7 +7,7 @@
 - [x] Q0 workqueue 空（reap 0；next EMPTY）
 - [x] 全面分析对照北星 / SSL / Phase D / 速度计划
 - [x] SSL-5：`ssl5-missing-to-gen-plan` MCP + 对照横幅 + 导演动作（不 dispatch）
-- [ ] ScriptSpanMediaMap（点段落→格/图）
+- [x] ScriptSpanMediaMap（`script-span-media-map` 只读；点段落→相交宫格/图）
 - [ ] 对照行四态 peek
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
