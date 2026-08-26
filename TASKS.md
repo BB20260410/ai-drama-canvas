@@ -77,6 +77,7 @@
 - [x] 15s 向导复用已加载对照板六图闸/写租约（未加载明示不自动查；建议路径仍不 loadAlign；不改 formatWizardPromptBody / WIZARD_POST_MATERIALIZE_NEXT；不派发；schemaVersion 仍为 1）
 - [x] 阅读器复用已算 earliest 露出六图闸/写租约（checkpointLine / writeLeaseLine；不 import 对照模块；schemaVersion 仍为 1；不抢租约、不派发）
 - [x] session-snapshot 写租约只读 peek（withStudioProjectWriteLease + getStudioProjectWriteLeaseReadOnly；只拷 held/holderId/denialHint/line；不暴露 token；不进 fingerprint；不改 nextAction / 草稿 ready；失败关闭为未持有；不抢租约、不派发；schemaVersion 仍为 1）
+- [x] session-snapshot 六图闸只读 peek（动态 import 首屏 DashboardGate；只拷 newSlotDispatchAllowed/blockingBatchNumber/line；不进 fingerprint；不改 nextAction / 草稿 ready；失败关闭为未放行；不执行停检、不派发；schemaVersion 仍为 1）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
