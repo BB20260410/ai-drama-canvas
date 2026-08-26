@@ -174,8 +174,8 @@ describe("单 unit 只读 pack+plan", () => {
   it("只认本 unit 的 unit-grid pack；单镜 pack 与其它 unit 忽略", async () => {
     const databasePath = await seedLedger({
       packs: [
-        { unitId: "S1E2-U03", packId: "pack-panel", unitGrid: false },
-        { unitId: "S1E2-U04", packId: "pack-other", unitGrid: true },
+        { unitId: "S1E2-U03", packId: "pack-panel", sequence: 1, unitGrid: false },
+        { unitId: "S1E2-U04", packId: "pack-other", sequence: 3, unitGrid: true },
         { unitId: "S1E2-U03", packId: "pack-old", sequence: 2, unitGrid: true },
         { unitId: "S1E2-U03", packId: "pack-new", sequence: 9, unitGrid: true },
       ],

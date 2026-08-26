@@ -1,6 +1,6 @@
 /**
  * 只读：单个 unit 是否已有落盘 unit-grid pack / 生成计划。
- * 给 earliest 人机同下一步用。不走 managedLedgerPaths / 可写 openDatabase。
+ * 给 earliest 人机同下一步用。不走可写账本路径 / 可写开库。
  * 禁止全槽位扫描。缺库/缺表失败关闭为「无 pack、无计划」，不建库。
  */
 import { openGenerationLedgerReadOnly } from "./studio-generation-ledger-readiness.js";

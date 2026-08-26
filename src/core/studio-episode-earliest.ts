@@ -228,7 +228,7 @@ export async function getStudioEpisodeEarliest(
   const earliestReason = earliest
     ? checkpoint && (checkpoint as any).newSlotDispatchAllowed === false
       ? `earliest=${earliest.unitId} 但六图闸未放行（batch ${(checkpoint as any).blockingBatchNumber}）`
-      : `下一有序 unit-grid：${earliest.unitId}（seq ${earliest.sequence}）`
+      : `下一有序 unit-grid：${earliest.unitId}（seq ${earliest.sequence}）→ ${earliest.code}`
     : units.length === 0
       ? `工程内尚无 ${season}/${episode} 单元`
       : `${season}/${episode} 列表内 formal 证据已齐（未必整集关账）`;
