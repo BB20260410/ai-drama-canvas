@@ -52,6 +52,7 @@
 - [x] SSL-5 create-plan 只读草稿（recommendedPath 含 create-plan；generationPlanDraft 只认焦点缺图格 focusPackId，禁止用同行已出图 preview pack；不执行、不 dispatch；schemaVersion 仍为 1）
 - [x] session-snapshot / 生成控制露出同一 create-plan 只读草稿（薄模块不拉对照板；只认 query.panelId / 当前宫格已落盘单镜包；整板 pack 不当单镜节点；草稿不进 fingerprint；不执行、不 dispatch；schemaVersion 仍为 1）
 - [x] 生成控制 / pack envelope 露出 unit-grid create-plan 只读草稿（节点 `{ targetKind: unit-grid, unitId }`；只认已落盘 history/计划 pack，不用 readiness 候选；SSL-5 / session-snapshot 保持单镜；不执行、不 dispatch；schemaVersion 仍为 1）
+- [x] session-snapshot 无 panelId 露出 unit-grid create-plan 草稿；单镜/整板 readiness next 含 create-plan；生成控制露出命令名（只认账本已落盘 pack，不猜第一格，不执行、不 dispatch；schemaVersion 仍为 1）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
