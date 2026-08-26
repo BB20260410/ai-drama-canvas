@@ -111,3 +111,36 @@ describe("正式生图页计划取消/重拍", () => {
     expect(handler.indexOf("if (actionBusy.value) return;")).toBeLessThan(handler.indexOf("actionBusy.value = request.command"));
   });
 });
+
+describe("正式生图页锁版光线服化与场景回指", () => {
+  it("无冻结包才退锁版光线服化，有包仍只认覆盖行；场景回指点穿不猜第一格", () => {
+    const view = read("src/renderer/src/components/StudioGenerationControlView.vue");
+    expect(view).toContain('data-testid="studio-lock-lighting"');
+    expect(view).toContain('data-testid="studio-lock-costume"');
+    expect(view).toContain('data-testid="studio-control-scene-backrefs"');
+    expect(view).toContain("getStudioUnitLockOverlays");
+    expect(view).toContain("getStudioSceneBackReferences");
+    expect(view).toContain("formatUnitLockPanelLightingLine");
+    expect(view).toContain("formatUnitLockPanelCostumeLine");
+    expect(view).toContain("revealControlSceneBackRef");
+    expect(view).toContain("lightingCostumeSource.value = \"frozen-rendered-prompt\"");
+    expect(view).toContain("lightingCostumeSource.value = \"unit-lock\"");
+    expect(view).toContain("禁止猜第一格");
+    expect(view).not.toContain("studio-unit-lock-overlays-read");
+    expect(view).not.toContain("studio-scene-backrefs-read");
+    expect(view).not.toContain("evaluateStudioConsistency");
+    expect(view).not.toContain("getStudioBindingControl");
+    const revealStart = view.indexOf("async function revealControlSceneBackRef(");
+    const revealEnd = view.indexOf("function resetHistoryPagination(", revealStart);
+    expect(revealStart).toBeGreaterThan(-1);
+    expect(revealEnd).toBeGreaterThan(revealStart);
+    const reveal = view.slice(revealStart, revealEnd);
+    expect(reveal).toContain("next.panels.some((panel) => panel.id === panelId)");
+    expect(reveal).not.toContain("panels[0]");
+    expect(reveal).not.toContain("pickFirstCoveredPanel");
+    const switchStart = view.indexOf("watch(() => props.projectRoot,");
+    const afterDetailNull = view.indexOf("detail.value = null;", switchStart);
+    expect(afterDetailNull).toBeGreaterThan(switchStart);
+    expect(view.indexOf("clearControlLockOverlayCache();", afterDetailNull)).toBeGreaterThan(afterDetailNull);
+  });
+});

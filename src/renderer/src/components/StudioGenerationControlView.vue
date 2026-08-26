@@ -138,6 +138,38 @@
               data-testid="studio-pack-costume">
               {{ frozenPackCostumeLine }}
             </p>
+            <p
+              v-if="lockLightingLine"
+              class="previous-standing"
+              data-testid="studio-lock-lighting">
+              {{ lockLightingLine }}
+            </p>
+            <p
+              v-if="lockCostumeLine"
+              class="previous-standing"
+              data-testid="studio-lock-costume">
+              {{ lockCostumeLine }}
+            </p>
+            <p
+              v-if="lightingCostumeSource === 'unit-lock' && !lockLightingLine && !lockCostumeLine"
+              class="previous-standing"
+              data-testid="studio-lock-empty">
+              锁版未记光线/服装。不是 BindingSet，不能当 generation-ready。
+            </p>
+            <p
+              v-if="controlSceneBackReferenceNote"
+              class="previous-standing"
+              data-testid="studio-control-scene-backrefs">
+              {{ controlSceneBackReferenceNote }}
+            </p>
+            <button
+              v-for="ref in controlSceneBackReferences"
+              :key="`${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+              type="button"
+              :data-testid="`studio-control-scene-backref-${ref.unitId}-${ref.panelId}`"
+              :disabled="loading"
+              @click="revealControlSceneBackRef(ref)"
+            >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
             <details v-if="historyTargetKind === 'panel' && isTechnicalGenerationMessage(detail.selectedPanel.generation.message)" class="technical-diagnostics">
               <summary data-testid="studio-generation-message-diagnostics">诊断详情</summary>
               <p><code>{{ detail.selectedPanel.generation.message }}</code></p>
@@ -244,11 +276,14 @@ import {
   formatFrozenPanelCostumeReadonlyLine,
   formatFrozenPanelLightingReadonlyLine,
   formatPreviousStandingReadonlyLine,
+  formatUnitLockPanelCostumeLine,
+  formatUnitLockPanelLightingLine,
   frozenPanelCostumeFromAnyFrozenPack,
   frozenPanelLightingFromAnyFrozenPack,
   previousStandingFromAnyFrozenPack,
   type StudioPanelStandingHandoff,
 } from "@core/studio-panel-standing";
+import { formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
 
 const props = defineProps<{
   projectRoot: string;
@@ -320,6 +355,84 @@ const frozenPackCostumeLine = ref<string | null>(null);
 const frozenPackLoading = ref(false);
 const frozenPackError = ref("");
 let frozenPackToken = 0;
+const lockLightingLine = ref<string | null>(null);
+const lockCostumeLine = ref<string | null>(null);
+const lightingCostumeSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>(null);
+const controlSceneBackReferenceNote = ref<string | null>(null);
+const controlSceneBackReferences = ref<SceneBackReference[]>([]);
+type ControlLockOverlay = {
+  panelId: string;
+  panelIndex: number;
+  sceneLighting: string;
+  costumeState: string;
+};
+const controlLockOverlayCacheKey = ref<string | null>(null);
+const controlLockOverlayByPanelId = ref(new Map<string, ControlLockOverlay>());
+
+function clearControlLockOverlayCache(): void {
+  controlLockOverlayCacheKey.value = null;
+  controlLockOverlayByPanelId.value = new Map();
+}
+
+async function readControlLockOverlays(
+  projectRoot: string,
+  unitId: string,
+  unitRevision: number,
+): Promise<Map<string, ControlLockOverlay>> {
+  const key = `${projectRoot}\0${unitId}:${unitRevision}`;
+  if (controlLockOverlayCacheKey.value === key) return controlLockOverlayByPanelId.value;
+  try {
+    const result = await window.canvasApi.getStudioUnitLockOverlays(projectRoot, { unitId, unitRevision });
+    const next = new Map<string, ControlLockOverlay>();
+    for (const row of result.overlays ?? []) {
+      const panelId = row.panelId?.trim() ?? "";
+      if (!panelId) continue;
+      next.set(panelId, {
+        panelId,
+        panelIndex: row.panelIndex,
+        sceneLighting: row.sceneLighting ?? "",
+        costumeState: row.costumeState ?? "",
+      });
+    }
+    controlLockOverlayCacheKey.value = key;
+    controlLockOverlayByPanelId.value = next;
+    return next;
+  } catch {
+    clearControlLockOverlayCache();
+    return controlLockOverlayByPanelId.value;
+  }
+}
+
+async function applyControlSceneBackrefs(
+  token: number,
+  panelId: string,
+  panelIndex: number,
+): Promise<void> {
+  const unit = detail.value?.unit;
+  if (!props.projectRoot || !unit?.id || !Number.isInteger(unit.revision) || unit.revision < 1) {
+    controlSceneBackReferenceNote.value = formatSceneBackReferences(0, []);
+    controlSceneBackReferences.value = [];
+    return;
+  }
+  try {
+    const result = await window.canvasApi.getStudioSceneBackReferences(props.projectRoot, {
+      unitId: unit.id,
+      unitRevision: unit.revision,
+      sequence: unit.sequence,
+      panelId,
+      panelIndex,
+      season: unit.seasonId,
+      episode: unit.episodeId,
+    });
+    if (token !== frozenPackToken) return;
+    controlSceneBackReferenceNote.value = result.sceneBackReferenceNote;
+    controlSceneBackReferences.value = result.sceneBackReferences ?? [];
+  } catch {
+    if (token !== frozenPackToken) return;
+    controlSceneBackReferenceNote.value = formatSceneBackReferences(0, []);
+    controlSceneBackReferences.value = [];
+  }
+}
 
 // P24 U2：结果行变化分类（经 getStudioPackCurrentness 按 packId 懒加载+缓存，页 ≤100 有界）。
 interface PackCurrentnessView {
@@ -381,57 +494,80 @@ const selectedPackId = computed(() => {
 });
 
 // P24 R5-F2：watch 源含 projectRoot——复制工程同 packId 切换时也重新加载身份。
-watch([selectedPackId, selectedPanelId, () => props.projectRoot], async () => {
+watch([selectedPackId, selectedPanelId, () => props.projectRoot, () => detail.value?.unit.id, () => detail.value?.unit.revision], async () => {
   const packId = selectedPackId.value;
   const token = ++frozenPackToken;
   frozenPackIdentity.value = null;
   frozenPackPreviousStanding.value = null;
   frozenPackLightingLine.value = null;
   frozenPackCostumeLine.value = null;
+  lockLightingLine.value = null;
+  lockCostumeLine.value = null;
+  lightingCostumeSource.value = null;
+  controlSceneBackReferenceNote.value = null;
+  controlSceneBackReferences.value = [];
   frozenPackError.value = "";
-  if (!packId) return;
-  frozenPackLoading.value = true;
-  try {
-    const pack = await window.canvasApi.getStudioFrozenPack(props.projectRoot, packId);
-    if (token !== frozenPackToken) return;
-    frozenPackIdentity.value = pack
-      ? pack.schemaVersion === 5
-        ? {
-          targetKind: "unit-grid",
+  const panel = detail.value?.panels.find((entry) => entry.id === selectedPanelId.value);
+  if (packId) {
+    frozenPackLoading.value = true;
+    try {
+      const pack = await window.canvasApi.getStudioFrozenPack(props.projectRoot, packId);
+      if (token !== frozenPackToken) return;
+      frozenPackIdentity.value = pack
+        ? pack.schemaVersion === 5
+          ? {
+            targetKind: "unit-grid",
+            packId: pack.id,
+            fingerprint: pack.fingerprint,
+            unitSnapshotFingerprint: pack.unitSnapshotFingerprint,
+            panelCount: pack.panels.length,
+            continuityFingerprint: pack.continuityFingerprint,
+          }
+          : {
+          targetKind: "panel",
           packId: pack.id,
           fingerprint: pack.fingerprint,
           unitSnapshotFingerprint: pack.unitSnapshotFingerprint,
-          panelCount: pack.panels.length,
-          continuityFingerprint: pack.continuityFingerprint,
+          panelCount: 1,
+          scriptRevisionId: pack.scriptRevision.id,
+          scriptSha256: pack.scriptRevision.bodySha256,
+          promptRevisionId: pack.promptRevision.id,
+          promptSha256: pack.promptRevision.bodySha256,
+          bindingSetId: pack.assetBinding.bindingSet.id,
+          continuityFingerprint: pack.continuity.fingerprint,
         }
-        : {
-        targetKind: "panel",
-        packId: pack.id,
-        fingerprint: pack.fingerprint,
-        unitSnapshotFingerprint: pack.unitSnapshotFingerprint,
-        panelCount: 1,
-        scriptRevisionId: pack.scriptRevision.id,
-        scriptSha256: pack.scriptRevision.bodySha256,
-        promptRevisionId: pack.promptRevision.id,
-        promptSha256: pack.promptRevision.bodySha256,
-        bindingSetId: pack.assetBinding.bindingSet.id,
-        continuityFingerprint: pack.continuity.fingerprint,
+        : null;
+      if (pack) {
+        frozenPackPreviousStanding.value = previousStandingFromAnyFrozenPack(pack, selectedPanelId.value);
+        frozenPackLightingLine.value = formatFrozenPanelLightingReadonlyLine(
+          frozenPanelLightingFromAnyFrozenPack(pack, selectedPanelId.value),
+        );
+        frozenPackCostumeLine.value = formatFrozenPanelCostumeReadonlyLine(
+          frozenPanelCostumeFromAnyFrozenPack(pack, selectedPanelId.value),
+        );
+        lightingCostumeSource.value = "frozen-rendered-prompt";
+        if (panel) await applyControlSceneBackrefs(token, panel.id, panel.ordinal);
+        return;
       }
-      : null;
-    frozenPackPreviousStanding.value = previousStandingFromAnyFrozenPack(pack, selectedPanelId.value);
-    frozenPackLightingLine.value = formatFrozenPanelLightingReadonlyLine(
-      frozenPanelLightingFromAnyFrozenPack(pack, selectedPanelId.value),
-    );
-    frozenPackCostumeLine.value = formatFrozenPanelCostumeReadonlyLine(
-      frozenPanelCostumeFromAnyFrozenPack(pack, selectedPanelId.value),
-    );
-    if (!pack) frozenPackError.value = "冻结包不存在或已损坏。";
-  } catch (reason) {
-    if (token !== frozenPackToken) return;
-    frozenPackError.value = reason instanceof Error ? reason.message : String(reason);
-  } finally {
-    if (token === frozenPackToken) frozenPackLoading.value = false;
+      frozenPackError.value = "冻结包不存在或已损坏。";
+    } catch (reason) {
+      if (token !== frozenPackToken) return;
+      frozenPackError.value = reason instanceof Error ? reason.message : String(reason);
+    } finally {
+      if (token === frozenPackToken) frozenPackLoading.value = false;
+    }
   }
+  if (token !== frozenPackToken) return;
+  lightingCostumeSource.value = "unit-lock";
+  const unit = detail.value?.unit;
+  if (props.projectRoot && unit?.id && Number.isInteger(unit.revision) && unit.revision >= 1 && panel) {
+    const overlays = await readControlLockOverlays(props.projectRoot, unit.id, unit.revision);
+    if (token !== frozenPackToken) return;
+    const overlay = overlays.get(panel.id);
+    lockLightingLine.value = formatUnitLockPanelLightingLine(overlay);
+    lockCostumeLine.value = formatUnitLockPanelCostumeLine(overlay);
+  }
+  if (panel) await applyControlSceneBackrefs(token, panel.id, panel.ordinal);
 });
 
 function ensurePackCurrentness(packId: string): void {
@@ -811,6 +947,35 @@ async function selectPanel(panelId: string): Promise<void> {
   await selectUnit(selectedUnitId.value, panelId);
 }
 
+async function revealControlSceneBackRef(ref: SceneBackReference): Promise<void> {
+  const unitId = ref.unitId.trim();
+  const panelId = ref.panelId.trim();
+  if (!unitId || !panelId) return;
+  if (unitId === selectedUnitId.value) {
+    if (!detail.value?.panels.some((panel) => panel.id === panelId)) return;
+    await selectPanel(panelId);
+    return;
+  }
+  const root = props.projectRoot;
+  const token = ++requestToken;
+  resetHistoryPagination();
+  try {
+    const next = await props.api.getDashboard(root, {
+      operation: "unit",
+      unitId,
+      panelId,
+    }) as StudioDashboardUnitDetail;
+    if (disposed || token !== requestToken || root !== props.projectRoot) return;
+    if (!next.panels.some((panel) => panel.id === panelId)) return;
+    selectedUnitId.value = unitId;
+    detail.value = next;
+    selectedPanelId.value = panelId;
+    await loadHistory(token);
+  } catch {
+    // 单元/宫格不在当前工程则失败关闭，禁止猜第一格。
+  }
+}
+
 function resetHistoryPagination(): void {
   historyCursor.value = undefined;
   historyNextCursor.value = undefined;
@@ -1125,6 +1290,12 @@ watch(() => props.projectRoot, () => {
   progress.value = null;
   units.value = null;
   detail.value = null;
+  clearControlLockOverlayCache();
+  lockLightingLine.value = null;
+  lockCostumeLine.value = null;
+  lightingCostumeSource.value = null;
+  controlSceneBackReferenceNote.value = null;
+  controlSceneBackReferences.value = [];
   history.value = [];
   selectedUnitId.value = "";
   selectedPanelId.value = "";
@@ -1178,7 +1349,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.studio-generation-control{height:100%;min-height:640px;display:grid;grid-template-rows:auto auto auto minmax(0,1fr);overflow:hidden;background:var(--ui-surface);color:var(--ui-text);font-family:Inter,"PingFang SC",sans-serif}.generation-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--ui-line);background:var(--ui-bg)}.generation-header span{color:var(--ui-accent);font:700 9px ui-monospace,monospace;letter-spacing:.12em}.generation-header h2{margin:6px 0 3px;font-size:20px}.generation-header p{margin:0;color:var(--ui-text-3);font-size:10px}.generation-header button,.pager button,.panel-stage header button,.generation-detail footer button{height:30px;padding:0 10px;border:1px solid var(--ui-accent);background:transparent;color:var(--ui-accent);cursor:pointer}.generation-header button:disabled,.pager button:disabled,.generation-detail footer button:disabled{opacity:.4;cursor:not-allowed}.generation-error{padding:9px 18px;border-bottom:1px solid var(--ui-danger);background:color-mix(in srgb, var(--ui-danger) 10%, var(--ui-surface));color:var(--ui-danger);font-size:10px}.generation-counts{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--ui-line)}.generation-counts article{padding:12px 18px;border-right:1px solid var(--ui-line)}.generation-counts strong,.generation-counts span{display:block}.generation-counts strong{font:600 19px ui-monospace,monospace}.generation-counts span{margin-top:4px;color:var(--ui-text-3);font-size:9px}.generation-counts .warn strong{color:var(--ui-accent)}.generation-layout{min-height:0;display:grid;grid-template-columns:230px minmax(300px,1fr) 360px}.unit-rail,.generation-detail{min-height:0;overflow:auto;background:var(--ui-surface)}.unit-rail{border-right:1px solid var(--ui-line)}.unit-rail>header{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--ui-line)}.unit-rail>header b{font-size:10px}.unit-rail>header small{color:var(--ui-text-3)}.unit-rail>button{width:100%;display:grid;gap:5px;padding:11px 14px;border:0;border-bottom:1px solid var(--ui-line);background:transparent;color:var(--ui-text-2);text-align:left;cursor:pointer;content-visibility:auto;contain-intrinsic-size:auto 56px}.unit-rail>button.active{box-shadow:inset 2px 0 var(--ui-accent);background:var(--ui-surface-2);color:var(--ui-accent)}.unit-rail>button strong{font-size:10px}.unit-rail>button span{color:var(--ui-text-3);font-size:8px}.pager{display:flex;justify-content:center;gap:8px;padding:10px}.panel-stage{min-width:0;min-height:0;overflow:auto;background:var(--ui-surface)}.panel-stage>header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--ui-line)}.panel-stage>header b,.panel-stage>header span{display:block}.panel-stage>header b{font-size:13px}.panel-stage>header span{margin-top:4px;color:var(--ui-text-3);font-size:9px}.panel-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));align-content:start}.panel-list>button{min-height:96px;display:grid;grid-template-columns:30px 1fr;align-items:start;gap:9px;padding:14px;border:0;border-right:1px solid var(--ui-line);border-bottom:1px solid var(--ui-line);background:var(--ui-bg);color:var(--ui-text-2);text-align:left;cursor:pointer;content-visibility:auto;contain-intrinsic-size:auto 96px}.panel-list>button.active{background:var(--ui-accent-soft);color:var(--ui-accent)}.panel-list>button>span{display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--ui-line);border-radius:50%;font:600 9px ui-monospace,monospace}.panel-list strong,.panel-list small{display:block}.panel-list strong{font-size:10px;line-height:1.4}.panel-list small{margin-top:7px;color:var(--ui-text-3);font-size:8px}.generation-detail{border-left:1px solid var(--ui-line)}.generation-detail>header,.generation-detail>section{padding:15px 17px;border-bottom:1px solid var(--ui-line)}.generation-detail>header span{color:var(--ui-accent);font-size:8px}.generation-detail h3{margin:6px 0 0;font-size:15px}.generation-detail>section>b{display:block;margin-bottom:8px;color:var(--ui-text-2);font-size:9px}.generation-detail>section>strong{display:inline-block;padding:4px 7px;border:1px solid var(--ui-line);color:var(--ui-text-2);font-size:8px}.generation-detail>section>strong.ready{border-color:var(--ui-accent);color:var(--ui-accent)}.generation-detail p{margin:8px 0 0;color:var(--ui-text-3);font-size:9px;line-height:1.55}.previous-standing{color:var(--ui-accent)!important}.result-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 0;border-top:1px solid var(--ui-line)}.result-row strong,.result-row small{display:block}.result-row strong{font-size:9px}.result-row small{margin-top:3px;color:var(--ui-text-3);font-size:7px}.result-row>span{color:var(--ui-danger);font-size:8px}.result-row>span.ready{color:var(--ui-accent-strong)}.generation-detail>footer{display:flex;gap:8px;padding:14px 17px}.empty-state{height:100%;display:grid;place-items:center;padding:30px;color:var(--ui-text-3);font-size:10px;text-align:center}@media(max-width:1000px){.generation-layout{grid-template-columns:190px 1fr}.generation-detail{grid-column:1/-1;max-height:330px;border-top:1px solid var(--ui-line)}.generation-counts{grid-template-columns:repeat(2,1fr)}}
+.studio-generation-control{height:100%;min-height:640px;display:grid;grid-template-rows:auto auto auto minmax(0,1fr);overflow:hidden;background:var(--ui-surface);color:var(--ui-text);font-family:Inter,"PingFang SC",sans-serif}.generation-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--ui-line);background:var(--ui-bg)}.generation-header span{color:var(--ui-accent);font:700 9px ui-monospace,monospace;letter-spacing:.12em}.generation-header h2{margin:6px 0 3px;font-size:20px}.generation-header p{margin:0;color:var(--ui-text-3);font-size:10px}.generation-header button,.pager button,.panel-stage header button,.generation-detail footer button,.generation-detail section button{height:30px;padding:0 10px;border:1px solid var(--ui-accent);background:transparent;color:var(--ui-accent);cursor:pointer}.generation-header button:disabled,.pager button:disabled,.generation-detail footer button:disabled,.generation-detail section button:disabled{opacity:.4;cursor:not-allowed}.generation-error{padding:9px 18px;border-bottom:1px solid var(--ui-danger);background:color-mix(in srgb, var(--ui-danger) 10%, var(--ui-surface));color:var(--ui-danger);font-size:10px}.generation-counts{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--ui-line)}.generation-counts article{padding:12px 18px;border-right:1px solid var(--ui-line)}.generation-counts strong,.generation-counts span{display:block}.generation-counts strong{font:600 19px ui-monospace,monospace}.generation-counts span{margin-top:4px;color:var(--ui-text-3);font-size:9px}.generation-counts .warn strong{color:var(--ui-accent)}.generation-layout{min-height:0;display:grid;grid-template-columns:230px minmax(300px,1fr) 360px}.unit-rail,.generation-detail{min-height:0;overflow:auto;background:var(--ui-surface)}.unit-rail{border-right:1px solid var(--ui-line)}.unit-rail>header{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--ui-line)}.unit-rail>header b{font-size:10px}.unit-rail>header small{color:var(--ui-text-3)}.unit-rail>button{width:100%;display:grid;gap:5px;padding:11px 14px;border:0;border-bottom:1px solid var(--ui-line);background:transparent;color:var(--ui-text-2);text-align:left;cursor:pointer;content-visibility:auto;contain-intrinsic-size:auto 56px}.unit-rail>button.active{box-shadow:inset 2px 0 var(--ui-accent);background:var(--ui-surface-2);color:var(--ui-accent)}.unit-rail>button strong{font-size:10px}.unit-rail>button span{color:var(--ui-text-3);font-size:8px}.pager{display:flex;justify-content:center;gap:8px;padding:10px}.panel-stage{min-width:0;min-height:0;overflow:auto;background:var(--ui-surface)}.panel-stage>header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--ui-line)}.panel-stage>header b,.panel-stage>header span{display:block}.panel-stage>header b{font-size:13px}.panel-stage>header span{margin-top:4px;color:var(--ui-text-3);font-size:9px}.panel-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));align-content:start}.panel-list>button{min-height:96px;display:grid;grid-template-columns:30px 1fr;align-items:start;gap:9px;padding:14px;border:0;border-right:1px solid var(--ui-line);border-bottom:1px solid var(--ui-line);background:var(--ui-bg);color:var(--ui-text-2);text-align:left;cursor:pointer;content-visibility:auto;contain-intrinsic-size:auto 96px}.panel-list>button.active{background:var(--ui-accent-soft);color:var(--ui-accent)}.panel-list>button>span{display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--ui-line);border-radius:50%;font:600 9px ui-monospace,monospace}.panel-list strong,.panel-list small{display:block}.panel-list strong{font-size:10px;line-height:1.4}.panel-list small{margin-top:7px;color:var(--ui-text-3);font-size:8px}.generation-detail{border-left:1px solid var(--ui-line)}.generation-detail>header,.generation-detail>section{padding:15px 17px;border-bottom:1px solid var(--ui-line)}.generation-detail>header span{color:var(--ui-accent);font-size:8px}.generation-detail h3{margin:6px 0 0;font-size:15px}.generation-detail>section>b{display:block;margin-bottom:8px;color:var(--ui-text-2);font-size:9px}.generation-detail>section>strong{display:inline-block;padding:4px 7px;border:1px solid var(--ui-line);color:var(--ui-text-2);font-size:8px}.generation-detail>section>strong.ready{border-color:var(--ui-accent);color:var(--ui-accent)}.generation-detail p{margin:8px 0 0;color:var(--ui-text-3);font-size:9px;line-height:1.55}.previous-standing{color:var(--ui-accent)!important}.result-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 0;border-top:1px solid var(--ui-line)}.result-row strong,.result-row small{display:block}.result-row strong{font-size:9px}.result-row small{margin-top:3px;color:var(--ui-text-3);font-size:7px}.result-row>span{color:var(--ui-danger);font-size:8px}.result-row>span.ready{color:var(--ui-accent-strong)}.generation-detail>footer{display:flex;gap:8px;padding:14px 17px}.empty-state{height:100%;display:grid;place-items:center;padding:30px;color:var(--ui-text-3);font-size:10px;text-align:center}@media(max-width:1000px){.generation-layout{grid-template-columns:190px 1fr}.generation-detail{grid-column:1/-1;max-height:330px;border-top:1px solid var(--ui-line)}.generation-counts{grid-template-columns:repeat(2,1fr)}}
 </style>
 <style scoped>
 .generation-plans{border-bottom:1px solid var(--ui-line);background:var(--ui-surface);max-height:220px;overflow:auto}.generation-plans>header{display:flex;align-items:center;justify-content:space-between;padding:8px 18px;border-bottom:1px solid var(--ui-line)}.generation-plans>header b{font-size:10px;color:var(--ui-accent)}.generation-plans>header span{color:var(--ui-text-3);font-size:9px}.plans-empty{padding:10px 18px;color:var(--ui-text-3);font-size:10px}.plan-group{border-bottom:1px solid var(--ui-line)}.plan-group>header{display:flex;align-items:center;justify-content:space-between;padding:6px 18px}.plan-group>header small{color:var(--ui-text-3);font-size:9px}.plan-group>header button{height:22px;padding:0 8px;border:1px solid var(--ui-accent);background:transparent;color:var(--ui-accent);cursor:pointer;font-size:9px}.plan-node{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:10px;align-items:center;padding:5px 18px;content-visibility:auto;contain-intrinsic-size:auto 32px}.node-status{font-size:9px;padding:2px 6px;border:1px solid var(--ui-line);text-align:center;color:var(--ui-text-2)}.node-status.dispatched,.node-status.planned{color:var(--ui-accent);border-color:var(--ui-accent)}.node-status.succeeded{color:var(--ui-ok);border-color:var(--ui-ok)}.node-status.failed,.node-status.cancelled{color:var(--ui-danger);border-color:var(--ui-danger)}.node-main{display:grid;gap:2px;min-width:0}.node-main strong{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.node-main small{color:var(--ui-text-3);font-size:9px}.node-main .node-error{color:var(--ui-danger)}.node-actions{display:flex;gap:6px}.node-actions button{height:22px;padding:0 8px;border:1px solid var(--ui-accent);background:transparent;color:var(--ui-accent);cursor:pointer;font-size:9px}.node-actions button:disabled{opacity:.4;cursor:not-allowed}

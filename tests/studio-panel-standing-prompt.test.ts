@@ -249,6 +249,10 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(control).toContain("previousStandingFromAnyFrozenPack(pack, selectedPanelId.value)");
     expect(control).toContain("frozenPanelLightingFromAnyFrozenPack(pack, selectedPanelId.value)");
     expect(control).toContain("formatPreviousStandingReadonlyLine");
+    expect(control).toContain("getStudioUnitLockOverlays");
+    expect(control).toContain("getStudioSceneBackReferences");
+    expect(control).toContain("formatUnitLockPanelLightingLine");
+    expect(control).not.toContain("studio-scene-backrefs-read");
     expect(control).not.toContain("evaluateStudioConsistency");
     expect(control).not.toContain("getStudioBindingControl");
     const review = readFileSync(path.join(repoRoot, "src/renderer/src/components/StudioContinuityReviewView.vue"), "utf8");
