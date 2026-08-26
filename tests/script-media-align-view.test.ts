@@ -98,6 +98,15 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain('data-testid="storyboard-wizard-materialize"');
     expect(vue).toContain('data-testid="storyboard-wizard-next"');
     expect(vue).toContain("Binding → freeze → create-plan → dispatch");
+    expect(vue).toContain("wizardPostMaterializeNextLine");
+    expect(vue).toContain("wizardAlignCheckpointLine");
+    expect(vue).toContain("wizardAlignWriteLeaseLine");
+    expect(vue).toContain("storyboard-wizard-checkpoint");
+    expect(vue).toContain("storyboard-wizard-write-lease");
+    expect(vue).toContain("对照板未加载，不自动查六图闸");
+    expect(vue).toContain("对照板未加载，不自动查写租约");
+    expect(vue).toContain("board.value?.checkpointLine");
+    expect(vue).toContain("board.value?.writeLeaseLine");
     expect(vue).toContain("仍需后续 Binding / freeze / create-plan");
     expect(vue).toContain("进入 Binding");
     expect(vue).not.toContain("仍需后续 Binding / freeze。</p>");

@@ -211,6 +211,24 @@ const missingReportOpenItems = computed(() =>
   (board.value?.missingReport.items ?? []).filter((item) => item.status !== "covered"),
 );
 
+const wizardAlignCheckpointLine = computed(() =>
+  board.value?.checkpointLine ?? "对照板未加载，不自动查六图闸",
+);
+
+const wizardAlignWriteLeaseLine = computed(() =>
+  board.value?.writeLeaseLine ?? "对照板未加载，不自动查写租约",
+);
+
+const wizardPostMaterializeNextLine = computed(() => {
+  if (board.value?.checkpoint?.newSlotDispatchAllowed === false) {
+    return `下一步：${board.value.checkpointLine}（不跳过 Binding，不自动派发）`;
+  }
+  if (board.value?.writeLease?.held === false) {
+    return "下一步：Binding → acquire-lease → freeze → create-plan → dispatch（不跳过 Binding，不自动派发）";
+  }
+  return "下一步：Binding → freeze → create-plan → dispatch（不跳过 Binding，不自动派发）";
+});
+
 async function copyMissingReport() {
   const report = board.value?.missingReport;
   if (!report) return;
@@ -1462,6 +1480,8 @@ function shortSha(value: string | null | undefined): string {
           <p v-for="validationError in wizardValidationErrors" :key="validationError">{{ validationError }}</p>
           <p v-if="!wizardValidationErrors.length">2–6 格、15 秒、动作和时间线已闭合；仍需后续 Binding / freeze / create-plan。</p>
         </div>
+        <span data-testid="storyboard-wizard-checkpoint">{{ wizardAlignCheckpointLine }}</span>
+        <span data-testid="storyboard-wizard-write-lease">{{ wizardAlignWriteLeaseLine }}</span>
         <button
           type="button"
           class="primary"
@@ -1474,7 +1494,7 @@ function shortSha(value: string | null | undefined): string {
           <b>{{ materialized.unitId }}</b>
           <p>unit r{{ materialized.unitRevision }} · prompt {{ materialized.promptRevisionId }}</p>
           <p v-for="panel in materialized.panelStatuses" :key="panel.panelId">G{{ panel.panelIndex }}：{{ panel.status }}</p>
-          <p data-testid="storyboard-wizard-next">下一步：Binding → freeze → create-plan → dispatch（不跳过 Binding，不自动派发）</p>
+          <p data-testid="storyboard-wizard-next">{{ wizardPostMaterializeNextLine }}</p>
           <button type="button" @click="emit('openUnit', { unitId: materialized.unitId, target: 'binding' })">进入 Binding</button>
         </div>
       </aside>
