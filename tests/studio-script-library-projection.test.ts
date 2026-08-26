@@ -8,6 +8,7 @@ import {
   countCoveredUnits,
   formatPanelCoverageMarks,
   formatPanelLightingCostumeLine,
+  formatPanelShotTypeLine,
   formatPanelStandingGaps,
   formatPanelStandingHandoff,
   formatSceneBackReferences,
@@ -232,6 +233,14 @@ describe("studio-script-library-projection pure helpers", () => {
     expect(hit.hits[0]?.previousHandoff).toBeNull();
     expect(hit.hits[0]?.sceneLighting).toBe("窗侧冷光");
     expect(hit.hits[0]?.costumeState).toBe("素袍");
+    expect(hit.hits[0]?.shotType).toBe("original");
+    expect(hit.hits[0]?.shotTypeLine).toContain("原镜：G1");
+    expect(hit.hits[0]?.shotTypeLine).toContain("必须锚定原文");
+    expect(hit.hits[0]?.shotTypeLine).toContain("不是 BindingSet");
+    expect(formatPanelShotTypeLine(hit.hits[0])).toContain("原镜：G1");
+    expect(formatPanelShotTypeLine({ panelIndex: 2, shotType: "extension" })).toContain("扩写格：G2");
+    expect(formatPanelShotTypeLine({ panelIndex: 3, shotType: "" })).toContain("锁版未记镜头类型");
+    expect(formatPanelShotTypeLine(null)).toBe("没有宫格可查镜头类型");
     expect(hit.hits[0]?.sceneBackReferences).toEqual([]);
     expect(hit.hits[0]?.sceneBackReferenceLine).toContain("本格快照未提及场景");
     expect(hit.hits[0]?.propBackReferences).toEqual([]);
@@ -769,6 +778,8 @@ describe("SSL-0 ScriptSpanMediaMap 入口", () => {
     expect(source).toContain("formatCharacterBackReferences");
     expect(source).toContain("formatPropBackReferences");
     expect(source).toContain("formatPanelLightingCostumeLine");
+    expect(source).toContain("formatPanelShotTypeLine");
+    expect(source).toContain("shotTypeLine");
     expect(source).toContain('from "./studio-scene-backrefs.js"');
     expect(source).toContain("不是 BindingSet，不能当 generation-ready");
     expect(source).not.toContain("getStudioBindingControl");

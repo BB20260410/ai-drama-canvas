@@ -107,6 +107,8 @@ describe("studio-storyboard-wizard", () => {
     expect(body).not.toContain("场景回指");
     expect(body).not.toContain("道具回指");
     expect(body).not.toContain("角色回指");
+    expect(body).not.toContain("扩写格：必须与前一格连续");
+    expect(body).not.toContain("禁止锚定原文");
     const lit = applyWizardPanelEdits(panels, [
       { panelIndex: 1, sceneLighting: "室内火光", costumeState: "深灰祭服" },
     ]);

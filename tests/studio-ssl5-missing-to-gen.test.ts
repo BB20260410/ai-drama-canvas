@@ -95,7 +95,10 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.propBackReferences).toEqual([]);
     expect(plan.characterBackReferenceLine).toBe("没有宫格可查角色回指");
     expect(plan.characterBackReferences).toEqual([]);
+    expect(plan.shotTypeLine).toBe("没有宫格可查镜头类型");
+    expect(plan.shotType).toBeUndefined();
     expect(plan.items[0]?.lightingCostumeLine).toBe("没有宫格可查光线/服化");
+    expect(plan.items[0]?.shotTypeLine).toBe("没有宫格可查镜头类型");
     expect(plan.items[0]?.recommendedPath).toEqual([
       "binding-ready?",
       "readiness",
@@ -148,6 +151,7 @@ describe("SSL-5 缺图下一步纯函数", () => {
             hasMedia: false,
             sceneLighting: "近灯",
             costumeState: "加披风",
+            shotType: "extension",
             previousHandoff: { panelIndex: 1, panelId: "p1", shotComposition: "中景", visualAction: "站定", filmingMethod: "固定" },
           }),
         ],
@@ -168,6 +172,11 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.previousLightingLine).toContain("锁版前镜光线：G1 窗侧冷光");
     expect(plan.previousCostumeLine).toContain("锁版前镜服化：G1 素袍");
     expect(plan.items[0]?.lightingCostumeLine).toContain("锁版光线：G2 近灯");
+    expect(plan.shotType).toBe("extension");
+    expect(plan.shotTypeLine).toContain("扩写格：G2");
+    expect(plan.shotTypeLine).toContain("禁止重新起镜");
+    expect(plan.shotTypeLine).toContain("不是 BindingSet");
+    expect(plan.items[0]?.shotTypeLine).toContain("扩写格：G2");
   });
 
   it("焦点宫格场景回指只扫已加载对照板，忽略更晚单元", () => {
@@ -201,6 +210,7 @@ describe("SSL-5 缺图下一步纯函数", () => {
             hasMedia: false,
             sceneLighting: "石室火塘",
             costumeState: "青布短打",
+            shotType: "original",
             assetMentions: [
               { assetId: "scene-stone", category: "scene", role: "石室" },
               { assetId: "prop-mask", category: "prop", role: "黄金面具" },
@@ -267,6 +277,10 @@ describe("SSL-5 缺图下一步纯函数", () => {
       panelId: "e1",
     }]);
     expect(plan.items.find((item) => item.unitId === "u-focus")?.characterBackReferences).toEqual(plan.characterBackReferences);
+    expect(plan.shotType).toBe("original");
+    expect(plan.shotTypeLine).toContain("原镜：G1");
+    expect(plan.shotTypeLine).toContain("必须锚定原文");
+    expect(plan.items.find((item) => item.unitId === "u-focus")?.shotTypeLine).toBe(plan.shotTypeLine);
   });
 
   it("全 covered 且无 earliest 则无焦点", () => {
@@ -286,6 +300,7 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(plan.propBackReferences).toEqual([]);
     expect(plan.characterBackReferenceLine).toBe("没有宫格可查角色回指");
     expect(plan.characterBackReferences).toEqual([]);
+    expect(plan.shotTypeLine).toBe("没有宫格可查镜头类型");
   });
 });
 
@@ -314,11 +329,14 @@ describe("SSL-5 入口源码合同", () => {
     expect(vue).toContain('data-testid="ssl5-focus-scene-backrefs"');
     expect(vue).toContain('data-testid="ssl5-focus-prop-backrefs"');
     expect(vue).toContain('data-testid="ssl5-focus-character-backrefs"');
+    expect(vue).toContain('data-testid="ssl5-focus-shot-type"');
     expect(vue).toContain('data-testid="ssl5-focus-lighting"');
     expect(vue).toContain('data-testid="ssl5-focus-previous-lighting"');
     expect(vue).toContain('data-testid="ssl5-focus-previous-costume"');
     expect(ssl5).toContain("formatSceneBackReferenceLineFromBoard");
     expect(ssl5).toContain("formatPanelLightingCostumeLine");
+    expect(ssl5).toContain("formatPanelShotTypeLine");
+    expect(ssl5).toContain("shotTypeLine");
     expect(ssl5).toContain("wizardPreviousLightingForPanel");
     expect(ssl5).toContain("wizardPreviousCostumeForPanel");
     expect(ssl5).toContain("lightingCostumeLine");

@@ -8,8 +8,10 @@ import {
 } from "./studio-generation-ledger.js";
 import { queryStudioGenerationFreeze } from "./studio-generation.js";
 import {
+  formatFrozenPanelShotTypeReadonlyLine,
   parseFrozenPanelCostumeFromRenderedPrompt,
   parseFrozenPanelLightingFromRenderedPrompt,
+  parseFrozenPanelShotTypeFromRenderedPrompt,
   previousStandingFromFrozenRenderedPrompt,
   type StudioPanelStandingHandoff,
 } from "./studio-panel-standing.js";
@@ -112,6 +114,11 @@ export interface StudioGenerationSessionSnapshot {
   characterMentions: Array<{ assetId: string; role: string }>;
   characterBackReferences: CharacterBackReference[];
   characterBackReferenceNote: string;
+  /**
+   * 冻结镜头类型只读句：只从该包 renderedPrompt 或 pack.panel.shotType 还原，不读 unit head。
+   * 无扩写/原镜则为 null，不进 fingerprint。不是 BindingSet。
+   */
+  shotTypeLine: string | null;
   camera: {
     current?: {
       shotComposition: string;
@@ -374,6 +381,16 @@ export async function buildStudioGenerationSessionSnapshot(
     characterMentions: sceneBackref.characterMentions,
     characterBackReferences: sceneBackref.characterBackReferences,
     characterBackReferenceNote: sceneBackref.characterBackReferenceNote,
+    shotTypeLine: (() => {
+      const prompt = frozenPanel?.request?.modelPayload?.renderedPrompt;
+      const fromPrompt = typeof prompt === "string"
+        ? parseFrozenPanelShotTypeFromRenderedPrompt(prompt)
+        : null;
+      const fromPanel = frozenPanel?.panel.shotType === "extension" || frozenPanel?.panel.shotType === "original"
+        ? frozenPanel.panel.shotType
+        : null;
+      return formatFrozenPanelShotTypeReadonlyLine(fromPrompt ?? fromPanel);
+    })(),
     camera: {
       current: frozenPanel
         ? {
@@ -430,6 +447,7 @@ export async function buildStudioGenerationSessionSnapshot(
             characterBackReferences: body.characterBackReferences,
           }
         : {}),
+      ...(body.shotTypeLine ? { shotTypeLine: body.shotTypeLine } : {}),
       camera: body.camera,
       topRiskCode: body.topRisk?.code ?? null,
     }),

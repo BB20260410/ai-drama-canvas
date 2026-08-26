@@ -2113,6 +2113,8 @@ describe("受管画布侧栏列表视口剔除", () => {
     expect(inspector).toContain('data-testid="managed-canvas-inspector-prop-backrefs"');
     expect(inspector).toContain("panelPropBackReferenceNote");
     expect(inspector).toContain('data-testid="managed-canvas-inspector-character-backrefs"');
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-shot-type"');
+    expect(inspector).toContain("panelShotTypeLine");
     expect(inspector).toContain("panelCharacterBackReferenceNote");
     expect(view).toContain("getStudioSceneBackReferences");
     expect(view).toContain("revealInspectorSceneBackRef");

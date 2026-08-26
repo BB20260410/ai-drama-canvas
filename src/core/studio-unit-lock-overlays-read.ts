@@ -21,6 +21,8 @@ export type StudioUnitLockOverlay = {
   panelIndex: number;
   sceneLighting: string;
   costumeState: string;
+  /** 可选列；缺列则为空，不让整次锁版光线/服化失败关闭。 */
+  shotType: "original" | "extension" | "";
 };
 
 export type StudioUnitLockOverlayQuery = {
@@ -96,8 +98,12 @@ export function readStudioUnitLockOverlays(
   const db = openStudioUnitLockOverlayDatabase(productionDatabasePath(projectRoot));
   if (!db) return emptyLockOverlayResult();
   try {
+    const hasShotType = new Set(
+      (db.prepare("PRAGMA table_info(studio_production_panels)").all() as Array<{ name?: string }>)
+        .map((row) => String(row.name ?? "")),
+    ).has("shot_type");
     const rows = db.prepare(`
-      SELECT p.panel_id, p.panel_index, p.scene_lighting, p.costume_state
+      SELECT p.panel_id, p.panel_index, p.scene_lighting, p.costume_state${hasShotType ? ", p.shot_type" : ""}
       FROM studio_production_panels p
       JOIN studio_production_units u
         ON u.id = p.unit_id AND u.revision = p.unit_revision
@@ -114,6 +120,7 @@ export function readStudioUnitLockOverlays(
       panel_index: number;
       scene_lighting: string;
       costume_state: string;
+      shot_type?: string;
     }>;
     const seen = new Set<string>();
     const overlays: StudioUnitLockOverlay[] = [];
@@ -122,11 +129,13 @@ export function readStudioUnitLockOverlays(
       const panelIndex = Number(row.panel_index);
       if (!panelId || !Number.isFinite(panelIndex) || seen.has(panelId)) continue;
       seen.add(panelId);
+      const rawShotType = String(row.shot_type ?? "").trim();
       overlays.push({
         panelId,
         panelIndex,
         sceneLighting: String(row.scene_lighting ?? "").trim(),
         costumeState: String(row.costume_state ?? "").trim(),
+        shotType: rawShotType === "extension" ? "extension" : rawShotType === "original" ? "original" : "",
       });
     }
     return { overlays };

@@ -8,6 +8,7 @@ import type { StudioProductionUnitSummary } from "@core/studio-production";
 import {
   formatPanelCoverageMarks,
   formatPanelLightingCostumeLine,
+  formatPanelShotTypeLine,
   formatPanelStandingGaps,
   formatPanelStandingHandoff,
   formatCharacterBackReferences,
@@ -989,6 +990,7 @@ function shortSha(value: string | null | undefined): string {
                 <small data-testid="span-media-hit-handoff">{{ formatPanelStandingHandoff(hit.previousHandoff) }}</small>
                 <small data-testid="span-media-hit-gaps">{{ formatPanelStandingGaps(hit) }}</small>
                 <small data-testid="span-media-hit-lighting">{{ formatPanelLightingCostumeLine(hit) }}</small>
+                <small data-testid="span-media-hit-shot-type">{{ hit.shotTypeLine }}</small>
                 <small data-testid="span-media-hit-scene-backrefs">{{ hit.sceneBackReferenceLine }}</small>
                 <small data-testid="span-media-hit-prop-backrefs">{{ hit.propBackReferenceLine }}</small>
                 <small data-testid="span-media-hit-character-backrefs">{{ hit.characterBackReferenceLine }}</small>
@@ -1069,6 +1071,7 @@ function shortSha(value: string | null | undefined): string {
           <span v-if="ssl5Plan.previousPanelIndex != null" data-testid="ssl5-focus-handoff">前镜 G{{ ssl5Plan.previousPanelIndex }} {{ ssl5Plan.previousShotComposition || "构图未记" }} · {{ ssl5Plan.previousVisualAction || "动作未记" }} · {{ ssl5Plan.previousFilmingMethod || "运镜未记" }}</span>
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-standing-gaps">{{ ssl5Plan.standingGapLine }}</span>
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-lighting">{{ ssl5Plan.lightingCostumeLine }}</span>
+          <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-shot-type">{{ ssl5Plan.shotTypeLine }}</span>
           <span v-if="ssl5Plan.previousLightingLine" data-testid="ssl5-focus-previous-lighting">{{ ssl5Plan.previousLightingLine }}</span>
           <span v-if="ssl5Plan.previousCostumeLine" data-testid="ssl5-focus-previous-costume">{{ ssl5Plan.previousCostumeLine }}</span>
           <span v-if="ssl5Plan.focusPanelId" data-testid="ssl5-focus-scene-backrefs">{{ ssl5Plan.sceneBackReferenceLine }}</span>
@@ -1206,6 +1209,7 @@ function shortSha(value: string | null | undefined): string {
             <div><dt>运镜</dt><dd data-testid="align-panel-filming">{{ selectedAlignPanel?.filmingMethod || "—" }}</dd></div>
             <div><dt>光线</dt><dd data-testid="align-panel-lighting">{{ selectedAlignPanel?.sceneLighting || "—" }}</dd></div>
             <div><dt>服化</dt><dd data-testid="align-panel-costume">{{ selectedAlignPanel?.costumeState || "—" }}</dd></div>
+            <div><dt>镜头类型</dt><dd data-testid="align-panel-shot-type">{{ formatPanelShotTypeLine(selectedAlignPanel) }}</dd></div>
             <div><dt>前镜</dt><dd data-testid="align-panel-handoff">{{ formatPanelStandingHandoff(selectedAlignPanel?.previousHandoff) }}</dd></div>
             <div><dt>站位缺口</dt><dd data-testid="align-panel-standing-gaps">{{ formatPanelStandingGaps(selectedAlignPanel) }}</dd></div>
             <div>
@@ -1298,6 +1302,7 @@ function shortSha(value: string | null | undefined): string {
           <label>运镜 <input v-model.trim="panel.filmingMethod" /></label>
           <label>光线 <input v-model.trim="panel.sceneLighting" data-testid="storyboard-wizard-lighting" /></label>
           <label>服化 <input v-model.trim="panel.costumeState" data-testid="storyboard-wizard-costume" /></label>
+          <p class="wide wizard-lock-hint" data-testid="storyboard-wizard-shot-type">{{ formatPanelShotTypeLine(panel) }}</p>
           <label>对白 <input v-model.trim="panel.dialogue" /></label>
           <label>时长 <input v-model.number="panel.durationSeconds" type="number" min="0.1" max="15" step="0.1" @change="reflowWizardTimings" /></label>
           <p

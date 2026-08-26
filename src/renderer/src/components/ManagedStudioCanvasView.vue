@@ -752,6 +752,7 @@
         :panel-frozen-lighting-line="inspectorFrozenLightingLine"
         :panel-frozen-costume-line="inspectorFrozenCostumeLine"
         :panel-lighting-costume-source="inspectorLightingCostumeSource"
+        :panel-shot-type-line="inspectorShotTypeLine"
         :panel-scene-back-reference-note="inspectorSceneBackReferenceNote"
         :panel-scene-back-references="inspectorSceneBackReferences"
         :panel-prop-back-reference-note="inspectorPropBackReferenceNote"
@@ -825,12 +826,15 @@ import StudioGenerationTraceDrawer, { type StudioTraceDrawerModel } from "./Stud
 import {
   formatFrozenPanelCostumeReadonlyLine,
   formatFrozenPanelLightingReadonlyLine,
+  formatFrozenPanelShotTypeReadonlyLine,
   formatPreviousStandingReadonlyLine,
   formatUnitLockPanelCostumeLine,
   formatUnitLockPanelLightingLine,
+  formatUnitLockPanelShotTypeLine,
   formatUnitLockPreviousStandingLine,
   frozenPanelCostumeFromAnyFrozenPack,
   frozenPanelLightingFromAnyFrozenPack,
+  frozenPanelShotTypeFromAnyFrozenPack,
   previousStandingFromAnyFrozenPack,
 } from "@core/studio-panel-standing";
 import { formatCharacterBackReferences, formatPropBackReferences, formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
@@ -1976,6 +1980,7 @@ const inspectorPreviousStandingSource = ref<"frozen-rendered-prompt" | "unit-loc
 const inspectorFrozenLightingLine = ref<string | null>(null);
 const inspectorFrozenCostumeLine = ref<string | null>(null);
 const inspectorLightingCostumeSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>(null);
+const inspectorShotTypeLine = ref<string | null>(null);
 const inspectorSceneBackReferenceNote = ref<string | null>(null);
 const inspectorSceneBackReferences = ref<SceneBackReference[]>([]);
 const inspectorPropBackReferenceNote = ref<string | null>(null);
@@ -1987,6 +1992,7 @@ type InspectorLockOverlay = {
   panelIndex: number;
   sceneLighting: string;
   costumeState: string;
+  shotType: "original" | "extension" | "";
 };
 const inspectorLockOverlayCacheKey = ref<string | null>(null);
 const inspectorLockOverlayByPanelId = ref(new Map<string, InspectorLockOverlay>());
@@ -2015,6 +2021,7 @@ async function readInspectorLockOverlays(
         panelIndex: row.panelIndex,
         sceneLighting: row.sceneLighting ?? "",
         costumeState: row.costumeState ?? "",
+        shotType: row.shotType === "extension" || row.shotType === "original" ? row.shotType : "",
       });
     }
     inspectorLockOverlayCacheKey.value = key;
@@ -2085,6 +2092,7 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
   inspectorFrozenLightingLine.value = null;
   inspectorFrozenCostumeLine.value = null;
   inspectorLightingCostumeSource.value = null;
+  inspectorShotTypeLine.value = null;
   inspectorSceneBackReferenceNote.value = null;
   inspectorSceneBackReferences.value = [];
   inspectorPropBackReferenceNote.value = null;
@@ -2111,6 +2119,9 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
         );
         inspectorFrozenCostumeLine.value = formatFrozenPanelCostumeReadonlyLine(
           frozenPanelCostumeFromAnyFrozenPack(pack, panel.id),
+        );
+        inspectorShotTypeLine.value = formatFrozenPanelShotTypeReadonlyLine(
+          frozenPanelShotTypeFromAnyFrozenPack(pack, panel.id),
         );
         inspectorLightingCostumeSource.value = "frozen-rendered-prompt";
         await applyInspectorSceneBackrefs(token, panel.id, panel.ordinal);
@@ -2146,6 +2157,7 @@ watch([selection, unitDetail, () => props.projectRoot], async () => {
   const overlay = overlays.get(panel.id);
   inspectorFrozenLightingLine.value = formatUnitLockPanelLightingLine(overlay);
   inspectorFrozenCostumeLine.value = formatUnitLockPanelCostumeLine(overlay);
+  inspectorShotTypeLine.value = formatUnitLockPanelShotTypeLine(overlay);
   inspectorLightingCostumeSource.value = "unit-lock";
   await applyInspectorSceneBackrefs(token, panel.id, panel.ordinal);
 }, { immediate: true });
@@ -4152,6 +4164,7 @@ function closeInspector(): void {
   inspectorFrozenLightingLine.value = null;
   inspectorFrozenCostumeLine.value = null;
   inspectorLightingCostumeSource.value = null;
+  inspectorShotTypeLine.value = null;
   inspectorSceneBackReferenceNote.value = null;
   inspectorSceneBackReferences.value = [];
   inspectorPropBackReferenceNote.value = null;

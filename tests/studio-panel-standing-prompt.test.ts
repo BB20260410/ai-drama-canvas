@@ -27,8 +27,13 @@ import {
   formatFrozenPanelCostumeReadonlyLine,
   formatUnitLockPanelLightingLine,
   formatUnitLockPanelCostumeLine,
+  formatUnitLockPanelShotTypeLine,
+  formatFrozenPanelShotTypeReadonlyLine,
+  parseFrozenPanelShotTypeFromRenderedPrompt,
+  frozenPanelShotTypeFromAnyFrozenPack,
   frozenPanelOverlaysFromFrozenPanelPacks,
   FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
+  EXTENSION_SHOT_TYPE_TOOL_NOTE,
 } from "../src/core/studio-panel-standing.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -167,6 +172,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(emptyContinuity).not.toContain("场景回指");
     expect(emptyContinuity).not.toContain("道具回指");
     expect(emptyContinuity).not.toContain("角色回指");
+    expect(emptyContinuity).not.toContain("扩写格：必须与前一格连续");
+    expect(emptyContinuity).not.toContain("禁止锚定原文");
     expect(formatWizardLightingPromptLine("")).toBeNull();
     expect(formatWizardCostumePromptLine("  ")).toBeNull();
     expect(formatWizardLightingPromptLine("室内火光")).toBe("光线：室内火光");
@@ -226,6 +233,34 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
       { target: { panelId: "p1" }, request: { modelPayload: { renderedPrompt: "只生成一张" } } },
     ])).toEqual([]);
     expect(FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE).toContain("光线（宫格覆盖）");
+    expect(parseFrozenPanelShotTypeFromRenderedPrompt("镜头类型：原镜")).toBe("original");
+    expect(parseFrozenPanelShotTypeFromRenderedPrompt("镜头类型：扩写延续（保持与前一格连续，不重新起镜）")).toBe("extension");
+    expect(parseFrozenPanelShotTypeFromRenderedPrompt("只生成一张 9:16 竖屏")).toBeNull();
+    expect(frozenPanelShotTypeFromAnyFrozenPack({
+      request: { modelPayload: { renderedPrompt: "镜头类型：扩写延续（保持与前一格连续，不重新起镜）" } },
+    })).toBe("extension");
+    expect(frozenPanelShotTypeFromAnyFrozenPack({
+      schemaVersion: 5,
+      panels: [{
+        panelId: "p2",
+        panelPack: { request: { modelPayload: { renderedPrompt: "镜头类型：原镜" } } },
+      }],
+    })).toBeNull();
+    expect(frozenPanelShotTypeFromAnyFrozenPack({
+      schemaVersion: 5,
+      panels: [{
+        panelId: "p2",
+        panelPack: { request: { modelPayload: { renderedPrompt: "镜头类型：原镜" } } },
+      }],
+    }, "p2")).toBe("original");
+    expect(formatFrozenPanelShotTypeReadonlyLine("extension")).toContain("冻结扩写格");
+    expect(formatFrozenPanelShotTypeReadonlyLine("original")).toContain("冻结原镜");
+    expect(formatFrozenPanelShotTypeReadonlyLine(null)).toBeNull();
+    expect(formatUnitLockPanelShotTypeLine({ panelIndex: 2, shotType: "extension" })).toContain("锁版扩写格：G2");
+    expect(formatUnitLockPanelShotTypeLine({ panelIndex: 2, shotType: "original" })).toContain("锁版原镜：G2");
+    expect(formatUnitLockPanelShotTypeLine({ panelIndex: 2, shotType: "" })).toBeNull();
+    expect(EXTENSION_SHOT_TYPE_TOOL_NOTE).toContain("扩写格");
+    expect(EXTENSION_SHOT_TYPE_TOOL_NOTE).toContain("禁止锚定原文");
   });
 
   it("session-snapshot / 生成控制 / 审片从冻结提示词露前镜，不读 head", () => {
@@ -235,6 +270,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(snapshot).toContain("parseFrozenPanelCostumeFromRenderedPrompt");
     expect(snapshot).toContain("frozenPanelLighting");
     expect(snapshot).toContain("frozenPanelCostume");
+    expect(snapshot).toContain("shotTypeLine");
+    expect(snapshot).toContain("parseFrozenPanelShotTypeFromRenderedPrompt");
     expect(snapshot).toContain("readStudioSceneBackReferences");
     expect(snapshot).toContain("sceneBackReferences");
     expect(snapshot).toContain('source: "frozen-rendered-prompt"');
@@ -245,6 +282,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(mcp).toContain("previousStanding");
     expect(mcp).toContain("frozenPanelLighting");
     expect(mcp).toContain("frozenPanelCostume");
+    expect(mcp).toContain("shotTypeLine");
     expect(mcp).toContain("sceneBackReferences");
     expect(mcp).toContain("只从该包 renderedPrompt 还原");
     const control = readFileSync(path.join(repoRoot, "src/renderer/src/components/StudioGenerationControlView.vue"), "utf8");
@@ -258,6 +296,9 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(control).toContain("getStudioSceneBackReferences");
     expect(control).toContain('data-testid="studio-control-prop-backrefs"');
     expect(control).toContain('data-testid="studio-control-character-backrefs"');
+    expect(control).toContain('data-testid="studio-control-shot-type"');
+    expect(control).toContain("frozenPanelShotTypeFromAnyFrozenPack(pack, selectedPanelId.value)");
+    expect(control).toContain("formatUnitLockPanelShotTypeLine");
     expect(control).toContain("formatUnitLockPanelLightingLine");
     expect(control).not.toContain("studio-scene-backrefs-read");
     expect(control).not.toContain("evaluateStudioConsistency");
@@ -265,6 +306,9 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     const review = readFileSync(path.join(repoRoot, "src/renderer/src/components/StudioContinuityReviewView.vue"), "utf8");
     expect(review).toContain('data-testid="studio-review-previous-standing"');
     expect(review).toContain('data-testid="studio-review-lighting-costume"');
+    expect(review).toContain('data-testid="studio-review-shot-type"');
+    expect(review).toContain("frozenPanelShotTypeFromAnyFrozenPack(pack, reviewStandingPanelId.value)");
+    expect(review).not.toContain("getStudioUnitLockOverlays");
     expect(review).toContain("previousStandingFromAnyFrozenPack(pack, reviewStandingPanelId.value)");
     expect(review).toContain("frozenPanelLightingFromAnyFrozenPack(pack, reviewStandingPanelId.value)");
     expect(review).toContain("focus?.packId");
@@ -278,6 +322,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(wizard).not.toContain("场景回指");
     expect(wizard).not.toContain("道具回指");
     expect(wizard).not.toContain("角色回指");
+    expect(wizard).not.toContain("扩写格：必须与前一格连续");
     const app = readFileSync(path.join(repoRoot, "src/renderer/src/App.vue"), "utf8");
     expect(app).toContain("formatWizardPromptBody(input.panels)");
     expect(app).not.toContain("evaluateStudioConsistency(");
@@ -295,6 +340,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(wizardView).toContain("formatUnitLockPreviousStandingLine");
     expect(wizardView).toContain('data-testid="storyboard-wizard-prop-backrefs"');
     expect(wizardView).toContain('data-testid="storyboard-wizard-character-backrefs"');
+    expect(wizardView).toContain('data-testid="storyboard-wizard-shot-type"');
+    expect(wizardView).toContain("formatPanelShotTypeLine");
     const brief = readFileSync(path.join(repoRoot, "src/core/codex.ts"), "utf8");
     expect(brief).toContain("previousStandings");
     expect(brief).toContain("previousStandingFromFrozenRenderedPrompt(panel.panelPack)");
@@ -304,6 +351,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(brief).toContain("SCENE_BACK_REFERENCE_TOOL_NOTE");
     expect(brief).toContain("PROP_BACK_REFERENCE_TOOL_NOTE");
     expect(brief).toContain("CHARACTER_BACK_REFERENCE_TOOL_NOTE");
+    expect(brief).toContain("EXTENSION_SHOT_TYPE_TOOL_NOTE");
     expect(brief).toContain("frozenPanelLightingFromAnyFrozenPack(panel.panelPack)");
     const canvas = readFileSync(path.join(repoRoot, "src/renderer/src/components/ManagedStudioCanvasView.vue"), "utf8");
     expect(canvas).toContain("previousStandingFromAnyFrozenPack(pack, panel.id)");
@@ -311,6 +359,8 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(canvas).toContain("formatFrozenPanelLightingReadonlyLine");
     expect(canvas).toContain("formatUnitLockPreviousStandingLine");
     expect(canvas).toContain("formatUnitLockPanelLightingLine");
+    expect(canvas).toContain("formatUnitLockPanelShotTypeLine");
+    expect(canvas).toContain("frozenPanelShotTypeFromAnyFrozenPack(pack, panel.id)");
     expect(canvas).toContain("getStudioUnitLockOverlays");
     expect(canvas).toContain("getStudioSceneBackReferences");
     expect(canvas).not.toContain("getStudioProductionUnitSnapshot");

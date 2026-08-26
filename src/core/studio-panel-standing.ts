@@ -202,6 +202,59 @@ export const PROP_BACK_REFERENCE_TOOL_NOTE =
 export const CHARACTER_BACK_REFERENCE_TOOL_NOTE =
   "若 session-snapshot 含 characterBackReferences / characterBackReferenceNote，必须与更早同角色快照提及连续，禁止换成未回指的角色。快照提及不是 BindingSet，不能当 generation-ready。";
 
+export const EXTENSION_SHOT_TYPE_TOOL_NOTE =
+  "若 session-snapshot / frozen pack / shotTypeLine 标明扩写格，必须与前一格连续，禁止重新起镜，禁止锚定原文 sourceSpans。原镜必须锚定原文。";
+
+export type FrozenPanelShotType = "original" | "extension";
+
+/** 从已冻结 renderedPrompt 还原镜头类型；历史包无「镜头类型」行则为 null。 */
+export function parseFrozenPanelShotTypeFromRenderedPrompt(
+  renderedPrompt: string,
+): FrozenPanelShotType | null {
+  const match = /镜头类型：(.+)/u.exec(renderedPrompt);
+  const text = match?.[1] ?? "";
+  if (text.includes("扩写")) return "extension";
+  if (text.includes("原镜")) return "original";
+  return null;
+}
+
+export function frozenPanelShotTypeFromAnyFrozenPack(
+  pack: AnyFrozenPackStandingSource | null | undefined,
+  panelId?: string,
+): FrozenPanelShotType | null {
+  const prompt = renderedPromptFromAnyFrozenPack(pack, panelId);
+  return prompt ? parseFrozenPanelShotTypeFromRenderedPrompt(prompt) : null;
+}
+
+export function formatFrozenPanelShotTypeReadonlyLine(
+  shotType: FrozenPanelShotType | null | undefined,
+): string | null {
+  if (shotType === "extension") {
+    return "冻结扩写格：必须与前一格连续，禁止重新起镜，禁止锚定原文。不是 BindingSet。";
+  }
+  if (shotType === "original") {
+    return "冻结原镜：必须锚定原文。不是 BindingSet。";
+  }
+  return null;
+}
+
+/** 当前宫格锁版镜头类型（无冻结包时）；不是 BindingSet。 */
+export function formatUnitLockPanelShotTypeLine(
+  overlay: { panelIndex: number; shotType?: string } | null | undefined,
+): string | null {
+  const shotType = overlay?.shotType === "extension"
+    ? "extension"
+    : overlay?.shotType === "original"
+      ? "original"
+      : "";
+  if (!overlay || !shotType) return null;
+  const prefix = `G${overlay.panelIndex} `;
+  if (shotType === "extension") {
+    return `锁版扩写格：${prefix}必须与前一格连续，禁止重新起镜，禁止锚定原文。不是 BindingSet，不能当 generation-ready。`;
+  }
+  return `锁版原镜：${prefix}必须锚定原文。不是 BindingSet，不能当 generation-ready。`;
+}
+
 export type FrozenPanelStandingRow = {
   panelId: string;
   previousStanding: StudioPanelStandingHandoff & { source: "frozen-rendered-prompt" };

@@ -157,6 +157,12 @@
               锁版未记光线/服装。不是 BindingSet，不能当 generation-ready。
             </p>
             <p
+              v-if="controlShotTypeLine"
+              class="previous-standing"
+              data-testid="studio-control-shot-type">
+              {{ controlShotTypeLine }}
+            </p>
+            <p
               v-if="controlSceneBackReferenceNote"
               class="previous-standing"
               data-testid="studio-control-scene-backrefs">
@@ -303,11 +309,14 @@ import {
 import {
   formatFrozenPanelCostumeReadonlyLine,
   formatFrozenPanelLightingReadonlyLine,
+  formatFrozenPanelShotTypeReadonlyLine,
   formatPreviousStandingReadonlyLine,
   formatUnitLockPanelCostumeLine,
   formatUnitLockPanelLightingLine,
+  formatUnitLockPanelShotTypeLine,
   frozenPanelCostumeFromAnyFrozenPack,
   frozenPanelLightingFromAnyFrozenPack,
+  frozenPanelShotTypeFromAnyFrozenPack,
   previousStandingFromAnyFrozenPack,
   type StudioPanelStandingHandoff,
 } from "@core/studio-panel-standing";
@@ -386,6 +395,9 @@ let frozenPackToken = 0;
 const lockLightingLine = ref<string | null>(null);
 const lockCostumeLine = ref<string | null>(null);
 const lightingCostumeSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>(null);
+const frozenPackShotTypeLine = ref<string | null>(null);
+const lockShotTypeLine = ref<string | null>(null);
+const controlShotTypeLine = computed(() => frozenPackShotTypeLine.value || lockShotTypeLine.value);
 const controlSceneBackReferenceNote = ref<string | null>(null);
 const controlSceneBackReferences = ref<SceneBackReference[]>([]);
 const controlPropBackReferenceNote = ref<string | null>(null);
@@ -397,6 +409,7 @@ type ControlLockOverlay = {
   panelIndex: number;
   sceneLighting: string;
   costumeState: string;
+  shotType: "original" | "extension" | "";
 };
 const controlLockOverlayCacheKey = ref<string | null>(null);
 const controlLockOverlayByPanelId = ref(new Map<string, ControlLockOverlay>());
@@ -424,6 +437,7 @@ async function readControlLockOverlays(
         panelIndex: row.panelIndex,
         sceneLighting: row.sceneLighting ?? "",
         costumeState: row.costumeState ?? "",
+        shotType: row.shotType === "extension" || row.shotType === "original" ? row.shotType : "",
       });
     }
     controlLockOverlayCacheKey.value = key;
@@ -545,8 +559,10 @@ watch([selectedPackId, selectedPanelId, () => props.projectRoot, () => detail.va
   frozenPackPreviousStanding.value = null;
   frozenPackLightingLine.value = null;
   frozenPackCostumeLine.value = null;
+  frozenPackShotTypeLine.value = null;
   lockLightingLine.value = null;
   lockCostumeLine.value = null;
+  lockShotTypeLine.value = null;
   lightingCostumeSource.value = null;
   controlSceneBackReferenceNote.value = null;
   controlSceneBackReferences.value = [];
@@ -593,6 +609,9 @@ watch([selectedPackId, selectedPanelId, () => props.projectRoot, () => detail.va
         frozenPackCostumeLine.value = formatFrozenPanelCostumeReadonlyLine(
           frozenPanelCostumeFromAnyFrozenPack(pack, selectedPanelId.value),
         );
+        frozenPackShotTypeLine.value = formatFrozenPanelShotTypeReadonlyLine(
+          frozenPanelShotTypeFromAnyFrozenPack(pack, selectedPanelId.value),
+        );
         lightingCostumeSource.value = "frozen-rendered-prompt";
         if (panel) await applyControlSceneBackrefs(token, panel.id, panel.ordinal);
         return;
@@ -614,6 +633,7 @@ watch([selectedPackId, selectedPanelId, () => props.projectRoot, () => detail.va
     const overlay = overlays.get(panel.id);
     lockLightingLine.value = formatUnitLockPanelLightingLine(overlay);
     lockCostumeLine.value = formatUnitLockPanelCostumeLine(overlay);
+    lockShotTypeLine.value = formatUnitLockPanelShotTypeLine(overlay);
   }
   if (panel) await applyControlSceneBackrefs(token, panel.id, panel.ordinal);
 });
@@ -1341,6 +1361,7 @@ watch(() => props.projectRoot, () => {
   clearControlLockOverlayCache();
   lockLightingLine.value = null;
   lockCostumeLine.value = null;
+  lockShotTypeLine.value = null;
   lightingCostumeSource.value = null;
   controlSceneBackReferenceNote.value = null;
   controlSceneBackReferences.value = [];
@@ -1359,6 +1380,7 @@ watch(() => props.projectRoot, () => {
   frozenPackPreviousStanding.value = null;
   frozenPackLightingLine.value = null;
   frozenPackCostumeLine.value = null;
+  frozenPackShotTypeLine.value = null;
   frozenPackError.value = "";
   duduDetectionRoot = "";
   duduProject.value = null;

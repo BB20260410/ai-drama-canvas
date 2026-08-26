@@ -11,6 +11,7 @@ import {
 } from "./studio-script-media-align.js";
 import {
   formatPanelLightingCostumeLine,
+  formatPanelShotTypeLine,
   formatPanelStandingGaps,
   formatCharacterBackReferenceLineFromBoard,
   formatPropBackReferenceLineFromBoard,
@@ -52,6 +53,8 @@ export interface Ssl5MissingToGenPlanItem {
   lightingCostumeLine: string;
   previousLightingLine: string | null;
   previousCostumeLine: string | null;
+  shotType?: "original" | "extension";
+  shotTypeLine: string;
   sceneBackReferenceLine: string;
   sceneBackReferences: SceneBackReference[];
   propBackReferenceLine: string;
@@ -78,6 +81,8 @@ export interface Ssl5MissingToGenPlan {
   lightingCostumeLine: string;
   previousLightingLine: string | null;
   previousCostumeLine: string | null;
+  shotType?: "original" | "extension";
+  shotTypeLine: string;
   sceneBackReferenceLine: string;
   sceneBackReferences: SceneBackReference[];
   propBackReferenceLine: string;
@@ -174,6 +179,10 @@ export function buildSsl5PlanFromBoard(
         lightingCostumeLine: formatPanelLightingCostumeLine(missingPanel ?? null),
         previousLightingLine: formatWizardLockPreviousLightingLine(previousLighting),
         previousCostumeLine: formatWizardLockPreviousCostumeLine(previousCostume),
+        shotType: missingPanel?.shotType === "extension" || missingPanel?.shotType === "original"
+          ? missingPanel.shotType
+          : undefined,
+        shotTypeLine: formatPanelShotTypeLine(missingPanel ?? null),
         sceneBackReferenceLine: missingPanel
           ? formatSceneBackReferenceLineFromBoard({
               currentUnitId: row.unitId,
@@ -238,6 +247,8 @@ export function buildSsl5PlanFromBoard(
     lightingCostumeLine: focus?.lightingCostumeLine ?? "没有宫格可查光线/服化",
     previousLightingLine: focus?.previousLightingLine ?? null,
     previousCostumeLine: focus?.previousCostumeLine ?? null,
+    shotType: focus?.shotType,
+    shotTypeLine: focus?.shotTypeLine ?? "没有宫格可查镜头类型",
     sceneBackReferenceLine: focus?.sceneBackReferenceLine ?? "没有宫格可查场景回指",
     sceneBackReferences: focus?.sceneBackReferences ?? [],
     propBackReferenceLine: focus?.propBackReferenceLine ?? "没有宫格可查道具回指",

@@ -258,6 +258,32 @@ export function formatPanelLightingCostumeLine(
   return `${parts.join(" · ")}。不是 BindingSet，不能当 generation-ready。`;
 }
 
+export type PanelShotTypeFields = {
+  panelIndex?: number;
+  shotType?: string;
+};
+
+/** 锁版本格原镜/扩写；不是 BindingSet，不能当 generation-ready。 */
+export function formatPanelShotTypeLine(
+  panel: PanelShotTypeFields | null | undefined,
+): string {
+  if (!panel) return "没有宫格可查镜头类型";
+  const index = Number(panel.panelIndex);
+  const prefix = Number.isFinite(index) ? `G${index} ` : "";
+  const shotType = panel.shotType === "extension"
+    ? "extension"
+    : panel.shotType === "original"
+      ? "original"
+      : "";
+  if (shotType === "extension") {
+    return `扩写格：${prefix}必须与前一格连续，禁止重新起镜，禁止锚定原文。不是 BindingSet，不能当 generation-ready。`;
+  }
+  if (shotType === "original") {
+    return `原镜：${prefix}必须锚定原文。不是 BindingSet，不能当 generation-ready。`;
+  }
+  return "锁版未记镜头类型。不是 BindingSet，不能当 generation-ready。";
+}
+
 export function listSceneAssetMentions(
   mentions: ReadonlyArray<{ assetId?: string; category?: string; role?: string }> | null | undefined,
 ): PanelAssetMentionLite[] {
@@ -851,6 +877,8 @@ export interface ScriptSpanMediaHit {
   previousHandoff: PanelStandingHandoff | null;
   sceneLighting: string;
   costumeState: string;
+  shotType?: "original" | "extension";
+  shotTypeLine: string;
   sceneBackReferenceLine: string;
   sceneBackReferences: SceneBackReference[];
   propBackReferenceLine: string;
@@ -905,6 +933,8 @@ export function resolveScriptSpanMediaMap(
         previousHandoff: panel.previousHandoff,
         sceneLighting: panel.sceneLighting,
         costumeState: panel.costumeState,
+        shotType: panel.shotType === "extension" || panel.shotType === "original" ? panel.shotType : undefined,
+        shotTypeLine: formatPanelShotTypeLine(panel),
         sceneBackReferenceLine: formatSceneBackReferenceLineFromBoard({
           currentUnitId: unit.unitId,
           currentSequence: unit.sequence,
