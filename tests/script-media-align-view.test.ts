@@ -41,7 +41,9 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain('data-testid="script-reader-span-media-board"');
     expect(vue).toContain("span-media-hit-standing");
     expect(vue).toContain("span-media-hit-handoff");
+    expect(vue).toContain("span-media-hit-align");
     expect(vue).toContain("formatPanelStandingHandoff(hit.previousHandoff)");
+    expect(vue).toContain("revealSpanMediaHit");
     expect(vue).toContain("getStudioScriptSpanMediaMap");
     expect(vue).toContain('data-testid="storyboard-wizard-suggest"');
     expect(vue).toContain('data-testid="storyboard-wizard-materialize"');
@@ -148,6 +150,29 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     );
     expect(suggest).toContain('actionLoading.value = ""');
     expect(suggest).toContain("report(reason)");
+  });
+
+  it("选区命中对照这格 fail-closed：busy 在首个 await 之前置位，未命中不猜宫格，缺图不绑其他格的图", () => {
+    const vue = source();
+    const alignButton = buttonAttrs(vue, "span-media-hit-align");
+    expect(alignButton).toContain(':disabled="Boolean(actionLoading)"');
+    expect(alignButton).toContain("正在处理，不能再对照这格");
+    const reveal = handlerBody(vue, "async function revealSpanMediaHit(", "async function revealSsl5Focus(");
+    expect(reveal).toContain("if (actionLoading.value) return;");
+    expect(reveal).toContain('actionLoading.value = "span-align"');
+    expect(reveal.indexOf("if (actionLoading.value) return;")).toBeLessThan(
+      reveal.indexOf('actionLoading.value = "span-align"'),
+    );
+    expect(reveal.indexOf('actionLoading.value = "span-align"')).toBeLessThan(
+      reveal.indexOf("await Promise.all("),
+    );
+    expect(reveal).toContain('activeTab.value = "align"');
+    expect(reveal).toContain("不能猜宫格");
+    expect(reveal).toContain("loadAlignPreview(focusPanel.rawSha256)");
+    expect(reveal).not.toContain("revealSsl5Focus");
+    expect(reveal).not.toContain("pickFirstCoveredPanel");
+    expect(reveal).not.toContain("getStudioBindingControl");
+    expect(reveal).not.toContain("evaluateStudioConsistency");
   });
 });
 

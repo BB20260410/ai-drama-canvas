@@ -11,6 +11,7 @@ import {
   pickFirstCoveredPanel,
   pickFirstMissingPanel,
   type ScriptLibraryIndex,
+  type ScriptSpanMediaHit,
   type ScriptSpanMediaMap,
 } from "@core/studio-script-library-projection";
 import type { ScriptReaderView } from "@core/studio-script-library-reader";
@@ -424,6 +425,52 @@ async function materializeWizard(): Promise<void> {
   }
 }
 
+async function revealSpanMediaHit(hit: ScriptSpanMediaHit): Promise<void> {
+  if (actionLoading.value) return;
+  actionLoading.value = "span-align";
+  error.value = "";
+  notice.value = "";
+  try {
+    let nextBoard = board.value;
+    if (!nextBoard) {
+      if (!season.value.trim() || !episode.value.trim()) {
+        report(new Error("请先填写季与集，才能对照这格。"));
+        return;
+      }
+      const query = {
+        season: season.value.trim(),
+        episode: episode.value.trim(),
+      };
+      const [loadedBoard, nextPlan] = await Promise.all([
+        props.api.getStudioScriptMediaAlignBoard(props.projectRoot, query),
+        props.api.planSsl5MissingToGen(props.projectRoot, query),
+      ]);
+      board.value = loadedBoard;
+      ssl5Plan.value = nextPlan;
+      nextBoard = loadedBoard;
+    }
+    const focusRow = nextBoard.rows.find((row) => row.unitId === hit.unitId);
+    if (!focusRow) {
+      report(new Error(`对照表没有 ${hit.unitId}，不能猜宫格。`));
+      return;
+    }
+    const focusPanel = focusRow.panels.find((panel) => panel.panelId === hit.panelId);
+    if (!focusPanel) {
+      report(new Error(`对照表没有 ${hit.unitId} G${hit.panelIndex}，不能猜宫格。`));
+      return;
+    }
+    selectedAlignRow.value = focusRow;
+    selectedAlignPanel.value = focusPanel;
+    await loadAlignPreview(focusPanel.rawSha256);
+    activeTab.value = "align";
+    notice.value = `已对照 ${hit.unitId} G${hit.panelIndex}。`;
+  } catch (reason) {
+    report(reason);
+  } finally {
+    actionLoading.value = "";
+  }
+}
+
 async function revealSsl5Focus(nextBoard: ScriptMediaAlignBoard, nextPlan: Ssl5MissingToGenPlan): Promise<void> {
   const focusRow = nextPlan.focusUnitId
     ? nextBoard.rows.find((row) => row.unitId === nextPlan.focusUnitId)
@@ -625,9 +672,18 @@ function shortSha(value: string | null | undefined): string {
                 <small data-testid="span-media-hit-standing">{{ hit.shotComposition || "构图未记" }} · {{ hit.visualAction || "动作未记" }} · {{ hit.filmingMethod || "运镜未记" }}</small>
                 <small data-testid="span-media-hit-handoff">{{ formatPanelStandingHandoff(hit.previousHandoff) }}</small>
               </div>
-              <button type="button" @click="emit('openUnit', { unitId: hit.unitId, target: hit.hasMedia ? 'review' : 'binding' })">
-                {{ hit.hasMedia ? "审片" : "去 Binding" }}
-              </button>
+              <div class="span-media-hit-actions">
+                <button
+                  type="button"
+                  data-testid="span-media-hit-align"
+                  :disabled="Boolean(actionLoading)"
+                  :title="actionLoading ? '正在处理，不能再对照这格' : undefined"
+                  @click="revealSpanMediaHit(hit)"
+                >对照这格</button>
+                <button type="button" @click="emit('openUnit', { unitId: hit.unitId, target: hit.hasMedia ? 'review' : 'binding' })">
+                  {{ hit.hasMedia ? "审片" : "去 Binding" }}
+                </button>
+              </div>
             </li>
           </ul>
           <p v-if="!spanMedia.hits.length">没有相交的宫格锚定；不能猜选区。</p>
@@ -843,7 +899,7 @@ button{border:1px solid var(--ui-line,#34362f);border-radius:4px;background:var(
 .library-layout{display:grid;grid-template-columns:minmax(320px,.9fr) minmax(360px,1.1fr);gap:14px}.document-list,.library-diagnostics,.reader-nav,.reader-body,.align-table-wrap,.media-preview,.wizard-source,.wizard-editor,.wizard-materialize{border:1px solid var(--ui-line,#34362f);background:var(--ui-surface,#171914);border-radius:5px;padding:12px;min-width:0}
 .pane-heading{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:9px}.pane-actions{display:flex;gap:5px}.pane-heading small,.document-card span,.document-card code{display:block;color:var(--ui-text-2,#8f9287);margin-top:4px;font-size:9px}.document-card{width:100%;display:block;margin-bottom:6px;text-align:left;padding:10px;content-visibility:auto;contain-intrinsic-size:auto 56px}.document-card.active{border-color:var(--ui-accent,#d7af55);background:color-mix(in srgb,var(--ui-accent,#d7af55) 8%,transparent)}
 .library-diagnostics h3{font-size:18px;margin-top:4px}.library-diagnostics dl{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.library-diagnostics dl div,.media-preview dl div{padding:8px;background:var(--ui-surface-2,#1a1c17)}dt{color:var(--ui-text-2,#8f9287);font-size:9px}dd{margin:4px 0 0;word-break:break-all}.qc-card{margin:12px 0;padding:12px;border-left:2px solid var(--ui-accent,#d7af55);background:var(--ui-surface-2,#1a1c17)}.qc-card p{margin:6px 0;color:var(--ui-text-2,#a6a99e)}
-.reader-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:12px}.reader-nav{max-height:680px;overflow:auto}.reader-nav h3:not(:first-child){margin-top:16px}.reader-nav button{width:100%;display:flex;justify-content:space-between;text-align:left;border:0;border-radius:0;background:transparent;color:var(--ui-text-2,#a6a99e);content-visibility:auto;contain-intrinsic-size:auto 28px}.reader-nav button.earliest{color:var(--ui-accent,#d7af55)}.reader-nav small{font-size:8px}.reader-body{padding:0;overflow:hidden}.span-media{padding:10px;border-bottom:1px solid var(--ui-line,#34362f);background:var(--ui-surface-2,#1a1c17)}.span-media b,.span-media span,.span-media p{display:block;margin:4px 0}.span-media li{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin:6px 0}.span-media-hit-copy{min-width:0;flex:1}.span-media-hit-copy small{display:block;color:var(--ui-text-2,#8f9287);margin-top:2px}
+.reader-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:12px}.reader-nav{max-height:680px;overflow:auto}.reader-nav h3:not(:first-child){margin-top:16px}.reader-nav button{width:100%;display:flex;justify-content:space-between;text-align:left;border:0;border-radius:0;background:transparent;color:var(--ui-text-2,#a6a99e);content-visibility:auto;contain-intrinsic-size:auto 28px}.reader-nav button.earliest{color:var(--ui-accent,#d7af55)}.reader-nav small{font-size:8px}.reader-body{padding:0;overflow:hidden}.span-media{padding:10px;border-bottom:1px solid var(--ui-line,#34362f);background:var(--ui-surface-2,#1a1c17)}.span-media b,.span-media span,.span-media p{display:block;margin:4px 0}.span-media li{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin:6px 0}.span-media-hit-copy{min-width:0;flex:1}.span-media-hit-copy small{display:block;color:var(--ui-text-2,#8f9287);margin-top:2px}.span-media-hit-actions{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
 .selection-status{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:10px;border-bottom:1px solid var(--ui-line,#34362f)}.selection-status span{color:var(--ui-text-2,#8f9287)}.selection-status button{background:var(--ui-accent,#d7af55);color:var(--ui-accent-contrast,#1a160c)}.script-body{display:block;width:100%;height:620px;resize:none;border:0;border-radius:0;padding:18px;font:12px/1.75 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}
 .align-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px}.align-table-wrap{overflow:auto}.summary{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;color:var(--ui-text-2,#a6a99e)}.summary .ok b{color:#8fbf7a}.summary .warn b{color:#d7af55}.summary .danger b{color:#d08370}.summary .earliest{width:100%;font-size:9px}.ssl5-plan{margin:0 0 10px;padding:10px;border:1px solid var(--ui-line,#34362f);background:var(--ui-surface-2,#1a1c17)}.ssl5-plan b,.ssl5-plan span,.ssl5-plan p{display:block;margin:4px 0}.ssl5-plan ol{margin:6px 0;padding-left:18px;color:var(--ui-text-2,#a6a99e)}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border-bottom:1px solid var(--ui-line,#2a2c26);padding:7px 5px;text-align:left;vertical-align:top}th{color:var(--ui-text-2,#8f9287);font-weight:500}td b,td small{display:block}td small{color:var(--ui-text-2,#8f9287)}.mono{font:9px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}.status-missing-all{background:rgba(208,131,112,.06)}tr.earliest td:first-child b::after{content:" · earliest";color:var(--ui-accent,#d7af55);font-weight:400}tr.selected{outline:1px solid var(--ui-accent,#d7af55);outline-offset:-1px}td button{padding:3px 5px;margin:0 2px 2px 0}.align-panels{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0;padding:0;list-style:none}.align-panels button.active{border-color:var(--ui-accent,#d7af55);color:var(--ui-accent,#d7af55)}.media-preview img{display:block;width:100%;max-height:420px;object-fit:contain;background:#080908;border:1px solid var(--ui-line,#34362f)}.preview-placeholder{min-height:220px;display:grid;place-items:center;background:#0c0d0b;color:var(--ui-text-2,#8f9287)}.media-preview dl{display:grid;gap:5px}.media-preview code{font-size:8px;word-break:break-all}
 .wizard-layout{display:grid;grid-template-columns:250px minmax(420px,1fr) 280px;gap:12px;align-items:start}.wizard-source blockquote{max-height:360px;overflow:auto;margin:10px 0;padding:10px;border-left:2px solid var(--ui-accent,#d7af55);background:var(--ui-surface-2,#1a1c17);white-space:pre-wrap;line-height:1.6}.wizard-controls{flex-wrap:wrap}.wizard-controls input{width:70px}.panel-editor{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;border:1px solid var(--ui-line,#34362f);border-radius:4px;margin-bottom:8px}.panel-editor header,.panel-editor .wide{grid-column:1/-1}.panel-editor header{display:flex;justify-content:space-between}.panel-editor input,.panel-editor textarea,.wizard-materialize input{width:100%}.panel-editor small{color:var(--ui-text-2,#8f9287)}.wizard-materialize{display:grid;gap:8px;position:sticky;top:8px}.validation{padding:9px;border:1px solid #8f4f45;background:#2a1815;color:#edb0a2}.validation.ok{border-color:#55754a;background:#162415;color:#a9d39a}.validation p{margin:5px 0}.materialized-result{padding:9px;border:1px solid #55754a;background:#162415}.materialized-result p{margin:4px 0;color:#a9d39a}.materialized-result b{word-break:break-all}
