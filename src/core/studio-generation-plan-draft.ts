@@ -29,11 +29,34 @@ export type Ssl5GenerationPlanDraft = StudioGenerationPlanDraft;
 const NOTE_BLOCKED = "只读草稿。不执行、不派发。";
 const NOTE_READY = "只起草建计划节点；不执行、不派发。派发须用计划推导 runId。";
 const NOTE_HAS_PLAN = "计划已落盘。下一步 dispatch；不执行、不派发。派发须用计划推导 runId。";
+const NOTE_WAIT = "计划节点进行中。下一步等待结果或对账；不执行、不派发。";
+const NOTE_RETRY = "计划节点已失败或已取消。下一步 retry；不执行、不重试、不派发。";
+const NOTE_REVIEW = "计划节点已有 raw+labeled。下一步 Review；不执行、不派发。";
+
+/** 账本节点投影子集；retry-superseded 在只读面映射为 planned，不进本联合。 */
+export type PersistedPlanNodeStatus =
+  | "planned"
+  | "dispatched"
+  | "failed"
+  | "cancelled"
+  | "succeeded";
 
 export const STUDIO_GENERATION_PLAN_ALREADY_EXISTS_PANEL =
   "该宫格已有生成计划，下一步是 dispatch（不派发）";
 export const STUDIO_GENERATION_PLAN_ALREADY_EXISTS_UNIT_GRID =
   "该整板已有生成计划，下一步是 dispatch（不派发）";
+export const STUDIO_GENERATION_PLAN_IN_FLIGHT_PANEL =
+  "该宫格计划节点进行中，等待结果或对账（不派发）";
+export const STUDIO_GENERATION_PLAN_IN_FLIGHT_UNIT_GRID =
+  "该整板计划节点进行中，等待结果或对账（不派发）";
+export const STUDIO_GENERATION_PLAN_RETRY_PANEL =
+  "该宫格计划节点已失败/已取消，下一步是 retry（不重试、不派发）";
+export const STUDIO_GENERATION_PLAN_RETRY_UNIT_GRID =
+  "该整板计划节点已失败/已取消，下一步是 retry（不重试、不派发）";
+export const STUDIO_GENERATION_PLAN_REVIEW_PANEL =
+  "该宫格计划节点已有结果，下一步是 Review（不派发）";
+export const STUDIO_GENERATION_PLAN_REVIEW_UNIT_GRID =
+  "该整板计划节点已有结果，下一步是 Review（不派发）";
 
 function blocked(reason: string): StudioGenerationPlanDraft {
   return {
@@ -46,9 +69,36 @@ function blocked(reason: string): StudioGenerationPlanDraft {
   };
 }
 
+function noteForPersistedPlan(status?: PersistedPlanNodeStatus): string {
+  if (status === "dispatched") return NOTE_WAIT;
+  if (status === "failed" || status === "cancelled") return NOTE_RETRY;
+  if (status === "succeeded") return NOTE_REVIEW;
+  return NOTE_HAS_PLAN;
+}
+
+export function blockedReasonForPersistedPlan(
+  kind: "panel" | "unit-grid",
+  status?: PersistedPlanNodeStatus,
+): string {
+  const panel = kind === "panel";
+  if (status === "dispatched") {
+    return panel ? STUDIO_GENERATION_PLAN_IN_FLIGHT_PANEL : STUDIO_GENERATION_PLAN_IN_FLIGHT_UNIT_GRID;
+  }
+  if (status === "failed" || status === "cancelled") {
+    return panel ? STUDIO_GENERATION_PLAN_RETRY_PANEL : STUDIO_GENERATION_PLAN_RETRY_UNIT_GRID;
+  }
+  if (status === "succeeded") {
+    return panel ? STUDIO_GENERATION_PLAN_REVIEW_PANEL : STUDIO_GENERATION_PLAN_REVIEW_UNIT_GRID;
+  }
+  return panel
+    ? STUDIO_GENERATION_PLAN_ALREADY_EXISTS_PANEL
+    : STUDIO_GENERATION_PLAN_ALREADY_EXISTS_UNIT_GRID;
+}
+
 function alreadyPlanned(
   reason: string,
   nodes: StudioGenerationPlanDraftNode[],
+  status?: PersistedPlanNodeStatus,
 ): StudioGenerationPlanDraft {
   return {
     command: STUDIO_GENERATION_PLAN_COMMAND,
@@ -56,7 +106,7 @@ function alreadyPlanned(
     blockedReason: reason,
     nodes,
     dispatch: false,
-    note: NOTE_HAS_PLAN,
+    note: noteForPersistedPlan(status),
   };
 }
 
@@ -65,8 +115,10 @@ export function composeStudioGenerationPlanDraft(input: {
   focusPanelId: string | null;
   focusPackId: string | null;
   targetKind?: "panel" | "unit-grid";
-  /** 账本已有对应 plan 时不再 ready 建计划；下一步是 dispatch，本面仍不派发。 */
+  /** 账本已有对应 plan 时不再 ready 建计划。未传 status 时下一步仍写 dispatch，本面仍不派发。 */
   hasPersistedPlan?: boolean;
+  /** 有计划时按节点状态区分 dispatch / wait / retry / Review。省略则保持 dispatch 文案。 */
+  persistedPlanStatus?: PersistedPlanNodeStatus;
 }): StudioGenerationPlanDraft {
   if (!input.focusUnitId) {
     return blocked("没有目标单元，不能建立计划");
@@ -77,7 +129,11 @@ export function composeStudioGenerationPlanDraft(input: {
     }
     const nodes: StudioGenerationPlanDraftNode[] = [{ targetKind: "unit-grid", unitId: input.focusUnitId }];
     if (input.hasPersistedPlan) {
-      return alreadyPlanned(STUDIO_GENERATION_PLAN_ALREADY_EXISTS_UNIT_GRID, nodes);
+      return alreadyPlanned(
+        blockedReasonForPersistedPlan("unit-grid", input.persistedPlanStatus),
+        nodes,
+        input.persistedPlanStatus,
+      );
     }
     return {
       command: STUDIO_GENERATION_PLAN_COMMAND,
@@ -96,7 +152,11 @@ export function composeStudioGenerationPlanDraft(input: {
   }
   const nodes: StudioGenerationPlanDraftNode[] = [{ unitId: input.focusUnitId, panelId: input.focusPanelId }];
   if (input.hasPersistedPlan) {
-    return alreadyPlanned(STUDIO_GENERATION_PLAN_ALREADY_EXISTS_PANEL, nodes);
+    return alreadyPlanned(
+      blockedReasonForPersistedPlan("panel", input.persistedPlanStatus),
+      nodes,
+      input.persistedPlanStatus,
+    );
   }
   return {
     command: STUDIO_GENERATION_PLAN_COMMAND,

@@ -362,7 +362,11 @@ import {
   type StudioPanelStandingHandoff,
 } from "@core/studio-panel-standing";
 import { formatCharacterBackReferences, formatPropBackReferences, formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
-import { composeStudioGenerationPlanDraft, type StudioGenerationPlanDraftNode } from "@core/studio-generation-plan-draft";
+import {
+  composeStudioGenerationPlanDraft,
+  type PersistedPlanNodeStatus,
+  type StudioGenerationPlanDraftNode,
+} from "@core/studio-generation-plan-draft";
 
 const props = defineProps<{
   projectRoot: string;
@@ -627,7 +631,32 @@ function hasPersistedPlanForDraft(): boolean {
   ));
 }
 
-/** 单镜只认当前宫格 ready pack；整板只认已落盘 unit-grid pack。已有计划则下一步 dispatch。不执行、不派发。 */
+function persistedPlanStatusForDraft(): PersistedPlanNodeStatus | undefined {
+  const nodes = progress.value?.nodes ?? [];
+  const match = historyTargetKind.value === "unit-grid"
+    ? nodes.find((node) => (
+      node.targetKind === "unit-grid" && node.unitId === selectedUnitId.value
+    ))
+    : nodes.find((node) => (
+      node.targetKind === "panel"
+      && node.unitId === selectedUnitId.value
+      && node.panelId === selectedPanelId.value
+    ));
+  const status = match?.status;
+  if (
+    status === "planned"
+    || status === "dispatched"
+    || status === "failed"
+    || status === "cancelled"
+    || status === "succeeded"
+  ) {
+    return status;
+  }
+  if (status === "retry-superseded") return "planned";
+  return undefined;
+}
+
+/** 单镜只认当前宫格 ready pack；整板只认已落盘 unit-grid pack。已有计划则按节点状态写下一步。不执行、不派发。 */
 const generationPlanDraft = computed(() => {
   if (historyTargetKind.value === "unit-grid") {
     return composeStudioGenerationPlanDraft({
@@ -636,6 +665,7 @@ const generationPlanDraft = computed(() => {
       focusPackId: persistedUnitGridPackIdForDraft(),
       targetKind: "unit-grid",
       hasPersistedPlan: hasPersistedPlanForDraft(),
+      persistedPlanStatus: persistedPlanStatusForDraft(),
     });
   }
   const generation = detail.value?.selectedPanel?.generation;
@@ -644,6 +674,7 @@ const generationPlanDraft = computed(() => {
     focusPanelId: selectedPanelId.value || null,
     focusPackId: generation?.status === "ready" && generation.packId ? generation.packId : null,
     hasPersistedPlan: hasPersistedPlanForDraft(),
+    persistedPlanStatus: persistedPlanStatusForDraft(),
   });
 });
 

@@ -88,10 +88,13 @@ import {
   AI_CANVAS_PROTOCOL_VERSION,
 } from "./release-manifest.js";
 import { withStudioRequestSchemaCache } from "./studio-request-schema-cache.js";
-import { composeStudioGenerationPlanDraft } from "./studio-generation-plan-draft.js";
 import {
-  readPersistedPanelHasPlan,
-  readPersistedUnitGridPackAndPlan,
+  composeStudioGenerationPlanDraft,
+  type PersistedPlanNodeStatus,
+} from "./studio-generation-plan-draft.js";
+import {
+  readPersistedPanelPlanState,
+  readPersistedUnitGridPlanState,
 } from "./studio-unit-grid-persisted-plan-read.js";
 
 export { AI_CANVAS_PROTOCOL_VERSION } from "./release-manifest.js";
@@ -411,10 +414,11 @@ function isStudioUnitGridGenerationPack(
     && pack.target.targetKind === "unit-grid";
 }
 
-/** 已落盘 pack 起草 create-plan 节点；已有计划则下一步 dispatch。不执行、不派发。 */
+/** 已落盘 pack 起草 create-plan 节点；已有计划则按节点状态写下一步。不执行、不派发。 */
 function composePersistedPackGenerationPlanDraft(
   pack: StudioGenerationFreezePack | StudioUnitGridGenerationFreezePack,
   hasPersistedPlan = false,
+  persistedPlanStatus?: PersistedPlanNodeStatus,
 ) {
   if (isStudioUnitGridGenerationPack(pack)) {
     return composeStudioGenerationPlanDraft({
@@ -423,6 +427,7 @@ function composePersistedPackGenerationPlanDraft(
       focusPackId: pack.id,
       targetKind: "unit-grid",
       hasPersistedPlan,
+      persistedPlanStatus,
     });
   }
   return composeStudioGenerationPlanDraft({
@@ -430,27 +435,41 @@ function composePersistedPackGenerationPlanDraft(
     focusPanelId: pack.target.panelId,
     focusPackId: pack.id,
     hasPersistedPlan,
+    persistedPlanStatus,
   });
 }
 
-function persistedPlanExistsForPack(
+function persistedPlanStateForPack(
   databasePath: string,
   pack: StudioGenerationFreezePack | StudioUnitGridGenerationFreezePack,
-): boolean {
+) {
   return isStudioUnitGridGenerationPack(pack)
-    ? readPersistedUnitGridPackAndPlan(databasePath, pack.target.unitId).hasPlan
-    : readPersistedPanelHasPlan(databasePath, pack.target.unitId, pack.target.panelId);
+    ? readPersistedUnitGridPlanState(databasePath, pack.target.unitId)
+    : readPersistedPanelPlanState(databasePath, pack.target.unitId, pack.target.panelId);
 }
 
-function packEnvelopeNext(hasPersistedPlan: boolean, allowGrok: boolean): string {
-  if (hasPersistedPlan) {
+function packEnvelopeNext(
+  hasPersistedPlan: boolean,
+  allowGrok: boolean,
+  persistedPlanStatus?: PersistedPlanNodeStatus,
+): string {
+  if (!hasPersistedPlan) {
     return allowGrok
-      ? "dispatch(provider=codex|grok) → agent imagegen → atomic raw/labeled writeback"
-      : "dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback";
+      ? "create-plan → dispatch(provider=codex|grok) → agent imagegen → atomic raw/labeled writeback"
+      : "create-plan → dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback";
+  }
+  if (persistedPlanStatus === "dispatched") {
+    return "wait → result or reconcile (no dispatch)";
+  }
+  if (persistedPlanStatus === "failed" || persistedPlanStatus === "cancelled") {
+    return "retry_studio_generation_plan_nodes (no retry here, no dispatch)";
+  }
+  if (persistedPlanStatus === "succeeded") {
+    return "Review (no dispatch)";
   }
   return allowGrok
-    ? "create-plan → dispatch(provider=codex|grok) → agent imagegen → atomic raw/labeled writeback"
-    : "create-plan → dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback";
+    ? "dispatch(provider=codex|grok) → agent imagegen → atomic raw/labeled writeback"
+    : "dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback";
 }
 
 function sameSortedStrings(left: string[], right: string[]): boolean {
@@ -970,8 +989,10 @@ export async function getStudioGenerationControlEnvelope(
         controlReferencesExposed: false as const,
       };
     }
-    const hasPersistedPlan = persistedPlanExistsForPack(shell.paths.generationDatabase, pack);
-    const generationPlanDraft = composePersistedPackGenerationPlanDraft(pack, hasPersistedPlan);
+    const persistedPlan = persistedPlanStateForPack(shell.paths.generationDatabase, pack);
+    const hasPersistedPlan = persistedPlan.hasPlan;
+    const persistedPlanStatus = persistedPlan.status ?? undefined;
+    const generationPlanDraft = composePersistedPackGenerationPlanDraft(pack, hasPersistedPlan, persistedPlanStatus);
     if (isStudioUnitGridGenerationPack(pack)) {
       const controlReferences = await verifiedStudioUnitGridControlReferences(shell.paths.root, pack);
       const request: StudioUnitGridCodexGenerationRequest = { ...pack.request, controlReferences };
@@ -993,7 +1014,7 @@ export async function getStudioGenerationControlEnvelope(
             grok: buildStudioUnitGridAgentImagegenBrief(pack, "grok"),
           },
           generationPlanDraft,
-          next: packEnvelopeNext(hasPersistedPlan, false),
+          next: packEnvelopeNext(hasPersistedPlan, false, persistedPlanStatus),
           dispatchPayloadTemplate: {
             command: "dispatch_studio_generation_pack" as const,
             required: ["packId", "packFingerprint", "generationRunId", "provider", "expectedRevision"],
@@ -1036,7 +1057,7 @@ export async function getStudioGenerationControlEnvelope(
           grok: buildStudioAgentImagegenBrief(pack, "grok"),
         },
         generationPlanDraft,
-        next: packEnvelopeNext(hasPersistedPlan, true),
+        next: packEnvelopeNext(hasPersistedPlan, true, persistedPlanStatus),
         dispatchPayloadTemplate: {
           command: "dispatch_studio_generation_pack" as const,
           required: ["packId", "packFingerprint", "generationRunId", "provider", "expectedRevision"],

@@ -78,6 +78,56 @@ describe("create-plan 只读草稿纯函数", () => {
     });
   });
 
+  it("已有计划且传入节点状态时区分 wait / retry / Review，仍不派发", () => {
+    expect(composeStudioGenerationPlanDraft({
+      focusUnitId: "u1",
+      focusPanelId: "p1",
+      focusPackId: "pack-own",
+      hasPersistedPlan: true,
+      persistedPlanStatus: "dispatched",
+    })).toMatchObject({
+      ready: false,
+      dispatch: false,
+      blockedReason: "该宫格计划节点进行中，等待结果或对账（不派发）",
+      note: "计划节点进行中。下一步等待结果或对账；不执行、不派发。",
+      nodes: [{ unitId: "u1", panelId: "p1" }],
+    });
+    expect(composeStudioGenerationPlanDraft({
+      focusUnitId: "u1",
+      focusPanelId: "p1",
+      focusPackId: "pack-own",
+      hasPersistedPlan: true,
+      persistedPlanStatus: "failed",
+    }).blockedReason).toBe("该宫格计划节点已失败/已取消，下一步是 retry（不重试、不派发）");
+    expect(composeStudioGenerationPlanDraft({
+      focusUnitId: "u1",
+      focusPanelId: "p1",
+      focusPackId: "pack-own",
+      hasPersistedPlan: true,
+      persistedPlanStatus: "cancelled",
+    }).note).toContain("下一步 retry");
+    expect(composeStudioGenerationPlanDraft({
+      focusUnitId: "u1",
+      focusPanelId: null,
+      focusPackId: "pack-grid",
+      targetKind: "unit-grid",
+      hasPersistedPlan: true,
+      persistedPlanStatus: "succeeded",
+    })).toMatchObject({
+      ready: false,
+      dispatch: false,
+      blockedReason: "该整板计划节点已有结果，下一步是 Review（不派发）",
+      nodes: [{ targetKind: "unit-grid", unitId: "u1" }],
+    });
+    expect(composeStudioGenerationPlanDraft({
+      focusUnitId: "u1",
+      focusPanelId: "p1",
+      focusPackId: "pack-own",
+      hasPersistedPlan: true,
+      persistedPlanStatus: "planned",
+    }).blockedReason).toBe("该宫格已有生成计划，下一步是 dispatch（不派发）");
+  });
+
   it("整板已有冻结 pack 时 ready 出 unit-grid 节点，无 pack 失败关闭", () => {
     expect(composeStudioGenerationPlanDraft({
       focusUnitId: "u1",
@@ -116,9 +166,10 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(snapshot).toContain("composeStudioGenerationPlanDraft");
     expect(snapshot).toContain("persistedPanelPackIdForDraft");
     expect(snapshot).toContain("persistedUnitGridPackIdForDraft");
-    expect(snapshot).toContain("readPersistedPanelHasPlan");
-    expect(snapshot).toContain("readPersistedUnitGridPackAndPlan");
+    expect(snapshot).toContain("readPersistedPanelPlanState");
+    expect(snapshot).toContain("readPersistedUnitGridPlanState");
     expect(snapshot).toContain("hasPersistedPlan");
+    expect(snapshot).toContain("persistedPlanStatus");
     expect(snapshot).toContain("listStudioGenerationPacksByUnit");
     expect(snapshot).toContain('targetKind: "unit-grid"');
     expect(snapshot).toContain('pack.provenance !== "asset-binding-set"');
@@ -151,6 +202,7 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(control).toContain('data-testid="studio-generation-plan-command"');
     expect(control).toContain("persistedUnitGridPackIdForDraft");
     expect(control).toContain("hasPersistedPlanForDraft");
+    expect(control).toContain("persistedPlanStatusForDraft");
     expect(control).toContain("formatGenerationPlanDraftNode");
     expect(control).toContain("generation?.status === \"ready\" && generation.packId");
     expect(control).not.toContain("dispatch_studio_generation_pack");
@@ -167,6 +219,7 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(computed).toContain('targetKind: "unit-grid"');
     expect(computed).toContain("persistedUnitGridPackIdForDraft()");
     expect(computed).toContain("hasPersistedPlan: hasPersistedPlanForDraft()");
+    expect(computed).toContain("persistedPlanStatus: persistedPlanStatusForDraft()");
     expect(computed).not.toContain("unitGridReadinessPackId");
     expect(computed).not.toContain("selectedPackId");
     expect(control).toContain("`unit-grid ${node.unitId}`");
@@ -176,12 +229,12 @@ describe("create-plan 草稿接线源码合同", () => {
     const codex = source("src/core/codex.ts");
     expect(codex).toContain("composeStudioGenerationPlanDraft");
     expect(codex).toContain("composePersistedPackGenerationPlanDraft");
-    expect(codex).toContain("persistedPlanExistsForPack");
+    expect(codex).toContain("persistedPlanStateForPack");
     expect(codex).toContain("packEnvelopeNext");
     expect(codex).toContain('targetKind: "unit-grid"');
-    expect(codex).toContain("composePersistedPackGenerationPlanDraft(pack, hasPersistedPlan)");
-    expect(codex).toContain("packEnvelopeNext(hasPersistedPlan, false)");
-    expect(codex).toContain("packEnvelopeNext(hasPersistedPlan, true)");
+    expect(codex).toContain("composePersistedPackGenerationPlanDraft(pack, hasPersistedPlan, persistedPlanStatus)");
+    expect(codex).toContain("packEnvelopeNext(hasPersistedPlan, false, persistedPlanStatus)");
+    expect(codex).toContain("packEnvelopeNext(hasPersistedPlan, true, persistedPlanStatus)");
     expect(codex).toContain('"create-plan → dispatch(provider=codex)');
     expect(codex).toContain('"create-plan → dispatch(provider=codex|grok)');
     expect(codex).toContain('"dispatch(provider=codex) → prepare pre-call intent');
@@ -197,8 +250,12 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(helper).toContain("pack.id");
     expect(helper).toContain("pack.target.panelId");
     expect(helper).toContain("hasPersistedPlan");
-    expect(helper).toContain("readPersistedPanelHasPlan");
-    expect(helper).toContain("readPersistedUnitGridPackAndPlan");
+    expect(helper).toContain("persistedPlanStatus");
+    expect(helper).toContain("readPersistedPanelPlanState");
+    expect(helper).toContain("readPersistedUnitGridPlanState");
+    expect(helper).toContain("wait → result or reconcile (no dispatch)");
+    expect(helper).toContain("retry_studio_generation_plan_nodes (no retry here, no dispatch)");
+    expect(helper).toContain("Review (no dispatch)");
     expect(helper).not.toContain("unitGridReadinessPackId");
     expect(helper).not.toContain("candidate.packId");
   });

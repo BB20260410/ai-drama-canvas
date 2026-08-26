@@ -202,7 +202,18 @@ describe("SSL-5 缺图下一步纯函数", () => {
     expect(refined.generationPlanDraft.blockedReason).toContain("下一步是 dispatch");
     expect(refined.generationPlanDraft.nodes).toEqual([{ unitId: "u-frozen", panelId: "p-focus" }]);
     expect(refined.items[0]?.generationPlanDraft.ready).toBe(false);
+    expect(refined.items[0]?.recommendedPath).toEqual(["dispatch", "prepare", "gen", "commit", "review"]);
     expect(refineSsl5FocusPlanDraftIfPersisted(plan, false).generationPlanDraft.ready).toBe(true);
+    const failed = refineSsl5FocusPlanDraftIfPersisted(plan, { hasPlan: true, status: "failed" });
+    expect(failed.generationPlanDraft.blockedReason).toContain("下一步是 retry");
+    expect(failed.generationPlanDraft.dispatch).toBe(false);
+    expect(failed.items[0]?.recommendedPath).toEqual(["retry"]);
+    const waiting = refineSsl5FocusPlanDraftIfPersisted(plan, { hasPlan: true, status: "dispatched" });
+    expect(waiting.generationPlanDraft.blockedReason).toContain("等待结果或对账");
+    expect(waiting.items[0]?.recommendedPath).toEqual(["wait"]);
+    const reviewed = refineSsl5FocusPlanDraftIfPersisted(plan, { hasPlan: true, status: "succeeded" });
+    expect(reviewed.generationPlanDraft.blockedReason).toContain("下一步是 Review");
+    expect(reviewed.items[0]?.recommendedPath).toEqual(["review"]);
   });
 
   it("composeSsl5GenerationPlanDraft 无焦点 / 无宫格失败关闭", () => {
@@ -449,7 +460,7 @@ describe("SSL-5 入口源码合同", () => {
     expect(ssl5).toContain("create-plan");
     expect(ssl5).toContain("composeSsl5GenerationPlanDraft");
     expect(ssl5).toContain("refineSsl5FocusPlanDraftIfPersisted");
-    expect(ssl5).toContain("readPersistedPanelHasPlan");
+    expect(ssl5).toContain("readPersistedPanelPlanState");
     expect(ssl5).toContain("studio-generation-plan-draft");
     expect(ssl5).toContain("focusPackId");
     expect(ssl5).toContain("SSL5_PLAN_SCHEMA_VERSION = 1");

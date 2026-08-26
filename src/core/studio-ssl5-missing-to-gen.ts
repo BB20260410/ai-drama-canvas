@@ -36,11 +36,12 @@ import {
 import type { CharacterBackReference, PropBackReference, SceneBackReference } from "./studio-scene-backrefs.js";
 import {
   composeSsl5GenerationPlanDraft,
+  type PersistedPlanNodeStatus,
   type Ssl5GenerationPlanDraft,
 } from "./studio-generation-plan-draft.js";
 import {
   generationLedgerSidecarPath,
-  readPersistedPanelHasPlan,
+  readPersistedPanelPlanState,
 } from "./studio-unit-grid-persisted-plan-read.js";
 
 export const SSL5_PLAN_SCHEMA_VERSION = 1 as const;
@@ -316,15 +317,36 @@ export function buildSsl5PlanFromBoard(
   };
 }
 
+export type Ssl5PersistedPlanHint = boolean | {
+  hasPlan: boolean;
+  status?: PersistedPlanNodeStatus;
+};
+
+function normalizeSsl5PersistedPlanHint(hint: Ssl5PersistedPlanHint): {
+  hasPlan: boolean;
+  status?: PersistedPlanNodeStatus;
+} {
+  return typeof hint === "boolean" ? { hasPlan: hint } : hint;
+}
+
+function recommendedPathForPersistedPlanStatus(status?: PersistedPlanNodeStatus): string[] {
+  if (status === "dispatched") return ["wait"];
+  if (status === "failed" || status === "cancelled") return ["retry"];
+  if (status === "succeeded") return ["review"];
+  return ["dispatch", "prepare", "gen", "commit", "review"];
+}
+
 /**
  * 焦点缺图格已有单镜计划时，草稿不再 ready 建计划。
  * 只精炼焦点（及同格 item）；不扫其它行、不执行、不派发。
+ * 未传 status 时下一步仍写 dispatch（兼容只传 boolean）。
  */
 export function refineSsl5FocusPlanDraftIfPersisted(
   plan: Ssl5MissingToGenPlan,
-  hasPersistedPlan: boolean,
+  persisted: Ssl5PersistedPlanHint,
 ): Ssl5MissingToGenPlan {
-  if (!hasPersistedPlan || !plan.focusUnitId || !plan.focusPanelId || !plan.focusPackId) {
+  const hint = normalizeSsl5PersistedPlanHint(persisted);
+  if (!hint.hasPlan || !plan.focusUnitId || !plan.focusPanelId || !plan.focusPackId) {
     return plan;
   }
   const draft = composeSsl5GenerationPlanDraft({
@@ -332,13 +354,15 @@ export function refineSsl5FocusPlanDraftIfPersisted(
     focusPanelId: plan.focusPanelId,
     focusPackId: plan.focusPackId,
     hasPersistedPlan: true,
+    persistedPlanStatus: hint.status,
   });
+  const recommendedPath = recommendedPathForPersistedPlanStatus(hint.status);
   return {
     ...plan,
     generationPlanDraft: draft,
     items: plan.items.map((item) => (
       item.unitId === plan.focusUnitId && item.focusPanelId === plan.focusPanelId
-        ? { ...item, generationPlanDraft: draft }
+        ? { ...item, generationPlanDraft: draft, recommendedPath }
         : item
     )),
   };
@@ -357,12 +381,13 @@ export async function planSsl5MissingToGen(
   // earliest 已由 align-board 算过；禁止二次 getStudioEpisodeEarliest。
   const plan = buildSsl5PlanFromBoard(projectRoot, query, board);
   if (!plan.focusUnitId || !plan.focusPanelId || !plan.focusPackId) return plan;
-  return refineSsl5FocusPlanDraftIfPersisted(
-    plan,
-    readPersistedPanelHasPlan(
-      generationLedgerSidecarPath(projectRoot),
-      plan.focusUnitId,
-      plan.focusPanelId,
-    ),
+  const persisted = readPersistedPanelPlanState(
+    generationLedgerSidecarPath(projectRoot),
+    plan.focusUnitId,
+    plan.focusPanelId,
   );
+  return refineSsl5FocusPlanDraftIfPersisted(plan, {
+    hasPlan: persisted.hasPlan,
+    status: persisted.status ?? undefined,
+  });
 }

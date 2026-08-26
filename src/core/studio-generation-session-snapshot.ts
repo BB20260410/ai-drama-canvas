@@ -28,8 +28,8 @@ import {
 } from "./studio-generation-plan-draft.js";
 import {
   generationLedgerSidecarPath,
-  readPersistedPanelHasPlan,
-  readPersistedUnitGridPackAndPlan,
+  readPersistedPanelPlanState,
+  readPersistedUnitGridPlanState,
 } from "./studio-unit-grid-persisted-plan-read.js";
 import type { StudioDashboardCurrentness, StudioDashboardNextAction } from "./studio-production-dashboard.js";
 import type { NextShotContinuitySnapshot } from "./studio-next-shot-continuity.js";
@@ -479,21 +479,33 @@ export async function buildStudioGenerationSessionSnapshot(
           focusUnitId: query.unitId,
           focusPanelId: query.panelId,
           focusPackId: await persistedPanelPackIdForDraft(projectRoot, query.panelId, readiness),
-          hasPersistedPlan: readPersistedPanelHasPlan(
-            generationLedgerSidecarPath(projectRoot),
-            query.unitId,
-            query.panelId,
-          ),
+          ...(() => {
+            const persisted = readPersistedPanelPlanState(
+              generationLedgerSidecarPath(projectRoot),
+              query.unitId,
+              query.panelId,
+            );
+            return {
+              hasPersistedPlan: persisted.hasPlan,
+              persistedPlanStatus: persisted.status ?? undefined,
+            };
+          })(),
         })
       : composeStudioGenerationPlanDraft({
           focusUnitId: query.unitId,
           focusPanelId: null,
           focusPackId: await persistedUnitGridPackIdForDraft(projectRoot, query.unitId),
           targetKind: "unit-grid",
-          hasPersistedPlan: readPersistedUnitGridPackAndPlan(
-            generationLedgerSidecarPath(projectRoot),
-            query.unitId,
-          ).hasPlan,
+          ...(() => {
+            const persisted = readPersistedUnitGridPlanState(
+              generationLedgerSidecarPath(projectRoot),
+              query.unitId,
+            );
+            return {
+              hasPersistedPlan: persisted.hasPlan,
+              persistedPlanStatus: persisted.status ?? undefined,
+            };
+          })(),
         }),
     camera: {
       current: frozenPanel
