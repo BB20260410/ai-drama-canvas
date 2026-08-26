@@ -43,6 +43,8 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("span-media-hit-handoff");
     expect(vue).toContain("span-media-hit-gaps");
     expect(vue).toContain("span-media-hit-align");
+    expect(vue).toContain("span-media-hit-trace");
+    expect(vue).toContain("openHitGenerationTrace");
     expect(vue).toContain("formatPanelStandingHandoff(hit.previousHandoff)");
     expect(vue).toContain("formatPanelStandingGaps");
     expect(vue).toContain("align-panel-standing-gaps");
@@ -245,5 +247,22 @@ describe("阅读器联动 earliest 正文", () => {
     expect(vue).toContain("void focusOutline(start, end)");
     expect(vue).toContain("该单元尚未锚定本修订，不能猜选区。");
     expect(vue).not.toContain("@click=\"emit('openUnit', { unitId: unit.unitId, target: 'canvas' })\"");
+  });
+});
+
+describe("对照侧栏打开生成追溯", () => {
+  it("点穿 pack/run 走 getStudioTrace，无钥匙不猜第一格", () => {
+    const vue = source();
+    const app = readFileSync(path.join(root, "src/renderer/src/App.vue"), "utf8");
+    const contract = readFileSync(path.join(root, "src/renderer/src/material-studio-ui-contract.ts"), "utf8");
+    expect(vue).toContain('data-testid="align-open-trace"');
+    expect(vue).toContain('data-testid="span-media-hit-trace"');
+    expect(vue).toContain("StudioGenerationTraceDrawer");
+    expect(vue).toContain("resolveAlignTraceSelector");
+    expect(vue).toContain("openHitGenerationTrace");
+    expect(vue).toContain("禁止猜第一格");
+    expect(vue).not.toContain("evaluateStudioConsistency");
+    expect(app).toContain("window.canvasApi.getStudioTrace");
+    expect(contract).toContain("getStudioTrace?");
   });
 });

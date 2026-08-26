@@ -536,14 +536,13 @@ function resolveAlignTraceSelector(): { packId: string } | { runId: string } | n
   return null;
 }
 
-async function openAlignGenerationTrace(): Promise<void> {
+async function loadAlignGenerationTrace(selector: { packId: string } | { runId: string } | null): Promise<void> {
   if (!props.api.getStudioTrace) {
     alignTraceOpen.value = true;
     alignTraceError.value = "当前桌面适配层未接入 getStudioTrace。";
     alignTrace.value = null;
     return;
   }
-  const selector = resolveAlignTraceSelector();
   alignTraceOpen.value = true;
   alignTraceError.value = "";
   alignTrace.value = null;
@@ -565,12 +564,25 @@ async function openAlignGenerationTrace(): Promise<void> {
   }
 }
 
+function openAlignGenerationTrace(): void {
+  void loadAlignGenerationTrace(resolveAlignTraceSelector());
+}
+
 function closeAlignGenerationTrace(): void {
   alignTraceLoadSequence += 1;
   alignTraceOpen.value = false;
   alignTraceLoading.value = false;
   alignTrace.value = null;
   alignTraceError.value = "";
+}
+
+function openHitGenerationTrace(hit: ScriptSpanMediaHit): void {
+  const selector = hit.packId
+    ? { packId: hit.packId }
+    : hit.generationRunId
+      ? { runId: hit.generationRunId }
+      : null;
+  void loadAlignGenerationTrace(selector);
 }
 
 async function selectAlignTablePanel(row: ScriptMediaAlignRow, panel: AlignPanelRow): Promise<void> {
@@ -753,6 +765,12 @@ function shortSha(value: string | null | undefined): string {
                   :title="actionLoading ? '正在处理，不能再对照这格' : undefined"
                   @click="revealSpanMediaHit(hit)"
                 >对照这格</button>
+                <button
+                  type="button"
+                  data-testid="span-media-hit-trace"
+                  :disabled="!hit.packId && !hit.generationRunId || !api.getStudioTrace"
+                  @click="openHitGenerationTrace(hit)"
+                >打开追溯</button>
                 <button type="button" @click="emit('openUnit', { unitId: hit.unitId, target: hit.hasMedia ? 'review' : 'binding' })">
                   {{ hit.hasMedia ? "审片" : "去 Binding" }}
                 </button>
@@ -913,13 +931,6 @@ function shortSha(value: string | null | undefined): string {
         </template>
         <div v-else class="empty">点击一行查看本地 raw/labeled 身份与缩略图。</div>
       </aside>
-      <StudioGenerationTraceDrawer
-        :open="alignTraceOpen"
-        :loading="alignTraceLoading"
-        :error="alignTraceError"
-        :trace="alignTrace"
-        @close="closeAlignGenerationTrace"
-      />
     </main>
 
     <main v-else-if="activeTab === 'wizard' && reader" class="wizard-layout" data-testid="storyboard-wizard-pane">
@@ -988,6 +999,13 @@ function shortSha(value: string | null | undefined): string {
         </div>
       </aside>
     </main>
+    <StudioGenerationTraceDrawer
+      :open="alignTraceOpen"
+      :loading="alignTraceLoading"
+      :error="alignTraceError"
+      :trace="alignTrace"
+      @close="closeAlignGenerationTrace"
+    />
   </section>
 </template>
 
