@@ -6631,6 +6631,7 @@ server.registerPrompt(
       "1) get_managed_studio_overview → project.id",
       "2) get_studio_production_dashboard(operation=overview|units|assets|queue)",
       "3) get_studio_binding_control / get_studio_generation_control(operation=readiness) 取已锁定人物·场景·道具与提示词锁",
+      "3b) 若已取回 get_studio_trace(operation=script-revision-impact)，把该页作为 get_studio_script_library_projection(operation=ssl5-missing-to-gen-plan).revisionImpact 传入；未取回不要为了 ssl5 去查",
       "4) 未锁定/歧义/未命中 → 停止并请用户确认，禁止偷选第一候选",
       "",
       "写入（仅 execute_command，带稳定 requestId/idempotencyKey）：",
