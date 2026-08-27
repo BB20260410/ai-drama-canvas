@@ -2,7 +2,7 @@
 
 ## software_goal: canvas-dual-track-optimize-20260826
 
-- status: `部分完成`。全面分析已落盘；SSL-5 只读计划入口已挂。整 Goal 未关账（无真生图闭环 / 无 T23）。
+- status: `部分完成`。云端 B 轨源码辅助已达极限并停手。整 Goal 未关账（无真生图闭环 / 无 T23）。
 - analysis: `docs/GOAL_无限画布全面分析与下一刀_20260826.md`
 - [x] Q0 workqueue 空（reap 0；next EMPTY）
 - [x] 全面分析对照北星 / SSL / Phase D / 速度计划
@@ -92,6 +92,7 @@
 - [x] 向导露出拆格骨架与建议资产，可改转场/负提示（只读骨架不进 formatWizardPromptBody / 冻结指纹；去掉建议是显式导演动作；不改 WIZARD_POST_MATERIALIZE_NEXT；schemaVersion 仍为 1；不把 scaffold 当 bond-loop 关账；不跳过 Binding、不派发）
 - [x] Align/Core/App 向导物化校验同源（listWizardMaterializeValidationErrors 并集：2–6/15s/至少 1 original/标题动作景别运镜时长/扩写不得锚原文/歧义未裁决；Vue 不 value-import wizard.ts；不改 formatWizardPromptBody / WIZARD_POST_MATERIALIZE_NEXT；schemaVersion 仍为 1；不跳过 Binding、不派发）
 - [x] 向导建议资产缺规范记录禁止静默跳过（打开解析 suggestedAssetResolutions 露 category/name；Core/App 写路径先解析再失败关闭，不先写 prompt；去掉建议是显式导演动作；不改 formatWizardPromptBody / WIZARD_POST_MATERIALIZE_NEXT；schemaVersion 仍为 1；不跳过 Binding、不派发）
+- [x] 云端 B 轨源码辅助达极限并停手（2026-08-27；不再克隆横幅/hint/校验；不把 scaffold 写进冻结提示词；不关整 Goal）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
