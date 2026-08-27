@@ -22,8 +22,15 @@ import {
   planEnvelopeNextFromNodeStatuses,
   planEnvelopeNextLabel,
   planOperationEnvelopeNext,
+  loadedRevisionImpactAlignLine,
+  loadedRevisionImpactClassificationForAlignTarget,
+  loadedRevisionImpactUnexpectedMark,
+  mergeSsl5RevisionImpactPages,
   refineSsl5FocusIfUnexpectedRevisionImpact,
   refineStudioGenerationPlanDraftIfUnitGridBlocking,
+  SSL5_REVISION_IMPACT_NOT_LOADED_LINE,
+  SSL5_REVISION_IMPACT_NOT_ON_PAGE_LINE,
+  SSL5_REVISION_IMPACT_UNEXPECTED_MARK,
   SSL5_UNEXPECTED_REVISION_IMPACT_REASON,
   STUDIO_GENERATION_PLAN_COMMAND,
   unexpectedRevisionImpactHitsFocus,
@@ -414,6 +421,41 @@ describe("已加载 unexpected 修订影响精炼 SSL-5", () => {
     });
     expect(keptGate.generationPlanDraft.blockedReason).toBe("六图闸未放行（batch 2）");
   });
+
+  it("impact 翻页追加不覆盖；对照格复用已加载分类，未加载不冒充 unexpected", () => {
+    const first = {
+      empty: false,
+      nextCursor: "c2",
+      items: [{ unitId: "u1", unitRevision: 1, rows: [{ panelId: "p1", changeClassification: "expected" as const }] }],
+    };
+    const second = {
+      empty: false,
+      items: [
+        { unitId: "u1", unitRevision: 1, rows: [{ panelId: "p1", changeClassification: "unexpected" as const }] },
+        { unitId: "u2", unitRevision: 3, rows: [{ panelId: "p2", changeClassification: "unexpected" as const }] },
+      ],
+    };
+    const merged = mergeSsl5RevisionImpactPages(first, second);
+    expect(merged.items).toHaveLength(2);
+    expect(merged.items[0]?.unitId).toBe("u1");
+    expect(merged.items[0]?.rows[0]?.changeClassification).toBe("expected");
+    expect(merged.items[1]?.unitId).toBe("u2");
+    expect(merged.nextCursor).toBeUndefined();
+    expect(merged.empty).toBe(false);
+
+    expect(loadedRevisionImpactAlignLine(null, { unitId: "u1", panelId: "p1" })).toBe(SSL5_REVISION_IMPACT_NOT_LOADED_LINE);
+    expect(loadedRevisionImpactClassificationForAlignTarget(merged, { unitId: "u9", panelId: "p1" })).toBeNull();
+    expect(loadedRevisionImpactAlignLine(merged, { unitId: "u9", panelId: "p1" })).toBe(SSL5_REVISION_IMPACT_NOT_ON_PAGE_LINE);
+    expect(loadedRevisionImpactClassificationForAlignTarget(merged, { unitId: "u1", panelId: "p1" })).toBe("expected");
+    expect(loadedRevisionImpactUnexpectedMark(merged, { unitId: "u1", panelId: "p1" })).toBeNull();
+    expect(loadedRevisionImpactUnexpectedMark(merged, { unitId: "u2", panelId: "p2" })).toBe(SSL5_REVISION_IMPACT_UNEXPECTED_MARK);
+    expect(loadedRevisionImpactClassificationForAlignTarget({
+      items: [{
+        unitId: "u3",
+        rows: [{ panelId: null, targetKind: "unit-grid", changeClassification: "unexpected" }],
+      }],
+    }, { unitId: "u3", panelId: "p9" })).toBe("unexpected");
+  });
 });
 
 describe("create-plan 草稿接线源码合同", () => {
@@ -422,6 +464,9 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(draft).toContain("refineSsl5FocusIfUnexpectedRevisionImpact");
     expect(draft).toContain("unexpectedRevisionImpactHitsFocus");
     expect(draft).toContain("SSL5_UNEXPECTED_REVISION_IMPACT_REASON");
+    expect(draft).toContain("mergeSsl5RevisionImpactPages");
+    expect(draft).toContain("loadedRevisionImpactClassificationForAlignTarget");
+    expect(draft).toContain("loadedRevisionImpactAlignLine");
     expect(draft).not.toContain("studio-trace");
     expect(draft).not.toContain("getStudioScriptRevisionImpact");
     expect(draft).toContain("refineStudioGenerationPlanDraftIfUnitGridBlocking");

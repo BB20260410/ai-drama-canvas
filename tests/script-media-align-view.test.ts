@@ -442,10 +442,36 @@ describe("对照侧栏打开生成追溯", () => {
     expect(vue).toContain("ssl5DisplayedPlan");
     expect(vue).toContain("SSL5_UNEXPECTED_REVISION_IMPACT_REASON");
     expect(vue).toContain("ssl5DisplayedPlan?.generationPlanDraft.ready");
-    const lookup = handlerBody(vue, "async function lookupRevisionImpact(", "async function lookupSpanMedia(");
+    const lookup = handlerBody(vue, "async function lookupRevisionImpact(", "async function lookupRevisionImpactNext(");
     expect(lookup).not.toContain("loadAlign(");
     expect(lookup).not.toContain("planSsl5MissingToGen");
     expect(vue).toContain("import type { Ssl5MissingToGenPlan } from \"@core/studio-ssl5-missing-to-gen\"");
     expect(vue).not.toMatch(/import\s+\{[^}]*planSsl5MissingToGen/u);
+  });
+
+  it("本修订影响可翻下一页，对照表复用已加载 unexpected，不自动查", () => {
+    const vue = source();
+    expect(vue).toContain('data-testid="script-reader-revision-impact-next"');
+    expect(vue).toContain("lookupRevisionImpactNext");
+    expect(vue).toContain("mergeSsl5RevisionImpactPages");
+    expect(vue).toContain("cursor");
+    expect(vue).toContain("loadedRevisionImpactUnexpectedMark");
+    expect(vue).toContain("loadedRevisionImpactAlignLine");
+    expect(vue).toContain('data-testid="align-panel-revision-impact"');
+    expect(vue).toContain("align-impact-");
+    expect(vue).toContain("ssl5UnexpectedReview");
+    expect(vue).toContain("去审片复核");
+    expect(vue).toContain("target: ssl5UnexpectedReview ? 'review' : 'binding'");
+    const next = handlerBody(vue, "async function lookupRevisionImpactNext(", "async function lookupSpanMedia(");
+    expect(next).toContain("if (actionLoading.value) return;");
+    expect(next).toContain("revisionImpact.value?.nextCursor");
+    expect(next).toContain("cursor");
+    expect(next).toContain("mergeSsl5RevisionImpactPages");
+    expect(next).not.toContain("loadAlign(");
+    expect(next).not.toContain("planSsl5MissingToGen");
+    const loadAlign = handlerBody(vue, "async function loadAlign()", "async function bootstrap(");
+    expect(loadAlign).not.toContain("lookupRevisionImpactNext");
+    expect(loadAlign).not.toContain("getStudioScriptRevisionImpact");
+    expect(vue).not.toContain("from \"@core/studio-trace");
   });
 });

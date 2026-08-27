@@ -45,6 +45,9 @@ import type {
 import type { StudioScriptProductUiApi } from "../material-studio-ui-contract";
 import type { Ssl5MissingToGenPlan } from "@core/studio-ssl5-missing-to-gen";
 import {
+  loadedRevisionImpactAlignLine,
+  loadedRevisionImpactUnexpectedMark,
+  mergeSsl5RevisionImpactPages,
   refineSsl5FocusIfUnexpectedRevisionImpact,
   SSL5_UNEXPECTED_REVISION_IMPACT_REASON,
   type StudioGenerationPlanDraftNode,
@@ -222,6 +225,21 @@ const ssl5EarliestNextLine = computed(() => {
   }
   return "先 Binding 确认再走 freeze → create-plan 链。";
 });
+
+const ssl5UnexpectedReview = computed(() =>
+  ssl5DisplayedPlan.value?.generationPlanDraft.blockedReason === SSL5_UNEXPECTED_REVISION_IMPACT_REASON,
+);
+
+const selectedAlignImpactLine = computed(() =>
+  loadedRevisionImpactAlignLine(revisionImpact.value, {
+    unitId: selectedAlignRow.value?.unitId ?? "",
+    panelId: selectedAlignPanel.value?.panelId ?? null,
+  }),
+);
+
+function alignImpactUnexpectedMark(unitId: string, panelId?: string | null): string | null {
+  return loadedRevisionImpactUnexpectedMark(revisionImpact.value, { unitId, panelId });
+}
 
 const missingReportOpenItems = computed(() =>
   (board.value?.missingReport.items ?? []).filter((item) => item.status !== "covered"),
@@ -473,6 +491,36 @@ async function lookupRevisionImpact(): Promise<void> {
     }
   } catch (reason) {
     revisionImpact.value = null;
+    report(reason);
+  } finally {
+    actionLoading.value = "";
+  }
+}
+
+async function lookupRevisionImpactNext(): Promise<void> {
+  if (actionLoading.value) return;
+  if (!reader.value) return;
+  const cursor = revisionImpact.value?.nextCursor;
+  if (!cursor) return;
+  if (!props.api.getStudioScriptRevisionImpact) {
+    report(new Error("当前桌面适配层未接入 script-revision-impact。"));
+    return;
+  }
+  actionLoading.value = "revision-impact";
+  error.value = "";
+  notice.value = "";
+  try {
+    const page = await props.api.getStudioScriptRevisionImpact(props.projectRoot, {
+      scriptRevisionId: reader.value.revisionId,
+      limit: 20,
+      cursor,
+    });
+    revisionImpact.value = mergeSsl5RevisionImpactPages(revisionImpact.value, page);
+    const unexpected = impactUnexpectedRowCount(revisionImpact.value);
+    notice.value = unexpected
+      ? `本修订影响已累积 ${revisionImpact.value.items.length} 个单元修订，其中 ${unexpected} 条非预期须人工复核。`
+      : `本修订影响已累积 ${revisionImpact.value.items.length} 个单元修订。`;
+  } catch (reason) {
     report(reason);
   } finally {
     actionLoading.value = "";
@@ -1283,6 +1331,14 @@ function shortSha(value: string | null | undefined): string {
             </li>
           </ul>
           <p v-if="revisionImpact.nextCursor">还有后续单元修订；本页有界，不一次拉全量。</p>
+          <button
+            v-if="revisionImpact.nextCursor"
+            type="button"
+            data-testid="script-reader-revision-impact-next"
+            :disabled="Boolean(actionLoading)"
+            :title="actionLoading ? '正在处理，不能再翻本修订影响' : undefined"
+            @click="lookupRevisionImpactNext"
+          >{{ actionLoading === "revision-impact" ? "反查中…" : "下一页影响" }}</button>
         </div>
         <textarea
           ref="scriptBodyElement"
@@ -1365,8 +1421,8 @@ function shortSha(value: string | null | undefined): string {
             v-if="ssl5Plan.focusUnitId"
             type="button"
             data-testid="ssl5-open-binding"
-            @click="emit('openUnit', { unitId: ssl5Plan.focusUnitId, target: 'binding' })"
-          >去 Binding 确认</button>
+            @click="emit('openUnit', { unitId: ssl5Plan.focusUnitId, target: ssl5UnexpectedReview ? 'review' : 'binding' })"
+          >{{ ssl5UnexpectedReview ? "去审片复核" : "去 Binding 确认" }}</button>
         </div>
         <div v-if="board?.missingReport" class="missing-report" data-testid="align-missing-report">
           <b>缺图报告</b>
@@ -1405,14 +1461,21 @@ function shortSha(value: string | null | undefined): string {
                     type="button"
                     :class="{ active: selectedAlignRow?.unitId === row.unitId && selectedAlignPanel?.panelId === panel.panelId }"
                     :data-testid="`align-table-panel-${panel.panelId}`"
+                    :title="alignImpactUnexpectedMark(row.unitId, panel.panelId) ?? undefined"
                     @click.stop="selectAlignTablePanel(row, panel)"
-                  >G{{ panel.panelIndex }}{{ panel.hasMedia ? "有" : "缺" }}</button>
+                  >G{{ panel.panelIndex }}{{ panel.hasMedia ? "有" : "缺" }}<template v-if="alignImpactUnexpectedMark(row.unitId, panel.panelId)">·非</template></button>
                 </div>
                 <template v-else>—</template>
               </td>
               <td :data-testid="`align-peek-${row.unitId}`">{{ peekLabel(row.consistencyPeek) }}</td>
               <td>{{ row.formalCommitted ? "是" : "否" }}</td>
-              <td :data-testid="`align-review-${row.unitId}`">{{ reviewDecisionLabel(row.reviewDecision) }}</td>
+              <td :data-testid="`align-review-${row.unitId}`">
+                {{ reviewDecisionLabel(row.reviewDecision) }}
+                <small
+                  v-if="alignImpactUnexpectedMark(row.unitId)"
+                  :data-testid="`align-impact-${row.unitId}`"
+                >{{ alignImpactUnexpectedMark(row.unitId) }}</small>
+              </td>
               <td class="mono">{{ shortSha(row.rawSha256) }}</td>
               <td class="mono">
                 <div v-if="row.packId">pack: {{ row.packId.slice(0, 28) }}…</div>
@@ -1435,6 +1498,7 @@ function shortSha(value: string | null | undefined): string {
           <h3>{{ selectedAlignRow.unitId }}</h3>
           <p v-if="selectedAlignPanel">G{{ selectedAlignPanel.panelIndex }} {{ selectedAlignPanel.title || selectedAlignPanel.panelId }}</p>
           <p data-testid="align-panel-peek">{{ peekLabel(selectedAlignPanel?.consistencyPeek ?? selectedAlignRow.consistencyPeek) }}</p>
+          <p data-testid="align-panel-revision-impact">{{ selectedAlignImpactLine }}</p>
           <ul v-if="selectedAlignRow.panels.length" class="align-panels" data-testid="align-panel-list">
             <li v-for="panel in selectedAlignRow.panels" :key="panel.panelId">
               <button

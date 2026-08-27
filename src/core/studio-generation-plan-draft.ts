@@ -127,16 +127,20 @@ export function refineStudioGenerationPlanDraftIfUnitGridBlocking(
 export const SSL5_UNEXPECTED_REVISION_IMPACT_REASON =
   "非预期剧本修订影响，须人工复核（不派发）";
 
+export type Ssl5RevisionImpactUnitHint = {
+  unitId: string;
+  unitRevision?: number;
+  rows: Array<{
+    panelId: string | null;
+    targetKind?: string;
+    changeClassification: string | null;
+  }>;
+};
+
 export type Ssl5RevisionImpactHint = {
   empty?: boolean;
-  items: Array<{
-    unitId: string;
-    rows: Array<{
-      panelId: string | null;
-      targetKind?: string;
-      changeClassification: string | null;
-    }>;
-  }>;
+  nextCursor?: string;
+  items: Ssl5RevisionImpactUnitHint[];
 } | null | undefined;
 
 export type Ssl5UnexpectedImpactPlan = {
@@ -199,6 +203,81 @@ export function refineSsl5FocusIfUnexpectedRevisionImpact<T extends Ssl5Unexpect
         : item
     )),
   };
+}
+
+export const SSL5_REVISION_IMPACT_NOT_LOADED_LINE = "未加载本修订影响，不自动查";
+export const SSL5_REVISION_IMPACT_NOT_ON_PAGE_LINE = "本页影响未覆盖此单元";
+export const SSL5_REVISION_IMPACT_UNEXPECTED_MARK = "非预期须复核";
+
+export function mergeSsl5RevisionImpactPages<
+  T extends { items: Array<{ unitId: string; unitRevision?: number }>; nextCursor?: string; empty: boolean },
+>(current: T | null, next: T): T {
+  if (!current) return next;
+  const seen = new Set(current.items.map((unit) => `${unit.unitId}:${unit.unitRevision ?? ""}`));
+  const items = [...current.items];
+  for (const unit of next.items) {
+    const key = `${unit.unitId}:${unit.unitRevision ?? ""}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    items.push(unit);
+  }
+  return {
+    ...next,
+    items,
+    empty: items.length === 0,
+    ...(next.nextCursor ? { nextCursor: next.nextCursor } : { nextCursor: undefined }),
+  };
+}
+
+export function loadedRevisionImpactClassificationForAlignTarget(
+  impact: Ssl5RevisionImpactHint,
+  target: { unitId: string; panelId?: string | null },
+): "unexpected" | "expected" | "current" | null {
+  if (!impact || impact.empty || !target.unitId) return null;
+  const unit = impact.items.find((item) => item.unitId === target.unitId);
+  if (!unit) return null;
+  if (target.panelId) {
+    const exact = unit.rows.filter((row) => row.panelId === target.panelId);
+    if (exact.some((row) => row.changeClassification === "unexpected")) return "unexpected";
+    const exactClass = exact.find((row) => row.changeClassification)?.changeClassification;
+    if (exactClass === "expected" || exactClass === "current" || exactClass === "unexpected") {
+      return exactClass;
+    }
+  }
+  if (unit.rows.some((row) => row.changeClassification === "unexpected" && (
+    !row.panelId || row.targetKind === "unit-grid" || !target.panelId
+  ))) {
+    return "unexpected";
+  }
+  if (!target.panelId && unit.rows.some((row) => row.changeClassification === "unexpected")) {
+    return "unexpected";
+  }
+  const fallback = unit.rows.find((row) => (
+    row.changeClassification === "expected" || row.changeClassification === "current"
+  ))?.changeClassification;
+  return fallback === "expected" || fallback === "current" ? fallback : null;
+}
+
+export function loadedRevisionImpactUnexpectedMark(
+  impact: Ssl5RevisionImpactHint,
+  target: { unitId: string; panelId?: string | null },
+): string | null {
+  return loadedRevisionImpactClassificationForAlignTarget(impact, target) === "unexpected"
+    ? SSL5_REVISION_IMPACT_UNEXPECTED_MARK
+    : null;
+}
+
+export function loadedRevisionImpactAlignLine(
+  impact: Ssl5RevisionImpactHint,
+  target: { unitId: string; panelId?: string | null },
+): string {
+  if (!impact) return SSL5_REVISION_IMPACT_NOT_LOADED_LINE;
+  if (impact.empty) return "该修订未钉到任何单元修订。";
+  const classification = loadedRevisionImpactClassificationForAlignTarget(impact, target);
+  if (!classification) return SSL5_REVISION_IMPACT_NOT_ON_PAGE_LINE;
+  if (classification === "unexpected") return "非预期变化，须人工复核（不自动 Review PASS）";
+  if (classification === "expected") return "预期变化";
+  return "当前";
 }
 
 /** pack envelope `next` 与草稿同一套 unit-grid 阻塞。planned 不挡。 */

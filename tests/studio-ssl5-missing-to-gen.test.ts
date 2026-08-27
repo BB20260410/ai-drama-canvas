@@ -990,6 +990,8 @@ describe("SSL-5 入口源码合同", () => {
     expect(vue).toContain("ssl5EarliestNextLine");
     expect(vue).toContain("ssl5DisplayedPlan");
     expect(vue).toContain("refineSsl5FocusIfUnexpectedRevisionImpact");
+    expect(vue).toContain("align-panel-revision-impact");
+    expect(vue).toContain("script-reader-revision-impact-next");
     expect(vue).not.toContain("from \"@core/studio-trace");
     expect(vue).not.toContain("dispatch_studio_generation_pack");
     expect(ssl5).toContain("formatSceneBackReferenceLineFromBoard");
