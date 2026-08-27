@@ -1,0 +1,54 @@
+{
+  "id": "goal-canvas-unit-grid-dispatch-gate-20260826",
+  "kind": "canvas-unit-grid-dispatch-gate",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-27T00:04:10.000Z",
+  "scope": "ManagedStudioCanvasView primaryStart, runLastWorkflowGroup, and node freeze-dispatch reuse the already-loaded unitDetail.nextAction. When unitGridNextActionBlockingKind is wait/retry/review/reconcile, buttons are disabled and the functions return without persistWorkflow / executeWorkflowGroup / requestGeneration. planned / create-plan / dispatch do not block. Zero extra IPC. Vue imports the kind helper from studio-canvas-node-action-panel (re-export), not from studio-generation-plan-draft. Does not change dashboard projection, T4, T5, or action codes.",
+  "invariants": {
+    "usesLoadedUnitDetailOnly": true,
+    "zeroExtraIpc": true,
+    "plannedDoesNotBlock": true,
+    "doesNotPersistWhenBlocked": true,
+    "doesNotExecuteWorkflowWhenBlocked": true,
+    "doesNotEmitRequestGenerationWhenBlocked": true,
+    "vueDoesNotImportPlanDraft": true,
+    "doesNotChangeActionCodes": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true,
+    "doesNotChangeDashboardProjection": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-script-library-reader.test.ts"
+      ],
+      "result": "14 files / 209 tests PASS"
+    },
+    "commit": "56cd1e0",
+    "linuxDirfdNote": "tests/studio-generation-session-snapshot.test.ts P7 fixture still needs Darwin dirfd; not claimed as this Cloud gate"
+  },
+  "notClaimed": [
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed",
+    "readiness reads checkpoint control",
+    "dashboard unit-level nextAction rewritten"
+  ]
+}

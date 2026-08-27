@@ -387,6 +387,7 @@ import {
 import { createProjectScopedActionGate, type ProjectScopedActionToken } from "./project-scoped-action-gate";
 import { statusClass } from "./utils";
 import { resolveStoryboardWizardAssets } from "./storyboard-wizard-assets";
+import { formatWizardPromptBody, listWizardMaterializeValidationErrors, listWizardMissingSuggestedAssetErrors } from "@core/studio-panel-standing";
 import { markT23RendererStartup, recordT23StartupRuntimeGate } from "./t23-renderer-startup-probe";
 import { createManagedStudioModulePreloader } from "./managed-studio-module-preload";
 import type { CreateManagedProjectOptions, ProjectShell } from "@core/managed-project";
@@ -960,6 +961,30 @@ const studioScriptAlignApi = {
   ) {
     return window.canvasApi.getStudioScriptMediaAlignBoard(root, query);
   },
+  getStudioTrace(
+    root: string,
+    selector: { packId?: string; runId?: string; resultId?: string },
+  ) {
+    return window.canvasApi.getStudioTrace(root, selector);
+  },
+  getStudioScriptRevisionImpact(
+    root: string,
+    query: { scriptRevisionId: string; limit?: number; cursor?: string },
+  ) {
+    return window.canvasApi.getStudioScriptRevisionImpact(root, query);
+  },
+  planSsl5MissingToGen(
+    root: string,
+    query: { season: string; episode: string; documentId?: string },
+  ) {
+    return window.canvasApi.planSsl5MissingToGen(root, query);
+  },
+  getStudioScriptSpanMediaMap(
+    root: string,
+    query: { season: string; episode: string; startOffsetUtf16: number; endOffsetUtf16: number },
+  ) {
+    return window.canvasApi.getStudioScriptSpanMediaMap(root, query);
+  },
   openStoryboardWizard(
     root: string,
     input: Parameters<typeof window.canvasApi.openStudioStoryboardWizard>[1],
@@ -997,9 +1022,19 @@ const studioScriptAlignApi = {
     const unitId = `unit-wizard-${semanticDigest.slice(0, 40)}`;
     const promptDocumentId = `prompt-wizard-${semanticDigest.slice(0, 40)}`;
     const promptTitle = `${input.unitTitle} · 15 秒分镜提示词`;
-    const promptBody = input.panels.map((panel) =>
-      `G${panel.panelIndex} ${panel.shotType} ${panel.startSeconds}-${panel.endSeconds}s ${panel.title}: ${panel.visualAction}`,
-    ).join("\n");
+    const validation = listWizardMaterializeValidationErrors(input.panels);
+    if (validation.length) {
+      throw new Error(validation.join("；"));
+    }
+    const assets = await resolveStoryboardWizardAssets(
+      input.panels,
+      (assetId) => window.canvasApi.getStudioAsset(root, assetId),
+    );
+    const missing = listWizardMissingSuggestedAssetErrors(input.panels, new Set(assets.keys()));
+    if (missing.length) {
+      throw new Error(missing.join("；"));
+    }
+    const promptBody = formatWizardPromptBody(input.panels);
 
     const requireResult = <T,>(
       result: Awaited<ReturnType<typeof window.canvasApi.executeStudioCommand>>,
@@ -1034,11 +1069,6 @@ const studioScriptAlignApi = {
         },
       })),
       "写入向导提示词修订",
-    );
-
-    const assets = await resolveStoryboardWizardAssets(
-      input.panels,
-      (assetId) => window.canvasApi.getStudioAsset(root, assetId),
     );
     const unit = requireResult<{ unit: { id: string; revision: number } }>(
       await window.canvasApi.executeStudioCommand(root, await createStudioCommandEnvelope({

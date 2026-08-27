@@ -34,7 +34,9 @@ import {
   type StudioGenerationCheckpointDashboardGate,
 } from "./studio-generation-checkpoint.js";
 import {
+  getStudioGenerationLatestPlanForUnitGrid,
   listStudioGenerationLatestUnitGridRuns,
+  listStudioGenerationPacksByUnit,
 } from "./studio-generation-ledger.js";
 import { queryStudioUnitGridGenerationFreeze } from "./studio-unit-grid-generation.js";
 import {
@@ -767,11 +769,13 @@ export function unitGridProjectionToDashboardNextAction(
       ? `unit-grid 目标（phase=${projection.phase}）：禁止 panel 级 execute-agent-imagegen。`
       : `unit-grid 目标（phase=${projection.phase}）。`,
     requiresWrite: projection.phase === "ready-to-freeze"
+      || projection.phase === "ready-to-plan"
       || projection.phase === "ready-to-dispatch"
       || projection.phase === "rework"
       || projection.phase === "not-invoked-needs-new-run"
       || projection.phase === "abandoned-needs-new-run"
-      || projection.phase === "pending-review",
+      || projection.phase === "pending-review"
+      || projection.phase === "ready-to-retry",
     locator: unitLocator(projectId, unitId),
   };
 }
@@ -818,6 +822,13 @@ async function resolveUnitGridDashboardNextAction(
       callStatus,
       pairComplete: latestRun.hasResultPair,
       reviewDecision,
+      persistedPlanStatus: latestRun.latestEventKind === "failed"
+        ? "failed"
+        : latestRun.latestEventKind === "cancelled"
+          ? "cancelled"
+          : latestRun.latestEventKind === "retry-superseded"
+            ? "planned"
+            : undefined,
     });
     return unitGridProjectionToDashboardNextAction(projectId, unitId, projection);
   }
@@ -838,10 +849,36 @@ async function resolveUnitGridDashboardNextAction(
   if (freezeBlock) return freezeBlock;
   const hasCurrentPack = Boolean(unitGridReady && unitGridReady.status === "ready");
   if (!hasCurrentPack) return null;
+  const persisted = await persistedUnitGridPackId(projectRoot, unitId);
+  if (!persisted) {
+    return unitGridProjectionToDashboardNextAction(
+      projectId,
+      unitId,
+      projectStudioUnitGridNextAction({ hasCurrentPack: false }),
+    );
+  }
+  const plan = await getStudioGenerationLatestPlanForUnitGrid(projectRoot, unitId).catch(() => null);
   const projection = projectStudioUnitGridNextAction({
-    hasCurrentPack,
+    hasCurrentPack: true,
+    hasCurrentPlan: Boolean(plan),
   });
   return unitGridProjectionToDashboardNextAction(projectId, unitId, projection);
+}
+
+/** 只认账本已落盘 unit-grid pack；readiness 候选不当冻结包。 */
+async function persistedUnitGridPackId(projectRoot: string, unitId: string): Promise<string | null> {
+  try {
+    const page = await listStudioGenerationPacksByUnit(projectRoot, { unitId, limit: 36 });
+    let latest: { sequence: number; packId: string } | null = null;
+    for (const item of page.items) {
+      if (item.targetKind === "unit-grid" && (!latest || item.sequence > latest.sequence)) {
+        latest = { sequence: item.sequence, packId: item.packId };
+      }
+    }
+    return latest?.packId ?? null;
+  } catch {
+    return null;
+  }
 }
 
 function bindingNextActionToDashboard(

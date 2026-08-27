@@ -1,0 +1,44 @@
+{
+  "id": "goal-director-open-trace-20260826",
+  "createdAt": "2026-08-26T19:01:00.000Z",
+  "kind": "director-open-trace-get-studio-trace-readonly",
+  "conclusion": "PASS",
+  "scope": "Director open-trace now calls canvas:get-studio-trace (getStudioGenerationTrace) and shows a readonly drawer with pack identity, changeClassification, previousStandings from frozen renderedPrompt, and run/result counts. Selected panel without pack/run fails closed; does not guess panels[0]. Does not evaluate pixels, call Binding inspect, or dispatch. Linux source contract only; no Electron GUI click.",
+  "invariants": {
+    "callsGetStudioTraceIpc": true,
+    "doesNotGuessFirstPanel": true,
+    "showsFrozenPreviousStandings": true,
+    "omitsStandingsWhenHistoryHasNoLine": true,
+    "doesNotReadUnitHeadForStanding": true,
+    "doesNotDispatch": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotCallBindingInspect": true,
+    "rendererDoesNotImportStudioTraceModule": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/studio-unit-grid-brief-contract.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-continuity-review-ui.test.ts",
+        "tests/studio-generation-plan-ui.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/use-virtual-list-lru-hotkeys.test.ts"
+      ],
+      "result": "7 files / 137 tests PASS"
+    },
+    "commit": "cd8cb1f"
+  },
+  "notClaimed": [
+    "real-generation constraint evidence",
+    "standing fully solved",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click of open-trace",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

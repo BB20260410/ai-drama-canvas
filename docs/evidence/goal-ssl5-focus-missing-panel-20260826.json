@@ -1,0 +1,35 @@
+{
+  "id": "goal-ssl5-focus-missing-panel-20260826",
+  "createdAt": "2026-08-26T18:07:00.000Z",
+  "kind": "ssl5-focus-first-missing-panel",
+  "conclusion": "PASS",
+  "scope": "SSL-5 readonly plan names first missing panel; does not dispatch",
+  "invariants": {
+    "focusPanelFromFirstMissing": true,
+    "coveredEarliestHasNoFocusPanel": true,
+    "doesNotDispatch": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotReviewPass": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/use-virtual-list-lru-hotkeys.test.ts"
+      ],
+      "result": "5 files / 32 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "runtime speed closed",
+    "100% fit",
+    "auto dispatch"
+  ]
+}

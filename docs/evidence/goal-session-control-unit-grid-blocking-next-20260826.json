@@ -1,0 +1,51 @@
+{
+  "id": "goal-session-control-unit-grid-blocking-next-20260826",
+  "kind": "session-control-unit-grid-blocking-next",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T22:27:00.000Z",
+  "scope": "refineStudioGenerationPlanDraftIfUnitGridBlocking lives in studio-generation-plan-draft (no align/ssl5/sqlite). session-snapshot wraps composeStudioGenerationPlanDraft with bundle.nextAction.code/label. Generation control panel draft uses already-loaded unit-grid progress node status (zero extra IPC). wait-or-reconcile-unit-grid-run / retry-unit-grid-plan-nodes / submit-unit-grid-review / reconcile-unit-grid-call and dispatched/failed/cancelled/succeeded block ready. planned / dispatch-unit-grid / create-unit-grid-plan do not. SSL-5 earliestBlockingPath delegates to unitGridNextActionBlockingKind. Draft stays out of session-snapshot fingerprint. Does not execute create-plan, dispatch, retry, or Review. schemaVersion stays 1.",
+  "invariants": {
+    "sessionSnapshotSchemaVersionUnchanged": 1,
+    "ssl5SchemaVersionUnchanged": 1,
+    "draftNotInFingerprint": true,
+    "noSessionSnapshotSsl5Import": true,
+    "noSessionSnapshotAlignImport": true,
+    "noGenerationControlExtraIpc": true,
+    "plannedDoesNotBlock": true,
+    "doesNotExecuteCreatePlan": true,
+    "doesNotDispatch": true,
+    "doesNotRetry": true,
+    "doesNotChangeT5": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts"
+      ],
+      "result": "8 files / 59 tests PASS"
+    },
+    "commit": "6158129"
+  },
+  "notClaimed": [
+    "create_studio_generation_plan executed",
+    "dispatch executed",
+    "retry executed",
+    "Review executed",
+    "pack envelope aligned to dashboard nextAction",
+    "T5 continuous generation remapped",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

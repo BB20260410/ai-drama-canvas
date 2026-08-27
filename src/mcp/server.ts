@@ -40,9 +40,12 @@ import { commitProjectImport, prepareProjectImport } from "../core/importer.js";
 import { listAgentSkills, readAgentSkill, saveAgentSkill } from "../core/skills.js";
 import { createContinuationHandoff, deleteProjectContext, getContinuationSnapshot, listProjectContext, searchProjectContext, upsertProjectContext } from "../core/memory.js";
 import { PROJECT_CONTEXT_KINDS } from "../core/types.js";
-import { buildStoryContext, connectStoryEvents, importStoryFile, importStoryText, listStoryChapters, listStoryEvents, listStorySources, readStoryChapter, upsertStoryEvent } from "../core/story.js";
-import { analyzeAdaptationChangeImpact, analyzeNovelChapters, exportAdaptation, generateAdaptationPlans, getAdaptationWorkspace, materializeSelectedAdaptationPlan, regenerateAdaptationScope, selectAdaptationPlan, upsertNarrativeBeat, upsertNovelFact, validateAdaptationPlan } from "../core/adaptation.js";
-import { applyEditOperation, cancelEditRender, createEditProject, createVideoContinuationPack, exportEditProjectOtio, extractLastFrame, extractTimelineFrame, getEditHistoryInfo, getEditProject, getEditRenderJob, importEditProjectOtio, listEditMedia, listEditProjects, listEditRenderJobs, listTimelineFrameExtractions, listVideoContinuationPacks, prepareEditMediaPreview, prepareEditMediaProxy, probeVideoEngine, redoEditProject, saveEditProject, startEditRender, undoEditProject, updateVideoContinuationPack } from "../core/editor.js";
+import { withAdaptation, type AdaptationModule } from "../core/adaptation-lazy.js";
+import { withEditor } from "../core/editor-lazy.js";
+import { withNovelAgent, type NovelAgentModule } from "../core/novel-agent-lazy.js";
+import { withStory, type StoryModule } from "../core/story-lazy.js";
+import { withNovelAnalysis, type NovelAnalysisModule } from "../core/novel-analysis-lazy.js";
+import { withNovelAnalysisProvider, type NovelAnalysisProviderModule } from "../core/novel-analysis-provider-lazy.js";
 import { editKeyframeCurveIssue, editKeyframeSourceTransformIssue } from "../core/keyframe-curve.js";
 import { doctorProject, getCapabilities, getProjectChanges, getProjectSnapshot, getStudioGenerationControlEnvelope } from "../core/codex.js";
 import { analyzeChangeImpact, commitExistingProductionRecovery, getProductionWorkflow, getStoryboard, listCreativeBibles, previewExistingProductionRecovery, updateProductionWorkflowStage, upsertCreativeBible, upsertStoryboardRow } from "../core/production.js";
@@ -51,42 +54,29 @@ import { executeIdempotentCommand, isStudioCommandRequest, listCommandLedger, re
 import { isRejectedCommandFailure } from "../core/command-outcome.js";
 import { classifyToolError } from "../core/tool-error-classification.js";
 import {
-  acquireStudioProjectWriteLease,
-  getStudioProjectWriteLeasePublic,
-  heartbeatStudioProjectWriteLease,
-  recommendGenerationUnknownDisposition,
-  releaseStudioProjectWriteLease,
-} from "../core/studio-project-write-lease.js";
-import {
-  readStudioGenerationDispatch,
-  readStudioImagegenCallIntentByRun,
-  readStudioGenerationResultBundle,
-} from "../core/studio-generation-ledger.js";
-import { getStudioEpisodeEarliest } from "../core/studio-episode-earliest.js";
+  withStudioEpisodeEarliest,
+  withStudioMultimediaTimeline,
+  withStudioProductionDashboard,
+  withStudioProductionProjectionBundle,
+  withStudioProjectWriteLease,
+  withStudioScriptLibraryReader,
+  withStudioScriptMediaAlign,
+  withStudioSsl5MissingToGen,
+  type StudioEpisodeEarliestModule,
+  type StudioMultimediaTimelineModule,
+  type StudioProductionDashboardModule,
+  type StudioProductionProjectionBundleModule,
+  type StudioProjectWriteLeaseModule,
+  type StudioScriptLibraryReaderModule,
+  type StudioScriptMediaAlignModule,
+  type StudioSsl5MissingToGenModule,
+} from "../core/studio-readonly-diagnostics-lazy.js";
+import type { StudioProductionDashboardQuery } from "../core/studio-production-dashboard.js";
 import { listAssetRelations, listVoiceIdentities, upsertAssetRelation, upsertVoiceIdentity } from "../core/asset-registry.js";
 import type { EditProject, GenerationJob, GenerationProvider, GenerationSettings } from "../core/types.js";
 import { PUBLICATION_KINDS, PUBLICATION_PURPOSES, PUBLICATION_VARIANTS, listPublicationIntents, listPublicationReceipts } from "../core/publication.js";
-import { createNovelAnalysisTask, listNovelAnalysisReviews, reviewNovelAnalysisBatch, reviewNovelAnalysisItem, submitNovelAnalysisProposal } from "../core/novel-analysis.js";
-import {
-  buildNovelContextPack,
-  compareNovelWritingSourceReceipts,
-  doctorNovelAgent,
-  getNovelManuscriptWorkspace,
-  getNovelSearchIndexStatus,
-  getNovelStateRebuildStatus,
-  getNovelWritingState,
-  listNovelManuscriptChapters,
-  listNovelWritingSourceReceipts,
-  planNovelStateRebuild,
-  probeNovelChapterConsistency,
-  preflightNovelChapterWrite,
-  prepareNovelChapterWrite,
-  readNovelManuscriptRange,
-  searchNovelManuscript,
-} from "../core/novel-agent-service.js";
 import { isNovelWritingStateRejectedError } from "../core/novel-writing-state.js";
 import { NOVEL_MANUSCRIPT_COMMAND_SCHEMA_OPTIONS } from "../core/novel-command-runtime.js";
-import { getNovelAnalysisExecutionRecoveryStatus, getNovelAnalysisProviderSettings, getNovelAnalysisRunProgress, listNovelAnalysisRunProgress, probeNovelAnalysisProvider } from "../core/novel-analysis-provider.js";
 import type { ScanProgress } from "../core/scanner.js";
 import { inspectFusionPackage } from "../core/fusion-package.js";
 import { loadFusionProductionAssets } from "../core/fusion-production.js";
@@ -119,8 +109,12 @@ import {
   type PanelVisualConstraint,
 } from "../core/fusion-visual-constraints.js";
 import { inspectManagedProject } from "../core/managed-project.js";
-import { getLocalCreativeProjectIngestStatus } from "../core/local-creative-project-ingest-status.js";
-import { previewLocalCreativeProductionUnits } from "../core/local-creative-production-unit-preview.js";
+import {
+  withLocalCreativeIngestStatus,
+  withLocalCreativePreview,
+  type LocalCreativeIngestStatusModule,
+  type LocalCreativePreviewModule,
+} from "../core/local-creative-lazy.js";
 import {
   getMaterialStudioState,
   getStudioCanonicalAsset,
@@ -143,16 +137,15 @@ import {
   listStudioBindingSections,
   listStudioBindingUnits,
 } from "../core/studio-binding-control.js";
-import { buildStudioProductionProjectionBundle } from "../core/studio-production-projection-bundle.js";
 import { evaluateStudioReviewTargetConsistency, getStudioContinuityReviewControl, resolveLatestStudioGenerationRunForPanel } from "../core/studio-continuity-review-control.js";
 import { getStudioGenerationTrace, getStudioScriptRevisionImpact } from "../core/studio-trace.js";
 import {
   getStudioEpisodeMissingMediaReport,
   getStudioEpisodeUnitMediaMap,
   getStudioScriptLibraryIndex,
+  resolveScriptSpanMediaMap,
+  withSpanMediaConsistencyPeeks,
 } from "../core/studio-script-library-projection.js";
-import { getStudioScriptReaderView } from "../core/studio-script-library-reader.js";
-import { getStudioScriptMediaAlignBoard } from "../core/studio-script-media-align.js";
 import { openStudioStoryboardWizard } from "../core/studio-storyboard-wizard.js";
 import { suggestStudioStoryboardDraft } from "../core/studio-storyboard-draft.js";
 import { runStudioFusionHelper } from "../core/studio-fusion-product-helpers.js";
@@ -172,28 +165,144 @@ import {
   runtimeMcpGateMode,
 } from "../core/runtime-mcp-effect.js";
 import { createRuntimeMcpPerformanceProbe } from "../core/runtime-mcp-observability.js";
-import {
-  getStudioProductionDashboard,
-  type StudioProductionDashboardQuery,
-} from "../core/studio-production-dashboard.js";
-import { getStudioMultimediaTimelineProjection } from "../core/studio-multimedia-timeline.js";
 import { getActiveManagedStudioContext } from "../core/active-managed-studio-context.js";
+import { withDuduReadonlyImport, type DuduReadonlyImportModule } from "../core/dudu-readonly-import-lazy.js";
+import { withStudioVideoPackage, type StudioVideoPackageModule } from "../core/studio-video-package-lazy.js";
+import type { StudioVideoPackageAuthorityInput } from "../core/studio-video-package.js";
 import {
-  discoverDuduReadonlyImportProjects,
-  getDuduReadonlyImportControl,
-  resolveDuduReadonlyImportCommandRoot,
-} from "../core/dudu-readonly-import.js";
-import {
-  getStudioVideoPackageControl,
-  type StudioVideoPackageAuthorityInput,
-} from "../core/studio-video-package.js";
-import { getStudioHiggsfieldVideoGenerationControl } from "../core/studio-higgsfield-video-generation.js";
-import { getStudioHiggsfieldConnectorWorkQueue } from "../core/studio-higgsfield-connector-queue.js";
+  withHiggsfieldQueue,
+  withHiggsfieldVideo,
+  type HiggsfieldQueueModule,
+  type HiggsfieldVideoModule,
+} from "../core/studio-higgsfield-lazy.js";
 import { projectHiggsfieldPrepareConnectorRequestForMcp } from "../core/studio-higgsfield-mcp-projection.js";
 import { AI_CANVAS_APPLICATION_VERSION, readRuntimeReleaseManifest } from "../core/release-manifest.js";
-import { STUDIO_CODEX_PUBLIC_COMMAND_SCHEMA_OPTIONS, studioSha256Schema } from "../core/studio-command-runtime.js";
+import { STUDIO_CODEX_PUBLIC_COMMAND_SCHEMA_OPTIONS, studioRevisionImpactHintSchema, studioSha256Schema } from "../core/studio-command-runtime.js";
 import { ensureConfinedDirectory } from "../core/confined-project-storage.js";
 import { createMcpToolRegistrar } from "./tool-registrar.js";
+
+const buildStoryContext = (...args: Parameters<StoryModule["buildStoryContext"]>) =>
+  withStory((story) => story.buildStoryContext(...args));
+const connectStoryEvents = (...args: Parameters<StoryModule["connectStoryEvents"]>) =>
+  withStory((story) => story.connectStoryEvents(...args));
+const importStoryFile = (...args: Parameters<StoryModule["importStoryFile"]>) =>
+  withStory((story) => story.importStoryFile(...args));
+const importStoryText = (...args: Parameters<StoryModule["importStoryText"]>) =>
+  withStory((story) => story.importStoryText(...args));
+const listStoryChapters = (...args: Parameters<StoryModule["listStoryChapters"]>) =>
+  withStory((story) => story.listStoryChapters(...args));
+const listStoryEvents = (...args: Parameters<StoryModule["listStoryEvents"]>) =>
+  withStory((story) => story.listStoryEvents(...args));
+const listStorySources = (...args: Parameters<StoryModule["listStorySources"]>) =>
+  withStory((story) => story.listStorySources(...args));
+const readStoryChapter = (...args: Parameters<StoryModule["readStoryChapter"]>) =>
+  withStory((story) => story.readStoryChapter(...args));
+const upsertStoryEvent = (...args: Parameters<StoryModule["upsertStoryEvent"]>) =>
+  withStory((story) => story.upsertStoryEvent(...args));
+const analyzeAdaptationChangeImpact = (...args: Parameters<AdaptationModule["analyzeAdaptationChangeImpact"]>) =>
+  withAdaptation((adaptation) => adaptation.analyzeAdaptationChangeImpact(...args));
+const analyzeNovelChapters = (...args: Parameters<AdaptationModule["analyzeNovelChapters"]>) =>
+  withAdaptation((adaptation) => adaptation.analyzeNovelChapters(...args));
+const exportAdaptation = (...args: Parameters<AdaptationModule["exportAdaptation"]>) =>
+  withAdaptation((adaptation) => adaptation.exportAdaptation(...args));
+const generateAdaptationPlans = (...args: Parameters<AdaptationModule["generateAdaptationPlans"]>) =>
+  withAdaptation((adaptation) => adaptation.generateAdaptationPlans(...args));
+const getAdaptationWorkspace = (...args: Parameters<AdaptationModule["getAdaptationWorkspace"]>) =>
+  withAdaptation((adaptation) => adaptation.getAdaptationWorkspace(...args));
+const materializeSelectedAdaptationPlan = (...args: Parameters<AdaptationModule["materializeSelectedAdaptationPlan"]>) =>
+  withAdaptation((adaptation) => adaptation.materializeSelectedAdaptationPlan(...args));
+const regenerateAdaptationScope = (...args: Parameters<AdaptationModule["regenerateAdaptationScope"]>) =>
+  withAdaptation((adaptation) => adaptation.regenerateAdaptationScope(...args));
+const selectAdaptationPlan = (...args: Parameters<AdaptationModule["selectAdaptationPlan"]>) =>
+  withAdaptation((adaptation) => adaptation.selectAdaptationPlan(...args));
+const upsertNarrativeBeat = (...args: Parameters<AdaptationModule["upsertNarrativeBeat"]>) =>
+  withAdaptation((adaptation) => adaptation.upsertNarrativeBeat(...args));
+const upsertNovelFact = (...args: Parameters<AdaptationModule["upsertNovelFact"]>) =>
+  withAdaptation((adaptation) => adaptation.upsertNovelFact(...args));
+const validateAdaptationPlan = (...args: Parameters<AdaptationModule["validateAdaptationPlan"]>) =>
+  withAdaptation((adaptation) => adaptation.validateAdaptationPlan(...args));
+const listNovelAnalysisReviews = (...args: Parameters<NovelAnalysisModule["listNovelAnalysisReviews"]>) =>
+  withNovelAnalysis((novelAnalysis) => novelAnalysis.listNovelAnalysisReviews(...args));
+const getNovelAnalysisProviderSettings = (...args: Parameters<NovelAnalysisProviderModule["getNovelAnalysisProviderSettings"]>) =>
+  withNovelAnalysisProvider((provider) => provider.getNovelAnalysisProviderSettings(...args));
+const probeNovelAnalysisProvider = (...args: Parameters<NovelAnalysisProviderModule["probeNovelAnalysisProvider"]>) =>
+  withNovelAnalysisProvider((provider) => provider.probeNovelAnalysisProvider(...args));
+const getNovelAnalysisRunProgress = (...args: Parameters<NovelAnalysisProviderModule["getNovelAnalysisRunProgress"]>) =>
+  withNovelAnalysisProvider((provider) => provider.getNovelAnalysisRunProgress(...args));
+const listNovelAnalysisRunProgress = (...args: Parameters<NovelAnalysisProviderModule["listNovelAnalysisRunProgress"]>) =>
+  withNovelAnalysisProvider((provider) => provider.listNovelAnalysisRunProgress(...args));
+const getNovelAnalysisExecutionRecoveryStatus = (...args: Parameters<NovelAnalysisProviderModule["getNovelAnalysisExecutionRecoveryStatus"]>) =>
+  withNovelAnalysisProvider((provider) => provider.getNovelAnalysisExecutionRecoveryStatus(...args));
+const buildNovelContextPack = (...args: Parameters<NovelAgentModule["buildNovelContextPack"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.buildNovelContextPack(...args));
+const compareNovelWritingSourceReceipts = (...args: Parameters<NovelAgentModule["compareNovelWritingSourceReceipts"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.compareNovelWritingSourceReceipts(...args));
+const doctorNovelAgent = (...args: Parameters<NovelAgentModule["doctorNovelAgent"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.doctorNovelAgent(...args));
+const getNovelManuscriptWorkspace = (...args: Parameters<NovelAgentModule["getNovelManuscriptWorkspace"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.getNovelManuscriptWorkspace(...args));
+const getNovelSearchIndexStatus = (...args: Parameters<NovelAgentModule["getNovelSearchIndexStatus"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.getNovelSearchIndexStatus(...args));
+const getNovelStateRebuildStatus = (...args: Parameters<NovelAgentModule["getNovelStateRebuildStatus"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.getNovelStateRebuildStatus(...args));
+const getNovelWritingState = (...args: Parameters<NovelAgentModule["getNovelWritingState"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.getNovelWritingState(...args));
+const listNovelManuscriptChapters = (...args: Parameters<NovelAgentModule["listNovelManuscriptChapters"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.listNovelManuscriptChapters(...args));
+const listNovelWritingSourceReceipts = (...args: Parameters<NovelAgentModule["listNovelWritingSourceReceipts"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.listNovelWritingSourceReceipts(...args));
+const planNovelStateRebuild = (...args: Parameters<NovelAgentModule["planNovelStateRebuild"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.planNovelStateRebuild(...args));
+const probeNovelChapterConsistency = (...args: Parameters<NovelAgentModule["probeNovelChapterConsistency"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.probeNovelChapterConsistency(...args));
+const preflightNovelChapterWrite = (...args: Parameters<NovelAgentModule["preflightNovelChapterWrite"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.preflightNovelChapterWrite(...args));
+const prepareNovelChapterWrite = (...args: Parameters<NovelAgentModule["prepareNovelChapterWrite"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.prepareNovelChapterWrite(...args));
+const readNovelManuscriptRange = (...args: Parameters<NovelAgentModule["readNovelManuscriptRange"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.readNovelManuscriptRange(...args));
+const searchNovelManuscript = (...args: Parameters<NovelAgentModule["searchNovelManuscript"]>) =>
+  withNovelAgent((novelAgent) => novelAgent.searchNovelManuscript(...args));
+const getLocalCreativeProjectIngestStatus = (...args: Parameters<LocalCreativeIngestStatusModule["getLocalCreativeProjectIngestStatus"]>) =>
+  withLocalCreativeIngestStatus((ingest) => ingest.getLocalCreativeProjectIngestStatus(...args));
+const previewLocalCreativeProductionUnits = (...args: Parameters<LocalCreativePreviewModule["previewLocalCreativeProductionUnits"]>) =>
+  withLocalCreativePreview((preview) => preview.previewLocalCreativeProductionUnits(...args));
+const discoverDuduReadonlyImportProjects = (...args: Parameters<DuduReadonlyImportModule["discoverDuduReadonlyImportProjects"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.discoverDuduReadonlyImportProjects(...args));
+const getDuduReadonlyImportControl = (...args: Parameters<DuduReadonlyImportModule["getDuduReadonlyImportControl"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.getDuduReadonlyImportControl(...args));
+const resolveDuduReadonlyImportCommandRoot = (...args: Parameters<DuduReadonlyImportModule["resolveDuduReadonlyImportCommandRoot"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.resolveDuduReadonlyImportCommandRoot(...args));
+const getStudioVideoPackageControl = (...args: Parameters<StudioVideoPackageModule["getStudioVideoPackageControl"]>) =>
+  withStudioVideoPackage((videoPackage) => videoPackage.getStudioVideoPackageControl(...args));
+const getStudioHiggsfieldVideoGenerationControl = (...args: Parameters<HiggsfieldVideoModule["getStudioHiggsfieldVideoGenerationControl"]>) =>
+  withHiggsfieldVideo((higgsfield) => higgsfield.getStudioHiggsfieldVideoGenerationControl(...args));
+const getStudioHiggsfieldConnectorWorkQueue = (...args: Parameters<HiggsfieldQueueModule["getStudioHiggsfieldConnectorWorkQueue"]>) =>
+  withHiggsfieldQueue((queue) => queue.getStudioHiggsfieldConnectorWorkQueue(...args));
+const getStudioEpisodeEarliest = (...args: Parameters<StudioEpisodeEarliestModule["getStudioEpisodeEarliest"]>) =>
+  withStudioEpisodeEarliest((earliest) => earliest.getStudioEpisodeEarliest(...args));
+const buildStudioProductionProjectionBundle = (...args: Parameters<StudioProductionProjectionBundleModule["buildStudioProductionProjectionBundle"]>) =>
+  withStudioProductionProjectionBundle((bundle) => bundle.buildStudioProductionProjectionBundle(...args));
+const getStudioProductionDashboard = (...args: Parameters<StudioProductionDashboardModule["getStudioProductionDashboard"]>) =>
+  withStudioProductionDashboard((dashboard) => dashboard.getStudioProductionDashboard(...args));
+const getStudioMultimediaTimelineProjection = (...args: Parameters<StudioMultimediaTimelineModule["getStudioMultimediaTimelineProjection"]>) =>
+  withStudioMultimediaTimeline((timeline) => timeline.getStudioMultimediaTimelineProjection(...args));
+const getStudioProjectWriteLeasePublic = (...args: Parameters<StudioProjectWriteLeaseModule["getStudioProjectWriteLeasePublic"]>) =>
+  withStudioProjectWriteLease((writeLease) => writeLease.getStudioProjectWriteLeasePublic(...args));
+const acquireStudioProjectWriteLease = (...args: Parameters<StudioProjectWriteLeaseModule["acquireStudioProjectWriteLease"]>) =>
+  withStudioProjectWriteLease((writeLease) => writeLease.acquireStudioProjectWriteLease(...args));
+const heartbeatStudioProjectWriteLease = (...args: Parameters<StudioProjectWriteLeaseModule["heartbeatStudioProjectWriteLease"]>) =>
+  withStudioProjectWriteLease((writeLease) => writeLease.heartbeatStudioProjectWriteLease(...args));
+const releaseStudioProjectWriteLease = (...args: Parameters<StudioProjectWriteLeaseModule["releaseStudioProjectWriteLease"]>) =>
+  withStudioProjectWriteLease((writeLease) => writeLease.releaseStudioProjectWriteLease(...args));
+const recommendGenerationUnknownDisposition = (...args: Parameters<StudioProjectWriteLeaseModule["recommendGenerationUnknownDisposition"]>) =>
+  withStudioProjectWriteLease((writeLease) => writeLease.recommendGenerationUnknownDisposition(...args));
+const getStudioScriptReaderView = (...args: Parameters<StudioScriptLibraryReaderModule["getStudioScriptReaderView"]>) =>
+  withStudioScriptLibraryReader((reader) => reader.getStudioScriptReaderView(...args));
+const getStudioScriptMediaAlignBoard = (...args: Parameters<StudioScriptMediaAlignModule["getStudioScriptMediaAlignBoard"]>) =>
+  withStudioScriptMediaAlign((align) => align.getStudioScriptMediaAlignBoard(...args));
+const planSsl5MissingToGen = (...args: Parameters<StudioSsl5MissingToGenModule["planSsl5MissingToGen"]>) =>
+  withStudioSsl5MissingToGen((ssl5) => ssl5.planSsl5MissingToGen(...args));
 
 const server = new McpServer({
   name: "ai-drama-canvas",
@@ -329,6 +438,7 @@ async function assertMcpToolRuntimeCurrent(name: string): Promise<void> {
 async function startMcpRuntimeGateWatchers(): Promise<void> {
   if (mcpRuntimeGateWatchers.length > 0) return;
   const boot = await MCP_RUNTIME_BOOT_IDENTITY;
+  // W4-E：默认只递归订 src/；tests/scripts 见 AI_CANVAS_RUNTIME_GATE_WATCH_TESTS_SCRIPTS
   const watchPaths = sourceDigestWatchPaths(boot.workspace);
   const workspaceRoot = watchPaths[0];
   if (!workspaceRoot) throw new Error("MCP 运行时源码 watcher 缺少 workspace 根。");
@@ -402,6 +512,7 @@ const studioGenerationControlQuerySchema = z.union([
     targetKind: z.literal("panel").optional(),
     unitId: studioStableIdSchema,
     panelId: studioStableIdSchema,
+    revisionImpact: studioRevisionImpactHintSchema,
   }).strict(),
   z.object({
     operation: z.literal("readiness"),
@@ -411,6 +522,7 @@ const studioGenerationControlQuerySchema = z.union([
       receiptId: studioStableIdSchema,
       receiptFingerprint: z.string().trim().regex(/^[a-f0-9]{64}$/u),
     }).strict().optional(),
+    revisionImpact: studioRevisionImpactHintSchema,
   }).strict(),
   z.object({
     operation: z.literal("pack"),
@@ -433,17 +545,23 @@ const studioGenerationControlQuerySchema = z.union([
     limit: studioPageLimitSchema,
     order: z.enum(["oldest-first", "newest-first"]).optional(),
   }).strict(),
-  z.object({ operation: z.literal("plan"), planId: studioStableIdSchema }).strict(),
+  z.object({
+    operation: z.literal("plan"),
+    planId: studioStableIdSchema,
+    revisionImpact: studioRevisionImpactHintSchema,
+  }).strict(),
   z.object({
     operation: z.literal("plan"),
     targetKind: z.literal("panel").optional(),
     unitId: studioStableIdSchema,
     panelId: studioStableIdSchema,
+    revisionImpact: studioRevisionImpactHintSchema,
   }).strict(),
   z.object({
     operation: z.literal("plan"),
     targetKind: z.literal("unit-grid"),
     unitId: studioStableIdSchema,
+    revisionImpact: studioRevisionImpactHintSchema,
   }).strict(),
   z.object({
     operation: z.literal("call"),
@@ -1850,6 +1968,11 @@ registrar.registerTool(
   async ({ projectRoot, generationRunId, remoteMayExist }) => {
     try {
       await inspectManagedProject(projectRoot);
+      const {
+        readStudioGenerationDispatch,
+        readStudioImagegenCallIntentByRun,
+        readStudioGenerationResultBundle,
+      } = await import("../core/studio-generation-ledger.js");
       const [dispatch, callIntent, bundle] = await Promise.all([
         readStudioGenerationDispatch(projectRoot, generationRunId).catch(() => null),
         readStudioImagegenCallIntentByRun(projectRoot, generationRunId).catch(() => null),
@@ -1861,7 +1984,7 @@ registrar.registerTool(
       );
       // run terminal from events is not always on dispatch; keep null if unknown
       const runTerminal = null as "failed" | "cancelled" | "succeeded" | null;
-      const advice = recommendGenerationUnknownDisposition({
+      const advice = await recommendGenerationUnknownDisposition({
         hasCallIntent,
         hasCommittedResult,
         runTerminal,
@@ -4628,7 +4751,7 @@ registrar.registerTool(
     inputSchema: {},
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
-  async () => textResult(await probeVideoEngine()),
+  async () => textResult(await withEditor((editor) => editor.probeVideoEngine())),
 );
 
 registrar.registerTool(
@@ -4641,7 +4764,7 @@ registrar.registerTool(
   },
   async ({ projectRoot }) => {
     try {
-      return textResult((await listEditProjects(projectRoot)).map((project) => ({
+      return textResult((await withEditor((editor) => editor.listEditProjects(projectRoot))).map((project) => ({
         id: project.id,
         name: project.name,
         episode: project.episode,
@@ -4666,7 +4789,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
   async ({ projectRoot, editProjectId }) => {
-    try { return textResult(await getEditProject(projectRoot, editProjectId)); }
+    try { return textResult(await withEditor((editor) => editor.getEditProject(projectRoot, editProjectId))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -4688,7 +4811,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, openWorldHint: false },
   },
   async ({ projectRoot, name, episode, width, height, fps, autoPopulate }) => {
-    try { return textResult(await createEditProject(projectRoot, { name, episode, width, height, fps, autoPopulate })); }
+    try { return textResult(await withEditor((editor) => editor.createEditProject(projectRoot, { name, episode, width, height, fps, autoPopulate }))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -4702,7 +4825,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, openWorldHint: false },
   },
   async ({ projectRoot, project, expectedRevision }) => {
-    try { return textResult(await saveEditProject(projectRoot, project as EditProject, expectedRevision, "codex")); }
+    try { return textResult(await withEditor((editor) => editor.saveEditProject(projectRoot, project as EditProject, expectedRevision, "codex"))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -4778,7 +4901,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
   async ({ projectRoot, editProjectId, expectedRevision, operation }) => {
-    try { return textResult(await applyEditOperation(projectRoot, editProjectId, expectedRevision, operation)); }
+    try { return textResult(await withEditor((editor) => editor.applyEditOperation(projectRoot, editProjectId, expectedRevision, operation))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -4791,7 +4914,7 @@ registrar.registerTool(
     inputSchema: { projectRoot: projectRootSchema, editProjectId: z.string().min(3) },
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
-  async ({ projectRoot, editProjectId }) => { try { return textResult(await getEditHistoryInfo(projectRoot, editProjectId)); } catch (error) { return toolError(error); } },
+  async ({ projectRoot, editProjectId }) => { try { return textResult(await withEditor((editor) => editor.getEditHistoryInfo(projectRoot, editProjectId))); } catch (error) { return toolError(error); } },
 );
 
 registrar.registerTool(
@@ -4802,7 +4925,7 @@ registrar.registerTool(
     inputSchema: { projectRoot: projectRootSchema, editProjectId: z.string().min(3), expectedRevision: z.number().int().positive() },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
-  async ({ projectRoot, editProjectId, expectedRevision }) => { try { return textResult(await undoEditProject(projectRoot, editProjectId, expectedRevision, "codex")); } catch (error) { return toolError(error); } },
+  async ({ projectRoot, editProjectId, expectedRevision }) => { try { return textResult(await withEditor((editor) => editor.undoEditProject(projectRoot, editProjectId, expectedRevision, "codex"))); } catch (error) { return toolError(error); } },
 );
 
 registrar.registerTool(
@@ -4813,7 +4936,7 @@ registrar.registerTool(
     inputSchema: { projectRoot: projectRootSchema, editProjectId: z.string().min(3), expectedRevision: z.number().int().positive() },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
-  async ({ projectRoot, editProjectId, expectedRevision }) => { try { return textResult(await redoEditProject(projectRoot, editProjectId, expectedRevision, "codex")); } catch (error) { return toolError(error); } },
+  async ({ projectRoot, editProjectId, expectedRevision }) => { try { return textResult(await withEditor((editor) => editor.redoEditProject(projectRoot, editProjectId, expectedRevision, "codex"))); } catch (error) { return toolError(error); } },
 );
 
 registrar.registerTool(
@@ -4824,7 +4947,7 @@ registrar.registerTool(
     inputSchema: { projectRoot: projectRootSchema, editProjectId: z.string().min(3), expectedRevision: z.number().int().positive(), outputPath: z.string().optional() },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
-  async ({ projectRoot, editProjectId, expectedRevision, outputPath }) => { try { return textResult(await exportEditProjectOtio(projectRoot, editProjectId, expectedRevision, outputPath)); } catch (error) { return toolError(error); } },
+  async ({ projectRoot, editProjectId, expectedRevision, outputPath }) => { try { return textResult(await withEditor((editor) => editor.exportEditProjectOtio(projectRoot, editProjectId, expectedRevision, outputPath))); } catch (error) { return toolError(error); } },
 );
 
 registrar.registerTool(
@@ -4835,7 +4958,7 @@ registrar.registerTool(
     inputSchema: { projectRoot: projectRootSchema, filePath: z.string().min(1), name: z.string().max(120).optional() },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
-  async ({ projectRoot, filePath, name }) => { try { return textResult(await importEditProjectOtio(projectRoot, filePath, name)); } catch (error) { return toolError(error); } },
+  async ({ projectRoot, filePath, name }) => { try { return textResult(await withEditor((editor) => editor.importEditProjectOtio(projectRoot, filePath, name))); } catch (error) { return toolError(error); } },
 );
 
 registrar.registerTool(
@@ -5118,7 +5241,7 @@ registrar.registerTool(
   "get_studio_trace",
   {
     title: "Studio 生成全链双向追溯（只读）",
-    description: "P24 双向追溯：by-pack/by-run/by-result 返回当时链投影（剧本 revision、原文 spans、单元修订、提示词 revision、BindingSet、连续性指纹、runs/results/reviews 有界列表与预期/非预期变化分类，历史身份一律经冻结包还原不读 head）；script-revision-impact 按剧本 revision 反查受影响单元修订→宫格→冻结包→runs→结果（两层分页，limit≤100）。只读，不写任何账本。",
+    description: "P24 双向追溯：by-pack/by-run/by-result 返回当时链投影（剧本 revision、原文 spans、单元修订、提示词 revision、BindingSet、连续性指纹、runs/results/reviews 有界列表、冻结提示词前镜 previousStandings（只从该包 renderedPrompt 还原，无该行则省略）、冻结宫格光线/服装覆盖 frozenPanelOverlays（无该行则省略）、一致性四态 peek（consistencyPeek，by-run 用该 run、否则本包 runs 最新一条只读 LRU；无 run 则省略以免改 P24 形状；未评估 ≠ 无法检查；不 evaluate 像素；机器不自动 Review PASS）、预期/非预期变化分类，历史身份一律经冻结包还原不读 head）；script-revision-impact 按剧本 revision 反查受影响单元修订→宫格→冻结包→runs→结果（两层分页，limit≤100）。只读，不写任何账本。",
     inputSchema: {
       projectRoot: managedStudioProjectRootSchema,
       operation: z.enum(["by-pack", "by-run", "by-result", "script-revision-impact"]),
@@ -5275,9 +5398,9 @@ registrar.registerTool(
 registrar.registerTool(
   "get_studio_script_library_projection",
   {
-    title: "剧本库只读投影（SSL-0/1/2/3）",
+    title: "剧本库只读投影（SSL-0/1/2/3/5 计划）",
     description:
-      "剧本库投影只读入口。library-index；episode-unit-media-map；missing-media-report；reader-view（正文+大纲+earliest）；script-media-align（SSL-3 一键图文对照：unit→图 SHA/缺图/trace 钥匙/大纲锚，需 season+episode，可选 documentId）。不写账本；不返回 CAS 路径/媒体二进制。",
+      "剧本库投影只读入口。library-index；episode-unit-media-map；missing-media-report；reader-view（正文+大纲+earliest）；script-media-align（SSL-3 一键图文对照：unit→图 SHA/缺图/trace 钥匙/大纲锚/缺图报告 missingReport，需 season+episode，可选 documentId）；ssl5-missing-to-gen-plan（SSL-5 缺图→earliest 只读下一步，含焦点宫格场景/道具/角色回指 sceneBackReferenceLine/sceneBackReferences/propBackReferenceLine/propBackReferences/characterBackReferenceLine/characterBackReferences、锁版光线/服化 lightingCostumeLine、镜头类型/扩写格 shotTypeLine、风格锁 styleLockLine 与 15s 节拍 beatLine/unitBeatLine、一致性四态 peek consistencyPeek（复用已加载对照板焦点格/行，零额外评估；未评估 ≠ 无法检查；机器不自动 Review PASS）、六图闸 checkpoint/checkpointLine（复用对照板已投影闸，未放行新槽时禁止再建议 create-plan/dispatch；earliest wait/retry/Review 文案更具体时保留；不二次读闸）、写租约 writeLease/writeLeaseLine（复用对照板已投影租约，未持有时 recommendedPath 在 freeze 前插入 acquire-lease；不暴露 token、不抢租约；未投影不插）、焦点宫格自己的 focusPackId 与 create-plan 只读草稿 generationPlanDraft（只认缺图格 pack，禁止用同行已出图 packId；账本已有对应 plan 则 ready=false、按节点状态写 dispatch/wait/retry/Review；焦点即 earliest 且 earliest 已是 wait/retry/Review/对账时禁止再建议 create-plan/dispatch，下一步以 earliest 为准；可选 revisionImpact 为调用方已取回的 script-revision-impact 页（焦点 unexpected 则 recommendedPath=review，禁止再建议 create-plan/dispatch；earliest/六图闸文案更具体时保留；省略不自动查）；不执行、不 dispatch）；只扫已加载对照板）；script-span-media-map（点选 span→相交宫格/图/构图/前镜交接/锁版光线服化/镜头类型/风格锁/15s 节拍/场景回指/道具回指/角色回指/一致性四态 peek consistencyPeek（只读 LRU；未评估 ≠ 无法检查；不跑像素；机器不自动 Review PASS），需 season+episode+startOffsetUtf16+endOffsetUtf16）。不写账本；不返回 CAS 路径/媒体二进制。",
     inputSchema: {
       projectRoot: managedStudioProjectRootSchema,
       operation: z.enum([
@@ -5287,6 +5410,8 @@ registrar.registerTool(
         "reader-view",
         "script-media-align",
         "storyboard-wizard-suggest",
+        "ssl5-missing-to-gen-plan",
+        "script-span-media-map",
       ]),
       kind: z.enum(["script", "prompt"]).optional(),
       season: z.string().min(1).max(64).optional(),
@@ -5297,6 +5422,21 @@ registrar.registerTool(
       scriptRevisionId: studioStableIdSchema.optional(),
       panelCount: z.number().int().min(2).max(6).optional(),
       includeBody: z.boolean().optional(),
+      startOffsetUtf16: z.number().int().min(0).optional(),
+      endOffsetUtf16: z.number().int().min(0).optional(),
+      revisionImpact: z.object({
+        empty: z.boolean().optional(),
+        nextCursor: z.string().optional(),
+        items: z.array(z.object({
+          unitId: z.string().min(1),
+          unitRevision: z.number().int().optional(),
+          rows: z.array(z.object({
+            panelId: z.string().nullable(),
+            targetKind: z.string().optional(),
+            changeClassification: z.string().nullable(),
+          })),
+        })),
+      }).optional(),
     },
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
@@ -5312,6 +5452,9 @@ registrar.registerTool(
     scriptRevisionId,
     panelCount,
     includeBody,
+    startOffsetUtf16,
+    endOffsetUtf16,
+    revisionImpact,
   }) => {
     try {
       await inspectManagedProject(projectRoot);
@@ -5355,6 +5498,31 @@ registrar.registerTool(
             ...(documentId ? { documentId } : {}),
             ...(revisionId ? { revisionId } : {}),
           }),
+        );
+      }
+      if (operation === "ssl5-missing-to-gen-plan") {
+        return managedStudioResult(
+          await planSsl5MissingToGen(projectRoot, {
+            season,
+            episode,
+            ...(documentId ? { documentId } : {}),
+            ...(revisionImpact ? { revisionImpact } : {}),
+          }),
+        );
+      }
+      if (operation === "script-span-media-map") {
+        if (startOffsetUtf16 === undefined || endOffsetUtf16 === undefined) {
+          throw new Error("script-span-media-map 需要 startOffsetUtf16 与 endOffsetUtf16。");
+        }
+        const map = await getStudioEpisodeUnitMediaMap(projectRoot, {
+          season,
+          episode,
+          ...(limit !== undefined ? { limit } : {}),
+        });
+        return managedStudioResult(
+          await withSpanMediaConsistencyPeeks(
+            resolveScriptSpanMediaMap(map, { startOffsetUtf16, endOffsetUtf16 }),
+          ),
         );
       }
       if (operation === "episode-unit-media-map") {
@@ -5520,7 +5688,7 @@ registrar.registerTool(
   "get_studio_generation_control",
   {
     title: "读取 Codex 生成一致性控制封装",
-    description: "单一只读入口提供 session-snapshot、panel/unit-grid 的 readiness、pack、history、plan、call、active-runs、detached-unknown。session-snapshot 汇总当前宫格的剧本片段、BindingSet、参考角色、上一镜实际尾态、机位与最高风险，不返回本地路径；就绪、历史与未知态同样不返回本地路径，仅 pack 返回已重验逐格闭包、受管 media CAS 边界和文件 SHA-256 的 controlReferences.localPath。call 读取不会重新授权模型调用；active-runs 返回指定单元/宫格所有 run 的完整状态投影与恢复动作；detached-unknown 只投影防重证据，不导入候选。",
+    description: "单一只读入口提供 session-snapshot、panel/unit-grid 的 readiness、pack、history、plan、call、active-runs、detached-unknown。session-snapshot 汇总当前宫格的剧本片段、BindingSet、参考角色、上一镜实际尾态、冻结提示词前镜交接（previousStanding，只从该包 renderedPrompt 还原、不读 head）、冻结宫格光线/服装覆盖（frozenPanelLighting / frozenPanelCostume，无该行则为 null）、冻结镜头类型只读句（shotTypeLine，只从该包 renderedPrompt 或 pack.panel.shotType 还原、不读 head，无扩写/原镜则为 null）、冻结风格锁只读句（styleLockLine，只从该包 controlReferences/assets 的 category=style 还原、不读 head，无风格控制参考则为 null）、冻结 15s 节拍只读句（beatLine，只从该包 target.unitLocalStartSeconds/unitLocalEndSeconds/durationSeconds 还原、不读 head，无时长则为 null）、一致性四态 peek（consistencyPeek，按当前宫格 newest-first 结果 run 或整板 latest run 只读 LRU；未评估 ≠ 无法检查；不进 fingerprint；不 evaluate 像素；机器不自动 Review PASS）、写租约只读 peek（writeLease，held/holderId/denialHint/line；经 withStudioProjectWriteLease 读 ReadOnly；不暴露 token；不进 fingerprint；不改 nextAction；失败关闭为未持有；不抢租约、不派发）、六图闸只读 peek（checkpoint，newSlotDispatchAllowed/blockingBatchNumber/line；动态 import 首屏 DashboardGate；不进 fingerprint；不改 nextAction；失败关闭为未放行；不执行停检、不派发）、create-plan 只读草稿（generationPlanDraft，有 query.panelId 只认该格已落盘单镜包；无 panelId 只认该单元已落盘 unit-grid pack，禁止猜第一格，禁止用 readiness 候选；账本已有对应 plan 则 ready=false、按节点状态写 dispatch/wait/retry/Review；驾驶舱 nextAction 已是 wait/retry/Review/对账时单镜/整板草稿不得再 ready；未冻结/未落盘 blocked，不进 fingerprint，不执行、不派发）、pack 的 agentExecution.generationPlanDraft（已落盘 pack 起草：单镜 {unitId,panelId}，整板 {targetKind:unit-grid,unitId}；禁止用 readiness 候选 pack；单镜 pack 若同单元 unit-grid 已在途/待重试/待审则草稿不得再 ready，next 跟 wait/retry/Review；不加 inspect；不执行、不派发）、跨单元场景/道具/角色回指（sceneMentions / sceneBackReferences / sceneBackReferenceNote / propMentions / propBackReferences / propBackReferenceNote / characterMentions / characterBackReferences / characterBackReferenceNote，只读生产库快照提及、不读 head、不是 BindingSet；无提及或无更早则空数组，缺库失败关闭为空且不建库）、机位与最高风险，不返回本地路径；就绪、历史与未知态同样不返回本地路径，仅 pack 返回已重验逐格闭包、受管 media CAS 边界和文件 SHA-256 的 controlReferences.localPath。call 读取不会重新授权模型调用；active-runs 返回指定单元/宫格所有 run 的完整状态投影、恢复动作与 envelope nextAction（本槽 unknown→对账、未审→Review、在途→wait；单镜另看同单元 unit-grid 在途则 wait/retry/Review；空槽 follow-core-readiness；generationBlocked 仍只认本槽 blockingRuns；不执行、不派发）；plan 信封 nextAction（按 planId/单元查：dispatched→wait、failed/cancelled→retry、planned→dispatch、全 succeeded→Review；无计划→create-plan；未限定列表或 not_found→follow-core-readiness；已取回 revisionImpact 且目标 unexpected 则改 Review unexpected revision impact；省略不自动查；不执行、不派发）；history 信封 nextAction（只看本页 items：未成对→wait、成对 pending→Review、成对 rejected→retry、空页/全 approved→follow-core-readiness；要看最新请 newest-first；不执行、不派发、不自动 Review PASS）；history 信封 consistencyPeek（本页优先成对 run 只读 LRU；未评估 ≠ 无法检查；不 evaluate 像素；机器不自动 Review PASS）；detached-unknown 只投影防重证据，不导入候选。readiness/plan 可传入调用方已取回的 revisionImpact，只精炼 next；省略不查；不改 freeze writeCommand。",
     inputSchema: {
       projectRoot: managedStudioProjectRootSchema,
       query: studioGenerationControlQuerySchema,
@@ -6094,7 +6262,7 @@ registrar.registerTool(
   },
   async ({ projectRoot, episode, limit }) => {
     try {
-      const media = await listEditMedia(projectRoot, episode);
+      const media = await withEditor((editor) => editor.listEditMedia(projectRoot, episode));
       return textResult({ total: media.length, media: media.slice(0, limit) });
     } catch (error) { return toolError(error); }
   },
@@ -6109,7 +6277,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   },
   async ({ projectRoot, artifactId }) => {
-    try { return textResult(await prepareEditMediaPreview(projectRoot, artifactId)); }
+    try { return textResult(await withEditor((editor) => editor.prepareEditMediaPreview(projectRoot, artifactId))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6123,7 +6291,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   },
   async ({ projectRoot, artifactId }) => {
-    try { return textResult(await prepareEditMediaProxy(projectRoot, artifactId)); }
+    try { return textResult(await withEditor((editor) => editor.prepareEditMediaProxy(projectRoot, artifactId))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6137,7 +6305,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
   async ({ projectRoot, editProjectId, expectedRevision, outputDirectory }) => {
-    try { return textResult(await startEditRender(projectRoot, editProjectId, { expectedRevision, outputDirectory })); }
+    try { return textResult(await withEditor((editor) => editor.startEditRender(projectRoot, editProjectId, { expectedRevision, outputDirectory }))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6151,7 +6319,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
   async ({ projectRoot, renderId }) => {
-    try { return textResult(await getEditRenderJob(projectRoot, renderId)); }
+    try { return textResult(await withEditor((editor) => editor.getEditRenderJob(projectRoot, renderId))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6165,7 +6333,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   },
   async ({ projectRoot, renderId }) => {
-    try { return textResult(await cancelEditRender(projectRoot, renderId)); }
+    try { return textResult(await withEditor((editor) => editor.cancelEditRender(projectRoot, renderId))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6179,7 +6347,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
   async ({ projectRoot, limit }) => {
-    try { return textResult((await listEditRenderJobs(projectRoot)).slice(0, limit)); }
+    try { return textResult((await withEditor((editor) => editor.listEditRenderJobs(projectRoot))).slice(0, limit)); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6193,7 +6361,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
   async ({ projectRoot, editProjectId, expectedRevision, timeSeconds, itemId, registerAsEndFrame, registerVariant }) => {
-    try { return textResult(await extractTimelineFrame(projectRoot, { editProjectId, expectedRevision, timeSeconds, itemId, registerAsEndFrame, registerVariant })); }
+    try { return textResult(await withEditor((editor) => editor.extractTimelineFrame(projectRoot, { editProjectId, expectedRevision, timeSeconds, itemId, registerAsEndFrame, registerVariant }))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6221,7 +6389,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
   async ({ projectRoot, editProjectId, limit }) => {
-    try { return textResult(await listTimelineFrameExtractions(projectRoot, editProjectId, limit)); }
+    try { return textResult(await withEditor((editor) => editor.listTimelineFrameExtractions(projectRoot, editProjectId, limit))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6235,7 +6403,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
   async ({ projectRoot, itemId, artifactId, videoPath }) => {
-    try { return textResult(await extractLastFrame(projectRoot, { itemId, artifactId, videoPath })); }
+    try { return textResult(await withEditor((editor) => editor.extractLastFrame(projectRoot, { itemId, artifactId, videoPath }))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6249,7 +6417,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   },
   async ({ projectRoot, itemId, sourceVideoPath, lastFramePath, prompt }) => {
-    try { return textResult(await createVideoContinuationPack(projectRoot, { itemId, sourceVideoPath, lastFramePath, prompt })); }
+    try { return textResult(await withEditor((editor) => editor.createVideoContinuationPack(projectRoot, { itemId, sourceVideoPath, lastFramePath, prompt }))); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6263,7 +6431,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
   async ({ projectRoot, itemId, limit }) => {
-    try { return textResult((await listVideoContinuationPacks(projectRoot, itemId)).slice(0, limit)); }
+    try { return textResult((await withEditor((editor) => editor.listVideoContinuationPacks(projectRoot, itemId))).slice(0, limit)); }
     catch (error) { return toolError(error); }
   },
 );
@@ -6283,7 +6451,7 @@ registrar.registerTool(
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   },
   async ({ projectRoot, continuationId, expectedRevision, status, error }) => {
-    try { return textResult(await updateVideoContinuationPack(projectRoot, continuationId, { expectedRevision, status, error })); }
+    try { return textResult(await withEditor((editor) => editor.updateVideoContinuationPack(projectRoot, continuationId, { expectedRevision, status, error }))); }
     catch (cause) { return toolError(cause); }
   },
 );
@@ -6407,7 +6575,7 @@ server.registerResource(
   { title: "剪辑工程", description: "读取剪辑工程修订、轨道和片段；片段数量受资源预算限制。", mimeType: "application/json" },
   async (uri, variables) => {
     const project = await resolveProjectById(String(variables.projectId ?? ""));
-    const edit = await getEditProject(project.primaryRoot, String(variables.editProjectId ?? ""));
+    const edit = await withEditor((editor) => editor.getEditProject(project.primaryRoot, String(variables.editProjectId ?? "")));
     let remaining = 500;
     return jsonResource(uri, { ...edit, tracks: edit.tracks.map((track) => { const clips = track.clips.slice(0, Math.max(0, remaining)); remaining -= clips.length; return { ...track, clips, clipsTruncated: clips.length < track.clips.length }; }), totalClips: edit.tracks.reduce((sum, track) => sum + track.clips.length, 0) });
   },
@@ -6471,15 +6639,16 @@ server.registerPrompt(
       "1) get_managed_studio_overview → project.id",
       "2) get_studio_production_dashboard(operation=overview|units|assets|queue)",
       "3) get_studio_binding_control / get_studio_generation_control(operation=readiness) 取已锁定人物·场景·道具与提示词锁",
+      "3b) 若已取回 get_studio_trace(operation=script-revision-impact)，把该页作为 get_studio_script_library_projection(operation=ssl5-missing-to-gen-plan) 与 get_studio_generation_control(operation=readiness|plan) 的 revisionImpact 传入；未取回不要为了这些读面去查",
       "4) 未锁定/歧义/未命中 → 停止并请用户确认，禁止偷选第一候选",
       "",
       "写入（仅 execute_command，带稳定 requestId/idempotencyKey）：",
       "5) freeze_studio_generation_pack（generation-ready 且 revision 匹配）；unit-grid 必须显式 targetKind=unit-grid",
-      `6) create_studio_generation_plan → dispatch_studio_generation_pack(provider=${provider})；unit-grid 真正调用模型前必须 prepare_studio_imagegen_call`,
+      `6) create_studio_generation_plan → get_studio_generation_control(operation=plan) 看 envelope nextAction；wait/retry/Review 时禁止 dispatch；仅 planned 才 dispatch_studio_generation_pack(provider=${provider})；若已取回 script-revision-impact，create-plan/dispatch 须带同一 revisionImpact（unexpected 则写路径拒绝）；未取回不要为了写命令去查；unit-grid 真正调用模型前必须 prepare_studio_imagegen_call`,
       "7) 仅首次 prepare 返回 callAllowed=true 时允许调用一次 imagegen；候选与回执只能写返回的 quarantine 精确路径；重放/恢复 callAllowed=false，必须先对账，禁止再次调用",
       "8) execute_command(commit_agent_imagegen_result_bundle)：必填活动 projectContextToken/provider/raw SHA/executionReceipt.callId，本地派生 labeled 并原子成对登记",
       "   Grok live source=grok-build-imagine，必须提交一次工具调用直观测字段与 quarantine 回执文件；cryptographicProviderReceipt=false，不得冒充供应商签名回执",
-      "9) get_studio_generation_control(call|detached-unknown|history|pack) 对账调用与结果身份 → 交给 Review/连续性门",
+      "9) get_studio_generation_control(history order=newest-first|call|detached-unknown|pack) 看 envelope nextAction 与 consistencyPeek 对账调用与结果身份；Review 时禁止再 dispatch，交给 Review/连续性门",
       "",
       "禁止：第二套库、自动绑定偷选、浏览器/Artlist 供应链、把机械 pass 当视觉通过、覆盖权威素材。",
     ].filter(Boolean).join("\n"));

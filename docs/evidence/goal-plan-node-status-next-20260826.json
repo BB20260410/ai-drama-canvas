@@ -1,0 +1,54 @@
+{
+  "id": "goal-plan-node-status-next-20260826",
+  "kind": "create-plan-draft-refine-by-plan-node-status",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T22:11:00.000Z",
+  "scope": "composeStudioGenerationPlanDraft accepts optional persistedPlanStatus. hasPersistedPlan without status keeps the existing dispatch copy (toEqual compatible). With status: planned→dispatch, dispatched→wait, failed/cancelled→retry, succeeded→Review. dispatch stays false; nodes are kept. Thin readonly readers derive status from the latest dispatch on the plan node packId, then raw+labeled results, then the latest run event. retry-superseded maps to planned. Unit-grid hasPlan still uses plan_node_targets only; missing plan_nodes row is planned. SSL-5 refines only the focus missing panel via one readPersistedPanelPlanState open. session-snapshot uses panel or unit-grid state. Generation control maps already-loaded progress.nodes status (no extra IPC). Pack envelope next branches on the same status. Does not change earliest or dashboard nextAction. Does not execute create_studio_generation_plan, dispatch, retry, or Review. schemaVersion stays 1.",
+  "invariants": {
+    "ssl5SchemaVersionUnchanged": 1,
+    "sessionSnapshotSchemaVersionUnchanged": 1,
+    "ssl5StillPanelOnly": true,
+    "onlyFocusPanelRefined": true,
+    "unitGridHasPlanStillTargetsOnly": true,
+    "noStatusKeepsDispatchCopy": true,
+    "retrySupersededMapsToPlanned": true,
+    "readonlyOpen": true,
+    "doesNotExecuteCreatePlan": true,
+    "doesNotDispatch": true,
+    "doesNotRetry": true,
+    "doesNotChangeEarliest": true,
+    "doesNotChangeDashboardNextAction": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-episode-earliest-plan-refine.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/studio-unit-grid-next-action.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/script-media-align-view.test.ts"
+      ],
+      "result": "8 files / 67 tests PASS"
+    },
+    "commit": "80bb401"
+  },
+  "notClaimed": [
+    "create_studio_generation_plan executed",
+    "dispatch executed",
+    "retry_studio_generation_plan_nodes executed",
+    "Review executed",
+    "earliest refined by node status",
+    "dashboard nextAction refined by node status",
+    "SSL-5 one-click generation closed",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

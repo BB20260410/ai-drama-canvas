@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "5-C",
+  "recordedAt": "2026-08-25T16:52:00Z",
+  "change": {
+    "gate": "src/core/studio-thumbnail-derivation-limit.ts",
+    "concurrency": 4,
+    "wrap": "src/core/material-studio.ts#materializeThumbnail source sharp(objectPath)",
+    "thumbnailRecipeUnchanged": "material-studio-thumb:v1:autorotate:inside-512:no-enlarge:webp-q82",
+    "recipeKeyAlgorithmUnchanged": "sha256(`${THUMBNAIL_RECIPE}\\0${mediaSha256}`)",
+    "canvasUiQueueUnchanged": 2
+  },
+  "tests": [
+    "tests/runtime-perf-wave5c-thumbnail-derivation-limit.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "sourceContractAndOwnerTests": { "passed": 3, "platform": "linux", "files": 1 }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W5-C：源图缩略派生（sharp 解码 objectPath 再 512 WebP）经 studioThumbnailDerivationGate 全进程并发上限 4，与 15 秒向导 / projection reader 同级。未改 THUMBNAIL_RECIPE / recipeKey / 512+q82。未预扫 CAS。",
+  "residual": [
+    "画布 scheduleStudioThumbnailDerivation 仍是 LatestBoundedTaskQueue(2)，比 core 闸更紧；未改成 4",
+    "已有缩略图 metadata 探测不进闸；视频/音频 prepareStudioMediaDerivatives 不进本闸",
+    "ensureStudioImageThumbnail 恢复前仍会 sha256File 源对象（W5-D 才收 serving 全 SHA）",
+    "非 thumb 仍整文件读入；带 sha 的 legacy thumb 仍流式读源（W5-B 残差）",
+    "W4-A/D/F 与 W5-A 残差仍在；禁止写成「已优化缩略指纹」或「thumb 永不读源文件」"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "goal-ssl5-earliest-blocking-next-20260826",
+  "kind": "ssl5-align-earliest-blocking-next",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T22:23:00.000Z",
+  "scope": "ScriptMediaAlignBoard copies earliest slot code/label (schemaVersion stays 1). SSL-5 refineSsl5FocusIfEarliestBlocking runs after panel persist refine. When focusUnitId===earliestUnitId and earliestCode is wait-or-reconcile-unit-grid-run / retry-unit-grid-plan-nodes / submit-unit-grid-review / reconcile-unit-grid-call, draft stays ready=false dispatch=false, recommendedPath is wait|retry|review (reconcile folds to wait). freeze/create-plan/dispatch codes and focus!==earliest keep panel-only create-plan. Align banner ssl5-earliest-next follows blockedReason. Director ssl5-plan says next follows earliest. Does not import studio-episode-earliest. Does not execute create-plan, dispatch, retry, or Review.",
+  "invariants": {
+    "alignSchemaVersionUnchanged": 1,
+    "ssl5SchemaVersionUnchanged": 1,
+    "panelOnlyDraft": true,
+    "noSecondEarliestCall": true,
+    "noSsl5ImportOfEpisodeEarliest": true,
+    "persistThenEarliestWaitWins": true,
+    "focusNotEarliestUnchanged": true,
+    "doesNotExecuteCreatePlan": true,
+    "doesNotDispatch": true,
+    "doesNotRetry": true,
+    "doesNotChangeT5": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/use-virtual-list-lru-hotkeys.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts"
+      ],
+      "result": "8 files / 53 tests PASS"
+    },
+    "commit": "4a59a4a"
+  },
+  "notClaimed": [
+    "create_studio_generation_plan executed",
+    "dispatch executed",
+    "retry executed",
+    "Review executed",
+    "T5 continuous generation remapped",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

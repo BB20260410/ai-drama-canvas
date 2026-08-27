@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "2-bundle-approved-bound",
+  "recordedAt": "2026-08-25T17:51:00Z",
+  "change": {
+    "kind": "source",
+    "files": [
+      "src/core/studio-approved-timeline-projection.ts",
+      "src/core/studio-production-projection-bundle.ts",
+      "src/core/studio-multimedia-timeline.ts"
+    ],
+    "helper": "resolveProjectionBundleApprovedTimelineUnitIds",
+    "phaseNameUnchanged": "timeline-approved-neighbors",
+    "bundleBound": "current + predecessor + successor, max 3, fail-closed empty",
+    "multimediaBound": "approvedStoryboardProjection unitIds=[snapshot.unit.id]"
+  },
+  "tests": [
+    "tests/runtime-perf-wave2-bundle-approved-bound.test.ts",
+    "tests/runtime-perf-wave2c-bounded-projection.test.ts",
+    "tests/source-module-boundaries.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "directedLinux": { "passed": 19, "files": 3, "platform": "linux" },
+    "p7OwnerFixture": "NOT_RUN Darwin dirfd",
+    "installedT23": "NOT_RUN",
+    "bundleOwnerFixture": "NOT_RUN Darwin dirfd"
+  },
+  "reviews": {
+    "implementation": "PASS: T23 phase set unchanged; helper fail-closed including blank current unitId even if neighbors exist; approved after neighbor maps; no T23 SQL / recipe / dashboard owner edit",
+    "redline": "PASS: no official scan; no ledger write; no GUI; no command-bus split; no N124; no P0-P14 rebuild"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "驾驶舱当前单元路径不再省略 unitIds 物化整集：bundle 最多当前+前后邻；多媒体 storyboard 只请求当前单元。阶段名仍是 timeline-approved-neighbors。未跑安装版 T23 / P7 owner。",
+  "residual": [
+    "earliest / diagnostics 省略 unitIds 仍整集（需要全序 / 集级 rollup）",
+    "P7 owner 有界对照仍需 Darwin",
+    "安装版 T23 未跑，禁止写成「T23 已复测不回退」",
+    "列表翻页探针未跑",
+    "禁止写成「运行速度已关账」或「展示 36 单元已证明不物化 2500」"
+  ]
+}

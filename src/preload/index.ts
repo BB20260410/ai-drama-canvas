@@ -290,7 +290,7 @@ const api = {
   ): ReturnType<typeof import("../core/studio-generation-ledger.js").getStudioDetachedGenerationUnknownUnitStates> =>
     ipcRenderer.invoke("canvas:get-studio-detached-unknown-unit-states", projectRoot, unitIds),
     // T9 批量时间线投影
-    getApprovedTimelineProjection: (projectRoot: string, query: { season?: string; episode?: string; fastMode?: boolean }): Promise<import("../core/studio-approved-timeline-projection.js").ApprovedTimelineProjection> =>
+    getApprovedTimelineProjection: (projectRoot: string, query: { season?: string; episode?: string; fastMode?: boolean; unitIds?: string[]; limit?: number }): Promise<import("../core/studio-approved-timeline-projection.js").ApprovedTimelineProjection> =>
       t23IpcPerformanceProbe.invoke("canvas:get-approved-timeline-projection", projectRoot, query),
     // T19 持续生图状态机
     getContinuousGenerationState: (projectRoot: string, input: { season?: string; episode?: string }): Promise<import("../core/studio-continuous-generation-state.js").ContinuousGenerationStateProjection> => ipcRenderer.invoke("canvas:get-continuous-generation-state", projectRoot, input),
@@ -341,8 +341,28 @@ const api = {
   // P24：追溯只读通道（规范 §2.3）。
   getStudioFrozenPack: (projectRoot: string, packId: string): ReturnType<typeof import("../core/studio-generation-ledger.js").readAnyStudioGenerationFrozenPack> =>
     t23IpcPerformanceProbe.invoke("canvas:get-studio-frozen-pack", projectRoot, packId),
+  getStudioUnitLockOverlays: (
+    projectRoot: string,
+    query: { unitId: string; unitRevision: number },
+  ): Promise<import("../core/studio-unit-lock-overlays-read.js").StudioUnitLockOverlayReadResult> =>
+    ipcRenderer.invoke("canvas:get-studio-unit-lock-overlays", projectRoot, query),
+  getStudioSceneBackReferences: (
+    projectRoot: string,
+    query: import("../core/studio-scene-backrefs-read.js").StudioSceneBackrefReadQuery,
+  ): Promise<import("../core/studio-scene-backrefs-read.js").StudioSceneBackrefReadResult> =>
+    ipcRenderer.invoke("canvas:get-studio-scene-backrefs", projectRoot, query),
   getStudioPackCurrentness: (projectRoot: string, packId: string): Promise<import("../core/studio-trace.js").StudioGenerationPackCurrentness> =>
     t23IpcPerformanceProbe.invoke("canvas:get-studio-pack-currentness", projectRoot, packId),
+  getStudioTrace: (
+    projectRoot: string,
+    selector: { packId?: string; runId?: string; resultId?: string },
+  ): Promise<import("../core/studio-trace.js").StudioGenerationTrace> =>
+    t23IpcPerformanceProbe.invoke("canvas:get-studio-trace", projectRoot, selector),
+  getStudioScriptRevisionImpact: (
+    projectRoot: string,
+    query: { scriptRevisionId: string; limit?: number; cursor?: string },
+  ): Promise<import("../core/studio-trace.js").StudioScriptRevisionImpactPage> =>
+    t23IpcPerformanceProbe.invoke("canvas:get-studio-script-revision-impact", projectRoot, query),
   listStudioTextRevisions: (projectRoot: string, query: { documentId: string; limit?: number; cursor?: string }): ReturnType<typeof import("../core/studio-production.js").listStudioTextRevisions> => ipcRenderer.invoke("canvas:list-studio-text-revisions", projectRoot, query),
   getStudioProductionDashboard: (projectRoot: string, query: import("../core/studio-production-dashboard.js").StudioProductionDashboardQuery): ReturnType<typeof import("../core/studio-production-dashboard.js").getStudioProductionDashboard> =>
     t23IpcPerformanceProbe.invoke("canvas:get-studio-production-dashboard", projectRoot, query),
@@ -371,6 +391,22 @@ const api = {
     query: { season: string; episode: string; documentId?: string; revisionId?: string; evidenceDir?: string },
   ): ReturnType<typeof import("../core/studio-script-media-align.js").getStudioScriptMediaAlignBoard> =>
     ipcRenderer.invoke("canvas:get-studio-script-media-align-board", projectRoot, query),
+  getStudioScriptSpanMediaMap: (
+    projectRoot: string,
+    query: { season: string; episode: string; startOffsetUtf16: number; endOffsetUtf16: number; limit?: number },
+  ): ReturnType<typeof import("../core/studio-script-library-projection.js").getStudioScriptSpanMediaMap> =>
+    ipcRenderer.invoke("canvas:get-studio-script-span-media-map", projectRoot, query),
+  planSsl5MissingToGen: (
+    projectRoot: string,
+    query: {
+      season: string;
+      episode: string;
+      documentId?: string;
+      evidenceDir?: string;
+      revisionImpact?: import("../core/studio-generation-plan-draft.js").Ssl5RevisionImpactHint;
+    },
+  ): ReturnType<typeof import("../core/studio-ssl5-missing-to-gen.js").planSsl5MissingToGen> =>
+    ipcRenderer.invoke("canvas:plan-ssl5-missing-to-gen", projectRoot, query),
   getStudioScriptLibraryIndex: (
     projectRoot: string,
     query: { limit?: number; kind?: "script" | "prompt" } = {},

@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { lstat, mkdir, readdir, rename, rm, stat } from "node:fs/promises";
 import path from "node:path";
-import sharp from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 
 /**
  * 旧生产画布节点缩略图（P18）。
@@ -17,6 +17,11 @@ import sharp from "sharp";
 
 const LEGACY_THUMBNAIL_MAX_EDGE = 512;
 const LEGACY_THUMBNAIL_WEBP_QUALITY = 82;
+/** 1×1 透明 WebP。thumb=1 失败时占位，禁止把 4K 原图 bytes 回退给 <img>。 */
+export const LEGACY_THUMBNAIL_PLACEHOLDER_WEBP = Buffer.from(
+  "UklGRkAAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAIAAAAQAFZQOCAYAAAAMAEAnQEqAQABAAzAziWkAANwAP7sZwAA",
+  "base64",
+);
 /** F-10（main 审查）：缓存总量上限——超出时按 mtime 最旧先淘汰（保守方向：多淘汰不漏可用项，漏网项会懒重生成）。 */
 const LEGACY_THUMBNAIL_CACHE_MAX_ENTRIES = 2_000;
 
@@ -61,7 +66,7 @@ async function existingThumbnail(target: string): Promise<LegacyThumbnailResult 
   try {
     const existing = await lstat(target);
     if (existing.isFile() && !existing.isSymbolicLink()) {
-      const metadata = await sharp(target, { failOn: "error" }).metadata();
+      const metadata = await (await loadSharpDefault())(target, { failOn: "error" }).metadata();
       if (metadata.width && metadata.height && metadata.format === "webp") {
         return { path: target, width: metadata.width, height: metadata.height };
       }
@@ -86,7 +91,7 @@ export async function resolveLegacyThumbnailFromBytes(
     await mkdir(cacheRoot, { recursive: true });
     const temporary = path.join(cacheRoot, `.${key}.${randomUUID()}.tmp.webp`);
     try {
-      const result = await sharp(bytes, { failOn: "error" })
+      const result = await (await loadSharpDefault())(bytes, { failOn: "error" })
         .rotate()
         .resize({ width: LEGACY_THUMBNAIL_MAX_EDGE, height: LEGACY_THUMBNAIL_MAX_EDGE, fit: "inside", withoutEnlargement: true })
         .webp({ quality: LEGACY_THUMBNAIL_WEBP_QUALITY })
@@ -105,7 +110,7 @@ export async function resolveLegacyThumbnailFromBytes(
   }
 }
 
-/** 返回可用缩略图；源不可读、非普通文件、不可解码或缓存目录不可写时返回 null（调用方回退原图）。 */
+/** 返回可用缩略图；源不可读、非普通文件、不可解码或缓存目录不可写时返回 null（调用方占位，不回退原图 bytes）。 */
 export async function resolveLegacyThumbnail(cacheRoot: string, absolutePath: string): Promise<LegacyThumbnailResult | null> {
   let sourceStats: Awaited<ReturnType<typeof stat>>;
   try {
@@ -119,11 +124,11 @@ export async function resolveLegacyThumbnail(cacheRoot: string, absolutePath: st
   const existing = await existingThumbnail(target);
   if (existing) return existing;
   try {
-    // mkdir 必须在 try 内：缓存目录不可写时返回 null 回退原图，绝不让 thumb 请求变成 404 破图。
+    // mkdir 必须在 try 内：缓存目录不可写时返回 null，由协议回占位 WebP，绝不回退 4K 原图 bytes。
     await mkdir(cacheRoot, { recursive: true });
     const temporary = path.join(cacheRoot, `.${key}.${randomUUID()}.tmp.webp`);
     try {
-      const result = await sharp(absolutePath, { failOn: "error" })
+      const result = await (await loadSharpDefault())(absolutePath, { failOn: "error" })
         .rotate()
         .resize({ width: LEGACY_THUMBNAIL_MAX_EDGE, height: LEGACY_THUMBNAIL_MAX_EDGE, fit: "inside", withoutEnlargement: true })
         .webp({ quality: LEGACY_THUMBNAIL_WEBP_QUALITY })

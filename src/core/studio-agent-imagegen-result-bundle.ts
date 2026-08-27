@@ -8,7 +8,8 @@ import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { lstat, readFile, realpath } from "node:fs/promises";
 import path from "node:path";
-import sharp, { type Metadata } from "sharp";
+import type { Metadata } from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import {
   assertActiveManagedStudioContextToken,
   type ActiveManagedStudioContext,
@@ -46,7 +47,7 @@ import {
   renderStudioUnitGridLabeledLayoutToBuffer,
 } from "./studio-labeled-layout.js";
 import { assertStudioImagegenCandidatePathAllowed } from "./studio-imagegen-candidate-gate.js";
-import { assertNoActiveStudioHiggsfieldConnectorReservation } from "./studio-higgsfield-connector-queue.js";
+import { withHiggsfieldQueue } from "./studio-higgsfield-lazy.js";
 import { inspectManagedProjectReadOnly } from "./managed-project.js";
 import {
   ensureConfinedDirectory,
@@ -469,7 +470,7 @@ async function inspectRaw(
   }
   let metadata: Metadata;
   try {
-    metadata = await sharp(canonicalPath, { failOn: "error", limitInputPixels: 100_000_000 }).rotate().metadata();
+    metadata = await (await loadSharpDefault())(canonicalPath, { failOn: "error", limitInputPixels: 100_000_000 }).rotate().metadata();
   } catch (error) {
     fail("raw-decode-failed", "raw 图像无法完整解码。", [error instanceof Error ? error.message : String(error)]);
   }
@@ -1086,7 +1087,7 @@ export async function commitAgentImagegenResultBundle(
     fail("invalid-input", "expectedRevision 必须是正整数。");
   }
   // Direct callers must fail before raw inspection, labeled render, material CAS or writeback receipt work.
-  await assertNoActiveStudioHiggsfieldConnectorReservation(projectRoot, generationRunId);
+  await withHiggsfieldQueue((queue) => queue.assertNoActiveStudioHiggsfieldConnectorReservation(projectRoot, generationRunId));
   const context = await assertActiveManagedStudioContextToken(projectRoot, input.projectContextToken);
   const executionReceipt = normalizeExecutionReceipt(input.executionReceipt, input.provider);
   const verified = await verifyPackAndDispatch({

@@ -6,7 +6,7 @@ export function assetUrl(filePath?: string, expectedSha256?: string): string {
   return `aicanvas-asset://file/?path=${encodeURIComponent(filePath)}${sha}`;
 }
 
-/** 旧画布节点缩略图 URL：主进程懒生成 512px WebP 并缓存，失败时回退原图。 */
+/** 旧画布节点缩略图 URL：主进程懒生成 512px WebP 并缓存，失败时协议回占位图，不回退原图。 */
 export function assetThumbnailUrl(filePath?: string): string {
   if (!filePath) return "";
   return `aicanvas-asset://file/?path=${encodeURIComponent(filePath)}&thumb=1`;

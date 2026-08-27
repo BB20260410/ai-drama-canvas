@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { linkSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -63,6 +63,16 @@ describe("SQLite sidecar 绑定竞态", () => {
     const outside = path.join(path.dirname(databasePath), "outside-shm-target");
     writeFileSync(outside, "attacker-controlled");
     symlinkSync(outside, `${databasePath}-shm`);
+    expect(() => assertSafeSqliteSidecars(databasePath, "竞态测试 ledger"))
+      .toThrow(/not a safe single-link regular file/);
+  });
+
+  it("硬链接 sidecar 立即失败关闭，不把多链接当瞬态 inode 竞态", () => {
+    const databasePath = tempDb();
+    const shmPath = `${databasePath}-shm`;
+    const hardPath = path.join(path.dirname(databasePath), "ledger.sqlite-shm.hard");
+    writeFileSync(shmPath, "shm-hard");
+    linkSync(shmPath, hardPath);
     expect(() => assertSafeSqliteSidecars(databasePath, "竞态测试 ledger"))
       .toThrow(/not a safe single-link regular file/);
   });

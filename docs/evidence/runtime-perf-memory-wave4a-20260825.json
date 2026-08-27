@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "4-A",
+  "recordedAt": "2026-08-25T15:20:00Z",
+  "change": {
+    "loader": "src/core/editor-lazy.ts",
+    "withEditorUsedBy": [
+      "src/mcp/server.ts",
+      "src/main/index.ts",
+      "src/core/command-bus.ts",
+      "src/core/codex.ts",
+      "src/core/production.ts"
+    ],
+    "commandBusWritePathUnmoved": true,
+    "keyframeCurveStillStaticInMcpZod": true
+  },
+  "tests": [
+    "tests/runtime-perf-wave4a-editor-lazy-import.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "sourceContractTests": { "passed": 2, "platform": "linux" }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W4-A：editor.js（含 OTIO）改为 withEditor 动态 import。未搬家 command-bus 写命令。MCP Zod 仍静态拉 keyframe-curve（小模块）。"
+}

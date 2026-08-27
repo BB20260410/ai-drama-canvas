@@ -26,10 +26,11 @@
       <div v-if="!progress || progress.nodes.length === 0" class="plans-empty" data-testid="generation-plan-empty-guide">
         <strong>尚无生成计划</strong>
         <p>步骤：① 绑定就绪 → ② 冻结/建计划 → ③ 派发生图 → ④ 回写 → ⑤ 审片。在画布选中宫格点「开始」，或由 Agent 经 MCP 建立计划；进度只来自本地账本。</p>
+        <p data-testid="studio-generation-plan-next">{{ planEnvelopeNextLabel([]) }}</p>
       </div>
       <article v-for="(group, groupIndex) in planGroups" :key="group.planId" class="plan-group" :data-plan-id="group.planId">
         <header>
-          <small>第 {{ groupIndex + 1 }} 批 · {{ group.nodes.length }} 个任务<template v-if="group.lastActivityAt"> · 最近活动 {{ group.lastActivityAt }}</template></small>
+          <small>第 {{ groupIndex + 1 }} 批 · {{ group.nodes.length }} 个任务<template v-if="group.lastActivityAt"> · 最近活动 {{ group.lastActivityAt }}</template> · <span data-testid="studio-generation-plan-next">{{ planEnvelopeNextLabel(group.nodes.map((node) => node.status)) }}</span></small>
           <button
             v-if="group.retriable"
             type="button"
@@ -120,6 +121,125 @@
             <strong v-else :class="detail.selectedPanel.generation.status">{{ generationStatusLabel(detail.selectedPanel.generation.status) }}</strong>
             <p v-if="historyTargetKind === 'unit-grid'">整板身份来自 unit-grid 计划或正式结果绑定的不可变生成包；不会借用第一格作为整板身份。</p>
             <p v-else>{{ generationMessageText(detail.selectedPanel.generation) }}</p>
+            <p
+              v-if="frozenPackPreviousStandingLine"
+              class="previous-standing"
+              data-testid="studio-pack-previous-standing">
+              {{ frozenPackPreviousStandingLine }}
+            </p>
+            <p
+              v-if="frozenPackLightingLine"
+              class="previous-standing"
+              data-testid="studio-pack-lighting">
+              {{ frozenPackLightingLine }}
+            </p>
+            <p
+              v-if="frozenPackCostumeLine"
+              class="previous-standing"
+              data-testid="studio-pack-costume">
+              {{ frozenPackCostumeLine }}
+            </p>
+            <p
+              v-if="lockLightingLine"
+              class="previous-standing"
+              data-testid="studio-lock-lighting">
+              {{ lockLightingLine }}
+            </p>
+            <p
+              v-if="lockCostumeLine"
+              class="previous-standing"
+              data-testid="studio-lock-costume">
+              {{ lockCostumeLine }}
+            </p>
+            <p
+              v-if="lightingCostumeSource === 'unit-lock' && !lockLightingLine && !lockCostumeLine"
+              class="previous-standing"
+              data-testid="studio-lock-empty">
+              锁版未记光线/服装。不是 BindingSet，不能当 generation-ready。
+            </p>
+            <p
+              v-if="controlShotTypeLine"
+              class="previous-standing"
+              data-testid="studio-control-shot-type">
+              {{ controlShotTypeLine }}
+            </p>
+            <p
+              v-if="frozenPackStyleLockLine"
+              class="previous-standing"
+              data-testid="studio-pack-style-lock">
+              {{ frozenPackStyleLockLine }}
+            </p>
+            <p
+              v-if="lockStyleLockLine"
+              class="previous-standing"
+              data-testid="studio-lock-style-lock">
+              {{ lockStyleLockLine }}
+            </p>
+            <p
+              v-if="controlBeatLine"
+              class="previous-standing"
+              data-testid="studio-control-beat">
+              {{ controlBeatLine }}
+            </p>
+            <p
+              class="previous-standing"
+              data-testid="studio-generation-plan-draft">
+              {{ generationPlanDraft.ready ? "可建立计划（不派发）" : generationPlanDraft.blockedReason }}
+            </p>
+            <p
+              v-if="generationPlanDraft.ready"
+              class="previous-standing"
+              data-testid="studio-generation-plan-command">
+              {{ generationPlanDraft.command }}
+            </p>
+            <p
+              v-if="generationPlanDraft.ready && generationPlanDraft.nodes?.[0]"
+              class="previous-standing"
+              data-testid="studio-generation-plan-nodes">
+              {{ formatGenerationPlanDraftNode(generationPlanDraft.nodes[0]) }}
+            </p>
+            <p
+              v-if="controlSceneBackReferenceNote"
+              class="previous-standing"
+              data-testid="studio-control-scene-backrefs">
+              {{ controlSceneBackReferenceNote }}
+            </p>
+            <button
+              v-for="ref in controlSceneBackReferences"
+              :key="`${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+              type="button"
+              :data-testid="`studio-control-scene-backref-${ref.unitId}-${ref.panelId}`"
+              :disabled="loading"
+              @click="revealControlSceneBackRef(ref)"
+            >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
+            <p
+              v-if="controlPropBackReferenceNote"
+              class="previous-standing"
+              data-testid="studio-control-prop-backrefs">
+              {{ controlPropBackReferenceNote }}
+            </p>
+            <button
+              v-for="ref in controlPropBackReferences"
+              :key="`prop:${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+              type="button"
+              :data-testid="`studio-control-prop-backref-${ref.unitId}-${ref.panelId}`"
+              :disabled="loading"
+              @click="revealControlSceneBackRef(ref)"
+            >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
+            <p
+              v-if="controlCharacterBackReferenceNote"
+              class="previous-standing"
+              data-testid="studio-control-character-backrefs">
+              {{ controlCharacterBackReferenceNote }}
+            </p>
+            <button
+              v-for="ref in controlCharacterBackReferences"
+              :key="`char:${ref.unitId}:${ref.panelId}:${ref.assetId}`"
+              type="button"
+              :data-testid="`studio-control-character-backref-${ref.unitId}-${ref.panelId}`"
+              :disabled="loading"
+              @click="revealControlSceneBackRef(ref)"
+            >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
             <details v-if="historyTargetKind === 'panel' && isTechnicalGenerationMessage(detail.selectedPanel.generation.message)" class="technical-diagnostics">
               <summary data-testid="studio-generation-message-diagnostics">诊断详情</summary>
               <p><code>{{ detail.selectedPanel.generation.message }}</code></p>
@@ -139,11 +259,16 @@
                 </template>
                 <div><dt>连续性指纹</dt><dd><code>{{ shortHash(frozenPackIdentity.continuityFingerprint) }}</code></dd></div>
                 <div><dt>单元快照指纹</dt><dd><code>{{ shortHash(frozenPackIdentity.unitSnapshotFingerprint) }}</code></dd></div>
+                <div v-if="frozenPackPreviousStandingLine"><dt>前镜交接</dt><dd>{{ frozenPackPreviousStandingLine }}</dd></div>
+                <div v-if="frozenPackLightingLine"><dt>光线</dt><dd>{{ frozenPackLightingLine }}</dd></div>
+                <div v-if="frozenPackCostumeLine"><dt>服装</dt><dd>{{ frozenPackCostumeLine }}</dd></div>
               </dl>
             </details>
           </section>
           <section>
             <b>正式结果</b>
+            <p data-testid="studio-generation-history-next">{{ historyEnvelopeNextLabel(history) }}</p>
+            <p data-testid="studio-generation-history-peek">{{ historyConsistencyPeekLabel(historyConsistencyPeek) }}</p>
             <p v-if="!history.length">尚无原始图或标注图写回；派发只表示本地已登记意图，图片尚未生成。</p>
             <article v-for="item in history" :key="item.resultId" class="result-row">
               <div><strong>{{ item.variant === 'raw' ? '原始图' : '标注图' }}</strong><small>{{ providerLabel(item.provider) }} · {{ reviewStatusLabel(item.status) }}</small></div>
@@ -219,6 +344,35 @@ import {
   createLatestRequestGate,
   loadDetachedUnknownNodeStates,
 } from "../studio-generation-refresh-controller";
+import {
+  formatFrozenPanelBeatReadonlyLine,
+  formatFrozenPanelCostumeReadonlyLine,
+  formatFrozenPanelLightingReadonlyLine,
+  formatFrozenPanelShotTypeReadonlyLine,
+  formatFrozenStyleLockReadonlyLine,
+  formatUnitLockStyleLockLine,
+  formatPreviousStandingReadonlyLine,
+  formatUnitLockPanelBeatLine,
+  formatUnitLockPanelCostumeLine,
+  formatUnitLockPanelLightingLine,
+  formatUnitLockPanelShotTypeLine,
+  frozenPanelBeatFromAnyFrozenPack,
+  frozenPanelCostumeFromAnyFrozenPack,
+  frozenPanelLightingFromAnyFrozenPack,
+  frozenPanelShotTypeFromAnyFrozenPack,
+  previousStandingFromAnyFrozenPack,
+  styleLockRefsFromAnyFrozenPack,
+  type StudioPanelStandingHandoff,
+} from "@core/studio-panel-standing";
+import { formatCharacterBackReferences, formatPropBackReferences, formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
+import {
+  composeStudioGenerationPlanDraft,
+  historyEnvelopeNextLabel,
+  planEnvelopeNextLabel,
+  refineStudioGenerationPlanDraftIfUnitGridBlocking,
+  type PersistedPlanNodeStatus,
+  type StudioGenerationPlanDraftNode,
+} from "@core/studio-generation-plan-draft";
 
 const props = defineProps<{
   projectRoot: string;
@@ -251,6 +405,12 @@ const selectedPanelId = ref("");
 const unitCursor = ref<string>();
 const unitCursorStack = ref<string[]>([]);
 const history = ref<StudioGenerationResultRecord[]>([]);
+type HistoryConsistencyPeek = {
+  status: "cached" | "unevaluated";
+  verdict?: "consistent" | "needs-review" | "drifted" | "not-checkable";
+  generationRunId: string | null;
+};
+const historyConsistencyPeek = ref<HistoryConsistencyPeek | undefined>();
 const historyCursor = ref<string>();
 const historyNextCursor = ref<string>();
 const historyCursorStack = ref<string[]>([]);
@@ -283,9 +443,117 @@ type FrozenPackIdentityView = {
   bindingSetId: string;
 });
 const frozenPackIdentity = ref<FrozenPackIdentityView | null>(null);
+const frozenPackPreviousStanding = ref<StudioPanelStandingHandoff | null>(null);
+const frozenPackPreviousStandingLine = computed(() => formatPreviousStandingReadonlyLine(frozenPackPreviousStanding.value));
+const frozenPackLightingLine = ref<string | null>(null);
+const frozenPackCostumeLine = ref<string | null>(null);
 const frozenPackLoading = ref(false);
 const frozenPackError = ref("");
 let frozenPackToken = 0;
+const lockLightingLine = ref<string | null>(null);
+const lockCostumeLine = ref<string | null>(null);
+const lightingCostumeSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>(null);
+const frozenPackShotTypeLine = ref<string | null>(null);
+const lockShotTypeLine = ref<string | null>(null);
+const controlShotTypeLine = computed(() => frozenPackShotTypeLine.value || lockShotTypeLine.value);
+const frozenPackStyleLockLine = ref<string | null>(null);
+const lockStyleLockLine = ref<string | null>(null);
+const frozenPackBeatLine = ref<string | null>(null);
+const lockBeatLine = ref<string | null>(null);
+const controlBeatLine = computed(() => frozenPackBeatLine.value || lockBeatLine.value);
+const controlSceneBackReferenceNote = ref<string | null>(null);
+const controlSceneBackReferences = ref<SceneBackReference[]>([]);
+const controlPropBackReferenceNote = ref<string | null>(null);
+const controlPropBackReferences = ref<SceneBackReference[]>([]);
+const controlCharacterBackReferenceNote = ref<string | null>(null);
+const controlCharacterBackReferences = ref<SceneBackReference[]>([]);
+type ControlLockOverlay = {
+  panelId: string;
+  panelIndex: number;
+  sceneLighting: string;
+  costumeState: string;
+  shotType: "original" | "extension" | "";
+};
+const controlLockOverlayCacheKey = ref<string | null>(null);
+const controlLockOverlayByPanelId = ref(new Map<string, ControlLockOverlay>());
+
+function clearControlLockOverlayCache(): void {
+  controlLockOverlayCacheKey.value = null;
+  controlLockOverlayByPanelId.value = new Map();
+}
+
+async function readControlLockOverlays(
+  projectRoot: string,
+  unitId: string,
+  unitRevision: number,
+): Promise<Map<string, ControlLockOverlay>> {
+  const key = `${projectRoot}\0${unitId}:${unitRevision}`;
+  if (controlLockOverlayCacheKey.value === key) return controlLockOverlayByPanelId.value;
+  try {
+    const result = await window.canvasApi.getStudioUnitLockOverlays(projectRoot, { unitId, unitRevision });
+    const next = new Map<string, ControlLockOverlay>();
+    for (const row of result.overlays ?? []) {
+      const panelId = row.panelId?.trim() ?? "";
+      if (!panelId) continue;
+      next.set(panelId, {
+        panelId,
+        panelIndex: row.panelIndex,
+        sceneLighting: row.sceneLighting ?? "",
+        costumeState: row.costumeState ?? "",
+        shotType: row.shotType === "extension" || row.shotType === "original" ? row.shotType : "",
+      });
+    }
+    controlLockOverlayCacheKey.value = key;
+    controlLockOverlayByPanelId.value = next;
+    return next;
+  } catch {
+    clearControlLockOverlayCache();
+    return controlLockOverlayByPanelId.value;
+  }
+}
+
+async function applyControlSceneBackrefs(
+  token: number,
+  panelId: string,
+  panelIndex: number,
+): Promise<void> {
+  const unit = detail.value?.unit;
+  if (!props.projectRoot || !unit?.id || !Number.isInteger(unit.revision) || unit.revision < 1) {
+    controlSceneBackReferenceNote.value = formatSceneBackReferences(0, []);
+    controlSceneBackReferences.value = [];
+    controlPropBackReferenceNote.value = formatPropBackReferences(0, []);
+    controlPropBackReferences.value = [];
+    controlCharacterBackReferenceNote.value = formatCharacterBackReferences(0, []);
+    controlCharacterBackReferences.value = [];
+    return;
+  }
+  try {
+    const result = await window.canvasApi.getStudioSceneBackReferences(props.projectRoot, {
+      unitId: unit.id,
+      unitRevision: unit.revision,
+      sequence: unit.sequence,
+      panelId,
+      panelIndex,
+      season: unit.seasonId,
+      episode: unit.episodeId,
+    });
+    if (token !== frozenPackToken) return;
+    controlSceneBackReferenceNote.value = result.sceneBackReferenceNote;
+    controlSceneBackReferences.value = result.sceneBackReferences ?? [];
+    controlPropBackReferenceNote.value = result.propBackReferenceNote;
+    controlPropBackReferences.value = result.propBackReferences ?? [];
+    controlCharacterBackReferenceNote.value = result.characterBackReferenceNote;
+    controlCharacterBackReferences.value = result.characterBackReferences ?? [];
+  } catch {
+    if (token !== frozenPackToken) return;
+    controlSceneBackReferenceNote.value = formatSceneBackReferences(0, []);
+    controlSceneBackReferences.value = [];
+    controlPropBackReferenceNote.value = formatPropBackReferences(0, []);
+    controlPropBackReferences.value = [];
+    controlCharacterBackReferenceNote.value = formatCharacterBackReferences(0, []);
+    controlCharacterBackReferences.value = [];
+  }
+}
 
 // P24 U2：结果行变化分类（经 getStudioPackCurrentness 按 packId 懒加载+缓存，页 ≤100 有界）。
 interface PackCurrentnessView {
@@ -346,48 +614,215 @@ const selectedPackId = computed(() => {
   return generation?.status === "ready" ? generation.packId : "";
 });
 
+/** 已落盘整板 pack：只认 history / 计划节点，不用 readiness 候选。 */
+function persistedUnitGridPackIdForDraft(): string | null {
+  return history.value[0]?.packId
+    ?? (progress.value?.nodes ?? []).find((node) => (
+      node.targetKind === "unit-grid" && node.unitId === selectedUnitId.value && node.packId
+    ))?.packId
+    ?? null;
+}
+
+function formatGenerationPlanDraftNode(node: StudioGenerationPlanDraftNode): string {
+  return "targetKind" in node && node.targetKind === "unit-grid"
+    ? `unit-grid ${node.unitId}`
+    : `${node.unitId} ${node.panelId}`;
+}
+
+function hasPersistedPlanForDraft(): boolean {
+  const nodes = progress.value?.nodes ?? [];
+  if (historyTargetKind.value === "unit-grid") {
+    return nodes.some((node) => (
+      node.targetKind === "unit-grid" && node.unitId === selectedUnitId.value
+    ));
+  }
+  return nodes.some((node) => (
+    node.targetKind === "panel"
+    && node.unitId === selectedUnitId.value
+    && node.panelId === selectedPanelId.value
+  ));
+}
+
+function persistedPlanStatusForDraft(): PersistedPlanNodeStatus | undefined {
+  const nodes = progress.value?.nodes ?? [];
+  const match = historyTargetKind.value === "unit-grid"
+    ? nodes.find((node) => (
+      node.targetKind === "unit-grid" && node.unitId === selectedUnitId.value
+    ))
+    : nodes.find((node) => (
+      node.targetKind === "panel"
+      && node.unitId === selectedUnitId.value
+      && node.panelId === selectedPanelId.value
+    ));
+  const status = match?.status;
+  if (
+    status === "planned"
+    || status === "dispatched"
+    || status === "failed"
+    || status === "cancelled"
+    || status === "succeeded"
+  ) {
+    return status;
+  }
+  if (status === "retry-superseded") return "planned";
+  return undefined;
+}
+
+/** 已加载 unit-grid 节点；零额外 IPC。planned 不挡单镜草稿。 */
+function unitGridPersistedStatusForBlocking(): PersistedPlanNodeStatus | undefined {
+  const nodes = progress.value?.nodes ?? [];
+  const match = nodes.find((node) => (
+    node.targetKind === "unit-grid" && node.unitId === selectedUnitId.value
+  ));
+  const status = match?.status;
+  if (
+    status === "planned"
+    || status === "dispatched"
+    || status === "failed"
+    || status === "cancelled"
+    || status === "succeeded"
+  ) {
+    return status;
+  }
+  if (status === "retry-superseded") return "planned";
+  return undefined;
+}
+
+/** 单镜只认当前宫格 ready pack；整板只认已落盘 unit-grid pack。已有计划则按节点状态写下一步。unit-grid 在途时单镜草稿不得再 ready。不执行、不派发。 */
+const generationPlanDraft = computed(() => {
+  if (historyTargetKind.value === "unit-grid") {
+    return composeStudioGenerationPlanDraft({
+      focusUnitId: selectedUnitId.value || null,
+      focusPanelId: null,
+      focusPackId: persistedUnitGridPackIdForDraft(),
+      targetKind: "unit-grid",
+      hasPersistedPlan: hasPersistedPlanForDraft(),
+      persistedPlanStatus: persistedPlanStatusForDraft(),
+    });
+  }
+  const generation = detail.value?.selectedPanel?.generation;
+  return refineStudioGenerationPlanDraftIfUnitGridBlocking(
+    composeStudioGenerationPlanDraft({
+      focusUnitId: selectedUnitId.value || null,
+      focusPanelId: selectedPanelId.value || null,
+      focusPackId: generation?.status === "ready" && generation.packId ? generation.packId : null,
+      hasPersistedPlan: hasPersistedPlanForDraft(),
+      persistedPlanStatus: persistedPlanStatusForDraft(),
+    }),
+    { status: unitGridPersistedStatusForBlocking() },
+  );
+});
+
 // P24 R5-F2：watch 源含 projectRoot——复制工程同 packId 切换时也重新加载身份。
-watch([selectedPackId, () => props.projectRoot], async () => {
+watch([selectedPackId, selectedPanelId, () => props.projectRoot, () => detail.value?.unit.id, () => detail.value?.unit.revision], async () => {
   const packId = selectedPackId.value;
   const token = ++frozenPackToken;
   frozenPackIdentity.value = null;
+  frozenPackPreviousStanding.value = null;
+  frozenPackLightingLine.value = null;
+  frozenPackCostumeLine.value = null;
+  frozenPackShotTypeLine.value = null;
+  frozenPackStyleLockLine.value = null;
+  frozenPackBeatLine.value = null;
+  lockLightingLine.value = null;
+  lockCostumeLine.value = null;
+  lockShotTypeLine.value = null;
+  lockStyleLockLine.value = null;
+  lockBeatLine.value = null;
+  lightingCostumeSource.value = null;
+  controlSceneBackReferenceNote.value = null;
+  controlSceneBackReferences.value = [];
+  controlPropBackReferenceNote.value = null;
+  controlPropBackReferences.value = [];
+  controlCharacterBackReferenceNote.value = null;
+  controlCharacterBackReferences.value = [];
   frozenPackError.value = "";
-  if (!packId) return;
-  frozenPackLoading.value = true;
-  try {
-    const pack = await window.canvasApi.getStudioFrozenPack(props.projectRoot, packId);
-    if (token !== frozenPackToken) return;
-    frozenPackIdentity.value = pack
-      ? pack.schemaVersion === 5
-        ? {
-          targetKind: "unit-grid",
+  const panel = detail.value?.panels.find((entry) => entry.id === selectedPanelId.value);
+  if (packId) {
+    frozenPackLoading.value = true;
+    try {
+      const pack = await window.canvasApi.getStudioFrozenPack(props.projectRoot, packId);
+      if (token !== frozenPackToken) return;
+      frozenPackIdentity.value = pack
+        ? pack.schemaVersion === 5
+          ? {
+            targetKind: "unit-grid",
+            packId: pack.id,
+            fingerprint: pack.fingerprint,
+            unitSnapshotFingerprint: pack.unitSnapshotFingerprint,
+            panelCount: pack.panels.length,
+            continuityFingerprint: pack.continuityFingerprint,
+          }
+          : {
+          targetKind: "panel",
           packId: pack.id,
           fingerprint: pack.fingerprint,
           unitSnapshotFingerprint: pack.unitSnapshotFingerprint,
-          panelCount: pack.panels.length,
-          continuityFingerprint: pack.continuityFingerprint,
+          panelCount: 1,
+          scriptRevisionId: pack.scriptRevision.id,
+          scriptSha256: pack.scriptRevision.bodySha256,
+          promptRevisionId: pack.promptRevision.id,
+          promptSha256: pack.promptRevision.bodySha256,
+          bindingSetId: pack.assetBinding.bindingSet.id,
+          continuityFingerprint: pack.continuity.fingerprint,
         }
-        : {
-        targetKind: "panel",
-        packId: pack.id,
-        fingerprint: pack.fingerprint,
-        unitSnapshotFingerprint: pack.unitSnapshotFingerprint,
-        panelCount: 1,
-        scriptRevisionId: pack.scriptRevision.id,
-        scriptSha256: pack.scriptRevision.bodySha256,
-        promptRevisionId: pack.promptRevision.id,
-        promptSha256: pack.promptRevision.bodySha256,
-        bindingSetId: pack.assetBinding.bindingSet.id,
-        continuityFingerprint: pack.continuity.fingerprint,
+        : null;
+      if (pack) {
+        frozenPackPreviousStanding.value = previousStandingFromAnyFrozenPack(pack, selectedPanelId.value);
+        frozenPackLightingLine.value = formatFrozenPanelLightingReadonlyLine(
+          frozenPanelLightingFromAnyFrozenPack(pack, selectedPanelId.value),
+        );
+        frozenPackCostumeLine.value = formatFrozenPanelCostumeReadonlyLine(
+          frozenPanelCostumeFromAnyFrozenPack(pack, selectedPanelId.value),
+        );
+        frozenPackShotTypeLine.value = formatFrozenPanelShotTypeReadonlyLine(
+          frozenPanelShotTypeFromAnyFrozenPack(pack, selectedPanelId.value),
+        );
+        frozenPackStyleLockLine.value = formatFrozenStyleLockReadonlyLine(
+          styleLockRefsFromAnyFrozenPack(pack, selectedPanelId.value),
+        );
+        frozenPackBeatLine.value = formatFrozenPanelBeatReadonlyLine(
+          frozenPanelBeatFromAnyFrozenPack(pack, selectedPanelId.value),
+        );
+        lightingCostumeSource.value = "frozen-rendered-prompt";
+        if (panel) await applyControlSceneBackrefs(token, panel.id, panel.ordinal);
+        return;
       }
-      : null;
-    if (!pack) frozenPackError.value = "冻结包不存在或已损坏。";
-  } catch (reason) {
-    if (token !== frozenPackToken) return;
-    frozenPackError.value = reason instanceof Error ? reason.message : String(reason);
-  } finally {
-    if (token === frozenPackToken) frozenPackLoading.value = false;
+      frozenPackError.value = "冻结包不存在或已损坏。";
+    } catch (reason) {
+      if (token !== frozenPackToken) return;
+      frozenPackError.value = reason instanceof Error ? reason.message : String(reason);
+    } finally {
+      if (token === frozenPackToken) frozenPackLoading.value = false;
+    }
   }
+  if (token !== frozenPackToken) return;
+  lightingCostumeSource.value = "unit-lock";
+  const unit = detail.value?.unit;
+  if (props.projectRoot && unit?.id && Number.isInteger(unit.revision) && unit.revision >= 1 && panel) {
+    const overlays = await readControlLockOverlays(props.projectRoot, unit.id, unit.revision);
+    if (token !== frozenPackToken) return;
+    const overlay = overlays.get(panel.id);
+    lockLightingLine.value = formatUnitLockPanelLightingLine(overlay);
+    lockCostumeLine.value = formatUnitLockPanelCostumeLine(overlay);
+    lockShotTypeLine.value = formatUnitLockPanelShotTypeLine(overlay);
+    lockStyleLockLine.value = formatUnitLockStyleLockLine(detail.value?.selectedPanel?.controlAssets);
+    lockBeatLine.value = formatUnitLockPanelBeatLine({
+      panelIndex: panel.ordinal,
+      startSeconds: panel.startSeconds,
+      endSeconds: panel.endSeconds,
+      durationSeconds: panel.durationSeconds,
+    });
+  } else if (panel) {
+    lockStyleLockLine.value = formatUnitLockStyleLockLine(detail.value?.selectedPanel?.controlAssets);
+    lockBeatLine.value = formatUnitLockPanelBeatLine({
+      panelIndex: panel.ordinal,
+      startSeconds: panel.startSeconds,
+      endSeconds: panel.endSeconds,
+      durationSeconds: panel.durationSeconds,
+    });
+  }
+  if (panel) await applyControlSceneBackrefs(token, panel.id, panel.ordinal);
 });
 
 function ensurePackCurrentness(packId: string): void {
@@ -526,6 +961,14 @@ function providerLabel(provider: string): string {
 
 function reviewStatusLabel(status: string): string {
   return status === "approved" ? "已通过" : status === "rejected" ? "需返工" : status === "pending" ? "待审片" : status;
+}
+
+function historyConsistencyPeekLabel(peek?: HistoryConsistencyPeek): string {
+  if (!peek || peek.status === "unevaluated" || !peek.verdict) return "一致性：未评估";
+  if (peek.verdict === "consistent") return "一致性：一致";
+  if (peek.verdict === "needs-review") return "一致性：需复核";
+  if (peek.verdict === "drifted") return "一致性：明显漂移";
+  return "一致性：无法检查";
 }
 
 function videoControlStatusLabel(control: StudioVideoPackagePublicControlLookup): string {
@@ -767,6 +1210,35 @@ async function selectPanel(panelId: string): Promise<void> {
   await selectUnit(selectedUnitId.value, panelId);
 }
 
+async function revealControlSceneBackRef(ref: SceneBackReference): Promise<void> {
+  const unitId = ref.unitId.trim();
+  const panelId = ref.panelId.trim();
+  if (!unitId || !panelId) return;
+  if (unitId === selectedUnitId.value) {
+    if (!detail.value?.panels.some((panel) => panel.id === panelId)) return;
+    await selectPanel(panelId);
+    return;
+  }
+  const root = props.projectRoot;
+  const token = ++requestToken;
+  resetHistoryPagination();
+  try {
+    const next = await props.api.getDashboard(root, {
+      operation: "unit",
+      unitId,
+      panelId,
+    }) as StudioDashboardUnitDetail;
+    if (disposed || token !== requestToken || root !== props.projectRoot) return;
+    if (!next.panels.some((panel) => panel.id === panelId)) return;
+    selectedUnitId.value = unitId;
+    detail.value = next;
+    selectedPanelId.value = panelId;
+    await loadHistory(token);
+  } catch {
+    // 单元/宫格不在当前工程则失败关闭，禁止猜第一格。
+  }
+}
+
 function resetHistoryPagination(): void {
   historyCursor.value = undefined;
   historyNextCursor.value = undefined;
@@ -791,6 +1263,7 @@ async function loadHistory(parentToken?: number): Promise<void> {
   const loadSequence = historyLoadGate.begin();
   if (!selectedUnitId.value) {
     history.value = [];
+    historyConsistencyPeek.value = undefined;
     detachedUnknownControl.value = null;
     videoControl.value = null;
     videoControlError.value = "";
@@ -856,21 +1329,35 @@ async function loadHistory(parentToken?: number): Promise<void> {
           return {
             items: historyResult.items,
             nextCursor: historyResult.nextCursor,
+            consistencyPeek: historyResult.consistencyPeek,
             readinessPackId,
             detachedUnknownControl: detachedUnknownResult as DetachedUnknownControlView,
           };
         })
       : selectedPanelId.value
-        ? await window.canvasApi.listStudioGenerationPanelHistory(root, {
+        ? await window.canvasApi.getStudioGenerationControl(root, {
+            operation: "history",
             unitId,
             panelId: selectedPanelId.value,
             ...(historyCursor.value ? { cursor: historyCursor.value } : {}),
             limit: 24,
             order: "newest-first",
-          }).then((result) => ({ ...result, readinessPackId: "", detachedUnknownControl: null }))
+          }).then((historyResult) => {
+            if (historyResult.operation !== "history" || historyResult.status !== "ready") {
+              throw new Error("宫格生成历史投影不可用。");
+            }
+            return {
+              items: historyResult.items,
+              nextCursor: historyResult.nextCursor,
+              consistencyPeek: historyResult.consistencyPeek,
+              readinessPackId: "",
+              detachedUnknownControl: null,
+            };
+          })
         : {
             items: [] as StudioGenerationResultRecord[],
             nextCursor: undefined,
+            consistencyPeek: undefined,
             readinessPackId: "",
             detachedUnknownControl: null,
           };
@@ -884,6 +1371,7 @@ async function loadHistory(parentToken?: number): Promise<void> {
       };
     }
     history.value = page.items;
+    historyConsistencyPeek.value = page.consistencyPeek;
     historyNextCursor.value = page.nextCursor;
     await loadVideoPackageControl(root, token, page.items);
   } catch (reason) {
@@ -1081,7 +1569,21 @@ watch(() => props.projectRoot, () => {
   progress.value = null;
   units.value = null;
   detail.value = null;
+  clearControlLockOverlayCache();
+  lockLightingLine.value = null;
+  lockCostumeLine.value = null;
+  lockShotTypeLine.value = null;
+  lockStyleLockLine.value = null;
+  lockBeatLine.value = null;
+  lightingCostumeSource.value = null;
+  controlSceneBackReferenceNote.value = null;
+  controlSceneBackReferences.value = [];
+  controlPropBackReferenceNote.value = null;
+  controlPropBackReferences.value = [];
+  controlCharacterBackReferenceNote.value = null;
+  controlCharacterBackReferences.value = [];
   history.value = [];
+  historyConsistencyPeek.value = undefined;
   selectedUnitId.value = "";
   selectedPanelId.value = "";
   loading.value = true;
@@ -1089,6 +1591,12 @@ watch(() => props.projectRoot, () => {
   // P24 R3-F2/F3：切工程必须清 U1/U2 身份与分类缓存（分类随各工程 binding head 状态实时重算，跨工程不可复用）。
   packCurrentness.value = {};
   frozenPackIdentity.value = null;
+  frozenPackPreviousStanding.value = null;
+  frozenPackLightingLine.value = null;
+  frozenPackCostumeLine.value = null;
+  frozenPackShotTypeLine.value = null;
+  frozenPackStyleLockLine.value = null;
+  frozenPackBeatLine.value = null;
   frozenPackError.value = "";
   duduDetectionRoot = "";
   duduProject.value = null;
@@ -1131,7 +1639,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.studio-generation-control{height:100%;min-height:640px;display:grid;grid-template-rows:auto auto auto minmax(0,1fr);overflow:hidden;background:var(--ui-surface);color:var(--ui-text);font-family:Inter,"PingFang SC",sans-serif}.generation-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--ui-line);background:var(--ui-bg)}.generation-header span{color:var(--ui-accent);font:700 9px ui-monospace,monospace;letter-spacing:.12em}.generation-header h2{margin:6px 0 3px;font-size:20px}.generation-header p{margin:0;color:var(--ui-text-3);font-size:10px}.generation-header button,.pager button,.panel-stage header button,.generation-detail footer button{height:30px;padding:0 10px;border:1px solid var(--ui-accent);background:transparent;color:var(--ui-accent);cursor:pointer}.generation-header button:disabled,.pager button:disabled,.generation-detail footer button:disabled{opacity:.4;cursor:not-allowed}.generation-error{padding:9px 18px;border-bottom:1px solid var(--ui-danger);background:color-mix(in srgb, var(--ui-danger) 10%, var(--ui-surface));color:var(--ui-danger);font-size:10px}.generation-counts{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--ui-line)}.generation-counts article{padding:12px 18px;border-right:1px solid var(--ui-line)}.generation-counts strong,.generation-counts span{display:block}.generation-counts strong{font:600 19px ui-monospace,monospace}.generation-counts span{margin-top:4px;color:var(--ui-text-3);font-size:9px}.generation-counts .warn strong{color:var(--ui-accent)}.generation-layout{min-height:0;display:grid;grid-template-columns:230px minmax(300px,1fr) 360px}.unit-rail,.generation-detail{min-height:0;overflow:auto;background:var(--ui-surface)}.unit-rail{border-right:1px solid var(--ui-line)}.unit-rail>header{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--ui-line)}.unit-rail>header b{font-size:10px}.unit-rail>header small{color:var(--ui-text-3)}.unit-rail>button{width:100%;display:grid;gap:5px;padding:11px 14px;border:0;border-bottom:1px solid var(--ui-line);background:transparent;color:var(--ui-text-2);text-align:left;cursor:pointer;content-visibility:auto;contain-intrinsic-size:auto 56px}.unit-rail>button.active{box-shadow:inset 2px 0 var(--ui-accent);background:var(--ui-surface-2);color:var(--ui-accent)}.unit-rail>button strong{font-size:10px}.unit-rail>button span{color:var(--ui-text-3);font-size:8px}.pager{display:flex;justify-content:center;gap:8px;padding:10px}.panel-stage{min-width:0;min-height:0;overflow:auto;background:var(--ui-surface)}.panel-stage>header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--ui-line)}.panel-stage>header b,.panel-stage>header span{display:block}.panel-stage>header b{font-size:13px}.panel-stage>header span{margin-top:4px;color:var(--ui-text-3);font-size:9px}.panel-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));align-content:start}.panel-list>button{min-height:96px;display:grid;grid-template-columns:30px 1fr;align-items:start;gap:9px;padding:14px;border:0;border-right:1px solid var(--ui-line);border-bottom:1px solid var(--ui-line);background:var(--ui-bg);color:var(--ui-text-2);text-align:left;cursor:pointer;content-visibility:auto;contain-intrinsic-size:auto 96px}.panel-list>button.active{background:var(--ui-accent-soft);color:var(--ui-accent)}.panel-list>button>span{display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--ui-line);border-radius:50%;font:600 9px ui-monospace,monospace}.panel-list strong,.panel-list small{display:block}.panel-list strong{font-size:10px;line-height:1.4}.panel-list small{margin-top:7px;color:var(--ui-text-3);font-size:8px}.generation-detail{border-left:1px solid var(--ui-line)}.generation-detail>header,.generation-detail>section{padding:15px 17px;border-bottom:1px solid var(--ui-line)}.generation-detail>header span{color:var(--ui-accent);font-size:8px}.generation-detail h3{margin:6px 0 0;font-size:15px}.generation-detail>section>b{display:block;margin-bottom:8px;color:var(--ui-text-2);font-size:9px}.generation-detail>section>strong{display:inline-block;padding:4px 7px;border:1px solid var(--ui-line);color:var(--ui-text-2);font-size:8px}.generation-detail>section>strong.ready{border-color:var(--ui-accent);color:var(--ui-accent)}.generation-detail p{margin:8px 0 0;color:var(--ui-text-3);font-size:9px;line-height:1.55}.result-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 0;border-top:1px solid var(--ui-line)}.result-row strong,.result-row small{display:block}.result-row strong{font-size:9px}.result-row small{margin-top:3px;color:var(--ui-text-3);font-size:7px}.result-row>span{color:var(--ui-danger);font-size:8px}.result-row>span.ready{color:var(--ui-accent-strong)}.generation-detail>footer{display:flex;gap:8px;padding:14px 17px}.empty-state{height:100%;display:grid;place-items:center;padding:30px;color:var(--ui-text-3);font-size:10px;text-align:center}@media(max-width:1000px){.generation-layout{grid-template-columns:190px 1fr}.generation-detail{grid-column:1/-1;max-height:330px;border-top:1px solid var(--ui-line)}.generation-counts{grid-template-columns:repeat(2,1fr)}}
+.studio-generation-control{height:100%;min-height:640px;display:grid;grid-template-rows:auto auto auto minmax(0,1fr);overflow:hidden;background:var(--ui-surface);color:var(--ui-text);font-family:Inter,"PingFang SC",sans-serif}.generation-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--ui-line);background:var(--ui-bg)}.generation-header span{color:var(--ui-accent);font:700 9px ui-monospace,monospace;letter-spacing:.12em}.generation-header h2{margin:6px 0 3px;font-size:20px}.generation-header p{margin:0;color:var(--ui-text-3);font-size:10px}.generation-header button,.pager button,.panel-stage header button,.generation-detail footer button,.generation-detail section button{height:30px;padding:0 10px;border:1px solid var(--ui-accent);background:transparent;color:var(--ui-accent);cursor:pointer}.generation-header button:disabled,.pager button:disabled,.generation-detail footer button:disabled,.generation-detail section button:disabled{opacity:.4;cursor:not-allowed}.generation-error{padding:9px 18px;border-bottom:1px solid var(--ui-danger);background:color-mix(in srgb, var(--ui-danger) 10%, var(--ui-surface));color:var(--ui-danger);font-size:10px}.generation-counts{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--ui-line)}.generation-counts article{padding:12px 18px;border-right:1px solid var(--ui-line)}.generation-counts strong,.generation-counts span{display:block}.generation-counts strong{font:600 19px ui-monospace,monospace}.generation-counts span{margin-top:4px;color:var(--ui-text-3);font-size:9px}.generation-counts .warn strong{color:var(--ui-accent)}.generation-layout{min-height:0;display:grid;grid-template-columns:230px minmax(300px,1fr) 360px}.unit-rail,.generation-detail{min-height:0;overflow:auto;background:var(--ui-surface)}.unit-rail{border-right:1px solid var(--ui-line)}.unit-rail>header{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--ui-line)}.unit-rail>header b{font-size:10px}.unit-rail>header small{color:var(--ui-text-3)}.unit-rail>button{width:100%;display:grid;gap:5px;padding:11px 14px;border:0;border-bottom:1px solid var(--ui-line);background:transparent;color:var(--ui-text-2);text-align:left;cursor:pointer;content-visibility:auto;contain-intrinsic-size:auto 56px}.unit-rail>button.active{box-shadow:inset 2px 0 var(--ui-accent);background:var(--ui-surface-2);color:var(--ui-accent)}.unit-rail>button strong{font-size:10px}.unit-rail>button span{color:var(--ui-text-3);font-size:8px}.pager{display:flex;justify-content:center;gap:8px;padding:10px}.panel-stage{min-width:0;min-height:0;overflow:auto;background:var(--ui-surface)}.panel-stage>header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--ui-line)}.panel-stage>header b,.panel-stage>header span{display:block}.panel-stage>header b{font-size:13px}.panel-stage>header span{margin-top:4px;color:var(--ui-text-3);font-size:9px}.panel-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));align-content:start}.panel-list>button{min-height:96px;display:grid;grid-template-columns:30px 1fr;align-items:start;gap:9px;padding:14px;border:0;border-right:1px solid var(--ui-line);border-bottom:1px solid var(--ui-line);background:var(--ui-bg);color:var(--ui-text-2);text-align:left;cursor:pointer;content-visibility:auto;contain-intrinsic-size:auto 96px}.panel-list>button.active{background:var(--ui-accent-soft);color:var(--ui-accent)}.panel-list>button>span{display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--ui-line);border-radius:50%;font:600 9px ui-monospace,monospace}.panel-list strong,.panel-list small{display:block}.panel-list strong{font-size:10px;line-height:1.4}.panel-list small{margin-top:7px;color:var(--ui-text-3);font-size:8px}.generation-detail{border-left:1px solid var(--ui-line)}.generation-detail>header,.generation-detail>section{padding:15px 17px;border-bottom:1px solid var(--ui-line)}.generation-detail>header span{color:var(--ui-accent);font-size:8px}.generation-detail h3{margin:6px 0 0;font-size:15px}.generation-detail>section>b{display:block;margin-bottom:8px;color:var(--ui-text-2);font-size:9px}.generation-detail>section>strong{display:inline-block;padding:4px 7px;border:1px solid var(--ui-line);color:var(--ui-text-2);font-size:8px}.generation-detail>section>strong.ready{border-color:var(--ui-accent);color:var(--ui-accent)}.generation-detail p{margin:8px 0 0;color:var(--ui-text-3);font-size:9px;line-height:1.55}.previous-standing{color:var(--ui-accent)!important}.result-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 0;border-top:1px solid var(--ui-line)}.result-row strong,.result-row small{display:block}.result-row strong{font-size:9px}.result-row small{margin-top:3px;color:var(--ui-text-3);font-size:7px}.result-row>span{color:var(--ui-danger);font-size:8px}.result-row>span.ready{color:var(--ui-accent-strong)}.generation-detail>footer{display:flex;gap:8px;padding:14px 17px}.empty-state{height:100%;display:grid;place-items:center;padding:30px;color:var(--ui-text-3);font-size:10px;text-align:center}@media(max-width:1000px){.generation-layout{grid-template-columns:190px 1fr}.generation-detail{grid-column:1/-1;max-height:330px;border-top:1px solid var(--ui-line)}.generation-counts{grid-template-columns:repeat(2,1fr)}}
 </style>
 <style scoped>
 .generation-plans{border-bottom:1px solid var(--ui-line);background:var(--ui-surface);max-height:220px;overflow:auto}.generation-plans>header{display:flex;align-items:center;justify-content:space-between;padding:8px 18px;border-bottom:1px solid var(--ui-line)}.generation-plans>header b{font-size:10px;color:var(--ui-accent)}.generation-plans>header span{color:var(--ui-text-3);font-size:9px}.plans-empty{padding:10px 18px;color:var(--ui-text-3);font-size:10px}.plan-group{border-bottom:1px solid var(--ui-line)}.plan-group>header{display:flex;align-items:center;justify-content:space-between;padding:6px 18px}.plan-group>header small{color:var(--ui-text-3);font-size:9px}.plan-group>header button{height:22px;padding:0 8px;border:1px solid var(--ui-accent);background:transparent;color:var(--ui-accent);cursor:pointer;font-size:9px}.plan-node{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:10px;align-items:center;padding:5px 18px;content-visibility:auto;contain-intrinsic-size:auto 32px}.node-status{font-size:9px;padding:2px 6px;border:1px solid var(--ui-line);text-align:center;color:var(--ui-text-2)}.node-status.dispatched,.node-status.planned{color:var(--ui-accent);border-color:var(--ui-accent)}.node-status.succeeded{color:var(--ui-ok);border-color:var(--ui-ok)}.node-status.failed,.node-status.cancelled{color:var(--ui-danger);border-color:var(--ui-danger)}.node-main{display:grid;gap:2px;min-width:0}.node-main strong{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.node-main small{color:var(--ui-text-3);font-size:9px}.node-main .node-error{color:var(--ui-danger)}.node-actions{display:flex;gap:6px}.node-actions button{height:22px;padding:0 8px;border:1px solid var(--ui-accent);background:transparent;color:var(--ui-accent);cursor:pointer;font-size:9px}.node-actions button:disabled{opacity:.4;cursor:not-allowed}

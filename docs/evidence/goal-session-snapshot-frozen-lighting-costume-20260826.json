@@ -1,0 +1,38 @@
+{
+  "id": "goal-session-snapshot-frozen-lighting-costume-20260826",
+  "kind": "session-snapshot-frozen-lighting-costume-readonly",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T19:20:55.000Z",
+  "scope": "get_studio_generation_control session-snapshot adds frozenPanelLighting / frozenPanelCostume parsed from the same frozen renderedPrompt as previousStanding. Historical packs without 光线/服装（宫格覆盖） stay null and omit those keys from fingerprint. Does not read unit head. schemaVersion remains 1. Not BindingSet; does not dispatch.",
+  "invariants": {
+    "parsesFrozenOverlayLinesOnly": true,
+    "nullWhenMissingDoesNotEnterFingerprint": true,
+    "doesNotReadUnitHead": true,
+    "schemaVersionUnchanged": true,
+    "doesNotDispatch": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/material-studio-ui-contract.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-continuity-review-ui.test.ts",
+        "tests/studio-trace-ui.test.ts"
+      ],
+      "result": "6 files / 138 tests PASS. P7 session-snapshot fixture not run on Linux (dirfd)."
+    },
+    "commit": "ee2d89e"
+  },
+  "notClaimed": [
+    "P7 owner session-snapshot live fixture",
+    "real-generation constraint evidence",
+    "lighting or costume fully solved",
+    "installed T23",
+    "list GUI probe",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

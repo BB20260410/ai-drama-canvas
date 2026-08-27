@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "2-A",
+  "recordedAt": "2026-08-25T14:25:00Z",
+  "change": {
+    "resolver": "resolveApprovedTimelineBound",
+    "maxUnits": 36,
+    "omitMeansWholeEpisode": true,
+    "emptyUnitIdsRejected": true,
+    "listSqlUnchanged": true,
+    "deriveRulesUnchanged": true
+  },
+  "verification": {
+    "typecheckApp": "PASS",
+    "linuxBoundTests": { "file": "tests/resolve-approved-timeline-bound.test.ts", "passed": 3 }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W2-A：可选 unitIds/limit 有界投影，上限 36；省略保持整集。未改 T23 SQL。"
+}

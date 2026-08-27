@@ -1,0 +1,50 @@
+{
+  "id": "goal-earliest-dashboard-plan-status-next-20260826",
+  "kind": "earliest-dashboard-next-action-by-plan-node-status",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T22:17:00.000Z",
+  "scope": "projectStudioUnitGridNextAction accepts optional persistedPlanStatus after inspect flags. planned/omitted keeps dispatch when a pack+plan exist. dispatched→wait-or-reconcile-unit-grid-run, failed/cancelled→retry-unit-grid-plan-nodes (new phase ready-to-retry), succeeded→submit-unit-grid-review. hasActiveRun / pairComplete / generation_unknown still win. earliest refineEarliestReadyToFreezeSlot forwards status; one readonly open via readPersistedUnitGridPackPlanState. PersistedUnitGridPackAndPlan shape unchanged. Dashboard latestRun maps latestEventKind failed/cancelled/retry-superseded; no extra inspect. Does not change T5 / deriveGenerationTargetState. Does not execute retry, dispatch, or Review. schemaVersion stays 1.",
+  "invariants": {
+    "earliestSchemaVersionUnchanged": 1,
+    "sessionSnapshotSchemaVersionUnchanged": 1,
+    "ssl5SchemaVersionUnchanged": 1,
+    "allSlotsStillHasCurrentPackFalse": true,
+    "onlyOnePendingSlotRefined": true,
+    "packAndPlanShapeUnchanged": true,
+    "unitGridHasPlanStillTargetsOnly": true,
+    "inspectFlagsBeatPlanStatus": true,
+    "t5Unchanged": true,
+    "doesNotExecuteRetry": true,
+    "doesNotDispatch": true,
+    "doesNotChangeT23Sql": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-unit-grid-next-action.test.ts",
+        "tests/studio-episode-earliest-plan-refine.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-production-dashboard-ui.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts"
+      ],
+      "result": "8 files / 78 tests PASS"
+    },
+    "commit": "921cb33"
+  },
+  "notClaimed": [
+    "retry_studio_generation_plan_nodes executed",
+    "dispatch executed",
+    "Review executed",
+    "T5 continuous generation remapped",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

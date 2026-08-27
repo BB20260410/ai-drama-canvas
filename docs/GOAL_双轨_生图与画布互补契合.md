@@ -90,3 +90,11 @@ owner 有大量剧本。画布必须提供产品级：
 - **可调度**：Phase D（composable / 侧栏虚拟化 / 受闸快捷键 / 导演动作面板）、Phase E（smoke 别名）— 挂 STATUS **B earliest** 或 TASKS，**永不压过 A formal**。  
 - **禁止**：Pinia 持 nextAction、产线窗口拆 command-bus/ledger 写路径、插件市场、脚本大 rename、lint/coverage 当 Goal 完成。  
 - 与 SSL/羁绊冲突时 **以北星与 SSL 计划为准**。
+
+---
+
+## 2026-08-27 · 云端 B 轨源码辅助停点（非整目标关账）
+
+云端 Linux VM 已把 B 轨源码合同接到极限：对照/SSL-5/阅读器/向导/next/peek/闸/租约/revisionImpact/向导失败关闭均已接。证据 `docs/evidence/goal-cloud-b-source-limit-20260827.json`（`conclusion: STOP`）。
+
+完成门 1–3 **未齐**（无点名产线关账、无隔离工程真实验证、无画布约束真实生图闭环）。禁止 `update_goal(completed=true)`。余下仅 owner Mac / 正式工程。

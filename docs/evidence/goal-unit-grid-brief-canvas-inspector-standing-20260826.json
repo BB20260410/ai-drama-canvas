@@ -1,0 +1,39 @@
+{
+  "id": "goal-unit-grid-brief-canvas-inspector-standing-20260826",
+  "createdAt": "2026-08-26T18:51:00.000Z",
+  "kind": "unit-grid-brief-canvas-inspector-previous-standing-readonly",
+  "conclusion": "PASS",
+  "scope": "Unit-grid Agent brief exposes previousStandings parsed from each panelPack renderedPrompt and appends a standing toolHints note. Canvas inspector shows shotComposition plus frozen previous standing when a pack exists (no head fallback); otherwise current-unit lock standing. Does not change renderedPrompt, evaluate pixels, call Binding, or dispatch.",
+  "invariants": {
+    "parsesFrozenPromptOnlyWhenPackExists": true,
+    "doesNotReadUnitHeadWhenPackExists": true,
+    "doesNotRewriteRenderedPrompt": true,
+    "doesNotDispatch": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotCallBindingControl": true,
+    "unitGridRequiresPanelId": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/studio-unit-grid-brief-contract.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-continuity-review-ui.test.ts",
+        "tests/studio-generation-plan-ui.test.ts"
+      ],
+      "result": "6 files / 132 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "real-generation constraint evidence",
+    "standing fully solved",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

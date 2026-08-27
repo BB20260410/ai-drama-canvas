@@ -36,9 +36,9 @@
         >
           构建身份 v{{ runtimeBuildIdentity.packageVersion }} · buildId:{{ runtimeBuildIdentity.buildId.slice(0, 12) }} · sourceDigest:{{ runtimeBuildIdentity.sourceDigest.slice(0, 12) }}
         </div>
-        <details v-if="productionDiagnostics" class="diagnostics-detail" data-testid="managed-canvas-diagnostics-detail">
+        <details class="diagnostics-detail" data-testid="managed-canvas-diagnostics-detail" @toggle="onProductionDiagnosticsToggle">
           <summary data-testid="managed-canvas-detailed-diagnostics">详细诊断</summary>
-          <div class="diagnostics-grid">
+          <div v-if="productionDiagnostics" class="diagnostics-grid">
             <span>派发 <b>{{ productionDiagnostics.counts.dispatches }}</b></span>
             <span>结果 <b>{{ productionDiagnostics.counts.results }}</b></span>
             <span>raw <b>{{ productionDiagnostics.counts.rawResults }}</b></span>
@@ -48,6 +48,7 @@
             <span>Run: 成功<b>{{ productionDiagnostics.runStateDistribution.succeeded }}</b> 失败<b>{{ productionDiagnostics.runStateDistribution.failed }}</b> 取消<b>{{ productionDiagnostics.runStateDistribution.cancelled }}</b> 飞行<b>{{ productionDiagnostics.runStateDistribution.inFlight }}</b></span>
             <small>诊断耗时 {{ productionDiagnostics.durationMs }}ms</small>
           </div>
+          <p v-else class="diagnostics-grid">{{ productionDiagnosticsLoading ? "正在读取诊断…" : "展开后读取整集诊断。" }}</p>
         </details>
       </details>
       <div class="header-actions">
@@ -63,14 +64,18 @@
           type="button"
           class="primary-start"
           data-testid="managed-canvas-primary-start"
-          :disabled="loading || workflowBusy || !unitDetail || generationProjectionDegraded || runtimeWriteBlocked"
+          :disabled="loading || workflowBusy || !unitDetail || generationProjectionDegraded || runtimeWriteBlocked || checkpointNewSlotBlocked || unitGridDispatchBlocked"
           :title="generationProjectionDegraded
             ? generationProjectionHint
             : runtimeWriteBlocked
               ? runtimeWriteGateHint
+            : checkpointNewSlotBlocked
+              ? checkpointGateHint
+            : unitGridDispatchBlocked
+              ? unitGridDispatchHint
             : (!unitDetail ? '请先从素材库添加 15 秒分镜' : undefined)"
           @click="primaryStart">
-          {{ generationProjectionDegraded ? "账本待恢复" : (workflowBusy ? "正在预检并记录派发…" : (unitDetail ? `准备并记录 ${unitDetail.panels.length} 格派发` : "准备派发")) }}
+          {{ generationProjectionDegraded ? "账本待恢复" : (checkpointNewSlotBlocked ? "六图闸未放行" : (unitGridDispatchBlocked ? "整板下一步不是派发" : (workflowBusy ? "正在预检并记录派发…" : (unitDetail ? `准备并记录 ${unitDetail.panels.length} 格派发` : "准备派发")))) }}
         </button>
       </div>
     </header>
@@ -169,7 +174,12 @@
         <div class="workflow-toolbar" data-testid="managed-canvas-workflow-toolbar" aria-label="工作流组">
           <span data-testid="managed-canvas-selection-count">已选宫格 {{ selectedPanelIds.length }}</span>
           <button type="button" data-testid="managed-canvas-create-workflow" :disabled="loading || selectedPanelIds.length === 0 || workflowBusy" @click="createWorkflowFromSelection">保存所选</button>
-          <button type="button" data-testid="managed-canvas-run-workflow" :disabled="loading || workflowBusy || workflowGroups.length === 0 || !unitDetail" @click="runLastWorkflowGroup">执行最近工作流组</button>
+          <button
+            type="button"
+            data-testid="managed-canvas-run-workflow"
+            :disabled="loading || workflowBusy || workflowGroups.length === 0 || !unitDetail || checkpointNewSlotBlocked || unitGridDispatchBlocked"
+            :title="checkpointNewSlotBlocked ? checkpointGateHint : (unitGridDispatchBlocked ? unitGridDispatchHint : undefined)"
+            @click="runLastWorkflowGroup">执行最近工作流组</button>
           <span v-if="workflowGroups.length" data-testid="managed-canvas-workflow-count">工作流 {{ workflowGroups.length }}</span>
           <span v-if="lastWorkflowTitle" data-testid="managed-canvas-last-workflow">最近：{{ lastWorkflowTitle }}</span>
           <span v-if="lastWorkflowRunSummary" data-testid="managed-canvas-workflow-run-summary">{{ lastWorkflowRunSummary }}</span>
@@ -711,7 +721,7 @@
         <details class="flow-caption technical-diagnostics">
           <summary data-testid="managed-canvas-diagnostics">诊断详情</summary>
           <div data-testid="managed-canvas-dom-counts">
-            <span>当前 DOM：{{ assetNodeCount }} 资产 · {{ unitNodeCount }} 单元 · {{ panelNodeCount }} 宫格 · {{ pipelineNodeCount }} 结果/审片 · {{ textDocumentCount }} 文稿</span>
+            <span>当前 DOM：{{ assetNodeCount }} 资产 · {{ unitNodeCount }} 单元 · {{ panelNodeCount }} 宫格 · {{ pipelineNodeCount }} 结果/审片 · {{ referenceNodeCount }} 参考 · {{ continuityNodeCount }} 连续性 · {{ edgeObjectCount }} 边 · {{ textDocumentCount }} 文稿</span>
             <span data-testid="managed-canvas-thumb-count">有图节点 {{ thumbnailNodeCount }}</span>
             <span>缩放 {{ Math.round(zoom * 100) }}%</span>
             <span data-testid="managed-canvas-layout-status">{{ layoutStatusLabel }}</span>
@@ -746,11 +756,27 @@
         :character-audio-playback-url="selectedCharacterAudioPlaybackUrl"
         :character-audio-blocked="characterAudioBlocked"
         :character-view-slots="selectedCharacterViewSlots"
+        :panel-previous-standing-line="inspectorPreviousStandingLine"
+        :panel-previous-standing-source="inspectorPreviousStandingSource"
+        :panel-frozen-lighting-line="inspectorFrozenLightingLine"
+        :panel-frozen-costume-line="inspectorFrozenCostumeLine"
+        :panel-lighting-costume-source="inspectorLightingCostumeSource"
+        :panel-shot-type-line="inspectorShotTypeLine"
+        :panel-style-lock-line="inspectorStyleLockLine"
+        :panel-beat-line="inspectorBeatLine"
+        :panel-consistency-peek-line="inspectorConsistencyPeekLine"
+        :panel-scene-back-reference-note="inspectorSceneBackReferenceNote"
+        :panel-scene-back-references="inspectorSceneBackReferences"
+        :panel-prop-back-reference-note="inspectorPropBackReferenceNote"
+        :panel-prop-back-references="inspectorPropBackReferences"
+        :panel-character-back-reference-note="inspectorCharacterBackReferenceNote"
+        :panel-character-back-references="inspectorCharacterBackReferences"
         @close="closeInspector"
         @focus-appearance="focusAppearance"
         @appearances-previous="appearancesPrevious"
         @appearances-next="appearancesNext"
         @run-node-action="runNodeAction"
+        @reveal-scene-back-ref="revealInspectorSceneBackRef"
       />
 
       <DirectorActionPanel
@@ -759,6 +785,13 @@
         :episode="episodeFilter || undefined"
         @close="closeDirectorPanel"
         @action="onDirectorAction"
+      />
+      <StudioGenerationTraceDrawer
+        :open="generationTraceOpen"
+        :loading="generationTraceLoading"
+        :error="generationTraceError"
+        :trace="generationTrace"
+        @close="closeStudioGenerationTrace"
       />
     </div>
   </section>
@@ -801,6 +834,28 @@ import ManagedStudioCanvasNode from "./ManagedStudioCanvasNode.vue";
 import StudioSpatialGroupNode from "./StudioSpatialGroupNode.vue";
 import CanvasInspectorPanel from "./CanvasInspectorPanel.vue";
 import DirectorActionPanel from "./DirectorActionPanel.vue";
+import StudioGenerationTraceDrawer, { type StudioTraceDrawerModel } from "./StudioGenerationTraceDrawer.vue";
+import {
+  formatFrozenPanelCostumeReadonlyLine,
+  formatFrozenPanelLightingReadonlyLine,
+  formatFrozenPanelBeatReadonlyLine,
+  formatFrozenPanelShotTypeReadonlyLine,
+  formatFrozenStyleLockReadonlyLine,
+  formatUnitLockStyleLockLine,
+  formatPreviousStandingReadonlyLine,
+  formatUnitLockPanelBeatLine,
+  formatUnitLockPanelCostumeLine,
+  formatUnitLockPanelLightingLine,
+  formatUnitLockPanelShotTypeLine,
+  formatUnitLockPreviousStandingLine,
+  frozenPanelBeatFromAnyFrozenPack,
+  frozenPanelCostumeFromAnyFrozenPack,
+  frozenPanelLightingFromAnyFrozenPack,
+  frozenPanelShotTypeFromAnyFrozenPack,
+  previousStandingFromAnyFrozenPack,
+  styleLockRefsFromAnyFrozenPack,
+} from "@core/studio-panel-standing";
+import { formatCharacterBackReferences, formatPropBackReferences, formatSceneBackReferences, type SceneBackReference } from "@core/studio-scene-backrefs";
 import type { DirectorAction } from "../director-action-panel.js";
 import type {
   MaterialStudioAssetCategory,
@@ -808,6 +863,7 @@ import type {
   MaterialStudioUiEntry,
   MaterialStudioUiPage,
 } from "../material-studio-ui-contract";
+import { createBoundedKeyedCache } from "../use-bounded-keyed-cache.js";
 import { createThumbnailLru } from "../use-thumbnail-lru.js";
 import { computeVirtualListWindow, sliceVirtualWindow } from "../use-virtual-list.js";
 import { LatestBoundedTaskQueue } from "../bounded-task-queue.js";
@@ -873,6 +929,7 @@ import {
 } from "@core/studio-canvas-workflow-groups-core";
 import {
   buildStudioCanvasNodeActionPanel,
+  unitGridNextActionBlockingKind,
   type StudioCanvasNodeActionCode,
 } from "@core/studio-canvas-node-action-panel";
 import { createStudioCanvasNodeStatusStore } from "@core/studio-canvas-node-status";
@@ -1001,8 +1058,10 @@ const pinnedAssetController = createDashboardLoadController();
 const timelineProjection = useStudioTimelineProjection(computed(() => props.projectRoot));
 // T15: 单元级写租约显示（谁正在写哪个单元）
 const unitLeaseDisplayHint = ref<string | null>(null);
-// T14: 生产诊断（真实状态，禁止推算）
+// T14: 生产诊断（真实状态，禁止推算）。默认不拉；展开「详细诊断」才物化整集。
 const productionDiagnostics = ref<any>(null);
+const productionDiagnosticsOpen = ref(false);
+const productionDiagnosticsLoading = ref(false);
 /** 运行时构建身份（release-manifest / 源码 digest），供 UI 验收与排障。 */
 const runtimeBuildIdentity = ref<{
   packageVersion: string;
@@ -1066,6 +1125,22 @@ const localSourceTruthLabel = computed(() => {
  * 但必须关闭派发，不能把尚未验真的历史结果显示为正式素材。
  */
 const generationProjectionDegraded = computed(() => overview.value?.generationProjection?.status === "degraded");
+/** 已加载 overview 六图闸未放行时挡主按钮；overview 未投影不挡。 */
+const checkpointNewSlotBlocked = computed(() =>
+  overview.value?.checkpoint.newSlotDispatchAllowed === false);
+const checkpointGateHint = computed(() => {
+  const batch = overview.value?.checkpoint.blockingBatchNumber;
+  return batch != null
+    ? `六图闸未放行（batch ${batch}），先完成停检/Review（不派发）`
+    : "六图闸未放行，先完成停检/Review（不派发）";
+});
+/** 已加载 unitDetail.nextAction 为 wait/retry/Review/对账时挡主按钮与工作流组；planned 不挡。 */
+const unitGridDispatchBlocked = computed(() =>
+  unitGridNextActionBlockingKind(unitDetail.value?.nextAction.code) != null);
+const unitGridDispatchHint = computed(() => {
+  const label = unitDetail.value?.nextAction.label?.trim();
+  return label || "整板下一步不是派发（不派发）";
+});
 const rawReferenceProjectionLoading = ref(false);
 const rawReferenceProjectionIssue = ref<string | undefined>();
 const generationProjectionHint = computed(() => {
@@ -1193,6 +1268,11 @@ let globalResourceLoadSequence = 0;
 /** Qwen D5：导演动作面板（只读导航） */
 const directorPanelOpen = ref(false);
 const directorHotkeys = createGatedHotkeyRegistry(DEFAULT_DIRECTOR_HOTKEYS);
+const generationTraceOpen = ref(false);
+const generationTraceLoading = ref(false);
+const generationTraceError = ref("");
+const generationTrace = shallowRef<StudioTraceDrawerModel | null>(null);
+let generationTraceLoadSequence = 0;
 /** Qwen D3：侧栏素材虚拟窗口 + 缩略图 LRU */
 const assetsLibraryScrollTop = ref(0);
 const ASSET_ROW_HEIGHT = 56;
@@ -1226,7 +1306,13 @@ const pendingConnectionSourceId = ref("");
 const selectedDraftEdgeId = ref("");
 const clearConfirmationArmed = ref(false);
 const showEdges = ref(true);
-const showMiniMap = ref(true);
+/** smoke 典型页 ≤78；超过此数默认关 MiniMap，避免全 store SVG。用户仍可手动开。 */
+const MINIMAP_AUTO_HIDE_AFTER_NODES = 80;
+const miniMapUserOverride = ref<boolean | null>(null);
+const showMiniMap = computed(() => {
+  if (miniMapUserOverride.value !== null) return miniMapUserOverride.value;
+  return nodes.value.length <= MINIMAP_AUTO_HIDE_AFTER_NODES;
+});
 // P25 主题皮肤：浅色（默认）/深色/米色，经主题模块持久化（组件内不出现存储字面量，合同红线）。
 const canvasTheme = ref<ManagedCanvasThemeId>(readManagedCanvasTheme());
 const canvasThemeAssets = computed(() => getManagedCanvasThemeAssets(canvasTheme.value));
@@ -1368,7 +1454,7 @@ const unitGridVideoPackagePipeline = ref(new Map<string, UnitGridVideoPackagePro
 const unitGridNonPassPipeline = ref(new Map<string, UnitGridNonPassProjection>());
 /** 核心投影判 PASS 的可见单元集合（唯一裁决的落地缓存）：区分“已通过·投影恢复中”与“等待检查”。 */
 const unitGridCorePassUnits = ref(new Set<string>());
-const frozenReferenceThumbnailCache = new Map<string, Promise<FrozenReferenceThumbnailResult>>();
+const frozenReferenceThumbnailCache = createBoundedKeyedCache<Promise<FrozenReferenceThumbnailResult>>(96);
 // 冻结参考闭包会同时复验多个本地 CAS 缩略图；generation-run 路径含 history+media+pack。
 // 超时必须 AbortController.abort，并丢弃迟到 IPC 结果（见 unit-grid-projection-read-gate）。
 const UNIT_GRID_RAW_PROJECTION_READ_TIMEOUT_MS = UNIT_GRID_RAW_PROJECTION_READ_TIMEOUT_MS_DEFAULT;
@@ -1426,6 +1512,62 @@ function authorityThumbUrl(recipeKey?: string): string | undefined {
   return url;
 }
 
+function resolveStudioTraceSelector(): { packId: string } | { runId: string } | { resultId: string } | null {
+  const canvasPanelId = selectedPanelIds.value[0];
+  if (canvasPanelId) {
+    const pipeline = panelPipeline.value.get(canvasPanelId);
+    if (pipeline?.packId) return { packId: pipeline.packId };
+    if (pipeline?.generationRunId) return { runId: pipeline.generationRunId };
+    if (pipeline?.raw?.resultId) return { resultId: pipeline.raw.resultId };
+    const focused = unitDetail.value?.selectedPanel;
+    if (focused?.panel.id === canvasPanelId && focused.generation.packId) {
+      return { packId: focused.generation.packId };
+    }
+    return null;
+  }
+  const unitId = unitDetail.value?.unit.id;
+  if (unitId) {
+    const grid = unitGridRawPipeline.value.get(unitId);
+    if (grid?.packId) return { packId: grid.packId };
+    if (grid?.generationRunId) return { runId: grid.generationRunId };
+  }
+  const focused = unitDetail.value?.selectedPanel;
+  if (focused?.generation.packId) return { packId: focused.generation.packId };
+  return null;
+}
+
+async function openStudioGenerationTrace(): Promise<void> {
+  directorPanelOpen.value = false;
+  generationTraceOpen.value = true;
+  generationTraceError.value = "";
+  generationTrace.value = null;
+  const selector = resolveStudioTraceSelector();
+  if (!selector) {
+    generationTraceError.value = "需要 pack 或 run。未冻结的宫格不能打开生成追溯，禁止猜第一格。";
+    return;
+  }
+  const sequence = ++generationTraceLoadSequence;
+  generationTraceLoading.value = true;
+  try {
+    const trace = await window.canvasApi.getStudioTrace(props.projectRoot, selector);
+    if (sequence !== generationTraceLoadSequence) return;
+    generationTrace.value = trace;
+  } catch (error) {
+    if (sequence !== generationTraceLoadSequence) return;
+    generationTraceError.value = error instanceof Error ? error.message : String(error);
+  } finally {
+    if (sequence === generationTraceLoadSequence) generationTraceLoading.value = false;
+  }
+}
+
+function closeStudioGenerationTrace(): void {
+  generationTraceLoadSequence += 1;
+  generationTraceOpen.value = false;
+  generationTraceLoading.value = false;
+  generationTrace.value = null;
+  generationTraceError.value = "";
+}
+
 function onDirectorAction(action: DirectorAction): void {
   if (action.kind === "toggle-panel") {
     toggleDirectorPanel();
@@ -1448,8 +1590,12 @@ function onDirectorAction(action: DirectorAction): void {
     directorPanelOpen.value = false;
     return;
   }
-  if (action.kind === "open-trace" || action.kind === "open-consistency") {
-    const panelId = unitDetail.value?.panels[0]?.id;
+  if (action.kind === "open-trace") {
+    void openStudioGenerationTrace();
+    return;
+  }
+  if (action.kind === "open-consistency") {
+    const panelId = selectedPanelIds.value[0] ?? unitDetail.value?.selectedPanelId ?? unitDetail.value?.panels[0]?.id;
     if (panelId) openPanelReview(panelId);
     directorPanelOpen.value = false;
   }
@@ -1864,6 +2010,258 @@ const selectedCharacterViewSlots = computed(() => {
   if (selection.value?.kind !== "asset") return [];
   return characterViewSlots.value.get(selection.value.asset.id) ?? [];
 });
+const inspectorPreviousStandingLine = ref<string | null>(null);
+const inspectorPreviousStandingSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>(null);
+const inspectorFrozenLightingLine = ref<string | null>(null);
+const inspectorFrozenCostumeLine = ref<string | null>(null);
+const inspectorLightingCostumeSource = ref<"frozen-rendered-prompt" | "unit-lock" | null>(null);
+const inspectorShotTypeLine = ref<string | null>(null);
+const inspectorStyleLockLine = ref<string | null>(null);
+const inspectorBeatLine = ref<string | null>(null);
+const inspectorConsistencyPeekLine = ref<string | null>(null);
+const inspectorSceneBackReferenceNote = ref<string | null>(null);
+const inspectorSceneBackReferences = ref<SceneBackReference[]>([]);
+const inspectorPropBackReferenceNote = ref<string | null>(null);
+const inspectorPropBackReferences = ref<SceneBackReference[]>([]);
+const inspectorCharacterBackReferenceNote = ref<string | null>(null);
+const inspectorCharacterBackReferences = ref<SceneBackReference[]>([]);
+type InspectorLockOverlay = {
+  panelId: string;
+  panelIndex: number;
+  sceneLighting: string;
+  costumeState: string;
+  shotType: "original" | "extension" | "";
+};
+const inspectorLockOverlayCacheKey = ref<string | null>(null);
+const inspectorLockOverlayByPanelId = ref(new Map<string, InspectorLockOverlay>());
+let inspectorStandingToken = 0;
+
+function clearInspectorLockOverlayCache(): void {
+  inspectorLockOverlayCacheKey.value = null;
+  inspectorLockOverlayByPanelId.value = new Map();
+}
+
+async function readInspectorLockOverlays(
+  projectRoot: string,
+  unitId: string,
+  unitRevision: number,
+): Promise<Map<string, InspectorLockOverlay>> {
+  const key = `${projectRoot}\0${unitId}:${unitRevision}`;
+  if (inspectorLockOverlayCacheKey.value === key) return inspectorLockOverlayByPanelId.value;
+  try {
+    const result = await window.canvasApi.getStudioUnitLockOverlays(projectRoot, { unitId, unitRevision });
+    const next = new Map<string, InspectorLockOverlay>();
+    for (const row of result.overlays ?? []) {
+      const panelId = row.panelId?.trim() ?? "";
+      if (!panelId) continue;
+      next.set(panelId, {
+        panelId,
+        panelIndex: row.panelIndex,
+        sceneLighting: row.sceneLighting ?? "",
+        costumeState: row.costumeState ?? "",
+        shotType: row.shotType === "extension" || row.shotType === "original" ? row.shotType : "",
+      });
+    }
+    inspectorLockOverlayCacheKey.value = key;
+    inspectorLockOverlayByPanelId.value = next;
+    return next;
+  } catch {
+    clearInspectorLockOverlayCache();
+    return inspectorLockOverlayByPanelId.value;
+  }
+}
+
+function inspectorConsistencyPeekLabel(peek?: {
+  status: "cached" | "unevaluated";
+  verdict?: "consistent" | "needs-review" | "drifted" | "not-checkable";
+  generationRunId?: string | null;
+}): string {
+  if (!peek || peek.status === "unevaluated" || !peek.verdict) return "一致性：未评估";
+  if (peek.verdict === "consistent") return "一致性：一致";
+  if (peek.verdict === "needs-review") return "一致性：需复核";
+  if (peek.verdict === "drifted") return "一致性：明显漂移";
+  return "一致性：无法检查";
+}
+
+async function applyInspectorConsistencyPeek(token: number, panelId: string): Promise<void> {
+  const unitId = unitDetail.value?.unit.id;
+  if (!props.projectRoot || !unitId || !panelId.trim()) {
+    if (token === inspectorStandingToken) inspectorConsistencyPeekLine.value = "一致性：未评估";
+    return;
+  }
+  try {
+    const historyResult = await window.canvasApi.getStudioGenerationControl(props.projectRoot, {
+      operation: "history",
+      unitId,
+      panelId,
+      limit: 1,
+      order: "newest-first",
+    });
+    if (token !== inspectorStandingToken) return;
+    if (historyResult.operation !== "history" || historyResult.status !== "ready") {
+      inspectorConsistencyPeekLine.value = "一致性：未评估";
+      return;
+    }
+    inspectorConsistencyPeekLine.value = inspectorConsistencyPeekLabel(historyResult.consistencyPeek);
+  } catch {
+    if (token === inspectorStandingToken) inspectorConsistencyPeekLine.value = "一致性：未评估";
+  }
+}
+
+async function applyInspectorSceneBackrefs(
+  token: number,
+  panelId: string,
+  panelIndex: number,
+): Promise<void> {
+  const unit = unitDetail.value?.unit;
+  if (!props.projectRoot || !unit?.id || !Number.isInteger(unit.revision) || unit.revision < 1) {
+    inspectorSceneBackReferenceNote.value = formatSceneBackReferences(0, []);
+    inspectorSceneBackReferences.value = [];
+    inspectorPropBackReferenceNote.value = formatPropBackReferences(0, []);
+    inspectorPropBackReferences.value = [];
+    inspectorCharacterBackReferenceNote.value = formatCharacterBackReferences(0, []);
+    inspectorCharacterBackReferences.value = [];
+    return;
+  }
+  try {
+    const result = await window.canvasApi.getStudioSceneBackReferences(props.projectRoot, {
+      unitId: unit.id,
+      unitRevision: unit.revision,
+      sequence: unit.sequence,
+      panelId,
+      panelIndex,
+      season: unit.seasonId,
+      episode: unit.episodeId,
+    });
+    if (token !== inspectorStandingToken) return;
+    inspectorSceneBackReferenceNote.value = result.sceneBackReferenceNote;
+    inspectorSceneBackReferences.value = result.sceneBackReferences ?? [];
+    inspectorPropBackReferenceNote.value = result.propBackReferenceNote;
+    inspectorPropBackReferences.value = result.propBackReferences ?? [];
+    inspectorCharacterBackReferenceNote.value = result.characterBackReferenceNote;
+    inspectorCharacterBackReferences.value = result.characterBackReferences ?? [];
+  } catch {
+    if (token !== inspectorStandingToken) return;
+    inspectorSceneBackReferenceNote.value = formatSceneBackReferences(0, []);
+    inspectorSceneBackReferences.value = [];
+    inspectorPropBackReferenceNote.value = formatPropBackReferences(0, []);
+    inspectorPropBackReferences.value = [];
+    inspectorCharacterBackReferenceNote.value = formatCharacterBackReferences(0, []);
+    inspectorCharacterBackReferences.value = [];
+  }
+}
+
+async function revealInspectorSceneBackRef(ref: SceneBackReference): Promise<void> {
+  if (!ref.unitId.trim() || !ref.panelId.trim()) return;
+  try {
+    await focusAppearance(ref.unitId, ref.panelId);
+  } catch {
+    // 单元/宫格不在当前工程则失败关闭，禁止猜第一格。
+  }
+}
+
+watch([selection, unitDetail, () => props.projectRoot], async () => {
+  const token = ++inspectorStandingToken;
+  inspectorPreviousStandingLine.value = null;
+  inspectorPreviousStandingSource.value = null;
+  inspectorFrozenLightingLine.value = null;
+  inspectorFrozenCostumeLine.value = null;
+  inspectorLightingCostumeSource.value = null;
+  inspectorShotTypeLine.value = null;
+  inspectorStyleLockLine.value = null;
+  inspectorBeatLine.value = null;
+  inspectorConsistencyPeekLine.value = null;
+  inspectorSceneBackReferenceNote.value = null;
+  inspectorSceneBackReferences.value = [];
+  inspectorPropBackReferenceNote.value = null;
+  inspectorPropBackReferences.value = [];
+  inspectorCharacterBackReferenceNote.value = null;
+  inspectorCharacterBackReferences.value = [];
+  if (selection.value?.kind !== "panel") return;
+  const panel = selection.value.panel;
+  void applyInspectorConsistencyPeek(token, panel.id);
+  const packId = unitDetail.value?.selectedPanel?.panel.id === panel.id
+    ? unitDetail.value.selectedPanel.generation.packId
+    : undefined;
+  if (packId && props.projectRoot) {
+    try {
+      const pack = await window.canvasApi.getStudioFrozenPack(props.projectRoot, packId);
+      if (token !== inspectorStandingToken) return;
+      if (pack) {
+        const line = formatPreviousStandingReadonlyLine(previousStandingFromAnyFrozenPack(pack, panel.id));
+        if (line) {
+          inspectorPreviousStandingLine.value = line;
+          inspectorPreviousStandingSource.value = "frozen-rendered-prompt";
+        }
+        inspectorFrozenLightingLine.value = formatFrozenPanelLightingReadonlyLine(
+          frozenPanelLightingFromAnyFrozenPack(pack, panel.id),
+        );
+        inspectorFrozenCostumeLine.value = formatFrozenPanelCostumeReadonlyLine(
+          frozenPanelCostumeFromAnyFrozenPack(pack, panel.id),
+        );
+        inspectorShotTypeLine.value = formatFrozenPanelShotTypeReadonlyLine(
+          frozenPanelShotTypeFromAnyFrozenPack(pack, panel.id),
+        );
+        inspectorStyleLockLine.value = formatFrozenStyleLockReadonlyLine(
+          styleLockRefsFromAnyFrozenPack(pack, panel.id),
+        );
+        inspectorBeatLine.value = formatFrozenPanelBeatReadonlyLine(
+          frozenPanelBeatFromAnyFrozenPack(pack, panel.id),
+        );
+        inspectorLightingCostumeSource.value = "frozen-rendered-prompt";
+        await applyInspectorSceneBackrefs(token, panel.id, panel.ordinal);
+        return;
+      }
+    } catch {
+      if (token !== inspectorStandingToken) return;
+    }
+  }
+  if (token !== inspectorStandingToken) return;
+  const previous = (unitDetail.value?.panels ?? [])
+    .filter((entry) => entry.ordinal < panel.ordinal)
+    .sort((left, right) => right.ordinal - left.ordinal)[0];
+  if (previous) {
+    inspectorPreviousStandingLine.value = formatUnitLockPreviousStandingLine({
+      panelIndex: previous.ordinal,
+      panelId: previous.id,
+      shotComposition: previous.shotComposition ?? "",
+      visualAction: previous.visualAction ?? "",
+      filmingMethod: "",
+    });
+    inspectorPreviousStandingSource.value = "unit-lock";
+  }
+  const unitId = unitDetail.value?.unit.id;
+  const unitRevision = unitDetail.value?.unit.revision;
+  inspectorBeatLine.value = formatUnitLockPanelBeatLine({
+    panelIndex: panel.ordinal,
+    startSeconds: panel.startSeconds,
+    endSeconds: panel.endSeconds,
+    durationSeconds: panel.durationSeconds,
+  });
+  if (!props.projectRoot || !unitId || !Number.isInteger(unitRevision) || unitRevision < 1) {
+    inspectorStyleLockLine.value = formatUnitLockStyleLockLine(
+      unitDetail.value?.selectedPanel?.panel.id === panel.id
+        ? unitDetail.value.selectedPanel.controlAssets
+        : undefined,
+    );
+    inspectorLightingCostumeSource.value = "unit-lock";
+    await applyInspectorSceneBackrefs(token, panel.id, panel.ordinal);
+    return;
+  }
+  const overlays = await readInspectorLockOverlays(props.projectRoot, unitId, unitRevision);
+  if (token !== inspectorStandingToken) return;
+  const overlay = overlays.get(panel.id);
+  inspectorFrozenLightingLine.value = formatUnitLockPanelLightingLine(overlay);
+  inspectorFrozenCostumeLine.value = formatUnitLockPanelCostumeLine(overlay);
+  inspectorShotTypeLine.value = formatUnitLockPanelShotTypeLine(overlay);
+  inspectorStyleLockLine.value = formatUnitLockStyleLockLine(
+    unitDetail.value?.selectedPanel?.panel.id === panel.id
+      ? unitDetail.value.selectedPanel.controlAssets
+      : undefined,
+  );
+  inspectorLightingCostumeSource.value = "unit-lock";
+  await applyInspectorSceneBackrefs(token, panel.id, panel.ordinal);
+}, { immediate: true });
 const appearanceListElement = computed<HTMLElement | null>(() => inspectorPanelEl.value?.appearanceListElement ?? null);
 
 const filteredEpisodes = computed(() => {
@@ -1884,7 +2282,12 @@ async function refreshTimelineProjectionForUnits(
     timelineProjection.reset();
     return null;
   }
-  await timelineProjection.refresh(scope.season, scope.episode);
+  const visibleUnitIds = [...new Set(units.map((unit) => unit.id).filter(Boolean))].slice(0, 36);
+  if (visibleUnitIds.length === 0) {
+    timelineProjection.reset();
+    return null;
+  }
+  await timelineProjection.refresh(scope.season, scope.episode, visibleUnitIds);
   return timelineProjection.projection.value
     ? new Map(timelineProjection.projection.value.map((unit) => [unit.unitId, unit]))
     : null;
@@ -2143,6 +2546,13 @@ const pipelineNodeCount = computed(() => nodes.value.filter((node) => {
   const kind = (node.data as { kind?: string } | undefined)?.kind;
   return kind === "raw" || kind === "labeled" || kind === "review";
 }).length);
+const referenceNodeCount = computed(() => nodes.value.filter((node) => (
+  (node.data as { kind?: string } | undefined)?.kind === "reference"
+)).length);
+const continuityNodeCount = computed(() => nodes.value.filter((node) => (
+  (node.data as { kind?: string } | undefined)?.kind === "continuity"
+)).length);
+const edgeObjectCount = computed(() => edges.value.length);
 const textDocumentCount = computed(() => textDocuments.value.length);
 const thumbnailNodeCount = computed(() => {
   const projectedAssets = workspaceMode.value === "workflow"
@@ -2194,9 +2604,14 @@ const nodeActionPanel = computed(() => {
       assetCount: panel.assetIds.length,
       canFreezeDispatch: panel.status === "generation-ready" || panel.bindingCurrentness === "current",
       isBusy: Boolean(selectedNodeBusy.value),
+      unitGridNextActionCode: unitDetail.value?.nextAction.code,
+      unitGridNextActionLabel: unitDetail.value?.nextAction.label,
+      checkpointNewSlotDispatchAllowed: overview.value?.checkpoint.newSlotDispatchAllowed,
+      checkpointBlockingBatchNumber: overview.value?.checkpoint.blockingBatchNumber,
     });
   }
   if (selection.value.kind === "unit") {
+    const sameUnit = unitDetail.value?.unit.id === selection.value.unit.id;
     return buildStudioCanvasNodeActionPanel({
       kind: "unit",
       id: selection.value.unit.id,
@@ -2204,6 +2619,10 @@ const nodeActionPanel = computed(() => {
       title: selection.value.unit.label,
       status: selection.value.unit.status,
       subtitle: selection.value.unit.episodeId,
+      unitGridNextActionCode: sameUnit ? unitDetail.value?.nextAction.code : undefined,
+      unitGridNextActionLabel: sameUnit ? unitDetail.value?.nextAction.label : undefined,
+      checkpointNewSlotDispatchAllowed: overview.value?.checkpoint.newSlotDispatchAllowed,
+      checkpointBlockingBatchNumber: overview.value?.checkpoint.blockingBatchNumber,
     });
   }
   if (selection.value.kind === "asset") {
@@ -2254,6 +2673,14 @@ function runNodeAction(code: StudioCanvasNodeActionCode): void {
     return;
   }
   if (code === "freeze-dispatch" && selection.value?.kind === "panel") {
+    if (checkpointNewSlotBlocked.value) {
+      errorMessage.value = checkpointGateHint.value;
+      return;
+    }
+    if (unitGridDispatchBlocked.value) {
+      errorMessage.value = unitGridDispatchHint.value;
+      return;
+    }
     emit("requestGeneration", {
       ...(unitDetail.value?.unit.id ? { unitId: unitDetail.value.unit.id } : {}),
       panelId: selection.value.panel.id,
@@ -3849,6 +4276,22 @@ function closeInspector(): void {
   const selectedNode = nodes.value.find((node) => node.selected);
   const nodeId = selectedNode?.id;
   selection.value = null;
+  inspectorStandingToken += 1;
+  inspectorPreviousStandingLine.value = null;
+  inspectorPreviousStandingSource.value = null;
+  inspectorFrozenLightingLine.value = null;
+  inspectorFrozenCostumeLine.value = null;
+  inspectorLightingCostumeSource.value = null;
+  inspectorShotTypeLine.value = null;
+  inspectorStyleLockLine.value = null;
+  inspectorBeatLine.value = null;
+  inspectorConsistencyPeekLine.value = null;
+  inspectorSceneBackReferenceNote.value = null;
+  inspectorSceneBackReferences.value = [];
+  inspectorPropBackReferenceNote.value = null;
+  inspectorPropBackReferences.value = [];
+  inspectorCharacterBackReferenceNote.value = null;
+  inspectorCharacterBackReferences.value = [];
   void nextTick(() => restoreInspectorFlowFocus(nodeId));
 }
 
@@ -4048,7 +4491,7 @@ function toggleEdges(): void {
 }
 
 function toggleMiniMap(): void {
-  showMiniMap.value = !showMiniMap.value;
+  miniMapUserOverride.value = !showMiniMap.value;
 }
 
 function toggleWorkspaceMode(): void {
@@ -4633,11 +5076,21 @@ async function loadApprovedUnitGridRawProjection(
         const adjudication = await readUnitGridProjectionWithin(
           "核心正式时间线投影",
           "时间线",
-          (signal) => ipcUnderSignal(signal, () => window.canvasApi.getApprovedTimelineProjection(projectRoot, {
-            season: group.season,
-            episode: group.episode,
-            fastMode: true,
-          })),
+          (signal) => ipcUnderSignal(signal, () => {
+            const unitIds = units.slice(0, 36)
+              .filter((unit) => unit.seasonId === group.season && unit.episodeId === group.episode)
+              .map((unit) => unit.id)
+              .filter(Boolean);
+            if (unitIds.length === 0) {
+              throw new Error("可见页没有可投影的 unitIds，禁止回退整集。");
+            }
+            return window.canvasApi.getApprovedTimelineProjection(projectRoot, {
+              season: group.season,
+              episode: group.episode,
+              fastMode: true,
+              unitIds,
+            });
+          }),
         );
         for (const coreUnit of adjudication.units) {
           coreByUnitId.set(coreUnit.unitId, coreUnit);
@@ -4684,7 +5137,8 @@ async function loadApprovedUnitGridRawProjection(
         .map((unit) => [unit.id, projectCoreNonPassProjection(coreByUnitId.get(unit.id))] as const)
         .filter((entry): entry is readonly [string, UnitGridNonPassProjection] => Boolean(entry[1])),
     );
-    rebuildGraph();
+    // 与随后停检账本 placeholder 的 schedule 同帧合并，避免核心裁剪后再同步整图一次。
+    scheduleUnitGridGraphRebuild();
     // 停检账本存证只作执行层身份来源与“深核验中”占位：仅核心判 PASS 且选中 SHA
     // 与存证一致的单元落占位；核心未判 PASS 的单元绝不因存证单独出现 raw 节点。
     const checkpointNeeded = units.slice(0, 36).some((unit) => {
@@ -6060,7 +6514,7 @@ function schedulePlanStatusRebuild(): void {
       planStatusRebuildDirty = true;
       return;
     }
-    rebuildGraph();
+    scheduleUnitGridGraphRebuild();
   }, 200);
 }
 
@@ -6078,7 +6532,8 @@ async function refreshGenerationProjectionFromLedger(): Promise<void> {
   if (canvasDisposed || projectRoot !== props.projectRoot) return;
   scheduleApprovedUnitGridRawProjection(projectRoot, units, coreByUnit);
   if (canvasDisposed || projectRoot !== props.projectRoot) return;
-  rebuildGraph();
+  // raw 投影收尾已 scheduleUnitGridGraphRebuild；此处再并入同一 rAF，避免同帧双整图。
+  scheduleUnitGridGraphRebuild();
 }
 
 /**
@@ -6119,6 +6574,14 @@ async function runLastWorkflowGroup(): Promise<void> {
     if (!workflowActionIsCurrent(scope)) return;
     if (runtimeWriteBlocked.value) {
       errorMessage.value = "运行工件或源码身份不可确认；已停止工作流派发，请重启源码无限画布。";
+      return;
+    }
+    if (checkpointNewSlotBlocked.value) {
+      errorMessage.value = checkpointGateHint.value;
+      return;
+    }
+    if (unitGridDispatchBlocked.value) {
+      errorMessage.value = unitGridDispatchHint.value;
       return;
     }
     await executeWorkflowGroup(group, frozenDraft, true, scope);
@@ -6167,6 +6630,18 @@ async function primaryStart(): Promise<void> {
     if (generationProjectionDegraded.value) {
       errorMessage.value = generationProjectionHint.value;
       lastWorkflowRunSummary.value = "生成账本待恢复，未派发";
+      lastWorkflowFailed.value = true;
+      return;
+    }
+    if (checkpointNewSlotBlocked.value) {
+      errorMessage.value = checkpointGateHint.value;
+      lastWorkflowRunSummary.value = "六图闸未放行，未派发";
+      lastWorkflowFailed.value = true;
+      return;
+    }
+    if (unitGridDispatchBlocked.value) {
+      errorMessage.value = unitGridDispatchHint.value;
+      lastWorkflowRunSummary.value = "整板下一步不是派发，未派发";
       lastWorkflowFailed.value = true;
       return;
     }
@@ -6511,11 +6986,19 @@ async function refreshUnitLeaseDisplay(): Promise<void> {
   }
 }
 
-/** T14: 加载生产诊断（真实状态，禁止“宫格数×3”推算）。 */
+function onProductionDiagnosticsToggle(event: Event): void {
+  const el = event.currentTarget;
+  if (!(el instanceof HTMLDetailsElement)) return;
+  productionDiagnosticsOpen.value = el.open;
+  if (el.open) void refreshProductionDiagnostics();
+}
+
+/** T14: 加载生产诊断（真实状态，禁止“宫格数×3”推算）。仅展开详细诊断时调用。 */
 async function refreshProductionDiagnostics(): Promise<void> {
   const projectRoot = props.projectRoot;
   const requestSequence = refreshSequence;
   const isCurrent = () => projectRoot === props.projectRoot && requestSequence === refreshSequence;
+  if (isCurrent()) productionDiagnosticsLoading.value = true;
   try {
     const api = (window as any).canvasApi;
     if (!api?.getStudioProductionDiagnostics) {
@@ -6527,6 +7010,8 @@ async function refreshProductionDiagnostics(): Promise<void> {
     productionDiagnostics.value = diagnostics;
   } catch {
     if (isCurrent()) productionDiagnostics.value = null;
+  } finally {
+    if (isCurrent()) productionDiagnosticsLoading.value = false;
   }
 }
 
@@ -6761,8 +7246,8 @@ async function refreshAll(): Promise<void> {
     // T12: loadUnits 已按当前页面唯一季集刷新批量投影；多季集混排不猜测。
     // T15: 刷新单元级写租约显示
     void refreshUnitLeaseDisplay();
-    // T14: 加载生产诊断（真实计数）
-    void refreshProductionDiagnostics();
+    // T14: 详细诊断含整集 canonical + 写版 inspect，不得在 36 单元首屏默认物化。
+    if (productionDiagnosticsOpen.value) void refreshProductionDiagnostics();
     // 来源预览只读但可能遍历较大目录，首屏完成后后台核对，不阻塞画布可用性。
     void refreshLocalProductionPreview(projectRoot, requestSequence);
     rebuildGraph();
@@ -8381,6 +8866,7 @@ function onCanvasKeydown(event: KeyboardEvent): void {
   const addWasOpen = addMenuOpen.value;
   const viewMenuWasOpen = Boolean(viewMenuEl.value?.hasAttribute("open"));
   const directorWasOpen = directorPanelOpen.value;
+  const traceWasOpen = generationTraceOpen.value;
   const connectWasOpen = connectMode.value;
   connectMode.value = false;
   pendingConnectionSourceId.value = "";
@@ -8388,6 +8874,7 @@ function onCanvasKeydown(event: KeyboardEvent): void {
   addMenuOpen.value = false;
   helpOpen.value = false;
   directorPanelOpen.value = false;
+  if (traceWasOpen) closeStudioGenerationTrace();
   closeViewMenu({ restore: false });
   resetClearConfirmation();
   stripPendingOutline(escapePendingId);
@@ -8439,6 +8926,7 @@ function invalidateCanvasRequests(): void {
   pinnedAssetController.invalidate();
   guardedActionGate.invalidate();
   invalidateGlobalResourceRequest();
+  miniMapUserOverride.value = null;
 }
 
 watch(() => unitDetail.value?.unit.id, (unitId, previousUnitId) => {
@@ -8456,6 +8944,7 @@ watch(() => props.projectRoot, async (_projectRoot, previousProjectRoot) => {
   overview.value = null;
   unitLeaseDisplayHint.value = null;
   productionDiagnostics.value = null;
+  productionDiagnosticsLoading.value = false;
   localProductionPreview.value = null;
   localCreativeIngestStatus.value = null;
   localProductionPreviewLoading.value = false;
@@ -8487,6 +8976,7 @@ watch(() => props.projectRoot, async (_projectRoot, previousProjectRoot) => {
   pinnedTextDocuments.value = [];
   pinnedMediaItems.value = new Map();
   unitDetail.value = null;
+  clearInspectorLockOverlayCache();
   unitGridRawPipeline.value = new Map();
   unitGridReferencePipeline.value = new Map();
   unitGridContinuityPipeline.value = new Map();
@@ -8495,6 +8985,7 @@ watch(() => props.projectRoot, async (_projectRoot, previousProjectRoot) => {
   unitGridNonPassPipeline.value = new Map();
   unitGridCorePassUnits.value = new Set();
   frozenReferenceThumbnailCache.clear();
+  thumbnailLru.clear();
   studioThumbnailDerivationFailed.clear();
   // T12/T13：切工程时失效在途投影请求并清空旧工程的投影/summary，不跨工程残留。
   timelineProjection.reset();

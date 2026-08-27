@@ -1,0 +1,43 @@
+{
+  "id": "goal-ssl5-reader-lighting-costume-backrefs-20260826",
+  "kind": "ssl5-reader-lock-lighting-costume-and-clickable-scene-backrefs",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T20:05:00.000Z",
+  "scope": "SSL-5 missing-to-gen plan and script-span-media-map expose lock-version sceneLighting/costumeState as lightingCostumeLine, plus previous-panel lighting/costume when G2+. Scene backrefs stay structured (sceneBackReferences) and click-through to the exact earlier align panel. Reader may load the align board only after the user clicks a backref. Align sidebar shows costumeState. Not BindingSet; no dispatch; no unit-head read; no Binding inspect; no pixel evaluate; SSL5_PLAN_SCHEMA_VERSION remains 1.",
+  "invariants": {
+    "usesLoadedBoardOnly": true,
+    "matchesSceneCategoryOnly": true,
+    "ignoresLaterUnits": true,
+    "notBindingSet": true,
+    "doesNotReadUnitHead": true,
+    "doesNotCallBindingInspect": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotDispatch": true,
+    "schemaVersionUnchanged": 1,
+    "readerLoadsAlignOnlyOnUserClick": true,
+    "wizardStillDoesNotAutoLoadAlign": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts"
+      ],
+      "result": "4 files / 39 tests PASS"
+    },
+    "commit": "9c2c351"
+  },
+  "notClaimed": [
+    "scene consistency fully solved",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

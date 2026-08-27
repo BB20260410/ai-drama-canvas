@@ -1,0 +1,55 @@
+{
+  "id": "goal-reader-ssl5-consistency-peek-20260826",
+  "kind": "reader-ssl5-consistency-peek",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T23:21:00.000Z",
+  "scope": "Reader span-media hits and the SSL-5 banner now expose consistencyPeek for Review assist. Span hits attach process-local LRU peeks from generationRunId after the pure overlap map; resolveScriptSpanMediaMap itself stays unevaluated. SSL-5 copies the already-loaded align-board peek of the focus missing panel, or the row peek only when there is no missing panel; it does not steal a covered sibling panel verdict and does not import the evaluator. Unevaluated ≠ not-checkable. Dynamic import peekStudioConsistencyVerdictByRunId from the span map only; does not call evaluateStudioConsistency; Vue reuses peekLabel and does not import the evaluator. schemaVersion remains 1. Machine does not auto Review PASS.",
+  "invariants": {
+    "schemaVersionStill1": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotAutoReviewPass": true,
+    "unevaluatedIsNotNotCheckable": true,
+    "resolveMapStaysUnevaluated": true,
+    "ssl5ReusesBoardPeek": true,
+    "ssl5DoesNotStealCoveredSiblingPeek": true,
+    "ssl5DoesNotImportEvaluator": true,
+    "projectionDoesNotStaticImportEvaluator": true,
+    "vueDoesNotImportEvaluator": true,
+    "doesNotChangeDashboardProjection": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-trace-ui.test.ts"
+      ],
+      "result": "13 files / 197 tests PASS"
+    },
+    "commit": "c0d9a97"
+  },
+  "notClaimed": [
+    "evaluateStudioConsistency called from span map or SSL-5",
+    "MCP new process always has cached verdict",
+    "auto Review PASS",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "id": "goal-align-panel-standing-handoff-20260826",
+  "createdAt": "2026-08-26T18:19:00.000Z",
+  "kind": "align-panel-standing-handoff-readonly",
+  "conclusion": "PASS",
+  "scope": "Align panel projects previous-panel standing handoff, filming/lighting, and snapshot asset mentions; SSL-5 focus carries previous shot fields. Not BindingSet. No dispatch.",
+  "invariants": {
+    "handoffFromPreviousPanelInUnit": true,
+    "assetMentionsAreSnapshotOnly": true,
+    "doesNotCallBindingControl": true,
+    "doesNotDispatch": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotReviewPass": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/use-virtual-list-lru-hotkeys.test.ts"
+      ],
+      "result": "5 files / 33 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "standing fully solved",
+    "BindingSet generation-ready",
+    "real-generation constraint evidence",
+    "installed T23",
+    "100% fit"
+  ]
+}

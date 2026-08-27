@@ -63,7 +63,12 @@ import {
   appendStudioContinuityObservation,
 } from "./studio-continuity-ledger.js";
 import { submitStudioGenerationReview } from "./studio-generation-review.js";
-import { submitStudioPostResultObservation } from "./studio-post-result-observation.js";
+import {
+  withStudioMultimediaTimeline,
+  withStudioPostResultObservation,
+  type StudioMultimediaTimelineModule,
+  type StudioPostResultObservationModule,
+} from "./studio-readonly-diagnostics-lazy.js";
 import {
   attestStudioGenerationCheckpoint,
   refreshStudioGenerationCheckpoint,
@@ -77,43 +82,68 @@ import {
   ActiveManagedStudioContextError,
   assertActiveManagedStudioContextToken,
 } from "./active-managed-studio-context.js";
+import { withDuduReadonlyImport, type DuduReadonlyImportModule } from "./dudu-readonly-import-lazy.js";
+import { withStudioVideoPackage, type StudioVideoPackageModule } from "./studio-video-package-lazy.js";
+import type { StudioVideoPackageAuthorityInput } from "./studio-video-package.js";
 import {
-  discoverDuduReadonlyImportProjects,
-  finalizeDuduReadonlyManagedProject,
-  getDuduReadonlyImportControl,
-  reconcileDuduReadonlyHistoricalPasses,
-} from "./dudu-readonly-import.js";
-import {
-  buildAndVerifyStudioVideoPackage,
-  getStudioVideoPackageControl,
-  prepareStudioVideoPackageExport,
-  StudioVideoPackageError,
-  type StudioVideoPackageAuthorityInput,
-} from "./studio-video-package.js";
-import {
-  attestStudioHiggsfieldConnectorCapability,
-  buildStudioHiggsfieldVideoConnectorRequest,
-  prepareStudioHiggsfieldVideoGeneration,
-  recordStudioHiggsfieldSubmission,
-} from "./studio-higgsfield-video-generation.js";
-import {
-  assertNoActiveStudioHiggsfieldConnectorReservation,
-  assertStudioHiggsfieldConnectorOwnerCurrent,
-  authorizeStudioHiggsfieldConnectorRequest,
-  claimStudioHiggsfieldConnectorRequest,
-  enqueueStudioHiggsfieldConnectorRequest,
-  getStudioHiggsfieldConnectorRequest,
-  preflightStudioHiggsfieldConnectorRequest,
-  reconcileStudioHiggsfieldConnectorRequest,
-  recordStudioHiggsfieldConnectorSubmission,
-} from "./studio-higgsfield-connector-queue.js";
-import { attachStudioMultimediaTimelineMedia } from "./studio-multimedia-timeline.js";
-import { materializeLocalCreativeProductionUnits } from "./local-creative-production-unit-materializer.js";
+  withHiggsfieldQueue,
+  withHiggsfieldVideo,
+  type HiggsfieldQueueModule,
+  type HiggsfieldVideoModule,
+} from "./studio-higgsfield-lazy.js";
+import { withLocalCreativeMaterializer, type LocalCreativeMaterializerModule } from "./local-creative-lazy.js";
 import {
   deterministicStudioTimelineRejection,
   rejectP30OrchestrationCommand,
 } from "./studio-command-errors.js";
 import type { StudioRuntimeCommandRequest } from "./studio-command-runtime.js";
+
+const discoverDuduReadonlyImportProjects = (...args: Parameters<DuduReadonlyImportModule["discoverDuduReadonlyImportProjects"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.discoverDuduReadonlyImportProjects(...args));
+const finalizeDuduReadonlyManagedProject = (...args: Parameters<DuduReadonlyImportModule["finalizeDuduReadonlyManagedProject"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.finalizeDuduReadonlyManagedProject(...args));
+const getDuduReadonlyImportControl = (...args: Parameters<DuduReadonlyImportModule["getDuduReadonlyImportControl"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.getDuduReadonlyImportControl(...args));
+const reconcileDuduReadonlyHistoricalPasses = (...args: Parameters<DuduReadonlyImportModule["reconcileDuduReadonlyHistoricalPasses"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.reconcileDuduReadonlyHistoricalPasses(...args));
+const buildAndVerifyStudioVideoPackage = (...args: Parameters<StudioVideoPackageModule["buildAndVerifyStudioVideoPackage"]>) =>
+  withStudioVideoPackage((videoPackage) => videoPackage.buildAndVerifyStudioVideoPackage(...args));
+const getStudioVideoPackageControl = (...args: Parameters<StudioVideoPackageModule["getStudioVideoPackageControl"]>) =>
+  withStudioVideoPackage((videoPackage) => videoPackage.getStudioVideoPackageControl(...args));
+const prepareStudioVideoPackageExport = (...args: Parameters<StudioVideoPackageModule["prepareStudioVideoPackageExport"]>) =>
+  withStudioVideoPackage((videoPackage) => videoPackage.prepareStudioVideoPackageExport(...args));
+const attestStudioHiggsfieldConnectorCapability = (...args: Parameters<HiggsfieldVideoModule["attestStudioHiggsfieldConnectorCapability"]>) =>
+  withHiggsfieldVideo((higgsfield) => higgsfield.attestStudioHiggsfieldConnectorCapability(...args));
+const buildStudioHiggsfieldVideoConnectorRequest = (...args: Parameters<HiggsfieldVideoModule["buildStudioHiggsfieldVideoConnectorRequest"]>) =>
+  withHiggsfieldVideo((higgsfield) => higgsfield.buildStudioHiggsfieldVideoConnectorRequest(...args));
+const prepareStudioHiggsfieldVideoGeneration = (...args: Parameters<HiggsfieldVideoModule["prepareStudioHiggsfieldVideoGeneration"]>) =>
+  withHiggsfieldVideo((higgsfield) => higgsfield.prepareStudioHiggsfieldVideoGeneration(...args));
+const recordStudioHiggsfieldSubmission = (...args: Parameters<HiggsfieldVideoModule["recordStudioHiggsfieldSubmission"]>) =>
+  withHiggsfieldVideo((higgsfield) => higgsfield.recordStudioHiggsfieldSubmission(...args));
+const assertNoActiveStudioHiggsfieldConnectorReservation = (...args: Parameters<HiggsfieldQueueModule["assertNoActiveStudioHiggsfieldConnectorReservation"]>) =>
+  withHiggsfieldQueue((queue) => queue.assertNoActiveStudioHiggsfieldConnectorReservation(...args));
+const submitStudioPostResultObservation = (...args: Parameters<StudioPostResultObservationModule["submitStudioPostResultObservation"]>) =>
+  withStudioPostResultObservation((observation) => observation.submitStudioPostResultObservation(...args));
+const attachStudioMultimediaTimelineMedia = (...args: Parameters<StudioMultimediaTimelineModule["attachStudioMultimediaTimelineMedia"]>) =>
+  withStudioMultimediaTimeline((timeline) => timeline.attachStudioMultimediaTimelineMedia(...args));
+const assertStudioHiggsfieldConnectorOwnerCurrent = (...args: Parameters<HiggsfieldQueueModule["assertStudioHiggsfieldConnectorOwnerCurrent"]>) =>
+  withHiggsfieldQueue((queue) => queue.assertStudioHiggsfieldConnectorOwnerCurrent(...args));
+const authorizeStudioHiggsfieldConnectorRequest = (...args: Parameters<HiggsfieldQueueModule["authorizeStudioHiggsfieldConnectorRequest"]>) =>
+  withHiggsfieldQueue((queue) => queue.authorizeStudioHiggsfieldConnectorRequest(...args));
+const claimStudioHiggsfieldConnectorRequest = (...args: Parameters<HiggsfieldQueueModule["claimStudioHiggsfieldConnectorRequest"]>) =>
+  withHiggsfieldQueue((queue) => queue.claimStudioHiggsfieldConnectorRequest(...args));
+const enqueueStudioHiggsfieldConnectorRequest = (...args: Parameters<HiggsfieldQueueModule["enqueueStudioHiggsfieldConnectorRequest"]>) =>
+  withHiggsfieldQueue((queue) => queue.enqueueStudioHiggsfieldConnectorRequest(...args));
+const getStudioHiggsfieldConnectorRequest = (...args: Parameters<HiggsfieldQueueModule["getStudioHiggsfieldConnectorRequest"]>) =>
+  withHiggsfieldQueue((queue) => queue.getStudioHiggsfieldConnectorRequest(...args));
+const preflightStudioHiggsfieldConnectorRequest = (...args: Parameters<HiggsfieldQueueModule["preflightStudioHiggsfieldConnectorRequest"]>) =>
+  withHiggsfieldQueue((queue) => queue.preflightStudioHiggsfieldConnectorRequest(...args));
+const reconcileStudioHiggsfieldConnectorRequest = (...args: Parameters<HiggsfieldQueueModule["reconcileStudioHiggsfieldConnectorRequest"]>) =>
+  withHiggsfieldQueue((queue) => queue.reconcileStudioHiggsfieldConnectorRequest(...args));
+const recordStudioHiggsfieldConnectorSubmission = (...args: Parameters<HiggsfieldQueueModule["recordStudioHiggsfieldConnectorSubmission"]>) =>
+  withHiggsfieldQueue((queue) => queue.recordStudioHiggsfieldConnectorSubmission(...args));
+const materializeLocalCreativeProductionUnits = (...args: Parameters<LocalCreativeMaterializerModule["materializeLocalCreativeProductionUnits"]>) =>
+  withLocalCreativeMaterializer((materializer) => materializer.materializeLocalCreativeProductionUnits(...args));
 
 async function buildStudioHiggsfieldImageConnectorRequest(projectRoot: string, generationRunId: string): Promise<{
   provider: "higgsfield-connector"; kind: "image"; model: "gpt_image_2"; prompt: string;
@@ -593,7 +623,7 @@ export async function executeStudioCommand(
       }
     }
     case "dispatch_studio_generation_pack": {
-      const { expectedRevision, ...dispatch } = request.payload;
+      const { expectedRevision, revisionImpact, ...dispatch } = request.payload;
       assertStudioGenerationExpectedRevision("studio_generation_dispatch", expectedRevision, { packId: dispatch.packId });
       try {
         const pack = await readAnyStudioGenerationFrozenPack(projectRoot, dispatch.packId);
@@ -634,7 +664,10 @@ export async function executeStudioCommand(
             currentRevision: pack.target.unitRevision,
           });
         }
-        return await dispatchStudioGenerationPack(projectRoot, dispatch);
+        return await dispatchStudioGenerationPack(projectRoot, {
+          ...dispatch,
+          ...(revisionImpact ? { revisionImpact } : {}),
+        });
       } catch (error) {
         rejectStudioGenerationPrecondition(error, "studio_generation_dispatch", {
           packId: dispatch.packId,
@@ -873,6 +906,7 @@ export async function executeStudioCommand(
         return await createStudioGenerationPlan(projectRoot, {
           nodes: request.payload.nodes,
           sourceCommandRequestId: operationId,
+          ...(request.payload.revisionImpact ? { revisionImpact: request.payload.revisionImpact } : {}),
         });
       } catch (error) {
         rejectStudioGenerationPrecondition(error, "studio_generation_plan", {});
@@ -1024,11 +1058,13 @@ export async function executeStudioCommand(
             : {}),
         });
       } catch (error) {
-        if (error instanceof StudioVideoPackageError) {
+        const packageError = await withStudioVideoPackage((videoPackage) =>
+          error instanceof videoPackage.StudioVideoPackageError ? error : null);
+        if (packageError) {
           rejectP30OrchestrationCommand({
             entityType: "studio_video_package",
-            reason: error.code === "operation-conflict" ? "revision_conflict" : "validation_failed",
-            message: error.message,
+            reason: packageError.code === "operation-conflict" ? "revision_conflict" : "validation_failed",
+            message: packageError.message,
             expectedRevision: request.payload.expectedRevision,
           });
         }

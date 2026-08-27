@@ -438,8 +438,8 @@ describe("素材库安全媒体读取协议", () => {
     expect(after.fullHashVerifications.derivative - before.fullHashVerifications.derivative).toBe(1);
     expect(after.cacheMisses.derivative - before.cacheMisses.derivative).toBe(1);
     expect(after.cacheHits.derivative - before.cacheHits.derivative).toBe(3);
-    expect(after.fullHashVerifications.media - before.fullHashVerifications.media).toBe(1);
-    expect(after.cacheHits.media - before.cacheHits.media).toBe(3);
+    expect(after.fullHashVerifications.media - before.fullHashVerifications.media).toBe(0);
+    expect(after.cacheHits.media - before.cacheHits.media).toBe(0);
     expect(after.size).toBeLessThanOrEqual(after.limit);
     expect(after.inFlight).toBe(0);
   }, 30_000);
@@ -528,6 +528,6 @@ describe("素材库安全媒体读取协议", () => {
 
     const after = getStudioMediaVerificationCacheDiagnostics();
     expect(after.fullHashVerifications.derivative - before.fullHashVerifications.derivative).toBe(2);
-    expect(after.fullHashVerifications.media - before.fullHashVerifications.media).toBe(2);
+    expect(after.fullHashVerifications.media - before.fullHashVerifications.media).toBe(0);
   });
 });

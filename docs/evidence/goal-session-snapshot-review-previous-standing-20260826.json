@@ -1,0 +1,40 @@
+{
+  "id": "goal-session-snapshot-review-previous-standing-20260826",
+  "createdAt": "2026-08-26T18:46:00.000Z",
+  "kind": "session-snapshot-review-previous-standing-readonly",
+  "conclusion": "PASS",
+  "scope": "Session snapshot, generation control, and continuity review expose previousStanding parsed only from that pack's renderedPrompt. Does not read unit head. Historical packs without the line stay null. Does not evaluate pixels or call Binding. No dispatch.",
+  "invariants": {
+    "parsesFrozenPromptOnly": true,
+    "doesNotReadUnitHead": true,
+    "historicalPacksStayNull": true,
+    "doesNotDispatch": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotCallBindingControl": true,
+    "firstPanelFingerprintUnchangedWhenNull": true,
+    "unitGridRequiresPanelId": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-continuity-review-ui.test.ts",
+        "tests/studio-unit-grid-brief-contract.test.ts",
+        "tests/studio-generation-plan-ui.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts"
+      ],
+      "result": "6 files / 38 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "real-generation constraint evidence",
+    "standing fully solved",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

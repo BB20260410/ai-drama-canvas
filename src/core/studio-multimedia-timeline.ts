@@ -911,6 +911,7 @@ async function approvedStoryboardProjection(
     season: snapshot.unit.season,
     episode: snapshot.unit.episode,
     fastMode: true,
+    unitIds: [snapshot.unit.id],
   });
   const unit = projection.units.find((entry) => entry.unitId === snapshot.unit.id);
   if (!unit || !unit.selectedRawSha256 || !unit.selectedLabeledSha256 || unit.productionStatus !== "pass") {

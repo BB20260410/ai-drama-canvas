@@ -1,0 +1,55 @@
+{
+  "id": "goal-ssl5-write-lease-missing-report-20260826",
+  "kind": "ssl5-write-lease-missing-report",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T23:36:00.000Z",
+  "scope": "Align board copies the write lease already computed by getStudioEpisodeEarliest (held / holderId / denialHint; no token). SSL-5 inserts acquire-lease before freeze only when the board projected held===false. Unprojected lease does not insert (legacy recommendedPath stays). Earliest wait/retry/Review and six-image gate still win. Align Vue exposes writeLeaseLine plus missingReport JSON copy (SSL-3 export). Does not acquire, expose token, dispatch, or change T4/T5/dashboard/readiness hot path.",
+  "invariants": {
+    "schemaVersionStill1": true,
+    "ssl5DoesNotSecondEarliest": true,
+    "ssl5DoesNotImportWriteLeaseModule": true,
+    "unprojectedLeaseDoesNotInsert": true,
+    "doesNotChangeDraftReadyForOpenLease": true,
+    "doesNotExposeToken": true,
+    "doesNotAcquireLease": true,
+    "doesNotDispatch": true,
+    "earliestAndCheckpointWin": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true,
+    "doesNotChangeDashboardProjection": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-script-library-reader.test.ts"
+      ],
+      "result": "14 files / 205 tests PASS"
+    },
+    "commit": "6182a6e"
+  },
+  "notClaimed": [
+    "SSL-5 acquires write lease",
+    "SSL-5 executes create-plan or dispatch",
+    "readiness reads checkpoint control",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

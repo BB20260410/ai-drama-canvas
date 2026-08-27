@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "2-B",
+  "recordedAt": "2026-08-25T14:31:00Z",
+  "change": {
+    "composableRefreshAcceptsUnitIds": true,
+    "canvasVisiblePageRequestsUnitIds": true,
+    "emptyVisibleIdsDoNotFallbackToEpisode": true
+  },
+  "verification": {
+    "typecheckApp": "PASS",
+    "linuxTests": {
+      "useStudioTimelineProjection": "PASS",
+      "managedStudioCanvasUi": "PASS",
+      "boundResolver": "PASS"
+    }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W2-B：画布可见页只请求 unitIds；空可见集不回退整集。核心裁决仍来自投影。"
+}

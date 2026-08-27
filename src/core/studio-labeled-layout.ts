@@ -10,7 +10,8 @@
 import { createHash } from "node:crypto";
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import sharp, { type Metadata } from "sharp";
+import type { Metadata } from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 
 export type StudioLabeledLayoutErrorCode =
   | "invalid-input"
@@ -155,7 +156,7 @@ export async function renderStudioLabeledLayoutToBuffer(
 
   let meta: Metadata;
   try {
-    meta = await sharp(rawPath).rotate().metadata();
+    meta = await (await loadSharpDefault())(rawPath).rotate().metadata();
   } catch (error) {
     fail("decode-failed", "raw 图像无法解码。", [error instanceof Error ? error.message : String(error)]);
   }
@@ -193,7 +194,7 @@ export async function renderStudioLabeledLayoutToBuffer(
 
   let png: Buffer;
   try {
-    png = await sharp(rawPath)
+    png = await (await loadSharpDefault())(rawPath)
       .rotate()
       .composite([{ input: svg, top: 0, left: 0 }])
       .png()
@@ -289,7 +290,7 @@ export async function renderStudioUnitGridLabeledLayoutToBuffer(
   }
   let meta: Metadata;
   try {
-    meta = await sharp(rawPath).rotate().metadata();
+    meta = await (await loadSharpDefault())(rawPath).rotate().metadata();
   } catch (error) {
     fail("decode-failed", "raw 图像无法解码。", [error instanceof Error ? error.message : String(error)]);
   }
@@ -323,7 +324,7 @@ export async function renderStudioUnitGridLabeledLayoutToBuffer(
 
   let png: Buffer;
   try {
-    png = await sharp(rawPath).rotate().composite([{ input: svg, top: 0, left: 0 }]).png().toBuffer();
+    png = await (await loadSharpDefault())(rawPath).rotate().composite([{ input: svg, top: 0, left: 0 }]).png().toBuffer();
   } catch (error) {
     fail("output-failed", "渲染 unit-grid labeled 失败。", [error instanceof Error ? error.message : String(error)]);
   }

@@ -89,20 +89,26 @@ function inspectOptionalSqliteFileBindingIdentity(
   label: string,
 ): SqliteSourceBindingIdentity | null {
   // 并发 SQLite 连接会合法地删除并重建 WAL/SHM/JOURNAL sidecar（checkpoint/连接关闭）。
-  // 删除（ENOENT）按“无 sidecar”处理；重建导致 lstat 与 O_NOFOLLOW 打开之间 inode
-  // 变更（"changed while binding"）是瞬态竞态而非来源篡改：按有界退避重试，每次
-  // 都重新执行完整安全校验（非 symlink、单链接、dev/ino 一致），最后一次仍失败才
-  // 失败关闭。其他安全违规（非普通文件、symlink、多链接）立即失败，不重试。
+  // 删除（ENOENT）按“无 sidecar”处理；重建导致 lstat↔realpath inode 变更、
+  // unlink 短窗 nlink=0、或 lstat 与 O_NOFOLLOW 打开之间 inode 变更
+  // （"changed while binding"）是瞬态竞态而非来源篡改：按有界退避重试。
+  // 其他安全违规（非普通文件、symlink、nlink>1）立即失败，不重试。
   const maxAttempts = 8;
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
       const metadata = lstatSync(filePath, { bigint: true });
       const canonicalPath = realpathSync(filePath);
       const canonicalMetadata = lstatSync(canonicalPath, { bigint: true });
-      if (!metadata.isFile() || metadata.isSymbolicLink() || metadata.nlink !== 1n
-        || !canonicalMetadata.isFile() || canonicalMetadata.isSymbolicLink() || canonicalMetadata.nlink !== 1n
-        || metadata.dev !== canonicalMetadata.dev || metadata.ino !== canonicalMetadata.ino) {
+      if (metadata.isSymbolicLink() || canonicalMetadata.isSymbolicLink()
+        || !metadata.isFile() || !canonicalMetadata.isFile()
+        || metadata.nlink > 1n || canonicalMetadata.nlink > 1n) {
         throw new Error(`${label} is not a safe single-link regular file.`);
+      }
+      // 合法并发重建：lstat↔realpath 之间 inode 被换，或 unlink 后短窗 nlink=0。
+      // 与下面 fd 绑定窗口同类，按瞬态竞态退避。symlink / 硬链（nlink>1）上面已失败关闭。
+      if (metadata.nlink !== 1n || canonicalMetadata.nlink !== 1n
+        || metadata.dev !== canonicalMetadata.dev || metadata.ino !== canonicalMetadata.ino) {
+        throw new Error(`${label} changed while binding its file descriptor.`);
       }
       const descriptor = openSync(filePath, fsConstants.O_RDONLY | fsConstants.O_NOFOLLOW);
       try {

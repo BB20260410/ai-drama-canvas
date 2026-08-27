@@ -9,7 +9,7 @@ import { createHash } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { spawn } from "node:child_process";
-import sharp from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import { createManagedProject, inspectManagedProject, type ProjectShell } from "./managed-project.js";
 import {
   appendStudioAssetVersion,
@@ -139,7 +139,7 @@ async function realPng(filePath: string, seed: number, width = 64, height = 96):
   const r = (seed * 37) % 200 + 20;
   const g = (seed * 17) % 200 + 20;
   const b = (seed * 53) % 200 + 20;
-  await sharp({
+  await (await loadSharpDefault())({
     create: { width, height, channels: 3, background: { r, g, b } },
   }).png({ compressionLevel: 6 }).toFile(filePath);
 }

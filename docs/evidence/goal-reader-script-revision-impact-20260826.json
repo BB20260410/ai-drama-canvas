@@ -1,0 +1,56 @@
+{
+  "id": "goal-reader-script-revision-impact-20260826",
+  "kind": "reader-script-revision-impact",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-27T00:12:00.000Z",
+  "scope": "Script reader exposes P24 getStudioScriptRevisionImpact for the already-loaded revisionId. On-demand only; not baked into ScriptReaderView. New IPC canvas:get-studio-script-revision-impact (dynamic import, requireManagedStudioProject). Unexpected rows require human review; machine does not Review PASS. No pack/run does not guess the first panel. Does not change SCRIPT_READER_SCHEMA_VERSION, getStudioTrace pack/run/result selector, P24 golden, T4, T5, or dashboard projection. Does not dispatch.",
+  "invariants": {
+    "onDemandOnly": true,
+    "readerSchemaVersionStill1": true,
+    "doesNotChangeGetStudioTraceSelector": true,
+    "doesNotChangeP24Golden": true,
+    "doesNotGuessFirstPanel": true,
+    "unexpectedRequiresHumanReview": true,
+    "doesNotAutoReviewPass": true,
+    "doesNotDispatch": true,
+    "vueDoesNotImportStudioTrace": true,
+    "readerCoreDoesNotImportStudioTrace": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true,
+    "doesNotChangeDashboardProjection": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-script-library-reader.test.ts"
+      ],
+      "result": "14 files / 210 tests PASS"
+    },
+    "commit": "99ad995",
+    "linuxDirfdNote": "tests/studio-generation-session-snapshot.test.ts P7 fixture still needs Darwin dirfd; not claimed as this Cloud gate"
+  },
+  "notClaimed": [
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed",
+    "SSL-6 product-pack close",
+    "script-revision-impact auto-loaded on reader open"
+  ]
+}

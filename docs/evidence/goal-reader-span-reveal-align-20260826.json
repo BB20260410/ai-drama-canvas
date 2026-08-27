@@ -1,0 +1,37 @@
+{
+  "id": "goal-reader-span-reveal-align-20260826",
+  "createdAt": "2026-08-26T18:24:20.000Z",
+  "kind": "reader-span-reveal-align-panel-readonly",
+  "conclusion": "PASS",
+  "scope": "Reader span-media hit can jump to align tab and select the exact unit/panel, then scroll that row nearest into view. Missing board is loaded without stealing SSL-5 focus. Unknown unit/panel fails closed. Missing-media hit does not bind another panel image. No dispatch.",
+  "invariants": {
+    "selectsExactPanelId": true,
+    "doesNotGuessPanel": true,
+    "doesNotRevealSsl5Instead": true,
+    "doesNotBindOtherPanelImage": true,
+    "doesNotCallBindingControl": true,
+    "doesNotDispatch": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotReviewPass": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/use-virtual-list-lru-hotkeys.test.ts"
+      ],
+      "result": "5 files / 35 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "desktop GUI click verified",
+    "standing fully solved",
+    "real-generation constraint evidence",
+    "installed T23",
+    "100% fit"
+  ]
+}

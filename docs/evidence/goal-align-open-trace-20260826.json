@@ -1,0 +1,39 @@
+{
+  "id": "goal-align-open-trace-20260826",
+  "createdAt": "2026-08-26T19:04:00.000Z",
+  "kind": "align-sidebar-open-studio-trace-readonly",
+  "conclusion": "PASS",
+  "scope": "Script-media align sidebar and reader span-media hits can open the same readonly StudioGenerationTraceDrawer via StudioScriptProductUiApi.getStudioTrace → canvas:get-studio-trace. Selected panel/hit without pack/run disables the button and fails closed; does not guess another panel. Drawer is mounted on the product-ring root so reader and align share it. Does not evaluate pixels, call Binding inspect, or dispatch. Linux source contract only; no Electron GUI click.",
+  "invariants": {
+    "callsGetStudioTraceViaAlignApi": true,
+    "doesNotGuessFirstPanel": true,
+    "reusesDirectorTraceDrawer": true,
+    "doesNotDispatch": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotCallBindingInspect": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/script-media-align-view.test.ts",
+        "tests/material-studio-ui-contract.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts"
+      ],
+      "result": "5 files / 126 tests PASS"
+    },
+    "commit": "cbf22d4"
+  },
+  "notClaimed": [
+    "real-generation constraint evidence",
+    "standing fully solved",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click of align-open-trace",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { executeIdempotentCommand } from "./command-bus.js";
-import { doctorNovelAgent } from "./novel-agent-service.js";
+import { withNovelAgent } from "./novel-agent-lazy.js";
 import {
   probeNovelChapterConsistencyCore,
   type NovelChapterConsistencyProbe,
@@ -406,7 +406,7 @@ export async function getNovelDesktopWritingDashboard(
   const snapshot = await repository.snapshot();
   if (!snapshot.chapters) throw new Error("Writing OS 桌面仪表盘只支持 managed manuscript。");
   const ordered = orderedNovelChapters(snapshot.chapters);
-  const doctor = await doctorNovelAgent(projectRoot, { workflowMode });
+  const doctor = await withNovelAgent((novelAgent) => novelAgent.doctorNovelAgent(projectRoot, { workflowMode }));
   const state = await loadNovelWritingState(projectRoot, snapshot.workspace.projectId);
   const selected = input.selectedChapterId
     ? ordered.find((entry) => entry.chapterId === input.selectedChapterId) ?? null

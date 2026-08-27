@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "6-B",
+  "recordedAt": "2026-08-25T17:20:00Z",
+  "change": {
+    "kind": "verification-skip",
+    "sourceCodeChanged": false,
+    "installedT23": "NOT_RUN"
+  },
+  "environment": {
+    "platform": "linux",
+    "ownerNamedInstalledT23": false,
+    "installedAppPath": "/Applications/AI 漫剧画布.app",
+    "installedAppPresent": false,
+    "officialManagedProjectPresent": false,
+    "guiLaunched": false
+  },
+  "verification": {
+    "t23FirstCardMs": null,
+    "t23FirstRawMs": null,
+    "hiddenStrictGate": "NOT_RUN",
+    "reason": "owner 未点名；本 Cloud 无 macOS 安装版、无正式受管工程 GUI。计划规定仅当 owner 点名才复测。"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W6-B：未跑安装版 T23 首卡/首 raw。不得称整包完成。整计划最高部分完成。",
+  "residual": [
+    "安装版 T23 首卡 ≤1.5s / 首 raw / IPC 峰值 4 本轮无新数；沿用 2026-08-11 关账，不回退也不重测",
+    "W2-C P7 有界对照仍需 Darwin",
+    "列表翻页 aicanvas-studio://media/* = 0 探针未跑",
+    "禁止写成「运行速度已关账」或「T23 已复测不回退」"
+  ]
+}

@@ -327,6 +327,7 @@ import {
 
 import {
   getApprovedTimelineProjection,
+  resolveProjectionBundleApprovedTimelineUnitIds,
   type ApprovedTimelineUnitProjection,
 } from "./studio-approved-timeline-projection.js";
 
@@ -346,12 +347,8 @@ import {
   type StudioMultimediaTimelineRole,
 } from "./studio-multimedia-timeline.js";
 
-import {
-  getStudioVideoPackageControl, // 修正点 4（3/4）：本轮真正调用，见主入口 videoPackage
-  type StudioVideoPackageControlLookup,
-  type StudioVideoPackageControlQuery,
-  type StudioVideoPackageAuthorityInput,
-} from "./studio-video-package.js";
+import { withStudioVideoPackage } from "./studio-video-package-lazy.js";
+import type { StudioVideoPackageControlLookup, StudioVideoPackageControlQuery, StudioVideoPackageAuthorityInput } from "./studio-video-package.js";
 
 import {
   getStudioMedia,
@@ -1218,29 +1215,35 @@ export async function buildStudioProductionProjectionBundle(
     }),
   );
 
-  // 步骤 3：整单元四轨 Timeline、正式结果选择和前后邻接并行读取。
-  const timelineProjectionPromise = getStudioMultimediaTimelineProjection(projectRoot, {
-    unitId,
-    unitRevision,
-  });
-  const approvedTimelinePromise = getApprovedTimelineProjection(projectRoot, {
-    season: unitDetail.unit.seasonId,
-    episode: unitDetail.unit.episodeId,
-    fastMode: true,
-  });
-  const successorMapPromise = getStudioCanonicalSuccessorUnitIds(projectRoot, [unitId]);
-  const predecessorMapPromise = getStudioCanonicalPredecessorUnitIds(projectRoot, [unitId]);
-
+  // 步骤 3：四轨 Timeline 与前后邻接并行；正式选择只物化当前+邻接（最多 3）。
+  // 阶段名必须仍是 timeline-approved-neighbors（T23 探针锁死集合）。
     const [timelineProjection, approvedTimeline, successorMap, predecessorMap] =
       await measureStudioProjectionPhase(
         instrumentation,
         "timeline-approved-neighbors",
-        () => Promise.all([
-          timelineProjectionPromise,
-          approvedTimelinePromise,
-          successorMapPromise,
-          predecessorMapPromise,
-        ]),
+        async () => {
+          const [timelineProjection, successorMap, predecessorMap] = await Promise.all([
+            getStudioMultimediaTimelineProjection(projectRoot, {
+              unitId,
+              unitRevision,
+            }),
+            getStudioCanonicalSuccessorUnitIds(projectRoot, [unitId]),
+            getStudioCanonicalPredecessorUnitIds(projectRoot, [unitId]),
+          ]);
+          const previousUnitId = predecessorMap[unitId] ?? null;
+          const nextUnitId = successorMap[unitId] ?? null;
+          const approvedTimeline = await getApprovedTimelineProjection(projectRoot, {
+            season: unitDetail.unit.seasonId,
+            episode: unitDetail.unit.episodeId,
+            fastMode: true,
+            unitIds: resolveProjectionBundleApprovedTimelineUnitIds({
+              unitId,
+              previousUnitId,
+              nextUnitId,
+            }),
+          });
+          return [timelineProjection, approvedTimeline, successorMap, predecessorMap] as const;
+        },
       );
 
   if (!timelineProjection) {
@@ -1288,7 +1291,7 @@ export async function buildStudioProductionProjectionBundle(
     ? { by: "authority-latest", authority: { kind: "studio-review", reviewId: ownReviewId } satisfies StudioVideoPackageAuthorityInput }
     : undefined;
   const videoPackageControlPromise = videoPackageQuery
-    ? getStudioVideoPackageControl(projectRoot, videoPackageQuery)
+    ? withStudioVideoPackage((videoPackage) => videoPackage.getStudioVideoPackageControl(projectRoot, videoPackageQuery))
     : Promise.resolve(undefined);
 
   // 步骤 6：相邻摘要、冻结包和视频包并行读取。

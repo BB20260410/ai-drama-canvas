@@ -89,6 +89,7 @@ import {
   setActiveStudioContext,
 } from "../core/sidecar.js";
 import {
+  hashResolvedLegacyAssetFile,
   isLegacyUnhashedMediaPathAllowed,
   readLegacyAssetBytes,
   resolveLegacyAssetPath,
@@ -97,7 +98,7 @@ import { getReviewQueue, listReviewRecords, submitReview } from "../core/reviews
 import { commitProjectImport, prepareProjectImport } from "../core/importer.js";
 import { deleteAgentSkill, listAgentSkills, readAgentSkill, saveAgentSkill } from "../core/skills.js";
 import { createContinuationHandoff, deleteProjectContext, getContinuationSnapshot, listProjectContext, searchProjectContext, upsertProjectContext } from "../core/memory.js";
-import { buildStoryContext, connectStoryEvents, importStoryFile, importStoryText, listStoryChapters, listStoryEvents, listStorySources, readStoryChapter, upsertStoryEvent } from "../core/story.js";
+import { withStory, type StoryModule } from "../core/story-lazy.js";
 import {
   resolveRuntimeBuildIdentity,
   sourceDigestPathIsRelevant,
@@ -115,12 +116,13 @@ import {
 } from "../core/runtime-ipc-effect.js";
 import { createRuntimeIpcPerformanceProbe } from "../core/runtime-ipc-observability.js";
 import { getRuntimeStorageReadMetrics } from "../core/runtime-storage-observability.js";
-import { applyEditOperation, beginEditorSession, cancelEditRender, closeEditorSession, createEditProject, createVideoContinuationPack, exportEditProjectOtio, extractLastFrame, extractTimelineFrame, getEditHistoryInfo, getEditProject, getEditorSessionState, getEditRenderJob, importEditProjectOtio, listEditMedia, listEditMediaPage, listEditProjects, listEditRenderJobs, listTimelineFrameExtractions, listVideoContinuationPacks, prepareEditMediaPreview, prepareEditMediaProxy, prepareNestedTimelinePreview, prepareTimelineVideoContinuation, probeVideoEngine, redoEditProject, renderEditProject, resolveEditorSessionRecovery, saveEditProject, setEditorSessionProject, startEditRender, undoEditProject, updateVideoContinuationPack, type EditOperation } from "../core/editor.js";
+import { withEditor, type EditorModule } from "../core/editor-lazy.js";
+import type { EditOperation } from "../core/editor.js";
 import { analyzeChangeImpact, getProductionWorkflow, getStoryboard, listCreativeBibles, updateProductionWorkflowStage, upsertCreativeBible, upsertStoryboardRow } from "../core/production.js";
-import { analyzeAdaptationChangeImpact, analyzeNovelChapters, exportAdaptation, generateAdaptationPlans, getAdaptationWorkspace, materializeSelectedAdaptationPlan, regenerateAdaptationScope, selectAdaptationPlan, upsertNarrativeBeat, upsertNovelFact, validateAdaptationPlan } from "../core/adaptation.js";
+import { withAdaptation, type AdaptationModule } from "../core/adaptation-lazy.js";
 import { listAssetRelations, listVoiceIdentities, upsertAssetRelation, upsertVoiceIdentity } from "../core/asset-registry.js";
-import { createNovelAnalysisTask, listNovelAnalysisReviews, reviewNovelAnalysisBatch, reviewNovelAnalysisItem } from "../core/novel-analysis.js";
-import { getNovelAnalysisProviderSettings, getNovelAnalysisRunProgress, listNovelAnalysisRunProgress, probeNovelAnalysisProvider } from "../core/novel-analysis-provider.js";
+import { withNovelAnalysis, type NovelAnalysisModule } from "../core/novel-analysis-lazy.js";
+import { withNovelAnalysisProvider, type NovelAnalysisProviderModule } from "../core/novel-analysis-provider-lazy.js";
 import {
   executeIdempotentCommand,
   getNovelImportCommandOwnerRoot,
@@ -178,8 +180,8 @@ import { getCanonicalAsset, getCanonicalAssetCatalogState, listCanonicalAssets, 
 import { FUSION_STORYBOARD_BEAT_ALGORITHM_VERSION, FUSION_STORYBOARD_VISIBLE_TIME_POLICY_VERSION } from "../core/fusion-storyboard-grid.js";
 import { getFusionStoryboardSheetState, listFusionStoryboardSheets } from "../core/fusion-storyboard-sheet-evidence.js";
 import type { AgentSkillCategory, CanvasEntity, CanvasSemanticLink, EditProject, GenerationKind, GenerationSettings, ProjectConfig, ProjectContextKind, ProjectImportMode, ProjectImportOptions, ReviewDecision, ShotTiming, StoryEventStatus, SubmitReviewInput, TaskPack, WorkItemStatus } from "../core/types.js";
-import { streamStudioMediaRequest, StudioMediaProtocolError } from "../core/studio-media-protocol.js";
-import { resolveLegacyThumbnailFromBytes } from "../core/legacy-thumbnails.js";
+import { evictVerifiedFileCacheAfterLeavingProject, streamStudioMediaRequest, StudioMediaProtocolError } from "../core/studio-media-protocol.js";
+import { LEGACY_THUMBNAIL_PLACEHOLDER_WEBP, resolveLegacyThumbnail } from "../core/legacy-thumbnails.js";
 import {
   getStudioMediaDerivatives,
   materializeStudioMediaDerivatives,
@@ -232,16 +234,10 @@ import {
   reconcileCanvasProjectionOutbox,
   replayUnconsumedCanvasProjectionEvents,
 } from "../core/studio-canvas-projection-outbox.js";
-import {
-  discoverDuduReadonlyImportProjects,
-  getDuduReadonlyImportControl,
-} from "../core/dudu-readonly-import.js";
-import {
-  getStudioVideoPackageControl,
-  toStudioVideoPackagePublicControlLookup,
-  type StudioVideoPackageControlQuery,
-} from "../core/studio-video-package.js";
-import { getStudioHiggsfieldVideoGenerationControl } from "../core/studio-higgsfield-video-generation.js";
+import { withDuduReadonlyImport, type DuduReadonlyImportModule } from "../core/dudu-readonly-import-lazy.js";
+import { withStudioVideoPackage, type StudioVideoPackageModule } from "../core/studio-video-package-lazy.js";
+import type { StudioVideoPackageControlQuery } from "../core/studio-video-package.js";
+import { withHiggsfieldVideo, type HiggsfieldVideoModule } from "../core/studio-higgsfield-lazy.js";
 import { buildStudioGenerationPlanProgress } from "../core/studio-generation-plan-progress.js";
 import { createStudioGenerationLedgerWatcher, type StudioGenerationLedgerWatcherHandle } from "./studio-generation-ledger-watcher.js";
 import { registerStudioGlobalResourceReadIpc } from "./studio-global-resource-read-ipc.js";
@@ -253,7 +249,7 @@ import {
   inspectAgentConnections,
 } from "../core/agent-connection-config.js";
 import { getStudioBindingControl, listStudioBindingUnits } from "../core/studio-binding-control.js";
-import { evaluateStudioGenerationPackCurrentness } from "../core/studio-trace.js";
+import { evaluateStudioGenerationPackCurrentness, getStudioGenerationTrace } from "../core/studio-trace.js";
 import { getStudioContinuityReviewControl } from "../core/studio-continuity-review-control.js";
 import { getStudioScriptMediaAlignBoard } from "../core/studio-script-media-align.js";
 import { inspectStudioCrossProjectAssetPackage } from "../core/studio-cross-project-asset-reuse.js";
@@ -290,6 +286,67 @@ import {
   type StudioCanvasWorkflowRunOptions,
 } from "../core/studio-canvas-workflow-runner.js";
 import type { StudioCanvasWorkflowGroup } from "../core/studio-canvas-layout-types.js";
+
+const buildStoryContext = (...args: Parameters<StoryModule["buildStoryContext"]>) =>
+  withStory((story) => story.buildStoryContext(...args));
+const connectStoryEvents = (...args: Parameters<StoryModule["connectStoryEvents"]>) =>
+  withStory((story) => story.connectStoryEvents(...args));
+const importStoryFile = (...args: Parameters<StoryModule["importStoryFile"]>) =>
+  withStory((story) => story.importStoryFile(...args));
+const importStoryText = (...args: Parameters<StoryModule["importStoryText"]>) =>
+  withStory((story) => story.importStoryText(...args));
+const listStoryChapters = (...args: Parameters<StoryModule["listStoryChapters"]>) =>
+  withStory((story) => story.listStoryChapters(...args));
+const listStoryEvents = (...args: Parameters<StoryModule["listStoryEvents"]>) =>
+  withStory((story) => story.listStoryEvents(...args));
+const listStorySources = (...args: Parameters<StoryModule["listStorySources"]>) =>
+  withStory((story) => story.listStorySources(...args));
+const readStoryChapter = (...args: Parameters<StoryModule["readStoryChapter"]>) =>
+  withStory((story) => story.readStoryChapter(...args));
+const upsertStoryEvent = (...args: Parameters<StoryModule["upsertStoryEvent"]>) =>
+  withStory((story) => story.upsertStoryEvent(...args));
+const analyzeAdaptationChangeImpact = (...args: Parameters<AdaptationModule["analyzeAdaptationChangeImpact"]>) =>
+  withAdaptation((adaptation) => adaptation.analyzeAdaptationChangeImpact(...args));
+const analyzeNovelChapters = (...args: Parameters<AdaptationModule["analyzeNovelChapters"]>) =>
+  withAdaptation((adaptation) => adaptation.analyzeNovelChapters(...args));
+const exportAdaptation = (...args: Parameters<AdaptationModule["exportAdaptation"]>) =>
+  withAdaptation((adaptation) => adaptation.exportAdaptation(...args));
+const generateAdaptationPlans = (...args: Parameters<AdaptationModule["generateAdaptationPlans"]>) =>
+  withAdaptation((adaptation) => adaptation.generateAdaptationPlans(...args));
+const getAdaptationWorkspace = (...args: Parameters<AdaptationModule["getAdaptationWorkspace"]>) =>
+  withAdaptation((adaptation) => adaptation.getAdaptationWorkspace(...args));
+const materializeSelectedAdaptationPlan = (...args: Parameters<AdaptationModule["materializeSelectedAdaptationPlan"]>) =>
+  withAdaptation((adaptation) => adaptation.materializeSelectedAdaptationPlan(...args));
+const regenerateAdaptationScope = (...args: Parameters<AdaptationModule["regenerateAdaptationScope"]>) =>
+  withAdaptation((adaptation) => adaptation.regenerateAdaptationScope(...args));
+const selectAdaptationPlan = (...args: Parameters<AdaptationModule["selectAdaptationPlan"]>) =>
+  withAdaptation((adaptation) => adaptation.selectAdaptationPlan(...args));
+const upsertNarrativeBeat = (...args: Parameters<AdaptationModule["upsertNarrativeBeat"]>) =>
+  withAdaptation((adaptation) => adaptation.upsertNarrativeBeat(...args));
+const upsertNovelFact = (...args: Parameters<AdaptationModule["upsertNovelFact"]>) =>
+  withAdaptation((adaptation) => adaptation.upsertNovelFact(...args));
+const validateAdaptationPlan = (...args: Parameters<AdaptationModule["validateAdaptationPlan"]>) =>
+  withAdaptation((adaptation) => adaptation.validateAdaptationPlan(...args));
+const listNovelAnalysisReviews = (...args: Parameters<NovelAnalysisModule["listNovelAnalysisReviews"]>) =>
+  withNovelAnalysis((novelAnalysis) => novelAnalysis.listNovelAnalysisReviews(...args));
+const getNovelAnalysisProviderSettings = (...args: Parameters<NovelAnalysisProviderModule["getNovelAnalysisProviderSettings"]>) =>
+  withNovelAnalysisProvider((provider) => provider.getNovelAnalysisProviderSettings(...args));
+const probeNovelAnalysisProvider = (...args: Parameters<NovelAnalysisProviderModule["probeNovelAnalysisProvider"]>) =>
+  withNovelAnalysisProvider((provider) => provider.probeNovelAnalysisProvider(...args));
+const getNovelAnalysisRunProgress = (...args: Parameters<NovelAnalysisProviderModule["getNovelAnalysisRunProgress"]>) =>
+  withNovelAnalysisProvider((provider) => provider.getNovelAnalysisRunProgress(...args));
+const listNovelAnalysisRunProgress = (...args: Parameters<NovelAnalysisProviderModule["listNovelAnalysisRunProgress"]>) =>
+  withNovelAnalysisProvider((provider) => provider.listNovelAnalysisRunProgress(...args));
+const discoverDuduReadonlyImportProjects = (...args: Parameters<DuduReadonlyImportModule["discoverDuduReadonlyImportProjects"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.discoverDuduReadonlyImportProjects(...args));
+const getDuduReadonlyImportControl = (...args: Parameters<DuduReadonlyImportModule["getDuduReadonlyImportControl"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.getDuduReadonlyImportControl(...args));
+const getStudioVideoPackageControl = (...args: Parameters<StudioVideoPackageModule["getStudioVideoPackageControl"]>) =>
+  withStudioVideoPackage((videoPackage) => videoPackage.getStudioVideoPackageControl(...args));
+const toStudioVideoPackagePublicControlLookup = (...args: Parameters<StudioVideoPackageModule["toStudioVideoPackagePublicControlLookup"]>) =>
+  withStudioVideoPackage((videoPackage) => videoPackage.toStudioVideoPackagePublicControlLookup(...args));
+const getStudioHiggsfieldVideoGenerationControl = (...args: Parameters<HiggsfieldVideoModule["getStudioHiggsfieldVideoGenerationControl"]>) =>
+  withHiggsfieldVideo((higgsfield) => higgsfield.getStudioHiggsfieldVideoGenerationControl(...args));
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url));
 const sourceRuntimeWorkspace = path.resolve(currentDir, "../..");
@@ -637,6 +694,7 @@ async function startSourceRuntimeGateWatchers(): Promise<void> {
     || !sourceRuntimeBootIdentity
     || sourceRuntimeGateWatchers.length > 0) return;
   // 不要等 boot hash：watcher 必须覆盖剩余 hash 窗口，否则首个诊断会被迫二次整树 walk。
+  // W4-E：默认只递归订 src/；tests/scripts 见 AI_CANVAS_RUNTIME_GATE_WATCH_TESTS_SCRIPTS
   const watchPaths = sourceDigestWatchPaths(sourceRuntimeWorkspace);
   const workspaceRoot = watchPaths[0];
   if (!workspaceRoot) throw new Error("运行时源码 watcher 缺少 workspace 根。");
@@ -958,14 +1016,30 @@ async function ensureStudioGenerationLedgerWatcher(projectRoot: string): Promise
   return next;
 }
 
+async function evictVerifiedFileCacheForClosedProject(projectRoot: string | null): Promise<void> {
+  if (!projectRoot) return;
+  try {
+    await evictVerifiedFileCacheAfterLeavingProject(projectRoot);
+  } catch {
+    // 切工程淘汰失败不得挡住 watcher 关闭或挂载。
+  }
+}
+
 async function ensureStudioGenerationLedgerWatcherExclusive(projectRoot: string): Promise<void> {
   if (appQuitOperationAdmission.isClosed()) throw new Error("应用正在退出，禁止新建生成账本 watcher。");
   const targetRoot = path.resolve(projectRoot);
   if (generationLedgerWatchedRoot === targetRoot && generationLedgerWatcher) return;
   const previous = generationLedgerWatcher;
+  const previousRoot = generationLedgerWatchedRoot;
   generationLedgerWatcher = null;
   generationLedgerWatchedRoot = null;
-  await previous?.close();
+  try {
+    await previous?.close();
+  } finally {
+    if (previousRoot && previousRoot !== targetRoot) {
+      await evictVerifiedFileCacheForClosedProject(previousRoot);
+    }
+  }
   if (appQuitOperationAdmission.isClosed()) throw new Error("应用正在退出，禁止新建生成账本 watcher。");
   generationLedgerWatcher = createStudioGenerationLedgerWatcher({
     projectRoot: targetRoot,
@@ -983,9 +1057,14 @@ async function ensureStudioGenerationLedgerWatcherExclusive(projectRoot: string)
 async function closeStudioGenerationLedgerWatcher(): Promise<void> {
   const next = generationLedgerWatcherChain.then(async () => {
     const closing = generationLedgerWatcher;
+    const closingRoot = generationLedgerWatchedRoot;
     generationLedgerWatcher = null;
     generationLedgerWatchedRoot = null;
-    await closing?.close();
+    try {
+      await closing?.close();
+    } finally {
+      await evictVerifiedFileCacheForClosedProject(closingRoot);
+    }
   });
   generationLedgerWatcherChain = next.catch(() => undefined);
   return next;
@@ -1922,7 +2001,7 @@ function requireCanonicalAssetListInput(input: unknown): CanonicalAssetIpcListIn
 async function cleanupActiveEditorSessions(): Promise<void> {
   const entries = [...activeEditorSessions.entries()];
   activeEditorSessions.clear();
-  await Promise.all(entries.map(([projectRoot, sessionId]) => closeEditorSession(projectRoot, sessionId)));
+  await Promise.all(entries.map(([projectRoot, sessionId]) => withEditor((editor) => editor.closeEditorSession(projectRoot, sessionId))));
 }
 
 async function trackActiveScan<T>(operation: () => Promise<T>): Promise<T> {
@@ -2986,10 +3065,11 @@ function registerIpc(): void {
   ipcMain.handle("canvas:get-approved-timeline-projection", async (
     _event,
     projectRoot: string,
-    query: { season?: string; episode?: string },
+    query: { season?: string; episode?: string; fastMode?: boolean; unitIds?: string[]; limit?: number } = {},
   ) => {
     await requireManagedStudioProject(projectRoot);
     const { getApprovedTimelineProjection } = await import("../core/studio-approved-timeline-projection.js");
+    // 省略 fastMode 由 core 视为 true；仅显式 false 走 full。
     return getApprovedTimelineProjection(projectRoot, query);
   });
   // T19 持续生图状态机（Agent 恢复生产位置）
@@ -3169,6 +3249,30 @@ function registerIpc(): void {
     await requireManagedStudioProject(projectRoot);
     return readAnyStudioGenerationFrozenPack(projectRoot, packId);
   });
+  ipcMain.handle(
+    "canvas:get-studio-unit-lock-overlays",
+    async (
+      _event,
+      projectRoot: string,
+      query: { unitId: string; unitRevision: number },
+    ) => {
+      await requireManagedStudioProjectReadOnly(projectRoot);
+      const { readStudioUnitLockOverlays } = await import("../core/studio-unit-lock-overlays-read.js");
+      return readStudioUnitLockOverlays(projectRoot, query);
+    },
+  );
+  ipcMain.handle(
+    "canvas:get-studio-scene-backrefs",
+    async (
+      _event,
+      projectRoot: string,
+      query: import("../core/studio-scene-backrefs-read.js").StudioSceneBackrefReadQuery,
+    ) => {
+      await requireManagedStudioProjectReadOnly(projectRoot);
+      const { readStudioSceneBackReferences } = await import("../core/studio-scene-backrefs-read.js");
+      return readStudioSceneBackReferences(projectRoot, query);
+    },
+  );
   ipcMain.handle("canvas:get-studio-pack-currentness", async (
     _event,
     projectRoot: string,
@@ -3179,6 +3283,38 @@ function registerIpc(): void {
     if (!pack) throw new Error(`冻结包不存在：${packId}`);
     // 与 trace 同一 target-aware fail-safe 口径；unit-grid 聚合全部 BindingSet，绝不拿首格冒充整板。
     return evaluateStudioGenerationPackCurrentness(projectRoot, pack);
+  });
+  ipcMain.handle("canvas:get-studio-trace", async (
+    _event,
+    projectRoot: string,
+    selector: { packId?: string; runId?: string; resultId?: string },
+  ) => {
+    await requireManagedStudioProject(projectRoot);
+    const packId = typeof selector?.packId === "string" ? selector.packId.trim() : "";
+    const runId = typeof selector?.runId === "string" ? selector.runId.trim() : "";
+    const resultId = typeof selector?.resultId === "string" ? selector.resultId.trim() : "";
+    const keys = [packId && "packId", runId && "runId", resultId && "resultId"].filter(Boolean);
+    if (keys.length !== 1) throw new Error("selector 必须恰好包含 packId/runId/resultId 之一。");
+    if (packId) return getStudioGenerationTrace(projectRoot, { packId });
+    if (runId) return getStudioGenerationTrace(projectRoot, { runId });
+    return getStudioGenerationTrace(projectRoot, { resultId });
+  });
+  ipcMain.handle("canvas:get-studio-script-revision-impact", async (
+    _event,
+    projectRoot: string,
+    query: { scriptRevisionId: string; limit?: number; cursor?: string },
+  ) => {
+    await requireManagedStudioProject(projectRoot);
+    const scriptRevisionId = typeof query?.scriptRevisionId === "string" ? query.scriptRevisionId.trim() : "";
+    if (!scriptRevisionId) throw new Error("script-revision-impact 需要 scriptRevisionId。");
+    const { getStudioScriptRevisionImpact } = await import("../core/studio-trace.js");
+    return getStudioScriptRevisionImpact(projectRoot, {
+      scriptRevisionId,
+      ...(query?.limit != null ? { limit: Math.min(Number(query.limit) || 20, 100) } : {}),
+      ...(typeof query?.cursor === "string" && query.cursor.trim()
+        ? { cursor: query.cursor.trim() }
+        : {}),
+    });
   });
   ipcMain.handle("canvas:list-studio-text-revisions", async (
     _event,
@@ -3264,6 +3400,36 @@ function registerIpc(): void {
     ) => {
       await requireManagedStudioProject(projectRoot);
       return getStudioScriptMediaAlignBoard(projectRoot, query);
+    },
+  );
+  ipcMain.handle(
+    "canvas:get-studio-script-span-media-map",
+    async (
+      _event,
+      projectRoot: string,
+      query: { season: string; episode: string; startOffsetUtf16: number; endOffsetUtf16: number; limit?: number },
+    ) => {
+      await requireManagedStudioProjectReadOnly(projectRoot);
+      const { getStudioScriptSpanMediaMap } = await import("../core/studio-script-library-projection.js");
+      return getStudioScriptSpanMediaMap(projectRoot, query);
+    },
+  );
+  ipcMain.handle(
+    "canvas:plan-ssl5-missing-to-gen",
+    async (
+      _event,
+      projectRoot: string,
+      query: {
+        season: string;
+        episode: string;
+        documentId?: string;
+        evidenceDir?: string;
+        revisionImpact?: import("../core/studio-generation-plan-draft.js").Ssl5RevisionImpactHint;
+      },
+    ) => {
+      await requireManagedStudioProjectReadOnly(projectRoot);
+      const { planSsl5MissingToGen } = await import("../core/studio-ssl5-missing-to-gen.js");
+      return planSsl5MissingToGen(projectRoot, query);
     },
   );
   ipcMain.handle(
@@ -3754,47 +3920,47 @@ function registerIpc(): void {
   ipcMain.handle("canvas:materialize-adaptation-plan", async (_event, projectRoot: string, input: Parameters<typeof materializeSelectedAdaptationPlan>[1]) => materializeSelectedAdaptationPlan(await requireLegacyStoryMutationProjectRoot(projectRoot), input));
   ipcMain.handle("canvas:analyze-adaptation-impact", (_event, projectRoot: string, input: Parameters<typeof analyzeAdaptationChangeImpact>[1]) => analyzeAdaptationChangeImpact(projectRoot, input));
   ipcMain.handle("canvas:regenerate-adaptation-scope", async (_event, projectRoot: string, input: Parameters<typeof regenerateAdaptationScope>[1]) => regenerateAdaptationScope(await requireLegacyStoryMutationProjectRoot(projectRoot), input));
-  ipcMain.handle("canvas:create-novel-analysis-task", async (_event, projectRoot: string, input: Parameters<typeof createNovelAnalysisTask>[1]) => {
+  ipcMain.handle("canvas:create-novel-analysis-task", async (_event, projectRoot: string, input: Parameters<NovelAnalysisModule["createNovelAnalysisTask"]>[1]) => {
     const idempotencyKey = `ui-analysis-task-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "create_novel_analysis_task", payload: input } });
     return result.result;
   });
-  ipcMain.handle("canvas:list-novel-analysis-reviews", (_event, projectRoot: string, options?: Parameters<typeof listNovelAnalysisReviews>[1]) => listNovelAnalysisReviews(projectRoot, options));
-  ipcMain.handle("canvas:review-novel-analysis-item", async (_event, projectRoot: string, input: Parameters<typeof reviewNovelAnalysisItem>[1]) => {
+  ipcMain.handle("canvas:list-novel-analysis-reviews", (_event, projectRoot: string, options?: Parameters<NovelAnalysisModule["listNovelAnalysisReviews"]>[1]) => listNovelAnalysisReviews(projectRoot, options));
+  ipcMain.handle("canvas:review-novel-analysis-item", async (_event, projectRoot: string, input: Parameters<NovelAnalysisModule["reviewNovelAnalysisItem"]>[1]) => {
     const idempotencyKey = `ui-analysis-review-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "review_novel_analysis_item", payload: input } });
     return result.result;
   });
-  ipcMain.handle("canvas:review-novel-analysis-batch", async (_event, projectRoot: string, input: Parameters<typeof reviewNovelAnalysisBatch>[1]) => {
+  ipcMain.handle("canvas:review-novel-analysis-batch", async (_event, projectRoot: string, input: Parameters<NovelAnalysisModule["reviewNovelAnalysisBatch"]>[1]) => {
     const idempotencyKey = `ui-analysis-review-batch-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "review_novel_analysis_batch", payload: input } });
     return result.result;
   });
   ipcMain.handle("canvas:get-novel-analysis-providers", (_event, projectRoot: string) => getNovelAnalysisProviderSettings(projectRoot));
   ipcMain.handle("canvas:probe-novel-analysis-provider", (_event, projectRoot: string, providerId: string) => probeNovelAnalysisProvider(projectRoot, providerId));
-  ipcMain.handle("canvas:upsert-novel-analysis-provider", async (_event, projectRoot: string, input: Parameters<typeof import("../core/novel-analysis-provider.js").upsertNovelAnalysisProvider>[1]) => {
+  ipcMain.handle("canvas:upsert-novel-analysis-provider", async (_event, projectRoot: string, input: Parameters<NovelAnalysisProviderModule["upsertNovelAnalysisProvider"]>[1]) => {
     const idempotencyKey = `ui-analysis-provider-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "upsert_novel_analysis_provider", payload: input } });
     return result.result;
   });
-  ipcMain.handle("canvas:plan-novel-analysis-run", async (_event, projectRoot: string, input: Parameters<typeof import("../core/novel-analysis-provider.js").planNovelAnalysisRun>[1]) => {
+  ipcMain.handle("canvas:plan-novel-analysis-run", async (_event, projectRoot: string, input: Parameters<NovelAnalysisProviderModule["planNovelAnalysisRun"]>[1]) => {
     const idempotencyKey = `ui-analysis-run-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "plan_novel_analysis_run", payload: input } });
     return result.result;
   });
   ipcMain.handle("canvas:list-novel-analysis-runs", (_event, projectRoot: string) => listNovelAnalysisRunProgress(projectRoot));
   ipcMain.handle("canvas:get-novel-analysis-run", (_event, projectRoot: string, runId: string) => getNovelAnalysisRunProgress(projectRoot, runId));
-  ipcMain.handle("canvas:execute-next-novel-analysis-run-task", async (_event, projectRoot: string, input: Parameters<typeof import("../core/novel-analysis-provider.js").executeNextNovelAnalysisRunTask>[1]) => {
+  ipcMain.handle("canvas:execute-next-novel-analysis-run-task", async (_event, projectRoot: string, input: Parameters<NovelAnalysisProviderModule["executeNextNovelAnalysisRunTask"]>[1]) => {
     const idempotencyKey = `ui-analysis-run-next-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "execute_next_novel_analysis_run_task", payload: input } });
     return result.result;
   });
-  ipcMain.handle("canvas:replace-novel-analysis-run-task", async (_event, projectRoot: string, input: Parameters<typeof import("../core/novel-analysis-provider.js").replaceNovelAnalysisRunTask>[1]) => {
+  ipcMain.handle("canvas:replace-novel-analysis-run-task", async (_event, projectRoot: string, input: Parameters<NovelAnalysisProviderModule["replaceNovelAnalysisRunTask"]>[1]) => {
     const idempotencyKey = `ui-analysis-run-replace-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "replace_novel_analysis_run_task", payload: input } });
     return result.result;
   });
-  ipcMain.handle("canvas:execute-novel-analysis-task", async (_event, projectRoot: string, input: Parameters<typeof import("../core/novel-analysis-provider.js").executeNovelAnalysisTask>[1]) => {
+  ipcMain.handle("canvas:execute-novel-analysis-task", async (_event, projectRoot: string, input: Parameters<NovelAnalysisProviderModule["executeNovelAnalysisTask"]>[1]) => {
     const idempotencyKey = `ui-analysis-execute-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, { requestId: `ui-${randomUUID()}`, idempotencyKey, request: { command: "execute_novel_analysis_task", payload: input } });
     return result.result;
@@ -3873,42 +4039,42 @@ function registerIpc(): void {
   });
   ipcMain.handle("canvas:list-voice-identities", (_event, projectRoot: string) => listVoiceIdentities(projectRoot));
   ipcMain.handle("canvas:upsert-voice-identity", (_event, projectRoot: string, input: Parameters<typeof upsertVoiceIdentity>[1]) => upsertVoiceIdentity(projectRoot, input, "user"));
-  ipcMain.handle("canvas:list-edit-projects", (_event, projectRoot: string) => listEditProjects(projectRoot));
-  ipcMain.handle("canvas:get-editor-session", (_event, projectRoot: string) => getEditorSessionState(projectRoot));
+  ipcMain.handle("canvas:list-edit-projects", (_event, projectRoot: string) => withEditor((editor) => editor.listEditProjects(projectRoot)));
+  ipcMain.handle("canvas:get-editor-session", (_event, projectRoot: string) => withEditor((editor) => editor.getEditorSessionState(projectRoot)));
   ipcMain.handle("canvas:begin-editor-session", async (_event, projectRoot: string) => {
-    const result = await beginEditorSession(projectRoot);
+    const result = await withEditor((editor) => editor.beginEditorSession(projectRoot));
     activeEditorSessions.set(projectRoot, result.state.sessionId);
     return result;
   });
-  ipcMain.handle("canvas:set-editor-session-project", (_event, projectRoot: string, sessionId: string, editProjectId: string) => setEditorSessionProject(projectRoot, sessionId, editProjectId));
-  ipcMain.handle("canvas:resolve-editor-session-recovery", (_event, projectRoot: string, sessionId: string, choice: "stable" | "latest") => resolveEditorSessionRecovery(projectRoot, sessionId, choice));
+  ipcMain.handle("canvas:set-editor-session-project", (_event, projectRoot: string, sessionId: string, editProjectId: string) => withEditor((editor) => editor.setEditorSessionProject(projectRoot, sessionId, editProjectId)));
+  ipcMain.handle("canvas:resolve-editor-session-recovery", (_event, projectRoot: string, sessionId: string, choice: "stable" | "latest") => withEditor((editor) => editor.resolveEditorSessionRecovery(projectRoot, sessionId, choice)));
   ipcMain.handle("canvas:close-editor-session", async (_event, projectRoot: string, sessionId: string) => {
-    const result = await closeEditorSession(projectRoot, sessionId);
+    const result = await withEditor((editor) => editor.closeEditorSession(projectRoot, sessionId));
     if (activeEditorSessions.get(projectRoot) === sessionId) activeEditorSessions.delete(projectRoot);
     return result;
   });
-  ipcMain.handle("canvas:get-edit-project", (_event, projectRoot: string, editProjectId: string) => getEditProject(projectRoot, editProjectId));
-  ipcMain.handle("canvas:create-edit-project", (_event, projectRoot: string, input?: Parameters<typeof createEditProject>[1]) => createEditProject(projectRoot, input));
-  ipcMain.handle("canvas:save-edit-project", (_event, projectRoot: string, project: EditProject, expectedRevision: number) => saveEditProject(projectRoot, project, expectedRevision));
-  ipcMain.handle("canvas:apply-edit-operation", (_event, projectRoot: string, editProjectId: string, expectedRevision: number, operation: EditOperation) => applyEditOperation(projectRoot, editProjectId, expectedRevision, operation, "user"));
-  ipcMain.handle("canvas:get-edit-history-info", (_event, projectRoot: string, editProjectId: string) => getEditHistoryInfo(projectRoot, editProjectId));
-  ipcMain.handle("canvas:undo-edit-project", (_event, projectRoot: string, editProjectId: string, expectedRevision: number) => undoEditProject(projectRoot, editProjectId, expectedRevision, "user"));
-  ipcMain.handle("canvas:redo-edit-project", (_event, projectRoot: string, editProjectId: string, expectedRevision: number) => redoEditProject(projectRoot, editProjectId, expectedRevision, "user"));
-  ipcMain.handle("canvas:export-edit-otio", (_event, projectRoot: string, editProjectId: string, expectedRevision: number, outputPath?: string) => exportEditProjectOtio(projectRoot, editProjectId, expectedRevision, outputPath));
-  ipcMain.handle("canvas:import-edit-otio", async (_event, projectRoot: string, filePath: string, name?: string) => importEditProjectOtio(await requireLegacyProjectRoot(projectRoot), filePath, name));
-  ipcMain.handle("canvas:list-edit-media", (_event, projectRoot: string, episode?: number) => listEditMedia(projectRoot, episode));
-  ipcMain.handle("canvas:list-edit-media-page", (_event, projectRoot: string, query?: Parameters<typeof listEditMediaPage>[1]) => listEditMediaPage(projectRoot, query));
-  ipcMain.handle("canvas:prepare-edit-media-preview", (_event, projectRoot: string, artifactId: string) => prepareEditMediaPreview(projectRoot, artifactId));
-  ipcMain.handle("canvas:prepare-edit-media-proxy", (_event, projectRoot: string, artifactId: string) => prepareEditMediaProxy(projectRoot, artifactId));
-  ipcMain.handle("canvas:prepare-nested-timeline-preview", (_event, projectRoot: string, parentEditProjectId: string, expectedRevision: number, clipId: string) => prepareNestedTimelinePreview(projectRoot, parentEditProjectId, expectedRevision, clipId));
-  ipcMain.handle("canvas:probe-video-engine", () => probeVideoEngine());
-  ipcMain.handle("canvas:list-edit-render-jobs", (_event, projectRoot: string) => listEditRenderJobs(projectRoot));
-  ipcMain.handle("canvas:render-edit-project", (_event, projectRoot: string, editProjectId: string, options: { expectedRevision: number; outputDirectory?: string }) => renderEditProject(projectRoot, editProjectId, options));
-  ipcMain.handle("canvas:start-edit-render", (_event, projectRoot: string, editProjectId: string, options: { expectedRevision: number; outputDirectory?: string }) => startEditRender(projectRoot, editProjectId, options));
-  ipcMain.handle("canvas:get-edit-render-job", (_event, projectRoot: string, renderId: string) => getEditRenderJob(projectRoot, renderId));
-  ipcMain.handle("canvas:cancel-edit-render", (_event, projectRoot: string, renderId: string) => cancelEditRender(projectRoot, renderId));
-  ipcMain.handle("canvas:extract-timeline-frame", (_event, projectRoot: string, input: Parameters<typeof extractTimelineFrame>[1]) => extractTimelineFrame(projectRoot, input));
-  ipcMain.handle("canvas:prepare-timeline-continuation", async (_event, projectRoot: string, input: Parameters<typeof prepareTimelineVideoContinuation>[1]) => {
+  ipcMain.handle("canvas:get-edit-project", (_event, projectRoot: string, editProjectId: string) => withEditor((editor) => editor.getEditProject(projectRoot, editProjectId)));
+  ipcMain.handle("canvas:create-edit-project", (_event, projectRoot: string, input?: Parameters<EditorModule["createEditProject"]>[1]) => withEditor((editor) => editor.createEditProject(projectRoot, input)));
+  ipcMain.handle("canvas:save-edit-project", (_event, projectRoot: string, project: EditProject, expectedRevision: number) => withEditor((editor) => editor.saveEditProject(projectRoot, project, expectedRevision)));
+  ipcMain.handle("canvas:apply-edit-operation", (_event, projectRoot: string, editProjectId: string, expectedRevision: number, operation: EditOperation) => withEditor((editor) => editor.applyEditOperation(projectRoot, editProjectId, expectedRevision, operation, "user")));
+  ipcMain.handle("canvas:get-edit-history-info", (_event, projectRoot: string, editProjectId: string) => withEditor((editor) => editor.getEditHistoryInfo(projectRoot, editProjectId)));
+  ipcMain.handle("canvas:undo-edit-project", (_event, projectRoot: string, editProjectId: string, expectedRevision: number) => withEditor((editor) => editor.undoEditProject(projectRoot, editProjectId, expectedRevision, "user")));
+  ipcMain.handle("canvas:redo-edit-project", (_event, projectRoot: string, editProjectId: string, expectedRevision: number) => withEditor((editor) => editor.redoEditProject(projectRoot, editProjectId, expectedRevision, "user")));
+  ipcMain.handle("canvas:export-edit-otio", (_event, projectRoot: string, editProjectId: string, expectedRevision: number, outputPath?: string) => withEditor((editor) => editor.exportEditProjectOtio(projectRoot, editProjectId, expectedRevision, outputPath)));
+  ipcMain.handle("canvas:import-edit-otio", async (_event, projectRoot: string, filePath: string, name?: string) => withEditor(async (editor) => editor.importEditProjectOtio(await requireLegacyProjectRoot(projectRoot), filePath, name)));
+  ipcMain.handle("canvas:list-edit-media", (_event, projectRoot: string, episode?: number) => withEditor((editor) => editor.listEditMedia(projectRoot, episode)));
+  ipcMain.handle("canvas:list-edit-media-page", (_event, projectRoot: string, query?: Parameters<EditorModule["listEditMediaPage"]>[1]) => withEditor((editor) => editor.listEditMediaPage(projectRoot, query)));
+  ipcMain.handle("canvas:prepare-edit-media-preview", (_event, projectRoot: string, artifactId: string) => withEditor((editor) => editor.prepareEditMediaPreview(projectRoot, artifactId)));
+  ipcMain.handle("canvas:prepare-edit-media-proxy", (_event, projectRoot: string, artifactId: string) => withEditor((editor) => editor.prepareEditMediaProxy(projectRoot, artifactId)));
+  ipcMain.handle("canvas:prepare-nested-timeline-preview", (_event, projectRoot: string, parentEditProjectId: string, expectedRevision: number, clipId: string) => withEditor((editor) => editor.prepareNestedTimelinePreview(projectRoot, parentEditProjectId, expectedRevision, clipId)));
+  ipcMain.handle("canvas:probe-video-engine", () => withEditor((editor) => editor.probeVideoEngine()));
+  ipcMain.handle("canvas:list-edit-render-jobs", (_event, projectRoot: string) => withEditor((editor) => editor.listEditRenderJobs(projectRoot)));
+  ipcMain.handle("canvas:render-edit-project", (_event, projectRoot: string, editProjectId: string, options: { expectedRevision: number; outputDirectory?: string }) => withEditor((editor) => editor.renderEditProject(projectRoot, editProjectId, options)));
+  ipcMain.handle("canvas:start-edit-render", (_event, projectRoot: string, editProjectId: string, options: { expectedRevision: number; outputDirectory?: string }) => withEditor((editor) => editor.startEditRender(projectRoot, editProjectId, options)));
+  ipcMain.handle("canvas:get-edit-render-job", (_event, projectRoot: string, renderId: string) => withEditor((editor) => editor.getEditRenderJob(projectRoot, renderId)));
+  ipcMain.handle("canvas:cancel-edit-render", (_event, projectRoot: string, renderId: string) => withEditor((editor) => editor.cancelEditRender(projectRoot, renderId)));
+  ipcMain.handle("canvas:extract-timeline-frame", (_event, projectRoot: string, input: Parameters<EditorModule["extractTimelineFrame"]>[1]) => withEditor((editor) => editor.extractTimelineFrame(projectRoot, input)));
+  ipcMain.handle("canvas:prepare-timeline-continuation", async (_event, projectRoot: string, input: Parameters<EditorModule["prepareTimelineVideoContinuation"]>[1]) => {
     if (input.expectedRevision === undefined) throw new Error("桌面端末帧续作必须锁定剪辑工程修订号。");
     const idempotencyKey = `ui-timeline-${createHash("sha256").update(JSON.stringify(input)).digest("hex").slice(0, 40)}`;
     const result = await executeIdempotentCommand(projectRoot, {
@@ -3918,11 +4084,11 @@ function registerIpc(): void {
     });
     return result.result;
   });
-  ipcMain.handle("canvas:list-timeline-frames", (_event, projectRoot: string, editProjectId?: string, limit?: number) => listTimelineFrameExtractions(projectRoot, editProjectId, limit));
-  ipcMain.handle("canvas:extract-last-frame", async (_event, projectRoot: string, input: { itemId: string; artifactId?: string; videoPath?: string }) => extractLastFrame(await requireLegacyProjectRoot(projectRoot), input));
-  ipcMain.handle("canvas:create-video-continuation", async (_event, projectRoot: string, input: { itemId: string; sourceVideoPath?: string; lastFramePath: string; prompt?: string }) => createVideoContinuationPack(await requireLegacyProjectRoot(projectRoot), input));
-  ipcMain.handle("canvas:list-video-continuations", (_event, projectRoot: string, itemId?: string) => listVideoContinuationPacks(projectRoot, itemId));
-  ipcMain.handle("canvas:update-video-continuation", (_event, projectRoot: string, continuationId: string, input: { expectedRevision: number; status: "failed" | "cancelled"; error: string }) => updateVideoContinuationPack(projectRoot, continuationId, input));
+  ipcMain.handle("canvas:list-timeline-frames", (_event, projectRoot: string, editProjectId?: string, limit?: number) => withEditor((editor) => editor.listTimelineFrameExtractions(projectRoot, editProjectId, limit)));
+  ipcMain.handle("canvas:extract-last-frame", async (_event, projectRoot: string, input: { itemId: string; artifactId?: string; videoPath?: string }) => withEditor(async (editor) => editor.extractLastFrame(await requireLegacyProjectRoot(projectRoot), input)));
+  ipcMain.handle("canvas:create-video-continuation", async (_event, projectRoot: string, input: { itemId: string; sourceVideoPath?: string; lastFramePath: string; prompt?: string }) => withEditor(async (editor) => editor.createVideoContinuationPack(await requireLegacyProjectRoot(projectRoot), input)));
+  ipcMain.handle("canvas:list-video-continuations", (_event, projectRoot: string, itemId?: string) => withEditor((editor) => editor.listVideoContinuationPacks(projectRoot, itemId)));
+  ipcMain.handle("canvas:update-video-continuation", (_event, projectRoot: string, continuationId: string, input: { expectedRevision: number; status: "failed" | "cancelled"; error: string }) => withEditor((editor) => editor.updateVideoContinuationPack(projectRoot, continuationId, input)));
   ipcMain.handle("canvas:get-item", (_event, projectRoot: string, itemId: string) => getItem(projectRoot, itemId));
   ipcMain.handle(
     "canvas:update-status",
@@ -4726,28 +4892,21 @@ if (!app.requestSingleInstanceLock()) {
       if (!expectedSha256 && !isLegacyUnhashedMediaPathAllowed(canonicalPath)) {
         return new Response("Unhashed legacy requests are limited to media files", { status: 403 });
       }
+      if (url.searchParams.get("thumb") === "1") {
+        if (expectedSha256) {
+          const digest = await hashResolvedLegacyAssetFile(canonicalPath);
+          if (!digest) return new Response("Path outside registered project roots or unsafe file identity", { status: 403 });
+          if (digest !== expectedSha256) return new Response("Content SHA-256 mismatch", { status: 409 });
+        }
+        const thumbnail = await resolveLegacyThumbnail(legacyThumbnailCacheRoot, canonicalPath);
+        const thumbBytes = thumbnail
+          ? await readFile(thumbnail.path)
+          : LEGACY_THUMBNAIL_PLACEHOLDER_WEBP;
+        return new Response(new Uint8Array(thumbBytes), { status: 200, headers: { "content-type": "image/webp", "cache-control": "no-store", "x-content-type-options": "nosniff" } });
+      }
       const asset = await readLegacyAssetBytes(canonicalPath);
       if (!asset) return new Response("Path outside registered project roots or unsafe file identity", { status: 403 });
-      if (expectedSha256) {
-        if (asset.sha256 !== expectedSha256) return new Response("Content SHA-256 mismatch", { status: 409 });
-        // sha 已验证：thumb=1 时可安全改供由该内容派生的缩略图（F-01 修复：校验先于缩略分支）。
-        if (url.searchParams.get("thumb") === "1") {
-          const thumbnail = await resolveLegacyThumbnailFromBytes(legacyThumbnailCacheRoot, `${asset.canonicalPath}:${asset.sha256}`, asset.bytes);
-          if (thumbnail) {
-            const thumbBytes = await readFile(thumbnail.path);
-            return new Response(new Uint8Array(thumbBytes), { status: 200, headers: { "content-type": "image/webp", "cache-control": "no-store", "x-content-type-options": "nosniff" } });
-          }
-        }
-        return new Response(new Uint8Array(asset.bytes), { status: 200, headers: { "content-type": legacyAssetContentType(asset.canonicalPath), "cache-control": "no-store", "x-content-type-options": "nosniff" } });
-      }
-      // P18：thumb=1 时优先返回懒生成的 512px WebP 缩略图；不可用时回退原图，不阻断渲染。
-      if (url.searchParams.get("thumb") === "1") {
-        const thumbnail = await resolveLegacyThumbnailFromBytes(legacyThumbnailCacheRoot, `${asset.canonicalPath}:${asset.sha256}`, asset.bytes);
-        if (thumbnail) {
-          const thumbBytes = await readFile(thumbnail.path);
-          return new Response(new Uint8Array(thumbBytes), { status: 200, headers: { "content-type": "image/webp", "cache-control": "no-store", "x-content-type-options": "nosniff" } });
-        }
-      }
+      if (expectedSha256 && asset.sha256 !== expectedSha256) return new Response("Content SHA-256 mismatch", { status: 409 });
       return new Response(new Uint8Array(asset.bytes), { status: 200, headers: { "content-type": legacyAssetContentType(asset.canonicalPath), "cache-control": "no-store", "x-content-type-options": "nosniff" } });
     } catch {
       return new Response("Not found", { status: 404 });

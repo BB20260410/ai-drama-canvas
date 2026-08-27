@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "6-reverify-expanded",
+  "recordedAt": "2026-08-25T19:44:48Z",
+  "change": {
+    "kind": "verification-only",
+    "sourceCodeChanged": false,
+    "note": "Goal 续跑：list-flip / M7 LRU / busy 墙钟之后重跑扩大定向套件 + typecheck:app。未改源码 / recipe / T23 SQL / 阶段名 / 120s timeout。"
+  },
+  "section1": [
+    { "id": 1, "gate": "default fastMode true", "verdict": "已完成", "evidence": "resolveApprovedTimelineFastMode ?? true；src/ 无 fastMode:false 赋值" },
+    { "id": 2, "gate": "full only explicit CLI + durationMs", "verdict": "已完成", "evidence": "scripts/report-approved-timeline-full.ts" },
+    { "id": 3, "gate": "36-unit screen does not materialize 2500", "verdict": "部分完成", "note": "画布可见页 unitIds；composable 空数组失败关闭；bundle 当前+邻最多 3；多媒体 storyboard 仅当前。earliest/diagnostics 仍整集（计划允许全序）。P7 owner 对照 NOT_RUN。" },
+    { "id": 4, "gate": "MCP cold start lazy editor/adaptation/novel", "verdict": "已完成", "note": "withX + deferred engine + 薄模块读配置。command-bus 仍静态拉 ledger（禁拆写路径）。" },
+    { "id": 5, "gate": "thumbnail LRU URL-only; list original count 0", "verdict": "部分完成", "note": "源码合同 W5-A–E + list-flip + 协议分类已绿；列表翻页 GUI 探针 NOT_RUN。Wave 5 父项不勾。" },
+    { "id": 6, "gate": "T23 gates do not regress", "verdict": "部分完成", "note": "expectedProjectionPhases 仍含且只有既有名（含 timeline-approved-neighbors）；unitTimingQueries 合同未改；安装版 T23 NOT_RUN。macos CI ≠ T23。" },
+    { "id": 7, "gate": "per-wave evidence; no 2026-08-11 final overwrite", "verdict": "已完成" },
+    { "id": 8, "gate": "no official bypass / no owner rebuild / no GUI", "verdict": "已完成" }
+  ],
+  "reviews": {
+    "redlineSkeptic": "PASS; 无 must-fix。THUMBNAIL_RECIPE 仍 material-studio-thumb:v1:autorotate:inside-512:no-enlarge:webp-q82；VERIFIED_FILE_CACHE_LIMIT 仍 2048；STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS 仍 120000；未拆 command-bus 写路径；未改 T23 SQL；未做 N124。",
+    "completionGate": "PASS; 整计划部分完成。本 Cloud 可落地切片已尽。不得勾 Wave 5 父项或关 Goal。"
+  },
+  "verification": {
+    "typecheckApp": "PASS",
+    "directedLinux": {
+      "filesAttempted": 38,
+      "filesPassed": 37,
+      "testsPassed": 320,
+      "testsFailed": 1,
+      "failed": {
+        "file": "tests/studio-sqlite-busy-contract.test.ts",
+        "case": "command ledger writable owner 也继承同一短 deadline",
+        "reason": "安全受管写入需要 macOS dirfd helper；禁止回退到路径式写入。既有 Linux 缺口，非本轮回归。"
+      },
+      "platform": "linux",
+      "durationMs": 5830,
+      "includesSincePriorReverify": [
+        "tests/runtime-perf-wave2f-reference-thumbnail-lru.test.ts",
+        "tests/runtime-perf-wave5-list-flip-media-count.test.ts",
+        "tests/studio-sqlite-busy-contract.test.ts"
+      ]
+    },
+    "installedApp": "NO_APP",
+    "installedT23": "NOT_RUN",
+    "listFlipProbe": "NOT_RUN",
+    "w2cP7": "NOT_RUN Darwin dirfd"
+  },
+  "tests": [
+    "tests/resolve-approved-timeline-fast-mode.test.ts",
+    "tests/report-approved-timeline-full.test.ts",
+    "tests/resolve-approved-timeline-bound.test.ts",
+    "tests/use-studio-timeline-projection.test.ts",
+    "tests/managed-studio-canvas-ui.test.ts",
+    "tests/runtime-perf-wave2c-bounded-projection.test.ts",
+    "tests/runtime-perf-wave2-bundle-approved-bound.test.ts",
+    "tests/runtime-perf-wave2f-reference-thumbnail-lru.test.ts",
+    "tests/runtime-perf-wave3a-readonly-inspect.test.ts",
+    "tests/runtime-perf-wave3b-ledger-readiness.test.ts",
+    "tests/runtime-perf-wave3c-earliest-list-revision.test.ts",
+    "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+    "tests/runtime-perf-wave4a-editor-lazy-import.test.ts",
+    "tests/runtime-perf-wave4b-story-adaptation-lazy-import.test.ts",
+    "tests/runtime-perf-wave4c-video-dudu-higgsfield-lazy-import.test.ts",
+    "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+    "tests/runtime-perf-wave4e-runtime-gate-watch-scope.test.ts",
+    "tests/runtime-perf-wave4f-sharp-lazy-import.test.ts",
+    "tests/runtime-perf-wave4-capabilities-deferred-engine.test.ts",
+    "tests/runtime-perf-wave4-novel-analysis-lazy-import.test.ts",
+    "tests/runtime-perf-wave4-capabilities-settings-thin.test.ts",
+    "tests/runtime-perf-wave5a-list-thumbnail-binding.test.ts",
+    "tests/runtime-perf-wave5b-legacy-thumb-path.test.ts",
+    "tests/runtime-perf-wave5c-thumbnail-derivation-limit.test.ts",
+    "tests/runtime-perf-wave5d-derivative-serving-binding.test.ts",
+    "tests/runtime-perf-wave5e-verified-file-cache-buckets.test.ts",
+    "tests/runtime-perf-wave5-list-flip-media-count.test.ts",
+    "tests/build-identity-watch-paths.test.ts",
+    "tests/runtime-write-gate.test.ts",
+    "tests/legacy-thumbnails.test.ts",
+    "tests/studio-labeled-layout.test.ts",
+    "tests/script-media-align-view.test.ts",
+    "tests/studio-continuity-review-ui.test.ts",
+    "tests/studio-continuity-review-desktop-integration.test.ts",
+    "tests/source-module-boundaries.test.ts",
+    "tests/t23-scale-performance-contract.test.ts",
+    "tests/t23-ipc-performance-probe.test.ts",
+    "tests/studio-sqlite-busy-contract.test.ts"
+  ],
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "overwrote20260811Final": false,
+    "t23SqlUnchanged": true,
+    "writeBusyTimeoutUnchanged": 120000,
+    "verifiedFileCacheLimitUnchanged": 2048,
+    "wave5ParentChecked": false
+  },
+  "claim": "扩大复验：typecheck:app PASS；Linux 37 files / 320 tests PASS；1 条 ledger busy 测需 Darwin dirfd（既有）。安装版 T23 / P7 owner / 列表 GUI 探针仍 NOT_RUN。整计划部分完成。禁止写「运行速度已关账」。",
+  "residual": [
+    "W2-C P7 owner 有界对照仍需 Darwin dirfd",
+    "安装版 T23 首卡/首 raw 未跑（本 Cloud 无 /Applications/AI 漫剧画布.app）",
+    "列表翻页 aicanvas-studio://media/* = 0 探针未跑（Wave 5 父项不勾）",
+    "earliest / diagnostics 仍整集（计划允许全序）",
+    "command-bus 仍静态拉 ledger（禁拆写路径）",
+    "macos CI ≠ 安装版 T23"
+  ]
+}

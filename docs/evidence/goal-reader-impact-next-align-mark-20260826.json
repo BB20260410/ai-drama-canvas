@@ -1,0 +1,64 @@
+{
+  "id": "goal-reader-impact-next-align-mark-20260826",
+  "kind": "reader-impact-next-align-mark",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-27T00:27:00.000Z",
+  "scope": "Script reader revision-impact can load the next bounded page via nextCursor and append units (dedupe unitId+unitRevision; does not pull the full set). Align table Review cell and panel buttons plus the selected-panel sidebar reuse already-loaded impact classification; unexpected shows 非预期须复核. Unloaded impact does not query and sidebar says 未加载本修订影响，不自动查. SSL-5 open button switches to review when the Vue overlay already refined unexpected. Thin helpers live in studio-generation-plan-draft. SSL-5 Core and ScriptReaderView do not import studio-trace. Does not change SCRIPT_READER_SCHEMA_VERSION, SSL5_PLAN_SCHEMA_VERSION, getStudioTrace selector, P24 golden, T4, T5, or dashboard projection. Does not dispatch.",
+  "invariants": {
+    "onDemandImpactOnly": true,
+    "nextPageAppendsNotReplaceFirstPage": true,
+    "doesNotLoadFullImpactInOneShot": true,
+    "doesNotAutoLoadImpactOnAlignOrReader": true,
+    "alignReusesLoadedUnexpectedOnly": true,
+    "unloadedLineDoesNotQuery": true,
+    "ssl5UnexpectedOpensReviewNotBinding": true,
+    "refineLivesInPlanDraftThinModule": true,
+    "ssl5CoreDoesNotImportStudioTrace": true,
+    "readerCoreDoesNotImportStudioTrace": true,
+    "vueDoesNotImportStudioTrace": true,
+    "readerSchemaVersionStill1": true,
+    "ssl5SchemaVersionStill1": true,
+    "doesNotChangeGetStudioTraceSelector": true,
+    "doesNotChangeP24Golden": true,
+    "doesNotAutoReviewPass": true,
+    "doesNotDispatch": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true,
+    "doesNotChangeDashboardProjection": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-script-library-reader.test.ts"
+      ],
+      "result": "14 files / 215 tests PASS"
+    },
+    "commit": "73806f4",
+    "linuxDirfdNote": "tests/studio-generation-session-snapshot.test.ts P7 fixture still needs Darwin dirfd; not claimed as this Cloud gate"
+  },
+  "notClaimed": [
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed",
+    "SSL-6 product-pack close",
+    "script-revision-impact auto-loaded on reader or align open",
+    "MCP ssl5-missing-to-gen-plan auto-queries revision impact"
+  ]
+}

@@ -27,6 +27,12 @@ import {
   type StudioDetachedGenerationUnknownObservation,
 } from "./studio-generation-ledger.js";
 import type { StudioGenerationFreezePack } from "./studio-generation.js";
+import {
+  frozenPanelOverlaysFromFrozenPanelPacks,
+  previousStandingsFromFrozenPanelPacks,
+  type FrozenPanelOverlayRow,
+  type FrozenPanelStandingRow,
+} from "./studio-panel-standing.js";
 import type { StudioUnitGridGenerationFreezePack } from "./studio-unit-grid-generation.js";
 import {
   getStudioAssetBindingSetCurrentness,
@@ -147,6 +153,49 @@ export interface StudioGenerationTrace {
   historicalEvidence?: StudioHistoricalGenerationEvidenceRecord;
   /** 仅在存在时返回；空项目保持既有 P24 投影逐字节兼容。 */
   detachedUnknownObservations?: StudioDetachedGenerationUnknownObservation[];
+  /**
+   * 锁版前镜：只从该包 renderedPrompt 还原，不读 unit head。
+   * 仅当至少一格含「前镜交接」行时返回，以免改历史 P24 投影形状。
+   */
+  previousStandings?: FrozenPanelStandingRow[];
+  /**
+   * 冻结宫格光线/服装覆盖：只从该包 renderedPrompt 还原，不读 unit head。
+   * 仅当至少一格含「光线/服装（宫格覆盖）」行时返回，以免改历史 P24 投影形状。
+   */
+  frozenPanelOverlays?: FrozenPanelOverlayRow[];
+  /**
+   * 一致性四态只读 peek：by-run 用该 run，否则本包 runs 最新一条（sequence 升序末项）。
+   * 无 run 则省略，以免改历史 P24 投影形状。只读进程内 LRU；未评估 ≠ 无法检查。
+   * 不 evaluate 像素。机器不自动 Review PASS。不是 BindingSet。
+   */
+  consistencyPeek?: {
+    status: "cached" | "unevaluated";
+    verdict?: "consistent" | "needs-review" | "drifted" | "not-checkable";
+    generationRunId: string | null;
+  };
+}
+
+/** 追溯 peek 用 run：by-run 认选择器；否则本包 runs 最新一条。不用上一镜尾态 run。 */
+export function traceEnvelopePeekRunId(input: {
+  selector?: { runId?: string };
+  runs: ReadonlyArray<{ runId?: string | null }>;
+}): string | null {
+  if (input.selector?.runId) return input.selector.runId;
+  for (let index = input.runs.length - 1; index >= 0; index -= 1) {
+    const runId = input.runs[index]?.runId;
+    if (runId) return runId;
+  }
+  return null;
+}
+
+async function traceEnvelopeConsistencyPeek(
+  runId: string | null,
+): Promise<StudioGenerationTrace["consistencyPeek"]> {
+  if (!runId) return undefined;
+  const { peekStudioConsistencyVerdictByRunId } = await import("./studio-consistency-evaluator.js");
+  const verdict = peekStudioConsistencyVerdictByRunId(runId);
+  if (verdict) return { status: "cached", verdict, generationRunId: runId };
+  return { status: "unevaluated", generationRunId: runId };
 }
 
 function selectorKeys(selector: Record<string, unknown>): string[] {
@@ -402,6 +451,12 @@ export async function getStudioGenerationTrace(
     listStudioDetachedGenerationUnknownObservations(projectRoot, { unitId: pack.target.unitId }),
   ]);
   const reviewsBox = await collectTraceReviews(projectRoot, runsBox.runs.map((run) => run.runId), TRACE_REVIEWS_CAP);
+  const previousStandings = previousStandingsFromFrozenPanelPacks(panelPacks);
+  const frozenPanelOverlays = frozenPanelOverlaysFromFrozenPanelPacks(panelPacks);
+  const consistencyPeek = await traceEnvelopeConsistencyPeek(traceEnvelopePeekRunId({
+    selector: "runId" in selector ? { runId: selector.runId } : {},
+    runs: runsBox.runs,
+  }));
   const panels: StudioGenerationTracePanelIdentity[] = panelPacks.map((panelPack) => ({
     panelId: panelPack.target.panelId,
     panelIndex: panelPack.target.panelIndex,
@@ -460,6 +515,9 @@ export async function getStudioGenerationTrace(
     reviewsTruncated: reviewsBox.truncated,
     ...(historicalEvidence ? { historicalEvidence } : {}),
     ...(detachedUnknownObservations.length > 0 ? { detachedUnknownObservations } : {}),
+    ...(previousStandings.length > 0 ? { previousStandings } : {}),
+    ...(frozenPanelOverlays.length > 0 ? { frozenPanelOverlays } : {}),
+    ...(consistencyPeek ? { consistencyPeek } : {}),
   };
 }
 

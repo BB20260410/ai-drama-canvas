@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "3-B",
+  "recordedAt": "2026-08-25T15:02:00Z",
+  "change": {
+    "helper": "assertGenerationLedgerSchemaFileReady",
+    "failClosedMissingFile": true,
+    "failClosedMissingSchema": true,
+    "doesNotCreateDatabase": true,
+    "wiredBeforeTimelineBatchRead": true,
+    "wiredBeforeEarliestCheckpoint": true,
+    "ledgerWriteContractUnchanged": true
+  },
+  "residual": {
+    "directListLatestRunsStillUsesOpenDatabase": true,
+    "linuxFullManagedProject": "createManagedProject 需 Darwin dirfd；本切片用临时 sqlite 证明闸本身不建库"
+  },
+  "tests": [
+    "tests/runtime-perf-wave3b-ledger-readiness.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "linuxTests": { "passed": 16, "files": 5 },
+    "p7FixtureTests": "Darwin dirfd only; Linux 未跑 fixture"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W3-B：缺库或无 schema_version 时只读投影失败关闭，不静默建 generation ledger。未改 ledger 写合同。"
+}

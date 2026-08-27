@@ -70,6 +70,11 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     );
     expect(refreshAll).toContain("if (canvasDisposed) return");
     expect(refreshAll).toContain("const isCurrent = () => !canvasDisposed");
+    expect(refreshAll).toContain("if (productionDiagnosticsOpen.value) void refreshProductionDiagnostics()");
+    expect(refreshAll).not.toMatch(/^\s*void refreshProductionDiagnostics\(\);/mu);
+    expect(refreshAll.indexOf('emit("initialUnitCardsCommitted"')).toBeLessThan(
+      refreshAll.indexOf("if (productionDiagnosticsOpen.value) void refreshProductionDiagnostics()"),
+    );
 
     const projectRootWatch = canvas.slice(
       canvas.indexOf("watch(() => props.projectRoot"),
@@ -200,6 +205,8 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     // snapshot 内闭合的 PASS execution identity；renderer 只做精确 SHA/pack
     // 匹配、读媒体和闭包核验，不再逐单元重读 Review。
     expect(canvas).toContain("getApprovedTimelineProjection");
+    expect(canvas).toContain("unitIds");
+    expect(canvas).toContain("禁止回退整集");
     expect(canvas).toContain("resolveUnitGridSelectedResultIdentity");
     expect(canvas).toContain("rawMediaSha256: selectedRawSha256");
     expect(canvas).toContain("停检账本只可作为首屏 placeholder");
@@ -212,6 +219,8 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain("核心裁决不可读时旧 PASS raw/参考/连续性不能继续冒充 current");
     expect(canvas).toContain("core.selectedRawSha256 === projection.rawMediaSha256");
     expect(canvas).toContain("深核验随后增量补回");
+    expect(canvas).toMatch(/unitGridNonPassPipeline\.value = new Map\([\s\S]{0,500}scheduleUnitGridGraphRebuild\(\);/u);
+    expect(canvas).toContain("与随后停检账本 placeholder 的 schedule 同帧合并");
     expect(canvas).toContain("scheduleUnitGridGraphRebuild");
     expect(canvas).toContain("flushUnitGridGraphRebuild");
     expect(canvas).toContain("createT23RawReferenceSpanTracker");
@@ -341,6 +350,11 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain('from "@vue-flow/minimap"');
     expect(canvas).toContain("<MiniMap");
     expect(canvas).toContain('data-testid="managed-canvas-minimap"');
+    expect(canvas).toContain("MINIMAP_AUTO_HIDE_AFTER_NODES");
+    expect(canvas).toContain("miniMapUserOverride");
+    expect(canvas).toContain("thumbnailLru.clear()");
+    expect(canvas).toContain("referenceNodeCount");
+    expect(canvas).toContain("continuityNodeCount");
     expect(canvas).toContain("@nodes-change=\"onNodesChange\"");
     expect(canvas).toContain("extractStudioCanvasPanelIdsFromSelection");
     expect(canvas).toContain("createStudioCanvasWorkflowGroup");
@@ -370,6 +384,13 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain('code === "focus-unit"');
     expect(canvas).toContain('code === "freeze-dispatch"');
     expect(canvas).toContain('code === "close-panel"');
+    expect(canvas).toContain("unitGridNextActionCode: unitDetail.value?.nextAction.code");
+    expect(canvas).toContain("unitGridNextActionLabel: unitDetail.value?.nextAction.label");
+    expect(canvas).toContain("overview.value?.checkpoint.newSlotDispatchAllowed");
+    expect(canvas).toContain("checkpointNewSlotBlocked");
+    expect(canvas).toContain("checkpointGateHint");
+    expect(canvas).toContain("六图闸未放行，未派发");
+    expect(source("src/renderer/src/components/CanvasInspectorPanel.vue")).toContain('data-testid="managed-canvas-inspector-next"');
     expect(canvas).toContain("appearanceListElement.value?.scrollIntoView");
     expect(canvas).toContain('if (kind === "asset" || kind === "unit" || kind === "panel") actionPanelOpen.value = true');
   });
@@ -388,6 +409,7 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     const canvas = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
     expect(canvas).toContain('data-testid="managed-canvas-run-workflow"');
     expect(canvas).toContain("runLastWorkflowGroup");
+    expect(canvas).toContain("checkpointNewSlotBlocked");
   });
 
   it("P15/MVP：主前台显式选择 Codex/Grok，复杂门禁仍走受管 Studio owner", () => {
@@ -449,6 +471,36 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).not.toContain("开始全部");
     expect(canvas).not.toContain("开始失败：");
     expect(canvas).toContain("派发准备失败：");
+  });
+
+  it("主按钮与节点 freeze-dispatch 复用已加载 overview 六图闸，零额外 IPC", () => {
+    const canvas = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    expect(canvas).toContain("checkpointNewSlotBlocked");
+    expect(canvas).toContain("checkpointGateHint");
+    expect(canvas).toContain("overview.value?.checkpoint.newSlotDispatchAllowed");
+    expect(canvas).toContain("overview.value?.checkpoint.blockingBatchNumber");
+    expect(canvas).toContain("if (checkpointNewSlotBlocked.value)");
+    expect(canvas).toContain("六图闸未放行，未派发");
+    expect(canvas).toContain("六图闸未放行");
+    expect(canvas).toContain('code === "freeze-dispatch"');
+    expect(canvas).toContain("runLastWorkflowGroup");
+    expect(canvas).toContain('data-testid="managed-canvas-run-workflow"');
+    expect(canvas).toMatch(
+      /async function runLastWorkflowGroup[\s\S]*?if \(checkpointNewSlotBlocked\.value\)[\s\S]*?await executeWorkflowGroup/u,
+    );
+    expect(canvas).toContain("unitGridDispatchBlocked");
+    expect(canvas).toContain("unitGridDispatchHint");
+    expect(canvas).toContain("unitGridNextActionBlockingKind");
+    expect(canvas).toContain("整板下一步不是派发，未派发");
+    expect(canvas).toMatch(
+      /async function primaryStart[\s\S]*?if \(unitGridDispatchBlocked\.value\)[\s\S]*?const mismatch = await preflightDraftMismatch/u,
+    );
+    expect(canvas).toMatch(
+      /async function runLastWorkflowGroup[\s\S]*?if \(unitGridDispatchBlocked\.value\)[\s\S]*?await executeWorkflowGroup/u,
+    );
+    expect(canvas).not.toContain("getStudioGenerationCheckpointControl");
+    expect(canvas).not.toContain("from \"@core/studio-generation-checkpoint");
+    expect(canvas).not.toContain("from \"@core/studio-generation-plan-draft");
   });
 
   it("P15：桌面端优先使用受管 Studio layout owner，添加单元后自动收起抽屉并适配画布", () => {
@@ -582,6 +634,9 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(diagnosticsBlock).not.toContain("getStudioProductionDiagnostics(props.projectRoot)");
     expect(canvasSwitchBlock).toContain("unitLeaseDisplayHint.value = null");
     expect(canvasSwitchBlock).toContain("productionDiagnostics.value = null");
+    expect(canvas).toContain("if (productionDiagnosticsOpen.value) void refreshProductionDiagnostics()");
+    expect(canvas).toContain("@toggle=\"onProductionDiagnosticsToggle\"");
+    expect(canvas).not.toContain("<details v-if=\"productionDiagnostics\" class=\"diagnostics-detail\"");
 
     const materialResetBlock = material.match(/function resetWorkspace\(\): void \{[\s\S]*?\n    \}/u)?.[0] ?? "";
     expect(materialResetBlock).toContain("actionGate.invalidate()");
@@ -865,6 +920,8 @@ describe("P25 主题与事件接线 UI 合同", () => {
     // 账本投影驱动节点徽标（syncPlanNodeStatuses 经 200ms 去抖重建；拖拽中置脏收尾补齐）。
     expect(view).toContain("schedulePlanStatusRebuild()");
     expect(view).toContain("planStatusRebuildDirty");
+    expect(view).toMatch(/function schedulePlanStatusRebuild[\s\S]*scheduleUnitGridGraphRebuild\(\);/u);
+    expect(view).toContain("raw 投影收尾已 scheduleUnitGridGraphRebuild");
     // 取消连线外科式清除描边（不触发全量重建，P15 合同）。
     expect(view).toContain("stripPendingOutline");
     expect(view).toMatch(/function toggleConnectMode[\s\S]{0,400}stripPendingOutline\(previousPendingId\);/u);
@@ -1944,6 +2001,33 @@ describe("受管画布侧栏列表视口剔除", () => {
     expect(view).toContain("else if (directorWasOpen) restoreDirectorToggleFocus()");
   });
 
+  it("导演生成追溯走 getStudioTrace，不猜第一格，不打开审片冒充", () => {
+    const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
+    const drawer = source("src/renderer/src/components/StudioGenerationTraceDrawer.vue");
+    expect(view).toContain("function resolveStudioTraceSelector");
+    expect(view).toContain("window.canvasApi.getStudioTrace");
+    expect(view).toContain("禁止猜第一格");
+    expect(view).toContain('action.kind === "open-trace"');
+    expect(view).not.toContain('action.kind === "open-trace" || action.kind === "open-consistency"');
+    expect(view).not.toContain("evaluateStudioConsistency(");
+    expect(view).not.toContain("getStudioBindingControl");
+    expect(drawer).toContain('data-testid="studio-generation-trace-drawer"');
+    expect(drawer).toContain('data-testid="studio-generation-trace-previous-standings"');
+    expect(drawer).toContain('data-testid="studio-generation-trace-overlays"');
+    expect(drawer).toContain('data-testid="studio-generation-trace-peek"');
+    expect(drawer).toContain("consistencyPeekLabel");
+    expect(drawer).toContain("frozenPanelOverlays");
+    expect(drawer).toContain("formatPreviousStandingReadonlyLine");
+    expect(drawer).not.toContain("evaluateStudioConsistency");
+    expect(drawer).not.toContain("getStudioBindingControl");
+    expect(view).toContain("applyInspectorConsistencyPeek");
+    expect(view).toContain("getStudioGenerationControl");
+    expect(view).toContain('operation: "history"');
+    expect(view).toContain('order: "newest-first"');
+    expect(view).not.toContain("studio-consistency-evaluator");
+    expect(view).not.toContain("studio-generation-session-snapshot");
+  });
+
   it("素材库/剧本资源关闭钮可 Tab，关闭后焦回开库钮，不改成 dialog", () => {
     const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
     const close = view.slice(
@@ -2058,6 +2142,38 @@ describe("受管画布侧栏列表视口剔除", () => {
     const view = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
     expect(inspector).toContain('class="technical-diagnostics inspector-diagnostics"');
     expect(inspector).toContain('data-testid="managed-canvas-inspector-diagnostics"');
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-composition"');
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-previous-standing"');
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-lighting"');
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-costume"');
+    expect(inspector).toContain("panelPreviousStandingLine");
+    expect(inspector).toContain("panelFrozenLightingLine");
+    expect(inspector).toContain("panelFrozenCostumeLine");
+    expect(inspector).toContain("panelLightingCostumeSource");
+    expect(inspector).toContain("锁版未记光线");
+    expect(view).toContain("formatUnitLockPanelLightingLine");
+    expect(view).toContain("getStudioUnitLockOverlays");
+    expect(view).not.toContain("studio-unit-lock-overlays-read");
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-scene-backrefs"');
+    expect(inspector).toContain("panelSceneBackReferenceNote");
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-prop-backrefs"');
+    expect(inspector).toContain("panelPropBackReferenceNote");
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-character-backrefs"');
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-shot-type"');
+    expect(inspector).toContain("panelShotTypeLine");
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-style-lock"');
+    expect(inspector).toContain("panelStyleLockLine");
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-beat"');
+    expect(inspector).toContain("panelBeatLine");
+    expect(inspector).toContain('data-testid="managed-canvas-inspector-peek"');
+    expect(inspector).toContain("panelConsistencyPeekLine");
+    expect(inspector).toContain("panelCharacterBackReferenceNote");
+    expect(view).toContain("getStudioSceneBackReferences");
+    expect(view).toContain("revealInspectorSceneBackRef");
+    expect(view).toContain("focusAppearance(ref.unitId, ref.panelId)");
+    expect(view).not.toContain("studio-scene-backrefs-read");
+    expect(inspector).not.toContain("evaluateStudioConsistency");
+    expect(inspector).not.toContain("getStudioBindingControl");
     expect(inspector).not.toContain('role="dialog"');
     expect(inspector).toContain('<aside class="canvas-inspector" aria-label="画布节点详情">');
     expect(view).toContain('@close="closeInspector"');
@@ -2070,6 +2186,8 @@ describe("受管画布侧栏列表视口剔除", () => {
     expect(view).toContain('data-testid="managed-canvas-diagnostics-detail"');
     expect(view).toContain('data-testid="managed-canvas-detailed-diagnostics"');
     expect(view).toContain('<summary data-testid="managed-canvas-detailed-diagnostics">详细诊断</summary>');
+    expect(view).toContain("@toggle=\"onProductionDiagnosticsToggle\"");
+    expect(view).not.toContain("<details v-if=\"productionDiagnostics\" class=\"diagnostics-detail\"");
     expect(view).toContain('<summary data-testid="managed-canvas-diagnostics">诊断详情</summary>');
     expect(view).toContain('data-testid="managed-canvas-metrics" open');
     expect(view).not.toContain("managed-canvas-detailed-diagnostics-");

@@ -5,7 +5,8 @@ import { createHash } from "node:crypto";
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import sharp, { type OutputInfo } from "sharp";
+import type { OutputInfo } from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import {
   canonicalizeStudioJsonValue as stableValue,
   digestStudioCanonicalJson as stableDigest,
@@ -82,6 +83,7 @@ import {
   type DetachedUnknownObservationRow,
   type LedgerPaths,
 } from "./studio-generation-ledger-storage.js";
+import { openGenerationLedgerReadOnly } from "./studio-generation-ledger-readiness.js";
 export {
   __setBeforeGenerationWritableOpenHookForTests,
   getStudioGenerationLedgerState,
@@ -498,6 +500,8 @@ export interface DispatchStudioGenerationPackInput {
   generationRunId: string;
   /** 本次由哪家正式 Agent 执行生图：codex 或 grok。 */
   provider: StudioFormalImagegenProvider;
+  /** 调用方已取回的 script-revision-impact 页。省略不自动查。 */
+  revisionImpact?: import("./studio-generation-plan-draft.js").Ssl5RevisionImpactHint;
 }
 
 /**
@@ -723,6 +727,25 @@ interface ResultRow {
 
 function fail(code: StudioGenerationLedgerErrorCode, message: string, details: string[] = []): never {
   throw new StudioGenerationLedgerError(code, message, details);
+}
+
+/** 调用方已取回的 script-revision-impact 才挡。省略不查 studio-trace。 */
+async function assertOptionalUnexpectedRevisionImpact(
+  targets: Array<{ unitId: string; panelId?: string | null }>,
+  impact: import("./studio-generation-plan-draft.js").Ssl5RevisionImpactHint,
+): Promise<void> {
+  if (!impact) return;
+  const {
+    firstGenerationTargetBlockedByUnexpectedRevisionImpact,
+    SSL5_UNEXPECTED_REVISION_IMPACT_REASON,
+  } = await import("./studio-generation-plan-draft.js");
+  const blocked = firstGenerationTargetBlockedByUnexpectedRevisionImpact(targets, impact);
+  if (blocked) {
+    fail("unexpected-revision-impact", SSL5_UNEXPECTED_REVISION_IMPACT_REASON, [
+      `unitId=${blocked.unitId}`,
+      ...(blocked.panelId ? [`panelId=${blocked.panelId}`] : []),
+    ]);
+  }
 }
 
 function assertNoActiveConnectorReservation(
@@ -2741,6 +2764,15 @@ export async function dispatchStudioGenerationPack(
       `provider=${provider} 不在冻结包 allowedProviders 内：${pack.request.allowedProviders.join(",")}`,
     );
   }
+  if (!existing) {
+    await assertOptionalUnexpectedRevisionImpact(
+      [{
+        unitId: pack.target.unitId,
+        panelId: isUnitGridFreezePack(pack) ? null : pack.target.panelId,
+      }],
+      input.revisionImpact,
+    );
+  }
   if (existing) {
     if (dispatchMatches(existing, { packId, packFingerprint, dispatchId })
       && existing.executor_provider === provider) {
@@ -3687,7 +3719,7 @@ async function inspectStudioImagegenQuarantineEvidence(input: {
   const receiptSha256 = sha256(receipt.bytes);
   let candidateInfo: OutputInfo;
   try {
-    const decoded = await sharp(candidate.bytes, { failOn: "warning", limitInputPixels: 25_000_000 })
+    const decoded = await (await loadSharpDefault())(candidate.bytes, { failOn: "warning", limitInputPixels: 25_000_000 })
       .rotate()
       .raw()
       .toBuffer({ resolveWithObject: true });
@@ -5925,11 +5957,22 @@ function normalizePlanNodeList(input: unknown): NormalizedPlanNode[] {
  */
 export async function createStudioGenerationPlan(
   projectRoot: string,
-  input: { nodes: StudioGenerationPlanNodeInput[]; sourceCommandRequestId: string },
+  input: {
+    nodes: StudioGenerationPlanNodeInput[];
+    sourceCommandRequestId: string;
+    revisionImpact?: import("./studio-generation-plan-draft.js").Ssl5RevisionImpactHint;
+  },
 ): Promise<StudioGenerationPlanRecord> {
   const { paths, projectId } = await managedLedgerPaths(projectRoot);
   const nodes = normalizePlanNodeList(input.nodes);
   const sourceCommandRequestId = normalizeId(input.sourceCommandRequestId, "sourceCommandRequestId");
+  await assertOptionalUnexpectedRevisionImpact(
+    nodes.map((node) => ({
+      unitId: node.unitId,
+      panelId: node.targetKind === "panel" ? node.panelId : null,
+    })),
+    input.revisionImpact,
+  );
   const readDb = openDatabase(paths);
   const selected: Array<{ packRow: PackRow; targetRow?: PackTargetRow }> = [];
   try {
@@ -7763,18 +7806,13 @@ function sqlPlaceholders(count: number): string {
 }
 
 /**
- * 批量获取一组单元的 unit-grid 目标最新 run（含成对结果 SHA）。
- * 单次 openDatabase；逐表一条批量 SQL（窗口函数取每组最新），替代逐单元多次点查。
- * 未派发的单元同样出现在结果中（latestRun=null），便于调用方对齐输入顺序。
+ * 在已打开连接上执行最新 unit-grid run 批量投影。调用方负责打开；本函数负责事务与 close。
+ * SQL 与装配口径对可写入口 / 时间线只读入口保持同一份。
  */
-export async function listStudioGenerationLatestUnitGridRuns(
-  projectRoot: string,
-  unitIds: string[],
-): Promise<StudioGenerationLatestUnitGridRun[]> {
-  const { paths } = await managedLedgerPaths(projectRoot);
-  const normalizedUnitIds = unitIds.map((unitId) => normalizeId(unitId, "unitId"));
-  if (normalizedUnitIds.length === 0) return [];
-  const db = openDatabase(paths);
+function queryLatestUnitGridRunsFromOpenDatabase(
+  db: DatabaseSync,
+  normalizedUnitIds: string[],
+): StudioGenerationLatestUnitGridRun[] {
   let readTransactionOpen = false;
   try {
     // 所有批量事实必须来自同一个 WAL 快照，否则 Review Head 在逐表查询之间变化时
@@ -8077,6 +8115,39 @@ export async function listStudioGenerationLatestUnitGridRuns(
     }
     db.close();
   }
+}
+
+/**
+ * 批量获取一组单元的 unit-grid 目标最新 run（含成对结果 SHA）。
+ * 单次 openDatabase；逐表一条批量 SQL（窗口函数取每组最新），替代逐单元多次点查。
+ * 未派发的单元同样出现在结果中（latestRun=null），便于调用方对齐输入顺序。
+ * 可写入口：驾驶舱 / T23 / unit-grid / session-snapshot。时间线投影走 ReadOnly 旁路。
+ */
+export async function listStudioGenerationLatestUnitGridRuns(
+  projectRoot: string,
+  unitIds: string[],
+): Promise<StudioGenerationLatestUnitGridRun[]> {
+  const { paths } = await managedLedgerPaths(projectRoot);
+  const normalizedUnitIds = unitIds.map((unitId) => normalizeId(unitId, "unitId"));
+  if (normalizedUnitIds.length === 0) return [];
+  return queryLatestUnitGridRunsFromOpenDatabase(openDatabase(paths), normalizedUnitIds);
+}
+
+/**
+ * 时间线投影专用：只读打开已有 generation ledger，再跑同一份批量 SQL。
+ * 不走 managedLedgerPaths / 可写 openDatabase（不 ensure CAS、不 preflight 整库复制、不迁移、不切 WAL）。
+ * 缺库/schema 未就绪失败关闭。不得用于驾驶舱 nextAction / T23 / unit-grid 写邻接路径。
+ */
+export async function listStudioGenerationLatestUnitGridRunsReadOnly(
+  databasePath: string,
+  unitIds: string[],
+): Promise<StudioGenerationLatestUnitGridRun[]> {
+  const normalizedUnitIds = unitIds.map((unitId) => normalizeId(unitId, "unitId"));
+  if (normalizedUnitIds.length === 0) return [];
+  return queryLatestUnitGridRunsFromOpenDatabase(
+    openGenerationLedgerReadOnly(databasePath),
+    normalizedUnitIds,
+  );
 }
 
 

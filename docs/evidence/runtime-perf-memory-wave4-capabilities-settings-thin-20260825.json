@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "4-capabilities-settings-thin",
+  "recordedAt": "2026-08-25T18:07:00Z",
+  "change": {
+    "kind": "source",
+    "files": [
+      "src/core/novel-analysis-provider-settings.ts",
+      "src/core/novel-analysis-provider.ts",
+      "src/core/codex.ts"
+    ],
+    "handshake": "getCapabilities(projectRoot) reads analysis-providers.json via thin settings module",
+    "writeOwnerUnmoved": "upsert/plan/execute still novel-analysis-provider.ts"
+  },
+  "tests": [
+    "tests/runtime-perf-wave4-capabilities-settings-thin.test.ts",
+    "tests/runtime-perf-wave4-capabilities-deferred-engine.test.ts",
+    "tests/runtime-perf-wave4-novel-analysis-lazy-import.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "directedLinux": { "passed": 8, "files": 3, "platform": "linux" }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "get_capabilities 带 projectRoot 时不再 withNovelAnalysisProvider 读配置。写路径未搬家。doctor / 分析工具仍会加载整图。",
+  "residual": [
+    "command-bus 仍静态拉 ledger",
+    "doctor 仍 withNovelAnalysisProvider 做 execution/run 检查",
+    "禁止写成「连上 Agent 永不加载小说分析」或「运行速度已关账」"
+  ]
+}

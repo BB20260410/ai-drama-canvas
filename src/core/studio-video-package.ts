@@ -22,7 +22,8 @@ import {
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
-import sharp, { type Metadata } from "sharp";
+import type { Metadata } from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import {
   canonicalizeStudioJsonValue as stableValue,
   digestStudioCanonicalJson as digest,
@@ -936,12 +937,12 @@ function decodeUtf8Strict(snapshot: StableFileSnapshot, label: string): string {
 async function decodePngSnapshot(snapshot: StableFileSnapshot, label: string): Promise<DecodedPngSnapshot> {
   try {
     const options = { failOn: "error" as const, limitInputPixels: MAX_VIDEO_IMAGE_PIXELS };
-    const metadata = await sharp(snapshot.bytes, options).metadata();
+    const metadata = await (await loadSharpDefault())(snapshot.bytes, options).metadata();
     if (metadata.format !== "png" || !metadata.width || !metadata.height
       || metadata.width > 16_384 || metadata.height > 16_384) {
       fail("verify-failed", `${label} 必须是尺寸受限的可解码 PNG。`);
     }
-    const decoded = await sharp(snapshot.bytes, options)
+    const decoded = await (await loadSharpDefault())(snapshot.bytes, options)
       .ensureAlpha()
       .raw()
       .toBuffer({ resolveWithObject: true });
@@ -2427,7 +2428,7 @@ async function buildStudioReviewSourceSpec(input: {
   }
   let metadata: Metadata;
   try {
-    metadata = await sharp(input.rawSnapshot.bytes, { failOn: "error", limitInputPixels: 100_000_000 }).metadata();
+    metadata = await (await loadSharpDefault())(input.rawSnapshot.bytes, { failOn: "error", limitInputPixels: 100_000_000 }).metadata();
   } catch (error) {
     throw new StudioVideoPackageError("input-drift", "Studio raw 无法为视频包解析尺寸。", [], { cause: error });
   }
@@ -4481,7 +4482,7 @@ async function writeCoreManagedVideoPackage(
     const width = Number(rect.width);
     const height = Number(rect.height);
     const cropName = `${authority.unitId}-${panelId}_raw.png`;
-    const cropBytes = await sharp(external.rawSnapshot.bytes, {
+    const cropBytes = await (await loadSharpDefault())(external.rawSnapshot.bytes, {
       failOn: "error",
       limitInputPixels: MAX_VIDEO_IMAGE_PIXELS,
     })
@@ -4517,8 +4518,8 @@ async function writeCoreManagedVideoPackage(
       + "</svg>",
       "utf8",
     );
-    const captionBytes = await sharp(captionSvg).png({ compressionLevel: 9 }).toBuffer();
-    const labeledBytes = await sharp({
+    const captionBytes = await (await loadSharpDefault())(captionSvg).png({ compressionLevel: 9 }).toBuffer();
+    const labeledBytes = await (await loadSharpDefault())({
       create: {
         width,
         height: height + captionHeight,
@@ -4801,7 +4802,7 @@ async function validateManifest(
     external.sourceKind,
     external.managedSource?.id,
   );
-  const sourceRawMetadata = await sharp(external.rawSnapshot.bytes, {
+  const sourceRawMetadata = await (await loadSharpDefault())(external.rawSnapshot.bytes, {
     failOn: "error",
     limitInputPixels: MAX_VIDEO_IMAGE_PIXELS,
   }).metadata().catch((error: unknown) => {
@@ -4836,7 +4837,7 @@ async function validateManifest(
       || labeled.width !== width || labeled.height < height || labeled.height > height + 2_048) {
       fail("verify-failed", `视频包 ${panelId} raw/labeled 尺寸与冻结裁区不一致。`);
     }
-    const expectedCrop = await sharp(external.rawSnapshot.bytes, {
+    const expectedCrop = await (await loadSharpDefault())(external.rawSnapshot.bytes, {
       failOn: "error",
       limitInputPixels: MAX_VIDEO_IMAGE_PIXELS,
     }).extract({ left, top, width, height }).ensureAlpha().raw().toBuffer({ resolveWithObject: true });

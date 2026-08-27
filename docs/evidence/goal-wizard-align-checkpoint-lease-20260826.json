@@ -1,0 +1,50 @@
+{
+  "id": "goal-wizard-align-checkpoint-lease-20260826",
+  "kind": "wizard-reuse-align-checkpoint-lease",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T23:39:00.000Z",
+  "scope": "15s wizard reuses already-loaded align board checkpointLine / writeLeaseLine. When the board is not loaded, copy says it will not auto-query. Suggest path still does not loadAlign. Does not change WIZARD_POST_MATERIALIZE_NEXT / formatWizardPromptBody / schemaVersion. Does not dispatch.",
+  "invariants": {
+    "schemaVersionStill1": true,
+    "wizardDoesNotAutoLoadAlignOnSuggest": true,
+    "unloadedBoardDoesNotQueryGate": true,
+    "doesNotChangeWizardPromptBody": true,
+    "doesNotDispatch": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true,
+    "doesNotChangeDashboardProjection": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-script-library-reader.test.ts"
+      ],
+      "result": "14 files / 205 tests PASS"
+    },
+    "commit": "f5f5062",
+    "linuxDirfdNote": "tests/studio-storyboard-wizard.test.ts fixture still needs Darwin dirfd; not claimed"
+  },
+  "notClaimed": [
+    "wizard auto loadAlign on suggest",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

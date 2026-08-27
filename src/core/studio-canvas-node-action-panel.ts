@@ -2,7 +2,16 @@
  * 画布节点内操作面板合同（视图层，clean-room 对齐 LocalMiniDrama CanvasStoryboardPanel）。
  * - 只读投影字段 + 可发起动作清单；不写业务真源
  * - 动作通过 execute_command / openDashboard 由上层执行
+ * - unit-grid 在途时 freeze-dispatch 不得再建议派发（只精炼文案，不执行）
  */
+import {
+  canvasFreezeDispatchOverrideForCheckpointGate,
+  canvasFreezeDispatchOverrideForUnitGridBlocking,
+  unitGridNextActionBlockingKind,
+} from "./studio-generation-plan-draft.js";
+
+export { unitGridNextActionBlockingKind };
+
 export type StudioCanvasNodeActionCode =
   | "open-dashboard"
   | "open-binding"
@@ -32,6 +41,12 @@ export interface StudioCanvasNodeActionPanelInput {
   /** 是否允许 freeze+dispatch（不假装生图） */
   canFreezeDispatch?: boolean;
   isBusy?: boolean;
+  /** 驾驶舱 / earliest nextAction。wait/retry/Review/对账时禁止再建议 freeze-dispatch。 */
+  unitGridNextActionCode?: string | null;
+  unitGridNextActionLabel?: string | null;
+  /** 已加载 overview 六图闸。未投影不挡；false 才禁止 freeze-dispatch。 */
+  checkpointNewSlotDispatchAllowed?: boolean | null;
+  checkpointBlockingBatchNumber?: number | null;
 }
 
 export interface StudioCanvasNodeActionPanel {
@@ -66,6 +81,21 @@ export function buildStudioCanvasNodeActionPanel(
   const fields: StudioCanvasNodeActionPanel["fields"] = [];
   const actions: StudioCanvasNodeAction[] = [];
   const busy = Boolean(input.isBusy);
+  const nextLabel = input.unitGridNextActionLabel?.trim() || "";
+  const unitGridOverride = canvasFreezeDispatchOverrideForUnitGridBlocking(
+    input.unitGridNextActionCode,
+    input.unitGridNextActionLabel,
+  );
+  const checkpointOverride = canvasFreezeDispatchOverrideForCheckpointGate(
+    input.checkpointNewSlotDispatchAllowed,
+    input.checkpointBlockingBatchNumber,
+  );
+  const freezeDispatchOverride = unitGridOverride ?? checkpointOverride;
+  if (nextLabel) {
+    fields.push({ key: "next", label: "下一步", value: nextLabel });
+  } else if (checkpointOverride) {
+    fields.push({ key: "next", label: "下一步", value: checkpointOverride.reason });
+  }
 
   if (nodeKind === "panel") {
     const panelId = (input.panelId ?? id).trim();
@@ -90,12 +120,19 @@ export function buildStudioCanvasNodeActionPanel(
       enabled: !busy && Boolean(unitId),
       reason: unitId ? undefined : "需要 unitId",
     });
-    actions.push({
-      code: "freeze-dispatch",
-      label: "打开生成队列",
-      enabled: !busy && Boolean(input.canFreezeDispatch) && Boolean(unitId && panelId),
-      reason: input.canFreezeDispatch ? undefined : "未满足 freeze 条件",
-    });
+    actions.push(freezeDispatchOverride
+      ? {
+          code: "freeze-dispatch",
+          label: freezeDispatchOverride.label,
+          enabled: false,
+          reason: freezeDispatchOverride.reason,
+        }
+      : {
+          code: "freeze-dispatch",
+          label: "打开生成队列",
+          enabled: !busy && Boolean(input.canFreezeDispatch) && Boolean(unitId && panelId),
+          reason: input.canFreezeDispatch ? undefined : "未满足 freeze 条件",
+        });
   } else if (nodeKind === "unit") {
     fields.push(
       { key: "unit", label: "单元", value: title },

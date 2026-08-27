@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "6-A",
+  "recordedAt": "2026-08-25T17:12:00Z",
+  "change": {
+    "kind": "verification-only",
+    "sourceCodeChanged": false,
+    "typecheckApp": "PASS",
+    "directedSuite": "plan W1–W5 Linux-runnable contract tests"
+  },
+  "tests": [
+    "tests/resolve-approved-timeline-fast-mode.test.ts",
+    "tests/report-approved-timeline-full.test.ts",
+    "tests/resolve-approved-timeline-bound.test.ts",
+    "tests/use-studio-timeline-projection.test.ts",
+    "tests/managed-studio-canvas-ui.test.ts",
+    "tests/runtime-perf-wave3a-readonly-inspect.test.ts",
+    "tests/runtime-perf-wave3b-ledger-readiness.test.ts",
+    "tests/runtime-perf-wave3c-earliest-list-revision.test.ts",
+    "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+    "tests/runtime-perf-wave4a-editor-lazy-import.test.ts",
+    "tests/runtime-perf-wave4b-story-adaptation-lazy-import.test.ts",
+    "tests/runtime-perf-wave4c-video-dudu-higgsfield-lazy-import.test.ts",
+    "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+    "tests/runtime-perf-wave4e-runtime-gate-watch-scope.test.ts",
+    "tests/runtime-perf-wave4f-sharp-lazy-import.test.ts",
+    "tests/runtime-perf-wave5a-list-thumbnail-binding.test.ts",
+    "tests/runtime-perf-wave5b-legacy-thumb-path.test.ts",
+    "tests/runtime-perf-wave5c-thumbnail-derivation-limit.test.ts",
+    "tests/runtime-perf-wave5d-derivative-serving-binding.test.ts",
+    "tests/runtime-perf-wave5e-verified-file-cache-buckets.test.ts",
+    "tests/build-identity-watch-paths.test.ts",
+    "tests/runtime-write-gate.test.ts",
+    "tests/legacy-thumbnails.test.ts",
+    "tests/studio-labeled-layout.test.ts",
+    "tests/script-media-align-view.test.ts",
+    "tests/studio-continuity-review-ui.test.ts",
+    "tests/studio-continuity-review-desktop-integration.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "directedLinux": {
+      "passed": 241,
+      "files": 27,
+      "platform": "linux",
+      "durationMs": 4040
+    },
+    "p7FixtureOwnerTests": {
+      "file": "tests/studio-approved-timeline-projection.test.ts",
+      "result": "9 failed",
+      "reason": "安全受管写入需要 macOS dirfd helper；禁止回退到路径式写入。",
+      "classification": "known W2-C residual; not a new regression"
+    },
+    "studioMediaProtocolOwnerTests": "未跑：medium 分区；importStudioMedia 需 Darwin dirfd"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W6-A：无窗口 typecheck:app PASS；本计划 Linux 可跑定向测 27 files / 241 tests PASS。未改源码、未改 recipe / T23 SQL。未称整计划关账。",
+  "residual": [
+    "W2-C P7 有界对照仍需 Darwin dirfd；studio-approved-timeline-projection 9 条仍是既有 fixture 失败",
+    "studio-media-protocol owner 测未跑（dirfd / medium）",
+    "未跑安装版 T23 首卡/首 raw（W6-B，仅 owner 点名）",
+    "未跑列表停留+翻 2 页 aicanvas-studio://media/* = 0 探针（Wave 5 父项）",
+    "W4-A/D：get_capabilities 仍 withEditor；command-bus 仍静态拉 ledger；doctor 仍探测 sharp/mammoth",
+    "W5 残差：显式打开原图/差分仍读原图；画布 UI 派生队列仍是 2；切工程 UI 未自动 evict verifiedFileCache",
+    "禁止写成「运行速度已关账」或「连上 Agent 永不加载 sharp/editor」或「已优化缩略指纹」"
+  ]
+}

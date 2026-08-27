@@ -1,9 +1,11 @@
-import { mkdtemp, rm, symlink } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   collectLegacyAssetAllowedRoots,
+  hashResolvedLegacyAssetFile,
   isLegacyUnhashedMediaPathAllowed,
   isLegacyAssetPathAllowed,
   isPathInsideRoots,
@@ -77,5 +79,17 @@ describe("legacy-asset-confinement", () => {
     const { unregisterProject } = await import("../src/core/sidecar.js");
     await unregisterProject(projectRoot);
     expect(await isLegacyAssetPathAllowed(insideFile)).toBe(false);
+  });
+
+  it("hashResolvedLegacyAssetFile 流式哈希，不依赖整文件 Buffer", async () => {
+    const root = await tempRoot("p27-hash-");
+    const filePath = path.join(root, "payload.bin");
+    const payload = Buffer.alloc(80 * 1024, 0x5a);
+    await writeFile(filePath, payload);
+    expect(await hashResolvedLegacyAssetFile(filePath)).toBe(createHash("sha256").update(payload).digest("hex"));
+    const alias = path.join(root, "alias.bin");
+    await symlink(filePath, alias);
+    expect(await hashResolvedLegacyAssetFile(alias)).toBeNull();
+    expect(await hashResolvedLegacyAssetFile(path.join(root, "missing.bin"))).toBeNull();
   });
 });

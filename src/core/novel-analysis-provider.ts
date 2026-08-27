@@ -1,12 +1,26 @@
 import { createHash, randomUUID } from "node:crypto";
-import { loadAdaptationStore, saveAdaptationStore } from "./adaptation.js";
+import { withAdaptation, type AdaptationModule } from "./adaptation-lazy.js";
 import { withProjectLock } from "./locks.js";
 import { createNovelAnalysisRun, parseNovelAnalysisProposal, replaceNovelAnalysisRunTaskAttempt, submitNovelAnalysisProposal } from "./novel-analysis.js";
 import { assertNovelAnalysisChapterBinding, assertNovelAnalysisTaskBindingUnchanged, freezeNovelAnalysisTaskBinding, NovelAnalysisTaskBindingError, persistNovelAnalysisProposal } from "./novel-analysis-task-binding.js";
 import { NovelAnalysisTransportError, assertNovelAnalysisStaticUrlPolicy, prepareNovelAnalysisPinnedTarget, requestPinnedNovelAnalysisText, type PinnedTarget } from "./novel-analysis-transport.js";
 import { appendEvent, getSidecarPaths, readJson, writeJsonAtomic } from "./sidecar.js";
-import { assertStoryLibraryIndexEnvelopeReadable, loadStoryAnalysisChapterSnapshot, loadStoryLibrarySnapshot, StoryAnalysisSnapshotError } from "./story.js";
+import { withStory, type StoryModule } from "./story-lazy.js";
+import { getNovelAnalysisProviderSettings } from "./novel-analysis-provider-settings.js";
 import type { AdaptationStore, NovelAnalysisProvider, NovelAnalysisProviderSettings, NovelAnalysisRunProgress, NovelAnalysisTask, StoryLibrary } from "./types.js";
+
+export { getNovelAnalysisProviderSettings } from "./novel-analysis-provider-settings.js";
+
+const loadAdaptationStore = (...args: Parameters<AdaptationModule["loadAdaptationStore"]>) =>
+  withAdaptation((adaptation) => adaptation.loadAdaptationStore(...args));
+const saveAdaptationStore = (...args: Parameters<AdaptationModule["saveAdaptationStore"]>) =>
+  withAdaptation((adaptation) => adaptation.saveAdaptationStore(...args));
+const loadStoryLibrarySnapshot = (...args: Parameters<StoryModule["loadStoryLibrarySnapshot"]>) =>
+  withStory((story) => story.loadStoryLibrarySnapshot(...args));
+const loadStoryAnalysisChapterSnapshot = (...args: Parameters<StoryModule["loadStoryAnalysisChapterSnapshot"]>) =>
+  withStory((story) => story.loadStoryAnalysisChapterSnapshot(...args));
+const assertStoryLibraryIndexEnvelopeReadable = (...args: Parameters<StoryModule["assertStoryLibraryIndexEnvelopeReadable"]>) =>
+  withStory((story) => story.assertStoryLibraryIndexEnvelopeReadable(...args));
 
 export interface UpsertNovelAnalysisProviderInput {
   expectedRevision: number;
@@ -188,7 +202,6 @@ const LEGACY_ANALYSIS_EXECUTION_LEASE_MS = 10 * 60_000;
 
 function now(): string { return new Date().toISOString(); }
 function record(value: unknown): value is Record<string, unknown> { return Boolean(value) && typeof value === "object" && !Array.isArray(value); }
-function emptySettings(): NovelAnalysisProviderSettings { return { schemaVersion: 1, revision: 0, providers: [], updatedAt: new Date(0).toISOString() }; }
 function hash(value: string): string { return createHash("sha256").update(value).digest("hex"); }
 
 function persistedExecutionError(error: unknown, status: "failed" | "submission_unknown"): string {
@@ -236,22 +249,6 @@ function childUrl(base: URL, suffix: "models" | "chat/completions"): URL {
   const url = new URL(base.toString());
   url.pathname = `${base.pathname.replace(/\/+$/, "")}/${suffix}`;
   return url;
-}
-
-function validateSettings(value: unknown): NovelAnalysisProviderSettings {
-  if (!record(value) || value.schemaVersion !== 1 || !Number.isInteger(value.revision) || !Array.isArray(value.providers) || typeof value.updatedAt !== "string") throw new Error("analysis-providers.json 结构损坏，已停止读取和写入。 ");
-  const ids = new Set<string>();
-  for (const entry of value.providers) {
-    if (!record(entry) || entry.schemaVersion !== 1 || typeof entry.id !== "string" || ids.has(entry.id) || typeof entry.name !== "string" || !["openai-compatible", "mock"].includes(String(entry.adapter)) || typeof entry.enabled !== "boolean" || typeof entry.model !== "string" || !Number.isInteger(entry.revision)) throw new Error("analysis-providers.json 包含无效或重复的 Provider。 ");
-    ids.add(entry.id);
-  }
-  if (value.defaultProviderId !== undefined && (typeof value.defaultProviderId !== "string" || !ids.has(value.defaultProviderId))) throw new Error("analysis-providers.json 的默认 Provider 不存在。 ");
-  return value as unknown as NovelAnalysisProviderSettings;
-}
-
-export async function getNovelAnalysisProviderSettings(projectRoot: string): Promise<NovelAnalysisProviderSettings> {
-  const value = await readJson<unknown | null>(getSidecarPaths(projectRoot).storyAnalysisProviders, null);
-  return value === null ? emptySettings() : validateSettings(value);
 }
 
 function normalizedProvider(input: UpsertNovelAnalysisProviderInput["provider"], existing?: NovelAnalysisProvider): NovelAnalysisProvider {
@@ -505,7 +502,10 @@ async function chapterPayload(projectRoot: string, task: NovelAnalysisTask, maxC
   try {
     snapshot = await loadStoryAnalysisChapterSnapshot(projectRoot, task.chapterRefs.map((chapter) => chapter.chapterId));
   } catch (error) {
-    if (error instanceof StoryAnalysisSnapshotError && error.kind === "library") {
+    const libraryUnavailable = await withStory(
+      (story) => error instanceof story.StoryAnalysisSnapshotError && error.kind === "library",
+    );
+    if (libraryUnavailable) {
       throw preDispatchFailure("NOVEL_ANALYSIS_PRE_DISPATCH_LIBRARY_UNAVAILABLE", "章节索引或迁移闭包当前不可读取；请恢复后重新执行。", error);
     }
     throw preDispatchFailure("NOVEL_ANALYSIS_PRE_DISPATCH_CHAPTER_UNAVAILABLE", "章节正文当前不可读取；请恢复章节后重新执行。", error);

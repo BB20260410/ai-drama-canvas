@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "5-list-flip-protocol-classify",
+  "recordedAt": "2026-08-25T19:03:00Z",
+  "change": {
+    "kind": "test-only",
+    "sourceCodeChanged": false,
+    "files": [
+      "tests/runtime-perf-wave5-list-flip-media-count.test.ts"
+    ],
+    "summary": "§1.5 源码合同补强：64-hex 键 + 镜像 Main hostname→field 分类，默认 72 条预览全部 thumbnailRecipeKey；thumbnail serving 分支不 inspectCasObjectCached。不是安装版 GUI/协议实测。"
+  },
+  "verification": {
+    "typecheckApp": "PASS",
+    "directedLinux": {
+      "files": 2,
+      "passed": 6,
+      "platform": "linux",
+      "thisFile": {
+        "file": "tests/runtime-perf-wave5-list-flip-media-count.test.ts",
+        "passed": 5
+      }
+    },
+    "reviews": {
+      "redline": "PASS; 无 must-fix",
+      "completion": "PASS; 源码合同切片成立；Wave 5 父项仍禁止勾选"
+    },
+    "listFlipProbe": "NOT_RUN",
+    "installedT23": "NOT_RUN"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "overwrote20260811Final": false,
+    "t23SqlUnchanged": true,
+    "thumbnailRecipeUnchanged": true,
+    "wave5ParentChecked": false
+  },
+  "claim": "W5 列表翻页：默认预览 URL 按 Main handler 分类为 thumbnailRecipeKey，次数 0 条 mediaSha256；thumbnail serving 不读源 CAS。禁止写「列表原图次数已测为 0」或勾 Wave 5 父项。禁止写「运行速度已关账」。",
+  "residual": [
+    "安装版列表停留+翻 2 页 GUI/协议探针仍 NOT_RUN",
+    "classify 是测试内镜像，不是 protocol.handle 实调",
+    "安装版 T23 / P7 owner 对照仍 NOT_RUN"
+  ]
+}

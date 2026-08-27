@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "kind": "goal-dual-track-slice",
+  "slice": "align-consistency-peek",
+  "recordedAt": "2026-08-26T17:52:00Z",
+  "change": {
+    "kind": "source-fix",
+    "sourceCodeChanged": true,
+    "note": "对照行挂 consistencyPeek。只读 peekStudioConsistencyVerdictByRunId（runId 缓存）。align 动态 import evaluator，不调用 evaluateStudioConsistency，不跑像素，不自动 Review PASS。未评估 ≠ 无法检查。"
+  },
+  "verification": {
+    "typecheckApp": "PENDING",
+    "targetedTests": "PENDING"
+  },
+  "goalVerdict": {
+    "slice": "已完成",
+    "wholeGoal": "部分完成",
+    "nextB": "阅读器 span→图桌面按钮",
+    "nextA": "等待 owner"
+  }
+}

@@ -4,7 +4,8 @@ import path from "node:path";
 import { upsertAssetRelation, upsertVoiceIdentity } from "./asset-registry.js";
 import { deleteCanvasEntity, deleteCanvasLink, redoCanvasSemanticState, undoCanvasSemanticState, upsertCanvasEntity, upsertCanvasLink } from "./canvas-state.js";
 import { saveScriptDocument } from "./documents.js";
-import { applyEditOperation, cancelEditRender, createEditProject, createVideoContinuationPack, exportEditProjectOtio, extractLastFrame, extractTimelineFrame, importEditProjectOtio, prepareEditMediaPreview, prepareEditMediaProxy, prepareTimelineVideoContinuation, redoEditProject, saveEditProject, startEditRender, undoEditProject, updateVideoContinuationPack, type EditOperation } from "./editor.js";
+import { withEditor, type EditorModule } from "./editor-lazy.js";
+import type { EditOperation } from "./editor.js";
 import { cancelGenerationJob, enqueueGeneration, migrateGenerationExecutionState, processGenerationQueue, reconcileHttpGenerationSubmission, updateBrowserGenerationJob, updateSubagentImageGenerationJob, upsertGenerationProvider } from "./generation.js";
 import { createContinuationHandoff, deleteProjectContext, upsertProjectContext } from "./memory.js";
 import { commitExistingProductionRecovery, updateProductionWorkflowStage, upsertCreativeBible, upsertStoryboardRow } from "./production.js";
@@ -35,8 +36,10 @@ import {
   projectConfirmedCommandFailureForReceipt,
 } from "./command-terminal-receipt.js";
 import { saveAgentSkill } from "./skills.js";
-import { connectStoryEvents, importStoryFile, importStoryText, upsertStoryEvent } from "./story.js";
-import { analyzeNovelChapters, exportAdaptation, generateAdaptationPlans, loadAdaptationStore, materializeSelectedAdaptationPlan, regenerateAdaptationScope, selectAdaptationPlan, upsertNarrativeBeat, upsertNovelFact } from "./adaptation.js";
+import { withAdaptation, type AdaptationModule } from "./adaptation-lazy.js";
+import { withStory, type StoryModule } from "./story-lazy.js";
+import { withNovelAnalysis, type NovelAnalysisModule } from "./novel-analysis-lazy.js";
+import { loadNovelAnalysisProvider, withNovelAnalysisProvider, type NovelAnalysisProviderModule } from "./novel-analysis-provider-lazy.js";
 import { createShotTaskPack, saveUnitTimeline } from "./timeline.js";
 import type { AssetRelationKind, BrowserGenerationUpdateStatus, BrowserPreflightInput, BrowserSubmissionReconciliationInput, BrowserUploadInput, CreativeBibleKind, ProductionWorkflowStageId, ProductionWorkflowStageStatus, ReconcileHttpGenerationSubmissionInput, ShotTiming, SubagentImageGenerationUpdateStatus, SubmitReviewInput, WorkItemStatus } from "./types.js";
 import { withProjectLock } from "./locks.js";
@@ -96,8 +99,6 @@ import {
   type PreflightPublicationInput,
 } from "./publication.js";
 import { enrichPublicationIntentWithDiagnostics } from "./studio-publication-preflight-diagnostics.js";
-import { createNovelAnalysisTask, reviewNovelAnalysisBatch, reviewNovelAnalysisItem, submitNovelAnalysisProposal } from "./novel-analysis.js";
-import { executeNextNovelAnalysisRunTask, executeNovelAnalysisTask, isNovelAnalysisExecutionSafetyError, markNovelAnalysisExecutionReconciliationRequired, novelAnalysisExecutionSafeMessage, planNovelAnalysisRun, reconcileNovelAnalysisExecution, replaceNovelAnalysisRunTask, upsertNovelAnalysisProvider } from "./novel-analysis-provider.js";
 import { ConfirmedCommandFailure, isConfirmedCommandFailure, isRejectedCommandFailure, RejectedCommandFailure } from "./command-outcome.js";
 import {
   RetrySafeSqliteBusyError,
@@ -175,10 +176,13 @@ import {
   readStudioGenerationReviewOperationRecordReadOnly,
   type SubmitStudioGenerationReviewInput,
 } from "./studio-generation-review.js";
+import type { SubmitStudioPostResultObservationInput } from "./studio-post-result-observation.js";
 import {
-  readStudioPostResultObservationOperationRecordReadOnly,
-  type SubmitStudioPostResultObservationInput,
-} from "./studio-post-result-observation.js";
+  withStudioMultimediaTimeline,
+  withStudioPostResultObservation,
+  type StudioMultimediaTimelineModule,
+  type StudioPostResultObservationModule,
+} from "./studio-readonly-diagnostics-lazy.js";
 import {
   readStudioGenerationCheckpointOperationRecordReadOnly,
   type AttestStudioGenerationCheckpointInput,
@@ -192,45 +196,47 @@ import {
   ActiveManagedStudioContextError,
   assertActiveManagedStudioContextToken,
 } from "./active-managed-studio-context.js";
-import {
-  DuduReadonlyControlConflictError,
-  discoverDuduReadonlyImportProjects,
-  getDuduReadonlyImportControl,
-  proveDuduReadonlyFinalizationOutcome,
-  readDuduReadonlyFinalizationOutcomeByOperationId,
-  readDuduReadonlyStageOutcomeByOperationId,
-  proveDuduReadonlyStageCommandOutcome,
-  resolveDuduReadonlyImportCommandRoot,
-  stageDuduReadonlyManagedProject,
-  summarizeDuduReadonlyStageResult,
-  type StageDuduReadonlyManagedProjectInput,
-} from "./dudu-readonly-import.js";
+import { withDuduReadonlyImport, type DuduReadonlyImportModule } from "./dudu-readonly-import-lazy.js";
+import type { StageDuduReadonlyManagedProjectInput } from "./dudu-readonly-import.js";
 import type { DuduReadonlySourceInput } from "./dudu-readonly-source.js";
-import {
-  getStudioVideoPackageControl,
-  readStudioVideoPackageBuildReceiptByOperationIdReadOnly,
-  readStudioVideoPackageExportIntentByOperationId,
-  type StudioVideoPackageAuthorityInput,
-  type StudioVideoPackageExpectedManagedSource,
-} from "./studio-video-package.js";
-import type {
-  AttestStudioHiggsfieldConnectorCapabilityInput,
-  RecordStudioHiggsfieldSubmissionInput,
-} from "./studio-higgsfield-video-generation.js";
-import type {
-  reconcileStudioHiggsfieldConnectorRequest,
-  HiggsfieldDirectUnlimitedObservation,
-} from "./studio-higgsfield-connector-queue.js";
-import {
-  readStudioMultimediaTimelineBindingByOperationId,
-  type AttachStudioMultimediaTimelineMediaInput,
-} from "./studio-multimedia-timeline.js";
-import {
-  materializeLocalCreativeProductionUnits,
-  readLocalCreativeProductionUnitMaterializationOutcomeReadOnly,
-  type LocalCreativeProductionUnitMaterializationReceipt,
-  type MaterializeLocalCreativeProductionUnitsInput,
-} from "./local-creative-production-unit-materializer.js";
+import { withStudioVideoPackage, type StudioVideoPackageModule } from "./studio-video-package-lazy.js";
+import type { StudioVideoPackageAuthorityInput, StudioVideoPackageExpectedManagedSource } from "./studio-video-package.js";
+import type { AttestStudioHiggsfieldConnectorCapabilityInput, RecordStudioHiggsfieldSubmissionInput } from "./studio-higgsfield-video-generation.js";
+import type { reconcileStudioHiggsfieldConnectorRequest, HiggsfieldDirectUnlimitedObservation } from "./studio-higgsfield-connector-queue.js";
+import type { AttachStudioMultimediaTimelineMediaInput } from "./studio-multimedia-timeline.js";
+import { withLocalCreativeMaterializer, type LocalCreativeMaterializerModule } from "./local-creative-lazy.js";
+import type { LocalCreativeProductionUnitMaterializationReceipt, MaterializeLocalCreativeProductionUnitsInput } from "./local-creative-production-unit-materializer.js";
+
+const discoverDuduReadonlyImportProjects = (...args: Parameters<DuduReadonlyImportModule["discoverDuduReadonlyImportProjects"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.discoverDuduReadonlyImportProjects(...args));
+const proveDuduReadonlyFinalizationOutcome = (...args: Parameters<DuduReadonlyImportModule["proveDuduReadonlyFinalizationOutcome"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.proveDuduReadonlyFinalizationOutcome(...args));
+const readDuduReadonlyFinalizationOutcomeByOperationId = (...args: Parameters<DuduReadonlyImportModule["readDuduReadonlyFinalizationOutcomeByOperationId"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.readDuduReadonlyFinalizationOutcomeByOperationId(...args));
+const readDuduReadonlyStageOutcomeByOperationId = (...args: Parameters<DuduReadonlyImportModule["readDuduReadonlyStageOutcomeByOperationId"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.readDuduReadonlyStageOutcomeByOperationId(...args));
+const proveDuduReadonlyStageCommandOutcome = (...args: Parameters<DuduReadonlyImportModule["proveDuduReadonlyStageCommandOutcome"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.proveDuduReadonlyStageCommandOutcome(...args));
+const resolveDuduReadonlyImportCommandRoot = (...args: Parameters<DuduReadonlyImportModule["resolveDuduReadonlyImportCommandRoot"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.resolveDuduReadonlyImportCommandRoot(...args));
+const stageDuduReadonlyManagedProject = (...args: Parameters<DuduReadonlyImportModule["stageDuduReadonlyManagedProject"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.stageDuduReadonlyManagedProject(...args));
+const summarizeDuduReadonlyStageResult = (...args: Parameters<DuduReadonlyImportModule["summarizeDuduReadonlyStageResult"]>) =>
+  withDuduReadonlyImport((dudu) => dudu.summarizeDuduReadonlyStageResult(...args));
+const getStudioVideoPackageControl = (...args: Parameters<StudioVideoPackageModule["getStudioVideoPackageControl"]>) =>
+  withStudioVideoPackage((videoPackage) => videoPackage.getStudioVideoPackageControl(...args));
+const readStudioVideoPackageBuildReceiptByOperationIdReadOnly = (...args: Parameters<StudioVideoPackageModule["readStudioVideoPackageBuildReceiptByOperationIdReadOnly"]>) =>
+  withStudioVideoPackage((videoPackage) => videoPackage.readStudioVideoPackageBuildReceiptByOperationIdReadOnly(...args));
+const readStudioVideoPackageExportIntentByOperationId = (...args: Parameters<StudioVideoPackageModule["readStudioVideoPackageExportIntentByOperationId"]>) =>
+  withStudioVideoPackage((videoPackage) => videoPackage.readStudioVideoPackageExportIntentByOperationId(...args));
+const materializeLocalCreativeProductionUnits = (...args: Parameters<LocalCreativeMaterializerModule["materializeLocalCreativeProductionUnits"]>) =>
+  withLocalCreativeMaterializer((materializer) => materializer.materializeLocalCreativeProductionUnits(...args));
+const readLocalCreativeProductionUnitMaterializationOutcomeReadOnly = (...args: Parameters<LocalCreativeMaterializerModule["readLocalCreativeProductionUnitMaterializationOutcomeReadOnly"]>) =>
+  withLocalCreativeMaterializer((materializer) => materializer.readLocalCreativeProductionUnitMaterializationOutcomeReadOnly(...args));
+const readStudioPostResultObservationOperationRecordReadOnly = (...args: Parameters<StudioPostResultObservationModule["readStudioPostResultObservationOperationRecordReadOnly"]>) =>
+  withStudioPostResultObservation((observation) => observation.readStudioPostResultObservationOperationRecordReadOnly(...args));
+const readStudioMultimediaTimelineBindingByOperationId = (...args: Parameters<StudioMultimediaTimelineModule["readStudioMultimediaTimelineBindingByOperationId"]>) =>
+  withStudioMultimediaTimeline((timeline) => timeline.readStudioMultimediaTimelineBindingByOperationId(...args));
 
 export type AppendStudioContinuityObservationCommandPayload = Omit<AppendStudioContinuityObservationInput, "operationId">;
 export type AppendStudioContinuityCorrectionCommandPayload = Omit<AppendStudioContinuityCorrectionInput, "operationId">;
@@ -404,7 +410,7 @@ export type CommandRequest =
   | { command: "prepare_timeline_continuation"; payload: { editProjectId: string; targetItemId: string; expectedRevision: number; timeSeconds?: number; prompt?: string; providerId?: string; enqueue?: boolean } }
   | { command: "upsert_context"; payload: Parameters<typeof upsertProjectContext>[1] }
   | { command: "delete_context"; payload: Parameters<typeof deleteProjectContext>[1] }
-  | { command: "upsert_story_event"; payload: Parameters<typeof upsertStoryEvent>[1] }
+  | { command: "upsert_story_event"; payload: Parameters<StoryModule["upsertStoryEvent"]>[1] }
   | { command: "connect_story_events"; payload: { sourceEventId: string; targetEventId: string } }
   | { command: "upsert_canvas_entity"; payload: Parameters<typeof upsertCanvasEntity>[1] }
   | { command: "delete_canvas_entity"; payload: { entityId: string } }
@@ -420,29 +426,29 @@ export type CommandRequest =
   | { command: "enqueue_generation"; payload: Parameters<typeof enqueueGeneration>[1] }
   | { command: "upsert_generation_provider"; payload: Parameters<typeof upsertGenerationProvider>[1] }
   | { command: "save_script_document"; payload: { filePath: string; content: string; expectedModifiedAt?: string } }
-  | { command: "extract_last_frame"; payload: Parameters<typeof extractLastFrame>[1] }
-  | { command: "create_video_continuation"; payload: Parameters<typeof createVideoContinuationPack>[1] }
+  | { command: "extract_last_frame"; payload: Parameters<EditorModule["extractLastFrame"]>[1] }
+  | { command: "create_video_continuation"; payload: Parameters<EditorModule["createVideoContinuationPack"]>[1] }
   | { command: "import_story_file"; payload: { filePath: string; title?: string } }
-  | { command: "import_story_text"; payload: Parameters<typeof importStoryText>[1] }
-  | { command: "analyze_novel_chapters"; payload: Parameters<typeof analyzeNovelChapters>[1] }
-  | { command: "generate_adaptation_plans"; payload: Parameters<typeof generateAdaptationPlans>[1] }
+  | { command: "import_story_text"; payload: Parameters<StoryModule["importStoryText"]>[1] }
+  | { command: "analyze_novel_chapters"; payload: Parameters<AdaptationModule["analyzeNovelChapters"]>[1] }
+  | { command: "generate_adaptation_plans"; payload: Parameters<AdaptationModule["generateAdaptationPlans"]>[1] }
   | { command: "select_adaptation_plan"; payload: { planId: string; expectedRevision: number } }
-  | { command: "materialize_adaptation_plan"; payload: Parameters<typeof materializeSelectedAdaptationPlan>[1] }
-  | { command: "regenerate_adaptation_scope"; payload: Parameters<typeof regenerateAdaptationScope>[1] }
-  | { command: "upsert_novel_fact"; payload: Parameters<typeof upsertNovelFact>[1] }
-  | { command: "upsert_narrative_beat"; payload: Parameters<typeof upsertNarrativeBeat>[1] }
-  | { command: "export_adaptation"; payload: Parameters<typeof exportAdaptation>[1] }
-  | { command: "create_novel_analysis_task"; payload: Parameters<typeof createNovelAnalysisTask>[1] }
-  | { command: "submit_novel_analysis_proposal"; payload: Parameters<typeof submitNovelAnalysisProposal>[1] }
-  | { command: "review_novel_analysis_item"; payload: Parameters<typeof reviewNovelAnalysisItem>[1] }
-  | { command: "review_novel_analysis_batch"; payload: Parameters<typeof reviewNovelAnalysisBatch>[1] }
-  | { command: "upsert_novel_analysis_provider"; payload: Parameters<typeof upsertNovelAnalysisProvider>[1] }
-  | { command: "plan_novel_analysis_run"; payload: Parameters<typeof planNovelAnalysisRun>[1] }
-  | { command: "execute_novel_analysis_task"; payload: Parameters<typeof executeNovelAnalysisTask>[1] }
-  | { command: "execute_next_novel_analysis_run_task"; payload: Parameters<typeof executeNextNovelAnalysisRunTask>[1] }
-  | { command: "replace_novel_analysis_run_task"; payload: Parameters<typeof replaceNovelAnalysisRunTask>[1] }
-  | { command: "mark_novel_analysis_execution_reconciliation_required"; payload: Parameters<typeof markNovelAnalysisExecutionReconciliationRequired>[1] }
-  | { command: "reconcile_novel_analysis_execution"; payload: Parameters<typeof reconcileNovelAnalysisExecution>[1] }
+  | { command: "materialize_adaptation_plan"; payload: Parameters<AdaptationModule["materializeSelectedAdaptationPlan"]>[1] }
+  | { command: "regenerate_adaptation_scope"; payload: Parameters<AdaptationModule["regenerateAdaptationScope"]>[1] }
+  | { command: "upsert_novel_fact"; payload: Parameters<AdaptationModule["upsertNovelFact"]>[1] }
+  | { command: "upsert_narrative_beat"; payload: Parameters<AdaptationModule["upsertNarrativeBeat"]>[1] }
+  | { command: "export_adaptation"; payload: Parameters<AdaptationModule["exportAdaptation"]>[1] }
+  | { command: "create_novel_analysis_task"; payload: Parameters<NovelAnalysisModule["createNovelAnalysisTask"]>[1] }
+  | { command: "submit_novel_analysis_proposal"; payload: Parameters<NovelAnalysisModule["submitNovelAnalysisProposal"]>[1] }
+  | { command: "review_novel_analysis_item"; payload: Parameters<NovelAnalysisModule["reviewNovelAnalysisItem"]>[1] }
+  | { command: "review_novel_analysis_batch"; payload: Parameters<NovelAnalysisModule["reviewNovelAnalysisBatch"]>[1] }
+  | { command: "upsert_novel_analysis_provider"; payload: Parameters<NovelAnalysisProviderModule["upsertNovelAnalysisProvider"]>[1] }
+  | { command: "plan_novel_analysis_run"; payload: Parameters<NovelAnalysisProviderModule["planNovelAnalysisRun"]>[1] }
+  | { command: "execute_novel_analysis_task"; payload: Parameters<NovelAnalysisProviderModule["executeNovelAnalysisTask"]>[1] }
+  | { command: "execute_next_novel_analysis_run_task"; payload: Parameters<NovelAnalysisProviderModule["executeNextNovelAnalysisRunTask"]>[1] }
+  | { command: "replace_novel_analysis_run_task"; payload: Parameters<NovelAnalysisProviderModule["replaceNovelAnalysisRunTask"]>[1] }
+  | { command: "mark_novel_analysis_execution_reconciliation_required"; payload: Parameters<NovelAnalysisProviderModule["markNovelAnalysisExecutionReconciliationRequired"]>[1] }
+  | { command: "reconcile_novel_analysis_execution"; payload: Parameters<NovelAnalysisProviderModule["reconcileNovelAnalysisExecution"]>[1] }
   | { command: "save_skill"; payload: Parameters<typeof saveAgentSkill>[1] }
   | { command: "create_handoff"; payload: { itemId?: string } }
   | { command: "save_unit_timeline"; payload: { unitId: string; timings: ShotTiming[] } }
@@ -457,7 +463,7 @@ export type CommandRequest =
   | { command: "register_publication_bundle"; payload: Parameters<typeof registerPublicationBundle>[1] }
   | { command: "cancel_publication_bundle"; payload: Parameters<typeof cancelPublicationBundle>[1] }
   | { command: "fail_publication_bundle"; payload: Parameters<typeof failPublicationBundle>[1] }
-  | { command: "create_edit_project"; payload: Parameters<typeof createEditProject>[1] }
+  | { command: "create_edit_project"; payload: Parameters<EditorModule["createEditProject"]>[1] }
   | { command: "save_edit_project"; payload: { project: EditProject; expectedRevision: number } }
   | { command: "undo_edit_project"; payload: { editProjectId: string; expectedRevision: number } }
   | { command: "redo_edit_project"; payload: { editProjectId: string; expectedRevision: number } }
@@ -465,7 +471,7 @@ export type CommandRequest =
   | { command: "import_edit_otio"; payload: { filePath: string; name?: string } }
   | { command: "start_edit_render"; payload: { editProjectId: string; expectedRevision: number; outputDirectory?: string } }
   | { command: "cancel_edit_render"; payload: { renderId: string } }
-  | { command: "extract_timeline_frame"; payload: Parameters<typeof extractTimelineFrame>[1] }
+  | { command: "extract_timeline_frame"; payload: Parameters<EditorModule["extractTimelineFrame"]>[1] }
   | { command: "prepare_edit_media_preview"; payload: { artifactId: string } }
   | { command: "prepare_edit_media_proxy"; payload: { artifactId: string } };
 
@@ -1332,7 +1338,7 @@ async function hydrateReceiptReconciledCommandResult(
     || !Number.isInteger(source.workspaceRevision)) {
     throw new Error("小说分析任务终态回执定位符无效；保持已对账账本并停止返回不完整结果。");
   }
-  const workspace = await loadAdaptationStore(projectRoot);
+  const workspace = await withAdaptation((adaptation) => adaptation.loadAdaptationStore(projectRoot));
   if (workspace.revision < Number(source.workspaceRevision)) {
     throw new Error("小说分析工作区修订早于终态回执；拒绝从不完整状态重建结果。");
   }
@@ -5077,13 +5083,15 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
           expectedDiscoveryFingerprint: request.payload.expectedDiscoveryFingerprint,
         }));
       } catch (error) {
-        if (error instanceof DuduReadonlyControlConflictError) {
+        const conflict = await withDuduReadonlyImport((dudu) =>
+          error instanceof dudu.DuduReadonlyControlConflictError ? error : null);
+        if (conflict) {
           rejectP30OrchestrationCommand({
             entityType: "dudu_readonly_import",
             reason: "control_conflict",
-            message: error.message,
-            expectedFingerprint: error.expectedFingerprint ?? request.payload.expectedDiscoveryFingerprint,
-            currentFingerprint: error.currentFingerprint,
+            message: conflict.message,
+            expectedFingerprint: conflict.expectedFingerprint ?? request.payload.expectedDiscoveryFingerprint,
+            currentFingerprint: conflict.currentFingerprint,
           });
         }
         throw error;
@@ -5301,7 +5309,7 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
       return finishBatch(projectRoot, taskId, input);
     }
     case "apply_edit_operation": {
-      const result = await applyEditOperation(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, request.payload.operation, "codex");
+      const result = await withEditor((editor) => editor.applyEditOperation(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, request.payload.operation, "codex"));
       return { editProjectId: result.project.id, revision: result.project.revision, updatedAt: result.project.updatedAt, affectedTrackIds: result.affectedTrackIds, affectedClipIds: result.affectedClipIds };
     }
     case "update_workflow_stage": return updateProductionWorkflowStage(projectRoot, request.payload, "codex");
@@ -5326,16 +5334,16 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
     }
     case "update_video_continuation": {
       const { continuationId, ...input } = request.payload;
-      return updateVideoContinuationPack(projectRoot, continuationId, input);
+      return withEditor((editor) => editor.updateVideoContinuationPack(projectRoot, continuationId, input));
     }
-    case "prepare_timeline_continuation": return prepareTimelineVideoContinuation(projectRoot, request.payload);
+    case "prepare_timeline_continuation": return withEditor((editor) => editor.prepareTimelineVideoContinuation(projectRoot, request.payload));
     case "upsert_context": return upsertProjectContext(projectRoot, request.payload, "codex");
     case "delete_context": {
       await deleteProjectContext(projectRoot, request.payload, "codex");
       return { deleted: request.payload.contextId };
     }
-    case "upsert_story_event": return upsertStoryEvent(projectRoot, request.payload, "codex");
-    case "connect_story_events": return connectStoryEvents(projectRoot, request.payload.sourceEventId, request.payload.targetEventId, "codex");
+    case "upsert_story_event": return withStory((story) => story.upsertStoryEvent(projectRoot, request.payload, "codex"));
+    case "connect_story_events": return withStory((story) => story.connectStoryEvents(projectRoot, request.payload.sourceEventId, request.payload.targetEventId, "codex"));
     case "upsert_canvas_entity": return upsertCanvasEntity(projectRoot, request.payload, "codex");
     case "delete_canvas_entity": return deleteCanvasEntity(projectRoot, request.payload.entityId, "codex");
     case "upsert_canvas_link": return upsertCanvasLink(projectRoot, request.payload, "codex");
@@ -5350,29 +5358,29 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
     case "enqueue_generation": return enqueueGeneration(projectRoot, request.payload);
     case "upsert_generation_provider": return upsertGenerationProvider(projectRoot, request.payload, "codex");
     case "save_script_document": return saveScriptDocument(projectRoot, request.payload.filePath, request.payload.content, request.payload.expectedModifiedAt);
-    case "extract_last_frame": return extractLastFrame(projectRoot, request.payload);
-    case "create_video_continuation": return createVideoContinuationPack(projectRoot, request.payload);
-    case "import_story_file": return importStoryFile(projectRoot, request.payload.filePath, request.payload.title);
-    case "import_story_text": return importStoryText(projectRoot, request.payload);
-    case "analyze_novel_chapters": return analyzeNovelChapters(projectRoot, request.payload);
-    case "generate_adaptation_plans": return generateAdaptationPlans(projectRoot, request.payload);
-    case "select_adaptation_plan": return selectAdaptationPlan(projectRoot, request.payload.planId, request.payload.expectedRevision);
-    case "materialize_adaptation_plan": return materializeSelectedAdaptationPlan(projectRoot, request.payload);
-    case "regenerate_adaptation_scope": return regenerateAdaptationScope(projectRoot, request.payload);
-    case "create_novel_analysis_task": return createNovelAnalysisTask(projectRoot, request.payload);
-    case "submit_novel_analysis_proposal": return submitNovelAnalysisProposal(projectRoot, request.payload);
-    case "review_novel_analysis_item": return reviewNovelAnalysisItem(projectRoot, request.payload);
-    case "review_novel_analysis_batch": return reviewNovelAnalysisBatch(projectRoot, request.payload);
-    case "upsert_novel_analysis_provider": return upsertNovelAnalysisProvider(projectRoot, request.payload);
-    case "plan_novel_analysis_run": return planNovelAnalysisRun(projectRoot, request.payload);
-    case "execute_novel_analysis_task": return executeNovelAnalysisTask(projectRoot, request.payload);
-    case "execute_next_novel_analysis_run_task": return executeNextNovelAnalysisRunTask(projectRoot, request.payload);
-    case "replace_novel_analysis_run_task": return replaceNovelAnalysisRunTask(projectRoot, request.payload);
-    case "mark_novel_analysis_execution_reconciliation_required": return markNovelAnalysisExecutionReconciliationRequired(projectRoot, request.payload);
-    case "reconcile_novel_analysis_execution": return reconcileNovelAnalysisExecution(projectRoot, request.payload);
-    case "upsert_novel_fact": return upsertNovelFact(projectRoot, request.payload);
-    case "upsert_narrative_beat": return upsertNarrativeBeat(projectRoot, request.payload);
-    case "export_adaptation": return exportAdaptation(projectRoot, request.payload);
+    case "extract_last_frame": return withEditor((editor) => editor.extractLastFrame(projectRoot, request.payload));
+    case "create_video_continuation": return withEditor((editor) => editor.createVideoContinuationPack(projectRoot, request.payload));
+    case "import_story_file": return withStory((story) => story.importStoryFile(projectRoot, request.payload.filePath, request.payload.title));
+    case "import_story_text": return withStory((story) => story.importStoryText(projectRoot, request.payload));
+    case "analyze_novel_chapters": return withAdaptation((adaptation) => adaptation.analyzeNovelChapters(projectRoot, request.payload));
+    case "generate_adaptation_plans": return withAdaptation((adaptation) => adaptation.generateAdaptationPlans(projectRoot, request.payload));
+    case "select_adaptation_plan": return withAdaptation((adaptation) => adaptation.selectAdaptationPlan(projectRoot, request.payload.planId, request.payload.expectedRevision));
+    case "materialize_adaptation_plan": return withAdaptation((adaptation) => adaptation.materializeSelectedAdaptationPlan(projectRoot, request.payload));
+    case "regenerate_adaptation_scope": return withAdaptation((adaptation) => adaptation.regenerateAdaptationScope(projectRoot, request.payload));
+    case "create_novel_analysis_task": return withNovelAnalysis((novelAnalysis) => novelAnalysis.createNovelAnalysisTask(projectRoot, request.payload));
+    case "submit_novel_analysis_proposal": return withNovelAnalysis((novelAnalysis) => novelAnalysis.submitNovelAnalysisProposal(projectRoot, request.payload));
+    case "review_novel_analysis_item": return withNovelAnalysis((novelAnalysis) => novelAnalysis.reviewNovelAnalysisItem(projectRoot, request.payload));
+    case "review_novel_analysis_batch": return withNovelAnalysis((novelAnalysis) => novelAnalysis.reviewNovelAnalysisBatch(projectRoot, request.payload));
+    case "upsert_novel_analysis_provider": return withNovelAnalysisProvider((provider) => provider.upsertNovelAnalysisProvider(projectRoot, request.payload));
+    case "plan_novel_analysis_run": return withNovelAnalysisProvider((provider) => provider.planNovelAnalysisRun(projectRoot, request.payload));
+    case "execute_novel_analysis_task": return withNovelAnalysisProvider((provider) => provider.executeNovelAnalysisTask(projectRoot, request.payload));
+    case "execute_next_novel_analysis_run_task": return withNovelAnalysisProvider((provider) => provider.executeNextNovelAnalysisRunTask(projectRoot, request.payload));
+    case "replace_novel_analysis_run_task": return withNovelAnalysisProvider((provider) => provider.replaceNovelAnalysisRunTask(projectRoot, request.payload));
+    case "mark_novel_analysis_execution_reconciliation_required": return withNovelAnalysisProvider((provider) => provider.markNovelAnalysisExecutionReconciliationRequired(projectRoot, request.payload));
+    case "reconcile_novel_analysis_execution": return withNovelAnalysisProvider((provider) => provider.reconcileNovelAnalysisExecution(projectRoot, request.payload));
+    case "upsert_novel_fact": return withAdaptation((adaptation) => adaptation.upsertNovelFact(projectRoot, request.payload));
+    case "upsert_narrative_beat": return withAdaptation((adaptation) => adaptation.upsertNarrativeBeat(projectRoot, request.payload));
+    case "export_adaptation": return withAdaptation((adaptation) => adaptation.exportAdaptation(projectRoot, request.payload));
     case "save_skill": return saveAgentSkill(projectRoot, request.payload);
     case "create_handoff": return createContinuationHandoff(projectRoot, request.payload);
     case "save_unit_timeline": return saveUnitTimeline(projectRoot, request.payload.unitId, request.payload.timings);
@@ -5391,17 +5399,17 @@ async function execute(projectRoot: string, request: CommandRequest, options: Pi
     case "register_publication_bundle": return registerPublicationBundle(projectRoot, request.payload, "codex");
     case "cancel_publication_bundle": return cancelPublicationBundle(projectRoot, request.payload, "codex");
     case "fail_publication_bundle": return failPublicationBundle(projectRoot, request.payload, "codex");
-    case "create_edit_project": return createEditProject(projectRoot, request.payload);
-    case "save_edit_project": return saveEditProject(projectRoot, request.payload.project, request.payload.expectedRevision, "codex");
-    case "undo_edit_project": return undoEditProject(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, "codex");
-    case "redo_edit_project": return redoEditProject(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, "codex");
-    case "export_edit_otio": return exportEditProjectOtio(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, request.payload.outputPath);
-    case "import_edit_otio": return importEditProjectOtio(projectRoot, request.payload.filePath, request.payload.name);
-    case "start_edit_render": return startEditRender(projectRoot, request.payload.editProjectId, { expectedRevision: request.payload.expectedRevision, outputDirectory: request.payload.outputDirectory });
-    case "cancel_edit_render": return cancelEditRender(projectRoot, request.payload.renderId);
-    case "extract_timeline_frame": return extractTimelineFrame(projectRoot, request.payload);
-    case "prepare_edit_media_preview": return prepareEditMediaPreview(projectRoot, request.payload.artifactId);
-    case "prepare_edit_media_proxy": return prepareEditMediaProxy(projectRoot, request.payload.artifactId);
+    case "create_edit_project": return withEditor((editor) => editor.createEditProject(projectRoot, request.payload));
+    case "save_edit_project": return withEditor((editor) => editor.saveEditProject(projectRoot, request.payload.project, request.payload.expectedRevision, "codex"));
+    case "undo_edit_project": return withEditor((editor) => editor.undoEditProject(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, "codex"));
+    case "redo_edit_project": return withEditor((editor) => editor.redoEditProject(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, "codex"));
+    case "export_edit_otio": return withEditor((editor) => editor.exportEditProjectOtio(projectRoot, request.payload.editProjectId, request.payload.expectedRevision, request.payload.outputPath));
+    case "import_edit_otio": return withEditor((editor) => editor.importEditProjectOtio(projectRoot, request.payload.filePath, request.payload.name));
+    case "start_edit_render": return withEditor((editor) => editor.startEditRender(projectRoot, request.payload.editProjectId, { expectedRevision: request.payload.expectedRevision, outputDirectory: request.payload.outputDirectory }));
+    case "cancel_edit_render": return withEditor((editor) => editor.cancelEditRender(projectRoot, request.payload.renderId));
+    case "extract_timeline_frame": return withEditor((editor) => editor.extractTimelineFrame(projectRoot, request.payload));
+    case "prepare_edit_media_preview": return withEditor((editor) => editor.prepareEditMediaPreview(projectRoot, request.payload.artifactId));
+    case "prepare_edit_media_proxy": return withEditor((editor) => editor.prepareEditMediaProxy(projectRoot, request.payload.artifactId));
   }
 }
 
@@ -6268,23 +6276,26 @@ async function executeIdempotentCommandWithinDeadline(projectRoot: string, input
       await appendEvent(storageRoot, { actor: "codex", type: "command.cancelled", requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: { requestHash, error: record.error.message, projectRoot: root, committed: false } });
       throw cancellation;
     }
-    if (isNovelAnalysisExecutionCommand(input.request) && isNovelAnalysisExecutionSafetyError(error)) {
-      // 小说正文外发通道的 pre-dispatch 与 post-dispatch 错误只能进入稳定投影。
-      // 特别是不能复用通用 command 事件的 projectRoot 字段：它会把本机绝对路径
-      // 和底层错误一起暴露给账本读取面或 Renderer。
-      const safeMessage = novelAnalysisExecutionSafeMessage(error);
-      const preDispatch = error.phase === "pre_dispatch";
-      record.status = preDispatch ? "failed" : "unknown";
-      record.result = undefined;
-      record.error = { message: safeMessage, observedAt };
-      record.executedAt = observedAt;
-      const stored = await persistRecord();
-      if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, stored);
-      const eventType = preDispatch ? "command.failed" : "command.outcome-unknown";
-      const eventData = { requestHash, error: safeMessage, novelAnalysisSafetyCode: error.code, phase: error.phase };
-      await appendEvent(storageRoot, { actor: "codex", type: eventType, requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: eventData });
-      if (storageRoot !== root) await appendEvent(root, { actor: "codex", type: eventType, requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: eventData });
-      throw error;
+    if (isNovelAnalysisExecutionCommand(input.request)) {
+      const provider = await loadNovelAnalysisProvider();
+      if (provider.isNovelAnalysisExecutionSafetyError(error)) {
+        // 小说正文外发通道的 pre-dispatch 与 post-dispatch 错误只能进入稳定投影。
+        // 特别是不能复用通用 command 事件的 projectRoot 字段：它会把本机绝对路径
+        // 和底层错误一起暴露给账本读取面或 Renderer。
+        const safeMessage = provider.novelAnalysisExecutionSafeMessage(error);
+        const preDispatch = error.phase === "pre_dispatch";
+        record.status = preDispatch ? "failed" : "unknown";
+        record.result = undefined;
+        record.error = { message: safeMessage, observedAt };
+        record.executedAt = observedAt;
+        const stored = await persistRecord();
+        if (storageRoot !== root) await mirrorTerminalLedgerRecord(root, stored);
+        const eventType = preDispatch ? "command.failed" : "command.outcome-unknown";
+        const eventData = { requestHash, error: safeMessage, novelAnalysisSafetyCode: error.code, phase: error.phase };
+        await appendEvent(storageRoot, { actor: "codex", type: eventType, requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: eventData });
+        if (storageRoot !== root) await appendEvent(root, { actor: "codex", type: eventType, requestId: input.requestId, idempotencyKey: input.idempotencyKey, command: input.request.command, data: eventData });
+        throw error;
+      }
     }
     if (isRejectedCommandFailure(error)) {
       record.status = "failed";

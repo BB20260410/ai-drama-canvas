@@ -2,14 +2,19 @@ import { constants as fsConstants } from "node:fs";
 import { access, lstat, realpath } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { getEditorSessionState, listEditProjects, listVideoContinuationPacks, probeVideoEngine, readEditRenderJobs } from "./editor.js";
+import { DEFERRED_VIDEO_ENGINE_CAPABILITY, withEditor } from "./editor-lazy.js";
+import { loadSharp } from "./sharp-lazy.js";
 import { generationPublicationTerminalMatchesJob, getGenerationSettings, getHttpGenerationSubmissionCheckpoint, listGenerationJobs } from "./generation.js";
 import { getContinuationSnapshot, listProjectContext } from "./memory.js";
 import { getReviewQueue, listReviewRecords } from "./reviews.js";
 import { getNextTask } from "./service.js";
 import { getSidecarPaths, listEvents, listTaskPacks, loadIndex, loadProjectConfig, readJson } from "./sidecar.js";
 import { readAgentSkills } from "./skills.js";
-import { listStoryChapters, listStoryEvents, listStorySources } from "./story.js";
+import { NOVEL_AGENT_CAPABILITIES } from "./novel-agent-capabilities.js";
+import { withAdaptation } from "./adaptation-lazy.js";
+import { withStory } from "./story-lazy.js";
+import { withNovelAnalysisProvider } from "./novel-analysis-provider-lazy.js";
+import { getNovelAnalysisProviderSettings } from "./novel-analysis-provider-settings.js";
 import { auditExistingProductionBaselines, getProductionWorkflow, getStoryboard, listCreativeBibles } from "./production.js";
 import { listAssetRelations, listVoiceIdentities } from "./asset-registry.js";
 import { listProjectLocks } from "./locks.js";
@@ -17,8 +22,6 @@ import { listPublicationIntents, publicationTargetExists } from "./publication.j
 import { listCommandLedger } from "./command-bus.js";
 import { resolveRuntimeBuildIdentity, type BuildIdentity } from "./build-identity.js";
 import { assertRuntimeBuildCurrentness } from "./project-backup.js";
-import { getAdaptationWorkspace } from "./adaptation.js";
-import { getNovelAnalysisExecutionRecoveryStatus, getNovelAnalysisProviderSettings, listNovelAnalysisRunProgress } from "./novel-analysis-provider.js";
 import { getCanvasHistoryInfo, getCanvasSemanticState } from "./canvas-state.js";
 import { getFusionAssetConsistencyState, type FusionAssetConsistencyState } from "./fusion-asset-consistency.js";
 import { getUnitTimelines } from "./timeline.js";
@@ -36,7 +39,10 @@ import {
   type StudioCodexGenerationRequest,
   type StudioGenerationFreezePack,
 } from "./studio-generation.js";
-import { buildStudioGenerationSessionSnapshot } from "./studio-generation-session-snapshot.js";
+import {
+  buildStudioGenerationSessionSnapshot,
+  historyEnvelopeConsistencyPeek,
+} from "./studio-generation-session-snapshot.js";
 import {
   getStudioGenerationLatestPlanForPanel,
   getStudioGenerationLatestPlanForUnitGrid,
@@ -57,6 +63,19 @@ import {
   type StudioFormalImagegenProvider,
 } from "./studio-imagegen-providers.js";
 import {
+  CHARACTER_BACK_REFERENCE_TOOL_NOTE,
+  EXTENSION_SHOT_TYPE_TOOL_NOTE,
+  FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
+  PROP_BACK_REFERENCE_TOOL_NOTE,
+  SCENE_BACK_REFERENCE_TOOL_NOTE,
+  UNIT_BEAT_TOOL_NOTE,
+  STYLE_LOCK_TOOL_NOTE,
+  UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE,
+  frozenPanelCostumeFromAnyFrozenPack,
+  frozenPanelLightingFromAnyFrozenPack,
+  previousStandingFromFrozenRenderedPrompt,
+} from "./studio-panel-standing.js";
+import {
   assertStudioUnitGridGenerationFreezePackCurrent,
   queryStudioUnitGridGenerationFreeze,
   type StudioUnitGridCodexGenerationRequest,
@@ -72,7 +91,22 @@ import {
   AI_CANVAS_PROTOCOL_VERSION,
 } from "./release-manifest.js";
 import { withStudioRequestSchemaCache } from "./studio-request-schema-cache.js";
-import { NOVEL_AGENT_CAPABILITIES } from "./novel-agent-service.js";
+import {
+  activeRunsEnvelopeNext,
+  composeStudioGenerationPlanDraft,
+  historyEnvelopeNext,
+  packEnvelopeNextOverrideForUnitGridBlocking,
+  planOperationEnvelopeNext,
+  refineNextIfUnexpectedRevisionImpact,
+  refineStudioGenerationPlanDraftIfUnitGridBlocking,
+  type PersistedPlanNodeStatus,
+  type Ssl5RevisionImpactHint,
+} from "./studio-generation-plan-draft.js";
+import {
+  generationLedgerSidecarPath,
+  readPersistedPanelPlanState,
+  readPersistedUnitGridPlanState,
+} from "./studio-unit-grid-persisted-plan-read.js";
 
 export { AI_CANVAS_PROTOCOL_VERSION } from "./release-manifest.js";
 
@@ -105,17 +139,31 @@ function sanitizedRemoteObservation<T extends { message: string } | undefined>(v
 
 export type StudioGenerationControlQuery =
   | { operation: "session-snapshot"; unitId: string; panelId?: string }
-  | { operation: "readiness"; targetKind?: "panel"; unitId: string; panelId: string }
+  | {
+      operation: "readiness";
+      targetKind?: "panel";
+      unitId: string;
+      panelId: string;
+      revisionImpact?: Ssl5RevisionImpactHint;
+    }
   | {
       operation: "readiness";
       targetKind: "unit-grid";
       unitId: string;
       continuationWaiver?: { receiptId: string; receiptFingerprint: string };
+      revisionImpact?: Ssl5RevisionImpactHint;
     }
   | { operation: "pack"; packId: string }
   | { operation: "history"; targetKind?: "panel"; unitId: string; panelId: string; cursor?: string; limit?: number; order?: "oldest-first" | "newest-first" }
   | { operation: "history"; targetKind: "unit-grid"; unitId: string; cursor?: string; limit?: number; order?: "oldest-first" | "newest-first" }
-  | { operation: "plan"; planId?: string; targetKind?: "panel" | "unit-grid"; unitId?: string; panelId?: string }
+  | {
+      operation: "plan";
+      planId?: string;
+      targetKind?: "panel" | "unit-grid";
+      unitId?: string;
+      panelId?: string;
+      revisionImpact?: Ssl5RevisionImpactHint;
+    }
   | { operation: "call"; generationRunId: string }
   | { operation: "active-runs"; targetKind?: "panel"; unitId: string; panelId: string }
   | { operation: "active-runs"; targetKind: "unit-grid"; unitId: string }
@@ -226,6 +274,17 @@ export function buildStudioUnitGridAgentImagegenBrief(
     throw new Error("unit-grid Agent brief 缺少 controlReferences，禁止降级 text-only。");
   }
   const promptContract = composeUnitGridBriefContract(pack);
+  const previousStandings = pack.panels.map((panel) => ({
+    panelId: panel.panelId,
+    previousStanding: previousStandingFromFrozenRenderedPrompt(panel.panelPack),
+  }));
+  const frozenPanelOverlays = pack.panels.flatMap((panel) => {
+    const lighting = frozenPanelLightingFromAnyFrozenPack(panel.panelPack);
+    const costume = frozenPanelCostumeFromAnyFrozenPack(panel.panelPack);
+    if (!lighting && !costume) return [];
+    return [{ panelId: panel.panelId, lighting, costume }];
+  });
+  const tool = providerToolHints(provider);
   return {
     schemaVersion: 1 as const,
     kind: "studio-agent-imagegen-brief" as const,
@@ -238,6 +297,8 @@ export function buildStudioUnitGridAgentImagegenBrief(
     prompt: pack.request.modelPayload.renderedPrompt,
     promptContract,
     promptContractText: renderUnitGridBriefContractText(promptContract),
+    previousStandings,
+    ...(frozenPanelOverlays.length > 0 ? { frozenPanelOverlays } : {}),
     forbidden: pack.request.forbidden,
     referenceCount: pack.request.controlReferences.length,
     controlReferences,
@@ -252,7 +313,20 @@ export function buildStudioUnitGridAgentImagegenBrief(
     continuityFingerprint: pack.continuityFingerprint,
     continuityNineFieldSummary,
     referencePathSource: "pack-operation-controlReferences-only" as const,
-    tool: providerToolHints(provider),
+    tool: {
+      ...tool,
+      notes: [
+        ...tool.notes,
+        FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
+        SCENE_BACK_REFERENCE_TOOL_NOTE,
+        PROP_BACK_REFERENCE_TOOL_NOTE,
+        CHARACTER_BACK_REFERENCE_TOOL_NOTE,
+        EXTENSION_SHOT_TYPE_TOOL_NOTE,
+        UNIT_BEAT_TOOL_NOTE,
+        STYLE_LOCK_TOOL_NOTE,
+        UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE,
+      ],
+    },
   };
 }
 
@@ -363,6 +437,108 @@ function isStudioUnitGridGenerationPack(
   return pack.schemaVersion === 5
     && pack.provenance === "unit-grid-binding-sets"
     && pack.target.targetKind === "unit-grid";
+}
+
+/** 已落盘 pack 起草 create-plan 节点；已有计划则按节点状态写下一步。不执行、不派发。 */
+function composePersistedPackGenerationPlanDraft(
+  pack: StudioGenerationFreezePack | StudioUnitGridGenerationFreezePack,
+  hasPersistedPlan = false,
+  persistedPlanStatus?: PersistedPlanNodeStatus,
+) {
+  if (isStudioUnitGridGenerationPack(pack)) {
+    return composeStudioGenerationPlanDraft({
+      focusUnitId: pack.target.unitId,
+      focusPanelId: null,
+      focusPackId: pack.id,
+      targetKind: "unit-grid",
+      hasPersistedPlan,
+      persistedPlanStatus,
+    });
+  }
+  return composeStudioGenerationPlanDraft({
+    focusUnitId: pack.target.unitId,
+    focusPanelId: pack.target.panelId,
+    focusPackId: pack.id,
+    hasPersistedPlan,
+    persistedPlanStatus,
+  });
+}
+
+function persistedPlanStateForPack(
+  databasePath: string,
+  pack: StudioGenerationFreezePack | StudioUnitGridGenerationFreezePack,
+) {
+  return isStudioUnitGridGenerationPack(pack)
+    ? readPersistedUnitGridPlanState(databasePath, pack.target.unitId)
+    : readPersistedPanelPlanState(databasePath, pack.target.unitId, pack.target.panelId);
+}
+
+/** 单镜 pack 才读同单元 unit-grid 节点；整板 pack 用自己的计划状态。不加 inspect。 */
+function siblingUnitGridPlanStatusForPanelPack(
+  databasePath: string,
+  pack: StudioGenerationFreezePack | StudioUnitGridGenerationFreezePack,
+): PersistedPlanNodeStatus | undefined {
+  if (isStudioUnitGridGenerationPack(pack)) return undefined;
+  return readPersistedUnitGridPlanState(databasePath, pack.target.unitId).status ?? undefined;
+}
+
+function packEnvelopeNext(
+  hasPersistedPlan: boolean,
+  allowGrok: boolean,
+  persistedPlanStatus?: PersistedPlanNodeStatus,
+  unitGridBlockingStatus?: PersistedPlanNodeStatus,
+): string {
+  const unitGridNext = packEnvelopeNextOverrideForUnitGridBlocking(unitGridBlockingStatus);
+  if (unitGridNext) return unitGridNext;
+  if (!hasPersistedPlan) {
+    return allowGrok
+      ? "create-plan → dispatch(provider=codex|grok) → agent imagegen → atomic raw/labeled writeback"
+      : "create-plan → dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback";
+  }
+  if (persistedPlanStatus === "dispatched") {
+    return "wait → result or reconcile (no dispatch)";
+  }
+  if (persistedPlanStatus === "failed" || persistedPlanStatus === "cancelled") {
+    return "retry_studio_generation_plan_nodes (no retry here, no dispatch)";
+  }
+  if (persistedPlanStatus === "succeeded") {
+    return "Review (no dispatch)";
+  }
+  return allowGrok
+    ? "dispatch(provider=codex|grok) → agent imagegen → atomic raw/labeled writeback"
+    : "dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback";
+}
+
+/** readiness 只读 next：同单元 unit-grid 在途时禁止再写 freeze→create-plan→dispatch。已取回 unexpected 改 Review。不加 inspect，不自动查。 */
+function readinessAgentNext(
+  projectRoot: string,
+  unitId: string,
+  fallback: string,
+  revisionImpact?: Ssl5RevisionImpactHint,
+  panelId?: string,
+): string {
+  const status = readPersistedUnitGridPlanState(generationLedgerSidecarPath(projectRoot), unitId).status
+    ?? undefined;
+  const chosen = packEnvelopeNextOverrideForUnitGridBlocking(status) ?? fallback;
+  return refineNextIfUnexpectedRevisionImpact({
+    next: chosen,
+    hint: revisionImpact,
+    targets: [{ unitId, panelId }],
+  });
+}
+
+function planRevisionImpactTargets(
+  query: { unitId?: string; panelId?: string },
+  nodes?: Array<{ unitId: string; targetKind?: string; panelId?: string }>,
+): Array<{ unitId: string; panelId?: string | null }> {
+  if (nodes && nodes.length > 0) {
+    return nodes.map((node) => ({
+      unitId: node.unitId,
+      panelId: node.targetKind === "panel" ? node.panelId : undefined,
+    }));
+  }
+  if (!query.unitId) return [];
+  return [{ unitId: query.unitId, panelId: query.panelId }];
 }
 
 function sameSortedStrings(left: string[], right: string[]): boolean {
@@ -504,6 +680,8 @@ async function verifiedStudioUnitGridControlReferences(
 /**
  * Codex 专用的本地生成控制封装。普通就绪/历史投影不返回路径；只有 pack
  * operation 会在重验受管项目、冻结输入、media CAS 路径与文件 SHA 后返回 localPath。
+ * readiness / plan 可传入调用方已取回的 revisionImpact，只精炼 next；省略不查。
+ * 不改 freeze writeCommand。
  */
 export async function getStudioGenerationControlEnvelope(
   projectRoot: string,
@@ -574,7 +752,12 @@ export async function getStudioGenerationControlEnvelope(
             },
             agentExecution: {
               formalProviders: STUDIO_FORMAL_IMAGEGEN_ALLOWED_PROVIDERS,
-              next: "freeze → plan → dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback",
+              next: readinessAgentNext(
+                projectRoot,
+                readiness.pack.target.unitId,
+                "freeze → create-plan → dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback",
+                query.revisionImpact,
+              ),
               briefs: {
                 codex: buildStudioUnitGridAgentImagegenBrief(readiness.pack, "codex"),
                 grok: buildStudioUnitGridAgentImagegenBrief(readiness.pack, "grok"),
@@ -657,7 +840,13 @@ export async function getStudioGenerationControlEnvelope(
         },
         agentExecution: {
           formalProviders: STUDIO_FORMAL_IMAGEGEN_ALLOWED_PROVIDERS,
-          next: "freeze → dispatch(provider=codex|grok) → agent imagegen → atomic raw/labeled writeback",
+          next: readinessAgentNext(
+            projectRoot,
+            readiness.pack.target.unitId,
+            "freeze → create-plan → dispatch(provider=codex|grok) → agent imagegen → atomic raw/labeled writeback",
+            query.revisionImpact,
+            readiness.pack.target.panelId,
+          ),
           briefs: {
             codex: buildStudioAgentImagegenBrief(readiness.pack, "codex"),
             grok: buildStudioAgentImagegenBrief(readiness.pack, "grok"),
@@ -734,6 +923,10 @@ export async function getStudioGenerationControlEnvelope(
       targetKind: query.targetKind ?? "panel",
       ...(query.targetKind === "unit-grid" ? {} : { panelId: (query as { panelId: string }).panelId }),
     });
+    const generationBlocked = result.blockingRuns.length > 0;
+    const unitGridBlockingStatus = result.targetKind === "panel"
+      ? readPersistedUnitGridPlanState(generationLedgerSidecarPath(projectRoot), result.unitId).status ?? undefined
+      : undefined;
     return {
       schemaVersion: 1 as const,
       kind: STUDIO_GENERATION_CONTROL_KIND,
@@ -744,7 +937,17 @@ export async function getStudioGenerationControlEnvelope(
       ...(result.panelId ? { panelId: result.panelId } : {}),
       runs: result.runs,
       blockingRuns: result.blockingRuns,
-      generationBlocked: result.blockingRuns.length > 0,
+      generationBlocked,
+      nextAction: activeRunsEnvelopeNext({
+        hasUnknownCall: result.runs.some((run) => run.callStatus === "generation_unknown")
+          || result.blockingRuns.some((row) => row.reason.includes("generation_unknown")),
+        hasUnreviewedPair: result.runs.some((run) => run.hasResultPair && run.reviewStatus === "unreviewed")
+          || result.blockingRuns.some((row) => row.reason.includes("未审片")),
+        hasInFlightRun: result.runs.some((run) => !run.terminal)
+          || result.blockingRuns.some((row) => row.reason.includes("非终态")),
+        generationBlocked,
+        unitGridBlockingStatus,
+      }),
       controlReferencesExposed: false as const,
     };
   }
@@ -799,6 +1002,7 @@ export async function getStudioGenerationControlEnvelope(
           operation: "plan" as const,
           status: "not_found" as const,
           planId: query.planId,
+          nextAction: planOperationEnvelopeNext({ kind: "not-found" }),
           controlReferencesExposed: false as const,
         };
       }
@@ -809,6 +1013,7 @@ export async function getStudioGenerationControlEnvelope(
           operation: "plan" as const,
           status: "not_found" as const,
           planId: query.planId,
+          nextAction: planOperationEnvelopeNext({ kind: "not-found" }),
           controlReferencesExposed: false as const,
         };
       }
@@ -818,9 +1023,19 @@ export async function getStudioGenerationControlEnvelope(
         operation: "plan" as const,
         status: "ready" as const,
         plan,
+        nextAction: planOperationEnvelopeNext({
+          kind: "scoped",
+          statuses: plan.nodes.map((node) => node.status),
+          revisionImpact: query.revisionImpact,
+          targets: planRevisionImpactTargets(query, plan.nodes),
+        }),
         controlReferencesExposed: false as const,
       };
     }
+    const scoped = Boolean(
+      (query.targetKind === "unit-grid" && query.unitId)
+      || (query.unitId && query.panelId),
+    );
     const plans = query.targetKind === "unit-grid" && query.unitId
       ? [await getStudioGenerationLatestPlanForUnitGrid(shell.paths.root, query.unitId)].filter(Boolean)
       : query.unitId && query.panelId
@@ -833,6 +1048,14 @@ export async function getStudioGenerationControlEnvelope(
       status: "ready" as const,
       projectId: shell.project.id,
       plans,
+      nextAction: scoped
+        ? planOperationEnvelopeNext({
+          kind: "scoped",
+          statuses: plans.flatMap((plan) => plan?.nodes.map((node) => node.status) ?? []),
+          revisionImpact: query.revisionImpact,
+          targets: planRevisionImpactTargets(query, plans.flatMap((plan) => plan?.nodes ?? [])),
+        })
+        : planOperationEnvelopeNext({ kind: "unscoped-list" }),
       controlReferencesExposed: false as const,
     };
   }
@@ -853,6 +1076,7 @@ export async function getStudioGenerationControlEnvelope(
           ...(query.limit === undefined ? {} : { limit: query.limit }),
           ...(query.order === undefined ? {} : { order: query.order }),
         });
+    const consistencyPeek = await historyEnvelopeConsistencyPeek(page.items);
     return {
       schemaVersion: 1 as const,
       kind: STUDIO_GENERATION_CONTROL_KIND,
@@ -865,6 +1089,8 @@ export async function getStudioGenerationControlEnvelope(
       ...(query.targetKind === "unit-grid" ? { targetKey: `unit-grid:${query.unitId}` } : { panelId: query.panelId }),
       items: page.items,
       ...(page.nextCursor ? { nextCursor: page.nextCursor } : {}),
+      nextAction: historyEnvelopeNext(page.items),
+      ...(consistencyPeek ? { consistencyPeek } : {}),
       controlReferencesExposed: false as const,
     };
   }
@@ -882,6 +1108,14 @@ export async function getStudioGenerationControlEnvelope(
         controlReferencesExposed: false as const,
       };
     }
+    const persistedPlan = persistedPlanStateForPack(shell.paths.generationDatabase, pack);
+    const hasPersistedPlan = persistedPlan.hasPlan;
+    const persistedPlanStatus = persistedPlan.status ?? undefined;
+    const unitGridBlockingStatus = siblingUnitGridPlanStatusForPanelPack(shell.paths.generationDatabase, pack);
+    const generationPlanDraft = refineStudioGenerationPlanDraftIfUnitGridBlocking(
+      composePersistedPackGenerationPlanDraft(pack, hasPersistedPlan, persistedPlanStatus),
+      { status: unitGridBlockingStatus },
+    );
     if (isStudioUnitGridGenerationPack(pack)) {
       const controlReferences = await verifiedStudioUnitGridControlReferences(shell.paths.root, pack);
       const request: StudioUnitGridCodexGenerationRequest = { ...pack.request, controlReferences };
@@ -902,6 +1136,8 @@ export async function getStudioGenerationControlEnvelope(
             codex: buildStudioUnitGridAgentImagegenBrief(pack, "codex"),
             grok: buildStudioUnitGridAgentImagegenBrief(pack, "grok"),
           },
+          generationPlanDraft,
+          next: packEnvelopeNext(hasPersistedPlan, false, persistedPlanStatus, unitGridBlockingStatus),
           dispatchPayloadTemplate: {
             command: "dispatch_studio_generation_pack" as const,
             required: ["packId", "packFingerprint", "generationRunId", "provider", "expectedRevision"],
@@ -943,6 +1179,8 @@ export async function getStudioGenerationControlEnvelope(
           codex: buildStudioAgentImagegenBrief(pack, "codex"),
           grok: buildStudioAgentImagegenBrief(pack, "grok"),
         },
+        generationPlanDraft,
+        next: packEnvelopeNext(hasPersistedPlan, true, persistedPlanStatus, unitGridBlockingStatus),
         dispatchPayloadTemplate: {
           command: "dispatch_studio_generation_pack" as const,
           required: ["packId", "packFingerprint", "generationRunId", "provider", "expectedRevision"],
@@ -1081,7 +1319,7 @@ export async function getCapabilities(
   projectRoot?: string,
   runtime: GetCapabilitiesRuntimeProjection = {},
 ) {
-  const engine = await probeVideoEngine();
+  const engine = DEFERRED_VIDEO_ENGINE_CAPABILITY;
   const machineMedia = await readMachineMediaRuntimeSnapshot();
   let project: Record<string, unknown> | undefined;
   if (projectRoot) {
@@ -1679,18 +1917,18 @@ export async function doctorProject(projectRoot: string) {
   const fusionPanelReferenceStorePresent = fusionProjectPresent && await canAccess(paths.panelReferenceResolutions, fsConstants.R_OK);
   const [generationJobs, renderJobs, continuations, publicationIntents, _eventProbe, engine, tasks, relations, voices, runtimeModules, projectLocks, commandLedger, adaptationWorkspace] = await Promise.all([
     diagnoseSidecar("generation-store-corrupt", "生成队列侧车", paths.generationJobs, () => listGenerationJobs(root), []),
-    diagnoseSidecar("render-store-corrupt", "剪辑导出侧车", paths.editorRenders, () => readEditRenderJobs(root), []),
-    diagnoseSidecar("continuation-store-corrupt", "视频续接侧车", paths.editorContinuations, () => listVideoContinuationPacks(root), []),
+    diagnoseSidecar("render-store-corrupt", "剪辑导出侧车", paths.editorRenders, () => withEditor((editor) => editor.readEditRenderJobs(root)), []),
+    diagnoseSidecar("continuation-store-corrupt", "视频续接侧车", paths.editorContinuations, () => withEditor((editor) => editor.listVideoContinuationPacks(root)), []),
     diagnoseSidecar("publication-store-corrupt", "素材发布侧车", paths.publications, () => listPublicationIntents(root), []),
     diagnoseSidecar("event-log-corrupt", "追加式事件日志", paths.events, () => listEvents(root, 2_000), []),
-    probeVideoEngine(),
+    withEditor((editor) => editor.probeVideoEngine()),
     diagnoseSidecar("task-store-corrupt", "任务包侧车", paths.tasks, () => listTaskPacks(root), []),
     diagnoseSidecar("asset-relation-store-corrupt", "资产关系侧车", paths.assetRelations, () => listAssetRelations(root), []),
     diagnoseSidecar("voice-store-corrupt", "音色身份侧车", paths.voiceIdentities, () => listVoiceIdentities(root), []),
-    Promise.allSettled([import("sharp"), import("mammoth")]),
+    Promise.allSettled([loadSharp(), import("mammoth")]),
     listProjectLocks(root),
     diagnoseSidecar("command-ledger-corrupt", "幂等命令账本", paths.commandLedger, async () => ({ entries: await listCommandLedger(root, 500) }), { entries: [] }),
-    diagnoseSidecar("adaptation-store-corrupt", "小说自动改编侧车", paths.storyAdaptation, () => getAdaptationWorkspace(root), null),
+    diagnoseSidecar("adaptation-store-corrupt", "小说自动改编侧车", paths.storyAdaptation, () => withAdaptation((adaptation) => adaptation.getAdaptationWorkspace(root)), null),
   ]);
   const machineMediaConfig = getMachineMediaRuntimeConfig();
   let machineMediaRuntime: Awaited<ReturnType<typeof readMachineMediaRuntimeSnapshot>> | undefined;
@@ -1744,12 +1982,12 @@ export async function doctorProject(projectRoot: string) {
       return canvas;
     }, null),
     diagnoseSidecar("canvas-history-corrupt", "无限画布历史侧车", paths.canvasHistory, () => getCanvasHistoryInfo(root), null),
-    diagnoseSidecar("story-index-corrupt", "小说来源与章节索引", paths.storyIndex, async () => Promise.all([listStorySources(root), listStoryChapters(root)]), [[], []]),
-    diagnoseSidecar("story-event-store-corrupt", "故事事件侧车", paths.storyEvents, () => listStoryEvents(root, { includeOrphans: true }), []),
+    diagnoseSidecar("story-index-corrupt", "小说来源与章节索引", paths.storyIndex, async () => withStory((story) => Promise.all([story.listStorySources(root), story.listStoryChapters(root)])), [[], []]),
+    diagnoseSidecar("story-event-store-corrupt", "故事事件侧车", paths.storyEvents, () => withStory((story) => story.listStoryEvents(root, { includeOrphans: true })), []),
     diagnoseSidecar("timeline-store-corrupt", "原镜头时间线侧车", paths.timeline, () => getUnitTimelines(root), []),
-    diagnoseSidecar("editor-project-store-corrupt", "剪辑工程侧车", paths.editorProjects, () => listEditProjects(root), []),
+    diagnoseSidecar("editor-project-store-corrupt", "剪辑工程侧车", paths.editorProjects, () => withEditor((editor) => editor.listEditProjects(root)), []),
     diagnoseSidecar("editor-session-corrupt", "剪辑会话侧车", paths.editorSession, async () => {
-      const session = await getEditorSessionState(root);
+      const session = await withEditor((editor) => editor.getEditorSessionState(root));
       if (session && (session.schemaVersion !== 1 || typeof session.sessionId !== "string" || typeof session.cleanShutdown !== "boolean")) throw new Error("剪辑会话结构无效。 ");
       return session;
     }, null),
@@ -2034,7 +2272,7 @@ export async function doctorProject(projectRoot: string) {
   if (settings?.defaultVideoProviderId && !providers.some((provider) => provider.id === settings.defaultVideoProviderId && provider.enabled)) providerIssues.push("默认视频供应商不存在或未启用");
   if (!sidecarFailed("generation-settings-corrupt")) checks.push({ id: "generation-providers", level: providerIssues.length ? "warning" : "ok", title: "生成供应商", detail: providerIssues.length ? providerIssues.join("；") : `${providers.filter((provider) => provider.enabled).length} 个已启用供应商，基础配置完整。`, suggestedAction: providerIssues.length ? "在项目设置/生成队列中修正供应商能力与凭据环境变量。" : undefined });
 
-  const analysisSettings = await diagnoseSidecar<NovelAnalysisProviderSettings>("analysis-provider-settings-corrupt", "小说分析模型配置", paths.storyAnalysisProviders, () => getNovelAnalysisProviderSettings(root), { schemaVersion: 1, revision: 0, providers: [], updatedAt: new Date(0).toISOString() });
+  const analysisSettings = await diagnoseSidecar<NovelAnalysisProviderSettings>("analysis-provider-settings-corrupt", "小说分析模型配置", paths.storyAnalysisProviders, () => withNovelAnalysisProvider((provider) => provider.getNovelAnalysisProviderSettings(root)), { schemaVersion: 1, revision: 0, providers: [], updatedAt: new Date(0).toISOString() });
   const analysisProviderIssues = analysisSettings.providers.filter((provider) => provider.enabled).flatMap((provider) => {
     const issues: string[] = [];
     if (provider.adapter === "openai-compatible" && !provider.baseUrl) issues.push(`${provider.name} 缺少 Base URL`);
@@ -2070,9 +2308,9 @@ export async function doctorProject(projectRoot: string) {
     const pendingAnalysisReviews = adaptationWorkspace.analysisReviews.filter((review) => review.status === "pending");
     const evidenceIssueReviews = pendingAnalysisReviews.filter((review) => review.evidenceIssues.length);
     const uncertainAnalysisTasks = adaptationWorkspace.analysisTasks.filter((task) => ["executing", "reconciliation_required", "submission_unknown"].includes(task.status));
-    const analysisExecutionRecovery = await getNovelAnalysisExecutionRecoveryStatus(root).catch(() => null);
+    const analysisExecutionRecovery = await withNovelAnalysisProvider((provider) => provider.getNovelAnalysisExecutionRecoveryStatus(root)).catch(() => null);
     const reconciliationCandidates = analysisExecutionRecovery?.candidates.length ?? 0;
-    const analysisRuns = await listNovelAnalysisRunProgress(root).catch(() => []);
+    const analysisRuns = await withNovelAnalysisProvider((provider) => provider.listNovelAnalysisRunProgress(root)).catch(() => []);
     const blockedAnalysisRuns = analysisRuns.filter((run) => run.status === "blocked" || run.status === "stale");
     const missingAnalysisTaskFiles = (await Promise.all(adaptationWorkspace.analysisTasks.flatMap((task) => [task.taskJsonPath, task.taskMarkdownPath]).map(async (filePath) => await canAccess(filePath, fsConstants.R_OK) ? "" : filePath))).filter(Boolean);
     const adaptationWarning = Boolean(planErrors || evidenceIssueReviews.length || missingAnalysisTaskFiles.length || uncertainAnalysisTasks.length || blockedAnalysisRuns.length || reconciliationCandidates);
@@ -2109,14 +2347,14 @@ export async function getProjectSnapshot(projectRoot: string, focusItemId?: stri
     getReviewQueue(root).then((entries) => entries.slice(0, 20)),
     listTaskPacks(root),
     listGenerationJobs(root),
-    readEditRenderJobs(root),
-    listVideoContinuationPacks(root, focusItemId),
+    withEditor((editor) => editor.readEditRenderJobs(root)),
+    withEditor((editor) => editor.listVideoContinuationPacks(root, focusItemId)),
     listEvents(root, 30),
     readAgentSkills(root, { enabledOnly: true }),
     getContinuationSnapshot(root, { itemId: focusItemId, initializeDefaultSkills: false }),
-    listStorySources(root),
-    listStoryChapters(root),
-    listStoryEvents(root, { includeOrphans: true }),
+    withStory((story) => story.listStorySources(root)),
+    withStory((story) => story.listStoryChapters(root)),
+    withStory((story) => story.listStoryEvents(root, { includeOrphans: true })),
     getProductionWorkflow(root, { includeEvidenceAudit: true }),
     listCreativeBibles(root),
     getStoryboard(root),

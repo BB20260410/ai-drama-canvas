@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "5-list-flip-source-contract",
+  "recordedAt": "2026-08-25T18:58:00Z",
+  "change": {
+    "kind": "test-only",
+    "sourceCodeChanged": false,
+    "files": [
+      "tests/runtime-perf-wave5-list-flip-media-count.test.ts"
+    ],
+    "summary": "§1.5 源码合同：helper 合成停留+翻 2 页×36 默认预览 media 协议次数为 0；LRU 只缓存 URL；素材库/画布库/总资源/对照表/审片列表视口默认不绑 media。不是安装版 GUI 翻页探针。"
+  },
+  "verification": {
+    "typecheckApp": "PASS",
+    "directedLinux": {
+      "files": 6,
+      "passed": 21,
+      "platform": "linux",
+      "thisFile": {
+        "file": "tests/runtime-perf-wave5-list-flip-media-count.test.ts",
+        "passed": 4
+      }
+    },
+    "reviews": {
+      "redline": "PASS; 标题防伪后无 must-fix",
+      "completion": "PASS; 源码合同切片成立；Wave 5 父项仍禁止勾选"
+    },
+    "listFlipProbe": "NOT_RUN",
+    "installedT23": "NOT_RUN"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "overwrote20260811Final": false,
+    "t23SqlUnchanged": true,
+    "thumbnailRecipeUnchanged": true,
+    "wave5ParentChecked": false
+  },
+  "claim": "W5 列表翻页：源码合同 helper 合成 72 条默认预览 aicanvas-studio://media/* = 0；LRU URL-only。禁止写「列表原图次数已测为 0」或勾 Wave 5 父项。禁止写「运行速度已关账」。",
+  "residual": [
+    "安装版列表停留+翻 2 页 GUI/协议探针仍 NOT_RUN",
+    "安装版 T23 / P7 owner 对照仍 NOT_RUN",
+    "显式打开原图、差分 readStudioMediaBytes、选中播放仍会走 media 协议（计划允许）"
+  ]
+}

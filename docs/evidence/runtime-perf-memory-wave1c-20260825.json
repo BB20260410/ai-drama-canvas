@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "1-C",
+  "recordedAt": "2026-08-25T14:25:00Z",
+  "coverage": {
+    "defaultFastResolver": "tests/resolve-approved-timeline-fast-mode.test.ts",
+    "omitEqualsExplicitTrue": "tests/studio-approved-timeline-projection.test.ts",
+    "explicitFalse": "tests/studio-approved-timeline-projection.test.ts + report-approved-timeline-full.test.ts",
+    "typecheckApp": "PASS"
+  },
+  "linuxPassed": 6,
+  "p7Fixture": "requires Darwin dirfd; not run on this Cloud",
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W1-C：默认快 / 省略=快 / 显式 false=full 已有定向测；typecheck:app PASS。Wave 1 可进 Wave 2。"
+}

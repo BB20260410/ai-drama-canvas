@@ -6,7 +6,8 @@ import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
-import sharp from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
+import { studioThumbnailDerivationGate } from "./studio-thumbnail-derivation-limit.js";
 import {
   ensureConfinedDirectory as ensureSharedConfinedDirectory,
   importConfinedFileToSha256Cas,
@@ -2027,17 +2028,18 @@ async function materializeThumbnail(
   try {
     const existingStats = await lstat(target);
     if (existingStats.isSymbolicLink() || !existingStats.isFile()) throw new Error(`缩略图目标不是普通文件：${target}`);
-    const metadata = await sharp(target, { failOn: "error" }).metadata();
+    const metadata = await (await loadSharpDefault())(target, { failOn: "error" }).metadata();
     if (!metadata.width || !metadata.height || metadata.format !== "webp") throw new Error(`缩略图不可解码：${target}`);
     return { recipeKey, path: target, width: metadata.width, height: metadata.height };
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
   }
-  const rendered = await sharp(objectPath, { failOn: "error" })
-    .rotate()
-    .resize({ width: 512, height: 512, fit: "inside", withoutEnlargement: true })
-    .webp({ quality: 82 })
-    .toBuffer({ resolveWithObject: true });
+  const rendered = await studioThumbnailDerivationGate.run(async () =>
+    (await loadSharpDefault())(objectPath, { failOn: "error" })
+      .rotate()
+      .resize({ width: 512, height: 512, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 82 })
+      .toBuffer({ resolveWithObject: true }));
   if (!rendered.info.width || !rendered.info.height || Math.max(rendered.info.width, rendered.info.height) > 512) {
     throw new Error("缩略图派生尺寸无效。");
   }
@@ -2585,15 +2587,71 @@ export async function listStudioMedia(projectRoot: string, query: StudioMediaLis
   }
 }
 
-export async function getStudioMedia(projectRoot: string, sha256: string): Promise<StudioMediaMetadata | null> {
-  const paths = await ensureStudioDirectories(projectRoot);
-  const normalized = normalizeSha256(sha256);
-  const db = openDatabase(paths.database);
+/**
+ * 画布 / IPC 按 SHA 读媒体元数据：只读打开已有素材库。
+ * 不 ensure 目录、不走可写 openDatabase（P28 probe + WAL + 建表）。
+ * 缺库/缺表视为没有该媒体（返回 null）。符号链接或不受支持的 schema 失败关闭。
+ * 并发相同 (root, sha) 单飞，避免 4 路 worker 重复打开同一行。
+ */
+const studioMediaLookupFlights = new Map<string, Promise<StudioMediaMetadata | null>>();
+
+function openMaterialStudioMediaReadOnly(databasePath: string): DatabaseSync | null {
+  if (!existsSync(databasePath)) return null;
+  const metadata = lstatSync(databasePath);
+  if (metadata.isSymbolicLink() || !metadata.isFile()) {
+    throw new Error("素材库数据库必须是无符号链接的普通文件。");
+  }
+  const db = new DatabaseSync(databasePath, { readOnly: true });
+  try {
+    db.exec("PRAGMA query_only = ON");
+    const tables = new Set(
+      (db.prepare(`
+        SELECT name FROM sqlite_master
+        WHERE type = 'table' AND name IN ('studio_meta', 'studio_media')
+      `).all() as Array<{ name: string }>).map((row) => row.name),
+    );
+    if (!tables.has("studio_meta") || !tables.has("studio_media")) {
+      db.close();
+      return null;
+    }
+    const version = db.prepare("SELECT value FROM studio_meta WHERE key = 'schema_version'")
+      .get() as { value?: string } | undefined;
+    if (version?.value !== undefined && version.value !== String(SCHEMA_VERSION)) {
+      throw new Error(`不支持的素材库 schema_version：${version.value}。`);
+    }
+    return db;
+  } catch (error) {
+    db.close();
+    throw error;
+  }
+}
+
+function readStudioMediaMetadataReadOnly(
+  paths: ReturnType<typeof studioPaths>,
+  normalized: string,
+): StudioMediaMetadata | null {
+  const db = openMaterialStudioMediaReadOnly(paths.database);
+  if (!db) return null;
   try {
     const row = db.prepare("SELECT * FROM studio_media WHERE sha256 = ?").get(normalized) as unknown as MediaRow | undefined;
     return row ? mediaFromRow(paths.root, row) : null;
   } finally {
     db.close();
+  }
+}
+
+export async function getStudioMedia(projectRoot: string, sha256: string): Promise<StudioMediaMetadata | null> {
+  const paths = studioPaths(projectRoot);
+  const normalized = normalizeSha256(sha256);
+  const key = `${paths.root}\u0000${normalized}`;
+  const existing = studioMediaLookupFlights.get(key);
+  if (existing) return existing;
+  const pending = Promise.resolve().then(() => readStudioMediaMetadataReadOnly(paths, normalized));
+  studioMediaLookupFlights.set(key, pending);
+  try {
+    return await pending;
+  } finally {
+    if (studioMediaLookupFlights.get(key) === pending) studioMediaLookupFlights.delete(key);
   }
 }
 
@@ -2616,7 +2674,7 @@ async function ensureStudioImageThumbnailInternal(
     if (metadata.isSymbolicLink() || !metadata.isFile()) {
       throw new Error("缩略图目标不是受管普通文件，已拒绝自动修复。");
     }
-    const decoded = await sharp(target, { failOn: "error" }).metadata();
+    const decoded = await (await loadSharpDefault())(target, { failOn: "error" }).metadata();
     if (!decoded.width || !decoded.height || decoded.format !== "webp") {
       throw new Error("缩略图不可解码。");
     }

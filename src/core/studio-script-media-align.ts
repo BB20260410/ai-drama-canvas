@@ -8,9 +8,12 @@ import { getStudioEpisodeEarliest } from "./studio-episode-earliest.js";
 import {
   getStudioEpisodeUnitMediaMap,
   buildMissingMediaReport,
+  pickFirstCoveredPanel,
+  type UnitPanelMediaEntry,
   type UnitSpanMediaMapEntry,
 } from "./studio-script-library-projection.js";
 import { getStudioScriptReaderView, type ScriptOutlineHeading } from "./studio-script-library-reader.js";
+import type { ConsistencyVerdict } from "./studio-consistency-evaluator.js";
 
 export const SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION = 1 as const;
 
@@ -38,6 +41,51 @@ export interface ScriptMediaAlignRow {
   };
   sourceSpans: Array<{ startOffsetUtf16: number; endOffsetUtf16: number }>;
   outlineAnchors: Array<{ title: string; level: number; startOffsetUtf16: number }>;
+  /** 只读缓存 peek。未评估 ≠ 无法检查。机器不自动 Review PASS。 */
+  consistencyPeek: AlignConsistencyPeek;
+  /** 宫格级媒体真相；unit-grid 不摊派。 */
+  panels: AlignPanelRow[];
+}
+
+export interface AlignConsistencyPeek {
+  status: "cached" | "unevaluated";
+  verdict?: ConsistencyVerdict;
+}
+
+export type AlignPanelRow = UnitPanelMediaEntry & { consistencyPeek: AlignConsistencyPeek };
+
+export type AlignCheckpointGate = {
+  newSlotDispatchAllowed: boolean;
+  blockingBatchNumber?: number;
+};
+
+/** 复用 earliest 已算的六图闸。未投影 ≠ 已放行。 */
+export function formatAlignCheckpointLine(checkpoint?: AlignCheckpointGate | null): string {
+  if (!checkpoint) return "对照板未投影六图闸";
+  if (checkpoint.newSlotDispatchAllowed === false) {
+    return checkpoint.blockingBatchNumber != null
+      ? `六图闸未放行（batch ${checkpoint.blockingBatchNumber}），先完成停检/Review（不派发）`
+      : "六图闸未放行，先完成停检/Review（不派发）";
+  }
+  return "六图闸已放行新槽";
+}
+
+export type AlignWriteLeaseGate = {
+  held: boolean;
+  holderId: string | null;
+  denialHint: string | null;
+};
+
+/** 复用 earliest 已算的写租约。未投影 ≠ 已持有。不暴露 token。 */
+export function formatAlignWriteLeaseLine(lease?: AlignWriteLeaseGate | null): string {
+  if (!lease) return "对照板未投影写租约";
+  if (lease.held) {
+    return lease.holderId
+      ? `写租约由 ${lease.holderId} 持有；无该租约禁止写命令（不派发）`
+      : "写租约已被持有；无该租约禁止写命令（不派发）";
+  }
+  return lease.denialHint
+    || "写租约未持有；写命令前须 acquire-lease（不派发）";
 }
 
 export interface ScriptMediaAlignBoard {
@@ -50,7 +98,14 @@ export interface ScriptMediaAlignBoard {
   documentTitle: string | null;
   revisionId: string | null;
   earliestUnitId: string | null;
+  earliestCode: string | null;
+  earliestLabel: string | null;
   earliestStatusLine: string | null;
+  earliestReason: string | null;
+  checkpoint: AlignCheckpointGate;
+  checkpointLine: string;
+  writeLease: AlignWriteLeaseGate;
+  writeLeaseLine: string;
   unitCount: number;
   coveredCount: number;
   partialCount: number;
@@ -80,6 +135,45 @@ export function matchOutlineAnchorsForUnit(
     .slice(0, 12);
 }
 
+export function attachAlignRowConsistencyPeeks(
+  rows: ScriptMediaAlignRow[],
+  verdictByRunId: ReadonlyMap<string, ConsistencyVerdict>,
+): ScriptMediaAlignRow[] {
+  return rows.map((row) => {
+    const verdict = row.generationRunId ? verdictByRunId.get(row.generationRunId) : undefined;
+    return {
+      ...row,
+      consistencyPeek: verdict
+        ? { status: "cached", verdict }
+        : { status: "unevaluated" },
+      panels: row.panels.map((panel) => {
+        const panelVerdict = panel.generationRunId ? verdictByRunId.get(panel.generationRunId) : undefined;
+        return {
+          ...panel,
+          consistencyPeek: panelVerdict
+            ? { status: "cached" as const, verdict: panelVerdict }
+            : { status: "unevaluated" as const },
+        };
+      }),
+    };
+  });
+}
+
+async function loadAlignConsistencyPeeks(rows: ScriptMediaAlignRow[]): Promise<Map<string, ConsistencyVerdict>> {
+  const runIds = [...new Set(
+    rows.flatMap((row) => [row.generationRunId, ...row.panels.map((panel) => panel.generationRunId)])
+      .filter((id): id is string => Boolean(id)),
+  )];
+  if (runIds.length === 0) return new Map();
+  const { peekStudioConsistencyVerdictByRunId } = await import("./studio-consistency-evaluator.js");
+  const out = new Map<string, ConsistencyVerdict>();
+  for (const runId of runIds) {
+    const verdict = peekStudioConsistencyVerdictByRunId(runId);
+    if (verdict) out.set(runId, verdict);
+  }
+  return out;
+}
+
 function rowStatus(u: UnitSpanMediaMapEntry): ScriptMediaAlignRow["status"] {
   if (u.coveredPanelCount <= 0) return "missing-all";
   if (u.missingPanelCount > 0) return "partial";
@@ -99,6 +193,7 @@ export async function getStudioScriptMediaAlignBoard(
 ): Promise<ScriptMediaAlignBoard> {
   const season = query.season;
   const episode = query.episode;
+  // 组合 earliest + media map；本函数不直接调用写版 inspect。
 
   const [map, earliest] = await Promise.all([
     getStudioEpisodeUnitMediaMap(projectRoot, { season, episode, limit: 200 }),
@@ -133,12 +228,12 @@ export async function getStudioScriptMediaAlignBoard(
   const slotById = new Map(earliest.slots.map((s) => [s.unitId, s]));
   const rows: ScriptMediaAlignRow[] = map.units.map((u) => {
     const slot = slotById.get(u.unitId);
-    const firstPanel = u.panels[0];
-    const rawSha256 = firstPanel?.rawSha256 ?? null;
-    const labeledSha256 = firstPanel?.labeledSha256 ?? null;
-    const packId = firstPanel?.packId ?? null;
-    const packFingerprint = firstPanel?.packFingerprint ?? null;
-    const generationRunId = firstPanel?.generationRunId ?? null;
+    const preview = pickFirstCoveredPanel(u.panels);
+    const rawSha256 = preview?.rawSha256 ?? null;
+    const labeledSha256 = preview?.labeledSha256 ?? null;
+    const packId = preview?.packId ?? null;
+    const packFingerprint = preview?.packFingerprint ?? null;
+    const generationRunId = preview?.generationRunId ?? null;
     const status = rowStatus(u);
     const spans = u.panels.flatMap((p) => p.sourceSpans);
     return {
@@ -164,11 +259,25 @@ export async function getStudioScriptMediaAlignBoard(
       },
       sourceSpans: spans,
       outlineAnchors: matchOutlineAnchorsForUnit(u.unitId, outline),
+      consistencyPeek: { status: "unevaluated" },
+      panels: u.panels.map((panel) => ({ ...panel, consistencyPeek: { status: "unevaluated" as const } })),
     };
   });
 
   rows.sort((a, b) => a.sequence - b.sequence);
+  const rowsWithPeek = attachAlignRowConsistencyPeeks(rows, await loadAlignConsistencyPeeks(rows));
   const missingReport = buildMissingMediaReport(map);
+  const checkpoint: AlignCheckpointGate = {
+    newSlotDispatchAllowed: earliest.checkpoint.newSlotDispatchAllowed !== false,
+    ...(earliest.checkpoint.blockingBatchNumber !== undefined
+      ? { blockingBatchNumber: earliest.checkpoint.blockingBatchNumber }
+      : {}),
+  };
+  const writeLease: AlignWriteLeaseGate = {
+    held: earliest.writeLease.held === true,
+    holderId: earliest.writeLease.holderId ?? null,
+    denialHint: earliest.writeLease.denialHint ?? null,
+  };
 
   return {
     schemaVersion: SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION,
@@ -180,12 +289,23 @@ export async function getStudioScriptMediaAlignBoard(
     documentTitle,
     revisionId,
     earliestUnitId: earliest.earliestUnitId,
+    earliestCode: earliest.earliestUnitId
+      ? earliest.slots.find((slot) => slot.unitId === earliest.earliestUnitId)?.code ?? null
+      : null,
+    earliestLabel: earliest.earliestUnitId
+      ? earliest.slots.find((slot) => slot.unitId === earliest.earliestUnitId)?.label ?? null
+      : null,
     earliestStatusLine: earliest.statusLine,
-    unitCount: rows.length,
-    coveredCount: rows.filter((r) => r.status === "covered").length,
-    partialCount: rows.filter((r) => r.status === "partial").length,
-    missingAllCount: rows.filter((r) => r.status === "missing-all").length,
-    rows,
+    earliestReason: earliest.earliestReason ?? null,
+    checkpoint,
+    checkpointLine: formatAlignCheckpointLine(checkpoint),
+    writeLease,
+    writeLeaseLine: formatAlignWriteLeaseLine(writeLease),
+    unitCount: rowsWithPeek.length,
+    coveredCount: rowsWithPeek.filter((r) => r.status === "covered").length,
+    partialCount: rowsWithPeek.filter((r) => r.status === "partial").length,
+    missingAllCount: rowsWithPeek.filter((r) => r.status === "missing-all").length,
+    rows: rowsWithPeek,
     missingReport,
     builtAt: new Date().toISOString(),
   };

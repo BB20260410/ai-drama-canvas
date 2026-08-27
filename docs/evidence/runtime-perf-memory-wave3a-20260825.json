@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "3-A",
+  "recordedAt": "2026-08-25T14:20:00Z",
+  "change": {
+    "approvedTimelineInspect": "inspectManagedProjectReadOnly",
+    "earliestInspect": "inspectManagedProjectReadOnly",
+    "earliestWriteLease": "getStudioProjectWriteLeaseReadOnly",
+    "alignBoardDirectWriteInspect": false,
+    "activateProjectOnReadPath": false
+  },
+  "residual": {
+    "checkpointControlMayEnsureLedger": true,
+    "timelineOpenDatabaseMayCreateSchema": true,
+    "reason": "earliest 仍调 getStudioGenerationCheckpointControl；时间线批读仍走 managedLedgerPaths/openDatabase。W3-B 处理未初始化失败关闭"
+  },
+  "tests": [
+    "tests/runtime-perf-wave3a-readonly-inspect.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "sourceContractTests": { "passed": 3, "platform": "linux" },
+    "relatedLinuxTests": { "passed": 12, "files": 4 },
+    "p7FixtureTests": "Darwin dirfd only; Linux 未跑 fixture",
+    "reviews": [
+      { "id": "bc-73b675d2-b3e8-518f-ac98-68bfa2d1f5d0", "verdict": "部分完成→合同误伤已修" },
+      { "id": "bc-a20ba5e4-f49b-531c-80e2-19cc1bad6c5e", "verdict": "部分完成：入口合法，禁夸大零 ensure" }
+    ]
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W3-A：时间线/earliest 入口改为 inspectManagedProjectReadOnly；earliest 租约改只读。不宣称整条只读路径零 ensure。未改 PASS 归约，未改 checkpoint owner。"
+}

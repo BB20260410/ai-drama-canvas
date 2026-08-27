@@ -1,0 +1,35 @@
+{
+  "id": "goal-freeze-prompt-previous-standing-20260826",
+  "createdAt": "2026-08-26T18:34:30.000Z",
+  "kind": "freeze-prompt-previous-standing",
+  "conclusion": "PASS",
+  "scope": "Single-panel renderedPrompt and unit-grid brief include previous-panel standing when a prior panel exists. First panel writes no extra line (fingerprint unchanged). Brief compose does not mutate pack.renderedPrompt. No dispatch.",
+  "invariants": {
+    "firstPanelDoesNotWriteHandoffLine": true,
+    "laterPanelPromptRequiresContinuousStart": true,
+    "briefDoesNotMutateRenderedPrompt": true,
+    "doesNotDispatch": true,
+    "doesNotCallBindingControl": true,
+    "doesNotReviewPass": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/studio-unit-grid-brief-contract.test.ts",
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts"
+      ],
+      "result": "5 files / 36 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "real-generation constraint evidence",
+    "standing fully solved",
+    "historical pack rewrite",
+    "installed T23",
+    "100% fit"
+  ]
+}

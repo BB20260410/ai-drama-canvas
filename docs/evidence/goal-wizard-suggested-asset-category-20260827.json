@@ -1,0 +1,63 @@
+{
+  "id": "goal-wizard-suggested-asset-category-20260827",
+  "kind": "wizard-suggested-asset-category",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-27T01:05:00.000Z",
+  "scope": "SSL-4/5 Core materializeStudioStoryboardWizardUnit no longer writes every suggestedAssetId as category=character with role=assetId. It resolves getStudioCanonicalAsset and maps real category + name. Missing IDs are omitted, not recategorized. Desktop App.vue already used asset.category / asset.name; Core now matches. Not BindingSet; Binding still required. Does not change formatWizardPromptBody, WIZARD_POST_MATERIALIZE_NEXT, STORYBOARD_WIZARD_SCHEMA_VERSION, freeze writeCommand, T4, T5, dashboard, or getStudioTrace selector.",
+  "invariants": {
+    "coreDoesNotHardcodeCharacterCategory": true,
+    "mapsCharacterScenePropStyle": true,
+    "roleUsesCanonicalName": true,
+    "missingSuggestedIdsOmitted": true,
+    "duplicateSuggestedIdsDeduped": true,
+    "desktopStillUsesAssetCategoryAndName": true,
+    "schemaVersionStill1": true,
+    "doesNotChangeFormatWizardPromptBody": true,
+    "doesNotChangeWizardPostMaterializeNext": true,
+    "doesNotAutoDispatch": true,
+    "doesNotSkipBinding": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true,
+    "doesNotChangeDashboardProjection": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-storyboard-wizard.test.ts",
+        "tests/storyboard-wizard-assets.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/user-facing-error.test.ts",
+        "tests/studio-command-runtime.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-script-library-reader.test.ts"
+      ],
+      "result": "typecheck:app PASS; 17 files / 238 tests PASS (prior suite + storyboard-wizard-assets). wizard file: new mapper/source-contract PASS; materialize sqlite skipIf !darwin; existing source-range still Linux dirfd (pre-existing, not this knife)"
+    },
+    "commit": "98971b9",
+    "linuxDirfdNote": "createManagedProject / initializeStudioProduction still need Darwin dirfd. New materialize sqlite case is skipIf !darwin. Existing wizard source-range case remains Linux-red; not claimed as this Cloud gate."
+  },
+  "notClaimed": [
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed",
+    "SSL-6 product-pack close",
+    "Linux live materialize sqlite",
+    "wizard auto-dispatch",
+    "wizard skips Binding"
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "6-C",
+  "recordedAt": "2026-08-25T17:36:00Z",
+  "change": {
+    "kind": "plan-close-partial",
+    "sourceCorrections": [
+      "useStudioTimelineProjection: explicit empty/blank/>36 unitIds fail closed",
+      "lazy-loader comments: drop studio-command-executor substring so source-module-boundaries stays bus-only"
+    ]
+  },
+  "section1": [
+    { "id": 1, "gate": "default fastMode true", "verdict": "已完成" },
+    { "id": 2, "gate": "full only explicit CLI + durationMs", "verdict": "已完成" },
+    { "id": 3, "gate": "36-unit screen does not materialize 2500", "verdict": "部分完成", "note": "canvas unitIds + composable fail-closed; W2-C Darwin 未跑; dashboard/bundle omit still whole episode" },
+    { "id": 4, "gate": "MCP cold start lazy editor/adaptation/novel", "verdict": "部分完成", "note": "withX lazy loaders; get_capabilities still withEditor; command-bus still static ledger" },
+    { "id": 5, "gate": "thumbnail LRU URL-only; list original count 0", "verdict": "部分完成", "note": "source contract; list flip probe NOT_RUN" },
+    { "id": 6, "gate": "T23 gates do not regress", "verdict": "部分完成", "note": "SQL contract unchanged; installed T23 NOT_RUN" },
+    { "id": 7, "gate": "per-wave evidence; no 2026-08-11 final overwrite", "verdict": "已完成" },
+    { "id": 8, "gate": "no official bypass / no owner rebuild / no GUI", "verdict": "已完成" }
+  ],
+  "reviews": {
+    "w1w3": "must-fix composable empty unitIds → fixed d9736e4 then PASS",
+    "w4w5": "PASS with residuals",
+    "redlineBranch": "PASS; plan max 部分完成",
+    "composableFix": "PASS",
+    "boundaryCommentFix": "source-module-boundaries 13 PASS after 2a4252f"
+  },
+  "verification": {
+    "typecheckApp": "PASS",
+    "directedLinux": { "passed": 241, "files": 27, "ref": "wave6a" },
+    "composableAfterFix": { "passed": 13, "file": "tests/use-studio-timeline-projection.test.ts" },
+    "npmTestFastLinux": {
+      "status": "FAIL",
+      "files": "64 failed | 243 passed | 1 skipped (308)",
+      "tests": "318 failed | 1527 passed | 4 skipped (1849)",
+      "durationMs": 42140,
+      "classification": {
+        "explicitDirfdMessage": 236,
+        "wrappedDirfdOrUnknownSameRoot": 74,
+        "privateTmpEnoent": 7,
+        "sourceModuleBoundariesCommentFalsePositive": 1,
+        "boundaryFixedAt": "2a4252f",
+        "note": "236+74+7+1=318；74 多为 dirfd 被包成 toThrow/toSatisfy，不是新语义回归"
+      },
+      "doNotTreatAsNewProductRegression": "Linux dirfd / /private/tmp; CI is macos-latest"
+    },
+    "installedT23": "NOT_RUN",
+    "listFlipProbe": "NOT_RUN",
+    "w2cP7": "NOT_RUN Darwin dirfd"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W6-C：对照 §1 八条已审查；纠正空 unitIds 回退与 executor 边界注释误伤。Linux npm test 因 Darwin dirfd 失败，不当新回归。整计划部分完成。未改 recipe / T23 SQL。",
+  "residual": [
+    "W2-C P7 有界对照仍需 Darwin",
+    "安装版 T23 首卡/首 raw 未跑",
+    "列表翻页 aicanvas-studio://media/* = 0 探针未跑",
+    "get_capabilities 仍 withEditor；command-bus 仍静态拉 ledger；doctor 仍探测 sharp/mammoth",
+    "画布 UI 派生队列仍是 2；切工程 UI 未自动 evict verifiedFileCache",
+    "禁止写成「运行速度已关账」或「T23 已复测不回退」或「已优化缩略指纹」"
+  ]
+}

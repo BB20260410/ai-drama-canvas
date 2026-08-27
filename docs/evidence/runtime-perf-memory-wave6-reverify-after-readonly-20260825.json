@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "6-reverify-after-readonly",
+  "recordedAt": "2026-08-25T22:22:30Z",
+  "head": "3159e786653b75045e633f92778f4f918b9846da",
+  "change": {
+    "kind": "verification-only",
+    "sourceCodeChanged": false,
+    "note": "身份只读 + 时间线账本批读只读 + 历史 PASS 活库只读之后扩大复验。未改源码 / recipe / T23 SQL / 阶段名 / 120s timeout / 2048。未改 checkpoint / databaseContextFor。"
+  },
+  "section1": [
+    { "id": 1, "gate": "default fastMode true", "verdict": "已完成" },
+    { "id": 2, "gate": "full only explicit CLI + durationMs", "verdict": "已完成" },
+    {
+      "id": 3,
+      "gate": "36-unit screen does not materialize 2500",
+      "verdict": "部分完成",
+      "note": "展示路径 unitIds→by-id + lean 身份只读 + 账本批读只读 + 历史 PASS 活库只读。earliest/diagnostics 仍整集全序。停检画布投影仍走 checkpoint 写初始化（有意不半吊子改）。P7 owner NOT_RUN。"
+    },
+    { "id": 4, "gate": "MCP cold start lazy editor/adaptation/novel", "verdict": "已完成" },
+    { "id": 5, "gate": "thumbnail LRU URL-only; list original count 0", "verdict": "部分完成", "note": "源码合同已绿；列表 GUI 探针 NOT_RUN。Wave 5 父项不勾。" },
+    { "id": 6, "gate": "T23 gates do not regress", "verdict": "部分完成", "note": "可写 latest-runs 与 listStudioProductionUnits 未改；安装版 T23 NOT_RUN。macos CI ≠ T23。" },
+    { "id": 7, "gate": "per-wave evidence; no 2026-08-11 final overwrite", "verdict": "已完成" },
+    { "id": 8, "gate": "no official bypass / no owner rebuild / no GUI", "verdict": "已完成" }
+  ],
+  "reviews": {
+    "redlineSkeptic": "PASS; 无 must-fix。listStudioProductionUnits 与 6170745^ 逐字节相同。dashboard/unit-grid/session-snapshot 仍走可写 latest-runs。checkpoint / command-bus / recipe / 2048 / 120s / T23 阶段名 / N124 未改。",
+    "completionGate": "PASS for this re-verify only。整计划仍部分完成。不得勾 Wave 5 父项或关 Goal。"
+  },
+  "verification": {
+    "typecheckApp": "PASS",
+    "directedLinux": {
+      "filesAttempted": 42,
+      "filesPassed": 41,
+      "testsPassed": 336,
+      "testsFailed": 1,
+      "failed": {
+        "file": "tests/studio-sqlite-busy-contract.test.ts",
+        "case": "command ledger writable owner 也继承同一短 deadline",
+        "reason": "安全受管写入需要 macOS dirfd helper；禁止回退到路径式写入。既有 Linux 缺口，非本轮回归。"
+      },
+      "platform": "linux",
+      "durationMs": 6760,
+      "includesSincePriorAfterLeanReverify": [
+        "tests/runtime-perf-wave2-identity-readonly-sql.test.ts",
+        "tests/runtime-perf-wave2-ledger-readonly-sql.test.ts",
+        "tests/runtime-perf-wave2-historical-facts-readonly-sql.test.ts"
+      ]
+    },
+    "installedApp": "NO_APP",
+    "installedT23": "NOT_RUN",
+    "listFlipProbe": "NOT_RUN",
+    "w2cP7": "NOT_RUN Darwin dirfd",
+    "huntAfterReadonly": {
+      "displayPathsPassUnitIds": true,
+      "canvasGetContinuousStateCalled": false,
+      "checkpointCanvasProjectionStillWriteInit": true,
+      "writableLatestRunsCallersUnchanged": [
+        "studio-production-dashboard.ts",
+        "studio-unit-grid-generation.ts",
+        "studio-generation-session-snapshot.ts"
+      ]
+    }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "overwrote20260811Final": false,
+    "t23SqlContractUnchanged": true,
+    "listStudioProductionUnitsSqlUnchanged": true,
+    "writableLatestUnitGridRunsUnchanged": true,
+    "checkpointInitUnchanged": true,
+    "writeBusyTimeoutUnchanged": 120000,
+    "verifiedFileCacheLimitUnchanged": 2048,
+    "wave5ParentChecked": false
+  },
+  "claim": "只读三刀之后扩大复验：typecheck:app PASS；Linux 41 files / 336 tests PASS；1 条 ledger busy 测需 Darwin dirfd（既有）。安装版 T23 / P7 owner / 列表 GUI 探针仍 NOT_RUN。整计划部分完成。禁止写「运行速度已关账」。",
+  "forbiddenClaims": [
+    "运行速度已关账",
+    "P7 有界对照已在本 Cloud 跑过",
+    "列表原图次数已测为 0",
+    "T23 已复测不回退"
+  ]
+}

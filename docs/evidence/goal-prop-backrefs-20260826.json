@@ -1,0 +1,52 @@
+{
+  "id": "goal-prop-backrefs-20260826",
+  "kind": "prop-backrefs-readonly",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T20:20:00.000Z",
+  "scope": "Cross-unit prop backrefs reuse the scene-backref contract: snapshot mentions with category=prop only. Align / SSL-5 / reader / 15s wizard scan the already-loaded board; session-snapshot / canvas inspector / generation control use one readOnly SQL open (same IPC canvas:get-studio-scene-backrefs) that returns both scene and prop sets. Click-through reuses existing reveal handlers and fail-closes instead of guessing panels[0]. Not BindingSet; does not write formatWizardPromptBody / freeze fingerprint; does not change StudioDashboardPanelSummary or get_studio_trace; unit-grid brief last tool note remains previous-standing. Review stays frozen-pack identity only.",
+  "invariants": {
+    "categoryPropOnly": true,
+    "sameIpcReturnsBothSets": true,
+    "usesLoadedBoardOnlyOnAlignSsl5ReaderWizard": true,
+    "doesNotAutoLoadAlignBoard": true,
+    "doesNotWriteFrozenPrompt": true,
+    "doesNotGuessFirstPanel": true,
+    "doesNotChangeDashboardProjection": true,
+    "doesNotWriteTraceHeadBackrefs": true,
+    "doesNotCallBindingInspect": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotDispatch": true,
+    "unitGridBriefLastNoteRemainsPreviousStanding": true,
+    "sessionSnapshotSchemaVersionUnchanged": 1,
+    "ssl5PlanSchemaVersionUnchanged": 1
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-scene-backrefs-readonly-sql.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-unit-grid-brief-contract.test.ts"
+      ],
+      "result": "8 files / 158 tests PASS; studio-storyboard-wizard 5/6 PASS, 1 Linux dirfd failure is pre-existing createManagedProject fixture"
+    },
+    "commit": "0fe87ca"
+  },
+  "notClaimed": [
+    "prop consistency fully solved",
+    "scene consistency fully solved",
+    "real-generation constraint evidence",
+    "wizard auto-loads align board",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

@@ -48,6 +48,10 @@ describe("StudioGenerationSessionSnapshot", () => {
     expect(first.binding.bindingSet?.currentness).toBe("current");
     expect(first.referenceRoles.unclassified).toHaveLength(3);
     expect(first.camera.current?.shotType).toBe("original");
+    expect(first.previousStanding).toBeNull();
+    expect(first.frozenPanelLighting).toBeNull();
+    expect(first.frozenPanelCostume).toBeNull();
+    expect(first.styleLockLine).toBeNull();
     expect(first.topRisk).toBeNull();
     expect(first.fingerprint).toBe(second.fingerprint);
 

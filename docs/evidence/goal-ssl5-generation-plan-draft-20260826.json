@@ -1,0 +1,38 @@
+{
+  "id": "goal-ssl5-generation-plan-draft-20260826",
+  "kind": "ssl5-generation-plan-readonly-draft",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T21:02:00.000Z",
+  "scope": "SSL-5 missing-to-gen plan now exposes a read-only create_studio_generation_plan draft. recommendedPath inserts create-plan between freeze and dispatch. Draft uses only the missing focus panel's own packId (focusPackId); sibling covered preview packId is never used as a plan node. Does not execute_command, does not dispatch, does not change SSL5_PLAN_SCHEMA_VERSION.",
+  "invariants": {
+    "schemaVersionUnchanged": 1,
+    "doesNotExecuteCreatePlan": true,
+    "doesNotDispatch": true,
+    "doesNotGuessFirstPanel": true,
+    "doesNotUseSiblingCoveredPack": true,
+    "doesNotChangeDashboardProjection": true,
+    "doesNotEvaluatePixels": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/use-virtual-list-lru-hotkeys.test.ts"
+      ],
+      "result": "3 files / 25 tests PASS"
+    },
+    "commit": "9486b65"
+  },
+  "notClaimed": [
+    "SSL-5 one-click generation closed",
+    "create_studio_generation_plan executed",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

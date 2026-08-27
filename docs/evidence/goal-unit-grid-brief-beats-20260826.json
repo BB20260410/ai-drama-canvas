@@ -1,0 +1,38 @@
+{
+  "id": "goal-unit-grid-brief-beats-20260826",
+  "kind": "unit-grid-brief-beats-timing-shot-type",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T20:52:00.000Z",
+  "scope": "Project unit-grid Agent promptContract.BEATS startSeconds/endSeconds/shotType from the already-frozen pack panels. promptContractText now shows 0–7.5s / 原镜 / 扩写. Does not rewrite freeze renderedPrompt, does not change UNIT_GRID_BRIEF_TEMPLATE_ID or contract schemaVersion, and unit-grid brief last tool note remains previous-standing.",
+  "invariants": {
+    "doesNotChangeRenderedPrompt": true,
+    "doesNotChangeBriefTemplateId": true,
+    "doesNotChangeBriefSchemaVersion": 1,
+    "unitGridBriefLastNoteRemainsPreviousStanding": true,
+    "doesNotChangeDashboardProjection": true,
+    "doesNotWriteTraceHeadBeat": true,
+    "doesNotDispatch": true,
+    "doesNotCallBindingInspect": true,
+    "doesNotEvaluatePixels": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-unit-grid-brief-contract.test.ts"
+      ],
+      "result": "1 file / 7 tests PASS"
+    },
+    "commit": "0c88681"
+  },
+  "notClaimed": [
+    "15s beat fully solved",
+    "shot-type / extension fully solved",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

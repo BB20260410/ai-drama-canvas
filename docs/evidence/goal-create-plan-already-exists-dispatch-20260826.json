@@ -1,0 +1,46 @@
+{
+  "id": "goal-create-plan-already-exists-dispatch-20260826",
+  "kind": "create-plan-draft-refine-when-plan-exists",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T22:01:00.000Z",
+  "scope": "composeStudioGenerationPlanDraft accepts hasPersistedPlan. When a persisted plan exists, ready=false, blockedReason says next is dispatch, dispatch stays false. SSL-5 refines only the focus missing panel via readPersistedPanelHasPlan (openGenerationLedgerReadOnly, LIMIT 1). Panel plans must point at a pack with no pack_targets so unit-grid compatibility panel_id is not treated as a panel plan. session-snapshot passes the same flag for panel or unit-grid. Generation control uses already-loaded progress.nodes (no extra IPC). Pack envelope next starts at dispatch when a plan exists. Does not execute create_studio_generation_plan or dispatch. schemaVersion stays 1.",
+  "invariants": {
+    "ssl5SchemaVersionUnchanged": 1,
+    "sessionSnapshotSchemaVersionUnchanged": 1,
+    "ssl5StillPanelOnly": true,
+    "onlyFocusPanelRefined": true,
+    "unitGridPlanNotCountedAsPanelPlan": true,
+    "readonlyOpen": true,
+    "doesNotExecuteCreatePlan": true,
+    "doesNotDispatch": true,
+    "doesNotUseAlignPreviewPackAsFocus": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-episode-earliest-plan-refine.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/studio-unit-grid-next-action.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/script-media-align-view.test.ts"
+      ],
+      "result": "8 files / 64 tests PASS"
+    },
+    "commit": "5e7db49"
+  },
+  "notClaimed": [
+    "create_studio_generation_plan executed",
+    "dispatch executed",
+    "SSL-5 one-click generation closed",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

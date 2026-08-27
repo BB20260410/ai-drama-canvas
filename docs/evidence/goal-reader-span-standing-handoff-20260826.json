@@ -1,0 +1,37 @@
+{
+  "id": "goal-reader-span-standing-handoff-20260826",
+  "createdAt": "2026-08-26T18:22:30.000Z",
+  "kind": "reader-span-media-standing-handoff-readonly",
+  "conclusion": "PASS",
+  "scope": "ScriptSpanMediaHit copies panel shotComposition/visualAction/filmingMethod/previousHandoff. Reader span-media list shows standing text only. Not BindingSet. No dispatch. No image bind on the hit list.",
+  "invariants": {
+    "hitCopiesPreviousHandoff": true,
+    "readerShowsStandingText": true,
+    "doesNotBindImagesOnHitList": true,
+    "doesNotCallBindingControl": true,
+    "doesNotDispatch": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotReviewPass": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/use-virtual-list-lru-hotkeys.test.ts"
+      ],
+      "result": "5 files / 34 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "standing fully solved",
+    "BindingSet generation-ready",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "100% fit"
+  ]
+}

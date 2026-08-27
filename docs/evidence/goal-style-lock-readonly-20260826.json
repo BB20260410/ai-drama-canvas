@@ -1,0 +1,55 @@
+{
+  "id": "goal-style-lock-readonly-20260826",
+  "kind": "style-lock-readonly-surfaces",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T21:52:00.000Z",
+  "scope": "Read-only style-lock exposure from existing category=style control references / snapshot mentions / frozen pack refs. Does not clone a category=style backref graph, does not write a new frozen 风格： line, does not add an 8th unit-grid brief slot, does not change STYLE_LOCK slot schema, does not call evaluateStudioConsistency or getStudioBindingControl, does not put current-head style lock on get_studio_trace. Review only reads frozen pack. Wizard only scans an already-loaded align board and never auto-loads it. unit-grid without panelId does not guess the first panel. Brief notes.at(-1) remains the previous-standing sentence. schemaVersion stays 1 for SSL-5 / session-snapshot / unit-grid brief.",
+  "invariants": {
+    "ssl5SchemaVersionUnchanged": 1,
+    "sessionSnapshotSchemaVersionUnchanged": 1,
+    "unitGridBriefSchemaVersionUnchanged": 1,
+    "unitGridBriefTemplateIdUnchanged": "unit-grid-brief-template-v1",
+    "noCategoryStyleBackReferences": true,
+    "noNewFrozenStylePromptLine": true,
+    "noEighthBriefSlot": true,
+    "reviewFrozenPackOnly": true,
+    "wizardDoesNotAutoLoadAlign": true,
+    "unitGridRequiresPanelId": true,
+    "briefLastNoteStillPreviousStanding": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotCallBindingControl": true,
+    "doesNotAddTraceHeadStyleLock": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/studio-unit-grid-brief-contract.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-continuity-review-ui.test.ts",
+        "tests/studio-scene-backrefs-readonly-sql.test.ts",
+        "tests/studio-unit-lock-overlays-readonly-sql.test.ts"
+      ],
+      "result": "11 files / 186 tests PASS"
+    },
+    "commit": "252c629"
+  },
+  "notClaimed": [
+    "style lock fully solved",
+    "category=style backref graph",
+    "new frozen 风格： line",
+    "8th brief slot",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

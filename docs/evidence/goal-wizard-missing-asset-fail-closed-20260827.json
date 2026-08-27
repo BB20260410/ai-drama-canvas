@@ -1,0 +1,61 @@
+{
+  "id": "goal-wizard-missing-asset-fail-closed-20260827",
+  "kind": "wizard-missing-asset-fail-closed",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-27T01:25:00.000Z",
+  "scope": "Wizard suggested asset IDs without a canonical record no longer silently skip. Core materialize and App write resolve first, then listWizardMissingSuggestedAssetErrors fail-closes before creating the prompt document. openStudioStoryboardWizard attaches suggestedAssetResolutions so Align can show category/name or 无规范记录. Mapper still does not invent character. Does not change formatWizardPromptBody, WIZARD_POST_MATERIALIZE_NEXT, STORYBOARD_WIZARD_SCHEMA_VERSION, freeze writeCommand, T4, T5, dashboard, or getStudioTrace selector.",
+  "invariants": {
+    "missingSuggestedFailsClosed": true,
+    "resolvesBeforePromptWrite": true,
+    "openAttachesSuggestedAssetResolutions": true,
+    "alignShowsCategoryNameOrMissing": true,
+    "mapperDoesNotInventCharacter": true,
+    "doesNotWriteSuggestedLineIntoPromptBody": true,
+    "schemaVersionStill1": true,
+    "doesNotChangeFormatWizardPromptBody": true,
+    "doesNotChangeWizardPostMaterializeNext": true,
+    "doesNotAutoDispatch": true,
+    "doesNotSkipBinding": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true,
+    "doesNotChangeDashboardProjection": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-library-projection.test.ts",
+        "tests/storyboard-wizard-assets.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-command-runtime.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/user-facing-error.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-script-library-reader.test.ts"
+      ],
+      "result": "typecheck:app PASS; 15 files / 239 tests PASS. wizard new missing-asset cases PASS; existing source-range still Linux dirfd (pre-existing, not this knife); Darwin materialize sqlite skip updated to fail-closed then clean materialize"
+    },
+    "commit": "1dee23f",
+    "darwinTestFollowUp": "62828e9",
+    "linuxDirfdNote": "wizard source-range / createManagedProject still need Darwin dirfd. Not claimed as this Cloud gate."
+  },
+  "notClaimed": [
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed",
+    "SSL-5 bond-loop scaffold in frozen prompt",
+    "SSL-6 product-pack close",
+    "wizard auto-dispatch",
+    "wizard skips Binding"
+  ]
+}

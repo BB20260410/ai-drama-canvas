@@ -2,7 +2,6 @@ import { createHash, randomUUID } from "node:crypto";
 import { constants } from "node:fs";
 import { access, copyFile, lstat, mkdir, open, readFile, readdir, realpath, stat } from "node:fs/promises";
 import path from "node:path";
-import * as mammoth from "mammoth";
 import {
   ensureConfinedDirectory,
   inspectExistingConfinedDirectory,
@@ -1216,6 +1215,7 @@ async function extractFile(filePath: string): Promise<{ text: string; kind: Stor
   if (fileStat.size > MAX_SOURCE_BYTES) throw new Error("原文文件超过 50MB，请先拆分后导入。");
   const kind = sourceKind(absolutePath);
   if (kind === "docx") {
+    const mammoth = await import("mammoth");
     const result = await mammoth.extractRawText({ path: absolutePath });
     return { text: normalizeText(result.value), kind, encoding: "docx", size: fileStat.size };
   }

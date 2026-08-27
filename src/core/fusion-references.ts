@@ -2,7 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { constants } from "node:fs";
 import { access, link, mkdir, open, readFile, rm, stat } from "node:fs/promises";
 import path from "node:path";
-import sharp from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import { loadFusionProductionAssets, loadFusionProjectManifest } from "./fusion-production.js";
 import { getSidecarPaths, readJson, writeJsonAtomicExclusive } from "./sidecar.js";
 import type {
@@ -183,7 +183,7 @@ async function renderReferenceBoard(projectRoot: string, identity: string, sourc
   const gutter = 16;
   const width = columns * tileWidth + (columns + 1) * gutter;
   const height = rows * tileHeight + (rows + 1) * gutter;
-  const tiles = await Promise.all(sources.map(async (source) => sharp(source.path, { failOn: "error" })
+  const tiles = await Promise.all(sources.map(async (source) => (await loadSharpDefault())(source.path, { failOn: "error" })
     .rotate()
     .resize({ width: tileWidth, height: tileHeight, fit: "contain", background: "#171411" })
     .png({ compressionLevel: 9, adaptiveFiltering: true })
@@ -193,7 +193,7 @@ async function renderReferenceBoard(projectRoot: string, identity: string, sourc
     left: gutter + (index % columns) * (tileWidth + gutter),
     top: gutter + Math.floor(index / columns) * (tileHeight + gutter),
   }));
-  const image = await sharp({ create: { width, height, channels: 3, background: "#28231d" } })
+  const image = await (await loadSharpDefault())({ create: { width, height, channels: 3, background: "#28231d" } })
     .composite(composite)
     .png({ compressionLevel: 9, adaptiveFiltering: true })
     .toBuffer();

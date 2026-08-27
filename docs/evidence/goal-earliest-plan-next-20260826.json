@@ -1,0 +1,42 @@
+{
+  "id": "goal-earliest-plan-next-20260826",
+  "kind": "episode-earliest-persisted-pack-plan-next",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T21:34:00.000Z",
+  "scope": "getStudioEpisodeEarliest keeps hasCurrentPack=false for every slot. After the slot loop it refines only the first pending ready-to-freeze unit via readPersistedUnitGridPackAndPlan (openGenerationLedgerReadOnly, one unit, LIMIT 1). No pack → freeze; persisted unit-grid pack without plan → create-unit-grid-plan; pack+plan → dispatch. statusLine now includes that unit's code/label so humans and agents share the same next step. Other pending slots stay freeze. Does not execute create_studio_generation_plan or dispatch. Does not import studio-generation-ledger.js / managedLedgerPaths / writable openDatabase. schemaVersion stays 1. Does not change T23 SQL, listStudioProductionUnits, or checkpoint write init.",
+  "invariants": {
+    "schemaVersionUnchanged": 1,
+    "allSlotsStillOmitPersistedPack": true,
+    "onlyEarliestPendingUnitRefined": true,
+    "readonlyOpen": true,
+    "panelPackIsNotUnitGridPack": true,
+    "doesNotExecuteCreatePlan": true,
+    "doesNotDispatch": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-episode-earliest-plan-refine.test.ts",
+        "tests/studio-unit-grid-next-action.test.ts",
+        "tests/runtime-perf-wave3a-readonly-inspect.test.ts",
+        "tests/runtime-perf-wave3b-ledger-readiness.test.ts",
+        "tests/runtime-perf-wave3c-earliest-list-revision.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts"
+      ],
+      "result": "6 files / 30 tests PASS"
+    },
+    "commit": "e6962f9"
+  },
+  "notClaimed": [
+    "every earliest slot now reads persisted packs",
+    "SSL-5 one-click generation closed",
+    "create_studio_generation_plan executed",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "6-darwin-ci-e1ea3f1",
+  "recordedAt": "2026-08-25T19:39:38Z",
+  "change": {
+    "kind": "verification-only",
+    "sourceCodeChanged": false,
+    "summary": "macos-latest CI check success on HEAD e1ea3f1（含 M7 LRU + busy 墙钟 5s）。不是安装版 T23，不是列表 GUI 探针。"
+  },
+  "verification": {
+    "darwinCi": {
+      "conclusion": "success",
+      "runId": 32889586061,
+      "url": "https://github.com/BB20260410/ai-drama-canvas/actions/runs/32889586061",
+      "headSha": "e1ea3f16e96475631d3ca80b058241f35abe6efb"
+    },
+    "related": {
+      "a89e275": { "conclusion": "success", "runId": 32887419972, "note": "协议分类源码合同" },
+      "a05fbc5": { "conclusion": "success", "runId": 32888760882, "note": "已含 M7 LRU；墙钟 flake 未复现" },
+      "b002adf": { "conclusion": "failure", "runId": 32887756159, "note": "547<500 ledger 墙钟 flake" },
+      "d0c4175": { "conclusion": "failure", "runId": 32887771995, "note": "507<500 writer-lock 墙钟 flake" }
+    },
+    "listFlipProbe": "NOT_RUN",
+    "installedT23": "NOT_RUN"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "overwrote20260811Final": false,
+    "writeBusyTimeoutUnchanged": 120000,
+    "wave5ParentChecked": false
+  },
+  "claim": "HEAD e1ea3f1 Darwin CI 已绿。禁止写「T23 已复测」「列表原图次数已测为 0」「运行速度已关账」。",
+  "residual": [
+    "安装版 T23 / P7 owner / 列表 GUI 探针仍 NOT_RUN"
+  ]
+}

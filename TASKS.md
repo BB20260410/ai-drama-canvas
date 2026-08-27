@@ -1,5 +1,164 @@
 # TASKS · 残留任务清账 2026-07-25
 
+## software_goal: canvas-dual-track-optimize-20260826
+
+- status: `部分完成`。云端 B 轨源码辅助已达极限并停手。整 Goal 未关账（无真生图闭环 / 无 T23）。
+- analysis: `docs/GOAL_无限画布全面分析与下一刀_20260826.md`
+- [x] Q0 workqueue 空（reap 0；next EMPTY）
+- [x] 全面分析对照北星 / SSL / Phase D / 速度计划
+- [x] SSL-5：`ssl5-missing-to-gen-plan` MCP + 对照横幅 + 导演动作（不 dispatch）
+- [x] ScriptSpanMediaMap（`script-span-media-map` 只读；点段落→相交宫格/图）
+- [x] 对照行四态 peek（只读缓存；未评估 ≠ 无法检查；不自动 Review PASS）
+- [x] 阅读器「这段配了哪些图」桌面按钮（`getStudioScriptSpanMediaMap`）
+- [x] episode-unit-media-map 按 panel 读 pack（unit-grid 不得复制到所有宫格）
+- [x] 对照表展开宫格行（把 per-panel 真相露到导演面）
+- [x] SSL-5 焦点落到第一张缺图宫格（不 dispatch）
+- [x] 打开对照自动露出 SSL-5 焦点宫格
+- [x] 剧本库 coveredMediaCount 不再恒为 0
+- [x] 对照所选宫格挂只读四态 peek
+- [x] 站位/构图只读演示（对照侧栏露出 shotComposition / visualAction；无正式工程真实验证）
+- [x] 对照宫格前镜交接 + 运镜/光线/快照资产提及（不是 BindingSet；不 dispatch）
+- [x] 阅读器选区命中带构图/运镜/前镜交接（只读文本；不绑图、不 dispatch）
+- [x] 选区命中「对照这格」跳到精确宫格并滚进视口（未命中不猜；缺图不绑其他格）
+- [x] 对照侧栏 / 选区命中 / SSL-5 焦点列出锁版站位缺口（≠ BindingSet / ≠ generation-ready）
+- [x] 对照表宫格列可点精确格（stop 冒泡；缺图不绑其他格）
+- [x] 对照行/SSL-5 预览只绑所选宫格 raw（不再回退整行/unit-grid 图）
+- [x] 新冻结 renderedPrompt / unit-grid brief 写入前镜站位（首格不写以免改指纹；不 dispatch）
+- [x] 单镜 Agent brief 从冻结 renderedPrompt 还原 previousStanding + toolHints（不读 head）
+- [x] session-snapshot / 生成控制 / 审片只读露出冻结前镜（不读 head；不 evaluate 像素；不调 Binding）
+- [x] unit-grid Agent brief previousStandings + toolHints；画布检查器构图/前镜（有冻结包不读 head）
+- [x] get_studio_trace 投影冻结前镜 previousStandings（无该行则省略，兼容 P24）
+- [x] 导演 open-trace 真调 get_studio_trace IPC（只读抽屉；无 pack/run 不猜第一格）
+- [x] 对照侧栏 / 阅读器选区点穿同一只读追溯抽屉
+- [x] 15s 向导 G2+ 露出前镜；物化 prompt 写入「前镜交接」行（首格不写）
+- [x] 15s 向导可填本格光线/服化；物化 prompt 非空才写；G2+ 只读上一格光线/服化（不自动写入、不加冻结前镜光线行）
+- [x] 画布检查器 / 生成控制 / 审片只从已加载冻结包露「光线/服装（宫格覆盖）」（unit-grid 必须 panelId；不改 dashboard 投影）
+- [x] session-snapshot 投影 frozenPanelLighting / frozenPanelCostume（无该行则 null，不进 fingerprint；不读 head）
+- [x] 单镜/整板 Agent brief + get_studio_trace 投影冻结宫格光线/服装（全空省略；不改 P24；不改 renderedPrompt）
+- [x] 对照侧栏跨单元场景回指（只扫已加载快照提及；更早同场景可点穿；≠ BindingSet）
+- [x] session-snapshot 跨单元场景回指（只读 SQL 快照提及；缺库失败关闭为空；brief 只加 tool note，不改同步 brief）
+- [x] SSL-5 横幅 / 阅读器选区命中复用对照同款场景回指（只扫已加载 board；≠ BindingSet）
+- [x] 画布检查器无冻结包时退本格锁版光线/服化（只读 SQL；不改 dashboard 投影；有冻结包仍只认覆盖行）
+- [x] 画布检查器跨单元场景回指（复用只读 SQL；点穿走 focusAppearance，不猜第一格；不改 get_studio_trace）
+- [x] 15s 向导跨单元场景回指（只扫已加载对照板；建议资产须在板里出现过 scene；不写冻结提示词）
+- [x] SSL-5 / 阅读器露出锁版光线服化；场景回指可点穿精确宫格（阅读器仅用户点穿才加载对照板；≠ BindingSet）
+- [x] 生成控制无冻结包退锁版光线/服化 + 当前 head 场景回指（有包仍只认覆盖行；点穿不猜第一格；不改 dashboard / get_studio_trace）
+- [x] 对照/SSL-5/阅读器/向导/检查器/生成控制/session-snapshot 跨单元道具回指（只认 category=prop；一次 IPC 同开库；点穿复用场景回指；不写冻结提示词；整板 brief 最后一条仍是前镜句；≠ BindingSet）
+- [x] 对照/SSL-5/阅读器/向导/检查器/生成控制/session-snapshot 跨单元角色回指（只认 category=character；一次 IPC 同开库返回 scene+prop+character；点穿复用场景回指；不写冻结提示词；整板 brief 最后一条仍是前镜句；≠ BindingSet）
+- [x] 对照/SSL-5/阅读器/向导/检查器/生成控制/审片/session-snapshot 扩写格镜头类型（只解析已有「镜头类型：」行；锁版 shot_type 为可选列；审片只认冻结包；不写新冻结行；整板 brief 最后一条仍是前镜句；≠ BindingSet）
+- [x] 对照/SSL-5/阅读器/向导/检查器/生成控制/审片/session-snapshot 15s 节拍（只读冻结包 target 起止秒，不写新冻结行；无包检查器/生成控制用驾驶舱已有 start/end/duration，不再开 lock-overlay timing SQL；审片只认冻结包；整板 brief 最后一条仍是前镜句；≠ BindingSet）
+- [x] unit-grid Agent brief.BEATS 带 startSeconds/endSeconds/shotType（promptContractText 含起止秒与原镜/扩写；不改冻结 renderedPrompt；templateId / schemaVersion 不变；整板 brief 最后一条仍是前镜句）
+- [x] 单镜 Agent brief 带 shotTypeLine / beatLine（只从冻结包 renderedPrompt / target 还原；无扩写/原镜或无时长则为 null；unit-grid 无 panelId 不猜第一格；不改 renderedPrompt）
+- [x] SSL-5 create-plan 只读草稿（recommendedPath 含 create-plan；generationPlanDraft 只认焦点缺图格 focusPackId，禁止用同行已出图 preview pack；不执行、不 dispatch；schemaVersion 仍为 1）
+- [x] session-snapshot / 生成控制露出同一 create-plan 只读草稿（薄模块不拉对照板；只认 query.panelId / 当前宫格已落盘单镜包；整板 pack 不当单镜节点；草稿不进 fingerprint；不执行、不 dispatch；schemaVersion 仍为 1）
+- [x] 生成控制 / pack envelope 露出 unit-grid create-plan 只读草稿（节点 `{ targetKind: unit-grid, unitId }`；只认已落盘 history/计划 pack，不用 readiness 候选；SSL-5 / session-snapshot 保持单镜；不执行、不 dispatch；schemaVersion 仍为 1）
+- [x] session-snapshot 无 panelId 露出 unit-grid create-plan 草稿；单镜/整板 readiness next 含 create-plan；生成控制露出命令名（只认账本已落盘 pack，不猜第一格，不执行、不 dispatch；schemaVersion 仍为 1）
+- [x] 驾驶舱 unit-grid nextAction：已落盘 pack 无计划 → create-plan；readiness 候选不当冻结包（不执行、不 dispatch）
+- [x] earliest 只对一个 pending 单元按落盘 pack/计划区分 freeze/plan/dispatch（全槽位仍不读 pack；只读开库；statusLine 带 code；不执行、不 dispatch；schemaVersion 仍为 1）
+- [x] 对照/SSL-5/阅读器/向导/检查器/生成控制/审片/session-snapshot/brief 风格锁只读露出（只认已有 category=style 控制参考；不开 category=style 回指；不写新冻结「风格：」行；不加第 8 槽；审片只认冻结包；向导不自动 loadAlign；整板 brief 最后一条仍是前镜句；≠ BindingSet）
+- [x] SSL-5 / session-snapshot / 生成控制 / pack envelope 已有计划则 create-plan 草稿改标 dispatch（SSL-5 只精炼焦点缺图格；单镜计划排除整板兼容 panel_id；不执行、不 dispatch；schemaVersion 仍为 1）
+- [x] SSL-5 / session-snapshot / 生成控制 / pack envelope 已有计划时按节点状态区分 dispatch/wait/retry/Review（未传 status 保持 dispatch 文案；retry-superseded→planned；SSL-5 只精炼焦点；生成控制零额外 IPC；不改 earliest / 驾驶舱 nextAction；不执行、不 dispatch、不 retry；schemaVersion 仍为 1）
+- [x] earliest / 驾驶舱 nextAction 按计划节点状态区分 dispatch/wait/retry/Review（earliest 一次只读开库；驾驶舱用 latestRun.latestEventKind；inspect 优先；不改 T5；不执行、不 dispatch、不 retry；schemaVersion 仍为 1）
+- [x] SSL-5 / 对照与 earliest wait/retry/Review 对齐（对照板带 earliestCode/label；焦点即 earliest 时禁止再建议 create-plan/dispatch；persist refine 之后 earliest wait 仍赢；不二次 getStudioEpisodeEarliest；不执行、不 dispatch、不 retry；schemaVersion 仍为 1）
+- [x] session-snapshot / 生成控制单镜草稿跟 unit-grid 在途对齐（驾驶舱 nextAction 或已加载 unit-grid 节点为 wait/retry/Review/对账时草稿不得再 ready；零额外 IPC；不进 fingerprint；不执行、不 dispatch、不 retry；schemaVersion 仍为 1）
+- [x] pack envelope 单镜草稿/next 跟 unit-grid 在途对齐（同单元 unit-grid 节点 dispatched/failed/cancelled/succeeded 时草稿不得再 ready，next 改 wait/retry/Review；不加 inspect；planned 不挡；不执行、不 dispatch、不 retry）
+- [x] readiness next 跟 unit-grid 在途对齐（单镜/整板 ready 路径的 agentExecution.next 在同单元 unit-grid 已在途/待重试/待审时改 wait/retry/Review；freeze writeCommand 不变；不加 inspect；不执行、不 dispatch、不 retry）
+- [x] 画布节点下一步跟 unit-grid 在途对齐（检查器「下一步」用已加载 unitDetail.nextAction；wait/retry/Review/对账时禁用 freeze-dispatch 并露出同一下一步；planned 不挡；零额外 IPC；不执行、不 dispatch、不 retry；schemaVersion 仍为 1）
+- [x] active-runs envelope next 跟本槽/unit-grid 对齐（unknown→对账、未审→Review、在途→wait；单镜另看同单元 unit-grid；generationBlocked 仍只认本槽 blockingRuns；不改 T4 ledger；不加 inspect；不执行、不 dispatch、不 retry；schemaVersion 仍为 1）
+- [x] 15s 向导物化后下一步含 create-plan（nextSteps / 物化结果写 Binding→freeze→create-plan→dispatch；不跳过 Binding，不自动派发，不改 formatWizardPromptBody；schemaVersion 仍为 1）
+- [x] generation-control operation=plan 信封 next 跟节点状态对齐（按 planId/单元查：dispatched→wait、failed/cancelled→retry、planned→dispatch、全 succeeded→Review；无计划→create-plan；未限定列表/not_found→follow-core-readiness；生成控制用已加载 progress.nodes，零额外 IPC；MCP 标准环先读 plan next 再决定是否 dispatch；不执行、不派发、不重试；不改 T4/T5；schemaVersion 仍为 1）
+- [x] generation-control operation=history 信封 next 跟本页结果对齐（未成对→wait、成对 pending→Review、成对 rejected→retry、空页/全 approved→follow-core-readiness；要看最新请 newest-first；生成控制用已加载 history，零额外 IPC；不改 history list SQL；不 evaluate 像素；不自动 Review PASS；不改 T4/T5；schemaVersion 仍为 1）
+- [x] session-snapshot 一致性四态 peek 辅助 Review（当前宫格 newest-first 结果 run，否则整板 latest run；只读进程内 LRU；未评估 ≠ 无法检查；动态 import peek，不 evaluate 像素；不进 fingerprint；不拉对照板；机器不自动 Review PASS；schemaVersion 仍为 1）
+- [x] generation-control operation=history 信封 consistencyPeek 辅助 Review（本页优先成对 run；只读进程内 LRU；未评估 ≠ 无法检查；动态 import peek，不 evaluate 像素；生成控制用已加载信封、零额外 IPC；Vue 不 import evaluator；不改 history list SQL；不改 T4/T5；机器不自动 Review PASS；schemaVersion 仍为 1）
+- [x] get_studio_trace / 画布检查器一致性四态 peek 辅助 Review（追溯 by-run 用该 run、否则本包最新 run；无 run 省略以免改 P24 形状；检查器复用 history 信封 newest-first limit 1；动态 import peek，不 evaluate 像素；Vue 不 import evaluator；不改 dashboard / T4/T5 / P24 golden；机器不自动 Review PASS）
+- [x] 阅读器 span 命中 / SSL-5 横幅一致性四态 peek（命中按 generationRunId 只读 LRU；SSL-5 复用对照板焦点格/行已有 peek，不偷同行已出图格、不二次评估；未评估 ≠ 无法检查；Vue 复用 peekLabel，不 import evaluator；schemaVersion 仍为 1；机器不自动 Review PASS）
+- [x] 对照/SSL-5 复用六图闸（对照板拷贝 earliest 已算 checkpoint；未放行新槽时禁止再建议 create-plan/dispatch；earliest wait/retry/Review 文案更具体时保留；不二次读闸；对照表 Review 角标用已有 reviewDecision；阅读器露出 earliestReason；不执行停检、不派发；schemaVersion 仍为 1）
+- [x] 对照/SSL-5 写租约 + 对照缺图报告 JSON（对照板拷贝 earliest 已算 writeLease，不暴露 token；未持有时 SSL-5 在 freeze 前插入 acquire-lease；未投影不插；闸/earliest 已挡不插；不改草稿 ready；对照面复制 missingReport；不抢租约、不派发；schemaVersion 仍为 1）
+- [x] 15s 向导复用已加载对照板六图闸/写租约（未加载明示不自动查；建议路径仍不 loadAlign；不改 formatWizardPromptBody / WIZARD_POST_MATERIALIZE_NEXT；不派发；schemaVersion 仍为 1）
+- [x] 阅读器复用已算 earliest 露出六图闸/写租约（checkpointLine / writeLeaseLine；不 import 对照模块；schemaVersion 仍为 1；不抢租约、不派发）
+- [x] session-snapshot 写租约只读 peek（withStudioProjectWriteLease + getStudioProjectWriteLeaseReadOnly；只拷 held/holderId/denialHint/line；不暴露 token；不进 fingerprint；不改 nextAction / 草稿 ready；失败关闭为未持有；不抢租约、不派发；schemaVersion 仍为 1）
+- [x] session-snapshot 六图闸只读 peek（动态 import 首屏 DashboardGate；只拷 newSlotDispatchAllowed/blockingBatchNumber/line；不进 fingerprint；不改 nextAction / 草稿 ready；失败关闭为未放行；不执行停检、不派发；schemaVersion 仍为 1）
+- [x] 画布主按钮/节点 freeze-dispatch 复用已加载 overview 六图闸（newSlotDispatchAllowed===false 时禁用主按钮；primaryStart / runNodeAction 不 persist / 不 emit；未投影不挡；unit-grid wait 文案优先；零额外 IPC；不改动作 code / dashboard / T4/T5；schemaVersion 仍为 1）
+- [x] 执行最近工作流组复用已加载 overview 六图闸（按钮禁用；runLastWorkflowGroup 不 executeWorkflowGroup；未投影不挡；零额外 IPC）
+- [x] 画布主按钮/节点/工作流组复用已加载 unit-grid 在途闸（wait/retry/Review/对账禁用并 return；planned 不挡；零额外 IPC；Vue 从 node-action-panel 再导出 kind helper，不 import plan-draft）
+- [x] 阅读器本修订影响复用 P24 script-revision-impact（按需 IPC；不进 ScriptReaderView；非预期须人工复核；无 pack/run 不猜第一格；不改 schema / getStudioTrace selector / P24 golden；不派发）
+- [x] 阅读器本修订影响点穿对照格 + 已加载 unexpected 精炼 SSL-5（有 panelId 跳精确格；无 panelId 只露单元行、不猜第一格；未加载不自动查；earliest/六图闸文案更具体时保留；薄模块不拉 studio-trace；不派发；schemaVersion 仍为 1）
+- [x] 本修订影响翻页 + 对照表/侧栏复用已加载 unexpected 角标（nextCursor 追加去重；未加载不自动查；SSL-5 非预期改去审片；不派发；schemaVersion 仍为 1）
+- [x] MCP/Core ssl5-missing-to-gen-plan 接受已取回 revisionImpact（焦点 unexpected → review；省略不自动查；SSL-5 不 import studio-trace；桌面仍 Vue 叠加；不派发；schemaVersion 仍为 1）
+- [x] create-plan/dispatch 写路径接受已取回 revisionImpact（unexpected 失败关闭；省略不查；幂等重放不挡；不改 freeze writeCommand；ledger 动态 import 薄模块，不拉 studio-trace）
+- [x] readiness/plan 只读 query 接受已取回 revisionImpact（unexpected 则 next 改 Review unexpected revision impact；wait/已 Review 保留；未限定列表/not_found 不猜单元；省略不查；不改 freeze writeCommand；不自动查；retry 仍未接）
+- [x] 向导 Core 物化按规范资产真实 category/name 落盘（getStudioCanonicalAsset；缺记录跳过，不再一律 character / role=assetId；与桌面 App 对齐；不改 formatWizardPromptBody / WIZARD_POST_MATERIALIZE_NEXT；schemaVersion 仍为 1；不跳过 Binding、不派发）
+- [x] 向导歧义未裁决禁止物化（validate / 桌面校验 / App 写路径失败关闭；applyWizardUnresolvedDecision include 必须在候选集；禁止默认第一候选；不改 formatWizardPromptBody / WIZARD_POST_MATERIALIZE_NEXT；schemaVersion 仍为 1；不跳过 Binding、不派发）
+- [x] 向导露出拆格骨架与建议资产，可改转场/负提示（只读骨架不进 formatWizardPromptBody / 冻结指纹；去掉建议是显式导演动作；不改 WIZARD_POST_MATERIALIZE_NEXT；schemaVersion 仍为 1；不把 scaffold 当 bond-loop 关账；不跳过 Binding、不派发）
+- [x] Align/Core/App 向导物化校验同源（listWizardMaterializeValidationErrors 并集：2–6/15s/至少 1 original/标题动作景别运镜时长/扩写不得锚原文/歧义未裁决；Vue 不 value-import wizard.ts；不改 formatWizardPromptBody / WIZARD_POST_MATERIALIZE_NEXT；schemaVersion 仍为 1；不跳过 Binding、不派发）
+- [x] 向导建议资产缺规范记录禁止静默跳过（打开解析 suggestedAssetResolutions 露 category/name；Core/App 写路径先解析再失败关闭，不先写 prompt；去掉建议是显式导演动作；不改 formatWizardPromptBody / WIZARD_POST_MATERIALIZE_NEXT；schemaVersion 仍为 1；不跳过 Binding、不派发）
+- [x] 云端 B 轨源码辅助达极限并停手（2026-08-27；不再克隆横幅/hint/校验；不把 scaffold 写进冻结提示词；不关整 Goal）
+- [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
+
+## software_goal: runtime-perf-memory-20260825
+
+- status: `阻塞`（本 Cloud；整计划 `部分完成`）。§1.3 by-id + 诊断懒展开 + lean 季集身份 + 身份只读 + 账本批读只读 + 历史 PASS 活库只读 + Linux 真投影 sqlite 接线 + 零 mock inspect + Wave 7 画布媒体热路径已落地；Darwin CI `43945a2`/`2d8ce47`/`4b1824a` 已绿。等待 owner：P7 owner / 安装版 T23 / 列表 GUI 探针
+- plan: `docs/PLAN_运行速度与内存占用长期执行_20260825.md`
+- [x] Wave 0：计划 + 调用点表 + 红线 + 证据（外部模型席 2026-08-26 已实调，主审无 must-fix；`python3 scripts/external-seat-review.py --brief <简报> -o /tmp/seat-review`）
+- [x] Wave 1-A：`getApprovedTimelineProjection` 默认 `fastMode ?? true`
+- [x] Wave 1-B：full 仅 CLI `report-approved-timeline-full` + 投影 `durationMs`；日常诊断保持 fast
+- [x] Wave 1-C：定向测试 + typecheck:app
+- [x] Wave 2-A：`unitIds`/`limit` 有界投影（上限 36；省略=整集）
+- [x] Wave 2-B：画布可见页只请求 unitIds
+- [x] Wave 2-D：账本/计划风暴并入单 rAF
+- [x] Wave 2-E：MiniMap 节点 >80 默认关
+- [x] Wave 2-F：切工程清 LRU；DOM counts 含参考/连续性
+- [x] Wave 2-F M7 残差：`frozenReferenceThumbnailCache` 同工程 `createBoundedKeyedCache(96)`，只持 Promise/URL
+- [x] Wave 2-C：Linux 有界对照（返回集 ⊆ 请求 id；省略=全量）。P7 owner 对照仍需 Darwin
+- [x] Wave 2 §1.3 残差：有界 `unitIds` 走 `listStudioProductionUnitIdentitiesByIds`，不再翻页扫集；2500 末页 36 Linux mock 只走 by-id。P7 仍需 Darwin
+- [x] Wave 2 §1.3 残差：画布详细诊断展开才读整集 diagnostics；refreshAll 默认不拉
+- [x] Wave 2 §1.3 残差：省略/limit/earliest 走 `listStudioProductionUnitIdentities`，不再翻页 `listStudioProductionUnits` 付 per-unit timing。P7 仍需 Darwin
+- [x] Wave 2 §1.3 残差：身份旁路只读打开已有生产库，缺库失败关闭；不 ensure / 不建库。Linux 真 sqlite 2500 末页 36 PASS。P7 仍需 Darwin
+- [x] Wave 2/3 §1.3 残差：时间线账本批读只读打开已有 generation ledger，不走 managedLedgerPaths / 可写 openDatabase。驾驶舱 / T23 / unit-grid 可写入口未改。Linux 真 sqlite 36 单元 PASS。P7 仍需 Darwin
+- [x] Wave 2/3 §1.3 残差：时间线历史 PASS 活库只读，不再 snapshot 复制整库。缺库/缺表仍空事实。P7 仍需 Darwin
+- [x] Wave 2/3 §1.3 残差：Linux 真 `getApprovedTimelineProjection` 手工 sqlite 接线（只 mock inspect；2500 末页 36；`unitTimingQueries=0`）。不是 P7 owner
+- [x] Wave 2/3 §1.3 残差：Linux 手工 schema v1 侧车零 mock inspect + 真投影（2500 末页 36）。不是 P7 owner
+- [x] Wave 2 bundle：驾驶舱正式时间线只物化当前+前后邻；多媒体 storyboard 只请求当前单元。阶段名不变
+- [x] Wave 3-A：earliest / approved-timeline / align-board 改 `inspectManagedProjectReadOnly`
+- [x] Wave 3-B：`assertGenerationLedgerSchemaFileReady` 失败关闭，不静默建库
+- [x] Wave 3-C：earliest 用 list 行 revision，去掉 per-unit snapshot
+- [x] Wave 3-D：ssl5 复用 align-board earliest，不二次调用
+- [x] Wave 4-A：editor / OTIO 经 `withEditor` 动态 import（不拆 command-bus 写路径）
+- [x] Wave 4 get_capabilities：握手不再 withEditor 探测 FFmpeg；deferred engine；probe_video_engine 仍实时探测
+- [x] Wave 4 novel-analysis：启动路径不静态拉 novel-analysis / provider；写 case 仍在 command-bus
+- [x] Wave 4 settings：get_capabilities(projectRoot) 读分析配置走薄模块，不加载整图
+- [x] Wave 4-B：story / adaptation / novel-agent-service 动态 import；mammoth 卸出 story 顶栏
+- [x] Wave 4-C：video-package / Higgsfield / dudu / local-creative 动态 import（mcp-projection 仍静态）
+- [x] Wave 4-D：MCP 只读诊断面抄 Main IPC `await import`（不拆 command-bus / ledger 写路径）
+- [x] Wave 4-E：runtime gate watcher 默认只订 `src/`；`tests/`/`scripts/` 改开关
+- [x] Wave 4-F：sharp 经媒体网关首次 touch（未改 CAS recipe / 缩略指纹）
+- [x] Wave 5-A：对照/审片未选中行只绑 thumbnailUrl；审片并排默认 thumb，原图显式打开
+- [x] Wave 5-B：legacy `thumb=1` 不先整文件读入；失败占位，不回退 4K bytes
+- [x] Wave 5-C：缩略派生并发上限（与画布 15s 向导并发 4 同级）
+- [x] Wave 5-D：derivative serving 只校派生文件 + DB 绑定
+- [x] Wave 5-E：`verifiedFileCache` 按 projectRoot 分桶或切工程淘汰（分桶 + Main watcher 关闭/切换淘汰旧桶）
+- [x] Wave 5 列表翻页源码合同：`tests/runtime-perf-wave5-list-flip-media-count.test.ts`（helper 合成 2 页×36 + hostname→thumbnailRecipeKey 分类 + thumbnail serving 不读源 CAS；非 GUI）
+- [ ] Wave 5 父项（列表翻页探针）：源码合同 W5-A–E + list-flip 已勾；安装版 `aicanvas-studio://media/* = 0` 未跑，故父项不勾
+- [x] Wave 6-A：typecheck:app + 本计划定向测（Linux 27/241 PASS；P7 fixture 仍需 Darwin）
+- [x] Wave 6-B：安装版 T23（owner 未点名 → 已写未跑；未弹窗）
+- [x] Wave 6-C：对照 §1 八条；全量审查 + Linux npm test（dirfd 失败已分类）；结论部分完成
+- [x] Wave 6 复验：两路审查 PASS；typecheck:app PASS；Linux 定向 35 files / 305 tests PASS；安装版 T23 仍 NOT_RUN
+- [x] Wave 6 扩大复验：typecheck:app PASS；Linux 37 files / 320 tests PASS（含 list-flip / M7 LRU / busy 墙钟）；busy ledger 1 条仍需 Darwin dirfd；安装版 T23 仍 NOT_RUN
+- [x] Wave 6 三刀后复验：typecheck:app PASS；Linux 38 files / 327 tests PASS（含 lean identities / units-read-phase）；busy ledger 1 条仍需 Darwin dirfd；安装版 T23 仍 NOT_RUN
+- [x] Wave 6 只读三刀后复验：typecheck:app PASS；Linux 41 files / 336 tests PASS（含 identity/ledger/historical readonly）；busy ledger 1 条仍需 Darwin dirfd；安装版 T23 仍 NOT_RUN
+- [x] Wave 6 零 mock inspect 后复验：typecheck:app PASS；Linux 41 files / 322 tests PASS（含 unmocked inspect / projection sqlite）；busy ledger 1 条仍需 Darwin dirfd；安装版 T23 仍 NOT_RUN
+- [x] Wave 6 Darwin CI：macos-latest check success on `0b46327`（run 32881922045）；不是安装版 T23
+- [x] Wave 6 Darwin CI 投影接线：`43945a2` run `32906441251` success（真 sqlite 5）；`2d8ce47` run `32906906873` success（零 mock inspect 6 + sqlite 5）；HEAD `4b1824a` run `32907435248` success（320 files）；不是安装版 T23 / 不是 P7 owner
+- [x] Wave 7 运行热路径：`getStudioMedia` 只读旁路 + 同 SHA 单飞；derivative 单次只读会话（保留二次 assert TOCTOU）；核心裁剪 rebuild 并入 rAF。未去掉 worker 增量 schedule。Linux 7/139 PASS。不是 P7 / T23 / GUI
+- [x] Wave 5-E Darwin CI：macos-latest check success on `3f04d05`（evict）与 `84b594c`（写回拦截）；不是安装版 T23
+- [x] Wave 5 列表翻页源码合同 Darwin CI：macos-latest check success on `379df38`（run 32886953416）；不是安装版 T23 / 不是 GUI 探针
+- [x] Darwin CI flake：`studio-sqlite-busy-contract` 墙钟 500→5000（b002adf run 32887756159）；未改 120s timeout
+- [x] HEAD `e1ea3f1` macos-latest check success（run 32889586061）；含 M7 LRU；不是安装版 T23
+- [x] `36abafb` macos-latest check success（run 32891408457）；扩大复验文档；不是安装版 T23 / 不是 GUI 探针
+- [x] Darwin CI flake：`sqlite-readonly-snapshot` -shm 竞态 nlink=0 / inode 换号改瞬态重试（5a075cf run 32893004763）；修复 `3a3462e` macos-latest success（run 32894599796）；symlink / 硬链仍失败关闭
+- [x] Wave 6：度量关账（结论部分完成，非整包完成；安装版 T23 未跑）
+- [ ] 禁止：重建 P0–P14、无证据 SQL 批量化、N124 CV、全盘扫正式工程
+
 ## software_goal: unit-grid-brief-contract-w1-20260825
 
 - status: `completed_slice`

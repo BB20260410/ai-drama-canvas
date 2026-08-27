@@ -10,7 +10,10 @@ import {
   registerStudioGenerationResultBundle,
 } from "../src/core/studio-generation-ledger.js";
 import { submitStudioGenerationReview } from "../src/core/studio-generation-review.js";
-import { getApprovedTimelineProjection } from "../src/core/studio-approved-timeline-projection.js";
+import {
+  getApprovedTimelineProjection,
+  resolveApprovedTimelineFastMode,
+} from "../src/core/studio-approved-timeline-projection.js";
 import {
   createStudioP7Fixture,
   seedStudioP7ResolvedContinuity,
@@ -261,19 +264,75 @@ describe("T9 getApprovedTimelineProjection 批量投影", () => {
     expect(inflightProjection.selectedPackFingerprint).toBeNull();
     expect(inflightProjection.selectedRunExecutionIdentity).toBeNull();
     expect(inflightProjection.referenceClosureStatus).toBe("not-applicable");
+    expect(projection.fastMode).toBe(true);
+    expect(projection.durationMs).toBeGreaterThanOrEqual(0);
   }, 120_000);
 
-  it("非 fastMode：PASS 单元同样给出真实 SHA", async () => {
+  it("显式 fastMode:false：PASS 单元同样给出真实 SHA", async () => {
     const fixture = await p7();
     const { passUnit, passMedia } = await seedUnitGridRuns(fixture);
     const projection = await getApprovedTimelineProjection(fixture.root, {
       season: "S03",
       episode: "EP01",
+      fastMode: false,
     });
     const passProjection = projection.units.find((unit) => unit.unitId === passUnit.unit.id)!;
     expect(passProjection.productionStatus).toBe("pass");
     expect(passProjection.selectedRawSha256).toBe(passMedia.raw.imported.sha256);
     expect(passProjection.selectedLabeledSha256).toBe(passMedia.labeled.imported.sha256);
+    expect(projection.fastMode).toBe(false);
+    expect(projection.durationMs).toBeGreaterThanOrEqual(0);
+  }, 120_000);
+
+  it("省略 fastMode 视为 true，与显式 true 投影一致", async () => {
+    expect(resolveApprovedTimelineFastMode(undefined)).toBe(true);
+    expect(resolveApprovedTimelineFastMode({})).toBe(true);
+    expect(resolveApprovedTimelineFastMode({ fastMode: undefined })).toBe(true);
+    expect(resolveApprovedTimelineFastMode({ fastMode: true })).toBe(true);
+    expect(resolveApprovedTimelineFastMode({ fastMode: false })).toBe(false);
+
+    const fixture = await p7();
+    await seedUnitGridRuns(fixture);
+    const omitted = await getApprovedTimelineProjection(fixture.root, {
+      season: "S03",
+      episode: "EP01",
+    });
+    const explicitFast = await getApprovedTimelineProjection(fixture.root, {
+      season: "S03",
+      episode: "EP01",
+      fastMode: true,
+    });
+    expect(omitted.units.map((unit) => ({
+      unitId: unit.unitId,
+      productionStatus: unit.productionStatus,
+      selectedResultSource: unit.selectedResultSource,
+      selectedRawSha256: unit.selectedRawSha256,
+      selectedLabeledSha256: unit.selectedLabeledSha256,
+    }))).toEqual(explicitFast.units.map((unit) => ({
+      unitId: unit.unitId,
+      productionStatus: unit.productionStatus,
+      selectedResultSource: unit.selectedResultSource,
+      selectedRawSha256: unit.selectedRawSha256,
+      selectedLabeledSha256: unit.selectedLabeledSha256,
+    })));
+    expect(omitted.fastMode).toBe(true);
+    expect(explicitFast.fastMode).toBe(true);
+    expect(omitted.durationMs).toBeGreaterThanOrEqual(0);
+    expect(omitted.bounded).toBe(false);
+    expect(explicitFast.bounded).toBe(false);
+  }, 120_000);
+
+  it("unitIds 有界：返回集 ⊆ 请求 id，且 bounded=true", async () => {
+    const fixture = await p7();
+    const { passUnit } = await seedUnitGridRuns(fixture);
+    const projection = await getApprovedTimelineProjection(fixture.root, {
+      season: "S03",
+      episode: "EP01",
+      unitIds: [passUnit.unit.id],
+    });
+    expect(projection.bounded).toBe(true);
+    expect(projection.unitCount).toBe(1);
+    expect(projection.units.map((unit) => unit.unitId)).toEqual([passUnit.unit.id]);
   }, 120_000);
 });
 

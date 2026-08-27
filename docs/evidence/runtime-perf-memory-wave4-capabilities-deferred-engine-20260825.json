@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "4-capabilities-deferred-engine",
+  "recordedAt": "2026-08-25T17:55:00Z",
+  "change": {
+    "kind": "source",
+    "files": [
+      "src/core/editor-lazy.ts",
+      "src/core/codex.ts"
+    ],
+    "handshake": "getCapabilities uses DEFERRED_VIDEO_ENGINE_CAPABILITY; no withEditor / probeVideoEngine",
+    "liveProbeOwner": "probe_video_engine still withEditor(probeVideoEngine)"
+  },
+  "priorReviews": {
+    "wave2BundleImplementation": "PASS bc-ebe40c96-c79c-5bc8-b312-8276361e277d",
+    "wave2BundleRedline": "PASS bc-6cda28bc-a5a8-5414-8b0b-b17d0dca30a3",
+    "mustFix": []
+  },
+  "tests": [
+    "tests/runtime-perf-wave4-capabilities-deferred-engine.test.ts",
+    "tests/runtime-perf-wave4a-editor-lazy-import.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "directedLinux": { "passed": 5, "files": 2, "platform": "linux" }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "get_capabilities 握手不再 withEditor 探测 FFmpeg。editor.engine 为 deferred，实时引擎仍走 probe_video_engine。doctor / 剪辑工具仍会加载 editor。",
+  "residual": [
+    "command-bus 仍静态拉 ledger",
+    "doctor 仍 withEditor / loadSharp / mammoth",
+    "禁止写成「连上 Agent 永不加载 editor」或「运行速度已关账」"
+  ]
+}

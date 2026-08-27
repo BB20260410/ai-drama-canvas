@@ -9,6 +9,7 @@ import {
 } from "../src/core/command-ledger-store.js";
 import {
   RetrySafeSqliteBusyError,
+  STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS,
   isRetrySafeSqliteBusyError,
   isSqliteBusyError,
   sqliteBusyTimeoutWithinDeadline,
@@ -16,6 +17,9 @@ import {
   withSqliteBusyRetry,
   withStudioSqliteBusyDeadline,
 } from "../src/core/studio-sqlite-busy.js";
+
+/** 短 deadline 墙钟上限：证明未把写库 120s busy_timeout 用满。含 CI 打开库/登记开销，不得用 500ms 卡死 macos runner。 */
+const SHORT_DEADLINE_WALL_MS = 5_000;
 
 describe("Studio SQLite busy proof and deadline", () => {
   it("原始 busy 默认 outcome unknown，只有 typed 零副作用证明可自动重试", async () => {
@@ -70,7 +74,8 @@ describe("Studio SQLite busy proof and deadline", () => {
           contender.close();
         }
       });
-      expect(Date.now() - startedAt).toBeLessThan(500);
+      expect(Date.now() - startedAt).toBeLessThan(SHORT_DEADLINE_WALL_MS);
+      expect(Date.now() - startedAt).toBeLessThan(STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS / 10);
     } finally {
       owner.exec("ROLLBACK");
       owner.close();
@@ -100,7 +105,8 @@ describe("Studio SQLite busy proof and deadline", () => {
         upsertCommandLedgerEntry(root, { ...entry, requestId: "request-ledger-deadline-002" }, timestamp))
         .catch((error: unknown) => error);
       expect(isSqliteBusyError(failure)).toBe(true);
-      expect(Date.now() - startedAt).toBeLessThan(500);
+      expect(Date.now() - startedAt).toBeLessThan(SHORT_DEADLINE_WALL_MS);
+      expect(Date.now() - startedAt).toBeLessThan(STUDIO_SQLITE_WRITE_BUSY_TIMEOUT_MS / 10);
     } finally {
       owner.exec("ROLLBACK");
       owner.close();

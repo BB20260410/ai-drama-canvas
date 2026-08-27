@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "3-D",
+  "recordedAt": "2026-08-25T15:13:00Z",
+  "change": {
+    "planSsl5UsesBoardEarliest": true,
+    "secondGetStudioEpisodeEarliestRemoved": true,
+    "recommendedPathUnchanged": true
+  },
+  "tests": [
+    "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "sourceContractTests": { "passed": 1, "platform": "linux" }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W3-D：planSsl5MissingToGen 复用 align-board.earliestUnitId，不再二次调用 earliest。未改 recommendedPath / 派发合同。"
+}

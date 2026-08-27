@@ -1,0 +1,42 @@
+{
+  "id": "goal-align-scene-backrefs-20260826",
+  "kind": "align-cross-unit-scene-backref-readonly",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T19:28:30.000Z",
+  "scope": "Align sidebar lists cross-unit scene back-references from already-loaded board snapshot mentions (category=scene). Looks only at earlier sequence/same-unit earlier panel. Cap 4. Clicking a ref selects that exact unit/panel and does not guess another panel. Not BindingSet; not generation-ready. No extra pack IO, no unit head, no Binding inspect, no dashboard projection change.",
+  "invariants": {
+    "usesLoadedAlignBoardOnly": true,
+    "matchesSceneCategoryOnly": true,
+    "ignoresLaterUnits": true,
+    "doesNotGuessMissingPanel": true,
+    "notBindingSet": true,
+    "doesNotReadUnitHead": true,
+    "doesNotCallBindingInspect": true,
+    "doesNotDispatch": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/material-studio-ui-contract.test.ts"
+      ],
+      "result": "5 files / 41 tests PASS"
+    },
+    "commit": "75aabe4"
+  },
+  "notClaimed": [
+    "scene consistency fully solved",
+    "BindingSet scene currentness",
+    "real-generation constraint evidence",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

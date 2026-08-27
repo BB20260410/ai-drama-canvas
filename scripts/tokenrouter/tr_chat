@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+# TokenRouter 唯一入口。禁止打官方千问 / 火山 / OpenAI。
+set -euo pipefail
+
+ENV_LOCAL="${HOME}/.grok/env.local"
+if [[ ! -f "$ENV_LOCAL" ]]; then
+  echo "没有 ~/.grok/env.local。Cloud 请用 python3 ~/.grok/bin/novel_chat.py --role tr（读环境变量）。不要跑 tr_chat。" >&2
+  exit 2
+fi
+set -a
+# shellcheck disable=SC1090
+source "$ENV_LOCAL"
+set +a
+
+if [[ -z "${TOKENROUTER_API_KEY:-}" ]]; then
+  echo "TOKENROUTER_API_KEY 未注入。" >&2
+  exit 2
+fi
+
+BASE="${TOKENROUTER_BASE_URL:-https://api.tokenrouter.com/v1}"
+if [[ "$BASE" != "https://api.tokenrouter.com/v1" ]]; then
+  echo "TOKENROUTER_BASE_URL 只允许 https://api.tokenrouter.com/v1" >&2
+  exit 2
+fi
+
+out=""
+prompt=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -o|--output)
+      out="${2:-}"
+      shift 2
+      ;;
+    --)
+      shift
+      prompt="${*:-}"
+      break
+      ;;
+    -*)
+      echo "未知参数: $1" >&2
+      exit 2
+      ;;
+    *)
+      if [[ -n "$prompt" ]]; then
+        prompt+=" $1"
+      else
+        prompt="$1"
+      fi
+      shift
+      ;;
+  esac
+done
+
+if [[ -z "$prompt" ]]; then
+  echo "用法: tr_chat \"问题\" -o /tmp/tr_out.txt" >&2
+  exit 2
+fi
+
+if [[ -z "$out" ]]; then
+  out="/tmp/tr_out.txt"
+fi
+
+payload="$(PROMPT="$prompt" python3 - <<'PY'
+import json, os
+print(json.dumps({
+    "model": "qwen/qwen3.8-max-free",
+    "messages": [{"role": "user", "content": os.environ["PROMPT"]}],
+    "max_tokens": 2048,
+}, ensure_ascii=False))
+PY
+)"
+
+body="$(mktemp)"
+hdr="$(mktemp)"
+trap 'rm -f "$body" "$hdr"' EXIT
+
+attempt=1
+max_attempts=3
+http_code=""
+while [[ "$attempt" -le "$max_attempts" ]]; do
+  http_code="$(
+    curl -sS "${BASE}/chat/completions" \
+      -H "Authorization: Bearer ${TOKENROUTER_API_KEY}" \
+      -H "Content-Type: application/json" \
+      --connect-timeout 20 \
+      --max-time 180 \
+      -D "$hdr" \
+      -o "$body" \
+      -w "%{http_code}" \
+      -d "$payload"
+  )"
+  if [[ "$http_code" != "500" ]] && ! grep -q "do_request_failed" "$body" 2>/dev/null; then
+    break
+  fi
+  if [[ "$attempt" -eq "$max_attempts" ]]; then
+    break
+  fi
+  attempt=$((attempt + 1))
+  sleep 2
+done
+
+if [[ "$http_code" != "200" ]]; then
+  echo "TokenRouter HTTP ${http_code}（已重试至第 ${attempt} 次）。正文未写出。" >&2
+  python3 - <<'PY' "$body" >&2
+import json, sys
+raw = open(sys.argv[1], "r", encoding="utf-8").read()
+print(raw[:500])
+PY
+  exit 1
+fi
+
+python3 - <<'PY' "$body" "$out"
+import json, sys
+data = json.loads(open(sys.argv[1], "r", encoding="utf-8").read())
+text = data["choices"][0]["message"]["content"]
+open(sys.argv[2], "w", encoding="utf-8").write(text)
+print(text)
+PY

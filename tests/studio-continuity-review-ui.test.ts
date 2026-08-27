@@ -126,6 +126,12 @@ describe("P7 连续性 / Review UI 有界 store", () => {
     const source = await readFile(path.join(process.cwd(), relative), "utf8");
     const template = parse(source, { filename: relative }).descriptor.template?.content ?? "";
     expect(template).toContain('data-testid="continuity-next-shot-handoff"');
+    expect(template).toContain('data-testid="studio-review-previous-standing"');
+    expect(template).toContain('data-testid="studio-review-lighting-costume"');
+    expect(template).toContain('data-testid="studio-review-shot-type"');
+    expect(template).toContain('data-testid="studio-review-style-lock"');
+    expect(template).toContain('data-testid="studio-review-beat"');
+    expect(template).toContain("冻结提示词约束");
     expect(template).toContain("末格可复用状态");
     expect(source).toContain("const continuityHandoff = computed");
     expect(source).toContain('new Set<StudioContinuityField>(["position", "facing", "heldObject", "layout", "lighting"])');

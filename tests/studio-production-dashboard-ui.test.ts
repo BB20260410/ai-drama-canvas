@@ -239,6 +239,12 @@ describe("P8 Dashboard UI 源码合同", () => {
     expect(core).toContain("unitGridFreezeBlockNextAction");
     expect(core).toContain('label: "补齐真实连续性状态"');
     expect(core).toContain("unit-grid 冻结预检");
+    expect(core).toContain("persistedUnitGridPackId");
+    expect(core).toContain("getStudioGenerationLatestPlanForUnitGrid");
+    expect(core).toContain("hasCurrentPlan");
+    expect(core).toContain("persistedPlanStatus");
+    expect(core).toContain("retry-superseded");
+    expect(core).toContain("readiness 候选不当冻结包");
     expect(core).toContain('unitGridNext?.code === "continuity-opaque"');
     expect(core).toContain("连续性仍含内部定位；先录入真实视觉状态，禁止冻结或重新派发。");
     expect(core).toContain("unit: StudioDashboardUnitSummary & { revision: number }");

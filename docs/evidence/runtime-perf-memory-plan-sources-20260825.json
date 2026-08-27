@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-plan-sources",
+  "recordedAt": "2026-08-25T13:30:00Z",
+  "plan": "docs/PLAN_运行速度与内存占用长期执行_20260825.md",
+  "externalModels": {
+    "requested": ["qwen", "glm", "doubao", "deepseek", "wenxin", "kimi", "grok", "codex"],
+    "ran": [],
+    "blocked": true,
+    "reason": "Cloud checkout 无 ~/.grok/env.local、无 novel_chat.py、无 grok/codex CLI、环境变量无供应商 Key。禁止伪造互评。",
+    "keysPrinted": false
+  },
+  "subagentsDispatched": [
+    "canvas-render",
+    "sqlite-projection",
+    "electron-startup",
+    "media-cas",
+    "closed-perf-docs",
+    "mcp-import-graph",
+    "redline-skeptic"
+  ],
+  "sourceFacts": {
+    "timelineDefaultFastMode": false,
+    "timelineDefaultFile": "src/core/studio-approved-timeline-projection.ts",
+    "timelinePagesAllEpisodeUnits": true,
+    "productionCallersMostlyFastTrue": true,
+    "unitsHotpathMsClosed": 42.06,
+    "t23FirstCardMsClosed": 1246,
+    "firstScreenJsBytesBefore": 807753,
+    "firstScreenJsBytesAfter": 437455,
+    "dashboardUnitPageLimit": 36,
+    "thumbnailLruDefault": 64,
+    "legacyThumbMaxEntries": 2000,
+    "formalProjectFullScan": false,
+    "mcpStaticCoreClosureApproxFiles": 137,
+    "mcpStaticCoreClosureApproxSourceBytes": 6100000,
+    "mainStaticCoreClosureApproxFiles": 106,
+    "mainStaticCoreClosureApproxSourceBytes": 4600000,
+    "mainIpcDynamicImports": 9,
+    "mcpStartupFastPath": false,
+    "storyStaticMammoth": true,
+    "runtimeGateWatchesTestsAndScripts": true,
+    "rebuildGraphFullReplace": true,
+    "minimapRendersAllStoreNodes": true,
+    "legacyThumbReadsFullFileFirst": true,
+    "reviewSideBySidePrefersMediaUrl": true,
+    "thumbnailLruNotClearedOnProjectSwitch": true,
+    "verifiedFileCacheNotProjectScoped": true
+  },
+  "subagentFold": {
+    "allSevenIdle": true,
+    "canvasRender": { "id": "bc-93821fc7-b2cd-5e96-8b2b-34aa0b87b76f", "into": "§3 S8–S10 / Wave 2-D/E/F" },
+    "sqliteProjection": { "id": "bc-dbb45db6-7895-596b-9747-a17b83c3fd4f", "into": "§3 S1–S5 / Wave 3-C/D" },
+    "electronStartup": { "id": "bc-33fa9f72-4e2a-5f4d-9a88-517061f6bc8c", "into": "Wave 4" },
+    "mediaCas": { "id": "bc-4a7bb3bb-eb9b-5d85-8b72-713f9873dc9d", "into": "§3 M3–M4/M7–M8 / Wave 5" },
+    "closedPerfDocs": { "id": "bc-f2acce87-8368-51fa-804d-e3af06f5092c", "into": "§2 / §7" },
+    "mcpImportGraph": { "id": "bc-5f5879a5-6646-5507-a45a-7ad698c3ebb2", "into": "§3 M2 / Wave 4" },
+    "redlineSkeptic": { "id": "bc-f3e1a439-cf01-5389-a9bf-fe907ace9c6d", "into": "§5 禁止清单" }
+  },
+  "claim": "速度/内存长期计划已按源码与已关账报告立项；七路只读审计已交叉并入；外部模型席本环境未能实调；未改运行时代码；未扫正式工程。"
+}

@@ -42,6 +42,7 @@ export async function computeStudioEpisodeUnitGridCanonical(
   const season = input.season ?? "S1";
   const episode = input.episode ?? "S1E1";
   // 唯一正式投影：当前修订 PASS > 已核验历史 PASS；与画布/UI 同一事实源。
+  // W1-B：日常诊断/连续状态保持显式 fast。full + 耗时只走 report-approved-timeline-full CLI。
   const timeline = await getApprovedTimelineProjection(projectRoot, {
     season,
     episode,

@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "4-novel-analysis-lazy",
+  "recordedAt": "2026-08-25T18:02:00Z",
+  "change": {
+    "kind": "source",
+    "files": [
+      "src/core/novel-analysis-lazy.ts",
+      "src/core/novel-analysis-provider-lazy.ts",
+      "src/core/command-bus.ts",
+      "src/core/codex.ts",
+      "src/mcp/server.ts",
+      "src/main/index.ts"
+    ],
+    "pattern": "withNovelAnalysis / withNovelAnalysisProvider; write cases stay in command-bus",
+    "safetyErrorPath": "loadNovelAnalysisProvider only inside novel-analysis execution catch"
+  },
+  "priorReviews": {
+    "wave4CapImplementation": "PASS bc-8b634a65-1869-50bf-a804-c29dd0d0b7e6",
+    "wave4CapRedline": "PASS bc-d5c2a195-c092-5f5a-9810-6b29a07942b2"
+  },
+  "tests": [
+    "tests/runtime-perf-wave4-novel-analysis-lazy-import.test.ts",
+    "tests/runtime-perf-wave4b-story-adaptation-lazy-import.test.ts",
+    "tests/runtime-perf-wave4-capabilities-deferred-engine.test.ts",
+    "tests/runtime-perf-wave4a-editor-lazy-import.test.ts",
+    "tests/source-module-boundaries.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "directedLinux": { "passed": 24, "files": 5, "platform": "linux" },
+    "commandBusOwner": "NOT_RUN Darwin dirfd"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "MCP / Main / command-bus / codex 启动路径不再静态拉 novel-analysis.js / novel-analysis-provider.js。写 case 未搬家。调用对应工具仍会加载整图。",
+  "residual": [
+    "command-bus 仍静态拉 ledger / generation",
+    "doctor 调用小说分析检查时仍会加载整图",
+    "禁止写成「连上 Agent 永不加载小说分析」或「运行速度已关账」"
+  ]
+}

@@ -4,7 +4,7 @@ import { access, link, lstat, open, realpath, rm } from "node:fs/promises";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { studioSqliteBusyTimeoutMs } from "./studio-sqlite-busy.js";
-import sharp from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import { inspectManagedProject } from "./managed-project.js";
 import { MEDIA_WEIGHTS, mediaStageTimeout, runMediaProcess } from "./media-runtime.js";
 import { getStudioMedia, type StudioMediaKind } from "./material-studio.js";
@@ -482,12 +482,12 @@ async function encodeWebpFromPng(
   expected: { width?: number; height?: number; maxWidth: number; maxHeight: number },
 ): Promise<void> {
   try {
-    await sharp(pngPath, {
+    await (await loadSharpDefault())(pngPath, {
       failOn: "error",
       limitInputPixels: 1_000_000,
       sequentialRead: true,
     }).webp({ quality: 82, effort: 4, smartSubsample: true }).toFile(webpPath);
-    const metadata = await sharp(webpPath, { failOn: "error", limitInputPixels: 1_000_000 }).metadata();
+    const metadata = await (await loadSharpDefault())(webpPath, { failOn: "error", limitInputPixels: 1_000_000 }).metadata();
     if (metadata.format !== "webp"
       || typeof metadata.width !== "number" || typeof metadata.height !== "number"
       || metadata.width < 1 || metadata.height < 1

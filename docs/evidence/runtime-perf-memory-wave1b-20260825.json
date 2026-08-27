@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "1-B",
+  "recordedAt": "2026-08-25T14:20:00Z",
+  "change": {
+    "projectionFields": ["fastMode", "durationMs"],
+    "cli": "scripts/report-approved-timeline-full.ts",
+    "cliExplicitFastMode": false,
+    "dailyDiagnosticsRemainFast": true,
+    "canonicalRemainsFast": true,
+    "officialProjectRefused": true
+  },
+  "verification": {
+    "typecheckApp": "PASS",
+    "linuxTests": {
+      "files": [
+        "tests/resolve-approved-timeline-fast-mode.test.ts",
+        "tests/report-approved-timeline-full.test.ts"
+      ],
+      "passed": 6
+    },
+    "p7FixtureTests": "Darwin dirfd only"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W1-B：full 仅显式 CLI；投影返回 durationMs。日常刷新/诊断不绑 full。"
+}

@@ -71,6 +71,79 @@ describe("projectStudioUnitGridNextAction", () => {
     expect(p.allowNewUnitGridRun).toBe(false);
   });
 
+  it("已落盘 pack 无计划时 ready-to-plan，不直接派发", () => {
+    const p = projectStudioUnitGridNextAction({
+      hasCurrentPack: true,
+      hasCurrentPlan: false,
+    });
+    expect(p.phase).toBe("ready-to-plan");
+    expect(p.code).toBe("create-unit-grid-plan");
+    expect(p.label).toContain("不派发");
+    expect(p.forbidPanelGenerate).toBe(true);
+    expect(p.allowNewUnitGridRun).toBe(true);
+    const next = unitGridProjectionToDashboardNextAction("project-test", "S1E01-U01", p);
+    expect(next.code).toBe("create-unit-grid-plan");
+    expect(next.requiresWrite).toBe(true);
+    expect(next.reason).toMatch(/禁止 panel/);
+  });
+
+  it("未声明 hasCurrentPlan 时保持有包即派发", () => {
+    const p = projectStudioUnitGridNextAction({ hasCurrentPack: true });
+    expect(p.phase).toBe("ready-to-dispatch");
+    expect(p.code).toBe("dispatch-unit-grid");
+  });
+
+  it("有计划时按节点状态区分 wait / retry / Review，inspect 优先", () => {
+    expect(projectStudioUnitGridNextAction({
+      hasCurrentPack: true,
+      hasCurrentPlan: true,
+      persistedPlanStatus: "dispatched",
+    })).toMatchObject({
+      phase: "in-flight",
+      code: "wait-or-reconcile-unit-grid-run",
+      allowNewUnitGridRun: false,
+      forbidPanelGenerate: true,
+    });
+    expect(projectStudioUnitGridNextAction({
+      hasCurrentPack: true,
+      hasCurrentPlan: true,
+      persistedPlanStatus: "failed",
+    })).toMatchObject({
+      phase: "ready-to-retry",
+      code: "retry-unit-grid-plan-nodes",
+      allowNewUnitGridRun: false,
+    });
+    expect(projectStudioUnitGridNextAction({
+      hasCurrentPack: true,
+      hasCurrentPlan: true,
+      persistedPlanStatus: "cancelled",
+    }).label).toContain("不重试、不派发");
+    expect(projectStudioUnitGridNextAction({
+      hasCurrentPack: true,
+      hasCurrentPlan: true,
+      persistedPlanStatus: "succeeded",
+    })).toMatchObject({
+      phase: "pending-review",
+      code: "submit-unit-grid-review",
+    });
+    expect(projectStudioUnitGridNextAction({
+      hasCurrentPack: true,
+      hasCurrentPlan: true,
+      persistedPlanStatus: "planned",
+    }).code).toBe("dispatch-unit-grid");
+    expect(projectStudioUnitGridNextAction({
+      hasCurrentPack: true,
+      hasActiveRun: true,
+      persistedPlanStatus: "failed",
+    }).code).toBe("wait-or-reconcile-unit-grid-run");
+    expect(projectStudioUnitGridNextAction({
+      hasCurrentPack: true,
+      pairComplete: true,
+      reviewDecision: "pending",
+      persistedPlanStatus: "failed",
+    }).code).toBe("submit-unit-grid-review");
+  });
+
   it("Dashboard 映射保留 unit locator 且 reason 禁止 panel 生图", () => {
     const projection = projectStudioUnitGridNextAction({
       hasCurrentPack: true,

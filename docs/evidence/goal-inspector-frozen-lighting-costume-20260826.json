@@ -1,0 +1,43 @@
+{
+  "id": "goal-inspector-frozen-lighting-costume-20260826",
+  "kind": "inspector-control-review-frozen-lighting-costume-readonly",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T19:19:30.000Z",
+  "scope": "Canvas inspector, generation control, and continuity review expose 光线（宫格覆盖） / 服装（宫格覆盖） parsed from the already-loaded frozen renderedPrompt. unit-grid requires panelId and does not guess the first panel. Historical packs without those lines stay hidden. No dashboard projection field added. No new freeze prompt line. Same pack fetch as previousStanding; no extra IO. Not BindingSet; does not dispatch.",
+  "invariants": {
+    "parsesFrozenOverlayLinesOnly": true,
+    "unitGridRequiresPanelId": true,
+    "historicalPacksWithoutOverlayStayHidden": true,
+    "doesNotChangeDashboardProjection": true,
+    "doesNotWritePreviousLightingIntoFrozenPrompt": true,
+    "reusesExistingFrozenPackFetch": true,
+    "doesNotDispatch": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/material-studio-ui-contract.test.ts",
+        "tests/studio-storyboard-wizard.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-continuity-review-ui.test.ts",
+        "tests/studio-trace-ui.test.ts"
+      ],
+      "result": "6 files PASS; wizard 5/6 PASS; 1 Linux dirfd failure is pre-existing createManagedProject fixture, not this slice"
+    },
+    "commit": "dad9285"
+  },
+  "notClaimed": [
+    "real-generation constraint evidence",
+    "lighting or costume fully solved",
+    "unit-lock lighting on canvas inspector",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "Electron GUI click",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

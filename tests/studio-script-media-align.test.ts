@@ -1,8 +1,47 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
+  attachAlignRowConsistencyPeeks,
+  formatAlignCheckpointLine,
+  formatAlignWriteLeaseLine,
   matchOutlineAnchorsForUnit,
   SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION,
+  type ScriptMediaAlignRow,
 } from "../src/core/studio-script-media-align.js";
+import {
+  indexStudioConsistencyPeek,
+  peekStudioConsistencyVerdictByRunId,
+  type ConsistencyEvaluationResult,
+} from "../src/core/studio-consistency-evaluator.js";
+
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+function alignRow(partial: Partial<ScriptMediaAlignRow> & Pick<ScriptMediaAlignRow, "unitId" | "sequence">): ScriptMediaAlignRow {
+  return {
+    title: partial.unitId,
+    formalCommitted: false,
+    isEarliest: false,
+    reviewDecision: null,
+    scriptRevisionId: null,
+    panelCount: 2,
+    coveredPanelCount: 2,
+    missingPanelCount: 0,
+    status: "covered",
+    rawSha256: null,
+    labeledSha256: null,
+    packId: null,
+    packFingerprint: null,
+    generationRunId: null,
+    trace: { byPack: null, byRun: null },
+    sourceSpans: [],
+    outlineAnchors: [],
+    consistencyPeek: { status: "unevaluated" },
+    panels: [],
+    ...partial,
+  };
+}
 
 describe("studio-script-media-align", () => {
   it("matches outline headings containing unit id", () => {
@@ -38,5 +77,146 @@ describe("studio-script-media-align", () => {
 
   it("schema frozen", () => {
     expect(SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION).toBe(1);
+  });
+
+  it("attachAlignRowConsistencyPeeks 只挂缓存四态，未命中为未评估", () => {
+    const rows = attachAlignRowConsistencyPeeks(
+      [
+        alignRow({ unitId: "U1", sequence: 1, generationRunId: "run-hit" }),
+        alignRow({ unitId: "U2", sequence: 2, generationRunId: "run-miss" }),
+        alignRow({ unitId: "U3", sequence: 3 }),
+      ],
+      new Map([["run-hit", "needs-review"]]),
+    );
+    expect(rows[0]?.consistencyPeek).toEqual({ status: "cached", verdict: "needs-review" });
+    expect(rows[1]?.consistencyPeek).toEqual({ status: "unevaluated" });
+    expect(rows[2]?.consistencyPeek).toEqual({ status: "unevaluated" });
+    const withPanels = attachAlignRowConsistencyPeeks(
+      [alignRow({
+        unitId: "U4",
+        sequence: 4,
+        generationRunId: "run-unit",
+        panels: [{
+          panelIndex: 2,
+          panelId: "p2",
+          title: "g2",
+          sourceSpans: [],
+          packId: null,
+          packFingerprint: null,
+          rawSha256: "raw2",
+          labeledSha256: null,
+          generationRunId: "run-panel",
+          hasMedia: true,
+          shotComposition: "中景",
+          visualAction: "停住",
+          filmingMethod: "固定",
+          sceneLighting: "室内",
+          costumeState: "",
+          shotType: "original",
+          assetMentions: [],
+          previousHandoff: null,
+          consistencyPeek: { status: "unevaluated" },
+        }],
+      })],
+      new Map([["run-panel", "drifted"], ["run-unit", "consistent"]]),
+    );
+    expect(withPanels[0]?.consistencyPeek).toEqual({ status: "cached", verdict: "consistent" });
+    expect(withPanels[0]?.panels[0]?.consistencyPeek).toEqual({ status: "cached", verdict: "drifted" });
+  });
+
+  it("runId peek 不跑像素，瞬态结果不编入", () => {
+    const cached: ConsistencyEvaluationResult = {
+      schemaVersion: 1,
+      kind: "studio-consistency-evaluation",
+      verdict: "drifted",
+      assets: [],
+      evidence: {
+        projectId: "p",
+        generationRunId: "run-align-peek",
+        resultSha256: "aa",
+        referenceSha256: [],
+        assetVersionIds: [],
+        packFingerprint: "fp",
+        evaluatorVersion: "test",
+        configSha: "cfg",
+      },
+      computedAt: "2026-08-26T17:51:00.000Z",
+      durationMs: 1,
+      frameNotes: [],
+    };
+    indexStudioConsistencyPeek(cached);
+    expect(peekStudioConsistencyVerdictByRunId("run-align-peek")).toBe("drifted");
+    indexStudioConsistencyPeek({ ...cached, evidence: { ...cached.evidence, generationRunId: "run-transient" }, transient: true, verdict: "not-checkable" });
+    expect(peekStudioConsistencyVerdictByRunId("run-transient")).toBeUndefined();
+    expect(peekStudioConsistencyVerdictByRunId("run-never")).toBeUndefined();
+  });
+});
+
+describe("对照行四态 peek 源码合同", () => {
+  it("align 动态 import peek，不调用 evaluate，不自动 Review PASS", () => {
+    const align = readFileSync(path.join(repoRoot, "src/core/studio-script-media-align.ts"), "utf8");
+    const vue = readFileSync(path.join(repoRoot, "src/renderer/src/components/ScriptMediaAlignView.vue"), "utf8");
+    expect(align).toContain('import("./studio-consistency-evaluator.js")');
+    expect(align).toContain("peekStudioConsistencyVerdictByRunId");
+    expect(align).not.toContain("evaluateStudioConsistency");
+    expect(align).not.toContain("evaluateStudioReviewTargetConsistency");
+    expect(align).not.toMatch(/^import \{[^}]*peekStudioConsistencyVerdictByRunId/mu);
+    expect(vue).toContain("align-peek-");
+    expect(vue).toContain("未评估");
+    expect(vue).toContain("peekLabel");
+    expect(align).toContain("panels: u.panels");
+    expect(vue).toContain("align-panel-list");
+    expect(vue).toContain("align-panel-peek");
+    expect(vue).toContain("span-media-hit-peek");
+    expect(vue).toContain("ssl5-focus-peek");
+    expect(align).toContain("row.panels.map((panel) => panel.generationRunId)");
+    expect(align).toContain("earliestCode");
+    expect(align).toContain("earliestLabel");
+    expect(align).toContain("earliestReason");
+    expect(align).toContain("formatAlignCheckpointLine");
+    expect(align).toContain("earliest.checkpoint");
+    expect(align).toContain("SCRIPT_MEDIA_ALIGN_SCHEMA_VERSION = 1");
+    expect(align).toContain("slots.find((slot) => slot.unitId === earliest.earliestUnitId)");
+    expect(vue).toContain("align-checkpoint-gate");
+    expect(vue).toContain("align-review-");
+    expect(vue).toContain("ssl5-checkpoint-next");
+    expect(align).toContain("formatAlignWriteLeaseLine");
+    expect(align).toContain("earliest.writeLease");
+    expect(align).toContain("missingReport");
+    expect(vue).toContain("align-write-lease");
+    expect(vue).toContain("ssl5-write-lease");
+    expect(vue).toContain("align-missing-report");
+    expect(vue).toContain("align-missing-report-copy");
+    expect(vue).toContain("copyMissingReport");
+    expect(align).not.toContain("studio-project-write-lease");
+  });
+
+  it("formatAlignCheckpointLine 只读投影六图闸，未投影 ≠ 已放行", () => {
+    expect(formatAlignCheckpointLine(null)).toBe("对照板未投影六图闸");
+    expect(formatAlignCheckpointLine({ newSlotDispatchAllowed: true })).toBe("六图闸已放行新槽");
+    expect(formatAlignCheckpointLine({ newSlotDispatchAllowed: false })).toBe(
+      "六图闸未放行，先完成停检/Review（不派发）",
+    );
+    expect(formatAlignCheckpointLine({ newSlotDispatchAllowed: false, blockingBatchNumber: 3 })).toBe(
+      "六图闸未放行（batch 3），先完成停检/Review（不派发）",
+    );
+  });
+
+  it("formatAlignWriteLeaseLine 只读投影写租约，未投影 ≠ 已持有，不暴露 token", () => {
+    expect(formatAlignWriteLeaseLine(null)).toBe("对照板未投影写租约");
+    expect(formatAlignWriteLeaseLine({ held: true, holderId: "agent-a", denialHint: null })).toBe(
+      "写租约由 agent-a 持有；无该租约禁止写命令（不派发）",
+    );
+    expect(formatAlignWriteLeaseLine({ held: true, holderId: null, denialHint: null })).toBe(
+      "写租约已被持有；无该租约禁止写命令（不派发）",
+    );
+    expect(formatAlignWriteLeaseLine({
+      held: false,
+      holderId: null,
+      denialHint: "须先 acquire_studio_project_write_lease",
+    })).toBe("须先 acquire_studio_project_write_lease");
+    expect(formatAlignWriteLeaseLine({ held: false, holderId: null, denialHint: null })).toBe(
+      "写租约未持有；写命令前须 acquire-lease（不派发）",
+    );
   });
 });

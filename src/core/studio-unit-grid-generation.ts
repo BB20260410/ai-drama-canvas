@@ -18,6 +18,7 @@ import {
   StudioGenerationFreezeError,
   assertStudioGenerationFreezePackCurrent,
   buildStudioGenerationFreezePackForUnitGridReadEpoch,
+  formatPreviousStandingPromptLine,
   type StudioCodexControlReference,
   type StudioFrozenAssetReference,
   type StudioGenerationFreezeErrorCode,
@@ -1204,10 +1205,21 @@ function renderUnitGridPrompt(
   }
   for (const [offset, pack] of panelPacks.entries()) {
     const instruction = pack.panel;
+    const previous = offset > 0 ? panelPacks[offset - 1] : undefined;
+    const previousLine = previous
+      ? formatPreviousStandingPromptLine({
+        panelIndex: previous.target.panelIndex,
+        panelId: previous.target.panelId,
+        shotComposition: previous.panel.shotComposition,
+        visualAction: previous.panel.visualAction,
+        filmingMethod: previous.panel.filmingMethod,
+      })
+      : null;
     lines.push(
       `第${offset + 1}格（${pack.target.unitLocalStartSeconds}–${pack.target.unitLocalEndSeconds}秒，仅作布局指令）：${instruction.title}。${instruction.visualAction}`,
       `第${offset + 1}格景别与构图：${instruction.shotComposition}`,
       `第${offset + 1}格拍摄方式：${instruction.filmingMethod}`,
+      ...(previousLine ? [`第${offset + 1}格${previousLine}`] : []),
       characterCastMatrix(pack, offset + 1),
       ...screenDirectionLocks(pack, offset + 1),
       `第${offset + 1}格冻结提示词：${modelVisualPromptBody(pack.promptRevision.body)}`,

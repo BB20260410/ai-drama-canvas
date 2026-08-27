@@ -67,6 +67,36 @@ import {
   memoStudioUnitGridRead,
   verifyStudioUnitGridMediaOnce,
 } from "./studio-unit-grid-read-epoch.js";
+import {
+  FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
+  CHARACTER_BACK_REFERENCE_TOOL_NOTE,
+  EXTENSION_SHOT_TYPE_TOOL_NOTE,
+  PROP_BACK_REFERENCE_TOOL_NOTE,
+  SCENE_BACK_REFERENCE_TOOL_NOTE,
+  UNIT_BEAT_TOOL_NOTE,
+  STYLE_LOCK_TOOL_NOTE,
+  formatFrozenStyleLockReadonlyLine,
+  formatPreviousStandingPromptLine,
+  parseFrozenPanelCostumeFromRenderedPrompt,
+  parseFrozenPanelLightingFromRenderedPrompt,
+  parsePreviousStandingFromRenderedPrompt,
+  studioAgentImagegenBriefConstraintLines,
+  styleLockRefsFromAnyFrozenPack,
+  pickPreviousPanelStanding,
+  type StudioPanelStandingHandoff,
+} from "./studio-panel-standing.js";
+
+export {
+  formatPreviousStandingPromptLine,
+  parsePreviousStandingFromRenderedPrompt,
+  pickPreviousPanelStanding,
+  previousStandingFromAnyFrozenPack,
+  previousStandingFromFrozenRenderedPrompt,
+  formatPreviousStandingReadonlyLine,
+  formatUnitLockPreviousStandingLine,
+  UNIT_GRID_PREVIOUS_STANDING_TOOL_NOTE,
+  type StudioPanelStandingHandoff,
+} from "./studio-panel-standing.js";
 
 const SHA256_PATTERN = /^[a-f0-9]{64}$/u;
 /** 内部账本定位串不是可供模型执行的视觉状态，禁止被当作已解析连续性。 */
@@ -1641,7 +1671,9 @@ function renderStudioPrompt(input: {
   assets: StudioFrozenAssetReference[];
   forbiddenAssets: StudioFrozenForbiddenAsset[];
   layout: StudioCodexModelPayload["layout"];
+  previousStanding?: StudioPanelStandingHandoff | null;
 }): string {
+  const previousLine = formatPreviousStandingPromptLine(input.previousStanding);
   const lines = [
     input.layout === "cinematic-wide"
       ? "只生成一张电影宽银幕横幅、电影写实的 AI 短剧分镜图；保持横屏，不要竖屏、拼图、分屏、字幕、水印、界面文字或现代物。"
@@ -1649,6 +1681,7 @@ function renderStudioPrompt(input: {
     `宫格画面：${input.panel.title}。${input.panel.visualAction}`,
     `景别与构图：${input.panel.shotComposition}`,
     `拍摄方式：${input.panel.filmingMethod}`,
+    ...(previousLine ? [previousLine] : []),
     `本格冻结提示词：${input.promptRevision.body}`,
     `镜头类型：${input.panel.shotType === "extension" ? "扩写延续（保持与前一格连续，不重新起镜）" : "原镜"}`,
   ];
@@ -1723,6 +1756,7 @@ function buildRequest(input: {
   previousApprovedRaw?: StudioPreviousApprovedRawSnapshot;
   assets: StudioFrozenAssetReference[];
   forbiddenAssets: StudioFrozenForbiddenAsset[];
+  previousStanding?: StudioPanelStandingHandoff | null;
 }): StudioCodexGenerationRequest {
   const layout = inferStudioPanelImageLayout({
     visualAction: input.panel.visualAction,
@@ -1732,7 +1766,11 @@ function buildRequest(input: {
   const modelPayload: StudioCodexModelPayload = {
     exactlyOneImage: true,
     layout,
-    renderedPrompt: renderStudioPrompt({ ...input, layout }),
+    renderedPrompt: renderStudioPrompt({
+      ...input,
+      layout,
+      ...(input.previousStanding ? { previousStanding: input.previousStanding } : {}),
+    }),
     target: input.target,
     panel: input.panel,
     prompt: {
@@ -2360,6 +2398,7 @@ async function buildFreezePackInternal(
   const scriptRevision = freezeTextRevision(snapshot.scriptRevision);
   const promptRevision = freezePromptRevision(panel.promptRevision);
   const instruction = panelInstruction(panel);
+  const previousStanding = pickPreviousPanelStanding(snapshot.panels, panel.index);
   const request = buildRequest({
     projectId: shell.project.id,
     target,
@@ -2372,6 +2411,7 @@ async function buildFreezePackInternal(
     ...(previousApprovedRaw ? { previousApprovedRaw } : {}),
     assets,
     forbiddenAssets,
+    ...(previousStanding ? { previousStanding } : {}),
   });
   const semantic: Omit<StudioGenerationFreezePack, "id" | "fingerprint"> = {
     schemaVersion: 4,
@@ -2651,6 +2691,17 @@ export interface StudioAgentImagegenBrief {
   exactlyOneImage: true;
   maxCalls: 1;
   renderedPrompt: string;
+  /** 从 renderedPrompt 还原；历史包无前镜行则为 null。 */
+  previousStanding: StudioPanelStandingHandoff | null;
+  /** 从 renderedPrompt 还原；历史包无宫格覆盖行则为 null。 */
+  frozenPanelLighting: string | null;
+  frozenPanelCostume: string | null;
+  /** 从该包 renderedPrompt / panel.shotType 还原；无扩写/原镜则为 null。 */
+  shotTypeLine: string | null;
+  /** 从该包 controlReferences / assets 的 category=style 还原；无风格控制参考则为 null。 */
+  styleLockLine: string | null;
+  /** 从该包 target 起止秒还原；无时长则为 null。不写新冻结行。 */
+  beatLine: string | null;
   controlReferences: Array<{
     assetId: string;
     category: string;
@@ -2704,6 +2755,14 @@ export function buildStudioAgentImagegenBrief(
         "严格只调用一次生图工具，只产出一张图。",
         "人物/场景/道具/风格只能来自冻结 pack 的 controlReferences 与 modelPayload。",
         "参考图本地路径只读 pack 操作返回的 request.controlReferences.localPath（已 CAS/SHA 校验）。",
+        "若 previousStanding 或 renderedPrompt 含「前镜交接」，必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。",
+        FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
+        SCENE_BACK_REFERENCE_TOOL_NOTE,
+        PROP_BACK_REFERENCE_TOOL_NOTE,
+        CHARACTER_BACK_REFERENCE_TOOL_NOTE,
+        EXTENSION_SHOT_TYPE_TOOL_NOTE,
+        UNIT_BEAT_TOOL_NOTE,
+        STYLE_LOCK_TOOL_NOTE,
         "禁止浏览器、Artlist、ComfyUI、网页自动化旁路。",
       ],
     }
@@ -2715,6 +2774,14 @@ export function buildStudioAgentImagegenBrief(
         `严格只生成一张${effectiveStudioPanelImageLayout(pack.request.modelPayload) === "cinematic-wide" ? "电影宽银幕横幅" : "9:16 竖屏"}分镜；有权威参考时用 image_edit 绑定角色/场景/道具/风格。`,
         "参考图 localPath 只来自 pack 操作的 verified controlReferences，不使用 brief 内路径。",
         "不得替换冻结包外的身份；不得把字幕/分屏画进 raw。",
+        "若 previousStanding 或 renderedPrompt 含「前镜交接」，必须从该站位连续起拍，禁止重起镜、镜像或改空间布局。",
+        FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
+        SCENE_BACK_REFERENCE_TOOL_NOTE,
+        PROP_BACK_REFERENCE_TOOL_NOTE,
+        CHARACTER_BACK_REFERENCE_TOOL_NOTE,
+        EXTENSION_SHOT_TYPE_TOOL_NOTE,
+        UNIT_BEAT_TOOL_NOTE,
+        STYLE_LOCK_TOOL_NOTE,
         "禁止浏览器、Artlist、网页自动化旁路。",
       ],
     };
@@ -2731,6 +2798,11 @@ export function buildStudioAgentImagegenBrief(
     exactlyOneImage: true,
     maxCalls: 1,
     renderedPrompt: pack.request.modelPayload.renderedPrompt,
+    previousStanding: parsePreviousStandingFromRenderedPrompt(pack.request.modelPayload.renderedPrompt),
+    frozenPanelLighting: parseFrozenPanelLightingFromRenderedPrompt(pack.request.modelPayload.renderedPrompt),
+    frozenPanelCostume: parseFrozenPanelCostumeFromRenderedPrompt(pack.request.modelPayload.renderedPrompt),
+    ...studioAgentImagegenBriefConstraintLines(pack),
+    styleLockLine: formatFrozenStyleLockReadonlyLine(styleLockRefsFromAnyFrozenPack(pack)),
     controlReferences: pack.request.controlReferences.map((ref) => ({
       assetId: ref.assetId,
       category: ref.category,

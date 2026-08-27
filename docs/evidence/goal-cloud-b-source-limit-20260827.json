@@ -1,0 +1,59 @@
+{
+  "id": "goal-cloud-b-source-limit-20260827",
+  "kind": "cloud-b-source-limit-stop",
+  "conclusion": "STOP",
+  "createdAt": "2026-08-27T01:26:00.000Z",
+  "scope": "Cloud Linux VM reached the B-track source-contract limit for canvas↔generation fit. Remaining north-star gates need owner Mac + official project. This is not Goal complete, not L5, not runtime-speed closed.",
+  "cloudCompleted": {
+    "ssl5ReadonlyPlan": true,
+    "alignReaderTraceConsistencyPeek": true,
+    "wizardCategoryUnresolvedScaffoldHomologyMissingFailClosed": true,
+    "nextAlignmentWaitRetryReview": true,
+    "checkpointLeaseUnexpectedHint": true
+  },
+  "remainingOwnerOnly": [
+    "installed T23",
+    "list GUI probe aicanvas-studio://media/* = 0",
+    "P7 owner bounded对照",
+    "real Codex generation constraint loop",
+    "SSL-5 one-click earliest real gen",
+    "SSL-6 isolation-project product-pack verification",
+    "SSL-5 bond-loop scaffold into frozen prompt (deliberately not written in Cloud)"
+  ],
+  "deliberatelyNotDoingInCloud": [
+    "clone more director banners / peek / lease / revisionImpact hints",
+    "write videoPromptScaffold into formatWizardPromptBody",
+    "clone another wizard validator",
+    "wire retry revisionImpact hint",
+    "half-extract rebuildGraph",
+    "change earliest non-focus slot pack reads",
+    "change T4 / T5 / dashboard projection / getStudioTrace selector"
+  ],
+  "invariants": {
+    "goalNotComplete": true,
+    "fitBandNotL5": true,
+    "runtimeSpeedNotClosed": true,
+    "doesNotForgeT23": true,
+    "doesNotForgeP7": true,
+    "doesNotForgeRealGeneration": true
+  },
+  "proof": {
+    "head": "e63be13",
+    "lastImplementation": "1dee23f",
+    "typecheckAppLastKnife": "PASS",
+    "targetedTestsLastKnife": "15 files / 239 tests PASS",
+    "linuxDirfdNote": "wizard source-range / createManagedProject still need Darwin dirfd. Not claimed as Cloud gate."
+  },
+  "notClaimed": [
+    "Goal complete",
+    "L5",
+    "100% fit",
+    "runtime speed closed",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "SSL-5 bond-loop scaffold in frozen prompt",
+    "SSL-6 product-pack close"
+  ]
+}

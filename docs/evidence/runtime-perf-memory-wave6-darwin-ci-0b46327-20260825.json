@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "6-darwin-ci",
+  "recordedAt": "2026-08-25T18:33:00Z",
+  "change": {
+    "kind": "verification-only",
+    "sourceCodeChanged": false,
+    "note": "GitHub Actions macos-latest CI check 在 0b46327（W4 settings 薄模块，含 Wave 1–6 主落地）success。HEAD 之后还有 W5-E evict / 写回拦截，其 CI 仍 queued。"
+  },
+  "verification": {
+    "platform": "macos-latest",
+    "runId": 32881922045,
+    "url": "https://github.com/BB20260410/ai-drama-canvas/actions/runs/32881922045",
+    "headSha": "0b46327372de03ed5ae1076911856c40e8805440",
+    "conclusion": "success",
+    "job": "check",
+    "includes": "typecheck + fast tests (CI workflow)",
+    "installedT23": "NOT_RUN",
+    "listFlipProbe": "NOT_RUN",
+    "w2cP7": "covered by macos dirfd in this CI SHA if those tests are in fast partition"
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "overwrote20260811Final": false
+  },
+  "claim": "W6 真实测试：macos-latest CI check 在 0b46327 SUCCESS。不是安装版 T23。禁止写「运行速度已关账」或「T23 已复测」。",
+  "residual": [
+    "HEAD ba0e4ab 的 CI 仍 queued（含 W5-E Main evict 与写回拦截）",
+    "安装版 T23 / 列表翻页探针仍 NOT_RUN",
+    "本 Cloud 无 /Applications/AI 漫剧画布.app"
+  ]
+}

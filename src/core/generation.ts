@@ -6,7 +6,7 @@ import path from "node:path";
 import { Readable, Transform, Writable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { promisify } from "node:util";
-import sharp from "sharp";
+import { loadSharpDefault } from "./sharp-lazy.js";
 import { appendEvent, getSidecarPaths, readJson, readTaskPack, writeJsonAtomic } from "./sidecar.js";
 import { getProjectIndex, scanAndPersist, updateStatusOverridesBatch } from "./service.js";
 import { BROWSER_PREFLIGHT_BLOCKER_CODES } from "./types.js";
@@ -3279,7 +3279,7 @@ async function renderLabeledCompanion(
   rawPath: string,
   targetPath: string,
 ): Promise<{ size: number; magic: string; sha256: string }> {
-  const metadata = await sharp(rawPath, { failOn: "error" }).metadata();
+  const metadata = await (await loadSharpDefault())(rawPath, { failOn: "error" }).metadata();
   if (!metadata.width || !metadata.height) throw new Error("生成结果无法解码，不能派生 labeled 检查版。");
   const bannerHeight = Math.max(54, Math.min(110, Math.round(metadata.height * 0.075)));
   const fontSize = Math.max(16, Math.min(32, Math.round(metadata.width / 28)));
@@ -3287,7 +3287,7 @@ async function renderLabeledCompanion(
   const svg = Buffer.from(`<svg width="${metadata.width}" height="${bannerHeight}" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="rgba(8,9,7,0.82)"/><text x="${Math.round(fontSize * 0.65)}" y="${Math.round(bannerHeight * 0.64)}" fill="#e6bd5b" font-family="PingFang SC,Arial,sans-serif" font-size="${fontSize}">${label}</text></svg>`);
   await mkdir(path.dirname(targetPath), { recursive: true });
   const temporary = `${targetPath}.${process.pid}.${Date.now()}.tmp.png`;
-  await sharp(rawPath, { failOn: "error" }).composite([{ input: svg, top: 0, left: 0 }]).png().toFile(temporary);
+  await (await loadSharpDefault())(rawPath, { failOn: "error" }).composite([{ input: svg, top: 0, left: 0 }]).png().toFile(temporary);
   const previousSha256 = job.resultSha256;
   const previousMagic = job.resultMagic;
   try {
@@ -3300,10 +3300,10 @@ async function renderLabeledCompanion(
     }
     const existing = await stat(targetPath);
     if (existing.size <= 0) throw new PublicationOutputConflict("labeled 目标已存在但为空，拒绝静默覆盖；保留任务等待人工核对。 ");
-    const existingMetadata = await sharp(targetPath, { failOn: "error" }).metadata();
+    const existingMetadata = await (await loadSharpDefault())(targetPath, { failOn: "error" }).metadata();
     if (existingMetadata.width !== metadata.width || existingMetadata.height !== metadata.height) throw new PublicationOutputConflict("labeled 目标尺寸与当前生成结果不一致，拒绝静默接纳或覆盖。 ");
     await pipeline(
-      sharp(targetPath, { failOn: "error" }).raw(),
+      (await loadSharpDefault())(targetPath, { failOn: "error" }).raw(),
       new Writable({ write(_chunk, _encoding, callback) { callback(); } }),
     );
     if (await sha256File(targetPath) !== expectedSha256) throw new PublicationOutputConflict("labeled 目标已存在且内容不是当前 raw 的确定性检查版，拒绝覆盖；保留任务等待人工核对。 ");
@@ -3347,8 +3347,8 @@ async function prepareIsolatedSubagentBundle(
     throw new PublicationOutputConflict("隔离 labeled 与已持久化 companion receipt 不一致。");
   }
   const [rawMetadata, companionMetadata] = await Promise.all([
-    sharp(output.isolatedPath, { failOn: "error" }).metadata(),
-    sharp(companionPath, { failOn: "error" }).metadata(),
+    (await loadSharpDefault())(output.isolatedPath, { failOn: "error" }).metadata(),
+    (await loadSharpDefault())(companionPath, { failOn: "error" }).metadata(),
   ]);
   if (!rawMetadata.width || !rawMetadata.height || rawMetadata.width !== companionMetadata.width || rawMetadata.height !== companionMetadata.height) {
     throw new PublicationOutputConflict("隔离 raw/labeled 尺寸不一致。");
@@ -3454,7 +3454,7 @@ async function inspectGeneratedResult(job: GenerationJob, filePath: string): Pro
 async function validateGeneratedResultFile(job: GenerationJob, filePath: string): Promise<{ size: number; magic: string; sha256: string }> {
   const inspected = await inspectGeneratedResult(job, filePath);
   if (job.kind === "image") {
-    const metadata = await sharp(filePath, { failOn: "error" }).metadata();
+    const metadata = await (await loadSharpDefault())(filePath, { failOn: "error" }).metadata();
     if (!metadata.width || !metadata.height) throw new Error("生成图片无法解码或缺少有效尺寸。 ");
     if (inspected.size < MIN_IMAGE_DOWNLOAD_BYTES || metadata.width < MIN_IMAGE_DIMENSION || metadata.height < MIN_IMAGE_DIMENSION) {
       throw new Error(`生成图片尺寸或体积过小（${metadata.width}×${metadata.height} / ${inspected.size} bytes），疑似无效或占位图。`);
@@ -3469,14 +3469,14 @@ async function validateGeneratedResultFile(job: GenerationJob, filePath: string)
       }
     }
     await pipeline(
-      sharp(filePath, { failOn: "error" }).raw(),
+      (await loadSharpDefault())(filePath, { failOn: "error" }).raw(),
       new Writable({ write(_chunk, _encoding, callback) { callback(); } }),
     );
     if (["asset", "fusion_frame", "fusion_storyboard_panel"].includes(job.purpose ?? "")) {
       if (inspected.size < MIN_FORMAL_IMAGE_DOWNLOAD_BYTES || metadata.width < MIN_FORMAL_IMAGE_WIDTH || metadata.height < MIN_FORMAL_IMAGE_HEIGHT) {
         throw new Error(`正式第三季图片尺寸或体积不足（${metadata.width}×${metadata.height} / ${inspected.size} bytes），拒绝作为生产资产发布。`);
       }
-      const statistics = await sharp(filePath, { failOn: "error" }).stats();
+      const statistics = await (await loadSharpDefault())(filePath, { failOn: "error" }).stats();
       const maximumDeviation = Math.max(...statistics.channels.slice(0, 3).map((channel) => channel.stdev));
       if (!Number.isFinite(statistics.entropy) || statistics.entropy < 0.02 || !Number.isFinite(maximumDeviation) || maximumDeviation < 2) {
         throw new Error("正式第三季图片像素变化近乎为空，疑似纯色或占位图，拒绝发布。");

@@ -1,0 +1,52 @@
+{
+  "id": "goal-ssl5-checkpoint-gate-20260826",
+  "kind": "ssl5-checkpoint-gate",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T23:28:00.000Z",
+  "scope": "Align board copies the checkpoint already computed by getStudioEpisodeEarliest (newSlotDispatchAllowed / blockingBatchNumber / earliestReason). SSL-5 reuses board.checkpoint and blocks create-plan/dispatch when the six-image gate has not released new slots. Earliest wait/retry/Review copy stays more specific when both apply. Does not call getStudioEpisodeEarliest or getStudioGenerationCheckpointControl from SSL-5. Align table exposes existing reviewDecision as a Review badge (SSL-3 P1). Reader shows earliestReason. schemaVersion remains 1. Does not attest checkpoint, dispatch, or change T4/T5/dashboard projection.",
+  "invariants": {
+    "schemaVersionStill1": true,
+    "ssl5DoesNotSecondEarliest": true,
+    "ssl5DoesNotReadCheckpointModule": true,
+    "unevaluatedIsNotNotCheckable": true,
+    "doesNotDispatch": true,
+    "doesNotAttestCheckpoint": true,
+    "earliestWaitWinsOverGateCopy": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true,
+    "doesNotChangeDashboardProjection": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-script-library-reader.test.ts"
+      ],
+      "result": "14 files / 203 tests PASS"
+    },
+    "commit": "95e0044"
+  },
+  "notClaimed": [
+    "SSL-5 executes create-plan or dispatch",
+    "checkpoint attestation",
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed"
+  ]
+}

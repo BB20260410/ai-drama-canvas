@@ -12,10 +12,12 @@ import type {
   GlobalStudioMediaResourceQuery,
 } from "../../core/studio-global-asset-catalog.js";
 import type { ReuseStudioGlobalResourceInput, ReuseStudioGlobalResourceResult } from "../../core/studio-global-resource-reuse.js";
-import type { ScriptLibraryIndex } from "../../core/studio-script-library-projection.js";
+import type { ScriptLibraryIndex, ScriptSpanMediaMap } from "../../core/studio-script-library-projection.js";
 import type { ScriptReaderView } from "../../core/studio-script-library-reader.js";
 import type { StudioProductionUnitListQuery, StudioProductionUnitPage } from "../../core/studio-production.js";
 import type { StudioStoryboardWizardSession, WizardEditablePanel } from "../../core/studio-storyboard-wizard.js";
+import type { Ssl5MissingToGenPlan } from "../../core/studio-ssl5-missing-to-gen.js";
+import type { StudioGenerationTrace } from "../../core/studio-trace.js";
 
 export type MaterialStudioSection = "script" | "prompt" | "character" | "scene" | "prop" | "style" | "media";
 export type MaterialStudioAssetCategory = "character" | "scene" | "prop" | "style";
@@ -326,6 +328,26 @@ export interface StudioScriptProductUiApi {
     evidenceDir?: string;
   }): Promise<ScriptReaderView>;
   getStudioScriptMediaAlignBoard(projectRoot: string, query: { season: string; episode: string }): Promise<import("../../core/studio-script-media-align.js").ScriptMediaAlignBoard>;
+  getStudioTrace?(
+    projectRoot: string,
+    selector: { packId?: string; runId?: string; resultId?: string },
+  ): Promise<StudioGenerationTrace>;
+  getStudioScriptRevisionImpact?(
+    projectRoot: string,
+    query: { scriptRevisionId: string; limit?: number; cursor?: string },
+  ): Promise<import("../../core/studio-trace.js").StudioScriptRevisionImpactPage>;
+  planSsl5MissingToGen(projectRoot: string, query: {
+    season: string;
+    episode: string;
+    documentId?: string;
+    revisionImpact?: import("../../core/studio-generation-plan-draft.js").Ssl5RevisionImpactHint;
+  }): Promise<Ssl5MissingToGenPlan>;
+  getStudioScriptSpanMediaMap(projectRoot: string, query: {
+    season: string;
+    episode: string;
+    startOffsetUtf16: number;
+    endOffsetUtf16: number;
+  }): Promise<ScriptSpanMediaMap>;
   openStoryboardWizard(projectRoot: string, input: {
     scriptRevisionId: string;
     panelCount?: number;

@@ -673,6 +673,28 @@ export interface StudioProductionUnitListQuery {
   limit?: number;
 }
 
+/** 时间线轻量身份：不含 timing / 集内时码。有界 by-id 与整集/earliest lean 共用。 */
+export interface StudioProductionUnitTimelineIdentity {
+  id: string;
+  sequence: number;
+  title: string;
+  revision: number;
+  panelCount: number;
+}
+
+export interface StudioProductionUnitIdentityByIdsQuery {
+  season: string;
+  episode: string;
+  unitIds: readonly string[];
+}
+
+export interface StudioProductionUnitIdentityListQuery {
+  season: string;
+  episode: string;
+  /** 按集内顺序截断。省略则最多 2500（与旧 cursor 50×50 同顶）。 */
+  limit?: number;
+}
+
 export interface StudioProductionUnitPage {
   items: StudioProductionUnitSummary[];
   nextCursor?: string;
@@ -3302,6 +3324,139 @@ export async function listStudioProductionUnits(
         })
         : undefined,
     };
+  } finally {
+    db.close();
+  }
+}
+
+/** 只读身份投影缺库/缺表时失败关闭，不建生产库。 */
+export const STUDIO_PRODUCTION_UNITS_UNINITIALIZED_MESSAGE = "生产知识库未初始化，只读身份投影失败关闭。";
+
+/**
+ * 时间线身份旁路专用：只读打开已有生产库。
+ * 不 ensure 目录、不建库、不迁移、不改 WAL。不得用于 listStudioProductionUnits。
+ */
+function openStudioProductionUnitsIdentityDatabase(databasePath: string): DatabaseSync {
+  if (!existsSync(databasePath)) {
+    throw new Error(STUDIO_PRODUCTION_UNITS_UNINITIALIZED_MESSAGE);
+  }
+  const metadata = lstatSync(databasePath);
+  if (metadata.isSymbolicLink() || !metadata.isFile()) {
+    throw new Error("生产知识库数据库必须是无符号链接的普通文件。");
+  }
+  const db = new DatabaseSync(databasePath, { readOnly: true });
+  try {
+    db.exec("PRAGMA query_only = ON");
+    const found = db.prepare(
+      "SELECT 1 AS found FROM sqlite_master WHERE type = 'table' AND name = 'studio_production_units' LIMIT 1",
+    ).get();
+    if (!found) {
+      throw new Error(STUDIO_PRODUCTION_UNITS_UNINITIALIZED_MESSAGE);
+    }
+    return db;
+  } catch (error) {
+    db.close();
+    throw error;
+  }
+}
+
+/**
+ * 按 id 读取同季同集单元身份（最多 36）。
+ * 给正式时间线有界投影用：禁止再翻页扫整集再 filter。
+ * 不走 unitSummaryFromRow，因此不记 unitTimingQueries / episodeStartQueries，
+ * 也不改 listStudioProductionUnits 的 T23 热路径 SQL。
+ * 只读打开已有生产库；缺库失败关闭。缺行或跨季集 id 直接省略。
+ */
+export async function listStudioProductionUnitIdentitiesByIds(
+  projectRoot: string,
+  query: StudioProductionUnitIdentityByIdsQuery,
+): Promise<StudioProductionUnitTimelineIdentity[]> {
+  const season = requiredText(query.season, "season", 500);
+  const episode = requiredText(query.episode, "episode", 500);
+  if (!Array.isArray(query.unitIds) || query.unitIds.length === 0) {
+    throw new Error("unitIds 必须是非空数组；省略该字段才表示整集。");
+  }
+  const ids = [...new Set(query.unitIds.map((id) => {
+    if (typeof id !== "string" || id.trim() === "") throw new Error("unitIds 含空标识。");
+    return id.trim();
+  }))];
+  if (ids.length === 0) {
+    throw new Error("unitIds 必须是非空数组；省略该字段才表示整集。");
+  }
+  if (ids.length > 36) throw new Error("unitIds 最多 36 项。");
+  const paths = productionPaths(projectRoot);
+  const db = openStudioProductionUnitsIdentityDatabase(paths.database);
+  try {
+    recordStudioUnitsReadCounter("productionBusinessSqlExecutions");
+    const placeholders = ids.map(() => "?").join(", ");
+    const rows = db.prepare(`
+      SELECT id, sequence, title, revision, panel_count
+      FROM studio_production_units
+      WHERE season = ? AND episode = ? AND id IN (${placeholders})
+      ORDER BY sequence, id
+    `).all(season, episode, ...ids) as Array<{
+      id: string;
+      sequence: number;
+      title: string;
+      revision: number;
+      panel_count: number;
+    }>;
+    return rows.map((row) => ({
+      id: row.id,
+      sequence: Number(row.sequence),
+      title: row.title,
+      revision: Number(row.revision),
+      panelCount: Number(row.panel_count),
+    }));
+  } finally {
+    db.close();
+  }
+}
+
+/**
+ * 按季集读取单元身份（最多 2500）。
+ * 给整集时间线 / earliest 用：只要 id/sequence/title/revision/panel_count，
+ * 禁止再走 dashboard units 热路径的 per-unit timing 摘要。
+ * 只读打开已有生产库；缺库失败关闭。不改 T23 热路径 SQL。
+ */
+export async function listStudioProductionUnitIdentities(
+  projectRoot: string,
+  query: StudioProductionUnitIdentityListQuery,
+): Promise<StudioProductionUnitTimelineIdentity[]> {
+  const season = requiredText(query.season, "season", 500);
+  const episode = requiredText(query.episode, "episode", 500);
+  const maxRows = 2500;
+  let limit = maxRows;
+  if (query.limit !== undefined) {
+    if (!Number.isSafeInteger(query.limit) || query.limit < 1 || query.limit > maxRows) {
+      throw new Error(`limit 必须是 1–${maxRows} 的整数。`);
+    }
+    limit = query.limit;
+  }
+  const paths = productionPaths(projectRoot);
+  const db = openStudioProductionUnitsIdentityDatabase(paths.database);
+  try {
+    recordStudioUnitsReadCounter("productionBusinessSqlExecutions");
+    const rows = db.prepare(`
+      SELECT id, sequence, title, revision, panel_count
+      FROM studio_production_units
+      WHERE season = ? AND episode = ?
+      ORDER BY sequence, id
+      LIMIT ?
+    `).all(season, episode, limit) as Array<{
+      id: string;
+      sequence: number;
+      title: string;
+      revision: number;
+      panel_count: number;
+    }>;
+    return rows.map((row) => ({
+      id: row.id,
+      sequence: Number(row.sequence),
+      title: row.title,
+      revision: Number(row.revision),
+      panelCount: Number(row.panel_count),
+    }));
   } finally {
     db.close();
   }

@@ -1,4 +1,4 @@
-import { loadAdaptationStore } from "./adaptation.js";
+import { withAdaptation } from "./adaptation-lazy.js";
 import type { NovelWorkspaceSnapshot } from "./novel-manuscript.js";
 import {
   loadNovelWritingState,
@@ -84,7 +84,7 @@ export async function getNovelMemoryAuthorityProjection(
 ): Promise<NovelMemoryAuthorityProjection> {
   const [state, legacy] = await Promise.all([
     loadNovelWritingState(projectRoot, snapshot.workspace.projectId),
-    loadAdaptationStore(projectRoot),
+    withAdaptation((adaptation) => adaptation.loadAdaptationStore(projectRoot)),
   ]);
   if (!state) {
     return {

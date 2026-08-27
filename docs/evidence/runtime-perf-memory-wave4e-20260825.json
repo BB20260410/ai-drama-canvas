@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "4-E",
+  "recordedAt": "2026-08-25T16:17:00Z",
+  "change": {
+    "watchScope": "src/core/build-identity.ts",
+    "callSitesUnmoved": [
+      "src/mcp/server.ts",
+      "src/main/index.ts"
+    ],
+    "envSwitch": "AI_CANVAS_RUNTIME_GATE_WATCH_TESTS_SCRIPTS",
+    "sourceDigestGlobsUnchanged": true,
+    "generationLedgerWatcherUnchanged": true,
+    "packagedIdentityGateUnchanged": true
+  },
+  "tests": [
+    "tests/runtime-perf-wave4e-runtime-gate-watch-scope.test.ts",
+    "tests/build-identity-watch-paths.test.ts",
+    "tests/runtime-write-gate.test.ts"
+  ],
+  "verification": {
+    "typecheckApp": "PASS",
+    "sourceContractTests": { "passed": 57, "platform": "linux", "files": 3 }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false
+  },
+  "claim": "W4-E：常驻 runtime gate watcher 默认只递归订 src/ + workspace 浅层。tests/scripts 仅当 AI_CANVAS_RUNTIME_GATE_WATCH_TESTS_SCRIPTS=1|true|yes|full 才递归监听。未改 SOURCE_DIGEST_GLOBS / computeSourceDigest，未关 generation-ledger watcher，未关 packaged 身份 gate（安装版仍不启源码 watcher）。",
+  "residual": [
+    "默认模式下改 tests/scripts 不会经 watcher 即时 invalidate；下一次完整 digest / watcher 不健康回退仍会算进身份",
+    "command-bus 仍静态拉 ledger；codex 仍静态拉 session-snapshot.js 本身（W4-D）",
+    "get_capabilities 仍 withEditor；doctor 仍动态探测 mammoth",
+    "list_projects 有 ingest manifest 时仍可能 withLocalCreativeContentImport",
+    "禁止写成「不再监听 tests/scripts」或「关掉了身份 gate / ledger watcher」"
+  ]
+}

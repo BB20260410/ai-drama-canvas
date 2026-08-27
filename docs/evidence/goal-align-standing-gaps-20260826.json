@@ -1,0 +1,36 @@
+{
+  "id": "goal-align-standing-gaps-20260826",
+  "createdAt": "2026-08-26T18:27:10.000Z",
+  "kind": "align-ssl5-standing-gaps-readonly",
+  "conclusion": "PASS",
+  "scope": "Pure listPanelStandingGaps/formatPanelStandingGaps. Align sidebar, reader span hits, and SSL-5 focus banner show lock-version standing gaps. Explicitly not BindingSet / not generation-ready. No dispatch.",
+  "invariants": {
+    "listsCompositionActionFilmingGaps": true,
+    "ssl5BannerOnlyWhenFocusPanelId": true,
+    "doesNotCallBindingControl": true,
+    "doesNotDispatch": true,
+    "doesNotClaimGenerationReady": true,
+    "doesNotEvaluatePixels": true,
+    "doesNotReviewPass": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/use-virtual-list-lru-hotkeys.test.ts"
+      ],
+      "result": "5 files / 35 tests PASS"
+    }
+  },
+  "notClaimed": [
+    "standing fully solved",
+    "BindingSet generation-ready",
+    "real-generation constraint evidence",
+    "installed T23",
+    "100% fit"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "kind": "runtime-perf-memory-wave",
+  "wave": "5-E-project-switch-evict",
+  "recordedAt": "2026-08-25T18:22:00Z",
+  "change": {
+    "kind": "source",
+    "files": [
+      "src/core/studio-media-protocol.ts",
+      "src/main/index.ts",
+      "tests/runtime-perf-wave5e-verified-file-cache-buckets.test.ts"
+    ],
+    "summary": "Main 关闭/切换 generation ledger watcher 时淘汰旧工程 verifiedFileCache（resolve + realpath 双键）。Vue 不接线。未扩大 2048，未改 recipe。"
+  },
+  "verification": {
+    "typecheckApp": "PASS",
+    "directedLinux": {
+      "files": 11,
+      "passed": 175,
+      "platform": "linux"
+    },
+    "reviews": {
+      "redline": "PASS; 无 must-fix",
+      "completion": "PASS; 无 must-fix"
+    }
+  },
+  "isolation": {
+    "officialProjectScan": false,
+    "ledgerWrite": false,
+    "gui": false,
+    "overwrote20260811Final": false,
+    "t23SqlUnchanged": true,
+    "thumbnailRecipeUnchanged": true,
+    "verifiedFileCacheLimit": 2048
+  },
+  "claim": "W5-E：切工程 Main 路径淘汰旧工程 verifiedFileCache。分桶仍在。禁止写「扩大了缓存上限」或「列表原图次数已测为 0」。",
+  "residual": [
+    "首卡前 watcher 未挂时 activate-project 不 close，旧桶可能仍驻留；未在 activate 加读盘以免碰 T23 首卡",
+    "inFlightFileInspections 未随切工程清空",
+    "列表翻页 aicanvas-studio://media/* = 0 探针仍 NOT_RUN",
+    "安装版 T23 / P7 owner 仍需 Darwin"
+  ]
+}
