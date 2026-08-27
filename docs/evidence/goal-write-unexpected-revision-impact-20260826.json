@@ -1,0 +1,64 @@
+{
+  "id": "goal-write-unexpected-revision-impact-20260826",
+  "kind": "write-unexpected-revision-impact",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-27T00:39:00.000Z",
+  "scope": "execute_command create_studio_generation_plan and dispatch_studio_generation_pack accept optional revisionImpact (caller-supplied script-revision-impact page). If a target unit has changeClassification=unexpected, ledger fails closed with unexpected-revision-impact before writing. Omitted hint does not query studio-trace. Idempotent dispatch replay is not blocked. freeze writeCommand payload is unchanged. Ledger dynamically imports the thin plan-draft helper and does not import studio-trace. Desktop error text maps unexpected-revision-impact to 须人工复核后再生成. managed_studio_lock_generate_writeback says: pass the same page on create-plan/dispatch if already fetched; do not query just for the write. Does not change SCRIPT_READER_SCHEMA_VERSION, SSL5_PLAN_SCHEMA_VERSION, getStudioTrace selector, P24 golden, T4, T5, or dashboard projection.",
+  "invariants": {
+    "optionalHintOnly": true,
+    "omittedHintDoesNotQuery": true,
+    "createPlanFailsClosedOnUnexpected": true,
+    "dispatchFailsClosedOnUnexpected": true,
+    "idempotentDispatchReplayNotBlocked": true,
+    "doesNotChangeFreezeWriteCommand": true,
+    "ledgerDoesNotImportStudioTrace": true,
+    "ledgerDynamicallyImportsPlanDraft": true,
+    "refineLivesInPlanDraftThinModule": true,
+    "userFacingMapsUnexpectedRevisionImpact": true,
+    "ssl5SchemaVersionStill1": true,
+    "doesNotChangeGetStudioTraceSelector": true,
+    "doesNotChangeP24Golden": true,
+    "doesNotAutoReviewPass": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true,
+    "doesNotChangeDashboardProjection": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/user-facing-error.test.ts",
+        "tests/studio-command-runtime.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-script-library-reader.test.ts"
+      ],
+      "result": "16 files / 235 tests PASS"
+    },
+    "commit": "9bb2d59",
+    "linuxDirfdNote": "tests/studio-generation-plan.test.ts / session-snapshot P7 fixture still needs Darwin dirfd; not claimed as this Cloud gate"
+  },
+  "notClaimed": [
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed",
+    "SSL-6 product-pack close",
+    "write path auto-queries revision impact",
+    "freeze payload revisionImpact",
+    "retry_studio_generation_plan_nodes revisionImpact"
+  ]
+}
