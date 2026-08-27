@@ -6636,7 +6636,7 @@ server.registerPrompt(
       "",
       "写入（仅 execute_command，带稳定 requestId/idempotencyKey）：",
       "5) freeze_studio_generation_pack（generation-ready 且 revision 匹配）；unit-grid 必须显式 targetKind=unit-grid",
-      `6) create_studio_generation_plan → get_studio_generation_control(operation=plan) 看 envelope nextAction；wait/retry/Review 时禁止 dispatch；仅 planned 才 dispatch_studio_generation_pack(provider=${provider})；unit-grid 真正调用模型前必须 prepare_studio_imagegen_call`,
+      `6) create_studio_generation_plan → get_studio_generation_control(operation=plan) 看 envelope nextAction；wait/retry/Review 时禁止 dispatch；仅 planned 才 dispatch_studio_generation_pack(provider=${provider})；若已取回 script-revision-impact，create-plan/dispatch 须带同一 revisionImpact（unexpected 则写路径拒绝）；未取回不要为了写命令去查；unit-grid 真正调用模型前必须 prepare_studio_imagegen_call`,
       "7) 仅首次 prepare 返回 callAllowed=true 时允许调用一次 imagegen；候选与回执只能写返回的 quarantine 精确路径；重放/恢复 callAllowed=false，必须先对账，禁止再次调用",
       "8) execute_command(commit_agent_imagegen_result_bundle)：必填活动 projectContextToken/provider/raw SHA/executionReceipt.callId，本地派生 labeled 并原子成对登记",
       "   Grok live source=grok-build-imagine，必须提交一次工具调用直观测字段与 quarantine 回执文件；cryptographicProviderReceipt=false，不得冒充供应商签名回执",

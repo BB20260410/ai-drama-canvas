@@ -8,6 +8,21 @@ export const studioAssetIdSchema = z.string().trim().regex(/^[A-Za-z0-9][A-Za-z0
 export const studioBindingRevisionTokenSchema = z.string().trim().regex(/^[a-f0-9]{64}$/u);
 export const studioSha256Schema = z.string().regex(/^[a-f0-9]{64}$/u);
 
+/** 调用方已取回的 script-revision-impact 页。省略不自动查。 */
+export const studioRevisionImpactHintSchema = z.object({
+  empty: z.boolean().optional(),
+  nextCursor: z.string().optional(),
+  items: z.array(z.object({
+    unitId: z.string().min(1),
+    unitRevision: z.number().int().optional(),
+    rows: z.array(z.object({
+      panelId: z.string().nullable(),
+      targetKind: z.string().optional(),
+      changeClassification: z.string().nullable(),
+    })),
+  })),
+}).optional();
+
 const studioContinuityScopeSchema = z.object({
   kind: z.enum(["panel", "source-shot"]),
   scopeId: studioStableIdSchema,
@@ -839,6 +854,7 @@ function publicCommandVariants(actor: StudioReviewerActor) {
       generationRunId: studioStableIdSchema,
       provider: z.enum(["codex", "grok"]),
       expectedRevision: z.number().int().positive(),
+      revisionImpact: studioRevisionImpactHintSchema,
     }).strict() }),
     z.object({ command: z.literal("register_studio_generation_result"), payload: z.object({
       packId: studioStableIdSchema,
@@ -984,6 +1000,7 @@ function publicCommandVariants(actor: StudioReviewerActor) {
           unitId: studioStableIdSchema,
         }).strict(),
       ])).min(1).max(36),
+      revisionImpact: studioRevisionImpactHintSchema,
     }).strict() }),
     z.object({ command: z.literal("fail_studio_generation_run"), payload: z.object({
       generationRunId: studioStableIdSchema,

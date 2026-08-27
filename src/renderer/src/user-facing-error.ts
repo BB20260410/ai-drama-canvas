@@ -8,6 +8,7 @@ const ERROR_TRANSLATIONS: ReadonlyArray<readonly [RegExp, string]> = [
   [/ENOENT|no such file or directory/i, "找不到需要的文件，请刷新后再试。"],
   [/EACCES|permission denied/i, "没有权限写入，请检查文件夹权限后重试。"],
   [/panel-run-in-flight/i, "这个宫格已有生成任务在进行中，请等它结束或先取消。"],
+  [/unexpected-revision-impact/i, "本修订对已有图有非预期影响，须人工复核后再生成。"],
   [/run-cancelled/i, "该生成任务已取消，不能继续写入结果；如需重试请重新开始。"],
   [/input-drift/i, "内容在开始前发生了变化，请重新核对连线后再开始。"],
   [/continuity-drift/i, "连续性校验未通过，请重新核对角色、场景、道具和剧本后再开始。"],

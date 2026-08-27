@@ -10,6 +10,7 @@ describe("user-facing-error", () => {
 
   it("生产语义错误类逐条命中", () => {
     expect(toUserFacingErrorText(new Error("panel-run-in-flight: 宫格已有非终态 run"))).toContain("已有生成任务在进行中");
+    expect(toUserFacingErrorText(new Error("unexpected-revision-impact: 非预期剧本修订影响，须人工复核（不派发）"))).toContain("须人工复核后再生成");
     expect(toUserFacingErrorText(new Error("run-cancelled"))).toContain("已取消");
     expect(toUserFacingErrorText(new Error("input-drift: Codex 请求必须携带"))).toContain("重新核对连线");
     expect(toUserFacingErrorText(new Error("continuity-drift"))).toContain("连续性校验未通过");

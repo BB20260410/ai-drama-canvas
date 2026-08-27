@@ -27,6 +27,7 @@ export type StudioGenerationLedgerErrorCode =
   | "plan-node-run-id-mismatch"
   | "plan-node-run-owned-by-other-plan"
   | "plan-not-found"
+  | "unexpected-revision-impact"
   | "invalid-input"
   | "invalid-cursor"
   | "storage-invalid";

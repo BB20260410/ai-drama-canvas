@@ -500,6 +500,8 @@ export interface DispatchStudioGenerationPackInput {
   generationRunId: string;
   /** 本次由哪家正式 Agent 执行生图：codex 或 grok。 */
   provider: StudioFormalImagegenProvider;
+  /** 调用方已取回的 script-revision-impact 页。省略不自动查。 */
+  revisionImpact?: import("./studio-generation-plan-draft.js").Ssl5RevisionImpactHint;
 }
 
 /**
@@ -725,6 +727,25 @@ interface ResultRow {
 
 function fail(code: StudioGenerationLedgerErrorCode, message: string, details: string[] = []): never {
   throw new StudioGenerationLedgerError(code, message, details);
+}
+
+/** 调用方已取回的 script-revision-impact 才挡。省略不查 studio-trace。 */
+async function assertOptionalUnexpectedRevisionImpact(
+  targets: Array<{ unitId: string; panelId?: string | null }>,
+  impact: import("./studio-generation-plan-draft.js").Ssl5RevisionImpactHint,
+): Promise<void> {
+  if (!impact) return;
+  const {
+    firstGenerationTargetBlockedByUnexpectedRevisionImpact,
+    SSL5_UNEXPECTED_REVISION_IMPACT_REASON,
+  } = await import("./studio-generation-plan-draft.js");
+  const blocked = firstGenerationTargetBlockedByUnexpectedRevisionImpact(targets, impact);
+  if (blocked) {
+    fail("unexpected-revision-impact", SSL5_UNEXPECTED_REVISION_IMPACT_REASON, [
+      `unitId=${blocked.unitId}`,
+      ...(blocked.panelId ? [`panelId=${blocked.panelId}`] : []),
+    ]);
+  }
 }
 
 function assertNoActiveConnectorReservation(
@@ -2741,6 +2762,15 @@ export async function dispatchStudioGenerationPack(
     fail(
       "invalid-input",
       `provider=${provider} 不在冻结包 allowedProviders 内：${pack.request.allowedProviders.join(",")}`,
+    );
+  }
+  if (!existing) {
+    await assertOptionalUnexpectedRevisionImpact(
+      [{
+        unitId: pack.target.unitId,
+        panelId: isUnitGridFreezePack(pack) ? null : pack.target.panelId,
+      }],
+      input.revisionImpact,
     );
   }
   if (existing) {
@@ -5927,11 +5957,22 @@ function normalizePlanNodeList(input: unknown): NormalizedPlanNode[] {
  */
 export async function createStudioGenerationPlan(
   projectRoot: string,
-  input: { nodes: StudioGenerationPlanNodeInput[]; sourceCommandRequestId: string },
+  input: {
+    nodes: StudioGenerationPlanNodeInput[];
+    sourceCommandRequestId: string;
+    revisionImpact?: import("./studio-generation-plan-draft.js").Ssl5RevisionImpactHint;
+  },
 ): Promise<StudioGenerationPlanRecord> {
   const { paths, projectId } = await managedLedgerPaths(projectRoot);
   const nodes = normalizePlanNodeList(input.nodes);
   const sourceCommandRequestId = normalizeId(input.sourceCommandRequestId, "sourceCommandRequestId");
+  await assertOptionalUnexpectedRevisionImpact(
+    nodes.map((node) => ({
+      unitId: node.unitId,
+      panelId: node.targetKind === "panel" ? node.panelId : null,
+    })),
+    input.revisionImpact,
+  );
   const readDb = openDatabase(paths);
   const selected: Array<{ packRow: PackRow; targetRow?: PackTargetRow }> = [];
   try {

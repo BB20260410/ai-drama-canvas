@@ -26,6 +26,7 @@ import {
   loadedRevisionImpactClassificationForAlignTarget,
   loadedRevisionImpactUnexpectedMark,
   mergeSsl5RevisionImpactPages,
+  firstGenerationTargetBlockedByUnexpectedRevisionImpact,
   refineSsl5FocusIfUnexpectedRevisionImpact,
   refineStudioGenerationPlanDraftIfUnitGridBlocking,
   SSL5_REVISION_IMPACT_NOT_LOADED_LINE,
@@ -456,6 +457,35 @@ describe("已加载 unexpected 修订影响精炼 SSL-5", () => {
       }],
     }, { unitId: "u3", panelId: "p9" })).toBe("unexpected");
   });
+
+  it("写路径已取回 unexpected 挡 create-plan/dispatch 目标；省略/空页/其他单元不挡", () => {
+    const unexpected = {
+      items: [{
+        unitId: "u-focus",
+        rows: [{ panelId: "p1", changeClassification: "unexpected" as const }],
+      }],
+    };
+    expect(firstGenerationTargetBlockedByUnexpectedRevisionImpact(
+      [{ unitId: "u-focus", panelId: "p1" }],
+      null,
+    )).toBeNull();
+    expect(firstGenerationTargetBlockedByUnexpectedRevisionImpact(
+      [{ unitId: "u-focus", panelId: "p1" }],
+      { empty: true, items: [] },
+    )).toBeNull();
+    expect(firstGenerationTargetBlockedByUnexpectedRevisionImpact(
+      [{ unitId: "u-focus", panelId: "p1" }],
+      { items: [{ unitId: "u-other", rows: [{ panelId: "p9", changeClassification: "unexpected" }] }] },
+    )).toBeNull();
+    expect(firstGenerationTargetBlockedByUnexpectedRevisionImpact(
+      [{ unitId: "u-focus", panelId: "p1" }],
+      unexpected,
+    )).toEqual({ unitId: "u-focus", panelId: "p1" });
+    expect(firstGenerationTargetBlockedByUnexpectedRevisionImpact(
+      [{ unitId: "u-focus", panelId: null }],
+      { items: [{ unitId: "u-focus", rows: [{ panelId: null, targetKind: "unit-grid", changeClassification: "unexpected" }] }] },
+    )).toEqual({ unitId: "u-focus", panelId: null });
+  });
 });
 
 describe("create-plan 草稿接线源码合同", () => {
@@ -464,6 +494,8 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(draft).toContain("refineSsl5FocusIfUnexpectedRevisionImpact");
     expect(draft).toContain("unexpectedRevisionImpactHitsFocus");
     expect(draft).toContain("SSL5_UNEXPECTED_REVISION_IMPACT_REASON");
+    expect(draft).toContain("firstGenerationTargetBlockedByUnexpectedRevisionImpact");
+    expect(draft).toContain("UNEXPECTED_REVISION_IMPACT_ERROR_CODE");
     expect(draft).toContain("mergeSsl5RevisionImpactPages");
     expect(draft).toContain("loadedRevisionImpactClassificationForAlignTarget");
     expect(draft).toContain("loadedRevisionImpactAlignLine");
@@ -486,6 +518,24 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(draft).not.toContain("node:sqlite");
     expect(draft).not.toContain("execute_command");
     expect(draft).not.toContain("dispatch_studio_generation_pack");
+  });
+
+  it("create-plan/dispatch 写路径接受已取回 revisionImpact，省略不查 studio-trace", () => {
+    const ledger = source("src/core/studio-generation-ledger.ts");
+    const runtime = source("src/core/studio-command-runtime.ts");
+    const executor = source("src/core/studio-command-executor.ts");
+    const prompt = source("src/mcp/server.ts");
+    expect(runtime).toContain("studioRevisionImpactHintSchema");
+    expect(runtime).toContain("revisionImpact: studioRevisionImpactHintSchema");
+    expect(ledger).toContain("assertOptionalUnexpectedRevisionImpact");
+    expect(ledger).toContain('import("./studio-generation-plan-draft.js")');
+    expect(ledger).toContain("unexpected-revision-impact");
+    expect(ledger).not.toContain("getStudioScriptRevisionImpact");
+    expect(ledger).not.toContain("from \"./studio-trace.js\"");
+    expect(executor).toContain("revisionImpact: request.payload.revisionImpact");
+    expect(executor).toContain("...(revisionImpact ? { revisionImpact } : {})");
+    expect(prompt).toContain("create-plan/dispatch 须带同一 revisionImpact");
+    expect(prompt).toContain("未取回不要为了写命令去查");
   });
 
   it("session-snapshot 有 panelId 走单镜、无 panelId 走已落盘整板，草稿不进 fingerprint", () => {

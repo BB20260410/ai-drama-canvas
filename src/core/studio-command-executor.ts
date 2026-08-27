@@ -623,7 +623,7 @@ export async function executeStudioCommand(
       }
     }
     case "dispatch_studio_generation_pack": {
-      const { expectedRevision, ...dispatch } = request.payload;
+      const { expectedRevision, revisionImpact, ...dispatch } = request.payload;
       assertStudioGenerationExpectedRevision("studio_generation_dispatch", expectedRevision, { packId: dispatch.packId });
       try {
         const pack = await readAnyStudioGenerationFrozenPack(projectRoot, dispatch.packId);
@@ -664,7 +664,10 @@ export async function executeStudioCommand(
             currentRevision: pack.target.unitRevision,
           });
         }
-        return await dispatchStudioGenerationPack(projectRoot, dispatch);
+        return await dispatchStudioGenerationPack(projectRoot, {
+          ...dispatch,
+          ...(revisionImpact ? { revisionImpact } : {}),
+        });
       } catch (error) {
         rejectStudioGenerationPrecondition(error, "studio_generation_dispatch", {
           packId: dispatch.packId,
@@ -903,6 +906,7 @@ export async function executeStudioCommand(
         return await createStudioGenerationPlan(projectRoot, {
           nodes: request.payload.nodes,
           sourceCommandRequestId: operationId,
+          ...(request.payload.revisionImpact ? { revisionImpact: request.payload.revisionImpact } : {}),
         });
       } catch (error) {
         rejectStudioGenerationPrecondition(error, "studio_generation_plan", {});

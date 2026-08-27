@@ -172,6 +172,25 @@ export function unexpectedRevisionImpactHitsFocus(
   return unit.rows.some((row) => row.changeClassification === "unexpected");
 }
 
+export const UNEXPECTED_REVISION_IMPACT_ERROR_CODE = "unexpected-revision-impact" as const;
+
+/** 已加载 impact 才认。未加载 / 空页不挡。任一目标单元有 unexpected 则返回该目标。 */
+export function firstGenerationTargetBlockedByUnexpectedRevisionImpact(
+  targets: Array<{ unitId: string; panelId?: string | null }>,
+  impact: Ssl5RevisionImpactHint,
+): { unitId: string; panelId?: string | null } | null {
+  if (!impact || impact.empty) return null;
+  for (const target of targets) {
+    if (unexpectedRevisionImpactHitsFocus(
+      { focusUnitId: target.unitId, focusPanelId: target.panelId ?? null },
+      impact,
+    )) {
+      return target;
+    }
+  }
+  return null;
+}
+
 /**
  * 已加载 script-revision-impact 且焦点格/单元有非预期时，禁止再建议 create-plan / dispatch。
  * 未加载不查、不挡。earliest wait/retry/Review 与六图闸未放行时保留更具体文案。
