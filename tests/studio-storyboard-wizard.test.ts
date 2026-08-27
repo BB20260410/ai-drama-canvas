@@ -266,7 +266,7 @@ describe("studio-storyboard-wizard", () => {
     expect(session.panels[0]?.sourceSpans[0]?.startOffsetUtf16).toBe(startOffsetUtf16);
   });
 
-  it.skipIf(process.platform !== "darwin")("Core 物化写入规范资产真实 category/name，缺记录跳过", async () => {
+  it.skipIf(process.platform !== "darwin")("Core 物化写入规范资产真实 category/name，缺记录失败关闭", async () => {
     const parent = await realpath(await mkdtemp(path.join(os.tmpdir(), "storyboard-wizard-asset-cat-")));
     roots.push(parent);
     const projectRoot = (await createManagedProject({ parentRoot: parent, name: "向导资产分类" })).paths.root;
@@ -316,7 +316,7 @@ describe("studio-storyboard-wizard", () => {
       { panelIndex: 2, visualAction: "抬手" },
       { panelIndex: 3, visualAction: "收束" },
     ]);
-    const materialized = await materializeStudioStoryboardWizardUnit(projectRoot, {
+    await expect(materializeStudioStoryboardWizardUnit(projectRoot, {
       season: "S1",
       episode: "E1",
       sequence: 1,
@@ -324,6 +324,19 @@ describe("studio-storyboard-wizard", () => {
       unitTitle: "向导资产分类",
       scriptRevisionId: revision.revision.id,
       panels,
+    })).rejects.toThrow(/G2 建议资产无规范记录：gone-missing/u);
+    const clean = applyWizardPanelEdits(panels, [{
+      panelIndex: 2,
+      suggestedAssetIds: ["character-ahang"],
+    }]);
+    const materialized = await materializeStudioStoryboardWizardUnit(projectRoot, {
+      season: "S1",
+      episode: "E1",
+      sequence: 1,
+      unitId: "unit-wizard-asset-cat",
+      unitTitle: "向导资产分类",
+      scriptRevisionId: revision.revision.id,
+      panels: clean,
     });
     const snapshot = await getStudioProductionUnitSnapshot(projectRoot, materialized.unitId);
     expect(snapshot?.panels.map((panel) => panel.assets.map((asset) => ({
