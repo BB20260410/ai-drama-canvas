@@ -16,8 +16,10 @@ import {
   createStudioProductionUnit,
   createStudioPromptDocument,
   getStudioTextRevision,
+  type StudioAssetCategory,
   type StudioProductionPanelInput,
 } from "./studio-production.js";
+import { getStudioCanonicalAsset } from "./material-studio.js";
 import { formatWizardPromptBody } from "./studio-panel-standing.js";
 
 export const STORYBOARD_WIZARD_SCHEMA_VERSION = 1 as const;
@@ -76,6 +78,62 @@ export interface MaterializeWizardInput {
   promptTitle?: string;
   source?: string;
   sourceVersion?: string;
+}
+
+export type WizardResolvedSuggestedAsset = {
+  assetId: string;
+  category: StudioAssetCategory;
+  name: string;
+};
+
+/**
+ * 建议资产 → 宫格提及。分类/角色名只认已解析规范资产；缺记录跳过，禁止一律写成 character。
+ * 与桌面 App 物化同一口径。不是 BindingSet，仍须 Binding 裁决。
+ */
+export function mapWizardSuggestedAssetsToPanelMentions(
+  suggestedAssetIds: readonly string[],
+  resolved: ReadonlyMap<string, WizardResolvedSuggestedAsset>,
+  evidenceReference: string,
+): StudioProductionPanelInput["assets"] {
+  const seen = new Set<string>();
+  const mentions: StudioProductionPanelInput["assets"] = [];
+  for (const assetId of suggestedAssetIds) {
+    const id = String(assetId || "").trim();
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    const asset = resolved.get(id);
+    if (!asset) continue;
+    mentions.push({
+      assetId: id,
+      category: asset.category,
+      presence: "optional",
+      role: asset.name.trim() || id,
+      continuityState: "unknown",
+      evidence: [{ kind: "wizard-suggest", reference: evidenceReference, note: "ssl4" }],
+    });
+  }
+  return mentions;
+}
+
+export async function resolveWizardSuggestedAssets(
+  projectRoot: string,
+  panels: ReadonlyArray<{ suggestedAssetIds?: readonly string[] }>,
+): Promise<Map<string, WizardResolvedSuggestedAsset>> {
+  const ids = [...new Set(panels.flatMap((panel) => panel.suggestedAssetIds ?? []).map((id) => String(id || "").trim()).filter(Boolean))];
+  const rows = await Promise.all(ids.map(async (assetId) => {
+    const asset = await getStudioCanonicalAsset(projectRoot, assetId);
+    return [assetId, asset] as const;
+  }));
+  const resolved = new Map<string, WizardResolvedSuggestedAsset>();
+  for (const [assetId, asset] of rows) {
+    if (!asset) continue;
+    resolved.set(assetId, {
+      assetId,
+      category: asset.category,
+      name: asset.name,
+    });
+  }
+  return resolved;
 }
 
 /** 纯：建议格 → 可编辑格（默认空动作字段，由 Agent 填）。 */
@@ -196,6 +254,7 @@ export async function materializeStudioStoryboardWizardUnit(
     sourceVersion: input.sourceVersion ?? "20260724",
   });
   const promptRevisionId = promptWrap.revision.id;
+  const resolvedAssets = await resolveWizardSuggestedAssets(projectRoot, input.panels);
 
   const panels: StudioProductionPanelInput[] = input.panels.map((p) => ({
     title: p.title,
@@ -210,14 +269,11 @@ export async function materializeStudioStoryboardWizardUnit(
       startOffsetUtf16: s.startOffsetUtf16,
       endOffsetUtf16: s.endOffsetUtf16,
     })),
-    assets: (p.suggestedAssetIds || []).map((assetId) => ({
-      assetId,
-      category: "character" as const,
-      presence: "optional" as const,
-      role: assetId,
-      continuityState: "unknown",
-      evidence: [{ kind: "wizard-suggest", reference: input.scriptRevisionId, note: "ssl4" }],
-    })),
+    assets: mapWizardSuggestedAssetsToPanelMentions(
+      p.suggestedAssetIds ?? [],
+      resolvedAssets,
+      input.scriptRevisionId,
+    ),
     transition: p.transition || undefined,
     costumeState: p.costumeState || undefined,
     sceneLighting: p.sceneLighting || undefined,

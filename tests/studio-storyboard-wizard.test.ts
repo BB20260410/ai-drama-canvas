@@ -5,11 +5,14 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   applyWizardPanelEdits,
+  mapWizardSuggestedAssetsToPanelMentions,
+  materializeStudioStoryboardWizardUnit,
   openStudioStoryboardWizard,
   toWizardEditablePanels,
   validateWizardForMaterialize,
   STORYBOARD_WIZARD_SCHEMA_VERSION,
   type WizardEditablePanel,
+  type WizardResolvedSuggestedAsset,
 } from "../src/core/studio-storyboard-wizard.js";
 import {
   formatWizardPromptBody,
@@ -21,8 +24,10 @@ import type { StudioStoryboardDraftPanelSuggestion } from "../src/core/studio-st
 import {
   appendStudioScriptRevision,
   createStudioScriptDocument,
+  getStudioProductionUnitSnapshot,
   initializeStudioProduction,
 } from "../src/core/studio-production.js";
+import { createStudioCanonicalAsset } from "../src/core/material-studio.js";
 import { createManagedProject } from "../src/core/managed-project.js";
 
 const roots: string[] = [];
@@ -83,6 +88,34 @@ describe("studio-storyboard-wizard", () => {
 
   it("schema frozen", () => {
     expect(STORYBOARD_WIZARD_SCHEMA_VERSION).toBe(1);
+  });
+
+  it("建议资产按规范分类落盘，禁止一律写成 character", () => {
+    const resolved = new Map<string, WizardResolvedSuggestedAsset>([
+      ["character-ahang", { assetId: "character-ahang", category: "character", name: "阿航" }],
+      ["scene-stone", { assetId: "scene-stone", category: "scene", name: "石室" }],
+      ["prop-mask", { assetId: "prop-mask", category: "prop", name: "黄金面具" }],
+      ["style-cine", { assetId: "style-cine", category: "style", name: "电影写实" }],
+    ]);
+    const mentions = mapWizardSuggestedAssetsToPanelMentions(
+      ["character-ahang", "scene-stone", "prop-mask", "style-cine", "gone-missing", "character-ahang"],
+      resolved,
+      "script-rev-1",
+    );
+    expect(mentions.map((item) => ({ assetId: item.assetId, category: item.category, role: item.role }))).toEqual([
+      { assetId: "character-ahang", category: "character", role: "阿航" },
+      { assetId: "scene-stone", category: "scene", role: "石室" },
+      { assetId: "prop-mask", category: "prop", role: "黄金面具" },
+      { assetId: "style-cine", category: "style", role: "电影写实" },
+    ]);
+    expect(mentions.every((item) => item.presence === "optional")).toBe(true);
+    const wizard = readFileSync(new URL("../src/core/studio-storyboard-wizard.ts", import.meta.url), "utf8");
+    expect(wizard).toContain("mapWizardSuggestedAssetsToPanelMentions");
+    expect(wizard).toContain("getStudioCanonicalAsset");
+    expect(wizard).not.toContain('category: "character" as const');
+    const app = readFileSync(new URL("../src/renderer/src/App.vue", import.meta.url), "utf8");
+    expect(app).toContain("category: asset.category");
+    expect(app).toContain("role: asset.name");
   });
 
   it("物化后下一步含 create-plan，不跳过 Binding，不自动派发", () => {
@@ -163,5 +196,83 @@ describe("studio-storyboard-wizard", () => {
       span.startOffsetUtf16 >= startOffsetUtf16 && span.endOffsetUtf16 <= endOffsetUtf16
     )).toBe(true);
     expect(session.panels[0]?.sourceSpans[0]?.startOffsetUtf16).toBe(startOffsetUtf16);
+  });
+
+  it("Core 物化写入规范资产真实 category/name，缺记录跳过", async () => {
+    const parent = await realpath(await mkdtemp(path.join(os.tmpdir(), "storyboard-wizard-asset-cat-")));
+    roots.push(parent);
+    const projectRoot = (await createManagedProject({ parentRoot: parent, name: "向导资产分类" })).paths.root;
+    await initializeStudioProduction(projectRoot);
+    await createStudioCanonicalAsset(projectRoot, {
+      id: "character-ahang",
+      category: "character",
+      name: "阿航",
+      expectedRevision: 0,
+    } as Parameters<typeof createStudioCanonicalAsset>[1]);
+    await createStudioCanonicalAsset(projectRoot, {
+      id: "scene-stone",
+      category: "scene",
+      name: "石室",
+      expectedRevision: 0,
+    } as Parameters<typeof createStudioCanonicalAsset>[1]);
+    await createStudioCanonicalAsset(projectRoot, {
+      id: "prop-mask",
+      category: "prop",
+      name: "黄金面具",
+      expectedRevision: 0,
+    } as Parameters<typeof createStudioCanonicalAsset>[1]);
+    await createStudioCanonicalAsset(projectRoot, {
+      id: "style-cine",
+      category: "style",
+      name: "电影写实",
+      expectedRevision: 0,
+    } as Parameters<typeof createStudioCanonicalAsset>[1]);
+    const doc = await createStudioScriptDocument(projectRoot, {
+      id: "script-wizard-assets",
+      title: "资产分类剧本",
+      expectedRevision: 0,
+    });
+    const revision = await appendStudioScriptRevision(projectRoot, {
+      documentId: doc.id,
+      expectedRevision: 0,
+      body: "第一句动作。第二句反应。第三句收束。",
+      source: "test",
+      sourceVersion: "1",
+    });
+    const panels = applyWizardPanelEdits(toWizardEditablePanels([
+      { ...basePanel(1), suggestedAssetIds: ["character-ahang", "scene-stone", "prop-mask", "style-cine"] },
+      { ...basePanel(2), suggestedAssetIds: ["character-ahang", "gone-missing"] },
+      { ...basePanel(3), suggestedAssetIds: [] },
+    ]), [
+      { panelIndex: 1, visualAction: "站定" },
+      { panelIndex: 2, visualAction: "抬手" },
+      { panelIndex: 3, visualAction: "收束" },
+    ]);
+    const materialized = await materializeStudioStoryboardWizardUnit(projectRoot, {
+      season: "S1",
+      episode: "E1",
+      sequence: 1,
+      unitId: "unit-wizard-asset-cat",
+      unitTitle: "向导资产分类",
+      scriptRevisionId: revision.revision.id,
+      panels,
+    });
+    const snapshot = await getStudioProductionUnitSnapshot(projectRoot, materialized.unitId);
+    expect(snapshot?.panels.map((panel) => panel.assets.map((asset) => ({
+      assetId: asset.assetId,
+      category: asset.category,
+      role: asset.role,
+    })))).toEqual([
+      [
+        { assetId: "character-ahang", category: "character", role: "阿航" },
+        { assetId: "prop-mask", category: "prop", role: "黄金面具" },
+        { assetId: "scene-stone", category: "scene", role: "石室" },
+        { assetId: "style-cine", category: "style", role: "电影写实" },
+      ],
+      [
+        { assetId: "character-ahang", category: "character", role: "阿航" },
+      ],
+      [],
+    ]);
   });
 });
