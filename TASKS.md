@@ -81,6 +81,7 @@
 - [x] 画布主按钮/节点 freeze-dispatch 复用已加载 overview 六图闸（newSlotDispatchAllowed===false 时禁用主按钮；primaryStart / runNodeAction 不 persist / 不 emit；未投影不挡；unit-grid wait 文案优先；零额外 IPC；不改动作 code / dashboard / T4/T5；schemaVersion 仍为 1）
 - [x] 执行最近工作流组复用已加载 overview 六图闸（按钮禁用；runLastWorkflowGroup 不 executeWorkflowGroup；未投影不挡；零额外 IPC）
 - [x] 画布主按钮/节点/工作流组复用已加载 unit-grid 在途闸（wait/retry/Review/对账禁用并 return；planned 不挡；零额外 IPC；Vue 从 node-action-panel 再导出 kind helper，不 import plan-draft）
+- [x] 阅读器本修订影响复用 P24 script-revision-impact（按需 IPC；不进 ScriptReaderView；非预期须人工复核；无 pack/run 不猜第一格；不改 schema / getStudioTrace selector / P24 golden；不派发）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
