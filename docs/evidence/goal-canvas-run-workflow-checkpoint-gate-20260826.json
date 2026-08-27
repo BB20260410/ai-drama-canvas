@@ -1,0 +1,52 @@
+{
+  "id": "goal-canvas-run-workflow-checkpoint-gate-20260826",
+  "kind": "canvas-run-workflow-checkpoint-gate",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-27T00:01:00.000Z",
+  "scope": "ManagedStudioCanvasView runLastWorkflowGroup reuses the already-loaded overview.checkpoint. When newSlotDispatchAllowed === false, the advanced 'run last workflow group' button is disabled and the function returns before executeWorkflowGroup. Unprojected overview does not block. Zero extra IPC. Does not change dashboard projection, T4, T5, or workflow runner command codes.",
+  "invariants": {
+    "usesLoadedOverviewOnly": true,
+    "zeroExtraIpc": true,
+    "unprojectedDoesNotBlock": true,
+    "doesNotExecuteWorkflowWhenBlocked": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true,
+    "doesNotChangeDashboardProjection": true,
+    "doesNotOpenCheckpointControl": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-script-library-reader.test.ts"
+      ],
+      "result": "14 files / 209 tests PASS"
+    },
+    "commit": "4f538d8",
+    "linuxDirfdNote": "tests/studio-generation-session-snapshot.test.ts P7 fixture still needs Darwin dirfd; not claimed as this Cloud gate"
+  },
+  "notClaimed": [
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed",
+    "primaryStart blocked by unit-grid wait",
+    "runLastWorkflowGroup blocked by unit-grid wait",
+    "readiness reads checkpoint control"
+  ]
+}
