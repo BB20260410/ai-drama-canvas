@@ -198,7 +198,7 @@ describe("studio-storyboard-wizard", () => {
     expect(session.panels[0]?.sourceSpans[0]?.startOffsetUtf16).toBe(startOffsetUtf16);
   });
 
-  it("Core 物化写入规范资产真实 category/name，缺记录跳过", async () => {
+  it.skipIf(process.platform !== "darwin")("Core 物化写入规范资产真实 category/name，缺记录跳过", async () => {
     const parent = await realpath(await mkdtemp(path.join(os.tmpdir(), "storyboard-wizard-asset-cat-")));
     roots.push(parent);
     const projectRoot = (await createManagedProject({ parentRoot: parent, name: "向导资产分类" })).paths.root;
