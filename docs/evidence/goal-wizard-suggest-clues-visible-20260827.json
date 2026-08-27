@@ -1,0 +1,62 @@
+{
+  "id": "goal-wizard-suggest-clues-visible-20260827",
+  "kind": "wizard-suggest-clues-visible",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-27T01:15:00.000Z",
+  "scope": "SSL-4/5 wizard desktop shows P20 videoPromptScaffold and suggestedAssetIds; transition and negativePrompt are editable and already materialize. Scaffold is readonly via formatWizardVideoPromptScaffoldLine. formatWizardPromptBody still does not write 拆格骨架 / videoPromptScaffold. Removing a suggested asset is an explicit director action. Does not close SSL-5 bond-loop (scaffold still not in frozen prompt). Does not change WIZARD_POST_MATERIALIZE_NEXT, STORYBOARD_WIZARD_SCHEMA_VERSION, freeze writeCommand, T4, T5, dashboard, or getStudioTrace selector.",
+  "invariants": {
+    "scaffoldReadonlyVisible": true,
+    "scaffoldNotInFormatWizardPromptBody": true,
+    "suggestedAssetsListed": true,
+    "suggestedRemoveIsExplicit": true,
+    "transitionEditable": true,
+    "negativePromptEditable": true,
+    "vueTypeOnlyImportsWizard": true,
+    "schemaVersionStill1": true,
+    "doesNotChangeFormatWizardPromptBody": true,
+    "doesNotChangeWizardPostMaterializeNext": true,
+    "doesNotCloseBondLoop": true,
+    "doesNotAutoDispatch": true,
+    "doesNotSkipBinding": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true,
+    "doesNotChangeDashboardProjection": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-library-projection.test.ts",
+        "tests/storyboard-wizard-assets.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/studio-command-runtime.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/user-facing-error.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-script-library-reader.test.ts"
+      ],
+      "result": "typecheck:app PASS; 15 files / 237 tests PASS. wizard source-range still Linux dirfd (pre-existing, not this knife); Core materialize sqlite skipped on non-Darwin"
+    },
+    "commit": "6193ca9",
+    "linuxDirfdNote": "wizard source-range / createManagedProject still need Darwin dirfd. Not claimed as this Cloud gate."
+  },
+  "notClaimed": [
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed",
+    "SSL-5 bond-loop scaffold in frozen prompt",
+    "SSL-6 product-pack close",
+    "wizard auto-dispatch",
+    "wizard skips Binding"
+  ]
+}

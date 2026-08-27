@@ -89,6 +89,7 @@
 - [x] readiness/plan 只读 query 接受已取回 revisionImpact（unexpected 则 next 改 Review unexpected revision impact；wait/已 Review 保留；未限定列表/not_found 不猜单元；省略不查；不改 freeze writeCommand；不自动查；retry 仍未接）
 - [x] 向导 Core 物化按规范资产真实 category/name 落盘（getStudioCanonicalAsset；缺记录跳过，不再一律 character / role=assetId；与桌面 App 对齐；不改 formatWizardPromptBody / WIZARD_POST_MATERIALIZE_NEXT；schemaVersion 仍为 1；不跳过 Binding、不派发）
 - [x] 向导歧义未裁决禁止物化（validate / 桌面校验 / App 写路径失败关闭；applyWizardUnresolvedDecision include 必须在候选集；禁止默认第一候选；不改 formatWizardPromptBody / WIZARD_POST_MATERIALIZE_NEXT；schemaVersion 仍为 1；不跳过 Binding、不派发）
+- [x] 向导露出拆格骨架与建议资产，可改转场/负提示（只读骨架不进 formatWizardPromptBody / 冻结指纹；去掉建议是显式导演动作；不改 WIZARD_POST_MATERIALIZE_NEXT；schemaVersion 仍为 1；不把 scaffold 当 bond-loop 关账；不跳过 Binding、不派发）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
