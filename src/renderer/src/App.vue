@@ -387,7 +387,7 @@ import {
 import { createProjectScopedActionGate, type ProjectScopedActionToken } from "./project-scoped-action-gate";
 import { statusClass } from "./utils";
 import { resolveStoryboardWizardAssets } from "./storyboard-wizard-assets";
-import { formatWizardPromptBody } from "@core/studio-panel-standing";
+import { formatWizardPromptBody, listWizardUnresolvedMaterializeErrors } from "@core/studio-panel-standing";
 import { markT23RendererStartup, recordT23StartupRuntimeGate } from "./t23-renderer-startup-probe";
 import { createManagedStudioModulePreloader } from "./managed-studio-module-preload";
 import type { CreateManagedProjectOptions, ProjectShell } from "@core/managed-project";
@@ -1022,6 +1022,10 @@ const studioScriptAlignApi = {
     const unitId = `unit-wizard-${semanticDigest.slice(0, 40)}`;
     const promptDocumentId = `prompt-wizard-${semanticDigest.slice(0, 40)}`;
     const promptTitle = `${input.unitTitle} · 15 秒分镜提示词`;
+    const unresolved = listWizardUnresolvedMaterializeErrors(input.panels);
+    if (unresolved.length) {
+      throw new Error(unresolved.join("；"));
+    }
     const promptBody = formatWizardPromptBody(input.panels);
 
     const requireResult = <T,>(

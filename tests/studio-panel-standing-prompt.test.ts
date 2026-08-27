@@ -41,6 +41,8 @@ import {
   STYLE_LOCK_TOOL_NOTE,
   studioAgentImagegenBriefConstraintLines,
   frozenPanelOverlaysFromFrozenPanelPacks,
+  listWizardUnresolvedMaterializeErrors,
+  applyWizardUnresolvedDecision,
   FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
   EXTENSION_SHOT_TYPE_TOOL_NOTE,
 } from "../src/core/studio-panel-standing.js";
@@ -581,5 +583,48 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(mcpTrace).toContain("consistencyPeek");
     expect(mcpTrace).toContain("无 run 则省略以免改 P24 形状");
     expect(mcpTrace).toContain("无该行则省略");
+  });
+});
+
+describe("向导歧义裁决", () => {
+  it("未裁决列出错误；include 必须在候选集内，exclude 清提案", () => {
+    const panels = [{
+      panelIndex: 2,
+      suggestedAssetIds: [] as string[],
+      unresolvedProposals: [{
+        surfaceText: "阿航",
+        startOffsetUtf16: 0,
+        endOffsetUtf16: 2,
+        candidateAssetIds: ["character-ahang-young", "character-ahang-child"],
+      }],
+    }];
+    expect(listWizardUnresolvedMaterializeErrors(panels)[0]).toContain("G2 资产歧义未裁决：阿航（2 候选）");
+    expect(() => applyWizardUnresolvedDecision(panels, {
+      panelIndex: 2,
+      surfaceText: "阿航",
+      action: "include",
+    })).toThrow(/禁止默认第一候选/u);
+    expect(() => applyWizardUnresolvedDecision(panels, {
+      panelIndex: 2,
+      surfaceText: "阿航",
+      action: "include",
+      assetId: "character-other",
+    })).toThrow(/不在候选集/u);
+    const included = applyWizardUnresolvedDecision(panels, {
+      panelIndex: 2,
+      surfaceText: "阿航",
+      action: "include",
+      assetId: "character-ahang-child",
+    });
+    expect(included[0]?.suggestedAssetIds).toEqual(["character-ahang-child"]);
+    expect(included[0]?.unresolvedProposals).toEqual([]);
+    expect(listWizardUnresolvedMaterializeErrors(included)).toEqual([]);
+    const excluded = applyWizardUnresolvedDecision(panels, {
+      panelIndex: 2,
+      surfaceText: "阿航",
+      action: "exclude",
+    });
+    expect(excluded[0]?.suggestedAssetIds).toEqual([]);
+    expect(excluded[0]?.unresolvedProposals).toEqual([]);
   });
 });

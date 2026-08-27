@@ -476,4 +476,19 @@ describe("对照侧栏打开生成追溯", () => {
     expect(loadAlign).not.toContain("getStudioScriptRevisionImpact");
     expect(vue).not.toContain("from \"@core/studio-trace");
   });
+
+  it("向导歧义未裁决不得物化，提供选用/排除，不默认第一候选", () => {
+    const vue = source();
+    expect(vue).toContain("listWizardUnresolvedMaterializeErrors");
+    expect(vue).toContain("applyWizardUnresolvedDecision");
+    expect(vue).toContain("errors.push(...listWizardUnresolvedMaterializeErrors(panels))");
+    expect(vue).toContain('data-testid="wizard-unresolved-exclude"');
+    expect(vue).toContain("wizard-unresolved-include-");
+    expect(vue).toContain("decideWizardUnresolved");
+    expect(vue).toContain("禁止默认第一候选");
+    expect(vue).not.toContain("candidateAssetIds[0]");
+    const app = readFileSync(path.join(root, "src/renderer/src/App.vue"), "utf8");
+    expect(app).toContain("listWizardUnresolvedMaterializeErrors(input.panels)");
+    expect(app).toContain("if (unresolved.length)");
+  });
 });

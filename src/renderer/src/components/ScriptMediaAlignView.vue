@@ -55,9 +55,11 @@ import {
 import { listOrWorkbenchPreviewUrl } from "../studio-list-preview-url";
 import StudioGenerationTraceDrawer, { type StudioTraceDrawerModel } from "./StudioGenerationTraceDrawer.vue";
 import {
+  applyWizardUnresolvedDecision,
   formatUnitLockPreviousStandingLine,
   formatWizardLockPreviousCostumeLine,
   formatWizardLockPreviousLightingLine,
+  listWizardUnresolvedMaterializeErrors,
   wizardPreviousCostumeForPanel,
   wizardPreviousLightingForPanel,
   wizardPreviousStandingForPanel,
@@ -727,8 +729,23 @@ const wizardValidationErrors = computed(() => {
       errors.push(`G${panel.panelIndex} 扩写格不得锚定原文`);
     }
   });
+  errors.push(...listWizardUnresolvedMaterializeErrors(panels));
   return errors;
 });
+
+function decideWizardUnresolved(
+  panelIndex: number,
+  surfaceText: string,
+  action: "include" | "exclude",
+  assetId?: string,
+): void {
+  wizardPanels.value = applyWizardUnresolvedDecision(wizardPanels.value, {
+    panelIndex,
+    surfaceText,
+    action,
+    ...(assetId ? { assetId } : {}),
+  });
+}
 
 async function materializeWizard(): Promise<void> {
   if (!reader.value || !wizard.value || wizardValidationErrors.value.length || actionLoading.value) return;
@@ -1689,6 +1706,26 @@ function shortSha(value: string | null | undefined): string {
             @click="revealWizardSceneBackRef(ref)"
           >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
           <small class="wide">原文锚 {{ panel.sourceSpans.length }} · 资产建议 {{ panel.suggestedAssetIds.length }} · 歧义 {{ panel.unresolvedProposals.length }}</small>
+          <div
+            v-for="proposal in panel.unresolvedProposals"
+            :key="`${panel.panelIndex}:${proposal.startOffsetUtf16}:${proposal.surfaceText}`"
+            class="wide"
+            :data-testid="`wizard-unresolved-${panel.panelIndex}`"
+          >
+            <span>{{ proposal.surfaceText }} 歧义未裁决，禁止默认第一候选</span>
+            <button
+              v-for="assetId in proposal.candidateAssetIds"
+              :key="`${proposal.surfaceText}:${assetId}`"
+              type="button"
+              :data-testid="`wizard-unresolved-include-${assetId}`"
+              @click="decideWizardUnresolved(panel.panelIndex, proposal.surfaceText, 'include', assetId)"
+            >选用 {{ assetId }}</button>
+            <button
+              type="button"
+              data-testid="wizard-unresolved-exclude"
+              @click="decideWizardUnresolved(panel.panelIndex, proposal.surfaceText, 'exclude')"
+            >排除</button>
+          </div>
         </article>
       </section>
 

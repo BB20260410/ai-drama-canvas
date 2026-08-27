@@ -86,6 +86,37 @@ describe("studio-storyboard-wizard", () => {
     expect(validateWizardForMaterialize(filled)).toEqual([]);
   });
 
+  it("未裁决歧义禁止物化，显式选用/排除后才放行", () => {
+    const ambiguous = toWizardEditablePanels([
+      {
+        ...basePanel(1),
+        unresolvedProposals: [{
+          surfaceText: "阿航",
+          startOffsetUtf16: 0,
+          endOffsetUtf16: 2,
+          candidateAssetIds: ["character-ahang-young", "character-ahang-child"],
+        }],
+      },
+      basePanel(2),
+      basePanel(3),
+    ]);
+    const filled = applyWizardPanelEdits(ambiguous, [
+      { panelIndex: 1, visualAction: "a" },
+      { panelIndex: 2, visualAction: "b" },
+      { panelIndex: 3, visualAction: "c" },
+    ]);
+    const blocked = validateWizardForMaterialize(filled);
+    expect(blocked.some((error) => error.includes("资产歧义未裁决") && error.includes("阿航"))).toBe(true);
+    expect(blocked.some((error) => error.includes("禁止静默选第一个候选"))).toBe(true);
+    const resolved = applyWizardPanelEdits(filled, [{
+      panelIndex: 1,
+      suggestedAssetIds: ["character-ahang-young"],
+      unresolvedProposals: [],
+    }]);
+    expect(validateWizardForMaterialize(resolved)).toEqual([]);
+    expect(resolved[0]?.suggestedAssetIds).toEqual(["character-ahang-young"]);
+  });
+
   it("schema frozen", () => {
     expect(STORYBOARD_WIZARD_SCHEMA_VERSION).toBe(1);
   });

@@ -615,6 +615,90 @@ export type FrozenPanelOverlayRow = {
  * 追溯/brief 共用：只从各格冻结 renderedPrompt 还原宫格光线/服装覆盖。
  * 两行都没有的格不进数组；全空则调用方应省略字段，保持历史 P24 投影兼容。
  */
+export type WizardUnresolvedProposalFields = {
+  surfaceText?: string;
+  candidateAssetIds?: readonly string[];
+};
+
+export type WizardUnresolvedPanelFields = {
+  panelIndex: number;
+  unresolvedProposals?: ReadonlyArray<WizardUnresolvedProposalFields>;
+};
+
+/** 物化前歧义未裁决错误。禁止静默选第一个候选。 */
+export function listWizardUnresolvedMaterializeErrors(
+  panels: ReadonlyArray<WizardUnresolvedPanelFields>,
+): string[] {
+  const errors: string[] = [];
+  for (const panel of panels) {
+    const proposals = panel.unresolvedProposals ?? [];
+    if (!proposals.length) continue;
+    const labels = proposals.map((proposal) => {
+      const text = String(proposal.surfaceText || "").trim() || "未知名";
+      const count = proposal.candidateAssetIds?.length ?? 0;
+      return count > 0 ? `${text}（${count} 候选）` : text;
+    });
+    errors.push(
+      `G${panel.panelIndex} 资产歧义未裁决：${labels.join("、")}。禁止静默选第一个候选，须人工选用或排除。`,
+    );
+  }
+  return errors;
+}
+
+export type WizardUnresolvedDecision = {
+  panelIndex: number;
+  surfaceText: string;
+  action: "include" | "exclude";
+  assetId?: string;
+};
+
+export type WizardUnresolvedEditablePanel = {
+  panelIndex: number;
+  suggestedAssetIds: string[];
+  unresolvedProposals: Array<{
+    surfaceText: string;
+    startOffsetUtf16: number;
+    endOffsetUtf16: number;
+    candidateAssetIds: string[];
+  }>;
+};
+
+/**
+ * 显式裁决歧义提案。include 必须给出候选集内 assetId；禁止默认第一项。
+ * 找不到提案则原样返回（排除幂等）。
+ */
+export function applyWizardUnresolvedDecision<T extends WizardUnresolvedEditablePanel>(
+  panels: readonly T[],
+  decision: WizardUnresolvedDecision,
+): T[] {
+  const surface = String(decision.surfaceText || "").trim();
+  if (!surface) throw new Error("歧义裁决缺少 surfaceText。");
+  return panels.map((panel) => {
+    if (panel.panelIndex !== decision.panelIndex) return panel;
+    const proposal = panel.unresolvedProposals.find((item) => item.surfaceText === surface);
+    if (!proposal) return panel;
+    if (decision.action === "exclude") {
+      return {
+        ...panel,
+        unresolvedProposals: panel.unresolvedProposals.filter((item) => item.surfaceText !== surface),
+      };
+    }
+    const assetId = String(decision.assetId || "").trim();
+    if (!assetId) throw new Error(`G${panel.panelIndex}「${surface}」选用必须给出 assetId，禁止默认第一候选。`);
+    if (!proposal.candidateAssetIds.includes(assetId)) {
+      throw new Error(`G${panel.panelIndex}「${surface}」选用不在候选集：${assetId}`);
+    }
+    const suggestedAssetIds = panel.suggestedAssetIds.includes(assetId)
+      ? panel.suggestedAssetIds
+      : [...panel.suggestedAssetIds, assetId];
+    return {
+      ...panel,
+      suggestedAssetIds,
+      unresolvedProposals: panel.unresolvedProposals.filter((item) => item.surfaceText !== surface),
+    };
+  });
+}
+
 export function frozenPanelOverlaysFromFrozenPanelPacks(
   packs: ReadonlyArray<{
     target?: { panelId?: string };

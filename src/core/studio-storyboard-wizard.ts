@@ -20,7 +20,7 @@ import {
   type StudioProductionPanelInput,
 } from "./studio-production.js";
 import { getStudioCanonicalAsset } from "./material-studio.js";
-import { formatWizardPromptBody } from "./studio-panel-standing.js";
+import { formatWizardPromptBody, listWizardUnresolvedMaterializeErrors } from "./studio-panel-standing.js";
 
 export const STORYBOARD_WIZARD_SCHEMA_VERSION = 1 as const;
 /** 物化后只读下一步。不跳过 Binding，不自动派发，中间必须 create-plan。 */
@@ -38,6 +38,8 @@ export interface WizardPanelEdit {
   costumeState?: string;
   sceneLighting?: string;
   negativePrompt?: string;
+  suggestedAssetIds?: string[];
+  unresolvedProposals?: StudioStoryboardDraftPanelSuggestion["unresolvedProposals"];
 }
 
 export interface WizardEditablePanel extends StudioStoryboardDraftPanelSuggestion {
@@ -174,6 +176,8 @@ export function applyWizardPanelEdits(
       costumeState: e.costumeState ?? p.costumeState,
       sceneLighting: e.sceneLighting ?? p.sceneLighting,
       negativePrompt: e.negativePrompt ?? p.negativePrompt,
+      suggestedAssetIds: e.suggestedAssetIds ?? p.suggestedAssetIds,
+      unresolvedProposals: e.unresolvedProposals ?? p.unresolvedProposals,
     };
   });
 }
@@ -194,6 +198,7 @@ export function validateWizardForMaterialize(panels: WizardEditablePanel[]): str
     if (!p.visualAction.trim()) errors.push(`G${p.panelIndex} 缺少 visualAction`);
     if (!p.title.trim()) errors.push(`G${p.panelIndex} 缺少 title`);
   }
+  errors.push(...listWizardUnresolvedMaterializeErrors(panels));
   return errors;
 }
 
@@ -223,6 +228,7 @@ export async function openStudioStoryboardWizard(
     panels: toWizardEditablePanels(suggestion.panels),
     nextSteps: [
       "Agent/人工填写每格 visualAction/景别/运镜/光线/服化（applyWizardPanelEdits）",
+      "未裁决的资产歧义必须选用或排除（applyWizardUnresolvedDecision）；禁止静默选第一个候选",
       "G2+ 必须从上一格站位连续起拍；上一格光线/服化只作锁版提示，不自动写入本格（不是 BindingSet，不能当 generation-ready）",
       "validateWizardForMaterialize 无错误后 materializeStudioStoryboardWizardUnit",
       WIZARD_POST_MATERIALIZE_NEXT,
