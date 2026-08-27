@@ -97,8 +97,10 @@ import {
   historyEnvelopeNext,
   packEnvelopeNextOverrideForUnitGridBlocking,
   planOperationEnvelopeNext,
+  refineNextIfUnexpectedRevisionImpact,
   refineStudioGenerationPlanDraftIfUnitGridBlocking,
   type PersistedPlanNodeStatus,
+  type Ssl5RevisionImpactHint,
 } from "./studio-generation-plan-draft.js";
 import {
   generationLedgerSidecarPath,
@@ -137,17 +139,31 @@ function sanitizedRemoteObservation<T extends { message: string } | undefined>(v
 
 export type StudioGenerationControlQuery =
   | { operation: "session-snapshot"; unitId: string; panelId?: string }
-  | { operation: "readiness"; targetKind?: "panel"; unitId: string; panelId: string }
+  | {
+      operation: "readiness";
+      targetKind?: "panel";
+      unitId: string;
+      panelId: string;
+      revisionImpact?: Ssl5RevisionImpactHint;
+    }
   | {
       operation: "readiness";
       targetKind: "unit-grid";
       unitId: string;
       continuationWaiver?: { receiptId: string; receiptFingerprint: string };
+      revisionImpact?: Ssl5RevisionImpactHint;
     }
   | { operation: "pack"; packId: string }
   | { operation: "history"; targetKind?: "panel"; unitId: string; panelId: string; cursor?: string; limit?: number; order?: "oldest-first" | "newest-first" }
   | { operation: "history"; targetKind: "unit-grid"; unitId: string; cursor?: string; limit?: number; order?: "oldest-first" | "newest-first" }
-  | { operation: "plan"; planId?: string; targetKind?: "panel" | "unit-grid"; unitId?: string; panelId?: string }
+  | {
+      operation: "plan";
+      planId?: string;
+      targetKind?: "panel" | "unit-grid";
+      unitId?: string;
+      panelId?: string;
+      revisionImpact?: Ssl5RevisionImpactHint;
+    }
   | { operation: "call"; generationRunId: string }
   | { operation: "active-runs"; targetKind?: "panel"; unitId: string; panelId: string }
   | { operation: "active-runs"; targetKind: "unit-grid"; unitId: string }
@@ -493,11 +509,36 @@ function packEnvelopeNext(
     : "dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback";
 }
 
-/** readiness 只读 next：同单元 unit-grid 在途时禁止再写 freeze→create-plan→dispatch。不加 inspect。 */
-function readinessAgentNext(projectRoot: string, unitId: string, fallback: string): string {
+/** readiness 只读 next：同单元 unit-grid 在途时禁止再写 freeze→create-plan→dispatch。已取回 unexpected 改 Review。不加 inspect，不自动查。 */
+function readinessAgentNext(
+  projectRoot: string,
+  unitId: string,
+  fallback: string,
+  revisionImpact?: Ssl5RevisionImpactHint,
+  panelId?: string,
+): string {
   const status = readPersistedUnitGridPlanState(generationLedgerSidecarPath(projectRoot), unitId).status
     ?? undefined;
-  return packEnvelopeNextOverrideForUnitGridBlocking(status) ?? fallback;
+  const chosen = packEnvelopeNextOverrideForUnitGridBlocking(status) ?? fallback;
+  return refineNextIfUnexpectedRevisionImpact({
+    next: chosen,
+    hint: revisionImpact,
+    targets: [{ unitId, panelId }],
+  });
+}
+
+function planRevisionImpactTargets(
+  query: { unitId?: string; panelId?: string },
+  nodes?: Array<{ unitId: string; targetKind?: string; panelId?: string }>,
+): Array<{ unitId: string; panelId?: string | null }> {
+  if (nodes && nodes.length > 0) {
+    return nodes.map((node) => ({
+      unitId: node.unitId,
+      panelId: node.targetKind === "panel" ? node.panelId : undefined,
+    }));
+  }
+  if (!query.unitId) return [];
+  return [{ unitId: query.unitId, panelId: query.panelId }];
 }
 
 function sameSortedStrings(left: string[], right: string[]): boolean {
@@ -639,6 +680,8 @@ async function verifiedStudioUnitGridControlReferences(
 /**
  * Codex 专用的本地生成控制封装。普通就绪/历史投影不返回路径；只有 pack
  * operation 会在重验受管项目、冻结输入、media CAS 路径与文件 SHA 后返回 localPath。
+ * readiness / plan 可传入调用方已取回的 revisionImpact，只精炼 next；省略不查。
+ * 不改 freeze writeCommand。
  */
 export async function getStudioGenerationControlEnvelope(
   projectRoot: string,
@@ -713,6 +756,7 @@ export async function getStudioGenerationControlEnvelope(
                 projectRoot,
                 readiness.pack.target.unitId,
                 "freeze → create-plan → dispatch(provider=codex) → prepare pre-call intent → one imagegen call → atomic raw/labeled writeback",
+                query.revisionImpact,
               ),
               briefs: {
                 codex: buildStudioUnitGridAgentImagegenBrief(readiness.pack, "codex"),
@@ -800,6 +844,8 @@ export async function getStudioGenerationControlEnvelope(
             projectRoot,
             readiness.pack.target.unitId,
             "freeze → create-plan → dispatch(provider=codex|grok) → agent imagegen → atomic raw/labeled writeback",
+            query.revisionImpact,
+            readiness.pack.target.panelId,
           ),
           briefs: {
             codex: buildStudioAgentImagegenBrief(readiness.pack, "codex"),
@@ -980,6 +1026,8 @@ export async function getStudioGenerationControlEnvelope(
         nextAction: planOperationEnvelopeNext({
           kind: "scoped",
           statuses: plan.nodes.map((node) => node.status),
+          revisionImpact: query.revisionImpact,
+          targets: planRevisionImpactTargets(query, plan.nodes),
         }),
         controlReferencesExposed: false as const,
       };
@@ -1004,6 +1052,8 @@ export async function getStudioGenerationControlEnvelope(
         ? planOperationEnvelopeNext({
           kind: "scoped",
           statuses: plans.flatMap((plan) => plan?.nodes.map((node) => node.status) ?? []),
+          revisionImpact: query.revisionImpact,
+          targets: planRevisionImpactTargets(query, plans.flatMap((plan) => plan?.nodes ?? [])),
         })
         : planOperationEnvelopeNext({ kind: "unscoped-list" }),
       controlReferencesExposed: false as const,

@@ -27,6 +27,8 @@ import {
   loadedRevisionImpactUnexpectedMark,
   mergeSsl5RevisionImpactPages,
   firstGenerationTargetBlockedByUnexpectedRevisionImpact,
+  READINESS_NEXT_UNEXPECTED_REVISION_REVIEW,
+  refineNextIfUnexpectedRevisionImpact,
   refineSsl5FocusIfUnexpectedRevisionImpact,
   refineStudioGenerationPlanDraftIfUnitGridBlocking,
   SSL5_REVISION_IMPACT_NOT_LOADED_LINE,
@@ -291,6 +293,49 @@ describe("create-plan 只读草稿纯函数", () => {
     expect(planOperationEnvelopeNext({ kind: "unscoped-list" })).toBe(PLAN_ENVELOPE_NEXT_FOLLOW);
     expect(planOperationEnvelopeNext({ kind: "scoped", statuses: [] })).toBe(PLAN_ENVELOPE_NEXT_CREATE);
     expect(planOperationEnvelopeNext({ kind: "scoped", statuses: ["dispatched"] })).toBe(PLAN_ENVELOPE_NEXT_WAIT);
+    const unexpectedHint = {
+      items: [{ unitId: "u1", rows: [{ panelId: "p1", changeClassification: "unexpected" as const }] }],
+    };
+    expect(planOperationEnvelopeNext({
+      kind: "not-found",
+      revisionImpact: unexpectedHint,
+      targets: [{ unitId: "u1", panelId: "p1" }],
+    })).toBe(PLAN_ENVELOPE_NEXT_FOLLOW);
+    expect(planOperationEnvelopeNext({
+      kind: "unscoped-list",
+      revisionImpact: unexpectedHint,
+      targets: [{ unitId: "u1", panelId: "p1" }],
+    })).toBe(PLAN_ENVELOPE_NEXT_FOLLOW);
+    expect(planOperationEnvelopeNext({
+      kind: "scoped",
+      statuses: [],
+      revisionImpact: unexpectedHint,
+      targets: [{ unitId: "u1", panelId: "p1" }],
+    })).toBe(READINESS_NEXT_UNEXPECTED_REVISION_REVIEW);
+    expect(planOperationEnvelopeNext({
+      kind: "scoped",
+      statuses: ["planned"],
+      revisionImpact: unexpectedHint,
+      targets: [{ unitId: "u1", panelId: "p1" }],
+    })).toBe(READINESS_NEXT_UNEXPECTED_REVISION_REVIEW);
+    expect(planOperationEnvelopeNext({
+      kind: "scoped",
+      statuses: ["dispatched"],
+      revisionImpact: unexpectedHint,
+      targets: [{ unitId: "u1", panelId: "p1" }],
+    })).toBe(PLAN_ENVELOPE_NEXT_WAIT);
+    expect(planOperationEnvelopeNext({
+      kind: "scoped",
+      statuses: ["failed"],
+      revisionImpact: unexpectedHint,
+      targets: [{ unitId: "u1", panelId: "p1" }],
+    })).toBe(READINESS_NEXT_UNEXPECTED_REVISION_REVIEW);
+    expect(planOperationEnvelopeNext({
+      kind: "scoped",
+      statuses: [],
+      revisionImpact: unexpectedHint,
+      targets: [{ unitId: "u-other", panelId: "p9" }],
+    })).toBe(PLAN_ENVELOPE_NEXT_CREATE);
     expect(planEnvelopeNextLabel(["dispatched"])).toContain("等待结果或对账");
     expect(planEnvelopeNextLabel(["failed"])).toContain("retry");
     expect(planEnvelopeNextLabel(["succeeded"])).toContain("Review");
@@ -485,6 +530,38 @@ describe("已加载 unexpected 修订影响精炼 SSL-5", () => {
       [{ unitId: "u-focus", panelId: null }],
       { items: [{ unitId: "u-focus", rows: [{ panelId: null, targetKind: "unit-grid", changeClassification: "unexpected" }] }] },
     )).toEqual({ unitId: "u-focus", panelId: null });
+
+    const freezeNext = "freeze → create-plan → dispatch(provider=codex)";
+    expect(refineNextIfUnexpectedRevisionImpact({
+      next: freezeNext,
+      hint: null,
+      targets: [{ unitId: "u-focus", panelId: "p1" }],
+    })).toBe(freezeNext);
+    expect(refineNextIfUnexpectedRevisionImpact({
+      next: freezeNext,
+      hint: unexpected,
+      targets: [{ unitId: "u-focus", panelId: "p1" }],
+    })).toBe(READINESS_NEXT_UNEXPECTED_REVISION_REVIEW);
+    expect(refineNextIfUnexpectedRevisionImpact({
+      next: "wait → result or reconcile (no dispatch)",
+      hint: unexpected,
+      targets: [{ unitId: "u-focus", panelId: "p1" }],
+    })).toBe("wait → result or reconcile (no dispatch)");
+    expect(refineNextIfUnexpectedRevisionImpact({
+      next: "Review (no dispatch)",
+      hint: unexpected,
+      targets: [{ unitId: "u-focus", panelId: "p1" }],
+    })).toBe("Review (no dispatch)");
+    expect(refineNextIfUnexpectedRevisionImpact({
+      next: "retry_studio_generation_plan_nodes (no retry here, no dispatch)",
+      hint: unexpected,
+      targets: [{ unitId: "u-focus", panelId: "p1" }],
+    })).toBe(READINESS_NEXT_UNEXPECTED_REVISION_REVIEW);
+    expect(refineNextIfUnexpectedRevisionImpact({
+      next: freezeNext,
+      hint: unexpected,
+      targets: [{ unitId: "u-other", panelId: "p9" }],
+    })).toBe(freezeNext);
   });
 });
 
@@ -496,6 +573,8 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(draft).toContain("SSL5_UNEXPECTED_REVISION_IMPACT_REASON");
     expect(draft).toContain("firstGenerationTargetBlockedByUnexpectedRevisionImpact");
     expect(draft).toContain("UNEXPECTED_REVISION_IMPACT_ERROR_CODE");
+    expect(draft).toContain("refineNextIfUnexpectedRevisionImpact");
+    expect(draft).toContain("READINESS_NEXT_UNEXPECTED_REVISION_REVIEW");
     expect(draft).toContain("mergeSsl5RevisionImpactPages");
     expect(draft).toContain("loadedRevisionImpactClassificationForAlignTarget");
     expect(draft).toContain("loadedRevisionImpactAlignLine");
@@ -536,6 +615,64 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(executor).toContain("...(revisionImpact ? { revisionImpact } : {})");
     expect(prompt).toContain("create-plan/dispatch 须带同一 revisionImpact");
     expect(prompt).toContain("未取回不要为了写命令去查");
+    expect(prompt).toContain("get_studio_generation_control(operation=readiness|plan)");
+    expect(prompt).toContain("未取回不要为了这些读面去查");
+  });
+
+  it("readiness/plan 只读 query 接受已取回 revisionImpact，省略不查，不改 freeze writeCommand", () => {
+    const draft = source("src/core/studio-generation-plan-draft.ts");
+    const codex = source("src/core/codex.ts");
+    const server = source("src/mcp/server.ts");
+    expect(draft).toContain("refineNextIfUnexpectedRevisionImpact");
+    expect(codex).toContain("refineNextIfUnexpectedRevisionImpact");
+    expect(codex).toContain("query.revisionImpact");
+    expect(codex).toContain("planRevisionImpactTargets");
+    expect(codex).not.toContain("getStudioScriptRevisionImpact");
+    expect(codex).not.toContain("from \"./studio-trace.js\"");
+    expect(codex).not.toContain("studio-ssl5-missing-to-gen");
+    expect(codex).not.toContain("studio-script-media-align");
+    const readinessHelperStart = codex.indexOf("function readinessAgentNext");
+    const readinessHelperEnd = codex.indexOf("function sameSortedStrings", readinessHelperStart);
+    const readinessHelper = codex.slice(readinessHelperStart, readinessHelperEnd);
+    expect(readinessHelper).toContain("refineNextIfUnexpectedRevisionImpact");
+    expect(readinessHelper).toContain("packEnvelopeNextOverrideForUnitGridBlocking");
+    expect(readinessHelper).not.toContain("getStudioScriptRevisionImpact");
+    const freezePayload = codex.slice(
+      codex.indexOf("writeCommand: {"),
+      codex.indexOf("controlReferencesExposed: false as const", codex.indexOf("writeCommand: {")),
+    );
+    expect(freezePayload).toContain("freeze_studio_generation_pack");
+    expect(freezePayload).not.toContain("revisionImpact");
+    const schemaStart = server.indexOf("const studioGenerationControlQuerySchema");
+    const schemaEnd = server.indexOf("const studioBindingControlQuerySchema");
+    const schema = server.slice(schemaStart, schemaEnd);
+    expect(schema).toContain("revisionImpact: studioRevisionImpactHintSchema");
+    const sessionSlice = schema.slice(
+      schema.indexOf('operation: z.literal("session-snapshot")'),
+      schema.indexOf('operation: z.literal("readiness")'),
+    );
+    expect(sessionSlice).not.toContain("revisionImpact");
+    const packSlice = schema.slice(
+      schema.indexOf('operation: z.literal("pack")'),
+      schema.indexOf('operation: z.literal("history")'),
+    );
+    expect(packSlice).not.toContain("revisionImpact");
+    const historySlice = schema.slice(
+      schema.indexOf('operation: z.literal("history")'),
+      schema.indexOf('operation: z.literal("plan")'),
+    );
+    expect(historySlice).not.toContain("revisionImpact");
+    const activeSlice = schema.slice(
+      schema.indexOf('operation: z.literal("active-runs")'),
+      schema.indexOf('operation: z.literal("detached-unknown")'),
+    );
+    expect(activeSlice).not.toContain("revisionImpact");
+    expect(server).toContain("readiness/plan 可传入调用方已取回的 revisionImpact");
+    expect(server).toContain("省略不查");
+    expect(server).toContain("不改 freeze writeCommand");
+    const control = source("src/renderer/src/components/StudioGenerationControlView.vue");
+    expect(control).not.toContain("getStudioScriptRevisionImpact");
+    expect(control).not.toContain("revisionImpact");
   });
 
   it("session-snapshot 有 panelId 走单镜、无 panelId 走已落盘整板，草稿不进 fingerprint", () => {
@@ -749,10 +886,13 @@ describe("create-plan 草稿接线源码合同", () => {
     const helperEnd = codex.indexOf("if (query.operation === \"history\")", helperStart);
     const helper = codex.slice(helperStart, helperEnd);
     expect(helper).toContain("planOperationEnvelopeNext");
+    expect(helper).toContain("revisionImpact: query.revisionImpact");
+    expect(helper).toContain("planRevisionImpactTargets");
     expect(helper).not.toContain("dispatch_studio_generation_pack");
     expect(helper).not.toContain("create_studio_generation_plan");
     expect(helper).not.toContain("studio-ssl5-missing-to-gen");
     expect(helper).not.toContain("listStudioGenerationActiveRuns");
+    expect(helper).not.toContain("getStudioScriptRevisionImpact");
     const control = source("src/renderer/src/components/StudioGenerationControlView.vue");
     expect(control).toContain("planEnvelopeNextLabel");
     expect(control).toContain('data-testid="studio-generation-plan-next"');

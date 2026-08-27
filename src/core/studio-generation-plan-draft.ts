@@ -191,6 +191,32 @@ export function firstGenerationTargetBlockedByUnexpectedRevisionImpact(
   return null;
 }
 
+export const READINESS_NEXT_UNEXPECTED_REVISION_REVIEW =
+  "Review unexpected revision impact (no dispatch)" as const;
+
+/**
+ * 已取回 unexpected 时，禁止再建议 create-plan / dispatch / retry。
+ * wait / 已是 Review 保留更具体文案。省略 hint / 空目标不挡、不查。
+ * 不执行、不派发。机器不自动 Review PASS。
+ */
+export function refineNextIfUnexpectedRevisionImpact(input: {
+  next: string;
+  hint: Ssl5RevisionImpactHint;
+  targets: Array<{ unitId: string; panelId?: string | null }>;
+}): string {
+  if (
+    input.next.startsWith("wait")
+    || input.next.startsWith("open Review")
+    || input.next.startsWith("Review")
+  ) {
+    return input.next;
+  }
+  if (firstGenerationTargetBlockedByUnexpectedRevisionImpact(input.targets, input.hint)) {
+    return READINESS_NEXT_UNEXPECTED_REVISION_REVIEW;
+  }
+  return input.next;
+}
+
 /**
  * 已加载 script-revision-impact 且焦点格/单元有非预期时，禁止再建议 create-plan / dispatch。
  * 未加载不查、不挡。earliest wait/retry/Review 与六图闸未放行时保留更具体文案。
@@ -408,11 +434,17 @@ export function planEnvelopeNextLabel(
 export function planOperationEnvelopeNext(input: {
   kind: "not-found" | "unscoped-list" | "scoped";
   statuses?: readonly (string | null | undefined)[];
+  revisionImpact?: Ssl5RevisionImpactHint;
+  targets?: Array<{ unitId: string; panelId?: string | null }>;
 }): string {
   if (input.kind === "not-found" || input.kind === "unscoped-list") {
     return PLAN_ENVELOPE_NEXT_FOLLOW;
   }
-  return planEnvelopeNextFromNodeStatuses(input.statuses ?? []);
+  return refineNextIfUnexpectedRevisionImpact({
+    next: planEnvelopeNextFromNodeStatuses(input.statuses ?? []),
+    hint: input.revisionImpact,
+    targets: input.targets ?? [],
+  });
 }
 
 export type HistoryEnvelopeItem = {

@@ -926,7 +926,7 @@ describe("SSL-5 入口源码合同", () => {
     expect(server).toContain("missingReport");
     expect(server).toContain("acquire-lease");
     expect(server).toContain("省略不自动查");
-    expect(server).toContain("未取回不要为了 ssl5 去查");
+    expect(server).toContain("未取回不要为了这些读面去查");
     expect(server).toContain("未取回不要为了写命令去查");
     expect(server).toContain("withStudioSsl5MissingToGen");
     const ssl5Handler = server.slice(
