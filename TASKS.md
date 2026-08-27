@@ -86,6 +86,7 @@
 - [x] 本修订影响翻页 + 对照表/侧栏复用已加载 unexpected 角标（nextCursor 追加去重；未加载不自动查；SSL-5 非预期改去审片；不派发；schemaVersion 仍为 1）
 - [x] MCP/Core ssl5-missing-to-gen-plan 接受已取回 revisionImpact（焦点 unexpected → review；省略不自动查；SSL-5 不 import studio-trace；桌面仍 Vue 叠加；不派发；schemaVersion 仍为 1）
 - [x] create-plan/dispatch 写路径接受已取回 revisionImpact（unexpected 失败关闭；省略不查；幂等重放不挡；不改 freeze writeCommand；ledger 动态 import 薄模块，不拉 studio-trace）
+- [x] readiness/plan 只读 query 接受已取回 revisionImpact（unexpected 则 next 改 Review unexpected revision impact；wait/已 Review 保留；未限定列表/not_found 不猜单元；省略不查；不改 freeze writeCommand；不自动查；retry 仍未接）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
