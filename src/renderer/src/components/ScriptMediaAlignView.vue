@@ -59,8 +59,10 @@ import {
   formatUnitLockPreviousStandingLine,
   formatWizardLockPreviousCostumeLine,
   formatWizardLockPreviousLightingLine,
+  formatWizardSuggestedAssetLine,
   formatWizardVideoPromptScaffoldLine,
   listWizardMaterializeValidationErrors,
+  listWizardMissingSuggestedAssetErrors,
   wizardPreviousCostumeForPanel,
   wizardPreviousLightingForPanel,
   wizardPreviousStandingForPanel,
@@ -718,7 +720,25 @@ function reflowWizardTimings(): void {
   }
 }
 
-const wizardValidationErrors = computed(() => listWizardMaterializeValidationErrors(wizardPanels.value));
+const wizardValidationErrors = computed(() => {
+  const errors = listWizardMaterializeValidationErrors(wizardPanels.value);
+  const resolutions = wizard.value?.suggestedAssetResolutions;
+  if (!resolutions) return errors;
+  return [
+    ...errors,
+    ...listWizardMissingSuggestedAssetErrors(
+      wizardPanels.value,
+      new Set(resolutions.map((item) => item.assetId)),
+    ),
+  ];
+});
+
+function wizardSuggestedAssetLine(assetId: string): string {
+  const resolutions = wizard.value?.suggestedAssetResolutions;
+  if (!resolutions) return formatWizardSuggestedAssetLine(assetId);
+  const hit = resolutions.find((item) => item.assetId === assetId);
+  return formatWizardSuggestedAssetLine(assetId, hit ?? null);
+}
 
 function decideWizardUnresolved(
   panelIndex: number,
@@ -1718,7 +1738,7 @@ function shortSha(value: string | null | undefined): string {
             class="wide"
             :data-testid="`wizard-suggested-${assetId}`"
           >
-            <span>建议资产 {{ assetId }}</span>
+            <span>{{ wizardSuggestedAssetLine(assetId) }}</span>
             <button
               type="button"
               data-testid="wizard-suggested-remove"

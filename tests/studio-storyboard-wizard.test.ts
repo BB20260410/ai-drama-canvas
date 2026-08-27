@@ -165,10 +165,25 @@ describe("studio-storyboard-wizard", () => {
     const wizard = readFileSync(new URL("../src/core/studio-storyboard-wizard.ts", import.meta.url), "utf8");
     expect(wizard).toContain("mapWizardSuggestedAssetsToPanelMentions");
     expect(wizard).toContain("getStudioCanonicalAsset");
+    expect(wizard).toContain("listWizardMissingSuggestedAssetErrors");
+    expect(wizard).toContain("suggestedAssetResolutions");
+    expect(wizard).toContain("禁止静默跳过");
     expect(wizard).not.toContain('category: "character" as const');
+    const resolveStart = wizard.indexOf("export async function resolveWizardSuggestedAssets(");
+    const resolveEnd = wizard.indexOf("export function toWizardEditablePanels(", resolveStart);
+    expect(wizard.slice(resolveStart, resolveEnd)).toContain("unresolvedProposals");
+    expect(wizard.slice(resolveStart, resolveEnd)).toContain("candidateAssetIds");
+    const materialize = wizard.slice(
+      wizard.indexOf("export async function materializeStudioStoryboardWizardUnit("),
+      wizard.indexOf("const promptDoc = await createStudioPromptDocument"),
+    );
+    expect(materialize).toContain("listWizardMissingSuggestedAssetErrors");
+    expect(materialize.indexOf("resolveWizardSuggestedAssets")).toBeLessThan(materialize.indexOf("listWizardMissingSuggestedAssetErrors"));
     const app = readFileSync(new URL("../src/renderer/src/App.vue", import.meta.url), "utf8");
     expect(app).toContain("category: asset.category");
     expect(app).toContain("role: asset.name");
+    expect(app).toContain("listWizardMissingSuggestedAssetErrors");
+    expect(app.indexOf("listWizardMissingSuggestedAssetErrors")).toBeLessThan(app.indexOf("create_studio_prompt_document"));
   });
 
   it("物化后下一步含 create-plan，不跳过 Binding，不自动派发", () => {

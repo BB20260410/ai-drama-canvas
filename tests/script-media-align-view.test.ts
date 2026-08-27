@@ -508,6 +508,10 @@ describe("对照侧栏打开生成追溯", () => {
     expect(vue).toContain('data-testid="wizard-suggested-remove"');
     expect(vue).toContain("removeWizardSuggestedAsset");
     expect(vue).toContain("suggestedAssetIds.filter((item) => item !== id)");
+    expect(vue).toContain("formatWizardSuggestedAssetLine");
+    expect(vue).toContain("wizardSuggestedAssetLine");
+    expect(vue).toContain("listWizardMissingSuggestedAssetErrors");
+    expect(vue).toContain("suggestedAssetResolutions");
     expect(vue).toContain("import type {");
     expect(vue).toContain('} from "@core/studio-storyboard-wizard"');
     expect(vue).not.toMatch(/import\s+\{[^}]*openStudioStoryboardWizard/u);

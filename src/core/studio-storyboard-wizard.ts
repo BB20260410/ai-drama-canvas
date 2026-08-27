@@ -20,7 +20,11 @@ import {
   type StudioProductionPanelInput,
 } from "./studio-production.js";
 import { getStudioCanonicalAsset } from "./material-studio.js";
-import { formatWizardPromptBody, listWizardMaterializeValidationErrors } from "./studio-panel-standing.js";
+import {
+  formatWizardPromptBody,
+  listWizardMaterializeValidationErrors,
+  listWizardMissingSuggestedAssetErrors,
+} from "./studio-panel-standing.js";
 
 export const STORYBOARD_WIZARD_SCHEMA_VERSION = 1 as const;
 /** 物化后只读下一步。不跳过 Binding，不自动派发，中间必须 create-plan。 */
@@ -66,6 +70,8 @@ export interface StudioStoryboardWizardSession {
   suggestion: StudioStoryboardDraftSuggestion;
   panels: WizardEditablePanel[];
   nextSteps: string[];
+  /** 打开时解析到的规范资产。缺记录不进此表；物化禁止静默跳过。 */
+  suggestedAssetResolutions?: WizardResolvedSuggestedAsset[];
   builtAt: string;
 }
 
@@ -119,9 +125,15 @@ export function mapWizardSuggestedAssetsToPanelMentions(
 
 export async function resolveWizardSuggestedAssets(
   projectRoot: string,
-  panels: ReadonlyArray<{ suggestedAssetIds?: readonly string[] }>,
+  panels: ReadonlyArray<{
+    suggestedAssetIds?: readonly string[];
+    unresolvedProposals?: ReadonlyArray<{ candidateAssetIds?: readonly string[] }>;
+  }>,
 ): Promise<Map<string, WizardResolvedSuggestedAsset>> {
-  const ids = [...new Set(panels.flatMap((panel) => panel.suggestedAssetIds ?? []).map((id) => String(id || "").trim()).filter(Boolean))];
+  const ids = [...new Set(panels.flatMap((panel) => [
+    ...(panel.suggestedAssetIds ?? []),
+    ...(panel.unresolvedProposals ?? []).flatMap((proposal) => proposal.candidateAssetIds ?? []),
+  ]).map((id) => String(id || "").trim()).filter(Boolean))];
   const rows = await Promise.all(ids.map(async (assetId) => {
     const asset = await getStudioCanonicalAsset(projectRoot, assetId);
     return [assetId, asset] as const;
@@ -203,6 +215,8 @@ export async function openStudioStoryboardWizard(
     ...(input.panelCount !== undefined ? { panelCount: input.panelCount } : {}),
     ...(input.sourceRange ? { sourceRange: input.sourceRange } : {}),
   });
+  const panels = toWizardEditablePanels(suggestion.panels);
+  const resolved = await resolveWizardSuggestedAssets(projectRoot, panels);
   return {
     schemaVersion: STORYBOARD_WIZARD_SCHEMA_VERSION,
     kind: "studio-storyboard-wizard-session",
@@ -210,10 +224,12 @@ export async function openStudioStoryboardWizard(
     scriptRevisionId: input.scriptRevisionId,
     ...(input.sourceRange ? { sourceRange: input.sourceRange } : {}),
     suggestion,
-    panels: toWizardEditablePanels(suggestion.panels),
+    panels,
+    suggestedAssetResolutions: [...resolved.values()],
     nextSteps: [
       "Agent/人工填写每格 visualAction/景别/运镜/光线/服化（applyWizardPanelEdits）",
       "未裁决的资产歧义必须选用或排除（applyWizardUnresolvedDecision）；禁止静默选第一个候选",
+      "无规范记录的建议资产必须去掉或先建资产；禁止静默跳过",
       "G2+ 必须从上一格站位连续起拍；上一格光线/服化只作锁版提示，不自动写入本格（不是 BindingSet，不能当 generation-ready）",
       "validateWizardForMaterialize 无错误后 materializeStudioStoryboardWizardUnit",
       WIZARD_POST_MATERIALIZE_NEXT,
@@ -232,6 +248,13 @@ export async function materializeStudioStoryboardWizardUnit(
   const script = await getStudioTextRevision(projectRoot, input.scriptRevisionId);
   if (!script) throw new Error(`scriptRevision 不存在：${input.scriptRevisionId}`);
 
+  const resolvedAssets = await resolveWizardSuggestedAssets(projectRoot, input.panels);
+  const missing = listWizardMissingSuggestedAssetErrors(
+    input.panels,
+    new Set(resolvedAssets.keys()),
+  );
+  if (missing.length) throw new Error(`向导物化拒绝：${missing.join("；")}`);
+
   const promptDoc = await createStudioPromptDocument(projectRoot, {
     title: input.promptTitle ?? `${input.unitTitle} wizard prompt`,
     expectedRevision: 0,
@@ -245,7 +268,6 @@ export async function materializeStudioStoryboardWizardUnit(
     sourceVersion: input.sourceVersion ?? "20260724",
   });
   const promptRevisionId = promptWrap.revision.id;
-  const resolvedAssets = await resolveWizardSuggestedAssets(projectRoot, input.panels);
 
   const panels: StudioProductionPanelInput[] = input.panels.map((p) => ({
     title: p.title,

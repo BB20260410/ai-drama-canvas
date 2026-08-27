@@ -387,7 +387,7 @@ import {
 import { createProjectScopedActionGate, type ProjectScopedActionToken } from "./project-scoped-action-gate";
 import { statusClass } from "./utils";
 import { resolveStoryboardWizardAssets } from "./storyboard-wizard-assets";
-import { formatWizardPromptBody, listWizardMaterializeValidationErrors } from "@core/studio-panel-standing";
+import { formatWizardPromptBody, listWizardMaterializeValidationErrors, listWizardMissingSuggestedAssetErrors } from "@core/studio-panel-standing";
 import { markT23RendererStartup, recordT23StartupRuntimeGate } from "./t23-renderer-startup-probe";
 import { createManagedStudioModulePreloader } from "./managed-studio-module-preload";
 import type { CreateManagedProjectOptions, ProjectShell } from "@core/managed-project";
@@ -1026,6 +1026,14 @@ const studioScriptAlignApi = {
     if (validation.length) {
       throw new Error(validation.join("；"));
     }
+    const assets = await resolveStoryboardWizardAssets(
+      input.panels,
+      (assetId) => window.canvasApi.getStudioAsset(root, assetId),
+    );
+    const missing = listWizardMissingSuggestedAssetErrors(input.panels, new Set(assets.keys()));
+    if (missing.length) {
+      throw new Error(missing.join("；"));
+    }
     const promptBody = formatWizardPromptBody(input.panels);
 
     const requireResult = <T,>(
@@ -1061,11 +1069,6 @@ const studioScriptAlignApi = {
         },
       })),
       "写入向导提示词修订",
-    );
-
-    const assets = await resolveStoryboardWizardAssets(
-      input.panels,
-      (assetId) => window.canvasApi.getStudioAsset(root, assetId),
     );
     const unit = requireResult<{ unit: { id: string; revision: number } }>(
       await window.canvasApi.executeStudioCommand(root, await createStudioCommandEnvelope({

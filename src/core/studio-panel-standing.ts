@@ -670,6 +670,52 @@ export function listWizardMaterializeValidationErrors(
   return errors;
 }
 
+export type WizardSuggestedAssetFields = {
+  panelIndex: number;
+  suggestedAssetIds?: readonly string[];
+};
+
+export type WizardSuggestedAssetResolution = {
+  assetId: string;
+  category?: string;
+  name?: string;
+};
+
+/** 建议资产只读句。有规范记录写 category/name；已解析但缺记录标明物化将拒绝。不写进 formatWizardPromptBody。 */
+export function formatWizardSuggestedAssetLine(
+  assetId: string,
+  resolved?: WizardSuggestedAssetResolution | null,
+): string {
+  const id = String(assetId || "").trim();
+  if (!id) return "";
+  if (resolved === undefined) return `建议资产 ${id}`;
+  if (!resolved) return `建议资产 ${id}（无规范记录，物化将拒绝）`;
+  const category = String(resolved.category || "").trim();
+  const name = String(resolved.name || "").trim();
+  if (category && name) return `建议资产 ${category} ${name}（${id}）`;
+  if (category) return `建议资产 ${category} ${id}`;
+  if (name) return `建议资产 ${name}（${id}）`;
+  return `建议资产 ${id}`;
+}
+
+/** 建议资产缺规范记录。禁止静默跳过；须去掉建议或先建资产。 */
+export function listWizardMissingSuggestedAssetErrors(
+  panels: ReadonlyArray<WizardSuggestedAssetFields>,
+  resolvedAssetIds: ReadonlySet<string>,
+): string[] {
+  const errors: string[] = [];
+  for (const panel of panels) {
+    const missing = [...new Set(
+      (panel.suggestedAssetIds ?? []).map((id) => String(id || "").trim()).filter(Boolean),
+    )].filter((id) => !resolvedAssetIds.has(id));
+    if (!missing.length) continue;
+    errors.push(
+      `G${panel.panelIndex} 建议资产无规范记录：${missing.join("、")}。禁止静默跳过，须去掉建议或先建资产。`,
+    );
+  }
+  return errors;
+}
+
 /** 物化前歧义未裁决错误。禁止静默选第一个候选。 */
 export function listWizardUnresolvedMaterializeErrors(
   panels: ReadonlyArray<WizardUnresolvedPanelFields>,

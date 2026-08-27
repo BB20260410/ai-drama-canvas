@@ -44,6 +44,8 @@ import {
   frozenPanelOverlaysFromFrozenPanelPacks,
   listWizardUnresolvedMaterializeErrors,
   listWizardMaterializeValidationErrors,
+  listWizardMissingSuggestedAssetErrors,
+  formatWizardSuggestedAssetLine,
   applyWizardUnresolvedDecision,
   FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
   EXTENSION_SHOT_TYPE_TOOL_NOTE,
@@ -536,6 +538,9 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(wizardView).toContain("wizardVideoScaffoldLine");
     expect(wizardView).toContain("wizard-suggested-");
     expect(wizardView).toContain("removeWizardSuggestedAsset");
+    expect(wizardView).toContain("formatWizardSuggestedAssetLine");
+    expect(wizardView).toContain("wizardSuggestedAssetLine");
+    expect(wizardView).toContain("listWizardMissingSuggestedAssetErrors");
     expect(wizardView).toContain("formatPanelShotTypeLine");
     expect(wizardView).toContain("formatPanelBeatLine");
     const brief = readFileSync(path.join(repoRoot, "src/core/codex.ts"), "utf8");
@@ -702,5 +707,30 @@ describe("向导物化校验同源", () => {
     const app = readFileSync(path.join(repoRoot, "src/renderer/src/App.vue"), "utf8");
     expect(app).toContain("listWizardMaterializeValidationErrors(input.panels)");
     expect(app).not.toContain("listWizardUnresolvedMaterializeErrors");
+  });
+});
+
+describe("向导建议资产缺记录失败关闭", () => {
+  it("formatWizardSuggestedAssetLine 露出分类/名称；缺记录标明将拒绝", () => {
+    expect(formatWizardSuggestedAssetLine("")).toBe("");
+    expect(formatWizardSuggestedAssetLine("prop-mask")).toBe("建议资产 prop-mask");
+    expect(formatWizardSuggestedAssetLine("prop-mask", null)).toBe("建议资产 prop-mask（无规范记录，物化将拒绝）");
+    expect(formatWizardSuggestedAssetLine("prop-mask", {
+      assetId: "prop-mask",
+      category: "prop",
+      name: "黄金面具",
+    })).toBe("建议资产 prop 黄金面具（prop-mask）");
+    expect(listWizardMissingSuggestedAssetErrors([
+      { panelIndex: 1, suggestedAssetIds: ["prop-mask", "gone-missing", "prop-mask"] },
+    ], new Set(["prop-mask"]))).toEqual([
+      "G1 建议资产无规范记录：gone-missing。禁止静默跳过，须去掉建议或先建资产。",
+    ]);
+    expect(listWizardMissingSuggestedAssetErrors([
+      { panelIndex: 1, suggestedAssetIds: ["prop-mask"] },
+    ], new Set(["prop-mask"]))).toEqual([]);
+    const standing = readFileSync(path.join(repoRoot, "src/core/studio-panel-standing.ts"), "utf8");
+    const promptFnStart = standing.indexOf("export function formatWizardPromptBody(");
+    const promptFnEnd = standing.indexOf("export function previousStandingsFromFrozenPanelPacks(", promptFnStart);
+    expect(standing.slice(promptFnStart, promptFnEnd)).not.toContain("formatWizardSuggestedAssetLine");
   });
 });
