@@ -96,7 +96,14 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("wizardStyleLockLine");
     expect(vue).not.toContain("listStyleBackReferences");
     expect(vue).toContain("formatPanelBeatLine");
+    expect(vue).toContain("revealAlignLocator");
     expect(vue).toContain("revealSpanMediaHit");
+    expect(vue).toContain("revealImpactRowAlign");
+    expect(vue).toContain("refineSsl5FocusIfUnexpectedRevisionImpact");
+    expect(vue).toContain("ssl5DisplayedPlan");
+    expect(vue).toContain("revision-impact-row-align");
+    expect(vue).toContain("露出这单元");
+    expect(vue).toContain("不猜第一格");
     expect(vue).toContain("getStudioScriptSpanMediaMap");
     expect(vue).toContain('data-testid="storyboard-wizard-suggest"');
     expect(vue).toContain('data-testid="storyboard-wizard-materialize"');
@@ -199,6 +206,8 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(loadAlign.indexOf("ssl5Plan.value = nextPlan")).toBeLessThan(
       loadAlign.indexOf("await revealSsl5Focus(nextBoard, nextPlan)"),
     );
+    expect(loadAlign).not.toContain("getStudioScriptRevisionImpact");
+    expect(loadAlign).not.toContain("lookupRevisionImpact");
   });
 
   it("导入/物化在进行中 fail-closed：actionLoading 在首个 await 之前置位，按钮禁用并给出大白话原因，连点不会重复写入", () => {
@@ -285,7 +294,7 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     const alignButton = buttonAttrs(vue, "span-media-hit-align");
     expect(alignButton).toContain(':disabled="Boolean(actionLoading)"');
     expect(alignButton).toContain("正在处理，不能再对照这格");
-    const reveal = handlerBody(vue, "async function revealSpanMediaHit(", "async function revealReaderSceneBackRef(");
+    const reveal = handlerBody(vue, "async function revealAlignLocator(", "async function revealSpanMediaHit(");
     expect(reveal).toContain("if (actionLoading.value) return;");
     expect(reveal).toContain('actionLoading.value = "span-align"');
     expect(reveal.indexOf("if (actionLoading.value) return;")).toBeLessThan(
@@ -297,12 +306,15 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(reveal).toContain('activeTab.value = "align"');
     expect(reveal).toContain("不能猜宫格");
     expect(reveal).toContain("loadAlignPreview(focusPanel.rawSha256)");
-    expect(reveal).toContain("scrollAlignRowIntoView(hit.unitId)");
+    expect(reveal).toContain("scrollAlignRowIntoView(target.unitId)");
     expect(vue).toContain('scrollIntoView({ block: "nearest" })');
+    expect(reveal).toContain("不猜第一格");
     expect(reveal).not.toContain("revealSsl5Focus");
     expect(reveal).not.toContain("pickFirstCoveredPanel");
+    expect(reveal).not.toContain("selectAlignRow");
     expect(reveal).not.toContain("getStudioBindingControl");
     expect(reveal).not.toContain("evaluateStudioConsistency");
+    expect(vue).toContain("await revealAlignLocator({ unitId: hit.unitId, panelId: hit.panelId, panelIndex: hit.panelIndex })");
   });
 
   it("阅读器场景回指点穿：对照板未加载时由用户点穿再加载，不猜宫格", () => {
@@ -412,5 +424,28 @@ describe("对照侧栏打开生成追溯", () => {
     expect(vue).not.toContain("getStudioBindingControl");
     expect(app).toContain("window.canvasApi.getStudioScriptRevisionImpact");
     expect(contract).toContain("getStudioScriptRevisionImpact?");
+  });
+
+  it("本修订影响可点穿对照格；无 panelId 只露单元行；已加载 unexpected 精炼 SSL-5", () => {
+    const vue = source();
+    const alignButton = buttonAttrs(vue, "revision-impact-row-align");
+    expect(alignButton).toContain(':disabled="Boolean(actionLoading)"');
+    expect(alignButton).toContain("revealImpactRowAlign(unit, row)");
+    expect(vue).toContain('{{ row.panelId ? "对照这格" : "露出这单元" }}');
+    expect(vue).toContain("无 panelId，只露单元行，不猜第一格");
+    const impactAlign = handlerBody(vue, "async function revealImpactRowAlign(", "async function revealReaderSceneBackRef(");
+    expect(impactAlign).toContain("await revealAlignLocator({ unitId: unit.unitId, panelId: row.panelId })");
+    expect(impactAlign).not.toContain("pickFirstCoveredPanel");
+    expect(impactAlign).not.toContain("selectAlignRow");
+    expect(impactAlign).not.toContain("from \"@core/studio-trace");
+    expect(vue).toContain("refineSsl5FocusIfUnexpectedRevisionImpact(ssl5Plan.value, revisionImpact.value)");
+    expect(vue).toContain("ssl5DisplayedPlan");
+    expect(vue).toContain("SSL5_UNEXPECTED_REVISION_IMPACT_REASON");
+    expect(vue).toContain("ssl5DisplayedPlan?.generationPlanDraft.ready");
+    const lookup = handlerBody(vue, "async function lookupRevisionImpact(", "async function lookupSpanMedia(");
+    expect(lookup).not.toContain("loadAlign(");
+    expect(lookup).not.toContain("planSsl5MissingToGen");
+    expect(vue).toContain("import type { Ssl5MissingToGenPlan } from \"@core/studio-ssl5-missing-to-gen\"");
+    expect(vue).not.toMatch(/import\s+\{[^}]*planSsl5MissingToGen/u);
   });
 });

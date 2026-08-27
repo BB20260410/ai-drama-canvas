@@ -44,7 +44,11 @@ import type {
 } from "@core/studio-storyboard-wizard";
 import type { StudioScriptProductUiApi } from "../material-studio-ui-contract";
 import type { Ssl5MissingToGenPlan } from "@core/studio-ssl5-missing-to-gen";
-import type { StudioGenerationPlanDraftNode } from "@core/studio-generation-plan-draft";
+import {
+  refineSsl5FocusIfUnexpectedRevisionImpact,
+  SSL5_UNEXPECTED_REVISION_IMPACT_REASON,
+  type StudioGenerationPlanDraftNode,
+} from "@core/studio-generation-plan-draft";
 import { listOrWorkbenchPreviewUrl } from "../studio-list-preview-url";
 import StudioGenerationTraceDrawer, { type StudioTraceDrawerModel } from "./StudioGenerationTraceDrawer.vue";
 import {
@@ -184,14 +188,24 @@ async function selectDocument(documentId: string, switchTab = true): Promise<voi
   }
 }
 
+const ssl5DisplayedPlan = computed(() => (
+  ssl5Plan.value
+    ? refineSsl5FocusIfUnexpectedRevisionImpact(ssl5Plan.value, revisionImpact.value)
+    : null
+));
+
 const ssl5FocusPath = computed(() => {
-  if (!ssl5Plan.value?.focusUnitId) return [];
-  return ssl5Plan.value.items.find((item) => item.unitId === ssl5Plan.value?.focusUnitId)?.recommendedPath ?? [];
+  const plan = ssl5DisplayedPlan.value;
+  if (!plan?.focusUnitId) return [];
+  return plan.items.find((item) => item.unitId === plan.focusUnitId)?.recommendedPath ?? [];
 });
 
 const ssl5EarliestNextLine = computed(() => {
-  const plan = ssl5Plan.value;
+  const plan = ssl5DisplayedPlan.value;
   if (!plan) return "先 Binding 确认再走 freeze → create-plan 链。";
+  if (plan.generationPlanDraft.blockedReason === SSL5_UNEXPECTED_REVISION_IMPACT_REASON) {
+    return plan.generationPlanDraft.blockedReason;
+  }
   if (plan.checkpoint?.newSlotDispatchAllowed === false) {
     return plan.generationPlanDraft.blockedReason
       || plan.checkpointLine
@@ -692,7 +706,11 @@ async function materializeWizard(): Promise<void> {
   }
 }
 
-async function revealSpanMediaHit(hit: ScriptSpanMediaHit): Promise<void> {
+async function revealAlignLocator(target: {
+  unitId: string;
+  panelId?: string | null;
+  panelIndex?: number | null;
+}): Promise<void> {
   if (actionLoading.value) return;
   actionLoading.value = "span-align";
   error.value = "";
@@ -716,27 +734,48 @@ async function revealSpanMediaHit(hit: ScriptSpanMediaHit): Promise<void> {
       ssl5Plan.value = nextPlan;
       nextBoard = loadedBoard;
     }
-    const focusRow = nextBoard.rows.find((row) => row.unitId === hit.unitId);
+    const focusRow = nextBoard.rows.find((row) => row.unitId === target.unitId);
     if (!focusRow) {
-      report(new Error(`对照表没有 ${hit.unitId}，不能猜宫格。`));
+      report(new Error(`对照表没有 ${target.unitId}，不能猜宫格。`));
       return;
     }
-    const focusPanel = focusRow.panels.find((panel) => panel.panelId === hit.panelId);
+    if (!target.panelId) {
+      selectedAlignRow.value = focusRow;
+      selectedAlignPanel.value = null;
+      selectedMediaPreview.value = null;
+      activeTab.value = "align";
+      notice.value = `已露出 ${target.unitId} 整板/未冻结行，不猜第一格。`;
+      await scrollAlignRowIntoView(target.unitId);
+      return;
+    }
+    const focusPanel = focusRow.panels.find((panel) => panel.panelId === target.panelId);
     if (!focusPanel) {
-      report(new Error(`对照表没有 ${hit.unitId} G${hit.panelIndex}，不能猜宫格。`));
+      const slot = target.panelIndex != null ? `G${target.panelIndex}` : target.panelId;
+      report(new Error(`对照表没有 ${target.unitId} ${slot}，不能猜宫格。`));
       return;
     }
     selectedAlignRow.value = focusRow;
     selectedAlignPanel.value = focusPanel;
     await loadAlignPreview(focusPanel.rawSha256);
     activeTab.value = "align";
-    notice.value = `已对照 ${hit.unitId} G${hit.panelIndex}。`;
-    await scrollAlignRowIntoView(hit.unitId);
+    notice.value = `已对照 ${target.unitId} G${focusPanel.panelIndex}。`;
+    await scrollAlignRowIntoView(target.unitId);
   } catch (reason) {
     report(reason);
   } finally {
     actionLoading.value = "";
   }
+}
+
+async function revealSpanMediaHit(hit: ScriptSpanMediaHit): Promise<void> {
+  await revealAlignLocator({ unitId: hit.unitId, panelId: hit.panelId, panelIndex: hit.panelIndex });
+}
+
+async function revealImpactRowAlign(
+  unit: { unitId: string },
+  row: { panelId: string | null },
+): Promise<void> {
+  await revealAlignLocator({ unitId: unit.unitId, panelId: row.panelId });
 }
 
 async function revealReaderSceneBackRef(ref: SceneBackReference): Promise<void> {
@@ -1219,10 +1258,22 @@ function shortSha(value: string | null | undefined): string {
                   <template v-if="row.inputCurrent === false"> · 输入已过期</template>
                 </small>
               </div>
-              <div class="span-media-hit-actions">
+              <div
+                v-for="(row, index) in unit.rows"
+                :key="`impact-actions:${row.packId || 'none'}:${row.runId || 'none'}:${index}`"
+                class="span-media-hit-actions"
+              >
                 <button
-                  v-for="(row, index) in unit.rows.filter((entry) => entry.packId || entry.runId)"
-                  :key="`trace:${row.packId || row.runId}:${index}`"
+                  type="button"
+                  data-testid="revision-impact-row-align"
+                  :disabled="Boolean(actionLoading)"
+                  :title="actionLoading
+                    ? '正在处理，不能再对照这格'
+                    : (row.panelId ? undefined : '无 panelId，只露单元行，不猜第一格')"
+                  @click="revealImpactRowAlign(unit, row)"
+                >{{ row.panelId ? "对照这格" : "露出这单元" }}</button>
+                <button
+                  v-if="row.packId || row.runId"
                   type="button"
                   data-testid="revision-impact-row-trace"
                   :disabled="!api.getStudioTrace"
@@ -1301,9 +1352,9 @@ function shortSha(value: string | null | undefined): string {
           >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
           <span>缺图 {{ ssl5Plan.missingAllCount }} · 部分 {{ ssl5Plan.partialCount }}</span>
           <span v-if="ssl5Plan.focusPackId" data-testid="ssl5-focus-pack">{{ ssl5Plan.focusPackId }}</span>
-          <span data-testid="ssl5-generation-plan-draft">{{ ssl5Plan.generationPlanDraft.ready ? "可建立计划（不派发）" : ssl5Plan.generationPlanDraft.blockedReason }}</span>
-          <span v-if="ssl5Plan.generationPlanDraft.ready" data-testid="ssl5-generation-plan-command">{{ ssl5Plan.generationPlanDraft.command }}</span>
-          <span v-if="ssl5Plan.generationPlanDraft.ready && ssl5Plan.generationPlanDraft.nodes?.[0]" data-testid="ssl5-generation-plan-nodes">{{ formatSsl5PlanDraftNode(ssl5Plan.generationPlanDraft.nodes[0]) }}</span>
+          <span data-testid="ssl5-generation-plan-draft">{{ ssl5DisplayedPlan?.generationPlanDraft.ready ? "可建立计划（不派发）" : ssl5DisplayedPlan?.generationPlanDraft.blockedReason }}</span>
+          <span v-if="ssl5DisplayedPlan?.generationPlanDraft.ready" data-testid="ssl5-generation-plan-command">{{ ssl5DisplayedPlan.generationPlanDraft.command }}</span>
+          <span v-if="ssl5DisplayedPlan?.generationPlanDraft.ready && ssl5DisplayedPlan.generationPlanDraft.nodes?.[0]" data-testid="ssl5-generation-plan-nodes">{{ formatSsl5PlanDraftNode(ssl5DisplayedPlan.generationPlanDraft.nodes[0]) }}</span>
           <ol v-if="ssl5FocusPath.length">
             <li v-for="step in ssl5FocusPath" :key="step">{{ step }}</li>
           </ol>

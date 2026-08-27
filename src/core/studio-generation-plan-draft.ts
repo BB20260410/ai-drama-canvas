@@ -124,6 +124,83 @@ export function refineStudioGenerationPlanDraftIfUnitGridBlocking(
   };
 }
 
+export const SSL5_UNEXPECTED_REVISION_IMPACT_REASON =
+  "非预期剧本修订影响，须人工复核（不派发）";
+
+export type Ssl5RevisionImpactHint = {
+  empty?: boolean;
+  items: Array<{
+    unitId: string;
+    rows: Array<{
+      panelId: string | null;
+      targetKind?: string;
+      changeClassification: string | null;
+    }>;
+  }>;
+} | null | undefined;
+
+export type Ssl5UnexpectedImpactPlan = {
+  focusUnitId: string | null;
+  focusPanelId: string | null;
+  earliestUnitId?: string | null;
+  earliestCode?: string | null;
+  earliestLabel?: string | null;
+  checkpoint?: { newSlotDispatchAllowed?: boolean } | null;
+  checkpointLine?: string | null;
+  writeLeaseLine?: string | null;
+  generationPlanDraft: StudioGenerationPlanDraft;
+  items: Array<{
+    unitId: string;
+    focusPanelId: string | null;
+    generationPlanDraft: StudioGenerationPlanDraft;
+    recommendedPath: string[];
+  }>;
+};
+
+/** 已加载 impact 才认。未加载 / 空页 / 焦点以外的单元不挡。 */
+export function unexpectedRevisionImpactHitsFocus(
+  focus: { focusUnitId: string | null; focusPanelId: string | null },
+  impact: Ssl5RevisionImpactHint,
+): boolean {
+  if (!impact || impact.empty || !focus.focusUnitId) return false;
+  const unit = impact.items.find((item) => item.unitId === focus.focusUnitId);
+  if (!unit) return false;
+  return unit.rows.some((row) => row.changeClassification === "unexpected");
+}
+
+/**
+ * 已加载 script-revision-impact 且焦点格/单元有非预期时，禁止再建议 create-plan / dispatch。
+ * 未加载不查、不挡。earliest wait/retry/Review 与六图闸未放行时保留更具体文案。
+ * 不执行、不派发。机器不自动 Review PASS。
+ */
+export function refineSsl5FocusIfUnexpectedRevisionImpact<T extends Ssl5UnexpectedImpactPlan>(
+  plan: T,
+  impact: Ssl5RevisionImpactHint,
+): T {
+  if (!impact || !plan.focusUnitId) return plan;
+  if (unitGridNextActionBlockingKind(plan.earliestCode) && plan.focusUnitId === plan.earliestUnitId) {
+    return plan;
+  }
+  if (plan.checkpoint?.newSlotDispatchAllowed === false) return plan;
+  if (!unexpectedRevisionImpactHitsFocus(plan, impact)) return plan;
+  const draft: StudioGenerationPlanDraft = {
+    ...plan.generationPlanDraft,
+    ready: false,
+    dispatch: false,
+    blockedReason: SSL5_UNEXPECTED_REVISION_IMPACT_REASON,
+    note: "非预期剧本修订影响已占用下一步。不执行、不派发。须人工复核。",
+  };
+  return {
+    ...plan,
+    generationPlanDraft: draft,
+    items: plan.items.map((item) => (
+      item.unitId === plan.focusUnitId
+        ? { ...item, generationPlanDraft: draft, recommendedPath: ["review"] }
+        : item
+    )),
+  };
+}
+
 /** pack envelope `next` 与草稿同一套 unit-grid 阻塞。planned 不挡。 */
 export function packEnvelopeNextOverrideForUnitGridBlocking(
   status?: PersistedPlanNodeStatus | null,

@@ -22,10 +22,14 @@ import {
   planEnvelopeNextFromNodeStatuses,
   planEnvelopeNextLabel,
   planOperationEnvelopeNext,
+  refineSsl5FocusIfUnexpectedRevisionImpact,
   refineStudioGenerationPlanDraftIfUnitGridBlocking,
+  SSL5_UNEXPECTED_REVISION_IMPACT_REASON,
   STUDIO_GENERATION_PLAN_COMMAND,
+  unexpectedRevisionImpactHitsFocus,
   unitGridNextActionBlockingKind,
   unitGridStatusBlockingKind,
+  type Ssl5UnexpectedImpactPlan,
 } from "../src/core/studio-generation-plan-draft.js";
 import {
   formatSessionCheckpointLine,
@@ -305,9 +309,121 @@ describe("create-plan 只读草稿纯函数", () => {
   });
 });
 
+function unexpectedImpactPlan(partial: Partial<Ssl5UnexpectedImpactPlan> = {}): Ssl5UnexpectedImpactPlan {
+  const draft = {
+    command: STUDIO_GENERATION_PLAN_COMMAND,
+    ready: true as const,
+    blockedReason: null,
+    nodes: [{ unitId: "u-focus", panelId: "p1" }],
+    dispatch: false as const,
+    note: "只起草建计划节点；不执行、不派发。派发须用计划推导 runId。",
+  };
+  return {
+    focusUnitId: "u-focus",
+    focusPanelId: "p1",
+    earliestUnitId: "u-focus",
+    earliestCode: "dispatch-unit-grid",
+    checkpoint: { newSlotDispatchAllowed: true },
+    generationPlanDraft: draft,
+    items: [{
+      unitId: "u-focus",
+      focusPanelId: "p1",
+      generationPlanDraft: draft,
+      recommendedPath: ["binding-ready?", "readiness", "freeze", "create-plan", "dispatch", "review"],
+    }],
+    ...partial,
+  };
+}
+
+describe("已加载 unexpected 修订影响精炼 SSL-5", () => {
+  it("未加载 / 空页 / 其他单元不挡；焦点单元 unexpected 禁止再建议 create-plan/dispatch", () => {
+    const plan = unexpectedImpactPlan();
+    expect(refineSsl5FocusIfUnexpectedRevisionImpact(plan, null)).toBe(plan);
+    expect(refineSsl5FocusIfUnexpectedRevisionImpact(plan, undefined).generationPlanDraft.ready).toBe(true);
+    expect(refineSsl5FocusIfUnexpectedRevisionImpact(plan, { empty: true, items: [] }).generationPlanDraft.ready).toBe(true);
+    expect(refineSsl5FocusIfUnexpectedRevisionImpact(plan, {
+      items: [{
+        unitId: "u-other",
+        rows: [{ panelId: "p9", changeClassification: "unexpected" }],
+      }],
+    }).generationPlanDraft.ready).toBe(true);
+    expect(unexpectedRevisionImpactHitsFocus(plan, {
+      items: [{
+        unitId: "u-focus",
+        rows: [{ panelId: "p1", changeClassification: "expected" }],
+      }],
+    })).toBe(false);
+
+    const blocked = refineSsl5FocusIfUnexpectedRevisionImpact(plan, {
+      items: [{
+        unitId: "u-focus",
+        rows: [{ panelId: "p1", targetKind: "panel", changeClassification: "unexpected" }],
+      }],
+    });
+    expect(blocked.generationPlanDraft.ready).toBe(false);
+    expect(blocked.generationPlanDraft.dispatch).toBe(false);
+    expect(blocked.generationPlanDraft.blockedReason).toBe(SSL5_UNEXPECTED_REVISION_IMPACT_REASON);
+    expect(blocked.items[0]?.recommendedPath).toEqual(["review"]);
+    expect(blocked.items[0]?.generationPlanDraft.ready).toBe(false);
+  });
+
+  it("整板/无 panelId unexpected 也挡焦点单元；earliest 与六图闸文案更具体时保留", () => {
+    const unitGrid = refineSsl5FocusIfUnexpectedRevisionImpact(unexpectedImpactPlan(), {
+      items: [{
+        unitId: "u-focus",
+        rows: [{ panelId: null, targetKind: "unit-grid", changeClassification: "unexpected" }],
+      }],
+    });
+    expect(unitGrid.generationPlanDraft.blockedReason).toBe(SSL5_UNEXPECTED_REVISION_IMPACT_REASON);
+
+    const waiting = unexpectedImpactPlan({
+      earliestCode: "wait-or-reconcile-unit-grid-run",
+      generationPlanDraft: {
+        command: STUDIO_GENERATION_PLAN_COMMAND,
+        ready: false,
+        blockedReason: "unit-grid 正在执行，等待结果或对账现有 run",
+        nodes: [{ unitId: "u-focus", panelId: "p1" }],
+        dispatch: false,
+        note: "earliest 已占用下一步。不执行、不派发、不重试。",
+      },
+    });
+    const keptWait = refineSsl5FocusIfUnexpectedRevisionImpact(waiting, {
+      items: [{
+        unitId: "u-focus",
+        rows: [{ panelId: "p1", changeClassification: "unexpected" }],
+      }],
+    });
+    expect(keptWait.generationPlanDraft.blockedReason).toBe("unit-grid 正在执行，等待结果或对账现有 run");
+
+    const gated = unexpectedImpactPlan({
+      checkpoint: { newSlotDispatchAllowed: false },
+      generationPlanDraft: {
+        command: STUDIO_GENERATION_PLAN_COMMAND,
+        ready: false,
+        blockedReason: "六图闸未放行（batch 2）",
+        nodes: [{ unitId: "u-focus", panelId: "p1" }],
+        dispatch: false,
+        note: "六图闸已占用下一步。不执行、不派发。",
+      },
+    });
+    const keptGate = refineSsl5FocusIfUnexpectedRevisionImpact(gated, {
+      items: [{
+        unitId: "u-focus",
+        rows: [{ panelId: "p1", changeClassification: "unexpected" }],
+      }],
+    });
+    expect(keptGate.generationPlanDraft.blockedReason).toBe("六图闸未放行（batch 2）");
+  });
+});
+
 describe("create-plan 草稿接线源码合同", () => {
   it("薄模块不拉对照板 / 不执行 / 不派发", () => {
     const draft = source("src/core/studio-generation-plan-draft.ts");
+    expect(draft).toContain("refineSsl5FocusIfUnexpectedRevisionImpact");
+    expect(draft).toContain("unexpectedRevisionImpactHitsFocus");
+    expect(draft).toContain("SSL5_UNEXPECTED_REVISION_IMPACT_REASON");
+    expect(draft).not.toContain("studio-trace");
+    expect(draft).not.toContain("getStudioScriptRevisionImpact");
     expect(draft).toContain("refineStudioGenerationPlanDraftIfUnitGridBlocking");
     expect(draft).toContain("packEnvelopeNextOverrideForUnitGridBlocking");
     expect(draft).toContain("canvasFreezeDispatchOverrideForUnitGridBlocking");

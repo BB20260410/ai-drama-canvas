@@ -942,6 +942,8 @@ describe("SSL-5 入口源码合同", () => {
     expect(ssl5).not.toContain("studio-generation-checkpoint");
     expect(ssl5).not.toContain("getStudioGenerationCheckpointControl");
     expect(ssl5).not.toContain("studio-project-write-lease");
+    expect(ssl5).not.toContain("studio-trace");
+    expect(ssl5).not.toContain("getStudioScriptRevisionImpact");
     expect(ssl5).toContain("earliestBlockingPath");
     expect(ssl5).toContain("readPersistedPanelPlanState");
     expect(ssl5).toContain("studio-generation-plan-draft");
@@ -986,6 +988,9 @@ describe("SSL-5 入口源码合同", () => {
     expect(vue).toContain("align-review-");
     expect(vue).toContain("reviewDecisionLabel");
     expect(vue).toContain("ssl5EarliestNextLine");
+    expect(vue).toContain("ssl5DisplayedPlan");
+    expect(vue).toContain("refineSsl5FocusIfUnexpectedRevisionImpact");
+    expect(vue).not.toContain("from \"@core/studio-trace");
     expect(vue).not.toContain("dispatch_studio_generation_pack");
     expect(ssl5).toContain("formatSceneBackReferenceLineFromBoard");
     expect(ssl5).toContain("formatPanelLightingCostumeLine");
