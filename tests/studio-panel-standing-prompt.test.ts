@@ -15,6 +15,7 @@ import {
   formatWizardPromptBody,
   formatWizardLightingPromptLine,
   formatWizardCostumePromptLine,
+  formatWizardVideoPromptScaffoldLine,
   formatWizardLockPreviousLightingLine,
   formatWizardLockPreviousCostumeLine,
   wizardPreviousLightingForPanel,
@@ -194,6 +195,7 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(emptyContinuity).not.toContain("扩写格：必须与前一格连续");
     expect(emptyContinuity).not.toContain("禁止锚定原文");
     expect(emptyContinuity).not.toContain("本单元须 2–6 格合计 15.0s");
+    expect(emptyContinuity).not.toContain("拆格骨架");
     expect(emptyContinuity).toContain("0-5s");
     expect(formatWizardLightingPromptLine("")).toBeNull();
     expect(formatWizardCostumePromptLine("  ")).toBeNull();
@@ -526,6 +528,13 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(wizardView).toContain('data-testid="storyboard-wizard-style-lock"');
     expect(wizardView).toContain("formatWizardStyleLockLine");
     expect(wizardView).toContain('data-testid="storyboard-wizard-beat"');
+    expect(wizardView).toContain('data-testid="storyboard-wizard-video-scaffold"');
+    expect(wizardView).toContain('data-testid="storyboard-wizard-transition"');
+    expect(wizardView).toContain('data-testid="storyboard-wizard-negative"');
+    expect(wizardView).toContain("formatWizardVideoPromptScaffoldLine");
+    expect(wizardView).toContain("wizardVideoScaffoldLine");
+    expect(wizardView).toContain("wizard-suggested-");
+    expect(wizardView).toContain("removeWizardSuggestedAsset");
     expect(wizardView).toContain("formatPanelShotTypeLine");
     expect(wizardView).toContain("formatPanelBeatLine");
     const brief = readFileSync(path.join(repoRoot, "src/core/codex.ts"), "utf8");
@@ -583,6 +592,23 @@ describe("前镜站位写入冻结提示词（纯函数）", () => {
     expect(mcpTrace).toContain("consistencyPeek");
     expect(mcpTrace).toContain("无 run 则省略以免改 P24 形状");
     expect(mcpTrace).toContain("无该行则省略");
+  });
+
+  it("formatWizardVideoPromptScaffoldLine 只读露出拆格骨架，不写进冻结提示词", () => {
+    expect(formatWizardVideoPromptScaffoldLine(undefined)).toBeNull();
+    expect(formatWizardVideoPromptScaffoldLine("")).toBeNull();
+    expect(formatWizardVideoPromptScaffoldLine("   ")).toBeNull();
+    expect(formatWizardVideoPromptScaffoldLine("hold, then whip to door")).toBe("拆格骨架：hold, then whip to door");
+    const standing = readFileSync(path.join(repoRoot, "src/core/studio-panel-standing.ts"), "utf8");
+    expect(standing).toContain("不写入 formatWizardPromptBody / 冻结指纹");
+    const promptFnStart = standing.indexOf("export function formatWizardPromptBody(");
+    const promptFnEnd = standing.indexOf("export function previousStandingsFromFrozenPanelPacks(", promptFnStart);
+    expect(promptFnStart).toBeGreaterThan(-1);
+    expect(promptFnEnd).toBeGreaterThan(promptFnStart);
+    const promptFn = standing.slice(promptFnStart, promptFnEnd);
+    expect(promptFn).not.toContain("videoPromptScaffold");
+    expect(promptFn).not.toContain("拆格骨架");
+    expect(promptFn).not.toContain("formatWizardVideoPromptScaffoldLine");
   });
 });
 

@@ -59,6 +59,7 @@ import {
   formatUnitLockPreviousStandingLine,
   formatWizardLockPreviousCostumeLine,
   formatWizardLockPreviousLightingLine,
+  formatWizardVideoPromptScaffoldLine,
   listWizardUnresolvedMaterializeErrors,
   wizardPreviousCostumeForPanel,
   wizardPreviousLightingForPanel,
@@ -612,6 +613,10 @@ function wizardCostumeLine(panelIndex: number): string | null {
   return formatWizardLockPreviousCostumeLine(wizardPreviousCostumeForPanel(wizardPanels.value, panelIndex));
 }
 
+function wizardVideoScaffoldLine(scaffold?: string): string | null {
+  return formatWizardVideoPromptScaffoldLine(scaffold);
+}
+
 function wizardStyleLockLine(panelIndex: number): string {
   const panel = wizardPanels.value.find((entry) => entry.panelIndex === panelIndex);
   return formatWizardStyleLockLine({
@@ -744,6 +749,18 @@ function decideWizardUnresolved(
     surfaceText,
     action,
     ...(assetId ? { assetId } : {}),
+  });
+}
+
+function removeWizardSuggestedAsset(panelIndex: number, assetId: string): void {
+  const id = String(assetId || "").trim();
+  if (!id) return;
+  wizardPanels.value = wizardPanels.value.map((panel) => {
+    if (panel.panelIndex !== panelIndex) return panel;
+    return {
+      ...panel,
+      suggestedAssetIds: panel.suggestedAssetIds.filter((item) => item !== id),
+    };
   });
 }
 
@@ -1662,7 +1679,14 @@ function shortSha(value: string | null | undefined): string {
           <p class="wide wizard-lock-hint" data-testid="storyboard-wizard-style-lock">{{ wizardStyleLockLine(panel.panelIndex) }}</p>
           <p class="wide wizard-lock-hint" data-testid="storyboard-wizard-beat">{{ formatPanelBeatLine(panel) }}</p>
           <label>对白 <input v-model.trim="panel.dialogue" /></label>
+          <label>转场 <input v-model.trim="panel.transition" data-testid="storyboard-wizard-transition" /></label>
+          <label class="wide">负提示 <input v-model.trim="panel.negativePrompt" data-testid="storyboard-wizard-negative" /></label>
           <label>时长 <input v-model.number="panel.durationSeconds" type="number" min="0.1" max="15" step="0.1" @change="reflowWizardTimings" /></label>
+          <p
+            v-if="wizardVideoScaffoldLine(panel.videoPromptScaffold)"
+            class="wide wizard-lock-hint"
+            data-testid="storyboard-wizard-video-scaffold"
+          >{{ wizardVideoScaffoldLine(panel.videoPromptScaffold) }}</p>
           <p
             v-if="wizardStandingLine(panel.panelIndex)"
             class="wide wizard-lock-hint wizard-previous-standing"
@@ -1706,6 +1730,19 @@ function shortSha(value: string | null | undefined): string {
             @click="revealWizardSceneBackRef(ref)"
           >U{{ ref.sequence }} G{{ ref.panelIndex }} {{ ref.role || ref.assetId }}</button>
           <small class="wide">原文锚 {{ panel.sourceSpans.length }} · 资产建议 {{ panel.suggestedAssetIds.length }} · 歧义 {{ panel.unresolvedProposals.length }}</small>
+          <div
+            v-for="assetId in panel.suggestedAssetIds"
+            :key="`suggest:${panel.panelIndex}:${assetId}`"
+            class="wide"
+            :data-testid="`wizard-suggested-${assetId}`"
+          >
+            <span>建议资产 {{ assetId }}</span>
+            <button
+              type="button"
+              data-testid="wizard-suggested-remove"
+              @click="removeWizardSuggestedAsset(panel.panelIndex, assetId)"
+            >去掉建议</button>
+          </div>
           <div
             v-for="proposal in panel.unresolvedProposals"
             :key="`${panel.panelIndex}:${proposal.startOffsetUtf16}:${proposal.surfaceText}`"

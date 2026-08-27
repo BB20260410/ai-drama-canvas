@@ -559,6 +559,12 @@ export function formatWizardCostumePromptLine(costumeState?: string): string | n
   return text ? `服化：${text}` : null;
 }
 
+/** P20 拆格 video_prompt 骨架只读句。不写入 formatWizardPromptBody / 冻结指纹。 */
+export function formatWizardVideoPromptScaffoldLine(scaffold?: string): string | null {
+  const text = scaffold?.trim() ?? "";
+  return text ? `拆格骨架：${text}` : null;
+}
+
 /** 向导物化 prompt 正文：G2+ 写入与冻结相同的「前镜交接」行；首格不写。光线/服化仅本格非空才追加，不写前镜光线行。 */
 export function formatWizardPromptBody(
   panels: ReadonlyArray<{

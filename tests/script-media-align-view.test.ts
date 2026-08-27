@@ -491,4 +491,26 @@ describe("对照侧栏打开生成追溯", () => {
     expect(app).toContain("listWizardUnresolvedMaterializeErrors(input.panels)");
     expect(app).toContain("if (unresolved.length)");
   });
+
+  it("向导露出拆格骨架与建议资产，可改转场负提示，不 value-import wizard.ts", () => {
+    const vue = source();
+    expect(vue).toContain('data-testid="storyboard-wizard-video-scaffold"');
+    expect(vue).toContain("formatWizardVideoPromptScaffoldLine");
+    expect(vue).toContain("wizardVideoScaffoldLine");
+    expect(vue).toContain("panel.videoPromptScaffold");
+    expect(vue).toContain('data-testid="storyboard-wizard-transition"');
+    expect(vue).toContain("v-model.trim=\"panel.transition\"");
+    expect(vue).toContain('data-testid="storyboard-wizard-negative"');
+    expect(vue).toContain("v-model.trim=\"panel.negativePrompt\"");
+    expect(vue).toContain("wizard-suggested-");
+    expect(vue).toContain('data-testid="wizard-suggested-remove"');
+    expect(vue).toContain("removeWizardSuggestedAsset");
+    expect(vue).toContain("suggestedAssetIds.filter((item) => item !== id)");
+    expect(vue).toContain("import type {");
+    expect(vue).toContain('} from "@core/studio-storyboard-wizard"');
+    expect(vue).not.toMatch(/import\s+\{[^}]*openStudioStoryboardWizard/u);
+    expect(vue).not.toMatch(/import\s+\{[^}]*materializeStudioStoryboardWizardUnit/u);
+    expect(vue).not.toMatch(/import\s+\{[^}]*formatWizardPromptBody/u);
+    expect(vue).not.toContain("拆格骨架：${");
+  });
 });
