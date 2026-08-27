@@ -91,6 +91,7 @@
 - [x] 向导歧义未裁决禁止物化（validate / 桌面校验 / App 写路径失败关闭；applyWizardUnresolvedDecision include 必须在候选集；禁止默认第一候选；不改 formatWizardPromptBody / WIZARD_POST_MATERIALIZE_NEXT；schemaVersion 仍为 1；不跳过 Binding、不派发）
 - [x] 向导露出拆格骨架与建议资产，可改转场/负提示（只读骨架不进 formatWizardPromptBody / 冻结指纹；去掉建议是显式导演动作；不改 WIZARD_POST_MATERIALIZE_NEXT；schemaVersion 仍为 1；不把 scaffold 当 bond-loop 关账；不跳过 Binding、不派发）
 - [x] Align/Core/App 向导物化校验同源（listWizardMaterializeValidationErrors 并集：2–6/15s/至少 1 original/标题动作景别运镜时长/扩写不得锚原文/歧义未裁决；Vue 不 value-import wizard.ts；不改 formatWizardPromptBody / WIZARD_POST_MATERIALIZE_NEXT；schemaVersion 仍为 1；不跳过 Binding、不派发）
+- [x] 向导建议资产缺规范记录禁止静默跳过（打开解析 suggestedAssetResolutions 露 category/name；Core/App 写路径先解析再失败关闭，不先写 prompt；去掉建议是显式导演动作；不改 formatWizardPromptBody / WIZARD_POST_MATERIALIZE_NEXT；schemaVersion 仍为 1；不跳过 Binding、不派发）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
