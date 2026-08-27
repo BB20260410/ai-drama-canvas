@@ -1,0 +1,56 @@
+{
+  "id": "goal-canvas-overview-checkpoint-gate-20260826",
+  "kind": "canvas-overview-checkpoint-gate",
+  "conclusion": "PASS",
+  "createdAt": "2026-08-26T23:59:30.000Z",
+  "scope": "ManagedStudioCanvasView primaryStart and node freeze-dispatch reuse the already-loaded overview.checkpoint. When newSlotDispatchAllowed === false, the main button is disabled and both primaryStart and runNodeAction(freeze-dispatch) return without persistWorkflow / requestGeneration. Unprojected overview does not block. unit-grid wait/retry/Review labels still win over the gate on the node panel. Zero extra IPC. Does not change dashboard projection, T4, T5, or action codes. schemaVersion of the node panel remains 1.",
+  "invariants": {
+    "usesLoadedOverviewOnly": true,
+    "zeroExtraIpc": true,
+    "unprojectedDoesNotBlock": true,
+    "unitGridWaitWinsOverGate": true,
+    "doesNotPersistWhenBlocked": true,
+    "doesNotEmitRequestGenerationWhenBlocked": true,
+    "doesNotChangeActionCodes": true,
+    "nodePanelSchemaVersionStill1": true,
+    "doesNotChangeT4": true,
+    "doesNotChangeT5": true,
+    "doesNotChangeDashboardProjection": true,
+    "doesNotOpenCheckpointControl": true
+  },
+  "proof": {
+    "typecheckApp": "PASS",
+    "targetedTests": {
+      "files": [
+        "tests/studio-script-library-projection.test.ts",
+        "tests/studio-ssl5-missing-to-gen.test.ts",
+        "tests/script-media-align-view.test.ts",
+        "tests/studio-script-media-align.test.ts",
+        "tests/studio-generation-plan-draft.test.ts",
+        "tests/studio-canvas-node-action-panel.test.ts",
+        "tests/managed-studio-canvas-ui.test.ts",
+        "tests/studio-persisted-plan-next.test.ts",
+        "tests/studio-panel-standing-prompt.test.ts",
+        "tests/runtime-perf-wave4d-readonly-diagnostics-lazy-import.test.ts",
+        "tests/runtime-perf-wave3d-ssl5-reuse-board-earliest.test.ts",
+        "tests/studio-generation-control-ui.test.ts",
+        "tests/studio-trace-ui.test.ts",
+        "tests/studio-script-library-reader.test.ts"
+      ],
+      "result": "14 files / 209 tests PASS"
+    },
+    "commit": "c584fa0",
+    "linuxDirfdNote": "tests/studio-generation-session-snapshot.test.ts P7 fixture still needs Darwin dirfd; not claimed as this Cloud gate"
+  },
+  "notClaimed": [
+    "installed T23",
+    "list GUI probe",
+    "P7 owner",
+    "real-generation constraint evidence",
+    "100% fit",
+    "runtime speed closed",
+    "runLastWorkflowGroup gated",
+    "readiness reads checkpoint control",
+    "dashboard unit-level nextAction rewritten to complete-checkpoint"
+  ]
+}

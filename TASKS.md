@@ -78,6 +78,7 @@
 - [x] 阅读器复用已算 earliest 露出六图闸/写租约（checkpointLine / writeLeaseLine；不 import 对照模块；schemaVersion 仍为 1；不抢租约、不派发）
 - [x] session-snapshot 写租约只读 peek（withStudioProjectWriteLease + getStudioProjectWriteLeaseReadOnly；只拷 held/holderId/denialHint/line；不暴露 token；不进 fingerprint；不改 nextAction / 草稿 ready；失败关闭为未持有；不抢租约、不派发；schemaVersion 仍为 1）
 - [x] session-snapshot 六图闸只读 peek（动态 import 首屏 DashboardGate；只拷 newSlotDispatchAllowed/blockingBatchNumber/line；不进 fingerprint；不改 nextAction / 草稿 ready；失败关闭为未放行；不执行停检、不派发；schemaVersion 仍为 1）
+- [x] 画布主按钮/节点 freeze-dispatch 复用已加载 overview 六图闸（newSlotDispatchAllowed===false 时禁用主按钮；primaryStart / runNodeAction 不 persist / 不 emit；未投影不挡；unit-grid wait 文案优先；零额外 IPC；不改动作 code / dashboard / T4/T5；schemaVersion 仍为 1）
 - [ ] 安装版 T23 / 列表 GUI 探针 / P7 / 真生图（仅 owner）
 
 ## software_goal: runtime-perf-memory-20260825
