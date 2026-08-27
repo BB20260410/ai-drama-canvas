@@ -172,7 +172,12 @@
         <div class="workflow-toolbar" data-testid="managed-canvas-workflow-toolbar" aria-label="工作流组">
           <span data-testid="managed-canvas-selection-count">已选宫格 {{ selectedPanelIds.length }}</span>
           <button type="button" data-testid="managed-canvas-create-workflow" :disabled="loading || selectedPanelIds.length === 0 || workflowBusy" @click="createWorkflowFromSelection">保存所选</button>
-          <button type="button" data-testid="managed-canvas-run-workflow" :disabled="loading || workflowBusy || workflowGroups.length === 0 || !unitDetail" @click="runLastWorkflowGroup">执行最近工作流组</button>
+          <button
+            type="button"
+            data-testid="managed-canvas-run-workflow"
+            :disabled="loading || workflowBusy || workflowGroups.length === 0 || !unitDetail || checkpointNewSlotBlocked"
+            :title="checkpointNewSlotBlocked ? checkpointGateHint : undefined"
+            @click="runLastWorkflowGroup">执行最近工作流组</button>
           <span v-if="workflowGroups.length" data-testid="managed-canvas-workflow-count">工作流 {{ workflowGroups.length }}</span>
           <span v-if="lastWorkflowTitle" data-testid="managed-canvas-last-workflow">最近：{{ lastWorkflowTitle }}</span>
           <span v-if="lastWorkflowRunSummary" data-testid="managed-canvas-workflow-run-summary">{{ lastWorkflowRunSummary }}</span>
@@ -6555,6 +6560,10 @@ async function runLastWorkflowGroup(): Promise<void> {
     if (!workflowActionIsCurrent(scope)) return;
     if (runtimeWriteBlocked.value) {
       errorMessage.value = "运行工件或源码身份不可确认；已停止工作流派发，请重启源码无限画布。";
+      return;
+    }
+    if (checkpointNewSlotBlocked.value) {
+      errorMessage.value = checkpointGateHint.value;
       return;
     }
     await executeWorkflowGroup(group, frozenDraft, true, scope);

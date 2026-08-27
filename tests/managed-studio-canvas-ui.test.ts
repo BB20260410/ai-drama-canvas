@@ -409,6 +409,7 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     const canvas = source("src/renderer/src/components/ManagedStudioCanvasView.vue");
     expect(canvas).toContain('data-testid="managed-canvas-run-workflow"');
     expect(canvas).toContain("runLastWorkflowGroup");
+    expect(canvas).toContain("checkpointNewSlotBlocked");
   });
 
   it("P15/MVP：主前台显式选择 Codex/Grok，复杂门禁仍走受管 Studio owner", () => {
@@ -482,6 +483,8 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain("六图闸未放行，未派发");
     expect(canvas).toContain("六图闸未放行");
     expect(canvas).toContain('code === "freeze-dispatch"');
+    expect(canvas).toContain("runLastWorkflowGroup");
+    expect(canvas).toContain('data-testid="managed-canvas-run-workflow"');
     expect(canvas).not.toContain("getStudioGenerationCheckpointControl");
     expect(canvas).not.toContain("from \"@core/studio-generation-checkpoint");
     expect(canvas).not.toContain("from \"@core/studio-generation-plan-draft");
