@@ -460,6 +460,7 @@ describe("create-plan 草稿接线源码合同", () => {
     const panel = source("src/core/studio-canvas-node-action-panel.ts");
     expect(panel).toContain("canvasFreezeDispatchOverrideForUnitGridBlocking");
     expect(panel).toContain("canvasFreezeDispatchOverrideForCheckpointGate");
+    expect(panel).toContain("unitGridNextActionBlockingKind");
     expect(panel).toContain("unitGridNextActionCode");
     expect(panel).toContain("unitGridNextActionLabel");
     expect(panel).toContain("checkpointNewSlotDispatchAllowed");
@@ -474,6 +475,8 @@ describe("create-plan 草稿接线源码合同", () => {
     expect(canvas).toContain("unitGridNextActionLabel: unitDetail.value?.nextAction.label");
     expect(canvas).toContain("overview.value?.checkpoint.newSlotDispatchAllowed");
     expect(canvas).toContain("checkpointNewSlotBlocked");
+    expect(canvas).toContain("unitGridDispatchBlocked");
+    expect(canvas).toContain("unitGridNextActionBlockingKind");
     expect(canvas).toContain("sameUnit ? unitDetail.value?.nextAction.code");
     expect(canvas).not.toContain("from \"@core/studio-generation-plan-draft");
     expect(canvas).not.toContain("studio-ssl5-missing-to-gen");

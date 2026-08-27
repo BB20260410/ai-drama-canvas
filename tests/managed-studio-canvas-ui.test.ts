@@ -485,6 +485,19 @@ describe("受管 Studio 无限画布 UI 合同", () => {
     expect(canvas).toContain('code === "freeze-dispatch"');
     expect(canvas).toContain("runLastWorkflowGroup");
     expect(canvas).toContain('data-testid="managed-canvas-run-workflow"');
+    expect(canvas).toMatch(
+      /async function runLastWorkflowGroup[\s\S]*?if \(checkpointNewSlotBlocked\.value\)[\s\S]*?await executeWorkflowGroup/u,
+    );
+    expect(canvas).toContain("unitGridDispatchBlocked");
+    expect(canvas).toContain("unitGridDispatchHint");
+    expect(canvas).toContain("unitGridNextActionBlockingKind");
+    expect(canvas).toContain("整板下一步不是派发，未派发");
+    expect(canvas).toMatch(
+      /async function primaryStart[\s\S]*?if \(unitGridDispatchBlocked\.value\)[\s\S]*?const mismatch = await preflightDraftMismatch/u,
+    );
+    expect(canvas).toMatch(
+      /async function runLastWorkflowGroup[\s\S]*?if \(unitGridDispatchBlocked\.value\)[\s\S]*?await executeWorkflowGroup/u,
+    );
     expect(canvas).not.toContain("getStudioGenerationCheckpointControl");
     expect(canvas).not.toContain("from \"@core/studio-generation-checkpoint");
     expect(canvas).not.toContain("from \"@core/studio-generation-plan-draft");

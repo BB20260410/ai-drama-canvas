@@ -7,7 +7,10 @@
 import {
   canvasFreezeDispatchOverrideForCheckpointGate,
   canvasFreezeDispatchOverrideForUnitGridBlocking,
+  unitGridNextActionBlockingKind,
 } from "./studio-generation-plan-draft.js";
+
+export { unitGridNextActionBlockingKind };
 
 export type StudioCanvasNodeActionCode =
   | "open-dashboard"

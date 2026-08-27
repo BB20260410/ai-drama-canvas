@@ -64,16 +64,18 @@
           type="button"
           class="primary-start"
           data-testid="managed-canvas-primary-start"
-          :disabled="loading || workflowBusy || !unitDetail || generationProjectionDegraded || runtimeWriteBlocked || checkpointNewSlotBlocked"
+          :disabled="loading || workflowBusy || !unitDetail || generationProjectionDegraded || runtimeWriteBlocked || checkpointNewSlotBlocked || unitGridDispatchBlocked"
           :title="generationProjectionDegraded
             ? generationProjectionHint
             : runtimeWriteBlocked
               ? runtimeWriteGateHint
             : checkpointNewSlotBlocked
               ? checkpointGateHint
+            : unitGridDispatchBlocked
+              ? unitGridDispatchHint
             : (!unitDetail ? '请先从素材库添加 15 秒分镜' : undefined)"
           @click="primaryStart">
-          {{ generationProjectionDegraded ? "账本待恢复" : (checkpointNewSlotBlocked ? "六图闸未放行" : (workflowBusy ? "正在预检并记录派发…" : (unitDetail ? `准备并记录 ${unitDetail.panels.length} 格派发` : "准备派发"))) }}
+          {{ generationProjectionDegraded ? "账本待恢复" : (checkpointNewSlotBlocked ? "六图闸未放行" : (unitGridDispatchBlocked ? "整板下一步不是派发" : (workflowBusy ? "正在预检并记录派发…" : (unitDetail ? `准备并记录 ${unitDetail.panels.length} 格派发` : "准备派发")))) }}
         </button>
       </div>
     </header>
@@ -175,8 +177,8 @@
           <button
             type="button"
             data-testid="managed-canvas-run-workflow"
-            :disabled="loading || workflowBusy || workflowGroups.length === 0 || !unitDetail || checkpointNewSlotBlocked"
-            :title="checkpointNewSlotBlocked ? checkpointGateHint : undefined"
+            :disabled="loading || workflowBusy || workflowGroups.length === 0 || !unitDetail || checkpointNewSlotBlocked || unitGridDispatchBlocked"
+            :title="checkpointNewSlotBlocked ? checkpointGateHint : (unitGridDispatchBlocked ? unitGridDispatchHint : undefined)"
             @click="runLastWorkflowGroup">执行最近工作流组</button>
           <span v-if="workflowGroups.length" data-testid="managed-canvas-workflow-count">工作流 {{ workflowGroups.length }}</span>
           <span v-if="lastWorkflowTitle" data-testid="managed-canvas-last-workflow">最近：{{ lastWorkflowTitle }}</span>
@@ -927,6 +929,7 @@ import {
 } from "@core/studio-canvas-workflow-groups-core";
 import {
   buildStudioCanvasNodeActionPanel,
+  unitGridNextActionBlockingKind,
   type StudioCanvasNodeActionCode,
 } from "@core/studio-canvas-node-action-panel";
 import { createStudioCanvasNodeStatusStore } from "@core/studio-canvas-node-status";
@@ -1130,6 +1133,13 @@ const checkpointGateHint = computed(() => {
   return batch != null
     ? `六图闸未放行（batch ${batch}），先完成停检/Review（不派发）`
     : "六图闸未放行，先完成停检/Review（不派发）";
+});
+/** 已加载 unitDetail.nextAction 为 wait/retry/Review/对账时挡主按钮与工作流组；planned 不挡。 */
+const unitGridDispatchBlocked = computed(() =>
+  unitGridNextActionBlockingKind(unitDetail.value?.nextAction.code) != null);
+const unitGridDispatchHint = computed(() => {
+  const label = unitDetail.value?.nextAction.label?.trim();
+  return label || "整板下一步不是派发（不派发）";
 });
 const rawReferenceProjectionLoading = ref(false);
 const rawReferenceProjectionIssue = ref<string | undefined>();
@@ -2665,6 +2675,10 @@ function runNodeAction(code: StudioCanvasNodeActionCode): void {
   if (code === "freeze-dispatch" && selection.value?.kind === "panel") {
     if (checkpointNewSlotBlocked.value) {
       errorMessage.value = checkpointGateHint.value;
+      return;
+    }
+    if (unitGridDispatchBlocked.value) {
+      errorMessage.value = unitGridDispatchHint.value;
       return;
     }
     emit("requestGeneration", {
@@ -6566,6 +6580,10 @@ async function runLastWorkflowGroup(): Promise<void> {
       errorMessage.value = checkpointGateHint.value;
       return;
     }
+    if (unitGridDispatchBlocked.value) {
+      errorMessage.value = unitGridDispatchHint.value;
+      return;
+    }
     await executeWorkflowGroup(group, frozenDraft, true, scope);
   } finally {
     if (workflowActionIsCurrent(scope)) workflowBusy.value = false;
@@ -6618,6 +6636,12 @@ async function primaryStart(): Promise<void> {
     if (checkpointNewSlotBlocked.value) {
       errorMessage.value = checkpointGateHint.value;
       lastWorkflowRunSummary.value = "六图闸未放行，未派发";
+      lastWorkflowFailed.value = true;
+      return;
+    }
+    if (unitGridDispatchBlocked.value) {
+      errorMessage.value = unitGridDispatchHint.value;
+      lastWorkflowRunSummary.value = "整板下一步不是派发，未派发";
       lastWorkflowFailed.value = true;
       return;
     }
