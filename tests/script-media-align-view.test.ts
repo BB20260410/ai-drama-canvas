@@ -439,6 +439,8 @@ describe("对照侧栏打开生成追溯", () => {
     expect(impactAlign).not.toContain("selectAlignRow");
     expect(impactAlign).not.toContain("from \"@core/studio-trace");
     expect(vue).toContain("refineSsl5FocusIfUnexpectedRevisionImpact(ssl5Plan.value, revisionImpact.value)");
+    expect(vue).toContain("planSsl5MissingToGen(props.projectRoot, query)");
+    expect(vue).not.toContain("revisionImpact: revisionImpact.value");
     expect(vue).toContain("ssl5DisplayedPlan");
     expect(vue).toContain("SSL5_UNEXPECTED_REVISION_IMPACT_REASON");
     expect(vue).toContain("ssl5DisplayedPlan?.generationPlanDraft.ready");

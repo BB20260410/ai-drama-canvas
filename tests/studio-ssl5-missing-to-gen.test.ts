@@ -925,7 +925,15 @@ describe("SSL-5 入口源码合同", () => {
     expect(server).toContain("writeLease/writeLeaseLine");
     expect(server).toContain("missingReport");
     expect(server).toContain("acquire-lease");
+    expect(server).toContain("省略不自动查");
     expect(server).toContain("withStudioSsl5MissingToGen");
+    const ssl5Handler = server.slice(
+      server.indexOf('if (operation === "ssl5-missing-to-gen-plan")'),
+      server.indexOf('if (operation === "script-span-media-map")'),
+    );
+    expect(ssl5Handler).toContain("revisionImpact");
+    expect(ssl5Handler).not.toContain("getStudioScriptRevisionImpact");
+    expect(ssl5Handler).not.toContain("getStudioGenerationTrace");
     expect(server).not.toMatch(/from ["'].*studio-ssl5-missing-to-gen\.js["']/u);
     expect(lazy).toContain('import("./studio-ssl5-missing-to-gen.js")');
     expect(ssl5).not.toMatch(/getStudioEpisodeEarliest\s*\(/u);
@@ -938,6 +946,8 @@ describe("SSL-5 入口源码合同", () => {
     expect(ssl5).toContain("refineSsl5FocusIfCheckpointBlocking");
     expect(ssl5).toContain("formatAlignCheckpointLine");
     expect(ssl5).toContain("refineSsl5RecommendedPathIfWriteLeaseOpen");
+    expect(ssl5).toContain("refineSsl5FocusIfUnexpectedRevisionImpact");
+    expect(ssl5).toContain("query.revisionImpact");
     expect(ssl5).toContain("formatAlignWriteLeaseLine");
     expect(ssl5).not.toContain("studio-generation-checkpoint");
     expect(ssl5).not.toContain("getStudioGenerationCheckpointControl");
@@ -1029,6 +1039,7 @@ describe("SSL-5 入口源码合同", () => {
     expect(director).toContain("六图闸");
     expect(director).toContain("acquire-lease");
     expect(director).toContain("缺图报告");
+    expect(director).toContain("已取回的 revisionImpact 可传入，省略不自动查");
     expect(director).not.toContain("dispatch_studio_generation_pack");
   });
 });

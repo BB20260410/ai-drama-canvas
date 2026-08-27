@@ -398,7 +398,13 @@ const api = {
     ipcRenderer.invoke("canvas:get-studio-script-span-media-map", projectRoot, query),
   planSsl5MissingToGen: (
     projectRoot: string,
-    query: { season: string; episode: string; documentId?: string; evidenceDir?: string },
+    query: {
+      season: string;
+      episode: string;
+      documentId?: string;
+      evidenceDir?: string;
+      revisionImpact?: import("../core/studio-generation-plan-draft.js").Ssl5RevisionImpactHint;
+    },
   ): ReturnType<typeof import("../core/studio-ssl5-missing-to-gen.js").planSsl5MissingToGen> =>
     ipcRenderer.invoke("canvas:plan-ssl5-missing-to-gen", projectRoot, query),
   getStudioScriptLibraryIndex: (

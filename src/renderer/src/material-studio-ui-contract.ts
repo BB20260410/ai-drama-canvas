@@ -336,7 +336,12 @@ export interface StudioScriptProductUiApi {
     projectRoot: string,
     query: { scriptRevisionId: string; limit?: number; cursor?: string },
   ): Promise<import("../../core/studio-trace.js").StudioScriptRevisionImpactPage>;
-  planSsl5MissingToGen(projectRoot: string, query: { season: string; episode: string; documentId?: string }): Promise<Ssl5MissingToGenPlan>;
+  planSsl5MissingToGen(projectRoot: string, query: {
+    season: string;
+    episode: string;
+    documentId?: string;
+    revisionImpact?: import("../../core/studio-generation-plan-draft.js").Ssl5RevisionImpactHint;
+  }): Promise<Ssl5MissingToGenPlan>;
   getStudioScriptSpanMediaMap(projectRoot: string, query: {
     season: string;
     episode: string;

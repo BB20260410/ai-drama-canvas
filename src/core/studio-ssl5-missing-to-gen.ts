@@ -41,9 +41,11 @@ import {
 import type { CharacterBackReference, PropBackReference, SceneBackReference } from "./studio-scene-backrefs.js";
 import {
   composeSsl5GenerationPlanDraft,
+  refineSsl5FocusIfUnexpectedRevisionImpact,
   unitGridNextActionBlockingKind,
   type PersistedPlanNodeStatus,
   type Ssl5GenerationPlanDraft,
+  type Ssl5RevisionImpactHint,
 } from "./studio-generation-plan-draft.js";
 import {
   generationLedgerSidecarPath,
@@ -519,7 +521,14 @@ export function refineSsl5FocusPlanDraftIfPersisted(
 
 export async function planSsl5MissingToGen(
   projectRoot: string,
-  query: { season: string; episode: string; evidenceDir?: string; documentId?: string },
+  query: {
+    season: string;
+    episode: string;
+    evidenceDir?: string;
+    documentId?: string;
+    /** 调用方已取回的 script-revision-impact 页。省略不自动查。 */
+    revisionImpact?: Ssl5RevisionImpactHint;
+  },
 ): Promise<Ssl5MissingToGenPlan> {
   const board = await getStudioScriptMediaAlignBoard(projectRoot, {
     season: query.season,
@@ -529,14 +538,16 @@ export async function planSsl5MissingToGen(
   });
   // earliest 已由 align-board 算过；禁止二次 getStudioEpisodeEarliest。
   const plan = buildSsl5PlanFromBoard(projectRoot, query, board);
-  if (!plan.focusUnitId || !plan.focusPanelId || !plan.focusPackId) return plan;
+  if (!plan.focusUnitId || !plan.focusPanelId || !plan.focusPackId) {
+    return refineSsl5FocusIfUnexpectedRevisionImpact(plan, query.revisionImpact);
+  }
   const persisted = readPersistedPanelPlanState(
     generationLedgerSidecarPath(projectRoot),
     plan.focusUnitId,
     plan.focusPanelId,
   );
-  return refineSsl5RecommendedPathIfWriteLeaseOpen(refineSsl5FocusIfCheckpointBlocking(refineSsl5FocusIfEarliestBlocking(refineSsl5FocusPlanDraftIfPersisted(plan, {
+  return refineSsl5FocusIfUnexpectedRevisionImpact(refineSsl5RecommendedPathIfWriteLeaseOpen(refineSsl5FocusIfCheckpointBlocking(refineSsl5FocusIfEarliestBlocking(refineSsl5FocusPlanDraftIfPersisted(plan, {
     hasPlan: persisted.hasPlan,
     status: persisted.status ?? undefined,
-  }))));
+  })))), query.revisionImpact);
 }
