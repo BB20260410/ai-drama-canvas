@@ -77,13 +77,35 @@ describe("studio-storyboard-wizard", () => {
 
   it("validateWizardForMaterialize enforces 15s and visualAction", () => {
     const panels = toWizardEditablePanels([basePanel(1), basePanel(2), basePanel(3)]) as WizardEditablePanel[];
-    expect(validateWizardForMaterialize(panels).some((e) => e.includes("visualAction"))).toBe(true);
+    expect(validateWizardForMaterialize(panels).some((e) => e.includes("画面动作"))).toBe(true);
     const filled = applyWizardPanelEdits(panels, [
       { panelIndex: 1, visualAction: "a" },
       { panelIndex: 2, visualAction: "b" },
       { panelIndex: 3, visualAction: "c" },
     ]);
     expect(validateWizardForMaterialize(filled)).toEqual([]);
+    const allExtension = toWizardEditablePanels([
+      { ...basePanel(1), shotType: "extension", sourceSpans: [] },
+      { ...basePanel(2), shotType: "extension", sourceSpans: [] },
+      { ...basePanel(3), shotType: "extension", sourceSpans: [] },
+    ]);
+    const filledExtension = applyWizardPanelEdits(allExtension, [
+      { panelIndex: 1, visualAction: "a" },
+      { panelIndex: 2, visualAction: "b" },
+      { panelIndex: 3, visualAction: "c" },
+    ]);
+    expect(validateWizardForMaterialize(filledExtension)).toContain("至少 1 个 original 格");
+    const anchoredExtension = toWizardEditablePanels([
+      basePanel(1),
+      { ...basePanel(2), shotType: "extension" },
+      basePanel(3),
+    ]);
+    const filledAnchored = applyWizardPanelEdits(anchoredExtension, [
+      { panelIndex: 1, visualAction: "a" },
+      { panelIndex: 2, visualAction: "b" },
+      { panelIndex: 3, visualAction: "c" },
+    ]);
+    expect(validateWizardForMaterialize(filledAnchored)).toContain("G2 扩写格不得锚定原文");
   });
 
   it("未裁决歧义禁止物化，显式选用/排除后才放行", () => {

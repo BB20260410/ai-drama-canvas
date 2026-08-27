@@ -617,10 +617,7 @@ export type FrozenPanelOverlayRow = {
   costume: string | null;
 };
 
-/**
- * 追溯/brief 共用：只从各格冻结 renderedPrompt 还原宫格光线/服装覆盖。
- * 两行都没有的格不进数组；全空则调用方应省略字段，保持历史 P24 投影兼容。
- */
+/** 向导歧义提案字段。物化前禁止静默选第一个候选。 */
 export type WizardUnresolvedProposalFields = {
   surfaceText?: string;
   candidateAssetIds?: readonly string[];
@@ -630,6 +627,48 @@ export type WizardUnresolvedPanelFields = {
   panelIndex: number;
   unresolvedProposals?: ReadonlyArray<WizardUnresolvedProposalFields>;
 };
+
+export type WizardMaterializeValidationPanel = WizardUnresolvedPanelFields & {
+  shotType?: string;
+  title?: string;
+  visualAction?: string;
+  shotComposition?: string;
+  filmingMethod?: string;
+  durationSeconds?: number;
+  sourceSpans?: ReadonlyArray<unknown>;
+};
+
+/**
+ * Align / Core 共用物化前校验。取两边并集：2–6 格、≈15s、至少 1 个 original、
+ * 标题/动作/景别/运镜/时长、扩写格不得锚定原文、歧义未裁决。
+ * Vue 可 value-import；不要让对照面 value-import studio-storyboard-wizard。
+ */
+export function listWizardMaterializeValidationErrors(
+  panels: ReadonlyArray<WizardMaterializeValidationPanel>,
+): string[] {
+  const errors: string[] = [];
+  if (panels.length < 2 || panels.length > 6) errors.push("宫格数量必须为 2–6");
+  if (!panels.some((panel) => panel.shotType === "original")) {
+    errors.push("至少 1 个 original 格");
+  }
+  const total = panels.reduce((sum, panel) => sum + Number(panel.durationSeconds || 0), 0);
+  if (Math.abs(total - 15) > 0.05) {
+    errors.push(`总时长必须为 15 秒，当前 ${Math.round(total * 10) / 10} 秒`);
+  }
+  for (const panel of panels) {
+    const index = panel.panelIndex;
+    if (!String(panel.title || "").trim()) errors.push(`G${index} 缺少标题`);
+    if (!String(panel.visualAction || "").trim()) errors.push(`G${index} 缺少画面动作`);
+    if (!String(panel.shotComposition || "").trim()) errors.push(`G${index} 缺少景别/构图`);
+    if (!String(panel.filmingMethod || "").trim()) errors.push(`G${index} 缺少运镜`);
+    if (Number(panel.durationSeconds || 0) <= 0) errors.push(`G${index} 时长必须大于 0`);
+    if (panel.shotType === "extension" && (panel.sourceSpans?.length ?? 0) > 0) {
+      errors.push(`G${index} 扩写格不得锚定原文`);
+    }
+  }
+  errors.push(...listWizardUnresolvedMaterializeErrors(panels));
+  return errors;
+}
 
 /** 物化前歧义未裁决错误。禁止静默选第一个候选。 */
 export function listWizardUnresolvedMaterializeErrors(

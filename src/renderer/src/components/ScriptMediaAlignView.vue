@@ -60,7 +60,7 @@ import {
   formatWizardLockPreviousCostumeLine,
   formatWizardLockPreviousLightingLine,
   formatWizardVideoPromptScaffoldLine,
-  listWizardUnresolvedMaterializeErrors,
+  listWizardMaterializeValidationErrors,
   wizardPreviousCostumeForPanel,
   wizardPreviousLightingForPanel,
   wizardPreviousStandingForPanel,
@@ -718,25 +718,7 @@ function reflowWizardTimings(): void {
   }
 }
 
-const wizardValidationErrors = computed(() => {
-  const panels = wizardPanels.value;
-  const errors: string[] = [];
-  if (panels.length < 2 || panels.length > 6) errors.push("宫格数量必须为 2–6");
-  const total = panels.reduce((sum, panel) => sum + Number(panel.durationSeconds || 0), 0);
-  if (Math.abs(total - 15) > 0.05) errors.push(`总时长必须为 15 秒，当前 ${Math.round(total * 10) / 10} 秒`);
-  panels.forEach((panel) => {
-    if (!panel.title.trim()) errors.push(`G${panel.panelIndex} 缺少标题`);
-    if (!panel.visualAction.trim()) errors.push(`G${panel.panelIndex} 缺少画面动作`);
-    if (!panel.shotComposition.trim()) errors.push(`G${panel.panelIndex} 缺少景别/构图`);
-    if (!panel.filmingMethod.trim()) errors.push(`G${panel.panelIndex} 缺少运镜`);
-    if (panel.durationSeconds <= 0) errors.push(`G${panel.panelIndex} 时长必须大于 0`);
-    if (panel.shotType === "extension" && panel.sourceSpans.length > 0) {
-      errors.push(`G${panel.panelIndex} 扩写格不得锚定原文`);
-    }
-  });
-  errors.push(...listWizardUnresolvedMaterializeErrors(panels));
-  return errors;
-});
+const wizardValidationErrors = computed(() => listWizardMaterializeValidationErrors(wizardPanels.value));
 
 function decideWizardUnresolved(
   panelIndex: number,

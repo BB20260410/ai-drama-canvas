@@ -20,7 +20,7 @@ import {
   type StudioProductionPanelInput,
 } from "./studio-production.js";
 import { getStudioCanonicalAsset } from "./material-studio.js";
-import { formatWizardPromptBody, listWizardUnresolvedMaterializeErrors } from "./studio-panel-standing.js";
+import { formatWizardPromptBody, listWizardMaterializeValidationErrors } from "./studio-panel-standing.js";
 
 export const STORYBOARD_WIZARD_SCHEMA_VERSION = 1 as const;
 /** 物化后只读下一步。不跳过 Binding，不自动派发，中间必须 create-plan。 */
@@ -182,24 +182,9 @@ export function applyWizardPanelEdits(
   });
 }
 
-/** 纯：物化前校验（extension 时长、原镜数量、动作非空）。 */
+/** 纯：物化前校验。与对照面向导同源，见 listWizardMaterializeValidationErrors。 */
 export function validateWizardForMaterialize(panels: WizardEditablePanel[]): string[] {
-  const errors: string[] = [];
-  if (panels.length < 2 || panels.length > 6) errors.push("panelCount 必须 2–6");
-  const originals = panels.filter((p) => p.shotType === "original");
-  if (originals.length < 1) errors.push("至少 1 个 original 格");
-  const total = panels.reduce((s, p) => s + Number(p.durationSeconds || 0), 0);
-  if (Math.abs(total - 15) > 0.05) errors.push(`时长合计须≈15s，当前 ${total}`);
-  for (const p of panels) {
-    if (p.shotType === "extension" && (p.durationSeconds <= 0 || p.sourceSpans.length > 0)) {
-      // extension 允许有 0 时长在建议阶段；物化前必须修好
-      if (p.durationSeconds <= 0) errors.push(`extension G${p.panelIndex} 时长必须 >0`);
-    }
-    if (!p.visualAction.trim()) errors.push(`G${p.panelIndex} 缺少 visualAction`);
-    if (!p.title.trim()) errors.push(`G${p.panelIndex} 缺少 title`);
-  }
-  errors.push(...listWizardUnresolvedMaterializeErrors(panels));
-  return errors;
+  return listWizardMaterializeValidationErrors(panels);
 }
 
 export async function openStudioStoryboardWizard(

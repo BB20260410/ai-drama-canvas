@@ -479,17 +479,19 @@ describe("对照侧栏打开生成追溯", () => {
 
   it("向导歧义未裁决不得物化，提供选用/排除，不默认第一候选", () => {
     const vue = source();
-    expect(vue).toContain("listWizardUnresolvedMaterializeErrors");
+    expect(vue).toContain("listWizardMaterializeValidationErrors");
     expect(vue).toContain("applyWizardUnresolvedDecision");
-    expect(vue).toContain("errors.push(...listWizardUnresolvedMaterializeErrors(panels))");
+    expect(vue).toContain("listWizardMaterializeValidationErrors(wizardPanels.value)");
     expect(vue).toContain('data-testid="wizard-unresolved-exclude"');
     expect(vue).toContain("wizard-unresolved-include-");
     expect(vue).toContain("decideWizardUnresolved");
     expect(vue).toContain("禁止默认第一候选");
     expect(vue).not.toContain("candidateAssetIds[0]");
+    expect(vue).not.toContain("listWizardUnresolvedMaterializeErrors");
     const app = readFileSync(path.join(root, "src/renderer/src/App.vue"), "utf8");
-    expect(app).toContain("listWizardUnresolvedMaterializeErrors(input.panels)");
-    expect(app).toContain("if (unresolved.length)");
+    expect(app).toContain("listWizardMaterializeValidationErrors(input.panels)");
+    expect(app).toContain("if (validation.length)");
+    expect(app).not.toContain("listWizardUnresolvedMaterializeErrors");
   });
 
   it("向导露出拆格骨架与建议资产，可改转场负提示，不 value-import wizard.ts", () => {

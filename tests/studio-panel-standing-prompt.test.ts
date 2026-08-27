@@ -43,6 +43,7 @@ import {
   studioAgentImagegenBriefConstraintLines,
   frozenPanelOverlaysFromFrozenPanelPacks,
   listWizardUnresolvedMaterializeErrors,
+  listWizardMaterializeValidationErrors,
   applyWizardUnresolvedDecision,
   FROZEN_PANEL_LIGHTING_COSTUME_TOOL_NOTE,
   EXTENSION_SHOT_TYPE_TOOL_NOTE,
@@ -652,5 +653,54 @@ describe("向导歧义裁决", () => {
     });
     expect(excluded[0]?.suggestedAssetIds).toEqual([]);
     expect(excluded[0]?.unresolvedProposals).toEqual([]);
+  });
+});
+
+describe("向导物化校验同源", () => {
+  function ok(index: number, overrides: Record<string, unknown> = {}) {
+    return {
+      panelIndex: index,
+      shotType: "original",
+      title: `G${index}`,
+      visualAction: "站定",
+      shotComposition: "中景",
+      filmingMethod: "固定",
+      durationSeconds: 5,
+      sourceSpans: [{ startOffsetUtf16: 0, endOffsetUtf16: 2 }],
+      unresolvedProposals: [],
+      ...overrides,
+    };
+  }
+
+  it("Align/Core/App 共用并集：缺 original、扩写锚定、缺景别失败关闭", () => {
+    expect(listWizardMaterializeValidationErrors([ok(1), ok(2), ok(3)])).toEqual([]);
+    expect(listWizardMaterializeValidationErrors([
+      ok(1, { visualAction: "" }),
+      ok(2),
+      ok(3),
+    ])).toContain("G1 缺少画面动作");
+    expect(listWizardMaterializeValidationErrors([
+      ok(1, { shotType: "extension", sourceSpans: [] }),
+      ok(2, { shotType: "extension", sourceSpans: [] }),
+      ok(3, { shotType: "extension", sourceSpans: [] }),
+    ])).toContain("至少 1 个 original 格");
+    expect(listWizardMaterializeValidationErrors([
+      ok(1),
+      ok(2, { shotType: "extension" }),
+      ok(3),
+    ])).toContain("G2 扩写格不得锚定原文");
+    expect(listWizardMaterializeValidationErrors([
+      ok(1, { shotComposition: "  " }),
+      ok(2),
+      ok(3),
+    ])).toContain("G1 缺少景别/构图");
+    const wizard = readFileSync(path.join(repoRoot, "src/core/studio-storyboard-wizard.ts"), "utf8");
+    expect(wizard).toContain("return listWizardMaterializeValidationErrors(panels)");
+    const align = readFileSync(path.join(repoRoot, "src/renderer/src/components/ScriptMediaAlignView.vue"), "utf8");
+    expect(align).toContain("listWizardMaterializeValidationErrors(wizardPanels.value)");
+    expect(align).not.toMatch(/import\s+\{[^}]*validateWizardForMaterialize/u);
+    const app = readFileSync(path.join(repoRoot, "src/renderer/src/App.vue"), "utf8");
+    expect(app).toContain("listWizardMaterializeValidationErrors(input.panels)");
+    expect(app).not.toContain("listWizardUnresolvedMaterializeErrors");
   });
 });
