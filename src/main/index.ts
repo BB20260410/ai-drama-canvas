@@ -3299,6 +3299,23 @@ function registerIpc(): void {
     if (runId) return getStudioGenerationTrace(projectRoot, { runId });
     return getStudioGenerationTrace(projectRoot, { resultId });
   });
+  ipcMain.handle("canvas:get-studio-script-revision-impact", async (
+    _event,
+    projectRoot: string,
+    query: { scriptRevisionId: string; limit?: number; cursor?: string },
+  ) => {
+    await requireManagedStudioProject(projectRoot);
+    const scriptRevisionId = typeof query?.scriptRevisionId === "string" ? query.scriptRevisionId.trim() : "";
+    if (!scriptRevisionId) throw new Error("script-revision-impact 需要 scriptRevisionId。");
+    const { getStudioScriptRevisionImpact } = await import("../core/studio-trace.js");
+    return getStudioScriptRevisionImpact(projectRoot, {
+      scriptRevisionId,
+      ...(query?.limit != null ? { limit: Math.min(Number(query.limit) || 20, 100) } : {}),
+      ...(typeof query?.cursor === "string" && query.cursor.trim()
+        ? { cursor: query.cursor.trim() }
+        : {}),
+    });
+  });
   ipcMain.handle("canvas:list-studio-text-revisions", async (
     _event,
     projectRoot: string,

@@ -35,5 +35,7 @@ describe("studio-script-library-reader", () => {
     expect(reader).not.toContain("evaluateStudioConsistency");
     expect(reader).not.toContain("studio-script-media-align");
     expect(reader).not.toContain("studio-project-write-lease");
+    expect(reader).not.toContain("studio-trace");
+    expect(reader).not.toContain("getStudioScriptRevisionImpact");
   });
 });

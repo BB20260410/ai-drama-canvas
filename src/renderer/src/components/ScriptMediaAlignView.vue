@@ -80,6 +80,7 @@ const reader = ref<ScriptReaderView | null>(null);
 const board = ref<ScriptMediaAlignBoard | null>(null);
 const ssl5Plan = ref<Ssl5MissingToGenPlan | null>(null);
 const spanMedia = ref<ScriptSpanMediaMap | null>(null);
+const revisionImpact = ref<Awaited<ReturnType<NonNullable<StudioScriptProductUiApi["getStudioScriptRevisionImpact"]>>> | null>(null);
 const units = ref<StudioProductionUnitSummary[]>([]);
 const season = ref(props.season ?? "");
 const episode = ref(props.episode ?? "");
@@ -169,6 +170,7 @@ async function selectDocument(documentId: string, switchTab = true): Promise<voi
       ...(season.value && episode.value ? { season: season.value, episode: episode.value } : {}),
       includeBody: true,
     });
+    revisionImpact.value = null;
     selectionStart.value = 0;
     selectionEnd.value = defaultSelectionLength(reader.value.body);
     wizard.value = null;
@@ -290,6 +292,7 @@ async function bootstrap(): Promise<void> {
   board.value = null;
   ssl5Plan.value = null;
   spanMedia.value = null;
+  revisionImpact.value = null;
   wizard.value = null;
   wizardPanels.value = [];
   selectedDocumentId.value = "";
@@ -402,6 +405,64 @@ function excerptForPanel(panel: WizardEditablePanel): string {
     .join("")
     .trim()
     .slice(0, 2_000);
+}
+
+function impactUnexpectedRowCount(
+  page: NonNullable<typeof revisionImpact.value>,
+): number {
+  return page.items.reduce(
+    (count, unit) => count + unit.rows.filter((row) => row.changeClassification === "unexpected").length,
+    0,
+  );
+}
+
+function impactClassificationLabel(classification: string | null): string {
+  if (classification === "unexpected") return "非预期变化，须人工复核（不自动 Review PASS）";
+  if (classification === "expected") return "预期变化";
+  if (classification === "current") return "当前";
+  return "未分类";
+}
+
+function openImpactRowTrace(row: { packId: string | null; runId: string | null }): void {
+  if (row.packId) {
+    void loadAlignGenerationTrace({ packId: row.packId });
+    return;
+  }
+  if (row.runId) {
+    void loadAlignGenerationTrace({ runId: row.runId });
+    return;
+  }
+}
+
+async function lookupRevisionImpact(): Promise<void> {
+  if (actionLoading.value) return;
+  if (!reader.value) return;
+  if (!props.api.getStudioScriptRevisionImpact) {
+    report(new Error("当前桌面适配层未接入 script-revision-impact。"));
+    return;
+  }
+  actionLoading.value = "revision-impact";
+  error.value = "";
+  notice.value = "";
+  try {
+    revisionImpact.value = await props.api.getStudioScriptRevisionImpact(props.projectRoot, {
+      scriptRevisionId: reader.value.revisionId,
+      limit: 20,
+    });
+    if (revisionImpact.value.empty) {
+      notice.value = "该修订未钉到任何单元修订。";
+    } else {
+      const unexpected = impactUnexpectedRowCount(revisionImpact.value);
+      notice.value = unexpected
+        ? `本修订影响 ${revisionImpact.value.items.length} 个单元修订，其中 ${unexpected} 条非预期须人工复核。`
+        : `本修订影响 ${revisionImpact.value.items.length} 个单元修订。`;
+    }
+  } catch (reason) {
+    revisionImpact.value = null;
+    report(reason);
+  } finally {
+    actionLoading.value = "";
+  }
 }
 
 async function lookupSpanMedia(): Promise<void> {
@@ -1056,6 +1117,15 @@ function shortSha(value: string | null | undefined): string {
           </button>
           <button
             type="button"
+            data-testid="script-reader-revision-impact"
+            :disabled="Boolean(actionLoading) || !api.getStudioScriptRevisionImpact"
+            :title="actionLoading ? '正在处理，不能再查本修订影响' : undefined"
+            @click="lookupRevisionImpact"
+          >
+            {{ actionLoading === "revision-impact" ? "反查中…" : "本修订影响哪些图" }}
+          </button>
+          <button
+            type="button"
             data-testid="script-reader-to-wizard"
             :disabled="Boolean(actionLoading)"
             :title="actionLoading ? '正在处理，不能再生成分镜建议' : undefined"
@@ -1128,6 +1198,40 @@ function shortSha(value: string | null | undefined): string {
             </li>
           </ul>
           <p v-if="!spanMedia.hits.length">没有相交的宫格锚定；不能猜选区。</p>
+        </div>
+        <div v-if="revisionImpact" class="span-media" data-testid="script-reader-revision-impact-board">
+          <b>本修订影响</b>
+          <span v-if="revisionImpact.empty">该修订未钉到任何单元修订。</span>
+          <span v-else>单元修订 {{ revisionImpact.items.length }} · 非预期 {{ impactUnexpectedRowCount(revisionImpact) }} 须人工复核</span>
+          <p data-testid="script-reader-revision-impact-review">非预期变化必须人工复核；机器不自动 Review PASS。不派发。</p>
+          <ul>
+            <li v-for="unit in revisionImpact.items" :key="`${unit.unitId}:${unit.unitRevision}`" :data-testid="`revision-impact-unit-${unit.unitId}`">
+              <div class="span-media-hit-copy">
+                <b>{{ unit.unitId }} r{{ unit.unitRevision }} · {{ unit.title }} · {{ unit.panelCount }} 格</b>
+                <small v-if="unit.truncated">本单元扇出已截断</small>
+                <small
+                  v-for="(row, index) in unit.rows"
+                  :key="`${row.packId || 'none'}:${row.runId || 'none'}:${index}`"
+                  :data-testid="`revision-impact-row-${unit.unitId}-${index}`"
+                >
+                  {{ row.panelId || (row.targetKind === "unit-grid" ? "整板" : "未冻结") }}
+                  · {{ impactClassificationLabel(row.changeClassification) }}
+                  <template v-if="row.inputCurrent === false"> · 输入已过期</template>
+                </small>
+              </div>
+              <div class="span-media-hit-actions">
+                <button
+                  v-for="(row, index) in unit.rows.filter((entry) => entry.packId || entry.runId)"
+                  :key="`trace:${row.packId || row.runId}:${index}`"
+                  type="button"
+                  data-testid="revision-impact-row-trace"
+                  :disabled="!api.getStudioTrace"
+                  @click="openImpactRowTrace(row)"
+                >打开追溯</button>
+              </div>
+            </li>
+          </ul>
+          <p v-if="revisionImpact.nextCursor">还有后续单元修订；本页有界，不一次拉全量。</p>
         </div>
         <textarea
           ref="scriptBodyElement"

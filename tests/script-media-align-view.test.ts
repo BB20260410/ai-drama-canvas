@@ -39,6 +39,8 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain('data-testid="script-reader-to-wizard"');
     expect(vue).toContain('data-testid="script-reader-span-media"');
     expect(vue).toContain('data-testid="script-reader-span-media-board"');
+    expect(vue).toContain('data-testid="script-reader-revision-impact"');
+    expect(vue).toContain('data-testid="script-reader-revision-impact-board"');
     expect(vue).toContain("span-media-hit-standing");
     expect(vue).toContain("span-media-hit-handoff");
     expect(vue).toContain("span-media-hit-gaps");
@@ -150,6 +152,12 @@ describe("剧本库与 15 秒分镜源码合同", () => {
     expect(vue).toContain("openAlignGenerationTrace");
     expect(vue).toContain("resolveAlignTraceSelector");
     expect(vue).toContain("getStudioTrace");
+    expect(vue).toContain("getStudioScriptRevisionImpact");
+    expect(vue).toContain("lookupRevisionImpact");
+    expect(vue).toContain("scriptRevisionId: reader.value.revisionId");
+    expect(vue).toContain("须人工复核（不自动 Review PASS）");
+    expect(vue).not.toContain("from \"@core/studio-trace");
+    expect(vue).not.toContain("from \"@core/studio-generation-session-snapshot");
     expect(vue).toContain("禁止猜第一格");
     expect(vue).not.toContain("evaluateStudioConsistency");
     expect(vue).not.toContain("getStudioBindingControl");
@@ -385,5 +393,24 @@ describe("对照侧栏打开生成追溯", () => {
     expect(vue).not.toContain("evaluateStudioConsistency");
     expect(app).toContain("window.canvasApi.getStudioTrace");
     expect(contract).toContain("getStudioTrace?");
+  });
+
+  it("阅读器本修订影响走 script-revision-impact，无 pack/run 不猜第一格", () => {
+    const vue = source();
+    const app = readFileSync(path.join(root, "src/renderer/src/App.vue"), "utf8");
+    const contract = readFileSync(path.join(root, "src/renderer/src/material-studio-ui-contract.ts"), "utf8");
+    expect(vue).toContain('data-testid="script-reader-revision-impact"');
+    expect(vue).toContain("lookupRevisionImpact");
+    expect(vue).toContain("openImpactRowTrace");
+    expect(vue).toContain("getStudioScriptRevisionImpact");
+    expect(vue).toContain("scriptRevisionId: reader.value.revisionId");
+    expect(vue).toContain("limit: 20");
+    expect(vue).toContain("非预期变化必须人工复核");
+    expect(vue).toContain("不自动 Review PASS");
+    expect(vue).not.toContain("from \"@core/studio-trace");
+    expect(vue).not.toContain("evaluateStudioConsistency");
+    expect(vue).not.toContain("getStudioBindingControl");
+    expect(app).toContain("window.canvasApi.getStudioScriptRevisionImpact");
+    expect(contract).toContain("getStudioScriptRevisionImpact?");
   });
 });

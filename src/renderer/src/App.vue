@@ -967,6 +967,12 @@ const studioScriptAlignApi = {
   ) {
     return window.canvasApi.getStudioTrace(root, selector);
   },
+  getStudioScriptRevisionImpact(
+    root: string,
+    query: { scriptRevisionId: string; limit?: number; cursor?: string },
+  ) {
+    return window.canvasApi.getStudioScriptRevisionImpact(root, query);
+  },
   planSsl5MissingToGen(
     root: string,
     query: { season: string; episode: string; documentId?: string },

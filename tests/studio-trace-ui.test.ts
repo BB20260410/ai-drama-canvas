@@ -65,7 +65,7 @@ describe("P24 追溯 IPC 桌面接线（§4-8）", () => {
       source("src/main/index.ts"),
       source("src/preload/index.ts"),
     ]);
-    for (const channel of ["canvas:get-studio-generation-control", "canvas:get-studio-frozen-pack", "canvas:get-studio-pack-currentness", "canvas:get-studio-trace", "canvas:list-studio-text-revisions"]) {
+    for (const channel of ["canvas:get-studio-generation-control", "canvas:get-studio-frozen-pack", "canvas:get-studio-pack-currentness", "canvas:get-studio-trace", "canvas:get-studio-script-revision-impact", "canvas:list-studio-text-revisions"]) {
       expect(main).toContain(`ipcMain.handle("${channel}"`);
       const handlerStart = main.indexOf(`ipcMain.handle("${channel}"`);
       const handler = main.slice(handlerStart, handlerStart + 600);
@@ -76,11 +76,15 @@ describe("P24 追溯 IPC 桌面接线（§4-8）", () => {
     expect(preload).toContain('invoke("canvas:get-studio-frozen-pack", projectRoot, packId)');
     expect(preload).toContain('invoke("canvas:get-studio-pack-currentness", projectRoot, packId)');
     expect(preload).toContain('invoke("canvas:get-studio-trace", projectRoot, selector)');
+    expect(preload).toContain('invoke("canvas:get-studio-script-revision-impact", projectRoot, query)');
     expect(preload).toContain('invoke("canvas:list-studio-text-revisions", projectRoot, query)');
     expect(preload).toContain('invoke("canvas:get-studio-generation-control", projectRoot, query)');
     expect(main).toContain("getStudioGenerationControlEnvelope(projectRoot, query)");
     expect(main).toContain("readAnyStudioGenerationFrozenPack(projectRoot, packId)");
     expect(main).toContain("getStudioGenerationTrace(projectRoot, { packId })");
+    expect(main).toContain("getStudioScriptRevisionImpact");
+    expect(main).toContain('ipcMain.handle("canvas:get-studio-script-revision-impact"');
+    expect(main).toContain("selector 必须恰好包含 packId/runId/resultId 之一");
     // pack-currentness 在 main 侧走 target-aware 聚合（内部逐 BindingSet 仍经
     // buildStudioAssetBindingCurrentContext→currentness→classify 纯模块，与 trace 同一映射点；退化资产归 unexpected）。
     expect(main).toContain("evaluateStudioGenerationPackCurrentness(projectRoot, pack)");

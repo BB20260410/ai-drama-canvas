@@ -358,6 +358,11 @@ const api = {
     selector: { packId?: string; runId?: string; resultId?: string },
   ): Promise<import("../core/studio-trace.js").StudioGenerationTrace> =>
     t23IpcPerformanceProbe.invoke("canvas:get-studio-trace", projectRoot, selector),
+  getStudioScriptRevisionImpact: (
+    projectRoot: string,
+    query: { scriptRevisionId: string; limit?: number; cursor?: string },
+  ): Promise<import("../core/studio-trace.js").StudioScriptRevisionImpactPage> =>
+    t23IpcPerformanceProbe.invoke("canvas:get-studio-script-revision-impact", projectRoot, query),
   listStudioTextRevisions: (projectRoot: string, query: { documentId: string; limit?: number; cursor?: string }): ReturnType<typeof import("../core/studio-production.js").listStudioTextRevisions> => ipcRenderer.invoke("canvas:list-studio-text-revisions", projectRoot, query),
   getStudioProductionDashboard: (projectRoot: string, query: import("../core/studio-production-dashboard.js").StudioProductionDashboardQuery): ReturnType<typeof import("../core/studio-production-dashboard.js").getStudioProductionDashboard> =>
     t23IpcPerformanceProbe.invoke("canvas:get-studio-production-dashboard", projectRoot, query),

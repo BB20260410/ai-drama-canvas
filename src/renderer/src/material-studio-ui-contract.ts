@@ -332,6 +332,10 @@ export interface StudioScriptProductUiApi {
     projectRoot: string,
     selector: { packId?: string; runId?: string; resultId?: string },
   ): Promise<StudioGenerationTrace>;
+  getStudioScriptRevisionImpact?(
+    projectRoot: string,
+    query: { scriptRevisionId: string; limit?: number; cursor?: string },
+  ): Promise<import("../../core/studio-trace.js").StudioScriptRevisionImpactPage>;
   planSsl5MissingToGen(projectRoot: string, query: { season: string; episode: string; documentId?: string }): Promise<Ssl5MissingToGenPlan>;
   getStudioScriptSpanMediaMap(projectRoot: string, query: {
     season: string;
