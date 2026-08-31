@@ -180,7 +180,7 @@
   "devDependencies": {
     "@types/node": "24.10.1",
     "@vitejs/plugin-vue": "6.0.2",
-    "electron": "43.4.1",
+    "electron": "44.0.0",
     "electron-builder": "26.15.3",
     "electron-vite": "5.0.0",
     "esbuild": "0.25.12",
